@@ -450,8 +450,8 @@ def _closings(user, start: dt.date, end: dt.date) -> list[Event]:
     with itself for anybody who remembers putting the date in.
     """
     postings = (
-        JobPosting.objects.for_user(user)
-        .with_application_count()
+        JobPosting.objects.visible_to(user)
+        .with_status(user)
         .select_related("company")
         .filter(closes_at__gte=start, closes_at__lt=end)
     )

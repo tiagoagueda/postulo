@@ -21,7 +21,7 @@ from io import BytesIO
 from typing import Any
 
 from django.db import transaction
-from django.db.models import Prefetch
+from django.db.models import Prefetch, Q
 from django.utils import timezone
 
 from postulo import __version__
@@ -211,7 +211,12 @@ logger = logging.getLogger(__name__)
 #: names only restores every sector the names imply, and none other (#897).
 #: 71 added ``web_links`` on a company: its social profiles, in the shape a contact's are
 #: written. An archive without them restores none (#906).
-FORMAT_VERSION = 71
+#: 72 made a company's ``notes``, and a listing's ``state``, ``discard_reason``, ``noted_at``
+#: and ``decided_at``, the exporting person's own (#896): the same keys, holding theirs. A
+#: company owned by one of their groups is written as theirs are; one only shared with them
+#: is written where their own records point at it, with ``shared_from`` naming its owner, and
+#: comes back as the importing person's own copy. An older archive restores as it did.
+FORMAT_VERSION = 72
 
 
 def industry_entry(industry) -> str | dict:
@@ -1081,14 +1086,36 @@ def counts(user) -> dict[str, int]:
     }
 
 
+def _pointed_at(user):
+    """The companies ``user``'s own records point at: their contacts, listings, applications,
+    notes and career there (#896). A condition, for a query over companies."""
+    return (
+        Q(contacts__owner=user)
+        | Q(postings__owner=user)
+        | Q(postings__applications__owner=user)
+        | Q(postings__statuses__owner=user)
+        | Q(personal_notes__owner=user)
+        | Q(appointments__owner=user)
+        | Q(career_entries__owner=user)
+    )
+
+
 def build_document(user) -> dict:
     """Assemble everything belonging to ``user`` as one nested document."""
     from postulo.accounts.models import Profile
-    from postulo.applications.models import Appointment, Reminder
+    from postulo.applications.models import Application, Appointment, Reminder
     from postulo.core.models import Tag
     from postulo.documents import printing
     from postulo.documents.models import CV, CoverLetter, RenderedDocument, UploadedDocument
-    from postulo.jobs.models import Capture, Company, CompanyLogo, Contact, FieldHint
+    from postulo.jobs.models import (
+        Capture,
+        Company,
+        CompanyLogo,
+        Contact,
+        FieldHint,
+        JobPosting,
+        ListingEvent,
+    )
 
     # Read afresh rather than through the instance cached on the user, which may be stale.
     profile = Profile.objects.filter(user=user).first()
@@ -1133,7 +1160,8 @@ def build_document(user) -> dict:
         # exactly who refers people -- was in the account and not in the archive.
         "contacts": [
             _contact(contact)
-            for contact in Contact.objects.for_user(user)
+            for contact in Contact.objects.manageable_by(user)
+            .with_notes(user)
             .filter(company__isnull=True)
             .select_related("department")
             .prefetch_related(*CONTACT_CHANNELS)
@@ -1156,21 +1184,34 @@ def build_document(user) -> dict:
     # Everything the loop below touches is read here, in a fixed number of queries: this
     # runs inside the write lock, so a query per application or per contact is every other
     # request waiting on it (#557).
+    # What the person holds: their own and their groups' (#896). A record only shared with
+    # them is somebody else's, and comes along only where their own data points at it.
     companies = (
-        Company.objects.for_user(user)
+        Company.objects.visible_to(user)
+        .filter(
+            Q(pk__in=Company.objects.manageable_by(user).values("pk"))
+            # In a subquery: joined across five relations, a company would repeat.
+            | Q(pk__in=Company.objects.filter(_pointed_at(user)).values("pk"))
+        )
+        .with_notes(user)
         .select_related("parent")
         .prefetch_related(
             "industries",
             "identifiers",
             Prefetch(
                 "contacts",
-                queryset=Contact.objects.select_related("department").prefetch_related(
-                    *CONTACT_CHANNELS
-                ),
+                queryset=Contact.objects.visible_to(user)
+                .with_notes(user)
+                .select_related("department")
+                .prefetch_related(*CONTACT_CHANNELS),
             ),
+            # The person's own status on each listing, their own history of it and their
+            # own applications (#896): first, so the lookups below go through these.
+            Prefetch("postings", queryset=JobPosting.objects.visible_to(user).with_status(user)),
+            Prefetch("postings__events", queryset=ListingEvent.objects.filter(owner=user)),
+            Prefetch("postings__applications", queryset=Application.objects.filter(owner=user)),
             "postings__applications__tags",
             "postings__applications__offers",
-            "postings__events",
             "postings__applications__events",
             "postings__applications__reminders",
             "postings__applications__interviews__contacts",
@@ -1189,6 +1230,13 @@ def build_document(user) -> dict:
             "names",
         )
     )
+    from postulo.core.sharing import principal_label
+
+    shared_only = set(
+        companies.exclude(pk__in=Company.objects.manageable_by(user).values("pk")).values_list(
+            "pk", flat=True
+        )
+    )
     logo_types = dict(
         CompanyLogo.objects.filter(company__owner=user).values_list("company_id", "media_type")
     )
@@ -1196,6 +1244,9 @@ def build_document(user) -> dict:
         document["companies"].append(
             {
                 **_fields(company, COMPANY_FIELDS),
+                # Somebody else's, only shared with this person, and here because their own
+                # records point at it (#896): it comes back as their own copy.
+                **({"shared_from": principal_label(company)} if company.pk in shared_only else {}),
                 "logo_file": (
                     logo_member(company, logo_types[company.pk]) if company.pk in logo_types else ""
                 ),

@@ -90,7 +90,7 @@ def chosen_ids(request) -> list[int]:
     return list(seen)
 
 
-def chosen_rows(request, model):
+def chosen_rows(request, model, *, write: bool = False):
     """The rows this person actually owns, out of the ids they sent.
 
     The whole of the safety of this feature is in this function. `for_user()` is what makes a
@@ -100,7 +100,11 @@ def chosen_rows(request, model):
     ids = chosen_ids(request)
     if not ids:
         return model.objects.none()
-    return model.objects.for_user(request.user).filter(pk__in=ids)
+    objects = model.objects
+    if write and hasattr(objects, "visible_to"):
+        # Changing several shared records at once asks what changing one asks (#896).
+        return objects.visible_to(request.user, write=True).filter(pk__in=ids)
+    return objects.for_user(request.user).filter(pk__in=ids)
 
 
 def nothing_chosen() -> str:

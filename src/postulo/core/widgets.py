@@ -363,7 +363,8 @@ class Sources:
     def listings(self):
         from postulo.jobs.models import JobPosting
 
-        return JobPosting.objects.for_user(self.user)
+        # Each as this person stands with it (#896): their own status and applications.
+        return JobPosting.objects.visible_to(self.user).with_status(self.user)
 
     @cached_property
     def insights(self):

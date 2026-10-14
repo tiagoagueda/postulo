@@ -46,7 +46,9 @@ def export(person) -> dict:
         company.pk: company
         for company in Company.objects.for_user(person).prefetch_related("industries")
     }
-    rows = PostalAddress.objects.for_user(person).filter(
+    # Through the companies: a shared company's address is reached by it (#896).
+    rows = PostalAddress.objects.filter(
+        object_id__in=list(companies),
         content_type=ContentType.objects.get_for_model(Company),
         latitude__isnull=False,
         longitude__isnull=False,
@@ -162,8 +164,9 @@ def _match(person, point: Point):
         if company is not None:
             return company
     if point.name:
+        # A file placing companies matches the person's own, as every import does (#896).
         return (
-            Company.objects.for_user(person)
+            Company.objects.owned_by(person)
             .filter(name_key=slugs.name_key(point.name))
             .prefetch_related("postal_addresses")
             .first()

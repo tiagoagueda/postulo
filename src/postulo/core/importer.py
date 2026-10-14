@@ -1059,7 +1059,7 @@ def _restore_phone_numbers(
         )
 
 
-def load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportReport:
+def load(user, archive: zipfile.ZipFile, *, force: bool = False, into=None) -> ImportReport:
     """Create everything in ``archive`` under ``user``.
 
     Runs in one transaction: a failure half way through leaves the account exactly as it
@@ -1067,12 +1067,13 @@ def load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportReport
     database refuses that the importer did not foresee is an `ArchiveError`, a sentence
     for the operator rather than a traceback (#375).
     """
+
     # Every file written on the way, so that a failure takes them back with the rows (#663):
     # the transaction rolls the rows back and has no say over the bytes beside them.
     written: list[str] = []
     marker = _written.set(written)
     try:
-        return _load(user, archive, force=force)
+        return _load(user, archive, force=force, into=into)
     except BaseException as error:
         _take_back(written)
         if isinstance(error, IntegrityError):
@@ -1135,7 +1136,9 @@ def _file_problem(stored_name: str, content: bytes, said: dict, *, uploaded: boo
 
 
 @transaction.atomic
-def _load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportReport:
+def _load(user, archive: zipfile.ZipFile, *, force: bool = False, into=None) -> ImportReport:
+    # Who the companies, contacts and listings go to: the person, or a group of theirs (#896).
+    principal = into or user
     from postulo.accounts.models import PersonIdentifier
     from postulo.applications.models import (
         Application,
@@ -1168,8 +1171,11 @@ def _load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportRepor
         CompanyLogo,
         Contact,
         Department,
+        DiscardReason,
         Industry,
         JobPosting,
+        ListingState,
+        ListingStatus,
     )
     from postulo.jobs.services import set_identifiers
     from postulo.resume import models as resume
@@ -1477,12 +1483,17 @@ def _load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportRepor
         contact_links = _link_rows(entry)
         contact_handles = _messaging_rows(entry)
         department_name = (entry.pop("department", "") or "").strip()[:120]
-        contact = Contact.objects.create(
-            owner=user, company=company, **_carried(entry, CONTACT_FIELDS, report, "A contact")
-        )
+        carried = _carried(entry, CONTACT_FIELDS, report, "A contact")
+        # The note is the importing person's own (#896), never a column of the contact.
+        contact_notes = str(carried.pop("notes", "") or "")
+        contact = Contact(company=company, **carried)
+        # Into the person's own, or one of their groups' (#896).
+        contact.set_principal(principal)
+        contact.save()
+        if contact_notes:
+            contact.write_note(user, contact_notes)
         if department_name and company is not None:
             department, _made = Department.objects.get_or_create(
-                owner=user,
                 company=company,
                 name_key=slugs.name_key(department_name),
                 defaults={"name": department_name},
@@ -1559,7 +1570,12 @@ def _load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportRepor
         # Before format 68 a company's place was one line; since #702 it is an address.
         legacy_location = str(company_entry.pop("location", "") or "")[:200]
         company_names = company_entry.pop("names", None) or []
+        # Format 72: a company only shared with whoever exported it comes back as the
+        # importer's own copy, as any other company does; who it came from is not kept.
+        company_entry.pop("shared_from", None)
         company_entry = _carried(company_entry, COMPANY_FIELDS, report, "A company")
+        # The importing person's own note (#896), written once the company is made.
+        company_notes = str(company_entry.pop("notes", "") or "")
         company_entry["logo_fetched_at"] = _dt(company_entry.get("logo_fetched_at"))
         # A switch, read as one: anything but a true is not marked. An archive from before
         # format 44 says nothing, and every company in it is one that is not (#683).
@@ -1579,14 +1595,20 @@ def _load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportRepor
         for entry in identifier_entries:
             if entry.get("scheme") != identifiers.OTHER:
                 company = Company.by_identifier(
-                    user, entry.get("scheme", ""), entry.get("value", "")
+                    principal, entry.get("scheme", ""), entry.get("value", "")
                 )
                 if company is not None:
                     break
         if company is None:
-            company = Company.objects.for_user(user).filter(name_key=slugs.name_key(name)).first()
+            company = (
+                Company.objects.owned_by(principal).filter(name_key=slugs.name_key(name)).first()
+            )
         if company is None:
-            company = Company.objects.create(owner=user, name=name, **company_entry)
+            company = Company(name=name, **company_entry)
+            company.set_principal(principal)
+            company.save()
+            if company_notes:
+                company.write_note(user, company_notes)
             report.companies += 1
             from postulo.jobs import logos
 
@@ -1621,7 +1643,6 @@ def _load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportRepor
         _restore_company_names(company, user, company_names)
         for department_name in department_names:
             Department.objects.get_or_create(
-                owner=user,
                 company=company,
                 name_key=slugs.name_key(department_name),
                 defaults={"name": department_name},
@@ -1731,10 +1752,28 @@ def _load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportRepor
             if posting_entry.get("description_format") not in ("plain", "markdown"):
                 posting_entry.pop("description_format", None)
 
-            posting = JobPosting.objects.create(
+            carried = _carried(posting_entry, POSTING_FIELDS, report, "A listing")
+            # Where the importing person stands with it is theirs (#896): a status of their
+            # own beside the listing, never columns on it.
+            status = {
+                name: carried.pop(name)
+                for name in ("state", "discard_reason", "noted_at", "decided_at")
+                if name in carried
+            }
+            posting = JobPosting(company=company, **carried)
+            posting.set_principal(principal)
+            posting.save()
+            if status.get("state") not in ListingState.values:
+                status["state"] = ListingState.NEW
+            if status.get("discard_reason") not in DiscardReason.values:
+                status["discard_reason"] = ""
+            ListingStatus.objects.create(
                 owner=user,
-                company=company,
-                **_carried(posting_entry, POSTING_FIELDS, report, "A listing"),
+                posting=posting,
+                state=status["state"],
+                discard_reason=status["discard_reason"],
+                noted_at=status.get("noted_at") or posting.created_at,
+                decided_at=status.get("decided_at"),
             )
             postings[old_posting_id] = posting
             report.postings += 1
@@ -2160,7 +2199,7 @@ def _load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportRepor
     pointable = {"capture": captures, "uploadeddocument": uploads}
     for posting, entries in listing_histories:
         report.listing_events += _restore_listing_history(
-            posting, entries, contacts=contacts, pointable=pointable
+            posting, entries, contacts=contacts, pointable=pointable, user=user
         )
 
     # ------------------------------------------------------ remembered places
@@ -2173,7 +2212,9 @@ def _load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportRepor
     return report
 
 
-def _restore_listing_history(posting, entries: list, *, contacts: dict, pointable: dict) -> int:
+def _restore_listing_history(
+    posting, entries: list, *, contacts: dict, pointable: dict, user
+) -> int:
     """Put back one listing's history. Returns how many entries came back.
 
     Rows are made directly, as the timeline's are, and the file is believed about nothing
@@ -2232,6 +2273,8 @@ def _restore_listing_history(posting, entries: list, *, contacts: dict, pointabl
             seen.add(external_id)
         ListingEvent.objects.create(
             posting=posting,
+            # The importing person's own history of it (#896).
+            owner=user,
             kind=kind,
             occurred_at=a_moment(entry.get("occurred_at")) or timezone.now(),
             summary=one_line(entry.get("summary"))[:SUMMARY_MAX_CHARS],

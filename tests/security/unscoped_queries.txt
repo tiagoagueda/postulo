@@ -1,12 +1,15 @@
 # Queries on an owned model with no for_user() or owner, looked at once (#825).
 # Each is a job that works across accounts on purpose, an expiry sweep, or a lookup under a
 # parent that was scoped. This list may only shrink: see test_unscoped_queries.py.
+# Since #896 a department, an identifier or an address on a company is reached through the
+# company, which the caller has already scoped: its own owner column copies the company's.
+# jobs/detach.py copies a record the caller has already decided the person loses (#896).
+# jobs/merging.py moves everybody's rows once _same_owner has checked that everybody who saw
+# the other record sees the kept one (#896).
 api/routers/applications.py::_detail::Application
 api/routers/applications.py::list_applications::Application
 api/routers/common.py::referrer_and_agency_or_422::Company
 api/routers/common.py::referrer_and_agency_or_422::Contact
-api/routers/companies.py::_detail::Company
-api/routers/companies.py::list_companies::Company
 api/routers/documents.py::download_document::RenderedDocument
 api/routers/documents.py::download_document::UploadedDocument
 api/routers/documents.py::get_cv::CV
@@ -17,12 +20,10 @@ api/routers/documents.py::patch_cv::CV
 api/routers/interviews.py::_contacts::Contact
 api/routers/interviews.py::_queryset::Interview
 api/routers/interviews.py::add_interview::Application
-api/routers/listings.py::_queryset::JobPosting
 api/routers/listings.py::add_listing_event::Contact
 api/routers/listings.py::add_listing_event::JobPosting
 api/routers/listings.py::add_listing_event::UploadedDocument
 api/routers/listings.py::apply::Application
-api/routers/listings.py::list_listing_choices::JobPosting
 api/routers/offers.py::_queryset::Offer
 api/routers/reminders.py::add_reminder::Application
 api/routers/reminders.py::calendar_feed::Reminder
@@ -45,17 +46,24 @@ core/errands.py::_finish::Errand
 core/errands.py::_run::Errand
 core/errands.py::fail_interrupted::Errand
 core/errands.py::forget_old::Errand
+core/gdpr.py::_listing_event_rows::ListingEvent
 core/gdpr.py::record_of_processing::Connection
 core/gdpr.py::references::Application
 core/gdpr.py::references::Appointment
 core/gdpr.py::references::Interview
+core/gdpr.py::references::ListingEvent
 core/gdpr.py::references::ReferenceLetter
 core/gdpr.py::retention_dry_run::Application
 core/gdpr.py::retention_dry_run::Appointment
 core/gdpr.py::retention_dry_run::Contact
 core/gdpr.py::retention_dry_run::Interview
+core/gdpr.py::retention_dry_run::ListingEvent
 core/importer.py::_load::Application
+core/importer.py::_load::Department
+core/importer.py::restore_contact::Department
 core/kind_files.py::_create_application::Application
+core/kind_files.py::_create_company::Department
+core/kind_files.py::_create_contact::Department
 core/kind_files.py::_settle_parents::Company
 core/messaging_handles.py::set_primary::MessagingHandle
 core/metrics.py::collect::Application
@@ -74,7 +82,9 @@ core/phone_numbers.py::set_primary::PhoneNumber
 core/postal.py::for_holder::PostalAddress
 core/postal.py::save_existing_objects::PostalAddress
 core/search.py::company_match::CompanyIdentifier
+core/search.py::company_match::CompanyName
 core/search.py::company_match::Industry
+core/search.py::company_match::PostalAddress
 core/server_views.py::get_context_data::UploadedDocument
 core/slow.py::import_a_spreadsheet::Errand
 core/slow.py::reap_archives::ExportArchive
@@ -89,20 +99,41 @@ documents/scrub.py::verify_uploads::UploadedDocument
 documents/signals.py::drop_the_copies_a_removed_connection_still_owed::DocumentCopy
 documents/signals.py::forget_the_entry_a_file_proved::UploadedDocument
 documents/signals.py::forget_the_source_of_a_render::RenderedDocument
+jobs/detach.py::_copy::Company
+jobs/detach.py::_copy_parts::Company
+jobs/duplicates.py::for_company::CompanyIdentifier
+jobs/forms.py::_save_department::Department
+jobs/geojson.py::export::PostalAddress
 jobs/history.py::bind_capture::Capture
-jobs/history.py::history_of::Capture
-jobs/history.py::history_of::UploadedDocument
 jobs/identifier_removals.py::offer::CompanyIdentifier
+jobs/merging.py::_write_entries::Application
 jobs/merging.py::merge_companies::Application
+jobs/merging.py::merge_companies::Company
 jobs/merging.py::merge_companies::CompanyIdentifier
 jobs/merging.py::merge_companies::Contact
 jobs/merging.py::merge_companies::Department
 jobs/merging.py::merge_companies::JobPosting
+jobs/merging.py::merge_contacts::Application
+jobs/merging.py::merge_contacts::Appointment
+jobs/merging.py::merge_contacts::Contact
+jobs/merging.py::merge_contacts::ListingEvent
+jobs/merging.py::merge_contacts::ReferenceLetter
+jobs/merging.py::plan_companies::Application
+jobs/merging.py::plan_contacts::Application
+jobs/merging.py::plan_contacts::Appointment
+jobs/merging.py::plan_contacts::Interview
+jobs/merging.py::plan_contacts::ListingEvent
+jobs/merging.py::plan_contacts::ReferenceLetter
 jobs/pages.py::_discard::CapturedPage
 jobs/pages.py::everything_kept::CapturedPage
 jobs/pages.py::expire_unconfirmed::CapturedPage
 jobs/pages.py::remove::CapturedPage
+jobs/services.py::set_identifiers::CompanyIdentifier
+jobs/sharing.py::dependents_kept_after::Company
+jobs/sharing.py::dependents_kept_after::Contact
+jobs/sharing.py::dependents_kept_after::JobPosting
 jobs/signals.py::_no_longer_only_the_career::Company
+jobs/signals.py::forget_what_was_pointed_at::ListingEvent
 jobs/signals.py::remove::CapturedPage
 jobs/signals.py::remove::Company
 jobs/signals.py::remove_the_files_from_disk::CapturedPage
@@ -110,9 +141,12 @@ jobs/signals.py::remove_the_logo_from_disk::Company
 jobs/slow.py::fetch_a_capture::Errand
 jobs/slow.py::find_a_logo::Company
 jobs/structure.py::departments_for::Department
+jobs/vcards.py::_make_contact::Department
+jobs/views.py::_keep::CompanyName
 jobs/views.py::get_context_data::Application
 jobs/views.py::get_context_data::CapturedPage
 jobs/views.py::get_context_data::RenderedDocument
+jobs/views.py::post::CompanyName
 notifications/inbox.py::forget_old::BrowserNotice
 notifications/pushkey.py::salt::Connection
 notifications/webhooks.py::claim::WebhookDelivery

@@ -62,7 +62,8 @@ def closing_for(user, at=None):
     with timezone.override(zone_for(user)):
         today = at or timezone.localdate()
         return (
-            JobPosting.objects.for_user(user)
+            JobPosting.objects.visible_to(user)
+            .with_status(user)
             .undecided()
             .filter(
                 closes_at__gte=today,

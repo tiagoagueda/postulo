@@ -528,7 +528,7 @@ class ApplicationDetailView(OwnedObjectMixin, DetailView):
         context["ending"] = endings.read(self.object.status, endings.entries(context["events"]))
         # What arrived about the listing, read through the posting rather than copied when
         # the application was made (#270): the first part of one history, stored once.
-        context["listing_events"] = history_of(self.object.posting)
+        context["listing_events"] = history_of(self.object.posting, self.object.owner)
         context["reminders"] = self.object.reminders.filter(done_at__isnull=True)
         # What deleting it would take with it, for the dialog on this page (#854).
         context["deletion"] = deletions.facts_for(ApplicationDeleteView, self.request, self.object)
@@ -791,7 +791,7 @@ def detail_fragments(request, application, *, target: str, event_form=None):
                 "events": application.events.all(),
                 # Both parts of the history, or the swap would draw the timeline without
                 # the listing's half until the next full page (#270).
-                "listing_events": history_of(application.posting),
+                "listing_events": history_of(application.posting, application.owner),
                 "oob": True,
             },
             request=request,

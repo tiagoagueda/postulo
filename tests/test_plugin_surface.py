@@ -383,6 +383,8 @@ def test_the_surface_holds_the_notifier_contract():
         "status_changed",
         "interview_scheduled",
         "offer_recorded",
+        "record_shared",
+        "share_ended",
     }
 
 

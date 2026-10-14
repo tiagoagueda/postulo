@@ -581,6 +581,8 @@ def signed_in_paths(a, c, me, entry=None, recovery_link: str = "", things=None) 
         "/export/applications/",
         "/import/",
         "/accounts/delete/",
+        # The groups one is in (#896).
+        "/accounts/groups/",
         "/server/overview/",
         "/server/people/",
         f"/server/people/{me.pk}/plugins/",
@@ -681,6 +683,10 @@ def signed_in_paths(a, c, me, entry=None, recovery_link: str = "", things=None) 
         # Merging two records of one company, and of one person: the page that asks which
         # one, and the page that says what would move. Fetched and never submitted, like
         # every confirmation on this walk (#239).
+        # Who has it, and the form that shares it (#896).
+        f"/jobs/share/company/{c.pk}/",
+        f"/jobs/owner/company/{c.pk}/",
+        "/jobs/conflicts/",
         f"/jobs/companies/{c.pk}/merge/",
         f"/jobs/companies/{c.pk}/merge/?with={duplicate.pk}",
         f"/jobs/contacts/{contact.pk}/merge/",

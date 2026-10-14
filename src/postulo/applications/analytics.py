@@ -368,7 +368,7 @@ def fingerprint(user) -> str:
     events = ApplicationEvent.objects.filter(application__owner=user).aggregate(
         n=Count("pk"), at=Max("pk")
     )
-    listings = JobPosting.objects.for_user(user).aggregate(n=Count("pk"), at=Max("updated_at"))
+    listings = JobPosting.objects.visible_to(user).aggregate(n=Count("pk"), at=Max("updated_at"))
     companies = Company.objects.for_user(user).aggregate(n=Count("pk"), at=Max("updated_at"))
     contacts = Contact.objects.for_user(user).aggregate(n=Count("pk"), at=Max("updated_at"))
     reminders = Reminder.objects.for_user(user).aggregate(
@@ -459,7 +459,7 @@ def build(user) -> Insights:
     )
     insights = Insights(total=len(applications))
 
-    listings = JobPosting.objects.for_user(user)
+    listings = JobPosting.objects.visible_to(user).with_status(user)
     insights.listings_noted = listings.count()
     insights.listings_applied = listings.in_state("applied").count()
     insights.listings_discarded = listings.in_state(ListingState.DISCARDED).count()

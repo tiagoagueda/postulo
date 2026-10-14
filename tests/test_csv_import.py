@@ -203,7 +203,7 @@ def test_the_import_makes_applications_listings_and_companies_and_skips_what_it_
     )
     assert black_mesa.posting.salary_min == Decimal(60000)
 
-    initech = JobPosting.objects.for_user(user).get(company__name="Initech")
+    initech = JobPosting.objects.for_user(user).with_status(user).get(company__name="Initech")
     assert initech.derived_state == ListingState.NEW and not initech.applications.exists()
     assert "Not applied yet" in initech.description
     assert Company.objects.for_user(user).count() == 3

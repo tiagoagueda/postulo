@@ -21,10 +21,11 @@ from django.views.generic import ListView
 
 from postulo.core import tables
 from postulo.core.cells import EditableCellView
-from postulo.core.mixins import OwnedObjectMixin, PageOrFragmentMixin
+from postulo.core.mixins import READ, OwnedObjectMixin, PageOrFragmentMixin, SharedObjectMixin
 from postulo.core.redirects import safe_next
 from postulo.core.search import clean_query, listing_match
 
+from . import whose
 from .forms import JobPostingForm
 from .models import LISTING_FILTERS, Capture, CaptureStatus, DiscardReason, JobPosting, ListingState
 from .tables import ListingsTable
@@ -91,13 +92,14 @@ class ListingListView(PageOrFragmentMixin, OwnedObjectMixin, ListView):
         # second annotation under the same name is an error rather than a no-op; the
         # table's ordering and filters second. That ordering always ends in the key, so
         # pagination over the aggregated rows never repeats a row or skips one.
-        queryset = super().get_queryset()
+        # Each listing as this person stands with it (#896): their status, their applications.
+        queryset = whose.base(
+            JobPosting, self.request.user, whose.chosen(self.request)
+        ).with_status(self.request.user)
         current = self.current_filter()
         if current == "undecided":
             queryset = queryset.undecided()
-        elif current == "all":
-            queryset = queryset.with_application_count()
-        else:
+        elif current != "all":
             queryset = queryset.in_state(current)
         queryset = queryset.select_related("company").with_table_data()
         # The masthead's search box, which narrows this table on this page (#313): the role,
@@ -112,7 +114,9 @@ class ListingListView(PageOrFragmentMixin, OwnedObjectMixin, ListView):
 
     def get_context_data(self, **kwargs) -> dict:
         context = super().get_context_data(**kwargs)
-        everything = JobPosting.objects.for_user(self.request.user)
+        context["whose_choices"] = whose.offered(self.request.user)
+        context["whose"] = whose.chosen(self.request)
+        everything = JobPosting.objects.visible_to(self.request.user).with_status(self.request.user)
         current = self.current_filter()
         # One query for all six numbers (#231). It was six, each grouping the whole table by
         # posting to count applications it then compared with zero.
@@ -187,11 +191,11 @@ class ListingBulkView(LoginRequiredMixin, View):
         changed = 0
         for listing in rows:
             if action == "shortlist":
-                did = listing.shortlist()
+                did = listing.shortlist(request.user)
             elif action == "discard":
-                did = listing.discard(reason)
+                did = listing.discard(request.user, reason)
             else:
-                did = listing.restore()
+                did = listing.restore(request.user)
             changed += bool(did)
         messages.success(request, bulk.changed(changed, ListingsTable))
         return redirect(self._back(request))
@@ -234,8 +238,10 @@ def _back_to(request: HttpRequest, fallback: str) -> HttpResponse:
     return HttpResponseRedirect(safe_next(request, fallback))
 
 
-class ListingStateView(OwnedObjectMixin, View):
+class ListingStateView(SharedObjectMixin, View):
     """Shortlist, discard or restore a listing. One POST, one decision, back where you were."""
+
+    access = READ
 
     action = ""
 
@@ -243,29 +249,31 @@ class ListingStateView(OwnedObjectMixin, View):
         return JobPosting.objects.for_user(self.request.user)
 
     def post(self, request: HttpRequest, pk: int) -> HttpResponse:
-        listing = get_object_or_404(self.get_queryset(), pk=pk)
+        listing = get_object_or_404(self.get_queryset().with_status(request.user), pk=pk)
         if self.action == "shortlist":
-            listing.shortlist()
+            listing.shortlist(request.user)
             messages.success(request, _("Shortlisted."))
         elif self.action == "discard":
             reason = request.POST.get("reason", "")
             if reason not in DiscardReason.values:
                 reason = DiscardReason.OTHER
-            listing.discard(reason)
+            listing.discard(request.user, reason)
             messages.success(request, _("Discarded. It stays in your history and can be restored."))
         elif self.action == "restore":
-            listing.restore()
+            listing.restore(request.user)
             messages.success(request, _("Back in your listings."))
         return _back_to(request, reverse("listings:list"))
 
 
-class ListingEventCreateView(OwnedObjectMixin, View):
+class ListingEventCreateView(SharedObjectMixin, View):
     """Add an entry to a listing's history, from the form on its own page (#270).
 
     POST only, and through `record_listing_event` like every other door into the history.
     A mistake in the form draws the listing's page again with the errors beside the fields,
     rather than sending somebody back to an empty form with a sentence about what they lost.
     """
+
+    access = READ
 
     def get_queryset(self):
         return JobPosting.objects.for_user(self.request.user).select_related("company")
@@ -275,7 +283,7 @@ class ListingEventCreateView(OwnedObjectMixin, View):
         from .history import record_listing_event
         from .views import listing_page_context
 
-        listing = get_object_or_404(self.get_queryset().with_application_count(), pk=pk)
+        listing = get_object_or_404(self.get_queryset().with_status(request.user), pk=pk)
         form = ListingEventForm(request.POST, user=request.user)
         if not form.is_valid():
             context = listing_page_context(request, listing, event_form=form)
@@ -288,18 +296,25 @@ class ListingEventCreateView(OwnedObjectMixin, View):
             occurred_at=form.cleaned_data["occurred_at"],
             contact=form.cleaned_data.get("contact"),
             artefact=form.cleaned_data.get("document"),
+            owner=request.user,
         )
         messages.success(request, _("Added to the listing's history."))
         return redirect(f"{listing.get_absolute_url()}#history")
 
 
-class ListingApplyView(OwnedObjectMixin, View):
+class ListingApplyView(SharedObjectMixin, View):
     """The decision that matters: apply. Creates the application and leaves the listing."""
+
+    access = READ
 
     template_name = "jobs/listing_apply.html"
 
     def get_queryset(self):
-        return JobPosting.objects.for_user(self.request.user).select_related("company")
+        return (
+            JobPosting.objects.for_user(self.request.user)
+            .with_status(self.request.user)
+            .select_related("company")
+        )
 
     def _form_class(self):
         from postulo.applications.forms import ApplicationDetailsForm
@@ -318,7 +333,7 @@ class ListingApplyView(OwnedObjectMixin, View):
         form = self._form_class()(request.POST, user=request.user)
         if not form.is_valid():
             return render(request, self.template_name, {"listing": listing, "form": form})
-        application = apply_to_listing(listing, form.application_data)
+        application = apply_to_listing(listing, form.application_data, owner=request.user)
         application.tags.set(form.chosen_tags())
         messages.success(request, _("Application recorded."))
         return redirect(application.get_absolute_url())

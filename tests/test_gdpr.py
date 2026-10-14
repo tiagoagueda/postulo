@@ -131,6 +131,11 @@ def test_references_cover_every_relation_that_points_at_a_contact():
     own = {PhoneNumber, PostalAddress, WebLink, MessagingHandle}
     assert gdpr.career_references(Contact(pk=0)).model is Reference
     own |= {Reference}
+    # A grant is not a reference: it says who may see the contact, and goes with it (#896).
+    from postulo.jobs.models import ContactNote, Share
+
+    # Nor a person's own note on them (#896): it is theirs, and goes with the contact.
+    own |= {Share, ContactNote}
     pointing = {relation.related_model for relation in Contact._meta.related_objects}
     through = {Interview.contacts.through}
 

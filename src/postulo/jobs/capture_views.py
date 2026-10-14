@@ -398,6 +398,7 @@ class CaptureReviewView(OwnedObjectMixin, View):
                     "deadline": None,
                 },
                 applied_at=moment_for(form.cleaned_data.get("applied_on")),
+                owner=request.user,
             )
             capture.application = application
             capture.save(

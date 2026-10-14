@@ -38,6 +38,7 @@ from dataclasses import dataclass, field
 from django import forms
 from django.core.exceptions import ValidationError
 from django.db import transaction
+from django.db.models import Prefetch
 from django.utils import timezone
 from django.utils.translation import gettext as _
 from django.utils.translation import gettext_lazy, ngettext
@@ -75,9 +76,11 @@ NOT_THE_FILES_TO_SAY = ("verified_at", "is_recovery")
 COMPANY_FIELDS = ("name", "kind", "website", "careers_url", "location", "notes")
 #: What the company's own form checks. The location is a line of its primary address since
 #: #702, written through `Company.location` rather than through a field of the form.
-COMPANY_FORM_FIELDS = tuple(name for name in COMPANY_FIELDS if name != "location")
+COMPANY_FORM_FIELDS = tuple(name for name in COMPANY_FIELDS if name not in ("location", "notes"))
 IDENTIFIER_FIELDS = ("scheme", "value", "label")
 CONTACT_FIELDS = ("name", "role", "email", "notes")
+#: A note is the person's own (#896), no column of the record, so no form field either.
+CONTACT_FORM_FIELDS = tuple(name for name in CONTACT_FIELDS if name != "notes")
 CONTACT_DETAILS: dict[str, tuple[str, ...]] = {
     "phone_numbers": tuple(
         name for name in export.PHONE_NUMBER_FIELDS if name not in NOT_THE_FILES_TO_SAY
@@ -237,23 +240,37 @@ def _queryset(user, kind: str):
 
     if kind == "companies":
         return (
-            Company.objects.for_user(user)
+            # What the person holds, their own and their groups' (#896), as the archive does.
+            Company.objects.manageable_by(user)
+            .with_notes(user)
             .select_related("parent")
             .prefetch_related("industries", "identifiers", "departments")
             .order_by("name_key")
         )
     if kind == "contacts":
         return (
-            Contact.objects.for_user(user)
+            Contact.objects.manageable_by(user)
+            .with_notes(user)
             .select_related("company", "department")
             .prefetch_related(*CONTACT_DETAILS)
             .order_by("name", "pk")
         )
     if kind == "listings":
-        return JobPosting.objects.for_user(user).select_related("company").order_by("pk")
+        return (
+            JobPosting.objects.manageable_by(user)
+            .with_status(user)
+            .select_related("company")
+            .order_by("pk")
+        )
     return (
         Application.objects.for_user(user)
-        .select_related("posting__company", "department", "through_agency")
+        .select_related("department", "through_agency")
+        # The listing as this person stands with it (#896), for the listing in each row.
+        .prefetch_related(
+            Prefetch(
+                "posting", queryset=JobPosting.objects.with_status(user).select_related("company")
+            )
+        )
         .prefetch_related("events", "interviews")
         .order_by("pk")
     )
@@ -422,6 +439,15 @@ def _form_for(model, names: tuple[str, ...]):
     return _FORMS[key]
 
 
+def _own_note(row: dict, clean: dict, problems: list[str]) -> None:
+    """The file's note, as the importing person's own (#896): text, or a problem."""
+    note = row.get("notes")
+    if note is not None and not isinstance(note, str):
+        problems.append(_("%(field)s: this is not text.") % {"field": _("Notes")})
+    else:
+        clean["notes"] = (note or "").strip()
+
+
 def _through_the_form(model, names: tuple[str, ...], row: dict) -> tuple[dict, list[str]]:
     """The model's own form, handed what the file says of ``names``: what it cleaned, and
     what was wrong. An absent key is what a blank form would hold; a key that holds
@@ -509,7 +535,7 @@ class Verdict:
 def _company_named(user, name: str):
     from postulo.jobs.models import Company
 
-    return Company.objects.for_user(user).filter(name_key=slugs.name_key(name)).first()
+    return Company.objects.owned_by(user).filter(name_key=slugs.name_key(name)).first()
 
 
 def _company_name(row: dict) -> str:
@@ -518,11 +544,24 @@ def _company_name(row: dict) -> str:
     return _text(row.get("company"), Company._meta.get_field("name").max_length)
 
 
+def principal_of(user, held: dict):
+    """Who the import gives what it makes to: ``user``, or one of their groups (#896)."""
+    into = (held or {}).get("into") or ""
+    if into.startswith("group:"):
+        try:
+            return user.groups.get(pk=int(into.split(":", 1)[1]))
+        except (ValueError, user.groups.model.DoesNotExist):
+            return user
+    return user
+
+
 class _Run:
     """What one pass over a file remembers: what it has already said, so a repeat is told."""
 
-    def __init__(self, user):
+    def __init__(self, user, principal=None):
         self.user = user
+        # Whose records are matched and made: the person's, or a group's of theirs (#896).
+        self.principal = principal or user
         self.seen: set = set()
         #: Companies this pass would make, by their key, so the page says so once.
         self.new_companies: set[str] = set()
@@ -532,7 +571,7 @@ class _Run:
         if not name:
             return []
         key = slugs.name_key(name)
-        if _company_named(self.user, name) is not None:
+        if _company_named(self.principal, name) is not None:
             return []
         self.new_companies.add(key)
         return [
@@ -553,6 +592,7 @@ def _assess_company(run: _Run, row: dict) -> Verdict:
     from postulo.jobs.models import Company
 
     clean, problems = _through_the_form(Company, COMPANY_FORM_FIELDS, row)
+    _own_note(row, clean, problems)
     location = row.get("location")
     if location is not None and not isinstance(location, str):
         problems.append(_("%(field)s: this is not text.") % {"field": _("Location")})
@@ -569,13 +609,13 @@ def _assess_company(run: _Run, row: dict) -> Verdict:
         verdict.outcome = REPEATED
         return verdict
     run.seen.add(("company", key))
-    if _company_named(run.user, name) is not None:
+    if _company_named(run.principal, name) is not None:
         verdict.outcome = PRESENT
         return verdict
     for entry in row.get("identifiers") or []:
         scheme, value = entry.get("scheme"), entry.get("value")
         if isinstance(scheme, str) and isinstance(value, str) and scheme != "other":
-            if Company.by_identifier(run.user, scheme, value) is not None:
+            if Company.by_identifier(run.principal, scheme, value) is not None:
                 verdict.outcome = PRESENT
                 verdict.notes.append(_("A company with the same identifier is already yours."))
                 return verdict
@@ -593,18 +633,23 @@ def _assess_company(run: _Run, row: dict) -> Verdict:
     return verdict
 
 
-def _create_company(user, verdict: Verdict, parents: dict) -> int:
+def _create_company(user, verdict: Verdict, parents: dict, principal=None) -> int:
     from postulo.core import identifiers as scheme_registry
     from postulo.jobs.models import Company, Department, Industry
     from postulo.jobs.services import set_identifiers
 
     held = verdict.clean
-    company = Company.objects.create(owner=user, **held["fields"])
+    fields = dict(held["fields"])
+    notes = fields.pop("notes", "")
+    company = Company(**fields)
+    company.set_principal(principal or user)
+    company.save()
+    if notes:
+        company.write_note(user, notes)
     if held["industries"]:
         company.industries.add(*Industry.named(user, held["industries"]))
     for name in held["departments"]:
         Department.objects.get_or_create(
-            owner=user,
             company=company,
             name_key=slugs.name_key(name),
             defaults={"name": name},
@@ -626,13 +671,13 @@ def _create_company(user, verdict: Verdict, parents: dict) -> int:
     return 1
 
 
-def _settle_parents(user, parents: dict) -> None:
+def _settle_parents(user, parents: dict, principal=None) -> None:
     """The ownership tree, once every company in the file exists: a name that matches
     nothing is left alone, and a company is never made its own parent."""
     from postulo.jobs.models import Company
 
     for child_pk, name in parents.items():
-        parent = _company_named(user, name)
+        parent = _company_named(principal or user, name)
         if parent is not None and parent.pk != child_pk:
             Company.objects.filter(pk=child_pk).update(parent=parent)
 
@@ -643,7 +688,8 @@ def _settle_parents(user, parents: dict) -> None:
 def _assess_contact(run: _Run, row: dict) -> Verdict:
     from postulo.jobs.models import Contact
 
-    clean, problems = _through_the_form(Contact, CONTACT_FIELDS, row)
+    clean, problems = _through_the_form(Contact, CONTACT_FORM_FIELDS, row)
+    _own_note(row, clean, problems)
     name = _text(row.get("name"), 200)
     company_name = _company_name(row)
     if problems or not name:
@@ -664,11 +710,11 @@ def _assess_contact(run: _Run, row: dict) -> Verdict:
         return verdict
     run.seen.add(("contact", *key))
 
-    mine = Contact.objects.for_user(run.user)
+    mine = Contact.objects.owned_by(run.principal)
     if email:
         found = mine.filter(email__iexact=email).exists()
     else:
-        company = _company_named(run.user, company_name) if company_name else None
+        company = _company_named(run.principal, company_name) if company_name else None
         if company_name and company is None:
             found = False
         else:
@@ -686,17 +732,26 @@ def _assess_contact(run: _Run, row: dict) -> Verdict:
     return verdict
 
 
-def _create_contact(user, verdict: Verdict) -> int:
+def _create_contact(user, verdict: Verdict, principal=None) -> int:
     from postulo.applications.services import get_or_create_company
     from postulo.core import importer, phone_numbers
     from postulo.jobs.models import Contact, Department
 
     held = verdict.clean
-    company = get_or_create_company(user, held["company"]) if held["company"] else None
-    contact = Contact.objects.create(owner=user, company=company, **held["fields"])
+    company = (
+        get_or_create_company(user, held["company"], principal=principal, strict=True)
+        if held["company"]
+        else None
+    )
+    fields = dict(held["fields"])
+    notes = fields.pop("notes", "")
+    contact = Contact(company=company, **fields)
+    contact.set_principal(principal or user)
+    contact.save()
+    if notes:
+        contact.write_note(user, notes)
     if held["department"] and company is not None:
         department, _made = Department.objects.get_or_create(
-            owner=user,
             company=company,
             name_key=slugs.name_key(held["department"]),
             defaults={"name": held["department"]},
@@ -729,16 +784,16 @@ def _create_contact(user, verdict: Verdict) -> int:
 # -- listings and applications
 
 
-def _find_listing(user, company_name: str, clean: dict):
+def _find_listing(principal, company_name: str, clean: dict):
     """The posting this account already holds that the file's says the same of: by its
     address where it has one, else its company, its title and its date (`posted_at`)."""
     from postulo.jobs.models import JobPosting
 
-    mine = JobPosting.objects.for_user(user)
+    mine = JobPosting.objects.owned_by(principal)
     key = same_url(clean.get("url") or "")
     if key:
         return mine.filter(url_key=key).first()
-    company = _company_named(user, company_name)
+    company = _company_named(principal, company_name)
     if company is None:
         return None
     return mine.filter(
@@ -786,7 +841,7 @@ def _assess_listing(run: _Run, row: dict) -> Verdict:
         verdict.outcome = REPEATED
         return verdict
     run.seen.add(key)
-    if _find_listing(run.user, company_name, clean) is not None:
+    if _find_listing(run.principal, company_name, clean) is not None:
         verdict.outcome = PRESENT
         return verdict
     verdict.notes += run.company_note(company_name)
@@ -794,12 +849,12 @@ def _assess_listing(run: _Run, row: dict) -> Verdict:
     return verdict
 
 
-def _create_listing(user, verdict: Verdict) -> int:
+def _create_listing(user, verdict: Verdict, principal=None) -> int:
     from postulo.applications.services import create_listing, get_or_create_company
 
     held = verdict.clean
-    company = get_or_create_company(user, held["company"])
-    create_listing(user, company=company, posting_data=held["fields"])
+    company = get_or_create_company(user, held["company"], principal=principal, strict=True)
+    create_listing(user, company=company, posting_data=held["fields"], principal=principal)
     return 1
 
 
@@ -833,7 +888,7 @@ def _assess_application(run: _Run, row: dict) -> Verdict:
         return verdict
     run.seen.add(key)
 
-    posting = _find_listing(run.user, company_name, listing)
+    posting = _find_listing(run.principal, company_name, listing)
     if posting is not None:
         for existing in Application.objects.for_user(run.user).filter(posting=posting):
             if _moment_date(existing.applied_at) == applied:
@@ -883,24 +938,29 @@ def _assess_application(run: _Run, row: dict) -> Verdict:
     return verdict
 
 
-def _create_application(user, verdict: Verdict, provenance: str) -> int:
+def _create_application(user, verdict: Verdict, provenance: str, principal=None) -> int:
     from postulo.applications.models import (
         Application,
         ApplicationEvent,
         EventKind,
         Interview,
     )
-    from postulo.applications.services import change_status, get_or_create_company, record_event
-    from postulo.jobs.models import Department, JobPosting
+    from postulo.applications.services import (
+        change_status,
+        create_listing,
+        get_or_create_company,
+        record_event,
+    )
+    from postulo.jobs.models import Department
 
     held = verdict.clean
-    company = get_or_create_company(user, held["company"])
-    posting = _find_listing(user, held["company"], held["listing"])
+    company = get_or_create_company(user, held["company"], principal=principal, strict=True)
+    posting = _find_listing(principal or user, held["company"], held["listing"])
     if posting is None:
-        posting = JobPosting.objects.create(owner=user, company=company, **held["listing"])
-    if posting.decided_at is None:
-        posting.decided_at = timezone.now()
-        posting.save(update_fields=["decided_at", "updated_at"])
+        posting = create_listing(
+            user, company=company, posting_data=held["listing"], principal=principal
+        )
+    posting.mark_decided(user)
     # Created as a draft and moved to the status the file gives through `change_status`, as the
     # spreadsheet import does (#808), so the log has the entry for it and the dates follow the
     # same rules; the file's own dates are put back afterwards, since they are what it says.
@@ -930,7 +990,7 @@ def _create_application(user, verdict: Verdict, provenance: str) -> int:
         if department is not None:
             Application.objects.filter(pk=application.pk).update(department=department)
     if held["through_agency"]:
-        agency = _company_named(user, held["through_agency"])
+        agency = _company_named(principal or user, held["through_agency"])
         if agency is not None:
             Application.objects.filter(pk=application.pk).update(through_agency=agency)
     for event in held["events"]:
@@ -968,7 +1028,7 @@ TITLES = {
 
 
 def _verdicts(user, held: dict) -> list[Verdict]:
-    run = _Run(user)
+    run = _Run(user, principal_of(user, held))
     assess = _ASSESS[held["kind"]]
     return [assess(run, row) for row in held["rows"]]
 
@@ -1057,18 +1117,19 @@ def apply(user, held: dict) -> Report:
     report = Report()
     provenance = str(_("Imported from %(file)s") % {"file": held.get("filename") or kind})[:120]
     parents: dict = {}
+    principal = principal_of(user, held)
     with transaction.atomic():
         for verdict in _verdicts(user, held):
             if verdict.outcome != ADD:
                 continue
             if kind == "companies":
-                report.added += _create_company(user, verdict, parents)
+                report.added += _create_company(user, verdict, parents, principal)
             elif kind == "contacts":
-                report.added += _create_contact(user, verdict)
+                report.added += _create_contact(user, verdict, principal)
             elif kind == "listings":
-                report.added += _create_listing(user, verdict)
+                report.added += _create_listing(user, verdict, principal)
             else:
-                report.added += _create_application(user, verdict, provenance)
+                report.added += _create_application(user, verdict, provenance, principal)
         if parents:
-            _settle_parents(user, parents)
+            _settle_parents(user, parents, principal)
     return report

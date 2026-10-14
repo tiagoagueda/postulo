@@ -1,0 +1,16 @@
+{% load i18n %}
+{% comment %} Who an import gives the companies, contacts and listings it makes to (#896): the
+   person, or one of their groups. Shown only to somebody in a group. What is matched as
+   already there is looked for among that owner's own records, and nowhere else. {% endcomment %}
+{% if request.user.groups.exists %}
+  <div class="field mb-4" data-import-owner>
+    <label for="import-into">{% translate "Whose they become" %}</label>
+    <select id="import-into" name="into" aria-describedby="import-into-help">
+      <option value="">{% translate "Yours" %}</option>
+      {% for group in request.user.groups.all %}
+        <option value="group:{{ group.pk }}">{% blocktranslate with name=group.name %}The group {{ name }}{% endblocktranslate %}</option>
+      {% endfor %}
+    </select>
+    <p id="import-into-help">{% translate "The companies, contacts and listings it adds. Applications and notes are always yours." %}</p>
+  </div>
+{% endif %}

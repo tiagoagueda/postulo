@@ -255,14 +255,41 @@ def _say_why(
 
 
 @transaction.atomic
-def create_listing(owner, *, company: Company, posting_data: dict) -> JobPosting:
-    """Add a listing: a posting the person has noticed and not yet decided about."""
-    return JobPosting.objects.create(owner=owner, company=company, **posting_data)
+def create_listing(owner, *, company: Company, posting_data: dict, principal=None) -> JobPosting:
+    """Add a listing: a posting the person has noticed and not yet decided about.
+
+    Where the person stands with it -- ``state``, ``discard_reason``, ``noted_at``,
+    ``decided_at``, when the data says -- is written as their own status (#896), never on
+    the listing, which may one day be shared with somebody who stands elsewhere.
+    """
+    from postulo.jobs.models import ListingStatus
+
+    data = dict(posting_data)
+    status = {
+        name: data.pop(name)
+        for name in ("state", "discard_reason", "noted_at", "decided_at")
+        if name in data
+    }
+    # Owned by ``principal`` -- one of ``owner``'s groups, for an import into it (#896) --
+    # while where ``owner`` stands with it stays theirs.
+    posting = JobPosting(company=company, **data)
+    posting.set_principal(principal or owner)
+    posting.save()
+    if status:
+        status["noted_at"] = status.get("noted_at") or posting.created_at
+        ListingStatus.objects.create(owner=owner, posting=posting, **status)
+    return posting
 
 
 @transaction.atomic
 def apply_to_listing(
-    posting: JobPosting, application_data: dict, *, actor: str = "", applied_at=None
+    posting: JobPosting,
+    application_data: dict,
+    *,
+    actor: str = "",
+    applied_at=None,
+    owner=None,
+    decided: bool = False,
 ) -> Application:
     """The decision: an application for a listing.
 
@@ -272,12 +299,18 @@ def apply_to_listing(
     ``applied_at`` is when it was actually sent, which is not always today: recording a
     search already under way is the common case, and the wiki says so (#222). It is carried
     into the status change, so the timeline entry and the date agree.
+
+    ``owner`` is who applies (#896): on a shared listing, the person at the keyboard, whose
+    application nobody else will see. Left out, it is the listing's own person.
     """
+    owner = owner or posting.owner
+    if owner is None:
+        raise ValueError("Say who applies: the listing belongs to a group.")
     application_data = dict(application_data)
     applied_at = application_data.pop("applied_at", None) or applied_at
     status = application_data.pop("status", Status.DRAFT)
     application = Application.objects.create(
-        owner=posting.owner, posting=posting, status=Status.DRAFT, **application_data
+        owner=owner, posting=posting, status=Status.DRAFT, **application_data
     )
 
     record_event(
@@ -290,9 +323,8 @@ def apply_to_listing(
     if status != Status.DRAFT:
         change_status(application, status, occurred_at=applied_at, actor=actor)
 
-    if posting.decided_at is None:
-        posting.decided_at = timezone.now()
-        posting.save(update_fields=["decided_at", "updated_at"])
+    if not decided:
+        posting.mark_decided(application.owner)
     return application
 
 
@@ -305,6 +337,7 @@ def create_application(
     application_data: dict,
     actor: str = "",
     applied_at=None,
+    principal=None,
 ):
     """Record a listing and an application for it in one step.
 
@@ -312,47 +345,108 @@ def create_application(
     to add a listing and then apply to it would be two forms for one thought. Underneath
     it is exactly those two steps, so the data is the same whichever door was used.
     """
-    posting = create_listing(owner, company=company, posting_data=posting_data)
-    return apply_to_listing(posting, application_data, actor=actor, applied_at=applied_at)
+    # Decided as it is made: the status row carries the moment from the start, rather
+    # than being written and then looked up again (#896).
+    posting = create_listing(
+        owner,
+        company=company,
+        posting_data={"decided_at": timezone.now(), **posting_data},
+        principal=principal,
+    )
+    return apply_to_listing(
+        posting, application_data, actor=actor, applied_at=applied_at, owner=owner, decided=True
+    )
 
 
-def get_or_create_company(owner, name: str, *, wikidata: str = "") -> Company:
-    """Find this owner's company by name, case-insensitively, or add it.
+def get_or_create_company(
+    owner, name: str, *, wikidata: str = "", principal=None, strict: bool = False
+) -> Company:
+    """Find the company ``owner`` means by name, case-insensitively, or add it.
 
     Matching loosely on the way in avoids ending up with "Acme", "acme" and "ACME" as
     three separate employers after a few weeks of typing. A Wikidata id, when the caller
     has one, is a stronger match than any spelling: the company carrying it is the one,
     whatever it is called here. A company found or made by name gains the id if it has
-    none yet and nobody else's record holds it.
+    none yet, nobody else's record holds it, and ``owner`` may change it.
+
+    ``principal`` owns a company made here -- ``owner`` themselves, or one of their groups
+    (#896). It is looked among first; then, unless ``strict`` (an import, which matches
+    within the owner it imports into and nowhere else), among the companies ``owner`` can
+    see -- their groups', and those shared with them -- so somebody in a household typing
+    "Acme" finds the household's Acme rather than starting a second one.
     """
     from postulo.jobs import identifiers
     from postulo.jobs.models import CompanyIdentifier
 
+    principal = principal or owner
     name = name.strip()
+    key = slugs.name_key(name)
     if wikidata:
-        by_id = Company.by_identifier(owner, identifiers.WIKIDATA, wikidata)
+        by_id = Company.by_identifier(principal, identifiers.WIKIDATA, wikidata)
+        if by_id is None and not strict:
+            by_id = _visible_by_identifier(owner, identifiers.WIKIDATA, wikidata)
         if by_id is not None:
             return by_id
-    company = Company.objects.for_user(owner).filter(name_key=slugs.name_key(name)).first()
+    company = Company.objects.owned_by(principal).filter(name_key=key).first()
+    if company is None and not strict:
+        company = (
+            Company.objects.visible_to(owner)
+            .filter(name_key=key)
+            .order_by("owner_group", "pk")
+            .first()
+        )
     if company is None:
         try:
             # A savepoint, so a concurrent request that made the same company first
             # leaves this one a row to read rather than a broken transaction.
             with transaction.atomic():
-                company = Company.objects.create(owner=owner, name=name)
+                company = Company(name=name)
+                company.set_principal(principal)
+                company.save()
         except IntegrityError:
-            company = Company.objects.for_user(owner).filter(name_key=slugs.name_key(name)).first()
+            company = Company.objects.owned_by(principal).filter(name_key=key).first()
             if company is None:
                 raise
-    if wikidata and not company.identifiers.filter(scheme=identifiers.WIKIDATA).exists():
+    if (
+        wikidata
+        and not company.identifiers.filter(scheme=identifiers.WIKIDATA).exists()
+        and Company.objects.visible_to(owner, write=True).filter(pk=company.pk).exists()
+    ):
         try:
             value = identifiers.clean(identifiers.WIKIDATA, wikidata)
         except ValidationError:
             return company
-        CompanyIdentifier.objects.get_or_create(
-            owner=owner, scheme=identifiers.WIKIDATA, value=value, defaults={"company": company}
+        # One company per identifier for each owner: if another company of the same owner
+        # already carries this item, this one does not take it too (#896: a group's own).
+        taken = CompanyIdentifier.objects.owned_by(company.principal).filter(
+            scheme=identifiers.WIKIDATA, value__iexact=value
         )
+        if not taken.exists():
+            CompanyIdentifier.objects.create(
+                company=company, scheme=identifiers.WIKIDATA, value=value
+            )
     return company
+
+
+def _visible_by_identifier(user, scheme: str, raw: str):
+    """A company ``user`` can see carrying this identifier, other than their own (#896)."""
+    from django.core.exceptions import ValidationError as Invalid
+
+    from postulo.jobs import identifiers
+    from postulo.jobs.models import CompanyIdentifier
+
+    try:
+        value = identifiers.clean(scheme, raw)
+    except Invalid:
+        return None
+    found = (
+        CompanyIdentifier.objects.for_user(user)
+        .filter(scheme=scheme, value__iexact=value)
+        .select_related("company")
+        .order_by("pk")
+        .first()
+    )
+    return found.company if found else None
 
 
 # ------------------------------------------------------------------- interviews

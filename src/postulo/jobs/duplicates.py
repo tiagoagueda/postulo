@@ -231,7 +231,21 @@ class Candidate:
     reasons: tuple[str, ...]
 
 
-def for_company(company) -> list[Candidate]:
+def _companies_of(company, person):
+    """Where ``company``'s duplicates are looked for: what ``person`` manages (#896) -- the
+    records they could merge -- or, with nobody named, its own owner's."""
+    if person is not None:
+        return Company.objects.manageable_by(person)
+    return Company.objects.owned_by(company.principal)
+
+
+def _contacts_of(contact, person):
+    if person is not None:
+        return Contact.objects.manageable_by(person)
+    return Contact.objects.owned_by(contact.principal)
+
+
+def for_company(company, person=None) -> list[Candidate]:
     """This person's other companies that look like ``company``, each with why.
 
     Three reads at most: the names and websites of the person's other companies, the
@@ -245,11 +259,8 @@ def for_company(company) -> list[Candidate]:
     domain = domain_of(company.website)
     reasons: dict[int, list[str]] = {}
 
-    others = (
-        Company.objects.filter(owner_id=company.owner_id)
-        .exclude(pk=company.pk)
-        .values_list("pk", "name", "website")
-    )
+    pool = _companies_of(company, person)
+    others = pool.exclude(pk=company.pk).values_list("pk", "name", "website")
     for pk, other_name, other_website in others:
         if name and bare_name(other_name) == name:
             reasons.setdefault(pk, []).append(_("The same name, once the legal form is set aside"))
@@ -264,7 +275,7 @@ def for_company(company) -> list[Candidate]:
     if mine:
         theirs = (
             CompanyIdentifier.objects.filter(
-                owner_id=company.owner_id, scheme__in={key[0] for key in mine}
+                company__in=pool.values("pk"), scheme__in={key[0] for key in mine}
             )
             .exclude(company_id=company.pk)
             .values_list("company_id", "scheme", "value", "label")
@@ -276,20 +287,18 @@ def for_company(company) -> list[Candidate]:
                     _("The same identifier: %(identifier)s") % {"identifier": str(matched)}
                 )
 
-    return _candidates(Company.objects.filter(owner_id=company.owner_id), reasons)
+    return _candidates(pool, reasons)
 
 
-def for_contact(contact) -> list[Candidate]:
+def for_contact(contact, person=None) -> list[Candidate]:
     """This person's other contacts that look like ``contact``: the same name, or the same
     email address. At whatever company -- somebody who changed employer is recorded twice
     exactly because they did."""
     if contact.pk is None:
         return []
-    found = _contacts_alike(contact.owner_id, [contact])
-    return _candidates(
-        Contact.objects.filter(owner_id=contact.owner_id).select_related("company"),
-        found.get(contact.pk, {}),
-    )
+    pool = _contacts_of(contact, person)
+    found = _contacts_alike(pool, [contact])
+    return _candidates(pool.select_related("company"), found.get(contact.pk, {}))
 
 
 def contacts_with_any(owner, contacts) -> set[int]:
@@ -301,13 +310,13 @@ def contacts_with_any(owner, contacts) -> set[int]:
     contacts = [contact for contact in contacts if contact.pk is not None]
     if not contacts:
         return set()
-    owner_id = getattr(owner, "pk", owner)
-    return {pk for pk, matches in _contacts_alike(owner_id, contacts).items() if matches}
+    pool = Contact.objects.manageable_by(owner)
+    return {pk for pk, matches in _contacts_alike(pool, contacts).items() if matches}
 
 
-def _contacts_alike(owner_id, contacts) -> dict[int, dict[int, list[str]]]:
-    """For each of ``contacts``: the owner's other contacts like it, each with why."""
-    everybody = list(Contact.objects.filter(owner_id=owner_id).values_list("pk", "name", "email"))
+def _contacts_alike(pool, contacts) -> dict[int, dict[int, list[str]]]:
+    """For each of ``contacts``: the other contacts in ``pool`` like it, each with why."""
+    everybody = list(pool.values_list("pk", "name", "email"))
     by_name: dict[str, list[int]] = {}
     by_email: dict[str, list[int]] = {}
     for pk, name, email in everybody:

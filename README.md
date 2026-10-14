@@ -68,7 +68,7 @@ buy, and why money does not move an issue up the list.
 is built as if that were the only thing that mattered.** A CV carries a home address, a
 phone number and a full employment history; a timeline says who has and has not replied.
 So the code and the data are kept as secure as the project knows how to make them: every
-record is owned and every query is scoped, files are never served without a permission
+record is owned and every query is scoped -- No one sees another person's data unless that person granted it -- explicitly, for a stated scope, revocably, and visibly to them at any time. Superusers can see and change any company, contact or listing, including private ones, but never anyone's notes, applications or documents. Files are never served without a permission
 check, the browser is held to a strict content security policy, nothing is fetched from
 the network without a deliberate decision, and the test suite includes security tests —
 ownership sweeps, policy checks, the things an attacker would try — that fail the build.

@@ -39,7 +39,8 @@ def _with_notes(request: HttpRequest) -> bool:
 class ContactVCardView(LoginRequiredMixin, View):
     def get(self, request: HttpRequest, pk: int) -> HttpResponse:
         contact = get_object_or_404(
-            vcards.contacts_of(Contact.objects.for_user(request.user)), pk=pk
+            vcards.contacts_of(Contact.objects.for_user(request.user).with_notes(request.user)),
+            pk=pk,
         )
         card = vcards.card_for_contact(contact, notes=_with_notes(request))
         return _download(vcard.card_to_text(card), f"postulo-contact-{contact.pk}.vcf")
@@ -47,9 +48,11 @@ class ContactVCardView(LoginRequiredMixin, View):
 
 class CompanyContactsVCardView(LoginRequiredMixin, View):
     def get(self, request: HttpRequest, pk: int) -> HttpResponse:
-        company = get_object_or_404(Company.objects.for_user(request.user), pk=pk)
+        company = get_object_or_404(
+            Company.objects.for_user(request.user).with_notes(request.user), pk=pk
+        )
         contacts = vcards.contacts_of(
-            Contact.objects.for_user(request.user).filter(company=company)
+            Contact.objects.for_user(request.user).with_notes(request.user).filter(company=company)
         )
         notes = _with_notes(request)
         text = vcard.cards_to_text(vcards.card_for_contact(c, notes=notes) for c in contacts)
@@ -58,7 +61,9 @@ class CompanyContactsVCardView(LoginRequiredMixin, View):
 
 class CompanyVCardView(LoginRequiredMixin, View):
     def get(self, request: HttpRequest, pk: int) -> HttpResponse:
-        company = get_object_or_404(Company.objects.for_user(request.user), pk=pk)
+        company = get_object_or_404(
+            Company.objects.for_user(request.user).with_notes(request.user), pk=pk
+        )
         card = vcards.card_for_company(company, notes=_with_notes(request))
         return _download(vcard.card_to_text(card), f"postulo-company-{company.pk}.vcf")
 
@@ -76,7 +81,9 @@ class CompanyExportView(LoginRequiredMixin, View):
 
         from postulo.core import kind_files
 
-        company = get_object_or_404(Company.objects.for_user(request.user), pk=pk)
+        company = get_object_or_404(
+            Company.objects.for_user(request.user).with_notes(request.user), pk=pk
+        )
         notes = _with_notes(request)
         # The JSON is Postulo's own; the card is the vCard module's (#877).
         if request.GET.get("format") != "json" and not modules.is_on(request.user, "format-vcard"):
@@ -99,7 +106,9 @@ class CompanyExportView(LoginRequiredMixin, View):
 
 class AllContactsVCardView(LoginRequiredMixin, View):
     def get(self, request: HttpRequest) -> HttpResponse:
-        contacts = vcards.contacts_of(Contact.objects.for_user(request.user))
+        contacts = vcards.contacts_of(
+            Contact.objects.for_user(request.user).with_notes(request.user)
+        )
         notes = _with_notes(request)
         text = vcard.cards_to_text(vcards.card_for_contact(c, notes=notes) for c in contacts)
         return _download(text, "postulo-contacts.vcf")
@@ -178,7 +187,12 @@ class ContactVCardsView(LoginRequiredMixin, TemplateView):
         if not chosen:
             messages.info(request, _("No card was ticked, so nothing was added."))
             return redirect("jobs:contact_vcards")
-        report = vcards.apply(request.user, cards, chosen)
+        into = None
+        wanted = request.POST.get("into", "")
+        if wanted.startswith("group:") and wanted[6:].isdigit():
+            # One of the person's own groups, or nobody's but theirs (#896).
+            into = request.user.groups.filter(pk=int(wanted[6:])).first()
+        report = vcards.apply(request.user, cards, chosen, into)
         request.session.pop(vcards.SESSION_KEY, None)
         total = report.contacts + report.companies
         if total:

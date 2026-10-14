@@ -20,6 +20,7 @@ import logging
 from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group
+from django.db import transaction
 from django.http import Http404, HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
@@ -68,9 +69,17 @@ class GroupsView(StaffRequiredMixin, View):
                 messages.success(request, _("Group made."))
             return redirect("server:groups")
         group = get_object_or_404(Group, pk=request.POST.get("group", "0") or 0)
+        from . import groups as lifecycle
+
         if action == "delete":
+            # Refused while it owns records (#896); its members keep copies of what was
+            # shared with it that their own data points at.
+            try:
+                lifecycle.delete_group(group)
+            except lifecycle.GroupOwnsRecords as refusal:
+                messages.error(request, str(refusal))
+                return redirect("server:groups")
             logger.warning("Group %r deleted by %s", group.name, request.user.username)
-            group.delete()
             messages.success(request, _("Group deleted."))
         elif action == "save":
             name = request.POST.get("name", "").strip()
@@ -78,10 +87,18 @@ class GroupsView(StaffRequiredMixin, View):
             if not name or len(name) > MAX_GROUP_NAME or clash:
                 messages.error(request, _("That is not a name this group can have."))
                 return redirect("server:groups")
-            group.name = name
-            group.save(update_fields=["name"])
             chosen = [int(pk) for pk in request.POST.getlist("members") if pk.isdigit()]
-            group.user_set.set(get_user_model().objects.filter(pk__in=chosen))
+            # Whoever is taken out keeps copies of what their own data points at, and the
+            # last member of a group that owns records stays (#896): `core.groups` does both,
+            # for this page and every other way the membership changes.
+            try:
+                with transaction.atomic():
+                    group.name = name
+                    group.save(update_fields=["name"])
+                    group.user_set.set(get_user_model().objects.filter(pk__in=chosen))
+            except lifecycle.LastMemberOwns as refusal:
+                messages.error(request, str(refusal))
+                return redirect("server:groups")
             logger.warning("Group %r set by %s", group.name, request.user.username)
             messages.success(request, _("Saved."))
         else:

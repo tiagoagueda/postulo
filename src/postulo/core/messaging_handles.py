@@ -23,7 +23,7 @@ from django.utils.translation import gettext_lazy as _
 from postulo.plugins.messaging_contacts import MESSAGING_CONTACTS
 
 from . import messaging_services
-from .formsets import RowsAlreadyGone, leaving, owner_of, remove_first
+from .formsets import RowsAlreadyGone, give_owner, leaving, remove_first
 from .messaging_services import OTHER
 from .models import MessagingHandle
 from .web_links import ServiceSelect
@@ -346,7 +346,7 @@ class BaseMessagingHandleFormSet(RowsAlreadyGone, generic_forms.BaseGenericInlin
 
     def save_new(self, form, commit=True):
         # Whose the row is, set where the row is made (#454).
-        form.instance.owner = owner_of(self.instance)
+        give_owner(form.instance, self.instance)
         return super().save_new(form, commit=commit)
 
     def save(self, commit: bool = True):

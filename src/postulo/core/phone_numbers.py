@@ -23,7 +23,7 @@ from django.utils.translation import ngettext_lazy
 from postulo.plugins.phone_numbers import PHONE_NUMBERS
 
 from . import phone_field, phones
-from .formsets import RowsAlreadyGone, leaving, owner_of, remove_first
+from .formsets import RowsAlreadyGone, give_owner, leaving, remove_first
 from .models import PhoneNumber
 from .option_icons import IconSelect
 
@@ -564,7 +564,7 @@ class BasePhoneNumberFormSet(RowsAlreadyGone, generic_forms.BaseGenericInlineFor
     def save_new(self, form, commit=True):
         # Whose the row is, set where the row is made, so that no page saving these rows
         # has to remember to (#454).
-        form.instance.owner = owner_of(self.instance)
+        give_owner(form.instance, self.instance)
         return super().save_new(form, commit=commit)
 
     def save(self, commit: bool = True):
@@ -659,7 +659,12 @@ def formset_for(
         # A refusal that leaves something out of the number says where it can go
         # instead, and only a holder with a notes box has anywhere: a contact, and not
         # *Your details*.
-        form_kwargs={"default_country": default_country, "has_notes": hasattr(holder, "notes")},
+        # Asked of the kind of holder, not of a `notes` attribute: a note is each reader's
+        # own since #896, and reading it here would need to know whose.
+        form_kwargs={
+            "default_country": default_country,
+            "has_notes": holder is not None and hasattr(type(holder), "NOTE_MODEL"),
+        },
     )
     formset.asked_by = asked_by
     # Read by the template, so the choice appears the day an operator installs a gateway

@@ -1,0 +1,13 @@
+{% load i18n %}
+{% comment %} One's own note on a company or a contact one may see but not change (#896): the
+   note is the reader's whatever the record's grant, so it has a form of its own. {% endcomment %}
+<form method="post" action="{% url 'jobs:own_note' kind record.pk %}" class="card mt-4" data-own-note>
+  {% csrf_token %}
+  <input type="hidden" name="next" value="{{ request.get_full_path }}">
+  <div class="field mb-3">
+    <label for="own-note">{% translate "Your notes" %}</label>
+    <textarea id="own-note" name="notes" rows="4" aria-describedby="own-note-help">{{ record.notes }}</textarea>
+    <p id="own-note-help">{% translate "Yours. Nobody else sees them, and they never appear on a document." %}</p>
+  </div>
+  <button type="submit" class="btn" data-variant="outline">{% translate "Keep my notes" %}</button>
+</form>

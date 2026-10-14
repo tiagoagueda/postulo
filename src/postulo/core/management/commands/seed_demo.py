@@ -667,7 +667,11 @@ class Command(BaseCommand):
                 location=location,
                 website=website,
                 careers_url=f"{website}/careers",
-                notes=rng.choice(
+            )
+            # The person's own note on it (#896), a row of theirs rather than a column.
+            company.write_note(
+                user,
+                rng.choice(
                     [
                         "",
                         "",
@@ -1057,21 +1061,33 @@ class Command(BaseCommand):
             (companies[7], "Data Engineer", ListingState.NEW, None, ""),
             (companies[2], "Junior Developer", ListingState.DISCARDED, None, DiscardReason.PAY),
         ]
+        from postulo.applications.services import create_listing
+
         for company, title, state, closes_in, reason in undecided:
-            JobPosting.objects.create(
-                owner=user,
+            # Through `create_listing`, which writes where the person stands as their own
+            # status rather than on the listing (#896).
+            create_listing(
+                user,
                 company=company,
-                title=title,
-                location=company.location,
-                employment_type="full_time",
-                url=f"{company.website}/careers/{rng.randint(1000, 9999)}",
-                source=rng.choices(SOURCES, weights=SOURCE_WEIGHTS)[0],
-                closes_at=(now.date() + dt.timedelta(days=closes_in)) if closes_in else None,
-                description=f"{company.name} is hiring a {title.lower()}. Noticed, not decided.",
-                state=state,
-                discard_reason=reason,
-                noted_at=now - dt.timedelta(days=rng.randint(1, 10)),
-                decided_at=(now - dt.timedelta(days=1)) if state != ListingState.NEW else None,
+                posting_data={
+                    "title": title,
+                    "location": company.location,
+                    "employment_type": "full_time",
+                    "url": f"{company.website}/careers/{rng.randint(1000, 9999)}",
+                    "source": rng.choices(SOURCES, weights=SOURCE_WEIGHTS)[0],
+                    "closes_at": (
+                        (now.date() + dt.timedelta(days=closes_in)) if closes_in else None
+                    ),
+                    "description": (
+                        f"{company.name} is hiring a {title.lower()}. Noticed, not decided."
+                    ),
+                    "state": state,
+                    "discard_reason": reason,
+                    "noted_at": now - dt.timedelta(days=rng.randint(1, 10)),
+                    "decided_at": (
+                        (now - dt.timedelta(days=1)) if state != ListingState.NEW else None
+                    ),
+                },
             )
             report.listings += 1
 

@@ -181,8 +181,8 @@ def test_where_both_say_something_the_kept_one_wins_and_the_other_is_written_dow
         "Wikidata: Q96",
         "Met them at the fair.",
     ):
-        assert line in kept.notes, line
-    assert kept.notes.index("The good one.") < kept.notes.index("Merged with Acme Ltd")
+        assert line in kept.own_note(), line
+    assert kept.own_note().index("The good one.") < kept.own_note().index("Merged with Acme Ltd")
 
 
 def test_the_note_is_written_even_where_nothing_differed(user, acme):
@@ -193,7 +193,7 @@ def test_the_note_is_written_even_where_nothing_differed(user, acme):
     merging.merge_companies(acme, other)
 
     acme.refresh_from_db()
-    assert acme.notes.startswith("Merged with Acme Ltd on ")
+    assert acme.own_note().startswith("Merged with Acme Ltd on ")
 
 
 def test_departments_of_one_name_become_one(user, acme, limited):
@@ -257,7 +257,7 @@ def test_a_logo_the_kept_company_has_no_room_for_is_said_and_then_gone(user, acm
     assert bytes(CompanyLogo.objects.get(company=acme).data).endswith(b"ours")
     assert CompanyLogo.objects.count() == 1, "one logo row, and the other's went with its company"
     assert any("Its logo" in line for line in plan.left_behind)
-    assert "Its logo" in acme.notes
+    assert "Its logo" in acme.own_note()
 
 
 def test_the_place_goes_with_the_address_it_is_of(user, acme):
@@ -333,7 +333,7 @@ def test_a_parent_the_kept_company_cannot_take_is_written_down(user):
     assert ("Part of", "Our Group", "Their Group") in {
         (row.label, row.kept, row.other) for row in plan.differences
     }
-    assert "Part of: Their Group" in kept.notes
+    assert "Part of: Their Group" in kept.own_note()
 
 
 # ------------------------------------------------------------------- the timeline
@@ -399,7 +399,7 @@ def test_a_merge_that_fails_did_not_happen(user, acme, limited, monkeypatch):
     person.refresh_from_db()
     acme.refresh_from_db()
     assert application.posting.company == limited and person.company == limited
-    assert acme.website == "" and acme.notes == ""
+    assert acme.website == "" and acme.own_note() == ""
     assert limited.identifiers.count() == 1 and limited.departments.count() == 1
 
 
@@ -430,11 +430,13 @@ def test_a_merge_stops_rather_than_delete_what_it_cannot_move(user, acme, limite
 
 
 def test_two_records_of_two_people_are_never_merged(user, other_user, acme):
+    """Not because their owners differ (#896): because the other person would lose sight of
+    what replaced their record, and the refusal says who."""
     theirs = company(other_user, "Acme Ltd")
 
-    with pytest.raises(ValueError, match="same person"):
+    with pytest.raises(merging.CannotMerge, match="can see"):
         merging.plan_companies(acme, theirs)
-    with pytest.raises(ValueError, match="same person"):
+    with pytest.raises(merging.CannotMerge, match="can see"):
         merging.merge_companies(acme, theirs)
 
     assert Company.objects.filter(pk=theirs.pk).exists()
@@ -527,7 +529,7 @@ def test_looking_at_the_page_changes_nothing(client, user, acme, limited):
     assert Company.objects.filter(pk=limited.pk).exists()
     acme.refresh_from_db()
     application.refresh_from_db()
-    assert acme.website == "" and acme.notes == ""
+    assert acme.website == "" and acme.own_note() == ""
     assert application.posting.company == limited
     assert not merged_entries(application)
 
@@ -688,8 +690,8 @@ def test_everything_the_other_person_held_moves(user, cave, twin):
     assert list(interview.contacts.all()) == [cave]
     assert (cave.role, cave.email) == ("Founder", "cave@aperture.example")
     assert cave.company == employer and cave.department.name == "Management"
-    assert "Merged with C. Johnson (Aperture Science) on " in cave.notes
-    assert "Likes lemons." in cave.notes
+    assert "Merged with C. Johnson (Aperture Science) on " in cave.own_note()
+    assert "Likes lemons." in cave.own_note()
 
 
 def test_the_kept_persons_own_stay_the_first_of_each(user, cave, twin):
@@ -778,7 +780,7 @@ def test_where_both_say_something_about_a_person_the_kept_one_wins(user, twin):
         "Email address: cave@aperture.example",
         "Company: Aperture Science · Management",
     ):
-        assert line in kept.notes, line
+        assert line in kept.own_note(), line
 
 
 def test_the_same_address_in_another_case_is_no_difference(user, twin):
@@ -827,7 +829,7 @@ def test_a_merge_of_people_that_fails_did_not_happen(user, cave, twin, monkeypat
     cave.refresh_from_db()
     assert application.contact == twin
     assert twin.phone_numbers.count() == 1 and not cave.phone_numbers.exists()
-    assert cave.notes == "" and cave.email == ""
+    assert cave.own_note() == "" and cave.email == ""
 
 
 def test_what_a_plugin_holds_about_them_is_said_before_the_merge(user, cave, twin, monkeypatch):

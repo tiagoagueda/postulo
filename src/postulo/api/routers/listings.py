@@ -56,11 +56,23 @@ router = Router(tags=["listings"], auth=scope("read"))
 
 
 def _queryset(request):
+    from django.db.models import Prefetch
+
+    from postulo.applications.models import Application
+
+    owner = request.auth.owner
+    # The caller's own status and applications on each listing, never anybody else's (#896).
     return (
         owned(request, JobPosting.objects)
         .select_related("company")
-        .with_application_count()
-        .prefetch_related("applications")
+        .with_status(owner)
+        .prefetch_related(
+            Prefetch(
+                "applications",
+                queryset=Application.objects.filter(owner=owner),
+                to_attr="own_applications",
+            )
+        )
     )
 
 
@@ -115,9 +127,11 @@ def list_listing_choices(
     listing and must not read the search to do it: a title, a company, a place and a state.
     Newest noted first, and ``q`` narrows to the ones whose title or company says it.
     """
-    listings = owned(request, JobPosting.objects).select_related("company")
+    listings = (
+        owned(request, JobPosting.objects).select_related("company").with_status(request.auth.owner)
+    )
     if state == "all":
-        listings = listings.with_application_count()
+        pass
     elif state == "undecided":
         listings = listings.undecided()
     elif state in LISTING_FILTERS:
@@ -191,6 +205,7 @@ def add_listing_event(request, pk: int, payload: ListingEventIn):
         contact=contact,
         artefact=document,
         external_id=payload.external_id,
+        owner=request.auth.owner,
     )
     shown = listing_event_out(event)
     if not created and not request.auth.has_scope("read") and event.actor != actor_of(request):
@@ -238,7 +253,10 @@ def apply(request, pk: int, payload: ApplicationDetailsIn):
     priority_or_422(payload.priority)
     named = referrer_and_agency_or_422(request, payload)
     application = apply_to_listing(
-        listing, {**payload.application_data(), **named}, actor=actor_of(request)
+        listing,
+        {**payload.application_data(), **named},
+        actor=actor_of(request),
+        owner=request.auth.owner,
     )
     application.tags.set(tags_named(request.auth.owner, payload.tags))
     from postulo.applications.models import Application
@@ -260,7 +278,7 @@ def apply(request, pk: int, payload: ApplicationDetailsIn):
 )
 def shortlist(request, pk: int):
     listing = owned_or_404(request, _queryset(request), pk)
-    listing.shortlist()
+    listing.shortlist(request.auth.owner)
     return listing_out(request, owned_or_404(request, _queryset(request), pk), detail=True)
 
 
@@ -268,12 +286,12 @@ def shortlist(request, pk: int):
 def discard(request, pk: int, payload: DiscardIn):
     listing = owned_or_404(request, _queryset(request), pk)
     reason = choice_or_422(payload.reason, DiscardReason, field="reason")
-    listing.discard(reason)
+    listing.discard(request.auth.owner, reason)
     return listing_out(request, owned_or_404(request, _queryset(request), pk), detail=True)
 
 
 @router.post("/{int:pk}/restore", response=ListingDetailOut, auth=scope("write"), summary="Restore")
 def restore(request, pk: int):
     listing = owned_or_404(request, _queryset(request), pk)
-    listing.restore()
+    listing.restore(request.auth.owner)
     return listing_out(request, owned_or_404(request, _queryset(request), pk), detail=True)

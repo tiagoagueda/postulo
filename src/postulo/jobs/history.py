@@ -31,6 +31,7 @@ from django.utils.translation import gettext as _
 from .models import (
     Capture,
     CaptureStatus,
+    Contact,
     JobPosting,
     ListingEvent,
     ListingEventKind,
@@ -97,7 +98,7 @@ def bounded(text) -> str:
     return text
 
 
-def _check_artefact(posting: JobPosting, kind: str, artefact) -> None:
+def _check_artefact(posting: JobPosting, kind: str, artefact, owner) -> None:
     """Refuse a link to anything but one of the owner's captures or files, and the wrong kind.
 
     A capture is bound as a capture and nothing else, and a *document* entry is one that
@@ -116,8 +117,8 @@ def _check_artefact(posting: JobPosting, kind: str, artefact) -> None:
         raise NotBound(f"A listing's history cannot point at {type(artefact).__name__}.")
     if isinstance(artefact, Capture) and kind != ListingEventKind.CAPTURE:
         raise NotBound("A capture is bound to a listing as a capture entry.")
-    if artefact.owner_id != posting.owner_id:
-        raise NotBound("That belongs to somebody other than the listing's owner.")
+    if artefact.owner_id != owner.pk:
+        raise NotBound("That belongs to somebody other than the person writing the entry.")
 
 
 def record_listing_event(
@@ -131,6 +132,7 @@ def record_listing_event(
     contact=None,
     artefact=None,
     external_id: str = "",
+    owner=None,
 ) -> tuple[ListingEvent, bool]:
     """Append one entry to a listing's history. Returns it, and whether it is new.
 
@@ -154,18 +156,20 @@ def record_listing_event(
     saying so, and neither may carry a NUL.
     """
     posting = listing_of(record)
+    owner = _whose_entry(record, posting, owner)
     kind = str(kind)
     if kind not in ListingEventKind.values:
         raise NotBound(
             f"{kind!r} is not a kind of entry; one of {sorted(ListingEventKind.values)}."
         )
-    _check_artefact(posting, kind, artefact)
-    if contact is not None and contact.owner_id != posting.owner_id:
-        raise NotBound("That contact belongs to somebody other than the listing's owner.")
+    _check_artefact(posting, kind, artefact, owner)
+    if contact is not None and not Contact.objects.visible_to(owner).filter(pk=contact.pk).exists():
+        raise NotBound("That contact is not one the person writing the entry can see.")
 
     external_id = one_line(external_id)[:EXTERNAL_ID_MAX_CHARS]
+    mine = ListingEvent.objects.filter(posting=posting, owner=owner)
     if external_id:
-        found = ListingEvent.objects.filter(posting=posting, external_id=external_id).first()
+        found = mine.filter(external_id=external_id).first()
         if found is not None:
             return found, False
 
@@ -186,16 +190,30 @@ def record_listing_event(
         # caller's transaction usable -- an API request is one, and the answer is the entry
         # the other request made.
         with transaction.atomic():
-            return ListingEvent.objects.create(posting=posting, **values), True
+            return ListingEvent.objects.create(posting=posting, owner=owner, **values), True
     except IntegrityError:
-        found = (
-            ListingEvent.objects.filter(posting=posting, external_id=external_id).first()
-            if external_id
-            else None
-        )
+        found = mine.filter(external_id=external_id).first() if external_id else None
         if found is None:
             raise
         return found, False
+
+
+def _whose_entry(record, posting: JobPosting, owner):
+    """Whose history the entry goes in (#896): a listing shared with two people has two.
+
+    Said by the caller where it can be, and otherwise the application's owner, or the
+    listing's own person. A group's listing has no one person, so an entry on it must say
+    whose it is, and one written for somebody who cannot see the listing is refused.
+    """
+    if owner is None and getattr(record, "posting_id", None) == posting.pk:
+        owner = record.owner
+    if owner is None:
+        owner = posting.owner
+    if owner is None:
+        raise NotBound("Say whose history the entry goes in: the listing belongs to a group.")
+    if not JobPosting.objects.visible_to(owner).filter(pk=posting.pk).exists():
+        raise NotBound("That listing is not one the person writing the entry can see.")
+    return owner
 
 
 class AlreadyDecided(NotBound):
@@ -217,8 +235,8 @@ def bind_capture(capture: Capture, posting: JobPosting, *, actor: str = "") -> L
     Read under a lock, so the review screen open in two tabs binds once; a capture that is
     no longer waiting raises `AlreadyDecided`.
     """
-    if capture.owner_id != posting.owner_id:
-        raise NotBound("That listing belongs to somebody other than the capture's owner.")
+    if not JobPosting.objects.visible_to(capture.owner).filter(pk=posting.pk).exists():
+        raise NotBound("That listing is not one the capture's owner can see.")
     locked = Capture.objects.select_for_update().filter(pk=capture.pk).first()
     if locked is None or locked.status != CaptureStatus.PENDING:
         raise AlreadyDecided("That capture has already been saved or discarded.")
@@ -235,6 +253,7 @@ def bind_capture(capture: Capture, posting: JobPosting, *, actor: str = "") -> L
         occurred_at=locked.created_at,
         actor=actor,
         artefact=locked,
+        owner=capture.owner,
     )
     locked.status = CaptureStatus.ACCEPTED
     locked.posting = posting
@@ -247,7 +266,7 @@ def bind_capture(capture: Capture, posting: JobPosting, *, actor: str = "") -> L
     return event
 
 
-def history_of(posting: JobPosting) -> list[ListingEvent]:
+def history_of(posting: JobPosting, user) -> list[ListingEvent]:
     """A listing's entries, newest first, with what each names loaded beside it.
 
     What each points at is fetched a kind at a time -- captures with what they kept of their
@@ -257,7 +276,7 @@ def history_of(posting: JobPosting) -> list[ListingEvent]:
     from postulo.documents.models import UploadedDocument
 
     entries = list(
-        ListingEvent.objects.filter(posting=posting)
+        ListingEvent.objects.filter(posting=posting, owner=user)
         .select_related("contact", "contact__company")
         .prefetch_related(
             GenericPrefetch(

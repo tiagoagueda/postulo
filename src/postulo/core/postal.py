@@ -30,7 +30,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.db import transaction
 from django.utils.translation import gettext_lazy as _
 
-from .formsets import RowsAlreadyGone, owner_of
+from .formsets import RowsAlreadyGone, give_owner, owner_of
 from .models import PostalAddress
 from .option_icons import IconSelect
 
@@ -621,7 +621,7 @@ class BasePostalAddressFormSet(RowsAlreadyGone, BaseGenericInlineFormSet):
     def save_new(self, form, commit=True):
         # Whose the row is, set where the row is made, so that no page saving these rows
         # has to remember to (#454).
-        form.instance.owner = owner_of(self.instance)
+        give_owner(form.instance, self.instance)
         return super().save_new(form, commit=commit)
 
     def save_existing_objects(self, commit=True):

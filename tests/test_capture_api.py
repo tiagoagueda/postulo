@@ -507,7 +507,9 @@ def test_accepting_a_capture_makes_a_listing_and_links_it(client, user, pending)
     assert pending.status == CaptureStatus.ACCEPTED
     assert pending.posting is not None
     assert pending.posting.title == "Research Engineer"
-    assert pending.posting.derived_state == "new", "a listing to decide about, not an application"
+    assert pending.posting.status_for(pending.owner).derived_state == "new", (
+        "a listing to decide about, not an application"
+    )
     assert pending.application is None
     assert response.url == pending.posting.get_absolute_url()
     assert not Application.objects.for_user(user).exists()
@@ -531,7 +533,7 @@ def test_accepting_a_capture_already_applied_to_makes_the_application_too(client
     assert pending.application is not None
     assert pending.application.posting == pending.posting
     assert pending.application.status == "applied"
-    assert pending.posting.derived_state == "applied"
+    assert pending.posting.status_for(pending.owner).derived_state == "applied"
     assert response.url == pending.application.get_absolute_url()
 
 

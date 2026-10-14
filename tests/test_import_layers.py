@@ -156,6 +156,9 @@ LAYERS: list[tuple[str, tuple[str, ...]]] = [
             "postulo.core.preferences",
             # Which day a week starts on, put in force beside them and read by the reports (#859).
             "postulo.core.weeks",
+            # Who may see, change and manage a shared record: the querysets the models of
+            # companies, contacts and listings are built on (#896).
+            "postulo.core.sharing",
             "postulo.core.identifiers",
             "postulo.plugins.identifiers*",
             # What a web link's service is, which the model reads to name a row (#305). The

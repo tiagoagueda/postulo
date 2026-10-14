@@ -278,7 +278,8 @@ def test_a_company_is_found_by_any_of_its_names(user):
         owner=user, company=company, language="fr", name="Université d'Aveiro", source="typed"
     )
 
-    assert Company.objects.for_user(user).filter(company_match("Université")).get() == company
+    found = Company.objects.for_user(user).with_notes(user).filter(company_match("Université"))
+    assert found.get() == company
 
 
 def test_a_merge_moves_the_names_the_kept_one_has_not(user):

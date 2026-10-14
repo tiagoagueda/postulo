@@ -23,8 +23,9 @@ Security is one of Postulo's stated missions, not a section of its README: the
 application holds CVs, cover letters and employment histories, and it is built as if that
 were the only thing that mattered.
 
-- Every record has an owner and every query is scoped to one; a request for somebody
-  else's record is a 404, never a confirmation that it exists.
+- No one sees another person's data unless that person granted it — explicitly, for a stated scope, revocably, and visibly to them at any time. Superusers can see and change any company, contact or listing, including private ones, but never anyone's notes, applications or documents. Every record has an owner -- a person, or for a company, a contact or a listing a
+  group -- and every query is scoped to what the person may see; a request for a record
+  nobody granted them is a 404, never a confirmation that it exists.
 - Files are delivered only through a view that has checked who is asking, with
   `Cache-Control: no-store`.
 - The browser runs under a strict content security policy: no inline script, no

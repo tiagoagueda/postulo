@@ -16,6 +16,16 @@ def owned_or_404(request, queryset, pk: int):
     return get_object_or_404(owned(request, queryset), pk=pk)
 
 
+def writable_or_404(request, queryset, pk: int):
+    """A company, contact or listing the caller may change the details of (#896).
+
+    The same 404 as one that is not there: a token that may read a record shared with it
+    read-only learns nothing more by trying to change it. A token reaches what its owner
+    does and no more -- never a superuser's everything.
+    """
+    return get_object_or_404(queryset.visible_to(request.auth.owner, write=True), pk=pk)
+
+
 def choice_or_422(value: str, choices, *, field: str, allow_blank: bool = False) -> str:
     if allow_blank and value == "":
         return value

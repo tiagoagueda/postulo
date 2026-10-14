@@ -1409,7 +1409,8 @@ def listing_out(request, posting, *, detail: bool = False) -> dict:
         "discard_reason": posting.discard_reason,
         "noted_at": posting.noted_at,
         "decided_at": posting.decided_at,
-        "application_ids": [a.pk for a in posting.applications.all()],
+        # The caller's own, as `_queryset` fetched them: never anybody else's (#896).
+        "application_ids": [a.pk for a in posting.own_applications],
         "web_url": request.build_absolute_uri(posting.get_absolute_url()),
         "updated_at": posting.updated_at,
     }
@@ -1418,7 +1419,9 @@ def listing_out(request, posting, *, detail: bool = False) -> dict:
 
         data["description"] = posting.description
         data["description_format"] = posting.description_format
-        data["events"] = [listing_event_out(event) for event in history_of(posting)]
+        data["events"] = [
+            listing_event_out(event) for event in history_of(posting, request.auth.owner)
+        ]
     return data
 
 

@@ -224,7 +224,7 @@ def test_deleting_the_listing_takes_its_history_and_leaves_the_file(listing, for
 def test_discarding_the_listing_keeps_everything(listing, forwarded):
     record_listing_event(listing, kind="document", summary="The description", artefact=forwarded)
 
-    listing.discard("pay")
+    listing.discard(listing.owner, "pay")
 
     assert listing.events.count() == 1
     assert UploadedDocument.objects.filter(pk=forwarded.pk).exists()

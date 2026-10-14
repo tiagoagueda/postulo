@@ -128,7 +128,11 @@ class EditableCellView(View):
     form_url_name = ""
 
     def get_queryset(self):
-        return self.model.objects.for_user(self.request.user)
+        # A cell changes the record's details: for a shared one, a read/write grant (#896).
+        objects = self.model.objects
+        if hasattr(objects, "visible_to"):
+            return objects.visible_to(self.request.user, write=True)
+        return objects.for_user(self.request.user)
 
     def get_object(self):
         return get_object_or_404(self.get_queryset(), pk=self.kwargs["pk"])

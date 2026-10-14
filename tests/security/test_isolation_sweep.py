@@ -419,6 +419,26 @@ def company_identifier(owner):
     )
 
 
+def their_group(owner):
+    from django.contrib.auth.models import Group
+
+    group = Group.objects.create(name=_named("Their group"))
+    group.user_set.add(owner)
+    return group
+
+
+def share(owner):
+    """One of ``owner``'s companies, shared with a third account (#896)."""
+    from django.contrib.auth import get_user_model
+
+    from postulo.jobs.models import Share
+
+    third = get_user_model().objects.create_user(
+        email=f"third-{next(_serial)}@example.org", password="not-a-real-password"
+    )
+    return Share.objects.create(company=company(owner), grantee_user=third, scope="read")
+
+
 def pk_of(make: Callable, **extra) -> Callable:
     return lambda owner: {"pk": make(owner).pk, **extra}
 
@@ -435,6 +455,8 @@ FACTORIES: dict[str, Callable] = {
     "accounts:remove_address": pk_of(postal_address),
     "accounts:remove_identifier": pk_of(person_identifier),
     "api:token_revoke": pk_of(token),
+    # one of the other person's groups, which this one is not in (#896)
+    "accounts:group_leave": pk_of(their_group),
     # applications
     "applications:delete": pk_of(application),
     "applications:detail": pk_of(application),
@@ -515,6 +537,11 @@ FACTORIES: dict[str, Callable] = {
     # Adding somebody else's capture to a listing's history (#270). The listing it names
     # is in the body; tests/security/test_listing_history.py asks for somebody else's there.
     "jobs:capture_bind": pk_of(capture),
+    # sharing a record, taking a share back, and one's own note on one (#896)
+    "jobs:share": lambda owner: {"kind": "company", "pk": company(owner).pk},
+    "jobs:share_revoke": pk_of(share),
+    "jobs:move_owner": lambda owner: {"kind": "company", "pk": company(owner).pk},
+    "jobs:own_note": lambda owner: {"kind": "company", "pk": company(owner).pk},
     "jobs:company_cell": pk_of(company, column="name"),
     "jobs:company_delete": pk_of(company),
     "jobs:company_identifier_remove": pk_of(company_identifier),
@@ -860,10 +887,10 @@ def test_somebody_elses_id_in_a_body_is_answered_as_a_missing_one(client, user, 
 # ----------------------------------------------------------- choices in a form (#422)
 
 
-def department(owner, at):
+def department(owner, at, name="A team"):
     from postulo.jobs.models import Department
 
-    return Department.objects.create(owner=owner, company=at, name="A team")
+    return Department.objects.create(owner=owner, company=at, name=name)
 
 
 def form_table(user, mine=None) -> dict:
@@ -963,7 +990,8 @@ def test_no_form_offers_a_choice_that_is_somebody_elses(user, other_user):
     industry(user)
     upload(user)
     theirs = application(other_user)
-    department(other_user, own_company)
+    # Named apart: a company has one department of a name, whoever filed it (#896).
+    department(other_user, own_company, name="Their team")
     contact_at(other_user, own_company)
     theirs.contact = contact_at(other_user, theirs.posting.company)
     theirs.save()

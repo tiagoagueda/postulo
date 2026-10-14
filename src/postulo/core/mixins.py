@@ -18,6 +18,39 @@ class OwnedObjectMixin(LoginRequiredMixin):
         return super().get_queryset().for_user(self.request.user)
 
 
+#: What a view of a shared record does with it (#896): read it -- and keep one's own note,
+#: status and history on it --, change its details, or delete it, give it to another owner
+#: and share it.
+READ, WRITE, MANAGE = "read", "write", "manage"
+
+
+def shared_scope(queryset, user, access: str = READ):
+    """``queryset`` narrowed to what ``user`` may do ``access`` to (#896).
+
+    A superuser reaches every company, contact and listing through the views addressed by
+    a record's id -- never their notes, statuses or applications, which are read for the
+    person asking -- so the override is passed here and nowhere else.
+    """
+    if access == MANAGE:
+        return queryset.manageable_by(user, everyone=True)
+    return queryset.visible_to(user, write=access == WRITE, everyone=True)
+
+
+class SharedObjectMixin(LoginRequiredMixin):
+    """`OwnedObjectMixin` for a company, a contact or a listing, which may be shared (#896).
+
+    ``access`` says what the view does: ``read`` (its page, and what a person keeps of their
+    own on it), ``write`` (its details) or ``manage`` (deleting it, its owner, its shares).
+    A record outside that is a 404, as somebody else's has always been: a read-only grant
+    does not reveal that the edit page exists.
+    """
+
+    access = READ
+
+    def get_queryset(self) -> QuerySet:
+        return shared_scope(super().get_queryset(), self.request.user, self.access)
+
+
 class OwnerFormMixin:
     """Stamp the current user onto objects created through a form."""
 

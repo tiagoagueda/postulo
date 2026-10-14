@@ -645,6 +645,26 @@ msgstr[2] "%(counter)s fhógra le cinneadh a dhéanamh orthu"
 msgstr[3] "%(counter)s bhfógra le cinneadh a dhéanamh orthu"
 msgstr[4] "%(counter)s fógra le cinneadh a dhéanamh orthu"
 
+#: src/postulo/templates/accounts/groups.html
+#, python-format
+msgid "%(counter)s member"
+msgid_plural "%(counter)s members"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+msgstr[4] ""
+
+#: src/postulo/templates/accounts/delete_account.html
+#, python-format
+msgid "%(counter)s of your records is shared with others: they keep a copy of what their own records need, and are told it is gone."
+msgid_plural "%(counter)s of your records are shared with others: they keep a copy of what their own records need, and are told they are gone."
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+msgstr[4] ""
+
 #: src/postulo/templates/core/search.html
 #, fuzzy, python-format
 msgid "%(counter)s result for “%(term)s”"
@@ -884,6 +904,11 @@ msgstr ""
 #, fuzzy, python-format
 msgid "%(from)s to %(to)s"
 msgstr "%(from)s go %(to)s"
+
+#: src/postulo/jobs/sharing.py
+#, python-format
+msgid "%(grantee)s keeps %(names)s, which points at it; take that back first, or nothing changes."
+msgstr ""
 
 #: src/postulo/core/destinations.py
 #, fuzzy, python-format
@@ -1241,6 +1266,11 @@ msgstr "Tá %(name)s mar chuid de Postulo. Múch é faoi Socruithe an fhreastala
 msgid "%(name)s signs in as <strong>%(current)s</strong>. The new username must be free on this instance; capitals do not make it different."
 msgstr "Síníonn %(name)s isteach mar <strong>%(current)s</strong>. Caithfidh an t-ainm úsáideora nua a bheith saor ar an ásc seo; ní dhéanann ceannlitreacha difear."
 
+#: src/postulo/core/groups.py
+#, python-format
+msgid "%(name)s still owns records. Give them to somebody, or delete them, first."
+msgstr ""
+
 #: src/postulo/jobs/vcards.py
 #, python-format
 msgid "%(name)s was not added: %(why)s"
@@ -1260,6 +1290,11 @@ msgstr "%(name)s — %(kind)s"
 #, fuzzy, python-format
 msgid "%(name)s — dashboard"
 msgstr "%(name)s — deais"
+
+#: src/postulo/templates/jobs/partials/sharing_panel.html
+#, python-format
+msgid "%(name)s's."
+msgstr ""
 
 #: src/postulo/templates/core/export.html
 #, fuzzy, python-format
@@ -1306,6 +1341,11 @@ msgstr ""
 msgid "%(name)s: the number %(value)s was left out. %(why)s"
 msgstr ""
 
+#: src/postulo/jobs/merging.py
+#, python-format
+msgid "%(names)s can see “%(other)s” and not “%(kept)s”. Share “%(kept)s” with them first, or nothing is merged."
+msgstr ""
+
 #: src/postulo/resume/views.py
 #, fuzzy, python-format
 msgid "%(ok)s, %(broken)s; the ones that did not say why."
@@ -1326,6 +1366,11 @@ msgstr "Cumasc %(other)s isteach i %(kept)s."
 msgid "%(other)s was merged into %(kept)s"
 msgstr "Cumasc %(other)s isteach i %(kept)s"
 
+#: src/postulo/jobs/ownership.py
+#, python-format
+msgid "%(owner)s has a record of that name already; merge the two on the conflicts page."
+msgstr ""
+
 #: src/postulo/plugins/installing.py
 #, fuzzy, python-format
 msgid "%(package)s: needs %(wanted)s, and %(owner)s has %(have)s."
@@ -1339,6 +1384,11 @@ msgstr "%(package)s: teastaíonn %(wanted)s uaidh, agus tá %(have)s ag Postulo.
 #: src/postulo/templates/applications/calendar.html
 #, python-format
 msgid "%(period)s: choose another"
+msgstr ""
+
+#: src/postulo/core/groups.py
+#, python-format
+msgid "%(person)s is the last member of %(name)s, which still owns records. Give them to somebody, or delete them, first."
 msgstr ""
 
 #: src/postulo/plugins/forms.py
@@ -1355,6 +1405,11 @@ msgstr "Ní ligeann %(provider)s d’fheidhmchlár seoladh as a stuaim féin."
 #, fuzzy, python-format
 msgid "%(provider)s does not let an application send on its own. Choose “Signed in once”."
 msgstr "Ní ligeann %(provider)s d’fheidhmchlár seoladh as a stuaim féin. Roghnaigh “Sínithe isteach uair amháin”."
+
+#: src/postulo/jobs/sharing.py
+#, python-format
+msgid "%(record)s points at %(names)s, which %(grantee)s cannot see and which is not yours to share. Nothing was shared."
+msgstr ""
 
 #: src/postulo/core/gdpr.py
 #, fuzzy, python-format
@@ -1640,6 +1695,16 @@ msgstr "%(what)s…"
 #, fuzzy, python-format
 msgid "%(when)s ago"
 msgstr "%(when)s ó shin"
+
+#: src/postulo/templates/jobs/share.html
+#, python-format
+msgid "%(who)s cannot see these, which it points at. They are shared read-only with it, or nothing is shared."
+msgstr ""
+
+#: src/postulo/jobs/sharing.py
+#, python-format
+msgid "%(who)s shared “%(what)s” with you"
+msgstr ""
 
 #: src/postulo/accounts/forms.py
 #, python-format
@@ -2350,10 +2415,6 @@ msgstr ""
 msgid "A month"
 msgstr "Mí"
 
-#: src/postulo/templates/server/groups.html
-msgid "A name for a set of accounts. A group has no powers of its own: it is what an access rule on a plugin or a module points at."
-msgstr ""
-
 #: src/postulo/core/messaging_services.py
 #, python-format
 msgid "A name is at most %(max)s characters."
@@ -2673,6 +2734,10 @@ msgstr "Ceanntásc roinne"
 msgid "A self-hosted job application manager, written from the applicant's side of the table. Your applications, your CVs, your cover letters, on your server."
 msgstr "Bainisteoir iarratas poist féinóstáilte, scríofa ó thaobh an iarratasóra den bhord. D'iarratais, do CVanna, do litreacha cumhdaigh, ar do fhreastalaí féin."
 
+#: src/postulo/templates/server/groups.html
+msgid "A set of accounts. A group can own companies, contacts and listings, which every member can then see, change, share and delete, and records can be shared with it; it is also what an access rule on a plugin or a module points at. Whoever leaves keeps a copy of what their own records need; a group that still owns records cannot lose its last member or be deleted."
+msgstr ""
+
 #: src/postulo/accounts/models.py
 #, fuzzy
 msgid "A short professional title, such as “Backend engineer”."
@@ -2875,6 +2940,10 @@ msgstr "glactha ar"
 #, fuzzy
 msgid "accepted by"
 msgstr "glactha ag"
+
+#: src/postulo/jobs/models.py
+msgid "access"
+msgstr ""
 
 #: src/postulo/templates/server/plugins.html
 msgid "Access"
@@ -3099,7 +3168,7 @@ msgstr ""
 msgid "Add what is new"
 msgstr "Cuir leis an méid atá nua"
 
-#: src/postulo/jobs/tables.py
+#: src/postulo/jobs/models.py src/postulo/jobs/tables.py
 #, fuzzy
 msgid "Added"
 msgstr "Curtha leis"
@@ -3314,6 +3383,10 @@ msgstr "Tairgtear iad ar fad, agus teanga a chuirfear leis i leagan níos déana
 
 #: src/postulo/templates/accounts/profile.html
 msgid "All optional, and none of it is worked out from anything else. None of it is printed until a CV is set to print it, one by one, under <em>Choose which details</em> on the CV."
+msgstr ""
+
+#: src/postulo/jobs/whose.py
+msgid "All you can see"
 msgstr ""
 
 #: src/postulo/applications/agenda.py
@@ -4026,6 +4099,10 @@ msgstr ""
 msgid "As a file"
 msgstr ""
 
+#: src/postulo/templates/jobs/move_owner.html
+msgid "As an administrator you may also give it to anybody: type their username below instead."
+msgstr ""
+
 #: src/postulo/resume/forms.py
 msgid "As it was published."
 msgstr ""
@@ -4210,6 +4287,8 @@ msgid "B2 — upper intermediate"
 msgstr "B2 — meánleibhéal uachtarach"
 
 #: src/postulo/templates/connections/pick.html
+#: src/postulo/templates/jobs/move_owner.html
+#: src/postulo/templates/jobs/share.html
 #, fuzzy
 msgid "Back"
 msgstr "Ar ais"
@@ -4485,6 +4564,10 @@ msgstr ""
 msgid "Buy me a coffee — scan to open buymeacoffee.com/tiagoagueda"
 msgstr "Ceannaigh caife dom — scan chun buymeacoffee.com/tiagoagueda a oscailt"
 
+#: src/postulo/jobs/models.py
+msgid "by"
+msgstr ""
+
 #: src/postulo/templates/server/person_recovery.html
 #, fuzzy
 msgid "By"
@@ -4595,7 +4678,9 @@ msgstr "URL aisghlaoch le clárú leis"
 #: src/postulo/templates/jobs/listing_apply.html
 #: src/postulo/templates/jobs/listing_form.html
 #: src/postulo/templates/jobs/merge.html
+#: src/postulo/templates/jobs/move_owner.html
 #: src/postulo/templates/jobs/posting_form.html
+#: src/postulo/templates/jobs/share.html
 #: src/postulo/templates/partials/confirm_delete.html
 #: src/postulo/templates/partials/table/cell.html
 #: src/postulo/templates/resume/item_form.html
@@ -4846,12 +4931,29 @@ msgstr "Athraigh pasfhocal"
 msgid "Change the logo"
 msgstr ""
 
+#: src/postulo/templates/jobs/conflicts.html
+#, python-format
+msgid "Change the owner of %(name)s"
+msgstr ""
+
+#: src/postulo/jobs/models.py
+msgid "change to a record"
+msgstr ""
+
 #: src/postulo/templates/server/people.html
 #: src/postulo/templates/server/person_username.html
 #: src/postulo/templates/settings/account.html
 #, fuzzy
 msgid "Change username"
 msgstr "Athraigh ainm úsáideora"
+
+#: src/postulo/jobs/models.py
+msgid "Changed"
+msgstr ""
+
+#: src/postulo/templates/jobs/partials/sharing_panel.html
+msgid "Changes"
+msgstr ""
 
 #: src/postulo/templates/documents/cv_item_form.html
 #, fuzzy, python-format
@@ -4862,6 +4964,10 @@ msgstr "Baineann athruithe anseo le “%(name)s” ar an CV seo amháin. Fágtar
 #, fuzzy
 msgid "Changes made here are pushed on the next run; the other side is read then too."
 msgstr "Seoltar athruithe a dhéantar anseo ar an gcéad rith eile; léitear an taobh eile ansin freisin."
+
+#: src/postulo/jobs/models.py
+msgid "changes to records"
+msgstr ""
 
 #: src/postulo/resume/models.py
 msgid "chapter"
@@ -5454,6 +5560,19 @@ msgstr "cumraíocht"
 msgid "Configured in the environment with the POSTULO_OIDC_* variables; see Configuration in the wiki."
 msgstr "Cumraithe sa timpeallacht leis na hathróga POSTULO_OIDC_*; féach Cumraíocht sa vicí."
 
+#: src/postulo/jobs/models.py
+msgid "conflict kept apart"
+msgstr ""
+
+#: src/postulo/templates/jobs/conflicts.html
+#: src/postulo/templates/jobs/partials/whose_form.html
+msgid "Conflicts"
+msgstr ""
+
+#: src/postulo/jobs/models.py
+msgid "conflicts kept apart"
+msgstr ""
+
 #: src/postulo/templates/connections/pick.html
 #, fuzzy
 msgid "Connect"
@@ -5591,6 +5710,7 @@ msgstr "Conradh"
 msgid "conversation"
 msgstr "comhrá"
 
+#: src/postulo/jobs/models.py
 #: src/postulo/templates/accounts/invite_created.html
 #: src/postulo/templates/documents/cv_text.html
 #, fuzzy
@@ -6997,9 +7117,8 @@ msgid "Every 15 minutes"
 msgstr "Gach 15 nóiméad"
 
 #: src/postulo/templates/server/people.html
-#, fuzzy
-msgid "Every account on this instance. Administrators see accounts, never anyone's applications or documents, but they can install plugins, so appoint only people you would trust with the database."
-msgstr "Gach cuntas ar an sampla seo. Feiceann riarthóirí cuntais, riamh iarratais ná cáipéisí aon duine, ach is féidir leo breiseáin a shuiteáil, mar sin ceap daoine a mbeadh muinín agat astu leis an mbunachar sonraí amháin."
+msgid "Every account on this instance. Administrators see accounts, never anyone's notes, applications or documents; a superuser can also see and change any company, contact or listing. They can install plugins, so appoint only people you would trust with the database."
+msgstr ""
 
 #: src/postulo/templates/applications/report.html
 #: src/postulo/templates/applications/report_print.html
@@ -7064,6 +7183,10 @@ msgstr "Gach cineál naisc ar an sampla seo, de réir breiseáin, agus an méid 
 msgid "Every language here but English is a machine draft waiting for somebody who speaks it to read it and say so. If one of them is yours, <a href=\"%(guide)s\" class=\"underline\">Translating</a> says how a review goes."
 msgstr "Is dréacht meaisín gach teanga anseo seachas an Béarla, ag fanacht le duine a labhraíonn í chun í a léamh agus é sin a rá. Más leatsa ceann acu, míníonn <a href=\"%(guide)s\" class=\"underline\">Aistriúchán</a> conas a dhéantar athbhreithniú."
 
+#: src/postulo/templates/jobs/move_owner.html
+msgid "Every member of the group can then see it, change it, share it and delete it."
+msgstr ""
+
 #: src/postulo/templates/server/design.html
 #, fuzzy
 msgid "Every piece the interface is built from, in the theme you are reading it in. Switch the theme under Settings → Appearance to see the other one."
@@ -7104,6 +7227,14 @@ msgstr ""
 
 #: src/postulo/templates/server/plugin_access.html
 msgid "Everybody may switch it for themselves"
+msgstr ""
+
+#: src/postulo/jobs/whose.py
+msgid "Everybody's"
+msgstr ""
+
+#: src/postulo/templates/jobs/conflicts.html
+msgid "Everybody's, as an administrator"
 msgstr ""
 
 #: src/postulo/jobs/listing_views.py src/postulo/templates/server/logs.html
@@ -7947,10 +8078,27 @@ msgstr ""
 msgid "Give each nationality as a country code."
 msgstr ""
 
+#: src/postulo/templates/jobs/move_owner.html
+msgid "Give it"
+msgstr ""
+
+#: src/postulo/templates/jobs/move_owner.html
+msgid "Give it to"
+msgstr ""
+
 #: src/postulo/templates/server/person_recovery.html
 #, fuzzy, python-format
 msgid "Give it to %(name)s in person, on the telephone, or however else you would prove it was you. Anyone who has it can set the password on that account."
 msgstr "Tabhair do %(name)s go pearsanta é, ar an nguthán, nó ar aon bhealach eile ina gcruthófá gurbh tusa a bhí ann. Is féidir le duine ar bith a bhfuil sé aige pasfhocal an chuntais sin a shocrú."
+
+#: src/postulo/templates/jobs/move_owner.html
+#, python-format
+msgid "Give it to %(name)s?"
+msgstr ""
+
+#: src/postulo/templates/jobs/conflicts.html
+msgid "Give it to somebody"
+msgstr ""
 
 #: src/postulo/core/personal.py
 msgid "Give nationalities as a list of country codes."
@@ -7980,6 +8128,10 @@ msgstr "Tabhair ainm don chomhartha agus scóip amháin ar a laghad."
 
 #: src/postulo/core/personal.py
 msgid "Give the year, and the month before the day: a year alone is enough."
+msgstr ""
+
+#: src/postulo/jobs/models.py
+msgid "Given to another owner"
 msgstr ""
 
 #: src/postulo/notifications/models.py
@@ -8089,7 +8241,8 @@ msgstr "Comhlán, roimh cháin. Fág folamh é má ainmníonn an fógra poist fi
 msgid "Gross, before tax. One end on its own is fine — most postings give one."
 msgstr "Comhlán, roimh cháin. Tá ceann amháin ina aonar ceart go leor — tugann formhór na bhfógraí poist ceann amháin."
 
-#: src/postulo/plugins/models.py src/postulo/resume/models.py
+#: src/postulo/jobs/models.py src/postulo/plugins/models.py
+#: src/postulo/resume/models.py src/postulo/templates/jobs/share.html
 #: src/postulo/templates/server/plugin_access.html
 #, fuzzy
 msgid "group"
@@ -8420,6 +8573,10 @@ msgstr "Hibrideach"
 #, fuzzy
 msgid "I have already applied to this one"
 msgstr "Chuir mé iarratas chuig an gceann seo cheana"
+
+#: src/postulo/templates/accounts/groups.html
+msgid "I understand: I no longer see what the group owns or was shared with, and I keep a copy of each record my own data points at."
+msgstr ""
 
 #: src/postulo/core/transfers.py
 msgid "iCalendar"
@@ -9109,10 +9266,23 @@ msgstr "eisithe ar"
 msgid "It also gets you back in: ask for a sign-in code and it arrives there. Making a different address primary moves that with it. You are still asked for your authenticator app if you have one."
 msgstr "Cuireann sé ar ais isteach tú freisin: iarr cód logála isteach agus tagann sé ansin. Má dhéanann tú seoladh eile ina phríomhcheann, bogann sé sin leis. Iarrfar d'aip fhíordheimhnithe ort fós má tá ceann agat."
 
+#: src/postulo/templates/jobs/move_owner.html
+msgid "It becomes yours alone."
+msgstr ""
+
+#: src/postulo/jobs/share_views.py src/postulo/templates/jobs/move_owner.html
+#, python-format
+msgid "It belongs to %(name)s now."
+msgstr ""
+
 #: src/postulo/templates/server/plugins.html
 #, fuzzy
 msgid "It can read and change everything on this instance, for every person on it. Install only what you have read or have reason to trust. Nothing is ever updated automatically: an update is a code change, and an administrator clicks it."
 msgstr "Is féidir leis gach rud ar an ásc seo a léamh agus a athrú, do gach duine air. Ná suiteáil ach an rud atá léite agat nó a bhfuil cúis agat muinín a bheith agat as. Ní nuashonraítear aon rud go huathoibríoch riamh: is athrú cóid é nuashonrú, agus cliceálann riarthóir air."
+
+#: src/postulo/jobs/share_views.py
+msgid "It cannot be given to them."
+msgstr ""
 
 #: src/postulo/applications/forms.py
 #, fuzzy
@@ -9206,6 +9376,10 @@ msgstr[1] "Tá sé taifeadta mar rud a seoladh le %(count)d iarratas, nach ndéa
 msgstr[2] "Tá sé taifeadta mar rud a seoladh le %(count)d iarratas, nach ndéarfaidh a thuilleadh gur seoladh é."
 msgstr[3] "Tá sé taifeadta mar rud a seoladh le %(count)d n-iarratas, nach ndéarfaidh a thuilleadh gur seoladh é."
 msgstr[4] "Tá sé taifeadta mar rud a seoladh le %(count)d iarratas, nach ndéarfaidh a thuilleadh gur seoladh é."
+
+#: src/postulo/jobs/sharing.py
+msgid "It is theirs already."
+msgstr ""
 
 #: src/postulo/templates/account/recovery_unusable.html
 #, fuzzy
@@ -9339,10 +9513,9 @@ msgstr ""
 msgid "Its name, in double quotes, or one name for each language, as in the example. A reader is shown the one closest to their language."
 msgstr "A ainm, idir comharthaí athfhriotail dúbailte, nó ainm amháin do gach teanga, mar sa sampla. Taispeántar don léitheoir an ceann is gaire dá theanga."
 
-#: src/postulo/jobs/merging.py
-#, fuzzy
-msgid "Its notes:"
-msgstr "A nótaí:"
+#: src/postulo/jobs/sharing.py
+msgid "Its owner's account was deleted. What your own records needed is kept."
+msgstr ""
 
 #: src/postulo/core/models.py
 msgid "its postcode"
@@ -9431,6 +9604,14 @@ msgstr "coinnigh rindreáil de leathanach gafa"
 msgid "Keep a rendering of the pages I capture"
 msgstr "Coinnigh rindreáil de na leathanaigh a ghabhaim"
 
+#: src/postulo/templates/jobs/conflicts.html
+msgid "Keep both"
+msgstr ""
+
+#: src/postulo/templates/jobs/partials/own_note_form.html
+msgid "Keep my notes"
+msgstr ""
+
 #: src/postulo/core/models.py
 msgid "keep the newest"
 msgstr ""
@@ -9483,6 +9664,10 @@ msgstr "Coinnithe"
 #, fuzzy
 msgid "Kept after they are used or expire, because taking somebody's account back is not something to be able to do without a trace."
 msgstr "Coinnítear é tar éis a úsáide nó a éaga, mar níor cheart go bhféadfaí cuntas duine a thógáil ar ais gan rian."
+
+#: src/postulo/jobs/share_views.py
+msgid "Kept apart: they will not be asked about again."
+msgstr ""
 
 #: src/postulo/templates/partials/postal_addresses.html
 #, fuzzy
@@ -9843,6 +10028,10 @@ msgstr ""
 msgid "Leave the box empty and a CV in this language prints the name the ESCO classification gives this skill: “%(name)s”."
 msgstr "Fág an bosca folamh agus clóscríobhann CV sa teanga seo an t-ainm a thugann rangú ESCO don scil seo: “%(name)s”."
 
+#: src/postulo/templates/accounts/groups.html
+msgid "Leave the group"
+msgstr ""
+
 #: src/postulo/templates/base.html
 msgid "Leave this page"
 msgstr ""
@@ -10096,6 +10285,14 @@ msgstr "iontráil liostála"
 #, fuzzy
 msgid "Listing filters"
 msgstr "Scagairí fógraí"
+
+#: src/postulo/jobs/models.py
+msgid "listing status"
+msgstr ""
+
+#: src/postulo/jobs/models.py
+msgid "listing statuses"
+msgstr ""
 
 #: src/postulo/core/help.py src/postulo/core/kind_files.py
 #: src/postulo/core/navigation.py src/postulo/core/search.py
@@ -10401,6 +10598,11 @@ msgstr ""
 msgid "may use it"
 msgstr ""
 
+#: src/postulo/jobs/share_views.py
+#, python-format
+msgid "Me, %(name)s"
+msgstr ""
+
 #: src/postulo/jobs/industries.py src/postulo/templates/server/overview.html
 #, fuzzy
 msgid "Media"
@@ -10493,6 +10695,10 @@ msgstr "Cumaisc teagmhálaithe"
 msgid "Merge into"
 msgstr "Cumaisc isteach i"
 
+#: src/postulo/templates/jobs/conflicts.html
+msgid "Merge into one"
+msgstr ""
+
 #: src/postulo/templates/jobs/merge.html
 #, fuzzy
 msgid "Merge with"
@@ -10502,6 +10708,10 @@ msgstr "Cumaisc le"
 #, fuzzy
 msgid "Merge with another contact"
 msgstr "Cumaisc le teagmhálaí eile"
+
+#: src/postulo/jobs/models.py
+msgid "Merged"
+msgstr ""
 
 #: src/postulo/templates/jobs/merge.html
 #, fuzzy
@@ -10860,6 +11070,10 @@ msgstr ""
 msgid "Neither is printed anywhere unless a CV says so: each CV has a switch for the form of address and one for the pronouns under its own <em>Settings</em>. Letters print neither."
 msgstr "Ní chlóscríobhtar ceachtar acu in áit ar bith mura ndeir CV amhlaidh: tá lasc ag gach CV don fhoirm bheannachta agus ceann do na forainmneacha faoina <em>Shocruithe</em> féin. Ní chlóscríobhann litreacha ceachtar acu."
 
+#: src/postulo/templates/jobs/share.html
+msgid "Neither lets them delete it, share it or give it to somebody else."
+msgstr ""
+
 #: src/postulo/api/forms.py
 #, fuzzy
 msgid "Never"
@@ -11200,6 +11414,15 @@ msgstr "Níl aon litir den chineál seo ann fós."
 msgid "No letters yet. A cover letter is for one posting; a motivation letter tells your story; a speculative letter goes where nothing is advertised; a follow-up note comes after an interview."
 msgstr "Níl aon litir ann fós. Baineann litir chumhdaigh le fógra amháin; insíonn litir spreagtha do scéal; téann litir gan iarraidh áit nach bhfuil aon fhógra; tagann nóta i ndiaidh agallaimh ina dhiaidh sin."
 
+#: src/postulo/jobs/models.py
+msgid "No longer shared"
+msgstr ""
+
+#: src/postulo/jobs/share_views.py
+#, python-format
+msgid "No longer shared with %(who)s."
+msgstr ""
+
 #: src/postulo/templates/server/backup_restore.html
 msgid "No media"
 msgstr ""
@@ -11362,6 +11585,10 @@ msgstr "Níor tháinig"
 msgid "Nobody"
 msgstr "Aon duine"
 
+#: src/postulo/templates/jobs/share.html
+msgid "Nobody else can see it."
+msgstr ""
+
 #: src/postulo/plugins/consent.py
 #, fuzzy
 msgid "Nobody has agreed to this yet. Connect it again."
@@ -11386,6 +11613,10 @@ msgstr "Níor shínigh aon duine isteach fós, mar sin ní féidir aon rud a she
 #, fuzzy
 msgid "Nobody is named here: whose contacts they are is the account's own business. Each person erases from their own contact's page."
 msgstr "Ní ainmnítear aon duine anseo: is gnó an chuntais féin cé leo na teagmhálaithe. Léirscriosann gach duine ó leathanach a theagmhálaí féin."
+
+#: src/postulo/jobs/share_views.py
+msgid "Nobody on this instance answers to that, or it is you; nothing was shared."
+msgstr ""
 
 #: src/postulo/templates/jobs/company_detail.html
 #, fuzzy
@@ -11435,6 +11666,10 @@ msgstr ""
 #, fuzzy
 msgid "Nobody you have recorded"
 msgstr "Aon duine a thaifead tú"
+
+#: src/postulo/templates/jobs/share.html
+msgid "Nobody, or the person below"
+msgstr ""
 
 #: src/postulo/jobs/industries.py
 #, fuzzy
@@ -11726,6 +11961,14 @@ msgstr "Nóta"
 msgid "Note (optional)"
 msgstr "Nóta (roghnach)"
 
+#: src/postulo/jobs/models.py
+msgid "note on a company"
+msgstr ""
+
+#: src/postulo/jobs/models.py
+msgid "note on a contact"
+msgstr ""
+
 #: src/postulo/jobs/tables.py
 #, fuzzy
 msgid "Noted"
@@ -11748,10 +11991,19 @@ msgid "notes"
 msgstr "nótaí"
 
 #: src/postulo/applications/views.py src/postulo/core/csv_import.py
+#: src/postulo/core/kind_files.py src/postulo/jobs/forms.py
 #: src/postulo/jobs/tables.py src/postulo/templates/jobs/company_detail.html
 #, fuzzy
 msgid "Notes"
 msgstr "Nótaí"
+
+#: src/postulo/jobs/models.py
+msgid "notes on companies"
+msgstr ""
+
+#: src/postulo/jobs/models.py
+msgid "notes on contacts"
+msgstr ""
 
 #: src/postulo/templates/server/plugins.html
 #, fuzzy
@@ -12049,6 +12301,10 @@ msgstr "Níor uaslódáladh aon rud fós."
 #, fuzzy
 msgid "Nothing waiting"
 msgstr "Níl aon rud ag fanacht"
+
+#: src/postulo/templates/jobs/conflicts.html
+msgid "Nothing wants deciding."
+msgstr ""
 
 #: src/postulo/documents/views.py src/postulo/jobs/vcard_views.py
 #, fuzzy
@@ -12758,6 +13014,14 @@ msgstr "Ach amháin do “Eile”: cad a thabhairt air ar CV."
 msgid "Only http and https addresses can be captured."
 msgstr "Ní féidir ach seoltaí http agus https a ghabháil."
 
+#: src/postulo/jobs/sharing.py
+msgid "Only its owner can share it."
+msgstr ""
+
+#: src/postulo/jobs/sharing.py
+msgid "Only its owner can take a share back."
+msgstr ""
+
 #: src/postulo/core/models.py
 #, fuzzy
 msgid "Only one of your own numbers can get you back into your account. This one belongs to somebody you deal with."
@@ -12777,6 +13041,10 @@ msgstr "Ní bhíonn sna dhá cheann seo ach na hiarratais a ainmníonn tarchuirt
 #, fuzzy
 msgid "Only the ones ticked below"
 msgstr "Na cinn a ticeáladh thíos amháin"
+
+#: src/postulo/templates/jobs/conflicts.html
+msgid "Only the ones you can see"
+msgstr ""
 
 #: src/postulo/core/server_views.py
 msgid "Only the operator's own account can stop being an administrator."
@@ -12894,6 +13162,10 @@ msgstr ""
 
 #: src/postulo/accounts/forms.py
 msgid "Or say only this"
+msgstr ""
+
+#: src/postulo/templates/jobs/move_owner.html
+msgid "Or to a person"
 msgstr ""
 
 #: src/postulo/jobs/forms.py
@@ -13033,10 +13305,43 @@ msgstr "Forbhreathnú"
 msgid "Own mail"
 msgstr "Ríomhphost féin"
 
-#: src/postulo/core/models.py
+#: src/postulo/templates/jobs/share.html
+#, python-format
+msgid "Owned by %(name)s."
+msgstr ""
+
+#: src/postulo/templates/jobs/conflicts.html
+msgid "Owned by a group nobody is in"
+msgstr ""
+
+#: src/postulo/templates/jobs/share.html
+#, python-format
+msgid "Owned by the group %(name)s: every member can see it, change it, share it and delete it."
+msgstr ""
+
+#: src/postulo/core/models.py src/postulo/jobs/models.py
 #, fuzzy
 msgid "owner"
 msgstr "úinéir"
+
+#: src/postulo/templates/jobs/move_owner.html
+#: src/postulo/templates/jobs/partials/sharing_panel.html
+msgid "Owner"
+msgstr ""
+
+#: src/postulo/core/models.py
+msgid "owning group"
+msgstr ""
+
+#: src/postulo/templates/accounts/groups.html
+#, python-format
+msgid "owns %(counter)s record"
+msgid_plural "owns %(counter)s records"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+msgstr[4] ""
 
 #: src/postulo/accounts/forms.py
 #, fuzzy
@@ -13298,8 +13603,8 @@ msgstr ""
 msgid "Permissions"
 msgstr "Ceadanna"
 
-#: src/postulo/accounts/models.py src/postulo/plugins/models.py
-#: src/postulo/resume/models.py
+#: src/postulo/accounts/models.py src/postulo/jobs/models.py
+#: src/postulo/plugins/models.py src/postulo/resume/models.py
 #, fuzzy
 msgid "person"
 msgstr "duine"
@@ -14392,6 +14697,14 @@ msgstr "Léite san áit ar thaispeáin do cheartúcháin féin é ar an suíomh 
 msgid "Read where your own corrections showed them on this site before: %(fields)s. Each is marked below; check them as you would anything else."
 msgstr "Léite san áit ar thaispeáin do cheartúcháin féin iad ar an suíomh seo roimhe: %(fields)s. Tá gach ceann marcáilte thíos; seiceáil iad mar a dhéanfá aon rud eile."
 
+#: src/postulo/jobs/models.py
+msgid "Read-only"
+msgstr ""
+
+#: src/postulo/jobs/models.py
+msgid "Read/write"
+msgstr ""
+
 #: src/postulo/resume/views.py
 #, fuzzy
 msgid "reading"
@@ -14525,6 +14838,14 @@ msgstr ""
 #, fuzzy
 msgid "records about other people are kept for (days)"
 msgstr "coinnítear taifid faoi dhaoine eile ar feadh (laethanta)"
+
+#: src/postulo/templates/jobs/conflicts.html
+msgid "Records held twice by different owners, and shares that point at something their reader cannot see. Nothing is merged, moved or shared until you say so."
+msgstr ""
+
+#: src/postulo/templates/accounts/groups.html
+msgid "Records held twice, and what wants deciding"
+msgstr ""
 
 #: src/postulo/templates/server/data_protection.html
 #, fuzzy, python-format
@@ -15243,6 +15564,10 @@ msgstr ""
 msgid "say that references are available on request"
 msgstr ""
 
+#: src/postulo/accounts/views.py
+msgid "Say that you understand what leaving does, first."
+msgstr ""
+
 #: src/postulo/core/postal.py
 #, fuzzy
 msgid "Say what this address is."
@@ -15417,6 +15742,14 @@ msgstr "Slándáil"
 msgid "See every capture waiting for review"
 msgstr "Féach ar gach gabháil atá ag fanacht le hathbhreithniú"
 
+#: src/postulo/templates/jobs/share.html
+msgid "See it"
+msgstr ""
+
+#: src/postulo/templates/jobs/share.html
+msgid "See it and change its details"
+msgstr ""
+
 #: src/postulo/templates/core/import_csv_done.html
 #, fuzzy
 msgid "See the applications"
@@ -15431,6 +15764,10 @@ msgstr "Féach an clár"
 #, fuzzy
 msgid "See the listings"
 msgstr "Féach na fógraí"
+
+#: src/postulo/templates/jobs/move_owner.html
+msgid "See what it would do"
+msgstr ""
 
 #: src/postulo/templates/jobs/merge.html
 #, fuzzy
@@ -15718,6 +16055,98 @@ msgstr "Seacht ndath, gach ceann tiúnta go 3:1 i gcoinne an chárta sa dá thé
 msgid "Shape"
 msgstr "Cruth"
 
+#: src/postulo/jobs/models.py
+msgid "share"
+msgstr ""
+
+#: src/postulo/templates/jobs/partials/sharing_panel.html
+#: src/postulo/templates/jobs/share.html
+msgid "Share"
+msgstr ""
+
+#: src/postulo/templates/jobs/share.html
+msgid "Share it"
+msgstr ""
+
+#: src/postulo/templates/jobs/conflicts.html
+msgid "Share it with them"
+msgstr ""
+
+#: src/postulo/templates/jobs/share.html
+msgid "Share them all"
+msgstr ""
+
+#: src/postulo/jobs/sharing.py
+#, python-format
+msgid "Share what it points at too, or nothing is shared: %(names)s"
+msgstr ""
+
+#: src/postulo/templates/jobs/share.html
+msgid "Share what it points at too?"
+msgstr ""
+
+#: src/postulo/jobs/ownership.py
+#, python-format
+msgid "Share what it points at with the group too, or it stays where it is: %(names)s"
+msgstr ""
+
+#: src/postulo/jobs/models.py
+msgid "shared"
+msgstr ""
+
+#: src/postulo/jobs/models.py
+msgid "Shared"
+msgstr ""
+
+#: src/postulo/jobs/models.py
+msgid "shared by"
+msgstr ""
+
+#: src/postulo/templates/jobs/share.html
+msgid "Shared with"
+msgstr ""
+
+#: src/postulo/templates/jobs/partials/sharing_panel.html
+#, python-format
+msgid "Shared with %(counter)s"
+msgid_plural "Shared with %(counter)s"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+msgstr[4] ""
+
+#: src/postulo/jobs/share_views.py
+#, python-format
+msgid "Shared with %(who)s."
+msgstr ""
+
+#: src/postulo/jobs/whose.py
+msgid "Shared with you"
+msgstr ""
+
+#: src/postulo/templates/jobs/partials/sharing_panel.html
+#, python-format
+msgid "Shared with you by %(name)s, read-only."
+msgstr ""
+
+#: src/postulo/templates/jobs/partials/sharing_panel.html
+#, python-format
+msgid "Shared with you by %(name)s: you can change its details."
+msgstr ""
+
+#: src/postulo/templates/jobs/conflicts.html
+msgid "Shared, pointing at something unshared"
+msgstr ""
+
+#: src/postulo/jobs/models.py
+msgid "shares"
+msgstr ""
+
+#: src/postulo/templates/jobs/share.html
+msgid "Sharing"
+msgstr ""
+
 #: src/postulo/core/widgets_builtin.py
 #, fuzzy
 msgid "Shortcuts"
@@ -15744,6 +16173,7 @@ msgstr "Ar an ngearrliosta"
 msgid "Shortlisted."
 msgstr "Curtha ar an ngearrliosta."
 
+#: src/postulo/templates/jobs/partials/whose_form.html
 #: src/postulo/templates/server/logs.html
 #, fuzzy
 msgid "Show"
@@ -15839,6 +16269,10 @@ msgstr "Taispeáin na breiseáin a thagann le Postulo"
 #, fuzzy
 msgid "Show this period"
 msgstr "Taispeáin an tréimhse seo"
+
+#: src/postulo/templates/jobs/partials/whose_form.html
+msgid "Showing"
+msgstr ""
 
 #: src/postulo/templates/applications/calendar.html
 #, python-format
@@ -16205,6 +16639,18 @@ msgstr "D’athraigh duine eile é seo agus tú á chur in eagar. Seo a deir sé
 msgid "Somebody has agreed to this. Test it to be sure it still stands."
 msgstr "Thoiligh duine éigin leis seo. Tástáil é le bheith cinnte go seasann sé fós."
 
+#: src/postulo/notifications/base.py
+msgid "Somebody shares a company, a contact or a listing with you"
+msgstr ""
+
+#: src/postulo/templates/jobs/partials/sharing_panel.html
+msgid "somebody who has since left"
+msgstr ""
+
+#: src/postulo/notifications/base.py
+msgid "Something shared with you is no longer shared"
+msgstr ""
+
 #: src/postulo/resume/candidate.py
 #, fuzzy
 msgid "Something that is not an entry"
@@ -16453,6 +16899,10 @@ msgstr "Cuir ó fheidhm é"
 #, fuzzy, python-format
 msgid "Stop opening as %(name)s"
 msgstr "Stop ag oscailt mar %(name)s"
+
+#: src/postulo/templates/jobs/share.html
+msgid "Stop sharing"
+msgstr ""
 
 #: src/postulo/core/tables.py
 #, fuzzy, python-format
@@ -16923,6 +17373,10 @@ msgstr "Tá an slabhra sin níos doimhne ná %(limit)s cuideachta — níos doim
 msgid "That company is no longer here."
 msgstr "Níl an chuideachta sin anseo a thuilleadh."
 
+#: src/postulo/api/routers/companies.py
+msgid "That company is shared with you read-only."
+msgstr ""
+
 #: src/postulo/plugins/consent.py
 #, fuzzy
 msgid "That connection does not use consent."
@@ -17220,6 +17674,10 @@ msgstr ""
 #, fuzzy
 msgid "That is not a file this page reads. It reads the JSON file it offers to download — one person's own record, as Postulo writes it — and nothing else."
 msgstr "Ní comhad é sin a léann an leathanach seo. Léann sé an comhad JSON a thairgeann sé le híoslódáil — taifead duine amháin féin, mar a scríobhann Postulo é — agus aon rud eile ní léann."
+
+#: src/postulo/jobs/sharing.py
+msgid "That is not a kind of access."
+msgstr ""
 
 #: src/postulo/accounts/avatars.py
 #, fuzzy, python-format
@@ -17723,6 +18181,10 @@ msgstr "Leibhéil an Chreata Eorpaigh Chomhchoitinn. Ní chlóscríobhann “Gan
 msgid "The companies' addresses on the map, as a file other mapping tools read, and points read back in."
 msgstr ""
 
+#: src/postulo/templates/partials/import_owner.html
+msgid "The companies, contacts and listings it adds. Applications and notes are always yours."
+msgstr ""
+
 #: src/postulo/core/kind_files.py
 #, python-format
 msgid "The company %(name)s is not in your account, and is added with it."
@@ -18040,6 +18502,22 @@ msgstr "Bhí an fhoirm imithe in éag, nó tháinig sí ó leathanach a síníod
 #, fuzzy
 msgid "The greys. A warm near-black rather than pure black, easier to read at length."
 msgstr "Na liatha. Beagnach-dubh te seachas dubh glan, níos éasca le léamh ar feadh tamaill."
+
+#: src/postulo/jobs/ownership.py src/postulo/jobs/sharing.py
+#, python-format
+msgid "the group %(name)s"
+msgstr ""
+
+#: src/postulo/jobs/share_views.py
+#: src/postulo/templates/partials/import_owner.html
+#, python-format
+msgid "The group %(name)s"
+msgstr ""
+
+#: src/postulo/templates/jobs/partials/sharing_panel.html
+#, python-format
+msgid "The group %(name)s's."
+msgstr ""
 
 #: src/postulo/resume/candidate.py
 #, fuzzy
@@ -18586,10 +19064,18 @@ msgstr "An ról"
 msgid "The route it went through. The report counts by this, including how many went through the public employment service's own board."
 msgstr ""
 
+#: src/postulo/jobs/conflicts.py
+msgid "The same advert"
+msgstr ""
+
 #: src/postulo/templates/jobs/capture_review.html
 #, fuzzy
 msgid "The same advert on another board is evidence about the job. Adding this capture to a listing's history keeps it, with any page it kept, and makes no second listing."
 msgstr "Is fianaise faoin bpost é an fógra céanna ar chlár eile. Coinníonn an ghabháil seo a chur le stair liostála é, le haon leathanach a choinnigh sí, agus ní dhéanann sé an dara liostáil."
+
+#: src/postulo/jobs/conflicts.py
+msgid "The same email address"
+msgstr ""
 
 #: src/postulo/jobs/duplicates.py
 #, fuzzy, python-format
@@ -18605,12 +19091,16 @@ msgstr "Na hiontrálacha céanna gan an leagan amach, i dteanga na cáipéise se
 msgid "The same figures by sector, and by industry within each. A company in three fields counts in all three."
 msgstr ""
 
+#: src/postulo/jobs/conflicts.py
+msgid "The same identifier"
+msgstr ""
+
 #: src/postulo/jobs/duplicates.py
 #, fuzzy, python-format
 msgid "The same identifier: %(identifier)s"
 msgstr "An t-aitheantóir céanna: %(identifier)s"
 
-#: src/postulo/jobs/duplicates.py
+#: src/postulo/jobs/conflicts.py src/postulo/jobs/duplicates.py
 #, fuzzy
 msgid "The same name"
 msgstr "An t-ainm céanna"
@@ -18619,6 +19109,10 @@ msgstr "An t-ainm céanna"
 #, fuzzy
 msgid "The same name, once the legal form is set aside"
 msgstr "An t-ainm céanna, nuair a chuirtear an fhoirm dhlíthiúil i leataobh"
+
+#: src/postulo/templates/jobs/conflicts.html
+msgid "The same thing twice"
+msgstr ""
 
 #: src/postulo/jobs/duplicates.py
 #, fuzzy, python-format
@@ -18900,6 +19394,10 @@ msgstr ""
 msgid "Their job title, as they give it themselves."
 msgstr "A theideal poist, mar a thugann siad féin é."
 
+#: src/postulo/templates/jobs/share.html
+msgid "Their username or email address on this instance, exactly."
+msgstr ""
+
 #: src/postulo/accounts/models.py src/postulo/documents/models.py
 #, fuzzy
 msgid "theme"
@@ -19015,6 +19513,10 @@ msgstr[4] "Tagann na figiúirí seo ó %(total)s iarratas — ró-bheag le concl
 #, fuzzy
 msgid "These look like the same one, and may not be. Nothing is merged unless you say so, and you are shown what would move first."
 msgstr "Is cosúil gurb ionann iad seo, agus b’fhéidir nach ionann. Ní chumasctar aon rud mura ndeir tú amhlaidh, agus taispeántar duit cad a bhogfaí ar dtús."
+
+#: src/postulo/templates/jobs/move_owner.html
+msgid "These no longer see it, and each keeps a copy of their own of what their applications, notes and other records point at:"
+msgstr ""
 
 #: src/postulo/templates/server/logs.html
 #, fuzzy
@@ -19487,6 +19989,10 @@ msgstr "Is riarthóir a athraíonn iad sin, duitse nó do chách — ní anseo r
 msgid "Three planes. A shadow is discarded under forced colours, so it may say what is above what and may never be the only thing saying it — each of these has a border too."
 msgstr "Trí phlána. Tréigtear scáth faoi dhathanna éigeantacha, mar sin féadann sé a rá cad atá os cionn cad ach ní féidir leis an t-aon rud a deir é a bheith ann riamh — tá imeall ag gach ceann acu seo freisin."
 
+#: src/postulo/jobs/models.py
+msgid "through"
+msgstr ""
+
 #: src/postulo/templates/settings/account.html
 #, fuzzy, python-format
 msgid "Through %(provider)s: no code. This instance is set to treat that as enough."
@@ -19862,6 +20368,10 @@ msgstr "cineál iontrála"
 
 #: src/postulo/applications/ical_import.py
 msgid "Type of interview"
+msgstr ""
+
+#: src/postulo/jobs/models.py
+msgid "type of record"
 msgstr ""
 
 #: src/postulo/jobs/models.py
@@ -20449,6 +20959,10 @@ msgstr "Seachtainí gan ceann ar bith"
 msgid "Welcome back, %(name)s"
 msgstr "Fáilte ar ais, %(name)s"
 
+#: src/postulo/jobs/models.py
+msgid "what"
+msgstr ""
+
 #: src/postulo/jobs/merging.py
 #, fuzzy, python-format
 msgid "What %(plugin)s holds about them, which Postulo cannot move."
@@ -20472,6 +20986,10 @@ msgstr "An méid a iarrann comhpháirt"
 #, fuzzy
 msgid "What a field is for, shown while the field is hovered or has the focus. A format the field requires stays under it instead."
 msgstr "Cad chuige a bhfuil réimse, le feiceáil fad is atá an réimse faoi scáth an phointeora nó fócas aige. Fanann formáid a theastaíonn ón réimse faoi ina ionad."
+
+#: src/postulo/templates/accounts/groups.html
+msgid "What a group owns, every member can see, change, share and delete. Your notes, your decisions and your applications stay yours."
+msgstr ""
 
 #: src/postulo/core/server_forms.py
 #, fuzzy
@@ -20522,6 +21040,10 @@ msgstr "cad a tháinig de"
 #, fuzzy
 msgid "What carries the mail off this machine."
 msgstr "An rud a iompraíonn an post ón meaisín seo."
+
+#: src/postulo/jobs/models.py
+msgid "what changed"
+msgstr ""
 
 #: src/postulo/templates/documents/rendered_compare.html
 #, fuzzy
@@ -20663,6 +21185,10 @@ msgstr "An méid a aithníonn sé: “duine”, “cuideachta” nó an dá chea
 msgid "What it may do"
 msgstr "Cad a fhéadann sé a dhéanamh"
 
+#: src/postulo/templates/jobs/move_owner.html
+msgid "What it points at is shared with the group, read-only:"
+msgstr ""
+
 #: src/postulo/applications/models.py
 #, fuzzy
 msgid "what it says"
@@ -20803,6 +21329,10 @@ msgstr ""
 #, fuzzy
 msgid "What the signs mean"
 msgstr "Cad a chiallaíonn na comharthaí"
+
+#: src/postulo/templates/jobs/share.html
+msgid "What they can do"
+msgstr ""
 
 #: src/postulo/templates/jobs/capture_page.html
 #, fuzzy
@@ -20982,7 +21512,7 @@ msgstr "An méid a deir “%(name)s”, gan an leagan amach: d’fhoirm a theast
 msgid "Whatever it is worth to you, once or now and then, at <a href=\"%(url)s\" class=\"underline\">buymeacoffee.com/tiagoagueda</a>."
 msgstr "Cibé is fiú leat é, uair amháin nó anois is arís, ag <a href=\"%(url)s\" class=\"underline\">buymeacoffee.com/tiagoagueda</a>."
 
-#: src/postulo/applications/models.py
+#: src/postulo/applications/models.py src/postulo/jobs/models.py
 #, fuzzy
 msgid "when"
 msgstr "cathain"
@@ -21289,6 +21819,10 @@ msgstr ""
 msgid "Who gave it, as a CV should print it. It is linked to the company of that name among yours, and added to your companies if there is none."
 msgstr ""
 
+#: src/postulo/templates/jobs/partials/sharing_panel.html
+msgid "Who has it"
+msgstr ""
+
 #: src/postulo/core/server_forms.py
 #, fuzzy
 msgid "Who issues the token. It decides which of the boxes below are wanted."
@@ -21335,6 +21869,10 @@ msgstr "An té a bhfuil tú ag bualadh leo. Tairgtear na daoine a thaifead tú s
 #, fuzzy
 msgid "Whoever put you forward, from the people you have recorded — at this company, at another, or at none. The figures count what each referrer led to."
 msgstr "An té a mhol thú, ó na daoine a thaifead tú — sa chuideachta seo, i gceann eile, nó i gceann ar bith. Comhaireann na figiúirí an méid a threoraigh gach tarchuirtheoir chuige."
+
+#: src/postulo/templates/partials/import_owner.html
+msgid "Whose they become"
+msgstr ""
 
 #: src/postulo/templates/jobs/posting_detail.html
 #, fuzzy
@@ -21467,8 +22005,16 @@ msgstr[2] "Le focal faire: iarrtar do dhara fachtóir ort, mura marcáil tú an 
 msgstr[3] "Le focal faire: iarrtar do dhara fachtóir ort, mura marcáil tú an brabhsálaí seo mar iontaofa. Maireann sé sin %(days)s lá."
 msgstr[4] "Le focal faire: iarrtar do dhara fachtóir ort, mura marcáil tú an brabhsálaí seo mar iontaofa. Maireann sé sin %(days)s lá."
 
+#: src/postulo/templates/jobs/share.html
+msgid "With a person"
+msgstr ""
+
 #: src/postulo/templates/server/backup_restore.html
 msgid "With Docker Compose"
+msgstr ""
+
+#: src/postulo/templates/jobs/share.html
+msgid "With one of your groups"
 msgstr ""
 
 #: src/postulo/templates/core/kind_file.html
@@ -21779,6 +22325,19 @@ msgstr ""
 msgid "You are already signed in."
 msgstr "Tá tú sínithe isteach cheana."
 
+#: src/postulo/templates/accounts/groups.html
+msgid "You are in no group. An administrator adds people to groups."
+msgstr ""
+
+#: src/postulo/templates/accounts/groups.html
+msgid "You are its last member and it still owns records: give them to somebody, or delete them, before you leave."
+msgstr ""
+
+#: src/postulo/accounts/views.py
+#, python-format
+msgid "You are no longer in %(name)s."
+msgstr ""
+
 #: src/postulo/templates/server/plugins.html
 msgid "You are not authorised to change settings."
 msgstr ""
@@ -21817,6 +22376,10 @@ msgstr "Is féidir leat ceann de gach cineál a bheith agat, ach amháin <em>Eil
 msgid "You can leave this page. The work carries on without you."
 msgstr "Is féidir leat an leathanach seo a fhágáil. Leanann an obair ar aghaidh gan tú."
 
+#: src/postulo/templates/jobs/move_owner.html
+msgid "You can no longer delete it, share it or take it back on your own."
+msgstr ""
+
 #: src/postulo/accounts/forms.py
 #, fuzzy
 msgid "You can sign in with this or with your address. Nobody else sees it — Postulo shows people your name."
@@ -21826,6 +22389,10 @@ msgstr "Is féidir leat síniú isteach leis seo nó le do sheoladh. Ní fheicea
 #, fuzzy
 msgid "You cannot deactivate the account you are signed in with."
 msgstr "Ní féidir leat an cuntas a bhfuil tú sínithe isteach leis a dhíghníomhachtú."
+
+#: src/postulo/jobs/ownership.py
+msgid "You cannot give it to them."
+msgstr ""
 
 #: src/postulo/plugins/policy.py
 #, fuzzy
@@ -21896,6 +22463,10 @@ msgstr "Tá ceann cosúil leis agat le dátaí eile. Beidh an dá cheann i do th
 #, fuzzy
 msgid "You have taken everything off it. Put something back whenever you like."
 msgstr "Bhain tú gach rud de. Cuir rud éigin ar ais nuair is mian leat."
+
+#: src/postulo/templates/accounts/delete_account.html
+msgid "You leave your groups; what they own stays theirs."
+msgstr ""
 
 #: src/postulo/documents/models.py
 msgid "You send it"
@@ -22063,6 +22634,14 @@ msgstr "Is é d’ainm baiste agus do shloinne an t-ainm a chlóscríobhann do C
 msgid "Your Gravatar has been fetched again."
 msgstr "Fuarthas do Gravatar arís."
 
+#: src/postulo/templates/accounts/groups.html src/postulo/templates/base.html
+msgid "Your groups"
+msgstr ""
+
+#: src/postulo/jobs/whose.py
+msgid "Your groups'"
+msgstr ""
+
 #: src/postulo/templates/jobs/company_detail.html
 msgid "Your history here"
 msgstr ""
@@ -22124,6 +22703,22 @@ msgstr "D'ainm air: “Telegram”, “Paperless sa bhaile”."
 #, fuzzy, python-format
 msgid "Your name, and under it what is chosen here from <a href=\"%(details_url)s\" class=\"underline\">Your details</a>, read again every time the document is drawn. Until you choose, that is your primary number, your account's address, the primary link of each kind, every identifier and where you are."
 msgstr "D’ainm, agus faoi an méid a roghnaítear anseo ó <a href=\"%(details_url)s\" class=\"underline\">Do shonraí</a>, léite arís gach uair a tharraingítear an cháipéis. Go dtí go roghnaíonn tú, is é sin d’uimhir phríomha, seoladh do chuntais, príomhnasc gach cineáil, gach aitheantóir agus an áit a bhfuil tú."
+
+#: src/postulo/jobs/share_views.py
+msgid "Your note is kept."
+msgstr ""
+
+#: src/postulo/templates/jobs/partials/own_note_form.html
+msgid "Your notes"
+msgstr ""
+
+#: src/postulo/templates/jobs/partials/sharing_panel.html
+msgid "Your notes and decisions on it are yours alone."
+msgstr ""
+
+#: src/postulo/templates/jobs/share.html
+msgid "Your notes on it, your decisions about it and your applications stay yours: sharing it never shares them."
+msgstr ""
 
 #: src/postulo/documents/models.py
 #, fuzzy
@@ -22221,6 +22816,10 @@ msgstr "Tá cártaí dá gcuid féin ag d’uimhreacha gutháin agus do naisc n�
 msgid "Your username has been changed."
 msgstr "Athraíodh d'ainm úsáideora."
 
+#: src/postulo/jobs/whose.py src/postulo/templates/partials/import_owner.html
+msgid "Yours"
+msgstr ""
+
 #: src/postulo/core/file_review.py
 #, fuzzy
 msgid "Yours is kept"
@@ -22240,8 +22839,17 @@ msgstr "Do cheann féin, ní an fostóra. Is féidir an liosta a shórtáil agus
 msgid "Yours, to prepare with. Nothing here is sent to anybody."
 msgstr "Do cheann féin, le ullmhú leis. Ní sheoltar aon rud anseo chuig aon duine."
 
+#: src/postulo/templates/jobs/partials/sharing_panel.html
+msgid "Yours."
+msgstr ""
+
 #: src/postulo/resume/models.py
 msgid "Yours. It is never printed on a document."
+msgstr ""
+
+#: src/postulo/jobs/forms.py
+#: src/postulo/templates/jobs/partials/own_note_form.html
+msgid "Yours. Nobody else sees them, and they never appear on a document."
 msgstr ""
 
 #: src/postulo/documents/forms.py
@@ -22249,10 +22857,9 @@ msgstr ""
 msgid "Yours. They go nowhere with the file."
 msgstr "Do cheann féin. Ní théann siad áit ar bith leis an gcomhad."
 
-#: src/postulo/jobs/forms.py
-#, fuzzy
-msgid "Yours. They never appear on a document or go anywhere else."
-msgstr "Do cheann féin. Ní fheictear iad riamh ar cháipéis ná ní théann siad áit ar bith eile."
+#: src/postulo/templates/jobs/share.html
+msgid "Yours: only you can share it, give it to a group or delete it."
+msgstr ""
 
 #: src/postulo/templates/jobs/address_place.html
 #: src/postulo/templates/jobs/company_map.html
@@ -22384,6 +22991,16 @@ msgstr "Scriosfar “%(name)s” go buan."
 msgid "“%(name)s” will be removed, and the secrets stored for it deleted."
 msgstr "Bainfear “%(name)s”, agus scriosfar na rúin a stóráladh dó."
 
+#: src/postulo/templates/jobs/conflicts.html
+#, python-format
+msgid "“%(record)s” is shared with %(who)s, who cannot see what it points at:"
+msgstr ""
+
+#: src/postulo/jobs/sharing.py
+#, python-format
+msgid "“%(target)s” is not shared with %(names)s, who can see this; share it with them first."
+msgstr ""
+
 #: src/postulo/resume/models.py
 #, python-format
 msgid "“%(title)s”"
@@ -22393,6 +23010,11 @@ msgstr ""
 #, fuzzy, python-format
 msgid "“%(title)s”, against the version sent before it."
 msgstr "“%(title)s”, i gcomparáid leis an leagan a seoladh roimhe."
+
+#: src/postulo/jobs/sharing.py
+#, python-format
+msgid "“%(what)s” is no longer shared with you"
+msgstr ""
 
 #: src/postulo/resume/forms.py
 msgid "“Lisbon, Portugal” or “Online”."

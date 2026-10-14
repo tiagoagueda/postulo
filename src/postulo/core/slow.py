@@ -67,6 +67,16 @@ def build_an_export(errand) -> dict:
     }
 
 
+def _group_of(user, into: str):
+    """One of ``user``'s groups, named ``group:<pk>``, or nobody: theirs (#896)."""
+    if not (into or "").startswith("group:"):
+        return None
+    try:
+        return user.groups.filter(pk=int(into.split(":", 1)[1])).first()
+    except ValueError:
+        return None
+
+
 @handler("csv_import", working=_("Importing your spreadsheet"))
 def import_a_spreadsheet(errand) -> dict:
     """Read the held sheet and bring it in, chunk by chunk, then say how it went (#555).
@@ -91,6 +101,7 @@ def import_a_spreadsheet(errand) -> dict:
         asked["mapping"],
         day_first=asked["day_first"],
         currency=asked["currency"],
+        into=_group_of(errand.owner, asked.get("into", "")),
     )
     return {
         "message": ngettext(

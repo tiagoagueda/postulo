@@ -1026,7 +1026,7 @@ def _short_file_name(name: str, limit: int = 80) -> str:
     return stem[: limit - len(extension) - 2] + "…." + extension
 
 
-def _company_for(user, row: ParsedRow, by_name: dict, by_identifier: dict):
+def _company_for(user, row: ParsedRow, by_name: dict, by_identifier: dict, principal=None):
     """The row's company and whether it was just made; the database is asked once per name."""
     from postulo.applications.services import get_or_create_company
     from postulo.jobs.models import Company
@@ -1040,10 +1040,12 @@ def _company_for(user, row: ParsedRow, by_name: dict, by_identifier: dict):
         return by_name[key], False
     existed = (
         key in by_name
-        or Company.objects.for_user(user).filter(name_key=key).exists()
-        or Company.by_identifier(user, "wikidata", row.wikidata) is not None
+        or Company.objects.owned_by(principal or user).filter(name_key=key).exists()
+        or Company.by_identifier(principal or user, "wikidata", row.wikidata) is not None
     )
-    company = get_or_create_company(user, row.company, wikidata=row.wikidata)
+    company = get_or_create_company(
+        user, row.company, wikidata=row.wikidata, principal=principal, strict=True
+    )
     by_name.setdefault(key, company)
     if row.wikidata:
         by_identifier[(key, row.wikidata)] = company
@@ -1051,7 +1053,13 @@ def _company_for(user, row: ParsedRow, by_name: dict, by_identifier: dict):
 
 
 def perform(
-    user, sheet: Sheet, mapping: list[str], *, day_first: bool = True, currency: str = "EUR"
+    user,
+    sheet: Sheet,
+    mapping: list[str],
+    *,
+    day_first: bool = True,
+    currency: str = "EUR",
+    into=None,
 ) -> CsvReport:
     """Import the sheet, a transaction per ``CHUNK_ROWS`` rows. Duplicates are reported, not made.
 
@@ -1103,7 +1111,7 @@ def perform(
                         % {"number": row.number}
                     )
                     continue
-                company, created = _company_for(user, row, by_name, by_identifier)
+                company, created = _company_for(user, row, by_name, by_identifier, into)
                 if created:
                     report.companies_created += 1
                 if row.applied_at is not None:
@@ -1142,7 +1150,9 @@ def perform(
 
                 if row.becomes == "listing":
                     posting_data["closes_at"] = row.deadline
-                    listing = create_listing(user, company=company, posting_data=posting_data)
+                    listing = create_listing(
+                        user, company=company, posting_data=posting_data, principal=into
+                    )
                     if notes:
                         listing.description = (listing.description + "\n\n" + notes).strip()
                         listing.save(update_fields=["description", "updated_at"])
@@ -1173,6 +1183,7 @@ def perform(
                         "deadline": row.deadline,
                     },
                     actor=provenance,
+                    principal=into,
                 )
                 wanted = row.status or "applied"
                 if applied_moment is not None:

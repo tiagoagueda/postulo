@@ -97,6 +97,9 @@ class KindFileView(LoginRequiredMixin, TemplateView):
                 request, _("That file was read, and there was nothing in it to import.")
             )
             return redirect(self._address)
+        # Whose what it adds becomes (#896): checked again, against the person's own
+        # groups, when it is added.
+        held["into"] = request.POST.get("into", "")[:40]
         request.session[key] = held
         return redirect(self._address)
 

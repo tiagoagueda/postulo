@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% translate "Sharing" %} · {{ record }}{% endblock %}
+
+{% block content %}
+  {% comment %} Who can see a company, a contact or a listing, and with what (#896).
+
+     Its owner's page, and every member's of the group that owns it: the grants, each with
+     the way to take it back, and the form to make another. A person is named by what the
+     sharer types -- an instance's accounts are not a directory to pick from -- and a group
+     is one of the sharer's own.
+
+     When what is shared points at something the other side cannot see, the same page asks
+     whether to share that too, and nothing is shared until it is answered.
+  {% endcomment %}
+  <div class="mx-auto max-w-2xl">
+    <c-page-title>
+      {% translate "Sharing" %}
+      <c-slot name="subtitle">
+        <bdi>{{ record }}</bdi>
+      </c-slot>
+    </c-page-title>
+
+    <div class="card mb-6" data-owner>
+      <p class="text-sm">
+        {% if record.owner_group_id %}
+          {% blocktranslate with name=record.owner_group.name %}Owned by the group {{ name }}: every member can see it, change it, share it and delete it.{% endblocktranslate %}
+        {% elif record.owner_id == request.user.pk %}
+          {% translate "Yours: only you can share it, give it to a group or delete it." %}
+        {% else %}
+          {% blocktranslate with name=record.owner.get_username %}Owned by {{ name }}.{% endblocktranslate %}
+        {% endif %}
+      </p>
+      <p class="mt-2 text-xs text-ink-500 dark:text-ink-400">
+        {% translate "Your notes on it, your decisions about it and your applications stay yours: sharing it never shares them." %}
+      </p>
+    </div>
+
+    {% if plan %}
+      <div class="card mb-6" data-share-confirm>
+        <c-section-title>{% translate "Share what it points at too?" %}</c-section-title>
+        <p class="mb-3 text-sm">
+          {% blocktranslate with who=grantee_label %}{{ who }} cannot see these, which it points at. They are shared read-only with it, or nothing is shared.{% endblocktranslate %}
+        </p>
+        <ul class="mb-4 list-disc ps-5 text-sm">
+          {% for target in plan.also %}<li><bdi>{{ target }}</bdi></li>{% endfor %}
+        </ul>
+        <form method="post" action="{{ request.path }}">
+          {% csrf_token %}
+          <input type="hidden" name="grantee" value="{{ grantee_value }}">
+          <input type="hidden" name="scope" value="{{ plan.scope }}">
+          <input type="hidden" name="also" value="1">
+          <div class="flex flex-wrap items-center gap-3">
+            <button type="submit" class="btn">{% translate "Share them all" %}</button>
+            <a href="{{ request.path }}" class="btn" data-variant="ghost">{% translate "Cancel" %}</a>
+          </div>
+        </form>
+      </div>
+    {% endif %}
+
+    <div class="card mb-6" data-grants>
+      <c-section-title>{% translate "Shared with" %}</c-section-title>
+      {% if grants %}
+        <ul class="divide-y divide-ink-100 text-sm dark:divide-ink-800">
+          {% for grant in grants %}
+            <li class="flex flex-wrap items-center justify-between gap-3 py-2" data-grant="{{ grant.pk }}">
+              <span>
+                {% if grant.grantee_group_id %}
+                  <span class="badge" data-variant="outline">{% translate "group" %}</span>
+                  <bdi>{{ grant.grantee_group.name }}</bdi>
+                {% else %}
+                  <bdi>{{ grant.grantee_user.get_username }}</bdi>
+                {% endif %}
+                · {{ grant.get_scope_display }}
+              </span>
+              <form method="post" action="{% url 'jobs:share_revoke' grant.pk %}">
+                {% csrf_token %}
+                <button type="submit" class="btn" data-variant="ghost" data-size="sm">{% translate "Stop sharing" %}</button>
+              </form>
+            </li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <c-empty variant="quiet">{% translate "Nobody else can see it." %}</c-empty>
+      {% endif %}
+    </div>
+
+    <form method="post" action="{{ request.path }}" class="card" data-share-form>
+      {% csrf_token %}
+      <c-section-title>{% translate "Share it" %}</c-section-title>
+      {% if groups %}
+        <div class="field mb-4">
+          <label for="share-group">{% translate "With one of your groups" %}</label>
+          <select id="share-group" name="grantee">
+            <option value="">{% translate "Nobody, or the person below" %}</option>
+            {% for group in groups %}
+              <option value="group:{{ group.pk }}">{{ group.name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+      {% endif %}
+      <div class="field mb-4">
+        <label for="share-person">{% translate "With a person" %}</label>
+        <input id="share-person" name="person" type="text" autocomplete="off" aria-describedby="share-person-help">
+        <p id="share-person-help">{% translate "Their username or email address on this instance, exactly." %}</p>
+      </div>
+      <fieldset class="field mb-4">
+        <legend>{% translate "What they can do" %}</legend>
+        <label class="flex items-center gap-2 text-sm"><input type="radio" class="input" name="scope" value="read" checked> {% translate "See it" %}</label>
+        <label class="flex items-center gap-2 text-sm"><input type="radio" class="input" name="scope" value="write"> {% translate "See it and change its details" %}</label>
+        <p class="text-xs text-ink-500 dark:text-ink-400">{% translate "Neither lets them delete it, share it or give it to somebody else." %}</p>
+      </fieldset>
+      <div class="flex flex-wrap items-center gap-3">
+        <button type="submit" class="btn">{% translate "Share" %}</button>
+        <a href="{{ record.get_absolute_url }}" class="btn" data-variant="ghost">{% translate "Back" %}</a>
+      </div>
+    </form>
+  </div>
+{% endblock %}

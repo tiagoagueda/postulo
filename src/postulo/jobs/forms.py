@@ -8,6 +8,7 @@ disclosure even if the resulting save were rejected.
 from __future__ import annotations
 
 from django import forms
+from django.db.models import Q
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
@@ -90,6 +91,51 @@ class OwnerScopedModelForm(forms.ModelForm):
     def scope_querysets(self) -> None:  # pragma: no cover - overridden where needed
         """Narrow any related-object fields to ``self.user``."""
 
+    #: The fields that point at another shared record (#896): a listing's company, a
+    #: contact's, a company's parent. Changed on a shared record, the new one must be one
+    #: everybody it is shared with can see, or the save is refused saying who cannot.
+    LINKS: tuple[str, ...] = ()
+
+    def clean(self):
+        cleaned = super().clean()
+        if self.instance.pk and self.user is not None:
+            from .sharing import check_link
+
+            for name in self.LINKS:
+                if name in self.fields and name in self.changed_data:
+                    refusal = check_link(self.instance, cleaned.get(name), self.user)
+                    if refusal:
+                        self.add_error(name, refusal)
+        return cleaned
+
+
+class OwnNoteForm(OwnerScopedModelForm):
+    """A form whose record holds one note per person: a company's, a contact's (#896).
+
+    ``notes`` is the reader's own note, read and written for ``self.user`` and nobody
+    else. A form narrowed to one field of the model -- a table cell -- drops it, so a cell
+    saving a name never touches a note it did not draw.
+    """
+
+    notes = forms.CharField(
+        label=_("Notes"),
+        required=False,
+        widget=forms.Textarea(attrs={"rows": 4}),
+        help_text=_("Yours. Nobody else sees them, and they never appear on a document."),
+    )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if len(self._meta.fields or ()) <= 1:
+            self.fields.pop("notes", None)
+        elif "notes" in self.fields and self.instance.pk and self.user is not None:
+            self.fields["notes"].initial = self.instance.note_for(self.user)
+
+    def _save_m2m(self):
+        super()._save_m2m()
+        if "notes" in self.fields and self.user is not None:
+            self.instance.write_note(self.user, self.cleaned_data.get("notes", ""))
+
 
 def sector_choices(blank) -> list[tuple[str, str]]:
     """The 22 NACE sections as choices, in the reader's language, after a blank one (#897)."""
@@ -110,7 +156,9 @@ class SectionedCheckboxes(forms.CheckboxSelectMultiple):
         return option
 
 
-class CompanyForm(OwnerScopedModelForm):
+class CompanyForm(OwnNoteForm):
+    LINKS = ("parent",)
+
     """A company, and the industries it operates in: pick from your own, or type new ones.
 
     **A sector above them (#897).** The sector is not the company's own: its sectors are its
@@ -213,10 +261,8 @@ class CompanyForm(OwnerScopedModelForm):
             "careers_url",
             "email",
             "industries",
-            "notes",
             "from_career",
         )
-        widgets = {"notes": forms.Textarea(attrs={"rows": 4})}
         help_texts = {
             "kind": _(
                 "An employer is somewhere you might work; a public employment service is "
@@ -227,7 +273,6 @@ class CompanyForm(OwnerScopedModelForm):
                 "Used by Find logo, and only when you press it. Postulo fetches nothing "
                 "from here on its own."
             ),
-            "notes": _("Yours. They never appear on a document or go anywhere else."),
         }
 
     def scope_querysets(self) -> None:
@@ -296,7 +341,14 @@ class CompanyForm(OwnerScopedModelForm):
             web_links.add_single_boxes(self, self.user, holder=self.instance, company=True)
 
         if "industries" in self.fields:
+            # The person's own vocabulary, and whatever is on the company already: its
+            # industries are the company's (#896), so somebody it is shared with sees -- and
+            # may take off -- one somebody else gave it, and a save keeps the ones it drew.
             mine = Industry.objects.for_user(self.user)
+            if self.instance.pk:
+                mine = Industry.objects.filter(
+                    Q(pk__in=mine.values("pk")) | Q(companies=self.instance)
+                ).distinct()
             self.fields["industries"].queryset = mine
             widget = self.fields["industries"].widget
             widget.sections = dict(mine.exclude(section="").values_list("pk", "section"))
@@ -416,7 +468,9 @@ class CompanyForm(OwnerScopedModelForm):
         names = Industry.split(self.cleaned_data.get("new_industries", ""))
         if names:
             sector = self.cleaned_data.get("sector", "")
-            company.industries.add(*Industry.named(company.owner, names, section=sector))
+            # Into the vocabulary of whoever typed them (#896), which is theirs whatever
+            # company they are put on.
+            company.industries.add(*Industry.named(self.user, names, section=sector))
 
     def clean(self) -> dict:
         """A known service picked means an employment service, named and addressed as the
@@ -435,7 +489,7 @@ class CompanyForm(OwnerScopedModelForm):
                 data["name"] = service.name
                 # The registry's name may clash with one the person already has, and
                 # `clean_name` ran on a blank; the same refusal, in the same words.
-                clash = Company.objects.for_user(self.user).filter(
+                clash = Company.objects.owned_by(self.principal()).filter(
                     name_key=slugs.name_key(service.name)
                 )
                 if self.instance.pk:
@@ -458,12 +512,19 @@ class CompanyForm(OwnerScopedModelForm):
         name = self.cleaned_data["name"].strip()
         if self.user is None:
             return name
-        clash = Company.objects.for_user(self.user).filter(name_key=slugs.name_key(name))
+        clash = Company.objects.owned_by(self.principal()).filter(name_key=slugs.name_key(name))
         if self.instance.pk:
             clash = clash.exclude(pk=self.instance.pk)
         if clash.exists():
             raise forms.ValidationError(_("You already have a company with that name."))
         return name
+
+    def principal(self):
+        """Whose companies a name must not repeat: the company's owner, a person or a group
+        (#896), or the person making a new one."""
+        if self.instance.pk:
+            return self.instance.principal
+        return self.user
 
 
 class CompanyLogoForm(forms.Form):
@@ -557,7 +618,7 @@ class BaseCompanyIdentifierFormSet(RowsAlreadyGone, OneOfEachKind, forms.BaseInl
             seen_values.add((scheme, value.casefold()))
             if scheme != identifiers.OTHER and self.owner is not None:
                 clash = (
-                    CompanyIdentifier.objects.for_user(self.owner)
+                    CompanyIdentifier.objects.owned_by(self.owner)
                     .filter(scheme=scheme, value__iexact=value)
                     .exclude(company=self.instance if self.instance.pk else None)
                     .select_related("company")
@@ -572,10 +633,15 @@ class BaseCompanyIdentifierFormSet(RowsAlreadyGone, OneOfEachKind, forms.BaseInl
 
     @property
     def owner(self):
-        return getattr(self.instance, "owner", None) or getattr(self, "user", None)
+        """Whose companies an identifier must not repeat: the company's owner, a person or a
+        group (#896), or the person making a new company."""
+        if getattr(self.instance, "pk", None):
+            return self.instance.principal
+        return getattr(self, "user", None)
 
     def save_new(self, form, commit=True):
-        form.instance.owner = self.instance.owner
+        # Owned as the company is: `OwnedAsItsCompany` copies its owner on save (#896).
+        form.instance.company = self.instance
         return super().save_new(form, commit=commit)
 
 
@@ -660,7 +726,9 @@ def _language_of(user) -> str:
     return getattr(profile, "language", "") or ""
 
 
-class ContactForm(OwnerScopedModelForm):
+class ContactForm(OwnNoteForm):
+    LINKS = ("company",)
+
     #: Typed rather than chosen, because a team is usually known before it is a record and
     #: making somebody create one first is a form standing in front of a form. The name is
     #: matched against the company's existing departments and only made when it is new,
@@ -675,8 +743,7 @@ class ContactForm(OwnerScopedModelForm):
 
     class Meta:
         model = Contact
-        fields = ("name", "role", "company", "email", "notes")
-        widgets = {"notes": forms.Textarea(attrs={"rows": 3})}
+        fields = ("name", "role", "company", "email")
         help_texts = {
             "role": _("Their job title, as they give it themselves."),
             "company": _("Where they work. Only companies you have recorded are offered."),
@@ -684,7 +751,6 @@ class ContactForm(OwnerScopedModelForm):
                 "Used to address them on an interview's calendar file. Postulo never writes "
                 "to it by itself."
             ),
-            "notes": _("Yours. They never appear on a document or go anywhere else."),
         }
 
     def __init__(self, *args, **kwargs):
@@ -754,10 +820,12 @@ class ContactForm(OwnerScopedModelForm):
         company_id = self.instance.company_id if self.instance else None
         if not company_id:
             return []
+        # The company's own, whoever filed them (#896), at a company this person can see.
         return list(
-            Department.objects.for_user(self.user)
-            .filter(company_id=company_id)
-            .values_list("name", flat=True)
+            Department.objects.filter(
+                company_id=company_id,
+                company__in=Company.objects.visible_to(self.user).values("pk"),
+            ).values_list("name", flat=True)
         )
 
     def save(self, commit: bool = True):
@@ -785,7 +853,6 @@ class ContactForm(OwnerScopedModelForm):
         # Capitals do not make a second team; the spelling first entered stays.
         department = (
             Department.objects.filter(
-                owner=self.user,
                 company_id=contact.company_id,
                 name_key=slugs.name_key(name),
             )
@@ -793,15 +860,15 @@ class ContactForm(OwnerScopedModelForm):
             .first()
         )
         if department is None:
-            department = Department.objects.create(
-                owner=self.user, company_id=contact.company_id, name=name
-            )
+            department = Department.objects.create(company_id=contact.company_id, name=name)
         if contact.department_id != department.pk:
             contact.department = department
             contact.save(update_fields=["department", "updated_at"])
 
 
 class JobPostingForm(OwnerScopedModelForm):
+    LINKS = ("company",)
+
     #: The title offers the ESCO unit groups as you type it, in the language read (#266).
     #: `autocomplete="off"` keeps the browser's memory of the box off it, as on the intake
     #: form; the code the words match follows the posting and is not offered here.

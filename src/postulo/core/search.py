@@ -182,7 +182,12 @@ def application_match(query: str) -> Q:
 
 
 def company_match(query: str) -> Q:
-    """What makes a company match: the same for the search and the Companies table's box."""
+    """What makes a company match: the same for the search and the Companies table's box.
+
+    Over a queryset that carries the reader's own note (`with_notes`, #896): a company is
+    found by what *they* wrote about it, never by what somebody it is shared with did. Its
+    names and addresses are the company's, whoever owns it, so they are matched by it.
+    """
     from django.contrib.contenttypes.models import ContentType
 
     from postulo.core.models import PostalAddress
@@ -191,13 +196,10 @@ def company_match(query: str) -> Q:
     industry = Industry.objects.filter(companies=OuterRef("pk"), name__icontains=query)
     identifier = CompanyIdentifier.objects.filter(company=OuterRef("pk"), value__icontains=query)
     # And by any of its names in other languages (#673).
-    named = CompanyName.objects.filter(
-        owner=OuterRef("owner"), company=OuterRef("pk"), name__icontains=query
-    )
+    named = CompanyName.objects.filter(company=OuterRef("pk"), name__icontains=query)
     # Where it is, by its addresses' towns and regions since the location became an address
     # (#702); never by a street, which the search does not read.
     address = PostalAddress.objects.filter(
-        owner=OuterRef("owner"),
         content_type=ContentType.objects.get_for_model(Company),
         object_id=OuterRef("pk"),
     ).filter(Q(municipality__icontains=query) | Q(region__icontains=query))
@@ -214,7 +216,10 @@ def search_listings(user, query: str, limit: int) -> Found:
     from postulo.jobs.models import JobPosting
 
     rows = ranked(
-        JobPosting.objects.for_user(user).select_related("company").filter(listing_match(query)),
+        JobPosting.objects.visible_to(user)
+        .with_status(user)
+        .select_related("company")
+        .filter(listing_match(query)),
         query,
         "title",
         "-noted_at",
@@ -287,6 +292,7 @@ def search_companies(user, query: str, limit: int) -> Found:
 
     rows = ranked(
         Company.objects.for_user(user)
+        .with_notes(user)
         .prefetch_related("industries", "postal_addresses")
         .filter(company_match(query)),
         query,
@@ -315,6 +321,7 @@ def search_contacts(user, query: str, limit: int) -> Found:
 
     rows = ranked(
         Contact.objects.for_user(user)
+        .with_notes(user)
         .select_related("company")
         .filter(contains(query, "name", "role", "email", "notes")),
         query,

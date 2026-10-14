@@ -31,7 +31,7 @@ class CompaniesTable(Table):
     #: `group` narrows to a whole ownership tree rather than one link of it, so it is the
     #: table's half of the company page's *across the group* (#138). Handled by the view
     #: rather than by a lookup, because "everything in this group" is a walk and not a join.
-    extra_params = ("q", "group")
+    extra_params = ("q", "group", "whose")
     changed_message = ngettext_lazy(
         "%(count)d company changed.", "%(count)d companies changed.", "count"
     )
@@ -234,7 +234,7 @@ class ListingsTable(Table):
     default_sort = "closes"
     #: The state tabs above the table, which narrow the list without being a column, and
     #: the masthead's search box, which narrows it by role, company and place (#313).
-    extra_params = ("state", "q")
+    extra_params = ("state", "q", "whose")
     changed_message = ngettext_lazy(
         "%(count)d listing changed.", "%(count)d listings changed.", "count"
     )

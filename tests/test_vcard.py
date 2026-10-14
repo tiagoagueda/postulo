@@ -421,7 +421,7 @@ def test_chosen_cards_become_contacts_under_the_company_named(user, company):
     assert (report.contacts, report.companies, report.problems) == (1, 0, [])
     contact = Contact.objects.get(owner=user, name="Sam Rivera")
     assert contact.company == company and contact.department.name == "Legal"
-    assert (contact.role, contact.email, contact.notes) == (
+    assert (contact.role, contact.email, contact.own_note()) == (
         "Lawyer",
         "sam@acme.example",
         "from a fair",

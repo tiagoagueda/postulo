@@ -12,6 +12,7 @@ import re
 from datetime import timedelta
 
 from django.apps import apps
+from django.conf import settings
 from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ValidationError
@@ -20,8 +21,8 @@ from django.db.models import (
     Case,
     Count,
     DecimalField,
-    Exists,
     F,
+    FilteredRelation,
     IntegerField,
     OuterRef,
     Q,
@@ -39,7 +40,8 @@ from postulo.core import slugs
 from postulo.core.addresses import same_url
 from postulo.core.identifiers import COMPANY, MAX_VALUE_LENGTH, KeepsItsScheme, scheme_field
 from postulo.core.language_field import LanguageField
-from postulo.core.models import OwnedModel, OwnedQuerySet
+from postulo.core.models import OwnedModel, PrincipalOwnedModel, PrincipalQuerySet
+from postulo.core.sharing import SharedQuerySet
 from postulo.core.stored_pictures import StoredPicture
 
 from . import esco, identifiers, industries, roles
@@ -64,6 +66,154 @@ def split_location(text: str) -> tuple[str, str]:
     if len(parts) > 1 and len(parts[-1]) == 2 and parts[-1].isalpha():
         return ", ".join(parts[:-1])[:120], parts[-1].upper()
     return text[:120], ""
+
+
+def _with_notes(queryset, note_model: str, field: str, user):
+    """Annotate ``user``'s own note, under the name the template has always read (#896)."""
+    notes = apps.get_model("jobs", note_model).objects.filter(owner=user, **{field: OuterRef("pk")})
+    return queryset.annotate(
+        notes=Coalesce(
+            Subquery(notes.values("text")[:1]), Value(""), output_field=models.TextField()
+        )
+    )
+
+
+class OfACompanyQuerySet(PrincipalQuerySet):
+    """A department's, an identifier's or a name's: seen as far as its company is (#896)."""
+
+    def for_user(self, user):
+        return self.filter(company__in=Company.objects.visible_to(user).values("pk"))
+
+
+class OwnedAsItsCompany:
+    """A department, an identifier or a name is owned as its company is (#896).
+
+    Copied on every save, so a row on a group's company is the group's whoever typed it,
+    and a company moved to another owner takes its rows with it in the same statement.
+    """
+
+    def save(self, *args, **kwargs):
+        if self.company_id is not None:
+            company = self.company
+            self.owner_id, self.owner_group_id = company.owner_id, company.owner_group_id
+            update = kwargs.get("update_fields")
+            if update is not None:
+                kwargs["update_fields"] = {*update, "owner", "owner_group"}
+        super().save(*args, **kwargs)
+
+
+class StartsAsTheOwners:
+    """A record that may be *made* with its owner's own values (#896).
+
+    ``Company(notes=...)``, ``JobPosting(state=...)``: what a record was made with before
+    notes and statuses were each person's. Taken still, and written as the owner's own when
+    the record is first saved -- which is exactly what they meant then, and what keeps a
+    plugin written before #896 working. Afterwards they are read and written per person.
+    """
+
+    OWN_VALUES: tuple[str, ...] = ()
+
+    def __init__(self, *args, **kwargs):
+        given = {name: kwargs.pop(name) for name in self.OWN_VALUES if name in kwargs}
+        super().__init__(*args, **kwargs)
+        self._owners_values = given
+        for name, value in given.items():
+            setattr(self, name, value)
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        given = getattr(self, "_owners_values", None)
+        if given and self.owner_id is not None:
+            self._owners_values = {}
+            self.write_owners_values(given)
+
+    def write_owners_values(self, given: dict) -> None:  # pragma: no cover - overridden
+        raise NotImplementedError
+
+    def refresh_from_db(self, *args, **kwargs):
+        """Read again, and forget what was read for somebody: it may have changed too."""
+        super().refresh_from_db(*args, **kwargs)
+        for name in (*self.OWN_VALUES, "application_count", "first_application_id"):
+            self.__dict__.pop(name, None)
+
+
+class OwnNote(StartsAsTheOwners):
+    """A record that holds one note per person who can see it (#896)."""
+
+    NOTE_MODEL = ""
+    NOTE_FIELD = ""
+    OWN_VALUES = ("notes",)
+
+    def write_owners_values(self, given: dict) -> None:
+        self.write_note(self.owner, given.get("notes", ""))
+
+    def note_for(self, user) -> str:
+        """``user``'s own note on this record, put where `notes` reads it, and returned."""
+        Note = apps.get_model("jobs", self.NOTE_MODEL)
+        text = (
+            Note.objects.filter(owner=user, **{self.NOTE_FIELD: self})
+            .values_list("text", flat=True)
+            .first()
+        )
+        self.notes = text or ""
+        return self.notes
+
+    def own_note(self) -> str:
+        """The note as it was read for somebody, or else the owner's own (#896).
+
+        For what is written about a record on its owner's behalf -- the data-subject
+        document, a card -- when the caller did not say whose note to carry.
+        """
+        if "notes" in self.__dict__:
+            return self.notes
+        return self.note_for(self.owner) if self.owner_id is not None else ""
+
+    def write_note(self, user, text: str) -> None:
+        """Keep ``text`` as ``user``'s own note; a blank one is no note at all."""
+        Note = apps.get_model("jobs", self.NOTE_MODEL)
+        text = (text or "").strip()
+        if text:
+            Note.objects.update_or_create(
+                owner=user, **{self.NOTE_FIELD: self}, defaults={"text": text}
+            )
+        else:
+            Note.objects.filter(owner=user, **{self.NOTE_FIELD: self}).delete()
+        self.notes = text
+
+
+class NotReadFor(Exception):
+    """A per-person value was read before anybody said whose (#896).
+
+    Not an `AttributeError`, deliberately: a template swallows those and prints nothing,
+    which is how somebody else's status would go unnoticed for ever.
+    """
+
+
+class ForOneReader:
+    """An attribute whose value belongs to whoever is reading the record (#896).
+
+    A shared listing has one row and as many statuses as readers, and a shared company one
+    row and as many notes. The value is set by the queryset that reads the row for somebody
+    (`with_status`, `with_notes`) or by asking the record for somebody (`status_for`,
+    `note_for`); reading it otherwise raises `NotReadFor`.
+    """
+
+    def __set_name__(self, owner, name) -> None:
+        self.name = name
+
+    def __get__(self, instance, owner=None):
+        if instance is None:
+            return self
+        try:
+            return instance.__dict__[self.name]
+        except KeyError:
+            raise NotReadFor(
+                f"{type(instance).__name__}.{self.name} is one person's: read the record "
+                "for somebody first (with_status/status_for, with_notes/note_for)."
+            ) from None
+
+    def __set__(self, instance, value) -> None:
+        instance.__dict__[self.name] = value
 
 
 class Industry(OwnedModel):
@@ -175,7 +325,13 @@ class Industry(OwnedModel):
         ]
 
 
-class CompanyQuerySet(OwnedQuerySet):
+class CompanyQuerySet(SharedQuerySet):
+    share_field = "company"
+
+    def with_notes(self, user) -> CompanyQuerySet:
+        """Each company with ``user``'s own note on it, blank when they wrote none (#896)."""
+        return _with_notes(self, "CompanyNote", "company", user)
+
     def bulk_create(self, objs, *args, **kwargs):
         """Give each company its `name_key`, which `save` would have: the constraint reads it."""
         objs = list(objs)
@@ -223,9 +379,10 @@ class CompanyQuerySet(OwnedQuerySet):
         coded = self.model.objects.filter(industries__code__in=wanted.divisions).values("pk")
         return self.filter(Q(kind__in=wanted.kinds) | Q(pk__in=coded))
 
-    def with_table_data(self) -> CompanyQuerySet:
+    def with_table_data(self, user) -> CompanyQuerySet:
         """Annotate the counts, dates and identifiers the companies table can show, sort by
-        and narrow on.
+        and narrow on -- counted for ``user`` (#896): the listings and people at a shared
+        company that they can see, and their own applications, never anybody else's.
 
         One annotation per identifier scheme, named as the table's column is, so an
         identifier sorts and filters like a column of the company's own rather than being
@@ -274,18 +431,32 @@ class CompanyQuerySet(OwnedQuerySet):
             # the table sorts and narrows on these -- a null where a zero belongs sorts to
             # the wrong end and answers "fewer than one" with nothing.
             "posting_count": Coalesce(
-                counted(JobPosting, company=OuterRef("pk")), Value(0), output_field=IntegerField()
+                counted(
+                    JobPosting,
+                    company=OuterRef("pk"),
+                    pk__in=JobPosting.objects.visible_to(user).values("pk"),
+                ),
+                Value(0),
+                output_field=IntegerField(),
             ),
             "application_count": Coalesce(
-                counted(Application, posting__company=OuterRef("pk")),
+                counted(Application, posting__company=OuterRef("pk"), owner=user),
                 Value(0),
                 output_field=IntegerField(),
             ),
             "contact_count": Coalesce(
-                counted(Contact, company=OuterRef("pk")), Value(0), output_field=IntegerField()
+                counted(
+                    Contact,
+                    company=OuterRef("pk"),
+                    pk__in=Contact.objects.visible_to(user).values("pk"),
+                ),
+                Value(0),
+                output_field=IntegerField(),
             ),
             "last_activity_at": Subquery(
-                ApplicationEvent.objects.filter(application__posting__company=OuterRef("pk"))
+                ApplicationEvent.objects.filter(
+                    application__posting__company=OuterRef("pk"), application__owner=user
+                )
                 .order_by("-occurred_at")
                 .values("occurred_at")[:1]
             ),
@@ -343,7 +514,7 @@ class CompanyKind(models.TextChoices):
     EMPLOYMENT_SERVICE = "employment_service", _("Public employment service")
 
 
-class Company(OwnedModel):
+class Company(OwnNote, PrincipalOwnedModel):
     """An employer, as recorded by one applicant -- or the employment service they are
     registered with, which has contacts, addresses and postings like an employer and is
     counted as one nowhere (#202).
@@ -402,7 +573,8 @@ class Company(OwnedModel):
     industries = models.ManyToManyField(
         Industry, blank=True, related_name="companies", verbose_name=_("industries")
     )
-    notes = models.TextField(_("notes"), blank=True)
+    #: The reader's own note (#896), from `with_notes(user)` or `note_for(user)`.
+    notes = ForOneReader()
     #: Added by the career form rather than by somebody looking for work there (#683): a
     #: former employer is a company like any other, and is left out of every place a
     #: company is picked for new work until a posting, a contact or an application is
@@ -433,16 +605,27 @@ class Company(OwnedModel):
     logo_source_url = models.CharField(_("logo address"), max_length=500, blank=True)
     logo_fetched_at = models.DateTimeField(_("logo fetched"), null=True, blank=True)
 
+    #: Who changed what on it (#896); goes with it.
+    changes = GenericRelation("jobs.RecordChange")
+
     objects = CompanyQuerySet.as_manager()
+
+    NOTE_MODEL, NOTE_FIELD = "CompanyNote", "company"
 
     class Meta:
         verbose_name = _("company")
         verbose_name_plural = _("companies")
         ordering = ("name",)
         constraints = [
+            PrincipalOwnedModel.one_owner("company_one_owner"),
+            # A NULL owner is distinct from every other in a unique constraint, so each of
+            # these binds only the rows of its own kind of owner (#896).
             models.UniqueConstraint(
                 fields=("owner", "name_key"), name="unique_company_name_per_owner"
-            )
+            ),
+            models.UniqueConstraint(
+                fields=("owner_group", "name_key"), name="unique_company_name_per_group"
+            ),
         ]
 
     def __str__(self) -> str:
@@ -701,7 +884,8 @@ class Company(OwnedModel):
         except ValidationError:
             return None
         found = (
-            CompanyIdentifier.objects.for_user(owner)
+            # Exactly that owner's (#896): an import into a group matches among the group's.
+            CompanyIdentifier.objects.owned_by(owner)
             .filter(scheme=scheme, value__iexact=value)
             .select_related("company")
             .first()
@@ -709,7 +893,7 @@ class Company(OwnedModel):
         return found.company if found else None
 
 
-class CompanyName(OwnedModel):
+class CompanyName(OwnedAsItsCompany, PrincipalOwnedModel):
     """A company's name in one language: from its Wikidata item, or typed (#673).
 
     ``Company.name`` stays the one name that identifies the company -- uniqueness, the
@@ -731,21 +915,24 @@ class CompanyName(OwnedModel):
     source = models.CharField(_("source"), max_length=10, choices=Source.choices)
     fetched_at = models.DateTimeField(_("fetched"), null=True, blank=True)
 
+    objects = OfACompanyQuerySet.as_manager()
+
     class Meta:
         verbose_name = _("company name")
         verbose_name_plural = _("company names")
         ordering = ("language", "pk")
         constraints = [
+            PrincipalOwnedModel.one_owner("company_name_one_owner"),
             models.UniqueConstraint(
                 fields=("company", "language"), name="one_company_name_per_language"
-            )
+            ),
         ]
 
     def __str__(self) -> str:
         return self.name
 
 
-class CompanyIdentifier(KeepsItsScheme, OwnedModel):
+class CompanyIdentifier(OwnedAsItsCompany, KeepsItsScheme, PrincipalOwnedModel):
     """One external id for a company: a Wikidata item, a LEI, a register number, a slug.
 
     Unique twice over: a company has one value per scheme (except *other*, which is a
@@ -769,6 +956,8 @@ class CompanyIdentifier(KeepsItsScheme, OwnedModel):
         blank=True,
         help_text=_("What the identifier is, when the scheme is Other."),
     )
+
+    objects = OfACompanyQuerySet.as_manager()
 
     class Meta:
         verbose_name = _("company identifier")
@@ -798,6 +987,15 @@ class CompanyIdentifier(KeepsItsScheme, OwnedModel):
                 condition=~models.Q(scheme=identifiers.OTHER),
                 name="one_company_per_identifier_per_owner",
             ),
+            # The same for a group's companies (#896); a NULL owner binds nothing above.
+            models.UniqueConstraint(
+                Lower("value"),
+                "owner_group",
+                "scheme",
+                condition=~models.Q(scheme=identifiers.OTHER),
+                name="one_company_per_identifier_per_group",
+            ),
+            PrincipalOwnedModel.one_owner("company_identifier_one_owner"),
             models.UniqueConstraint(
                 "company",
                 "scheme",
@@ -871,7 +1069,7 @@ class CompanyLogo(StoredPicture):
         return f"logo of company {self.company_id}"
 
 
-class Department(OwnedModel):
+class Department(OwnedAsItsCompany, PrincipalOwnedModel):
     """A team inside a company: engineering, legal, the Lisbon office.
 
     Deliberately not a `Company` with a parent, though it would fit the shape. A department
@@ -894,15 +1092,20 @@ class Department(OwnedModel):
     #: As on `Company`: the name the constraint compares (#546).
     name_key = models.CharField(max_length=360, blank=True, editable=False)
 
+    objects = OfACompanyQuerySet.as_manager()
+
     class Meta:
         verbose_name = _("department")
         verbose_name_plural = _("departments")
         ordering = ("name",)
         constraints = [
+            PrincipalOwnedModel.one_owner("department_one_owner"),
+            # The company fixes the owner, so the owner is no part of the rule (#896): a
+            # group's company has one Engineering, whichever member typed it.
             models.UniqueConstraint(
-                fields=("owner", "company", "name_key"),
+                fields=("company", "name_key"),
                 name="unique_department_name_per_company",
-            )
+            ),
         ]
 
     def __str__(self) -> str:
@@ -913,7 +1116,15 @@ class Department(OwnedModel):
         super().save(*args, **kwargs)
 
 
-class Contact(OwnedModel):
+class ContactQuerySet(SharedQuerySet):
+    share_field = "contact"
+
+    def with_notes(self, user) -> ContactQuerySet:
+        """Each contact with ``user``'s own note on them, blank when they wrote none (#896)."""
+        return _with_notes(self, "ContactNote", "contact", user)
+
+
+class Contact(OwnNote, PrincipalOwnedModel):
     """Someone at a company: a recruiter, a hiring manager, a friend on the inside."""
 
     company = models.ForeignKey(
@@ -950,15 +1161,27 @@ class Contact(OwnedModel):
     web_links = GenericRelation("core.WebLink", verbose_name=_("web links"))
     #: And their handles on messaging services (#682).
     messaging_handles = GenericRelation("core.MessagingHandle", verbose_name=_("messaging handles"))
-    notes = models.TextField(_("notes"), blank=True)
+    #: The reader's own note (#896), from `with_notes(user)` or `note_for(user)`.
+    notes = ForOneReader()
+
+    #: Who changed what on it (#896); goes with it.
+    changes = GenericRelation("jobs.RecordChange")
+
+    objects = ContactQuerySet.as_manager()
+
+    NOTE_MODEL, NOTE_FIELD = "ContactNote", "contact"
 
     class Meta:
         verbose_name = _("contact")
         verbose_name_plural = _("contacts")
         ordering = ("name",)
+        constraints = [PrincipalOwnedModel.one_owner("contact_one_owner")]
 
     def __str__(self) -> str:
         return self.name
+
+    def get_absolute_url(self) -> str:
+        return reverse("jobs:contact_update", args=[self.pk])
 
     def clean(self) -> None:
         """A department belongs to a company, so a contact cannot borrow another's."""
@@ -1082,26 +1305,26 @@ LISTING_FILTERS = (
 )
 
 
-class JobPostingQuerySet(models.QuerySet):
-    def for_user(self, user) -> JobPostingQuerySet:
-        if user is None or not getattr(user, "is_authenticated", False):
-            return self.none()
-        return self.filter(owner=user)
+class JobPostingQuerySet(SharedQuerySet):
+    share_field = "posting"
 
-    def open(self) -> JobPostingQuerySet:
-        return self.filter(closed_at__isnull=True)
+    def with_status(self, user) -> JobPostingQuerySet:
+        """Each listing as ``user`` stands with it: their status and their applications (#896).
 
-    def with_application_count(self) -> JobPostingQuerySet:
-        """How many applications each listing has, and the first one to link to (#558).
-
-        Correlated subqueries, as `CompanyQuerySet.with_table_data` does, not a `GROUP BY`
-        over every posting column; and the application's key is annotated so a row draws its
-        *Application* button without fetching the application, a query per applied row.
+        A listing nobody has decided about reads as *new*, noted when it was added. The
+        status is a `FilteredRelation` to ``user``'s own row -- one join, which can match at
+        most one row -- and the applications are counted among ``user``'s own only: on a
+        shared listing, anybody else's application is not there to count.
         """
-        # By label, as `with_table_data` does: a listing's model importing theirs is a cycle.
         Application = apps.get_model("applications", "Application")
-        mine = Application.objects.filter(posting=OuterRef("pk")).order_by()
+        mine = Application.objects.filter(posting=OuterRef("pk"), owner=user).order_by()
         return self.annotate(
+            reader_status=FilteredRelation("statuses", condition=Q(statuses__owner=user)),
+        ).annotate(
+            state=Coalesce(F("reader_status__state"), Value(ListingState.NEW)),
+            discard_reason=Coalesce(F("reader_status__discard_reason"), Value("")),
+            noted_at=Coalesce(F("reader_status__noted_at"), F("created_at")),
+            decided_at=F("reader_status__decided_at"),
             application_count=Coalesce(
                 Subquery(
                     mine.values(placeholder=Value(1)).annotate(n=Count("*")).values("n")[:1],
@@ -1115,6 +1338,15 @@ class JobPostingQuerySet(models.QuerySet):
                 output_field=IntegerField(),
             ),
         )
+
+    def _read(self) -> JobPostingQuerySet:
+        """Refuse to answer a question about status before knowing whose (#896)."""
+        if "state" not in self.query.annotations:
+            raise NotReadFor("Ask with_status(user) before asking about a listing's state.")
+        return self
+
+    def open(self) -> JobPostingQuerySet:
+        return self.filter(closed_at__isnull=True)
 
     def with_salary_order(self) -> JobPostingQuerySet:
         """Annotate a yearly figure to sort the salary column by, within a currency.
@@ -1170,7 +1402,7 @@ class JobPostingQuerySet(models.QuerySet):
 
     def undecided(self) -> JobPostingQuerySet:
         """New or shortlisted, not applied to, and still open: what the person must decide."""
-        return self.with_application_count().filter(state_condition("undecided"))
+        return self._read().filter(state_condition("undecided"))
 
     def closing_soon(self, days: int = 7) -> JobPostingQuerySet:
         today = timezone.localdate()
@@ -1180,7 +1412,7 @@ class JobPostingQuerySet(models.QuerySet):
 
     def in_state(self, state: str) -> JobPostingQuerySet:
         """Filter by a stored state or one of the two derived ones."""
-        annotated = self.with_application_count()
+        annotated = self._read()
         condition = state_condition(state)
         return annotated.filter(condition) if condition is not None else annotated
 
@@ -1196,11 +1428,10 @@ class JobPostingQuerySet(models.QuerySet):
         count: *has this listing any applications* is the only thing the tabs ask, and asking
         it as `COUNT(...) > 0` makes the database group before it can answer.
         """
-        applied = Exists(
-            apps.get_model("applications", "Application").objects.filter(posting=OuterRef("pk"))
-        )
-        tabs = {name: state_condition(name, applied=applied) for name in TAB_ORDER}
-        counted = self.aggregate(
+        # The reader's own applications, as `with_status` counted them (#896): an `Exists`
+        # over every application on a shared listing would count somebody else's.
+        tabs = {name: state_condition(name) for name in TAB_ORDER}
+        counted = self._read().aggregate(
             all=Count("pk"),
             **{
                 f"tab_{index}": Count("pk", filter=condition)
@@ -1212,7 +1443,7 @@ class JobPostingQuerySet(models.QuerySet):
         return answer
 
 
-class JobPosting(OwnedModel):
+class JobPosting(StartsAsTheOwners, PrincipalOwnedModel):
     """A specific opening at a company — a listing, until the person decides about it.
 
     Every posting arrives here first, captured or typed, and waits: new, then shortlisted
@@ -1299,27 +1530,32 @@ class JobPosting(OwnedModel):
         help_text=_("Set when the opening is no longer available."),
     )
 
-    state = models.CharField(
-        _("state"), max_length=20, choices=ListingState, default=ListingState.NEW
-    )
-    discard_reason = models.CharField(
-        _("why it was discarded"), max_length=20, choices=DiscardReason, blank=True
-    )
-    noted_at = models.DateTimeField(
-        _("noted on"), default=timezone.now, help_text=_("When it entered your listings.")
-    )
-    decided_at = models.DateTimeField(_("decided on"), null=True, blank=True)
+    #: Where the listing stands *for the person reading it* (#896): each is a value of their
+    #: own `ListingStatus`, put there by `JobPostingQuerySet.with_status(user)` or
+    #: `status_for(user)`. Reading one that was never put there is an error, never a guess.
+    state = ForOneReader()
+    discard_reason = ForOneReader()
+    noted_at = ForOneReader()
+    decided_at = ForOneReader()
+    application_count = ForOneReader()
+    first_application_id = ForOneReader()
+
+    #: Who changed what on it (#896); goes with it.
+    changes = GenericRelation("jobs.RecordChange")
 
     objects = JobPostingQuerySet.as_manager()
 
     class Meta:
         verbose_name = _("job posting")
         verbose_name_plural = _("job postings")
-        ordering = ("-noted_at", "-created_at")
+        # When it entered *the reader's* listings is theirs (#896); a list asks for it by
+        # ordering on `noted_at` after `with_status`.
+        ordering = ("-created_at", "-pk")
         indexes = [
-            models.Index(fields=("owner", "state")),
             models.Index(fields=("owner", "url_key"), name="jobposting_owner_url_key"),
+            models.Index(fields=("owner_group", "url_key"), name="jobposting_group_url_key"),
         ]
+        constraints = [PrincipalOwnedModel.one_owner("job_posting_one_owner")]
 
     def __str__(self) -> str:
         return f"{self.title} — {self.company.name}"
@@ -1360,10 +1596,8 @@ class JobPosting(OwnedModel):
 
     @property
     def has_applications(self) -> bool:
-        count = getattr(self, "application_count", None)
-        if count is None:
-            count = self.applications.count()
-        return count > 0
+        """Whether *the reader* applied: their own applications only, never anyone else's."""
+        return self.application_count > 0
 
     @property
     def is_markdown(self) -> bool:
@@ -1398,6 +1632,10 @@ class JobPosting(OwnedModel):
             return "closed"
         return self.state
 
+    def get_discard_reason_display(self) -> str:
+        """The reader's reason in words, as Django would have named it for a field (#896)."""
+        return str(dict(DiscardReason.choices).get(self.discard_reason, self.discard_reason))
+
     @property
     def derived_state_label(self) -> str:
         labels = {**dict(ListingState.choices), "applied": _("Applied"), "closed": _("Closed")}
@@ -1407,35 +1645,83 @@ class JobPosting(OwnedModel):
     def is_undecided(self) -> bool:
         return self.derived_state in (ListingState.NEW, ListingState.SHORTLISTED)
 
-    def shortlist(self) -> bool:
-        """Shortlist it; False, and nothing touched, when it already was."""
+    OWN_VALUES = ("state", "discard_reason", "noted_at", "decided_at")
+
+    def write_owners_values(self, given: dict) -> None:
+        values = {name: given[name] for name in self.OWN_VALUES if name in given}
+        values["noted_at"] = values.get("noted_at") or self.created_at
+        ListingStatus.objects.update_or_create(owner=self.owner, posting=self, defaults=values)
+
+    def status_for(self, user) -> JobPosting:
+        """Put ``user``'s own status and applications on this listing, and return it (#896).
+
+        For a listing that was fetched without `with_status`. A list asks its queryset
+        instead, which does it in the one query that reads the rows.
+        """
+        own = ListingStatus.objects.filter(owner=user, posting=self).first()
+        self.state = own.state if own else ListingState.NEW
+        self.discard_reason = own.discard_reason if own else ""
+        self.noted_at = own.noted_at if own else self.created_at
+        self.decided_at = own.decided_at if own else None
+        mine = self.applications.filter(owner=user).order_by("created_at", "pk")
+        self.application_count = mine.count()
+        first = mine.first()
+        self.first_application_id = first.pk if first else None
+        return self
+
+    def _decide(self, user, state: str, reason: str, decided_at) -> None:
+        """Write ``user``'s own decision about this listing, and show it here at once."""
+        ListingStatus.objects.update_or_create(
+            owner=user,
+            posting=self,
+            defaults={"state": state, "discard_reason": reason, "decided_at": decided_at},
+            create_defaults={
+                "state": state,
+                "discard_reason": reason,
+                "decided_at": decided_at,
+                "noted_at": self.created_at,
+            },
+        )
+        self.state, self.discard_reason, self.decided_at = state, reason, decided_at
+
+    def shortlist(self, user) -> bool:
+        """Shortlist it for ``user``; False, and nothing touched, when it already was."""
+        self._ensure_status(user)
         if self.state == ListingState.SHORTLISTED:
             return False
-        self.state = ListingState.SHORTLISTED
-        self.discard_reason = ""
-        self.decided_at = timezone.now()
-        self.save(update_fields=["state", "discard_reason", "decided_at", "updated_at"])
+        self._decide(user, ListingState.SHORTLISTED, "", timezone.now())
         return True
 
-    def discard(self, reason: str = "") -> bool:
-        """Discard it; False, and the date kept, when it already was, for the same reason."""
+    def discard(self, user, reason: str = "") -> bool:
+        """Discard it for ``user``; False, and the date kept, when it already was so."""
+        self._ensure_status(user)
         if self.state == ListingState.DISCARDED and self.discard_reason == reason:
             return False
-        self.state = ListingState.DISCARDED
-        self.discard_reason = reason
-        self.decided_at = timezone.now()
-        self.save(update_fields=["state", "discard_reason", "decided_at", "updated_at"])
+        self._decide(user, ListingState.DISCARDED, reason, timezone.now())
         return True
 
-    def restore(self) -> bool:
-        """Back to new, as if the decision had not been made; False when it was new already."""
+    def restore(self, user) -> bool:
+        """Back to new for ``user``, as if never decided; False when it was new already."""
+        self._ensure_status(user)
         if self.state == ListingState.NEW:
             return False
-        self.state = ListingState.NEW
-        self.discard_reason = ""
-        self.decided_at = None
-        self.save(update_fields=["state", "discard_reason", "decided_at", "updated_at"])
+        self._decide(user, ListingState.NEW, "", None)
         return True
+
+    def mark_decided(self, user) -> None:
+        """Note when ``user`` decided about this listing, unless they already had (#896)."""
+        ListingStatus.objects.get_or_create(
+            owner=user,
+            posting=self,
+            defaults={"noted_at": self.created_at, "decided_at": timezone.now()},
+        )
+        ListingStatus.objects.filter(owner=user, posting=self, decided_at__isnull=True).update(
+            decided_at=timezone.now()
+        )
+
+    def _ensure_status(self, user) -> None:
+        if "state" not in self.__dict__:
+            self.status_for(user)
 
     def close(self) -> None:
         if self.closed_at is None:
@@ -1737,15 +2023,15 @@ SYSTEM_LISTING_EVENT_KINDS = frozenset({ListingEventKind.CAPTURE})
 
 class ListingEventQuerySet(models.QuerySet):
     def for_user(self, user) -> ListingEventQuerySet:
-        """Scope through the listing, as the timeline scopes through its application.
+        """``user``'s own entries, on listings they can still see (#896).
 
-        An entry carries no owner of its own, for the reason `ApplicationEvent` gives:
-        duplicating it would be a second source of truth that could drift out of step with
-        the listing it belongs to.
+        An entry is its writer's: a listing shared with two people has two histories, so
+        each keeps their own messages, captures and notes about it. Both conditions hold,
+        so an entry on a listing that stopped being shared is out of reach with it.
         """
         if user is None or not getattr(user, "is_authenticated", False):
             return self.none()
-        return self.filter(posting__owner=user)
+        return self.filter(owner=user, posting__in=JobPosting.objects.visible_to(user).values("pk"))
 
 
 class ListingEvent(models.Model):
@@ -1780,6 +2066,13 @@ class ListingEvent(models.Model):
 
     posting = models.ForeignKey(
         JobPosting, on_delete=models.CASCADE, related_name="events", verbose_name=_("listing")
+    )
+    #: Whose entry this is (#896): a shared listing has one history per person.
+    owner = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="listing_events",
+        verbose_name=_("owner"),
     )
     kind = models.CharField(
         _("type"), max_length=20, choices=ListingEventKind, default=ListingEventKind.NOTE
@@ -1834,7 +2127,7 @@ class ListingEvent(models.Model):
         ]
         constraints = [
             models.UniqueConstraint(
-                fields=("posting", "external_id"),
+                fields=("posting", "owner", "external_id"),
                 condition=~models.Q(external_id=""),
                 name="listing_event_once_per_source_id",
             ),
@@ -1842,6 +2135,13 @@ class ListingEvent(models.Model):
 
     def __str__(self) -> str:
         return self.summary or str(self.get_kind_display())
+
+    def save(self, *args, **kwargs):
+        # An entry made without saying whose is the listing's own person's, as
+        # `record_listing_event` has it (#896). A group's listing has none to give.
+        if self.owner_id is None and self.posting_id is not None:
+            self.owner_id = self.posting.owner_id
+        super().save(*args, **kwargs)
 
     @property
     def points_at(self):
@@ -1852,7 +2152,7 @@ class ListingEvent(models.Model):
         its columns say.
         """
         found = self.artefact if self.artefact_type_id and self.artefact_id else None
-        if found is None or getattr(found, "owner_id", None) != self.posting.owner_id:
+        if found is None or getattr(found, "owner_id", None) != self.owner_id:
             return None
         return found
 
@@ -1952,3 +2252,254 @@ class FieldHint(OwnedModel):
 
     def __str__(self) -> str:
         return f"{self.host}: {self.get_field_display()}"
+
+
+class ShareScope(models.TextChoices):
+    READ = "read", _("Read-only")
+    WRITE = "write", _("Read/write")
+
+
+class Share(models.Model):
+    """A grant: one company, contact or listing, shared with a person or a group (#896).
+
+    **Read/write means the record's own details.** It never means deleting the record,
+    giving it to another owner or sharing it further: those belong to its owner, or to
+    every member of the group that owns it.
+
+    Concrete foreign keys rather than a generic relation, so a deleted record takes its
+    grants with it in the database and the visibility check can use an index.
+    """
+
+    Scope = ShareScope
+
+    company = models.ForeignKey(
+        Company, on_delete=models.CASCADE, null=True, blank=True, related_name="shares"
+    )
+    contact = models.ForeignKey(
+        Contact, on_delete=models.CASCADE, null=True, blank=True, related_name="shares"
+    )
+    posting = models.ForeignKey(
+        JobPosting, on_delete=models.CASCADE, null=True, blank=True, related_name="shares"
+    )
+    grantee_user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name="shares_received",
+        verbose_name=_("person"),
+    )
+    grantee_group = models.ForeignKey(
+        "auth.Group",
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name="shares_received",
+        verbose_name=_("group"),
+    )
+    scope = models.CharField(_("access"), max_length=5, choices=ShareScope.choices)
+    granted_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="shares_given",
+        verbose_name=_("shared by"),
+    )
+    created_at = models.DateTimeField(_("shared"), auto_now_add=True)
+
+    class Meta:
+        verbose_name = _("share")
+        verbose_name_plural = _("shares")
+        ordering = ("created_at", "pk")
+        constraints = [
+            models.CheckConstraint(
+                condition=Q(company__isnull=False, contact__isnull=True, posting__isnull=True)
+                | Q(company__isnull=True, contact__isnull=False, posting__isnull=True)
+                | Q(company__isnull=True, contact__isnull=True, posting__isnull=False),
+                name="share_has_one_record",
+            ),
+            models.CheckConstraint(
+                condition=Q(grantee_user__isnull=False, grantee_group__isnull=True)
+                | Q(grantee_user__isnull=True, grantee_group__isnull=False),
+                name="share_has_one_grantee",
+            ),
+            *(
+                models.UniqueConstraint(
+                    fields=(record, grantee),
+                    condition=Q(**{f"{record}__isnull": False, f"{grantee}__isnull": False}),
+                    name=f"one_share_per_{record}_per_{grantee}",
+                )
+                for record in ("company", "contact", "posting")
+                for grantee in ("grantee_user", "grantee_group")
+            ),
+        ]
+
+    def __str__(self) -> str:
+        return f"{self.record} → {self.grantee} ({self.scope})"
+
+    @property
+    def record(self):
+        return self.company or self.contact or self.posting
+
+    @property
+    def grantee(self):
+        return self.grantee_user or self.grantee_group
+
+
+class CompanyNote(OwnedModel):
+    """One person's note on a company (#896).
+
+    The note was a column on the company until companies could be shared; two people on one
+    shared company each keep their own, and neither ever sees the other's.
+    """
+
+    company = models.ForeignKey(
+        Company, on_delete=models.CASCADE, related_name="personal_notes", verbose_name=_("company")
+    )
+    text = models.TextField(_("notes"))
+
+    class Meta:
+        verbose_name = _("note on a company")
+        verbose_name_plural = _("notes on companies")
+        constraints = [
+            models.UniqueConstraint(fields=("owner", "company"), name="one_note_per_company_each")
+        ]
+
+    def __str__(self) -> str:
+        return f"note on company {self.company_id}"
+
+
+class ContactNote(OwnedModel):
+    """One person's note on a contact (#896), as `CompanyNote` is on a company."""
+
+    contact = models.ForeignKey(
+        Contact, on_delete=models.CASCADE, related_name="personal_notes", verbose_name=_("contact")
+    )
+    text = models.TextField(_("notes"))
+
+    class Meta:
+        verbose_name = _("note on a contact")
+        verbose_name_plural = _("notes on contacts")
+        constraints = [
+            models.UniqueConstraint(fields=("owner", "contact"), name="one_note_per_contact_each")
+        ]
+
+    def __str__(self) -> str:
+        return f"note on contact {self.contact_id}"
+
+
+class ListingStatus(OwnedModel):
+    """Where one person stands with one listing (#896).
+
+    A shared listing is shared as a posting -- its title, its company, whether the opening
+    is still there -- and never as a decision: one person discarding it discards it for
+    nobody else. No row means *new*, noted when the listing was added.
+    """
+
+    posting = models.ForeignKey(
+        JobPosting, on_delete=models.CASCADE, related_name="statuses", verbose_name=_("listing")
+    )
+    state = models.CharField(
+        _("state"), max_length=20, choices=ListingState, default=ListingState.NEW
+    )
+    discard_reason = models.CharField(
+        _("why it was discarded"), max_length=20, choices=DiscardReason, blank=True
+    )
+    noted_at = models.DateTimeField(
+        _("noted on"), default=timezone.now, help_text=_("When it entered your listings.")
+    )
+    decided_at = models.DateTimeField(_("decided on"), null=True, blank=True)
+
+    class Meta:
+        verbose_name = _("listing status")
+        verbose_name_plural = _("listing statuses")
+        indexes = [models.Index(fields=("owner", "state"))]
+        constraints = [
+            models.UniqueConstraint(fields=("owner", "posting"), name="one_status_per_listing_each")
+        ]
+
+    def __str__(self) -> str:
+        return f"{self.state} for listing {self.posting_id}"
+
+
+class RecordChangeAction(models.TextChoices):
+    CREATED = "created", _("Added")
+    EDITED = "edited", _("Changed")
+    SHARED = "shared", _("Shared")
+    UNSHARED = "unshared", _("No longer shared")
+    OWNER_CHANGED = "owner_changed", _("Given to another owner")
+    COPIED = "copied", _("Copied")
+    MERGED = "merged", _("Merged")
+
+
+class RecordChange(models.Model):
+    """Who changed what on a company, a contact or a listing, and when (#896).
+
+    A shared record edited by somebody else changes what its owner sees, so the record says
+    who did it. Names of fields, never their values: what a record *said* stays on the
+    record, and an old note does not outlive a share that was taken back.
+    """
+
+    Action = RecordChangeAction
+
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
+    object_id = models.PositiveBigIntegerField()
+    record = GenericForeignKey("content_type", "object_id")
+    #: Who, while they are on the instance; somebody who has left reads as such.
+    actor = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="record_changes",
+        verbose_name=_("by"),
+    )
+    #: What did it when it was not a person at the keyboard: a token, a plugin, an import.
+    via = models.CharField(_("through"), max_length=120, blank=True)
+    at = models.DateTimeField(_("when"), default=timezone.now)
+    action = models.CharField(_("what"), max_length=20, choices=RecordChangeAction.choices)
+    fields = models.JSONField(_("what changed"), default=list, blank=True)
+    detail = models.JSONField(default=dict, blank=True)
+
+    class Meta:
+        verbose_name = _("change to a record")
+        verbose_name_plural = _("changes to records")
+        ordering = ("-at", "-pk")
+        indexes = [models.Index(fields=("content_type", "object_id", "-at"))]
+
+    def __str__(self) -> str:
+        return f"{self.action} {self.content_type_id}:{self.object_id}"
+
+
+class ConflictDismissal(models.Model):
+    """Two records somebody looked at on the conflicts page and said to keep apart (#896).
+
+    One row per pair, in either order, so the page stops asking about it for everybody who
+    could have resolved it.
+    """
+
+    kind = models.CharField(_("type of record"), max_length=10)
+    first_id = models.PositiveBigIntegerField()
+    second_id = models.PositiveBigIntegerField()
+    by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="conflicts_dismissed",
+        verbose_name=_("by"),
+    )
+    at = models.DateTimeField(_("when"), default=timezone.now)
+
+    class Meta:
+        verbose_name = _("conflict kept apart")
+        verbose_name_plural = _("conflicts kept apart")
+        constraints = [
+            models.UniqueConstraint(
+                fields=("kind", "first_id", "second_id"), name="one_dismissal_per_pair"
+            )
+        ]
+
+    def __str__(self) -> str:
+        return f"{self.kind} {self.first_id}/{self.second_id}"

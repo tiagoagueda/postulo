@@ -202,6 +202,8 @@ def test_a_notifier_connection_carries_a_switch_per_event(client, user):
         "event_status_changed": False,
         "event_interview_scheduled": False,
         "event_offer_recorded": False,
+        "event_record_shared": False,
+        "event_share_ended": False,
     }
 
 

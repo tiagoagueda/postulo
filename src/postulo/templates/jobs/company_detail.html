@@ -10,6 +10,7 @@
 {% endblock %}
 
 {% block content %}
+  {% if sharing %}{% include "jobs/partials/sharing_panel.html" with panel=sharing %}{% endif %}
   {% comment %} The logo is changed on the edit page, by pressing it (#853). {% endcomment %}
   <div id="company-head" class="mb-6 flex flex-wrap items-start gap-4">
     {% company_logo company "size-14 text-lg" %}
@@ -399,9 +400,13 @@
         </section>
       {% endif %}
 
-      {% if company.notes %}
-        <c-section-title class="mt-8">{% translate "Notes" %}</c-section-title>
-        <div class="card whitespace-pre-line text-sm">{{ company.notes }}</div>
+      {% if can_write %}
+        {% if company.notes %}
+          <c-section-title class="mt-8">{% translate "Notes" %}</c-section-title>
+          <div class="card whitespace-pre-line text-sm">{{ company.notes }}</div>
+        {% endif %}
+      {% else %}
+        {% include "jobs/partials/own_note_form.html" with record=company kind="company" %}
       {% endif %}
 
       {% comment %} Its name in other languages (#673): from its Wikidata item on a press, or

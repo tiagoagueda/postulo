@@ -74,6 +74,142 @@ class OwnedModel(TimeStampedModel):
         abstract = True
 
 
+def group_ids(user):
+    """The groups ``user`` belongs to, as a subquery (#896).
+
+    A subquery rather than a list read first, so scoping a queryset costs no query of its
+    own: the membership is asked inside the one statement that reads the rows, and is
+    whatever the database holds at that moment -- a person removed from a group a second
+    ago sees nothing of it on their next page.
+    """
+    from django.contrib.auth.models import Group
+
+    if user is None or not getattr(user, "is_authenticated", False):
+        return Group.objects.none().values("pk")
+    return Group.objects.filter(user=user).values("pk")
+
+
+class PrincipalQuerySet(OwnedQuerySet):
+    """Rows owned by one person **or by one group** (#896).
+
+    ``for_user`` keeps its meaning -- what this person owns -- and widens it to what the
+    groups they belong to own. ``owned_by`` is the exact owner, for matching a name or an
+    identifier inside one owner's records: an import into a group looks among the group's.
+    """
+
+    def for_user(self, user) -> "PrincipalQuerySet":
+        if user is None or not getattr(user, "is_authenticated", False):
+            return self.none()
+        return self.filter(Q(owner=user) | Q(owner_group__in=group_ids(user)))
+
+    def owned_by(self, principal) -> "PrincipalQuerySet":
+        """Exactly ``principal``'s rows: a user's own, or a group's own."""
+        from django.contrib.auth.models import Group
+
+        if principal is None:
+            return self.none()
+        if isinstance(principal, Group):
+            return self.filter(owner_group=principal)
+        if not getattr(principal, "is_authenticated", False):
+            return self.none()
+        return self.filter(owner=principal)
+
+
+class PrincipalOwnedModel(OwnedModel):
+    """Owned by exactly one person or exactly one group (#896).
+
+    Still an `OwnedModel`, so every guard that walks owned models keeps walking these. The
+    ``owner`` becomes optional because a group-owned row has none; a check constraint on
+    each concrete model keeps exactly one of the two set.
+
+    **A child's owner columns copy its parent's**, never the person who typed the row: a
+    telephone number on a group's company is the group's, so deleting the account of the
+    member who added it does not take it off the company.
+    """
+
+    owner = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name="%(app_label)s_%(class)s_set",
+        verbose_name=_("owner"),
+    )
+    #: PROTECT: a group that still owns records cannot be deleted; its records are given
+    #: away first, on the conflicts page.
+    owner_group = models.ForeignKey(
+        "auth.Group",
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name="%(app_label)s_%(class)s_owned",
+        verbose_name=_("owning group"),
+    )
+
+    objects = PrincipalQuerySet.as_manager()
+
+    class Meta:
+        abstract = True
+
+    @staticmethod
+    def one_owner(name: str) -> models.CheckConstraint:
+        """The constraint every concrete subclass carries: one owner, person or group."""
+        return models.CheckConstraint(
+            condition=Q(owner__isnull=False, owner_group__isnull=True)
+            | Q(owner__isnull=True, owner_group__isnull=False),
+            name=name,
+        )
+
+    @property
+    def principal(self):
+        """The user or the group that owns this row."""
+        return self.owner if self.owner_id is not None else self.owner_group
+
+    def set_principal(self, principal) -> None:
+        """Make ``principal`` (a user or a group) the one owner, in memory."""
+        from django.contrib.auth.models import Group
+
+        if isinstance(principal, Group):
+            self.owner, self.owner_group = None, principal
+        else:
+            self.owner, self.owner_group = principal, None
+
+
+class OwnedAsItsHolder:
+    """A number, an address, a link or a handle is owned as what holds it is (#896).
+
+    Whoever typed it, a row on a group's company is the group's, so the account of the
+    member who added it can be deleted without taking it off the company. Copied on every
+    save from the holder -- a profile's rows keep their person, who is the holder's -- and
+    asked of the database only when the holder is not in hand already.
+    """
+
+    def save(self, *args, **kwargs):
+        holder_model = (
+            ContentType.objects.get_for_id(self.content_type_id).model_class()
+            if self.content_type_id
+            else None
+        )
+        if holder_model is not None and any(
+            field.name == "owner_group" for field in holder_model._meta.get_fields()
+        ):
+            holder = self._state.fields_cache.get("holder")
+            if holder is not None:
+                owners = (holder.owner_id, holder.owner_group_id)
+            else:
+                owners = (
+                    holder_model._default_manager.filter(pk=self.object_id)
+                    .values_list("owner_id", "owner_group_id")
+                    .first()
+                )
+            if owners is not None:
+                self.owner_id, self.owner_group_id = owners
+                update = kwargs.get("update_fields")
+                if update is not None:
+                    kwargs["update_fields"] = {*update, "owner", "owner_group"}
+        super().save(*args, **kwargs)
+
+
 class TagColour(models.TextChoices):
     """The tones a tag may take, and the whole of them (#285).
 
@@ -250,7 +386,7 @@ class Tag(OwnedModel):
         return [part.strip() for part in re.split(r"[;,/]", text or "") if part.strip()]
 
 
-class PhoneNumber(OwnedModel):
+class PhoneNumber(OwnedAsItsHolder, PrincipalOwnedModel):
     """One telephone number belonging to a person or to a contact.
 
     A generic relation, for the reason ``CVItem`` gives: the holder is heterogeneous — the
@@ -343,6 +479,7 @@ class PhoneNumber(OwnedModel):
         verbose_name_plural = _("telephone numbers")
         ordering = ("-is_primary", "created_at", "pk")
         constraints = [
+            PrincipalOwnedModel.one_owner("phone_number_one_owner"),
             models.UniqueConstraint(
                 fields=("content_type", "object_id"),
                 condition=Q(is_primary=True),
@@ -490,7 +627,7 @@ class PhoneNumber(OwnedModel):
 address_placer = None
 
 
-class PostalAddress(OwnedModel):
+class PostalAddress(OwnedAsItsHolder, PrincipalOwnedModel):
     """One postal address belonging to a person, a contact or a company (#329).
 
     A generic relation, for the reason :class:`PhoneNumber` gives: the holder is
@@ -612,6 +749,7 @@ class PostalAddress(OwnedModel):
         verbose_name_plural = _("postal addresses")
         ordering = ("-is_primary", "created_at", "pk")
         constraints = [
+            PrincipalOwnedModel.one_owner("postal_address_one_owner"),
             models.UniqueConstraint(
                 fields=("content_type", "object_id"),
                 condition=Q(is_primary=True),
@@ -701,7 +839,7 @@ class PostalAddress(OwnedModel):
         return separator.join(part for part in (p.strip() for p in parts if p) if part)
 
 
-class WebLink(OwnedModel):
+class WebLink(OwnedAsItsHolder, PrincipalOwnedModel):
     """One address on the web belonging to a person or to a contact.
 
     A social profile, a code repository, a website: three kinds, and a row for each of the
@@ -780,6 +918,7 @@ class WebLink(OwnedModel):
         verbose_name_plural = _("web links")
         ordering = ("-is_primary", "created_at", "pk")
         constraints = [
+            PrincipalOwnedModel.one_owner("web_link_one_owner"),
             models.UniqueConstraint(
                 fields=("content_type", "object_id", "kind"),
                 condition=Q(is_primary=True),
@@ -848,7 +987,7 @@ class WebLink(OwnedModel):
         return link_services.brand_for(self.service, self.kind)
 
 
-class MessagingHandle(OwnedModel):
+class MessagingHandle(OwnedAsItsHolder, PrincipalOwnedModel):
     """How somebody is reached on a messaging service: a person's or a contact's (#682).
 
     Matrix, XMPP, Signal, Telegram, Threema, or whatever else: a **handle** the service gave
@@ -902,6 +1041,7 @@ class MessagingHandle(OwnedModel):
         verbose_name_plural = _("messaging handles")
         ordering = ("-is_primary", "created_at", "pk")
         constraints = [
+            PrincipalOwnedModel.one_owner("messaging_handle_one_owner"),
             models.UniqueConstraint(
                 fields=("content_type", "object_id"),
                 condition=Q(is_primary=True),

@@ -20,7 +20,7 @@ from django.urls import reverse, reverse_lazy
 from django.utils.decorators import method_decorator
 from django.utils.translation import gettext_lazy as _
 from django.views import View
-from django.views.generic import CreateView, ListView, UpdateView
+from django.views.generic import CreateView, ListView, TemplateView, UpdateView
 
 from postulo.core.context_processors import theme_switch
 from postulo.core.files import serve_stored_picture
@@ -522,6 +522,9 @@ class DeleteAccountView(LoginRequiredMixin, View):
             {
                 "section_title": _("Your data"),
                 "counts": counts(request.user),
+                # What deleting does to what others hold (#896).
+                "shared_records": _shared_records(request.user),
+                "groups": request.user.groups.order_by("name"),
                 "last_administrator": deletion.is_last_administrator(request.user),
                 "error": error,
             },
@@ -662,3 +665,61 @@ class RequestLoginCodeView(View):
         if not transport.email_sign_in():
             raise Http404("Signing in by email is not offered here.")
         return request_login_code(request, *args, **kwargs)
+
+
+class YourGroupsView(LoginRequiredMixin, TemplateView):
+    """The groups this person is in, and leaving one (#896)."""
+
+    template_name = "accounts/groups.html"
+
+    def get_context_data(self, **kwargs):
+        from postulo.core import groups as lifecycle
+
+        context = super().get_context_data(**kwargs)
+        rows = []
+        for group in self.request.user.groups.order_by("name"):
+            members = group.user_set.count()
+            owns = len(lifecycle.owned_by(group))
+            rows.append(
+                {
+                    "group": group,
+                    "members": members,
+                    "owns": owns,
+                    "last_with_records": members == 1 and owns > 0,
+                }
+            )
+        context["groups"] = rows
+        return context
+
+
+class GroupLeaveView(LoginRequiredMixin, View):
+    """Leave one of one's groups, after saying so."""
+
+    def post(self, request, pk: int):
+        from django.contrib import messages
+        from django.shortcuts import get_object_or_404, redirect
+
+        from postulo.core import groups as lifecycle
+
+        group = get_object_or_404(request.user.groups.all(), pk=pk)
+        if request.POST.get("confirmed") != "1":
+            messages.error(request, _("Say that you understand what leaving does, first."))
+            return redirect("accounts:groups")
+        try:
+            lifecycle.leave(group, request.user)
+        except lifecycle.LastMemberOwns as refusal:
+            messages.error(request, str(refusal))
+        else:
+            messages.success(request, _("You are no longer in %(name)s.") % {"name": group.name})
+        return redirect("accounts:groups")
+
+
+def _shared_records(user) -> int:
+    """How many of ``user``'s own companies, contacts and listings someone else can see."""
+    from postulo.jobs.models import Share
+
+    return (
+        Share.objects.filter(company__owner=user).values("company").distinct().count()
+        + Share.objects.filter(contact__owner=user).values("contact").distinct().count()
+        + Share.objects.filter(posting__owner=user).values("posting").distinct().count()
+    )

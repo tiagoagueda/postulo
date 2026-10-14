@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% translate "Conflicts" %}{% endblock %}
+
+{% block content %}
+  {% comment %} What wants deciding between owners (#896): the same company, person or advert
+     held twice, a shared record pointing at one somebody cannot see, and -- for an
+     administrator -- the records of a group nobody is in. Nothing here happens by itself;
+     each line offers the ways to settle it. {% endcomment %}
+  <div class="mx-auto max-w-3xl">
+    <c-page-title>
+      {% translate "Conflicts" %}
+      <c-slot name="subtitle">
+        {% translate "Records held twice by different owners, and shares that point at something their reader cannot see. Nothing is merged, moved or shared until you say so." %}
+      </c-slot>
+    </c-page-title>
+
+    {% if request.user.is_superuser %}
+      <p class="mb-4 text-sm">
+        {% if everyone %}
+          <a href="{{ request.path }}" class="underline">{% translate "Only the ones you can see" %}</a>
+        {% else %}
+          <a href="?everyone=1" class="underline">{% translate "Everybody's, as an administrator" %}</a>
+        {% endif %}
+      </p>
+    {% endif %}
+
+    {% if found.empty %}
+      <c-empty variant="quiet">{% translate "Nothing wants deciding." %}</c-empty>
+    {% endif %}
+
+    {% if found.pairs %}
+      <section class="mb-6" aria-labelledby="conflicts-pairs" data-conflict-pairs>
+        <c-section-title id="conflicts-pairs">{% translate "The same thing twice" %}</c-section-title>
+        <ul class="space-y-3">
+          {% for pair in found.pairs %}
+            <li class="card text-sm" data-pair="{{ pair.kind }}:{{ pair.first.pk }}:{{ pair.second.pk }}">
+              <p>
+                <a href="{{ pair.first.get_absolute_url }}" class="underline"><bdi>{{ pair.first }}</bdi></a>
+                <span class="text-ink-500 dark:text-ink-400">(<bdi>{{ pair.first_owner }}</bdi>)</span>
+                ·
+                <a href="{{ pair.second.get_absolute_url }}" class="underline"><bdi>{{ pair.second }}</bdi></a>
+                <span class="text-ink-500 dark:text-ink-400">(<bdi>{{ pair.second_owner }}</bdi>)</span>
+              </p>
+              <p class="mt-1 text-ink-500 dark:text-ink-400">{{ pair.reasons|join:", " }}</p>
+              <div class="mt-3 flex flex-wrap items-center gap-2">
+                {% if pair.kind != "listing" and pair.first_manageable and pair.second_manageable %}
+                  {% if pair.kind == "company" %}
+                    <a href="{% url 'jobs:company_merge' pair.first.pk %}?with={{ pair.second.pk }}" class="btn" data-size="sm">{% translate "Merge into one" %}</a>
+                  {% else %}
+                    <a href="{% url 'jobs:contact_merge' pair.first.pk %}?with={{ pair.second.pk }}" class="btn" data-size="sm">{% translate "Merge into one" %}</a>
+                  {% endif %}
+                {% endif %}
+                {% if pair.first_manageable %}
+                  <a href="{% url 'jobs:move_owner' pair.kind pair.first.pk %}" class="btn" data-variant="outline" data-size="sm">{% blocktranslate with name=pair.first %}Change the owner of {{ name }}{% endblocktranslate %}</a>
+                {% endif %}
+                <form method="post" action="{{ request.path }}">
+                  {% csrf_token %}
+                  <input type="hidden" name="kind" value="{{ pair.kind }}">
+                  <input type="hidden" name="first" value="{{ pair.first.pk }}">
+                  <input type="hidden" name="second" value="{{ pair.second.pk }}">
+                  <button type="submit" class="btn" data-variant="ghost" data-size="sm">{% translate "Keep both" %}</button>
+                </form>
+              </div>
+            </li>
+          {% endfor %}
+        </ul>
+      </section>
+    {% endif %}
+
+    {% if found.dangling %}
+      <section class="mb-6" aria-labelledby="conflicts-dangling" data-conflict-dangling>
+        <c-section-title id="conflicts-dangling">{% translate "Shared, pointing at something unshared" %}</c-section-title>
+        <ul class="space-y-3">
+          {% for item in found.dangling %}
+            <li class="card text-sm">
+              <p>
+                {% blocktranslate trimmed with record=item.record who=item.grant.grantee %}
+                  “{{ record }}” is shared with {{ who }}, who cannot see what it points at:
+                {% endblocktranslate %}
+                {% for target in item.missing %}<bdi>{{ target }}</bdi>{% if not forloop.last %}, {% endif %}{% endfor %}
+              </p>
+              <a href="{% url 'jobs:share' 'company' item.missing.0.pk %}" class="btn mt-2" data-variant="outline" data-size="sm">{% translate "Share it with them" %}</a>
+            </li>
+          {% endfor %}
+        </ul>
+      </section>
+    {% endif %}
+
+    {% if found.orphaned %}
+      <section class="mb-6" aria-labelledby="conflicts-orphaned" data-conflict-orphaned>
+        <c-section-title id="conflicts-orphaned">{% translate "Owned by a group nobody is in" %}</c-section-title>
+        <ul class="space-y-2 text-sm">
+          {% for kind, record in found.orphaned %}
+            <li class="card flex flex-wrap items-center justify-between gap-2">
+              <span><bdi>{{ record }}</bdi> · <span class="text-ink-500 dark:text-ink-400">{{ record.owner_group.name }}</span></span>
+              <a href="{% url 'jobs:move_owner' kind record.pk %}" class="btn" data-variant="outline" data-size="sm">{% translate "Give it to somebody" %}</a>
+            </li>
+          {% endfor %}
+        </ul>
+      </section>
+    {% endif %}
+  </div>
+{% endblock %}

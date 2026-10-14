@@ -1,0 +1,52 @@
+{% load i18n %}
+{% comment %} Who has this record, and who changed it (#896).
+
+   Its owner, or how the reader came to see it; for whoever may share it, the way to; and the
+   last changes, by whom, as names of what changed and never what it said. `panel` is
+   `jobs.sharing.panel(record, user)`.
+{% endcomment %}
+<section class="card mb-6 text-sm" data-sharing-panel aria-labelledby="sharing-panel-title">
+  <h2 id="sharing-panel-title" class="sr-only">{% translate "Who has it" %}</h2>
+  <div class="flex flex-wrap items-center justify-between gap-3">
+    <p data-owner>
+      {% if panel.mine %}
+        {% translate "Yours." %}
+      {% elif panel.owned_by_group %}
+        {% blocktranslate with name=panel.owner_label %}The group {{ name }}'s.{% endblocktranslate %}
+      {% elif panel.grant %}
+        {% if panel.grant.scope == "write" %}
+          {% blocktranslate with name=panel.owner_label %}Shared with you by {{ name }}: you can change its details.{% endblocktranslate %}
+        {% else %}
+          {% blocktranslate with name=panel.owner_label %}Shared with you by {{ name }}, read-only.{% endblocktranslate %}
+        {% endif %}
+      {% else %}
+        {% blocktranslate with name=panel.owner_label %}{{ name }}'s.{% endblocktranslate %}
+      {% endif %}
+      <span class="text-ink-500 dark:text-ink-400">{% translate "Your notes and decisions on it are yours alone." %}</span>
+    </p>
+    {% if panel.manages %}
+      <a href="{% url 'jobs:share' panel.kind panel.record.pk %}" class="btn" data-variant="outline" data-size="sm" data-share-link>
+        {% if panel.grant_count %}
+          {% blocktranslate count counter=panel.grant_count %}Shared with {{ counter }}{% plural %}Shared with {{ counter }}{% endblocktranslate %}
+        {% else %}
+          {% translate "Share" %}
+        {% endif %}
+      </a>
+      <a href="{% url 'jobs:move_owner' panel.kind panel.record.pk %}" class="btn" data-variant="ghost" data-size="sm" data-move-link>{% translate "Owner" %}</a>
+    {% endif %}
+  </div>
+  {% if panel.changes %}
+    <details class="mt-3" data-record-trail>
+      <summary class="cursor-pointer text-ink-500 dark:text-ink-400">{% translate "Changes" %}</summary>
+      <ul class="mt-2 space-y-1">
+        {% for change in panel.changes %}
+          <li>
+            <time datetime="{{ change.at.isoformat }}">{{ change.at|date:"SHORT_DATETIME_FORMAT" }}</time> ·
+            {% if change.actor %}<bdi>{{ change.actor.get_username }}</bdi>{% elif change.via %}<bdi>{{ change.via }}</bdi>{% else %}{% translate "somebody who has since left" %}{% endif %} ·
+            {{ change.get_action_display }}{% if change.fields %}: {{ change.fields|join:", " }}{% endif %}
+          </li>
+        {% endfor %}
+      </ul>
+    </details>
+  {% endif %}
+</section>

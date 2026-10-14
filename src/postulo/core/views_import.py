@@ -70,6 +70,8 @@ def import_csv(request: HttpRequest):
                 mapping=mapping,
                 day_first=day_first,
                 currency=currency,
+                # Whose the companies and listings become (#896); checked in the errand.
+                into=request.POST.get("into", "")[:40],
             )
             csv_import.forget(request.session)
             return redirect("core:errand", pk=errand.pk)

@@ -35,7 +35,7 @@ from postulo.plugins.social_profiles import SOCIAL_PROFILES
 from postulo.plugins.websites import WEBSITES
 
 from . import addresses, link_services
-from .formsets import RowsAlreadyGone, leaving, owner_of, remove_first
+from .formsets import RowsAlreadyGone, give_owner, leaving, remove_first
 from .models import WebLink
 from .option_icons import OptionIcons
 
@@ -817,7 +817,7 @@ class BaseWebLinkFormSet(RowsAlreadyGone, generic_forms.BaseGenericInlineFormSet
         # What the row is and whose it is, set where the row is made, so that no page
         # saving these rows has to remember to (#454).
         form.instance.kind = self.kind
-        form.instance.owner = owner_of(self.instance)
+        give_owner(form.instance, self.instance)
         return super().save_new(form, commit=commit)
 
     def save(self, commit: bool = True):

@@ -34,6 +34,17 @@
       <p class="mt-4 text-xs text-ink-500 dark:text-ink-400">
         {% translate "Plus your career record, listings, reminders, tags, your picture, every file behind a document, your API tokens, your connections and their secrets, the invitations you issued that nobody accepted, and the account itself. Every file is removed from the server's disk, not only its record." %}
       </p>
+      {% if shared_records %}
+        <p class="mt-2 text-xs" data-shared-records>
+          {% blocktranslate count counter=shared_records %}{{ counter }} of your records is shared with others: they keep a copy of what their own records need, and are told it is gone.{% plural %}{{ counter }} of your records are shared with others: they keep a copy of what their own records need, and are told they are gone.{% endblocktranslate %}
+        </p>
+      {% endif %}
+      {% if groups %}
+        <p class="mt-2 text-xs" data-groups>
+          {% translate "You leave your groups; what they own stays theirs." %}
+          {% for group in groups %}<bdi>{{ group.name }}</bdi>{% if not forloop.last %}, {% endif %}{% endfor %}
+        </p>
+      {% endif %}
     </div>
 
     <div class="card mb-6">

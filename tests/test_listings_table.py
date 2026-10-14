@@ -19,7 +19,7 @@ from django.utils import timezone
 
 from postulo.applications.models import Application, Status
 from postulo.core import tables
-from postulo.jobs.models import Company, DiscardReason, JobPosting, ListingState
+from postulo.jobs.models import Company, DiscardReason, JobPosting, ListingState, ListingStatus
 from postulo.jobs.tables import ListingsTable
 
 pytestmark = pytest.mark.django_db
@@ -33,7 +33,9 @@ def company(user):
 
 
 def listing(user, company, title="Test Engineer", **fields):
-    return JobPosting.objects.create(owner=user, company=company, title=title, **fields)
+    """A listing of ``user``'s, read as they stand with it (#896)."""
+    made = JobPosting.objects.create(owner=user, company=company, title=title, **fields)
+    return made.status_for(user)
 
 
 def titles(response) -> list[str]:
@@ -91,9 +93,9 @@ def test_the_state_is_a_column_that_sorts_and_a_tab_that_narrows_but_never_both(
     column shows the state and orders by it; the tabs, which carry the counts, choose."""
     listing(user, company, title="Fresh")
     shortlisted = listing(user, company, title="Kept")
-    shortlisted.shortlist()
+    shortlisted.shortlist(user)
     binned = listing(user, company, title="Binned")
-    binned.discard(DiscardReason.PAY)
+    binned.discard(user, DiscardReason.PAY)
 
     client.force_login(user)
     html = client.get(reverse(LIST) + "?state=all").content.decode()
@@ -126,7 +128,7 @@ def test_a_tab_and_a_column_filter_compose(client, user, company):
     first = listing(user, company, title="Binned here")
     second = listing(user, other, title="Binned there")
     for item in (first, second):
-        item.discard(DiscardReason.LOCATION)
+        item.discard(user, DiscardReason.LOCATION)
     listing(user, company, title="Still to decide")
 
     client.force_login(user)
@@ -236,10 +238,10 @@ def test_a_sweep_discards_the_ticked_ones_and_says_why_once(client, user, compan
 
     assert response.status_code == 302
     for item in (first, second):
-        item.refresh_from_db()
+        item.status_for(user)
         assert item.state == ListingState.DISCARDED
         assert item.discard_reason == DiscardReason.PAY
-    kept.refresh_from_db()
+    kept.status_for(user)
     assert kept.state == ListingState.NEW, "an unticked row is not swept up with them"
 
 
@@ -248,11 +250,11 @@ def test_a_sweep_can_shortlist_and_can_put_them_back(client, user, company):
     client.force_login(user)
 
     client.post(reverse("listings:bulk"), {"chosen": [item.pk], "bulk-action": "shortlist"})
-    item.refresh_from_db()
+    item.status_for(user)
     assert item.state == ListingState.SHORTLISTED
 
     client.post(reverse("listings:bulk"), {"chosen": [item.pk], "bulk-action": "restore"})
-    item.refresh_from_db()
+    item.status_for(user)
     assert item.state == ListingState.NEW
 
 
@@ -272,8 +274,8 @@ def test_a_sweep_touches_only_the_rows_that_are_yours(client, user, other_user, 
         {"chosen": [mine.pk, theirs.pk], "bulk-action": "discard", "reason": "pay"},
     )
 
-    mine.refresh_from_db()
-    theirs.refresh_from_db()
+    mine.status_for(user)
+    theirs.status_for(other_user)
     assert mine.state == ListingState.DISCARDED
     assert theirs.state == ListingState.NEW
 
@@ -286,7 +288,7 @@ def test_a_sweep_refuses_an_action_it_does_not_have(client, user, company):
         reverse("listings:bulk"), {"chosen": [item.pk], "bulk-action": "delete"}, follow=True
     )
 
-    item.refresh_from_db()
+    item.status_for(user)
     assert item.state == ListingState.NEW
     assert "not something Postulo can do" in response.content.decode()
 
@@ -300,7 +302,7 @@ def test_an_unknown_reason_becomes_other_rather_than_refusing_the_sweep(client, 
         {"chosen": [item.pk], "bulk-action": "discard", "reason": "nonsense"},
     )
 
-    item.refresh_from_db()
+    item.status_for(user)
     assert item.discard_reason == DiscardReason.OTHER
 
 
@@ -333,7 +335,7 @@ def test_a_column_that_is_not_editable_cannot_be_edited_by_address(client, user,
 def test_the_row_still_says_which_state_it_is_in(client, user, company):
     """`data-listing-state` was on the row before the page was a table and stays on it."""
     item = listing(user, company)
-    item.shortlist()
+    item.shortlist(user)
     client.force_login(user)
 
     html = client.get(reverse(LIST)).content.decode()
@@ -346,9 +348,9 @@ def test_a_sweep_counts_only_the_rows_it_changed_and_keeps_their_dates(client, u
     nor re-stamps the day the decision was really made (#508)."""
     fresh = listing(user, company, title="Fresh")
     done = listing(user, company, title="Done")
-    done.shortlist()
+    done.shortlist(user)
     stamped = timezone.now() - dt.timedelta(days=30)
-    JobPosting.objects.filter(pk=done.pk).update(decided_at=stamped)
+    ListingStatus.objects.filter(owner=user, posting=done).update(decided_at=stamped)
     client.force_login(user)
 
     response = client.post(
@@ -358,8 +360,8 @@ def test_a_sweep_counts_only_the_rows_it_changed_and_keeps_their_dates(client, u
     )
 
     assert "1 listing changed." in response.content.decode()
-    done.refresh_from_db()
-    fresh.refresh_from_db()
+    done.status_for(user)
+    fresh.status_for(user)
     assert done.decided_at == stamped
     assert fresh.state == ListingState.SHORTLISTED
     assert fresh.decided_at is not None

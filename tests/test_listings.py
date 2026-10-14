@@ -36,7 +36,9 @@ def company(user):
 
 
 def listing(user, company, title="Test Engineer", **fields):
-    return JobPosting.objects.create(owner=user, company=company, title=title, **fields)
+    """A listing of ``user``'s, read as they stand with it (#896)."""
+    made = JobPosting.objects.create(owner=user, company=company, title=title, **fields)
+    return made.status_for(user)
 
 
 # ------------------------------------------------------------------ the model
@@ -49,18 +51,18 @@ def test_a_new_listing_is_undecided_and_earns_its_derived_states(user, company):
     assert fresh.is_undecided
     assert fresh.decided_at is None
 
-    fresh.shortlist()
+    fresh.shortlist(user)
     assert fresh.derived_state == "shortlisted" and fresh.decided_at is not None
 
-    fresh.discard(DiscardReason.PAY)
+    fresh.discard(user, DiscardReason.PAY)
     assert fresh.derived_state == "discarded" and fresh.discard_reason == DiscardReason.PAY
     assert not fresh.is_undecided
 
-    fresh.restore()
+    fresh.restore(user)
     assert fresh.derived_state == "new" and fresh.decided_at is None
 
     Application.objects.create(owner=user, posting=fresh, status=Status.APPLIED)
-    fresh = JobPosting.objects.with_application_count().get(pk=fresh.pk)
+    fresh = JobPosting.objects.with_status(user).get(pk=fresh.pk)
     assert fresh.derived_state == "applied", "derived from the application, never stored"
     assert fresh.state == ListingState.NEW, "the stored state did not have to change"
 
@@ -70,23 +72,23 @@ def test_a_closed_or_expired_listing_is_closed(user, company):
     assert expired.derived_state == "closed"
     gone = listing(user, company, title="Gone", closed_at=timezone.now())
     assert gone.derived_state == "closed"
-    assert JobPosting.objects.for_user(user).undecided().count() == 0
-    assert JobPosting.objects.for_user(user).in_state("closed").count() == 2
+    assert JobPosting.objects.for_user(user).with_status(user).undecided().count() == 0
+    assert JobPosting.objects.for_user(user).with_status(user).in_state("closed").count() == 2
 
 
 def test_the_queryset_filters_agree_with_the_derived_state(user, company):
     new = listing(user, company, title="New")
     short = listing(user, company, title="Short")
-    short.shortlist()
+    short.shortlist(user)
     binned = listing(user, company, title="Binned")
-    binned.discard()
+    binned.discard(user)
     applied = listing(user, company, title="Applied")
     Application.objects.create(owner=user, posting=applied, status=Status.APPLIED)
     soon = listing(
         user, company, title="Soon", closes_at=timezone.localdate() + dt.timedelta(days=3)
     )
 
-    everything = JobPosting.objects.for_user(user)
+    everything = JobPosting.objects.for_user(user).with_status(user)
     assert soon.derived_state == "new" and soon.is_undecided
     assert set(everything.undecided().values_list("title", flat=True)) == {"New", "Short", "Soon"}
     assert list(everything.closing_soon().values_list("title", flat=True)) == ["Soon"]
@@ -134,7 +136,7 @@ def test_changing_the_title_moves_the_code_and_other_saves_carry_it(user, compan
     assert JobPosting.objects.get(pk=posting.pk).isco_code == "1112"
 
     # A save that does not write the title leaves the code as it is.
-    posting.shortlist()
+    posting.shortlist(user)
     assert JobPosting.objects.get(pk=posting.pk).isco_code == "1112"
 
 
@@ -144,7 +146,7 @@ def test_changing_the_title_moves_the_code_and_other_saves_carry_it(user, compan
 def test_the_listings_page_shows_what_is_to_decide_by_default(client, user, company):
     listing(user, company, title="Decide me")
     binned = listing(user, company, title="Binned")
-    binned.discard(DiscardReason.LOCATION)
+    binned.discard(user, DiscardReason.LOCATION)
     applied = listing(user, company, title="Done")
     Application.objects.create(owner=user, posting=applied, status=Status.APPLIED)
     client.force_login(user)
@@ -194,7 +196,7 @@ def test_adding_a_listing_by_hand_needs_only_a_company_and_a_title(client, user)
         {"company_name": "Black Mesa", "title": "Research Engineer", "salary_period": "year"},
     )
     assert response.status_code == 302
-    created = JobPosting.objects.get(owner=user)
+    created = JobPosting.objects.get(owner=user).status_for(user)
     assert created.company.name == "Black Mesa"
     assert created.derived_state == "new"
     assert response.url == created.get_absolute_url()
@@ -208,20 +210,20 @@ def test_shortlist_discard_and_restore_from_the_page(client, user, company):
 
     response = client.post(reverse("listings:shortlist", args=[item.pk]), {"next": back})
     assert response.status_code == 302 and response.url == back
-    item.refresh_from_db()
+    item.status_for(user)
     assert item.state == ListingState.SHORTLISTED
 
     client.post(reverse("listings:discard", args=[item.pk]), {"reason": "pay"})
-    item.refresh_from_db()
+    item.status_for(user)
     assert item.state == ListingState.DISCARDED and item.discard_reason == DiscardReason.PAY
 
     client.post(reverse("listings:discard", args=[item.pk]), {"reason": "nonsense"})
-    item.refresh_from_db()
+    item.status_for(user)
     assert item.discard_reason == DiscardReason.OTHER
 
     response = client.post(reverse("listings:restore", args=[item.pk]), {"next": "https://evil/"})
     assert response.url == reverse("listings:list"), "an offsite next is ignored"
-    item.refresh_from_db()
+    item.status_for(user)
     assert item.state == ListingState.NEW
 
 
@@ -241,9 +243,9 @@ def test_applying_creates_the_application_and_the_listing_leaves_the_queue(clien
     assert response.url == application.get_absolute_url()
     assert application.status == Status.APPLIED
     assert application.events.filter(summary="Application created").exists()
-    item.refresh_from_db()
+    item.status_for(user)
     assert item.decided_at is not None
-    assert JobPosting.objects.for_user(user).undecided().count() == 0
+    assert JobPosting.objects.for_user(user).with_status(user).undecided().count() == 0
     html = client.get(reverse("listings:list") + "?state=applied").content.decode()
     assert "Apply to me" in html and application.get_absolute_url() in html
 
@@ -256,7 +258,7 @@ def test_the_listing_page_carries_the_decision_buttons(client, user, company):
     assert reverse("listings:discard", args=[item.pk]) in html
     assert reverse("listings:apply", args=[item.pk]) in html
     assert 'name="reason"' in html
-    item.discard(DiscardReason.LOCATION)
+    item.discard(user, DiscardReason.LOCATION)
     html = client.get(item.get_absolute_url()).content.decode()
     assert reverse("listings:restore", args=[item.pk]) in html
     assert "The location" in html
@@ -294,8 +296,9 @@ def test_recording_an_application_still_works_in_one_step(client, user):
     )
     assert response.status_code == 302
     application = Application.objects.get(owner=user)
-    assert application.posting.derived_state == "applied"
-    assert application.posting.decided_at is not None
+    posting = application.posting.status_for(user)
+    assert posting.derived_state == "applied"
+    assert posting.decided_at is not None
 
 
 def test_listings_are_private_to_their_owner(client, user, other_user, company):
@@ -324,7 +327,7 @@ def test_the_navigation_and_the_dashboard_point_at_listings(client, user, compan
 def test_the_selectivity_widget_reports_what_was_let_go(client, user, company):
     listing(user, company, title="A")
     binned = listing(user, company, title="B")
-    binned.discard()
+    binned.discard(user)
     applied = listing(user, company, title="C")
     Application.objects.create(owner=user, posting=applied, status=Status.APPLIED)
     profile = user.profile
@@ -348,7 +351,7 @@ def test_the_export_carries_listing_state_and_the_importer_reads_both_formats(
     user, other_user, company
 ):
     item = listing(user, company, title="Software developers", closes_at=timezone.localdate())
-    item.shortlist()
+    item.shortlist(user)
     Capture.objects.create(
         owner=user,
         url="https://example.org/j/2",
@@ -366,7 +369,7 @@ def test_the_export_carries_listing_state_and_the_importer_reads_both_formats(
 
     archive_bytes = write_archive(user).getvalue()
     load(other_user, zipfile.ZipFile(io.BytesIO(archive_bytes)))
-    restored = JobPosting.objects.get(owner=other_user)
+    restored = JobPosting.objects.get(owner=other_user).status_for(other_user)
     assert restored.state == ListingState.SHORTLISTED
     assert restored.decided_at is not None
     assert restored.isco_code == "2512"
@@ -391,7 +394,7 @@ def test_a_format_one_archive_still_imports(user, other_user, company):
         archive.writestr("postulo.json", json.dumps(document, default=str))
     load(other_user, zipfile.ZipFile(io.BytesIO(buffer.getvalue())))
 
-    restored = JobPosting.objects.get(owner=other_user)
+    restored = JobPosting.objects.get(owner=other_user).status_for(other_user)
     assert restored.state == ListingState.NEW
     assert restored.noted_at is not None
     assert restored.decided_at is not None, "it had an application, so it was decided"
@@ -412,8 +415,8 @@ def test_the_state_cell_the_tab_and_the_sort_agree(user, company, stored, when, 
     if applied:
         Application.objects.create(owner=user, posting=row, status=Status.APPLIED)
 
-    everything = JobPosting.objects.for_user(user)
-    derived = everything.with_application_count().get(pk=row.pk).derived_state
+    everything = JobPosting.objects.for_user(user).with_status(user)
+    derived = everything.get(pk=row.pk).derived_state
     # The undecided tab holds the shortlisted rows too, and the shortlisted tab is inside it.
     tabs = {"new": ["undecided"], "shortlisted": ["undecided", "shortlisted"]}.get(
         derived, [derived]
@@ -424,9 +427,7 @@ def test_the_state_cell_the_tab_and_the_sort_agree(user, company, stored, when, 
     assert holding == tabs
     counts = everything.tab_counts()
     assert [name for name in TAB_ORDER if counts[name]] == tabs
-    assert (
-        everything.with_application_count().with_state_order().get(pk=row.pk).state_order == order
-    )
+    assert everything.with_state_order().get(pk=row.pk).state_order == order
 
 
 def test_the_old_posting_form_has_no_address_and_listings_are_added_through_the_listings_page(

@@ -1,0 +1,17 @@
+{% load i18n %}
+{% comment %} Whose records the list shows (#896): only for somebody with more than their own --
+   a group, a share -- or an administrator, who may ask for everybody's. A form of its own, so
+   it works without scripts; the tab the person is on comes along. {% endcomment %}
+{% if whose_choices %}
+  <form method="get" class="mb-4 flex flex-wrap items-center gap-2 text-sm" data-whose>
+    {% if request.GET.state %}<input type="hidden" name="state" value="{{ request.GET.state }}">{% endif %}
+    <label for="whose-choice">{% translate "Showing" %}</label>
+    <select id="whose-choice" name="whose">
+      {% for value, label in whose_choices %}
+        <option value="{{ value }}"{% if value == whose %} selected{% endif %}>{{ label }}</option>
+      {% endfor %}
+    </select>
+    <button type="submit" class="btn" data-variant="outline" data-size="sm">{% translate "Show" %}</button>
+    <a href="{% url 'jobs:conflicts' %}" class="ms-auto underline">{% translate "Conflicts" %}</a>
+  </form>
+{% endif %}

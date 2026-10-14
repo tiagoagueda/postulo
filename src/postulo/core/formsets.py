@@ -27,6 +27,19 @@ def owner_of(holder):
     return holder.owner if hasattr(holder, "owner") else holder.user
 
 
+def give_owner(row, holder) -> None:
+    """Make ``row`` owned as ``holder`` is: by its person, or by its group (#896).
+
+    A company or a contact may belong to a group, and its numbers, links and addresses
+    then belong to the group too -- never to the member who typed them, whose account
+    could otherwise take them off the group's record when it is deleted.
+    """
+    if getattr(holder, "owner_group_id", None) is not None:
+        row.owner, row.owner_group = None, holder.owner_group
+    else:
+        row.owner = owner_of(holder)
+
+
 def leaving(formset) -> set:
     """The keys of the stored rows this submission removes.
 

@@ -34,7 +34,15 @@ class CoreConfig(AppConfig):
         # Registers the dashboard widgets core owns, and the export archive as a piece
         # of slow work (#247), and the configuration checks `manage.py check` runs before
         # the first request (#233).
-        from . import checks, safe_choices, signals, slow, transfers, widgets_builtin  # noqa: F401
+        from . import (  # noqa: F401
+            checks,
+            groups,
+            safe_choices,
+            signals,
+            slow,
+            transfers,
+            widgets_builtin,
+        )
 
         # A number past what the database holds is an invalid choice, not a 500 (#767).
         safe_choices.install()

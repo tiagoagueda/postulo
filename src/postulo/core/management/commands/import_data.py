@@ -15,6 +15,11 @@ class Command(BaseCommand):
         parser.add_argument("email", help="The account to import into.")
         parser.add_argument("archive", help="The zip produced by export_data.")
         parser.add_argument(
+            "--group",
+            default="",
+            help="One of the account's groups to give the companies, contacts and listings to.",
+        )
+        parser.add_argument(
             "--force",
             action="store_true",
             help=(
@@ -31,7 +36,12 @@ class Command(BaseCommand):
 
         try:
             with zipfile.ZipFile(options["archive"]) as archive:
-                report = load(user, archive, force=options["force"])
+                into = None
+                if options["group"]:
+                    into = user.groups.filter(name=options["group"]).first()
+                    if into is None:
+                        raise CommandError(f"{user} is not in a group called {options['group']!r}.")
+                report = load(user, archive, force=options["force"], into=into)
         except (ArchiveError, zipfile.BadZipFile) as exc:
             raise CommandError(str(exc)) from exc
 

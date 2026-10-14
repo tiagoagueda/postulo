@@ -27,7 +27,7 @@ from postulo.applications import agenda
 from postulo.applications.models import Application, Reminder, Status
 from postulo.applications.services import later_time, postpone_reminder
 from postulo.jobs import closing
-from postulo.jobs.models import Company, JobPosting, ListingState
+from postulo.jobs.models import Company, JobPosting
 
 pytestmark = pytest.mark.django_db
 
@@ -322,8 +322,7 @@ def test_only_undecided_listings_are_counted_as_closing(user, company, posting, 
     )
     assert list(closing.closing_for(user)) == [open_one]
 
-    open_one.state = ListingState.DISCARDED
-    open_one.save(update_fields=["state"])
+    open_one.discard(user)
     assert list(closing.closing_for(user)) == []
 
 

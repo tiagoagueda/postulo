@@ -525,6 +525,22 @@ msgstr[0] "%(counter)s oglas za odluku"
 msgstr[1] "%(counter)s oglasa za odluku"
 msgstr[2] "%(counter)s oglasa za odluku"
 
+#: src/postulo/templates/accounts/groups.html
+#, python-format
+msgid "%(counter)s member"
+msgid_plural "%(counter)s members"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+
+#: src/postulo/templates/accounts/delete_account.html
+#, python-format
+msgid "%(counter)s of your records is shared with others: they keep a copy of what their own records need, and are told it is gone."
+msgid_plural "%(counter)s of your records are shared with others: they keep a copy of what their own records need, and are told they are gone."
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+
 #: src/postulo/templates/core/search.html
 #, fuzzy, python-format
 msgid "%(counter)s result for “%(term)s”"
@@ -746,6 +762,11 @@ msgstr ""
 #, fuzzy, python-format
 msgid "%(from)s to %(to)s"
 msgstr "%(from)s – %(to)s"
+
+#: src/postulo/jobs/sharing.py
+#, python-format
+msgid "%(grantee)s keeps %(names)s, which points at it; take that back first, or nothing changes."
+msgstr ""
 
 #: src/postulo/core/destinations.py
 #, fuzzy, python-format
@@ -1089,6 +1110,11 @@ msgstr "%(name)s je dio Postula. Umjesto toga isključite ga u Postavke posluži
 msgid "%(name)s signs in as <strong>%(current)s</strong>. The new username must be free on this instance; capitals do not make it different."
 msgstr "%(name)s se prijavljuje kao <strong>%(current)s</strong>. Novo korisničko ime mora biti slobodno na ovoj instanci; velika slova ga ne razlikuju."
 
+#: src/postulo/core/groups.py
+#, python-format
+msgid "%(name)s still owns records. Give them to somebody, or delete them, first."
+msgstr ""
+
 #: src/postulo/jobs/vcards.py
 #, python-format
 msgid "%(name)s was not added: %(why)s"
@@ -1108,6 +1134,11 @@ msgstr "%(name)s — %(kind)s"
 #, fuzzy, python-format
 msgid "%(name)s — dashboard"
 msgstr "%(name)s — nadzorna ploča"
+
+#: src/postulo/templates/jobs/partials/sharing_panel.html
+#, python-format
+msgid "%(name)s's."
+msgstr ""
 
 #: src/postulo/templates/core/export.html
 #, fuzzy, python-format
@@ -1154,6 +1185,11 @@ msgstr ""
 msgid "%(name)s: the number %(value)s was left out. %(why)s"
 msgstr ""
 
+#: src/postulo/jobs/merging.py
+#, python-format
+msgid "%(names)s can see “%(other)s” and not “%(kept)s”. Share “%(kept)s” with them first, or nothing is merged."
+msgstr ""
+
 #: src/postulo/resume/views.py
 #, fuzzy, python-format
 msgid "%(ok)s, %(broken)s; the ones that did not say why."
@@ -1174,6 +1210,11 @@ msgstr "%(other)s je spojen s %(kept)s."
 msgid "%(other)s was merged into %(kept)s"
 msgstr "%(other)s je spojen s %(kept)s"
 
+#: src/postulo/jobs/ownership.py
+#, python-format
+msgid "%(owner)s has a record of that name already; merge the two on the conflicts page."
+msgstr ""
+
 #: src/postulo/plugins/installing.py
 #, fuzzy, python-format
 msgid "%(package)s: needs %(wanted)s, and %(owner)s has %(have)s."
@@ -1187,6 +1228,11 @@ msgstr "%(package)s: treba %(wanted)s, a Postulo ima %(have)s."
 #: src/postulo/templates/applications/calendar.html
 #, python-format
 msgid "%(period)s: choose another"
+msgstr ""
+
+#: src/postulo/core/groups.py
+#, python-format
+msgid "%(person)s is the last member of %(name)s, which still owns records. Give them to somebody, or delete them, first."
 msgstr ""
 
 #: src/postulo/plugins/forms.py
@@ -1203,6 +1249,11 @@ msgstr "%(provider)s ne dopušta aplikaciji da šalje samostalno."
 #, fuzzy, python-format
 msgid "%(provider)s does not let an application send on its own. Choose “Signed in once”."
 msgstr "%(provider)s ne dopušta aplikaciji da šalje samostalno. Odaberite „Jednom prijavljeno”."
+
+#: src/postulo/jobs/sharing.py
+#, python-format
+msgid "%(record)s points at %(names)s, which %(grantee)s cannot see and which is not yours to share. Nothing was shared."
+msgstr ""
 
 #: src/postulo/core/gdpr.py
 #, fuzzy, python-format
@@ -1460,6 +1511,16 @@ msgstr "%(what)s…"
 #, fuzzy, python-format
 msgid "%(when)s ago"
 msgstr "prije %(when)s"
+
+#: src/postulo/templates/jobs/share.html
+#, python-format
+msgid "%(who)s cannot see these, which it points at. They are shared read-only with it, or nothing is shared."
+msgstr ""
+
+#: src/postulo/jobs/sharing.py
+#, python-format
+msgid "%(who)s shared “%(what)s” with you"
+msgstr ""
 
 #: src/postulo/accounts/forms.py
 #, python-format
@@ -2166,10 +2227,6 @@ msgstr ""
 msgid "A month"
 msgstr "Mjesec"
 
-#: src/postulo/templates/server/groups.html
-msgid "A name for a set of accounts. A group has no powers of its own: it is what an access rule on a plugin or a module points at."
-msgstr ""
-
 #: src/postulo/core/messaging_services.py
 #, python-format
 msgid "A name is at most %(max)s characters."
@@ -2487,6 +2544,10 @@ msgstr "Naslov odjeljka"
 msgid "A self-hosted job application manager, written from the applicant's side of the table. Your applications, your CVs, your cover letters, on your server."
 msgstr "Samostalno hostani upravitelj prijava za posao, napisan sa strane kandidata. Vaše prijave, vaši životopisi, vaša motivacijska pisma, na vašem poslužitelju."
 
+#: src/postulo/templates/server/groups.html
+msgid "A set of accounts. A group can own companies, contacts and listings, which every member can then see, change, share and delete, and records can be shared with it; it is also what an access rule on a plugin or a module points at. Whoever leaves keeps a copy of what their own records need; a group that still owns records cannot lose its last member or be deleted."
+msgstr ""
+
 #: src/postulo/accounts/models.py
 #, fuzzy
 msgid "A short professional title, such as “Backend engineer”."
@@ -2687,6 +2748,10 @@ msgstr "prihvaćeno dana"
 #, fuzzy
 msgid "accepted by"
 msgstr "prihvatio/la"
+
+#: src/postulo/jobs/models.py
+msgid "access"
+msgstr ""
 
 #: src/postulo/templates/server/plugins.html
 msgid "Access"
@@ -2911,7 +2976,7 @@ msgstr ""
 msgid "Add what is new"
 msgstr "Dodaj ono što je novo"
 
-#: src/postulo/jobs/tables.py
+#: src/postulo/jobs/models.py src/postulo/jobs/tables.py
 #, fuzzy
 msgid "Added"
 msgstr "Dodano"
@@ -3118,6 +3183,10 @@ msgstr "Nude se svi, a i jezik dodan u kasnijem izdanju."
 
 #: src/postulo/templates/accounts/profile.html
 msgid "All optional, and none of it is worked out from anything else. None of it is printed until a CV is set to print it, one by one, under <em>Choose which details</em> on the CV."
+msgstr ""
+
+#: src/postulo/jobs/whose.py
+msgid "All you can see"
 msgstr ""
 
 #: src/postulo/applications/agenda.py
@@ -3824,6 +3893,10 @@ msgstr ""
 msgid "As a file"
 msgstr ""
 
+#: src/postulo/templates/jobs/move_owner.html
+msgid "As an administrator you may also give it to anybody: type their username below instead."
+msgstr ""
+
 #: src/postulo/resume/forms.py
 msgid "As it was published."
 msgstr ""
@@ -4008,6 +4081,8 @@ msgid "B2 — upper intermediate"
 msgstr "B2 — više srednje"
 
 #: src/postulo/templates/connections/pick.html
+#: src/postulo/templates/jobs/move_owner.html
+#: src/postulo/templates/jobs/share.html
 #, fuzzy
 msgid "Back"
 msgstr "Natrag"
@@ -4283,6 +4358,10 @@ msgstr ""
 msgid "Buy me a coffee — scan to open buymeacoffee.com/tiagoagueda"
 msgstr "Počasti me kavom — skenirajte za otvaranje buymeacoffee.com/tiagoagueda"
 
+#: src/postulo/jobs/models.py
+msgid "by"
+msgstr ""
+
 #: src/postulo/templates/server/person_recovery.html
 #, fuzzy
 msgid "By"
@@ -4393,7 +4472,9 @@ msgstr "Povratni URL za registraciju kod pružatelja"
 #: src/postulo/templates/jobs/listing_apply.html
 #: src/postulo/templates/jobs/listing_form.html
 #: src/postulo/templates/jobs/merge.html
+#: src/postulo/templates/jobs/move_owner.html
 #: src/postulo/templates/jobs/posting_form.html
+#: src/postulo/templates/jobs/share.html
 #: src/postulo/templates/partials/confirm_delete.html
 #: src/postulo/templates/partials/table/cell.html
 #: src/postulo/templates/resume/item_form.html
@@ -4642,12 +4723,29 @@ msgstr "Promijeni lozinku"
 msgid "Change the logo"
 msgstr ""
 
+#: src/postulo/templates/jobs/conflicts.html
+#, python-format
+msgid "Change the owner of %(name)s"
+msgstr ""
+
+#: src/postulo/jobs/models.py
+msgid "change to a record"
+msgstr ""
+
 #: src/postulo/templates/server/people.html
 #: src/postulo/templates/server/person_username.html
 #: src/postulo/templates/settings/account.html
 #, fuzzy
 msgid "Change username"
 msgstr "Promijeni korisničko ime"
+
+#: src/postulo/jobs/models.py
+msgid "Changed"
+msgstr ""
+
+#: src/postulo/templates/jobs/partials/sharing_panel.html
+msgid "Changes"
+msgstr ""
 
 #: src/postulo/templates/documents/cv_item_form.html
 #, fuzzy, python-format
@@ -4658,6 +4756,10 @@ msgstr "Promjene ovdje vrijede za „%(name)s“ samo u ovom životopisu. Glavni
 #, fuzzy
 msgid "Changes made here are pushed on the next run; the other side is read then too."
 msgstr "Promjene napravljene ovdje šalju se pri sljedećem pokretanju; tada se čita i druga strana."
+
+#: src/postulo/jobs/models.py
+msgid "changes to records"
+msgstr ""
 
 #: src/postulo/resume/models.py
 msgid "chapter"
@@ -5250,6 +5352,19 @@ msgstr "konfiguracija"
 msgid "Configured in the environment with the POSTULO_OIDC_* variables; see Configuration in the wiki."
 msgstr "Konfigurirano u okruženju varijablama POSTULO_OIDC_*; vidi Konfiguracija u wikiju."
 
+#: src/postulo/jobs/models.py
+msgid "conflict kept apart"
+msgstr ""
+
+#: src/postulo/templates/jobs/conflicts.html
+#: src/postulo/templates/jobs/partials/whose_form.html
+msgid "Conflicts"
+msgstr ""
+
+#: src/postulo/jobs/models.py
+msgid "conflicts kept apart"
+msgstr ""
+
 #: src/postulo/templates/connections/pick.html
 #, fuzzy
 msgid "Connect"
@@ -5387,6 +5502,7 @@ msgstr "Na određeno"
 msgid "conversation"
 msgstr "razgovor"
 
+#: src/postulo/jobs/models.py
 #: src/postulo/templates/accounts/invite_created.html
 #: src/postulo/templates/documents/cv_text.html
 #, fuzzy
@@ -6791,9 +6907,8 @@ msgid "Every 15 minutes"
 msgstr "Svakih 15 minuta"
 
 #: src/postulo/templates/server/people.html
-#, fuzzy
-msgid "Every account on this instance. Administrators see accounts, never anyone's applications or documents, but they can install plugins, so appoint only people you would trust with the database."
-msgstr "Svaki račun na ovoj instanci. Administratori vide račune, nikad nečije prijave ili dokumente, ali mogu instalirati dodatke, pa imenujte samo osobe kojima biste povjerili bazu podataka."
+msgid "Every account on this instance. Administrators see accounts, never anyone's notes, applications or documents; a superuser can also see and change any company, contact or listing. They can install plugins, so appoint only people you would trust with the database."
+msgstr ""
 
 #: src/postulo/templates/applications/report.html
 #: src/postulo/templates/applications/report_print.html
@@ -6858,6 +6973,10 @@ msgstr "Svaka vrsta veze na ovoj instanci, po dodatku, s brojem veza. Kako se ko
 msgid "Every language here but English is a machine draft waiting for somebody who speaks it to read it and say so. If one of them is yours, <a href=\"%(guide)s\" class=\"underline\">Translating</a> says how a review goes."
 msgstr "Svaki jezik ovdje osim engleskoga strojni je nacrt koji čeka da ga netko tko ga govori pročita i to potvrdi. Ako je jedan od njih vaš, <a href=\"%(guide)s\" class=\"underline\">Prevođenje</a> objašnjava kako izgleda pregled."
 
+#: src/postulo/templates/jobs/move_owner.html
+msgid "Every member of the group can then see it, change it, share it and delete it."
+msgstr ""
+
 #: src/postulo/templates/server/design.html
 #, fuzzy
 msgid "Every piece the interface is built from, in the theme you are reading it in. Switch the theme under Settings → Appearance to see the other one."
@@ -6898,6 +7017,14 @@ msgstr ""
 
 #: src/postulo/templates/server/plugin_access.html
 msgid "Everybody may switch it for themselves"
+msgstr ""
+
+#: src/postulo/jobs/whose.py
+msgid "Everybody's"
+msgstr ""
+
+#: src/postulo/templates/jobs/conflicts.html
+msgid "Everybody's, as an administrator"
 msgstr ""
 
 #: src/postulo/jobs/listing_views.py src/postulo/templates/server/logs.html
@@ -7741,10 +7868,27 @@ msgstr ""
 msgid "Give each nationality as a country code."
 msgstr ""
 
+#: src/postulo/templates/jobs/move_owner.html
+msgid "Give it"
+msgstr ""
+
+#: src/postulo/templates/jobs/move_owner.html
+msgid "Give it to"
+msgstr ""
+
 #: src/postulo/templates/server/person_recovery.html
 #, fuzzy, python-format
 msgid "Give it to %(name)s in person, on the telephone, or however else you would prove it was you. Anyone who has it can set the password on that account."
 msgstr "Dajte je %(name)s osobno, telefonom ili na bilo koji drugi način kojim biste dokazali da ste to vi. Tko god je ima, može postaviti lozinku tog računa."
+
+#: src/postulo/templates/jobs/move_owner.html
+#, python-format
+msgid "Give it to %(name)s?"
+msgstr ""
+
+#: src/postulo/templates/jobs/conflicts.html
+msgid "Give it to somebody"
+msgstr ""
 
 #: src/postulo/core/personal.py
 msgid "Give nationalities as a list of country codes."
@@ -7774,6 +7918,10 @@ msgstr "Dajte tokenu naziv i barem jedan opseg."
 
 #: src/postulo/core/personal.py
 msgid "Give the year, and the month before the day: a year alone is enough."
+msgstr ""
+
+#: src/postulo/jobs/models.py
+msgid "Given to another owner"
 msgstr ""
 
 #: src/postulo/notifications/models.py
@@ -7883,7 +8031,8 @@ msgstr "Bruto, prije poreza. Ostavite prazno ako oglas navodi samo jedan iznos."
 msgid "Gross, before tax. One end on its own is fine — most postings give one."
 msgstr "Bruto, prije poreza. Dovoljan je i samo jedan kraj raspona — većina oglasa navodi jedan."
 
-#: src/postulo/plugins/models.py src/postulo/resume/models.py
+#: src/postulo/jobs/models.py src/postulo/plugins/models.py
+#: src/postulo/resume/models.py src/postulo/templates/jobs/share.html
 #: src/postulo/templates/server/plugin_access.html
 #, fuzzy
 msgid "group"
@@ -8214,6 +8363,10 @@ msgstr "Hibridno"
 #, fuzzy
 msgid "I have already applied to this one"
 msgstr "Već sam se prijavio/la na ovaj"
+
+#: src/postulo/templates/accounts/groups.html
+msgid "I understand: I no longer see what the group owns or was shared with, and I keep a copy of each record my own data points at."
+msgstr ""
 
 #: src/postulo/core/transfers.py
 msgid "iCalendar"
@@ -8899,10 +9052,23 @@ msgstr "izdano dana"
 msgid "It also gets you back in: ask for a sign-in code and it arrives there. Making a different address primary moves that with it. You are still asked for your authenticator app if you have one."
 msgstr "Ona vas i vraća natrag: zatražite kod za prijavu i stiže tamo. Ako drugu adresu postavite kao primarnu, to se seli s njom. I dalje ćete biti pitani za aplikaciju za autentifikaciju ako je imate."
 
+#: src/postulo/templates/jobs/move_owner.html
+msgid "It becomes yours alone."
+msgstr ""
+
+#: src/postulo/jobs/share_views.py src/postulo/templates/jobs/move_owner.html
+#, python-format
+msgid "It belongs to %(name)s now."
+msgstr ""
+
 #: src/postulo/templates/server/plugins.html
 #, fuzzy
 msgid "It can read and change everything on this instance, for every person on it. Install only what you have read or have reason to trust. Nothing is ever updated automatically: an update is a code change, and an administrator clicks it."
 msgstr "Može čitati i mijenjati sve na ovoj instanci, za svaku osobu na njoj. Instalirajte samo ono što ste pročitali ili čemu imate razloga vjerovati. Ništa se nikad ne ažurira samo: ažuriranje je promjena koda i na njega klikne administrator."
+
+#: src/postulo/jobs/share_views.py
+msgid "It cannot be given to them."
+msgstr ""
 
 #: src/postulo/applications/forms.py
 #, fuzzy
@@ -8994,6 +9160,10 @@ msgid_plural "It is recorded as sent with %(count)d applications, which will no 
 msgstr[0] "Zabilježen je kao poslan uz %(count)d prijavu, koja više neće reći da je poslan."
 msgstr[1] "Zabilježen je kao poslan uz %(count)d prijave, koje više neće reći da je poslan."
 msgstr[2] "Zabilježen je kao poslan uz %(count)d prijava, koje više neće reći da je poslan."
+
+#: src/postulo/jobs/sharing.py
+msgid "It is theirs already."
+msgstr ""
 
 #: src/postulo/templates/account/recovery_unusable.html
 #, fuzzy
@@ -9127,10 +9297,9 @@ msgstr ""
 msgid "Its name, in double quotes, or one name for each language, as in the example. A reader is shown the one closest to their language."
 msgstr "Njegov naziv, u dvostrukim navodnicima, ili po jedan naziv za svaki jezik, kao u primjeru. Čitatelju se prikazuje onaj najbliži njegovu jeziku."
 
-#: src/postulo/jobs/merging.py
-#, fuzzy
-msgid "Its notes:"
-msgstr "Njegove bilješke:"
+#: src/postulo/jobs/sharing.py
+msgid "Its owner's account was deleted. What your own records needed is kept."
+msgstr ""
 
 #: src/postulo/core/models.py
 msgid "its postcode"
@@ -9219,6 +9388,14 @@ msgstr "zadrži prikaz uhvaćene stranice"
 msgid "Keep a rendering of the pages I capture"
 msgstr "Zadrži prikaz stranica koje hvatam"
 
+#: src/postulo/templates/jobs/conflicts.html
+msgid "Keep both"
+msgstr ""
+
+#: src/postulo/templates/jobs/partials/own_note_form.html
+msgid "Keep my notes"
+msgstr ""
+
 #: src/postulo/core/models.py
 msgid "keep the newest"
 msgstr ""
@@ -9271,6 +9448,10 @@ msgstr "Zadržano"
 #, fuzzy
 msgid "Kept after they are used or expire, because taking somebody's account back is not something to be able to do without a trace."
 msgstr "Čuva se nakon uporabe ili isteka, jer oduzimanje nečijeg računa ne smije biti moguće bez traga."
+
+#: src/postulo/jobs/share_views.py
+msgid "Kept apart: they will not be asked about again."
+msgstr ""
 
 #: src/postulo/templates/partials/postal_addresses.html
 #, fuzzy
@@ -9631,6 +9812,10 @@ msgstr ""
 msgid "Leave the box empty and a CV in this language prints the name the ESCO classification gives this skill: “%(name)s”."
 msgstr "Ostavite polje prazno i životopis na ovom jeziku ispisuje naziv koji klasifikacija ESCO daje ovoj vještini: „%(name)s“."
 
+#: src/postulo/templates/accounts/groups.html
+msgid "Leave the group"
+msgstr ""
+
 #: src/postulo/templates/base.html
 msgid "Leave this page"
 msgstr ""
@@ -9884,6 +10069,14 @@ msgstr "zapis oglasa"
 #, fuzzy
 msgid "Listing filters"
 msgstr "Filtri oglasa"
+
+#: src/postulo/jobs/models.py
+msgid "listing status"
+msgstr ""
+
+#: src/postulo/jobs/models.py
+msgid "listing statuses"
+msgstr ""
 
 #: src/postulo/core/help.py src/postulo/core/kind_files.py
 #: src/postulo/core/navigation.py src/postulo/core/search.py
@@ -10187,6 +10380,11 @@ msgstr ""
 msgid "may use it"
 msgstr ""
 
+#: src/postulo/jobs/share_views.py
+#, python-format
+msgid "Me, %(name)s"
+msgstr ""
+
 #: src/postulo/jobs/industries.py src/postulo/templates/server/overview.html
 #, fuzzy
 msgid "Media"
@@ -10279,6 +10477,10 @@ msgstr "Spoji kontakte"
 msgid "Merge into"
 msgstr "Spoji u"
 
+#: src/postulo/templates/jobs/conflicts.html
+msgid "Merge into one"
+msgstr ""
+
 #: src/postulo/templates/jobs/merge.html
 #, fuzzy
 msgid "Merge with"
@@ -10288,6 +10490,10 @@ msgstr "Spoji s"
 #, fuzzy
 msgid "Merge with another contact"
 msgstr "Spoji s drugim kontaktom"
+
+#: src/postulo/jobs/models.py
+msgid "Merged"
+msgstr ""
 
 #: src/postulo/templates/jobs/merge.html
 #, fuzzy
@@ -10646,6 +10852,10 @@ msgstr ""
 msgid "Neither is printed anywhere unless a CV says so: each CV has a switch for the form of address and one for the pronouns under its own <em>Settings</em>. Letters print neither."
 msgstr "Nijedno se nigdje ne ispisuje osim ako životopis tako ne kaže: svaki životopis ima prekidač za oblik oslovljavanja i jedan za zamjenice u svojim <em>Postavkama</em>. Pisma ne ispisuju nijedno."
 
+#: src/postulo/templates/jobs/share.html
+msgid "Neither lets them delete it, share it or give it to somebody else."
+msgstr ""
+
 #: src/postulo/api/forms.py
 #, fuzzy
 msgid "Never"
@@ -10986,6 +11196,15 @@ msgstr "Još nema pisama ove vrste."
 msgid "No letters yet. A cover letter is for one posting; a motivation letter tells your story; a speculative letter goes where nothing is advertised; a follow-up note comes after an interview."
 msgstr "Još nema pisama. Popratno pismo odnosi se na jedan oglas; motivacijsko pismo priča vašu priču; otvorena molba ide tamo gdje se ništa ne oglašava; bilješka dolazi nakon razgovora."
 
+#: src/postulo/jobs/models.py
+msgid "No longer shared"
+msgstr ""
+
+#: src/postulo/jobs/share_views.py
+#, python-format
+msgid "No longer shared with %(who)s."
+msgstr ""
+
 #: src/postulo/templates/server/backup_restore.html
 msgid "No media"
 msgstr ""
@@ -11148,6 +11367,10 @@ msgstr "Nedolazak"
 msgid "Nobody"
 msgstr "Nitko"
 
+#: src/postulo/templates/jobs/share.html
+msgid "Nobody else can see it."
+msgstr ""
+
 #: src/postulo/plugins/consent.py
 #, fuzzy
 msgid "Nobody has agreed to this yet. Connect it again."
@@ -11172,6 +11395,10 @@ msgstr "Još se nitko nije prijavio, pa se ništa ne može poslati. Spremite pos
 #, fuzzy
 msgid "Nobody is named here: whose contacts they are is the account's own business. Each person erases from their own contact's page."
 msgstr "Ovdje nitko nije imenovan: čiji su kontakti stvar je samog računa. Svaka osoba briše sa stranice vlastitog kontakta."
+
+#: src/postulo/jobs/share_views.py
+msgid "Nobody on this instance answers to that, or it is you; nothing was shared."
+msgstr ""
 
 #: src/postulo/templates/jobs/company_detail.html
 #, fuzzy
@@ -11221,6 +11448,10 @@ msgstr ""
 #, fuzzy
 msgid "Nobody you have recorded"
 msgstr "Nitko koga ste zabilježili"
+
+#: src/postulo/templates/jobs/share.html
+msgid "Nobody, or the person below"
+msgstr ""
 
 #: src/postulo/jobs/industries.py
 #, fuzzy
@@ -11512,6 +11743,14 @@ msgstr "Bilješka"
 msgid "Note (optional)"
 msgstr "Bilješka (neobavezno)"
 
+#: src/postulo/jobs/models.py
+msgid "note on a company"
+msgstr ""
+
+#: src/postulo/jobs/models.py
+msgid "note on a contact"
+msgstr ""
+
 #: src/postulo/jobs/tables.py
 #, fuzzy
 msgid "Noted"
@@ -11534,10 +11773,19 @@ msgid "notes"
 msgstr "bilješke"
 
 #: src/postulo/applications/views.py src/postulo/core/csv_import.py
+#: src/postulo/core/kind_files.py src/postulo/jobs/forms.py
 #: src/postulo/jobs/tables.py src/postulo/templates/jobs/company_detail.html
 #, fuzzy
 msgid "Notes"
 msgstr "Bilješke"
+
+#: src/postulo/jobs/models.py
+msgid "notes on companies"
+msgstr ""
+
+#: src/postulo/jobs/models.py
+msgid "notes on contacts"
+msgstr ""
 
 #: src/postulo/templates/server/plugins.html
 #, fuzzy
@@ -11831,6 +12079,10 @@ msgstr "Još ništa nije preneseno."
 #, fuzzy
 msgid "Nothing waiting"
 msgstr "Ništa ne čeka"
+
+#: src/postulo/templates/jobs/conflicts.html
+msgid "Nothing wants deciding."
+msgstr ""
 
 #: src/postulo/documents/views.py src/postulo/jobs/vcard_views.py
 #, fuzzy
@@ -12502,6 +12754,14 @@ msgstr "Samo za „Ostalo“: kako to nazvati u životopisu."
 msgid "Only http and https addresses can be captured."
 msgstr "Samo http i https adrese mogu se uhvatiti."
 
+#: src/postulo/jobs/sharing.py
+msgid "Only its owner can share it."
+msgstr ""
+
+#: src/postulo/jobs/sharing.py
+msgid "Only its owner can take a share back."
+msgstr ""
+
 #: src/postulo/core/models.py
 #, fuzzy
 msgid "Only one of your own numbers can get you back into your account. This one belongs to somebody you deal with."
@@ -12521,6 +12781,10 @@ msgstr "U ova dva nalaze se samo prijave koje navode preporučitelja ili agencij
 #, fuzzy
 msgid "Only the ones ticked below"
 msgstr "Samo oni označeni u nastavku"
+
+#: src/postulo/templates/jobs/conflicts.html
+msgid "Only the ones you can see"
+msgstr ""
 
 #: src/postulo/core/server_views.py
 msgid "Only the operator's own account can stop being an administrator."
@@ -12636,6 +12900,10 @@ msgstr ""
 
 #: src/postulo/accounts/forms.py
 msgid "Or say only this"
+msgstr ""
+
+#: src/postulo/templates/jobs/move_owner.html
+msgid "Or to a person"
 msgstr ""
 
 #: src/postulo/jobs/forms.py
@@ -12775,10 +13043,41 @@ msgstr "Pregled"
 msgid "Own mail"
 msgstr "Vlastita pošta"
 
-#: src/postulo/core/models.py
+#: src/postulo/templates/jobs/share.html
+#, python-format
+msgid "Owned by %(name)s."
+msgstr ""
+
+#: src/postulo/templates/jobs/conflicts.html
+msgid "Owned by a group nobody is in"
+msgstr ""
+
+#: src/postulo/templates/jobs/share.html
+#, python-format
+msgid "Owned by the group %(name)s: every member can see it, change it, share it and delete it."
+msgstr ""
+
+#: src/postulo/core/models.py src/postulo/jobs/models.py
 #, fuzzy
 msgid "owner"
 msgstr "vlasnik"
+
+#: src/postulo/templates/jobs/move_owner.html
+#: src/postulo/templates/jobs/partials/sharing_panel.html
+msgid "Owner"
+msgstr ""
+
+#: src/postulo/core/models.py
+msgid "owning group"
+msgstr ""
+
+#: src/postulo/templates/accounts/groups.html
+#, python-format
+msgid "owns %(counter)s record"
+msgid_plural "owns %(counter)s records"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
 
 #: src/postulo/accounts/forms.py
 #, fuzzy
@@ -13040,8 +13339,8 @@ msgstr ""
 msgid "Permissions"
 msgstr "Dozvole"
 
-#: src/postulo/accounts/models.py src/postulo/plugins/models.py
-#: src/postulo/resume/models.py
+#: src/postulo/accounts/models.py src/postulo/jobs/models.py
+#: src/postulo/plugins/models.py src/postulo/resume/models.py
 #, fuzzy
 msgid "person"
 msgstr "osoba"
@@ -14128,6 +14427,14 @@ msgstr "Pročitano ondje gdje su ga vaši vlastiti ispravci ranije pokazali na o
 msgid "Read where your own corrections showed them on this site before: %(fields)s. Each is marked below; check them as you would anything else."
 msgstr "Pročitano ondje gdje su ih vaši vlastiti ispravci ranije pokazali na ovoj web-stranici: %(fields)s. Svako je označeno u nastavku; provjerite ih kao i sve ostalo."
 
+#: src/postulo/jobs/models.py
+msgid "Read-only"
+msgstr ""
+
+#: src/postulo/jobs/models.py
+msgid "Read/write"
+msgstr ""
+
 #: src/postulo/resume/views.py
 #, fuzzy
 msgid "reading"
@@ -14261,6 +14568,14 @@ msgstr ""
 #, fuzzy
 msgid "records about other people are kept for (days)"
 msgstr "zapisi o drugim osobama čuvaju se (dana)"
+
+#: src/postulo/templates/jobs/conflicts.html
+msgid "Records held twice by different owners, and shares that point at something their reader cannot see. Nothing is merged, moved or shared until you say so."
+msgstr ""
+
+#: src/postulo/templates/accounts/groups.html
+msgid "Records held twice, and what wants deciding"
+msgstr ""
 
 #: src/postulo/templates/server/data_protection.html
 #, fuzzy, python-format
@@ -14977,6 +15292,10 @@ msgstr ""
 msgid "say that references are available on request"
 msgstr ""
 
+#: src/postulo/accounts/views.py
+msgid "Say that you understand what leaving does, first."
+msgstr ""
+
 #: src/postulo/core/postal.py
 #, fuzzy
 msgid "Say what this address is."
@@ -15151,6 +15470,14 @@ msgstr "Sigurnost"
 msgid "See every capture waiting for review"
 msgstr "Pogledaj svako hvatanje koje čeka na pregled"
 
+#: src/postulo/templates/jobs/share.html
+msgid "See it"
+msgstr ""
+
+#: src/postulo/templates/jobs/share.html
+msgid "See it and change its details"
+msgstr ""
+
 #: src/postulo/templates/core/import_csv_done.html
 #, fuzzy
 msgid "See the applications"
@@ -15165,6 +15492,10 @@ msgstr "Vidi ploču"
 #, fuzzy
 msgid "See the listings"
 msgstr "Vidi oglase"
+
+#: src/postulo/templates/jobs/move_owner.html
+msgid "See what it would do"
+msgstr ""
 
 #: src/postulo/templates/jobs/merge.html
 #, fuzzy
@@ -15452,6 +15783,96 @@ msgstr "Sedam boja, svaka podešena na 3:1 prema kartici u objema temama."
 msgid "Shape"
 msgstr "Oblik"
 
+#: src/postulo/jobs/models.py
+msgid "share"
+msgstr ""
+
+#: src/postulo/templates/jobs/partials/sharing_panel.html
+#: src/postulo/templates/jobs/share.html
+msgid "Share"
+msgstr ""
+
+#: src/postulo/templates/jobs/share.html
+msgid "Share it"
+msgstr ""
+
+#: src/postulo/templates/jobs/conflicts.html
+msgid "Share it with them"
+msgstr ""
+
+#: src/postulo/templates/jobs/share.html
+msgid "Share them all"
+msgstr ""
+
+#: src/postulo/jobs/sharing.py
+#, python-format
+msgid "Share what it points at too, or nothing is shared: %(names)s"
+msgstr ""
+
+#: src/postulo/templates/jobs/share.html
+msgid "Share what it points at too?"
+msgstr ""
+
+#: src/postulo/jobs/ownership.py
+#, python-format
+msgid "Share what it points at with the group too, or it stays where it is: %(names)s"
+msgstr ""
+
+#: src/postulo/jobs/models.py
+msgid "shared"
+msgstr ""
+
+#: src/postulo/jobs/models.py
+msgid "Shared"
+msgstr ""
+
+#: src/postulo/jobs/models.py
+msgid "shared by"
+msgstr ""
+
+#: src/postulo/templates/jobs/share.html
+msgid "Shared with"
+msgstr ""
+
+#: src/postulo/templates/jobs/partials/sharing_panel.html
+#, python-format
+msgid "Shared with %(counter)s"
+msgid_plural "Shared with %(counter)s"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+
+#: src/postulo/jobs/share_views.py
+#, python-format
+msgid "Shared with %(who)s."
+msgstr ""
+
+#: src/postulo/jobs/whose.py
+msgid "Shared with you"
+msgstr ""
+
+#: src/postulo/templates/jobs/partials/sharing_panel.html
+#, python-format
+msgid "Shared with you by %(name)s, read-only."
+msgstr ""
+
+#: src/postulo/templates/jobs/partials/sharing_panel.html
+#, python-format
+msgid "Shared with you by %(name)s: you can change its details."
+msgstr ""
+
+#: src/postulo/templates/jobs/conflicts.html
+msgid "Shared, pointing at something unshared"
+msgstr ""
+
+#: src/postulo/jobs/models.py
+msgid "shares"
+msgstr ""
+
+#: src/postulo/templates/jobs/share.html
+msgid "Sharing"
+msgstr ""
+
 #: src/postulo/core/widgets_builtin.py
 #, fuzzy
 msgid "Shortcuts"
@@ -15478,6 +15899,7 @@ msgstr "U užem izboru"
 msgid "Shortlisted."
 msgstr "Stavljeno u uži izbor."
 
+#: src/postulo/templates/jobs/partials/whose_form.html
 #: src/postulo/templates/server/logs.html
 #, fuzzy
 msgid "Show"
@@ -15573,6 +15995,10 @@ msgstr "Prikaži dodatke koje Postulo isporučuje"
 #, fuzzy
 msgid "Show this period"
 msgstr "Prikaži ovo razdoblje"
+
+#: src/postulo/templates/jobs/partials/whose_form.html
+msgid "Showing"
+msgstr ""
 
 #: src/postulo/templates/applications/calendar.html
 #, python-format
@@ -15939,6 +16365,18 @@ msgstr "Netko drugi je ovo promijenio dok ste uređivali. Ovo sada piše."
 msgid "Somebody has agreed to this. Test it to be sure it still stands."
 msgstr "Netko je na ovo pristao. Testirajte da budete sigurni da još vrijedi."
 
+#: src/postulo/notifications/base.py
+msgid "Somebody shares a company, a contact or a listing with you"
+msgstr ""
+
+#: src/postulo/templates/jobs/partials/sharing_panel.html
+msgid "somebody who has since left"
+msgstr ""
+
+#: src/postulo/notifications/base.py
+msgid "Something shared with you is no longer shared"
+msgstr ""
+
 #: src/postulo/resume/candidate.py
 #, fuzzy
 msgid "Something that is not an entry"
@@ -16187,6 +16625,10 @@ msgstr "Onemogući je"
 #, fuzzy, python-format
 msgid "Stop opening as %(name)s"
 msgstr "Prestani otvarati kao: %(name)s"
+
+#: src/postulo/templates/jobs/share.html
+msgid "Stop sharing"
+msgstr ""
 
 #: src/postulo/core/tables.py
 #, fuzzy, python-format
@@ -16657,6 +17099,10 @@ msgstr "Taj je lanac dublji od %(limit)s tvrtki — dublje nego što Postulo mo�
 msgid "That company is no longer here."
 msgstr "Te tvrtke više nema."
 
+#: src/postulo/api/routers/companies.py
+msgid "That company is shared with you read-only."
+msgstr ""
+
 #: src/postulo/plugins/consent.py
 #, fuzzy
 msgid "That connection does not use consent."
@@ -16948,6 +17394,10 @@ msgstr ""
 #, fuzzy
 msgid "That is not a file this page reads. It reads the JSON file it offers to download — one person's own record, as Postulo writes it — and nothing else."
 msgstr "To nije datoteka koju ova stranica čita. Čita JSON datoteku koju nudi za preuzimanje — zapis jedne osobe, onako kako ga piše Postulo — i ništa drugo."
+
+#: src/postulo/jobs/sharing.py
+msgid "That is not a kind of access."
+msgstr ""
 
 #: src/postulo/accounts/avatars.py
 #, fuzzy, python-format
@@ -17445,6 +17895,10 @@ msgstr "Razine Zajedničkog europskog referentnog okvira. „Nije navedeno“ ne
 msgid "The companies' addresses on the map, as a file other mapping tools read, and points read back in."
 msgstr ""
 
+#: src/postulo/templates/partials/import_owner.html
+msgid "The companies, contacts and listings it adds. Applications and notes are always yours."
+msgstr ""
+
 #: src/postulo/core/kind_files.py
 #, python-format
 msgid "The company %(name)s is not in your account, and is added with it."
@@ -17758,6 +18212,22 @@ msgstr "Obrazac je istekao ili je došao sa stranice koja je u međuvremenu odja
 #, fuzzy
 msgid "The greys. A warm near-black rather than pure black, easier to read at length."
 msgstr "Sive. Topla gotovo crna umjesto čiste crne, ugodnija za duže čitanje."
+
+#: src/postulo/jobs/ownership.py src/postulo/jobs/sharing.py
+#, python-format
+msgid "the group %(name)s"
+msgstr ""
+
+#: src/postulo/jobs/share_views.py
+#: src/postulo/templates/partials/import_owner.html
+#, python-format
+msgid "The group %(name)s"
+msgstr ""
+
+#: src/postulo/templates/jobs/partials/sharing_panel.html
+#, python-format
+msgid "The group %(name)s's."
+msgstr ""
 
 #: src/postulo/resume/candidate.py
 #, fuzzy
@@ -18298,10 +18768,18 @@ msgstr "Pozicija"
 msgid "The route it went through. The report counts by this, including how many went through the public employment service's own board."
 msgstr ""
 
+#: src/postulo/jobs/conflicts.py
+msgid "The same advert"
+msgstr ""
+
 #: src/postulo/templates/jobs/capture_review.html
 #, fuzzy
 msgid "The same advert on another board is evidence about the job. Adding this capture to a listing's history keeps it, with any page it kept, and makes no second listing."
 msgstr "Isti oglas na drugoj ploči dokaz je o poslu. Dodavanje ovog hvatanja u povijest oglasa čuva ga, s bilo kojom stranicom koju je sačuvalo, i ne stvara drugi oglas."
+
+#: src/postulo/jobs/conflicts.py
+msgid "The same email address"
+msgstr ""
 
 #: src/postulo/jobs/duplicates.py
 #, fuzzy, python-format
@@ -18317,12 +18795,16 @@ msgstr "Isti zapisi bez izgleda, na jeziku ovog dokumenta. Nijedan od ovih ne po
 msgid "The same figures by sector, and by industry within each. A company in three fields counts in all three."
 msgstr ""
 
+#: src/postulo/jobs/conflicts.py
+msgid "The same identifier"
+msgstr ""
+
 #: src/postulo/jobs/duplicates.py
 #, fuzzy, python-format
 msgid "The same identifier: %(identifier)s"
 msgstr "Isti identifikator: %(identifier)s"
 
-#: src/postulo/jobs/duplicates.py
+#: src/postulo/jobs/conflicts.py src/postulo/jobs/duplicates.py
 #, fuzzy
 msgid "The same name"
 msgstr "Isto ime"
@@ -18331,6 +18813,10 @@ msgstr "Isto ime"
 #, fuzzy
 msgid "The same name, once the legal form is set aside"
 msgstr "Isto ime, kad se izuzme pravni oblik"
+
+#: src/postulo/templates/jobs/conflicts.html
+msgid "The same thing twice"
+msgstr ""
 
 #: src/postulo/jobs/duplicates.py
 #, fuzzy, python-format
@@ -18612,6 +19098,10 @@ msgstr ""
 msgid "Their job title, as they give it themselves."
 msgstr "Njihov naziv radnog mjesta, kako ga sami navode."
 
+#: src/postulo/templates/jobs/share.html
+msgid "Their username or email address on this instance, exactly."
+msgstr ""
+
 #: src/postulo/accounts/models.py src/postulo/documents/models.py
 #, fuzzy
 msgid "theme"
@@ -18725,6 +19215,10 @@ msgstr[2] "Ove brojke dolaze iz %(total)s prijava — premalo za zaključke. Či
 #, fuzzy
 msgid "These look like the same one, and may not be. Nothing is merged unless you say so, and you are shown what would move first."
 msgstr "Ovi izgledaju kao isti, a možda i nisu. Ništa se ne spaja osim ako to ne kažete, a prije toga vam se pokazuje što bi se premjestilo."
+
+#: src/postulo/templates/jobs/move_owner.html
+msgid "These no longer see it, and each keeps a copy of their own of what their applications, notes and other records point at:"
+msgstr ""
 
 #: src/postulo/templates/server/logs.html
 #, fuzzy
@@ -19197,6 +19691,10 @@ msgstr "Njih prebacuje administrator, za vas ili za sve — nikada ovdje."
 msgid "Three planes. A shadow is discarded under forced colours, so it may say what is above what and may never be the only thing saying it — each of these has a border too."
 msgstr "Tri ravnine. Sjena se odbacuje pri prisilnim bojama, pa može reći što je iznad čega, ali nikad ne smije biti jedino što to govori — svaka od ovih ima i obrub."
 
+#: src/postulo/jobs/models.py
+msgid "through"
+msgstr ""
+
 #: src/postulo/templates/settings/account.html
 #, fuzzy, python-format
 msgid "Through %(provider)s: no code. This instance is set to treat that as enough."
@@ -19568,6 +20066,10 @@ msgstr "vrsta unosa"
 
 #: src/postulo/applications/ical_import.py
 msgid "Type of interview"
+msgstr ""
+
+#: src/postulo/jobs/models.py
+msgid "type of record"
 msgstr ""
 
 #: src/postulo/jobs/models.py
@@ -20155,6 +20657,10 @@ msgstr "Tjedni bez ijedne"
 msgid "Welcome back, %(name)s"
 msgstr "Dobro došli natrag, %(name)s"
 
+#: src/postulo/jobs/models.py
+msgid "what"
+msgstr ""
+
 #: src/postulo/jobs/merging.py
 #, fuzzy, python-format
 msgid "What %(plugin)s holds about them, which Postulo cannot move."
@@ -20178,6 +20684,10 @@ msgstr "Što komponenta traži"
 #, fuzzy
 msgid "What a field is for, shown while the field is hovered or has the focus. A format the field requires stays under it instead."
 msgstr "Čemu polje služi, prikazuje se dok je polje iznad pokazivača ili ima fokus. Oblik koji polje traži ostaje ispod njega."
+
+#: src/postulo/templates/accounts/groups.html
+msgid "What a group owns, every member can see, change, share and delete. Your notes, your decisions and your applications stay yours."
+msgstr ""
 
 #: src/postulo/core/server_forms.py
 #, fuzzy
@@ -20228,6 +20738,10 @@ msgstr "što je bilo s tim"
 #, fuzzy
 msgid "What carries the mail off this machine."
 msgstr "Ono što odnosi poštu s ovog stroja."
+
+#: src/postulo/jobs/models.py
+msgid "what changed"
+msgstr ""
 
 #: src/postulo/templates/documents/rendered_compare.html
 #, fuzzy
@@ -20369,6 +20883,10 @@ msgstr "Što identificira: „osobu“, „tvrtku“ ili oboje. Nudi se u Vašim
 msgid "What it may do"
 msgstr "Što smije raditi"
 
+#: src/postulo/templates/jobs/move_owner.html
+msgid "What it points at is shared with the group, read-only:"
+msgstr ""
+
 #: src/postulo/applications/models.py
 #, fuzzy
 msgid "what it says"
@@ -20509,6 +21027,10 @@ msgstr ""
 #, fuzzy
 msgid "What the signs mean"
 msgstr "Što znače znakovi"
+
+#: src/postulo/templates/jobs/share.html
+msgid "What they can do"
+msgstr ""
 
 #: src/postulo/templates/jobs/capture_page.html
 #, fuzzy
@@ -20688,7 +21210,7 @@ msgstr "Što kaže „%(name)s“, bez izgleda: za obrazac koji traži zalijeplj
 msgid "Whatever it is worth to you, once or now and then, at <a href=\"%(url)s\" class=\"underline\">buymeacoffee.com/tiagoagueda</a>."
 msgstr "Koliko god vam vrijedi, jednom ili s vremena na vrijeme, na <a href=\"%(url)s\" class=\"underline\">buymeacoffee.com/tiagoagueda</a>."
 
-#: src/postulo/applications/models.py
+#: src/postulo/applications/models.py src/postulo/jobs/models.py
 #, fuzzy
 msgid "when"
 msgstr "kada"
@@ -20995,6 +21517,10 @@ msgstr ""
 msgid "Who gave it, as a CV should print it. It is linked to the company of that name among yours, and added to your companies if there is none."
 msgstr ""
 
+#: src/postulo/templates/jobs/partials/sharing_panel.html
+msgid "Who has it"
+msgstr ""
+
 #: src/postulo/core/server_forms.py
 #, fuzzy
 msgid "Who issues the token. It decides which of the boxes below are wanted."
@@ -21041,6 +21567,10 @@ msgstr "S kim se sastajete. Nude se osobe koje ste zabilježili u ovoj tvrtki i 
 #, fuzzy
 msgid "Whoever put you forward, from the people you have recorded — at this company, at another, or at none. The figures count what each referrer led to."
 msgstr "Tko god vas je preporučio, iz osoba koje ste zabilježili — u ovoj tvrtki, u drugoj ili ni u jednoj. Brojke prikazuju do čega je doveo svaki preporučitelj."
+
+#: src/postulo/templates/partials/import_owner.html
+msgid "Whose they become"
+msgstr ""
 
 #: src/postulo/templates/jobs/posting_detail.html
 #, fuzzy
@@ -21171,8 +21701,16 @@ msgstr[0] "Uz lozinku: traži se vaš drugi faktor, osim ako ste ovaj preglednik
 msgstr[1] "Uz lozinku: traži se vaš drugi faktor, osim ako ste ovaj preglednik označili kao pouzdan. To traje %(days)s dana."
 msgstr[2] "Uz lozinku: traži se vaš drugi faktor, osim ako ste ovaj preglednik označili kao pouzdan. To traje %(days)s dana."
 
+#: src/postulo/templates/jobs/share.html
+msgid "With a person"
+msgstr ""
+
 #: src/postulo/templates/server/backup_restore.html
 msgid "With Docker Compose"
+msgstr ""
+
+#: src/postulo/templates/jobs/share.html
+msgid "With one of your groups"
 msgstr ""
 
 #: src/postulo/templates/core/kind_file.html
@@ -21483,6 +22021,19 @@ msgstr ""
 msgid "You are already signed in."
 msgstr "Već ste prijavljeni."
 
+#: src/postulo/templates/accounts/groups.html
+msgid "You are in no group. An administrator adds people to groups."
+msgstr ""
+
+#: src/postulo/templates/accounts/groups.html
+msgid "You are its last member and it still owns records: give them to somebody, or delete them, before you leave."
+msgstr ""
+
+#: src/postulo/accounts/views.py
+#, python-format
+msgid "You are no longer in %(name)s."
+msgstr ""
+
 #: src/postulo/templates/server/plugins.html
 msgid "You are not authorised to change settings."
 msgstr ""
@@ -21521,6 +22072,10 @@ msgstr "Možete imati po jednu od svake vrste, osim <em>Ostalo</em>. Vrsta koju 
 msgid "You can leave this page. The work carries on without you."
 msgstr "Možete napustiti ovu stranicu. Rad se nastavlja bez vas."
 
+#: src/postulo/templates/jobs/move_owner.html
+msgid "You can no longer delete it, share it or take it back on your own."
+msgstr ""
+
 #: src/postulo/accounts/forms.py
 #, fuzzy
 msgid "You can sign in with this or with your address. Nobody else sees it — Postulo shows people your name."
@@ -21530,6 +22085,10 @@ msgstr "Pomoću ovoga ili svoje adrese možete se prijaviti. Nitko drugi ga ne v
 #, fuzzy
 msgid "You cannot deactivate the account you are signed in with."
 msgstr "Ne možete deaktivirati račun kojim ste prijavljeni."
+
+#: src/postulo/jobs/ownership.py
+msgid "You cannot give it to them."
+msgstr ""
 
 #: src/postulo/plugins/policy.py
 #, fuzzy
@@ -21594,6 +22153,10 @@ msgstr "Imate sličnu s drugim datumima. Obje će biti u vašem zapisu."
 #, fuzzy
 msgid "You have taken everything off it. Put something back whenever you like."
 msgstr "Sve ste uklonili. Vratite nešto kad god želite."
+
+#: src/postulo/templates/accounts/delete_account.html
+msgid "You leave your groups; what they own stays theirs."
+msgstr ""
 
 #: src/postulo/documents/models.py
 msgid "You send it"
@@ -21761,6 +22324,14 @@ msgstr "Vaše ime i prezime su ime koje vaši životopisi i pisma ispisuju na vr
 msgid "Your Gravatar has been fetched again."
 msgstr "Vaš Gravatar je ponovno dohvaćen."
 
+#: src/postulo/templates/accounts/groups.html src/postulo/templates/base.html
+msgid "Your groups"
+msgstr ""
+
+#: src/postulo/jobs/whose.py
+msgid "Your groups'"
+msgstr ""
+
 #: src/postulo/templates/jobs/company_detail.html
 msgid "Your history here"
 msgstr ""
@@ -21822,6 +22393,22 @@ msgstr "Vaš naziv za nju: „Telegram“, „Paperless kod kuće“."
 #, fuzzy, python-format
 msgid "Your name, and under it what is chosen here from <a href=\"%(details_url)s\" class=\"underline\">Your details</a>, read again every time the document is drawn. Until you choose, that is your primary number, your account's address, the primary link of each kind, every identifier and where you are."
 msgstr "Vaše ime, a ispod njega ono što je ovdje odabrano iz <a href=\"%(details_url)s\" class=\"underline\">Vaših podataka</a>, ponovno pročitano svaki put kad se dokument crta. Dok ne odaberete, to je vaš primarni broj, adresa vašeg računa, primarna poveznica svake vrste, svaki identifikator i gdje se nalazite."
+
+#: src/postulo/jobs/share_views.py
+msgid "Your note is kept."
+msgstr ""
+
+#: src/postulo/templates/jobs/partials/own_note_form.html
+msgid "Your notes"
+msgstr ""
+
+#: src/postulo/templates/jobs/partials/sharing_panel.html
+msgid "Your notes and decisions on it are yours alone."
+msgstr ""
+
+#: src/postulo/templates/jobs/share.html
+msgid "Your notes on it, your decisions about it and your applications stay yours: sharing it never shares them."
+msgstr ""
 
 #: src/postulo/documents/models.py
 #, fuzzy
@@ -21919,6 +22506,10 @@ msgstr "Vaši telefonski brojevi i poveznice imaju vlastite kartice niže. Gdje 
 msgid "Your username has been changed."
 msgstr "Vaše korisničko ime je promijenjeno."
 
+#: src/postulo/jobs/whose.py src/postulo/templates/partials/import_owner.html
+msgid "Yours"
+msgstr ""
+
 #: src/postulo/core/file_review.py
 #, fuzzy
 msgid "Yours is kept"
@@ -21938,8 +22529,17 @@ msgstr "Vaše, a ne poslodavčevo. Popis se prema tome može sortirati i sužava
 msgid "Yours, to prepare with. Nothing here is sent to anybody."
 msgstr "Vaše, za pripremu. Ništa se odavde nikome ne šalje."
 
+#: src/postulo/templates/jobs/partials/sharing_panel.html
+msgid "Yours."
+msgstr ""
+
 #: src/postulo/resume/models.py
 msgid "Yours. It is never printed on a document."
+msgstr ""
+
+#: src/postulo/jobs/forms.py
+#: src/postulo/templates/jobs/partials/own_note_form.html
+msgid "Yours. Nobody else sees them, and they never appear on a document."
 msgstr ""
 
 #: src/postulo/documents/forms.py
@@ -21947,10 +22547,9 @@ msgstr ""
 msgid "Yours. They go nowhere with the file."
 msgstr "Vaše. Ne idu nikamo uz datoteku."
 
-#: src/postulo/jobs/forms.py
-#, fuzzy
-msgid "Yours. They never appear on a document or go anywhere else."
-msgstr "Vaše. Nikad se ne pojavljuju na dokumentu niti idu bilo kamo drugdje."
+#: src/postulo/templates/jobs/share.html
+msgid "Yours: only you can share it, give it to a group or delete it."
+msgstr ""
 
 #: src/postulo/templates/jobs/address_place.html
 #: src/postulo/templates/jobs/company_map.html
@@ -22080,6 +22679,16 @@ msgstr "„%(name)s“ bit će trajno izbrisano."
 msgid "“%(name)s” will be removed, and the secrets stored for it deleted."
 msgstr "„%(name)s“ bit će uklonjeno, a tajne pohranjene za njega izbrisane."
 
+#: src/postulo/templates/jobs/conflicts.html
+#, python-format
+msgid "“%(record)s” is shared with %(who)s, who cannot see what it points at:"
+msgstr ""
+
+#: src/postulo/jobs/sharing.py
+#, python-format
+msgid "“%(target)s” is not shared with %(names)s, who can see this; share it with them first."
+msgstr ""
+
 #: src/postulo/resume/models.py
 #, python-format
 msgid "“%(title)s”"
@@ -22089,6 +22698,11 @@ msgstr ""
 #, fuzzy, python-format
 msgid "“%(title)s”, against the version sent before it."
 msgstr "„%(title)s“, u usporedbi s verzijom poslanom prije nje."
+
+#: src/postulo/jobs/sharing.py
+#, python-format
+msgid "“%(what)s” is no longer shared with you"
+msgstr ""
 
 #: src/postulo/resume/forms.py
 msgid "“Lisbon, Portugal” or “Online”."

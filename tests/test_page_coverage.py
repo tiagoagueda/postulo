@@ -26,6 +26,9 @@ from tests.e2e.test_accessibility import VISITED_URL_NAMES
 #: Patterns nothing will ever visit with a browser, and why. Keep this honest: a reason
 #: like "hard to set up" belongs in the list of things to fix, not here.
 EXCUSED: dict[str, str] = {
+    "accounts:group_leave": "POST only: leaves one of one's groups and goes back to the list.",
+    "jobs:own_note": "POST only: keeps the reader's own note and goes back to the record's page.",
+    "jobs:share_revoke": "POST only: takes one grant back and goes back to the sharing page.",
     "core:healthz": "a JSON status document for monitoring to poll",
     "core:csp_report": "an endpoint a browser posts violation reports to; it draws nothing (#822)",
     "core:manifest": "the JSON manifest a browser reads when installing the app",

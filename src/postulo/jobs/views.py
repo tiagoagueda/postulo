@@ -28,6 +28,9 @@ from postulo.core import deletions, identifier_order, slugs, tables, throttle
 from postulo.core.cells import EditableCellView
 from postulo.core.files import serve_stored_picture
 from postulo.core.mixins import (
+    MANAGE,
+    READ,
+    WRITE,
     ConfirmDeleteMixin,
     GdprNoticeMixin,
     MessagingHandlesMixin,
@@ -36,7 +39,9 @@ from postulo.core.mixins import (
     PageOrFragmentMixin,
     PhoneNumbersMixin,
     PostalAddressesMixin,
+    SharedObjectMixin,
     WebLinksMixin,
+    shared_scope,
 )
 from postulo.core.params import as_pk
 from postulo.core.redirects import safe_next
@@ -52,6 +57,7 @@ from . import (
     merging,
     outline,
     tiles,
+    whose,
 )
 from .forms import CompanyForm, CompanyIdentifierFormSet, ContactForm, IndustryForm, JobPostingForm
 from .models import (
@@ -76,6 +82,42 @@ class UserFormKwargsMixin:
 
 
 # ------------------------------------------------------------------- companies
+
+
+class KeepsOthersCopies:
+    """Deleting a record somebody else can see leaves them a copy of what their own data
+    points at (#896): their application at a shared listing outlives its owner's change of
+    mind. The record itself goes, and with it everything it holds."""
+
+    def form_valid(self, form):
+        from . import detach, sharing
+
+        record = self.get_object()
+        others = [
+            person for person in sharing.audience(record) if person.pk != self.request.user.pk
+        ]
+        if others:
+            detach.after_losing([record], others, check=False)
+        return super().form_valid(form)
+
+
+class KeepsTheTrail:
+    """A page that makes or changes a company, a contact or a listing writes its trail (#896):
+    who did it, and the names of what changed. Only once the save went through -- a page
+    drawn again with its errors changed nothing."""
+
+    trail_creates = False
+
+    def form_valid(self, form):
+        from . import trail
+
+        response = super().form_valid(form)
+        if response.status_code in (301, 302, 303) and getattr(self.object, "pk", None):
+            if self.trail_creates:
+                trail.record(self.object, self.request.user, trail.CREATED)
+            else:
+                trail.edited(self.object, self.request.user, form)
+        return response
 
 
 class CompanyListView(PageOrFragmentMixin, OwnedObjectMixin, ListView):
@@ -109,9 +151,11 @@ class CompanyListView(PageOrFragmentMixin, OwnedObjectMixin, ListView):
         # The table's ordering always ends in the key, so pagination over the aggregated
         # rows never repeats or skips one between pages.
         queryset = (
-            super()
-            .get_queryset()
-            .with_table_data()
+            # Whose: all the reader can see, or a part of it, or everybody's (#896).
+            whose.base(Company, self.request.user, whose.chosen(self.request))
+            .with_table_data(self.request.user)
+            # The reader's own note, for its column, its filter and the search (#896).
+            .with_notes(self.request.user)
             .select_related("parent")
             .prefetch_related("industries", "identifiers", "postal_addresses")
         )
@@ -158,6 +202,8 @@ class CompanyListView(PageOrFragmentMixin, OwnedObjectMixin, ListView):
 
     def get_context_data(self, **kwargs) -> dict:
         context = super().get_context_data(**kwargs)
+        context["whose_choices"] = whose.offered(self.request.user)
+        context["whose"] = whose.chosen(self.request)
         context["search"] = self.request.GET.get("q", "")
         context["table"] = self.table
         context["page_sizes"] = tables.PAGE_SIZES
@@ -168,6 +214,31 @@ class CompanyListView(PageOrFragmentMixin, OwnedObjectMixin, ListView):
         context["group"] = self.request.GET.get("group", "").strip()
         context["map_offered"] = mapping.map_offered(self.request.user)
         return context
+
+
+def addresses_for(person, *, write: bool = False):
+    """The addresses ``person`` reaches (#896): their own, and those of the companies and
+    contacts they can see -- or, with ``write``, change. Owned as their holder is, so a
+    shared company's address is reached through the company, never by its owner column."""
+    from django.contrib.contenttypes.models import ContentType
+
+    from postulo.accounts.models import Profile
+    from postulo.core.models import PostalAddress
+
+    from .models import Contact
+
+    types = ContentType.objects.get_for_models(Company, Contact, Profile)
+    return PostalAddress.objects.filter(
+        Q(
+            content_type_id=types[Company].pk,
+            object_id__in=Company.objects.visible_to(person, write=write).values("pk"),
+        )
+        | Q(
+            content_type_id=types[Contact].pk,
+            object_id__in=Contact.objects.visible_to(person, write=write).values("pk"),
+        )
+        | Q(content_type_id=types[Profile].pk, owner=person)
+    )
 
 
 def pinned_addresses(person) -> list[dict]:
@@ -190,7 +261,7 @@ def pinned_addresses(person) -> list[dict]:
 
     types = ContentType.objects.get_for_models(Company, Contact, Profile)
     company_type, contact_type, profile_type = (types[m].pk for m in (Company, Contact, Profile))
-    rows = PostalAddress.objects.for_user(person).filter(
+    rows = addresses_for(person).filter(
         Q(content_type_id=company_type)
         | Q(content_type_id__in=[contact_type, profile_type], on_map=True)
     )
@@ -280,7 +351,8 @@ class CompanyWikidataView(LoginRequiredMixin, View):
         if not wikidata_offered(request.user):
             raise Http404
         return get_object_or_404(
-            Company.objects.for_user(request.user).prefetch_related(
+            # Fetching its names changes them: the company's details, so a grant to write.
+            shared_scope(Company.objects, request.user, WRITE).prefetch_related(
                 "identifiers", "names", "postal_addresses"
             ),
             pk=pk,
@@ -363,7 +435,6 @@ class CompanyWikidataView(LoginRequiredMixin, View):
             ).delete()
             for tag, name in names.items():
                 CompanyName.objects.update_or_create(
-                    owner=company.owner,
                     company=company,
                     language=tag,
                     defaults={
@@ -400,7 +471,7 @@ class CompanyNamesView(LoginRequiredMixin, View):
 
         from .models import CompanyName
 
-        company = get_object_or_404(Company.objects.for_user(request.user), pk=pk)
+        company = get_object_or_404(shared_scope(Company.objects, request.user, WRITE), pk=pk)
         back = reverse("jobs:company_detail", args=[company.pk])
         if request.POST.get("remove"):
             company.names.filter(pk=as_pk(request.POST.get("remove"))).delete()
@@ -421,7 +492,6 @@ class CompanyNamesView(LoginRequiredMixin, View):
             )
             return redirect(back)
         CompanyName.objects.update_or_create(
-            owner=company.owner,
             company=company,
             language=tag,
             defaults={"name": name, "source": CompanyName.Source.TYPED, "fetched_at": None},
@@ -521,11 +591,11 @@ class AddressPlaceView(LoginRequiredMixin, View):
     template_name = "jobs/address_place.html"
 
     def _address(self, request, pk: int):
-        from postulo.core.models import PostalAddress
 
         if not mapping.map_offered(request.user):
             raise Http404
-        return get_object_or_404(PostalAddress.objects.for_user(request.user), pk=pk)
+        # Placing it changes it: the holder's details, so a grant to write them (#896).
+        return get_object_or_404(addresses_for(request.user, write=True), pk=pk)
 
     def _back(self, request, address) -> str:
         from postulo.accounts.models import Profile
@@ -719,7 +789,7 @@ class CompanyBulkView(LoginRequiredMixin, View):
 
         from postulo.core import bulk
 
-        rows = bulk.chosen_rows(request, Company)
+        rows = bulk.chosen_rows(request, Company, write=True)
         if not rows.exists():
             messages.info(request, bulk.nothing_chosen())
             return redirect(self._back(request))
@@ -751,7 +821,8 @@ class CompanyBulkView(LoginRequiredMixin, View):
         return safe_next(request, reverse("jobs:company_list"))
 
 
-class CompanyDetailView(OwnedObjectMixin, DetailView):
+class CompanyDetailView(SharedObjectMixin, DetailView):
+    access = READ
     model = Company
     template_name = "jobs/company_detail.html"
     context_object_name = "company"
@@ -762,6 +833,7 @@ class CompanyDetailView(OwnedObjectMixin, DetailView):
         return (
             super()
             .get_queryset()
+            .with_notes(self.request.user)
             .select_related("parent")
             .prefetch_related(
                 "industries", "identifiers", "names", "phone_numbers", "postal_addresses"
@@ -775,6 +847,15 @@ class CompanyDetailView(OwnedObjectMixin, DetailView):
 
         context = super().get_context_data(**kwargs)
         person = self.request.user
+        # Who has it, how the reader came to, and whether they may change it (#896).
+        from . import sharing
+
+        context["sharing"] = sharing.panel(self.object, person)
+        context["can_write"] = (
+            Company.objects.visible_to(person, write=True, everyone=True)
+            .filter(pk=self.object.pk)
+            .exists()
+        )
         # The summary of identifiers in the person's order, with the schemes they switched
         # off counted rather than drawn (#672). All of them are still in the edit form.
         shown, hidden = identifier_order.shown_and_hidden(
@@ -807,31 +888,52 @@ class CompanyDetailView(OwnedObjectMixin, DetailView):
         context["group"] = structure.group_of(self.object, person)
         context["parent"] = structure.parent_of(self.object, person)
         context["children"] = structure.children_of(self.object, person)
+        # Everything below is the person's own and nobody else's, whoever else can see the
+        # company (#896): their career, their education, their meetings.
         # The entries of the career that name this company, newest first (#683).
-        context["career_entries"] = self.object.career_entries.order_by("-start_date", "-pk")
+        context["career_entries"] = self.object.career_entries.filter(owner=person).order_by(
+            "-start_date", "-pk"
+        )
         # And the education entries that name it as their institution (#685).
-        context["education_entries"] = self.object.education_entries.order_by("-end_date", "-pk")
+        context["education_entries"] = self.object.education_entries.filter(owner=person).order_by(
+            "-end_date", "-pk"
+        )
         # And the certifications it issued, as the person recorded them (#686).
-        context["certifications"] = self.object.certifications.order_by("-issued_on", "-pk")
+        context["certifications"] = self.object.certifications.filter(owner=person).order_by(
+            "-issued_on", "-pk"
+        )
         # And the honours it gave and the memberships it holds (#693).
-        context["honours"] = self.object.honours.order_by("-awarded_on", "-pk")
-        context["memberships"] = self.object.memberships.order_by("-start_date", "-pk")
+        context["honours"] = self.object.honours.filter(owner=person).order_by("-awarded_on", "-pk")
+        context["memberships"] = self.object.memberships.filter(owner=person).order_by(
+            "-start_date", "-pk"
+        )
         # And the courses it gave (#695).
-        context["courses"] = self.object.courses.order_by("-end_date", "-pk")
+        context["courses"] = self.object.courses.filter(owner=person).order_by("-end_date", "-pk")
         # The meetings with an adviser, for a company that is a public employment service (#888).
         context["appointments"] = (
-            self.object.appointments.select_related("contact").order_by("-starts_at", "-pk")
+            self.object.appointments.filter(owner=person)
+            .select_related("contact")
+            .order_by("-starts_at", "-pk")
             if self.object.is_employment_service
             else []
         )
-        context["contacts"] = self.object.contacts.select_related("department").prefetch_related(
-            "phone_numbers", "web_links", "messaging_handles"
+        # The people here this person can see, each with their own note on them (#896): a
+        # shared company's other contacts are somebody else's until they are shared too.
+        context["contacts"] = (
+            Contact.objects.visible_to(person)
+            .with_notes(person)
+            .filter(company=self.object)
+            .select_related("department")
+            .prefetch_related("phone_numbers", "web_links", "messaging_handles")
         )
+        # And its listings, each as this person stands with it, with their own applications
+        # only: on a shared listing nobody else's is there to see (#896).
         context["postings"] = (
-            JobPosting.objects.for_user(person)
+            JobPosting.objects.visible_to(person)
+            .with_status(person)
             .filter(company__in=counted)
             .select_related("company")
-            .prefetch_related("applications")
+            .prefetch_related(own_applications(person))
         )
         # Decided once for the page rather than per contact: it is one answer about one
         # person, and asking it per row would be a query per row for the same answer.
@@ -862,7 +964,7 @@ class CompanyDetailView(OwnedObjectMixin, DetailView):
         merge_url = reverse("jobs:company_merge", args=[self.object.pk])
         context["duplicates"] = [
             (candidate, f"{merge_url}?with={candidate.record.pk}")
-            for candidate in duplicates.for_company(self.object)
+            for candidate in duplicates.for_company(self.object, person)
         ]
         context["people_alike"] = duplicates.contacts_with_any(person, context["contacts"])
         return context
@@ -956,7 +1058,10 @@ class CompanyIdentifierRemoveView(OwnedObjectMixin, View):
 
     def _row(self, request, pk: int):
         return get_object_or_404(
-            CompanyIdentifier.objects.for_user(request.user).select_related("company"), pk=pk
+            CompanyIdentifier.objects.filter(
+                company__in=shared_scope(Company.objects, request.user, WRITE).values("pk")
+            ).select_related("company"),
+            pk=pk,
         )
 
     @staticmethod
@@ -1011,6 +1116,7 @@ class LogoFormMixin:
 
 @method_decorator(transaction.non_atomic_requests, name="dispatch")
 class CompanyCreateView(
+    KeepsTheTrail,
     LogoFormMixin,
     OwnedObjectMixin,
     UserFormKwargsMixin,
@@ -1021,6 +1127,7 @@ class CompanyCreateView(
     WebLinksMixin,
     CreateView,
 ):
+    trail_creates = True
     model = Company
     form_class = CompanyForm
     template_name = "jobs/company_form.html"
@@ -1038,8 +1145,9 @@ class CompanyCreateView(
 
 @method_decorator(transaction.non_atomic_requests, name="dispatch")
 class CompanyUpdateView(
+    KeepsTheTrail,
     LogoFormMixin,
-    OwnedObjectMixin,
+    SharedObjectMixin,
     UserFormKwargsMixin,
     CompanyIdentifiersMixin,
     PhoneNumbersMixin,
@@ -1047,6 +1155,7 @@ class CompanyUpdateView(
     WebLinksMixin,
     UpdateView,
 ):
+    access = WRITE
     model = Company
     form_class = CompanyForm
     template_name = "jobs/company_form.html"
@@ -1071,7 +1180,7 @@ class CompanyLogoView(OwnedObjectMixin, View):
     """
 
     def get_queryset(self):
-        return Company.objects.for_user(self.request.user)
+        return shared_scope(Company.objects, self.request.user, READ)
 
     def get(self, request: HttpRequest, pk: int) -> HttpResponse:
         company = get_object_or_404(self.get_queryset(), pk=pk)
@@ -1098,7 +1207,7 @@ class CompanyLogoActionView(OwnedObjectMixin, View):
     """
 
     def get_queryset(self):
-        return Company.objects.for_user(self.request.user)
+        return shared_scope(Company.objects, self.request.user, WRITE)
 
     def post(self, request: HttpRequest, pk: int, action: str) -> HttpResponse:
         from postulo.core import errands
@@ -1201,7 +1310,7 @@ class MergeView(LoginRequiredMixin, View):
     url_name = ""
 
     def records(self):
-        return self.model.objects.for_user(self.request.user)
+        return self.model.objects.manageable_by(self.request.user)
 
     def plan(self, kept, other):
         raise NotImplementedError
@@ -1264,19 +1373,20 @@ class CompanyMergeView(MergeView):
     url_name = "jobs:company_merge"
 
     def plan(self, kept, other):
-        return merging.plan_companies(kept, other)
+        return merging.plan_companies(kept, other, self.request.user)
 
     def merge(self, kept, other):
         return merging.merge_companies(kept, other)
 
     def alike(self, kept) -> list:
-        return duplicates.for_company(kept)
+        return duplicates.for_company(kept, self.request.user)
 
     def after(self, kept) -> str:
         return kept.get_absolute_url()
 
 
-class CompanyDeleteView(ConfirmDeleteMixin, OwnedObjectMixin, DeleteView):
+class CompanyDeleteView(KeepsOthersCopies, ConfirmDeleteMixin, SharedObjectMixin, DeleteView):
+    access = MANAGE
     model = Company
     template_name = "partials/confirm_delete.html"
     success_url = reverse_lazy("jobs:company_list")
@@ -1482,6 +1592,7 @@ class ComesBackMixin:
 
 
 class ContactCreateView(
+    KeepsTheTrail,
     ComesBackMixin,
     OwnedObjectMixin,
     UserFormKwargsMixin,
@@ -1493,6 +1604,7 @@ class ContactCreateView(
     MessagingHandlesMixin,
     CreateView,
 ):
+    trail_creates = True
     model = Contact
     form_class = ContactForm
     template_name = "jobs/contact_form.html"
@@ -1538,8 +1650,9 @@ class ContactCreateView(
 
 
 class ContactUpdateView(
+    KeepsTheTrail,
     ComesBackMixin,
-    OwnedObjectMixin,
+    SharedObjectMixin,
     UserFormKwargsMixin,
     GdprNoticeMixin,
     PhoneNumbersMixin,
@@ -1548,25 +1661,52 @@ class ContactUpdateView(
     MessagingHandlesMixin,
     UpdateView,
 ):
+    access = WRITE
     model = Contact
     form_class = ContactForm
     template_name = "jobs/contact_form.html"
 
+    def get_queryset(self):
+        # The only page a contact has, so a read-only grant sees it (#896); saving it asks
+        # for a read/write one, and is the same 404 as ever without.
+        access = READ if self.request.method in ("GET", "HEAD") else WRITE
+        return shared_scope(Contact.objects, self.request.user, access)
+
+    def writable(self) -> bool:
+        return (
+            Contact.objects.visible_to(self.request.user, write=True, everyone=True)
+            .filter(pk=self.object.pk)
+            .exists()
+        )
+
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class)
+        if not self.writable():
+            for field in form.fields.values():
+                field.disabled = True
+        return form
+
     def get_context_data(self, **kwargs) -> dict:
         context = super().get_context_data(**kwargs)
+        from . import sharing
+
+        context["sharing"] = sharing.panel(self.object, self.request.user)
+        context["read_only"] = not self.writable()
         # The one page a person has, so this is where it is said that they look like
         # somebody recorded twice (#239). Worked out as the page is drawn; told, not done.
         merge_url = reverse("jobs:contact_merge", args=[self.object.pk])
-        context["merge_url"] = merge_url
+        # Merging deletes one of two records: offered to who manages this one.
+        context["merge_url"] = merge_url if context["sharing"]["manages"] else ""
         # The letters this person wrote, and the applications each went with (#666).
         context["reference_letters"] = list(
-            self.object.reference_letters.select_related("upload").prefetch_related(
-                "upload__applications__posting__company"
-            )
+            # The person's own letters only (#896): a shared contact may have written others.
+            self.object.reference_letters.filter(owner=self.request.user)
+            .select_related("upload")
+            .prefetch_related("upload__applications__posting__company")
         )
         context["duplicates"] = [
             (candidate, f"{merge_url}?with={candidate.record.pk}")
-            for candidate in duplicates.for_contact(self.object)
+            for candidate in duplicates.for_contact(self.object, self.request.user)
         ]
         return context
 
@@ -1608,20 +1748,21 @@ class ContactMergeView(MergeView):
         return super().records().select_related("company", "department")
 
     def plan(self, kept, other):
-        return merging.plan_contacts(kept, other)
+        return merging.plan_contacts(kept, other, self.request.user)
 
     def merge(self, kept, other):
         return merging.merge_contacts(kept, other)
 
     def alike(self, kept) -> list:
-        return duplicates.for_contact(kept)
+        return duplicates.for_contact(kept, self.request.user)
 
     def after(self, kept) -> str:
         # A person has no page but the one they are edited on.
         return reverse("jobs:contact_update", args=[kept.pk])
 
 
-class ContactDeleteView(ConfirmDeleteMixin, OwnedObjectMixin, DeleteView):
+class ContactDeleteView(KeepsOthersCopies, ConfirmDeleteMixin, SharedObjectMixin, DeleteView):
+    access = MANAGE
     model = Contact
     template_name = "partials/confirm_delete.html"
 
@@ -1700,8 +1841,10 @@ class ContactExportView(OwnedObjectMixin, View):
         if not gdpr.is_offered(request.user):
             raise Http404
         contact = get_object_or_404(Contact.objects.for_user(request.user), pk=pk)
+        # The person asking's own note on them, and nobody else's (#896).
+        contact.note_for(request.user)
         response = JsonResponse(
-            gdpr.contact_document(contact),
+            gdpr.contact_document(contact, request.user),
             json_dumps_params={"ensure_ascii": False},
             content_type="application/json",
         )
@@ -1712,6 +1855,15 @@ class ContactExportView(OwnedObjectMixin, View):
 
 
 # -------------------------------------------------------------------- postings
+
+
+def own_applications(person):
+    """``posting.applications.all`` as ``person``'s own and nobody else's (#896)."""
+    from django.db.models import Prefetch
+
+    from postulo.applications.models import Application
+
+    return Prefetch("applications", queryset=Application.objects.filter(owner=person))
 
 
 def listing_page_context(request, posting, *, event_form=None) -> dict:
@@ -1739,28 +1891,39 @@ def listing_page_context(request, posting, *, event_form=None) -> dict:
         ),
         # What arrived about it, newest first (#270): the same entries the application's
         # page reads through its posting, once there is an application.
-        "listing_events": history_of(posting),
+        "listing_events": history_of(posting, request.user),
         "event_form": event_form or ListingEventForm(user=request.user),
     }
 
 
-class PostingDetailView(OwnedObjectMixin, DetailView):
+class PostingDetailView(SharedObjectMixin, DetailView):
+    access = READ
     model = JobPosting
     template_name = "jobs/posting_detail.html"
     context_object_name = "posting"
 
     def get_queryset(self):
-        return super().get_queryset().select_related("company").with_application_count()
+        return (
+            super()
+            .get_queryset()
+            .select_related("company")
+            .with_status(self.request.user)
+            .prefetch_related(own_applications(self.request.user))
+        )
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context.update(listing_page_context(self.request, self.object))
+        from . import sharing
+
+        context["sharing"] = sharing.panel(self.object, self.request.user)
         # What deleting it would take with it, for the dialog on this page (#854).
         context["deletion"] = deletions.facts_for(PostingDeleteView, self.request, self.object)
         return context
 
 
-class PostingUpdateView(OwnedObjectMixin, UserFormKwargsMixin, UpdateView):
+class PostingUpdateView(KeepsTheTrail, SharedObjectMixin, UserFormKwargsMixin, UpdateView):
+    access = WRITE
     model = JobPosting
     form_class = JobPostingForm
     template_name = "jobs/posting_form.html"
@@ -1776,7 +1939,8 @@ class PostingUpdateView(OwnedObjectMixin, UserFormKwargsMixin, UpdateView):
         return super().form_valid(form)
 
 
-class PostingDeleteView(ConfirmDeleteMixin, OwnedObjectMixin, DeleteView):
+class PostingDeleteView(KeepsOthersCopies, ConfirmDeleteMixin, SharedObjectMixin, DeleteView):
+    access = MANAGE
     model = JobPosting
     template_name = "partials/confirm_delete.html"
     success_url = reverse_lazy("jobs:company_list")

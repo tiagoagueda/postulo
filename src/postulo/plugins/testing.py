@@ -187,7 +187,8 @@ def listing_history(record) -> list[dict]:
     from postulo.jobs.history import history_of, listing_of
 
     entries = []
-    for event in history_of(listing_of(record)):
+    # The record's own person's history (#896): an application's owner, a listing's.
+    for event in history_of(listing_of(record), record.owner):
         points_at = ""
         if event.bound_capture is not None:
             points_at = "capture"

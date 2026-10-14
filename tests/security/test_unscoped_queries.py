@@ -23,7 +23,18 @@ SOURCE = Path(__file__).resolve().parents[2] / "src" / "postulo"
 BASELINE = Path(__file__).with_name("unscoped_queries.txt")
 
 #: Words that make a statement scoped: the manager's own, an owner column or an owner argument.
-SCOPED = ("for_user", "owner", "request.user", "self.user", "user=", "profile__user")
+SCOPED = (
+    "for_user",
+    "owner",
+    "request.user",
+    "self.user",
+    "user=",
+    "profile__user",
+    # A shared record's scopes (#896).
+    "visible_to",
+    "manageable_by",
+    "owned_by",
+)
 
 
 def owned_model_names() -> set[str]:
@@ -39,7 +50,8 @@ def owned_model_names() -> set[str]:
                     and any(getattr(t, "id", "") == "owner" for t in item.targets)
                     for item in node.body
                 )
-                if "OwnedModel" in bases or has_owner:
+                # A person's or a group's record (#896) is owned all the same.
+                if bases & {"OwnedModel", "PrincipalOwnedModel"} or has_owner:
                     found.add(node.name)
     return found
 

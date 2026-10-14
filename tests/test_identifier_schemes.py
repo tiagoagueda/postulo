@@ -3145,7 +3145,8 @@ def test_the_companies_table_asks_for_postulos_own_schemes_and_no_others(client,
     define(SIREN)
     CompanyIdentifier.objects.create(owner=user, company=company, scheme="siren", value="552081317")
 
-    asked = {name for name in Company.objects.with_table_data().query.annotations if "id_" in name}
+    annotated = Company.objects.with_table_data(user).query.annotations
+    asked = {name for name in annotated if "id_" in name}
     columns = {column.key for column in CompaniesTable.columns if column.key.startswith("id_")}
     assert asked == columns == {f"id_{key}" for key in company_identifiers.shipped()} - {"id_other"}
     assert "id_siren" not in asked

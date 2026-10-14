@@ -118,6 +118,9 @@ def delete_account(user) -> DeletionReport:
         # What a session holds -- an import under review: a parsed CV, a spreadsheet, a vCard
         # -- is personal data in a table the account does not own (#750).
         report.rows["sessions ended"] = sessions.end_all_of(user)
+        # Whoever this person shared a company, a contact or a listing with keeps a copy of
+        # what their own data points at, and is told it is gone (#896).
+        report.rows["copies kept by others"] = _leave_copies(user)
         _count, per_model = user.delete()
         for label, count in per_model.items():
             report.rows[label.split(".")[-1].lower()] = count
@@ -147,3 +150,30 @@ def delete_account(user) -> DeletionReport:
     # of their own, and only if the deletion really commits.
     transaction.on_commit(remove_files)
     return report
+
+
+def _leave_copies(user) -> int:
+    """Copies for the people ``user``'s records were shared with, before they go (#896)."""
+    from postulo.jobs import detach, sharing
+    from postulo.jobs.models import Company, Contact, JobPosting
+
+    records = [
+        *Company.objects.filter(owner=user),
+        *Contact.objects.filter(owner=user),
+        *JobPosting.objects.filter(owner=user),
+    ]
+    others = {}
+    told = []
+    for record in records:
+        for person in sharing.audience(record):
+            if person.pk != user.pk:
+                others[person.pk] = person
+                told.append((person, record))
+    if not others:
+        return 0
+    made = detach.after_losing(records, list(others.values()), check=False)
+    for person, record in told:
+        transaction.on_commit(
+            lambda person=person, record=str(record): sharing.tell_gone(person, record)
+        )
+    return len(made)

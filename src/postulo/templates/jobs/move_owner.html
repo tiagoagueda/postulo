@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% translate "Owner" %} · {{ record }}{% endblock %}
+
+{% block content %}
+  {% comment %} Giving a company, a contact or a listing to another owner (#896): one of the
+     giver's groups, or -- for a group's record -- the member asking. Said in full before it
+     is done, because it changes who may delete it and who keeps a copy. {% endcomment %}
+  <div class="mx-auto max-w-2xl">
+    <c-page-title>
+      {% translate "Owner" %}
+      <c-slot name="subtitle"><bdi>{{ record }}</bdi></c-slot>
+    </c-page-title>
+
+    <div class="card mb-6 text-sm" data-move-now>
+      <p>
+        {% blocktranslate with name=owner_label %}It belongs to {{ name }} now.{% endblocktranslate %}
+      </p>
+    </div>
+
+    {% if confirm %}
+      <form method="post" action="{{ request.path }}" class="card mb-6" data-move-confirm>
+        {% csrf_token %}
+        <input type="hidden" name="to" value="{{ to_value }}">
+        <input type="hidden" name="confirmed" value="1">
+        <c-section-title>{% blocktranslate with name=to_label %}Give it to {{ name }}?{% endblocktranslate %}</c-section-title>
+        <ul class="mb-4 list-disc space-y-1 ps-5 text-sm">
+          {% if to_group %}
+            <li>{% translate "Every member of the group can then see it, change it, share it and delete it." %}</li>
+            <li>{% translate "You can no longer delete it, share it or take it back on your own." %}</li>
+          {% else %}
+            <li>{% translate "It becomes yours alone." %}</li>
+          {% endif %}
+          {% if losing %}
+            <li>
+              {% translate "These no longer see it, and each keeps a copy of their own of what their applications, notes and other records point at:" %}
+              {% for person in losing %}<bdi>{{ person.get_username }}</bdi>{% if not forloop.last %}, {% endif %}{% endfor %}
+            </li>
+          {% endif %}
+          {% if also %}
+            <li>
+              {% translate "What it points at is shared with the group, read-only:" %}
+              {% for target in also %}<bdi>{{ target }}</bdi>{% if not forloop.last %}, {% endif %}{% endfor %}
+            </li>
+          {% endif %}
+        </ul>
+        <div class="flex flex-wrap items-center gap-3">
+          <button type="submit" class="btn">{% translate "Give it" %}</button>
+          <a href="{{ request.path }}" class="btn" data-variant="ghost">{% translate "Cancel" %}</a>
+        </div>
+      </form>
+    {% else %}
+      <form method="post" action="{{ request.path }}" class="card" data-move-form>
+        {% csrf_token %}
+        <div class="field mb-4">
+          <label for="move-to">{% translate "Give it to" %}</label>
+          <select id="move-to" name="to" required>
+            {% for value, name in choices %}<option value="{{ value }}">{{ name }}</option>{% endfor %}
+          </select>
+          {% if superuser %}
+            <p>{% translate "As an administrator you may also give it to anybody: type their username below instead." %}</p>
+          {% endif %}
+        </div>
+        {% if superuser %}
+          <div class="field mb-4">
+            <label for="move-person">{% translate "Or to a person" %}</label>
+            <input id="move-person" name="person" type="text" autocomplete="off">
+          </div>
+        {% endif %}
+        <div class="flex flex-wrap items-center gap-3">
+          <button type="submit" class="btn">{% translate "See what it would do" %}</button>
+          <a href="{{ record.get_absolute_url }}" class="btn" data-variant="ghost">{% translate "Back" %}</a>
+        </div>
+      </form>
+    {% endif %}
+  </div>
+{% endblock %}

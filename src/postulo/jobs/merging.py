@@ -164,10 +164,8 @@ class Plan:
         if self.left_behind:
             lines.append(_("Not carried over:"))
             lines.extend(self.left_behind)
-        theirs = (getattr(self.other, "notes", "") or "").strip()
-        if theirs:
-            lines.append(_("Its notes:"))
-            lines.append(theirs)
+        # Its notes are not repeated here: each person's own note moves to the kept record
+        # whole, joined to the one they had on it (#896), by `_move_notes`.
         return "\n".join(lines)
 
 
@@ -192,14 +190,44 @@ def _moved(label, queryset, name) -> Moved | None:
 
 
 def _same_owner(kept, other) -> None:
-    """Two different records of one person's. Everything else is a mistake in the caller:
-    the views look both up among the person's own before they get here."""
+    """Two different records of one kind, and nobody who could see the other one left
+    without sight of what replaces it (#896).
+
+    A merge deletes the other record and points everything at the kept one -- everybody's
+    rows, not only its owner's: a member's own listing at a group's company moves with it
+    rather than going with the company. So everybody who can see the other must be able to
+    see the kept one; who cannot is named, and the kept one is theirs to share first.
+    """
     if type(kept) is not type(other):
         raise ValueError("A merge is of two records of one kind.")
     if kept.pk is None or other.pk is None or kept.pk == other.pk:
         raise ValueError("A merge needs two different records.")
-    if kept.owner_id != other.owner_id:
-        raise ValueError("Both records have to belong to the same person.")
+    from .sharing import audience
+
+    seeing_kept = {person.pk for person in audience(kept)}
+    left_out = [person for person in audience(other) if person.pk not in seeing_kept]
+    if left_out:
+        raise CannotMerge(
+            _(
+                "%(names)s can see “%(other)s” and not “%(kept)s”. Share “%(kept)s” with "
+                "them first, or nothing is merged."
+            )
+            % {
+                "names": ", ".join(person.get_username() for person in left_out),
+                "other": other,
+                "kept": kept,
+            }
+        )
+
+
+def _seen_by(viewer) -> dict:
+    """What a plan shown to ``viewer`` counts: their own rows. Nobody: everybody's."""
+    return {"owner_id": viewer.pk} if viewer is not None else {}
+
+
+def _visible(model, viewer):
+    """Records of ``model`` ``viewer`` can see, or every one of them for nobody in particular."""
+    return model.objects.visible_to(viewer) if viewer is not None else model.objects.all()
 
 
 def _say(plan: Plan, applications, sentence: str) -> None:
@@ -210,9 +238,34 @@ def _say(plan: Plan, applications, sentence: str) -> None:
             roles.append(sentence)
 
 
-def _join_notes(record, note: str) -> None:
-    mine = (record.notes or "").strip()
-    record.notes = f"{mine}\n\n{note}" if mine else note
+def _joined(first: str, second: str) -> str:
+    first, second = (first or "").strip(), (second or "").strip()
+    return f"{first}\n\n{second}" if first and second else first or second
+
+
+def _move_notes(kept, other, note: str) -> None:
+    """Every person's note on ``other`` goes to ``kept`` (#896), and the merge's own words go
+    to the note of the one who merged.
+
+    A note is one person's: two people's notes on the two records are never run together,
+    and where one person had a note on each, theirs are joined, the kept record's first.
+    """
+    from django.apps import apps
+
+    Note = apps.get_model("jobs", kept.NOTE_MODEL)
+    field = kept.NOTE_FIELD
+    for moving in Note.objects.filter(**{field: other}):
+        staying = Note.objects.filter(owner_id=moving.owner_id, **{field: kept}).first()
+        if staying is None:
+            setattr(moving, field, kept)
+            moving.save(update_fields=[field, "updated_at"])
+        else:
+            staying.text = _joined(staying.text, moving.text)
+            staying.save(update_fields=["text", "updated_at"])
+            moving.delete()
+    merger = kept.owner
+    if merger is not None:
+        kept.write_note(merger, _joined(kept.note_for(merger), note))
 
 
 def _write_entries(plan: Plan) -> None:
@@ -226,7 +279,7 @@ def _write_entries(plan: Plan) -> None:
         "other": plan.other_called,
         "kept": plan.kept_called,
     }
-    applications = Application.objects.filter(owner_id=plan.kept.owner_id, pk__in=plan.touched)
+    applications = Application.objects.filter(pk__in=plan.touched)
     for application in applications:
         record_event(
             application,
@@ -337,39 +390,41 @@ def _parent_after(kept, other):
     return kept.parent, False
 
 
-def plan_companies(kept, other) -> Plan:
+def plan_companies(kept, other, viewer=None) -> Plan:
     """What merging the company ``other`` into ``kept`` would do."""
     from postulo.applications.models import Application
 
     _same_owner(kept, other)
     plan = Plan(kept=kept, other=other)
-    owner = kept.owner_id
+    mine = _seen_by(viewer)
 
-    sent = Application.objects.filter(owner_id=owner).select_related("posting", "posting__company")
-    postings = JobPosting.objects.filter(owner_id=owner, company=other)
+    sent = Application.objects.filter(**mine).select_related("posting", "posting__company")
+    postings = _visible(JobPosting, viewer).filter(company=other)
     applications = sent.filter(posting__company=other)
     through = sent.filter(through_agency=other)
     aimed = sent.filter(department__company=other)
     moving_ids, differing_ids, _already = _identifier_moves(kept, other)
     moving_teams, folding_teams = _department_moves(kept, other)
-    children = Company.objects.filter(owner_id=owner, parent=other).exclude(pk=kept.pk)
+    children = _visible(Company, viewer).filter(parent=other).exclude(pk=kept.pk)
     industries = other.industries.exclude(pk__in=kept.industries.values("pk"))
 
     lines = [
         _moved(_("Postings"), postings, lambda row: row.title),
         _moved(_("Applications for them"), applications, lambda row: row.posting.title),
-        _moved(_("People"), Contact.objects.filter(owner_id=owner, company=other), str),
+        _moved(_("People"), _visible(Contact, viewer).filter(company=other), str),
         _moved(_("Companies that are part of it"), children, str),
         _moved(_("Applications that went through it as an agency"), through, str),
         _moved(_("Industries"), industries, str),
-        _moved(_("Career entries"), other.career_entries.all(), lambda row: row.role),
+        _moved(_("Career entries"), other.career_entries.filter(**mine), lambda row: row.role),
         _moved(
-            _("Education entries"), other.education_entries.all(), lambda row: row.qualification
+            _("Education entries"),
+            other.education_entries.filter(**mine),
+            lambda row: row.qualification,
         ),
-        _moved(_("Certifications"), other.certifications.all(), str),
-        _moved(_("Honours and awards"), other.honours.all(), str),
-        _moved(_("Memberships"), other.memberships.all(), str),
-        _moved(_("Courses"), other.courses.all(), str),
+        _moved(_("Certifications"), other.certifications.filter(**mine), str),
+        _moved(_("Honours and awards"), other.honours.filter(**mine), str),
+        _moved(_("Memberships"), other.memberships.filter(**mine), str),
+        _moved(_("Courses"), other.courses.filter(**mine), str),
         _moved(_("Appointments"), other.appointments.all(), str),
         _moved(_("Telephone numbers"), other.phone_numbers.all(), lambda row: row.number),
         _moved(
@@ -460,23 +515,20 @@ def merge_companies(kept, other) -> Plan:
     _same_owner(kept, other)
     locked = {
         row.pk: row
-        for row in Company.objects.select_for_update().filter(
-            owner_id=kept.owner_id, pk__in=[kept.pk, other.pk]
-        )
+        for row in Company.objects.select_for_update().filter(pk__in=[kept.pk, other.pk])
     }
     if len(locked) != 2:
         raise _gone()
     kept, other = locked[kept.pk], locked[other.pk]
 
     plan = plan_companies(kept, other)
-    owner = kept.owner_id
     now = timezone.now()
 
     # The applications whose answer changes -- a new employer, a new agency -- are stamped,
     # so a client that asks the API what changed since it last looked is told.
-    Application.objects.filter(owner_id=owner, pk__in=plan.touched).update(updated_at=now)
-    Application.objects.filter(owner_id=owner, through_agency=other).update(through_agency=kept)
-    JobPosting.objects.filter(owner_id=owner, company=other).update(company=kept, updated_at=now)
+    Application.objects.filter(pk__in=plan.touched).update(updated_at=now)
+    Application.objects.filter(through_agency=other).update(through_agency=kept)
+    JobPosting.objects.filter(company=other).update(company=kept, updated_at=now)
 
     # Departments before the people in them, so nobody is ever in a team at another
     # company than their own: a team of the same name takes the other's people and
@@ -489,7 +541,7 @@ def merge_companies(kept, other) -> Plan:
     Department.objects.filter(pk__in=[team.pk for team in moving_teams]).update(
         company=kept, updated_at=now
     )
-    Contact.objects.filter(owner_id=owner, company=other).update(company=kept, updated_at=now)
+    Contact.objects.filter(company=other).update(company=kept, updated_at=now)
 
     moving_ids, _differing, _already = _identifier_moves(kept, other)
     CompanyIdentifier.objects.filter(pk__in=[row.pk for row in moving_ids]).update(
@@ -501,7 +553,7 @@ def merge_companies(kept, other) -> Plan:
     # Putting it under the kept company would make each part of the other.
     above = _above(kept)
     parent, _changes = _parent_after(kept, other)
-    children = Company.objects.filter(owner_id=owner, parent=other).exclude(pk=kept.pk)
+    children = Company.objects.filter(parent=other).exclude(pk=kept.pk)
     children.filter(pk__in=above).update(parent=other.parent, updated_at=now)
     children.exclude(pk__in=above).update(parent=kept, updated_at=now)
 
@@ -552,8 +604,8 @@ def merge_companies(kept, other) -> Plan:
         kept.logo_source = other.logo_source
         kept.logo_source_url = other.logo_source_url
         kept.logo_fetched_at = other.logo_fetched_at
-    _join_notes(kept, plan.note())
     kept.save()
+    _move_notes(kept, other, plan.note())
 
     _write_entries(plan)
     _refuse_what_is_left(
@@ -595,19 +647,19 @@ def _handle_moves(kept, other) -> tuple[list, list]:
     return moving, already
 
 
-def plan_contacts(kept, other) -> Plan:
+def plan_contacts(kept, other, viewer=None) -> Plan:
     """What merging the person ``other`` into ``kept`` would do."""
     from postulo.applications.models import Application, Appointment, Interview
 
     _same_owner(kept, other)
     plan = Plan(kept=kept, other=other)
-    owner = kept.owner_id
+    mine = _seen_by(viewer)
 
-    sent = Application.objects.filter(owner_id=owner).select_related("posting", "posting__company")
-    appointments = Appointment.objects.filter(owner_id=owner, contact=other)
+    sent = Application.objects.filter(**mine).select_related("posting", "posting__company")
+    appointments = Appointment.objects.filter(**mine, contact=other)
     main = sent.filter(contact=other)
     referred = sent.filter(referred_by=other)
-    interviews = Interview.objects.filter(owner_id=owner, contacts=other).select_related(
+    interviews = Interview.objects.filter(**mine, contacts=other).select_related(
         "application__posting__company"
     )
     met = sent.filter(interviews__contacts=other).distinct()
@@ -629,9 +681,7 @@ def plan_contacts(kept, other) -> Plan:
         # check before the delete does not see as a loss, so it is moved by name here.
         _moved(
             _("Entries in listing histories that came from them"),
-            ListingEvent.objects.filter(posting__owner_id=owner, contact=other).select_related(
-                "posting"
-            ),
+            ListingEvent.objects.filter(**mine, contact=other).select_related("posting"),
             lambda row: row.summary or row.posting.title,
         ),
     ]
@@ -640,7 +690,7 @@ def plan_contacts(kept, other) -> Plan:
     lines.append(
         _moved(
             _("Reference letters they wrote"),
-            ReferenceLetter.objects.filter(owner_id=owner, referee=other).select_related("upload"),
+            ReferenceLetter.objects.filter(**mine, referee=other).select_related("upload"),
             lambda row: row.upload.title,
         )
     )
@@ -648,8 +698,8 @@ def plan_contacts(kept, other) -> Plan:
 
     # Their entry among the referees moves to the kept person, who keeps their own where both
     # have one (#696).
-    their_entry = Reference.objects.filter(owner_id=owner, contact=other)
-    if Reference.objects.filter(owner_id=owner, contact=kept).exists():
+    their_entry = Reference.objects.filter(**mine, contact=other)
+    if Reference.objects.filter(**mine, contact=kept).exists():
         if their_entry.exists():
             plan.left_behind.append(
                 _("Their entry among your references: you already have one for the other.")
@@ -757,7 +807,7 @@ def merge_contacts(kept, other) -> Plan:
     locked = {
         row.pk: row
         for row in Contact.objects.select_for_update()
-        .filter(owner_id=kept.owner_id, pk__in=[kept.pk, other.pk])
+        .filter(pk__in=[kept.pk, other.pk])
         .select_related("company", "department")
     }
     if len(locked) != 2:
@@ -765,29 +815,30 @@ def merge_contacts(kept, other) -> Plan:
     kept, other = locked[kept.pk], locked[other.pk]
 
     plan = plan_contacts(kept, other)
-    owner = kept.owner_id
     now = timezone.now()
 
-    Application.objects.filter(owner_id=owner, pk__in=plan.touched).update(updated_at=now)
-    Application.objects.filter(owner_id=owner, contact=other).update(contact=kept)
-    Application.objects.filter(owner_id=owner, referred_by=other).update(referred_by=kept)
+    Application.objects.filter(pk__in=plan.touched).update(updated_at=now)
+    Application.objects.filter(contact=other).update(contact=kept)
+    Application.objects.filter(referred_by=other).update(referred_by=kept)
     # Who an entry in a listing's history came from (#270). `SET_NULL` would otherwise
     # clear it in silence when the other record goes, and the collector's question below
     # does not count a cleared link as something lost.
-    ListingEvent.objects.filter(posting__owner_id=owner, contact=other).update(contact=kept)
+    ListingEvent.objects.filter(contact=other).update(contact=kept)
     # The letters they wrote, for the same reason (#666).
-    ReferenceLetter.objects.filter(owner_id=owner, referee=other).update(referee=kept)
+    ReferenceLetter.objects.filter(referee=other).update(referee=kept)
     # And the meetings they were the adviser at (#888), for the same reason.
-    Appointment.objects.filter(owner_id=owner, contact=other).update(contact=kept)
+    Appointment.objects.filter(contact=other).update(contact=kept)
 
     # Their entry among the referees: moved where the kept person has none, and otherwise
     # theirs goes and the kept person's stays, with the places it had on CVs (#696).
     from postulo.resume.models import Reference
 
-    if Reference.objects.filter(owner_id=owner, contact=kept).exists():
-        Reference.objects.filter(owner_id=owner, contact=other).delete()
-    else:
-        Reference.objects.filter(owner_id=owner, contact=other).update(contact=kept)
+    # Per person: each keeps their own entry for the kept one where they had one (#896).
+    for owner in Reference.objects.filter(contact=other).values_list("owner_id", flat=True):
+        if Reference.objects.filter(owner_id=owner, contact=kept).exists():
+            Reference.objects.filter(owner_id=owner, contact=other).delete()
+        else:
+            Reference.objects.filter(owner_id=owner, contact=other).update(contact=kept)
 
     # An interview both were at has the kept person once, not twice.
     seats = Interview.contacts.through.objects
@@ -813,8 +864,8 @@ def merge_contacts(kept, other) -> Plan:
         kept.company, kept.department = other.company, other.department
     elif other.company_id == kept.company_id and not kept.department_id:
         kept.department = other.department
-    _join_notes(kept, plan.note())
     kept.save()
+    _move_notes(kept, other, plan.note())
 
     _write_entries(plan)
     _refuse_what_is_left(

@@ -102,7 +102,7 @@ def card_for_contact(contact: Contact, *, notes: bool = False) -> vcard.Card:
         addresses=_addresses(contact),
         links=tuple(vcard.Link(row.url) for row in contact.web_links.all()),
         impps=_impps(contact),
-        notes=contact.notes if notes else "",
+        notes=contact.own_note() if notes else "",
         uid=vcard.uid_for(instance_name(), "contact", contact.pk),
         revised=contact.updated_at,
     )
@@ -116,7 +116,7 @@ def card_for_company(company: Company, *, notes: bool = False) -> vcard.Card:
         kind=vcard.KIND_ORG,
         company=company.name,
         links=(vcard.Link(company.website),) if company.website else (),
-        notes=company.notes if notes else "",
+        notes=company.own_note() if notes else "",
         uid=vcard.uid_for(instance_name(), "company", company.pk),
         revised=company.updated_at,
     )
@@ -216,14 +216,15 @@ def held_cards(held) -> list[vcard.Card]:
     return cards
 
 
-def _existing(user) -> tuple[set, set]:
+def _existing(principal) -> tuple[set, set]:
+    # What the owner the cards go to holds already (#896): the person's, or a group's.
     contacts = {
         (slugs.name_key(name), company_key or "")
-        for name, company_key in Contact.objects.for_user(user).values_list(
+        for name, company_key in Contact.objects.owned_by(principal).values_list(
             "name", "company__name_key"
         )
     }
-    companies = set(Company.objects.for_user(user).values_list("name_key", flat=True))
+    companies = set(Company.objects.owned_by(principal).values_list("name_key", flat=True))
     return contacts, companies
 
 
@@ -316,7 +317,7 @@ def review(user, cards: list[vcard.Card]) -> list[Entry]:
     return entries
 
 
-def apply(user, cards: list[vcard.Card], chosen: set[int]) -> Report:
+def apply(user, cards: list[vcard.Card], chosen: set[int], into=None) -> Report:
     """Make the cards that were chosen, and only those.
 
     Looked at again as they are made: what was here when the page was drawn may not be what
@@ -324,7 +325,7 @@ def apply(user, cards: list[vcard.Card], chosen: set[int]) -> Report:
     card's -- reported, and the others go on.
     """
     report = Report()
-    contacts, companies = _existing(user)
+    contacts, companies = _existing(into or user)
     for index in sorted(chosen):
         if not 0 <= index < len(cards):
             continue
@@ -337,7 +338,7 @@ def apply(user, cards: list[vcard.Card], chosen: set[int]) -> Report:
                 if card.is_org:
                     if slugs.name_key(name) in companies:
                         continue
-                    _make_company(user, card, report)
+                    _make_company(user, card, report, into)
                     companies.add(slugs.name_key(name))
                 else:
                     key = (
@@ -346,7 +347,7 @@ def apply(user, cards: list[vcard.Card], chosen: set[int]) -> Report:
                     )
                     if key in contacts:
                         continue
-                    _make_contact(user, card, report)
+                    _make_contact(user, card, report, into)
                     contacts.add(key)
         except (ValidationError, ValueError) as error:
             report.problems.append(
@@ -356,7 +357,7 @@ def apply(user, cards: list[vcard.Card], chosen: set[int]) -> Report:
     return report
 
 
-def _make_company(user, card: vcard.Card, report: Report) -> None:
+def _make_company(user, card: vcard.Card, report: Report, into=None) -> None:
     website = ""
     for link in card.links:
         try:
@@ -369,25 +370,29 @@ def _make_company(user, card: vcard.Card, report: Report) -> None:
             continue
         website = link.url
         break
-    Company.objects.create(
-        owner=user, name=card.name.strip()[:200], website=website[:200], notes=card.notes
-    )
+    company = Company(name=card.name.strip()[:200], website=website[:200])
+    company.set_principal(into or user)
+    company.save()
+    # The importing person's own note (#896).
+    company.write_note(user, card.notes)
     report.companies += 1
 
 
-def _make_contact(user, card: vcard.Card, report: Report) -> None:
+def _make_contact(user, card: vcard.Card, report: Report, into=None) -> None:
     from postulo.applications.services import get_or_create_company
     from postulo.jobs import structure
 
     who = card.name[:80]
-    company = get_or_create_company(user, card.company[:200]) if card.company else None
+    company = (
+        get_or_create_company(user, card.company[:200], principal=into, strict=True)
+        if card.company
+        else None
+    )
     department = None
     if company is not None and card.department and structure.structure_allowed(user):
         department = Department.objects.filter(
-            owner=user, company=company, name_key=slugs.name_key(card.department)
-        ).first() or Department.objects.create(
-            owner=user, company=company, name=card.department[:120]
-        )
+            company=company, name_key=slugs.name_key(card.department)
+        ).first() or Department.objects.create(company=company, name=card.department[:120])
     email = card.email
     if email:
         try:
@@ -398,15 +403,17 @@ def _make_contact(user, card: vcard.Card, report: Report) -> None:
                 % {"name": who, "value": email[:80]}
             )
             email = ""
-    contact = Contact.objects.create(
-        owner=user,
+    contact = Contact(
         company=company,
         department=department,
         name=card.name.strip()[:200],
         role=card.role[:200],
         email=email,
-        notes=card.notes,
     )
+    # The person's own, or one of their groups' (#896).
+    contact.set_principal(into or user)
+    contact.save()
+    contact.write_note(user, card.notes)
     _numbers(user, contact, card, report)
     _postal(user, contact, card, report)
     _links(user, contact, card, report)

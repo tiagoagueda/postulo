@@ -2,7 +2,7 @@ from django.urls import path
 
 from postulo.core import modules
 
-from . import capture_views, page_views, vcard_views, views
+from . import capture_views, page_views, share_views, vcard_views, views
 
 app_name = "jobs"
 
@@ -12,6 +12,12 @@ vcard = modules.required("format-vcard")
 geojson = modules.required("format-geojson")
 
 urlpatterns = [
+    # Sharing a company, a contact or a listing, and a person's own note on one (#896).
+    path("share/<str:kind>/<int:pk>/", share_views.ShareView.as_view(), name="share"),
+    path("share/<int:pk>/revoke/", share_views.RevokeView.as_view(), name="share_revoke"),
+    path("owner/<str:kind>/<int:pk>/", share_views.MoveView.as_view(), name="move_owner"),
+    path("conflicts/", share_views.ConflictsView.as_view(), name="conflicts"),
+    path("notes/<str:kind>/<int:pk>/", share_views.OwnNoteView.as_view(), name="own_note"),
     path("companies/", views.CompanyListView.as_view(), name="company_list"),
     path("companies/map/", views.CompanyMapView.as_view(), name="company_map"),
     path("addresses/<int:pk>/place/", views.AddressPlaceView.as_view(), name="address_place"),

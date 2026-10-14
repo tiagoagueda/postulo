@@ -1,7 +1,7 @@
 """Companies and the people at them."""
 
 from django.db import transaction
-from django.db.models import Q
+from django.db.models import Prefetch, Q
 from django.utils.translation import gettext as _
 from ninja import Query, Router, Status
 from ninja.errors import HttpError
@@ -10,7 +10,7 @@ from ninja.pagination import paginate
 from postulo.applications.services import get_or_create_company
 from postulo.core import slugs
 from postulo.jobs import identifiers
-from postulo.jobs.models import Company, CompanyKind, Contact, Industry
+from postulo.jobs.models import Company, CompanyKind, Contact, Industry, JobPosting
 
 from ..auth import scope
 from ..paging import AFTER_ID, UPDATED_SINCE, Moment, Page, RowId, changed_since
@@ -24,7 +24,7 @@ from ..schemas import (
     company_out,
     contact_out,
 )
-from .common import identifiers_or_422, owned, owned_or_404
+from .common import identifiers_or_422, owned, owned_or_404, writable_or_404
 
 router = Router(tags=["companies"], auth=scope("read"))
 
@@ -39,6 +39,7 @@ def list_companies(
 ):
     companies = (
         owned(request, Company.objects)
+        .with_notes(request.auth.owner)
         .prefetch_related(
             "industries", "identifiers", "phone_numbers", "postal_addresses", "web_links", "names"
         )
@@ -63,10 +64,27 @@ def add_company(request, payload: CompanyIn):
     # would stay (#435).
     with transaction.atomic():
         company = get_or_create_company(request.auth.owner, payload.name, wikidata=wikidata)
-        for field in ("website", "careers_url", "location", "notes"):
+        changes = any(
+            getattr(payload, field)
+            for field in ("website", "careers_url", "location", "kind", "email", "identifiers")
+        ) or bool(payload.phone_numbers or payload.postal_addresses or payload.web_links)
+        changes = changes or bool(payload.industries)
+        if (
+            changes
+            and not Company.objects.visible_to(request.auth.owner, write=True)
+            .filter(pk=company.pk)
+            .exists()
+        ):
+            # Found by name among the companies shared with the caller read-only (#896):
+            # said so, rather than changed or silently left as it was.
+            raise HttpError(403, _("That company is shared with you read-only."))
+        for field in ("website", "careers_url", "location"):
             value = getattr(payload, field)
             if value:
                 setattr(company, field, value)
+        if payload.notes:
+            # The caller's own note (#896), never a column of the company.
+            company.write_note(request.auth.owner, payload.notes)
         if payload.kind in CompanyKind.values:
             company.kind = payload.kind
         company.save()
@@ -156,21 +174,25 @@ def _write_reached(
         web_links.add_links(company, owner, links)
 
 
-def _detail(request, pk: int) -> Company:
-    return owned_or_404(
-        request,
-        Company.objects.prefetch_related(
-            "contacts",
-            "postings",
+def _detail(request, pk: int, *, write: bool = False) -> Company:
+    owner = request.auth.owner
+    companies = (
+        # The caller's own notes on the company and on its people (#896), and only the
+        # people and listings at it the caller can see.
+        Company.objects.with_notes(owner).prefetch_related(
+            Prefetch("contacts", queryset=Contact.objects.visible_to(owner).with_notes(owner)),
+            Prefetch("postings", queryset=JobPosting.objects.visible_to(owner)),
             "industries",
             "identifiers",
             "phone_numbers",
             "postal_addresses",
             "web_links",
             "names",
-        ),
-        pk,
+        )
     )
+    if write:
+        return writable_or_404(request, companies, pk)
+    return owned_or_404(request, companies, pk)
 
 
 @router.get("/{int:pk}", response=CompanyDetailOut, summary="One company, with its contacts")
@@ -183,7 +205,8 @@ def _name_or_refusal(request, company: Company, name: str) -> str:
     name = name.strip()
     if not name:
         raise HttpError(422, _("This field is required."))
-    clash = Company.objects.for_user(request.auth.owner).filter(name_key=slugs.name_key(name))
+    # Among the company's own owner's (#896): a person's or a group's.
+    clash = Company.objects.owned_by(company.principal).filter(name_key=slugs.name_key(name))
     if clash.exclude(pk=company.pk).exists():
         raise HttpError(422, _("You already have a company with that name."))
     return name
@@ -193,11 +216,12 @@ def _name_or_refusal(request, company: Company, name: str) -> str:
     "/{int:pk}", response=CompanyDetailOut, auth=scope("write"), summary="Change a company"
 )
 def patch_company(request, pk: int, payload: CompanyPatch):
-    company = _detail(request, pk)
+    company = _detail(request, pk, write=True)
     data = payload.dict(exclude_unset=True)
     industries = data.pop("industries", None)
     data.pop("identifiers", None)
     email = data.pop("email", None)
+    notes = data.pop("notes", None)
     data.pop("phone_numbers", None)
     data.pop("postal_addresses", None)
     data.pop("web_links", None)
@@ -208,6 +232,18 @@ def patch_company(request, pk: int, payload: CompanyPatch):
             if value is not None:
                 setattr(company, field, value)
         company.save()
+        if data:
+            from postulo.jobs import trail
+
+            trail.record(
+                company,
+                request.auth.owner,
+                trail.EDITED,
+                fields=[name for name, value in data.items() if value is not None],
+                via=request.auth.name,
+            )
+        if notes is not None:
+            company.write_note(request.auth.owner, notes)
         if industries is not None:
             company.industries.set(Industry.named(request.auth.owner, industries))
         if payload.identifiers is not None:
@@ -279,7 +315,9 @@ def add_contact(request, pk: int, payload: ContactIn):
     # nothing on the instance and nothing is asked or spent (#329; the bound of #142 and
     # #374 is for a person's own numbers).
     number = phones.combine(number, country)
+    notes = fields.pop("notes", "") or ""
     contact = Contact.objects.create(owner=request.auth.owner, company=company, **fields)
+    contact.write_note(request.auth.owner, notes)
     if number:
         phone_numbers.save_only_number(contact, request.auth.owner, number)
     web_links.add_links(contact, request.auth.owner, links)

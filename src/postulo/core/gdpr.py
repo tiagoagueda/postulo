@@ -84,7 +84,7 @@ def _contact_rows(contact) -> dict:
         "name": contact.name,
         "role": contact.role,
         "email": contact.email,
-        "notes": contact.notes,
+        "notes": contact.own_note(),
         "company": contact.company.name if contact.company_id else "",
         "department": (
             contact.department.name if contact.department_id and contact.department else ""
@@ -151,7 +151,7 @@ def _messaging_rows(contact) -> list[dict]:
     ]
 
 
-def _listing_event_rows(contact) -> list[dict]:
+def _listing_event_rows(contact, reader=None) -> list[dict]:
     """Every entry in a listing's history that names this person as who it came from (#270).
 
     What they said or sent is data about them as much as about the job, and this document
@@ -170,7 +170,7 @@ def _listing_event_rows(contact) -> list[dict]:
             "summary": event.summary,
             "body": event.body,
         }
-        for event in ListingEvent.objects.filter(contact=contact).select_related(
+        for event in _by(ListingEvent.objects.filter(contact=contact), reader).select_related(
             "posting", "posting__company"
         )
     ]
@@ -279,7 +279,12 @@ def _reference_letter_rows(letters) -> list[dict]:
     ]
 
 
-def contact_document(contact) -> dict:
+def _by(queryset, reader):
+    """``queryset`` as ``reader``'s own rows, or all of them when nobody is named (#896)."""
+    return queryset if reader is None else queryset.filter(owner=reader)
+
+
+def contact_document(contact, reader=None) -> dict:
     """Everything the instance holds on one other person, in one document.
 
     The answer to "what do you have on me?". The rows Postulo itself keeps, and then every
@@ -291,7 +296,9 @@ def contact_document(contact) -> dict:
     from postulo.plugins.data import export_sections_for
 
     plugins = export_sections_for(contact)
-    found = references(contact)
+    # Asked by one person about a contact they may share with others (#896): what *they*
+    # hold on them -- their applications, interviews and letters -- and nobody else's.
+    found = {kind: _by(rows, reader) for kind, rows in references(contact).items()}
     document = {
         "document": DOCUMENT_NAME,
         "version": DOCUMENT_VERSION,
@@ -300,13 +307,13 @@ def contact_document(contact) -> dict:
         "postal_addresses": _address_rows(contact),
         "web_links": _web_link_rows(contact),
         "messaging_handles": _messaging_rows(contact),
-        "listing_events": _listing_event_rows(contact),
+        "listing_events": _listing_event_rows(contact, reader),
         "applications": _application_rows(found["applications"]),
         "referrals": _application_rows(found["referrals"]),
         "interviews": _interview_rows(found["interviews"]),
         "appointments": _appointment_rows(found["appointments"]),
         "reference_letters": _reference_letter_rows(found["reference_letters"]),
-        "references": _career_reference_rows(career_references(contact)),
+        "references": _career_reference_rows(_by(career_references(contact), reader)),
         "plugins": plugins,
     }
     if "not_carried" in plugins:

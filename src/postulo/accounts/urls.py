@@ -42,6 +42,9 @@ urlpatterns = [
     path("avatar/<int:pk>/", views.AvatarView.as_view(), name="avatar"),
     path("avatar/refresh/", views.GravatarRefreshView.as_view(), name="avatar_refresh"),
     path("delete/", views.DeleteAccountView.as_view(), name="delete"),
+    # The groups one is in, and leaving one (#896).
+    path("groups/", views.YourGroupsView.as_view(), name="groups"),
+    path("groups/<int:pk>/leave/", views.GroupLeaveView.as_view(), name="group_leave"),
     path("invitations/", views.InviteListView.as_view(), name="invite_list"),
     path("invitations/new/", views.InviteCreateView.as_view(), name="invite_create"),
     path("invitations/<int:pk>/revoke/", views.InviteRevokeView.as_view(), name="invite_revoke"),

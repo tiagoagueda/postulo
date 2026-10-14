@@ -68,7 +68,7 @@ def set_identifiers(
         if scheme == identifiers.OTHER:
             continue
         clash = (
-            CompanyIdentifier.objects.for_user(company.owner)
+            CompanyIdentifier.objects.owned_by(company.principal)
             .filter(scheme=scheme, value__iexact=value)
             .exclude(company=company)
             .select_related("company")
@@ -107,7 +107,7 @@ def set_identifiers(
         identifier = held.first()
         if identifier is None:
             identifier = CompanyIdentifier.objects.create(
-                owner=company.owner, company=company, scheme=scheme, value=value, label=label
+                company=company, scheme=scheme, value=value, label=label
             )
         if identifier.label != label:
             identifier.label = label

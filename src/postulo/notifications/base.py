@@ -36,6 +36,9 @@ EVENTS = {
     "status_changed": _("An application's status changes"),
     "interview_scheduled": _("An interview is scheduled or moved"),
     "offer_recorded": _("An offer is recorded"),
+    # A company, a contact or a listing shared with you, and taken back (#896).
+    "record_shared": _("Somebody shares a company, a contact or a listing with you"),
+    "share_ended": _("Something shared with you is no longer shared"),
 }
 
 #: The events that say what the person *did* rather than what happened *to* them (#240).

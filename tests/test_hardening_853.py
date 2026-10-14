@@ -29,7 +29,7 @@ def test_an_upload_sets_the_logo_and_saves_nothing_else(client, user):
     )
 
     company.refresh_from_db()
-    assert company.has_logo and (company.name, company.notes) == ("Aperture", "keep")
+    assert company.has_logo and (company.name, company.own_note()) == ("Aperture", "keep")
     assert response.redirect_chain[-1][0] == reverse("jobs:company_update", args=[company.pk])
 
 
