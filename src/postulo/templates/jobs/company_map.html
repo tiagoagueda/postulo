@@ -10,8 +10,11 @@
 
 {% comment %} The whole window (#849): only the masthead, and the bottom bar on a phone, around the
    map; the heading, the way back to the table, the list of places and the footer's line drawn
-   over it. The page is still the list (#108): with scripts off the map stays hidden and the
-   stage holds the heading, the open list and the footer, in that order. {% endcomment %}
+   over it (#909): the heading at the top of the start side with the list of places under it,
+   the way back to the table at the top of the end side, and the footer's line, with the
+   map's credit, at the bottom of the end side, where the zoom and *Near me* buttons stand
+   above it. The page is still the list (#108): with scripts off the map stays hidden and the
+   stage holds the heading, the open list and the footer. {% endcomment %}
 {% block main_width %}max-w-none{% endblock %}
 {% block main_padding %}{% endblock %}
 {% block footer %}{% endblock %}
@@ -30,43 +33,44 @@
              {% if outline %}data-map-outline="{{ outline|as_json }}"{% endif %}
              data-map-tiles="{{ tiles.url }}"
              data-map-max-zoom="{{ tiles.max_zoom }}"
-             data-map-zoom-in="{% translate 'Zoom in' %}"
-             data-map-zoom-out="{% translate 'Zoom out' %}"
              data-map-cluster="{% translate 'Companies here: {count}' %}"
-             data-map-locate="{% translate 'Near me' %}"
              data-map-here="{% translate 'You are about here' %}"
              data-map-locate-refused="{% translate 'The browser was not allowed to say where you are, so the map stays where it was.' %}"
              data-map-locate-failed="{% translate 'The browser could not say where you are. The map stays where it was.' %}"></div>
         {% comment %} The icon of *Near me* (#850), drawn by the server and cloned into the control
            by the script, the way every icon here is one file Postulo serves. {% endcomment %}
         <template data-map-locate-icon>{% icon "locate-fixed" %}</template>
+        {% comment %} The three buttons' names and tooltips (#909): the script names each button
+           by its sentence (`aria-labelledby`), and the page's tooltips show it while the button
+           is hovered or has the focus. In the card, which is hidden with scripts off, when
+           there are no buttons to name. {% endcomment %}
+        <span id="map-tip-zoom-in" data-tooltip>{% translate "Zoom in" %}</span>
+        <span id="map-tip-zoom-out" data-tooltip>{% translate "Zoom out" %}</span>
+        <span id="map-tip-locate" data-tooltip>{% translate "Near me" %}</span>
       </div>
       {% comment %} What *Near me* has to say when the browser does not answer: a status, read
          out by a screen reader, over the map. {% endcomment %}
       <p class="map-overlay absolute start-1/2 bottom-16 max-w-[calc(100%-1.5rem)] -translate-x-1/2 px-4 py-2 text-sm empty:pointer-events-none empty:opacity-0 sm:bottom-14" role="status" data-map-status></p>
     {% endif %}
 
-    <div class="map-overlay absolute start-3 top-3 flex max-w-[calc(100%-1.5rem)] flex-wrap items-center gap-x-4 gap-y-1 px-4 py-3">
-      <div>
+    {% comment %} The heading and, under it, the list of places, one column down the start side
+       (#909), so the list starts wherever the heading ends, in any language. The column lets
+       the pointer through to the map; what is in it does not. Its foot stays above the
+       footer's line, at the bottom of the end side. The heading has no card (#909): the
+       words alone over the map, with the page's ground as a halo so they stay legible over
+       the tiles, and room at the end on a phone for the way back to the table. {% endcomment %}
+    <div class="pointer-events-none absolute start-3 top-3 bottom-20 z-1 flex w-[calc(100%-1.5rem)] flex-col items-start gap-2 sm:w-80 lg:bottom-14" data-map-column>
+      <div class="map-heading pointer-events-auto max-w-[calc(100%-7rem)] px-1 sm:max-w-full" data-map-heading>
         <c-page-title>{% translate "Companies" %}</c-page-title>
-        <p class="text-sm text-ink-500 dark:text-ink-400" data-map-count>
-          {% blocktranslate trimmed count total=places|length %}
-            One place
-          {% plural %}
-            {{ total }} places
-          {% endblocktranslate %}
-        </p>
       </div>
-      <a href="{% url 'jobs:company_list' %}" class="btn" data-variant="outline" data-map-table>
-        {% icon "table" %}{% translate "Table" %}
-      </a>
-    </div>
 
     {% if places %}
       {% comment %} The list of places: the accessible form of the page, open unless a phone's
          screen is too small to share, where the script closes it. A <details> the browser opens
-         itself, so it works with scripts off. {% endcomment %}
-      <details class="map-overlay map-drawer absolute inset-x-3 bottom-14 max-h-[50%] overflow-y-auto sm:inset-x-auto sm:end-3 sm:top-3 sm:bottom-auto sm:max-h-[calc(100%-9rem)] sm:w-80" open data-map-drawer>
+         itself, so it works with scripts off. Under the heading (#909); on a phone as wide as
+         the map, and, open, three-fifths of the column at most, so the buttons above the
+         footer's line are still in reach. {% endcomment %}
+      <details class="map-overlay map-drawer pointer-events-auto max-h-[60%] min-h-0 w-full overflow-y-auto sm:max-h-full" open data-map-drawer>
         <summary class="cursor-pointer px-4 py-3 font-medium">
           <h2 class="inline">{% translate "Places" %}</h2>
         </summary>
@@ -120,7 +124,15 @@
           {% include "jobs/partials/map_credits.html" %}
         </div>
       </details>
-    {% else %}
+    {% endif %}
+    </div>
+
+    {% comment %} The way back to the table, on its own at the top of the end side (#909). {% endcomment %}
+    <a href="{% url 'jobs:company_list' %}" class="btn absolute end-3 top-3 z-1 shadow-sm" data-variant="outline" data-map-table>
+      {% icon "table" %}{% translate "Table" %}
+    </a>
+
+    {% if not places %}
       <div class="flex size-full items-center justify-center px-4 pt-28 pb-16">
         <div class="max-w-md">
           <c-empty icon="map-pin">
@@ -131,16 +143,19 @@
       </div>
     {% endif %}
 
-    {% comment %} The footer's one line, over the map's foot (#849): the same links every page
-       ends with, the legal notice among them, which an instance may be required to show. The
-       map's own credit is the end of that line rather than a second box in the other corner:
-       the tiles' attribution, which their licence asks to see on the map, and Leaflet. Written
-       by the server, so a typed credit is escaped like any text, and shown by the script once
-       the map is drawn, since with scripts off there is no map to credit. {% endcomment %}
-    <footer class="map-overlay map-footer absolute start-3 bottom-3 flex max-w-[calc(100%-1.5rem)] flex-wrap items-center gap-x-4 px-3 text-xs text-ink-500 sm:max-w-[60%] dark:text-ink-400">
-      {% include "partials/footer_links.html" %}
+    {% comment %} The footer's one line, over the map's foot (#849), in the bottom corner of the end
+       side (#909): the same links every page ends with, the legal notice among them, which an
+       instance may be required to show -- but never the motto, and *Source code* and *Help*
+       as icons with tooltips. The map's own credit is the end of that line, after a dot,
+       rather than a second box: the tiles' attribution, which their licence asks to see on
+       the map, and Leaflet. Written by the server, so a typed credit is escaped like any
+       text, and shown by the script once the map is drawn, since with scripts off there is
+       no map to credit. {% endcomment %}
+    <footer class="map-overlay map-footer absolute end-3 bottom-3 flex max-w-[calc(100%-1.5rem)] flex-wrap items-center justify-end gap-x-2 px-3 text-xs text-ink-500 sm:max-w-[60%] dark:text-ink-400">
+      {% include "partials/footer_links.html" with compact=True %}
       {% if places %}
-        <p class="flex flex-wrap gap-x-4" data-map-tile-credit hidden>
+        <p class="flex flex-wrap items-center gap-x-3" data-map-tile-credit hidden>
+          {% icon "dot" class="size-4 -mx-1" %}
           {% if tiles.url %}
             {% if tiles.attribution_url %}
               <a href="{{ tiles.attribution_url }}" rel="noopener noreferrer external" target="_blank"

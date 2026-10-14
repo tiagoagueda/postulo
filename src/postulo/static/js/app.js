@@ -4758,6 +4758,8 @@
    * tooltip: a popover, hidden until the field is hovered or has the focus, and still the
    * control's description either way, so a screen reader reads it with the field exactly
    * as before. A card's one sentence is the same thing on the card's question mark.
+   * A button or a link drawn as an icon alone is *named* by its sentence instead
+   * (`aria-labelledby`, #909): the same tooltip, shown the same way, and the name it reads.
    *
    * **What shows one.** The pointer resting on the field -- its label, its control, or
    * the tooltip itself -- and the focus being anywhere in the field. A field is the
@@ -4854,8 +4856,13 @@
     return !!node && node.nodeType === 1 && node.matches("[data-tooltip][popover]");
   }
 
+  // A control's tooltips: the sentences that describe it, or that name an icon alone (#909).
+  var TIP_TAKERS = "[aria-describedby], [aria-labelledby]";
+
   function tipsOf(control) {
-    return (control.getAttribute("aria-describedby") || "")
+    var ids = [control.getAttribute("aria-describedby"), control.getAttribute("aria-labelledby")];
+    return ids
+      .join(" ")
       .split(/\s+/)
       .map(function (id) {
         return id ? document.getElementById(id) : null;
@@ -4865,7 +4872,7 @@
 
   function tipsIn(box) {
     var found = [];
-    Array.prototype.forEach.call(box.querySelectorAll("[aria-describedby]"), function (control) {
+    Array.prototype.forEach.call(box.querySelectorAll(TIP_TAKERS), function (control) {
       tipsOf(control).forEach(function (tip) {
         if (found.indexOf(tip) === -1) {
           found.push(tip);
@@ -4888,9 +4895,17 @@
       }
       box = box.parentElement ? box.parentElement.closest(".field") : null;
     }
-    var described = node.closest("[aria-describedby]");
-    var own = described ? tipsOf(described) : [];
-    return own.length ? { anchor: described, tips: own, spent: false } : null;
+    // The nearest control with a tooltip of its own: a section named by its heading, on the
+    // way out, has none and is passed over.
+    var described = node.closest(TIP_TAKERS);
+    while (described) {
+      var own = tipsOf(described);
+      if (own.length) {
+        return { anchor: described, tips: own, spent: false };
+      }
+      described = described.parentElement ? described.parentElement.closest(TIP_TAKERS) : null;
+    }
+    return null;
   }
 
   function samePlace(one, other) {
@@ -5196,7 +5211,8 @@
       function (tip) {
         // Only a sentence something is described by: one nothing names would be put out
         // of sight with nothing left to show it, and is better left where it is.
-        if (document.querySelector('[aria-describedby~="' + CSS.escape(tip.id) + '"]')) {
+        var id = CSS.escape(tip.id);
+        if (document.querySelector('[aria-describedby~="' + id + '"], [aria-labelledby~="' + id + '"]')) {
           tip.setAttribute("popover", "manual");
           tip.setAttribute("role", "tooltip");
         }
@@ -7459,26 +7475,23 @@
    * there. Nothing is stored and nothing is sent: the position goes from the browser to the
    * map and no further. Only the map page's policy lets it ask at all.
    */
-  // The bottom corner on the side the page starts from (#907): left, and right on a page
+  // The bottom corner on the side the page ends on (#909): right, and left on a page
   // written right to left. Leaflet's corners are physical, and the overlays over the map
   // are placed by start and end, so the buttons follow the footer to whichever side it is.
-  function startCorner(canvas) {
-    return getComputedStyle(canvas).direction === "rtl" ? "bottomright" : "bottomleft";
+  function endCorner(canvas) {
+    return getComputedStyle(canvas).direction === "rtl" ? "bottomleft" : "bottomright";
   }
 
-  // How far the bottom corners are lifted: past the top of the footer's line, and of the
-  // closed list of places where it sits at the foot (on a phone), whatever their height
-  // in this language and at this width (#907). Measured, since the footer wraps onto a
-  // second line when its words are long, and written as a custom property through the
-  // CSSOM, which the policy allows; the stylesheet's own lift stands until then.
+  // How far the bottom corners are lifted: past the top of the footer's line, whatever its
+  // height in this language and at this width (#907, #909). Measured, since the footer
+  // wraps onto a second line when its words are long, and written as a custom property
+  // through the CSSOM, which the policy allows; the stylesheet's own lift stands until then.
   function liftCorners(canvas) {
     var stage = canvas.closest("[data-map-stage]");
     if (!stage) {
       return;
     }
-    var below = Array.prototype.slice.call(
-      stage.querySelectorAll(".map-footer, [data-map-drawer]")
-    );
+    var below = Array.prototype.slice.call(stage.querySelectorAll(".map-footer"));
     function measure() {
       var box = canvas.getBoundingClientRect();
       var lift = 0;
@@ -7499,6 +7512,23 @@
       });
       watcher.observe(canvas);
     }
+  }
+
+  // A map button named by its tooltip (#909): the sentence the server drew, which the page's
+  // tooltips show while the button is hovered or has the focus, in place of the browser's
+  // own `title` and of Leaflet's `aria-label`, which would name it a second time.
+  function nameByTip(button, id) {
+    if (!button || !document.getElementById(id)) {
+      return;
+    }
+    button.removeAttribute("title");
+    button.removeAttribute("aria-label");
+    button.setAttribute("aria-labelledby", id);
+  }
+
+  function tipText(id, fallback) {
+    var tip = document.getElementById(id);
+    return (tip && tip.textContent.trim()) || fallback;
   }
 
   function locateControl(L, map, canvas, corner) {
@@ -7522,11 +7552,9 @@
       onAdd: function () {
         var bar = L.DomUtil.create("div", "leaflet-bar leaflet-control");
         var button = L.DomUtil.create("a", "map-locate", bar);
-        var label = canvas.getAttribute("data-map-locate") || "";
         button.href = "#";
         button.setAttribute("role", "button");
-        button.setAttribute("aria-label", label);
-        button.title = label;
+        nameByTip(button, "map-tip-locate");
         var icon = document.querySelector("template[data-map-locate-icon]");
         if (icon) {
           button.appendChild(icon.content.cloneNode(true));
@@ -7603,20 +7631,25 @@
         minZoom: 1,
         maxZoom: parseInt(canvas.getAttribute("data-map-max-zoom"), 10) || 19,
       });
-      // At the bottom of the start side, above the footer's line (#907): clear of the
-      // heading drawn over the top of the map (#849) and of the list of places at the
-      // end, on the side a reader's eye starts from, and the stylesheet lifts that corner
-      // over the footer and, on a phone, over the closed list.
-      var corner = startCorner(canvas);
-      L.control
+      // At the bottom of the end side, stacked above the footer's line (#909): clear of the
+      // heading and the list of places down the start side, and the stylesheet lifts that
+      // corner over the footer. Each button is named by its tooltip.
+      var corner = endCorner(canvas);
+      var zoom = L.control
         .zoom({
           position: corner,
-          zoomInTitle: canvas.getAttribute("data-map-zoom-in") || "+",
-          zoomOutTitle: canvas.getAttribute("data-map-zoom-out") || "-",
+          zoomInTitle: tipText("map-tip-zoom-in", "+"),
+          zoomOutTitle: tipText("map-tip-zoom-out", "-"),
         })
         .addTo(map);
+      nameByTip(zoom.getContainer().querySelector(".leaflet-control-zoom-in"), "map-tip-zoom-in");
+      nameByTip(zoom.getContainer().querySelector(".leaflet-control-zoom-out"), "map-tip-zoom-out");
       locateControl(L, map, canvas, corner).addTo(map);
       liftCorners(canvas);
+      if (popovers) {
+        // The buttons are new, so their sentences become tooltips only now.
+        readyTooltips();
+      }
       // The credit is the end of the footer's line over the map, written by the server; it
       // is shown now there is a map for it to credit, and Leaflet draws no box of its own.
       var stage = canvas.closest("[data-map-stage]");

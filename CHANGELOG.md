@@ -114,6 +114,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🔧 Changed
 
+- The companies map puts its zoom and Near me buttons, with tooltips, above a compact footer line in the bottom-right corner, its heading without a card or count, the Table button top right and the list of places under the heading (#909)
 - The companies map draws its zoom and Near me buttons at the bottom of the start side, above the footer's line, and on the right on a right-to-left page (#907)
 - Companies are classified by sector, the NACE section, above their industries: the company form narrows by it, and the table, industries page, report and insights group by it; ESCO's NACE links order the suggestions (#897)
 - The companies map credits its tiles and Leaflet at the end of the footer's line over the map, in the same look, instead of in a second box of Leaflet's own (#908)

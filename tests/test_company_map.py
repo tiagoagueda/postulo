@@ -8,6 +8,8 @@ it as data. Where its tiles come from, and what the page's policy then allows, i
 
 from __future__ import annotations
 
+import re
+
 import pytest
 from django.urls import reverse
 
@@ -460,6 +462,61 @@ def test_the_footers_links_are_drawn_once_over_the_map(client, user):
     assert "map-footer" in html
 
 
+def test_the_heading_has_no_card_and_no_count_and_the_table_is_its_own(client, user):
+    """#909: the heading lies on the map with no box and no count of places under it, the
+    way back to the table is at the top of the end side, and the list of places is under
+    the heading, in one column down the start side."""
+    Company.objects.create(owner=user, name="One", location="Lisbon")
+
+    html = page(client, user).content.decode()
+
+    heading = html[html.index("data-map-heading") - 200 : html.index("data-map-heading")]
+    assert "map-overlay" not in heading, "no card around the heading"
+    assert "data-map-count" not in html and "One place" not in html
+    table = html[html.rindex("<a", 0, html.index("data-map-table")) : html.index("data-map-table")]
+    assert "absolute end-3 top-3" in table
+    column = html[html.index("data-map-column") : html.index("data-map-table")]
+    assert column.index("data-map-heading") < column.index("data-map-drawer")
+
+
+def test_the_footer_over_the_map_is_its_compact_line_in_the_end_corner(client, user):
+    """#909: bottom right, never the motto, Source code and Help as icons named by their
+    tooltips, then a dot and the map's credit."""
+    Company.objects.create(owner=user, name="One", location="Lisbon")
+
+    html = page(client, user).content.decode()
+
+    footer = re.search(r"<footer[^>]*map-footer.*?</footer>", html, re.S)[0]
+    assert "absolute end-3 bottom-3" in footer.split(">")[0]
+    assert "data-motto" not in footer
+    assert footer.index("data-powered") < footer.index("data-source") < footer.index("data-help")
+    assert footer.index("data-help") < footer.index('data-icon="dot"') < footer.index(">Leaflet<")
+    for tip, words in (("footer-tip-source", "Source code"), ("footer-tip-help", "Help")):
+        assert f'aria-labelledby="{tip}"' in footer
+        assert f'<span id="{tip}" data-tooltip>{words}</span>' in footer
+    for mark in ("data-source", "data-help"):
+        link = footer[footer.index(mark) : footer.index("</a>", footer.index(mark))]
+        assert "<span" not in link, "the icon alone, no words beside it"
+
+
+def test_the_map_buttons_have_their_tooltips(client, user):
+    Company.objects.create(owner=user, name="One", location="Lisbon")
+
+    html = page(client, user).content.decode()
+
+    for tip, words in (("map-tip-zoom-in", "Zoom in"), ("map-tip-zoom-out", "Zoom out")):
+        assert f'<span id="{tip}" data-tooltip>{words}</span>' in html
+
+
+def test_every_other_page_keeps_the_motto_and_the_words(client, user):
+    client.force_login(user)
+
+    html = client.get(reverse("jobs:company_list")).content.decode()
+
+    assert "data-motto" in html and "footer-tip-source" not in html
+    assert 'title="Help"' in html
+
+
 def test_the_places_are_a_list_that_opens_without_a_script(client, user):
     Company.objects.create(owner=user, name="One", location="Lisbon")
 
@@ -504,7 +561,7 @@ def test_near_me_is_offered_in_the_readers_words(client, user):
 
     html = page(client, user).content.decode()
 
-    assert 'data-map-locate="Near me"' in html
+    assert '<span id="map-tip-locate" data-tooltip>Near me</span>' in html
     assert "data-map-locate-refused=" in html and "data-map-locate-failed=" in html
     assert 'role="status" data-map-status' in html
     assert 'data-icon="locate-fixed"' in html

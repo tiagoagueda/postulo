@@ -2699,23 +2699,40 @@ html {
   min-height: 24rem;
 }
 
-/* What is drawn over the map: the heading, the list of places, the footer's line. Over
+/* What is drawn over the map in a box: the list of places and the footer's line. Over
    Leaflet's own stacking context, which the canvas keeps to itself. */
 .map-overlay {
   @apply rounded-lg border border-ink-200 bg-white/95 shadow-sm dark:border-ink-800 dark:bg-ink-900/95;
   z-index: 1;
 }
 
-/* Leaflet's bottom corners sit above the footer's line, and on a phone above the closed
-   list of places too, so neither covers the zoom and *Near me* buttons, which are at the
-   bottom of the start side (#907). The script measures how far that is and sets
-   --map-corner-lift; these are what stands until it has. The credit is the footer's (#908). */
+/* The heading has no box (#909): its words lie on the map, ringed with the page's own
+   ground so they stay legible over any tile, in either theme. */
+.map-heading {
+  text-shadow:
+    0 0 0.25rem var(--color-background),
+    0 0 0.5rem var(--color-background),
+    0 0 1rem var(--color-background);
+}
+
+/* Leaflet's bottom corners sit above the footer's line, so it never covers the zoom and
+   *Near me* buttons, which are at the bottom of the end side, over the footer (#909). The
+   script measures how far that is and sets --map-corner-lift; these are what stands until
+   it has. The buttons line up with the footer's edge. */
 .map-stage .leaflet-bottom {
-  bottom: var(--map-corner-lift, 6.5rem);
+  bottom: var(--map-corner-lift, 5.5rem);
 
   @media (width >= 40rem) {
-    bottom: var(--map-corner-lift, 4.5rem);
+    bottom: var(--map-corner-lift, 3.5rem);
   }
+}
+
+.map-stage .leaflet-right .leaflet-control {
+  margin-right: 0.75rem;
+}
+
+.map-stage .leaflet-left .leaflet-control {
+  margin-left: 0.75rem;
 }
 
 /* Dark tiles in the dark theme (#849): a raster basemap has no dark style of its own, so

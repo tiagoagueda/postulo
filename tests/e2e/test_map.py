@@ -173,30 +173,40 @@ def test_a_click_on_the_map_places_an_address_by_hand(live_server, page: Page, p
     assert (address.latitude, address.longitude) != (40.64, -8.65)
 
 
-# ------------------------------------------------- the buttons on the start side (#907)
+# ------------------------------------- the buttons and the credit in the end corner (#909)
 
 
-def corner_of_buttons(page: Page) -> dict:
-    """Where the zoom and Near me buttons sit, against the map and the footer's line."""
+def layout(page: Page) -> dict:
+    """Where everything over the map sits, against the map, the footer's line and each other."""
     return page.evaluate(
         """() => {
-          const map = document.querySelector('[data-map]').getBoundingClientRect();
-          const footer = document.querySelector('.map-footer').getBoundingClientRect();
+          const box = (el) => el.getBoundingClientRect();
+          const map = box(document.querySelector('[data-map]'));
+          const footer = box(document.querySelector('.map-footer'));
+          const heading = box(document.querySelector('[data-map-heading]'));
+          const drawer = box(document.querySelector('[data-map-drawer]'));
+          const table = box(document.querySelector('[data-map-table]'));
+          const middle = map.left + map.width / 2;
           const boxes = [...document.querySelectorAll(
-              '.leaflet-control-zoom, .leaflet-control:has(.map-locate)')]
-            .map(el => el.getBoundingClientRect());
+              '.leaflet-control-zoom, .leaflet-control:has(.map-locate)')].map(box);
           return {
             count: boxes.length,
-            start: boxes.every(r => r.left < map.left + map.width / 2),
-            end: boxes.every(r => r.right > map.left + map.width / 2),
+            start: boxes.every(r => r.left < middle),
+            end: boxes.every(r => r.right > middle),
             above_footer: boxes.every(r => r.bottom <= footer.top + 1),
+            footer_end: footer.right > middle && footer.bottom > map.bottom - 24,
+            footer_start: footer.left < middle && footer.bottom > map.bottom - 24,
+            drawer_under_heading: drawer.top >= heading.bottom - 1,
+            drawer_start: drawer.left < middle,
+            table_top_end: table.right > middle && table.top < map.top + 24,
+            heading_clear_of_table: heading.right <= table.left + 1,
           };
         }"""
     )
 
 
 @pytest.mark.parametrize("width", [1280, 390])
-def test_the_buttons_are_at_the_bottom_of_the_start_side_above_the_footer(
+def test_the_buttons_and_credit_are_in_the_end_corner_and_the_list_under_the_heading(
     live_server, page: Page, placed, width
 ):
     watch(page)
@@ -204,12 +214,15 @@ def test_the_buttons_are_at_the_bottom_of_the_start_side_above_the_footer(
     sign_in(page, live_server.url, "/jobs/companies/map/")
     expect(page.locator(".leaflet-control-zoom")).to_be_visible()
 
-    where = corner_of_buttons(page)
-    assert where["count"] == 2 and where["start"] and where["above_footer"], where
-    expect(page.locator(".leaflet-bottom.leaflet-right .leaflet-control")).to_have_count(0)
+    where = layout(page)
+    assert where["count"] == 2 and where["end"] and where["above_footer"], where
+    assert where["footer_end"] and where["table_top_end"] and where["heading_clear_of_table"], where
+    assert where["drawer_under_heading"] and where["drawer_start"], where
+    expect(page.locator(".leaflet-bottom.leaflet-left .leaflet-control")).to_have_count(0)
+    expect(page.locator("[data-map-drawer]")).to_have_js_property("open", width > 640)
 
 
-def test_right_to_left_the_buttons_follow_the_footer_to_the_right(
+def test_right_to_left_the_buttons_follow_the_footer_to_the_left(
     live_server, page: Page, placed, applicant
 ):
     profile = applicant.profile
@@ -220,5 +233,55 @@ def test_right_to_left_the_buttons_follow_the_footer_to_the_right(
     sign_in(page, live_server.url, "/jobs/companies/map/")
     expect(page.locator(".leaflet-control-zoom")).to_be_visible()
 
-    where = corner_of_buttons(page)
-    assert where["count"] == 2 and where["end"] and where["above_footer"], where
+    where = layout(page)
+    assert where["count"] == 2 and where["start"] and where["above_footer"], where
+    assert where["footer_start"], where
+
+
+@pytest.mark.parametrize(
+    ("selector", "words"),
+    [
+        (".leaflet-control-zoom-in", "Zoom in"),
+        (".leaflet-control-zoom-out", "Zoom out"),
+        (".map-locate", "Near me"),
+        (".map-footer [data-source]", "Source code"),
+        (".map-footer [data-help]", "Help"),
+    ],
+)
+def test_each_icon_is_named_by_the_tooltip_it_shows(
+    live_server, page: Page, placed, selector, words
+):
+    """#909: the page's own tooltip on hover, Basecoat's look, and no browser `title`."""
+    watch(page)
+    page.set_viewport_size({"width": 1280, "height": 800})
+    sign_in(page, live_server.url, "/jobs/companies/map/")
+    expect(page.locator(".leaflet-control-zoom")).to_be_visible()
+    control = page.locator(selector)
+    expect(control).to_have_accessible_name(words)
+    assert control.get_attribute("title") is None
+
+    control.hover()
+
+    tip = page.locator("[data-tooltip][popover]:popover-open")
+    expect(tip).to_have_count(1)
+    expect(tip).to_have_text(words)
+
+
+def test_the_footer_over_the_map_has_no_motto_and_no_words_beside_its_icons(
+    live_server, page: Page, placed
+):
+    watch(page)
+    page.set_viewport_size({"width": 1280, "height": 800})
+    sign_in(page, live_server.url, "/jobs/companies/map/")
+    expect(page.locator("[data-map-tile-credit]")).to_be_visible()
+
+    footer = page.locator(".map-footer")
+    expect(footer.locator("[data-motto]")).to_have_count(0)
+    expect(footer.get_by_role("link", name="Powered by Postulo")).to_be_visible()
+    expect(footer.get_by_text("Source code")).to_be_hidden()
+    expect(footer.get_by_text("Help", exact=True)).to_be_hidden()
+    expect(footer.locator('[data-map-tile-credit] [data-icon="dot"]')).to_be_visible()
+    assert page.locator("[data-map-heading]").evaluate(
+        "el => getComputedStyle(el).backgroundColor === 'rgba(0, 0, 0, 0)'"
+        " && getComputedStyle(el).borderTopWidth === '0px'"
+    )
