@@ -278,6 +278,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🐛 Fixed
 
+- The calendar's *Search everything* link carries the words searched for, and a template lint refuses a filter inside translated text (#893)
 - The social-profile and repository service lists draw every mark in one colour: Bluesky, Mastodon and YouTube in black or white as their owners allow, and Codeberg, Facebook and Instagram, whose owners allow no black version, by their icon (#905)
 - A module's icon is centred in its tile on both plugin pages, and the connection pages draw each plugin with the same tile (#901)
 - The calendar's period name is centred on the page in every view, between the step buttons and the views, and its picker opens under it (#900)

@@ -294,18 +294,46 @@ def test_the_compiled_catalogue_loads_and_pluralises(code, compiled):
     assert len(forms) == languages.nplurals(code), f"{code}: plural rule yields {forms}"
     one = catalogue.ngettext("%(counter)s company", "%(counter)s companies", 1)
     many = catalogue.ngettext("%(counter)s company", "%(counter)s companies", 2)
-    assert "%(counter)s" in one and "%(counter)s" in many
+    assert "%(counter)s" in many
+    # The form for one may say "one company" without the figure when it is never used for
+    # another number, which is the rule `scripts/messages.py check` holds a translation to
+    # (#893); where it also counts higher, as in Russian's 21, it must carry it.
+    if TOOL.counts_beyond_one(code)[catalogue.plural(1)]:
+        assert "%(counter)s" in one
+
+
+def sound_translations(catalogue, code: str) -> list:
+    """The plain messages of ``catalogue`` that are translated into other words than the
+    English and that `compile` keeps: a draft with a problem is left out of the .mo."""
+    return [
+        m
+        for m in catalogue.messages.values()
+        if m.translated
+        and m.plural is None
+        and m.context is None
+        and m.msgstr[0] != m.msgid
+        and not TOOL.message_problems(m, code)
+    ]
 
 
 @pytest.mark.parametrize("code", CODES)
 def test_a_started_catalogue_actually_translates(code, compiled, catalogues):
+    """Not one string in particular, which a machine draft may have broken and `compile`
+    left out (#893), but the first of the catalogue's own that it compiles."""
     if code not in started(catalogues):
         pytest.skip(f"{code}: nobody has begun this catalogue yet")
+    probes = sound_translations(catalogues["postulo", code], code)
+    if not probes and languages.primary(code) == "en":
+        # A variety of the source language may rightly say everything as the source does.
+        pytest.skip(f"{code}: English, whose words may all be the source's own")
+    assert probes, f"{code}: begun, but nothing in it would be compiled"
     path = compiled["postulo"] / languages.locale_dir_name(code) / "LC_MESSAGES" / "django.mo"
     with path.open("rb") as handle:
         catalogue = gettext.GNUTranslations(handle)
-    one = catalogue.ngettext("%(counter)s company", "%(counter)s companies", 1)
-    assert one != "%(counter)s company", f"{code}: compiled but translating nothing"
+    probe = probes[0]
+    assert catalogue.gettext(probe.msgid) == probe.msgstr[0], (
+        f"{code}: compiled but translating nothing"
+    )
 
 
 @pytest.mark.parametrize("name", [n for n in NAMES if n != "postulo"])
@@ -355,9 +383,13 @@ def test_the_interface_renders_in_every_language(client, user, code, compiled, c
         return
     with translation.override(code):
         heading = translation.gettext("Applications")
-    assert heading != "Applications" or code in ("nl", "ga", "mt", "sv", "da"), (
-        f"{code}: the applications heading is still English"
-    )
+    # The heading is the catalogue's own word for it wherever it has a sound one. That word
+    # may be "Applications" (Dutch, Swedish, every variety of English), and a catalogue that
+    # has begun need not have reached it yet; how complete each is, is the gate's question
+    # and the release's, not this page's (#893).
+    held = catalogues["postulo", code].messages.get((None, "Applications"))
+    if held is not None and held.translated and not TOOL.message_problems(held, code):
+        assert heading == held.msgstr[0], f"{code}: the page does not read its catalogue"
     assert heading in body
 
 

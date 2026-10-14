@@ -818,6 +818,49 @@ def test_the_count_detector_knows_the_difference():
     )
 
 
+def expressions_in_translated_text(text: str) -> list[int]:
+    """Line numbers of a `blocktranslate` whose text holds more than a bare name.
+
+    Inside the block `{{ }}` takes a name and nothing else: `{{ query|urlencode }}` is not
+    applied but extracted as the placeholder `%(query|urlencode)s`, which no context fills, so
+    the English link went out empty and every translation failed to format (#893). The filter
+    belongs in the tag, `with query_in_address=page.search|urlencode`.
+    """
+    found = []
+    for match in re.finditer(r"\{%-?\s*blocktrans(?:late)?\b.*?-?%\}", text, re.DOTALL):
+        end = text.find("endblocktrans", match.end())
+        body = text[match.end() : end if end != -1 else len(text)]
+        if any(not re.fullmatch(r"\w+", v.strip()) for v in re.findall(r"\{\{(.*?)\}\}", body)):
+            found.append(text.count("\n", 0, match.start()) + 1)
+    return found
+
+
+@pytest.mark.parametrize(
+    "path", TEMPLATES, ids=lambda p: str(p.relative_to(TEMPLATES[0].parents[3]))
+)
+def test_no_translated_text_filters_a_value_in_place(path: Path):
+    lines = expressions_in_translated_text(path.read_text(encoding="utf-8"))
+    assert not lines, (
+        f"{path.name}: a `blocktranslate` filters or looks up a value inside its text at "
+        f"line(s) {lines}; bind it in the tag with `with name=value|filter`"
+    )
+
+
+def test_the_expression_detector_knows_the_difference():
+    assert expressions_in_translated_text(
+        "x\n{% blocktranslate with q=s %}<a href='?q={{ q|urlencode }}'>{% endblocktranslate %}"
+    ) == [2]
+    assert expressions_in_translated_text(
+        "{% blocktranslate %}Hello {{ user.name }}{% endblocktranslate %}"
+    ) == [1]
+    assert (
+        expressions_in_translated_text(
+            "{% blocktranslate with q=s|urlencode %}?q={{ q }} {{ n }}{% endblocktranslate %}"
+        )
+        == []
+    )
+
+
 # htmx is told not to run what a response carries (#823): `allowEval` off refuses `hx-on`, the
 # `js:` prefixes and trigger filters, and `allowScriptTags` off leaves a `<script>` in a swapped
 # fragment alone. The content security policy already forbids both; this keeps the setting and

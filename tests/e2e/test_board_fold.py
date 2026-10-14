@@ -41,7 +41,10 @@ from __future__ import annotations
 import re
 
 import pytest
+from django.utils.translation import gettext, ngettext
 from playwright.sync_api import Browser, Page, expect
+
+from postulo.core import languages
 
 from . import test_accessibility as walks
 from . import test_application_filters as filter_tests
@@ -110,7 +113,18 @@ def label_of(status: str) -> str:
 
 def in_words(count: int) -> str:
     """A count as the page says it: under its title, and of each column to a screen reader."""
-    return f"{count} application" if count == 1 else f"{count} applications"
+    return ngettext("%(total)s application", "%(total)s applications", count) % {"total": count}
+
+
+def heading_named(status: str, does: str) -> str:
+    """What a heading's control is called: its status, and what pressing it does."""
+    return gettext(f"%(status)s: {does}") % {"status": label_of(status)}
+
+
+def in_the_pages_language(page: Page):
+    """The words a page is expected to say, in the language it is drawn in: a page in
+    Arabic says its headings in Arabic once somebody has translated them (#893)."""
+    return languages.override(page.locator("html").get_attribute("lang"))
 
 
 def columns(page: Page) -> dict[str, dict]:
@@ -140,28 +154,30 @@ def folded_to(page: Page, person, status: str, **wanted) -> None:
     expect(page.locator("[data-board-strip]")).to_have_count(len(statuses()) - len(opened))
     drawn = columns(page)
     assert list(drawn) == statuses()
-    for key, column in drawn.items():
-        held = on_the_board(person, **{**wanted, "status": key})
-        if key in opened:
-            does = "show all columns" if len(opened) == 1 else "fold this column"
-            assert not column["strip"] and column["listed"], key
-            assert column["expanded"] == "true", key
-            assert column["name"] == f"{label_of(key)}: {does}"
-            assert column["cards"] == held, key
-        else:
-            does = "show this column too" if opened else "show only this column"
-            assert column["strip"] and not column["listed"], key
-            assert column["expanded"] == "false", key
-            assert column["name"] == f"{label_of(key)}: {does}"
-            assert column["cards"] == [], key
-        assert column["count"] == len(held), (key, column["count"], held)
-        assert column["described"] == in_words(len(held)), (key, column["described"])
-        assert column["controls"], key
+    with in_the_pages_language(page):
+        for key, column in drawn.items():
+            held = on_the_board(person, **{**wanted, "status": key})
+            if key in opened:
+                does = "show all columns" if len(opened) == 1 else "fold this column"
+                assert not column["strip"] and column["listed"], key
+                assert column["expanded"] == "true", key
+                assert column["name"] == heading_named(key, does)
+                assert column["cards"] == held, key
+            else:
+                does = "show this column too" if opened else "show only this column"
+                assert column["strip"] and not column["listed"], key
+                assert column["expanded"] == "false", key
+                assert column["name"] == heading_named(key, does)
+                assert column["cards"] == [], key
+            assert column["count"] == len(held), (key, column["count"], held)
+            assert column["described"] == in_words(len(held)), (key, column["described"])
+            assert column["controls"], key
+        all_columns = gettext("All columns")
     expect(page.locator("#applications-count")).to_contain_text(
         re.compile(rf"^\s*{len(asked(person, **{**wanted, 'status': status}))}\b")
     )
     expect(page.locator("#board-unfold")).to_be_visible()
-    expect(page.locator("#board-unfold")).to_have_text("All columns")
+    expect(page.locator("#board-unfold")).to_have_text(all_columns)
 
 
 def unfolded(page: Page, person, **wanted) -> None:
@@ -170,12 +186,13 @@ def unfolded(page: Page, person, **wanted) -> None:
     expect(page.locator("[data-board-section]")).to_have_count(len(statuses()))
     drawn = columns(page)
     assert list(drawn) == statuses()
-    for key, column in drawn.items():
-        held = on_the_board(person, **{**wanted, "status": key})
-        assert not column["strip"] and column["listed"] and column["expanded"] == "true", key
-        assert column["name"] == f"{label_of(key)}: show only this column"
-        assert column["cards"] == held and column["count"] == len(held), key
-        assert column["described"] == in_words(len(held)), (key, column["described"])
+    with in_the_pages_language(page):
+        for key, column in drawn.items():
+            held = on_the_board(person, **{**wanted, "status": key})
+            assert not column["strip"] and column["listed"] and column["expanded"] == "true", key
+            assert column["name"] == heading_named(key, "show only this column")
+            assert column["cards"] == held and column["count"] == len(held), key
+            assert column["described"] == in_words(len(held)), (key, column["described"])
     expect(page.locator("#applications-count")).to_contain_text(
         re.compile(rf"^\s*{len(asked(person, **wanted))}\b")
     )
@@ -451,7 +468,15 @@ def test_the_focus_ring_of_a_heading_is_not_cut_by_the_boards_box(
             for side, sign in (("left", 1), ("top", 1), ("right", -1), ("bottom", -1)):
                 index = ("left", "top", "right", "bottom").index(side)
                 inside = (ring[index] - drawn[index]) * sign
-                assert inside >= 0, f"{address} {status}: the ring's {side} is cut by {-inside}"
+                # The box scrolls by whole pixels, and a heading as wide as its words is not
+                # one: in Arabic one ended 70.28 pixels from the column's start, and brought
+                # to the edge the least way it stayed 0.28 of a pixel past it (#893). Less
+                # than a pixel along the way the box scrolls is that, not a ring drawn
+                # outside its control, which is two pixels out.
+                slack = 1 if side in ("left", "right") else 0
+                assert inside > -slack or inside >= 0, (
+                    f"{address} {status}: the ring's {side} is cut by {-inside}"
+                )
                 assert (ring[index] - screen[index]) * sign >= 0, (address, status, side)
 
 

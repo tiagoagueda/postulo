@@ -94,7 +94,9 @@ def test_the_calendar_narrows_the_period_shown_and_says_so(client, user):
     assert 'aria-label="Search the calendar"' in masthead_search(html)
     note = re.search(r"<p[^>]*data-search-note>.*?</p>", html, re.S)[0]
     assert "September 2026" in note and "aperture" in note
-    assert reverse("core:search") in note
+    # The words go with the link, not just the address: a filter written inside the
+    # translated text was extracted as a placeholder and sent `?q=` out empty (#893).
+    assert f'href="{reverse("core:search")}?q=aperture"' in note
 
 
 def test_the_search_travels_through_the_period_the_views_and_the_days(client, user):

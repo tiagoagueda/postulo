@@ -5,14 +5,19 @@ Postulo offers no right-to-left language yet, and that is exactly why this exist
 page ever rendered, so what the interface did under ``rtl`` was unknown rather than
 known-good. #70 brings Arabic; this is the work that has to be true before it arrives.
 
-The pseudo-locale is a real language tag on a profile with no catalogue behind it. The
-words stay English, which makes the layout easier to judge rather than harder: what is
-being checked is which edge things sit against, and reading the labels while you check is
-a help.
+The account reads Postulo in Arabic, whose catalogue Weblate fills: what is checked is
+which edge things sit against, whatever the words are. A control is found by its name in
+the language the page is drawn in, which is English for a string nobody has translated yet
+and Arabic for one somebody has (#893).
 """
 
+import json
+
 import pytest
+from django.utils.translation import gettext
 from playwright.sync_api import Page, expect
+
+from postulo.core import languages
 
 from .test_accessibility import (  # noqa: F401
     axe_source,
@@ -39,9 +44,15 @@ PAGES = (
 )
 
 
+def said(text: str) -> str:
+    """``text`` as the right-to-left page says it."""
+    with languages.override("ar"):
+        return gettext(text)
+
+
 @pytest.fixture
 def right_to_left(furnished):  # noqa: F811
-    """The signed-in account reads Postulo in Arabic. No catalogue; the words stay English."""
+    """The signed-in account reads Postulo in Arabic."""
     profile = furnished["applicant"].profile
     profile.language = "ar"
     profile.save(update_fields=["language"])
@@ -81,8 +92,8 @@ def test_the_action_group_moves_to_the_other_end(live_server, page: Page, right_
     sign_in(page, base)
     page.goto(f"{base}/applications/?view=board")
 
-    heading = page.get_by_role("heading", name="Applications").bounding_box()
-    action = page.get_by_role("link", name="Record an application").bounding_box()
+    heading = page.get_by_role("heading", name=said("Applications")).bounding_box()
+    action = page.get_by_role("link", name=said("Record an application")).bounding_box()
 
     assert action["x"] < heading["x"], "the actions should sit at the reading-end edge"
 
@@ -111,7 +122,7 @@ def test_the_skip_link_lands_on_the_reading_edge(live_server, page: Page, right_
     page.goto(f"{base}/applications/")
     page.keyboard.press("Tab")
 
-    skip = page.get_by_role("link", name="Skip to content")
+    skip = page.get_by_role("link", name=said("Skip to content"))
     expect(skip).to_be_focused()
     box = skip.bounding_box()
     width = page.viewport_size["width"]
@@ -165,9 +176,12 @@ def test_a_menu_opens_from_its_triggers_reading_end(
     sign_in(page, base)
     page.goto(f"{base}/")
 
-    trigger = page.get_by_label("Account menu", exact=False)
+    name = right_to_left["applicant"].display_name
+    label = said("Account menu, %(name)s") % {"name": name}
+    trigger = page.get_by_label(label, exact=True)
     trigger.click()
-    panel = page.locator("header [data-menu]:has([aria-label^='Account menu']) > [popover]")
+    quoted = json.dumps(label, ensure_ascii=False)
+    panel = page.locator(f"header [data-menu]:has([aria-label={quoted}]) > [popover]")
     expect(panel).to_be_visible()
     box = panel.bounding_box()
     from_ = trigger.bounding_box()

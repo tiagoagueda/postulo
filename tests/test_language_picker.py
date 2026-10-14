@@ -21,6 +21,9 @@ import re
 
 import pytest
 from django.urls import reverse
+from django.utils import translation
+
+from postulo.core import languages
 
 pytestmark = pytest.mark.django_db
 
@@ -33,6 +36,21 @@ def page(client, user):
 
 def between(html: str, start: str, end: str) -> str:
     return html.split(start)[1].split(end)[0]
+
+
+def default_words(html: str) -> str:
+    """What the default's sentence says beside the name and tag, in the page's own language.
+
+    The words are the interface's, not the default language's, and German translates them
+    ("Standard"); reading them from the catalogue the page was drawn in keeps these tests
+    about where the words go, not about which languages are still untranslated (#893).
+    """
+    language = re.search(r'<html lang="([^"]+)"', html)[1]
+    with languages.override(language):
+        sentence = translation.pgettext(
+            "names the language used when nothing was chosen", "%(name)s %(tag)s — Default"
+        )
+    return " ".join(re.sub(r"%\(\w+\)s", " ", sentence).split())
 
 
 def picker(html: str) -> str:
@@ -252,7 +270,7 @@ def test_the_first_row_names_the_instance_default_in_itself(client, user):
     assert '<bdi dir="ltr" aria-hidden="true"' in row and ">de</bdi>" in row
     # The word and its dash follow, in the interface language and outside the name's span.
     after = row.split("</bdi>")[1]
-    assert "— Default" in after and "lang=" not in after
+    assert default_words(html) in after and "lang=" not in after
     assert "checked" in row, "nothing stored, so the row is the one chosen"
 
 
@@ -262,7 +280,7 @@ def test_the_closed_summary_says_the_same(client, user):
     html = client.get(reverse("settings:locale")).content.decode()
 
     summary = between(html, "<summary", "</summary>")
-    assert '<span lang="de">Deutsch</span>' in summary and "Default" in summary
+    assert '<span lang="de">Deutsch</span>' in summary and default_words(html) in summary
 
 
 def test_a_default_with_a_region_keeps_it_and_one_with_no_flag_closes_up(client, user):

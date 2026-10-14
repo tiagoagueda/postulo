@@ -211,9 +211,9 @@
   {% if page.search %}
     <p class="mb-4 text-sm text-ink-600 dark:text-ink-300" data-search-note>
       {% url 'core:search' as everything_url %}
-      {% blocktranslate trimmed with period=page.title query=page.search %}
+      {% blocktranslate trimmed with period=page.title query=page.search query_in_address=page.search|urlencode %}
         Showing what matches “{{ query }}” in {{ period }}.
-        <a href="{{ everything_url }}?q={{ query|urlencode }}" class="underline">Search everything</a>
+        <a href="{{ everything_url }}?q={{ query_in_address }}" class="underline">Search everything</a>
       {% endblocktranslate %}
       · <a href="{{ page.unsearched }}" class="underline">{% translate "Clear the search" %}</a>
     </p>
