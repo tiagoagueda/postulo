@@ -135,14 +135,20 @@ def test_weblates_spelling_of_the_plural_rule_is_the_same_rule(tool):
 
 
 def test_approving_in_weblate_makes_a_draft_reviewed(tool):
-    """The review step, end to end: the flag Weblate clears is the one the counts read."""
-    path = tool.po_path("fr-FR")
-    original = path.read_bytes()
-    before = tool.stats_for(tool.parse(original.decode("utf-8")))
-    after = tool.stats_for(
-        tool.parse(weblate_save(original, "fr-FR", approve=True).decode("utf-8"))
-    )
-    assert before["drafts"], "the sample has drafts to approve"
+    """The review step, end to end: the flag Weblate clears is the one the counts read.
+
+    Any catalogue that still holds a draft will do. Which ones do changes as speakers review
+    (fr-FR, the sample this used to read, has none left), so the test looks for one rather
+    than naming it.
+    """
+    for code in [*SAMPLES, *tool.translated_languages()]:
+        original = tool.po_path(code).read_bytes()
+        before = tool.stats_for(tool.parse(original.decode("utf-8")))
+        if before["drafts"]:
+            break
+    else:
+        pytest.skip("no catalogue holds a draft to approve")
+    after = tool.stats_for(tool.parse(weblate_save(original, code, approve=True).decode("utf-8")))
     # Every draft approved. The save also drafts one empty slot by machine, when there is
     # one -- whether there is depends on how far Weblate has got, which is not this test's.
     added = after["translated"] - before["translated"]
