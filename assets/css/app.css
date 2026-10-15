@@ -127,6 +127,16 @@
 @source not "../../src/postulo/static/css";
 
 /*
+ * Nor the translation catalogues. Their text is what translators write in Weblate, and the
+ * scanner read it as candidate classes: a translation holding the word "italic" put an
+ * `.italic` rule in this file, and the Weblate pull request failed CI for a stylesheet nobody
+ * had touched (#893). Every class the interface uses is written in a template or in Python;
+ * none comes from a translation.
+ */
+@source not "../../src/postulo/locale";
+@source not "../../src/postulo/plugins/*/locale";
+
+/*
  * Dark mode has three states. An explicit profile preference stamps data-theme on the
  * root element and wins outright; with nothing stamped, the operating system decides.
  * Both branches feed the same `dark:` variant, so no rule has to know which applied.
