@@ -1005,3 +1005,31 @@ def test_a_kept_file_swapped_on_the_disk_cannot_unpack_without_end(client, kept,
 
     assert page.status_code == 200 and "data-source-unreadable" in page.content.decode()
     assert download.status_code == 404
+
+
+def test_the_answer_to_a_rendering_is_narrowed_for_a_token_that_only_sends_pages(client, user):
+    """`GET /captures` already blanks the address, company and location for a captures-only
+    token (#761); the answer to sending a rendering, 201 and 200 alike, said all of it (#950)."""
+    keep_everything(user)
+    capture = a_capture(user, source_name="Evil Board")
+
+    for expected in (201, 200):
+        response = put(client, capture.pk, **issue(user, "captures"))
+        assert response.status_code == expected
+        row = response.json()
+        for hidden in ("url", "company_name", "location", "source"):
+            assert row[hidden] == "", (expected, hidden)
+        assert "Evil" not in json.dumps(row) and "example.org/j/7" not in json.dumps(row)
+        assert row["title"] == "A role" and f"/captures/{capture.pk}/" in row["review_url"]
+
+
+def test_the_answer_to_a_rendering_is_whole_for_a_token_that_also_reads(client, user):
+    keep_everything(user)
+    capture = a_capture(user, source_name="Evil Board")
+
+    for expected in (201, 200):
+        response = put(client, capture.pk, **issue(user, "captures", "read"))
+        assert response.status_code == expected
+        row = response.json()
+        assert row["url"] == "https://example.org/j/7" and row["company_name"] == "Evil Corp"
+        assert row["source"] == "Evil Board"
