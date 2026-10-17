@@ -1437,3 +1437,79 @@ def test_a_worker_killed_mid_install_leaves_everything_as_it_was(
         if item.name != ".record.lock"
     )
     assert after_files == before_files, "the directory, `.previous` included, is as it was"
+
+
+# ----------------------------------------------------------------- SEC2: #968, #969
+
+
+def test_a_wheel_named_like_a_plugin_that_ships_inside_postulo_is_refused(tmp_path):
+    """It would take the built-in's policy rows, access rules and connections (#968)."""
+    wheel = a_wheel(
+        tmp_path,
+        entry_points=("[postulo.notifiers]\nwebhook = postulo_example:Notifier\n",),
+    )
+
+    with pytest.raises(InstallError, match="ships inside Postulo"):
+        installing.check(installing.read_wheel(wheel))
+
+
+def test_a_wheel_with_a_name_of_its_own_is_still_accepted(tmp_path):
+    wheel = a_wheel(
+        tmp_path,
+        entry_points=("[postulo.notifiers]\nsomething-else = postulo_example:Notifier\n",),
+    )
+
+    installing.check(installing.read_wheel(wheel))
+
+
+def test_a_metadata_member_that_inflates_far_past_any_plugins_is_not_read(tmp_path, monkeypatch):
+    """A deflate bomb is refused on the directory's word, before it is inflated (#969)."""
+    wheel = tmp_path / "postulo_bomb-1.0-py3-none-any.whl"
+    with zipfile.ZipFile(wheel, "w", compression=zipfile.ZIP_DEFLATED) as archive:
+        archive.writestr(
+            "postulo_bomb-1.0.dist-info/METADATA",
+            "Name: postulo-bomb\nVersion: 1.0\n\n" + "A" * (installing.MAX_METADATA_BYTES + 1),
+        )
+    assert wheel.stat().st_size < 10_000, "it is a small file that claims to be large"
+    opened = []
+    real = zipfile.ZipFile.open
+    monkeypatch.setattr(
+        zipfile.ZipFile, "open", lambda self, *a, **kw: opened.append(a) or real(self, *a, **kw)
+    )
+
+    with pytest.raises(InstallError, match="far larger"):
+        installing.read_wheel(wheel)
+    assert not opened, "refused on the directory's word, without inflating"
+
+
+def test_a_member_that_fails_its_checksum_is_a_refusal_not_a_traceback(tmp_path, monkeypatch):
+    wheel = a_wheel(tmp_path)
+    real = zipfile.ZipFile.getinfo
+
+    def lying(self, name):
+        info = real(self, name)
+        info.CRC ^= 1
+        return info
+
+    monkeypatch.setattr(zipfile.ZipFile, "getinfo", lying)
+    with pytest.raises(InstallError, match="damaged"):
+        installing.read_wheel(wheel)
+
+
+def test_an_encrypted_member_and_a_wheel_of_thousands_of_members_are_refused(tmp_path, monkeypatch):
+    wheel = a_wheel(tmp_path)
+    monkeypatch.setattr(installing, "MAX_WHEEL_MEMBERS", 2)
+    with pytest.raises(InstallError, match="far more files"):
+        installing.read_wheel(wheel)
+    monkeypatch.undo()
+
+    real = zipfile.ZipFile.getinfo
+
+    def encrypted(self, name):
+        info = real(self, name)
+        info.flag_bits |= 0x1
+        return info
+
+    monkeypatch.setattr(zipfile.ZipFile, "getinfo", encrypted)
+    with pytest.raises(InstallError, match="encrypted"):
+        installing.read_wheel(wheel)

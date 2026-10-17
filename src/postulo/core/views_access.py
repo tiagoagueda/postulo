@@ -71,6 +71,15 @@ class GroupsView(StaffRequiredMixin, View):
         group = get_object_or_404(Group, pk=request.POST.get("group", "0") or 0)
         from . import groups as lifecycle
 
+        if not request.user.is_superuser and PluginAccess.objects.filter(group=group).exists():
+            # A group an access rule names is part of that rule (#967): who is in it, what
+            # it is called and whether it exists decide what the people in it may do.
+            messages.error(
+                request,
+                _("Only the operator may change a group that a plugin's access rules name."),
+            )
+            return redirect("server:groups")
+
         if action == "delete":
             # Refused while it owns records (#896); its members keep copies of what was
             # shared with it that their own data points at.
@@ -104,6 +113,27 @@ class GroupsView(StaffRequiredMixin, View):
         else:
             raise Http404
         return redirect("server:groups")
+
+
+def _is_about_me(user, *, person_id=None, group_id=None) -> bool:
+    """Whether a rule's subject is this administrator or a group they belong to (#967).
+
+    The operator (a superuser) is never held to it. Any other administrator is not to
+    write or lift the rules that decide what they themselves may do, or change who is in
+    a group such a rule names: the restriction would be theirs to undo.
+    """
+    if user.is_superuser:
+        return False
+    if person_id is not None and person_id == user.pk:
+        return True
+    return group_id is not None and user.groups.filter(pk=group_id).exists()
+
+
+def _refuse_own_rule(request: HttpRequest) -> None:
+    messages.error(
+        request,
+        _("Only the operator may change a rule about your own account or one of your groups."),
+    )
 
 
 def _governed(name: str):
@@ -177,6 +207,9 @@ class PluginAccessView(StaffRequiredMixin, View):
 
     def _save(self, request: HttpRequest, name: str) -> None:
         for rule in PluginAccess.objects.filter(plugin=name):
+            if _is_about_me(request.user, person_id=rule.person_id, group_id=rule.group_id):
+                _refuse_own_rule(request)
+                continue
             if f"remove-{rule.pk}" in request.POST:
                 rule.delete()
                 continue
@@ -198,6 +231,13 @@ class PluginAccessView(StaffRequiredMixin, View):
         target = next(iter(subject.values()), None)
         if target is None:
             messages.error(request, _("Choose a group or an account."))
+            return
+        if _is_about_me(
+            request.user,
+            person_id=getattr(target, "pk", None) if "person" in subject else None,
+            group_id=target.pk if "group" in subject else None,
+        ):
+            _refuse_own_rule(request)
             return
         rule, made = PluginAccess.objects.get_or_create(plugin=name, **subject)
         rule.may_use = "use" in request.POST
