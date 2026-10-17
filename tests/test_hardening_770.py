@@ -123,3 +123,18 @@ def test_the_update_check_does_not_keep_a_release_address_that_runs_script(monke
         updates.check()
 
         assert updates.status().get("url", kept) == kept
+
+
+@pytest.mark.parametrize("address", [SCRIPT, "data:text/html,x", "file:///etc/hosts"])
+def test_the_plugin_surfaces_link_writer_stores_no_script_address(user, address):
+    """The door #770's walk did not reach: `save_web_link`, which a plugin hands
+    a card's URL (#991)."""
+    from django.core.exceptions import ValidationError
+
+    from postulo.plugins import api
+
+    company = Company.objects.create(owner=user, name="Aperture")
+    contact = Contact.objects.create(owner=user, company=company, name="Alex")
+    with pytest.raises(ValidationError):
+        api.save_web_link(contact, user, WebLink.Kind.WEBSITE, address)
+    assert not WebLink.objects.filter(owner=user).exists()

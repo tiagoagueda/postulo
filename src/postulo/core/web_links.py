@@ -290,9 +290,20 @@ def save_only_link(holder, owner, kind: str, typed: str) -> WebLink | None:
 
     **One box has no choice of service**, so the address says it (#305): a new address is
     read as one pasted with nothing chosen, and takes the service whose host it is on, or
-    *Other*. That can refuse nothing. An address left as it was keeps what it had.
+    *Other*. That step refuses nothing; the address itself is held to `addresses.web_address`
+    first (#991), so a `javascript:` or `data:` address is never stored, whichever caller --
+    the importer, a card read by a plugin -- hands it over. An address left as it was keeps
+    what it had.
+
+    Raises `ValidationError` (code ``address``) for anything that is not a complete http(s)
+    address.
     """
     typed = (typed or "").strip()
+    if typed:
+        try:
+            typed = addresses.web_address(typed)
+        except ValueError as error:
+            raise ValidationError(str(error), code="address") from error
     primary = primary_for(holder, kind)
     if not typed:
         if primary is not None:
