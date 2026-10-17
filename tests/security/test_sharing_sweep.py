@@ -7,7 +7,7 @@ with this one, and then every address is tried.
 
 * **read** addresses answer a read-only grant: the record's page, its cards and files, and
   what a person keeps of their own on it -- their decision about a listing, their history of
-  it, their application;
+  it, their application, the contacts they add at a company;
 * **write** addresses change the record's details, and need a read/write grant;
 * **manage** addresses delete it, merge it or give it away, and no grant reaches them: they
   are its owner's, or every member's of the group that owns it;

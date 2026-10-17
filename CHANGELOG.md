@@ -8,6 +8,11 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🔒 Security
 
+- The account archive carries only the exporter's own appointments at a shared or group-owned company, and its count matches the file (#966)
+- A company page, a company table and the group count name a parent or child company only to people who can see it, and a company cannot be put under one whose audience could not see it (#957)
+- A delete confirmation counts only the reader's own applications, meetings, history and documents, and a reader who cannot delete is neither offered the dialog nor sent its counts (#958)
+- The company merge preview names only the viewer's own appointments (#973)
+- The threat model says that the contacts a person adds at a shared company stay theirs (#955)
 - Companies, contacts and listings may be a group's or shared read-only or read/write, under an amended promise: nobody sees another's data unless granted, and a superuser sees any of those three but never anyone's notes, applications or documents (#896)
 - On a pull request the CI caches are restored by their exact key and never by a prefix, so a run of somebody else's code cannot read what a run on main restores or leave behind a poisoned fallback (#827)
 - The isolation sweep now asks the owner's own record to get past the lookup (and fixes the five entries that never did), checks every download it reaches for no-store, and a ratchet test fails on a new query of an owned model with no for_user or owner (#825)
