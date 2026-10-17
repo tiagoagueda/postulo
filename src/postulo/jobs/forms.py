@@ -16,7 +16,7 @@ from postulo.core import phone_field, phone_numbers, phones, slugs, web_links
 from postulo.core.formsets import RowsAlreadyGone
 from postulo.core.identifiers import IdentifierRow, OneOfEachKind, SchemeSelect, offering
 
-from . import employment_services, esco, identifiers, industries, logos, structure
+from . import company_names, employment_services, esco, identifiers, industries, logos, structure
 from .models import (
     Company,
     CompanyIdentifier,
@@ -489,12 +489,7 @@ class CompanyForm(OwnNoteForm):
                 data["name"] = service.name
                 # The registry's name may clash with one the person already has, and
                 # `clean_name` ran on a blank; the same refusal, in the same words.
-                clash = Company.objects.owned_by(self.principal()).filter(
-                    name_key=slugs.name_key(service.name)
-                )
-                if self.instance.pk:
-                    clash = clash.exclude(pk=self.instance.pk)
-                if clash.exists():
+                if self.name_clashes(service.name):
                     self.add_error("name", _("You already have a company with that name."))
             if not data.get("website"):
                 data["website"] = service.website
@@ -512,12 +507,28 @@ class CompanyForm(OwnNoteForm):
         name = self.cleaned_data["name"].strip()
         if self.user is None:
             return name
-        clash = Company.objects.owned_by(self.principal()).filter(name_key=slugs.name_key(name))
-        if self.instance.pk:
-            clash = clash.exclude(pk=self.instance.pk)
-        if clash.exists():
+        if self.name_clashes(name):
             raise forms.ValidationError(_("You already have a company with that name."))
         return name
+
+    def name_clashes(self, name: str) -> bool:
+        """Whether the owner holds another company by ``name``.
+
+        Somebody renaming a company shared with them is asking about its owner's other
+        companies, so the answer is bounded, and a spent allowance is refused in its own
+        words instead of either answer (#949).
+        """
+        from postulo.core import throttle
+
+        try:
+            return company_names.clashes(
+                self.user,
+                self.principal(),
+                name,
+                company=self.instance if self.instance.pk else None,
+            )
+        except throttle.TooOften as too_often:
+            raise forms.ValidationError(str(too_often)) from too_often
 
     def principal(self):
         """Whose companies a name must not repeat: the company's owner, a person or a group

@@ -522,6 +522,10 @@ POSTULO_TEXT_PER_NUMBER_RATE = env("POSTULO_TEXT_PER_NUMBER_RATE", default="3/h"
 # URL, so this is deliberately low: an administrator helping people back in one at a time
 # never notices it, and a compromised administrator session cannot mint fifty (#103).
 POSTULO_RECOVERY_RATE = env("POSTULO_RECOVERY_RATE", default="10/h")
+# How often one account may be told that a company of its owner's already has a name, when the
+# company is shared with it and not its own (#949). Renaming a shared company asks about the
+# owner's other companies; the answer is kept, as telephone numbers' is (#758), but bounded.
+POSTULO_COMPANY_NAME_RATE = env("POSTULO_COMPANY_NAME_RATE", default="20/h")
 # Usernames one account may try to change to in an hour (#745). Each attempt that names a
 # taken username says so, which is how a name is found out; the sign-up form is bounded by
 # allauth's per-address limit and cannot be bounded per account, there being none yet.

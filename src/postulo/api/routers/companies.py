@@ -8,8 +8,7 @@ from ninja.errors import HttpError
 from ninja.pagination import paginate
 
 from postulo.applications.services import get_or_create_company
-from postulo.core import slugs
-from postulo.jobs import identifiers
+from postulo.jobs import company_names, identifiers
 from postulo.jobs.models import Company, CompanyKind, Contact, Industry, JobPosting
 
 from ..auth import scope
@@ -206,8 +205,8 @@ def _name_or_refusal(request, company: Company, name: str) -> str:
     if not name:
         raise HttpError(422, _("This field is required."))
     # Among the company's own owner's (#896): a person's or a group's.
-    clash = Company.objects.owned_by(company.principal).filter(name_key=slugs.name_key(name))
-    if clash.exclude(pk=company.pk).exists():
+    # A grantee asking is bounded and, once spent, answered alike (#949): `TooOften` is a 429.
+    if company_names.clashes(request.auth.owner, company.principal, name, company=company):
         raise HttpError(422, _("You already have a company with that name."))
     return name
 
