@@ -20,6 +20,7 @@ import django
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import get_user_model
+from django.core.exceptions import PermissionDenied
 from django.core.mail import send_mail
 from django.db import connection, transaction
 from django.http import HttpRequest, HttpResponse
@@ -57,6 +58,51 @@ logger = logging.getLogger(__name__)
 
 class ServerIndexView(StaffRequiredMixin, RedirectView):
     pattern_name = "server:overview"
+
+
+class PluginSettingsMixin:
+    """Hold a plugin's settings page to the access list's "may change its settings" (#967).
+
+    The Settings button on *Plugins* is drawn disabled for an administrator a rule excludes,
+    but a button is only the interface: the page behind it has to refuse as well. The plugins
+    the page belongs to are read off the manifests (`settings=` names this page's URL name),
+    so a future plugin's page is covered by naming it here and nothing else. A page two
+    plugins share (mail: the sender and the SMTP transport) is refused if either rule says
+    no, because the form changes both.
+
+    Put before `StaffRequiredMixin` in the bases, so a person who is not an administrator is
+    still turned away by that one first.
+    """
+
+    #: The URL name the manifests give as `settings=`, e.g. ``"server:maps"``.
+    settings_page: str = ""
+
+    def dispatch(self, request, *args, **kwargs):
+        if request.user.is_authenticated and request.user.is_staff and self.settings_page:
+            from postulo.plugins import policy
+
+            if not all(
+                policy.may_change_settings(request.user, name)
+                for name in settings_page_plugins(self.settings_page)
+            ):
+                raise PermissionDenied
+        return super().dispatch(request, *args, **kwargs)
+
+
+def settings_page_plugins(page: str) -> list[str]:
+    """The names of the plugins whose manifest says their settings are at the URL name `page`."""
+    from postulo.plugins import base, policy
+    from postulo.plugins.registry import plugins
+
+    names = []
+    for kind in (*policy.GOVERNED_KINDS, *policy.UNGOVERNED_KINDS):
+        for plugin in plugins(kind):
+            if page in (
+                base.manifest_of(plugin).settings,
+                getattr(plugin, "settings_url_name", ""),
+            ):
+                names.append(plugin.name)
+    return names
 
 
 class ServerSectionMixin(StaffRequiredMixin):
@@ -626,12 +672,14 @@ class CaptureView(PolicyView):
         return context
 
 
-class MapsView(PolicyView):
+class MapsView(PluginSettingsMixin, PolicyView):
     """Where the companies' map takes its tiles, and what the choice tells whom (#898).
 
     Reached from the Maps plugin's *Settings* under Plugins rather than from a section of its
     own: it is that plugin's setting, and with the plugin off there is no map to draw.
     """
+
+    settings_page = "server:maps"
 
     form_class = MapsForm
     template_name = "server/maps.html"
@@ -696,10 +744,12 @@ class DefaultsView(PolicyView):
         return redirect("server:defaults")
 
 
-class DataProtectionView(PolicyView):
+class DataProtectionView(PluginSettingsMixin, PolicyView):
     """How long the instance keeps records about other people, and in whose words it says
     so — with the dry run that shows what the policy would touch before anything is asked
     to go (#297)."""
+
+    settings_page = "server:data_protection"
 
     form_class = GdprForm
     template_name = "server/data_protection.html"
@@ -793,8 +843,10 @@ def _mailer_summary() -> dict:
     }
 
 
-class EmailView(PolicyView):
+class EmailView(PluginSettingsMixin, PolicyView):
     """The email settings, and the two ways of proving them."""
+
+    settings_page = "server:email"
 
     form_class = EmailForm
     template_name = "server/email.html"
@@ -867,7 +919,7 @@ class EmailView(PolicyView):
 
 
 @method_decorator(transaction.non_atomic_requests, name="dispatch")
-class EmailConnectionTestView(StaffRequiredMixin, View):
+class EmailConnectionTestView(PluginSettingsMixin, StaffRequiredMixin, View):
     """Open a connection with what is on screen, and hang up without sending anything.
 
     Out of the request's transaction (#357): it waits on a mail server and writes nothing
@@ -881,6 +933,8 @@ class EmailConnectionTestView(StaffRequiredMixin, View):
     is not up yet, and refusing to record what somebody typed because a machine elsewhere is
     down is rarely the right answer.
     """
+
+    settings_page = "server:email"
 
     def post(self, request: HttpRequest) -> HttpResponse:
         from . import mail
@@ -954,12 +1008,14 @@ class EmailConnectionTestView(StaffRequiredMixin, View):
         return redirect("server:email")
 
 
-class EmailConsentView(StaffRequiredMixin, View):
+class EmailConsentView(PluginSettingsMixin, StaffRequiredMixin, View):
     """Sign in to the mail provider once, as the mailbox this instance sends from (#151).
 
     A POST rather than a link, because it starts a round trip that ends in a stored
     credential -- and this one sends the password resets.
     """
+
+    settings_page = "server:email"
 
     def post(self, request: HttpRequest) -> HttpResponse:
         from . import mail_auth
@@ -983,11 +1039,13 @@ class EmailConsentView(StaffRequiredMixin, View):
 
 
 @method_decorator(transaction.non_atomic_requests, name="dispatch")
-class EmailTestView(StaffRequiredMixin, View):
+class EmailTestView(PluginSettingsMixin, StaffRequiredMixin, View):
     """Send one message, so a configuration can be proven before anyone depends on it.
 
     Out of the request's transaction (#357), like the connection test beside it.
     """
+
+    settings_page = "server:email"
 
     def post(self, request: HttpRequest) -> HttpResponse:
         form = TestEmailForm(request.POST)
@@ -1140,7 +1198,7 @@ class PluginsView(ServerSectionMixin, TemplateView):
         return context
 
 
-class IdentifierSchemesView(PolicyView):
+class IdentifierSchemesView(PluginSettingsMixin, PolicyView):
     """The identifier schemes this instance defines for itself: the registry's settings (#311).
 
     One form, one box of JSON, drawn in two places. On *Plugins* it is in a dialog, which
@@ -1163,6 +1221,8 @@ class IdentifierSchemesView(PolicyView):
 
     Administrators only, as every page of *Server settings* is (`StaffRequiredMixin`).
     """
+
+    settings_page = "server:identifier_schemes"
 
     form_class = IdentifierSchemesForm
     template_name = "server/identifier_schemes.html"

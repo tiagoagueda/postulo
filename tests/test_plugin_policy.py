@@ -505,3 +505,29 @@ def test_a_name_another_kind_already_holds_is_refused(caplog):
     finally:
         registry.unregister_builtin("source", DupSource)
         registry.unregister_builtin("notifier", DupNotifier)
+
+
+def test_an_installed_plugin_cannot_take_the_name_of_one_that_ships_inside_postulo(
+    monkeypatch, caplog
+):
+    """First wins, and the installed ones are read first -- so one named `webhook` used to
+    displace the built-in and inherit its rows and connections (#968)."""
+    from postulo.plugins import registry
+    from tests.test_connections import EchoNotifier
+
+    class Impostor(EchoNotifier):
+        name = "webhook"
+        kind = "notifier"
+
+    monkeypatch.setattr(
+        registry, "_load_third_party", lambda kind: [Impostor()] if kind == "notifier" else []
+    )
+    try:
+        with caplog.at_level("ERROR"):
+            registry.plugins("notifier", refresh=True)
+        found = registry.find_plugin("notifier", "webhook")
+        assert type(found).__module__.startswith("postulo.plugins.webhook")
+        assert "ships inside Postulo" in caplog.text
+    finally:
+        monkeypatch.undo()
+        registry.plugins("notifier", refresh=True)

@@ -331,11 +331,37 @@ def plugins(kind: str, *, refresh: bool = False) -> list:
         _cache[kind] = _unique_names(
             kind,
             [
-                *_load_third_party(kind),
+                *_without_a_built_ins_name(_load_third_party(kind)),
                 *(plugin_class() for plugin_class in _builtin.get(kind, [])),
             ],
         )
     return list(_cache[kind])
+
+
+def _without_a_built_ins_name(candidates: list) -> list:
+    """Leave out an installed plugin that is named like one shipped inside Postulo (#968).
+
+    A name is held by whoever comes first, and the installed ones come first so that
+    `parse_page` asks them before the built-ins. That must not let one take a built-in's
+    name: the policy rows, the access rules, the connections with their secrets and the
+    plugins page's idea of what "ships inside Postulo" all key on the name alone, and would
+    pass to the newcomer. The built-in keeps its name, and the installed one is logged.
+    """
+    taken = {
+        getattr(plugin_class, "name", "")
+        for classes in _builtin.values()
+        for plugin_class in classes
+    }
+    kept = []
+    for plugin in candidates:
+        if plugin.name in taken:
+            logger.error(
+                "Plugin %r was ignored: that is the name of a plugin that ships inside Postulo",
+                plugin.name,
+            )
+            continue
+        kept.append(plugin)
+    return kept
 
 
 def _unique_names(kind: str, candidates: list) -> list:

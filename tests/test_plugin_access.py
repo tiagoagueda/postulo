@@ -211,3 +211,125 @@ def test_groups_are_made_filled_renamed_and_deleted(client, admin_user, user):
     assert Group.objects.count() == 1, "a name is not made twice"
     client.post(url, {"action": "delete", "group": group.pk})
     assert not Group.objects.exists()
+
+
+# ------------------------------------------- the page behind the button (#967)
+
+SETTINGS_PAGES = [
+    ("maps", "server:maps"),
+    ("gdpr", "server:data_protection"),
+    ("email", "server:email"),
+    ("identifiers", "server:identifier_schemes"),
+]
+
+
+@pytest.mark.parametrize(("plugin", "page"), SETTINGS_PAGES)
+def test_a_settings_page_refuses_an_administrator_a_rule_excludes(client, plugin, page):
+    other = staff()
+    PluginAccess.objects.create(plugin=plugin, person=other, may_change_settings=False)
+    client.force_login(other)
+
+    assert client.get(reverse(page)).status_code == 403
+    assert client.post(reverse(page), {}).status_code == 403
+
+
+def test_the_operator_and_an_unexcluded_administrator_still_reach_the_page(client, admin_user):
+    other = staff()
+    PluginAccess.objects.create(plugin="maps", person=other, may_change_settings=False)
+    PluginAccess.objects.create(plugin="maps", person=admin_user, may_change_settings=False)
+    client.force_login(admin_user)
+    assert client.get(reverse("server:maps")).status_code == 200
+    client.force_login(staff("third"))
+    assert client.get(reverse("server:maps")).status_code == 200
+
+
+def test_a_rule_through_a_group_closes_the_page_too(client, group):
+    other = staff()
+    other.groups.add(group)
+    PluginAccess.objects.create(plugin="maps", group=group, may_change_settings=False)
+    client.force_login(other)
+    assert client.get(reverse("server:maps")).status_code == 403
+
+
+def test_the_excluded_administrator_cannot_change_the_map_settings(client):
+    from postulo.core.models import SiteSettings
+
+    other = staff()
+    PluginAccess.objects.create(plugin="maps", person=other, may_change_settings=False)
+    before = SiteSettings.get().map_tile_url
+    client.force_login(other)
+    client.post(
+        reverse("server:maps"),
+        {"map_tiles": "custom", "map_tile_url": "https://evil.example/{z}/{x}/{y}.png"},
+    )
+    assert SiteSettings.get().map_tile_url == before
+
+
+@pytest.mark.parametrize(
+    "name", ["server:email_consent", "server:email_test", "server:email_connection_test"]
+)
+def test_the_mail_pages_actions_are_held_to_the_same_rule(client, name):
+    other = staff()
+    PluginAccess.objects.create(plugin="email", person=other, may_change_settings=False)
+    client.force_login(other)
+    assert client.post(reverse(name), {}).status_code == 403
+
+
+def test_the_identifier_dialog_is_held_to_it_too(client):
+    other = staff()
+    PluginAccess.objects.create(plugin="identifiers", person=other, may_change_settings=False)
+    client.force_login(other)
+    response = client.post(
+        reverse("server:identifier_schemes"), {"definitions": "[]"}, HTTP_HX_REQUEST="true"
+    )
+    assert response.status_code == 403
+
+
+def test_a_page_both_of_two_plugins_share_is_closed_by_either_rule(client):
+    other = staff()
+    PluginAccess.objects.create(plugin="smtp", person=other, may_change_settings=False)
+    client.force_login(other)
+    assert client.get(reverse("server:email")).status_code == 403
+
+
+def test_an_excluded_administrator_cannot_lift_their_own_rule(client, group):
+    other = staff()
+    rule = PluginAccess.objects.create(plugin="websites", person=other, may_change_settings=False)
+    client.force_login(other)
+    url = reverse("server:plugin_access", args=["websites"])
+
+    client.post(url, {"action": "save", f"remove-{rule.pk}": "on"})
+    assert PluginAccess.objects.filter(pk=rule.pk).exists()
+    client.post(url, {"action": "save", f"settings-{rule.pk}": "on"})
+    rule.refresh_from_db()
+    assert not rule.may_change_settings
+    client.post(url, {"action": "add", "subject": f"person:{other.pk}", "settings": "on"})
+    rule.refresh_from_db()
+    assert not rule.may_change_settings
+
+
+def test_nor_can_they_write_a_rule_for_a_group_they_are_in_or_change_a_group_a_rule_names(
+    client, group
+):
+    other = staff()
+    other.groups.add(group)
+    url = reverse("server:plugin_access", args=["websites"])
+    client.force_login(other)
+    client.post(url, {"action": "add", "subject": f"group:{group.pk}", "settings": "on"})
+    assert not PluginAccess.objects.filter(group=group).exists()
+
+    PluginAccess.objects.create(plugin="websites", group=group, may_change_settings=False)
+    client.post(reverse("server:groups"), {"action": "save", "group": group.pk, "name": group.name})
+    client.post(reverse("server:groups"), {"action": "delete", "group": group.pk})
+    assert Group.objects.filter(pk=group.pk).exists()
+    assert other.groups.filter(pk=group.pk).exists()
+
+
+def test_the_operator_may_still_write_rules_about_anyone(client, admin_user):
+    other = staff()
+    client.force_login(admin_user)
+    client.post(
+        reverse("server:plugin_access", args=["websites"]),
+        {"action": "add", "subject": f"person:{other.pk}", "use": "on"},
+    )
+    assert PluginAccess.objects.filter(plugin="websites", person=other).exists()
