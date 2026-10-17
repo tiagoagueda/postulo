@@ -108,9 +108,6 @@ class RestoreReport:
     #: Whether the archive was signed by this instance's key, and so what it holds is what an
     #: instance with this key wrote (#772). Anything else is restored only when asked for.
     authenticity: str = UNSIGNED
-    #: Files under plugins/ left unwritten because the archive was not authentic: a plugins
-    #: directory is code that runs at every start.
-    plugins_withheld: int = 0
 
 
 def database_vendor() -> str:
@@ -708,7 +705,8 @@ def _unknown_migrations() -> list[str]:
 def authenticity(archive: tarfile.TarFile, manifest: dict) -> tuple[str, dict[str, str]]:
     """Whether this instance's key signed the archive, and the digest each file should have.
 
-    ``unsigned`` for an archive written before they were signed. ``unverified`` when the
+    ``unsigned`` for an archive with no signature: written before they were signed, or stripped
+    of it (#974). ``unverified`` when the
     signature does not check out under this key -- an archive altered after it was written, one
     written under another key, or one whose files are not the ones signed -- which this cannot
     tell apart, and does not need to: neither is something to restore code from on trust (#772).
@@ -752,9 +750,9 @@ def restore_backup(
     manifest and a digest of every file are signed with a MAC under a key derived from the
     instance's own, so an archive altered after it was written -- a copy in a place others can
     write to -- does not check out; neither does one written under another key. That is refused
-    unless ``unverified`` says the operator knows where it came from. An archive written before
-    signing is restored without its ``plugins/`` directory, which is code that runs at every
-    start, unless ``unverified`` says the same.
+    unless ``unverified`` says the operator knows where it came from. An archive with no signature
+    is refused the same way (#974): one written before signing cannot be told from one whose
+    signature was removed.
     """
     from postulo.plugins import secrets
 
@@ -799,7 +797,18 @@ def restore_backup(
         tempfile.TemporaryDirectory(prefix="postulo-restore-") as scratch,
     ):
         report.authenticity, signed = authenticity(archive, manifest)
-        if report.authenticity == UNVERIFIED and not unverified:
+        if report.authenticity != AUTHENTIC and not unverified:
+            # An archive whose signature was removed looks exactly like one written before
+            # archives were signed, so both need the operator's say-so (#974).
+            if report.authenticity == UNSIGNED:
+                raise BackupError(
+                    "This archive carries no signature this instance can check: it was written "
+                    "before archives were signed, or its signature was removed by whoever "
+                    "altered it, and the two cannot be told apart. Restoring it would put back "
+                    "a database, files and a plugins directory nobody can vouch for, and the "
+                    "plugins run at every start. Nothing was changed. Pass --unverified if you "
+                    "know where the archive has been."
+                )
             raise BackupError(
                 "This archive was not signed by this instance's key: it was altered after it was "
                 "written, or it was written under another key (POSTULO_FIELD_KEY, or SECRET_KEY "
@@ -850,12 +859,6 @@ def restore_backup(
                         f"{entry.name!r} is not the file this archive was signed with. "
                         "Nothing was changed."
                     )
-        if report.authenticity != AUTHENTIC and not unverified:
-            # Code that runs at every start is not put back on trust (#772).
-            kept = [item for item in files if item[1] != PLUGINS_PREFIX]
-            report.plugins_withheld = len(files) - len(kept)
-            files = kept
-
         load_database(dump, member)
         if not allow_newer and (unknown := _unknown_migrations()):
             raise BackupError(

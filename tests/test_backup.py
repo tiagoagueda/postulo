@@ -558,7 +558,11 @@ def test_an_archive_from_before_the_plugins_went_in_still_restores(tmp_path, set
 
     old = rewritten_manifest(archive, tmp_path / "old.tar.gz", to_format_one)
     User.objects.all().delete()
-    report = restore_backup(old)
+    # An archive with no signature is refused without the flag (#974): a format-1 archive
+    # cannot be told from a signed one whose signature was stripped.
+    with pytest.raises(BackupError, match="no signature"):
+        restore_backup(old)
+    report = restore_backup(old, unverified=True)
     assert report.counts["users"] == 1
     assert report.plugins == [] and report.key_matches is None
 
@@ -768,3 +772,27 @@ def test_the_commands_wrap_it_all(tmp_path, capsys):
 
     with pytest.raises(CommandError, match="does not exist"):
         call_command("restore", str(tmp_path / "nope.tar.gz"))
+
+
+def test_an_archive_whose_signature_was_removed_is_refused_without_the_flag(tmp_path, settings):
+    """The signature is only worth something if taking it off does not turn the check off (#974)."""
+    a_search()
+    archive = write_backup(tmp_path / "instance.tar.gz").path
+
+    def stripped(manifest):
+        del manifest["authentication"]
+        return manifest
+
+    old = rewritten_manifest(archive, tmp_path / "stripped.tar.gz", stripped)
+    User.objects.all().delete()
+
+    with pytest.raises(BackupError, match="no signature"):
+        restore_backup(old)
+    assert not User.objects.exists(), "nothing was changed"
+
+    report = restore_backup(old, unverified=True)
+    assert report.authenticity == "unsigned"
+    assert User.objects.count() == 1
+
+    with pytest.raises(CommandError, match="--unverified"):
+        call_command("restore", str(old), "--force")

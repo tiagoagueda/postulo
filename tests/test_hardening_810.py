@@ -53,6 +53,22 @@ def test_console_refuses_everybody_and_the_page_draws_no_link(client, archive, s
     assert reverse("server:backup_download", args=[archive]) not in page
 
 
+def test_a_word_the_instance_does_not_know_grants_nobody(client, archive, settings):
+    """`operators` is a typo for `operator`; it must not fall back to every administrator (#978)."""
+    settings.POSTULO_BACKUP_DOWNLOAD = "operators"
+    assert get(client, make("adm", is_staff=True), archive).status_code == 404
+    assert get(client, make("op", is_staff=True, is_superuser=True), archive).status_code == 404
+
+
+def test_start_up_refuses_a_word_the_setting_does_not_know(settings):
+    from django.core.checks import run_checks
+
+    settings.POSTULO_BACKUP_DOWNLOAD = "operators"
+    assert [e for e in run_checks() if e.id == "postulo.E001" and "BACKUP_DOWNLOAD" in e.msg]
+    settings.POSTULO_BACKUP_DOWNLOAD = "operator"
+    assert not [e for e in run_checks() if "BACKUP_DOWNLOAD" in e.msg]
+
+
 def test_the_threat_model_names_the_exception():
     from pathlib import Path
 

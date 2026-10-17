@@ -42,8 +42,9 @@ class Command(BaseCommand):
             "--unverified",
             action="store_true",
             help=(
-                "Restore an archive this instance's key did not sign, plugins directory "
-                "included, which runs at every start. Only for one whose whole history you know."
+                "Restore an archive this instance's key did not sign, or that carries no "
+                "signature, plugins directory included, which runs at every start. Only for "
+                "one whose whole history you know."
             ),
         )
 
@@ -66,18 +67,11 @@ class Command(BaseCommand):
             self.stdout.write("  signed by this instance's key")
         else:
             what = (
-                "was written before archives were signed"
+                "carries no signature (written before archives were signed, or stripped of it)"
                 if report.authenticity == "unsigned"
                 else "was not signed by this instance's key"
             )
             self.stdout.write(self.style.WARNING(f"  the archive {what}"))
-        if report.plugins_withheld:
-            self.stdout.write(
-                self.style.WARNING(
-                    f"  {report.plugins_withheld} files of the plugins directory were left out: "
-                    "it is code that runs at every start. Pass --unverified to restore it."
-                )
-            )
         if report.media_skipped:
             self.stdout.write(
                 self.style.WARNING(
