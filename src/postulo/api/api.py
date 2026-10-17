@@ -903,11 +903,43 @@ def urls():
             # ninja's own home for the API answers a bare 404 page; it goes where every other
             # address nothing owns goes (#760).
             pattern.callback = _no_such_address
-            continue
-        _answer_a_wrong_method_as_a_problem(pattern)
+        else:
+            _answer_a_wrong_method_as_a_problem(pattern)
     # Last, so that it only sees what no address above took: a mistyped path, or an id the
     # `{int:pk}` converter turned away (#430).
-    return [*patterns, re_path(r"^", _no_such_address)], application, namespace
+    patterns = [*patterns, re_path(r"^", _no_such_address)]
+    for pattern in patterns:
+        _never_kept_by_a_cache(pattern)
+    return patterns, application, namespace
+
+
+def _never_kept_by_a_cache(pattern) -> None:
+    """Give every answer of the API with no Cache-Control of its own `no-store` (#952).
+
+    ``SECURITY.md`` promises that what is handed over is not kept, and #788 made that hold for
+    attachments by keying on ``Content-Disposition``. The calendar feeds and every JSON answer are
+    plain bodies, so an interview's place, a profile's birth data or a timeline stayed in the
+    HTTP cache of whatever asked for it after the token was revoked. The API has no answer that
+    is meant to be kept, so the rule is one wrapper around every address -- the schema, the 401
+    and 404 of an address nothing owns included -- and not a line in each view. An answer that
+    says something of its own keeps it.
+    """
+    from functools import wraps
+
+    from django.urls import URLPattern
+
+    if not isinstance(pattern, URLPattern):
+        return
+    view = pattern.callback
+
+    @wraps(view)
+    def uncached(request, *args, **kwargs):
+        response = view(request, *args, **kwargs)
+        if not response.has_header("Cache-Control"):
+            response["Cache-Control"] = "private, max-age=0, no-store"
+        return response
+
+    pattern.callback = uncached
 
 
 def _answer_a_wrong_method_as_a_problem(pattern) -> None:
