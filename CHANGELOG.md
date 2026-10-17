@@ -8,6 +8,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🔒 Security
 
+- Free text written through the API (a timeline body, a status note, notes, a description, a letter) is refused over 40,000 characters, as a listing's history is, and a longer timeline entry from a page is cut there with a marker (#953)
 - Every answer of the API that says nothing of caching, the iCalendar feeds and all JSON included, is given Cache-Control private, max-age=0, no-store (#952)
 - A wrong token sent to openapi.json, to an address the API does not have or with a method it does not take is counted against the address and bars it after sixty, as on every other call (#951)
 - Sending a rendering with a token that only holds captures answers with the narrowed capture, as the list does, without the address, company, location or source (#950)

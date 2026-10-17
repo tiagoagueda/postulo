@@ -254,6 +254,8 @@ _LinkNameLine = _line(60)
 #: (``resume.candidate.MAX_CONTACT_ROWS``): each is checked against a pattern and written
 #: in the request that brings it, and a list with no end is a request with none.
 MAX_WEB_LINKS = 20
+#: What the free text a caller writes says of its length: the bound a listing history keeps (#953).
+LONG_TEXT = f"At most {BODY_MAX_CHARS:,} characters."
 
 
 class WebLinkIn(Schema):
@@ -359,7 +361,7 @@ class CompanyIn(Schema):
         default_factory=list,
         description="Added to the company; a Wikidata id also matches an existing company.",
     )
-    notes: str = ""
+    notes: str = Field(default="", max_length=BODY_MAX_CHARS, description=LONG_TEXT)
 
 
 class CompanyPatch(Schema):
@@ -383,7 +385,7 @@ class CompanyPatch(Schema):
     identifiers: list[IdentifierIn] | None = Field(
         default=None, description="Replaces the whole list"
     )
-    notes: str | None = None
+    notes: str | None = Field(default=None, max_length=BODY_MAX_CHARS, description=LONG_TEXT)
 
 
 def _one_of(choices, *, allow_blank: bool):
@@ -459,7 +461,7 @@ class ContactIn(Schema):
             "another service, each with its service. Fifty at most."
         ),
     )
-    notes: str = ""
+    notes: str = Field(default="", max_length=BODY_MAX_CHARS, description=LONG_TEXT)
 
 
 # ------------------------------------------------------------------- listings
@@ -616,7 +618,7 @@ class ListingIn(Schema):
         default="year", max_length=10, description="year, month, day or hour."
     )
     closes_at: dt.date | None = None
-    description: str = ""
+    description: str = Field(default="", max_length=BODY_MAX_CHARS, description=LONG_TEXT)
     description_format: Literal["plain", "markdown"] = Field(
         default="plain",
         description="How `description` is read: plain (the default) or markdown. Stored as sent.",
@@ -740,7 +742,7 @@ class InterviewIn(Schema):
     ends_at: Moment | None = Field(default=None, description="An hour after the start if unset")
     location: str = Field(default="", max_length=500)
     contact_ids: list[RowId] = Field(default_factory=list)
-    notes: str = ""
+    notes: str = Field(default="", max_length=BODY_MAX_CHARS, description=LONG_TEXT)
     remind: bool = Field(default=True, description="Make a reminder for the day before")
 
 
@@ -752,12 +754,12 @@ class InterviewPatch(Schema):
     ends_at: Moment | None = None
     location: str | None = Field(default=None, max_length=500)
     contact_ids: list[RowId] | None = None
-    notes: str | None = None
+    notes: str | None = Field(default=None, max_length=BODY_MAX_CHARS, description=LONG_TEXT)
 
 
 class InterviewOutcomeIn(Schema):
     outcome: str = Field(description="done, cancelled or no_show")
-    note: str = ""
+    note: str = Field(default="", max_length=BODY_MAX_CHARS, description=LONG_TEXT)
 
 
 class ApplicationOut(Schema):
@@ -832,7 +834,7 @@ class ApplicationDetailOut(ApplicationOut):
 
 class StatusIn(Schema):
     status: str
-    note: str = ""
+    note: str = Field(default="", max_length=BODY_MAX_CHARS, description=LONG_TEXT)
     end_reason: str = Field(
         default="",
         description=(
@@ -846,7 +848,7 @@ class StatusIn(Schema):
 class EventIn(Schema):
     kind: str = "note"
     summary: str = Field(default="", max_length=250)
-    body: str = ""
+    body: str = Field(default="", max_length=BODY_MAX_CHARS, description=LONG_TEXT)
     occurred_at: Moment | None = None
 
 
@@ -1069,7 +1071,7 @@ class LetterDetailOut(LetterOut):
 class LetterIn(Schema):
     name: _required(120)
     subject: str = Field(default="", max_length=250)
-    body: str
+    body: str = Field(max_length=BODY_MAX_CHARS)
     is_template: bool = False
 
 
