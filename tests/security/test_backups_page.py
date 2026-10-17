@@ -18,6 +18,7 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.urls import reverse
 
 from postulo.core import backups
+from tests.recently import reauthenticate
 from tests.test_backups_page import make_archive
 
 pytestmark = pytest.mark.django_db
@@ -48,6 +49,7 @@ def sign_in_properly(client, person):
         reverse("account_login"), {"login": person.username, "password": PASSWORD}
     )
     assert response.status_code == 302, response.content[:300]
+    reauthenticate(client, PASSWORD)
 
 
 def every_address(name: str) -> list[tuple[str, str]]:

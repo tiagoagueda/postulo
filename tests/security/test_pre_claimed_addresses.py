@@ -20,6 +20,7 @@ from django.core import mail
 from django.urls import reverse
 
 from postulo.core.models import SiteSettings
+from tests.recently import reauthenticate
 from tests.test_sso import a_request, configured, social_login  # noqa: F401 - a fixture
 
 pytestmark = pytest.mark.django_db
@@ -53,6 +54,7 @@ def pre_claim(client, account, address: str = VICTIM) -> None:
     Signed in properly, because the page asks for the password again (#891).
     """
     client.post(reverse("account_login"), {"login": account.username, "password": PASSWORD})
+    reauthenticate(client, PASSWORD)
     response = client.post(reverse("account_email"), {"email": address, "action_add": ""})
     assert response.status_code in (200, 302)
     assert EmailAddress.objects.filter(user=account, email=address, verified=False).exists()

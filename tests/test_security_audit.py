@@ -12,19 +12,14 @@ import re
 import tomllib
 from pathlib import Path
 
-from django.conf import settings
-
 ROOT = Path(__file__).resolve().parent.parent
 CI = ROOT / ".forgejo" / "workflows" / "ci.yml"
 LOCK = ROOT / "uv.lock"
 
 #: advisory -> (package, the first version that fixes it, the issue that says why).
-IGNORED = {
-    # oauthlib's OAuth2 token endpoint compares a PKCE verifier with `==`. That is the
-    # provider's side; Postulo is only ever the client (allauth's OpenID Connect sign-in),
-    # and every django-allauth release so far requires `oauthlib<4`.
-    "CVE-2026-49265": ("oauthlib", "4.0.0", "#323"),
-}
+#: Empty since #987: the lock holds oauthlib 4, so CVE-2026-49265 (#323) needs no exception.
+#: An advisory ignored in ci.yml has to be added here with its reason, or the build fails.
+IGNORED: dict[str, tuple[str, str, str]] = {}
 
 
 def version(text: str) -> tuple[int, ...]:
@@ -63,16 +58,3 @@ def test_the_lock_holds_an_icalendar_that_limits_how_deep_a_file_may_nest():
         re.match(r"icalendar\s*>=\s*7\.1\.3", dependency)
         for dependency in declared["project"]["dependencies"]
     )
-
-
-def test_postulo_never_runs_oauthlibs_provider_side():
-    """The reason CVE-2026-49265 cannot reach Postulo: no OAuth2 provider is installed,
-    and nothing in the code talks to oauthlib directly."""
-    assert not [app for app in settings.INSTALLED_APPS if app.startswith("allauth.idp")]
-    source = ROOT / "src" / "postulo"
-    importing = [
-        str(path.relative_to(ROOT))
-        for path in source.rglob("*.py")
-        if re.search(r"^\s*(from|import)\s+oauthlib\b", path.read_text(encoding="utf-8"), re.M)
-    ]
-    assert not importing, importing
