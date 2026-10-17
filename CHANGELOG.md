@@ -20,6 +20,7 @@ All notable changes to Postulo are recorded here. The format follows
 - A record cannot be given to a deactivated account, a deactivated account cannot be added to a group or given a plugin access rule, and the groups pages mark the deactivated members who stay. (#947)
 - Two shares of one record to one person, or two groups of one name, made at once end as one instead of an error, and a group that is not a number is a 404. (#948)
 - A group's row is locked while members are removed, so two removals of its last two members cannot leave records it owns with nobody in it. (#989)
+- A wrong token sent to openapi.json, to an address the API does not have or with a method it does not take is counted against the address and bars it after sixty, as on every other call (#951)
 - Sending a rendering with a token that only holds captures answers with the narrowed capture, as the list does, without the address, company, location or source (#950)
 - Renaming a company shared with you counts, against POSTULO_COMPANY_NAME_RATE (20/h), each time it is refused for a name its owner already holds, and a spent allowance refuses every name alike, so a rename is no longer a way to read the owner's other company names (#949)
 - Companies, contacts and listings may be a group's or shared read-only or read/write, under an amended promise: nobody sees another's data unless granted, and a superuser sees any of those three but never anyone's notes, applications or documents (#896)

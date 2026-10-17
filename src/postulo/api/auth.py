@@ -72,6 +72,40 @@ def lookup(raw: str) -> ApiToken | None:
     return record
 
 
+def live_token(request) -> ApiToken | None:
+    """The live token a request presents, counted and barred as every other call's is (#951).
+
+    For the callers that are not an operation -- the schema view, the 405 and the unknown-address
+    answers -- and so have no `HttpBearer` over them: they read the same header, but a wrong
+    token presented there used to be neither counted nor barred, so an address barred on every
+    operation could keep guessing on those. Raises :class:`problems.Refused` (a 429) for a barred
+    address; the caller builds the answer, as none of the API's handlers runs over it.
+    """
+    scheme, _space, raw = request.META.get("HTTP_AUTHORIZATION", "").partition(" ")
+    raw = raw.strip()
+    if scheme.lower() != "bearer" or not raw:
+        return None
+    _barred(request)
+    record = lookup(raw)
+    if record is None:
+        _wrong_token(request)
+    return record
+
+
+def refusal_response(request, refusal: problems.Refused) -> JsonResponse:
+    """A :class:`problems.Refused` raised outside any operation, built by hand as a 429."""
+    response = JsonResponse(
+        problems.document(
+            request, refusal.status_code, refusal.message, kind=refusal.kind, **refusal.extensions
+        ),
+        status=refusal.status_code,
+        content_type=problems.CONTENT_TYPE,
+    )
+    if "retry_after" in refusal.extensions:
+        response["Retry-After"] = str(refusal.extensions["retry_after"])
+    return response
+
+
 def _in_their_own_words(request, record: ApiToken) -> None:
     """From here on, this request is in the language and time zone of the token's owner.
 
@@ -176,15 +210,18 @@ def for_readers_of_the_api(view):
 
     It is not an ``HttpBearer``, because this is a plain Django view rather than an
     operation, and it spends no allowance and records no use: asking what the API looks
-    like is not using it.
+    like is not using it. A wrong token is counted and a barred address refused all the same
+    (#951), since the guess is the same guess.
     """
 
     def guarded(request, *args, **kwargs):
         if getattr(request.user, "is_authenticated", False):
             return view(request, *args, **kwargs)
-        scheme, _space, raw = request.headers.get("Authorization", "").partition(" ")
-        if scheme.lower() == "bearer" and lookup(raw.strip()) is not None:
-            return view(request, *args, **kwargs)
+        try:
+            if live_token(request) is not None:
+                return view(request, *args, **kwargs)
+        except problems.Refused as barred:
+            return refusal_response(request, barred)
         # Word for word what every other refusal without a token says, for the same reason:
         # confirming that a token exists is itself something not to confirm. Built by hand
         # rather than raised, because this is a plain Django view and no handler of the
