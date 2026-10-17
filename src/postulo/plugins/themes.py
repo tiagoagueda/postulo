@@ -12,10 +12,11 @@ A plugin's templates run because an administrator installed the plugin, having s
 author, licence and source; that is the same trust that already lets it parse job adverts
 and hold somebody's credentials, not a new one being granted here.
 
-**Appended, never prepended, and that decides who wins.** Django's filesystem loader walks
-``DIRS`` in order and takes the first template it finds, so Postulo's own directory stays
-first and a plugin cannot replace a page of Postulo's interface by shipping a file at the
-same path. Between plugins the first one registered wins, for the same reason.
+**Searched last, and that decides who wins.** The directories are not in ``TEMPLATES``'
+``DIRS``, which the filesystem loader walks before the app directories: they are read by
+`template_loader.Loader`, the final loader in the list. So a plugin cannot replace a page of
+Postulo's interface, nor a template of Django, allauth or the admin (a form widget, say), by
+shipping a file at the same path (#971). Between plugins the first one registered wins.
 
 **A plugin that declares no theme gets no template directory.** Not caution for its own
 sake: an unused search path is a file somebody can shadow by accident, and there is no
@@ -26,8 +27,6 @@ from __future__ import annotations
 
 import logging
 from pathlib import Path
-
-from django.conf import settings
 
 from postulo.documents import themes
 
@@ -59,10 +58,8 @@ def register_template_dir(path: Path | str) -> bool:
     future caller could quietly break.
     """
     path = str(Path(path).resolve())
-    configured = settings.TEMPLATES[0].setdefault("DIRS", [])
-    if path in [str(Path(one).resolve()) for one in configured] or path in _registered:
+    if path in _registered:
         return False
-    settings.TEMPLATES[0]["DIRS"] = [*configured, path]
     _registered.append(path)
     _forget_the_engines()
     logger.debug("Reading templates from %s", path)
@@ -94,11 +91,6 @@ def forget_registered() -> None:
     """
     if not _registered:
         return
-    taken = {str(Path(one).resolve()) for one in _registered}
-    configured = settings.TEMPLATES[0].get("DIRS", [])
-    settings.TEMPLATES[0]["DIRS"] = [
-        one for one in configured if str(Path(one).resolve()) not in taken
-    ]
     _registered.clear()
     _forget_the_engines()
 

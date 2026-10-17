@@ -135,8 +135,22 @@ TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
         "DIRS": [PACKAGE_DIR / "templates"],
-        "APP_DIRS": True,
+        # The loaders spelt out, not `APP_DIRS`, for the last one: an installed plugin's
+        # `templates/` is searched after every directory Postulo and its apps own, so it
+        # cannot redraw a form widget or a page of the sign-in by shipping a file at the same
+        # path (#971). Cotton leaves a list that already holds its loader as it finds it.
         "OPTIONS": {
+            "loaders": [
+                (
+                    "django.template.loaders.cached.Loader",
+                    [
+                        "django_cotton.cotton_loader.Loader",
+                        "django.template.loaders.filesystem.Loader",
+                        "django.template.loaders.app_directories.Loader",
+                        "postulo.plugins.template_loader.Loader",
+                    ],
+                )
+            ],
             "context_processors": [
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
