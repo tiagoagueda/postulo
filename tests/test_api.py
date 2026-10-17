@@ -769,3 +769,76 @@ def test_the_token_list_names_scopes_as_sentences_and_translates_the_placeholder
     assert escape(str(SCOPES["read"])) not in html and "captures, read" not in html
     assert 'placeholder="Firefox auf dem Laptop"' in html
     assert isinstance(ApiTokenForm().fields["name"].widget.attrs["placeholder"], Promise)
+
+
+# ------------------------------------------------- free text is held to a length (#953)
+
+LONGEST = 40_000
+
+
+@pytest.mark.parametrize(
+    ("path", "field", "payload"),
+    [
+        ("/api/v1/applications/{application}/events", "body", {"kind": "note", "summary": "x"}),
+        ("/api/v1/applications/{application}/status", "note", {"status": "interviewing"}),
+        ("/api/v1/companies", "notes", {"name": "Long Co"}),
+        ("/api/v1/listings", "description", {"title": "Role", "company_name": "Long Co"}),
+    ],
+)
+def test_a_free_text_field_over_the_bound_is_refused_naming_it(
+    client, user, search, path, field, payload
+):
+    bearer = issue(user, "read", "write")
+    path = path.format(application=search["application"].pk)
+
+    over = post(client, path, {**payload, field: "a" * (LONGEST + 1)}, **bearer)
+    at = post(client, path, {**payload, field: "a" * LONGEST}, **bearer)
+
+    assert over.status_code == 422
+    assert field in json.dumps(over.json())
+    assert at.status_code in (200, 201), at.content[:300]
+
+
+def test_the_other_free_text_fields_are_bounded_in_the_schema(client, user):
+    schemas = client.get("/api/v1/openapi.json", **issue(user)).json()["components"]["schemas"]
+
+    for name, field in [
+        ("EventIn", "body"),
+        ("StatusIn", "note"),
+        ("InterviewIn", "notes"),
+        ("InterviewPatch", "notes"),
+        ("InterviewOutcomeIn", "note"),
+        ("CompanyIn", "notes"),
+        ("CompanyPatch", "notes"),
+        ("ContactIn", "notes"),
+        ("ListingIn", "description"),
+        ("LetterIn", "body"),
+    ]:
+        prop = schemas[name]["properties"][field]
+        bound = prop.get("maxLength") or max(
+            (branch.get("maxLength", 0) for branch in prop.get("anyOf", [])), default=0
+        )
+        assert bound == LONGEST, (name, field)
+
+
+def test_a_longer_body_written_on_the_page_is_stored_cut_with_the_marker(client, user, search):
+    from django.urls import reverse
+
+    from postulo.applications.models import ApplicationEvent
+    from postulo.jobs.history import TRUNCATED
+
+    client.force_login(user)
+    application = search["application"]
+
+    client.post(
+        reverse("applications:event_create", args=[application.pk]),
+        {
+            "kind": "note",
+            "summary": "Pasted",
+            "body": "b" * (LONGEST + 500),
+            "occurred_at": "2026-09-21T10:00",
+        },
+    )
+
+    stored = ApplicationEvent.objects.get(application=application, summary="Pasted").body
+    assert stored == "b" * LONGEST + TRUNCATED

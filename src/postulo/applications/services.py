@@ -16,6 +16,7 @@ from django.utils import formats, timezone
 from django.utils.translation import gettext_lazy as _
 
 from postulo.core import slugs
+from postulo.jobs.history import bounded
 from postulo.jobs.models import Company, JobPosting
 from postulo.notifications import slow
 
@@ -61,6 +62,9 @@ def record_event(
     # Clip to the columns: PostgreSQL refuses what SQLite stores silently (#463).
     summary = summary[: ApplicationEvent._meta.get_field("summary").max_length]
     actor = actor[: ApplicationEvent._meta.get_field("actor").max_length]
+    # Held to what a listing's history keeps: cut with a marker on the way in from a page or an
+    # import; the API refuses a longer one before it gets here (#953).
+    body = bounded(body)
     return ApplicationEvent.objects.create(
         application=application,
         kind=kind,
