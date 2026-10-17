@@ -37,7 +37,7 @@ def sign_in(page: Page, base: str, path: str = "/", *, email: str = EMAIL) -> No
     client.force_login(user, backend="allauth.account.auth_backends.AuthenticationBackend")
     session = client.session
     session[AUTHENTICATION_METHODS_SESSION_KEY] = [
-        {"method": "password", "at": time.time(), "email": email}
+        {"method": "password", "at": time.time(), "email": email, "reauthenticated": True}
     ]
     session.save()
     page.context.add_cookies(

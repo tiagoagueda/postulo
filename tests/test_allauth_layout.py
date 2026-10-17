@@ -18,6 +18,8 @@ from __future__ import annotations
 import pytest
 from django.urls import reverse
 
+from tests.recently import reauthenticate
+
 pytestmark = pytest.mark.django_db
 
 #: A class that exists only in Postulo's stylesheet. If it is on the page, the layout
@@ -149,6 +151,7 @@ def passkey(client, user):
         reverse("account_login"), {"login": user.email, "password": "not-a-real-password"}
     )
     assert signed_in.status_code == 302, "the sign-in this fixture stands on"
+    reauthenticate(client, "not-a-real-password")
 
     made = WebAuthn.add(user, "The laptop", what_a_browser_hands_back()).instance
     TOTP.activate(user, "JBSWY3DPEHPK3PXP")

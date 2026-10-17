@@ -8,6 +8,8 @@ from django.contrib.auth import get_user_model
 from django.core.management import call_command
 from django.urls import reverse
 
+from tests.recently import reauthenticate
+
 pytestmark = pytest.mark.django_db
 
 User = get_user_model()
@@ -61,8 +63,9 @@ def sign_in(client, login="alex"):
 
 def activate_totp(client) -> str:
     """Walk the activation page as a person would; return the secret that was enrolled."""
+    reauthenticate(client, PASSWORD)  # a sign-in alone is not that proof since allauth 65.20
     response = client.get(reverse("mfa_activate_totp"))
-    assert response.status_code == 200, "signed in a moment ago, so no reauthentication"
+    assert response.status_code == 200, "reauthenticated a moment ago, so no second question"
     secret = response.context["form"].secret
     response = client.post(reverse("mfa_activate_totp"), {"code": current_code(secret)})
     assert response.status_code == 302
@@ -96,6 +99,7 @@ def test_account_shows_the_state_and_the_door(client, person):
 
 def test_activating_enrols_the_app_and_hands_out_recovery_codes(client, person):
     sign_in(client)
+    reauthenticate(client, PASSWORD)
     response = client.get(reverse("mfa_activate_totp"))
     assert response.status_code == 200
     secret = response.context["form"].secret
@@ -210,6 +214,7 @@ def test_the_authenticator_qr_is_marked_so_the_dark_theme_can_invert_it(client, 
     low contrast but invisible, and no camera will find it.
     """
     sign_in(client)
+    reauthenticate(client, PASSWORD)
 
     html = client.get(reverse("mfa_activate_totp")).content.decode()
 

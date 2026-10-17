@@ -32,7 +32,7 @@ from postulo.resume.models import (
     Publication,
     Reference,
 )
-from tests.recently import signed_in_recently
+from tests.recently import reauthenticate, signed_in_recently
 
 pytestmark = pytest.mark.django_db
 
@@ -224,6 +224,7 @@ def sign_in_properly(client, user):
     )
     response = client.post(reverse("account_login"), {"login": user.username, "password": PASSWORD})
     assert response.status_code == 302, response.content[:300]
+    reauthenticate(client, PASSWORD)
 
 
 @pytest.fixture

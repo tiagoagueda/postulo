@@ -51,8 +51,11 @@ def sign_in(client, username: str = "mallory"):
 
 
 def claim(client, address: str = VICTIM):
-    """Add ``address`` through the page, signed in properly (the page asks for the password)."""
+    """Add ``address`` through the page, signed in properly and then asked again for the
+    password: since allauth 65.20 a sign-in no longer stands in for that (#987)."""
     sign_in(client)
+    reauthenticated = client.post(reverse("account_reauthenticate"), {"password": PASSWORD})
+    assert reauthenticated.status_code == 302
     return client.post(reverse("account_email"), {"email": address, "action_add": ""})
 
 
