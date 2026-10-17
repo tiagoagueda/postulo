@@ -8,6 +8,8 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🔒 Security
 
+- A restore refuses an archive with no signature unless --unverified, since one whose signature was removed looks like one from before signing, and the Restore page shows the verdict and prints the flag (#974)
+- An unrecognised POSTULO_BACKUP_DOWNLOAD is refused at start-up and grants nobody, where it used to grant every administrator (#978)
 - Companies, contacts and listings may be a group's or shared read-only or read/write, under an amended promise: nobody sees another's data unless granted, and a superuser sees any of those three but never anyone's notes, applications or documents (#896)
 - On a pull request the CI caches are restored by their exact key and never by a prefix, so a run of somebody else's code cannot read what a run on main restores or leave behind a poisoned fallback (#827)
 - The isolation sweep now asks the owner's own record to get past the lookup (and fixes the five entries that never did), checks every download it reaches for no-store, and a ratchet test fails on a new query of an owned model with no for_user or owner (#825)
