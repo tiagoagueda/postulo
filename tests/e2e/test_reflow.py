@@ -44,6 +44,8 @@ import pytest
 from playwright.sync_api import Page, expect
 from playwright.sync_api import TimeoutError as PlaywrightTimeoutError
 
+from tests.e2e.signing_in import confirm_password
+
 from .conftest import PASSWORD
 from .test_accessibility import furnished, sign_in, signed_in_paths  # noqa: F401
 
@@ -274,9 +276,7 @@ def test_no_page_scrolls_sideways_at_320_pixels(
     seen: list[tuple[str, float]] = []
     for path in paths:
         goto_watched(page, f"{base}{path}", seen)
-        if "reauthenticate" in page.url:
-            page.locator("input[name=password]").fill(PASSWORD)
-            page.locator("form").get_by_role("button").first.click()
+        if confirm_password(page, PASSWORD):
             page.goto(f"{base}{path}")
 
         for spill in page.evaluate(SPILLS):
