@@ -22,20 +22,19 @@ pytestmark = pytest.mark.e2e
 
 @pytest.fixture
 def strict_csp(settings):
-    """Exactly what `config/settings/prod.py` sends."""
-    from django.utils.csp import CSP
+    """The policy production sends, because it is the one every settings module carries.
 
-    settings.SECURE_CSP = {
-        "default-src": [CSP.NONE],
-        "script-src": [CSP.SELF],
-        "style-src": [CSP.SELF],
-        "img-src": [CSP.SELF, "data:"],
-        "font-src": [CSP.SELF],
-        "connect-src": [CSP.SELF],
-        "form-action": [CSP.SELF],
-        "frame-ancestors": [CSP.NONE],
-        "base-uri": [CSP.SELF],
-    }
+    `SECURE_CSP` is defined once in `config/settings/base.py` and inherited by the test and
+    production modules alike, so this does not restate it: it used to, as a hand copy that
+    went stale as the real policy gained `base-uri 'none'`, `frame-src`, `worker-src`, a
+    nonce for the preview's inline style and `report-uri` (#984). All it does now is fail
+    if something has replaced the policy with another, so these tests cannot pass under a
+    policy nobody serves.
+    """
+    from postulo.config.settings import base
+
+    assert settings.SECURE_CSP == base.SECURE_CSP, "the browser tests run under another policy"
+    assert settings.SECURE_CSP, "no content security policy is being enforced at all"
     return settings
 
 
