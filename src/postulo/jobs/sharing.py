@@ -125,12 +125,15 @@ def grantee_label(grantee) -> str:
 
 
 @transaction.atomic
-def share(record, grantee, scope: str, actor, *, also_share: bool = False) -> Plan:
+def share(
+    record, grantee, scope: str, actor, *, also_share: bool = False, addressed_as: str = ""
+) -> Plan:
     """Share ``record`` with ``grantee``, and -- with ``also_share`` -- what it points at.
 
     Raises `ShareRefused` when a reference stands in the way: one the sharer may not share,
     or one they may and did not agree to. Sharing again with the same person changes the
-    scope rather than adding a second grant.
+    scope rather than adding a second grant. ``addressed_as`` is what the sharer typed to
+    find the person, kept to show them in place of the username (#943).
     """
     from . import trail
 
@@ -149,7 +152,13 @@ def share(record, grantee, scope: str, actor, *, also_share: bool = False) -> Pl
             % {"names": ", ".join(f"“{target}”" for target in plan.also)}
         )
     for target in [*plan.also, record]:
-        _grant(target, grantee, scope if target is record else ShareScope.READ, actor)
+        _grant(
+            target,
+            grantee,
+            scope if target is record else ShareScope.READ,
+            actor,
+            addressed_as=addressed_as,
+        )
         trail.record(target, actor, trail.SHARED, detail=_detail(grantee, scope))
     transaction.on_commit(lambda: _tell_shared(record, grantee, actor))
     return plan
@@ -161,16 +170,27 @@ def _is_the_owner(record, grantee) -> bool:
     return record.owner_id == grantee.pk
 
 
-def _grant(record, grantee, scope: str, actor) -> Share:
+def _grant(record, grantee, scope: str, actor, *, addressed_as: str = "") -> Share:
     lookup = {FIELD[type(record)]: record}
     lookup["grantee_group" if isinstance(grantee, Group) else "grantee_user"] = grantee
-    found = Share.objects.filter(**lookup).first()
-    if found is None:
-        return Share.objects.create(**lookup, scope=scope, granted_by=actor)
+    # One query that cannot lose a race: two shares of the same record to the same grantee
+    # at once (a double submit) end as one row, not as an IntegrityError (#948).
+    found, created = Share.objects.get_or_create(
+        **lookup,
+        defaults={"scope": scope, "granted_by": actor, "addressed_as": addressed_as},
+    )
+    if created:
+        return found
     # Widened when asked again; a referenced record never narrows what it already had.
+    changed = []
     if found.scope != scope and (scope == ShareScope.WRITE or found.record == record):
         found.scope = scope
-        found.save(update_fields=["scope"])
+        changed.append("scope")
+    if addressed_as and found.addressed_as != addressed_as:
+        found.addressed_as = addressed_as
+        changed.append("addressed_as")
+    if changed:
+        found.save(update_fields=changed)
     return found
 
 

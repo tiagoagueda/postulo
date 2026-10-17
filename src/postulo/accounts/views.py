@@ -678,12 +678,16 @@ class YourGroupsView(LoginRequiredMixin, TemplateView):
         context = super().get_context_data(**kwargs)
         rows = []
         for group in self.request.user.groups.order_by("name"):
-            members = group.user_set.count()
+            people = list(group.user_set.order_by("username"))
+            members = len(people)
             owns = len(lifecycle.owned_by(group))
             rows.append(
                 {
                     "group": group,
                     "members": members,
+                    # Who else is in it: membership authorises the group's records, so every
+                    # member can see who holds it (#945).
+                    "people": people,
                     "owns": owns,
                     "last_with_records": members == 1 and owns > 0,
                 }
