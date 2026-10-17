@@ -556,3 +556,77 @@ def test_choosing_one_s_own_group_or_nothing_costs_no_allowance(client, person):
     assert "Too many" not in str(list(get_messages(first.wsgi_request))[-1])
     second = _share_lookup(client, company, "y@example.org")
     assert "Too many" in str(list(get_messages(second.wsgi_request))[-1])
+# ------------------------------------------------------------ a shared company's name (#949)
+
+
+@pytest.fixture
+def shared_company(person, other):
+    """``other`` owns two companies and shares one of them, read/write, with ``person``."""
+    from postulo.jobs.models import Company, Share
+
+    shared = Company.objects.create(owner=other, name="Shared Co")
+    Company.objects.create(owner=other, name="Secret Employer")
+    Share.objects.create(company=shared, grantee_user=person, scope=Share.Scope.WRITE)
+    return shared
+
+
+def rename(client, raw, company, name):
+    return client.patch(
+        f"/api/v1/companies/{company.pk}",
+        data=json.dumps({"name": name}),
+        content_type="application/json",
+        headers={"Authorization": f"Bearer {raw}"},
+    )
+
+
+@override_settings(POSTULO_COMPANY_NAME_RATE="2/h")
+def test_a_grantee_is_told_a_held_name_only_so_often(client, person, shared_company):
+    raw = token_for(person)
+
+    first = rename(client, raw, shared_company, "Secret Employer")
+    second = rename(client, raw, shared_company, "secret  employer")
+    third = rename(client, raw, shared_company, "Secret Employer")
+
+    assert first.status_code == second.status_code == 422
+    assert third.status_code == 429
+    assert "Retry-After" in third
+
+
+@override_settings(POSTULO_COMPANY_NAME_RATE="2/h")
+def test_once_spent_a_free_name_and_a_held_one_are_refused_alike(client, person, shared_company):
+    raw = token_for(person)
+    for _ in range(2):
+        rename(client, raw, shared_company, "Secret Employer")
+
+    held = rename(client, raw, shared_company, "Secret Employer")
+    free = rename(client, raw, shared_company, "Nobody Has This")
+
+    assert held.status_code == free.status_code == 429
+    assert held.json()["detail"] == free.json()["detail"]
+    shared_company.refresh_from_db()
+    assert shared_company.name == "Shared Co", "the free name was not applied either"
+
+
+@override_settings(POSTULO_COMPANY_NAME_RATE="1/h")
+def test_a_free_name_spends_nothing_and_the_owner_is_never_bounded(
+    client, person, other, shared_company
+):
+    raw = token_for(person)
+    assert rename(client, raw, shared_company, "Free One").status_code == 200
+    assert rename(client, raw, shared_company, "Free Two").status_code == 200
+
+    owner_raw = token_for(other, "owner")
+    for _ in range(3):
+        assert rename(client, owner_raw, shared_company, "Secret Employer").status_code == 422
+
+
+@override_settings(POSTULO_COMPANY_NAME_RATE="1/h")
+def test_the_page_bounds_a_grantee_in_the_same_way(client, person, shared_company):
+    client.force_login(person)
+    url = reverse("jobs:company_update", args=[shared_company.pk])
+
+    first = client.post(url, {"name": "Secret Employer"})
+    second = client.post(url, {"name": "Secret Employer"})
+
+    assert "already have a company" in first.content.decode()
+    assert "Too many requests" in second.content.decode()

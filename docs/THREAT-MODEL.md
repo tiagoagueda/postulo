@@ -137,6 +137,17 @@ Three things follow, and each is a promise:
 - **The map can be switched off.** The `maps` feature plugin decides whether the map, the
   placing of a location and any pin are offered. Off, nothing is shown and nothing is
   deleted: every stored coordinate stays for the day it is switched back on.
+- **A grantee who renames a shared company is asked about its owner's other companies
+  (#949, accepted and bounded).** A read/write grant lets the grantee edit the record's own
+  fields, the name among them, and the per-owner uniqueness of names needs the clash check
+  to look at everything the owner holds, which the grantee cannot otherwise see. Dropping
+  the check was rejected; so was making the name the owner's alone. The answer is kept and
+  bounded as the telephone one is (#758): a person who does not own the company is told that
+  a name is held at most `POSTULO_COMPANY_NAME_RATE` times an hour (20 by default), and once
+  that is spent a free name and a held one are refused in the same 429, so the refusal is
+  no longer the answer. The residue is a slow, per-account guess at employer names by
+  somebody the owner trusted with one record, and every rename that succeeds is in the
+  record's trail, which the owner sees.
 
 ## What is out of scope
 
