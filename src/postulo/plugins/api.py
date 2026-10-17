@@ -127,11 +127,15 @@ if TYPE_CHECKING:  # pragma: no cover - the names `__getattr__` resolves at run 
 
     from .consent import ACCESS_TOKEN, access_token
     from .http import (
+        BodyRefused,
         DestinationRefused,
         approve_host,
         check_destination,
         client,
+        deadline_in,
         public_only_client,
+        read_body,
+        until,
     )
     from .models import SyncLink
 
@@ -189,6 +193,7 @@ __all__ = [
     "Application",
     "Appointment",
     "AppointmentHow",
+    "BodyRefused",
     "CalendarEntry",
     "CalendarRefused",
     "ConnectedPlugin",
@@ -244,6 +249,7 @@ __all__ = [
     "calendar_status",
     "check_destination",
     "client",
+    "deadline_in",
     "declares",
     "description_of",
     "event_lines",
@@ -263,6 +269,7 @@ __all__ = [
     "primary_phone_number",
     "primary_web_link",
     "public_only_client",
+    "read_body",
     "read_calendar",
     "record_event",
     "record_listing_event",
@@ -278,6 +285,7 @@ __all__ = [
     "settle_interview",
     "shipped",
     "suggest",
+    "until",
     "vcard_from_values",
     "vcards_from_text",
 ]
@@ -471,6 +479,16 @@ def __getattr__(name: str):
         from .http import public_only_client
 
         return public_only_client
+    if name in ("read_body", "deadline_in", "until", "BodyRefused"):
+        # The other half of the rule for a plugin that fetches from a server it does not
+        # control: `client` bounds each wait, not their sum, and reads a body whole. A plugin
+        # that asks a remote server for a document opens `until(deadline_in(seconds))` around
+        # the request, streams it, and reads it with `read_body(response, limit=..., deadline=...)`,
+        # which stops at the limit and raises a `BodyRefused` (too large, too slow, in a coding
+        # it will not unpack) instead of holding a worker for whatever the server sends.
+        from . import http
+
+        return getattr(http, name)
     if name in ("approve_host", "check_destination", "DestinationRefused"):
         # The same rule for a plugin that does not speak HTTP: `approve_host` resolves a name,
         # holds every address it answers with to the instance's policy, and hands back the one
