@@ -92,3 +92,63 @@ def test_a_contacts_data_subject_export_is_not_stored(signed_in, user):
     if response.status_code == 404:  # the export is an optional feature
         pytest.skip("the data-subject export is not offered here")
     assert response["Cache-Control"] == NO_STORE
+
+
+# ------------------------------------------------- the API's plain answers (#952)
+
+
+@pytest.fixture
+def bearer(user):
+    from postulo.api.models import ApiToken
+
+    _record, raw = ApiToken.issue(user, "Agent", scopes=("read", "write"))
+    return {"HTTP_AUTHORIZATION": f"Bearer {raw}"}
+
+
+@pytest.mark.parametrize(
+    "path",
+    [
+        "/api/v1/interviews/calendar.ics",
+        "/api/v1/reminders/calendar.ics",
+        "/api/v1/applications",
+        "/api/v1/me",
+        "/api/v1/openapi.json",
+    ],
+)
+def test_an_api_answer_is_not_stored(client, bearer, path):
+    response = client.get(path, **bearer)
+
+    assert response.status_code == 200, path
+    assert response["Cache-Control"] == NO_STORE
+
+
+@pytest.mark.parametrize(
+    ("method", "path", "headers", "status"),
+    [
+        ("get", "/api/v1/no/such/address", True, 404),
+        ("get", "/api/v1/no/such/address", False, 401),
+        ("delete", "/api/v1/me", True, 405),
+        ("get", "/api/v1/applications/999999", True, 404),
+    ],
+)
+def test_an_api_refusal_is_not_stored_either(client, bearer, method, path, headers, status):
+    response = getattr(client, method)(path, **(bearer if headers else {}))
+
+    assert response.status_code == status
+    assert response["Cache-Control"] == NO_STORE
+
+
+def test_an_api_answer_that_says_something_of_its_own_keeps_it():
+    from django.urls import URLPattern
+
+    from postulo.api import api as module
+
+    def view(request):
+        response = HttpResponse(b"x")
+        response["Cache-Control"] = "no-store"
+        return response
+
+    pattern = URLPattern(pattern=type("P", (), {})(), callback=view)
+    module._never_kept_by_a_cache(pattern)
+
+    assert pattern.callback(RequestFactory().get("/"))["Cache-Control"] == "no-store"
