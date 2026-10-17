@@ -8,6 +8,9 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🔒 Security
 
+- The monthly dependency workflow resolves, installs and tests the new lock in a job with no secret and hands two files to a second job, in a fresh container, that runs nothing from the new packages, checks what it commits, runs git with hooks off and alone holds the bot's token (#975)
+- The PostgreSQL apt signing key is a committed file whose fingerprint a test checks, in the image and in CI, instead of a download trusted on TLS alone (#981)
+- The browser CSP test runs under the policy production sends instead of a stale hand copy of it (#984)
 - Companies, contacts and listings may be a group's or shared read-only or read/write, under an amended promise: nobody sees another's data unless granted, and a superuser sees any of those three but never anyone's notes, applications or documents (#896)
 - On a pull request the CI caches are restored by their exact key and never by a prefix, so a run of somebody else's code cannot read what a run on main restores or leave behind a poisoned fallback (#827)
 - The isolation sweep now asks the owner's own record to get past the lookup (and fixes the five entries that never did), checks every download it reaches for no-store, and a ratchet test fails on a new query of an owned model with no for_user or owner (#825)
