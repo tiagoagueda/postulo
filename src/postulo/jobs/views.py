@@ -7,7 +7,7 @@ from functools import cached_property
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db import transaction
-from django.db.models import Count, Q
+from django.db.models import Count, Exists, OuterRef, Q
 from django.http import Http404, HttpRequest, HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse, reverse_lazy
@@ -89,6 +89,15 @@ class KeepsOthersCopies:
     points at (#896): their application at a shared listing outlives its owner's change of
     mind. The record itself goes, and with it everything it holds."""
 
+    def others_keep_a_copy(self) -> str:
+        """The sentence, without a number, that what other people keep of their own stays
+        with them (#958): the counts above are the reader's alone."""
+        from . import sharing
+
+        if any(person.pk != self.request.user.pk for person in sharing.audience(self.object)):
+            return str(_("What other people keep of their own here stays with them as a copy."))
+        return ""
+
     def form_valid(self, form):
         from . import detach, sharing
 
@@ -157,6 +166,12 @@ class CompanyListView(PageOrFragmentMixin, OwnedObjectMixin, ListView):
             # The reader's own note, for its column, its filter and the search (#896).
             .with_notes(self.request.user)
             .select_related("parent")
+            # Whether the parent named in its column is one the reader may see (#957).
+            .annotate(
+                parent_seen=Exists(
+                    Company.objects.visible_to(self.request.user).filter(pk=OuterRef("parent_id"))
+                )
+            )
             .prefetch_related("industries", "identifiers", "postal_addresses")
         )
         # Through `clean_query`, as the search over everything reads its own: the words
@@ -867,7 +882,10 @@ class CompanyDetailView(SharedObjectMixin, DetailView):
             getattr(person, "profile", None), "identifier_style", "both"
         )
         # What deleting it would take with it, for the dialog on this page (#854).
-        context["deletion"] = deletions.facts_for(CompanyDeleteView, self.request, self.object)
+        # Only for who may delete it: a reader is neither offered the dialog nor sent the
+        # counts behind it (#958).
+        if context["sharing"]["manages"]:
+            context["deletion"] = deletions.facts_for(CompanyDeleteView, self.request, self.object)
         context["identifiers_hidden"] = len(hidden)
         # Which of the company's identifiers do not fit together, worked out as the page is
         # drawn and told, never refused (#675). Hidden ones count: a warning concerns them too.
@@ -1406,11 +1424,14 @@ class CompanyDeleteView(KeepsOthersCopies, ConfirmDeleteMixin, SharedObjectMixin
 
         context = super().get_context_data(**kwargs)
         company = self.object
-        applications = Application.objects.filter(posting__company=company)
+        person = self.request.user
+        # Only the reader's own rows are counted, and the contacts they can see (#958): the
+        # rest is other people's, whatever is shared, and a count is already a disclosure.
+        applications = Application.objects.filter(posting__company=company, owner=person)
         postings = company.postings.count()
         applied = applications.count()
-        contacts = company.contacts.count()
-        appointments = company.appointments.count()
+        contacts = Contact.objects.visible_to(person).filter(company=company).count()
+        appointments = company.appointments.filter(owner=person).count()
         # Each ngettext carries its two texts as literals: the extractor reads call sites.
         context["consequences"] = [
             text % {"count": number}
@@ -1438,15 +1459,15 @@ class CompanyDeleteView(KeepsOthersCopies, ConfirmDeleteMixin, SharedObjectMixin
             )
         # The career is not deleted with a company (#683): an entry keeps its text.
         entries = (
-            company.career_entries.count()
-            + company.education_entries.count()
-            + company.certifications.count()
-            + company.honours.count()
-            + company.memberships.count()
-            + company.courses.count()
+            company.career_entries.filter(owner=person).count()
+            + company.education_entries.filter(owner=person).count()
+            + company.certifications.filter(owner=person).count()
+            + company.honours.filter(owner=person).count()
+            + company.memberships.filter(owner=person).count()
+            + company.courses.filter(owner=person).count()
         )
         # A contact goes with its company, and so does a referee's entry (#696).
-        referees = Reference.objects.filter(contact__company=company).count()
+        referees = Reference.objects.filter(contact__company=company, owner=person).count()
         if referees:
             consequences = context["consequences"]
             consequences.append(
@@ -1466,6 +1487,9 @@ class CompanyDeleteView(KeepsOthersCopies, ConfirmDeleteMixin, SharedObjectMixin
                 )
                 % {"count": entries}
             )
+        elsewhere = self.others_keep_a_copy()
+        if elsewhere:
+            kept.append(elsewhere)
         if kept:
             context["kept"] = " ".join(kept)
         return context
@@ -1918,7 +1942,8 @@ class PostingDetailView(SharedObjectMixin, DetailView):
 
         context["sharing"] = sharing.panel(self.object, self.request.user)
         # What deleting it would take with it, for the dialog on this page (#854).
-        context["deletion"] = deletions.facts_for(PostingDeleteView, self.request, self.object)
+        if context["sharing"]["manages"]:
+            context["deletion"] = deletions.facts_for(PostingDeleteView, self.request, self.object)
         return context
 
 
@@ -1955,7 +1980,10 @@ class PostingDeleteView(KeepsOthersCopies, ConfirmDeleteMixin, SharedObjectMixin
         from .models import Capture, CapturedPage
 
         context = super().get_context_data(**kwargs)
-        applications = self.object.applications.all()
+        person = self.request.user
+        # The reader's own rows only (#958): other people's applications, captures and
+        # history entries on a shared listing are theirs.
+        applications = self.object.applications.filter(owner=person)
         number = applications.count()
         consequences = []
         if number:
@@ -1970,7 +1998,7 @@ class PostingDeleteView(KeepsOthersCopies, ConfirmDeleteMixin, SharedObjectMixin
         # Its history goes with it, and so do the captures that became it, with what they
         # kept of the page (#664); a file somebody forwarded lives in their documents and
         # is not deleted with a listing (#270), and saying so here is the difference.
-        captures = self.object.captures.all()
+        captures = self.object.captures.filter(owner=person)
         if captures.exists():
             consequences.append(
                 ngettext(
@@ -1990,7 +2018,7 @@ class PostingDeleteView(KeepsOthersCopies, ConfirmDeleteMixin, SharedObjectMixin
                     )
                     % {"count": kept_pages}
                 )
-        entries = self.object.events.all()
+        entries = self.object.events.filter(owner=person)
         if entries.exists():
             consequences.append(
                 ngettext(
@@ -2030,6 +2058,9 @@ class PostingDeleteView(KeepsOthersCopies, ConfirmDeleteMixin, SharedObjectMixin
                 )
                 % {"count": pointed}
             )
+        elsewhere = self.others_keep_a_copy()
+        if elsewhere:
+            kept.append(elsewhere)
         if kept:
             context["kept"] = " ".join(kept)
         return context
