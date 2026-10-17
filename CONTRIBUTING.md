@@ -12,6 +12,26 @@ maintainer's long hand-written issues are the exception, and blank issues stay a
 vulnerability is not a public issue: follow [SECURITY.md](SECURITY.md). Remove personal
 details from any log or screenshot first. The forms live in `.forgejo/ISSUE_TEMPLATE/`.
 
+## The GitHub mirror
+
+The code lives on Forgejo and is pushed to GitHub as a plain copy; nothing is kept on a
+separate branch. GitHub shows `.github/README.md` before the root `README.md`, so that file
+is the root README with a "read-only mirror" notice on top and every relative link made
+absolute on Forgejo. **It is generated**: after changing `README.md` run
+
+```sh
+uv run python scripts/readme_languages.py   # the "In your language" table (also generated)
+uv run python scripts/github_readme.py      # .github/README.md
+```
+
+`tests/test_readme.py` fails when either is out of date. The GitHub repository's settings
+are set once by hand: Issues, Wiki, Projects and Discussions off, and the description and
+website pointing at the Forgejo URL. Pull requests cannot be turned off there.
+
+Forgejo also reads `.github/` for issue and pull request templates and for workflows when
+`.forgejo/` has none, so anything GitHub-only added to `.github/` needs a `.forgejo/`
+counterpart (the same test checks).
+
 ## Getting set up
 
 Requires Python 3.12.4 or newer and [uv](https://docs.astral.sh/uv/).
