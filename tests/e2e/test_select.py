@@ -31,6 +31,8 @@ import re
 import pytest
 from playwright.sync_api import Browser, Page, expect
 
+from tests.e2e.signing_in import confirm_password
+
 from .card_menu import open_menu, row, trigger_of
 from .selects import active_option, button_of, choose, list_of, open_list, options_of
 from .test_accessibility import (  # noqa: F401
@@ -106,9 +108,7 @@ def to_the_gallery(page: Page, base: str) -> None:
 
     sign_in(page, base)
     page.goto(f"{base}/server/design/")
-    if "reauthenticate" in page.url:
-        page.locator("input[name=password]").fill(PASSWORD)
-        page.locator("form").get_by_role("button").first.click()
+    if confirm_password(page, PASSWORD):
         page.goto(f"{base}/server/design/")
     expect(page.locator("#design-choices")).to_be_visible()
 
@@ -1529,9 +1529,7 @@ def test_axe_is_clean_with_a_list_open(
             failures.append(describe(f"{where} ({scheme})", found))
 
     page.goto(f"{base}/server/design/")
-    if "reauthenticate" in page.url:
-        page.locator("input[name=password]").fill(PASSWORD)
-        page.locator("form").get_by_role("button").first.click()
+    if confirm_password(page, PASSWORD):
         page.goto(f"{base}/server/design/")
     for ident in ("design-choice-icons", "design-choice-long", "design-choice-groups"):
         select = page.locator(f"#{ident}")

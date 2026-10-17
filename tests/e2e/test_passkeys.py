@@ -18,6 +18,8 @@ from __future__ import annotations
 import pytest
 from playwright.sync_api import Page, expect
 
+from tests.e2e.signing_in import confirm_password
+
 from .conftest import EMAIL, PASSWORD
 
 pytestmark = pytest.mark.e2e
@@ -89,9 +91,7 @@ def test_a_passkey_can_be_added_and_then_signs_somebody_in(
     page.goto(f"{base}/settings/account/")
     expect(page.locator("[data-passkeys]")).to_have_attribute("data-passkeys", "0")
     page.get_by_role("link", name="Add one").click()
-    if "reauthenticate" in page.url:
-        page.locator("input[name=password]").fill(PASSWORD)
-        page.locator("form").get_by_role("button").first.click()
+    confirm_password(page, PASSWORD)
 
     # --- registering one
     page.locator("input[name=name]").fill("The laptop")
@@ -135,6 +135,9 @@ def test_a_passkey_can_be_added_and_then_signs_somebody_in(
     expect(page.locator("table")).to_contain_text("The laptop")
     page.get_by_role("link", name="Remove").click()
     page.get_by_role("button", name="Remove").click()
+    # Signed in by passkey, so removing one asks for the password first (allauth 65.20), and
+    # then carries on with the removal it held back.
+    confirm_password(page, PASSWORD)
     expect(page).to_have_url(f"{base}/accounts/2fa/webauthn/")
     expect(page.get_by_text("No security keys have been added.")).to_be_visible()
     assert not Authenticator.objects.filter(

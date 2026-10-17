@@ -49,6 +49,8 @@ from contextlib import contextmanager
 import pytest
 from playwright.sync_api import Page
 
+from tests.e2e.signing_in import confirm_password
+
 from .conftest import PASSWORD
 from .test_accessibility import (  # noqa: F401 - `furnished` and `axe_source` are fixtures
     axe_should_read,
@@ -96,9 +98,7 @@ def every_page(
         if skip(path):
             continue
         goto_watched(page, f"{base}{path}", seen)
-        if "reauthenticate" in page.url:
-            page.locator("input[name=password]").fill(PASSWORD)
-            page.locator("form").get_by_role("button").first.click()
+        if confirm_password(page, PASSWORD):
             page.goto(f"{base}{path}")
         yield path
 

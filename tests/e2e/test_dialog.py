@@ -14,7 +14,7 @@ import pytest
 from playwright.sync_api import Browser, Page, expect
 
 from tests.e2e.conftest import PASSWORD
-from tests.e2e.signing_in import sign_in
+from tests.e2e.signing_in import confirm_password, sign_in
 
 pytestmark = pytest.mark.e2e
 
@@ -35,9 +35,7 @@ NOTHING = "rgba(0, 0, 0, 0)"
 def open_the_gallery(page: Page, base: str) -> None:
     sign_in(page, base)
     page.goto(f"{base}/server/design/")
-    if "reauthenticate" in page.url:
-        page.locator("input[name=password]").fill(PASSWORD)
-        page.locator("form").get_by_role("button").first.click()
+    if confirm_password(page, PASSWORD):
         page.goto(f"{base}/server/design/")
 
 
