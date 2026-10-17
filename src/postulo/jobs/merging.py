@@ -425,7 +425,7 @@ def plan_companies(kept, other, viewer=None) -> Plan:
         _moved(_("Honours and awards"), other.honours.filter(**mine), str),
         _moved(_("Memberships"), other.memberships.filter(**mine), str),
         _moved(_("Courses"), other.courses.filter(**mine), str),
-        _moved(_("Appointments"), other.appointments.all(), str),
+        _moved(_("Appointments"), other.appointments.filter(**mine), str),
         _moved(_("Telephone numbers"), other.phone_numbers.all(), lambda row: row.number),
         _moved(
             _("Names in other languages"),
