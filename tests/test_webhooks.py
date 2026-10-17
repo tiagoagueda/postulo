@@ -652,3 +652,20 @@ def test_a_key_longer_than_its_column_is_shortened_and_still_means_one_delivery(
 
     assert first is not None and len(first.key) <= limit
     assert webhooks.enqueue(connection, notification) is None
+
+
+def test_a_plain_http_receiver_is_refused_unless_it_is_on_an_allowed_private_network(settings):
+    """The signature hides nothing, and the body is the notification (#970)."""
+    config = {"secret": SECRET}
+    notifier = WebhookNotifier()
+
+    settings.POSTULO_CONNECTIONS_ALLOW_PRIVATE = False
+    assert "url" in notifier.validate({**config, "url": "http://example.org/hook"})
+    assert "url" in notifier.validate({**config, "url": "http://10.0.0.5/hook"})
+    assert "https://" in notifier.validate({**config, "url": "http://example.org/hook"})["url"][0]
+    assert "http://" not in notifier.validate({**config, "url": "ftp://x"})["url"][0]
+
+    settings.POSTULO_CONNECTIONS_ALLOW_PRIVATE = True
+    assert "url" in notifier.validate({**config, "url": "http://8.8.8.8/hook"}), "public host"
+    assert "url" not in notifier.validate({**config, "url": "http://10.0.0.5/hook"}), "LAN"
+    assert "url" not in notifier.validate({**config, "url": "https://8.8.8.8/hook"})

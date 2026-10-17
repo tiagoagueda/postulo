@@ -91,6 +91,11 @@ REACHING_PAST: dict[str, dict[str, str]] = {
         "postulo.core.mail_auth": ("the instance's own token when it signs in with XOAUTH2 (#151)"),
     },
     "webhook": {
+        "postulo.core.destinations": (
+            "whether the operator allows a connection to reach a private address, and whether "
+            "an address is public: a plain-HTTP receiver is accepted only on a private "
+            "network the operator allowed, which is the operator's switch to read (#970)"
+        ),
         "postulo.notifications.webhooks": (
             "where a delivery waits for the scheduler. A plugin holds no rows, and a "
             "delivery has to outlive the send that left it, scoped to its owner by Postulo rather "
