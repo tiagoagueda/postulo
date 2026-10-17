@@ -800,7 +800,8 @@ def attach_rendering(request, pk: int):
         )
     except pages.NotKept as refusal:
         raise _refused(refusal) from refusal
-    return Status(200 if already else 201, _as_output(request, capture))
+    # The narrowed row: a token that only sends pages is not told the queue (#761, #950).
+    return Status(200 if already else 201, _as_listed(request, capture))
 
 
 @api.post(
