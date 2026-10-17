@@ -19,6 +19,25 @@ from . import secrets
 from .base import CONNECTED_KINDS
 
 
+class CatalogueSerial(models.Model):
+    """The highest ``serial`` seen from a catalogue, kept where a cache cull cannot take it (#972).
+
+    A signed index says what its publisher signed, not when, so an old one can be served
+    again by whoever controls the hosting. The counter that makes that visible has to outlive
+    the cache, which is culled when full and emptied by anything that clears it: it is one row
+    per catalogue *name* rather than a column of `PluginRepository`, because a catalogue
+    configured from the environment has no row of that kind. ``key`` is the public key it was
+    seen under: a new key is a catalogue not yet seen.
+    """
+
+    name = models.CharField(max_length=100, unique=True)
+    key = models.CharField(max_length=200)
+    serial = models.PositiveBigIntegerField()
+
+    def __str__(self) -> str:
+        return f"{self.name}: {self.serial}"
+
+
 class PluginRepository(models.Model):
     """A catalogue an administrator may install plugins from, as a row rather than a string.
 

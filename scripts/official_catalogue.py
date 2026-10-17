@@ -55,7 +55,13 @@ def render(document: dict) -> bytes:
     return (json.dumps(document, indent=2, sort_keys=True, ensure_ascii=False) + "\n").encode()
 
 
-def build(wheels: Path, expires_days: int = 0) -> dict:
+#: How long an index stays good once signed (#972). An instance refuses one past its expiry, so a
+#: copy served long after the release it listed was withdrawn refuses itself; it also means the
+#: index has to be signed again within this time, whether or not anything changed.
+DEFAULT_EXPIRES_DAYS = 60
+
+
+def build(wheels: Path, expires_days: int = DEFAULT_EXPIRES_DAYS) -> dict:
     source = tomllib.loads(SOURCE.read_text(encoding="utf-8"))
     plugins = []
     for entry in source.get("plugin", []):
@@ -82,7 +88,8 @@ def build(wheels: Path, expires_days: int = 0) -> dict:
         )
     # A counter that only goes up, signed with the rest (#783): an instance remembers the highest
     # it has seen, and refuses an older index served again by whoever hosts it. Seconds since the
-    # epoch are monotonic without anybody keeping a number. `--expires-days` also signs an expiry.
+    # epoch are monotonic without anybody keeping a number. `--expires-days` signs an expiry
+    # too, by default (#972).
     document = {"plugins": plugins, "serial": int(time.time())}
     if expires_days:
         document["expires"] = (dt.datetime.now(dt.UTC) + dt.timedelta(days=expires_days)).strftime(
@@ -144,8 +151,9 @@ def main(argv: list[str] | None = None) -> int:
     built.add_argument(
         "--expires-days",
         type=int,
-        default=0,
-        help="also sign an expiry this many days ahead (an instance refuses an index past it)",
+        default=DEFAULT_EXPIRES_DAYS,
+        help="sign an expiry this many days ahead; an instance refuses an index past it "
+        "(default %(default)s, and 0 signs none)",
     )
     signed = sub.add_parser("sign", help="write index.json.sig")
     signed.add_argument("--key-file")

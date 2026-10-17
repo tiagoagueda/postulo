@@ -16,6 +16,7 @@ from __future__ import annotations
 
 import logging
 import time
+import uuid
 
 from django.core.cache import cache
 from django.utils import timezone
@@ -95,7 +96,8 @@ def sync_connection(connection: Connection) -> SyncReport:
     depend on which one it was (#335).
     """
     key = lease_key(connection)
-    if not cache.add(key, timezone.now().isoformat(), LEASE_SECONDS):
+    token = uuid.uuid4().hex
+    if not cache.add(key, token, LEASE_SECONDS):
         return SyncReport(
             notes=[str(_("A sync of this connection is already running."))],
             already_running=True,
@@ -104,7 +106,12 @@ def sync_connection(connection: Connection) -> SyncReport:
         with preferences.as_person(connection.owner):
             return _run_connection(connection)
     finally:
-        cache.delete(key)
+        # Only a lease that is still this run's (#988): one that outlived `LEASE_SECONDS` was
+        # taken by the next run, and deleting that would let a third start beside it. The
+        # cache has no atomic compare-and-delete, so what is left is the instant between
+        # the two calls, as in `scheduler.only_one_pass` (#576).
+        if cache.get(key) == token:
+            cache.delete(key)
 
 
 def _run_connection(connection: Connection) -> SyncReport:

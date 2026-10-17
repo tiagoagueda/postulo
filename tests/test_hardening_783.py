@@ -124,3 +124,20 @@ def test_a_counter_or_expiry_that_is_not_one_is_refused(serving, fields):
 
     with pytest.raises(catalogue.CatalogueError):
         catalogue.fetch("repo")
+
+
+def test_the_counter_survives_a_cleared_cache(serving):
+    """The memory is a row, not a cache entry a cull or a clear can take (#972)."""
+    serving(serial=12)
+    catalogue.fetch("repo")
+
+    cache.clear()
+    serving(serial=11)
+    with pytest.raises(catalogue.CatalogueError, match="older than one already seen"):
+        catalogue.fetch("repo")
+    serving(serial=13)
+    assert catalogue.fetch("repo").serial == 13
+    cache.clear()
+    serving(serial=12)
+    with pytest.raises(catalogue.CatalogueError, match="older than one already seen"):
+        catalogue.fetch("repo")
