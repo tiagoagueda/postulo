@@ -166,3 +166,95 @@ def test_a_revoked_grant_reaches_nothing(client, user, other_user):
     assert client.get(url).status_code == 200
     grant.delete()
     assert client.get(url).status_code == 404
+
+
+# ------------------------------------------------- deleting a shared contact (#956, #961)
+
+
+def shared_referee(user, other_user, scope=Share.Scope.READ):
+    """``user``'s contact, shared with ``other_user``, and a reference letter from them held
+    by each of the two, plus ``other_user``'s own career referee entry and application."""
+    from django.core.files.base import ContentFile
+
+    from postulo.applications.models import Application
+    from postulo.documents.models import ReferenceLetter, UploadedDocument
+    from postulo.resume.models import Reference
+
+    contact = Contact.objects.create(owner=user, name="Ada Referee")
+    Share.objects.create(contact=contact, grantee_user=other_user, scope=scope)
+    uploads = {}
+    for holder in (user, other_user):
+        upload = UploadedDocument.objects.create(
+            owner=holder,
+            title=f"Letter of {holder.pk}",
+            kind="reference",
+            file=ContentFile(b"%PDF-1.7 ref\n%%EOF", name="r.pdf"),
+        )
+        ReferenceLetter.objects.create(owner=holder, upload=upload, referee=contact)
+        uploads[holder.pk] = upload
+    company = Company.objects.create(owner=other_user, name="Their Employer")
+    posting = JobPosting.objects.create(owner=other_user, company=company, title="Engineer")
+    application = Application.objects.create(owner=other_user, posting=posting, contact=contact)
+    # The model refuses a referee that is not the owner's own, so the row a grantee is left
+    # holding (a contact that was theirs, then moved or shared on) is made past that check.
+    stub = Contact.objects.create(owner=other_user, name="Stub")
+    reference = Reference.objects.create(owner=other_user, contact=stub)
+    Reference.objects.filter(pk=reference.pk).update(contact=contact)
+    reference.refresh_from_db()
+    return contact, uploads, application, reference
+
+
+@pytest.mark.parametrize("scope", [Share.Scope.READ, Share.Scope.WRITE])
+@pytest.mark.parametrize("offered", [True, False])
+def test_deleting_a_shared_contact_deletes_only_the_deleters_letters(
+    client, user, other_user, scope, offered
+):
+    from django.contrib.messages import get_messages
+
+    from postulo.documents.models import UploadedDocument
+    from postulo.plugins.gdpr import GDPR
+    from postulo.plugins.models import PluginPolicy
+
+    if not offered:
+        PluginPolicy.objects.create(plugin=GDPR, person=None, state=PluginPolicy.State.FORCED_OFF)
+    contact, uploads, _application, _reference = shared_referee(user, other_user, scope)
+    client.force_login(user)
+    url = reverse("jobs:contact_delete", args=[contact.pk])
+
+    # The dialog counts the deleter's letter, not the grantee's.
+    assert "1 reference letter they wrote is kept" in client.get(url).content.decode()
+
+    response = client.post(url, {"delete_letters": "1"})
+
+    assert response.status_code == 302
+    assert not Contact.objects.filter(pk=contact.pk).exists()
+    assert not UploadedDocument.objects.filter(pk=uploads[user.pk].pk).exists()
+    assert UploadedDocument.objects.filter(pk=uploads[other_user.pk].pk).exists(), (
+        "another member's letter went with the contact"
+    )
+    if offered:
+        said = " ".join(str(m) for m in get_messages(response.wsgi_request))
+        assert "application" not in said, "the summary counted the grantee's application"
+        assert "letter" not in said, "the summary counted the grantee's letter"
+
+
+@pytest.mark.parametrize("offered", [True, False])
+def test_deleting_a_shared_contact_leaves_the_others_a_copy(client, user, other_user, offered):
+    from postulo.documents.models import ReferenceLetter
+    from postulo.plugins.gdpr import GDPR
+    from postulo.plugins.models import PluginPolicy
+
+    if not offered:
+        PluginPolicy.objects.create(plugin=GDPR, person=None, state=PluginPolicy.State.FORCED_OFF)
+    contact, uploads, application, reference = shared_referee(user, other_user)
+    client.force_login(user)
+
+    client.post(reverse("jobs:contact_delete", args=[contact.pk]))
+
+    assert not Contact.objects.filter(pk=contact.pk).exists()
+    reference.refresh_from_db()
+    application.refresh_from_db()
+    copy = reference.contact
+    assert copy is not None and copy.owner_id == other_user.pk
+    assert application.contact_id == copy.pk
+    assert ReferenceLetter.objects.get(upload=uploads[other_user.pk]).referee_id == copy.pk
