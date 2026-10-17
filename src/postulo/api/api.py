@@ -54,7 +54,7 @@ from postulo.jobs.models import Capture, CaptureStatus
 from postulo.plugins.base import CaptureError, JobPostingData
 from postulo.plugins.fetching import fetch_page
 
-from . import idempotency, problems
+from . import auth, idempotency, problems
 from .auth import ScopedAuth, TokenAuth, for_readers_of_the_api, scope
 from .models import ApiToken
 from .paging import AFTER_ID, UPDATED_SINCE, Moment, Money, Page, RowId, changed_since
@@ -930,7 +930,11 @@ def _answer_a_wrong_method_as_a_problem(pattern) -> None:
     def answering(request, *args, **kwargs):
         response = view(request, *args, **kwargs)
         if response.status_code == 405 and response.get("Content-Type") != problems.CONTENT_TYPE:
-            if not _has_a_live_token(request):
+            try:
+                live = _has_a_live_token(request)
+            except problems.Refused as barred:
+                return auth.refusal_response(request, barred)
+            if not live:
                 # No token, no route table (#760): the methods an address allows are part of
                 # what it would tell a stranger, and are said only to someone who may ask.
                 return problems.refuse(request, api, 401, problems.no_token())
@@ -945,10 +949,7 @@ def _answer_a_wrong_method_as_a_problem(pattern) -> None:
 
 def _has_a_live_token(request) -> bool:
     """Whether the request carries a bearer token that is live, whatever it is for."""
-    from .auth import lookup
-
-    scheme, _space, raw = request.META.get("HTTP_AUTHORIZATION", "").partition(" ")
-    return scheme.lower() == "bearer" and lookup(raw.strip()) is not None
+    return auth.live_token(request) is not None
 
 
 def _no_such_address(request, *args, **kwargs):
@@ -957,6 +958,10 @@ def _no_such_address(request, *args, **kwargs):
     A 401 for a request with no live token, as for every other call, so the route table is
     not probed without one; a 404 for one that has.
     """
-    if _has_a_live_token(request):
+    try:
+        live = _has_a_live_token(request)
+    except problems.Refused as barred:
+        return auth.refusal_response(request, barred)
+    if live:
         return problems.refuse(request, api, 404, str(_("Nothing of yours is at this address.")))
     return problems.refuse(request, api, 401, problems.no_token())
