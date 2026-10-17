@@ -33,7 +33,7 @@
           {% for person in people %}
             <label class="tap-target inline-flex items-center gap-2 text-sm">
               <input type="checkbox" class="input" name="members" value="{{ person.pk }}" {% if person.pk in entry.members %}checked{% endif %}>
-              {{ person.username }}
+              {{ person.username }}{% if not person.is_active %} <span class="text-ink-500 dark:text-ink-400">({% translate "deactivated" %})</span>{% endif %}
             </label>
           {% endfor %}
         </div>

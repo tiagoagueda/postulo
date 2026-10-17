@@ -66,3 +66,29 @@ def test_looking_at_the_pages_needs_nothing_more(client, admin, member):
 
     for name in ("server:person_recovery", "server:person_delete"):
         assert client.get(reverse(name, args=[member.pk])).status_code == 200
+
+
+def test_deactivating_and_renaming_ask_for_a_recent_sign_in_too(client, admin, member):
+    """The two actions that were left out of the first round (#944)."""
+    client.force_login(admin)
+
+    deactivate = client.post(reverse("server:person_active", args=[member.pk]))
+    rename = client.post(
+        reverse("server:person_username", args=[member.pk]),
+        {"username": "renamed", "first_name": "", "last_name": "", "language": ""},
+    )
+
+    assert asks(deactivate) and asks(rename)
+    member.refresh_from_db()
+    assert member.is_active and member.username == "member"
+
+
+def test_after_a_recent_sign_in_deactivating_works_and_the_rename_form_opens(client, admin, member):
+    signed_in_recently(client, admin)
+
+    assert client.get(reverse("server:person_username", args=[member.pk])).status_code == 200
+    done = client.post(reverse("server:person_active", args=[member.pk]))
+
+    assert done.status_code == 302 and "reauthenticate" not in done["Location"]
+    member.refresh_from_db()
+    assert not member.is_active

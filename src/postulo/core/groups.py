@@ -20,6 +20,7 @@ from __future__ import annotations
 
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group
+from django.db import connection
 from django.db.models.signals import m2m_changed
 from django.dispatch import receiver
 from django.utils.translation import gettext as _
@@ -108,6 +109,11 @@ def _pairs(instance, model, pk_set, reverse):
 
 
 def _before_leaving(pairs) -> None:
+    # The group's row is locked first, so two removals of the last two members take turns and
+    # the second sees the first's result (#989). A no-op on SQLite, which has one writer.
+    if connection.in_atomic_block:
+        for pk in sorted({group.pk for group, _person in pairs}):
+            Group.objects.select_for_update().filter(pk=pk).first()
     for group, person in pairs:
         stays = group.user_set.exclude(pk=person.pk)
         leaving = {p.pk for g, p in pairs if g.pk == group.pk}

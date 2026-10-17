@@ -70,7 +70,7 @@
                   <span class="badge" data-variant="outline">{% translate "group" %}</span>
                   <bdi>{{ grant.grantee_group.name }}</bdi>
                 {% else %}
-                  <bdi>{{ grant.grantee_user.get_username }}</bdi>
+                  <bdi>{{ grant.addressed_as|default:grant.grantee_user.get_username }}</bdi>
                 {% endif %}
                 · {{ grant.get_scope_display }}
               </span>
