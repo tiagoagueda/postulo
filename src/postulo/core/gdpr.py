@@ -470,7 +470,7 @@ class ErasureRefused(Exception):
         )
 
 
-def erase_contact(contact) -> ErasureReport:
+def erase_contact(contact, reader=None) -> ErasureReport:
     """Delete the contact and everything that points at it, and say what was deleted.
 
     The rows cascade by construction — the generic relations are why a deleted contact has
@@ -478,6 +478,9 @@ def erase_contact(contact) -> ErasureReport:
     each count is taken before the delete that spends it, and the plugins are asked before
     anything goes, in the same transaction, because a row erased while its contact survives
     is a deletion that cannot be undone and the report that said it happened is wrong.
+
+    ``reader`` is the person who asked: the counts they are shown are of their own rows, never
+    another member's of a shared contact (#956). Left out, every owner's are counted.
 
     Raises `ErasureRefused`, having removed nothing, while a plugin holds rows about the
     person that it could not remove.
@@ -497,13 +500,13 @@ def erase_contact(contact) -> ErasureReport:
             "messaging_handles": contact.messaging_handles.count(),
             # Their entries among the referees go with them, and with those the places they
             # had on CVs; a CV already sent keeps its words, as what was sent stays true (#696).
-            "references": career_references(contact).count(),
+            "references": _by(career_references(contact), reader).count(),
             "plugin_rows": removed,
         }
         # Each is kept and loses the person: an application its main contact (or whoever
         # referred it, #239), an entry in a listing's history who it came from (#270), an
         # interview a seat.
-        unlinked = {kind: rows.count() for kind, rows in references(contact).items()}
+        unlinked = {kind: _by(rows, reader).count() for kind, rows in references(contact).items()}
         name = contact.name
         contact.delete()
 

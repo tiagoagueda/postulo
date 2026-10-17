@@ -89,7 +89,8 @@ class KeepsOthersCopies:
     points at (#896): their application at a shared listing outlives its owner's change of
     mind. The record itself goes, and with it everything it holds."""
 
-    def form_valid(self, form):
+    def keep_others_copies(self) -> None:
+        """Give each other person who sees the record a copy of what their data points at."""
         from . import detach, sharing
 
         record = self.get_object()
@@ -98,6 +99,9 @@ class KeepsOthersCopies:
         ]
         if others:
             detach.after_losing([record], others, check=False)
+
+    def form_valid(self, form):
+        self.keep_others_copies()
         return super().form_valid(form)
 
 
@@ -1775,7 +1779,7 @@ class ContactDeleteView(KeepsOthersCopies, ConfirmDeleteMixin, SharedObjectMixin
         from django.utils.translation import ngettext
 
         context = super().get_context_data(**kwargs)
-        number = self.object.reference_letters.count()
+        number = self.own_letters().count()
         if number:
             context["kept"] = ngettext(
                 "%(count)d reference letter they wrote is kept, without a referee.",
@@ -1788,12 +1792,17 @@ class ContactDeleteView(KeepsOthersCopies, ConfirmDeleteMixin, SharedObjectMixin
             }
         return context
 
+    def own_letters(self):
+        """The letters the person deleting wrote down, never another member's (#956): a
+        shared referee can hold one from each, and each upload is its holder's own file."""
+        return self.object.reference_letters.filter(owner=self.request.user)
+
     def form_valid(self, form):
         from postulo.core import gdpr
 
         # What was asked about their letters is done first, while the link is there to find
         # them by (#666); the contact's erasure then counts what is left as unlinked.
-        letters = self.object.reference_letters.select_related("upload")
+        letters = self.own_letters().select_related("upload")
         delete_letters = bool(self.request.POST.get("delete_letters"))
 
         # A deletion that does not say what it removed is a guess about its own effect, so
@@ -1804,10 +1813,13 @@ class ContactDeleteView(KeepsOthersCopies, ConfirmDeleteMixin, SharedObjectMixin
                 # One savepoint: a refused erasure leaves the contact, so it must leave their
                 # letters too, and the refusal is a normal response that would commit them.
                 with transaction.atomic():
+                    # The copy the others are promised comes before anything goes, as it
+                    # does on the plain path (#961).
+                    self.keep_others_copies()
                     if delete_letters:
                         for letter in letters:
                             letter.upload.delete()
-                    report = gdpr.erase_contact(self.object)
+                    report = gdpr.erase_contact(self.object, reader=self.request.user)
             except gdpr.ErasureRefused as refused:
                 # A plugin holds rows about them that it could not remove, so nothing
                 # was. Back to the person, who is still there, with the reason (#371).
