@@ -80,7 +80,7 @@
          the table to that whole ownership tree -- which is the table's half of the company
          page's *across the group* (#138). {% endcomment %}
       <td class="px-4 py-3">
-        {% if company.parent %}
+        {% if company.parent and company.parent_seen %}
           <a href="{% url 'jobs:company_list' %}?group={{ company.parent.name|urlencode }}"
              class="underline"><bdi>{{ company.parent.name }}</bdi></a>
         {% else %}—{% endif %}

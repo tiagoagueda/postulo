@@ -1217,7 +1217,7 @@ def build_document(user) -> dict:
             "postings__applications__interviews__contacts",
             Prefetch(
                 "appointments",
-                queryset=Appointment.objects.select_related("reminder"),
+                queryset=Appointment.objects.for_user(user).select_related("reminder"),
             ),
             "postings__applications__department__company",
             "postings__applications__through_agency",

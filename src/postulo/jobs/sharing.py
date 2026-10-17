@@ -252,6 +252,34 @@ def check_link(record, target, actor) -> str:
     ) % {"target": target, "names": ", ".join(missing)}
 
 
+def check_child_link(record, parent) -> str:
+    """A refusal, or nothing: may ``record`` be made part of ``parent`` now? (#957)
+
+    A parent link is shown to the parent's audience, so everybody who can see ``parent``
+    must be able to see ``record`` -- the other way round from `check_link`. A record not
+    yet saved is seen by whoever will own it, nobody else.
+    """
+    if parent is None:
+        return ""
+    if record.pk is None:
+        keepers = {record.owner_id} if record.owner_id is not None else set()
+        if record.owner_group_id is not None:
+            keepers |= set(record.owner_group.user_set.values_list("pk", flat=True))
+        missing = [person for person in audience(parent) if person.pk not in keepers]
+    else:
+        missing = [person for person in audience(parent) if not seen_by(record, person)]
+    if not missing:
+        return ""
+    return _(
+        "“%(record)s” would be shown to %(names)s, who can see “%(parent)s”; "
+        "share it with them first."
+    ) % {
+        "record": record,
+        "parent": parent,
+        "names": ", ".join(person.get_username() for person in missing),
+    }
+
+
 def shared_with(user):
     """The grants this person, or a group of theirs, holds."""
     from postulo.core.models import group_ids

@@ -477,6 +477,17 @@ class CompanyForm(OwnNoteForm):
         registry has it wherever the person wrote nothing; otherwise the name is required,
         exactly as it always was (#202)."""
         data = super().clean()
+        if "parent" in self.fields and data.get("parent") is not None:
+            if not self.instance.pk or "parent" in self.changed_data:
+                from .sharing import check_child_link
+
+                # A new company is not saved yet: it will be the person's alone (#957).
+                subject = self.instance
+                if not subject.pk and subject.owner_id is None:
+                    subject.owner = self.user
+                refusal = check_child_link(subject, data["parent"])
+                if refusal:
+                    self.add_error("parent", refusal)
         if "kind" in self.fields and not data.get("kind"):
             data["kind"] = CompanyKind.EMPLOYER
         if "known_service" not in self.fields:
