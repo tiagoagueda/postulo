@@ -11,6 +11,7 @@ from django.urls import reverse
 from postulo.core.memo import forget_decisions
 from postulo.plugins import policy
 from postulo.plugins.models import PluginAccess, PluginPolicy
+from tests.recently import signed_in_recently
 
 pytestmark = pytest.mark.django_db
 
@@ -198,7 +199,7 @@ def test_only_an_administrator_reaches_either_page(client, user):
 
 
 def test_groups_are_made_filled_renamed_and_deleted(client, admin_user, user):
-    client.force_login(admin_user)
+    signed_in_recently(client, admin_user)
     url = reverse("server:groups")
     client.post(url, {"action": "create", "name": "Team"})
     group = Group.objects.get(name="Team")

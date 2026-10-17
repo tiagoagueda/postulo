@@ -8,6 +8,13 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🔒 Security
 
+- The share form's lookup of a person by username or address is limited per account (POSTULO_SHARE_LOOKUP_RATE, 20/h), and a hit names the address as typed, never the username it belongs to. (#943)
+- Deactivating an account and changing someone's username under People ask for a recent sign-in, like the other People actions. (#944)
+- Changing a group's members asks for a recent sign-in and is logged with who was added and who was removed, and Your groups lists every member by username. (#945)
+- Giving a listing whose company has a parent to a group shares the parent too, and a refusal is a message instead of a server error. (#946)
+- A record cannot be given to a deactivated account, a deactivated account cannot be added to a group or given a plugin access rule, and the groups pages mark the deactivated members who stay. (#947)
+- Two shares of one record to one person, or two groups of one name, made at once end as one instead of an error, and a group that is not a number is a 404. (#948)
+- A group's row is locked while members are removed, so two removals of its last two members cannot leave records it owns with nobody in it. (#989)
 - Companies, contacts and listings may be a group's or shared read-only or read/write, under an amended promise: nobody sees another's data unless granted, and a superuser sees any of those three but never anyone's notes, applications or documents (#896)
 - On a pull request the CI caches are restored by their exact key and never by a prefix, so a run of somebody else's code cannot read what a run on main restores or leave behind a poisoned fallback (#827)
 - The isolation sweep now asks the owner's own record to get past the lookup (and fixes the five entries that never did), checks every download it reaches for no-store, and a ratchet test fails on a new query of an owned model with no for_user or owner (#825)

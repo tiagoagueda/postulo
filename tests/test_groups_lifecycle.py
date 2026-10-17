@@ -18,6 +18,7 @@ from postulo.jobs.models import (
     RecordChange,
     Share,
 )
+from tests.recently import signed_in_recently
 
 User = get_user_model()
 
@@ -110,7 +111,7 @@ def test_an_administrator_removing_someone_does_the_same(client, ana, ben, house
     company = owned_by_group(household)
     company.write_note(ben, "kept")
     root = User.objects.create_superuser(email="root@example.org", password="not-a-real-pw")
-    client.force_login(root)
+    signed_in_recently(client, root)
     client.post(
         reverse("server:groups"),
         {"action": "save", "group": household.pk, "name": "Household", "members": [ana.pk]},
@@ -307,3 +308,116 @@ def test_a_merge_across_owners_never_takes_a_record_from_somebody(ana, ben, hous
     bens.refresh_from_db()
     assert bens.company == ours, "a member's own listing at the group's company stays at it"
     assert CompanyNote.objects.get(owner=ana).company == ours
+
+
+def _root(client):
+    root = User.objects.create_superuser(email="root@example.org", password="not-a-real-pw")
+    signed_in_recently(client, root)
+    return root
+
+
+def test_a_membership_change_is_logged_with_who_came_and_who_went(
+    client, caplog, ana, ben, household
+):
+    """Membership authorises a group's records, so the log names the change (#945)."""
+    cleo = person("cleo")
+    _root(client)
+    with caplog.at_level("WARNING", logger="postulo.core.views_access"):
+        client.post(
+            reverse("server:groups"),
+            {
+                "action": "save",
+                "group": household.pk,
+                "name": "Household",
+                "members": [ana.pk, cleo.pk],
+            },
+        )
+    line = next(r.getMessage() for r in caplog.records if "set by root" in r.getMessage())
+    assert "added ['cleo']" in line and "removed ['ben']" in line
+    assert "@example.org" not in line, "usernames, never addresses"
+
+
+def test_changing_groups_asks_for_a_recent_sign_in(client, ana, ben, household):
+    root = User.objects.create_superuser(email="root@example.org", password="not-a-real-pw")
+    client.force_login(root)
+    response = client.post(
+        reverse("server:groups"),
+        {"action": "save", "group": household.pk, "name": "Household", "members": [root.pk]},
+    )
+    assert response.status_code == 302 and "reauthenticate" in response["Location"]
+    assert not household.user_set.filter(pk=root.pk).exists()
+
+
+def test_your_groups_lists_who_is_in_each_one(client, ana, ben, household):
+    client.force_login(ana)
+    page = client.get(reverse("accounts:groups")).content.decode()
+    assert "<bdi>ben</bdi>" in page and "<bdi>ana</bdi>" in page
+
+
+def test_a_deactivated_member_stays_and_is_marked_but_none_is_added(client, ana, ben, household):
+    ben.is_active = False
+    ben.save()
+    cleo = person("cleo")
+    cleo.is_active = False
+    cleo.save()
+    _root(client)
+    url = reverse("server:groups")
+    assert "(deactivated)" in client.get(url).content.decode()
+    client.post(
+        url,
+        {
+            "action": "save",
+            "group": household.pk,
+            "name": "Household",
+            "members": [ana.pk, ben.pk, cleo.pk],
+        },
+    )
+    assert set(household.user_set.values_list("username", flat=True)) == {"ana", "ben"}
+    client.force_login(ana)
+    assert "deactivated" in client.get(reverse("accounts:groups")).content.decode()
+
+
+def test_a_group_that_is_not_a_number_is_a_404_and_not_a_server_error(client):
+    _root(client)
+    response = client.post(reverse("server:groups"), {"action": "delete", "group": "abc"})
+    assert response.status_code == 404
+
+
+def test_a_name_taken_between_the_look_and_the_make_is_refused_not_a_500(client, monkeypatch):
+    """The unique name decides; the earlier look can lose the race (#948)."""
+    Group.objects.create(name="Team")
+    _root(client)
+    from postulo.core import views_access
+
+    class Blind:
+        def exists(self):
+            return False
+
+    real = Group.objects.filter
+    monkeypatch.setattr(
+        Group.objects,
+        "filter",
+        lambda *a, **k: Blind() if "name__iexact" in k else real(*a, **k),
+    )
+    # The page's own check (case-insensitive) is blind; the exact-name insert still collides.
+    assert views_access._make_group("Team") is False
+    monkeypatch.undo()
+    assert Group.objects.filter(name="Team").count() == 1
+
+
+def test_removing_a_member_locks_the_group_row_first(ana, ben, household, monkeypatch):
+    """The last-member check runs under a lock on PostgreSQL (#989)."""
+    from django.db import transaction
+    from django.db.models.query import QuerySet
+
+    seen = []
+    real = QuerySet.select_for_update
+
+    def watch(self, *a, **k):
+        seen.append(self.model)
+        return real(self, *a, **k)
+
+    monkeypatch.setattr(QuerySet, "select_for_update", watch)
+    with transaction.atomic():
+        household.user_set.remove(ben)
+    assert Group in seen

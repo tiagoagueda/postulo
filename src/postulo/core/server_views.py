@@ -280,6 +280,7 @@ class PersonAdminView(StaffRequiredMixin, View):
 class PersonActiveView(StaffRequiredMixin, View):
     """Deactivate an account — it keeps its data, cannot sign in — or reactivate it."""
 
+    @method_decorator(reauthentication_required)
     def post(self, request: HttpRequest, pk: int) -> HttpResponse:
         person = get_object_or_404(get_user_model(), pk=pk)
         if person == request.user:
@@ -292,7 +293,11 @@ class PersonActiveView(StaffRequiredMixin, View):
                 person.save(update_fields=["is_active"])
                 messages.success(
                     request,
-                    _("%(name)s is deactivated: nothing deleted, no sign-in.") % {"name": person},
+                    _(
+                        "%(name)s is deactivated: nothing deleted, no sign-in. Their group "
+                        "memberships and shares are kept."
+                    )
+                    % {"name": person},
                 )
         else:
             person.is_active = True
@@ -446,6 +451,12 @@ class PersonUsernameView(StaffRequiredMixin, UpdateView):
 
     template_name = "server/person_username.html"
     section_title = _("People")
+
+    @method_decorator(reauthentication_required)
+    def post(self, request, *args, **kwargs):
+        # Changing a sign-in identifier wants a fresh proof, as the other People actions do
+        # (#944); looking at the form does not.
+        return super().post(request, *args, **kwargs)
 
     def get_queryset(self):
         return get_user_model().objects.all()

@@ -526,6 +526,11 @@ POSTULO_RECOVERY_RATE = env("POSTULO_RECOVERY_RATE", default="10/h")
 # taken username says so, which is how a name is found out; the sign-up form is bounded by
 # allauth's per-address limit and cannot be bounded per account, there being none yet.
 POSTULO_USERNAME_RATE = env("POSTULO_USERNAME_RATE", default="10/h")
+# People one account may look up by username or address on a record's *Sharing* page in an
+# hour (#943). A hit shares the record, a miss says nobody answers: that is an oracle for
+# who holds an account here, so the number of tries is bounded. Choosing one's own group
+# costs nothing.
+POSTULO_SHARE_LOOKUP_RATE = env("POSTULO_SHARE_LOOKUP_RATE", default="20/h")
 # API tokens one account may make in an hour (#764). Each is a way in with no password and no
 # second factor; making a handful an hour is a person, making fifty is not.
 POSTULO_API_TOKEN_RATE = env("POSTULO_API_TOKEN_RATE", default="10/h")

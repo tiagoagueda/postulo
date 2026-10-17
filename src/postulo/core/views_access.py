@@ -20,13 +20,16 @@ import logging
 from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group
-from django.db import transaction
+from django.db import IntegrityError, transaction
+from django.db.models import Q
 from django.http import Http404, HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
+from django.utils.decorators import method_decorator
 from django.utils.translation import gettext as _
 from django.views import View
 
+from postulo.accounts.reauth import reauthentication_required
 from postulo.plugins import base, policy
 from postulo.plugins.models import PluginAccess, PluginPolicy
 
@@ -55,20 +58,23 @@ class GroupsView(StaffRequiredMixin, View):
             {"section_title": _("People"), "groups": groups, "people": people},
         )
 
+    @method_decorator(reauthentication_required)
     def post(self, request: HttpRequest) -> HttpResponse:
         action = request.POST.get("action", "")
         if action == "create":
             name = request.POST.get("name", "").strip()
             if not name or len(name) > MAX_GROUP_NAME:
                 messages.error(request, _("A group needs a name."))
-            elif Group.objects.filter(name__iexact=name).exists():
-                messages.error(request, _("There is a group of that name already."))
-            else:
-                Group.objects.create(name=name)
+            elif _make_group(name):
                 logger.warning("Group %r made by %s", name, request.user.username)
                 messages.success(request, _("Group made."))
+            else:
+                messages.error(request, _("There is a group of that name already."))
             return redirect("server:groups")
-        group = get_object_or_404(Group, pk=request.POST.get("group", "0") or 0)
+        pk = request.POST.get("group", "")
+        if not pk.isdigit():
+            raise Http404
+        group = get_object_or_404(Group, pk=int(pk))
         from . import groups as lifecycle
 
         if action == "delete":
@@ -91,19 +97,50 @@ class GroupsView(StaffRequiredMixin, View):
             # Whoever is taken out keeps copies of what their own data points at, and the
             # last member of a group that owns records stays (#896): `core.groups` does both,
             # for this page and every other way the membership changes.
+            People = get_user_model()
             try:
                 with transaction.atomic():
+                    # Locked, so two administrators saving at once take turns (#989).
+                    group = Group.objects.select_for_update().get(pk=group.pk)
+                    before = set(group.user_set.values_list("pk", flat=True))
+                    # A deactivated account may stay a member -- nothing is deleted -- but is
+                    # not added: it could sign in to nothing (#947).
+                    wanted = People.objects.filter(pk__in=chosen).filter(
+                        Q(is_active=True) | Q(pk__in=before)
+                    )
                     group.name = name
                     group.save(update_fields=["name"])
-                    group.user_set.set(get_user_model().objects.filter(pk__in=chosen))
+                    group.user_set.set(wanted)
+                    after = set(group.user_set.values_list("pk", flat=True))
             except lifecycle.LastMemberOwns as refusal:
                 messages.error(request, str(refusal))
                 return redirect("server:groups")
-            logger.warning("Group %r set by %s", group.name, request.user.username)
+            names = dict(People.objects.filter(pk__in=before | after).values_list("pk", "username"))
+            # Membership is what authorises a group's records, so the line says who came and
+            # who went -- usernames, never addresses (#945).
+            logger.warning(
+                "Group %r set by %s: added %s, removed %s",
+                group.name,
+                request.user.username,
+                sorted(names[pk] for pk in after - before) or "nobody",
+                sorted(names[pk] for pk in before - after) or "nobody",
+            )
             messages.success(request, _("Saved."))
         else:
             raise Http404
         return redirect("server:groups")
+
+
+def _make_group(name: str) -> bool:
+    """Make the group, or say it exists: the unique name decides, not a look beforehand (#948)."""
+    if Group.objects.filter(name__iexact=name).exists():
+        return False
+    try:
+        with transaction.atomic():  # a savepoint: the refusal must not poison the request's
+            Group.objects.create(name=name)
+    except IntegrityError:
+        return False
+    return True
 
 
 def _governed(name: str):
@@ -192,7 +229,7 @@ class PluginAccessView(StaffRequiredMixin, View):
         if kind == "group" and pk.isdigit():
             subject = {"group": Group.objects.filter(pk=pk).first()}
         elif kind == "person" and pk.isdigit():
-            subject = {"person": get_user_model().objects.filter(pk=pk).first()}
+            subject = {"person": get_user_model().objects.filter(pk=pk, is_active=True).first()}
         else:
             subject = {}
         target = next(iter(subject.values()), None)

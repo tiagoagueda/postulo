@@ -177,3 +177,86 @@ def test_a_change_is_written_down_with_who_made_it(client, owner, friend):
     client.force_login(owner)
     page = client.get(reverse("jobs:company_detail", args=[company.pk])).content.decode()
     assert "friend" in page and "website" in page
+
+
+def test_a_hit_by_address_names_the_address_and_never_the_username(client, owner, friend):
+    """Typing an address must not teach the username that goes with it (#943)."""
+    company = Company.objects.create(owner=owner, name="Acme")
+    client.force_login(owner)
+    url = reverse("jobs:share", args=["company", company.pk])
+
+    response = client.post(url, {"person": "Friend@Example.org", "scope": "read"}, follow=True)
+
+    page = response.content.decode()
+    assert "Shared with Friend@Example.org." in page
+    assert "friend</bdi>" not in page and ">friend<" not in page
+    assert "Friend@Example.org" in page, "the list says it as it was typed"
+    assert Share.objects.get().grantee_user == friend
+
+
+def test_sharing_twice_leaves_one_grant_with_the_wider_scope(owner, friend):
+    """The second of two quick submits widens the first instead of colliding with it (#948)."""
+    company = Company.objects.create(owner=owner, name="Acme")
+    sharing.share(company, friend, "read", owner)
+    sharing.share(company, friend, "write", owner)
+    grant = Share.objects.get()
+    assert grant.scope == "write"
+
+
+def test_giving_a_listing_to_a_group_shares_a_company_and_its_parent_too(client, owner):
+    """The move shares what it points at, parent included, and does not fail (#946)."""
+    parent = Company.objects.create(owner=owner, name="Holding")
+    company = Company.objects.create(owner=owner, name="Acme", parent=parent)
+    posting = create_listing(owner, company=company, posting_data={"title": "Engineer"})
+    team = Group.objects.create(name="Team")
+    other = person("other")
+    team.user_set.add(owner, other)
+    client.force_login(owner)
+
+    response = client.post(
+        reverse("jobs:move_owner", args=["listing", posting.pk]),
+        {"to": f"group:{team.pk}", "confirmed": "1"},
+    )
+
+    assert response.status_code == 302
+    posting.refresh_from_db()
+    assert posting.owner_group_id == team.pk
+    assert {(s.company_id, s.scope) for s in Share.objects.filter(grantee_group=team)} == {
+        (company.pk, "read"),
+        (parent.pk, "read"),
+    }
+
+
+def test_a_refused_move_is_a_message_and_not_a_server_error(client, owner):
+    company = Company.objects.create(owner=owner, name="Acme")
+    team = Group.objects.create(name="Team")
+    team.user_set.add(owner)
+    client.force_login(owner)
+    from unittest import mock
+
+    with mock.patch(
+        "postulo.jobs.ownership.move", side_effect=sharing.ShareRefused("not like that")
+    ):
+        response = client.post(
+            reverse("jobs:move_owner", args=["company", company.pk]),
+            {"to": f"group:{team.pk}", "confirmed": "1"},
+        )
+    assert response.status_code == 302
+
+
+def test_a_superuser_cannot_give_a_record_to_a_deactivated_account(client, owner):
+    """Sharing refuses a deactivated account, and so does giving (#947)."""
+    gone = person("gone")
+    gone.is_active = False
+    gone.save()
+    boss = User.objects.create_superuser(email="boss@example.org", password="not-a-real-pw")
+    company = Company.objects.create(owner=owner, name="Acme")
+    client.force_login(boss)
+
+    client.post(
+        reverse("jobs:move_owner", args=["company", company.pk]),
+        {"person": "gone", "confirmed": "1"},
+    )
+
+    company.refresh_from_db()
+    assert company.owner_id == owner.pk

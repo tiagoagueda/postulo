@@ -92,7 +92,7 @@ def move(record, principal, actor, *, also_share: bool = False) -> None:
                 % {"names": ", ".join(f"“{target}”" for target in plan.also)}
             )
         for target in plan.also:
-            sharing.share(target, principal, Share.Scope.READ, actor)
+            sharing.share(target, principal, Share.Scope.READ, actor, also_share=also_share)
     gone = losing(record, principal)
     detach.after_losing(record, gone)
     before = sharing.principal_label(record) if hasattr(sharing, "principal_label") else ""

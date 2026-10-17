@@ -2298,6 +2298,10 @@ class Share(models.Model):
         verbose_name=_("group"),
     )
     scope = models.CharField(_("access"), max_length=5, choices=ShareScope.choices)
+    # What the sharer typed to find a person (their address, or their username). The page
+    # shows it back instead of the username, so typing an address never teaches the username
+    # that goes with it (#943).
+    addressed_as = models.CharField(max_length=254, blank=True, editable=False)
     granted_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.SET_NULL,

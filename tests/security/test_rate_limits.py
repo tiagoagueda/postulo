@@ -497,3 +497,62 @@ def test_an_allowance_spent_is_still_spent_when_the_old_five_minutes_are_up(star
     assert _seconds_left("probe-spent") > 300
     with pytest.raises(throttle.TooOften):
         throttle.consume("probe-spent", "someone", rate)
+
+
+def _share_lookup(client, company, value):
+    return client.post(
+        reverse("jobs:share", args=["company", company.pk]), {"person": value, "scope": "read"}
+    )
+
+
+@override_settings(POSTULO_SHARE_LOOKUP_RATE="3/h")
+def test_looking_people_up_to_share_with_is_bounded_and_says_nothing_either_way(
+    client, person, django_user_model
+):
+    """A hit shares, a miss refuses: typed in volume that is a directory of accounts (#943)."""
+    from django.contrib.messages import get_messages
+
+    from postulo.jobs.models import Company
+
+    gone = django_user_model.objects.create_user(
+        email="gone@example.org", username="gone", password=PASSWORD, is_active=False
+    )
+    company = Company.objects.create(owner=person, name="Acme")
+    client.force_login(person)
+
+    def said(value):
+        response = _share_lookup(client, company, value)
+        assert response.status_code == 302
+        return [str(list(get_messages(response.wsgi_request))[-1])]
+
+    unknown = said("nobody@example.org")
+    deactivated = said(gone.email)
+    own = said(person.email)
+    assert unknown == deactivated == own and unknown, "one wording for every miss"
+
+    refused = said("someone-else@example.org")
+    assert refused != unknown and "Too many" in refused[0]
+
+
+@override_settings(POSTULO_SHARE_LOOKUP_RATE="1/h")
+def test_choosing_one_s_own_group_or_nothing_costs_no_allowance(client, person):
+    from django.contrib.auth.models import Group
+
+    from postulo.jobs.models import Company, Share
+
+    mine = Group.objects.create(name="Mine")
+    person.groups.add(mine)
+    company = Company.objects.create(owner=person, name="Acme")
+    client.force_login(person)
+
+    for _ in range(3):
+        _share_lookup(client, company, "")
+    _share_lookup(client, company, f"group:{mine.pk}")
+    assert Share.objects.filter(grantee_group=mine).exists()
+    # ... and the one allowance is still whole.
+    from django.contrib.messages import get_messages
+
+    first = _share_lookup(client, company, "x@example.org")
+    assert "Too many" not in str(list(get_messages(first.wsgi_request))[-1])
+    second = _share_lookup(client, company, "y@example.org")
+    assert "Too many" in str(list(get_messages(second.wsgi_request))[-1])

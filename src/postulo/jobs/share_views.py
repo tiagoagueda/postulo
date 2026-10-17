@@ -10,6 +10,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.translation import gettext as _
 from django.views import View
 
+from postulo.core import throttle
 from postulo.core.mixins import MANAGE, READ, shared_scope
 from postulo.core.redirects import safe_next
 
@@ -44,7 +45,17 @@ class ShareView(LoginRequiredMixin, View):
 
     def post(self, request: HttpRequest, kind: str, pk: int) -> HttpResponse:
         record = record_or_404(request, kind, pk, MANAGE)
-        value = request.POST.get("grantee") or request.POST.get("person", "")
+        value = (request.POST.get("grantee") or request.POST.get("person", "")).strip()
+        if value and not value.startswith("group:"):
+            # Whom a typed name or address belongs to is how an account is found out; the
+            # number of tries is bounded, and choosing one's own group costs nothing (#943).
+            try:
+                throttle.consume(
+                    "share-lookup", request.user, throttle.rate_for("POSTULO_SHARE_LOOKUP_RATE")
+                )
+            except throttle.TooOften as too_often:
+                messages.error(request, str(too_often))
+                return redirect(request.path)
         grantee = sharing.grantee_from(request.user, value)
         if grantee is None:
             messages.error(
@@ -54,12 +65,13 @@ class ShareView(LoginRequiredMixin, View):
             return redirect(request.path)
         scope = request.POST.get("scope", "read")
         also = request.POST.get("also") == "1"
+        # A person is named back as they were typed, never by the username an address maps to.
+        typed = "" if isinstance(grantee, Group) else value
+        label = sharing.grantee_label(grantee) if isinstance(grantee, Group) else value
         plan = sharing.plan_share(record, grantee, scope, request.user)
         if plan.possible and plan.also and not also:
             # Asked, and nothing done until it is answered.
-            grantee_value = (
-                f"group:{grantee.pk}" if hasattr(grantee, "user_set") else grantee.get_username()
-            )
+            grantee_value = f"group:{grantee.pk}" if isinstance(grantee, Group) else value
             return render(
                 request,
                 self.template_name,
@@ -67,19 +79,16 @@ class ShareView(LoginRequiredMixin, View):
                     request,
                     record,
                     plan=plan,
-                    grantee_label=sharing.grantee_label(grantee),
+                    grantee_label=label,
                     grantee_value=grantee_value,
                 ),
             )
         try:
-            sharing.share(record, grantee, scope, request.user, also_share=also)
+            sharing.share(record, grantee, scope, request.user, also_share=also, addressed_as=typed)
         except sharing.ShareRefused as refusal:
             messages.error(request, str(refusal))
             return redirect(request.path)
-        messages.success(
-            request,
-            _("Shared with %(who)s.") % {"who": sharing.grantee_label(grantee)},
-        )
+        messages.success(request, _("Shared with %(who)s.") % {"who": label})
         return redirect(request.path)
 
 
@@ -139,7 +148,13 @@ class MoveView(LoginRequiredMixin, View):
         from django.contrib.auth import get_user_model
 
         if person and request.user.is_superuser:
-            return get_user_model().objects.filter(username__iexact=person.strip()).first()
+            # A deactivated account cannot sign in, so a record given to it is out of
+            # everyone's reach: sharing refuses it too (#947).
+            return (
+                get_user_model()
+                .objects.filter(username__iexact=person.strip(), is_active=True)
+                .first()
+            )
         if value == "me":
             return request.user
         if value.startswith("group:"):
@@ -204,7 +219,7 @@ class MoveView(LoginRequiredMixin, View):
             )
         try:
             ownership.move(record, to, request.user, also_share=True)
-        except ownership.MoveRefused as refusal:
+        except (ownership.MoveRefused, sharing.ShareRefused) as refusal:
             messages.error(request, str(refusal))
             return redirect(request.path)
         messages.success(request, _("It belongs to %(name)s now.") % {"name": ownership.label(to)})
