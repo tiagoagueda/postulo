@@ -3,6 +3,15 @@
 # Postulo
 
 [![CI](https://source.tiagoagueda.com/postulo/postulo/actions/workflows/ci.yml/badge.svg)](https://source.tiagoagueda.com/postulo/postulo/actions)
+[![Latest release](https://img.shields.io/gitea/v/release/postulo/postulo?gitea_url=https://source.tiagoagueda.com&label=release)](https://source.tiagoagueda.com/postulo/postulo/releases)
+[![License: AGPL-3.0-or-later](https://img.shields.io/badge/license-AGPL--3.0--or--later-blue)](https://source.tiagoagueda.com/postulo/postulo/src/branch/main/LICENSE)
+[![Python 3.12 or newer](https://img.shields.io/badge/python-3.12%2B-blue)](https://source.tiagoagueda.com/postulo/postulo/src/branch/main/pyproject.toml)
+[![Django 6.1](https://img.shields.io/badge/django-6.1-0c4b33)](https://source.tiagoagueda.com/postulo/postulo/src/branch/main/pyproject.toml)
+[![Docker image](https://img.shields.io/badge/docker-image-2496ed)](https://source.tiagoagueda.com/postulo/postulo/packages)
+[![Translation progress](https://translate.tiagoagueda.com/widget/postulo/svg-badge.svg)](https://translate.tiagoagueda.com/projects/postulo/)
+[![Last commit](https://img.shields.io/gitea/last-commit/postulo/postulo?gitea_url=https://source.tiagoagueda.com)](https://source.tiagoagueda.com/postulo/postulo/commits/branch/main)
+[![No telemetry](https://img.shields.io/badge/telemetry-none-brightgreen)](https://source.tiagoagueda.com/postulo/postulo/src/branch/main/SECURITY.md)
+[![No paywall](https://img.shields.io/badge/paywall-never-brightgreen)](https://source.tiagoagueda.com/postulo/postulo#never-paywalled)
 
 **Self-hosted job application manager, from the applicant's side of the table.**
 
@@ -12,7 +21,7 @@ data, on your server.
 
 From the Latin *postulō* — "I apply for". First person, deliberately.
 
-> **Status: 0.4.0.** Usable and used, but not battle-tested: it has recorded real
+> **Status: pre-1.0.** Usable and used, but not battle-tested: it has recorded real
 > applications, by one person, for weeks rather than years. Releasing here is a deliberate
 > act rather than something that happens on a schedule, so `main` may be ahead of the last
 > tag — the [changelog](CHANGELOG.md) says by how much.
@@ -132,51 +141,29 @@ and answers for it. The assistant is a tool; the contributor is accountable. See
 
 ## In your language
 
-Postulo speaks every official language of the European Union, Brazilian Portuguese
-beside the European, and the languages of Europe beyond the Union. The interface is a
-setting per person; the documentation is in English, and this paragraph says what
-Postulo is in each language so nobody has to guess. Translations are made, corrected and
-reviewed at [translate.tiagoagueda.com](https://translate.tiagoagueda.com/projects/postulo/)
-([docs/TRANSLATING.md](docs/TRANSLATING.md)).
+The interface is a setting per person; the documentation is in English, and the table
+below says what Postulo is in each language so nobody has to guess. Translations are made,
+corrected and reviewed at [translate.tiagoagueda.com](https://translate.tiagoagueda.com/projects/postulo/)
+([docs/TRANSLATING.md](docs/TRANSLATING.md)), where the live progress of every language is.
 
-- **български** — Postulo е самостоятелно хостван мениджър на кандидатури за работа: вашите кандидатури, CV-та и мотивационни писма, на вашия сървър, без платени функции.
-- **bosanski** — Postulo je samostalno hostovani upravitelj prijava za posao: vaše prijave, CV-jevi i motivaciona pisma na vašem serveru, bez plaćenih funkcija.
-- **català** — Postulo és un gestor de candidatures autoallotjat: les vostres candidatures, CV i cartes de presentació al vostre servidor, sense funcions de pagament.
-- **čeština** — Postulo je samostatně hostovaný správce žádostí o práci: vaše žádosti, CV a motivační dopisy na vašem serveru, bez placených funkcí.
-- **Cymraeg** — Rheolwr ceisiadau am swydd hunangynhaliol yw Postulo: eich ceisiadau, eich CVau a'ch llythyrau eglurhaol ar eich gweinydd eich hun, heb unrhyw nodweddion taledig.
-- **dansk** — Postulo er en selvhostet håndtering af jobansøgninger: dine ansøgninger, CV'er og ansøgningsbreve på din egen server, uden betalte funktioner.
-- **Deutsch** — Postulo ist ein selbst gehosteter Bewerbungsmanager: Ihre Bewerbungen, Lebensläufe und Anschreiben auf Ihrem eigenen Server, ohne kostenpflichtige Funktionen.
-- **Ελληνικά** — Το Postulo είναι ένας αυτοφιλοξενούμενος διαχειριστής αιτήσεων εργασίας: οι αιτήσεις, τα βιογραφικά και οι συνοδευτικές επιστολές σας, στον διακομιστή σας, χωρίς επί πληρωμή λειτουργίες.
-- **español** — Postulo es un gestor de candidaturas de empleo autoalojado: tus candidaturas, CV y cartas de presentación en tu propio servidor, sin funciones de pago.
-- **eesti** — Postulo on ise majutatav töökandideerimiste haldur: teie kandideerimised, CV-d ja motivatsioonikirjad teie enda serveris, ilma tasuliste funktsioonideta.
-- **euskara** — Postulo norberak ostatatutako lan-eskaeren kudeatzailea da: zure eskaerak, CVak eta aurkezpen-gutunak zure zerbitzarian, ordainpeko funtziorik gabe.
-- **suomi** — Postulo on itse ylläpidettävä työhakemusten hallinta: hakemuksesi, CV:si ja saatekirjeesi omalla palvelimellasi, ilman maksullisia ominaisuuksia.
-- **français** — Postulo est un gestionnaire de candidatures auto-hébergé : vos candidatures, vos CV et vos lettres de motivation sur votre propre serveur, sans fonctionnalité payante.
-- **Gaeilge** — Bainisteoir iarratas poist féinóstáilte is ea Postulo: d'iarratais, do CVanna agus do litreacha cumhdaigh ar do fhreastalaí féin, gan aon ghné íoctha.
-- **galego** — Postulo é un xestor de candidaturas de emprego auto-hospedado: as túas candidaturas, CV e cartas de presentación no teu propio servidor, sen funcións de pago.
-- **hrvatski** — Postulo je samostalno hostani upravitelj prijava za posao: vaše prijave, životopisi i motivacijska pisma na vašem poslužitelju, bez plaćenih značajki.
-- **magyar** — A Postulo saját szerveren futtatható álláspályázat-kezelő: a jelentkezéseid, önéletrajzaid és motivációs leveleid a saját szervereden, fizetős funkciók nélkül.
-- **հայերեն** — Postulo-ն ինքնահյուրընկալվող աշխատանքի դիմումների կառավարիչ է՝ ձեր դիմումները, CV-ները և մոտիվացիոն նամակները ձեր սերվերի վրա, առանց վճարովի հնարավորությունների։
-- **íslenska** — Postulo er sjálfhýstur umsóknastjóri: umsóknirnar þínar, ferilskrárnar þínar og kynningarbréfin þín á þínum eigin þjóni, án greiddra eiginleika.
-- **italiano** — Postulo è un gestore di candidature self-hosted: le tue candidature, i tuoi CV e le tue lettere di presentazione sul tuo server, senza funzioni a pagamento.
-- **ქართული** — Postulo არის თვითჰოსტირებული განაცხადების მმართველი: თქვენი განაცხადები, CV-ები და სამოტივაციო წერილები თქვენს სერვერზე, ფასიანი ფუნქციების გარეშე.
-- **Lëtzebuergesch** — Postulo ass e selwer gehostene Bewerbungsmanager: Är Kandidaturen, CVen a Motivatiounsbréiwer op Ärem eegene Server, ouni bezuelte Funktiounen.
-- **lietuvių** — Postulo — savarankiškai talpinama darbo paraiškų tvarkyklė: jūsų paraiškos, CV ir motyvaciniai laiškai jūsų serveryje, be mokamų funkcijų.
-- **latviešu** — Postulo ir pašhostēts darba pieteikumu pārvaldnieks: jūsu pieteikumi, CV un motivācijas vēstules jūsu serverī, bez maksas funkcijām.
-- **македонски** — Postulo е самостојно хостиран управувач на пријави за работа: вашите пријави, CV-а и мотивациски писма на вашиот сервер, без платени функции.
-- **Malti** — Postulo huwa maniġer ta' applikazzjonijiet għax-xogħol self-hosted: l-applikazzjonijiet, is-CVs u l-ittri ta' motivazzjoni tiegħek fuq is-server tiegħek, mingħajr funzjonijiet bi ħlas.
-- **norsk bokmål** — Postulo er en selvhostet søknadsbehandler: søknadene dine, CV-ene dine og søknadsbrevene dine på din egen server, uten betalte funksjoner.
-- **Nederlands** — Postulo is een zelfgehoste sollicitatiemanager: uw sollicitaties, cv's en brieven op uw eigen server, zonder betaalde functies.
-- **polski** — Postulo to samodzielnie hostowany menedżer aplikacji o pracę: twoje aplikacje, CV i listy motywacyjne na twoim serwerze, bez płatnych funkcji.
-- **português** — O Postulo é um gestor de candidaturas auto-hospedado: as suas candidaturas, CV e cartas de apresentação no seu próprio servidor, sem funcionalidades pagas.
-- **română** — Postulo este un manager de candidaturi găzduit pe propriul server: candidaturile, CV-urile și scrisorile tale de intenție pe serverul tău, fără funcții plătite.
-- **slovenčina** — Postulo je samostatne hostovaný správca žiadostí o prácu: vaše žiadosti, CV a motivačné listy na vašom serveri, bez platených funkcií.
-- **slovenščina** — Postulo je samostojno gostovan upravljalnik prijav za zaposlitev: vaše prijave, življenjepisi in motivacijska pisma na vašem strežniku, brez plačljivih funkcij.
-- **shqip** — Postulo është një menaxher aplikimesh pune i vetëstrehuar: aplikimet, CV-të dhe letrat tuaja motivuese në serverin tuaj, pa veçori me pagesë.
-- **српски** — Postulo је самостално хостован управљач пријава за посао: ваше пријаве, CV-јеви и мотивациона писма на вашем серверу, без плаћених функција.
-- **svenska** — Postulo är en självhostad hanterare för jobbansökningar: dina ansökningar, CV:n och personliga brev på din egen server, utan betalfunktioner.
-- **Türkçe** — Postulo, kendi sunucunuzda barındırılan bir iş başvurusu yöneticisidir: başvurularınız, CV'leriniz ve ön yazılarınız kendi sunucunuzda, ücretli özellikler olmadan.
-- **українська** — Postulo — це самостійно розміщений менеджер заявок на роботу: ваші заявки, резюме та супровідні листи на вашому сервері, без платних функцій.
+<!-- languages:start (written by scripts/readme_languages.py; do not edit by hand) -->
+
+Postulo speaks **10 languages**, each named here as its speakers write it.
+
+| | Language | What Postulo is |
+| --- | --- | --- |
+| <img src="src/postulo/static/flags/id.svg" width="20" height="15" alt=""> | **<span lang="id" dir="ltr">Bahasa Indonesia</span>** | — |
+| <img src="src/postulo/static/flags/ca.svg" width="20" height="15" alt=""> | **<span lang="en-CA" dir="ltr">English (Canada)</span>** | — |
+| <img src="src/postulo/static/flags/gb.svg" width="20" height="15" alt=""> | **<span lang="en-GB" dir="ltr">English (United Kingdom)</span>** | <span lang="en-GB" dir="ltr">Postulo is a self-hosted job application manager: your applications, CVs and cover letters on your own server, with no paid features.</span> |
+| <img src="src/postulo/static/flags/mx.svg" width="20" height="15" alt=""> | **<span lang="es-MX" dir="ltr">español (México)</span>** | — |
+| <img src="src/postulo/static/flags/ca.svg" width="20" height="15" alt=""> | **<span lang="fr-CA" dir="ltr">français (Canada)</span>** | — |
+| <img src="src/postulo/static/flags/fr.svg" width="20" height="15" alt=""> | **<span lang="fr-FR" dir="ltr">français (France)</span>** | — |
+| <img src="src/postulo/static/flags/es-ga.svg" width="20" height="15" alt=""> | **<span lang="gl" dir="ltr">galego</span>** | — |
+| <img src="src/postulo/static/flags/lt.svg" width="20" height="15" alt=""> | **<span lang="lt" dir="ltr">lietuvių</span>** | — |
+| <img src="src/postulo/static/flags/hu.svg" width="20" height="15" alt=""> | **<span lang="hu" dir="ltr">magyar</span>** | — |
+| <img src="src/postulo/static/flags/pt.svg" width="20" height="15" alt=""> | **<span lang="pt-PT" dir="ltr">português (Portugal)</span>** | — |
+
+<!-- languages:end -->
 
 ## Documentation
 
