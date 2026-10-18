@@ -75,12 +75,16 @@ merge reach the person without a second place to look; the entry holds only how 
 what has been agreed (a note of the account holder's own, not a consent record) and whether the
 details print. A CV prints a reference only when its permission is *Agreed*, and then the name,
 the role, the company and the relationship; the email address and the primary number only where
-the entry says so. The renderer hands a theme a read-only value built under those two rules and
-never the entry or the contact, so a theme from a plugin cannot step round them. Nothing about a
+the entry says so. The renderer builds the `sections` a shipped theme draws from under those two
+rules, as a read-only value that never holds the entry or the contact, and the themes
+Postulo ships read nothing else of a reference. A theme from a plugin is not held to them:
+it is handed the CV and letter records themselves, which reach each reference's entry and
+contact, and is trusted like the plugin that carries it (#820, #965). Nothing about a
 referee is written to a list, a log or an error message, and the candidate file never carries
 one: a file moved to another instance should not hold other people's addresses. A CV already
 sent keeps the words it was sent with (#217), which the erasure and the merge say.
-`tests/test_references.py` and `tests/security/test_cv_prints.py` hold each of these.
+`tests/test_references.py` and `tests/security/test_cv_prints.py` hold each of these for
+the shipped themes.
 
 **A date and a place of birth sit beside it (#679), and so do nationalities (#680) and
 gender (#681).** They are what an identity check asks for, a nationality can reveal an ethnic
