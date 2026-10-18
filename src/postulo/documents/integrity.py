@@ -6,7 +6,8 @@ library, an ODT or a DOCX is read from its zip directory and never unpacked, and
 here executes or renders what it is given; the evidence is the bytes a format must start
 and end with. The one decoder is Pillow's, for a picture, held to the same cap on pixels
 the avatar is (`core.pictures.decode`), and the bytes are kept as they came: an upload is
-kept as it was.
+kept as it was. The one thing done to a picture is `without_metadata` (#964), at the person's
+request and without re-encoding it.
 
 A library for the container questions (`puremagic`) was weighed and not taken for now: the
 zip directory answers both questions that matter, in a dozen lines and with nothing new to
@@ -19,6 +20,8 @@ The second question is `matches`: a size and a SHA-256 read in chunks.
 from __future__ import annotations
 
 import hashlib
+import io
+import re
 import zipfile
 from collections.abc import Callable
 from typing import IO
@@ -191,3 +194,131 @@ def damage_of(name: str, *, size: int | None, checksum: str) -> str:
     if checksum and found != checksum:
         return Damage.CHANGED
     return ""
+
+
+# ---------------------------------------------- metadata, cut out without re-encoding (#964)
+
+#: A phone's photograph carries where it was taken, when and with what, in EXIF (and XMP and
+#: IPTC). An uploaded certificate is often one, and is then attached to mail sent to an
+#: employer. These are cut out of the file by its structure, so the compressed picture is
+#: byte for byte what it was: a re-encode would cost a scan its quality and the stored
+#: checksum its meaning.
+#:
+#: JPEG segments dropped: APP1 (Exif, XMP), APP3 (extended Exif), APP13 (Photoshop, IPTC) and
+#: COM (a comment). APP0 (JFIF), APP2 (the ICC colour profile), APP14 (Adobe's colour
+#: transform) and everything the decoder needs stay.
+_JPEG_DROPPED = frozenset({0xE1, 0xE3, 0xED, 0xFE})
+#: PNG chunks dropped: Exif, the three kinds of text, and the modification time.
+_PNG_DROPPED = frozenset({b"eXIf", b"tEXt", b"iTXt", b"zTXt", b"tIME"})
+_PNG_SIGNATURE = b"\x89PNG\r\n\x1a\n"
+#: In the compressed data of a scan a 0xFF is followed by 0x00 (stuffing), a restart marker or
+#: more 0xFF (padding); anything else is the next marker.
+_NEXT_MARKER = re.compile(rb"\xff[^\x00\xd0-\xd7\xff]")
+_ORIENTATION = 0x0112
+
+
+def _orientation_segment(data: bytes) -> bytes:
+    """An APP1 segment holding only the picture's orientation, or nothing where it is upright.
+
+    The orientation is not about the photographer: it is how the pixels must be turned to be
+    read the right way up, and without it a portrait photograph of a page lies on its side.
+    """
+    from PIL import Image
+
+    try:
+        turned = Image.open(io.BytesIO(data)).getexif().get(_ORIENTATION)
+    except Exception:  # a picture Pillow cannot read the tags of has none to keep
+        return b""
+    if not isinstance(turned, int) or not 2 <= turned <= 8:
+        return b""
+    tiff = (
+        b"II*\x00"
+        + (8).to_bytes(4, "little")  # little-endian, first directory at 8
+        + (1).to_bytes(2, "little")  # one entry
+        + _ORIENTATION.to_bytes(2, "little")
+        + (3).to_bytes(2, "little")  # tag, type SHORT
+        + (1).to_bytes(4, "little")
+        + turned.to_bytes(2, "little")
+        + b"\x00\x00"
+        + (0).to_bytes(4, "little")  # no further directory
+    )
+    payload = b"Exif\x00\x00" + tiff
+    return b"\xff\xe1" + (len(payload) + 2).to_bytes(2, "big") + payload
+
+
+def _jpeg_without_metadata(data: bytes) -> bytes:
+    if not data.startswith(b"\xff\xd8"):
+        return data
+    kept = [b"\xff\xd8"]
+    orientation_at: int | None = None
+    position = 2
+    while position < len(data):
+        if data[position] != 0xFF:
+            return data  # not the structure of a JPEG: leave it alone
+        while position + 1 < len(data) and data[position + 1] == 0xFF:
+            position += 1  # fill bytes before a marker
+        if position + 1 >= len(data):
+            return data
+        marker = data[position + 1]
+        if marker == 0xD9:  # the end of the image; whatever follows is not part of it
+            kept.append(b"\xff\xd9")
+            break
+        if marker == 0x01 or 0xD0 <= marker <= 0xD8:  # no length
+            kept.append(data[position : position + 2])
+            position += 2
+            continue
+        if position + 4 > len(data):
+            return data
+        end = position + 2 + int.from_bytes(data[position + 2 : position + 4], "big")
+        if end > len(data) or end < position + 4:
+            return data
+        if marker in _JPEG_DROPPED:
+            if marker == 0xE1 and orientation_at is None:
+                orientation_at = len(kept)
+                kept.append(b"")  # where the orientation goes back
+        else:
+            kept.append(data[position:end])
+        position = end
+        if marker == 0xDA:  # a scan: its compressed data runs to the next marker
+            following = _NEXT_MARKER.search(data, position)
+            stop = following.start() if following else len(data)
+            kept.append(data[position:stop])
+            position = stop
+    if orientation_at is not None:
+        kept[orientation_at] = _orientation_segment(data)
+    return b"".join(kept)
+
+
+def _png_without_metadata(data: bytes) -> bytes:
+    if not data.startswith(_PNG_SIGNATURE):
+        return data
+    kept = [_PNG_SIGNATURE]
+    position = len(_PNG_SIGNATURE)
+    while position + 12 <= len(data):
+        length = int.from_bytes(data[position : position + 4], "big")
+        end = position + 12 + length
+        if end > len(data):
+            return data
+        name = data[position + 4 : position + 8]
+        if name not in _PNG_DROPPED:
+            kept.append(data[position:end])
+        position = end
+        if name == b"IEND":  # whatever follows is not part of the picture
+            return b"".join(kept)
+    return data  # no IEND: not a whole PNG, left alone
+
+
+def without_metadata(extension: str, data: bytes) -> bytes:
+    """The picture's bytes with its EXIF, XMP, IPTC, comments and text chunks cut out (#964).
+
+    Not re-encoded: the compressed image is untouched, so it decodes to the same pixels. A JPEG
+    keeps an APP1 holding only its orientation, so a photograph taken sideways is not shown
+    sideways. Bytes that do not have the structure of the kind named are returned as they came,
+    and so is anything that is not a PNG or a JPEG.
+    """
+    extension = extension.lower()
+    if extension == "png":
+        return _png_without_metadata(data)
+    if extension in ("jpg", "jpeg"):
+        return _jpeg_without_metadata(data)
+    return data

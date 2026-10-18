@@ -8,6 +8,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🔒 Security
 
+- A photograph uploaded as a document has its location, time and camera cut out by default, without re-encoding the picture: a box on the upload form, ticked unless you untick it. (#964)
 - A translation that adds markup the English lacks (a tag, attribute, address or stray <) is left out of the compiled catalogue if a draft and fails the check if reviewed, and the map's "you are here" tooltip is text. (#983)
 - The board's fold links encode their hx-vals with as_json instead of pasting a string into JSON, and a template lint refuses any hx-vals or hx-headers built another way. (#985)
 - The company edit page no longer prints a translated sentence as markup: the kept-back notice on the company, contact and profile pages is composed in Python with the setting's name in italics, and a lint allows |safe in two templates only. (#982)
