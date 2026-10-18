@@ -101,7 +101,11 @@ def arranged(rows: Iterable, profile) -> list:
     """
     ranks = _ranks(profile)
     rows = list(rows)
-    return sorted(rows, key=lambda row: ranks.get(row.scheme, len(ranks)))
+    # The primary identifier leads (#922); the rest keep the person's order of schemes.
+    return sorted(
+        rows,
+        key=lambda row: (not getattr(row, "is_primary", False), ranks.get(row.scheme, len(ranks))),
+    )
 
 
 def shown_and_hidden(rows: Iterable, profile) -> tuple[list, list]:
@@ -122,4 +126,7 @@ def order_queryset(queryset, profile):
         default=Value(len(ranks)),
         output_field=IntegerField(),
     )
-    return queryset.annotate(_scheme_rank=rank).order_by("_scheme_rank", "scheme", "value")
+    ordering = ("_scheme_rank", "scheme", "value")
+    if "is_primary" in {field.name for field in queryset.model._meta.get_fields()}:
+        ordering = ("-is_primary", *ordering)
+    return queryset.annotate(_scheme_rank=rank).order_by(*ordering)

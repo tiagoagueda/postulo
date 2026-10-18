@@ -528,15 +528,15 @@ def test_the_only_row_hands_the_primary_to_nobody(client, user):
     assert "<span data-hands-on hidden>" in dialog
 
 
-def test_an_identifiers_dialog_never_mentions_a_primary(client, user):
-    """Identifiers have none, so the sentence is not there to show."""
+def test_an_identifiers_dialog_says_who_inherits_the_primary_only_when_there_is_one(client, user):
+    """The sentence is there for the primary identifier (#922), hidden while it is the only one."""
     identifier = an_identifier(user)
 
     html = profile_html(client, user)
 
     dialog = html[html.index(f'<dialog popover id="remove-identifier-{identifier.pk}"') :]
     dialog = dialog[: dialog.index("</dialog>")]
-    assert "data-hands-on" not in dialog and "becomes the primary" not in dialog
+    assert "data-hands-on hidden" in dialog, "the only identifier hands its star to nobody"
 
 
 def test_primary_is_a_star_and_the_boxes_are_gone(client, user):

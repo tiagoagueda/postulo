@@ -1242,6 +1242,11 @@ msgstr "%(scheme)s: esta não é a forma habitual."
 msgid "%(sent)s, %(failed)s; each document says which."
 msgstr "%(sent)s, %(failed)s; cada documento indica qual."
 
+#: src/postulo/core/web_links.py
+#, python-format
+msgid "%(service)s is already used by another row."
+msgstr ""
+
 #: src/postulo/core/templatetags/postulo.py
 #, python-format
 msgid "%(share)s%%"
@@ -2165,6 +2170,10 @@ msgstr "Uma imagem que carregue tem de ser %(formats)s, com um máximo de %(mega
 msgid "A picture you uploaded is shown rather than your Gravatar, and your Gravatar rather than your initials. <em>Remove the uploaded picture</em> is offered once there is one: tick it and save, and the file is deleted."
 msgstr "Uma imagem que tenha carregado é mostrada em vez do seu Gravatar, e o seu Gravatar em vez das suas iniciais. <em>Remover a imagem carregada</em> é oferecido quando existe uma: assinale a caixa, guarde, e o ficheiro é eliminado."
 
+#: src/postulo/templates/accounts/profile.html
+msgid "A pin for it is drawn on your map, at its postcode or town, and only you can see it."
+msgstr ""
+
 #: src/postulo/templates/partials/postal_addresses.html
 msgid "A place rather than a whole address, and kept as it is. For post to reach it:"
 msgstr "Um lugar e não uma morada completa, guardado tal como está. Para o correio lá chegar:"
@@ -2364,6 +2373,10 @@ msgstr "Uma pequena tecla desenhada junto a «Guardar e passar à seguinte», «
 #: src/postulo/templates/server/design.html
 msgid "A small one"
 msgstr "Uma pequena"
+
+#: src/postulo/templates/help/links.html
+msgid "A social profile is one to a service: a service another row already uses is greyed out in the menu and cannot be chosen again, and saving refuses a second one. A service that lives on many servers, such as Mastodon, and <em>Other</em> can be used as often as you like, and so can the cards of code repositories. Rows that already shared a service stay as they are, with a note, until you change them."
+msgstr ""
 
 #: src/postulo/templates/applications/application_form.html
 msgid "A status changed here is recorded on the timeline, the same as anywhere else."
@@ -2915,6 +2928,10 @@ msgstr "Já enviada —"
 msgid "Already there: you have this one, so it is not added again."
 msgstr "Já existe: já tem este, por isso não é adicionado outra vez."
 
+#: src/postulo/core/web_links.py
+msgid "Already used by another row"
+msgstr ""
+
 #: src/postulo/templates/accounts/profile.html
 msgid "Also happens by itself when your primary address changes."
 msgstr "Também acontece automaticamente quando o seu endereço principal muda."
@@ -3142,6 +3159,10 @@ msgstr "Outro convite"
 #: src/postulo/api/idempotency.py
 msgid "Another request is using this Idempotency-Key; try again in a moment."
 msgstr "Outro pedido está a usar esta Idempotency-Key; tente novamente dentro de instantes."
+
+#: src/postulo/templates/partials/web_links.html
+msgid "Another row is on the same service. Both stay as they are; remove one, or move it to Other, when you like."
+msgstr ""
 
 #: src/postulo/api/models.py
 msgid "answer"
@@ -9304,6 +9325,7 @@ msgstr "Dinheiro e datas"
 
 #: src/postulo/accounts/forms.py src/postulo/applications/agenda.py
 #: src/postulo/templates/applications/report.html
+#: src/postulo/templates/cotton/date_picker.html
 msgid "Month"
 msgstr "Mês"
 
@@ -9657,6 +9679,7 @@ msgid "Next interview"
 msgstr "Próxima entrevista"
 
 #: src/postulo/applications/agenda.py
+#: src/postulo/templates/cotton/date_picker.html
 msgid "Next month"
 msgstr "Mês seguinte"
 
@@ -11719,10 +11742,6 @@ msgstr "telefone"
 msgid "Phone screen"
 msgstr "Triagem telefónica"
 
-#: src/postulo/templates/accounts/profile.html
-msgid "Pick a day"
-msgstr "Escolher um dia"
-
 #: src/postulo/templates/documents/letter_detail.html
 msgid "Pick an application and the placeholders are filled in from it."
 msgstr "Escolha uma candidatura e os marcadores são preenchidos a partir dela."
@@ -12191,6 +12210,7 @@ msgid "Previous day"
 msgstr "Dia anterior"
 
 #: src/postulo/applications/agenda.py
+#: src/postulo/templates/cotton/date_picker.html
 msgid "Previous month"
 msgstr "Mês anterior"
 
@@ -12202,6 +12222,10 @@ msgstr "Semana anterior"
 msgid "Previous, This month and Next. With chevrons only, the words are still the buttons' names for a screen reader."
 msgstr "Anterior, Este mês e Seguinte. Só com setas, as palavras continuam a ser os nomes dos botões para um leitor de ecrã."
 
+#: src/postulo/accounts/models.py src/postulo/core/models.py
+msgid "primary"
+msgstr "principal"
+
 #: src/postulo/core/design.py src/postulo/templates/cotton/primary_choice.html
 #: src/postulo/templates/jobs/company_map.html
 #: src/postulo/templates/partials/messaging_handles.html
@@ -12212,10 +12236,6 @@ msgstr "Anterior, Este mês e Seguinte. Só com setas, as palavras continuam a s
 #: src/postulo/templates/settings/account.html
 msgid "Primary"
 msgstr "Principal"
-
-#: src/postulo/core/models.py
-msgid "primary"
-msgstr "principal"
 
 #: src/postulo/documents/models.py
 msgid "print the EQF level of my qualifications"
@@ -13952,6 +13972,10 @@ msgstr "mostrar as indicações de teclas"
 msgid "show on the map"
 msgstr "mostrar no mapa"
 
+#: src/postulo/templates/accounts/profile.html
+msgid "Show on the map"
+msgstr ""
+
 #: src/postulo/templates/applications/interview_list.html
 msgid "Show past too"
 msgstr "Mostrar também as passadas"
@@ -13983,6 +14007,10 @@ msgstr "Mostrar o número de ordem em cada entrada do percurso"
 #: src/postulo/templates/settings/plugins.html
 msgid "Show the plugins Postulo ships"
 msgstr "Mostrar os plugins que vêm com o Postulo"
+
+#: src/postulo/templates/accounts/profile.html
+msgid "Show this address on the map?"
+msgstr ""
 
 #: src/postulo/templates/applications/report.html
 msgid "Show this period"
@@ -16569,6 +16597,10 @@ msgstr "A etapa que cada candidatura tinha alcançado quando foi rejeitada, reti
 msgid "The stage is read from each timeline: where the application stood when it ended."
 msgstr "A etapa é lida em cada cronologia: onde a candidatura estava quando terminou."
 
+#: src/postulo/templates/help/identifiers.html
+msgid "The star at the start of a row marks your primary identifier. A CV prints it first, and alone where its template has room for only one. Removing it hands the star to the next row."
+msgstr ""
+
 #: src/postulo/applications/forms.py
 msgid "The start date they proposed, if one was."
 msgstr "A data de início proposta, se houve uma."
@@ -19149,7 +19181,7 @@ msgstr "erros seguidos"
 msgid "XOAUTH2, with a token from the provider"
 msgstr "XOAUTH2, com um token do fornecedor"
 
-#: src/postulo/accounts/forms.py
+#: src/postulo/accounts/forms.py src/postulo/templates/cotton/date_picker.html
 msgid "Year"
 msgstr "Ano"
 
@@ -19427,7 +19459,7 @@ msgstr "Os seus contactos num ficheiro .vcf que um livro de endereços lê, e a 
 msgid "Your CV header shows a town and a country and never a street, whatever is here."
 msgstr "O cabeçalho do seu CV mostra uma localidade e um país e nunca uma rua, seja o que for que esteja aqui."
 
-#: src/postulo/templates/accounts/profile.html
+#: src/postulo/accounts/views.py src/postulo/templates/accounts/profile.html
 msgid "Your CV photo"
 msgstr "A sua fotografia de CV"
 

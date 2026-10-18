@@ -29,6 +29,7 @@ from django.utils.translation import gettext as _
 from postulo.core import messaging_handles, phone_numbers, phones, postal, web_links
 from postulo.core.models import MessagingHandle, PhoneNumber, PostalAddress, WebLink
 
+from . import primary_identifier
 from .models import PersonIdentifier
 
 
@@ -39,7 +40,7 @@ class Kind:
     #: The address's own name, `accounts:remove_<name>`, and the dialog's id prefix.
     name: str
     model: type[models.Model]
-    #: Whether one row of the block is its primary. Identifiers have none.
+    #: Whether one row of the block is its primary.
     has_primary: bool = True
 
 
@@ -47,7 +48,7 @@ NUMBER = Kind("number", PhoneNumber)
 LINK = Kind("link", WebLink)
 ADDRESS = Kind("address", PostalAddress)
 MESSAGING = Kind("messaging", MessagingHandle)
-IDENTIFIER = Kind("identifier", PersonIdentifier, has_primary=False)
+IDENTIFIER = Kind("identifier", PersonIdentifier)
 
 
 # ------------------------------------------------------------------ whose rows these are
@@ -167,10 +168,7 @@ def refusal(kind: Kind, row) -> str:
 
 
 def hand_on(kind: Kind, row, holder):
-    """After ``row`` has gone: who is primary in its block now, by the rule saving follows.
-
-    Nothing for identifiers, which have no primary.
-    """
+    """After ``row`` has gone: who is primary in its block now, by the rule saving follows."""
     if kind is NUMBER:
         return phone_numbers.ensure_one_primary(holder)
     if kind is LINK:
@@ -179,7 +177,7 @@ def hand_on(kind: Kind, row, holder):
         return postal.ensure_one_primary(holder)
     if kind is MESSAGING:
         return messaging_handles.ensure_one_primary(holder)
-    return None
+    return primary_identifier.ensure_one_primary(holder)
 
 
 def left(kind: Kind, row, person) -> int:

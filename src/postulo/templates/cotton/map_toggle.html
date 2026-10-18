@@ -1,0 +1,19 @@
+{% load i18n postulo %}
+<c-vars field />
+{% comment %} Whether an address is shown on the map, as a pin beside the star and the bin of its
+   row on *Your details* (#923): `<c-map-toggle :field="row.on_map" />`.
+
+   Still the checkbox it always was, so it posts with *Save* and works with scripts off: it
+   is hidden from sight inside the label that is its 24-pixel target, and what is seen is
+   a pin. Off it is the crossed-out pin in grey, on it is the plain pin in green, so the two
+   differ in shape and not only in colour, and still do in forced colours. With a script,
+   turning it on asks first, in the page's one map dialog (`app.js`); turning it off does
+   not. The field's sentence is the pin's tooltip, and also its description, for a screen
+   reader, in a span of its own so that it is not part of the checkbox's name. {% endcomment %}
+<label class="map-toggle" title="{{ field.help_text }}">
+  {{ field|add_class:"sr-only" }}
+  {% icon "map-pin-off" class="size-5" %}
+  {% icon "map-pin" class="size-5" %}
+  <span class="sr-only">{{ field.label }}</span>
+</label>
+<span class="sr-only" id="{{ field.auto_id }}_helptext">{{ field.help_text }}</span>

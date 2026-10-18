@@ -1400,6 +1400,11 @@ msgstr "%(scheme)s: din mhijiex il-forma tas-soltu."
 msgid "%(sent)s, %(failed)s; each document says which."
 msgstr "%(sent)s, %(failed)s; kull dokument jgħid liema."
 
+#: src/postulo/core/web_links.py
+#, python-format
+msgid "%(service)s is already used by another row."
+msgstr ""
+
 #: src/postulo/core/templatetags/postulo.py
 #, fuzzy, python-format
 msgid "%(share)s%%"
@@ -2502,6 +2507,10 @@ msgstr "Stampa li tikkarga trid tkun %(formats)s, ta' mhux aktar minn %(megabyte
 msgid "A picture you uploaded is shown rather than your Gravatar, and your Gravatar rather than your initials. <em>Remove the uploaded picture</em> is offered once there is one: tick it and save, and the file is deleted."
 msgstr "Stampa li ttellajt tintwera minflok il-Gravatar tiegħek, u l-Gravatar tiegħek minflok l-inizjali tiegħek. <em>Neħħi l-istampa mtellgħa</em> tiġi offruta ladarba jkun hemm waħda: immarkaha u aħżen, u l-fajl jitħassar."
 
+#: src/postulo/templates/accounts/profile.html
+msgid "A pin for it is drawn on your map, at its postcode or town, and only you can see it."
+msgstr ""
+
 #: src/postulo/templates/partials/postal_addresses.html
 #, fuzzy
 msgid "A place rather than a whole address, and kept as it is. For post to reach it:"
@@ -2748,6 +2757,10 @@ msgstr "Għatu żgħir ta' tasta ħdejn Issejvja u kompli, Skarta u kompli, Aqbe
 #, fuzzy
 msgid "A small one"
 msgstr "Żgħira"
+
+#: src/postulo/templates/help/links.html
+msgid "A social profile is one to a service: a service another row already uses is greyed out in the menu and cannot be chosen again, and saving refuses a second one. A service that lives on many servers, such as Mastodon, and <em>Other</em> can be used as often as you like, and so can the cards of code repositories. Rows that already shared a service stay as they are, with a note, until you change them."
+msgstr ""
 
 #: src/postulo/templates/applications/application_form.html
 #, fuzzy
@@ -3416,6 +3429,10 @@ msgstr "Diġà mibgħut —"
 msgid "Already there: you have this one, so it is not added again."
 msgstr "Diġà hemm: għandek dan, għalhekk ma jiżdiedx għal darb'oħra."
 
+#: src/postulo/core/web_links.py
+msgid "Already used by another row"
+msgstr ""
+
 #: src/postulo/templates/accounts/profile.html
 #, fuzzy
 msgid "Also happens by itself when your primary address changes."
@@ -3693,6 +3710,10 @@ msgstr "Stedina oħra"
 #, fuzzy
 msgid "Another request is using this Idempotency-Key; try again in a moment."
 msgstr "Talba oħra qed tuża dan l-Idempotency-Key; erġa' pprova f'mument."
+
+#: src/postulo/templates/partials/web_links.html
+msgid "Another row is on the same service. Both stay as they are; remove one, or move it to Other, when you like."
+msgstr ""
 
 #: src/postulo/api/models.py
 #, fuzzy
@@ -11133,6 +11154,7 @@ msgstr "Flus u dati"
 
 #: src/postulo/accounts/forms.py src/postulo/applications/agenda.py
 #: src/postulo/templates/applications/report.html
+#: src/postulo/templates/cotton/date_picker.html
 #, fuzzy
 msgid "Month"
 msgstr "Xahar"
@@ -11553,6 +11575,7 @@ msgid "Next interview"
 msgstr "L-intervista li jmiss"
 
 #: src/postulo/applications/agenda.py
+#: src/postulo/templates/cotton/date_picker.html
 #, fuzzy
 msgid "Next month"
 msgstr "Ix-xahar ta' wara"
@@ -14058,11 +14081,6 @@ msgstr "telefon"
 msgid "Phone screen"
 msgstr "Skrinjar bit-telefon"
 
-#: src/postulo/templates/accounts/profile.html
-#, fuzzy
-msgid "Pick a day"
-msgstr "Agħżel jum"
-
 #: src/postulo/templates/documents/letter_detail.html
 #, fuzzy
 msgid "Pick an application and the placeholders are filled in from it."
@@ -14628,6 +14646,7 @@ msgid "Previous day"
 msgstr "Il-jum ta' qabel"
 
 #: src/postulo/applications/agenda.py
+#: src/postulo/templates/cotton/date_picker.html
 #, fuzzy
 msgid "Previous month"
 msgstr "Ix-xahar ta' qabel"
@@ -14642,6 +14661,11 @@ msgstr "Il-ġimgħa ta' qabel"
 msgid "Previous, This month and Next. With chevrons only, the words are still the buttons' names for a screen reader."
 msgstr "Ta' qabel, Dan ix-xahar u Li jmiss. B'vleġeġ biss, il-kliem xorta jibqa' l-ismijiet tal-buttuni għal screen reader."
 
+#: src/postulo/accounts/models.py src/postulo/core/models.py
+#, fuzzy
+msgid "primary"
+msgstr "prinċipali"
+
 #: src/postulo/core/design.py src/postulo/templates/cotton/primary_choice.html
 #: src/postulo/templates/jobs/company_map.html
 #: src/postulo/templates/partials/messaging_handles.html
@@ -14653,11 +14677,6 @@ msgstr "Ta' qabel, Dan ix-xahar u Li jmiss. B'vleġeġ biss, il-kliem xorta jibq
 #, fuzzy
 msgid "Primary"
 msgstr "Primarju"
-
-#: src/postulo/core/models.py
-#, fuzzy
-msgid "primary"
-msgstr "prinċipali"
 
 #: src/postulo/documents/models.py
 #, fuzzy
@@ -16735,6 +16754,10 @@ msgstr "uri l-ħjiel tat-tasti"
 msgid "show on the map"
 msgstr "uri fuq il-mappa"
 
+#: src/postulo/templates/accounts/profile.html
+msgid "Show on the map"
+msgstr ""
+
 #: src/postulo/templates/applications/interview_list.html
 #, fuzzy
 msgid "Show past too"
@@ -16774,6 +16797,10 @@ msgstr "Uri n-numru tal-ordni fuq kull entrata tal-karriera"
 #, fuzzy
 msgid "Show the plugins Postulo ships"
 msgstr "Uri l-plugins li jiġu ma' Postulo"
+
+#: src/postulo/templates/accounts/profile.html
+msgid "Show this address on the map?"
+msgstr ""
 
 #: src/postulo/templates/applications/report.html
 #, fuzzy
@@ -19866,6 +19893,10 @@ msgstr "L-istadju li kull applikazzjoni kienet waslet għalih meta ġiet rifjuta
 #, fuzzy
 msgid "The stage is read from each timeline: where the application stood when it ended."
 msgstr "L-istadju jinqara minn kull kronoloġija: fejn kienet l-applikazzjoni meta spiċċat."
+
+#: src/postulo/templates/help/identifiers.html
+msgid "The star at the start of a row marks your primary identifier. A CV prints it first, and alone where its template has room for only one. Removing it hands the star to the next row."
+msgstr ""
 
 #: src/postulo/applications/forms.py
 #, fuzzy
@@ -22984,7 +23015,7 @@ msgstr "ħażin f'ringiela"
 msgid "XOAUTH2, with a token from the provider"
 msgstr "XOAUTH2, b’token mill-fornitur"
 
-#: src/postulo/accounts/forms.py
+#: src/postulo/accounts/forms.py src/postulo/templates/cotton/date_picker.html
 #, fuzzy
 msgid "Year"
 msgstr "Sena"
@@ -23321,7 +23352,7 @@ msgstr "Il-kuntatti tiegħek f'fajl .vcf li jaqra ktieb tal-indirizzi, u l-karti
 msgid "Your CV header shows a town and a country and never a street, whatever is here."
 msgstr "L-intestatura tas-CV tiegħek turi belt u pajjiż u qatt triq, ikun xi jkun hawn."
 
-#: src/postulo/templates/accounts/profile.html
+#: src/postulo/accounts/views.py src/postulo/templates/accounts/profile.html
 #, fuzzy
 msgid "Your CV photo"
 msgstr "Ir-ritratt tas-CV tiegħek"

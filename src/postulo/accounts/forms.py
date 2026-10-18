@@ -41,7 +41,7 @@ from postulo.core import (
 from postulo.core.formsets import RowsAlreadyGone
 from postulo.core.identifiers import IdentifierRow, OneOfEachKind, SchemeSelect, offering
 
-from . import addresses, addressing, avatars, claims, identifiers
+from . import addresses, addressing, avatars, claims, identifiers, primary_identifier
 from .models import ADDRESSING_MAX_LENGTH, Invite, PersonIdentifier, Profile
 
 
@@ -1590,6 +1590,25 @@ class BasePersonIdentifierFormSet(RowsAlreadyGone, OneOfEachKind, forms.BaseInli
             if (scheme, value) in seen_values:
                 form.add_error("value", _("This identifier is already listed."))
             seen_values.add((scheme, value))
+
+    def save(self, commit: bool = True):
+        """Save the rows, then settle which of them is the primary (#922).
+
+        The radio names a form prefix and not a key, as the other blocks' do, because a row
+        being added has no key yet. A page that names none (an older client, a company's
+        form) leaves the primary the person has; failing that, the first row becomes it.
+        """
+        saved = super().save(commit=commit)
+        if not commit or not isinstance(self.instance, Profile):
+            return saved
+        chosen = (self.data.get(f"{self.prefix}-primary") or "").strip()
+        for form in self.forms:
+            if form.prefix == chosen and form.instance.pk and not form.cleaned_data.get("DELETE"):
+                primary_identifier.set_primary(self.instance, form.instance)
+                break
+        else:
+            primary_identifier.ensure_one_primary(self.instance)
+        return saved
 
 
 PersonIdentifierFormSet = forms.inlineformset_factory(

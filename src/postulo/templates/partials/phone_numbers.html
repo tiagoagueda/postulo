@@ -31,7 +31,7 @@
    The sentence under the legend is the topic's own summary, one string for both.
 {% endcomment %}
 <fieldset class="card mb-6 min-w-0" data-phone-numbers id="section-phones">
-  <legend class="label px-1">{% translate "Telephone numbers" %}</legend>{% help_topic "telephone-numbers" as about %}{% if card_help %}
+  <legend class="legend-title">{% translate "Telephone numbers" %}</legend>{% help_topic "telephone-numbers" as about %}{% if card_help %}
   <c-help-mark :topic="about.slug" anchor="section-phones" :in_sight="refused" />{% else %}
   <p class="mb-3 text-sm text-ink-500 dark:text-ink-400">
     {{ about.summary }}
@@ -65,7 +65,7 @@
            wide -- unusable, and a WCAG 2.2 2.5.8 target-size failure that axe catches.
         {% endcomment %}
         <div class="contact-row" data-phone-row{% if not remove_at_once %} data-words{% endif %}>
-          <div class="flex flex-none flex-wrap items-center gap-x-3 gap-y-1 pb-1 text-sm" data-row-star>
+          <div class="flex min-w-0 flex-wrap items-center gap-x-3 gap-y-1 pb-1 text-sm" data-row-star>
             {% if remove_at_once %}
               <c-primary-choice name="{{ numbers.prefix }}-primary" value="{{ row.prefix }}" :checked="row.instance.is_primary" />
             {% else %}

@@ -676,11 +676,11 @@ def test_a_contacts_form_keeps_its_help_in_sight(client, user):
     summary = str(help_topics.topic("telephone-numbers").summary)
     for seam in (
         # Under each legend: the sentence, as it was.
-        '<legend class="label px-1">Telephone numbers</legend>\n'
+        '<legend class="legend-title">Telephone numbers</legend>\n'
         '  <p class="mb-3 text-sm text-ink-500 dark:text-ink-400">\n'
         f"    {summary}\n  </p>\n"
         '  <input type="hidden" name="phone_numbers-TOTAL_FORMS"',
-        '<legend class="label px-1">Social profiles</legend>\n'
+        '<legend class="legend-title">Social profiles</legend>\n'
         '    <p class="mb-3 text-sm text-ink-500 dark:text-ink-400">A LinkedIn, a Mastodon',
         # Under the rows: the paragraphs, as they were.
         '  </ol>\n  \n  <p class="mt-3 text-xs text-ink-500 dark:text-ink-400">\n'

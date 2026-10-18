@@ -316,7 +316,7 @@ def test_identifiers_travel_in_the_export(user):
 
     document = export.build_document(user)
     rows = document["account"]["identifiers"]
-    assert rows == [{"scheme": identifiers.ORCID, "value": ORCID, "label": ""}]
+    assert rows == [{"scheme": identifiers.ORCID, "value": ORCID, "label": "", "is_primary": True}]
 
 
 def test_a_person_identifier_says_its_schemes_mark_and_a_company_scheme_has_none():

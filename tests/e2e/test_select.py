@@ -711,15 +711,17 @@ def test_each_kind_draws_its_icon_in_the_list_and_in_the_button(page: Page, live
     sign_in(page, live_server.url)
     page.goto(f"{live_server.url}/accounts/profile/")
 
+    # What the button draws for the chosen option: its icon, or its service's one-colour mark
+    # where it has one, as every repository service does since #926.
     for name, chosen, another, icon in (
-        ("phone_numbers-0-kind", "printer", "Mobile", "smartphone"),
-        ("addresses-0-kind", "mailbox", "Home", "home"),
-        ("identifiers-0-scheme", "graduation-cap", "Wikidata", "globe"),
-        ("repositories-0-service", "git-branch", "Other", "globe"),
+        ("phone_numbers-0-kind", "data-icon=printer", "Mobile", "smartphone"),
+        ("addresses-0-kind", "data-icon=mailbox", "Home", "home"),
+        ("identifiers-0-scheme", "data-icon=graduation-cap", "Wikidata", "globe"),
+        ("repositories-0-service", "data-brand=gitlab", "Other", "globe"),
     ):
         select = page.locator(f"select[name={name}]")
         button = button_of(select)
-        expect(button.locator(f"svg[data-icon={chosen}]")).to_have_count(1), name
+        expect(button.locator(f"svg[{chosen}]")).to_have_count(1), name
         panel = open_list(page, select)
         option = panel.get_by_role("option", name=another, exact=True)
         expect(option.locator(f"svg[data-icon={icon}]")).to_have_count(1), name
@@ -848,17 +850,25 @@ def test_in_a_tables_header_the_list_is_whole_and_narrows_the_table(
     assert page.evaluate(LEFT_BEHIND) == []
 
 
-#: Buttons and lists that belong to no select on the page, and selects with two.
+#: Buttons and lists that belong to no select on the page, and selects with two. A select
+#: that says `data-native` is kept as the browser draws it (NATIVE_ON_PURPOSE in
+#: tests/test_template_lint.py, such as the birth calendar's month and year, #928) and has none.
 LEFT_BEHIND = """() => {
   const wrong = [];
   for (const root of document.querySelectorAll('[data-select]')) {
     const select = root.previousElementSibling;
     if (!select || select.tagName !== 'SELECT') wrong.push('a button with no select');
   }
-  for (const select of document.querySelectorAll('select:not([multiple])')) {
+  for (const select of document.querySelectorAll('select:not([multiple]):not([data-native])')) {
     const root = select.nextElementSibling;
     if (!root || !root.matches('[data-select]')) {
       wrong.push((select.id || select.name) + ' has no button');
+    }
+  }
+  for (const select of document.querySelectorAll('select[data-native]')) {
+    const root = select.nextElementSibling;
+    if (root && root.matches('[data-select]')) {
+      wrong.push((select.id || select.name || select.ariaLabel) + ' is native and has a button');
     }
   }
   const panels = document.querySelectorAll('[data-select-panel]').length;

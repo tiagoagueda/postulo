@@ -1242,6 +1242,11 @@ msgstr "%(scheme)s: dat ass net déi gewéinlech Form."
 msgid "%(sent)s, %(failed)s; each document says which."
 msgstr "%(sent)s, %(failed)s; all Dokument seet, wéi eng."
 
+#: src/postulo/core/web_links.py
+#, python-format
+msgid "%(service)s is already used by another row."
+msgstr ""
+
 #: src/postulo/core/templatetags/postulo.py
 #, fuzzy, python-format
 msgid "%(share)s%%"
@@ -2314,6 +2319,10 @@ msgstr "E Bild, dat Dir eropluet, muss %(formats)s sinn, net méi grouss wéi %(
 msgid "A picture you uploaded is shown rather than your Gravatar, and your Gravatar rather than your initials. <em>Remove the uploaded picture</em> is offered once there is one: tick it and save, and the file is deleted."
 msgstr "E Bild, dat Dir eropgelueden hutt, gëtt amplaz vun Ärem Gravatar gewisen, an Äre Gravatar amplaz vun Ären Initialen. <em>Dat eropgelueden Bild ewechhuelen</em> gëtt ugebueden, soubal et eent gëtt: haakt et un a späichert, an de Fichier gëtt geläscht."
 
+#: src/postulo/templates/accounts/profile.html
+msgid "A pin for it is drawn on your map, at its postcode or town, and only you can see it."
+msgstr ""
+
 #: src/postulo/templates/partials/postal_addresses.html
 #, fuzzy
 msgid "A place rather than a whole address, and kept as it is. For post to reach it:"
@@ -2556,6 +2565,10 @@ msgstr "Eng kleng Tast nieft „Späicheren a weider“, „Verwerfen a weider�
 #, fuzzy
 msgid "A small one"
 msgstr "E klengen"
+
+#: src/postulo/templates/help/links.html
+msgid "A social profile is one to a service: a service another row already uses is greyed out in the menu and cannot be chosen again, and saving refuses a second one. A service that lives on many servers, such as Mastodon, and <em>Other</em> can be used as often as you like, and so can the cards of code repositories. Rows that already shared a service stay as they are, with a note, until you change them."
+msgstr ""
 
 #: src/postulo/templates/applications/application_form.html
 #, fuzzy
@@ -3216,6 +3229,10 @@ msgstr "Scho geschéckt —"
 msgid "Already there: you have this one, so it is not added again."
 msgstr "Schonn do: Dir hutt dëst schonn, dofir gëtt et net nach eng Kéier derbäigesat."
 
+#: src/postulo/core/web_links.py
+msgid "Already used by another row"
+msgstr ""
+
 #: src/postulo/templates/accounts/profile.html
 #, fuzzy
 msgid "Also happens by itself when your primary address changes."
@@ -3487,6 +3504,10 @@ msgstr "Nach eng Invitatioun"
 #, fuzzy
 msgid "Another request is using this Idempotency-Key; try again in a moment."
 msgstr "Eng aner Ufro benotzt dësen Idempotency-Key; probéiert an engem Moment nach eng Kéier."
+
+#: src/postulo/templates/partials/web_links.html
+msgid "Another row is on the same service. Both stay as they are; remove one, or move it to Other, when you like."
+msgstr ""
 
 #: src/postulo/api/models.py
 #, fuzzy
@@ -10915,6 +10936,7 @@ msgstr "Suen an Datumer"
 
 #: src/postulo/accounts/forms.py src/postulo/applications/agenda.py
 #: src/postulo/templates/applications/report.html
+#: src/postulo/templates/cotton/date_picker.html
 #, fuzzy
 msgid "Month"
 msgstr "Mount"
@@ -11335,6 +11357,7 @@ msgid "Next interview"
 msgstr "Nächsten Entretien"
 
 #: src/postulo/applications/agenda.py
+#: src/postulo/templates/cotton/date_picker.html
 #, fuzzy
 msgid "Next month"
 msgstr "Den nächste Mount"
@@ -13796,11 +13819,6 @@ msgstr "Telefon"
 msgid "Phone screen"
 msgstr "Telefonsentretien"
 
-#: src/postulo/templates/accounts/profile.html
-#, fuzzy
-msgid "Pick a day"
-msgstr "En Dag wielen"
-
 #: src/postulo/templates/documents/letter_detail.html
 #, fuzzy
 msgid "Pick an application and the placeholders are filled in from it."
@@ -14366,6 +14384,7 @@ msgid "Previous day"
 msgstr "Den Dag virdrun"
 
 #: src/postulo/applications/agenda.py
+#: src/postulo/templates/cotton/date_picker.html
 #, fuzzy
 msgid "Previous month"
 msgstr "De Mount virdrun"
@@ -14380,6 +14399,11 @@ msgstr "D'Woch virdrun"
 msgid "Previous, This month and Next. With chevrons only, the words are still the buttons' names for a screen reader."
 msgstr "Virdrun, Dëse Mount a Weider. Mat nëmme Feiler sinn d'Wierder fir e Screenreader ëmmer nach d'Nimm vun de Knäppercher."
 
+#: src/postulo/accounts/models.py src/postulo/core/models.py
+#, fuzzy
+msgid "primary"
+msgstr "haapt"
+
 #: src/postulo/core/design.py src/postulo/templates/cotton/primary_choice.html
 #: src/postulo/templates/jobs/company_map.html
 #: src/postulo/templates/partials/messaging_handles.html
@@ -14391,11 +14415,6 @@ msgstr "Virdrun, Dëse Mount a Weider. Mat nëmme Feiler sinn d'Wierder fir e Sc
 #, fuzzy
 msgid "Primary"
 msgstr "Primär"
-
-#: src/postulo/core/models.py
-#, fuzzy
-msgid "primary"
-msgstr "haapt"
 
 #: src/postulo/documents/models.py
 #, fuzzy
@@ -16463,6 +16482,10 @@ msgstr "Tastenhiweiser weisen"
 msgid "show on the map"
 msgstr "op der Kaart weisen"
 
+#: src/postulo/templates/accounts/profile.html
+msgid "Show on the map"
+msgstr ""
+
 #: src/postulo/templates/applications/interview_list.html
 #, fuzzy
 msgid "Show past too"
@@ -16502,6 +16525,10 @@ msgstr "D'Reiefolleg-Nummer bei all Karriärentrée weisen"
 #, fuzzy
 msgid "Show the plugins Postulo ships"
 msgstr "D'Plugins weisen, déi Postulo matbréngt"
+
+#: src/postulo/templates/accounts/profile.html
+msgid "Show this address on the map?"
+msgstr ""
 
 #: src/postulo/templates/applications/report.html
 #, fuzzy
@@ -19572,6 +19599,10 @@ msgstr "D'Etapp, déi all Kandidatur erreecht hat, wéi se ofgeleent, zréckgezu
 #, fuzzy
 msgid "The stage is read from each timeline: where the application stood when it ended."
 msgstr "D'Etapp gëtt aus all Zäitlinn gelies: wou d'Kandidatur stoung, wéi se ofgeschloss gouf."
+
+#: src/postulo/templates/help/identifiers.html
+msgid "The star at the start of a row marks your primary identifier. A CV prints it first, and alone where its template has room for only one. Removing it hands the star to the next row."
+msgstr ""
 
 #: src/postulo/applications/forms.py
 #, fuzzy
@@ -22682,7 +22713,7 @@ msgstr "falsch hannerteneen"
 msgid "XOAUTH2, with a token from the provider"
 msgstr "XOAUTH2, mat engem Token vum Ubidder"
 
-#: src/postulo/accounts/forms.py
+#: src/postulo/accounts/forms.py src/postulo/templates/cotton/date_picker.html
 #, fuzzy
 msgid "Year"
 msgstr "Joer"
@@ -23013,7 +23044,7 @@ msgstr "Är Kontakter an engem .vcf-Fichier, deen en Adressbuch liest, an d'Kaar
 msgid "Your CV header shows a town and a country and never a street, whatever is here."
 msgstr "De Kapp vun ärem Lieweslaf weist eng Uertschaft an e Land an ni eng Strooss, wat och ëmmer hei steet."
 
-#: src/postulo/templates/accounts/profile.html
+#: src/postulo/accounts/views.py src/postulo/templates/accounts/profile.html
 #, fuzzy
 msgid "Your CV photo"
 msgstr "Är CV-Foto"

@@ -14,6 +14,7 @@ from io import BytesIO
 import pytest
 from django.urls import reverse
 
+from postulo.accounts import primary_identifier as person_identifiers
 from postulo.accounts.models import PersonIdentifier, Profile
 from postulo.core import export, identifier_order, identifiers, importer, navigation
 from postulo.documents import printing
@@ -220,7 +221,9 @@ def test_a_company_with_only_hidden_identifiers_still_says_so(client, user):
 def test_your_details_and_the_cvs_choice_follow_the_order(client, user):
     profile = user.profile
     PersonIdentifier.objects.create(profile=profile, scheme="orcid", value=ORCID)
-    PersonIdentifier.objects.create(profile=profile, scheme="wikidata", value="Q95")
+    wikidata = PersonIdentifier.objects.create(profile=profile, scheme="wikidata", value="Q95")
+    # The primary leads (#922); the order of schemes decides among the rest.
+    person_identifiers.set_primary(profile, wikidata)
     profile.identifier_order = identifier_order.complete(["wikidata", "orcid"])
     profile.hidden_identifiers = ["orcid"]
     profile.save()

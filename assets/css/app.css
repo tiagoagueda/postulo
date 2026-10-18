@@ -872,12 +872,8 @@
    * the second, at the top. A long heading wraps in its own column and never runs under
    * the mark.
    *
-   * A card that is a `<fieldset>` has a `<legend>` and no header: the name sits on the
-   * card's top border at the start. The question mark sits on the same border at the end,
-   * the card's ground behind it so the border stops for it as it does for the legend. A
-   * fieldset's padding box begins under its legend, so the mark is put back up by half the
-   * legend's line and half its own height (WHATWG's rendering of a fieldset; the same in
-   * every engine). Nothing inside the card is ever under it.
+   * A card that is a `<fieldset>` has a `<legend>` and no header; the legend is drawn as the
+   * title and the mark placed as below (#919).
    *
    * The sentence is a `data-tooltip`: where a script runs it is the mark's tooltip, and
    * these rules are what it is before that, and with scripts off -- the paragraph under the
@@ -917,13 +913,41 @@
     @apply order-last basis-full text-sm text-ink-500 dark:text-ink-400;
   }
 
+  /*
+   * A card that is a <fieldset> (#919) keeps its <legend>, because the grouping is what a
+   * screen reader announces, but the legend is drawn as the card's title and not on its
+   * top border: floated at the full width it leaves the border in every engine (WHATWG's
+   * rendering of a fieldset only seats a legend that is in flow), and lies inside the
+   * card's padding in the place and type of `<c-section-title>`. The question mark is at
+   * the inline end of that line, where a card with a header has it; the legend leaves it
+   * room, and everything after the legend clears the float.
+   */
+  fieldset > legend.legend-title {
+    float: inline-start;
+    inline-size: 100%;
+    padding: 0;
+    margin-block-end: calc(var(--spacing) * 3);
+    font-size: inherit;
+    line-height: 1.5;
+    font-weight: 500;
+  }
+
+  fieldset:has(> legend.legend-title) > :not(legend) {
+    clear: both;
+  }
+
   fieldset:has(> [data-help-mark]) {
     position: relative;
   }
 
+  fieldset:has(> [data-help-mark]) > legend.legend-title {
+    padding-inline-end: calc(var(--spacing) * 10);
+  }
+
+  /* The card's padding is 1.5rem and the title's line 1.5rem, as is the mark. */
   fieldset > [data-help-mark][data-variant] {
-    @apply absolute end-4 bg-card;
-    inset-block-start: calc(-0.625rem - var(--spacing) * 3);
+    @apply absolute end-6;
+    inset-block-start: calc(var(--spacing) * 6);
   }
 
   fieldset > [data-help-summary]:not([popover]) {
@@ -1327,6 +1351,51 @@
     @apply sm:grid-cols-[minmax(0,12rem)_minmax(0,1fr)_minmax(0,10rem)_auto];
   }
 
+  /*
+   * An identifier's row on *Your details* (#922): the star first and the bin last, as every
+   * other block's row has them (#866). Below 40rem they share the first line, the bin at its
+   * far end, and the boxes take a line each; from 40rem they are the first and the last
+   * column of the row.
+   */
+  .name-if-other-row[data-primary] {
+    grid-template-columns: auto minmax(0, 1fr) auto;
+  }
+
+  .name-if-other-row[data-primary] > [data-row-star] {
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  .name-if-other-row[data-primary] > [data-row-bin] {
+    grid-column: 3;
+    grid-row: 1;
+    justify-self: end;
+  }
+
+  .name-if-other-row[data-primary] > :not([data-row-star], [data-row-bin]) {
+    grid-column: 1 / -1;
+  }
+
+  @media (width >= 40rem) {
+    .name-if-other-row[data-primary],
+    .name-if-other-row[data-primary]:has(select option[value="other"]:checked),
+    .name-if-other-row[data-primary][data-has-name] {
+      grid-template-columns: auto minmax(0, 12rem) minmax(0, 1fr) auto;
+    }
+
+    .name-if-other-row[data-primary]:has(select option[value="other"]:checked),
+    .name-if-other-row[data-primary][data-has-name] {
+      grid-template-columns: auto minmax(0, 12rem) minmax(0, 1fr) minmax(0, 10rem) auto;
+    }
+
+    .name-if-other-row[data-primary] > [data-row-star],
+    .name-if-other-row[data-primary] > [data-row-bin],
+    .name-if-other-row[data-primary] > :not([data-row-star], [data-row-bin]) {
+      grid-column: auto;
+      grid-row: auto;
+    }
+  }
+
   .name-if-other-row [data-name-if-other] {
     display: none;
   }
@@ -1576,6 +1645,34 @@
   }
 
   /*
+   * Whether an address is shown on the map (#923): a pin beside the star and the bin. A
+   * checkbox kept for the keyboard and the screen reader and hidden from sight inside the label
+   * that is its 24-pixel target; off it is the crossed-out pin in grey, on it the plain pin in
+   * green, so the two differ in shape and not only in colour.
+   */
+  .map-toggle {
+    @apply relative inline-flex size-6 shrink-0 cursor-pointer items-center justify-center
+      rounded-md text-ink-500 hover:text-green-700 dark:text-ink-400 dark:hover:text-green-300;
+  }
+
+  .map-toggle:has(input:checked) {
+    @apply text-green-600 dark:text-green-400;
+  }
+
+  .map-toggle svg[data-icon="map-pin"],
+  .map-toggle:has(input:checked) svg[data-icon="map-pin-off"] {
+    display: none;
+  }
+
+  .map-toggle:has(input:checked) svg[data-icon="map-pin"] {
+    display: block;
+  }
+
+  .map-toggle:has(input:focus-visible) {
+    @apply outline-solid outline-2 outline-offset-2 outline-brand-500;
+  }
+
+  /*
    * A row of contact details (#866): the star, then what the row is, then its boxes, then
    * the bin, on one line from 640 pixels up -- telephone numbers, messaging and links.
    * Under that the boxes take a line each and the star and the bin are kept on the first,
@@ -1618,8 +1715,23 @@
   }
 
   @media (width < 40rem) {
+    /* Level (#931): the two share the first line and each sits at its top, with the star
+       at the top of its own wrapper, which may hold more than the star -- the choice of the
+       number that gets its owner back in -- so that no row's star is lower than its bin. */
+    .contact-row > [data-row-star],
+    .contact-row > [data-row-bin] {
+      align-self: flex-start;
+    }
+
     .contact-row > [data-row-star] {
+      align-items: flex-start;
       order: -2;
+    }
+
+    /* It takes what the bin leaves and no more, so a long choice beside the star wraps
+       inside it and the bin stays on the line. */
+    .contact-row[data-phone-row]:not([data-words]) > [data-row-star] {
+      flex: 1 1 0;
     }
 
     .contact-row > [data-row-bin] {
@@ -2593,6 +2705,21 @@ html {
   }
 
   .primary-choice:has(input:focus-visible) {
+    outline: 2px solid Highlight;
+    outline-offset: 2px;
+  }
+
+  /* The map pin (#923) in the system's own colours: the crossed-out pin in `ButtonText`, the
+     plain pin in `Highlight`, and the focus ring as on the star. */
+  .map-toggle svg {
+    stroke: ButtonText;
+  }
+
+  .map-toggle:has(input:checked) svg {
+    stroke: Highlight;
+  }
+
+  .map-toggle:has(input:focus-visible) {
     outline: 2px solid Highlight;
     outline-offset: 2px;
   }

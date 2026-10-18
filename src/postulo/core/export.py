@@ -216,7 +216,9 @@ logger = logging.getLogger(__name__)
 #: company owned by one of their groups is written as theirs are; one only shared with them
 #: is written where their own records point at it, with ``shared_from`` naming its owner, and
 #: comes back as the importing person's own copy. An older archive restores as it did.
-FORMAT_VERSION = 72
+#: 73 added ``is_primary`` on each of the profile's ``identifiers``: the one a CV prints first
+#: (#922). An older archive restores with its first identifier primary.
+FORMAT_VERSION = 73
 
 
 def industry_entry(industry) -> str | dict:
@@ -885,7 +887,12 @@ def _identifier_rows(profile) -> list[dict]:
     if not profile:
         return []
     return [
-        {"scheme": row.scheme, "value": row.value, "label": row.label}
+        {
+            "scheme": row.scheme,
+            "value": row.value,
+            "label": row.label,
+            "is_primary": row.is_primary,
+        }
         for row in profile.identifiers.all()
     ]
 

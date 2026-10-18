@@ -1321,6 +1321,11 @@ msgstr "%(scheme)s: tai nėra įprasta forma."
 msgid "%(sent)s, %(failed)s; each document says which."
 msgstr "%(sent)s, %(failed)s; tai nurodyta prie kiekvieno dokumento."
 
+#: src/postulo/core/web_links.py
+#, python-format
+msgid "%(service)s is already used by another row."
+msgstr ""
+
 #: src/postulo/core/templatetags/postulo.py
 #, python-format
 msgid "%(share)s%%"
@@ -2261,6 +2266,10 @@ msgstr "Įkeliamas vaizdas turi būti %(formats)s formato, ne didesnis kaip %(me
 msgid "A picture you uploaded is shown rather than your Gravatar, and your Gravatar rather than your initials. <em>Remove the uploaded picture</em> is offered once there is one: tick it and save, and the file is deleted."
 msgstr "Įkeltas vaizdas rodomas vietoj jūsų Gravatar vaizdo, o Gravatar vaizdas – vietoj jūsų inicialų. <em>Pašalinti įkeltą vaizdą</em> siūloma, kai toks vaizdas yra: pažymėkite ir išsaugokite, ir failas bus ištrintas."
 
+#: src/postulo/templates/accounts/profile.html
+msgid "A pin for it is drawn on your map, at its postcode or town, and only you can see it."
+msgstr ""
+
 #: src/postulo/templates/partials/postal_addresses.html
 msgid "A place rather than a whole address, and kept as it is. For post to reach it:"
 msgstr "Vieta, o ne visas adresas, saugoma tokia, kokia yra. Kad paštas ją pasiektų:"
@@ -2463,6 +2472,10 @@ msgstr "Mažas klavišo ženklelis šalia mygtukų „Išsaugoti ir kitas“, �
 #: src/postulo/templates/server/design.html
 msgid "A small one"
 msgstr "Mažas"
+
+#: src/postulo/templates/help/links.html
+msgid "A social profile is one to a service: a service another row already uses is greyed out in the menu and cannot be chosen again, and saving refuses a second one. A service that lives on many servers, such as Mastodon, and <em>Other</em> can be used as often as you like, and so can the cards of code repositories. Rows that already shared a service stay as they are, with a note, until you change them."
+msgstr ""
 
 #: src/postulo/templates/applications/application_form.html
 msgid "A status changed here is recorded on the timeline, the same as anywhere else."
@@ -3020,6 +3033,10 @@ msgstr "Jau išsiųsta —"
 msgid "Already there: you have this one, so it is not added again."
 msgstr "Jau yra: šį jau turite, todėl jis dar kartą nepridedamas."
 
+#: src/postulo/core/web_links.py
+msgid "Already used by another row"
+msgstr ""
+
 #: src/postulo/templates/accounts/profile.html
 msgid "Also happens by itself when your primary address changes."
 msgstr "Įvyksta ir savaime, kai pasikeičia jūsų pagrindinis adresas."
@@ -3250,6 +3267,10 @@ msgstr "Kitas kvietimas"
 #: src/postulo/api/idempotency.py
 msgid "Another request is using this Idempotency-Key; try again in a moment."
 msgstr "Šį Idempotency-Key šiuo metu naudoja kita užklausa; po akimirkos bandykite dar kartą."
+
+#: src/postulo/templates/partials/web_links.html
+msgid "Another row is on the same service. Both stay as they are; remove one, or move it to Other, when you like."
+msgstr ""
 
 #: src/postulo/api/models.py
 msgid "answer"
@@ -9451,6 +9472,7 @@ msgstr "Pinigai ir datos"
 
 #: src/postulo/accounts/forms.py src/postulo/applications/agenda.py
 #: src/postulo/templates/applications/report.html
+#: src/postulo/templates/cotton/date_picker.html
 msgid "Month"
 msgstr "Mėnuo"
 
@@ -9806,6 +9828,7 @@ msgid "Next interview"
 msgstr "Kitas pokalbis"
 
 #: src/postulo/applications/agenda.py
+#: src/postulo/templates/cotton/date_picker.html
 msgid "Next month"
 msgstr "Kitas mėnuo"
 
@@ -11907,10 +11930,6 @@ msgstr "telefonas"
 msgid "Phone screen"
 msgstr "Atrankos pokalbis telefonu"
 
-#: src/postulo/templates/accounts/profile.html
-msgid "Pick a day"
-msgstr "Pasirinkti dieną"
-
 #: src/postulo/templates/documents/letter_detail.html
 msgid "Pick an application and the placeholders are filled in from it."
 msgstr "Pasirinkite paraišką, ir vietos rezervavimo ženklai bus užpildyti jos duomenimis."
@@ -12379,6 +12398,7 @@ msgid "Previous day"
 msgstr "Ankstesnė diena"
 
 #: src/postulo/applications/agenda.py
+#: src/postulo/templates/cotton/date_picker.html
 msgid "Previous month"
 msgstr "Ankstesnis mėnuo"
 
@@ -12390,6 +12410,10 @@ msgstr "Ankstesnė savaitė"
 msgid "Previous, This month and Next. With chevrons only, the words are still the buttons' names for a screen reader."
 msgstr "„Ankstesnis“, „Šis mėnuo“ ir „Kitas“. Pasirinkus tik rodykles, žodžiai ekrano skaitytuvui vis tiek lieka mygtukų pavadinimais."
 
+#: src/postulo/accounts/models.py src/postulo/core/models.py
+msgid "primary"
+msgstr "pagrindinis"
+
 #: src/postulo/core/design.py src/postulo/templates/cotton/primary_choice.html
 #: src/postulo/templates/jobs/company_map.html
 #: src/postulo/templates/partials/messaging_handles.html
@@ -12400,10 +12424,6 @@ msgstr "„Ankstesnis“, „Šis mėnuo“ ir „Kitas“. Pasirinkus tik rodyk
 #: src/postulo/templates/settings/account.html
 msgid "Primary"
 msgstr "Pagrindinis"
-
-#: src/postulo/core/models.py
-msgid "primary"
-msgstr "pagrindinis"
 
 #: src/postulo/documents/models.py
 msgid "print the EQF level of my qualifications"
@@ -14171,6 +14191,10 @@ msgstr "rodyti klavišų užuominas"
 msgid "show on the map"
 msgstr "rodyti žemėlapyje"
 
+#: src/postulo/templates/accounts/profile.html
+msgid "Show on the map"
+msgstr ""
+
 #: src/postulo/templates/applications/interview_list.html
 msgid "Show past too"
 msgstr "Rodyti ir praėjusius"
@@ -14202,6 +14226,10 @@ msgstr "Rodyti eilės numerį kiekviename karjeros įraše"
 #: src/postulo/templates/settings/plugins.html
 msgid "Show the plugins Postulo ships"
 msgstr "Rodyti papildinius, kuriuos pateikia Postulo"
+
+#: src/postulo/templates/accounts/profile.html
+msgid "Show this address on the map?"
+msgstr ""
 
 #: src/postulo/templates/applications/report.html
 msgid "Show this period"
@@ -16817,6 +16845,10 @@ msgstr "Etapas, kurį kiekviena paraiška buvo pasiekusi, kai buvo atmesta, atsi
 msgid "The stage is read from each timeline: where the application stood when it ended."
 msgstr "Etapas nuskaitomas iš kiekvienos chronologijos: kur paraiška buvo, kai baigėsi."
 
+#: src/postulo/templates/help/identifiers.html
+msgid "The star at the start of a row marks your primary identifier. A CV prints it first, and alone where its template has room for only one. Removing it hands the star to the next row."
+msgstr ""
+
 #: src/postulo/applications/forms.py
 msgid "The start date they proposed, if one was."
 msgstr "Jų pasiūlyta pradžios data, jei ją pasiūlė."
@@ -19414,7 +19446,7 @@ msgstr "kiek kartų iš eilės klaidinga"
 msgid "XOAUTH2, with a token from the provider"
 msgstr "XOAUTH2, su teikėjo žetonu"
 
-#: src/postulo/accounts/forms.py
+#: src/postulo/accounts/forms.py src/postulo/templates/cotton/date_picker.html
 msgid "Year"
 msgstr "Metai"
 
@@ -19700,7 +19732,7 @@ msgstr "Jūsų kontaktai .vcf faile, kurį skaito adresų knygos, ir adresų kny
 msgid "Your CV header shows a town and a country and never a street, whatever is here."
 msgstr "Jūsų CV antraštėje rodoma gyvenvietė ir šalis, bet niekada gatvė, kad ir kas čia būtų įrašyta."
 
-#: src/postulo/templates/accounts/profile.html
+#: src/postulo/accounts/views.py src/postulo/templates/accounts/profile.html
 msgid "Your CV photo"
 msgstr "Jūsų CV nuotrauka"
 

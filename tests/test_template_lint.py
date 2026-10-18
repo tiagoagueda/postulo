@@ -381,7 +381,14 @@ SELECT_TAG = re.compile(r"<select\b(?:\{%.*?%\}|\{\{.*?\}\}|[^>])*>", re.DOTALL)
 #: here all the same, because it is a select somebody will see as the browser draws it.
 #: (The one the application has is a widget's, not a template's: the tags of an
 #: application, a `<select multiple>` that the label chips are layered over, #139.)
-NATIVE_ON_PURPOSE: dict[tuple[str, str], str] = {}
+NATIVE_ON_PURPOSE: dict[tuple[str, str], str] = {
+    # The calendar's month and year (#928), which carry no `name` so that they are never posted
+    # with the form around them. A birth year is picked from a hundred and twenty-odd, and the
+    # native select is the one that takes a typed "19", "1990"; the list is built by `app.js`.
+    ("templates/cotton/date_picker.html", ""): (
+        "the calendar's month and year: unnamed, so never posted, and a year is typed into"
+    ),
+}
 
 SOURCE_ROOT = Path(__file__).resolve().parents[1] / "src" / "postulo"
 

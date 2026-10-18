@@ -1242,6 +1242,11 @@ msgstr "%(scheme)s: এটি স্বাভাবিক গঠন নয়।
 msgid "%(sent)s, %(failed)s; each document says which."
 msgstr "%(sent)s, %(failed)s; কোনটির কী হয়েছে, তা প্রতিটি নথিতে লেখা আছে।"
 
+#: src/postulo/core/web_links.py
+#, python-format
+msgid "%(service)s is already used by another row."
+msgstr ""
+
 #: src/postulo/core/templatetags/postulo.py
 #, fuzzy, python-format
 msgid "%(share)s%%"
@@ -2314,6 +2319,10 @@ msgstr "আপনার আপলোড করা ছবিকে %(formats)s �
 msgid "A picture you uploaded is shown rather than your Gravatar, and your Gravatar rather than your initials. <em>Remove the uploaded picture</em> is offered once there is one: tick it and save, and the file is deleted."
 msgstr "আপনার আপলোড করা ছবি আপনার Gravatar-এর বদলে দেখানো হয়, এবং আপনার Gravatar আপনার নামের আদ্যক্ষরের বদলে। ছবি থাকলে <em>আপলোড করা ছবিটি সরান</em> দেখানো হয়: এতে টিক দিয়ে সংরক্ষণ করুন, ফাইলটি মুছে ফেলা হবে।"
 
+#: src/postulo/templates/accounts/profile.html
+msgid "A pin for it is drawn on your map, at its postcode or town, and only you can see it."
+msgstr ""
+
 #: src/postulo/templates/partials/postal_addresses.html
 #, fuzzy
 msgid "A place rather than a whole address, and kept as it is. For post to reach it:"
@@ -2557,6 +2566,10 @@ msgstr "“সংরক্ষণ করে পরেরটি”, “বাদ �
 #, fuzzy
 msgid "A small one"
 msgstr "একটি ছোট"
+
+#: src/postulo/templates/help/links.html
+msgid "A social profile is one to a service: a service another row already uses is greyed out in the menu and cannot be chosen again, and saving refuses a second one. A service that lives on many servers, such as Mastodon, and <em>Other</em> can be used as often as you like, and so can the cards of code repositories. Rows that already shared a service stay as they are, with a note, until you change them."
+msgstr ""
 
 #: src/postulo/templates/applications/application_form.html
 #, fuzzy
@@ -3219,6 +3232,10 @@ msgstr "ইতিমধ্যে পাঠানো হয়েছে —"
 msgid "Already there: you have this one, so it is not added again."
 msgstr "আগে থেকেই আছে: এটি আপনার কাছে আছে, তাই আবার যোগ করা হবে না।"
 
+#: src/postulo/core/web_links.py
+msgid "Already used by another row"
+msgstr ""
+
 #: src/postulo/templates/accounts/profile.html
 #, fuzzy
 msgid "Also happens by itself when your primary address changes."
@@ -3490,6 +3507,10 @@ msgstr "আরেকটি আমন্ত্রণ"
 #, fuzzy
 msgid "Another request is using this Idempotency-Key; try again in a moment."
 msgstr "অন্য একটি অনুরোধ এই Idempotency-Key ব্যবহার করছে; একটু পরে আবার চেষ্টা করুন।"
+
+#: src/postulo/templates/partials/web_links.html
+msgid "Another row is on the same service. Both stay as they are; remove one, or move it to Other, when you like."
+msgstr ""
 
 #: src/postulo/api/models.py
 #, fuzzy
@@ -10949,6 +10970,7 @@ msgstr "বেতন ও তারিখ"
 
 #: src/postulo/accounts/forms.py src/postulo/applications/agenda.py
 #: src/postulo/templates/applications/report.html
+#: src/postulo/templates/cotton/date_picker.html
 #, fuzzy
 msgid "Month"
 msgstr "মাস"
@@ -11370,6 +11392,7 @@ msgid "Next interview"
 msgstr "পরবর্তী সাক্ষাৎকার"
 
 #: src/postulo/applications/agenda.py
+#: src/postulo/templates/cotton/date_picker.html
 #, fuzzy
 msgid "Next month"
 msgstr "পরবর্তী মাস"
@@ -13849,11 +13872,6 @@ msgstr "ফোন"
 msgid "Phone screen"
 msgstr "ফোনে প্রাথমিক বাছাই"
 
-#: src/postulo/templates/accounts/profile.html
-#, fuzzy
-msgid "Pick a day"
-msgstr "একটি দিন বেছে নিন"
-
 #: src/postulo/templates/documents/letter_detail.html
 #, fuzzy
 msgid "Pick an application and the placeholders are filled in from it."
@@ -14420,6 +14438,7 @@ msgid "Previous day"
 msgstr "পূর্ববর্তী দিন"
 
 #: src/postulo/applications/agenda.py
+#: src/postulo/templates/cotton/date_picker.html
 #, fuzzy
 msgid "Previous month"
 msgstr "পূর্ববর্তী মাস"
@@ -14434,6 +14453,11 @@ msgstr "পূর্ববর্তী সপ্তাহ"
 msgid "Previous, This month and Next. With chevrons only, the words are still the buttons' names for a screen reader."
 msgstr "পূর্ববর্তী, এই মাস এবং পরবর্তী। শুধু তীরচিহ্ন বেছে নিলেও, স্ক্রিন রিডারের কাছে লেখাগুলোই বোতামগুলোর নাম থাকে।"
 
+#: src/postulo/accounts/models.py src/postulo/core/models.py
+#, fuzzy
+msgid "primary"
+msgstr "প্রধান"
+
 #: src/postulo/core/design.py src/postulo/templates/cotton/primary_choice.html
 #: src/postulo/templates/jobs/company_map.html
 #: src/postulo/templates/partials/messaging_handles.html
@@ -14444,11 +14468,6 @@ msgstr "পূর্ববর্তী, এই মাস এবং পরবর�
 #: src/postulo/templates/settings/account.html
 #, fuzzy
 msgid "Primary"
-msgstr "প্রধান"
-
-#: src/postulo/core/models.py
-#, fuzzy
-msgid "primary"
 msgstr "প্রধান"
 
 #: src/postulo/documents/models.py
@@ -16539,6 +16558,10 @@ msgstr "কী-এর ইঙ্গিত দেখানো"
 msgid "show on the map"
 msgstr "মানচিত্রে দেখান"
 
+#: src/postulo/templates/accounts/profile.html
+msgid "Show on the map"
+msgstr ""
+
 #: src/postulo/templates/applications/interview_list.html
 #, fuzzy
 msgid "Show past too"
@@ -16578,6 +16601,10 @@ msgstr "কর্মজীবনের প্রতিটি এন্ট্র�
 #, fuzzy
 msgid "Show the plugins Postulo ships"
 msgstr "Postulo-র সঙ্গে আসা প্লাগইনগুলো দেখান"
+
+#: src/postulo/templates/accounts/profile.html
+msgid "Show this address on the map?"
+msgstr ""
 
 #: src/postulo/templates/applications/report.html
 #, fuzzy
@@ -19661,6 +19688,10 @@ msgstr "প্রত্যাখ্যাত, প্রত্যাহার ক
 #, fuzzy
 msgid "The stage is read from each timeline: where the application stood when it ended."
 msgstr "ধাপটি প্রতিটি সময়রেখা থেকে পড়া হয়: আবেদনটি শেষ হওয়ার সময় যেখানে ছিল।"
+
+#: src/postulo/templates/help/identifiers.html
+msgid "The star at the start of a row marks your primary identifier. A CV prints it first, and alone where its template has room for only one. Removing it hands the star to the next row."
+msgstr ""
 
 #: src/postulo/applications/forms.py
 #, fuzzy
@@ -22791,7 +22822,7 @@ msgstr "পরপর কতবার ভুল"
 msgid "XOAUTH2, with a token from the provider"
 msgstr "XOAUTH2, প্রদানকারীর দেওয়া টোকেন দিয়ে"
 
-#: src/postulo/accounts/forms.py
+#: src/postulo/accounts/forms.py src/postulo/templates/cotton/date_picker.html
 #, fuzzy
 msgid "Year"
 msgstr "বছর"
@@ -23127,7 +23158,7 @@ msgstr "আপনার পরিচিতিগুলো এমন একটি
 msgid "Your CV header shows a town and a country and never a street, whatever is here."
 msgstr "এখানে যা-ই থাকুক, আপনার সিভির ওপরের অংশে একটি শহর ও একটি দেশ দেখায়, কখনো রাস্তা নয়।"
 
-#: src/postulo/templates/accounts/profile.html
+#: src/postulo/accounts/views.py src/postulo/templates/accounts/profile.html
 #, fuzzy
 msgid "Your CV photo"
 msgstr "আপনার সিভি ছবি"

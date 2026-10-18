@@ -1479,6 +1479,11 @@ msgstr "%(scheme)s: ní hé sin an gnáthfhoirm."
 msgid "%(sent)s, %(failed)s; each document says which."
 msgstr "%(sent)s, %(failed)s; deir gach cáipéis cé acu."
 
+#: src/postulo/core/web_links.py
+#, python-format
+msgid "%(service)s is already used by another row."
+msgstr ""
+
 #: src/postulo/core/templatetags/postulo.py
 #, fuzzy, python-format
 msgid "%(share)s%%"
@@ -2596,6 +2601,10 @@ msgstr "Caithfidh pictiúr a uaslódálann tú a bheith %(formats)s, nach mó n�
 msgid "A picture you uploaded is shown rather than your Gravatar, and your Gravatar rather than your initials. <em>Remove the uploaded picture</em> is offered once there is one: tick it and save, and the file is deleted."
 msgstr "Taispeántar pictiúr a d’uaslódáil tú seachas do Gravatar, agus do Gravatar seachas do thúslitreacha. Tairgtear <em>Bain an pictiúr uaslódáilte</em> nuair atá ceann ann: ticeáil é agus sábháil, agus scriostar an comhad."
 
+#: src/postulo/templates/accounts/profile.html
+msgid "A pin for it is drawn on your map, at its postcode or town, and only you can see it."
+msgstr ""
+
 #: src/postulo/templates/partials/postal_addresses.html
 #, fuzzy
 msgid "A place rather than a whole address, and kept as it is. For post to reach it:"
@@ -2845,6 +2854,10 @@ msgstr "A caipín eochair beag in aice Sábháil agus seo chugainn, Discard agus
 #, fuzzy
 msgid "A small one"
 msgstr "Ceann beag"
+
+#: src/postulo/templates/help/links.html
+msgid "A social profile is one to a service: a service another row already uses is greyed out in the menu and cannot be chosen again, and saving refuses a second one. A service that lives on many servers, such as Mastodon, and <em>Other</em> can be used as often as you like, and so can the cards of code repositories. Rows that already shared a service stay as they are, with a note, until you change them."
+msgstr ""
 
 #: src/postulo/templates/applications/application_form.html
 #, fuzzy
@@ -3519,6 +3532,10 @@ msgstr "Seolta cheana —"
 msgid "Already there: you have this one, so it is not added again."
 msgstr "Cheana féin ann: tá an ceann seo agat, mar sin ní chuirtear leis arís é."
 
+#: src/postulo/core/web_links.py
+msgid "Already used by another row"
+msgstr ""
+
 #: src/postulo/templates/accounts/profile.html
 #, fuzzy
 msgid "Also happens by itself when your primary address changes."
@@ -3799,6 +3816,10 @@ msgstr "Cuireadh eile"
 #, fuzzy
 msgid "Another request is using this Idempotency-Key; try again in a moment."
 msgstr "Tá iarratas eile ag úsáid an Idempotency-Key seo; bain triail eile as i gceann nóiméid."
+
+#: src/postulo/templates/partials/web_links.html
+msgid "Another row is on the same service. Both stay as they are; remove one, or move it to Other, when you like."
+msgstr ""
 
 #: src/postulo/api/models.py
 #, fuzzy
@@ -11276,6 +11297,7 @@ msgstr "Airgead agus dátaí"
 
 #: src/postulo/accounts/forms.py src/postulo/applications/agenda.py
 #: src/postulo/templates/applications/report.html
+#: src/postulo/templates/cotton/date_picker.html
 #, fuzzy
 msgid "Month"
 msgstr "Mí"
@@ -11697,6 +11719,7 @@ msgid "Next interview"
 msgstr "An chéad agallamh eile"
 
 #: src/postulo/applications/agenda.py
+#: src/postulo/templates/cotton/date_picker.html
 #, fuzzy
 msgid "Next month"
 msgstr "An mhí seo chugainn"
@@ -14242,11 +14265,6 @@ msgstr "teileafón"
 msgid "Phone screen"
 msgstr "Scagadh teileafóin"
 
-#: src/postulo/templates/accounts/profile.html
-#, fuzzy
-msgid "Pick a day"
-msgstr "Pioc lá"
-
 #: src/postulo/templates/documents/letter_detail.html
 #, fuzzy
 msgid "Pick an application and the placeholders are filled in from it."
@@ -14813,6 +14831,7 @@ msgid "Previous day"
 msgstr "An lá roimhe sin"
 
 #: src/postulo/applications/agenda.py
+#: src/postulo/templates/cotton/date_picker.html
 #, fuzzy
 msgid "Previous month"
 msgstr "An mhí roimhe sin"
@@ -14827,6 +14846,11 @@ msgstr "Seachtain roimhe seo"
 msgid "Previous, This month and Next. With chevrons only, the words are still the buttons' names for a screen reader."
 msgstr "Roimhe Seo, An mhí seo agus Next. Le chevrons amháin, tá na focail fós ainmneacha na cnaipí 'do léitheoir scáileáin."
 
+#: src/postulo/accounts/models.py src/postulo/core/models.py
+#, fuzzy
+msgid "primary"
+msgstr "príomh"
+
 #: src/postulo/core/design.py src/postulo/templates/cotton/primary_choice.html
 #: src/postulo/templates/jobs/company_map.html
 #: src/postulo/templates/partials/messaging_handles.html
@@ -14838,11 +14862,6 @@ msgstr "Roimhe Seo, An mhí seo agus Next. Le chevrons amháin, tá na focail f�
 #, fuzzy
 msgid "Primary"
 msgstr "Príomh"
-
-#: src/postulo/core/models.py
-#, fuzzy
-msgid "primary"
-msgstr "príomh"
 
 #: src/postulo/documents/models.py
 #, fuzzy
@@ -16947,6 +16966,10 @@ msgstr "léiríonn leideanna eochair"
 msgid "show on the map"
 msgstr "a thaispeáint ar an léarscáil"
 
+#: src/postulo/templates/accounts/profile.html
+msgid "Show on the map"
+msgstr ""
+
 #: src/postulo/templates/applications/interview_list.html
 #, fuzzy
 msgid "Show past too"
@@ -16986,6 +17009,10 @@ msgstr "Taispeáin uimhir an oird ar gach iontráil ghairme"
 #, fuzzy
 msgid "Show the plugins Postulo ships"
 msgstr "Taispeáin na breiseáin a thagann le Postulo"
+
+#: src/postulo/templates/accounts/profile.html
+msgid "Show this address on the map?"
+msgstr ""
 
 #: src/postulo/templates/applications/report.html
 #, fuzzy
@@ -20102,6 +20129,10 @@ msgstr "An chéim a shroich gach iarratas nuair a diúltaíodh dó, nuair a tarr
 #, fuzzy
 msgid "The stage is read from each timeline: where the application stood when it ended."
 msgstr "Léitear an chéim ó gach amlíne: an áit a raibh an t-iarratas nuair a chríochnaigh sé."
+
+#: src/postulo/templates/help/identifiers.html
+msgid "The star at the start of a row marks your primary identifier. A CV prints it first, and alone where its template has room for only one. Removing it hands the star to the next row."
+msgstr ""
 
 #: src/postulo/applications/forms.py
 #, fuzzy
@@ -23244,7 +23275,7 @@ msgstr "mícheart i ndiaidh a chéile"
 msgid "XOAUTH2, with a token from the provider"
 msgstr "XOAUTH2, le comhartha ón soláthraí"
 
-#: src/postulo/accounts/forms.py
+#: src/postulo/accounts/forms.py src/postulo/templates/cotton/date_picker.html
 #, fuzzy
 msgid "Year"
 msgstr "Bliain agus Bliain"
@@ -23589,7 +23620,7 @@ msgstr "Do teagmhálacha i .vcf comhad léann leabhar seoladh, agus na cártaí 
 msgid "Your CV header shows a town and a country and never a street, whatever is here."
 msgstr "Taispeánann ceanntásc do CV baile agus tír agus ní shráid riamh, cibé rud atá anseo."
 
-#: src/postulo/templates/accounts/profile.html
+#: src/postulo/accounts/views.py src/postulo/templates/accounts/profile.html
 #, fuzzy
 msgid "Your CV photo"
 msgstr "Do CV grianghraf"

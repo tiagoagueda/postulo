@@ -1321,6 +1321,11 @@ msgstr "%(scheme)s: то није уобичајен облик."
 msgid "%(sent)s, %(failed)s; each document says which."
 msgstr "%(sent)s, %(failed)s; сваки документ каже који."
 
+#: src/postulo/core/web_links.py
+#, python-format
+msgid "%(service)s is already used by another row."
+msgstr ""
+
 #: src/postulo/core/templatetags/postulo.py
 #, fuzzy, python-format
 msgid "%(share)s%%"
@@ -2408,6 +2413,10 @@ msgstr "Слика коју отпремите мора бити %(formats)s, в
 msgid "A picture you uploaded is shown rather than your Gravatar, and your Gravatar rather than your initials. <em>Remove the uploaded picture</em> is offered once there is one: tick it and save, and the file is deleted."
 msgstr "Отпремљена слика приказује се уместо вашег Gravatar-а, а Gravatar уместо ваших иницијала. <em>Уклони отпремљену слику</em> нуди се када она постоји: означите то и сачувајте, и датотека се брише."
 
+#: src/postulo/templates/accounts/profile.html
+msgid "A pin for it is drawn on your map, at its postcode or town, and only you can see it."
+msgstr ""
+
 #: src/postulo/templates/partials/postal_addresses.html
 #, fuzzy
 msgid "A place rather than a whole address, and kept as it is. For post to reach it:"
@@ -2652,6 +2661,10 @@ msgstr "Мала ознака тастера поред Сачувај и даљ
 #, fuzzy
 msgid "A small one"
 msgstr "Мала"
+
+#: src/postulo/templates/help/links.html
+msgid "A social profile is one to a service: a service another row already uses is greyed out in the menu and cannot be chosen again, and saving refuses a second one. A service that lives on many servers, such as Mastodon, and <em>Other</em> can be used as often as you like, and so can the cards of code repositories. Rows that already shared a service stay as they are, with a note, until you change them."
+msgstr ""
 
 #: src/postulo/templates/applications/application_form.html
 #, fuzzy
@@ -3316,6 +3329,10 @@ msgstr "Већ послато —"
 msgid "Already there: you have this one, so it is not added again."
 msgstr "Већ постоји: ово већ имате, па се не додаје поново."
 
+#: src/postulo/core/web_links.py
+msgid "Already used by another row"
+msgstr ""
+
 #: src/postulo/templates/accounts/profile.html
 #, fuzzy
 msgid "Also happens by itself when your primary address changes."
@@ -3590,6 +3607,10 @@ msgstr "Још једна позивница"
 #, fuzzy
 msgid "Another request is using this Idempotency-Key; try again in a moment."
 msgstr "Овај Idempotency-Key користи други захтев; покушајте поново за тренутак."
+
+#: src/postulo/templates/partials/web_links.html
+msgid "Another row is on the same service. Both stay as they are; remove one, or move it to Other, when you like."
+msgstr ""
 
 #: src/postulo/api/models.py
 #, fuzzy
@@ -11024,6 +11045,7 @@ msgstr "Новац и датуми"
 
 #: src/postulo/accounts/forms.py src/postulo/applications/agenda.py
 #: src/postulo/templates/applications/report.html
+#: src/postulo/templates/cotton/date_picker.html
 #, fuzzy
 msgid "Month"
 msgstr "Месец"
@@ -11444,6 +11466,7 @@ msgid "Next interview"
 msgstr "Следећи интервју"
 
 #: src/postulo/applications/agenda.py
+#: src/postulo/templates/cotton/date_picker.html
 #, fuzzy
 msgid "Next month"
 msgstr "Следећи месец"
@@ -13927,11 +13950,6 @@ msgstr "телефон"
 msgid "Phone screen"
 msgstr "Телефонски разговор"
 
-#: src/postulo/templates/accounts/profile.html
-#, fuzzy
-msgid "Pick a day"
-msgstr "Изаберите дан"
-
 #: src/postulo/templates/documents/letter_detail.html
 #, fuzzy
 msgid "Pick an application and the placeholders are filled in from it."
@@ -14497,6 +14515,7 @@ msgid "Previous day"
 msgstr "Претходни дан"
 
 #: src/postulo/applications/agenda.py
+#: src/postulo/templates/cotton/date_picker.html
 #, fuzzy
 msgid "Previous month"
 msgstr "Претходни месец"
@@ -14511,6 +14530,11 @@ msgstr "Претходна недеља"
 msgid "Previous, This month and Next. With chevrons only, the words are still the buttons' names for a screen reader."
 msgstr "Претходно, Овај месец и Следеће. Само са стрелицама, речи остају називи дугмади за читач екрана."
 
+#: src/postulo/accounts/models.py src/postulo/core/models.py
+#, fuzzy
+msgid "primary"
+msgstr "главни"
+
 #: src/postulo/core/design.py src/postulo/templates/cotton/primary_choice.html
 #: src/postulo/templates/jobs/company_map.html
 #: src/postulo/templates/partials/messaging_handles.html
@@ -14522,11 +14546,6 @@ msgstr "Претходно, Овај месец и Следеће. Само са
 #, fuzzy
 msgid "Primary"
 msgstr "Примарно"
-
-#: src/postulo/core/models.py
-#, fuzzy
-msgid "primary"
-msgstr "главни"
 
 #: src/postulo/documents/models.py
 #, fuzzy
@@ -16599,6 +16618,10 @@ msgstr "прикажи наговештаје тастера"
 msgid "show on the map"
 msgstr "прикажи на мапи"
 
+#: src/postulo/templates/accounts/profile.html
+msgid "Show on the map"
+msgstr ""
+
 #: src/postulo/templates/applications/interview_list.html
 #, fuzzy
 msgid "Show past too"
@@ -16638,6 +16661,10 @@ msgstr "Приказуј редни број на сваком уносу кар
 #, fuzzy
 msgid "Show the plugins Postulo ships"
 msgstr "Прикажи додатке које Postulo доноси"
+
+#: src/postulo/templates/accounts/profile.html
+msgid "Show this address on the map?"
+msgstr ""
 
 #: src/postulo/templates/applications/report.html
 #, fuzzy
@@ -19719,6 +19746,10 @@ msgstr "Фаза коју је свака пријава достигла кад
 #, fuzzy
 msgid "The stage is read from each timeline: where the application stood when it ended."
 msgstr "Фаза се чита са сваке временске линије: где је пријава била када се завршила."
+
+#: src/postulo/templates/help/identifiers.html
+msgid "The star at the start of a row marks your primary identifier. A CV prints it first, and alone where its template has room for only one. Removing it hands the star to the next row."
+msgstr ""
 
 #: src/postulo/applications/forms.py
 #, fuzzy
@@ -22833,7 +22864,7 @@ msgstr "погрешно узастопно"
 msgid "XOAUTH2, with a token from the provider"
 msgstr "XOAUTH2, са токеном пружаоца"
 
-#: src/postulo/accounts/forms.py
+#: src/postulo/accounts/forms.py src/postulo/templates/cotton/date_picker.html
 #, fuzzy
 msgid "Year"
 msgstr "Година"
@@ -23167,7 +23198,7 @@ msgstr "Ваши контакти у датотеци .vcf коју адреса
 msgid "Your CV header shows a town and a country and never a street, whatever is here."
 msgstr "Заглавље вашег ЦВ-ја приказује место и државу, а никада улицу, шта год овде било."
 
-#: src/postulo/templates/accounts/profile.html
+#: src/postulo/accounts/views.py src/postulo/templates/accounts/profile.html
 #, fuzzy
 msgid "Your CV photo"
 msgstr "Ваша фотографија за CV"

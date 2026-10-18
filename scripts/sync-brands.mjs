@@ -32,12 +32,21 @@ const lines = (path) =>
     .map((line) => line.replace(/(^|\s)#.*/, "").trim())
     .filter(Boolean);
 
+// The owner a vendored file's mark belongs to, and the licence of the artwork in it.
+const FILE_OWNERS = { linkedin: "LinkedIn" };
+const FILE_LICENCE = "CC-BY-4.0 (Font Awesome Free, Fonticons, Inc.; the mark itself is its owner's)";
+
 const MODES = ["brand", "single-colour"];
 
-// A line is `slug`, or `slug single-colour <guidelines URL> <what they say>`.
+// A line is `slug`, or `slug single-colour <guidelines URL> <what they say>`; either may
+// have `@<file>` after the slug, naming a vendored SVG under assets/brand-sources/ for a
+// mark Simple Icons does not carry (its licence and origin are in the file's own comment).
 let failed = false;
 const parsed = new Map();
-for (const line of lines(LIST)) {
+for (const raw of lines(LIST)) {
+  const fileMatch = raw.match(/^(\S+)\s+@(\S+)(.*)$/);
+  const line = fileMatch ? `${fileMatch[1]}${fileMatch[3]}` : raw;
+  const file = fileMatch ? fileMatch[2] : "";
   const [, slug, mode = "brand", url = "", evidence = ""] = line.match(/^(\S+)(?:\s+(\S+)(?:\s+(\S+)(?:\s+(.*))?)?)?$/);
   if (!MODES.includes(mode)) {
     console.error(`"${slug}" has the mode "${mode}"; the modes are ${MODES.join(" and ")}.`);
@@ -47,8 +56,14 @@ for (const line of lines(LIST)) {
       `"${slug}" is single-colour, which needs the owner's guidelines page (https) and what it says allowing a one-colour version, after the mode in ${LIST}.`,
     );
     failed = true;
+  } else if (file && (!/^assets\/brand-sources\/[a-z0-9-]+\.svg$/.test(file) || !existsSync(file))) {
+    console.error(`"${slug}" names the file "${file}", which is not an existing assets/brand-sources/*.svg.`);
+    failed = true;
+  } else if (file && mode !== "single-colour") {
+    console.error(`"${slug}" comes from a file, which is drawn in single-colour only.`);
+    failed = true;
   } else {
-    parsed.set(slug, { mode, url, evidence: evidence.trim() });
+    parsed.set(slug, { mode, url, evidence: evidence.trim(), file });
   }
 }
 if (failed) {
@@ -72,6 +87,29 @@ mkdirSync(DESTINATION, { recursive: true });
 
 const notices = [];
 for (const slug of [...wanted].sort()) {
+  const { mode, url, evidence, file } = parsed.get(slug);
+  if (file) {
+    // A vendored file keeps its own attribution comment (Font Awesome Free asks that it stay).
+    const own = readFileSync(file, "utf8");
+    const owner = FILE_OWNERS[slug] ?? slug;
+    writeFileSync(
+      join(DESTINATION, `${slug}.svg`),
+      own.replace(/^<svg\b/, '<svg fill="currentColor"').replace(/\s*$/, "\n"),
+    );
+    notices.push(
+      [
+        `${slug}`,
+        `  Owner: ${owner}`,
+        "  Mode: single-colour (currentColor, black on the light page and white on the dark one; its owner's guidelines allow a one-colour version)",
+        `  Licence: ${FILE_LICENCE}`,
+        `  Source: ${file}, as published in Font Awesome Free; its own comment names the artwork's author and licence`,
+        "  Guidelines: not stated",
+        `  Allowed by: ${url}`,
+        `  They say: ${evidence}`,
+      ].join("\n"),
+    );
+    continue;
+  }
   const entry = data.get(slug);
   const from = join(PACKAGE, "icons", `${slug}.svg`);
   if (!entry || !existsSync(from)) {
@@ -85,7 +123,6 @@ for (const slug of [...wanted].sort()) {
     failed = true;
     continue;
   }
-  const { mode, url, evidence } = parsed.get(slug);
   const colour = `#${entry.hex.toUpperCase()}`;
   const fill = mode === "brand" ? colour : "currentColor";
   // One trailing newline, as the repository's end-of-file hook leaves every file.
@@ -124,7 +161,7 @@ const header = `Brand marks in this directory
 
 Each file is a logo that belongs to the owner named below, taken from the Simple Icons
 package (simple-icons ${version}, https://simpleicons.org, whose own artwork notice is
-CC0-1.0). Postulo shows a mark only to identify the service it stands for, and claims no
+CC0-1.0), or, where it has none, from a file in assets/brand-sources/ that names its origin. Postulo shows a mark only to identify the service it stands for, and claims no
 endorsement by, or involvement of, its owner: the owners are not involved with Postulo.
 
 These files are NOT covered by Postulo's AGPL-3.0-or-later licence, which cannot speak for

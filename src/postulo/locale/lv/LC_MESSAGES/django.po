@@ -1321,6 +1321,11 @@ msgstr "%(scheme)s: tā nav ierastā forma."
 msgid "%(sent)s, %(failed)s; each document says which."
 msgstr "%(sent)s, %(failed)s; katrs dokuments parāda, kā gājis."
 
+#: src/postulo/core/web_links.py
+#, python-format
+msgid "%(service)s is already used by another row."
+msgstr ""
+
 #: src/postulo/core/templatetags/postulo.py
 #, fuzzy, python-format
 msgid "%(share)s%%"
@@ -2408,6 +2413,10 @@ msgstr "Augšupielādētam attēlam jābūt %(formats)s, ne lielākam par %(mega
 msgid "A picture you uploaded is shown rather than your Gravatar, and your Gravatar rather than your initials. <em>Remove the uploaded picture</em> is offered once there is one: tick it and save, and the file is deleted."
 msgstr "Augšupielādēts attēls tiek rādīts jūsu Gravatar vietā, un jūsu Gravatar — iniciāļu vietā. <em>Noņemt augšupielādēto attēlu</em> tiek piedāvāts, kad tāds ir: atzīmējiet to un saglabājiet, un fails tiek izdzēsts."
 
+#: src/postulo/templates/accounts/profile.html
+msgid "A pin for it is drawn on your map, at its postcode or town, and only you can see it."
+msgstr ""
+
 #: src/postulo/templates/partials/postal_addresses.html
 #, fuzzy
 msgid "A place rather than a whole address, and kept as it is. For post to reach it:"
@@ -2653,6 +2662,10 @@ msgstr "Mazs atslēgas vāciņš blakus Saglabāt un nākamais, Izmest un nākam
 #, fuzzy
 msgid "A small one"
 msgstr "Mazs"
+
+#: src/postulo/templates/help/links.html
+msgid "A social profile is one to a service: a service another row already uses is greyed out in the menu and cannot be chosen again, and saving refuses a second one. A service that lives on many servers, such as Mastodon, and <em>Other</em> can be used as often as you like, and so can the cards of code repositories. Rows that already shared a service stay as they are, with a note, until you change them."
+msgstr ""
 
 #: src/postulo/templates/applications/application_form.html
 #, fuzzy
@@ -3319,6 +3332,10 @@ msgstr "Jau nosūtīts —"
 msgid "Already there: you have this one, so it is not added again."
 msgstr "Jau tur: jums ir šis, tāpēc tas netiek pievienots vēlreiz."
 
+#: src/postulo/core/web_links.py
+msgid "Already used by another row"
+msgstr ""
+
 #: src/postulo/templates/accounts/profile.html
 #, fuzzy
 msgid "Also happens by itself when your primary address changes."
@@ -3593,6 +3610,10 @@ msgstr "Vēl viens uzaicinājums"
 #, fuzzy
 msgid "Another request is using this Idempotency-Key; try again in a moment."
 msgstr "Šo Idempotency-Key jau lieto cits pieprasījums; pamēģiniet pēc brīža vēlreiz."
+
+#: src/postulo/templates/partials/web_links.html
+msgid "Another row is on the same service. Both stay as they are; remove one, or move it to Other, when you like."
+msgstr ""
 
 #: src/postulo/api/models.py
 #, fuzzy
@@ -11058,6 +11079,7 @@ msgstr "Nauda un datumi"
 
 #: src/postulo/accounts/forms.py src/postulo/applications/agenda.py
 #: src/postulo/templates/applications/report.html
+#: src/postulo/templates/cotton/date_picker.html
 #, fuzzy
 msgid "Month"
 msgstr "Mēnesis"
@@ -11479,6 +11501,7 @@ msgid "Next interview"
 msgstr "Nākamā intervija"
 
 #: src/postulo/applications/agenda.py
+#: src/postulo/templates/cotton/date_picker.html
 #, fuzzy
 msgid "Next month"
 msgstr "Nākamais mēnesis"
@@ -13980,11 +14003,6 @@ msgstr "tālrunis"
 msgid "Phone screen"
 msgstr "Telefona intervija"
 
-#: src/postulo/templates/accounts/profile.html
-#, fuzzy
-msgid "Pick a day"
-msgstr "Izvēlieties dienu"
-
 #: src/postulo/templates/documents/letter_detail.html
 #, fuzzy
 msgid "Pick an application and the placeholders are filled in from it."
@@ -14551,6 +14569,7 @@ msgid "Previous day"
 msgstr "Iepriekšējā diena"
 
 #: src/postulo/applications/agenda.py
+#: src/postulo/templates/cotton/date_picker.html
 #, fuzzy
 msgid "Previous month"
 msgstr "Iepriekšējais mēnesis"
@@ -14565,6 +14584,11 @@ msgstr "Iepriekšējā nedēļa"
 msgid "Previous, This month and Next. With chevrons only, the words are still the buttons' names for a screen reader."
 msgstr "Iepriekšējais, Šo mēnesi un nākamo. Tikai ar hevroniem, vārdi joprojām ir pogu nosaukumi ekrāna lasītājam."
 
+#: src/postulo/accounts/models.py src/postulo/core/models.py
+#, fuzzy
+msgid "primary"
+msgstr "galvenais"
+
 #: src/postulo/core/design.py src/postulo/templates/cotton/primary_choice.html
 #: src/postulo/templates/jobs/company_map.html
 #: src/postulo/templates/partials/messaging_handles.html
@@ -14576,11 +14600,6 @@ msgstr "Iepriekšējais, Šo mēnesi un nākamo. Tikai ar hevroniem, vārdi jopr
 #, fuzzy
 msgid "Primary"
 msgstr "Primārais"
-
-#: src/postulo/core/models.py
-#, fuzzy
-msgid "primary"
-msgstr "galvenais"
 
 #: src/postulo/documents/models.py
 #, fuzzy
@@ -16675,6 +16694,10 @@ msgstr "rādīt taustiņu padomus"
 msgid "show on the map"
 msgstr "rādīt kartē"
 
+#: src/postulo/templates/accounts/profile.html
+msgid "Show on the map"
+msgstr ""
+
 #: src/postulo/templates/applications/interview_list.html
 #, fuzzy
 msgid "Show past too"
@@ -16714,6 +16737,10 @@ msgstr "Rādīt kārtas numuru katrā karjeras ierakstā"
 #, fuzzy
 msgid "Show the plugins Postulo ships"
 msgstr "Rādīt spraudņus, ko piegādā Postulo"
+
+#: src/postulo/templates/accounts/profile.html
+msgid "Show this address on the map?"
+msgstr ""
 
 #: src/postulo/templates/applications/report.html
 #, fuzzy
@@ -19808,6 +19835,10 @@ msgstr "Posms, kādu katrs pieteikums bija sasniedzis, kad tika noraidīts, atsa
 #, fuzzy
 msgid "The stage is read from each timeline: where the application stood when it ended."
 msgstr "Posms tiek nolasīts no katras hronoloģijas: kur pieteikums atradās, kad tas beidzās."
+
+#: src/postulo/templates/help/identifiers.html
+msgid "The star at the start of a row marks your primary identifier. A CV prints it first, and alone where its template has room for only one. Removing it hands the star to the next row."
+msgstr ""
 
 #: src/postulo/applications/forms.py
 #, fuzzy
@@ -22942,7 +22973,7 @@ msgstr "nepareizi pēc kārtas"
 msgid "XOAUTH2, with a token from the provider"
 msgstr "XOAUTH2, ar marķieri no nodrošinātāja"
 
-#: src/postulo/accounts/forms.py
+#: src/postulo/accounts/forms.py src/postulo/templates/cotton/date_picker.html
 #, fuzzy
 msgid "Year"
 msgstr "Gads"
@@ -23281,7 +23312,7 @@ msgstr "Jūsu kontakti .vcf failu adrešu grāmatu lasa, un kartes no vienas nod
 msgid "Your CV header shows a town and a country and never a street, whatever is here."
 msgstr "Jūsu CV galvene rāda pilsētu un valsti un nekad ielu, lai kas arī šeit būtu."
 
-#: src/postulo/templates/accounts/profile.html
+#: src/postulo/accounts/views.py src/postulo/templates/accounts/profile.html
 #, fuzzy
 msgid "Your CV photo"
 msgstr "CV fotoattēls"

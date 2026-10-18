@@ -1242,6 +1242,11 @@ msgstr "%(scheme)s: det er ikkje den vanlege forma."
 msgid "%(sent)s, %(failed)s; each document says which."
 msgstr "%(sent)s, %(failed)s; kvart dokument viser kva."
 
+#: src/postulo/core/web_links.py
+#, python-format
+msgid "%(service)s is already used by another row."
+msgstr ""
+
 #: src/postulo/core/templatetags/postulo.py
 #, fuzzy, python-format
 msgid "%(share)s%%"
@@ -2314,6 +2319,10 @@ msgstr "Eit bilete du lastar opp, må vere %(formats)s, på høgst %(megabytes)s
 msgid "A picture you uploaded is shown rather than your Gravatar, and your Gravatar rather than your initials. <em>Remove the uploaded picture</em> is offered once there is one: tick it and save, and the file is deleted."
 msgstr "Eit bilete du har lasta opp, blir vist i staden for Gravatar-en din, og Gravatar-en din i staden for initialane dine. <em>Fjern det opplasta biletet</em> blir tilbode når det finst eitt: kryss av og lagre, så blir fila sletta."
 
+#: src/postulo/templates/accounts/profile.html
+msgid "A pin for it is drawn on your map, at its postcode or town, and only you can see it."
+msgstr ""
+
 #: src/postulo/templates/partials/postal_addresses.html
 #, fuzzy
 msgid "A place rather than a whole address, and kept as it is. For post to reach it:"
@@ -2556,6 +2565,10 @@ msgstr "Ein liten tastetopp ved sida av Lagre og neste, Forkast og neste, Hopp t
 #, fuzzy
 msgid "A small one"
 msgstr "Ein liten"
+
+#: src/postulo/templates/help/links.html
+msgid "A social profile is one to a service: a service another row already uses is greyed out in the menu and cannot be chosen again, and saving refuses a second one. A service that lives on many servers, such as Mastodon, and <em>Other</em> can be used as often as you like, and so can the cards of code repositories. Rows that already shared a service stay as they are, with a note, until you change them."
+msgstr ""
 
 #: src/postulo/templates/applications/application_form.html
 #, fuzzy
@@ -3216,6 +3229,10 @@ msgstr "Allereie sendt –"
 msgid "Already there: you have this one, so it is not added again."
 msgstr "Finst allereie: du har denne, så ho blir ikkje lagd til på nytt."
 
+#: src/postulo/core/web_links.py
+msgid "Already used by another row"
+msgstr ""
+
 #: src/postulo/templates/accounts/profile.html
 #, fuzzy
 msgid "Also happens by itself when your primary address changes."
@@ -3487,6 +3504,10 @@ msgstr "Ein ny invitasjon"
 #, fuzzy
 msgid "Another request is using this Idempotency-Key; try again in a moment."
 msgstr "Ein annan førespurnad brukar denne Idempotency-Key; prøv igjen om ei lita stund."
+
+#: src/postulo/templates/partials/web_links.html
+msgid "Another row is on the same service. Both stay as they are; remove one, or move it to Other, when you like."
+msgstr ""
 
 #: src/postulo/api/models.py
 #, fuzzy
@@ -10915,6 +10936,7 @@ msgstr "Pengar og datoar"
 
 #: src/postulo/accounts/forms.py src/postulo/applications/agenda.py
 #: src/postulo/templates/applications/report.html
+#: src/postulo/templates/cotton/date_picker.html
 #, fuzzy
 msgid "Month"
 msgstr "Månad"
@@ -11335,6 +11357,7 @@ msgid "Next interview"
 msgstr "Neste intervju"
 
 #: src/postulo/applications/agenda.py
+#: src/postulo/templates/cotton/date_picker.html
 #, fuzzy
 msgid "Next month"
 msgstr "Neste månad"
@@ -13796,11 +13819,6 @@ msgstr "telefon"
 msgid "Phone screen"
 msgstr "Telefonintervju"
 
-#: src/postulo/templates/accounts/profile.html
-#, fuzzy
-msgid "Pick a day"
-msgstr "Vel ein dag"
-
 #: src/postulo/templates/documents/letter_detail.html
 #, fuzzy
 msgid "Pick an application and the placeholders are filled in from it."
@@ -14366,6 +14384,7 @@ msgid "Previous day"
 msgstr "Førre dag"
 
 #: src/postulo/applications/agenda.py
+#: src/postulo/templates/cotton/date_picker.html
 #, fuzzy
 msgid "Previous month"
 msgstr "Førre månad"
@@ -14380,6 +14399,11 @@ msgstr "Førre veke"
 msgid "Previous, This month and Next. With chevrons only, the words are still the buttons' names for a screen reader."
 msgstr "Førre, Denne månaden og Neste. Med berre vinkelpiler er orda framleis namna på knappane for ein skjermlesar."
 
+#: src/postulo/accounts/models.py src/postulo/core/models.py
+#, fuzzy
+msgid "primary"
+msgstr "hovud"
+
 #: src/postulo/core/design.py src/postulo/templates/cotton/primary_choice.html
 #: src/postulo/templates/jobs/company_map.html
 #: src/postulo/templates/partials/messaging_handles.html
@@ -14391,11 +14415,6 @@ msgstr "Førre, Denne månaden og Neste. Med berre vinkelpiler er orda framleis 
 #, fuzzy
 msgid "Primary"
 msgstr "Hovud"
-
-#: src/postulo/core/models.py
-#, fuzzy
-msgid "primary"
-msgstr "hovud"
 
 #: src/postulo/documents/models.py
 #, fuzzy
@@ -16463,6 +16482,10 @@ msgstr "vis tastehint"
 msgid "show on the map"
 msgstr "vis på kartet"
 
+#: src/postulo/templates/accounts/profile.html
+msgid "Show on the map"
+msgstr ""
+
 #: src/postulo/templates/applications/interview_list.html
 #, fuzzy
 msgid "Show past too"
@@ -16502,6 +16525,10 @@ msgstr "Vis rekkjefølgjenummeret på kvar oppføring i CV-grunnlaget"
 #, fuzzy
 msgid "Show the plugins Postulo ships"
 msgstr "Vis tillegga Postulo kjem med"
+
+#: src/postulo/templates/accounts/profile.html
+msgid "Show this address on the map?"
+msgstr ""
 
 #: src/postulo/templates/applications/report.html
 #, fuzzy
@@ -19572,6 +19599,10 @@ msgstr "Fasen kvar søknad hadde nådd då han vart avslått, trekt eller enda u
 #, fuzzy
 msgid "The stage is read from each timeline: where the application stood when it ended."
 msgstr "Fasen blir lesen frå kvar tidslinje: kvar søknaden stod då han vart avslutta."
+
+#: src/postulo/templates/help/identifiers.html
+msgid "The star at the start of a row marks your primary identifier. A CV prints it first, and alone where its template has room for only one. Removing it hands the star to the next row."
+msgstr ""
 
 #: src/postulo/applications/forms.py
 #, fuzzy
@@ -22682,7 +22713,7 @@ msgstr "feil på rad"
 msgid "XOAUTH2, with a token from the provider"
 msgstr "XOAUTH2, med eit token frå leverandøren"
 
-#: src/postulo/accounts/forms.py
+#: src/postulo/accounts/forms.py src/postulo/templates/cotton/date_picker.html
 #, fuzzy
 msgid "Year"
 msgstr "År"
@@ -23013,7 +23044,7 @@ msgstr "Kontaktane dine i ei .vcf-fil som ei adressebok kan lese, og korta frå 
 msgid "Your CV header shows a town and a country and never a street, whatever is here."
 msgstr "Toppen av CV-en din viser ein by og eit land og aldri ei gate, same kva som står her."
 
-#: src/postulo/templates/accounts/profile.html
+#: src/postulo/accounts/views.py src/postulo/templates/accounts/profile.html
 #, fuzzy
 msgid "Your CV photo"
 msgstr "CV-fotoet ditt"

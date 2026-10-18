@@ -166,13 +166,11 @@ def test_the_identifier_lines_draw_no_mark_for_schemes_that_have_none(
     expect(entries.filter(has_text="Wikidata").locator("span").first).to_have_text("Wikidata")
 
 
-def test_a_service_without_a_mark_draws_none_and_the_page_has_only_these(
-    page: Page, live_server, company
-):
+def test_every_service_draws_its_mark_and_the_page_has_only_these(page: Page, live_server, company):
     open_company(page, live_server, company)
     assert page.locator("main svg[data-brand]").evaluate_all(
         "(all) => all.map((svg) => svg.dataset.brand).sort()"
-    ) == ["forgejo", "github", "mastodon"]
+    ) == ["forgejo", "github", "mastodon", "x"]
     # And the footer's single mark, the Forgejo one beside the link to the source (#837).
     assert page.locator("footer svg[data-brand]").evaluate_all(
         "(all) => all.map((svg) => svg.dataset.brand)"

@@ -1241,6 +1241,9 @@ def _load(user, archive: zipfile.ZipFile, *, force: bool = False, into=None) -> 
         _restore_postal_addresses(profile, user, addresses, report)
         _restore_web_links(profile, user, links, report)
         _restore_messaging_handles(profile, user, handles, report)
+    from postulo.accounts import primary_identifier as account_identifiers
+
+    wanted_primary = None
     for row in account.get("identifiers") or []:
         scheme = (row.get("scheme") or "").strip()
         value = (row.get("value") or "").strip()
@@ -1280,7 +1283,16 @@ def _load(user, archive: zipfile.ZipFile, *, force: bool = False, into=None) -> 
                         f"was not added: your details already hold another under {scheme}.",
                     )
                 continue
-        PersonIdentifier.objects.get_or_create(**found, defaults={"label": label})
+        row_made, _made = PersonIdentifier.objects.get_or_create(**found, defaults={"label": label})
+        if row.get("is_primary") is True:
+            wanted_primary = wanted_primary or row_made
+    if profile:
+        # The archive's primary where it named one; failing that the profile keeps what it
+        # has, or its first identifier becomes it (#922).
+        if wanted_primary is not None:
+            account_identifiers.set_primary(profile, wanted_primary)
+        else:
+            account_identifiers.ensure_one_primary(profile)
 
     avatar_file = account.get("avatar_file") or ""
     if profile and avatar_file:

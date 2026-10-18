@@ -208,12 +208,20 @@ class PersonIdentifier(KeepsItsScheme, models.Model):
         blank=True,
         help_text=_("What the identifier is, when the scheme is Other."),
     )
+    #: The one a CV prints first, or alone where a template has room for one (#922). At most
+    #: one per person; a person with identifiers always has one.
+    is_primary = models.BooleanField(_("primary"), default=False)
 
     class Meta:
         verbose_name = _("identifier")
         verbose_name_plural = _("identifiers")
-        ordering = ("scheme", "value")
+        ordering = ("-is_primary", "scheme", "value")
         constraints = [
+            models.UniqueConstraint(
+                fields=("profile",),
+                condition=models.Q(is_primary=True),
+                name="one_primary_identifier_per_person",
+            ),
             models.UniqueConstraint(
                 fields=("profile", "scheme"),
                 condition=~models.Q(scheme=identifiers.OTHER),
@@ -223,6 +231,19 @@ class PersonIdentifier(KeepsItsScheme, models.Model):
 
     def __str__(self) -> str:
         return f"{self.scheme_label}: {self.value}"
+
+    def save(self, *args, **kwargs):
+        # A person with identifiers always has a primary one (#922): the first row written
+        # is it, by whatever route it comes -- the page, an import, a shell.
+        if (
+            self._state.adding
+            and not self.is_primary
+            and not PersonIdentifier.objects.filter(
+                profile_id=self.profile_id, is_primary=True
+            ).exists()
+        ):
+            self.is_primary = True
+        super().save(*args, **kwargs)
 
     def clean(self) -> None:
         """Tidy and check the value here, so nothing stores a half-typed identifier.

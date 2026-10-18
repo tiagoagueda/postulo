@@ -1242,6 +1242,11 @@ msgstr "%(scheme)s: ეს ჩვეულებრივი ფორმა ა
 msgid "%(sent)s, %(failed)s; each document says which."
 msgstr "%(sent)s, %(failed)s; თითოეულ დოკუმენტთან მითითებულია, რომელი."
 
+#: src/postulo/core/web_links.py
+#, python-format
+msgid "%(service)s is already used by another row."
+msgstr ""
+
 #: src/postulo/core/templatetags/postulo.py
 #, fuzzy, python-format
 msgid "%(share)s%%"
@@ -2314,6 +2319,10 @@ msgstr "სურათი, რომელსაც ატვირთავთ
 msgid "A picture you uploaded is shown rather than your Gravatar, and your Gravatar rather than your initials. <em>Remove the uploaded picture</em> is offered once there is one: tick it and save, and the file is deleted."
 msgstr "ატვირთული სურათი ჩანს თქვენი Gravatar-ის ნაცვლად, ხოლო თქვენი Gravatar — თქვენი ინიციალების ნაცვლად. <em>ატვირთული სურათის მოხსნა</em> შემოგთავაზებთ, როგორც კი სურათი იქნება: მონიშნეთ და შეინახეთ, და ფაილი წაიშლება."
 
+#: src/postulo/templates/accounts/profile.html
+msgid "A pin for it is drawn on your map, at its postcode or town, and only you can see it."
+msgstr ""
+
 #: src/postulo/templates/partials/postal_addresses.html
 #, fuzzy
 msgid "A place rather than a whole address, and kept as it is. For post to reach it:"
@@ -2556,6 +2565,10 @@ msgstr "პატარა კლავიშის ნიშნაკი ღი
 #, fuzzy
 msgid "A small one"
 msgstr "პატარა"
+
+#: src/postulo/templates/help/links.html
+msgid "A social profile is one to a service: a service another row already uses is greyed out in the menu and cannot be chosen again, and saving refuses a second one. A service that lives on many servers, such as Mastodon, and <em>Other</em> can be used as often as you like, and so can the cards of code repositories. Rows that already shared a service stay as they are, with a note, until you change them."
+msgstr ""
 
 #: src/postulo/templates/applications/application_form.html
 #, fuzzy
@@ -3216,6 +3229,10 @@ msgstr "უკვე გაგზავნილია —"
 msgid "Already there: you have this one, so it is not added again."
 msgstr "უკვე არის: ეს უკვე გაქვთ, ამიტომ ხელახლა არ დაემატება."
 
+#: src/postulo/core/web_links.py
+msgid "Already used by another row"
+msgstr ""
+
 #: src/postulo/templates/accounts/profile.html
 #, fuzzy
 msgid "Also happens by itself when your primary address changes."
@@ -3487,6 +3504,10 @@ msgstr "კიდევ ერთი მოწვევა"
 #, fuzzy
 msgid "Another request is using this Idempotency-Key; try again in a moment."
 msgstr "სხვა მოთხოვნა იყენებს ამ Idempotency-Key-ს; სცადეთ ერთ წამში ხელახლა."
+
+#: src/postulo/templates/partials/web_links.html
+msgid "Another row is on the same service. Both stay as they are; remove one, or move it to Other, when you like."
+msgstr ""
 
 #: src/postulo/api/models.py
 #, fuzzy
@@ -10915,6 +10936,7 @@ msgstr "ფული და თარიღები"
 
 #: src/postulo/accounts/forms.py src/postulo/applications/agenda.py
 #: src/postulo/templates/applications/report.html
+#: src/postulo/templates/cotton/date_picker.html
 #, fuzzy
 msgid "Month"
 msgstr "თვე"
@@ -11335,6 +11357,7 @@ msgid "Next interview"
 msgstr "შემდეგი გასაუბრება"
 
 #: src/postulo/applications/agenda.py
+#: src/postulo/templates/cotton/date_picker.html
 #, fuzzy
 msgid "Next month"
 msgstr "შემდეგი თვე"
@@ -13796,11 +13819,6 @@ msgstr "ტელეფონი"
 msgid "Phone screen"
 msgstr "სატელეფონო გასაუბრება"
 
-#: src/postulo/templates/accounts/profile.html
-#, fuzzy
-msgid "Pick a day"
-msgstr "დღის არჩევა"
-
 #: src/postulo/templates/documents/letter_detail.html
 #, fuzzy
 msgid "Pick an application and the placeholders are filled in from it."
@@ -14366,6 +14384,7 @@ msgid "Previous day"
 msgstr "წინა დღე"
 
 #: src/postulo/applications/agenda.py
+#: src/postulo/templates/cotton/date_picker.html
 #, fuzzy
 msgid "Previous month"
 msgstr "წინა თვე"
@@ -14380,6 +14399,11 @@ msgstr "წინა კვირა"
 msgid "Previous, This month and Next. With chevrons only, the words are still the buttons' names for a screen reader."
 msgstr "„წინა“, „ეს თვე“ და „შემდეგი“. „მხოლოდ ისრების“ შემთხვევაში სიტყვები ეკრანის წამკითხველისთვის მაინც ღილაკების სახელებად რჩება."
 
+#: src/postulo/accounts/models.py src/postulo/core/models.py
+#, fuzzy
+msgid "primary"
+msgstr "მთავარი"
+
 #: src/postulo/core/design.py src/postulo/templates/cotton/primary_choice.html
 #: src/postulo/templates/jobs/company_map.html
 #: src/postulo/templates/partials/messaging_handles.html
@@ -14390,11 +14414,6 @@ msgstr "„წინა“, „ეს თვე“ და „შემდეგ�
 #: src/postulo/templates/settings/account.html
 #, fuzzy
 msgid "Primary"
-msgstr "მთავარი"
-
-#: src/postulo/core/models.py
-#, fuzzy
-msgid "primary"
 msgstr "მთავარი"
 
 #: src/postulo/documents/models.py
@@ -16463,6 +16482,10 @@ msgstr "კლავიშების მინიშნებების ჩ�
 msgid "show on the map"
 msgstr "რუკაზე ჩვენება"
 
+#: src/postulo/templates/accounts/profile.html
+msgid "Show on the map"
+msgstr ""
+
 #: src/postulo/templates/applications/interview_list.html
 #, fuzzy
 msgid "Show past too"
@@ -16502,6 +16525,10 @@ msgstr "რიგითი ნომრის ჩვენება კარი
 #, fuzzy
 msgid "Show the plugins Postulo ships"
 msgstr "Postulo-ს თანმხლები მოდულების ჩვენება"
+
+#: src/postulo/templates/accounts/profile.html
+msgid "Show this address on the map?"
+msgstr ""
 
 #: src/postulo/templates/applications/report.html
 #, fuzzy
@@ -19572,6 +19599,10 @@ msgstr "ეტაპი, რომელსაც თითოეულმა �
 #, fuzzy
 msgid "The stage is read from each timeline: where the application stood when it ended."
 msgstr "ეტაპი თითოეული ქრონოლოგიიდან იკითხება: სად იდგა განაცხადი, როცა დასრულდა."
+
+#: src/postulo/templates/help/identifiers.html
+msgid "The star at the start of a row marks your primary identifier. A CV prints it first, and alone where its template has room for only one. Removing it hands the star to the next row."
+msgstr ""
 
 #: src/postulo/applications/forms.py
 #, fuzzy
@@ -22682,7 +22713,7 @@ msgstr "ზედიზედ შეცდომები"
 msgid "XOAUTH2, with a token from the provider"
 msgstr "XOAUTH2, პროვაიდერის ტოკენით"
 
-#: src/postulo/accounts/forms.py
+#: src/postulo/accounts/forms.py src/postulo/templates/cotton/date_picker.html
 #, fuzzy
 msgid "Year"
 msgstr "წელი"
@@ -23013,7 +23044,7 @@ msgstr "თქვენი კონტაქტები .vcf ფაილშ�
 msgid "Your CV header shows a town and a country and never a street, whatever is here."
 msgstr "თქვენი CV-ის სათაური აჩვენებს ქალაქს და ქვეყანას და არასოდეს ქუჩას, რაც არ უნდა ეწეროს აქ."
 
-#: src/postulo/templates/accounts/profile.html
+#: src/postulo/accounts/views.py src/postulo/templates/accounts/profile.html
 #, fuzzy
 msgid "Your CV photo"
 msgstr "თქვენი CV-ის ფოტო"

@@ -18,10 +18,10 @@ is nothing at all.
 **Websites have no services.** A website is its own thing; its block offers *Other* alone.
 
 **Nothing here is looked up anywhere.** The icon is a generic one out of the Lucide set, and
-is what a select draws. A service may also name a ``brand`` mark (#654), drawn where a link
-is shown, and only where the owner's published colour clears 3:1 on both pages: Mastodon,
-Bluesky, Facebook, Instagram, YouTube and Codeberg. The others keep the icon alone, and
-LinkedIn has no mark at all (``assets/brands.txt``, ``TRADEMARKS.md``).
+is what a service shows when its brand mark is missing. Every service names a ``brand`` mark
+(#654, #926), drawn in one colour where a link is shown and in the service select
+(``assets/brands.txt``, ``TRADEMARKS.md``); the Lucide icon is the neutral fallback should a
+mark ever be withdrawn at its owner's request.
 """
 
 from __future__ import annotations
@@ -148,11 +148,14 @@ SERVICES: dict[str, LinkService] = {
             _path(rf"/(?:in|pub|company|school|showcase)/(?P<handle>{PART}){REST}"),
             hosts=("linkedin.com",),
             icon="user",
+            brand="linkedin",
             example="https://www.linkedin.com/in/name",
-            # A person's own profile; a company, a school and a showcase page stay a
-            # stored address, or *Other*. No handle rule: LinkedIn's custom address takes
-            # accented letters (#638) and a rule here would refuse a real one.
+            # A person's own profile is asked for under /in/ and a company's page under
+            # /company/ (#932); a school and a showcase page stay a stored address, or
+            # *Other*. No handle rule: LinkedIn's custom address takes accented letters
+            # (#638) and a rule here would refuse a real one.
             prefix="https://www.linkedin.com/in/",
+            company_prefix="https://www.linkedin.com/company/",
         ),
         LinkService(
             MASTODON,
@@ -208,6 +211,7 @@ SERVICES: dict[str, LinkService] = {
             ),
             hosts=("x.com", "twitter.com"),
             icon="at-sign",
+            brand="x",
             example="https://x.com/name",
             prefix="https://x.com/",
         ),
@@ -219,8 +223,10 @@ SERVICES: dict[str, LinkService] = {
             _path(rf"/(?:profile|pages|companies|company)/(?P<handle>{PART}){REST}"),
             hosts=("xing.com",),
             icon="user",
+            brand="xing",
             example="https://www.xing.com/profile/Name_Surname",
             prefix="https://www.xing.com/profile/",
+            company_prefix="https://www.xing.com/pages/",
         ),
         LinkService(
             FACEBOOK,
@@ -254,6 +260,7 @@ SERVICES: dict[str, LinkService] = {
             ),
             hosts=("facebook.com", "fb.com"),
             icon="user",
+            brand="facebook",
             example="https://www.facebook.com/name",
             prefix="https://www.facebook.com/",
         ),
@@ -281,6 +288,7 @@ SERVICES: dict[str, LinkService] = {
             ),
             hosts=("instagram.com",),
             icon="user",
+            brand="instagram",
             example="https://www.instagram.com/name",
             prefix="https://www.instagram.com/",
         ),
@@ -291,6 +299,7 @@ SERVICES: dict[str, LinkService] = {
             _path(rf"/(?P<handle>@{INSTAGRAM_NAME}){REST}"),
             hosts=("threads.com", "threads.net"),
             icon="at-sign",
+            brand="threads",
             example="https://www.threads.com/@name",
             prefix="https://www.threads.com/@",
         ),
@@ -333,6 +342,7 @@ SERVICES: dict[str, LinkService] = {
             # Also one somebody runs themselves: chosen, and accepted on its shape.
             any_host=True,
             icon="git-branch",
+            brand="gitlab",
             example="https://gitlab.com/name/project",
         ),
         LinkService(
@@ -342,6 +352,7 @@ SERVICES: dict[str, LinkService] = {
             _path(rf"/{_not(*_FORGEJO_PAGES)}(?P<handle>{PART}(?:/{PART})?){REST}"),
             hosts=("codeberg.org",),
             icon="git-branch",
+            brand="codeberg",
             example="https://codeberg.org/name/project",
         ),
         LinkService(
@@ -368,6 +379,7 @@ SERVICES: dict[str, LinkService] = {
             ),
             hosts=("bitbucket.org",),
             icon="git-branch",
+            brand="bitbucket",
             example="https://bitbucket.org/name/project",
         ),
         LinkService(

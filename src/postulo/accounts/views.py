@@ -24,6 +24,7 @@ from django.views.generic import CreateView, ListView, TemplateView, UpdateView
 
 from postulo.core.context_processors import theme_switch
 from postulo.core.files import serve_stored_picture
+from postulo.core.link_services import KIND_ICONS, OTHER_ICON
 from postulo.core.mixins import MessagingHandlesMixin, StaffRequiredMixin, WebLinksMixin
 from postulo.core.redirects import safe_next
 
@@ -176,49 +177,69 @@ class ProfileView(LoginRequiredMixin, WebLinksMixin, MessagingHandlesMixin, Upda
         either, and the count is the rows the block starts with (#180).
         """
 
-        def entry(anchor: str, label, count=None) -> dict:
+        def entry(anchor: str, label, icon: str, count=None) -> dict:
             return {
                 "href": f"#{anchor}",
                 "anchor": anchor,
                 "label": label,
-                "icon": "",
+                "icon": icon,
                 "count": count,
                 "current": "",
             }
 
         entries = [
-            entry("section-picture", _("Your picture")),
-            entry("section-name", _("Your name")),
-            entry("section-personal", _("Personal details")),
-            entry("section-contact", _("Contact block")),
+            entry("section-picture", _("Your picture"), "circle-user-round"),
+            entry("section-cv-photo", _("Your CV photo"), "camera"),
+            entry("section-name", _("Your name"), "id-card"),
+            entry("section-personal", _("Personal details"), "user-round"),
+            entry("section-contact", _("Contact block"), "contact"),
         ]
         messaging = context.get("messaging")
         if messaging is not None:
             entries.append(
-                entry("section-messaging", _("Messaging"), removals.saved_count(messaging))
+                entry(
+                    "section-messaging",
+                    _("Messaging"),
+                    "message-circle",
+                    removals.saved_count(messaging),
+                )
             )
         for block in context.get("links") or []:
             entries.append(
                 entry(
                     f"section-links-{block.kind}",
                     block.block.legend,
+                    # The kind's own icon, so the menu and the rows agree.
+                    KIND_ICONS.get(block.kind, OTHER_ICON),
                     removals.saved_count(block),
                 )
             )
         numbers = context.get("numbers")
         if numbers is not None:
             entries.append(
-                entry("section-phones", _("Telephone numbers"), removals.saved_count(numbers))
+                entry(
+                    "section-phones", _("Telephone numbers"), "phone", removals.saved_count(numbers)
+                )
             )
         addresses = context.get("addresses")
         if addresses is not None:
             entries.append(
-                entry("section-addresses", _("Postal addresses"), removals.saved_count(addresses))
+                entry(
+                    "section-addresses",
+                    _("Postal addresses"),
+                    "map-pin",
+                    removals.saved_count(addresses),
+                )
             )
         identifiers = context.get("identifiers")
         if identifiers is not None:
             entries.append(
-                entry("section-identifiers", _("Identifiers"), removals.saved_count(identifiers))
+                entry(
+                    "section-identifiers",
+                    _("Identifiers"),
+                    "fingerprint",
+                    removals.saved_count(identifiers),
+                )
             )
         return entries
 
