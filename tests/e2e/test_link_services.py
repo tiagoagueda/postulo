@@ -229,9 +229,9 @@ def test_the_icon_beside_the_select_follows_the_choice(page: Page, live_server, 
     select = row.locator("select")
     name = row.locator('input[name$="-label"]')
 
-    assert shown_icon(row) == ["user"], "LinkedIn, as stored"
+    assert shown_icon(row) == ["brand:linkedin"], "LinkedIn, as stored (#926)"
     expect(row.locator("[data-option-mark]")).to_be_hidden()
-    expect(button_of(select).locator("svg[data-icon=user]")).to_have_count(1)
+    expect(button_of(select).locator("svg[data-brand=linkedin]")).to_have_count(1)
     expect(name).to_be_hidden()
 
     select.select_option("mastodon")
@@ -269,8 +269,10 @@ def test_the_list_draws_a_services_own_mark_and_an_icon_for_one_without(
     expect(mastodon.locator("svg[data-brand=mastodon]")).to_have_count(1)
     expect(mastodon.locator("svg[data-icon]")).to_have_count(0)
     linkedin = panel.get_by_role("option", name="LinkedIn", exact=True)
-    expect(linkedin.locator("svg[data-icon=user]")).to_have_count(1)
-    expect(linkedin.locator("svg[data-brand]")).to_have_count(0)
+    expect(linkedin.locator("svg[data-brand=linkedin]")).to_have_count(1)
+    expect(linkedin.locator("svg[data-icon]")).to_have_count(0)
+    other = panel.get_by_role("option", name="Other", exact=True)
+    expect(other.locator("svg[data-icon=globe]")).to_have_count(1)
 
 
 #: Each mark in an open list: its service, its colour, and its contrast with the option's
@@ -339,8 +341,8 @@ def test_every_mark_in_a_service_list_is_one_colour_and_legible(
         brand = option.locator("svg[data-brand]").get_attribute("data-brand")
         lit = next(f for f in panel.evaluate(OPTION_MARKS) if f["brand"] == brand)
         assert lit["ratio"] >= 3, (scheme, "highlighted", lit)
-    for gone in ("codeberg", "facebook", "instagram"):
-        expect(panel.locator(f"svg[data-brand={gone}]")).to_have_count(0)
+    for shown in ("linkedin", "codeberg", "facebook", "instagram"):
+        expect(panel.locator(f"svg[data-brand={shown}]")).to_have_count(1)
 
 
 def test_an_address_pasted_into_a_new_row_chooses_its_service_at_once(

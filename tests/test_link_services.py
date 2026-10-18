@@ -919,7 +919,11 @@ def test_each_option_says_its_icon_and_its_hosts_and_the_chosen_icon_is_the_one_
     row = web_links.WebLinkForm(instance=saved, kind=SOCIAL)
     html = str(row["service"])
 
-    assert re.search(r'<option value="linkedin" data-icon="user" data-hosts="linkedin.com"', html)
+    assert re.search(
+        r'<option value="linkedin" data-icon="user" data-brand="linkedin" '
+        r'data-hosts="linkedin.com"',
+        html,
+    )
     assert re.search(
         r'<option value="mastodon" selected data-icon="at-sign" data-brand="mastodon" '
         r'data-hosts="mastodon.social mastodon.online">',
@@ -940,6 +944,9 @@ def test_each_option_says_its_icon_and_its_hosts_and_the_chosen_icon_is_the_one_
         "user",
         "video",
     ]
+    assert {"linkedin", "mastodon", "youtube", "x", "facebook"} <= set(
+        re.findall(r'data-brand="([a-z-]+)"', after)
+    ), "every service has a mark (#926)"
 
 
 def test_a_stored_row_saved_as_it_was_is_not_checked_again(user, monkeypatch):
@@ -1079,9 +1086,14 @@ def test_a_row_reads_star_service_name_address_then_the_bin(client, user, contac
     assert re.search(r'<option value=""[^>]*selected', new), "a new row starts unchosen"
     # The chosen service's icon is drawn beside the select, and no other: the rest are
     # in the template after the select, for its own control to copy (#301).
-    for row, icon in ((on_a_service, "user"), (other, "globe"), (new, "globe")):
+    for row, icon, brand in (
+        (on_a_service, "", "linkedin"),
+        (other, "globe", ""),
+        (new, "globe", ""),
+    ):
         beside = re.search(r"<span[^>]*data-option-mark[^>]*>(.*?)</span>", row, re.S).group(1)
-        assert re.findall(r'data-icon="([a-z-]+)"', beside) == [icon]
+        assert re.findall(r'data-icon="([a-z-]+)"', beside) == ([icon] if icon else [])
+        assert re.findall(r'data-brand="([a-z-]+)"', beside) == ([brand] if brand else [])
         listed = re.search(r"<template data-option-icons>(.*?)</template>", row, re.S).group(1)
         assert sorted(re.findall(r'data-icon="([a-z-]+)"', listed)) == [
             "at-sign",

@@ -1,42 +1,48 @@
-# Brand marks from Simple Icons that Postulo ships, one per line (#654).
+# Brand marks that Postulo ships, one per line (#654, #926).
 # `npm run sync:brands` copies exactly these into src/postulo/static/brands/ and writes
 # NOTICE.txt beside them; it exits non-zero on a slug the package no longer has, so an
 # upstream removal is decided at the bump and never silent.
 #
-# A line is `slug` or `slug single-colour <guidelines URL> <what they say>`: the mode
-# (TRADEMARKS.md rule 2) is one of
+# A line is `slug [@source] [mode <guidelines URL> <what they say>]`.
+#
+# The source is Simple Icons (the `simple-icons` package) unless the slug is followed by
+# `@assets/brand-sources/<file>.svg`, a vendored file for a mark Simple Icons does not carry.
+# The file keeps its own attribution comment, which the sync script leaves in place:
+#
+#   linkedin    Simple Icons removed it at its owner's request (14.0.0). LinkedIn's own download
+#               kit (brand.linkedin.com/downloads) is the source its guidelines name, but it
+#               could not be fetched offline, so the mark is Font Awesome Free 7.3.1's brands
+#               `linkedin` (CC BY 4.0, Fonticons, Inc.), the "in" in its square. Swap in the
+#               kit's black [in] SVG here if it is ever vendored (#926).
+#
+# The mode (TRADEMARKS.md rule 2) is one of
 #
 #   brand          the owner's published colour, unmodified, and only where it clears 3:1 on
 #                  BOTH the white page and the dark one (tests/test_brands.py computes it
 #                  from the colour in Simple Icons' data). The default.
 #   single-colour  drawn in currentColor, which the stylesheet makes black on the light page
-#                  and white on the dark one, and only where the owner's own guidelines
-#                  allow a one-colour version. The line records the page and what it says,
-#                  and the script refuses the mark without them. Do not add one on the
-#                  strength of a guess: a mark whose guidelines cannot be shown to allow it
-#                  stays brand-or-none.
-#   none           not here at all: the service draws its Lucide icon.
+#                  and white on the dark one, beside the service's name and only to say which
+#                  service a link or an option goes to (nominative use, #926). The line records
+#                  the page that comes nearest to allowing it and what it says (or that it
+#                  could not be read), and the script refuses the mark without them. Every
+#                  mark a link service draws is in this mode.
+#   none           not here at all: the service draws its Lucide icon. For a mark whose owner
+#                  has asked Postulo not to show it (record the date), or whose official logo
+#                  is not a single shape: Wikidata's three bars, whose Simple Icons version is
+#                  a recolouring the Wikimedia trademark policy does not allow without separate
+#                  permission (6.3 / 3.2 contrast); none shown.
 #
-# Considered, and why a mark is in none (contrast of its published colour against white /
-# against the dark page, and what the owner's page was found to say on 2026-10-05):
-#   x          21.0 / 1.0   about.x.com brand toolkit would not be fetched (HTTP 402); nothing shown
-#   threads    21.0 / 1.0   Meta's Threads page says nothing on colour versions
-#   bitbucket   6.8 / 2.9   Atlassian's page says nothing on colour versions
-#   gitlab      2.9 / 7.0   the trademark page had no usable text; nothing shown
-#   xing        6.9 / 2.9   dev.xing.com/logo_rules is a 404
-#   wikidata    6.3 / 3.2   its official logo is red, green and blue bars; Simple Icons' one-colour 006699
-#                           version is a recolouring, and the Wikimedia trademark policy says the logos
-#                           "should not be modified without separate permission"; none shown
-# Checked again on 2026-10-13 for the service selects (#905), where a coloured mark among
-# black ones read as a row of logos; three owners allow black and white, three do not:
-#   codeberg    Codeberg/Design publishes the icon in blue and in white only, and its README
-#               says "Don't tint the logo in a custom color"; no black version, so none
-#   facebook    Meta's logo page allows Facebook Blue or white ("DON'T change the color of the
-#               logo"); no black version, so none
-#   instagram   Meta's pages offer "full-color (preferred) or monochromatic white"; no black
-#               version, so none
-# LinkedIn has no mark in Simple Icons any more (removed at its owner's terms, 14.0.0),
-# and none is taken from anywhere else (#654).
+# Owners' pages as read on 2026-10-05, 2026-10-13 and 2026-10-15, for the marks whose pages do
+# not name black and white (the maintainer's decision of 2026-10-15 shows them in one colour all
+# the same, as Simple Icons and Font Awesome do):
+#   codeberg    Codeberg/Design publishes the icon in blue and in white; "Don't tint the logo in a custom color"
+#   facebook    Meta's logo page: Facebook Blue or white, "DON'T change the color of the logo"
+#   instagram   Meta's pages offer "full-color (preferred) or monochromatic white"
+#   x           about.x.com brand toolkit would not be fetched (HTTP 402)
+#   threads     Meta's Threads page says nothing on colour versions
+#   bitbucket   Atlassian's page says nothing on colour versions
+#   gitlab      the trademark page had no usable text (design.gitlab.com redirects to a sign-in)
+#   xing        dev.xing.com/logo_rules is a 404
 bluesky single-colour https://bsky.social/about/support/branding "Use a monochrome (black or white) variant when displaying alongside other social media icons"; its don'ts forbid recolouring "other than the approved black and white variants"
 mastodon single-colour https://joinmastodon.org/branding "Use a black or white version of the logo when contrast can not be maintained with the main logo"; the page offers the mark alone in purple, black and white
 youtube single-colour https://brand.youtube/youtube-icon/ "The logo icon is provided in three color variations: full-color, monochromatic black, and monochromatic white." In those "the triangle in the icon is knocked out so the background shows through", as the Simple Icons path draws it
@@ -44,3 +50,12 @@ forgejo single-colour https://codeberg.org/forgejo/meta/src/branch/readme/brandi
 github single-colour https://brand.github.com/foundations/logo "The Invertocat and our wordmark should only appear in white, black, or in few cases grey or green."
 orcid single-colour https://info.orcid.org/documentation/integration-guide/orcid-id-display-guidelines/ "If a specific level of color contrast is required for accessibility reasons then you can use the high contrast black and white icon or the reversed-out white icon on darker color backgrounds." Any other colourway is forbidden.
 sourcehut single-colour https://sourcehut.org/logo/ The page publishes the logo in black and in white, and releases it as CC0 ("A circle is not copyrightable. But, if you insist, you may consider these CC-0."); trademark rights are not waived, so it is shown to identify SourceHut only
+linkedin @assets/brand-sources/fontawesome-free-linkedin.svg single-colour https://brand.linkedin.com/in-logo "LinkedIn members may only use the [in] Logo in three color variations: blue, black, and white"; in a social-media line-up the icons use one of the three provided colours. The mark is Font Awesome Free's, because LinkedIn's own kit could not be downloaded offline (#926)
+facebook single-colour https://www.meta.com/brand/resources/facebook/logo/ Meta's logo page shows Facebook Blue and white and does not mention black; drawn in one colour in a list of services as nominative use (#926)
+instagram single-colour https://about.meta.com/brand/resources/instagram/instagram-brand/ Meta's pages offer full colour or monochromatic white and do not mention black; drawn in one colour in a list of services as nominative use (#926)
+codeberg single-colour https://codeberg.org/Codeberg/Design The kit holds the logo in blue and in white, CC0 with the name a trademark of Codeberg e.V.; drawn in one colour in a list of services as nominative use (#926)
+x single-colour https://about.x.com/en/who-we-are/brand-toolkit The brand toolkit could not be read (HTTP 402); drawn in one colour in a list of services as nominative use (#926)
+threads single-colour https://www.meta.com/brand/resources/threads/ Meta's page says nothing on colour versions; drawn in one colour in a list of services as nominative use (#926)
+gitlab single-colour https://about.gitlab.com/handbook/marketing/brand-and-product-marketing/brand/brand-activation/trademark-guidelines/ The trademark page could not be read as text; drawn in one colour in a list of services as nominative use (#926)
+bitbucket single-colour https://atlassian.design/foundations/logos Atlassian's page says nothing on colour versions; drawn in one colour in a list of services as nominative use (#926)
+xing single-colour https://dev.xing.com/logo_rules The page is a 404; drawn in one colour in a list of services as nominative use (#926)

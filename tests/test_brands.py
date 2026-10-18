@@ -51,7 +51,21 @@ def listed() -> set[str]:
 
 def modes() -> dict[str, str]:
     """Each listed mark's mode: the second word of its line, ``brand`` where there is none."""
-    return {line.split()[0]: ([*line.split(), "brand"])[1] for line in lines_of(BRAND_LIST)}
+    found = {}
+    for line in lines_of(BRAND_LIST):
+        words = [word for word in line.split() if not word.startswith("@")]
+        found[words[0]] = ([*words, "brand"])[1]
+    return found
+
+
+def vendored() -> dict[str, Path]:
+    """The marks whose line names a file under assets/brand-sources/ as their source."""
+    found = {}
+    for line in lines_of(BRAND_LIST):
+        words = line.split()
+        if len(words) > 1 and words[1].startswith("@"):
+            found[words[0]] = REPO / words[1][1:]
+    return found
 
 
 def single_colour() -> set[str]:
@@ -130,12 +144,20 @@ def test_a_single_colour_mark_is_drawn_in_currentcolor_and_says_so():
 
 
 def test_a_mark_that_was_not_shipped_is_not_a_brand():
-    """LinkedIn has no mark in Simple Icons and none is taken from elsewhere; X, Threads,
-    Xing, Bitbucket and GitLab fail 3:1 on a page and no guidelines were found allowing
-    them in one colour. Each is the Lucide icon, so each is an error here."""
-    for name in ("linkedin", "x", "threads", "xing", "bitbucket", "gitlab"):
-        with pytest.raises(TemplateSyntaxError):
-            render(f'{{% brand "{name}" %}}')
+    """Wikidata's three coloured bars are not a single shape, and its Simple Icons version
+    is a recolouring; it is none, so it is an error here."""
+    with pytest.raises(TemplateSyntaxError):
+        render('{% brand "wikidata" %}')
+
+
+def test_the_linkedin_mark_keeps_font_awesomes_attribution_and_is_one_colour():
+    html = render('{% brand "linkedin" %}')
+    assert 'data-brand-mode="single-colour"' in html and 'fill="currentColor"' in html
+    assert "Font Awesome Free" in html and "CC BY 4.0" in html, "the attribution comment stays"
+    svg = (BRAND_DIR / "linkedin.svg").read_text(encoding="utf-8")
+    assert "Font Awesome Free" in svg and "CC BY 4.0" in svg
+    block = notice_blocks()["linkedin"]
+    assert "Licence: CC-BY-4.0" in block and "Owner: LinkedIn" in block
 
 
 @pytest.mark.parametrize("name", ["../css/app", "..\\icons\\user", "mastodon/../x", "", "A B"])
@@ -192,11 +214,29 @@ def test_a_mark_is_in_one_of_two_modes_and_its_file_and_notice_agree():
             assert re.search(r"^  They say: \S", block, re.M), f"{slug}: no words"
 
 
+def test_a_mark_not_in_simple_icons_names_an_existing_vendored_file_with_its_licence_comment():
+    assert set(vendored()) == {"linkedin"}
+    for slug, path in vendored().items():
+        assert path.is_file() and path.parent == REPO / "assets" / "brand-sources", slug
+        assert modes()[slug] == "single-colour", "a vendored mark is drawn in one colour"
+        assert "CC BY 4.0" in path.read_text(encoding="utf-8"), f"{slug}: attribution comment"
+
+
 def test_the_marks_that_are_single_colour_are_the_ones_whose_guidelines_were_read():
     """The decision per candidate, recorded in the list: GitHub, SourceHut, Forgejo and
-    ORCID are published by their owners in black or white (or as a monochrome file), and X,
-    Threads, Xing, Bitbucket and GitLab are not here, for want of a page showing it."""
+    ORCID are published by their owners in black or white (or as a monochrome file), and
+    LinkedIn's own page allows black and white; the rest are drawn in one colour as
+    nominative use, by the maintainer's decision of 2026-10-15 (#926)."""
     assert single_colour() == {
+        "linkedin",
+        "facebook",
+        "instagram",
+        "codeberg",
+        "x",
+        "threads",
+        "xing",
+        "bitbucket",
+        "gitlab",
         "github",
         "sourcehut",
         "forgejo",
@@ -205,15 +245,12 @@ def test_the_marks_that_are_single_colour_are_the_ones_whose_guidelines_were_rea
         "mastodon",
         "youtube",
     }
-    assert not listed() & {"x", "threads", "xing", "bitbucket", "gitlab", "linkedin"}
-    # Their owners allow the colour logo or a white one and no black one (#905).
-    assert not listed() & {"codeberg", "facebook", "instagram"}
+    assert not listed() & {"wikidata"}
 
 
 def test_no_mark_a_link_service_draws_is_in_its_brand_colour():
     """A service select lists marks in the option's ink, never a row of coloured logos
-    (#905): every service's mark is single-colour, or the service has none and draws its
-    Lucide icon."""
+    (#905): every service's mark is single-colour (#926)."""
     from postulo.core.link_services import registry
 
     services = registry().values()
@@ -224,14 +261,13 @@ def test_no_mark_a_link_service_draws_is_in_its_brand_colour():
             assert modes()[service.brand] == "single-colour", service.key
 
 
-@pytest.mark.parametrize(
-    ("key", "icon"), [("codeberg", "git-branch"), ("facebook", "user"), ("instagram", "user")]
-)
-def test_a_service_whose_owner_allows_no_black_mark_draws_its_icon(key, icon):
+def test_every_link_service_has_a_mark():
+    """The decision of #926: each service in the select has a one-colour mark."""
     from postulo.core.link_services import registry
 
-    service = registry()[key]
-    assert service.brand == "" and service.icon == icon
+    for key, service in registry().items():
+        assert service.brand_name == service.brand != "", f"{key} has no mark"
+        assert modes()[service.brand] == "single-colour", key
 
 
 def test_every_brand_mark_clears_three_to_one_on_both_pages():
@@ -371,11 +407,46 @@ def test_sync_refuses_a_single_colour_mark_without_its_guidelines_recorded(tmp_p
 
 
 @pytest.mark.skipif(NODE is None, reason="Node is only needed to change the set")
+def test_sync_takes_a_vendored_file_and_keeps_its_comment(tmp_path):
+    fake_package(tmp_path, {"alpha": {}})
+    sources = tmp_path / "assets" / "brand-sources"
+    sources.mkdir()
+    (sources / "beta.svg").write_text(
+        '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 8 8"><!-- by someone, CC BY 4.0 -->'
+        '<path d="M0 0"/></svg>',
+        encoding="utf-8",
+    )
+    result = sync(tmp_path, ["alpha", f"beta @assets/brand-sources/beta.svg {GUIDELINES}"])
+    assert result.returncode == 0, result.stderr
+    out = tmp_path / "src" / "postulo" / "static" / "brands"
+    svg = (out / "beta.svg").read_text()
+    assert svg.startswith('<svg fill="currentColor" xmlns=') and "CC BY 4.0" in svg
+    assert "Allowed by: https://example.org/brand" in (out / "NOTICE.txt").read_text()
+
+
+@pytest.mark.skipif(NODE is None, reason="Node is only needed to change the set")
+@pytest.mark.parametrize(
+    "line",
+    [
+        "beta @assets/brand-sources/missing.svg " + GUIDELINES,
+        "beta @../outside.svg " + GUIDELINES,
+        "beta @assets/brand-sources/beta.svg",
+    ],
+)
+def test_sync_refuses_a_vendored_file_that_is_missing_outside_or_without_guidelines(tmp_path, line):
+    fake_package(tmp_path, {"alpha": {}})
+    (tmp_path / "assets" / "brand-sources").mkdir()
+    (tmp_path / "assets" / "brand-sources" / "beta.svg").write_text("<svg></svg>", encoding="utf-8")
+    result = sync(tmp_path, [line])
+    assert result.returncode != 0 and "beta" in result.stderr
+
+
+@pytest.mark.skipif(NODE is None, reason="Node is only needed to change the set")
 def test_sync_fails_on_a_slug_the_package_no_longer_has(tmp_path):
     fake_package(tmp_path, {"alpha": {}})
-    result = sync(tmp_path, ["alpha", "linkedin"])
+    result = sync(tmp_path, ["alpha", "wikidata"])
     assert result.returncode != 0
-    assert "linkedin" in result.stderr and "removed upstream" in result.stderr
+    assert "wikidata" in result.stderr and "removed upstream" in result.stderr
 
 
 @pytest.mark.skipif(NODE is None, reason="Node is only needed to change the set")
@@ -392,7 +463,7 @@ def test_sync_refuses_a_licence_outside_the_list(tmp_path):
 # --------------------------------------------------------------------- the link services
 
 
-def test_shipped_link_services_name_only_marks_that_exist_and_linkedin_names_none():
+def test_shipped_link_services_name_only_marks_that_exist():
     from postulo.plugins.link_services.services import SERVICES
 
     named = {key: service.brand for key, service in SERVICES.items() if service.brand}
@@ -400,11 +471,8 @@ def test_shipped_link_services_name_only_marks_that_exist_and_linkedin_names_non
     for key, brand in named.items():
         assert brand in listed(), f"{key} names {brand}, which is not shipped"
         assert SERVICES[key].brand_name == brand
-    assert SERVICES["linkedin"].brand == "", "LinkedIn has no mark (#654)"
-    for key in ("github", "forgejo", "sourcehut"):
+    for key in ("github", "forgejo", "sourcehut", "linkedin", "x", "gitlab"):
         assert SERVICES[key].brand_name == key, f"{key} is drawn in one colour"
-    for key in ("x", "threads", "xing", "bitbucket", "gitlab"):
-        assert SERVICES[key].brand_name == "", f"{key} has no mark and keeps its icon"
         assert SERVICES[key].icon_name, "and the Lucide icon is its fallback"
 
 
@@ -432,5 +500,6 @@ def test_a_web_link_on_a_service_with_a_mark_says_which():
 
     assert WebLink(service="mastodon", kind="social").brand == "mastodon"
     assert WebLink(service="github", kind="repository").brand == "github"
-    assert WebLink(service="gitlab", kind="repository").brand == ""
+    assert WebLink(service="gitlab", kind="repository").brand == "gitlab"
+    assert WebLink(service="", kind="social").brand == ""
     assert WebLink(service="", kind="social").brand == ""

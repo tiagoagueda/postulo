@@ -822,7 +822,7 @@ def test_a_row_saved_as_it_was_beside_a_new_one_is_not_its_own_duplicate(user, c
 
 def test_a_service_with_a_mark_draws_it_in_the_place_of_its_icon(client, user):
     """The row and the options of the service select name the brand mark of a service that
-    has one, and a service that has none keeps its icon (#867)."""
+    has one, which since #926 is every service; Other keeps its icon (#867)."""
     WebLink.objects.create(
         owner=user,
         holder=user.profile,
@@ -841,7 +841,8 @@ def test_a_service_with_a_mark_draws_it_in_the_place_of_its_icon(client, user):
         re.search(r'value="([^"]*)"', tag)[1]: tag for tag in re.findall(r"<option[^>]*>", block)
     }
     assert 'data-brand="github"' in options["github"]
-    assert "data-brand" not in options["gitlab"] and "data-icon" in options["gitlab"]
+    assert 'data-brand="gitlab"' in options["gitlab"], "and so does every service (#926)"
+    assert "data-brand" not in options["other"] and "data-icon" in options["other"]
     template = block[block.index("<template data-option-icons>") :]
     assert 'data-brand="github"' in template, "the mark is drawn once, for the script to copy"
     row = block[block.index("<li ") : block.index("</li>")]
