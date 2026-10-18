@@ -162,6 +162,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🔧 Changed
 
+- The instructions for AI assistants moved from CLAUDE.md to AGENTS.md, which Codex, Copilot, Cursor and others read; CLAUDE.md only imports it (#939)
 - The section menu of Your details has an icon on every entry, and Your CV photo is in it. (#920)
 - A social profile is one to a service: a service another row uses is greyed out in the menu and a second one is refused, except Other and services on many servers such as Mastodon; rows that already share one are kept and flagged. (#925)
 - An identifier can be marked primary with a star at the start of its row; a CV prints it first. (#922)
@@ -252,6 +253,9 @@ All notable changes to Postulo are recorded here. The format follows
 - Address rules no longer claim to print an address in its country's order, which nothing did; the order only lays out the form's lines, and the unused print and expects functions are gone. (#643)
 
 ### ✨ Added
+
+- A code of conduct, the Contributor Covenant 2.1, for issues, pull requests and Weblate, with reports to the maintainer's address (#1007)
+- An accessibility statement, ACCESSIBILITY.md: WCAG 2.2 AA as the aim, how it is checked, the known limits, and how to report a barrier without an account (#1008)
 
 - `read_body`, `deadline_in`, `until` and `BodyRefused` are on `postulo.plugins.api`, so a plugin can bound what a remote server sends it (#967)
 - Groups own companies, contacts and listings, records are shared with people or groups, each person's notes and listing decisions stay their own, and leaving keeps a copy of what is yours; a conflicts page settles duplicates across owners (#896)
