@@ -14,6 +14,8 @@ that loop needs a hand:
     uv run python scripts/weblate.py components --create   # and create the missing ones
     uv run python scripts/weblate.py configure [C…]    # apply the settings below to components
     uv run python scripts/weblate.py addons [C…]       # squash commits, machine-draft new strings
+    uv run python scripts/weblate.py clean [--apply] [--language L…] [--backup FILE]
+                                                       # empty machine drafts that fail a check
 
 **Renaming strings in bulk** (a sweep like #705) would drop every translation Weblate holds
 for them that has not reached the repository yet, so it goes: `lock`, `commit`, `push`,
@@ -295,6 +297,68 @@ def cmd_addons(args) -> int:
     return 0
 
 
+#: Weblate's own checks, as a search. A machine draft that fails one of these is wrong in a
+#: way no speaker should have to find: a placeholder lost, a tag broken, a word repeated.
+BROKEN_DRAFTS = (
+    "state:needs-editing AND (check:python-format OR check:python-brace-format"
+    " OR check:xml-tags OR check:duplicate)"
+)
+
+
+def _patch_unit(unit_id: int, empty: list[str]) -> None:
+    """Empty one unit, waiting out the API's hourly limit rather than failing on it."""
+    import time
+
+    while True:
+        try:
+            call(f"units/{unit_id}/", "PATCH", {"state": 0, "target": empty})
+            return
+        except SystemExit as stop:
+            if "429" not in str(stop):
+                raise
+            print("rate limited; waiting five minutes", flush=True)
+            time.sleep(300)
+
+
+def cmd_clean(args) -> int:
+    """Empty the machine drafts that fail a check, and every draft of the languages named.
+
+    A draft is a guess nobody has read; a broken one costs a speaker more than an empty
+    slot does. Dry run unless `--apply`; with it, every unit is written to `--backup` first
+    (id, source, target) so nothing is lost. The machine-draft add-on only fills empty slots
+    of strings that change, so an emptied one stays empty until it is asked for again.
+    """
+    import urllib.parse
+
+    queries = [BROKEN_DRAFTS] + [
+        f"state:needs-editing AND language:{code}" for code in args.language
+    ]
+    found: dict[int, dict] = {}
+    for query in queries:
+        for unit in every(f"units/?q={urllib.parse.quote(query)}&page_size=1000"):
+            found[unit["id"]] = unit
+    by_language: dict[str, int] = {}
+    for unit in found.values():
+        by_language[unit["language_code"]] = by_language.get(unit["language_code"], 0) + 1
+    print(f"{len(found)} draft(s) to empty:", dict(sorted(by_language.items())))
+    if not args.apply:
+        print("dry run; add --apply (and --backup FILE) to empty them")
+        return 0
+    if not args.backup:
+        raise SystemExit("--apply needs --backup FILE")
+    keep = [
+        {k: u[k] for k in ("id", "translation", "language_code", "source", "target", "state")}
+        for u in found.values()
+    ]
+    Path(args.backup).write_text(json.dumps(keep, ensure_ascii=False), encoding="utf-8")
+    for done, unit in enumerate(found.values(), 1):
+        _patch_unit(unit["id"], [""] * len(unit["target"]))
+        if done % 200 == 0:
+            print(f"{done}/{len(found)}", flush=True)
+    print(f"emptied {len(found)}; backup in {args.backup}")
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
     if hasattr(sys.stdout, "reconfigure"):
         sys.stdout.reconfigure(encoding="utf-8")
@@ -323,6 +387,12 @@ def main(argv: list[str] | None = None) -> int:
     one = sub.add_parser("addons")
     one.add_argument("components", nargs="*")
     one.set_defaults(run=cmd_addons)
+
+    one = sub.add_parser("clean")
+    one.add_argument("--apply", action="store_true")
+    one.add_argument("--language", nargs="*", default=[], help="also empty every draft of these")
+    one.add_argument("--backup")
+    one.set_defaults(run=cmd_clean)
     args = parser.parse_args(argv)
     return args.run(args)
 
