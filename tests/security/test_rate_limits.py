@@ -556,6 +556,8 @@ def test_choosing_one_s_own_group_or_nothing_costs_no_allowance(client, person):
     assert "Too many" not in str(list(get_messages(first.wsgi_request))[-1])
     second = _share_lookup(client, company, "y@example.org")
     assert "Too many" in str(list(get_messages(second.wsgi_request))[-1])
+
+
 # ------------------------------------------------------------ a shared company's name (#949)
 
 
