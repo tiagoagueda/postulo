@@ -1241,7 +1241,7 @@ def _load(user, archive: zipfile.ZipFile, *, force: bool = False, into=None) -> 
         _restore_postal_addresses(profile, user, addresses, report)
         _restore_web_links(profile, user, links, report)
         _restore_messaging_handles(profile, user, handles, report)
-    from postulo.accounts import identifiers as account_identifiers
+    from postulo.accounts import primary_identifier as account_identifiers
 
     wanted_primary = None
     for row in account.get("identifiers") or []:

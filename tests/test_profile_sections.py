@@ -45,6 +45,7 @@ def test_every_entry_points_at_a_part_of_the_page(client, user):
 
     assert set(nav) == {
         "section-picture",
+        "section-cv-photo",
         "section-name",
         "section-personal",
         "section-contact",

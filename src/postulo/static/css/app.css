@@ -7309,7 +7309,7 @@
     grid-row: 1;
     justify-self: end;
   }
-  .name-if-other-row[data-primary] > .field {
+  .name-if-other-row[data-primary] > :not([data-row-star], [data-row-bin]) {
     grid-column: 1 / -1;
   }
   @media (width >= 40rem) {
@@ -7319,7 +7319,7 @@
     .name-if-other-row[data-primary]:has(select option[value="other"]:checked), .name-if-other-row[data-primary][data-has-name] {
       grid-template-columns: auto minmax(0, 12rem) minmax(0, 1fr) minmax(0, 10rem) auto;
     }
-    .name-if-other-row[data-primary] > [data-row-star], .name-if-other-row[data-primary] > [data-row-bin], .name-if-other-row[data-primary] > .field {
+    .name-if-other-row[data-primary] > [data-row-star], .name-if-other-row[data-primary] > [data-row-bin], .name-if-other-row[data-primary] > :not([data-row-star], [data-row-bin]) {
       grid-column: auto;
       grid-row: auto;
     }

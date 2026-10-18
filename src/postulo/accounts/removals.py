@@ -29,7 +29,7 @@ from django.utils.translation import gettext as _
 from postulo.core import messaging_handles, phone_numbers, phones, postal, web_links
 from postulo.core.models import MessagingHandle, PhoneNumber, PostalAddress, WebLink
 
-from . import identifiers
+from . import primary_identifier
 from .models import PersonIdentifier
 
 
@@ -177,7 +177,7 @@ def hand_on(kind: Kind, row, holder):
         return postal.ensure_one_primary(holder)
     if kind is MESSAGING:
         return messaging_handles.ensure_one_primary(holder)
-    return identifiers.ensure_one_primary(holder)
+    return primary_identifier.ensure_one_primary(holder)
 
 
 def left(kind: Kind, row, person) -> int:

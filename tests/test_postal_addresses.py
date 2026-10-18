@@ -1045,9 +1045,10 @@ def test_on_your_details_a_row_says_what_it_is_then_the_address_then_its_control
     [kept, empty] = rows_of(client.get(reverse("accounts:profile")).content.decode())
 
     parts = ["street", "postcode", "municipality", "region", "country"]
-    # And the map's choice last, on a person's own address while the map is on (#702).
-    assert kept["controls"] == ["kind", "label", "primary", "remove", *parts, "on_map"]
-    assert empty["controls"] == ["kind", "label", "primary", *parts, "on_map"], (
+    # The map's pin first among the controls of the line (#923), on a person's own address
+    # while the map is on (#702), then the star and the bin.
+    assert kept["controls"] == ["kind", "label", "on_map", "primary", "remove", *parts]
+    assert empty["controls"] == ["kind", "label", "on_map", "primary", *parts], (
         "nothing to remove yet"
     )
 
@@ -1070,7 +1071,7 @@ def test_the_parts_are_in_the_order_their_country_writes_them(client, user):
 
     rows = rows_of(client.get(reverse("accounts:profile")).content.decode())
 
-    order = {row["chosen"]["country"]: row["controls"][4:9] for row in rows[:4]}
+    order = {row["chosen"]["country"]: row["controls"][5:10] for row in rows[:4]}
     assert order == {
         "PT": ["street", "postcode", "municipality", "region", "country"],
         "US": ["street", "municipality", "region", "postcode", "country"],
@@ -1086,7 +1087,7 @@ def test_a_row_sent_back_is_drawn_in_the_order_of_the_country_that_was_posted(cl
     )
 
     [row] = rows_of(response.content.decode())
-    assert row["controls"][3:8] == ["street", "municipality", "region", "postcode", "country"]
+    assert row["controls"][4:9] == ["street", "municipality", "region", "postcode", "country"]
 
 
 def test_switched_off_every_country_is_drawn_in_the_plain_order(client, user):
@@ -1096,7 +1097,7 @@ def test_switched_off_every_country_is_drawn_in_the_plain_order(client, user):
 
     [kept, _empty] = rows_of(client.get(reverse("accounts:profile")).content.decode())
 
-    assert kept["controls"][4:9] == ["street", "postcode", "municipality", "region", "country"]
+    assert kept["controls"][5:10] == ["street", "postcode", "municipality", "region", "country"]
 
 
 def test_a_page_that_saves_at_its_foot_reads_in_the_same_order_and_keeps_its_boxes(user):

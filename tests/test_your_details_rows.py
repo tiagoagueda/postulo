@@ -7,7 +7,7 @@ import re
 import pytest
 from django.core.exceptions import ValidationError
 
-from postulo.accounts import identifiers as person_identifiers
+from postulo.accounts import primary_identifier as person_identifiers
 from postulo.accounts.forms import PersonIdentifierFormSet
 from postulo.accounts.models import PersonIdentifier
 from postulo.core import web_links

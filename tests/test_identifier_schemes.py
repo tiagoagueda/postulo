@@ -1393,7 +1393,7 @@ def test_an_archive_carries_the_identifiers_and_not_the_definitions(user, compan
     document = json.loads(archive_of(user).read(MANIFEST_NAME))
 
     assert document["account"]["identifiers"] == [
-        {"scheme": "staff-number", "value": "AB-123456", "label": ""}
+        {"scheme": "staff-number", "value": "AB-123456", "label": "", "is_primary": True}
     ]
     assert document["companies"][0]["identifiers"] == [
         {"scheme": "siren", "value": "552081317", "label": ""}

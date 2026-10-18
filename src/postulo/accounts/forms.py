@@ -41,7 +41,7 @@ from postulo.core import (
 from postulo.core.formsets import RowsAlreadyGone
 from postulo.core.identifiers import IdentifierRow, OneOfEachKind, SchemeSelect, offering
 
-from . import addresses, addressing, avatars, claims, identifiers
+from . import addresses, addressing, avatars, claims, identifiers, primary_identifier
 from .models import ADDRESSING_MAX_LENGTH, Invite, PersonIdentifier, Profile
 
 
@@ -1604,10 +1604,10 @@ class BasePersonIdentifierFormSet(RowsAlreadyGone, OneOfEachKind, forms.BaseInli
         chosen = (self.data.get(f"{self.prefix}-primary") or "").strip()
         for form in self.forms:
             if form.prefix == chosen and form.instance.pk and not form.cleaned_data.get("DELETE"):
-                identifiers.set_primary(self.instance, form.instance)
+                primary_identifier.set_primary(self.instance, form.instance)
                 break
         else:
-            identifiers.ensure_one_primary(self.instance)
+            primary_identifier.ensure_one_primary(self.instance)
         return saved
 
 
