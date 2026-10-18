@@ -129,11 +129,11 @@ def test_at_1280_a_refusal_sits_beside_its_box_and_the_line_stays_level(
     row = page.evaluate(ROW, 0)
     assert [control["name"] for control in row["controls"]] == [
         "kind",
+        "on_map",
         "primary",
         "remove",
         *PARTS,
-        "on_map",
-    ], "what it is with the star and the bin at its end, the address, then the map (#866, #702)"
+    ], "what it is with the pin, the star and the bin at its end, then the address (#866, #923)"
 
     [line] = [
         line
@@ -226,7 +226,7 @@ def test_at_320_every_box_is_a_line_of_its_own_with_a_refusal_showing(
         assert tops == sorted(tops) and len(set(tops)) == len(tops), (index, boxes)
         kind = next(box for box in boxes if box["name"] == "kind")
         for control in row["controls"]:
-            if control["name"] in ("primary", "remove"):
+            if control["name"] in ("on_map", "primary", "remove"):
                 assert control["top"] < kind["bottom"], "the star and the bin on the kind's line"
 
     assert page.evaluate(SPILLS) == []

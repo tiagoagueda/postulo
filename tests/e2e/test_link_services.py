@@ -98,6 +98,14 @@ def contact(applicant):
     return person
 
 
+def free_linkedin() -> None:
+    """Let a new row choose LinkedIn: one profile to a service (#925), so the stored one
+    becomes Other for a test that is about choosing it."""
+    from postulo.core.models import WebLink
+
+    WebLink.objects.filter(kind="social", service="linkedin").update(service="")
+
+
 def rows_of(page: Page, kind: str):
     return page.locator(f"[data-web-links={kind}] ol > li")
 
@@ -270,7 +278,8 @@ def test_the_list_draws_a_services_own_mark_and_an_icon_for_one_without(
     expect(mastodon.locator("svg[data-icon]")).to_have_count(0)
     linkedin = panel.get_by_role("option", name="LinkedIn", exact=True)
     expect(linkedin.locator("svg[data-brand=linkedin]")).to_have_count(1)
-    expect(linkedin.locator("svg[data-icon]")).to_have_count(0)
+    # The row's own service carries the list's tick, which is not a mark.
+    expect(linkedin.locator("svg[data-icon]:not([data-icon=check])")).to_have_count(0)
     other = panel.get_by_role("option", name="Other", exact=True)
     expect(other.locator("svg[data-icon=globe]")).to_have_count(1)
 
@@ -341,7 +350,11 @@ def test_every_mark_in_a_service_list_is_one_colour_and_legible(
         brand = option.locator("svg[data-brand]").get_attribute("data-brand")
         lit = next(f for f in panel.evaluate(OPTION_MARKS) if f["brand"] == brand)
         assert lit["ratio"] >= 3, (scheme, "highlighted", lit)
-    for shown in ("linkedin", "codeberg", "facebook", "instagram"):
+    marked = {
+        "social": ("linkedin", "facebook", "instagram", "x"),
+        "repository": ("codeberg", "gitlab", "bitbucket"),
+    }[kind]
+    for shown in marked:
         expect(panel.locator(f"svg[data-brand={shown}]")).to_have_count(1)
 
 
@@ -359,7 +372,7 @@ def test_an_address_pasted_into_a_new_row_chooses_its_service_at_once(
     expect(select).to_have_value("")
     address.fill("pt.linkedin.com/in/alex")
     expect(select).to_have_value("linkedin")
-    assert shown_icon(new) == ["user"]
+    assert shown_icon(new) == ["brand:linkedin"]
 
     # Still the address's to say while nobody has chosen: another host, another service;
     # a host no service knows, and nothing is chosen again.
@@ -430,6 +443,7 @@ def test_with_scripts_off_choosing_other_shows_the_name_and_saves_it(
     page = context.new_page()
     try:
         sign_in(page, live_server.url)
+        free_linkedin()
         page.goto(f"{live_server.url}/accounts/profile/")
         new = rows_of(page, "social").last
         name = new.locator('input[name$="-label"]')
@@ -589,6 +603,7 @@ def test_choosing_a_service_shows_its_prefix_and_other_gives_the_address_box_bac
     page: Page, live_server, links
 ):
     sign_in(page, live_server.url)
+    free_linkedin()
     page.goto(f"{live_server.url}/accounts/profile/")
     new = rows_of(page, "social").last
     select = new.locator("select")
@@ -632,6 +647,7 @@ def test_choosing_a_service_shows_its_prefix_and_other_gives_the_address_box_bac
 
 def test_a_whole_address_pasted_beside_a_prefix_is_shown_whole(page: Page, live_server, links):
     sign_in(page, live_server.url)
+    free_linkedin()
     page.goto(f"{live_server.url}/accounts/profile/")
     new = rows_of(page, "social").last
     new.locator("select").select_option("linkedin")
