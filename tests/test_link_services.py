@@ -2130,3 +2130,57 @@ def test_the_single_box_with_several_profiles_off_has_no_prefix(user):
     for field in box.fields.values():
         assert type(field) is forms.URLField
         assert "data-address-box" not in field.widget.attrs
+
+
+# -------------------------------------------------- a company's page is not a person's (#932)
+
+
+def company_form(**data):
+    return web_links.WebLinkForm(data=data, kind=SOCIAL, company=True)
+
+
+def test_a_companys_linkedin_row_builds_a_company_address_and_a_persons_builds_a_profile():
+    mine = company_form(service="linkedin", label="", url="acme-labs")
+    theirs = form(service="linkedin", label="", url="alex")
+
+    assert mine.is_valid() and theirs.is_valid()
+    assert mine.cleaned_data["url"] == "https://www.linkedin.com/company/acme-labs"
+    assert theirs.cleaned_data["url"] == "https://www.linkedin.com/in/alex"
+
+
+def test_each_kind_of_row_still_recognises_the_others_full_address_when_pasted():
+    company_takes_profile = company_form(
+        service="linkedin", label="", url="https://www.linkedin.com/in/alex"
+    )
+    person_takes_company = form(
+        service="linkedin", label="", url="https://www.linkedin.com/company/acme-labs/"
+    )
+
+    assert company_takes_profile.is_valid() and person_takes_company.is_valid()
+    assert company_takes_profile.cleaned_data["url"] == "https://www.linkedin.com/in/alex"
+    assert person_takes_company.cleaned_data["url"] == "https://www.linkedin.com/company/acme-labs/"
+
+
+def test_a_company_address_is_made_a_name_in_a_company_row_and_a_stored_profile_is_kept(user):
+    service = link_services.find("linkedin").for_holder(company=True)
+
+    assert service.prefix == "https://www.linkedin.com/company/"
+    assert service.username_in("https://www.linkedin.com/company/acme-labs") == "acme-labs"
+    assert service.username_in("https://www.linkedin.com/in/alex") is None
+
+
+def test_the_options_of_a_company_row_carry_the_company_prefix():
+    row = company_form()
+
+    assert row.fields["service"].widget.facts["linkedin"]["data-prefix"] == (
+        "https://www.linkedin.com/company/"
+    )
+    assert form().fields["service"].widget.facts["linkedin"]["data-prefix"] == (
+        "https://www.linkedin.com/in/"
+    )
+
+
+def test_a_service_with_no_company_prefix_serves_a_company_with_the_persons():
+    bluesky = link_services.find("bluesky")
+
+    assert bluesky.for_holder(company=True) is bluesky

@@ -54,7 +54,7 @@ from __future__ import annotations
 
 import logging
 import re
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from pathlib import Path
 from urllib.parse import unquote, urlsplit
 
@@ -137,6 +137,10 @@ class Service:
     #: a Mastodon server, somebody's Forgejo, *Other*. An address, so it is https, on a
     #: host, and without a name in it; one that is not is read as blank.
     prefix: str = ""
+    #: The same for a company's page, where a company's address lives under another path
+    #: than a person's (LinkedIn's ``/company/`` against ``/in/``, #932). Blank where the
+    #: person's ``prefix`` serves a company too; read as blank on the same terms.
+    company_prefix: str = ""
 
     def __post_init__(self) -> None:
         # Whatever a plugin wrote them as -- a `LinkKind`, a list -- they are read as a
@@ -145,6 +149,15 @@ class Service:
         hosts = (self.hosts,) if isinstance(self.hosts, str) else tuple(self.hosts or ())
         object.__setattr__(self, "hosts", tuple(str(host).lower().strip(".") for host in hosts))
         object.__setattr__(self, "prefix", _fixed_front(self.prefix))
+        object.__setattr__(self, "company_prefix", _fixed_front(self.company_prefix))
+
+    def for_holder(self, company: bool = False) -> Service:
+        """This service as a row of the given holder reads it: a company's row has the
+        company prefix in front of the name where there is one, anyone else's the person's.
+        Both kinds of address are recognised whichever row they are pasted into."""
+        if not company or not self.company_prefix:
+            return self
+        return replace(self, prefix=self.company_prefix, company_prefix="")
 
     def hosted(self, url: str) -> bool:
         """Whether ``url`` is on one of this service's own hosts, or a subdomain of one."""

@@ -149,10 +149,12 @@ SERVICES: dict[str, LinkService] = {
             hosts=("linkedin.com",),
             icon="user",
             example="https://www.linkedin.com/in/name",
-            # A person's own profile; a company, a school and a showcase page stay a
-            # stored address, or *Other*. No handle rule: LinkedIn's custom address takes
-            # accented letters (#638) and a rule here would refuse a real one.
+            # A person's own profile is asked for under /in/ and a company's page under
+            # /company/ (#932); a school and a showcase page stay a stored address, or
+            # *Other*. No handle rule: LinkedIn's custom address takes accented letters
+            # (#638) and a rule here would refuse a real one.
             prefix="https://www.linkedin.com/in/",
+            company_prefix="https://www.linkedin.com/company/",
         ),
         LinkService(
             MASTODON,
@@ -221,6 +223,7 @@ SERVICES: dict[str, LinkService] = {
             icon="user",
             example="https://www.xing.com/profile/Name_Surname",
             prefix="https://www.xing.com/profile/",
+            company_prefix="https://www.xing.com/pages/",
         ),
         LinkService(
             FACEBOOK,

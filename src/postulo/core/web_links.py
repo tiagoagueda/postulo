@@ -623,7 +623,7 @@ class WebLinkForm(forms.ModelForm):
         model = WebLink
         fields = ("service", "label", "url")
 
-    def __init__(self, *args, kind: str = "", **kwargs):
+    def __init__(self, *args, kind: str = "", company: bool = False, **kwargs):
         super().__init__(*args, **kwargs)
         #: The kind of link the row is. The formset says; a row on its own carries it.
         self.link_kind = kind or self.instance.kind
@@ -641,7 +641,11 @@ class WebLinkForm(forms.ModelForm):
         # Said once under the block rather than under every row, where it would stand
         # beneath a box that is only drawn for *Other*.
         self.fields["label"].help_text = ""
-        offered = link_services.services_for(self.link_kind)
+        # A company's row reads each service by its company prefix where it has one (#932).
+        offered = {
+            key: service.for_holder(company)
+            for key, service in link_services.services_for(self.link_kind).items()
+        }
         if not offered:
             del self.fields["service"]
             return
@@ -872,7 +876,10 @@ def formset_for(holder, kind: str, *, data=None, prefix: str | None = None, comp
         can_delete=True,
     )
     formset = factory(
-        data=data, instance=holder, prefix=prefix or block.prefix, form_kwargs={"kind": kind}
+        data=data,
+        instance=holder,
+        prefix=prefix or block.prefix,
+        form_kwargs={"kind": kind, "company": company},
     )
     formset.kind = kind
     # Whether a row has a service to choose: the template draws the select only then.
