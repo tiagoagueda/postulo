@@ -16,6 +16,18 @@ def signed_in_recently(client, user) -> None:
     client.force_login(user, backend="allauth.account.auth_backends.AuthenticationBackend")
     session = client.session
     session[AUTHENTICATION_METHODS_SESSION_KEY] = [
-        {"method": "password", "at": time.time(), "email": user.email}
+        {"method": "password", "at": time.time(), "email": user.email, "reauthenticated": True}
     ]
     session.save()
+
+
+def reauthenticate(client, password: str) -> None:
+    """Type the password again on allauth's page, as it asks since 65.20 (#987).
+
+    A form sign-in is no longer taken for that proof; the record it leaves is not marked
+    `reauthenticated`, so a view behind `reauthentication_required` sends the person here.
+    """
+    from django.urls import reverse
+
+    response = client.post(reverse("account_reauthenticate"), {"password": password})
+    assert response.status_code == 302, response.content[:300]

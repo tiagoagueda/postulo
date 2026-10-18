@@ -25,6 +25,7 @@ from playwright.sync_api import Browser, Page, expect
 from playwright.sync_api import TimeoutError as PlaywrightTimeoutError
 
 from tests.e2e.conftest import EMAIL, PASSWORD
+from tests.e2e.signing_in import sign_in  # a session reauthenticated a moment ago (#987)
 
 from .test_accessibility import axe_source, describe, violations_on  # noqa: F401
 from .test_reflow import SCROLLS_SIDEWAYS, SPILLS
@@ -121,13 +122,6 @@ def crowd(administrator):
         )
         for number in range(1, CROWD + 1)
     ]
-
-
-def sign_in(page: Page, base: str) -> None:
-    page.goto(f"{base}/accounts/login/")
-    page.locator("input[name=login]").fill(EMAIL)
-    page.locator("input[name=password]").fill(PASSWORD)
-    page.locator("form").get_by_role("button", name="Sign In", exact=True).click()
 
 
 def overflow(page: Page) -> int:

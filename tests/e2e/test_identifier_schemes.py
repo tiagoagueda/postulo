@@ -19,7 +19,7 @@ import pytest
 from playwright.sync_api import Browser, Page, expect
 
 from tests.e2e.conftest import PASSWORD
-from tests.e2e.signing_in import sign_in
+from tests.e2e.signing_in import confirm_password, sign_in
 
 from .test_accessibility import axe_source, describe, violations_on  # noqa: F401
 from .test_reflow import SCROLLS_SIDEWAYS
@@ -50,9 +50,7 @@ def administrator(applicant):
 def open_plugins(page: Page, base: str) -> None:
     sign_in(page, base)
     page.goto(f"{base}/server/plugins/")
-    if "reauthenticate" in page.url:
-        page.locator("input[name=password]").fill(PASSWORD)
-        page.locator("form").get_by_role("button").first.click()
+    if confirm_password(page, PASSWORD):
         page.goto(f"{base}/server/plugins/")
 
 

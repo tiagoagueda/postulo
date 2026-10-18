@@ -39,6 +39,8 @@ from dataclasses import dataclass
 import pytest
 from playwright.sync_api import Page
 
+from tests.e2e.signing_in import confirm_password
+
 from .conftest import PASSWORD
 from .test_accessibility import furnished, sign_in, signed_in_paths  # noqa: F401
 
@@ -277,9 +279,7 @@ def test_everything_is_still_big_enough_when_somebody_asks_for_less_room(
     found: dict[str, str] = {}
     for path in paths:
         page.goto(f"{base}{path}")
-        if "reauthenticate" in page.url:
-            page.locator("input[name=password]").fill(PASSWORD)
-            page.locator("form").get_by_role("button").first.click()
+        if confirm_password(page, PASSWORD):
             page.goto(f"{base}{path}")
 
         # A preview is the document itself, with the theme's own stylesheet and none of the

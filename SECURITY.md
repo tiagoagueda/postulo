@@ -39,8 +39,10 @@ were the only thing that mattered.
 - The test suite contains security tests — ownership sweeps across every view and
   queryset, policy checks, path-traversal and redirect checks — and they fail the build.
 - Dependencies are audited against known vulnerabilities in CI on every run and on a
-  weekly schedule, so a fresh disclosure in a library is noticed without anyone having to
-  remember to look.
+  weekly schedule. That audit only knows what the advisory databases (PyPI, OSV) have
+  published, and they lag the projects' own announcements -- Django 6.1.2 fixed four
+  issues while the audit still passed on 6.1.1 (#986) -- so it is a net, not a guarantee:
+  the maintainer also reads the direct dependencies' release notes (see below).
 - A vulnerability report is handled before any feature work.
 
 ## When a vulnerability is disclosed in a dependency
@@ -50,7 +52,12 @@ The process, so that it is the same every time and needs no thinking on a bad da
 1. **Notice.** The `security` job in CI audits every locked dependency on every push and
    every Monday; the maintainer is also subscribed to the security announcements of the
    direct dependencies (Django, django-allauth, django-ninja, Pillow, WeasyPrint, httpx,
-   cryptography). A failing audit is a page, not a chore.
+   cryptography). A failing audit is a page, not a chore. **The audit lags**, so once a
+   week, and before every release, also check by hand: the security announcements and the
+   newest release notes of those same libraries (Django's `django-announce` list and
+   release notes, django-allauth's changelog, the GitHub advisories of the others), and
+   compare their latest patch version with `uv.lock`. A newer patch release with a security
+   fix is a disclosure even when `pip-audit` says nothing: go on from step 2.
 2. **Assess** within a day: does Postulo use the affected code path, and can it be reached
    from outside? Record the answer in a confidential issue.
 3. **Fix**: upgrade the dependency (`uv lock --upgrade-package NAME`), run the suite, and if

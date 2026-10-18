@@ -37,7 +37,7 @@ def sign_in(page: Page, base: str, path: str = "/", *, email: str = EMAIL) -> No
     client.force_login(user, backend="allauth.account.auth_backends.AuthenticationBackend")
     session = client.session
     session[AUTHENTICATION_METHODS_SESSION_KEY] = [
-        {"method": "password", "at": time.time(), "email": email}
+        {"method": "password", "at": time.time(), "email": email, "reauthenticated": True}
     ]
     session.save()
     page.context.add_cookies(
@@ -45,3 +45,20 @@ def sign_in(page: Page, base: str, path: str = "/", *, email: str = EMAIL) -> No
     )
     page.goto(f"{base}{path}")
     expect(page).to_have_url(f"{base}{path}")
+
+
+def confirm_password(page: Page, password: str) -> bool:
+    """Answer allauth's "Confirm" page, if the browser is on it; whether it was.
+
+    Since allauth 65.20 a sign-in no longer stands in for typing the password again (#987), so
+    a sensitive step reached after a form or passkey sign-in, or after the five minutes of
+    the cookie sign-in, stops here. The button pressed is the one of the form that holds the
+    password field: the page also carries the navigation's *Sign out* form, and the first
+    button of "a form" was that one.
+    """
+    if "reauthenticate" not in page.url:
+        return False
+    page.locator("input[name=password]").fill(password)
+    page.locator("form:has(input[name=password])").get_by_role("button").first.click()
+    page.wait_for_url(lambda url: "reauthenticate" not in url)
+    return True
