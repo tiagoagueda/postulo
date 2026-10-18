@@ -72,6 +72,8 @@ LAYERS: list[tuple[str, tuple[str, ...]]] = [
             "postulo.core.media",
             "postulo.core.languages",
             "postulo.core.logs",
+            # The one list of one-time secrets in an address, used by both logs (#754, #979): `re`.
+            "postulo.core.logredact",
             "postulo.core.mail_choices",
             # Markdown to sanitised markup for a listing's description (#665): a parser, an
             # allowlist and nothing of Postulo's, read by the record that holds the text.

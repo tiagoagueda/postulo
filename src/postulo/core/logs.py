@@ -42,6 +42,8 @@ from pathlib import Path
 
 from django.conf import settings
 
+from . import logredact
+
 try:
     import fcntl
 except ImportError:  # Windows, where Postulo is one process and there is no flock to take
@@ -191,8 +193,12 @@ def scrub(text: str) -> str:
 
     A 404 or a 500 on one of those routes is logged by Django with the path it was asked
     for, and the path is the single-use credential. The log is read by every administrator
-    and handed to a collector (#733).
+    and handed to a collector (#733). The access log's own list is applied first, so the
+    password-reset and email-confirmation keys are taken out here too and a new secret path
+    is added in one place (#979); the two routes named above then show the mask they always
+    have, in place of the access log's.
     """
+    text = logredact.redact(text)
     pattern = _secret_path_pattern()
     return pattern.sub(lambda found: found.group(1) + _MASK, text) if pattern else text
 
