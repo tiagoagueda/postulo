@@ -102,6 +102,11 @@ def request_origin(request) -> str:
     return request.META.get("POSTULO_PROXY_ADDR") or request.META.get("REMOTE_ADDR", "")
 
 
+def was_forwarded(request) -> bool:
+    """Whether a trusted peer passed this request on, by any forwarding header (#977)."""
+    return "POSTULO_PROXY_ADDR" in request.META
+
+
 def describe(request) -> dict:
     """Where this request arrived from, and whether that was a proxy Postulo believes.
 
@@ -159,9 +164,12 @@ class TrustedProxyMiddleware:
         if is_trusted(remote_addr):
             forwarded_for = request.META.get("HTTP_X_FORWARDED_FOR", "")
             if forwarded_for:
-                # Kept under its own name as well: something may want to know the request
-                # was forwarded, and the original list is evidence rather than a claim.
                 request.META["REMOTE_ADDR"] = client_address(remote_addr, forwarded_for)
+            # Kept under its own name as well: something may want to know the request was
+            # forwarded, and the original list is evidence rather than a claim. Whatever
+            # header showed it, not only the one that names a client (#977): a proxy that
+            # sets `X-Forwarded-Proto` alone still has the world behind it.
+            if any(request.META.get(header) for header in FORWARDING_HEADERS):
                 request.META["POSTULO_PROXY_ADDR"] = remote_addr
         else:
             # Evidence that there is a proxy that is not trusted (#757): something forwarding

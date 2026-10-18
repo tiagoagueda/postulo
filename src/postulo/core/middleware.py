@@ -67,7 +67,7 @@ class HealthProbeMiddleware:
             return False
         # `TrustedProxyMiddleware` leaves this behind whenever a trusted peer sent a
         # forwarding header, including one it could make nothing of.
-        if "POSTULO_PROXY_ADDR" in request.META:
+        if proxy.was_forwarded(request):
             return False
         try:
             return ipaddress.ip_address(request.META.get("REMOTE_ADDR", "")).is_loopback
