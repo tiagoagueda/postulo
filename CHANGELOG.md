@@ -8,6 +8,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🔒 Security
 
+- The links in a capture notification (mail, webhook, push) are built on POSTULO_PUBLIC_URL when it is set, not on the Host the capture request carried. (#962)
 - A logo address fetched on a shared or group-owned company spends the allowance of the person who pressed the button, once, never the owner's or a shared bucket. (#960)
 - A GeoJSON file or a page's JSON-LD nested thousands deep is refused, or skipped, instead of ending in a server error. (#959)
 - The account archive carries only the exporter's own appointments at a shared or group-owned company, and its count matches the file (#966)
