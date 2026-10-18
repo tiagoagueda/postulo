@@ -917,3 +917,38 @@ def test_only_two_templates_may_mark_anything_safe():
     assert not found, f"|safe in {found}: compose the markup in Python (core.htmlstrings)"
     present = [path.name for path in TEMPLATES if path.name in MAY_MARK_SAFE]
     assert sorted(present) == sorted(MAY_MARK_SAFE), "the allow-list names a template that is gone"
+
+
+# ------------------------------------------------- JSON an attribute carries is encoded, not pasted
+
+#: htmx reads `hx-vals` and `hx-headers` as JSON. Dropping a value into a quoted JSON string
+#: mixes two escapings (HTML's leaves a backslash that breaks the JSON), and the safety then
+#: rests on a filter in a view two files away. `|as_json` encodes the whole document (#985).
+JSON_ATTRIBUTE = re.compile(r"""\bhx-(?:vals|headers)\s*=\s*(?:"([^"]*)"|'([^']*)')""")
+ONLY_AS_JSON = re.compile(r"\s*\{\{\s*[\w.]+\s*\|\s*as_json\s*\}\}\s*")
+
+
+@pytest.mark.parametrize(
+    "path", TEMPLATES, ids=lambda p: str(p.relative_to(TEMPLATES[0].parents[3]))
+)
+def test_a_json_attribute_is_never_built_by_pasting_a_value_into_it(path: Path):
+    text = COMMENT.sub("", path.read_text(encoding="utf-8"))
+    for match in JSON_ATTRIBUTE.finditer(text):
+        value = match.group(1) if match.group(1) is not None else match.group(2)
+        if "{{" in value or "{%" in value:
+            assert ONLY_AS_JSON.fullmatch(value), (
+                f"{path.name}: {match.group(0)!r} builds JSON by interpolation; "
+                "pass a dict and write {{ value|as_json }}"
+            )
+
+
+def test_the_json_attribute_lint_knows_the_difference():
+    bad = """<a hx-vals='{"status": "{{ column.statuses }}"}'>"""
+    good = '<a hx-vals="{{ column.vals|as_json }}">'
+    assert any(
+        "{{" in (m.group(1) or m.group(2)) and not ONLY_AS_JSON.fullmatch(m.group(1) or m.group(2))
+        for m in JSON_ATTRIBUTE.finditer(bad)
+    )
+    assert all(
+        ONLY_AS_JSON.fullmatch(m.group(1) or m.group(2)) for m in JSON_ATTRIBUTE.finditer(good)
+    )

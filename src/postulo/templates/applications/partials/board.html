@@ -158,7 +158,7 @@
                aria-label="{% blocktranslate trimmed with status=column.label %}{{ status }}: show only this column{% endblocktranslate %}"
              {% endif %}
              {% if column.statuses %}
-               hx-vals='{"status": "{{ column.statuses }}"}'
+               hx-vals="{{ column.vals|as_json }}"
              {% else %}
                hx-params="not status"
              {% endif %}
