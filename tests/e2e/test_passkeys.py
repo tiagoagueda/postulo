@@ -134,9 +134,10 @@ def test_a_passkey_can_be_added_and_then_signs_somebody_in(
     page.locator("[data-passkeys]").get_by_role("link", name="Manage").click()
     expect(page.locator("table")).to_contain_text("The laptop")
     page.get_by_role("link", name="Remove").click()
+    # Signed in by passkey, so the removal page asks for the password first (allauth 65.20)
+    # and then carries on to the page it held back.
+    confirm_password(page, PASSWORD)
     page.get_by_role("button", name="Remove").click()
-    # Signed in by passkey, so removing one asks for the password first (allauth 65.20), and
-    # then carries on with the removal it held back.
     confirm_password(page, PASSWORD)
     expect(page).to_have_url(f"{base}/accounts/2fa/webauthn/")
     expect(page.get_by_text("No security keys have been added.")).to_be_visible()
