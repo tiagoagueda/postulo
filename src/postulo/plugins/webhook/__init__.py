@@ -128,6 +128,27 @@ def encode(payload: dict) -> str:
 # ------------------------------------------------------------------- the plugin
 
 
+def _on_a_private_network(url: str) -> bool:
+    """Whether a plain-HTTP receiver is the one honest case: a private address, allowed (#970).
+
+    The signature authenticates a request to its receiver and hides nothing, and the body is
+    the notification. A receiver across the public internet is therefore reached over TLS
+    or not at all; one on the operator's own network, which the operator has said Postulo
+    may dial, is the exception. Every address the name answers with has to be private.
+    """
+    from urllib.parse import urlsplit
+
+    from postulo.core import destinations
+
+    if not destinations.private_allowed():
+        return False
+    try:
+        found = destinations.addresses_for(urlsplit(url).hostname or "")
+    except (destinations.Unresolvable, ValueError):
+        return False
+    return bool(found) and not any(destinations.is_public(address) for address in found)
+
+
 @declares(
     shipped(
         name="webhook",
@@ -163,7 +184,8 @@ class WebhookNotifier:
                 help=str(
                     _(
                         "Where the JSON is posted. HTTPS, and a public address unless the "
-                        "operator has allowed private ones."
+                        "operator has allowed private ones; plain HTTP only for a receiver on "
+                        "such a private network."
                     )
                 ),
             ),
@@ -185,8 +207,10 @@ class WebhookNotifier:
     def validate(self, config: dict) -> dict[str, list[str]]:
         problems: dict[str, list[str]] = {}
         url = (config.get("url") or "").strip()
-        if not url.startswith(("https://", "http://")):
-            problems["url"] = [str(_("An address starting with https:// or http://."))]
+        if not url.startswith("https://") and not (
+            url.startswith("http://") and _on_a_private_network(url)
+        ):
+            problems["url"] = [str(_("An address starting with https://."))]
         else:
             try:
                 check_destination(url)

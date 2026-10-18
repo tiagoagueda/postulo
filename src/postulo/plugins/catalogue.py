@@ -278,12 +278,30 @@ def refuse_stale(name: str, key: str, serial: int | None, expires: dt.datetime |
         )
     if serial is None:
         return
-    seen = kept_digests().get(name, {})
-    if seen.get("key") == key and isinstance(seen.get("serial"), int) and serial < seen["serial"]:
+    highest = highest_serial(name, key)
+    if highest is not None and serial < highest:
         raise CatalogueError(
             str(_("The catalogue is older than one already seen (%(old)d, after %(new)d)."))
-            % {"old": serial, "new": seen["serial"]}
+            % {"old": serial, "new": highest}
         )
+
+
+def highest_serial(name: str, key: str) -> int | None:
+    """The highest serial seen from this catalogue under this key, or ``None`` (#972).
+
+    The database row is the memory. The cache entry `remember` also keeps is read as well,
+    which only ever raises the answer: it is what an instance had before the row existed.
+    """
+    from .models import CatalogueSerial
+
+    found = []
+    row = CatalogueSerial.objects.filter(name=name, key=key).first()
+    if row is not None:
+        found.append(row.serial)
+    seen = kept_digests().get(name, {})
+    if seen.get("key") == key and isinstance(seen.get("serial"), int):
+        found.append(seen["serial"])
+    return max(found) if found else None
 
 
 def fetch(name: str) -> Catalogue:
@@ -336,6 +354,7 @@ def remember(one: Catalogue) -> None:
             if release.sha256
         }
     )
+    keep_serial(one)
     try:
         held = cache.get(DIGESTS_CACHE_KEY) or {}
         before = held.get(one.name, {})
@@ -356,6 +375,26 @@ def remember(one: Catalogue) -> None:
         cache.set(DIGESTS_CACHE_KEY, held, None)
     except Exception:  # pragma: no cover - a cache that is down costs a label, not a page
         logger.warning("Could not keep the checksums of repository %r", one.name, exc_info=True)
+
+
+def keep_serial(one: Catalogue) -> None:
+    """Write the highest serial seen to the database, under the key it was verified against."""
+    from .models import CatalogueSerial
+
+    if not isinstance(one.serial, int):
+        return
+    row, made = CatalogueSerial.objects.get_or_create(
+        name=one.name, defaults={"key": one.public_key, "serial": one.serial}
+    )
+    if made:
+        return
+    if row.key != one.public_key:
+        row.key, row.serial = one.public_key, one.serial
+    elif one.serial > row.serial:
+        row.serial = one.serial
+    else:
+        return
+    row.save(update_fields=["key", "serial"])
 
 
 def kept_digests() -> dict[str, dict]:

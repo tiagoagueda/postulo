@@ -209,27 +209,60 @@ def _author(headers) -> str:
     return headers.get("Author-email", "") or headers.get("Author", "") or ""
 
 
+#: The most a wheel's own description of itself may inflate to, per member (#969). A real
+#: METADATA is a few kilobytes; a megabyte is far past any plugin's.
+MAX_METADATA_BYTES = 1 << 20
+
+#: The most members a wheel may hold. A plugin is a handful of modules, templates and
+#: catalogues; the directory is read whole, so it is bounded before anything else is.
+MAX_WHEEL_MEMBERS = 5000
+
+
+def _read_member(wheel: zipfile.ZipFile, name: str) -> str:
+    """One metadata member as text, read within `MAX_METADATA_BYTES` (#969).
+
+    The archive's directory is asked first, and what it claims is not trusted either: the
+    read itself stops one byte past the cap, so a header that lies about its size cannot
+    make the worker inflate the member whole.
+    """
+    too_big = InstallError(str(_("The wheel's metadata is far larger than any plugin's.")))
+    info = wheel.getinfo(name)
+    if info.flag_bits & 0x1:
+        raise InstallError(str(_("The wheel has an encrypted member, which a plugin never needs.")))
+    if info.file_size > MAX_METADATA_BYTES:
+        raise too_big
+    try:
+        with wheel.open(info) as member:
+            raw = member.read(MAX_METADATA_BYTES + 1)
+    except (zipfile.BadZipFile, NotImplementedError, RuntimeError, EOFError) as error:
+        raise InstallError(
+            str(_("The wheel's metadata cannot be read; it may be damaged."))
+        ) from error
+    if len(raw) > MAX_METADATA_BYTES:
+        raise too_big
+    return raw.decode("utf-8", "replace")
+
+
 def read_wheel(path: Path) -> PackageInfo:
     """What the wheel says about itself. Nothing is installed and no code is run."""
     if not zipfile.is_zipfile(path):
         raise InstallError(str(_("That is not a wheel: Postulo installs .whl files.")))
     with zipfile.ZipFile(path) as wheel:
+        if len(wheel.infolist()) > MAX_WHEEL_MEMBERS:
+            raise InstallError(str(_("The wheel holds far more files than any plugin does.")))
         names = wheel.namelist()
         metadata_name = _one(names, r"[^/]+\.dist-info/METADATA")
         if metadata_name is None:
             raise InstallError(str(_("The wheel has no metadata; it may be damaged.")))
-        headers = Parser().parsestr(wheel.read(metadata_name).decode("utf-8", "replace"))
+        headers = Parser().parsestr(_read_member(wheel, metadata_name))
         wheel_name = _one(names, r"[^/]+\.dist-info/WHEEL")
         tags = []
         if wheel_name:
-            tags = (
-                Parser().parsestr(wheel.read(wheel_name).decode("utf-8", "replace")).get_all("Tag")
-                or []
-            )
+            tags = Parser().parsestr(_read_member(wheel, wheel_name)).get_all("Tag") or []
         entry_points = []
         points_name = _one(names, r"[^/]+\.dist-info/entry_points\.txt")
         if points_name:
-            entry_points = _plugin_entry_points(wheel.read(points_name).decode("utf-8", "replace"))
+            entry_points = _plugin_entry_points(_read_member(wheel, points_name))
 
     return PackageInfo(
         name=headers.get("Name", "") or path.stem,
@@ -489,6 +522,18 @@ def check(info: PackageInfo) -> None:
             )
             % {"name": info.name}
         )
+    for entry in info.entry_points:
+        name = entry.partition(":")[2]
+        if is_internal(name):
+            raise InstallError(
+                str(
+                    _(
+                        "%(name)s is the name of a plugin that ships inside Postulo; "
+                        "a plugin needs a name of its own."
+                    )
+                )
+                % {"name": name}
+            )
     problems = conflicts_with_core(info)
     if problems:
         raise InstallError(

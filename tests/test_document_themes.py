@@ -320,10 +320,9 @@ def theme_plugin(tmp_path, monkeypatch):
 
 def test_a_plugins_theme_and_its_templates_arrive_together(theme_plugin, settings, user):
     """The whole door, end to end: declare a theme, ship the markup, render a document."""
-    from postulo.plugins.themes import register_plugin_themes
-
-    settings.TEMPLATES = [{**settings.TEMPLATES[0], "DIRS": list(settings.TEMPLATES[0]["DIRS"])}]
     from vellum import Vellum
+
+    from postulo.plugins.themes import register_plugin_themes
 
     assert register_plugin_themes(Vellum) == 1
 
@@ -338,36 +337,54 @@ def test_a_plugins_theme_and_its_templates_arrive_together(theme_plugin, setting
     assert themes.find("vellum").provider == "Vellum Press"
 
 
-def test_a_plugin_cannot_replace_a_page_of_postulos_interface(theme_plugin, settings):
-    """Appended, never prepended, exactly as its catalogues are.
+def test_a_plugin_cannot_replace_a_page_of_postulos_interface(theme_plugin):
+    """Searched last, so what Postulo or an app has by a name is what is used (#971).
 
-    Django's loader takes the first template it finds, so Postulo's own directory staying
-    first is what stops a plugin shipping ``documents/cv_list.html`` and quietly becoming
-    the CV list.
+    Django's loader takes the first template it finds, so a plugin shipping
+    ``documents/cv_list.html`` must not become the CV list, nor ``django/forms/widgets/input.html``
+    the look of every input on the instance.
     """
+    from django.template import engines
+    from django.template.loader import render_to_string
+
     from postulo.plugins import themes as plugin_themes
 
-    first = settings.TEMPLATES[0]["DIRS"][0]
-    settings.TEMPLATES = [{**settings.TEMPLATES[0], "DIRS": list(settings.TEMPLATES[0]["DIRS"])}]
+    directory = theme_plugin / "templates"
+    for name in ("django/forms/widgets/input.html", "documents/cv_list.html"):
+        (directory / name).parent.mkdir(parents=True, exist_ok=True)
+        (directory / name).write_text("HIJACKED", encoding="utf-8")
+    (directory / "vellum" / "only_here.html").write_text("MINE", encoding="utf-8")
 
-    assert plugin_themes.register_template_dir(theme_plugin / "templates") is True
-    assert plugin_themes.register_template_dir(theme_plugin / "templates") is False, "once"
+    assert plugin_themes.register_template_dir(directory) is True
+    assert plugin_themes.register_template_dir(directory) is False, "once"
+    try:
+        from django import forms
 
-    assert settings.TEMPLATES[0]["DIRS"][0] == first
-    plugin_themes._registered.remove(str((theme_plugin / "templates").resolve()))
+        class Form(forms.Form):
+            name = forms.CharField()
+
+        assert "HIJACKED" not in Form().as_p()
+        widget = engines["django"].get_template("django/forms/widgets/input.html")
+        assert str(directory) not in widget.origin.name
+        origin = engines["django"].get_template("documents/cv_list.html").origin.name
+        assert str(directory) not in origin
+        assert render_to_string("vellum/only_here.html") == "MINE", "a name nothing else has"
+    finally:
+        plugin_themes.forget_registered()
 
 
-def test_a_plugin_that_declares_no_theme_gets_no_template_directory(settings):
+def test_a_plugin_that_declares_no_theme_gets_no_template_directory():
     """An unused search path is a file somebody can shadow by accident."""
+    from postulo.plugins import themes as plugin_themes
     from postulo.plugins.themes import register_plugin_themes
 
-    before = list(settings.TEMPLATES[0]["DIRS"])
+    before = list(plugin_themes._registered)
 
     class Quiet:
         name = "quiet"
 
     assert register_plugin_themes(Quiet) == 0
-    assert settings.TEMPLATES[0]["DIRS"] == before
+    assert plugin_themes._registered == before
 
 
 def test_a_plugin_that_cannot_list_its_themes_does_not_take_the_page_down():
@@ -408,7 +425,6 @@ def vellum_installed(theme_plugin, settings, monkeypatch):
     from postulo.plugins import record, registry
     from postulo.plugins import themes as plugin_themes
 
-    settings.TEMPLATES = [{**settings.TEMPLATES[0], "DIRS": list(settings.TEMPLATES[0]["DIRS"])}]
     off: set[str] = set()
     stamp = ["one"]
 
@@ -464,7 +480,9 @@ def test_the_templates_of_a_plugin_that_went_away_are_no_longer_read(
     directory = (theme_plugin / "templates").resolve()
 
     def read() -> bool:
-        return directory in [Path(one).resolve() for one in settings.TEMPLATES[0]["DIRS"]]
+        from postulo.plugins import themes as plugin_themes
+
+        return directory in [Path(one).resolve() for one in plugin_themes._registered]
 
     registry.plugins("feature")
     assert read()

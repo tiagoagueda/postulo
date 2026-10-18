@@ -217,3 +217,22 @@ def test_a_switched_on_official_repository_lists_helloworld_and_vouches_for_it(o
 
 def test_switched_off_it_vouches_for_nothing(official):
     assert provenance.official_repositories() == set()
+
+
+def test_the_tool_signs_an_expiry_unless_told_not_to(tmp_path):
+    """A stale copy of the index refuses itself (#972); the committed pair is signed again
+    with the key, which is not on this machine, and so carries none until then."""
+    tool = load_tool()
+    wheels = tmp_path
+    for plugin in tomllib_plugins():
+        for release in plugin.get("release", []):
+            (wheels / tool.wheel_name(release["url"])).write_bytes(b"wheel")
+
+    assert "expires" in tool.build(wheels)
+    assert "expires" not in tool.build(wheels, expires_days=0)
+
+
+def tomllib_plugins() -> list:
+    import tomllib
+
+    return tomllib.loads((DIRECTORY / "plugins.toml").read_text(encoding="utf-8")).get("plugin", [])

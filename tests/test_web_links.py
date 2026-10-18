@@ -847,3 +847,21 @@ def test_a_service_with_a_mark_draws_it_in_the_place_of_its_icon(client, user):
     row = block[block.index("<li ") : block.index("</li>")]
     mark = row[row.index("data-option-mark") : row.index("<select")]
     assert 'data-brand="github"' in mark and "data-icon" not in mark
+
+
+@pytest.mark.parametrize(
+    "address",
+    ["javascript:alert(1)", "data:text/html,<b>x</b>", "file:///etc/passwd", "ftp://x.test/y"],
+)
+def test_save_only_link_refuses_an_address_that_is_not_web(contact, user, address):
+    """The one function every plugin writes a link with checks what the other doors do (#991)."""
+    from django.core.exceptions import ValidationError
+
+    with pytest.raises(ValidationError):
+        web_links.save_only_link(contact, user, WebLink.Kind.WEBSITE, address)
+    assert not WebLink.objects.exists()
+
+
+def test_save_only_link_still_saves_a_web_address(contact, user):
+    saved = web_links.save_only_link(contact, user, WebLink.Kind.WEBSITE, " https://alex.test/me ")
+    assert saved.url == "https://alex.test/me"

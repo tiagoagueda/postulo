@@ -495,3 +495,15 @@ def test_sync_now_writes_the_same_text_as_the_scheduler(client, user, an_owner_f
     client.post(reverse("connections:sync_now", args=[connection.pk]))
 
     what_the_run_wrote(an_owner_far_from_the_server, connection)
+
+
+def test_a_run_that_outlived_its_lease_does_not_free_the_next_runs(user):
+    """It deleted the key whatever it held, so a third run could start beside the second (#988)."""
+    connection = a_sync(user)
+    key = syncing.lease_key(connection)
+    MirrorSync.during = lambda: cache.set(key, "the-next-runs-token", 60)
+
+    syncing.sync_connection(connection)
+
+    assert cache.get(key) == "the-next-runs-token"
+    cache.delete(key)

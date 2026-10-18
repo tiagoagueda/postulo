@@ -32,6 +32,14 @@ All notable changes to Postulo are recorded here. The format follows
 - The monthly dependency workflow resolves, installs and tests the new lock in a job with no secret and hands two files to a second job, in a fresh container, that runs nothing from the new packages, checks what it commits, runs git with hooks off and alone holds the bot's token (#975)
 - The PostgreSQL apt signing key is a committed file whose fingerprint a test checks, in the image and in CI, instead of a download trusted on TLS alone (#981)
 - The browser CSP test runs under the policy production sends instead of a stale hand copy of it (#984)
+- A plugin's settings page now refuses an administrator whose access rule says they may not change its settings, an administrator who is not the operator cannot write or lift a rule about themselves or their groups, and the pages of the mail settings are held to it too (#967)
+- An installed plugin can no longer register under the name of one that ships inside Postulo: the install is refused and the built-in keeps the name (#968)
+- A wheel's metadata members are read within a size limit, an encrypted member and a wheel of thousands of files are refused (#969)
+- The webhook notifier accepts only an https:// receiver, or a plain http:// one on a private network the operator allowed (#970)
+- A plugin's templates are searched after every template Postulo and its apps own, so a theme cannot redraw a form widget or a page, as the module always promised (#971)
+- The highest catalogue serial seen is kept in the database and not only in the cache, so an old signed index is still refused after the cache is cleared, and the official index tool signs an expiry by default (#972)
+- A sync connection's lease is released only if it still holds this run's token (#988)
+- A web link saved from a card or an import is refused unless it is a complete http(s) address, whoever hands it over (#991)
 - Companies, contacts and listings may be a group's or shared read-only or read/write, under an amended promise: nobody sees another's data unless granted, and a superuser sees any of those three but never anyone's notes, applications or documents (#896)
 - On a pull request the CI caches are restored by their exact key and never by a prefix, so a run of somebody else's code cannot read what a run on main restores or leave behind a poisoned fallback (#827)
 - The isolation sweep now asks the owner's own record to get past the lookup (and fixes the five entries that never did), checks every download it reaches for no-store, and a ratchet test fails on a new query of an owned model with no for_user or owner (#825)
@@ -222,6 +230,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### ✨ Added
 
+- `read_body`, `deadline_in`, `until` and `BodyRefused` are on `postulo.plugins.api`, so a plugin can bound what a remote server sends it (#967)
 - Groups own companies, contacts and listings, records are shared with people or groups, each person's notes and listing decisions stay their own, and leaving keeps a copy of what is yours; a conflicts page settles duplicates across owners (#896)
 - Seven more European languages are scaffolded with empty catalogues for 0.5.0: Azerbaijani, Belarusian, Kazakh, Montenegrin, Norwegian Nynorsk, Romansh and Faroese; none is offered until a string is translated (#269)
 - A company holds social profiles, its LinkedIn page and its accounts, as a contact does: on its form, on its page with each service's mark, in the API, in the archive and through a merge (#906)
