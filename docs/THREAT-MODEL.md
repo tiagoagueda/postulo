@@ -137,6 +137,29 @@ Three things follow, and each is a promise:
 - **The map can be switched off.** The `maps` feature plugin decides whether the map, the
   placing of a location and any pin are offered. Off, nothing is shown and nothing is
   deleted: every stored coordinate stays for the day it is switched back on.
+- **A grantee who renames a shared company is asked about its owner's other companies
+  (#949, accepted and bounded).** A read/write grant lets the grantee edit the record's own
+  fields, the name among them, and the per-owner uniqueness of names needs the clash check
+  to look at everything the owner holds, which the grantee cannot otherwise see. Dropping
+  the check was rejected; so was making the name the owner's alone. The answer is kept and
+  bounded as the telephone one is (#758): a person who does not own the company is told that
+  a name is held at most `POSTULO_COMPANY_NAME_RATE` times an hour (20 by default), and once
+  that is spent a free name and a held one are refused in the same 429, so the refusal is
+  no longer the answer. The residue is a slow, per-account guess at employer names by
+  somebody the owner trusted with one record, and every rename that succeeds is in the
+  record's trail, which the owner sees.
+- **A refused capture says why, and so tells a caller what a name resolves to (#954,
+  accepted).** A capture of an address whose name does not resolve, or resolves to a private
+  or local network, is refused with a sentence for each case, in the API's 422 `detail` and
+  on the capture form. A token holder or any account can therefore ask, one hostname at a
+  time, whether the instance's resolver knows a name and whether it lives on the private
+  side: a slow map of the internal names of the network the instance sits on, bounded by the
+  capture allowance, which is spent before the fetch (30 an hour). The project chose to tell
+  the person why a fetch was refused, because a bare refusal of a mistyped address or a
+  captive portal is worse than the disclosure on a personal instance; on an instance in an
+  office, where internal names are worth something, an operator who minds can lower
+  `POSTULO_CAPTURE_RATE`. The sentences are the ones the person is owed, and
+  `tests/security/test_outbound.py` pins them. Awaiting the owner's confirmation at review.
 
 ## What is out of scope
 

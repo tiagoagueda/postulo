@@ -54,7 +54,7 @@ from postulo.jobs.models import Capture, CaptureStatus
 from postulo.plugins.base import CaptureError, JobPostingData
 from postulo.plugins.fetching import fetch_page
 
-from . import idempotency, problems
+from . import auth, idempotency, problems
 from .auth import ScopedAuth, TokenAuth, for_readers_of_the_api, scope
 from .models import ApiToken
 from .paging import AFTER_ID, UPDATED_SINCE, Moment, Money, Page, RowId, changed_since
@@ -800,7 +800,8 @@ def attach_rendering(request, pk: int):
         )
     except pages.NotKept as refusal:
         raise _refused(refusal) from refusal
-    return Status(200 if already else 201, _as_output(request, capture))
+    # The narrowed row: a token that only sends pages is not told the queue (#761, #950).
+    return Status(200 if already else 201, _as_listed(request, capture))
 
 
 @api.post(
@@ -902,11 +903,43 @@ def urls():
             # ninja's own home for the API answers a bare 404 page; it goes where every other
             # address nothing owns goes (#760).
             pattern.callback = _no_such_address
-            continue
-        _answer_a_wrong_method_as_a_problem(pattern)
+        else:
+            _answer_a_wrong_method_as_a_problem(pattern)
     # Last, so that it only sees what no address above took: a mistyped path, or an id the
     # `{int:pk}` converter turned away (#430).
-    return [*patterns, re_path(r"^", _no_such_address)], application, namespace
+    patterns = [*patterns, re_path(r"^", _no_such_address)]
+    for pattern in patterns:
+        _never_kept_by_a_cache(pattern)
+    return patterns, application, namespace
+
+
+def _never_kept_by_a_cache(pattern) -> None:
+    """Give every answer of the API with no Cache-Control of its own `no-store` (#952).
+
+    ``SECURITY.md`` promises that what is handed over is not kept, and #788 made that hold for
+    attachments by keying on ``Content-Disposition``. The calendar feeds and every JSON answer are
+    plain bodies, so an interview's place, a profile's birth data or a timeline stayed in the
+    HTTP cache of whatever asked for it after the token was revoked. The API has no answer that
+    is meant to be kept, so the rule is one wrapper around every address -- the schema, the 401
+    and 404 of an address nothing owns included -- and not a line in each view. An answer that
+    says something of its own keeps it.
+    """
+    from functools import wraps
+
+    from django.urls import URLPattern
+
+    if not isinstance(pattern, URLPattern):
+        return
+    view = pattern.callback
+
+    @wraps(view)
+    def uncached(request, *args, **kwargs):
+        response = view(request, *args, **kwargs)
+        if not response.has_header("Cache-Control"):
+            response["Cache-Control"] = "private, max-age=0, no-store"
+        return response
+
+    pattern.callback = uncached
 
 
 def _answer_a_wrong_method_as_a_problem(pattern) -> None:
@@ -929,7 +962,11 @@ def _answer_a_wrong_method_as_a_problem(pattern) -> None:
     def answering(request, *args, **kwargs):
         response = view(request, *args, **kwargs)
         if response.status_code == 405 and response.get("Content-Type") != problems.CONTENT_TYPE:
-            if not _has_a_live_token(request):
+            try:
+                live = _has_a_live_token(request)
+            except problems.Refused as barred:
+                return auth.refusal_response(request, barred)
+            if not live:
                 # No token, no route table (#760): the methods an address allows are part of
                 # what it would tell a stranger, and are said only to someone who may ask.
                 return problems.refuse(request, api, 401, problems.no_token())
@@ -944,10 +981,7 @@ def _answer_a_wrong_method_as_a_problem(pattern) -> None:
 
 def _has_a_live_token(request) -> bool:
     """Whether the request carries a bearer token that is live, whatever it is for."""
-    from .auth import lookup
-
-    scheme, _space, raw = request.META.get("HTTP_AUTHORIZATION", "").partition(" ")
-    return scheme.lower() == "bearer" and lookup(raw.strip()) is not None
+    return auth.live_token(request) is not None
 
 
 def _no_such_address(request, *args, **kwargs):
@@ -956,6 +990,10 @@ def _no_such_address(request, *args, **kwargs):
     A 401 for a request with no live token, as for every other call, so the route table is
     not probed without one; a 404 for one that has.
     """
-    if _has_a_live_token(request):
+    try:
+        live = _has_a_live_token(request)
+    except problems.Refused as barred:
+        return auth.refusal_response(request, barred)
+    if live:
         return problems.refuse(request, api, 404, str(_("Nothing of yours is at this address.")))
     return problems.refuse(request, api, 401, problems.no_token())
