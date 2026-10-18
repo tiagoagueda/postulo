@@ -896,7 +896,43 @@ def problems_in(catalogue: Catalogue, code: str) -> list[str]:
     return found
 
 
+_TAG = re.compile(r"</?[a-zA-Z][^>]*>")
+_REPEATED = re.compile(r"(\b\w+\b)(\s+\1){3,}")
+_RUNOFF = re.compile(r"\.{8,}|\[(?:TD|FONT)\b")
+
+
+def quality_problems(message: Message) -> list[str]:
+    """What a machine most often gets wrong besides placeholders.
+
+    Broken HTML (a ``<code>`` turned into ``X16X``, a tag dropped), a word repeated four
+    times, and the run-off a model produces on a short string (rows of dots, pasted
+    markup). Found in the first LibreTranslate pass over every catalogue: Swahili, Urdu and
+    Albanian were the worst. Nothing here needs the language, only the source and the form.
+    """
+    found: list[str] = []
+    if not message.translated:
+        return found
+    sources_ = [message.msgid] if message.plural is None else [message.msgid, message.plural]
+    for index, form in enumerate(message.msgstr):
+        source = sources_[min(index, len(sources_) - 1)]
+        if sorted(map(_squeeze, _TAG.findall(source))) != sorted(map(_squeeze, _TAG.findall(form))):
+            found.append(f"{message.msgid!r} → {form!r}: HTML tags differ")
+        elif _REPEATED.search(form) and not _REPEATED.search(source):
+            found.append(f"{message.msgid!r} → {form!r}: a word is repeated")
+        elif _RUNOFF.search(form) or (len(source) > 12 and len(form) > 4 * len(source) + 30):
+            found.append(f"{message.msgid!r} → {form!r}: looks like run-off text")
+    return found
+
+
+def _squeeze(tag: str) -> str:
+    return " ".join(tag.split())
+
+
 def message_problems(message: Message, code: str) -> list[str]:
+    return placeholder_problems(message, code) + quality_problems(message)
+
+
+def placeholder_problems(message: Message, code: str) -> list[str]:
     """What is wrong with one translated entry: its plural forms and its placeholders."""
     found: list[str] = []
     if not message.translated:

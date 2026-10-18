@@ -741,3 +741,20 @@ def test_the_detector_finds_a_count_beside_a_noun():
     assert not COUNTED_NOUN.search("%(count)s")
     assert not COUNTED_NOUN.search("Hello %(name)s, welcome")
     assert not COUNTED_NOUN.search("%(total)d.")
+
+
+@pytest.mark.parametrize(
+    ("source", "form", "kind"),
+    [
+        ("A <code>.whl</code> file", "Un fichier X16X", "HTML tags differ"),
+        ("Fetch it again", "Tch tch tch tch tch Kwa mara", "a word is repeated"),
+        ("Report · %(period)s", "Picha zote ........................", "run-off"),
+        ("Row %(n)s", "Ligne %(n)s", None),
+        ("Press <kbd>d</kbd>", "Appuyez sur <kbd>d</kbd>", None),
+    ],
+)
+def test_machine_run_off_is_named(source, form, kind, tool):
+    """What the first LibreTranslate pass got wrong beyond placeholders."""
+    message = tool.Message(msgid=source, msgstr=[form])
+    found = tool.quality_problems(message)
+    assert (kind is None and not found) or (kind and any(kind in p for p in found))
