@@ -245,7 +245,9 @@ class RequestIDMiddleware:
         given = request.headers.get(logs.REQUEST_ID_HEADER, "")
         # Taken only from a proxy Postulo trusts (#798): from anybody else the id is theirs to
         # choose, and a stranger could write another request's id into the log.
-        if given and not proxy.is_trusted(request.META.get("REMOTE_ADDR", "")):
+        # Judged by the peer that delivered the request, not by the client address a proxy put
+        # in `REMOTE_ADDR`, or a trusted proxy's own id would always be thrown away (#976).
+        if given and not proxy.is_trusted(proxy.request_origin(request)):
             given = ""
         identifier = given if logs.acceptable(given) else logs.new_request_id()
         request.request_id = identifier

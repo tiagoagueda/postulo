@@ -91,6 +91,17 @@ def is_trusted(address: str) -> bool:
     return any(parsed in network for network in trusted_networks())
 
 
+def request_origin(request) -> str:
+    """The peer that delivered the request: the proxy where one forwarded it (#976).
+
+    `TrustedProxyMiddleware` replaces `REMOTE_ADDR` with the client's address when a trusted
+    proxy named one, and keeps the proxy's own under `POSTULO_PROXY_ADDR`. A decision about
+    *who may be believed* (a request id, a forwarding header) is about the peer, not the
+    client behind it.
+    """
+    return request.META.get("POSTULO_PROXY_ADDR") or request.META.get("REMOTE_ADDR", "")
+
+
 def describe(request) -> dict:
     """Where this request arrived from, and whether that was a proxy Postulo believes.
 
@@ -98,7 +109,7 @@ def describe(request) -> dict:
     address it arrives from, which is the value to put in ``POSTULO_TRUSTED_PROXIES``,
     rather than a redirect loop and a guess.
     """
-    peer = request.META.get("POSTULO_PROXY_ADDR") or request.META.get("REMOTE_ADDR", "")
+    peer = request_origin(request)
     return {
         "peer": peer,
         "trusted": is_trusted(peer),

@@ -8,6 +8,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🔒 Security
 
+- A request id sent by a trusted proxy is kept when the proxy also sent X-Forwarded-For, judged by the proxy that delivered the request and not by the client address it named. (#976)
 - The threat model says the referee rules bind the shipped themes and the sections they are handed, and that a plugin theme is handed full records and trusted. (#965)
 - Calendar files (the feeds, the downloads, an interview's file, and what a sync plugin writes) no longer carry your private notes or name the people you meet as attendees, so a calendar program cannot offer to send them updates; the notes' help text says so. (#963)
 - The links in a capture notification (mail, webhook, push) are built on POSTULO_PUBLIC_URL when it is set, not on the Host the capture request carried. (#962)
