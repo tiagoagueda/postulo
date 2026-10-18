@@ -632,7 +632,10 @@ class InterviewForm(OwnerScopedModelForm):
                 "Who you are meeting. The people you have recorded at this company are "
                 "offered, and anybody already on this interview who has since moved on."
             ),
-            "notes": _("Yours, to prepare with. Nothing here is sent to anybody."),
+            "notes": _(
+                "Yours, to prepare with. Nothing here is sent to anybody, and it is left out "
+                "of the calendar files."
+            ),
             "ends_at": _("Left blank, it lasts an hour."),
         }
         widgets = {
@@ -731,7 +734,10 @@ class AppointmentForm(OwnerScopedModelForm):
             "contact": _("Your adviser, where you have recorded them at that service."),
             "starts_at": _("In your time zone."),
             "ends_at": _("Left blank, it lasts an hour."),
-            "notes": _("Yours, to prepare with. Nothing here is sent to anybody."),
+            "notes": _(
+                "Yours, to prepare with. Nothing here is sent to anybody, and it is left out "
+                "of the calendar files."
+            ),
             "outcome_notes": _("What was said or agreed, to write down afterwards."),
             "attended": _(
                 "Tick it once you have been. The report addressed to your adviser counts "
