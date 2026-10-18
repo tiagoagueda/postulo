@@ -817,3 +817,56 @@ def test_the_classification_is_read_from_the_data_volume():
     assert any("mkdir -p" in line and match["path"] in line for line in text.splitlines()), (
         "the directory is not created"
     )
+
+
+PGDG_KEY = ROOT / "docker" / "apt.postgresql.org.asc"
+#: The fingerprint PostgreSQL publishes for key id ACCC4CF8 on its Debian download page.
+PGDG_FINGERPRINT = "B97B0AFCAA1A47F044F244A07FCC7D46ACCC4CF8"
+
+
+def fingerprint_of(armoured: str) -> str:
+    """The OpenPGP v4 fingerprint of the first key in an ASCII-armoured block.
+
+    By hand because the runtime stage, and CI, have no `gpg` and installing it for one
+    check would add a package to the image. The fingerprint is the SHA-1 of the public-key
+    packet's body behind `0x99` and its two-byte length (RFC 4880 section 12.2).
+    """
+    import base64
+    import hashlib
+
+    lines = [line for line in armoured.splitlines() if line.strip()]
+    start = lines.index("-----BEGIN PGP PUBLIC KEY BLOCK-----")
+    body = []
+    for line in lines[start + 1 :]:
+        if line.startswith(("=", "-----")):
+            break
+        if ":" not in line:  # armour headers
+            body.append(line)
+    data = base64.b64decode("".join(body))
+    assert data[0] & 0xC0 == 0x80 and (data[0] >> 2) & 0x0F == 6, "not a public-key packet"
+    assert data[0] & 0x03 == 1, "expected a two-byte packet length"  # old format, as PGDG's
+    length = int.from_bytes(data[1:3], "big")
+    packet = data[3 : 3 + length]
+    assert packet[0] == 4, "expected a version 4 key"
+    return hashlib.sha1(b"\x99" + length.to_bytes(2, "big") + packet).hexdigest().upper()  # noqa: S324 - the fingerprint's definition
+
+
+def test_the_apt_signing_key_is_committed_and_is_postgresqls():
+    """#981: the key `signed-by=` trusts was whatever www.postgresql.org answered at build time.
+
+    TLS was the only check, where the uv binary and its installer are pinned by digest
+    (#790). The key is a file in the repository now, and its fingerprint is the one
+    PostgreSQL publishes, so a changed key is a visible change to review.
+    """
+    assert fingerprint_of(PGDG_KEY.read_text(encoding="utf-8")) == PGDG_FINGERPRINT
+
+
+@pytest.mark.parametrize(
+    "path", [DOCKERFILE, ROOT / ".forgejo" / "workflows" / "ci.yml"], ids=lambda p: p.name
+)
+def test_nothing_fetches_the_apt_signing_key(path):
+    text = path.read_text(encoding="utf-8")
+    assert "apt.postgresql.org.asc" in text
+    assert "media/keys" not in text, "the signing key must be the committed file, not a download"
+    assert not re.search(r"curl[^\n]*\.asc", text.replace("\\n", " ")), "no key is downloaded"
+    assert "docker/apt.postgresql.org.asc" in text, "the committed key is what gets installed"

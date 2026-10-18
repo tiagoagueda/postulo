@@ -230,6 +230,13 @@ ENV PYTHONUNBUFFERED=1 \
 # default fonts do not draw is the usual reason to reach for it:
 #     docker build --build-arg POSTULO_EXTRA_APT_PACKAGES=fonts-noto-extra ...
 ARG POSTULO_EXTRA_APT_PACKAGES=""
+
+# PostgreSQL's apt signing key (fingerprint B97B 0AFC AA1A 47F0 44F2 44A0 7FCC 7D46 ACCC 4CF8),
+# committed rather than fetched: whatever an address answered at build time would become the
+# key apt trusts for every package from that repository (#981). tests/test_image_build.py
+# computes the fingerprint of the file and compares it with the one above.
+COPY docker/apt.postgresql.org.asc /tmp/apt.postgresql.org.asc
+
 # What makes the upgrade run a second time (#300). A layer is served from the builder's
 # cache for as long as its text and the layer under it are the same, and neither changes
 # when Debian publishes an update. So on a builder that keeps its cache the line below ran
@@ -260,8 +267,8 @@ RUN echo "Debian's packages as of: ${POSTULO_APT_REFRESH:-whenever this layer wa
            apt-get install -y --no-install-recommends $POSTULO_EXTRA_APT_PACKAGES; \
        fi \
     && install -d /usr/share/postgresql-common/pgdg \
-    && curl -fsSL -o /usr/share/postgresql-common/pgdg/apt.postgresql.org.asc \
-        https://www.postgresql.org/media/keys/ACCC4CF8.asc \
+    && install -m 644 /tmp/apt.postgresql.org.asc /usr/share/postgresql-common/pgdg/apt.postgresql.org.asc \
+    && rm /tmp/apt.postgresql.org.asc \
     && echo "deb [signed-by=/usr/share/postgresql-common/pgdg/apt.postgresql.org.asc] https://apt.postgresql.org/pub/repos/apt bookworm-pgdg main" \
         > /etc/apt/sources.list.d/pgdg.list \
     && apt-get update \

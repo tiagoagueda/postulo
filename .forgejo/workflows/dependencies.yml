@@ -16,6 +16,15 @@
 # may write is the bot account's: the repository secret DEPENDENCIES_TOKEN is a token of
 # `postulo-bot`, whose team has write access to this repository alone. There is no
 # `permissions:` block because Forgejo 16 ignores the field and warns on every job (#727).
+#
+# Two jobs, because a step boundary is not a privilege boundary (#975). Resolving the lock
+# builds source distributions, installing it runs the newest release of every locked
+# package, and pytest loads whatever plugins those packages register: all of it as root,
+# and anything it leaves behind (a git hook in the checkout, a binary earlier on the PATH)
+# would run in the next step of the same container. So `upgrade` has no secret at all and
+# hands over two files; `propose` starts from a fresh container, runs nothing from the new
+# packages, copies those two files over a clean checkout and is the only job that holds
+# the token. tests/test_tooling.py holds the split in place.
 name: Dependencies
 
 on:
@@ -38,6 +47,8 @@ jobs:
     runs-on: ubuntu-latest
     container:
       image: node:22-bookworm
+    outputs:
+      changed: ${{ steps.lock.outputs.changed }}
 
     steps:
       - uses: actions/checkout@v4
@@ -95,8 +106,71 @@ jobs:
         env:
           DJANGO_SETTINGS_MODULE: postulo.config.settings.test
 
-      - name: Push the branch and open the pull request
+      - name: Hand over the two files
+        # The only things that cross to the job that holds the token. Renamed because the
+        # artifact action of this Forgejo does not carry hidden files reliably.
         if: steps.lock.outputs.changed == 'true'
+        run: |
+          mkdir handoff
+          cp uv.lock handoff/uv.lock
+          cp .pre-commit-config.yaml handoff/pre-commit-config.yaml
+
+      - name: Keep them for the next job
+        if: steps.lock.outputs.changed == 'true'
+        # v3 works on Forgejo Actions; v4 depends on GitHub's own artifact backend.
+        uses: actions/upload-artifact@v3
+        with:
+          name: dependency-lock
+          path: handoff
+          retention-days: 1
+
+  propose:
+    name: Push the branch and open the pull request
+    needs: upgrade
+    if: needs.upgrade.outputs.changed == 'true'
+    runs-on: ubuntu-latest
+    container:
+      image: node:22-bookworm
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Fetch the two files
+        uses: actions/download-artifact@v3
+        with:
+          name: dependency-lock
+          path: handoff
+
+      - name: Check and commit them
+        run: |
+          # Exactly two regular files, and nothing else, whatever the artifact holds.
+          [ "$(find handoff -mindepth 1 | wc -l)" = "2" ]
+          [ -f handoff/uv.lock ] && [ ! -L handoff/uv.lock ]
+          [ -f handoff/pre-commit-config.yaml ] && [ ! -L handoff/pre-commit-config.yaml ]
+          cp handoff/uv.lock uv.lock
+          cp handoff/pre-commit-config.yaml .pre-commit-config.yaml
+          rm -r handoff
+          # The pre-commit file may only have moved ruff's revision: one line out, one in.
+          changed_lines="$(git -c core.hooksPath=/dev/null -c safe.directory="$GITHUB_WORKSPACE" diff --numstat -- .pre-commit-config.yaml | awk '{ print $1 + $2 }')"
+          [ -z "$changed_lines" ] || [ "$changed_lines" -le 2 ]
+          # Nothing but the two files may be different from the checkout.
+          git -c core.hooksPath=/dev/null -c safe.directory="$GITHUB_WORKSPACE" status --porcelain | while read -r state path; do
+            case "$path" in
+              uv.lock|.pre-commit-config.yaml) ;;
+              *) echo "Unexpected change: $state $path"; exit 1 ;;
+            esac
+          done
+          git -c core.hooksPath=/dev/null -c safe.directory="$GITHUB_WORKSPACE" diff --quiet -- uv.lock && { echo "The lock did not change."; exit 1; }
+          branch="dependencies/$(date -u +%Y-%m)"
+          git -c core.hooksPath=/dev/null -c safe.directory="$GITHUB_WORKSPACE" checkout -B "$branch"
+          git -c core.hooksPath=/dev/null -c safe.directory="$GITHUB_WORKSPACE" add uv.lock .pre-commit-config.yaml
+          git -c core.hooksPath=/dev/null -c safe.directory="$GITHUB_WORKSPACE" -c user.name="Postulo dependencies" -c user.email="dependencies@postulo.invalid" commit -m "Upgrade the lock file ($(date -u +%Y-%m-%d))" \
+            -m "Every dependency moved to its newest version the constraints allow; ruff, the migration check and the suite on Python 3.14 passed against them. The pull request's CI run is the full check. Read the changelogs of anything that crossed a major version before merging."
+          echo "$branch" > /tmp/branch
+
+      - name: Push the branch and open the pull request
         env:
           # Through the environment, never expanded into the script: a value that reaches a
           # shell as text is data, one pasted into it is code.
@@ -111,15 +185,9 @@ jobs:
           REPOSITORY: ${{ github.repository }}
           BASE: ${{ github.ref_name }}
         run: |
-          branch="dependencies/$(date -u +%Y-%m)"
-          git config user.name "Postulo dependencies"
-          git config user.email "dependencies@postulo.invalid"
-          git checkout -B "$branch"
-          git add uv.lock .pre-commit-config.yaml
-          git commit -m "Upgrade the lock file ($(date -u +%Y-%m-%d))" \
-            -m "Every dependency moved to its newest version the constraints allow; ruff, the migration check and the suite on Python 3.14 passed against them. The pull request's CI run is the full check. Read the changelogs of anything that crossed a major version before merging."
+          branch="$(cat /tmp/branch)"
           # The token in the URL of this one push, not in .git/config.
-          git push --force "${SERVER%%://*}://x-access-token:${TOKEN}@${SERVER#*://}/${REPOSITORY}.git" "HEAD:refs/heads/${branch}"
+          git -c core.hooksPath=/dev/null -c safe.directory="$GITHUB_WORKSPACE" push --force "${SERVER%%://*}://x-access-token:${TOKEN}@${SERVER#*://}/${REPOSITORY}.git" "HEAD:refs/heads/${branch}"
           python3 - "$branch" <<'PY'
           import json, os, sys, urllib.parse, urllib.request
           branch = sys.argv[1]
@@ -148,7 +216,7 @@ jobs:
                   "base": base,
                   "title": f"Upgrade the lock file ({branch.split('/')[-1]})",
                   "body": (
-                      "`uv lock --upgrade`, run by the Dependencies workflow. Before opening this, "
+                      "Every locked dependency upgraded, by the Dependencies workflow. Before opening this, "
                       "ruff, the migration check and the suite passed on Python 3.14 alone. "
                       + ci + " Before merging, read the changelogs of anything that "
                       "crossed a major version, and land the lock file on its own, as CONTRIBUTING.md asks."
