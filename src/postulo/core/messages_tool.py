@@ -48,6 +48,7 @@ import tokenize
 import tomllib
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
+from html.parser import HTMLParser
 from pathlib import Path
 
 from postulo.core.languages import (
@@ -917,6 +918,8 @@ def quality_problems(message: Message) -> list[str]:
         source = sources_[min(index, len(sources_) - 1)]
         if sorted(map(_squeeze, _TAG.findall(source))) != sorted(map(_squeeze, _TAG.findall(form))):
             found.append(f"{message.msgid!r} → {form!r}: HTML tags differ")
+        elif (foreign := foreign_markup(source, form)) is not None:
+            found.append(f"{message.msgid!r} → {form!r}: {foreign}")
         elif _REPEATED.search(form) and not _REPEATED.search(source):
             found.append(f"{message.msgid!r} → {form!r}: a word is repeated")
         elif _RUNOFF.search(form) or (len(source) > 12 and len(form) > 4 * len(source) + 30):
@@ -926,6 +929,78 @@ def quality_problems(message: Message) -> list[str]:
 
 def _squeeze(tag: str) -> str:
     return " ".join(tag.split())
+
+
+#: Attributes that carry an address a browser would follow or load.
+_ADDRESSES = frozenset(
+    {"href", "src", "srcset", "action", "formaction", "poster", "data", "xlink:href"}
+)
+
+
+class _Markup(HTMLParser):
+    """What a string would make a browser build: its tags, their attributes, their addresses.
+
+    Parsed the way a browser reads it, which is not the way a regular expression does:
+    ``title=">"`` does not end a tag, and a comment or a declaration is markup too.
+    """
+
+    def __init__(self) -> None:
+        super().__init__(convert_charrefs=True)
+        self.shapes: set[tuple[str, str]] = set()
+        self.addresses: set[str] = set()
+
+    def handle_starttag(self, tag, attrs):
+        self.shapes.add((tag, ""))
+        for name, value in attrs:
+            self.shapes.add((tag, name))
+            if name in _ADDRESSES:
+                self.addresses.add((value or "").strip())
+
+    handle_startendtag = handle_starttag
+
+    def handle_endtag(self, tag):
+        self.shapes.add((tag, "/"))
+
+    def handle_comment(self, data):
+        self.shapes.add(("!--", ""))
+
+    def handle_decl(self, decl):
+        self.shapes.add(("!", ""))
+
+    def handle_pi(self, data):
+        self.shapes.add(("?", ""))
+
+    def unknown_decl(self, data):
+        self.shapes.add(("![", ""))
+
+
+def markup_of(text: str) -> _Markup:
+    parser = _Markup()
+    parser.feed(text)
+    parser.close()
+    return parser
+
+
+def foreign_markup(source: str, form: str) -> str | None:
+    """What ``form`` would make a page build that ``source`` does not (#983), or None.
+
+    A translation is text: Django prints a ``blocktranslate`` and a ``translate`` as template
+    source and Leaflet writes a tooltip with ``innerHTML``, so a msgstr that carries a tag, an
+    attribute or an address the English does not is markup somebody added. Every (tag,
+    attribute-name) pair and every ``href``/``src`` value of the form must be the source's;
+    and a form may not hold a ``<`` more than the source does, which also covers what a
+    parser reads as text, such as a tag left open.
+    """
+    if "<" not in form:
+        return None
+    got, wanted = markup_of(form), markup_of(source)
+    if extra := got.shapes - wanted.shapes:
+        return f"carries markup the source does not ({', '.join(sorted(a + b for a, b in extra))})"
+    if extra := got.addresses - wanted.addresses:
+        return f"carries an address the source does not ({', '.join(sorted(extra))})"
+    if form.count("<") > source.count("<"):
+        return "carries a '<' the source does not"
+    return None
 
 
 def message_problems(message: Message, code: str) -> list[str]:

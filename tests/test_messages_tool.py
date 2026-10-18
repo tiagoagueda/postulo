@@ -408,3 +408,65 @@ def test_compile_writes_the_status_report_the_picker_reads(tool, tmp_path, monke
     monkeypatch.setattr(Path, "write_text", capture)
     assert tool.cmd_compile() == 0
     assert written["status.json"] == tool._status_text(tool.build_report())
+
+
+# --------------------------------------------- a translation is text, not markup (#983)
+
+HOSTILE = [
+    # (the English, what a translator wrote)
+    ("Written by someone", "<script>alert(1)</script>"),
+    ("Written by someone", "<img src=x onerror=alert(1)>"),
+    ("Written by someone", "Written by <a href='https://evil.example/'>someone</a>"),
+    ("Written by someone", "Written by <!-- someone"),
+    ("Written by someone", "Written by <b someone"),
+    (
+        'Sign in under <a href="{url}">Settings</a>',
+        'Sign in under <a href="//evil.example">Settings</a>',
+    ),
+    (
+        'Sign in under <a href="{url}">Settings</a>',
+        'Sign in under <a href="{url}" onclick="x()">Settings</a>',
+    ),
+    ("Written by <bdi>Ana</bdi>", "Written by <bdi>Ana</bdi><script>"),
+]
+
+
+@pytest.mark.parametrize(("source", "form"), HOSTILE)
+def test_markup_the_english_does_not_carry_is_a_problem(tool, source, form):
+    message = tool.Message(msgid=source, msgstr=[form])
+    assert tool.message_problems(message, "fr-FR"), form
+
+
+@pytest.mark.parametrize(
+    ("source", "form"),
+    [
+        ("Written by <bdi>Ana</bdi>", "Écrit par <bdi>Ana</bdi>"),
+        (
+            'Under <a href="{url}" class="underline">Settings</a>',
+            'Sous <a href="{url}" class="underline">Réglages</a>',
+        ),
+        ("Press <kbd>d</kbd>", "Appuyez sur <kbd>d</kbd>"),
+        ("Written by someone", "Écrit par quelqu'un"),
+        ("1 < 2", "1 < 2"),
+    ],
+)
+def test_the_markup_the_english_carries_may_be_kept(tool, source, form):
+    assert not tool.message_problems(tool.Message(msgid=source, msgstr=[form]), "fr-FR")
+
+
+def test_a_draft_with_markup_is_left_out_of_the_file_and_a_reviewed_one_fails_check(tool, tmp_path):
+    """Drafts are compiled, but not one that adds markup; a reviewed one is a failure."""
+    header = {
+        "Content-Type": "text/plain; charset=UTF-8",
+        "Plural-Forms": "nplurals=2; plural=(n > 1);",
+    }
+    draft = tool.Message(msgid="Written by someone", msgstr=["<script>x</script>"], flags=["fuzzy"])
+    catalogue = tool.Catalogue(header=header, messages={(None, "Written by someone"): draft})
+    compiled = tool.compile_catalogue(catalogue, "fr-FR")
+    translations = gettext.GNUTranslations(io.BytesIO(compiled))
+    assert translations.gettext("Written by someone") == "Written by someone"
+
+    reviewed = tool.Message(msgid="Written by someone", msgstr=["<script>x</script>"])
+    assert tool.problems_in(
+        tool.Catalogue(header=header, messages={(None, "Written by someone"): reviewed}), "fr-FR"
+    )

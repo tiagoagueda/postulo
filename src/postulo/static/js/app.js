@@ -7974,8 +7974,12 @@
               if (here) {
                 here.setLatLng(point);
               } else {
+                // An element, not the string: Leaflet writes a string with innerHTML, and this
+                // one is a translation, which is text and never markup (#983).
+                var hereWords = document.createElement("span");
+                hereWords.textContent = canvas.getAttribute("data-map-here") || "";
                 here = L.circleMarker(point, { className: "map-here", radius: 7 })
-                  .bindTooltip(canvas.getAttribute("data-map-here") || "")
+                  .bindTooltip(hereWords)
                   .addTo(map);
               }
               map.setView(point, Math.max(map.getZoom(), 11));
