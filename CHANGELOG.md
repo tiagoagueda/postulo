@@ -8,6 +8,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🔒 Security
 
+- seed_demo takes the new account's password from POSTULO_SEED_PASSWORD or a prompt (--password), never from the command line. (#980)
 - Postulo's own JSON log scrubs the same one-time secrets as the access log: password-reset and email-confirmation keys too, from one list. (#979)
 - /healthz tells a request a trusted proxy passed on by any forwarding header (not only X-Forwarded-For) from the container's own probe, so it is held to the host list and is not told the version. (#977)
 - A request id sent by a trusted proxy is kept when the proxy also sent X-Forwarded-For, judged by the proxy that delivered the request and not by the client address it named. (#976)
