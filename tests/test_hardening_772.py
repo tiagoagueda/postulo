@@ -93,7 +93,7 @@ def test_an_authentic_archive_restores_with_its_plugins(tmp_path, settings):
     report = restore_backup(archive)
 
     assert report.authenticity == AUTHENTIC
-    assert report.plugin_files == 2 and report.plugins_withheld == 0
+    assert report.plugin_files == 2
 
 
 @pytest.mark.parametrize("member", ["plugins/postulo_imap/__init__.py", "media/documents/cv.pdf"])
@@ -135,9 +135,10 @@ def test_an_archive_written_under_another_key_is_refused_without_the_flag(tmp_pa
         restore_backup(archive)
 
 
-def test_an_archive_from_before_signing_is_restored_without_its_plugins_directory(
+def test_an_archive_from_before_signing_needs_the_flag_and_then_brings_its_plugins(
     tmp_path, settings
 ):
+    """It cannot be told from one whose signature was removed, so it is asked for (#974)."""
     archive = an_archive(tmp_path, settings)
 
     def unsigned(manifest):
@@ -151,12 +152,11 @@ def test_an_archive_from_before_signing_is_restored_without_its_plugins_director
     plugin = Path(settings.POSTULO_PLUGINS_DIR) / "postulo_imap" / "__init__.py"
     empty_the_data_directories(settings)
 
-    report = restore_backup(old)
+    with pytest.raises(BackupError, match="no signature"):
+        restore_backup(old)
+    assert not plugin.exists() and not User.objects.exists()
+
+    report = restore_backup(old, unverified=True)
 
     assert report.authenticity == UNSIGNED
-    assert report.plugins_withheld == 2 and report.plugin_files == 0
-    assert not plugin.exists(), "code that runs at every start is not put back on trust"
-    assert report.media_files == 1, "the rest is"
-
-    User.objects.all().delete()
-    assert restore_backup(old, force=True, unverified=True).plugin_files == 2
+    assert report.plugin_files == 2 and report.media_files == 1

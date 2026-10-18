@@ -45,8 +45,10 @@ from postulo.accounts.reauth import reauthentication_required
 
 from . import backups, errands, site
 from .backup import (
+    AUTHENTIC,
     BackupError,
     _newer_than_installed,
+    authenticity,
     database_vendor,
     read_manifest,
     verify_backup,
@@ -75,11 +77,11 @@ class BackupsMixin(ServerSectionMixin):
 def may_download(user) -> bool:
     """Whether this person may take a backup through the browser (#810), by the instance's rule."""
     rule = str(getattr(settings, "POSTULO_BACKUP_DOWNLOAD", "administrators")).strip().lower()
-    if rule == "console":
-        return False
+    if rule == "administrators":
+        return bool(getattr(user, "is_staff", False))
     if rule == "operator":
         return bool(getattr(user, "is_superuser", False))
-    return bool(getattr(user, "is_staff", False))
+    return False  # "console", and a word the instance does not know grants nobody (#978)
 
 
 def _archive(name: str):
@@ -308,10 +310,12 @@ class BackupRestoreView(BackupsMixin, View):
         path = _archive(name)
         ok, problem = backups.verify(path)
         manifest: dict = {}
+        verdict = ""
         if ok:
             try:
                 with tarfile.open(path, "r:gz") as opened:
                     manifest = read_manifest(opened)
+                    verdict, _signed = authenticity(opened, manifest)
             except (BackupError, tarfile.TarError, OSError) as error:
                 ok, problem = False, str(error)
         engine = (manifest.get("database") or {}).get("engine", "")
@@ -324,6 +328,9 @@ class BackupRestoreView(BackupsMixin, View):
                 "name": name,
                 "path": path,
                 "verified": ok,
+                "authenticity": verdict,
+                "authentic": verdict == AUTHENTIC,
+                "restore_flags": "--force" if verdict == AUTHENTIC else "--force --unverified",
                 "problem": problem,
                 "manifest": manifest,
                 "created": (manifest.get("postulo") or {}).get("created_at", ""),

@@ -255,6 +255,23 @@ def test_the_restore_page_verifies_and_writes_out_the_commands(client, admin):
     assert backups.archives()[0].checked == "ok"
 
 
+@pytest.mark.django_db(transaction=True)
+def test_the_restore_page_asks_for_the_flag_unless_the_archive_is_signed(client, admin, tmp_path):
+    """The commands it prints must work: an unsigned archive is refused without it (#974)."""
+    from postulo.core.backup import write_backup
+
+    unsigned = make_archive()
+    client.force_login(admin)
+    html = client.get(reverse("server:backup_restore", args=[unsigned.name])).content.decode()
+    assert 'data-restore="unsigned"' in html
+    assert "--force --unverified" in html
+
+    signed = write_backup(backups.directory() / "postulo-backup-20260102-030000.tar.gz").path
+    html = client.get(reverse("server:backup_restore", args=[signed.name])).content.decode()
+    assert 'data-restore="authentic"' in html
+    assert "--unverified" not in html and "--force" in html
+
+
 def test_the_restore_page_refuses_an_archive_that_does_not_verify(client, admin):
     path = make_archive(broken=True)
     client.force_login(admin)
