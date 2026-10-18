@@ -15,11 +15,15 @@ from postulo.plugins.api import declares, shipped
 #: administrator has recorded about it, so it is fixed the way a source's name is.
 REPOSITORIES = "repositories"
 
+#: The feature's name as a person reads it. Core quotes it when it says a setting is off
+#: (`core.web_links`), so it is translated once, here (#982).
+LABEL = _("Multiple code repositories")
+
 
 @declares(
     shipped(
         name=REPOSITORIES,
-        label=_("Multiple code repositories"),
+        label=LABEL,
         kind="feature",
         parent="multiple-fields",
         categories=("contacts",),

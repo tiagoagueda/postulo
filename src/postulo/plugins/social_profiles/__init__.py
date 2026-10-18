@@ -24,11 +24,15 @@ from postulo.plugins.api import declares, shipped
 #: administrator has recorded about it, so it is fixed the way a source's name is.
 SOCIAL_PROFILES = "social-profiles"
 
+#: The feature's name as a person reads it. Core quotes it when it says a setting is off
+#: (`core.web_links`), so it is translated once, here (#982).
+LABEL = _("Multiple social profiles")
+
 
 @declares(
     shipped(
         name=SOCIAL_PROFILES,
-        label=_("Multiple social profiles"),
+        label=LABEL,
         kind="feature",
         parent="multiple-fields",
         categories=("contacts",),

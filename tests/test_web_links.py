@@ -866,3 +866,62 @@ def test_save_only_link_refuses_an_address_that_is_not_web(contact, user, addres
 def test_save_only_link_still_saves_a_web_address(contact, user):
     saved = web_links.save_only_link(contact, user, WebLink.Kind.WEBSITE, " https://alex.test/me ")
     assert saved.url == "https://alex.test/me"
+
+
+# ------------------------------------------------ a translation is text, not markup (#982)
+
+
+@pytest.fixture
+def hostile(monkeypatch):
+    """Every kept-back sentence as a translator with bad intentions might have written it."""
+    from dataclasses import replace
+
+    bad = "<script>alert(1)</script><b>bold</b> {setting} <a href='//evil.example'>x</a>"
+    monkeypatch.setattr(
+        web_links,
+        "BLOCKS",
+        tuple(replace(b, kept_back=bad, kept_back_contact=bad) for b in web_links.BLOCKS),
+    )
+    monkeypatch.setattr(
+        web_links,
+        "COMPANY_BLOCKS",
+        tuple(replace(b, kept_back_contact=bad) for b in web_links.COMPANY_BLOCKS),
+    )
+
+
+def test_the_kept_back_sentence_names_the_setting_in_italics_and_nothing_else(
+    client, user, contact
+):
+    add(contact, user, "https://github.com/cave", kind=REPOSITORY, primary=True)
+    add(contact, user, "https://codeberg.org/cave", kind=REPOSITORY)
+    switch_off(user)
+    client.force_login(user)
+
+    html = client.get(reverse("jobs:contact_update", args=[contact.pk])).content.decode()
+    assert "<em>Multiple code repositories</em> is switched off" in html
+    assert "&lt;em&gt;" not in html, "the markup is not shown as text"
+
+
+def test_markup_in_a_translated_kept_back_sentence_is_shown_as_text_on_every_page(
+    client, user, contact, hostile
+):
+    company = contact.company
+    add(contact, user, "https://github.com/cave", kind=REPOSITORY, primary=True)
+    add(contact, user, "https://codeberg.org/cave", kind=REPOSITORY)
+    add(company, user, "https://www.linkedin.com/company/a", kind=SOCIAL, primary=True)
+    add(company, user, "https://mastodon.example/@a", kind=SOCIAL)
+    add(user.profile, user, "https://www.linkedin.com/in/me", kind=SOCIAL, primary=True)
+    add(user.profile, user, "https://mastodon.example/@me", kind=SOCIAL)
+    switch_off(user)
+    client.force_login(user)
+
+    for name, args in (
+        ("jobs:contact_update", [contact.pk]),
+        ("jobs:company_update", [company.pk]),
+        ("accounts:profile", []),
+    ):
+        html = client.get(reverse(name, args=args)).content.decode()
+        assert "&lt;script&gt;alert(1)&lt;/script&gt;" in html, name
+        assert "<script>alert(1)" not in html and "<b>bold</b>" not in html, name
+        assert "<a href='//evil.example'>" not in html, name
+        assert "<em>" in html, f"{name}: the setting's name keeps its emphasis"

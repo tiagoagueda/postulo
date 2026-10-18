@@ -8,6 +8,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🔒 Security
 
+- The company edit page no longer prints a translated sentence as markup: the kept-back notice on the company, contact and profile pages is composed in Python with the setting's name in italics, and a lint allows |safe in two templates only. (#982)
 - seed_demo takes the new account's password from POSTULO_SEED_PASSWORD or a prompt (--password), never from the command line. (#980)
 - Postulo's own JSON log scrubs the same one-time secrets as the access log: password-reset and email-confirmation keys too, from one list. (#979)
 - /healthz tells a request a trusted proxy passed on by any forwarding header (not only X-Forwarded-For) from the container's own probe, so it is held to the host list and is not told the version. (#977)
