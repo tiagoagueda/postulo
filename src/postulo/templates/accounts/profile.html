@@ -198,11 +198,11 @@
             on the CV.
           {% endblocktranslate %}
         </p>
-        <fieldset class="mb-4" aria-describedby="personal-details-help"{% if form.birth_year.errors %} data-invalid="true"{% endif %}>
+        <fieldset class="mb-4 min-w-0" aria-describedby="personal-details-help"{% if form.birth_year.errors %} data-invalid="true"{% endif %}>
           <legend class="label">{% translate "Date of birth" %}</legend>
-          <div class="flex flex-wrap items-start gap-x-4">
+          <div class="flex items-start gap-x-2 sm:gap-x-4">
             {% for box in form.birth_boxes %}
-              <div class="field mb-2 w-20"{% if box.errors %} data-invalid="true"{% endif %}>
+              <div class="field mb-2 w-20 min-w-0 shrink"{% if box.errors %} data-invalid="true"{% endif %}>
                 <label for="{{ box.id_for_label }}">{{ box.label }}</label>
                 {{ box }}
               </div>
@@ -211,22 +211,16 @@
                (#863): a birth date is known and typed faster than it is picked, and a picker
                cannot say a year alone, which the record allows. The button is hidden until
                `app.js` runs, because without it the picker would fill nothing; the boxes are
-               the whole form. The picker is the browser's own date input in a popover,
-               chosen with the calendar's (#858) so no library is vendored for either. {% endcomment %}
-            <div class="field mb-2 self-end">
+               the whole form. The row never wraps (#928): the button stays level with the
+               boxes down to 320px, so the boxes give way before it does. {% endcomment %}
+            <div class="field mb-2 w-auto shrink-0 self-end">
               <button type="button" class="btn" data-variant="outline" data-size="icon" hidden
                       data-birth-picker popovertarget="birth-picker" aria-haspopup="dialog"
                       aria-label="{% translate 'Choose the date of birth from a calendar' %}"
                       title="{% translate 'Choose the date of birth from a calendar' %}">{% icon "calendar-days" %}</button>
             </div>
           </div>
-          <div id="birth-picker" popover data-popover data-align="start" class="w-72">
-            <div class="field p-4">
-              <label for="birth-picker-input">{% translate "Pick a day" %}</label>
-              <input type="date" id="birth-picker-input" class="input" min="1900-01-01" max="{% now 'Y-m-d' %}" data-birth-picker-input>
-              <p class="mt-2 text-sm text-ink-500 dark:text-ink-400">{% translate "It fills the day, month and year boxes. To give a year alone, type it in the box." %}</p>
-            </div>
-          </div>
+          <c-date-picker id="birth-picker" label="{% translate 'Date of birth' %}">{% translate "It fills the day, month and year boxes. To give a year alone, type it in the box." %}</c-date-picker>
           <c-field-feedback :field="form.birth_year" />
         </fieldset>
         <div class="flex flex-wrap items-start gap-x-4">
@@ -255,7 +249,7 @@
         {% comment %} A menu for each nationality held and one empty: saving draws the next
            one (#680). Each is a native select, which is what there is with scripts off. What
            is said only as a scope is the next field, and is used while none is listed. {% endcomment %}
-        <fieldset class="mb-4" aria-describedby="personal-details-help">
+        <fieldset class="mb-4 min-w-0" aria-describedby="personal-details-help">
           <legend class="label">{% translate "Nationalities" %}</legend>
           <div class="flex flex-wrap items-start gap-x-4">
             {% for menu in form.nationality_menus %}

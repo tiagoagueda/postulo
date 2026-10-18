@@ -7307,6 +7307,278 @@
 
   onContentReady(readyButtonTooltips);
 
+  /* ------------------------------------------------- the calendar of Postulo's own (#928)
+   *
+   * `<c-date-picker>` draws a popover with a month select, a year select and an empty grid;
+   * this draws the days. The ARIA date-picker dialog pattern: the grid is one tab stop and
+   * the arrow keys move by a day and by a week, Page Up and Page Down by a month (with Shift,
+   * a year), Home and End to the first and last day of the week, Enter or Space chooses, and
+   * Escape closes the popover, which the browser gives back to its button. Today is
+   * `aria-current="date"`, the chosen day `aria-pressed` and its cell `aria-selected`, and
+   * every day is named in full by the browser's own locale: no month or weekday is in a
+   * catalogue. A day before `data-min` or after today is disabled, and the keys stop at the
+   * edge. The chosen day leaves as a `date-picker-choose` event on the panel carrying
+   * "YYYY-MM-DD"; the opener may set `data-value` on the panel first, and the calendar opens
+   * on that day.
+   */
+  function readyDatePickers() {
+    Array.prototype.forEach.call(document.querySelectorAll("[data-date-picker]"), function (panel) {
+      if (panel.getAttribute("data-ready")) {
+        return;
+      }
+      panel.setAttribute("data-ready", "true");
+      var grid = panel.querySelector("[data-date-picker-grid]");
+      var monthSelect = panel.querySelector("[data-date-picker-month]");
+      var yearSelect = panel.querySelector("[data-date-picker-year]");
+      var previous = panel.querySelector("[data-date-picker-previous]");
+      var next = panel.querySelector("[data-date-picker-next]");
+      var status = panel.querySelector("[data-date-picker-status]");
+      if (!grid || !monthSelect || !yearSelect) {
+        return;
+      }
+      var lang = document.documentElement.getAttribute("lang") || undefined;
+      function formatter(options) {
+        try {
+          return new Intl.DateTimeFormat(lang, options);
+        } catch (error) {
+          return new Intl.DateTimeFormat(undefined, options);
+        }
+      }
+      var monthName = formatter({ month: "long" });
+      var weekdayName = formatter({ weekday: "long" });
+      var weekdayShort = formatter({ weekday: "short" });
+      var dayName = formatter({ dateStyle: "full" });
+      var monthYear = formatter({ month: "long", year: "numeric" });
+      var firstWeekday = 1; // Monday, as Date.getDay() counts; the locale may say otherwise.
+      try {
+        var locale = new Intl.Locale(lang || navigator.language);
+        var info = locale.getWeekInfo ? locale.getWeekInfo() : locale.weekInfo;
+        if (info && info.firstDay) {
+          firstWeekday = info.firstDay % 7;
+        }
+      } catch (error) {
+        firstWeekday = 1;
+      }
+
+      function pad(number, width) {
+        var text = String(number);
+        while (text.length < width) {
+          text = "0" + text;
+        }
+        return text;
+      }
+      // setFullYear, so that a year below 100 is itself and not 19xx.
+      function make(year, month, day) {
+        var date = new Date(2000, 0, 1);
+        date.setFullYear(year, month, day);
+        return date;
+      }
+      function iso(date) {
+        return pad(date.getFullYear(), 4) + "-" + pad(date.getMonth() + 1, 2) + "-" + pad(date.getDate(), 2);
+      }
+      function parse(text) {
+        var parts = /^(\d{4})-(\d{2})-(\d{2})$/.exec(text || "");
+        if (!parts) {
+          return null;
+        }
+        var date = make(+parts[1], +parts[2] - 1, +parts[3]);
+        return iso(date) === text ? date : null;
+      }
+      var now = new Date();
+      var today = make(now.getFullYear(), now.getMonth(), now.getDate());
+      var earliest = parse(panel.getAttribute("data-min")) || make(1900, 0, 1);
+      var chosen = null;
+      var focused = today;
+      var rtl = false;
+
+      function clamp(date) {
+        if (date < earliest) {
+          return earliest;
+        }
+        return date > today ? today : date;
+      }
+      function shift(date, days, months) {
+        if (months) {
+          var target = make(date.getFullYear(), date.getMonth() + months, 1);
+          var last = make(target.getFullYear(), target.getMonth() + 1, 0).getDate();
+          return clamp(make(target.getFullYear(), target.getMonth(), Math.min(date.getDate(), last)));
+        }
+        return clamp(make(date.getFullYear(), date.getMonth(), date.getDate() + days));
+      }
+
+      function buildSelects() {
+        monthSelect.textContent = "";
+        for (var month = 0; month < 12; month += 1) {
+          var option = document.createElement("option");
+          option.value = String(month);
+          option.textContent = monthName.format(make(2000, month, 1));
+          monthSelect.appendChild(option);
+        }
+        yearSelect.textContent = "";
+        for (var year = today.getFullYear(); year >= earliest.getFullYear(); year -= 1) {
+          var yearOption = document.createElement("option");
+          yearOption.value = String(year);
+          yearOption.textContent = String(year);
+          yearSelect.appendChild(yearOption);
+        }
+      }
+
+      function render(moveFocus) {
+        var year = focused.getFullYear();
+        var month = focused.getMonth();
+        monthSelect.value = String(month);
+        yearSelect.value = String(year);
+        grid.textContent = "";
+        var head = grid.createTHead().insertRow();
+        for (var column = 0; column < 7; column += 1) {
+          var weekday = make(2001, 0, 7 + ((firstWeekday + column) % 7)); // 7 Jan 2001 was a Sunday
+          var th = document.createElement("th");
+          th.scope = "col";
+          var abbreviation = document.createElement("abbr");
+          abbreviation.title = weekdayName.format(weekday);
+          abbreviation.textContent = weekdayShort.format(weekday);
+          th.appendChild(abbreviation);
+          head.appendChild(th);
+        }
+        var body = grid.createTBody();
+        var offset = (make(year, month, 1).getDay() - firstWeekday + 7) % 7;
+        var cursor = make(year, month, 1 - offset);
+        var row;
+        for (var cell = 0; cell < 42; cell += 1) {
+          if (cell % 7 === 0) {
+            if (cell >= 35 && cursor.getMonth() !== month) {
+              break;
+            }
+            row = body.insertRow();
+          }
+          var td = row.insertCell();
+          td.setAttribute("role", "gridcell");
+          if (cursor.getMonth() === month) {
+            var button = document.createElement("button");
+            button.type = "button";
+            button.textContent = String(cursor.getDate());
+            button.setAttribute("data-date", iso(cursor));
+            button.setAttribute("aria-label", dayName.format(cursor));
+            if (cursor.getTime() === today.getTime()) {
+              button.setAttribute("aria-current", "date");
+            }
+            if (chosen && cursor.getTime() === chosen.getTime()) {
+              td.setAttribute("aria-selected", "true");
+              button.setAttribute("aria-pressed", "true");
+            }
+            button.tabIndex = cursor.getTime() === focused.getTime() ? 0 : -1;
+            button.disabled = cursor < earliest || cursor > today;
+            td.appendChild(button);
+          }
+          cursor = make(cursor.getFullYear(), cursor.getMonth(), cursor.getDate() + 1);
+        }
+        if (status) {
+          status.textContent = monthYear.format(focused);
+        }
+        if (moveFocus) {
+          var target = grid.querySelector('button[tabindex="0"]');
+          if (target) {
+            target.focus();
+          }
+        }
+      }
+
+      function move(date, moveFocus) {
+        focused = clamp(date);
+        render(moveFocus);
+      }
+
+      grid.addEventListener("click", function (event) {
+        var button = event.target.closest ? event.target.closest("button[data-date]") : null;
+        if (!button || button.disabled) {
+          return;
+        }
+        chosen = parse(button.getAttribute("data-date"));
+        panel.dispatchEvent(new CustomEvent("date-picker-choose", { detail: { value: iso(chosen) } }));
+        if (panel.hidePopover) {
+          panel.hidePopover();
+        }
+      });
+
+      grid.addEventListener("keydown", function (event) {
+        if (!event.target.matches || !event.target.matches("button[data-date]") || event.altKey || event.ctrlKey || event.metaKey) {
+          return;
+        }
+        var column = (focused.getDay() - firstWeekday + 7) % 7;
+        var forward = rtl ? -1 : 1;
+        var target;
+        switch (event.key) {
+          case "ArrowLeft":
+            target = shift(focused, -forward, 0);
+            break;
+          case "ArrowRight":
+            target = shift(focused, forward, 0);
+            break;
+          case "ArrowUp":
+            target = shift(focused, -7, 0);
+            break;
+          case "ArrowDown":
+            target = shift(focused, 7, 0);
+            break;
+          case "Home":
+            target = shift(focused, -column, 0);
+            break;
+          case "End":
+            target = shift(focused, 6 - column, 0);
+            break;
+          case "PageUp":
+            target = shift(focused, 0, event.shiftKey ? -12 : -1);
+            break;
+          case "PageDown":
+            target = shift(focused, 0, event.shiftKey ? 12 : 1);
+            break;
+          default:
+            return;
+        }
+        event.preventDefault();
+        move(target, true);
+      });
+
+      monthSelect.addEventListener("change", function () {
+        move(make(focused.getFullYear(), +monthSelect.value, 1), false);
+      });
+      yearSelect.addEventListener("change", function () {
+        move(make(+yearSelect.value, focused.getMonth(), 1), false);
+      });
+      if (previous) {
+        previous.addEventListener("click", function () {
+          move(shift(focused, 0, -1), false);
+        });
+      }
+      if (next) {
+        next.addEventListener("click", function () {
+          move(shift(focused, 0, 1), false);
+        });
+      }
+
+      panel.addEventListener("beforetoggle", function (event) {
+        if (event.newState !== "open") {
+          return;
+        }
+        rtl = window.getComputedStyle(panel).direction === "rtl";
+        chosen = parse(panel.getAttribute("data-value"));
+        focused = chosen ? clamp(chosen) : today;
+        render(false);
+      });
+      panel.addEventListener("toggle", function (event) {
+        if (event.newState === "open") {
+          var target = grid.querySelector('button[tabindex="0"]');
+          if (target) {
+            target.focus();
+          }
+        }
+      });
+      buildSelects();
+    });
+  }
+
+  onContentReady(readyDatePickers);
+
   /* ------------------------------------------- the date of birth's calendar (#863)
    *
    * The day, month and year boxes are the form; this adds a calendar beside them. The button
@@ -7323,9 +7595,8 @@
       button.setAttribute("data-ready", "true");
       button.hidden = false;
       var fieldset = button.closest("fieldset");
-      var input = document.querySelector("[data-birth-picker-input]");
       var panel = document.getElementById(button.getAttribute("popovertarget"));
-      if (!fieldset || !input || !panel) {
+      if (!fieldset || !panel) {
         return;
       }
       function box(autocomplete) {
@@ -7341,21 +7612,19 @@
       button.addEventListener("click", function () {
         var day = box("bday-day"), month = box("bday-month"), year = box("bday-year");
         if (day && month && year && day.value && month.value && /^\d{4}$/.test(year.value.trim())) {
-          input.value = pad(year.value, 4) + "-" + pad(month.value, 2) + "-" + pad(day.value, 2);
+          panel.setAttribute("data-value", pad(year.value, 4) + "-" + pad(month.value, 2) + "-" + pad(day.value, 2));
+        } else {
+          panel.removeAttribute("data-value");
         }
       });
-      input.addEventListener("change", function () {
-        var parts = /^(\d{4})-(\d{2})-(\d{2})$/.exec(input.value);
+      panel.addEventListener("date-picker-choose", function (event) {
+        var parts = /^(\d{4})-(\d{2})-(\d{2})$/.exec(event.detail.value);
         if (!parts) {
           return;
         }
         box("bday-year").value = parts[1];
         box("bday-month").value = String(parseInt(parts[2], 10));
         box("bday-day").value = String(parseInt(parts[3], 10));
-        if (panel.hidePopover) {
-          panel.hidePopover();
-        }
-        box("bday-day").focus();
       });
     });
   }

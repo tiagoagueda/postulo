@@ -1,0 +1,31 @@
+{% load i18n postulo %}
+<c-vars id label min="1900-01-01" />
+{% comment %} A calendar of Postulo's own, in a popover (#928): a month and a year to choose and a grid
+   of days to press. `<c-date-picker id="birth-picker" label="…">the sentence that says what
+   it does</c-date-picker>`, opened by a `<button popovertarget="birth-picker">` the caller
+   writes and hides until `app.js` runs, because without it the popover draws an empty grid.
+
+   The component draws the frame and its four labels. `app.js` (`readyDatePicker`) draws the
+   days, from the browser's own locale, so the names of the months and weekdays are never in a
+   catalogue. It follows the ARIA date-picker dialog pattern, and hands the day chosen to
+   whoever asked, as a `date-picker-choose` event on the panel carrying `YYYY-MM-DD`; it opens
+   on the day in the panel's `data-value`, which the opener sets before the click opens it.
+   `data-min` is the earliest day, and today the latest.
+
+   The month and the year are native selects on purpose (see NATIVE_ON_PURPOSE in
+   tests/test_template_lint.py): a birth date is decades back and a list of years is typed
+   into, which Basecoat's own select does not take. {% endcomment %}
+<div id="{{ id }}" popover data-popover data-align="center" data-date-picker data-min="{{ min }}"
+     role="dialog" aria-label="{{ label }}">
+  <p data-date-picker-help>{{ slot }}</p>
+  <div data-date-picker-head>
+    <button type="button" class="btn" data-variant="ghost" data-size="icon-sm" data-date-picker-previous
+            aria-label="{% translate 'Previous month' %}">{% icon "chevron-left" %}</button>
+    <select data-native aria-label="{% translate 'Month' %}" data-date-picker-month></select>
+    <select data-native aria-label="{% translate 'Year' %}" data-date-picker-year></select>
+    <button type="button" class="btn" data-variant="ghost" data-size="icon-sm" data-date-picker-next
+            aria-label="{% translate 'Next month' %}">{% icon "chevron-right" %}</button>
+  </div>
+  <table role="grid" data-date-picker-grid></table>
+  <p class="sr-only" aria-live="polite" data-date-picker-status></p>
+</div>

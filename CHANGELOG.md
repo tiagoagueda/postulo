@@ -155,6 +155,7 @@ All notable changes to Postulo are recorded here. The format follows
 - An address is shown on the map by a pin beside its star and bin on Your details, which asks before it is turned on. (#923)
 - Clicking the fixed front of a username's address puts the cursor in the name. (#924)
 - Every service in the social-profile and code-repository selects has a one-colour brand mark, black on the light page and white on the dark one, from Simple Icons and, for LinkedIn, from Font Awesome Free (CC BY 4.0) (#926)
+- On Your details the date of birth's calendar button stays beside the day, month and year boxes on one line down to 320px, and its picker is Postulo's own calendar (month and year menus, a keyboard-driven grid of days, named by your browser's language) instead of the browser's date input. (#928)
 - The companies map puts its zoom and Near me buttons, with tooltips, above a compact footer line in the bottom-right corner, its heading without a card or count, the Table button top right and the list of places under the heading (#909)
 - The companies map draws its zoom and Near me buttons at the bottom of the start side, above the footer's line, and on the right on a right-to-left page (#907)
 - Companies are classified by sector, the NACE section, above their industries: the company form narrows by it, and the table, industries page, report and insights group by it; ESCO's NACE links order the suggestions (#897)

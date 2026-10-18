@@ -1245,3 +1245,74 @@
     min-inline-size: 2.75rem;
   }
 }
+
+/*
+ * The calendar of Postulo's own (#928), `<c-date-picker>`: a month and a year to choose above
+ * a grid of days to press. Basecoat 1.0.2 has no date picker, so it is painted here, from the
+ * palette, on its popover. Written on its data attributes, because Basecoat names no date picker and this file paints only
+ * Basecoat's classes (`tests/test_stylesheet.py`). Unlayered, like the popover rules in `app.css` it must beat, which
+ * give a panel no inline padding. Every day is a button 2.25rem square, well past the 24
+ * pixels of WCAG 2.5.8, and the whole panel is at most 19rem so that it fits a phone 320 wide.
+ */
+[data-date-picker][data-popover][popover] {
+  inline-size: min(19rem, calc(100vw - 1rem));
+  padding: calc(var(--spacing) * 3);
+}
+
+[data-date-picker-help] {
+  @apply mb-3 text-sm text-ink-500 dark:text-ink-400;
+}
+
+[data-date-picker-head] {
+  @apply mb-2 flex items-center gap-1;
+}
+
+[data-date-picker-head] select {
+  @apply min-w-0 flex-1;
+}
+
+[data-date-picker-head] select:last-of-type {
+  flex: 0 0 5rem;
+}
+
+[dir="rtl"] [data-date-picker-head] > .btn svg {
+  transform: scaleX(-1);
+}
+
+[data-date-picker-grid] {
+  @apply w-full border-collapse text-center text-sm;
+  table-layout: fixed;
+}
+
+[data-date-picker-grid] th {
+  @apply pb-1 text-xs font-medium text-ink-500 dark:text-ink-400;
+}
+
+[data-date-picker-grid] abbr {
+  text-decoration: none;
+}
+
+[data-date-picker-grid] td {
+  @apply p-0;
+}
+
+[data-date-picker-grid] td > button {
+  @apply mx-auto flex size-9 cursor-pointer items-center justify-center rounded-md text-ink-900
+    hover:bg-accent hover:text-accent-foreground dark:text-ink-100;
+}
+
+[data-date-picker-grid] td > button:focus-visible {
+  @apply outline-solid outline-2 outline-offset-1 outline-ring;
+}
+
+[data-date-picker-grid] td > button[aria-current="date"] {
+  @apply font-semibold ring-1 ring-inset ring-ink-500 dark:ring-ink-400;
+}
+
+[data-date-picker-grid] td > button[aria-pressed="true"] {
+  @apply bg-primary text-primary-foreground hover:bg-brand-700;
+}
+
+[data-date-picker-grid] td > button:disabled {
+  @apply cursor-not-allowed opacity-50;
+}

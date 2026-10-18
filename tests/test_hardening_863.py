@@ -20,7 +20,10 @@ def test_the_boxes_are_still_there_and_the_calendar_is_added_hidden_until_a_scri
     button = html[html.index("data-birth-picker") - 200 : html.index("data-birth-picker") + 400]
     assert " hidden" in button, "without a script it would fill nothing"
     assert 'popovertarget="birth-picker"' in button
-    assert 'type="date"' in html and 'max="' in html and 'min="1900-01-01"' in html
+    # The picker is Postulo's own calendar (#928), not the browser's date input.
+    assert 'type="date"' not in html
+    assert 'id="birth-picker"' in html and "data-date-picker" in html
+    assert 'data-min="1900-01-01"' in html
 
 
 def test_the_script_fills_the_boxes_from_the_picker():
@@ -29,3 +32,4 @@ def test_the_script_fills_the_boxes_from_the_picker():
     js = Path("src/postulo/static/js/app.js").read_text(encoding="utf-8")
 
     assert "readyBirthPicker" in js and 'box("bday-year").value = parts[1]' in js
+    assert "date-picker-choose" in js and "readyDatePickers" in js
