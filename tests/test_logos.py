@@ -309,6 +309,24 @@ def test_a_site_with_nothing_usable_says_so(web, company, monkeypatch):
         logos.find_on_website(company)
 
 
+def test_a_deeply_nested_json_ld_block_is_skipped_not_a_crash(web, company, monkeypatch):
+    """A page's JSON-LD nested thousands deep must end in the sentence, not a traceback (#959)."""
+    deep = "[" * 200_000 + "]" * 200_000
+    monkeypatch.setattr(
+        logos.fetching,
+        "fetch_page",
+        lambda url: logos.fetching.FetchedPage(
+            url="https://blackmesa.test/",
+            html=a_page(ld=f'<script type="application/ld+json">{deep}</script>').decode(),
+        ),
+    )
+    with pytest.raises(logos.UnusableLogo, match=r"Nothing on blackmesa\.test"):
+        logos.find_on_website(company)
+    # A document nested as deep as the parser allows is walked without recursing.
+    shallow = "[" * 900 + '{"@type":"Organization","logo":"https://x.test/l.png"}' + "]" * 900
+    assert logos._organisation_logos([shallow]) == ["https://x.test/l.png"]
+
+
 def test_a_site_that_blocks_the_icon_says_why(web, company, monkeypatch):
     monkeypatch.setattr(
         logos.fetching,

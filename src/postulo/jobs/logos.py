@@ -362,7 +362,7 @@ def _organisation_logos(blocks: list[str]) -> list[str]:
     for block in blocks:
         try:
             payload = json.loads(block)
-        except ValueError:
+        except (ValueError, RecursionError):  # RecursionError: nested thousands deep (#959)
             continue
         for node in _walk(payload):
             if not isinstance(node, dict):
@@ -380,13 +380,15 @@ def _organisation_logos(blocks: list[str]) -> list[str]:
 
 
 def _walk(node):
-    yield node
-    if isinstance(node, dict):
-        for value in node.values():
-            yield from _walk(value)
-    elif isinstance(node, list):
-        for value in node:
-            yield from _walk(value)
+    """Every node of a parsed document, without recursing: depth is the page's to choose (#959)."""
+    pending = [node]
+    while pending:
+        current = pending.pop()
+        yield current
+        if isinstance(current, dict):
+            pending.extend(current.values())
+        elif isinstance(current, list):
+            pending.extend(current)
 
 
 def find_on_website(company) -> str:

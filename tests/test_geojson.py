@@ -153,6 +153,18 @@ def test_a_file_that_is_not_a_collection_is_refused(body):
         geojson.read(body)
 
 
+def test_a_deeply_nested_document_is_refused_not_a_server_error(client, user):
+    """A JSON array nested thousands deep ends in RecursionError, not a ValueError (#959)."""
+    nested = b"[" * 200_000 + b"]" * 200_000
+    with pytest.raises(geojson.GeoJsonRefused, match="not GeoJSON"):
+        geojson.read(nested)
+    client.force_login(user)
+    body = SimpleUploadedFile("places.geojson", nested, content_type="application/geo+json")
+    response = client.post(reverse("jobs:company_places"), {"file": body}, follow=True)
+    assert response.status_code == 200
+    assert "That file is not GeoJSON." in response.content.decode()
+
+
 def test_points_off_the_globe_or_without_a_name_are_left_out():
     points = geojson.read(
         json.dumps(
