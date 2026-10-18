@@ -321,7 +321,7 @@
       {% include "partials/postal_addresses.html" with remove_at_once=True card_help=True tips=tips refused=refused %}
 
       <fieldset class="card mb-6" data-identifiers id="section-identifiers">
-        <legend class="label px-1">{% translate "Identifiers" %}</legend>
+        <legend class="legend-title">{% translate "Identifiers" %}</legend>
         <c-help-mark topic="identifiers" anchor="section-identifiers" :in_sight="refused" />
         {% comment %} What may be typed stays in sight (#302): it is an instruction, and
            the rest of what this paragraph used to say is the card's help. Which registers'
@@ -338,7 +338,7 @@
         {% endif %}
         <ol class="space-y-3">
           {% for row in identifiers %}
-            {% if row.already_gone or row.DELETE.value %}{% include "partials/removed_row.html" %}{% else %}<c-identifier-row :row="row" remove_at_once :tip="tips" />{% endif %}
+            {% if row.already_gone or row.DELETE.value %}{% include "partials/removed_row.html" %}{% else %}<c-identifier-row :row="row" remove_at_once :tip="tips" primary_name="identifiers-primary" />{% endif %}
           {% endfor %}
         </ol>
         {% include "partials/removed_said.html" %}
@@ -368,6 +368,18 @@
        carries the sentence for a row that turns out to have gone already -- this copy
        of the page being out of date -- which `app.js` says when the address answers
        that there is no such row. {% endcomment %}
+    {% comment %} The one question the map pins ask before one is turned on (#923): `app.js` opens
+       it when a pin is ticked and ticks it when *Show on the map* is pressed. Cancel and Escape
+       leave it off. With scripts off the pin is a tick box and nothing asks. {% endcomment %}
+    {% if addresses %}
+      <c-dialog id="map-confirm" data-map-confirm-dialog>
+        <c-slot name="title">{% translate "Show this address on the map?" %}</c-slot>
+        <c-slot name="description">{% translate "A pin for it is drawn on your map, at its postcode or town, and only you can see it." %}</c-slot>
+        <c-slot name="footer">
+          <button type="button" class="btn" data-map-confirm>{% translate "Show on the map" %}</button>
+        </c-slot>
+      </c-dialog>
+    {% endif %}
     {% for removal in removals %}
       <c-dialog id="{{ removal.dialog }}" action="{{ removal.action }}" live data-remove-row data-gone-said="{{ removal.already_gone }}">
         <c-slot name="title">{% blocktranslate trimmed with what=removal.value %}Remove <bdi>{{ what }}</bdi>?{% endblocktranslate %}</c-slot>

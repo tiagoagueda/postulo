@@ -23,8 +23,8 @@
    line of what it follows.
 {% endcomment %}
 {% for block in links %}
-  <fieldset class="card mb-6" data-web-links="{{ block.kind }}" id="section-links-{{ block.kind }}">
-    <legend class="label px-1">{{ block.block.legend }}</legend>{% if card_help %}
+  <fieldset class="card mb-6" data-web-links="{{ block.kind }}"{% if block.kind == "social" %} data-one-per-service{% endif %} id="section-links-{{ block.kind }}">
+    <legend class="legend-title">{{ block.block.legend }}</legend>{% if card_help %}
     <c-help-mark topic="links" :subject="block.block.legend" :summary="block.block.intro" anchor="section-links-{{ block.kind }}" no_drawer :in_sight="refused" />
     <p class="mb-3 text-sm text-ink-500 dark:text-ink-400" data-links-how>
       {% if block.has_services %}
@@ -120,6 +120,9 @@
             </div>
           </div>
           <div class="field">
+            {% if row.shares_its_service %}
+              <p class="text-xs text-amber-700 dark:text-amber-300" data-shares-service>{% translate "Another row is on the same service. Both stay as they are; remove one, or move it to Other, when you like." %}</p>
+            {% endif %}
             {% if row.kept_as_written %}
               <p class="text-xs text-ink-500 dark:text-ink-400" data-kept-as-written>{% translate "This address is kept as written. To change it to the short form, type the name alone in the box." %}</p>
             {% endif %}

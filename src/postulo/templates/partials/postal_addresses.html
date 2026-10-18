@@ -33,7 +33,7 @@
    the line of what it follows, so that without them the rows are drawn as before #302.
 {% endcomment %}
 <fieldset class="card mb-6 min-w-0" data-postal-addresses id="section-addresses">
-  <legend class="label px-1">{% translate "Postal addresses" %}</legend>{% help_topic "postal-addresses" as about %}{% if card_help %}
+  <legend class="legend-title">{% translate "Postal addresses" %}</legend>{% help_topic "postal-addresses" as about %}{% if card_help %}
   <c-help-mark :topic="about.slug" anchor="section-addresses" :in_sight="refused" />{% else %}
   <p class="mb-3 text-sm text-ink-500 dark:text-ink-400">
     {{ about.summary }}
@@ -90,6 +90,7 @@
           </div>
           <div class="flex flex-none items-center gap-x-3 pt-6 text-sm" data-row-actions>
             {% if remove_at_once %}
+              {% if row.on_map %}<c-map-toggle :field="row.on_map" />{% endif %}
               <c-primary-choice name="{{ addresses.prefix }}-primary" value="{{ row.prefix }}" :checked="row.instance.is_primary" />
               {% if row.removal %}<c-remove-button :removal="row.removal" />{% endif %}
             {% else %}
@@ -154,8 +155,10 @@
         {% endfor %}
         {% comment %} The map (#702): whether a contact's or your own address is drawn, which is
            off until asked, and where a saved one sits -- at its postcode, its town, or where
-           somebody put it by hand -- with the page that places it by hand. {% endcomment %}
-        {% if row.on_map %}
+           somebody put it by hand -- with the page that places it by hand. On *Your details* the
+           switch is the pin beside the star and the bin (#923), and asks before it is turned on;
+           the contact's form keeps its tick box and the sentence under it. {% endcomment %}
+        {% if row.on_map and not remove_at_once %}
           <label class="mb-1 inline-flex items-center gap-2 py-1 text-sm">
             {{ row.on_map|add_class:"input" }} <span>{{ row.on_map.label }}</span>
           </label>

@@ -1242,6 +1242,11 @@ msgstr "%(scheme)s: ez nem a szokásos forma."
 msgid "%(sent)s, %(failed)s; each document says which."
 msgstr "%(sent)s, %(failed)s; minden dokumentum megmondja, melyik."
 
+#: src/postulo/core/web_links.py
+#, python-format
+msgid "%(service)s is already used by another row."
+msgstr ""
+
 #: src/postulo/core/templatetags/postulo.py
 #, python-format
 msgid "%(share)s%%"
@@ -2167,6 +2172,10 @@ msgstr "A feltöltött képnek %(formats)s formátumúnak kell lennie, legfeljeb
 msgid "A picture you uploaded is shown rather than your Gravatar, and your Gravatar rather than your initials. <em>Remove the uploaded picture</em> is offered once there is one: tick it and save, and the file is deleted."
 msgstr "A feltöltött kép a Gravatar helyett jelenik meg, a Gravatar pedig a monogramja helyett. A <em>Feltöltött kép eltávolítása</em> lehetőség akkor jelenik meg, ha van feltöltött kép: jelölje be és mentsen, és a fájl törlődik."
 
+#: src/postulo/templates/accounts/profile.html
+msgid "A pin for it is drawn on your map, at its postcode or town, and only you can see it."
+msgstr ""
+
 #: src/postulo/templates/partials/postal_addresses.html
 msgid "A place rather than a whole address, and kept as it is. For post to reach it:"
 msgstr "Egy hely, nem egy teljes cím, és úgy őrizzük meg, ahogy van. Hogy a posta megérkezzen:"
@@ -2367,6 +2376,10 @@ msgstr "Egy kis billentyűfelirat a Mentés és tovább, az Elvetés és tovább
 #: src/postulo/templates/server/design.html
 msgid "A small one"
 msgstr "Egy kicsi"
+
+#: src/postulo/templates/help/links.html
+msgid "A social profile is one to a service: a service another row already uses is greyed out in the menu and cannot be chosen again, and saving refuses a second one. A service that lives on many servers, such as Mastodon, and <em>Other</em> can be used as often as you like, and so can the cards of code repositories. Rows that already shared a service stay as they are, with a note, until you change them."
+msgstr ""
 
 #: src/postulo/templates/applications/application_form.html
 msgid "A status changed here is recorded on the timeline, the same as anywhere else."
@@ -2920,6 +2933,10 @@ msgstr "Már elküldve —"
 msgid "Already there: you have this one, so it is not added again."
 msgstr "Már megvan: ez már szerepel Önnél, ezért nem kerül be újra."
 
+#: src/postulo/core/web_links.py
+msgid "Already used by another row"
+msgstr ""
+
 #: src/postulo/templates/accounts/profile.html
 msgid "Also happens by itself when your primary address changes."
 msgstr "Magától is megtörténik, amikor az elsődleges címe megváltozik."
@@ -3147,6 +3164,10 @@ msgstr "Újabb meghívó"
 #: src/postulo/api/idempotency.py
 msgid "Another request is using this Idempotency-Key; try again in a moment."
 msgstr "Egy másik kérés éppen ezt az Idempotency-Key kulcsot használja; próbálja újra egy pillanat múlva."
+
+#: src/postulo/templates/partials/web_links.html
+msgid "Another row is on the same service. Both stay as they are; remove one, or move it to Other, when you like."
+msgstr ""
 
 #: src/postulo/api/models.py
 msgid "answer"
@@ -12259,6 +12280,10 @@ msgstr "Előző hét"
 msgid "Previous, This month and Next. With chevrons only, the words are still the buttons' names for a screen reader."
 msgstr "Előző, Ez a hónap és Következő. Csak nyilakkal a szövegek továbbra is a gombok nevei a képernyőolvasó számára."
 
+#: src/postulo/accounts/models.py src/postulo/core/models.py
+msgid "primary"
+msgstr "elsődleges"
+
 #: src/postulo/core/design.py src/postulo/templates/cotton/primary_choice.html
 #: src/postulo/templates/jobs/company_map.html
 #: src/postulo/templates/partials/messaging_handles.html
@@ -12269,10 +12294,6 @@ msgstr "Előző, Ez a hónap és Következő. Csak nyilakkal a szövegek tovább
 #: src/postulo/templates/settings/account.html
 msgid "Primary"
 msgstr "Elsődleges"
-
-#: src/postulo/core/models.py
-msgid "primary"
-msgstr "elsődleges"
 
 #: src/postulo/documents/models.py
 msgid "print the EQF level of my qualifications"
@@ -14035,6 +14056,10 @@ msgstr "billentyűk megjelenítése"
 msgid "show on the map"
 msgstr "megjelenítés a térképen"
 
+#: src/postulo/templates/accounts/profile.html
+msgid "Show on the map"
+msgstr ""
+
 #: src/postulo/templates/applications/interview_list.html
 msgid "Show past too"
 msgstr "A múltbeliek is"
@@ -14066,6 +14091,10 @@ msgstr "Sorszám megjelenítése minden pályafutás-bejegyzésen"
 #: src/postulo/templates/settings/plugins.html
 msgid "Show the plugins Postulo ships"
 msgstr "A Postulóval érkező bővítmények megjelenítése"
+
+#: src/postulo/templates/accounts/profile.html
+msgid "Show this address on the map?"
+msgstr ""
 
 #: src/postulo/templates/applications/report.html
 msgid "Show this period"
@@ -16669,6 +16698,10 @@ msgstr "Az egyes jelentkezések által elért fázis az elutasításkor, a vissz
 #: src/postulo/templates/widgets/endings.html
 msgid "The stage is read from each timeline: where the application stood when it ended."
 msgstr "A fázist az egyes idővonalakból olvassuk ki: hol tartott a jelentkezés, amikor lezárult."
+
+#: src/postulo/templates/help/identifiers.html
+msgid "The star at the start of a row marks your primary identifier. A CV prints it first, and alone where its template has room for only one. Removing it hands the star to the next row."
+msgstr ""
 
 #: src/postulo/applications/forms.py
 msgid "The start date they proposed, if one was."
@@ -19546,7 +19579,7 @@ msgstr "A kapcsolattartói egy címjegyzékek által olvasható .vcf-fájlban, v
 msgid "Your CV header shows a town and a country and never a street, whatever is here."
 msgstr "Az önéletrajza fejléce települést és országot mutat, sosem utcát, bármi is áll itt."
 
-#: src/postulo/templates/accounts/profile.html
+#: src/postulo/accounts/views.py src/postulo/templates/accounts/profile.html
 msgid "Your CV photo"
 msgstr "Az önéletrajzfotója"
 

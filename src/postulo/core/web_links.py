@@ -22,6 +22,7 @@ as it is stored, so nothing is refused in retrospect.
 from __future__ import annotations
 
 import unicodedata
+from collections.abc import Callable, Iterable
 from dataclasses import dataclass, replace
 
 from django import forms
@@ -43,6 +44,29 @@ Kind = WebLink.Kind
 
 #: What a row posts for *Other*, and what the stylesheet looks for to show the name box.
 OTHER = link_services.OTHER
+
+
+def one_row_per_service(kind: str, key: str) -> bool:
+    """Whether a holder's rows of this kind may not share this service (#925).
+
+    Social profiles are one to a service, as identifiers are one to a kind (#307): a second
+    LinkedIn row is a mistake, not a second account. Three things are left out on purpose.
+    *Other* repeats, being no service. A service that lives on hosts nobody can list
+    (``any_host``: Mastodon, somebody's Forgejo) repeats, because one person has an account
+    on each of several servers. And code repositories are not covered: a holder has a
+    repository for every project, so a service there is a place and not an account.
+    """
+    if kind != Kind.SOCIAL or not key or key == OTHER:
+        return False
+    service = link_services.find(key, kind)
+    return service is not None and not service.any_host
+
+
+def _removing(form) -> bool:
+    """Whether a row is on its way out of the block: gone already, or marked for removal."""
+    if getattr(form, "already_gone", False):
+        return True
+    return "DELETE" in form.fields and bool(form["DELETE"].value())
 
 
 @dataclass(frozen=True)
@@ -369,6 +393,8 @@ def checked_rows(rows) -> list[dict]:
     found: list[dict] = []
     # Once under each kind: one address may be a repository and a website both (#457).
     seen: set[tuple[str, str]] = set()
+    # Once to a service where the service is one to a holder (#925).
+    serviced: set[tuple[str, str]] = set()
     for row in rows:
         kind = str(row.get("kind") or "")
         url = str(row.get("url") or "").strip()
@@ -389,6 +415,13 @@ def checked_rows(rows) -> list[dict]:
             )
         except ValidationError as error:
             raise ValidationError(f"{url}: {error.messages[0]}", code=error.code) from error
+        if one_row_per_service(kind, service):
+            if (kind, service) in serviced:
+                taken = _("%(service)s is already used by another row.") % {
+                    "service": link_services.label_for(service, kind)
+                }
+                raise ValidationError(f"{url}: {taken}", code="service_taken")
+            serviced.add((kind, service))
         found.append(
             {
                 "kind": kind,
@@ -487,6 +520,20 @@ class ServiceSelect(OptionIcons, forms.Select):
         super().__init__(attrs, choices)
         #: The attributes each option carries, by the option's value. The form fills it.
         self.facts: dict[str, dict[str, str]] = {}
+        #: Asked when the select is drawn, for the services the block's other rows hold and
+        #: this one may not take (#925). A row on its own has no neighbours.
+        self.taken: Callable[[], Iterable[str]] = lambda: ()
+
+    def get_context(self, name, value, attrs):
+        context = super().get_context(name, value, attrs)
+        # Switched off, never the row's own service: a row keeps what it has, even beside a
+        # duplicate about to be refused, or it could not be posted back.
+        off = set(self.taken()) - set(context["widget"]["value"])
+        for _group, options, _index in context["widget"]["optgroups"]:
+            for option in options:
+                if option["value"] in off:
+                    option["attrs"]["disabled"] = True
+        return context
 
     def create_option(self, name, value, label, selected, index, subindex=None, attrs=None):
         option = super().create_option(name, value, label, selected, index, subindex, attrs)
@@ -670,6 +717,13 @@ class WebLinkForm(forms.ModelForm):
                     "data-hosts": " ".join(service.hosts),
                     # Only where there is one: the script shows it in front of the name.
                     **({"data-prefix": service.prefix} if service.prefix else {}),
+                    # Said beside an option that is switched off because another row holds
+                    # it (#925); only the services that are one to a holder have it.
+                    **(
+                        {"data-why": str(_("Already used by another row"))}
+                        if one_row_per_service(self.link_kind, key)
+                        else {}
+                    ),
                 }
                 for key, service in offered.items()
             },
@@ -703,6 +757,13 @@ class WebLinkForm(forms.ModelForm):
         """The prefix of the service the row is on, whether or not the box is showing it:
         what the script puts in front of the name when somebody chooses one."""
         return self.fields["url"].widget.prefix
+
+    @property
+    def shares_its_service(self) -> bool:
+        """Whether this saved row is on a service another saved row is on too (#925): kept as
+        it is, and flagged by the page."""
+        siblings = getattr(self, "siblings", None)
+        return siblings is not None and siblings.shares_a_service(self)
 
     @property
     def kept_as_written(self) -> bool:
@@ -827,6 +888,81 @@ class BaseWebLinkFormSet(RowsAlreadyGone, generic_forms.BaseGenericInlineFormSet
             if typed in seen or elsewhere:
                 form.add_error("url", _("This address is already listed."))
             seen.add(typed)
+        self._one_row_per_service()
+
+    def add_fields(self, form, index):
+        super().add_fields(form, index)
+        if "service" in form.fields:
+            form.fields["service"].widget.taken = lambda: self.held_services(besides=form)
+        form.siblings = self
+
+    def _service_of(self, form) -> str:
+        """The service a row is set to, as posted or as drawn; empty while none is chosen."""
+        return (form["service"].value() or "") if "service" in form.fields else ""
+
+    def held_services(self, besides=None) -> set[str]:
+        """The services the other rows of this block hold that a row may not also take."""
+        return {
+            key
+            for form in self.forms
+            if form is not besides and not _removing(form)
+            for key in [self._service_of(form)]
+            if one_row_per_service(self.kind, key)
+        }
+
+    def shares_a_service(self, form) -> bool:
+        """Whether a saved row is on a service another saved row is on as well: rows kept as
+        they were (#925), which the page flags so that the person can merge or remove one."""
+        if not form.instance.pk or _removing(form):
+            return False
+        key = form.initial.get("service") or ""
+        if not one_row_per_service(self.kind, key):
+            return False
+        return any(
+            other is not form
+            and other.instance.pk
+            and not _removing(other)
+            and other.initial.get("service") == key
+            for other in self.forms
+        )
+
+    def _one_row_per_service(self) -> None:
+        """Refuse a second row on a service that is one to a holder (#925).
+
+        A saved row keeps the service it was saved with, even beside another saved row on
+        it: nothing stored is refused in retrospect. A row that takes a service anew -- a
+        new row, or a saved one given another -- is refused when another row, staying, has
+        it; between rows taking it anew, the first keeps it.
+        """
+        rows = [
+            form
+            for form in self.forms
+            if form.is_valid() and not form.cleaned_data.get("DELETE") and not _removing(form)
+        ]
+
+        def keeps(form, key: str) -> bool:
+            return bool(form.instance.pk) and form.initial.get("service") == key
+
+        claimed: set[str] = set()
+        for form in rows:
+            key = form.cleaned_data.get("service") or ""
+            if one_row_per_service(self.kind, key) and keeps(form, key):
+                claimed.add(key)
+        for form in rows:
+            key = form.cleaned_data.get("service") or ""
+            if not one_row_per_service(self.kind, key) or keeps(form, key):
+                continue
+            if key in claimed:
+                form.add_error(
+                    "service" if "service" in form.fields else "url",
+                    ValidationError(
+                        _("%(service)s is already used by another row."),
+                        code="service_taken",
+                        params={"service": link_services.label_for(key, self.kind)},
+                    ),
+                )
+            else:
+                claimed.add(key)
 
     def save_new(self, form, commit=True):
         # What the row is and whose it is, set where the row is made, so that no page

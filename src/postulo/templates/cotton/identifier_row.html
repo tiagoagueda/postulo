@@ -1,5 +1,5 @@
 {% load i18n postulo %}
-<c-vars row remove_at_once="" tip="" />
+<c-vars row remove_at_once="" tip="" primary_name="" />
 {% comment %} One identifier: what kind, the value, and -- when the kind is Other -- a name
    for it. The same row on a company's form and on *Your details*, which used to be two
    byte-identical copies (#284).
@@ -7,6 +7,10 @@
    `remove_at_once` is *Your details* (#303): the row's *Remove* is a bin that asks in a
    dialog and takes the row off there and then. The company's form keeps the *Remove* box,
    and a ticked one goes when the form is saved.
+
+   `primary_name` is *Your details* as well (#922): the radios' shared name, which draws a
+   star first in the row, as the other blocks do (#303). A company's identifiers have no
+   primary.
 
    The name box is drawn only when it means something. The display side has always followed
    that rule (`scheme_label` uses the label only for Other); the form contradicted it with
@@ -45,7 +49,12 @@
       </div>
     {% endif %}
   {% endwith %}
-  <div class="name-if-other-row grid gap-3 sm:items-end"{% if row.label.value %} data-has-name{% endif %}>
+  <div class="name-if-other-row grid gap-3 sm:items-end"{% if row.label.value %} data-has-name{% endif %}{% if primary_name %} data-primary{% endif %}>
+    {% if primary_name %}
+      <div class="flex items-center pb-1" data-row-star>
+        <c-primary-choice :name="primary_name" value="{{ row.prefix }}" :checked="row.instance.is_primary" />
+      </div>
+    {% endif %}
     <div class="field">
       <label for="{{ row.scheme.id_for_label }}">{% translate "Type" %}</label>
       {{ row.scheme }}
@@ -59,7 +68,7 @@
       {{ row.label }}
     </div>
     {% if remove_at_once %}
-      {% if row.removal %}<span class="pb-1"><c-remove-button :removal="row.removal" /></span>{% else %}<span></span>{% endif %}
+      {% if row.removal %}<span class="flex items-center pb-1" data-row-bin><c-remove-button :removal="row.removal" /></span>{% else %}<span data-row-bin></span>{% endif %}
     {% elif row.instance.pk %}
       <label class="flex items-center gap-1.5 pb-2 text-sm">
         {{ row.DELETE|add_class:"input" }} <span>{% translate "Remove" %}</span>

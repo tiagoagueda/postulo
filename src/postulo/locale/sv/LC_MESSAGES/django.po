@@ -1242,6 +1242,11 @@ msgstr "%(scheme)s: det är inte den vanliga formen."
 msgid "%(sent)s, %(failed)s; each document says which."
 msgstr "%(sent)s, %(failed)s; varje dokument anger vilket."
 
+#: src/postulo/core/web_links.py
+#, python-format
+msgid "%(service)s is already used by another row."
+msgstr ""
+
 #: src/postulo/core/templatetags/postulo.py
 #, fuzzy, python-format
 msgid "%(share)s%%"
@@ -2314,6 +2319,10 @@ msgstr "En bild du laddar upp måste vara %(formats)s, högst %(megabytes)s MB o
 msgid "A picture you uploaded is shown rather than your Gravatar, and your Gravatar rather than your initials. <em>Remove the uploaded picture</em> is offered once there is one: tick it and save, and the file is deleted."
 msgstr "En bild du har laddat upp visas i stället för din Gravatar, och din Gravatar i stället för dina initialer. <em>Ta bort den uppladdade bilden</em> erbjuds när det finns en: kryssa i den och spara, så raderas filen."
 
+#: src/postulo/templates/accounts/profile.html
+msgid "A pin for it is drawn on your map, at its postcode or town, and only you can see it."
+msgstr ""
+
 #: src/postulo/templates/partials/postal_addresses.html
 #, fuzzy
 msgid "A place rather than a whole address, and kept as it is. For post to reach it:"
@@ -2557,6 +2566,10 @@ msgstr "Ett litet nyckeltak bredvid Spara och nästa, Discard och nästa, Hoppa 
 #, fuzzy
 msgid "A small one"
 msgstr "En liten"
+
+#: src/postulo/templates/help/links.html
+msgid "A social profile is one to a service: a service another row already uses is greyed out in the menu and cannot be chosen again, and saving refuses a second one. A service that lives on many servers, such as Mastodon, and <em>Other</em> can be used as often as you like, and so can the cards of code repositories. Rows that already shared a service stay as they are, with a note, until you change them."
+msgstr ""
 
 #: src/postulo/templates/applications/application_form.html
 #, fuzzy
@@ -3219,6 +3232,10 @@ msgstr "Redan skickat —"
 msgid "Already there: you have this one, so it is not added again."
 msgstr "Redan där: du har den här, så det läggs inte till igen."
 
+#: src/postulo/core/web_links.py
+msgid "Already used by another row"
+msgstr ""
+
 #: src/postulo/templates/accounts/profile.html
 #, fuzzy
 msgid "Also happens by itself when your primary address changes."
@@ -3490,6 +3507,10 @@ msgstr "En annan inbjudan"
 #, fuzzy
 msgid "Another request is using this Idempotency-Key; try again in a moment."
 msgstr "En annan förfrågan använder den här Idempotency-Key; försök igen om en stund."
+
+#: src/postulo/templates/partials/web_links.html
+msgid "Another row is on the same service. Both stay as they are; remove one, or move it to Other, when you like."
+msgstr ""
 
 #: src/postulo/api/models.py
 #, fuzzy
@@ -14434,6 +14455,11 @@ msgstr "Föregående vecka"
 msgid "Previous, This month and Next. With chevrons only, the words are still the buttons' names for a screen reader."
 msgstr "Föregående, Denna månad och nästa. Med chevrons är orden fortfarande knapparnas namn för en skärmläsare."
 
+#: src/postulo/accounts/models.py src/postulo/core/models.py
+#, fuzzy
+msgid "primary"
+msgstr "primärt"
+
 #: src/postulo/core/design.py src/postulo/templates/cotton/primary_choice.html
 #: src/postulo/templates/jobs/company_map.html
 #: src/postulo/templates/partials/messaging_handles.html
@@ -14445,11 +14471,6 @@ msgstr "Föregående, Denna månad och nästa. Med chevrons är orden fortfarand
 #, fuzzy
 msgid "Primary"
 msgstr "Primär"
-
-#: src/postulo/core/models.py
-#, fuzzy
-msgid "primary"
-msgstr "primärt"
 
 #: src/postulo/documents/models.py
 #, fuzzy
@@ -16539,6 +16560,10 @@ msgstr "visa viktiga tips"
 msgid "show on the map"
 msgstr "visa på kartan"
 
+#: src/postulo/templates/accounts/profile.html
+msgid "Show on the map"
+msgstr ""
+
 #: src/postulo/templates/applications/interview_list.html
 #, fuzzy
 msgid "Show past too"
@@ -16578,6 +16603,10 @@ msgstr "Visa ordningsnumret på varje karriärpost"
 #, fuzzy
 msgid "Show the plugins Postulo ships"
 msgstr "Visa de tillägg Postulo levererar"
+
+#: src/postulo/templates/accounts/profile.html
+msgid "Show this address on the map?"
+msgstr ""
 
 #: src/postulo/templates/applications/report.html
 #, fuzzy
@@ -19661,6 +19690,10 @@ msgstr "Steget varje ansökan hade nått när den avslogs, återkallades eller g
 #, fuzzy
 msgid "The stage is read from each timeline: where the application stood when it ended."
 msgstr "Steget läses från varje tidslinje: där ansökan stod när den avslutades."
+
+#: src/postulo/templates/help/identifiers.html
+msgid "The star at the start of a row marks your primary identifier. A CV prints it first, and alone where its template has room for only one. Removing it hands the star to the next row."
+msgstr ""
 
 #: src/postulo/applications/forms.py
 #, fuzzy
@@ -23127,7 +23160,7 @@ msgstr "Dina kontakter i en .vcf-fil en adressbok läser, och korten på en sät
 msgid "Your CV header shows a town and a country and never a street, whatever is here."
 msgstr "Ditt CV-huvud visar ort och land och aldrig en gata, vad som än står här."
 
-#: src/postulo/templates/accounts/profile.html
+#: src/postulo/accounts/views.py src/postulo/templates/accounts/profile.html
 #, fuzzy
 msgid "Your CV photo"
 msgstr "Ditt CV-foto"

@@ -1400,6 +1400,11 @@ msgstr "%(scheme)s: nid dyna'r ffurf arferol."
 msgid "%(sent)s, %(failed)s; each document says which."
 msgstr "%(sent)s, %(failed)s; mae pob dogfen yn dweud pa un."
 
+#: src/postulo/core/web_links.py
+#, python-format
+msgid "%(service)s is already used by another row."
+msgstr ""
+
 #: src/postulo/core/templatetags/postulo.py
 #, fuzzy, python-format
 msgid "%(share)s%%"
@@ -2502,6 +2507,10 @@ msgstr "Rhaid i lun rydych yn ei lwytho i fyny fod yn %(formats)s, heb fod yn fw
 msgid "A picture you uploaded is shown rather than your Gravatar, and your Gravatar rather than your initials. <em>Remove the uploaded picture</em> is offered once there is one: tick it and save, and the file is deleted."
 msgstr "Dangosir llun rydych wedi'i lwytho i fyny yn hytrach na'ch Gravatar, a'ch Gravatar yn hytrach na'ch blaenlythrennau. Cynigir <em>Tynnu'r llun a lwythwyd</em> unwaith y bydd un: ticiwch ef a chadwch, a chaiff y ffeil ei dileu."
 
+#: src/postulo/templates/accounts/profile.html
+msgid "A pin for it is drawn on your map, at its postcode or town, and only you can see it."
+msgstr ""
+
 #: src/postulo/templates/partials/postal_addresses.html
 #, fuzzy
 msgid "A place rather than a whole address, and kept as it is. For post to reach it:"
@@ -2748,6 +2757,10 @@ msgstr "Cap bysell bach wrth ymyl Cadw a nesaf, Taflu a nesaf, Neidio i'r nesaf 
 #, fuzzy
 msgid "A small one"
 msgstr "Un bach"
+
+#: src/postulo/templates/help/links.html
+msgid "A social profile is one to a service: a service another row already uses is greyed out in the menu and cannot be chosen again, and saving refuses a second one. A service that lives on many servers, such as Mastodon, and <em>Other</em> can be used as often as you like, and so can the cards of code repositories. Rows that already shared a service stay as they are, with a note, until you change them."
+msgstr ""
 
 #: src/postulo/templates/applications/application_form.html
 #, fuzzy
@@ -3416,6 +3429,10 @@ msgstr "Wedi'i anfon eisoes —"
 msgid "Already there: you have this one, so it is not added again."
 msgstr "Yno eisoes: mae gennych hwn, felly nid yw'n cael ei ychwanegu eto."
 
+#: src/postulo/core/web_links.py
+msgid "Already used by another row"
+msgstr ""
+
 #: src/postulo/templates/accounts/profile.html
 #, fuzzy
 msgid "Also happens by itself when your primary address changes."
@@ -3693,6 +3710,10 @@ msgstr "Gwahoddiad arall"
 #, fuzzy
 msgid "Another request is using this Idempotency-Key; try again in a moment."
 msgstr "Mae cais arall yn defnyddio'r Idempotency-Key hwn; rhowch gynnig arall arni mewn eiliad."
+
+#: src/postulo/templates/partials/web_links.html
+msgid "Another row is on the same service. Both stay as they are; remove one, or move it to Other, when you like."
+msgstr ""
 
 #: src/postulo/api/models.py
 #, fuzzy
@@ -14642,6 +14663,11 @@ msgstr "Yr wythnos flaenorol"
 msgid "Previous, This month and Next. With chevrons only, the words are still the buttons' names for a screen reader."
 msgstr "Blaenorol, Y mis hwn a Nesaf. Gyda saethau yn unig, mae'r geiriau'n dal i fod yn enwau'r botymau i ddarllenydd sgrin."
 
+#: src/postulo/accounts/models.py src/postulo/core/models.py
+#, fuzzy
+msgid "primary"
+msgstr "prif"
+
 #: src/postulo/core/design.py src/postulo/templates/cotton/primary_choice.html
 #: src/postulo/templates/jobs/company_map.html
 #: src/postulo/templates/partials/messaging_handles.html
@@ -14653,11 +14679,6 @@ msgstr "Blaenorol, Y mis hwn a Nesaf. Gyda saethau yn unig, mae'r geiriau'n dal 
 #, fuzzy
 msgid "Primary"
 msgstr "Prif"
-
-#: src/postulo/core/models.py
-#, fuzzy
-msgid "primary"
-msgstr "prif"
 
 #: src/postulo/documents/models.py
 #, fuzzy
@@ -16735,6 +16756,10 @@ msgstr "dangos awgrymiadau bysellau"
 msgid "show on the map"
 msgstr "dangos ar y map"
 
+#: src/postulo/templates/accounts/profile.html
+msgid "Show on the map"
+msgstr ""
+
 #: src/postulo/templates/applications/interview_list.html
 #, fuzzy
 msgid "Show past too"
@@ -16774,6 +16799,10 @@ msgstr "Dangos y rhif trefn ar bob cofnod gyrfa"
 #, fuzzy
 msgid "Show the plugins Postulo ships"
 msgstr "Dangos yr ategion sy'n dod gyda Postulo"
+
+#: src/postulo/templates/accounts/profile.html
+msgid "Show this address on the map?"
+msgstr ""
 
 #: src/postulo/templates/applications/report.html
 #, fuzzy
@@ -19866,6 +19895,10 @@ msgstr "Y cam yr oedd pob cais wedi'i gyrraedd pan gafodd ei wrthod, ei dynnu'n 
 #, fuzzy
 msgid "The stage is read from each timeline: where the application stood when it ended."
 msgstr "Darllenir y cam o bob llinell amser: lle'r oedd y cais pan ddaeth i ben."
+
+#: src/postulo/templates/help/identifiers.html
+msgid "The star at the start of a row marks your primary identifier. A CV prints it first, and alone where its template has room for only one. Removing it hands the star to the next row."
+msgstr ""
 
 #: src/postulo/applications/forms.py
 #, fuzzy
@@ -23321,7 +23354,7 @@ msgstr "Eich pobl gyswllt mewn ffeil .vcf y mae llyfr cyfeiriadau yn ei darllen,
 msgid "Your CV header shows a town and a country and never a street, whatever is here."
 msgstr "Mae pennawd eich CV yn dangos tref a gwlad ac nid stryd byth, beth bynnag sydd yma."
 
-#: src/postulo/templates/accounts/profile.html
+#: src/postulo/accounts/views.py src/postulo/templates/accounts/profile.html
 #, fuzzy
 msgid "Your CV photo"
 msgstr "Eich llun CV"

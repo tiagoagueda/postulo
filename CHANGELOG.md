@@ -149,6 +149,11 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🔧 Changed
 
+- The section menu of Your details has an icon on every entry, and Your CV photo is in it. (#920)
+- A social profile is one to a service: a service another row uses is greyed out in the menu and a second one is refused, except Other and services on many servers such as Mastodon; rows that already share one are kept and flagged. (#925)
+- An identifier can be marked primary with a star at the start of its row; a CV prints it first. (#922)
+- An address is shown on the map by a pin beside its star and bin on Your details, which asks before it is turned on. (#923)
+- Clicking the fixed front of a username's address puts the cursor in the name. (#924)
 - The companies map puts its zoom and Near me buttons, with tooltips, above a compact footer line in the bottom-right corner, its heading without a card or count, the Table button top right and the list of places under the heading (#909)
 - The companies map draws its zoom and Near me buttons at the bottom of the start side, above the footer's line, and on the right on a right-to-left page (#907)
 - Companies are classified by sector, the NACE section, above their industries: the company form narrows by it, and the table, industries page, report and insights group by it; ESCO's NACE links order the suggestions (#897)
@@ -314,6 +319,11 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🐛 Fixed
 
+- A company's LinkedIn row builds a /company/ address and a person's an /in/ address; Xing likewise. (#932)
+- On a phone the star and the bin of a telephone row stay level beside the choice of the number that gets you back in. (#931)
+- The seven cards of Your details that drew their heading on the border draw it inside the card. (#919)
+- Your details on a phone: the masthead keeps the instance's name and logo and the section menu is drawn, now held by browser tests. (#930)
+- The section menu of Your details is held on a phone by a browser test. (#929)
 - The calendar's *Search everything* link carries the words searched for, and a template lint refuses a filter inside translated text (#893)
 - The social-profile and repository service lists draw every mark in one colour: Bluesky, Mastodon and YouTube in black or white as their owners allow, and Codeberg, Facebook and Instagram, whose owners allow no black version, by their icon (#905)
 - A module's icon is centred in its tile on both plugin pages, and the connection pages draw each plugin with the same tile (#901)

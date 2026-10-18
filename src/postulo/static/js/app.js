@@ -607,6 +607,73 @@
     }
   });
 
+  // One social profile to a service (#925). The server switches off, in each row's choice of
+  // service, the services the other rows hold -- never the row's own, never Other, never a
+  // service that repeats (an option says so by having no `data-why`) -- so with this script
+  // blocked the rows are right as drawn. This keeps them right while somebody changes a
+  // row's service, or takes a row off at once, by running the same rule as
+  // `BaseWebLinkFormSet` in `core/web_links.py` over the whole block again.
+  function holdServices(block) {
+    var rows = Array.prototype.map.call(
+      block.querySelectorAll("select[data-service-select]"),
+      function (select) {
+        var line = select.closest("li");
+        var remove = line && line.querySelector("input[name$='-DELETE']");
+        var gone = line && (line.hidden || (remove && remove.checked));
+        var chosen = select.options[select.selectedIndex];
+        var once = chosen && chosen.hasAttribute("data-why");
+        return { select: select, service: gone || !once ? "" : select.value };
+      }
+    );
+    rows.forEach(function (row) {
+      var taken = {};
+      rows.forEach(function (other) {
+        if (other !== row && other.service) {
+          taken[other.service] = true;
+        }
+      });
+      Array.prototype.forEach.call(row.select.options, function (option) {
+        option.disabled =
+          option.value !== row.select.value &&
+          option.hasAttribute("data-why") &&
+          taken[option.value] === true;
+      });
+    });
+  }
+
+  onContentReady(function () {
+    Array.prototype.forEach.call(document.querySelectorAll("[data-one-per-service]"), holdServices);
+  });
+
+  document.addEventListener("change", function (event) {
+    var block = event.target.closest && event.target.closest("[data-one-per-service]");
+    if (block) {
+      holdServices(block);
+    }
+  });
+
+  // Clicking the fixed front of an address puts the cursor in the name beside it (#924). The
+  // front is text, so a press on it only selected it: it focuses the box at its end now, unless
+  // the press was a drag that selected some of it to copy. The ring is the group's own
+  // (`focus-within`), so one is drawn.
+  document.addEventListener("click", function (event) {
+    var addon = event.target.closest && event.target.closest("[data-address-group] > span");
+    var group = addon && addon.parentNode;
+    var box = group && group.querySelector("[data-address-box]");
+    if (!box || addon.hidden || box.disabled) {
+      return;
+    }
+    var picked = window.getSelection && window.getSelection();
+    if (picked && !picked.isCollapsed && addon.contains(picked.anchorNode)) {
+      return;
+    }
+    box.focus();
+    if (box.setSelectionRange && box.value) {
+      var end = box.value.length;
+      box.setSelectionRange(end, end);
+    }
+  });
+
   // A publication's type decides which of its fields are drawn (#687). The page is drawn for
   // the type the entry has; choosing another shows the fields it uses and hides the others,
   // each field's `data-type-field` listing the types that use it. Hidden is not refused: a
@@ -3239,6 +3306,57 @@
     true
   );
 
+  /* ------------------------------------------------------ a map pin, asked about before it is on
+   *
+   * An address is shown on the map by a pin beside its star and bin (#923): a tick box under the
+   * pin's drawing. Ticking it opens the page's one question, `#map-confirm`, and the box stays
+   * off until *Show on the map* is pressed; *Cancel* and Escape leave it off, and turning it
+   * off asks nothing. With no script, or where `showModal` is missing, the box is ticked
+   * directly, as it always was. Focus goes back to the pin, which `dialogOpener` does.
+   */
+  var pendingPin = null;
+
+  document.addEventListener("click", function (event) {
+    var target = event.target;
+    var box = target && target.closest ? target.closest(".map-toggle input[type=checkbox]") : null;
+    var dialog = document.querySelector("dialog[data-map-confirm-dialog]");
+    if (!box || !box.checked || !dialog || typeof dialog.showModal !== "function") {
+      return;
+    }
+    event.preventDefault();
+    pendingPin = box;
+    dialogOpener[dialog.id] = box;
+    dialog.showModal();
+  });
+
+  document.addEventListener("click", function (event) {
+    var button = event.target.closest ? event.target.closest("[data-map-confirm]") : null;
+    var dialog = button && button.closest("dialog[data-dialog]");
+    if (!dialog) {
+      return;
+    }
+    var box = pendingPin;
+    pendingPin = null;
+    if (box) {
+      box.checked = true;
+      box.dispatchEvent(new Event("input", { bubbles: true }));
+      box.dispatchEvent(new Event("change", { bubbles: true }));
+    }
+    if (dialog.open) {
+      dialog.close();
+    }
+  });
+
+  document.addEventListener(
+    "close",
+    function (event) {
+      if (event.target && event.target.hasAttribute && event.target.hasAttribute("data-map-confirm-dialog")) {
+        pendingPin = null;
+      }
+    },
+    true
+  );
+
   /* ------------------------------------------ a dialog whose work changed the page behind it
    *
    * `data-refresh="id"` on a dialog names the region of the page its work changes. When the
@@ -4152,6 +4270,15 @@
     words.textContent = optionWords(option);
     copyLanguage(option, words);
     row.appendChild(words);
+    var why = row.getAttribute("aria-disabled") === "true" && option.getAttribute("data-why");
+    if (why) {
+      // Why an option is switched off, for a screen reader and, resting on it, a pointer (#925).
+      var reason = document.createElement("span");
+      reason.className = "sr-only";
+      reason.textContent = " — " + why;
+      row.appendChild(reason);
+      row.title = why;
+    }
     if (option.selected) {
       var tick = optionIcon("check");
       if (tick) {
@@ -5624,6 +5751,9 @@
     }
     if (block.matches("[data-identifiers]")) {
       holdKinds(block);
+    }
+    if (block.matches("[data-one-per-service]")) {
+      holdServices(block);
     }
     var count = block.id
       ? document.querySelector('[data-section-link="' + CSS.escape(block.id) + '"] .badge')
