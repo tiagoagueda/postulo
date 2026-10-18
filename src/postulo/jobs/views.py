@@ -1128,7 +1128,7 @@ class LogoFormMixin:
 
     def form_valid(self, form):
         response = super().form_valid(form)
-        problem = form.apply_logo(self.object)
+        problem = form.apply_logo(self.object, self.request.user)
         if problem:
             messages.warning(
                 self.request, _("The logo was not changed: %(problem)s") % {"problem": problem}
@@ -1294,7 +1294,8 @@ class CompanyLogoActionView(OwnedObjectMixin, View):
             except throttle.TooOften as too_often:
                 messages.error(request, str(too_often))
                 return redirect(back)
-        problem = form.apply_logo(company)
+        # Spent above, for the person pressing the button (#960): not again for the owner.
+        problem = form.apply_logo(company, request.user, spend=False)
         if problem:
             messages.warning(
                 request, _("The logo was not changed: %(problem)s") % {"problem": problem}

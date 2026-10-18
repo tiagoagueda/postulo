@@ -264,21 +264,25 @@ def clear(company) -> None:
         company.save(update_fields=[*LOGO_FIELDS, *legacy])
 
 
-def spend_fetch(owner) -> None:
-    """Use one of the owner's fetches, or raise :class:`UnusableLogo` saying why not (#407)."""
+def spend_fetch(who) -> None:
+    """Use one of the person's fetches, or raise :class:`UnusableLogo` saying why not (#407)."""
     try:
-        throttle.fetch(owner)
+        throttle.fetch(who)
     except throttle.TooOften as too_often:
         raise UnusableLogo(str(too_often)) from too_often
 
 
-def from_url(company, url: str, *, spend: bool = True) -> None:
+def from_url(company, url: str, *, by=None, spend: bool = True) -> None:
     """Fetch the address, keep the picture. Raises :class:`UnusableLogo` with the reason.
 
-    ``spend=False`` for a caller that has already spent the allowance for this fetch.
+    The allowance spent is that of ``by``, the person who pressed the button: never the
+    company's owner, who may be somebody else or a group, which is nobody (#960).
+    ``spend=False`` for a caller that has already spent it for this fetch.
     """
     if spend:
-        spend_fetch(company.owner)
+        if by is None:
+            raise TypeError("from_url spends the allowance of `by`, the person acting")
+        spend_fetch(by)
     store(company, process(download(url)), source="url", url=url)
 
 

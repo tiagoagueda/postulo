@@ -8,6 +8,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🔒 Security
 
+- A logo address fetched on a shared or group-owned company spends the allowance of the person who pressed the button, once, never the owner's or a shared bucket. (#960)
 - A GeoJSON file or a page's JSON-LD nested thousands deep is refused, or skipped, instead of ending in a server error. (#959)
 - The account archive carries only the exporter's own appointments at a shared or group-owned company, and its count matches the file (#966)
 - A company page, a company table and the group count name a parent or child company only to people who can see it, and a company cannot be put under one whose audience could not see it (#957)
