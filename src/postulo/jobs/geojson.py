@@ -96,7 +96,8 @@ def read(raw: bytes) -> list[Point]:
         )
     try:
         document = json.loads(raw.decode("utf-8-sig"))
-    except (UnicodeDecodeError, ValueError) as error:
+    except (UnicodeDecodeError, ValueError, RecursionError) as error:
+        # RecursionError: a document nested thousands deep (#959).
         raise GeoJsonRefused(_("That file is not GeoJSON.")) from error
     if not isinstance(document, dict) or document.get("type") != "FeatureCollection":
         raise GeoJsonRefused(_("That file is not a GeoJSON collection of features."))

@@ -29,13 +29,17 @@ from django import forms
 from django.contrib.contenttypes import forms as generic_forms
 from django.core.exceptions import ValidationError
 from django.db import transaction
+from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
 
+from postulo.plugins.repositories import LABEL as REPOSITORIES_LABEL
 from postulo.plugins.repositories import REPOSITORIES
+from postulo.plugins.social_profiles import LABEL as SOCIAL_PROFILES_LABEL
 from postulo.plugins.social_profiles import SOCIAL_PROFILES
+from postulo.plugins.websites import LABEL as WEBSITES_LABEL
 from postulo.plugins.websites import WEBSITES
 
-from . import addresses, link_services
+from . import addresses, htmlstrings, link_services
 from .formsets import RowsAlreadyGone, give_owner, leaving, remove_first
 from .models import WebLink
 from .option_icons import OptionIcons
@@ -94,6 +98,23 @@ class Block:
     #: a contact.
     kept_back: str
     kept_back_contact: str
+    #: The name of the setting that is off, in the person's language. It is the one slot
+    #: of the two sentences above, so a translation is text and the markup is ours (#982).
+    setting: str = ""
+
+    @property
+    def kept_back_html(self):
+        """`kept_back` with the setting's name emphasised, the translation escaped."""
+        return htmlstrings.sentence(
+            self.kept_back, setting=format_html("<em>{}</em>", self.setting)
+        )
+
+    @property
+    def kept_back_contact_html(self):
+        """`kept_back_contact`, the same."""
+        return htmlstrings.sentence(
+            self.kept_back_contact, setting=format_html("<em>{}</em>", self.setting)
+        )
 
 
 BLOCKS: tuple[Block, ...] = (
@@ -110,13 +131,14 @@ BLOCKS: tuple[Block, ...] = (
         label=_("Social profile"),
         help_text=_("Your LinkedIn, or wherever a recruiter should look you up."),
         kept_back=_(
-            "Some social profiles are kept and not shown, because <em>Several social "
-            "profiles</em> is switched off. They come back untouched if it is switched on."
+            "Some social profiles are kept and not shown, because {setting} is switched "
+            "off. They come back untouched if it is switched on."
         ),
         kept_back_contact=_(
             "Some social profiles are kept for this contact and not shown, because "
-            "<em>Multiple social profiles</em> is switched off."
+            "{setting} is switched off."
         ),
+        setting=SOCIAL_PROFILES_LABEL,
     ),
     Block(
         kind=Kind.REPOSITORY,
@@ -131,13 +153,14 @@ BLOCKS: tuple[Block, ...] = (
         label=_("Code repository"),
         help_text=_("A profile on GitHub, Forgejo, GitLab or similar."),
         kept_back=_(
-            "Some code repositories are kept and not shown, because <em>Several code "
-            "repositories</em> is switched off. They come back untouched if it is switched on."
+            "Some code repositories are kept and not shown, because {setting} is switched "
+            "off. They come back untouched if it is switched on."
         ),
         kept_back_contact=_(
             "Some code repositories are kept for this contact and not shown, because "
-            "<em>Multiple code repositories</em> is switched off."
+            "{setting} is switched off."
         ),
+        setting=REPOSITORIES_LABEL,
     ),
     Block(
         kind=Kind.WEBSITE,
@@ -152,13 +175,14 @@ BLOCKS: tuple[Block, ...] = (
         label=_("Website"),
         help_text=_("Your own site, if you have one."),
         kept_back=_(
-            "Some websites are kept and not shown, because <em>Multiple websites</em> is "
-            "switched off. They come back untouched if it is switched on."
+            "Some websites are kept and not shown, because {setting} is switched off. "
+            "They come back untouched if it is switched on."
         ),
         kept_back_contact=_(
-            "Some websites are kept for this contact and not shown, because <em>Several "
-            "websites</em> is switched off."
+            "Some websites are kept for this contact and not shown, because {setting} is "
+            "switched off."
         ),
+        setting=WEBSITES_LABEL,
     ),
 )
 
@@ -180,7 +204,7 @@ COMPANY_BLOCKS: tuple[Block, ...] = (
         help_text=_("The company's LinkedIn page, or wherever it posts."),
         kept_back_contact=_(
             "Some social profiles are kept for this company and not shown, because "
-            "<em>Several social profiles</em> is switched off."
+            "{setting} is switched off."
         ),
     ),
 )

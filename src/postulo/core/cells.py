@@ -27,7 +27,7 @@ so the refusal is announced by the machinery that was already there. The only th
 was ``aria-invalid`` on the input, which the view sets.
 
 **Every editable cell posts to the form the page already uses.** `docs/PLAN.md` and
-`CLAUDE.md` both say it: status changes go through `change_status`, records are written with
+`AGENTS.md` both say it: status changes go through `change_status`, records are written with
 `record_event`, fields are never poked. A cell that wrote ``company.name = x; save()`` would
 be a second way of saving that has to be kept in step with the first, and the day it drifts
 is the day something is saved without its rules. So the machinery here builds a one-field

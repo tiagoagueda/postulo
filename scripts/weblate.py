@@ -272,6 +272,11 @@ def cmd_configure(args) -> int:
     for component in chosen(args.components):
         # The layout is gettext's; the extensions' WebExtension JSON components keep theirs.
         settings = dict(LAYOUT) if component.get("file_format") == "po" else {}
+        # Markup a translator adds is told to them before the pull request exists (#983):
+        # Weblate's own check, added to whatever flags the component already carries.
+        flags = [f.strip() for f in str(component.get("check_flags", "")).split(",") if f.strip()]
+        if "safe-html" not in flags:
+            settings["check_flags"] = ", ".join([*flags, "safe-html"])
         if args.round_trip and not linked(component):
             settings.update(ROUND_TRIP)
             repo = str(component.get("repo", ""))

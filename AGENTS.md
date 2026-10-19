@@ -1,0 +1,103 @@
+# Working on Postulo
+
+Postulo is a self-hosted, AGPL-3.0 Django application that manages a job search from the
+applicant's side: listings, applications and their timelines, companies, CVs and cover
+letters, reminders, interviews. One person's data never reaches another's. Read
+`docs/PLAN.md` for the architecture and `CONTRIBUTING.md` for the rules; this file is the
+short version for an AI assistant, whichever one is used, and it defers to both.
+`CLAUDE.md` holds nothing but an import of this file, so every assistant reads the same
+rules: write a new one here, never there. Read `CODE_OF_CONDUCT.md` too, which applies to
+whatever you write in an issue or a pull request, and `ACCESSIBILITY.md`, which says what
+a change must not break.
+
+## What this project promises
+
+Four commitments are stated in the README and are not negotiable in code:
+
+- **Never paywalled.** No feature gate, no tier, no licence key, nothing that "unlocks".
+- **Secure, because of what it holds.** Every query is owner-scoped (`for_user()`), every
+  file is served through a permission check, the CSP allows no inline script, secrets
+  are encrypted, and `tests/security/` grows with every feature that touches a boundary.
+- **Usable by everyone.** Keyboard, screen readers, scripts off, both themes at WCAG 2.2
+  AA; the browser suite runs axe-core over every page it visits.
+- **Modular.** Anything that could reasonably vary is a plugin behind an entry point, and
+  a plugin carries its own `locale/`.
+
+## How the code is shaped
+
+- `src/postulo/<app>/` per domain: `core`, `accounts`, `jobs`, `applications`,
+  `documents`, `resume`, `plugins`, `api`. Models inherit `OwnedModel`; views use
+  `OwnedObjectMixin` (a foreign object is a 404, never a 403).
+- The event log is the truth: change status through `change_status`, record with
+  `record_event`, never poke fields directly.
+- Server-rendered templates with htmx and Tailwind v4 (`npm run build:css`; the compiled
+  CSS is committed). All JavaScript lives in `static/js/app.js` and vendored files —
+  the CSP forbids inline scripts. Django `{# #}` comments are single-line only.
+- Markup used on more than one page is a component in `templates/cotton/` (django-cotton),
+  called as `<c-field :field="form.name" />`, with a `<c-vars>` line at the top declaring
+  what it takes. `{% include %}` is for a fragment of one page. A component can see the
+  caller's whole context; read only what the tag was given, so the contract stays true.
+- The component vocabulary is [Basecoat](https://basecoatui.com/)'s: a button is
+  `class="btn" data-variant="ghost" data-size="xs"`. A component's structural file is
+  imported in `assets/css/app.css` the day it is adopted and painted in
+  `assets/css/basecoat.css`; never the bundle, the base tokens or a style pack, and never
+  a class name on both sides of the import (`tests/test_stylesheet.py`). Everything it
+  ships must still work with scripts off and pass axe in both themes.
+- Every `<select>` is drawn native, which is the control with scripts off, and `app.js`
+  builds Basecoat's select beside it and drives it (#301): never write `<div
+  class="select">` yourself. An option says its flag in `data-flag` (`LanguageSelect`,
+  `CountrySelect`) or its icon in `data-icon` (`IconSelect`, or `{% option_icons %}` for
+  a select a template writes), generic and never a brand's mark. `data-native` keeps one
+  select native, and `tests/test_template_lint.py` lists each with its reason.
+- Every `next` redirect goes through `safe_next()`.
+- Never name a side of the page: logical utilities (`ms`/`me`, `ps`/`pe`, `start`/`end`,
+  `text-start`/`text-end`) only, and `<bdi>` around typed text that sits inline beside
+  other text. `tests/test_template_lint.py` fails on a physical one.
+- Before writing code that implements a standard, a format, a data set or a well-known
+  algorithm, look for an open-source library that does it (`CONTRIBUTING.md`, *Look for a
+  library before you write one*), and say in the pull request what you found.
+- A new export or import picks JSON first, vCard 4.0 for contacts, iCalendar for events,
+  and PDF, then ODT, then DOCX for documents (`CONTRIBUTING.md`, *Formats*).
+- Every user-facing string is wrapped for translation. After adding or changing one, run
+  `uv run python scripts/messages.py extract` so every catalogue gets its empty slot.
+  **Never write a translation**: no `msgstr`, in any language, by hand or by script.
+  Translations are made in Weblate only, which drafts new strings by machine and sends them
+  back as a pull request; `scripts/messages.py guard` refuses a commit that writes one
+  (`docs/TRANSLATING.md`, #706). A rename that carries translations follows *Renaming
+  strings in bulk* there.
+
+## Before saying a change is done
+
+```sh
+uv run ruff check . && uv run ruff format --check .
+uv run pytest                                    # in-memory SQLite, warnings are errors
+uv run pytest -m e2e --browser chromium -n 4     # browser suite; what belongs there: CONTRIBUTING.md
+uv run python scripts/messages.py extract --check && uv run python scripts/messages.py check
+uv run python scripts/messages.py guard          # no translation written outside Weblate
+npm run build:css                                # then commit src/postulo/static/css/app.css
+```
+
+The compiled stylesheet is committed, so a template that gains a class ships a class that does
+nothing until it is rebuilt. `tests/test_stylesheet.py` fails on a stale one wherever
+`node_modules` is installed.
+
+A feature ships with its tests, its wiki page (a commit to the `postulo.wiki` repository,
+beside this one, naming the same issue) and a CHANGELOG
+entry under *Unreleased*, in one of six marked sections — `### ✨ Added`, `### 🔧 Changed`,
+`### 🐛 Fixed`, `### 🔒 Security`, `### ⚠️ Deprecated`, `### 🗑️ Removed` — ending with the
+issue it closes. **An entry is one line: what changed and who it affects, at most about
+three hundred characters, ending in `(#N)`.** The reasoning, the rejected alternatives
+and the detail belong in the issue and in the commit message, which explain why, not
+what; the changelog section is the release's notes verbatim, and a release note nobody
+can scan in two minutes is not one (#254). A security entry may add the sentence an
+operator needs to decide whether to hurry, and a breaking change the line that says what
+to do; `tests/test_changelog.py` holds *Unreleased* to the length. Never create a release
+tag; releases are a deliberate, separate act.
+
+## Working with AI
+
+AI-written code is welcome here on the same terms as any other: a person proposes it,
+has read it, can explain it, and answers for it. The assistant is a tool the contributor
+uses, not a contributor. Say in the pull request that a model helped, the way you would
+credit a library, and review the output with the care you would give a stranger's patch —
+especially around ownership scoping, file handling and anything the security tests cover.

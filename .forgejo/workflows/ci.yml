@@ -515,9 +515,9 @@ jobs:
         run: |
           mkdir -p /tmp/postulo-media /tmp/postulo-backups /tmp/postulo-static
           uv run manage.py migrate --noinput
-          uv run manage.py seed_demo demo@example.org --no-pdf --password ci-only-not-a-secret-either
+          uv run manage.py seed_demo demo@example.org --no-pdf
           uv run manage.py backup /tmp/postulo-roundtrip.tar.gz
-          uv run manage.py seed_demo rival@example.org --no-pdf --password ci-only-not-a-secret-either
+          uv run manage.py seed_demo rival@example.org --no-pdf
           uv run manage.py restore /tmp/postulo-roundtrip.tar.gz --force
           uv run manage.py shell -c "
           from django.contrib.auth import get_user_model
@@ -559,7 +559,7 @@ jobs:
               out.addfile(m, io.BytesIO(data) if data is not None else None)
           out.close()
           PY
-          uv run manage.py seed_demo rival@example.org --no-pdf --password ci-only-not-a-secret-either
+          uv run manage.py seed_demo rival@example.org --no-pdf
           if uv run manage.py restore /tmp/postulo-corrupt.tar.gz --force; then
             echo "a truncated dump was restored" >&2; exit 1
           fi
@@ -577,6 +577,8 @@ jobs:
           POSTULO_MEDIA_ROOT: /tmp/postulo-media
           POSTULO_BACKUP_DIR: /tmp/postulo-backups
           POSTULO_STATIC_ROOT: /tmp/postulo-static
+          # The demo accounts' password, read from the environment: never from an argument (#980).
+          POSTULO_SEED_PASSWORD: ci-only-not-a-secret-either
 
   security:
     name: Security audit

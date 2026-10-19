@@ -414,8 +414,11 @@ class CompanyForm(OwnNoteForm):
                 counted[division] = counted.get(division, 0) + 1
         return sorted(counted, key=lambda code: (-counted[code], code))
 
-    def apply_logo(self, company: Company) -> str:
+    def apply_logo(self, company: Company, by, *, spend: bool = True) -> str:
         """Do what the logo fields asked for. Returns a problem to show, or "".
+
+        An address costs one use of ``by``'s fetch allowance, the person acting and not
+        the company's owner (#960); ``spend=False`` where the caller has spent it already.
 
         A logo that cannot be fetched never stops a company being saved: the person was
         recording an employer, and an icon that would not come is not a reason to lose
@@ -434,7 +437,7 @@ class CompanyForm(OwnNoteForm):
         url = (self.cleaned_data.get("logo_url") or "").strip()
         if url and url != company.logo_source_url:
             try:
-                logos.from_url(company, url)
+                logos.from_url(company, url, by=by, spend=spend)
             except logos.UnusableLogo as error:
                 return str(error)
         return ""

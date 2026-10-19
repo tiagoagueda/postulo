@@ -12,6 +12,13 @@ return, and in a line-oriented format that ends the property there. The library 
 line break in a text and refuses one in an address, but it leaves every other control
 character in place, so each value still goes through `without_controls` first (#218).
 
+**What a file never carries (#963).** The person's own preparation notes are not written, and
+nobody is named as an ``ATTENDEE``. The same lines go to a subscribed feed, a download a
+person forwards, and a calendar a sync plugin writes into, which may be shared or an
+employer's; many calendar programs treat an attendee with an address as somebody to send
+updates to, and the notes were written on the promise that nothing is sent to anybody. The
+people met are named in the description, as text, and that is all of them a calendar needs.
+
 **Three shapes, because there are three kinds of thing.** An interview is a meeting at an
 hour: a ``VEVENT`` in UTC, which every reader understands and no time-zone table can get
 wrong. An application's deadline and a listing's closing date are *days*: nobody knows the
@@ -146,8 +153,6 @@ def event_component(interview: Interview, *, url: str = "", alarm: bool = False)
     }
 
     description: list[str] = []
-    if interview.notes:
-        description.append(interview.notes)
     people = list(interview.contacts.all())
     if people:
         description.append(
@@ -178,20 +183,6 @@ def event_component(interview: Interview, *, url: str = "", alarm: bool = False)
         event.add("description", clean("\n".join(description)))
     if url:
         event.add("url", url)
-    for person in people:
-        if person.email:
-            # The address goes through the same sieve as the name: it is typed by a person
-            # or sent by an API client, and it sits on the same line. A quotation mark has
-            # no spelling inside a quoted parameter, so it is dropped.
-            address = without_controls(person.email)
-            event.add(
-                "attendee",
-                icalendar.vCalAddress(f"mailto:{address}"),
-                parameters={
-                    "CN": without_controls(person.name.replace('"', "")),
-                    "ROLE": "REQ-PARTICIPANT",
-                },
-            )
     if alarm and (alarm_part := alarm_component(interview)) is not None:
         event.add_component(alarm_part)
     return event
@@ -212,15 +203,14 @@ def appointment_component(appointment: Appointment, *, url: str = "") -> icalend
     """The VEVENT for one appointment with an adviser at an employment service (#888).
 
     A meeting like an interview, written the same way: UTC moments, the place as its
-    location, the adviser's name and email, and the notes the person wrote to prepare. What
-    was agreed afterwards is the person's own record and is not written, because the file goes
-    to a calendar that may be shared. An end left blank lasts an hour. An attended appointment
-    is still ``CONFIRMED``: it happened.
+    location and the adviser's name. The notes the person wrote, what was agreed afterwards
+    and the adviser's address are the person's own record and are not written, because the
+    file goes to a calendar that may be shared, and an address would make the adviser an
+    invitee (#963). An end left blank lasts an hour. An attended appointment is still
+    ``CONFIRMED``: it happened.
     """
     adviser = appointment.contact
     description: list[str] = []
-    if appointment.notes:
-        description.append(appointment.notes)
     if adviser is not None:
         description.append(_("With: %(people)s") % {"people": adviser.name})
     url = without_controls(url)
@@ -244,16 +234,6 @@ def appointment_component(appointment: Appointment, *, url: str = "") -> icalend
         event.add("description", clean("\n".join(description)))
     if url:
         event.add("url", url)
-    if adviser is not None and adviser.email:
-        address = without_controls(adviser.email)
-        event.add(
-            "attendee",
-            icalendar.vCalAddress(f"mailto:{address}"),
-            parameters={
-                "CN": without_controls(adviser.name.replace('"', "")),
-                "ROLE": "REQ-PARTICIPANT",
-            },
-        )
     return event
 
 

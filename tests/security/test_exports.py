@@ -130,7 +130,7 @@ def test_a_contact_cannot_add_lines_to_the_diary_feed(client, user, interview_wi
     text = client.get(reverse("applications:interview_calendar")).content.decode()
 
     assert_only_the_event_is_there(text)
-    assert any(line.startswith("ATTENDEE;CN=") for line in text.split("\r\n"))
+    assert not any(line.startswith("ATTENDEE") for line in text.split("\r\n"))
 
 
 def test_a_contact_cannot_add_lines_to_the_api_feed(client, user, interview_with_a_bent_contact):

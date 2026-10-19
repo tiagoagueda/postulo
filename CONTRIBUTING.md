@@ -2,7 +2,11 @@
 
 Thank you for considering it. Postulo is developed on
 [Forgejo](https://source.tiagoagueda.com/postulo/postulo); the GitHub repository is a
-read-only mirror, so please open issues and pull requests on Forgejo.
+read-only mirror, so please open issues and pull requests on Forgejo. Everyone taking
+part, in issues, pull requests and Weblate alike, is held to the
+[code of conduct](CODE_OF_CONDUCT.md). What the interface promises people with
+disabilities, and what a change must therefore not break, is in
+[ACCESSIBILITY.md](ACCESSIBILITY.md).
 
 ## Opening an issue
 
@@ -352,8 +356,12 @@ conversation between people, and the person opening it is the one who will be as
 what a line does and why. Say that a model helped, the way you would credit a library.
 Review what it wrote with the care you would give a stranger's patch, especially around
 ownership scoping, file handling and anything the security tests cover, because a
-plausible-looking mistake is the kind that gets through. `CLAUDE.md` in the repository
-root tells an assistant how this project works; keep it current when the rules change.
+plausible-looking mistake is the kind that gets through. `AGENTS.md` in the repository
+root tells an assistant how this project works, and is the file Codex, Copilot, Cursor and
+others read; keep it current when the rules change. `CLAUDE.md` only imports it (Claude
+Code reads that file and not `AGENTS.md`), so a rule written there would reach one
+assistant alone: write it in `AGENTS.md`. `tests/test_contribution_rules.py` holds
+`CLAUDE.md` to the one import.
 
 ## House style
 
