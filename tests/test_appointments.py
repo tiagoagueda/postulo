@@ -282,8 +282,8 @@ def test_the_pages_download_carries_it_as_a_meeting(client, user, appointment):
     assert f"UID:{appointment.uid}" in body
     assert "SUMMARY:Appointment: France Travail" in body
     assert "LOCATION:12 rue de la Paix" in body
-    assert "Bring the CV" in body and "With: Mme Durand" in body
-    assert "mailto:d@ft.test" in body
+    assert "Bring the CV" not in body and "With: Mme Durand" in body
+    assert "d@ft.test" not in body, "an address would make the adviser an invitee (#963)"
     assert "outcome" not in body.lower(), "what was agreed is the person's own"
 
 

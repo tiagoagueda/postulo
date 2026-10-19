@@ -71,3 +71,33 @@ def test_the_logger_applies_it_to_every_atom_that_can_hold_an_address():
 
     got = RedactingLogger.atoms(Probe.__new__(Probe), None, None, {}, 0)
     assert "abc" not in got["r"] and "abc" not in got["U"] and got["s"] == 302
+
+
+@pytest.mark.parametrize(
+    "path",
+    [
+        "/accounts/password/reset/key/1-dgawx6-3721abcdef/",
+        "/accounts/confirm-email/MQ:1tXyzSECRETKEY/",
+        "/accounts/recover/RECOVERYTOKEN/",
+    ],
+)
+def test_the_json_log_loses_the_same_secrets_as_the_access_log(path):
+    """A 500 on the one request that carries a key must not write the key (#979)."""
+    import json
+    import logging
+
+    from django.test import RequestFactory
+
+    from postulo.core.logs import JSONFormatter
+
+    request = RequestFactory().get(path)
+    record = logging.LogRecord(
+        "django.request", logging.ERROR, __file__, 1, "Internal Server Error: %s", (path,), None
+    )
+    record.request = request
+
+    written = JSONFormatter().format(record)
+    secret = path.rstrip("/").rsplit("/", 1)[1]
+    assert secret not in written
+    document = json.loads(written)
+    assert secret not in document["message"] and secret not in document["request"]

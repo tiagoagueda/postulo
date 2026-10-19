@@ -186,7 +186,7 @@ def test_an_svg_that_is_not_an_svg_is_refused():
 
 def test_a_logo_is_fetched_once_and_kept_here(web, company):
     web["responses"]["https://cdn.example/logo.png"] = (200, an_image(), "image/png")
-    logos.from_url(company, "https://cdn.example/logo.png")
+    logos.from_url(company, "https://cdn.example/logo.png", by=company.owner)
 
     company.refresh_from_db()
     assert company.has_logo, "the file is ours now"
@@ -228,7 +228,7 @@ def test_a_private_address_is_never_fetched(company):
     *connections*, because a logo is public by definition.
     """
     with pytest.raises(logos.UnusableLogo, match="private or local network"):
-        logos.from_url(company, "http://192.168.1.20/logo.png")
+        logos.from_url(company, "http://192.168.1.20/logo.png", by=company.owner)
     company.refresh_from_db()
     assert not company.has_logo
 
@@ -237,7 +237,7 @@ def test_a_logo_is_public_even_where_connections_may_reach_the_network(company, 
     settings.POSTULO_CONNECTIONS_ALLOW_PRIVATE = True
 
     with pytest.raises(logos.UnusableLogo, match="private or local network"):
-        logos.from_url(company, "http://192.168.1.20/logo.png")
+        logos.from_url(company, "http://192.168.1.20/logo.png", by=company.owner)
     assert not company.has_logo
 
 
@@ -307,6 +307,24 @@ def test_a_site_with_nothing_usable_says_so(web, company, monkeypatch):
     )
     with pytest.raises(logos.UnusableLogo, match=r"Nothing on blackmesa\.test"):
         logos.find_on_website(company)
+
+
+def test_a_deeply_nested_json_ld_block_is_skipped_not_a_crash(web, company, monkeypatch):
+    """A page's JSON-LD nested thousands deep must end in the sentence, not a traceback (#959)."""
+    deep = "[" * 200_000 + "]" * 200_000
+    monkeypatch.setattr(
+        logos.fetching,
+        "fetch_page",
+        lambda url: logos.fetching.FetchedPage(
+            url="https://blackmesa.test/",
+            html=a_page(ld=f'<script type="application/ld+json">{deep}</script>').decode(),
+        ),
+    )
+    with pytest.raises(logos.UnusableLogo, match=r"Nothing on blackmesa\.test"):
+        logos.find_on_website(company)
+    # A document nested as deep as the parser allows is walked without recursing.
+    shallow = "[" * 900 + '{"@type":"Organization","logo":"https://x.test/l.png"}' + "]" * 900
+    assert logos._organisation_logos([shallow]) == ["https://x.test/l.png"]
 
 
 def test_a_site_that_blocks_the_icon_says_why(web, company, monkeypatch):
@@ -389,7 +407,7 @@ def test_a_refused_identifier_stops_the_logo_fields_too(client, user, company, w
     assert not Company.objects.for_user(user).filter(name="Aperture").exists()
     assert web["calls"] == [], "nothing fetched for a company that was not saved"
 
-    logos.from_url(company, "https://cdn.example/logo.png")
+    logos.from_url(company, "https://cdn.example/logo.png", by=company.owner)
     web["calls"].clear()
     response = client.post(
         reverse("jobs:company_update", args=[company.pk]),
@@ -428,7 +446,7 @@ def test_the_logo_is_served_from_this_instance_and_only_to_its_owner(
     client, user, other_user, company, web
 ):
     web["responses"]["https://cdn.example/logo.png"] = (200, an_image(), "image/png")
-    logos.from_url(company, "https://cdn.example/logo.png")
+    logos.from_url(company, "https://cdn.example/logo.png", by=company.owner)
 
     client.force_login(user)
     response = client.get(reverse("jobs:company_logo", args=[company.pk]))
@@ -452,7 +470,7 @@ def test_a_company_page_shows_the_logo_and_never_the_far_address(client, user, c
     assert "Find logo" in client.get(edit).content.decode()
 
     web["responses"]["https://cdn.example/logo.png"] = (200, an_image(), "image/png")
-    logos.from_url(company, "https://cdn.example/logo.png")
+    logos.from_url(company, "https://cdn.example/logo.png", by=company.owner)
     html = client.get(company.get_absolute_url()).content.decode()
     assert reverse("jobs:company_logo", args=[company.pk]) in html
     html = client.get(edit).content.decode()
@@ -595,8 +613,8 @@ def test_two_people_recording_the_same_company_keep_their_own(user, other_user, 
     web["responses"]["https://cdn.example/logo.png"] = (200, an_image(), "image/png")
     mine = Company.objects.create(owner=user, name="Black Mesa")
     theirs = Company.objects.create(owner=other_user, name="Black Mesa")
-    logos.from_url(mine, "https://cdn.example/logo.png")
-    logos.from_url(theirs, "https://cdn.example/logo.png")
+    logos.from_url(mine, "https://cdn.example/logo.png", by=mine.owner)
+    logos.from_url(theirs, "https://cdn.example/logo.png", by=theirs.owner)
     assert CompanyLogo.objects.get(company=mine).pk != CompanyLogo.objects.get(company=theirs).pk
     assert CompanyLogo.objects.filter(company__owner=user).count() == 1
     assert CompanyLogo.objects.filter(company__owner=other_user).count() == 1
@@ -612,7 +630,7 @@ def test_a_logo_travels_in_the_export_and_comes_back(user, other_user, web):
 
     web["responses"]["https://cdn.example/logo.png"] = (200, an_image(), "image/png")
     company = Company.objects.create(owner=user, name="Black Mesa")
-    logos.from_url(company, "https://cdn.example/logo.png")
+    logos.from_url(company, "https://cdn.example/logo.png", by=company.owner)
 
     archive = write_archive(user)
     with zipfile.ZipFile(archive) as bundle:
@@ -958,3 +976,51 @@ def test_find_logo_spends_the_fetch_allowance_and_is_refused_once_it_is_spent(
 
     assert "Too many requests" in response.content.decode()
     assert Errand.objects.filter(owner=user).count() == 1, "only the first press sent one"
+
+
+# ----------------------------------------------------- whose allowance a fetch spends (#960)
+
+
+@pytest.fixture
+def spent(monkeypatch):
+    """The accounts whose fetch allowance was charged, in order."""
+    who: list = []
+    monkeypatch.setattr(logos.throttle, "fetch", who.append)
+    return who
+
+
+def test_a_grantees_logo_address_spends_the_grantees_allowance_once(
+    client, user, other_user, company, web, spent
+):
+    from postulo.jobs.models import Share
+
+    Share.objects.create(company=company, grantee_user=other_user, scope=Share.Scope.WRITE)
+    client.force_login(other_user)
+    web["responses"]["https://cdn.example/logo.png"] = (200, an_image(), "image/png")
+    client.post(
+        reverse("jobs:company_update", args=[company.pk]),
+        {"name": "Black Mesa", "kind": "employer", "logo_url": "https://cdn.example/logo.png"},
+    )
+    assert spent == [other_user], "the person pressing, once, and never the owner"
+    assert user not in spent
+
+
+def test_a_group_owned_companys_logo_address_is_charged_to_the_person_acting(
+    client, user, other_user, web, spent
+):
+    from django.contrib.auth.models import Group
+
+    team = Group.objects.create(name="Team")
+    team.user_set.add(user, other_user)
+    company = Company(name="Team Co")
+    company.set_principal(team)
+    company.save()
+    web["responses"]["https://cdn.example/logo.png"] = (200, an_image(), "image/png")
+    client.force_login(other_user)
+    client.post(
+        reverse("jobs:company_update", args=[company.pk]),
+        {"name": "Team Co", "kind": "employer", "logo_url": "https://cdn.example/logo.png"},
+    )
+    assert spent == [other_user], "never the shared None bucket"
+    with pytest.raises(TypeError):
+        logos.from_url(company, "https://cdn.example/logo.png")

@@ -108,6 +108,40 @@ def test_a_uid_with_a_line_break_adds_no_property_to_the_feed(client, user):
         assert not [line for line in text.splitlines() if line.startswith("ATTENDEE")]
 
 
+def test_no_calendar_file_carries_private_notes_or_a_contacts_address(client, user):
+    """Notes are the person's, and a contact with an address would be invited (#963)."""
+    from postulo.applications.models import Appointment
+    from postulo.jobs.models import Contact
+
+    interview = an_interview(user, "Own visible role")
+    contact = Contact.objects.create(
+        owner=user, company=interview.application.posting.company, name="Cave", email="c@x.test"
+    )
+    interview.contacts.add(contact)
+    Interview.objects.filter(pk=interview.pk).update(notes="PRIVATE-PREP-NOTE")
+    office = interview.application.posting.company
+    Appointment.objects.create(
+        owner=user,
+        company=office,
+        contact=contact,
+        starts_at=timezone.now() + dt.timedelta(days=4),
+        notes="PRIVATE-APPOINTMENT-NOTE",
+    )
+    client.force_login(user)
+
+    served = [
+        client.get(reverse("applications:interview_calendar")),
+        client.get(reverse("applications:interview_ics", args=[interview.pk])),
+        client.get(reverse("applications:calendar_download"), {"view": "agenda"}),
+    ]
+    for response in served:
+        text = response.content.decode()
+        assert "BEGIN:VEVENT" in text
+        assert "PRIVATE-" not in text and "c@x.test" not in text
+        assert not [line for line in text.splitlines() if line.startswith("ATTENDEE")]
+    assert "With: Cave" in served[1].content.decode(), "the person is still named, as text"
+
+
 def test_an_outcome_this_version_does_not_know_still_has_a_file(client, user):
     interview = an_interview(user, "Own visible role")
     Interview.objects.filter(pk=interview.pk).update(outcome="rescheduled")

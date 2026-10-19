@@ -90,12 +90,31 @@ def test_the_same_seed_gives_the_same_search(db, django_user_model):
     assert titles(one) == titles(two)
 
 
-def test_it_creates_the_account_when_asked_to(db, django_user_model):
-    call_command("seed_demo", "fresh@example.org", "--no-pdf", "--password", "pw", verbosity=0)
+def test_it_creates_the_account_when_asked_to(db, django_user_model, monkeypatch):
+    monkeypatch.setenv("POSTULO_SEED_PASSWORD", "pw")
+    call_command("seed_demo", "fresh@example.org", "--no-pdf", verbosity=0)
 
     user = django_user_model.objects.get(email="fresh@example.org")
     assert user.check_password("pw")
     assert Application.objects.for_user(user).exists()
+
+
+def test_a_password_is_never_taken_from_the_command_line(db, django_user_model, monkeypatch):
+    """It would be in the shell's history and in `ps` (#980)."""
+    monkeypatch.delenv("POSTULO_SEED_PASSWORD", raising=False)
+    with pytest.raises(CommandError):
+        call_command("seed_demo", "fresh@example.org", "--no-pdf", "--password", "pw")
+    assert not django_user_model.objects.filter(email="fresh@example.org").exists()
+
+
+def test_the_flag_asks_for_the_password(db, django_user_model, monkeypatch):
+    monkeypatch.delenv("POSTULO_SEED_PASSWORD", raising=False)
+    monkeypatch.setattr("getpass.getpass", lambda prompt="": "typed-at-the-prompt")
+    call_command("seed_demo", "asked@example.org", "--no-pdf", "--password", verbosity=0)
+
+    assert django_user_model.objects.get(email="asked@example.org").check_password(
+        "typed-at-the-prompt"
+    )
 
 
 def test_a_refused_run_leaves_the_address_as_it_found_it(db, user):

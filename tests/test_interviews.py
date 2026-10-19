@@ -441,13 +441,10 @@ def test_the_ics_file_is_one_every_calendar_can_import(client, user, application
     assert "DTSTART:20261005T093000Z" in lines and "DTEND:20261005T103000Z" in lines
     assert "SUMMARY:On site: Test Engineer at Aperture Science" in lines
     assert "LOCATION:1 Aperture Way\\, Cambridge\\; floor 3" in lines
-    assert any(
-        line.startswith("DESCRIPTION:Bring ID.\\nAsk about the team.\\nWith: Cave")
-        for line in lines
-    )
-    attendee = icalendar.Calendar.from_ical(text).walk("VEVENT")[0]["ATTENDEE"]
-    assert str(attendee) == "mailto:cave@aperture.test"
-    assert attendee.params["CN"] == "Cave Johnson" and attendee.params["ROLE"] == "REQ-PARTICIPANT"
+    # The people met are named, as text; the notes and the address are not written (#963).
+    assert any(line.startswith("DESCRIPTION:With: Cave") for line in lines)
+    assert "Bring ID" not in text and "cave@aperture.test" not in text
+    assert not any(line.startswith("ATTENDEE") for line in lines)
     assert any(line.startswith("URL:http://testserver/applications/") for line in lines)
     assert "STATUS:CONFIRMED" in lines
     assert all(len(line.encode()) <= 75 for line in lines), "folded at 75 octets"
@@ -536,11 +533,11 @@ def test_the_whole_diary_downloads_as_one_file(client, user, application):
 
 def test_folding_never_splits_a_character(application):
     interview = schedule_interview(application, kind=InterviewKind.VIDEO, starts_at=in_days(2))
-    interview.notes = "é" * 100
+    interview.location = "é" * 100
     text = ical.calendar([interview])
     assert all(len(line.encode()) <= 75 for line in text.split("\r\n"))
     parsed = icalendar.Calendar.from_ical(text).walk("VEVENT")[0]
-    assert str(parsed["DESCRIPTION"]).startswith("é" * 100), "and unfolds to what was written"
+    assert str(parsed["LOCATION"]) == "é" * 100, "and unfolds to what was written"
 
 
 def test_a_property_value_keeps_no_way_of_ending_its_own_line():
@@ -550,12 +547,12 @@ def test_a_property_value_keeps_no_way_of_ending_its_own_line():
     assert "\r" not in ical.escape("a\rb") and "\n" not in ical.escape("a\rb")
 
 
-def test_a_parameter_value_cannot_start_a_property_of_its_own(application):
-    """``CN=`` sits mid-line, so a break in a name would be a break in the file."""
+def test_a_name_cannot_start_a_property_of_its_own(application):
+    """A name sits mid-line in the description, so a break in it would be a break in the file."""
     company = application.posting.company
     for name, expected in [
-        ("Cave\r\nBEGIN:VALARM", "CaveBEGIN:VALARM"),
-        ('Cave "Jack" Johnson', "Cave Jack Johnson"),
+        ("Cave\r\nBEGIN:VALARM", "Cave\nBEGIN:VALARM"),
+        ('Cave "Jack" Johnson', 'Cave "Jack" Johnson'),
         ("Johnson, Cave", "Johnson, Cave"),
     ]:
         person = Contact.objects.create(
@@ -567,7 +564,8 @@ def test_a_parameter_value_cannot_start_a_property_of_its_own(application):
         text = ical.calendar([interview])
         assert not any(line.startswith("BEGIN:VALARM") for line in text.split("\r\n"))
         event = icalendar.Calendar.from_ical(text).walk("VEVENT")[0]
-        assert event["ATTENDEE"].params["CN"] == expected
+        assert "ATTENDEE" not in event
+        assert str(event["DESCRIPTION"]).startswith(f"With: {expected}")
 
 
 def test_the_identifier_of_an_interview_cannot_add_a_property(application):

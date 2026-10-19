@@ -85,6 +85,25 @@ def test_a_request_a_proxy_passed_on_is_not_the_probe(client, forwarded_for):
     assert response.status_code == 400
 
 
+def test_a_proxy_that_sets_only_the_protocol_is_not_the_probe_and_learns_no_version(client):
+    """A loopback proxy forwarding without `X-Forwarded-For` has the world behind it (#977)."""
+    refused = client.get("/healthz", HTTP_X_FORWARDED_PROTO="https", **AS_THE_PROBE)
+    assert refused.status_code == 400
+
+    answered = client.get(
+        "/healthz",
+        REMOTE_ADDR="127.0.0.1",
+        HTTP_HOST="postulo.example.org",
+        HTTP_X_FORWARDED_PROTO="https",
+    )
+    assert answered.status_code == 200
+    assert "version" not in answered.json()
+
+
+def test_the_probe_itself_is_still_told_the_version(client):
+    assert "version" in client.get("/healthz", **AS_THE_PROBE).json()
+
+
 @pytest.mark.parametrize(
     "path", ["/", "/healthz/", "/healthz/x", "/metrics", "/logs", "/accounts/login/"]
 )

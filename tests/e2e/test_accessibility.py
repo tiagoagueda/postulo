@@ -837,6 +837,20 @@ def test_the_company_form_in_two_columns_has_no_violations(
 
 
 @pytest.mark.parametrize("scheme", ["light", "dark"])
+def test_the_upload_form_with_its_metadata_box_has_no_violations(
+    live_server, page: Page, axe_source, furnished, scheme
+):
+    """The box that removes a photograph's location is ticked and named (#964)."""
+    page.emulate_media(color_scheme=scheme)
+    sign_in(page, live_server.url)
+    page.goto(f"{live_server.url}/documents/files/new/")
+    box = page.get_by_label("Remove the photo's metadata (location, time, camera)")
+    expect(box).to_be_checked()
+    found = violations_on(page, axe_source)
+    assert not found, describe(f"the upload form ({scheme})", found)
+
+
+@pytest.mark.parametrize("scheme", ["light", "dark"])
 def test_the_contact_and_capture_forms_in_two_columns_have_no_violations(
     live_server, page: Page, axe_source, furnished, scheme
 ):

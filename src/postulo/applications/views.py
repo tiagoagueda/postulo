@@ -348,6 +348,9 @@ class ApplicationListView(PageOrFragmentMixin, OwnedObjectMixin, ApplicationFilt
                     "open": is_open,
                     "action": action,
                     "statuses": ",".join(after),
+                    # What `hx-vals` carries, as data: the template encodes it with
+                    # `as_json` instead of pasting a string into a JSON document (#985).
+                    "vals": {"status": ",".join(after)},
                     "url": self.fold_url(after),
                 }
             )

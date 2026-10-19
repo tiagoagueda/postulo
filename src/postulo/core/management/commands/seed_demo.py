@@ -16,6 +16,8 @@ Deterministic for a given ``--seed``, so two people running it get the same sear
 from __future__ import annotations
 
 import datetime as dt
+import getpass
+import os
 import random
 import secrets
 import unicodedata
@@ -319,7 +321,36 @@ class Command(BaseCommand):
             action="store_true",
             help="Skip rendering snapshot PDFs even if a renderer is available.",
         )
-        parser.add_argument("--password", help="Set this password if the account is created.")
+        parser.add_argument(
+            "--password",
+            action="store_true",
+            help=(
+                "Ask for the password of the account, if it is created. Without this the "
+                "password is read from POSTULO_SEED_PASSWORD, or made up and not shown. A "
+                "password is never taken from the command line, where it would be in the "
+                "shell's history and in the process list."
+            ),
+        )
+
+    @staticmethod
+    def _password(options) -> str:
+        """The password for a new account: never one typed on the command line (#980).
+
+        A string given as the `password` option is a call from Python, `call_command(...,
+        password=...)`, which has no shell history to land in. From a shell it is
+        `POSTULO_SEED_PASSWORD`, or a prompt where `--password` was passed.
+        """
+        given = options.get("password")
+        if isinstance(given, str) and given:
+            return given
+        if os.environ.get("POSTULO_SEED_PASSWORD"):
+            return os.environ["POSTULO_SEED_PASSWORD"]
+        if given:
+            typed = getpass.getpass("Password for the new account: ")
+            if not typed:
+                raise CommandError("No password was given.")
+            return typed
+        return secrets.token_urlsafe(24)
 
     def handle(self, *args, **options) -> None:
         User = get_user_model()
@@ -328,7 +359,7 @@ class Command(BaseCommand):
         if created:
             user = User.objects.create_user(
                 email=options["email"],
-                password=options["password"] or secrets.token_urlsafe(24),
+                password=self._password(options),
             )
         has_data = any(
             model.objects.for_user(user).exists()

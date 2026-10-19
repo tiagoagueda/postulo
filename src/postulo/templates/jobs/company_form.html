@@ -145,7 +145,7 @@
 
         {% for box in form.link_boxes %}<c-field :field="box" />{% endfor %}
         {% for block, count in links_kept_back %}
-          <p class="mb-4 text-sm text-ink-500 dark:text-ink-400">{{ block.kept_back_contact|safe }}</p>
+          <p class="mb-4 text-sm text-ink-500 dark:text-ink-400">{{ block.kept_back_contact_html }}</p>
         {% endfor %}
         <c-field :field="form.notes" />
         {% if form.from_career %}<c-field :field="form.from_career" />{% endif %}

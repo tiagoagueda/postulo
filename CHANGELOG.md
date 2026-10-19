@@ -8,6 +8,19 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🔒 Security
 
+- A photograph uploaded as a document has its location, time and camera cut out by default, without re-encoding the picture: a box on the upload form, ticked unless you untick it. (#964)
+- A translation that adds markup the English lacks (a tag, attribute, address or stray <) is left out of the compiled catalogue if a draft and fails the check if reviewed, and the map's "you are here" tooltip is text. (#983)
+- The board's fold links encode their hx-vals with as_json instead of pasting a string into JSON, and a template lint refuses any hx-vals or hx-headers built another way. (#985)
+- The company edit page no longer prints a translated sentence as markup: the kept-back notice on the company, contact and profile pages is composed in Python with the setting's name in italics, and a lint allows |safe in two templates only. (#982)
+- seed_demo takes the new account's password from POSTULO_SEED_PASSWORD or a prompt (--password), never from the command line. (#980)
+- Postulo's own JSON log scrubs the same one-time secrets as the access log: password-reset and email-confirmation keys too, from one list. (#979)
+- /healthz tells a request a trusted proxy passed on by any forwarding header (not only X-Forwarded-For) from the container's own probe, so it is held to the host list and is not told the version. (#977)
+- A request id sent by a trusted proxy is kept when the proxy also sent X-Forwarded-For, judged by the proxy that delivered the request and not by the client address it named. (#976)
+- The threat model says the referee rules bind the shipped themes and the sections they are handed, and that a plugin theme is handed full records and trusted. (#965)
+- Calendar files (the feeds, the downloads, an interview's file, and what a sync plugin writes) no longer carry your private notes or name the people you meet as attendees, so a calendar program cannot offer to send them updates; the notes' help text says so. (#963)
+- The links in a capture notification (mail, webhook, push) are built on POSTULO_PUBLIC_URL when it is set, not on the Host the capture request carried. (#962)
+- A logo address fetched on a shared or group-owned company spends the allowance of the person who pressed the button, once, never the owner's or a shared bucket. (#960)
+- A GeoJSON file or a page's JSON-LD nested thousands deep is refused, or skipped, instead of ending in a server error. (#959)
 - The account archive carries only the exporter's own appointments at a shared or group-owned company, and its count matches the file (#966)
 - A company page, a company table and the group count name a parent or child company only to people who can see it, and a company cannot be put under one whose audience could not see it (#957)
 - A delete confirmation counts only the reader's own applications, meetings, history and documents, and a reader who cannot delete is neither offered the dialog nor sent its counts (#958)

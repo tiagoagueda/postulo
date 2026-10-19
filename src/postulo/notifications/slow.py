@@ -25,6 +25,7 @@ from collections.abc import Callable
 from contextlib import contextmanager
 from contextvars import ContextVar
 
+from django.conf import settings
 from django.db import transaction
 from django.urls import reverse
 from django.utils import formats, timezone
@@ -60,13 +61,18 @@ def deliver(errand) -> dict:
 
 
 def link(payload: dict, path: str) -> str:
-    """A link a message can carry, from where the request said this instance is reached.
+    """A link a message can carry: the same precedence as `absolute_url` (#747, #962).
 
-    The request is gone by the time this runs, so the address it knew travels in the errand.
-    `absolute_url` is the fallback it has always been -- `POSTULO_PUBLIC_URL`, else the bare
-    path -- and it is the fallback rather than the answer because a message that says
-    */jobs/captures/3/review/* is a message nobody can follow from their mail (#247).
+    The operator's `POSTULO_PUBLIC_URL` wins, because a Host header is the sender's to
+    choose and a link in a message goes to whoever receives it. Without one, the address
+    the request knew, which travels in the errand since the request is gone by the time
+    this runs; without that, the bare path, which `absolute_url` returns. A message that
+    says */jobs/captures/3/review/* is one nobody can follow from their mail (#247), hence
+    the middle step.
     """
+    public = (getattr(settings, "POSTULO_PUBLIC_URL", "") or "").rstrip("/")
+    if public:
+        return f"{public}{path}"
     base = (payload.get("base") or "").rstrip("/")
     return f"{base}{path}" if base else absolute_url(path)
 

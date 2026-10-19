@@ -2,8 +2,11 @@
 
 from __future__ import annotations
 
+import io
+
 from django import forms
 from django.contrib.contenttypes.models import ContentType
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.db.models import Q
 from django.utils.html import format_html
 from django.utils.text import format_lazy
@@ -538,8 +541,9 @@ class UploadedDocumentForm(OwnerScopedModelForm):
             "kind": _("What sort of thing it is, so the lists can be narrowed by it."),
             "file": _(
                 "PDF, Word, OpenDocument, RTF, plain text, PNG or JPEG. Postulo keeps it "
-                "exactly as uploaded, under a name of its own — what you send is the file "
-                "you gave it."
+                "under a name of its own and changes nothing in it, except what the box "
+                "below removes from a photograph: a PDF or a Word file keeps whatever it "
+                "carries, such as its author."
             ),
             "notes": _("Yours. They go nowhere with the file."),
             "replaces": _("An older version of the same thing, kept but no longer offered."),
@@ -550,6 +554,22 @@ class UploadedDocumentForm(OwnerScopedModelForm):
     #: at all for an existing file of another kind. A new file shows them whatever the kind
     #: says, because the kind is chosen on the same page and nothing here needs a script.
     REFERENCE_FIELDS = ("referee", "new_referee", "written_on", "valid_until", "delivery")
+
+    #: Ticked unless the person unticks it, on a new file only (#964). A scanned certificate
+    #: is very often a phone's photograph, and that carries where it was taken, when and with
+    #: what; the file is then attached to mail sent to an employer. Only the metadata is cut
+    #: out, by the file's structure: the picture is not re-encoded, so it is the same pixels.
+    strip_metadata = forms.BooleanField(
+        label=_("Remove the photo's metadata (location, time, camera)"),
+        required=False,
+        initial=True,
+        help_text=_(
+            "For a PNG or JPEG. Cuts out where it was taken, when and with what, which a "
+            "phone's photograph carries, before it is kept and before it is sent anywhere. "
+            "The picture itself is not touched. Untick it to keep the file exactly as it is."
+        ),
+    )
+    field_order = ("title", "kind", "file", "strip_metadata")
 
     referee = forms.ModelChoiceField(
         label=_("Referee"),
@@ -689,6 +709,7 @@ class UploadedDocumentForm(OwnerScopedModelForm):
             # file is a new upload that `replaces` this one, which keeps both and says which
             # came after.
             self.fields.pop("file", None)
+            self.fields.pop("strip_metadata", None)
         self.fields["replaces"].queryset = queryset
         self.fields["replaces"].label = _("Supersedes")
 
@@ -711,10 +732,35 @@ class UploadedDocumentForm(OwnerScopedModelForm):
 
     def clean(self):
         cleaned = super().clean()
+        self._without_the_photos_metadata(cleaned)
         written, until = cleaned.get("written_on"), cleaned.get("valid_until")
         if written and until and until < written:
             self.add_error("valid_until", _("A letter cannot expire before it was written."))
         return cleaned
+
+    def _without_the_photos_metadata(self, cleaned: dict) -> None:
+        """Swap the upload for the same picture with its metadata cut out, if asked (#964).
+
+        After `clean_file` has judged it a picture, and not re-encoded: the result must still
+        decode, or the file is kept as it came rather than refused.
+        """
+        uploaded = cleaned.get("file")
+        if not uploaded or not cleaned.get("strip_metadata") or "strip_metadata" not in self.fields:
+            return
+        extension = integrity.extension_of(uploaded.name)
+        if extension not in ("png", "jpg", "jpeg"):
+            return
+        uploaded.seek(0)
+        original = uploaded.read()
+        uploaded.seek(0)
+        stripped = integrity.without_metadata(extension, original)
+        if stripped == original or integrity.problem(
+            extension, io.BytesIO(stripped), len(stripped)
+        ):
+            return
+        cleaned["file"] = SimpleUploadedFile(
+            uploaded.name, stripped, content_type=getattr(uploaded, "content_type", None)
+        )
 
     def _keep_reference_letter(self, document: UploadedDocument) -> None:
         """Write, or drop, the letter's record to match the kind the file now has (#666)."""

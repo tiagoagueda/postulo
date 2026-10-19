@@ -76,6 +76,10 @@ def healthz(request: HttpRequest) -> JsonResponse:
 def _is_local(request: HttpRequest) -> bool:
     import ipaddress
 
+    from .proxy import was_forwarded
+
+    if was_forwarded(request):
+        return False
     try:
         return ipaddress.ip_address(request.META.get("REMOTE_ADDR", "")).is_loopback
     except ValueError:

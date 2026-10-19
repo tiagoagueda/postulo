@@ -143,6 +143,26 @@ def test_near_me_moves_the_map_to_the_browser_when_pressed(live_server, page: Pa
     assert page.locator("[data-map-status]").inner_text() == ""
 
 
+def test_the_you_are_here_tooltip_is_text_even_if_a_translation_holds_markup(
+    live_server, page: Page, placed
+):
+    """Leaflet writes a string tooltip with innerHTML; the words must arrive as text (#983)."""
+    watch(page)
+    page.context.grant_permissions(["geolocation"])
+    page.context.set_geolocation({"latitude": 41.15, "longitude": -8.61})
+    sign_in(page, live_server.url, "/jobs/companies/map/")
+    page.evaluate(
+        "document.querySelector('[data-map-here]').setAttribute('data-map-here', '<b>here</b>')"
+    )
+
+    page.get_by_role("button", name="Near me").click()
+    page.locator("path.map-here").hover()
+
+    tooltip = page.locator(".leaflet-tooltip")
+    expect(tooltip).to_have_text("<b>here</b>")
+    expect(tooltip.locator("b")).to_have_count(0)
+
+
 def test_near_me_says_so_when_the_browser_will_not_tell(live_server, page: Page, placed):
     watch(page)
     sign_in(page, live_server.url, "/jobs/companies/map/")
