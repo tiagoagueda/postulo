@@ -499,13 +499,23 @@ def test_the_footer_over_the_map_is_its_compact_line_in_the_end_corner(client, u
         assert "<span" not in link, "the icon alone, no words beside it"
 
 
+def test_the_map_buttons_ask_for_their_tooltips_beside_them(client, user):
+    """#915: the three sentences ask for the inline-start side, which faces into the map."""
+    Company.objects.create(owner=user, name="One", location="Lisbon")
+
+    html = page(client, user).content.decode()
+
+    for tip in ("map-tip-zoom-in", "map-tip-zoom-out", "map-tip-locate"):
+        assert f'<span id="{tip}" data-tooltip data-tooltip-place="start">' in html
+
+
 def test_the_map_buttons_have_their_tooltips(client, user):
     Company.objects.create(owner=user, name="One", location="Lisbon")
 
     html = page(client, user).content.decode()
 
     for tip, words in (("map-tip-zoom-in", "Zoom in"), ("map-tip-zoom-out", "Zoom out")):
-        assert f'<span id="{tip}" data-tooltip>{words}</span>' in html
+        assert f'<span id="{tip}" data-tooltip data-tooltip-place="start">{words}</span>' in html
 
 
 def test_every_other_page_keeps_the_motto_and_the_words(client, user):
@@ -561,7 +571,9 @@ def test_near_me_is_offered_in_the_readers_words(client, user):
 
     html = page(client, user).content.decode()
 
-    assert '<span id="map-tip-locate" data-tooltip>Near me</span>' in html
+    assert (
+        '<span id="map-tip-locate" data-tooltip data-tooltip-place="start">Near me</span>' in html
+    )
     assert "data-map-locate-refused=" in html and "data-map-locate-failed=" in html
     assert 'role="status" data-map-status' in html
     assert 'data-icon="locate-fixed"' in html

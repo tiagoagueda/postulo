@@ -305,3 +305,80 @@ def test_the_footer_over_the_map_has_no_motto_and_no_words_beside_its_icons(
         "el => getComputedStyle(el).backgroundColor === 'rgba(0, 0, 0, 0)'"
         " && getComputedStyle(el).borderTopWidth === '0px'"
     )
+
+
+def beside(page: Page, selector: str) -> dict:
+    """Where the open tooltip is, set against the control it belongs to (#915)."""
+    page.locator(selector).hover()
+    expect(page.locator("[data-tooltip][popover]:popover-open")).to_have_count(1)
+    return page.evaluate(
+        """(selector) => {
+          const tip = document.querySelector("[data-tooltip][popover]:popover-open");
+          const t = tip.getBoundingClientRect();
+          const a = document.querySelector(selector).getBoundingClientRect();
+          return {
+            side: tip.getAttribute("data-tooltip-side"),
+            gap_start: a.left - t.right,
+            gap_end: t.left - a.right,
+            centre: Math.abs((t.top + t.bottom) / 2 - (a.top + a.bottom) / 2),
+            overlaps: !(t.right <= a.left || t.left >= a.right
+                        || t.bottom <= a.top || t.top >= a.bottom),
+          };
+        }""",
+        selector,
+    )
+
+
+@pytest.mark.parametrize(
+    "selector",
+    [".leaflet-control-zoom-in", ".leaflet-control-zoom-out", ".map-locate"],
+)
+def test_the_map_tooltips_are_beside_the_button_towards_the_map(
+    live_server, page: Page, placed, selector
+):
+    """#915: left of a button on the right-hand side, vertically centred, over no button."""
+    watch(page)
+    page.set_viewport_size({"width": 1280, "height": 800})
+    sign_in(page, live_server.url, "/jobs/companies/map/")
+    expect(page.locator(".leaflet-control-zoom")).to_be_visible()
+
+    where = beside(page, selector)
+
+    assert where["side"] == "start" and not where["overlaps"], where
+    assert 0 <= where["gap_start"] <= 8, where
+    assert where["centre"] <= 1, where
+
+
+def test_right_to_left_the_map_tooltips_are_on_the_right_of_the_button(
+    live_server, page: Page, placed, applicant
+):
+    profile = applicant.profile
+    profile.language = "ar"
+    profile.save(update_fields=["language"])
+    watch(page)
+    page.set_viewport_size({"width": 1280, "height": 800})
+    sign_in(page, live_server.url, "/jobs/companies/map/")
+    expect(page.locator(".leaflet-control-zoom")).to_be_visible()
+
+    where = beside(page, ".leaflet-control-zoom-in")
+
+    assert where["side"] == "start" and not where["overlaps"], where
+    assert 0 <= where["gap_end"] <= 8, where
+
+
+def test_the_tooltip_beside_the_button_stays_when_the_pointer_crosses_the_gap(
+    live_server, page: Page, placed
+):
+    watch(page)
+    page.set_viewport_size({"width": 1280, "height": 800})
+    sign_in(page, live_server.url, "/jobs/companies/map/")
+    expect(page.locator(".leaflet-control-zoom")).to_be_visible()
+    button = page.locator(".leaflet-control-zoom-in")
+    button.hover()
+    tip = page.locator("[data-tooltip][popover]:popover-open")
+    expect(tip).to_have_count(1)
+
+    box = tip.bounding_box()
+    page.mouse.move(box["x"] + box["width"] / 2, box["y"] + box["height"] / 2, steps=8)
+
+    expect(tip).to_have_count(1)

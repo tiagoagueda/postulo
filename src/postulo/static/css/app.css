@@ -8109,6 +8109,17 @@ progress.funnel-bar::-moz-progress-bar {
 [data-tooltip][popover][data-tooltip-side="below"]::after {
   inset-block-end: 100%;
 }
+[data-tooltip][popover][data-tooltip-side="start"]::after, [data-tooltip][popover][data-tooltip-side="end"]::after {
+  inset-block: 0;
+  block-size: auto;
+  inline-size: 8px;
+}
+[data-tooltip][popover][data-tooltip-side="start"]::after {
+  inset-inline: 100% auto;
+}
+[data-tooltip][popover][data-tooltip-side="end"]::after {
+  inset-inline: auto 100%;
+}
 @media (forced-colors: active) {
   [data-tooltip][popover] {
     border-color: CanvasText;
