@@ -2100,6 +2100,23 @@ progress.funnel-bar::-moz-progress-bar {
   inset-block-end: 100%;
 }
 
+/* Beside the anchor (#915): the strip is the tooltip's full height and eight wide, on the
+   side that faces the anchor. */
+[data-tooltip][popover][data-tooltip-side="start"]::after,
+[data-tooltip][popover][data-tooltip-side="end"]::after {
+  inset-block: 0;
+  block-size: auto;
+  inline-size: 8px;
+}
+
+[data-tooltip][popover][data-tooltip-side="start"]::after {
+  inset-inline: 100% auto;
+}
+
+[data-tooltip][popover][data-tooltip-side="end"]::after {
+  inset-inline: auto 100%;
+}
+
 /* The system's own colours, and a border that is one: a high-contrast theme repaints the
    ground to `Canvas`, and the box would otherwise be words lying loose over the page. */
 @media (forced-colors: active) {

@@ -5158,6 +5158,9 @@
     if (bandRight - bandLeft < TIP_NARROWEST) {
       return null;
     }
+    if (inlinePlace(place)) {
+      return null;
+    }
     var along = place !== "above" && place !== "below";
     var atRight = along && Math.abs(box.right - from.right) < 1;
     var atLeft = along && !atRight;
@@ -5186,9 +5189,26 @@
     return { left: left, top: top, right: left + wide, bottom: top + tall };
   }
 
+  // `start` and `end` (#915): beside the anchor, on its inline-start or inline-end side,
+  // centred on it. Not in the lists below; an anchor asks for one.
+  function inlinePlace(place) {
+    return place === "start" || place === "end";
+  }
+
   // Where a tooltip of this size would be, put at one of the places, in the window's
   // co-ordinates.
   function tipBoxAt(place, from, wide, tall, seen, rtl) {
+    if (inlinePlace(place)) {
+      // Left of the anchor when it is the start side of a left-to-right page, right of it
+      // when it is the end side or the page runs right to left.
+      var onLeft = (place === "start") !== rtl;
+      var beside = Math.round(onLeft ? from.left - TIP_GAP - wide : from.right + TIP_GAP);
+      // Slid along the anchor's side as far as the window needs, never past it.
+      var level = (from.top + from.bottom) / 2 - tall / 2;
+      level = Math.max(seen.top + TIP_EDGE, Math.min(level, seen.bottom - TIP_EDGE - tall));
+      level = Math.round(level);
+      return { left: beside, top: level, right: beside + wide, bottom: level + tall };
+    }
     var top = place.indexOf("above") === 0 ? from.top - TIP_GAP - tall : from.bottom + TIP_GAP;
     var left;
     if (place === "above" || place === "below") {
@@ -5211,7 +5231,8 @@
     var style = tip.style;
     style.left = box.left - origin.left + "px";
     style.top = box.top - origin.top + "px";
-    tip.setAttribute("data-tooltip-side", place.indexOf("above") === 0 ? "above" : "below");
+    var side = inlinePlace(place) ? place : place.indexOf("above") === 0 ? "above" : "below";
+    tip.setAttribute("data-tooltip-side", side);
     var edge = tip.clientLeft;
     var outLeft = Math.max(0, box.left - from.left) + edge;
     var outRight = Math.max(0, from.right - box.right) + edge;
@@ -5262,6 +5283,12 @@
     var origin = tip.getBoundingClientRect();
     var rtl = window.getComputedStyle(anchor).direction === "rtl";
     var places = anchor.hasAttribute("data-help-mark") ? MARK_PLACES : TIP_PLACES;
+    // A side asked for (#915), on the sentence or on its anchor, comes first; when it has
+    // no room the usual order follows.
+    var asked = tip.getAttribute("data-tooltip-place") || anchor.getAttribute("data-tooltip-place");
+    if (asked === "start" || asked === "end" || asked === "below") {
+      places = [asked].concat(places);
+    }
     var obstacles = tipObstacles(anchor);
     for (var i = 0; i < places.length; i += 1) {
       var place = places[i];

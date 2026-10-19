@@ -162,6 +162,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🔧 Changed
 
+- On the companies' map, the Zoom in, Zoom out and Near me tooltips appear beside their button, towards the map, instead of over the neighbouring button; tooltips can now ask for a side (`data-tooltip-place`). (#915)
 - The instructions for AI assistants moved from CLAUDE.md to AGENTS.md, which Codex, Copilot, Cursor and others read; CLAUDE.md only imports it (#939)
 - The section menu of Your details has an icon on every entry, and Your CV photo is in it. (#920)
 - A social profile is one to a service: a service another row uses is greyed out in the menu and a second one is refused, except Other and services on many servers such as Mastodon; rows that already share one are kept and flagged. (#925)
