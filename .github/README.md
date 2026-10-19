@@ -98,6 +98,8 @@ decorative, colour never carries a meaning on its own, changes on the page are a
 to screen readers, and the pages are checked against the accessibility guidelines
 (WCAG 2.2, level AA) as part of the browser tests rather than as an afterthought. When a
 feature cannot be made to work for someone, that is a bug, and it is filed as one.
+[ACCESSIBILITY.md](https://source.tiagoagueda.com/postulo/postulo/src/branch/main/ACCESSIBILITY.md) is the accessibility statement: what is checked and
+how, what is known not to work yet, and how to report a barrier.
 
 ## What it does
 
@@ -140,7 +142,7 @@ feature cannot be made to work for someone, that is a bug, and it is filed as on
 Much of Postulo is written with an AI assistant, and contributions made the same way are
 welcome. The rule is simple: a person proposes the change, has read it, can explain it,
 and answers for it. The assistant is a tool; the contributor is accountable. See
-[CONTRIBUTING.md](https://source.tiagoagueda.com/postulo/postulo/src/branch/main/CONTRIBUTING.md) and [CLAUDE.md](https://source.tiagoagueda.com/postulo/postulo/src/branch/main/CLAUDE.md).
+[CONTRIBUTING.md](https://source.tiagoagueda.com/postulo/postulo/src/branch/main/CONTRIBUTING.md) and [AGENTS.md](https://source.tiagoagueda.com/postulo/postulo/src/branch/main/AGENTS.md).
 
 ## In your language
 
@@ -271,4 +273,5 @@ Developed on [Forgejo](https://source.tiagoagueda.com/postulo/postulo) and mirro
 GitHub. Issues and pull requests belong on the Forgejo repository; the GitHub copy is a
 read-only mirror. A bug or a request has a form there (see
 [CONTRIBUTING.md](https://source.tiagoagueda.com/postulo/postulo/src/branch/main/CONTRIBUTING.md#opening-an-issue)); a security problem does not go in an
-issue, see [SECURITY.md](https://source.tiagoagueda.com/postulo/postulo/src/branch/main/SECURITY.md).
+issue, see [SECURITY.md](https://source.tiagoagueda.com/postulo/postulo/src/branch/main/SECURITY.md). Everyone taking part is held to the
+[code of conduct](https://source.tiagoagueda.com/postulo/postulo/src/branch/main/CODE_OF_CONDUCT.md).

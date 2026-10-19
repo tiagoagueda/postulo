@@ -14,7 +14,7 @@ from pathlib import Path
 import pytest
 
 ROOT = Path(__file__).resolve().parents[1]
-DOCUMENTS = ["docs/TRANSLATING.md", "CONTRIBUTING.md", "CLAUDE.md"]
+DOCUMENTS = ["docs/TRANSLATING.md", "CONTRIBUTING.md", "AGENTS.md"]
 
 #: What each of them said before, and must not say again.
 CONTRADICTIONS = [
@@ -49,4 +49,4 @@ def test_the_handbook_says_where_and_what_a_commit_may_do():
 
 
 def test_the_assistant_is_told_never_to_write_one():
-    assert "Never write a translation" in (ROOT / "CLAUDE.md").read_text(encoding="utf-8")
+    assert "Never write a translation" in (ROOT / "AGENTS.md").read_text(encoding="utf-8")

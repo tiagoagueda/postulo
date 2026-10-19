@@ -1182,6 +1182,16 @@ def _git(*args: str) -> str:
     ).stdout.decode("utf-8")
 
 
+def _is_commit(revision: str) -> bool:
+    import subprocess
+
+    try:
+        _git("cat-file", "-e", f"{revision}^{{commit}}")
+    except subprocess.CalledProcessError:
+        return False
+    return True
+
+
 def _git_file(revision: str, path: str) -> str | None:
     import subprocess
 
@@ -1298,6 +1308,12 @@ def cmd_guard(base: str | None, head: str, staged: bool) -> int:
     if staged:
         problems = guard_staged()
     else:
+        if base and set(base) != {"0"} and not _is_commit(base):
+            # A force-push hands over the commit the branch pointed at before, which the
+            # checkout no longer has; every commit the push brought is still in
+            # origin/main..head, so read those, as for a new branch (#1011).
+            print(f"{base} is not a commit here (a force-push?); reading from origin/main")
+            base = None
         if not base or set(base) == {"0"}:
             base = _git("merge-base", "origin/main", head).strip()
         else:

@@ -542,7 +542,7 @@ def test_nothing_lower_cases_a_code_for_itself():
 def test_the_other_spelling_is_only_written_beside_the_right_one():
     """In the guide and the wiki a code is written as Postulo writes it. The one exception is
     a sentence saying what not to write, and it says what to write on the same line."""
-    pages = [*(REPO / "docs").glob("*.md"), *(REPO / name for name in ("README.md", "CLAUDE.md"))]
+    pages = [*(REPO / "docs").glob("*.md"), *(REPO / name for name in ("README.md", "AGENTS.md"))]
     pages += [REPO / "CONTRIBUTING.md", *(WIKI.glob("*.md") if WIKI.is_dir() else [])]
     assert len(pages) > 5
 
