@@ -186,6 +186,21 @@ def test_guard_lets_weblate_through(tool, repo):
     assert tool.cmd_guard(base, "HEAD", staged=False) == 0
 
 
+def test_guard_reads_from_origin_main_when_the_base_is_gone(tool, repo, capsys):
+    """After a force-push the commit the branch pointed at before is not in the checkout;
+    the guard reads the branch since origin/main instead of crashing (#1011)."""
+    root, catalogue = repo
+    git(root, "update-ref", "refs/remotes/origin/main", "HEAD")
+    git(root, "switch", "-q", "-c", "topic")
+    catalogue.write_text(po(entry("Save", "Enregistrer")), encoding="utf-8", newline="\n")
+    git(root, "commit", "-q", "-am", "translate by hand")
+    gone = "a7cc52b93362d01ea97e7f71d051591c823175b3"
+
+    assert tool.cmd_guard(gone, "HEAD", staged=False) == 1
+    out = capsys.readouterr().out
+    assert "is not a commit here" in out and "translation was changed here" in out
+
+
 def test_guard_reads_what_is_staged(tool, repo):
     root, catalogue = repo
     catalogue.write_text(po(entry("Save", "Enregistrer")), encoding="utf-8", newline="\n")

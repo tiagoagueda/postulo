@@ -338,6 +338,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🐛 Fixed
 
+- CI's translation guard no longer crashes on a force-pushed branch: a previous commit it cannot find makes it read the branch since main (#1011)
 - A company's LinkedIn row builds a /company/ address and a person's an /in/ address; Xing likewise. (#932)
 - On a phone the star and the bin of a telephone row stay level beside the choice of the number that gets you back in. (#931)
 - The seven cards of Your details that drew their heading on the border draw it inside the card. (#919)
