@@ -727,12 +727,12 @@ msgstr "%(kind)s ստեղծվեց։ Այժմ ընտրեք, թե ինչ կլին�
 msgid "%(kind)s held"
 msgstr "%(kind)s-ը կայացավ"
 
-#: src/postulo/api/routers/companies.py
+#: src/postulo/api/routers/companies.py src/postulo/jobs/surface.py
 #, fuzzy, python-format
 msgid "%(kind)s is not a kind of address."
 msgstr "%(kind)s հասցեի տեսակ չէ։"
 
-#: src/postulo/api/routers/companies.py
+#: src/postulo/api/routers/companies.py src/postulo/jobs/surface.py
 #, fuzzy, python-format
 msgid "%(kind)s is not a kind of number."
 msgstr "%(kind)s համարի տեսակ չէ։"
@@ -1242,7 +1242,7 @@ msgstr "%(scheme)s՝ սա սովորական ձևը չէ։"
 msgid "%(sent)s, %(failed)s; each document says which."
 msgstr "%(sent)s, %(failed)s․ յուրաքանչյուր փաստաթղթում նշված է, թե որը։"
 
-#: src/postulo/core/web_links.py
+#: src/postulo/core/web_links.py src/postulo/jobs/surface.py
 #, python-format
 msgid "%(service)s is already used by another row."
 msgstr ""
@@ -1789,6 +1789,10 @@ msgstr "Ընկերությունը մեկ նույնացուցիչ է կրում
 msgid "A company in several sectors or industries counts in each of them."
 msgstr "Մի քանի ճյուղերում կամ ոլորտներում գործող ընկերությունը հաշվվում է դրանցից յուրաքանչյուրում։"
 
+#: src/postulo/jobs/surface.py
+msgid "A company needs a name."
+msgstr ""
+
 #: src/postulo/templates/jobs/company_map.html
 #, fuzzy
 msgid "A company with addresses in several places is counted at each, so the counts add up to more than the companies there are."
@@ -1799,7 +1803,7 @@ msgstr "Մի քանի վայրերում հասցեներ ունեցող ընկ�
 msgid "A company with the same identifier is already yours."
 msgstr "Նույն նույնացուցիչով ընկերություն արդեն ունեք։"
 
-#: src/postulo/api/routers/companies.py
+#: src/postulo/api/routers/companies.py src/postulo/jobs/surface.py
 #, fuzzy
 msgid "A company's links are its social profiles."
 msgstr "Ընկերության հղումները նրա սոցիալական պրոֆիլներն են։"
@@ -1833,6 +1837,10 @@ msgstr "Կոնտակտ առանց ընկերության"
 #, fuzzy, python-format
 msgid "A contact has at most %(max)s messaging handles."
 msgstr "Կոնտակտը կարող է ունենալ առավելագույնը %(max)s մեսենջերի անուն։"
+
+#: src/postulo/jobs/surface.py
+msgid "A contact needs a name."
+msgstr ""
 
 #: src/postulo/templates/server/design.html
 #, fuzzy
@@ -1903,6 +1911,10 @@ msgstr "Ծննդյան ամսաթիվը չի կարող լինել %(year)s թվ
 #, fuzzy
 msgid "A deep blue. Ten steps, of which the interface spends a handful."
 msgstr "Խորը կապույտ։ Տասը աստիճան, որոնցից ինտերֆեյսն օգտագործում է մի քանիսը։"
+
+#: src/postulo/jobs/surface.py
+msgid "A department needs a name."
+msgstr ""
 
 #: src/postulo/resume/publications.py
 #, fuzzy
@@ -2233,6 +2245,10 @@ msgstr "Միջազգային ձևաչափով համարն այս տեղակայ
 #, fuzzy
 msgid "A number is kept once on this instance. If one is already recorded here, saving says so rather than taking it from whoever has it."
 msgstr "Համարը այս տեղակայման վրա պահվում է մեկ անգամ։ Եթե այն արդեն գրանցված է այստեղ, պահպանումն ասում է դա՝ այն չվերցնելով նրանից, ում պատկանում է։"
+
+#: src/postulo/jobs/surface.py
+msgid "A number is needed."
+msgstr ""
 
 #: src/postulo/templates/help/telephone_numbers.html
 #, fuzzy
@@ -3284,6 +3300,10 @@ msgstr "Հասցեն չի կարող պարունակել օգտանուն կա�
 #, fuzzy
 msgid "An address cannot contain a line break or any other control character."
 msgstr "Հասցեն չի կարող պարունակել տողադարձ կամ որևէ այլ կառավարման նիշ։"
+
+#: src/postulo/jobs/surface.py
+msgid "An address needs at least one part."
+msgstr ""
 
 #: src/postulo/documents/forms.py
 #, fuzzy
@@ -6912,6 +6932,10 @@ msgstr "Ուղարկվեց էլ. փոստով, և ձեր ուղարկածը գր
 #, fuzzy
 msgid "Employer"
 msgstr "Գործատու"
+
+#: src/postulo/jobs/surface.py
+msgid "Employer structure is switched off, so departments and parents are not changed."
+msgstr ""
 
 #: src/postulo/applications/models.py
 #, fuzzy
@@ -13125,6 +13149,10 @@ msgstr "Առցանց"
 msgid "Only %(name)s"
 msgstr "Միայն %(name)s"
 
+#: src/postulo/jobs/surface.py
+msgid "Only a company's or a contact's details can be written."
+msgstr ""
+
 #: src/postulo/jobs/capture_views.py
 #, fuzzy
 msgid "Only a discarded capture can be put back."
@@ -15808,7 +15836,7 @@ msgstr "նշել, որ հանձնարարականները տրամադրվում
 msgid "Say that you understand what leaving does, first."
 msgstr ""
 
-#: src/postulo/core/postal.py
+#: src/postulo/core/postal.py src/postulo/jobs/surface.py
 #, fuzzy
 msgid "Say what this address is."
 msgstr "Ասեք՝ ինչ հասցե է սա։"
@@ -15819,7 +15847,7 @@ msgstr "Ասեք՝ ինչ հասցե է սա։"
 msgid "Say what this identifier is."
 msgstr "Ասեք, թե ինչ է այս նույնացուցիչը։"
 
-#: src/postulo/core/phone_numbers.py
+#: src/postulo/core/phone_numbers.py src/postulo/jobs/surface.py
 #, fuzzy
 msgid "Say what this number is."
 msgstr "Ասեք, թե ինչ համար է սա։"
@@ -15838,6 +15866,10 @@ msgstr "Նշեք, թե ում ուղարկել։"
 #, fuzzy
 msgid "Say whose tiles they are: their licence asks for a credit on the map."
 msgstr "Նշեք, թե ումն են սալիկները․ դրանց լիցենզիան պահանջում է հեղինակային նշում քարտեզի վրա։"
+
+#: src/postulo/jobs/surface.py
+msgid "Say whose work this is: a saved account."
+msgstr ""
 
 #: src/postulo/templates/applications/application_detail.html
 #: src/postulo/templates/applications/interview_form.html
@@ -17656,6 +17688,10 @@ msgstr "Այդ շղթան ավելի խորն է, քան %(limit)s ընկերո�
 msgid "That company is no longer here."
 msgstr "Այդ ընկերությունն այլևս գոյություն չունի։"
 
+#: src/postulo/jobs/surface.py
+msgid "That company is not one you can see."
+msgstr ""
+
 #: src/postulo/api/routers/companies.py
 msgid "That company is shared with you read-only."
 msgstr ""
@@ -17684,6 +17720,10 @@ msgstr "Այդ CV-ն ձերը չէ։"
 #, fuzzy
 msgid "That department belongs to a different company."
 msgstr "Այդ բաժինը պատկանում է այլ ընկերության։"
+
+#: src/postulo/jobs/surface.py
+msgid "That department is not one you can see."
+msgstr ""
 
 #: src/postulo/templates/base.html
 #, fuzzy
@@ -17969,6 +18009,10 @@ msgstr "Սա այն ֆայլը չէ, որը կարդում է այս էջը։ Ա
 msgid "That is not a kind of access."
 msgstr ""
 
+#: src/postulo/jobs/surface.py
+msgid "That is not a kind of company."
+msgstr ""
+
 #: src/postulo/accounts/avatars.py
 #, fuzzy, python-format
 msgid "That is not a kind of picture Postulo keeps. Use %(formats)s."
@@ -17993,6 +18037,10 @@ msgstr "Սա %(country)s երկրում օգտագործվող համար չէ�
 #, fuzzy, python-format
 msgid "That is not a Postulo backup that opens cleanly: %(problem)s"
 msgstr "Սա Postulo-ի պահուստային պատճեն չէ, որը բացվում է առանց խնդիրների՝ %(problem)s"
+
+#: src/postulo/jobs/surface.py
+msgid "That is not a record that has been saved."
+msgstr ""
 
 #: src/postulo/core/messaging_services.py
 #, fuzzy
@@ -18130,6 +18178,10 @@ msgstr "Այդ հղումը հնարավոր չէ օգտագործել։"
 msgid "That link will not work any more."
 msgstr "Այդ հղումն այլևս չի աշխատի։"
 
+#: src/postulo/jobs/surface.py
+msgid "That name cannot be checked just now."
+msgstr ""
+
 #: src/postulo/core/phones.py
 #, fuzzy
 msgid "That number has no area code."
@@ -18226,6 +18278,10 @@ msgstr "Այդ հավելումն այլևս տեղադրված չէ։"
 #, fuzzy
 msgid "That plugin is switched off for you."
 msgstr "Այդ հավելումը ձեզ համար անջատված է։"
+
+#: src/postulo/jobs/surface.py
+msgid "That record is not yours to change."
+msgstr ""
 
 #: src/postulo/core/mail_auth.py src/postulo/plugins/consent.py
 #, fuzzy
@@ -19970,6 +20026,7 @@ msgid "This address is already in your listings, since %(when)s."
 msgstr "Այս հասցեն արդեն ձեր հայտարարությունների մեջ է %(when)s-ից։"
 
 #: src/postulo/core/postal.py src/postulo/core/web_links.py
+#: src/postulo/jobs/surface.py
 #, fuzzy
 msgid "This address is already listed."
 msgstr "Այս հասցեն արդեն ցանկում է։"
@@ -20293,7 +20350,7 @@ msgstr "Սա ձեր սեփական հաշիվն է։ Ձեզ համար ստեղ�
 msgid "This month"
 msgstr "Այս ամիս"
 
-#: src/postulo/core/phone_numbers.py
+#: src/postulo/core/phone_numbers.py src/postulo/jobs/surface.py
 #, fuzzy
 msgid "This number is already listed."
 msgstr "Այս համարն արդեն ցանկում է։"
@@ -22765,6 +22822,7 @@ msgid "You"
 msgstr "Դուք"
 
 #: src/postulo/api/routers/companies.py src/postulo/jobs/forms.py
+#: src/postulo/jobs/surface.py
 #, fuzzy
 msgid "You already have a company with that name."
 msgstr "Այդ անունով ընկերություն արդեն ունեք։"
@@ -23425,7 +23483,8 @@ msgstr "· դեռ ընթանում է"
 msgid "“%(code)s” is not a language code, like %(first)s or %(second)s."
 msgstr "«%(code)s»-ը լեզվի կոդ չէ (օրինակ՝ %(first)s կամ %(second)s)։"
 
-#: src/postulo/core/web_links.py src/postulo/resume/candidate.py
+#: src/postulo/core/web_links.py src/postulo/jobs/surface.py
+#: src/postulo/resume/candidate.py
 #, fuzzy, python-format
 msgid "“%(kind)s” is not one of the types of link."
 msgstr "«%(kind)s» հղման տեսակներից մեկը չէ։"

@@ -727,12 +727,12 @@ msgstr "%(kind)s creà. Tschernai ussa tge che vegn en il document."
 msgid "%(kind)s held"
 msgstr "%(kind)s fatg"
 
-#: src/postulo/api/routers/companies.py
+#: src/postulo/api/routers/companies.py src/postulo/jobs/surface.py
 #, fuzzy, python-format
 msgid "%(kind)s is not a kind of address."
 msgstr "%(kind)s n'è betg ina sort d'adressa."
 
-#: src/postulo/api/routers/companies.py
+#: src/postulo/api/routers/companies.py src/postulo/jobs/surface.py
 #, fuzzy, python-format
 msgid "%(kind)s is not a kind of number."
 msgstr "%(kind)s n'è betg ina sort da numer."
@@ -1242,7 +1242,7 @@ msgstr "%(scheme)s: quai n'è betg la furma usitada."
 msgid "%(sent)s, %(failed)s; each document says which."
 msgstr "%(sent)s, %(failed)s; mintga document inditgescha tgenin."
 
-#: src/postulo/core/web_links.py
+#: src/postulo/core/web_links.py src/postulo/jobs/surface.py
 #, python-format
 msgid "%(service)s is already used by another row."
 msgstr ""
@@ -1789,6 +1789,10 @@ msgstr "Ina interpresa ha in identificatur per sistem."
 msgid "A company in several sectors or industries counts in each of them."
 msgstr "In'interpresa en plirs secturs u branschas vegn dumbrada en mintgin."
 
+#: src/postulo/jobs/surface.py
+msgid "A company needs a name."
+msgstr ""
+
 #: src/postulo/templates/jobs/company_map.html
 #, fuzzy
 msgid "A company with addresses in several places is counted at each, so the counts add up to more than the companies there are."
@@ -1799,7 +1803,7 @@ msgstr "In'interpresa cun adressas en plirs lieus vegn dumbrada en mintgin, usch
 msgid "A company with the same identifier is already yours."
 msgstr "Ina interpresa cun il medem identificatur è gia Vossa."
 
-#: src/postulo/api/routers/companies.py
+#: src/postulo/api/routers/companies.py src/postulo/jobs/surface.py
 #, fuzzy
 msgid "A company's links are its social profiles."
 msgstr "Las colliaziuns d'ina interpresa èn ses profils socials."
@@ -1833,6 +1837,10 @@ msgstr "In contact senza interpresa"
 #, fuzzy, python-format
 msgid "A contact has at most %(max)s messaging handles."
 msgstr "In contact ha maximalmain %(max)s nums d'utilisader da messadis."
+
+#: src/postulo/jobs/surface.py
+msgid "A contact needs a name."
+msgstr ""
 
 #: src/postulo/templates/server/design.html
 #, fuzzy
@@ -1903,6 +1911,10 @@ msgstr "Ina data da naschientscha n'è betg avant %(year)s."
 #, fuzzy
 msgid "A deep blue. Ten steps, of which the interface spends a handful."
 msgstr "In blau stgir. Diesch stgalims, dals quals l'interfatscha dovra paucs."
+
+#: src/postulo/jobs/surface.py
+msgid "A department needs a name."
+msgstr ""
 
 #: src/postulo/resume/publications.py
 #, fuzzy
@@ -2233,6 +2245,10 @@ msgstr "In numer en sia furma internaziunala vegn conservà mo ina giada sin que
 #, fuzzy
 msgid "A number is kept once on this instance. If one is already recorded here, saving says so rather than taking it from whoever has it."
 msgstr "In numer vegn conservà mo ina giada sin questa instanza. Sch'el è gia registrà qua, di l'arcunar quai enstagl da al prender da la persuna che al ha."
+
+#: src/postulo/jobs/surface.py
+msgid "A number is needed."
+msgstr ""
 
 #: src/postulo/templates/help/telephone_numbers.html
 #, fuzzy
@@ -3284,6 +3300,10 @@ msgstr "Ina adressa na po betg cuntegnair in num d'utilisader u in pled-clav."
 #, fuzzy
 msgid "An address cannot contain a line break or any other control character."
 msgstr "Ina adressa na po betg cuntegnair ina midada da lingia u in auter caracter da controlla."
+
+#: src/postulo/jobs/surface.py
+msgid "An address needs at least one part."
+msgstr ""
 
 #: src/postulo/documents/forms.py
 #, fuzzy
@@ -6912,6 +6932,10 @@ msgstr "Tramess per e-mail, e registrà quai che Vus avais tramess."
 #, fuzzy
 msgid "Employer"
 msgstr "Patrun"
+
+#: src/postulo/jobs/surface.py
+msgid "Employer structure is switched off, so departments and parents are not changed."
+msgstr ""
 
 #: src/postulo/applications/models.py
 #, fuzzy
@@ -13125,6 +13149,10 @@ msgstr "Online"
 msgid "Only %(name)s"
 msgstr "Mo %(name)s"
 
+#: src/postulo/jobs/surface.py
+msgid "Only a company's or a contact's details can be written."
+msgstr ""
+
 #: src/postulo/jobs/capture_views.py
 #, fuzzy
 msgid "Only a discarded capture can be put back."
@@ -15808,7 +15836,7 @@ msgstr "inditgar che referenzas èn disponiblas sin dumonda"
 msgid "Say that you understand what leaving does, first."
 msgstr ""
 
-#: src/postulo/core/postal.py
+#: src/postulo/core/postal.py src/postulo/jobs/surface.py
 #, fuzzy
 msgid "Say what this address is."
 msgstr "Indicai tge adressa che quai è."
@@ -15819,7 +15847,7 @@ msgstr "Indicai tge adressa che quai è."
 msgid "Say what this identifier is."
 msgstr "Inditgai tge che quest identificatur è."
 
-#: src/postulo/core/phone_numbers.py
+#: src/postulo/core/phone_numbers.py src/postulo/jobs/surface.py
 #, fuzzy
 msgid "Say what this number is."
 msgstr "Indicai tge numer che quai è."
@@ -15838,6 +15866,10 @@ msgstr "Inditgai a tgi ch'i duai vegnir tramess."
 #, fuzzy
 msgid "Say whose tiles they are: their licence asks for a credit on the map."
 msgstr "Indicai da tgi che las plattinas èn: lur licenza pretenda ina menziun sin la charta."
+
+#: src/postulo/jobs/surface.py
+msgid "Say whose work this is: a saved account."
+msgstr ""
 
 #: src/postulo/templates/applications/application_detail.html
 #: src/postulo/templates/applications/interview_form.html
@@ -17656,6 +17688,10 @@ msgstr "Questa chadaina cumpiglia dapli che %(limit)s interpresas ina sut l'autr
 msgid "That company is no longer here."
 msgstr "Questa interpresa n'exista betg pli."
 
+#: src/postulo/jobs/surface.py
+msgid "That company is not one you can see."
+msgstr ""
+
 #: src/postulo/api/routers/companies.py
 msgid "That company is shared with you read-only."
 msgstr ""
@@ -17684,6 +17720,10 @@ msgstr "Quest CV n'è betg Voss."
 #, fuzzy
 msgid "That department belongs to a different company."
 msgstr "Questa partiziun tutga tar ina autra interpresa."
+
+#: src/postulo/jobs/surface.py
+msgid "That department is not one you can see."
+msgstr ""
 
 #: src/postulo/templates/base.html
 #, fuzzy
@@ -17969,6 +18009,10 @@ msgstr "Quai n'è betg ina datoteca che questa pagina legia. Ella legia la datot
 msgid "That is not a kind of access."
 msgstr ""
 
+#: src/postulo/jobs/surface.py
+msgid "That is not a kind of company."
+msgstr ""
+
 #: src/postulo/accounts/avatars.py
 #, fuzzy, python-format
 msgid "That is not a kind of picture Postulo keeps. Use %(formats)s."
@@ -17993,6 +18037,10 @@ msgstr "Quai n'è betg in numer che %(country)s utilisescha: nagin numer da là 
 #, fuzzy, python-format
 msgid "That is not a Postulo backup that opens cleanly: %(problem)s"
 msgstr "Quai n'è betg ina copia da segirezza da Postulo che sa lascha avrir senza problems: %(problem)s"
+
+#: src/postulo/jobs/surface.py
+msgid "That is not a record that has been saved."
+msgstr ""
 
 #: src/postulo/core/messaging_services.py
 #, fuzzy
@@ -18130,6 +18178,10 @@ msgstr "Quella colliaziun na po betg vegnir duvrada."
 msgid "That link will not work any more."
 msgstr "Questa colliaziun na funcziuna betg pli."
 
+#: src/postulo/jobs/surface.py
+msgid "That name cannot be checked just now."
+msgstr ""
+
 #: src/postulo/core/phones.py
 #, fuzzy
 msgid "That number has no area code."
@@ -18226,6 +18278,10 @@ msgstr "Quest plugin n'è betg pli installà."
 #, fuzzy
 msgid "That plugin is switched off for you."
 msgstr "Quest plugin è deactivà per Vus."
+
+#: src/postulo/jobs/surface.py
+msgid "That record is not yours to change."
+msgstr ""
 
 #: src/postulo/core/mail_auth.py src/postulo/plugins/consent.py
 #, fuzzy
@@ -19970,6 +20026,7 @@ msgid "This address is already in your listings, since %(when)s."
 msgstr "Questa adressa è gia en Voss inserats dapi %(when)s."
 
 #: src/postulo/core/postal.py src/postulo/core/web_links.py
+#: src/postulo/jobs/surface.py
 #, fuzzy
 msgid "This address is already listed."
 msgstr "Questa adressa è gia en la glista."
@@ -20293,7 +20350,7 @@ msgstr "Quai è Voss agen conto. Ina colliaziun che Vus creais per Vus sez n'è 
 msgid "This month"
 msgstr "Quest mais"
 
-#: src/postulo/core/phone_numbers.py
+#: src/postulo/core/phone_numbers.py src/postulo/jobs/surface.py
 #, fuzzy
 msgid "This number is already listed."
 msgstr "Quest numer è gia en la glista."
@@ -22765,6 +22822,7 @@ msgid "You"
 msgstr "Vus"
 
 #: src/postulo/api/routers/companies.py src/postulo/jobs/forms.py
+#: src/postulo/jobs/surface.py
 #, fuzzy
 msgid "You already have a company with that name."
 msgstr "Vus avais gia ina interpresa cun quel num."
@@ -23425,7 +23483,8 @@ msgstr "· anc en curs"
 msgid "“%(code)s” is not a language code, like %(first)s or %(second)s."
 msgstr "«%(code)s» n'è betg in code da lingua, sco %(first)s u %(second)s."
 
-#: src/postulo/core/web_links.py src/postulo/resume/candidate.py
+#: src/postulo/core/web_links.py src/postulo/jobs/surface.py
+#: src/postulo/resume/candidate.py
 #, fuzzy, python-format
 msgid "“%(kind)s” is not one of the types of link."
 msgstr "«%(kind)s» n'è betg in dals tips da colliaziun."

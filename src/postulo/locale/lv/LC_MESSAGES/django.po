@@ -798,12 +798,12 @@ msgstr "%(kind)s izveidots. Tagad izvēlieties, kas tajā būs."
 msgid "%(kind)s held"
 msgstr "%(kind)s notika"
 
-#: src/postulo/api/routers/companies.py
+#: src/postulo/api/routers/companies.py src/postulo/jobs/surface.py
 #, fuzzy, python-format
 msgid "%(kind)s is not a kind of address."
 msgstr "%(kind)s nav sava veida adrese."
 
-#: src/postulo/api/routers/companies.py
+#: src/postulo/api/routers/companies.py src/postulo/jobs/surface.py
 #, fuzzy, python-format
 msgid "%(kind)s is not a kind of number."
 msgstr "%(kind)s nav sava veida skaitlis."
@@ -1321,7 +1321,7 @@ msgstr "%(scheme)s: tā nav ierastā forma."
 msgid "%(sent)s, %(failed)s; each document says which."
 msgstr "%(sent)s, %(failed)s; katrs dokuments parāda, kā gājis."
 
-#: src/postulo/core/web_links.py
+#: src/postulo/core/web_links.py src/postulo/jobs/surface.py
 #, python-format
 msgid "%(service)s is already used by another row."
 msgstr ""
@@ -1883,6 +1883,10 @@ msgstr "Uzņēmumam ir viens identifikators katrā shēmā."
 msgid "A company in several sectors or industries counts in each of them."
 msgstr "Vairāku nozaru vai nozaru uzņēmums skaitās katrā no tām."
 
+#: src/postulo/jobs/surface.py
+msgid "A company needs a name."
+msgstr ""
+
 #: src/postulo/templates/jobs/company_map.html
 #, fuzzy
 msgid "A company with addresses in several places is counted at each, so the counts add up to more than the companies there are."
@@ -1893,7 +1897,7 @@ msgstr "Uzņēmums ar adresēm vairākās vietās tiek skaitīts katrā, tāpēc
 msgid "A company with the same identifier is already yours."
 msgstr "Uzņēmums ar tādu pašu identifikatoru jau ir jūsu uzņēmums."
 
-#: src/postulo/api/routers/companies.py
+#: src/postulo/api/routers/companies.py src/postulo/jobs/surface.py
 #, fuzzy
 msgid "A company's links are its social profiles."
 msgstr "Uzņēmuma saites ir tā sociālie profili."
@@ -1927,6 +1931,10 @@ msgstr "Kontakts bez uzņēmuma"
 #, fuzzy, python-format
 msgid "A contact has at most %(max)s messaging handles."
 msgstr "Kontaktam ir ne vairāk kā %(max)s ziņojumapmaiņas rokturi."
+
+#: src/postulo/jobs/surface.py
+msgid "A contact needs a name."
+msgstr ""
 
 #: src/postulo/templates/server/design.html
 #, fuzzy
@@ -1997,6 +2005,10 @@ msgstr "Dzimšanas datums nav pirms %(year)s."
 #, fuzzy
 msgid "A deep blue. Ten steps, of which the interface spends a handful."
 msgstr "Dziļi zila. Desmit soļi, no kuriem saskarne izmanto dažus."
+
+#: src/postulo/jobs/surface.py
+msgid "A department needs a name."
+msgstr ""
 
 #: src/postulo/resume/publications.py
 #, fuzzy
@@ -2327,6 +2339,10 @@ msgstr "Starptautiskā formā ierakstīts numurs šajā instancē tiek glabāts 
 #, fuzzy
 msgid "A number is kept once on this instance. If one is already recorded here, saving says so rather than taking it from whoever has it."
 msgstr "Numuru šajā instalācijā patur vienreiz. Ja tas šeit jau ir pierakstīts, saglabāšana to pasaka, nevis atņem to tam, kam tas ir."
+
+#: src/postulo/jobs/surface.py
+msgid "A number is needed."
+msgstr ""
 
 #: src/postulo/templates/help/telephone_numbers.html
 #, fuzzy
@@ -3387,6 +3403,10 @@ msgstr "Adrese nevar saturēt lietotāja vārdu vai paroli."
 #, fuzzy
 msgid "An address cannot contain a line break or any other control character."
 msgstr "Adresē nedrīkst būt rindas pārtraukums vai cita vadības rakstzīme."
+
+#: src/postulo/jobs/surface.py
+msgid "An address needs at least one part."
+msgstr ""
 
 #: src/postulo/documents/forms.py
 #, fuzzy
@@ -7030,6 +7050,10 @@ msgstr "Nosūtīts e-pastā, un ierakstīts, ko nosūtījāt."
 #, fuzzy
 msgid "Employer"
 msgstr "Darba devējs"
+
+#: src/postulo/jobs/surface.py
+msgid "Employer structure is switched off, so departments and parents are not changed."
+msgstr ""
 
 #: src/postulo/applications/models.py
 #, fuzzy
@@ -13298,6 +13322,10 @@ msgstr "Tiešsaistē"
 msgid "Only %(name)s"
 msgstr "Tikai %(name)s"
 
+#: src/postulo/jobs/surface.py
+msgid "Only a company's or a contact's details can be written."
+msgstr ""
+
 #: src/postulo/jobs/capture_views.py
 #, fuzzy
 msgid "Only a discarded capture can be put back."
@@ -16002,7 +16030,7 @@ msgstr "norādīt, ka atsauces ir pieejamas pēc pieprasījuma"
 msgid "Say that you understand what leaving does, first."
 msgstr "Saki, ka vispirms saproti, ko nozīmē aiziešana."
 
-#: src/postulo/core/postal.py
+#: src/postulo/core/postal.py src/postulo/jobs/surface.py
 #, fuzzy
 msgid "Say what this address is."
 msgstr "Pasakiet, kas ir šī adrese."
@@ -16013,7 +16041,7 @@ msgstr "Pasakiet, kas ir šī adrese."
 msgid "Say what this identifier is."
 msgstr "Norādiet, kas ir šis identifikators."
 
-#: src/postulo/core/phone_numbers.py
+#: src/postulo/core/phone_numbers.py src/postulo/jobs/surface.py
 #, fuzzy
 msgid "Say what this number is."
 msgstr "Pasakiet, kas tas ir par numuru."
@@ -16032,6 +16060,10 @@ msgstr "Norādiet, kam to nosūtīt."
 #, fuzzy
 msgid "Say whose tiles they are: their licence asks for a credit on the map."
 msgstr "Saki, kuri kauliņi tie ir: viņu licence lūdz kredītu kartē."
+
+#: src/postulo/jobs/surface.py
+msgid "Say whose work this is: a saved account."
+msgstr ""
 
 #: src/postulo/templates/applications/application_detail.html
 #: src/postulo/templates/applications/interview_form.html
@@ -17873,6 +17905,10 @@ msgstr "Tā ķēde ir dziļāka par %(limit)s uzņēmumiem — dziļāk, nekā P
 msgid "That company is no longer here."
 msgstr "Šī uzņēmuma vairs nav šeit."
 
+#: src/postulo/jobs/surface.py
+msgid "That company is not one you can see."
+msgstr ""
+
 #: src/postulo/api/routers/companies.py
 #, fuzzy
 msgid "That company is shared with you read-only."
@@ -17902,6 +17938,10 @@ msgstr "Tas CV nav tavs."
 #, fuzzy
 msgid "That department belongs to a different company."
 msgstr "Tā nodaļa pieder citam uzņēmumam."
+
+#: src/postulo/jobs/surface.py
+msgid "That department is not one you can see."
+msgstr ""
 
 #: src/postulo/templates/base.html
 #, fuzzy
@@ -18191,6 +18231,10 @@ msgstr "Šo failu šī lapa nelasa. Tā lasa JSON failu, ko piedāvā lejupielā
 msgid "That is not a kind of access."
 msgstr "Tā nav sava veida piekļuve."
 
+#: src/postulo/jobs/surface.py
+msgid "That is not a kind of company."
+msgstr ""
+
 #: src/postulo/accounts/avatars.py
 #, fuzzy, python-format
 msgid "That is not a kind of picture Postulo keeps. Use %(formats)s."
@@ -18215,6 +18259,10 @@ msgstr "Šo numuru %(country)s neizmanto: tur neviens numurs tā nesākas."
 #, fuzzy, python-format
 msgid "That is not a Postulo backup that opens cleanly: %(problem)s"
 msgstr "Tas nav Postulo dublējums, kas atveras tīri: %(problem)s"
+
+#: src/postulo/jobs/surface.py
+msgid "That is not a record that has been saved."
+msgstr ""
 
 #: src/postulo/core/messaging_services.py
 #, fuzzy
@@ -18352,6 +18400,10 @@ msgstr "Šo saiti nevar izmantot."
 msgid "That link will not work any more."
 msgstr "Šī saite vairs nedarbosies."
 
+#: src/postulo/jobs/surface.py
+msgid "That name cannot be checked just now."
+msgstr ""
+
 #: src/postulo/core/phones.py
 #, fuzzy
 msgid "That number has no area code."
@@ -18449,6 +18501,10 @@ msgstr "Šis spraudnis vairs nav instalēts."
 #, fuzzy
 msgid "That plugin is switched off for you."
 msgstr "Šis spraudnis jums ir izslēgts."
+
+#: src/postulo/jobs/surface.py
+msgid "That record is not yours to change."
+msgstr ""
 
 #: src/postulo/core/mail_auth.py src/postulo/plugins/consent.py
 #, fuzzy
@@ -20213,6 +20269,7 @@ msgid "This address is already in your listings, since %(when)s."
 msgstr "Šī adrese jau ir jūsu sludinājumos kopš %(when)s."
 
 #: src/postulo/core/postal.py src/postulo/core/web_links.py
+#: src/postulo/jobs/surface.py
 #, fuzzy
 msgid "This address is already listed."
 msgstr "Šī adrese jau ir sarakstā."
@@ -20538,7 +20595,7 @@ msgstr "Šis ir jūsu paša konts. Saite, ko izveidojat sev, nav ceļš atpakaļ
 msgid "This month"
 msgstr "Šomēnes"
 
-#: src/postulo/core/phone_numbers.py
+#: src/postulo/core/phone_numbers.py src/postulo/jobs/surface.py
 #, fuzzy
 msgid "This number is already listed."
 msgstr "Šis numurs jau ir sarakstā."
@@ -23025,6 +23082,7 @@ msgid "You"
 msgstr "Jūs"
 
 #: src/postulo/api/routers/companies.py src/postulo/jobs/forms.py
+#: src/postulo/jobs/surface.py
 #, fuzzy
 msgid "You already have a company with that name."
 msgstr "Jums jau ir uzņēmums ar šādu nosaukumu."
@@ -23703,7 +23761,8 @@ msgstr "· vēl turpinās"
 msgid "“%(code)s” is not a language code, like %(first)s or %(second)s."
 msgstr "“%(code)s” nav valodas kods, piemēram, %(first)s vai %(second)s."
 
-#: src/postulo/core/web_links.py src/postulo/resume/candidate.py
+#: src/postulo/core/web_links.py src/postulo/jobs/surface.py
+#: src/postulo/resume/candidate.py
 #, fuzzy, python-format
 msgid "“%(kind)s” is not one of the types of link."
 msgstr "“%(kind)s” nav neviens no saišu veidiem."

@@ -727,12 +727,12 @@ msgstr "%(kind)s შეიქმნა. ახლა აირჩიეთ, რ�
 msgid "%(kind)s held"
 msgstr "%(kind)s ჩატარდა"
 
-#: src/postulo/api/routers/companies.py
+#: src/postulo/api/routers/companies.py src/postulo/jobs/surface.py
 #, fuzzy, python-format
 msgid "%(kind)s is not a kind of address."
 msgstr "%(kind)s მისამართის სახეობა არ არის."
 
-#: src/postulo/api/routers/companies.py
+#: src/postulo/api/routers/companies.py src/postulo/jobs/surface.py
 #, fuzzy, python-format
 msgid "%(kind)s is not a kind of number."
 msgstr "%(kind)s ნომრის სახეობა არ არის."
@@ -1242,7 +1242,7 @@ msgstr "%(scheme)s: ეს ჩვეულებრივი ფორმა ა
 msgid "%(sent)s, %(failed)s; each document says which."
 msgstr "%(sent)s, %(failed)s; თითოეულ დოკუმენტთან მითითებულია, რომელი."
 
-#: src/postulo/core/web_links.py
+#: src/postulo/core/web_links.py src/postulo/jobs/surface.py
 #, python-format
 msgid "%(service)s is already used by another row."
 msgstr ""
@@ -1789,6 +1789,10 @@ msgstr "კომპანია თითო სქემაზე ერთ �
 msgid "A company in several sectors or industries counts in each of them."
 msgstr "რამდენიმე სექტორსა თუ დარგში მოქმედი კომპანია თითოეულში ითვლება."
 
+#: src/postulo/jobs/surface.py
+msgid "A company needs a name."
+msgstr ""
+
 #: src/postulo/templates/jobs/company_map.html
 #, fuzzy
 msgid "A company with addresses in several places is counted at each, so the counts add up to more than the companies there are."
@@ -1799,7 +1803,7 @@ msgstr "კომპანია, რომელსაც რამდენი
 msgid "A company with the same identifier is already yours."
 msgstr "იმავე იდენტიფიკატორის მქონე კომპანია უკვე გაქვთ."
 
-#: src/postulo/api/routers/companies.py
+#: src/postulo/api/routers/companies.py src/postulo/jobs/surface.py
 #, fuzzy
 msgid "A company's links are its social profiles."
 msgstr "კომპანიის ბმულები მისი სოციალური პროფილებია."
@@ -1833,6 +1837,10 @@ msgstr "კონტაქტი კომპანიის გარეშე"
 #, fuzzy, python-format
 msgid "A contact has at most %(max)s messaging handles."
 msgstr "კონტაქტს მაქსიმუმ %(max)s მესენჯერის სახელი შეიძლება ჰქონდეს."
+
+#: src/postulo/jobs/surface.py
+msgid "A contact needs a name."
+msgstr ""
 
 #: src/postulo/templates/server/design.html
 #, fuzzy
@@ -1903,6 +1911,10 @@ msgstr "დაბადების თარიღი %(year)s წლამდ�
 #, fuzzy
 msgid "A deep blue. Ten steps, of which the interface spends a handful."
 msgstr "მუქი ლურჯი. ათი საფეხური, რომელთაგან ინტერფეისი რამდენიმეს იყენებს."
+
+#: src/postulo/jobs/surface.py
+msgid "A department needs a name."
+msgstr ""
 
 #: src/postulo/resume/publications.py
 #, fuzzy
@@ -2233,6 +2245,10 @@ msgstr "საერთაშორისო ფორმით ჩაწერ�
 #, fuzzy
 msgid "A number is kept once on this instance. If one is already recorded here, saving says so rather than taking it from whoever has it."
 msgstr "ნომერი ამ ინსტალაციაზე ერთხელ ინახება. თუ უკვე ჩაწერილია აქ, შენახვა ამას გეუბნებათ, ნაცვლად იმისა, რომ ჩამოართვას მას, ვისაც აქვს."
+
+#: src/postulo/jobs/surface.py
+msgid "A number is needed."
+msgstr ""
 
 #: src/postulo/templates/help/telephone_numbers.html
 #, fuzzy
@@ -3284,6 +3300,10 @@ msgstr "მისამართი ვერ შეიცავს მომხ
 #, fuzzy
 msgid "An address cannot contain a line break or any other control character."
 msgstr "მისამართი ვერ შეიცავს ახალ სტრიქონს ან სხვა მმართველ სიმბოლოს."
+
+#: src/postulo/jobs/surface.py
+msgid "An address needs at least one part."
+msgstr ""
 
 #: src/postulo/documents/forms.py
 #, fuzzy
@@ -6912,6 +6932,10 @@ msgstr "ელფოსტით გაიგზავნა და გაგზ
 #, fuzzy
 msgid "Employer"
 msgstr "დამსაქმებელი"
+
+#: src/postulo/jobs/surface.py
+msgid "Employer structure is switched off, so departments and parents are not changed."
+msgstr ""
 
 #: src/postulo/applications/models.py
 #, fuzzy
@@ -13125,6 +13149,10 @@ msgstr "ონლაინ"
 msgid "Only %(name)s"
 msgstr "მხოლოდ %(name)s"
 
+#: src/postulo/jobs/surface.py
+msgid "Only a company's or a contact's details can be written."
+msgstr ""
+
 #: src/postulo/jobs/capture_views.py
 #, fuzzy
 msgid "Only a discarded capture can be put back."
@@ -15808,7 +15836,7 @@ msgstr "მითითება, რომ რეკომენდაციე
 msgid "Say that you understand what leaving does, first."
 msgstr ""
 
-#: src/postulo/core/postal.py
+#: src/postulo/core/postal.py src/postulo/jobs/surface.py
 #, fuzzy
 msgid "Say what this address is."
 msgstr "თქვით, რა მისამართია ეს."
@@ -15819,7 +15847,7 @@ msgstr "თქვით, რა მისამართია ეს."
 msgid "Say what this identifier is."
 msgstr "თქვით, რა არის ეს იდენტიფიკატორი."
 
-#: src/postulo/core/phone_numbers.py
+#: src/postulo/core/phone_numbers.py src/postulo/jobs/surface.py
 #, fuzzy
 msgid "Say what this number is."
 msgstr "თქვით, რა ნომერია ეს."
@@ -15838,6 +15866,10 @@ msgstr "მიუთითეთ, ვის გაეგზავნოს."
 #, fuzzy
 msgid "Say whose tiles they are: their licence asks for a credit on the map."
 msgstr "მიუთითეთ, ვისია ფილები: მათი ლიცენზია რუკაზე ავტორობის მითითებას მოითხოვს."
+
+#: src/postulo/jobs/surface.py
+msgid "Say whose work this is: a saved account."
+msgstr ""
 
 #: src/postulo/templates/applications/application_detail.html
 #: src/postulo/templates/applications/interview_form.html
@@ -17656,6 +17688,10 @@ msgstr "ეს ჯაჭვი %(limit)s კომპანიაზე ღრ�
 msgid "That company is no longer here."
 msgstr "ეს კომპანია აღარ არსებობს."
 
+#: src/postulo/jobs/surface.py
+msgid "That company is not one you can see."
+msgstr ""
+
 #: src/postulo/api/routers/companies.py
 msgid "That company is shared with you read-only."
 msgstr ""
@@ -17684,6 +17720,10 @@ msgstr "ეს CV თქვენი არ არის."
 #, fuzzy
 msgid "That department belongs to a different company."
 msgstr "ეს განყოფილება სხვა კომპანიას ეკუთვნის."
+
+#: src/postulo/jobs/surface.py
+msgid "That department is not one you can see."
+msgstr ""
 
 #: src/postulo/templates/base.html
 #, fuzzy
@@ -17969,6 +18009,10 @@ msgstr "ეს ის ფაილი არ არის, რომელსა
 msgid "That is not a kind of access."
 msgstr ""
 
+#: src/postulo/jobs/surface.py
+msgid "That is not a kind of company."
+msgstr ""
+
 #: src/postulo/accounts/avatars.py
 #, fuzzy, python-format
 msgid "That is not a kind of picture Postulo keeps. Use %(formats)s."
@@ -17993,6 +18037,10 @@ msgstr "ეს არ არის ნომერი, რომელსაც 
 #, fuzzy, python-format
 msgid "That is not a Postulo backup that opens cleanly: %(problem)s"
 msgstr "ეს არ არის Postulo-ს სარეზერვო ასლი, რომელიც უპრობლემოდ იხსნება: %(problem)s"
+
+#: src/postulo/jobs/surface.py
+msgid "That is not a record that has been saved."
+msgstr ""
 
 #: src/postulo/core/messaging_services.py
 #, fuzzy
@@ -18130,6 +18178,10 @@ msgstr "ეს ბმული ვერ გამოიყენება."
 msgid "That link will not work any more."
 msgstr "ეს ბმული აღარ იმუშავებს."
 
+#: src/postulo/jobs/surface.py
+msgid "That name cannot be checked just now."
+msgstr ""
+
 #: src/postulo/core/phones.py
 #, fuzzy
 msgid "That number has no area code."
@@ -18226,6 +18278,10 @@ msgstr "ის მოდული აღარ არის დაყენე�
 #, fuzzy
 msgid "That plugin is switched off for you."
 msgstr "ეს მოდული თქვენთვის გამორთულია."
+
+#: src/postulo/jobs/surface.py
+msgid "That record is not yours to change."
+msgstr ""
 
 #: src/postulo/core/mail_auth.py src/postulo/plugins/consent.py
 #, fuzzy
@@ -19970,6 +20026,7 @@ msgid "This address is already in your listings, since %(when)s."
 msgstr "ეს მისამართი უკვე თქვენს ვაკანსიებშია, %(when)s-დან."
 
 #: src/postulo/core/postal.py src/postulo/core/web_links.py
+#: src/postulo/jobs/surface.py
 #, fuzzy
 msgid "This address is already listed."
 msgstr "ეს მისამართი უკვე სიაშია."
@@ -20293,7 +20350,7 @@ msgstr "ეს თქვენივე ანგარიშია. საკ�
 msgid "This month"
 msgstr "ეს თვე"
 
-#: src/postulo/core/phone_numbers.py
+#: src/postulo/core/phone_numbers.py src/postulo/jobs/surface.py
 #, fuzzy
 msgid "This number is already listed."
 msgstr "ეს ნომერი უკვე სიაშია."
@@ -22765,6 +22822,7 @@ msgid "You"
 msgstr "თქვენ"
 
 #: src/postulo/api/routers/companies.py src/postulo/jobs/forms.py
+#: src/postulo/jobs/surface.py
 #, fuzzy
 msgid "You already have a company with that name."
 msgstr "უკვე გაქვთ ამ სახელის კომპანია."
@@ -23425,7 +23483,8 @@ msgstr "· ჯერ მიმდინარეობს"
 msgid "“%(code)s” is not a language code, like %(first)s or %(second)s."
 msgstr "„%(code)s“ არ არის ენის კოდი, როგორიცაა %(first)s ან %(second)s."
 
-#: src/postulo/core/web_links.py src/postulo/resume/candidate.py
+#: src/postulo/core/web_links.py src/postulo/jobs/surface.py
+#: src/postulo/resume/candidate.py
 #, fuzzy, python-format
 msgid "“%(kind)s” is not one of the types of link."
 msgstr "„%(kind)s“ ბმულის ტიპებიდან არცერთი არ არის."

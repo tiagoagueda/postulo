@@ -727,12 +727,12 @@ msgstr "%(kind)s skapad. Välj nu vad som ska stå på den."
 msgid "%(kind)s held"
 msgstr "%(kind)s genomförd"
 
-#: src/postulo/api/routers/companies.py
+#: src/postulo/api/routers/companies.py src/postulo/jobs/surface.py
 #, fuzzy, python-format
 msgid "%(kind)s is not a kind of address."
 msgstr "%(kind)s är inte en sorts adress."
 
-#: src/postulo/api/routers/companies.py
+#: src/postulo/api/routers/companies.py src/postulo/jobs/surface.py
 #, fuzzy, python-format
 msgid "%(kind)s is not a kind of number."
 msgstr "%(kind)s är inte ett slags nummer."
@@ -1242,7 +1242,7 @@ msgstr "%(scheme)s: det är inte den vanliga formen."
 msgid "%(sent)s, %(failed)s; each document says which."
 msgstr "%(sent)s, %(failed)s; varje dokument anger vilket."
 
-#: src/postulo/core/web_links.py
+#: src/postulo/core/web_links.py src/postulo/jobs/surface.py
 #, fuzzy, python-format
 msgid "%(service)s is already used by another row."
 msgstr "%(service)s används redan av en annan rad."
@@ -1789,6 +1789,10 @@ msgstr "Ett företag har en identifierare per schema."
 msgid "A company in several sectors or industries counts in each of them."
 msgstr "Ett företag inom flera sektorer eller branscher räknas i var och en av dem."
 
+#: src/postulo/jobs/surface.py
+msgid "A company needs a name."
+msgstr ""
+
 #: src/postulo/templates/jobs/company_map.html
 #, fuzzy
 msgid "A company with addresses in several places is counted at each, so the counts add up to more than the companies there are."
@@ -1799,7 +1803,7 @@ msgstr "Ett företag med adresser på flera ställen räknas på varje, så räk
 msgid "A company with the same identifier is already yours."
 msgstr "Ett företag med samma identifierare är redan ditt."
 
-#: src/postulo/api/routers/companies.py
+#: src/postulo/api/routers/companies.py src/postulo/jobs/surface.py
 #, fuzzy
 msgid "A company's links are its social profiles."
 msgstr "Ett företags länkar är dess sociala profiler."
@@ -1833,6 +1837,10 @@ msgstr "En kontakt på inget företag"
 #, fuzzy, python-format
 msgid "A contact has at most %(max)s messaging handles."
 msgstr "En kontakt har högst %(max)s meddelandehandtag."
+
+#: src/postulo/jobs/surface.py
+msgid "A contact needs a name."
+msgstr ""
 
 #: src/postulo/templates/server/design.html
 #, fuzzy
@@ -1903,6 +1911,10 @@ msgstr "Ett födelsedatum är inte före %(year)s."
 #, fuzzy
 msgid "A deep blue. Ten steps, of which the interface spends a handful."
 msgstr "En djupblå. Tio steg, av vilka gränssnittet använder ett fåtal."
+
+#: src/postulo/jobs/surface.py
+msgid "A department needs a name."
+msgstr ""
 
 #: src/postulo/resume/publications.py
 #, fuzzy
@@ -2233,6 +2245,10 @@ msgstr "Ett nummer i sin internationella form sparas en gång på den här insta
 #, fuzzy
 msgid "A number is kept once on this instance. If one is already recorded here, saving says so rather than taking it from whoever has it."
 msgstr "Ett nummer sparas en gång på den här installationen. Finns det redan här säger sparandet det, i stället för att ta det från den som har det."
+
+#: src/postulo/jobs/surface.py
+msgid "A number is needed."
+msgstr ""
 
 #: src/postulo/templates/help/telephone_numbers.html
 #, fuzzy
@@ -3290,6 +3306,10 @@ msgstr "En adress kan inte bära ett användarnamn eller ett lösenord."
 #, fuzzy
 msgid "An address cannot contain a line break or any other control character."
 msgstr "En adress får inte innehålla radbrytning eller något annat styrtecken."
+
+#: src/postulo/jobs/surface.py
+msgid "An address needs at least one part."
+msgstr ""
 
 #: src/postulo/documents/forms.py
 #, fuzzy
@@ -6929,6 +6949,10 @@ msgstr "Skickad med e-post, och det du skickade registrerades."
 #, fuzzy
 msgid "Employer"
 msgstr "Arbetsgivare"
+
+#: src/postulo/jobs/surface.py
+msgid "Employer structure is switched off, so departments and parents are not changed."
+msgstr ""
 
 #: src/postulo/applications/models.py
 #, fuzzy
@@ -13174,6 +13198,10 @@ msgstr "Online"
 msgid "Only %(name)s"
 msgstr "Bara %(name)s"
 
+#: src/postulo/jobs/surface.py
+msgid "Only a company's or a contact's details can be written."
+msgstr ""
+
 #: src/postulo/jobs/capture_views.py
 #, fuzzy
 msgid "Only a discarded capture can be put back."
@@ -15874,7 +15902,7 @@ msgstr "säga att referenser finns tillgängliga på begäran"
 msgid "Say that you understand what leaving does, first."
 msgstr "Säg att ni förstår vad som händer, först."
 
-#: src/postulo/core/postal.py
+#: src/postulo/core/postal.py src/postulo/jobs/surface.py
 #, fuzzy
 msgid "Say what this address is."
 msgstr "Säg vad den här adressen är."
@@ -15885,7 +15913,7 @@ msgstr "Säg vad den här adressen är."
 msgid "Say what this identifier is."
 msgstr "Ange vad den här identifieraren är."
 
-#: src/postulo/core/phone_numbers.py
+#: src/postulo/core/phone_numbers.py src/postulo/jobs/surface.py
 #, fuzzy
 msgid "Say what this number is."
 msgstr "Säg vad det här numret är."
@@ -15904,6 +15932,10 @@ msgstr "Ange vem det ska skickas till."
 #, fuzzy
 msgid "Say whose tiles they are: their licence asks for a credit on the map."
 msgstr "Säg vars kakel de är: deras licens kräver en kredit på kartan."
+
+#: src/postulo/jobs/surface.py
+msgid "Say whose work this is: a saved account."
+msgstr ""
 
 #: src/postulo/templates/applications/application_detail.html
 #: src/postulo/templates/applications/interview_form.html
@@ -17753,6 +17785,10 @@ msgstr "Den kedjan är mer än %(limit)s företag djup, djupare än någon konce
 msgid "That company is no longer here."
 msgstr "Det företaget finns inte längre här."
 
+#: src/postulo/jobs/surface.py
+msgid "That company is not one you can see."
+msgstr ""
+
 #: src/postulo/api/routers/companies.py
 #, fuzzy
 msgid "That company is shared with you read-only."
@@ -17782,6 +17818,10 @@ msgstr "Detta CV är inte ditt."
 #, fuzzy
 msgid "That department belongs to a different company."
 msgstr "Den avdelningen hör till ett annat företag."
+
+#: src/postulo/jobs/surface.py
+msgid "That department is not one you can see."
+msgstr ""
 
 #: src/postulo/templates/base.html
 #, fuzzy
@@ -18068,6 +18108,10 @@ msgstr "Det är inte en fil som den här sidan läser. Den läser JSON-filen som
 msgid "That is not a kind of access."
 msgstr "Det är inte ett slags åtkomst."
 
+#: src/postulo/jobs/surface.py
+msgid "That is not a kind of company."
+msgstr ""
+
 #: src/postulo/accounts/avatars.py
 #, fuzzy, python-format
 msgid "That is not a kind of picture Postulo keeps. Use %(formats)s."
@@ -18092,6 +18136,10 @@ msgstr "Det är inte ett nummer som %(country)s använder: inget nummer där bö
 #, fuzzy, python-format
 msgid "That is not a Postulo backup that opens cleanly: %(problem)s"
 msgstr "Det är inte en Postulo backup som öppnar rent: %(problem)s"
+
+#: src/postulo/jobs/surface.py
+msgid "That is not a record that has been saved."
+msgstr ""
 
 #: src/postulo/core/messaging_services.py
 #, fuzzy
@@ -18229,6 +18277,10 @@ msgstr "Den länken går inte att använda."
 msgid "That link will not work any more."
 msgstr "Den länken kommer inte att fungera längre."
 
+#: src/postulo/jobs/surface.py
+msgid "That name cannot be checked just now."
+msgstr ""
+
 #: src/postulo/core/phones.py
 #, fuzzy
 msgid "That number has no area code."
@@ -18325,6 +18377,10 @@ msgstr "Det tillägget är inte längre installerat."
 #, fuzzy
 msgid "That plugin is switched off for you."
 msgstr "Det pluginet är avstängt för dig."
+
+#: src/postulo/jobs/surface.py
+msgid "That record is not yours to change."
+msgstr ""
 
 #: src/postulo/core/mail_auth.py src/postulo/plugins/consent.py
 #, fuzzy
@@ -20082,6 +20138,7 @@ msgid "This address is already in your listings, since %(when)s."
 msgstr "Den här adressen finns redan bland dina annonser, sedan %(when)s."
 
 #: src/postulo/core/postal.py src/postulo/core/web_links.py
+#: src/postulo/jobs/surface.py
 #, fuzzy
 msgid "This address is already listed."
 msgstr "Den här adressen finns redan med."
@@ -20407,7 +20464,7 @@ msgstr "Det här är ditt eget konto. En länk du gör åt dig själv är ingen 
 msgid "This month"
 msgstr "Denna månad"
 
-#: src/postulo/core/phone_numbers.py
+#: src/postulo/core/phone_numbers.py src/postulo/jobs/surface.py
 #, fuzzy
 msgid "This number is already listed."
 msgstr "Det här numret finns redan i listan."
@@ -22891,6 +22948,7 @@ msgid "You"
 msgstr "Du du du"
 
 #: src/postulo/api/routers/companies.py src/postulo/jobs/forms.py
+#: src/postulo/jobs/surface.py
 #, fuzzy
 msgid "You already have a company with that name."
 msgstr "Du har redan ett företag med det namnet."
@@ -23567,7 +23625,8 @@ msgstr "· pågår fortfarande"
 msgid "“%(code)s” is not a language code, like %(first)s or %(second)s."
 msgstr "”%(code)s” är inte en språkkod, som %(first)s eller %(second)s."
 
-#: src/postulo/core/web_links.py src/postulo/resume/candidate.py
+#: src/postulo/core/web_links.py src/postulo/jobs/surface.py
+#: src/postulo/resume/candidate.py
 #, fuzzy, python-format
 msgid "“%(kind)s” is not one of the types of link."
 msgstr "”%(kind)s” är inte en av länktyperna."

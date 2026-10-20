@@ -940,12 +940,12 @@ msgstr "Cruthaíodh %(kind)s. Roghnaigh anois cad a bheidh air."
 msgid "%(kind)s held"
 msgstr "%(kind)s ar siúl"
 
-#: src/postulo/api/routers/companies.py
+#: src/postulo/api/routers/companies.py src/postulo/jobs/surface.py
 #, fuzzy, python-format
 msgid "%(kind)s is not a kind of address."
 msgstr "%(kind)s nach bhfuil cineál seoladh."
 
-#: src/postulo/api/routers/companies.py
+#: src/postulo/api/routers/companies.py src/postulo/jobs/surface.py
 #, fuzzy, python-format
 msgid "%(kind)s is not a kind of number."
 msgstr "%(kind)s nach bhfuil ar chineál an uimhir."
@@ -1479,7 +1479,7 @@ msgstr "%(scheme)s: ní hé sin an gnáthfhoirm."
 msgid "%(sent)s, %(failed)s; each document says which."
 msgstr "%(sent)s, %(failed)s; deir gach cáipéis cé acu."
 
-#: src/postulo/core/web_links.py
+#: src/postulo/core/web_links.py src/postulo/jobs/surface.py
 #, fuzzy, python-format
 msgid "%(service)s is already used by another row."
 msgstr "%(service)s a úsáidtear cheana féin ag sraith eile."
@@ -2071,6 +2071,10 @@ msgstr "Tá aitheantóir amháin in aghaidh na scéime ag cuideachta."
 msgid "A company in several sectors or industries counts in each of them."
 msgstr "Tá cuideachta i roinnt earnálacha nó tionscail chomhaireamh i ngach ceann acu."
 
+#: src/postulo/jobs/surface.py
+msgid "A company needs a name."
+msgstr ""
+
 #: src/postulo/templates/jobs/company_map.html
 #, fuzzy
 msgid "A company with addresses in several places is counted at each, so the counts add up to more than the companies there are."
@@ -2081,7 +2085,7 @@ msgstr "Tá cuideachta le seoltaí in áiteanna éagsúla chomhaireamh ag gach, 
 msgid "A company with the same identifier is already yours."
 msgstr "Tá cuideachta leis an aitheantóir céanna mise cheana féin."
 
-#: src/postulo/api/routers/companies.py
+#: src/postulo/api/routers/companies.py src/postulo/jobs/surface.py
 #, fuzzy
 msgid "A company's links are its social profiles."
 msgstr "Tá naisc cuideachta a próifílí sóisialta."
@@ -2115,6 +2119,10 @@ msgstr "Teagmháil ag aon chuideachta"
 #, fuzzy, python-format
 msgid "A contact has at most %(max)s messaging handles."
 msgstr "Tá teagmháil ag an chuid is mó %(max)s Láimhseálann teachtaireachtaí."
+
+#: src/postulo/jobs/surface.py
+msgid "A contact needs a name."
+msgstr ""
 
 #: src/postulo/templates/server/design.html
 #, fuzzy
@@ -2185,6 +2193,10 @@ msgstr "Níl dáta breithe roimh %(year)s."
 #, fuzzy
 msgid "A deep blue. Ten steps, of which the interface spends a handful."
 msgstr "Gorm domhain. Deich gcéim, a n-úsáideann an comhéadan lámh iontu."
+
+#: src/postulo/jobs/surface.py
+msgid "A department needs a name."
+msgstr ""
 
 #: src/postulo/resume/publications.py
 #, fuzzy
@@ -2515,6 +2527,10 @@ msgstr "Coinnítear uimhir ina foirm idirnáisiúnta uair amháin ar an sampla s
 #, fuzzy
 msgid "A number is kept once on this instance. If one is already recorded here, saving says so rather than taking it from whoever has it."
 msgstr "Coinnítear uimhir uair amháin ar an tsuiteáil seo. Má tá sí taifeadta anseo cheana, deir an sábháil é sin, seachas í a bhaint de cibé duine a bhfuil sí aige."
+
+#: src/postulo/jobs/surface.py
+msgid "A number is needed."
+msgstr ""
 
 #: src/postulo/templates/help/telephone_numbers.html
 #, fuzzy
@@ -3590,6 +3606,10 @@ msgstr "Ní féidir le seoladh ainm úsáideora nó pasfhocal a iompar."
 #, fuzzy
 msgid "An address cannot contain a line break or any other control character."
 msgstr "Ní féidir briseadh líne ná aon charachtar rialúcháin eile a bheith i seoladh."
+
+#: src/postulo/jobs/surface.py
+msgid "An address needs at least one part."
+msgstr ""
 
 #: src/postulo/documents/forms.py
 #, fuzzy
@@ -7244,6 +7264,10 @@ msgstr "Seolta le ríomhphost, agus taifeadadh an méid a sheol tú."
 #, fuzzy
 msgid "Employer"
 msgstr "Fostóir"
+
+#: src/postulo/jobs/surface.py
+msgid "Employer structure is switched off, so departments and parents are not changed."
+msgstr ""
 
 #: src/postulo/applications/models.py
 #, fuzzy
@@ -13561,6 +13585,10 @@ msgstr "Ar Líne"
 msgid "Only %(name)s"
 msgstr "%(name)s amháin"
 
+#: src/postulo/jobs/surface.py
+msgid "Only a company's or a contact's details can be written."
+msgstr ""
+
 #: src/postulo/jobs/capture_views.py
 #, fuzzy
 msgid "Only a discarded capture can be put back."
@@ -16279,7 +16307,7 @@ msgstr "a rá go bhfuil tagairtí ar fáil arna iarraidh sin"
 msgid "Say that you understand what leaving does, first."
 msgstr "Abair go dtuigeann tú cad a dhéanann fágáil, ar dtús."
 
-#: src/postulo/core/postal.py
+#: src/postulo/core/postal.py src/postulo/jobs/surface.py
 #, fuzzy
 msgid "Say what this address is."
 msgstr "Abair cad é an seoladh seo."
@@ -16290,7 +16318,7 @@ msgstr "Abair cad é an seoladh seo."
 msgid "Say what this identifier is."
 msgstr "Abair cad é an t-aitheantóir seo."
 
-#: src/postulo/core/phone_numbers.py
+#: src/postulo/core/phone_numbers.py src/postulo/jobs/surface.py
 #, fuzzy
 msgid "Say what this number is."
 msgstr "Abair cad é an uimhir seo."
@@ -16309,6 +16337,10 @@ msgstr "Abair cé chuige a seolfar é."
 #, fuzzy
 msgid "Say whose tiles they are: their licence asks for a credit on the map."
 msgstr "Abair a bhfuil a tíleanna: iarrann a gceadúnas creidmheas a fháil ar an léarscáil."
+
+#: src/postulo/jobs/surface.py
+msgid "Say whose work this is: a saved account."
+msgstr ""
 
 #: src/postulo/templates/applications/application_detail.html
 #: src/postulo/templates/applications/interview_form.html
@@ -18161,6 +18193,10 @@ msgstr "Tá an slabhra sin níos doimhne ná %(limit)s cuideachta — níos doim
 msgid "That company is no longer here."
 msgstr "Níl an chuideachta sin anseo a thuilleadh."
 
+#: src/postulo/jobs/surface.py
+msgid "That company is not one you can see."
+msgstr ""
+
 #: src/postulo/api/routers/companies.py
 #, fuzzy
 msgid "That company is shared with you read-only."
@@ -18190,6 +18226,10 @@ msgstr "Níl an CV mise."
 #, fuzzy
 msgid "That department belongs to a different company."
 msgstr "Baineann an roinn sin le cuideachta eile."
+
+#: src/postulo/jobs/surface.py
+msgid "That department is not one you can see."
+msgstr ""
 
 #: src/postulo/templates/base.html
 #, fuzzy
@@ -18485,6 +18525,10 @@ msgstr "Ní comhad é sin a léann an leathanach seo. Léann sé an comhad JSON 
 msgid "That is not a kind of access."
 msgstr "Ní cineál rochtana é sin."
 
+#: src/postulo/jobs/surface.py
+msgid "That is not a kind of company."
+msgstr ""
+
 #: src/postulo/accounts/avatars.py
 #, fuzzy, python-format
 msgid "That is not a kind of picture Postulo keeps. Use %(formats)s."
@@ -18509,6 +18553,10 @@ msgstr "Ní uimhir í sin a úsáideann %(country)s: ní thosaíonn aon uimhir a
 #, fuzzy, python-format
 msgid "That is not a Postulo backup that opens cleanly: %(problem)s"
 msgstr "Níl an tweet seo ar fáil"
+
+#: src/postulo/jobs/surface.py
+msgid "That is not a record that has been saved."
+msgstr ""
 
 #: src/postulo/core/messaging_services.py
 #, fuzzy
@@ -18646,6 +18694,10 @@ msgstr "Ní féidir an nasc sin a úsáid."
 msgid "That link will not work any more."
 msgstr "Ní oibreoidh an nasc sin a thuilleadh."
 
+#: src/postulo/jobs/surface.py
+msgid "That name cannot be checked just now."
+msgstr ""
+
 #: src/postulo/core/phones.py
 #, fuzzy
 msgid "That number has no area code."
@@ -18745,6 +18797,10 @@ msgstr "Níl an breiseán sin suiteáilte a thuilleadh."
 #, fuzzy
 msgid "That plugin is switched off for you."
 msgstr "Tá an breiseán sin múchta duitse."
+
+#: src/postulo/jobs/surface.py
+msgid "That record is not yours to change."
+msgstr ""
 
 #: src/postulo/core/mail_auth.py src/postulo/plugins/consent.py
 #, fuzzy
@@ -20526,6 +20582,7 @@ msgid "This address is already in your listings, since %(when)s."
 msgstr "Tá an seoladh seo i do chuid fógraí cheana, ó %(when)s."
 
 #: src/postulo/core/postal.py src/postulo/core/web_links.py
+#: src/postulo/jobs/surface.py
 #, fuzzy
 msgid "This address is already listed."
 msgstr "Tá an seoladh seo liostaithe cheana."
@@ -20851,7 +20908,7 @@ msgstr "Seo do chuntas féin. Ní bealach ar ais é nasc a dhéanann tú duit f�
 msgid "This month"
 msgstr "An mhí seo"
 
-#: src/postulo/core/phone_numbers.py
+#: src/postulo/core/phone_numbers.py src/postulo/jobs/surface.py
 #, fuzzy
 msgid "This number is already listed."
 msgstr "Tá an uimhir seo ar an liosta cheana."
@@ -23344,6 +23401,7 @@ msgid "You"
 msgstr "Tá tú"
 
 #: src/postulo/api/routers/companies.py src/postulo/jobs/forms.py
+#: src/postulo/jobs/surface.py
 #, fuzzy
 msgid "You already have a company with that name."
 msgstr "Tá cuideachta leis an ainm sin agat cheana."
@@ -24029,7 +24087,8 @@ msgstr "· ar siúl fós"
 msgid "“%(code)s” is not a language code, like %(first)s or %(second)s."
 msgstr "Ní cód teanga é “%(code)s”, mar %(first)s nó %(second)s."
 
-#: src/postulo/core/web_links.py src/postulo/resume/candidate.py
+#: src/postulo/core/web_links.py src/postulo/jobs/surface.py
+#: src/postulo/resume/candidate.py
 #, fuzzy, python-format
 msgid "“%(kind)s” is not one of the types of link."
 msgstr "Ní ceann de na cineálacha naisc é “%(kind)s”."

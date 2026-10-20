@@ -727,12 +727,12 @@ msgstr "%(kind)s luotu. Valitse nyt, mitä siihen tulee."
 msgid "%(kind)s held"
 msgstr "%(kind)s pidetty"
 
-#: src/postulo/api/routers/companies.py
+#: src/postulo/api/routers/companies.py src/postulo/jobs/surface.py
 #, fuzzy, python-format
 msgid "%(kind)s is not a kind of address."
 msgstr "%(kind)s ei ole eräänlainen osoite."
 
-#: src/postulo/api/routers/companies.py
+#: src/postulo/api/routers/companies.py src/postulo/jobs/surface.py
 #, fuzzy, python-format
 msgid "%(kind)s is not a kind of number."
 msgstr "%(kind)s ei ole eräänlainen numero."
@@ -1242,7 +1242,7 @@ msgstr "%(scheme)s: tämä ei ole tavallinen muoto."
 msgid "%(sent)s, %(failed)s; each document says which."
 msgstr "%(sent)s, %(failed)s; jokainen asiakirja kertoo, kumpi."
 
-#: src/postulo/core/web_links.py
+#: src/postulo/core/web_links.py src/postulo/jobs/surface.py
 #, fuzzy, python-format
 msgid "%(service)s is already used by another row."
 msgstr "%(service)s käytetään jo toisella rivillä."
@@ -1789,6 +1789,10 @@ msgstr "Yrityksellä on yksi tunniste kutakin järjestelmää kohti."
 msgid "A company in several sectors or industries counts in each of them."
 msgstr "Useilla aloilla tai toimialoilla toimivalla yrityksellä on kullakin merkitystä."
 
+#: src/postulo/jobs/surface.py
+msgid "A company needs a name."
+msgstr ""
+
 #: src/postulo/templates/jobs/company_map.html
 #, fuzzy
 msgid "A company with addresses in several places is counted at each, so the counts add up to more than the companies there are."
@@ -1799,7 +1803,7 @@ msgstr "Yritys, jolla on osoitteita useissa paikoissa lasketaan kussakin, joten 
 msgid "A company with the same identifier is already yours."
 msgstr "Yhtiö, jolla on sama tunniste, on jo sinun."
 
-#: src/postulo/api/routers/companies.py
+#: src/postulo/api/routers/companies.py src/postulo/jobs/surface.py
 #, fuzzy
 msgid "A company's links are its social profiles."
 msgstr "Yrityksen yhteydet ovat sen sosiaaliset profiilit."
@@ -1833,6 +1837,10 @@ msgstr "Yhteyshenkilö ei missään yrityksessä"
 #, fuzzy, python-format
 msgid "A contact has at most %(max)s messaging handles."
 msgstr "Yhteyshenkilöllä on enintään %(max)s viestikahvat."
+
+#: src/postulo/jobs/surface.py
+msgid "A contact needs a name."
+msgstr ""
 
 #: src/postulo/templates/server/design.html
 #, fuzzy
@@ -1903,6 +1911,10 @@ msgstr "Syntymäaika ei ole ennen %(year)s."
 #, fuzzy
 msgid "A deep blue. Ten steps, of which the interface spends a handful."
 msgstr "Syvä sininen. Kymmenen sävyä, joista käyttöliittymä käyttää kourallisen."
+
+#: src/postulo/jobs/surface.py
+msgid "A department needs a name."
+msgstr ""
 
 #: src/postulo/resume/publications.py
 #, fuzzy
@@ -2233,6 +2245,10 @@ msgstr "Kansainvälisessä muodossa oleva numero tallennetaan tähän palvelimee
 #, fuzzy
 msgid "A number is kept once on this instance. If one is already recorded here, saving says so rather than taking it from whoever has it."
 msgstr "Numero säilytetään tässä asennuksessa kerran. Jos se on jo kirjattu tänne, tallennus sanoo sen sen sijaan, että ottaisi sen siltä, jolla se on."
+
+#: src/postulo/jobs/surface.py
+msgid "A number is needed."
+msgstr ""
 
 #: src/postulo/templates/help/telephone_numbers.html
 #, fuzzy
@@ -3290,6 +3306,10 @@ msgstr "Osoitteessa ei voi olla käyttäjätunnusta tai salasanaa."
 #, fuzzy
 msgid "An address cannot contain a line break or any other control character."
 msgstr "Osoite ei voi sisältää rivinvaihtoa tai muuta ohjausmerkkiä."
+
+#: src/postulo/jobs/surface.py
+msgid "An address needs at least one part."
+msgstr ""
 
 #: src/postulo/documents/forms.py
 #, fuzzy
@@ -6929,6 +6949,10 @@ msgstr "Lähetetty sähköpostitse, ja lähettämäsi kirjattu."
 #, fuzzy
 msgid "Employer"
 msgstr "Työnantaja"
+
+#: src/postulo/jobs/surface.py
+msgid "Employer structure is switched off, so departments and parents are not changed."
+msgstr ""
 
 #: src/postulo/applications/models.py
 #, fuzzy
@@ -13174,6 +13198,10 @@ msgstr "Verkossa"
 msgid "Only %(name)s"
 msgstr "Vain %(name)s"
 
+#: src/postulo/jobs/surface.py
+msgid "Only a company's or a contact's details can be written."
+msgstr ""
+
 #: src/postulo/jobs/capture_views.py
 #, fuzzy
 msgid "Only a discarded capture can be put back."
@@ -15874,7 +15902,7 @@ msgstr "sano, että viittaukset ovat saatavilla pyynnöstä"
 msgid "Say that you understand what leaving does, first."
 msgstr "Sano, että ymmärrät, mitä lähtö tekee."
 
-#: src/postulo/core/postal.py
+#: src/postulo/core/postal.py src/postulo/jobs/surface.py
 #, fuzzy
 msgid "Say what this address is."
 msgstr "Kerro, mikä tämä osoite on."
@@ -15885,7 +15913,7 @@ msgstr "Kerro, mikä tämä osoite on."
 msgid "Say what this identifier is."
 msgstr "Kerro, mikä tämä tunniste on."
 
-#: src/postulo/core/phone_numbers.py
+#: src/postulo/core/phone_numbers.py src/postulo/jobs/surface.py
 #, fuzzy
 msgid "Say what this number is."
 msgstr "Kerro, mikä numero tämä on."
@@ -15904,6 +15932,10 @@ msgstr "Kerro, kenelle se lähetetään."
 #, fuzzy
 msgid "Say whose tiles they are: their licence asks for a credit on the map."
 msgstr "Sano, kenen laattoja ne ovat: niiden lisenssi pyytää luottoa kartalta."
+
+#: src/postulo/jobs/surface.py
+msgid "Say whose work this is: a saved account."
+msgstr ""
 
 #: src/postulo/templates/applications/application_detail.html
 #: src/postulo/templates/applications/interview_form.html
@@ -17753,6 +17785,10 @@ msgstr "Ketju on syvempi kuin %(limit)s yritystä — syvempi kuin mitä Postulo
 msgid "That company is no longer here."
 msgstr "Sitä yritystä ei enää ole täällä."
 
+#: src/postulo/jobs/surface.py
+msgid "That company is not one you can see."
+msgstr ""
+
 #: src/postulo/api/routers/companies.py
 #, fuzzy
 msgid "That company is shared with you read-only."
@@ -17782,6 +17818,10 @@ msgstr "Se CV ei ole sinun."
 #, fuzzy
 msgid "That department belongs to a different company."
 msgstr "Tuo osasto kuuluu toiselle yritykselle."
+
+#: src/postulo/jobs/surface.py
+msgid "That department is not one you can see."
+msgstr ""
 
 #: src/postulo/templates/base.html
 #, fuzzy
@@ -18068,6 +18108,10 @@ msgstr "Tämä ei ole tiedosto, jota tämä sivu lukee. Se lukee JSON-tiedoston,
 msgid "That is not a kind of access."
 msgstr "Se ei ole eräänlainen pääsy."
 
+#: src/postulo/jobs/surface.py
+msgid "That is not a kind of company."
+msgstr ""
+
 #: src/postulo/accounts/avatars.py
 #, fuzzy, python-format
 msgid "That is not a kind of picture Postulo keeps. Use %(formats)s."
@@ -18092,6 +18136,10 @@ msgstr "Se ei ole numero, jota maa %(country)s käyttää: yksikään numero sie
 #, fuzzy, python-format
 msgid "That is not a Postulo backup that opens cleanly: %(problem)s"
 msgstr "Tuo ei ole Postulon varmuuskopio, joka aukeaa siististi: %(problem)s"
+
+#: src/postulo/jobs/surface.py
+msgid "That is not a record that has been saved."
+msgstr ""
 
 #: src/postulo/core/messaging_services.py
 #, fuzzy
@@ -18229,6 +18277,10 @@ msgstr "Tuota linkkiä ei voi käyttää."
 msgid "That link will not work any more."
 msgstr "Tuo linkki ei enää toimi."
 
+#: src/postulo/jobs/surface.py
+msgid "That name cannot be checked just now."
+msgstr ""
+
 #: src/postulo/core/phones.py
 #, fuzzy
 msgid "That number has no area code."
@@ -18325,6 +18377,10 @@ msgstr "Tuota liitännäistä ei ole enää asennettu."
 #, fuzzy
 msgid "That plugin is switched off for you."
 msgstr "Tuo liitännäinen on sinulla pois päältä."
+
+#: src/postulo/jobs/surface.py
+msgid "That record is not yours to change."
+msgstr ""
 
 #: src/postulo/core/mail_auth.py src/postulo/plugins/consent.py
 #, fuzzy
@@ -20082,6 +20138,7 @@ msgid "This address is already in your listings, since %(when)s."
 msgstr "Tämä osoite on jo ilmoituksissasi, alkaen %(when)s."
 
 #: src/postulo/core/postal.py src/postulo/core/web_links.py
+#: src/postulo/jobs/surface.py
 #, fuzzy
 msgid "This address is already listed."
 msgstr "Tämä osoite on jo luettelossa."
@@ -20407,7 +20464,7 @@ msgstr "Tämä on sinun oma tilisi. Itsellesi tekemäsi linkki ei ole tie takais
 msgid "This month"
 msgstr "Tässä kuussa"
 
-#: src/postulo/core/phone_numbers.py
+#: src/postulo/core/phone_numbers.py src/postulo/jobs/surface.py
 #, fuzzy
 msgid "This number is already listed."
 msgstr "Tämä numero on jo luettelossa."
@@ -22891,6 +22948,7 @@ msgid "You"
 msgstr "Sinä"
 
 #: src/postulo/api/routers/companies.py src/postulo/jobs/forms.py
+#: src/postulo/jobs/surface.py
 #, fuzzy
 msgid "You already have a company with that name."
 msgstr "Sinulla on jo tämänniminen yritys."
@@ -23567,7 +23625,8 @@ msgstr "· vielä käynnissä"
 msgid "“%(code)s” is not a language code, like %(first)s or %(second)s."
 msgstr "”%(code)s” ei ole kielikoodi, kuten %(first)s tai %(second)s."
 
-#: src/postulo/core/web_links.py src/postulo/resume/candidate.py
+#: src/postulo/core/web_links.py src/postulo/jobs/surface.py
+#: src/postulo/resume/candidate.py
 #, fuzzy, python-format
 msgid "“%(kind)s” is not one of the types of link."
 msgstr "”%(kind)s” ei ole yksi linkkityypeistä."

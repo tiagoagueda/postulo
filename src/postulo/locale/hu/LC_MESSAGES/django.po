@@ -727,12 +727,12 @@ msgstr "%(kind)s létrehozva. Most válassza ki, mi kerüljön rá."
 msgid "%(kind)s held"
 msgstr "%(kind)s megtartva"
 
-#: src/postulo/api/routers/companies.py
+#: src/postulo/api/routers/companies.py src/postulo/jobs/surface.py
 #, python-format
 msgid "%(kind)s is not a kind of address."
 msgstr "Ez nem címtípus: %(kind)s."
 
-#: src/postulo/api/routers/companies.py
+#: src/postulo/api/routers/companies.py src/postulo/jobs/surface.py
 #, python-format
 msgid "%(kind)s is not a kind of number."
 msgstr "Ez nem számtípus: %(kind)s."
@@ -1242,7 +1242,7 @@ msgstr "%(scheme)s: ez nem a szokásos forma."
 msgid "%(sent)s, %(failed)s; each document says which."
 msgstr "%(sent)s, %(failed)s; minden dokumentum megmondja, melyik."
 
-#: src/postulo/core/web_links.py
+#: src/postulo/core/web_links.py src/postulo/jobs/surface.py
 #, python-format
 msgid "%(service)s is already used by another row."
 msgstr ""
@@ -1734,6 +1734,10 @@ msgstr "Egy cégnek azonosítási rendszerenként egy azonosítója lehet."
 msgid "A company in several sectors or industries counts in each of them."
 msgstr "Több ágazatban vagy iparágban működő cég mindegyikben beleszámít."
 
+#: src/postulo/jobs/surface.py
+msgid "A company needs a name."
+msgstr ""
+
 #: src/postulo/templates/jobs/company_map.html
 msgid "A company with addresses in several places is counted at each, so the counts add up to more than the companies there are."
 msgstr "A több helyen is címmel rendelkező cég minden helyen beleszámít, így a számok összege több, mint ahány cég van."
@@ -1742,7 +1746,7 @@ msgstr "A több helyen is címmel rendelkező cég minden helyen beleszámít, �
 msgid "A company with the same identifier is already yours."
 msgstr "Ugyanilyen azonosítójú cég már szerepel az adatai között."
 
-#: src/postulo/api/routers/companies.py
+#: src/postulo/api/routers/companies.py src/postulo/jobs/surface.py
 msgid "A company's links are its social profiles."
 msgstr "A cég hivatkozásai a közösségi profiljai."
 
@@ -1772,6 +1776,10 @@ msgstr "Kapcsolattartó cég nélkül"
 #, python-format
 msgid "A contact has at most %(max)s messaging handles."
 msgstr "Egy kapcsolattartónak legfeljebb %(max)s üzenetküldő azonosítója lehet."
+
+#: src/postulo/jobs/surface.py
+msgid "A contact needs a name."
+msgstr ""
 
 #: src/postulo/templates/server/design.html
 msgid "A country and a number in one group"
@@ -1829,6 +1837,10 @@ msgstr "A születési dátum nem lehet %(year)s előtti."
 #: src/postulo/core/design.py
 msgid "A deep blue. Ten steps, of which the interface spends a handful."
 msgstr "Mélykék. Tíz árnyalat, amelyekből a felület néhányat használ."
+
+#: src/postulo/jobs/surface.py
+msgid "A department needs a name."
+msgstr ""
 
 #: src/postulo/resume/publications.py
 msgid "A DOI looks like 10.1000/182: “10.”, a number, a slash and the rest."
@@ -2097,6 +2109,10 @@ msgstr "A nemzetközi formájú szám ezen a példányon csak egyszer szerepelhe
 #: src/postulo/templates/partials/phone_numbers.html
 msgid "A number is kept once on this instance. If one is already recorded here, saving says so rather than taking it from whoever has it."
 msgstr "Egy szám ezen a példányon egyszer szerepel. Ha már fel van jegyezve itt, a mentés ezt mondja, ahelyett hogy elvenné attól, akié."
+
+#: src/postulo/jobs/surface.py
+msgid "A number is needed."
+msgstr ""
 
 #: src/postulo/templates/help/telephone_numbers.html
 msgid "A number its country cannot have is refused, and the refusal says why. A number Postulo cannot place is kept as you typed it, with a note beside it. One recorded before numbers were checked stays as it is, marked, until you change it. Nothing here proves that a number is yours."
@@ -2974,6 +2990,10 @@ msgstr "Egy cím nem tartalmazhat felhasználónevet vagy jelszót."
 #: src/postulo/core/addresses.py
 msgid "An address cannot contain a line break or any other control character."
 msgstr "A cím nem tartalmazhat sortörést vagy más vezérlőkaraktert."
+
+#: src/postulo/jobs/surface.py
+msgid "An address needs at least one part."
+msgstr ""
 
 #: src/postulo/documents/forms.py
 msgid "An address of yours is offered here once it has been confirmed."
@@ -5986,6 +6006,10 @@ msgstr "E-mailben elküldve, és az elküldöttek feljegyezve."
 #: src/postulo/jobs/models.py
 msgid "Employer"
 msgstr "Munkáltató"
+
+#: src/postulo/jobs/surface.py
+msgid "Employer structure is switched off, so departments and parents are not changed."
+msgstr ""
 
 #: src/postulo/applications/models.py
 msgid "employment service"
@@ -11164,6 +11188,10 @@ msgstr "Online"
 msgid "Only %(name)s"
 msgstr "Csak %(name)s"
 
+#: src/postulo/jobs/surface.py
+msgid "Only a company's or a contact's details can be written."
+msgstr ""
+
 #: src/postulo/jobs/capture_views.py
 msgid "Only a discarded capture can be put back."
 msgstr "Csak elvetett rögzítés állítható vissza."
@@ -13397,7 +13425,7 @@ msgstr "annak jelzése, hogy referenciák kérésre rendelkezésre állnak"
 msgid "Say that you understand what leaving does, first."
 msgstr "Először jelezze, hogy érti, mit jelent a kilépés."
 
-#: src/postulo/core/postal.py
+#: src/postulo/core/postal.py src/postulo/jobs/surface.py
 msgid "Say what this address is."
 msgstr "Adja meg, milyen cím ez."
 
@@ -13406,7 +13434,7 @@ msgstr "Adja meg, milyen cím ez."
 msgid "Say what this identifier is."
 msgstr "Adja meg, mi ez az azonosító."
 
-#: src/postulo/core/phone_numbers.py
+#: src/postulo/core/phone_numbers.py src/postulo/jobs/surface.py
 msgid "Say what this number is."
 msgstr "Adja meg, milyen szám ez."
 
@@ -13421,6 +13449,10 @@ msgstr "Adja meg, kinek kell elküldeni."
 #: src/postulo/core/server_forms.py
 msgid "Say whose tiles they are: their licence asks for a credit on the map."
 msgstr "Adja meg, kiéi a csempék: a licencük forrásmegjelölést kér a térképen."
+
+#: src/postulo/jobs/surface.py
+msgid "Say whose work this is: a saved account."
+msgstr ""
 
 #: src/postulo/templates/applications/application_detail.html
 #: src/postulo/templates/applications/interview_form.html
@@ -14950,6 +14982,10 @@ msgstr "Ez a lánc több mint %(limit)s cég mélységű, ami mélyebb minden ol
 msgid "That company is no longer here."
 msgstr "Az a cég már nem létezik."
 
+#: src/postulo/jobs/surface.py
+msgid "That company is not one you can see."
+msgstr ""
+
 #: src/postulo/api/routers/companies.py
 msgid "That company is shared with you read-only."
 msgstr "Ez a cég csak olvasásra van megosztva Önnel."
@@ -14973,6 +15009,10 @@ msgstr "Ez az önéletrajz nem az Öné."
 #: src/postulo/jobs/models.py
 msgid "That department belongs to a different company."
 msgstr "Az a részleg egy másik céghez tartozik."
+
+#: src/postulo/jobs/surface.py
+msgid "That department is not one you can see."
+msgstr ""
 
 #: src/postulo/templates/base.html
 msgid "That did not work — the server answered {status}. Nothing on this page has changed."
@@ -15223,6 +15263,10 @@ msgstr "Ez nem olyan fájl, amelyet ez az oldal beolvas. Csak az általa letölt
 msgid "That is not a kind of access."
 msgstr "Ez nem hozzáférési típus."
 
+#: src/postulo/jobs/surface.py
+msgid "That is not a kind of company."
+msgstr ""
+
 #: src/postulo/accounts/avatars.py
 #, python-format
 msgid "That is not a kind of picture Postulo keeps. Use %(formats)s."
@@ -15246,6 +15290,10 @@ msgstr "Ilyen számot nem használ ez az ország: %(country)s. Ott egyetlen szá
 #, python-format
 msgid "That is not a Postulo backup that opens cleanly: %(problem)s"
 msgstr "Ez nem hibátlanul megnyíló Postulo-biztonsági mentés: %(problem)s"
+
+#: src/postulo/jobs/surface.py
+msgid "That is not a record that has been saved."
+msgstr ""
 
 #: src/postulo/core/messaging_services.py
 msgid "That is not a service a handle can be on."
@@ -15358,6 +15406,10 @@ msgstr "Ez a hivatkozás nem használható."
 msgid "That link will not work any more."
 msgstr "Ez a hivatkozás nem fog többé működni."
 
+#: src/postulo/jobs/surface.py
+msgid "That name cannot be checked just now."
+msgstr ""
+
 #: src/postulo/core/phones.py
 msgid "That number has no area code."
 msgstr "Ennek a számnak nincs körzetszáma."
@@ -15444,6 +15496,10 @@ msgstr "Ez a bővítmény már nincs telepítve."
 #: src/postulo/plugins/syncing.py src/postulo/plugins/views.py
 msgid "That plugin is switched off for you."
 msgstr "Ez a bővítmény az Ön számára ki van kapcsolva."
+
+#: src/postulo/jobs/surface.py
+msgid "That record is not yours to change."
+msgstr ""
 
 #: src/postulo/core/mail_auth.py src/postulo/plugins/consent.py
 msgid "That reply did not come from a request Postulo made."
@@ -16915,6 +16971,7 @@ msgid "This address is already in your listings, since %(when)s."
 msgstr "Ez a cím már a hirdetései között van, ekkortól: %(when)s."
 
 #: src/postulo/core/postal.py src/postulo/core/web_links.py
+#: src/postulo/jobs/surface.py
 msgid "This address is already listed."
 msgstr "Ez a cím már szerepel a listán."
 
@@ -17181,7 +17238,7 @@ msgstr "Ez a saját fiókja. A saját magának készített hivatkozás nem jelen
 msgid "This month"
 msgstr "Ez a hónap"
 
-#: src/postulo/core/phone_numbers.py
+#: src/postulo/core/phone_numbers.py src/postulo/jobs/surface.py
 msgid "This number is already listed."
 msgstr "Ez a szám már szerepel a listán."
 
@@ -19220,6 +19277,7 @@ msgid "You"
 msgstr "Ön"
 
 #: src/postulo/api/routers/companies.py src/postulo/jobs/forms.py
+#: src/postulo/jobs/surface.py
 msgid "You already have a company with that name."
 msgstr "Már van ilyen nevű cége."
 
@@ -19778,7 +19836,8 @@ msgstr "· még tart"
 msgid "“%(code)s” is not a language code, like %(first)s or %(second)s."
 msgstr "A(z) „%(code)s” nem nyelvkód (ilyen például a(z) %(first)s vagy a(z) %(second)s)."
 
-#: src/postulo/core/web_links.py src/postulo/resume/candidate.py
+#: src/postulo/core/web_links.py src/postulo/jobs/surface.py
+#: src/postulo/resume/candidate.py
 #, python-format
 msgid "“%(kind)s” is not one of the types of link."
 msgstr "A(z) „%(kind)s” nem tartozik a hivatkozástípusok közé."

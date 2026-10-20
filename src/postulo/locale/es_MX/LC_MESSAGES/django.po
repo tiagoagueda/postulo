@@ -727,12 +727,12 @@ msgstr "%(kind)s creado. Ahora elige qué incluye."
 msgid "%(kind)s held"
 msgstr "Se realizó: %(kind)s"
 
-#: src/postulo/api/routers/companies.py
+#: src/postulo/api/routers/companies.py src/postulo/jobs/surface.py
 #, python-format
 msgid "%(kind)s is not a kind of address."
 msgstr "%(kind)s no es un tipo de dirección."
 
-#: src/postulo/api/routers/companies.py
+#: src/postulo/api/routers/companies.py src/postulo/jobs/surface.py
 #, python-format
 msgid "%(kind)s is not a kind of number."
 msgstr "%(kind)s no es un tipo de número."
@@ -1242,7 +1242,7 @@ msgstr "%(scheme)s: esa no es la forma habitual."
 msgid "%(sent)s, %(failed)s; each document says which."
 msgstr "%(sent)s, %(failed)s; cada documento indica cuál."
 
-#: src/postulo/core/web_links.py
+#: src/postulo/core/web_links.py src/postulo/jobs/surface.py
 #, fuzzy, python-format
 msgid "%(service)s is already used by another row."
 msgstr "%(service)s ya es usado por otra fila."
@@ -1734,6 +1734,10 @@ msgstr "Una empresa tiene un identificador por esquema."
 msgid "A company in several sectors or industries counts in each of them."
 msgstr "Una empresa que pertenece a varios sectores o industrias cuenta en cada uno de ellos."
 
+#: src/postulo/jobs/surface.py
+msgid "A company needs a name."
+msgstr ""
+
 #: src/postulo/templates/jobs/company_map.html
 msgid "A company with addresses in several places is counted at each, so the counts add up to more than the companies there are."
 msgstr "Una empresa con direcciones en varios lugares se cuenta en cada uno, así que la suma de los conteos supera el número de empresas que hay."
@@ -1742,7 +1746,7 @@ msgstr "Una empresa con direcciones en varios lugares se cuenta en cada uno, as�
 msgid "A company with the same identifier is already yours."
 msgstr "Una empresa con el mismo identificador ya es tuya."
 
-#: src/postulo/api/routers/companies.py
+#: src/postulo/api/routers/companies.py src/postulo/jobs/surface.py
 msgid "A company's links are its social profiles."
 msgstr "Los vínculos de una empresa son sus perfiles sociales."
 
@@ -1772,6 +1776,10 @@ msgstr "Un contacto sin empresa"
 #, python-format
 msgid "A contact has at most %(max)s messaging handles."
 msgstr "Un contacto tiene como máximo %(max)s usuarios de mensajería."
+
+#: src/postulo/jobs/surface.py
+msgid "A contact needs a name."
+msgstr ""
 
 #: src/postulo/templates/server/design.html
 msgid "A country and a number in one group"
@@ -1829,6 +1837,10 @@ msgstr "Una fecha de nacimiento no puede ser anterior a %(year)s."
 #: src/postulo/core/design.py
 msgid "A deep blue. Ten steps, of which the interface spends a handful."
 msgstr "Un azul profundo. Diez tonos, de los que la interfaz usa unos cuantos."
+
+#: src/postulo/jobs/surface.py
+msgid "A department needs a name."
+msgstr ""
 
 #: src/postulo/resume/publications.py
 msgid "A DOI looks like 10.1000/182: “10.”, a number, a slash and the rest."
@@ -2097,6 +2109,10 @@ msgstr "Un número en su forma internacional se guarda una sola vez en esta inst
 #: src/postulo/templates/partials/phone_numbers.html
 msgid "A number is kept once on this instance. If one is already recorded here, saving says so rather than taking it from whoever has it."
 msgstr "Cada número se conserva una sola vez en esta instancia. Si ya está registrado aquí, al guardar se te avisa en lugar de quitárselo a quien lo tenga."
+
+#: src/postulo/jobs/surface.py
+msgid "A number is needed."
+msgstr ""
 
 #: src/postulo/templates/help/telephone_numbers.html
 msgid "A number its country cannot have is refused, and the refusal says why. A number Postulo cannot place is kept as you typed it, with a note beside it. One recorded before numbers were checked stays as it is, marked, until you change it. Nothing here proves that a number is yours."
@@ -2977,6 +2993,10 @@ msgstr "Una dirección no puede incluir un nombre de usuario ni una contraseña.
 #: src/postulo/core/addresses.py
 msgid "An address cannot contain a line break or any other control character."
 msgstr "Una dirección no puede contener un salto de línea ni ningún otro carácter de control."
+
+#: src/postulo/jobs/surface.py
+msgid "An address needs at least one part."
+msgstr ""
 
 #: src/postulo/documents/forms.py
 msgid "An address of yours is offered here once it has been confirmed."
@@ -5990,6 +6010,10 @@ msgstr "Enviado por correo, y se registró lo que enviaste."
 #: src/postulo/jobs/models.py
 msgid "Employer"
 msgstr "Empleador"
+
+#: src/postulo/jobs/surface.py
+msgid "Employer structure is switched off, so departments and parents are not changed."
+msgstr ""
 
 #: src/postulo/applications/models.py
 msgid "employment service"
@@ -11169,6 +11193,10 @@ msgstr "En línea"
 msgid "Only %(name)s"
 msgstr "Solo %(name)s"
 
+#: src/postulo/jobs/surface.py
+msgid "Only a company's or a contact's details can be written."
+msgstr ""
+
 #: src/postulo/jobs/capture_views.py
 msgid "Only a discarded capture can be put back."
 msgstr "Solo se puede restaurar una captura descartada."
@@ -13404,7 +13432,7 @@ msgstr "indicar que hay referencias disponibles a solicitud"
 msgid "Say that you understand what leaving does, first."
 msgstr "Primero confirme que entiende lo que implica salir."
 
-#: src/postulo/core/postal.py
+#: src/postulo/core/postal.py src/postulo/jobs/surface.py
 msgid "Say what this address is."
 msgstr "Indica qué es esta dirección."
 
@@ -13413,7 +13441,7 @@ msgstr "Indica qué es esta dirección."
 msgid "Say what this identifier is."
 msgstr "Indica qué es este identificador."
 
-#: src/postulo/core/phone_numbers.py
+#: src/postulo/core/phone_numbers.py src/postulo/jobs/surface.py
 msgid "Say what this number is."
 msgstr "Indica qué es este número."
 
@@ -13428,6 +13456,10 @@ msgstr "Indica a quién enviarlo."
 #: src/postulo/core/server_forms.py
 msgid "Say whose tiles they are: their licence asks for a credit on the map."
 msgstr "Indica de quién son las teselas: su licencia pide un crédito en el mapa."
+
+#: src/postulo/jobs/surface.py
+msgid "Say whose work this is: a saved account."
+msgstr ""
 
 #: src/postulo/templates/applications/application_detail.html
 #: src/postulo/templates/applications/interview_form.html
@@ -14966,6 +14998,10 @@ msgstr "Esa cadena tiene más de %(limit)s empresas de profundidad, más de lo q
 msgid "That company is no longer here."
 msgstr "Esa empresa ya no existe."
 
+#: src/postulo/jobs/surface.py
+msgid "That company is not one you can see."
+msgstr ""
+
 #: src/postulo/api/routers/companies.py
 msgid "That company is shared with you read-only."
 msgstr "Esa empresa se comparte con usted solo para lectura."
@@ -14989,6 +15025,10 @@ msgstr "Ese CV no es tuyo."
 #: src/postulo/jobs/models.py
 msgid "That department belongs to a different company."
 msgstr "Esa área pertenece a otra empresa."
+
+#: src/postulo/jobs/surface.py
+msgid "That department is not one you can see."
+msgstr ""
 
 #: src/postulo/templates/base.html
 msgid "That did not work — the server answered {status}. Nothing on this page has changed."
@@ -15239,6 +15279,10 @@ msgstr "Ese no es un archivo que esta página lea. Solo lee el archivo JSON que 
 msgid "That is not a kind of access."
 msgstr "Eso no es un tipo de acceso."
 
+#: src/postulo/jobs/surface.py
+msgid "That is not a kind of company."
+msgstr ""
+
 #: src/postulo/accounts/avatars.py
 #, python-format
 msgid "That is not a kind of picture Postulo keeps. Use %(formats)s."
@@ -15262,6 +15306,10 @@ msgstr "Ese no es un número que se use en %(country)s: allí ningún número em
 #, python-format
 msgid "That is not a Postulo backup that opens cleanly: %(problem)s"
 msgstr "Ese no es un respaldo de Postulo que se abra correctamente: %(problem)s"
+
+#: src/postulo/jobs/surface.py
+msgid "That is not a record that has been saved."
+msgstr ""
 
 #: src/postulo/core/messaging_services.py
 msgid "That is not a service a handle can be on."
@@ -15374,6 +15422,10 @@ msgstr "Ese enlace no se puede utilizar."
 msgid "That link will not work any more."
 msgstr "Ese enlace ya no funcionará."
 
+#: src/postulo/jobs/surface.py
+msgid "That name cannot be checked just now."
+msgstr ""
+
 #: src/postulo/core/phones.py
 msgid "That number has no area code."
 msgstr "Ese número no tiene código de área."
@@ -15460,6 +15512,10 @@ msgstr "Ese complemento ya no está instalado."
 #: src/postulo/plugins/syncing.py src/postulo/plugins/views.py
 msgid "That plugin is switched off for you."
 msgstr "Ese complemento está desactivado para ti."
+
+#: src/postulo/jobs/surface.py
+msgid "That record is not yours to change."
+msgstr ""
 
 #: src/postulo/core/mail_auth.py src/postulo/plugins/consent.py
 msgid "That reply did not come from a request Postulo made."
@@ -16932,6 +16988,7 @@ msgid "This address is already in your listings, since %(when)s."
 msgstr "Esta dirección ya está en tus vacantes, desde %(when)s."
 
 #: src/postulo/core/postal.py src/postulo/core/web_links.py
+#: src/postulo/jobs/surface.py
 msgid "This address is already listed."
 msgstr "Esta dirección ya está en la lista."
 
@@ -17198,7 +17255,7 @@ msgstr "Esta es tu propia cuenta. Un enlace que crees para ti no es una forma de
 msgid "This month"
 msgstr "Este mes"
 
-#: src/postulo/core/phone_numbers.py
+#: src/postulo/core/phone_numbers.py src/postulo/jobs/surface.py
 msgid "This number is already listed."
 msgstr "Este número ya está en la lista."
 
@@ -19237,6 +19294,7 @@ msgid "You"
 msgstr "Tú"
 
 #: src/postulo/api/routers/companies.py src/postulo/jobs/forms.py
+#: src/postulo/jobs/surface.py
 msgid "You already have a company with that name."
 msgstr "Ya tienes una empresa con ese nombre."
 
@@ -19796,7 +19854,8 @@ msgstr "· todavía en curso"
 msgid "“%(code)s” is not a language code, like %(first)s or %(second)s."
 msgstr "\"%(code)s\" no es un código de idioma, como %(first)s o %(second)s."
 
-#: src/postulo/core/web_links.py src/postulo/resume/candidate.py
+#: src/postulo/core/web_links.py src/postulo/jobs/surface.py
+#: src/postulo/resume/candidate.py
 #, python-format
 msgid "“%(kind)s” is not one of the types of link."
 msgstr "\"%(kind)s\" no es uno de los tipos de enlace."

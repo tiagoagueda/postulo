@@ -798,12 +798,12 @@ msgstr "%(kind)s vytvorené. Teraz vyberte, čo v ňom bude."
 msgid "%(kind)s held"
 msgstr "%(kind)s prebehol"
 
-#: src/postulo/api/routers/companies.py
+#: src/postulo/api/routers/companies.py src/postulo/jobs/surface.py
 #, fuzzy, python-format
 msgid "%(kind)s is not a kind of address."
 msgstr "Nie je to druh adresy."
 
-#: src/postulo/api/routers/companies.py
+#: src/postulo/api/routers/companies.py src/postulo/jobs/surface.py
 #, fuzzy, python-format
 msgid "%(kind)s is not a kind of number."
 msgstr "%(kind)s nie je druh čísla."
@@ -1321,7 +1321,7 @@ msgstr "%(scheme)s: to nie je obvyklý tvar."
 msgid "%(sent)s, %(failed)s; each document says which."
 msgstr "%(sent)s, %(failed)s; každý dokument uvádza, ktorý to bol."
 
-#: src/postulo/core/web_links.py
+#: src/postulo/core/web_links.py src/postulo/jobs/surface.py
 #, fuzzy, python-format
 msgid "%(service)s is already used by another row."
 msgstr "%(service)s sa už používa v inom riadku."
@@ -1883,6 +1883,10 @@ msgstr "Firma má jeden identifikátor na schému."
 msgid "A company in several sectors or industries counts in each of them."
 msgstr "Do každej z nich patrí spoločnosť vo viacerých odvetviach alebo odvetviach."
 
+#: src/postulo/jobs/surface.py
+msgid "A company needs a name."
+msgstr ""
+
 #: src/postulo/templates/jobs/company_map.html
 #, fuzzy
 msgid "A company with addresses in several places is counted at each, so the counts add up to more than the companies there are."
@@ -1893,7 +1897,7 @@ msgstr "Spoločnosť s adresami na viacerých miestach sa počíta na každom, t
 msgid "A company with the same identifier is already yours."
 msgstr "Spoločnosť s rovnakým identifikátorom je už vaša."
 
-#: src/postulo/api/routers/companies.py
+#: src/postulo/api/routers/companies.py src/postulo/jobs/surface.py
 #, fuzzy
 msgid "A company's links are its social profiles."
 msgstr "Odkazy spoločnosti sú jej sociálne profily."
@@ -1927,6 +1931,10 @@ msgstr "Kontakt v žiadnej spoločnosti"
 #, fuzzy, python-format
 msgid "A contact has at most %(max)s messaging handles."
 msgstr "Kontakt má nanajvýš %(max)s kľučky správ."
+
+#: src/postulo/jobs/surface.py
+msgid "A contact needs a name."
+msgstr ""
 
 #: src/postulo/templates/server/design.html
 #, fuzzy
@@ -1997,6 +2005,10 @@ msgstr "Dátum narodenia nie je pred %(year)s."
 #, fuzzy
 msgid "A deep blue. Ten steps, of which the interface spends a handful."
 msgstr "Tmavomodrá. Desať odtieňov, z ktorých rozhranie používa len niekoľko."
+
+#: src/postulo/jobs/surface.py
+msgid "A department needs a name."
+msgstr ""
 
 #: src/postulo/resume/publications.py
 #, fuzzy
@@ -2327,6 +2339,10 @@ msgstr "Číslo v medzinárodnom tvare sa na tejto inštancii uchováva raz. Ak 
 #, fuzzy
 msgid "A number is kept once on this instance. If one is already recorded here, saving says so rather than taking it from whoever has it."
 msgstr "Číslo sa na tejto inštalácii drží raz. Ak už je tu zapísané, uloženie to povie, namiesto toho, aby ho vzalo tomu, kto ho má."
+
+#: src/postulo/jobs/surface.py
+msgid "A number is needed."
+msgstr ""
 
 #: src/postulo/templates/help/telephone_numbers.html
 #, fuzzy
@@ -3390,6 +3406,10 @@ msgstr "Adresa nemôže obsahovať užívateľské meno alebo heslo."
 #, fuzzy
 msgid "An address cannot contain a line break or any other control character."
 msgstr "Adresa nemôže obsahovať zalomenie riadka ani iný riadiaci znak."
+
+#: src/postulo/jobs/surface.py
+msgid "An address needs at least one part."
+msgstr ""
 
 #: src/postulo/documents/forms.py
 #, fuzzy
@@ -7034,6 +7054,10 @@ msgstr "Odoslané e-mailom a zaznamenané, čo ste poslali."
 #, fuzzy
 msgid "Employer"
 msgstr "Zamestnávateľ"
+
+#: src/postulo/jobs/surface.py
+msgid "Employer structure is switched off, so departments and parents are not changed."
+msgstr ""
 
 #: src/postulo/applications/models.py
 #, fuzzy
@@ -13303,6 +13327,10 @@ msgstr "Online"
 msgid "Only %(name)s"
 msgstr "Len %(name)s"
 
+#: src/postulo/jobs/surface.py
+msgid "Only a company's or a contact's details can be written."
+msgstr ""
+
 #: src/postulo/jobs/capture_views.py
 #, fuzzy
 msgid "Only a discarded capture can be put back."
@@ -16009,7 +16037,7 @@ msgstr "uviesť, že odkazy sú k dispozícii na požiadanie"
 msgid "Say that you understand what leaving does, first."
 msgstr "Povedz, že chápeš, čo robí odchod."
 
-#: src/postulo/core/postal.py
+#: src/postulo/core/postal.py src/postulo/jobs/surface.py
 #, fuzzy
 msgid "Say what this address is."
 msgstr "Povedzte, čo je táto adresa."
@@ -16020,7 +16048,7 @@ msgstr "Povedzte, čo je táto adresa."
 msgid "Say what this identifier is."
 msgstr "Povedzte, čo je tento identifikátor."
 
-#: src/postulo/core/phone_numbers.py
+#: src/postulo/core/phone_numbers.py src/postulo/jobs/surface.py
 #, fuzzy
 msgid "Say what this number is."
 msgstr "Povedzte, čo je to za číslo."
@@ -16039,6 +16067,10 @@ msgstr "Uveďte, komu to poslať."
 #, fuzzy
 msgid "Say whose tiles they are: their licence asks for a credit on the map."
 msgstr "Povedzte, koho dlaždice sú: ich licencia žiada o úver na mape."
+
+#: src/postulo/jobs/surface.py
+msgid "Say whose work this is: a saved account."
+msgstr ""
 
 #: src/postulo/templates/applications/application_detail.html
 #: src/postulo/templates/applications/interview_form.html
@@ -17889,6 +17921,10 @@ msgstr "Ten reťazec je hlbší než %(limit)s spoločností — hlbšie, než d
 msgid "That company is no longer here."
 msgstr "Táto firma tu už nie je."
 
+#: src/postulo/jobs/surface.py
+msgid "That company is not one you can see."
+msgstr ""
+
 #: src/postulo/api/routers/companies.py
 #, fuzzy
 msgid "That company is shared with you read-only."
@@ -17918,6 +17954,10 @@ msgstr "Ten životopis nie je tvoj."
 #, fuzzy
 msgid "That department belongs to a different company."
 msgstr "To oddelenie patrí inej spoločnosti."
+
+#: src/postulo/jobs/surface.py
+msgid "That department is not one you can see."
+msgstr ""
 
 #: src/postulo/templates/base.html
 #, fuzzy
@@ -18207,6 +18247,10 @@ msgstr "Toto nie je súbor, ktorý táto stránka číta. Číta súbor JSON, kt
 msgid "That is not a kind of access."
 msgstr "To nie je druh prístupu."
 
+#: src/postulo/jobs/surface.py
+msgid "That is not a kind of company."
+msgstr ""
+
 #: src/postulo/accounts/avatars.py
 #, fuzzy, python-format
 msgid "That is not a kind of picture Postulo keeps. Use %(formats)s."
@@ -18231,6 +18275,10 @@ msgstr "Toto nie je číslo, aké používa %(country)s: žiadne číslo tam tak
 #, fuzzy, python-format
 msgid "That is not a Postulo backup that opens cleanly: %(problem)s"
 msgstr "To nie je záloha Postulo, ktorá sa otvára čisto: %(problem)s"
+
+#: src/postulo/jobs/surface.py
+msgid "That is not a record that has been saved."
+msgstr ""
 
 #: src/postulo/core/messaging_services.py
 #, fuzzy
@@ -18368,6 +18416,10 @@ msgstr "Tento odkaz sa nedá použiť."
 msgid "That link will not work any more."
 msgstr "Tento odkaz už nebude fungovať."
 
+#: src/postulo/jobs/surface.py
+msgid "That name cannot be checked just now."
+msgstr ""
+
 #: src/postulo/core/phones.py
 #, fuzzy
 msgid "That number has no area code."
@@ -18465,6 +18517,10 @@ msgstr "Tento plugin už nie je nainštalovaný."
 #, fuzzy
 msgid "That plugin is switched off for you."
 msgstr "Tento plugin je pre vás vypnutý."
+
+#: src/postulo/jobs/surface.py
+msgid "That record is not yours to change."
+msgstr ""
 
 #: src/postulo/core/mail_auth.py src/postulo/plugins/consent.py
 #, fuzzy
@@ -20230,6 +20286,7 @@ msgid "This address is already in your listings, since %(when)s."
 msgstr "Táto adresa už je vo vašich ponukách, od %(when)s."
 
 #: src/postulo/core/postal.py src/postulo/core/web_links.py
+#: src/postulo/jobs/surface.py
 #, fuzzy
 msgid "This address is already listed."
 msgstr "Táto adresa už je v zozname."
@@ -20555,7 +20612,7 @@ msgstr "Toto je váš vlastný účet. Odkaz, ktorý si urobíte sami, nie je ce
 msgid "This month"
 msgstr "Tento mesiac"
 
-#: src/postulo/core/phone_numbers.py
+#: src/postulo/core/phone_numbers.py src/postulo/jobs/surface.py
 #, fuzzy
 msgid "This number is already listed."
 msgstr "Toto číslo už je v zozname."
@@ -23042,6 +23099,7 @@ msgid "You"
 msgstr "Ty"
 
 #: src/postulo/api/routers/companies.py src/postulo/jobs/forms.py
+#: src/postulo/jobs/surface.py
 #, fuzzy
 msgid "You already have a company with that name."
 msgstr "Firmu s týmto názvom už máte."
@@ -23721,7 +23779,8 @@ msgstr "· stále prebieha"
 msgid "“%(code)s” is not a language code, like %(first)s or %(second)s."
 msgstr "„%(code)s“ nie je kód jazyka, ako %(first)s alebo %(second)s."
 
-#: src/postulo/core/web_links.py src/postulo/resume/candidate.py
+#: src/postulo/core/web_links.py src/postulo/jobs/surface.py
+#: src/postulo/resume/candidate.py
 #, fuzzy, python-format
 msgid "“%(kind)s” is not one of the types of link."
 msgstr "„%(kind)s“ nie je jedným z typov odkazov."

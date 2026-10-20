@@ -757,3 +757,87 @@ def test_the_surface_holds_the_one_vcard_mapping_and_nothing_to_fetch_with():
     assert (read.name, read.company, read.department) == ("Alex Morgan", "Acme", "Legal")
     with pytest.raises(api.VCardRefused):
         api.vcards_from_text("BEGIN:VCARD\nVERSION:2.1\nFN:A\nEND:VCARD\n")
+
+
+# ------------------------------------------------- companies and the person's card (#328)
+
+COMPANY_SURFACE = (
+    "AddressRow",
+    "Company",
+    "CompanyKind",
+    "Department",
+    "LinkRow",
+    "PersonCard",
+    "PhoneNumberKind",
+    "PhoneRow",
+    "PostalAddressKind",
+    "Refused",
+    "SavedRows",
+    "WriteRefused",
+    "addresses_for",
+    "create_contact",
+    "get_or_create_department",
+    "links_for",
+    "numbers_for",
+    "person_card",
+    "save_phone_numbers",
+    "save_postal_addresses",
+    "save_web_links",
+    "update_company",
+    "update_contact",
+)
+
+
+@pytest.mark.django_db
+def test_the_surface_holds_companies_departments_and_the_persons_card():
+    """What a contacts sync reads and writes, promised by name and handed over as the core's
+    own objects rather than copies (#328)."""
+    from postulo.core import card_rows
+    from postulo.core.models import PhoneNumber, PostalAddress
+    from postulo.documents import rendering
+    from postulo.jobs import surface
+    from postulo.jobs.models import Company, CompanyKind, Department
+    from postulo.plugins import api
+
+    for name in COMPANY_SURFACE:
+        assert name in api.__all__, name
+    assert api.Company is Company
+    assert api.Department is Department
+    assert api.CompanyKind is CompanyKind
+    assert api.PhoneNumberKind is PhoneNumber.Kind
+    assert api.PostalAddressKind is PostalAddress.Kind
+    assert api.numbers_for is card_rows.numbers_for
+    assert api.person_card is rendering.person_card
+    assert api.update_company is surface.update_company
+    assert api.create_contact is surface.create_contact
+    assert api.save_web_links is surface.save_web_links
+
+
+def test_importing_the_surface_has_not_imported_the_services():
+    """The names resolve when asked for, so importing the surface costs nothing (#328)."""
+    import subprocess
+    import sys
+
+    code = (
+        "import sys, postulo.plugins.api as a;"
+        "print('postulo.jobs.surface' in sys.modules, 'postulo.jobs.models' in sys.modules)"
+    )
+    result = subprocess.run(  # noqa: S603
+        [sys.executable, "-c", code], capture_output=True, text=True
+    )
+    assert result.stdout.split() == ["False", "False"], result.stderr
+
+
+def test_the_services_that_write_import_neither_a_user_nor_a_profile():
+    """The person's own details are read only: the module that writes holds no model that
+    would write them (#328). The behaviour is in `test_plugin_surface_records.py`."""
+    import inspect
+
+    from postulo.jobs import surface
+
+    imports = [
+        line
+        for line in inspect.getsource(surface).splitlines()
+        if line.startswith(("from ", "import "))
+    ]
+    assert not [line for line in imports if "accounts" in line or "auth" in line]

@@ -656,12 +656,12 @@ msgstr "%(kind)s dibuat. Sekarang pilih isinya."
 msgid "%(kind)s held"
 msgstr "%(kind)s terlaksana"
 
-#: src/postulo/api/routers/companies.py
+#: src/postulo/api/routers/companies.py src/postulo/jobs/surface.py
 #, python-format
 msgid "%(kind)s is not a kind of address."
 msgstr "%(kind)s bukan jenis alamat."
 
-#: src/postulo/api/routers/companies.py
+#: src/postulo/api/routers/companies.py src/postulo/jobs/surface.py
 #, python-format
 msgid "%(kind)s is not a kind of number."
 msgstr "%(kind)s bukan jenis nomor."
@@ -1163,7 +1163,7 @@ msgstr "%(scheme)s: bentuknya tidak seperti biasanya."
 msgid "%(sent)s, %(failed)s; each document says which."
 msgstr "%(sent)s, %(failed)s; setiap dokumen menyebutkan yang mana."
 
-#: src/postulo/core/web_links.py
+#: src/postulo/core/web_links.py src/postulo/jobs/surface.py
 #, python-format
 msgid "%(service)s is already used by another row."
 msgstr ""
@@ -1640,6 +1640,10 @@ msgstr "Satu perusahaan memiliki satu pengenal per skema."
 msgid "A company in several sectors or industries counts in each of them."
 msgstr "Perusahaan di beberapa sektor atau industri dihitung di masing-masing."
 
+#: src/postulo/jobs/surface.py
+msgid "A company needs a name."
+msgstr ""
+
 #: src/postulo/templates/jobs/company_map.html
 msgid "A company with addresses in several places is counted at each, so the counts add up to more than the companies there are."
 msgstr "Perusahaan dengan alamat di beberapa tempat dihitung di setiap tempat, sehingga jumlahnya lebih banyak daripada jumlah perusahaan yang ada."
@@ -1648,7 +1652,7 @@ msgstr "Perusahaan dengan alamat di beberapa tempat dihitung di setiap tempat, s
 msgid "A company with the same identifier is already yours."
 msgstr "Perusahaan dengan pengenal yang sama sudah ada di akun Anda."
 
-#: src/postulo/api/routers/companies.py
+#: src/postulo/api/routers/companies.py src/postulo/jobs/surface.py
 msgid "A company's links are its social profiles."
 msgstr "Tautan perusahaan adalah profil sosialnya."
 
@@ -1678,6 +1682,10 @@ msgstr "Kontak tanpa perusahaan"
 #, python-format
 msgid "A contact has at most %(max)s messaging handles."
 msgstr "Satu kontak memiliki paling banyak %(max)s nama pengguna perpesanan."
+
+#: src/postulo/jobs/surface.py
+msgid "A contact needs a name."
+msgstr ""
 
 #: src/postulo/templates/server/design.html
 msgid "A country and a number in one group"
@@ -1735,6 +1743,10 @@ msgstr "Tanggal lahir tidak boleh sebelum tahun %(year)s."
 #: src/postulo/core/design.py
 msgid "A deep blue. Ten steps, of which the interface spends a handful."
 msgstr "Biru tua. Sepuluh tingkat, beberapa di antaranya dipakai oleh antarmuka."
+
+#: src/postulo/jobs/surface.py
+msgid "A department needs a name."
+msgstr ""
 
 #: src/postulo/resume/publications.py
 msgid "A DOI looks like 10.1000/182: “10.”, a number, a slash and the rest."
@@ -2003,6 +2015,10 @@ msgstr "Nomor dalam bentuk internasionalnya hanya dapat disimpan sekali di insta
 #: src/postulo/templates/partials/phone_numbers.html
 msgid "A number is kept once on this instance. If one is already recorded here, saving says so rather than taking it from whoever has it."
 msgstr "Satu nomor hanya disimpan sekali di instans ini. Jika nomor itu sudah tercatat di sini, penyimpanan akan memberi tahu Anda, alih-alih mengambilnya dari siapa pun yang memilikinya."
+
+#: src/postulo/jobs/surface.py
+msgid "A number is needed."
+msgstr ""
 
 #: src/postulo/templates/help/telephone_numbers.html
 msgid "A number its country cannot have is refused, and the refusal says why. A number Postulo cannot place is kept as you typed it, with a note beside it. One recorded before numbers were checked stays as it is, marked, until you change it. Nothing here proves that a number is yours."
@@ -2874,6 +2890,10 @@ msgstr "Alamat tidak boleh memuat nama pengguna atau kata sandi."
 #: src/postulo/core/addresses.py
 msgid "An address cannot contain a line break or any other control character."
 msgstr "Alamat tidak boleh berisi jeda baris atau karakter kontrol lain."
+
+#: src/postulo/jobs/surface.py
+msgid "An address needs at least one part."
+msgstr ""
 
 #: src/postulo/documents/forms.py
 msgid "An address of yours is offered here once it has been confirmed."
@@ -5881,6 +5901,10 @@ msgstr "Dikirim lewat email, dan apa yang Anda kirim sudah dicatat."
 #: src/postulo/jobs/models.py
 msgid "Employer"
 msgstr "Pemberi kerja"
+
+#: src/postulo/jobs/surface.py
+msgid "Employer structure is switched off, so departments and parents are not changed."
+msgstr ""
 
 #: src/postulo/applications/models.py
 msgid "employment service"
@@ -11035,6 +11059,10 @@ msgstr "Daring"
 msgid "Only %(name)s"
 msgstr "Hanya %(name)s"
 
+#: src/postulo/jobs/surface.py
+msgid "Only a company's or a contact's details can be written."
+msgstr ""
+
 #: src/postulo/jobs/capture_views.py
 msgid "Only a discarded capture can be put back."
 msgstr "Hanya tangkapan yang dibuang yang dapat dikembalikan."
@@ -13262,7 +13290,7 @@ msgstr "sebutkan bahwa referensi tersedia atas permintaan"
 msgid "Say that you understand what leaving does, first."
 msgstr "Nyatakan dahulu bahwa Anda memahami akibat dari keluar."
 
-#: src/postulo/core/postal.py
+#: src/postulo/core/postal.py src/postulo/jobs/surface.py
 msgid "Say what this address is."
 msgstr "Sebutkan alamat apa ini."
 
@@ -13271,7 +13299,7 @@ msgstr "Sebutkan alamat apa ini."
 msgid "Say what this identifier is."
 msgstr "Sebutkan pengenal apa ini."
 
-#: src/postulo/core/phone_numbers.py
+#: src/postulo/core/phone_numbers.py src/postulo/jobs/surface.py
 msgid "Say what this number is."
 msgstr "Sebutkan nomor apa ini."
 
@@ -13286,6 +13314,10 @@ msgstr "Sebutkan kepada siapa surat ini dikirim."
 #: src/postulo/core/server_forms.py
 msgid "Say whose tiles they are: their licence asks for a credit on the map."
 msgstr "Sebutkan pemilik ubin tersebut: lisensinya meminta kredit di peta."
+
+#: src/postulo/jobs/surface.py
+msgid "Say whose work this is: a saved account."
+msgstr ""
 
 #: src/postulo/templates/applications/application_detail.html
 #: src/postulo/templates/applications/interview_form.html
@@ -14814,6 +14846,10 @@ msgstr "Rantai itu lebih dalam dari %(limit)s perusahaan, lebih dalam dari grup 
 msgid "That company is no longer here."
 msgstr "Perusahaan itu sudah tidak ada."
 
+#: src/postulo/jobs/surface.py
+msgid "That company is not one you can see."
+msgstr ""
+
 #: src/postulo/api/routers/companies.py
 msgid "That company is shared with you read-only."
 msgstr "Perusahaan itu dibagikan kepada Anda hanya-baca."
@@ -14837,6 +14873,10 @@ msgstr "CV itu bukan milik Anda."
 #: src/postulo/jobs/models.py
 msgid "That department belongs to a different company."
 msgstr "Departemen itu milik perusahaan lain."
+
+#: src/postulo/jobs/surface.py
+msgid "That department is not one you can see."
+msgstr ""
 
 #: src/postulo/templates/base.html
 msgid "That did not work — the server answered {status}. Nothing on this page has changed."
@@ -15084,6 +15124,10 @@ msgstr "Itu bukan berkas yang dibaca halaman ini. Halaman ini hanya membaca berk
 msgid "That is not a kind of access."
 msgstr "Itu bukan jenis akses."
 
+#: src/postulo/jobs/surface.py
+msgid "That is not a kind of company."
+msgstr ""
+
 #: src/postulo/accounts/avatars.py
 #, python-format
 msgid "That is not a kind of picture Postulo keeps. Use %(formats)s."
@@ -15107,6 +15151,10 @@ msgstr "Itu bukan nomor yang digunakan di %(country)s: tidak ada nomor di sana y
 #, python-format
 msgid "That is not a Postulo backup that opens cleanly: %(problem)s"
 msgstr "Itu bukan cadangan Postulo yang dapat dibuka dengan baik: %(problem)s"
+
+#: src/postulo/jobs/surface.py
+msgid "That is not a record that has been saved."
+msgstr ""
 
 #: src/postulo/core/messaging_services.py
 msgid "That is not a service a handle can be on."
@@ -15219,6 +15267,10 @@ msgstr "Tautan itu tidak dapat digunakan."
 msgid "That link will not work any more."
 msgstr "Tautan itu tidak akan berfungsi lagi."
 
+#: src/postulo/jobs/surface.py
+msgid "That name cannot be checked just now."
+msgstr ""
+
 #: src/postulo/core/phones.py
 msgid "That number has no area code."
 msgstr "Nomor itu tidak memiliki kode area."
@@ -15304,6 +15356,10 @@ msgstr "Plugin itu tidak lagi terpasang."
 #: src/postulo/plugins/syncing.py src/postulo/plugins/views.py
 msgid "That plugin is switched off for you."
 msgstr "Plugin itu dinonaktifkan untuk Anda."
+
+#: src/postulo/jobs/surface.py
+msgid "That record is not yours to change."
+msgstr ""
 
 #: src/postulo/core/mail_auth.py src/postulo/plugins/consent.py
 msgid "That reply did not come from a request Postulo made."
@@ -16767,6 +16823,7 @@ msgid "This address is already in your listings, since %(when)s."
 msgstr "Alamat ini sudah ada di lowongan Anda, sejak %(when)s."
 
 #: src/postulo/core/postal.py src/postulo/core/web_links.py
+#: src/postulo/jobs/surface.py
 msgid "This address is already listed."
 msgstr "Alamat ini sudah tercantum."
 
@@ -17033,7 +17090,7 @@ msgstr "Ini akun Anda sendiri. Tautan yang Anda buat untuk diri sendiri bukan ja
 msgid "This month"
 msgstr "Bulan ini"
 
-#: src/postulo/core/phone_numbers.py
+#: src/postulo/core/phone_numbers.py src/postulo/jobs/surface.py
 msgid "This number is already listed."
 msgstr "Nomor ini sudah tercantum."
 
@@ -19069,6 +19126,7 @@ msgid "You"
 msgstr "Anda"
 
 #: src/postulo/api/routers/companies.py src/postulo/jobs/forms.py
+#: src/postulo/jobs/surface.py
 msgid "You already have a company with that name."
 msgstr "Anda sudah memiliki perusahaan dengan nama itu."
 
@@ -19624,7 +19682,8 @@ msgstr "· masih berjalan"
 msgid "“%(code)s” is not a language code, like %(first)s or %(second)s."
 msgstr "“%(code)s” bukan kode bahasa, seperti %(first)s atau %(second)s."
 
-#: src/postulo/core/web_links.py src/postulo/resume/candidate.py
+#: src/postulo/core/web_links.py src/postulo/jobs/surface.py
+#: src/postulo/resume/candidate.py
 #, python-format
 msgid "“%(kind)s” is not one of the types of link."
 msgstr "“%(kind)s” bukan salah satu jenis tautan."

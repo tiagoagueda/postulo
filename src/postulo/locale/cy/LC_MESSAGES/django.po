@@ -869,12 +869,12 @@ msgstr "Crëwyd %(kind)s. Dewiswch nawr beth sydd arno."
 msgid "%(kind)s held"
 msgstr "Cynhaliwyd %(kind)s"
 
-#: src/postulo/api/routers/companies.py
+#: src/postulo/api/routers/companies.py src/postulo/jobs/surface.py
 #, fuzzy, python-format
 msgid "%(kind)s is not a kind of address."
 msgstr "Nid yw %(kind)s yn fath o gyfeiriad."
 
-#: src/postulo/api/routers/companies.py
+#: src/postulo/api/routers/companies.py src/postulo/jobs/surface.py
 #, fuzzy, python-format
 msgid "%(kind)s is not a kind of number."
 msgstr "Nid yw %(kind)s yn fath o rif."
@@ -1400,7 +1400,7 @@ msgstr "%(scheme)s: nid dyna'r ffurf arferol."
 msgid "%(sent)s, %(failed)s; each document says which."
 msgstr "%(sent)s, %(failed)s; mae pob dogfen yn dweud pa un."
 
-#: src/postulo/core/web_links.py
+#: src/postulo/core/web_links.py src/postulo/jobs/surface.py
 #, python-format
 msgid "%(service)s is already used by another row."
 msgstr ""
@@ -1977,6 +1977,10 @@ msgstr "Mae cwmni'n cario un dynodydd fesul cynllun."
 msgid "A company in several sectors or industries counts in each of them."
 msgstr "Mae cwmni mewn sawl sector neu ddiwydiant yn cyfrif ym mhob un ohonynt."
 
+#: src/postulo/jobs/surface.py
+msgid "A company needs a name."
+msgstr ""
+
 #: src/postulo/templates/jobs/company_map.html
 #, fuzzy
 msgid "A company with addresses in several places is counted at each, so the counts add up to more than the companies there are."
@@ -1987,7 +1991,7 @@ msgstr "Mae cwmni â chyfeiriadau mewn sawl lle yn cael ei gyfrif ym mhob un, fe
 msgid "A company with the same identifier is already yours."
 msgstr "Mae cwmni gyda'r un dynodydd eisoes yn eiddo i chi."
 
-#: src/postulo/api/routers/companies.py
+#: src/postulo/api/routers/companies.py src/postulo/jobs/surface.py
 #, fuzzy
 msgid "A company's links are its social profiles."
 msgstr "Proffiliau cymdeithasol cwmni yw ei ddolenni."
@@ -2021,6 +2025,10 @@ msgstr "Cyswllt heb gwmni"
 #, fuzzy, python-format
 msgid "A contact has at most %(max)s messaging handles."
 msgstr "Mae gan gyswllt %(max)s cyfrif negeseua ar y mwyaf."
+
+#: src/postulo/jobs/surface.py
+msgid "A contact needs a name."
+msgstr ""
 
 #: src/postulo/templates/server/design.html
 #, fuzzy
@@ -2091,6 +2099,10 @@ msgstr "Nid yw dyddiad geni cyn %(year)s."
 #, fuzzy
 msgid "A deep blue. Ten steps, of which the interface spends a handful."
 msgstr "Glas dwfn. Deg cam, ac mae'r rhyngwyneb yn defnyddio llond llaw ohonynt."
+
+#: src/postulo/jobs/surface.py
+msgid "A department needs a name."
+msgstr ""
 
 #: src/postulo/resume/publications.py
 #, fuzzy
@@ -2421,6 +2433,10 @@ msgstr "Cedwir rhif yn ei ffurf ryngwladol unwaith yn unig ar y gweinydd hwn. Os
 #, fuzzy
 msgid "A number is kept once on this instance. If one is already recorded here, saving says so rather than taking it from whoever has it."
 msgstr "Cedwir rhif unwaith ar y gosodiad hwn. Os yw eisoes wedi'i gofnodi yma, mae'r cadw'n dweud hynny yn hytrach na'i gymryd oddi ar bwy bynnag sydd biau fe."
+
+#: src/postulo/jobs/surface.py
+msgid "A number is needed."
+msgstr ""
 
 #: src/postulo/templates/help/telephone_numbers.html
 #, fuzzy
@@ -3484,6 +3500,10 @@ msgstr "Ni all cyfeiriad gario enw defnyddiwr na chyfrinair."
 #, fuzzy
 msgid "An address cannot contain a line break or any other control character."
 msgstr "Ni all cyfeiriad gynnwys toriad llinell nac unrhyw nod rheoli arall."
+
+#: src/postulo/jobs/surface.py
+msgid "An address needs at least one part."
+msgstr ""
 
 #: src/postulo/documents/forms.py
 #, fuzzy
@@ -7122,6 +7142,10 @@ msgstr "Anfonwyd drwy e-bost, a chofnodwyd yr hyn a anfonwyd gennych."
 #, fuzzy
 msgid "Employer"
 msgstr "Cyflogwr"
+
+#: src/postulo/jobs/surface.py
+msgid "Employer structure is switched off, so departments and parents are not changed."
+msgstr ""
 
 #: src/postulo/applications/models.py
 #, fuzzy
@@ -13383,6 +13407,10 @@ msgstr "Ar-lein"
 msgid "Only %(name)s"
 msgstr "%(name)s yn unig"
 
+#: src/postulo/jobs/surface.py
+msgid "Only a company's or a contact's details can be written."
+msgstr ""
+
 #: src/postulo/jobs/capture_views.py
 #, fuzzy
 msgid "Only a discarded capture can be put back."
@@ -16078,7 +16106,7 @@ msgstr "dweud bod geirdaon ar gael ar gais"
 msgid "Say that you understand what leaving does, first."
 msgstr ""
 
-#: src/postulo/core/postal.py
+#: src/postulo/core/postal.py src/postulo/jobs/surface.py
 #, fuzzy
 msgid "Say what this address is."
 msgstr "Dywedwch beth yw'r cyfeiriad hwn."
@@ -16089,7 +16117,7 @@ msgstr "Dywedwch beth yw'r cyfeiriad hwn."
 msgid "Say what this identifier is."
 msgstr "Dywedwch beth yw'r dynodydd hwn."
 
-#: src/postulo/core/phone_numbers.py
+#: src/postulo/core/phone_numbers.py src/postulo/jobs/surface.py
 #, fuzzy
 msgid "Say what this number is."
 msgstr "Dywedwch beth yw'r rhif hwn."
@@ -16108,6 +16136,10 @@ msgstr "Dywedwch at bwy i'w anfon."
 #, fuzzy
 msgid "Say whose tiles they are: their licence asks for a credit on the map."
 msgstr "Dywedwch pwy biau'r teils: mae eu trwydded yn gofyn am gydnabyddiaeth ar y map."
+
+#: src/postulo/jobs/surface.py
+msgid "Say whose work this is: a saved account."
+msgstr ""
 
 #: src/postulo/templates/applications/application_detail.html
 #: src/postulo/templates/applications/interview_form.html
@@ -17928,6 +17960,10 @@ msgstr "Mae'r gadwyn honno'n ddyfnach na %(limit)s cwmni — yn ddyfnach nag y g
 msgid "That company is no longer here."
 msgstr "Nid yw'r cwmni hwnnw yma mwyach."
 
+#: src/postulo/jobs/surface.py
+msgid "That company is not one you can see."
+msgstr ""
+
 #: src/postulo/api/routers/companies.py
 msgid "That company is shared with you read-only."
 msgstr ""
@@ -17956,6 +17992,10 @@ msgstr "Nid yw'r CV hwnnw'n eiddo i chi."
 #, fuzzy
 msgid "That department belongs to a different company."
 msgstr "Mae'r adran honno'n perthyn i gwmni arall."
+
+#: src/postulo/jobs/surface.py
+msgid "That department is not one you can see."
+msgstr ""
 
 #: src/postulo/templates/base.html
 #, fuzzy
@@ -18247,6 +18287,10 @@ msgstr "Nid yw honno'n ffeil y mae'r dudalen hon yn ei darllen. Mae'n darllen y 
 msgid "That is not a kind of access."
 msgstr ""
 
+#: src/postulo/jobs/surface.py
+msgid "That is not a kind of company."
+msgstr ""
+
 #: src/postulo/accounts/avatars.py
 #, fuzzy, python-format
 msgid "That is not a kind of picture Postulo keeps. Use %(formats)s."
@@ -18271,6 +18315,10 @@ msgstr "Nid yw hwnnw'n rhif y mae %(country)s yn ei ddefnyddio: nid oes unrhyw r
 #, fuzzy, python-format
 msgid "That is not a Postulo backup that opens cleanly: %(problem)s"
 msgstr "Nid yw hwnnw'n gopi wrth gefn Postulo sy'n agor yn iawn: %(problem)s"
+
+#: src/postulo/jobs/surface.py
+msgid "That is not a record that has been saved."
+msgstr ""
 
 #: src/postulo/core/messaging_services.py
 #, fuzzy
@@ -18408,6 +18456,10 @@ msgstr "Ni ellir defnyddio'r ddolen honno."
 msgid "That link will not work any more."
 msgstr "Ni fydd y ddolen honno'n gweithio mwyach."
 
+#: src/postulo/jobs/surface.py
+msgid "That name cannot be checked just now."
+msgstr ""
+
 #: src/postulo/core/phones.py
 #, fuzzy
 msgid "That number has no area code."
@@ -18506,6 +18558,10 @@ msgstr "Nid yw'r ategyn hwnnw wedi'i osod mwyach."
 #, fuzzy
 msgid "That plugin is switched off for you."
 msgstr "Mae'r ategyn hwnnw wedi'i ddiffodd i chi."
+
+#: src/postulo/jobs/surface.py
+msgid "That record is not yours to change."
+msgstr ""
 
 #: src/postulo/core/mail_auth.py src/postulo/plugins/consent.py
 #, fuzzy
@@ -20266,6 +20322,7 @@ msgid "This address is already in your listings, since %(when)s."
 msgstr "Mae'r cyfeiriad hwn eisoes yn eich hysbysebion, ers %(when)s."
 
 #: src/postulo/core/postal.py src/postulo/core/web_links.py
+#: src/postulo/jobs/surface.py
 #, fuzzy
 msgid "This address is already listed."
 msgstr "Mae'r cyfeiriad hwn eisoes wedi'i restru."
@@ -20589,7 +20646,7 @@ msgstr "Eich cyfrif eich hun yw hwn. Nid yw dolen a wnewch i chi'ch hun yn fford
 msgid "This month"
 msgstr "Y mis hwn"
 
-#: src/postulo/core/phone_numbers.py
+#: src/postulo/core/phone_numbers.py src/postulo/jobs/surface.py
 #, fuzzy
 msgid "This number is already listed."
 msgstr "Mae'r rhif hwn eisoes ar y rhestr."
@@ -23067,6 +23124,7 @@ msgid "You"
 msgstr "Chi"
 
 #: src/postulo/api/routers/companies.py src/postulo/jobs/forms.py
+#: src/postulo/jobs/surface.py
 #, fuzzy
 msgid "You already have a company with that name."
 msgstr "Mae gennych gwmni â'r enw hwnnw eisoes."
@@ -23733,7 +23791,8 @@ msgstr "· yn dal i fynd"
 msgid "“%(code)s” is not a language code, like %(first)s or %(second)s."
 msgstr "Nid yw “%(code)s” yn god iaith, fel %(first)s neu %(second)s."
 
-#: src/postulo/core/web_links.py src/postulo/resume/candidate.py
+#: src/postulo/core/web_links.py src/postulo/jobs/surface.py
+#: src/postulo/resume/candidate.py
 #, fuzzy, python-format
 msgid "“%(kind)s” is not one of the types of link."
 msgstr "Nid yw “%(kind)s” yn un o'r mathau o ddolen."
