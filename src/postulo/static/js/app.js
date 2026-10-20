@@ -5528,8 +5528,18 @@
         if (event.newState !== "open" || !panel.matches || !panel.matches("[data-popover][popover]")) {
           return;
         }
+        // The tooltip is placed a frame after the focus arrives, so a press that follows the
+        // focus at once opens the panel before the tooltip is open: the button's place is
+        // spent whether or not its tooltip has shown yet, or it shows after the panel and
+        // takes the first Escape.
         [tipFocus, tipHover].forEach(function (place) {
-          if (place && place.tips.some(tipIsOpen)) {
+          if (!place) {
+            return;
+          }
+          var opener =
+            place.anchor.matches("[popovertarget]") &&
+            document.getElementById(place.anchor.getAttribute("popovertarget")) === panel;
+          if (opener || place.tips.some(tipIsOpen)) {
             place.spent = true;
           }
         });
