@@ -71,11 +71,11 @@ API_READ = {
     "postulo-api:restore",
     "postulo-api:shortlist",
     "postulo-api:get_company",
-    "postulo-api:add_contact",
     "postulo-api:get_listing",
     "postulo-api:add_listing_event",
 }
-API_WRITE = {"postulo-api:patch_company"}
+#: Adding a contact to a company changes the company's people, so it needs the write grant (#328).
+API_WRITE = {"postulo-api:patch_company", "postulo-api:add_contact"}
 
 
 def share_everything(owner, grantee, scope):

@@ -656,12 +656,12 @@ msgstr "%(kind)s已建立. 現在想一想到底出什么事了."
 msgid "%(kind)s held"
 msgstr "%(kind)s被扣"
 
-#: src/postulo/api/routers/companies.py
+#: src/postulo/api/routers/companies.py src/postulo/jobs/surface.py
 #, fuzzy, python-format
 msgid "%(kind)s is not a kind of address."
 msgstr "%(kind)s不是那种地址."
 
-#: src/postulo/api/routers/companies.py
+#: src/postulo/api/routers/companies.py src/postulo/jobs/surface.py
 #, fuzzy, python-format
 msgid "%(kind)s is not a kind of number."
 msgstr "%(kind)s不是數字."
@@ -1163,7 +1163,7 @@ msgstr "%(scheme)s:不是通常的形式."
 msgid "%(sent)s, %(failed)s; each document says which."
 msgstr "%(sent)s, %(failed)s; 每份文件都說出是哪個."
 
-#: src/postulo/core/web_links.py
+#: src/postulo/core/web_links.py src/postulo/jobs/surface.py
 #, python-format
 msgid "%(service)s is already used by another row."
 msgstr ""
@@ -1695,6 +1695,10 @@ msgstr "每家公司在每種識別碼類型下只能有一個識別碼。"
 msgid "A company in several sectors or industries counts in each of them."
 msgstr "有數個分行或行業的公司相當重要."
 
+#: src/postulo/jobs/surface.py
+msgid "A company needs a name."
+msgstr ""
+
 #: src/postulo/templates/jobs/company_map.html
 #, fuzzy
 msgid "A company with addresses in several places is counted at each, so the counts add up to more than the companies there are."
@@ -1705,7 +1709,7 @@ msgstr "有多個地點的公司被數到一邊去 所以相當於有公司相�
 msgid "A company with the same identifier is already yours."
 msgstr "您已經有一家具有相同識別碼的公司。"
 
-#: src/postulo/api/routers/companies.py
+#: src/postulo/api/routers/companies.py src/postulo/jobs/surface.py
 #, fuzzy
 msgid "A company's links are its social profiles."
 msgstr "公司的連結就是它的社群檔案。"
@@ -1739,6 +1743,10 @@ msgstr "不屬於任何公司的聯絡人"
 #, fuzzy, python-format
 msgid "A contact has at most %(max)s messaging handles."
 msgstr "一位聯絡人最多可有 %(max)s 個通訊帳號。"
+
+#: src/postulo/jobs/surface.py
+msgid "A contact needs a name."
+msgstr ""
 
 #: src/postulo/templates/server/design.html
 #, fuzzy
@@ -1809,6 +1817,10 @@ msgstr "出生日期不能早於 %(year)s 年。"
 #, fuzzy
 msgid "A deep blue. Ten steps, of which the interface spends a handful."
 msgstr "深藍色。共十個色階，介面只用到其中幾個。"
+
+#: src/postulo/jobs/surface.py
+msgid "A department needs a name."
+msgstr ""
 
 #: src/postulo/resume/publications.py
 #, fuzzy
@@ -2139,6 +2151,10 @@ msgstr "國際格式的電話號碼在此站台上只會保存一次。若已在
 #, fuzzy
 msgid "A number is kept once on this instance. If one is already recorded here, saving says so rather than taking it from whoever has it."
 msgstr "每個號碼在此站台上只會保存一次。如果此號碼已有紀錄，儲存時會告知您，而不會從擁有它的人那裡移走。"
+
+#: src/postulo/jobs/surface.py
+msgid "A number is needed."
+msgstr ""
 
 #: src/postulo/templates/help/telephone_numbers.html
 #, fuzzy
@@ -3184,6 +3200,10 @@ msgstr "地址不能有使用者名或密碼 ."
 #, fuzzy
 msgid "An address cannot contain a line break or any other control character."
 msgstr "地址不能包含分行符或其他控制字符 ."
+
+#: src/postulo/jobs/surface.py
+msgid "An address needs at least one part."
+msgstr ""
 
 #: src/postulo/documents/forms.py
 #, fuzzy
@@ -6807,6 +6827,10 @@ msgstr "有你所發的電子郵件和錄音."
 #, fuzzy
 msgid "Employer"
 msgstr "雇主"
+
+#: src/postulo/jobs/surface.py
+msgid "Employer structure is switched off, so departments and parents are not changed."
+msgstr ""
 
 #: src/postulo/applications/models.py
 #, fuzzy
@@ -12996,6 +13020,10 @@ msgstr "網路資源"
 msgid "Only %(name)s"
 msgstr "僅限 %(name)s"
 
+#: src/postulo/jobs/surface.py
+msgid "Only a company's or a contact's details can be written."
+msgstr ""
+
 #: src/postulo/jobs/capture_views.py
 #, fuzzy
 msgid "Only a discarded capture can be put back."
@@ -15673,7 +15701,7 @@ msgstr "有請參考"
 msgid "Say that you understand what leaving does, first."
 msgstr ""
 
-#: src/postulo/core/postal.py
+#: src/postulo/core/postal.py src/postulo/jobs/surface.py
 #, fuzzy
 msgid "Say what this address is."
 msgstr "說出這個地址."
@@ -15684,7 +15712,7 @@ msgstr "說出這個地址."
 msgid "Say what this identifier is."
 msgstr "就說出這個身份."
 
-#: src/postulo/core/phone_numbers.py
+#: src/postulo/core/phone_numbers.py src/postulo/jobs/surface.py
 #, fuzzy
 msgid "Say what this number is."
 msgstr "就說出這個號碼是多少."
@@ -15703,6 +15731,10 @@ msgstr "就說到底要寄给誰去取去."
 #, fuzzy
 msgid "Say whose tiles they are: their licence asks for a credit on the map."
 msgstr "註明圖磚的來源：其授權要求在地圖上標示出處。"
+
+#: src/postulo/jobs/surface.py
+msgid "Say whose work this is: a saved account."
+msgstr ""
 
 #: src/postulo/templates/applications/application_detail.html
 #: src/postulo/templates/applications/interview_form.html
@@ -17520,6 +17552,10 @@ msgstr "有超過%(limit)s公司的深度."
 msgid "That company is no longer here."
 msgstr "那家公司已不在了."
 
+#: src/postulo/jobs/surface.py
+msgid "That company is not one you can see."
+msgstr ""
+
 #: src/postulo/api/routers/companies.py
 msgid "That company is shared with you read-only."
 msgstr ""
@@ -17548,6 +17584,10 @@ msgstr "CV不是你的."
 #, fuzzy
 msgid "That department belongs to a different company."
 msgstr "那部門是分別的."
+
+#: src/postulo/jobs/surface.py
+msgid "That department is not one you can see."
+msgstr ""
 
 #: src/postulo/templates/base.html
 #, fuzzy
@@ -17830,6 +17870,10 @@ msgstr "它不是這一頁所讀取的檔案. 它讀取了它提供下載的JSON
 msgid "That is not a kind of access."
 msgstr ""
 
+#: src/postulo/jobs/surface.py
+msgid "That is not a kind of company."
+msgstr ""
+
 #: src/postulo/accounts/avatars.py
 #, fuzzy, python-format
 msgid "That is not a kind of picture Postulo keeps. Use %(formats)s."
@@ -17854,6 +17898,10 @@ msgstr "它不是用 %(country)s 的數字: 沒有數字是那樣開始的 ."
 #, fuzzy, python-format
 msgid "That is not a Postulo backup that opens cleanly: %(problem)s"
 msgstr "它不是一副能打出正義的 Postulo 備份: %(problem)s"
+
+#: src/postulo/jobs/surface.py
+msgid "That is not a record that has been saved."
+msgstr ""
 
 #: src/postulo/core/messaging_services.py
 #, fuzzy
@@ -17991,6 +18039,10 @@ msgstr "無法使用此連接 ."
 msgid "That link will not work any more."
 msgstr "連接再也沒有用."
 
+#: src/postulo/jobs/surface.py
+msgid "That name cannot be checked just now."
+msgstr ""
+
 #: src/postulo/core/phones.py
 #, fuzzy
 msgid "That number has no area code."
@@ -18086,6 +18138,10 @@ msgstr "该外掛程式已無法安裝 ."
 #, fuzzy
 msgid "That plugin is switched off for you."
 msgstr "有插件被關了."
+
+#: src/postulo/jobs/surface.py
+msgid "That record is not yours to change."
+msgstr ""
 
 #: src/postulo/core/mail_auth.py src/postulo/plugins/consent.py
 #, fuzzy
@@ -19822,6 +19878,7 @@ msgid "This address is already in your listings, since %(when)s."
 msgstr "自從%(when)s起,這個地址就已放入你的名單了."
 
 #: src/postulo/core/postal.py src/postulo/core/web_links.py
+#: src/postulo/jobs/surface.py
 #, fuzzy
 msgid "This address is already listed."
 msgstr "此地址已列出 ."
@@ -20145,7 +20202,7 @@ msgstr "這是你自有的賬戶. 有你所想的連結不是回想之道, 如�
 msgid "This month"
 msgstr "就這個月了"
 
-#: src/postulo/core/phone_numbers.py
+#: src/postulo/core/phone_numbers.py src/postulo/jobs/surface.py
 #, fuzzy
 msgid "This number is already listed."
 msgstr "此數字已列出 ."
@@ -22614,6 +22671,7 @@ msgid "You"
 msgstr "你"
 
 #: src/postulo/api/routers/companies.py src/postulo/jobs/forms.py
+#: src/postulo/jobs/surface.py
 #, fuzzy
 msgid "You already have a company with that name."
 msgstr "您已經有同名的公司。"
@@ -23271,7 +23329,8 @@ msgstr "仍在跑中"
 msgid "“%(code)s” is not a language code, like %(first)s or %(second)s."
 msgstr "“%(code)s”不是同%(first)s或%(second)s等同的語言代碼."
 
-#: src/postulo/core/web_links.py src/postulo/resume/candidate.py
+#: src/postulo/core/web_links.py src/postulo/jobs/surface.py
+#: src/postulo/resume/candidate.py
 #, fuzzy, python-format
 msgid "“%(kind)s” is not one of the types of link."
 msgstr "“%(kind)s”不是連接方式之一."

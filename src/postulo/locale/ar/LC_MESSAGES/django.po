@@ -1011,12 +1011,12 @@ msgstr "تم إنشاء %(kind)s. اختر الآن ما يظهر فيه."
 msgid "%(kind)s held"
 msgstr "عُقدت المقابلة: %(kind)s"
 
-#: src/postulo/api/routers/companies.py
+#: src/postulo/api/routers/companies.py src/postulo/jobs/surface.py
 #, fuzzy, python-format
 msgid "%(kind)s is not a kind of address."
 msgstr "%(kind)s ليس نوعًا من العناوين."
 
-#: src/postulo/api/routers/companies.py
+#: src/postulo/api/routers/companies.py src/postulo/jobs/surface.py
 #, fuzzy, python-format
 msgid "%(kind)s is not a kind of number."
 msgstr "%(kind)s ليس نوعًا من الأرقام."
@@ -1558,7 +1558,7 @@ msgstr "%(scheme)s: هذه ليست الصيغة المعتادة."
 msgid "%(sent)s, %(failed)s; each document says which."
 msgstr "%(sent)s، %(failed)s؛ وكل مستند يذكر أيها."
 
-#: src/postulo/core/web_links.py
+#: src/postulo/core/web_links.py src/postulo/jobs/surface.py
 #, fuzzy, python-format
 msgid "%(service)s is already used by another row."
 msgstr "%(service)s يستخدم بالفعل من قبل صف آخر."
@@ -2165,6 +2165,10 @@ msgstr "للشركة مُعرِّف واحد لكل نظام."
 msgid "A company in several sectors or industries counts in each of them."
 msgstr "وتحسب شركة في عدة قطاعات أو صناعات في كل منها."
 
+#: src/postulo/jobs/surface.py
+msgid "A company needs a name."
+msgstr ""
+
 #: src/postulo/templates/jobs/company_map.html
 #, fuzzy
 msgid "A company with addresses in several places is counted at each, so the counts add up to more than the companies there are."
@@ -2175,7 +2179,7 @@ msgstr "تُحتسب الشركة التي لها عناوين في عدة أم�
 msgid "A company with the same identifier is already yours."
 msgstr "لديك بالفعل شركة بالمعرّف نفسه."
 
-#: src/postulo/api/routers/companies.py
+#: src/postulo/api/routers/companies.py src/postulo/jobs/surface.py
 #, fuzzy
 msgid "A company's links are its social profiles."
 msgstr "روابط الشركة هي ملامحها الاجتماعية."
@@ -2209,6 +2213,10 @@ msgstr "جهة اتصال بلا شركة"
 #, fuzzy, python-format
 msgid "A contact has at most %(max)s messaging handles."
 msgstr "لجهة الاتصال %(max)s من أسماء حسابات المراسلة كحد أقصى."
+
+#: src/postulo/jobs/surface.py
+msgid "A contact needs a name."
+msgstr ""
 
 #: src/postulo/templates/server/design.html
 #, fuzzy
@@ -2279,6 +2287,10 @@ msgstr "لا يمكن أن يكون تاريخ الميلاد قبل %(year)s."
 #, fuzzy
 msgid "A deep blue. Ten steps, of which the interface spends a handful."
 msgstr "أزرق داكن. عشر درجات، تستخدم الواجهة بضعًا منها."
+
+#: src/postulo/jobs/surface.py
+msgid "A department needs a name."
+msgstr ""
 
 #: src/postulo/resume/publications.py
 #, fuzzy
@@ -2609,6 +2621,10 @@ msgstr "يُسجَّل الرقم بصيغته الدولية مرة واحدة 
 #, fuzzy
 msgid "A number is kept once on this instance. If one is already recorded here, saving says so rather than taking it from whoever has it."
 msgstr "يُحفظ الرقم مرة واحدة فقط على هذا المثيل. إن كان مسجّلًا هنا بالفعل، فسيُعلمك الحفظ بذلك بدلًا من أخذه ممن يملكه."
+
+#: src/postulo/jobs/surface.py
+msgid "A number is needed."
+msgstr ""
 
 #: src/postulo/templates/help/telephone_numbers.html
 #, fuzzy
@@ -3690,6 +3706,10 @@ msgstr "لا يمكن أن يتضمن العنوان اسم مستخدم أو ك
 #, fuzzy
 msgid "An address cannot contain a line break or any other control character."
 msgstr "لا يمكن أن يحتوي العنوان على فاصل أسطر أو أي حرف تحكم آخر."
+
+#: src/postulo/jobs/surface.py
+msgid "An address needs at least one part."
+msgstr ""
 
 #: src/postulo/documents/forms.py
 #, fuzzy
@@ -7349,6 +7369,10 @@ msgstr "تم الإرسال بالبريد الإلكتروني، وتم تسج�
 #, fuzzy
 msgid "Employer"
 msgstr "صاحب العمل"
+
+#: src/postulo/jobs/surface.py
+msgid "Employer structure is switched off, so departments and parents are not changed."
+msgstr ""
 
 #: src/postulo/applications/models.py
 #, fuzzy
@@ -13689,6 +13713,10 @@ msgstr "على الإنترنت"
 msgid "Only %(name)s"
 msgstr "%(name)s فقط"
 
+#: src/postulo/jobs/surface.py
+msgid "Only a company's or a contact's details can be written."
+msgstr ""
+
 #: src/postulo/jobs/capture_views.py
 #, fuzzy
 msgid "Only a discarded capture can be put back."
@@ -16411,7 +16439,7 @@ msgstr "ذكر أن المراجع متاحة عند الطلب"
 msgid "Say that you understand what leaving does, first."
 msgstr "قُلْ بأنّك تَفْهمُ ما يَتْركُ، أولاً."
 
-#: src/postulo/core/postal.py
+#: src/postulo/core/postal.py src/postulo/jobs/surface.py
 #, fuzzy
 msgid "Say what this address is."
 msgstr "حدّد نوع هذا العنوان."
@@ -16422,7 +16450,7 @@ msgstr "حدّد نوع هذا العنوان."
 msgid "Say what this identifier is."
 msgstr "اذكر ما هو هذا المعرّف."
 
-#: src/postulo/core/phone_numbers.py
+#: src/postulo/core/phone_numbers.py src/postulo/jobs/surface.py
 #, fuzzy
 msgid "Say what this number is."
 msgstr "حدّد نوع هذا الرقم."
@@ -16441,6 +16469,10 @@ msgstr "حدد إلى من يُرسَل."
 #, fuzzy
 msgid "Say whose tiles they are: their licence asks for a credit on the map."
 msgstr "اذكر مصدر المربعات: ترخيصها يشترط إسنادًا على الخريطة."
+
+#: src/postulo/jobs/surface.py
+msgid "Say whose work this is: a saved account."
+msgstr ""
 
 #: src/postulo/templates/applications/application_detail.html
 #: src/postulo/templates/applications/interview_form.html
@@ -18287,6 +18319,10 @@ msgstr "تتجاوز هذه السلسلة عمق %(limit)s شركة، وهو ع
 msgid "That company is no longer here."
 msgstr "لم تعد تلك الشركة موجودة."
 
+#: src/postulo/jobs/surface.py
+msgid "That company is not one you can see."
+msgstr ""
+
 #: src/postulo/api/routers/companies.py
 #, fuzzy
 msgid "That company is shared with you read-only."
@@ -18316,6 +18352,10 @@ msgstr "هذه السيرة الذاتية ليست لك."
 #, fuzzy
 msgid "That department belongs to a different company."
 msgstr "ينتمي ذلك القسم إلى شركة أخرى."
+
+#: src/postulo/jobs/surface.py
+msgid "That department is not one you can see."
+msgstr ""
 
 #: src/postulo/templates/base.html
 #, fuzzy
@@ -18614,6 +18654,10 @@ msgstr "هذا ليس ملفًا تقرؤه هذه الصفحة. فهي تقرأ
 msgid "That is not a kind of access."
 msgstr "هذا ليس نوع من الوصول."
 
+#: src/postulo/jobs/surface.py
+msgid "That is not a kind of company."
+msgstr ""
+
 #: src/postulo/accounts/avatars.py
 #, fuzzy, python-format
 msgid "That is not a kind of picture Postulo keeps. Use %(formats)s."
@@ -18638,6 +18682,10 @@ msgstr "هذا ليس رقمًا يُستخدم في %(country)s: لا يبدأ 
 #, fuzzy, python-format
 msgid "That is not a Postulo backup that opens cleanly: %(problem)s"
 msgstr "هذه ليست نسخة احتياطية من Postulo تُفتح دون أخطاء: %(problem)s"
+
+#: src/postulo/jobs/surface.py
+msgid "That is not a record that has been saved."
+msgstr ""
 
 #: src/postulo/core/messaging_services.py
 #, fuzzy
@@ -18775,6 +18823,10 @@ msgstr "لا يمكن استخدام هذا الرابط."
 msgid "That link will not work any more."
 msgstr "لن يعمل هذا الرابط بعد الآن."
 
+#: src/postulo/jobs/surface.py
+msgid "That name cannot be checked just now."
+msgstr ""
+
 #: src/postulo/core/phones.py
 #, fuzzy
 msgid "That number has no area code."
@@ -18875,6 +18927,10 @@ msgstr "لم يعد هذا المكوّن الإضافي مُثبَّتًا."
 #, fuzzy
 msgid "That plugin is switched off for you."
 msgstr "هذا المكوّن الإضافي معطّل لديك."
+
+#: src/postulo/jobs/surface.py
+msgid "That record is not yours to change."
+msgstr ""
 
 #: src/postulo/core/mail_auth.py src/postulo/plugins/consent.py
 #, fuzzy
@@ -20664,6 +20720,7 @@ msgid "This address is already in your listings, since %(when)s."
 msgstr "هذا العنوان موجود بالفعل في إعلاناتك منذ %(when)s."
 
 #: src/postulo/core/postal.py src/postulo/core/web_links.py
+#: src/postulo/jobs/surface.py
 #, fuzzy
 msgid "This address is already listed."
 msgstr "هذا العنوان مُدرَج بالفعل."
@@ -20989,7 +21046,7 @@ msgstr "هذا حسابك أنت. الرابط الذي تنشئه لنفسك ل
 msgid "This month"
 msgstr "هذا الشهر"
 
-#: src/postulo/core/phone_numbers.py
+#: src/postulo/core/phone_numbers.py src/postulo/jobs/surface.py
 #, fuzzy
 msgid "This number is already listed."
 msgstr "هذا الرقم مُدرَج بالفعل."
@@ -23485,6 +23542,7 @@ msgid "You"
 msgstr "أنت"
 
 #: src/postulo/api/routers/companies.py src/postulo/jobs/forms.py
+#: src/postulo/jobs/surface.py
 #, fuzzy
 msgid "You already have a company with that name."
 msgstr "لديك بالفعل شركة بهذا الاسم."
@@ -24172,7 +24230,8 @@ msgstr "· لم تنتهِ بعد"
 msgid "“%(code)s” is not a language code, like %(first)s or %(second)s."
 msgstr "«%(code)s» ليس رمز لغة، مثل %(first)s أو %(second)s."
 
-#: src/postulo/core/web_links.py src/postulo/resume/candidate.py
+#: src/postulo/core/web_links.py src/postulo/jobs/surface.py
+#: src/postulo/resume/candidate.py
 #, fuzzy, python-format
 msgid "“%(kind)s” is not one of the types of link."
 msgstr "«%(kind)s» ليس من أنواع الروابط."

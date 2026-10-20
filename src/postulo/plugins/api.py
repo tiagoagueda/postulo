@@ -53,6 +53,11 @@ may add to: `LinkService` is one entry, `LinkServicePlugin` what holds them, and
 
 **A messaging handle is on a service too (#682)**, a registry of its own: `MessagingService`
 is one entry, `MessagingServicePlugin` what holds them, `messaging_service_of` the read.
+
+**Companies, departments and the person's card are on it too (#328)**: the records and
+their vocabularies, a holder's numbers, addresses and links as plain values, the person's own
+card (read only: nothing here writes a `User` or a `Profile`), and the calls that write a
+company, a department, a contact and their rows, each taking an `actor`.
 """
 
 from __future__ import annotations
@@ -86,6 +91,16 @@ if TYPE_CHECKING:  # pragma: no cover - the names `__getattr__` resolves at run 
         settle_interview,
     )
     from postulo.applications.suggestions import suggest
+    from postulo.core.card_rows import (
+        AddressRow,
+        LinkRow,
+        PhoneNumberKind,
+        PhoneRow,
+        PostalAddressKind,
+    )
+    from postulo.core.card_rows import addresses_for as addresses_for
+    from postulo.core.card_rows import links_for as links_for
+    from postulo.core.card_rows import numbers_for as numbers_for
     from postulo.core.currencies import CURRENCY_CODES
     from postulo.core.languages import match as language_match
     from postulo.core.languages import matches as language_matches
@@ -117,11 +132,24 @@ if TYPE_CHECKING:  # pragma: no cover - the names `__getattr__` resolves at run 
     from postulo.documents.formats import Format as DocumentFormat
     from postulo.documents.formats import register as register_document_format
     from postulo.documents.outline import Outline
+    from postulo.documents.rendering import PersonCard, person_card
     from postulo.documents.themes import Kind as ThemeKind
     from postulo.documents.themes import Theme
     from postulo.jobs.history import record_listing_event
-    from postulo.jobs.models import Contact
+    from postulo.jobs.models import Company, CompanyKind, Contact, Department
     from postulo.jobs.places import resolve as place_of
+    from postulo.jobs.surface import (
+        Refused,
+        SavedRows,
+        WriteRefused,
+        create_contact,
+        get_or_create_department,
+        save_phone_numbers,
+        save_postal_addresses,
+        save_web_links,
+        update_company,
+        update_contact,
+    )
     from postulo.notifications.base import EVENTS, Notification, NotifierPlugin
     from postulo.resume.importing import Record
 
@@ -190,16 +218,20 @@ __all__ = [
     "MAX_IMPORT_BYTES",
     "MEDIUMS",
     "TEXT",
+    "AddressRow",
     "Application",
     "Appointment",
     "AppointmentHow",
     "BodyRefused",
     "CalendarEntry",
     "CalendarRefused",
+    "Company",
+    "CompanyKind",
     "ConnectedPlugin",
     "ConnectionUnusable",
     "Consent",
     "Contact",
+    "Department",
     "DestinationRefused",
     "DocumentFormat",
     "DocumentMetadata",
@@ -213,6 +245,7 @@ __all__ = [
     "InterviewOutcome",
     "JobPostingData",
     "LinkKind",
+    "LinkRow",
     "LinkService",
     "LinkServicePlugin",
     "Manifest",
@@ -224,7 +257,13 @@ __all__ = [
     "Outline",
     "OwnedModel",
     "OwnedQuerySet",
+    "PersonCard",
+    "PhoneNumberKind",
+    "PhoneRow",
+    "PostalAddressKind",
     "Record",
+    "Refused",
+    "SavedRows",
     "SourcePlugin",
     "StorePlugin",
     "Suggestion",
@@ -242,18 +281,22 @@ __all__ = [
     "VCardLink",
     "VCardPhone",
     "VCardRefused",
+    "WriteRefused",
     "access_token",
     "add_appointment",
     "add_reminder",
+    "addresses_for",
     "approve_host",
     "calendar_status",
     "check_destination",
     "client",
+    "create_contact",
     "deadline_in",
     "declares",
     "description_of",
     "event_lines",
     "get_or_create_company",
+    "get_or_create_department",
     "is_language_tag",
     "label_of",
     "language_match",
@@ -261,9 +304,12 @@ __all__ = [
     "language_override",
     "language_tag",
     "link_service_of",
+    "links_for",
     "manifest_of",
     "medium_of",
     "messaging_service_of",
+    "numbers_for",
+    "person_card",
     "phone_number_is_taken",
     "place_of",
     "primary_phone_number",
@@ -281,11 +327,16 @@ __all__ = [
     "retire_reminder",
     "safe_next",
     "save_phone_number",
+    "save_phone_numbers",
+    "save_postal_addresses",
     "save_web_link",
+    "save_web_links",
     "settle_interview",
     "shipped",
     "suggest",
     "until",
+    "update_company",
+    "update_contact",
     "vcard_from_values",
     "vcards_from_text",
 ]
@@ -380,6 +431,51 @@ _ELSEWHERE: dict[str, tuple[str, str]] = {
     # reads one back by key, or `None` for *Other* and for a key nothing installed knows.
     "MessagingService": ("postulo.core.messaging_services", "Service"),
     "messaging_service_of": ("postulo.core.messaging_services", "find"),
+    # ----------------------------------------- companies, departments and the person (#328)
+    # What a sync of contacts needs and could not reach: the companies and departments a
+    # card is filed under, the vocabularies it maps onto, and the person's own card. All of
+    # it is scoped with `for_user()` like any `OwnedModel`. A holder's rows come back as plain
+    # values (`PhoneRow`, `AddressRow`, `LinkRow`: kind, label, value, primary) and follow the
+    # person's switches -- with *Several telephone numbers* off, the primary alone. The
+    # person's card (`person_card(user)`, a `PersonCard`) is read only: given and family
+    # name, the sign-in address, headline, location, the kind of picture, and those rows.
+    # Nothing on the surface writes a `User` or a `Profile`. Identifiers stay off it.
+    "Company": ("postulo.jobs.models", "Company"),
+    "CompanyKind": ("postulo.jobs.models", "CompanyKind"),
+    "Department": ("postulo.jobs.models", "Department"),
+    "PhoneNumberKind": ("postulo.core.card_rows", "PhoneNumberKind"),
+    "PostalAddressKind": ("postulo.core.card_rows", "PostalAddressKind"),
+    "PhoneRow": ("postulo.core.card_rows", "PhoneRow"),
+    "AddressRow": ("postulo.core.card_rows", "AddressRow"),
+    "LinkRow": ("postulo.core.card_rows", "LinkRow"),
+    "numbers_for": ("postulo.core.card_rows", "numbers_for"),
+    "addresses_for": ("postulo.core.card_rows", "addresses_for"),
+    "links_for": ("postulo.core.card_rows", "links_for"),
+    "PersonCard": ("postulo.documents.rendering", "PersonCard"),
+    "person_card": ("postulo.documents.rendering", "person_card"),
+    # ---------------------------------- and the calls that write them, each with an `actor`
+    # Never by saving a model. `actor` is the account the work is done for: a record has to
+    # be one it may change (its own, its group's, or one shared with it read/write -- a
+    # read-only share is refused), a department and a row are owned as the record handed in
+    # is -- a contact is `actor`'s own, as the ones added at a shared company are (#955) --
+    # and a `WriteRefused` says why in words. `actor` is accepted so the signature
+    # lasts; it is recorded where a trail already exists (`via` names the plugin there).
+    # While *employer structure* is off, reads work and a new department, a contact put in
+    # one and a parent are refused. `update_company` refuses a name another of the owner's
+    # companies has, and never merges. The rows calls make a holder's rows the ones handed
+    # in, keep a row that stays, settle one primary, and return a row the rules refuse in
+    # `SavedRows.refused` with the reason instead of raising; with a switch off they write
+    # the primary alone and leave the rows the person is not shown as they were.
+    "WriteRefused": ("postulo.jobs.surface", "WriteRefused"),
+    "SavedRows": ("postulo.jobs.surface", "SavedRows"),
+    "Refused": ("postulo.jobs.surface", "Refused"),
+    "update_company": ("postulo.jobs.surface", "update_company"),
+    "get_or_create_department": ("postulo.jobs.surface", "get_or_create_department"),
+    "create_contact": ("postulo.jobs.surface", "create_contact"),
+    "update_contact": ("postulo.jobs.surface", "update_contact"),
+    "save_phone_numbers": ("postulo.jobs.surface", "save_phone_numbers"),
+    "save_postal_addresses": ("postulo.jobs.surface", "save_postal_addresses"),
+    "save_web_links": ("postulo.jobs.surface", "save_web_links"),
     # ------------------------------------------------------------------- vCard text (#660)
     # RFC 6350 for a contact, written and read by the one mapping Postulo's own export and
     # import use, so a card a plugin writes and one Postulo writes are the same card and the

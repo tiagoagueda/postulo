@@ -727,12 +727,12 @@ msgstr "Kwa kuwa Alimuumba, Sasa chagua nini kinaendelea."
 msgid "%(kind)s held"
 msgstr "[hariri] Waliozaliwa"
 
-#: src/postulo/api/routers/companies.py
+#: src/postulo/api/routers/companies.py src/postulo/jobs/surface.py
 #, fuzzy, python-format
 msgid "%(kind)s is not a kind of address."
 msgstr "[TD=\"width: 456\"] [FONT=&](2)[/FONT][FONT=&]Bila kuathiri masharti ya kifungu kidogo tu."
 
-#: src/postulo/api/routers/companies.py
+#: src/postulo/api/routers/companies.py src/postulo/jobs/surface.py
 #, fuzzy, python-format
 msgid "%(kind)s is not a kind of number."
 msgstr "[TD=\"width: 456\"] [FONT=&](2)[/FONT][FONT=&]Bila kuathiri masharti ya kifungu kidogo tu."
@@ -1242,7 +1242,7 @@ msgstr "[TD=\"width: 456\"] [FONT=&](2)[/FONT][FONT=&]Bila kuathiri masharti ya 
 msgid "%(sent)s, %(failed)s; each document says which."
 msgstr "[TD=\"width: 456\"] [FONT=&](2)[/FONT][FONT=&]Bila kuathiri masharti ya kifungu kidogo (1) cha kifungu hiki, Tume itakuwa na mamlaka ya kuajiri mtaalamu yeyote kwa ajili ya shughuli maalumu au kwa muda mfupi.[/FONT]."
 
-#: src/postulo/core/web_links.py
+#: src/postulo/core/web_links.py src/postulo/jobs/surface.py
 #, python-format
 msgid "%(service)s is already used by another row."
 msgstr ""
@@ -1789,6 +1789,10 @@ msgstr "Kampuni ina vitambulisho moja kwa kila mpango."
 msgid "A company in several sectors or industries counts in each of them."
 msgstr "Kampuni katika sekta kadhaa au viwanda huhesabu katika kila mmoja wao."
 
+#: src/postulo/jobs/surface.py
+msgid "A company needs a name."
+msgstr ""
+
 #: src/postulo/templates/jobs/company_map.html
 #, fuzzy
 msgid "A company with addresses in several places is counted at each, so the counts add up to more than the companies there are."
@@ -1799,7 +1803,7 @@ msgstr "Kampuni iliyo na anwani katika maeneo kadhaa inahesabiwa kila mmoja, kwa
 msgid "A company with the same identifier is already yours."
 msgstr "Kampuni iliyo na kitambulisho sawa tayari ni yako."
 
-#: src/postulo/api/routers/companies.py
+#: src/postulo/api/routers/companies.py src/postulo/jobs/surface.py
 #, fuzzy
 msgid "A company's links are its social profiles."
 msgstr "Viungo vya kampuni ni maelezo yake ya kijamii."
@@ -1833,6 +1837,10 @@ msgstr "Kuwasiliana na Hakuna Kampuni"
 #, fuzzy, python-format
 msgid "A contact has at most %(max)s messaging handles."
 msgstr "Kwa mfano, kuna njia nyingi za kutuma ujumbe."
+
+#: src/postulo/jobs/surface.py
+msgid "A contact needs a name."
+msgstr ""
 
 #: src/postulo/templates/server/design.html
 #, fuzzy
@@ -1903,6 +1911,10 @@ msgstr "Kabla ya kupanda, mmea hauwezi kukua."
 #, fuzzy
 msgid "A deep blue. Ten steps, of which the interface spends a handful."
 msgstr "Kuwa na blue. Hatua kumi, ambayo interface hutumia wachache."
+
+#: src/postulo/jobs/surface.py
+msgid "A department needs a name."
+msgstr ""
 
 #: src/postulo/resume/publications.py
 #, fuzzy
@@ -2233,6 +2245,10 @@ msgstr "Baadhi ya mifano ya aina yake ya kimataifa imewekwa mara moja juu ya sua
 #, fuzzy
 msgid "A number is kept once on this instance. If one is already recorded here, saving says so rather than taking it from whoever has it."
 msgstr "Baadhi ya kesi hizo zimetajwa mara moja katika kesi hiyo. Ikiwa mtu tayari amerekodiwa hapa, kuokoa anasema hivyo badala ya kuichukua kutoka kwa yeyote aliye nayo."
+
+#: src/postulo/jobs/surface.py
+msgid "A number is needed."
+msgstr ""
 
 #: src/postulo/templates/help/telephone_numbers.html
 #, fuzzy
@@ -3287,6 +3303,10 @@ msgstr "Anwani haiwezi kubeba jina la mtumiaji au nenosiri."
 #, fuzzy
 msgid "An address cannot contain a line break or any other control character."
 msgstr "Anwani haiwezi kuwa na kuvunja mstari au tabia nyingine yoyote ya kudhibiti."
+
+#: src/postulo/jobs/surface.py
+msgid "An address needs at least one part."
+msgstr ""
 
 #: src/postulo/documents/forms.py
 #, fuzzy
@@ -6925,6 +6945,10 @@ msgstr "“Na wakaambiwa madhalimu, onjeni malipo ya yale mliyo kuwa mkiyachuma�
 #, fuzzy
 msgid "Employer"
 msgstr "Mfanyakazi"
+
+#: src/postulo/jobs/surface.py
+msgid "Employer structure is switched off, so departments and parents are not changed."
+msgstr ""
 
 #: src/postulo/applications/models.py
 #, fuzzy
@@ -13169,6 +13193,10 @@ msgstr "Online"
 msgid "Only %(name)s"
 msgstr "Kwa upande mwingine, [X5]"
 
+#: src/postulo/jobs/surface.py
+msgid "Only a company's or a contact's details can be written."
+msgstr ""
+
 #: src/postulo/jobs/capture_views.py
 #, fuzzy
 msgid "Only a discarded capture can be put back."
@@ -15867,7 +15895,7 @@ msgstr "kusema kuwa maombi hayo yanapatikana katika"
 msgid "Say that you understand what leaving does, first."
 msgstr "Mwambie kwamba unaelewa nini cha kufanya, kwanza."
 
-#: src/postulo/core/postal.py
+#: src/postulo/core/postal.py src/postulo/jobs/surface.py
 #, fuzzy
 msgid "Say what this address is."
 msgstr "Sema nini anwani hii ni."
@@ -15878,7 +15906,7 @@ msgstr "Sema nini anwani hii ni."
 msgid "Say what this identifier is."
 msgstr "Sema nini kitambulisho hiki ni."
 
-#: src/postulo/core/phone_numbers.py
+#: src/postulo/core/phone_numbers.py src/postulo/jobs/surface.py
 #, fuzzy
 msgid "Say what this number is."
 msgstr "Waambie idadi hii ni nini."
@@ -15897,6 +15925,10 @@ msgstr "Waambie ni nani wa kuchukua."
 #, fuzzy
 msgid "Say whose tiles they are: their licence asks for a credit on the map."
 msgstr "Sema: Ni ya nani ardhi na vilivyomo ndani yake, na nani mmiliki wa ardhi."
+
+#: src/postulo/jobs/surface.py
+msgid "Say whose work this is: a saved account."
+msgstr ""
 
 #: src/postulo/templates/applications/application_detail.html
 #: src/postulo/templates/applications/interview_form.html
@@ -17737,6 +17769,10 @@ msgstr "Mlolongo huo ni zaidi ya makampuni ya X24X, ambayo ni ya kina zaidi kuli
 msgid "That company is no longer here."
 msgstr "Kampuni hii haipo tena."
 
+#: src/postulo/jobs/surface.py
+msgid "That company is not one you can see."
+msgstr ""
+
 #: src/postulo/api/routers/companies.py
 #, fuzzy
 msgid "That company is shared with you read-only."
@@ -17766,6 +17802,10 @@ msgstr "CV yako si ya kwako."
 #, fuzzy
 msgid "That department belongs to a different company."
 msgstr "Idara hii ni ya kampuni nyingine."
+
+#: src/postulo/jobs/surface.py
+msgid "That department is not one you can see."
+msgstr ""
 
 #: src/postulo/templates/base.html
 #, fuzzy
@@ -18052,6 +18092,10 @@ msgstr "Hii sio faili ambayo ukurasa huu unaisoma. Inasoma faili ya JSON inatoa 
 msgid "That is not a kind of access."
 msgstr "Hii sio aina ya upatikanaji."
 
+#: src/postulo/jobs/surface.py
+msgid "That is not a kind of company."
+msgstr ""
+
 #: src/postulo/accounts/avatars.py
 #, fuzzy, python-format
 msgid "That is not a kind of picture Postulo keeps. Use %(formats)s."
@@ -18076,6 +18120,10 @@ msgstr "Hiyo sio idadi ya matumizi %(country)s: hakuna idadi inayoanza hivyo."
 #, fuzzy, python-format
 msgid "That is not a Postulo backup that opens cleanly: %(problem)s"
 msgstr "Hii sio salama ya Postulo ambayo inafungua safi: %(problem)s"
+
+#: src/postulo/jobs/surface.py
+msgid "That is not a record that has been saved."
+msgstr ""
 
 #: src/postulo/core/messaging_services.py
 #, fuzzy
@@ -18213,6 +18261,10 @@ msgstr "Link hii haiwezi kutumika."
 msgid "That link will not work any more."
 msgstr "Link hii haitafanya kazi tena."
 
+#: src/postulo/jobs/surface.py
+msgid "That name cannot be checked just now."
+msgstr ""
+
 #: src/postulo/core/phones.py
 #, fuzzy
 msgid "That number has no area code."
@@ -18309,6 +18361,10 @@ msgstr "Plugin hii haipatikani tena."
 #, fuzzy
 msgid "That plugin is switched off for you."
 msgstr "Plugin hii ni kwa ajili yenu."
+
+#: src/postulo/jobs/surface.py
+msgid "That record is not yours to change."
+msgstr ""
 
 #: src/postulo/core/mail_auth.py src/postulo/plugins/consent.py
 #, fuzzy
@@ -20065,6 +20121,7 @@ msgid "This address is already in your listings, since %(when)s."
 msgstr "Makala hii ni tayari katika orodha yako tangu %(when)s."
 
 #: src/postulo/core/postal.py src/postulo/core/web_links.py
+#: src/postulo/jobs/surface.py
 #, fuzzy
 msgid "This address is already listed."
 msgstr "Orodha hii tayari imeandikwa."
@@ -20390,7 +20447,7 @@ msgstr "Hii ni akaunti yako. Uunganisho unaofanya mwenyewe sio njia ya kurudi ny
 msgid "This month"
 msgstr "Mwezi huu"
 
-#: src/postulo/core/phone_numbers.py
+#: src/postulo/core/phone_numbers.py src/postulo/jobs/surface.py
 #, fuzzy
 msgid "This number is already listed."
 msgstr "Idadi hii tayari imeorodheshwa."
@@ -22874,6 +22931,7 @@ msgid "You"
 msgstr "Wewe ni wewe"
 
 #: src/postulo/api/routers/companies.py src/postulo/jobs/forms.py
+#: src/postulo/jobs/surface.py
 #, fuzzy
 msgid "You already have a company with that name."
 msgstr "Tayari una kampuni yenye jina hilo."
@@ -23549,7 +23607,8 @@ msgstr "· bado tunaendelea"
 msgid "“%(code)s” is not a language code, like %(first)s or %(second)s."
 msgstr "Hakuna lugha ya kiajemi kama %(first)s au %(second)s."
 
-#: src/postulo/core/web_links.py src/postulo/resume/candidate.py
+#: src/postulo/core/web_links.py src/postulo/jobs/surface.py
+#: src/postulo/resume/candidate.py
 #, fuzzy, python-format
 msgid "“%(kind)s” is not one of the types of link."
 msgstr "[TD=\"width: 456\"] [FONT=&](2)[/FONT][FONT=&]Bila kuathiri masharti ya kifungu kidogo (1) cha kifungu hiki, Tume itakuwa na mamlaka ya kuajiri mtaalamu yeyote kwa ajili ya shughuli maalumu au kwa muda mfupi.[/FONT]."

@@ -798,12 +798,12 @@ msgstr "%(kind)s sukurtas. Dabar pasirinkite, kas jame bus."
 msgid "%(kind)s held"
 msgstr "%(kind)s įvyko"
 
-#: src/postulo/api/routers/companies.py
+#: src/postulo/api/routers/companies.py src/postulo/jobs/surface.py
 #, python-format
 msgid "%(kind)s is not a kind of address."
 msgstr "%(kind)s nėra adreso rūšis."
 
-#: src/postulo/api/routers/companies.py
+#: src/postulo/api/routers/companies.py src/postulo/jobs/surface.py
 #, python-format
 msgid "%(kind)s is not a kind of number."
 msgstr "%(kind)s nėra numerio rūšis."
@@ -1321,7 +1321,7 @@ msgstr "%(scheme)s: tai nėra įprasta forma."
 msgid "%(sent)s, %(failed)s; each document says which."
 msgstr "%(sent)s, %(failed)s; tai nurodyta prie kiekvieno dokumento."
 
-#: src/postulo/core/web_links.py
+#: src/postulo/core/web_links.py src/postulo/jobs/surface.py
 #, python-format
 msgid "%(service)s is already used by another row."
 msgstr ""
@@ -1828,6 +1828,10 @@ msgstr "Įmonė gali turėti tik po vieną kiekvienos schemos identifikatorių."
 msgid "A company in several sectors or industries counts in each of them."
 msgstr "Keliuose sektoriuose ar pramonės šakose veikianti įmonė skaičiuojama kiekviename iš jų."
 
+#: src/postulo/jobs/surface.py
+msgid "A company needs a name."
+msgstr ""
+
 #: src/postulo/templates/jobs/company_map.html
 msgid "A company with addresses in several places is counted at each, so the counts add up to more than the companies there are."
 msgstr "Įmonė, turinti adresų keliose vietose, skaičiuojama kiekvienoje iš jų, todėl skaičių suma viršija esamų įmonių skaičių."
@@ -1836,7 +1840,7 @@ msgstr "Įmonė, turinti adresų keliose vietose, skaičiuojama kiekvienoje iš 
 msgid "A company with the same identifier is already yours."
 msgstr "Įmonę su tuo pačiu identifikatoriumi jau turite."
 
-#: src/postulo/api/routers/companies.py
+#: src/postulo/api/routers/companies.py src/postulo/jobs/surface.py
 msgid "A company's links are its social profiles."
 msgstr "Įmonės nuorodos yra jos socialiniai profiliai."
 
@@ -1866,6 +1870,10 @@ msgstr "Kontaktas be įmonės"
 #, python-format
 msgid "A contact has at most %(max)s messaging handles."
 msgstr "Didžiausias kontakto slapyvardžių skaičius: %(max)s."
+
+#: src/postulo/jobs/surface.py
+msgid "A contact needs a name."
+msgstr ""
 
 #: src/postulo/templates/server/design.html
 msgid "A country and a number in one group"
@@ -1923,6 +1931,10 @@ msgstr "Gimimo data negali būti ankstesnė nei %(year)s m."
 #: src/postulo/core/design.py
 msgid "A deep blue. Ten steps, of which the interface spends a handful."
 msgstr "Sodri mėlyna. Dešimt atspalvių, iš kurių sąsaja naudoja vos kelis."
+
+#: src/postulo/jobs/surface.py
+msgid "A department needs a name."
+msgstr ""
 
 #: src/postulo/resume/publications.py
 msgid "A DOI looks like 10.1000/182: “10.”, a number, a slash and the rest."
@@ -2191,6 +2203,10 @@ msgstr "Tarptautinės formos numeris šiame egzemplioriuje saugomas tik vieną k
 #: src/postulo/templates/partials/phone_numbers.html
 msgid "A number is kept once on this instance. If one is already recorded here, saving says so rather than taking it from whoever has it."
 msgstr "Numeris šiame egzemplioriuje saugomas tik vieną kartą. Jei jis čia jau įrašytas, išsaugant apie tai pranešama, užuot atėmus jį iš to, kas jį turi."
+
+#: src/postulo/jobs/surface.py
+msgid "A number is needed."
+msgstr ""
 
 #: src/postulo/templates/help/telephone_numbers.html
 msgid "A number its country cannot have is refused, and the refusal says why. A number Postulo cannot place is kept as you typed it, with a note beside it. One recorded before numbers were checked stays as it is, marked, until you change it. Nothing here proves that a number is yours."
@@ -3074,6 +3090,10 @@ msgstr "Adrese negali būti naudotojo vardo ar slaptažodžio."
 #: src/postulo/core/addresses.py
 msgid "An address cannot contain a line break or any other control character."
 msgstr "Adrese negali būti eilutės lūžio ar kito valdymo simbolio."
+
+#: src/postulo/jobs/surface.py
+msgid "An address needs at least one part."
+msgstr ""
 
 #: src/postulo/documents/forms.py
 msgid "An address of yours is offered here once it has been confirmed."
@@ -6091,6 +6111,10 @@ msgstr "Išsiųsta el. paštu ir įrašyta, ką išsiuntėte."
 #: src/postulo/jobs/models.py
 msgid "Employer"
 msgstr "Darbdavys"
+
+#: src/postulo/jobs/surface.py
+msgid "Employer structure is switched off, so departments and parents are not changed."
+msgstr ""
 
 #: src/postulo/applications/models.py
 msgid "employment service"
@@ -11293,6 +11317,10 @@ msgstr "Internetinis šaltinis"
 msgid "Only %(name)s"
 msgstr "Tik %(name)s"
 
+#: src/postulo/jobs/surface.py
+msgid "Only a company's or a contact's details can be written."
+msgstr ""
+
 #: src/postulo/jobs/capture_views.py
 msgid "Only a discarded capture can be put back."
 msgstr "Grąžinti galima tik išmestą fiksavimą."
@@ -13532,7 +13560,7 @@ msgstr "nurodyti, kad rekomendacijos pateikiamos paprašius"
 msgid "Say that you understand what leaving does, first."
 msgstr "Pirmiausia patvirtinkite, kad suprantate, ką reiškia išėjimas."
 
-#: src/postulo/core/postal.py
+#: src/postulo/core/postal.py src/postulo/jobs/surface.py
 msgid "Say what this address is."
 msgstr "Nurodykite, koks tai adresas."
 
@@ -13541,7 +13569,7 @@ msgstr "Nurodykite, koks tai adresas."
 msgid "Say what this identifier is."
 msgstr "Nurodykite, kas tai per identifikatorius."
 
-#: src/postulo/core/phone_numbers.py
+#: src/postulo/core/phone_numbers.py src/postulo/jobs/surface.py
 msgid "Say what this number is."
 msgstr "Nurodykite, koks tai numeris."
 
@@ -13556,6 +13584,10 @@ msgstr "Nurodykite, kam siųsti."
 #: src/postulo/core/server_forms.py
 msgid "Say whose tiles they are: their licence asks for a credit on the map."
 msgstr "Nurodykite, kieno tai plytelės: jų licencija reikalauja autorystės nurodymo žemėlapyje."
+
+#: src/postulo/jobs/surface.py
+msgid "Say whose work this is: a saved account."
+msgstr ""
 
 #: src/postulo/templates/applications/application_detail.html
 #: src/postulo/templates/applications/interview_form.html
@@ -15086,6 +15118,10 @@ msgstr "Ši įmonių grandinė per gili (riba: %(limit)s), tokios grupės Postul
 msgid "That company is no longer here."
 msgstr "Tos įmonės čia nebėra."
 
+#: src/postulo/jobs/surface.py
+msgid "That company is not one you can see."
+msgstr ""
+
 #: src/postulo/api/routers/companies.py
 msgid "That company is shared with you read-only."
 msgstr "Ši įmonė bendrinama su jumis tik skaitymui."
@@ -15109,6 +15145,10 @@ msgstr "Šis CV ne jūsų."
 #: src/postulo/jobs/models.py
 msgid "That department belongs to a different company."
 msgstr "Šis padalinys priklauso kitai įmonei."
+
+#: src/postulo/jobs/surface.py
+msgid "That department is not one you can see."
+msgstr ""
 
 #: src/postulo/templates/base.html
 msgid "That did not work — the server answered {status}. Nothing on this page has changed."
@@ -15362,6 +15402,10 @@ msgstr "Šis puslapis tokio failo neskaito. Jis nuskaito tik JSON failą, kurį 
 msgid "That is not a kind of access."
 msgstr "Tai nėra prieigos rūšis."
 
+#: src/postulo/jobs/surface.py
+msgid "That is not a kind of company."
+msgstr ""
+
 #: src/postulo/accounts/avatars.py
 #, python-format
 msgid "That is not a kind of picture Postulo keeps. Use %(formats)s."
@@ -15385,6 +15429,10 @@ msgstr "Tai ne numeris, kurį naudoja %(country)s: ten jokie numeriai taip nepra
 #, python-format
 msgid "That is not a Postulo backup that opens cleanly: %(problem)s"
 msgstr "Tai nėra Postulo atsarginė kopija, kuri atsidarytų be klaidų: %(problem)s"
+
+#: src/postulo/jobs/surface.py
+msgid "That is not a record that has been saved."
+msgstr ""
 
 #: src/postulo/core/messaging_services.py
 msgid "That is not a service a handle can be on."
@@ -15497,6 +15545,10 @@ msgstr "Šios nuorodos naudoti negalima."
 msgid "That link will not work any more."
 msgstr "Ši nuoroda daugiau neveiks."
 
+#: src/postulo/jobs/surface.py
+msgid "That name cannot be checked just now."
+msgstr ""
+
 #: src/postulo/core/phones.py
 msgid "That number has no area code."
 msgstr "Šis numeris neturi vietovės kodo."
@@ -15584,6 +15636,10 @@ msgstr "Tas papildinys nebeįdiegtas."
 #: src/postulo/plugins/syncing.py src/postulo/plugins/views.py
 msgid "That plugin is switched off for you."
 msgstr "Tas papildinys jums išjungtas."
+
+#: src/postulo/jobs/surface.py
+msgid "That record is not yours to change."
+msgstr ""
 
 #: src/postulo/core/mail_auth.py src/postulo/plugins/consent.py
 msgid "That reply did not come from a request Postulo made."
@@ -17063,6 +17119,7 @@ msgid "This address is already in your listings, since %(when)s."
 msgstr "Šis adresas jau yra jūsų skelbimuose nuo %(when)s."
 
 #: src/postulo/core/postal.py src/postulo/core/web_links.py
+#: src/postulo/jobs/surface.py
 msgid "This address is already listed."
 msgstr "Šis adresas jau yra sąraše."
 
@@ -17329,7 +17386,7 @@ msgstr "Tai jūsų pačių paskyra. Sau sukurta nuoroda nėra būdas vėl patekt
 msgid "This month"
 msgstr "Šis mėnuo"
 
-#: src/postulo/core/phone_numbers.py
+#: src/postulo/core/phone_numbers.py src/postulo/jobs/surface.py
 msgid "This number is already listed."
 msgstr "Šis numeris jau yra sąraše."
 
@@ -19371,6 +19428,7 @@ msgid "You"
 msgstr "Jūs"
 
 #: src/postulo/api/routers/companies.py src/postulo/jobs/forms.py
+#: src/postulo/jobs/surface.py
 msgid "You already have a company with that name."
 msgstr "Jau turite įmonę tokiu pavadinimu."
 
@@ -19932,7 +19990,8 @@ msgstr "· dar vyksta"
 msgid "“%(code)s” is not a language code, like %(first)s or %(second)s."
 msgstr "„%(code)s“ nėra kalbos kodas (pvz., %(first)s ar %(second)s)."
 
-#: src/postulo/core/web_links.py src/postulo/resume/candidate.py
+#: src/postulo/core/web_links.py src/postulo/jobs/surface.py
+#: src/postulo/resume/candidate.py
 #, python-format
 msgid "“%(kind)s” is not one of the types of link."
 msgstr "„%(kind)s“ nėra nuorodų tipas."

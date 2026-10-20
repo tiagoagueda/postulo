@@ -727,12 +727,12 @@ msgstr "%(kind)s تخلیق کیا۔ اب اس پر جو کچھ چلتا ہے ا
 msgid "%(kind)s held"
 msgstr "[XX]"
 
-#: src/postulo/api/routers/companies.py
+#: src/postulo/api/routers/companies.py src/postulo/jobs/surface.py
 #, fuzzy, python-format
 msgid "%(kind)s is not a kind of address."
 msgstr "%(kind)s ایک قسم کا پتہ نہیں ہے۔."
 
-#: src/postulo/api/routers/companies.py
+#: src/postulo/api/routers/companies.py src/postulo/jobs/surface.py
 #, fuzzy, python-format
 msgid "%(kind)s is not a kind of number."
 msgstr "%(kind)s کوئی عدد نہیں۔."
@@ -1242,7 +1242,7 @@ msgstr "%(scheme)s: یہ عام شکل نہیں ہے۔."
 msgid "%(sent)s, %(failed)s; each document says which."
 msgstr "%(sent)s، %(failed)s؛ ہر دستاویز کون کہلاتی ہے۔."
 
-#: src/postulo/core/web_links.py
+#: src/postulo/core/web_links.py src/postulo/jobs/surface.py
 #, python-format
 msgid "%(service)s is already used by another row."
 msgstr ""
@@ -1789,6 +1789,10 @@ msgstr "ایک کمپنی ہر منصوبے پر مشتمل ہے."
 msgid "A company in several sectors or industries counts in each of them."
 msgstr "ان میں سے ہر ایک میں کئی شعبوں یا صنعتوں میں ایک کمپنی۔."
 
+#: src/postulo/jobs/surface.py
+msgid "A company needs a name."
+msgstr ""
+
 #: src/postulo/templates/jobs/company_map.html
 #, fuzzy
 msgid "A company with addresses in several places is counted at each, so the counts add up to more than the companies there are."
@@ -1799,7 +1803,7 @@ msgstr "کئی جگہوں پر پتوں کے ساتھ ایک کمپنی کو ہ�
 msgid "A company with the same identifier is already yours."
 msgstr "اسی شناخت کنندہ کے ساتھ ایک کمپنی پہلے ہی آپ کی ہے."
 
-#: src/postulo/api/routers/companies.py
+#: src/postulo/api/routers/companies.py src/postulo/jobs/surface.py
 #, fuzzy
 msgid "A company's links are its social profiles."
 msgstr "ایک کمپنی کے تعلقات اس کی سماجی بنیاد ہیں۔."
@@ -1833,6 +1837,10 @@ msgstr "کسی کمپنی میں رابطہ"
 #, fuzzy, python-format
 msgid "A contact has at most %(max)s messaging handles."
 msgstr "ایک رابطہ زیادہ تر [X22XX] کے ذریعے ہوتا ہے."
+
+#: src/postulo/jobs/surface.py
+msgid "A contact needs a name."
+msgstr ""
 
 #: src/postulo/templates/server/design.html
 #, fuzzy
@@ -1903,6 +1911,10 @@ msgstr "پیدائش کی تاریخ %(year)s سے پہلے نہیں ہے۔."
 #, fuzzy
 msgid "A deep blue. Ten steps, of which the interface spends a handful."
 msgstr "ایک گہرا نیلا. دس قدم، جن میں سے interface ایک مٹھی بھر خرچ کرتا ہے۔."
+
+#: src/postulo/jobs/surface.py
+msgid "A department needs a name."
+msgstr ""
 
 #: src/postulo/resume/publications.py
 #, fuzzy
@@ -2233,6 +2245,10 @@ msgstr "اس کی بین الاقوامی شکل میں ایک عدد اس نم�
 #, fuzzy
 msgid "A number is kept once on this instance. If one is already recorded here, saving says so rather than taking it from whoever has it."
 msgstr "اِس سلسلے میں ایک مثال پر غور کریں ۔ اگر یہاں پہلے ہی سے کوئی ریکارڈ کیا گیا ہے تو اسے بچانے کی بجائے اسے کسی سے بھی محفوظ رکھیں۔."
+
+#: src/postulo/jobs/surface.py
+msgid "A number is needed."
+msgstr ""
 
 #: src/postulo/templates/help/telephone_numbers.html
 #, fuzzy
@@ -3287,6 +3303,10 @@ msgstr "کوئی پتہ صارف کا نام یا پاس ورڈ نہیں لے س
 #, fuzzy
 msgid "An address cannot contain a line break or any other control character."
 msgstr "پتے پر کوئی لائن ٹوٹ نہیں سکتی یا کوئی اَور بااختیار شخصیت ۔."
+
+#: src/postulo/jobs/surface.py
+msgid "An address needs at least one part."
+msgstr ""
 
 #: src/postulo/documents/forms.py
 #, fuzzy
@@ -6925,6 +6945,10 @@ msgstr "(اے محمدصلى الله عليه وسلم) پھر تم نے جو �
 #, fuzzy
 msgid "Employer"
 msgstr "مزدور"
+
+#: src/postulo/jobs/surface.py
+msgid "Employer structure is switched off, so departments and parents are not changed."
+msgstr ""
 
 #: src/postulo/applications/models.py
 #, fuzzy
@@ -13169,6 +13193,10 @@ msgstr "آن لائن"
 msgid "Only %(name)s"
 msgstr "صرف %(name)s"
 
+#: src/postulo/jobs/surface.py
+msgid "Only a company's or a contact's details can be written."
+msgstr ""
+
 #: src/postulo/jobs/capture_views.py
 #, fuzzy
 msgid "Only a discarded capture can be put back."
@@ -15867,7 +15895,7 @@ msgstr "کہتے ہیں کہ حوالہ جات درخواست پر دستیاب 
 msgid "Say that you understand what leaving does, first."
 msgstr "کہہ دو کہ تم سمجھ گئے ہو کہ پہلے کیا چھوڑا گیا ہے."
 
-#: src/postulo/core/postal.py
+#: src/postulo/core/postal.py src/postulo/jobs/surface.py
 #, fuzzy
 msgid "Say what this address is."
 msgstr "کہ یہ پتہ کیا ہے."
@@ -15878,7 +15906,7 @@ msgstr "کہ یہ پتہ کیا ہے."
 msgid "Say what this identifier is."
 msgstr "کہ پتہ چلتا ہے کہ ایجنٹ ہے."
 
-#: src/postulo/core/phone_numbers.py
+#: src/postulo/core/phone_numbers.py src/postulo/jobs/surface.py
 #, fuzzy
 msgid "Say what this number is."
 msgstr "کہ یہ تعداد کیا ہے."
@@ -15897,6 +15925,10 @@ msgstr "جس نے اس کو اٹھانے کے لیے بھیجا ہو۔."
 #, fuzzy
 msgid "Say whose tiles they are: their licence asks for a credit on the map."
 msgstr "جس کے ٹیلے وہ ہیں: ان کی سند نقشے پر ایک کریڈٹ طلب کرتی ہے۔."
+
+#: src/postulo/jobs/surface.py
+msgid "Say whose work this is: a saved account."
+msgstr ""
 
 #: src/postulo/templates/applications/application_detail.html
 #: src/postulo/templates/applications/interview_form.html
@@ -17737,6 +17769,10 @@ msgstr "یہ زنجیر %(limit)s کمپنیوں سے زیادہ گہری ہے �
 msgid "That company is no longer here."
 msgstr "یہ کمپنی اب یہاں نہیں ہے."
 
+#: src/postulo/jobs/surface.py
+msgid "That company is not one you can see."
+msgstr ""
+
 #: src/postulo/api/routers/companies.py
 #, fuzzy
 msgid "That company is shared with you read-only."
@@ -17766,6 +17802,10 @@ msgstr "کہ سی وی آپ نہیں ہے."
 #, fuzzy
 msgid "That department belongs to a different company."
 msgstr "یہ شعبہ ایک مختلف کمپنی سے تعلق رکھتا ہے۔."
+
+#: src/postulo/jobs/surface.py
+msgid "That department is not one you can see."
+msgstr ""
 
 #: src/postulo/templates/base.html
 #, fuzzy
@@ -18052,6 +18092,10 @@ msgstr "یہ فائل نہیں ہے اِس میں جولیو فائل پڑھتی
 msgid "That is not a kind of access."
 msgstr "یہ رسائی کی ایک قسم نہیں ہے."
 
+#: src/postulo/jobs/surface.py
+msgid "That is not a kind of company."
+msgstr ""
+
 #: src/postulo/accounts/avatars.py
 #, fuzzy, python-format
 msgid "That is not a kind of picture Postulo keeps. Use %(formats)s."
@@ -18076,6 +18120,10 @@ msgstr "یہ عدد %(country)s استعمال نہیں ہوتا: کوئی عد�
 #, fuzzy, python-format
 msgid "That is not a Postulo backup that opens cleanly: %(problem)s"
 msgstr "یہ ایک پوسٹلو بیک اپ نہیں ہے جو صاف ستھرائی: %(problem)s"
+
+#: src/postulo/jobs/surface.py
+msgid "That is not a record that has been saved."
+msgstr ""
 
 #: src/postulo/core/messaging_services.py
 #, fuzzy
@@ -18213,6 +18261,10 @@ msgstr "اس لنک کو استعمال نہیں کیا جا سکتا۔."
 msgid "That link will not work any more."
 msgstr "یہ بندھن مزید کام نہیں کرے گا ۔."
 
+#: src/postulo/jobs/surface.py
+msgid "That name cannot be checked just now."
+msgstr ""
+
 #: src/postulo/core/phones.py
 #, fuzzy
 msgid "That number has no area code."
@@ -18309,6 +18361,10 @@ msgstr "وہ لوئس اب نصب نہیں ہوا ہے."
 #, fuzzy
 msgid "That plugin is switched off for you."
 msgstr "یہ پلگ انس آپ کے لئے منسوخ ہے."
+
+#: src/postulo/jobs/surface.py
+msgid "That record is not yours to change."
+msgstr ""
 
 #: src/postulo/core/mail_auth.py src/postulo/plugins/consent.py
 #, fuzzy
@@ -20065,6 +20121,7 @@ msgid "This address is already in your listings, since %(when)s."
 msgstr "یہ پتہ پہلے ہی آپ کی فہرست میں ہے، کیونکہ %(when)s."
 
 #: src/postulo/core/postal.py src/postulo/core/web_links.py
+#: src/postulo/jobs/surface.py
 #, fuzzy
 msgid "This address is already listed."
 msgstr "یہ پتہ پہلے ہی سے درج ہے۔."
@@ -20390,7 +20447,7 @@ msgstr "یہ آپ کا اپنا حساب ہے۔ اِس سلسلے میں ایک 
 msgid "This month"
 msgstr "اس مہینے"
 
-#: src/postulo/core/phone_numbers.py
+#: src/postulo/core/phone_numbers.py src/postulo/jobs/surface.py
 #, fuzzy
 msgid "This number is already listed."
 msgstr "یہ تعداد پہلے ہی سے درج ہے۔."
@@ -22874,6 +22931,7 @@ msgid "You"
 msgstr "آپ"
 
 #: src/postulo/api/routers/companies.py src/postulo/jobs/forms.py
+#: src/postulo/jobs/surface.py
 #, fuzzy
 msgid "You already have a company with that name."
 msgstr "آپ کے پاس اس نام سے پہلے ہی ایک کمپنی ہے."
@@ -23549,7 +23607,8 @@ msgstr "▪ ابھی تک چلتے ہیں"
 msgid "“%(code)s” is not a language code, like %(first)s or %(second)s."
 msgstr "\"X1X %(code)s\" زبان کا کوڈ نہیں ہے جیسا کہ %(first)s یا %(second)s۔."
 
-#: src/postulo/core/web_links.py src/postulo/resume/candidate.py
+#: src/postulo/core/web_links.py src/postulo/jobs/surface.py
+#: src/postulo/resume/candidate.py
 #, fuzzy, python-format
 msgid "“%(kind)s” is not one of the types of link."
 msgstr "\"X1X %(kind)s\" تعلقات کی ایک قسم نہیں ہے۔."

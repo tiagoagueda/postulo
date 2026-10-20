@@ -798,12 +798,12 @@ msgstr "%(kind)s creat. Acum alege ce intră în el."
 msgid "%(kind)s held"
 msgstr "%(kind)s susținut"
 
-#: src/postulo/api/routers/companies.py
+#: src/postulo/api/routers/companies.py src/postulo/jobs/surface.py
 #, fuzzy, python-format
 msgid "%(kind)s is not a kind of address."
 msgstr "%(kind)s nu este un fel de adresă."
 
-#: src/postulo/api/routers/companies.py
+#: src/postulo/api/routers/companies.py src/postulo/jobs/surface.py
 #, fuzzy, python-format
 msgid "%(kind)s is not a kind of number."
 msgstr "%(kind)s nu este un fel de număr."
@@ -1321,7 +1321,7 @@ msgstr "%(scheme)s: aceasta nu este forma obișnuită."
 msgid "%(sent)s, %(failed)s; each document says which."
 msgstr "%(sent)s, %(failed)s; fiecare document spune care."
 
-#: src/postulo/core/web_links.py
+#: src/postulo/core/web_links.py src/postulo/jobs/surface.py
 #, python-format
 msgid "%(service)s is already used by another row."
 msgstr ""
@@ -1883,6 +1883,10 @@ msgstr "O companie are un identificator pe schemă."
 msgid "A company in several sectors or industries counts in each of them."
 msgstr "O companie din mai multe sectoare sau industrii contează în fiecare dintre ele."
 
+#: src/postulo/jobs/surface.py
+msgid "A company needs a name."
+msgstr ""
+
 #: src/postulo/templates/jobs/company_map.html
 #, fuzzy
 msgid "A company with addresses in several places is counted at each, so the counts add up to more than the companies there are."
@@ -1893,7 +1897,7 @@ msgstr "O companie cu adrese în mai multe locuri este luată în considerare la
 msgid "A company with the same identifier is already yours."
 msgstr "O companie cu acelaşi identificator este deja a ta."
 
-#: src/postulo/api/routers/companies.py
+#: src/postulo/api/routers/companies.py src/postulo/jobs/surface.py
 #, fuzzy
 msgid "A company's links are its social profiles."
 msgstr "Legăturile unei companii sunt profilurile sociale."
@@ -1927,6 +1931,10 @@ msgstr "Un contact la nici o companie"
 #, fuzzy, python-format
 msgid "A contact has at most %(max)s messaging handles."
 msgstr "Un contact are cel mult mânere de mesagerie %(max)s."
+
+#: src/postulo/jobs/surface.py
+msgid "A contact needs a name."
+msgstr ""
 
 #: src/postulo/templates/server/design.html
 #, fuzzy
@@ -1997,6 +2005,10 @@ msgstr "Data nașterii nu este anterioară %(year)s."
 #, fuzzy
 msgid "A deep blue. Ten steps, of which the interface spends a handful."
 msgstr "Un albastru intens. Zece trepte, dintre care interfața folosește câteva."
+
+#: src/postulo/jobs/surface.py
+msgid "A department needs a name."
+msgstr ""
 
 #: src/postulo/resume/publications.py
 #, fuzzy
@@ -2327,6 +2339,10 @@ msgstr "Un număr în forma sa internațională este păstrat o singură dată p
 #, fuzzy
 msgid "A number is kept once on this instance. If one is already recorded here, saving says so rather than taking it from whoever has it."
 msgstr "Un număr se păstrează o singură dată pe această instanță. Dacă e deja înregistrat aici, salvarea o spune, în loc să i-l ia celui care îl are."
+
+#: src/postulo/jobs/surface.py
+msgid "A number is needed."
+msgstr ""
 
 #: src/postulo/templates/help/telephone_numbers.html
 #, fuzzy
@@ -3387,6 +3403,10 @@ msgstr "O adresă nu poate purta un nume de utilizator sau o parolă."
 #, fuzzy
 msgid "An address cannot contain a line break or any other control character."
 msgstr "O adresă nu poate conține o întrerupere de rând sau alt caracter de control."
+
+#: src/postulo/jobs/surface.py
+msgid "An address needs at least one part."
+msgstr ""
 
 #: src/postulo/documents/forms.py
 #, fuzzy
@@ -7030,6 +7050,10 @@ msgstr "Trimis prin e-mail și înregistrat ce ai trimis."
 #, fuzzy
 msgid "Employer"
 msgstr "Angajator"
+
+#: src/postulo/jobs/surface.py
+msgid "Employer structure is switched off, so departments and parents are not changed."
+msgstr ""
 
 #: src/postulo/applications/models.py
 #, fuzzy
@@ -13298,6 +13322,10 @@ msgstr "Online"
 msgid "Only %(name)s"
 msgstr "Doar %(name)s"
 
+#: src/postulo/jobs/surface.py
+msgid "Only a company's or a contact's details can be written."
+msgstr ""
+
 #: src/postulo/jobs/capture_views.py
 #, fuzzy
 msgid "Only a discarded capture can be put back."
@@ -16002,7 +16030,7 @@ msgstr "spune că referințele sunt disponibile la cerere"
 msgid "Say that you understand what leaving does, first."
 msgstr "Spune că înţelegi ce face plecarea."
 
-#: src/postulo/core/postal.py
+#: src/postulo/core/postal.py src/postulo/jobs/surface.py
 #, fuzzy
 msgid "Say what this address is."
 msgstr "Spuneți ce este această adresă."
@@ -16013,7 +16041,7 @@ msgstr "Spuneți ce este această adresă."
 msgid "Say what this identifier is."
 msgstr "Spune ce este acest identificator."
 
-#: src/postulo/core/phone_numbers.py
+#: src/postulo/core/phone_numbers.py src/postulo/jobs/surface.py
 #, fuzzy
 msgid "Say what this number is."
 msgstr "Spune ce este acest număr."
@@ -16032,6 +16060,10 @@ msgstr "Spune cui să fie trimis."
 #, fuzzy
 msgid "Say whose tiles they are: their licence asks for a credit on the map."
 msgstr "Spune ale cui sunt ţiglele: permisul lor cere un credit pe hartă."
+
+#: src/postulo/jobs/surface.py
+msgid "Say whose work this is: a saved account."
+msgstr ""
 
 #: src/postulo/templates/applications/application_detail.html
 #: src/postulo/templates/applications/interview_form.html
@@ -17873,6 +17905,10 @@ msgstr "Acel lanț are mai mult de %(limit)s companii în adâncime, mai mult de
 msgid "That company is no longer here."
 msgstr "Acea companie nu mai este aici."
 
+#: src/postulo/jobs/surface.py
+msgid "That company is not one you can see."
+msgstr ""
+
 #: src/postulo/api/routers/companies.py
 #, fuzzy
 msgid "That company is shared with you read-only."
@@ -17902,6 +17938,10 @@ msgstr "CV-ul nu e al tău."
 #, fuzzy
 msgid "That department belongs to a different company."
 msgstr "Acel departament aparține altei companii."
+
+#: src/postulo/jobs/surface.py
+msgid "That department is not one you can see."
+msgstr ""
 
 #: src/postulo/templates/base.html
 #, fuzzy
@@ -18191,6 +18231,10 @@ msgstr "Acesta nu este un fișier pe care îl citește această pagină. Ea cite
 msgid "That is not a kind of access."
 msgstr "Acesta nu este un fel de acces."
 
+#: src/postulo/jobs/surface.py
+msgid "That is not a kind of company."
+msgstr ""
+
 #: src/postulo/accounts/avatars.py
 #, fuzzy, python-format
 msgid "That is not a kind of picture Postulo keeps. Use %(formats)s."
@@ -18215,6 +18259,10 @@ msgstr "Acesta nu este un număr folosit în %(country)s: niciun număr de acolo
 #, fuzzy, python-format
 msgid "That is not a Postulo backup that opens cleanly: %(problem)s"
 msgstr "Aceasta nu este o copie de rezervă Postulo care se deschide curat: %(problem)s"
+
+#: src/postulo/jobs/surface.py
+msgid "That is not a record that has been saved."
+msgstr ""
 
 #: src/postulo/core/messaging_services.py
 #, fuzzy
@@ -18352,6 +18400,10 @@ msgstr "Acel link nu poate fi folosit."
 msgid "That link will not work any more."
 msgstr "Acel link nu va mai funcționa."
 
+#: src/postulo/jobs/surface.py
+msgid "That name cannot be checked just now."
+msgstr ""
+
 #: src/postulo/core/phones.py
 #, fuzzy
 msgid "That number has no area code."
@@ -18449,6 +18501,10 @@ msgstr "Pluginul acela nu mai este instalat."
 #, fuzzy
 msgid "That plugin is switched off for you."
 msgstr "Acel plugin este dezactivat pentru tine."
+
+#: src/postulo/jobs/surface.py
+msgid "That record is not yours to change."
+msgstr ""
 
 #: src/postulo/core/mail_auth.py src/postulo/plugins/consent.py
 #, fuzzy
@@ -20213,6 +20269,7 @@ msgid "This address is already in your listings, since %(when)s."
 msgstr "Această adresă este deja în anunțurile tale, din %(when)s."
 
 #: src/postulo/core/postal.py src/postulo/core/web_links.py
+#: src/postulo/jobs/surface.py
 #, fuzzy
 msgid "This address is already listed."
 msgstr "Această adresă este deja în listă."
@@ -20538,7 +20595,7 @@ msgstr "Acesta este contul dumneavoastră. Un link făcut pentru dumneavoastră 
 msgid "This month"
 msgstr "Luna aceasta"
 
-#: src/postulo/core/phone_numbers.py
+#: src/postulo/core/phone_numbers.py src/postulo/jobs/surface.py
 #, fuzzy
 msgid "This number is already listed."
 msgstr "Acest număr este deja în listă."
@@ -23025,6 +23082,7 @@ msgid "You"
 msgstr "Tu"
 
 #: src/postulo/api/routers/companies.py src/postulo/jobs/forms.py
+#: src/postulo/jobs/surface.py
 #, fuzzy
 msgid "You already have a company with that name."
 msgstr "Ai deja o companie cu acest nume."
@@ -23703,7 +23761,8 @@ msgstr "· încă în curs"
 msgid "“%(code)s” is not a language code, like %(first)s or %(second)s."
 msgstr "„%(code)s” nu este un cod de limbă, precum %(first)s sau %(second)s."
 
-#: src/postulo/core/web_links.py src/postulo/resume/candidate.py
+#: src/postulo/core/web_links.py src/postulo/jobs/surface.py
+#: src/postulo/resume/candidate.py
 #, fuzzy, python-format
 msgid "“%(kind)s” is not one of the types of link."
 msgstr "„%(kind)s” nu este unul dintre tipurile de link."

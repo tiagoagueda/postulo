@@ -429,6 +429,49 @@ def contact_details(owner, cv: CV | None = None) -> dict:
     return details
 
 
+@dataclass(frozen=True)
+class PersonCard:
+    """The person's own details as a plugin reads them: plain values, read only (#328).
+
+    Given and family name, the **sign-in address** (``User.email``) and not allauth's other
+    rows, the headline, the location as a document prints it, the kind of picture there is
+    (``upload``, ``gravatar`` or blank: `Profile.picture`), and the numbers, addresses and
+    links as ``person`` is shown them. Nothing on the surface writes any of it back.
+    """
+
+    given_name: str
+    family_name: str
+    email: str
+    headline: str
+    location: str
+    picture: str
+    numbers: tuple
+    addresses: tuple
+    links: tuple
+
+
+def person_card(user) -> PersonCard:
+    """``user``'s card, built beside `contact_details` from the same pieces (#328).
+
+    The rows follow the person's switches, as the CV's do: with *Several telephone numbers*
+    off, the primary number alone. Identifiers and messaging handles are not on it.
+    """
+    from postulo.core import card_rows, postal
+
+    profile = getattr(user, "profile", None)
+    return PersonCard(
+        given_name=user.first_name,
+        family_name=user.last_name,
+        email=user.email,
+        headline=getattr(profile, "headline", "") or "",
+        location=postal.printed_location(profile) if profile is not None else "",
+        picture=(profile.picture or "") if profile is not None else "",
+        numbers=card_rows.numbers_for(profile, user) if profile is not None else (),
+        addresses=card_rows.addresses_for(profile, user) if profile is not None else (),
+        links=card_rows.links_for(profile, user) if profile is not None else (),
+    )
+
+
 def _personal_lines(
     date: str, place: str, countries: list, scope: str, gender: str = ""
 ) -> list[str]:

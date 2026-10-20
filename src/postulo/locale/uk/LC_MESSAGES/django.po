@@ -798,12 +798,12 @@ msgstr "%(kind)s створено. Тепер оберіть, що в ньому
 msgid "%(kind)s held"
 msgstr "%(kind)s відкладено"
 
-#: src/postulo/api/routers/companies.py
+#: src/postulo/api/routers/companies.py src/postulo/jobs/surface.py
 #, fuzzy, python-format
 msgid "%(kind)s is not a kind of address."
 msgstr "%(kind)s не є свого роду адреси."
 
-#: src/postulo/api/routers/companies.py
+#: src/postulo/api/routers/companies.py src/postulo/jobs/surface.py
 #, fuzzy, python-format
 msgid "%(kind)s is not a kind of number."
 msgstr "%(kind)s не є своєрідним числом."
@@ -1321,7 +1321,7 @@ msgstr "%(scheme)s: що не є звичайною формою."
 msgid "%(sent)s, %(failed)s; each document says which."
 msgstr "%(sent)s, %(failed)s; кожен документ сказав, що."
 
-#: src/postulo/core/web_links.py
+#: src/postulo/core/web_links.py src/postulo/jobs/surface.py
 #, python-format
 msgid "%(service)s is already used by another row."
 msgstr ""
@@ -1883,6 +1883,10 @@ msgstr "Компанія має один ідентифікатор на схе�
 msgid "A company in several sectors or industries counts in each of them."
 msgstr "Компанія в декількох секторах або галузевих галузях підраховує в кожному з них."
 
+#: src/postulo/jobs/surface.py
+msgid "A company needs a name."
+msgstr ""
+
 #: src/postulo/templates/jobs/company_map.html
 #, fuzzy
 msgid "A company with addresses in several places is counted at each, so the counts add up to more than the companies there are."
@@ -1893,7 +1897,7 @@ msgstr "Компанія з адресами в декількох місцях 
 msgid "A company with the same identifier is already yours."
 msgstr "Компанія з однаковим ідентифікатором вже є вашим."
 
-#: src/postulo/api/routers/companies.py
+#: src/postulo/api/routers/companies.py src/postulo/jobs/surface.py
 #, fuzzy
 msgid "A company's links are its social profiles."
 msgstr "Посилання компанії є його соціальними профілями."
@@ -1927,6 +1931,10 @@ msgstr "Контакти"
 #, fuzzy, python-format
 msgid "A contact has at most %(max)s messaging handles."
 msgstr "Зв'язатися з нами %(max)s."
+
+#: src/postulo/jobs/surface.py
+msgid "A contact needs a name."
+msgstr ""
 
 #: src/postulo/templates/server/design.html
 #, fuzzy
@@ -1997,6 +2005,10 @@ msgstr "Дата народження не до %(year)s."
 #, fuzzy
 msgid "A deep blue. Ten steps, of which the interface spends a handful."
 msgstr "Глибокий синій. Десять кроків, з яких інтерфейс проводить ручну."
+
+#: src/postulo/jobs/surface.py
+msgid "A department needs a name."
+msgstr ""
 
 #: src/postulo/resume/publications.py
 #, fuzzy
@@ -2327,6 +2339,10 @@ msgstr "Кількість в міжнародній формі зберігає
 #, fuzzy
 msgid "A number is kept once on this instance. If one is already recorded here, saving says so rather than taking it from whoever has it."
 msgstr "Номер зберігається на цьому встановленні один раз. Якщо він уже записаний тут, збереження це каже, замість того щоб забрати його в того, хто його має."
+
+#: src/postulo/jobs/surface.py
+msgid "A number is needed."
+msgstr ""
 
 #: src/postulo/templates/help/telephone_numbers.html
 #, fuzzy
@@ -3387,6 +3403,10 @@ msgstr "Адреса не може перенести ім’я користув
 #, fuzzy
 msgid "An address cannot contain a line break or any other control character."
 msgstr "Адреса не може містити ланцюжок або будь-якого іншого символу управління."
+
+#: src/postulo/jobs/surface.py
+msgid "An address needs at least one part."
+msgstr ""
 
 #: src/postulo/documents/forms.py
 #, fuzzy
@@ -7030,6 +7050,10 @@ msgstr "Запишіться на електронну пошту та запи�
 #, fuzzy
 msgid "Employer"
 msgstr "Роботодавець"
+
+#: src/postulo/jobs/surface.py
+msgid "Employer structure is switched off, so departments and parents are not changed."
+msgstr ""
 
 #: src/postulo/applications/models.py
 #, fuzzy
@@ -13298,6 +13322,10 @@ msgstr "Інтернет"
 msgid "Only %(name)s"
 msgstr "Тільки %(name)s"
 
+#: src/postulo/jobs/surface.py
+msgid "Only a company's or a contact's details can be written."
+msgstr ""
+
 #: src/postulo/jobs/capture_views.py
 #, fuzzy
 msgid "Only a discarded capture can be put back."
@@ -16002,7 +16030,7 @@ msgstr "скажіть, що посилання доступні на запит
 msgid "Say that you understand what leaving does, first."
 msgstr "Скажіть, що ви розумієте, що йдете, спочатку."
 
-#: src/postulo/core/postal.py
+#: src/postulo/core/postal.py src/postulo/jobs/surface.py
 #, fuzzy
 msgid "Say what this address is."
 msgstr "Скажіть, що це за адреса."
@@ -16013,7 +16041,7 @@ msgstr "Скажіть, що це за адреса."
 msgid "Say what this identifier is."
 msgstr "Зазначте, що це за ідентифікатор."
 
-#: src/postulo/core/phone_numbers.py
+#: src/postulo/core/phone_numbers.py src/postulo/jobs/surface.py
 #, fuzzy
 msgid "Say what this number is."
 msgstr "Скажіть, що це за номер."
@@ -16032,6 +16060,10 @@ msgstr "Скажіть, хто його відправить."
 #, fuzzy
 msgid "Say whose tiles they are: their licence asks for a credit on the map."
 msgstr "Скажіть, чиї плитки вони є: їх ліцензія просить за кредит на карті."
+
+#: src/postulo/jobs/surface.py
+msgid "Say whose work this is: a saved account."
+msgstr ""
 
 #: src/postulo/templates/applications/application_detail.html
 #: src/postulo/templates/applications/interview_form.html
@@ -17873,6 +17905,10 @@ msgstr "Той ланцюг глибший за %(limit)s компаній — �
 msgid "That company is no longer here."
 msgstr "Про компанію."
 
+#: src/postulo/jobs/surface.py
+msgid "That company is not one you can see."
+msgstr ""
+
 #: src/postulo/api/routers/companies.py
 #, fuzzy
 msgid "That company is shared with you read-only."
@@ -17902,6 +17938,10 @@ msgstr "Що резюме не ваш."
 #, fuzzy
 msgid "That department belongs to a different company."
 msgstr "Той відділ належить іншій компанії."
+
+#: src/postulo/jobs/surface.py
+msgid "That department is not one you can see."
+msgstr ""
 
 #: src/postulo/templates/base.html
 #, fuzzy
@@ -18191,6 +18231,10 @@ msgstr "Це не файл цієї сторінки читання. Він чи
 msgid "That is not a kind of access."
 msgstr "Це не вид доступу."
 
+#: src/postulo/jobs/surface.py
+msgid "That is not a kind of company."
+msgstr ""
+
 #: src/postulo/accounts/avatars.py
 #, fuzzy, python-format
 msgid "That is not a kind of picture Postulo keeps. Use %(formats)s."
@@ -18215,6 +18259,10 @@ msgstr "Це не число %(country)s використовує: немає ч
 #, fuzzy, python-format
 msgid "That is not a Postulo backup that opens cleanly: %(problem)s"
 msgstr "Це не резервна копія Postulo, яка добре відкриває: %(problem)s"
+
+#: src/postulo/jobs/surface.py
+msgid "That is not a record that has been saved."
+msgstr ""
 
 #: src/postulo/core/messaging_services.py
 #, fuzzy
@@ -18352,6 +18400,10 @@ msgstr "Це посилання не можна використати."
 msgid "That link will not work any more."
 msgstr "Це посилання більше не працюватиме."
 
+#: src/postulo/jobs/surface.py
+msgid "That name cannot be checked just now."
+msgstr ""
+
 #: src/postulo/core/phones.py
 #, fuzzy
 msgid "That number has no area code."
@@ -18449,6 +18501,10 @@ msgstr "Той додаток більше не встановлено."
 #, fuzzy
 msgid "That plugin is switched off for you."
 msgstr "Цей плагін вимкнено для вас."
+
+#: src/postulo/jobs/surface.py
+msgid "That record is not yours to change."
+msgstr ""
 
 #: src/postulo/core/mail_auth.py src/postulo/plugins/consent.py
 #, fuzzy
@@ -20213,6 +20269,7 @@ msgid "This address is already in your listings, since %(when)s."
 msgstr "Ця адреса вже є у ваших вакансіях, від %(when)s."
 
 #: src/postulo/core/postal.py src/postulo/core/web_links.py
+#: src/postulo/jobs/surface.py
 #, fuzzy
 msgid "This address is already listed."
 msgstr "Ця адреса вже у списку."
@@ -20538,7 +20595,7 @@ msgstr "Це ваш власний обліковий запис. Посилан
 msgid "This month"
 msgstr "За місяць"
 
-#: src/postulo/core/phone_numbers.py
+#: src/postulo/core/phone_numbers.py src/postulo/jobs/surface.py
 #, fuzzy
 msgid "This number is already listed."
 msgstr "Цей номер уже є в списку."
@@ -23025,6 +23082,7 @@ msgid "You"
 msgstr "Ви"
 
 #: src/postulo/api/routers/companies.py src/postulo/jobs/forms.py
+#: src/postulo/jobs/surface.py
 #, fuzzy
 msgid "You already have a company with that name."
 msgstr "У вас уже є компанія з такою назвою."
@@ -23703,7 +23761,8 @@ msgstr "· ще триває"
 msgid "“%(code)s” is not a language code, like %(first)s or %(second)s."
 msgstr "\"%(code)s\" не є мовним кодом, як %(first)s або %(second)s."
 
-#: src/postulo/core/web_links.py src/postulo/resume/candidate.py
+#: src/postulo/core/web_links.py src/postulo/jobs/surface.py
+#: src/postulo/resume/candidate.py
 #, fuzzy, python-format
 msgid "“%(kind)s” is not one of the types of link."
 msgstr "«%(kind)s» не є однією з видів посилання."

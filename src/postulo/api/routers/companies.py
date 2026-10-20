@@ -10,6 +10,7 @@ from ninja.pagination import paginate
 from postulo.applications.services import get_or_create_company
 from postulo.jobs import company_names, identifiers
 from postulo.jobs.models import Company, CompanyKind, Contact, Industry, JobPosting
+from postulo.jobs.surface import WriteRefused, create_contact
 
 from ..auth import scope
 from ..paging import AFTER_ID, UPDATED_SINCE, Moment, Page, RowId, changed_since
@@ -272,7 +273,9 @@ def add_contact(request, pk: int, payload: ContactIn):
 
     from postulo.core import messaging_handles, phone_numbers, phones, web_links
 
-    company = _detail(request, pk)
+    # Write access, not read (#328): a company shared read-only is a 404 here, as it is for
+    # a change to the company itself.
+    company = _detail(request, pk, write=True)
     fields = payload.dict()
     # One LinkedIn address in the payload, as there has always been, written to the row
     # that is the contact's primary social profile now (#189). It is read as an address
@@ -315,8 +318,14 @@ def add_contact(request, pk: int, payload: ContactIn):
     # #374 is for a person's own numbers).
     number = phones.combine(number, country)
     notes = fields.pop("notes", "") or ""
-    contact = Contact.objects.create(owner=request.auth.owner, company=company, **fields)
-    contact.write_note(request.auth.owner, notes)
+    # The one service that makes a contact (#328): the same checks as every writer, and the
+    # change in the contact's trail under this token's name.
+    try:
+        contact = create_contact(
+            company, actor=request.auth.owner, via=request.auth.name, notes=notes, **fields
+        )
+    except WriteRefused as exc:
+        raise HttpError(422, str(exc)) from exc
     if number:
         phone_numbers.save_only_number(contact, request.auth.owner, number)
     web_links.add_links(contact, request.auth.owner, links)
