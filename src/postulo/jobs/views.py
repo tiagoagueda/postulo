@@ -355,6 +355,13 @@ def _primary_address(company):
     return next((row for row in rows if row.is_primary), rows[0] if rows else None)
 
 
+def _company_names(company) -> list:
+    """A company's names in other languages, each with its language in the reader's words (#673)."""
+    from postulo.core import languages
+
+    return [(languages.native_name(row.language, row.language), row) for row in company.names.all()]
+
+
 class CompanyWikidataView(LoginRequiredMixin, View):
     """*Fetch from Wikidata*, what came back, and keeping it (#673).
 
@@ -378,6 +385,14 @@ class CompanyWikidataView(LoginRequiredMixin, View):
         )
 
     @staticmethod
+    def _back_key(company) -> str:
+        return f"wikidata-{company.pk}-next"
+
+    def _back(self, request, company) -> str:
+        """Where to go when done: the page the press came from, kept through the review."""
+        return safe_next(request, reverse("jobs:company_detail", args=[company.pk]))
+
+    @staticmethod
     def _held_key(company) -> str:
         return f"wikidata-{company.pk}"
 
@@ -387,7 +402,8 @@ class CompanyWikidataView(LoginRequiredMixin, View):
         company = self._company(request, pk)
         held = request.session.get(self._held_key(company))
         if not held:
-            return redirect("jobs:company_detail", pk=company.pk)
+            back = request.session.get(self._back_key(company))
+            return redirect(back or self._back(request, company))
         names = sorted(
             (
                 (languages.native_name(tag, tag), tag, name)
@@ -402,6 +418,8 @@ class CompanyWikidataView(LoginRequiredMixin, View):
             {
                 "company": company,
                 "held": held,
+                "back": request.session.get(self._back_key(company))
+                or reverse("jobs:company_detail", args=[company.pk]),
                 "names": names,
                 # Where the point would go, and whether a hand-placed one is in its way (#701).
                 "address": address,
@@ -418,23 +436,26 @@ class CompanyWikidataView(LoginRequiredMixin, View):
         key = self._held_key(company)
         if request.POST.get("keep"):
             held = request.session.pop(key, None)
+            back = request.session.pop(self._back_key(company), None)
             if held:
                 self._keep(company, held)
                 messages.success(request, _("Kept what Wikidata said."))
-            return redirect("jobs:company_detail", pk=company.pk)
+            return redirect(back or self._back(request, company))
         qid = company.wikidata_id()
         if not qid:
             messages.error(request, _("Give the company its Wikidata identifier first."))
-            return redirect("jobs:company_detail", pk=company.pk)
+            return redirect(self._back(request, company))
         try:
             throttle.wikidata(request.user)
             item = wikidata.fetch(qid)
         except throttle.TooOften as too_often:
             messages.error(request, str(too_often))
-            return redirect("jobs:company_detail", pk=company.pk)
+            return redirect(self._back(request, company))
         except wikidata.WikidataRefused as refused:
             messages.error(request, str(refused))
-            return redirect("jobs:company_detail", pk=company.pk)
+            return redirect(self._back(request, company))
+        # Where the review's "Keep" and "Cancel" return to: Edit, when Edit asked (#917).
+        request.session[self._back_key(company)] = self._back(request, company)
         request.session[key] = {
             "qid": item.qid,
             "names": item.names,
@@ -491,7 +512,7 @@ class CompanyNamesView(LoginRequiredMixin, View):
         from .models import CompanyName
 
         company = get_object_or_404(shared_scope(Company.objects, request.user, WRITE), pk=pk)
-        back = reverse("jobs:company_detail", args=[company.pk])
+        back = safe_next(request, reverse("jobs:company_detail", args=[company.pk]))
         if request.POST.get("remove"):
             company.names.filter(pk=as_pk(request.POST.get("remove"))).delete()
             return redirect(back)
@@ -960,17 +981,8 @@ class CompanyDetailView(SharedObjectMixin, DetailView):
         # Decided once for the page rather than per contact: it is one answer about one
         # person, and asking it per row would be a query per row for the same answer.
         context["several_numbers"] = phone_numbers.several_allowed(person)
-        # Its names in other languages, and whether Wikidata may be asked for them (#673).
-        from postulo.core import languages
-
-        context["company_names"] = [
-            (languages.native_name(row.language, row.language), row)
-            for row in self.object.names.all()
-        ]
-        context["wikidata_offered"] = wikidata_offered(person)
-        context["name_languages"] = sorted(
-            languages.NATIVE_NAMES.items(), key=lambda pair: pair[1].casefold()
-        )
+        # Its names in other languages, read in a popover beside its name (#917).
+        context["company_names"] = _company_names(self.object)
         # The company's own numbers and addresses (#329), on the same terms as a contact's.
         context["company_numbers"] = phone_numbers.numbers_for(self.object, person)
         context["company_addresses"] = list(self.object.postal_addresses.all())
@@ -1191,6 +1203,18 @@ class CompanyUpdateView(
             return refused
         messages.success(self.request, _("Company updated."))
         return super().form_valid(form)
+
+    def get_context_data(self, **kwargs):
+        """The names in other languages, edited here and read from the company's page (#917)."""
+        from postulo.core import languages
+
+        context = super().get_context_data(**kwargs)
+        context["company_names"] = _company_names(self.object)
+        context["wikidata_offered"] = wikidata_offered(self.request.user)
+        context["name_languages"] = sorted(
+            languages.NATIVE_NAMES.items(), key=lambda pair: pair[1].casefold()
+        )
+        return context
 
 
 class CompanyLogoView(OwnedObjectMixin, View):

@@ -5518,6 +5518,25 @@
       },
       true
     );
+    // A button that opens a popover has said what it is: its tooltip is put away as the panel
+    // opens (#917), so that Escape, whose first press would otherwise dismiss the tooltip, closes
+    // the panel at once. It comes back when the pointer or the focus comes to it again.
+    document.addEventListener(
+      "toggle",
+      function (event) {
+        var panel = event.target;
+        if (event.newState !== "open" || !panel.matches || !panel.matches("[data-popover][popover]")) {
+          return;
+        }
+        [tipFocus, tipHover].forEach(function (place) {
+          if (place && place.tips.some(tipIsOpen)) {
+            place.spent = true;
+          }
+        });
+        drawTips();
+      },
+      true
+    );
 
     document.addEventListener("scroll", placeTipsSoon, { capture: true, passive: true });
     window.addEventListener("resize", function () {

@@ -15,7 +15,28 @@
   <div id="company-head" class="mb-6 flex flex-wrap items-start gap-4">
     {% company_logo company "size-14 text-lg" %}
     <div>
-      <c-page-title>{{ company.name }}</c-page-title>
+      <div class="flex items-center gap-2">
+        <c-page-title>{{ company.name }}</c-page-title>
+        {% comment %} Its names in other languages (#673), read from here and changed under Edit
+           (#917): a button after the name that opens a popover, drawn only when there are some.
+           A `popovertarget` button, so it opens with no script; the browser closes it on Escape
+           and gives the focus back. The tooltip is the button's name, as the map's buttons are. {% endcomment %}
+        {% if company_names %}
+          <button type="button" class="btn" data-variant="ghost" data-size="icon" popovertarget="company-names"
+                  aria-haspopup="dialog" aria-labelledby="company-names-tip" data-company-names-button>{% icon "languages" %}</button>
+          <span id="company-names-tip" data-tooltip>{% translate "Names in other languages" %}</span>
+          <div id="company-names" popover data-popover data-align="start" class="w-80" data-company-names>
+            <ul class="divide-y divide-ink-100 p-2 text-sm dark:divide-ink-800">
+              {% for language, row in company_names %}
+                <li class="flex flex-wrap items-baseline gap-x-3 px-2 py-1.5">
+                  <span class="w-28 text-ink-500 dark:text-ink-400">{{ language }}</span>
+                  <bdi lang="{{ row.language }}" class="min-w-0 flex-1">{{ row.name }}</bdi>
+                </li>
+              {% endfor %}
+            </ul>
+          </div>
+        {% endif %}
+      </div>
       {% if company.is_employment_service %}
         <p class="text-sm text-ink-500 dark:text-ink-400">{{ company.get_kind_display }}</p>
       {% endif %}
@@ -408,57 +429,6 @@
       {% else %}
         {% include "jobs/partials/own_note_form.html" with record=company kind="company" %}
       {% endif %}
-
-      {% comment %} Its name in other languages (#673): from its Wikidata item on a press, or
-         typed for a language Wikidata gave none for. Lists and tables keep the name you
-         typed; a document written in one of these languages prints this one. {% endcomment %}
-      <section class="mt-8" data-company-names>
-        <c-section-title>{% translate "Names in other languages" %}</c-section-title>
-        <div class="card text-sm">
-          {% if company_names %}
-            <ul class="mb-3 divide-y divide-ink-100 dark:divide-ink-800">
-              {% for language, row in company_names %}
-                <li class="flex flex-wrap items-center gap-x-3 py-1.5">
-                  <span class="w-36 text-ink-500 dark:text-ink-400">{{ language }}</span>
-                  <bdi lang="{{ row.language }}" class="min-w-0 flex-1">{{ row.name }}</bdi>
-                  <span class="text-xs text-ink-500 dark:text-ink-400">{{ row.get_source_display }}</span>
-                  <form method="post" action="{% url 'jobs:company_names' company.pk %}">
-                    {% csrf_token %}
-                    <button type="submit" name="remove" value="{{ row.pk }}" class="btn" data-variant="ghost" data-size="sm">{% translate "Remove" %}</button>
-                  </form>
-                </li>
-              {% endfor %}
-            </ul>
-          {% else %}
-            <p class="mb-3 text-ink-500 dark:text-ink-400">{% translate "None yet. Documents print the name above in every language." %}</p>
-          {% endif %}
-          {% if wikidata_offered %}
-            {% if company.wikidata_id %}
-              <form method="post" action="{% url 'jobs:company_wikidata' company.pk %}" class="mb-3">
-                {% csrf_token %}
-                <button type="submit" class="btn" data-variant="outline">{% translate "Fetch from Wikidata" %}</button>
-                <span class="ms-2 text-xs text-ink-500 dark:text-ink-400">{% translate "One request to www.wikidata.org for this company's item; nothing is kept until you say so." %}</span>
-              </form>
-            {% else %}
-              <p class="mb-3 text-xs text-ink-500 dark:text-ink-400">{% translate "Give the company its Wikidata identifier, under Edit, to fetch its names from there." %}</p>
-            {% endif %}
-          {% endif %}
-          <form method="post" action="{% url 'jobs:company_names' company.pk %}" class="flex flex-wrap items-end gap-3">
-            {% csrf_token %}
-            <div class="field">
-              <label for="name-language">{% translate "Language" %}</label>
-              <select class="select" id="name-language" name="language" required>
-                {% for code, native in name_languages %}<option value="{{ code }}">{{ native }}</option>{% endfor %}
-              </select>
-            </div>
-            <div class="field min-w-0 flex-1">
-              <label for="name-typed">{% translate "Its name in that language" %}</label>
-              <input class="input" id="name-typed" name="name" maxlength="200" required>
-            </div>
-            <button type="submit" class="btn" data-variant="outline">{% translate "Add" %}</button>
-          </form>
-        </div>
-      </section>
     </div>
 
     <aside>

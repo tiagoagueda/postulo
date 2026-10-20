@@ -46,7 +46,7 @@
     <form method="post" class="flex flex-wrap items-center gap-3">
       {% csrf_token %}
       <button type="submit" name="keep" value="1" class="btn">{% translate "Keep these" %}</button>
-      <a href="{% url 'jobs:company_detail' company.pk %}" class="btn" data-variant="ghost">{% translate "Cancel" %}</a>
+      <a href="{{ back }}" class="btn" data-variant="ghost">{% translate "Cancel" %}</a>
     </form>
   </div>
 {% endblock %}

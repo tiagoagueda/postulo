@@ -240,7 +240,7 @@ def test_off_nothing_is_offered_and_nothing_fetched(client, user, wikidata_answe
     forget_decisions()
     client.force_login(user)
 
-    page = client.get(reverse("jobs:company_detail", args=[company.pk])).content.decode()
+    page = client.get(reverse("jobs:company_update", args=[company.pk])).content.decode()
 
     assert "Fetch from Wikidata" not in page
     assert client.post(reverse("jobs:company_wikidata", args=[company.pk])).status_code == 404
@@ -440,3 +440,127 @@ def test_taking_wikidatas_point_off_places_it_from_its_words(client, user, wikid
 
     address.refresh_from_db()
     assert address.placed_by != "wikidata"
+
+
+# ------------------------------------------------- read beside the name, edited under Edit (#917)
+
+
+def two_names(user, company):
+    for tag, name in (("pt", "Universidade de Aveiro"), ("fr", "Université d'Aveiro")):
+        CompanyName.objects.create(owner=user, company=company, language=tag, name=name)
+
+
+def test_the_icon_is_drawn_only_when_there_are_names(client, user):
+    company = Company.objects.create(owner=user, name="Aveiro Uni")
+    client.force_login(user)
+    url = reverse("jobs:company_detail", args=[company.pk])
+
+    bare = client.get(url).content.decode()
+    two_names(user, company)
+    page = client.get(url).content.decode()
+
+    assert "data-company-names" not in bare and "company-names-tip" not in bare
+    assert 'popovertarget="company-names"' in page
+    assert 'aria-labelledby="company-names-tip"' in page
+    assert 'id="company-names" popover' in page
+    assert '<bdi lang="pt" class="min-w-0 flex-1">Universidade de Aveiro</bdi>' in page
+    assert "Fetch from Wikidata" not in page and 'name="remove"' not in page
+
+
+def test_the_names_are_changed_on_the_edit_page(client, user):
+    company = aperture(user)
+    two_names(user, company)
+    client.force_login(user)
+
+    page = client.get(reverse("jobs:company_update", args=[company.pk])).content.decode()
+
+    edit = reverse("jobs:company_update", args=[company.pk])
+    assert "Fetch from Wikidata" in page and 'name="remove"' in page
+    assert f'name="next" value="{edit}"' in page
+    assert reverse("jobs:company_names", args=[company.pk]) in page
+    assert "above under Identifiers" not in page, "a Wikidata id is there: the sentence is not"
+
+
+def test_a_company_with_no_wikidata_id_is_told_where_to_give_one(client, user):
+    company = Company.objects.create(owner=user, name="Aveiro Uni")
+    client.force_login(user)
+
+    page = client.get(reverse("jobs:company_update", args=[company.pk])).content.decode()
+
+    assert "Give the company its Wikidata identifier, above under Identifiers" in page
+
+
+def test_a_name_added_or_removed_returns_to_the_page_that_asked(client, user):
+    company = Company.objects.create(owner=user, name="Aveiro Uni")
+    client.force_login(user)
+    edit = reverse("jobs:company_update", args=[company.pk])
+    names = reverse("jobs:company_names", args=[company.pk])
+
+    added = client.post(names, {"language": "fr-FR", "name": "Aveiro", "next": edit})
+    removed = client.post(names, {"remove": company.names.get().pk, "next": edit})
+
+    assert added.url == edit and removed.url == edit
+
+
+@pytest.mark.parametrize("next_url", ["https://evil.example/x", "//evil.example/x", "abc", ""])
+def test_an_unsafe_next_is_ignored(client, user, next_url):
+    company = Company.objects.create(owner=user, name="Aveiro Uni")
+    client.force_login(user)
+
+    response = client.post(
+        reverse("jobs:company_names", args=[company.pk]),
+        {"language": "fr-FR", "name": "Aveiro", "next": next_url},
+    )
+
+    assert response.url == reverse("jobs:company_detail", args=[company.pk])
+
+
+def test_a_fetch_and_its_review_return_to_edit(client, user, wikidata_answers):
+    answers, _seen = wikidata_answers
+    an_item(answers)
+    company = aperture(user)
+    client.force_login(user)
+    edit = reverse("jobs:company_update", args=[company.pk])
+    url = reverse("jobs:company_wikidata", args=[company.pk])
+
+    client.post(url, {"next": edit})
+    review = client.get(url)
+    kept = client.post(url, {"keep": "1"})
+
+    assert f'href="{edit}"' in review.content.decode(), "Cancel goes back to Edit"
+    assert kept.url == edit
+    assert company.names.filter(language="pt").exists()
+
+
+def test_a_fetch_refused_returns_to_edit_and_an_unsafe_next_does_not_stick(
+    client, user, wikidata_answers
+):
+    answers, _seen = wikidata_answers
+    an_item(answers)
+    company = aperture(user)
+    client.force_login(user)
+    detail = reverse("jobs:company_detail", args=[company.pk])
+    url = reverse("jobs:company_wikidata", args=[company.pk])
+
+    client.post(url, {"next": "https://evil.example/"})
+    kept = client.post(url, {"keep": "1"})
+
+    assert kept.url == detail
+
+
+def test_a_reader_is_shown_the_names_and_no_form_to_change_them(client, user, other_user):
+    from postulo.jobs.models import Share
+
+    company = aperture(other_user)
+    two_names(other_user, company)
+    Share.objects.create(company=company, grantee_user=user, scope=Share.Scope.READ)
+    client.force_login(user)
+
+    page = client.get(reverse("jobs:company_detail", args=[company.pk])).content.decode()
+
+    assert "Universidade de Aveiro" in page and 'popovertarget="company-names"' in page
+    assert reverse("jobs:company_names", args=[company.pk]) not in page
+    assert reverse("jobs:company_wikidata", args=[company.pk]) not in page
+    assert client.get(reverse("jobs:company_update", args=[company.pk])).status_code == 404
+    names = reverse("jobs:company_names", args=[company.pk])
+    assert client.post(names, {"language": "pt", "name": "X"}).status_code == 404

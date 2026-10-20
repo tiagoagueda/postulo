@@ -192,6 +192,62 @@
       <a href="{% url 'jobs:company_list' %}" class="btn" data-variant="ghost">{% translate "Cancel" %}</a>
     </div>
   </form>
+  {% comment %} Its name in other languages (#673), changed here and read from its page (#917):
+     from its Wikidata item on a press, or typed for a language Wikidata gave none for. Lists
+     and tables keep the name you typed; a document written in one of these languages prints
+     this one. Forms of their own, drawn after the main form because a form cannot hold
+     another, as the logo's are: changing a name saves nothing else on the page, and each
+     returns here. Only for a company that exists. {% endcomment %}
+  {% if object %}
+    <section class="card mt-6 max-w-2xl text-sm" id="section-names" data-company-names>
+      <c-section-title>{% translate "Names in other languages" %}</c-section-title>
+      {% if company_names %}
+        <ul class="mb-3 divide-y divide-ink-100 dark:divide-ink-800">
+          {% for language, row in company_names %}
+            <li class="flex flex-wrap items-center gap-x-3 py-1.5">
+              <span class="w-36 text-ink-500 dark:text-ink-400">{{ language }}</span>
+              <bdi lang="{{ row.language }}" class="min-w-0 flex-1">{{ row.name }}</bdi>
+              <span class="text-xs text-ink-500 dark:text-ink-400">{{ row.get_source_display }}</span>
+              <form method="post" action="{% url 'jobs:company_names' object.pk %}">
+                {% csrf_token %}
+                <input type="hidden" name="next" value="{% url 'jobs:company_update' object.pk %}">
+                <button type="submit" name="remove" value="{{ row.pk }}" class="btn" data-variant="ghost" data-size="sm">{% translate "Remove" %}<span class="sr-only">: <bdi lang="{{ row.language }}">{{ row.name }}</bdi></span></button>
+              </form>
+            </li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <p class="mb-3 text-ink-500 dark:text-ink-400">{% translate "None yet. Documents print the name above in every language." %}</p>
+      {% endif %}
+      {% if wikidata_offered %}
+        {% if object.wikidata_id %}
+          <form method="post" action="{% url 'jobs:company_wikidata' object.pk %}" class="mb-3">
+            {% csrf_token %}
+            <input type="hidden" name="next" value="{% url 'jobs:company_update' object.pk %}">
+            <button type="submit" class="btn" data-variant="outline">{% translate "Fetch from Wikidata" %}</button>
+            <span class="ms-2 text-xs text-ink-500 dark:text-ink-400">{% translate "One request to www.wikidata.org for this company's item; nothing is kept until you say so." %}</span>
+          </form>
+        {% else %}
+          <p class="mb-3 text-xs text-ink-500 dark:text-ink-400">{% translate "Give the company its Wikidata identifier, above under Identifiers, and save, to fetch its names from there." %}</p>
+        {% endif %}
+      {% endif %}
+      <form method="post" action="{% url 'jobs:company_names' object.pk %}" class="flex flex-wrap items-end gap-3">
+        {% csrf_token %}
+        <input type="hidden" name="next" value="{% url 'jobs:company_update' object.pk %}">
+        <div class="field">
+          <label for="name-language">{% translate "Language" %}</label>
+          <select class="select" id="name-language" name="language" required>
+            {% for code, native in name_languages %}<option value="{{ code }}">{{ native }}</option>{% endfor %}
+          </select>
+        </div>
+        <div class="field min-w-0 flex-1">
+          <label for="name-typed">{% translate "Its name in that language" %}</label>
+          <input class="input" id="name-typed" name="name" maxlength="200" required>
+        </div>
+        <button type="submit" class="btn" data-variant="outline">{% translate "Add" %}</button>
+      </form>
+    </section>
+  {% endif %}
   {% comment %} A saved identifier is taken off by its bin, which asks here and removes it there
      and then, without saving the rest of the form (#857). The dialogs are drawn after the form,
      because a form cannot hold another and the bins sit inside it; the script that does it is
