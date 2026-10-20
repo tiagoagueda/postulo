@@ -102,6 +102,11 @@ class Scheme:
     #: and a personal profile are different addresses for the same scheme, which is exactly
     #: the sort of thing one registry has to be able to say and two could not (#109).
     person_link: str = ""
+    #: Builds the address from the value itself, where it depends on more than a template can
+    #: say: a company register's page is a different site for each country (#935). Given the
+    #: normalised value, returns an address or nothing; used instead of `link`, and never by a
+    #: scheme an instance defines.
+    link_by: Callable[[str], str] | None = None
     #: Shown beside the input.
     example: str = ""
     #: Path prefixes that identify a pasted URL of this scheme, so the slug can be lifted.
@@ -172,7 +177,14 @@ class Scheme:
     def identifies(self, subject: str) -> bool:
         return subject in self.subjects
 
+    @property
+    def links(self) -> bool:
+        """Whether a value of this scheme can lead somewhere."""
+        return bool(self.link or self.link_by)
+
     def url_for(self, value: str, subject: str = "") -> str:
+        if self.link_by:
+            return self.link_by(value)
         template = self.person_link if (subject == PERSON and self.person_link) else self.link
         if not template:
             return ""

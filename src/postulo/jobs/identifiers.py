@@ -57,7 +57,7 @@ def choices() -> tuple[tuple[str, object], ...]:
 
 def linked() -> tuple[str, ...]:
     """The keys whose values lead somewhere, for a table that offers to open them."""
-    return tuple(key for key, scheme in schemes().items() if scheme.link)
+    return tuple(key for key, scheme in schemes().items() if scheme.links)
 
 
 def scheme_for(key: str):

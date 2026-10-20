@@ -20,9 +20,10 @@ knows where it links. That is the whole of what a scheme may do — a checksum c
 typos a lookup would, which is the entire reason ORCID and the LEI have one.
 
 **``register`` is one generic scheme for every national company register** — SIRET, NIF,
-Companies House, KvK, Handelsregister — and Postulo validates none of them beyond a country
-prefix. That is the itch this being a plugin scratches: a plugin per country could do
-better, without waiting for a patch here.
+Companies House, KvK, Handelsregister. It checks the digits of the countries whose rule is
+public and links to the register's own page where it has a stable one (`registers`, #935);
+the rest are held to a country prefix and led to the EU business registers search. A plugin
+per country could do better, without waiting for a patch here.
 """
 
 from __future__ import annotations
@@ -33,6 +34,8 @@ from django.utils.translation import gettext_lazy as _
 
 from postulo.core.identifiers import COMPANY, PERSON, Scheme
 from postulo.plugins.api import COUNTRY_CODES
+
+from . import registers
 
 BOTH = frozenset({PERSON, COMPANY})
 ONLY_PERSON = frozenset({PERSON})
@@ -102,6 +105,12 @@ _REGISTER_COUNTRIES = COUNTRY_CODES | {"EL", "XK"}
 def starts_with_a_country(value: str) -> bool:
     """Whether the two letters a register number begins with are a country's code."""
     return value[:2] in _REGISTER_COUNTRIES
+
+
+def register_checks_out(value: str) -> bool:
+    """The country's own check digit where its rule is known (`registers.CHECKS`), else only
+    the two letters a number begins with (#935)."""
+    return starts_with_a_country(value) and registers.checks_out(value) is not False
 
 
 def orcid_checks_out(value: str) -> bool:
@@ -250,8 +259,12 @@ SCHEMES: dict[str, Scheme] = {
             example=_("PT 501234567, FR 552081317, DE HRB 12345"),
             upper=True,
             tidy=_country_then_number,
-            checksum=starts_with_a_country,
-            checksum_message=_("Start with the country's two-letter code."),
+            link_by=registers.link_for,
+            checksum=register_checks_out,
+            checksum_message=_(
+                "Start with the country's two-letter code, then a number that passes that "
+                "country's check digit."
+            ),
             icon="building-2",
         ),
         Scheme(

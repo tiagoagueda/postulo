@@ -257,6 +257,7 @@ All notable changes to Postulo are recorded here. The format follows
 ### ✨ Added
 
 - The plugin surface holds companies, departments and the person's own card (read only, with the sign-in address), a holder's numbers, addresses and links as plain values, and services to update a company, make a department and a contact, and write several numbers, addresses and links; each takes an `actor`. (#328)
+- A company register number is checked against its country's check digit (France, Czechia, Norway, Finland, Estonia, Poland) and links to the register's own page (seven countries) or the EU business-register search, all offline. (#935)
 - A code of conduct, the Contributor Covenant 2.1, for issues, pull requests and Weblate, with reports to the maintainer's address (#1007)
 - An accessibility statement, ACCESSIBILITY.md: WCAG 2.2 AA as the aim, how it is checked, the known limits, and how to report a barrier without an account (#1008)
 

@@ -88,7 +88,7 @@ def test_each_linked_scheme_knows_where_it_points():
     assert (
         identifiers.url_for("opencorporates", "gb/1") == "https://opencorporates.com/companies/gb/1"
     )
-    assert identifiers.url_for("register", "PT 1") == "", "no universal home for a register number"
+    assert identifiers.url_for("register", "PT 1").startswith("https://e-justice.europa.eu/")
     assert identifiers.url_for("other", "x") == ""
 
 
