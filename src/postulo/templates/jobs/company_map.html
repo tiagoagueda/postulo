@@ -128,9 +128,14 @@
     </div>
 
     {% comment %} The way back to the table, on its own at the top of the end side (#909). {% endcomment %}
-    <a href="{% url 'jobs:company_list' %}" class="btn absolute end-3 top-3 z-1 shadow-sm" data-variant="outline" data-map-table>
-      {% icon "table" %}{% translate "Table" %}
+    {% comment %} On a phone (below `sm`) the word is visually hidden, not removed, so the link
+       keeps its name "Table" (SC 2.5.3) and is a square icon; "Table view" is its tooltip,
+       below it (#916), described-by and so never read as the name. From `sm` the word is drawn
+       and the tooltip is not shown (`data-tooltip-narrow`). {% endcomment %}
+    <a href="{% url 'jobs:company_list' %}" class="btn absolute end-3 top-3 z-1 shadow-sm max-sm:size-9 max-sm:p-0" data-variant="outline" aria-describedby="map-tip-table" data-map-table>
+      {% icon "table" %}<span class="sr-only sm:not-sr-only">{% translate "Table" %}</span>
     </a>
+    <span id="map-tip-table" data-tooltip data-tooltip-place="below" data-tooltip-narrow hidden>{% translate "Table view" %}</span>
 
     {% if not places %}
       <div class="flex size-full items-center justify-center px-4 pt-28 pb-16">

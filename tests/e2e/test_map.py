@@ -382,3 +382,51 @@ def test_the_tooltip_beside_the_button_stays_when_the_pointer_crosses_the_gap(
     page.mouse.move(box["x"] + box["width"] / 2, box["y"] + box["height"] / 2, steps=8)
 
     expect(tip).to_have_count(1)
+
+
+def test_on_a_phone_the_table_link_is_its_icon_with_a_tooltip_below_it(
+    live_server, page: Page, placed
+):
+    """#916: the word is visually hidden, the name stays "Table", "Table view" shows below."""
+    watch(page)
+    page.set_viewport_size({"width": 390, "height": 800})
+    sign_in(page, live_server.url, "/jobs/companies/map/")
+    expect(page.locator(".leaflet-control-zoom")).to_be_visible()
+    link = page.locator("[data-map-table]")
+    expect(link).to_have_accessible_name("Table")
+    expect(link).to_have_text("Table")
+    box = link.bounding_box()
+    assert 24 <= box["width"] <= 48 and 24 <= box["height"] <= 48, box
+
+    link.hover()
+
+    tip = page.locator("[data-tooltip][popover]:popover-open")
+    expect(tip).to_have_text("Table view")
+    where = tip.bounding_box()
+    assert where["y"] >= box["y"] + box["height"], (where, box)
+    assert where["x"] <= box["x"] + box["width"] and where["x"] + where["width"] >= box["x"], (
+        "under the link"
+    )
+    page.mouse.move(5, 400)
+    expect(tip).to_have_count(0)
+    link.focus()
+    expect(page.locator("[data-tooltip][popover]:popover-open")).to_have_text("Table view")
+
+
+def test_from_small_up_the_table_link_shows_its_word_and_no_tooltip(
+    live_server, page: Page, placed
+):
+    watch(page)
+    page.set_viewport_size({"width": 1280, "height": 800})
+    sign_in(page, live_server.url, "/jobs/companies/map/")
+    expect(page.locator(".leaflet-control-zoom")).to_be_visible()
+    link = page.locator("[data-map-table]")
+    expect(link).to_have_accessible_name("Table")
+    assert link.bounding_box()["width"] > 60
+
+    link.hover()
+    page.wait_for_timeout(600)
+    link.focus()
+    page.wait_for_timeout(300)
+
+    expect(page.locator("[data-tooltip][popover]:popover-open")).to_have_count(0)

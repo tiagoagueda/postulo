@@ -509,6 +509,23 @@ def test_the_map_buttons_ask_for_their_tooltips_beside_them(client, user):
         assert f'<span id="{tip}" data-tooltip data-tooltip-place="start">' in html
 
 
+def test_the_table_link_loses_its_word_on_phones_but_keeps_it_and_has_a_tooltip(client, user):
+    """#916: the word is visually hidden below `sm`, not removed; "Table view" is its
+    tooltip, asked for below the link and for phones only."""
+    Company.objects.create(owner=user, name="One", location="Lisbon")
+
+    html = page(client, user).content.decode()
+
+    mark = html.index("data-map-table")
+    link = html[html.rindex("<a", 0, mark) : html.index("</a>", mark)]
+    assert '<span class="sr-only sm:not-sr-only">Table</span>' in link
+    assert 'aria-describedby="map-tip-table"' in link and "max-sm:size-9" in link
+    assert (
+        '<span id="map-tip-table" data-tooltip data-tooltip-place="below"'
+        " data-tooltip-narrow hidden>Table view</span>"
+    ) in html
+
+
 def test_the_map_buttons_have_their_tooltips(client, user):
     Company.objects.create(owner=user, name="One", location="Lisbon")
 

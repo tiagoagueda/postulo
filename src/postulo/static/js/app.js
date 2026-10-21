@@ -5263,6 +5263,14 @@
       }
       return;
     }
+    if (tip.hasAttribute("data-tooltip-narrow") && window.matchMedia("(min-width: 40rem)").matches) {
+      // A tooltip for a control that has lost its words on a phone (#916): from `sm` the
+      // words are drawn and the tooltip would only repeat them.
+      if (tipIsOpen(tip)) {
+        tip.hidePopover();
+      }
+      return;
+    }
     var seen = tipWindow();
     var from = anchor.getBoundingClientRect();
     if (!overlap(from, seen)) {
@@ -5369,6 +5377,10 @@
         if (document.querySelector('[aria-describedby~="' + id + '"], [aria-labelledby~="' + id + '"]')) {
           tip.setAttribute("popover", "manual");
           tip.setAttribute("role", "tooltip");
+          if (tip.hasAttribute("data-tooltip-narrow")) {
+            // Hidden by the server so that, with scripts off, it is not words in the page.
+            tip.removeAttribute("hidden");
+          }
         }
       }
     );
