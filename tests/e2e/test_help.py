@@ -94,7 +94,7 @@ FOCUSED = """() => {
     field: field ? box(field) : null,
     label: label ? box(label) : null,
     last: el.matches('button[type=submit]') && !el.closest('dialog'),
-    first: el.matches('#section-picture [data-help-mark]'),
+    first: el.matches('.page-title-help [data-help-mark]'),
   };
 }"""
 
@@ -577,7 +577,7 @@ def test_in_a_window_400_percent_zoom_leaves_every_stop_is_by_the_rule(
     if spacing:
         page.evaluate(ADOPT, TEXT_SPACING)
     page.locator(
-        "[data-picture] [data-help-mark]" if key == "Tab" else "main form button[type=submit]"
+        ".page-title-help [data-help-mark]" if key == "Tab" else "main form button[type=submit]"
     ).first.focus()
 
     failures: list[str] = []

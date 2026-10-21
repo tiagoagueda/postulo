@@ -138,6 +138,47 @@ TOPICS: dict[str, Topic] = {
             context=_pasted_whole,
         ),
         Topic(
+            slug="your-details",
+            title=_("Your details"),
+            summary=_(
+                "What Postulo knows about you as a candidate: the name, picture and contact "
+                "block your CVs print, and the numbers, addresses, links and identifiers "
+                "behind them."
+            ),
+            template="help/your_details.html",
+            back=_("Back to Your details"),
+        ),
+        Topic(
+            slug="cv-photo",
+            title=_("Your CV photo"),
+            summary=_(
+                "A photograph for your CVs, kept apart from your picture. It is kept as you "
+                "frame it, and a CV prints it only when you tick that on the CV. The plain "
+                "text and the Word file never carry it."
+            ),
+            template="help/cv_photo.html",
+        ),
+        Topic(
+            slug="personal-details",
+            title=_("Personal details"),
+            summary=_(
+                "All optional, and none of it is worked out from anything else. None of it "
+                "is printed until a CV is set to print it, one by one, under “Choose which "
+                "details” on the CV."
+            ),
+            template="help/personal_details.html",
+        ),
+        Topic(
+            slug="messaging",
+            title=_("Messaging"),
+            summary=_(
+                "How somebody is reached on Matrix, XMPP, Signal, Telegram or another "
+                "service, with one of them marked as the one to use. A telephone number that "
+                "is also on a messaging app belongs under Telephone numbers."
+            ),
+            template="help/messaging.html",
+        ),
+        Topic(
             slug="listings",
             title=_("Listings"),
             summary=_(

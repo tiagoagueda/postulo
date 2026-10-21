@@ -45,9 +45,12 @@ pytestmark = pytest.mark.django_db
 #: The cards of *Your details*, each with the topic its question mark opens.
 CARDS = {
     "section-picture": "your-picture",
+    "section-cv-photo": "cv-photo",
     "section-name": "your-name",
+    "section-personal": "personal-details",
     "section-contact": "contact-block",
     "section-phones": "telephone-numbers",
+    "section-messaging": "messaging",
     "section-links-social": "links",
     "section-links-repository": "links",
     "section-links-website": "links",
@@ -94,6 +97,8 @@ def paragraph(html: str, element_id: str) -> str:
 
 #: Topics of a page's heading rather than of a card of *Your details* (#839).
 PAGE_TOPICS = {
+    # Beside the heading of *Your details* itself (#918).
+    "your-details": "accounts:profile",
     "listings": "listings:list",
     "documents": "documents:cv_list",
     "calendar": "applications:calendar",
@@ -331,7 +336,7 @@ def test_every_card_has_its_question_mark_its_sentence_and_its_drawer(client, us
 
     for slug in set(CARDS.values()):
         assert html.count(f'<dialog id="help-{slug}"') == 1, slug
-    assert html.count("data-help-mark") == len(CARDS)
+    assert html.count("data-help-mark") == len(CARDS) + 1, "and one beside the heading"
 
 
 def test_a_card_is_named_by_its_own_name_and_shows_its_own_sentence(client, user):
@@ -553,9 +558,11 @@ def test_a_page_with_nothing_refused_has_its_tooltips(client, user):
 def test_what_to_type_stays_in_sight(client, user):
     """An instruction is read before the mistake, so it is no tooltip (#302): *Location*
     while there is no address to derive a line from, the telephone row a new number is
-    typed into and the single box that stands in for the rows, and on each card of links
-    what to do with an address. *Location* with a line in grey only explains it, and a
-    stored number's sentence only says how it is kept: those are tooltips."""
+    typed into and the single box that stands in for the rows. *Location* with a line in
+    grey only explains it, and a stored number's sentence only says how it is kept: those
+    are tooltips. What to do with an address on a card of links, and what may be pasted into
+    *Identifiers*, were in sight under their headings and are the second half of the card's
+    tooltip since #918: they stay in sight only while something is refused."""
     from postulo.core.models import PostalAddress
 
     numbered(user)
@@ -565,21 +572,29 @@ def test_what_to_type_stays_in_sight(client, user):
     assert "data-tooltip" in paragraph(html, "id_phone_numbers-0-number_helptext")
     assert "data-tooltip" not in paragraph(html, "id_phone_numbers-1-number_helptext")
 
+    assert "data-links-how" not in html and "data-identifiers-how" not in html
     said = {
         kind: " ".join(text.split())
         for kind, text in re.findall(
-            r'data-web-links="(\w+)".*?<p[^>]*data-links-how[^>]*>(.*?)</p>', html, re.S
+            r'data-web-links="(\w+)".*?<p[^>]*data-help-summary[^>]*>(.*?)</p>', html, re.S
         )
     }
     paste = (
         "Paste an address without choosing a service, and saving chooses it where the "
         "address is on one Postulo knows."
     )
-    assert said == {
-        "social": paste,
-        "repository": paste,
-        "website": "Left blank, the name is the address's host.",
-    }
+    for kind, blank in (
+        ("social", paste),
+        ("repository", paste),
+        ("website", "Left blank, the name is the address's host."),
+    ):
+        assert said[kind].endswith(blank), kind
+    sentence = re.search(
+        r"<p[^>]*data-tooltip[^>]*data-help-summary[^>]*>([^<]*An address on .*?)</p>",
+        card(html, "section-identifiers"),
+        re.S,
+    )
+    assert sentence and PASTED_WHOLE in " ".join(sentence.group(1).split())
 
     PostalAddress.objects.create(
         owner=user, holder=user.profile, municipality="Porto", country="PT", is_primary=True
@@ -744,3 +759,54 @@ def test_the_topics_page_leads_back_to_the_page(client, user, slug):
     ).content.decode()
 
     assert f'href="{reverse(url)}"' in page and str(help_topics.topic(slug).back) in page
+
+
+# --------------------------------- the same beside Your details, and under no heading (#918)
+
+
+def test_the_heading_of_your_details_has_a_question_mark_and_no_sentence_under_it(client, user):
+    """The mark follows the H1 and names the page's topic; the sentence is its tooltip and
+    the drawer holds the way to Settings. Nothing under the heading says what the page is."""
+    html = details(client, user)
+
+    heading = re.search(r'<div class="page-title-help">(.*?)<dialog', html, re.S)[1]
+    assert re.search(r"<h1[^>]*>\s*Your details\s*</h1>", heading)
+    assert 'data-opens-dialog="help-your-details"' in heading and "Help: Your details" in heading
+    summary = paragraph(html, re.search(r'aria-describedby="([^"]+)"', heading)[1])
+    assert "data-tooltip" in summary
+    sentence = str(help_topics.topic("your-details").summary)
+    assert html.count(sentence) == 1, "said once, as the topic's summary"
+    assert 'href="/settings/"' in html[html.index('<dialog id="help-your-details"') :]
+    # No paragraph under the heading, and none under a section's title.
+    assert "How\n          Postulo behaves for you" not in html
+    for anchor in ("section-cv-photo", "section-personal"):
+        header = re.search(r"<header[^>]*>.*?</header>", card(html, anchor), re.S)[0]
+        assert "data-help-mark" in header
+        assert "<p>" not in re.sub(r"<p[^>]*data-help-summary.*?</p>", "", header, flags=re.S)
+
+
+def test_a_new_card_has_its_help_where_the_old_paragraph_was(client, user):
+    """*Your CV photo*, *Personal details* and *Messaging* are cards with a question mark
+    and no text of their own under the title; the fieldsets of *Personal details* are
+    still described by its sentence."""
+    html = details(client, user)
+
+    part = card(html, "section-personal")
+    assert "data-tooltip" in paragraph(part, "personal-details-help")
+    assert part.count('aria-describedby="personal-details-help"') >= 3, "mark and fieldsets"
+    assert "All optional, and none of it is worked out" in html
+    assert 'data-opens-dialog="help-messaging"' in card(html, "section-messaging")
+    header = re.search(r"<header[^>]*>.*?</header>", card(html, "section-cv-photo"), re.S)[0]
+    assert "<p " not in re.sub(r"<p[^>]*data-help-summary.*?</p>", "", header, flags=re.S)
+
+
+def test_a_refusal_keeps_the_pages_sentence_under_its_heading(client, user):
+    """While anything on the page is refused no help is a tooltip, the heading's included."""
+    client.force_login(user)
+
+    html = client.post(
+        reverse("accounts:profile"), {"first_name": "Alex", "last_name": ""}
+    ).content.decode()
+
+    heading = re.search(r'<div class="page-title-help">(.*?)<dialog', html, re.S)[1]
+    assert "data-tooltip" not in heading and "data-help-summary" in heading

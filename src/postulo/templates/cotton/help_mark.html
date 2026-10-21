@@ -30,6 +30,10 @@
    something else on the page already names it -- the two menus of *Your name* are
    described by that card's sentence -- and is made up otherwise.
 
+   Whatever stands between the tags is said after the sentence, as part of it: an
+   instruction about what to type, which used to stand under the card's title and is now the
+   tooltip's second half (#918). It is in sight, as the sentence is, while something is refused.
+
    `data-turned` is the server saying the page's language writes a question mark turned
    round, as the Arabic script does (`question_mark_turned`); the stylesheet turns the
    icon by it.
@@ -42,5 +46,5 @@
 <a href="{% url 'core:help_topic' about.slug %}{% if anchor %}?next={{ request.path|urlencode:'' }}%23{{ anchor|urlencode:'' }}{% endif %}"
    target="_blank" rel="noopener" class="btn" data-variant="ghost" data-size="icon-xs" data-help-mark{% if turned %} data-turned{% endif %}
    data-opens-dialog="help-{{ about.slug }}" aria-describedby="{{ tip|default:made }}">{% icon "circle-question-mark" class="size-4" %}<span class="sr-only">{% blocktranslate trimmed with subject=subject|default:about.title %}Help: {{ subject }}{% endblocktranslate %}</span><span class="sr-only" data-new-tab> {% translate "(opens in a new tab)" %}</span></a>
-<p id="{{ tip|default:made }}"{% if not in_sight %} data-tooltip{% endif %} data-help-summary>{{ summary|default:about.summary }}</p>
+<p id="{{ tip|default:made }}"{% if not in_sight %} data-tooltip{% endif %} data-help-summary>{{ summary|default:about.summary }}{% if slot %} {{ slot }}{% endif %}</p>
 {% if not no_drawer %}<c-help-drawer :topic="about.slug" />{% endif %}

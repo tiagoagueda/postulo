@@ -14,10 +14,11 @@
    `card_help` is *Your details* as well (#302): each card has a question mark, named by
    the card and showing the card's own sentence, and they open one drawer, because the
    cards work the same way and their help is one topic. It is drawn once, after the cards.
-   What the paragraph under the rows says is in it, but for what it says about what to
-   type, which stays in sight under the legend, once per card: on a card with a choice of
-   service, that an address pasted with none chosen chooses its own; on one without, that
-   a name may be left blank. `refused` keeps the card's sentence under the legend. Without
+   What the paragraph under the rows says is in it. What to type -- on a card with a choice
+   of service, that an address pasted with none chosen chooses its own; on one without,
+   that a name may be left blank -- is said after the card's sentence, in the mark's
+   tooltip, and no longer in a paragraph of its own (#918, which reverses #302 for it);
+   `refused` keeps it under the legend with the sentence. Without
    `card_help` -- the contact form -- the sentence and the paragraph stay in sight, as they
    were, and the template draws what it drew before #302: each switch is written on the
    line of what it follows.
@@ -25,14 +26,7 @@
 {% for block in links %}
   <fieldset class="card mb-6" data-web-links="{{ block.kind }}"{% if block.kind == "social" %} data-one-per-service{% endif %} id="section-links-{{ block.kind }}">
     <legend class="legend-title">{{ block.block.legend }}</legend>{% if card_help %}
-    <c-help-mark topic="links" :subject="block.block.legend" :summary="block.block.intro" anchor="section-links-{{ block.kind }}" no_drawer :in_sight="refused" />
-    <p class="mb-3 text-sm text-ink-500 dark:text-ink-400" data-links-how>
-      {% if block.has_services %}
-        {% translate "Paste an address without choosing a service, and saving chooses it where the address is on one Postulo knows." %}
-      {% else %}
-        {% translate "Left blank, the name is the address's host." %}
-      {% endif %}
-    </p>{% else %}
+    <c-help-mark topic="links" :subject="block.block.legend" :summary="block.block.intro" anchor="section-links-{{ block.kind }}" no_drawer :in_sight="refused">{% if block.has_services %}{% translate "Paste an address without choosing a service, and saving chooses it where the address is on one Postulo knows." %}{% else %}{% translate "Left blank, the name is the address's host." %}{% endif %}</c-help-mark>{% else %}
     <p class="mb-3 text-sm text-ink-500 dark:text-ink-400">{{ block.block.intro }}</p>{% endif %}
     {{ block.management_form }}
     {% if block.non_form_errors %}

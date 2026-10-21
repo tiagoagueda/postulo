@@ -227,3 +227,28 @@ def test_the_map_pin_asks_before_it_is_turned_on(page: Page, live_server, detail
     expect(box).to_be_checked()
     pin.click()  # turning it off asks nothing
     expect(box).not_to_be_checked()
+
+
+@pytest.mark.parametrize("width", [390, 1280])
+def test_the_heading_has_its_question_mark_and_no_sentence_under_it(
+    page: Page, live_server, details, width
+):
+    """A question mark follows the H1 at every width, its 24px target in sight, with the
+    page's sentence as its tooltip and no paragraph under the heading (#918)."""
+    page.set_viewport_size({"width": width, "height": 900})
+    sign_in(page, live_server.url, "/accounts/profile/")
+    heading = page.locator("main h1").first
+    mark = page.locator(".page-title-help [data-help-mark]")
+    expect(heading).to_be_visible()
+    expect(mark).to_be_visible()
+    box, target = heading.bounding_box(), mark.bounding_box()
+    assert target["width"] >= 24 and target["height"] >= 24, target
+    assert abs((target["y"] + target["height"] / 2) - (box["y"] + box["height"] / 2)) <= 12
+    assert target["x"] + target["width"] <= width
+    # With scripts on the sentence is the tooltip: nothing is drawn under the heading.
+    expect(page.locator(".page-title-help [data-help-summary]")).not_to_be_visible()
+    mark.focus()
+    expect(page.locator(".page-title-help [data-help-summary]")).to_be_visible()
+    assert page.evaluate("() => document.documentElement.scrollWidth <= window.innerWidth + 1")
+    for card in ("section-cv-photo", "section-personal", "section-messaging"):
+        expect(page.locator(f"#{card} [data-help-mark]").first).to_be_visible()

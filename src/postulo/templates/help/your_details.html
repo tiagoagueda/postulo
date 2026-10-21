@@ -1,0 +1,25 @@
+{% load i18n %}
+{% comment %} The help of *Your details* as a page (#918), drawn by the page's drawer and by the page at /help/your-details/. It is what the line under the heading used to say, with the way to Settings that was in it. {% endcomment %}
+<p>
+  {% blocktranslate trimmed %}
+    This page is what Postulo knows about you as a candidate. The name, the picture and the
+    contact block are what your CVs and letters print at their top; the telephone numbers,
+    messaging handles, postal addresses, links and identifiers are behind the contact block,
+    and a CV prints the ones its own <em>Settings</em> choose.
+  {% endblocktranslate %}
+</p>
+<p>
+  {% blocktranslate trimmed %}
+    Each part has a question mark of its own, beside its title, with one sentence about it
+    when you rest on it and the whole of its help when you press it. <em>Save</em> at the
+    bottom keeps everything you changed; removing a saved row asks first and takes effect at
+    once.
+  {% endblocktranslate %}
+</p>
+<p>
+  {% url 'settings:index' as settings_url %}
+  {% blocktranslate trimmed %}
+    How Postulo behaves for you, such as its theme, its language and your account, is not
+    here: it is under <a href="{{ settings_url }}" class="underline">Settings</a>.
+  {% endblocktranslate %}
+</p>
