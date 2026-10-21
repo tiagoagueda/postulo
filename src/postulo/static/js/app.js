@@ -5467,6 +5467,20 @@
         if (event.key !== "Escape" || event.isComposing) {
           return;
         }
+        // The button that opened a panel that is open has said what it is (#917): its tooltip
+        // does not take the key, the panel does. Decided here, from what is open now, and not
+        // only when the panel opened, so a tooltip placed a frame late, or a place made afresh
+        // by a pointer that came to rest on the button, cannot take the first Escape. A panel
+        // opened by something else (the *New* menu) leaves the tooltip its Escape.
+        [tipFocus, tipHover].forEach(function (place) {
+          var target =
+            place && place.anchor.matches("[popovertarget]")
+              ? document.getElementById(place.anchor.getAttribute("popovertarget"))
+              : null;
+          if (target && target.matches(":popover-open")) {
+            place.spent = true;
+          }
+        });
         var showing = function (place) {
           return !!place && !place.spent && place.tips.some(tipIsOpen);
         };
