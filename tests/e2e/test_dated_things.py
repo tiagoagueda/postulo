@@ -61,10 +61,14 @@ def dated(applicant):
     return {"application": application, "reminder": reminder}
 
 
-def test_putting_a_reminder_off_moves_it_where_it_stands(page: Page, live_server, dated):
+def test_putting_a_reminder_off_moves_it_where_it_stands(page: Page, live_server, dated, applicant):
     """The row stays and its date changes. A reminder put off until next week is still
     outstanding and still this application's; what was wrong with it was the day."""
+    import zoneinfo
+
     from django.utils import formats, timezone
+
+    from postulo.core.preferences import instance_zone
 
     reminder = dated["reminder"]
     sign_in(page, live_server.url)
@@ -75,7 +79,11 @@ def test_putting_a_reminder_off_moves_it_where_it_stands(page: Page, live_server
     block.locator("button[popovertarget]").click()
     block.get_by_role("menuitem", name="Put off until next week").click()
 
-    next_week = timezone.localtime(timezone.now() + dt.timedelta(days=7))
+    # The day in the zone the page is drawn in -- the person's, else the instance's -- and not
+    # in the test process's: between 22:00 and midnight UTC the two are different days, and
+    # this failed every evening for those two hours.
+    zone = zoneinfo.ZoneInfo(applicant.profile.time_zone or instance_zone())
+    next_week = (timezone.now() + dt.timedelta(days=7)).astimezone(zone)
     expect(block).to_contain_text("Chase them")
     # The row writes the day the language writes it: a named format, never one written
     # out (the rule in CONTRIBUTING). A hard-coded "%d" zero-pads the day the app's "j"
