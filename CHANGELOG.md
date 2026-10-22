@@ -168,6 +168,7 @@ All notable changes to Postulo are recorded here. The format follows
 - Your details has one help pattern: a question mark after the heading and at the top right of every section, with a tooltip and the full text in a drawer, and no helper text under any heading. (#918)
 - Form of address, pronouns and gender are stored as language-neutral concepts (`he`, `doctor_f`) and drawn in the language of the page or document; only "Other" stays free text. The profile API returns `{key, label}` for each. (#921)
 - Telephone numbers, postal addresses and social profiles work the same for a company, a contact and Your details: the star, the bin that removes a row at once and the help mark on all three, a browser fills a phone number only on your own, and a contact's card on its company's page lists its addresses. (#934)
+- Form of address, pronouns and gender are stored as language-neutral concepts (`he`, `doctor_f`) and drawn in the language of the page or document; only "Other" stays free text. The profile API returns `{key, label}` for each. (#921)
 - The instructions for AI assistants moved from CLAUDE.md to AGENTS.md, which Codex, Copilot, Cursor and others read; CLAUDE.md only imports it (#939)
 - The section menu of Your details has an icon on every entry, and Your CV photo is in it. (#920)
 - A social profile is one to a service: a service another row uses is greyed out in the menu and a second one is refused, except Other and services on many servers such as Mastodon; rows that already share one are kept and flagged. (#925)
