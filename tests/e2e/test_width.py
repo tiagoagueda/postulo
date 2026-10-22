@@ -70,8 +70,10 @@ def company_form_parts(page: Page) -> tuple[dict, dict, dict]:
     # The column beside the details: numbers, addresses and identifiers (#329).
     identifiers = page.locator("main form [data-company-rows]").bounding_box()
     # By its type rather than its name: the right-to-left test reads the page in Arabic.
-    # The last: the logo dialog's own forms come before the form this is about (#853).
-    save = page.locator('main form button[type="submit"]').last.bounding_box()
+    # Of the company's own form, the only one with no `action`: the logo dialog's forms come
+    # before it (#853), and the names and hiring forms after it (#917, #941), each with
+    # submit buttons of its own.
+    save = page.locator('main form:not([action]) button[type="submit"]').last.bounding_box()
     assert details and identifiers and save
     return details, identifiers, save
 
