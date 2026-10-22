@@ -589,7 +589,10 @@ def test_editing_a_reminder_moves_it_and_unstamps_it(client, user, application):
     reminder = a_reminder(user, application, due_at=timezone.now() - dt.timedelta(hours=1))
     Reminder.objects.filter(pk=reminder.pk).update(notified_at=timezone.now())
     client.force_login(user)
-    when = timezone.localtime(timezone.now() + dt.timedelta(days=3)).strftime("%Y-%m-%dT%H:%M")
+    # Noon, three days on: a time of day that is never the hour a clock change repeats. The
+    # same hour three days on, taken from now, was 02:30 on the Sunday the clocks went back
+    # whenever the suite ran at 02:30, and the form refuses a time that happens twice.
+    when = (timezone.localdate() + dt.timedelta(days=3)).strftime("%Y-%m-%dT12:00")
 
     response = client.post(
         reverse("applications:reminder_update", args=[reminder.pk]),
