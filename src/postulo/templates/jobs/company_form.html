@@ -166,11 +166,11 @@
       </fieldset>
       {% comment %} What the company answers on and where it is (#329), the rows a contact
          has, above its identifiers. {% endcomment %}
-      {% if numbers %}{% include "partials/phone_numbers.html" %}{% endif %}
-      {% include "partials/postal_addresses.html" %}
+      {% if numbers %}{% include "partials/phone_numbers.html" with remove_at_once=True card_help=True tips=tips refused=refused %}{% endif %}
+      {% include "partials/postal_addresses.html" with remove_at_once=True card_help=True tips=tips refused=refused %}
       {% comment %} Its social profiles (#906), the rows a contact's are, while *Several social
          profiles* is on; the one box beside the website while it is off. {% endcomment %}
-      {% include "partials/web_links.html" %}
+      {% include "partials/web_links.html" with remove_at_once=True card_help=True tips=tips refused=refused %}
       <fieldset class="card mb-6" data-identifiers id="section-identifiers">
         <legend class="legend-title">{% translate "Identifiers" %}</legend>
         <p class="mb-3 text-sm text-ink-500 dark:text-ink-400">
@@ -315,6 +315,7 @@
      and then, without saving the rest of the form (#857). The dialogs are drawn after the form,
      because a form cannot hold another and the bins sit inside it; the script that does it is
      the one *Your details* uses. {% endcomment %}
+  {% include "jobs/partials/row_removals.html" with whose="company" %}
   {% for removal in identifier_removals %}
     <c-dialog id="{{ removal.dialog }}" action="{{ removal.action }}" live data-remove-row data-gone-said="{{ removal.already_gone }}">
       <c-slot name="title">{% blocktranslate trimmed with what=removal.value %}Remove <bdi>{{ what }}</bdi>?{% endblocktranslate %}</c-slot>

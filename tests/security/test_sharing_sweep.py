@@ -45,6 +45,8 @@ READ = {
 WRITE = {
     "jobs:company_cell",
     "jobs:company_identifier_remove",
+    "jobs:company_remove_row",
+    "jobs:contact_remove_row",
     "jobs:company_wikidata",
     "jobs:company_names",
     "jobs:company_signal_add",

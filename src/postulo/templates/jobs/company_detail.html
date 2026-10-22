@@ -467,6 +467,14 @@
                     {% if contact.email %}
                       <p class="truncate text-xs text-ink-500 dark:text-ink-400">{{ contact.email }}</p>
                     {% endif %}
+                    {% comment %} Its addresses as the company's own are listed above (#934): each
+                       on a line of its own, the kind first. No feature governs them, so all are
+                       shown, to whoever may see the contact. {% endcomment %}
+                    {% for address in contact.postal_addresses.all %}
+                      <p class="text-xs text-ink-500 dark:text-ink-400" data-contact-address>
+                        {% if address.kind %}<span class="text-ink-400 dark:text-ink-500">{% if address.kind == "other" %}{{ address.label }}{% else %}{{ address.get_kind_display }}{% endif %}</span> {% endif %}<bdi>{{ address.one_line }}</bdi>
+                      </p>
+                    {% endfor %}
                     {% for link in contact.web_links.all %}
                       {% if link.is_primary or link.kind in several_links %}
                         <p class="wrap-anywhere text-xs text-ink-500 dark:text-ink-400">

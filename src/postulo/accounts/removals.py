@@ -72,6 +72,30 @@ def rows(kind: Kind, person) -> models.QuerySet:
     )
 
 
+#: The blocks a company's or a contact's page can take a row off at once (#934). Not the
+#: messaging handles (a contact's keep their *Remove* box) nor the identifiers (not rows of
+#: this kind at all): the three blocks the shared partials draw for every holder.
+HOLDER_KINDS: dict[str, Kind] = {kind.name: kind for kind in (NUMBER, LINK, ADDRESS)}
+
+
+def holder_rows(kind: Kind, holder) -> models.QuerySet:
+    """The rows of this kind held by a company or a contact, and nothing else.
+
+    Whose page it is -- and whether the reader may write to it -- is the caller's question,
+    asked of the holder; this is only the holder's own rows, so that a row of another
+    holder is a 404 whatever its key.
+    """
+    return kind.model._default_manager.filter(
+        content_type=ContentType.objects.get_for_model(type(holder)), object_id=holder.pk
+    )
+
+
+def holder_action(holder, kind: Kind, pk: int) -> str:
+    """The address that takes one row off a company's or a contact's page."""
+    name = "company" if holder._meta.model_name == "company" else "contact"
+    return reverse(f"jobs:{name}_remove_row", args=[holder.pk, kind.name, pk])
+
+
 def offered(kind: Kind, person, row) -> bool:
     """Whether the block this row sits in is on the page at all.
 
@@ -202,6 +226,9 @@ class Removal:
     #: Whether taking it off hands the primary to another row, which the dialog says. True
     #: as the page is drawn; `app.js` keeps the sentence true as rows go without a reload.
     hands_on: bool
+    #: The address that removes it, for a row on a company's or a contact's page; the
+    #: profile's rows have an address per kind (`accounts:remove_<kind>`).
+    url: str = ""
 
     @property
     def already_gone(self) -> str:
@@ -217,16 +244,18 @@ class Removal:
 
     @property
     def action(self) -> str:
-        return reverse(f"accounts:remove_{self.kind.name}", args=[self.pk])
+        return self.url or reverse(f"accounts:remove_{self.kind.name}", args=[self.pk])
 
 
-def offer(kind: Kind, formset) -> list[Removal]:
+def offer(kind: Kind, formset, holder=None) -> list[Removal]:
     """Mark each saved row of a block with what taking it off would be, and list them.
 
     Read from the table rather than from the forms: after a save that was refused, a form's
     instance carries what was typed into it, and the dialog is about the row as it is kept.
     A row already taken off by a removal -- posted back as its key and its removal -- has no
     instance any more and is offered nothing.
+
+    ``holder`` is a company or a contact (#934): the rows then go by that holder's address.
     """
     saved = [form for form in formset.initial_forms if form.instance.pk]
     kept = kind.model._default_manager.in_bulk([form.instance.pk for form in saved])
@@ -240,6 +269,7 @@ def offer(kind: Kind, formset) -> list[Removal]:
             pk=row.pk,
             value=words(kind, row),
             hands_on=bool(getattr(row, "is_primary", False)) and len(saved) > 1,
+            url=holder_action(holder, kind, row.pk) if holder is not None else "",
         )
         form.removal = removal
         found.append(removal)

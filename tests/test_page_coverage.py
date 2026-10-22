@@ -181,6 +181,14 @@ EXCUSED: dict[str, str] = {
         "a POST from a row's dialog on Your details, answered with a redirect back to it, "
         "or JSON for the script; a GET is that redirect and nothing else"
     ),
+    "jobs:company_remove_row": (
+        "a POST from a row's dialog on a company's form, answered with a redirect back to it, "
+        "or JSON for the script; a GET is that redirect and nothing else (#934)"
+    ),
+    "jobs:contact_remove_row": (
+        "a POST from a row's dialog on a contact's form, answered with a redirect back to it, "
+        "or JSON for the script; a GET is that redirect and nothing else (#934)"
+    ),
     "jobs:company_wikidata": (
         "what a press of Fetch from Wikidata brought back, held in the session; without a "
         "fetch it sends you to the company's page, so the walk never finds it drawn (#673)"

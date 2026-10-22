@@ -51,7 +51,7 @@
   {% with box=widget.subwidgets.1 %}
     <input type="text" name="{{ box.name }}" id="{{ box.attrs.id }}"
            value="{{ box.value|default_if_none:'' }}"
-           inputmode="tel" autocomplete="tel"{% if widget.described_by %} aria-describedby="{{ widget.described_by }}"{% endif %}{% if widget.invalid %} aria-invalid="{{ widget.invalid }}"{% endif %}>
+           inputmode="tel" autocomplete="{{ box.attrs.autocomplete|default:'off' }}"{% if widget.described_by %} aria-describedby="{{ widget.described_by }}"{% endif %}{% if widget.invalid %} aria-invalid="{{ widget.invalid }}"{% endif %}>
   {% endwith %}
 </div>
 {% comment %} The number already stored, where the numbering plan has something to say about

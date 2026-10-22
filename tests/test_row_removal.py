@@ -558,18 +558,21 @@ def test_primary_is_a_star_and_the_boxes_are_gone(client, user):
     assert f"remove-number-{number.pk}" in html
 
 
-def test_the_contact_form_keeps_its_boxes(client, user):
-    """The same partials, and the contact form does what it always did (#303 leaves it)."""
+def test_the_contact_form_has_the_same_star_and_bin(client, user):
+    """The same partials, the same controls (#934): a contact's saved row has the star and the
+    bin that asks and removes it at once, and no Remove box; it was the one form that kept
+    the box while Your details was given the bin (#303)."""
     someone = contact(user)
-    a_number(user, holder=someone, primary=True)
+    row = a_number(user, holder=someone, primary=True)
     client.force_login(user)
 
     html = client.get(reverse("jobs:contact_update", args=[someone.pk])).content.decode()
 
-    assert 'name="phone_numbers-0-DELETE"' in html
-    assert "primary-choice" not in html
-    assert "data-remove-trigger" not in html
-    assert "<dialog" not in html.replace('<dialog popover id="leave-dialog"', "")
+    assert 'name="phone_numbers-0-DELETE"' not in html
+    assert "primary-choice" in html
+    assert "data-remove-trigger" in html
+    assert f"remove-number-{row.pk}" in html
+    assert reverse("jobs:contact_remove_row", args=[someone.pk, "number", row.pk]) in html
 
 
 def test_the_company_form_takes_an_identifier_off_by_its_bin_too(client, user):

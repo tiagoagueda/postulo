@@ -167,6 +167,7 @@ All notable changes to Postulo are recorded here. The format follows
 - On the companies' map, the Zoom in, Zoom out and Near me tooltips appear beside their button, towards the map, instead of over the neighbouring button; tooltips can now ask for a side (`data-tooltip-place`). (#915)
 - Your details has one help pattern: a question mark after the heading and at the top right of every section, with a tooltip and the full text in a drawer, and no helper text under any heading. (#918)
 - Form of address, pronouns and gender are stored as language-neutral concepts (`he`, `doctor_f`) and drawn in the language of the page or document; only "Other" stays free text. The profile API returns `{key, label}` for each. (#921)
+- Telephone numbers, postal addresses and social profiles work the same for a company, a contact and Your details: the star, the bin that removes a row at once and the help mark on all three, a browser fills a phone number only on your own, and a contact's card on its company's page lists its addresses. (#934)
 - The instructions for AI assistants moved from CLAUDE.md to AGENTS.md, which Codex, Copilot, Cursor and others read; CLAUDE.md only imports it (#939)
 - The section menu of Your details has an icon on every entry, and Your CV photo is in it. (#920)
 - A social profile is one to a service: a service another row uses is greyed out in the menu and a second one is refused, except Other and services on many servers such as Mastodon; rows that already share one are kept and flagged. (#925)
@@ -263,6 +264,7 @@ All notable changes to Postulo are recorded here. The format follows
 - A company register number is checked against its country's check digit (France, Czechia, Norway, Finland, Estonia, Poland) and links to the register's own page (seven countries) or the EU business-register search, all offline. (#935)
 - Date pickers of Postulo's own beside every date box, and on the calendar one per view: months, a week, a day, and a range for the agenda, which now takes an end day (`until=`) (#933)
 - A company has a status: its legal state (active, in administration, acquired, dissolved) and dated hiring signals, shown by its name, in the table and on the map, and as a notice on its listings. (#941)
+- A company's vCard carries its mailbox, every number and address, its website and its social profiles, and importing one reads them back; the API takes and returns `phone_numbers`, `postal_addresses` and `web_links` on a contact as on a company. (#934)
 - A code of conduct, the Contributor Covenant 2.1, for issues, pull requests and Weblate, with reports to the maintainer's address (#1007)
 - An accessibility statement, ACCESSIBILITY.md: WCAG 2.2 AA as the aim, how it is checked, the known limits, and how to report a barrier without an account (#1008)
 
@@ -389,6 +391,10 @@ All notable changes to Postulo are recorded here. The format follows
 - Capturing a page without JSON-LD, or from a board with a recipe, now parses its HTML once instead of seven or eight times, so large pages and the extension's batch capture stop tying up a worker. (#591)
 - Setting a profile picture or company logo from a phone photo no longer holds a web worker for seconds: the picture is bounded to 2048 pixels and encoded at most twice (#482)
 - Binding a capture to a listing you already have now empties the review data kept on the capture, as saving and discarding already did (#523)
+
+### ⚠️ Deprecated
+
+- API: a contact's single `phone`, `phone_country` and `linkedin_url` are deprecated in favour of its `phone_numbers` and `web_links` lists; they are still taken and returned, and will be removed in a later release. (#934)
 
 ## [0.4.0] — 2026-10-04
 

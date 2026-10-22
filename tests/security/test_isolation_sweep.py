@@ -405,6 +405,24 @@ def postal_address(owner):
     )
 
 
+def number_on_a_company(owner):
+    """A telephone number on somebody else's company, taken off at once (#934)."""
+    from postulo.core.models import PhoneNumber
+
+    held = company(owner)
+    row = PhoneNumber.objects.create(owner=owner, holder=held, number="+351211234567")
+    return {"holder_pk": held.pk, "kind": "number", "pk": row.pk}
+
+
+def address_on_a_contact(owner):
+    """An address on somebody else's contact, taken off at once (#934)."""
+    from postulo.core.models import PostalAddress
+
+    held = contact(owner)
+    row = PostalAddress.objects.create(owner=owner, holder=held, street="Their street 1")
+    return {"holder_pk": held.pk, "kind": "address", "pk": row.pk}
+
+
 def person_identifier(owner):
     from postulo.accounts.models import PersonIdentifier
 
@@ -460,6 +478,9 @@ FACTORIES: dict[str, Callable] = {
     "accounts:remove_messaging": pk_of(messaging_handle),
     "accounts:remove_address": pk_of(postal_address),
     "accounts:remove_identifier": pk_of(person_identifier),
+    # a row taken off a company's or a contact's page at once (#934)
+    "jobs:company_remove_row": number_on_a_company,
+    "jobs:contact_remove_row": address_on_a_contact,
     "api:token_revoke": pk_of(token),
     # one of the other person's groups, which this one is not in (#896)
     "accounts:group_leave": pk_of(their_group),

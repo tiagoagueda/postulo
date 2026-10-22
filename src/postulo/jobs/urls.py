@@ -52,6 +52,12 @@ urlpatterns = [
     path("companies/new/", views.CompanyCreateView.as_view(), name="company_create"),
     path("companies/<int:pk>/", views.CompanyDetailView.as_view(), name="company_detail"),
     path("companies/<int:pk>/edit/", views.CompanyUpdateView.as_view(), name="company_update"),
+    # One telephone number, address or link taken off at once, after its dialog asked (#934).
+    path(
+        "companies/<int:holder_pk>/remove/<slug:kind>/<int:pk>/",
+        views.RemoveCompanyRowView.as_view(),
+        name="company_remove_row",
+    ),
     path(
         "companies/<int:pk>/cell/<slug:column>/",
         views.CompanyCellView.as_view(),
@@ -76,6 +82,11 @@ urlpatterns = [
     path("industries/<int:pk>/delete/", views.IndustryDeleteView.as_view(), name="industry_delete"),
     path("contacts/new/", views.ContactCreateView.as_view(), name="contact_create"),
     path("contacts/<int:pk>/edit/", views.ContactUpdateView.as_view(), name="contact_update"),
+    path(
+        "contacts/<int:holder_pk>/remove/<slug:kind>/<int:pk>/",
+        views.RemoveContactRowView.as_view(),
+        name="contact_remove_row",
+    ),
     path("contacts/<int:pk>/delete/", views.ContactDeleteView.as_view(), name="contact_delete"),
     path("contacts/<int:pk>/export/", views.ContactExportView.as_view(), name="contact_export"),
     path("contacts/<int:pk>/merge/", views.ContactMergeView.as_view(), name="contact_merge"),

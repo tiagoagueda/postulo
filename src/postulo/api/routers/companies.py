@@ -149,6 +149,44 @@ def add_company(request, payload: CompanyIn):
     return Status(201, company_out(_detail(request, company.pk), detail=True))
 
 
+def _number_rows(numbers) -> list[dict]:
+    """The numbers of a payload as rows to write, each checked against its country's
+    numbering plan as the page checks it; an impossible one is a 422. The same for a company
+    and a contact (#934)."""
+    from postulo.core import phones
+    from postulo.core.models import PhoneNumber
+
+    rows = []
+    for row in numbers:
+        if row.kind and row.kind not in PhoneNumber.Kind.values:
+            raise HttpError(422, _("%(kind)s is not a kind of number.") % {"kind": row.kind})
+        verdict = phones.check(row.number, row.country)
+        if verdict.impossible:
+            raise HttpError(422, verdict.sentence(notes=True))
+        rows.append(
+            {
+                "number": phones.combine(row.number, row.country),
+                "kind": row.kind,
+                "label": row.label if row.kind == PhoneNumber.Kind.OTHER else "",
+                "is_primary": row.is_primary,
+            }
+        )
+    return rows
+
+
+def _checked_addresses(addresses) -> list[dict]:
+    """The addresses of a payload as rows to write: the kind checked, the country in capitals.
+    The same for a company and a contact (#934)."""
+    from postulo.core.models import PostalAddress
+
+    rows = []
+    for row in addresses:
+        if row.kind and row.kind not in PostalAddress.Kind.values:
+            raise HttpError(422, _("%(kind)s is not a kind of address.") % {"kind": row.kind})
+        rows.append({**row.dict(), "country": (row.country or "").upper()})
+    return rows
+
+
 def _set_status(request, company: Company, data: dict) -> None:
     """The company's legal state from a payload (#941), checked as the form checks it.
 
@@ -201,8 +239,7 @@ def _write_reached(
     from django.core.exceptions import ValidationError
     from django.core.validators import validate_email
 
-    from postulo.core import importer, phones
-    from postulo.core.models import PhoneNumber, PostalAddress
+    from postulo.core import importer
 
     if email is not None:
         email = email.strip()
@@ -214,30 +251,12 @@ def _write_reached(
         company.email = email
         company.save(update_fields=["email", "updated_at"])
     if numbers is not None:
-        rows = []
-        for row in numbers:
-            if row.kind and row.kind not in PhoneNumber.Kind.values:
-                raise HttpError(422, _("%(kind)s is not a kind of number.") % {"kind": row.kind})
-            verdict = phones.check(row.number, row.country)
-            if verdict.impossible:
-                raise HttpError(422, verdict.sentence(notes=True))
-            rows.append(
-                {
-                    "number": phones.combine(row.number, row.country),
-                    "kind": row.kind,
-                    "label": row.label if row.kind == PhoneNumber.Kind.OTHER else "",
-                    "is_primary": row.is_primary,
-                }
-            )
+        rows = _number_rows(numbers)
         if replace:
             company.phone_numbers.all().delete()
         importer._restore_phone_numbers(company, owner, rows)
     if addresses is not None:
-        rows = []
-        for row in addresses:
-            if row.kind and row.kind not in PostalAddress.Kind.values:
-                raise HttpError(422, _("%(kind)s is not a kind of address.") % {"kind": row.kind})
-            rows.append({**row.dict(), "country": (row.country or "").upper()})
+        rows = _checked_addresses(addresses)
         if replace:
             company.postal_addresses.all().delete()
         importer._restore_postal_addresses(
@@ -432,7 +451,7 @@ def remove_signal(request, pk: int, signal_id: int):
 def add_contact(request, pk: int, payload: ContactIn):
     from django.core.exceptions import ValidationError
 
-    from postulo.core import messaging_handles, phone_numbers, phones, web_links
+    from postulo.core import importer, messaging_handles, phones, web_links
 
     # Write access, not read (#328): a company shared read-only is a 404 here, as it is for
     # a change to the company itself.
@@ -459,25 +478,22 @@ def add_contact(request, pk: int, payload: ContactIn):
         handles = messaging_handles.checked_rows(handles)
     except ValidationError as exc:
         raise HttpError(422, "; ".join(exc.messages)) from exc
-    # One number in the payload, as there has always been, written to the row that holds
-    # it. A client sending a number somebody here already has is told so rather than
-    # silently given a contact without one.
-    number = (fields.pop("phone", "") or "").strip()
-    # Checked against its country's numbering plan as the field on the page checks it
-    # (#304), and for the same reason: a number that cannot exist is refused with why,
-    # and one the plan cannot place is kept as it came. The country is the number's own,
-    # where it starts with `+`, and `phone_country` otherwise: the chooser beside the box,
-    # for a client that holds a national number and knows where it is. With neither, a
-    # national number is refused in the words the page uses. A contact has notes, so a
-    # refusal that leaves something out says where it can go.
+    # The lists, checked as a company's are; the single number is the earlier shape of the
+    # same thing (deprecated, #934) and joins them as the primary when none of them is.
+    number_rows = _number_rows(payload.phone_numbers)
+    address_rows = _checked_addresses(payload.postal_addresses)
+    fields.pop("phone_numbers", None)
+    fields.pop("postal_addresses", None)
+    single = (fields.pop("phone", "") or "").strip()
     country = fields.pop("phone_country", "")
-    verdict = phones.check(number, country)
-    if verdict.impossible:
-        raise HttpError(422, verdict.sentence(notes=True))
-    # A contact's number is one this account recorded, never one it is, so it collides with
-    # nothing on the instance and nothing is asked or spent (#329; the bound of #142 and
-    # #374 is for a person's own numbers).
-    number = phones.combine(number, country)
+    if single:
+        verdict = phones.check(single, country)
+        if verdict.impossible:
+            raise HttpError(422, verdict.sentence(notes=True))
+        single = phones.combine(single, country)
+        if phones.normalise(single) not in {phones.normalise(r["number"]) for r in number_rows}:
+            leads = not any(r["is_primary"] for r in number_rows)
+            number_rows.insert(0, {"number": single, "kind": "", "label": "", "is_primary": leads})
     notes = fields.pop("notes", "") or ""
     # The one service that makes a contact (#328): the same checks as every writer, and the
     # change in the contact's trail under this token's name.
@@ -487,8 +503,13 @@ def add_contact(request, pk: int, payload: ContactIn):
         )
     except WriteRefused as exc:
         raise HttpError(422, str(exc)) from exc
-    if number:
-        phone_numbers.save_only_number(contact, request.auth.owner, number)
+    # A contact's number is one this account recorded, never one it is, so it collides with
+    # nothing on the instance and nothing is asked or spent (#329; the bound of #142 and
+    # #374 is for a person's own numbers).
+    importer._restore_phone_numbers(contact, request.auth.owner, number_rows)
+    importer._restore_postal_addresses(
+        contact, request.auth.owner, importer._address_rows({"postal_addresses": address_rows})
+    )
     web_links.add_links(contact, request.auth.owner, links)
     messaging_handles.add_handles(contact, request.auth.owner, handles)
     return Status(201, contact_out(contact))

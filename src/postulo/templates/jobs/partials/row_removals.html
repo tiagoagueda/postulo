@@ -1,0 +1,19 @@
+{% load i18n %}
+{% comment %} A saved telephone number, address or link is taken off by its bin, which asks here
+   and removes it there and then, without saving the rest of the form (#934): the contract
+   *Your details* has (#303), for a company's and a contact's page too. The dialogs are drawn
+   after the form, because a form cannot hold another and the bins sit inside it; the script
+   that does it is the one *Your details* uses. `whose` is `company` or `contact`. {% endcomment %}
+{% for removal in removals %}
+  <c-dialog id="{{ removal.dialog }}" action="{{ removal.action }}" live data-remove-row data-gone-said="{{ removal.already_gone }}">
+    <c-slot name="title">{% blocktranslate trimmed with what=removal.value %}Remove <bdi>{{ what }}</bdi>?{% endblocktranslate %}</c-slot>
+    <c-slot name="description">
+      {% if whose == "company" %}{% translate "It comes off this company now, without waiting for Save, and cannot be put back." %}{% else %}{% translate "It comes off this contact now, without waiting for Save, and cannot be put back." %}{% endif %}
+      {% if removal.kind.has_primary %}<span data-hands-on{% if not removal.hands_on %} hidden{% endif %}>{% translate "The next one in the list becomes the primary." %}</span>{% endif %}
+      <noscript>{% translate "Anything else you have changed on this page and not saved is lost." %}</noscript>
+    </c-slot>
+    <c-slot name="footer">
+      <button type="submit" class="btn" data-variant="destructive">{% translate "Remove" %}</button>
+    </c-slot>
+  </c-dialog>
+{% endfor %}

@@ -23,6 +23,7 @@ number yet, so the control does not appear.
 from __future__ import annotations
 
 import contextlib
+import re
 from datetime import timedelta
 
 import pytest
@@ -318,8 +319,11 @@ def test_a_contacts_rows_never_offer_the_choice(client, user):
     block = block[: block.index("</fieldset>")]
     assert 'name="phone_numbers-0-number_1"' in block, "the rows are there"
     assert "data-recovery-choice" not in theirs
-    assert "Gets me back in" not in theirs and "gets you back in" not in theirs
-    assert 'name="phone_numbers-primary"' in block and "phone_numbers-0-DELETE" in block
+    # The rows, not the card's help drawer, which is the topic's one text for every holder.
+    rows = re.sub(r"<dialog.*?</dialog>", "", theirs, flags=re.S)
+    assert "Gets me back in" not in rows and "gets you back in" not in rows
+    assert 'name="phone_numbers-primary"' in block and "primary-choice" in block
+    assert "phone_numbers-0-DELETE" not in block, "a bin, since #934"
     assert "data-recovery-choice" in mine and "Gets me back in" in mine
 
 

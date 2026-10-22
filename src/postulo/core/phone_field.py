@@ -76,7 +76,11 @@ class PhoneWidget(forms.MultiWidget):
                 forms.TextInput(
                     attrs={
                         "inputmode": "tel",
-                        "autocomplete": "tel",
+                        # Off until the field says the number is the reader's own
+                        # (`PhoneField(own=True)`): a browser fills "tel" with the
+                        # reader's number, which on a company's or a contact's row is the
+                        # wrong person's (#934).
+                        "autocomplete": "off",
                         **(attrs or {}),
                     }
                 ),
@@ -167,7 +171,9 @@ class PhoneField(forms.MultiValueField):
 
     widget = PhoneWidget
 
-    def __init__(self, *, default_country: str = "", has_notes: bool = False, **kwargs):
+    def __init__(
+        self, *, default_country: str = "", has_notes: bool = False, own: bool = False, **kwargs
+    ):
         kwargs.setdefault("require_all_fields", False)
         kwargs.setdefault("help_text", HELP)
         fields = (
@@ -181,6 +187,11 @@ class PhoneField(forms.MultiValueField):
         self.has_notes = has_notes
         self.widget.default_country = default_country
         self.widget.has_notes = has_notes
+        #: Only a person's own number is theirs for the browser to fill, as an address is
+        #: (`postal.formset_for`'s `own`); a company's or a contact's is somebody else's.
+        self.own = own
+        if own:
+            self.widget.widgets[1].attrs["autocomplete"] = "tel"
         # Whatever `initial` was passed in was set before the widget existed.
         self.initial = self.initial
 

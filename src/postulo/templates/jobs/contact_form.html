@@ -60,9 +60,9 @@
       {% comment %} The postal addresses are always offered, so this column always is: a person
          card's ADR lands here (#329). {% endcomment %}
         <div class="max-w-2xl 2xl:flex-1" data-contact-rows>
-          {% if numbers %}{% include "partials/phone_numbers.html" %}{% endif %}
-          {% include "partials/postal_addresses.html" %}
-          {% include "partials/web_links.html" %}
+          {% if numbers %}{% include "partials/phone_numbers.html" with remove_at_once=True card_help=True tips=tips refused=refused %}{% endif %}
+          {% include "partials/postal_addresses.html" with remove_at_once=True card_help=True tips=tips refused=refused %}
+          {% include "partials/web_links.html" with remove_at_once=True card_help=True tips=tips refused=refused %}
           {% if messaging %}{% include "partials/messaging_handles.html" %}{% endif %}
         </div>
     </div>
@@ -79,6 +79,16 @@
       {% endif %}
     </div>
   </form>
+  {% include "jobs/partials/row_removals.html" with whose="contact" %}
+  {% if addresses %}
+    <c-dialog id="map-confirm" data-map-confirm-dialog>
+      <c-slot name="title">{% translate "Show this address on the map?" %}</c-slot>
+      <c-slot name="description">{% translate "A pin for it is drawn on your map, at its postcode or town, and only you can see it." %}</c-slot>
+      <c-slot name="footer">
+        <button type="button" class="btn" data-map-confirm>{% translate "Show on the map" %}</button>
+      </c-slot>
+    </c-dialog>
+  {% endif %}
   {% if read_only %}<div class="max-w-2xl">{% include "jobs/partials/own_note_form.html" with record=object kind="contact" %}</div>{% endif %}
   {% comment %} The one contact as a card (#660), outside the form above: a form does not hold
      a form. Only for a contact that exists. {% endcomment %}

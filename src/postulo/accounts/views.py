@@ -25,7 +25,13 @@ from django.views.generic import CreateView, ListView, TemplateView, UpdateView
 from postulo.core.context_processors import theme_switch
 from postulo.core.files import serve_stored_picture
 from postulo.core.link_services import KIND_ICONS, OTHER_ICON
-from postulo.core.mixins import MessagingHandlesMixin, StaffRequiredMixin, WebLinksMixin
+from postulo.core.mixins import (
+    MessagingHandlesMixin,
+    PhoneNumbersMixin,
+    PostalAddressesMixin,
+    StaffRequiredMixin,
+    WebLinksMixin,
+)
 from postulo.core.redirects import safe_next
 
 from . import avatars, deletion, removals
@@ -36,7 +42,14 @@ from .reauth import reauthentication_required
 
 
 @method_decorator(transaction.non_atomic_requests, name="dispatch")
-class ProfileView(LoginRequiredMixin, WebLinksMixin, MessagingHandlesMixin, UpdateView):
+class ProfileView(
+    LoginRequiredMixin,
+    WebLinksMixin,
+    PhoneNumbersMixin,
+    PostalAddressesMixin,
+    MessagingHandlesMixin,
+    UpdateView,
+):
     """Edit your own details. There is no view of anyone else's.
 
     Out of the request's transaction (#357) so the Gravatar fetch holds no lock: the save is
@@ -69,52 +82,13 @@ class ProfileView(LoginRequiredMixin, WebLinksMixin, MessagingHandlesMixin, Upda
         )
         return PersonIdentifierFormSet(**kwargs)
 
-    def get_numbers(self):
-        """The telephone rows, when this person is offered more than one number.
-
-        ``None`` while the feature is off, which is what the template checks: the single
-        box on the contact block is the whole control then, and rendering both would be
-        two things writing one primary row.
-        """
-        from postulo.core import phone_numbers, phones
-
-        if not phone_numbers.several_allowed(self.request.user):
-            return None
-        kwargs = {
-            "holder": self.object,
-            "default_country": phones.default_country(getattr(self.object, "language", "")),
-            "asked_by": self.request.user,
-        }
-        if self.request.method == "POST" and "phone_numbers-TOTAL_FORMS" in self.request.POST:
-            kwargs["data"] = self.request.POST
-        return phone_numbers.formset_for(**kwargs)
-
-    def get_addresses(self):
-        """The postal rows. Always offered: no feature governs these, and nothing verifies
-        them — Postulo is not going to post anything (#92).
-        """
-        from postulo.core import phones, postal
-
-        kwargs = {
-            "holder": self.object,
-            "default_country": phones.default_country(getattr(self.object, "language", "")),
-            # Who the policy is asked about: *Address rules by country* may be off for them.
-            "person": self.request.user,
-        }
-        if self.request.method == "POST" and "addresses-TOTAL_FORMS" in self.request.POST:
-            kwargs["data"] = self.request.POST
-        return postal.formset_for(**kwargs)
-
     def get_context_data(self, **kwargs) -> dict:
-        from postulo.core import phone_numbers
-
         from . import identifiers as person_identifiers
 
+        # `numbers`, `numbers_kept_back` and `addresses` come from the two mixins, the same
+        # code a company's and a contact's pages use (#934).
         context = super().get_context_data(**kwargs)
         context.setdefault("identifiers", self.get_identifiers())
-        context.setdefault("numbers", self.get_numbers())
-        context.setdefault("addresses", self.get_addresses())
-        context["numbers_kept_back"] = phone_numbers.kept_back(self.object, self.request.user)
         context["identifier_schemes"] = person_identifiers.schemes().values()
         context["identifiers_pasted"] = person_identifiers.pasted_whole()
         context["removals"] = self._removals(context)
@@ -245,7 +219,7 @@ class ProfileView(LoginRequiredMixin, WebLinksMixin, MessagingHandlesMixin, Upda
 
     def form_valid(self, form):
         formset = self.get_identifiers()
-        numbers = self.get_numbers()
+        numbers = self.get_phone_numbers()
         addresses = self.get_addresses()
         links = self.get_web_links()
         messaging = self.get_messaging()

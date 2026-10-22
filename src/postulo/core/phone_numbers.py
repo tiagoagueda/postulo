@@ -477,7 +477,14 @@ class PhoneNumberForm(forms.ModelForm):
         model = PhoneNumber
         fields = ("kind", "label", "number")
 
-    def __init__(self, *args, default_country: str = "", has_notes: bool = False, **kwargs):
+    def __init__(
+        self,
+        *args,
+        default_country: str = "",
+        has_notes: bool = False,
+        own: bool = False,
+        **kwargs,
+    ):
         super().__init__(*args, **kwargs)
         kind = self.fields["kind"]
         kind.widget = IconSelect(icons=KIND_ICONS, choices=kind.choices)
@@ -486,6 +493,7 @@ class PhoneNumberForm(forms.ModelForm):
             required=False,
             default_country=default_country,
             has_notes=has_notes,
+            own=own,
         )
         if self.instance and self.instance.pk:
             self.fields["number"].initial = self.instance.number
@@ -664,6 +672,8 @@ def formset_for(
         form_kwargs={
             "default_country": default_country,
             "has_notes": holder is not None and hasattr(type(holder), "NOTE_MODEL"),
+            # The browser fills a person's own number and no one else's (#934).
+            "own": identifies(holder),
         },
     )
     formset.asked_by = asked_by

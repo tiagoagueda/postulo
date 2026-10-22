@@ -784,6 +784,8 @@ class ProfileForm(forms.ModelForm):
                 default_country=phones.default_country(
                     getattr(self.instance, "language", "") or settings.LANGUAGE_CODE
                 ),
+                # The person's own number: the one a browser may fill (#934).
+                own=True,
             )
         # And one box per kind of link whose feature is off, on the same terms (#189).
         web_links.add_single_boxes(self, getattr(self.instance, "user", None), holder=self.instance)

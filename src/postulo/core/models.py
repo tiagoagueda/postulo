@@ -413,6 +413,15 @@ class PhoneNumber(OwnedAsItsHolder, PrincipalOwnedModel):
     within its holder. That also stops a contact entry from blocking the number's real
     holder from adding it to their own profile.
 
+    **What differs between the three holders, on purpose (#934)**, and nothing else does:
+    a person's numbers are unique across the instance and spend the collision allowance; a
+    contact's and a company's are not. *Gets me back in* (``is_recovery``) is offered on
+    *Your details* alone, and then only where a text gateway is installed. A browser fills
+    a telephone box on *Your details* (``autocomplete="tel"``) and on no other holder's.
+    The profile's vCard and CV carry the printed primary number only, which is a choice
+    about a document; a company's and a contact's cards carry every number. Each is pinned by
+    ``tests/test_contact_details_parity.py``.
+
     Only a number that reached international form takes part. A number the numbering
     plans cannot place -- a short number, words, a national number from before a country
     was asked for -- is kept exactly as typed (``phones.py``, #304) and has no comparable
@@ -645,6 +654,12 @@ class PostalAddress(OwnedAsItsHolder, PrincipalOwnedModel):
     and between the holders of one account -- a company and the people who work in its
     building (#329).
 
+    **What differs between the three holders, on purpose (#934)**: a company's addresses are
+    always drawn on the map, there being no *Show on the map* choice for them (#702), where a
+    contact's and a person's are drawn only when asked; and a browser fills the address boxes
+    on *Your details* and on no other holder's. Pinned by
+    ``tests/test_contact_details_parity.py``.
+
     **Valid cannot mean verified.** Deciding whether an address exists needs a per-country
     reference database or a paid lookup service -- a network dependency, a cost, and a
     stream of updates. Telephone numbers have the equivalent in one small library, the
@@ -840,7 +855,7 @@ class PostalAddress(OwnedAsItsHolder, PrincipalOwnedModel):
 
 
 class WebLink(OwnedAsItsHolder, PrincipalOwnedModel):
-    """One address on the web belonging to a person or to a contact.
+    """One address on the web belonging to a person, a contact or a company.
 
     A social profile, a code repository, a website: three kinds, and a row for each of the
     several a person may have of each. A generic relation, for the reason
@@ -865,6 +880,11 @@ class WebLink(OwnedAsItsHolder, PrincipalOwnedModel):
     service and the handle are the name. The model stores what it is given; the check
     belongs to whoever takes an address in (``core.web_links.WebLinkForm``, the API), so
     that nothing already stored is ever refused in retrospect.
+
+    **What differs between the holders, on purpose (#934)**: a company is offered the social
+    kind alone (``web_links.COMPANY_KINDS``), because its website is a column of the company
+    (``Company.website``) and its repositories are not its own; a contact and a person get
+    all three kinds. Pinned by ``tests/test_contact_details_parity.py``.
 
     **One primary per kind, per holder.** The primary is the row a CV header prints and
     the row that stays offered when the kind's feature is switched off -- so "off" is

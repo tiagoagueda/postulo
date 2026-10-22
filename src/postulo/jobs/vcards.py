@@ -127,17 +127,27 @@ def _legal_state_note(company: Company) -> str:
 
 
 def card_for_company(company: Company, *, notes: bool = False) -> vcard.Card:
-    """A company as a ``KIND:org`` card. Its location waits for a company to have an
-    address (#329). Its notes are the person's own, only when asked; a legal state other
-    than active is a fact and goes in the note either way (#941)."""
+    """A company as a ``KIND:org`` card: its general mailbox, every number and address, its
+    website and its social profiles, as a contact's card carries a contact's (#934).
+
+    Everything the company holds goes, whatever its primary is. The profile's card is the one
+    that does not: it holds what a CV prints (the printed primary only), which is a choice
+    about a document and not about what the person has recorded (`card_for_person`). Its
+    notes are the person's own, only when asked; a legal state other than active is a fact
+    and goes in the note either way (#941).
+    """
     note = "\n".join(
         line for line in (company.own_note() if notes else "", _legal_state_note(company)) if line
     )
+    website = (vcard.Link(company.website),) if company.website else ()
     return vcard.Card(
         name=company.name,
         kind=vcard.KIND_ORG,
         company=company.name,
-        links=(vcard.Link(company.website),) if company.website else (),
+        email=company.email,
+        phones=_phones(company),
+        addresses=_addresses(company),
+        links=website + tuple(vcard.Link(row.url) for row in company.web_links.all()),
         notes=note,
         uid=vcard.uid_for(instance_name(), "company", company.pk),
         revised=company.updated_at,
@@ -291,15 +301,13 @@ def _not_kept(card: vcard.Card) -> list[str]:
     if any(vcard.impp_read(uri) is None for uri in card.impps):
         left.append("IMPP")
     if card.is_org:
-        # A company has a name, a website and notes, and no number, address or address
-        # for mail (#329): what a card of one carries beside those is left out.
+        # A company has a name, a mailbox, numbers, addresses, a website, social profiles
+        # and notes (#934): what a card of one carries beside those is left out, and so is a
+        # second website, a company having one column for it.
         for present, name in (
-            (card.email, "EMAIL"),
-            (card.phones, "TEL"),
-            (card.addresses, "ADR"),
             (card.role, "TITLE"),
             (card.impps, "IMPP"),
-            (len(card.links) > 1, "URL"),
+            (len(_company_links(card)[0]) > 1, "URL"),
         ):
             if present:
                 left.append(name)
@@ -385,9 +393,21 @@ def apply(user, cards: list[vcard.Card], chosen: set[int], into=None) -> Report:
     return report
 
 
+def _company_links(card: vcard.Card) -> tuple[list[vcard.Link], list[vcard.Link]]:
+    """A company card's links as a company holds them: the websites it was given, of which
+    the first that is a web address becomes its website, and its social profiles."""
+    websites, socials = [], []
+    for link in card.links:
+        (socials if _kind_of(link.url, link.social) == web_links.Kind.SOCIAL else websites).append(
+            link
+        )
+    return websites, socials
+
+
 def _make_company(user, card: vcard.Card, report: Report, into=None) -> None:
     website = ""
-    for link in card.links:
+    websites, socials = _company_links(card)
+    for link in websites:
         try:
             _url(link.url)
         except ValidationError:
@@ -398,11 +418,24 @@ def _make_company(user, card: vcard.Card, report: Report, into=None) -> None:
             continue
         website = link.url
         break
-    company = Company(name=card.name.strip()[:200], website=website[:200])
+    email = card.email
+    if email:
+        try:
+            validate_email(email)
+        except ValidationError:
+            report.problems.append(
+                _("%(name)s: %(value)s is not an email address, and was left out.")
+                % {"name": card.name[:80], "value": email[:80]}
+            )
+            email = ""
+    company = Company(name=card.name.strip()[:200], website=website[:200], email=email)
     company.set_principal(into or user)
     company.save()
     # The importing person's own note (#896).
     company.write_note(user, card.notes)
+    _numbers(user, company, card, report)
+    _postal(user, company, card, report)
+    _links(user, company, card, report, only=socials)
     report.companies += 1
 
 
@@ -449,7 +482,7 @@ def _make_contact(user, card: vcard.Card, report: Report, into=None) -> None:
     report.contacts += 1
 
 
-def _numbers(user, contact: Contact, card: vcard.Card, report: Report) -> None:
+def _numbers(user, contact, card: vcard.Card, report: Report) -> None:
     # A number with no country in front is read in the country of the card's own address.
     country = next((a.country for a in card.addresses if a.country), "")
     made = None
@@ -491,7 +524,7 @@ def _numbers(user, contact: Contact, card: vcard.Card, report: Report) -> None:
         phone_numbers.ensure_one_primary(contact)
 
 
-def _postal(user, contact: Contact, card: vcard.Card, report: Report) -> None:
+def _postal(user, contact, card: vcard.Card, report: Report) -> None:
     wanted = None
     made = None
     for address in card.addresses:
@@ -541,9 +574,9 @@ def _kind_of(url: str, social: bool) -> str:
     return web_links.Kind.WEBSITE
 
 
-def _links(user, contact: Contact, card: vcard.Card, report: Report) -> None:
+def _links(user, contact, card: vcard.Card, report: Report, only=None) -> None:
     rows, seen = [], set()
-    for link in card.links:
+    for link in card.links if only is None else only:
         try:
             addresses.web_address(link.url)
             checked = web_links.checked_rows(

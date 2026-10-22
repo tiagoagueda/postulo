@@ -24,6 +24,7 @@ from django.views.generic import (
     UpdateView,
 )
 
+from postulo.accounts import removals
 from postulo.core import deletions, identifier_order, slugs, tables, throttle
 from postulo.core.cells import EditableCellView
 from postulo.core.files import serve_stored_picture
@@ -1086,7 +1087,7 @@ class CompanyDetailView(SharedObjectMixin, DetailView):
             .with_notes(person)
             .filter(company=self.object)
             .select_related("department")
-            .prefetch_related("phone_numbers", "web_links", "messaging_handles")
+            .prefetch_related("phone_numbers", "postal_addresses", "web_links", "messaging_handles")
         )
         # And its listings, each as this person stands with it, with their own applications
         # only: on a shared listing nobody else's is there to see (#896).
@@ -1267,6 +1268,103 @@ class LogoFormMixin:
         return response
 
 
+class RemovesRowsAtOnceMixin:
+    """The star, the bin and the help marks on the rows of a company's or a contact's page,
+    as *Your details* has them (#934).
+
+    ``removals`` in the context lists the saved rows the page offers to take off at once, each
+    marked on its form, and ``refused`` is whether anything on the page was refused -- which
+    keeps each card's one sentence in sight, as on the profile (#302). It must stand before
+    the mixins that build the blocks, because it reads what they put in the context.
+    """
+
+    def get_context_data(self, **kwargs) -> dict:
+        context = super().get_context_data(**kwargs)
+        holder = getattr(self, "object", None)
+        found: list = []
+        # A reader who may only look is offered no bin: the address would answer 404.
+        if holder is not None and holder.pk and not context.get("read_only"):
+            numbers = context.get("numbers")
+            if numbers is not None:
+                found += removals.offer(removals.NUMBER, numbers, holder)
+            for block in context.get("links") or []:
+                found += removals.offer(removals.LINK, block, holder)
+            if context.get("addresses") is not None:
+                found += removals.offer(removals.ADDRESS, context["addresses"], holder)
+        context["removals"] = found
+        blocks = [context.get("numbers"), context.get("addresses"), *(context.get("links") or [])]
+        form = context.get("form")
+        context["refused"] = (form is not None and form.is_bound and not form.is_valid()) or any(
+            b is not None and b.is_bound and not b.is_valid() for b in blocks
+        )
+        context["tips"] = not context["refused"]
+        return context
+
+
+class RemoveHolderRowView(LoginRequiredMixin, View):
+    """Take one telephone number, address or link off a company's or a contact's page at once,
+    after its dialog asked (#934): the same contract as *Your details* (#303).
+
+    By a POST only. The holder is looked up among the ones this reader may write to -- a
+    read-only share, and anybody else's, is a 404 -- and the row among that holder's own.
+    With htmx the answer is for `app.js`, which takes the row out of the page; without it
+    the page is drawn again at the row's block.
+    """
+
+    model: type = Company
+    edit_url_name = "jobs:company_update"
+
+    def _holder(self, request: HttpRequest, pk: int):
+        return get_object_or_404(shared_scope(self.model.objects, request.user, WRITE), pk=pk)
+
+    def _row(self, request: HttpRequest, holder, kind: str, pk: int):
+        try:
+            found = removals.HOLDER_KINDS[kind]
+        except KeyError:
+            raise Http404 from None
+        row = get_object_or_404(removals.holder_rows(found, holder), pk=pk)
+        if not removals.offered(found, request.user, row):
+            raise Http404
+        return found, row
+
+    def get(self, request: HttpRequest, holder_pk: int, kind: str, pk: int) -> HttpResponse:
+        holder = self._holder(request, holder_pk)
+        found, row = self._row(request, holder, kind, pk)
+        return redirect(
+            f"{reverse(self.edit_url_name, args=[holder.pk])}#{removals.anchor(found, row)}"
+        )
+
+    def post(self, request: HttpRequest, holder_pk: int, kind: str, pk: int) -> HttpResponse:
+        holder = self._holder(request, holder_pk)
+        found, row = self._row(request, holder, kind, pk)
+        back = reverse(self.edit_url_name, args=[holder.pk])
+        said = str(removals.said(removals.words(found, row)))
+        with transaction.atomic():
+            row.delete()
+            primary = removals.hand_on(found, row, holder)
+        if request.htmx:
+            return JsonResponse(
+                {
+                    "removed": True,
+                    "said": said,
+                    "primary": primary.pk if primary is not None else None,
+                    "count": removals.holder_rows(found, holder).count(),
+                }
+            )
+        messages.success(request, said)
+        return redirect(f"{back}#{removals.anchor(found, row)}")
+
+
+class RemoveCompanyRowView(RemoveHolderRowView):
+    model = Company
+    edit_url_name = "jobs:company_update"
+
+
+class RemoveContactRowView(RemoveHolderRowView):
+    model = Contact
+    edit_url_name = "jobs:contact_update"
+
+
 @method_decorator(transaction.non_atomic_requests, name="dispatch")
 class CompanyCreateView(
     KeepsTheTrail,
@@ -1275,6 +1373,7 @@ class CompanyCreateView(
     UserFormKwargsMixin,
     OwnerFormMixin,
     CompanyIdentifiersMixin,
+    RemovesRowsAtOnceMixin,
     PhoneNumbersMixin,
     PostalAddressesMixin,
     WebLinksMixin,
@@ -1303,6 +1402,7 @@ class CompanyUpdateView(
     SharedObjectMixin,
     UserFormKwargsMixin,
     CompanyIdentifiersMixin,
+    RemovesRowsAtOnceMixin,
     PhoneNumbersMixin,
     PostalAddressesMixin,
     WebLinksMixin,
@@ -1778,6 +1878,7 @@ class ContactCreateView(
     UserFormKwargsMixin,
     OwnerFormMixin,
     GdprNoticeMixin,
+    RemovesRowsAtOnceMixin,
     PhoneNumbersMixin,
     PostalAddressesMixin,
     WebLinksMixin,
@@ -1835,6 +1936,7 @@ class ContactUpdateView(
     SharedObjectMixin,
     UserFormKwargsMixin,
     GdprNoticeMixin,
+    RemovesRowsAtOnceMixin,
     PhoneNumbersMixin,
     PostalAddressesMixin,
     WebLinksMixin,

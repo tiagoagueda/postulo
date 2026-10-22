@@ -672,12 +672,13 @@ def test_the_cards_help_is_no_longer_under_the_rows(client, user):
     assert "Postulo never opens a link on its own" in html
 
 
-def test_a_contacts_form_keeps_its_help_in_sight(client, user):
-    """The same rows on another page: no question mark, no tooltip, and the sentences
-    where they were. A page takes the new shape when it is given it, not by accident --
-    and is drawn as it was before #302 at every place a switch was added: each switch is
-    written on the line of what it follows, so it leaves no blank line behind. The sentence
-    under the telephone legend is the topic's own summary, one string in one place."""
+def test_a_contacts_form_has_the_same_cards_help_as_your_details(client, user):
+    """The same rows on another page, the same controls (#934): a question mark on each card,
+    whose drawer holds what the paragraphs under the rows used to say there, and none of
+    those paragraphs left in sight. The contact's page was the one that kept the old shape
+    (#302) while it was the only one; a company's and a contact's pages take the profile's now,
+    and it is said once -- not "kept once on this instance", which is not true of a contact's
+    number."""
     company = Company.objects.create(owner=user, name="Aperture Science")
     contact = Contact.objects.create(owner=user, company=company, name="Cave Johnson")
     PhoneNumber.objects.create(owner=user, holder=contact, number="+351912345679", is_primary=True)
@@ -685,26 +686,16 @@ def test_a_contacts_form_keeps_its_help_in_sight(client, user):
 
     html = client.get(reverse("jobs:contact_update", args=[contact.pk])).content.decode()
 
-    assert "data-help-mark" not in html and "data-tooltip" not in html
-    assert "<dialog" not in html.replace('<dialog popover id="leave-dialog"', "")
-    assert 'id="id_phone_numbers-0-number_helptext"' in html
-    summary = str(help_topics.topic("telephone-numbers").summary)
-    for seam in (
-        # Under each legend: the sentence, as it was.
-        '<legend class="legend-title">Telephone numbers</legend>\n'
-        '  <p class="mb-3 text-sm text-ink-500 dark:text-ink-400">\n'
-        f"    {summary}\n  </p>\n"
-        '  <input type="hidden" name="phone_numbers-TOTAL_FORMS"',
-        '<legend class="legend-title">Social profiles</legend>\n'
-        '    <p class="mb-3 text-sm text-ink-500 dark:text-ink-400">A LinkedIn, a Mastodon',
-        # Under the rows: the paragraphs, as they were.
-        '  </ol>\n  \n  <p class="mt-3 text-xs text-ink-500 dark:text-ink-400">\n'
-        "    A number is kept once on this instance.",
-        "  </p>\n  \n</fieldset>",
-        '    </ol>\n    \n    <p class="mt-3 text-xs text-ink-500 dark:text-ink-400">',
-        "    </p>\n  </fieldset>\n",
+    assert html.count("data-help-mark") >= 3, "telephone numbers, addresses and links"
+    assert 'data-opens-dialog="help-telephone-numbers"' in html
+    assert 'data-opens-dialog="help-postal-addresses"' in html
+    assert "<dialog" in html
+    page = html[: html.index('<dialog id="help-')] if '<dialog id="help-' in html else html
+    for moved in (
+        "A number is kept once on this instance.",
+        "Unlike a telephone number, an address is not kept once",
     ):
-        assert seam in html, seam
+        assert moved not in page, moved
 
 
 def test_the_gallerys_question_mark_is_named_for_its_own_card(client):

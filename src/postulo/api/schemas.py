@@ -357,12 +357,23 @@ class ContactOut(Schema):
     email: str = ""
     #: The primary number, where the single number has always been, so a client written
     #: against the earlier shape keeps working. `phone_numbers` is the whole list.
-    phone: str = ""
+    phone: str = Field(
+        default="",
+        json_schema_extra={"deprecated": True},
+        description="Deprecated: the primary number. Read `phone_numbers`, which holds them all.",
+    )
     phone_numbers: list[PhoneNumberOut] = Field(default_factory=list)
+    postal_addresses: list[PostalAddressOut] = Field(default_factory=list)
     #: The primary social profile, where the single LinkedIn address has always been, so a
     #: client written against the earlier shape keeps working. `web_links` is the whole
     #: list, of every kind (#189).
-    linkedin_url: str = ""
+    linkedin_url: str = Field(
+        default="",
+        json_schema_extra={"deprecated": True},
+        description=(
+            "Deprecated: the primary social profile. Read `web_links`, which holds every link."
+        ),
+    )
     web_links: list[WebLinkOut] = Field(default_factory=list)
     messaging_handles: list[MessagingHandleOut] = Field(default_factory=list)
     notes: str = ""
@@ -478,9 +489,12 @@ class ContactIn(Schema):
     phone: str = Field(
         default="",
         max_length=40,
+        json_schema_extra={"deprecated": True},
         description=(
-            "The contact's telephone number: in the international form, starting with `+`, "
-            "or the way it is written in its own country with that country in "
+            "Deprecated: send `phone_numbers`, which takes as many as there are. It joins "
+            "them as the primary when none of them is. The contact's telephone number: in "
+            "the international form, starting with `+`, or the way it is written in its own "
+            "country with that country in "
             "`phone_country`. It is checked against the country's numbering plan. A number "
             "that cannot exist there is a 422 saying why, and so is a national number sent "
             "with neither a `+` nor `phone_country`. An accepted number is stored, and "
@@ -492,15 +506,32 @@ class ContactIn(Schema):
     phone_country: PhoneCountry = Field(
         default="",
         max_length=2,
+        json_schema_extra={"deprecated": True},
         description=(
-            "The country `phone` is in, as an ISO 3166-1 alpha-2 code (`FR`), for a number "
+            "Deprecated with `phone`: `phone_numbers` rows carry their own `country`. The "
+            "country `phone` is in, as an ISO 3166-1 alpha-2 code (`FR`), for a number "
             "written the national way. Ignored when `phone` starts with `+` or `00`, which "
             "say their own country. A code that is not a country is a 422."
         ),
     )
     #: Saved as the contact's primary social profile (#189), and drawn as a link on the
     #: company's page, so it is checked like every other address that is (#218).
-    linkedin_url: WebAddress = Field(default="", max_length=500)
+    linkedin_url: WebAddress = Field(
+        default="",
+        max_length=500,
+        json_schema_extra={"deprecated": True},
+        description=(
+            "Deprecated: send it in `web_links` with kind `social`. Still taken, as the "
+            "primary social profile when none of them is."
+        ),
+    )
+    #: The contact's numbers and addresses, as a company's are written (#934).
+    phone_numbers: list[PhoneNumberIn] = Field(
+        default_factory=list, description="The contact's numbers, one of them the primary."
+    )
+    postal_addresses: list[PostalAddressIn] = Field(
+        default_factory=list, description="The contact's addresses, one of them the primary."
+    )
     #: The contact's links of every kind, each on a service or on none (#305). The single
     #: address above is still taken, as a social profile, beside whatever is listed here.
     web_links: list[WebLinkIn] = Field(
@@ -1658,22 +1689,7 @@ def company_out(company, *, detail: bool = False) -> dict:
             for row in company.names.all()
         ],
         "phone_numbers": [_number_out(row) for row in company.phone_numbers.all()],
-        "postal_addresses": [
-            {
-                "kind": row.kind,
-                "label": row.label,
-                "street": row.street,
-                "postcode": row.postcode,
-                "municipality": row.municipality,
-                "region": row.region,
-                "country": row.country,
-                "is_primary": row.is_primary,
-                "latitude": row.latitude,
-                "longitude": row.longitude,
-                "placed_by": row.placed_by,
-            }
-            for row in company.postal_addresses.all()
-        ],
+        "postal_addresses": [_address_out(row) for row in company.postal_addresses.all()],
         "web_links": [_link_out(row) for row in company.web_links.all()],
         "location": company.location,
         "industries": [industry.name for industry in company.industries.all()],
@@ -1720,6 +1736,23 @@ def _link_out(row) -> dict:
     }
 
 
+def _address_out(row) -> dict:
+    """One postal address as the API answers it, a company's or a contact's (#934)."""
+    return {
+        "kind": row.kind,
+        "label": row.label,
+        "street": row.street,
+        "postcode": row.postcode,
+        "municipality": row.municipality,
+        "region": row.region,
+        "country": row.country,
+        "is_primary": row.is_primary,
+        "latitude": row.latitude,
+        "longitude": row.longitude,
+        "placed_by": row.placed_by,
+    }
+
+
 def _number_out(row) -> dict:
     return {
         "kind": row.kind,
@@ -1750,16 +1783,8 @@ def contact_out(contact) -> dict:
         # The primary stays where the single number always was, so a client written
         # against the old shape keeps working, and the whole list sits beside it.
         "phone": _primary_number(contact),
-        "phone_numbers": [
-            {
-                "kind": row.kind,
-                "label": row.label,
-                "number": row.number,
-                "formatted": phones.readable(row.number),
-                "is_primary": row.is_primary,
-            }
-            for row in contact.phone_numbers.all()
-        ],
+        "phone_numbers": [_number_out(row) for row in contact.phone_numbers.all()],
+        "postal_addresses": [_address_out(row) for row in contact.postal_addresses.all()],
         "linkedin_url": _primary_link(contact, "social"),
         "web_links": [_link_out(row) for row in contact.web_links.all()],
         "messaging_handles": [
