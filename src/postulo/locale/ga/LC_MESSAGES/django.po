@@ -345,6 +345,16 @@ msgstr[2] "%(count)d Láimhseálann teachtaireachtaí"
 msgstr[3] "%(count)d Láimhseálann teachtaireachtaí"
 msgstr[4] "%(count)d Láimhseálann teachtaireachtaí"
 
+#: src/postulo/jobs/status.py
+#, python-format
+msgid "%(count)d open listing"
+msgid_plural "%(count)d open listings"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+msgstr[4] ""
+
 #: src/postulo/core/gdpr.py
 #, fuzzy, python-format
 msgid "%(count)d plugin row"
@@ -664,6 +674,16 @@ msgstr[1] "%(counter)s de do thaifid a roinnt le daoine eile: coinníonn siad c�
 msgstr[2] "%(counter)s de do thaifid a roinnt le daoine eile: coinníonn siad cóip de cad is gá a gcuid taifead féin, agus deirtear go bhfuil siad imithe."
 msgstr[3] "%(counter)s de do thaifid a roinnt le daoine eile: coinníonn siad cóip de cad is gá a gcuid taifead féin, agus deirtear go bhfuil siad imithe."
 msgstr[4] "%(counter)s de do thaifid a roinnt le daoine eile: coinníonn siad cóip de cad is gá a gcuid taifead féin, agus deirtear go bhfuil siad imithe."
+
+#: src/postulo/templates/jobs/partials/company_row.html
+#, python-format
+msgid "%(counter)s open listing"
+msgid_plural "%(counter)s open listings"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+msgstr[4] ""
 
 #: src/postulo/templates/core/search.html
 #, fuzzy, python-format
@@ -1820,9 +1840,8 @@ msgid "<em>Kind</em> says what the number is, and can be left blank. Choose <em>
 msgstr "Deir <em>Cineál</em> cad is uimhir ann, agus is féidir é a fhágáil bán. Roghnaigh <em>Eile</em> agus fiafraíonn bosca cad ba cheart a thabhairt air."
 
 #: src/postulo/templates/help/contact_block.html
-#, fuzzy
-msgid "<em>Language of your career record</em> says which language your experience, education and projects are typed in. A CV in another language shows what you have translated and says what it could not. It also decides which forms of address and pronouns the menus of <em>Your name</em> offer. Left as it is, it follows the language you read Postulo in."
-msgstr "Deir <em>Teanga do thaifid ghairme</em> cén teanga ina bhfuil do thaithí, d’oideachas agus do thionscadail clóscríofa. Taispeánann CV i dteanga eile an méid a d’aistrigh tú agus deir sé cad nach bhféadfadh sé a aistriú. Socraíonn sé freisin cé na bealaí labhartha agus forainmneacha a thairgeann roghchláir <em>D’ainm</em>. Má fhágtar mar atá é, leanann sé an teanga ina léann tú Postulo."
+msgid "<em>Language of your career record</em> says which language your experience, education and projects are typed in. A CV in another language shows what you have translated and says what it could not. It also decides which forms of address and pronouns the menus of <em>Your name</em> offer, and in which words. Left as it is, it follows the language you read Postulo in."
+msgstr ""
 
 #: src/postulo/templates/help/contact_block.html
 #, fuzzy
@@ -2062,6 +2081,10 @@ msgid "A company"
 msgstr "Cuideachta"
 
 #: src/postulo/jobs/models.py
+msgid "A company cannot acquire itself."
+msgstr ""
+
+#: src/postulo/jobs/models.py
 #, fuzzy
 msgid "A company cannot be part of itself."
 msgstr "Ní féidir le cuideachta a bheith ina cuid di féin."
@@ -2290,9 +2313,8 @@ msgid "A form of address is what is written before a name, and pronouns say how 
 msgstr "Is é foirm bheannachta an rud a scríobhtar roimh ainm, agus deir forainmneacha conas tagairt a dhéanamh duit. Ní ghlactar le rud ar bith nuair atá ceachtar acu bán, agus ní oibrítear amach ceachtar acu riamh as d’ainm."
 
 #: src/postulo/core/help.py
-#, fuzzy
-msgid "A form of address is written before your name, and your pronouns say how to refer to you. Both are optional, and nothing is assumed when they are blank."
-msgstr "Scríobhtar foirm bheannachta roimh d’ainm, agus deir do chuid forainmneacha conas tagairt a dhéanamh duit. Tá an dá cheann roghnach, agus ní ghlactar le rud ar bith nuair atá siad bán."
+msgid "A form of address is written before your name, and your pronouns say how to refer to you. Both are optional, nothing is assumed when they are blank, and each is kept as a choice that your pages and documents show in their own language."
+msgstr ""
 
 #: src/postulo/core/views_access.py
 #, fuzzy
@@ -3136,6 +3158,18 @@ msgstr "Cuntais"
 msgid "Acknowledged"
 msgstr "Admhaithe"
 
+#: src/postulo/jobs/models.py
+msgid "acquired by"
+msgstr ""
+
+#: src/postulo/jobs/models.py
+msgid "Acquired or merged"
+msgstr ""
+
+#: src/postulo/api/routers/companies.py
+msgid "acquired_by must be a company you can see."
+msgstr ""
+
 #: src/postulo/templates/jobs/company_detail.html
 #, fuzzy, python-format
 msgid "Across the %(name)s group"
@@ -3164,6 +3198,10 @@ msgstr "Gníomhartha do %(name)s"
 #, fuzzy, python-format
 msgid "Actions for %(what)s"
 msgstr "Gníomhartha do %(what)s"
+
+#: src/postulo/jobs/models.py
+msgid "Active"
+msgstr ""
 
 #: src/postulo/templates/applications/application_detail.html
 #: src/postulo/templates/jobs/company_detail.html
@@ -3238,6 +3276,10 @@ msgstr "Cuir clib leis"
 msgid "Add all of this"
 msgstr "Cuir seo ar fad leis"
 
+#: src/postulo/templates/jobs/company_form.html
+msgid "Add an entry"
+msgstr ""
+
 #: src/postulo/templates/resume/item_form.html
 #, fuzzy
 msgid "Add an industry"
@@ -3253,6 +3295,10 @@ msgstr "Cuir iontrálacha leis"
 #, fuzzy
 msgid "Add entry"
 msgstr "Cuir iontráil leis"
+
+#: src/postulo/applications/forms.py
+msgid "Add it anyway"
+msgstr ""
 
 #: src/postulo/applications/ical_import.py
 #, fuzzy
@@ -4328,6 +4374,20 @@ msgstr "Mar a scríobhadh é: céatadán, líon roghanna, an dílsiú."
 msgid "As it will print"
 msgstr "Mar a chlóscríobhfar é"
 
+#: src/postulo/jobs/models.py
+msgid "as of"
+msgstr ""
+
+#: src/postulo/templates/jobs/company_form.html
+msgid "As of"
+msgstr ""
+
+#: src/postulo/templates/jobs/partials/company_row.html
+#: src/postulo/templates/jobs/partials/company_status.html
+#, python-format
+msgid "as of %(date)s"
+msgstr ""
+
 #: src/postulo/templates/documents/cv_text.html
 #, fuzzy
 msgid "As plain text"
@@ -4815,6 +4875,11 @@ msgstr "ag an"
 msgid "By"
 msgstr "Ag"
 
+#: src/postulo/templates/jobs/partials/company_status.html
+#, python-format
+msgid "by <a href=\"%(acquirer_url)s\" class=\"underline\"><bdi>%(name)s</bdi></a>"
+msgstr ""
+
 #: src/postulo/templates/widgets/sources.html
 #, fuzzy
 msgid "By agency"
@@ -5173,6 +5238,7 @@ msgstr "deimhnithe"
 msgid "Certifications it issued"
 msgstr "Deimhniúcháin a d'eisigh sé"
 
+#: src/postulo/templates/jobs/company_form.html
 #: src/postulo/templates/settings/locale.html
 #, fuzzy
 msgid "Change"
@@ -5459,6 +5525,10 @@ msgstr "Roghnaigh cén cineál aitheantóra é seo."
 #, fuzzy
 msgid "Choose what it prints instead"
 msgstr "Roghnaigh cad a chlóscríobhann sé ina ionad"
+
+#: src/postulo/jobs/status_views.py
+msgid "Choose what was reported and the date."
+msgstr ""
 
 #: src/postulo/applications/views.py
 #, fuzzy
@@ -6079,6 +6149,10 @@ msgstr "Áirithe de réir cathain a tharla sé, mar sin baineann freagra a thaga
 msgid "Counted by when it happened, so a reply in this period to an older application belongs here. That is a different question from what was sent, and the two are kept apart."
 msgstr "Áirithe de réir cathain a tharla sé, mar sin baineann freagra a thagann sa tréimhse seo ar iarratas níos sine leis an áit seo. Ceist eile is ea sin seachas cad a seoladh, agus coinnítear an dá cheann scartha."
 
+#: src/postulo/templates/jobs/partials/company_status.html
+msgid "Counted from the listings recorded here; nobody has reported it."
+msgstr ""
+
 #: src/postulo/templates/widgets/interviews_summary.html
 #, fuzzy
 msgid "Counted from the timeline, so interviews recorded before the diary existed are in."
@@ -6313,6 +6387,10 @@ msgstr "Dáta Breithe"
 
 #: src/postulo/templates/help/personal_details.html
 msgid "Date of birth, place and country of birth, gender and nationalities are what an identity check asks for, and nothing a job search needs until a CV says so. Every part is optional."
+msgstr ""
+
+#: src/postulo/templates/jobs/company_form.html
+msgid "Dated entries, kept as a history and shared with everybody who can see this company. One older than 90 days is shown as of its date."
 msgstr ""
 
 #: src/postulo/applications/models.py
@@ -6819,6 +6897,10 @@ msgstr "Caite i leataobh. Fanann sé i do stair agus is féidir é a athchóiri�
 msgid "Dismiss"
 msgstr "Ruaig"
 
+#: src/postulo/jobs/models.py
+msgid "Dissolved"
+msgstr ""
+
 #: src/postulo/documents/forms.py
 #, fuzzy
 msgid "Do not send after"
@@ -7005,6 +7087,11 @@ msgstr "Íoslódáil na daoine mar vCard"
 #, fuzzy
 msgid "Downloading one needs you to sign in again, and is written to the log with your name. Keep what you download as carefully as the instance itself. The key that the connection secrets are under is not in an archive: keep your <code>.env</code> somewhere else."
 msgstr "Íoslódáil ar cheann riachtanais tú a shíniú i arís, agus tá sé scríofa chuig an logáil le d'ainm. Coinnigh cad a íoslódáil tú mar go cúramach mar shampla féin. Níl an eochair go bhfuil na rúin nasc faoi i gcartlann: a choinneáil do <code>.env</code> áit éigin eile."
+
+#: src/postulo/accounts/addressing.py
+msgctxt "form of address"
+msgid "Dr"
+msgstr ""
 
 #: src/postulo/applications/models.py
 #, fuzzy
@@ -7383,6 +7470,11 @@ msgstr "críochnaíonn"
 msgid "Energy"
 msgstr "Fuinneamh"
 
+#: src/postulo/accounts/addressing.py
+msgctxt "form of address"
+msgid "Eng."
+msgstr ""
+
 #: src/postulo/jobs/industries.py
 #, fuzzy
 msgid "Engineering"
@@ -7701,6 +7793,10 @@ msgstr "Ordú samplach"
 msgid "Exceptions to what this instance decides for everybody. Whatever you set here is shown to this person on their own settings page, with your name against it."
 msgstr "Eisceachtaí ón méid a shocraíonn an t-ásc seo do chách. Taispeántar an rud a shocraíonn tú anseo don duine seo ar a leathanach socruithe féin, le d’ainm leis."
 
+#: src/postulo/jobs/tables.py
+msgid "Exclude dissolved"
+msgstr ""
+
 #: src/postulo/documents/rendering.py src/postulo/resume/candidate.py
 #: src/postulo/resume/registry.py src/postulo/resume/views_candidate.py
 #: src/postulo/templates/resume/europass_import.html
@@ -7856,6 +7952,11 @@ msgstr "Facs"
 #, fuzzy
 msgid "Feature"
 msgstr "Gné"
+
+#: src/postulo/accounts/addressing.py
+msgctxt "gender"
+msgid "Female"
+msgstr ""
 
 #: src/postulo/templates/jobs/company_form.html
 #, fuzzy
@@ -8748,6 +8849,11 @@ msgstr "tá lógó"
 msgid "has an uploaded picture"
 msgstr "tá pictiúr uaslódáilte"
 
+#: src/postulo/accounts/addressing.py
+msgctxt "pronouns"
+msgid "he/him"
+msgstr ""
+
 #: src/postulo/accounts/models.py src/postulo/documents/models.py
 #: src/postulo/resume/views.py
 #, fuzzy
@@ -8822,6 +8928,40 @@ msgstr "buaicphointí"
 #, fuzzy
 msgid "highlights for this CV"
 msgstr "buaicphointí don CV seo"
+
+#: src/postulo/jobs/models.py src/postulo/jobs/tables.py
+#: src/postulo/templates/jobs/company_form.html
+#: src/postulo/templates/jobs/partials/company_signals.html
+msgid "Hiring"
+msgstr ""
+
+#: src/postulo/jobs/models.py
+msgid "Hiring freeze"
+msgstr ""
+
+#: src/postulo/jobs/models.py
+msgid "hiring signal"
+msgstr ""
+
+#: src/postulo/jobs/status_views.py
+msgid "Hiring signal added."
+msgstr ""
+
+#: src/postulo/jobs/status_views.py
+msgid "Hiring signal changed."
+msgstr ""
+
+#: src/postulo/jobs/status_views.py
+msgid "Hiring signal removed."
+msgstr ""
+
+#: src/postulo/jobs/merging.py
+msgid "Hiring signals"
+msgstr ""
+
+#: src/postulo/jobs/models.py
+msgid "hiring signals"
+msgstr ""
 
 #: src/postulo/templates/jobs/posting_detail.html
 #, fuzzy
@@ -9319,6 +9459,10 @@ msgstr "I gceann 90 lá"
 #, fuzzy
 msgid "In a year"
 msgstr "I gceann bliana"
+
+#: src/postulo/jobs/models.py
+msgid "In administration"
+msgstr ""
 
 #: src/postulo/templates/widgets/counters.html
 #, fuzzy
@@ -10012,6 +10156,10 @@ msgstr "Meaitseálann a chomhad leis an méid a shínigh an stór oifigiúil."
 msgid "Its general mailbox, such as jobs@ or info@. A person's address goes on a contact."
 msgstr "A bosca poist ginearálta, mar shampla jobs@ nó info@.ie. Téann seoladh duine ar theagmháil."
 
+#: src/postulo/templates/jobs/company_wikidata.html
+msgid "Its legal state"
+msgstr ""
+
 #: src/postulo/jobs/merging.py
 #, fuzzy, python-format
 msgid "Its logo: %(name)s has one of its own, and a picture cannot be kept in a note."
@@ -10507,6 +10655,10 @@ msgstr "domhanleithead"
 msgid "Latitude"
 msgstr "Amharc ar gach eolas"
 
+#: src/postulo/jobs/models.py
+msgid "Laying off"
+msgstr ""
+
 #: src/postulo/resume/forms.py
 #, fuzzy
 msgid "Learning you took, with or without a certificate of attendance. A programme that led to a degree or diploma belongs in Education; a credential somebody can check, or that may lapse, belongs in Certifications."
@@ -10526,6 +10678,10 @@ msgstr "Fág folamh chun an ceann atá stóráilte cheana a choinneáil."
 #, fuzzy
 msgid "Leave empty if this is your current role."
 msgstr "Fág folamh más é seo do ról reatha."
+
+#: src/postulo/templates/jobs/company_wikidata.html
+msgid "Leave it as it is"
+msgstr ""
 
 #: src/postulo/resume/forms.py
 #, fuzzy
@@ -10621,6 +10777,10 @@ msgstr "Dlí"
 #, fuzzy
 msgid "Legal notice"
 msgstr "Fógra dlíthiúil"
+
+#: src/postulo/jobs/models.py
+msgid "legal state"
+msgstr ""
 
 #: src/postulo/core/server_forms.py
 #, fuzzy
@@ -11070,6 +11230,11 @@ msgstr "Déan ina riarthóir"
 msgid "Make it"
 msgstr "Déan é"
 
+#: src/postulo/accounts/addressing.py
+msgctxt "gender"
+msgid "Male"
+msgstr ""
+
 #: src/postulo/templates/settings/account.html
 #, fuzzy
 msgid "Manage"
@@ -11165,6 +11330,11 @@ msgstr "is féidir é a athrú dóibh féin"
 #, fuzzy
 msgid "may use it"
 msgstr "is féidir é a úsáid"
+
+#: src/postulo/accounts/addressing.py
+msgctxt "form of address"
+msgid "Me"
+msgstr ""
 
 #: src/postulo/jobs/share_views.py
 #, fuzzy, python-format
@@ -11365,6 +11535,11 @@ msgstr "Microsoft amháin: an t-eolaire ina bhfuil an feidhmchlár cláraithe. F
 msgid "minibuses"
 msgstr "taiseachas aeir: fliuch"
 
+#: src/postulo/accounts/addressing.py
+msgctxt "form of address"
+msgid "Miss"
+msgstr ""
+
 #: src/postulo/documents/models.py
 #, fuzzy
 msgid "Missing entry"
@@ -11534,6 +11709,26 @@ msgstr "Bog suas"
 msgid "Moved to %(status)s."
 msgstr "Bogtha go %(status)s."
 
+#: src/postulo/accounts/addressing.py
+msgctxt "form of address"
+msgid "Mr"
+msgstr ""
+
+#: src/postulo/accounts/addressing.py
+msgctxt "form of address"
+msgid "Mrs"
+msgstr ""
+
+#: src/postulo/accounts/addressing.py
+msgctxt "form of address"
+msgid "Ms"
+msgstr ""
+
+#: src/postulo/accounts/addressing.py
+msgctxt "form of address"
+msgid "Mx"
+msgstr ""
+
 #: src/postulo/applications/models.py
 #, fuzzy
 msgid "My own choice"
@@ -11578,6 +11773,10 @@ msgstr "Ainm"
 #, fuzzy
 msgid "Name of the language"
 msgstr "Ainm na teanga"
+
+#: src/postulo/jobs/models.py
+msgid "Name the acquirer only for a company that was acquired."
+msgstr ""
 
 #: src/postulo/core/messaging_services.py
 #, fuzzy
@@ -12328,6 +12527,11 @@ msgstr "Aon duine a thaifead tú"
 msgid "Nobody, or the person below"
 msgstr "Aon duine, nó an duine thíos"
 
+#: src/postulo/accounts/addressing.py
+msgctxt "gender"
+msgid "Non-binary"
+msgstr ""
+
 #: src/postulo/jobs/industries.py
 #, fuzzy
 msgid "Non-profit"
@@ -12548,6 +12752,10 @@ msgstr "Nach bhfuil clóite ar aon CV go dtí go bhfuil siad aontaithe."
 msgid "Not recorded"
 msgstr "Níor taifeadadh"
 
+#: src/postulo/jobs/forms.py
+msgid "Not recorded here"
+msgstr ""
+
 #: src/postulo/documents/forms.py
 #, fuzzy
 msgid "Not said"
@@ -12657,6 +12865,19 @@ msgstr "Tugtha faoi deara"
 #, fuzzy, python-format
 msgid "noted %(when)s"
 msgstr "tugtha faoi deara %(when)s"
+
+#: src/postulo/jobs/models.py
+msgid "noted by"
+msgstr ""
+
+#: src/postulo/templates/jobs/partials/company_signals.html
+#, python-format
+msgid "Noted by <bdi>%(name)s</bdi>"
+msgstr ""
+
+#: src/postulo/templates/jobs/partials/company_signals.html
+msgid "Noted by somebody who has since left"
+msgstr ""
 
 #: src/postulo/jobs/models.py
 #, fuzzy
@@ -15118,6 +15339,11 @@ msgstr "Táirgthe ag Postulo ó thaifid an duine seo féin. Ní shocraíonn Post
 msgid "Produced on %(produced)s"
 msgstr "Táirgthe ar %(produced)s"
 
+#: src/postulo/accounts/addressing.py
+msgctxt "form of address"
+msgid "Prof."
+msgstr ""
+
 #: src/postulo/resume/models.py
 #, fuzzy
 msgid "proficiency"
@@ -15570,6 +15796,20 @@ msgstr "Taifead tairiscint"
 msgid "Record and change: applications, listings, notes, reminders, letters, your details. A call that changes a record answers with the whole record, timeline and contacts included, so this can see what it touches"
 msgstr "Taifead agus athrú: iarratais, liostaí, nótaí, meabhrúcháin, litreacha, do shonraí. Glao a athraíonn freagraí taifead leis an taifead iomlán, amlíne agus teagmhálacha san áireamh, ionas gur féidir é seo a fheiceáil cad a bhaineann sé"
 
+#: src/postulo/templates/jobs/company_wikidata.html
+#, python-format
+msgid "Record it as acquired or merged into <bdi>%(name)s</bdi>"
+msgstr ""
+
+#: src/postulo/templates/jobs/company_wikidata.html
+msgid "Record it as dissolved"
+msgstr ""
+
+#: src/postulo/templates/jobs/company_wikidata.html
+#, python-format
+msgid "Record it as dissolved on %(date)s"
+msgstr ""
+
 #: src/postulo/templates/server/record_of_processing.html
 #, fuzzy
 msgid "Record of processing"
@@ -15596,6 +15836,10 @@ msgstr "Taifead a bhfuil seolta agat"
 #, fuzzy
 msgid "Recorded"
 msgstr "Taifeadta"
+
+#: src/postulo/jobs/models.py
+msgid "recorded"
+msgstr ""
 
 #: src/postulo/plugins/forms.py
 #, fuzzy
@@ -15984,6 +16228,10 @@ msgstr "Bain an pictiúr uaslódáilte"
 msgid "Remove this connection?"
 msgstr "Bain an nasc seo?"
 
+#: src/postulo/templates/jobs/company_form.html
+msgid "Remove this entry"
+msgstr ""
+
 #: src/postulo/templates/server/design.html
 #, fuzzy
 msgid "Remove this example?"
@@ -16351,6 +16599,10 @@ msgstr "Sábháil agus ar aghaidh"
 #, fuzzy
 msgid "save as I go"
 msgstr "shábháil mar a théann mé"
+
+#: src/postulo/templates/jobs/company_form.html
+msgid "Save the change"
+msgstr ""
 
 #: src/postulo/templates/jobs/company_form.html
 #, fuzzy
@@ -17002,6 +17254,10 @@ msgstr[4] "Roinnte le %(counter)s"
 msgid "Shared with %(who)s."
 msgstr "Roinnte le %(who)s."
 
+#: src/postulo/templates/jobs/company_form.html
+msgid "Shared with everybody who can see this company. Say when it became true and where you learnt it, if you know."
+msgstr ""
+
 #: src/postulo/jobs/whose.py
 #, fuzzy
 msgid "Shared with you"
@@ -17031,6 +17287,11 @@ msgstr "scaireanna"
 #, fuzzy
 msgid "Sharing"
 msgstr "Comhroinnt"
+
+#: src/postulo/accounts/addressing.py
+msgctxt "pronouns"
+msgid "she/her"
+msgstr ""
 
 #: src/postulo/core/widgets_builtin.py
 #, fuzzy
@@ -17252,6 +17513,10 @@ msgstr "Síniú isteach"
 msgid "Sign-in methods"
 msgstr "Modhanna sínithe isteach"
 
+#: src/postulo/jobs/models.py
+msgid "signal"
+msgstr ""
+
 #: src/postulo/core/mail_choices.py
 #, fuzzy
 msgid "Signed in once, as the mailbox that sends"
@@ -17286,6 +17551,10 @@ msgstr "Síniú isteach le comhartha"
 #, fuzzy
 msgid "Signs in to an existing account by e-mail"
 msgstr "Sínigh isteach i gcuntas atá ann trí ríomhphost"
+
+#: src/postulo/jobs/models.py
+msgid "since"
+msgstr ""
 
 #: src/postulo/resume/models.py
 #, fuzzy, python-format
@@ -17555,6 +17824,7 @@ msgstr "Thoiligh duine éigin leis seo. Tástáil é le bheith cinnte go seasann
 msgid "Somebody shares a company, a contact or a listing with you"
 msgstr "Somebody scaireanna cuideachta, teagmháil nó liosta le leat"
 
+#: src/postulo/templates/jobs/company_form.html
 #: src/postulo/templates/jobs/partials/sharing_panel.html
 #, fuzzy
 msgid "somebody who has since left"
@@ -17605,7 +17875,10 @@ msgstr "Sórtáil de réir %(column)s, is ísle ar dtús"
 msgid "source"
 msgstr "foinse"
 
-#: src/postulo/plugins/kinds.py src/postulo/templates/server/email.html
+#: src/postulo/plugins/kinds.py src/postulo/templates/jobs/company_form.html
+#: src/postulo/templates/jobs/partials/company_signals.html
+#: src/postulo/templates/jobs/partials/company_status.html
+#: src/postulo/templates/server/email.html
 #: src/postulo/templates/server/plugins.html
 #: src/postulo/templates/widgets/sources.html
 #, fuzzy
@@ -17737,12 +18010,13 @@ msgstr "stádas"
 
 #: src/postulo/applications/forms.py src/postulo/applications/reports.py
 #: src/postulo/applications/tables.py src/postulo/core/csv_import.py
-#: src/postulo/templates/accounts/invite_list.html
+#: src/postulo/jobs/tables.py src/postulo/templates/accounts/invite_list.html
 #: src/postulo/templates/applications/partials/bulk_fields.html
 #: src/postulo/templates/applications/partials/status_card.html
 #: src/postulo/templates/applications/report.html
 #: src/postulo/templates/applications/report_print.html
 #: src/postulo/templates/core/import_csv_map.html
+#: src/postulo/templates/jobs/company_form.html
 #, fuzzy
 msgid "Status"
 msgstr "Stádas"
@@ -18950,6 +19224,11 @@ msgstr "D’oibrigh sé sin."
 msgid "That would make a loop: %(name)s is already part of this one."
 msgstr "Dhéanfadh sé sin lúb: tá %(name)s ina cuid de seo cheana."
 
+#: src/postulo/jobs/models.py
+#, python-format
+msgid "That would make a loop: %(name)s was already acquired by this one."
+msgstr ""
+
 #: src/postulo/applications/views.py src/postulo/jobs/views.py
 #, fuzzy, python-format
 msgid "The %(count)d document you sent is kept, and still says where it went."
@@ -19220,6 +19499,14 @@ msgstr "Níl aon seoladh ag an gcuideachta é a chur ar: cuir ceann amháin, agu
 msgid "The company is matched by name and created if it is new. Only the company and the job title are required; everything else can be filled in later."
 msgstr "Meaitseáiltear an chuideachta de réir ainm agus cruthaítear í má tá sí nua. Níl ag teastáil ach an chuideachta agus teideal an phoist; is féidir gach rud eile a líonadh isteach níos déanaí."
 
+#: src/postulo/applications/forms.py
+msgid "The company is recorded as dissolved. Tick this to add the listing."
+msgstr ""
+
+#: src/postulo/jobs/models.py
+msgid "The company it became part of, if that company is recorded here."
+msgstr ""
+
 #: src/postulo/jobs/models.py
 #, fuzzy
 msgid "The company this one belongs to, if it belongs to one."
@@ -19270,6 +19557,14 @@ msgstr "Iarrann an ceadúnas tíleanna ar an léarscáil mar ghnáththéacs. Mar
 msgid "The dashboard lists open applications nothing has happened to for a while, with nothing planned. Recruiters' own advice clusters around two to three weeks."
 msgstr "Liostálann an painéal iarratais oscailte nár tharla aon rud dóibh le tamall, gan aon rud beartaithe. Bíonn comhairle na n-earcaitheoirí féin thart ar dhá go trí seachtaine."
 
+#: src/postulo/api/routers/companies.py src/postulo/jobs/forms.py
+msgid "The date cannot be in the future."
+msgstr ""
+
+#: src/postulo/jobs/models.py
+msgid "The date it became true, if known."
+msgstr ""
+
 #: src/postulo/documents/forms.py
 #, fuzzy
 msgid "The date on the letter, as a date. Leave it empty when you do not know."
@@ -19279,6 +19574,10 @@ msgstr "An dáta ar an litir, mar dháta. Fág folamh é nuair nach bhfuil a fhi
 #, fuzzy
 msgid "The date you mean to have sent it by. It is not a reminder — set one of those if you want telling."
 msgstr "An dáta a bhfuil sé i gceist agat é a bheith seolta faoi. Ní meabhrúchán é — socraigh ceann acu sin más mian leat a bheith ar an eolas."
+
+#: src/postulo/jobs/forms.py
+msgid "The day it was true or reported, not today's date unless it is."
+msgstr ""
 
 #: src/postulo/templates/server/plugins.html
 #, fuzzy
@@ -20668,6 +20967,11 @@ msgstr "Bhí siad ag agallamh."
 msgid "They were the main contact."
 msgstr "Ba iad an príomhtheagmhálaí."
 
+#: src/postulo/accounts/addressing.py
+msgctxt "pronouns"
+msgid "they/them"
+msgstr ""
+
 #: src/postulo/jobs/pages.py
 #, fuzzy
 msgid "This account does not keep a rendering of a page."
@@ -20800,6 +21104,11 @@ msgstr "Caitheadh an ghabháil seo uaidh."
 msgid "This company"
 msgstr "An chuideachta seo"
 
+#: src/postulo/jobs/status.py
+#, python-format
+msgid "This company has been in administration since %(date)s."
+msgstr ""
+
 #: src/postulo/jobs/logos.py
 #, fuzzy
 msgid "This company has no website recorded."
@@ -20809,6 +21118,24 @@ msgstr "Níl aon suíomh gréasáin taifeadta don chuideachta seo."
 #, fuzzy
 msgid "This company has none of its industries from the NACE list yet."
 msgstr "Tá an chuideachta aon cheann dá tionscail ó liosta NACE go fóill."
+
+#: src/postulo/jobs/status.py
+msgid "This company is recorded as being in administration."
+msgstr ""
+
+#: src/postulo/jobs/status.py
+msgid "This company is recorded as dissolved."
+msgstr ""
+
+#: src/postulo/jobs/status.py
+#, python-format
+msgid "This company was dissolved on %(date)s."
+msgstr ""
+
+#: src/postulo/jobs/status.py
+#, python-format
+msgid "This company was reported laying people off as of %(date)s."
+msgstr ""
 
 #: src/postulo/templates/resume/item_form.html
 #, fuzzy
@@ -21201,6 +21528,10 @@ msgstr "Tick sé nuair a bhí tú. Tá na cruinnithe ar fhreastail an tuarascái
 #, fuzzy
 msgid "Tick rows to act on several at once."
 msgstr "Ticeáil rónna chun gníomhú ar roinnt acu ag an am céanna."
+
+#: src/postulo/applications/forms.py
+msgid "Tick the box to add the listing anyway."
+msgstr ""
 
 #: src/postulo/jobs/capture_views.py
 #, fuzzy
@@ -22312,9 +22643,8 @@ msgid "What is in the file"
 msgstr "A bhfuil sa chomhad"
 
 #: src/postulo/templates/help/your_name.html
-#, fuzzy
-msgid "What is kept is the text itself. If your career record changes language, a choice made from the other language's list stays what it was, and is shown as <em>Other…</em> with its text in the box."
-msgstr "An méid a choinnítear is é an téacs féin é. Má athraíonn teanga do thaifid ghairme, fanann rogha a rinneadh ó liosta na teanga eile mar a bhí sí, agus taispeántar mar <em>Eile…</em> í le a téacs sa bhosca."
+msgid "What is kept is the choice, not one language's word for it: <em>il</em> in French and <em>he/him</em> in English are the same choice, so your menus and your documents show it in the language they are drawn in when your career record changes language. Only what you write under <em>Other…</em> is kept as you typed it, and shown as typed in every language. A word you type there that a list already has is kept as that choice."
+msgstr ""
 
 #: src/postulo/templates/documents/cv_detail.html
 #, fuzzy
@@ -22455,6 +22785,10 @@ msgstr "Cén saghas oibre atá ann. Na réimsí thíos a leanúint ar an gcineá
 #, fuzzy
 msgid "what the check found"
 msgstr "a bhfuair an tseiceáil amach"
+
+#: src/postulo/jobs/forms.py
+msgid "What the company is. Shown to everybody who can see it."
+msgstr ""
 
 #: src/postulo/applications/forms.py
 #, fuzzy
@@ -22606,6 +22940,14 @@ msgstr "cad a aontaíodh"
 #, fuzzy
 msgid "what was asked"
 msgstr "cad a iarradh"
+
+#: src/postulo/templates/jobs/company_form.html
+msgid "What was reported"
+msgstr ""
+
+#: src/postulo/jobs/forms.py
+msgid "What was reported about its hiring."
+msgstr ""
 
 #: src/postulo/applications/forms.py
 #, fuzzy
@@ -22902,6 +23244,14 @@ msgstr "Nuair is féidir leis an sampla seo cód a sheoladh chuig guthán, is f�
 msgid "Where you came across it: a job board, a referral, the company site."
 msgstr "Cár tháinig tú air: bord post, moladh, suíomh na cuideachta."
 
+#: src/postulo/jobs/models.py
+msgid "Where you learnt it: a news article, a post."
+msgstr ""
+
+#: src/postulo/jobs/models.py
+msgid "Where you learnt it: a register, an article."
+msgstr ""
+
 #: src/postulo/resume/views.py
 #, fuzzy
 msgid "where you live"
@@ -23174,10 +23524,19 @@ msgstr "Tugann Wikidata a ainm sa teanga sin. Fetch arís a athrú, nó é a chu
 msgid "Wikidata has no item with that identifier."
 msgstr "Tá Wikidata aon mhír leis an aitheantóir."
 
+#: src/postulo/templates/jobs/company_wikidata.html
+#, python-format
+msgid "Wikidata names %(qid)s as its replacement; no company here carries that identifier."
+msgstr ""
+
 #: src/postulo/jobs/wikidata.py
 #, fuzzy
 msgid "Wikidata redirected too many times."
 msgstr "Wikidata atreoraíodh an iomarca uair."
+
+#: src/postulo/templates/jobs/company_wikidata.html
+msgid "Wikidata says this organisation has ended. Choose whether to record it; the legal state is shown to everybody who can see this company."
+msgstr ""
 
 #: src/postulo/jobs/wikidata.py
 #, fuzzy

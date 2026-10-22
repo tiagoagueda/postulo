@@ -419,6 +419,12 @@ def company_identifier(owner):
     )
 
 
+def company_signal(owner):
+    from postulo.jobs.models import CompanyHiringSignal
+
+    return CompanyHiringSignal.objects.create(company=company(owner), kind="hiring")
+
+
 def their_group(owner):
     from django.contrib.auth.models import Group
 
@@ -548,6 +554,10 @@ FACTORIES: dict[str, Callable] = {
     # its names in other languages, and what Wikidata said of it (#673)
     "jobs:company_wikidata": pk_of(company),
     "jobs:company_names": pk_of(company),
+    # its dated hiring signals (#941)
+    "jobs:company_signal_add": pk_of(company),
+    "jobs:company_signal_edit": pk_of(company_signal),
+    "jobs:company_signal_remove": pk_of(company_signal),
     "jobs:company_detail": pk_of(company),
     "jobs:company_logo": pk_of(logo_kept),
     # placing an address by hand: somebody's own address, on their *Your details* (#702)
@@ -590,6 +600,12 @@ API: dict[str, tuple[str, Callable, dict]] = {
     "postulo-api:get_company": ("get", pk_of(company), {}),
     "postulo-api:patch_company": ("patch", pk_of(company), {"notes": "x"}),
     "postulo-api:add_contact": ("post", pk_of(company), {"name": "x"}),
+    "postulo-api:add_signal": ("post", pk_of(company), {"kind": "hiring"}),
+    "postulo-api:remove_signal": (
+        "delete",
+        lambda owner: {"pk": (s := company_signal(owner)).company_id, "signal_id": s.pk},
+        {},
+    ),
     "postulo-api:get_application": ("get", pk_of(application), {}),
     "postulo-api:add_event": ("post", pk_of(application), {"summary": "x"}),
     "postulo-api:set_status": ("post", pk_of(application), {"status": "applied"}),

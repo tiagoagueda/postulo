@@ -307,8 +307,9 @@ class Profile(models.Model):
 
     #: What is written before the name -- Mr, Mme, *Eng.ª* -- and how to refer to the person
     #: -- she/her, *iel* -- as two answers, because they are two questions (#309). Each is
-    #: the text itself rather than a key into `accounts.addressing`'s lists, so it survives
-    #: a change of language and an *Other* is just text. Optional, never worked out from
+    #: a language-neutral concept (``mrs``, ``they``) from `accounts.addressing`, drawn in the
+    #: language of the page or the document, so it survives a change of language (#921);
+    #: *Other* is the one exception, the free text as typed. Optional, never worked out from
     #: anything, and nothing is assumed while blank. Neither is printed anywhere unless a
     #: CV says so: each CV chooses which of these details it carries, and both of these
     #: start off (#308, `documents.printing`).
@@ -316,8 +317,8 @@ class Profile(models.Model):
         _("form of address"), max_length=ADDRESSING_MAX_LENGTH, blank=True
     )
     pronouns = models.CharField(_("pronouns"), max_length=ADDRESSING_MAX_LENGTH, blank=True)
-    #: Gender in the person's own words (#681), stored as the text itself exactly as the form
-    #: of address is: a listed word, or whatever they typed. Optional, never worked out from a
+    #: Gender (#681), stored as a concept (``female``, ``non_binary``) exactly as the form of
+    #: address is, or whatever they typed under *Other*. Optional, never worked out from a
     #: name, an address or any other field, independent of the two above, and printed only on
     #: a CV that says so. There is none on a contact, which would record something about
     #: another person that nobody asked to be recorded.

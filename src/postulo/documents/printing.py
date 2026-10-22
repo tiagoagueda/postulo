@@ -32,6 +32,7 @@ from dataclasses import dataclass, field
 
 from django.utils.translation import gettext_lazy as _
 
+from postulo.accounts import addressing
 from postulo.accounts.identifiers import OTHER
 from postulo.core import demonyms, languages, personal
 from postulo.core.identifiers import PERSON, as_restored, find
@@ -429,9 +430,13 @@ def resolve(owner, cv: CV | None = None) -> Printed:
         printed.location = postal.printed_location(profile)
     if cv is not None and profile is not None:
         if cv.show_form_of_address:
-            printed.form_of_address = (profile.form_of_address or "").strip()
+            printed.form_of_address = addressing.label(
+                addressing.FORM_OF_ADDRESS, profile.form_of_address, languages.current()
+            )
         if cv.show_pronouns:
-            printed.pronouns = (profile.pronouns or "").strip()
+            printed.pronouns = addressing.label(
+                addressing.PRONOUNS, profile.pronouns, languages.current()
+            )
         if cv.show_birth_date:
             printed.birth_date = (profile.birth_date or "").strip()
         if cv.show_birth_place:
@@ -445,7 +450,9 @@ def resolve(owner, cv: CV | None = None) -> Printed:
             if not printed.nationalities and profile.nationality_scope in personal.SCOPES:
                 printed.nationality_scope = profile.nationality_scope
         if cv.show_gender:
-            printed.gender = (profile.gender or "").strip()
+            printed.gender = addressing.label(
+                addressing.GENDER, profile.gender, languages.current()
+            )
         if cv.show_photo:
             from postulo.accounts import avatars
 

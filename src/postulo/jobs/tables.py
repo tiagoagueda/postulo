@@ -3,13 +3,14 @@
 from django.utils.translation import gettext_lazy as _
 from django.utils.translation import ngettext_lazy
 
-from postulo.core.tables import Column, Table, register
+from postulo.core.tables import Column, ExtraFilter, Table, register
 
 from . import identifiers, industries
 from .models import (
     CompanyKind,
     DiscardReason,
     EmploymentType,
+    LegalState,
     RemoteType,
 )
 
@@ -32,6 +33,12 @@ class CompaniesTable(Table):
     #: table's half of the company page's *across the group* (#138). Handled by the view
     #: rather than by a lookup, because "everything in this group" is a walk and not a join.
     extra_params = ("q", "group", "whose")
+    #: Two questions the *Status* column carries (#941), applied by the view because what
+    #: *hiring* means is a reading of two things (a current signal, or listings not closed).
+    extra_filters = (
+        ExtraFilter("hiring", _("Hiring"), kind="flag", columns=("status",)),
+        ExtraFilter("live", _("Exclude dissolved"), kind="flag", columns=("status",)),
+    )
     changed_message = ngettext_lazy(
         "%(count)d company changed.", "%(count)d companies changed.", "count"
     )
@@ -131,6 +138,17 @@ class CompaniesTable(Table):
         # row would be ten joins per page for a fact the row above already states (#138).
         Column(
             "parent", _("Part of"), sort=("parent__name",), filter="text", lookups=("parent__name",)
+        ),
+        # What the company is and what it is doing about hiring (#941): the legal state
+        # when it is not active, then the latest signal or the count of open listings.
+        Column(
+            "status",
+            _("Status"),
+            sort=("legal_state",),
+            filter="choice",
+            lookups=("legal_state",),
+            choices=tuple(LegalState.choices),
+            default=True,
         ),
         # Employer or employment service (#202). Off by default -- most people have one
         # office and many employers, and the name cell says which is which -- and here so

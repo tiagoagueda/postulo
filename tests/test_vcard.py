@@ -359,7 +359,7 @@ def test_the_persons_own_card_has_n_and_only_what_the_default_cv_prints(user):
     user.save()
     profile = user.profile
     profile.headline = "Counsel"
-    profile.pronouns = "they/them"
+    profile.pronouns = "they"
     profile.birth_date = "1985-04-12"
     profile.save()
     PostalAddress.objects.create(
@@ -585,3 +585,20 @@ def test_a_file_that_is_refused_says_why_and_holds_nothing(client, user):
     assert "2.1" in response.content.decode()
     assert response.context["entries"] is None
     assert ContentType.objects.exists()
+
+
+@pytest.mark.django_db
+def test_the_pronouns_on_a_card_are_worded_in_the_language_of_the_career_record(user):
+    """The concept `he` is `il` on a card for a French record and `he/him` on an English
+    one; free text typed as Other is written as typed (#921)."""
+    profile = user.profile
+    profile.pronouns = "he"
+    profile.record_language = "fr-FR"
+    profile.save()
+    assert "PRONOUNS:il" in lines(vcard.card_to_text(vcards.card_for_person(user)))
+    profile.record_language = "en-GB"
+    profile.save()
+    assert "PRONOUNS:he/him" in lines(vcard.card_to_text(vcards.card_for_person(user)))
+    profile.pronouns = "xe/xem"
+    profile.save()
+    assert "PRONOUNS:xe/xem" in lines(vcard.card_to_text(vcards.card_for_person(user)))

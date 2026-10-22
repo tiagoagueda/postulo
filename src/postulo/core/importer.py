@@ -197,11 +197,13 @@ def _profile_value(profile, name: str, value):
         return _REFUSED
     if isinstance(value, str) and not value and not column.blank:
         return _REFUSED
-    if name == "gender" and isinstance(value, str):
-        # An archive written before #864 holds the words the list offered then.
+    if name in {"form_of_address", "pronouns", "gender"} and isinstance(value, str):
+        # An archive written before #921 holds the words some language's list offered (and
+        # before #864 the older gender words): each becomes the concept it names, and text
+        # that names none stays as it was typed.
         from postulo.accounts import addressing
 
-        value = addressing.current_gender_word(value)
+        value = addressing.stored_value(name, value)
     if name == "nationalities":
         # One function holds a list of nationalities to the rule at every door (#680).
         if not isinstance(value, list):
@@ -440,7 +442,17 @@ def _d(value):
 #: The keys whose value is an address a page will draw as a link: a web link, a listing's page, a
 #: company's site, a copy's place in a store, a career entry's own address and its credential.
 ADDRESS_KEYS = frozenset(
-    {"url", "website", "careers_url", "external_url", "logo_source_url", "credential_url"}
+    {
+        "url",
+        "website",
+        "careers_url",
+        "external_url",
+        "logo_source_url",
+        "credential_url",
+        # A company's legal state's source and a hiring signal's (#941).
+        "legal_state_source",
+        "source_url",
+    }
 )
 
 
@@ -870,6 +882,52 @@ def _restore_company_names(company, owner, rows) -> None:
         held.add(tag)
 
 
+def _closes_a_loop(acquirer, child_pk: int) -> bool:
+    """Whether naming ``acquirer`` for the company ``child_pk`` would close a loop: an archive
+    can say anything, and `Company.clean` is not run here (#941)."""
+    from postulo.jobs.models import Company
+
+    node, seen = acquirer, set()
+    for _step in range(Company.MAX_DEPTH + 1):
+        if node is None or node.pk in seen:
+            return False
+        if node.pk == child_pk:
+            return True
+        seen.add(node.pk)
+        node = node.acquired_by
+    return True
+
+
+def _restore_hiring_signals(company, importer, rows) -> None:
+    """A company's dated hiring entries (#941), format 75's: each a kind, a day and an address.
+
+    An entry with a kind this Postulo does not know or no day is left out rather than
+    guessed at. Who noted it is a username on the instance that wrote the file: it is kept
+    for the importing person's own entries and is nobody for anybody else's, whom this
+    instance may not know.
+    """
+    from django.utils import timezone
+
+    from postulo.jobs.models import HiringSignalKind
+
+    if not isinstance(rows, list):
+        return
+    for row in rows[:500]:
+        if not isinstance(row, dict) or row.get("kind") not in HiringSignalKind.values:
+            continue
+        day = _d(row.get("noted_on")) if isinstance(row.get("noted_on"), str) else None
+        if day is None:
+            continue
+        source = row.get("source_url")
+        company.signals.create(
+            kind=row["kind"],
+            noted_on=day,
+            source=source[:500] if isinstance(source, str) else "",
+            author=importer if row.get("author") == importer.get_username() else None,
+            created_at=_dt(row.get("created_at")) or timezone.now(),
+        )
+
+
 def _restore_postal_addresses(holder, owner, rows: list[dict], report=None) -> None:
     """Recreate a holder's addresses.
 
@@ -1174,6 +1232,7 @@ def _load(user, archive: zipfile.ZipFile, *, force: bool = False, into=None) -> 
         DiscardReason,
         Industry,
         JobPosting,
+        LegalState,
         ListingState,
         ListingStatus,
     )
@@ -1465,6 +1524,8 @@ def _load(user, archive: zipfile.ZipFile, *, force: bool = False, into=None) -> 
     #: reading and applied afterwards, because a parent may appear later in the file than
     #: its child does.
     wants_parent: dict[int, str] = {}
+    #: And the company each one was acquired by, resolved the same way (#941).
+    wants_acquirer: dict[int, str] = {}
 
     #: The department each application named, as (company name, department name).
     #: Applied after the tree, because a department at a parent company is only
@@ -1572,6 +1633,10 @@ def _load(user, archive: zipfile.ZipFile, *, force: bool = False, into=None) -> 
         # Resolved after every company in the file exists: a parent may be named before it
         # has been read, and an archive written before format 5 names none at all.
         parent_name = (company_entry.pop("parent", "") or "").strip()
+        # Format 75's status (#941): the company it was acquired by, resolved with the tree,
+        # and its dated hiring entries. An older archive has neither.
+        acquirer_name = str(company_entry.pop("acquired_by", "") or "").strip()
+        signal_entries = company_entry.pop("hiring_signals", None) or []
         # Its switchboard and its offices, as a contact's are written (#329); format 67 is the
         # first to carry them, and an older archive simply has none.
         company_numbers = _phone_rows(company_entry)
@@ -1592,6 +1657,14 @@ def _load(user, archive: zipfile.ZipFile, *, force: bool = False, into=None) -> 
         # A switch, read as one: anything but a true is not marked. An archive from before
         # format 44 says nothing, and every company in it is one that is not (#683).
         company_entry["from_career"] = company_entry.get("from_career") is True
+        # The legal state: one this Postulo knows, or active; a day or none; an address
+        # `drop_unsafe_addresses` has already emptied if it was not a web one (#941).
+        if company_entry.get("legal_state") not in LegalState.values:
+            company_entry["legal_state"] = LegalState.ACTIVE
+        since = company_entry.get("legal_state_since")
+        company_entry["legal_state_since"] = _d(since) if isinstance(since, str) else None
+        if not isinstance(company_entry.get("legal_state_source"), str):
+            company_entry["legal_state_source"] = ""
 
         # A company is an identity keyed by its name, which is why intake matches on
         # it too. Importing attaches to one that already exists rather than colliding
@@ -1622,6 +1695,9 @@ def _load(user, archive: zipfile.ZipFile, *, force: bool = False, into=None) -> 
             if company_notes:
                 company.write_note(user, company_notes)
             report.companies += 1
+            _restore_hiring_signals(company, user, signal_entries)
+            if acquirer_name:
+                wants_acquirer[company.pk] = acquirer_name
             from postulo.jobs import logos
 
             logo = _extract_within(archive, logo_name, logos.MAX_BYTES) if logo_name else None
@@ -1938,6 +2014,26 @@ def _load(user, archive: zipfile.ZipFile, *, force: bool = False, into=None) -> 
             parent = by_name.get(name.casefold())
             if parent is not None and parent.pk != child_pk:
                 Company.objects.filter(pk=child_pk).update(parent=parent)
+
+    # The company each was acquired by (#941), by name like the parent; never itself, and
+    # only while the company says it was acquired.
+    if wants_acquirer:
+        by_name = {
+            company.name.casefold(): company
+            for company in Company.objects.for_user(user).filter(
+                name__in=set(wants_acquirer.values())
+            )
+        }
+        for child_pk, name in wants_acquirer.items():
+            acquirer = by_name.get(name.casefold())
+            if (
+                acquirer is not None
+                and acquirer.pk != child_pk
+                and not _closes_a_loop(acquirer, child_pk)
+            ):
+                Company.objects.filter(pk=child_pk, legal_state=LegalState.ACQUIRED).update(
+                    acquired_by=acquirer
+                )
 
     # The companies the career names, by name like an agency: one the file does not hold
     # leaves the entry unlinked and its text as written, and nothing is added (#683).

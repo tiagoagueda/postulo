@@ -8,7 +8,9 @@ redirects (a merged item redirects to the one it was merged into), each held to
 or a schedule: a person presses *Fetch from Wikidata*, sees what came back, and keeps it or
 not.
 
-**What it reads, and what it keeps of it.** The item's labels, in the languages Postulo
+**What it reads, and what it keeps of it.** (#941: also whether the item ended -- P576 -- and
+which item replaced it -- P1366 -- which the review page only *offers*; a company's legal state
+is never changed unseen.) The item's labels, in the languages Postulo
 speaks (a label in a language nobody here can choose is a name nobody prints), with Wikidata's
 ``mul`` label standing in for a language that has none of its own. Wikidata is edited by
 anyone, so each label is treated as untrusted text: normalised, stripped of control and
@@ -27,6 +29,7 @@ import json
 import re
 import unicodedata
 from dataclasses import dataclass, field
+from datetime import date
 from urllib.parse import urljoin, urlsplit
 
 import httpx
@@ -61,6 +64,12 @@ class Item:
     names: dict[str, str] = field(default_factory=dict)
     #: ``(latitude, longitude)`` from the preferred, or the only, coordinate location (P625).
     point: tuple[float, float] | None = None
+    #: Whether the item says the organisation ended (P576), and the day when it says one
+    #: (#941). Only offered for confirmation; nothing here changes a company by itself.
+    dissolved: bool = False
+    dissolved_on: date | None = None
+    #: The items that replaced it (P1366), as identifiers.
+    replaced_by: list[str] = field(default_factory=list)
 
 
 def user_agent() -> str:
@@ -145,6 +154,51 @@ def point_from(claims: dict) -> tuple[float, float] | None:
     return lat, lon
 
 
+_TIME = re.compile(r"\+(\d{4})-(\d{2})-(\d{2})T")
+
+
+def _live(statements) -> list[dict]:
+    """The statements of a property that are not deprecated."""
+    return [
+        row for row in statements or [] if isinstance(row, dict) and row.get("rank") != "deprecated"
+    ]
+
+
+def dissolved_from(claims: dict) -> tuple[bool, date | None]:
+    """Whether the item has a *dissolved, abolished or demolished* date (P576), and the day.
+
+    The day only where there is exactly one statement and it is precise to the day (#941):
+    a year is not a day, and a company is not dissolved on January 1st because a year was
+    all Wikidata knew. An item with the property but no usable day is still dissolved.
+    """
+    statements = _live(claims.get("P576") if isinstance(claims, dict) else None)
+    if not statements:
+        return False, None
+    if len(statements) != 1:
+        return True, None
+    value = (((statements[0].get("mainsnak") or {}).get("datavalue") or {}).get("value")) or {}
+    if not isinstance(value, dict) or not isinstance(value.get("time"), str):
+        return True, None
+    match = _TIME.match(value["time"])
+    if not match or value.get("precision") != 11:
+        return True, None
+    try:
+        return True, date(int(match[1]), int(match[2]), int(match[3]))
+    except ValueError:
+        return True, None
+
+
+def replaced_by_from(claims: dict) -> list[str]:
+    """The items that replaced this one (P1366), as ``Q`` identifiers, at most three."""
+    found: list[str] = []
+    for row in _live(claims.get("P1366") if isinstance(claims, dict) else None):
+        value = (((row.get("mainsnak") or {}).get("datavalue") or {}).get("value")) or {}
+        qid = value.get("id") if isinstance(value, dict) else None
+        if isinstance(qid, str) and _QID.fullmatch(qid) and qid not in found:
+            found.append(qid)
+    return found[:3]
+
+
 def fetch(qid: str) -> Item:
     """Ask Wikidata for one item. Raises `WikidataRefused` with the reason."""
     qid = (qid or "").strip().upper()
@@ -158,10 +212,15 @@ def fetch(qid: str) -> Item:
     found_qid, entity = next(iter(entities.items()))
     if not isinstance(entity, dict):
         raise WikidataRefused(_("Wikidata's answer was not an item."))
+    claims = entity.get("claims") or {}
+    dissolved, dissolved_on = dissolved_from(claims)
     return Item(
         qid=str(found_qid),
         names=names_from(entity.get("labels") or {}),
-        point=point_from(entity.get("claims") or {}),
+        point=point_from(claims),
+        dissolved=dissolved,
+        dissolved_on=dissolved_on,
+        replaced_by=replaced_by_from(claims),
     )
 
 

@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% load i18n %}
+{% load i18n postulo %}
 
 {% block title %}{{ posting.title }}{% endblock %}
 {% block breadcrumb %}
@@ -19,6 +19,7 @@
         </a>
       </p>
       <c-page-title>{{ posting.title }}</c-page-title>
+      {% company_notice posting.company %}
       <p class="mt-1 text-sm text-ink-500 dark:text-ink-400">
         <span class="badge" data-tone="grey"
               data-listing-state="{{ posting.derived_state }}">

@@ -7,7 +7,7 @@ from functools import cached_property
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db import transaction
-from django.db.models import Count, Exists, OuterRef, Q
+from django.db.models import Count, Exists, OuterRef, Prefetch, Q
 from django.http import Http404, HttpRequest, HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse, reverse_lazy
@@ -56,18 +56,29 @@ from . import (
     mapping,
     merging,
     outline,
+    status,
     tiles,
     whose,
 )
-from .forms import CompanyForm, CompanyIdentifierFormSet, ContactForm, IndustryForm, JobPostingForm
+from .forms import (
+    CompanyForm,
+    CompanyIdentifierFormSet,
+    ContactForm,
+    HiringSignalForm,
+    IndustryForm,
+    JobPostingForm,
+)
 from .models import (
     Company,
+    CompanyHiringSignal,
     CompanyIdentifier,
     CompanyLogo,
     Contact,
     DiscardReason,
+    HiringSignalKind,
     Industry,
     JobPosting,
+    LegalState,
 )
 from .tables import CompaniesTable
 
@@ -189,6 +200,14 @@ class CompanyListView(PageOrFragmentMixin, OwnedObjectMixin, ListView):
         # The companies only the career added are not in the table until a filter asks (#683).
         if not self.table.given("from_career"):
             queryset = queryset.filter(from_career=False)
+        # The two questions of the Status column (#941).
+        if self.table.given("hiring"):
+            queryset = queryset.filter(
+                Q(signal_now=HiringSignalKind.HIRING)
+                | (Q(open_listing_count__gt=0) & Q(signal_now=""))
+            )
+        if self.table.given("live"):
+            queryset = queryset.exclude(legal_state=LegalState.DISSOLVED)
         queryset = self.table.apply(queryset)
         # The search matches industries and identifiers through `Exists`, so it cannot
         # repeat a company. Only the Industries column joins a many-valued relation, where
@@ -300,6 +319,7 @@ def pinned_addresses(person) -> list[dict]:
                 reverse("jobs:company_detail", args=[company.pk]),
                 True,
             )
+            state = company.legal_state if company.legal_state != LegalState.ACTIVE else ""
         elif row.content_type_id == contact_type:
             contact = contacts.get(row.object_id)
             if contact is None:
@@ -309,8 +329,10 @@ def pinned_addresses(person) -> list[dict]:
                 reverse("jobs:contact_update", args=[contact.pk]),
                 False,
             )
+            state = ""
         else:
             name, url, is_company = str(_("You")), reverse("accounts:profile"), False
+            state = ""
         lat, lon = row.latitude, row.longitude
         if row.placed_by not in placing.KEPT and row.place_key() != row.placed_from:
             placed = places_data_place(row)
@@ -326,6 +348,9 @@ def pinned_addresses(person) -> list[dict]:
                 "url": url,
                 "what": what,
                 "company": is_company,
+                #: A company's legal state when it is not active (#941): the map draws
+                #: such a pin differently and says why in its title.
+                "state": state,
                 "key": f"{row.content_type_id}:{row.object_id}",
                 "primary": row.is_primary,
                 "lat": lat,
@@ -421,6 +446,8 @@ class CompanyWikidataView(LoginRequiredMixin, View):
                 "back": request.session.get(self._back_key(company))
                 or reverse("jobs:company_detail", args=[company.pk]),
                 "names": names,
+                # Whether it ended, and who replaced it: offered, never applied unseen (#941).
+                "ending": self._ending(request, company, held),
                 # Where the point would go, and whether a hand-placed one is in its way (#701).
                 "address": address,
                 "by_hand": address is not None and address.placed_by == address.Placed.MANUAL,
@@ -439,6 +466,7 @@ class CompanyWikidataView(LoginRequiredMixin, View):
             back = request.session.pop(self._back_key(company), None)
             if held:
                 self._keep(company, held)
+                self._keep_ending(request, company, held)
                 messages.success(request, _("Kept what Wikidata said."))
             return redirect(back or self._back(request, company))
         qid = company.wikidata_id()
@@ -460,6 +488,9 @@ class CompanyWikidataView(LoginRequiredMixin, View):
             "qid": item.qid,
             "names": item.names,
             "point": list(item.point) if item.point else None,
+            "dissolved": item.dissolved,
+            "dissolved_on": item.dissolved_on.isoformat() if item.dissolved_on else None,
+            "replaced_by": item.replaced_by,
             "at": timezone.now().isoformat(),
         }
         return redirect("jobs:company_wikidata", pk=company.pk)
@@ -484,6 +515,84 @@ class CompanyWikidataView(LoginRequiredMixin, View):
                     },
                 )
             self.keep_point(company, held)
+
+    # ------------------------------------------------- whether it ended, and who replaced it
+    #
+    # A statement of Wikidata's about the company's legal state (#941). It is a fact other
+    # people see, so it is *offered* on the review page as a choice that starts on "leave it
+    # as it is", and written only by the person pressing Keep with a choice made.
+
+    def _ending(self, request, company, held) -> dict:
+        """What the held answer offers about the company's legal state: the day it was
+        dissolved, and the company it was replaced by when that one is recorded here and may
+        be named (every person who sees this company can see it, #896)."""
+        from datetime import date
+
+        from . import sharing
+        from .models import CompanyIdentifier
+
+        offer = {"dissolved": None, "replacement": None, "unrecorded": [], "refusal": ""}
+        if held.get("dissolved") and company.legal_state != LegalState.DISSOLVED:
+            when = held.get("dissolved_on")
+            offer["dissolved"] = {"on": date.fromisoformat(when) if when else None}
+        for qid in held.get("replaced_by") or []:
+            found = (
+                CompanyIdentifier.objects.filter(
+                    scheme=identifiers.WIKIDATA,
+                    value__iexact=qid,
+                    company__in=Company.objects.visible_to(request.user).values("pk"),
+                )
+                .exclude(company=company)
+                .select_related("company")
+                .first()
+            )
+            if found is None:
+                offer["unrecorded"].append(qid)
+                continue
+            refusal = sharing.check_link(company, found.company, request.user)
+            if refusal:
+                offer["refusal"] = refusal
+            elif offer["replacement"] is None and company.acquired_by_id != found.company_id:
+                offer["replacement"] = found.company
+        return offer
+
+    def _keep_ending(self, request, company, held) -> None:
+        """Write the legal state the person chose on the review page, if they chose one."""
+        from datetime import date
+
+        choice = request.POST.get("legal_state", "")
+        offer = self._ending(request, company, held)
+        when = held.get("dissolved_on")
+        since = date.fromisoformat(when) if when else None
+        source = f"https://www.wikidata.org/wiki/{held.get('qid', '')}"
+        if choice == LegalState.DISSOLVED and offer["dissolved"] is not None:
+            changes = {
+                "legal_state": LegalState.DISSOLVED,
+                "legal_state_since": since,
+                "legal_state_source": source,
+                "acquired_by": None,
+            }
+        elif choice == LegalState.ACQUIRED and offer["replacement"] is not None:
+            changes = {
+                "legal_state": LegalState.ACQUIRED,
+                "legal_state_since": since,
+                "legal_state_source": source,
+                "acquired_by": offer["replacement"],
+            }
+        else:
+            return
+        for name, value in changes.items():
+            setattr(company, name, value)
+        company.save(update_fields=[*changes, "updated_at"])
+        from . import trail
+
+        trail.record(
+            company,
+            request.user,
+            trail.EDITED,
+            fields=[name for name in changes if name != "legal_state_source"],
+            via="Wikidata",
+        )
 
     def keep_point(self, company, held) -> None:
         """Where it is, from the same answer, on the primary address (#701).
@@ -783,6 +892,8 @@ class CompanyMapView(LoginRequiredMixin, TemplateView):
                 "what": entry["what"],
                 "place": entry["place"],
                 "company": entry["key"] if entry["company"] else "",
+                "state": entry["state"],
+                "state_label": str(LegalState(entry["state"]).label) if entry["state"] else "",
             }
             for entry in pinned
             if entry["lat"] is not None
@@ -875,8 +986,14 @@ class CompanyDetailView(SharedObjectMixin, DetailView):
             .get_queryset()
             .with_notes(self.request.user)
             .select_related("parent")
+            .select_related("acquired_by")
             .prefetch_related(
-                "industries", "identifiers", "names", "phone_numbers", "postal_addresses"
+                "industries",
+                "identifiers",
+                "names",
+                "phone_numbers",
+                "postal_addresses",
+                Prefetch("signals", queryset=CompanyHiringSignal.objects.select_related("author")),
             )
         )
 
@@ -891,6 +1008,8 @@ class CompanyDetailView(SharedObjectMixin, DetailView):
         from . import sharing
 
         context["sharing"] = sharing.panel(self.object, person)
+        # What it is and what it is doing about hiring (#941), shared with the company.
+        context["company_status"] = status.for_company(self.object, person)
         context["can_write"] = (
             Company.objects.visible_to(person, write=True, everyone=True)
             .filter(pk=self.object.pk)
@@ -1196,6 +1315,26 @@ class CompanyUpdateView(
     addresses_pinnable = False
     links_for_company = True
 
+    def get_context_data(self, **kwargs) -> dict:
+        from postulo.core import languages
+
+        context = super().get_context_data(**kwargs)
+        # Its dated hiring entries and the form that adds one (#941); each is changed or
+        # taken off by a form of its own, outside the company's.
+        context["signals"] = list(self.object.signals.select_related("author"))
+        # Its own ids: the company's form has a `kind` of its own on the same page.
+        context["signal_form"] = HiringSignalForm(
+            auto_id="signal_%s", initial={"noted_on": timezone.localdate()}
+        )
+        context["signal_kinds"] = HiringSignalKind.choices
+        # The names in other languages, edited here and read from the company's page (#917).
+        context["company_names"] = _company_names(self.object)
+        context["wikidata_offered"] = wikidata_offered(self.request.user)
+        context["name_languages"] = sorted(
+            languages.NATIVE_NAMES.items(), key=lambda pair: pair[1].casefold()
+        )
+        return context
+
     def form_valid(self, form):
         if (refused := self.refuse_bad_identifiers(form)) is not None:
             return refused
@@ -1203,18 +1342,6 @@ class CompanyUpdateView(
             return refused
         messages.success(self.request, _("Company updated."))
         return super().form_valid(form)
-
-    def get_context_data(self, **kwargs):
-        """The names in other languages, edited here and read from the company's page (#917)."""
-        from postulo.core import languages
-
-        context = super().get_context_data(**kwargs)
-        context["company_names"] = _company_names(self.object)
-        context["wikidata_offered"] = wikidata_offered(self.request.user)
-        context["name_languages"] = sorted(
-            languages.NATIVE_NAMES.items(), key=lambda pair: pair[1].casefold()
-        )
-        return context
 
 
 class CompanyLogoView(OwnedObjectMixin, View):

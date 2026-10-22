@@ -25,6 +25,7 @@ from django.db import transaction
 from django.utils.translation import gettext as _
 from django.utils.translation import ngettext
 
+from postulo.accounts import addressing
 from postulo.core import (
     addresses,
     link_services,
@@ -108,15 +109,36 @@ def card_for_contact(contact: Contact, *, notes: bool = False) -> vcard.Card:
     )
 
 
+def _legal_state_note(company: Company) -> str:
+    """One line saying what the company is, when it is anything but active (#941): the
+    state, the day it became true and where it was learnt. A card of an active company
+    carries none, and the hiring entries are not on a card at all -- they are a reading of
+    the moment, which a file outlives."""
+    from .models import LegalState
+
+    if company.legal_state == LegalState.ACTIVE:
+        return ""
+    line = str(company.get_legal_state_display())
+    if company.legal_state_since:
+        line += f" ({company.legal_state_since.isoformat()})"
+    if company.legal_state_source:
+        line += f" {company.legal_state_source}"
+    return line
+
+
 def card_for_company(company: Company, *, notes: bool = False) -> vcard.Card:
     """A company as a ``KIND:org`` card. Its location waits for a company to have an
-    address (#329)."""
+    address (#329). Its notes are the person's own, only when asked; a legal state other
+    than active is a fact and goes in the note either way (#941)."""
+    note = "\n".join(
+        line for line in (company.own_note() if notes else "", _legal_state_note(company)) if line
+    )
     return vcard.Card(
         name=company.name,
         kind=vcard.KIND_ORG,
         company=company.name,
         links=(vcard.Link(company.website),) if company.website else (),
-        notes=company.own_note() if notes else "",
+        notes=note,
         uid=vcard.uid_for(instance_name(), "company", company.pk),
         revised=company.updated_at,
     )
@@ -165,7 +187,13 @@ def card_for_person(user) -> vcard.Card:
         links=tuple(
             vcard.Link(url) for url in (printed.website, printed.social, printed.repository) if url
         ),
-        pronouns=(getattr(profile, "pronouns", "") or "").strip(),
+        # The concept in the language of the card (#921): the career record's, else this
+        # request's. Free text typed as *Other* is written as typed.
+        pronouns=addressing.label(
+            addressing.PRONOUNS,
+            getattr(profile, "pronouns", ""),
+            addressing.language_of(profile),
+        ),
         uid=vcard.uid_for(instance_name(), "person", user.pk),
     )
 

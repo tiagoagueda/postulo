@@ -27,6 +27,26 @@
           {% endif %}
         </span>
       </td>
+    {% elif column.key == 'status' %}
+      {% comment %} The legal state when it is not active, the latest hiring signal (as of its
+         date once stale), and the count of listings not closed where nobody has a current
+         word (#941). {% endcomment %}
+      <td class="px-4 py-3" data-company-state-cell>
+        <span class="flex flex-wrap items-center gap-1">
+          {% if company.legal_state != 'active' %}
+            <span class="badge" data-tone="{% if company.legal_state == 'administration' or company.legal_state == 'dissolved' %}amber{% else %}grey{% endif %}" data-legal-state="{{ company.legal_state }}"><span>{{ company.get_legal_state_display }}</span></span>
+          {% endif %}
+          {% if company.signal_kind %}
+            <span class="badge" data-tone="{% if company.signal_kind == 'hiring' %}green{% elif company.signal_kind == 'laying_off' %}amber{% else %}grey{% endif %}" data-hiring-signal="{{ company.signal_kind }}">
+              <span>{{ company.signal_kind_label }}{% if not company.signal_now %} · {% blocktranslate trimmed with date=company.signal_on|date:"DATE_FORMAT" %}as of {{ date }}{% endblocktranslate %}{% endif %}</span>
+            </span>
+          {% endif %}
+          {% if company.open_listing_count and not company.signal_now %}
+            <span class="badge" data-tone="grey" data-derived-hiring><span>{% blocktranslate count counter=company.open_listing_count trimmed %}{{ counter }} open listing{% plural %}{{ counter }} open listings{% endblocktranslate %}</span></span>
+          {% endif %}
+          {% if company.legal_state == 'active' and not company.signal_kind and not company.open_listing_count %}—{% endif %}
+        </span>
+      </td>
     {% elif column.key == 'kind' %}
       <td class="px-4 py-3 text-ink-500 dark:text-ink-400">{{ company.get_kind_display }}</td>
     {% elif column.key == 'from_career' %}

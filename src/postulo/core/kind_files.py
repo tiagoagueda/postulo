@@ -63,9 +63,10 @@ MAX_DETAILS = 20
 #: when it gained ``email``, ``phone_numbers`` and ``postal_addresses`` (#329), and to 4 when
 #: the archive's block stopped carrying ``location`` (#702): the file still writes the line,
 #: which becomes the town and country of the company's primary address, and reads an older
-#: file exactly as before.
+#: file exactly as before. It went to 5 when the archive's company block gained a legal state
+#: and hiring entries (#941): the file does not write them yet, and reads an older one as before.
 #: The contacts file went to 2 when an address gained its point and its map choice (#702).
-FORMATS = {"companies": 4, "contacts": 2, "listings": 1, "applications": 1}
+FORMATS = {"companies": 5, "contacts": 2, "listings": 1, "applications": 1}
 
 #: Telephone numbers are not read with a say in whether they were confirmed or are a way
 #: back in (#142, #144): neither is written.

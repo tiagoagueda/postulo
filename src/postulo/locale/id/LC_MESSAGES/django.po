@@ -225,6 +225,12 @@ msgid "%(count)d messaging handle"
 msgid_plural "%(count)d messaging handles"
 msgstr[0] "%(count)d nama pengguna perpesanan"
 
+#: src/postulo/jobs/status.py
+#, python-format
+msgid "%(count)d open listing"
+msgid_plural "%(count)d open listings"
+msgstr[0] ""
+
 #: src/postulo/core/gdpr.py
 #, python-format
 msgid "%(count)d plugin row"
@@ -416,6 +422,12 @@ msgstr[0] "%(counter)s anggota"
 msgid "%(counter)s of your records is shared with others: they keep a copy of what their own records need, and are told it is gone."
 msgid_plural "%(counter)s of your records are shared with others: they keep a copy of what their own records need, and are told they are gone."
 msgstr[0] "%(counter)s rekaman Anda dibagikan dengan orang lain: mereka menyimpan salinan yang dibutuhkan rekaman mereka sendiri, dan diberi tahu bahwa rekaman itu telah hilang."
+
+#: src/postulo/templates/jobs/partials/company_row.html
+#, python-format
+msgid "%(counter)s open listing"
+msgid_plural "%(counter)s open listings"
+msgstr[0] ""
 
 #: src/postulo/templates/core/search.html
 #, python-format
@@ -1435,8 +1447,8 @@ msgid "<em>Kind</em> says what the number is, and can be left blank. Choose <em>
 msgstr "<em>Jenis</em> menyatakan jenis nomornya, dan dapat dikosongkan. Pilih <em>Lainnya</em>, dan sebuah kotak akan menanyakan namanya."
 
 #: src/postulo/templates/help/contact_block.html
-msgid "<em>Language of your career record</em> says which language your experience, education and projects are typed in. A CV in another language shows what you have translated and says what it could not. It also decides which forms of address and pronouns the menus of <em>Your name</em> offer. Left as it is, it follows the language you read Postulo in."
-msgstr "<em>Bahasa riwayat karier Anda</em> menyatakan dalam bahasa apa pengalaman, pendidikan, dan proyek Anda diketik. CV dalam bahasa lain menampilkan apa yang telah Anda terjemahkan dan menyebutkan apa yang tidak dapat ditampilkannya. Bahasa ini juga menentukan bentuk sapaan dan kata ganti yang ditawarkan menu di <em>Nama Anda</em>. Jika dibiarkan apa adanya, bahasa ini mengikuti bahasa yang Anda gunakan untuk membaca Postulo."
+msgid "<em>Language of your career record</em> says which language your experience, education and projects are typed in. A CV in another language shows what you have translated and says what it could not. It also decides which forms of address and pronouns the menus of <em>Your name</em> offer, and in which words. Left as it is, it follows the language you read Postulo in."
+msgstr ""
 
 #: src/postulo/templates/help/contact_block.html
 msgid "<em>Location</em> is where you are, as a document should print it. Left blank, your documents print the town and country of your primary postal address, never the street, and the box shows that line in grey. The blank is what is kept, so making another address the primary changes what is printed without this page being saved again. Type something and that is printed instead."
@@ -1634,6 +1646,10 @@ msgid "A company"
 msgstr "Perusahaan"
 
 #: src/postulo/jobs/models.py
+msgid "A company cannot acquire itself."
+msgstr ""
+
+#: src/postulo/jobs/models.py
 msgid "A company cannot be part of itself."
 msgstr "Perusahaan tidak dapat menjadi bagian dari dirinya sendiri."
 
@@ -1826,8 +1842,8 @@ msgid "A form of address is what is written before a name, and pronouns say how 
 msgstr "Bentuk sapaan adalah apa yang ditulis sebelum nama, dan kata ganti menyatakan cara merujuk kepada Anda. Tidak ada yang diasumsikan jika salah satunya kosong, dan keduanya tidak pernah disimpulkan dari nama Anda."
 
 #: src/postulo/core/help.py
-msgid "A form of address is written before your name, and your pronouns say how to refer to you. Both are optional, and nothing is assumed when they are blank."
-msgstr "Sapaan ditulis sebelum nama Anda, dan kata ganti Anda menunjukkan cara merujuk kepada Anda. Keduanya opsional, dan tidak ada yang diasumsikan jika kosong."
+msgid "A form of address is written before your name, and your pronouns say how to refer to you. Both are optional, nothing is assumed when they are blank, and each is kept as a choice that your pages and documents show in their own language."
+msgstr ""
 
 #: src/postulo/core/views_access.py
 msgid "A group needs a name."
@@ -2519,6 +2535,18 @@ msgstr "Akun"
 msgid "Acknowledged"
 msgstr "Dikonfirmasi"
 
+#: src/postulo/jobs/models.py
+msgid "acquired by"
+msgstr ""
+
+#: src/postulo/jobs/models.py
+msgid "Acquired or merged"
+msgstr ""
+
+#: src/postulo/api/routers/companies.py
+msgid "acquired_by must be a company you can see."
+msgstr ""
+
 #: src/postulo/templates/jobs/company_detail.html
 #, python-format
 msgid "Across the %(name)s group"
@@ -2545,6 +2573,10 @@ msgstr "Tindakan untuk %(name)s"
 #, python-format
 msgid "Actions for %(what)s"
 msgstr "Tindakan untuk %(what)s"
+
+#: src/postulo/jobs/models.py
+msgid "Active"
+msgstr ""
 
 #: src/postulo/templates/applications/application_detail.html
 #: src/postulo/templates/jobs/company_detail.html
@@ -2607,6 +2639,10 @@ msgstr "Tambahkan tag"
 msgid "Add all of this"
 msgstr "Tambahkan semua ini"
 
+#: src/postulo/templates/jobs/company_form.html
+msgid "Add an entry"
+msgstr ""
+
 #: src/postulo/templates/resume/item_form.html
 msgid "Add an industry"
 msgstr "Tambahkan bidang usaha"
@@ -2619,6 +2655,10 @@ msgstr "Tambahkan entri"
 #: src/postulo/templates/jobs/posting_detail.html
 msgid "Add entry"
 msgstr "Tambahkan entri"
+
+#: src/postulo/applications/forms.py
+msgid "Add it anyway"
+msgstr ""
 
 #: src/postulo/applications/ical_import.py
 msgid "Add it as"
@@ -3493,6 +3533,20 @@ msgstr "Seperti yang tertulis: persentase, jumlah opsi saham, jadwal vesting."
 msgid "As it will print"
 msgstr "Seperti yang akan dicetak"
 
+#: src/postulo/jobs/models.py
+msgid "as of"
+msgstr ""
+
+#: src/postulo/templates/jobs/company_form.html
+msgid "As of"
+msgstr ""
+
+#: src/postulo/templates/jobs/partials/company_row.html
+#: src/postulo/templates/jobs/partials/company_status.html
+#, python-format
+msgid "as of %(date)s"
+msgstr ""
+
 #: src/postulo/templates/documents/cv_text.html
 msgid "As plain text"
 msgstr "Sebagai teks biasa"
@@ -3888,6 +3942,11 @@ msgstr "oleh"
 msgid "By"
 msgstr "Oleh"
 
+#: src/postulo/templates/jobs/partials/company_status.html
+#, python-format
+msgid "by <a href=\"%(acquirer_url)s\" class=\"underline\"><bdi>%(name)s</bdi></a>"
+msgstr ""
+
 #: src/postulo/templates/widgets/sources.html
 msgid "By agency"
 msgstr "Menurut agensi"
@@ -4186,6 +4245,7 @@ msgstr "sertifikasi"
 msgid "Certifications it issued"
 msgstr "Sertifikasi yang diterbitkannya"
 
+#: src/postulo/templates/jobs/company_form.html
 #: src/postulo/templates/settings/locale.html
 msgid "Change"
 msgstr "Ubah"
@@ -4422,6 +4482,10 @@ msgstr "Pilih jenis pengenal."
 #: src/postulo/templates/documents/cv_detail.html
 msgid "Choose what it prints instead"
 msgstr "Pilih yang ditampilkan sebagai gantinya"
+
+#: src/postulo/jobs/status_views.py
+msgid "Choose what was reported and the date."
+msgstr ""
 
 #: src/postulo/applications/views.py
 msgid "Choose which application this is about first."
@@ -4934,6 +4998,10 @@ msgstr "Dihitung berdasarkan waktu kejadiannya, jadi balasan dalam periode ini u
 msgid "Counted by when it happened, so a reply in this period to an older application belongs here. That is a different question from what was sent, and the two are kept apart."
 msgstr "Dihitung berdasarkan waktu kejadiannya, jadi balasan dalam periode ini untuk lamaran yang lebih lama masuk di sini. Itu pertanyaan yang berbeda dari apa yang dikirim, dan keduanya dipisahkan."
 
+#: src/postulo/templates/jobs/partials/company_status.html
+msgid "Counted from the listings recorded here; nobody has reported it."
+msgstr ""
+
 #: src/postulo/templates/widgets/interviews_summary.html
 msgid "Counted from the timeline, so interviews recorded before the diary existed are in."
 msgstr "Dihitung dari linimasa, jadi wawancara yang dicatat sebelum agenda ada juga ikut terhitung."
@@ -5126,6 +5194,10 @@ msgstr "Tanggal lahir"
 
 #: src/postulo/templates/help/personal_details.html
 msgid "Date of birth, place and country of birth, gender and nationalities are what an identity check asks for, and nothing a job search needs until a CV says so. Every part is optional."
+msgstr ""
+
+#: src/postulo/templates/jobs/company_form.html
+msgid "Dated entries, kept as a history and shared with everybody who can see this company. One older than 90 days is shown as of its date."
 msgstr ""
 
 #: src/postulo/applications/models.py
@@ -5547,6 +5619,10 @@ msgstr "Dibuang. Lowongan ini tetap ada di riwayat Anda dan dapat dipulihkan."
 msgid "Dismiss"
 msgstr "Tutup"
 
+#: src/postulo/jobs/models.py
+msgid "Dissolved"
+msgstr ""
+
 #: src/postulo/documents/forms.py
 msgid "Do not send after"
 msgstr "Jangan kirim setelah"
@@ -5701,6 +5777,11 @@ msgstr "Unduh orang-orang ini sebagai vCard"
 #: src/postulo/templates/server/backups.html
 msgid "Downloading one needs you to sign in again, and is written to the log with your name. Keep what you download as carefully as the instance itself. The key that the connection secrets are under is not in an archive: keep your <code>.env</code> somewhere else."
 msgstr "Untuk mengunduh cadangan, Anda harus masuk lagi, dan unduhan itu dicatat di log dengan nama Anda. Jaga apa yang Anda unduh sama hati-hatinya dengan instans itu sendiri. Kunci yang mengenkripsi rahasia koneksi tidak ada di dalam arsip: simpan <code>.env</code> Anda di tempat lain."
+
+#: src/postulo/accounts/addressing.py
+msgctxt "form of address"
+msgid "Dr"
+msgstr ""
 
 #: src/postulo/applications/models.py
 msgid "Draft"
@@ -6012,6 +6093,11 @@ msgstr "berakhir"
 msgid "Energy"
 msgstr "Energi"
 
+#: src/postulo/accounts/addressing.py
+msgctxt "form of address"
+msgid "Eng."
+msgstr ""
+
 #: src/postulo/jobs/industries.py
 msgid "Engineering"
 msgstr "Teknik"
@@ -6273,6 +6359,10 @@ msgstr "Contoh perintah"
 msgid "Exceptions to what this instance decides for everybody. Whatever you set here is shown to this person on their own settings page, with your name against it."
 msgstr "Pengecualian terhadap keputusan instans ini untuk semua orang. Apa pun yang Anda atur di sini ditampilkan kepada orang ini di halaman pengaturannya sendiri, disertai nama Anda."
 
+#: src/postulo/jobs/tables.py
+msgid "Exclude dissolved"
+msgstr ""
+
 #: src/postulo/documents/rendering.py src/postulo/resume/candidate.py
 #: src/postulo/resume/registry.py src/postulo/resume/views_candidate.py
 #: src/postulo/templates/resume/europass_import.html
@@ -6402,6 +6492,11 @@ msgstr "Faks"
 #: src/postulo/plugins/kinds.py
 msgid "Feature"
 msgstr "Fitur"
+
+#: src/postulo/accounts/addressing.py
+msgctxt "gender"
+msgid "Female"
+msgstr ""
 
 #: src/postulo/templates/jobs/company_form.html
 msgid "Fetch from Wikidata"
@@ -7146,6 +7241,11 @@ msgstr "memiliki logo"
 msgid "has an uploaded picture"
 msgstr "memiliki gambar yang diunggah"
 
+#: src/postulo/accounts/addressing.py
+msgctxt "pronouns"
+msgid "he/him"
+msgstr ""
+
 #: src/postulo/accounts/models.py src/postulo/documents/models.py
 #: src/postulo/resume/views.py
 msgid "headline"
@@ -7208,6 +7308,40 @@ msgstr "sorotan"
 #: src/postulo/documents/models.py
 msgid "highlights for this CV"
 msgstr "sorotan untuk CV ini"
+
+#: src/postulo/jobs/models.py src/postulo/jobs/tables.py
+#: src/postulo/templates/jobs/company_form.html
+#: src/postulo/templates/jobs/partials/company_signals.html
+msgid "Hiring"
+msgstr ""
+
+#: src/postulo/jobs/models.py
+msgid "Hiring freeze"
+msgstr ""
+
+#: src/postulo/jobs/models.py
+msgid "hiring signal"
+msgstr ""
+
+#: src/postulo/jobs/status_views.py
+msgid "Hiring signal added."
+msgstr ""
+
+#: src/postulo/jobs/status_views.py
+msgid "Hiring signal changed."
+msgstr ""
+
+#: src/postulo/jobs/status_views.py
+msgid "Hiring signal removed."
+msgstr ""
+
+#: src/postulo/jobs/merging.py
+msgid "Hiring signals"
+msgstr ""
+
+#: src/postulo/jobs/models.py
+msgid "hiring signals"
+msgstr ""
 
 #: src/postulo/templates/jobs/posting_detail.html
 msgid "History"
@@ -7607,6 +7741,10 @@ msgstr "Dalam 90 hari"
 #: src/postulo/api/forms.py
 msgid "In a year"
 msgstr "Dalam setahun"
+
+#: src/postulo/jobs/models.py
+msgid "In administration"
+msgstr ""
 
 #: src/postulo/templates/widgets/counters.html
 msgid "In conversation"
@@ -8186,6 +8324,10 @@ msgstr "Berkasnya cocok dengan yang ditandatangani oleh repositori resmi."
 msgid "Its general mailbox, such as jobs@ or info@. A person's address goes on a contact."
 msgstr "Kotak surat umumnya, seperti jobs@ atau info@. Alamat milik seseorang dicatat pada kontak."
 
+#: src/postulo/templates/jobs/company_wikidata.html
+msgid "Its legal state"
+msgstr ""
+
 #: src/postulo/jobs/merging.py
 #, python-format
 msgid "Its logo: %(name)s has one of its own, and a picture cannot be kept in a note."
@@ -8595,6 +8737,10 @@ msgstr "lintang"
 msgid "Latitude"
 msgstr "Lintang"
 
+#: src/postulo/jobs/models.py
+msgid "Laying off"
+msgstr ""
+
 #: src/postulo/resume/forms.py
 msgid "Learning you took, with or without a certificate of attendance. A programme that led to a degree or diploma belongs in Education; a credential somebody can check, or that may lapse, belongs in Certifications."
 msgstr "Pembelajaran yang Anda ikuti, dengan atau tanpa sertifikat kehadiran. Program yang menghasilkan gelar atau ijazah termasuk dalam Pendidikan; kredensial yang dapat diperiksa orang lain, atau yang dapat kedaluwarsa, termasuk dalam Sertifikasi."
@@ -8610,6 +8756,10 @@ msgstr "Kosongkan untuk mempertahankan yang sudah disimpan."
 #: src/postulo/resume/models.py
 msgid "Leave empty if this is your current role."
 msgstr "Kosongkan jika ini peran Anda saat ini."
+
+#: src/postulo/templates/jobs/company_wikidata.html
+msgid "Leave it as it is"
+msgstr ""
 
 #: src/postulo/resume/forms.py
 msgid "Leave it empty for a single day or when it has no end."
@@ -8688,6 +8838,10 @@ msgstr "Hukum"
 #: src/postulo/templates/partials/footer_links.html
 msgid "Legal notice"
 msgstr "Pemberitahuan hukum"
+
+#: src/postulo/jobs/models.py
+msgid "legal state"
+msgstr ""
 
 #: src/postulo/core/server_forms.py
 msgid "Let a capture keep a rendering of its page"
@@ -9051,6 +9205,11 @@ msgstr "Jadikan administrator"
 msgid "Make it"
 msgstr "Buat"
 
+#: src/postulo/accounts/addressing.py
+msgctxt "gender"
+msgid "Male"
+msgstr ""
+
 #: src/postulo/templates/settings/account.html
 msgid "Manage"
 msgstr "Kelola"
@@ -9127,6 +9286,11 @@ msgstr "boleh mengaktifkan atau menonaktifkannya untuk diri sendiri"
 #: src/postulo/plugins/models.py
 msgid "may use it"
 msgstr "boleh menggunakannya"
+
+#: src/postulo/accounts/addressing.py
+msgctxt "form of address"
+msgid "Me"
+msgstr ""
 
 #: src/postulo/jobs/share_views.py
 #, python-format
@@ -9291,6 +9455,11 @@ msgstr "Khusus Microsoft: direktori tempat aplikasi didaftarkan. Kosongkan untuk
 msgid "minibuses"
 msgstr "minibus"
 
+#: src/postulo/accounts/addressing.py
+msgctxt "form of address"
+msgid "Miss"
+msgstr ""
+
 #: src/postulo/documents/models.py
 msgid "Missing entry"
 msgstr "Entri tidak ada"
@@ -9436,6 +9605,26 @@ msgstr "Pindahkan ke atas"
 msgid "Moved to %(status)s."
 msgstr "Dipindahkan ke %(status)s."
 
+#: src/postulo/accounts/addressing.py
+msgctxt "form of address"
+msgid "Mr"
+msgstr ""
+
+#: src/postulo/accounts/addressing.py
+msgctxt "form of address"
+msgid "Mrs"
+msgstr ""
+
+#: src/postulo/accounts/addressing.py
+msgctxt "form of address"
+msgid "Ms"
+msgstr ""
+
+#: src/postulo/accounts/addressing.py
+msgctxt "form of address"
+msgid "Mx"
+msgstr ""
+
 #: src/postulo/applications/models.py
 msgid "My own choice"
 msgstr "Pilihan saya sendiri"
@@ -9474,6 +9663,10 @@ msgstr "Nama"
 #: src/postulo/resume/forms.py
 msgid "Name of the language"
 msgstr "Nama bahasa"
+
+#: src/postulo/jobs/models.py
+msgid "Name the acquirer only for a company that was acquired."
+msgstr ""
 
 #: src/postulo/core/messaging_services.py
 msgid "Name the service this handle is on, or choose one from the list."
@@ -10087,6 +10280,11 @@ msgstr "Bukan orang yang pernah Anda catat"
 msgid "Nobody, or the person below"
 msgstr "Tidak ada, atau orang di bawah"
 
+#: src/postulo/accounts/addressing.py
+msgctxt "gender"
+msgid "Non-binary"
+msgstr ""
+
 #: src/postulo/jobs/industries.py
 msgid "Non-profit"
 msgstr "Nirlaba"
@@ -10267,6 +10465,10 @@ msgstr "Tidak ditampilkan di CV mana pun sampai mereka menyetujuinya."
 msgid "Not recorded"
 msgstr "Tidak dicatat"
 
+#: src/postulo/jobs/forms.py
+msgid "Not recorded here"
+msgstr ""
+
 #: src/postulo/documents/forms.py
 msgid "Not said"
 msgstr "Tidak disebutkan"
@@ -10360,6 +10562,19 @@ msgstr "Dicatat"
 #, python-format
 msgid "noted %(when)s"
 msgstr "dicatat %(when)s"
+
+#: src/postulo/jobs/models.py
+msgid "noted by"
+msgstr ""
+
+#: src/postulo/templates/jobs/partials/company_signals.html
+#, python-format
+msgid "Noted by <bdi>%(name)s</bdi>"
+msgstr ""
+
+#: src/postulo/templates/jobs/partials/company_signals.html
+msgid "Noted by somebody who has since left"
+msgstr ""
 
 #: src/postulo/jobs/models.py
 msgid "noted on"
@@ -12331,6 +12546,11 @@ msgstr "Dibuat oleh Postulo dari catatan orang ini sendiri. Postulo tidak meneta
 msgid "Produced on %(produced)s"
 msgstr "Dibuat pada %(produced)s"
 
+#: src/postulo/accounts/addressing.py
+msgctxt "form of address"
+msgid "Prof."
+msgstr ""
+
 #: src/postulo/resume/models.py
 msgid "proficiency"
 msgstr "kecakapan"
@@ -12696,6 +12916,20 @@ msgstr "Catat tawaran"
 msgid "Record and change: applications, listings, notes, reminders, letters, your details. A call that changes a record answers with the whole record, timeline and contacts included, so this can see what it touches"
 msgstr "Mencatat dan mengubah: lamaran, lowongan, catatan, pengingat, surat, data Anda. Panggilan yang mengubah catatan menjawab dengan seluruh catatan, termasuk linimasa dan kontaknya, sehingga token ini dapat melihat apa yang disentuhnya"
 
+#: src/postulo/templates/jobs/company_wikidata.html
+#, python-format
+msgid "Record it as acquired or merged into <bdi>%(name)s</bdi>"
+msgstr ""
+
+#: src/postulo/templates/jobs/company_wikidata.html
+msgid "Record it as dissolved"
+msgstr ""
+
+#: src/postulo/templates/jobs/company_wikidata.html
+#, python-format
+msgid "Record it as dissolved on %(date)s"
+msgstr ""
+
 #: src/postulo/templates/server/record_of_processing.html
 msgid "Record of processing"
 msgstr "Catatan pemrosesan"
@@ -12717,6 +12951,10 @@ msgstr "Catat apa yang Anda kirim"
 #: src/postulo/applications/tables.py
 msgid "Recorded"
 msgstr "Dicatat"
+
+#: src/postulo/jobs/models.py
+msgid "recorded"
+msgstr ""
 
 #: src/postulo/plugins/forms.py
 msgid "Recorded against everything installed from here, so it cannot change later without orphaning what it installed."
@@ -13035,6 +13273,10 @@ msgstr "Hapus gambar yang diunggah"
 msgid "Remove this connection?"
 msgstr "Keluarkan koneksi ini?"
 
+#: src/postulo/templates/jobs/company_form.html
+msgid "Remove this entry"
+msgstr ""
+
 #: src/postulo/templates/server/design.html
 msgid "Remove this example?"
 msgstr "Keluarkan contoh ini?"
@@ -13344,6 +13586,10 @@ msgstr "Simpan dan berikutnya"
 #: src/postulo/accounts/models.py
 msgid "save as I go"
 msgstr "simpan selagi saya bekerja"
+
+#: src/postulo/templates/jobs/company_form.html
+msgid "Save the change"
+msgstr ""
 
 #: src/postulo/templates/jobs/company_form.html
 msgid "Save the company to add another identifier."
@@ -13883,6 +14129,10 @@ msgstr[0] "Dibagikan kepada %(counter)s"
 msgid "Shared with %(who)s."
 msgstr "Dibagikan kepada %(who)s."
 
+#: src/postulo/templates/jobs/company_form.html
+msgid "Shared with everybody who can see this company. Say when it became true and where you learnt it, if you know."
+msgstr ""
+
 #: src/postulo/jobs/whose.py
 msgid "Shared with you"
 msgstr "Dibagikan kepada Anda"
@@ -13908,6 +14158,11 @@ msgstr "pembagian"
 #: src/postulo/templates/jobs/share.html
 msgid "Sharing"
 msgstr "Pembagian"
+
+#: src/postulo/accounts/addressing.py
+msgctxt "pronouns"
+msgid "she/her"
+msgstr ""
 
 #: src/postulo/core/widgets_builtin.py
 msgid "Shortcuts"
@@ -14090,6 +14345,10 @@ msgstr "Proses masuk"
 msgid "Sign-in methods"
 msgstr "Metode masuk"
 
+#: src/postulo/jobs/models.py
+msgid "signal"
+msgstr ""
+
 #: src/postulo/core/mail_choices.py
 msgid "Signed in once, as the mailbox that sends"
 msgstr "Masuk sekali, sebagai kotak surat yang mengirim"
@@ -14117,6 +14376,10 @@ msgstr "Masuk dengan token"
 #: src/postulo/templates/server/signin.html
 msgid "Signs in to an existing account by e-mail"
 msgstr "Masuk ke akun yang sudah ada berdasarkan email"
+
+#: src/postulo/jobs/models.py
+msgid "since"
+msgstr ""
 
 #: src/postulo/resume/models.py
 #, python-format
@@ -14343,6 +14606,7 @@ msgstr "Seseorang telah menyetujui ini. Uji untuk memastikan persetujuan itu mas
 msgid "Somebody shares a company, a contact or a listing with you"
 msgstr "Seseorang membagikan perusahaan, kontak, atau lowongan kepada Anda"
 
+#: src/postulo/templates/jobs/company_form.html
 #: src/postulo/templates/jobs/partials/sharing_panel.html
 msgid "somebody who has since left"
 msgstr "seseorang yang sejak itu telah keluar"
@@ -14385,7 +14649,10 @@ msgstr "Urutkan menurut %(column)s, terendah lebih dulu"
 msgid "source"
 msgstr "sumber"
 
-#: src/postulo/plugins/kinds.py src/postulo/templates/server/email.html
+#: src/postulo/plugins/kinds.py src/postulo/templates/jobs/company_form.html
+#: src/postulo/templates/jobs/partials/company_signals.html
+#: src/postulo/templates/jobs/partials/company_status.html
+#: src/postulo/templates/server/email.html
 #: src/postulo/templates/server/plugins.html
 #: src/postulo/templates/widgets/sources.html
 msgid "Source"
@@ -14494,12 +14761,13 @@ msgstr "status"
 
 #: src/postulo/applications/forms.py src/postulo/applications/reports.py
 #: src/postulo/applications/tables.py src/postulo/core/csv_import.py
-#: src/postulo/templates/accounts/invite_list.html
+#: src/postulo/jobs/tables.py src/postulo/templates/accounts/invite_list.html
 #: src/postulo/templates/applications/partials/bulk_fields.html
 #: src/postulo/templates/applications/partials/status_card.html
 #: src/postulo/templates/applications/report.html
 #: src/postulo/templates/applications/report_print.html
 #: src/postulo/templates/core/import_csv_map.html
+#: src/postulo/templates/jobs/company_form.html
 msgid "Status"
 msgstr "Status"
 
@@ -15513,6 +15781,11 @@ msgstr "Itu berhasil."
 msgid "That would make a loop: %(name)s is already part of this one."
 msgstr "Itu akan membuat lingkaran: %(name)s sudah menjadi bagian dari perusahaan ini."
 
+#: src/postulo/jobs/models.py
+#, python-format
+msgid "That would make a loop: %(name)s was already acquired by this one."
+msgstr ""
+
 #: src/postulo/applications/views.py src/postulo/jobs/views.py
 #, python-format
 msgid "The %(count)d document you sent is kept, and still says where it went."
@@ -15735,6 +16008,14 @@ msgstr "Perusahaan ini tidak memiliki alamat untuk menempatkannya: tambahkan sat
 msgid "The company is matched by name and created if it is new. Only the company and the job title are required; everything else can be filled in later."
 msgstr "Perusahaan dicocokkan berdasarkan nama dan dibuat jika belum ada. Hanya perusahaan dan jabatan yang wajib; selebihnya dapat diisi nanti."
 
+#: src/postulo/applications/forms.py
+msgid "The company is recorded as dissolved. Tick this to add the listing."
+msgstr ""
+
+#: src/postulo/jobs/models.py
+msgid "The company it became part of, if that company is recorded here."
+msgstr ""
+
 #: src/postulo/jobs/models.py
 msgid "The company this one belongs to, if it belongs to one."
 msgstr "Perusahaan induk dari perusahaan ini, jika ada."
@@ -15775,6 +16056,14 @@ msgstr "Kredit yang diminta lisensi ubin, digambar di peta sebagai teks biasa. C
 msgid "The dashboard lists open applications nothing has happened to for a while, with nothing planned. Recruiters' own advice clusters around two to three weeks."
 msgstr "Dasbor mencantumkan lamaran terbuka yang sudah lama tidak mengalami perkembangan dan tidak memiliki rencana apa pun. Saran para perekrut sendiri berkisar antara dua hingga tiga minggu."
 
+#: src/postulo/api/routers/companies.py src/postulo/jobs/forms.py
+msgid "The date cannot be in the future."
+msgstr ""
+
+#: src/postulo/jobs/models.py
+msgid "The date it became true, if known."
+msgstr ""
+
 #: src/postulo/documents/forms.py
 msgid "The date on the letter, as a date. Leave it empty when you do not know."
 msgstr "Tanggal pada surat, sebagai tanggal. Kosongkan jika Anda tidak tahu."
@@ -15782,6 +16071,10 @@ msgstr "Tanggal pada surat, sebagai tanggal. Kosongkan jika Anda tidak tahu."
 #: src/postulo/applications/forms.py
 msgid "The date you mean to have sent it by. It is not a reminder — set one of those if you want telling."
 msgstr "Tanggal paling lambat Anda berniat mengirimnya. Ini bukan pengingat — buat pengingat jika Anda ingin diberi tahu."
+
+#: src/postulo/jobs/forms.py
+msgid "The day it was true or reported, not today's date unless it is."
+msgstr ""
 
 #: src/postulo/templates/server/plugins.html
 msgid "The default for every account. One person's exceptions are on their row under People. Switching a plugin off stops it being used and deletes nothing."
@@ -16923,6 +17216,11 @@ msgstr "Mereka hadir dalam wawancara."
 msgid "They were the main contact."
 msgstr "Mereka adalah kontak utama."
 
+#: src/postulo/accounts/addressing.py
+msgctxt "pronouns"
+msgid "they/them"
+msgstr ""
+
 #: src/postulo/jobs/pages.py
 msgid "This account does not keep a rendering of a page."
 msgstr "Akun ini tidak menyimpan hasil cetak halaman."
@@ -17033,6 +17331,11 @@ msgstr "Tangkapan ini dibuang."
 msgid "This company"
 msgstr "Perusahaan ini"
 
+#: src/postulo/jobs/status.py
+#, python-format
+msgid "This company has been in administration since %(date)s."
+msgstr ""
+
 #: src/postulo/jobs/logos.py
 msgid "This company has no website recorded."
 msgstr "Perusahaan ini tidak memiliki situs web yang tercatat."
@@ -17040,6 +17343,24 @@ msgstr "Perusahaan ini tidak memiliki situs web yang tercatat."
 #: src/postulo/templates/resume/item_form.html
 msgid "This company has none of its industries from the NACE list yet."
 msgstr "Perusahaan ini belum memiliki bidang usaha dari daftar NACE."
+
+#: src/postulo/jobs/status.py
+msgid "This company is recorded as being in administration."
+msgstr ""
+
+#: src/postulo/jobs/status.py
+msgid "This company is recorded as dissolved."
+msgstr ""
+
+#: src/postulo/jobs/status.py
+#, python-format
+msgid "This company was dissolved on %(date)s."
+msgstr ""
+
+#: src/postulo/jobs/status.py
+#, python-format
+msgid "This company was reported laying people off as of %(date)s."
+msgstr ""
 
 #: src/postulo/templates/resume/item_form.html
 msgid "This entry prints its original text on every CV."
@@ -17367,6 +17688,10 @@ msgstr "Centang setelah Anda hadir. Laporan untuk penasihat Anda menghitung pert
 #: src/postulo/templates/partials/table/bulk.html
 msgid "Tick rows to act on several at once."
 msgstr "Centang baris untuk memproses beberapa sekaligus."
+
+#: src/postulo/applications/forms.py
+msgid "Tick the box to add the listing anyway."
+msgstr ""
 
 #: src/postulo/jobs/capture_views.py
 msgid "Ticked, the listing becomes an application straight away. Otherwise it waits in your listings for you to decide."
@@ -18276,8 +18601,8 @@ msgid "What is in the file"
 msgstr "Isi berkas"
 
 #: src/postulo/templates/help/your_name.html
-msgid "What is kept is the text itself. If your career record changes language, a choice made from the other language's list stays what it was, and is shown as <em>Other…</em> with its text in the box."
-msgstr "Yang disimpan adalah teksnya sendiri. Jika bahasa riwayat karier Anda berubah, pilihan yang dibuat dari daftar bahasa lain tetap seperti semula, dan ditampilkan sebagai <em>Lainnya…</em> dengan teksnya di dalam kotak."
+msgid "What is kept is the choice, not one language's word for it: <em>il</em> in French and <em>he/him</em> in English are the same choice, so your menus and your documents show it in the language they are drawn in when your career record changes language. Only what you write under <em>Other…</em> is kept as you typed it, and shown as typed in every language. A word you type there that a list already has is kept as that choice."
+msgstr ""
 
 #: src/postulo/templates/documents/cv_detail.html
 msgid "What is on this CV"
@@ -18391,6 +18716,10 @@ msgstr "Jenis karya ini. Kolom di bawah mengikuti jenisnya: memilih jenis lain m
 #: src/postulo/resume/models.py
 msgid "what the check found"
 msgstr "hasil pemeriksaan"
+
+#: src/postulo/jobs/forms.py
+msgid "What the company is. Shown to everybody who can see it."
+msgstr ""
 
 #: src/postulo/applications/forms.py
 msgid "What the figure covers. Offers are compared by the year."
@@ -18512,6 +18841,14 @@ msgstr "yang disepakati"
 #: src/postulo/core/models.py
 msgid "what was asked"
 msgstr "apa yang ditanyakan"
+
+#: src/postulo/templates/jobs/company_form.html
+msgid "What was reported"
+msgstr ""
+
+#: src/postulo/jobs/forms.py
+msgid "What was reported about its hiring."
+msgstr ""
 
 #: src/postulo/applications/forms.py
 msgid "What was said or agreed, to write down afterwards."
@@ -18753,6 +19090,14 @@ msgstr "Jika instans ini dapat mengirim kode ke telepon, nomor yang telah Anda k
 msgid "Where you came across it: a job board, a referral, the company site."
 msgstr "Tempat Anda menemukannya: situs lowongan kerja, rujukan, situs perusahaan."
 
+#: src/postulo/jobs/models.py
+msgid "Where you learnt it: a news article, a post."
+msgstr ""
+
+#: src/postulo/jobs/models.py
+msgid "Where you learnt it: a register, an article."
+msgstr ""
+
 #: src/postulo/resume/views.py
 msgid "where you live"
 msgstr "tempat tinggal"
@@ -18973,9 +19318,18 @@ msgstr "Wikidata menyediakan namanya dalam bahasa itu. Ambil lagi untuk mengubah
 msgid "Wikidata has no item with that identifier."
 msgstr "Wikidata tidak memiliki item dengan pengenal itu."
 
+#: src/postulo/templates/jobs/company_wikidata.html
+#, python-format
+msgid "Wikidata names %(qid)s as its replacement; no company here carries that identifier."
+msgstr ""
+
 #: src/postulo/jobs/wikidata.py
 msgid "Wikidata redirected too many times."
 msgstr "Wikidata mengalihkan terlalu banyak kali."
+
+#: src/postulo/templates/jobs/company_wikidata.html
+msgid "Wikidata says this organisation has ended. Choose whether to record it; the legal state is shown to everybody who can see this company."
+msgstr ""
 
 #: src/postulo/jobs/wikidata.py
 msgid "Wikidata sent the request somewhere else."

@@ -39,8 +39,10 @@ TABLES = {
     "languages.FLAG_COUNTRIES": languages.FLAG_COUNTRIES,
     "languages.PLURAL_FORMS": languages.PLURAL_FORMS,
     "phones.FROM_LANGUAGE": phones.FROM_LANGUAGE,
-    "addressing.FORMS_OF_ADDRESS": addressing.FORMS_OF_ADDRESS,
-    "addressing.PRONOUNS": addressing.PRONOUNS,
+    "addressing.WORDS[form_of_address]": addressing.WORDS[addressing.FORM_OF_ADDRESS],
+    "addressing.WORDS[pronouns]": addressing.WORDS[addressing.PRONOUNS],
+    "addressing.WORDS[gender]": addressing.WORDS[addressing.GENDER],
+    "addressing.OFFERED[form_of_address]": addressing.OFFERED[addressing.FORM_OF_ADDRESS],
 }
 TAGS = sorted({code for table in TABLES.values() for code in table} | {languages.SOURCE})
 

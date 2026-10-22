@@ -2,8 +2,10 @@
 
 Two fields, because they are two questions: a form of address is written before a name,
 and pronouns say how to refer to somebody. Each is offered from a list in the language the
-career record is written in, with a box for anything else, and is stored as the text
-itself. Neither is printed anywhere unless a CV says so, which is #308's.
+career record is written in, with a box for anything else. What is stored is a concept
+(`mrs`, `they`), the same in every language and drawn in the language of the page or the
+document; only *Other* is text, stored as typed (#921). Neither is printed anywhere unless a
+CV says so, which is #308's.
 
 And the location: blank means the town and country of the primary postal address, worked
 out whenever it is printed, through one function every reader asks.
@@ -100,33 +102,85 @@ def page(client, user) -> str:
 
 
 @pytest.mark.parametrize(
-    ("language", "forms", "pronouns"),
+    ("language", "form", "word", "pronouns"),
     [
-        ("en-GB", "Mx", "they/them"),
-        ("fr-FR", "Mme", "iel"),
-        ("pt-PT", "Eng.ª", "elu/delu"),
-        ("pt-BR", "Sra.", "elu/delu"),
+        ("en-GB", "mx", "Mx", "they/them"),
+        ("fr-FR", "mrs", "Mme", "iel"),
+        ("pt-PT", "engineer_f", "Eng.ª", "elu/delu"),
+        ("pt-BR", "mrs", "Sra.", "elu/delu"),
     ],
 )
-def test_each_language_has_its_own_list(language, forms, pronouns):
+def test_each_language_has_its_own_list(language, form, word, pronouns):
     """Data, not translations: *Eng.ª* is Portuguese usage and translates nothing."""
-    assert forms in addressing.forms_of_address(language)
-    assert pronouns in addressing.pronouns(language)
+    assert form in addressing.forms_of_address(language)
+    assert "they" in addressing.pronouns(language)
+    assert addressing.label("form_of_address", form, language) == word
+    assert addressing.label("pronouns", "they", language) == pronouns
 
 
 def test_english_keeps_the_full_stop_on_a_word_cut_at_its_end():
     """The rule the list cites (*New Hart's Rules*): a contraction, which keeps the word's
     last letter, drops the stop -- Mr, Dr -- and a word cut off at its end keeps it."""
-    english = addressing.forms_of_address("en-GB")
-    assert "Prof." in english and "Prof" not in english
-    assert {"Mr", "Mrs", "Ms", "Mx", "Dr"} <= set(english), "the contractions have none"
+    words = {
+        key: addressing.label("form_of_address", key, "en-GB")
+        for key in addressing.forms_of_address("en-GB")
+    }
+    assert words["professor"] == "Prof." and "Prof" not in words.values()
+    assert [words[k] for k in ("mr", "mrs", "ms", "mx", "doctor")] == [
+        "Mr",
+        "Mrs",
+        "Ms",
+        "Mx",
+        "Dr",
+    ]
 
 
 def test_the_lists_are_not_one_list_translated():
-    assert "Eng.ª" not in addressing.forms_of_address("pt-BR"), "Portuguese, not Brazilian"
-    assert "Sr.ª" in addressing.forms_of_address("pt-PT")
-    assert "Sra." in addressing.forms_of_address("pt-BR")
-    assert "Me" not in addressing.forms_of_address("en-GB")
+    assert "engineer_f" not in addressing.forms_of_address("pt-BR"), "Portuguese, not Brazilian"
+    assert addressing.label("form_of_address", "mrs", "pt-PT") == "Sr.ª"
+    assert addressing.label("form_of_address", "mrs", "pt-BR") == "Sra."
+    assert "maitre" not in addressing.forms_of_address("en-GB")
+
+
+def test_a_gendered_title_has_a_neutral_fallback():
+    """English and French have one *Dr* and one *Prof.*; Portuguese has two. The unmarked
+    concept is what a bare word becomes, and both genders print the one word where the
+    language has no feminine (#921)."""
+    for language in ("en-GB", "fr-FR"):
+        assert "doctor_f" not in addressing.forms_of_address(language)
+        assert addressing.label("form_of_address", "doctor_f", language) == addressing.label(
+            "form_of_address", "doctor", language
+        )
+    assert addressing.label("form_of_address", "professor_f", "en") == "Prof."
+    assert addressing.label("form_of_address", "professor_f", "fr") == "Pr"
+    assert addressing.label("form_of_address", "doctor_f", "pt-PT") == "Dr.ª"
+    assert addressing.label("form_of_address", "doctor_f", "pt-BR") == "Dra."
+    assert addressing.label("form_of_address", "professor", "pt-PT") == "Prof."
+    assert addressing.concept_of("form_of_address", "Dr") == "doctor"
+    assert addressing.concept_of("form_of_address", "Prof.") == "professor"
+    assert addressing.concept_of("form_of_address", "Dr.ª") == "doctor_f"
+    assert addressing.concept_of("form_of_address", "Dra.") == "doctor_f"
+
+
+def test_a_word_of_any_language_is_the_concept_and_anything_else_is_not():
+    assert addressing.concept_of("form_of_address", "Mme") == "mrs"
+    assert addressing.concept_of("form_of_address", "mme") == "mrs"
+    assert addressing.concept_of("pronouns", "iel") == "they"
+    assert addressing.concept_of("pronouns", "ela/dela") == "she"
+    assert addressing.concept_of("gender", "Woman") == "female", "the words before #864"
+    assert addressing.concept_of("gender", "Não binário") == "non_binary"
+    assert addressing.concept_of("form_of_address", "he") == ""
+    assert addressing.concept_of("pronouns", "xe/xem") == ""
+    assert addressing.stored_value("pronouns", " xe/xem ") == "xe/xem"
+    assert addressing.stored_value("pronouns", " Il ") == "he"
+
+
+def test_a_concept_is_drawn_in_the_language_it_is_asked_for_and_other_text_is_not():
+    assert addressing.label("pronouns", "he", "fr-FR") == "il"
+    assert addressing.label("pronouns", "he", "en-GB") == "he/him"
+    assert addressing.label("pronouns", "xe/xem", "fr-FR") == "xe/xem"
+    assert addressing.label("form_of_address", "maitre", "en-GB") == "Me", "the catalogue's"
+    assert addressing.label("gender", "male", "de") == "Male", "the catalogue's, untranslated"
 
 
 def test_a_language_with_no_list_offers_none_and_a_variant_takes_its_familys():
@@ -154,10 +208,19 @@ def test_the_list_follows_the_language_of_the_career_record(client, user):
     """Not the interface's, when the record says: the name is written beside the record."""
     named(user, record_language="fr-FR")
     html = page(client, user)
-    assert options(html, "form_of_address") == ["", "M.", "Mme", "Dr", "Pr", "Me", "other"]
-    assert options(html, "pronouns") == ["", "elle", "il", "iel", "other"]
+    assert options(html, "form_of_address") == [
+        "",
+        "mr",
+        "mrs",
+        "doctor",
+        "professor",
+        "maitre",
+        "other",
+    ]
+    assert options(html, "pronouns") == ["", "she", "he", "they", "other"]
     # Said to be French, so a screen reader reading the English page says *Mme* in French.
-    assert re.search(r'<option value="Mme" lang="fr"', html)
+    assert re.search(r'<option value="mrs" lang="fr" dir="ltr">Mme</option>', html)
+    assert re.search(r'<option value="they" lang="fr" dir="ltr">iel</option>', html)
     assert not re.search(r'<option value="other" lang=', html), "Other… is the page's word"
 
 
@@ -165,10 +228,10 @@ def test_the_interface_language_when_the_record_says_nothing(user):
     named(user)
     with translation.override("pt-BR"):
         form = ProfileForm(instance=user.profile)
-        assert "Sra." in [value for value, _label in form.fields["form_of_address"].widget.choices]
+        assert ("mrs", "Sra.") in form.fields["form_of_address"].widget.choices
     with translation.override("en-GB"):
         form = ProfileForm(instance=user.profile)
-        assert "Mx" in [value for value, _label in form.fields["form_of_address"].widget.choices]
+        assert ("mx", "Mx") in form.fields["form_of_address"].widget.choices
 
 
 def test_a_language_with_no_list_offers_only_other(client, user):
@@ -179,29 +242,56 @@ def test_a_language_with_no_list_offers_only_other(client, user):
 
 
 def test_a_stored_value_in_the_list_is_chosen_in_the_menu(client, user):
-    named(user, form_of_address="Dr", pronouns="they/them", record_language="en-GB")
+    named(user, form_of_address="doctor", pronouns="they", record_language="en-GB")
     html = page(client, user)
-    assert chosen(html, "form_of_address") == "Dr" and chosen(html, "pronouns") == "they/them"
+    assert chosen(html, "form_of_address") == "doctor" and chosen(html, "pronouns") == "they"
     assert box(html, "form_of_address_other") == "" and box(html, "pronouns_other") == ""
 
 
-def test_a_stored_value_not_in_the_list_shows_as_other_with_its_text(client, user):
-    """Typed as Other, or chosen from another language's list before the record changed
-    language: either way it is the answer, shown where it can be read and changed."""
-    named(user, form_of_address="Eng.ª", pronouns="xe/xem", record_language="en-GB")
+def test_a_stored_value_not_a_concept_shows_as_other_with_its_text(client, user):
+    """Typed as Other: the answer, shown as typed where it can be read and changed."""
+    named(user, form_of_address="Rev", pronouns="xe/xem", record_language="en-GB")
     html = page(client, user)
     assert chosen(html, "form_of_address") == "other"
-    assert box(html, "form_of_address_other") == "Eng.ª"
+    assert box(html, "form_of_address_other") == "Rev"
     assert chosen(html, "pronouns") == "other"
     assert box(html, "pronouns_other") == "xe/xem"
 
 
-def test_a_prof_stored_before_the_list_gained_its_full_stop_still_shows(client, user):
-    """What is stored is the text, so a list being corrected loses nobody's answer."""
-    named(user, form_of_address="Prof", record_language="en-GB")
+def test_a_concept_the_language_does_not_offer_is_still_chosen_in_the_menu(client, user):
+    """A profile that holds *Eng.ª* (`engineer_f`) and a record turned English: the menu
+    keeps the answer, in the word the language writes for it, rather than showing nothing."""
+    named(user, form_of_address="engineer_f", record_language="en-GB")
     html = page(client, user)
-    assert chosen(html, "form_of_address") == "other"
-    assert box(html, "form_of_address_other") == "Prof"
+    assert chosen(html, "form_of_address") == "engineer_f"
+    assert "engineer_f" in options(html, "form_of_address")
+    assert box(html, "form_of_address_other") == ""
+
+
+def test_switching_the_language_shows_the_other_word_and_changes_nothing_stored(client, user):
+    """EN to FR: *he/him* becomes *il* and `he` stays `he` (#921)."""
+    named(user, pronouns="he", form_of_address="mrs", record_language="en-GB")
+    english = page(client, user)
+    assert re.search(r'<option value="he"[^>]*selected[^>]*>he/him</option>', english)
+    user.profile.record_language = "fr-FR"
+    user.profile.save()
+    french = page(client, user)
+    assert re.search(r'<option value="he"[^>]*selected[^>]*>il</option>', french)
+    assert re.search(r'<option value="mrs"[^>]*selected[^>]*>Mme</option>', french)
+    user.profile.refresh_from_db()
+    assert (user.profile.pronouns, user.profile.form_of_address) == ("he", "mrs")
+
+
+def test_other_survives_a_change_of_language(client, user):
+    named(user, pronouns="xe/xem", form_of_address="Rev", record_language="en-GB")
+    for language in ("fr-FR", "pt-PT", "de"):
+        user.profile.record_language = language
+        user.profile.save()
+        html = page(client, user)
+        assert chosen(html, "pronouns") == "other" and box(html, "pronouns_other") == "xe/xem"
+        assert box(html, "form_of_address_other") == "Rev"
+    user.profile.refresh_from_db()
+    assert (user.profile.pronouns, user.profile.form_of_address) == ("xe/xem", "Rev")
 
 
 def test_what_is_listed_and_what_is_typed_keep_their_own_direction(client, user):
@@ -272,16 +362,33 @@ def test_both_menus_are_described_by_the_sentence_that_explains_them(client, use
 # ------------------------------------------------------------------------ the form
 
 
-def test_a_choice_from_the_list_is_stored_as_its_text(client, user):
+def test_a_choice_from_the_list_is_stored_as_its_concept(client, user):
     named(user, record_language="pt-PT")
     client.force_login(user)
     response = client.post(
         reverse("accounts:profile"),
-        posted(user, form_of_address="Eng.ª", pronouns="ela/dela", record_language="pt-PT"),
+        posted(user, form_of_address="engineer_f", pronouns="she", record_language="pt-PT"),
     )
     assert response.status_code == 302
     user.profile.refresh_from_db()
-    assert (user.profile.form_of_address, user.profile.pronouns) == ("Eng.ª", "ela/dela")
+    assert (user.profile.form_of_address, user.profile.pronouns) == ("engineer_f", "she")
+
+
+def test_a_word_typed_as_other_that_a_list_has_is_stored_as_the_concept(client, user):
+    named(user)
+    client.force_login(user)
+    client.post(
+        reverse("accounts:profile"),
+        posted(
+            user,
+            form_of_address="other",
+            form_of_address_other="Mme",
+            pronouns="other",
+            pronouns_other="iel",
+        ),
+    )
+    user.profile.refresh_from_db()
+    assert (user.profile.form_of_address, user.profile.pronouns) == ("mrs", "they")
 
 
 def test_other_stores_what_was_typed(client, user):
@@ -305,10 +412,10 @@ def test_a_box_left_behind_by_a_choice_from_the_list_is_not_the_answer(user):
     """Hidden text is never what gets saved: the menu says Mr, and Mr it is."""
     named(user)
     form = ProfileForm(
-        posted(user, form_of_address="Mr", form_of_address_other="Sir"), instance=user.profile
+        posted(user, form_of_address="mr", form_of_address_other="Sir"), instance=user.profile
     )
     assert form.is_valid(), form.errors
-    assert form.save().form_of_address == "Mr"
+    assert form.save().form_of_address == "mr"
 
 
 def test_other_with_nothing_typed_asks_for_it(user):
@@ -319,20 +426,23 @@ def test_other_with_nothing_typed_asks_for_it(user):
 
 
 def test_the_empty_choice_clears_it(user):
-    named(user, form_of_address="Dr", pronouns="he/him")
+    named(user, form_of_address="doctor", pronouns="he")
     form = ProfileForm(posted(user), instance=user.profile)
     assert form.is_valid(), form.errors
     profile = form.save()
     assert (profile.form_of_address, profile.pronouns) == ("", "")
 
 
-def test_a_menu_takes_text_from_a_list_it_no_longer_shows(user):
+def test_a_menu_takes_a_choice_from_a_list_it_no_longer_shows(user):
     """The career record's language changed between drawing the page and posting it: the
-    answer is still an answer, because what is stored is the text."""
+    answer is still an answer, a concept, or the word of a list it came from (#921)."""
     named(user, record_language="en-GB")
+    form = ProfileForm(posted(user, form_of_address="maitre"), instance=user.profile)
+    assert form.is_valid(), form.errors
+    assert form.save().form_of_address == "maitre"
     form = ProfileForm(posted(user, form_of_address="Mme"), instance=user.profile)
     assert form.is_valid(), form.errors
-    assert form.save().form_of_address == "Mme"
+    assert form.save().form_of_address == "mrs"
 
 
 def test_neither_may_run_past_its_column(user):
@@ -366,11 +476,11 @@ def test_what_is_wrong_with_a_box_the_menu_did_not_choose_is_not_an_error(user):
     named(user)
     for left_behind in ("z" * 41, "a\x00b"):
         form = ProfileForm(
-            posted(user, form_of_address="Mr", form_of_address_other=left_behind),
+            posted(user, form_of_address="mr", form_of_address_other=left_behind),
             instance=user.profile,
         )
         assert form.is_valid(), form.errors
-        assert form.save().form_of_address == "Mr"
+        assert form.save().form_of_address == "mr"
 
 
 def test_the_empty_other_message_names_the_list_and_not_where_it_is(user):
@@ -397,34 +507,57 @@ def test_its_translations_name_no_position_and_agree_with_either_menu(language):
 
 def test_a_page_that_comes_back_keeps_a_choice_from_a_list_it_no_longer_shows(client, user):
     """Drawn in French with *Mme* chosen; the record becomes English in another tab; the
-    first tab is posted with something else wrong. The menu drawn back used to have no
-    *Mme* to select, so the browser showed *Not stated* and the next save cleared it."""
-    named(user, record_language="en-GB", form_of_address="Mme")
+    first tab is posted with something else wrong. The menu drawn back must still have the
+    choice to select, or the browser shows *Not stated* and the next save clears it."""
+    named(user, record_language="en-GB", form_of_address="mrs")
     client.force_login(user)
     response = client.post(
         reverse("accounts:profile"),
-        posted(user, last_name="", form_of_address="Mme", record_language="en-GB"),
+        posted(user, last_name="", form_of_address="maitre", record_language="en-GB"),
     )
     assert response.status_code == 200, "the page comes back, because the last name is missing"
     html = response.content.decode()
-    assert chosen(html, "form_of_address") == "Mme"
+    assert chosen(html, "form_of_address") == "maitre"
     values = options(html, "form_of_address")
-    assert values[-2:] == ["Mme", "other"] and "Mr" in values, values
-    # It is nobody's list's, so it claims no language, and its direction is its letters'.
-    assert re.search(r'<option value="Mme" selected dir="auto">', html)
+    assert values[-2:] == ["maitre", "other"] and "mr" in values, values
     # Sent again as drawn, it is saved.
     client.post(
         reverse("accounts:profile"),
         posted(user, form_of_address=chosen(html, "form_of_address"), record_language="en-GB"),
     )
     user.profile.refresh_from_db()
-    assert user.profile.form_of_address == "Mme"
+    assert user.profile.form_of_address == "maitre"
+
+
+def test_a_bound_form_with_errors_keeps_what_was_sent(client, user):
+    """Whatever the menu was sent, concept or text, is chosen again, and the box keeps the
+    text that was typed in it."""
+    named(user, record_language="en-GB")
+    client.force_login(user)
+    html = client.post(
+        reverse("accounts:profile"),
+        posted(
+            user,
+            last_name="",
+            form_of_address="other",
+            form_of_address_other="Rev",
+            pronouns="she",
+        ),
+    ).content.decode()
+    assert chosen(html, "form_of_address") == "other"
+    assert box(html, "form_of_address_other") == "Rev"
+    assert chosen(html, "pronouns") == "she"
+    html = client.post(
+        reverse("accounts:profile"), posted(user, last_name="", pronouns="elle")
+    ).content.decode()
+    assert chosen(html, "pronouns") == "elle", "a word no list of this language has, as sent"
+    assert re.search(r'<option value="elle" selected dir="auto">elle</option>', html)
 
 
 def test_a_page_that_comes_back_offers_nothing_extra_for_an_ordinary_choice(client, user):
     named(user, record_language="en-GB")
     client.force_login(user)
-    for sent in ("Dr", "other", ""):
+    for sent in ("doctor", "other", ""):
         html = client.post(
             reverse("accounts:profile"),
             posted(user, last_name="", form_of_address=sent, form_of_address_other="Rev"),
@@ -461,11 +594,11 @@ def test_neither_is_printed_on_a_cv_that_has_not_said_so(user):
     """#308 lets a CV choose to print them, and a CV starts with both off: one nobody has
     opened the choice on prints neither. What one that has said so prints is
     `tests/test_cv_prints.py`."""
-    named(user, form_of_address="Dr.ª", pronouns="elu/delu")
+    named(user, form_of_address="doctor_f", pronouns="they")
     cv = CV.objects.create(owner=user, name="Main")
     html = render_cv_html(cv)
     assert "Alex Morgan" in html
-    assert "Dr.ª" not in html and "elu/delu" not in html
+    assert "Dr.ª" not in html and "elu/delu" not in html and "doctor_f" not in html
     details = contact_details(user)
     assert "Dr.ª" not in json.dumps(details, default=str)
 
@@ -551,15 +684,33 @@ def test_saving_a_blank_location_keeps_it_blank(client, user):
 
 
 def test_both_travel_in_the_archive_and_come_back(user, other_user):
-    named(user, form_of_address="Mx", pronouns="they/them")
+    named(user, form_of_address="mx", pronouns="they")
     document = export.build_document(user)
-    assert document["account"]["profile"]["form_of_address"] == "Mx"
-    assert document["account"]["profile"]["pronouns"] == "they/them"
+    assert document["account"]["profile"]["form_of_address"] == "mx"
+    assert document["account"]["profile"]["pronouns"] == "they"
 
     importer.load(other_user, zipfile.ZipFile(export.write_archive(user)))
     other_user.profile.refresh_from_db()
-    assert other_user.profile.form_of_address == "Mx"
-    assert other_user.profile.pronouns == "they/them"
+    assert other_user.profile.form_of_address == "mx"
+    assert other_user.profile.pronouns == "they"
+
+
+def test_an_archive_of_format_73_with_words_comes_back_as_concepts(user, other_user):
+    """Before #921 the profile held one language's words; every one a list has becomes the
+    concept it names, and what none has stays as typed (#921)."""
+    named(user, form_of_address="Mme", pronouns="xe/xem", gender="Homme")
+    document = export.build_document(user)
+    document["postulo"]["format"] = 73
+    buffer = BytesIO()
+    with zipfile.ZipFile(buffer, "w") as archive:
+        archive.writestr(export.MANIFEST_NAME, json.dumps(document, default=str))
+    buffer.seek(0)
+
+    importer.load(other_user, zipfile.ZipFile(buffer))
+    other_user.profile.refresh_from_db()
+    assert other_user.profile.form_of_address == "mrs"
+    assert other_user.profile.pronouns == "xe/xem"
+    assert other_user.profile.gender == "male"
 
 
 def test_the_archive_keeps_a_blank_location_blank(user):
@@ -570,7 +721,7 @@ def test_the_archive_keeps_a_blank_location_blank(user):
 
 
 def test_an_older_archive_without_them_restores_both_blank(user, other_user):
-    named(user, form_of_address="Mx", pronouns="they/them")
+    named(user, form_of_address="mx", pronouns="they")
     document = export.build_document(user)
     document["postulo"]["format"] = 25
     del document["account"]["profile"]["form_of_address"]
@@ -587,16 +738,39 @@ def test_an_older_archive_without_them_restores_both_blank(user, other_user):
 
 def test_the_candidate_file_carries_them_and_fills_a_blank(user, other_user):
     """The file of #181 carries the name, so it carries what goes beside it."""
-    named(user, form_of_address="Eng.ª", pronouns="ela/dela")
+    named(user, form_of_address="engineer_f", pronouns="she")
     data = json.dumps(export.build_candidate_document(user)).encode()
     held = candidate.read(data)
-    assert held["details"]["form_of_address"] == "Eng.ª"
+    assert held["details"]["form_of_address"] == "engineer_f"
 
-    named(other_user, pronouns="she/her")
+    named(other_user, pronouns="they")
     candidate.apply(other_user, held)
     other_user.profile.refresh_from_db()
-    assert other_user.profile.form_of_address == "Eng.ª", "a blank is filled"
-    assert other_user.profile.pronouns == "she/her", "an answer is kept"
+    assert other_user.profile.form_of_address == "engineer_f", "a blank is filled"
+    assert other_user.profile.pronouns == "they", "an answer is kept"
+
+
+def test_a_candidate_file_of_words_is_read_as_concepts_and_shown_as_words(user, other_user):
+    named(user)
+    document = export.build_candidate_document(user)
+    document["account"]["profile"]["form_of_address"] = "Eng.ª"
+    document["account"]["profile"]["pronouns"] = "ela/dela"
+    held = candidate.read(json.dumps(document).encode())
+    named(other_user, record_language="pt-PT")
+    plan = candidate.plan(other_user, held)
+    shown = {
+        row.label: row.sub
+        for section in plan.sections
+        if section.key == "details"
+        for row in section.rows
+    }
+    assert shown["Form of address"] == "Eng.ª" and shown["Pronouns"] == "ela/dela"
+    candidate.apply(other_user, held)
+    other_user.profile.refresh_from_db()
+    assert (other_user.profile.form_of_address, other_user.profile.pronouns) == (
+        "engineer_f",
+        "she",
+    )
 
 
 def test_a_candidate_file_with_one_too_long_is_refused_for_that_row(user):
@@ -629,36 +803,59 @@ def patch(client, payload, **headers):
 
 
 def test_the_api_reads_them_and_the_location_both_ways(client, user):
-    named(user, form_of_address="Dr", pronouns="he/him")
+    named(user, form_of_address="doctor", pronouns="he", gender="Rev")
     an_address(user)
     body = client.get("/api/v1/profile", **bearer(user)).json()
     assert body["first_name"] == "Alex" and body["last_name"] == "Morgan"
-    assert (body["form_of_address"], body["pronouns"]) == ("Dr", "he/him")
+    assert body["form_of_address"] == {"key": "doctor", "label": "Dr"}
+    assert body["pronouns"] == {"key": "he", "label": "he/him"}
+    assert body["gender"] == {"key": "other", "label": "Rev"}, "free text, as typed"
     assert body["location"] == "", "as stored"
     assert body["printed_location"] == "Lisboa, Portugal", "as printed"
+    user.profile.record_language = "fr-FR"
+    user.profile.save()
+    body = client.get("/api/v1/profile", **bearer(user)).json()
+    assert body["pronouns"] == {"key": "he", "label": "il"}, "the label follows the record"
 
 
-def test_the_api_writes_them_as_text(client, user):
+def test_the_api_reads_nothing_given_as_a_blank_key(client, user):
+    named(user)
+    body = client.get("/api/v1/profile", **bearer(user)).json()
+    assert body["pronouns"] == {"key": "", "label": ""}
+
+
+def test_the_api_writes_a_key_a_word_or_free_text(client, user):
     named(user)
     response = patch(
         client,
-        {"form_of_address": "Eng.ª", "pronouns": " iel ", "location": "Porto"},
+        {
+            "form_of_address": "engineer_f",
+            "pronouns": " iel ",
+            "gender": "Rev",
+            "location": "Porto",
+        },
         **bearer(user, "write"),
     )
     assert response.status_code == 200, response.content
     body = response.json()
-    assert (body["form_of_address"], body["pronouns"]) == ("Eng.ª", "iel")
+    assert body["form_of_address"]["key"] == "engineer_f"
+    assert body["pronouns"] == {"key": "they", "label": "they/them"}, "a word is its concept"
+    assert body["gender"] == {"key": "other", "label": "Rev"}
     assert body["location"] == body["printed_location"] == "Porto"
     user.profile.refresh_from_db()
-    assert (user.profile.form_of_address, user.profile.pronouns) == ("Eng.ª", "iel")
+    assert (user.profile.form_of_address, user.profile.pronouns, user.profile.gender) == (
+        "engineer_f",
+        "they",
+        "Rev",
+    )
 
 
 def test_a_field_left_out_is_left_alone_and_printed_location_is_not_written(client, user):
-    named(user, form_of_address="Mx", headline="Engineer")
+    named(user, form_of_address="mx", headline="Engineer")
     response = patch(client, {"printed_location": "Mars"}, **bearer(user, "write"))
     assert response.status_code == 200
     user.profile.refresh_from_db()
-    assert user.profile.form_of_address == "Mx" and user.profile.headline == "Engineer"
+    assert user.profile.form_of_address == "mx" and user.profile.headline == "Engineer"
     assert user.profile.location == ""
 
 

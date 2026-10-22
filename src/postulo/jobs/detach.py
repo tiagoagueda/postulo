@@ -37,6 +37,7 @@ DEPENDENTS = {
         ("jobs", "Contact", "company"),
         ("jobs", "JobPosting", "company"),
         ("jobs", "Company", "parent"),
+        ("jobs", "Company", "acquired_by"),
         ("jobs", "CompanyNote", "company"),
         ("applications", "Application", "through_agency"),
         ("applications", "Appointment", "company"),
@@ -69,6 +70,7 @@ DEPENDENT_LINKS = {"contact": (("applications", "Interview", "contacts"),)}
 #: own parts, its grants, its trail, and the ones the copy re-makes.
 NOT_DEPENDENTS = {
     ("jobs", "CompanyName", "company"),
+    ("jobs", "CompanyHiringSignal", "company"),
     ("jobs", "CompanyIdentifier", "company"),
     ("jobs", "CompanyLogo", "company"),
     ("jobs", "Department", "company"),
@@ -176,6 +178,9 @@ def _copy(record, person, copy_of, needs):
     if isinstance(clone, Company):
         if clone.parent_id and needs(clone.parent):
             clone.parent = copy_of(Company.objects.get(pk=clone.parent_id))
+        # Its acquirer (#941), as its parent: a copy never names what its owner cannot open.
+        if clone.acquired_by_id and needs(clone.acquired_by):
+            clone.acquired_by = copy_of(Company.objects.get(pk=clone.acquired_by_id))
         clone.name = _free_name(person, clone.name)
         clone.has_logo = False
     elif isinstance(clone, Contact):
@@ -228,7 +233,15 @@ def _copy_parts(original, clone, person) -> None:
     """What hangs off a record goes with its copy: owned as the copy is, which is ``person``."""
     from postulo.core.models import MessagingHandle, PhoneNumber, PostalAddress, WebLink
 
-    from .models import Company, CompanyIdentifier, CompanyLogo, CompanyName, Department, Industry
+    from .models import (
+        Company,
+        CompanyHiringSignal,
+        CompanyIdentifier,
+        CompanyLogo,
+        CompanyName,
+        Department,
+        Industry,
+    )
 
     held_from = ContentType.objects.get_for_model(type(original))
     for row_model in (PhoneNumber, PostalAddress, WebLink, MessagingHandle):
@@ -246,7 +259,7 @@ def _copy_parts(original, clone, person) -> None:
                 continue
     if not isinstance(original, Company):
         return
-    for part_model in (CompanyName, CompanyIdentifier, Department):
+    for part_model in (CompanyName, CompanyHiringSignal, CompanyIdentifier, Department):
         for part in part_model.objects.filter(company=original):
             part.pk = part.id = None
             part._state.adding = True

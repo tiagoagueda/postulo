@@ -285,6 +285,14 @@ msgstr[0] "%(count)d slapyvardis susirašinėjimo programoje"
 msgstr[1] "%(count)d slapyvardžiai susirašinėjimo programose"
 msgstr[2] "%(count)d slapyvardžių susirašinėjimo programose"
 
+#: src/postulo/jobs/status.py
+#, python-format
+msgid "%(count)d open listing"
+msgid_plural "%(count)d open listings"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+
 #: src/postulo/core/gdpr.py
 #, python-format
 msgid "%(count)d plugin row"
@@ -540,6 +548,14 @@ msgid_plural "%(counter)s of your records are shared with others: they keep a co
 msgstr[0] "%(counter)s jūsų įrašu dalijamasi su kitais: jie pasilieka savo įrašams reikalingą kopiją ir gauna pranešimą, kad jo nebėra."
 msgstr[1] "%(counter)s jūsų įrašais dalijamasi su kitais: jie pasilieka savo įrašams reikalingą kopiją ir gauna pranešimą, kad jų nebėra."
 msgstr[2] "%(counter)s jūsų įrašų dalijamasi su kitais: jie pasilieka savo įrašams reikalingą kopiją ir gauna pranešimą, kad jų nebėra."
+
+#: src/postulo/templates/jobs/partials/company_row.html
+#, python-format
+msgid "%(counter)s open listing"
+msgid_plural "%(counter)s open listings"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
 
 #: src/postulo/templates/core/search.html
 #, python-format
@@ -1619,8 +1635,8 @@ msgid "<em>Kind</em> says what the number is, and can be left blank. Choose <em>
 msgstr "<em>Rūšis</em> nurodo, koks tai numeris, ir gali likti tuščia. Pasirinkus <em>Kita</em>, laukelyje paklausiama, kaip jį pavadinti."
 
 #: src/postulo/templates/help/contact_block.html
-msgid "<em>Language of your career record</em> says which language your experience, education and projects are typed in. A CV in another language shows what you have translated and says what it could not. It also decides which forms of address and pronouns the menus of <em>Your name</em> offer. Left as it is, it follows the language you read Postulo in."
-msgstr "<em>Karjeros aprašo kalba</em> nurodo, kuria kalba įvesta jūsų patirtis, išsilavinimas ir projektai. Kita kalba parengtas CV rodo tai, ką išvertėte, ir nurodo, ko išversti nepavyko. Ji taip pat lemia, kokius kreipinius ir įvardžius siūlo skilties <em>Jūsų vardas</em> meniu. Jei paliksite kaip yra, ji atitiks kalbą, kuria skaitote Postulo."
+msgid "<em>Language of your career record</em> says which language your experience, education and projects are typed in. A CV in another language shows what you have translated and says what it could not. It also decides which forms of address and pronouns the menus of <em>Your name</em> offer, and in which words. Left as it is, it follows the language you read Postulo in."
+msgstr ""
 
 #: src/postulo/templates/help/contact_block.html
 msgid "<em>Location</em> is where you are, as a document should print it. Left blank, your documents print the town and country of your primary postal address, never the street, and the box shows that line in grey. The blank is what is kept, so making another address the primary changes what is printed without this page being saved again. Type something and that is printed instead."
@@ -1822,6 +1838,10 @@ msgid "A company"
 msgstr "Įmonė"
 
 #: src/postulo/jobs/models.py
+msgid "A company cannot acquire itself."
+msgstr ""
+
+#: src/postulo/jobs/models.py
 msgid "A company cannot be part of itself."
 msgstr "Įmonė negali priklausyti pati sau."
 
@@ -2014,8 +2034,8 @@ msgid "A form of address is what is written before a name, and pronouns say how 
 msgstr "Kreipinys – tai, kas rašoma prieš vardą, o įvardžiai nurodo, kaip apie jus kalbėti. Jei kuris nors laukas tuščias, nieko nespėjama, ir nė vienas niekada nenustatomas pagal jūsų vardą."
 
 #: src/postulo/core/help.py
-msgid "A form of address is written before your name, and your pronouns say how to refer to you. Both are optional, and nothing is assumed when they are blank."
-msgstr "Kreipinys rašomas prieš jūsų vardą, o įvardžiai nurodo, kaip apie jus kalbėti. Abu neprivalomi; jei jie tušti, nieko nenumanoma."
+msgid "A form of address is written before your name, and your pronouns say how to refer to you. Both are optional, nothing is assumed when they are blank, and each is kept as a choice that your pages and documents show in their own language."
+msgstr ""
 
 #: src/postulo/core/views_access.py
 msgid "A group needs a name."
@@ -2711,6 +2731,18 @@ msgstr "Paskyros"
 msgid "Acknowledged"
 msgstr "Gavimas patvirtintas"
 
+#: src/postulo/jobs/models.py
+msgid "acquired by"
+msgstr ""
+
+#: src/postulo/jobs/models.py
+msgid "Acquired or merged"
+msgstr ""
+
+#: src/postulo/api/routers/companies.py
+msgid "acquired_by must be a company you can see."
+msgstr ""
+
 #: src/postulo/templates/jobs/company_detail.html
 #, python-format
 msgid "Across the %(name)s group"
@@ -2737,6 +2769,10 @@ msgstr "Veiksmai: %(name)s"
 #, python-format
 msgid "Actions for %(what)s"
 msgstr "Veiksmai: %(what)s"
+
+#: src/postulo/jobs/models.py
+msgid "Active"
+msgstr ""
 
 #: src/postulo/templates/applications/application_detail.html
 #: src/postulo/templates/jobs/company_detail.html
@@ -2799,6 +2835,10 @@ msgstr "Pridėti žymą"
 msgid "Add all of this"
 msgstr "Pridėti visa tai"
 
+#: src/postulo/templates/jobs/company_form.html
+msgid "Add an entry"
+msgstr ""
+
 #: src/postulo/templates/resume/item_form.html
 msgid "Add an industry"
 msgstr "Pridėti šaką"
@@ -2811,6 +2851,10 @@ msgstr "Pridėti įrašų"
 #: src/postulo/templates/jobs/posting_detail.html
 msgid "Add entry"
 msgstr "Pridėti įrašą"
+
+#: src/postulo/applications/forms.py
+msgid "Add it anyway"
+msgstr ""
 
 #: src/postulo/applications/ical_import.py
 msgid "Add it as"
@@ -3699,6 +3743,20 @@ msgstr "Kaip buvo parašyta: procentas, opcionų skaičius, teisių įgijimo tva
 msgid "As it will print"
 msgstr "Kaip atrodys atspausdinta"
 
+#: src/postulo/jobs/models.py
+msgid "as of"
+msgstr ""
+
+#: src/postulo/templates/jobs/company_form.html
+msgid "As of"
+msgstr ""
+
+#: src/postulo/templates/jobs/partials/company_row.html
+#: src/postulo/templates/jobs/partials/company_status.html
+#, python-format
+msgid "as of %(date)s"
+msgstr ""
+
 #: src/postulo/templates/documents/cv_text.html
 msgid "As plain text"
 msgstr "Grynuoju tekstu"
@@ -4094,6 +4152,11 @@ msgstr "pagal"
 msgid "By"
 msgstr "Kas sukūrė"
 
+#: src/postulo/templates/jobs/partials/company_status.html
+#, python-format
+msgid "by <a href=\"%(acquirer_url)s\" class=\"underline\"><bdi>%(name)s</bdi></a>"
+msgstr ""
+
 #: src/postulo/templates/widgets/sources.html
 msgid "By agency"
 msgstr "Pagal agentūrą"
@@ -4394,6 +4457,7 @@ msgstr "sertifikatai"
 msgid "Certifications it issued"
 msgstr "Išduoti pažymėjimai"
 
+#: src/postulo/templates/jobs/company_form.html
 #: src/postulo/templates/settings/locale.html
 msgid "Change"
 msgstr "Keisti"
@@ -4630,6 +4694,10 @@ msgstr "Pasirinkite identifikatoriaus tipą."
 #: src/postulo/templates/documents/cv_detail.html
 msgid "Choose what it prints instead"
 msgstr "Pasirinkti, ką pateikti vietoj to"
+
+#: src/postulo/jobs/status_views.py
+msgid "Choose what was reported and the date."
+msgstr ""
 
 #: src/postulo/applications/views.py
 msgid "Choose which application this is about first."
@@ -5142,6 +5210,10 @@ msgstr "Skaičiuojama pagal tai, kada tai įvyko, todėl atsakymas, gautas šiuo
 msgid "Counted by when it happened, so a reply in this period to an older application belongs here. That is a different question from what was sent, and the two are kept apart."
 msgstr "Skaičiuojama pagal tai, kada tai įvyko, todėl atsakymas, gautas šiuo laikotarpiu į senesnę paraišką, priklauso čia. Tai kitas klausimas nei tai, kas buvo išsiųsta, ir abu laikomi atskirai."
 
+#: src/postulo/templates/jobs/partials/company_status.html
+msgid "Counted from the listings recorded here; nobody has reported it."
+msgstr ""
+
 #: src/postulo/templates/widgets/interviews_summary.html
 msgid "Counted from the timeline, so interviews recorded before the diary existed are in."
 msgstr "Skaičiuojama pagal chronologiją, todėl įtraukiami ir pokalbiai, įrašyti dar prieš atsirandant darbotvarkei."
@@ -5334,6 +5406,10 @@ msgstr "Gimimo data"
 
 #: src/postulo/templates/help/personal_details.html
 msgid "Date of birth, place and country of birth, gender and nationalities are what an identity check asks for, and nothing a job search needs until a CV says so. Every part is optional."
+msgstr ""
+
+#: src/postulo/templates/jobs/company_form.html
+msgid "Dated entries, kept as a history and shared with everybody who can see this company. One older than 90 days is shown as of its date."
 msgstr ""
 
 #: src/postulo/applications/models.py
@@ -5757,6 +5833,10 @@ msgstr "Išmesta. Skelbimas lieka jūsų istorijoje, jį galima atkurti."
 msgid "Dismiss"
 msgstr "Uždaryti"
 
+#: src/postulo/jobs/models.py
+msgid "Dissolved"
+msgstr ""
+
 #: src/postulo/documents/forms.py
 msgid "Do not send after"
 msgstr "Nesiųsti po"
@@ -5911,6 +5991,11 @@ msgstr "Atsisiųsti šiuos žmones kaip vCard"
 #: src/postulo/templates/server/backups.html
 msgid "Downloading one needs you to sign in again, and is written to the log with your name. Keep what you download as carefully as the instance itself. The key that the connection secrets are under is not in an archive: keep your <code>.env</code> somewhere else."
 msgstr "Norint atsisiųsti kopiją, reikia prisijungti dar kartą, o atsisiuntimas įrašomas į žurnalą su jūsų vardu. Tai, ką atsisiunčiate, saugokite taip pat atsargiai kaip patį egzempliorių. Rakto, kuriuo užšifruotos ryšių paslaptys, archyve nėra: savo <code>.env</code> failą laikykite kitoje vietoje."
+
+#: src/postulo/accounts/addressing.py
+msgctxt "form of address"
+msgid "Dr"
+msgstr ""
 
 #: src/postulo/applications/models.py
 msgid "Draft"
@@ -6222,6 +6307,11 @@ msgstr "baigiasi"
 msgid "Energy"
 msgstr "Energetika"
 
+#: src/postulo/accounts/addressing.py
+msgctxt "form of address"
+msgid "Eng."
+msgstr ""
+
 #: src/postulo/jobs/industries.py
 msgid "Engineering"
 msgstr "Inžinerija"
@@ -6483,6 +6573,10 @@ msgstr "Pavyzdinė komanda"
 msgid "Exceptions to what this instance decides for everybody. Whatever you set here is shown to this person on their own settings page, with your name against it."
 msgstr "Išimtys iš to, ką šis egzempliorius nustato visiems. Tai, ką čia nustatysite, šiam asmeniui rodoma jo paties nustatymų puslapyje kartu su jūsų vardu."
 
+#: src/postulo/jobs/tables.py
+msgid "Exclude dissolved"
+msgstr ""
+
 #: src/postulo/documents/rendering.py src/postulo/resume/candidate.py
 #: src/postulo/resume/registry.py src/postulo/resume/views_candidate.py
 #: src/postulo/templates/resume/europass_import.html
@@ -6612,6 +6706,11 @@ msgstr "Faksas"
 #: src/postulo/plugins/kinds.py
 msgid "Feature"
 msgstr "Funkcija"
+
+#: src/postulo/accounts/addressing.py
+msgctxt "gender"
+msgid "Female"
+msgstr ""
 
 #: src/postulo/templates/jobs/company_form.html
 msgid "Fetch from Wikidata"
@@ -7356,6 +7455,11 @@ msgstr "turi logotipą"
 msgid "has an uploaded picture"
 msgstr "turi įkeltą vaizdą"
 
+#: src/postulo/accounts/addressing.py
+msgctxt "pronouns"
+msgid "he/him"
+msgstr ""
+
 #: src/postulo/accounts/models.py src/postulo/documents/models.py
 #: src/postulo/resume/views.py
 msgid "headline"
@@ -7418,6 +7522,40 @@ msgstr "akcentai"
 #: src/postulo/documents/models.py
 msgid "highlights for this CV"
 msgstr "šio CV akcentai"
+
+#: src/postulo/jobs/models.py src/postulo/jobs/tables.py
+#: src/postulo/templates/jobs/company_form.html
+#: src/postulo/templates/jobs/partials/company_signals.html
+msgid "Hiring"
+msgstr ""
+
+#: src/postulo/jobs/models.py
+msgid "Hiring freeze"
+msgstr ""
+
+#: src/postulo/jobs/models.py
+msgid "hiring signal"
+msgstr ""
+
+#: src/postulo/jobs/status_views.py
+msgid "Hiring signal added."
+msgstr ""
+
+#: src/postulo/jobs/status_views.py
+msgid "Hiring signal changed."
+msgstr ""
+
+#: src/postulo/jobs/status_views.py
+msgid "Hiring signal removed."
+msgstr ""
+
+#: src/postulo/jobs/merging.py
+msgid "Hiring signals"
+msgstr ""
+
+#: src/postulo/jobs/models.py
+msgid "hiring signals"
+msgstr ""
 
 #: src/postulo/templates/jobs/posting_detail.html
 msgid "History"
@@ -7821,6 +7959,10 @@ msgstr "Po 90 dienų"
 #: src/postulo/api/forms.py
 msgid "In a year"
 msgstr "Po metų"
+
+#: src/postulo/jobs/models.py
+msgid "In administration"
+msgstr ""
 
 #: src/postulo/templates/widgets/counters.html
 msgid "In conversation"
@@ -8402,6 +8544,10 @@ msgstr "Jo failas atitinka tai, ką pasirašė oficialioji repozitorija."
 msgid "Its general mailbox, such as jobs@ or info@. A person's address goes on a contact."
 msgstr "Bendrasis įmonės el. pašto adresas, pvz., jobs@ ar info@. Asmens adresas įrašomas prie kontakto."
 
+#: src/postulo/templates/jobs/company_wikidata.html
+msgid "Its legal state"
+msgstr ""
+
 #: src/postulo/jobs/merging.py
 #, python-format
 msgid "Its logo: %(name)s has one of its own, and a picture cannot be kept in a note."
@@ -8811,6 +8957,10 @@ msgstr "platuma"
 msgid "Latitude"
 msgstr "Platuma"
 
+#: src/postulo/jobs/models.py
+msgid "Laying off"
+msgstr ""
+
 #: src/postulo/resume/forms.py
 msgid "Learning you took, with or without a certificate of attendance. A programme that led to a degree or diploma belongs in Education; a credential somebody can check, or that may lapse, belongs in Certifications."
 msgstr "Mokymai, kuriuose dalyvavote, su lankymo pažymėjimu ar be jo. Programa, kurią baigus įgytas laipsnis ar diplomas, priklauso skyriui „Išsilavinimas“; kvalifikacijos įrodymas, kurį kas nors gali patikrinti arba kuris gali nustoti galioti, – skyriui „Sertifikatai“."
@@ -8826,6 +8976,10 @@ msgstr "Palikite tuščią, kad išliktų jau išsaugotas."
 #: src/postulo/resume/models.py
 msgid "Leave empty if this is your current role."
 msgstr "Palikite tuščią, jei tai dabartinės pareigos."
+
+#: src/postulo/templates/jobs/company_wikidata.html
+msgid "Leave it as it is"
+msgstr ""
 
 #: src/postulo/resume/forms.py
 msgid "Leave it empty for a single day or when it has no end."
@@ -8904,6 +9058,10 @@ msgstr "Teisinės paslaugos"
 #: src/postulo/templates/partials/footer_links.html
 msgid "Legal notice"
 msgstr "Teisinė informacija"
+
+#: src/postulo/jobs/models.py
+msgid "legal state"
+msgstr ""
 
 #: src/postulo/core/server_forms.py
 msgid "Let a capture keep a rendering of its page"
@@ -9269,6 +9427,11 @@ msgstr "Padaryti administratoriumi"
 msgid "Make it"
 msgstr "Sukurti"
 
+#: src/postulo/accounts/addressing.py
+msgctxt "gender"
+msgid "Male"
+msgstr ""
+
 #: src/postulo/templates/settings/account.html
 msgid "Manage"
 msgstr "Tvarkyti"
@@ -9345,6 +9508,11 @@ msgstr "gali įjungti ar išjungti sau"
 #: src/postulo/plugins/models.py
 msgid "may use it"
 msgstr "gali naudoti"
+
+#: src/postulo/accounts/addressing.py
+msgctxt "form of address"
+msgid "Me"
+msgstr ""
 
 #: src/postulo/jobs/share_views.py
 #, python-format
@@ -9509,6 +9677,11 @@ msgstr "Tik Microsoft: katalogas, kuriame užregistruota programa. Palikite tuš
 msgid "minibuses"
 msgstr "mikroautobusai"
 
+#: src/postulo/accounts/addressing.py
+msgctxt "form of address"
+msgid "Miss"
+msgstr ""
+
 #: src/postulo/documents/models.py
 msgid "Missing entry"
 msgstr "Trūkstamas įrašas"
@@ -9654,6 +9827,26 @@ msgstr "Perkelti aukštyn"
 msgid "Moved to %(status)s."
 msgstr "Nauja būsena: %(status)s."
 
+#: src/postulo/accounts/addressing.py
+msgctxt "form of address"
+msgid "Mr"
+msgstr ""
+
+#: src/postulo/accounts/addressing.py
+msgctxt "form of address"
+msgid "Mrs"
+msgstr ""
+
+#: src/postulo/accounts/addressing.py
+msgctxt "form of address"
+msgid "Ms"
+msgstr ""
+
+#: src/postulo/accounts/addressing.py
+msgctxt "form of address"
+msgid "Mx"
+msgstr ""
+
 #: src/postulo/applications/models.py
 msgid "My own choice"
 msgstr "Mano sprendimas"
@@ -9692,6 +9885,10 @@ msgstr "Pavadinimas"
 #: src/postulo/resume/forms.py
 msgid "Name of the language"
 msgstr "Kalbos pavadinimas"
+
+#: src/postulo/jobs/models.py
+msgid "Name the acquirer only for a company that was acquired."
+msgstr ""
 
 #: src/postulo/core/messaging_services.py
 msgid "Name the service this handle is on, or choose one from the list."
@@ -10307,6 +10504,11 @@ msgstr "Nė vienas jūsų įrašytas asmuo"
 msgid "Nobody, or the person below"
 msgstr "Niekas arba toliau nurodytas asmuo"
 
+#: src/postulo/accounts/addressing.py
+msgctxt "gender"
+msgid "Non-binary"
+msgstr ""
+
 #: src/postulo/jobs/industries.py
 msgid "Non-profit"
 msgstr "Ne pelno sektorius"
@@ -10487,6 +10689,10 @@ msgstr "Nepateikiama jokiame CV, kol nesutiks."
 msgid "Not recorded"
 msgstr "Neįrašyta"
 
+#: src/postulo/jobs/forms.py
+msgid "Not recorded here"
+msgstr ""
+
 #: src/postulo/documents/forms.py
 msgid "Not said"
 msgstr "Nenurodyta"
@@ -10580,6 +10786,19 @@ msgstr "Įtraukta"
 #, python-format
 msgid "noted %(when)s"
 msgstr "pastebėta %(when)s"
+
+#: src/postulo/jobs/models.py
+msgid "noted by"
+msgstr ""
+
+#: src/postulo/templates/jobs/partials/company_signals.html
+#, python-format
+msgid "Noted by <bdi>%(name)s</bdi>"
+msgstr ""
+
+#: src/postulo/templates/jobs/partials/company_signals.html
+msgid "Noted by somebody who has since left"
+msgstr ""
 
 #: src/postulo/jobs/models.py
 msgid "noted on"
@@ -12597,6 +12816,11 @@ msgstr "Parengė Postulo pagal paties asmens įrašus. Postulo nenustato jokio t
 msgid "Produced on %(produced)s"
 msgstr "Parengta %(produced)s"
 
+#: src/postulo/accounts/addressing.py
+msgctxt "form of address"
+msgid "Prof."
+msgstr ""
+
 #: src/postulo/resume/models.py
 msgid "proficiency"
 msgstr "lygis"
@@ -12968,6 +13192,20 @@ msgstr "Įrašyti pasiūlymą"
 msgid "Record and change: applications, listings, notes, reminders, letters, your details. A call that changes a record answers with the whole record, timeline and contacts included, so this can see what it touches"
 msgstr "Įrašyti ir keisti: paraiškas, skelbimus, pastabas, priminimus, laiškus, jūsų duomenis. Įrašą keičiantis iškvietimas grąžina visą įrašą su chronologija ir kontaktais, todėl matoma, ką jis paveikė"
 
+#: src/postulo/templates/jobs/company_wikidata.html
+#, python-format
+msgid "Record it as acquired or merged into <bdi>%(name)s</bdi>"
+msgstr ""
+
+#: src/postulo/templates/jobs/company_wikidata.html
+msgid "Record it as dissolved"
+msgstr ""
+
+#: src/postulo/templates/jobs/company_wikidata.html
+#, python-format
+msgid "Record it as dissolved on %(date)s"
+msgstr ""
+
 #: src/postulo/templates/server/record_of_processing.html
 msgid "Record of processing"
 msgstr "Duomenų tvarkymo veiklos įrašai"
@@ -12989,6 +13227,10 @@ msgstr "Įrašyti, ką išsiuntėte"
 #: src/postulo/applications/tables.py
 msgid "Recorded"
 msgstr "Įrašyta"
+
+#: src/postulo/jobs/models.py
+msgid "recorded"
+msgstr ""
 
 #: src/postulo/plugins/forms.py
 msgid "Recorded against everything installed from here, so it cannot change later without orphaning what it installed."
@@ -13309,6 +13551,10 @@ msgstr "Pašalinti įkeltą vaizdą"
 msgid "Remove this connection?"
 msgstr "Pašalinti šį ryšį?"
 
+#: src/postulo/templates/jobs/company_form.html
+msgid "Remove this entry"
+msgstr ""
+
 #: src/postulo/templates/server/design.html
 msgid "Remove this example?"
 msgstr "Pašalinti šį pavyzdį?"
@@ -13618,6 +13864,10 @@ msgstr "Išsaugoti ir toliau"
 #: src/postulo/accounts/models.py
 msgid "save as I go"
 msgstr "išsaugoti iš karto"
+
+#: src/postulo/templates/jobs/company_form.html
+msgid "Save the change"
+msgstr ""
 
 #: src/postulo/templates/jobs/company_form.html
 msgid "Save the company to add another identifier."
@@ -14159,6 +14409,10 @@ msgstr[2] "Bendrinama su %(counter)s"
 msgid "Shared with %(who)s."
 msgstr "Bendrinama su %(who)s."
 
+#: src/postulo/templates/jobs/company_form.html
+msgid "Shared with everybody who can see this company. Say when it became true and where you learnt it, if you know."
+msgstr ""
+
 #: src/postulo/jobs/whose.py
 msgid "Shared with you"
 msgstr "Bendrinama su jumis"
@@ -14184,6 +14438,11 @@ msgstr "bendrinimai"
 #: src/postulo/templates/jobs/share.html
 msgid "Sharing"
 msgstr "Dalijimasis"
+
+#: src/postulo/accounts/addressing.py
+msgctxt "pronouns"
+msgid "she/her"
+msgstr ""
 
 #: src/postulo/core/widgets_builtin.py
 msgid "Shortcuts"
@@ -14366,6 +14625,10 @@ msgstr "Prisijungimas"
 msgid "Sign-in methods"
 msgstr "Prisijungimo būdai"
 
+#: src/postulo/jobs/models.py
+msgid "signal"
+msgstr ""
+
 #: src/postulo/core/mail_choices.py
 msgid "Signed in once, as the mailbox that sends"
 msgstr "Prisijungta vieną kartą, kaip siunčianti pašto dėžutė"
@@ -14393,6 +14656,10 @@ msgstr "Prisijungimas su žetonu"
 #: src/postulo/templates/server/signin.html
 msgid "Signs in to an existing account by e-mail"
 msgstr "Prisijungia prie esamos paskyros el. paštu"
+
+#: src/postulo/jobs/models.py
+msgid "since"
+msgstr ""
 
 #: src/postulo/resume/models.py
 #, python-format
@@ -14619,6 +14886,7 @@ msgstr "Kas nors su tuo sutiko. Išbandykite, kad įsitikintumėte, jog sutikima
 msgid "Somebody shares a company, a contact or a listing with you"
 msgstr "Kažkas bendrina su jumis įmonę, kontaktą ar skelbimą"
 
+#: src/postulo/templates/jobs/company_form.html
 #: src/postulo/templates/jobs/partials/sharing_panel.html
 msgid "somebody who has since left"
 msgstr "kažkas, kas vėliau išėjo"
@@ -14661,7 +14929,10 @@ msgstr "Rikiuoti pagal stulpelį %(column)s, mažiausios reikšmės viršuje"
 msgid "source"
 msgstr "šaltinis"
 
-#: src/postulo/plugins/kinds.py src/postulo/templates/server/email.html
+#: src/postulo/plugins/kinds.py src/postulo/templates/jobs/company_form.html
+#: src/postulo/templates/jobs/partials/company_signals.html
+#: src/postulo/templates/jobs/partials/company_status.html
+#: src/postulo/templates/server/email.html
 #: src/postulo/templates/server/plugins.html
 #: src/postulo/templates/widgets/sources.html
 msgid "Source"
@@ -14770,12 +15041,13 @@ msgstr "būsena"
 
 #: src/postulo/applications/forms.py src/postulo/applications/reports.py
 #: src/postulo/applications/tables.py src/postulo/core/csv_import.py
-#: src/postulo/templates/accounts/invite_list.html
+#: src/postulo/jobs/tables.py src/postulo/templates/accounts/invite_list.html
 #: src/postulo/templates/applications/partials/bulk_fields.html
 #: src/postulo/templates/applications/partials/status_card.html
 #: src/postulo/templates/applications/report.html
 #: src/postulo/templates/applications/report_print.html
 #: src/postulo/templates/core/import_csv_map.html
+#: src/postulo/templates/jobs/company_form.html
 msgid "Status"
 msgstr "Būsena"
 
@@ -15797,6 +16069,11 @@ msgstr "Pavyko."
 msgid "That would make a loop: %(name)s is already part of this one."
 msgstr "Taip susidarytų ciklas: %(name)s jau priklauso šiai įmonei."
 
+#: src/postulo/jobs/models.py
+#, python-format
+msgid "That would make a loop: %(name)s was already acquired by this one."
+msgstr ""
+
 #: src/postulo/applications/views.py src/postulo/jobs/views.py
 #, python-format
 msgid "The %(count)d document you sent is kept, and still says where it went."
@@ -16023,6 +16300,14 @@ msgstr "Įmonė neturi adreso, prie kurio jį būtų galima priskirti: pridėkit
 msgid "The company is matched by name and created if it is new. Only the company and the job title are required; everything else can be filled in later."
 msgstr "Įmonė atpažįstama pagal pavadinimą ir sukuriama, jei ji nauja. Privalomi tik įmonė ir pareigų pavadinimas; visa kita galima užpildyti vėliau."
 
+#: src/postulo/applications/forms.py
+msgid "The company is recorded as dissolved. Tick this to add the listing."
+msgstr ""
+
+#: src/postulo/jobs/models.py
+msgid "The company it became part of, if that company is recorded here."
+msgstr ""
+
 #: src/postulo/jobs/models.py
 msgid "The company this one belongs to, if it belongs to one."
 msgstr "Įmonė, kuriai priklauso ši įmonė, jei tokia yra."
@@ -16063,6 +16348,14 @@ msgstr "Plytelių licencijos reikalaujamas autorystės nurodymas, rodomas žemė
 msgid "The dashboard lists open applications nothing has happened to for a while, with nothing planned. Recruiters' own advice clusters around two to three weeks."
 msgstr "Skydelyje rodomos atviros paraiškos, kuriose kurį laiką nieko nevyko ir nieko nesuplanuota. Patys atrankos specialistai dažniausiai pataria laukti dviejų–trijų savaičių."
 
+#: src/postulo/api/routers/companies.py src/postulo/jobs/forms.py
+msgid "The date cannot be in the future."
+msgstr ""
+
+#: src/postulo/jobs/models.py
+msgid "The date it became true, if known."
+msgstr ""
+
 #: src/postulo/documents/forms.py
 msgid "The date on the letter, as a date. Leave it empty when you do not know."
 msgstr "Laiške nurodyta data, datos formatu. Palikite tuščią, jei jos nežinote."
@@ -16070,6 +16363,10 @@ msgstr "Laiške nurodyta data, datos formatu. Palikite tuščią, jei jos nežin
 #: src/postulo/applications/forms.py
 msgid "The date you mean to have sent it by. It is not a reminder — set one of those if you want telling."
 msgstr "Data, iki kurios ketinate ją išsiųsti. Tai ne priminimas — jei norite, kad jums būtų priminta, nustatykite priminimą."
+
+#: src/postulo/jobs/forms.py
+msgid "The day it was true or reported, not today's date unless it is."
+msgstr ""
 
 #: src/postulo/templates/server/plugins.html
 msgid "The default for every account. One person's exceptions are on their row under People. Switching a plugin off stops it being used and deletes nothing."
@@ -17223,6 +17520,11 @@ msgstr "Šis asmuo dalyvavo pokalbyje."
 msgid "They were the main contact."
 msgstr "Šis asmuo buvo pagrindinis kontaktas."
 
+#: src/postulo/accounts/addressing.py
+msgctxt "pronouns"
+msgid "they/them"
+msgstr ""
+
 #: src/postulo/jobs/pages.py
 msgid "This account does not keep a rendering of a page."
 msgstr "Ši paskyra nesaugo puslapio vaizdo."
@@ -17333,6 +17635,11 @@ msgstr "Šis fiksavimas išmestas."
 msgid "This company"
 msgstr "Ši įmonė"
 
+#: src/postulo/jobs/status.py
+#, python-format
+msgid "This company has been in administration since %(date)s."
+msgstr ""
+
 #: src/postulo/jobs/logos.py
 msgid "This company has no website recorded."
 msgstr "Šios įmonės svetainė neįrašyta."
@@ -17340,6 +17647,24 @@ msgstr "Šios įmonės svetainė neįrašyta."
 #: src/postulo/templates/resume/item_form.html
 msgid "This company has none of its industries from the NACE list yet."
 msgstr "Ši įmonė dar neturi nė vienos šakos iš NACE sąrašo."
+
+#: src/postulo/jobs/status.py
+msgid "This company is recorded as being in administration."
+msgstr ""
+
+#: src/postulo/jobs/status.py
+msgid "This company is recorded as dissolved."
+msgstr ""
+
+#: src/postulo/jobs/status.py
+#, python-format
+msgid "This company was dissolved on %(date)s."
+msgstr ""
+
+#: src/postulo/jobs/status.py
+#, python-format
+msgid "This company was reported laying people off as of %(date)s."
+msgstr ""
 
 #: src/postulo/templates/resume/item_form.html
 msgid "This entry prints its original text on every CV."
@@ -17667,6 +17992,10 @@ msgstr "Pažymėkite, kai susitikime dalyvausite. Jūsų konsultantui skirtoje a
 #: src/postulo/templates/partials/table/bulk.html
 msgid "Tick rows to act on several at once."
 msgstr "Pažymėkite eilutes, kad galėtumėte atlikti veiksmą su keliomis iš karto."
+
+#: src/postulo/applications/forms.py
+msgid "Tick the box to add the listing anyway."
+msgstr ""
 
 #: src/postulo/jobs/capture_views.py
 msgid "Ticked, the listing becomes an application straight away. Otherwise it waits in your listings for you to decide."
@@ -18580,8 +18909,8 @@ msgid "What is in the file"
 msgstr "Kas yra faile"
 
 #: src/postulo/templates/help/your_name.html
-msgid "What is kept is the text itself. If your career record changes language, a choice made from the other language's list stays what it was, and is shown as <em>Other…</em> with its text in the box."
-msgstr "Saugomas pats tekstas. Jei pasikeičia jūsų karjeros aprašo kalba, iš kitos kalbos sąrašo padarytas pasirinkimas lieka toks, koks buvo, ir rodomas kaip <em>Kita…</em>, o jo tekstas – laukelyje."
+msgid "What is kept is the choice, not one language's word for it: <em>il</em> in French and <em>he/him</em> in English are the same choice, so your menus and your documents show it in the language they are drawn in when your career record changes language. Only what you write under <em>Other…</em> is kept as you typed it, and shown as typed in every language. A word you type there that a list already has is kept as that choice."
+msgstr ""
 
 #: src/postulo/templates/documents/cv_detail.html
 msgid "What is on this CV"
@@ -18695,6 +19024,10 @@ msgstr "Koks tai darbas. Toliau esantys laukai priklauso nuo tipo: pasirinkus ki
 #: src/postulo/resume/models.py
 msgid "what the check found"
 msgstr "ką rado patikrinimas"
+
+#: src/postulo/jobs/forms.py
+msgid "What the company is. Shown to everybody who can see it."
+msgstr ""
 
 #: src/postulo/applications/forms.py
 msgid "What the figure covers. Offers are compared by the year."
@@ -18816,6 +19149,14 @@ msgstr "kas sutarta"
 #: src/postulo/core/models.py
 msgid "what was asked"
 msgstr "kas buvo prašoma"
+
+#: src/postulo/templates/jobs/company_form.html
+msgid "What was reported"
+msgstr ""
+
+#: src/postulo/jobs/forms.py
+msgid "What was reported about its hiring."
+msgstr ""
 
 #: src/postulo/applications/forms.py
 msgid "What was said or agreed, to write down afterwards."
@@ -19057,6 +19398,14 @@ msgstr "Jei šis egzempliorius gali siųsti kodą į telefoną, patvirtintas num
 msgid "Where you came across it: a job board, a referral, the company site."
 msgstr "Kur jį radote: darbo skelbimų portale, per rekomendaciją, įmonės svetainėje."
 
+#: src/postulo/jobs/models.py
+msgid "Where you learnt it: a news article, a post."
+msgstr ""
+
+#: src/postulo/jobs/models.py
+msgid "Where you learnt it: a register, an article."
+msgstr ""
+
 #: src/postulo/resume/views.py
 msgid "where you live"
 msgstr "kur gyvenate"
@@ -19277,9 +19626,18 @@ msgstr "Wikidata pateikia pavadinimą ta kalba. Norėdami jį pakeisti, gaukite 
 msgid "Wikidata has no item with that identifier."
 msgstr "Wikidata neturi elemento su tokiu identifikatoriumi."
 
+#: src/postulo/templates/jobs/company_wikidata.html
+#, python-format
+msgid "Wikidata names %(qid)s as its replacement; no company here carries that identifier."
+msgstr ""
+
 #: src/postulo/jobs/wikidata.py
 msgid "Wikidata redirected too many times."
 msgstr "Wikidata peradresavo per daug kartų."
+
+#: src/postulo/templates/jobs/company_wikidata.html
+msgid "Wikidata says this organisation has ended. Choose whether to record it; the legal state is shown to everybody who can see this company."
+msgstr ""
 
 #: src/postulo/jobs/wikidata.py
 msgid "Wikidata sent the request somewhere else."

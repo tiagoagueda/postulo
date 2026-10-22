@@ -13,6 +13,7 @@ from django.utils.text import format_lazy
 from django.utils.translation import gettext
 from django.utils.translation import gettext_lazy as _
 
+from postulo.accounts import addressing
 from postulo.core import demonyms, languages, personal, postal
 from postulo.core.date_widgets import DateInput
 from postulo.core.htmlstrings import sentence
@@ -274,7 +275,8 @@ class CVForm(ThemeChoiceMixin, LanguageChoiceMixin, OwnerScopedModelForm):
             else _("The line your details give, never a street. They give none yet.")
         )
         for name in ("form_of_address", "pronouns"):
-            said = (getattr(profile, name, "") or "").strip()
+            # The concept as a word, in the language this page is drawn in (#921).
+            said = addressing.label(name, getattr(profile, name, ""), languages.current())
             self.fields[f"show_{name}"].help_text = (
                 sentence(_("As things stand: {value}."), value=_typed(said)) if said else GIVES_NONE
             )
@@ -294,7 +296,9 @@ class CVForm(ThemeChoiceMixin, LanguageChoiceMixin, OwnerScopedModelForm):
         self.fields["show_birth_place"].help_text = (
             sentence(_("As things stand: {value}."), value=_typed(place)) if place else GIVES_NONE
         )
-        gender = (getattr(profile, "gender", "") or "").strip()
+        gender = addressing.label(
+            addressing.GENDER, getattr(profile, "gender", ""), languages.current()
+        )
         self.fields["show_gender"].help_text = (
             sentence(_("As things stand: {value}."), value=_typed(gender)) if gender else GIVES_NONE
         )

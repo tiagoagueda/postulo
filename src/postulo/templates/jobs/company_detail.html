@@ -37,6 +37,7 @@
           </div>
         {% endif %}
       </div>
+      {% include "jobs/partials/company_status.html" %}
       {% if company.is_employment_service %}
         <p class="text-sm text-ink-500 dark:text-ink-400">{{ company.get_kind_display }}</p>
       {% endif %}
@@ -256,6 +257,8 @@
           {% endif %}
         </c-empty>
       {% endif %}
+
+      {% include "jobs/partials/company_signals.html" %}
 
       {% if career_entries %}
         <c-section-title class="mt-8">{% translate "Your history here" %}</c-section-title>

@@ -186,6 +186,9 @@ EXCUSED: dict[str, str] = {
         "fetch it sends you to the company's page, so the walk never finds it drawn (#673)"
     ),
     "jobs:company_names": "a form's answer that adds or removes one name and goes back (#673)",
+    "jobs:company_signal_add": "a POST from the company form that adds a hiring entry (#941)",
+    "jobs:company_signal_edit": "a POST from the company form that changes a hiring entry (#941)",
+    "jobs:company_signal_remove": "a POST from the company form that removes a hiring entry (#941)",
     "jobs:company_identifier_remove": (
         "a POST from an identifier's dialog on the company form, answered with a redirect "
         "back to it, or JSON for the script; a GET is that redirect and nothing else"

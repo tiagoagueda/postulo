@@ -13,7 +13,7 @@ from postulo.core import slugs
 from postulo.core.csv_import import OFFERED_CURRENCIES
 from postulo.core.date_widgets import DateInput, DateTimeInput
 from postulo.core.models import Tag, TagColour, TagIcon
-from postulo.jobs import esco, recall
+from postulo.jobs import esco, recall, status
 from postulo.jobs.forms import POSTING_HELP, OwnerScopedModelForm, who_and_where
 from postulo.jobs.models import (
     Company,
@@ -22,6 +22,7 @@ from postulo.jobs.models import (
     DescriptionFormat,
     EmploymentType,
     JobPosting,
+    LegalState,
     RemoteType,
     SalaryPeriod,
     currency_code,
@@ -105,6 +106,14 @@ class PostingIntakeForm(UserAwareForm):
         # it becomes and is not offered here (#266).
         widget=forms.TextInput(attrs={"list": "title-suggestions", "autocomplete": "off"}),
         help_text=POSTING_HELP["title"],
+    )
+    #: Asked only when the company named is recorded as dissolved (#941): adding work at a
+    #: company that no longer exists is allowed -- the record may be wrong, or the person may
+    #: know better -- but not by accident. The page draws the box only when it applies.
+    confirm_dissolved = forms.BooleanField(
+        label=_("Add it anyway"),
+        required=False,
+        help_text=_("The company is recorded as dissolved. Tick this to add the listing."),
     )
     url = forms.URLField(
         label=_("Posting URL"),
@@ -227,7 +236,36 @@ class PostingIntakeForm(UserAwareForm):
         low, high = cleaned.get("salary_min"), cleaned.get("salary_max")
         if low is not None and high is not None and low > high:
             self.add_error("salary_max", _("The upper figure cannot be below the lower one."))
+        self._ask_about_a_dissolved_company(cleaned)
         return cleaned
+
+    #: The company the confirmation is about, set by `clean`; the page draws the box when it
+    #: is there.
+    dissolved_company = None
+
+    def _ask_about_a_dissolved_company(self, cleaned) -> None:
+        """Refuse, with a box to tick, a listing for a company recorded as dissolved (#941).
+
+        Looked up the way the save will look it up -- by name, among the companies this
+        person can see -- so what is asked about is the company that would be used.
+        """
+        name = (cleaned.get("company_name") or "").strip()
+        if not name or self.user is None:
+            return
+        company = (
+            Company.objects.visible_to(self.user)
+            .filter(name_key=slugs.name_key(name), legal_state=LegalState.DISSOLVED)
+            .order_by("owner_group", "pk")
+            .first()
+        )
+        if company is None:
+            return
+        self.dissolved_company = company
+        if not cleaned.get("confirm_dissolved"):
+            self.add_error(
+                "confirm_dissolved",
+                status.warning(company) + " " + str(_("Tick the box to add the listing anyway.")),
+            )
 
     #: Posting fields that are stored as text, and are blank rather than null.
     POSTING_TEXT_FIELDS = (

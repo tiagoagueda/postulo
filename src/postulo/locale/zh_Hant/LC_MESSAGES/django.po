@@ -225,6 +225,12 @@ msgid "%(count)d messaging handle"
 msgid_plural "%(count)d messaging handles"
 msgstr[0] "%(count)d 訊息控件"
 
+#: src/postulo/jobs/status.py
+#, python-format
+msgid "%(count)d open listing"
+msgid_plural "%(count)d open listings"
+msgstr[0] ""
+
 #: src/postulo/core/gdpr.py
 #, fuzzy, python-format
 msgid "%(count)d plugin row"
@@ -416,6 +422,12 @@ msgstr[0] "%(counter)s成員"
 msgid "%(counter)s of your records is shared with others: they keep a copy of what their own records need, and are told it is gone."
 msgid_plural "%(counter)s of your records are shared with others: they keep a copy of what their own records need, and are told they are gone."
 msgstr[0] "有 一 件 有 一 有 一 有 一 有 一 有 一 有 一 有 一 有 一 有 一 有 一 有 一 有 一 有 一 有 一 有 一 有 一 有 一 有 一 有 一 有 一 有 一 有 一 有 一 有 一 有 一 有 一 有 一 有 一 有 一 有 一 有 一 有 一 有 一 有 一 有 一 有 一 有 一 有 一 有 一 有 一 有 一 有 一 有 一 有 一 有 一 有 一 有 一 有 一 有 一 有 一 有 一 有 一 有 一 有 一 有 一 有 一 有 一 有 一 有 一 有 一 有 一 有 一 有 一 有 一 有 一 有 一 有 一 有 一 有 一 有 一 有 一 有 一 有 一 有 二 有 一 有 一 有 一 有 一 有 一 有 一 有 一 有 一 有 一 有 一 有 一 有 有 一 有 有 有 一 有 一 有 一 有 一 有 一 有 一 有 一 有 一 有 有 有 一 有 有 有 有 有 有 一 有 一 有 有 有 有 有 有 有 有 有 有 有 有 有 有 有 有 有 有 有 有 有 有 有 有 有 有 有 有 有 有 有 有 有 有 有 有 有 有 有 有 有 有 有 有 有 有 有 有 有."
+
+#: src/postulo/templates/jobs/partials/company_row.html
+#, python-format
+msgid "%(counter)s open listing"
+msgid_plural "%(counter)s open listings"
+msgstr[0] ""
 
 #: src/postulo/templates/core/search.html
 #, fuzzy, python-format
@@ -1452,9 +1464,8 @@ msgid "<em>Kind</em> says what the number is, and can be left blank. Choose <em>
 msgstr "<em> Kind </em> 表示數字是多少并可以留作空白. 選擇 <em> 其他 </em> 并用相框取出取名 ."
 
 #: src/postulo/templates/help/contact_block.html
-#, fuzzy
-msgid "<em>Language of your career record</em> says which language your experience, education and projects are typed in. A CV in another language shows what you have translated and says what it could not. It also decides which forms of address and pronouns the menus of <em>Your name</em> offer. Left as it is, it follows the language you read Postulo in."
-msgstr "<em>職涯紀錄的語言</em>指出您的經歷、學歷與專案是以哪種語言輸入的。以其他語言產生的履歷會顯示您已翻譯的內容，並註明無法翻譯的部分。這項設定也決定<em>您的姓名</em>選單中提供哪些稱謂與代名詞。若維持原狀，則會依照您閱讀 Postulo 所用的語言。"
+msgid "<em>Language of your career record</em> says which language your experience, education and projects are typed in. A CV in another language shows what you have translated and says what it could not. It also decides which forms of address and pronouns the menus of <em>Your name</em> offer, and in which words. Left as it is, it follows the language you read Postulo in."
+msgstr ""
 
 #: src/postulo/templates/help/contact_block.html
 #, fuzzy
@@ -1686,6 +1697,10 @@ msgid "A company"
 msgstr "一家公司"
 
 #: src/postulo/jobs/models.py
+msgid "A company cannot acquire itself."
+msgstr ""
+
+#: src/postulo/jobs/models.py
 #, fuzzy
 msgid "A company cannot be part of itself."
 msgstr "公司不能隸屬於自己。"
@@ -1914,9 +1929,8 @@ msgid "A form of address is what is written before a name, and pronouns say how 
 msgstr "稱謂是寫在姓名前面的稱呼，代名詞則說明該如何稱呼您。兩者留空時都不會做任何假設，也絕不會從您的姓名推斷。"
 
 #: src/postulo/core/help.py
-#, fuzzy
-msgid "A form of address is written before your name, and your pronouns say how to refer to you. Both are optional, and nothing is assumed when they are blank."
-msgstr "稱謂寫在您的名字前面，代名詞則說明該如何稱呼您。兩者都是選填，留空時不會做任何假設。"
+msgid "A form of address is written before your name, and your pronouns say how to refer to you. Both are optional, nothing is assumed when they are blank, and each is kept as a choice that your pages and documents show in their own language."
+msgstr ""
 
 #: src/postulo/core/views_access.py
 #, fuzzy
@@ -2752,6 +2766,18 @@ msgstr "帳號"
 msgid "Acknowledged"
 msgstr "已確認收件"
 
+#: src/postulo/jobs/models.py
+msgid "acquired by"
+msgstr ""
+
+#: src/postulo/jobs/models.py
+msgid "Acquired or merged"
+msgstr ""
+
+#: src/postulo/api/routers/companies.py
+msgid "acquired_by must be a company you can see."
+msgstr ""
+
 #: src/postulo/templates/jobs/company_detail.html
 #, fuzzy, python-format
 msgid "Across the %(name)s group"
@@ -2780,6 +2806,10 @@ msgstr "%(name)s 的操作"
 #, fuzzy, python-format
 msgid "Actions for %(what)s"
 msgstr "%(what)s 的動作"
+
+#: src/postulo/jobs/models.py
+msgid "Active"
+msgstr ""
 
 #: src/postulo/templates/applications/application_detail.html
 #: src/postulo/templates/jobs/company_detail.html
@@ -2854,6 +2884,10 @@ msgstr "新增標籤"
 msgid "Add all of this"
 msgstr "全部新增"
 
+#: src/postulo/templates/jobs/company_form.html
+msgid "Add an entry"
+msgstr ""
+
 #: src/postulo/templates/resume/item_form.html
 #, fuzzy
 msgid "Add an industry"
@@ -2869,6 +2903,10 @@ msgstr "新增項目"
 #, fuzzy
 msgid "Add entry"
 msgstr "新增項目"
+
+#: src/postulo/applications/forms.py
+msgid "Add it anyway"
+msgstr ""
 
 #: src/postulo/applications/ical_import.py
 #, fuzzy
@@ -3916,6 +3954,20 @@ msgstr "照原文記錄：百分比、認股權數量、既得條件。"
 msgid "As it will print"
 msgstr "列印樣貌"
 
+#: src/postulo/jobs/models.py
+msgid "as of"
+msgstr ""
+
+#: src/postulo/templates/jobs/company_form.html
+msgid "As of"
+msgstr ""
+
+#: src/postulo/templates/jobs/partials/company_row.html
+#: src/postulo/templates/jobs/partials/company_status.html
+#, python-format
+msgid "as of %(date)s"
+msgstr ""
+
 #: src/postulo/templates/documents/cv_text.html
 #, fuzzy
 msgid "As plain text"
@@ -4403,6 +4455,11 @@ msgstr "由"
 msgid "By"
 msgstr "由"
 
+#: src/postulo/templates/jobs/partials/company_status.html
+#, python-format
+msgid "by <a href=\"%(acquirer_url)s\" class=\"underline\"><bdi>%(name)s</bdi></a>"
+msgstr ""
+
 #: src/postulo/templates/widgets/sources.html
 #, fuzzy
 msgid "By agency"
@@ -4757,6 +4814,7 @@ msgstr "憑證"
 msgid "Certifications it issued"
 msgstr "它所颁发的證件"
 
+#: src/postulo/templates/jobs/company_form.html
 #: src/postulo/templates/settings/locale.html
 #, fuzzy
 msgid "Change"
@@ -5043,6 +5101,10 @@ msgstr "選擇身份證的類型 ."
 #, fuzzy
 msgid "Choose what it prints instead"
 msgstr "選擇改為列印的內容"
+
+#: src/postulo/jobs/status_views.py
+msgid "Choose what was reported and the date."
+msgstr ""
 
 #: src/postulo/applications/views.py
 #, fuzzy
@@ -5663,6 +5725,10 @@ msgstr "因此這段時間回應了更古老的應用程式."
 msgid "Counted by when it happened, so a reply in this period to an older application belongs here. That is a different question from what was sent, and the two are kept apart."
 msgstr "因此這段時間回應了更古老的應用程式。 這同所發出之事是不同的 兩人被分開了."
 
+#: src/postulo/templates/jobs/partials/company_status.html
+msgid "Counted from the listings recorded here; nobody has reported it."
+msgstr ""
+
 #: src/postulo/templates/widgets/interviews_summary.html
 #, fuzzy
 msgid "Counted from the timeline, so interviews recorded before the diary existed are in."
@@ -5897,6 +5963,10 @@ msgstr "出生日期"
 
 #: src/postulo/templates/help/personal_details.html
 msgid "Date of birth, place and country of birth, gender and nationalities are what an identity check asks for, and nothing a job search needs until a CV says so. Every part is optional."
+msgstr ""
+
+#: src/postulo/templates/jobs/company_form.html
+msgid "Dated entries, kept as a history and shared with everybody who can see this company. One older than 90 days is shown as of its date."
 msgstr ""
 
 #: src/postulo/applications/models.py
@@ -6399,6 +6469,10 @@ msgstr "被拋棄了. 它能被取回 它能被取回."
 msgid "Dismiss"
 msgstr "解散"
 
+#: src/postulo/jobs/models.py
+msgid "Dissolved"
+msgstr ""
+
 #: src/postulo/documents/forms.py
 #, fuzzy
 msgid "Do not send after"
@@ -6585,6 +6659,11 @@ msgstr "下載這些人作 vCard"
 #, fuzzy
 msgid "Downloading one needs you to sign in again, and is written to the log with your name. Keep what you download as carefully as the instance itself. The key that the connection secrets are under is not in an archive: keep your <code>.env</code> somewhere else."
 msgstr "下載需要您再簽入, 就用您的名字寫入日志 。 有你下載的相當小心 連接秘密所依據的金鑰不是被放入了檔案: 保留您 <code>. env </code> 在別處."
+
+#: src/postulo/accounts/addressing.py
+msgctxt "form of address"
+msgid "Dr"
+msgstr ""
 
 #: src/postulo/applications/models.py
 #, fuzzy
@@ -6963,6 +7042,11 @@ msgstr "結束"
 msgid "Energy"
 msgstr "能源"
 
+#: src/postulo/accounts/addressing.py
+msgctxt "form of address"
+msgid "Eng."
+msgstr ""
+
 #: src/postulo/jobs/industries.py
 #, fuzzy
 msgid "Engineering"
@@ -7281,6 +7365,10 @@ msgstr "範例指令"
 msgid "Exceptions to what this instance decides for everybody. Whatever you set here is shown to this person on their own settings page, with your name against it."
 msgstr "此站台為所有人所做決定的例外。您在這裡設定的任何內容，都會顯示在此人自己的設定頁面上，並註明您的名字。"
 
+#: src/postulo/jobs/tables.py
+msgid "Exclude dissolved"
+msgstr ""
+
 #: src/postulo/documents/rendering.py src/postulo/resume/candidate.py
 #: src/postulo/resume/registry.py src/postulo/resume/views_candidate.py
 #: src/postulo/templates/resume/europass_import.html
@@ -7436,6 +7524,11 @@ msgstr "傳真"
 #, fuzzy
 msgid "Feature"
 msgstr "功能"
+
+#: src/postulo/accounts/addressing.py
+msgctxt "gender"
+msgid "Female"
+msgstr ""
 
 #: src/postulo/templates/jobs/company_form.html
 #, fuzzy
@@ -8326,6 +8419,11 @@ msgstr "有地標"
 msgid "has an uploaded picture"
 msgstr "有上傳相片"
 
+#: src/postulo/accounts/addressing.py
+msgctxt "pronouns"
+msgid "he/him"
+msgstr ""
+
 #: src/postulo/accounts/models.py src/postulo/documents/models.py
 #: src/postulo/resume/views.py
 #, fuzzy
@@ -8400,6 +8498,40 @@ msgstr "突顯"
 #, fuzzy
 msgid "highlights for this CV"
 msgstr "cV 有突顯"
+
+#: src/postulo/jobs/models.py src/postulo/jobs/tables.py
+#: src/postulo/templates/jobs/company_form.html
+#: src/postulo/templates/jobs/partials/company_signals.html
+msgid "Hiring"
+msgstr ""
+
+#: src/postulo/jobs/models.py
+msgid "Hiring freeze"
+msgstr ""
+
+#: src/postulo/jobs/models.py
+msgid "hiring signal"
+msgstr ""
+
+#: src/postulo/jobs/status_views.py
+msgid "Hiring signal added."
+msgstr ""
+
+#: src/postulo/jobs/status_views.py
+msgid "Hiring signal changed."
+msgstr ""
+
+#: src/postulo/jobs/status_views.py
+msgid "Hiring signal removed."
+msgstr ""
+
+#: src/postulo/jobs/merging.py
+msgid "Hiring signals"
+msgstr ""
+
+#: src/postulo/jobs/models.py
+msgid "hiring signals"
+msgstr ""
 
 #: src/postulo/templates/jobs/posting_detail.html
 #, fuzzy
@@ -8889,6 +9021,10 @@ msgstr "在90天后"
 #, fuzzy
 msgid "In a year"
 msgstr "一年后"
+
+#: src/postulo/jobs/models.py
+msgid "In administration"
+msgstr ""
 
 #: src/postulo/templates/widgets/counters.html
 #, fuzzy
@@ -9578,6 +9714,10 @@ msgstr "它的檔案符合正版主目錄所簽署的 ."
 msgid "Its general mailbox, such as jobs@ or info@. A person's address goes on a contact."
 msgstr "它的通信箱, 如工作@ 或信息@ 。 有一個人的住址接通了."
 
+#: src/postulo/templates/jobs/company_wikidata.html
+msgid "Its legal state"
+msgstr ""
+
 #: src/postulo/jobs/merging.py
 #, fuzzy, python-format
 msgid "Its logo: %(name)s has one of its own, and a picture cannot be kept in a note."
@@ -10073,6 +10213,10 @@ msgstr "緯度"
 msgid "Latitude"
 msgstr "經度"
 
+#: src/postulo/jobs/models.py
+msgid "Laying off"
+msgstr ""
+
 #: src/postulo/resume/forms.py
 #, fuzzy
 msgid "Learning you took, with or without a certificate of attendance. A programme that led to a degree or diploma belongs in Education; a credential somebody can check, or that may lapse, belongs in Certifications."
@@ -10092,6 +10236,10 @@ msgstr "留空即保留已儲存的值。"
 #, fuzzy
 msgid "Leave empty if this is your current role."
 msgstr "若這是您目前的職位，請留空。"
+
+#: src/postulo/templates/jobs/company_wikidata.html
+msgid "Leave it as it is"
+msgstr ""
 
 #: src/postulo/resume/forms.py
 #, fuzzy
@@ -10187,6 +10335,10 @@ msgstr "法律服務業"
 #, fuzzy
 msgid "Legal notice"
 msgstr "法律聲明"
+
+#: src/postulo/jobs/models.py
+msgid "legal state"
+msgstr ""
 
 #: src/postulo/core/server_forms.py
 #, fuzzy
@@ -10632,6 +10784,11 @@ msgstr "使管理員"
 msgid "Make it"
 msgstr "建立"
 
+#: src/postulo/accounts/addressing.py
+msgctxt "gender"
+msgid "Male"
+msgstr ""
+
 #: src/postulo/templates/settings/account.html
 #, fuzzy
 msgid "Manage"
@@ -10727,6 +10884,11 @@ msgstr "可以自行切換"
 #, fuzzy
 msgid "may use it"
 msgstr "可能用上它了"
+
+#: src/postulo/accounts/addressing.py
+msgctxt "form of address"
+msgid "Me"
+msgstr ""
 
 #: src/postulo/jobs/share_views.py
 #, fuzzy, python-format
@@ -10927,6 +11089,11 @@ msgstr "就微軟: 應用程式被登入的目錄 。 在接受任何目錄的�
 msgid "minibuses"
 msgstr "小巴士"
 
+#: src/postulo/accounts/addressing.py
+msgctxt "form of address"
+msgid "Miss"
+msgstr ""
+
 #: src/postulo/documents/models.py
 #, fuzzy
 msgid "Missing entry"
@@ -11096,6 +11263,26 @@ msgstr "上移"
 msgid "Moved to %(status)s."
 msgstr "已移至 %(status)s."
 
+#: src/postulo/accounts/addressing.py
+msgctxt "form of address"
+msgid "Mr"
+msgstr ""
+
+#: src/postulo/accounts/addressing.py
+msgctxt "form of address"
+msgid "Mrs"
+msgstr ""
+
+#: src/postulo/accounts/addressing.py
+msgctxt "form of address"
+msgid "Ms"
+msgstr ""
+
+#: src/postulo/accounts/addressing.py
+msgctxt "form of address"
+msgid "Mx"
+msgstr ""
+
 #: src/postulo/applications/models.py
 #, fuzzy
 msgid "My own choice"
@@ -11140,6 +11327,10 @@ msgstr "姓名"
 #, fuzzy
 msgid "Name of the language"
 msgstr "語言名稱"
+
+#: src/postulo/jobs/models.py
+msgid "Name the acquirer only for a company that was acquired."
+msgstr ""
 
 #: src/postulo/core/messaging_services.py
 #, fuzzy
@@ -11886,6 +12077,11 @@ msgstr "有被你錄取相片的人"
 msgid "Nobody, or the person below"
 msgstr "沒有人能活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活活"
 
+#: src/postulo/accounts/addressing.py
+msgctxt "gender"
+msgid "Non-binary"
+msgstr ""
+
 #: src/postulo/jobs/industries.py
 #, fuzzy
 msgid "Non-profit"
@@ -12106,6 +12302,10 @@ msgstr "在他們同意之前 在任何CV上都不要出字."
 msgid "Not recorded"
 msgstr "未收錄"
 
+#: src/postulo/jobs/forms.py
+msgid "Not recorded here"
+msgstr ""
+
 #: src/postulo/documents/forms.py
 #, fuzzy
 msgid "Not said"
@@ -12215,6 +12415,19 @@ msgstr "有注意到"
 #, fuzzy, python-format
 msgid "noted %(when)s"
 msgstr "注 %(when)s"
+
+#: src/postulo/jobs/models.py
+msgid "noted by"
+msgstr ""
+
+#: src/postulo/templates/jobs/partials/company_signals.html
+#, python-format
+msgid "Noted by <bdi>%(name)s</bdi>"
+msgstr ""
+
+#: src/postulo/templates/jobs/partials/company_signals.html
+msgid "Noted by somebody who has since left"
+msgstr ""
 
 #: src/postulo/jobs/models.py
 #, fuzzy
@@ -14583,6 +14796,11 @@ msgstr "由波斯圖洛出自他自己的記錄 Postulo并沒有設下目標:一
 msgid "Produced on %(produced)s"
 msgstr "在 %(produced)s 上出厂"
 
+#: src/postulo/accounts/addressing.py
+msgctxt "form of address"
+msgid "Prof."
+msgstr ""
+
 #: src/postulo/resume/models.py
 #, fuzzy
 msgid "proficiency"
@@ -15023,6 +15241,20 @@ msgstr "錄取出價"
 msgid "Record and change: applications, listings, notes, reminders, letters, your details. A call that changes a record answers with the whole record, timeline and contacts included, so this can see what it touches"
 msgstr "記錄與變更：應徵、職缺、備註、提醒、信函、您的聯絡資訊。變更紀錄的呼叫會回傳完整的紀錄（包含時間軸與聯絡人），因此此權杖能看到它所影響的內容"
 
+#: src/postulo/templates/jobs/company_wikidata.html
+#, python-format
+msgid "Record it as acquired or merged into <bdi>%(name)s</bdi>"
+msgstr ""
+
+#: src/postulo/templates/jobs/company_wikidata.html
+msgid "Record it as dissolved"
+msgstr ""
+
+#: src/postulo/templates/jobs/company_wikidata.html
+#, python-format
+msgid "Record it as dissolved on %(date)s"
+msgstr ""
+
 #: src/postulo/templates/server/record_of_processing.html
 #, fuzzy
 msgid "Record of processing"
@@ -15049,6 +15281,10 @@ msgstr "有你送去的就收錄"
 #, fuzzy
 msgid "Recorded"
 msgstr "有錄取"
+
+#: src/postulo/jobs/models.py
+msgid "recorded"
+msgstr ""
 
 #: src/postulo/plugins/forms.py
 #, fuzzy
@@ -15433,6 +15669,10 @@ msgstr "移除已上傳相片"
 msgid "Remove this connection?"
 msgstr "取出此連接?"
 
+#: src/postulo/templates/jobs/company_form.html
+msgid "Remove this entry"
+msgstr ""
+
 #: src/postulo/templates/server/design.html
 #, fuzzy
 msgid "Remove this example?"
@@ -15800,6 +16040,10 @@ msgstr "儲存和下一個"
 #, fuzzy
 msgid "save as I go"
 msgstr "有我可去"
+
+#: src/postulo/templates/jobs/company_form.html
+msgid "Save the change"
+msgstr ""
 
 #: src/postulo/templates/jobs/company_form.html
 #, fuzzy
@@ -16443,6 +16687,10 @@ msgstr[0] "有相通 %(counter)s"
 msgid "Shared with %(who)s."
 msgstr "与 %(who)s相通."
 
+#: src/postulo/templates/jobs/company_form.html
+msgid "Shared with everybody who can see this company. Say when it became true and where you learnt it, if you know."
+msgstr ""
+
 #: src/postulo/jobs/whose.py
 msgid "Shared with you"
 msgstr ""
@@ -16471,6 +16719,11 @@ msgstr "份额"
 #, fuzzy
 msgid "Sharing"
 msgstr "分享"
+
+#: src/postulo/accounts/addressing.py
+msgctxt "pronouns"
+msgid "she/her"
+msgstr ""
 
 #: src/postulo/core/widgets_builtin.py
 #, fuzzy
@@ -16692,6 +16945,10 @@ msgstr "已簽入"
 msgid "Sign-in methods"
 msgstr "簽入方法"
 
+#: src/postulo/jobs/models.py
+msgid "signal"
+msgstr ""
+
 #: src/postulo/core/mail_choices.py
 #, fuzzy
 msgid "Signed in once, as the mailbox that sends"
@@ -16726,6 +16983,10 @@ msgstr "有符號簽入"
 #, fuzzy
 msgid "Signs in to an existing account by e-mail"
 msgstr "以電子郵件簽入已存在的帳號"
+
+#: src/postulo/jobs/models.py
+msgid "since"
+msgstr ""
 
 #: src/postulo/resume/models.py
 #, fuzzy, python-format
@@ -16995,6 +17256,7 @@ msgstr "有的人同意了 試取到底到底到底能站到底."
 msgid "Somebody shares a company, a contact or a listing with you"
 msgstr "有同你相通相通相通相通相通相通相通相通相通相通相通相通相通相通相通相通相通相通相通相通相通相通相通相通相通相通相通相通相通相通相通相通相通相通相通相通相通相通相通相通相通相通相通相通相通相通相通相通相通相通相通相通相通相通相通相通相通相通相通相通相通相通相通相通相通相通相通相通相通相通相通相通相通相通相通相通相相通相通相通相通相通相通相通相相相通相通相相相相相相通相通相通相相相相通相相相通相相相相相相相相相通相相相相相相相相通相相相相相相通相相相相相相相相通相相相相相相相相相相相相相相通相相相相相相相相相相"
 
+#: src/postulo/templates/jobs/company_form.html
 #: src/postulo/templates/jobs/partials/sharing_panel.html
 #, fuzzy
 msgid "somebody who has since left"
@@ -17045,7 +17307,10 @@ msgstr "按 %(column)s 排序, 第一位"
 msgid "source"
 msgstr "來源"
 
-#: src/postulo/plugins/kinds.py src/postulo/templates/server/email.html
+#: src/postulo/plugins/kinds.py src/postulo/templates/jobs/company_form.html
+#: src/postulo/templates/jobs/partials/company_signals.html
+#: src/postulo/templates/jobs/partials/company_status.html
+#: src/postulo/templates/server/email.html
 #: src/postulo/templates/server/plugins.html
 #: src/postulo/templates/widgets/sources.html
 #, fuzzy
@@ -17177,12 +17442,13 @@ msgstr "狀態"
 
 #: src/postulo/applications/forms.py src/postulo/applications/reports.py
 #: src/postulo/applications/tables.py src/postulo/core/csv_import.py
-#: src/postulo/templates/accounts/invite_list.html
+#: src/postulo/jobs/tables.py src/postulo/templates/accounts/invite_list.html
 #: src/postulo/templates/applications/partials/bulk_fields.html
 #: src/postulo/templates/applications/partials/status_card.html
 #: src/postulo/templates/applications/report.html
 #: src/postulo/templates/applications/report_print.html
 #: src/postulo/templates/core/import_csv_map.html
+#: src/postulo/templates/jobs/company_form.html
 #, fuzzy
 msgid "Status"
 msgstr "狀態"
@@ -18374,6 +18640,11 @@ msgstr "有效果了."
 msgid "That would make a loop: %(name)s is already part of this one."
 msgstr "有回路了: %(name)s 就已是一部份了."
 
+#: src/postulo/jobs/models.py
+#, python-format
+msgid "That would make a loop: %(name)s was already acquired by this one."
+msgstr ""
+
 #: src/postulo/applications/views.py src/postulo/jobs/views.py
 #, fuzzy, python-format
 msgid "The %(count)d document you sent is kept, and still says where it went."
@@ -18636,6 +18907,14 @@ msgstr "公司沒有地址可以接:再接一通再接."
 msgid "The company is matched by name and created if it is new. Only the company and the job title are required; everything else can be filled in later."
 msgstr "公司依名稱比對，若是新的公司就會建立。只有公司與職稱為必填；其他都可以之後再填。"
 
+#: src/postulo/applications/forms.py
+msgid "The company is recorded as dissolved. Tick this to add the listing."
+msgstr ""
+
+#: src/postulo/jobs/models.py
+msgid "The company it became part of, if that company is recorded here."
+msgstr ""
+
 #: src/postulo/jobs/models.py
 #, fuzzy
 msgid "The company this one belongs to, if it belongs to one."
@@ -18686,6 +18965,14 @@ msgstr "在地圖上被畫作成正文出自地圖所需要得到的相關功勞
 msgid "The dashboard lists open applications nothing has happened to for a while, with nothing planned. Recruiters' own advice clusters around two to three weeks."
 msgstr "有一陣子沒有出事了 就沒有計劃了 二到三周后被招募者的建議相接相接."
 
+#: src/postulo/api/routers/companies.py src/postulo/jobs/forms.py
+msgid "The date cannot be in the future."
+msgstr ""
+
+#: src/postulo/jobs/models.py
+msgid "The date it became true, if known."
+msgstr ""
+
 #: src/postulo/documents/forms.py
 #, fuzzy
 msgid "The date on the letter, as a date. Leave it empty when you do not know."
@@ -18695,6 +18982,10 @@ msgstr "信上的日期 就當是日期 在你不知道后就放空了."
 #, fuzzy
 msgid "The date you mean to have sent it by. It is not a reminder — set one of those if you want telling."
 msgstr "就當是您想送去的日期 它不是一種教誨,而以它為教誨."
+
+#: src/postulo/jobs/forms.py
+msgid "The day it was true or reported, not today's date unless it is."
+msgstr ""
 
 #: src/postulo/templates/server/plugins.html
 #, fuzzy
@@ -20060,6 +20351,11 @@ msgstr "他們去接受面試了."
 msgid "They were the main contact."
 msgstr "他們是主要接觸者."
 
+#: src/postulo/accounts/addressing.py
+msgctxt "pronouns"
+msgid "they/them"
+msgstr ""
+
 #: src/postulo/jobs/pages.py
 #, fuzzy
 msgid "This account does not keep a rendering of a page."
@@ -20192,6 +20488,11 @@ msgstr "它被取走了."
 msgid "This company"
 msgstr "這家公司"
 
+#: src/postulo/jobs/status.py
+#, python-format
+msgid "This company has been in administration since %(date)s."
+msgstr ""
+
 #: src/postulo/jobs/logos.py
 #, fuzzy
 msgid "This company has no website recorded."
@@ -20201,6 +20502,24 @@ msgstr "這家公司沒有網站被收錄了."
 #, fuzzy
 msgid "This company has none of its industries from the NACE list yet."
 msgstr "在NACE名單上并沒有一項產業."
+
+#: src/postulo/jobs/status.py
+msgid "This company is recorded as being in administration."
+msgstr ""
+
+#: src/postulo/jobs/status.py
+msgid "This company is recorded as dissolved."
+msgstr ""
+
+#: src/postulo/jobs/status.py
+#, python-format
+msgid "This company was dissolved on %(date)s."
+msgstr ""
+
+#: src/postulo/jobs/status.py
+#, python-format
+msgid "This company was reported laying people off as of %(date)s."
+msgstr ""
 
 #: src/postulo/templates/resume/item_form.html
 #, fuzzy
@@ -20593,6 +20912,10 @@ msgstr "去過之後請勾選。寄給您就業輔導員的報告會計算已出
 #, fuzzy
 msgid "Tick rows to act on several at once."
 msgstr "有好幾行能一出出一出."
+
+#: src/postulo/applications/forms.py
+msgid "Tick the box to add the listing anyway."
+msgstr ""
 
 #: src/postulo/jobs/capture_views.py
 #, fuzzy
@@ -21696,9 +22019,8 @@ msgid "What is in the file"
 msgstr "檔案中是什麼"
 
 #: src/postulo/templates/help/your_name.html
-#, fuzzy
-msgid "What is kept is the text itself. If your career record changes language, a choice made from the other language's list stays what it was, and is shown as <em>Other…</em> with its text in the box."
-msgstr "所保存的是文本本身。 如果您的生涯紀錄改變了語言, 從其他語言清單中取出一項選擇就保持了原樣并被顯示为 <em> 其他. </em> 有其文字被放入框中."
+msgid "What is kept is the choice, not one language's word for it: <em>il</em> in French and <em>he/him</em> in English are the same choice, so your menus and your documents show it in the language they are drawn in when your career record changes language. Only what you write under <em>Other…</em> is kept as you typed it, and shown as typed in every language. A word you type there that a list already has is kept as that choice."
+msgstr ""
 
 #: src/postulo/templates/documents/cv_detail.html
 #, fuzzy
@@ -21839,6 +22161,10 @@ msgstr "它是什么活儿? 下面的字段跟隨了類型: 選擇另一個字�
 #, fuzzy
 msgid "what the check found"
 msgstr "有錢找了什麼"
+
+#: src/postulo/jobs/forms.py
+msgid "What the company is. Shown to everybody who can see it."
+msgstr ""
 
 #: src/postulo/applications/forms.py
 #, fuzzy
@@ -21989,6 +22315,14 @@ msgstr "所商定的"
 #, fuzzy
 msgid "what was asked"
 msgstr "有什麼事被問到"
+
+#: src/postulo/templates/jobs/company_form.html
+msgid "What was reported"
+msgstr ""
+
+#: src/postulo/jobs/forms.py
+msgid "What was reported about its hiring."
+msgstr ""
 
 #: src/postulo/applications/forms.py
 #, fuzzy
@@ -22285,6 +22619,14 @@ msgstr "若此站台能傳送代碼到電話，您已確認的號碼也可以作
 msgid "Where you came across it: a job board, a referral, the company site."
 msgstr "您是在哪裡看到的：求職網站、內部推薦、公司網站。"
 
+#: src/postulo/jobs/models.py
+msgid "Where you learnt it: a news article, a post."
+msgstr ""
+
+#: src/postulo/jobs/models.py
+msgid "Where you learnt it: a register, an article."
+msgstr ""
+
 #: src/postulo/resume/views.py
 #, fuzzy
 msgid "where you live"
@@ -22556,10 +22898,19 @@ msgstr "Wikidata 提供了該語言的名稱。若要變更，請重新取得，
 msgid "Wikidata has no item with that identifier."
 msgstr "Wikidata 有同樣的符號."
 
+#: src/postulo/templates/jobs/company_wikidata.html
+#, python-format
+msgid "Wikidata names %(qid)s as its replacement; no company here carries that identifier."
+msgstr ""
+
 #: src/postulo/jobs/wikidata.py
 #, fuzzy
 msgid "Wikidata redirected too many times."
 msgstr "有太多次被Wikidata重定向了."
+
+#: src/postulo/templates/jobs/company_wikidata.html
+msgid "Wikidata says this organisation has ended. Choose whether to record it; the legal state is shown to everybody who can see this company."
+msgstr ""
 
 #: src/postulo/jobs/wikidata.py
 #, fuzzy

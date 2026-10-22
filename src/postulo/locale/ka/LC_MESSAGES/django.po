@@ -255,6 +255,13 @@ msgid_plural "%(count)d messaging handles"
 msgstr[0] "%(count)d მესენჯერის სახელი"
 msgstr[1] "%(count)d მესენჯერის სახელი"
 
+#: src/postulo/jobs/status.py
+#, python-format
+msgid "%(count)d open listing"
+msgid_plural "%(count)d open listings"
+msgstr[0] ""
+msgstr[1] ""
+
 #: src/postulo/core/gdpr.py
 #, fuzzy, python-format
 msgid "%(count)d plugin row"
@@ -476,6 +483,13 @@ msgstr[1] ""
 #, python-format
 msgid "%(counter)s of your records is shared with others: they keep a copy of what their own records need, and are told it is gone."
 msgid_plural "%(counter)s of your records are shared with others: they keep a copy of what their own records need, and are told they are gone."
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/postulo/templates/jobs/partials/company_row.html
+#, python-format
+msgid "%(counter)s open listing"
+msgid_plural "%(counter)s open listings"
 msgstr[0] ""
 msgstr[1] ""
 
@@ -1544,9 +1558,8 @@ msgid "<em>Kind</em> says what the number is, and can be left blank. Choose <em>
 msgstr "<em>სახეობა</em> ამბობს, რა ნომერია, და შეიძლება ცარიელი დარჩეს. აირჩიეთ <em>სხვა</em> და ველი გკითხავთ, რა დაარქვათ."
 
 #: src/postulo/templates/help/contact_block.html
-#, fuzzy
-msgid "<em>Language of your career record</em> says which language your experience, education and projects are typed in. A CV in another language shows what you have translated and says what it could not. It also decides which forms of address and pronouns the menus of <em>Your name</em> offer. Left as it is, it follows the language you read Postulo in."
-msgstr "<em>კარიერული ისტორიის ენა</em> მიუთითებს, რომელ ენაზეა აკრეფილი თქვენი გამოცდილება, განათლება და პროექტები. სხვა ენაზე CV აჩვენებს იმას, რაც თარგმნეთ, და ამბობს, რისი ჩვენებაც ვერ შეძლო. ის ასევე წყვეტს, მიმართვის რომელ ფორმებსა და ნაცვალსახელებს შემოგთავაზებთ <em>თქვენი სახელის</em> მენიუები. თუ უცვლელად დატოვებთ, ის მიჰყვება ენას, რომელზეც Postulo-ს კითხულობთ."
+msgid "<em>Language of your career record</em> says which language your experience, education and projects are typed in. A CV in another language shows what you have translated and says what it could not. It also decides which forms of address and pronouns the menus of <em>Your name</em> offer, and in which words. Left as it is, it follows the language you read Postulo in."
+msgstr ""
 
 #: src/postulo/templates/help/contact_block.html
 #, fuzzy
@@ -1780,6 +1793,10 @@ msgid "A company"
 msgstr "კომპანია"
 
 #: src/postulo/jobs/models.py
+msgid "A company cannot acquire itself."
+msgstr ""
+
+#: src/postulo/jobs/models.py
 #, fuzzy
 msgid "A company cannot be part of itself."
 msgstr "კომპანია არ შეიძლება იყოს საკუთარი თავის ნაწილი."
@@ -2005,9 +2022,8 @@ msgid "A form of address is what is written before a name, and pronouns say how 
 msgstr "მიმართვის ფორმა არის ის, რაც სახელის წინ იწერება, ნაცვალსახელები კი ამბობს, როგორ მოგმართონ. როცა რომელიმე ცარიელია, არაფერი იგულისხმება, და არცერთი არასოდეს გამოიყვანება თქვენი სახელიდან."
 
 #: src/postulo/core/help.py
-#, fuzzy
-msgid "A form of address is written before your name, and your pronouns say how to refer to you. Both are optional, and nothing is assumed when they are blank."
-msgstr "მიმართვის ფორმა იწერება თქვენი სახელის წინ, ნაცვალსახელები კი მიუთითებს, როგორ მოგმართონ. ორივე არასავალდებულოა და, თუ ცარიელია, არაფერი იგულისხმება."
+msgid "A form of address is written before your name, and your pronouns say how to refer to you. Both are optional, nothing is assumed when they are blank, and each is kept as a choice that your pages and documents show in their own language."
+msgstr ""
 
 #: src/postulo/core/views_access.py
 #, fuzzy
@@ -2840,6 +2856,18 @@ msgstr "ანგარიშები"
 msgid "Acknowledged"
 msgstr "გათვალისწინებულია"
 
+#: src/postulo/jobs/models.py
+msgid "acquired by"
+msgstr ""
+
+#: src/postulo/jobs/models.py
+msgid "Acquired or merged"
+msgstr ""
+
+#: src/postulo/api/routers/companies.py
+msgid "acquired_by must be a company you can see."
+msgstr ""
+
 #: src/postulo/templates/jobs/company_detail.html
 #, fuzzy, python-format
 msgid "Across the %(name)s group"
@@ -2868,6 +2896,10 @@ msgstr "მოქმედებები %(name)s-ისთვის"
 #, fuzzy, python-format
 msgid "Actions for %(what)s"
 msgstr "მოქმედებები: %(what)s"
+
+#: src/postulo/jobs/models.py
+msgid "Active"
+msgstr ""
 
 #: src/postulo/templates/applications/application_detail.html
 #: src/postulo/templates/jobs/company_detail.html
@@ -2942,6 +2974,10 @@ msgstr "დაამატეთ იარლიყი"
 msgid "Add all of this"
 msgstr "ყველაფრის დამატება"
 
+#: src/postulo/templates/jobs/company_form.html
+msgid "Add an entry"
+msgstr ""
+
 #: src/postulo/templates/resume/item_form.html
 #, fuzzy
 msgid "Add an industry"
@@ -2957,6 +2993,10 @@ msgstr "ჩანაწერების დამატება"
 #, fuzzy
 msgid "Add entry"
 msgstr "ჩანაწერის დამატება"
+
+#: src/postulo/applications/forms.py
+msgid "Add it anyway"
+msgstr ""
 
 #: src/postulo/applications/ical_import.py
 #, fuzzy
@@ -4006,6 +4046,20 @@ msgstr "ისე, როგორც დაიწერა: პროცენ�
 msgid "As it will print"
 msgstr "როგორც დაიბეჭდება"
 
+#: src/postulo/jobs/models.py
+msgid "as of"
+msgstr ""
+
+#: src/postulo/templates/jobs/company_form.html
+msgid "As of"
+msgstr ""
+
+#: src/postulo/templates/jobs/partials/company_row.html
+#: src/postulo/templates/jobs/partials/company_status.html
+#, python-format
+msgid "as of %(date)s"
+msgstr ""
+
 #: src/postulo/templates/documents/cv_text.html
 #, fuzzy
 msgid "As plain text"
@@ -4492,6 +4546,11 @@ msgstr ""
 msgid "By"
 msgstr "ვისგან"
 
+#: src/postulo/templates/jobs/partials/company_status.html
+#, python-format
+msgid "by <a href=\"%(acquirer_url)s\" class=\"underline\"><bdi>%(name)s</bdi></a>"
+msgstr ""
+
 #: src/postulo/templates/widgets/sources.html
 #, fuzzy
 msgid "By agency"
@@ -4847,6 +4906,7 @@ msgstr "სერტიფიცირებები"
 msgid "Certifications it issued"
 msgstr "მის მიერ გაცემული სერტიფიკატები"
 
+#: src/postulo/templates/jobs/company_form.html
 #: src/postulo/templates/settings/locale.html
 #, fuzzy
 msgid "Change"
@@ -5129,6 +5189,10 @@ msgstr "აირჩიეთ, რა სახის იდენტიფი�
 #, fuzzy
 msgid "Choose what it prints instead"
 msgstr "სანაცვლოდ დასაბეჭდის არჩევა"
+
+#: src/postulo/jobs/status_views.py
+msgid "Choose what was reported and the date."
+msgstr ""
 
 #: src/postulo/applications/views.py
 #, fuzzy
@@ -5746,6 +5810,10 @@ msgstr "ითვლება იმის მიხედვით, როდ�
 msgid "Counted by when it happened, so a reply in this period to an older application belongs here. That is a different question from what was sent, and the two are kept apart."
 msgstr "ითვლება იმის მიხედვით, როდის მოხდა, ამიტომ ამ პერიოდში ძველ განაცხადზე მიღებული პასუხი აქ მიეკუთვნება. ეს სხვა კითხვაა, ვიდრე ის, რაც გაიგზავნა, და ორივე ცალკე ინახება."
 
+#: src/postulo/templates/jobs/partials/company_status.html
+msgid "Counted from the listings recorded here; nobody has reported it."
+msgstr ""
+
 #: src/postulo/templates/widgets/interviews_summary.html
 #, fuzzy
 msgid "Counted from the timeline, so interviews recorded before the diary existed are in."
@@ -5980,6 +6048,10 @@ msgstr "დაბადების თარიღი"
 
 #: src/postulo/templates/help/personal_details.html
 msgid "Date of birth, place and country of birth, gender and nationalities are what an identity check asks for, and nothing a job search needs until a CV says so. Every part is optional."
+msgstr ""
+
+#: src/postulo/templates/jobs/company_form.html
+msgid "Dated entries, kept as a history and shared with everybody who can see this company. One older than 90 days is shown as of its date."
 msgstr ""
 
 #: src/postulo/applications/models.py
@@ -6482,6 +6554,10 @@ msgstr "გაუქმებულია. ის თქვენს ისტ�
 msgid "Dismiss"
 msgstr "დახურვა"
 
+#: src/postulo/jobs/models.py
+msgid "Dissolved"
+msgstr ""
+
 #: src/postulo/documents/forms.py
 #, fuzzy
 msgid "Do not send after"
@@ -6668,6 +6744,11 @@ msgstr "ამ ადამიანების ჩამოტვირთვ�
 #, fuzzy
 msgid "Downloading one needs you to sign in again, and is written to the log with your name. Keep what you download as carefully as the instance itself. The key that the connection secrets are under is not in an archive: keep your <code>.env</code> somewhere else."
 msgstr "ჩამოტვირთვისთვის ხელახლა შესვლაა საჭირო და ის თქვენი სახელით ჟურნალში იწერება. რასაც ჩამოტვირთავთ, ისევე ფრთხილად შეინახეთ, როგორც თავად ინსტალაცია. გასაღები, რომლითაც კავშირების საიდუმლოებებია დაშიფრული, არქივში არ არის: თქვენი <code>.env</code> სხვაგან შეინახეთ."
+
+#: src/postulo/accounts/addressing.py
+msgctxt "form of address"
+msgid "Dr"
+msgstr ""
 
 #: src/postulo/applications/models.py
 #, fuzzy
@@ -7045,6 +7126,11 @@ msgstr "მთავრდება"
 msgid "Energy"
 msgstr "ენერგეტიკა"
 
+#: src/postulo/accounts/addressing.py
+msgctxt "form of address"
+msgid "Eng."
+msgstr ""
+
 #: src/postulo/jobs/industries.py
 #, fuzzy
 msgid "Engineering"
@@ -7359,6 +7445,10 @@ msgstr "ბრძანების მაგალითი"
 msgid "Exceptions to what this instance decides for everybody. Whatever you set here is shown to this person on their own settings page, with your name against it."
 msgstr "გამონაკლისები იმისგან, რასაც ეს ინსტალაცია ყველასთვის წყვეტს. რასაც აქ დააყენებთ, იმ ადამიანს უჩვენდება მის საკუთარ პარამეტრების გვერდზე, თქვენი სახელით გვერდით."
 
+#: src/postulo/jobs/tables.py
+msgid "Exclude dissolved"
+msgstr ""
+
 #: src/postulo/documents/rendering.py src/postulo/resume/candidate.py
 #: src/postulo/resume/registry.py src/postulo/resume/views_candidate.py
 #: src/postulo/templates/resume/europass_import.html
@@ -7514,6 +7604,11 @@ msgstr "ფაქსი"
 #, fuzzy
 msgid "Feature"
 msgstr "ფუნქცია"
+
+#: src/postulo/accounts/addressing.py
+msgctxt "gender"
+msgid "Female"
+msgstr ""
 
 #: src/postulo/templates/jobs/company_form.html
 #, fuzzy
@@ -8400,6 +8495,11 @@ msgstr "აქვს ლოგო"
 msgid "has an uploaded picture"
 msgstr "აქვს ატვირთული სურათი"
 
+#: src/postulo/accounts/addressing.py
+msgctxt "pronouns"
+msgid "he/him"
+msgstr ""
+
 #: src/postulo/accounts/models.py src/postulo/documents/models.py
 #: src/postulo/resume/views.py
 #, fuzzy
@@ -8474,6 +8574,40 @@ msgstr "მთავარი პუნქტები"
 #, fuzzy
 msgid "highlights for this CV"
 msgstr "მთავარი პუნქტები ამ CV-სთვის"
+
+#: src/postulo/jobs/models.py src/postulo/jobs/tables.py
+#: src/postulo/templates/jobs/company_form.html
+#: src/postulo/templates/jobs/partials/company_signals.html
+msgid "Hiring"
+msgstr ""
+
+#: src/postulo/jobs/models.py
+msgid "Hiring freeze"
+msgstr ""
+
+#: src/postulo/jobs/models.py
+msgid "hiring signal"
+msgstr ""
+
+#: src/postulo/jobs/status_views.py
+msgid "Hiring signal added."
+msgstr ""
+
+#: src/postulo/jobs/status_views.py
+msgid "Hiring signal changed."
+msgstr ""
+
+#: src/postulo/jobs/status_views.py
+msgid "Hiring signal removed."
+msgstr ""
+
+#: src/postulo/jobs/merging.py
+msgid "Hiring signals"
+msgstr ""
+
+#: src/postulo/jobs/models.py
+msgid "hiring signals"
+msgstr ""
 
 #: src/postulo/templates/jobs/posting_detail.html
 #, fuzzy
@@ -8964,6 +9098,10 @@ msgstr "90 დღეში"
 #, fuzzy
 msgid "In a year"
 msgstr "ერთ წელიწადში"
+
+#: src/postulo/jobs/models.py
+msgid "In administration"
+msgstr ""
 
 #: src/postulo/templates/widgets/counters.html
 #, fuzzy
@@ -9651,6 +9789,10 @@ msgstr "მისი ფაილი ემთხვევა იმას, რ�
 msgid "Its general mailbox, such as jobs@ or info@. A person's address goes on a contact."
 msgstr "მისი საერთო საფოსტო ყუთი, მაგალითად jobs@ ან info@. ადამიანის მისამართი კონტაქტში იწერება."
 
+#: src/postulo/templates/jobs/company_wikidata.html
+msgid "Its legal state"
+msgstr ""
+
 #: src/postulo/jobs/merging.py
 #, fuzzy, python-format
 msgid "Its logo: %(name)s has one of its own, and a picture cannot be kept in a note."
@@ -10142,6 +10284,10 @@ msgstr "განედი"
 msgid "Latitude"
 msgstr "განედი"
 
+#: src/postulo/jobs/models.py
+msgid "Laying off"
+msgstr ""
+
 #: src/postulo/resume/forms.py
 #, fuzzy
 msgid "Learning you took, with or without a certificate of attendance. A programme that led to a degree or diploma belongs in Education; a credential somebody can check, or that may lapse, belongs in Certifications."
@@ -10161,6 +10307,10 @@ msgstr "დატოვეთ ცარიელი, რომ უკვე შ�
 #, fuzzy
 msgid "Leave empty if this is your current role."
 msgstr "დატოვეთ ცარიელი, თუ ეს თქვენი ამჟამინდელი პოზიციაა."
+
+#: src/postulo/templates/jobs/company_wikidata.html
+msgid "Leave it as it is"
+msgstr ""
 
 #: src/postulo/resume/forms.py
 #, fuzzy
@@ -10255,6 +10405,10 @@ msgstr "სამართალი"
 #, fuzzy
 msgid "Legal notice"
 msgstr "სამართლებრივი შეტყობინება"
+
+#: src/postulo/jobs/models.py
+msgid "legal state"
+msgstr ""
 
 #: src/postulo/core/server_forms.py
 #, fuzzy
@@ -10699,6 +10853,11 @@ msgstr "ადმინისტრატორად დანიშვნა"
 msgid "Make it"
 msgstr "შექმნა"
 
+#: src/postulo/accounts/addressing.py
+msgctxt "gender"
+msgid "Male"
+msgstr ""
+
 #: src/postulo/templates/settings/account.html
 #, fuzzy
 msgid "Manage"
@@ -10794,6 +10953,11 @@ msgstr "შეუძლია მისი ჩართვა-გამორთ
 #, fuzzy
 msgid "may use it"
 msgstr "შეუძლია მისი გამოყენება"
+
+#: src/postulo/accounts/addressing.py
+msgctxt "form of address"
+msgid "Me"
+msgstr ""
 
 #: src/postulo/jobs/share_views.py
 #, python-format
@@ -10992,6 +11156,11 @@ msgstr "მხოლოდ Microsoft: დირექტორია, რომ�
 msgid "minibuses"
 msgstr "მიკროავტობუსები"
 
+#: src/postulo/accounts/addressing.py
+msgctxt "form of address"
+msgid "Miss"
+msgstr ""
+
 #: src/postulo/documents/models.py
 #, fuzzy
 msgid "Missing entry"
@@ -11161,6 +11330,26 @@ msgstr "ზემოთ გადატანა"
 msgid "Moved to %(status)s."
 msgstr "გადავიდა სტატუსზე: %(status)s."
 
+#: src/postulo/accounts/addressing.py
+msgctxt "form of address"
+msgid "Mr"
+msgstr ""
+
+#: src/postulo/accounts/addressing.py
+msgctxt "form of address"
+msgid "Mrs"
+msgstr ""
+
+#: src/postulo/accounts/addressing.py
+msgctxt "form of address"
+msgid "Ms"
+msgstr ""
+
+#: src/postulo/accounts/addressing.py
+msgctxt "form of address"
+msgid "Mx"
+msgstr ""
+
 #: src/postulo/applications/models.py
 #, fuzzy
 msgid "My own choice"
@@ -11205,6 +11394,10 @@ msgstr "სახელი"
 #, fuzzy
 msgid "Name of the language"
 msgstr "ენის სახელი"
+
+#: src/postulo/jobs/models.py
+msgid "Name the acquirer only for a company that was acquired."
+msgstr ""
 
 #: src/postulo/core/messaging_services.py
 #, fuzzy
@@ -11947,6 +12140,11 @@ msgstr "არავინ აღრიცხულთაგან"
 msgid "Nobody, or the person below"
 msgstr ""
 
+#: src/postulo/accounts/addressing.py
+msgctxt "gender"
+msgid "Non-binary"
+msgstr ""
+
 #: src/postulo/jobs/industries.py
 #, fuzzy
 msgid "Non-profit"
@@ -12167,6 +12365,10 @@ msgstr "არცერთ CV-ზე არ იბეჭდება, სან�
 msgid "Not recorded"
 msgstr "არ აღრიცხულა"
 
+#: src/postulo/jobs/forms.py
+msgid "Not recorded here"
+msgstr ""
+
 #: src/postulo/documents/forms.py
 #, fuzzy
 msgid "Not said"
@@ -12274,6 +12476,19 @@ msgstr "შენიშნულია"
 #, fuzzy, python-format
 msgid "noted %(when)s"
 msgstr "აღინიშნა %(when)s"
+
+#: src/postulo/jobs/models.py
+msgid "noted by"
+msgstr ""
+
+#: src/postulo/templates/jobs/partials/company_signals.html
+#, python-format
+msgid "Noted by <bdi>%(name)s</bdi>"
+msgstr ""
+
+#: src/postulo/templates/jobs/partials/company_signals.html
+msgid "Noted by somebody who has since left"
+msgstr ""
 
 #: src/postulo/jobs/models.py
 #, fuzzy
@@ -14651,6 +14866,11 @@ msgstr "შექმნილია Postulo-ს მიერ ამ ადამ
 msgid "Produced on %(produced)s"
 msgstr "შექმნილია %(produced)s"
 
+#: src/postulo/accounts/addressing.py
+msgctxt "form of address"
+msgid "Prof."
+msgstr ""
+
 #: src/postulo/resume/models.py
 #, fuzzy
 msgid "proficiency"
@@ -15092,6 +15312,20 @@ msgstr "შეთავაზების აღრიცხვა"
 msgid "Record and change: applications, listings, notes, reminders, letters, your details. A call that changes a record answers with the whole record, timeline and contacts included, so this can see what it touches"
 msgstr "აღრიცხვა და შეცვლა: განაცხადები, ვაკანსიები, შენიშვნები, შეხსენებები, წერილები, თქვენი მონაცემები. გამოძახება, რომელიც ჩანაწერს ცვლის, პასუხად მთელ ჩანაწერს აბრუნებს, ქრონოლოგიისა და კონტაქტების ჩათვლით, რომ ამან დაინახოს, რას ეხება"
 
+#: src/postulo/templates/jobs/company_wikidata.html
+#, python-format
+msgid "Record it as acquired or merged into <bdi>%(name)s</bdi>"
+msgstr ""
+
+#: src/postulo/templates/jobs/company_wikidata.html
+msgid "Record it as dissolved"
+msgstr ""
+
+#: src/postulo/templates/jobs/company_wikidata.html
+#, python-format
+msgid "Record it as dissolved on %(date)s"
+msgstr ""
+
 #: src/postulo/templates/server/record_of_processing.html
 #, fuzzy
 msgid "Record of processing"
@@ -15118,6 +15352,10 @@ msgstr "აღრიცხეთ, რა გაგზავნეთ"
 #, fuzzy
 msgid "Recorded"
 msgstr "აღრიცხულია"
+
+#: src/postulo/jobs/models.py
+msgid "recorded"
+msgstr ""
 
 #: src/postulo/plugins/forms.py
 #, fuzzy
@@ -15500,6 +15738,10 @@ msgstr "ატვირთული სურათის მოხსნა"
 msgid "Remove this connection?"
 msgstr "მოვხსნათ ეს კავშირი?"
 
+#: src/postulo/templates/jobs/company_form.html
+msgid "Remove this entry"
+msgstr ""
+
 #: src/postulo/templates/server/design.html
 #, fuzzy
 msgid "Remove this example?"
@@ -15867,6 +16109,10 @@ msgstr "შენახვა და შემდეგი"
 #, fuzzy
 msgid "save as I go"
 msgstr "შენახვა მუშაობისას"
+
+#: src/postulo/templates/jobs/company_form.html
+msgid "Save the change"
+msgstr ""
 
 #: src/postulo/templates/jobs/company_form.html
 #, fuzzy
@@ -16500,6 +16746,10 @@ msgstr[1] ""
 msgid "Shared with %(who)s."
 msgstr ""
 
+#: src/postulo/templates/jobs/company_form.html
+msgid "Shared with everybody who can see this company. Say when it became true and where you learnt it, if you know."
+msgstr ""
+
 #: src/postulo/jobs/whose.py
 msgid "Shared with you"
 msgstr ""
@@ -16524,6 +16774,11 @@ msgstr ""
 
 #: src/postulo/templates/jobs/share.html
 msgid "Sharing"
+msgstr ""
+
+#: src/postulo/accounts/addressing.py
+msgctxt "pronouns"
+msgid "she/her"
 msgstr ""
 
 #: src/postulo/core/widgets_builtin.py
@@ -16743,6 +16998,10 @@ msgstr "შესვლა"
 msgid "Sign-in methods"
 msgstr "შესვლის ხერხები"
 
+#: src/postulo/jobs/models.py
+msgid "signal"
+msgstr ""
+
 #: src/postulo/core/mail_choices.py
 #, fuzzy
 msgid "Signed in once, as the mailbox that sends"
@@ -16777,6 +17036,10 @@ msgstr "შესვლა ტოკენით"
 #, fuzzy
 msgid "Signs in to an existing account by e-mail"
 msgstr "არსებულ ანგარიშში შედის ელფოსტით"
+
+#: src/postulo/jobs/models.py
+msgid "since"
+msgstr ""
 
 #: src/postulo/resume/models.py
 #, fuzzy, python-format
@@ -17038,6 +17301,7 @@ msgstr "ვიღაც დათანხმდა ამას. შეამ�
 msgid "Somebody shares a company, a contact or a listing with you"
 msgstr ""
 
+#: src/postulo/templates/jobs/company_form.html
 #: src/postulo/templates/jobs/partials/sharing_panel.html
 msgid "somebody who has since left"
 msgstr ""
@@ -17086,7 +17350,10 @@ msgstr "დალაგება %(column)s მიხედვით, ჯერ 
 msgid "source"
 msgstr "კოდი"
 
-#: src/postulo/plugins/kinds.py src/postulo/templates/server/email.html
+#: src/postulo/plugins/kinds.py src/postulo/templates/jobs/company_form.html
+#: src/postulo/templates/jobs/partials/company_signals.html
+#: src/postulo/templates/jobs/partials/company_status.html
+#: src/postulo/templates/server/email.html
 #: src/postulo/templates/server/plugins.html
 #: src/postulo/templates/widgets/sources.html
 #, fuzzy
@@ -17218,12 +17485,13 @@ msgstr "სტატუსი"
 
 #: src/postulo/applications/forms.py src/postulo/applications/reports.py
 #: src/postulo/applications/tables.py src/postulo/core/csv_import.py
-#: src/postulo/templates/accounts/invite_list.html
+#: src/postulo/jobs/tables.py src/postulo/templates/accounts/invite_list.html
 #: src/postulo/templates/applications/partials/bulk_fields.html
 #: src/postulo/templates/applications/partials/status_card.html
 #: src/postulo/templates/applications/report.html
 #: src/postulo/templates/applications/report_print.html
 #: src/postulo/templates/core/import_csv_map.html
+#: src/postulo/templates/jobs/company_form.html
 #, fuzzy
 msgid "Status"
 msgstr "სტატუსი"
@@ -18410,6 +18678,11 @@ msgstr "ეს გამოვიდა."
 msgid "That would make a loop: %(name)s is already part of this one."
 msgstr "ეს მარყუჟს შექმნიდა: %(name)s უკვე ამის ნაწილია."
 
+#: src/postulo/jobs/models.py
+#, python-format
+msgid "That would make a loop: %(name)s was already acquired by this one."
+msgstr ""
+
 #: src/postulo/applications/views.py src/postulo/jobs/views.py
 #, fuzzy, python-format
 msgid "The %(count)d document you sent is kept, and still says where it went."
@@ -18672,6 +18945,14 @@ msgstr "კომპანიას არ აქვს მისამართ
 msgid "The company is matched by name and created if it is new. Only the company and the job title are required; everything else can be filled in later."
 msgstr "კომპანია სახელით უკავშირდება და იქმნება, თუ ახალია. სავალდებულოა მხოლოდ კომპანია და თანამდებობის დასახელება; დანარჩენი მოგვიანებით შეივსება."
 
+#: src/postulo/applications/forms.py
+msgid "The company is recorded as dissolved. Tick this to add the listing."
+msgstr ""
+
+#: src/postulo/jobs/models.py
+msgid "The company it became part of, if that company is recorded here."
+msgstr ""
+
 #: src/postulo/jobs/models.py
 #, fuzzy
 msgid "The company this one belongs to, if it belongs to one."
@@ -18722,6 +19003,14 @@ msgstr "ავტორობის მითითება, რომელს
 msgid "The dashboard lists open applications nothing has happened to for a while, with nothing planned. Recruiters' own advice clusters around two to three weeks."
 msgstr "მიმოხილვა ჩამოთვლის ღია განაცხადებს, სადაც უკვე ხნის განმავლობაში არაფერი მომხდარა და არაფერია დაგეგმილი. თავად რეკრუტერების რჩევები ორ-სამ კვირაზე იყრის თავს."
 
+#: src/postulo/api/routers/companies.py src/postulo/jobs/forms.py
+msgid "The date cannot be in the future."
+msgstr ""
+
+#: src/postulo/jobs/models.py
+msgid "The date it became true, if known."
+msgstr ""
+
 #: src/postulo/documents/forms.py
 #, fuzzy
 msgid "The date on the letter, as a date. Leave it empty when you do not know."
@@ -18731,6 +19020,10 @@ msgstr "წერილზე მითითებული თარიღი,
 #, fuzzy
 msgid "The date you mean to have sent it by. It is not a reminder — set one of those if you want telling."
 msgstr "თარიღი, რომლამდეც მის გაგზავნას აპირებთ. ეს შეხსენება არ არის — დააყენეთ შეხსენება, თუ გსურთ, რომ შეგახსენოთ."
+
+#: src/postulo/jobs/forms.py
+msgid "The day it was true or reported, not today's date unless it is."
+msgstr ""
 
 #: src/postulo/templates/server/plugins.html
 #, fuzzy
@@ -20091,6 +20384,11 @@ msgstr "ისინი გასაუბრებას ესწრებო�
 msgid "They were the main contact."
 msgstr "ისინი მთავარი კონტაქტი იყვნენ."
 
+#: src/postulo/accounts/addressing.py
+msgctxt "pronouns"
+msgid "they/them"
+msgstr ""
+
 #: src/postulo/jobs/pages.py
 #, fuzzy
 msgid "This account does not keep a rendering of a page."
@@ -20221,6 +20519,11 @@ msgstr "ეს აღება უკუგდებულია."
 msgid "This company"
 msgstr "ეს კომპანია"
 
+#: src/postulo/jobs/status.py
+#, python-format
+msgid "This company has been in administration since %(date)s."
+msgstr ""
+
 #: src/postulo/jobs/logos.py
 #, fuzzy
 msgid "This company has no website recorded."
@@ -20230,6 +20533,24 @@ msgstr "ამ კომპანიისთვის ვებგვერდ�
 #, fuzzy
 msgid "This company has none of its industries from the NACE list yet."
 msgstr "ამ კომპანიას NACE-ის სიიდან ჯერ არცერთი დარგი არ აქვს."
+
+#: src/postulo/jobs/status.py
+msgid "This company is recorded as being in administration."
+msgstr ""
+
+#: src/postulo/jobs/status.py
+msgid "This company is recorded as dissolved."
+msgstr ""
+
+#: src/postulo/jobs/status.py
+#, python-format
+msgid "This company was dissolved on %(date)s."
+msgstr ""
+
+#: src/postulo/jobs/status.py
+#, python-format
+msgid "This company was reported laying people off as of %(date)s."
+msgstr ""
 
 #: src/postulo/templates/resume/item_form.html
 #, fuzzy
@@ -20621,6 +20942,10 @@ msgstr "მონიშნეთ, როცა დაესწრებით. �
 #, fuzzy
 msgid "Tick rows to act on several at once."
 msgstr "მონიშნეთ სტრიქონები რამდენიმეზე ერთდროულად სამოქმედოდ."
+
+#: src/postulo/applications/forms.py
+msgid "Tick the box to add the listing anyway."
+msgstr ""
 
 #: src/postulo/jobs/capture_views.py
 #, fuzzy
@@ -21722,9 +22047,8 @@ msgid "What is in the file"
 msgstr "რა არის ფაილში"
 
 #: src/postulo/templates/help/your_name.html
-#, fuzzy
-msgid "What is kept is the text itself. If your career record changes language, a choice made from the other language's list stays what it was, and is shown as <em>Other…</em> with its text in the box."
-msgstr "ინახება თავად ტექსტი. თუ თქვენი კარიერული ისტორიის ენა შეიცვლება, სხვა ენის სიიდან გაკეთებული არჩევანი ისეთივე რჩება, როგორიც იყო, და ჩანს როგორც <em>სხვა…</em>, თავისი ტექსტით ველში."
+msgid "What is kept is the choice, not one language's word for it: <em>il</em> in French and <em>he/him</em> in English are the same choice, so your menus and your documents show it in the language they are drawn in when your career record changes language. Only what you write under <em>Other…</em> is kept as you typed it, and shown as typed in every language. A word you type there that a list already has is kept as that choice."
+msgstr ""
 
 #: src/postulo/templates/documents/cv_detail.html
 #, fuzzy
@@ -21863,6 +22187,10 @@ msgstr "რა სახის ნაშრომია. ქვემოთ მ�
 #, fuzzy
 msgid "what the check found"
 msgstr "რა იპოვა შემოწმებამ"
+
+#: src/postulo/jobs/forms.py
+msgid "What the company is. Shown to everybody who can see it."
+msgstr ""
 
 #: src/postulo/applications/forms.py
 #, fuzzy
@@ -22013,6 +22341,14 @@ msgstr "რაზე შეთანხმდით"
 #, fuzzy
 msgid "what was asked"
 msgstr "მოთხოვნილი"
+
+#: src/postulo/templates/jobs/company_form.html
+msgid "What was reported"
+msgstr ""
+
+#: src/postulo/jobs/forms.py
+msgid "What was reported about its hiring."
+msgstr ""
 
 #: src/postulo/applications/forms.py
 #, fuzzy
@@ -22309,6 +22645,14 @@ msgstr "სადაც ამ ინსტალაციას ტელეფ
 msgid "Where you came across it: a job board, a referral, the company site."
 msgstr "სად წააწყდით მას: ვაკანსიების საიტი, რეკომენდაცია, კომპანიის საიტი."
 
+#: src/postulo/jobs/models.py
+msgid "Where you learnt it: a news article, a post."
+msgstr ""
+
+#: src/postulo/jobs/models.py
+msgid "Where you learnt it: a register, an article."
+msgstr ""
+
 #: src/postulo/resume/views.py
 #, fuzzy
 msgid "where you live"
@@ -22579,10 +22923,19 @@ msgstr "Wikidata ამ ენაზე მის სახელს იძლ�
 msgid "Wikidata has no item with that identifier."
 msgstr "Wikidata-ს ამ იდენტიფიკატორით ელემენტი არ აქვს."
 
+#: src/postulo/templates/jobs/company_wikidata.html
+#, python-format
+msgid "Wikidata names %(qid)s as its replacement; no company here carries that identifier."
+msgstr ""
+
 #: src/postulo/jobs/wikidata.py
 #, fuzzy
 msgid "Wikidata redirected too many times."
 msgstr "Wikidata-მ ძალიან ბევრჯერ გადაამისამართა."
+
+#: src/postulo/templates/jobs/company_wikidata.html
+msgid "Wikidata says this organisation has ended. Choose whether to record it; the legal state is shown to everybody who can see this company."
+msgstr ""
 
 #: src/postulo/jobs/wikidata.py
 #, fuzzy

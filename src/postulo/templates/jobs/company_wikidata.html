@@ -40,10 +40,34 @@
         <p class="text-sm text-ink-500 dark:text-ink-400">{% translate "The item gives no single place." %}</p>
       {% endif %}
     </div>
+    {% comment %} Whether it ended, and who replaced it (#941): offered, never applied. The
+       choice starts on leaving the company as it is, because its legal state is shown to
+       everybody who can see it. {% endcomment %}
+    {% if ending.dissolved or ending.replacement or ending.unrecorded or ending.refusal %}
+      <fieldset class="card mb-4" data-wikidata-ending>
+        <legend class="legend-title">{% translate "Its legal state" %}</legend>
+        <p class="mb-2 text-sm text-ink-500 dark:text-ink-400">
+          {% translate "Wikidata says this organisation has ended. Choose whether to record it; the legal state is shown to everybody who can see this company." %}
+        </p>
+        <div class="space-y-2 text-sm">
+          <label class="flex items-center gap-2"><input type="radio" class="input" name="legal_state" value="" form="wikidata-keep" checked> {% translate "Leave it as it is" %}</label>
+          {% if ending.dissolved %}
+            <label class="flex items-center gap-2"><input type="radio" class="input" name="legal_state" value="dissolved" form="wikidata-keep"> {% if ending.dissolved.on %}{% blocktranslate trimmed with date=ending.dissolved.on|date:"DATE_FORMAT" %}Record it as dissolved on {{ date }}{% endblocktranslate %}{% else %}{% translate "Record it as dissolved" %}{% endif %}</label>
+          {% endif %}
+          {% if ending.replacement %}
+            <label class="flex items-center gap-2"><input type="radio" class="input" name="legal_state" value="acquired" form="wikidata-keep"> {% blocktranslate trimmed with name=ending.replacement.name %}Record it as acquired or merged into <bdi>{{ name }}</bdi>{% endblocktranslate %}</label>
+          {% endif %}
+        </div>
+        {% for qid in ending.unrecorded %}
+          <p class="mt-2 text-xs text-ink-500 dark:text-ink-400">{% blocktranslate trimmed %}Wikidata names {{ qid }} as its replacement; no company here carries that identifier.{% endblocktranslate %}</p>
+        {% endfor %}
+        {% if ending.refusal %}<p class="mt-2 text-xs text-ink-500 dark:text-ink-400">{{ ending.refusal }}</p>{% endif %}
+      </fieldset>
+    {% endif %}
     <p class="mb-4 text-xs text-ink-500 dark:text-ink-400">
       {% translate "Wikidata's data is in the public domain (CC0). Keeping these replaces any name you typed for the same language, and takes off a name an earlier fetch gave that this one did not." %}
     </p>
-    <form method="post" class="flex flex-wrap items-center gap-3">
+    <form method="post" id="wikidata-keep" class="flex flex-wrap items-center gap-3">
       {% csrf_token %}
       <button type="submit" name="keep" value="1" class="btn">{% translate "Keep these" %}</button>
       <a href="{{ back }}" class="btn" data-variant="ghost">{% translate "Cancel" %}</a>

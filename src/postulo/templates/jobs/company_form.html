@@ -152,6 +152,18 @@
       </div>
 
       <div class="max-w-2xl 2xl:flex-1" data-company-rows>
+      {% comment %} What the company is (#941): a fact about it, shared with everybody who can
+         see it. Its hiring is dated entries and is kept below the form. {% endcomment %}
+      <fieldset class="card mb-6" data-company-state id="section-status">
+        <legend class="legend-title">{% translate "Status" %}</legend>
+        <p class="mb-3 text-sm text-ink-500 dark:text-ink-400">
+          {% translate "Shared with everybody who can see this company. Say when it became true and where you learnt it, if you know." %}
+        </p>
+        <c-field :field="form.legal_state" />
+        <c-field :field="form.legal_state_since" />
+        <c-field :field="form.legal_state_source" />
+        <c-field :field="form.acquired_by" />
+      </fieldset>
       {% comment %} What the company answers on and where it is (#329), the rows a contact
          has, above its identifiers. {% endcomment %}
       {% if numbers %}{% include "partials/phone_numbers.html" %}{% endif %}
@@ -245,6 +257,57 @@
           <input class="input" id="name-typed" name="name" maxlength="200" required>
         </div>
         <button type="submit" class="btn" data-variant="outline">{% translate "Add" %}</button>
+      </form>
+    </section>
+  {% endif %}
+  {% if object %}
+    {% comment %} Its hiring (#941): dated entries, each with who noted it. Forms of their own,
+       outside the one above, since changing an entry should not save the rest of the page. {% endcomment %}
+    <section class="card mt-6 max-w-2xl" id="section-hiring" data-hiring-signals>
+      <h2 class="legend-title">{% translate "Hiring" %}</h2>
+      <p class="mb-3 text-sm text-ink-500 dark:text-ink-400">
+        {% translate "Dated entries, kept as a history and shared with everybody who can see this company. One older than 90 days is shown as of its date." %}
+      </p>
+      {% if signals %}
+        <ul class="mb-4 space-y-3">
+          {% for entry in signals %}
+            <li class="rounded border border-ink-100 p-3 dark:border-ink-800" data-hiring-entry="{{ entry.kind }}">
+              <p class="flex flex-wrap items-center justify-between gap-2">
+                <span><span class="font-medium">{{ entry.get_kind_display }}</span> · <time datetime="{{ entry.noted_on.isoformat }}">{{ entry.noted_on|date:"DATE_FORMAT" }}</time></span>
+                <span class="text-sm text-ink-500 dark:text-ink-400">{% if entry.author %}<bdi>{{ entry.author.get_username }}</bdi>{% else %}{% translate "somebody who has since left" %}{% endif %}</span>
+              </p>
+              <details class="mt-2 text-sm">
+                <summary class="cursor-pointer text-ink-600 dark:text-ink-400">{% translate "Change" %}</summary>
+                <form method="post" action="{% url 'jobs:company_signal_edit' entry.pk %}" class="mt-2">
+                  {% csrf_token %}
+                  <input type="hidden" name="next" value="{% url 'jobs:company_update' object.pk %}#section-hiring">
+                  <label class="label" for="signal-kind-{{ entry.pk }}">{% translate "What was reported" %}</label>
+                  <select class="input mb-2" id="signal-kind-{{ entry.pk }}" name="kind">
+                    {% for value, label in signal_kinds %}<option value="{{ value }}"{% if value == entry.kind %} selected{% endif %}>{{ label }}</option>{% endfor %}
+                  </select>
+                  <label class="label" for="signal-on-{{ entry.pk }}">{% translate "As of" %}</label>
+                  <input class="input mb-2" type="date" id="signal-on-{{ entry.pk }}" name="noted_on" value="{{ entry.noted_on.isoformat }}" required>
+                  <label class="label" for="signal-source-{{ entry.pk }}">{% translate "Source" %}</label>
+                  <input class="input mb-2" type="url" id="signal-source-{{ entry.pk }}" name="source" value="{{ entry.source }}" maxlength="500">
+                  <button type="submit" class="btn" data-size="sm">{% translate "Save the change" %}</button>
+                </form>
+              </details>
+              <form method="post" action="{% url 'jobs:company_signal_remove' entry.pk %}" class="mt-2">
+                {% csrf_token %}
+                <input type="hidden" name="next" value="{% url 'jobs:company_update' object.pk %}#section-hiring">
+                <button type="submit" class="btn" data-variant="destructive-ghost" data-size="sm">{% translate "Remove this entry" %}</button>
+              </form>
+            </li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+      <form method="post" action="{% url 'jobs:company_signal_add' object.pk %}">
+        {% csrf_token %}
+        <input type="hidden" name="next" value="{% url 'jobs:company_update' object.pk %}#section-hiring">
+        <c-field :field="signal_form.kind" />
+        <c-field :field="signal_form.noted_on" />
+        <c-field :field="signal_form.source" />
+        <button type="submit" class="btn">{% translate "Add an entry" %}</button>
       </form>
     </section>
   {% endif %}

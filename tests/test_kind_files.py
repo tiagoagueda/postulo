@@ -469,6 +469,7 @@ SHAPES = {
         2: "2f357806aee6ae96",
         3: "84c1f35b8ffe3ba6",
         4: "50ff4c78352e5f2b",
+        5: "b855dd2dcb6160fc",
     },
     "contacts": {1: "2147065eb442ef0d", 2: "1c3d3e9bc93d8cca"},
     "listings": {1: "10895cbc17c8b6cd"},
@@ -508,7 +509,7 @@ def test_what_a_file_writes_is_something_the_archive_writes():
 def test_the_archive_and_the_candidate_file_are_untouched_by_the_new_files():
     assert export.FORMAT_VERSION >= 53
     assert export.CANDIDATE_FORMAT >= 15
-    assert set(kind_files.FORMATS.values()) == {1, 2, 4}
+    assert set(kind_files.FORMATS.values()) == {1, 2, 5}
 
 
 def test_every_kind_is_named_in_the_settings_section_it_belongs_to():

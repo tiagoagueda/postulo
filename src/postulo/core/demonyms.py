@@ -453,14 +453,15 @@ def demonym(code: str, language: str, *, feminine: bool = False) -> str:
 
 
 def is_feminine(gender: str) -> bool:
-    """Whether a person's gender, as the list and the profile hold it, asks for the feminine
-    form: the first answer of any language's list, and nothing else (#864, #865)."""
+    """Whether a person's gender, as the profile holds it, asks for the feminine form: the
+    concept ``female``, and nothing else (#864, #865, #921).
+
+    A profile not yet migrated, an archive and a candidate file may still hold the word some
+    language's list had for it -- *Féminin*, or *Woman* from before #864 -- and
+    `addressing.concept_of` reads those as the concept, so they are honoured too."""
     from postulo.accounts import addressing
 
-    word = (gender or "").strip().casefold()
-    return bool(word) and any(
-        word == answers[0].casefold() for answers in addressing.GENDERS.values()
-    )
+    return addressing.concept_of(addressing.GENDER, gender) == "female"
 
 
 def nationality(code: str, language: str, gender: str = "") -> str:

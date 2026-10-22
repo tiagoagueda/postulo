@@ -430,3 +430,36 @@ def test_from_small_up_the_table_link_shows_its_word_and_no_tooltip(
     page.wait_for_timeout(300)
 
     expect(page.locator("[data-tooltip][popover]:popover-open")).to_have_count(0)
+
+
+def test_a_dissolved_company_is_drawn_apart_and_says_why_in_its_title(
+    live_server, page: Page, applicant
+):
+    """The pin of a company that is dissolved, or in administration, has a class of its own
+    and a title that names the state, so colour is never the only cue (#941)."""
+    from postulo.jobs import placing
+    from postulo.jobs.models import Company, LegalState
+
+    for name, place, lat, lon, state in (
+        ("Gone Ltd", "Aveiro", 40.64, -8.65, LegalState.DISSOLVED),
+        ("Careful Ltd", "Porto", 41.15, -8.61, LegalState.ADMINISTRATION),
+        ("Fine Ltd", "Faro", 37.02, -7.93, LegalState.ACTIVE),
+    ):
+        company = Company.objects.create(
+            owner=applicant, name=name, location=f"{place}, PT", legal_state=state
+        )
+        placing.place_by_hand(company.postal_addresses.get(), lat, lon)
+    watch(page)
+
+    sign_in(page, live_server.url, "/jobs/companies/map/")
+
+    expect(page.locator(".map-pin")).to_have_count(3)
+    expect(page.locator(".map-pin-dissolved")).to_have_attribute(
+        "title", "Gone Ltd · Work · Dissolved"
+    )
+    expect(page.locator(".map-pin-administration")).to_have_attribute(
+        "title", "Careful Ltd · Work · In administration"
+    )
+    expect(
+        page.locator(".map-pin:not(.map-pin-dissolved):not(.map-pin-administration)")
+    ).to_have_attribute("title", "Fine Ltd · Work")

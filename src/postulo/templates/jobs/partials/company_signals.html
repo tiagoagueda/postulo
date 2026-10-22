@@ -1,0 +1,25 @@
+{% load i18n %}
+{% comment %} The dated hiring entries of a company, newest first, each with who noted it and
+   where it was learnt (#941). Shared with the company: anyone who can see it sees them. {% endcomment %}
+{% if company_status.history %}
+  <c-section-title class="mt-8">{% translate "Hiring" %}</c-section-title>
+  <div class="card p-0" data-hiring-history>
+    <ul class="divide-y divide-ink-100 dark:divide-ink-800">
+      {% for entry in company_status.history %}
+        <li class="px-4 py-3" data-hiring-entry="{{ entry.kind }}">
+          <p class="flex flex-wrap items-center gap-2">
+            <span class="font-medium">{{ entry.get_kind_display }}</span>
+            <time class="text-sm text-ink-500 dark:text-ink-400" datetime="{{ entry.noted_on.isoformat }}">{{ entry.noted_on|date:"DATE_FORMAT" }}</time>
+          </p>
+          <p class="text-sm text-ink-500 dark:text-ink-400">
+            {% if entry.author %}{% blocktranslate trimmed with name=entry.author.get_username %}Noted by <bdi>{{ name }}</bdi>{% endblocktranslate %}{% else %}{% translate "Noted by somebody who has since left" %}{% endif %}
+            {% if entry.source %}
+              · <a href="{{ entry.source }}" rel="noopener noreferrer external" target="_blank"
+                   class="text-brand-600 underline dark:text-brand-400">{% translate "Source" %}</a>
+            {% endif %}
+          </p>
+        </li>
+      {% endfor %}
+    </ul>
+  </div>
+{% endif %}

@@ -255,6 +255,13 @@ msgid_plural "%(count)d messaging handles"
 msgstr[0] "%(count)d Messagerie-Handle"
 msgstr[1] "%(count)d Messagerie-Handles"
 
+#: src/postulo/jobs/status.py
+#, python-format
+msgid "%(count)d open listing"
+msgid_plural "%(count)d open listings"
+msgstr[0] ""
+msgstr[1] ""
+
 #: src/postulo/core/gdpr.py
 #, fuzzy, python-format
 msgid "%(count)d plugin row"
@@ -476,6 +483,13 @@ msgstr[1] ""
 #, python-format
 msgid "%(counter)s of your records is shared with others: they keep a copy of what their own records need, and are told it is gone."
 msgid_plural "%(counter)s of your records are shared with others: they keep a copy of what their own records need, and are told they are gone."
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/postulo/templates/jobs/partials/company_row.html
+#, python-format
+msgid "%(counter)s open listing"
+msgid_plural "%(counter)s open listings"
 msgstr[0] ""
 msgstr[1] ""
 
@@ -1544,9 +1558,8 @@ msgid "<em>Kind</em> says what the number is, and can be left blank. Choose <em>
 msgstr "<em>Zort</em> seet, wat d'Nummer ass, a ka eidel bleiwen. Wielt <em>Aner</em>, an e Feld freet, wéi se ze nennen ass."
 
 #: src/postulo/templates/help/contact_block.html
-#, fuzzy
-msgid "<em>Language of your career record</em> says which language your experience, education and projects are typed in. A CV in another language shows what you have translated and says what it could not. It also decides which forms of address and pronouns the menus of <em>Your name</em> offer. Left as it is, it follows the language you read Postulo in."
-msgstr "<em>Sprooch vun Ärem Karriäredossier</em> seet, a wéi enger Sprooch Är Beruffserfarung, Ausbildung a Projeten agetippt sinn. E CV an enger anerer Sprooch weist, wat Dir iwwersat hutt, a seet, wat en net konnt. Si entscheet och, wéi eng Uriedformen a Pronomen d'Menüe vun <em>Äre Numm</em> ubidden. Wann Dir se léisst, wéi se ass, follegt se der Sprooch, an där Dir de Postulo liest."
+msgid "<em>Language of your career record</em> says which language your experience, education and projects are typed in. A CV in another language shows what you have translated and says what it could not. It also decides which forms of address and pronouns the menus of <em>Your name</em> offer, and in which words. Left as it is, it follows the language you read Postulo in."
+msgstr ""
 
 #: src/postulo/templates/help/contact_block.html
 #, fuzzy
@@ -1780,6 +1793,10 @@ msgid "A company"
 msgstr "Eng Firma"
 
 #: src/postulo/jobs/models.py
+msgid "A company cannot acquire itself."
+msgstr ""
+
+#: src/postulo/jobs/models.py
 #, fuzzy
 msgid "A company cannot be part of itself."
 msgstr "Eng Firma kann net Deel vu sech selwer sinn."
@@ -2005,9 +2022,8 @@ msgid "A form of address is what is written before a name, and pronouns say how 
 msgstr "En Uried ass dat, wat virun en Numm geschriwwe gëtt, a Pronomen soen, wéi iwwer Iech geschwat gëtt. Näischt gëtt ugeholl, wann eent dovun eidel ass, a keent gëtt jee aus Ärem Numm ofgeleet."
 
 #: src/postulo/core/help.py
-#, fuzzy
-msgid "A form of address is written before your name, and your pronouns say how to refer to you. Both are optional, and nothing is assumed when they are blank."
-msgstr "Eng Uriedform steet virun Ärem Numm, an Är Pronomen soen, wéi een Iech nennt. Allebéid si fakultativ, a näischt gëtt ugeholl, wa se eidel sinn."
+msgid "A form of address is written before your name, and your pronouns say how to refer to you. Both are optional, nothing is assumed when they are blank, and each is kept as a choice that your pages and documents show in their own language."
+msgstr ""
 
 #: src/postulo/core/views_access.py
 #, fuzzy
@@ -2840,6 +2856,18 @@ msgstr "Konten"
 msgid "Acknowledged"
 msgstr "Zur Kenntnis geholl"
 
+#: src/postulo/jobs/models.py
+msgid "acquired by"
+msgstr ""
+
+#: src/postulo/jobs/models.py
+msgid "Acquired or merged"
+msgstr ""
+
+#: src/postulo/api/routers/companies.py
+msgid "acquired_by must be a company you can see."
+msgstr ""
+
 #: src/postulo/templates/jobs/company_detail.html
 #, fuzzy, python-format
 msgid "Across the %(name)s group"
@@ -2868,6 +2896,10 @@ msgstr "Aktioune fir %(name)s"
 #, fuzzy, python-format
 msgid "Actions for %(what)s"
 msgstr "Aktioune fir %(what)s"
+
+#: src/postulo/jobs/models.py
+msgid "Active"
+msgstr ""
 
 #: src/postulo/templates/applications/application_detail.html
 #: src/postulo/templates/jobs/company_detail.html
@@ -2942,6 +2974,10 @@ msgstr "En Etikett derbäisetzen"
 msgid "Add all of this"
 msgstr "Dat alles dobäisetzen"
 
+#: src/postulo/templates/jobs/company_form.html
+msgid "Add an entry"
+msgstr ""
+
 #: src/postulo/templates/resume/item_form.html
 #, fuzzy
 msgid "Add an industry"
@@ -2957,6 +2993,10 @@ msgstr "Andréi dobäisetzen"
 #, fuzzy
 msgid "Add entry"
 msgstr "En Andrag dobäisetzen"
+
+#: src/postulo/applications/forms.py
+msgid "Add it anyway"
+msgstr ""
 
 #: src/postulo/applications/ical_import.py
 #, fuzzy
@@ -4006,6 +4046,20 @@ msgstr "Esou wéi et geschriwwe stoung: e Prozentsaz, eng Zuel vun Optiounen, d'
 msgid "As it will print"
 msgstr "Esou, wéi e gedréckt gëtt"
 
+#: src/postulo/jobs/models.py
+msgid "as of"
+msgstr ""
+
+#: src/postulo/templates/jobs/company_form.html
+msgid "As of"
+msgstr ""
+
+#: src/postulo/templates/jobs/partials/company_row.html
+#: src/postulo/templates/jobs/partials/company_status.html
+#, python-format
+msgid "as of %(date)s"
+msgstr ""
+
 #: src/postulo/templates/documents/cv_text.html
 #, fuzzy
 msgid "As plain text"
@@ -4492,6 +4546,11 @@ msgstr ""
 msgid "By"
 msgstr "Vun"
 
+#: src/postulo/templates/jobs/partials/company_status.html
+#, python-format
+msgid "by <a href=\"%(acquirer_url)s\" class=\"underline\"><bdi>%(name)s</bdi></a>"
+msgstr ""
+
 #: src/postulo/templates/widgets/sources.html
 #, fuzzy
 msgid "By agency"
@@ -4847,6 +4906,7 @@ msgstr "Zertifizéierungen"
 msgid "Certifications it issued"
 msgstr "Zertifikater, déi se ausgestallt huet"
 
+#: src/postulo/templates/jobs/company_form.html
 #: src/postulo/templates/settings/locale.html
 #, fuzzy
 msgid "Change"
@@ -5129,6 +5189,10 @@ msgstr "Wielt, wat fir eng Zort Identifikateur dat ass."
 #, fuzzy
 msgid "Choose what it prints instead"
 msgstr "Wielen, wat en amplaz weist"
+
+#: src/postulo/jobs/status_views.py
+msgid "Choose what was reported and the date."
+msgstr ""
 
 #: src/postulo/applications/views.py
 #, fuzzy
@@ -5746,6 +5810,10 @@ msgstr "Gezielt no deem, wéini et geschitt ass, dofir gehéiert eng Äntwert, d
 msgid "Counted by when it happened, so a reply in this period to an older application belongs here. That is a different question from what was sent, and the two are kept apart."
 msgstr "Gezielt no deem, wéini et geschitt ass, dofir gehéiert eng Äntwert, déi an dëser Period op eng eeler Kandidatur kënnt, hei hin. Dat ass eng aner Fro wéi déi, wat geschéckt gouf, an déi zwee ginn ausenee gehalen."
 
+#: src/postulo/templates/jobs/partials/company_status.html
+msgid "Counted from the listings recorded here; nobody has reported it."
+msgstr ""
+
 #: src/postulo/templates/widgets/interviews_summary.html
 #, fuzzy
 msgid "Counted from the timeline, so interviews recorded before the diary existed are in."
@@ -5980,6 +6048,10 @@ msgstr "Gebuertsdatum"
 
 #: src/postulo/templates/help/personal_details.html
 msgid "Date of birth, place and country of birth, gender and nationalities are what an identity check asks for, and nothing a job search needs until a CV says so. Every part is optional."
+msgstr ""
+
+#: src/postulo/templates/jobs/company_form.html
+msgid "Dated entries, kept as a history and shared with everybody who can see this company. One older than 90 days is shown as of its date."
 msgstr ""
 
 #: src/postulo/applications/models.py
@@ -6482,6 +6554,10 @@ msgstr "Verworf. Si bleift an Ärer Geschicht a kann zréckgeholl ginn."
 msgid "Dismiss"
 msgstr "Ignoréieren"
 
+#: src/postulo/jobs/models.py
+msgid "Dissolved"
+msgstr ""
+
 #: src/postulo/documents/forms.py
 #, fuzzy
 msgid "Do not send after"
@@ -6668,6 +6744,11 @@ msgstr "Dës Leit als vCard eroflueden"
 #, fuzzy
 msgid "Downloading one needs you to sign in again, and is written to the log with your name. Keep what you download as carefully as the instance itself. The key that the connection secrets are under is not in an archive: keep your <code>.env</code> somewhere else."
 msgstr "Fir een erofzelueden, musst Dir Iech nach eng Kéier umellen, an et gëtt mat Ärem Numm am Protokoll notéiert. Passt op dat, wat Dir eroflued, esou gutt op wéi op d'Instanz selwer. De Schlëssel, ënner deem d'Verbindungsgeheimnisser leien, ass net an engem Archiv: behaalt Äre <code>.env</code> soss enzwousch."
+
+#: src/postulo/accounts/addressing.py
+msgctxt "form of address"
+msgid "Dr"
+msgstr ""
 
 #: src/postulo/applications/models.py
 #, fuzzy
@@ -7045,6 +7126,11 @@ msgstr "hält op"
 msgid "Energy"
 msgstr "Energie"
 
+#: src/postulo/accounts/addressing.py
+msgctxt "form of address"
+msgid "Eng."
+msgstr ""
+
 #: src/postulo/jobs/industries.py
 #, fuzzy
 msgid "Engineering"
@@ -7359,6 +7445,10 @@ msgstr "Beispillbefeel"
 msgid "Exceptions to what this instance decides for everybody. Whatever you set here is shown to this person on their own settings page, with your name against it."
 msgstr "Ausnamen zu deem, wat dës Installatioun fir jiddereen entscheet. Wat Dir hei setzt, gëtt där Persoun op hirer eegener Astellungssäit gewisen, mat Ärem Numm doniewent."
 
+#: src/postulo/jobs/tables.py
+msgid "Exclude dissolved"
+msgstr ""
+
 #: src/postulo/documents/rendering.py src/postulo/resume/candidate.py
 #: src/postulo/resume/registry.py src/postulo/resume/views_candidate.py
 #: src/postulo/templates/resume/europass_import.html
@@ -7514,6 +7604,11 @@ msgstr "Fax"
 #, fuzzy
 msgid "Feature"
 msgstr "Fonctioun"
+
+#: src/postulo/accounts/addressing.py
+msgctxt "gender"
+msgid "Female"
+msgstr ""
 
 #: src/postulo/templates/jobs/company_form.html
 #, fuzzy
@@ -8400,6 +8495,11 @@ msgstr "huet e Logo"
 msgid "has an uploaded picture"
 msgstr "huet en eropgeluedent Bild"
 
+#: src/postulo/accounts/addressing.py
+msgctxt "pronouns"
+msgid "he/him"
+msgstr ""
+
 #: src/postulo/accounts/models.py src/postulo/documents/models.py
 #: src/postulo/resume/views.py
 #, fuzzy
@@ -8474,6 +8574,40 @@ msgstr "Héichpunkten"
 #, fuzzy
 msgid "highlights for this CV"
 msgstr "Héichpunkte fir dëse CV"
+
+#: src/postulo/jobs/models.py src/postulo/jobs/tables.py
+#: src/postulo/templates/jobs/company_form.html
+#: src/postulo/templates/jobs/partials/company_signals.html
+msgid "Hiring"
+msgstr ""
+
+#: src/postulo/jobs/models.py
+msgid "Hiring freeze"
+msgstr ""
+
+#: src/postulo/jobs/models.py
+msgid "hiring signal"
+msgstr ""
+
+#: src/postulo/jobs/status_views.py
+msgid "Hiring signal added."
+msgstr ""
+
+#: src/postulo/jobs/status_views.py
+msgid "Hiring signal changed."
+msgstr ""
+
+#: src/postulo/jobs/status_views.py
+msgid "Hiring signal removed."
+msgstr ""
+
+#: src/postulo/jobs/merging.py
+msgid "Hiring signals"
+msgstr ""
+
+#: src/postulo/jobs/models.py
+msgid "hiring signals"
+msgstr ""
 
 #: src/postulo/templates/jobs/posting_detail.html
 #, fuzzy
@@ -8964,6 +9098,10 @@ msgstr "An 90 Deeg"
 #, fuzzy
 msgid "In a year"
 msgstr "An engem Joer"
+
+#: src/postulo/jobs/models.py
+msgid "In administration"
+msgstr ""
 
 #: src/postulo/templates/widgets/counters.html
 #, fuzzy
@@ -9651,6 +9789,10 @@ msgstr "Seng Datei stëmmt mat deem iwwereneen, wat den offiziellen Depot ënner
 msgid "Its general mailbox, such as jobs@ or info@. A person's address goes on a contact."
 msgstr "Hiert allgemengt Postfach, wéi jobs@ oder info@. D'Adress vun enger Persoun gehéiert bei e Kontakt."
 
+#: src/postulo/templates/jobs/company_wikidata.html
+msgid "Its legal state"
+msgstr ""
+
 #: src/postulo/jobs/merging.py
 #, fuzzy, python-format
 msgid "Its logo: %(name)s has one of its own, and a picture cannot be kept in a note."
@@ -10142,6 +10284,10 @@ msgstr "Breedegrad"
 msgid "Latitude"
 msgstr "Breedegrad"
 
+#: src/postulo/jobs/models.py
+msgid "Laying off"
+msgstr ""
+
 #: src/postulo/resume/forms.py
 #, fuzzy
 msgid "Learning you took, with or without a certificate of attendance. A programme that led to a degree or diploma belongs in Education; a credential somebody can check, or that may lapse, belongs in Certifications."
@@ -10161,6 +10307,10 @@ msgstr "Loosst eidel, fir dat ze behalen, wat scho gespäichert ass."
 #, fuzzy
 msgid "Leave empty if this is your current role."
 msgstr "Loosst eidel, wann dat Äre aktuelle Posten ass."
+
+#: src/postulo/templates/jobs/company_wikidata.html
+msgid "Leave it as it is"
+msgstr ""
 
 #: src/postulo/resume/forms.py
 #, fuzzy
@@ -10255,6 +10405,10 @@ msgstr "Recht"
 #, fuzzy
 msgid "Legal notice"
 msgstr "Impressum"
+
+#: src/postulo/jobs/models.py
+msgid "legal state"
+msgstr ""
 
 #: src/postulo/core/server_forms.py
 #, fuzzy
@@ -10699,6 +10853,11 @@ msgstr "Zum Administrateur maachen"
 msgid "Make it"
 msgstr "Uleeën"
 
+#: src/postulo/accounts/addressing.py
+msgctxt "gender"
+msgid "Male"
+msgstr ""
+
 #: src/postulo/templates/settings/account.html
 #, fuzzy
 msgid "Manage"
@@ -10794,6 +10953,11 @@ msgstr "dierf et fir sech selwer ëmschalten"
 #, fuzzy
 msgid "may use it"
 msgstr "dierf et benotzen"
+
+#: src/postulo/accounts/addressing.py
+msgctxt "form of address"
+msgid "Me"
+msgstr ""
 
 #: src/postulo/jobs/share_views.py
 #, python-format
@@ -10992,6 +11156,11 @@ msgstr "Nëmme Microsoft: d’Verzeechnis, an deem d’Applikatioun registréier
 msgid "minibuses"
 msgstr "Minibussen"
 
+#: src/postulo/accounts/addressing.py
+msgctxt "form of address"
+msgid "Miss"
+msgstr ""
+
 #: src/postulo/documents/models.py
 #, fuzzy
 msgid "Missing entry"
@@ -11161,6 +11330,26 @@ msgstr "No uewe réckelen"
 msgid "Moved to %(status)s."
 msgstr "Op %(status)s gesat."
 
+#: src/postulo/accounts/addressing.py
+msgctxt "form of address"
+msgid "Mr"
+msgstr ""
+
+#: src/postulo/accounts/addressing.py
+msgctxt "form of address"
+msgid "Mrs"
+msgstr ""
+
+#: src/postulo/accounts/addressing.py
+msgctxt "form of address"
+msgid "Ms"
+msgstr ""
+
+#: src/postulo/accounts/addressing.py
+msgctxt "form of address"
+msgid "Mx"
+msgstr ""
+
 #: src/postulo/applications/models.py
 #, fuzzy
 msgid "My own choice"
@@ -11205,6 +11394,10 @@ msgstr "Numm"
 #, fuzzy
 msgid "Name of the language"
 msgstr "Numm vun der Sprooch"
+
+#: src/postulo/jobs/models.py
+msgid "Name the acquirer only for a company that was acquired."
+msgstr ""
 
 #: src/postulo/core/messaging_services.py
 #, fuzzy
@@ -11947,6 +12140,11 @@ msgstr "Keen, deen Dir notéiert hutt"
 msgid "Nobody, or the person below"
 msgstr ""
 
+#: src/postulo/accounts/addressing.py
+msgctxt "gender"
+msgid "Non-binary"
+msgstr ""
+
 #: src/postulo/jobs/industries.py
 #, fuzzy
 msgid "Non-profit"
@@ -12167,6 +12365,10 @@ msgstr "Op kengem CV gewisen, ier si averstane sinn."
 msgid "Not recorded"
 msgstr "Net notéiert"
 
+#: src/postulo/jobs/forms.py
+msgid "Not recorded here"
+msgstr ""
+
 #: src/postulo/documents/forms.py
 #, fuzzy
 msgid "Not said"
@@ -12274,6 +12476,19 @@ msgstr "Notéiert"
 #, fuzzy, python-format
 msgid "noted %(when)s"
 msgstr "notéiert %(when)s"
+
+#: src/postulo/jobs/models.py
+msgid "noted by"
+msgstr ""
+
+#: src/postulo/templates/jobs/partials/company_signals.html
+#, python-format
+msgid "Noted by <bdi>%(name)s</bdi>"
+msgstr ""
+
+#: src/postulo/templates/jobs/partials/company_signals.html
+msgid "Noted by somebody who has since left"
+msgstr ""
 
 #: src/postulo/jobs/models.py
 #, fuzzy
@@ -14651,6 +14866,11 @@ msgstr "Vum Postulo aus den eegenen Opzeechnunge vun dëser Persoun erstallt. Po
 msgid "Produced on %(produced)s"
 msgstr "Erstallt den %(produced)s"
 
+#: src/postulo/accounts/addressing.py
+msgctxt "form of address"
+msgid "Prof."
+msgstr ""
+
 #: src/postulo/resume/models.py
 #, fuzzy
 msgid "proficiency"
@@ -15092,6 +15312,20 @@ msgstr "Eng Offert notéieren"
 msgid "Record and change: applications, listings, notes, reminders, letters, your details. A call that changes a record answers with the whole record, timeline and contacts included, so this can see what it touches"
 msgstr "Notéieren an änneren: Kandidaturen, Annoncen, Notizen, Erënnerungen, Bréiwer, Är Kontaktdaten. En Opruff, deen en Andrag ännert, äntwert mam ganzen Andrag, Zäitlinn a Kontakter abegraff, sou datt dëst gesäit, wat en upaakt"
 
+#: src/postulo/templates/jobs/company_wikidata.html
+#, python-format
+msgid "Record it as acquired or merged into <bdi>%(name)s</bdi>"
+msgstr ""
+
+#: src/postulo/templates/jobs/company_wikidata.html
+msgid "Record it as dissolved"
+msgstr ""
+
+#: src/postulo/templates/jobs/company_wikidata.html
+#, python-format
+msgid "Record it as dissolved on %(date)s"
+msgstr ""
+
 #: src/postulo/templates/server/record_of_processing.html
 #, fuzzy
 msgid "Record of processing"
@@ -15118,6 +15352,10 @@ msgstr "Notéiert, wat Dir geschéckt hutt"
 #, fuzzy
 msgid "Recorded"
 msgstr "Notéiert"
+
+#: src/postulo/jobs/models.py
+msgid "recorded"
+msgstr ""
 
 #: src/postulo/plugins/forms.py
 #, fuzzy
@@ -15500,6 +15738,10 @@ msgstr "Dat eropgelueden Bild ewechhuelen"
 msgid "Remove this connection?"
 msgstr "Dës Verbindung ewechhuelen?"
 
+#: src/postulo/templates/jobs/company_form.html
+msgid "Remove this entry"
+msgstr ""
+
 #: src/postulo/templates/server/design.html
 #, fuzzy
 msgid "Remove this example?"
@@ -15867,6 +16109,10 @@ msgstr "Späicheren a weider"
 #, fuzzy
 msgid "save as I go"
 msgstr "direkt späicheren"
+
+#: src/postulo/templates/jobs/company_form.html
+msgid "Save the change"
+msgstr ""
 
 #: src/postulo/templates/jobs/company_form.html
 #, fuzzy
@@ -16500,6 +16746,10 @@ msgstr[1] ""
 msgid "Shared with %(who)s."
 msgstr ""
 
+#: src/postulo/templates/jobs/company_form.html
+msgid "Shared with everybody who can see this company. Say when it became true and where you learnt it, if you know."
+msgstr ""
+
 #: src/postulo/jobs/whose.py
 msgid "Shared with you"
 msgstr ""
@@ -16524,6 +16774,11 @@ msgstr ""
 
 #: src/postulo/templates/jobs/share.html
 msgid "Sharing"
+msgstr ""
+
+#: src/postulo/accounts/addressing.py
+msgctxt "pronouns"
+msgid "she/her"
 msgstr ""
 
 #: src/postulo/core/widgets_builtin.py
@@ -16743,6 +16998,10 @@ msgstr "Umeldung"
 msgid "Sign-in methods"
 msgstr "Umeldungsmethoden"
 
+#: src/postulo/jobs/models.py
+msgid "signal"
+msgstr ""
+
 #: src/postulo/core/mail_choices.py
 #, fuzzy
 msgid "Signed in once, as the mailbox that sends"
@@ -16777,6 +17036,10 @@ msgstr "Umeldung mat engem Token"
 #, fuzzy
 msgid "Signs in to an existing account by e-mail"
 msgstr "Mellt sech per E-Mail bei engem bestehende Kont un"
+
+#: src/postulo/jobs/models.py
+msgid "since"
+msgstr ""
 
 #: src/postulo/resume/models.py
 #, fuzzy, python-format
@@ -17038,6 +17301,7 @@ msgstr "Een huet deem zougestëmmt. Testt et fir sécher ze sinn, datt et nach g
 msgid "Somebody shares a company, a contact or a listing with you"
 msgstr ""
 
+#: src/postulo/templates/jobs/company_form.html
 #: src/postulo/templates/jobs/partials/sharing_panel.html
 msgid "somebody who has since left"
 msgstr ""
@@ -17086,7 +17350,10 @@ msgstr "No %(column)s zortéieren, déi niddregst fir d’éischt"
 msgid "source"
 msgstr "Quell"
 
-#: src/postulo/plugins/kinds.py src/postulo/templates/server/email.html
+#: src/postulo/plugins/kinds.py src/postulo/templates/jobs/company_form.html
+#: src/postulo/templates/jobs/partials/company_signals.html
+#: src/postulo/templates/jobs/partials/company_status.html
+#: src/postulo/templates/server/email.html
 #: src/postulo/templates/server/plugins.html
 #: src/postulo/templates/widgets/sources.html
 #, fuzzy
@@ -17218,12 +17485,13 @@ msgstr "status"
 
 #: src/postulo/applications/forms.py src/postulo/applications/reports.py
 #: src/postulo/applications/tables.py src/postulo/core/csv_import.py
-#: src/postulo/templates/accounts/invite_list.html
+#: src/postulo/jobs/tables.py src/postulo/templates/accounts/invite_list.html
 #: src/postulo/templates/applications/partials/bulk_fields.html
 #: src/postulo/templates/applications/partials/status_card.html
 #: src/postulo/templates/applications/report.html
 #: src/postulo/templates/applications/report_print.html
 #: src/postulo/templates/core/import_csv_map.html
+#: src/postulo/templates/jobs/company_form.html
 #, fuzzy
 msgid "Status"
 msgstr "Status"
@@ -18410,6 +18678,11 @@ msgstr "Dat huet geklappt."
 msgid "That would make a loop: %(name)s is already part of this one."
 msgstr "Dat géif eng Schlaufe ginn: %(name)s ass scho Deel vun dëser hei."
 
+#: src/postulo/jobs/models.py
+#, python-format
+msgid "That would make a loop: %(name)s was already acquired by this one."
+msgstr ""
+
 #: src/postulo/applications/views.py src/postulo/jobs/views.py
 #, fuzzy, python-format
 msgid "The %(count)d document you sent is kept, and still says where it went."
@@ -18672,6 +18945,14 @@ msgstr "D'Firma huet keng Adress, fir et drop ze setzen: setzt eng derbäi a ruf
 msgid "The company is matched by name and created if it is new. Only the company and the job title are required; everything else can be filled in later."
 msgstr "D'Firma gëtt iwwer den Numm zougeuerdent an ugeluecht, wa se nei ass. Néideg sinn nëmmen d'Firma an d'Stellenbezeechnung; alles anescht kann duerno ausgefëllt ginn."
 
+#: src/postulo/applications/forms.py
+msgid "The company is recorded as dissolved. Tick this to add the listing."
+msgstr ""
+
+#: src/postulo/jobs/models.py
+msgid "The company it became part of, if that company is recorded here."
+msgstr ""
+
 #: src/postulo/jobs/models.py
 #, fuzzy
 msgid "The company this one belongs to, if it belongs to one."
@@ -18722,6 +19003,14 @@ msgstr "D'Quellenugab, déi d'Lizenz vun de Kachele verlaangt, als einfachen Tex
 msgid "The dashboard lists open applications nothing has happened to for a while, with nothing planned. Recruiters' own advice clusters around two to three weeks."
 msgstr "Den Iwwerbléck lëscht oppe Kandidaturen op, bei deenen zanter enger Zäit näischt geschitt ass an näischt geplangt ass. D'Recruteure selwer roden zu zwou bis dräi Wochen."
 
+#: src/postulo/api/routers/companies.py src/postulo/jobs/forms.py
+msgid "The date cannot be in the future."
+msgstr ""
+
+#: src/postulo/jobs/models.py
+msgid "The date it became true, if known."
+msgstr ""
+
 #: src/postulo/documents/forms.py
 #, fuzzy
 msgid "The date on the letter, as a date. Leave it empty when you do not know."
@@ -18731,6 +19020,10 @@ msgstr "Den Datum um Bréif, als Datum. Loosst en eidel, wann Dir en net wësst.
 #, fuzzy
 msgid "The date you mean to have sent it by. It is not a reminder — set one of those if you want telling."
 msgstr "Den Datum, bis wéini Dir se geschéckt wëllt hunn. Et ass keng Erënnerung — setzt eng, wann Dir drun erënnert wëllt ginn."
+
+#: src/postulo/jobs/forms.py
+msgid "The day it was true or reported, not today's date unless it is."
+msgstr ""
 
 #: src/postulo/templates/server/plugins.html
 #, fuzzy
@@ -20091,6 +20384,11 @@ msgstr "Si ware bei engem Entretien."
 msgid "They were the main contact."
 msgstr "Si waren den Haaptkontakt."
 
+#: src/postulo/accounts/addressing.py
+msgctxt "pronouns"
+msgid "they/them"
+msgstr ""
+
 #: src/postulo/jobs/pages.py
 #, fuzzy
 msgid "This account does not keep a rendering of a page."
@@ -20221,6 +20519,11 @@ msgstr "Dës Erfaassung gouf verworf."
 msgid "This company"
 msgstr "Dës Firma"
 
+#: src/postulo/jobs/status.py
+#, python-format
+msgid "This company has been in administration since %(date)s."
+msgstr ""
+
 #: src/postulo/jobs/logos.py
 #, fuzzy
 msgid "This company has no website recorded."
@@ -20230,6 +20533,24 @@ msgstr "Fir dës Firma ass keng Websäit notéiert."
 #, fuzzy
 msgid "This company has none of its industries from the NACE list yet."
 msgstr "Dës Firma huet nach keng vun hire Branchen aus der NACE-Lëscht."
+
+#: src/postulo/jobs/status.py
+msgid "This company is recorded as being in administration."
+msgstr ""
+
+#: src/postulo/jobs/status.py
+msgid "This company is recorded as dissolved."
+msgstr ""
+
+#: src/postulo/jobs/status.py
+#, python-format
+msgid "This company was dissolved on %(date)s."
+msgstr ""
+
+#: src/postulo/jobs/status.py
+#, python-format
+msgid "This company was reported laying people off as of %(date)s."
+msgstr ""
 
 #: src/postulo/templates/resume/item_form.html
 #, fuzzy
@@ -20621,6 +20942,10 @@ msgstr "Haakt et un, soubal Dir do waart. De Rapport fir Äre Beroder zielt déi
 #, fuzzy
 msgid "Tick rows to act on several at once."
 msgstr "Kräizt Zeilen un, fir mat méi op eemol ze schaffen."
+
+#: src/postulo/applications/forms.py
+msgid "Tick the box to add the listing anyway."
+msgstr ""
 
 #: src/postulo/jobs/capture_views.py
 #, fuzzy
@@ -21722,9 +22047,8 @@ msgid "What is in the file"
 msgstr "Wat am Fichier steet"
 
 #: src/postulo/templates/help/your_name.html
-#, fuzzy
-msgid "What is kept is the text itself. If your career record changes language, a choice made from the other language's list stays what it was, and is shown as <em>Other…</em> with its text in the box."
-msgstr "Gespäichert gëtt den Text selwer. Wann Äre Karriäredossier d'Sprooch wiesselt, bleift eng Wiel aus der Lëscht vun der anerer Sprooch, wat se war, a gëtt als <em>Aner…</em> mat hirem Text am Feld gewisen."
+msgid "What is kept is the choice, not one language's word for it: <em>il</em> in French and <em>he/him</em> in English are the same choice, so your menus and your documents show it in the language they are drawn in when your career record changes language. Only what you write under <em>Other…</em> is kept as you typed it, and shown as typed in every language. A word you type there that a list already has is kept as that choice."
+msgstr ""
 
 #: src/postulo/templates/documents/cv_detail.html
 #, fuzzy
@@ -21863,6 +22187,10 @@ msgstr "Wat fir eng Zort Aarbecht et ass. D'Felder hei drënner riichte sech no 
 #, fuzzy
 msgid "what the check found"
 msgstr "wat d'Kontroll fonnt huet"
+
+#: src/postulo/jobs/forms.py
+msgid "What the company is. Shown to everybody who can see it."
+msgstr ""
 
 #: src/postulo/applications/forms.py
 #, fuzzy
@@ -22013,6 +22341,14 @@ msgstr "wat ofgemaach gouf"
 #, fuzzy
 msgid "what was asked"
 msgstr "wat gefrot gouf"
+
+#: src/postulo/templates/jobs/company_form.html
+msgid "What was reported"
+msgstr ""
+
+#: src/postulo/jobs/forms.py
+msgid "What was reported about its hiring."
+msgstr ""
 
 #: src/postulo/applications/forms.py
 #, fuzzy
@@ -22309,6 +22645,14 @@ msgstr "Wou dës Instanz e Code op en Telefon schécke kann, kann eng Nummer, d�
 msgid "Where you came across it: a job board, a referral, the company site."
 msgstr "Wou Dir drop gestouss sidd: eng Jobbörse, eng Empfeelung, d'Säit vun der Firma."
 
+#: src/postulo/jobs/models.py
+msgid "Where you learnt it: a news article, a post."
+msgstr ""
+
+#: src/postulo/jobs/models.py
+msgid "Where you learnt it: a register, an article."
+msgstr ""
+
 #: src/postulo/resume/views.py
 #, fuzzy
 msgid "where you live"
@@ -22579,10 +22923,19 @@ msgstr "Wikidata gëtt säin Numm an där Sprooch un. Ruft nach eng Kéier of, f
 msgid "Wikidata has no item with that identifier."
 msgstr "Wikidata huet keen Element mat deem Identifikateur."
 
+#: src/postulo/templates/jobs/company_wikidata.html
+#, python-format
+msgid "Wikidata names %(qid)s as its replacement; no company here carries that identifier."
+msgstr ""
+
 #: src/postulo/jobs/wikidata.py
 #, fuzzy
 msgid "Wikidata redirected too many times."
 msgstr "Wikidata huet ze dacks ëmgeleet."
+
+#: src/postulo/templates/jobs/company_wikidata.html
+msgid "Wikidata says this organisation has ended. Choose whether to record it; the legal state is shown to everybody who can see this company."
+msgstr ""
 
 #: src/postulo/jobs/wikidata.py
 #, fuzzy

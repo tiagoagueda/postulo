@@ -64,7 +64,7 @@ def test_the_word_is_the_languages_and_the_genders(code, language, feminine, wor
         (None, False),
     ],
 )
-def test_only_the_first_answer_of_the_list_asks_for_the_feminine(gender, feminine):
+def test_only_the_concept_female_and_the_words_for_it_ask_for_the_feminine(gender, feminine):
     assert demonyms.is_feminine(gender) is feminine
 
 
@@ -95,7 +95,7 @@ def holding(user, gender="", **profile):
 
 
 def test_the_menus_on_your_details_name_the_people_and_keep_the_country(client, user):
-    holding(user, gender="Féminin", record_language="fr-FR")
+    holding(user, gender="female", record_language="fr-FR")
     client.force_login(user)
 
     html = client.get(reverse("accounts:profile")).content.decode()
@@ -105,7 +105,7 @@ def test_the_menus_on_your_details_name_the_people_and_keep_the_country(client, 
 
 
 def test_a_cv_prints_the_word_in_its_language_agreeing_with_the_gender(user):
-    holding(user, gender="Feminino")
+    holding(user, gender="female")
     cv = CV.objects.create(owner=user, name="Main", language="fr", show_nationality=True)
     assert "Nationality" not in rendering.cv_text(cv), "French words, not English ones"
     assert "portugaise, brésilienne" in rendering.cv_text(cv)
@@ -114,7 +114,7 @@ def test_a_cv_prints_the_word_in_its_language_agreeing_with_the_gender(user):
     user.profile.save()
     assert "portugais, brésilien" in rendering.cv_text(cv)
 
-    user.profile.gender = "Female"
+    user.profile.gender = "female"
     user.profile.save()
     cv.language = "de"
     cv.save()

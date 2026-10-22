@@ -2,7 +2,7 @@ from django.urls import path
 
 from postulo.core import modules
 
-from . import capture_views, page_views, share_views, vcard_views, views
+from . import capture_views, page_views, share_views, status_views, vcard_views, views
 
 app_name = "jobs"
 
@@ -32,6 +32,22 @@ urlpatterns = [
         name="company_wikidata",
     ),
     path("companies/<int:pk>/names/", views.CompanyNamesView.as_view(), name="company_names"),
+    # Its dated hiring signals (#941): add one, change one, take one off.
+    path(
+        "companies/<int:pk>/signals/",
+        status_views.SignalAddView.as_view(),
+        name="company_signal_add",
+    ),
+    path(
+        "signals/<int:pk>/edit/",
+        status_views.SignalEditView.as_view(),
+        name="company_signal_edit",
+    ),
+    path(
+        "signals/<int:pk>/remove/",
+        status_views.SignalRemoveView.as_view(),
+        name="company_signal_remove",
+    ),
     path("companies/bulk/", views.CompanyBulkView.as_view(), name="company_bulk"),
     path("companies/new/", views.CompanyCreateView.as_view(), name="company_create"),
     path("companies/<int:pk>/", views.CompanyDetailView.as_view(), name="company_detail"),

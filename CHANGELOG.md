@@ -166,6 +166,7 @@ All notable changes to Postulo are recorded here. The format follows
 - On a phone the companies' map shows the Table link as its icon alone, with a "Table view" tooltip below it; the word is kept for screen readers and shown from the small breakpoint up. (#916)
 - On the companies' map, the Zoom in, Zoom out and Near me tooltips appear beside their button, towards the map, instead of over the neighbouring button; tooltips can now ask for a side (`data-tooltip-place`). (#915)
 - Your details has one help pattern: a question mark after the heading and at the top right of every section, with a tooltip and the full text in a drawer, and no helper text under any heading. (#918)
+- Form of address, pronouns and gender are stored as language-neutral concepts (`he`, `doctor_f`) and drawn in the language of the page or document; only "Other" stays free text. The profile API returns `{key, label}` for each. (#921)
 - The instructions for AI assistants moved from CLAUDE.md to AGENTS.md, which Codex, Copilot, Cursor and others read; CLAUDE.md only imports it (#939)
 - The section menu of Your details has an icon on every entry, and Your CV photo is in it. (#920)
 - A social profile is one to a service: a service another row uses is greyed out in the menu and a second one is refused, except Other and services on many servers such as Mastodon; rows that already share one are kept and flagged. (#925)
@@ -261,6 +262,7 @@ All notable changes to Postulo are recorded here. The format follows
 - The plugin surface holds companies, departments and the person's own card (read only, with the sign-in address), a holder's numbers, addresses and links as plain values, and services to update a company, make a department and a contact, and write several numbers, addresses and links; each takes an `actor`. (#328)
 - A company register number is checked against its country's check digit (France, Czechia, Norway, Finland, Estonia, Poland) and links to the register's own page (seven countries) or the EU business-register search, all offline. (#935)
 - Date pickers of Postulo's own beside every date box, and on the calendar one per view: months, a week, a day, and a range for the agenda, which now takes an end day (`until=`) (#933)
+- A company has a status: its legal state (active, in administration, acquired, dissolved) and dated hiring signals, shown by its name, in the table and on the map, and as a notice on its listings. (#941)
 - A code of conduct, the Contributor Covenant 2.1, for issues, pull requests and Weblate, with reports to the maintainer's address (#1007)
 - An accessibility statement, ACCESSIBILITY.md: WCAG 2.2 AA as the aim, how it is checked, the known limits, and how to report a barrier without an account (#1008)
 

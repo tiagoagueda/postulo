@@ -20,6 +20,7 @@ from django.urls import reverse
 from ninja import Field, Schema
 from pydantic import AfterValidator, BeforeValidator
 
+from postulo.accounts import addressing
 from postulo.accounts.models import Profile, User
 from postulo.core import personal, phones
 from postulo.core.addresses import web_address
@@ -143,6 +144,26 @@ class PostalAddressOut(Schema):
     placed_by: str = ""
 
 
+class HiringSignalOut(Schema):
+    """One dated entry about a company's hiring (#941). Shared with the company: anyone who
+    can see it sees the entry and who noted it."""
+
+    id: int
+    kind: str = Field(description="hiring, freeze or laying_off")
+    noted_on: dt.date = Field(description="The day it is as of")
+    source: str = ""
+    author: str = Field(default="", description="The username of whoever noted it, if known")
+    created_at: dt.datetime
+
+
+class HiringSignalIn(Schema):
+    kind: str = Field(description="hiring, freeze or laying_off")
+    noted_on: dt.date | None = Field(
+        default=None, description="The day it is as of; today if left out"
+    )
+    source: WebAddress = Field(default="", max_length=500)
+
+
 class CompanyOut(Schema):
     id: int
     name: str
@@ -176,6 +197,27 @@ class CompanyOut(Schema):
             "Added from an entry in the person's career, and not yet used for a posting, a "
             "contact or an application. Read-only: the career form sets it and the first "
             "use clears it"
+        ),
+    )
+    #: What the company is (#941), shared with everybody who can see it.
+    legal_state: str = Field(
+        default="active",
+        description="active, administration, acquired or dissolved",
+    )
+    legal_state_since: dt.date | None = Field(
+        default=None, description="The date the legal state became true, if known"
+    )
+    legal_state_source: str = Field(default="", description="Where it was learnt: an address")
+    acquired_by: int | None = Field(
+        default=None,
+        description="The id of the company it became part of, while it is acquired",
+    )
+    hiring_signals: list[HiringSignalOut] = Field(
+        default_factory=list,
+        description=(
+            "Its dated hiring entries, newest first. The latest is the signal; one older than "
+            "90 days is as of its date. Whether it has open listings is not stored: count "
+            "the listings that are not closed"
         ),
     )
     created_at: dt.datetime
@@ -362,6 +404,14 @@ class CompanyIn(Schema):
         description="Added to the company; a Wikidata id also matches an existing company.",
     )
     notes: str = Field(default="", max_length=BODY_MAX_CHARS, description=LONG_TEXT)
+    legal_state: str = Field(
+        default="", description="active, administration, acquired or dissolved; empty leaves it"
+    )
+    legal_state_since: dt.date | None = None
+    legal_state_source: WebAddress = Field(default="", max_length=500)
+    acquired_by: int | None = Field(
+        default=None, description="The id of a company you can see; only for acquired"
+    )
 
 
 class CompanyPatch(Schema):
@@ -386,6 +436,14 @@ class CompanyPatch(Schema):
         default=None, description="Replaces the whole list"
     )
     notes: str | None = Field(default=None, max_length=BODY_MAX_CHARS, description=LONG_TEXT)
+    legal_state: str | None = Field(
+        default=None, description="active, administration, acquired or dissolved"
+    )
+    legal_state_since: dt.date | None = None
+    legal_state_source: WebAddress | None = Field(default=None, max_length=500)
+    acquired_by: int | None = Field(
+        default=None, description="The id of a company you can see, or null; only for acquired"
+    )
 
 
 def _one_of(choices, *, allow_blank: bool):
@@ -1196,23 +1254,48 @@ def _capitals(value):
     return value.upper() if isinstance(value, str) else value
 
 
+class Addressed(Schema):
+    """A form of address, pronouns or gender, as a concept and the word for it (#921).
+
+    `key` is what is stored and is the same in every language: a concept such as `he`,
+    `doctor_f` or `non_binary`, or `other` for free text the person typed in their own words,
+    or blank when nothing is given. `label` is the word to show, in the language of the
+    career record (the language of the request when the record names none); for `other` it
+    is the text exactly as typed, in every language.
+    """
+
+    key: str = Field(description="A concept, `other` for free text, or blank for nothing given")
+    label: str = Field(description="The word for it in the record's language; free text as typed")
+
+
+def _addressed(field: str, stored: str, language: str) -> dict:
+    stored = (stored or "").strip()
+    if not stored:
+        return {"key": "", "label": ""}
+    if stored in addressing.CONCEPTS[field]:
+        return {"key": stored, "label": addressing.label(field, stored, language)}
+    return {"key": addressing.OTHER, "label": stored}
+
+
 class ProfileOut(Schema):
     """Your details: the name and the contact block a CV prints (#309)."""
 
     first_name: str
     last_name: str
-    form_of_address: str = Field(
-        default="",
+    form_of_address: Addressed = Field(
         description=(
-            "Written before the name (Mr, Mme, Eng.ª), as the text itself; blank when not "
-            "given. Printed only on a CV whose `prints.form_of_address` is true."
+            "Written before the name (Mr, Mme, Eng.ª): the concept stored (`mr`, `mrs`, `miss`, "
+            "`ms`, `mx`, `doctor`, `doctor_f`, `professor`, `professor_f`, `engineer`, "
+            "`engineer_f`, `maitre`) and its word in the record's language, or `other` and the "
+            "text as typed; blank key when not given. Printed, in the language of the CV, only "
+            "on a CV whose `prints.form_of_address` is true."
         ),
     )
-    pronouns: str = Field(
-        default="",
+    pronouns: Addressed = Field(
         description=(
-            "How to refer to the person (she/her, iel), as the text itself; blank when not "
-            "given. Printed only on a CV whose `prints.pronouns` is true."
+            "How to refer to the person: `she`, `he` or `they` with the word for it (she/her, "
+            "iel), or `other` and the text as typed; blank key when not given. Printed only on "
+            "a CV whose `prints.pronouns` is true."
         ),
     )
     birth_date: str = Field(
@@ -1249,11 +1332,11 @@ class ProfileOut(Schema):
             "answer given is stored only while there are none"
         ),
     )
-    gender: str = Field(
-        default="",
+    gender: Addressed = Field(
         description=(
-            "In the person's own words, as the text itself; blank when not given. Never worked "
-            "out from anything. Printed only on a CV whose `prints.gender` is true."
+            "`female`, `male` or `non_binary` with the word for it, or `other` and the person's "
+            "own words as typed; blank key when not given. Never worked out from anything. "
+            "Printed only on a CV whose `prints.gender` is true."
         ),
     )
     headline: str = ""
@@ -1314,11 +1397,19 @@ class ProfilePatch(Schema):
     last_name: _NameLine | None = None
     form_of_address: _AddressingLine | None = Field(
         default=None,
-        description="Any text, including one no list offers; empty clears it",
+        description=(
+            "A concept's key (`he`), or any text; empty clears it. Text that is a word of "
+            "some language's list for a concept (`Mme`, `iel`) is stored as that concept, "
+            "and any other text is stored as typed and read back as `other`"
+        ),
     )
     pronouns: _AddressingLine | None = Field(
         default=None,
-        description="Any text, including one no list offers; empty clears it",
+        description=(
+            "A concept's key (`he`), or any text; empty clears it. Text that is a word of "
+            "some language's list for a concept (`Mme`, `iel`) is stored as that concept, "
+            "and any other text is stored as typed and read back as `other`"
+        ),
     )
     birth_date: _BirthDateLine | None = Field(
         default=None,
@@ -1350,7 +1441,11 @@ class ProfilePatch(Schema):
     )
     gender: _AddressingLine | None = Field(
         default=None,
-        description="Any text, including one no list offers; empty clears it",
+        description=(
+            "A concept's key (`he`), or any text; empty clears it. Text that is a word of "
+            "some language's list for a concept (`Mme`, `iel`) is stored as that concept, "
+            "and any other text is stored as typed and read back as `other`"
+        ),
     )
     headline: _HeadlineLine | None = None
     location: _LocationLine | None = Field(
@@ -1361,11 +1456,12 @@ class ProfilePatch(Schema):
 
 def profile_out(profile) -> dict:
     user = profile.user
+    language = addressing.language_of(profile)
     return {
         "first_name": user.first_name,
         "last_name": user.last_name,
-        "form_of_address": profile.form_of_address,
-        "pronouns": profile.pronouns,
+        "form_of_address": _addressed("form_of_address", profile.form_of_address, language),
+        "pronouns": _addressed("pronouns", profile.pronouns, language),
         "birth_date": profile.birth_date,
         "birth_place": profile.birth_place,
         "birth_country": profile.birth_country,
@@ -1373,7 +1469,7 @@ def profile_out(profile) -> dict:
         # Worked out from the countries while there are any, which is what the person meant.
         "nationality_scope": personal.derived_scope(profile.nationalities)
         or profile.nationality_scope,
-        "gender": profile.gender,
+        "gender": _addressed("gender", profile.gender, language),
         "headline": profile.headline,
         "location": profile.location,
         "printed_location": printed_location(profile),
@@ -1588,6 +1684,11 @@ def company_out(company, *, detail: bool = False) -> dict:
         ],
         "notes": company.notes,
         "from_career": company.from_career,
+        "legal_state": company.legal_state,
+        "legal_state_since": company.legal_state_since,
+        "legal_state_source": company.legal_state_source,
+        "acquired_by": company.acquired_by_id,
+        "hiring_signals": [signal_out(row) for row in company.signals.all()],
         "created_at": company.created_at,
         "updated_at": company.updated_at,
     }
@@ -1595,6 +1696,17 @@ def company_out(company, *, detail: bool = False) -> dict:
         data["contacts"] = [contact_out(c) for c in company.contacts.all()]
         data["listing_ids"] = [p.pk for p in company.postings.all()]
     return data
+
+
+def signal_out(row) -> dict:
+    return {
+        "id": row.pk,
+        "kind": row.kind,
+        "noted_on": row.noted_on,
+        "source": row.source,
+        "author": row.author.get_username() if row.author_id else "",
+        "created_at": row.created_at,
+    }
 
 
 def _link_out(row) -> dict:

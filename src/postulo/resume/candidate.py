@@ -958,15 +958,19 @@ class _Planner:
                 column.run_validators(value)
                 if name == "record_language":
                     value = self._language(value)
-                if name == "gender":
-                    # A file written before #864 holds the words the list offered then.
-                    value = addressing.current_gender_word(value)
+                if name in addressing.FIELDS:
+                    # A file written before #921 holds words, and before #864 older ones:
+                    # each becomes the concept it names, else stays as typed.
+                    value = addressing.stored_value(name, value)
             except ValidationError as error:
                 section.rows.append(Row(label, REFUSED, sub=raw[:80], notes=error.messages))
                 continue
             if not value:
                 continue
             shown = languages.native_name(value, value) if name.endswith("language") else value
+            if name in addressing.FIELDS:
+                # The word the person will read in their own language, not the key (#921).
+                shown = addressing.label(name, value, addressing.language_of(self.profile))
             holder = self.user if name in NAME_FIELDS else self.profile
             mine = str(getattr(holder, name, "") or "")
             if not mine.strip():

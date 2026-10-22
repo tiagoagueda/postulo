@@ -557,15 +557,19 @@ class ListedSelect(forms.Select):
     is drawn at the wrong end. The empty choice and *Other…* are the interface's own words
     and carry nothing.
 
-    A value that is none of those is one a bound form was sent from another list (see
-    `ProfileForm._offer`). Nothing says which language it is in, so it claims none, and
-    its direction is left to its own letters.
+    The values of the options that come from the list are concepts (#921), the words shown are
+    that language's. A value that is none of those is one a bound form was sent from a list
+    in another language (see `ProfileForm._offer`). Nothing says which language it is in, so
+    it claims none, and its direction is left to its own letters.
     """
 
     def __init__(self, attrs=None, choices=(), *, listed=(), language: str = ""):
         super().__init__(attrs, choices)
         self.listed = tuple(listed)
         self.language = language
+        #: The one value, if any, a bound form was sent that no concept of the list names
+        #: (see `ProfileForm._offer`): free text, whose language nothing says.
+        self.kept = ""
 
     def create_option(self, name, value, *args, **kwargs):
         option = super().create_option(name, value, *args, **kwargs)
@@ -573,7 +577,7 @@ class ListedSelect(forms.Select):
             if self.language:
                 option["attrs"]["lang"] = self.language
                 option["attrs"]["dir"] = languages.direction(self.language)
-        elif value not in ("", addressing.OTHER):
+        elif value and value == self.kept:
             option["attrs"]["dir"] = "auto"
         return option
 
@@ -743,9 +747,9 @@ class ProfileForm(forms.ModelForm):
         # the name is written in the language the record is (#309).
         language = addressing.language_of(self.instance)
         written_in = addressing.written_in(language)
-        self._offer("form_of_address", addressing.forms_of_address(language), written_in)
-        self._offer("pronouns", addressing.pronouns(language), written_in)
-        self._offer("gender", addressing.genders(language), written_in)
+        self._offer("form_of_address", language, written_in)
+        self._offer("pronouns", language, written_in)
+        self._offer("gender", language, written_in)
         self._explain_location()
         # The formats and the size are the ones `clean_picture` refuses by (#302): read from
         # `avatars`, so the sentence under the box cannot promise what the form turns away.
@@ -890,39 +894,53 @@ class ProfileForm(forms.ModelForm):
         except ValidationError as refused:
             self.add_error("birth_year", refused)
 
-    def _offer(self, name: str, listed: tuple[str, ...], written_in: str) -> None:
-        """Fill one menu with its language's list, and start it where the stored text is.
+    def _offer(self, name: str, language: str, written_in: str) -> None:
+        """Fill one menu with its language's concepts, and start it where the stored value is.
 
-        Text that is in the list is chosen in the menu. Text that is not -- typed as Other,
-        or from a list in another language -- chooses *Other…* and is in the box beside it,
-        which the stylesheet then shows. Blank chooses the empty entry: nothing is assumed.
+        The options are concepts (#921): the value posted is the key, ``he``, and the words are
+        that language's. A stored concept is chosen in the menu, whichever language the menu
+        is drawn in, so switching the record from English to French shows *il* for ``he``
+        and nothing stored changes. Stored text that is no concept at all is what somebody
+        typed as *Other…*: it chooses *Other…* and is in the box beside it, which the
+        stylesheet then shows. A concept this language's list does not offer (``doctor_f`` in
+        English) is offered once more, as itself, in the language's word for it, so the menu
+        keeps what the profile holds. Blank chooses the empty entry: nothing is assumed.
 
         Both menus are described by the card's one sentence, which says what each is: a
         help text under each, in a column this narrow, would say it twice in a worse place.
         `DescribedByTheCardsSentence` names it. The rest -- where the lists come from, and
         that neither is printed unless a CV says so -- is the card's help (#302).
 
-        **A page that comes back keeps what it was sent.** The menu takes text from a list
-        it no longer shows, so a page drawn in French and posted after the record became
-        English may send *Mme*. Saved, that is simply the answer. Drawn again because
-        something else on the page was wrong, it used to match no option: the browser
-        showed *Not stated*, and the next save cleared a choice nobody had touched. So a
-        posted value this list does not have is offered once more, as itself, for as long
-        as the form is bound.
+        **A page that comes back keeps what it was sent.** A page drawn in French and posted
+        after the record became English may send ``mrs`` or a text; saved, that is simply the
+        answer. Drawn again because something else on the page was wrong, it must not match
+        no option and show *Not stated*, clearing a choice nobody had touched. So a posted
+        value this list does not offer is offered once more, as itself, for as long as the
+        form is bound.
         """
         widget = self.fields[name].widget
-        widget.listed = listed
-        widget.language = written_in
+        offered = addressing.offered(name, language)
+        stored = (getattr(self.instance, name, "") or "").strip()
         sent = (self.data.get(self.add_prefix(name)) or "").strip() if self.is_bound else ""
-        kept = [(sent, sent)] if sent and sent != addressing.OTHER and sent not in listed else []
+        concepts = addressing.CONCEPTS[name]
+        held_key = stored if stored in concepts else ""
+        sent_key = sent if sent in concepts else ""
+        extra = [key for key in dict.fromkeys((held_key, sent_key)) if key and key not in offered]
+        # Text that is no concept and not the Other marker: a posted value no list names.
+        unknown = sent if sent and sent != addressing.OTHER and not sent_key else ""
+        shown = written_in or language
+        widget.listed = (*offered, *extra)
+        widget.language = written_in
+        widget.kept = unknown
         widget.choices = [
             ("", _("Not stated")),
-            *((text, text) for text in listed),
-            *kept,
+            *((key, addressing.label(name, key, shown)) for key in widget.listed),
+            *([(unknown, unknown)] if unknown else []),
             (addressing.OTHER, _("Other…")),
         ]
-        stored = (getattr(self.instance, name, "") or "").strip()
-        if stored and stored not in listed:
+        if held_key:
+            self.initial[name] = held_key
+        elif stored:
             self.initial[name] = addressing.OTHER
             self.initial[f"{name}_other"] = stored
 
@@ -962,6 +980,9 @@ class ProfileForm(forms.ModelForm):
         on screen to say why. And a box that is the answer says one thing at a time: text
         that is too long is not also missing.
 
+        What is stored is the concept the menu chose (#921), or the box's text as typed unless
+        it is a word some language's list has for a concept, which then is that concept.
+
         The message names the list rather than where it is: on a phone the menu is above
         the box, not beside it (WCAG 1.3.3).
         """
@@ -978,7 +999,9 @@ class ProfileForm(forms.ModelForm):
                 chosen = typed
             else:
                 self._errors.pop(box, None)
-            cleaned[name] = chosen
+            # A word of any language the lists know is stored as the concept it names (#921);
+            # whatever else was typed is stored as it was, which is what *Other…* is.
+            cleaned[name] = addressing.stored_value(name, chosen)
         return cleaned
 
     def clean_picture(self):

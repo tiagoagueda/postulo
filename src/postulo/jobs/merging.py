@@ -54,6 +54,7 @@ from .models import (
     Contact,
     Department,
     JobPosting,
+    LegalState,
     ListingEvent,
 )
 
@@ -433,6 +434,8 @@ def plan_companies(kept, other, viewer=None) -> Plan:
             lambda row: row.name,
         ),
         _moved(_("Postal addresses"), other.postal_addresses.all(), lambda row: row.one_line()),
+        # Its dated hiring entries (#941): all of them, so the history stays whole.
+        _moved(_("Hiring signals"), other.signals.all(), str),
     ]
     plan.moves = [line for line in lines if line is not None]
     # Its social profiles (#906), the ones the kept company does not list already.
@@ -474,6 +477,21 @@ def plan_companies(kept, other, viewer=None) -> Plan:
                 str(other.get_kind_display()),
             )
         )
+    # Its legal state (#941): the kept company's own wins when it says anything but
+    # *active*; otherwise it takes the other's, and a different one is for the note.
+    if other.legal_state != LegalState.ACTIVE:
+        if kept.legal_state == LegalState.ACTIVE:
+            plan.fills.append(
+                Filled(_label(Company, "legal_state"), str(other.get_legal_state_display()))
+            )
+        elif kept.legal_state != other.legal_state:
+            plan.differences.append(
+                Difference(
+                    _label(Company, "legal_state"),
+                    str(kept.get_legal_state_display()),
+                    str(other.get_legal_state_display()),
+                )
+            )
     parent, changes = _parent_after(kept, other)
     if changes and parent is not None:
         plan.fills.append(Filled(_label(Company, "parent"), parent.name))
@@ -558,6 +576,23 @@ def merge_companies(kept, other) -> Plan:
     children.exclude(pk__in=above).update(parent=kept, updated_at=now)
 
     kept.industries.add(*other.industries.all())
+
+    # Its hiring signals (#941) move whole, and the companies it acquired were acquired by
+    # the kept one -- except the kept one itself, which cannot acquire itself.
+    other.signals.update(company=kept)
+    Company.objects.filter(acquired_by=other).exclude(pk=kept.pk).update(
+        acquired_by=kept, updated_at=now
+    )
+    if kept.acquired_by_id == other.pk:
+        kept.acquired_by = None
+    if kept.legal_state == LegalState.ACTIVE and other.legal_state != LegalState.ACTIVE:
+        kept.legal_state = other.legal_state
+        kept.legal_state_since = other.legal_state_since
+        kept.legal_state_source = other.legal_state_source
+        if other.acquired_by_id not in (None, kept.pk):
+            kept.acquired_by_id = other.acquired_by_id
+    if kept.legal_state != LegalState.ACQUIRED:
+        kept.acquired_by = None
 
     # Its names in other languages (#673): the kept company's own wins a language it has.
     other.names.exclude(language__in=kept.names.values("language")).update(company=kept)

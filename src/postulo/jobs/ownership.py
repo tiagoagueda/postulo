@@ -26,7 +26,15 @@ from django.utils.translation import gettext as _
 from postulo.core.models import MessagingHandle, PhoneNumber, PostalAddress, WebLink
 
 from . import sharing, trail
-from .models import Company, CompanyIdentifier, CompanyName, Contact, Department, Share
+from .models import (
+    Company,
+    CompanyHiringSignal,
+    CompanyIdentifier,
+    CompanyName,
+    Contact,
+    Department,
+    Share,
+)
 
 
 class MoveRefused(Exception):
@@ -124,7 +132,7 @@ def _set_owner(record, principal) -> None:
         ) from exc
     record.owner_id, record.owner_group_id = owner_id, group_id
     if isinstance(record, Company):
-        for child in (CompanyName, CompanyIdentifier, Department):
+        for child in (CompanyName, CompanyHiringSignal, CompanyIdentifier, Department):
             child.objects.filter(company=record).update(owner_id=owner_id, owner_group_id=group_id)
     held = ContentType.objects.get_for_model(type(record))
     for row_model in (PhoneNumber, PostalAddress, WebLink, MessagingHandle):

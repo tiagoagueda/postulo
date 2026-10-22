@@ -102,6 +102,20 @@ def furnished(applicant):
 
     company = Company.objects.create(owner=applicant, name="Aperture Science", location="Cambridge")
     company.industries.set(Industry.named(applicant, ["Research"]))
+    # A status on the company (#941), so its page, its table row and its form are walked with
+    # the badge, the history and the notice on them, not in the empty state alone: in
+    # administration, a fresh freeze and an old "hiring" that reads as of its date.
+    from postulo.jobs.models import CompanyHiringSignal
+
+    company.legal_state, company.legal_state_since = "administration", timezone.localdate()
+    company.save()
+    for kind, days in (("freeze", 3), ("hiring", 200)):
+        CompanyHiringSignal.objects.create(
+            company=company,
+            kind=kind,
+            noted_on=timezone.localdate() - dt.timedelta(days=days),
+            author=applicant,
+        )
     cave = Contact.objects.create(owner=applicant, company=company, name="Cave Johnson", role="CEO")
     # Handles on messaging services, on the person and on a contact, so that the new block
     # is walked with a row in it, an *Other* one included (#682).

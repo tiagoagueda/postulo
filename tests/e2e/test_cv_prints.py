@@ -56,8 +56,8 @@ def cv(applicant):
     from postulo.resume.models import Experience
 
     profile = applicant.profile
-    profile.form_of_address = "Dr"
-    profile.pronouns = "they/them"
+    profile.form_of_address = "doctor"
+    profile.pronouns = "they"
     profile.save()
     PhoneNumber.objects.create(
         owner=applicant, holder=profile, number=MOBILE, kind="mobile", is_primary=True

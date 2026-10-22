@@ -88,8 +88,9 @@ TOPICS: dict[str, Topic] = {
             title=_("Your name"),
             summary=_(
                 "A form of address is written before your name, and your pronouns say how "
-                "to refer to you. Both are optional, and nothing is assumed when they are "
-                "blank."
+                "to refer to you. Both are optional, nothing is assumed when they are "
+                "blank, and each is kept as a choice that your pages and documents show in "
+                "their own language."
             ),
             template="help/your_name.html",
         ),

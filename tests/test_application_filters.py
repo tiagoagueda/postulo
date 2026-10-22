@@ -704,7 +704,7 @@ def test_each_is_still_a_filter_the_table_knows(rf, name):
     assert ApplicationsTable(rf.get("/", {name: "x"})).filters_active
     assert not ApplicationsTable(rf.get("/", {name: " "})).filters_active
     assert ApplicationsTable.extra_params == ("q",), "the search has no control of the table's"
-    assert CompaniesTable.extra_filters == ()
+    assert [extra.name for extra in CompaniesTable.extra_filters] == ["hiring", "live"]
 
 
 @pytest.mark.parametrize(

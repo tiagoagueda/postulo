@@ -375,6 +375,28 @@ def company_logo(company, css_class: str = "size-6 text-[0.6rem]") -> str:
 
 
 @register.simple_tag
+def company_notice(company) -> str:
+    """The quiet sentence under a listing's or an application's heading when its company is
+    dissolved, in administration, or laying people off -- or nothing (#941).
+
+    A fact with its date, in the neutral words the company's status uses; it asks nothing
+    and blocks nothing. The company's own page is where the status is changed.
+    """
+    if company is None:
+        return ""
+    from postulo.jobs import status
+
+    sentence = status.warning(company)
+    if not sentence:
+        return ""
+    return format_html(
+        '<p class="mt-1 text-sm text-ink-500 dark:text-ink-400" data-company-notice'
+        ' role="note">{}</p>',
+        sentence,
+    )
+
+
+@register.simple_tag
 def plugin_logo(plugin, css_class: str = "size-6 text-[0.6rem]") -> str:
     """A plugin's logo, or an initials tile until it ships one (#106).
 

@@ -2957,6 +2957,30 @@ html {
   }
 }
 
+/* A company that is dissolved or in administration (#941): a grey pin for the first, an amber
+   one for the second; the marker's title names the state, so colour is never the only cue. */
+.map-canvas .map-pin-dissolved::after {
+  background: var(--color-ink-400);
+  border-color: white;
+  box-shadow: 0 0 0 1px var(--color-ink-600);
+
+  @variant dark {
+    background: var(--color-ink-500);
+    border-color: var(--color-ink-900);
+    box-shadow: 0 0 0 1px var(--color-ink-300);
+  }
+}
+
+.map-canvas .map-pin-administration::after {
+  background: var(--color-amber-500);
+  box-shadow: 0 0 0 1px var(--color-amber-700);
+
+  @variant dark {
+    background: var(--color-amber-400);
+    box-shadow: 0 0 0 1px var(--color-amber-300);
+  }
+}
+
 .map-canvas .map-cluster {
   display: flex;
   align-items: center;

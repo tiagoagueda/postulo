@@ -9,7 +9,16 @@ from ninja.pagination import paginate
 
 from postulo.applications.services import get_or_create_company
 from postulo.jobs import company_names, identifiers
-from postulo.jobs.models import Company, CompanyKind, Contact, Industry, JobPosting
+from postulo.jobs.models import (
+    Company,
+    CompanyHiringSignal,
+    CompanyKind,
+    Contact,
+    HiringSignalKind,
+    Industry,
+    JobPosting,
+    LegalState,
+)
 from postulo.jobs.surface import WriteRefused, create_contact
 
 from ..auth import scope
@@ -21,10 +30,16 @@ from ..schemas import (
     CompanyPatch,
     ContactIn,
     ContactOut,
+    HiringSignalIn,
+    HiringSignalOut,
     company_out,
     contact_out,
+    signal_out,
 )
-from .common import identifiers_or_422, owned, owned_or_404, writable_or_404
+from .common import choice_or_422, identifiers_or_422, owned, owned_or_404, writable_or_404
+
+#: The signals are read with their authors, so a list of companies is not a query per entry.
+SIGNALS = Prefetch("signals", queryset=CompanyHiringSignal.objects.select_related("author"))
 
 router = Router(tags=["companies"], auth=scope("read"))
 
@@ -41,7 +56,13 @@ def list_companies(
         owned(request, Company.objects)
         .with_notes(request.auth.owner)
         .prefetch_related(
-            "industries", "identifiers", "phone_numbers", "postal_addresses", "web_links", "names"
+            "industries",
+            "identifiers",
+            "phone_numbers",
+            "postal_addresses",
+            "web_links",
+            "names",
+            SIGNALS,
         )
         .order_by("name", "pk")
     )
@@ -66,7 +87,18 @@ def add_company(request, payload: CompanyIn):
         company = get_or_create_company(request.auth.owner, payload.name, wikidata=wikidata)
         changes = any(
             getattr(payload, field)
-            for field in ("website", "careers_url", "location", "kind", "email", "identifiers")
+            for field in (
+                "website",
+                "careers_url",
+                "location",
+                "kind",
+                "email",
+                "identifiers",
+                "legal_state",
+                "legal_state_since",
+                "legal_state_source",
+                "acquired_by",
+            )
         ) or bool(payload.phone_numbers or payload.postal_addresses or payload.web_links)
         changes = changes or bool(payload.industries)
         if (
@@ -87,6 +119,20 @@ def add_company(request, payload: CompanyIn):
             company.write_note(request.auth.owner, payload.notes)
         if payload.kind in CompanyKind.values:
             company.kind = payload.kind
+        _set_status(
+            request,
+            company,
+            {
+                name: getattr(payload, name)
+                for name in (
+                    "legal_state",
+                    "legal_state_since",
+                    "legal_state_source",
+                    "acquired_by",
+                )
+                if getattr(payload, name)
+            },
+        )
         company.save()
         if payload.industries:
             company.industries.add(*Industry.named(request.auth.owner, payload.industries))
@@ -101,6 +147,46 @@ def add_company(request, payload: CompanyIn):
             links=[row.dict() for row in payload.web_links],
         )
     return Status(201, company_out(_detail(request, company.pk), detail=True))
+
+
+def _set_status(request, company: Company, data: dict) -> None:
+    """The company's legal state from a payload (#941), checked as the form checks it.
+
+    The state is one of the four, the acquirer is a company the caller can see and that
+    everybody who can see this one can see too, and the model's own `clean` refuses the
+    rest (itself, a loop, an acquirer on a company that was not acquired). A refusal is a
+    422 naming the reason, and the caller's transaction undoes what came before it.
+    """
+    from django.core.exceptions import ValidationError
+
+    from postulo.jobs import sharing
+
+    if not data:
+        return
+    owner = request.auth.owner
+    if "legal_state" in data:
+        company.legal_state = choice_or_422(data["legal_state"], LegalState, field="legal_state")
+    if "legal_state_since" in data:
+        company.legal_state_since = data["legal_state_since"]
+    if "legal_state_source" in data:
+        company.legal_state_source = data["legal_state_source"] or ""
+    if "acquired_by" in data:
+        target_id = data["acquired_by"]
+        target = (
+            None
+            if target_id is None
+            else Company.objects.visible_to(owner).filter(pk=target_id).first()
+        )
+        if target_id is not None and target is None:
+            raise HttpError(422, _("acquired_by must be a company you can see."))
+        refusal = sharing.check_link(company, target, owner) if company.pk else ""
+        if refusal:
+            raise HttpError(422, str(refusal))
+        company.acquired_by = target
+    try:
+        company.clean()
+    except ValidationError as exc:
+        raise HttpError(422, "; ".join(exc.messages)) from exc
 
 
 def _write_reached(
@@ -180,6 +266,7 @@ def _detail(request, pk: int, *, write: bool = False) -> Company:
         # The caller's own notes on the company and on its people (#896), and only the
         # people and listings at it the caller can see.
         Company.objects.with_notes(owner).prefetch_related(
+            SIGNALS,
             Prefetch("contacts", queryset=Contact.objects.visible_to(owner).with_notes(owner)),
             Prefetch("postings", queryset=JobPosting.objects.visible_to(owner)),
             "industries",
@@ -225,21 +312,32 @@ def patch_company(request, pk: int, payload: CompanyPatch):
     data.pop("phone_numbers", None)
     data.pop("postal_addresses", None)
     data.pop("web_links", None)
+    # Its legal state (#941): handled together, so the state and its acquirer are checked
+    # as one thing. Null clears a date, an address or an acquirer; the state itself cannot
+    # be null.
+    status = {
+        name: data.pop(name)
+        for name in ("legal_state", "legal_state_since", "legal_state_source", "acquired_by")
+        if name in data
+    }
+    if status.get("legal_state", "") is None:
+        status.pop("legal_state")
     if data.get("name") is not None:
         data["name"] = _name_or_refusal(request, company, data["name"])
     with transaction.atomic():  # a refusal below undoes the saves above it (#435)
         for field, value in data.items():
             if value is not None:
                 setattr(company, field, value)
+        _set_status(request, company, status)
         company.save()
-        if data:
+        if data or status:
             from postulo.jobs import trail
 
             trail.record(
                 company,
                 request.auth.owner,
                 trail.EDITED,
-                fields=[name for name, value in data.items() if value is not None],
+                fields=[name for name, value in data.items() if value is not None] + list(status),
                 via=request.auth.name,
             )
         if notes is not None:
@@ -260,6 +358,69 @@ def patch_company(request, pk: int, payload: CompanyPatch):
             replace=True,
         )
     return company_out(_detail(request, pk), detail=True)
+
+
+@router.post(
+    "/{int:pk}/signals",
+    response={201: HiringSignalOut},
+    auth=scope("write"),
+    summary="Add a hiring signal to a company",
+)
+def add_signal(request, pk: int, payload: HiringSignalIn):
+    """A dated entry about what the company is doing about hiring. Shared with the company,
+    and recorded with the caller as its author."""
+    from django.utils import timezone
+
+    from postulo.jobs import status, trail
+
+    company = _detail(request, pk, write=True)
+    kind = choice_or_422(payload.kind, HiringSignalKind, field="kind")
+    day = payload.noted_on or timezone.localdate()
+    if day > timezone.localdate():
+        raise HttpError(422, _("The date cannot be in the future."))
+    with transaction.atomic():
+        row = CompanyHiringSignal.objects.create(
+            company=company,
+            kind=kind,
+            noted_on=day,
+            source=payload.source,
+            author=request.auth.owner,
+        )
+        trail.record(
+            company,
+            request.auth.owner,
+            trail.EDITED,
+            fields=["hiring_signals"],
+            via=request.auth.name,
+        )
+        status.touch(company)
+    return Status(201, signal_out(row))
+
+
+@router.delete(
+    "/{int:pk}/signals/{int:signal_id}",
+    response={204: None},
+    auth=scope("write"),
+    summary="Remove a hiring signal",
+)
+def remove_signal(request, pk: int, signal_id: int):
+    from django.shortcuts import get_object_or_404
+
+    from postulo.jobs import status, trail
+
+    company = _detail(request, pk, write=True)
+    row = get_object_or_404(CompanyHiringSignal, pk=signal_id, company=company)
+    with transaction.atomic():
+        row.delete()
+        trail.record(
+            company,
+            request.auth.owner,
+            trail.EDITED,
+            fields=["hiring_signals"],
+            via=request.auth.name,
+        )
+        status.touch(company)
+    return Status(204, None)
 
 
 @router.post(

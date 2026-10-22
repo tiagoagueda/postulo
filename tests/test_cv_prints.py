@@ -68,8 +68,8 @@ def person(user):
     user.save()
     profile = user.profile
     profile.headline = "Backend engineer"
-    profile.form_of_address = "Dr"
-    profile.pronouns = "they/them"
+    profile.form_of_address = "doctor"
+    profile.pronouns = "they"
     profile.save()
     PhoneNumber.objects.create(
         owner=user, holder=profile, number=MOBILE, kind="mobile", is_primary=True
@@ -1617,3 +1617,29 @@ def test_the_api_reads_and_writes_the_choice(client, with_handles):
     assert {one["id"] for one in prints["offered"]} == {
         one.pk for one in with_handles.profile.messaging_handles.all()
     }
+
+
+@pytest.mark.parametrize(
+    ("language", "title", "pronouns"),
+    [("en", "Dr", "they/them"), ("fr", "Dr", "iel"), ("pt-PT", "Dr.ª", "elu/delu")],
+)
+def test_the_concepts_are_printed_in_the_language_of_the_cv(person, language, title, pronouns):
+    """Stored once as `doctor_f` and `they` (#921): each document words them in its own
+    language, and the stored values do not change."""
+    person.profile.form_of_address = "doctor_f"
+    person.profile.save()
+    cv = a_cv(person, language=language, show_form_of_address=True, show_pronouns=True)
+    assert rendering.cv_text(cv).splitlines()[0] == f"{title} Alex Morgan ({pronouns})"
+    person.profile.refresh_from_db()
+    assert (person.profile.form_of_address, person.profile.pronouns) == ("doctor_f", "they")
+
+
+def test_free_text_typed_as_other_is_printed_as_typed_in_every_language(person):
+    person.profile.form_of_address = "Rev"
+    person.profile.pronouns = "xe/xem"
+    person.profile.save()
+    for language in ("en", "fr", "pt-PT"):
+        cv = a_cv(person, name=language, language=language, show_form_of_address=True)
+        cv.show_pronouns = True
+        cv.save()
+        assert rendering.cv_text(cv).splitlines()[0] == "Rev Alex Morgan (xe/xem)"

@@ -4,6 +4,7 @@
 # Since #896 a department, an identifier or an address on a company is reached through the
 # company, which the caller has already scoped: its own owner column copies the company's.
 # jobs/detach.py copies a record the caller has already decided the person loses (#896).
+# jobs/status.py stamps a company the caller has already scoped, as its signals change (#941).
 # jobs/merging.py moves everybody's rows once _same_owner has checked that everybody who saw
 # the other record sees the kept one (#896).
 api/routers/applications.py::_detail::Application
@@ -99,7 +100,6 @@ documents/scrub.py::verify_uploads::UploadedDocument
 documents/signals.py::drop_the_copies_a_removed_connection_still_owed::DocumentCopy
 documents/signals.py::forget_the_entry_a_file_proved::UploadedDocument
 documents/signals.py::forget_the_source_of_a_render::RenderedDocument
-jobs/detach.py::_copy::Company
 jobs/detach.py::_copy_parts::Company
 jobs/duplicates.py::for_company::CompanyIdentifier
 jobs/forms.py::_save_department::Department
@@ -140,6 +140,7 @@ jobs/signals.py::remove_the_files_from_disk::CapturedPage
 jobs/signals.py::remove_the_logo_from_disk::Company
 jobs/slow.py::fetch_a_capture::Errand
 jobs/slow.py::find_a_logo::Company
+jobs/status.py::touch::Company
 jobs/structure.py::departments_for::Department
 jobs/vcards.py::_make_contact::Department
 jobs/views.py::_keep::CompanyName

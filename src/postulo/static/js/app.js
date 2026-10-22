@@ -8630,9 +8630,15 @@
       markers.forEach(function (entry) {
         var point = [entry.lat, entry.lon];
         points.push(point);
+        // A company that is dissolved or in administration is drawn differently (#941), and
+        // its title says so: the colour is never the only word.
+        var pinClass = entry.company ? "map-pin" : "map-pin map-pin-person";
+        if (entry.state) {
+          pinClass += " map-pin-" + entry.state;
+        }
         L.marker(point, {
-          icon: L.divIcon({ className: entry.company ? "map-pin" : "map-pin map-pin-person", iconSize: [24, 24] }),
-          title: entry.name + (entry.what ? " · " + entry.what : ""),
+          icon: L.divIcon({ className: pinClass, iconSize: [24, 24] }),
+          title: entry.name + (entry.what ? " · " + entry.what : "") + (entry.state_label ? " · " + entry.state_label : ""),
           alt: entry.name,
           company: entry.company,
         })

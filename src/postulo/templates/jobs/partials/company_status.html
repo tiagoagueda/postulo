@@ -1,0 +1,36 @@
+{% load i18n %}
+{% comment %} What the company is and what it is doing about hiring (#941), by its name: the legal
+   state when it is not active, the latest hiring signal -- *as of* its date once it is older
+   than 90 days -- and, where nobody has reported anything current, the count of listings that
+   have not closed, drawn as derived: it is worked out here and stored nowhere. {% endcomment %}
+{% if company_status.shown %}
+  <div class="mt-2 flex flex-wrap items-center gap-2 text-sm" data-company-status>
+    {% if company_status.shows_state %}
+      <span class="badge" data-tone="{{ company_status.state_tone }}" data-legal-state="{{ company_status.state }}">
+        <span>{{ company_status.state_label }}{% if company_status.since %} · <time datetime="{{ company_status.since.isoformat }}">{{ company_status.since|date:"DATE_FORMAT" }}</time>{% endif %}</span>
+      </span>
+      {% if company_status.acquirer %}
+        <span class="text-ink-500 dark:text-ink-400">
+          {% url 'jobs:company_detail' company_status.acquirer.pk as acquirer_url %}
+          {% blocktranslate trimmed with name=company_status.acquirer.name %}
+            by <a href="{{ acquirer_url }}" class="underline"><bdi>{{ name }}</bdi></a>
+          {% endblocktranslate %}
+        </span>
+      {% endif %}
+      {% if company_status.source %}
+        <a href="{{ company_status.source }}" rel="noopener noreferrer external" target="_blank"
+           class="text-brand-600 underline dark:text-brand-400">{% translate "Source" %}</a>
+      {% endif %}
+    {% endif %}
+    {% if company_status.signal %}
+      <span class="badge" data-tone="{{ company_status.signal_tone }}" data-hiring-signal="{{ company_status.signal.kind }}"{% if company_status.stale %} data-stale{% endif %}>
+        <span>{{ company_status.signal_label }}{% if company_status.stale %} · {% blocktranslate trimmed with date=company_status.signal.noted_on|date:"DATE_FORMAT" %}as of {{ date }}{% endblocktranslate %}{% endif %}</span>
+      </span>
+    {% endif %}
+    {% if company_status.suggests_hiring %}
+      <span class="badge" data-tone="grey" data-derived-hiring title="{% translate 'Counted from the listings recorded here; nobody has reported it.' %}">
+        <span>{{ company_status.open_listings_label }}</span>
+      </span>
+    {% endif %}
+  </div>
+{% endif %}

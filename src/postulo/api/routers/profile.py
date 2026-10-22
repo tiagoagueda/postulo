@@ -13,6 +13,7 @@ from django.utils.translation import gettext as _
 from ninja import Router
 from ninja.errors import HttpError
 
+from postulo.accounts import addressing
 from postulo.accounts.models import Profile
 
 from ..auth import scope
@@ -39,9 +40,11 @@ def patch_profile(request, payload: ProfilePatch):
     A field left out is left alone. A date of birth is `1990`, `1990-03` or `1990-03-12`, a
     real date that is not in the future, and a country is a two-letter code from the list;
     either refused is a 422 naming the field. The form of address, the pronouns and the
-    gender take any text: the lists *Your details* offers are a convenience of the page, and
-    what is stored is the text either way. A first or last name may not be emptied, as on the
-    page, because a job search is conducted under one's own name.
+    gender take a concept's key (`he`, `doctor_f`, `non_binary`) or any text: text that is a
+    word of some language's list for a concept (`Mme`, `iel`) is stored as that concept, and
+    any other text is stored as typed and read back with the key `other` (#921). A first or
+    last name may not be emptied, as on the page, because a job search is conducted under
+    one's own name.
 
     Answers with the record as it now stands, as every `PATCH` here does, including one
     that changed nothing.
@@ -61,6 +64,10 @@ def patch_profile(request, payload: ProfilePatch):
     if names:
         user.save(update_fields=names)
     for name, value in data.items():
+        if name in addressing.FIELDS:
+            # A concept's key, or a word some language's list has for one, is stored as the
+            # concept; any other text is *Other*, stored as typed (#921).
+            value = addressing.stored_value(name, value)
         setattr(profile, name, value)
     # The name is on the account and `updated_at` is on the profile, and it is the profile's
     # that this call answers with: a change to the name alone moves it too, as saving the

@@ -42,7 +42,7 @@ def choose_other_and_type(page: Page, base: str) -> None:
     pronouns_other = page.locator("input[name=pronouns_other]")
     pronouns.select_option("other")
     expect(pronouns_other).to_be_visible()
-    pronouns.select_option("they/them")
+    pronouns.select_option("they")
     expect(pronouns_other).to_be_hidden()
 
     # Gender is the third of the kind (#681): the same box, shown by the same rule.
@@ -60,7 +60,7 @@ def choose_other_and_type(page: Page, base: str) -> None:
     expect(menu).to_have_value("other")
     expect(other).to_be_visible()
     expect(other).to_have_value("Rev")
-    expect(pronouns).to_have_value("they/them")
+    expect(pronouns).to_have_value("they")
     expect(pronouns_other).to_be_hidden()
     expect(gender).to_have_value("other")
     expect(gender_other).to_have_value("agender")
@@ -72,7 +72,7 @@ def test_choosing_other_shows_the_box_and_keeps_what_was_typed(page: Page, live_
 
     applicant.profile.refresh_from_db()
     assert applicant.profile.form_of_address == "Rev"
-    assert applicant.profile.pronouns == "they/them"
+    assert applicant.profile.pronouns == "they"
     assert applicant.profile.gender == "agender"
 
 
@@ -284,7 +284,7 @@ def test_a_full_stop_stays_at_the_end_on_a_page_drawn_right_to_left(
     profile = applicant.profile
     profile.language = "ar"
     profile.record_language = "pt-PT"
-    profile.form_of_address = "Prof."
+    profile.form_of_address = "professor"
     profile.pronouns = "Prof. Dr."
     profile.save()
     sign_in(page, live_server.url)
@@ -292,7 +292,7 @@ def test_a_full_stop_stays_at_the_end_on_a_page_drawn_right_to_left(
     expect(page.locator("html")).to_have_attribute("dir", "rtl")
 
     menu = page.locator("select[name=form_of_address]")
-    expect(menu).to_have_value("Prof.")
+    expect(menu).to_have_value("professor")
     assert menu.evaluate("menu => getComputedStyle(menu).direction") == "rtl", "the page's"
     assert menu.evaluate("menu => getComputedStyle(menu.selectedOptions[0]).direction") == "ltr"
     # The button says the same of the choice it shows, and its list of each option (#301).

@@ -20,12 +20,14 @@ from postulo.core.identifiers import IdentifierRow, OneOfEachKind, SchemeSelect,
 from . import company_names, employment_services, esco, identifiers, industries, logos, structure
 from .models import (
     Company,
+    CompanyHiringSignal,
     CompanyIdentifier,
     CompanyKind,
     Contact,
     Department,
     Industry,
     JobPosting,
+    LegalState,
     ListingEvent,
 )
 
@@ -157,8 +159,39 @@ class SectionedCheckboxes(forms.CheckboxSelectMultiple):
         return option
 
 
+class HiringSignalForm(forms.ModelForm):
+    """One dated entry about a company's hiring (#941): what was reported, as of when, and
+    where it was learnt. Who noted it is the signed-in person, never a field."""
+
+    class Meta:
+        model = CompanyHiringSignal
+        fields = ("kind", "noted_on", "source")
+        # ISO, which is what a date box takes: the locale's own format shows it empty.
+        widgets = {"noted_on": forms.DateInput(attrs={"type": "date"}, format="%Y-%m-%d")}
+        help_texts = {
+            "kind": _("What was reported about its hiring."),
+            "noted_on": _("The day it was true or reported, not today's date unless it is."),
+        }
+
+    def clean_noted_on(self):
+        from django.utils import timezone
+
+        day = self.cleaned_data["noted_on"]
+        if day > timezone.localdate():
+            raise forms.ValidationError(_("The date cannot be in the future."))
+        return day
+
+    def clean_source(self):
+        from postulo.core.addresses import web_address
+
+        try:
+            return web_address(self.cleaned_data.get("source", ""))
+        except ValueError as exc:
+            raise forms.ValidationError(str(exc)) from exc
+
+
 class CompanyForm(OwnNoteForm):
-    LINKS = ("parent",)
+    LINKS = ("parent", "acquired_by")
 
     """A company, and the industries it operates in: pick from your own, or type new ones.
 
@@ -263,8 +296,14 @@ class CompanyForm(OwnNoteForm):
             "email",
             "industries",
             "from_career",
+            "legal_state",
+            "legal_state_since",
+            "legal_state_source",
+            "acquired_by",
         )
+        widgets = {"legal_state_since": forms.DateInput(attrs={"type": "date"}, format="%Y-%m-%d")}
         help_texts = {
+            "legal_state": _("What the company is. Shown to everybody who can see it."),
             "kind": _(
                 "An employer is somewhere you might work; a public employment service is "
                 "the office you are registered with. A recruitment agency is an ordinary "
@@ -305,6 +344,19 @@ class CompanyForm(OwnNoteForm):
                 companies = companies.exclude(pk__in=excluded)
             self.fields["parent"].queryset = companies
             self.fields["parent"].empty_label = _("Not part of another company")
+
+        if "legal_state" in self.fields:
+            # Not required either: left out, a company stays what it is (active, if new).
+            self.fields["legal_state"].required = False
+            self.fields["legal_state"].choices = LegalState.choices
+        if "acquired_by" in self.fields:
+            # Among the companies this person can see, minus this one: an acquirer nobody
+            # the company is shared with could see is refused by `LINKS`, as a parent is.
+            candidates = Company.objects.for_user(self.user)
+            if self.instance and self.instance.pk:
+                candidates = candidates.exclude(pk=self.instance.pk)
+            self.fields["acquired_by"].queryset = candidates
+            self.fields["acquired_by"].empty_label = _("Not recorded here")
 
         if "kind" in self.fields:
             # Not required, so that a form posted without it -- an older client, a script,
@@ -366,6 +418,25 @@ class CompanyForm(OwnNoteForm):
             self.fields["logo_url"].initial = self.instance.logo_source_url
         if "remove_logo" in self.fields and not (self.instance.pk and self.instance.has_logo):
             del self.fields["remove_logo"]
+
+    def clean_legal_state(self):
+        """Left blank, a company stays as it is (active, when new): a form posted without the
+        block -- an older client, a script -- changes nothing."""
+        return (
+            self.cleaned_data.get("legal_state")
+            or (self.instance.legal_state if self.instance.pk else "")
+            or LegalState.ACTIVE
+        )
+
+    def clean_legal_state_source(self):
+        """An http or https address, as every address drawn as a link is held to (#941): the
+        field's own check also lets an ftp one through."""
+        from postulo.core.addresses import web_address
+
+        try:
+            return web_address(self.cleaned_data.get("legal_state_source", ""))
+        except ValueError as exc:
+            raise forms.ValidationError(str(exc)) from exc
 
     def clean_logo_upload(self):
         """Refuse here whatever `logos.process` would refuse later, in the same words.

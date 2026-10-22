@@ -47,6 +47,9 @@ WRITE = {
     "jobs:company_identifier_remove",
     "jobs:company_wikidata",
     "jobs:company_names",
+    "jobs:company_signal_add",
+    "jobs:company_signal_edit",
+    "jobs:company_signal_remove",
     "jobs:company_logo_action",
     "jobs:company_update",
     "jobs:posting_update",
@@ -75,7 +78,12 @@ API_READ = {
     "postulo-api:add_listing_event",
 }
 #: Adding a contact to a company changes the company's people, so it needs the write grant (#328).
-API_WRITE = {"postulo-api:patch_company", "postulo-api:add_contact"}
+API_WRITE = {
+    "postulo-api:patch_company",
+    "postulo-api:add_signal",
+    "postulo-api:remove_signal",
+    "postulo-api:add_contact",
+}
 
 
 def share_everything(owner, grantee, scope):

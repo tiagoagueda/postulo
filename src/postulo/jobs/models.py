@@ -473,6 +473,30 @@ class CompanyQuerySet(SharedQuerySet):
             .order_by("-is_primary", "created_at", "pk")
             .values("municipality")[:1]
         )
+        # Its status (#941): the listings the reader can see that have not closed, and the
+        # latest hiring signal with the date it holds for. `signal_now` is the signal only
+        # while it is fresh, so a filter never counts an entry that is no longer current.
+        annotations["open_listing_count"] = Coalesce(
+            Subquery(
+                JobPosting.objects.visible_to(user)
+                .filter(company=OuterRef("pk"))
+                .exclude(shut_condition())
+                .order_by()
+                .values(placeholder=Value(1))
+                .annotate(n=Count("*"))
+                .values("n")[:1],
+                output_field=IntegerField(),
+            ),
+            Value(0),
+            output_field=IntegerField(),
+        )
+        latest = CompanyHiringSignal.objects.filter(company=OuterRef("pk")).order_by(
+            "-noted_on", "-pk"
+        )
+        annotations["signal_kind"] = Coalesce(
+            Subquery(latest.values("kind")[:1]), Value(""), output_field=models.CharField()
+        )
+        annotations["signal_on"] = Subquery(latest.values("noted_on")[:1])
         # The columns the table has: Postulo's own schemes, as `tables.py` lists them.
         for key in identifiers.shipped():
             if key == identifiers.OTHER:
@@ -482,7 +506,14 @@ class CompanyQuerySet(SharedQuerySet):
                 .order_by("pk")
                 .values("value")[:1]
             )
-        return self.annotate(**annotations)
+        cutoff = timezone.localdate() - timedelta(days=SIGNAL_STALE_AFTER_DAYS)
+        return self.annotate(**annotations).annotate(
+            signal_now=Case(
+                When(signal_on__gte=cutoff, then=F("signal_kind")),
+                default=Value(""),
+                output_field=models.CharField(),
+            )
+        )
 
 
 class LogoSource(models.TextChoices):
@@ -512,6 +543,30 @@ class CompanyKind(models.TextChoices):
 
     EMPLOYER = "employer", _("Employer")
     EMPLOYMENT_SERVICE = "employment_service", _("Public employment service")
+
+
+class LegalState(models.TextChoices):
+    """What a company *is*, in law and in fact (#941): a fact about the company, shared with
+    everybody who can see it, and stated as neutrally as a register states it."""
+
+    ACTIVE = "active", _("Active")
+    ADMINISTRATION = "administration", _("In administration")
+    ACQUIRED = "acquired", _("Acquired or merged")
+    DISSOLVED = "dissolved", _("Dissolved")
+
+
+class HiringSignalKind(models.TextChoices):
+    """What a company is doing about hiring, as of a date (#941). Dated entries, never a
+    state: "unknown" is the absence of an entry."""
+
+    HIRING = "hiring", _("Hiring")
+    FREEZE = "freeze", _("Hiring freeze")
+    LAYING_OFF = "laying_off", _("Laying off")
+
+
+#: How many days an entry stays "current". Older, it is shown as *as of <date>*, so a
+#: "hiring" from last year does not read as true today (#941).
+SIGNAL_STALE_AFTER_DAYS = 90
 
 
 class Company(OwnNote, PrincipalOwnedModel):
@@ -548,6 +603,35 @@ class Company(OwnNote, PrincipalOwnedModel):
         related_name="children",
         verbose_name=_("part of"),
         help_text=_("The company this one belongs to, if it belongs to one."),
+    )
+    #: What the company is (#941): shared with everybody who can see it, set by hand with the
+    #: date it became true and, optionally, where it was learnt, or confirmed from Wikidata.
+    #: A column with a default, so every company recorded before it is active.
+    legal_state = models.CharField(
+        _("legal state"), max_length=20, choices=LegalState, default=LegalState.ACTIVE
+    )
+    legal_state_since = models.DateField(
+        _("since"),
+        null=True,
+        blank=True,
+        help_text=_("The date it became true, if known."),
+    )
+    legal_state_source = models.URLField(
+        _("source"),
+        blank=True,
+        max_length=500,
+        help_text=_("Where you learnt it: a register, an article."),
+    )
+    #: The company it became part of, when the state is *acquired* and that company is
+    #: recorded. Not an ownership link: `parent` is what a company belongs to today.
+    acquired_by = models.ForeignKey(
+        "self",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="acquired",
+        verbose_name=_("acquired by"),
+        help_text=_("The company it became part of, if that company is recorded here."),
     )
     website = models.URLField(_("website"), blank=True)
     careers_url = models.URLField(
@@ -727,6 +811,12 @@ class Company(OwnNote, PrincipalOwnedModel):
         return row.value if row is not None else ""
 
     @property
+    def signal_kind_label(self) -> str:
+        """The label of the latest hiring signal a table row was annotated with (#941)."""
+        kind = getattr(self, "signal_kind", "")
+        return str(HiringSignalKind(kind).label) if kind else ""
+
+    @property
     def is_employment_service(self) -> bool:
         return self.kind == CompanyKind.EMPLOYMENT_SERVICE
 
@@ -742,6 +832,7 @@ class Company(OwnNote, PrincipalOwnedModel):
         a list of subsidiaries trying to work out which one.
         """
         super().clean()
+        self._clean_acquired_by()
         if self.parent_id is None:
             return
         if self.pk and self.parent_id == self.pk:
@@ -767,6 +858,33 @@ class Company(OwnNote, PrincipalOwnedModel):
         # the new parent, this company, and the longest run beneath it (#532).
         if self.pk and depth + self._height_below() - 1 > self.MAX_DEPTH:
             raise self._too_deep()
+
+    def _clean_acquired_by(self) -> None:
+        """Refuse an acquirer that is the company itself, closes a loop, or has no state to
+        go with (#941): the same care `parent` is given, for the same reasons."""
+        if self.acquired_by_id is None:
+            return
+        if self.legal_state != LegalState.ACQUIRED:
+            raise ValidationError(
+                {"acquired_by": _("Name the acquirer only for a company that was acquired.")}
+            )
+        if self.pk and self.acquired_by_id == self.pk:
+            raise ValidationError({"acquired_by": _("A company cannot acquire itself.")})
+        seen, node = set(), self.acquired_by
+        while node is not None:
+            if self.pk and node.pk == self.pk:
+                raise ValidationError(
+                    {
+                        "acquired_by": _(
+                            "That would make a loop: %(name)s was already acquired by this one."
+                        )
+                        % {"name": self.acquired_by.name}
+                    }
+                )
+            if node.pk in seen:
+                break
+            seen.add(node.pk)
+            node = node.acquired_by
 
     def _too_deep(self) -> ValidationError:
         return ValidationError(
@@ -930,6 +1048,68 @@ class CompanyName(OwnedAsItsCompany, PrincipalOwnedModel):
 
     def __str__(self) -> str:
         return self.name
+
+
+class CompanyHiringSignal(OwnedAsItsCompany, PrincipalOwnedModel):
+    """One dated entry about what a company is doing about hiring (#941).
+
+    Append-only in spirit, as a listing's history is: "laid off in March, hiring again in
+    June" stays readable, so the page shows the entries and the latest one is the signal.
+    Shared with the company -- anyone who can see it sees the entries, and anyone with a
+    write share may add or change one -- and each says who noted it and when, so a reader
+    can weigh it. It holds no free text: a kind, a date and an address, which keeps nothing
+    a stranger wrote.
+    """
+
+    company = models.ForeignKey(
+        Company, on_delete=models.CASCADE, related_name="signals", verbose_name=_("company")
+    )
+    kind = models.CharField(_("signal"), max_length=12, choices=HiringSignalKind)
+    #: The day it was true or reported, not the day it was typed (that is `created_at`).
+    noted_on = models.DateField(_("as of"), default=timezone.localdate)
+    source = models.URLField(
+        _("source"),
+        blank=True,
+        max_length=500,
+        help_text=_("Where you learnt it: a news article, a post."),
+    )
+    #: Who noted it, while they are on the instance; `SET_NULL` so a left account leaves
+    #: the entry standing.
+    author = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="company_signals",
+        verbose_name=_("noted by"),
+    )
+    created_at = models.DateTimeField(_("recorded"), default=timezone.now)
+
+    objects = OfACompanyQuerySet.as_manager()
+
+    class Meta:
+        verbose_name = _("hiring signal")
+        verbose_name_plural = _("hiring signals")
+        ordering = ("-noted_on", "-pk")
+        indexes = [models.Index(fields=("company", "-noted_on"), name="company_signal_by_date")]
+        constraints = [PrincipalOwnedModel.one_owner("company_signal_one_owner")]
+
+    def __str__(self) -> str:
+        return f"{self.get_kind_display()} ({self.noted_on})"
+
+    def clean(self) -> None:
+        super().clean()
+        from postulo.core.addresses import web_address
+
+        try:
+            self.source = web_address(self.source)
+        except ValueError as exc:
+            raise ValidationError({"source": str(exc)}) from exc
+
+    @property
+    def is_stale(self) -> bool:
+        """Older than `SIGNAL_STALE_AFTER_DAYS`: shown as *as of <date>*."""
+        return (timezone.localdate() - self.noted_on).days > SIGNAL_STALE_AFTER_DAYS
 
 
 class CompanyIdentifier(OwnedAsItsCompany, KeepsItsScheme, PrincipalOwnedModel):
@@ -1266,6 +1446,12 @@ class DiscardReason(models.TextChoices):
 TAB_ORDER = ("undecided", ListingState.SHORTLISTED, ListingState.DISCARDED, "applied", "closed")
 
 
+def shut_condition() -> Q:
+    """A listing that has closed: marked closed, or past its closing date. What *closed*
+    means is written here once, for the tabs and for a company's open listings (#941)."""
+    return Q(closed_at__isnull=False) | Q(closes_at__lt=timezone.localdate())
+
+
 def state_condition(state: str, *, applied=None):
     """What one listing state *is*, as a condition. ``None`` for "no condition at all".
 
@@ -1282,7 +1468,7 @@ def state_condition(state: str, *, applied=None):
     """
     has_application = applied if applied is not None else Q(application_count__gt=0)
     no_application = ~Q(has_application) if applied is not None else Q(application_count=0)
-    shut = Q(closed_at__isnull=False) | Q(closes_at__lt=timezone.localdate())
+    shut = shut_condition()
     if state == "applied":
         return Q(has_application)
     if state == "closed":

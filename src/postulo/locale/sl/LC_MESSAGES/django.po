@@ -315,6 +315,15 @@ msgstr[1] "%(count)d sporočilni ročaji"
 msgstr[2] "%(count)d sporočilni ročaji"
 msgstr[3] "%(count)d sporočilni ročaji"
 
+#: src/postulo/jobs/status.py
+#, python-format
+msgid "%(count)d open listing"
+msgid_plural "%(count)d open listings"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+
 #: src/postulo/core/gdpr.py
 #, fuzzy, python-format
 msgid "%(count)d plugin row"
@@ -602,6 +611,15 @@ msgstr[0] ""
 msgstr[1] "%(counter)s vaših zapisov se deli z drugimi: vodijo kopijo, kar potrebujejo njihovi zapisi, in pravijo, da so odšli."
 msgstr[2] "%(counter)s vaših zapisov se deli z drugimi: vodijo kopijo, kar potrebujejo njihovi zapisi, in pravijo, da so odšli."
 msgstr[3] "%(counter)s vaših zapisov se deli z drugimi: vodijo kopijo, kar potrebujejo njihovi zapisi, in pravijo, da so odšli."
+
+#: src/postulo/templates/jobs/partials/company_row.html
+#, python-format
+msgid "%(counter)s open listing"
+msgid_plural "%(counter)s open listings"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
 
 #: src/postulo/templates/core/search.html
 #, fuzzy, python-format
@@ -1728,9 +1746,8 @@ msgid "<em>Kind</em> says what the number is, and can be left blank. Choose <em>
 msgstr "<em>Vrsta</em> pove, kaj je številka, in je lahko prazna. Izberite <em>Drugo</em> in polje vpraša, kako jo imenovati."
 
 #: src/postulo/templates/help/contact_block.html
-#, fuzzy
-msgid "<em>Language of your career record</em> says which language your experience, education and projects are typed in. A CV in another language shows what you have translated and says what it could not. It also decides which forms of address and pronouns the menus of <em>Your name</em> offer. Left as it is, it follows the language you read Postulo in."
-msgstr "<em>Jezik vašega kariernega zapisa</em> določa, v katerem jeziku so napisane vaše izkušnje, izobrazba in projekti. Življenjepis v drugem jeziku pokaže, kar ste prevedli, in navede, česa ni bilo mogoče. Določa tudi, katere oblike nagovora in zaimke ponujajo meniji v razdelku <em>Vaše ime</em>. Če ga pustite, kot je, sledi jeziku, v katerem berete Postulo."
+msgid "<em>Language of your career record</em> says which language your experience, education and projects are typed in. A CV in another language shows what you have translated and says what it could not. It also decides which forms of address and pronouns the menus of <em>Your name</em> offer, and in which words. Left as it is, it follows the language you read Postulo in."
+msgstr ""
 
 #: src/postulo/templates/help/contact_block.html
 #, fuzzy
@@ -1968,6 +1985,10 @@ msgid "A company"
 msgstr "Podjetje"
 
 #: src/postulo/jobs/models.py
+msgid "A company cannot acquire itself."
+msgstr ""
+
+#: src/postulo/jobs/models.py
 #, fuzzy
 msgid "A company cannot be part of itself."
 msgstr "Podjetje ne more biti del samega sebe."
@@ -2196,9 +2217,8 @@ msgid "A form of address is what is written before a name, and pronouns say how 
 msgstr "Oblika nagovora je tisto, kar se napiše pred imenom, zaimki pa povedo, kako se sklicevati na vas. Če je katero koli polje prazno, se nič ne predvideva, nobeno pa se nikoli ne izpelje iz vašega imena."
 
 #: src/postulo/core/help.py
-#, fuzzy
-msgid "A form of address is written before your name, and your pronouns say how to refer to you. Both are optional, and nothing is assumed when they are blank."
-msgstr "Oblika nagovora se napiše pred vaše ime, zaimki pa povedo, kako se sklicevati na vas. Oboje je neobvezno in če sta polji prazni, se nič ne predvideva."
+msgid "A form of address is written before your name, and your pronouns say how to refer to you. Both are optional, nothing is assumed when they are blank, and each is kept as a choice that your pages and documents show in their own language."
+msgstr ""
 
 #: src/postulo/core/views_access.py
 #, fuzzy
@@ -3040,6 +3060,18 @@ msgstr "Računi"
 msgid "Acknowledged"
 msgstr "Potrjeno"
 
+#: src/postulo/jobs/models.py
+msgid "acquired by"
+msgstr ""
+
+#: src/postulo/jobs/models.py
+msgid "Acquired or merged"
+msgstr ""
+
+#: src/postulo/api/routers/companies.py
+msgid "acquired_by must be a company you can see."
+msgstr ""
+
 #: src/postulo/templates/jobs/company_detail.html
 #, fuzzy, python-format
 msgid "Across the %(name)s group"
@@ -3068,6 +3100,10 @@ msgstr "Dejanja za %(name)s"
 #, fuzzy, python-format
 msgid "Actions for %(what)s"
 msgstr "Dejanja za %(what)s"
+
+#: src/postulo/jobs/models.py
+msgid "Active"
+msgstr ""
 
 #: src/postulo/templates/applications/application_detail.html
 #: src/postulo/templates/jobs/company_detail.html
@@ -3142,6 +3178,10 @@ msgstr "Dodaj oznako"
 msgid "Add all of this"
 msgstr "Dodaj vse to"
 
+#: src/postulo/templates/jobs/company_form.html
+msgid "Add an entry"
+msgstr ""
+
 #: src/postulo/templates/resume/item_form.html
 #, fuzzy
 msgid "Add an industry"
@@ -3157,6 +3197,10 @@ msgstr "Dodaj vnose"
 #, fuzzy
 msgid "Add entry"
 msgstr "Dodaj vnos"
+
+#: src/postulo/applications/forms.py
+msgid "Add it anyway"
+msgstr ""
 
 #: src/postulo/applications/ical_import.py
 #, fuzzy
@@ -4225,6 +4269,20 @@ msgstr "Kot je bilo zapisano: odstotek, število možnosti, pridobitev pravic."
 msgid "As it will print"
 msgstr "Kot bo natisnjeno"
 
+#: src/postulo/jobs/models.py
+msgid "as of"
+msgstr ""
+
+#: src/postulo/templates/jobs/company_form.html
+msgid "As of"
+msgstr ""
+
+#: src/postulo/templates/jobs/partials/company_row.html
+#: src/postulo/templates/jobs/partials/company_status.html
+#, python-format
+msgid "as of %(date)s"
+msgstr ""
+
 #: src/postulo/templates/documents/cv_text.html
 #, fuzzy
 msgid "As plain text"
@@ -4712,6 +4770,11 @@ msgstr "z"
 msgid "By"
 msgstr "Kdo"
 
+#: src/postulo/templates/jobs/partials/company_status.html
+#, python-format
+msgid "by <a href=\"%(acquirer_url)s\" class=\"underline\"><bdi>%(name)s</bdi></a>"
+msgstr ""
+
 #: src/postulo/templates/widgets/sources.html
 #, fuzzy
 msgid "By agency"
@@ -5069,6 +5132,7 @@ msgstr "certifikati"
 msgid "Certifications it issued"
 msgstr "Potrdila, ki jih je izdal"
 
+#: src/postulo/templates/jobs/company_form.html
 #: src/postulo/templates/settings/locale.html
 #, fuzzy
 msgid "Change"
@@ -5355,6 +5419,10 @@ msgstr "Izberite, kakšne vrste je ta identifikator."
 #, fuzzy
 msgid "Choose what it prints instead"
 msgstr "Izberite, kaj se natisne namesto tega"
+
+#: src/postulo/jobs/status_views.py
+msgid "Choose what was reported and the date."
+msgstr ""
 
 #: src/postulo/applications/views.py
 #, fuzzy
@@ -5975,6 +6043,10 @@ msgstr "Šteje se po tem, kdaj se je zgodilo, zato odgovor, ki v tem obdobju pri
 msgid "Counted by when it happened, so a reply in this period to an older application belongs here. That is a different question from what was sent, and the two are kept apart."
 msgstr "Šteje se po tem, kdaj se je zgodilo, zato odgovor, ki v tem obdobju prispe na starejšo prijavo, sodi sem. To je drugo vprašanje kot to, kaj je bilo poslano, in oba ostajata ločena."
 
+#: src/postulo/templates/jobs/partials/company_status.html
+msgid "Counted from the listings recorded here; nobody has reported it."
+msgstr ""
+
 #: src/postulo/templates/widgets/interviews_summary.html
 #, fuzzy
 msgid "Counted from the timeline, so interviews recorded before the diary existed are in."
@@ -6209,6 +6281,10 @@ msgstr "Datum rojstva"
 
 #: src/postulo/templates/help/personal_details.html
 msgid "Date of birth, place and country of birth, gender and nationalities are what an identity check asks for, and nothing a job search needs until a CV says so. Every part is optional."
+msgstr ""
+
+#: src/postulo/templates/jobs/company_form.html
+msgid "Dated entries, kept as a history and shared with everybody who can see this company. One older than 90 days is shown as of its date."
 msgstr ""
 
 #: src/postulo/applications/models.py
@@ -6714,6 +6790,10 @@ msgstr "Zavrženo. Ostane v vaši zgodovini in ga je mogoče obnoviti."
 msgid "Dismiss"
 msgstr "Opusti"
 
+#: src/postulo/jobs/models.py
+msgid "Dissolved"
+msgstr ""
+
 #: src/postulo/documents/forms.py
 #, fuzzy
 msgid "Do not send after"
@@ -6900,6 +6980,11 @@ msgstr "Prenesite te ljudi kot vCard"
 #, fuzzy
 msgid "Downloading one needs you to sign in again, and is written to the log with your name. Keep what you download as carefully as the instance itself. The key that the connection secrets are under is not in an archive: keep your <code>.env</code> somewhere else."
 msgstr "Prenašanje enega vas potrebuje, da se ponovno prijavite, in je zapisano v dnevnik s svojim imenom. Obdržite tisto, kar prenesete tako previdno kot sam primer. Ključ, pod katerim so skrivnosti povezave, ni v arhivu: imej svoj <code>.env</code> nekje drugje."
+
+#: src/postulo/accounts/addressing.py
+msgctxt "form of address"
+msgid "Dr"
+msgstr ""
 
 #: src/postulo/applications/models.py
 #, fuzzy
@@ -7278,6 +7363,11 @@ msgstr "se konča"
 msgid "Energy"
 msgstr "Energetika"
 
+#: src/postulo/accounts/addressing.py
+msgctxt "form of address"
+msgid "Eng."
+msgstr ""
+
 #: src/postulo/jobs/industries.py
 #, fuzzy
 msgid "Engineering"
@@ -7596,6 +7686,10 @@ msgstr "Primer ukaza"
 msgid "Exceptions to what this instance decides for everybody. Whatever you set here is shown to this person on their own settings page, with your name against it."
 msgstr "Izjeme od tega, kar ta strežnik odloči za vse. Kar nastavite tukaj, je tej osebi prikazano na njeni lastni strani z nastavitvami, z vašim imenom zraven."
 
+#: src/postulo/jobs/tables.py
+msgid "Exclude dissolved"
+msgstr ""
+
 #: src/postulo/documents/rendering.py src/postulo/resume/candidate.py
 #: src/postulo/resume/registry.py src/postulo/resume/views_candidate.py
 #: src/postulo/templates/resume/europass_import.html
@@ -7751,6 +7845,11 @@ msgstr "Faks"
 #, fuzzy
 msgid "Feature"
 msgstr "Funkcija"
+
+#: src/postulo/accounts/addressing.py
+msgctxt "gender"
+msgid "Female"
+msgstr ""
 
 #: src/postulo/templates/jobs/company_form.html
 #, fuzzy
@@ -8643,6 +8742,11 @@ msgstr "ima logotip"
 msgid "has an uploaded picture"
 msgstr "ima naloženo sliko"
 
+#: src/postulo/accounts/addressing.py
+msgctxt "pronouns"
+msgid "he/him"
+msgstr ""
+
 #: src/postulo/accounts/models.py src/postulo/documents/models.py
 #: src/postulo/resume/views.py
 #, fuzzy
@@ -8717,6 +8821,40 @@ msgstr "poudarki"
 #, fuzzy
 msgid "highlights for this CV"
 msgstr "poudarki za ta življenjepis"
+
+#: src/postulo/jobs/models.py src/postulo/jobs/tables.py
+#: src/postulo/templates/jobs/company_form.html
+#: src/postulo/templates/jobs/partials/company_signals.html
+msgid "Hiring"
+msgstr ""
+
+#: src/postulo/jobs/models.py
+msgid "Hiring freeze"
+msgstr ""
+
+#: src/postulo/jobs/models.py
+msgid "hiring signal"
+msgstr ""
+
+#: src/postulo/jobs/status_views.py
+msgid "Hiring signal added."
+msgstr ""
+
+#: src/postulo/jobs/status_views.py
+msgid "Hiring signal changed."
+msgstr ""
+
+#: src/postulo/jobs/status_views.py
+msgid "Hiring signal removed."
+msgstr ""
+
+#: src/postulo/jobs/merging.py
+msgid "Hiring signals"
+msgstr ""
+
+#: src/postulo/jobs/models.py
+msgid "hiring signals"
+msgstr ""
 
 #: src/postulo/templates/jobs/posting_detail.html
 #, fuzzy
@@ -9212,6 +9350,10 @@ msgstr "Čez 90 dni"
 #, fuzzy
 msgid "In a year"
 msgstr "Čez eno leto"
+
+#: src/postulo/jobs/models.py
+msgid "In administration"
+msgstr ""
 
 #: src/postulo/templates/widgets/counters.html
 #, fuzzy
@@ -9904,6 +10046,10 @@ msgstr "Njegova datoteka se ujema s tem, kar je podpisal uradni repozitorij."
 msgid "Its general mailbox, such as jobs@ or info@. A person's address goes on a contact."
 msgstr "Njegov splošni nabiralnik, kot so delovna mesta@ ali info@. Naslov osebe gre na kontakt."
 
+#: src/postulo/templates/jobs/company_wikidata.html
+msgid "Its legal state"
+msgstr ""
+
 #: src/postulo/jobs/merging.py
 #, fuzzy, python-format
 msgid "Its logo: %(name)s has one of its own, and a picture cannot be kept in a note."
@@ -10399,6 +10545,10 @@ msgstr "zemljepisna širina"
 msgid "Latitude"
 msgstr "Zemljepisna širina"
 
+#: src/postulo/jobs/models.py
+msgid "Laying off"
+msgstr ""
+
 #: src/postulo/resume/forms.py
 #, fuzzy
 msgid "Learning you took, with or without a certificate of attendance. A programme that led to a degree or diploma belongs in Education; a credential somebody can check, or that may lapse, belongs in Certifications."
@@ -10418,6 +10568,10 @@ msgstr "Pustite prazno, da ohranite že shranjeno."
 #, fuzzy
 msgid "Leave empty if this is your current role."
 msgstr "Pustite prazno, če je to vaše trenutno delovno mesto."
+
+#: src/postulo/templates/jobs/company_wikidata.html
+msgid "Leave it as it is"
+msgstr ""
 
 #: src/postulo/resume/forms.py
 #, fuzzy
@@ -10513,6 +10667,10 @@ msgstr "Pravo"
 #, fuzzy
 msgid "Legal notice"
 msgstr "Pravno obvestilo"
+
+#: src/postulo/jobs/models.py
+msgid "legal state"
+msgstr ""
 
 #: src/postulo/core/server_forms.py
 #, fuzzy
@@ -10961,6 +11119,11 @@ msgstr "Nastavi za skrbnika"
 msgid "Make it"
 msgstr "Naj ti bo"
 
+#: src/postulo/accounts/addressing.py
+msgctxt "gender"
+msgid "Male"
+msgstr ""
+
 #: src/postulo/templates/settings/account.html
 #, fuzzy
 msgid "Manage"
@@ -11056,6 +11219,11 @@ msgstr "lahko ga zamenjate zase"
 #, fuzzy
 msgid "may use it"
 msgstr "lahko ga uporabite"
+
+#: src/postulo/accounts/addressing.py
+msgctxt "form of address"
+msgid "Me"
+msgstr ""
 
 #: src/postulo/jobs/share_views.py
 #, fuzzy, python-format
@@ -11256,6 +11424,11 @@ msgstr "Samo Microsoft: imenik, v katerem je registrirana aplikacija. Pustite pr
 msgid "minibuses"
 msgstr "minibusi"
 
+#: src/postulo/accounts/addressing.py
+msgctxt "form of address"
+msgid "Miss"
+msgstr ""
+
 #: src/postulo/documents/models.py
 #, fuzzy
 msgid "Missing entry"
@@ -11425,6 +11598,26 @@ msgstr "Premakni navzgor"
 msgid "Moved to %(status)s."
 msgstr "Premaknjeno na %(status)s."
 
+#: src/postulo/accounts/addressing.py
+msgctxt "form of address"
+msgid "Mr"
+msgstr ""
+
+#: src/postulo/accounts/addressing.py
+msgctxt "form of address"
+msgid "Mrs"
+msgstr ""
+
+#: src/postulo/accounts/addressing.py
+msgctxt "form of address"
+msgid "Ms"
+msgstr ""
+
+#: src/postulo/accounts/addressing.py
+msgctxt "form of address"
+msgid "Mx"
+msgstr ""
+
 #: src/postulo/applications/models.py
 #, fuzzy
 msgid "My own choice"
@@ -11469,6 +11662,10 @@ msgstr "Ime"
 #, fuzzy
 msgid "Name of the language"
 msgstr "Ime jezika"
+
+#: src/postulo/jobs/models.py
+msgid "Name the acquirer only for a company that was acquired."
+msgstr ""
 
 #: src/postulo/core/messaging_services.py
 #, fuzzy
@@ -12218,6 +12415,11 @@ msgstr "Nihče, ki ste ga zabeležili"
 msgid "Nobody, or the person below"
 msgstr "Nihče, ali oseba spodaj"
 
+#: src/postulo/accounts/addressing.py
+msgctxt "gender"
+msgid "Non-binary"
+msgstr ""
+
 #: src/postulo/jobs/industries.py
 #, fuzzy
 msgid "Non-profit"
@@ -12438,6 +12640,10 @@ msgstr "Dokler se ne dogovorijo, ni natisnjen na nobenem življenjepisu."
 msgid "Not recorded"
 msgstr "Ni zabeleženo"
 
+#: src/postulo/jobs/forms.py
+msgid "Not recorded here"
+msgstr ""
+
 #: src/postulo/documents/forms.py
 #, fuzzy
 msgid "Not said"
@@ -12547,6 +12753,19 @@ msgstr "Zabeleženo"
 #, fuzzy, python-format
 msgid "noted %(when)s"
 msgstr "zabeleženo %(when)s"
+
+#: src/postulo/jobs/models.py
+msgid "noted by"
+msgstr ""
+
+#: src/postulo/templates/jobs/partials/company_signals.html
+#, python-format
+msgid "Noted by <bdi>%(name)s</bdi>"
+msgstr ""
+
+#: src/postulo/templates/jobs/partials/company_signals.html
+msgid "Noted by somebody who has since left"
+msgstr ""
 
 #: src/postulo/jobs/models.py
 #, fuzzy
@@ -14985,6 +15204,11 @@ msgstr "Izdelalo Postulo iz lastnih zapisov te osebe. Postulo ne postavlja noben
 msgid "Produced on %(produced)s"
 msgstr "Izdelano %(produced)s"
 
+#: src/postulo/accounts/addressing.py
+msgctxt "form of address"
+msgid "Prof."
+msgstr ""
+
 #: src/postulo/resume/models.py
 #, fuzzy
 msgid "proficiency"
@@ -15434,6 +15658,20 @@ msgstr "Zabeleži ponudbo"
 msgid "Record and change: applications, listings, notes, reminders, letters, your details. A call that changes a record answers with the whole record, timeline and contacts included, so this can see what it touches"
 msgstr "Zapis in sprememba: prijave, seznami, opombe, opomniki, pisma, vaše podrobnosti. Klic, ki spremeni zapis odgovori s celotnim zapisom, časovnico in stiki vključeni, tako da lahko vidite, kaj se dotakne"
 
+#: src/postulo/templates/jobs/company_wikidata.html
+#, python-format
+msgid "Record it as acquired or merged into <bdi>%(name)s</bdi>"
+msgstr ""
+
+#: src/postulo/templates/jobs/company_wikidata.html
+msgid "Record it as dissolved"
+msgstr ""
+
+#: src/postulo/templates/jobs/company_wikidata.html
+#, python-format
+msgid "Record it as dissolved on %(date)s"
+msgstr ""
+
 #: src/postulo/templates/server/record_of_processing.html
 #, fuzzy
 msgid "Record of processing"
@@ -15460,6 +15698,10 @@ msgstr "Zabeleži, kaj ste poslali"
 #, fuzzy
 msgid "Recorded"
 msgstr "Zabeleženo"
+
+#: src/postulo/jobs/models.py
+msgid "recorded"
+msgstr ""
 
 #: src/postulo/plugins/forms.py
 #, fuzzy
@@ -15847,6 +16089,10 @@ msgstr "Odstrani naloženo sliko"
 msgid "Remove this connection?"
 msgstr "Odstranim to povezavo?"
 
+#: src/postulo/templates/jobs/company_form.html
+msgid "Remove this entry"
+msgstr ""
+
 #: src/postulo/templates/server/design.html
 #, fuzzy
 msgid "Remove this example?"
@@ -16214,6 +16460,10 @@ msgstr "Shrani in naprej"
 #, fuzzy
 msgid "save as I go"
 msgstr "ko grem, rešim"
+
+#: src/postulo/templates/jobs/company_form.html
+msgid "Save the change"
+msgstr ""
 
 #: src/postulo/templates/jobs/company_form.html
 #, fuzzy
@@ -16864,6 +17114,10 @@ msgstr[3] "Deljeno z %(counter)s"
 msgid "Shared with %(who)s."
 msgstr "Deljeno s %(who)s."
 
+#: src/postulo/templates/jobs/company_form.html
+msgid "Shared with everybody who can see this company. Say when it became true and where you learnt it, if you know."
+msgstr ""
+
 #: src/postulo/jobs/whose.py
 #, fuzzy
 msgid "Shared with you"
@@ -16893,6 +17147,11 @@ msgstr "delnice"
 #, fuzzy
 msgid "Sharing"
 msgstr "Izmenjava"
+
+#: src/postulo/accounts/addressing.py
+msgctxt "pronouns"
+msgid "she/her"
+msgstr ""
 
 #: src/postulo/core/widgets_builtin.py
 #, fuzzy
@@ -17114,6 +17373,10 @@ msgstr "Prijava"
 msgid "Sign-in methods"
 msgstr "Načini prijave"
 
+#: src/postulo/jobs/models.py
+msgid "signal"
+msgstr ""
+
 #: src/postulo/core/mail_choices.py
 #, fuzzy
 msgid "Signed in once, as the mailbox that sends"
@@ -17148,6 +17411,10 @@ msgstr "Prijava z žetonom"
 #, fuzzy
 msgid "Signs in to an existing account by e-mail"
 msgstr "Prijava v obstoječi račun prek e-pošte"
+
+#: src/postulo/jobs/models.py
+msgid "since"
+msgstr ""
 
 #: src/postulo/resume/models.py
 #, fuzzy, python-format
@@ -17417,6 +17684,7 @@ msgstr "Nekdo je v to privolil. Preizkusite, da boste prepričani, da še velja.
 msgid "Somebody shares a company, a contact or a listing with you"
 msgstr "Nekdo z vami deli podjetje, stik ali seznam"
 
+#: src/postulo/templates/jobs/company_form.html
 #: src/postulo/templates/jobs/partials/sharing_panel.html
 #, fuzzy
 msgid "somebody who has since left"
@@ -17467,7 +17735,10 @@ msgstr "Razvrsti po %(column)s, najnižje najprej"
 msgid "source"
 msgstr "vir"
 
-#: src/postulo/plugins/kinds.py src/postulo/templates/server/email.html
+#: src/postulo/plugins/kinds.py src/postulo/templates/jobs/company_form.html
+#: src/postulo/templates/jobs/partials/company_signals.html
+#: src/postulo/templates/jobs/partials/company_status.html
+#: src/postulo/templates/server/email.html
 #: src/postulo/templates/server/plugins.html
 #: src/postulo/templates/widgets/sources.html
 #, fuzzy
@@ -17599,12 +17870,13 @@ msgstr "stanje"
 
 #: src/postulo/applications/forms.py src/postulo/applications/reports.py
 #: src/postulo/applications/tables.py src/postulo/core/csv_import.py
-#: src/postulo/templates/accounts/invite_list.html
+#: src/postulo/jobs/tables.py src/postulo/templates/accounts/invite_list.html
 #: src/postulo/templates/applications/partials/bulk_fields.html
 #: src/postulo/templates/applications/partials/status_card.html
 #: src/postulo/templates/applications/report.html
 #: src/postulo/templates/applications/report_print.html
 #: src/postulo/templates/core/import_csv_map.html
+#: src/postulo/templates/jobs/company_form.html
 #, fuzzy
 msgid "Status"
 msgstr "Stanje"
@@ -18808,6 +19080,11 @@ msgstr "To je uspelo."
 msgid "That would make a loop: %(name)s is already part of this one."
 msgstr "To bi ustvarilo zanko: %(name)s je že del tega."
 
+#: src/postulo/jobs/models.py
+#, python-format
+msgid "That would make a loop: %(name)s was already acquired by this one."
+msgstr ""
+
 #: src/postulo/applications/views.py src/postulo/jobs/views.py
 #, fuzzy, python-format
 msgid "The %(count)d document you sent is kept, and still says where it went."
@@ -19076,6 +19353,14 @@ msgstr "Podjetje nima naslova, da bi si ga nadeli: dodajte enega, in ponovno pri
 msgid "The company is matched by name and created if it is new. Only the company and the job title are required; everything else can be filled in later."
 msgstr "Podjetje se ujema po imenu in se ustvari, če je novo. Obvezna sta samo podjetje in naziv delovnega mesta; vse drugo je mogoče izpolniti pozneje."
 
+#: src/postulo/applications/forms.py
+msgid "The company is recorded as dissolved. Tick this to add the listing."
+msgstr ""
+
+#: src/postulo/jobs/models.py
+msgid "The company it became part of, if that company is recorded here."
+msgstr ""
+
 #: src/postulo/jobs/models.py
 #, fuzzy
 msgid "The company this one belongs to, if it belongs to one."
@@ -19126,6 +19411,14 @@ msgstr "Krediti, ki jih zahteva dovoljenje za ploščice, narisano na zemljevidu
 msgid "The dashboard lists open applications nothing has happened to for a while, with nothing planned. Recruiters' own advice clusters around two to three weeks."
 msgstr "Nadzorna plošča navaja odprte prijave, pri katerih se že nekaj časa ni nič zgodilo in ni nič načrtovano. Nasveti samih kadrovnikov se gibljejo okoli dveh do treh tednov."
 
+#: src/postulo/api/routers/companies.py src/postulo/jobs/forms.py
+msgid "The date cannot be in the future."
+msgstr ""
+
+#: src/postulo/jobs/models.py
+msgid "The date it became true, if known."
+msgstr ""
+
 #: src/postulo/documents/forms.py
 #, fuzzy
 msgid "The date on the letter, as a date. Leave it empty when you do not know."
@@ -19135,6 +19428,10 @@ msgstr "Datum pisma, kot datum. Pusti prazno, ko ne veš."
 #, fuzzy
 msgid "The date you mean to have sent it by. It is not a reminder — set one of those if you want telling."
 msgstr "Datum, do katerega ga nameravate poslati. Ni opomnik – nastavite ga, če želite biti obveščeni."
+
+#: src/postulo/jobs/forms.py
+msgid "The day it was true or reported, not today's date unless it is."
+msgstr ""
 
 #: src/postulo/templates/server/plugins.html
 #, fuzzy
@@ -20518,6 +20815,11 @@ msgstr "Bili so na razgovoru."
 msgid "They were the main contact."
 msgstr "Bili so glavni stik."
 
+#: src/postulo/accounts/addressing.py
+msgctxt "pronouns"
+msgid "they/them"
+msgstr ""
+
 #: src/postulo/jobs/pages.py
 #, fuzzy
 msgid "This account does not keep a rendering of a page."
@@ -20650,6 +20952,11 @@ msgstr "Ta zajem je bil zavržen."
 msgid "This company"
 msgstr "To podjetje"
 
+#: src/postulo/jobs/status.py
+#, python-format
+msgid "This company has been in administration since %(date)s."
+msgstr ""
+
 #: src/postulo/jobs/logos.py
 #, fuzzy
 msgid "This company has no website recorded."
@@ -20659,6 +20966,24 @@ msgstr "To podjetje nima zabeležene spletne strani."
 #, fuzzy
 msgid "This company has none of its industries from the NACE list yet."
 msgstr "Ta družba še nima nobene industrije s seznama NACE."
+
+#: src/postulo/jobs/status.py
+msgid "This company is recorded as being in administration."
+msgstr ""
+
+#: src/postulo/jobs/status.py
+msgid "This company is recorded as dissolved."
+msgstr ""
+
+#: src/postulo/jobs/status.py
+#, python-format
+msgid "This company was dissolved on %(date)s."
+msgstr ""
+
+#: src/postulo/jobs/status.py
+#, python-format
+msgid "This company was reported laying people off as of %(date)s."
+msgstr ""
 
 #: src/postulo/templates/resume/item_form.html
 #, fuzzy
@@ -21051,6 +21376,10 @@ msgstr "Tiktakaj, ko si že bil. Poročilo, naslovljeno na vašega svetovalca, �
 #, fuzzy
 msgid "Tick rows to act on several at once."
 msgstr "Označite vrstice, da delujete na več naenkrat."
+
+#: src/postulo/applications/forms.py
+msgid "Tick the box to add the listing anyway."
+msgstr ""
 
 #: src/postulo/jobs/capture_views.py
 #, fuzzy
@@ -22160,9 +22489,8 @@ msgid "What is in the file"
 msgstr "Kaj je v datoteki"
 
 #: src/postulo/templates/help/your_name.html
-#, fuzzy
-msgid "What is kept is the text itself. If your career record changes language, a choice made from the other language's list stays what it was, and is shown as <em>Other…</em> with its text in the box."
-msgstr "Shranjeno je besedilo samo. Če se jezik vašega kariernega zapisa spremeni, izbira iz seznama drugega jezika ostane, kar je bila, in je prikazana kot <em>Drugo…</em> z besedilom v polju."
+msgid "What is kept is the choice, not one language's word for it: <em>il</em> in French and <em>he/him</em> in English are the same choice, so your menus and your documents show it in the language they are drawn in when your career record changes language. Only what you write under <em>Other…</em> is kept as you typed it, and shown as typed in every language. A word you type there that a list already has is kept as that choice."
+msgstr ""
 
 #: src/postulo/templates/documents/cv_detail.html
 #, fuzzy
@@ -22303,6 +22631,10 @@ msgstr "Kakšno delo je to? Polja spodaj sledijo vrsti: izbira drugega kaže tis
 #, fuzzy
 msgid "what the check found"
 msgstr "kaj je preverjanje pokazalo"
+
+#: src/postulo/jobs/forms.py
+msgid "What the company is. Shown to everybody who can see it."
+msgstr ""
 
 #: src/postulo/applications/forms.py
 #, fuzzy
@@ -22454,6 +22786,14 @@ msgstr "dogovorjeno"
 #, fuzzy
 msgid "what was asked"
 msgstr "kaj je bilo vprašano"
+
+#: src/postulo/templates/jobs/company_form.html
+msgid "What was reported"
+msgstr ""
+
+#: src/postulo/jobs/forms.py
+msgid "What was reported about its hiring."
+msgstr ""
 
 #: src/postulo/applications/forms.py
 #, fuzzy
@@ -22750,6 +23090,14 @@ msgstr "Kjer ta namestitev lahko pošlje kodo na telefon, je lahko potrjena šte
 msgid "Where you came across it: a job board, a referral, the company site."
 msgstr "Kje ste nanj naleteli: zaposlitveni portal, priporočilo, spletišče podjetja."
 
+#: src/postulo/jobs/models.py
+msgid "Where you learnt it: a news article, a post."
+msgstr ""
+
+#: src/postulo/jobs/models.py
+msgid "Where you learnt it: a register, an article."
+msgstr ""
+
 #: src/postulo/resume/views.py
 #, fuzzy
 msgid "where you live"
@@ -23022,10 +23370,19 @@ msgstr "Wikidata daje svoje ime v tem jeziku. Prinesite še enkrat, da ga spreme
 msgid "Wikidata has no item with that identifier."
 msgstr "Wikidata nima postavke s tem identifikatorjem."
 
+#: src/postulo/templates/jobs/company_wikidata.html
+#, python-format
+msgid "Wikidata names %(qid)s as its replacement; no company here carries that identifier."
+msgstr ""
+
 #: src/postulo/jobs/wikidata.py
 #, fuzzy
 msgid "Wikidata redirected too many times."
 msgstr "Wikipodatki so se prevečkrat preusmerili."
+
+#: src/postulo/templates/jobs/company_wikidata.html
+msgid "Wikidata says this organisation has ended. Choose whether to record it; the legal state is shown to everybody who can see this company."
+msgstr ""
 
 #: src/postulo/jobs/wikidata.py
 #, fuzzy

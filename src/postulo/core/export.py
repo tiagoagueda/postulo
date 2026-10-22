@@ -218,7 +218,16 @@ logger = logging.getLogger(__name__)
 #: comes back as the importing person's own copy. An older archive restores as it did.
 #: 73 added ``is_primary`` on each of the profile's ``identifiers``: the one a CV prints first
 #: (#922). An older archive restores with its first identifier primary.
-FORMAT_VERSION = 73
+#: 74 wrote the profile's ``form_of_address``, ``pronouns`` and ``gender`` as language-neutral
+#: concepts (``he``, ``doctor_f``, ``non_binary``) instead of one language's words; free text
+#: typed under *Other* is written as typed. An older archive's words are read back as the
+#: concepts they name in any language, and text that names none stays as it was (#921).
+#: 75 added a company's status: ``legal_state`` (``active``, ``administration``, ``acquired``,
+#: ``dissolved``) with ``legal_state_since`` and ``legal_state_source``, ``acquired_by`` naming
+#: the company it became part of (by name, as ``parent`` is), and ``hiring_signals``: its dated
+#: entries, each a ``kind``, the day it is ``noted_on``, a ``source_url`` and who noted it. An
+#: archive without them restores every company as active, with no entries (#941).
+FORMAT_VERSION = 75
 
 
 def industry_entry(industry) -> str | dict:
@@ -291,7 +300,10 @@ def industry_entry(industry) -> str | dict:
 #: 20 added ``company`` on a course, read back as a hint, as a certification's is (#695).
 #: 21 added ``participations``, read back through the form a person would have typed one into,
 #: so a role or a type outside the lists is a refused row (#694).
-CANDIDATE_FORMAT = 21
+#: 22 wrote ``form_of_address``, ``pronouns`` and ``gender`` as concepts, as the archive does;
+#: a file's words are read back as the concepts they name, and shown as words in the language
+#: of the career record (#921).
+CANDIDATE_FORMAT = 22
 
 MANIFEST_NAME = "postulo.json"
 MEDIA_PREFIX = "media/"
@@ -404,6 +416,11 @@ COMPANY_FIELDS = (
     "careers_url",
     "email",
     "notes",
+    # What it is (#941): the legal state, the day it became true and where it was learnt.
+    # The company it was acquired by is written by name below.
+    "legal_state",
+    "legal_state_since",
+    "legal_state_source",
     # Whether only the career added it (#683): read back as written, so a former employer
     # stays out of the pickers after a restore as it was before.
     "from_career",
@@ -1117,6 +1134,7 @@ def build_document(user) -> dict:
     from postulo.jobs.models import (
         Capture,
         Company,
+        CompanyHiringSignal,
         CompanyLogo,
         Contact,
         FieldHint,
@@ -1201,10 +1219,11 @@ def build_document(user) -> dict:
             | Q(pk__in=Company.objects.filter(_pointed_at(user)).values("pk"))
         )
         .with_notes(user)
-        .select_related("parent")
+        .select_related("parent", "acquired_by")
         .prefetch_related(
             "industries",
             "identifiers",
+            Prefetch("signals", queryset=CompanyHiringSignal.objects.select_related("author")),
             Prefetch(
                 "contacts",
                 queryset=Contact.objects.visible_to(user)
@@ -1261,6 +1280,21 @@ def build_document(user) -> dict:
                 # is what the importer can resolve against companies it has just made or
                 # matched. An empty string is a company that belongs to nobody.
                 "parent": company.parent.name if company.parent_id else "",
+                # The company it was acquired by, by name for the same reason (#941).
+                "acquired_by": company.acquired_by.name if company.acquired_by_id else "",
+                # Its dated hiring entries, newest first, each with who noted it (#941). The
+                # author is a username, meaningful on this instance; another reads it as
+                # nobody unless it is the importing person.
+                "hiring_signals": [
+                    {
+                        "kind": row.kind,
+                        "noted_on": _value(row.noted_on),
+                        "source_url": row.source,
+                        "author": row.author.get_username() if row.author_id else "",
+                        "created_at": _value(row.created_at),
+                    }
+                    for row in company.signals.all()
+                ],
                 "industries": [industry_entry(industry) for industry in company.industries.all()],
                 # The teams inside this company, as records of their own. They used to
                 # travel only as a name beside a contact, which silently dropped every

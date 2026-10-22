@@ -255,6 +255,13 @@ msgid_plural "%(count)d messaging handles"
 msgstr[0] "%(count)d alcume de mensaxería"
 msgstr[1] "%(count)d alcumes de mensaxería"
 
+#: src/postulo/jobs/status.py
+#, python-format
+msgid "%(count)d open listing"
+msgid_plural "%(count)d open listings"
+msgstr[0] ""
+msgstr[1] ""
+
 #: src/postulo/core/gdpr.py
 #, python-format
 msgid "%(count)d plugin row"
@@ -478,6 +485,13 @@ msgid "%(counter)s of your records is shared with others: they keep a copy of wh
 msgid_plural "%(counter)s of your records are shared with others: they keep a copy of what their own records need, and are told they are gone."
 msgstr[0] "%(counter)s dos teus rexistros está compartido con outras persoas: conservan unha copia do que precisan os seus propios rexistros e avísaselles de que desapareceu."
 msgstr[1] "%(counter)s dos teus rexistros están compartidos con outras persoas: conservan unha copia do que precisan os seus propios rexistros e avísaselles de que desapareceron."
+
+#: src/postulo/templates/jobs/partials/company_row.html
+#, python-format
+msgid "%(counter)s open listing"
+msgid_plural "%(counter)s open listings"
+msgstr[0] ""
+msgstr[1] ""
 
 #: src/postulo/templates/core/search.html
 #, python-format
@@ -1527,8 +1541,8 @@ msgid "<em>Kind</em> says what the number is, and can be left blank. Choose <em>
 msgstr "<em>Tipo</em> indica que número é, e pódese deixar en branco. Escolle <em>Outro</em> e unha caixa pregunta como chamalo."
 
 #: src/postulo/templates/help/contact_block.html
-msgid "<em>Language of your career record</em> says which language your experience, education and projects are typed in. A CV in another language shows what you have translated and says what it could not. It also decides which forms of address and pronouns the menus of <em>Your name</em> offer. Left as it is, it follows the language you read Postulo in."
-msgstr "<em>Idioma da túa traxectoria</em> indica en que idioma escribes a túa experiencia, a túa formación e os teus proxectos. Un CV noutro idioma mostra o que traduciches e indica o que non puido traducir. Tamén decide que tratamentos e pronomes ofrecen os menús de <em>O teu nome</em>. Se o deixas como está, segue o idioma no que les o Postulo."
+msgid "<em>Language of your career record</em> says which language your experience, education and projects are typed in. A CV in another language shows what you have translated and says what it could not. It also decides which forms of address and pronouns the menus of <em>Your name</em> offer, and in which words. Left as it is, it follows the language you read Postulo in."
+msgstr ""
 
 #: src/postulo/templates/help/contact_block.html
 msgid "<em>Location</em> is where you are, as a document should print it. Left blank, your documents print the town and country of your primary postal address, never the street, and the box shows that line in grey. The blank is what is kept, so making another address the primary changes what is printed without this page being saved again. Type something and that is printed instead."
@@ -1728,6 +1742,10 @@ msgid "A company"
 msgstr "Unha empresa"
 
 #: src/postulo/jobs/models.py
+msgid "A company cannot acquire itself."
+msgstr ""
+
+#: src/postulo/jobs/models.py
 msgid "A company cannot be part of itself."
 msgstr "Unha empresa non pode formar parte de si mesma."
 
@@ -1920,8 +1938,8 @@ msgid "A form of address is what is written before a name, and pronouns say how 
 msgstr "O tratamento é o que se escribe diante dun nome, e os pronomes indican como referirse a ti. Non se supón nada cando algún está en branco, e ningún se deduce nunca do teu nome."
 
 #: src/postulo/core/help.py
-msgid "A form of address is written before your name, and your pronouns say how to refer to you. Both are optional, and nothing is assumed when they are blank."
-msgstr "O tratamento escríbese diante do teu nome, e os teus pronomes indican como referirse a ti. Ambos son opcionais, e non se dá nada por suposto cando están en branco."
+msgid "A form of address is written before your name, and your pronouns say how to refer to you. Both are optional, nothing is assumed when they are blank, and each is kept as a choice that your pages and documents show in their own language."
+msgstr ""
 
 #: src/postulo/core/views_access.py
 msgid "A group needs a name."
@@ -2615,6 +2633,18 @@ msgstr "Contas"
 msgid "Acknowledged"
 msgstr "Recepción confirmada"
 
+#: src/postulo/jobs/models.py
+msgid "acquired by"
+msgstr ""
+
+#: src/postulo/jobs/models.py
+msgid "Acquired or merged"
+msgstr ""
+
+#: src/postulo/api/routers/companies.py
+msgid "acquired_by must be a company you can see."
+msgstr ""
+
 #: src/postulo/templates/jobs/company_detail.html
 #, python-format
 msgid "Across the %(name)s group"
@@ -2641,6 +2671,10 @@ msgstr "Accións para %(name)s"
 #, python-format
 msgid "Actions for %(what)s"
 msgstr "Accións para %(what)s"
+
+#: src/postulo/jobs/models.py
+msgid "Active"
+msgstr ""
 
 #: src/postulo/templates/applications/application_detail.html
 #: src/postulo/templates/jobs/company_detail.html
@@ -2703,6 +2737,10 @@ msgstr "Engadir unha etiqueta"
 msgid "Add all of this"
 msgstr "Engadir todo isto"
 
+#: src/postulo/templates/jobs/company_form.html
+msgid "Add an entry"
+msgstr ""
+
 #: src/postulo/templates/resume/item_form.html
 msgid "Add an industry"
 msgstr "Engadir un ramo de actividade"
@@ -2715,6 +2753,10 @@ msgstr "Engadir entradas"
 #: src/postulo/templates/jobs/posting_detail.html
 msgid "Add entry"
 msgstr "Engadir unha entrada"
+
+#: src/postulo/applications/forms.py
+msgid "Add it anyway"
+msgstr ""
 
 #: src/postulo/applications/ical_import.py
 msgid "Add it as"
@@ -3596,6 +3638,20 @@ msgstr "Tal como estaba escrito: unha porcentaxe, un número de opcións, o per�
 msgid "As it will print"
 msgstr "Tal como se imprimirá"
 
+#: src/postulo/jobs/models.py
+msgid "as of"
+msgstr ""
+
+#: src/postulo/templates/jobs/company_form.html
+msgid "As of"
+msgstr ""
+
+#: src/postulo/templates/jobs/partials/company_row.html
+#: src/postulo/templates/jobs/partials/company_status.html
+#, python-format
+msgid "as of %(date)s"
+msgstr ""
+
 #: src/postulo/templates/documents/cv_text.html
 msgid "As plain text"
 msgstr "Como texto simple"
@@ -3991,6 +4047,11 @@ msgstr "por"
 msgid "By"
 msgstr "Por"
 
+#: src/postulo/templates/jobs/partials/company_status.html
+#, python-format
+msgid "by <a href=\"%(acquirer_url)s\" class=\"underline\"><bdi>%(name)s</bdi></a>"
+msgstr ""
+
 #: src/postulo/templates/widgets/sources.html
 msgid "By agency"
 msgstr "Por axencia"
@@ -4290,6 +4351,7 @@ msgstr "certificacións"
 msgid "Certifications it issued"
 msgstr "Certificacións que emitiu"
 
+#: src/postulo/templates/jobs/company_form.html
 #: src/postulo/templates/settings/locale.html
 msgid "Change"
 msgstr "Cambiar"
@@ -4526,6 +4588,10 @@ msgstr "Escolle o tipo de identificador."
 #: src/postulo/templates/documents/cv_detail.html
 msgid "Choose what it prints instead"
 msgstr "Escoller o que mostra no seu lugar"
+
+#: src/postulo/jobs/status_views.py
+msgid "Choose what was reported and the date."
+msgstr ""
 
 #: src/postulo/applications/views.py
 msgid "Choose which application this is about first."
@@ -5038,6 +5104,10 @@ msgstr "Cóntase por cando ocorreu, polo que unha resposta recibida neste perío
 msgid "Counted by when it happened, so a reply in this period to an older application belongs here. That is a different question from what was sent, and the two are kept apart."
 msgstr "Cóntase por cando ocorreu, polo que unha resposta recibida neste período a unha candidatura máis antiga pertence aquí. Esa é unha pregunta distinta de que se enviou, e as dúas mantéñense separadas."
 
+#: src/postulo/templates/jobs/partials/company_status.html
+msgid "Counted from the listings recorded here; nobody has reported it."
+msgstr ""
+
 #: src/postulo/templates/widgets/interviews_summary.html
 msgid "Counted from the timeline, so interviews recorded before the diary existed are in."
 msgstr "Cóntase desde a cronoloxía, así que entran as entrevistas rexistradas antes de que existise a axenda."
@@ -5230,6 +5300,10 @@ msgstr "Data de nacemento"
 
 #: src/postulo/templates/help/personal_details.html
 msgid "Date of birth, place and country of birth, gender and nationalities are what an identity check asks for, and nothing a job search needs until a CV says so. Every part is optional."
+msgstr ""
+
+#: src/postulo/templates/jobs/company_form.html
+msgid "Dated entries, kept as a history and shared with everybody who can see this company. One older than 90 days is shown as of its date."
 msgstr ""
 
 #: src/postulo/applications/models.py
@@ -5652,6 +5726,10 @@ msgstr "Descartada. Queda no teu historial e pódese restaurar."
 msgid "Dismiss"
 msgstr "Pechar"
 
+#: src/postulo/jobs/models.py
+msgid "Dissolved"
+msgstr ""
+
 #: src/postulo/documents/forms.py
 msgid "Do not send after"
 msgstr "Non enviar despois de"
@@ -5806,6 +5884,11 @@ msgstr "Descargar estas persoas como vCard"
 #: src/postulo/templates/server/backups.html
 msgid "Downloading one needs you to sign in again, and is written to the log with your name. Keep what you download as carefully as the instance itself. The key that the connection secrets are under is not in an archive: keep your <code>.env</code> somewhere else."
 msgstr "Para descargar unha tes que iniciar sesión de novo, e a descarga queda no rexistro co teu nome. Conserva o que descargues co mesmo coidado que a propia instancia. A chave que cifra os segredos das conexións non está en ningún arquivo: conserva o teu <code>.env</code> noutro lugar."
+
+#: src/postulo/accounts/addressing.py
+msgctxt "form of address"
+msgid "Dr"
+msgstr ""
 
 #: src/postulo/applications/models.py
 msgid "Draft"
@@ -6117,6 +6200,11 @@ msgstr "remata"
 msgid "Energy"
 msgstr "Enerxía"
 
+#: src/postulo/accounts/addressing.py
+msgctxt "form of address"
+msgid "Eng."
+msgstr ""
+
 #: src/postulo/jobs/industries.py
 msgid "Engineering"
 msgstr "Enxeñaría"
@@ -6378,6 +6466,10 @@ msgstr "Orde de exemplo"
 msgid "Exceptions to what this instance decides for everybody. Whatever you set here is shown to this person on their own settings page, with your name against it."
 msgstr "Excepcións ao que esta instancia decide para todo o mundo. O que configures aquí móstraselle a esta persoa na súa propia páxina de configuración, co teu nome ao lado."
 
+#: src/postulo/jobs/tables.py
+msgid "Exclude dissolved"
+msgstr ""
+
 #: src/postulo/documents/rendering.py src/postulo/resume/candidate.py
 #: src/postulo/resume/registry.py src/postulo/resume/views_candidate.py
 #: src/postulo/templates/resume/europass_import.html
@@ -6507,6 +6599,11 @@ msgstr "Fax"
 #: src/postulo/plugins/kinds.py
 msgid "Feature"
 msgstr "Funcionalidade"
+
+#: src/postulo/accounts/addressing.py
+msgctxt "gender"
+msgid "Female"
+msgstr ""
 
 #: src/postulo/templates/jobs/company_form.html
 msgid "Fetch from Wikidata"
@@ -7251,6 +7348,11 @@ msgstr "ten logotipo"
 msgid "has an uploaded picture"
 msgstr "ten unha imaxe cargada"
 
+#: src/postulo/accounts/addressing.py
+msgctxt "pronouns"
+msgid "he/him"
+msgstr ""
+
 #: src/postulo/accounts/models.py src/postulo/documents/models.py
 #: src/postulo/resume/views.py
 msgid "headline"
@@ -7313,6 +7415,40 @@ msgstr "destacados"
 #: src/postulo/documents/models.py
 msgid "highlights for this CV"
 msgstr "destacados para este CV"
+
+#: src/postulo/jobs/models.py src/postulo/jobs/tables.py
+#: src/postulo/templates/jobs/company_form.html
+#: src/postulo/templates/jobs/partials/company_signals.html
+msgid "Hiring"
+msgstr ""
+
+#: src/postulo/jobs/models.py
+msgid "Hiring freeze"
+msgstr ""
+
+#: src/postulo/jobs/models.py
+msgid "hiring signal"
+msgstr ""
+
+#: src/postulo/jobs/status_views.py
+msgid "Hiring signal added."
+msgstr ""
+
+#: src/postulo/jobs/status_views.py
+msgid "Hiring signal changed."
+msgstr ""
+
+#: src/postulo/jobs/status_views.py
+msgid "Hiring signal removed."
+msgstr ""
+
+#: src/postulo/jobs/merging.py
+msgid "Hiring signals"
+msgstr ""
+
+#: src/postulo/jobs/models.py
+msgid "hiring signals"
+msgstr ""
 
 #: src/postulo/templates/jobs/posting_detail.html
 msgid "History"
@@ -7714,6 +7850,10 @@ msgstr "Dentro de 90 días"
 #: src/postulo/api/forms.py
 msgid "In a year"
 msgstr "Dentro dun ano"
+
+#: src/postulo/jobs/models.py
+msgid "In administration"
+msgstr ""
 
 #: src/postulo/templates/widgets/counters.html
 msgid "In conversation"
@@ -8294,6 +8434,10 @@ msgstr "O seu ficheiro coincide co que asinou o repositorio oficial."
 msgid "Its general mailbox, such as jobs@ or info@. A person's address goes on a contact."
 msgstr "O seu correo xeral, como jobs@ ou info@. O enderezo dunha persoa vai nun contacto."
 
+#: src/postulo/templates/jobs/company_wikidata.html
+msgid "Its legal state"
+msgstr ""
+
 #: src/postulo/jobs/merging.py
 #, python-format
 msgid "Its logo: %(name)s has one of its own, and a picture cannot be kept in a note."
@@ -8703,6 +8847,10 @@ msgstr "latitude"
 msgid "Latitude"
 msgstr "Latitude"
 
+#: src/postulo/jobs/models.py
+msgid "Laying off"
+msgstr ""
+
 #: src/postulo/resume/forms.py
 msgid "Learning you took, with or without a certificate of attendance. A programme that led to a degree or diploma belongs in Education; a credential somebody can check, or that may lapse, belongs in Certifications."
 msgstr "Aprendizaxe que realizaches, con ou sen certificado de asistencia. Un programa que levou a un título ou diploma vai en Formación; unha credencial que alguén pode comprobar, ou que pode caducar, vai en Certificacións."
@@ -8718,6 +8866,10 @@ msgstr "Déixao en branco para conservar o que xa está gardado."
 #: src/postulo/resume/models.py
 msgid "Leave empty if this is your current role."
 msgstr "Déixao baleiro se é o teu posto actual."
+
+#: src/postulo/templates/jobs/company_wikidata.html
+msgid "Leave it as it is"
+msgstr ""
 
 #: src/postulo/resume/forms.py
 msgid "Leave it empty for a single day or when it has no end."
@@ -8796,6 +8948,10 @@ msgstr "Xurídico"
 #: src/postulo/templates/partials/footer_links.html
 msgid "Legal notice"
 msgstr "Aviso legal"
+
+#: src/postulo/jobs/models.py
+msgid "legal state"
+msgstr ""
 
 #: src/postulo/core/server_forms.py
 msgid "Let a capture keep a rendering of its page"
@@ -9160,6 +9316,11 @@ msgstr "Facer administrador"
 msgid "Make it"
 msgstr "Crealo"
 
+#: src/postulo/accounts/addressing.py
+msgctxt "gender"
+msgid "Male"
+msgstr ""
+
 #: src/postulo/templates/settings/account.html
 msgid "Manage"
 msgstr "Xestionar"
@@ -9236,6 +9397,11 @@ msgstr "pode activalo ou desactivalo para si"
 #: src/postulo/plugins/models.py
 msgid "may use it"
 msgstr "pode usalo"
+
+#: src/postulo/accounts/addressing.py
+msgctxt "form of address"
+msgid "Me"
+msgstr ""
 
 #: src/postulo/jobs/share_views.py
 #, python-format
@@ -9400,6 +9566,11 @@ msgstr "Só Microsoft: o directorio no que está rexistrada a aplicación. Déix
 msgid "minibuses"
 msgstr "microbuses"
 
+#: src/postulo/accounts/addressing.py
+msgctxt "form of address"
+msgid "Miss"
+msgstr ""
+
 #: src/postulo/documents/models.py
 msgid "Missing entry"
 msgstr "Falta a entrada"
@@ -9545,6 +9716,26 @@ msgstr "Mover arriba"
 msgid "Moved to %(status)s."
 msgstr "Movida a %(status)s."
 
+#: src/postulo/accounts/addressing.py
+msgctxt "form of address"
+msgid "Mr"
+msgstr ""
+
+#: src/postulo/accounts/addressing.py
+msgctxt "form of address"
+msgid "Mrs"
+msgstr ""
+
+#: src/postulo/accounts/addressing.py
+msgctxt "form of address"
+msgid "Ms"
+msgstr ""
+
+#: src/postulo/accounts/addressing.py
+msgctxt "form of address"
+msgid "Mx"
+msgstr ""
+
 #: src/postulo/applications/models.py
 msgid "My own choice"
 msgstr "Decisión propia"
@@ -9583,6 +9774,10 @@ msgstr "Nome"
 #: src/postulo/resume/forms.py
 msgid "Name of the language"
 msgstr "Nome da lingua"
+
+#: src/postulo/jobs/models.py
+msgid "Name the acquirer only for a company that was acquired."
+msgstr ""
 
 #: src/postulo/core/messaging_services.py
 msgid "Name the service this handle is on, or choose one from the list."
@@ -10197,6 +10392,11 @@ msgstr "Ninguén que teñas rexistrado"
 msgid "Nobody, or the person below"
 msgstr "Ninguén, ou a persoa de abaixo"
 
+#: src/postulo/accounts/addressing.py
+msgctxt "gender"
+msgid "Non-binary"
+msgstr ""
+
 #: src/postulo/jobs/industries.py
 msgid "Non-profit"
 msgstr "Sen ánimo de lucro"
@@ -10377,6 +10577,10 @@ msgstr "Non se mostra en ningún CV ata que dea o seu consentimento."
 msgid "Not recorded"
 msgstr "Non rexistrado"
 
+#: src/postulo/jobs/forms.py
+msgid "Not recorded here"
+msgstr ""
+
 #: src/postulo/documents/forms.py
 msgid "Not said"
 msgstr "Sen indicar"
@@ -10470,6 +10674,19 @@ msgstr "Anotada"
 #, python-format
 msgid "noted %(when)s"
 msgstr "anotada o %(when)s"
+
+#: src/postulo/jobs/models.py
+msgid "noted by"
+msgstr ""
+
+#: src/postulo/templates/jobs/partials/company_signals.html
+#, python-format
+msgid "Noted by <bdi>%(name)s</bdi>"
+msgstr ""
+
+#: src/postulo/templates/jobs/partials/company_signals.html
+msgid "Noted by somebody who has since left"
+msgstr ""
 
 #: src/postulo/jobs/models.py
 msgid "noted on"
@@ -12464,6 +12681,11 @@ msgstr "Elaborado polo Postulo a partir dos rexistros desta persoa. O Postulo no
 msgid "Produced on %(produced)s"
 msgstr "Elaborado o %(produced)s"
 
+#: src/postulo/accounts/addressing.py
+msgctxt "form of address"
+msgid "Prof."
+msgstr ""
+
 #: src/postulo/resume/models.py
 msgid "proficiency"
 msgstr "nivel"
@@ -12832,6 +13054,20 @@ msgstr "Rexistrar unha proposta"
 msgid "Record and change: applications, listings, notes, reminders, letters, your details. A call that changes a record answers with the whole record, timeline and contacts included, so this can see what it touches"
 msgstr "Rexistrar e cambiar: candidaturas, ofertas, notas, recordatorios, cartas, os teus datos. Unha chamada que cambia un rexistro responde co rexistro enteiro, incluídos a cronoloxía e os contactos, para que isto poida ver o que modifica"
 
+#: src/postulo/templates/jobs/company_wikidata.html
+#, python-format
+msgid "Record it as acquired or merged into <bdi>%(name)s</bdi>"
+msgstr ""
+
+#: src/postulo/templates/jobs/company_wikidata.html
+msgid "Record it as dissolved"
+msgstr ""
+
+#: src/postulo/templates/jobs/company_wikidata.html
+#, python-format
+msgid "Record it as dissolved on %(date)s"
+msgstr ""
+
 #: src/postulo/templates/server/record_of_processing.html
 msgid "Record of processing"
 msgstr "Rexistro das actividades de tratamento"
@@ -12853,6 +13089,10 @@ msgstr "Rexistrar o que enviaches"
 #: src/postulo/applications/tables.py
 msgid "Recorded"
 msgstr "Rexistrada"
+
+#: src/postulo/jobs/models.py
+msgid "recorded"
+msgstr ""
 
 #: src/postulo/plugins/forms.py
 msgid "Recorded against everything installed from here, so it cannot change later without orphaning what it installed."
@@ -13172,6 +13412,10 @@ msgstr "Quitar a imaxe cargada"
 msgid "Remove this connection?"
 msgstr "Queres quitar esta conexión?"
 
+#: src/postulo/templates/jobs/company_form.html
+msgid "Remove this entry"
+msgstr ""
+
 #: src/postulo/templates/server/design.html
 msgid "Remove this example?"
 msgstr "Quitar este exemplo?"
@@ -13481,6 +13725,10 @@ msgstr "Gardar e seguinte"
 #: src/postulo/accounts/models.py
 msgid "save as I go"
 msgstr "gardar sobre a marcha"
+
+#: src/postulo/templates/jobs/company_form.html
+msgid "Save the change"
+msgstr ""
 
 #: src/postulo/templates/jobs/company_form.html
 msgid "Save the company to add another identifier."
@@ -14021,6 +14269,10 @@ msgstr[1] "Compartido con %(counter)s"
 msgid "Shared with %(who)s."
 msgstr "Compartido con %(who)s."
 
+#: src/postulo/templates/jobs/company_form.html
+msgid "Shared with everybody who can see this company. Say when it became true and where you learnt it, if you know."
+msgstr ""
+
 #: src/postulo/jobs/whose.py
 msgid "Shared with you"
 msgstr "Compartido contigo"
@@ -14046,6 +14298,11 @@ msgstr "comparticións"
 #: src/postulo/templates/jobs/share.html
 msgid "Sharing"
 msgstr "Compartición"
+
+#: src/postulo/accounts/addressing.py
+msgctxt "pronouns"
+msgid "she/her"
+msgstr ""
 
 #: src/postulo/core/widgets_builtin.py
 msgid "Shortcuts"
@@ -14228,6 +14485,10 @@ msgstr "Inicio de sesión"
 msgid "Sign-in methods"
 msgstr "Métodos de inicio de sesión"
 
+#: src/postulo/jobs/models.py
+msgid "signal"
+msgstr ""
+
 #: src/postulo/core/mail_choices.py
 msgid "Signed in once, as the mailbox that sends"
 msgstr "Coa sesión iniciada unha vez, como a caixa de correo que envía"
@@ -14255,6 +14516,10 @@ msgstr "Inicio de sesión cun testemuño"
 #: src/postulo/templates/server/signin.html
 msgid "Signs in to an existing account by e-mail"
 msgstr "Inicia sesión nunha conta existente por correo electrónico"
+
+#: src/postulo/jobs/models.py
+msgid "since"
+msgstr ""
 
 #: src/postulo/resume/models.py
 #, python-format
@@ -14481,6 +14746,7 @@ msgstr "Alguén xa o aceptou. Próbao para asegurarte de que segue vixente."
 msgid "Somebody shares a company, a contact or a listing with you"
 msgstr "Alguén comparte contigo unha empresa, un contacto ou un anuncio"
 
+#: src/postulo/templates/jobs/company_form.html
 #: src/postulo/templates/jobs/partials/sharing_panel.html
 msgid "somebody who has since left"
 msgstr "alguén que xa saíu"
@@ -14523,7 +14789,10 @@ msgstr "Ordenar por %(column)s, de menor a maior"
 msgid "source"
 msgstr "fonte"
 
-#: src/postulo/plugins/kinds.py src/postulo/templates/server/email.html
+#: src/postulo/plugins/kinds.py src/postulo/templates/jobs/company_form.html
+#: src/postulo/templates/jobs/partials/company_signals.html
+#: src/postulo/templates/jobs/partials/company_status.html
+#: src/postulo/templates/server/email.html
 #: src/postulo/templates/server/plugins.html
 #: src/postulo/templates/widgets/sources.html
 msgid "Source"
@@ -14632,12 +14901,13 @@ msgstr "estado"
 
 #: src/postulo/applications/forms.py src/postulo/applications/reports.py
 #: src/postulo/applications/tables.py src/postulo/core/csv_import.py
-#: src/postulo/templates/accounts/invite_list.html
+#: src/postulo/jobs/tables.py src/postulo/templates/accounts/invite_list.html
 #: src/postulo/templates/applications/partials/bulk_fields.html
 #: src/postulo/templates/applications/partials/status_card.html
 #: src/postulo/templates/applications/report.html
 #: src/postulo/templates/applications/report_print.html
 #: src/postulo/templates/core/import_csv_map.html
+#: src/postulo/templates/jobs/company_form.html
 msgid "Status"
 msgstr "Estado"
 
@@ -15655,6 +15925,11 @@ msgstr "Iso funcionou."
 msgid "That would make a loop: %(name)s is already part of this one."
 msgstr "Iso faría un bucle: %(name)s xa forma parte desta."
 
+#: src/postulo/jobs/models.py
+#, python-format
+msgid "That would make a loop: %(name)s was already acquired by this one."
+msgstr ""
+
 #: src/postulo/applications/views.py src/postulo/jobs/views.py
 #, python-format
 msgid "The %(count)d document you sent is kept, and still says where it went."
@@ -15879,6 +16154,14 @@ msgstr "A empresa non ten ningún enderezo onde poñelo: engade un e obtén os d
 msgid "The company is matched by name and created if it is new. Only the company and the job title are required; everything else can be filled in later."
 msgstr "A empresa identifícase polo nome e créase se é nova. Só son obrigatorios a empresa e o cargo; todo o demais pódese encher máis tarde."
 
+#: src/postulo/applications/forms.py
+msgid "The company is recorded as dissolved. Tick this to add the listing."
+msgstr ""
+
+#: src/postulo/jobs/models.py
+msgid "The company it became part of, if that company is recorded here."
+msgstr ""
+
 #: src/postulo/jobs/models.py
 msgid "The company this one belongs to, if it belongs to one."
 msgstr "A empresa á que pertence esta, se pertence a algunha."
@@ -15919,6 +16202,14 @@ msgstr "A atribución que pide a licenza das teselas, escrita no mapa como texto
 msgid "The dashboard lists open applications nothing has happened to for a while, with nothing planned. Recruiters' own advice clusters around two to three weeks."
 msgstr "O panel lista as candidaturas abertas nas que hai tempo que non pasa nada e sen nada previsto. Os consellos dos propios recrutadores concéntranse entre dúas e tres semanas."
 
+#: src/postulo/api/routers/companies.py src/postulo/jobs/forms.py
+msgid "The date cannot be in the future."
+msgstr ""
+
+#: src/postulo/jobs/models.py
+msgid "The date it became true, if known."
+msgstr ""
+
 #: src/postulo/documents/forms.py
 msgid "The date on the letter, as a date. Leave it empty when you do not know."
 msgstr "A data da carta, como data. Déixaa baleira se non a sabes."
@@ -15926,6 +16217,10 @@ msgstr "A data da carta, como data. Déixaa baleira se non a sabes."
 #: src/postulo/applications/forms.py
 msgid "The date you mean to have sent it by. It is not a reminder — set one of those if you want telling."
 msgstr "A data na que queres tela enviada. Non é un recordatorio — crea un se queres que se che avise."
+
+#: src/postulo/jobs/forms.py
+msgid "The day it was true or reported, not today's date unless it is."
+msgstr ""
 
 #: src/postulo/templates/server/plugins.html
 msgid "The default for every account. One person's exceptions are on their row under People. Switching a plugin off stops it being used and deletes nothing."
@@ -17073,6 +17368,11 @@ msgstr "Estivo nunha entrevista."
 msgid "They were the main contact."
 msgstr "Era o contacto principal."
 
+#: src/postulo/accounts/addressing.py
+msgctxt "pronouns"
+msgid "they/them"
+msgstr ""
+
 #: src/postulo/jobs/pages.py
 msgid "This account does not keep a rendering of a page."
 msgstr "Esta conta non conserva versións xeradas das páxinas."
@@ -17183,6 +17483,11 @@ msgstr "Esta captura descartouse."
 msgid "This company"
 msgstr "Esta empresa"
 
+#: src/postulo/jobs/status.py
+#, python-format
+msgid "This company has been in administration since %(date)s."
+msgstr ""
+
 #: src/postulo/jobs/logos.py
 msgid "This company has no website recorded."
 msgstr "Esta empresa non ten ningún sitio web rexistrado."
@@ -17190,6 +17495,24 @@ msgstr "Esta empresa non ten ningún sitio web rexistrado."
 #: src/postulo/templates/resume/item_form.html
 msgid "This company has none of its industries from the NACE list yet."
 msgstr "Esta empresa aínda non ten ningún ramo de actividade da lista NACE."
+
+#: src/postulo/jobs/status.py
+msgid "This company is recorded as being in administration."
+msgstr ""
+
+#: src/postulo/jobs/status.py
+msgid "This company is recorded as dissolved."
+msgstr ""
+
+#: src/postulo/jobs/status.py
+#, python-format
+msgid "This company was dissolved on %(date)s."
+msgstr ""
+
+#: src/postulo/jobs/status.py
+#, python-format
+msgid "This company was reported laying people off as of %(date)s."
+msgstr ""
 
 #: src/postulo/templates/resume/item_form.html
 msgid "This entry prints its original text on every CV."
@@ -17517,6 +17840,10 @@ msgstr "Márcao cando xa foses. O informe dirixido ao teu orientador conta as ci
 #: src/postulo/templates/partials/table/bulk.html
 msgid "Tick rows to act on several at once."
 msgstr "Marca filas para actuar sobre varias á vez."
+
+#: src/postulo/applications/forms.py
+msgid "Tick the box to add the listing anyway."
+msgstr ""
 
 #: src/postulo/jobs/capture_views.py
 msgid "Ticked, the listing becomes an application straight away. Otherwise it waits in your listings for you to decide."
@@ -18428,8 +18755,8 @@ msgid "What is in the file"
 msgstr "Que hai no ficheiro"
 
 #: src/postulo/templates/help/your_name.html
-msgid "What is kept is the text itself. If your career record changes language, a choice made from the other language's list stays what it was, and is shown as <em>Other…</em> with its text in the box."
-msgstr "O que se garda é o propio texto. Se a túa traxectoria cambia de idioma, unha opción escollida na lista do outro idioma queda como estaba, e móstrase como <em>Outro…</em> co seu texto na caixa."
+msgid "What is kept is the choice, not one language's word for it: <em>il</em> in French and <em>he/him</em> in English are the same choice, so your menus and your documents show it in the language they are drawn in when your career record changes language. Only what you write under <em>Other…</em> is kept as you typed it, and shown as typed in every language. A word you type there that a list already has is kept as that choice."
+msgstr ""
 
 #: src/postulo/templates/documents/cv_detail.html
 msgid "What is on this CV"
@@ -18543,6 +18870,10 @@ msgstr "Que tipo de obra é. Os campos de abaixo dependen do tipo: escoller outr
 #: src/postulo/resume/models.py
 msgid "what the check found"
 msgstr "o que atopou a comprobación"
+
+#: src/postulo/jobs/forms.py
+msgid "What the company is. Shown to everybody who can see it."
+msgstr ""
 
 #: src/postulo/applications/forms.py
 msgid "What the figure covers. Offers are compared by the year."
@@ -18664,6 +18995,14 @@ msgstr "o que se acordou"
 #: src/postulo/core/models.py
 msgid "what was asked"
 msgstr "o que se pediu"
+
+#: src/postulo/templates/jobs/company_form.html
+msgid "What was reported"
+msgstr ""
+
+#: src/postulo/jobs/forms.py
+msgid "What was reported about its hiring."
+msgstr ""
 
 #: src/postulo/applications/forms.py
 msgid "What was said or agreed, to write down afterwards."
@@ -18905,6 +19244,14 @@ msgstr "Se esta instancia pode enviar un código a un teléfono, un número que 
 msgid "Where you came across it: a job board, a referral, the company site."
 msgstr "Onde a atopaches: un portal de emprego, unha recomendación, o sitio web da empresa."
 
+#: src/postulo/jobs/models.py
+msgid "Where you learnt it: a news article, a post."
+msgstr ""
+
+#: src/postulo/jobs/models.py
+msgid "Where you learnt it: a register, an article."
+msgstr ""
+
 #: src/postulo/resume/views.py
 msgid "where you live"
 msgstr "onde vives"
@@ -19125,9 +19472,18 @@ msgstr "Wikidata dá o seu nome nese idioma. Obtén os datos de novo para cambia
 msgid "Wikidata has no item with that identifier."
 msgstr "Wikidata non ten ningún elemento con ese identificador."
 
+#: src/postulo/templates/jobs/company_wikidata.html
+#, python-format
+msgid "Wikidata names %(qid)s as its replacement; no company here carries that identifier."
+msgstr ""
+
 #: src/postulo/jobs/wikidata.py
 msgid "Wikidata redirected too many times."
 msgstr "Wikidata redirixiu demasiadas veces."
+
+#: src/postulo/templates/jobs/company_wikidata.html
+msgid "Wikidata says this organisation has ended. Choose whether to record it; the legal state is shown to everybody who can see this company."
+msgstr ""
 
 #: src/postulo/jobs/wikidata.py
 msgid "Wikidata sent the request somewhere else."

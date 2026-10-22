@@ -61,11 +61,11 @@ def test_a_patch_answers_with_the_record_whatever_it_changed(client, user):
     what it may change -- by sending nothing at all, if it likes. The scope's label and
     the API's description both say so, and this is here so that changing either the
     behaviour or the words is a decision somebody takes rather than an accident."""
-    named(user, "Alex", "Morgan", pronouns="they/them")
+    named(user, "Alex", "Morgan", pronouns="they")
     response = patch(client, {}, **issue(user, "write"))
     assert response.status_code == 200
     body = response.json()
-    assert (body["first_name"], body["pronouns"]) == ("Alex", "they/them")
+    assert (body["first_name"], body["pronouns"]["key"]) == ("Alex", "they")
 
     from postulo.api.api import api
     from postulo.api.models import SCOPES
@@ -77,11 +77,11 @@ def test_a_patch_answers_with_the_record_whatever_it_changed(client, user):
 
 
 def test_a_token_reads_and_writes_its_owners_profile_and_nobody_elses(client, user, other_user):
-    named(user, "Alex", "Morgan", pronouns="they/them")
-    named(other_user, "Sam", "Rivera", pronouns="she/her", location="Porto")
+    named(user, "Alex", "Morgan", pronouns="they")
+    named(other_user, "Sam", "Rivera", pronouns="she", location="Porto")
 
     body = client.get("/api/v1/profile", **issue(user, "read")).json()
-    assert body["first_name"] == "Alex" and body["pronouns"] == "they/them"
+    assert body["first_name"] == "Alex" and body["pronouns"]["label"] == "they/them"
     assert "Sam" not in json.dumps(body) and "Porto" not in json.dumps(body)
 
     response = patch(
@@ -90,7 +90,7 @@ def test_a_token_reads_and_writes_its_owners_profile_and_nobody_elses(client, us
     assert response.status_code == 200
     other_user.refresh_from_db()
     other_user.profile.refresh_from_db()
-    assert other_user.first_name == "Sam" and other_user.profile.pronouns == "she/her"
+    assert other_user.first_name == "Sam" and other_user.profile.pronouns == "she"
 
 
 def test_an_unknown_field_changes_nothing_it_names(client, user):
