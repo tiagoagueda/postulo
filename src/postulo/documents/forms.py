@@ -14,6 +14,7 @@ from django.utils.translation import gettext
 from django.utils.translation import gettext_lazy as _
 
 from postulo.core import demonyms, languages, personal, postal
+from postulo.core.date_widgets import DateInput
 from postulo.core.htmlstrings import sentence
 from postulo.jobs.forms import OwnerScopedModelForm, who_and_where
 from postulo.jobs.models import Contact
@@ -590,13 +591,13 @@ class UploadedDocumentForm(OwnerScopedModelForm):
     written_on = forms.DateField(
         label=_("Written on"),
         required=False,
-        widget=forms.DateInput(attrs={"type": "date"}),
+        widget=DateInput(),
         help_text=_("The date on the letter, as a date. Leave it empty when you do not know."),
     )
     valid_until = forms.DateField(
         label=_("Do not send after"),
         required=False,
-        widget=forms.DateInput(attrs={"type": "date"}),
+        widget=DateInput(),
         help_text=_("Yours to set and never enforced: after it, Postulo warns and does not block."),
     )
     delivery = forms.ChoiceField(

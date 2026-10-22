@@ -1,0 +1,27 @@
+{% load i18n postulo %}
+<c-vars id input until_input="" mode="day" label="" min="" max="" submit=False size="icon" />
+{% comment %} The calendar beside a date box (#933): a button and the `<c-date-picker>` it opens,
+   written after the box (or the pair of boxes, in a range) it fills.
+
+   `<c-date-field id="report-calendar" input="report-from" until_input="report-to" mode="range" />`
+
+   The box stays the form: it is the browser's own date input, drawn by the caller or by the
+   date widgets (`core/date_widgets.py`), and with scripts off, or with the calendar closed, it
+   takes and posts what it always did. The button is hidden in the markup because without a
+   script the calendar would fill nothing, and `app.js` (`readyDateFields`) shows it, opens the
+   calendar on what the box holds and keeps to the box's own `min` and `max`, then writes the
+   choice back and fires the box's `change`, so a table's filter narrows as if it were typed.
+
+   With no `label`, the calendar takes the name of the box's own label when it opens. `size` is
+   the button's, Basecoat's `icon` unless a smaller box beside it asks for less. {% endcomment %}
+<button type="button" class="btn shrink-0" data-variant="outline" data-size="{{ size }}" hidden
+        data-date-opener popovertarget="{{ id }}" aria-haspopup="dialog"
+        aria-label="{% translate 'Choose dates from a calendar' %}"
+        title="{% translate 'Choose dates from a calendar' %}">{% icon "calendar-days" %}</button>
+{% if label %}
+  <c-date-picker id="{{ id }}" label="{{ label }}" mode="{{ mode }}" min="{{ min }}" max="{{ max }}"
+                 input="{{ input }}" until_input="{{ until_input }}" :submit="submit" />
+{% else %}
+  <c-date-picker id="{{ id }}" label="{% translate 'Calendar' %}" mode="{{ mode }}" min="{{ min }}" max="{{ max }}"
+                 input="{{ input }}" until_input="{{ until_input }}" :submit="submit" named_by_field />
+{% endif %}

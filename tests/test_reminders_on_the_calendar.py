@@ -259,7 +259,10 @@ def test_the_day_clicked_is_the_forms_day(client, user):
     form = client.get(reverse("applications:reminder_create"), {"on": "2030-03-13"})
 
     assert form.status_code == 200
-    assert 'value="2030-03-13T09:00"' in form.content.decode()
+    html = form.content.decode()
+    # The date box and the time box the one value is drawn in (#933).
+    assert 'name="due_at" value="2030-03-13"' in html
+    assert 'name="due_at_time" value="09:00"' in html
 
 
 @pytest.mark.parametrize("raw", ["soon", "2030-02-30", "13/03/2030", "2030-03-13T25:00", ""])

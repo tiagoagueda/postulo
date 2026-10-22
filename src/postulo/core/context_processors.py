@@ -34,7 +34,7 @@ def theme_switch(choice: str) -> dict:
 
 def ui(request: HttpRequest) -> dict:
     """Interface-wide values: the resolved theme, the direction, the navigation, the policy."""
-    from . import languages, navigation
+    from . import languages, navigation, weeks
 
     theme = ""
     choice = "system"
@@ -81,6 +81,12 @@ def ui(request: HttpRequest) -> dict:
         # and a rendered document agree and a language Django has never heard of still
         # gets a direction (#43 goes well past the set Django ships with).
         "text_direction": languages.direction(languages.current()),
+        # The day a week starts on, for this person, on <html> (#933): every date picker
+        # draws its weeks from it, so they agree with the calendar and the reports. Django's
+        # numbering, 0 for Sunday, which is also `Date.getDay()`'s.
+        "first_weekday": weeks.first_day(),
+        # And whether their language numbers its weeks, which adds a column to the pickers.
+        "week_numbers": weeks.numbers_weeks(languages.current()),
         "theme_switch": theme_switch(choice),
         # Read by `app.js` off <body>, and by the pages that document a key so that they do
         # not promise one that is switched off.

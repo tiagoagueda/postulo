@@ -33,3 +33,17 @@ def first_day() -> int:
         return int(formats.get_format("FIRST_DAY_OF_WEEK")) % 7
     except (TypeError, ValueError):
         return 1
+
+
+#: The languages whose readers number their weeks (#933): a Swede books "vecka 42", a German
+#: "KW 42". A date picker in one of them draws the ISO 8601 number beside each week; nobody
+#: else is shown a column they never use. By the language's primary subtag, because the habit
+#: is the language's wherever it is read. Kept here rather than in ``config/formats``: Django
+#: reads only the format names it knows from those modules, and an invented one is returned
+#: verbatim (see that package's docstring).
+NUMBERED_WEEKS = frozenset({"da", "de", "fi", "fo", "is", "nb", "nn", "no", "sv"})
+
+
+def numbers_weeks(language: str) -> bool:
+    """Whether a reader of ``language`` (a BCP 47 tag) numbers the weeks of the year."""
+    return (language or "").split("-")[0].lower() in NUMBERED_WEEKS

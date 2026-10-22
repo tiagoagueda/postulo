@@ -1,0 +1,4 @@
+{% comment %} A date box with Postulo's calendar beside it (#933, `core/date_widgets.py`): the
+   box is Django's own and the form; the button and the calendar are `<c-date-field>`'s. A
+   widget drawn with no id has nothing for the calendar to name, and is the box alone. {% endcomment %}
+{% if widget.attrs.id %}<div class="flex items-center gap-2" data-date-box>{% include "django/forms/widgets/input.html" %}<c-date-field id="{{ widget.attrs.id }}-calendar" input="{{ widget.attrs.id }}" /></div>{% else %}{% include "django/forms/widgets/input.html" %}{% endif %}

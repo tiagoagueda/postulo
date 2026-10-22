@@ -164,7 +164,13 @@
      *Next* draws its chevron after the word, mirroring *Previous*, and both chevrons turn
      round on a right-to-left page (#902).
      The picker is a plain GET form in a popover with a native date input: `on=` takes any day
-     of the period, so one input serves every view and needs no script. {% endcomment %}
+     of the period, so one input serves every view and needs no script; the agenda's has its
+     last day as well (`until=`).
+
+     With a script, the name opens a picker suited to the view instead (#933): the months of a
+     year for the month, a grid of days that chooses a whole week for the week, a day for the
+     day, and a first and a last day for the agenda. It writes its choice into the form's own
+     boxes and sends the form, so both ways arrive at the same address. {% endcomment %}
   {% comment %} Three tracks on a wide screen, so the period's name is at the centre of the page
      whatever width the groups either side of it take, in either direction of writing (#900):
      the step group at the start, the name in the middle track, the views at the end. Narrower,
@@ -176,8 +182,9 @@
       <a href="{{ page.later }}" class="btn" data-variant="outline" aria-label="{{ page.steps.next }}" data-step="next"><span class="{% if page.labels %}btn-label{% else %}sr-only{% endif %}">{% translate "Next" %}</span>{% icon "chevron-right" data_rtl_flip="" %}</a>
     </div>
     <h2 class="justify-self-center text-center text-lg font-medium">
+      {% blocktranslate trimmed with period=page.title asvar choose_another %}{{ period }}: choose another{% endblocktranslate %}
       <button type="button" class="btn text-lg" data-variant="ghost" popovertarget="calendar-picker" aria-haspopup="dialog"
-              aria-label="{% blocktranslate trimmed with period=page.title %}{{ period }}: choose another{% endblocktranslate %}">{{ page.title }}</button>
+              data-date-opener data-picker="calendar-period" aria-label="{{ choose_another }}">{{ page.title }}</button>
     </h2>
     <div id="calendar-picker" popover data-popover data-align="center" class="w-72">
       <form method="get" action="{% url 'applications:calendar' %}" class="flex flex-col gap-3 p-4">
@@ -185,12 +192,20 @@
         {% if page.kinds_value %}<input type="hidden" name="kinds" value="{{ page.kinds_value }}">{% endif %}
         {% if page.search %}<input type="hidden" name="q" value="{{ page.search }}">{% endif %}
         <div class="field">
-          <label for="calendar-picker-on">{% translate "Go to the day" %}</label>
+          <label for="calendar-picker-on">{% if page.view == "agenda" %}{% translate "From" %}{% else %}{% translate "Go to the day" %}{% endif %}</label>
           <input type="date" id="calendar-picker-on" name="on" value="{{ page.on|date:'Y-m-d' }}" class="input" required>
         </div>
+        {% if page.view == "agenda" %}
+          <div class="field">
+            <label for="calendar-picker-until">{% translate "To" %}</label>
+            <input type="date" id="calendar-picker-until" name="until" value="{{ page.last|date:'Y-m-d' }}" class="input">
+          </div>
+        {% endif %}
         <button type="submit" class="btn">{% translate "Go" %}</button>
       </form>
     </div>
+    <c-date-picker id="calendar-period" label="{{ choose_another }}" mode="{{ page.picker_mode }}" input="calendar-picker-on"
+                   until_input="{% if page.view == 'agenda' %}calendar-picker-until{% endif %}" submit />
     {% comment %} Four shapes of the same days (#861), now beside the period they change: month
        first, and the agenda for a phone, where a month grid is thirty-one cells of nothing.
        Links, so each is an address; the open one is filled and carries `aria-current`. {% endcomment %}

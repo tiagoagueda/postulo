@@ -130,12 +130,19 @@
              {% if live %}hx-get="{{ request.path }}" hx-include="#{{ form_id }}, [data-table-search]" hx-sync="#{{ form_id }}:replace" hx-trigger="change"
                hx-target="#{{ table_id }}" hx-swap="outerHTML" hx-push-url="true"{% endif %}
              class="w-full px-2 py-1 text-xs">
-      <input type="date" id="{{ id }}-to" name="{{ name }}_to" value="{{ control.value_to }}"
-             {% if form_id %}form="{{ form_id }}"{% endif %}
-             aria-label="{{ control.filter_label }}: {% translate 'to' %}"
-             {% if live %}hx-get="{{ request.path }}" hx-include="#{{ form_id }}, [data-table-search]" hx-sync="#{{ form_id }}:replace" hx-trigger="change"
-               hx-target="#{{ table_id }}" hx-swap="outerHTML" hx-push-url="true"{% endif %}
-             class="w-full px-2 py-1 text-xs">
+      {% comment %} The two days in one range picker (#933), its button beside the second:
+         a choice fills both boxes and fires the second's `change`, which is what narrows the
+         table, once, with both. {% endcomment %}
+      <div class="flex items-center gap-1" data-date-box>
+        <input type="date" id="{{ id }}-to" name="{{ name }}_to" value="{{ control.value_to }}"
+               {% if form_id %}form="{{ form_id }}"{% endif %}
+               aria-label="{{ control.filter_label }}: {% translate 'to' %}"
+               {% if live %}hx-get="{{ request.path }}" hx-include="#{{ form_id }}, [data-table-search]" hx-sync="#{{ form_id }}:replace" hx-trigger="change"
+                 hx-target="#{{ table_id }}" hx-swap="outerHTML" hx-push-url="true"{% endif %}
+               class="w-full px-2 py-1 text-xs">
+        <c-date-field id="{{ id }}-calendar" input="{{ id }}-from" until_input="{{ id }}-to" mode="range"
+                      label="{{ control.filter_label }}" size="icon-sm" />
+      </div>
     </div>
   {% endif %}
 {% endwith %}

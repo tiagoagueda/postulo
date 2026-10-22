@@ -61,7 +61,11 @@
         </div>
         <div class="field">
           <label for="report-month">{% translate "Month" %}</label>
-          <input type="month" name="on" id="report-month" value="{{ on_month }}">
+          {% comment %} The browser's month box, and the months of a year beside it (#933). {% endcomment %}
+          <div class="flex items-center gap-2" data-date-box>
+            <input type="month" name="on" id="report-month" value="{{ on_month }}">
+            <c-date-field id="report-month-calendar" input="report-month" mode="month" />
+          </div>
           <p class="mt-1 text-xs text-ink-500 dark:text-ink-400">
             {% translate "Used for a month, and for the quarter that month falls in." %}
           </p>
@@ -72,7 +76,12 @@
         </div>
         <div class="field">
           <label for="report-to">{% translate "To" %}</label>
-          <input type="date" name="to" id="report-to" value="{{ period.end|date:'Y-m-d' }}">
+          {% comment %} One range picker for the two days, beside the second (#933). {% endcomment %}
+          <div class="flex items-center gap-2" data-date-box>
+            <input type="date" name="to" id="report-to" value="{{ period.end|date:'Y-m-d' }}">
+            <c-date-field id="report-period-calendar" input="report-from" until_input="report-to" mode="range"
+                          label="{% translate 'Dates you choose' %}" />
+          </div>
         </div>
       </div>
       <div class="mt-4 flex flex-wrap items-center gap-3">

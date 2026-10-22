@@ -1252,7 +1252,8 @@
  * palette, on its popover. Written on its data attributes, because Basecoat names no date picker and this file paints only
  * Basecoat's classes (`tests/test_stylesheet.py`). Unlayered, like the popover rules in `app.css` it must beat, which
  * give a panel no inline padding. Every day is a button 2.25rem square, well past the 24
- * pixels of WCAG 2.5.8, and the whole panel is at most 19rem so that it fits a phone 320 wide.
+ * pixels of WCAG 2.5.8, and the whole panel is at most 19rem so that it fits a phone 320 wide;
+ * below 40rem it is a sheet instead (#933).
  */
 [data-date-picker][data-popover][popover] {
   inline-size: min(19rem, calc(100vw - 1rem));
@@ -1315,4 +1316,54 @@
 
 [data-date-picker-grid] td > button:disabled {
   @apply cursor-not-allowed opacity-50;
+}
+
+/*
+ * The modes of #933. A week's days either side of the month are drawn quieter; the row the
+ * pointer or the focus is on is lit whole, which is what a press will choose; the days inside
+ * a range are tinted, its two ends filled. In month mode the cells hold a month's name, three
+ * to a row, so a button is the width of its cell rather than a square.
+ */
+[data-date-picker-grid] td > button[data-outside] {
+  @apply text-ink-500 dark:text-ink-400;
+}
+
+[data-date-picker-grid] tr[data-preview] td > button:not([aria-pressed="true"]),
+[data-date-picker-grid] td > button[data-in-range] {
+  @apply bg-accent text-accent-foreground;
+}
+
+[data-date-picker-grid] th[data-week-number] {
+  @apply w-8 pe-1 text-xs font-normal tabular-nums text-ink-500 dark:text-ink-400;
+}
+
+[data-date-picker-grid] td > button[data-month] {
+  @apply h-11 w-full px-1 text-sm;
+}
+
+/*
+ * On a narrow screen the calendar is a sheet along the foot of the window (#933), as wide as
+ * the window, and every day a target of 44 pixels: `app.js` leaves its placement to this rule.
+ */
+@media (width < 40rem) {
+  [data-date-picker][data-popover][popover] {
+    inset-block: auto 0;
+    inset-inline: 0;
+    margin: 0;
+    inline-size: 100%;
+    max-inline-size: 100%;
+    max-block-size: 85dvh;
+    position-area: none;
+    position-try-fallbacks: none;
+    border-end-start-radius: 0;
+    border-end-end-radius: 0;
+  }
+
+  [data-date-picker-grid] td > button {
+    @apply size-11;
+  }
+
+  [data-date-picker-head] .btn {
+    @apply size-11;
+  }
 }

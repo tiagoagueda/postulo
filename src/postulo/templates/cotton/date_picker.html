@@ -1,31 +1,62 @@
 {% load i18n postulo %}
-<c-vars id label min="1900-01-01" />
-{% comment %} A calendar of Postulo's own, in a popover (#928): a month and a year to choose and a grid
-   of days to press. `<c-date-picker id="birth-picker" label="…">the sentence that says what
+<c-vars id label mode="day" min="" max="" input="" until_input="" submit=False named_by_field=False />
+{% comment %} A calendar of Postulo's own, in a popover (#928, #933): a month and a year to choose
+   and a grid to press. `<c-date-picker id="birth-picker" label="…">the sentence that says what
    it does</c-date-picker>`, opened by a `<button popovertarget="birth-picker">` the caller
    writes and hides until `app.js` runs, because without it the popover draws an empty grid.
 
-   The component draws the frame and its four labels. `app.js` (`readyDatePicker`) draws the
-   days, from the browser's own locale, so the names of the months and weekdays are never in a
-   catalogue. It follows the ARIA date-picker dialog pattern, and hands the day chosen to
-   whoever asked, as a `date-picker-choose` event on the panel carrying `YYYY-MM-DD`; it opens
-   on the day in the panel's `data-value`, which the opener sets before the click opens it.
-   `data-min` is the earliest day, and today the latest.
+   Four modes, one grid (#933), after bootstrap-datepicker's `minViewMode`, week selection and
+   range, drawn in Basecoat's structure and Postulo's paint:
+   - `day`, the default: a month of days, one to press;
+   - `week`: the same days, a row lit as the pointer or the focus crosses it, and any day of
+     it gives the week's first day, by the first weekday `<html data-first-weekday>` says;
+   - `month`: the twelve months of a year, the arrows beside it changing the year, and the
+     choice is `YYYY-MM`;
+   - `range`: a first press sets the first day, a second the last (swapped if it is earlier),
+     the days between lit, and the choice carries both.
+
+   The component draws the frame and its labels. `app.js` (`readyDatePickers`) draws the days
+   and the months, from the browser's own locale, so the names of the months and weekdays are
+   never in a catalogue. It follows the ARIA date-picker dialog pattern, and hands the choice
+   to whoever asked, as a `date-picker-choose` event on the panel carrying `value` (and `until`
+   in a range); it opens on the `data-value` (and `data-until`) the opener sets before the
+   click opens it. `min` and `max` are the earliest and latest days, `YYYY-MM-DD`; empty is no
+   limit. With `input` (and `until_input`), the ids of the boxes it stands beside, the panel fills those inputs itself and fires their
+   `change`, and opens on what they hold (`readyDateFields`); with `submit` as well, it then
+   sends their form.
 
    The month and the year are native selects on purpose (see NATIVE_ON_PURPOSE in
    tests/test_template_lint.py): a birth date is decades back and a list of years is typed
    into, which Basecoat's own select does not take. {% endcomment %}
-<div id="{{ id }}" popover data-popover data-align="center" data-date-picker data-min="{{ min }}"
+{% comment %} The sentences the status line says, with their gaps left for `app.js` to fill:
+   written through `blocktranslate` so that the catalogue holds them as Python's do,
+   `%(day)s` and not an escaped `%%(day)s`. {% endcomment %}
+{% blocktranslate with day="%(day)s" asvar week_status %}Week of {{ day }}{% endblocktranslate %}
+{% blocktranslate with start="%(start)s" end="%(end)s" asvar range_status %}From {{ start }} to {{ end }}{% endblocktranslate %}
+{% blocktranslate with start="%(start)s" asvar range_start_status %}From {{ start }}: now choose the last day{% endblocktranslate %}
+<div id="{{ id }}" popover data-popover data-align="center" data-date-picker data-mode="{{ mode }}"
+     data-min="{{ min }}" data-max="{{ max }}"{% if input %} data-for="{{ input }}"{% endif %}{% if until_input %} data-until-for="{{ until_input }}"{% endif %}{% if submit %} data-submit{% endif %}{% if named_by_field %} data-named-by-field{% endif %}
+     data-week-label="{% translate 'Week' %}"
+     {% if mode == "week" %}data-week-status="{{ week_status }}"{% endif %}
+     {% if mode == "range" %}data-range-status="{{ range_status }}" data-range-start-status="{{ range_start_status }}"{% endif %}
      role="dialog" aria-label="{{ label }}">
-  <p data-date-picker-help>{{ slot }}</p>
+  {% if slot.strip %}<p data-date-picker-help>{{ slot }}</p>{% endif %}
   <div data-date-picker-head>
-    <button type="button" class="btn" data-variant="ghost" data-size="icon-sm" data-date-picker-previous
-            aria-label="{% translate 'Previous month' %}">{% icon "chevron-left" %}</button>
-    <select data-native aria-label="{% translate 'Month' %}" data-date-picker-month></select>
-    <select data-native aria-label="{% translate 'Year' %}" data-date-picker-year></select>
-    <button type="button" class="btn" data-variant="ghost" data-size="icon-sm" data-date-picker-next
-            aria-label="{% translate 'Next month' %}">{% icon "chevron-right" %}</button>
+    {% if mode == "month" %}
+      <button type="button" class="btn" data-variant="ghost" data-size="icon-sm" data-date-picker-previous
+              aria-label="{% translate 'Previous year' %}">{% icon "chevron-left" %}</button>
+      <select data-native aria-label="{% translate 'Year' %}" data-date-picker-year></select>
+      <button type="button" class="btn" data-variant="ghost" data-size="icon-sm" data-date-picker-next
+              aria-label="{% translate 'Next year' %}">{% icon "chevron-right" %}</button>
+    {% else %}
+      <button type="button" class="btn" data-variant="ghost" data-size="icon-sm" data-date-picker-previous
+              aria-label="{% translate 'Previous month' %}">{% icon "chevron-left" %}</button>
+      <select data-native aria-label="{% translate 'Month' %}" data-date-picker-month></select>
+      <select data-native aria-label="{% translate 'Year' %}" data-date-picker-year></select>
+      <button type="button" class="btn" data-variant="ghost" data-size="icon-sm" data-date-picker-next
+              aria-label="{% translate 'Next month' %}">{% icon "chevron-right" %}</button>
+    {% endif %}
   </div>
-  <table role="grid" data-date-picker-grid></table>
+  <table role="grid" data-date-picker-grid{% if mode == "month" %} aria-label="{% translate 'Choose a month' %}"{% endif %}></table>
   <p class="sr-only" aria-live="polite" data-date-picker-status></p>
 </div>

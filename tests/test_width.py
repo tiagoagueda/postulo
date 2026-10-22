@@ -500,7 +500,9 @@ KEPT: dict[str, str] = {}
 #: A table, or a four-column grid of figures -- the dashboard's shape, and the report's.
 #: Not `sm:grid-cols-2`, which is how a form pairs its fields, nor `lg:grid-cols-3`, which
 #: is a detail page's sidebar layout: those are the pages #188 keeps at 1280 on purpose.
-GRID = re.compile(r"<table\b|\blg:grid-cols-4\b")
+#: Nor a date picker's month (#933), which is a `<table role="grid">` in a popover beside a
+#: date box, not content laid out in the column.
+GRID = re.compile(r"<table\b(?![^>]*data-date-picker-grid)|\blg:grid-cols-4\b")
 
 
 def test_every_page_with_a_table_or_a_grid_has_taken_the_screen(client, furnished):  # noqa: F811

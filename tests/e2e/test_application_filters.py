@@ -825,10 +825,11 @@ def test_narrow_and_an_open_header_fit_at_320_pixels(page: Page, live_server, se
 
     result = page.evaluate(SCROLLS_SIDEWAYS)
     assert not result["reached"], f"{language}: {result}"
-    # What a person sees: a list is the button built for its select, which is a button.
+    # What a person sees: a list is the button built for its select, which is a button. A
+    # closed popover -- a date filter's calendar (#933) -- is not on the screen at all.
     controls = page.locator(
         "[data-narrow-form] :is(input:not([type=hidden]), select:not([data-select-ready]),"
-        " button, summary)"
+        " button, summary):not([popover] *)"
     )
     assert controls.count() >= 10
     for control in controls.all():

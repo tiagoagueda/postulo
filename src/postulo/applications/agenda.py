@@ -58,7 +58,7 @@ from django.conf import settings
 from django.urls import reverse
 from django.utils import formats, timezone
 from django.utils.translation import gettext_lazy as _
-from django.utils.translation import ngettext_lazy
+from django.utils.translation import ngettext, ngettext_lazy
 
 from postulo.jobs.models import JobPosting
 
@@ -78,6 +78,10 @@ VIEWS = ("month", "week", "day", "agenda")
 DEFAULT_VIEW = "month"
 #: How far the agenda reads ahead. A month, roughly; a phone wants a list, not a grid.
 AGENDA_DAYS = 30
+#: The longest an agenda may be asked to run, first day to last (#933): a year, leap day and
+#: all. An end day further off is brought back to this, so an address cannot ask the server
+#: for every event of a decade.
+AGENDA_MAX_DAYS = 366
 #: How many of a day's events a month cell draws before it counts the rest. A cell with
 #: three interviews and two reminders cannot hold five sentences; it holds two and the
 #: number left, and the day itself opens on the rest.
@@ -589,14 +593,25 @@ def kinds_parameter(kinds) -> str:
     return ",".join(kind for kind, _label, _tone in KINDS if kind in wanted)
 
 
-def url_for(view: str, day: dt.date, kinds=None, search: str = "") -> str:
+def default_until(day: dt.date) -> dt.date:
+    """The last day of an agenda that starts on ``day`` and was given no end: thirty days."""
+    return day + dt.timedelta(days=AGENDA_DAYS - 1)
+
+
+def url_for(
+    view: str, day: dt.date, kinds=None, search: str = "", until: dt.date | None = None
+) -> str:
     """The address of one view on one day: the month by its month, the rest by their day.
 
     The kinds travel with it, so *Earlier* does not quietly widen a narrowed calendar, and
-    the search with them, for the same reason (#848).
+    the search with them, for the same reason (#848). An agenda carries its last day as
+    ``until`` (#933), and only where it is not the thirty days an agenda runs anyway, so every
+    address written before it had one still says what it said.
     """
     base = reverse("applications:calendar")
     query = f"month={day:%Y-%m}" if view == DEFAULT_VIEW else f"view={view}&on={day:%Y-%m-%d}"
+    if view == "agenda" and until is not None and until != default_until(day):
+        query += f"&until={until:%Y-%m-%d}"
     narrowed = kinds_parameter(kinds)
     if narrowed:
         query += f"&kinds={narrowed}"
@@ -619,6 +634,22 @@ def day_from(raw: str) -> dt.date | None:
     except ValueError:
         return None
     return day if MIN_YEAR <= day.year <= MAX_YEAR else None
+
+
+def agenda_span(on: dt.date, until: dt.date | None) -> tuple[dt.date, dt.date | None]:
+    """An agenda's first day and its last as an address may ask for them (#933).
+
+    No end day is the thirty days an agenda always ran, and stays ``None``. An end before the
+    start is the same days asked for the other way round, so the two are swapped rather than
+    refused; and an end further than :data:`AGENDA_MAX_DAYS` from the start is brought back.
+    """
+    if until is None:
+        return on, None
+    if until < on:
+        on, until = until, on
+    until = min(until, on + dt.timedelta(days=AGENDA_MAX_DAYS - 1))
+    # Thirty days asked for by name are the thirty days an agenda runs anyway.
+    return on, None if until == default_until(on) else until
 
 
 @dataclass
@@ -653,6 +684,18 @@ class Page:
     long_weekdays: bool = False
     #: What the masthead's search narrowed this page to, if it did (#848).
     search: str = ""
+    #: The agenda's last day where the address chose one (#933); ``None`` is the thirty days.
+    until: dt.date | None = None
+
+    @property
+    def last(self) -> dt.date:
+        """The last day on the page: the day before ``end``, which is exclusive."""
+        return self.end - dt.timedelta(days=1)
+
+    @property
+    def length(self) -> int:
+        """How many days the page runs."""
+        return (self.end - self.start).days
 
     @property
     def weekday_pairs(self) -> list[tuple[str, str]]:
@@ -672,7 +715,16 @@ class Page:
         button shows only *Previous* and *Next* -- and ``today`` is the middle one, which
         is the period containing today and so is named for the view.
         """
+        if self.view == "agenda" and self.length != AGENDA_DAYS:
+            return agenda_steps(self.length)
         return STEPS[self.view]
+
+    @property
+    def picker_mode(self) -> str:
+        """Which picker the period's name opens (#933): the months of a year for the month, a
+        grid of days choosing a whole week for the week, a day for the day, and a first and a
+        last day for the agenda."""
+        return {"month": "month", "week": "week", "day": "day"}.get(self.view, "range")
 
     @property
     def kinds_value(self) -> str:
@@ -686,7 +738,7 @@ class Page:
             (
                 view,
                 VIEW_LABELS[view],
-                url_for(view, self.on, self.kinds, self.search),
+                url_for(view, self.on, self.kinds, self.search, self.until),
                 view == self.view,
                 VIEW_ICONS[view],
             )
@@ -716,7 +768,7 @@ class Page:
                     label,
                     tone,
                     showing,
-                    url_for(self.view, self.on, wanted or ALL_KINDS, self.search),
+                    url_for(self.view, self.on, wanted or ALL_KINDS, self.search, self.until),
                 )
             )
         return rows
@@ -728,12 +780,12 @@ class Page:
     @property
     def unsearched(self) -> str:
         """This same period with the search taken off (#848)."""
-        return url_for(self.view, self.on, self.kinds)
+        return url_for(self.view, self.on, self.kinds, until=self.until)
 
     @property
     def everything(self) -> str:
         """This same period with every kind back. The way out of a calendar narrowed to one."""
-        return url_for(self.view, self.on, ALL_KINDS, self.search)
+        return url_for(self.view, self.on, ALL_KINDS, self.search, self.until)
 
     @property
     def empty(self) -> bool:
@@ -755,6 +807,17 @@ STEPS = {
     },
 }
 
+
+def agenda_steps(days: int) -> dict[str, str]:
+    """The period buttons' names for an agenda of ``days`` days other than thirty (#933)."""
+    return {
+        "previous": ngettext("Previous %(days)s day", "Previous %(days)s days", days)
+        % {"days": days},
+        "today": _("Today"),
+        "next": ngettext("Next %(days)s day", "Next %(days)s days", days) % {"days": days},
+    }
+
+
 VIEW_LABELS = {
     "month": _("Month"),
     "week": _("Week"),
@@ -773,10 +836,20 @@ VIEW_ICONS = {
 
 
 def build(
-    user, view: str, on: dt.date, *, today: dt.date | None = None, kinds=None, search: str = ""
+    user,
+    view: str,
+    on: dt.date,
+    *,
+    today: dt.date | None = None,
+    kinds=None,
+    search: str = "",
+    until: dt.date | None = None,
 ) -> Page:
-    """The page for one view on one day, dressed in this person's calendar choices (#859)."""
-    page = _build(user, view, on, today=today, kinds=kinds)
+    """The page for one view on one day, dressed in this person's calendar choices (#859).
+
+    ``until`` is an agenda's last day (#933), and means nothing to the other views.
+    """
+    page = _build(user, view, on, today=today, kinds=kinds, until=until)
     profile = getattr(user, "profile", None)
     if profile is not None:
         page.labels = profile.calendar_labels
@@ -821,7 +894,15 @@ def narrow(page: Page, search: str) -> None:
     page.today += suffix
 
 
-def _build(user, view: str, on: dt.date, *, today: dt.date | None = None, kinds=None) -> Page:
+def _build(
+    user,
+    view: str,
+    on: dt.date,
+    *,
+    today: dt.date | None = None,
+    kinds=None,
+    until: dt.date | None = None,
+) -> Page:
     today = today or timezone.localdate()
     view = view if view in VIEWS else DEFAULT_VIEW
     kinds = frozenset(kinds) if kinds else frozenset(ALL_KINDS)
@@ -877,19 +958,34 @@ def _build(user, view: str, on: dt.date, *, today: dt.date | None = None, kinds=
             listed=[(on, events)],
             kinds=kinds,
         )
-    start, end = on, on + dt.timedelta(days=AGENDA_DAYS)
+    # An end day chosen in the range picker (#933), or the thirty days an agenda always ran.
+    on, until = agenda_span(on, until)
+    start = on
+    end = (until or default_until(on)) + dt.timedelta(days=1)
+    length = end - start
     events = events_between(user, start, end, kinds)
     showing_reminders = REMINDER in kinds
+    if until is None:
+        title = ngettext_lazy(
+            "%(days)s day from %(day)s", "%(days)s days from %(day)s", AGENDA_DAYS
+        ) % {"days": AGENDA_DAYS, "day": formats.date_format(on, "DATE_FORMAT")}
+    else:
+        title = _("%(start)s to %(end)s") % {
+            "start": formats.date_format(on, "DATE_FORMAT"),
+            "end": formats.date_format(until, "DATE_FORMAT"),
+        }
+    # Earlier and later step by the length asked for, and keep it; so does *Today*.
+    last = length - dt.timedelta(days=1)
     return Page(
         view="agenda",
         on=on,
         start=start,
         end=end,
-        title=ngettext_lazy("%(days)s day from %(day)s", "%(days)s days from %(day)s", AGENDA_DAYS)
-        % {"days": AGENDA_DAYS, "day": formats.date_format(on, "DATE_FORMAT")},
-        earlier=url_for("agenda", on - dt.timedelta(days=AGENDA_DAYS), kinds),
-        later=url_for("agenda", end, kinds),
-        today=url_for("agenda", today, kinds),
+        title=title,
+        earlier=url_for("agenda", on - length, kinds, until=on - dt.timedelta(days=1)),
+        later=url_for("agenda", end, kinds, until=end + last),
+        today=url_for("agenda", today, kinds, until=today + last),
+        until=until,
         events=events,
         listed=sorted(by_day(events).items()),
         kinds=kinds,
@@ -899,7 +995,8 @@ def _build(user, view: str, on: dt.date, *, today: dt.date | None = None, kinds=
 
 
 def page_for(params, user, *, today: dt.date | None = None) -> Page:
-    """The page a request asks for: ``?month=2026-09``, or ``?view=week&on=2026-09-15``.
+    """The page a request asks for: ``?month=2026-09``, or ``?view=week&on=2026-09-15``, or
+    ``?view=agenda&on=2026-09-15&until=2026-10-31``.
 
     Anything unreadable falls back to today, in the shape asked for: an address somebody
     mistyped still gets a calendar rather than an error about dates.
@@ -916,6 +1013,8 @@ def page_for(params, user, *, today: dt.date | None = None) -> Page:
         today=today,
         kinds=kinds_from(params.get("kinds", "")),
         search=params.get("q", "")[:200],
+        # The agenda's last day (#933); an unreadable one is the thirty days.
+        until=day_from(params.get("until", "")) if view == "agenda" else None,
     )
 
 

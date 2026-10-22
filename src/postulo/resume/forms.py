@@ -8,6 +8,7 @@ from django.urls import reverse_lazy
 from django.utils.translation import gettext_lazy as _
 
 from postulo.core import language_names, languages, phones, postal
+from postulo.core.date_widgets import DateInput
 from postulo.core.language_field import LanguageChoiceField
 from postulo.jobs.forms import OwnerScopedModelForm
 
@@ -30,7 +31,7 @@ from .models import (
     SkillGroup,
 )
 
-DATE_WIDGET = forms.DateInput(attrs={"type": "date"})
+DATE_WIDGET = DateInput()
 
 
 #: What the fields every kind of entry shares say about themselves (#205).

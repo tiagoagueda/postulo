@@ -13,6 +13,7 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 from postulo.core import phone_field, phone_numbers, phones, slugs, web_links
+from postulo.core.date_widgets import DateInput, DateTimeInput
 from postulo.core.formsets import RowsAlreadyGone
 from postulo.core.identifiers import IdentifierRow, OneOfEachKind, SchemeSelect, offering
 
@@ -924,8 +925,8 @@ class JobPostingForm(OwnerScopedModelForm):
             "description_format",
         )
         widgets = {
-            "posted_at": forms.DateInput(attrs={"type": "date"}),
-            "closes_at": forms.DateInput(attrs={"type": "date"}),
+            "posted_at": DateInput(),
+            "closes_at": DateInput(),
             "description": forms.Textarea(attrs={"rows": 10}),
         }
         #: `source` is left out: the model's own sentence says it, and a model form takes
@@ -1032,9 +1033,7 @@ class ListingEventForm(OwnerScopedModelForm):
             "contact": _("Who it came from, if it is somebody you have recorded."),
         }
         widgets = {
-            "occurred_at": forms.DateTimeInput(
-                attrs={"type": "datetime-local"}, format="%Y-%m-%dT%H:%M"
-            ),
+            "occurred_at": DateTimeInput(),
             "body": forms.Textarea(attrs={"rows": 4}),
         }
 

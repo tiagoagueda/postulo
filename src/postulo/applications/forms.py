@@ -11,6 +11,7 @@ from django.utils.translation import gettext_lazy as _
 
 from postulo.core import slugs
 from postulo.core.csv_import import OFFERED_CURRENCIES
+from postulo.core.date_widgets import DateInput, DateTimeInput
 from postulo.core.models import Tag, TagColour, TagIcon
 from postulo.jobs import esco, recall
 from postulo.jobs.forms import POSTING_HELP, OwnerScopedModelForm, who_and_where
@@ -196,7 +197,7 @@ class PostingIntakeForm(UserAwareForm):
     closes_at = forms.DateField(
         label=_("Closing date"),
         required=False,
-        widget=forms.DateInput(attrs={"type": "date"}),
+        widget=DateInput(),
         help_text=POSTING_HELP["closes_at"],
     )
     description = forms.CharField(
@@ -275,7 +276,7 @@ class ApplicationDetailsForm(UserAwareForm):
     applied_on = forms.DateField(
         label=_("Applied on"),
         required=False,
-        widget=forms.DateInput(attrs={"type": "date"}),
+        widget=DateInput(),
         help_text=_(
             "When you actually sent it. Left empty it is today, which is wrong for a search "
             "already under way — and reply times, the months and the report are measured "
@@ -285,7 +286,7 @@ class ApplicationDetailsForm(UserAwareForm):
     deadline = forms.DateField(
         label=_("Your deadline"),
         required=False,
-        widget=forms.DateInput(attrs={"type": "date"}),
+        widget=DateInput(),
         help_text=APPLICATION_HELP["deadline"],
     )
     tags = forms.ModelMultipleChoiceField(
@@ -401,7 +402,7 @@ class ApplicationForm(OwnerScopedModelForm):
             "through_agency",
             "tags",
         )
-        widgets = {"deadline": forms.DateInput(attrs={"type": "date"})}
+        widgets = {"deadline": DateInput()}
         help_texts = APPLICATION_HELP
 
     def save(self, commit: bool = True):
@@ -558,9 +559,7 @@ class EventForm(forms.ModelForm):
             "body": _("Anything longer worth keeping with it. It sits under the line."),
         }
         widgets = {
-            "occurred_at": forms.DateTimeInput(
-                attrs={"type": "datetime-local"}, format="%Y-%m-%dT%H:%M"
-            ),
+            "occurred_at": DateTimeInput(),
             "body": forms.Textarea(attrs={"rows": 3}),
         }
 
@@ -591,9 +590,7 @@ class ReminderForm(OwnerScopedModelForm):
             ),
             "application": _("Which one it is about. Leave it empty for a reminder about none."),
         }
-        widgets = {
-            "due_at": forms.DateTimeInput(attrs={"type": "datetime-local"}, format="%Y-%m-%dT%H:%M")
-        }
+        widgets = {"due_at": DateTimeInput()}
 
     def scope_querysets(self) -> None:
         self.fields["application"].queryset = Application.objects.for_user(
@@ -639,12 +636,8 @@ class InterviewForm(OwnerScopedModelForm):
             "ends_at": _("Left blank, it lasts an hour."),
         }
         widgets = {
-            "starts_at": forms.DateTimeInput(
-                attrs={"type": "datetime-local"}, format="%Y-%m-%dT%H:%M"
-            ),
-            "ends_at": forms.DateTimeInput(
-                attrs={"type": "datetime-local"}, format="%Y-%m-%dT%H:%M"
-            ),
+            "starts_at": DateTimeInput(),
+            "ends_at": DateTimeInput(),
             "contacts": forms.CheckboxSelectMultiple,
             "notes": forms.Textarea(attrs={"rows": 4}),
         }
@@ -745,12 +738,8 @@ class AppointmentForm(OwnerScopedModelForm):
             ),
         }
         widgets = {
-            "starts_at": forms.DateTimeInput(
-                attrs={"type": "datetime-local"}, format="%Y-%m-%dT%H:%M"
-            ),
-            "ends_at": forms.DateTimeInput(
-                attrs={"type": "datetime-local"}, format="%Y-%m-%dT%H:%M"
-            ),
+            "starts_at": DateTimeInput(),
+            "ends_at": DateTimeInput(),
             "notes": forms.Textarea(attrs={"rows": 3}),
             "outcome_notes": forms.Textarea(attrs={"rows": 3}),
         }
@@ -860,8 +849,8 @@ class OfferForm(OwnerScopedModelForm):
         )
         widgets = {
             "currency": forms.TextInput(attrs={"list": "offer-currencies", "maxlength": 3}),
-            "starts_on": forms.DateInput(attrs={"type": "date"}),
-            "answer_by": forms.DateInput(attrs={"type": "date"}),
+            "starts_on": DateInput(),
+            "answer_by": DateInput(),
             "variable_pay": forms.Textarea(attrs={"rows": 2}),
             "equity": forms.Textarea(attrs={"rows": 2}),
             "benefits": forms.Textarea(attrs={"rows": 3}),

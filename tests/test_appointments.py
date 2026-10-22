@@ -10,6 +10,7 @@ from __future__ import annotations
 import datetime as dt
 import io
 import json
+import re
 import zipfile
 
 import pytest
@@ -125,7 +126,10 @@ def test_it_is_entered_from_the_calendar_with_its_day_already_in_it(client, user
     page = client.get(reverse("applications:appointment_create"), {"on": "2031-05-04"})
 
     assert page.status_code == 200
-    assert 'value="2031-05-04T10:00"' in page.content.decode()
+    html = page.content.decode()
+    # The date box and the time box the one value is drawn in (#933).
+    assert re.search(r'name="starts_at" value="2031-05-04"', html)
+    assert re.search(r'name="starts_at_time" value="10:00"', html)
 
 
 def test_it_is_entered_from_the_services_own_page_and_returns_there(client, user, office):

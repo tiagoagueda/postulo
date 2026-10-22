@@ -3071,7 +3071,25 @@
       : null;
   }
 
+  // A calendar on a narrow screen is a sheet along the foot of the window (#933), which the
+  // stylesheet places by itself: whatever was set by hand is taken off.
+  function isSheet(panel) {
+    return (
+      panel.hasAttribute("data-date-picker") &&
+      !!window.matchMedia &&
+      window.matchMedia("(max-width: 39.99rem)").matches
+    );
+  }
+
   function placePanel(panel) {
+    if (isSheet(panel)) {
+      ["top", "bottom", "left", "right", "margin", "max-height", "min-width", "position-area", "position-try-fallbacks"].forEach(
+        function (property) {
+          panel.style.removeProperty(property);
+        }
+      );
+      return;
+    }
     var trigger = panelTrigger(panel);
     if (!trigger) {
       return;
@@ -3201,6 +3219,9 @@
   // Whether a panel the browser placed sits against its trigger. A trigger with no box --
   // *More* while the line holds every item -- has nothing to sit against and proves nothing.
   function besideItsTrigger(panel) {
+    if (isSheet(panel)) {
+      return true;
+    }
     var trigger = panelTrigger(panel);
     if (!trigger) {
       return true;
@@ -7389,19 +7410,31 @@
 
   onContentReady(readyButtonTooltips);
 
-  /* ------------------------------------------------- the calendar of Postulo's own (#928)
+  /* ------------------------------------------------- the calendar of Postulo's own (#928, #933)
    *
    * `<c-date-picker>` draws a popover with a month select, a year select and an empty grid;
-   * this draws the days. The ARIA date-picker dialog pattern: the grid is one tab stop and
-   * the arrow keys move by a day and by a week, Page Up and Page Down by a month (with Shift,
-   * a year), Home and End to the first and last day of the week, Enter or Space chooses, and
-   * Escape closes the popover, which the browser gives back to its button. Today is
-   * `aria-current="date"`, the chosen day `aria-pressed` and its cell `aria-selected`, and
-   * every day is named in full by the browser's own locale: no month or weekday is in a
-   * catalogue. A day before `data-min` or after today is disabled, and the keys stop at the
-   * edge. The chosen day leaves as a `date-picker-choose` event on the panel carrying
-   * "YYYY-MM-DD"; the opener may set `data-value` on the panel first, and the calendar opens
-   * on that day.
+   * this draws the days, or in `month` mode the twelve months. The ARIA date-picker dialog
+   * pattern: the grid is one tab stop and the arrow keys move by a day and by a week, Page Up
+   * and Page Down by a month (with Shift, a year), Home and End to the first and last day of
+   * the week, Enter or Space chooses, and Escape closes the popover, which the browser gives
+   * back to its button. Today is `aria-current="date"`, the chosen day `aria-pressed` and its
+   * cell `aria-selected`, and every day is named in full by the browser's own locale: no month
+   * or weekday is in a catalogue. A day before `data-min` or after `data-max` is disabled, and
+   * the keys stop at the edge.
+   *
+   * The modes (#933): `day` chooses a day; `week` lights the row the pointer or the focus is
+   * on and chooses the first day of the week pressed; `month` is a grid of three by four,
+   * the arrows moving by a month and by a row of three, Page Up and Page Down by a year;
+   * `range` takes a first day and a last, lighting the days between as the pointer moves.
+   *
+   * The week starts on the day the server says (`<html data-first-weekday>`, Django's
+   * numbering, which is `Date.getDay()`'s), so every picker agrees with the calendar and the
+   * reports; where it says nothing, the locale's. Where `<html data-week-numbers>` is set, a
+   * column of ISO 8601 week numbers leads the grid.
+   *
+   * The choice leaves as a `date-picker-choose` event on the panel carrying `value`
+   * ("YYYY-MM-DD", or "YYYY-MM" for a month) and, in a range, `until`. The opener may set
+   * `data-value` (and `data-until`) on the panel first, and the calendar opens on them.
    */
   function readyDatePickers() {
     Array.prototype.forEach.call(document.querySelectorAll("[data-date-picker]"), function (panel) {
@@ -7409,16 +7442,18 @@
         return;
       }
       panel.setAttribute("data-ready", "true");
+      var mode = panel.getAttribute("data-mode") || "day";
       var grid = panel.querySelector("[data-date-picker-grid]");
       var monthSelect = panel.querySelector("[data-date-picker-month]");
       var yearSelect = panel.querySelector("[data-date-picker-year]");
       var previous = panel.querySelector("[data-date-picker-previous]");
       var next = panel.querySelector("[data-date-picker-next]");
       var status = panel.querySelector("[data-date-picker-status]");
-      if (!grid || !monthSelect || !yearSelect) {
+      if (!grid || !yearSelect || (mode !== "month" && !monthSelect)) {
         return;
       }
-      var lang = document.documentElement.getAttribute("lang") || undefined;
+      var root = document.documentElement;
+      var lang = root.getAttribute("lang") || undefined;
       function formatter(options) {
         try {
           return new Intl.DateTimeFormat(lang, options);
@@ -7431,16 +7466,22 @@
       var weekdayShort = formatter({ weekday: "short" });
       var dayName = formatter({ dateStyle: "full" });
       var monthYear = formatter({ month: "long", year: "numeric" });
-      var firstWeekday = 1; // Monday, as Date.getDay() counts; the locale may say otherwise.
-      try {
-        var locale = new Intl.Locale(lang || navigator.language);
-        var info = locale.getWeekInfo ? locale.getWeekInfo() : locale.weekInfo;
-        if (info && info.firstDay) {
-          firstWeekday = info.firstDay % 7;
+      var firstWeekday = 1; // Monday, as Date.getDay() counts.
+      var said = root.getAttribute("data-first-weekday");
+      if (said && /^[0-6]$/.test(said)) {
+        firstWeekday = +said;
+      } else {
+        try {
+          var locale = new Intl.Locale(lang || navigator.language);
+          var info = locale.getWeekInfo ? locale.getWeekInfo() : locale.weekInfo;
+          if (info && info.firstDay) {
+            firstWeekday = info.firstDay % 7;
+          }
+        } catch (error) {
+          firstWeekday = 1;
         }
-      } catch (error) {
-        firstWeekday = 1;
       }
+      var weekNumbers = root.hasAttribute("data-week-numbers") && mode !== "month";
 
       function pad(number, width) {
         var text = String(number);
@@ -7458,26 +7499,70 @@
       function iso(date) {
         return pad(date.getFullYear(), 4) + "-" + pad(date.getMonth() + 1, 2) + "-" + pad(date.getDate(), 2);
       }
+      function isoMonth(date) {
+        return iso(date).slice(0, 7);
+      }
+      // "YYYY-MM-DD", or "YYYY-MM" for the first of a month; anything else is nothing.
       function parse(text) {
-        var parts = /^(\d{4})-(\d{2})-(\d{2})$/.exec(text || "");
+        text = (text || "").trim();
+        if (/^\d{4}-\d{2}$/.test(text)) {
+          text += "-01";
+        }
+        var parts = /^(\d{4})-(\d{2})-(\d{2})$/.exec(text);
         if (!parts) {
           return null;
         }
         var date = make(+parts[1], +parts[2] - 1, +parts[3]);
         return iso(date) === text ? date : null;
       }
+      function sameDay(one, other) {
+        return !!(one && other) && one.getTime() === other.getTime();
+      }
+      function weekStart(date) {
+        return make(date.getFullYear(), date.getMonth(), date.getDate() - ((date.getDay() - firstWeekday + 7) % 7));
+      }
+      // ISO 8601: the week holding the year's first Thursday is its first.
+      function isoWeek(date) {
+        var thursday = make(date.getFullYear(), date.getMonth(), date.getDate() + 3 - ((date.getDay() + 6) % 7));
+        var first = make(thursday.getFullYear(), 0, 4);
+        return 1 + Math.round(((thursday - first) / 86400000 - 3 + ((first.getDay() + 6) % 7)) / 7);
+      }
+      function fill(template, values) {
+        return String(template || "").replace(/%\((\w+)\)s/g, function (whole, name) {
+          return Object.prototype.hasOwnProperty.call(values, name) ? values[name] : whole;
+        });
+      }
+
       var now = new Date();
       var today = make(now.getFullYear(), now.getMonth(), now.getDate());
-      var earliest = parse(panel.getAttribute("data-min")) || make(1900, 0, 1);
-      var chosen = null;
+      var earliest = null;
+      var latest = null;
+      var chosen = null; // the day, the week's first day or the month's first day chosen
+      var until = null; // a range's last day
+      var anchor = null; // a range's first day, pressed and waiting for its last
       var focused = today;
       var rtl = false;
 
+      function readBounds() {
+        earliest = parse(panel.getAttribute("data-min"));
+        latest = parse(panel.getAttribute("data-max"));
+        if (mode === "month") {
+          earliest = earliest && make(earliest.getFullYear(), earliest.getMonth(), 1);
+          latest = latest && make(latest.getFullYear(), latest.getMonth(), 1);
+        }
+      }
+      function outside(date) {
+        if (mode === "month") {
+          var first = make(date.getFullYear(), date.getMonth(), 1);
+          return (earliest && first < earliest) || (latest && first > latest);
+        }
+        return (earliest && date < earliest) || (latest && date > latest);
+      }
       function clamp(date) {
-        if (date < earliest) {
+        if (earliest && date < earliest) {
           return earliest;
         }
-        return date > today ? today : date;
+        return latest && date > latest ? latest : date;
       }
       function shift(date, days, months) {
         if (months) {
@@ -7488,16 +7573,26 @@
         return clamp(make(date.getFullYear(), date.getMonth(), date.getDate() + days));
       }
 
-      function buildSelects() {
-        monthSelect.textContent = "";
+      if (monthSelect) {
         for (var month = 0; month < 12; month += 1) {
           var option = document.createElement("option");
           option.value = String(month);
           option.textContent = monthName.format(make(2000, month, 1));
           monthSelect.appendChild(option);
         }
+      }
+      // The years offered: the limits where there are some, else a century back and a decade
+      // on, always taking in the year on show.
+      var yearsDrawn = "";
+      function drawYears() {
+        var top = latest ? latest.getFullYear() : Math.max(today.getFullYear() + 10, focused.getFullYear());
+        var bottom = earliest ? earliest.getFullYear() : Math.min(today.getFullYear() - 100, focused.getFullYear());
+        if (yearsDrawn === top + ":" + bottom) {
+          return;
+        }
+        yearsDrawn = top + ":" + bottom;
         yearSelect.textContent = "";
-        for (var year = today.getFullYear(); year >= earliest.getFullYear(); year -= 1) {
+        for (var year = top; year >= bottom; year -= 1) {
           var yearOption = document.createElement("option");
           yearOption.value = String(year);
           yearOption.textContent = String(year);
@@ -7505,13 +7600,119 @@
         }
       }
 
-      function render(moveFocus) {
+      function say(text) {
+        if (status) {
+          status.textContent = text;
+        }
+      }
+      function announce() {
+        if (mode === "month") {
+          say(String(focused.getFullYear()));
+        } else if (mode === "week") {
+          say(fill(panel.getAttribute("data-week-status"), { day: dayName.format(weekStart(focused)) }));
+        } else if (mode === "range" && anchor) {
+          say(fill(panel.getAttribute("data-range-start-status"), { start: dayName.format(anchor) }));
+        } else {
+          say(monthYear.format(focused));
+        }
+      }
+
+      // What is lit: the chosen day, the chosen week, or the range (with the pointer's preview
+      // while a first day waits for its last). Painted onto the buttons already drawn, so that
+      // a pointer crossing the grid moves nothing and loses no focus.
+      function paint(hovered) {
+        var from = chosen;
+        var to = mode === "range" ? until : chosen;
+        if (mode === "week" && chosen) {
+          to = make(chosen.getFullYear(), chosen.getMonth(), chosen.getDate() + 6);
+        }
+        if (mode === "range" && anchor) {
+          from = anchor;
+          to = hovered || anchor;
+          if (to < from) {
+            var swap = from;
+            from = to;
+            to = swap;
+          }
+        }
+        Array.prototype.forEach.call(grid.querySelectorAll("button[data-date]"), function (button) {
+          var date = parse(button.getAttribute("data-date"));
+          var cell = button.parentNode;
+          var picked = !!(from && to) && date >= from && date <= to;
+          var end = sameDay(date, from) || sameDay(date, to);
+          var pressed = mode === "range" ? picked && end : picked;
+          if (pressed) {
+            button.setAttribute("aria-pressed", "true");
+          } else {
+            button.removeAttribute("aria-pressed");
+          }
+          if (picked) {
+            cell.setAttribute("aria-selected", "true");
+          } else {
+            cell.removeAttribute("aria-selected");
+          }
+          if (mode === "range" && picked && !end) {
+            button.setAttribute("data-in-range", "");
+          } else {
+            button.removeAttribute("data-in-range");
+          }
+        });
+      }
+
+      function renderMonths(moveFocus) {
+        var year = focused.getFullYear();
+        drawYears();
+        yearSelect.value = String(year);
+        grid.textContent = "";
+        var body = grid.createTBody();
+        var row;
+        for (var month = 0; month < 12; month += 1) {
+          if (month % 3 === 0) {
+            row = body.insertRow();
+          }
+          var td = row.insertCell();
+          td.setAttribute("role", "gridcell");
+          var first = make(year, month, 1);
+          var button = document.createElement("button");
+          button.type = "button";
+          button.textContent = monthName.format(first);
+          button.setAttribute("data-month", isoMonth(first));
+          button.setAttribute("aria-label", monthYear.format(first));
+          if (year === today.getFullYear() && month === today.getMonth()) {
+            button.setAttribute("aria-current", "date");
+          }
+          if (chosen && year === chosen.getFullYear() && month === chosen.getMonth()) {
+            td.setAttribute("aria-selected", "true");
+            button.setAttribute("aria-pressed", "true");
+          }
+          button.tabIndex = month === focused.getMonth() ? 0 : -1;
+          button.disabled = !!outside(first);
+          td.appendChild(button);
+        }
+        announce();
+        if (moveFocus) {
+          focusCurrent();
+        }
+      }
+
+      function renderDays(moveFocus) {
         var year = focused.getFullYear();
         var month = focused.getMonth();
+        drawYears();
         monthSelect.value = String(month);
         yearSelect.value = String(year);
         grid.textContent = "";
         var head = grid.createTHead().insertRow();
+        if (weekNumbers) {
+          var corner = document.createElement("th");
+          corner.scope = "col";
+          var short = document.createElement("abbr");
+          short.title = panel.getAttribute("data-week-label") || "";
+          short.textContent = "#";
+          corner.appendChild(short);
+          corner.setAttribute("data-week-number", "");
+          head.appendChild(corner);
+        }
         for (var column = 0; column < 7; column += 1) {
           var weekday = make(2001, 0, 7 + ((firstWeekday + column) % 7)); // 7 Jan 2001 was a Sunday
           var th = document.createElement("th");
@@ -7532,63 +7733,201 @@
               break;
             }
             row = body.insertRow();
+            row.setAttribute("data-week", iso(cursor));
+            if (weekNumbers) {
+              var number = document.createElement("th");
+              number.scope = "row";
+              number.setAttribute("data-week-number", "");
+              number.textContent = String(isoWeek(make(cursor.getFullYear(), cursor.getMonth(), cursor.getDate() + 3)));
+              row.appendChild(number);
+            }
           }
           var td = row.insertCell();
           td.setAttribute("role", "gridcell");
-          if (cursor.getMonth() === month) {
+          // A week runs across the month's edge, so in week mode its days either side are
+          // drawn too, quieter, and pressing one chooses the same week.
+          var inMonth = cursor.getMonth() === month;
+          if (inMonth || mode === "week") {
             var button = document.createElement("button");
             button.type = "button";
             button.textContent = String(cursor.getDate());
             button.setAttribute("data-date", iso(cursor));
             button.setAttribute("aria-label", dayName.format(cursor));
-            if (cursor.getTime() === today.getTime()) {
+            if (!inMonth) {
+              button.setAttribute("data-outside", "");
+            }
+            if (sameDay(cursor, today)) {
               button.setAttribute("aria-current", "date");
             }
-            if (chosen && cursor.getTime() === chosen.getTime()) {
-              td.setAttribute("aria-selected", "true");
-              button.setAttribute("aria-pressed", "true");
-            }
-            button.tabIndex = cursor.getTime() === focused.getTime() ? 0 : -1;
-            button.disabled = cursor < earliest || cursor > today;
+            button.tabIndex = sameDay(cursor, focused) ? 0 : -1;
+            button.disabled = !!outside(cursor);
             td.appendChild(button);
           }
           cursor = make(cursor.getFullYear(), cursor.getMonth(), cursor.getDate() + 1);
         }
-        if (status) {
-          status.textContent = monthYear.format(focused);
-        }
+        paint(anchor ? focused : null);
+        lightWeek(focused);
+        announce();
         if (moveFocus) {
-          var target = grid.querySelector('button[tabindex="0"]');
-          if (target) {
-            target.focus();
-          }
+          focusCurrent();
         }
       }
 
+      function render(moveFocus) {
+        if (mode === "month") {
+          renderMonths(moveFocus);
+        } else {
+          renderDays(moveFocus);
+        }
+      }
+      function focusCurrent() {
+        var target = grid.querySelector('button[tabindex="0"]');
+        if (target) {
+          target.focus();
+        }
+      }
       function move(date, moveFocus) {
         focused = clamp(date);
         render(moveFocus);
       }
 
-      grid.addEventListener("click", function (event) {
-        var button = event.target.closest ? event.target.closest("button[data-date]") : null;
-        if (!button || button.disabled) {
+      // Week mode: the row under the pointer or the focus is lit, as bootstrap-datepicker's
+      // week selection does, so what a press will choose is on show before it is made.
+      function lightWeek(date) {
+        if (mode !== "week") {
           return;
         }
-        chosen = parse(button.getAttribute("data-date"));
-        panel.dispatchEvent(new CustomEvent("date-picker-choose", { detail: { value: iso(chosen) } }));
-        if (panel.hidePopover) {
-          panel.hidePopover();
+        var start = date ? iso(weekStart(date)) : "";
+        Array.prototype.forEach.call(grid.querySelectorAll("tr[data-week]"), function (row) {
+          var first = row.querySelector("button[data-date]");
+          var lit = !!first && iso(weekStart(parse(first.getAttribute("data-date")))) === start;
+          if (lit) {
+            row.setAttribute("data-preview", "");
+          } else {
+            row.removeAttribute("data-preview");
+          }
+        });
+      }
+      function dayUnder(event) {
+        var button = event.target.closest ? event.target.closest("button[data-date]") : null;
+        return button && !button.disabled ? parse(button.getAttribute("data-date")) : null;
+      }
+      grid.addEventListener("mouseover", function (event) {
+        var date = dayUnder(event);
+        if (!date) {
+          return;
+        }
+        if (mode === "week") {
+          lightWeek(date);
+        } else if (mode === "range" && anchor) {
+          paint(date);
+        }
+      });
+      grid.addEventListener("mouseleave", function () {
+        if (mode === "week") {
+          lightWeek(focused);
+        } else if (mode === "range" && anchor) {
+          paint(focused);
+        }
+      });
+      grid.addEventListener("focusin", function (event) {
+        var date = dayUnder(event);
+        if (date && mode === "week") {
+          lightWeek(date);
+        } else if (date && mode === "range" && anchor) {
+          paint(date);
         }
       });
 
+      function choose(detail) {
+        panel.dispatchEvent(new CustomEvent("date-picker-choose", { detail: detail }));
+        if (panel.hidePopover) {
+          panel.hidePopover();
+        }
+      }
+      function press(date) {
+        if (mode === "month") {
+          chosen = make(date.getFullYear(), date.getMonth(), 1);
+          choose({ value: isoMonth(chosen) });
+        } else if (mode === "week") {
+          chosen = weekStart(date);
+          choose({ value: iso(chosen) });
+        } else if (mode === "range") {
+          if (!anchor) {
+            anchor = date;
+            focused = date;
+            chosen = null;
+            until = null;
+            paint(date);
+            announce();
+            return;
+          }
+          chosen = anchor < date ? anchor : date;
+          until = anchor < date ? date : anchor;
+          anchor = null;
+          say(fill(panel.getAttribute("data-range-status"), { start: dayName.format(chosen), end: dayName.format(until) }));
+          choose({ value: iso(chosen), until: iso(until) });
+        } else {
+          chosen = date;
+          choose({ value: iso(chosen) });
+        }
+      }
+
+      grid.addEventListener("click", function (event) {
+        var button = event.target.closest ? event.target.closest("button[data-date], button[data-month]") : null;
+        if (!button || button.disabled) {
+          return;
+        }
+        press(parse(button.getAttribute("data-date") || button.getAttribute("data-month")));
+      });
+
       grid.addEventListener("keydown", function (event) {
-        if (!event.target.matches || !event.target.matches("button[data-date]") || event.altKey || event.ctrlKey || event.metaKey) {
+        if (
+          !event.target.matches ||
+          !event.target.matches("button[data-date], button[data-month]") ||
+          event.altKey ||
+          event.ctrlKey ||
+          event.metaKey
+        ) {
+          return;
+        }
+        var forward = rtl ? -1 : 1;
+        var target;
+        if (mode === "month") {
+          var place = focused.getMonth() % 3;
+          switch (event.key) {
+            case "ArrowLeft":
+              target = shift(focused, 0, -forward);
+              break;
+            case "ArrowRight":
+              target = shift(focused, 0, forward);
+              break;
+            case "ArrowUp":
+              target = shift(focused, 0, -3);
+              break;
+            case "ArrowDown":
+              target = shift(focused, 0, 3);
+              break;
+            case "Home":
+              target = shift(focused, 0, -place);
+              break;
+            case "End":
+              target = shift(focused, 0, 2 - place);
+              break;
+            case "PageUp":
+              target = shift(focused, 0, -12);
+              break;
+            case "PageDown":
+              target = shift(focused, 0, 12);
+              break;
+            default:
+              return;
+          }
+          event.preventDefault();
+          move(target, true);
           return;
         }
         var column = (focused.getDay() - firstWeekday + 7) % 7;
-        var forward = rtl ? -1 : 1;
-        var target;
         switch (event.key) {
           case "ArrowLeft":
             target = shift(focused, -forward, 0);
@@ -7621,45 +7960,151 @@
         move(target, true);
       });
 
-      monthSelect.addEventListener("change", function () {
-        move(make(focused.getFullYear(), +monthSelect.value, 1), false);
-      });
+      if (monthSelect) {
+        monthSelect.addEventListener("change", function () {
+          move(make(focused.getFullYear(), +monthSelect.value, 1), false);
+        });
+      }
       yearSelect.addEventListener("change", function () {
         move(make(+yearSelect.value, focused.getMonth(), 1), false);
       });
+      var step = mode === "month" ? 12 : 1;
       if (previous) {
         previous.addEventListener("click", function () {
-          move(shift(focused, 0, -1), false);
+          move(shift(focused, 0, -step), false);
         });
       }
       if (next) {
         next.addEventListener("click", function () {
-          move(shift(focused, 0, 1), false);
+          move(shift(focused, 0, step), false);
         });
       }
 
       panel.addEventListener("beforetoggle", function (event) {
         if (event.newState !== "open") {
+          // The placement set by hand goes with the panel: a table's filter is swapped by htmx
+          // once a choice is made, and htmx's settle copies an element's `style` across by
+          // `setAttribute`, which the content security policy refuses.
+          panel.removeAttribute("style");
           return;
         }
         rtl = window.getComputedStyle(panel).direction === "rtl";
+        readBounds();
+        anchor = null;
         chosen = parse(panel.getAttribute("data-value"));
-        focused = chosen ? clamp(chosen) : today;
+        until = mode === "range" ? parse(panel.getAttribute("data-until")) : null;
+        if (chosen && mode === "week") {
+          chosen = weekStart(chosen);
+        } else if (chosen && mode === "month") {
+          chosen = make(chosen.getFullYear(), chosen.getMonth(), 1);
+        }
+        if (mode === "range" && chosen && until && until < chosen) {
+          var swap = chosen;
+          chosen = until;
+          until = swap;
+        }
+        if (mode === "range" && chosen && !until) {
+          until = chosen;
+        }
+        focused = clamp(chosen || (mode === "month" ? make(today.getFullYear(), today.getMonth(), 1) : today));
         render(false);
       });
       panel.addEventListener("toggle", function (event) {
         if (event.newState === "open") {
-          var target = grid.querySelector('button[tabindex="0"]');
-          if (target) {
-            target.focus();
-          }
+          focusCurrent();
         }
       });
-      buildSelects();
     });
   }
 
   onContentReady(readyDatePickers);
+
+  /* ---------------------------------------------- a date box with a calendar beside it (#933)
+   *
+   * `<c-date-field>` and the date widgets (`core/widgets.py`) draw the browser's own date box,
+   * which is the form, and beside it a button, hidden in the markup, that opens a
+   * `<c-date-picker>` naming the box (`data-for`, and `data-until-for` for a range's second).
+   * Without a script the box is all there is and posts what it always posted. With one, the
+   * button is shown, the calendar opens on what the box holds and keeps to its `min` and
+   * `max`, and a choice is written back into the box, which then says `input` and `change`, so
+   * a table's filter (htmx, on `change`) narrows the table as if it had been typed. A panel
+   * marked `data-submit` then sends the box's form: the calendar's period (#933).
+   *
+   * A button carrying `data-picker` names a different panel from its `popovertarget`: the
+   * period button opens the form that works without a script, and with one, the calendar.
+   */
+  function readyDateFields() {
+    Array.prototype.forEach.call(document.querySelectorAll("[data-date-opener]"), function (button) {
+      if (button.getAttribute("data-ready")) {
+        return;
+      }
+      button.setAttribute("data-ready", "true");
+      var name = button.getAttribute("data-picker");
+      if (name && document.getElementById(name)) {
+        button.setAttribute("popovertarget", name);
+      }
+      var panel = document.getElementById(button.getAttribute("popovertarget"));
+      var from = panel && document.getElementById(panel.getAttribute("data-for"));
+      if (!from) {
+        return;
+      }
+      var to = panel.getAttribute("data-until-for") ? document.getElementById(panel.getAttribute("data-until-for")) : null;
+      button.hidden = false;
+      function hold(attribute, value) {
+        if (value) {
+          panel.setAttribute(attribute, value);
+        } else {
+          panel.removeAttribute(attribute);
+        }
+      }
+      button.addEventListener("click", function () {
+        hold("data-value", from.value);
+        hold("data-until", to ? to.value : "");
+        // The box's own limits, where the page gave it some; else the panel's own.
+        if (from.min) {
+          panel.setAttribute("data-min", from.min);
+        }
+        if ((to || from).max) {
+          panel.setAttribute("data-max", (to || from).max);
+        }
+        // A panel named for no field in particular takes the name of the box's label.
+        if (panel.hasAttribute("data-named-by-field") && from.labels && from.labels.length) {
+          panel.setAttribute("aria-label", from.labels[0].textContent.replace(/\s*\*\s*$/, "").trim());
+        }
+      });
+    });
+    Array.prototype.forEach.call(document.querySelectorAll("[data-date-picker][data-for]"), function (panel) {
+      if (panel.getAttribute("data-field-ready")) {
+        return;
+      }
+      panel.setAttribute("data-field-ready", "true");
+      panel.addEventListener("date-picker-choose", function (event) {
+        var from = document.getElementById(panel.getAttribute("data-for"));
+        var to = panel.getAttribute("data-until-for") ? document.getElementById(panel.getAttribute("data-until-for")) : null;
+        if (!from) {
+          return;
+        }
+        function write(box, value) {
+          // A month chosen for a box that takes a day is the month's first day.
+          if (box.type === "date" && /^\d{4}-\d{2}$/.test(value)) {
+            value += "-01";
+          }
+          box.value = value;
+          box.dispatchEvent(new Event("input", { bubbles: true }));
+        }
+        write(from, event.detail.value);
+        if (to && event.detail.until) {
+          write(to, event.detail.until);
+        }
+        (to || from).dispatchEvent(new Event("change", { bubbles: true }));
+        if (panel.hasAttribute("data-submit") && from.form) {
+          from.form.submit();
+        }
+      });
+    });
+  }
+
+  onContentReady(readyDateFields);
 
   /* ------------------------------------------- the date of birth's calendar (#863)
    *

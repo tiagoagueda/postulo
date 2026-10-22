@@ -1178,7 +1178,7 @@ class CalendarView(LoginRequiredMixin, View):
         page = agenda.page_for(request.GET, request.user)
         # The masthead's search narrows what the calendar shows, in the period on screen (#848).
         scope = SearchScope(
-            request, _("Search the calendar"), keep=("view", "on", "month", "kinds")
+            request, _("Search the calendar"), keep=("view", "on", "until", "month", "kinds")
         )
         return render(request, self.template_name, {"page": page, "site_scope": scope})
 
@@ -1275,7 +1275,12 @@ class InterviewUpdateView(OwnedObjectMixin, UserFormKwargsMixin, UpdateView):
             undo that and log a move nobody made.
             """
             drawn = form.cleaned_data.get(f"drawn_{name}")
-            return bool(drawn) and form.data.get(name, "").strip() == drawn
+            # Read through the widget, which puts the date box and the time box back together
+            # into the one value the page drew (#933).
+            posted = form.fields[name].widget.value_from_datadict(
+                form.data, form.files, form.add_prefix(name)
+            )
+            return bool(drawn) and (posted or "").strip() == drawn
 
         starts_at = previous.starts_at if as_drawn("starts_at") else form.cleaned_data["starts_at"]
         if as_drawn("ends_at"):

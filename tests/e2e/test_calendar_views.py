@@ -1,9 +1,12 @@
-"""The calendar's bar in a browser: the view buttons on a phone (#904)."""
+"""The calendar's bar in a browser: the view buttons on a phone (#904), and the picker each
+view's name opens (#933)."""
 
 from __future__ import annotations
 
+import re
+
 import pytest
-from playwright.sync_api import Page, expect
+from playwright.sync_api import Browser, Page, expect
 
 from tests.e2e.signing_in import sign_in
 
@@ -72,8 +75,94 @@ def test_the_picker_opens_under_the_middle_of_the_name(live_server, page: Page, 
     sign_in(page, live_server.url, "/applications/calendar/")
 
     page.locator("[data-period] h2 button").click()
-    picker = page.locator("#calendar-picker")
+    picker = page.locator("#calendar-period")
     expect(picker).to_be_visible()
     name = page.locator("[data-period] h2").bounding_box()
     box = picker.bounding_box()
     assert abs((box["x"] + box["width"] / 2) - (name["x"] + name["width"] / 2)) <= 2
+
+
+# ------------------------------------------------------------ a picker per view (#933)
+
+
+def open_period(page: Page, live_server, address: str):
+    page.set_viewport_size({"width": 1280, "height": 800})
+    sign_in(page, live_server.url, address)
+    page.locator("[data-period] h2 button").click()
+    panel = page.locator("#calendar-period")
+    expect(panel).to_be_visible()
+    return panel
+
+
+def test_the_month_opens_the_months_of_its_year(live_server, page: Page, applicant):
+    panel = open_period(page, live_server, "/applications/calendar/?month=2026-09")
+
+    expect(panel).to_have_attribute("data-mode", "month")
+    expect(panel.locator("button[data-month]")).to_have_count(12)
+    expect(panel.locator('button[data-month="2026-09"]')).to_have_attribute("aria-pressed", "true")
+    expect(panel.locator('button[data-month="2026-09"]')).to_be_focused()
+    panel.locator("[data-date-picker-next]").click()
+    panel.locator('button[data-month="2027-02"]').click()
+
+    expect(page).to_have_url(re.compile(r"on=2027-02-01"))
+    expect(page.locator("[data-period] h2")).to_contain_text("February 2027")
+
+
+def test_the_week_lights_a_whole_week_and_goes_to_its_first_day(live_server, page: Page, applicant):
+    panel = open_period(page, live_server, "/applications/calendar/?view=week&on=2026-09-16")
+
+    expect(panel).to_have_attribute("data-mode", "week")
+    expect(panel.locator('td[aria-selected="true"]')).to_have_count(7)
+    panel.locator('button[data-date="2026-09-24"]').hover()
+    lit = panel.locator("tr[data-preview] button[data-date]")
+    expect(lit).to_have_count(7)
+    expect(lit.first).to_have_attribute("data-date", "2026-09-21")
+    panel.locator('button[data-date="2026-09-24"]').click()
+
+    expect(page).to_have_url(re.compile(r"view=week&on=2026-09-21"))
+
+
+def test_the_day_goes_to_the_day_pressed(live_server, page: Page, applicant):
+    panel = open_period(page, live_server, "/applications/calendar/?view=day&on=2026-09-16")
+
+    expect(panel).to_have_attribute("data-mode", "day")
+    expect(panel.locator('button[data-date="2026-09-16"]')).to_be_focused()
+    page.keyboard.press("ArrowDown")
+    page.keyboard.press("Enter")
+
+    expect(page).to_have_url(re.compile(r"view=day&on=2026-09-23"))
+
+
+def test_the_agenda_takes_a_first_day_and_a_last(live_server, page: Page, applicant):
+    panel = open_period(page, live_server, "/applications/calendar/?view=agenda&on=2026-09-16")
+
+    expect(panel).to_have_attribute("data-mode", "range")
+    expect(panel.locator('button[data-date="2026-09-16"]')).to_have_attribute(
+        "aria-pressed", "true"
+    )
+    expect(panel.locator("button[data-in-range]").first).to_be_visible()
+    panel.locator('button[data-date="2026-09-20"]').click()
+    expect(panel).to_be_visible()
+    panel.locator('button[data-date="2026-09-08"]').hover()
+    expect(panel.locator("button[data-in-range]")).to_have_count(11)
+    panel.locator('button[data-date="2026-09-08"]').click()
+
+    expect(page).to_have_url(re.compile(r"view=agenda&on=2026-09-08&until=2026-09-20"))
+    expect(page.locator("[data-period] h2")).to_contain_text("8 Sep 2026 to 20 Sep 2026")
+    expect(page.locator('[data-step="next"]')).to_have_attribute("aria-label", "Next 13 days")
+
+
+def test_without_a_script_the_name_opens_the_form(browser: Browser, live_server, applicant):
+    context = browser.new_context(java_script_enabled=False)
+    page = context.new_page()
+    try:
+        sign_in(page, live_server.url, "/applications/calendar/?view=agenda&on=2026-09-16")
+        page.locator("[data-period] h2 button").click()
+        form = page.locator("#calendar-picker")
+        expect(form).to_be_visible()
+        form.locator("#calendar-picker-until").fill("2026-09-30")
+        form.get_by_role("button", name="Go").click()
+        expect(page).to_have_url(re.compile(r"on=2026-09-16&until=2026-09-30"))
+        expect(page.locator("[data-period] h2")).to_contain_text("16 Sep 2026 to 30 Sep 2026")
+    finally:
+        context.close()

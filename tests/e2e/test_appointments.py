@@ -45,7 +45,9 @@ def test_an_appointment_is_made_from_the_calendar_and_drawn_on_its_day(
 
     page.get_by_role("link", name="New appointment").first.click()
     expect(page).to_have_url(re.compile(r"/applications/appointments/new/\?next="))
-    page.get_by_label("Starts").fill(f"{day:%Y-%m-%d}T10:30")
+    # A date box and a time box since #933, posting what the one box did.
+    page.get_by_label("Starts").fill(f"{day:%Y-%m-%d}")
+    page.locator("#id_starts_at_time").fill("10:30")
     page.locator("select#id_contact").select_option(label="Mme Durand · France Travail")
     page.get_by_label("Where").fill("12 rue de la Paix")
     page.get_by_role("button", name="Save", exact=True).click()
@@ -72,7 +74,8 @@ def test_the_services_page_lists_it_and_adds_another_that_returns_there(
     expect(page.locator("#appointments")).to_contain_text("No appointments yet.")
 
     page.locator("[data-new-appointment]").click()
-    page.get_by_label("Starts").fill("2031-05-04T09:00")
+    page.get_by_label("Starts").fill("2031-05-04")
+    page.locator("#id_starts_at_time").fill("09:00")
     page.get_by_role("button", name="Save", exact=True).click()
 
     expect(page).to_have_url(re.compile(rf"/jobs/companies/{office.pk}/"))

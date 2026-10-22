@@ -261,7 +261,8 @@ def test_everything_the_reminders_page_did_works_on_the_calendar_with_no_script(
         here = page.url
         name = f"New reminder on {day.day} {day:%B}"
         page.get_by_role("link", name=name).click()
-        expect(page.locator("input[name=due_at]")).to_have_value(f"{day:%Y-%m-%d}T09:00")
+        expect(page.locator("input[name=due_at]")).to_have_value(f"{day:%Y-%m-%d}")
+        expect(page.locator("input[name=due_at_time]")).to_have_value("09:00")
         page.locator("input[name=summary]").fill("Book the train")
         page.get_by_role("button", name="Save").click()
         expect(page).to_have_url(here)

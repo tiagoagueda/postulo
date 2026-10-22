@@ -260,6 +260,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 - The plugin surface holds companies, departments and the person's own card (read only, with the sign-in address), a holder's numbers, addresses and links as plain values, and services to update a company, make a department and a contact, and write several numbers, addresses and links; each takes an `actor`. (#328)
 - A company register number is checked against its country's check digit (France, Czechia, Norway, Finland, Estonia, Poland) and links to the register's own page (seven countries) or the EU business-register search, all offline. (#935)
+- Date pickers of Postulo's own beside every date box, and on the calendar one per view: months, a week, a day, and a range for the agenda, which now takes an end day (`until=`) (#933)
 - A code of conduct, the Contributor Covenant 2.1, for issues, pull requests and Weblate, with reports to the maintainer's address (#1007)
 - An accessibility statement, ACCESSIBILITY.md: WCAG 2.2 AA as the aim, how it is checked, the known limits, and how to report a barrier without an account (#1008)
 
@@ -345,6 +346,7 @@ All notable changes to Postulo are recorded here. The format follows
 ### 🐛 Fixed
 
 - Adding a contact through the API needs write access to the company, not only read access, so a company shared read-only can no longer be given contacts. (#328)
+- A stored date no longer shows as an empty box in British English and other languages that write the day first (#933)
 - CI's translation guard no longer crashes on a force-pushed branch: a previous commit it cannot find makes it read the branch since main (#1011)
 - A company's LinkedIn row builds a /company/ address and a person's an /in/ address; Xing likewise. (#932)
 - On a phone the star and the bin of a telephone row stay level beside the choice of the number that gets you back in. (#931)

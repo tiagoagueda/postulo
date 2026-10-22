@@ -26,6 +26,7 @@ from django.views import View
 from django.views.generic import DeleteView, ListView
 
 from postulo.core import errands, site, throttle
+from postulo.core.date_widgets import DateInput
 from postulo.core.htmlstrings import sentence
 from postulo.core.mixins import ConfirmDeleteMixin, OwnedObjectMixin
 from postulo.plugins.policy import plugins_for
@@ -231,7 +232,7 @@ def review_form_class():
         applied_on = forms.DateField(
             label=_("Applied on"),
             required=False,
-            widget=forms.DateInput(attrs={"type": "date"}),
+            widget=DateInput(),
             help_text=_(
                 "Left empty it is today. Capturing a posting you applied to last week is common."
             ),

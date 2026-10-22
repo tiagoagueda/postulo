@@ -2616,6 +2616,20 @@ html:has(.page-alert > [role="alert"]:not(:empty)) {
   }
 }
 
+/* A date box and the calendar button beside it (#933): the box takes the line, the button
+   keeps its size. A date and a time wrap, the time under the date, where both do not fit. */
+@layer components {
+  [data-date-box] > input {
+    @apply min-w-0 flex-1;
+  }
+  [data-date-time] > [data-date-box] {
+    @apply min-w-0 flex-[2_1_11rem];
+  }
+  [data-date-time] > input[type="time"] {
+    @apply min-w-0 flex-[1_1_7rem];
+  }
+}
+
 /* Accessibility: the skip link is visible only when it has focus, and nothing moves for
    someone who asked their system for less motion. */
 @layer components {

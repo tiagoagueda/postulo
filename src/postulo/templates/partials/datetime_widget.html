@@ -1,0 +1,10 @@
+{% load i18n %}{% comment %} A date and a time (#933, `core/date_widgets.py`): the date box with
+   its calendar, then the browser's own time box, which together post what the one
+   `datetime-local` box did. The group wraps, the time under the date, where there is no room
+   for both on a line. {% endcomment %}
+<div class="flex flex-wrap items-center gap-2" data-date-time>
+  {% with date=widget.subwidgets.0 time=widget.subwidgets.1 %}
+    {% include date.template_name with widget=date %}
+    <input type="time" name="{{ time.name }}"{% if time.value != None %} value="{{ time.value|stringformat:'s' }}"{% endif %}{% include "django/forms/widgets/attrs.html" with widget=time %} aria-label="{% translate 'Time' %}" data-time-box>
+  {% endwith %}
+</div>

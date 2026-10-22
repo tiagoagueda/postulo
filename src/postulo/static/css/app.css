@@ -6035,6 +6035,69 @@
   cursor: not-allowed;
   opacity: 50%;
 }
+[data-date-picker-grid] td > button[data-outside] {
+  color: var(--color-ink-500);
+  &:where([data-theme="dark"], [data-theme="dark"] *) {
+    color: var(--color-ink-400);
+  }
+  @media (prefers-color-scheme: dark) {
+    &:where(:root:not([data-theme="light"]), :root:not([data-theme="light"]) *) {
+      color: var(--color-ink-400);
+    }
+  }
+}
+[data-date-picker-grid] tr[data-preview] td > button:not([aria-pressed="true"]), [data-date-picker-grid] td > button[data-in-range] {
+  background-color: var(--color-accent);
+  color: var(--color-accent-foreground);
+}
+[data-date-picker-grid] th[data-week-number] {
+  width: calc(var(--spacing) * 8);
+  padding-inline-end: var(--spacing);
+  font-size: var(--text-xs);
+  line-height: var(--tw-leading, var(--text-xs--line-height));
+  --tw-font-weight: var(--font-weight-normal);
+  font-weight: var(--font-weight-normal);
+  color: var(--color-ink-500);
+  --tw-numeric-spacing: tabular-nums;
+  font-variant-numeric: var(--tw-ordinal,) var(--tw-slashed-zero,) var(--tw-numeric-figure,) var(--tw-numeric-spacing,) var(--tw-numeric-fraction,);
+  &:where([data-theme="dark"], [data-theme="dark"] *) {
+    color: var(--color-ink-400);
+  }
+  @media (prefers-color-scheme: dark) {
+    &:where(:root:not([data-theme="light"]), :root:not([data-theme="light"]) *) {
+      color: var(--color-ink-400);
+    }
+  }
+}
+[data-date-picker-grid] td > button[data-month] {
+  height: calc(var(--spacing) * 11);
+  width: 100%;
+  padding-inline: var(--spacing);
+  font-size: var(--text-sm);
+  line-height: var(--tw-leading, var(--text-sm--line-height));
+}
+@media (width < 40rem) {
+  [data-date-picker][data-popover][popover] {
+    inset-block: auto 0;
+    inset-inline: 0;
+    margin: 0;
+    inline-size: 100%;
+    max-inline-size: 100%;
+    max-block-size: 85dvh;
+    position-area: none;
+    position-try-fallbacks: none;
+    border-end-start-radius: 0;
+    border-end-end-radius: 0;
+  }
+  [data-date-picker-grid] td > button {
+    width: calc(var(--spacing) * 11);
+    height: calc(var(--spacing) * 11);
+  }
+  [data-date-picker-head] .btn {
+    width: calc(var(--spacing) * 11);
+    height: calc(var(--spacing) * 11);
+  }
+}
 @layer base {
   :root:where([data-theme="dark"], [data-theme="dark"] *) {
     --color-ink-400: oklch(0.68 0.012 250);
@@ -8630,6 +8693,18 @@ html:has(.page-alert > [role="alert"]:not(:empty)) {
   }
 }
 @layer components {
+  [data-date-box] > input {
+    min-width: 0px;
+    flex: 1;
+  }
+  [data-date-time] > [data-date-box] {
+    min-width: 0px;
+    flex: 2 1 11rem;
+  }
+  [data-date-time] > input[type="time"] {
+    min-width: 0px;
+    flex: 1 1 7rem;
+  }
   .skip-link {
     position: absolute;
     width: 1px;

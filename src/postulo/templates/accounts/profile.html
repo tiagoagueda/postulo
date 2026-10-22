@@ -201,7 +201,8 @@
                       title="{% translate 'Choose the date of birth from a calendar' %}">{% icon "calendar-days" %}</button>
             </div>
           </div>
-          <c-date-picker id="birth-picker" label="{% translate 'Date of birth' %}">{% translate "It fills the day, month and year boxes. To give a year alone, type it in the box." %}</c-date-picker>
+          {% now "Y-m-d" as today_iso %}
+          <c-date-picker id="birth-picker" label="{% translate 'Date of birth' %}" min="1900-01-01" max="{{ today_iso }}">{% translate "It fills the day, month and year boxes. To give a year alone, type it in the box." %}</c-date-picker>
           <c-field-feedback :field="form.birth_year" />
         </fieldset>
         <div class="flex flex-wrap items-start gap-x-4">

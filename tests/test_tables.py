@@ -852,7 +852,9 @@ def test_each_filter_name_is_posted_by_one_control_only(client, user, search, ur
 
         # The phone's copies are its own form's: not live, and applied by its own button.
         narrow = next(f for f in found.forms if "data-narrow-form" in f)
-        held = [i for i in found.inputs if form_of(i) == NARROW]
+        # Named: a control without a name posts nothing, such as the month and year lists of
+        # a date filter's calendar (#933).
+        held = [i for i in found.inputs if form_of(i) == NARROW and i.get("name")]
         assert all(i["_form"] is narrow for i in held), "written in it, naming no other form"
         assert not any("hx-get" in i for i in held), "none is live"
         assert narrow["method"] == "get" and narrow["action"] == reverse(url_name)
