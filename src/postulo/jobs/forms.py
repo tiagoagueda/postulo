@@ -167,7 +167,7 @@ class HiringSignalForm(forms.ModelForm):
         model = CompanyHiringSignal
         fields = ("kind", "noted_on", "source")
         # ISO, which is what a date box takes: the locale's own format shows it empty.
-        widgets = {"noted_on": forms.DateInput(attrs={"type": "date"}, format="%Y-%m-%d")}
+        widgets = {"noted_on": DateInput()}
         help_texts = {
             "kind": _("What was reported about its hiring."),
             "noted_on": _("The day it was true or reported, not today's date unless it is."),
@@ -301,7 +301,7 @@ class CompanyForm(OwnNoteForm):
             "legal_state_source",
             "acquired_by",
         )
-        widgets = {"legal_state_since": forms.DateInput(attrs={"type": "date"}, format="%Y-%m-%d")}
+        widgets = {"legal_state_since": DateInput()}
         help_texts = {
             "legal_state": _("What the company is. Shown to everybody who can see it."),
             "kind": _(
