@@ -8,13 +8,14 @@ nor a build step to have run first, and asks Django to render in each language.
 catalogues, and every guarantee below is made about each set rather than about the core
 one -- because the risk in giving a plugin its own catalogue was never that nobody would
 translate it, it was that its strings would leave the sight of the test that says the
-twenty-four European Union languages stay complete. Sets are discovered from the
+languages a release selects are complete. Sets are discovered from the
 filesystem, so a plugin that moves its strings out of core is covered here the moment it
 does, with no list to remember to add it to.
 """
 
 import ast
 import gettext
+import itertools
 import re
 from pathlib import Path
 
@@ -47,35 +48,9 @@ NAMES = [subject.name for subject in SETS]
 #: Every (catalogue set, language) pair, which is what "a catalogue" means from here on.
 EVERY = [(subject.name, code) for subject in SETS for code in CODES]
 
-#: The 24 official languages of the European Union: phase one (#43), finished in 0.2.0 and
-#: not allowed to regress. Every later phase adds languages whose catalogues arrive over
-#: time, so "complete" is a promise about these and an aspiration about the rest.
-EUROPEAN_UNION = (
-    "bg",
-    "cs",
-    "da",
-    "de",
-    "el",
-    "en-GB",
-    "es",
-    "et",
-    "fi",
-    "fr-FR",
-    "ga",
-    "hr",
-    "hu",
-    "it",
-    "lt",
-    "lv",
-    "mt",
-    "nl",
-    "pl",
-    "pt-PT",
-    "ro",
-    "sk",
-    "sl",
-    "sv",
-)
+#: The languages the release this checkout would become must carry complete (#347): the
+#: one list in `postulo.core.messages_tool`, for the version in `src/postulo/__init__.py`.
+SELECTED = TOOL.selected()
 
 
 #: Languages with at least one translated string, which are the ones a person is offered.
@@ -132,12 +107,11 @@ def compiled(tool, catalogues, tmp_path_factory):
     trans_real._default = None
 
 
-def test_the_settings_offer_every_eu_language():
+def test_the_settings_offer_every_selected_language():
     codes = dict(settings.LANGUAGES)
-    # The twenty-four, by name rather than by count: Europe beyond the Union (#118) and
-    # Africa (#70) both arrive language by language, and a total pinned here would have to
-    # be edited by every one of them.
-    for code in EUROPEAN_UNION:
+    # By name rather than by count: languages arrive one by one, and a total pinned here
+    # would have to be edited by every one of them.
+    for code in SELECTED:
         assert code in codes
     assert codes == languages.NATIVE_NAMES, "the settings offer exactly what the table holds"
     assert codes["pt-BR"] == "português (Brasil)"
@@ -155,11 +129,9 @@ def test_the_settings_offer_the_african_languages_too():
 
 
 @pytest.mark.release
-@pytest.mark.parametrize(
-    ("name", "code"), [pair for pair in EVERY if pair[1] in EUROPEAN_UNION], ids=str
-)
-def test_every_european_union_language_stays_complete(name, code, catalogues):
-    """Finished in 0.2.0. A published version must not quietly leave a gap in one of these.
+@pytest.mark.parametrize(("name", "code"), [pair for pair in EVERY if pair[1] in SELECTED], ids=str)
+def test_every_selected_language_is_complete(name, code, catalogues):
+    """A published version must not quietly leave a gap in a language its release selects.
 
     Every set, which is the whole reason #127 was allowed to give a plugin its own
     catalogue: for a plugin Postulo ships, Postulo is the author, and a string that leaves
@@ -167,7 +139,7 @@ def test_every_european_union_language_stays_complete(name, code, catalogues):
 
     **Marked `release`, so it is deselected by default and run before a tag.** The promise
     is about what somebody installs, not about what is on a branch halfway through a feature.
-    Holding every commit to twenty-four languages meant translating twenty-four times before
+    Holding every commit to every selected language meant translating twenty-four times before
     a string had been read by anybody, and the translations were made by the same hand that
     wrote the English a minute earlier -- work with a real cost and no reader. While a change
     is being made, English, French and European Portuguese are enough to see it in three
@@ -758,3 +730,48 @@ def test_machine_run_off_is_named(source, form, kind, tool):
     message = tool.Message(msgid=source, msgstr=[form])
     found = tool.quality_problems(message)
     assert (kind is None and not found) or (kind and any(kind in p for p in found))
+
+
+def test_each_release_line_selects_known_languages_with_a_catalogue_each():
+    """The list names languages as Postulo writes them, each scaffolded in every set (#347)."""
+    for line, codes in TOOL.SELECTED.items():
+        assert len(set(codes)) == len(codes), f"{line} names a language twice"
+        for code in codes:
+            assert code in languages.NATIVE_NAMES, f"{line}: {code} is not a language Postulo has"
+            assert code != languages.SOURCE, f"{line}: the source is complete by definition"
+            for subject in SETS:
+                assert TOOL.po_path(code, subject).is_file(), f"{line}: no {subject.name} {code}"
+
+
+def test_a_later_release_keeps_every_language_of_the_one_before():
+    lines = sorted(TOOL.SELECTED, key=lambda line: tuple(int(part) for part in line.split(".")))
+    for earlier, later in itertools.pairwise(lines):
+        dropped = set(TOOL.SELECTED[earlier]) - set(TOOL.SELECTED[later])
+        assert not dropped, f"{later} drops {sorted(dropped)}, which {earlier} required"
+
+
+def test_the_version_in_the_checkout_has_its_languages_selected():
+    """A version bump to a line with no list fails here, on every commit, not at the tag."""
+    from postulo import __version__
+
+    assert TOOL.selected(__version__) == TOOL.SELECTED[TOOL.release_line(__version__)]
+
+
+def test_a_patch_release_holds_its_line_and_an_unknown_line_is_refused():
+    assert TOOL.selected("0.5.2") == TOOL.SELECTED["0.5"]
+    assert TOOL.selected("0.5.0rc1") == TOOL.SELECTED["0.5"]
+    with pytest.raises(ValueError, match="SELECTED"):
+        TOOL.selected("99.0.0")
+
+
+def test_the_release_gate_command_reads_the_list(capsys):
+    """`postulo-messages gate --release` gates exactly the selected languages."""
+    asked = []
+    original = TOOL.cmd_gate
+    TOOL.cmd_gate = lambda codes: asked.append(codes) or 0
+    try:
+        assert TOOL.main(["gate", "--release", "0.5.0"]) == 0
+        assert TOOL.main(["gate", "fr-FR", "pt-PT"]) == 0
+    finally:
+        TOOL.cmd_gate = original
+    assert asked == [list(TOOL.SELECTED["0.5"]), ["fr-FR", "pt-PT"]]

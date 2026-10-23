@@ -617,6 +617,141 @@ def translated_languages() -> list[str]:
     return [code for code, _name in LANGUAGES if code != SOURCE]
 
 
+#: The languages a release must carry complete, a draft counting (#347), by release line: a
+#: patch release holds its line's list. Written once and read by everything that holds a
+#: release to it: `postulo-messages gate --release`, `uv run pytest -m release`,
+#: `scripts/release_tools.py check` and the plugin repositories, through this module. A plain
+#: literal, so that the release script, which imports nothing, can read it too. The source,
+#: en-GB, is complete by definition and not listed. A later line keeps every language of the
+#: one before it (`tests/test_translations.py`).
+SELECTED = {
+    # The 39 the core carried filled when the decision was taken (#269), nothing added.
+    "0.4": (
+        "bg",
+        "bs",
+        "ca",
+        "cs",
+        "cy",
+        "da",
+        "de",
+        "el",
+        "es",
+        "et",
+        "eu",
+        "fi",
+        "fr-FR",
+        "ga",
+        "gl",
+        "hr",
+        "hu",
+        "hy",
+        "is",
+        "it",
+        "ka",
+        "lb",
+        "lt",
+        "lv",
+        "mk",
+        "mt",
+        "nb",
+        "nl",
+        "pl",
+        "pt-BR",
+        "pt-PT",
+        "ro",
+        "sk",
+        "sl",
+        "sq",
+        "sr-Cyrl",
+        "sv",
+        "tr",
+        "uk",
+    ),
+    # 0.4's, the North American variants, the rest of the continent and its edges, then
+    # Chinese and Arabic (maintainer, 2026-10-23).
+    "0.5": (
+        "bg",
+        "bs",
+        "ca",
+        "cs",
+        "cy",
+        "da",
+        "de",
+        "el",
+        "es",
+        "et",
+        "eu",
+        "fi",
+        "fr-FR",
+        "ga",
+        "gl",
+        "hr",
+        "hu",
+        "hy",
+        "is",
+        "it",
+        "ka",
+        "lb",
+        "lt",
+        "lv",
+        "mk",
+        "mt",
+        "nb",
+        "nl",
+        "pl",
+        "pt-BR",
+        "pt-PT",
+        "ro",
+        "sk",
+        "sl",
+        "sq",
+        "sr-Cyrl",
+        "sv",
+        "tr",
+        "uk",
+        "en-CA",
+        "es-MX",
+        "fr-CA",
+        "az",
+        "be",
+        "cnr",
+        "fo",
+        "kk",
+        "nn",
+        "rm",
+        "zh-Hans",
+        "zh-Hant",
+        "ar",
+    ),
+}
+
+
+def release_line(version: str) -> str:
+    """``X.Y`` of a version: ``0.5.2`` and ``0.5.0rc1`` are both on the ``0.5`` line."""
+    found = re.match(r"(\d+)\.(\d+)", version or "")
+    if not found:
+        raise ValueError(f"{version!r} is not a version.")
+    return f"{found[1]}.{found[2]}"
+
+
+def selected(version: str | None = None) -> tuple[str, ...]:
+    """The languages ``version`` must carry complete; the core's own version by default.
+
+    A plugin asks with no argument and gets the list of the core it is pinned beside, which
+    is the release it ships with. A version with no list is refused rather than guessed: a
+    release line is added to `SELECTED` before it is tagged.
+    """
+    if version is None:
+        from postulo import __version__ as version
+    line = release_line(version)
+    if line not in SELECTED:
+        raise ValueError(
+            f"No languages are selected for {line}: add the line to SELECTED in "
+            "postulo/core/messages_tool.py (#347)."
+        )
+    return SELECTED[line]
+
+
 #: Header keys Weblate writes when a translation is saved, kept here as found.
 WEBLATE_KEYS = ("PO-Revision-Date", "Last-Translator", "Language-Team", "X-Generator")
 
@@ -1379,13 +1514,25 @@ def main(argv: list[str] | None = None) -> int:
     guard.add_argument("--head", default="HEAD", help="the last commit of the range")
     guard.add_argument("--staged", action="store_true", help="check what is staged instead")
     gate = sub.add_parser("gate", help="every string present in these languages")
-    gate.add_argument("codes", nargs="+", metavar="CODE")
+    gate.add_argument("codes", nargs="*", metavar="CODE")
+    gate.add_argument(
+        "--release",
+        nargs="?",
+        const="",
+        metavar="VERSION",
+        help="the languages selected for that release (default: the core's version)",
+    )
     args = parser.parse_args(argv)
     project()
     if args.command == "guard":
         return cmd_guard(args.base, args.head, args.staged)
     if args.command == "gate":
-        return cmd_gate(args.codes)
+        codes = list(args.codes)
+        if args.release is not None:
+            codes += [code for code in selected(args.release or None) if code not in codes]
+        if not codes:
+            parser.error("gate needs language codes, --release, or both")
+        return cmd_gate(codes)
     if args.command == "extract":
         return cmd_extract(args.check)
     if args.command == "compile":

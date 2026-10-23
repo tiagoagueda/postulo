@@ -625,12 +625,14 @@ End the entry with the issue it closes, in brackets: `(#42)`.
 
 ## Making a release
 
-1. `uv run pytest -m release` — the promises that must hold in a published version rather
-   than in every commit. Today that is the twenty-four European Union catalogues being
-   complete. A string missing in one of them is translated **in Weblate**, never here: merge
-   Weblate's open pull request first, and if the gate still names strings, they are ones
-   Weblate's machine translation has no model for and a speaker has to do them there
-   (`docs/TRANSLATING.md`). Run it again once that pull request is merged.
+1. `uv run python scripts/messages.py gate --release X.Y.Z` — every string present, a draft
+   counting, in every language the release selects: the list for its line in `SELECTED`,
+   `src/postulo/core/messages_tool.py` (#347). Add the line to that list first if it is
+   new; `scripts/release_tools.py check` refuses a tag whose line has none. A string missing
+   in one of them is translated **in Weblate**, never here: merge Weblate's open pull request
+   first, and translate there what the gate still names (`docs/TRANSLATING.md`). Run it again
+   once that pull request is merged. Once the version is set (step 3), `uv run pytest -m
+   release` holds the same languages and the rest of the promises a published version makes.
 1b. `uv run python scripts/screenshots.py --check` names the documentation's pictures that
    no longer match the interface. Run `uv run python scripts/screenshots.py` to retake them,
    look at what changed, and commit the new files: those in `assets/screenshots/` here, those

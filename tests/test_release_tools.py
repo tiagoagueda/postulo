@@ -24,6 +24,10 @@ def repo(tmp_path):
     (tmp_path / "src" / "postulo" / "__init__.py").write_text(
         '__version__ = "0.2.0"\n', encoding="utf-8"
     )
+    (tmp_path / "src" / "postulo" / "core").mkdir()
+    (tmp_path / "src" / "postulo" / "core" / "messages_tool.py").write_text(
+        'SELECTED = {\n    "0.2": ("fr-FR", "pt-PT"),\n}\n', encoding="utf-8"
+    )
     (tmp_path / "CHANGELOG.md").write_text(
         "# Changelog\n\n## [Unreleased]\n\n### Added\n\n- Something coming.\n\n"
         "## [0.2.0] — 2026-10-01\n\n### Added\n\n- Interviews.\n- Search.\n\n"
@@ -683,3 +687,21 @@ def test_a_network_that_never_comes_back_gives_up_at_the_deadline(monkeypatch):
     problems = wait(clock, minutes=1)
 
     assert len(problems) == 1 and "could not ask Forgejo" in problems[0]
+
+
+def test_a_release_line_with_no_languages_selected_is_refused(repo):
+    """#347: the languages a release must carry are written down before it is tagged."""
+    assert tools.selected_languages("0.2.0", repo) == ("fr-FR", "pt-PT")
+    assert tools.selected_languages("0.2.3rc1", repo) == ("fr-FR", "pt-PT")
+    (repo / "src" / "postulo" / "core" / "messages_tool.py").write_text(
+        'SELECTED = {\n    "0.1": ("fr-FR",),\n}\n', encoding="utf-8"
+    )
+    with pytest.raises(tools.ReleaseError, match=r"No languages are selected for 0\.2"):
+        tools.check("v0.2.0", repo)
+
+
+def test_the_real_list_is_readable_without_importing_it():
+    from postulo.core import messages_tool
+
+    for line, codes in messages_tool.SELECTED.items():
+        assert tools.selected_languages(f"{line}.0") == codes

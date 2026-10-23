@@ -20,6 +20,7 @@ the registry itself, the way ``docker pull`` would: with ``FORGEJO_USER`` and
 from __future__ import annotations
 
 import argparse
+import ast
 import base64
 import hashlib
 import json
@@ -274,6 +275,33 @@ def wait_for_ci(
         sleep(every)
 
 
+def selected_languages(version: str, root: Path = ROOT) -> tuple[str, ...]:
+    """The languages ``version``'s release line must carry complete (#347).
+
+    Read from ``SELECTED`` in ``postulo/core/messages_tool.py``, the one list the release gate,
+    the handbook and the plugin repositories also read, without importing it: this script
+    runs with nothing installed.
+    """
+    path = root / "src" / "postulo" / "core" / "messages_tool.py"
+    tree = ast.parse(path.read_text(encoding="utf-8"))
+    table = None
+    for node in tree.body:
+        if isinstance(node, ast.Assign) and any(
+            isinstance(target, ast.Name) and target.id == "SELECTED" for target in node.targets
+        ):
+            table = ast.literal_eval(node.value)
+    if table is None:
+        raise ReleaseError(f"{path.name} has no SELECTED list of release languages (#347).")
+    found = re.match(r"(\d+)\.(\d+)", version)
+    line = f"{found[1]}.{found[2]}" if found else version
+    if line not in table:
+        raise ReleaseError(
+            f"No languages are selected for {line}: add the line to SELECTED in "
+            "src/postulo/core/messages_tool.py, then run `uv run pytest -m release` (#347)."
+        )
+    return tuple(table[line])
+
+
 def check(tag: str, root: Path = ROOT) -> str:
     """Everything that must agree before a release is made. Returns the version."""
     version = version_of_tag(tag)
@@ -284,6 +312,7 @@ def check(tag: str, root: Path = ROOT) -> str:
     if packaged != version:
         raise ReleaseError(f"Tag {tag} but src/postulo/__init__.py says {packaged}.")
     changelog_section(version, root)
+    selected_languages(version, root)
     if not is_prerelease(version):
         # A release candidate moves no minor tag, so the compose files keep naming the last
         # stable one until the release itself is made.

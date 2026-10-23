@@ -65,16 +65,27 @@ Which languages a build needs is decided in #347, in five points:
 
 1. **Every language is scaffolded**: each has its catalogue, with a slot for every string.
 2. **A development build** needs every string present in **en-GB, fr-FR and pt-PT**, a draft
-   counting. A commit adds a string with its slots empty; Weblate drafts it by machine and
-   its pull request brings the drafts in, so that pull request is where this is held
-   (`scripts/messages.py gate fr-FR pt-PT` in CI). Between the two, a development build shows
-   the new string in English.
+   counting. A commit adds a string with its slots empty; it is translated in Weblate, and
+   Weblate's pull request brings the translations in, so that pull request is where this is
+   held (`scripts/messages.py gate fr-FR pt-PT` in CI). Between the two, a development build
+   shows the new string in English. Weblate's machine drafting is switched off for now, so a
+   new string waits for a person in Weblate.
 3. **A release** needs every string present in **the languages selected for it**, a draft
-   counting (`uv run pytest -m release`).
-4. **0.4.0** selects no language beyond those it already carries.
-5. **0.5.0** adds **fr-CA** and **en-CA**; then any language of the European continent still
-   missing (Russian excepted); then **Chinese** (`zh-Hans`, `zh-Hant`) and **Arabic**, which may
-   move to 0.6.0.
+   counting. They are written once, as `SELECTED` in `src/postulo/core/messages_tool.py`, by
+   release line (`0.5` covers 0.5.0 and every 0.5.x), and everything reads that list:
+   `uv run pytest -m release`, `scripts/messages.py gate --release X.Y.Z`,
+   `scripts/release_tools.py check` and each plugin repository's release gate, through
+   `postulo.core.messages_tool.selected()`.
+4. **0.4** selects the 39 languages the core carried filled when this was decided:
+   `bg bs ca cs cy da de el es et eu fi fr-FR ga gl hr hu hy is it ka lb lt lv mk mt nb nl pl
+   pt-BR pt-PT ro sk sl sq sr-Cyrl sv tr uk`.
+5. **0.5** adds the North American variants **fr-CA**, **en-CA** and **es-MX**; the rest of
+   the continent and its edges, **be**, **cnr**, **fo**, **nn**, **rm**, **az** and **kk**;
+   and **Chinese** (`zh-Hans`, `zh-Hant`) and **Arabic**: 52 in all.
+
+A later release line keeps every language of the one before it. A release line is added to
+`SELECTED` before it is tagged; `scripts/release_tools.py check` refuses a tag whose line has
+no list.
 
 "Every language of Africa" is some two thousand of them, so the rule drawn for 0.3.0 is
 **a language with official or national status in at least one African state, plus the
