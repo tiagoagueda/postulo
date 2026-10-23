@@ -5,8 +5,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"PO-Revision-Date: 2026-10-22 22:14+0000\n"
-"Last-Translator: LibreTranslate <noreply-mt-libretranslate@weblate.org>\n"
+"PO-Revision-Date: 2026-10-23 11:32+0000\n"
+"Last-Translator: Tiago Águeda <tiago.agueda@tiagoagueda.com>\n"
 "Language-Team: Turkish <https://translate.tiagoagueda.com/projects/postulo/postulo/tr/>\n"
 "Language: tr\n"
 "MIME-Version: 1.0\n"
@@ -168,8 +168,8 @@ msgstr[1] "%(count)d yapmadı"
 #, fuzzy, python-format
 msgid "%(count)d document is queued for %(label)s. The scheduler sends it on its next pass; the document shows how that went."
 msgid_plural "%(count)d documents are queued for %(label)s. The scheduler sends them on its next pass; each document shows how that went."
-msgstr[0] "%(count)d belgeleri [X35X için sıralanmıştır. Programcı onları bir sonraki geçişine gönderir; her belge, bunun nasıl gittiğini gösterir."
-msgstr[1] "%(count)d belgeleri [X35X için sıralanmıştır. Programcı onları bir sonraki geçişine gönderir; her belge, bunun nasıl gittiğini gösterir."
+msgstr[0] "%(count)d belge %(label)s için sıraya alındı. Zamanlayıcı onu bir sonraki geçişinde gönderir; sonucun nasıl olduğunu belgede görebilirsiniz."
+msgstr[1] "%(count)d belge %(label)s için sıraya alındı. Zamanlayıcı onları bir sonraki geçişinde gönderir; sonucun nasıl olduğunu her belgede görebilirsiniz."
 
 #: src/postulo/core/gdpr.py src/postulo/jobs/views.py
 #, fuzzy, python-format
@@ -548,7 +548,7 @@ msgstr "%(field)s %(choice)s ve başka bir şey ile gider."
 #: src/postulo/api/routers/applications.py
 #, fuzzy, python-format
 msgid "%(field)s goes with one of %(statuses)s; got %(status)s."
-msgstr "[X0Xx] [X27X'den biri ile gider; [45XXx]."
+msgstr "%(field)s, %(statuses)s durumlarından biriyle birlikte kullanılır; gelen: %(status)s."
 
 #: src/postulo/documents/printing.py
 #, fuzzy, python-format
@@ -609,13 +609,13 @@ msgstr "%(field)s tüm uygulama şirketinde insanlar olmalıdır."
 #: src/postulo/api/routers/listings.py
 #, fuzzy, python-format
 msgid "%(field)s must be one of %(choices)s."
-msgstr "%(field)s [X25X’den biri olmalıdır."
+msgstr "%(field)s şunlardan biri olmalıdır: %(choices)s."
 
 #: src/postulo/api/routers/common.py src/postulo/api/routers/listings.py
 #: src/postulo/documents/printing.py
 #, fuzzy, python-format
 msgid "%(field)s must be one of %(choices)s; got %(value)s."
-msgstr "[X0Xx] [X25X’den biri olmalıdır; %(value)s."
+msgstr "%(field)s şunlardan biri olmalıdır: %(choices)s; gelen değer: %(value)s."
 
 #: src/postulo/documents/printing.py
 #, fuzzy, python-format
@@ -655,7 +655,7 @@ msgstr "%(figure)s %(currency)s saatte"
 #: src/postulo/applications/models.py
 #, fuzzy, python-format
 msgid "%(figure)s %(currency)s per month"
-msgstr "[X0X11X] ayda"
+msgstr "aylık %(figure)s %(currency)s"
 
 #: src/postulo/applications/models.py
 #, fuzzy, python-format
@@ -689,7 +689,7 @@ msgstr[1] "%(figure)s"
 #: src/postulo/accounts/forms.py
 #, fuzzy, python-format
 msgid "%(formats)s, up to %(megabytes)s MB."
-msgstr "%(formats)s MB."
+msgstr "%(formats)s, en fazla %(megabytes)s MB."
 
 #: src/postulo/templates/server/backups.html
 #, fuzzy, python-format
@@ -872,7 +872,7 @@ msgstr "%(name)s (ed.)"
 #: src/postulo/documents/forms.py
 #, fuzzy, python-format
 msgid "%(name)s (not printed: permission is “%(permission)s”)"
-msgstr "%(name)s ( yazdırılmamış: izin (X38X)"
+msgstr "%(name)s (yazdırılmadı: izin “%(permission)s”)"
 
 #: src/postulo/templates/documents/cv_text.html
 #, fuzzy, python-format
@@ -1084,7 +1084,7 @@ msgstr "%(name)s."
 #: src/postulo/templates/core/export.html
 #, fuzzy, python-format
 msgid "%(name)s, kept until %(when)s."
-msgstr "%(name)s, [X21X'e kadar tuttu."
+msgstr "%(name)s, %(when)s tarihine kadar saklanır."
 
 #: src/postulo/templates/server/backup_delete.html
 #, fuzzy, python-format
@@ -1129,7 +1129,7 @@ msgstr "%(name)s: sayı %(value)s ayrıldı. %(why)s"
 #: src/postulo/jobs/merging.py
 #, fuzzy, python-format
 msgid "%(names)s can see “%(other)s” and not “%(kept)s”. Share “%(kept)s” with them first, or nothing is merged."
-msgstr "%(names)s [X19X19X’i görebilir ve değil (X39X). Share “[X57X)\" ilk olarak, ya da hiçbir şey bir araya gelmiyor."
+msgstr "%(names)s “%(other)s” öğesini görebiliyor, ancak “%(kept)s” öğesini göremiyor. Önce “%(kept)s” öğesini onlarla paylaşın; aksi halde hiçbir şey birleştirilmez."
 
 #: src/postulo/resume/views.py
 #, fuzzy, python-format
@@ -1144,7 +1144,7 @@ msgstr "%(old)s → %(new)s"
 #: src/postulo/jobs/merging.py
 #, fuzzy, python-format
 msgid "%(other)s has been merged into %(kept)s."
-msgstr "%(other)s [X31X'e birleştirilmiştir."
+msgstr "%(other)s, %(kept)s ile birleştirildi."
 
 #: src/postulo/jobs/merging.py
 #, fuzzy, python-format
@@ -1174,7 +1174,7 @@ msgstr "%(period)s: Başkasını seçin"
 #: src/postulo/core/groups.py
 #, fuzzy, python-format
 msgid "%(person)s is the last member of %(name)s, which still owns records. Give them to somebody, or delete them, first."
-msgstr "%(person)s, hala kayıtları olan son üyedir. Onları birine verin ya da önce onları sil."
+msgstr "%(person)s, hâlâ kayıtlara sahip olan %(name)s grubunun son üyesidir. Önce bu kayıtları birine verin ya da silin."
 
 #: src/postulo/plugins/forms.py
 #, fuzzy, python-format
@@ -1205,7 +1205,7 @@ msgstr "%(removed)s; %(kept)s"
 #, fuzzy, python-format
 msgctxt "translation progress"
 msgid "%(reviewed)s, %(draft)s, %(untranslated)s"
-msgstr "%(reviewed)s, %(draft)s"
+msgstr "%(reviewed)s, %(draft)s, %(untranslated)s"
 
 #: src/postulo/documents/rendering.py
 #: src/postulo/notifications/management/commands/send_due_reminders.py
@@ -1217,7 +1217,7 @@ msgstr "%(company)s şirketinde %(role)s"
 #: src/postulo/jobs/closing.py
 #, fuzzy, python-format
 msgid "%(role)s at %(company)s — %(closing)s"
-msgstr "%(role)s %(company)s"
+msgstr "%(company)s şirketinde %(role)s — %(closing)s"
 
 #: src/postulo/applications/quiet.py
 #, fuzzy, python-format
@@ -1244,7 +1244,7 @@ msgstr "%(scheme)s zaten başka bir satırda listeleniyor."
 #: src/postulo/core/identifiers.py
 #, fuzzy, python-format
 msgid "%(scheme)s: that is not the usual form (for example %(example)s)."
-msgstr "%(scheme)s: Bu normal form değildir (örneğin [X52X)."
+msgstr "%(scheme)s: bu olağan biçim değil (örneğin %(example)s)."
 
 #: src/postulo/core/identifiers.py
 #, fuzzy, python-format
@@ -1269,7 +1269,7 @@ msgstr "%%%(share)s"
 #: src/postulo/applications/agenda.py
 #, fuzzy, python-format
 msgid "%(start)s to %(end)s"
-msgstr "%(start)s"
+msgstr "%(start)s ile %(end)s arası"
 
 #: src/postulo/templates/applications/partials/board.html
 #, fuzzy, python-format
@@ -1457,7 +1457,7 @@ msgstr "%(who)s bunu göremez, hangi noktaları gösterir. Onlar sadece onunla p
 #: src/postulo/jobs/sharing.py
 #, fuzzy, python-format
 msgid "%(who)s shared “%(what)s” with you"
-msgstr "%(who)s sizinle birlikte paylaştı"
+msgstr "%(who)s, “%(what)s” öğesini sizinle paylaştı"
 
 #: src/postulo/accounts/forms.py
 #, fuzzy, python-format
@@ -1520,7 +1520,7 @@ msgstr "587 ile YouTubeTLS, 465 TLS, 25 ile. Aşağıda seçilen güvenlikle ayn
 #: src/postulo/templates/cotton/identifier_schemes.html
 #, fuzzy
 msgid "<code dir=\"ltr\">iso7064-mod11-2</code>, which an ORCID ends in, or <code dir=\"ltr\">iso7064-mod97-10</code>, which a legal-entity identifier ends in. No other can be named."
-msgstr "<code dir=\"ltr\">iso7064-mod11-2</code>, bir ORCID'nin içinde sona erdiği veya <code dir=\"ltr\">iso7064-mod97-10[X99X) yasal tanımlayıcıların sona erdiği. Başka hiçbir şey adlandırılamaz."
+msgstr "<code dir=\"ltr\">iso7064-mod11-2</code> (bir ORCID bununla biter) veya <code dir=\"ltr\">iso7064-mod97-10</code> (bir tüzel kişilik tanımlayıcısı bununla biter). Başka bir ad verilemez."
 
 #: src/postulo/templates/cotton/identifier_schemes.html
 #, fuzzy
@@ -1535,7 +1535,7 @@ msgstr "<em>CVs ve portföyler </em> kariyer kaydınızın çeşitleridir: her b
 #: src/postulo/templates/help/documents.html
 #, fuzzy
 msgid "<em>Files</em> are documents you kept as they came: a diploma, a certificate, a reference letter. They can be marked as the proof of an entry of your career, and sent with an application. <em>Sent documents</em> are copies of what went out, exactly as it went, kept unchanged so that you can see later what you claimed."
-msgstr "<em>Files[X9X) geldikçe tutulan belgelerdir: bir diploma, bir sertifika, referans mektubu. Kariyerinizin bir girişinin kanıtı olarak işaretlenebilir ve bir uygulama ile gönderilirler. <em> Sent belgeleri</em>, tam olarak gittiği gibi, değişmeden kaldı, böylece iddia ettiğiniz şeyi daha sonra görebileceksiniz."
+msgstr "<em>Dosyalar</em>, geldikleri gibi sakladığınız belgelerdir: bir diploma, bir sertifika, bir referans mektubu. Kariyerinizdeki bir kaydın kanıtı olarak işaretlenebilir ve bir başvuruyla birlikte gönderilebilirler. <em>Gönderilen belgeler</em>, gönderilen her şeyin tam olarak gittiği haliyle kopyalarıdır; daha sonra neyi beyan ettiğinizi görebilmeniz için değiştirilmeden saklanır."
 
 #: src/postulo/templates/help/contact_block.html
 #, fuzzy
@@ -1545,7 +1545,7 @@ msgstr "<em>Headline</em>, “Backend mühendisi” gibi kısa bir profesyonel b
 #: src/postulo/templates/help/career.html
 #, fuzzy
 msgid "<em>Import</em> reads a Europass CV; <em>Export</em> writes your details and your career as one file you can keep or move to another Postulo; <em>Preview</em> shows the whole record as a document, and <em>Your CVs</em> opens the variants made from it."
-msgstr "<em>İmport</em> bir Europass CV'sini okur; <em>Export</em> ayrıntılarınızı ve kariyerinizi başka bir Postulo'a taşıyabilir veya hareket ettirebileceğiniz bir dosya olarak yazar; <em>Pizi[X153X) Tüm rekoru bir belge olarak gösterir ve [X201X) CV'lerinizi [X213X5)."
+msgstr "<em>İçe aktar</em> bir Europass CV'sini okur; <em>Dışa aktar</em> bilgilerinizi ve kariyerinizi saklayabileceğiniz veya başka bir Postulo'ya taşıyabileceğiniz tek bir dosya olarak yazar; <em>Önizleme</em> tüm kaydı bir belge olarak gösterir ve <em>CV'leriniz</em> ondan oluşturulan varyantları açar."
 
 #: src/postulo/templates/help/identifiers.html
 #, fuzzy
@@ -1592,7 +1592,7 @@ msgstr "<strong>Firefox on Android:</strong> <em> Home ekrana ek </em> tarayıc�
 #: src/postulo/templates/help/install.html
 #, fuzzy
 msgid "<strong>Safari on a Mac:</strong> choose <em>Add to Dock</em> from the <em>File</em> menu, or from the Share button."
-msgstr "<strong>Sunari bir Mac üzerinde: </strong> <em> Dock'a ek olarak <em>File</em> menüsünden veya Share butonundan."
+msgstr "<strong>Mac'te Safari:</strong> <em>Dosya</em> menüsünden veya Paylaş düğmesinden <em>Dock'a Ekle</em> seçeneğini seçin."
 
 #: src/postulo/templates/help/install.html
 #, fuzzy
@@ -2146,7 +2146,7 @@ msgstr "Bir bağlantı diğerini {value}, bir backslash veya bir çizgi molası 
 #: src/postulo/core/identifiers.py
 #, fuzzy
 msgid "A link holds {value}, which is where the identifier goes."
-msgstr "Bir bağlantı, tanımlayıcının nereye gittiğidir."
+msgstr "Bir bağlantı, tanımlayıcının geleceği yeri gösteren {value} ifadesini içerir."
 
 #: src/postulo/core/identifiers.py
 #, fuzzy, python-format
@@ -3124,7 +3124,7 @@ msgstr "Kariyerinizde bir girişten eklendi. Yeni bir iş için bir şirket seç
 #: src/postulo/jobs/capture_views.py
 #, fuzzy
 msgid "Added to the history of {listing}."
-msgstr "{listing the tarihine eklendi."
+msgstr "{listing} geçmişine eklendi."
 
 #: src/postulo/jobs/listing_views.py
 #, fuzzy
@@ -3181,7 +3181,7 @@ msgstr "adres"
 #: src/postulo/accounts/models.py
 #, fuzzy
 msgid "address claims"
-msgstr "adres iddia iddia iddia iddia"
+msgstr "adres beyanları"
 
 #: src/postulo/templates/jobs/company_map.html
 #, fuzzy
@@ -3414,7 +3414,7 @@ msgstr "%(pasted)s üzerinde bir adres tüm geçmiş olabilir: Postulo tanımlay
 #: src/postulo/templates/help/postal_addresses.html
 #, fuzzy
 msgid "An address recorded before addresses were checked, or brought in by a file, that its country would refuse today stays as it is, marked <em>Kept as it was</em>, and is checked the next time you change it."
-msgstr "Adreslerin kontrol edilmesinden önce kaydedilen bir adres veya bir dosya tarafından getirildi, ülkesinin bugün olduğu gibi kalacağını reddetmesi, <em>Kept, </em> olduğu gibi </em> ve bir dahaki sefere değiştirirsiniz."
+msgstr "Adresler denetlenmeye başlamadan önce kaydedilmiş ya da bir dosyayla getirilmiş olup ülkesinin bugün reddedeceği bir adres olduğu gibi kalır, <em>Olduğu gibi tutuldu</em> olarak işaretlenir ve bir sonraki değiştirişinizde denetlenir."
 
 #: src/postulo/resume/candidate.py
 #, fuzzy
@@ -3630,7 +3630,7 @@ msgstr "yanıt"
 #: src/postulo/applications/services.py
 #, fuzzy, python-format
 msgid "Answer %(company)s about their offer by %(day)s"
-msgstr "Cevap [X7XX40X]"
+msgstr "%(company)s şirketinin teklifine %(day)s tarihine kadar yanıt verin"
 
 #: src/postulo/applications/models.py
 #, fuzzy
@@ -3971,7 +3971,7 @@ msgstr "Randevu katıldı:"
 #: src/postulo/applications/services.py
 #, fuzzy, python-format
 msgid "Appointment tomorrow: %(company)s at %(time)s"
-msgstr "Yarın Randevu: %(company)s"
+msgstr "Yarınki randevu: %(company)s, saat %(time)s"
 
 #: src/postulo/applications/agenda.py
 #, fuzzy
@@ -4776,7 +4776,7 @@ msgstr "Yakalayın."
 #: src/postulo/jobs/capture_views.py
 #, fuzzy
 msgid "Capture discarded. It is in {link}."
-msgstr "Yakalanmış discarded. It is in {link It."
+msgstr "Yakalama atıldı. {link} içinde bulunuyor."
 
 #: src/postulo/api/models.py
 #, fuzzy
@@ -7448,7 +7448,7 @@ msgstr "Siz daraltana kadar her şey sunulur. Hepsini işaretleyin, öyle kalır
 #: src/postulo/templates/jobs/capture_page_forget.html
 #, fuzzy, python-format
 msgid "Everything kept of the page that “%(title)s” was read from will be deleted permanently."
-msgstr "Her şey, “[X34X)'in kalıcı olarak silineceği sayfanın tutulmasıydı."
+msgstr "“%(title)s” kaydının okunduğu sayfadan saklanan her şey kalıcı olarak silinecek."
 
 #: src/postulo/templates/api/token_list.html
 #, fuzzy, python-format
@@ -7463,7 +7463,7 @@ msgstr "Bir tarihle her şey burada: röportajlar, bir danışmanla randevular, 
 #: src/postulo/templates/accounts/profile.html
 #, fuzzy, python-format
 msgid "Everything you have recorded, not only these details, is under <a href=\"%(everything_url)s\" class=\"underline\">Export everything</a>."
-msgstr "Kayıt olduğunuz her şey, sadece bu detaylar değil, her şeyi <a href=\"%(everything_url)s\" class=\"underline\">Export altındadır[X127X)."
+msgstr "Yalnızca bu bilgiler değil, kaydettiğiniz her şey <a href=\"%(everything_url)s\" class=\"underline\">Her şeyi dışa aktar</a> bölümündedir."
 
 #: src/postulo/templates/resume/preview.html
 #, fuzzy
@@ -7686,7 +7686,7 @@ msgstr "getirdi"
 #: src/postulo/templates/jobs/company_form.html
 #, fuzzy, python-format
 msgid "Fetched again from <bdi>%(address)s</bdi>."
-msgstr "<bdi>%(address)s[X35X35X]'ten tekrar dinlendi."
+msgstr "<bdi>%(address)s</bdi> adresinden yeniden alındı."
 
 #: src/postulo/jobs/slow.py
 #, fuzzy
@@ -8057,7 +8057,7 @@ msgstr "Bu dosyayı unutun"
 #: src/postulo/templates/settings/capture.html
 #, fuzzy, python-format
 msgid "Forget what is remembered for %(host)s"
-msgstr "[X30X için hatırlanan şeyi unutun]"
+msgstr "%(host)s için hatırlananları unut"
 
 #: src/postulo/accounts/settings_views.py
 #, fuzzy, python-format
@@ -8334,7 +8334,7 @@ msgstr "%(name)s kişisine yüz yüze, telefonla ya da siz olduğunuzu kanıtlay
 #: src/postulo/templates/jobs/move_owner.html
 #, fuzzy, python-format
 msgid "Give it to %(name)s?"
-msgstr "Bunu (X11X) verin mi?"
+msgstr "%(name)s kişisine verilsin mi?"
 
 #: src/postulo/templates/jobs/conflicts.html
 #, fuzzy
@@ -9241,12 +9241,12 @@ msgstr "Günlükte"
 #: src/postulo/core/search.py
 #, fuzzy, python-format
 msgid "in the document (%(kind)s) rendered on %(when)s"
-msgstr "belgede ([X17X) %(when)s"
+msgstr "%(when)s tarihinde oluşturulan belgede (%(kind)s)"
 
 #: src/postulo/core/search.py
 #, fuzzy, python-format
 msgid "in the document (%(kind)s) you sent to %(company)s on %(when)s"
-msgstr "belgede (X17X) %(when)s'a gönderildiniz"
+msgstr "%(when)s tarihinde %(company)s şirketine gönderdiğiniz belgede (%(kind)s)"
 
 #: src/postulo/templates/cotton/review_sections.html
 #: src/postulo/templates/jobs/contact_vcards.html
@@ -10142,7 +10142,7 @@ msgstr "Anahtarlar: <kbd class=\"kbd\">Ctrl</kbd>+<kbd class=\"kbd\">Enter</kbd>
 #: src/postulo/templates/jobs/capture_review.html
 #, fuzzy
 msgid "Keys: <kbd class=\"kbd\">d</kbd> discards and moves on, <kbd class=\"kbd\">j</kbd> skips to the next, <kbd class=\"kbd\">Ctrl</kbd>+<kbd class=\"kbd\">Enter</kbd> saves and moves on — while nothing is being typed."
-msgstr "Anahtarlar: <kbd class=\"kbd\"> discards ve hareket eder, <kbd class=\"kbd\">j </kbd> bir sonraki aşamaya atlar, <kbd class=\"kbd\">Ctrl</kbd>+[X126]Enter</kbd>."
+msgstr "Tuşlar: <kbd class=\"kbd\">d</kbd> atar ve devam eder, <kbd class=\"kbd\">j</kbd> sonrakine geçer, <kbd class=\"kbd\">Ctrl</kbd>+<kbd class=\"kbd\">Enter</kbd> kaydeder ve devam eder — hiçbir şey yazılmıyorken."
 
 #: src/postulo/documents/forms.py
 #, fuzzy
@@ -11191,7 +11191,7 @@ msgstr "Merged into it, ve sonra silindi"
 #: src/postulo/jobs/merging.py
 #, fuzzy, python-format
 msgid "Merged with %(name)s on %(date)s."
-msgstr "[X24X12X] ile birlikte."
+msgstr "%(date)s tarihinde %(name)s ile birleştirildi."
 
 #: src/postulo/jobs/views.py
 #, fuzzy
@@ -13461,8 +13461,8 @@ msgstr[1] "%(counter)s sayfalar, %(weight)s"
 #, fuzzy, python-format
 msgid "One page, weighing %(weight)s of the %(room)s this instance keeps for one account."
 msgid_plural "%(counter)s pages, weighing %(weight)s of the %(room)s this instance keeps for one account."
-msgstr[0] "%(counter)s sayfalar, %(room)s %(room)s Bu örnek bir hesap için tutar."
-msgstr[1] "%(counter)s sayfalar, %(room)s %(room)s Bu örnek bir hesap için tutar."
+msgstr[0] "Tek sayfa; bu örneğin bir hesap için ayırdığı %(room)s alanın %(weight)s kadarını kaplıyor."
+msgstr[1] "%(counter)s sayfa; bu örneğin bir hesap için ayırdığı %(room)s alanın %(weight)s kadarını kaplıyor."
 
 #: src/postulo/templates/settings/account.html
 #, fuzzy, python-format
@@ -13491,7 +13491,7 @@ msgstr "Bu şirketin eşyası için www.wikidata.org'a bir istek; bunu söyleyen
 #: src/postulo/templates/help/postal_addresses.html
 #, fuzzy
 msgid "One row for each address you want to keep. <em>Kind</em> says which it is and can be left blank. Choose <em>Other</em> and a box asks what to call it."
-msgstr "Her bir adres için bir satır tutmak istiyorsunuz. <em>Kind[X51X) Hangi olduğunu ve boş bırakılabileceğini söylüyor. <em>Diğer</em> ve bir kutu onu ne çağıracağını sorar."
+msgstr "Saklamak istediğiniz her adres için bir satır. <em>Tür</em> adresin ne olduğunu belirtir ve boş bırakılabilir. <em>Diğer</em> seçeneğini seçtiğinizde bir kutu ona ne ad vereceğinizi sorar."
 
 #: src/postulo/templates/help/telephone_numbers.html
 #, fuzzy
@@ -14315,7 +14315,7 @@ msgstr "Place"
 #: src/postulo/resume/models.py
 #, fuzzy
 msgid "place"
-msgstr "yer yer yer yeri"
+msgstr "yer"
 
 #: src/postulo/templates/partials/postal_addresses.html
 #, fuzzy
@@ -14388,7 +14388,7 @@ msgstr "GeoJSON gibi yerler"
 #: src/postulo/templates/jobs/partials/map_credits.html
 #, fuzzy
 msgid "Places from <a href=\"https://www.geonames.org\" class=\"underline\" rel=\"noopener noreferrer external\">GeoNames</a> (<a href=\"https://creativecommons.org/licenses/by/3.0/\" class=\"underline\" rel=\"noopener noreferrer external\">CC BY 3.0</a>; its postal codes <a href=\"https://creativecommons.org/licenses/by/4.0/\" class=\"underline\" rel=\"noopener noreferrer external\">CC BY 4.0</a>); country names from the Unicode CLDR, through Babel; the world outline from <a href=\"https://www.naturalearthdata.com\" class=\"underline\" rel=\"noopener noreferrer external\">Natural Earth</a> (public domain); the map drawn by <a href=\"https://leafletjs.com\" class=\"underline\" rel=\"noopener noreferrer external\">Leaflet</a>."
-msgstr "<a href=\"https://www.geonames.org\" class=\"underline\" rel=\"noopener noreferrer external\">GeoNames </a> ([X114X)CC BY 3.0</a>; postal kodları <a href=\"https://creativecommons.org/licenses/by/4.0/\" class=\"underline\" rel=\"noopener noreferrer external\">CC BY 4.0</a>; Unicode CLDR ülke isimleri, Babel; Dünya'dan Dünya<a href=\"https://www.naturalearthdata.com\" class=\"underline\" rel=\"noopener noreferrer external\">."
+msgstr "Yerler: <a href=\"https://www.geonames.org\" class=\"underline\" rel=\"noopener noreferrer external\">GeoNames</a> (<a href=\"https://creativecommons.org/licenses/by/3.0/\" class=\"underline\" rel=\"noopener noreferrer external\">CC BY 3.0</a>; posta kodları: <a href=\"https://creativecommons.org/licenses/by/4.0/\" class=\"underline\" rel=\"noopener noreferrer external\">CC BY 4.0</a>); ülke adları: Unicode CLDR, Babel aracılığıyla; dünya ana hatları: <a href=\"https://www.naturalearthdata.com\" class=\"underline\" rel=\"noopener noreferrer external\">Natural Earth</a> (kamu malı); harita çizimi: <a href=\"https://leafletjs.com\" class=\"underline\" rel=\"noopener noreferrer external\">Leaflet</a>."
 
 #: src/postulo/jobs/roles.py
 #, fuzzy
@@ -14718,7 +14718,7 @@ msgstr "Postulo kendi barındırılan bir iş uygulama yöneticisidir: uygulamal
 #: src/postulo/templates/settings/accessibility.html
 #, fuzzy, python-format
 msgid "Postulo is checked against WCAG 2.2 at level AA, in both themes, at 320 pixels and under Windows High Contrast; reduced motion and more contrast follow your system's own setting. What is checked, what is known not to work yet, and how to tell us when something does not work for you is on the <a href=\"%(guide)s\" class=\"underline\" rel=\"noopener noreferrer external\" target=\"_blank\">Accessibility page<span class=\"sr-only\"> (opens in a new tab)</span></a>."
-msgstr "Postulo, WCAG 2.2 seviyesine karşı kontrol edilir AA, her iki temada, 320 pikselde ve Windows High Contrast'ın altında; hareketi azaltır ve daha kontrast sisteminizin kendi ayarınızı takip eder. Ne kontrol edilir, henüz işe yaramadı ve sizin için işe yaramayan bir şeyin <a href=\"%(guide)s\" class=\"underline\" rel=\"noopener noreferrer external\" target=\"_blank\"> Erişilebilirlik sayfasında <span class=\"sr-only\"> (Yeni bir sekmede açılır)[X443X)."
+msgstr "Postulo, her iki temada, 320 piksel genişlikte ve Windows Yüksek Karşıtlık altında WCAG 2.2 AA düzeyine göre denetlenir; azaltılmış hareket ve daha fazla karşıtlık sisteminizin kendi ayarını izler. Nelerin denetlendiği, nelerin henüz çalışmadığının bilindiği ve bir şey sizin için çalışmadığında bunu bize nasıl bildireceğiniz <a href=\"%(guide)s\" class=\"underline\" rel=\"noopener noreferrer external\" target=\"_blank\">Erişilebilirlik sayfasında<span class=\"sr-only\"> (yeni sekmede açılır)</span></a> yer alır."
 
 #: src/postulo/templates/help/links.html
 #, fuzzy
@@ -15568,8 +15568,8 @@ msgstr "Kayıtlar iki kez tuttu ve karar vermek ne istiyor"
 #, fuzzy, python-format
 msgid "Records older than %(cutoff)s (%(days)s day). Nothing was removed; this is the report a deletion would be made from."
 msgid_plural "Records older than %(cutoff)s (%(days)s days). Nothing was removed; this is the report a deletion would be made from."
-msgstr[0] "%(cutoff)s ([X31X) günden daha eski kayıtlar. Hiçbir şey kaldırıldı; bu, bir deletion raporundan yapılacak."
-msgstr[1] "%(cutoff)s ([X31X) günden daha eski kayıtlar. Hiçbir şey kaldırıldı; bu, bir deletion raporundan yapılacak."
+msgstr[0] "%(cutoff)s tarihinden eski kayıtlar (%(days)s gün). Hiçbir şey kaldırılmadı; bu, bir silme işleminin dayanacağı rapordur."
+msgstr[1] "%(cutoff)s tarihinden eski kayıtlar (%(days)s gün). Hiçbir şey kaldırılmadı; bu, bir silme işleminin dayanacağı rapordur."
 
 #: src/postulo/templates/server/person_recovery.html
 #, fuzzy
@@ -16109,12 +16109,12 @@ msgstr "Yuvarlak ve derinlik"
 #: src/postulo/core/csv_import.py
 #, fuzzy, python-format
 msgid "Row %(number)s: %(problems)s"
-msgstr "%(number)s"
+msgstr "Satır %(number)s: %(problems)s"
 
 #: src/postulo/core/csv_import.py
 #, fuzzy, python-format
 msgid "Row %(number)s: already recorded (%(role)s at %(company)s, %(date)s)"
-msgstr "Row %(number)s: zaten kaydedildi (%(role)s, %(date)s"
+msgstr "Satır %(number)s: zaten kayıtlı (%(company)s şirketinde %(role)s, %(date)s)"
 
 #: src/postulo/core/csv_import.py
 #, fuzzy, python-format
@@ -16400,7 +16400,7 @@ msgstr "şema"
 #: src/postulo/core/identifiers.py
 #, fuzzy, python-format
 msgid "Scheme “%(key)s”: its name, its example or one of its links holds something that is not text and could not be drawn on a page, so the scheme is left out."
-msgstr "Scheme “[X8X)”: İsmi, onun örneği veya bağlantılarından biri metin olmayan bir şey tutar ve bir sayfada çizilemez, bu yüzden program dışarıda bırakılır."
+msgstr "“%(key)s” şeması: adı, örneği veya bağlantılarından biri metin olmayan ve bir sayfaya çizilemeyen bir şey içeriyor, bu nedenle şema dışarıda bırakıldı."
 
 #: src/postulo/core/server_forms.py
 #, fuzzy
@@ -17103,7 +17103,7 @@ msgstr "Show"
 #: src/postulo/templates/applications/calendar.html
 #, fuzzy, python-format
 msgid "Showing what matches “%(query)s” in %(period)s. <a href=\"%(everything_url)s?q=%(query_in_address)s\" class=\"underline\">Search everything</a>"
-msgstr "%(period)s <a href=\"%(everything_url)s?q=%(query_in_address)s\" class=\"underline\"> Her şeyi ara </a>"
+msgstr "%(period)s içinde “%(query)s” ile eşleşenler gösteriliyor. <a href=\"%(everything_url)s?q=%(query_in_address)s\" class=\"underline\">Her şeyde ara</a>"
 
 #: src/postulo/notifications/models.py
 #, fuzzy
@@ -17418,12 +17418,12 @@ msgstr "Yazılım"
 #: src/postulo/core/web_links.py
 #, fuzzy
 msgid "Some code repositories are kept and not shown, because {setting} is switched off. They come back untouched if it is switched on."
-msgstr "Bazı kod depozitleri tutulur ve gösterilmez, çünkü {kes} kapalıdır. Onlar devam ederse geri döndüler."
+msgstr "Bazı kod depoları saklanıyor ancak gösterilmiyor, çünkü {setting} kapalı. Açıldığında hiç değişmeden geri gelirler."
 
 #: src/postulo/core/web_links.py
 #, fuzzy
 msgid "Some code repositories are kept for this contact and not shown, because {setting} is switched off."
-msgstr "Bazı kod repositorları bu temas için tutulur ve gösterilmez, çünkü {kes} kapalıdır."
+msgstr "Bu kişi için bazı kod depoları saklanıyor ancak gösterilmiyor, çünkü {setting} kapalı."
 
 #: src/postulo/applications/views_ical.py
 #, fuzzy
@@ -17433,17 +17433,17 @@ msgstr "Bazı seçenekler başka bir görünüme ihtiyaç duyar."
 #: src/postulo/core/web_links.py
 #, fuzzy
 msgid "Some social profiles are kept and not shown, because {setting} is switched off. They come back untouched if it is switched on."
-msgstr "Bazı sosyal profiller tutulur ve gösterilmez, çünkü {kes} kapalıdır. Onlar devam ederse geri döndüler."
+msgstr "Bazı sosyal profiller saklanıyor ancak gösterilmiyor, çünkü {setting} kapalı. Açıldığında hiç değişmeden geri gelirler."
 
 #: src/postulo/core/web_links.py
 #, fuzzy
 msgid "Some social profiles are kept for this company and not shown, because {setting} is switched off."
-msgstr "Bazı sosyal profiller bu şirket için tutulur ve gösterilmez, çünkü {kes} kapalıdır."
+msgstr "Bu şirket için bazı sosyal profiller saklanıyor ancak gösterilmiyor, çünkü {setting} kapalı."
 
 #: src/postulo/core/web_links.py
 #, fuzzy
 msgid "Some social profiles are kept for this contact and not shown, because {setting} is switched off."
-msgstr "Bazı sosyal profiller bu temas için tutulur ve gösterilmez, çünkü {kes} kapalıdır."
+msgstr "Bu kişi için bazı sosyal profiller saklanıyor ancak gösterilmiyor, çünkü {setting} kapalı."
 
 #: src/postulo/resume/views_candidate.py
 #, fuzzy, python-format
@@ -17453,12 +17453,12 @@ msgstr "Bazı telefon numaraları eklendi. %(why)s"
 #: src/postulo/core/web_links.py
 #, fuzzy
 msgid "Some websites are kept and not shown, because {setting} is switched off. They come back untouched if it is switched on."
-msgstr "Bazı web siteleri tutulur ve gösterilmez, çünkü {kes} kapalıdır. Onlar devam ederse geri döndüler."
+msgstr "Bazı web siteleri saklanıyor ancak gösterilmiyor, çünkü {setting} kapalı. Açıldığında hiç değişmeden geri gelirler."
 
 #: src/postulo/core/web_links.py
 #, fuzzy
 msgid "Some websites are kept for this contact and not shown, because {setting} is switched off."
-msgstr "Bazı web siteleri bu temas için tutulur ve gösterilmez, çünkü {} kapalıdır."
+msgstr "Bu kişi için bazı web siteleri saklanıyor ancak gösterilmiyor, çünkü {setting} kapalı."
 
 #: src/postulo/accounts/models.py
 #, fuzzy
@@ -17749,7 +17749,7 @@ msgstr "Çalışmaz hale getir"
 #: src/postulo/templates/partials/table/views.html
 #, fuzzy, python-format
 msgid "Stop opening as %(name)s"
-msgstr "[X16X) olarak açılmayı bırakın"
+msgstr "%(name)s olarak açmayı durdur"
 
 #: src/postulo/templates/jobs/share.html
 #, fuzzy
@@ -18448,8 +18448,8 @@ msgstr "Bu dosya, bölümleri bir takvimden daha derinleştirir."
 #, fuzzy, python-format
 msgid "That file took longer than %(seconds)s second to arrive."
 msgid_plural "That file took longer than %(seconds)s seconds to arrive."
-msgstr[0] "Bu dosya, gelecek saniyelerden daha uzun sürdü."
-msgstr[1] "Bu dosya, gelecek saniyelerden daha uzun sürdü."
+msgstr[0] "Bu dosyanın gelmesi %(seconds)s saniyeden uzun sürdü."
+msgstr[1] "Bu dosyanın gelmesi %(seconds)s saniyeden uzun sürdü."
 
 #: src/postulo/jobs/vcard_views.py
 #, fuzzy
@@ -18475,7 +18475,7 @@ msgstr "Bu dosya okunmuştu ve hiçbir olay ya da görev yoktu."
 #: src/postulo/jobs/logos.py
 #, fuzzy, python-format
 msgid "That file was sent with the content encoding “%(coding)s”, which Postulo does not unpack."
-msgstr "Bu dosya, Postulo'nun paketlenmediği içerik ile gönderildi."
+msgstr "Bu dosya, Postulo'nun açamadığı “%(coding)s” içerik kodlamasıyla gönderildi."
 
 #: src/postulo/core/phones.py
 #, fuzzy
@@ -18811,13 +18811,13 @@ msgstr "O sayfa %(status)s döndürdü."
 #, fuzzy, python-format
 msgid "That page took longer than %(seconds)s second to arrive, so it was not read."
 msgid_plural "That page took longer than %(seconds)s seconds to arrive, so it was not read."
-msgstr[0] "Bu sayfa, gelecek saniyelerden daha uzun sürdü, bu yüzden okumadı."
-msgstr[1] "Bu sayfa, gelecek saniyelerden daha uzun sürdü, bu yüzden okumadı."
+msgstr[0] "Bu sayfanın gelmesi %(seconds)s saniyeden uzun sürdü, bu nedenle okunmadı."
+msgstr[1] "Bu sayfanın gelmesi %(seconds)s saniyeden uzun sürdü, bu nedenle okunmadı."
 
 #: src/postulo/plugins/fetching.py
 #, fuzzy, python-format
 msgid "That page was sent with the content encoding “%(coding)s”, which Postulo does not unpack, so it was not read."
-msgstr "Bu sayfa, Postulo'nun paketlenmediği içerik ile gönderildi, bu yüzden okumadı."
+msgstr "Bu sayfa, Postulo'nun açamadığı “%(coding)s” içerik kodlamasıyla gönderildi, bu nedenle okunmadı."
 
 #: src/postulo/applications/forms.py
 #, fuzzy
@@ -19306,7 +19306,7 @@ msgstr "Hata giriş yapıldı. Bu örneği yönetiyorsanız, sunucu girişi ayr�
 #: src/postulo/templates/resume/item_form.html
 #, fuzzy, python-format
 msgid "The ESCO classification knows this skill as “%(name)s”. Where you have not written your own, a CV in another of the classification's languages prints the name it gives the skill there."
-msgstr "ESCO sınıflandırması bu yeteneği “[X45X) olarak bilir. Kendinizi yazmadığınız yerde, sınıflandırmanın başka bir dilde bir CV, orada yetenekleri veren adı yazdırır."
+msgstr "ESCO sınıflandırması bu beceriyi “%(name)s” olarak tanır. Kendi adınızı yazmadığınız durumlarda, sınıflandırmanın başka bir dilindeki bir CV, sınıflandırmanın o dilde beceriye verdiği adı yazdırır."
 
 #: src/postulo/resume/forms.py
 #, fuzzy
@@ -20020,7 +20020,7 @@ msgstr "Form bu örnek devam ettiğinden daha büyük çıktı."
 #: src/postulo/templates/jobs/capture_page_forget.html
 #, fuzzy, python-format
 msgid "The rendering kept of the page that “%(title)s” was read from will be deleted permanently."
-msgstr "Form, “[X37X)'in kalıcı olarak silineceği sayfadan saklandı."
+msgstr "“%(title)s” kaydının okunduğu sayfanın saklanan görüntüsü kalıcı olarak silinecek."
 
 #: src/postulo/templates/jobs/capture_page.html
 #, fuzzy
@@ -20572,7 +20572,7 @@ msgstr "Bu referanslar dışarıda bırakılır, çünkü adlandırılmamışlar
 #: src/postulo/templates/documents/cv_detail.html
 #, fuzzy, python-format
 msgid "These skills print the name the ESCO classification gives them in %(tongue)s, because you have not written one of your own:"
-msgstr "Bu beceriler, ESCO sınıflandırması adını yazdırır, çünkü kendinizden birini yazmanız gerekir:"
+msgstr "Kendi adınızı yazmadığınız için bu beceriler, ESCO sınıflandırmasının %(tongue)s dilinde onlara verdiği adı yazdırır:"
 
 #: src/postulo/applications/models.py
 #, fuzzy
@@ -20675,7 +20675,7 @@ msgstr "Bu arşiv doğrulamaz, bu yüzden ondan geri yüklemez."
 #: src/postulo/templates/server/backup_restore.html
 #, fuzzy, python-format
 msgid "This archive holds a %(there)s database and this instance runs %(here)s. A restore refuses an archive from the other engine."
-msgstr "Bu arşiv bir veritabanına sahiptir ve bu örnek %(here)s çalışır. Bir geri yükleme diğer motordan bir arşiv reddeder."
+msgstr "Bu arşiv bir %(there)s veritabanı içeriyor, bu örnek ise %(here)s çalıştırıyor. Geri yükleme, diğer veritabanı motorundan gelen bir arşivi reddeder."
 
 #: src/postulo/templates/server/backup_restore.html
 #, fuzzy
@@ -20770,7 +20770,7 @@ msgstr "Bu şirket %(date)s ile çözüldü."
 #: src/postulo/jobs/status.py
 #, fuzzy, python-format
 msgid "This company was reported laying people off as of %(date)s."
-msgstr "Bu şirket, insanları [X50X) olarak döşeniyordu."
+msgstr "Bu şirketin %(date)s itibarıyla işten çıkarma yaptığı bildirildi."
 
 #: src/postulo/templates/resume/item_form.html
 #, fuzzy
@@ -20861,7 +20861,7 @@ msgstr "Bu kurulumda henüz hesap yok, bu yüzden kayıt formu ona ulaşan herke
 #: src/postulo/resume/candidate.py
 #, fuzzy, python-format
 msgid "This instance has no kind of identifier called “%(key)s”, so it is added as Other, named “%(name)s”."
-msgstr "Bu örnek, “[X48X) olarak adlandırılan bir tür tanımlayıcıya sahip değildir, bu nedenle O'nun adı “X90X” olarak eklenmiştir."
+msgstr "Bu örnekte “%(key)s” adında bir tanımlayıcı türü yok; bu nedenle “%(name)s” adıyla Diğer olarak ekleniyor."
 
 #: src/postulo/notifications/text.py
 #, fuzzy
@@ -20931,7 +20931,7 @@ msgstr "Bu bir ülke kodu değildir."
 #: src/postulo/resume/candidate.py
 #, fuzzy, python-format
 msgid "This is not a value %(kind)s accepts here, so it is added as Other, named “%(name)s”."
-msgstr "Bu bir değer değil %(kind)s burada kabul ediyor, bu yüzden O'nun adı “X75X” olarak ekleniyor."
+msgstr "Bu, %(kind)s türünün burada kabul ettiği bir değer değil; bu nedenle “%(name)s” adıyla Diğer olarak ekleniyor."
 
 #: src/postulo/resume/candidate.py
 #, fuzzy
@@ -21016,7 +21016,7 @@ msgstr "Bu giden kutusu %(other)s olarak değil, %(address)s olarak gönderir."
 #: src/postulo/templates/help/your_details.html
 #, fuzzy
 msgid "This page is what Postulo knows about you as a candidate. The name, the picture and the contact block are what your CVs and letters print at their top; the telephone numbers, messaging handles, postal addresses, links and identifiers are behind the contact block, and a CV prints the ones its own <em>Settings</em> choose."
-msgstr "Bu sayfa, Postulo'nun size bir aday olarak bildiği şeydir. Adı, resim ve iletişim bloğu, CV'lerinizin ve mektuplarınızın üstlerinde bastıkları şeydir; telefon numaraları, mesajlaşma işleri, posta adresleri, bağlantıları ve tanımlayıcılar iletişim bloğunun arkasındadır ve bir CV baskıları kendi [X297]Settings</em>."
+msgstr "Bu sayfa, Postulo'nun bir aday olarak sizin hakkınızda bildikleridir. Ad, fotoğraf ve iletişim bloğu, CV'lerinizin ve mektuplarınızın en üstte yazdırdığı bilgilerdir; telefon numaraları, mesajlaşma kullanıcı adları, posta adresleri, bağlantılar ve tanımlayıcılar iletişim bloğunun arkasındadır ve bir CV, kendi <em>Ayarlar</em> bölümünün seçtiklerini yazdırır."
 
 #: src/postulo/resume/forms.py src/postulo/resume/models.py
 #, fuzzy
@@ -21138,7 +21138,7 @@ msgstr "%(title)s işaretle"
 #: src/postulo/templates/help/your_picture.html
 #, fuzzy
 msgid "Tick <em>Use my Gravatar</em> and save, and Postulo asks gravatar.com once for the picture kept there for your primary email address. Gravatar is sent a hash of the address, not the address. Postulo keeps a copy and shows that, so nothing is fetched while pages are viewed. It asks again when your primary address changes, or when you press <em>Fetch my Gravatar again</em>. Untick the box and save, and the copy is deleted."
-msgstr "<em> Gravatarımı </em> kullanın ve kurtarın ve Postulo, resim için bir kez birincil e-posta adresiniz için orada tutulmasını ister. Gravatar adresin bir hash gönderdi, adres değil. Postulo bir kopya tutar ve bunu gösterir, bu yüzden sayfaların görüntülendiği zaman hiçbir şey gelmez. İlk adresiniz değiştiğinde tekrar sorar veya basında <em> Tekrar Gravatarımı (X368X) Kutuyu ve kurtarmayın ve kopya silinir."
+msgstr "<em>Gravatar'ımı kullan</em> kutusunu işaretleyip kaydedin; Postulo, birincil e-posta adresiniz için orada saklanan resmi gravatar.com'dan bir kez ister. Gravatar'a adresin kendisi değil, bir özeti (hash) gönderilir. Postulo bir kopya saklar ve onu gösterir; böylece sayfalar görüntülenirken hiçbir şey alınmaz. Birincil adresiniz değiştiğinde veya <em>Gravatar'ımı yeniden al</em> düğmesine bastığınızda yeniden ister. Kutunun işaretini kaldırıp kaydedin; kopya silinir."
 
 #: src/postulo/resume/forms.py
 #, fuzzy
@@ -21348,8 +21348,8 @@ msgstr "Çok fazla mesaj. Birazdan tekrar deneyin."
 #, fuzzy, python-format
 msgid "Too many requests: %(times)d allowed every %(seconds)d second."
 msgid_plural "Too many requests: %(times)d allowed every %(seconds)d seconds."
-msgstr[0] "Çok fazla istek: %(times)d her saniye izin verdi."
-msgstr[1] "Çok fazla istek: %(times)d her saniye izin verdi."
+msgstr[0] "Çok fazla istek: her %(seconds)d saniyede %(times)d isteğe izin verilir."
+msgstr[1] "Çok fazla istek: her %(seconds)d saniyede %(times)d isteğe izin verilir."
 
 #: src/postulo/core/models.py
 #, fuzzy
@@ -22152,7 +22152,7 @@ msgstr "Bir plan ne söyleyebilir"
 #: src/postulo/templates/cotton/identifier_schemes.html
 #, fuzzy
 msgid "What a value looks like, from its first character to its last. A character stands for itself. A class is one character out of several: <code dir=\"ltr\">[A-Z]</code>, <code dir=\"ltr\">[0-9a-f]</code>, <code dir=\"ltr\">[^ ]</code> for anything but a space, <code dir=\"ltr\">\\d</code> for a digit, <code dir=\"ltr\">\\w</code> for a letter, a digit or an underscore. A count follows what it counts: <code dir=\"ltr\">{4}</code>, <code dir=\"ltr\">{2,5}</code>, or <code dir=\"ltr\">?</code> for one or none. Alternatives are separated by <code dir=\"ltr\">|</code>, and a fixed separator sits in round brackets: <code dir=\"ltr\">( - )?</code>."
-msgstr "Bir değer neye benziyor, ilk karakterinden sonuna. Bir karakter kendi için duruyor. Bir sınıf birkaç karakterden biridir: <code dir=\"ltr\">[A-Z]</code>, <code dir=\"ltr\">[0-9a-f]</code>, <code dir=\"ltr\"></code> herhangi bir şey için ama bir alan için, <code dir=\"ltr\"> bir sayısal, [X270X270X] A count what it count: <code dir=\"ltr\">{4}</code>, <code dir=\"ltr\">{2,5}</code> veya [X450X) bir ya da hiçbiri için. Alternatifler <code dir=\"ltr\">|</code> tarafından ayrılır ve sabit bir sempozyum yuvarlak braketlerde oturur: <code dir=\"ltr\">()?</code>."
+msgstr "Bir değerin ilk karakterinden son karakterine kadar nasıl göründüğü. Bir karakter kendisini ifade eder. Bir sınıf, birkaç karakterden biridir: <code dir=\"ltr\">[A-Z]</code>, <code dir=\"ltr\">[0-9a-f]</code>, boşluk dışındaki her şey için <code dir=\"ltr\">[^ ]</code>, bir rakam için <code dir=\"ltr\">\\d</code>, bir harf, rakam veya alt çizgi için <code dir=\"ltr\">\\w</code>. Bir sayı, saydığı şeyin ardından gelir: <code dir=\"ltr\">{4}</code>, <code dir=\"ltr\">{2,5}</code> veya bir ya da hiç için <code dir=\"ltr\">?</code>. Alternatifler <code dir=\"ltr\">|</code> ile ayrılır ve sabit bir ayırıcı yuvarlak parantez içinde yer alır: <code dir=\"ltr\">( - )?</code>."
 
 #: src/postulo/templates/server/design.html
 #, fuzzy
@@ -22685,7 +22685,7 @@ msgstr "Belgeleriniz adınızın altında basıyor: bir başlık, neredesiniz ve
 #: src/postulo/templates/documents/cv_text.html
 #, fuzzy, python-format
 msgid "What “%(name)s” says, without the layout: for a form that wants the text pasted in. Select all of it and copy."
-msgstr "What “[X6XX)” diyor, düzen olmadan: Metinin geçmiş olmasını isteyen bir form için. Tümünü seçin ve kopyalayın."
+msgstr "“%(name)s” belgesinin içeriği, düzen olmadan: metnin yapıştırılmasını isteyen formlar için. Tümünü seçip kopyalayın."
 
 #: src/postulo/templates/server/overview.html
 #, fuzzy, python-format
@@ -22753,7 +22753,7 @@ msgstr "Bir kartın <em>Hizmet</em> menüsü vardır, adresi seçin. Onun ikonu 
 #: src/postulo/templates/cotton/identifier_schemes.html
 #, fuzzy
 msgid "Where a value leads: an http or https address with <code dir=\"ltr\">{value}</code> where the identifier goes, after the host. <code dir=\"ltr\">person_link</code> is the address for a person, where that is another one."
-msgstr "Bir değer nereye yol açar: <code dir=\"ltr\"> ile bir http veya https adresi </code> </code>, tanımlayıcıların bulunduğu yerde, ev sahibinden sonra. <code dir=\"ltr\">kişi link</code> bir kişi için adresidir, bu başka bir şeydir."
+msgstr "Bir değerin yönlendirdiği yer: ana makine adından sonra, tanımlayıcının geleceği yerde <code dir=\"ltr\">{value}</code> bulunan bir http veya https adresi. <code dir=\"ltr\">person_link</code>, farklı olduğunda bir kişiye ait adrestir."
 
 #: src/postulo/applications/widgets.py
 #, fuzzy
@@ -23264,13 +23264,13 @@ msgstr "Endüstrileri, departmanları ve tanımlayıcıları ile. Logolar dışa
 #, fuzzy
 msgctxt "introduces the people at an interview, after its place; {people} is their names"
 msgid "with {people}"
-msgstr "{insanlar}"
+msgstr "{people} ile"
 
 #: src/postulo/applications/models.py
 #, fuzzy
 msgctxt "introduces the people at an interview, on a line of its own; {people} is their names"
 msgid "With {people}"
-msgstr "{insanlar}"
+msgstr "{people} ile"
 
 #: src/postulo/applications/ical.py
 #, fuzzy, python-format
@@ -23425,7 +23425,7 @@ msgstr "<bdi>%(name)s</bdi>"
 #: src/postulo/templates/resume/candidate_file.html
 #, fuzzy, python-format
 msgid "Written by Postulo %(version)s on %(when)s."
-msgstr "Postulo %(version)s tarafından yazıldı."
+msgstr "Postulo %(version)s tarafından %(when)s tarihinde yazıldı."
 
 #: src/postulo/templates/resume/europass_import.html
 #, fuzzy, python-format
@@ -24201,7 +24201,7 @@ msgstr "· hâlâ sürüyor"
 #: src/postulo/core/language_field.py
 #, fuzzy, python-format
 msgid "“%(code)s” is not a language code, like %(first)s or %(second)s."
-msgstr "%(code)s”, %(first)s veya [X53X) gibi bir dil kodu değildir."
+msgstr "“%(code)s” bir dil kodu değil (örneğin %(first)s veya %(second)s gibi)."
 
 #: src/postulo/core/web_links.py src/postulo/jobs/surface.py
 #: src/postulo/resume/candidate.py
@@ -24212,7 +24212,7 @@ msgstr "%(kind)s” bağlantı türlerinden biri değildir."
 #: src/postulo/templates/partials/table/views.html
 #, fuzzy, python-format
 msgid "“%(name)s” asks for things this table no longer has, and is shown without them:"
-msgstr "“[X1X)” bu masanın artık sahip olmadığı şeyleri sorar ve onlar olmadan gösterilir:"
+msgstr "“%(name)s”, bu tablonun artık içermediği şeyleri istiyor ve onlar olmadan gösteriliyor:"
 
 #: src/postulo/resume/candidate.py
 #, fuzzy, python-format
@@ -24269,12 +24269,12 @@ msgstr "“%(name)s” kaldırılacak ve onun için saklanan gizli bilgiler sili
 #: src/postulo/templates/jobs/conflicts.html
 #, fuzzy, python-format
 msgid "“%(record)s” is shared with %(who)s, who cannot see what it points at:"
-msgstr "%(record)s\" [X28X28X] ile paylaşılır, hangi noktaları göremez:"
+msgstr "“%(record)s”, işaret ettiği şeyi göremeyen %(who)s ile paylaşılıyor:"
 
 #: src/postulo/jobs/sharing.py
 #, fuzzy, python-format
 msgid "“%(record)s” would be shown to %(names)s, who can see “%(parent)s”; share it with them first."
-msgstr "[X1X31X], (X55X55X)'i görebilecek, ilk önce onlarla paylaşacaktır."
+msgstr "“%(record)s”, “%(parent)s” öğesini görebilen %(names)s kişilerine gösterilecek; önce onu onlarla paylaşın."
 
 #: src/postulo/jobs/sharing.py
 #, fuzzy, python-format
@@ -24294,7 +24294,7 @@ msgstr "%(title)s, daha önce gönderilen sürüme karşı."
 #: src/postulo/jobs/sharing.py
 #, fuzzy, python-format
 msgid "“%(what)s” is no longer shared with you"
-msgstr "Artık sizinle paylaşılmaz"
+msgstr "“%(what)s” artık sizinle paylaşılmıyor"
 
 #: src/postulo/resume/forms.py
 #, fuzzy
