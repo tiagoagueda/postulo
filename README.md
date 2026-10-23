@@ -150,20 +150,30 @@ corrected and reviewed at [translate.tiagoagueda.com](https://translate.tiagoagu
 
 <!-- languages:start (written by scripts/readme_languages.py; do not edit by hand) -->
 
-Postulo speaks **10 languages**, each named here as its speakers write it.
+Postulo speaks **20 languages**, each named here as its speakers write it.
 
 | | Language | What Postulo is |
 | --- | --- | --- |
 | <img src="src/postulo/static/flags/id.svg" width="20" height="15" alt=""> | **<span lang="id" dir="ltr">Bahasa Indonesia</span>** | <span lang="id" dir="ltr">Postulo adalah pengelola lamaran kerja yang dihosting sendiri: lamaran, CV, dan surat lamaran Anda di server Anda sendiri, tanpa fitur berbayar.</span> |
-| <img src="src/postulo/static/flags/ca.svg" width="20" height="15" alt=""> | **<span lang="en-CA" dir="ltr">English (Canada)</span>** | <span lang="en-CA" dir="ltr">Postulo is a self-hosted job application manager: your applications, CVs and cover letters on your own server, with no paid features.</span> |
+| <img src="src/postulo/static/flags/ba.svg" width="20" height="15" alt=""> | **<span lang="bs" dir="ltr">bosanski</span>** | — |
+| <img src="src/postulo/static/flags/es-ct.svg" width="20" height="15" alt=""> | **<span lang="ca" dir="ltr">català</span>** | — |
+| <img src="src/postulo/static/flags/dk.svg" width="20" height="15" alt=""> | **<span lang="da" dir="ltr">dansk</span>** | — |
+| <img src="src/postulo/static/flags/de.svg" width="20" height="15" alt=""> | **<span lang="de" dir="ltr">Deutsch</span>** | — |
+| <img src="src/postulo/static/flags/ca.svg" width="20" height="15" alt=""> | **<span lang="en-CA" dir="ltr">English (Canada)</span>** | <span lang="en-CA" dir="ltr">Postulo is a self-hosted job application manager: your applications, résumés and cover letters on your own server, with no paid features.</span> |
 | <img src="src/postulo/static/flags/gb.svg" width="20" height="15" alt=""> | **<span lang="en-GB" dir="ltr">English (United Kingdom)</span>** | <span lang="en-GB" dir="ltr">Postulo is a self-hosted job application manager: your applications, CVs and cover letters on your own server, with no paid features.</span> |
+| <img src="src/postulo/static/flags/es.svg" width="20" height="15" alt=""> | **<span lang="es" dir="ltr">español</span>** | — |
 | <img src="src/postulo/static/flags/mx.svg" width="20" height="15" alt=""> | **<span lang="es-MX" dir="ltr">español (México)</span>** | <span lang="es-MX" dir="ltr">Postulo es un administrador de solicitudes de empleo de alojamiento propio: sus solicitudes, currículums y cartas de presentación en su propio servidor, sin funciones de pago.</span> |
 | <img src="src/postulo/static/flags/ca.svg" width="20" height="15" alt=""> | **<span lang="fr-CA" dir="ltr">français (Canada)</span>** | <span lang="fr-CA" dir="ltr">Postulo est un gestionnaire de candidatures auto-hébergé : vos candidatures, CV et lettres de présentation sur votre propre serveur, sans fonction payante.</span> |
 | <img src="src/postulo/static/flags/fr.svg" width="20" height="15" alt=""> | **<span lang="fr-FR" dir="ltr">français (France)</span>** | <span lang="fr-FR" dir="ltr">Postulo est un gestionnaire de candidatures auto-hébergé : vos candidatures, CV et lettres de motivation sur votre propre serveur, sans fonction payante.</span> |
 | <img src="src/postulo/static/flags/es-ga.svg" width="20" height="15" alt=""> | **<span lang="gl" dir="ltr">galego</span>** | <span lang="gl" dir="ltr">Postulo é un xestor de candidaturas de emprego autoaloxado: as túas candidaturas, CV e cartas de presentación no teu propio servidor, sen funcións de pago.</span> |
+| <img src="src/postulo/static/flags/hr.svg" width="20" height="15" alt=""> | **<span lang="hr" dir="ltr">hrvatski</span>** | — |
 | <img src="src/postulo/static/flags/lt.svg" width="20" height="15" alt=""> | **<span lang="lt" dir="ltr">lietuvių</span>** | <span lang="lt" dir="ltr">Postulo yra savarankiškai talpinama darbo paraiškų tvarkyklė: jūsų paraiškos, gyvenimo aprašymai ir motyvaciniai laiškai jūsų pačių serveryje, be mokamų funkcijų.</span> |
 | <img src="src/postulo/static/flags/hu.svg" width="20" height="15" alt=""> | **<span lang="hu" dir="ltr">magyar</span>** | <span lang="hu" dir="ltr">A Postulo egy saját üzemeltetésű álláspályázat-kezelő: a jelentkezései, önéletrajzai és motivációs levelei a saját szerverén, fizetős funkciók nélkül.</span> |
 | <img src="src/postulo/static/flags/pt.svg" width="20" height="15" alt=""> | **<span lang="pt-PT" dir="ltr">português (Portugal)</span>** | <span lang="pt-PT" dir="ltr">O Postulo é um gestor de candidaturas de emprego alojado por si: as suas candidaturas, CV e cartas de apresentação no seu próprio servidor, sem funcionalidades pagas.</span> |
+| <img src="src/postulo/static/flags/cz.svg" width="20" height="15" alt=""> | **<span lang="cs" dir="ltr">čeština</span>** | — |
+| <img src="src/postulo/static/flags/gr.svg" width="20" height="15" alt=""> | **<span lang="el" dir="ltr">Ελληνικά</span>** | — |
+| <img src="src/postulo/static/flags/bg.svg" width="20" height="15" alt=""> | **<span lang="bg" dir="ltr">български</span>** | — |
+| <img src="src/postulo/static/flags/rs.svg" width="20" height="15" alt=""> | **<span lang="sr-Cyrl" dir="ltr">српски</span>** | — |
 
 <!-- languages:end -->
 

@@ -21,11 +21,12 @@ from io import BytesIO
 import pytest
 from django.urls import reverse
 from django.utils import translation
+from django.utils.translation import pgettext
 
 from postulo.accounts import addressing
 from postulo.accounts.forms import ProfileForm
 from postulo.api.models import ApiToken
-from postulo.core import export, importer, postal
+from postulo.core import export, importer, languages, postal
 from postulo.core.models import PostalAddress
 from postulo.documents.models import CV
 from postulo.documents.rendering import contact_details, render_cv_html
@@ -180,7 +181,11 @@ def test_a_concept_is_drawn_in_the_language_it_is_asked_for_and_other_text_is_no
     assert addressing.label("pronouns", "he", "en-GB") == "he/him"
     assert addressing.label("pronouns", "xe/xem", "fr-FR") == "xe/xem"
     assert addressing.label("form_of_address", "maitre", "en-GB") == "Me", "the catalogue's"
-    assert addressing.label("gender", "male", "de") == "Male", "the catalogue's, untranslated"
+    # German has no table of its own, so the word is the catalogue's, whatever Weblate has made
+    # of it: a test never pins a translation.
+    with languages.override("de"):
+        catalogue = pgettext("gender", "Male")
+    assert addressing.label("gender", "male", "de") == catalogue, "the catalogue's"
 
 
 def test_a_language_with_no_list_offers_none_and_a_variant_takes_its_familys():
