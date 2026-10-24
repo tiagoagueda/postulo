@@ -33,7 +33,10 @@
                   </p>
                 {% endif %}
               </td>
-              <td class="align-top">
+              {% comment %} The notes are long sentences in some languages and one word of
+                 them can be wider than half of 320 pixels (Greek "πληκτρολογούνταν"), so
+                 this half may break inside a word, like the other one. {% endcomment %}
+              <td class="align-top wrap-anywhere">
                 <p{% if row.outcome == "add" %} class="font-medium"{% endif %}>{{ row.outcome_label }}</p>
                 {% for note in row.notes %}
                   <p class="text-xs text-ink-500 dark:text-ink-400">{{ note }}</p>
