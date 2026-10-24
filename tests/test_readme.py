@@ -9,9 +9,12 @@
 from __future__ import annotations
 
 import importlib.util
+import os
 import re
 import tomllib
 from pathlib import Path
+
+import pytest
 
 REPO = Path(__file__).resolve().parents[1]
 
@@ -24,7 +27,16 @@ def _script(name: str):
 
 
 def test_the_language_table_is_current():
+    """On a contributor's machine; in CI only that the table can still be written.
+
+    The table follows the translations, which land from Weblate, so it is stale on every
+    Weblate pull request and on ``main`` until the README workflow's pull request brings
+    it up to date (#1044). Comparing it in CI turned those runs red for nothing.
+    """
     script = _script("readme_languages")
+    if os.environ.get("CI"):
+        script.render((REPO / "README.md").read_text(encoding="utf-8"))
+        pytest.skip("CI: .forgejo/workflows/readme.yml keeps the table current (#1044)")
     assert script.main(["--check"]) == 0, "run scripts/readme_languages.py"
 
 

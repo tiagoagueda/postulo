@@ -1,0 +1,145 @@
+# Keeps the README's generated parts current after translations land (#1044).
+#
+# The "In your language" table in README.md (scripts/readme_languages.py) lists each
+# language with Postulo's tagline as its own catalogue has it, and .github/README.md
+# (scripts/github_readme.py) copies the README for the GitHub mirror. Both change whenever
+# Weblate translates the tagline, so every Weblate pull request used to turn red until
+# somebody ran the two scripts by hand and pushed to the `weblate` branch -- and Weblate,
+# which rebases that branch onto `main` before it pushes, then dropped the commit again.
+# Weblate cannot run our scripts itself.
+#
+# So the table is written after the fact instead: on every push to `main` that touches
+# something it is made from, this runs both scripts and, if either file moved, opens (or
+# updates) a pull request with the result. `tests/test_readme.py` no longer compares the
+# table in CI for the same reason, and still compares it on a contributor's machine.
+#
+# The pull request is meant to be squash-merged: `main` requires signed commits, and the
+# commit this job makes is unsigned, while the squash commit is Forgejo's and signed.
+#
+# It writes a branch and opens a pull request, so it needs more than `contents: read`,
+# which is why it is its own file rather than a job in ci.yml. It uses the same bot token
+# as dependencies.yml (repository secret DEPENDENCIES_TOKEN, `postulo-bot`), so the pull
+# request starts ci.yml: Forgejo ignores events whose doer is the Actions user (#585).
+# There is no `permissions:` block because Forgejo 16 ignores the field (#727), and the
+# conditions sit on steps because this runner fails a job whose `if` is false (#712).
+name: README
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "README.md"
+      - ".github/README.md"
+      - "src/postulo/locale/**"
+      - "src/postulo/core/languages.py"
+      - "src/postulo/core/messages_tool.py"
+      - "src/postulo/static/flags/**"
+      - "scripts/readme_languages.py"
+      - "scripts/github_readme.py"
+  workflow_dispatch:
+
+env:
+  UV_VERSION: "0.12.17"
+  # The sha256 of that version's install.sh, checked before it is run (#790). Bump it with
+  # UV_VERSION, see CONTRIBUTING.md.
+  UV_INSTALLER_SHA256: "37b82230b28617c6c24fa52364fa28aa37f2aa40c114809a623f6b064a9730e5"
+  BRANCH: readme-languages
+
+jobs:
+  tables:
+    name: README language tables
+    runs-on: ubuntu-latest
+    container:
+      image: node:22-bookworm
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # Pushed below with the token handed to that one step, not with one left in
+          # .git/config for every step after the checkout.
+          persist-credentials: false
+
+      - name: Install uv
+        run: |
+          curl -LsSf "https://astral.sh/uv/${UV_VERSION}/install.sh" -o /tmp/uv-install.sh
+          echo "${UV_INSTALLER_SHA256}  /tmp/uv-install.sh" | sha256sum -c -
+          sh /tmp/uv-install.sh
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+
+      - name: Write the tables
+        id: tables
+        # Both scripts import only the standard library and postulo.core's catalogue
+        # tools, so no dependency is installed: a Python is enough.
+        run: |
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+          uv run --no-project --python 3.14 python scripts/readme_languages.py
+          uv run --no-project --python 3.14 python scripts/github_readme.py
+          if git diff --quiet -- README.md .github/README.md; then
+            echo "The tables are current."
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            git diff --stat -- README.md .github/README.md
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Push the branch and open the pull request, or close a stale one
+        env:
+          # Through the environment, never expanded into the script.
+          TOKEN: ${{ secrets.DEPENDENCIES_TOKEN || secrets.GITHUB_TOKEN }}
+          BOT_TOKEN_SET: ${{ secrets.DEPENDENCIES_TOKEN != '' && 'yes' || 'no' }}
+          CHANGED: ${{ steps.tables.outputs.changed }}
+          SERVER: ${{ github.server_url }}
+          REPOSITORY: ${{ github.repository }}
+          BASE: ${{ github.ref_name }}
+        run: |
+          if [ "$CHANGED" = true ]; then
+            git config user.name "Postulo README"
+            git config user.email "readme@postulo.invalid"
+            git checkout -B "$BRANCH"
+            git add README.md .github/README.md
+            git commit -m "Bring the README language tables up to date" \
+              -m "Written by scripts/readme_languages.py and scripts/github_readme.py after translations landed on main (#1044)."
+            # The token in the URL of this one push, not in .git/config. Forced: the branch
+            # is always main plus this one commit, rewritten on every run.
+            git push --force "${SERVER%%://*}://x-access-token:${TOKEN}@${SERVER#*://}/${REPOSITORY}.git" "HEAD:refs/heads/${BRANCH}"
+          fi
+          python3 - <<'PY'
+          import json, os, urllib.request
+          branch, changed = os.environ["BRANCH"], os.environ["CHANGED"] == "true"
+          server, repository, token = os.environ["SERVER"], os.environ["REPOSITORY"], os.environ["TOKEN"]
+          api = f"{server.rstrip('/')}/api/v1/repos/{repository}"
+          def call(method, path, body=None):
+              request = urllib.request.Request(api + path, method=method, data=json.dumps(body).encode() if body else None)
+              request.add_header("Authorization", f"token {token}")
+              request.add_header("Accept", "application/json")
+              if body is not None:
+                  request.add_header("Content-Type", "application/json")
+              with urllib.request.urlopen(request, timeout=60) as response:
+                  return json.loads(response.read() or b"null")
+          mine = [p for p in call("GET", "/pulls?state=open&limit=50") if p.get("head", {}).get("ref") == branch]
+          if not changed:
+              # Somebody regenerated the tables by hand, or the last one was merged.
+              for pull in mine:
+                  call("PATCH", f"/pulls/{pull['number']}", {"state": "closed"})
+                  print(f"Closed {pull['html_url']}: main's tables are current.")
+          elif mine:
+              print(f"{mine[0]['html_url']} is already open; the branch was updated under it.")
+          else:
+              ci = (
+                  "CI on this pull request is the check; merge it when it is green."
+                  if os.environ["BOT_TOKEN_SET"] == "yes"
+                  else "No bot token is configured (secret `DEPENDENCIES_TOKEN`), so CI did not run on this pull request: run it by hand before merging."
+              )
+              pull = call("POST", "/pulls", {
+                  "head": branch,
+                  "base": os.environ["BASE"],
+                  "title": "Bring the README language tables up to date",
+                  "body": (
+                      "Written by the README workflow after translations landed on `main` (#1044): "
+                      "`scripts/readme_languages.py` and `scripts/github_readme.py`, nothing else. "
+                      + ci + " **Squash-merge it**: `main` requires signed commits, and only the "
+                      "squash commit is signed (by Forgejo)."
+                  ),
+              })
+              print(f"Opened {pull['html_url']}")
+          PY

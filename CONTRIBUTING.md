@@ -28,7 +28,10 @@ uv run python scripts/readme_languages.py   # the "In your language" table (also
 uv run python scripts/github_readme.py      # .github/README.md
 ```
 
-`tests/test_readme.py` fails when either is out of date. The GitHub repository's settings
+`tests/test_readme.py` fails when either is out of date. The table also follows the
+translations, which arrive from Weblate, so CI does not compare it: after translations land
+on `main`, the README workflow (`.forgejo/workflows/readme.yml`) runs both scripts and opens
+a pull request with the result, to be squash-merged. The GitHub repository's settings
 are set once by hand: Issues, Wiki, Projects and Discussions off, and the description and
 website pointing at the Forgejo URL. Pull requests cannot be turned off there.
 
