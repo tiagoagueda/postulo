@@ -124,6 +124,35 @@ def browser_context_args(browser_context_args):
     return {**browser_context_args, "service_workers": "block"}
 
 
+def _blocking_service_workers(new_context):
+    @functools.wraps(new_context)
+    def wrapper(self, *args, **kwargs):
+        kwargs.setdefault("service_workers", "block")
+        return new_context(self, *args, **kwargs)
+
+    return wrapper
+
+
+@pytest.fixture(scope="session", autouse=True)
+def _no_service_worker_in_a_context_a_test_opens_itself():
+    """The same for a context a test opens with `browser.new_context()` (#1046).
+
+    `browser_context_args` reaches only the `page` and `context` fixtures, and 79 contexts
+    in 37 files are opened by hand -- a phone viewport, scripts off -- so in those the
+    worker installed and fetched the offline page after all. The live server shares one
+    in-memory SQLite connection between its request threads, and that fetch, answered
+    while the next test's page was asking for the job list, hung both requests inside
+    SQLite until the five-minute timeout stopped the browser job, twice in a row on
+    #1041. A test that does want the worker still says `service_workers="allow"`.
+    """
+    from playwright.sync_api import Browser
+
+    original = Browser.new_context
+    Browser.new_context = _blocking_service_workers(original)
+    yield
+    Browser.new_context = original
+
+
 def pytest_terminal_summary(terminalreporter):
     """Page loads a walk asked for twice, so a stall stays in the log without failing it."""
     # Only where this run loaded the walks: the unit job has no Playwright to import them with.
