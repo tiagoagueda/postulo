@@ -261,7 +261,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### ✨ Added
 
-- The languages each release must carry complete are listed once, in `messages_tool.SELECTED`: 0.5 adds fr-CA, en-CA, es-MX, be, cnr, fo, nn, rm, az, kk, zh-Hans, zh-Hant and Arabic to 0.4's 39, and every release gate reads it. (#347)
+- The languages each release must carry complete are listed once, in `messages_tool.SELECTED`: 0.5 adds fr-CA, en-CA, es-MX, be, cnr, fo, nn, rm, az, kk, zh-Hans, zh-Hant, Arabic, Hindi, Urdu, Bengali and Indonesian to 0.4's 39, and every release gate reads it. (#347)
 - The plugin surface holds companies, departments and the person's own card (read only, with the sign-in address), a holder's numbers, addresses and links as plain values, and services to update a company, make a department and a contact, and write several numbers, addresses and links; each takes an `actor`. (#328)
 - A company register number is checked against its country's check digit (France, Czechia, Norway, Finland, Estonia, Poland) and links to the register's own page (seven countries) or the EU business-register search, all offline. (#935)
 - Date pickers of Postulo's own beside every date box, and on the calendar one per view: months, a week, a day, and a range for the agenda, which now takes an end day (`until=`) (#933)

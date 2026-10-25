@@ -81,7 +81,8 @@ Which languages a build needs is decided in #347, in five points:
    pt-BR pt-PT ro sk sl sq sr-Cyrl sv tr uk`.
 5. **0.5** adds the North American variants **fr-CA**, **en-CA** and **es-MX**; the rest of
    the continent and its edges, **be**, **cnr**, **fo**, **nn**, **rm**, **az** and **kk**;
-   and **Chinese** (`zh-Hans`, `zh-Hant`) and **Arabic**: 52 in all.
+   **Chinese** (`zh-Hans`, `zh-Hant`) and **Arabic**; and **Hindi** (`hi`), **Urdu** (`ur`),
+   **Bengali** (`bn`) and **Indonesian** (`id`): 56 in all.
 
 A later release line keeps every language of the one before it. A release line is added to
 `SELECTED` before it is tagged; `scripts/release_tools.py check` refuses a tag whose line has

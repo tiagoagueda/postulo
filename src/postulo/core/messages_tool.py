@@ -668,7 +668,8 @@ SELECTED = {
         "uk",
     ),
     # 0.4's, the North American variants, the rest of the continent and its edges, then
-    # Chinese and Arabic (maintainer, 2026-10-23).
+    # Chinese and Arabic (maintainer, 2026-10-23), then Hindi, Urdu, Bengali and Indonesian,
+    # #728's remaining four (maintainer, 2026-10-25; #269).
     "0.5": (
         "bg",
         "bs",
@@ -722,6 +723,10 @@ SELECTED = {
         "zh-Hans",
         "zh-Hant",
         "ar",
+        "hi",
+        "ur",
+        "bn",
+        "id",
     ),
 }
 
