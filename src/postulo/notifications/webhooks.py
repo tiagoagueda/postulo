@@ -16,6 +16,7 @@ from __future__ import annotations
 
 import datetime as dt
 import logging
+import time
 
 from django.db import models
 from django.utils import timezone
@@ -37,6 +38,10 @@ FIRST_RETRY = dt.timedelta(minutes=5)
 MAX_ATTEMPTS = 8
 #: How many rows one scheduler pass delivers before leaving the rest to the next.
 BATCH = 50
+#: How many seconds one scheduler pass may spend starting deliveries (#365). A pass that has
+#: used it leaves the rest of the batch to the next pass rather than holding everybody's
+#: reminders behind receivers that answer slowly.
+BUDGET = 60.0
 #: What is claimed while a delivery is in flight, so a pass killed mid-request leaves a row
 #: that comes back by itself rather than one stuck for ever (#221).
 SENDING_LEASE = dt.timedelta(minutes=15)
@@ -204,10 +209,21 @@ def forget_old(*, days: int = KEEP_DAYS) -> int:
     return done.delete()[0]
 
 
-def send_pending(*, limit: int = BATCH) -> tuple[int, int]:
-    """Deliver what is due. Returns (sent, failed). Called by the scheduler on every pass."""
+def send_pending(*, limit: int = BATCH, budget: float = BUDGET) -> tuple[int, int]:
+    """Deliver what is due. Returns (sent, failed). Called by the scheduler on every pass.
+
+    With a ``budget`` in seconds, deliveries are started until that much time has gone and the
+    rest wait for the next pass, as `run_syncs` does (#365). Each one is held to the plugin's
+    TOTAL, so a pass spends at most the budget and one delivery more here, however many
+    receivers answer slowly; before this, fifty slow receivers could hold every account's
+    reminders for the whole of fifty deadlines. A delivery already started is never cut off.
+    """
+    started = time.monotonic()
     sent = failed = 0
     for row in list(pending()[:limit]):
+        if budget and time.monotonic() - started >= budget:
+            logger.info("Webhook budget of %ss spent; the rest wait for the next pass", budget)
+            break
         if row.connection is not None and not allows(row.connection):
             # Asked before the claim, which would move the retry time a lease ahead: a row the
             # policy has off waits where it is, and resumes the moment it is switched on (#362).

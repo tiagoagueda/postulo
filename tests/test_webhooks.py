@@ -13,6 +13,8 @@ from __future__ import annotations
 
 import datetime as dt
 import json
+import socket
+import threading
 import time
 from decimal import Decimal
 from unittest import mock
@@ -669,3 +671,108 @@ def test_a_plain_http_receiver_is_refused_unless_it_is_on_an_allowed_private_net
     assert "url" in notifier.validate({**config, "url": "http://8.8.8.8/hook"}), "public host"
     assert "url" not in notifier.validate({**config, "url": "http://10.0.0.5/hook"}), "LAN"
     assert "url" not in notifier.validate({**config, "url": "https://8.8.8.8/hook"})
+
+
+# --------------------------------------- a receiver cannot hold the scheduler (#365)
+
+
+class _Dribbler(threading.Thread):
+    """A receiver that accepts, then answers one byte at a time, never quite finishing."""
+
+    def __init__(self):
+        super().__init__(daemon=True)
+        self.listener = socket.socket()
+        self.listener.bind(("127.0.0.1", 0))
+        self.listener.listen(1)
+        self.port = self.listener.getsockname()[1]
+
+    def run(self):
+        connection, _address = self.listener.accept()
+        try:
+            for byte in b"HTTP/1.1 200 OK\r\n":
+                connection.send(bytes([byte]))
+                time.sleep(0.3)
+        except OSError:
+            pass
+        finally:
+            connection.close()
+            self.listener.close()
+
+
+def test_a_receiver_that_answers_slowly_fails_the_delivery_at_the_deadline(user, settings):
+    """Each wait is short, so only the whole-request deadline can end it, and it records why."""
+    settings.POSTULO_CONNECTIONS_ALLOW_PRIVATE = True
+    server = _Dribbler()
+    server.start()
+    webhook_connection(user, url=f"http://127.0.0.1:{server.port}/hook")
+    notify(user, Notification(event="reminder_due", title="Chase them", key="reminder:1"))
+    started = time.monotonic()
+
+    with (
+        mock.patch.object(webhook, "check_destination", lambda url: None),
+        mock.patch.object(webhook, "TOTAL", 1.0),
+    ):
+        assert webhooks.send_pending() == (0, 1)
+
+    assert time.monotonic() - started < 5, "held to the deadline, not to every byte"
+    row = WebhookDelivery.objects.get()
+    assert row.status == DeliveryStatus.FAILED and row.next_attempt_at
+    assert row.last_error, "the reason is on the row"
+    server.join(timeout=10)
+
+
+class _Endless(httpx.SyncByteStream):
+    """A reply body that never ends: reading it would fill the worker's memory."""
+
+    def __init__(self):
+        self.read = 0
+
+    def __iter__(self):
+        while True:
+            self.read += 1
+            yield b"x" * 65536
+
+
+def test_a_reply_past_any_size_is_never_read_into_memory(user):
+    """The status is all a delivery uses; the body is left unread, so no size can cost memory."""
+    webhook_connection(user)
+    notify(user, Notification(event="reminder_due", title="Chase them", key="reminder:1"))
+    body = _Endless()
+
+    def make_client(**kwargs):
+        kwargs.pop("total", None)
+        handler = lambda request: httpx.Response(200, stream=body)  # noqa: E731
+        return httpx.Client(transport=httpx.MockTransport(handler), **kwargs)
+
+    started = time.monotonic()
+    with (
+        mock.patch.object(webhook, "check_destination", lambda url: None),
+        mock.patch.object(webhook, "client", make_client),
+    ):
+        assert webhooks.send_pending() == (1, 0)
+
+    assert time.monotonic() - started < 5
+    assert body.read <= 1, "not one chunk past what httpx peeks at was asked for"
+    assert WebhookDelivery.objects.get().status == DeliveryStatus.SENT
+
+
+def test_the_pass_stops_starting_deliveries_once_its_budget_is_spent(user, monkeypatch):
+    """A delivery under way is never cut off; the budget decides whether to begin another."""
+    webhook_connection(user)
+    for n in range(3):
+        notify(user, Notification(event="reminder_due", title=f"Chase {n}", key=f"reminder:{n}"))
+    clock = {"now": 0.0}
+    monkeypatch.setattr("postulo.notifications.webhooks.time.monotonic", lambda: clock["now"])
+
+    def slow_post(url, secret, body, *, event, delivery):
+        clock["now"] += 40.0
+        return Answer(200)
+
+    with (
+        mock.patch.object(webhook, "check_destination", lambda url: None),
+        mock.patch.object(webhook, "post", slow_post),
+    ):
+        assert webhooks.send_pending(budget=60) == (2, 0), "the third waits for the next pass"
+        assert WebhookDelivery.objects.filter(status=DeliveryStatus.SENT).count() == 2
+        clock["now"] = 0.0
+        assert webhooks.send_pending(budget=60) == (1, 0), "and goes out on it"
