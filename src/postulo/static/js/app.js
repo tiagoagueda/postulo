@@ -8295,7 +8295,11 @@
 
   window.addEventListener("beforeinstallprompt", function (event) {
     // Kept for the menu rather than shown: the browser's own banner is the nagging this
-    // leaves out, and the address bar's install icon is still there for anybody who looks.
+    // leaves out. What `preventDefault()` holds back is that banner -- the mini-infobar on
+    // Android, since Chrome 76 -- and nothing else: the install icon in a desktop address
+    // bar is the browser's own and is drawn whether or not a page keeps the event, and so
+    // are Edge's *App available* and the menu's *Install*. When the icon is missing, look
+    // at the manifest and the worker, not here (#899).
     event.preventDefault();
     installOffer = event;
     showInstallEntries();
@@ -8319,6 +8323,37 @@
   });
 
   onContentReady(showInstallEntries);
+
+  /* A Postulo link followed while the app is open in a window of its own (#899). The
+   * manifest's `launch_handler` asks for `focus-existing`, so the browser brings that window
+   * forward instead of starting a second one -- and then leaves it where it was, handing the
+   * link's address to the page through `launchQueue`. Going there is this page's job.
+   *
+   * The launch that loaded this page is in the queue too, and is passed over: it is already
+   * here, or it was sent on to sign in, which the address it came with would only repeat.
+   * Only another origin's address is refused; one of Postulo's own is opened as any link
+   * is, so a form with unsaved changes still asks first (`beforeunload`, above).
+   */
+  if ("launchQueue" in window && window.launchQueue && typeof window.launchQueue.setConsumer === "function") {
+    var ownLaunch = true;
+    window.launchQueue.setConsumer(function (launchParams) {
+      var target;
+      try {
+        target = new URL(launchParams && launchParams.targetURL, window.location.href);
+      } catch (error) {
+        return;
+      }
+      if (ownLaunch || target.origin !== window.location.origin || target.href === window.location.href) {
+        return;
+      }
+      window.location.assign(target.href);
+    });
+    // `setConsumer` hands over what was already waiting before it returns: the launch that
+    // opened this page. Anything after it is a link followed later. Should a browser queue
+    // that first launch only after this script has run, it names this page's own address,
+    // and nothing happens -- or, when it was sent on to sign in, costs one more redirect.
+    ownLaunch = false;
+  }
 
   document.addEventListener("click", function (event) {
     if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) {

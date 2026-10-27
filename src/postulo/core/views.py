@@ -147,9 +147,13 @@ def manifest(request: HttpRequest) -> JsonResponse:
     names are the account's, and a browser that sends none gets the instance's default.
 
     `id` and `scope` are the root, so the app is one thing wherever it was installed from,
-    and opens on the board. The icons are two pairs on purpose: a launcher that crops every
-    icon to its own shape takes the `maskable` one, which is padded and opaque, and anything
-    else takes the plain mark; one image for both is the one that gets cut into.
+    and opens on the board. Every Postulo page is inside that scope, sign-in page included,
+    which is what lets a browser offer *Open in app* in the address bar on any of them and
+    open that same page in the app window (#899).
+
+    The icons are two pairs on purpose: a launcher that crops every icon to its own shape
+    takes the `maskable` one, which is padded and opaque, and anything else takes the plain
+    mark; one image for both is the one that gets cut into.
     """
     from django.templatetags.static import static
 
@@ -168,6 +172,15 @@ def manifest(request: HttpRequest) -> JsonResponse:
             "start_url": reverse("applications:board"),
             "scope": "/",
             "display": "standalone",
+            # A Postulo link followed while the app is installed: an open window is
+            # brought forward and `app.js` takes it to the link's address, rather than a
+            # second window started beside it; a browser that knows neither mode decides
+            # for itself (#899).
+            "launch_handler": {"client_mode": ["focus-existing", "auto"]},
+            # And such a link opens in the app at all, from mail, chat or the browser
+            # extensions, where the browser captures links and the person has not turned it
+            # off in the browser's own settings. Postulo has no setting of its own (#899).
+            "handle_links": "preferred",
             "background_color": BACKGROUND_COLOUR,
             "theme_color": THEME_COLOUR,
             "categories": ["productivity", "business"],

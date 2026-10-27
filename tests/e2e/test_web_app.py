@@ -9,7 +9,7 @@ answered with Postulo's offline page instead of the browser's own error.
 from __future__ import annotations
 
 import pytest
-from playwright.sync_api import Page, expect
+from playwright.sync_api import BrowserType, Page, expect
 
 from .signing_in import sign_in
 
@@ -109,3 +109,84 @@ def test_signing_out_unregisters_the_worker(page: Page, live_server, applicant):
     expect(page.get_by_role("banner").get_by_role("link", name="Sign in")).to_be_visible()
 
     assert page.evaluate("navigator.serviceWorker.getRegistration('/').then((r) => !!r)") is False
+
+
+# ------------------------------------------------------- installing from the address bar
+#
+# Asked of Chromium itself, through DevTools' `Page.getInstallabilityErrors`: the check that
+# decides whether the address bar shows its install icon and whether a page is sent
+# `beforeinstallprompt` (#899). Two things make the answer worth having. The suite's own
+# browser is the headless shell, which has no installer and answers every page with an empty
+# list, so these launch the full Chromium that `playwright install chromium` puts beside it
+# (`channel="chromium"`, in its new headless mode). And a context of the ordinary kind is off
+# the record, where nothing installs, so the profile is a real one, in a temporary folder.
+
+
+@pytest.fixture
+def full_chromium(browser_type: BrowserType, tmp_path):
+    """A page in the full Chromium, with a profile of its own and workers allowed."""
+    context = browser_type.launch_persistent_context(
+        str(tmp_path / "profile"), channel="chromium", service_workers="allow"
+    )
+    try:
+        yield context.pages[0] if context.pages else context.new_page()
+    finally:
+        context.close()
+
+
+def installability_errors(page: Page) -> list[str]:
+    """Why Chromium would not install this page, by DevTools' ids; empty when it would."""
+    session = page.context.new_cdp_session(page)
+    try:
+        answer = session.send("Page.getInstallabilityErrors")
+    finally:
+        session.detach()
+    return [
+        error["errorId"]
+        + "".join(f" {item['name']}={item['value']}" for item in error["errorArguments"])
+        for error in answer["installabilityErrors"]
+    ]
+
+
+def test_chromium_would_install_postulo_for_somebody_signed_in(
+    full_chromium, live_server, applicant
+):
+    page = full_chromium
+    sign_in(page, live_server.url)
+    assert page.evaluate(KEPT), "the worker, with its fetch handler, is in place"
+
+    assert installability_errors(page) == []
+
+
+def test_chromium_would_install_postulo_from_the_sign_in_page(full_chromium, live_server):
+    """Signed out: no session on the manifest's request, and no worker (#753), yet the same
+    app -- the install icon is not held back until somebody has signed in (#899)."""
+    page = full_chromium
+    page.goto(f"{live_server.url}/accounts/login/")
+
+    assert installability_errors(page) == []
+
+
+def test_the_check_is_not_empty_handed(full_chromium, live_server):
+    """A page with no manifest is refused, so an empty list above is Chromium's verdict."""
+    page = full_chromium
+    page.goto(f"{live_server.url}/offline/")
+
+    assert "no-manifest" in installability_errors(page)
+
+
+def test_chromium_reads_the_launch_handler(full_chromium, live_server):
+    """What Chromium's own parser makes of the manifest, not just what the server sent."""
+    page = full_chromium
+    page.goto(f"{live_server.url}/accounts/login/")
+    session = page.context.new_cdp_session(page)
+    try:
+        answer = session.send("Page.getAppManifest")
+    finally:
+        session.detach()
+
+    assert answer["errors"] == []
+    parsed = answer["manifest"]
+    assert parsed["launchHandler"] == {"clientMode": "kFocusExisting"}
+    assert parsed["scope"] == f"{live_server.url}/"
+    assert parsed["id"] == f"{live_server.url}/"

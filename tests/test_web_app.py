@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import json
 import re
+from pathlib import Path
 
 import pytest
 from django.test import Client
@@ -34,6 +35,43 @@ def test_the_manifest_has_what_an_install_needs():
     assert payload["start_url"] == reverse("applications:board")
     assert payload["lang"] == "en-GB" and payload["dir"] == "ltr"
     assert payload["theme_color"] and payload["background_color"]
+
+
+def test_a_followed_link_reuses_the_open_window_and_lands_in_the_app():
+    """#899: one window, brought forward, and links captured where the browser allows it.
+
+    `focus-existing` first, and `auto` after it for a browser that knows neither that mode
+    nor the array. Both are the browser's to honour and the person's to turn off in its
+    settings; Postulo adds no setting of its own.
+    """
+    payload = manifest(Client())
+
+    assert payload["launch_handler"] == {"client_mode": ["focus-existing", "auto"]}
+    assert payload["handle_links"] == "preferred"
+
+
+def test_every_page_is_inside_the_apps_scope():
+    """*Open in app* is offered only for an address inside `scope` (#899)."""
+    payload = manifest(Client())
+
+    assert payload["scope"] == "/"
+    for address in [payload["start_url"], *(item["url"] for item in payload["shortcuts"])]:
+        assert address.startswith(payload["scope"]), address
+    assert reverse("account_login").startswith(payload["scope"]), "where a signed-out launch goes"
+
+
+def test_the_launch_queue_takes_the_open_window_to_the_link():
+    """`focus-existing` brings the window forward and leaves it where it was (#899).
+
+    Going to the link's address is the page's job, through `launchQueue`; without it, a
+    link followed while the app is open would only ever raise the window.
+    """
+    script = (Path(__file__).resolve().parents[1] / "src/postulo/static/js/app.js").read_text(
+        encoding="utf-8"
+    )
+
+    assert "window.launchQueue.setConsumer(" in script
+    assert "launchParams.targetURL" in script
 
 
 def test_the_manifest_keeps_the_maskable_icon_apart_from_the_plain_one():
