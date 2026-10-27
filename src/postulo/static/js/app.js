@@ -3836,6 +3836,20 @@
     return option.label || option.text || "";
   }
 
+  // What the closed control shows for an option: the words it has in the list, unless it
+  // says otherwise. A language's variant is *Brasil* under the heading *Português*, and
+  // *português (Brasil)* alone (#1053).
+  function chosenWords(option) {
+    return (option && option.getAttribute("data-chosen")) || optionWords(option);
+  }
+
+  // What the box over a long list finds an option by: its words, and whatever else it says
+  // it is called -- a language's name in English as well as in itself (#1053).
+  function searchWords(option) {
+    var also = option.getAttribute("data-search");
+    return plainWords(also ? optionWords(option) + " " + also : optionWords(option));
+  }
+
   // The language and the direction an option says it is written in (#309): *Mme* in a
   // menu drawn in English is French, and is said and laid out as French.
   function copyLanguage(from, to) {
@@ -3852,7 +3866,7 @@
   function drawChosen(state) {
     var select = state.select;
     var option = select.options[select.selectedIndex] || null;
-    var words = option ? optionWords(option) : "";
+    var words = option ? chosenWords(option) : "";
     if (state.label.textContent !== words) {
       state.label.textContent = words;
     }
@@ -3891,7 +3905,7 @@
     var longest = "";
     var width = -1;
     Array.prototype.forEach.call(select.options, function (option) {
-      var words = optionWords(option);
+      var words = chosenWords(option);
       var measured = measuredWords[words];
       if (measured === undefined) {
         measured = measuringContext ? measuringContext.measureText(words).width : words.length;
@@ -4059,6 +4073,8 @@
       said: null,
       rows: [],
       plain: [],
+      // What the box finds each row by, which may be more than its words (`searchWords`).
+      found: [],
       active: null,
       settled: false,
       typed: "",
@@ -4391,6 +4407,7 @@
     listbox.textContent = "";
     state.rows = [];
     state.plain = [];
+    state.found = [];
     state.active = null;
     state.typed = "";
     state.settled = false;
@@ -4448,6 +4465,7 @@
       count += 1;
       state.rows.push(row);
       state.plain.push(plainWords(optionWords(option)));
+      state.found.push(searchWords(option));
       into.appendChild(row);
     }
     var groups = 0;
@@ -4462,6 +4480,8 @@
         heading.setAttribute("role", "presentation");
         heading.setAttribute("data-select-heading", "");
         heading.textContent = child.label;
+        // A heading over a language's variants is in that language, as its options are (#1053).
+        copyLanguage(child, heading);
         group.setAttribute("role", "group");
         group.setAttribute("aria-labelledby", heading.id);
         group.appendChild(heading);
@@ -4488,7 +4508,7 @@
   function showMatching(state) {
     var wanted = plainWords(state.filter ? state.filter.value : "").replace(/^00(?=\d)/, "+");
     var shown = state.rows.filter(function (row, index) {
-      var matches = !wanted || state.plain[index].indexOf(wanted) !== -1;
+      var matches = !wanted || state.found[index].indexOf(wanted) !== -1;
       if (matches) {
         row.removeAttribute("aria-hidden");
       } else {
@@ -4514,9 +4534,11 @@
       var chosen = offered.filter(function (row) {
         return row.getAttribute("aria-selected") === "true";
       })[0];
+      // A row the box found only by another of its names -- Deutsch, for "German" -- ranks
+      // nowhere among the words it shows, and is still the one meant (#1053).
       activateSelectRow(
         state,
-        wanted ? bestSelectMatch(state, offered, wanted, 0) : chosen || offered[0]
+        wanted ? bestSelectMatch(state, offered, wanted, 0) || offered[0] : chosen || offered[0]
       );
       state.moved = false;
     }
@@ -5967,8 +5989,10 @@
 
   // A search box over a list that grows with every catalogue somebody starts (#72). It is
   // hidden in the markup and shown here, because with scripts off it would do nothing; the
-  // list itself is whole either way. It narrows by the name in its own language and by the
-  // tag, hides a group left with no row, and says how many are left for a screen reader.
+  // list itself is whole either way. It narrows by the name in its own language, by the
+  // English one and the one in the page's language -- "German" finds Deutsch (#1053) -- and
+  // by the tag, whatever the case and the accents; hides a group left with no row, and says
+  // how many are left for a screen reader.
   var languageFilter = picker && picker.querySelector("[data-language-filter]");
   if (languageFilter) {
     var filterInput = languageFilter.querySelector("input");
@@ -5976,12 +6000,13 @@
     var filterEmpty = languageFilter.querySelector("[data-language-filter-empty]");
     languageFilter.hidden = false;
     filterInput.addEventListener("input", function () {
-      var wanted = filterInput.value.trim().toLowerCase();
+      var wanted = plainWords(filterInput.value);
       var shown = 0;
       Array.prototype.forEach.call(picker.querySelectorAll("[data-language-group]"), function (group) {
         var inGroup = 0;
         Array.prototype.forEach.call(group.querySelectorAll("[data-language-row]"), function (row) {
-          var match = !wanted || row.getAttribute("data-language-search").indexOf(wanted) !== -1;
+          var words = plainWords(row.getAttribute("data-language-search"));
+          var match = !wanted || words.indexOf(wanted) !== -1;
           row.hidden = !match;
           inGroup += match ? 1 : 0;
         });
@@ -6057,9 +6082,12 @@
     typed = now - typedAt > 1000 ? event.key : typed + event.key;
     typedAt = now;
     var wanted = typed.toLowerCase();
+    // By the whole name, which a variant's row does not show: "por" finds *Brasil* under
+    // *Português* (#1053).
     var found = radios.filter(function (radio) {
       var label = radio.closest("label");
-      return label && label.textContent.trim().toLowerCase().indexOf(wanted) === 0;
+      var name = label && (label.getAttribute("data-language-name") || label.textContent);
+      return name && name.trim().toLowerCase().indexOf(wanted) === 0;
     })[0];
     if (found) {
       event.preventDefault();

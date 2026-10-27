@@ -145,3 +145,73 @@ def test_the_closed_control_says_which_language_is_in_use(page: Page, live_serve
 
     expect(summary).to_be_visible()
     expect(summary.locator("[lang=de]")).to_have_text("Deutsch")
+
+
+# ------------------------------------------------ finding a language by name (#1053)
+
+
+def shown_rows(picker) -> list[str]:
+    """The codes of the rows the search box has left in the list."""
+    return picker.evaluate(
+        """(picker) => Array.from(picker.querySelectorAll('[data-language-row]'))
+             .filter((row) => !row.hidden)
+             .map((row) => row.querySelector('input').value)"""
+    )
+
+
+def test_a_language_is_found_by_its_english_name_or_its_own(page: Page, live_server, applicant):
+    """*German* finds *Deutsch*, and so does *deutsch*: somebody may know either."""
+    sign_in(page, live_server.url)
+    picker = open_picker(page, live_server.url)
+    box = picker.get_by_label("Find a language")
+
+    box.fill("German")
+    expect(picker.locator("[data-language-row]:not([hidden])")).to_have_count(1)
+    assert shown_rows(picker) == ["de"]
+
+    box.fill("deutsch")
+    assert shown_rows(picker) == ["de"]
+
+    # A variant's row says *Brasil* under *Português*, and is found by either language.
+    box.fill("brazilian")
+    assert shown_rows(picker) == ["pt-BR"]
+    expect(picker.locator('[role="group"]:not([hidden])')).to_have_count(1)
+    box.fill("portugu")
+    assert sorted(shown_rows(picker)) == ["pt-BR", "pt-PT"]
+    box.fill("français")
+    assert sorted(shown_rows(picker)) == ["fr-CA", "fr-FR"]
+
+
+def test_the_instance_default_menu_is_grouped_and_found_by_either_name(
+    page: Page, live_server, applicant
+):
+    """The select on *Server settings -> Defaults*: the box every long select has, which
+    reads what an option says it is called as well as its words."""
+    from tests.e2e.selects import button_of, list_of, open_list, options_of
+    from tests.e2e.signing_in import confirm_password
+
+    applicant.is_staff = True
+    applicant.is_superuser = True
+    applicant.save(update_fields=["is_staff", "is_superuser"])
+    sign_in(page, live_server.url)
+    page.goto(f"{live_server.url}/server/defaults/")
+    if confirm_password(page, PASSWORD):
+        page.goto(f"{live_server.url}/server/defaults/")
+    select = page.locator("select[name=default_language]")
+    panel = open_list(page, select)
+    box = panel.locator("[data-select-filter]")
+
+    expect(panel.locator('[data-select-heading][lang="pt"]')).to_have_text("Português")
+
+    box.fill("German")
+    expect(options_of(page, select)).to_have_text(["Deutsch"])
+    box.fill("deutsch")
+    expect(options_of(page, select)).to_have_text(["Deutsch"])
+
+    box.fill("mexican")
+    expect(options_of(page, select)).to_have_text(["México"])
+    page.keyboard.press("Enter")
+    expect(select).to_have_value("es-MX")
+    # Closed, the choice is named whole: *México* alone would not say which language.
+    expect(button_of(select)).to_contain_text("español (México)")
+    expect(list_of(page, select)).to_be_hidden()

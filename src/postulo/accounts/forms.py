@@ -308,23 +308,22 @@ def language_choices(default: str | None = None) -> list[tuple[str, str]]:
     Its stored value stays empty, so it still means "follow the default" and never "pin
     today's". It is named even when the instance does not offer it, as a statement of fact.
 
-    A language that is only partly translated says so beside its name, and one nobody has
-    reviewed says that, so nobody is surprised by English in the gaps or by an odd turn of
-    phrase. Unreviewed does not mean machine-made: `pt-BR` was seeded from `pt-PT` and
-    adapted, which is a different provenance and the same warning.
     Each language is named in itself, which is the only way somebody who cannot read the
     current one will recognise theirs. That is also what makes the ``lang`` attribute
     matter here more than anywhere else in Postulo: without it a screen reader pronounces
     every entry with the rules of the interface language, and "Ελληνικά" read as English
-    is not a word — it is a string of letters, or nothing at all. So how well translated a
-    language is has been moved out of the option text and into the group it sits in: the
-    option holds the name and nothing else, and can therefore be marked as being in that
-    language, while the words about it stay in the language they are actually written in.
+    is not a word — it is a string of letters, or nothing at all. So an option holds the
+    name and nothing in another language. A language that is only partly translated has
+    its percentage beside its name, which carries no language of its own; how far along
+    the rest are is what *Settings -> Language and time* draws beside each row.
+
+    In the order of the list, and flat: a menu shows a language's variants under one
+    heading (`grouped_by_language`, #1053), and that grouping is the menu's. They used to
+    be grouped by how well each was translated, which put *português (Portugal)* and
+    *português (Brasil)* under two different headings whenever one had more drafts.
     """
     status = languages.translation_status()
-    reviewed: list[tuple[str, str]] = []
-    drafted: list[tuple[str, str]] = []
-    partial: list[tuple[str, str]] = []
+    offered: list[tuple[str, str]] = []
     from postulo.core import site
 
     for code, name in settings.LANGUAGES:
@@ -340,32 +339,90 @@ def language_choices(default: str | None = None) -> list[tuple[str, str]]:
             # promise with nothing behind it. The catalogue sits there waiting for a
             # translator, and the language appears the day one starts.
             continue
-        row = languages.status_of(code, status)
-        if row is None or row.get("total", 0) == 0:
-            reviewed.append((code, name))
-        elif row.get("percent", 0) < 95:
+        row = languages.status_of(code, status) or {}
+        if row.get("total", 0) and row.get("percent", 0) < 95:
             # A bare percentage carries no language of its own, so it can stay beside the
             # name without putting English inside an option marked as something else.
-            partial.append((code, f"{name}{_percent_suffix(row['percent'])}"))
-        elif row.get("drafts", 0):
-            drafted.append((code, name))
-        else:
-            reviewed.append((code, name))
+            name = f"{name}{_percent_suffix(row['percent'])}"
+        offered.append((code, name))
 
     if default is None:
         default = instance_defaults()[0]
-    choices: list = [("", default_language_label(default))]
-    if reviewed:
-        choices.append((_("Reviewed by a speaker"), reviewed))
-    if drafted:
-        # Not "machine translation": a variant seeded from a sibling catalogue is not
-        # machine-translated, and pt-BR is exactly that. What every language in this
-        # group has in common is that no speaker has read it yet, which is the thing
-        # worth saying and the only thing that is true of all of them.
-        choices.append((_("Awaiting review by a speaker"), drafted))
-    if partial:
-        choices.append((_("Partly translated"), partial))
-    return choices
+    return [("", default_language_label(default)), *offered]
+
+
+def flat_choices(choices) -> list[tuple]:
+    """A menu's choices with any groups opened out, in order: what each option is."""
+    flat: list[tuple] = []
+    for value, label in choices:
+        if isinstance(label, (list, tuple)):
+            flat.extend(label)
+        else:
+            flat.append((value, label))
+    return flat
+
+
+class LanguageHeading(str):
+    """The heading over a language's variants, which says what language it is written in."""
+
+    lang = ""
+
+
+class VariantLabel(str):
+    """A variant's name under its language's heading, *Brasil*, which knows its whole one,
+    *português (Brasil)*, for wherever it stands alone."""
+
+    full = ""
+
+
+def _variant_label(code: str, label) -> VariantLabel:
+    """*Brasil* for ``pt-BR``, keeping what the menu put after the name: *Brasil (40%)*."""
+    from postulo.core import language_names
+
+    whole = str(label)
+    own = languages.native_name(code)
+    after = whole.removeprefix(own) if own and whole.startswith(own) else ""
+    shown = VariantLabel(f"{language_names.variant_name(code)}{after}")
+    shown.full = whole
+    return shown
+
+
+def grouped_by_language(choices) -> list:
+    """A language menu's choices with each language's variants together under its name (#1053).
+
+    The one place the grouping is made, for every menu of languages Postulo draws: the
+    select (`LanguageSelect`) and the rows of *Settings -> Language and time* alike.
+
+    A language offered in one form is an option as it was: *Deutsch*. One offered in
+    several is a group headed by the language's name in itself, *Português*, with each
+    variant under it by what tells it apart, *Portugal* and *Brasil*, or for Chinese by
+    script, *简体中文* and *繁體中文*. The group stands where the first of them stood.
+    Only what is on Postulo's own list is grouped: a held `pt-AO` that nothing here has a
+    name for stays an option of its own, as the tag it is, where it was.
+
+    Takes choices grouped already, and opens them out first.
+    """
+    flat = flat_choices(choices)
+    listed = [str(value) for value, _label in flat if value and languages.find(value)]
+    families = languages.families(listed)
+    labels = {str(value): label for value, label in flat}
+    grouped: list = []
+    done: set[str] = set()
+    for value, label in flat:
+        language = languages.primary(value) if value and languages.find(value) else ""
+        members = families.get(language, [])
+        if len(members) < 2:
+            grouped.append((value, label))
+            continue
+        if language in done:
+            continue
+        done.add(language)
+        from postulo.core import language_names
+
+        heading = LanguageHeading(language_names.family_name(language))
+        heading.lang = language
+        grouped.append((heading, [(code, _variant_label(code, labels[code])) for code in members]))
+    return grouped
 
 
 def with_what_is_held(choices: list, held) -> list:
@@ -378,7 +435,7 @@ def with_what_is_held(choices: list, held) -> list:
     itself: nothing here knows a name for it.
     """
     held = languages.tag(held)
-    if not held or languages.find(held, [code for code, _name in choices]):
+    if not held or languages.find(held, [code for code, _name in flat_choices(choices)]):
         return choices
     return [*choices, (held, held)]
 
@@ -387,8 +444,19 @@ class LanguageSelect(forms.Select):
     """A language menu whose options say which language each of them is in.
 
     WCAG 2.2 calls this Language of Parts (3.1.2, level AA). A ``<select>`` allows ``lang``
-    on an ``<option>`` and nothing inside one, which is why the state of a translation had
-    to move to the group label: the option text has to be wholly in the language it claims.
+    on an ``<option>`` and nothing inside one, so the option text has to be wholly in the
+    language it claims.
+
+    A language's variants sit together under its name (#1053), whatever order the choices
+    were given in: `grouped_by_language` makes the groups as the menu is drawn, and the
+    heading carries the ``lang`` of the language it names. Under it a variant is called by
+    what tells it apart, *Brasil*; the whole name, *português (Brasil)*, is in
+    ``data-chosen`` for the closed control ``app.js`` builds, where *Brasil* alone would
+    not say which language had been chosen.
+
+    Every option also says what else it can be found by, in ``data-search``: its English
+    name and its name in the language the page is in, so that typing *German* into the box
+    over a long list finds *Deutsch* (#1053). The box is the one every long select has.
 
     Right-to-left languages will want ``dir`` alongside this; that belongs with the rest of
     the layout work rather than here.
@@ -403,6 +471,8 @@ class LanguageSelect(forms.Select):
     nothing: no flag beats a wrong flag. ``flagged=False`` is a menu that wants none.
     """
 
+    template_name = "partials/language_select.html"
+
     def __init__(self, attrs=None, choices=(), *, flagged: bool = True, default: str = ""):
         super().__init__(attrs, choices)
         self.flagged = flagged
@@ -410,13 +480,27 @@ class LanguageSelect(forms.Select):
         # claims no ``lang``, since its words are in the interface language.
         self.default = default
 
-    def create_option(self, name, value, *args, **kwargs):
-        option = super().create_option(name, value, *args, **kwargs)
+    def optgroups(self, name, value, attrs=None):
+        # The choices stay as the field gave them, which is what it validates against; only
+        # what is drawn is grouped.
+        given = self.choices
+        self.choices = grouped_by_language(given)
+        try:
+            return super().optgroups(name, value, attrs)
+        finally:
+            self.choices = given
+
+    def create_option(self, name, value, label, *args, **kwargs):
+        option = super().create_option(name, value, label, *args, **kwargs)
         code = str(value or "")
         if code:
+            from postulo.core import language_names
+
             option["attrs"]["lang"] = code
+            option["attrs"]["data-search"] = language_names.search_words(code, languages.current())
+        if getattr(label, "full", ""):
+            option["attrs"]["data-chosen"] = label.full
         if (code or self.default) and self.flagged:
-            from postulo.core import languages
             from postulo.core.flags import flag_url
 
             option["attrs"]["data-flag"] = flag_url(languages.flag_country(code or self.default))
@@ -1672,26 +1756,39 @@ class LocaleForm(forms.ModelForm):
         ``state`` is how the translation was made, and the percentage comes out of the name
         rather than staying appended to it: outside the ``lang`` span there is somewhere to
         put it, which is exactly what a dropdown did not have.
+
+        The groups are the select's (`grouped_by_language`, #1053): a language offered in
+        several forms is a heading in that language, ``lang`` and all, with a row for each
+        variant beneath it, and the languages offered in one form are rows between them,
+        each run of them a group with no heading. A row under a heading shows ``label``,
+        *Brasil*; the closed control and the type-ahead have the whole ``name``.
         """
         from postulo.core import languages
 
         current = self["language"].value() or ""
-        offered = {code for _label, entries in language_choices()[1:] for code, _name in entries}
+        offered = {code for code, _name in language_choices()[1:]}
         if current not in offered:
             # A stored language the instance has withdrawn (#120, #426) has no row, so the
             # page shows the instance default, which is what the person actually gets.
             current = ""
         status = languages.translation_status()
-        groups = []
-        for label, entries in language_choices()[1:]:
-            groups.append(
-                {
-                    "label": label,
-                    "options": [
-                        self._language_option(code, name, current, status) for code, name in entries
-                    ],
-                }
-            )
+        groups: list[dict] = []
+        for value, entries in grouped_by_language(language_choices()[1:]):
+            if isinstance(entries, list):
+                groups.append(
+                    {
+                        "label": value,
+                        "lang": value.lang,
+                        "options": [
+                            self._language_option(code, shown.full, current, status, shown=shown)
+                            for code, shown in entries
+                        ],
+                    }
+                )
+                continue
+            if not groups or groups[-1]["label"]:
+                groups.append({"label": "", "lang": "", "options": []})
+            groups[-1]["options"].append(self._language_option(value, entries, current, status))
         # The blank row names what it stands for: the flag, the name in its own language, the
         # grey tag and the word, the last in the interface language (#698). It is a statement
         # of fact about the instance, so it names the default even if it is not offered.
@@ -1699,10 +1796,13 @@ class LocaleForm(forms.ModelForm):
         return [
             {
                 "label": "",
+                "lang": "",
                 "options": [
                     {
                         "code": "",
                         "name": default_language_label(default),
+                        "label": default_language_label(default),
+                        "search": "",
                         "markup": default_language_markup(default),
                         "country": languages.flag_country(default),
                         "selected": not current,
@@ -1715,9 +1815,13 @@ class LocaleForm(forms.ModelForm):
         ]
 
     @staticmethod
-    def _language_option(code: str, name, current: str, status: dict) -> dict:
-        """One row: what it is called, whose flag stands for it, and how it was made."""
-        from postulo.core import languages
+    def _language_option(code: str, name, current: str, status: dict, *, shown=None) -> dict:
+        """One row: what it is called, whose flag stands for it, and how it was made.
+
+        ``shown`` is what the row says where that is not the whole name: a variant under its
+        language's heading, *Brasil* (#1053).
+        """
+        from postulo.core import language_names, languages
 
         row = languages.status_of(code, status) or {}
         percent = row.get("percent") if row.get("total") else None
@@ -1740,6 +1844,14 @@ class LocaleForm(forms.ModelForm):
             "name": (
                 str(name).removesuffix(_percent_suffix(percent)) if state == "partial" else name
             ),
+            "label": (
+                str(shown if shown is not None else name).removesuffix(_percent_suffix(percent))
+                if state == "partial"
+                else (shown if shown is not None else name)
+            ),
+            # What the search box finds it by: its own name, its English one and its name in
+            # the language the page is in (#1053).
+            "search": language_names.search_words(code, languages.current()),
             "country": languages.flag_country(code),
             "selected": languages.same(code, current),
             "state": state,

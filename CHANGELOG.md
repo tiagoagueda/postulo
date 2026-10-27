@@ -163,6 +163,7 @@ All notable changes to Postulo are recorded here. The format follows
 ### 🔧 Changed
 
 - On a phone the navigation bar at the foot of the window holds every item, in your order, and no More: it keeps one row and scrolls sideways when they do not fit, fades out the end that has more past it, and keeps the page you are on and the link you tab to in view. (#912)
+- A language menu shows a language's variants under its own name (Português: Portugal, Brasil; 中文 by script), its search box finds a language by its English name too, and a browser asking for plain pt, es, fr, en or zh gets pt-BR, es-MX, fr-FR, en-GB or zh-Hans. (#1053)
 - A company's names in other languages are read from a popover opened by a languages icon beside its name, drawn only when there are some; adding, fetching and removing them moved to its Edit page. (#917)
 - On a phone the companies' map shows the Table link as its icon alone, with a "Table view" tooltip below it; the word is kept for screen readers and shown from the small breakpoint up. (#916)
 - On the companies' map, the Zoom in, Zoom out and Near me tooltips appear beside their button, towards the map, instead of over the neighbouring button; tooltips can now ask for a side (`data-tooltip-place`). (#915)

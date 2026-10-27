@@ -157,9 +157,19 @@ one rather than English in the gaps -- unless the draft would fail to format, ha
 not know.
 
 The language picker is a **disclosure** holding a list, not a dropdown: closed it is one
-line showing the language in use, and open it is every language grouped by how far along it
-is — *read by a speaker*, *written, not yet read by a speaker*, or *still being translated*
-with the percentage beside the name.
+line showing the language in use, and open it is every language, each row saying how far
+along it is — *read by a speaker*, *written, not yet read by a speaker*, or *still being
+translated* with the percentage beside the name. A language offered in several forms is one
+heading in its own name with a row for each form beneath it (#1053): *Português* over
+*Portugal* and *Brasil*, *中文* over *简体中文* and *繁體中文*, which are named by script. A
+box above the list finds a language by its own name, its English one or its name in the
+interface language. Every language menu groups the same way, from one function
+(`accounts.forms.grouped_by_language`).
+
+A browser that asks for a language and not a form of it is given the form most of its
+speakers use: `pt` is `pt-BR`, `es` is `es-MX`, `fr` is `fr-FR`, `en` is `en-GB` and `zh` is
+`zh-Hans` (`languages.DEFAULT_VARIANTS`). One that names a form is given that form, and where
+the instance does not offer it, another form of the same language comes before the default.
 
 It is not a `<select>` because one cannot do what this needs. An `<option>` takes `lang` and
 nothing inside it, so the name could not be marked as being in its own language, the flag

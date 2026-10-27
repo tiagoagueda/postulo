@@ -454,6 +454,51 @@ def native_name(code, default: str = "") -> str:
     return NATIVE_NAMES.get(find(code), default)
 
 
+# ------------------------------------------------------ one language, several variants
+#
+# Five languages are offered in more than one form: Portuguese, Spanish, French and English
+# by country, Chinese by script (#1053). To somebody looking for theirs each is one
+# language, so a menu shows it once with its variants beneath, and a browser that asks for
+# the language and not a form of it is given one on purpose rather than whichever happened
+# to come first on the list.
+
+#: A language asked for bare → the variant it lands on: the one most of its speakers use
+#: (#1053). Django's own answer was the first entry on the list that began with the
+#: language, so ``pt`` was European Portuguese, and ``es``, being a code of its own, was
+#: Spain's; Brazil and Mexico are where most speakers of either live. A browser that names
+#: a variant is given that variant: only the bare tag is read here.
+DEFAULT_VARIANTS: dict[str, str] = {
+    "en": "en-GB",
+    "es": "es-MX",
+    "fr": "fr-FR",
+    "pt": "pt-BR",
+    "zh": "zh-Hans",
+}
+
+
+def default_variant(code) -> str:
+    """The variant a bare language tag stands for, or "" for any other tag (#1053).
+
+    ``pt`` is ``pt-BR``; ``pt-PT``, ``pt-AO`` and ``de`` stand for themselves and answer "".
+    """
+    return DEFAULT_VARIANTS.get(_folded(code), "")
+
+
+def families(codes: Iterable[str]) -> dict[str, list[str]]:
+    """The codes by the language they are a form of, each language where it first appears.
+
+    ``pt-PT`` and ``pt-BR`` are one family, as are ``es`` and ``es-MX``; ``nb`` and ``nn``
+    are two, since the registry gives each a language subtag of its own. Every code is kept
+    as it was given, in the order it was given.
+    """
+    grouped: dict[str, list[str]] = {}
+    for code in codes:
+        language = primary(code)
+        if language:
+            grouped.setdefault(language, []).append(code)
+    return grouped
+
+
 # ------------------------------------------------------- the language of the moment
 #
 # Django answers `get_language()` in lower case once a translation is active and with

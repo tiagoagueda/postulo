@@ -162,7 +162,49 @@ class LocaleMiddleware(DjangoLocaleMiddleware):
 
     def process_request(self, request):
         super().process_request(request)
+        variant = self._variant_asked_for(request)
+        if variant:
+            languages.activate(variant)
         request.LANGUAGE_CODE = languages.current()
+
+    @staticmethod
+    def _variant_asked_for(request) -> str:
+        """The variant a browser that names a language bare is given, or "" (#1053).
+
+        Django gives ``Accept-Language: pt`` the first language on the list that begins with
+        ``pt``, which is European Portuguese; ``es``, a code of its own, is Spain's. Postulo
+        gives the variant most of the language's speakers use (`languages.DEFAULT_VARIANTS`).
+
+        Read as Django reads the header: the first language in it that anything is offered
+        for is the one that decides, so ``pt-PT, pt;q=0.8`` is still European Portuguese --
+        a browser that names a variant is given that variant. A language chosen in the
+        cookie Django reads first is left alone. Whether the instance offers the variant is
+        `preferences.fallback`'s to ask, once the database may be: this runs before it.
+        """
+        from django.utils import translation
+        from django.utils.translation.trans_real import (
+            language_code_re,
+            parse_accept_lang_header,
+        )
+
+        def supported(code, *, strict=False) -> str:
+            """What Django has a catalogue for to answer ``code`` with, or ""."""
+            try:
+                return translation.get_supported_language_variant(code, strict=strict)
+            except LookupError:
+                return ""
+
+        if supported(request.COOKIES.get(settings.LANGUAGE_COOKIE_NAME)):
+            return ""
+        header = request.META.get("HTTP_ACCEPT_LANGUAGE", "")
+        for asked, _quality in parse_accept_lang_header(header):
+            if asked == "*":
+                return ""
+            if not language_code_re.search(asked) or not supported(asked):
+                continue
+            variant = languages.default_variant(asked)
+            return supported(variant, strict=True) if variant else ""
+        return ""
 
     def process_response(self, request, response):
         response = super().process_response(request, response)

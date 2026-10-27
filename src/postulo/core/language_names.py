@@ -222,3 +222,66 @@ def match(text) -> str:
         return ""
     (only,) = codes
     return "" if only in UMBRELLAS else only
+
+
+# ------------------------------------------------- a language among its own variants (#1053)
+
+
+def family_name(code) -> str:
+    """What a language calls itself as the heading over its variants: *Português* over
+    Portugal and Brasil, *中文* over the two scripts.
+
+    CLDR's name for the bare language, in that language, capitalised as CLDR asks of a menu
+    (`capitalised`). The name on Postulo's own list where CLDR has none.
+    """
+    language = languages.primary(code)
+    found = _cldr(language, _locale(language)) if language else ""
+    return capitalised(found, language) if found else languages.native_name(code, str(code))
+
+
+def _names_a_script(code: str) -> bool:
+    """Whether a tag says which script it is written in, as ``zh-Hans`` does."""
+    return any(len(part) == 4 and part.isalpha() for part in code.split("-")[1:])
+
+
+def _likely_region(code: str) -> str:
+    """The country CLDR takes a tag that names none to mean: ``ES`` for ``es``."""
+    likely = babel.core.get_global("likely_subtags").get(languages.primary(code), "")
+    region = likely.rsplit("_", 1)[-1] if "_" in likely else ""
+    return region if len(region) == 2 and region.isalpha() else ""
+
+
+def variant_name(code) -> str:
+    """What tells one variant of a language from the others, in the variant's own language.
+
+    A variant by country is named by its country: *Brasil*, *México*, *United Kingdom*. A
+    tag that names no country is read with the one CLDR says is likely, so ``es`` is
+    *España*. A variant by script is its whole name, *简体中文* and *繁體中文* (#1053): the
+    script alone, *简体*, is not what anybody calls their language.
+    """
+    code = languages.tag(code)
+    own = languages.native_name(code, code)
+    if _names_a_script(code) and not languages.region_of(code):
+        return own
+    region = languages.region_of(code) or _likely_region(code)
+    locale = _locale(code)
+    found = locale.territories.get(region, "") if locale is not None and region else ""
+    return found or own
+
+
+@lru_cache(maxsize=1024)
+def search_words(code, in_language="") -> str:
+    """Everything a language can be found by in a menu's search box (#1053).
+
+    Its own name, which is the one the menu shows; CLDR's English one, so that *German*
+    finds *Deutsch*; its name in ``in_language``, the language the page is read in, so a
+    French reader's *allemand* does too; and its tag. Each once, in that order.
+    """
+    code = languages.tag(code)
+    if not code:
+        return ""
+    words = [languages.native_name(code, code), name(code, "en")]
+    if in_language:
+        words.append(name(code, in_language))
+    words.append(code)
+    return " ".join(dict.fromkeys(word for word in words if word))

@@ -135,3 +135,82 @@ def test_the_interface_renders_in_the_variant(client, user, code, compiled):
 
     assert response.status_code == 200
     assert f'lang="{code}"' in response.content.decode()
+
+
+# ------------------------------------------- a browser that names the language bare (#1053)
+
+
+def page_language(client, asked: str) -> str:
+    """The `lang` the sign-in page is drawn in for a visitor whose browser asks for this."""
+    import re
+
+    response = client.get(reverse("account_login"), HTTP_ACCEPT_LANGUAGE=asked)
+    return re.search(r'<html lang="([^"]+)"', response.content.decode()).group(1)
+
+
+@pytest.mark.parametrize(
+    ("asked", "given"),
+    [
+        ("pt", "pt-BR"),
+        ("es", "es-MX"),
+        ("fr", "fr-FR"),
+        ("en", "en-GB"),
+        ("zh", "zh-Hans"),
+    ],
+)
+def test_a_bare_tag_lands_on_the_variant_most_of_its_speakers_use(client, asked, given):
+    """Not whichever came first on the list: that made ``pt`` European Portuguese, and ``es``,
+    a code of its own, Spain's Spanish."""
+    assert page_language(client, asked) == given
+
+
+@pytest.mark.parametrize(
+    ("asked", "given"),
+    [
+        ("pt-PT", "pt-PT"),
+        ("es-ES", "es"),
+        ("fr-CA", "fr-CA"),
+        ("en-CA", "en-CA"),
+        ("zh-Hant", "zh-Hant"),
+        ("pt-PT,pt;q=0.8", "pt-PT"),
+        ("de,pt;q=0.8", "de"),
+    ],
+)
+def test_a_browser_that_names_a_variant_is_given_that_variant(client, asked, given):
+    assert page_language(client, asked) == given
+
+
+def test_a_bare_tag_is_given_another_form_of_the_language_before_none_of_it(client):
+    """An instance offering European Portuguese and not the Brazilian: ``pt`` is still
+    Portuguese, and not the instance's English."""
+    from postulo.core.models import SiteSettings
+
+    SiteSettings.objects.update_or_create(
+        pk=1, defaults={"offered_languages": ["de", "pt-PT"], "default_language": "de"}
+    )
+
+    assert page_language(client, "pt") == "pt-PT"
+    assert page_language(client, "fr") == "de", "and never another language"
+
+
+def test_the_defaults_are_variants_postulo_has():
+    for bare, variant in languages.DEFAULT_VARIANTS.items():
+        assert languages.find(variant) == variant, variant
+        assert languages.primary(variant) == bare
+        assert languages.default_variant(bare.upper()) == variant
+    assert languages.default_variant("pt-PT") == "", "only the bare tag is read"
+    assert languages.default_variant("de") == ""
+
+
+def test_the_variants_of_a_language_are_one_family():
+    codes = ["en-GB", "de", "es", "es-MX", "nb", "nn", "pt-PT", "pt-BR", "zh-Hans", "zh-Hant"]
+
+    assert languages.families(codes) == {
+        "en": ["en-GB"],
+        "de": ["de"],
+        "es": ["es", "es-MX"],
+        "nb": ["nb"],
+        "nn": ["nn"],
+        "pt": ["pt-PT", "pt-BR"],
+        "zh": ["zh-Hans", "zh-Hant"],
+    }

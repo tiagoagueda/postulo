@@ -77,8 +77,9 @@ def fallback(*, own: bool) -> str:
     Somebody whose language has been withdrawn, or who chose none, reads the instance's
     default. A visitor is heard by their browser, but only within what the instance
     offers and only for a language somebody has begun translating -- the two filters the
-    picker applies -- and the default otherwise. Somebody signed in with no language of their
-    own is not heard by their browser at all: `apply` passes ``own=True`` for them.
+    picker applies -- then by another form of the language it asked for that passes both,
+    and the default otherwise. Somebody signed in with no language of their own is not heard
+    by their browser at all: `apply` passes ``own=True`` for them.
     """
     from . import site
 
@@ -89,6 +90,12 @@ def fallback(*, own: bool) -> str:
         asked = languages.current()
         if offered(asked) and languages.begun(asked):
             return ""
+        # Another form of the same language before none of it (#1053). A browser that asks
+        # for `pt` is given Brazilian Portuguese, and on an instance that offers only the
+        # European, that is still Portuguese and still the reader's; English is not.
+        for sibling in languages.matches(asked)[1:]:
+            if offered(sibling) and languages.begun(sibling):
+                return sibling
         return default
     except Exception:  # pragma: no cover - a broken settings row must not blank a page
         return ""

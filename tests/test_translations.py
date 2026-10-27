@@ -371,7 +371,7 @@ def test_a_language_nobody_has_translated_is_not_offered(catalogues):
     nothing behind it. The catalogue waits for a translator; the option appears with them."""
     from postulo.accounts.forms import language_choices
 
-    offered = {code for _group, entries in language_choices()[1:] for code, _label in entries}
+    offered = {code for code, _label in language_choices()[1:]}
     # As the reader sees it: a language is begun when any of its catalogues -- Postulo's own
     # or a plugin's -- has a translated string, which is what the picker reads.
     begun = {
@@ -390,13 +390,15 @@ def test_a_language_nobody_has_translated_is_not_offered(catalogues):
     assert set(started(catalogues)) <= offered | {languages.SOURCE}
 
 
-def test_the_picker_groups_languages_by_how_well_translated_they_are(client, user, monkeypatch):
-    """The state of a translation is a group heading, not part of a language's name.
+def test_the_state_of_a_translation_is_never_part_of_a_languages_name(client, user, monkeypatch):
+    """A language's name is the option, and how well it is translated is said apart from it.
 
     It used to be appended to the option text — "Deutsch — machine translation, awaiting
     review" — which put an English phrase inside the one option that has to be wholly in
     German, because that option carries `lang="de"` and a screen reader will pronounce
-    every word of it accordingly.
+    every word of it accordingly. Then it was the group an option sat in, which put the two
+    forms of one language under different headings (#1053): the menu groups a language's
+    variants now, and the rows of *Settings -> Language and time* say the state of each.
     """
     from postulo.accounts import forms
     from postulo.core import languages as languages_module
@@ -411,16 +413,18 @@ def test_the_picker_groups_languages_by_how_well_translated_they_are(client, use
         },
     )
     with translation.override("en-GB"):
-        groups = {str(label): dict(entries) for label, entries in forms.language_choices()[1:]}
+        names = dict(forms.language_choices()[1:])
 
-    # Not "machine translation": pt-BR is seeded from pt-PT and adapted, which is a
-    # different provenance and the same warning. What every language here has in common
-    # is that nobody has read it yet.
-    assert groups["Awaiting review by a speaker"]["de"] == "Deutsch"
-    assert groups["Reviewed by a speaker"]["fr-FR"] == "français (France)"
-    assert groups["Reviewed by a speaker"]["sv"] == "svenska", "no status known: the name alone"
+    assert names["de"] == "Deutsch", "drafts or none, the name alone"
+    assert names["fr-FR"] == "français (France)"
+    assert names["sv"] == "svenska", "no status known: the name alone"
     # A bare percentage carries no language of its own, so it may stay beside the name.
-    assert groups["Partly translated"]["pl"] == "polski (40%)"
+    assert names["pl"] == "polski (40%)"
+
+    client.force_login(user)
+    rows = forms.LocaleForm(instance=user.profile).language_groups()
+    states = {option["code"]: option["state"] for group in rows for option in group["options"]}
+    assert states["de"] == "draft" and states["fr-FR"] == "reviewed" and states["pl"] == "partial"
 
 
 def test_every_language_says_which_language_it_is_in(client, user):
@@ -479,7 +483,7 @@ def test_each_language_shows_its_flag_without_reading_it_out(client, user):
     # rather than missing, which is why this counts what is on the page and not the table.
     from postulo.accounts.forms import language_choices
 
-    offered = {code for _group, entries in language_choices()[1:] for code, _label in entries}
+    offered = {code for code, _label in language_choices()[1:]}
     expected = {
         languages.flag_country(code).lower() for code in offered if languages.flag_country(code)
     }

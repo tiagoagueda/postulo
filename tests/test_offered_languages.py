@@ -36,8 +36,8 @@ def settings_row(db):
 
 
 def offered_codes() -> set[str]:
-    """Every code the picker actually shows, across its groups."""
-    return {code for _group, entries in language_choices()[1:] for code, _label in entries}
+    """Every code the picker actually shows."""
+    return {code for code, _label in language_choices()[1:]}
 
 
 # ------------------------------------------------------------- nothing stored

@@ -252,3 +252,65 @@ def test_an_ambiguous_or_unknown_name_is_nothing(typed):
     """What is put on a CV is never a guess: *Norwegian* is Bokmål or Nynorsk, *Chinese* is
     two scripts, *Portuguese* is two countries'."""
     assert language_names.match(typed) == ""
+
+
+# ------------------------------------------- a language among its own variants (#1053)
+
+
+@pytest.mark.parametrize(
+    ("code", "heading"),
+    [
+        ("pt-BR", "Português"),
+        ("es-MX", "Español"),
+        ("fr-CA", "Français"),
+        ("en-GB", "English"),
+        ("zh-Hant", "中文"),
+    ],
+)
+def test_the_heading_over_the_variants_is_the_language_in_itself(code, heading):
+    """Capitalised as CLDR asks of a menu: *Português*, where a sentence says *português*."""
+    assert language_names.family_name(code) == heading
+
+
+@pytest.mark.parametrize(
+    ("code", "variant"),
+    [
+        ("pt-PT", "Portugal"),
+        ("pt-BR", "Brasil"),
+        ("es", "España"),
+        ("es-MX", "México"),
+        ("fr-FR", "France"),
+        ("fr-CA", "Canada"),
+        ("en-GB", "United Kingdom"),
+        ("en-CA", "Canada"),
+    ],
+)
+def test_a_variant_by_country_is_named_by_the_country_in_its_own_language(code, variant):
+    """``es`` names no country, and is read with the one CLDR says is likely: Spain."""
+    assert language_names.variant_name(code) == variant
+
+
+def test_chinese_is_named_by_script_and_not_by_region():
+    assert language_names.variant_name("zh-Hans") == "简体中文"
+    assert language_names.variant_name("zh-Hant") == "繁體中文"
+
+
+def test_a_language_is_found_by_its_english_name_as_well_as_its_own():
+    """*German* finds *Deutsch* (#1053)."""
+    words = language_names.search_words("de")
+
+    assert words.startswith("Deutsch")
+    assert "German" in words
+    assert words.endswith("de")
+
+
+def test_and_by_its_name_in_the_language_the_page_is_read_in():
+    assert "allemand" in language_names.fold(language_names.search_words("de", "fr-FR"))
+    assert "Brazilian Portuguese" in language_names.search_words("pt-BR")
+    assert "Simplified Chinese" in language_names.search_words("zh-Hans")
+
+
+def test_every_language_postulo_has_can_be_found_by_more_than_its_tag():
+    for code in languages.NATIVE_NAMES:
+        words = language_names.search_words(code)
+        assert languages.NATIVE_NAMES[code] in words and code in words, code

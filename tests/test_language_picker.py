@@ -163,12 +163,14 @@ def test_only_the_percentage_comes_out_of_a_name_with_a_region(client, user, mon
 
     html = client.get(reverse("settings:locale")).content.decode()
 
-    assert '<span lang="fr-FR">français (France)</span>' in html, "the name, whole"
+    # Under *Français* the row is the country (#1053), and the closed control has it whole.
+    assert '<span lang="fr-FR">France</span>' in html, "the region, whole"
+    assert 'data-language-name="français (France)"' in html
     assert "40%" in html, "and the figure beside it"
-    assert "français (France) (40%)" not in html
+    assert "France (40%)" not in html
 
     # A dropdown still carries the figure in the option: it has nowhere else to put it.
-    partly = dict(language_choices()[-1][1])
+    partly = dict(language_choices()[1:])
     assert partly["fr-FR"] == "français (France) (40%)"
     # Both callers of the row: the name as the choices decorate it, and the bare one.
     assert language_row("fr-FR", partly["fr-FR"], status=status)["name"] == "français (France)"
@@ -332,3 +334,120 @@ def test_the_list_can_be_searched_but_only_where_a_script_can_do_it(page):
 
 def test_the_page_says_plainly_that_a_partly_translated_language_shows_english(page):
     assert "shows English wherever its translation has not reached" in page
+
+
+# ------------------------------------------- one language, several forms (#1053)
+
+
+def test_a_languages_variants_sit_under_its_name():
+    from postulo.accounts.forms import grouped_by_language
+
+    grouped = grouped_by_language([("", "Default"), *languages.LANGUAGES])
+    headings = {str(value): value for value, entries in grouped if isinstance(entries, list)}
+    variants = {
+        str(value): [(code, str(label)) for code, label in entries]
+        for value, entries in grouped
+        if isinstance(entries, list)
+    }
+
+    assert variants == {
+        "English": [("en-GB", "United Kingdom"), ("en-CA", "Canada")],
+        "Español": [("es", "España"), ("es-MX", "México")],
+        "Français": [("fr-FR", "France"), ("fr-CA", "Canada")],
+        "Português": [("pt-PT", "Portugal"), ("pt-BR", "Brasil")],
+        "中文": [("zh-Hans", "简体中文"), ("zh-Hant", "繁體中文")],
+    }
+    assert headings["Português"].lang == "pt", "a heading says which language it is in"
+    # The rest are options as they were, in the order of the list, with the blank first and
+    # a group where its first variant stood.
+    assert grouped[0] == ("", "Default")
+    assert str(grouped[1][0]) == "English"
+    assert ("de", "Deutsch") in grouped
+    assert ("sr-Cyrl", "српски") in grouped, "one form of a language is a plain option"
+
+
+def test_a_variant_knows_its_whole_name_and_keeps_its_percentage():
+    from postulo.accounts.forms import grouped_by_language
+
+    grouped = dict(
+        grouped_by_language(
+            [("pt-PT", "português (Portugal)"), ("pt-BR", "português (Brasil) (40%)")]
+        )
+    )
+    (brasil,) = [label for code, label in grouped["Português"] if code == "pt-BR"]
+
+    assert brasil == "Brasil (40%)"
+    assert brasil.full == "português (Brasil) (40%)"
+
+
+def test_a_language_the_instance_offers_in_one_form_is_a_plain_option(settings_row_pt_br):
+    from postulo.accounts.forms import grouped_by_language, language_choices
+
+    grouped = grouped_by_language(language_choices())
+
+    assert ("pt-BR", "português (Brasil)") in grouped
+    assert not any(isinstance(entries, list) for _value, entries in grouped)
+
+
+def test_a_held_tag_postulo_has_no_name_for_stays_where_it_was():
+    from postulo.accounts.forms import grouped_by_language
+
+    grouped = grouped_by_language([("pt-PT", "a"), ("pt-BR", "b"), ("pt-AO", "pt-AO")])
+
+    assert grouped[-1] == ("pt-AO", "pt-AO")
+
+
+def test_every_language_menu_draws_the_groups_with_their_language():
+    """The select on *Server settings -> Defaults*, a document's language, a CV's: one widget."""
+    from postulo.accounts.forms import LanguageSelect
+
+    html = LanguageSelect(choices=[("", "Default"), *languages.LANGUAGES]).render("x", "pt-BR")
+
+    assert '<optgroup label="Português" lang="pt">' in html
+    assert '<optgroup label="中文" lang="zh">' in html
+    brasil = re.search(r'<option value="pt-BR"[^>]*>([^<]*)</option>', html)
+    assert brasil[1] == "Brasil"
+    assert 'data-chosen="português (Brasil)"' in brasil[0], "the closed control says it whole"
+    assert "Brazilian Portuguese" in brasil[0], "and it can be found in English"
+    deutsch = re.search(r'<option value="de"[^>]*>', html)[0]
+    assert 'data-search="Deutsch German de"' in deutsch
+    assert "data-chosen" not in deutsch, "a language in one form is named whole already"
+
+
+def test_the_instance_default_is_chosen_from_the_same_groups(client, django_user_model):
+    admin = django_user_model.objects.create_user(
+        email="admin@example.org", username="admin", password="x", is_staff=True
+    )
+    client.force_login(admin)
+
+    html = client.get(reverse("server:defaults")).content.decode()
+    menu = between(html, 'name="default_language"', "</select>")
+
+    assert '<optgroup label="Español" lang="es">' in menu
+    assert re.search(r'<option value="es-MX"[^>]*>México</option>', menu)
+
+
+def test_the_settings_rows_are_grouped_the_same_way(page):
+    panel = picker(page)
+    heading = re.search(r'<div data-language-group role="group" aria-labelledby="([^"]+)">', panel)
+
+    assert heading, "a language's variants are a group, named by their heading"
+    assert re.search(r'id="language-group-\d+" lang="pt">\s*Português\s*</p>', panel)
+    assert '<span lang="pt-BR">Brasil</span>' in panel
+    assert 'data-language-name="português (Brasil)"' in panel, "what the type-ahead reads"
+
+
+def test_a_row_can_be_found_by_its_english_name(page):
+    """What the search box reads (#1053): *German* finds *Deutsch*."""
+    row = re.search(r'data-language-search="([^"]*)">\s*<input[^>]*value="de"', picker(page))
+
+    assert row and "German" in row[1] and "Deutsch" in row[1]
+
+
+@pytest.fixture
+def settings_row_pt_br(db):
+    from postulo.core.models import SiteSettings
+
+    SiteSettings.objects.update_or_create(
+        pk=1, defaults={"offered_languages": ["de", "pt-BR"], "default_language": "de"}
+    )

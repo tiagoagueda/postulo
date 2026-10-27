@@ -1,0 +1,8 @@
+{% comment %} A language menu (#1053): Django's own select, but a group over a language's variants
+   says which language its heading is written in, as each option already does (WCAG 3.1.2).
+   *Português* over Portugal and Brasil is Portuguese, whatever the page is read in.
+   `accounts.forms.LanguageSelect` says the rest. {% endcomment %}<select name="{{ widget.name }}"{% include "django/forms/widgets/attrs.html" %}>{% for group_name, group_choices, group_index in widget.optgroups %}{% if group_name %}
+  <optgroup label="{{ group_name }}"{% if group_name.lang %} lang="{{ group_name.lang }}"{% endif %}>{% endif %}{% for option in group_choices %}
+  {% include option.template_name with widget=option %}{% endfor %}{% if group_name %}
+  </optgroup>{% endif %}{% endfor %}
+</select>
