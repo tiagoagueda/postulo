@@ -1065,7 +1065,7 @@
    * rest under *More*, and how many it holds is decided by width, because without a script
    * nothing can measure what fits:
    *
-   *   below md (the bar)   4
+   *   below md (the bar)   all   it scrolls sideways instead (#912)
    *   md, 768              2     the search is a link here, not a box
    *   lg, 1024             3
    *   xl, 1280             5
@@ -1096,13 +1096,12 @@
     @apply cursor-pointer;
   }
 
-  /* *More* goes wherever the line holds everything, the bar included: a person whose
-     navigation has four items or fewer has nothing under it (#339). The search is not
-     under it: it is the masthead's icon, at every width. */
+  /* *More* goes wherever the line holds everything (#339). The search is not under it: it
+     is the masthead's icon, at every width. The bar below `md` holds every item and
+     scrolls sideways where they do not fit (#912), so *More* is never drawn there, and
+     nothing here counts its items. */
   @media (width < 48rem) {
-    .nav-main > a:nth-of-type(n + 5),
-    .nav-main [data-popover] > a[data-nav]:nth-of-type(-n + 4),
-    .nav-main:not(:has(> a:nth-of-type(5))) > [data-nav-more] {
+    .nav-main > [data-nav-more] {
       display: none;
     }
   }
@@ -1141,7 +1140,7 @@
 
   /* Where a script has measured the row, its answer stands instead of the count: the
      items marked `data-in-more` are under *More* and the rest are in the line. Only from
-     `md` up -- the bar's four are not a question of room -- and only while the mark is
+     `md` up -- the bar holds them all and scrolls (#912) -- and only while the mark is
      there, so a script that never ran leaves the count above as the whole answer. */
   @media (width >= 48rem) {
     .nav-main[data-fitted] > a:not([data-in-more]),
@@ -2459,21 +2458,36 @@ html:has(.page-alert > [role="alert"]:not(:empty)) {
 /*
  * The main navigation below `md`: a bar fixed to the foot of the window (#299).
  *
- * The same `<nav>` as the row above, drawn another way: the first four items and *More*,
- * each an icon over its label, in five equal slots -- except that no slot is narrower
- * than the longest word in it, so a label wraps between its words (*Πίνακας ελέγχου*,
- * *Tableau de bord*) and never inside one. Breaking inside the word was tried, and at 320
- * it cut *Αγγελίες* and *Αιτήσεις* in two in order to give the width to a slot that did
- * not need it. Where even the longest words do not fit side by side -- Estonian's
- * *Kandideerimised* at 320 -- *More* goes to a second row rather than off the edge: the
- * bar grows a line and nothing is cut, clipped or scrolled. Below 360 pixels the labels
- * are a pixel smaller, which is what keeps Greek and German, in the widest of the fonts,
- * on one row at 320. No slot is narrower than 44 pixels, the size a thumb wants.
+ * The same `<nav>` as the row above, drawn another way: every item, in the person's order,
+ * each an icon over its label (#912). *More* is not drawn here: on a phone it cost a tap in
+ * front of every item past the fourth, and hid where they were. The slots share the width
+ * equally where they fit -- except that no slot is narrower than the longest word in it, so
+ * a label wraps between its words (*Πίνακας ελέγχου*, *Tableau de bord*) and never inside
+ * one. Breaking inside the word was tried, and at 320 it cut *Αγγελίες* and *Αιτήσεις* in
+ * two in order to give the width to a slot that did not need it.
+ *
+ * **Where they do not fit, the bar scrolls sideways.** Seven items at 320, or Estonian's
+ * *Kandideerimised* beside six others at any phone's width: the bar keeps its one row and
+ * scrolls. That reverses #299, under which the bar grew a line rather than scroll -- a rule
+ * written for five slots, which for seven would have been a bar of three rows. Reflow (SC
+ * 1.4.10) asks that the page not scroll sideways, and it does not: the bar scrolls in its
+ * own box, the way a wide table does. Below 360 pixels the labels are a pixel smaller, so
+ * that more of them fit before the bar has to scroll. No slot is narrower than 44 pixels,
+ * the size a thumb wants.
+ *
+ * **A bar that scrolls has to say so, and not in colour alone.** Wherever there is more of
+ * it past an edge, that edge fades the items out, so the last one in view is cut part way
+ * through -- a shape that says *more this way*, as well as a shade. `app.js` says which
+ * edges have more, as `data-overflow-start` and `data-overflow-end`, whenever the bar is
+ * scrolled or resized. The fades are a sticky pseudo-element at each end of the row that
+ * takes no room in it, and `scroll-padding-inline` keeps whatever is scrolled to clear of
+ * them: a link reached by Tab, which the browser and `app.js` bring into view (SC 2.4.11),
+ * and the page you are on, which `app.js` brings into view as the page opens.
  *
  * Unlayered, because each item is still a `nav-link` -- the tint, the weight and the
  * underline that mark the current page come with it, and so does the preference that
  * takes the underline off (#289) -- and `nav-link` is a utility, which a rule in a layer
- * cannot beat. Nothing here sets `display`, so the counts above still decide what shows.
+ * cannot beat.
  *
  * **Nothing on a page may end up behind it.** The bar's height is measured into
  * `--bottom-bar-height` by `app.js`, the way the header's is, and three things read it:
@@ -2489,8 +2503,11 @@ html:has(.page-alert > [role="alert"]:not(:empty)) {
  */
 @media (width < 48rem) {
   .nav-main {
-    @apply fixed inset-x-0 bottom-0 flex-wrap items-stretch gap-0 border-t border-ink-200 bg-white
-      px-0.5 pt-1 pb-1 dark:border-ink-800 dark:bg-ink-900;
+    @apply fixed inset-x-0 bottom-0 flex-nowrap items-stretch gap-0 overflow-x-auto
+      overflow-y-hidden overscroll-x-contain border-t border-ink-200 bg-white px-1 pt-1 pb-1
+      dark:border-ink-800 dark:bg-ink-900;
+    scroll-padding-inline: 1.5rem;
+    scrollbar-width: thin;
   }
 
   /* The inset only where the page is drawn to the screen's edge: an installed app, with no
@@ -2504,38 +2521,59 @@ html:has(.page-alert > [role="alert"]:not(:empty)) {
   }
 
   /* Equal shares from nothing, each held at its own longest word by the automatic minimum
-     a flex item has -- which is why nothing here sets a `min-width` on the slot itself. */
-  .nav-main > a,
-  .nav-main > [data-nav-more] {
-    flex: 1 1 0;
-  }
-
-  .nav-main > a,
-  .nav-main > [data-nav-more] > button {
-    @apply min-h-12 flex-col justify-center gap-0.5 px-px py-1 text-center text-xs
-      whitespace-normal;
+     a flex item has -- which is why nothing here sets a `min-width` on the slot itself.
+     That minimum is also what makes the row wider than the bar where the words do not fit,
+     and so what makes the bar scroll. */
+  .nav-main > a {
+    @apply min-h-12 flex-[1_1_0] flex-col justify-center gap-0.5 px-px py-1 text-center
+      text-xs whitespace-normal;
   }
 
   /* The 44 pixels a thumb wants, on the label rather than on the slot: a floor under the
      slot's own minimum rather than in place of it. A pixel of padding beside it and no
      more -- enough that two labels each held at their longest word do not read as one
-     word, and at 320 every other pixel of a slot is a letter. */
-  .nav-main > a > span,
-  .nav-main > [data-nav-more] > button > span {
+     word, and every other pixel of a slot is a letter. */
+  .nav-main > a > span {
     min-inline-size: 2.75rem;
   }
 
-  .nav-main > [data-nav-more] > button {
-    @apply w-full;
-  }
-
-  .nav-main > a > svg,
-  .nav-main > [data-nav-more] > button > svg {
+  .nav-main > a > svg {
     @apply size-5;
   }
 
-  /* *More* opens upwards from the bar, over the page, because there is no room below it:
-     the menus' own rule (see *menus* below) turns it over, and needs nothing from here. */
+  /* The fades at the edges (#912): each as wide as the scroll padding, stuck to its end of
+     the bar, and giving back with a negative margin the room it would take, so the slots
+     share the width as though it were not there. Over the items, and never in the way of
+     a tap on them. */
+  .nav-main::before,
+  .nav-main::after {
+    @apply pointer-events-none sticky z-10 w-6 flex-none from-white to-transparent opacity-0
+      transition-opacity dark:from-ink-900;
+    content: "";
+  }
+
+  .nav-main::before {
+    @apply start-0 -me-6 bg-linear-to-r;
+  }
+
+  .nav-main::after {
+    @apply end-0 -ms-6 bg-linear-to-l;
+  }
+
+  /* Written out on the nav, since a pseudo-class after a pseudo-element -- which is what
+     the `rtl:` variant would write here -- is no selector at all. */
+  .nav-main:dir(rtl)::before {
+    @apply bg-linear-to-l;
+  }
+
+  .nav-main:dir(rtl)::after {
+    @apply bg-linear-to-r;
+  }
+
+  .nav-main[data-overflow-start]::before,
+  .nav-main[data-overflow-end]::after {
+    @apply opacity-100;
+  }
 
   body:has(.nav-main) {
     padding-bottom: var(--bottom-bar-height, 4.5rem);
@@ -2555,8 +2593,7 @@ html:has(.page-alert > [role="alert"]:not(:empty)) {
 }
 
 @media (width < 22.5rem) {
-  .nav-main > a,
-  .nav-main > [data-nav-more] > button {
+  .nav-main > a {
     font-size: 0.6875rem;
   }
 }
@@ -2566,16 +2603,10 @@ html:has(.page-alert > [role="alert"]:not(:empty)) {
  * bolder type, so the line never leaves somebody with nothing saying where they are. Not
  * underlined and not `aria-current` -- *More* is not the page; the item inside it is, and
  * it carries both. Which items are under *More* depends on the width and, where a script
- * has measured, on its answer, so this asks the same questions the counts above ask.
- * Unlayered for the bar's reason: *More* is a `nav-link`.
+ * has measured, on its answer, so this asks the same questions the counts above ask. From
+ * `md` up only: below it there is no *More* (#912). Unlayered for the bar's reason: *More*
+ * is a `nav-link`.
  */
-@media (width < 48rem) {
-  .nav-main > [data-nav-more]:has(> [data-popover] > a[aria-current="page"]:nth-of-type(n + 5))
-    > button {
-    @apply bg-ink-100 font-semibold text-ink-900 dark:bg-ink-800 dark:text-ink-50;
-  }
-}
-
 @media (48rem <= width < 64rem) {
   .nav-main:not([data-fitted])
     > [data-nav-more]:has(> [data-popover] > a[aria-current="page"]:nth-of-type(n + 3))

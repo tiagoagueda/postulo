@@ -25,9 +25,11 @@ profile, and an item in neither is drawn anyway:
   its own place for everybody else. An order that is the default one is stored as nothing
   at all, so a later release that changes the default reaches everybody who never chose.
 
-The order decides more than the sequence. The row and the phone's bar hold only so many
-items (the stylesheet says how many at each width), and they hold the *first* ones: the
-person who puts *Applications* first is also choosing what stays in reach on a phone.
+The order decides more than the sequence. The row holds only so many items (the
+stylesheet says how many at each width), and it holds the *first* ones. The phone's bar
+holds them all and scrolls sideways where they do not fit (#912), so the first ones are
+the ones in view without scrolling: the person who puts *Applications* first is also
+choosing what stays in reach on a phone.
 """
 
 from __future__ import annotations

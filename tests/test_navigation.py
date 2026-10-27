@@ -9,6 +9,7 @@ wordmark is a link — and when it is taken the wordmark has to do the job prope
 from __future__ import annotations
 
 import re
+from pathlib import Path
 
 import pytest
 from django.urls import reverse
@@ -541,6 +542,85 @@ def test_the_masthead_reaches_the_search_at_every_width(client, user):
 
     search = client.get(reverse("core:search")).content.decode()
     assert re.search(r'<input[^>]*id="search-q"[^>]*data-search-shortcut', search)
+
+
+# ------------------------------------------------- the bar that scrolls (#912)
+
+STATIC = Path(__file__).resolve().parents[1] / "src" / "postulo" / "static"
+
+
+def phone_rules() -> str:
+    """Every rule the built stylesheet applies only below `md`, run together."""
+    css = (STATIC / "css" / "app.css").read_text(encoding="utf-8")
+    blocks = []
+    for found in re.finditer(r"@media \(width < 48rem\) \{", css):
+        depth, at = 1, found.end()
+        while depth:
+            depth += {"{": 1, "}": -1}.get(css[at], 0)
+            at += 1
+        blocks.append(css[found.end() : at])
+    return "\n".join(blocks)
+
+
+def test_every_item_is_a_link_of_the_bar_in_the_persons_order(client, user):
+    """Below `md` the bar holds every item rather than four and *More* (#912): each item is a
+    link that is a child of the `<nav>` itself, in the person's order, so Tab reaches the
+    ones scrolled out of sight. *More* is still in the page, for the row from `md` up."""
+    order = list(reversed(navigation.DEFAULT_ORDER))
+    Profile.objects.filter(user=user).update(nav_order=order)
+    client.force_login(user)
+    html = client.get(reverse("applications:list")).content.decode()
+
+    assert line_order(html) == order
+    nav = html[html.index('<nav class="nav-main"') : html.index("</nav>")]
+    line = nav[: nav.index("data-nav-more")]
+    assert re.search(r'<a [^>]*data-nav="applications" aria-current="page"', line)
+    assert line.count('aria-current="page"') == 1
+    assert 'aria-label="Main"' in nav and "tabindex" not in line
+    assert "data-nav-more" in nav, "More stays, for the masthead's row"
+
+
+def test_below_md_the_bar_scrolls_on_one_row_and_more_is_not_drawn():
+    """The stylesheet's half: one row that scrolls sideways in its own box, never a second
+    row (which #299 chose, and #912 reverses), *More* hidden, and no count of four left
+    to hide the rest."""
+    rules = phone_rules()
+    bar = re.search(r"\n  \.nav-main \{(.*?)\n  \}", rules, re.S).group(1)
+    assert "position: fixed" in bar
+    assert "flex-wrap: nowrap" in bar and "flex-wrap: wrap" not in rules
+    assert "overflow-x: auto" in bar and "overflow-y: hidden" in bar
+    assert "scroll-padding-inline:" in bar, "what is scrolled to stops clear of the fades"
+    assert re.search(r"\.nav-main > \[data-nav-more\] \{\s*display: none;", rules)
+    assert "nth-of-type" not in rules, "nothing below md counts the items any more"
+    # The 44 pixels a thumb wants are still the label's floor.
+    assert re.search(r"\.nav-main > a > span \{\s*min-inline-size: 2\.75rem;", rules)
+
+
+def test_the_bar_says_it_scrolls_with_a_fade_and_not_by_colour_alone():
+    """A fade at each end with more past it, over the items so that the last one in view is
+    cut part way through -- shown by the marks `app.js` sets, and never in a tap's way."""
+    rules = phone_rules()
+    fades = re.search(r"\.nav-main::before, \.nav-main::after \{(.*?)\n  \}", rules, re.S)
+    assert fades, "the fades are the bar's own pseudo-elements"
+    fade = fades.group(1)
+    assert "position: sticky" in fade and "pointer-events: none" in fade
+    assert "opacity: 0%" in fade
+    assert re.search(
+        r"\.nav-main\[data-overflow-start\]::before, \.nav-main\[data-overflow-end\]::after"
+        r" \{\s*opacity: 100%;",
+        rules,
+    )
+    assert ".nav-main:dir(rtl)::before" in rules, "a right-to-left page fades the other way"
+
+
+def test_the_script_marks_the_edges_and_keeps_the_current_and_focused_links_in_view():
+    script = (STATIC / "js" / "app.js").read_text(encoding="utf-8")
+    assert '"data-overflow-start"' in script and '"data-overflow-end"' in script
+    assert 'mainNav.addEventListener("scroll", markBarEdges' in script
+    assert 'mainNav.addEventListener("focusin"' in script
+    assert ':scope > a[aria-current="page"]' in script
+    # And the bar is still measured for everything that has to clear it.
+    assert '"--bottom-bar-height"' in script
 
 
 # ------------------------------------------- the underline on the current link (#289)

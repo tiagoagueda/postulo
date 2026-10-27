@@ -9,17 +9,22 @@
    fits, so the count is decided by breakpoint, for the widest of the languages the reflow
    walk is taken in; a script may refine it by measuring, never replace it.
 
-   Below `md` the same element is a bar fixed to the foot of the window: the first four
-   items and *More*, which opens the rest. The search is the masthead's icon (#339). Nothing the account menu holds.
-   The bar is still this `<nav>`, so it keeps the name *Main* and its place in the
+   Below `md` the same element is a bar fixed to the foot of the window: every item, and
+   no *More* (#912). Where the items do not fit side by side the bar scrolls sideways
+   rather than grow a second row -- which reverses #299's rule that it never scrolled --
+   with a fade at each end that has more past it, and `app.js` keeps the page you are on
+   and any link reached by Tab in view. Every item is a link, so Tab reaches the ones
+   scrolled out of sight. The search is the masthead's icon (#339). Nothing the account
+   menu holds. The bar is still this `<nav>`, so it keeps the name *Main* and its place in the
    reading order, after the wordmark and before the search -- the order a keyboard or a
    screen reader meets it in is the same at every width, and only where it is drawn
    changes.
 
    *More* is a disclosure that is navigation, so `<c-dropdown-menu kind="navigation">`: a
    popover whose rows are `menu-item` and deliberately not `role="menu"` -- the account
-   menu's reasoning, in `base.html` (#310). It holds every item once more, and the stylesheet shows only the ones the line
-   does not, at whatever width it is, and is not drawn at all when that is nothing. Only one
+   menu's reasoning, in `base.html` (#310). It holds every item once more, and the
+   stylesheet shows only the ones the line does not, at whatever width it is, and is not
+   drawn at all when that is nothing -- nor anywhere below `md`. Only one
    copy of an item is ever in the layout, so the duplicate never reaches the accessibility
    tree.
 

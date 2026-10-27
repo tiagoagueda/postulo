@@ -352,15 +352,16 @@ def test_the_navigation_becomes_a_bar_and_still_works(
     language,
 ):
     """Below 768 pixels the main navigation is a bar fixed to the foot of the window, and it
-    has to work as one (#299).
+    has to work as one (#299, #912).
 
-    Seven links do not fit a phone, which is why this test exists at all: until #299 they
-    were stacked behind a *Menu* disclosure (#113), and this pinned that answer. The answer
-    changed and the property did not. At 320 pixels, in every language the walk is taken in,
-    nothing scrolls sideways, and every destination is reachable: the first four in the bar,
-    the rest and the search under *More*, which opens from the keyboard, closes with Escape
-    and takes you where it says. Each item has two copies in the page -- the line's and
-    *More*'s -- and exactly one of them is ever drawn, so no destination reaches the
+    Every link does not fit a phone, which is why this test exists at all: until #299 they
+    were stacked behind a *Menu* disclosure (#113), then the bar held four and *More*, and
+    since #912 it holds them all and scrolls sideways in its own box. The answer changed and
+    the property did not. At 320 pixels, in every language the walk is taken in, the page
+    does not scroll sideways -- the bar may, as a wide table does, which is what the
+    criterion allows -- and every destination is reachable, in the bar, by Tab and by a
+    tap. *More* is not drawn. Each item has two copies in the page -- the bar's and the
+    row's *More*'s -- and exactly one of them is ever drawn, so no destination reaches the
     accessibility tree twice.
     """
     from postulo.accounts.models import Profile
@@ -390,24 +391,21 @@ def test_the_navigation_becomes_a_bar_and_still_works(
 
     keys = list(navigation.DEFAULT_ORDER)
     in_bar = [key for key in keys if nav.locator(f':scope > a[data-nav="{key}"]').is_visible()]
-    assert in_bar == keys[:4], in_bar
-
-    trigger = more.locator(":scope > button")
-    panel = more.locator(":scope > [popover]")
-    trigger.focus()
-    page.keyboard.press("Enter")
-    expect(panel).to_be_visible()
-    page.keyboard.press("Escape")
-    expect(panel).to_be_hidden()
-    expect(trigger).to_be_focused()
-
-    page.keyboard.press("Enter")
+    assert in_bar == keys, in_bar
+    expect(more).to_be_hidden()
     for key in keys:
         copies = nav.locator(f'[data-nav="{key}"]')
         drawn = [copies.nth(i).is_visible() for i in range(copies.count())]
         assert drawn.count(True) == 1, f"{key}: {drawn.count(True)} copies drawn"
-    expect(more.locator("[data-nav-search]")).to_have_count(0)
-    more.locator('[data-nav="companies"]').click()
+
+    # By Tab, every one of them, however far along the bar it is.
+    nav.locator(f':scope > a[data-nav="{keys[0]}"]').focus()
+    for key in keys[1:]:
+        page.keyboard.press("Tab")
+        expect(nav.locator(f':scope > a[data-nav="{key}"]')).to_be_focused()
+    assert not page.evaluate(SCROLLS_SIDEWAYS)["reached"], "the bar scrolled, the page did not"
+
+    nav.locator(':scope > a[data-nav="companies"]').click()
     expect(page).to_have_url(f"{base}/jobs/companies/")
 
     page.locator("header [data-search-link]").click()

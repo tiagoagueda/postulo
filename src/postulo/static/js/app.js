@@ -2494,7 +2494,8 @@
    * It refines and never replaces. Every item is already in the line or under *More*
    * before this runs, `data-fitted` is what lets its answer stand in for the count, and a
    * script that fails half way leaves the count as the whole answer. Below `md` it takes
-   * its marks off again: the bar holds four, and that is not a question of room.
+   * its marks off again: the bar holds every item and scrolls sideways where they do not
+   * fit (#912), so nothing there goes under *More*.
    *
    * Three measurements, because *More* has no width while it is hidden, and two widths
    * while it is not: everything in the line first, then *More* with an item under it so
@@ -2611,16 +2612,90 @@
     }
   }
 
+  /* ------------------------------------------------ the bar, scrolled
+   *
+   * Below `md` the bar holds every item and scrolls sideways where they do not fit (#912).
+   * Three things the stylesheet cannot do on its own:
+   *
+   * - Say which ends have more past them, as `data-overflow-start` and `data-overflow-end`
+   *   on the bar, which is what draws the fade at that end. In the inline direction, so
+   *   that a right-to-left page fades the right ones; `scrollLeft` runs from nought to
+   *   below nought there, which is why only its size is read.
+   * - Bring the page you are on into view as the page opens, so that the bar never opens
+   *   with the place you are in scrolled off it.
+   * - Bring a link reached by Tab into view (SC 2.4.11, focus not obscured). The browser
+   *   scrolls a focused element into view on its own, but not every browser stops short of
+   *   the fades; this scrolls the bar itself, by the least that clears them, and never
+   *   the page, because the bar is fixed and scrolling the page would not move it.
+   *
+   * Nothing here when the navigation is the masthead's row, which never scrolls.
+   */
+  function barScrolls() {
+    return !!mainNav && window.getComputedStyle(mainNav).position === "fixed";
+  }
+
+  function markBarEdges() {
+    if (!mainNav) {
+      return;
+    }
+    var room = mainNav.scrollWidth - mainNav.clientWidth;
+    var along = Math.abs(mainNav.scrollLeft);
+    var scrolls = barScrolls() && room > 1;
+    mainNav.toggleAttribute("data-overflow-start", scrolls && along > 1);
+    mainNav.toggleAttribute("data-overflow-end", scrolls && along < room - 1);
+  }
+
+  function revealInBar(link) {
+    if (!barScrolls() || !link || link.parentElement !== mainNav) {
+      return;
+    }
+    var style = window.getComputedStyle(mainNav);
+    var bar = mainNav.getBoundingClientRect();
+    var box = link.getBoundingClientRect();
+    var left = bar.left + mainNav.clientLeft + (parseFloat(style.scrollPaddingLeft) || 0);
+    var right =
+      bar.left + mainNav.clientLeft + mainNav.clientWidth - (parseFloat(style.scrollPaddingRight) || 0);
+    var by = 0;
+    if (box.left < left) {
+      by = box.left - left;
+    } else if (box.right > right) {
+      by = Math.min(box.right - right, box.left - left);
+    }
+    if (by) {
+      mainNav.scrollLeft += by;
+    }
+    markBarEdges();
+  }
+
+  function revealCurrentInBar() {
+    if (mainNav) {
+      revealInBar(mainNav.querySelector(':scope > a[aria-current="page"]'));
+    }
+  }
+
+  if (mainNav) {
+    mainNav.addEventListener("scroll", markBarEdges, { passive: true });
+    mainNav.addEventListener("focusin", function (event) {
+      revealInBar(event.target);
+    });
+  }
+
   function measureChrome() {
     measureHeader();
     scheduleFit();
+    markBarEdges();
   }
 
   fitNavigation();
   measureHeader();
+  revealCurrentInBar();
+  markBarEdges();
   window.addEventListener("resize", measureChrome);
   if (document.fonts && document.fonts.ready) {
-    document.fonts.ready.then(measureChrome);
+    document.fonts.ready.then(function () {
+      measureChrome();
+      revealCurrentInBar();
+    });
   }
   if (window.ResizeObserver) {
     var chromeWatcher = new window.ResizeObserver(measureChrome);
