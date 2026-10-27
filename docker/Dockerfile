@@ -208,6 +208,14 @@ ENV PYTHONUNBUFFERED=1 \
 # `libharfbuzz-subset0` because WeasyPrint 70 warns at import without it and says a later
 # version will require it (#163).
 #
+# `libthai0` is how Pango breaks a line of Thai (#1052). Thai has no spaces, so a break
+# between words needs a dictionary, and Pango asks libthai for it; without it, a line of
+# Thai breaks only at a space, which Thai seldom has, and the themes' `overflow-wrap: anywhere` then cuts it through
+# the middle of words wherever it reaches the margin. Debian's libpango-1.0-0 already depends on it,
+# so this installs nothing new today. It is named so the image says it relies on it, rather
+# than relying on a dependency of a dependency that a later Pango could drop.
+# tests/test_fonts.py holds it here.
+#
 # `postgresql-client-17` is `manage.py backup` and `manage.py restore` on the engine
 # `docker/compose.postgres.yml` offers: those commands shell out to pg_dump and pg_restore
 # rather than copying a file that is being written to, and stopped with "pg_dump is not on
@@ -261,6 +269,7 @@ RUN echo "Debian's packages as of: ${POSTULO_APT_REFRESH:-whenever this layer wa
     && apt-get upgrade -y \
     && apt-get install -y --no-install-recommends \
         libpango-1.0-0 libpangoft2-1.0-0 libharfbuzz0b libharfbuzz-subset0 libfontconfig1 \
+        libthai0 \
         fonts-dejavu-core fonts-noto-core fonts-noto-cjk \
         ca-certificates curl \
     && if [ -n "$POSTULO_EXTRA_APT_PACKAGES" ]; then \

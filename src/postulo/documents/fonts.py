@@ -64,6 +64,19 @@ PROBES: dict[str, tuple[str, str]] = {
     "Tfng": ("tfr", "\u2d30"),
 }
 
+#: A style of a script, by its ISO 15924 variant code → the language that is set in it, the
+#: family the document themes and the interface name for it, and a character to ask (#1054).
+#:
+#: A style is not found the way a script is. Asking the map for a font for Urdu answers with
+#: whichever font fontconfig ranks first for the language, and Noto Naskh Arabic draws every
+#: letter of Urdu: the script would be *drawable* in the wrong style. So the family is asked
+#: for by name, and the answer is the family the map actually loaded -- a map asked for a
+#: family it does not have hands back its best substitute, which is a no -- and that font's
+#: cmap. The character is NOON GHUNNA, a letter of Urdu that Arabic does not use.
+STYLE_PROBES: dict[str, tuple[str, str, str]] = {
+    "Aran": ("urd", "Noto Nastaliq Urdu", "\u06ba"),
+}
+
 
 def cmap_covers(cmap_table: bytes, codepoint: int) -> bool:
     """Whether a character has a glyph in a font's cmap table.
@@ -156,11 +169,77 @@ def renderable_scripts() -> dict[str, bool] | None:
     page and the command say what they actually know.
     """
     from postulo.core import languages
-    from postulo.documents.pdf import _is_importable
 
     offered = languages.scripts_offered()
     if not offered:
         return {}
+    handles = _handles()
+    if handles is None:
+        return None
+    ffi, font_map, gobject, pango, harfbuzz = handles
+
+    answer: dict[str, bool] = {}
+    for script in sorted(offered):
+        probe = PROBES.get(script)
+        if probe is None:
+            # A script the language list offers but this table cannot probe: it
+            # cannot be passed off as drawn. The test in tests/test_fonts.py holds
+            # the two tables together, so this is a bug the suite finds, not a
+            # state the page has to survive.
+            answer[script] = False
+            continue
+        language_tag, sample = probe
+        answer[script] = _script_drawable(
+            ffi, font_map, gobject, pango, harfbuzz, language_tag, sample
+        )
+    # The styles after the scripts, under codes of their own: a script drawn in the wrong
+    # style is legible, and that is a different answer from boxes (#1054).
+    for style in sorted(languages.styles_offered()):
+        style_probe = STYLE_PROBES.get(style)
+        if style_probe is None:
+            answer[style] = False
+            continue
+        language_tag, family, sample = style_probe
+        answer[style] = _script_drawable(
+            ffi, font_map, gobject, pango, harfbuzz, language_tag, sample, family=family
+        )
+    return answer
+
+
+def family_draws(family: str, language_tag: str, sample: str) -> bool | None:
+    """Whether this machine has ``family`` and it maps ``sample``, asked as a render asks.
+
+    ``None`` where WeasyPrint's native libraries are absent and nothing can be asked. The
+    tests that look for a family among a PDF's fonts ask this first, so that a machine
+    without the family skips them rather than failing them (#1054).
+    """
+    handles = _handles()
+    if handles is None:
+        return None
+    ffi, font_map, gobject, pango, harfbuzz = handles
+    return _script_drawable(
+        ffi, font_map, gobject, pango, harfbuzz, language_tag, sample, family=family
+    )
+
+
+def script_draws(script: str) -> bool | None:
+    """Whether this machine draws ``script`` (a code in `PROBES`), asked as the check asks.
+
+    ``None`` where nothing can be asked. For the tests that lay a script out through
+    WeasyPrint and skip on a machine that would draw it as boxes (#1052).
+    """
+    handles = _handles()
+    if handles is None:
+        return None
+    ffi, font_map, gobject, pango, harfbuzz = handles
+    language_tag, sample = PROBES[script]
+    return _script_drawable(ffi, font_map, gobject, pango, harfbuzz, language_tag, sample)
+
+
+def _handles():
+    """WeasyPrint's native handles and a font map wired the way it wires its own, or None."""
+    from postulo.documents.pdf import _is_importable
+
     if not _is_importable("weasyprint"):
         return None
     try:
@@ -177,28 +256,26 @@ def renderable_scripts() -> dict[str, bool] | None:
     font_map = ffi.gc(pangoft2.pango_ft2_font_map_new(), gobject.g_object_unref)
     pangoft2.pango_fc_font_map_set_config(ffi.cast("PangoFcFontMap *", font_map), config)
     fontconfig.FcConfigDestroy(config)
-
-    answer: dict[str, bool] = {}
-    for script in sorted(offered):
-        probe = PROBES.get(script)
-        if probe is None:
-            # A script the language list offers but this table cannot probe: it
-            # cannot be passed off as drawn. The test in tests/test_fonts.py holds
-            # the two tables together, so this is a bug the suite finds, not a
-            # state the page has to survive.
-            answer[script] = False
-            continue
-        language_tag, sample = probe
-        answer[script] = _script_drawable(
-            ffi, font_map, gobject, pango, harfbuzz, language_tag, sample
-        )
-    return answer
+    return ffi, font_map, gobject, pango, harfbuzz
 
 
 def _script_drawable(
-    ffi, font_map, gobject, pango, harfbuzz, language_tag: str, sample: str
+    ffi,
+    font_map,
+    gobject,
+    pango,
+    harfbuzz,
+    language_tag: str,
+    sample: str,
+    *,
+    family: str | None = None,
 ) -> bool:
-    """The font the map resolves for that language, and its cmap's word on the sample."""
+    """The font the map resolves for that language, and its cmap's word on the sample.
+
+    With ``family``, the font is asked for by that name, and a font of any other family is
+    a no however much of the script it maps: it is the substitute the map reaches for when
+    the family is not installed (#1054).
+    """
     context = pango.pango_font_map_create_context(font_map)
     try:
         language = pango.pango_language_from_string(language_tag.encode("utf-8"))
@@ -207,12 +284,16 @@ def _script_drawable(
         pango.pango_context_set_language(context, language)
         description = pango.pango_font_description_new()
         try:
+            if family is not None:
+                pango.pango_font_description_set_family(description, family.encode("utf-8"))
             font = pango.pango_font_map_load_font(font_map, context, description)
         finally:
             pango.pango_font_description_free(description)
         if font == ffi.NULL:
             return False
         try:
+            if family is not None and _family_of(ffi, pango, font).casefold() != family.casefold():
+                return False
             # The hb_ calls go to HarfBuzz's own handle, the way WeasyPrint's shaping does:
             # its functions are a library of their own, and the FFI object itself has never
             # carried them — asking it was the first red streak of #74.
@@ -238,3 +319,15 @@ def _script_drawable(
         # never be unref'd (doing so corrupts Pango and segfaults). The context is
         # a caller-owned GObject and is unref'd, matching WeasyPrint.
         gobject.g_object_unref(context)
+
+
+def _family_of(ffi, pango, font) -> str:
+    """The family of a font the map loaded, as the font itself names it (#1054)."""
+    described = pango.pango_font_describe_with_absolute_size(font)
+    if described == ffi.NULL:
+        return ""
+    try:
+        name = pango.pango_font_description_get_family(described)
+        return "" if name == ffi.NULL else ffi.string(name).decode("utf-8", "replace")
+    finally:
+        pango.pango_font_description_free(described)

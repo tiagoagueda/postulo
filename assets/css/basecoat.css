@@ -1095,6 +1095,17 @@
   }
 }
 
+
+/* The badge's text in Urdu is cut sideways only, as `truncate` is in `app.css` (#1054): its
+   Nastaliq descenders reach below the line, and `overflow: hidden` took their tails. */
+@layer utilities {
+  :lang(ur) .badge > span {
+    overflow-x: clip;
+    overflow-y: visible;
+    min-width: 0;
+  }
+}
+
 /* ------------------------------------------------------------------ alert */
 
 /*

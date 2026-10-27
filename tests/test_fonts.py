@@ -15,6 +15,7 @@ laptop of whoever added the language rather than in somebody's hands.
 
 import re
 import struct
+import unicodedata
 from pathlib import Path
 
 import pytest
@@ -189,7 +190,7 @@ def test_cmap_with_no_answerable_subtable_cannot_say_yes():
     assert cmap_covers(b"\x00\x01\x00\x02", 0x41) is False, "a directory that is not there"
 
 
-def _mocked_probe_handles(table: bytes):
+def _mocked_probe_handles(table: bytes, language: bytes = b"ara", resolved: bytes = b""):
     """The probe's native side, mocked: the map resolves one font, HarfBuzz hands its
     ``cmap`` over as ``table``.
 
@@ -202,14 +203,16 @@ def _mocked_probe_handles(table: bytes):
 
     ffi = cffi.FFI()
     data = ffi.new("char[]", table)
+    family_name = ffi.new("char[]", resolved)
     unrefed = []
+    asked_for = []
 
     class Pango:
         def pango_font_map_create_context(self, _font_map):
             return "context"
 
         def pango_language_from_string(self, tag):
-            assert tag == b"ara"
+            assert tag == language
             return "language"
 
         def pango_context_set_language(self, context, language):
@@ -223,7 +226,19 @@ def _mocked_probe_handles(table: bytes):
             return "font"
 
         def pango_font_description_free(self, description):
+            assert description in ("description", "described")
+
+        def pango_font_description_set_family(self, description, family):
             assert description == "description"
+            asked_for.append(family)
+
+        def pango_font_describe_with_absolute_size(self, font):
+            assert font == "font"
+            return "described"
+
+        def pango_font_description_get_family(self, described):
+            assert described == "described"
+            return family_name
 
         def pango_font_get_hb_font(self, font):
             assert font == "font"
@@ -254,7 +269,9 @@ def _mocked_probe_handles(table: bytes):
         def g_object_unref(self, obj):
             unrefed.append(obj)
 
-    return ffi, GObject(), Pango(), Harfbuzz(), unrefed
+    pango = Pango()
+    pango.asked_for = asked_for
+    return ffi, GObject(), pango, Harfbuzz(), unrefed
 
 
 def test_the_probe_reads_the_cmap_of_the_font_the_map_resolves():
@@ -316,3 +333,93 @@ def test_the_probe_of_a_script_is_a_character_of_that_script():
         written = languages.script_name(script)
         assert script in languages.SCRIPT_NAMES, f"{script} has no name to say it with"
         assert written.upper() in name or "CJK" in name, (script, sample, name)
+
+
+# ------------------------------------------------ the style a script is written in (#1054)
+
+#: Which Debian font package draws which style of a script, as `COVERAGE` does for scripts.
+STYLE_COVERAGE: dict[str, tuple[str, ...]] = {
+    "Aran": ("fonts-noto-core",),
+}
+
+
+def test_urdu_is_asked_about_in_nastaliq():
+    """Urdu is offered (#1051), so the question about its fonts is the style it is written in,
+    under ISO 15924's code for that variant, and in words on the page and the command."""
+    from postulo.documents import fonts
+
+    assert languages.script_of("ur") == "Arab", "the script is still Arabic; the style is not"
+    assert languages.styles_offered() == {"Aran"}
+    assert languages.script_name("Aran") == "Arabic (Nastaliq)"
+    assert set(languages.STYLES.values()) <= set(fonts.STYLE_PROBES)
+    for _language, family, sample in fonts.STYLE_PROBES.values():
+        assert "NASTALIQ" in family.upper()
+        assert unicodedata.name(sample).startswith("ARABIC LETTER")
+
+
+def test_the_image_installs_the_family_every_offered_style_is_drawn_in():
+    installed = installed_font_packages()
+    for style in sorted(languages.styles_offered()):
+        options = STYLE_COVERAGE.get(style)
+        assert options, f"{style} is offered but no font package is recorded for it"
+        assert installed & set(options), f"the image cannot draw {style}: install one of {options}"
+
+
+def test_the_style_probe_asks_for_the_family_and_takes_only_that_family():
+    """Named for Urdu and drawn by Naskh is the wrong style, however much it maps (#1054)."""
+    from postulo.documents import fonts
+
+    table = _cmap12([(0x0600, 0x06FF, 5)])
+    ffi, gobject, pango, harfbuzz, unrefed = _mocked_probe_handles(
+        table, language=b"urd", resolved=b"Noto Nastaliq Urdu"
+    )
+    answer = fonts._script_drawable(
+        ffi, "font-map", gobject, pango, harfbuzz, "urd", "\u06ba", family="Noto Nastaliq Urdu"
+    )
+    assert answer is True
+    assert pango.asked_for == [b"Noto Nastaliq Urdu"]
+    assert unrefed == ["font", "context"]
+
+    ffi, gobject, pango, harfbuzz, unrefed = _mocked_probe_handles(
+        table, language=b"urd", resolved=b"Noto Naskh Arabic"
+    )
+    answer = fonts._script_drawable(
+        ffi, "font-map", gobject, pango, harfbuzz, "urd", "\u06ba", family="Noto Nastaliq Urdu"
+    )
+    assert answer is False, "the map's substitute for a family it does not have"
+    assert unrefed == ["font", "context"]
+
+
+def _answered(monkeypatch, nastaliq: bool) -> None:
+    from postulo.documents import fonts
+
+    answer = dict.fromkeys(languages.scripts_offered(), True)
+    answer["Aran"] = nastaliq
+    monkeypatch.setattr(fonts, "renderable_scripts", lambda: answer)
+
+
+def test_check_fonts_says_whether_urdu_is_drawn_in_nastaliq(monkeypatch):
+    from io import StringIO
+
+    from django.core.management import call_command
+
+    _answered(monkeypatch, nastaliq=True)
+    out = StringIO()
+    call_command("check_fonts", stdout=out)
+    assert "draws      Arabic (Nastaliq)" in out.getvalue()
+    assert "though not" not in out.getvalue()
+
+    _answered(monkeypatch, nastaliq=False)
+    out = StringIO()
+    # Said, and not a failure: Urdu is still drawn, legibly, in Naskh.
+    call_command("check_fonts", stdout=out)
+    assert "cannot draw  Arabic (Nastaliq)" in out.getvalue()
+    assert "though not in every style" in out.getvalue()
+
+
+def test_the_image_names_libthai_for_breaking_thai():
+    """Pango breaks a line of Thai with libthai's dictionary (#1052). Debian's Pango depends
+    on it today; the image names it so that a later Pango cannot drop it unnoticed."""
+    text = DOCKERFILE.read_text(encoding="utf-8")
+    body = "\n".join(line for line in text.splitlines() if not line.lstrip().startswith("#"))
+    assert re.search(r"\blibthai0\b", body), "the image does not install libthai0"

@@ -496,3 +496,22 @@ def test_the_templates_of_a_plugin_that_went_away_are_no_longer_read(
     stamp[0] = "three"
     registry.plugins("feature")
     assert read() and themes.find("vellum") is not None, "and back again"
+
+
+def test_no_theme_hyphenates_or_justifies():
+    """`hyphens: auto` and `text-align: justify` are the two rules that would do something to
+    a Chinese or Thai paragraph -- a hyphen Han never takes, gaps stretched between its
+    characters -- and no shipped theme sets either (#1052). A theme that comes to set one
+    has to say how it keeps it away from the scripts that break without spaces."""
+    import re
+    from pathlib import Path
+
+    import postulo
+
+    folder = Path(postulo.__file__).parent / "templates" / "documents" / "themes"
+    sources = sorted(folder.rglob("*.html"))
+    assert len(sources) >= 9, "the base templates and both themes' three kinds"
+    for source in sources:
+        text = source.read_text(encoding="utf-8")
+        assert not re.search(r"hyphens\s*:\s*auto", text), source.name
+        assert not re.search(r"text-align\s*:\s*justify", text), source.name

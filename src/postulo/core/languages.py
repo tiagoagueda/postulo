@@ -1011,10 +1011,24 @@ SCRIPTS: dict[str, str] = {
     "ur": "Arab",
 }
 
+#: Language subtag → the style of its script it is set in, where the script alone does not
+#: say enough to draw it (#1054).
+#:
+#: Urdu is written in the Arabic script, which is what `SCRIPTS` says and what the registry
+#: says, but in Nastaliq, the hanging calligraphic style, and not in the Naskh that Arabic is
+#: set in. A font that draws the Arabic script draws Urdu legibly and foreign-looking, so the
+#: question the fonts are asked for Urdu is a second one: not *is the script drawn* but *is it
+#: drawn in its own style*. ISO 15924 has a code for exactly that variant, ``Aran``, and the
+#: answer is said under it, beside the scripts, wherever the scripts are said.
+STYLES: dict[str, str] = {
+    "ur": "Aran",
+}
+
 #: A script's code → what it is called, for the two places that say it to a person: the
 #: server overview and ``manage.py check_fonts``. In English, as those two always were.
 SCRIPT_NAMES: dict[str, str] = {
     "Arab": "Arabic",
+    "Aran": "Arabic (Nastaliq)",
     "Armn": "Armenian",
     "Beng": "Bengali",
     "Cyrl": "Cyrillic",
@@ -1051,3 +1065,9 @@ def script_name(script: str) -> str:
 def scripts_offered() -> set[str]:
     """Every script but Latin among the languages Postulo currently offers, by its code."""
     return {script_of(code) for code, _name in LANGUAGES} - {"Latn"}
+
+
+def styles_offered() -> set[str]:
+    """Every style in `STYLES` that a language Postulo currently offers is set in (#1054)."""
+    offered = {primary(code) for code, _name in LANGUAGES}
+    return {style for language, style in STYLES.items() if language in offered}

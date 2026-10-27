@@ -6,6 +6,13 @@
         font-size: 10pt;
         line-height: 1.45;
       }
+      /* Urdu is set in Nastaliq and Arabic stays in Naskh (#1054): the one family
+         first, only where the document says it is Urdu, and the line opened up for
+         a style whose words descend on a diagonal and stack higher than Naskh's. */
+      body:lang(ur) {
+        font-family: "Noto Nastaliq Urdu", "Helvetica Neue", Helvetica, Arial, "Noto Sans", "Noto Sans Ethiopic", "Noto Naskh Arabic", sans-serif;
+        line-height: 2;
+      }
 
       @page { size: A4; margin: 18mm; }
       * { box-sizing: border-box; }

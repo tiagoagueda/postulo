@@ -361,6 +361,38 @@
   }
 
   /*
+   * Where a line may break in the scripts that put no space between words (#1052).
+   *
+   * Chinese and Japanese break between almost any two characters, under the kinsoku rules:
+   * no closing mark -- ，。）」 -- at the start of a line, no opening one at its end. The
+   * browser's `auto` keeps the punctuation; `strict` is the set a typesetter would apply,
+   * which adds the small kana and the prolonged sound mark, and it is what a Chinese or
+   * Japanese reader expects of a page that is mostly prose.
+   *
+   * Korean puts spaces between its words, and a browser breaks inside them anyway: by
+   * default Hangul is broken like Han, syllable by syllable. `keep-all` breaks it at its
+   * spaces. The rules above that stop a long Latin word running out of its box are left as
+   * they are, and they do Korean no harm under `keep-all`: `break-word` and `anywhere`
+   * break inside a word only when the word alone is wider than its line, the last resort
+   * Latin gets, and the `break-all` utilities are on addresses, tokens and keys, which are
+   * not Korean.
+   *
+   * Thai has no spaces and no breaks between letters: a line breaks between words, which
+   * the browser finds with ICU's dictionary, and nothing has to be said for it here.
+   *
+   * On `[lang]`, as Urdu's family is: both properties are inherited, so they are said once
+   * by whatever element says the language.
+   */
+  [lang]:lang(zh),
+  [lang]:lang(ja) {
+    line-break: strict;
+  }
+
+  [lang]:lang(ko) {
+    word-break: keep-all;
+  }
+
+  /*
    * Machine text is never in the reader's script. A package name, a version, a checksum,
    * an entry point: all Latin, and all liable to sit inside an Arabic or Hebrew line where
    * the bidirectional algorithm resolves the punctuation around them against the
@@ -380,6 +412,45 @@
    */
   bdi {
     unicode-bidi: isolate;
+  }
+
+  /*
+   * Urdu is written in Nastaliq, the hanging calligraphic style of the Arabic script, and
+   * not in the upright Naskh that Arabic is set in (#1054). Text in Naskh can be read, and
+   * it looks foreign to most of the people reading it, the way a Latin page set in Fraktur
+   * would. So a page or a passage marked Urdu asks for Noto Nastaliq Urdu first -- the
+   * image installs it with `fonts-noto-core`, and a desktop that lacks it falls through to
+   * the ordinary stack -- and Arabic, which never matches `:lang(ur)`, keeps what it had.
+   *
+   * On `[lang]` rather than on every element in Urdu: the family is inherited from the
+   * element that says the language, and `code`, `kbd` and `pre` keep the monospace
+   * Tailwind's reset gives them.
+   *
+   * Nastaliq sets each word on a diagonal, descending to the left, and its letters stack
+   * higher and drop lower than Latin ones: Noto's face is 2.5 em from the top of its tallest
+   * ligature to the bottom of its lowest descender, against about 1.2 for a Latin face. A
+   * line of 1.5 lets one line's descenders run into the next one's ascenders, and a box
+   * that clips -- `truncate`, a one-line select -- cuts the words in half. Two is the middle
+   * of the 1.8 to 2.2 the script is usually given, and it is set through the variables every
+   * `text-*` and `leading-*` utility reads, so a button, a chip and a table row grow with
+   * it rather than keeping a line height measured for Latin. The figures' `text-5xl` keeps
+   * its line of one: it is a number, and numbers are not written in Nastaliq.
+   */
+  [lang]:lang(ur) {
+    font-family: "Noto Nastaliq Urdu", var(--font-sans);
+    line-height: 2;
+    --text-xs--line-height: 2;
+    --text-sm--line-height: 2;
+    --text-base--line-height: 2;
+    --text-lg--line-height: 2;
+    --text-xl--line-height: 2;
+    --text-2xl--line-height: 2;
+    --text-3xl--line-height: 2;
+    --text-title--line-height: 2;
+    --leading-tight: 2;
+    --leading-snug: 2;
+    --leading-normal: 2;
+    --leading-relaxed: 2;
   }
 
   /*
@@ -530,6 +601,29 @@
   select option,
   select optgroup {
     @apply bg-white text-ink-900 dark:bg-ink-950 dark:text-ink-100;
+  }
+}
+
+/*
+ * A line cut short with an ellipsis is cut sideways, and `truncate` does it with
+ * `overflow: hidden`, which cuts top and bottom as well. A Latin word never reaches either.
+ * Nastaliq does (#1054): Noto Nastaliq Urdu's letters reach 1.9 em above the baseline and
+ * 0.6 below it, more than the line of 2 the base layer opens for them, and a column heading,
+ * a pill or a dashboard link lost the tails of its descenders to its own box, three pixels at
+ * the size of a table's heading. In Urdu the cut is made sideways only: `clip` on the one
+ * axis leaves the other `visible`, where `hidden` would have turned it into a scroll box, and
+ * the ellipsis still comes, since any overflow but `visible` draws one. A box that clips is
+ * not a scroll box, though, and only a scroll box lets a flex or grid item shrink below its
+ * words without being told: the minimum width is said outright, or a dashboard row's title
+ * held its whole length and pushed the date beside it off the page. In `utilities`, and named
+ * for each place that truncates through `@apply`, so it reaches what `truncate` does; the
+ * badge's own span, which is Basecoat's, is named in `basecoat.css`.
+ */
+@layer utilities {
+  :lang(ur) .truncate {
+    overflow-x: clip;
+    overflow-y: visible;
+    min-width: 0;
   }
 }
 

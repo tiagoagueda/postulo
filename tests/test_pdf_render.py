@@ -24,6 +24,7 @@ run them -- which is what happened the first time they ran on Linux.
 from __future__ import annotations
 
 import datetime
+import re
 from ctypes.util import find_library
 
 import pytest
@@ -241,3 +242,148 @@ def test_a_very_long_address_stays_on_the_page(user, theme, kind):
 
     for page in WeasyPrintBackend().document(html).render().pages:
         assert not overflowing(page), "something is drawn past the edge of the page"
+
+
+# ------------------------------------------- Urdu in Nastaliq, Arabic in Naskh (#1054)
+
+#: The fonts a PDF embeds, by the name each is embedded under, without the subset's tag.
+BASE_FONT = re.compile(rb"/BaseFont\s*/(?:[A-Z]{6}\+)?([^\s/\[\]<>()]+)")
+
+#: Two lines of a CV in each language, in the script each is written in.
+URDU = (
+    "سافٹ ویئر انجینئر",
+    "میں نے سرور اور ڈیٹا بیس کی دیکھ بھال کی اور تین انجینئروں کو سکھایا۔",
+)
+ARABIC = ("مهندس برمجيات", "حافظت على الخوادم وقواعد البيانات ودرّبت ثلاثة مهندسين.")
+
+
+def embedded(content: bytes) -> set[str]:
+    return {name.decode("latin-1") for name in BASE_FONT.findall(content)}
+
+
+def needs_family(family: str, language_tag: str, sample: str) -> None:
+    """Skip where this machine has not got the family: CI's test job installs DejaVu alone,
+    and the image, which carries `fonts-noto-core`, is where these say something."""
+    from postulo.documents import fonts
+
+    if not fonts.family_draws(family, language_tag, sample):
+        pytest.skip(f"{family} is not installed here")
+
+
+def written_in(user, experience, language: str, lines: tuple[str, str], theme: str) -> bytes:
+    headline, summary = lines
+    experience.summary = summary
+    experience.save()
+    cv = selection(user, experience, language=language, theme=theme)
+    cv.headline = headline
+    cv.save()
+    return readable(rendering.render_cv_html(cv))
+
+
+@pytest.mark.parametrize("theme", [name for name, kind in SETTINGS if kind == themes.Kind.CV])
+def test_an_urdu_cv_is_set_in_nastaliq(user, experience, theme):
+    needs_family("Noto Nastaliq Urdu", "urd", "ں")
+
+    fonts = embedded(written_in(user, experience, "ur", URDU, theme))
+
+    assert any("Nastaliq" in name for name in fonts), fonts
+
+
+@pytest.mark.parametrize("theme", [name for name, kind in SETTINGS if kind == themes.Kind.CV])
+def test_an_arabic_cv_is_still_set_in_naskh(user, experience, theme):
+    needs_family("Noto Naskh Arabic", "ara", "ب")
+
+    fonts = embedded(written_in(user, experience, "ar", ARABIC, theme))
+
+    assert any("Naskh" in name for name in fonts), fonts
+    assert not any("Nastaliq" in name for name in fonts), "Nastaliq is Urdu's, not Arabic's"
+
+
+# ------------------------------------- where a line breaks without spaces (#1052)
+
+#: What may not start a line in Chinese or Japanese: the closing marks of the kinsoku rules.
+CLOSING = "，。、；：？！）」』】〉》〕”’"
+
+#: ... and what may not end one: the opening marks.
+OPENING = "（「『【〈《〔“‘"
+
+#: A Chinese paragraph with a closing or opening mark every few characters, long enough to
+#: take several lines of an A4 page: a break that lands beside a mark has to be moved.
+CHINESE = (
+    "我们维护了服务器和数据库，部署时间从四十分钟缩短到四分钟。"
+    "（另外）我们还指导了三名工程师，「效果」很好！"
+) * 12
+
+#: Single words of Thai, none of them a compound a dictionary could split, run together as
+#: Thai is written: "I love the cat and the dog of his in the house".
+THAI_WORDS = ("ผม", "รัก", "แมว", "และ", "หมา", "ของ", "เขา", "ใน", "บ้าน")
+THAI = "".join(THAI_WORDS) * 25
+
+
+def laid_out_lines(html: str) -> list[str]:
+    """The text of every line WeasyPrint laid out, in order, page after page.
+
+    The line boxes are what Pango broke the paragraphs into, so this is the text layer as a
+    reader's selection would find it, one line at a time.
+    """
+    from weasyprint.formatting_structure import boxes
+
+    lines = []
+    for page in WeasyPrintBackend().document(html).render().pages:
+        for box in page._page_box.descendants():
+            if isinstance(box, boxes.LineBox):
+                texts = [text.text for text in box.descendants() if isinstance(text, boxes.TextBox)]
+                lines.append("".join(texts))
+    return lines
+
+
+def needs_script(script: str) -> None:
+    """Skip where this machine has no font for the script, the way the families above do."""
+    from postulo.documents import fonts
+
+    if not fonts.script_draws(script):
+        pytest.skip(f"no font draws {script} here")
+
+
+@pytest.mark.parametrize("theme", [name for name, kind in SETTINGS if kind == themes.Kind.CV])
+def test_a_chinese_cv_never_starts_a_line_with_a_closing_mark(user, experience, theme):
+    """Pango breaks Han between almost any two characters under UAX #14, which keeps the
+    kinsoku marks off the wrong end of a line; the themes' `overflow-wrap: anywhere` breaks
+    only a word too long for its line, which nothing in a Chinese paragraph is."""
+    needs_script("Hans")
+    experience.summary = CHINESE
+    experience.save()
+    cv = selection(user, experience, language="zh-Hans", theme=theme)
+
+    lines = [line.strip() for line in laid_out_lines(rendering.render_cv_html(cv))]
+    chinese = [line for line in lines if line and line[0] in CHINESE]
+
+    assert len(chinese) > 3, "the paragraph was meant to take several lines"
+    assert not [line for line in lines if line and line[0] in CLOSING], lines
+    assert not [line for line in lines if line and line[-1] in OPENING], lines
+
+
+@pytest.mark.parametrize("theme", [name for name, kind in SETTINGS if kind == themes.Kind.CV])
+def test_a_thai_cv_breaks_only_between_words(user, experience, theme):
+    """Thai has no spaces, and Pango finds its breaks with libthai's dictionary, which
+    `docker/Dockerfile` installs by name: every line of the paragraph ends where a word does.
+    Two words a dictionary knows as one may be kept together; a word is never cut."""
+    needs_script("Thai")
+    experience.summary = THAI
+    experience.save()
+    cv = selection(user, experience, language="th", theme=theme)
+
+    lines = [line.strip() for line in laid_out_lines(rendering.render_cv_html(cv))]
+    thai = [line for line in lines if line and line[0] in THAI]
+    assert len(thai) > 3, "the paragraph was meant to take several lines"
+    assert "".join(thai) == THAI, "the paragraph's lines are the whole of it, in order"
+
+    word_ends, offset = set(), 0
+    for word in THAI_WORDS * 25:
+        offset += len(word)
+        word_ends.add(offset)
+    line_ends, offset = set(), 0
+    for line in thai:
+        offset += len(line)
+        line_ends.add(offset)
+    assert line_ends <= word_ends, f"a line ends inside a word: {sorted(line_ends - word_ends)}"

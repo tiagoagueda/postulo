@@ -63,7 +63,10 @@
         </div>
         {% comment %} The row above says who draws; this one says whether the drawing can
            be read. Which of the scripts the offered languages need, this machine's
-           fonts draw — the question a render would have asked, asked now (#74).
+           fonts draw — the question a render would have asked, asked now (#74). A
+           style a language is set in is listed beside the scripts under a name of its own,
+           "Arabic (Nastaliq)" for Urdu, red where only the script's ordinary style is
+           drawn (#1054).
            `None` is a state of its own: a machine without WeasyPrint's libraries
            cannot be asked, and "cannot be checked" must not read as "all of them". {% endcomment %}
         <div class="flex justify-between gap-4" data-fonts="{% if font_scripts is None %}unknown{% else %}listed{% endif %}">

@@ -5665,6 +5665,13 @@
     border: 1px solid CanvasText;
   }
 }
+@layer utilities {
+  :lang(ur) .badge > span {
+    overflow-x: clip;
+    overflow-y: visible;
+    min-width: 0;
+  }
+}
 @layer components {
   .alert {
     display: flex;
@@ -6161,11 +6168,33 @@
   h1, h2, h3 {
     overflow-wrap: break-word;
   }
+  [lang]:lang(zh), [lang]:lang(ja) {
+    line-break: strict;
+  }
+  [lang]:lang(ko) {
+    word-break: keep-all;
+  }
   code, kbd, samp {
     unicode-bidi: isolate;
   }
   bdi {
     unicode-bidi: isolate;
+  }
+  [lang]:lang(ur) {
+    font-family: "Noto Nastaliq Urdu", var(--font-sans);
+    line-height: 2;
+    --text-xs--line-height: 2;
+    --text-sm--line-height: 2;
+    --text-base--line-height: 2;
+    --text-lg--line-height: 2;
+    --text-xl--line-height: 2;
+    --text-2xl--line-height: 2;
+    --text-3xl--line-height: 2;
+    --text-title--line-height: 2;
+    --leading-tight: 2;
+    --leading-snug: 2;
+    --leading-normal: 2;
+    --leading-relaxed: 2;
   }
   [dir="rtl"] [data-icon="chevron-left"], [dir="rtl"] [data-icon="chevron-right"], [dir="rtl"] [data-icon="chevrons-left"], [dir="rtl"] [data-icon="chevrons-right"], [dir="rtl"] [data-icon="arrow-left"], [dir="rtl"] [data-icon="arrow-right"], [dir="rtl"] [data-icon="arrow-big-left"], [dir="rtl"] [data-icon="arrow-big-right"], [dir="rtl"] [data-icon="corner-down-left"], [dir="rtl"] [data-icon="corner-down-right"], [dir="rtl"] [data-icon="move-left"], [dir="rtl"] [data-icon="move-right"], [dir="rtl"] [data-icon="undo"], [dir="rtl"] [data-icon="redo"] {
     transform: scaleX(-1);
@@ -6330,6 +6359,11 @@
         color: var(--color-ink-100);
       }
     }
+  }
+  :lang(ur) .truncate {
+    overflow-x: clip;
+    overflow-y: visible;
+    min-width: 0;
   }
 }
 @layer components {

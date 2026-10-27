@@ -6,6 +6,11 @@ languages need, the font the renderer resolves for that language is asked for th
 character that would be in the document, and the question is about the character, not
 the package.
 
+A language set in a style of its script -- Urdu in Nastaliq (#1054) -- is asked about
+under the style's own code, after the scripts. A style that is missing is said, in red,
+and does not fail the command: the script is still drawn, legibly, in its ordinary style,
+and a deployment check that passed yesterday should not stop on a typeface.
+
 Exit codes: ``0`` when every offered script draws or the question cannot be asked on
 this machine at all (and the reason is said), ``1`` when an offered script would come
 out boxes.
@@ -37,21 +42,38 @@ class Command(BaseCommand):
             )
             return
 
-        missing = [
-            languages.script_name(script) for script, drawable in answer.items() if not drawable
-        ]
+        missing = [languages.script_name(script) for script in offered if not answer.get(script)]
         for script in offered:
             name = languages.script_name(script)
             if answer.get(script):
                 self.stdout.write(self.style.SUCCESS(f"draws      {name}"))
             else:
                 self.stdout.write(self.style.ERROR(f"cannot draw  {name}"))
+        for style in sorted(languages.styles_offered()):
+            name = languages.script_name(style)
+            if answer.get(style):
+                self.stdout.write(self.style.SUCCESS(f"draws      {name}"))
+            else:
+                self.stdout.write(
+                    self.style.ERROR(
+                        f"cannot draw  {name}: its documents come out in the script's "
+                        "ordinary style. On Debian or Ubuntu: apt install fonts-noto-core."
+                    )
+                )
         if missing:
             raise CommandError(
                 f"{' and '.join(missing)} would come out as boxes. On Debian or "
                 "Ubuntu: apt install fonts-noto-core, and fonts-noto-cjk for CJK, "
                 "then re-run this."
             )
-        self.stdout.write(
-            self.style.SUCCESS("Every script the offered languages need, this machine draws.")
-        )
+        if all(answer.get(style) for style in languages.styles_offered()):
+            self.stdout.write(
+                self.style.SUCCESS("Every script the offered languages need, this machine draws.")
+            )
+        else:
+            self.stdout.write(
+                self.style.WARNING(
+                    "Every script the offered languages need, this machine draws, though not "
+                    "in every style they are written in."
+                )
+            )

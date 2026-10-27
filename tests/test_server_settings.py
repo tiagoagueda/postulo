@@ -189,6 +189,22 @@ def test_the_overview_says_which_scripts_this_machine_draws(client, admin):
             assert languages.script_name(script) in html, "in words, not by its code"
 
 
+def test_the_overview_says_whether_urdu_is_drawn_in_nastaliq(client, admin, monkeypatch):
+    """Urdu drawn only in Naskh is a style missing, said in red beside the scripts (#1054)."""
+    from postulo.core import languages
+    from postulo.documents import fonts
+
+    answer = dict.fromkeys(languages.scripts_offered(), True)
+    answer["Aran"] = False
+    monkeypatch.setattr(fonts, "renderable_scripts", lambda: answer)
+
+    signed_in_recently(client, admin)
+    html = client.get(reverse("server:overview")).content.decode()
+
+    assert '<span class="text-red-600 dark:text-red-400">Arabic (Nastaliq)</span>' in html
+    assert '<span class="">Arabic</span>' in html
+
+
 def test_the_overview_says_how_to_keep_postulo_going_and_nothing_else_does(client, admin, user):
     """The one place inside the application that mentions support (#199).
 
