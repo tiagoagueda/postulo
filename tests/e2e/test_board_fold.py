@@ -22,7 +22,8 @@ whether a person can use any of it. These do:
 * **a card that is held is not swapped away**, by a filter's answer or by a fold;
 * **a status with no column** folds every column and says where those applications are;
 * **on a phone** the page does not scroll sideways, no strip's name is cut, and nothing in
-  the row of filters is cut, in the widest languages;
+  the row of filters is cut, in the widest languages; the sections are stacked down the page,
+  which scrolls them, a section opens in place, and a held card scrolls the page (#844);
 * **axe**, in both themes, open and folded;
 * **several columns open at once** (#709): a strip opens beside the columns already open, an
   open column's heading folds that one alone, and a card moved between two open columns is
@@ -73,6 +74,10 @@ axe_source = walks.axe_source
 
 WIDE = {"width": 1280, "height": 900}
 NARROWEST = {"width": 320, "height": 640}
+PHONE = {"width": 390, "height": 740}
+#: The narrowest window the board is a box at: from `sm` up. Below it the sections are
+#: stacked and the page scrolls them (#844).
+NARROW_BOX = {"width": 640, "height": 740}
 
 BOARD = "/applications/?view=board"
 
@@ -1350,17 +1355,18 @@ def test_a_card_moved_by_its_menu_leaves_the_board_where_it_was_scrolled(
 def test_a_swap_elsewhere_on_the_page_leaves_the_board_where_it_was_scrolled(
     page: Page, live_server, search
 ):
-    """On a phone the open column of a folded board is brought into the scroll box, when
-    the page arrives and when the board is swapped. It was brought back after any swap on
-    the page: somebody who had scrolled the box back to read the strips, and then changed
-    the theme from the account menu, had it taken out of their hands. Only a swap that
-    brings a board does it."""
+    """In a narrow box the open columns of a folded board are brought into it, when the page
+    arrives and when the board is swapped. They were brought back after any swap on the
+    page: somebody who had scrolled the box back to read the strips, and then changed the
+    theme from the account menu, had it taken out of their hands. Only a swap that brings a
+    board does it. The narrowest box there is, since a phone stacks the sections (#844),
+    and two columns open, which do not fit in it side by side."""
     person = search["applicant"]
     base = live_server.url
     sign_in(page, base)
-    page.set_viewport_size({"width": 390, "height": 740})
-    page.goto(f"{base}{BOARD}&status=offer")
-    folded_to(page, person, "offer")
+    page.set_viewport_size(NARROW_BOX)
+    page.goto(f"{base}{BOARD}&status=interviewing,offer")
+    folded_to(page, person, "interviewing,offer")
     arrived = scroll_of(page)
     assert arrived > 0, "the open column was brought into the box on arrival"
     assert page.evaluate(OPEN_COLUMN_IN_VIEW)
@@ -1379,8 +1385,9 @@ def test_a_swap_elsewhere_on_the_page_leaves_the_board_where_it_was_scrolled(
     page.keyboard.press("Escape")
     page.locator("#application-filters input[name=quiet]").check()
     expect(page).to_have_url(re.compile(r"[?&]quiet=1(&|$)"))
-    folded_to(page, person, "offer", quiet=True)
-    page.wait_for_function(OPEN_COLUMN_IN_VIEW)
+    folded_to(page, person, "interviewing,offer", quiet=True)
+    page.wait_for_function(f"() => ({SCROLL})() > 0")
+    assert page.evaluate(OPEN_COLUMN_IN_VIEW)
 
 
 #: How fast the page itself scrolls the board with a card held `inside` pixels from the
@@ -1441,27 +1448,74 @@ def test_the_pages_own_scrolling_makes_room_for_the_browsers(page: Page, live_se
     assert max(speeds.values()) <= CEILING, speeds
 
 
-def test_a_narrow_board_scrolls_in_a_narrower_band(page: Page, live_server, search):
-    """The band is a fifth of the box at most. Seventy-two pixels at either side of a box
-    288 wide is half of it, and a card picked up near its end scrolled the board at once.
-    At sixty-five pixels from the edge a wide board scrolls and a narrow one does not; well
-    inside its own band the narrow one scrolls as before."""
+#: How fast the page itself scrolls the page, stacked on a phone (#844), with a card held
+#: `inside` pixels above the foot of what the page shows -- the window's, less the bar of
+#: navigation fixed to it -- in pixels a second. Negative is over the bar.
+PAGE_SPEED = """async (inside) => {
+  const page = document.scrollingElement;
+  const box = document.querySelector('[data-board]');
+  const card = document.querySelector('[data-card]');
+  const bar = document.querySelector('[data-nav-main]');
+  const foot = window.innerHeight
+    - (bar && getComputedStyle(bar).position === 'fixed' ? bar.offsetHeight : 0);
+  page.scrollTop = 0;
+  const at = {clientX: window.innerWidth / 2, clientY: foot - inside};
+  const transfer = new DataTransfer();
+  const fire = (target, type, more = {}) => target.dispatchEvent(
+    new DragEvent(type, {bubbles: true, cancelable: true, dataTransfer: transfer, ...more}));
+  const wait = (ms) => new Promise((done) => setTimeout(done, ms));
+  fire(card, 'dragstart');
+  fire(box, 'dragover', at);
+  const over = setInterval(() => fire(box, 'dragover', at), 40);
+  await wait(120);
+  const began = [performance.now(), page.scrollTop];
+  await wait(400);
+  const ended = [performance.now(), page.scrollTop];
+  clearInterval(over);
+  fire(card, 'dragend');
+  page.scrollTop = 0;
+  return (ended[1] - began[1]) / (ended[0] - began[0]) * 1000;
+}"""
+
+
+def page_speed(page: Page, inside: float) -> float:
+    return page.evaluate(PAGE_SPEED, inside)
+
+
+def test_a_card_held_near_the_foot_of_a_phone_scrolls_the_page(page: Page, live_server, search):
+    """Stacked, on a phone, the box does not scroll and the page does (#844): a card held
+    near the foot of what the page shows -- above the bar of navigation -- scrolls the page
+    down, faster the nearer, fastest over the bar, and never above the ceiling. The band is
+    a fifth of what the page shows at most, as it is of a box: in a short window, sixty-five
+    pixels from the foot is outside it."""
     base = live_server.url
     sign_in(page, base)
-    page.set_viewport_size(WIDE)
+    page.set_viewport_size(PHONE)
     page.goto(f"{base}{BOARD}")
     expect(page.locator("[data-card][draggable=true]").first).to_be_visible()
-    assert own_speed(page, 65) > 0
+    assert page.locator("[data-board]").evaluate("(box) => box.scrollWidth <= box.clientWidth")
 
-    page.set_viewport_size(NARROWEST)
+    speeds = {inside: page_speed(page, inside) for inside in (100, 60, 30, 5, -10)}
+    assert speeds[100] == 0, f"outside the band: {speeds}"
+    assert 0 < speeds[60] < speeds[30] < speeds[5], speeds
+    assert speeds[-10] > 500, f"over the bar, past the edge: {speeds}"
+    assert max(speeds.values()) <= CEILING, speeds
+    assert page.evaluate("() => document.querySelector('[data-board]').scrollLeft") == 0
+
+    page.set_viewport_size({"width": 320, "height": 420})
     page.goto(f"{base}{BOARD}")
     expect(page.locator("[data-card][draggable=true]").first).to_be_visible()
-    width = page.locator("[data-board]").bounding_box()["width"]
-    assert width / 5 < 60, f"a box {width} wide, whose fifth is less than sixty"
-    assert own_speed(page, 65) == 0, "outside a fifth of the box"
-    assert own_speed(page, width / 5 + 2) == 0
-    assert own_speed(page, 40) > 0, "and inside it"
-    assert own_speed(page, 22) > own_speed(page, 40)
+    shown = page.evaluate(
+        """() => {
+          const bar = document.querySelector('[data-nav-main]');
+          const header = document.querySelector('[data-site-header]');
+          return window.innerHeight - header.offsetHeight
+            - (getComputedStyle(bar).position === 'fixed' ? bar.offsetHeight : 0);
+        }"""
+    )
+    assert shown / 5 < 60, f"{shown} shown, whose fifth is less than sixty"
+    assert page_speed(page, 65) == 0, "outside a fifth of what the page shows"
+    assert page_speed(page, 30) > 0, "and inside it"
 
 
 def measured(page: Page, inside: float, for_ms: int = 400) -> float:
@@ -2040,7 +2094,9 @@ def test_the_switch_carries_the_status_between_the_shapes(page: Page, live_serve
 # --------------------------------------------------------------------------- a phone
 
 #: Every strip, measured: whether its name is inside the strip and on one line, and how
-#: large it is drawn. Asked of the browser, in whatever font it is drawing in.
+#: large it is drawn. Asked of the browser, in whatever font it is drawing in. A line is a
+#: column of text where the name is written down the strip, and a row where it is written
+#: across, as it is on a phone (#844).
 STRIPS = """() => [...document.querySelectorAll('[data-board-strip]')].map((strip) => {
   const control = strip.querySelector('[data-board-fold]');
   const name = control.querySelector('span');
@@ -2049,7 +2105,9 @@ STRIPS = """() => [...document.querySelectorAll('[data-board-strip]')].map((stri
   const n = name.getBoundingClientRect();
   const range = document.createRange();
   range.selectNodeContents(name);
-  const lines = new Set([...range.getClientRects()].map((r) => Math.round(r.left))).size;
+  const down = getComputedStyle(name).writingMode.startsWith('vertical');
+  const lines = new Set([...range.getClientRects()].map((r) => Math.round(down ? r.left : r.top)))
+    .size;
   const within = (inner) => inner.left >= s.left - 0.5 && inner.right <= s.right + 0.5
       && inner.top >= s.top - 0.5 && inner.bottom <= s.bottom + 0.5;
   return {
@@ -2084,7 +2142,9 @@ def test_folded_the_page_does_not_scroll_sideways_and_no_strip_is_cut(
     """Reflow (SC 1.4.10). The strips' names are written down the strip, so a strip is as
     narrow as a line of text and as tall as its name is long: nothing clips it, in German
     or in Greek. The board stays in its scroll box, and the open column -- the last one
-    here, the furthest from where the box starts -- is brought into it."""
+    here, the furthest from where the box starts -- is brought into it. On a phone the
+    sections are stacked (#844) and a strip is a line across the page, its name written
+    across it, on one line and uncut too."""
     set_language(search, language)
     base = live_server.url
     sign_in(page, base)
@@ -2099,7 +2159,7 @@ def test_folded_the_page_does_not_scroll_sideways_and_no_strip_is_cut(
     assert [strip["status"] for strip in strips] == statuses()[:-1]
     for strip in strips:
         assert strip["name"], strip
-        assert strip["upright"] == "vertical-rl", strip
+        assert strip["upright"] == ("horizontal-tb" if width < 640 else "vertical-rl"), strip
         assert strip["inside"] and not strip["cut"], (language, width, strip)
         assert strip["lines"] == 1, (language, width, strip)
         assert strip["size"] >= 14, strip
@@ -2109,29 +2169,95 @@ def test_folded_the_page_does_not_scroll_sideways_and_no_strip_is_cut(
     assert page.evaluate(OPEN_COLUMN_IN_VIEW), "the open column is in the box"
 
 
-def test_without_a_script_on_a_phone_the_folded_board_stays_in_its_box(
-    browser: Browser, live_server, search
+#: The board's sections as drawn on a phone: each one's box and its heading's, the box's own,
+#: how the box overflows and whether it scrolls, and the page's masthead.
+STACKED = """() => {
+  const box = document.querySelector('[data-board]');
+  const header = document.querySelector('[data-site-header]').getBoundingClientRect();
+  const rect = (r) => ({left: r.left, right: r.right, top: r.top, bottom: r.bottom});
+  return {
+    box: rect(box.getBoundingClientRect()),
+    overflow: [getComputedStyle(box).overflowX, getComputedStyle(box).overflowY],
+    scrolls: box.scrollWidth > box.clientWidth + 1 || box.scrollHeight > box.clientHeight + 1,
+    masthead: header.bottom,
+    sections: [...box.querySelectorAll('[data-board-section]')].map((section) => ({
+      status: section.dataset.boardSection,
+      strip: section.hasAttribute('data-board-strip'),
+      at: rect(section.getBoundingClientRect()),
+      heading: rect(section.querySelector('[data-board-fold]').closest('h2').parentElement
+        .getBoundingClientRect()),
+    })),
+  };
+}"""
+
+
+def stacked_in_one_column(drawn: dict) -> None:
+    """Every section the box's width, each under the one before, and nothing scrolling but
+    the page."""
+    assert drawn["overflow"] == ["visible", "visible"] and not drawn["scrolls"], drawn
+    box = drawn["box"]
+    above = None
+    for section in drawn["sections"]:
+        at = section["at"]
+        assert abs(at["left"] - box["left"]) <= 1 and abs(at["right"] - box["right"]) <= 1, section
+        if above is not None:
+            assert at["top"] >= above - 0.5, ("each under the one before", section)
+        above = at["bottom"]
+
+
+@pytest.mark.parametrize("scripts", [False, True], ids=["scripts off", "scripts on"])
+def test_on_a_phone_the_sections_are_stacked_and_the_page_scrolls(
+    browser: Browser, live_server, search, scripts
 ):
-    """Nothing brings the open column into the box then, and nothing has to: the box is
-    inside the screen and scrolls, and the column is in it, a sideways scroll away."""
+    """Below `sm` the board is one column of sections, each the page's width, open or
+    folded (#844): the box scrolls neither way, a strip is one line across the page with its
+    count at its end, and the page does not scroll sideways. The same with scripts off,
+    which nothing has to measure. And a section's heading sticks under the masthead while
+    the page is scrolled down its section, where it stuck to the top of the box before --
+    without a script, under the masthead's height as the stylesheet guesses it."""
     base = live_server.url
-    context = browser.new_context(java_script_enabled=False, viewport=NARROWEST)
+    context = browser.new_context(java_script_enabled=scripts, viewport=NARROWEST)
     page = context.new_page()
     try:
         sign_in(page, base)
         page.goto(f"{base}{BOARD}&status=offer")
         expect(page.locator("[data-board-strip]")).to_have_count(len(statuses()) - 1)
         assert not page.evaluate(SCROLLS_SIDEWAYS)["reached"]
-        box = page.locator("[data-board]").bounding_box()
-        assert box["x"] >= 0 and box["x"] + box["width"] <= NARROWEST["width"], box
+        drawn = page.evaluate(STACKED)
+        stacked_in_one_column(drawn)
+        assert drawn["box"]["left"] >= 0 and drawn["box"]["right"] <= NARROWEST["width"]
         for strip in page.evaluate(STRIPS):
             assert strip["inside"] and not strip["cut"] and strip["lines"] == 1, strip
-        reach = page.locator("[data-board]").evaluate(
-            "(box) => [box.scrollWidth, box.clientWidth, getComputedStyle(box).overflowX]"
-        )
-        assert reach[0] > reach[1] and reach[2] == "auto", reach
+            assert strip["upright"] == "horizontal-tb" and strip["count"], strip
+        for section in drawn["sections"]:
+            if section["strip"]:
+                assert section["at"]["bottom"] - section["at"]["top"] < 60, ("one line", section)
         expect(page.locator("[data-board-section='offer'] [data-card]")).to_have_count(0)
         expect(page.locator("[data-board-section='offer'] [data-empty]")).to_be_attached()
+
+        page.goto(f"{base}{BOARD}")
+        expect(page.locator("[data-board-strip]")).to_have_count(0)
+        stacked_in_one_column(page.evaluate(STACKED))
+        # Down into the column with the most cards, past the top of its section.
+        tallest = max(
+            page.evaluate(STACKED)["sections"],
+            key=lambda section: section["at"]["bottom"] - section["at"]["top"],
+        )
+        page.evaluate(
+            "(by) => { document.scrollingElement.scrollTop += by; }",
+            tallest["at"]["top"] + 40 - page.evaluate(STACKED)["masthead"],
+        )
+        drawn = page.evaluate(STACKED)
+        heading = next(s for s in drawn["sections"] if s["status"] == tallest["status"])
+        assert heading["at"]["top"] < drawn["masthead"] - 20, heading
+        # Without a script nothing measures the masthead, and the stylesheet's 4.25rem is
+        # what the heading sticks under, as every rule that clears the masthead does.
+        under = drawn["masthead"] if scripts else 4.25 * 16
+        assert abs(heading["heading"]["top"] - under) <= 1, (
+            "stuck under the masthead",
+            drawn["masthead"],
+            heading,
+        )
     finally:
         context.close()
 
@@ -2329,32 +2455,36 @@ def test_a_board_that_fits_in_its_box_is_centred_in_it(page: Page, live_server, 
 def test_the_open_columns_are_brought_to_the_middle_of_a_box_they_do_not_fit(
     page: Page, live_server, search, language
 ):
-    """On a phone the folded board is wider than its box. The open column is in the middle
-    of the box when the page arrives; a strip pressed opens a column the two do not fit
-    beside, and the box brings the one pressed to the middle; one of them folded leaves the
-    other, which fits, in the middle again."""
+    """In the narrowest box there is the folded board can be wider than the box. The open
+    columns are in the middle of the box when the page arrives, or where they do not fit,
+    the first of them; a strip pressed opens a column, and the box brings the one pressed to
+    the middle; one of them folded leaves the other two, which fit, in the middle again.
+    It was a phone, with one column open, until a phone stacked the sections (#844); from
+    `sm` up a board with one column open fits, so it takes two."""
     set_language(search, language)
     person = search["applicant"]
     base = live_server.url
     sign_in(page, base)
-    page.set_viewport_size({"width": 390, "height": 740})
-    page.goto(f"{base}{BOARD}&status=applied")
-    folded_to(page, person, "applied")
+    page.set_viewport_size(NARROW_BOX)
+    page.goto(f"{base}{BOARD}&status=interviewing,offer")
+    folded_to(page, person, "interviewing,offer")
     placed = page.evaluate(PLACED)
-    assert placed["scrolls"] and abs(placed["off"]["applied"]) <= 1, placed
+    assert placed["scrolls"] and abs(placed["off"]["interviewing"]) <= 1, placed
 
-    fold(page, "interviewing").click()
-    folded_to(page, person, "applied,interviewing")
+    fold(page, "assessment").click()
+    folded_to(page, person, "interviewing,assessment,offer")
     still(page)
     placed = page.evaluate(PLACED)
-    assert abs(placed["off"]["interviewing"]) <= 1, placed
+    assert abs(placed["off"]["assessment"]) <= 1, placed
 
-    fold(page, "applied").click()
-    folded_to(page, person, "interviewing")
+    fold(page, "offer").click()
+    folded_to(page, person, "interviewing,assessment")
     still(page)
     placed = page.evaluate(PLACED)
-    assert abs(placed["off"]["interviewing"]) <= 1, placed
-    expect(fold(page, "applied")).to_be_focused()
+    assert placed["scrolls"], placed
+    off = placed["off"]
+    assert abs(off["interviewing"] + off["assessment"]) <= 1, ("the two in the middle", placed)
+    expect(fold(page, "offer")).to_be_focused()
 
 
 #: Every frame from now until the flag is read: the width of one column, found afresh each
@@ -2451,11 +2581,129 @@ def test_a_column_opens_and_folds_in_motion_unless_less_motion_is_asked(
     )
 
 
+# ----------------------------------------------------------- stacked on a phone (#844)
+
+#: Where a heading's control is from the top of the window.
+TOP_OF = "(id) => document.getElementById(id).getBoundingClientRect().top"
+
+#: Every frame from now until the flag is read: the height of one section, found afresh
+#: each time since a fold replaces the board.
+WATCH_HEIGHT = """(status) => {
+  window.watched = {heights: []};
+  const began = performance.now();
+  const look = () => {
+    const section = document.querySelector(`[data-board-section='${status}']`);
+    window.watched.heights.push(section ? section.getBoundingClientRect().height : null);
+    if (performance.now() - began < 1500) {
+      requestAnimationFrame(look);
+    } else {
+      window.watched.done = true;
+    }
+  };
+  requestAnimationFrame(look);
+}"""
+
+
+@pytest.mark.parametrize("motion", ["no-preference", "reduce"])
+def test_on_a_phone_a_section_opens_in_place(page: Page, live_server, search, motion):
+    """Stacked, a strip pressed opens where it is: its heading stays where it was on the
+    screen while the sections above it fold, and the section grows to its new height frame
+    by frame -- or is drawn at once for somebody who asked for less motion (#844). A long
+    column's heading, stuck under the masthead and pressed there, stays under the masthead.
+    Nothing is left on the sections for htmx to carry into the next board."""
+    person = search["applicant"]
+    page.emulate_media(reduced_motion=motion)
+    base = live_server.url
+    sign_in(page, base)
+    page.set_viewport_size(PHONE)
+    page.goto(f"{base}{BOARD}&status=draft,applied")
+    folded_to(page, person, "draft,applied")
+
+    fold(page, "interviewing").scroll_into_view_if_needed()
+    page.evaluate("() => { document.scrollingElement.scrollTop += 60; }")
+    was = page.evaluate(TOP_OF, "board-fold-interviewing")
+    before = page.evaluate(
+        "() => document.querySelector(\"[data-board-section='interviewing']\").offsetHeight"
+    )
+    page.evaluate(WATCH_HEIGHT, "interviewing")
+    fold(page, "interviewing").click()
+    folded_to(page, person, "draft,applied,interviewing")
+    page.wait_for_function("() => window.watched && window.watched.done", timeout=10_000)
+    still(page)
+    assert abs(page.evaluate(TOP_OF, "board-fold-interviewing") - was) <= 4, "opened in place"
+    expect(fold(page, "interviewing")).to_be_focused()
+    heights = [h for h in page.evaluate("() => window.watched.heights") if h is not None]
+    after = heights[-1]
+    assert after > before + 40, (before, after)
+    on_the_way = sorted({round(h) for h in heights if before + 2 < h < after - 2})
+    if motion == "reduce":
+        assert on_the_way == [], heights
+    else:
+        assert on_the_way, ("a frame between the two heights", heights)
+    assert page.evaluate(
+        """() => [...document.querySelectorAll('[data-board-section]')].every((section) =>
+          !section.style.height && !section.style.width && !section.style.overflow)
+          && !document.querySelector('[data-board]').style.rowGap"""
+    )
+
+    # Every column open, and the page scrolled down the second, whose heading is stuck under
+    # the masthead: pressed there, the first column above folds, and the heading pressed
+    # stays under the masthead rather than going up the page with what was above it.
+    page.goto(f"{base}{BOARD}")
+    expect(page.locator("[data-board-strip]")).to_have_count(0)
+    masthead = page.evaluate(
+        "() => document.querySelector('[data-site-header]').getBoundingClientRect().bottom"
+    )
+    top = page.locator("[data-board-section='applied']").bounding_box()["y"]
+    page.evaluate(f"() => {{ document.scrollingElement.scrollTop += {top - masthead + 30}; }}")
+    stuck = page.evaluate(
+        "() => document.querySelector(\"[data-board-section='applied'] h2\").parentElement"
+        ".getBoundingClientRect().top"
+    )
+    assert abs(stuck - masthead) <= 1, (stuck, masthead)
+    was = page.evaluate(TOP_OF, "board-fold-applied")
+    fold(page, "applied").click()
+    folded_to(page, person, "applied")
+    still(page)
+    assert abs(page.evaluate(TOP_OF, "board-fold-applied") - was) <= 4, "still under the masthead"
+
+
+def test_on_a_phone_a_move_leaves_the_page_where_it_was(page: Page, live_server, search):
+    """A move loads the page. Stacked, it is the page that was scrolled down to the card
+    and not the box (#844), and the page comes back scrolled where it was, once."""
+    from postulo.applications.models import Application, Status
+
+    person = search["applicant"]
+    base = live_server.url
+    sign_in(page, base)
+    page.set_viewport_size(PHONE)
+    page.goto(f"{base}{BOARD}")
+    (moved,) = on_the_board(person, status="interviewing")
+    card = page.locator(f"[data-card='{moved}']")
+    card.scroll_into_view_if_needed()
+    page.evaluate("() => { document.scrollingElement.scrollTop += 40; }")
+    scrolled = page.evaluate("() => document.scrollingElement.scrollTop")
+    assert scrolled > 300, scrolled
+
+    with page.expect_navigation():
+        choose_status(card, "assessment")
+
+    assert Application.objects.get(pk=moved).status == Status.ASSESSMENT
+    page.wait_for_function(
+        "(scrolled) => Math.abs(document.scrollingElement.scrollTop - scrolled) <= 1",
+        arg=scrolled,
+    )
+    expect(page.locator(f"[data-board-section='assessment'] [data-card='{moved}']")).to_be_visible()
+    page.reload()
+    expect(page.locator("[data-card][draggable=true]").first).to_be_visible()
+
+
 # ------------------------------------------------------- the names stay in view (#652)
 
 #: Each column's name -- an open column's heading, a strip's -- against the board's box and
-#: the window, vertically: the board scrolls sideways at 320, and a name off the side is
-#: the sideways scroll's business, not this one's.
+#: the window, vertically: the board scrolls sideways at 640, and a name off the side is
+#: the sideways scroll's business, not this one's. Below that the sections are stacked and
+#: the page scrolls them (#844), which the phone's own tests hold.
 NAMES_IN_VIEW = """() => {
   const box = document.querySelector('[data-board]').getBoundingClientRect();
   const header = document.querySelector('[data-site-header]').getBoundingClientRect();
@@ -2471,7 +2719,7 @@ NAMES_IN_VIEW = """() => {
 
 
 @pytest.mark.parametrize("language", ["en", "ar"])
-@pytest.mark.parametrize("width", [320, 1280])
+@pytest.mark.parametrize("width", [640, 1280])
 def test_every_columns_name_stays_in_view_down_a_long_column(
     page: Page, live_server, search, language, width
 ):

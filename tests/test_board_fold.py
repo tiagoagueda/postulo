@@ -787,6 +787,23 @@ def test_the_board_scrolls_only_while_a_card_is_held_and_never_under_reduced_mot
     assert re.search(r"scrollLeft \+= ", APP_JS), "the script moves the box, not a style"
 
 
+def test_stacked_on_a_phone_the_script_scrolls_the_page_and_not_the_box():
+    """Below `sm` the sections are stacked and the box does not scroll (#844). Each of the
+    script's sideways paths asks whether the board is stacked, read from the box as drawn:
+    the scroll under a held card, the place kept across a move, the centring after a fold
+    (which stands down) and the fold's motion, which goes by height there."""
+    assert "function boardStacked(box) {" in APP_JS
+    assert 'gridAutoFlow.indexOf("column") < 0' in APP_JS
+    edge = APP_JS.split("function edgeSpeed(box, x, y) {")[1].split("\n  }\n")[0]
+    assert "boardStacked(box)" in edge and "pageFoot()" in edge
+    assert "document.scrollingElement.scrollTop += (edgeScroll.speed" in APP_JS
+    middle = APP_JS.split("function boardMiddle(box, pressed) {")[1][:120]
+    assert "if (boardStacked(box)) {\n      return null;" in middle
+    assert "place.top = document.scrollingElement.scrollTop" in APP_JS
+    assert 'var size = stacked ? "height" : "width";' in APP_JS
+    assert "function keepInPlace(heading, at, lead) {" in APP_JS
+
+
 def test_a_held_card_keeps_the_board_it_was_picked_up_from():
     """Nothing is asked for the board and no answer is put in it while a card is held."""
     for event in ('"htmx:confirm"', '"htmx:beforeSwap"'):
@@ -813,6 +830,8 @@ def test_the_columns_move_only_for_somebody_who_has_not_asked_for_less_motion():
     assert moving.count(".animate(") == 5
     settle = APP_JS.split("var landing = boardLanding;")[1].split("\n  });\n")[0]
     assert "var moving = Boolean(was) && !lessMotionAsked();" in settle
-    assert APP_JS.count("moveTheColumns(") == 2, "defined once and called once"
-    assert settle.index("if (moving) {") < settle.index("moveTheColumns(box, was)")
-    assert "scrollTheBoard(box, goal, lead)" in settle.split("if (moving) {")[2]
+    # Called twice: for stacked sections on a phone (#844) and for columns side by side.
+    assert APP_JS.count("moveTheColumns(") == 3, "defined once and called twice"
+    for called in settle.split("moveTheColumns(box, was)")[:-1]:
+        assert "if (moving) {" in called[-60:], "each behind the preference"
+    assert "scrollTheBoard(box, goal, lead)" in settle.split("if (moving) {")[-1]

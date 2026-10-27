@@ -1223,7 +1223,7 @@ class AccessibilityForm(forms.ModelForm):
             "show_career_order": _("Show the order number on each career entry"),
             "keyboard_shortcuts": _("Let a single key do something"),
             "show_key_hints": _("Show the keys beside the controls that have one"),
-            "nav_underline": _("Underline the page you are on"),
+            "nav_underline": _("Underline links in navigation"),
             "show_breadcrumb": _("Show a breadcrumb under the navigation bar"),
             "breadcrumb_on_hover": _("Show the breadcrumb only while I point at it"),
         }
@@ -1263,10 +1263,12 @@ class AccessibilityForm(forms.ModelForm):
             ),
             "nav_underline": _(
                 "The link for the page you are on is underlined as well as shaded and set "
-                "in bolder type. Turn the underline off for a quieter header: the weight "
-                "and the shade stay, so the page you are on is never marked by colour "
-                "alone. A high-contrast theme underlines it whatever you choose here, "
-                "because there the shading is discarded and the underline is not."
+                "in bolder type, and a column's name on the Applications board is "
+                "underlined while you point at it. Turn this off for a quieter page: the "
+                "weight and the shade stay, so the page you are on is never marked by "
+                "colour alone. A high-contrast theme underlines the page you are on "
+                "whatever you choose here, because there the shading is discarded and the "
+                "underline is not."
             ),
         }
 

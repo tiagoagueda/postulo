@@ -666,7 +666,7 @@ def test_a_stranger_gets_the_default(client, db):
 def test_accessibility_offers_the_switch_and_saves_it(client, user):
     client.force_login(user)
     page = client.get(reverse("settings:accessibility")).content.decode()
-    assert 'name="nav_underline"' in page and "Underline the page you are on" in page
+    assert 'name="nav_underline"' in page and "Underline links in navigation" in page
 
     # A checkbox left unticked posts nothing at all, which is how "off" arrives.
     response = client.post(reverse("settings:accessibility"), {})

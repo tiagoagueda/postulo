@@ -2,7 +2,7 @@
 
 The browser suite walks every page at a phone's width (`tests/e2e/test_every_page.py`); what
 is held here is the source of the decisions it cannot see: the coarse-pointer sizes, the
-board's one-column answer and the keyboards the fields ask for.
+board's stacked sections and the keyboards the fields ask for.
 """
 
 from __future__ import annotations
@@ -39,16 +39,23 @@ def test_a_coarse_pointer_gets_forty_four_pixels_not_a_narrow_window():
     assert "font-size: 1rem" in block
 
 
-def test_the_board_snaps_to_a_column_on_a_phone():
-    match = re.search(
-        r"@media \(width < 40rem\) and \(pointer: coarse\) \{\s*\.board-box \{(.*?)\}", CSS, re.S
-    )
-    assert match and "scroll-snap-type: x proximity" in match.group(1)
-    assert "[data-board-section]" in CSS and "scroll-snap-align: center" in CSS
+def test_the_board_is_stacked_on_a_phone_and_the_page_scrolls_it():
+    """Below `sm` the sections are one column the page's width, and the box is no box: it
+    scrolled both ways and snapped to a column, on a screen too small for a box (#844)."""
+    match = re.search(r"@media \(width < 40rem\) \{\s*\.board-box \{(.*?)\}", CSS, re.S)
+    assert match, "no phone rule for the board's box"
+    assert "overflow: visible" in match.group(1) and "max-block-size: none" in match.group(1)
+    for phone in ("max-sm:grid-flow-row", "max-sm:auto-cols-auto", "max-sm:justify-stretch"):
+        assert phone in BOARD, phone
+    # The heading sticks under the masthead, and a strip's name is written across.
+    assert "max-sm:top-[var(--header-height,4.25rem)]" in BOARD
+    assert "sm:[writing-mode:vertical-rl]" in BOARD
+    assert " [writing-mode:vertical-rl]" not in BOARD
 
 
-def test_an_open_column_is_nearly_the_window_wide_on_a_phone_and_288_from_sm():
-    assert "w-[calc(100vw-4rem)] sm:w-72" in BOARD
+def test_an_open_column_is_the_page_wide_on_a_phone_and_288_from_sm():
+    assert "{% if column.open %}sm:w-72{% else %}" in BOARD
+    assert "100vw" not in BOARD
 
 
 def test_the_fields_ask_for_the_keyboard_that_suits_them():

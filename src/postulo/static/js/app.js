@@ -822,6 +822,14 @@
    *
    * The edges are the box's as drawn, and `scrollLeft` moves the way its sign says in
    * either direction of writing, so a right-to-left board needs nothing of its own.
+   *
+   * **On a phone it is the page that scrolls** (#844). Below `sm` the sections are stacked
+   * and the box does not scroll at all, so a section off the screen is above or below it,
+   * and the page is scrolled instead -- the same band, the same speeds, along the top and
+   * the foot of what the page shows between the masthead and the bar of navigation fixed
+   * to the window's foot. Over either of those is past the edge. Touch screens have no drag
+   * and drop, so this is a narrow window with a mouse; the browser's own band is at the
+   * window's edges, under the masthead and the bar, so there is no room to make for it.
    */
   var EDGE = 72; // pixels from an edge within which the board scrolls, at the most
   var EDGE_SHARE = 5; // and never more than one part in this many of the box's width
@@ -839,29 +847,61 @@
     edgeScroll = null;
   }
 
-  // Pixels a second, signed the way `scrollLeft` moves: nothing unless the pointer is level
-  // with the box and within the band along one of its side edges, or beyond that edge.
-  function edgeSpeed(box, x, y) {
-    var around = box.getBoundingClientRect();
-    if (y < around.top || y > around.bottom) {
-      return 0;
-    }
-    var before = x - around.left;
-    var after = around.right - x;
+  // Whether the board's sections are stacked, as they are below `sm` (#844), where the
+  // page scrolls them and the box does not. Read from the box as it is drawn, so that the
+  // script and the stylesheet cannot disagree about where the line is.
+  function boardStacked(box) {
+    return Boolean(box) && window.getComputedStyle(box).gridAutoFlow.indexOf("column") < 0;
+  }
+
+  // Pixels a second, signed the way the scroll moves, for a pointer at `at` between the
+  // edges `start` and `end`: nothing unless it is within the band along one of them, or
+  // beyond it. `browsers` where a browser scrolls by itself along the same edges.
+  function speedInBand(start, end, at, browsers) {
+    var before = at - start;
+    var after = end - at;
     var near = Math.min(before, after);
-    var band = Math.min(EDGE, around.width / EDGE_SHARE);
+    var band = Math.min(EDGE, (end - start) / EDGE_SHARE);
     if (near >= band) {
       return 0;
     }
     var pace = 1; // past the edge, where no browser scrolls the box
-    if (near >= BROWSERS) {
+    if (browsers && near >= BROWSERS) {
       // From the far side of the band up to where the browser's begins.
       pace = SLOWEST + (1 - SLOWEST) * (1 - (near - BROWSERS) / Math.max(band - BROWSERS, 1));
-    } else if (near >= 0) {
+    } else if (browsers && near >= 0) {
       // Inside the browser's: down to nothing by the middle of it.
       pace = Math.max(0, (2 * near) / BROWSERS - 1);
+    } else if (near >= 0) {
+      // No band of the browser's along these edges: from the far side up to the edge.
+      pace = SLOWEST + (1 - SLOWEST) * (1 - near / band);
     }
     return (before < after ? -1 : 1) * FASTEST * pace;
+  }
+
+  // The page's own edges, for stacked sections: under the masthead, and above the bar of
+  // navigation where one is fixed to the foot of the window.
+  function pageFoot() {
+    var foot = window.innerHeight;
+    if (mainNav && window.getComputedStyle(mainNav).position === "fixed") {
+      foot -= mainNav.offsetHeight;
+    }
+    return foot;
+  }
+
+  // Pixels a second, signed the way `scrollLeft` moves -- or, stacked, the page's
+  // `scrollTop`: nothing unless the pointer is level with the box and within the band
+  // along one of its side edges, or beyond that edge; stacked, within the band along the
+  // top or the foot of what the page shows.
+  function edgeSpeed(box, x, y) {
+    if (boardStacked(box)) {
+      return speedInBand(headerHeight(), pageFoot(), y, false);
+    }
+    var around = box.getBoundingClientRect();
+    if (y < around.top || y > around.bottom) {
+      return 0;
+    }
+    return speedInBand(around.left, around.right, x, true);
   }
 
   function stepEdgeScroll(now) {
@@ -877,7 +917,11 @@
     // than a tenth of a second.
     var elapsed = Math.min(Math.max(now - edgeScroll.last, 0), 100);
     edgeScroll.last = now;
-    edgeScroll.box.scrollLeft += (edgeScroll.speed * elapsed) / 1000;
+    if (edgeScroll.page) {
+      document.scrollingElement.scrollTop += (edgeScroll.speed * elapsed) / 1000;
+    } else {
+      edgeScroll.box.scrollLeft += (edgeScroll.speed * elapsed) / 1000;
+    }
     edgeScroll.frame = window.requestAnimationFrame(stepEdgeScroll);
   }
 
@@ -897,6 +941,7 @@
       edgeScroll.frame = window.requestAnimationFrame(stepEdgeScroll);
     }
     edgeScroll.box = box;
+    edgeScroll.page = boardStacked(box);
     edgeScroll.speed = speed;
     edgeScroll.seen = now;
   }
@@ -1122,6 +1167,9 @@
    * storage, with the address the form goes back to, and not in the address, which is the
    * question and nothing else -- and put back once, on the page that address draws.
    * However the move was made: a card's menu moves it from a column scrolled to as well.
+   *
+   * Stacked, on a phone (#844), it is the page that was scrolled to the section, and the
+   * page's place is what is kept and put back.
    */
   var BOARD_PLACE = "postulo.board.place";
 
@@ -1142,7 +1190,11 @@
       return;
     }
     try {
-      storage.setItem(BOARD_PLACE, JSON.stringify({ at: back.value, left: box.scrollLeft }));
+      var place = { at: back.value, left: box.scrollLeft };
+      if (boardStacked(box)) {
+        place.top = document.scrollingElement.scrollTop;
+      }
+      storage.setItem(BOARD_PLACE, JSON.stringify(place));
     } catch (full) {
       // No room, or no leave: the board comes back at its start, as it used to.
     }
@@ -1162,7 +1214,14 @@
     } catch (unreadable) {
       return false;
     }
-    if (!kept || kept.at !== window.location.pathname + window.location.search || !kept.left) {
+    if (!kept || kept.at !== window.location.pathname + window.location.search) {
+      return false;
+    }
+    if (kept.top && boardStacked(box)) {
+      document.scrollingElement.scrollTop = kept.top;
+      return true;
+    }
+    if (!kept.left) {
       return false;
     }
     box.scrollLeft = kept.left;
@@ -1208,7 +1267,9 @@
    * anything else on the page -- the theme switch is one -- which would take the board out
    * of the hands of somebody who had scrolled it; and not on the page a move loads, where
    * the board is put back where it was. The columns are centred by the stylesheet while
-   * they fit (`board.html`), so this moves only a board wider than its box.
+   * they fit (`board.html`), so this moves only a board wider than its box. Not at all
+   * where the sections are stacked, on a phone (#844): the box does not scroll there, and
+   * what is kept in sight is the heading that was pressed (the next block).
    */
   function foldControl(node) {
     return node && node.closest ? node.closest("[data-board-fold]") : null;
@@ -1286,6 +1347,9 @@
   // negative in a right-to-left page; the edges are the box's as drawn, so the sum is the
   // same either way.
   function boardMiddle(box, pressed) {
+    if (boardStacked(box)) {
+      return null;
+    }
     var open = box.querySelectorAll("[data-board-section]:not([data-board-strip])");
     var folded = Boolean(box.querySelector("[data-board-strip]"));
     var around = box.getBoundingClientRect();
@@ -1379,6 +1443,18 @@
    * **Nobody who asked for less motion sees anything move.** The board is drawn at its new
    * widths and the box is put where it goes, at once. Nor does anything move while a card
    * is held, since nothing of the board is swapped then (above).
+   *
+   * **Stacked, on a phone, the same is done down the page** (#844). Every section is the
+   * page's width there, so what changes is a section's height: each goes from its old
+   * height to its new one, the gap between them with it, and the box, which does not
+   * scroll, is as tall as they are on the way. The page is what scrolls, so instead of the
+   * box being brought to the open columns, the heading that was pressed is kept where it
+   * was on the screen while the sections above it open or fold: a section opens in place,
+   * and a long one folded from its heading, stuck under the masthead, leaves its strip
+   * there and not somewhere above. A swap that nothing pressed -- a filter's -- leaves the
+   * page where it was, as the browser does. The board says which it is drawn as when the
+   * answer lands, and an answer drawn the other way, a phone turned between the two, is
+   * drawn at once.
    */
   var FOLD_TIME = 240; // milliseconds
   var FOLD_EASING = "cubic-bezier(0.2, 0, 0, 1)";
@@ -1437,20 +1513,28 @@
         ? asking.getAttribute("data-focus-after").replace(/^#/, "")
         : asking.id;
     }
+    var stacked = boardStacked(box);
+    var size = stacked ? "height" : "width";
     var widths = {};
     var copies = {};
     sectionsOf(box).forEach(function (section) {
       var status = section.getAttribute("data-board-section");
-      widths[status] = section.getBoundingClientRect().width;
+      widths[status] = section.getBoundingClientRect()[size];
       copies[status] = copyOfColumn(section);
     });
+    var held = pressed ? document.getElementById(pressed) : null;
     boardWas = {
+      // Stacked, a column's height and the gap between rows; otherwise its width and the
+      // gap between columns.
+      stacked: stacked,
       widths: widths,
       copies: copies,
-      gap: parseFloat(window.getComputedStyle(box).columnGap) || 0,
+      gap: parseFloat(window.getComputedStyle(box)[stacked ? "rowGap" : "columnGap"]) || 0,
       height: box.getBoundingClientRect().height,
       left: box.scrollLeft,
       pressed: pressed,
+      // Stacked: where the pressed heading was on the screen, to be kept there.
+      at: stacked && held ? held.getBoundingClientRect().top : null,
     };
   });
 
@@ -1462,22 +1546,39 @@
     }
     boardWas = null;
     window.cancelAnimationFrame(boardScrolling);
+    if (was && was.stacked !== boardStacked(box)) {
+      // Drawn the other way from the board it replaces: nothing to move it from.
+      was = null;
+    }
     boardLanding = { box: box, was: was };
     if (!was) {
       return;
     }
     // Held where the old board was until the swap settles.
     if (!lessMotionAsked()) {
+      var size = was.stacked ? "height" : "width";
       sectionsOf(box).forEach(function (section) {
         var width = was.widths[section.getAttribute("data-board-section")];
         if (width !== undefined) {
-          section.style.width = width + "px";
+          section.style[size] = width + "px";
+          if (was.stacked) {
+            // A column held at a strip's height would lie over the sections below it.
+            section.style.overflow = "clip";
+          }
         }
       });
-      box.style.columnGap = was.gap + "px";
-      box.style.height = was.height + "px";
+      box.style[was.stacked ? "rowGap" : "columnGap"] = was.gap + "px";
+      if (!was.stacked) {
+        box.style.height = was.height + "px";
+      }
     }
     box.scrollLeft = was.left;
+    var pressed = was.stacked && was.at !== null ? document.getElementById(was.pressed) : null;
+    if (pressed) {
+      // Stacked, the page was held to its new height as the board was put in, which can
+      // have pulled it up short: the heading back where it was, on this frame.
+      document.scrollingElement.scrollTop += pressed.getBoundingClientRect().top - was.at;
+    }
   });
 
   // An answer that was not swapped in leaves the board as it was, and what was measured
@@ -1494,17 +1595,24 @@
   // through a style on the content itself: htmx carries the style of an element with an id
   // -- the list of cards has one -- into the next board, and the page's content security
   // policy refuses a style written that way.
+  //
+  // Stacked (#844), the same down the page: a column's height and the gap between rows,
+  // its content at the page's width throughout, so nothing is laid out at a width it
+  // arrives at; and the box is left to be as tall as its columns, since the page scrolls.
   function moveTheColumns(box, was) {
+    var stacked = was.stacked;
+    var size = stacked ? "height" : "width";
+    var gapOf = stacked ? "rowGap" : "columnGap";
     var sections = sectionsOf(box).map(function (section) {
       return {
         section: section,
         status: section.getAttribute("data-board-section"),
-        to: section.getBoundingClientRect().width,
+        to: section.getBoundingClientRect()[size],
         inside: section.clientWidth,
         parts: Array.prototype.slice.call(section.children),
       };
     });
-    var gap = parseFloat(window.getComputedStyle(box).columnGap) || 0;
+    var gap = parseFloat(window.getComputedStyle(box)[gapOf]) || 0;
     var high = box.getBoundingClientRect().height;
     var moves = [];
     var tidy = [];
@@ -1521,7 +1629,9 @@
       // Laid out at the width it arrives at, and uncovered or covered by its edge.
       section.style.overflow = "clip";
       section.style.position = "relative";
-      section.style.setProperty("--board-arrives", column.inside + "px");
+      if (!stacked) {
+        section.style.setProperty("--board-arrives", column.inside + "px");
+      }
       parts.forEach(function (part) {
         moves.push(part.animate([{ opacity: 0 }, { opacity: 1 }], timing));
       });
@@ -1531,12 +1641,15 @@
         copy.style.position = "absolute";
         copy.style.insetBlockStart = "0";
         copy.style.insetInlineStart = "0";
-        copy.style.width = from + "px";
+        copy.style.width = stacked ? "100%" : from + "px";
         copy.style.pointerEvents = "none";
         section.appendChild(copy);
         moves.push(copy.animate([{ opacity: 1 }, { opacity: 0 }], timing));
       }
-      moves.push(section.animate([{ width: from + "px" }, { width: to + "px" }], timing));
+      var frames = [{}, {}];
+      frames[0][size] = from + "px";
+      frames[1][size] = to + "px";
+      moves.push(section.animate(frames, timing));
       tidy.push(function () {
         section.style.overflow = "";
         section.style.position = "";
@@ -1547,9 +1660,12 @@
       });
     });
     if (Math.abs(was.gap - gap) >= 1) {
-      moves.push(box.animate([{ columnGap: was.gap + "px" }, { columnGap: gap + "px" }], timing));
+      var gaps = [{}, {}];
+      gaps[0][gapOf] = was.gap + "px";
+      gaps[1][gapOf] = gap + "px";
+      moves.push(box.animate(gaps, timing));
     }
-    if (Math.abs(was.height - high) >= 1) {
+    if (!stacked && Math.abs(was.height - high) >= 1) {
       // Shorter than what it holds on the way, and no scroll bar for it.
       box.style.overflowY = "hidden";
       moves.push(box.animate([{ height: was.height + "px" }, { height: high + "px" }], timing));
@@ -1590,6 +1706,34 @@
     boardScrolling = window.requestAnimationFrame(step);
   }
 
+  // Stacked (#844): the page scrolled so that `heading` is `at` pixels from the top of the
+  // window, as it was when it was pressed, on every frame of the columns' motion, `lead`,
+  // and once more at its end. For as long again where nothing moves, since that is not
+  // motion but the page held still: what is drawn just after the swap -- the lists the
+  // filter row builds are some of it -- makes the page taller, and a page that was too
+  // short for the heading to be kept where it was has the room a moment later. What is
+  // measured each frame is where the heading is, so the browser's own scroll anchoring,
+  // where it has moved the page as well, is not counted twice.
+  function keepInPlace(heading, at, lead) {
+    var until = window.performance.now() + FOLD_TIME;
+    var step = function () {
+      if (!heading.isConnected) {
+        boardScrolling = 0;
+        return;
+      }
+      var by = heading.getBoundingClientRect().top - at;
+      if (Math.abs(by) >= 1) {
+        document.scrollingElement.scrollTop += by;
+      }
+      var going = lead ? lead.playState === "running" : window.performance.now() < until;
+      boardScrolling = going ? window.requestAnimationFrame(step) : 0;
+    };
+    step();
+    if (lead) {
+      lead.finished.then(step, function () {});
+    }
+  }
+
   document.addEventListener("htmx:afterSettle", function () {
     var landing = boardLanding;
     boardLanding = null;
@@ -1603,10 +1747,23 @@
     // anything is moved.
     sectionsOf(box).forEach(function (section) {
       section.style.width = "";
+      section.style.height = "";
+      section.style.overflow = "";
     });
     box.style.columnGap = "";
+    box.style.rowGap = "";
     box.style.height = "";
     var heading = was && was.pressed ? document.getElementById(was.pressed) : null;
+    if (was && was.stacked) {
+      var motion = null;
+      if (moving) {
+        motion = moveTheColumns(box, was);
+      }
+      if (heading && was.at !== null) {
+        keepInPlace(heading, was.at, motion);
+      }
+      return;
+    }
     var goal = boardMiddle(box, heading ? columnOf(heading) : null);
     var lead = null;
     if (moving) {

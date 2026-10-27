@@ -447,7 +447,13 @@ class Profile(models.Model):
     #: page is still not colour alone, which is what WCAG 2.2 SC 1.4.1 asks. The underline
     #: also comes back under forced colours whatever this says, because there it is the
     #: only one of the three cues that survives (#289).
-    nav_underline = models.BooleanField(_("underline the page you are on"), default=True)
+    #:
+    #: It reaches the board's column names too (#843), which are underlined while pointed
+    #: at: they are the board's navigation -- each one folds or opens the board -- and a
+    #: person who asked for a quieter header had them underlining under the pointer all the
+    #: same. A card's title keeps its underline: it is a link in the content, not a way
+    #: round the page. One setting and not two, because it is one wish.
+    nav_underline = models.BooleanField(_("underline links in navigation"), default=True)
     #: How much room the interface leaves around things (#292).
     #:
     #: **Comfortable is the default and stays the default.** A generous interface is the

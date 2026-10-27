@@ -116,6 +116,20 @@ def test_forced_colours_underlines_it_whatever_the_preference_says():
     assert "text-decoration-line: underline" in rule
 
 
+def test_the_boards_column_names_follow_the_preference_from_the_utilities_layer():
+    """#843: the column names underline under the pointer by `hover:underline`, a utility,
+    and no rule in `components` beats a utility whatever its specificity. So the rule that
+    takes the underline away is in `utilities`, and takes nothing else."""
+    selector = 'body[data-nav-underline="off"] [data-board-section] [data-board-fold]'
+    at = CSS.index(selector)
+    rule = CSS[at : CSS.index("}", at)]
+    assert "text-decoration-line: none" in rule
+    for cue in ("font-", "background", "color:"):
+        assert cue not in rule, f"the preference may not touch {cue!r}"
+    layer = CSS.rindex("@layer ", 0, at)
+    assert CSS.startswith("@layer utilities", layer), "a utility is only beaten in utilities"
+
+
 def test_more_contrast_is_answered():
     assert "@media (prefers-contrast: more)" in CSS
 

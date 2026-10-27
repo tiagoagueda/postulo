@@ -152,3 +152,35 @@ def test_the_navigation_underline_follows_the_preference_but_not_under_forced_co
     assert decoration_of_the_current_link(page) == "underline", (
         "forced colours discards the tint, so the underline comes back whatever was chosen"
     )
+
+
+def decoration_under_the_pointer(page: Page, selector: str) -> str:
+    target = page.locator(selector).first
+    target.hover()
+    return target.evaluate("element => getComputedStyle(element).textDecorationLine")
+
+
+def test_the_boards_column_names_follow_the_same_preference(
+    page: Page,
+    live_server,
+    furnished,  # noqa: F811
+):
+    """#843: the column names are the board's navigation, so the switch that quietens the
+    header quietens them too. A card's title is a link in the content and keeps its
+    underline either way. The template's `hover:underline` is a utility, which a rule in
+    `components` cannot beat, so this is what shows the rule is in the right layer."""
+    from postulo.accounts.models import Profile
+
+    heading = "[data-board-section] [data-board-fold]"
+    card = "[data-card] a.block"
+    sign_in(page, live_server.url)
+    page.goto(f"{live_server.url}/applications/?view=board")
+    assert decoration_under_the_pointer(page, heading) == "underline", "the default"
+
+    profile = Profile.objects.get(user=furnished["applicant"])
+    profile.nav_underline = False
+    profile.save(update_fields=["nav_underline"])
+
+    page.goto(f"{live_server.url}/applications/?view=board")
+    assert decoration_under_the_pointer(page, heading) == "none", "switched off"
+    assert decoration_under_the_pointer(page, card) == "underline", "a card's title keeps it"

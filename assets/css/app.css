@@ -627,6 +627,22 @@
   }
 }
 
+/*
+ * The board's column names under the same preference as the header's underline (#843).
+ * Each is the board's navigation -- it folds or opens the board -- and it is underlined
+ * while pointed at, by a `hover:underline` in the template. That is a utility, and a
+ * utility beats anything in `components` whatever its specificity, which is why this is
+ * not beside the header's rule but here, where the higher specificity is what decides. A
+ * card's title keeps its underline: it is a link in the content, not a way round the
+ * page. Forced colours leave this alone: an underline under the pointer is not the only
+ * cue of anything, as the current page's is there.
+ */
+@layer utilities {
+  body[data-nav-underline="off"] [data-board-section] [data-board-fold] {
+    text-decoration-line: none;
+  }
+}
+
 /* --------------------------------------------------------- component layer */
 
 /*
@@ -1136,7 +1152,8 @@
      goes: the weight and the tint stay, so the current page is still marked by something
      that is not colour, which is what SC 1.4.1 asks of the default and of this. Higher
      specificity rather than another layer, so the two rules are read together; forced
-     colours puts the underline back further down, unlayered, where it beats both. */
+     colours puts the underline back further down, unlayered, where it beats both. The
+     board's column names follow the same preference, in `utilities` (#843). */
   body[data-nav-underline="off"] .nav-link-active,
   body[data-nav-underline="off"] .menu-item[aria-current="page"] {
     text-decoration-line: none;
@@ -1692,22 +1709,21 @@
   }
 
   /*
-   * The board on a phone (#73): one column and the edge of the next is a column and a
-   * hint, so below `sm` an open column is nearly the window's width and the box snaps
-   * to the column it stops nearest -- a swipe moves a column, and the folded strips
-   * beside it say what else there is. Drag and drop does not fire on a touch screen; each
-   * card's own status menu is the way to move one, and stays in the card. Only where the
-   * pointer is coarse: a narrow desktop window has a mouse, a card dragged near the box's
-   * edge scrolls it a few pixels at a time, and a snap would pull each of them back. The
-   * column snaps to the middle, where the page already brings the one pressed.
+   * The board on a phone (#844): the sections stacked, and the page scrolling them. It was
+   * one column and the edge of the next in a box that snapped to a column (#73), and the
+   * box scrolled both ways (#652) -- a box inside the page on a screen too small for one,
+   * where a swipe meant for the page moved a column. Below `sm` the sections are one
+   * column the page's width (`board.html`), and the box is no box: nothing clips it, so
+   * nothing in it scrolls, and a section's heading sticks to the page under the masthead
+   * rather than to a box. Its name in `aria-label` and its place in the tab order stay, as
+   * they are what a scroll box is from `sm` up. Both overflows, since one that is not
+   * `visible` makes the other scroll as well; drag and drop, where there is a mouse, scrolls
+   * the page (`app.js`).
    */
-  @media (width < 40rem) and (pointer: coarse) {
+  @media (width < 40rem) {
     .board-box {
-      scroll-snap-type: x proximity;
-    }
-
-    .board-box [data-board-section] {
-      scroll-snap-align: center;
+      overflow: visible;
+      max-block-size: none;
     }
   }
 
