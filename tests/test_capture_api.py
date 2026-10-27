@@ -141,6 +141,54 @@ def test_a_page_with_no_posting_is_refused_with_an_explanation(client, bearer):
     assert "job posting" in response.json()["detail"]
 
 
+def test_a_page_read_as_nothing_is_a_posting_when_its_title_was_typed(client, bearer, user):
+    """The extension's review lets a person fill in what the page did not give (#710): what
+    was typed is the capture, and its review says nothing read it."""
+    response = post_capture(
+        client,
+        bearer,
+        url="https://example.org/j/9",
+        html="<html><body>Sign in to see this job.</body></html>",
+        data={"title": "Research Engineer", "company_name": "Black Mesa"},
+    )
+
+    assert response.status_code == 201, response.content
+    capture = Capture.objects.for_user(user).get()
+    assert (capture.data["title"], capture.data["company_name"]) == (
+        "Research Engineer",
+        "Black Mesa",
+    )
+    assert capture.source_name == "", "nothing read it"
+    assert capture.status == CaptureStatus.PENDING, "typed is not the same as reviewed"
+    client.force_login(user)
+    review = client.get(reverse("jobs:capture_review", args=[capture.pk])).content.decode()
+    assert "Nothing could be read from the page" in review
+    assert "Read by" not in review
+
+
+@pytest.mark.parametrize(
+    "data",
+    [None, {}, {"company_name": "Black Mesa"}, {"title": "   "}],
+    ids=["no corrections", "empty corrections", "no title", "blank title"],
+)
+def test_a_page_read_as_nothing_with_no_title_typed_is_refused_naming_it(
+    client, bearer, user, data
+):
+    payload = {"url": "https://example.org/j/9", "html": "<html></html>"}
+    if data is not None:
+        payload["data"] = data
+
+    response = post_capture(client, bearer, **payload)
+
+    assert response.status_code == 422
+    assert response["Content-Type"].startswith("application/problem+json")
+    problem = response.json()
+    assert "job posting" in json.dumps(problem)
+    if data is not None:
+        assert "title" in json.dumps(problem), "the field the capture is missing is named"
+    assert not Capture.objects.for_user(user).exists()
+
+
 def test_the_api_will_not_fetch_a_local_address(client, bearer, user):
     """The same guard as the web interface, on the surface a script can reach."""
     response = post_capture(client, bearer, url="http://127.0.0.1/admin")

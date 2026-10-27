@@ -36,7 +36,7 @@
               <p class="font-medium">{{ capture }}</p>
               <p class="truncate text-xs text-ink-500 dark:text-ink-400">
                 {{ capture.data.company_name|default:"—" }}
-                · <code>{{ capture.source_name }}</code>
+                {% if capture.source_name %}· <code>{{ capture.source_name }}</code>{% endif %}
                 · {{ capture.created_at|date:"DATETIME_FORMAT" }}
               </p>
             </div>

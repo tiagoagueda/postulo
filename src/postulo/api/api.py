@@ -488,10 +488,45 @@ def create_capture(
 
 
 def _capture(request, owner, payload: CaptureIn, answer) -> dict:
-    """Read the page, keep the capture, tell the owner — the body of the call above."""
-    url, data, source, html, handed = _read(payload, owner)
+    """Read the page, keep the capture, tell the owner — the body of the call above.
+
+    **A page nothing could be read from is still a posting when the person typed one (#710).**
+    The extension lets them correct every field before sending, and a title they typed is
+    what the review needs; what is judged is the capture as sent, corrections included. With
+    no title read and none typed it is refused as before, naming ``data.title`` -- the one
+    field a capture cannot be without.
+    """
+    url, data, source, html, handed = _read(payload, owner, typed=payload.data is not None)
     read = data
-    if payload.data is not None:
+    if data is None:
+        corrections = payload.data.model_dump(exclude_unset=True) if payload.data else {}
+        if not (corrections.get("title") or "").strip():
+            raise ValidationError(
+                [
+                    {
+                        "type": "missing",
+                        "loc": ("body", "payload", "data", "title"),
+                        "msg": str(
+                            _(
+                                "Nothing resembling a job posting was found there, and no "
+                                "title was sent: send at least the posting's title."
+                            )
+                        ),
+                    }
+                ]
+            )
+        try:
+            data = JobPostingData.model_validate(corrections)
+        except PydanticValidationError as exc:
+            raise ValidationError(
+                [
+                    {**error, "loc": ("body", "payload", "data", *error["loc"])}
+                    for error in exc.errors(
+                        include_url=False, include_context=False, include_input=False
+                    )
+                ]
+            ) from exc
+    elif payload.data is not None:
         corrections = payload.data.model_dump(exclude_unset=True)
         try:
             data = JobPostingData.model_validate({**data.model_dump(), **corrections})
@@ -535,7 +570,8 @@ def _capture(request, owner, payload: CaptureIn, answer) -> dict:
         capture = Capture.objects.create(
             owner=owner,
             url=url[:500],
-            source_name=source.name,
+            # Typed by hand where nothing could be read: no source read it (#710).
+            source_name=source.name if source is not None else "",
             source_version=getattr(source, "version", ""),
             origin="api",
             data=data.model_dump(mode="json"),
@@ -544,7 +580,7 @@ def _capture(request, owner, payload: CaptureIn, answer) -> dict:
         _page, note = pages.keep_source_quietly(capture, html, keeping)
         # What its review will learn from, and what the corrections sent with it teach now:
         # the same act as correcting a field on the review screen, only earlier (#267).
-        if payload.data is not None:
+        if payload.data is not None and read is not None:
             remembered.after_capture(capture, handed, html, read=read, corrected=data)
         else:
             remembered.after_capture(capture, handed, html)
@@ -629,9 +665,13 @@ def preview_capture(request, payload: PageIn):
     }
 
 
-def _read(payload: PageIn, owner):
+def _read(payload: PageIn, owner, *, typed: bool = False):
     """The page's address, what it was read as, the source that read it, the text that was
     read, and the owner's remembered places it was read with; or a 422.
+
+    ``typed``: the caller sent the fields as the person corrected them, so a page nothing
+    could be read from is answered with ``None`` for what it was read as and for its source,
+    for the caller to judge by what was typed (#710), instead of being refused here.
 
     The text is handed back because it is what a capture may keep (#256): exactly what the
     parser was given, whichever way it arrived. The places, because the capture keeps which
@@ -663,6 +703,8 @@ def _read(payload: PageIn, owner):
         raise HttpError(422, str(exc)) from exc
 
     result = remembered.read_page(owner, url, html)
+    if result is None and typed:
+        return url, None, None, html, []
     if result is None:
         raise HttpError(422, str(_("Nothing resembling a job posting was found there.")))
     data, source, handed = result

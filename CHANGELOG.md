@@ -360,6 +360,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🐛 Fixed
 
+- A capture of a page nothing could be read from is accepted when a title was typed for it, and its review says nothing read it; with no title it is still refused, naming the field. (#710)
 - Adding a contact through the API needs write access to the company, not only read access, so a company shared read-only can no longer be given contacts. (#328)
 - A stored date no longer shows as an empty box in British English and other languages that write the day first (#933)
 - CI's translation guard no longer crashes on a force-pushed branch: a previous commit it cannot find makes it read the branch since main (#1011)

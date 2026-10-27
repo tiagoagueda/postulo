@@ -11,10 +11,14 @@
   <div class="mx-auto max-w-3xl" data-capture-review>
     <h1 class="mb-1 text-title font-semibold tracking-tight">{% translate "Review the capture" %}</h1>
     <p class="mb-1 text-sm text-ink-500 dark:text-ink-400">
-      {% blocktranslate trimmed with source=capture.source_name %}
-        Read by {{ source }}. Check it before saving — a parser reading somebody else's
-        markup gets things wrong, which is why nothing has been recorded yet.
-      {% endblocktranslate %}
+      {% if capture.source_name %}
+        {% blocktranslate trimmed with source=capture.source_name %}
+          Read by {{ source }}. Check it before saving — a parser reading somebody else's
+          markup gets things wrong, which is why nothing has been recorded yet.
+        {% endblocktranslate %}
+      {% else %}
+        {% translate "Nothing could be read from the page: what is here was typed when it was captured. Check it before saving; nothing has been recorded yet." %}
+      {% endif %}
     </p>
     <p class="mb-4 text-sm text-ink-500 dark:text-ink-400" data-queue>
       {% if queue_left %}
