@@ -9,6 +9,11 @@ A point a person put there by hand, or fetched from Wikidata on a press (#701), 
 the address's words change, because it was not derived from them; anything else follows the
 words. With the map switched off for the owner nothing is placed and nothing stored is
 touched, as for a company's location before (#700).
+
+The street is read by `geocoding` alone, on the scheduler's pass, never here (#913). A pin it
+found is kept while the address reads as it did when it was looked up; once the address
+changes, the pin goes back to the offline point here, at once, until the scheduler looks the
+new street up.
 """
 
 from __future__ import annotations
@@ -24,6 +29,9 @@ def place(address) -> None:
     """Set ``address``'s point from its parts. Called by ``PostalAddress.save``."""
     if address.placed_by in KEPT:
         return
+    if address.placed_by == address.Placed.STREET and address.street_from != address.comparable:
+        # The street it was found at is not the address's any more: back to its words.
+        address.placed_from = ""
     key = address.place_key()
     if key == address.placed_from:
         return
@@ -55,4 +63,7 @@ def take_off_by_hand(address) -> None:
     address.placed_by = ""
     address.placed_from = ""
     address.latitude = address.longitude = None
+    # And looked up by its street again, where look-ups are on (#913).
+    address.street_from = ""
+    address.street_tried_at = None
     address.save()

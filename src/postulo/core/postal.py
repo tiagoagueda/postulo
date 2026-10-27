@@ -403,11 +403,17 @@ class PostalAddressForm(forms.ModelForm):
         if not self.mapped or not self.instance.pk:
             return None
         address = self.instance
+        from postulo.jobs import geocoding
+
+        # Named before anything is sent (#913, as #700 asked): where its street is still to be
+        # looked up, the line says by which service.
+        geocoder = geocoding.current()
         return {
             "placed": address.is_placed,
             "how": address.get_placed_by_display() if address.placed_by else "",
             "by_hand": address.placed_by == address.Placed.MANUAL,
             "url": reverse("jobs:address_place", args=[address.pk]),
+            "looking_up": geocoder.name if geocoder and geocoding.pending(address) else "",
         }
 
     def has_changed(self) -> bool:

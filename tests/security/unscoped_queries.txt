@@ -7,6 +7,7 @@
 # jobs/status.py stamps a company the caller has already scoped, as its signals change (#941).
 # jobs/merging.py moves everybody's rows once _same_owner has checked that everybody who saw
 # the other record sees the kept one (#896).
+# jobs/geocoding.py walks every account's addresses in the scheduler, as its one caller (#913).
 api/routers/applications.py::_detail::Application
 api/routers/applications.py::list_applications::Application
 api/routers/common.py::referrer_and_agency_or_422::Company
@@ -103,6 +104,7 @@ documents/signals.py::forget_the_source_of_a_render::RenderedDocument
 jobs/detach.py::_copy_parts::Company
 jobs/duplicates.py::for_company::CompanyIdentifier
 jobs/forms.py::_save_department::Department
+jobs/geocoding.py::due::PostalAddress
 jobs/geojson.py::export::PostalAddress
 jobs/history.py::bind_capture::Capture
 jobs/identifier_removals.py::offer::CompanyIdentifier

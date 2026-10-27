@@ -170,10 +170,11 @@ class CaptureForm(PinnedPolicyForm):
 
 
 class MapsForm(PinnedPolicyForm):
-    """Where the companies' map takes its tiles (#898).
+    """Where the companies' map takes its tiles (#898), and whether streets are looked up (#913).
 
-    The address is checked here, before it is stored, by the rule the map reads it with
-    (`postulo.jobs.tiles.url_problem`), so a value the map would refuse never reaches the row.
+    Each address is checked here, before it is stored, by the rule it is read with
+    (`postulo.jobs.tiles.url_problem`, `postulo.jobs.geocoding.url_problem`), so a value the
+    map would refuse never reaches the row.
     """
 
     map_tiles = forms.ChoiceField(
@@ -185,9 +186,26 @@ class MapsForm(PinnedPolicyForm):
         ),
     )
 
+    geocoder = forms.ChoiceField(
+        label=_("Street look-ups"),
+        widget=forms.RadioSelect,
+        help_text=_(
+            "Whether an address with a street is pinned at its street. The service is sent "
+            "the address's street, postcode, town, region and country, never who it belongs "
+            "to. Otherwise pins stay at the postcode or the town."
+        ),
+    )
+
     class Meta:
         model = SiteSettings
-        fields = ("map_tiles", "map_tile_url", "map_tile_attribution")
+        fields = (
+            "map_tiles",
+            "map_tile_url",
+            "map_tile_attribution",
+            "geocoder",
+            "geocoder_url",
+            "geocoder_consent",
+        )
         help_texts = {
             "map_tile_url": _(
                 "Used with “A tile server of your own”: an https:// address, or a path on "
@@ -198,6 +216,17 @@ class MapsForm(PinnedPolicyForm):
                 "The credit the tiles' licence asks for, drawn on the map as plain text. "
                 "For example: © OpenStreetMap contributors"
             ),
+            "geocoder_url": _(
+                "The service's base address. Left empty with Nominatim, OpenStreetMap's "
+                "public instance is used: https://nominatim.openstreetmap.org. For your "
+                "own: for example https://photon.example.org"
+            ),
+            "geocoder_consent": _(
+                "Companies' addresses, and the addresses of people and contacts that are "
+                "shown on the map, are sent to the service. Those are personal data, and "
+                "OpenStreetMap's public Nominatim asks not to be sent any. Tick this to say "
+                "you accept that, or use a service of your own."
+            ),
         }
 
     def __init__(self, *args, **kwargs):
@@ -207,6 +236,14 @@ class MapsForm(PinnedPolicyForm):
         self.fields["map_tiles"].choices = tiles.SOURCE_CHOICES
         self.fields["map_tile_url"].required = False
         self.fields["map_tile_attribution"].required = False
+        from postulo.jobs import geocoding
+
+        self.fields["geocoder"].choices = geocoding.CHOICES
+        # Left out of a post, as a form older than #913 leaves it, it keeps the default: off.
+        self.fields["geocoder"].required = False
+        self.fields["geocoder_url"].required = False
+        if not self.initial.get("geocoder"):
+            self.initial["geocoder"] = geocoding.chosen()[0]
         if not self.initial.get("map_tiles"):
             self.initial["map_tiles"] = tiles.current().source
         in_force = tiles.current()
@@ -215,11 +252,12 @@ class MapsForm(PinnedPolicyForm):
             "map_tile_url": in_force.url if in_force.source == tiles.CUSTOM else "",
             "map_tile_attribution": in_force.attribution,
         }
+        effective["geocoder"], effective["geocoder_url"] = geocoding.chosen()
         for field in self.pinned:
             self.initial[field] = effective[field]
 
     def clean(self):
-        from postulo.jobs import tiles
+        from postulo.jobs import geocoding, tiles
 
         cleaned = super().clean()
         source = cleaned.get("map_tiles", self.initial.get("map_tiles"))
@@ -235,7 +273,25 @@ class MapsForm(PinnedPolicyForm):
                     "map_tile_attribution",
                     _("Say whose tiles they are: their licence asks for a credit on the map."),
                 )
+        service = cleaned.get("geocoder", self.initial.get("geocoder"))
+        if service in geocoding.SERVICES:
+            if "geocoder_url" not in self.pinned:
+                url = cleaned.get("geocoder_url", "").strip()
+                url = url or geocoding.DEFAULT_URLS.get(service, "")
+                if problem := geocoding.url_problem(url):
+                    self.add_error("geocoder_url", problem)
+            if "geocoder" not in self.pinned and not cleaned.get("geocoder_consent"):
+                self.add_error(
+                    "geocoder_consent",
+                    _("Street look-ups send addresses to the service: tick this to say so."),
+                )
         return cleaned
+
+    def save(self, commit=True):
+        # Saving the setting is how an administrator answers a service that refused the
+        # look-ups (#913): whatever they chose, the stop it recorded is lifted.
+        self.instance.geocoder_problem = ""
+        return super().save(commit=commit)
 
 
 class OfferedLanguagesForm(forms.ModelForm):

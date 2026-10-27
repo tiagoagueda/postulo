@@ -684,13 +684,21 @@ class MapsView(PluginSettingsMixin, PolicyView):
     form_class = MapsForm
     template_name = "server/maps.html"
     section_title = _("Maps")
-    pinned_fields = ("map_tiles", "map_tile_url", "map_tile_attribution")
+    pinned_fields = (
+        "map_tiles",
+        "map_tile_url",
+        "map_tile_attribution",
+        "geocoder",
+        "geocoder_url",
+    )
 
     def get_context_data(self, **kwargs):
-        from postulo.jobs import tiles
+        from postulo.jobs import geocoding, tiles
 
         context = super().get_context_data(**kwargs)
         context["tiles"] = tiles.current()
+        context["geocoder"] = geocoding.current()
+        context["geocoder_problem"] = site.current().geocoder_problem
         context["editable"] = len(context["pinned"]) < len(self.pinned_fields)
         return context
 

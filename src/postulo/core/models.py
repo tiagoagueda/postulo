@@ -732,6 +732,8 @@ class PostalAddress(OwnedAsItsHolder, PrincipalOwnedModel):
         POSTCODE = "postcode", _("its postcode")
         MANUAL = "manual", _("by hand")
         WIKIDATA = "wikidata", _("from Wikidata")
+        #: Looked up by its street with the geocoding service the operator chose (#913).
+        STREET = "street", _("its street")
 
     #: Where the map draws it, and how that was decided (#702). Placed offline when the
     #: address is saved -- its postcode's centroid where the postal codes were downloaded,
@@ -745,6 +747,12 @@ class PostalAddress(OwnedAsItsHolder, PrincipalOwnedModel):
     #: The parts the point was placed from, so an edit that changes nothing places nothing.
     placed_from = models.CharField(max_length=300, blank=True, editable=False)
     placed_at = models.DateTimeField(_("placed"), null=True, blank=True, editable=False)
+    #: The address, folded (`comparable`), as it was when its street was last looked up
+    #: (#913), found or not: a save that changes nothing asks the service nothing again.
+    street_from = models.CharField(max_length=300, blank=True, editable=False)
+    #: When a look-up last failed for a reason that may pass (a timeout, a busy service), so
+    #: it is tried again after a while rather than on every scheduler pass.
+    street_tried_at = models.DateTimeField(null=True, blank=True, editable=False)
     #: Whether a person's own or a contact's address is drawn on the map (#702). Off unless
     #: they ask: a home is somewhere somebody can be found. A company's addresses are drawn
     #: whatever this says.
@@ -1324,6 +1332,20 @@ class SiteSettings(models.Model):
     #: Plain text, never markup: Leaflet writes the credit with ``innerHTML``, so the page
     #: escapes it before handing it over.
     map_tile_attribution = models.CharField(_("tile credit"), max_length=300, blank=True)
+    #: Whether, and with what, an address's street is looked up for its pin (#913):
+    #: ``off``, ``nominatim``, ``photon`` or ``addok``, blank for "not set here", which reads
+    #: as the environment's answer, off by default. `postulo.jobs.geocoding` says what each
+    #: sends where.
+    geocoder = models.CharField(_("street look-ups"), max_length=10, blank=True)
+    geocoder_url = models.CharField(_("look-up service address"), max_length=300, blank=True)
+    #: The operator's word that the service may be sent the addresses of the people and the
+    #: contacts shown on the map, not only companies' (#913). Nominatim's public instance asks
+    #: not to be sent personal data; this is where an operator says they have read that.
+    geocoder_consent = models.BooleanField(_("send addresses to the service"), default=False)
+    #: Why look-ups stopped, when the service refused them (HTTP 403): its policy asks to be
+    #: able to switch an application off, so a refusal stops every look-up until the
+    #: setting is saved again. Shown on the settings page.
+    geocoder_problem = models.CharField(max_length=300, blank=True, editable=False)
     sso_is_second_factor = models.BooleanField(
         _("single sign-on counts as the second factor"),
         null=True,

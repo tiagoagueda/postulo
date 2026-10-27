@@ -169,6 +169,9 @@
               <span class="inline-block py-1">{{ tiles.attribution }}</span>
             {% endif %}
           {% endif %}
+          {% if street_credit %}
+            <span class="inline-block py-1" data-street-credit>{% blocktranslate trimmed with credit=street_credit %}Addresses: {{ credit }}{% endblocktranslate %}</span>
+          {% endif %}
           <a href="https://leafletjs.com" rel="noopener noreferrer external" target="_blank"
              class="inline-block py-1 underline underline-offset-2 hover:text-ink-700 dark:hover:text-ink-200">Leaflet</a>
         </p>

@@ -700,6 +700,15 @@ POSTULO_MAP_TILES = env("POSTULO_MAP_TILES", default="osm").strip().lower()
 POSTULO_MAP_TILE_URL = env("POSTULO_MAP_TILE_URL", default="").strip()
 POSTULO_MAP_TILE_ATTRIBUTION = env("POSTULO_MAP_TILE_ATTRIBUTION", default="").strip()
 
+# Whether an address with a street is pinned at that street, looked up with a geocoding service
+# (#913): `off` (the default: the postcode or the town, offline), `nominatim`, `photon` or
+# `addok`, and the service's base address. Set here, the choice is the operator's word that the
+# service may be sent the addresses on the map, people's and contacts' included. Each also
+# changeable under Server settings -> Plugins -> Maps when not set here.
+# `postulo.jobs.geocoding` says what is sent where.
+POSTULO_GEOCODER = env("POSTULO_GEOCODER", default="").strip().lower()
+POSTULO_GEOCODER_URL = env("POSTULO_GEOCODER_URL", default="").strip()
+
 # Optional hand-off to the web server once Django has authorised a download. Leave both
 # unset to have Django stream the file itself, which is correct but ties up a worker.
 # nginx: an `internal` location, e.g. "/protected-media/".

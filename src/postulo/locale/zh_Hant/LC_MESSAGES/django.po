@@ -1180,6 +1180,11 @@ msgstr "%(sent)s，%(failed)s；每份文件會說明是哪一種。"
 msgid "%(service)s is already used by another row."
 msgstr "%(service)s 已被另一列使用。"
 
+#: src/postulo/jobs/geocoding.py
+#, python-format
+msgid "%(service)s refused the look-ups (%(status)s). They are stopped."
+msgstr ""
+
 #: src/postulo/core/templatetags/postulo.py
 #, python-format
 msgid "%(share)s%%"
@@ -2777,6 +2782,10 @@ msgstr "新增檔案只會增加內容。您已有的資料會完全維持原樣
 msgid "Adding a file only ever adds. What you already have is left exactly as it is and is not added a second time, so the same file twice is the same as once. Nothing in your record is changed or removed."
 msgstr "新增檔案只會增加內容。您已有的資料會完全維持原樣，也不會重複新增，因此同一個檔案加入兩次與一次的結果相同。您紀錄中的任何內容都不會被變更或移除。"
 
+#: src/postulo/jobs/geocoding.py
+msgid "addok (France's Base Adresse Nationale)"
+msgstr ""
+
 #: src/postulo/applications/reports.py src/postulo/jobs/tables.py
 #: src/postulo/templates/partials/web_links.html
 msgid "Address"
@@ -2800,6 +2809,16 @@ msgstr "電子郵件地址認領"
 #: src/postulo/templates/jobs/company_map.html
 msgid "Addresses are placed at their town: the postal codes have not been downloaded on this instance (manage.py fetch_geonames --postcodes)."
 msgstr "地址會定位在所在城鎮：此站台尚未下載郵遞區號（manage.py fetch_geonames --postcodes）。"
+
+#: src/postulo/templates/server/maps.html
+#, python-format
+msgid "Addresses with a street are pinned at their street, looked up with %(service)s at %(url)s. The scheduler sends one address a second: a company's, and a person's own or a contact's when it is shown on the map. It sends the address's parts, never who it belongs to."
+msgstr ""
+
+#: src/postulo/templates/jobs/company_map.html
+#, python-format
+msgid "Addresses: %(credit)s"
+msgstr ""
 
 #: src/postulo/templates/server/people.html
 msgid "Administrator"
@@ -4761,6 +4780,10 @@ msgstr "隸屬於它的公司"
 #: src/postulo/templates/widgets/shortcuts.html
 msgid "Companies you have applied to"
 msgstr "您已應徵的公司"
+
+#: src/postulo/core/server_forms.py
+msgid "Companies' addresses, and the addresses of people and contacts that are shown on the map, are sent to the service. Those are personal data, and OpenStreetMap's public Nominatim asks not to be sent any. Tick this to say you accept that, or use a service of your own."
+msgstr ""
 
 #: src/postulo/templates/resume/candidate_file.html
 msgid "Companies, listings, applications, captures and documents are not in it either. They are one job search; this is you. The export of everything is under Settings."
@@ -7150,6 +7173,14 @@ msgstr "請先在上方「識別碼」中為這家公司提供其 Wikidata 識�
 msgid "Give the email a subject."
 msgstr "請為這封郵件填寫主旨。"
 
+#: src/postulo/jobs/geocoding.py
+msgid "Give the service's address."
+msgstr ""
+
+#: src/postulo/jobs/geocoding.py
+msgid "Give the service's base address, without a question mark or a #."
+msgstr ""
+
 #: src/postulo/api/views.py
 msgid "Give the token a name and at least one scope."
 msgstr "請為權杖命名，並至少選擇一個範圍。"
@@ -8446,6 +8477,15 @@ msgid "Its properties are what a recruiter's software and a file manager read: t
 msgstr "它的屬性是招募人員的軟體與檔案管理工具會讀取的資訊：標題、作者等等。初始值是檔案原本就帶有的內容；變更只會套用到此檔案。"
 
 #: src/postulo/core/models.py
+msgid "its street"
+msgstr ""
+
+#: src/postulo/templates/partials/postal_addresses.html
+#, python-format
+msgid "Its street will be looked up with %(service)s shortly."
+msgstr ""
+
+#: src/postulo/core/models.py
 msgid "its town"
 msgstr "其城鎮"
 
@@ -9192,6 +9232,10 @@ msgstr "經度"
 #: src/postulo/templates/jobs/address_place.html
 msgid "Longitude"
 msgstr "經度"
+
+#: src/postulo/core/models.py
+msgid "look-up service address"
+msgstr ""
 
 #: src/postulo/jobs/slow.py
 msgid "Looking for a logo"
@@ -10394,6 +10438,10 @@ msgstr "不是您記錄過的人"
 msgid "Nobody, or the person below"
 msgstr "沒有人，或下方的人"
 
+#: src/postulo/jobs/geocoding.py
+msgid "Nominatim (OpenStreetMap)"
+msgstr ""
+
 #: src/postulo/accounts/addressing.py
 msgctxt "gender"
 msgid "Non-binary"
@@ -11126,6 +11174,10 @@ msgstr "已停用，因為它所屬的模組已停用。"
 #: src/postulo/templates/settings/account.html
 msgid "Off. A code from an authenticator app, asked for after the password, means a leaked password alone is not enough."
 msgstr "已關閉。在密碼之後要求輸入驗證器應用程式產生的驗證碼，可確保僅憑外洩的密碼無法登入。"
+
+#: src/postulo/jobs/geocoding.py
+msgid "Off: pins stay at the postcode or the town, worked out on this instance"
+msgstr ""
 
 #: src/postulo/applications/analytics.py src/postulo/applications/models.py
 msgid "Offer"
@@ -12081,6 +12133,10 @@ msgstr "電話"
 #: src/postulo/applications/models.py
 msgid "Phone screen"
 msgstr "電話面試"
+
+#: src/postulo/jobs/geocoding.py
+msgid "Photon"
+msgstr ""
 
 #: src/postulo/templates/documents/letter_detail.html
 msgid "Pick an application and the placeholders are filled in from it."
@@ -13755,6 +13811,10 @@ msgstr "儲存公司後即可新增另一個識別碼。"
 msgid "Save this first, then come back and agree."
 msgstr "請先儲存，再回來同意。"
 
+#: src/postulo/templates/server/maps.html
+msgid "Save this page to start them again, or switch them off."
+msgstr ""
+
 #: src/postulo/templates/accounts/profile.html
 msgid "Save to add another identifier."
 msgstr "儲存後即可新增另一個識別碼。"
@@ -14023,6 +14083,10 @@ msgstr "傳送測試訊息"
 msgid "Send a test message to"
 msgstr "傳送測試訊息給"
 
+#: src/postulo/core/models.py
+msgid "send addresses to the service"
+msgstr ""
+
 #: src/postulo/templates/connections/list.html
 msgid "Send everything"
 msgstr "全部傳送"
@@ -14080,6 +14144,10 @@ msgstr "會先透過您自己的寄件匣寄出，並附上履歷、信函與您
 #: src/postulo/documents/models.py
 msgid "sent on"
 msgstr "寄出日期"
+
+#: src/postulo/templates/server/record_of_processing.html
+msgid "Sent the street, postcode, town, region and country of companies' addresses, and of the addresses of people and contacts that are shown on the map. Never who an address belongs to."
+msgstr ""
 
 #: src/postulo/documents/models.py
 msgid "sent to"
@@ -15015,6 +15083,23 @@ msgstr "儲存時間"
 #: src/postulo/plugins/forms.py
 msgid "Stored; leave blank to keep the current value."
 msgstr "已儲存；留空即可保留目前的值。"
+
+#: src/postulo/core/models.py
+#: src/postulo/templates/server/record_of_processing.html
+msgid "street look-ups"
+msgstr ""
+
+#: src/postulo/core/server_forms.py
+msgid "Street look-ups"
+msgstr ""
+
+#: src/postulo/templates/server/maps.html
+msgid "Street look-ups are off. Pins stay at the postcode or the town, worked out on this instance, and no address is sent anywhere. A pin can still be placed by hand."
+msgstr ""
+
+#: src/postulo/core/server_forms.py
+msgid "Street look-ups send addresses to the service: tick this to say so."
+msgstr ""
 
 #: src/postulo/templates/account/partials/password_meter.html
 #, fuzzy
@@ -17030,6 +17115,10 @@ msgstr "伺服器拒絕了這些認證資訊：%(detail)s"
 msgid "The server that accepts the mail — its name, not an address."
 msgstr "接收郵件的伺服器——請填寫其名稱，而非位址。"
 
+#: src/postulo/core/server_forms.py
+msgid "The service's base address. Left empty with Nominatim, OpenStreetMap's public instance is used: https://nominatim.openstreetmap.org. For your own: for example https://photon.example.org"
+msgstr ""
+
 #: src/postulo/plugins/fetching.py
 msgid "The site asked us to slow down (429). Try again in a few minutes."
 msgstr "網站要求我們放慢速度（429）。請過幾分鐘再試。"
@@ -17681,6 +17770,10 @@ msgstr "這不是 %(kind)s 在此接受的值，因此會以「其他」新增�
 #: src/postulo/resume/candidate.py
 msgid "This is not text."
 msgstr "這不是文字。"
+
+#: src/postulo/templates/server/maps.html
+msgid "This is OpenStreetMap's public Nominatim. Its policy asks not to be sent personal data, allows one request a second for the whole instance, and lets its operators block an application without notice. An instance with many people on it should run a geocoder of its own."
+msgstr ""
 
 #: src/postulo/templates/jobs/capture_page.html
 msgid "This is the beginning. The whole of it is in the download."
@@ -18342,6 +18435,10 @@ msgstr "使用我的 Gravatar"
 #: src/postulo/accounts/models.py
 msgid "use my Gravatar"
 msgstr "使用我的 Gravatar"
+
+#: src/postulo/jobs/geocoding.py
+msgid "Use the service's web address, starting with https://."
+msgstr ""
 
 #: src/postulo/api/routers/applications.py
 msgid "Use the status or interviews endpoints; the timeline records those itself."
@@ -19226,8 +19323,8 @@ msgid "Where somebody can check it. A CV prints it as a link."
 msgstr "可供他人查證的地方。履歷會將它印成連結。"
 
 #: src/postulo/templates/server/maps.html
-msgid "Where the companies' map takes the tiles it is drawn on."
-msgstr "公司地圖所用圖磚的來源。"
+msgid "Where the companies' map takes the tiles it is drawn on, and whether addresses are pinned at their street."
+msgstr ""
 
 #: src/postulo/jobs/models.py
 msgid "where the logo came from"
@@ -19322,6 +19419,10 @@ msgstr "您目前的求職概況。"
 #: src/postulo/core/help.py
 msgid "Wherever post reaches you, with one of them marked as the one to use. Documents never print a street: they print that one's town and country, unless “Location” says otherwise."
 msgstr "任何能收到郵件的地址，並將其中一個標示為要使用的地址。文件絕不列印街道：只會列印該地址的城市與國家，除非「地點」另有指定。"
+
+#: src/postulo/core/server_forms.py
+msgid "Whether an address with a street is pinned at its street. The service is sent the address's street, postcode, town, region and country, never who it belongs to. Otherwise pins stay at the postcode or the town."
+msgstr ""
 
 #: src/postulo/core/models.py
 msgid "Whether anyone who finds the address may create an account."

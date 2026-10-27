@@ -356,6 +356,9 @@ def pinned_addresses(person) -> list[dict]:
                 "primary": row.is_primary,
                 "lat": lat,
                 "lon": lon,
+                #: Pinned at its street by a geocoding service, whose data asks for a credit
+                #: on the map (#913).
+                "street": row.placed_by == PostalAddress.Placed.STREET,
             }
         )
     return found
@@ -882,6 +885,16 @@ class CompanyMapView(LoginRequiredMixin, TemplateView):
         )
         # Said only when it is true: a company at several places is counted at each (#703).
         context["counted_at_several"] = any(len(keys) > 1 for keys in where_each.values())
+        # The geocoder's credit, beside the tiles', when a pin on show was found by it (#913).
+        # The service in force names it; a pin found before it was switched off is credited
+        # to OpenStreetMap, whose data two of the three services are.
+        if any(entry["street"] and entry["lat"] is not None for entry in pinned):
+            from . import geocoding
+
+            in_force = geocoding.current()
+            context["street_credit"] = (
+                in_force.attribution if in_force else geocoding.ATTRIBUTIONS[geocoding.NOMINATIM]
+            )
         # What Leaflet draws: one marker per address, as data, each saying whose it is, so
         # the clusters count companies and a company never reaches the page as markup.
         context["drawn"] = [

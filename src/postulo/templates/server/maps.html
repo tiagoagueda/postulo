@@ -7,7 +7,7 @@
   <c-page-title>
     {% translate "Maps" %}
     <c-slot name="subtitle">
-    {% translate "Where the companies' map takes the tiles it is drawn on." %}
+    {% translate "Where the companies' map takes the tiles it is drawn on, and whether addresses are pinned at their street." %}
     </c-slot>
   </c-page-title>
 
@@ -22,6 +22,24 @@
       <p>{% translate "The map is drawn on the tiles at the address below. When it is on another server, that server learns each viewer's address and the area they look at; on this instance's own address, nothing is sent anywhere." %}</p>
     {% else %}
       <p>{% translate "The map is drawn on the world's outline, kept on this instance. Nothing is fetched from anywhere, and the map cannot show streets." %}</p>
+    {% endif %}
+  </div>
+
+  {% comment %} The same for street look-ups (#913): who is sent which addresses, said before the
+     switch, and a refusal from the service said first of all, since it has stopped them. {% endcomment %}
+  {% if geocoder_problem %}
+    <div class="alert mb-4" data-variant="error" role="alert" data-geocoder-problem>{{ geocoder_problem }} {% translate "Save this page to start them again, or switch them off." %}</div>
+  {% endif %}
+  <div class="card mb-4 text-sm" data-geocoder="{{ geocoder.service|default:'off' }}">
+    {% if geocoder %}
+      <p>{% blocktranslate trimmed with service=geocoder.name url=geocoder.url %}
+        Addresses with a street are pinned at their street, looked up with {{ service }} at {{ url }}. The scheduler sends one address a second: a company's, and a person's own or a contact's when it is shown on the map. It sends the address's parts, never who it belongs to.
+      {% endblocktranslate %}</p>
+      {% if geocoder.public_nominatim %}
+        <p class="mt-2 text-xs text-ink-500 dark:text-ink-400">{% translate "This is OpenStreetMap's public Nominatim. Its policy asks not to be sent personal data, allows one request a second for the whole instance, and lets its operators block an application without notice. An instance with many people on it should run a geocoder of its own." %}</p>
+      {% endif %}
+    {% else %}
+      <p>{% translate "Street look-ups are off. Pins stay at the postcode or the town, worked out on this instance, and no address is sent anywhere. A pin can still be placed by hand." %}</p>
     {% endif %}
   </div>
 

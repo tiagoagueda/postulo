@@ -107,26 +107,41 @@ test:
   countries listed or, for somebody who would rather say less, as only whether they are a
   citizen of the EU, the EEA or Switzerland.
 - A place of birth is the text typed and a country, never looked up and never offered to
-  the map, which stops at city level for a company and holds nothing about a person.
+  the map, nor to the service that looks up the map's streets (#913).
 
 **Nothing about an address is verified, and nothing about it is a way back in.** Postulo is
 not going to post anything, so *valid* means well-formed enough to be used. An address can
 never become a recovery route by accident, because there is no flag on it that could.
 
-**The map knows a town or a postcode, unless a person places an address by hand.** A postal
-address is placed offline at its postcode's centroid, where an operator downloaded the
-postal codes, or else at its town (#108, #700, #702): a search at street precision is a map of where the person will be at
-nine in the morning if any of it works out, sitting in the same database as the CV that carries
-the home address. Nothing about a location is ever sent to a geocoding service to be placed.
-The map is drawn by Leaflet, served from the instance, over tiles the operator chooses, and
-that choice is the one way the neighbourhood of somebody's search can leave the instance.
-Three things follow, and each is a promise:
+**The map knows a town or a postcode, unless the operator switches street look-ups on or a
+person places an address by hand.** A postal address is placed offline at its postcode's
+centroid, where an operator downloaded the postal codes, or else at its town (#108, #700,
+#702): a search at street precision is a map of where the person will be at nine in the morning
+if any of it works out, sitting in the same database as the CV that carries the home address.
+#700 kept every location off geocoding services for that reason; the maintainer reversed it on
+2026-10-15 (#913), behind a switch that is off until the operator turns it on. The map is drawn
+by Leaflet, served from the instance, over tiles the operator chooses. The tiles and the street
+look-ups are the two ways the neighbourhood of somebody's search can leave the instance. What
+follows are promises:
 
-- **A finer pin is an act, not a default.** A pin at the precision of a street exists only
-  for one address a person deliberately places by hand (#702). A company's addresses are
-  drawn; a person's own home and a contact's address, which is somebody else's personal data,
-  only when they ask, address by address. A point is stored on the instance, is in the
-  contact's data-subject export and goes when the contact is erased, and never leaves it.
+- **Street look-ups are the operator's decision, and say what they send.** *Server settings →
+  Plugins → Maps*, or `POSTULO_GEOCODER`, chooses a service: Nominatim (OpenStreetMap's public
+  instance pre-filled), Photon or addok, each at an address the operator can point at their
+  own. The scheduler sends it one address a second: the street, postcode, town, region and
+  country of a company's address, and of a person's own or a contact's address where that is
+  shown on the map. It never sends whose address it is, and nothing is sent from a page as it
+  is saved. People's and contacts' addresses are personal data, and OpenStreetMap's public
+  Nominatim asks not to be sent any, so the setting asks the operator's explicit word before
+  any look-up runs; set in the environment, the setting is that word. The line under each
+  address names the service before its street is sent, the record of processing lists the
+  service as a recipient, and a refusal from the service stops every look-up until the
+  setting is saved again.
+- **A finer pin never overrides a person.** A point placed by hand (#702) or from Wikidata
+  (#701) is never replaced by a look-up, and *take off* gives a point back to the address's
+  words. A company's addresses are drawn; a person's own home and a contact's address, which
+  is somebody else's personal data, only when they ask, address by address, and only those
+  are looked up. A point is stored on the instance, is in the contact's data-subject export
+  and goes when the contact is erased.
 - **A tile server learns the area a person looks at, and the operator chooses which.** By
   default the browser fetches OpenStreetMap's public tiles (#898, reversing #700's choice of
   no tiles): the foundation's servers see the viewer's address and which tiles they ask for,

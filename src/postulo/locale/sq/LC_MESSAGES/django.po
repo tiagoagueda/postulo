@@ -1261,6 +1261,11 @@ msgstr "%(sent)s, %(failed)s; çdo dokument tregon se cili."
 msgid "%(service)s is already used by another row."
 msgstr "%(service)s është përdorur tashmë nga një rresht tjetër."
 
+#: src/postulo/jobs/geocoding.py
+#, python-format
+msgid "%(service)s refused the look-ups (%(status)s). They are stopped."
+msgstr ""
+
 #: src/postulo/core/templatetags/postulo.py
 #, python-format
 msgid "%(share)s%%"
@@ -2881,6 +2886,10 @@ msgstr "Shtimi i një skedari vetëm shton. Ajo që keni tashmë mbetet saktësi
 msgid "Adding a file only ever adds. What you already have is left exactly as it is and is not added a second time, so the same file twice is the same as once. Nothing in your record is changed or removed."
 msgstr "Shtimi i një skedari vetëm shton. Ajo që keni tashmë lihet tamam siç është dhe nuk shtohet për herë të dytë, prandaj i njëjti skedar dy herë është njësoj si një herë. Asgjë në regjistrin tuaj nuk ndryshohet apo hiqet."
 
+#: src/postulo/jobs/geocoding.py
+msgid "addok (France's Base Adresse Nationale)"
+msgstr ""
+
 #: src/postulo/applications/reports.py src/postulo/jobs/tables.py
 #: src/postulo/templates/partials/web_links.html
 msgid "Address"
@@ -2904,6 +2913,16 @@ msgstr "pretendime adresash"
 #: src/postulo/templates/jobs/company_map.html
 msgid "Addresses are placed at their town: the postal codes have not been downloaded on this instance (manage.py fetch_geonames --postcodes)."
 msgstr "Adresat vendosen në qytetin e tyre: kodet postare nuk janë shkarkuar në këtë instancë (manage.py fetch_geonames --postcodes)."
+
+#: src/postulo/templates/server/maps.html
+#, python-format
+msgid "Addresses with a street are pinned at their street, looked up with %(service)s at %(url)s. The scheduler sends one address a second: a company's, and a person's own or a contact's when it is shown on the map. It sends the address's parts, never who it belongs to."
+msgstr ""
+
+#: src/postulo/templates/jobs/company_map.html
+#, python-format
+msgid "Addresses: %(credit)s"
+msgstr ""
 
 #: src/postulo/templates/server/people.html
 msgid "Administrator"
@@ -4858,6 +4877,10 @@ msgstr "Kompanitë që janë pjesë e saj"
 #: src/postulo/templates/widgets/shortcuts.html
 msgid "Companies you have applied to"
 msgstr "Kompanitë ku keni aplikuar"
+
+#: src/postulo/core/server_forms.py
+msgid "Companies' addresses, and the addresses of people and contacts that are shown on the map, are sent to the service. Those are personal data, and OpenStreetMap's public Nominatim asks not to be sent any. Tick this to say you accept that, or use a service of your own."
+msgstr ""
 
 #: src/postulo/templates/resume/candidate_file.html
 msgid "Companies, listings, applications, captures and documents are not in it either. They are one job search; this is you. The export of everything is under Settings."
@@ -7227,6 +7250,14 @@ msgstr "Jepini kompanisë identifikuesin e saj Wikidata, më lart te Identifikue
 msgid "Give the email a subject."
 msgstr "Jepini email-it një subjekt."
 
+#: src/postulo/jobs/geocoding.py
+msgid "Give the service's address."
+msgstr ""
+
+#: src/postulo/jobs/geocoding.py
+msgid "Give the service's base address, without a question mark or a #."
+msgstr ""
+
 #: src/postulo/api/views.py
 msgid "Give the token a name and at least one scope."
 msgstr "Jepini tokenit një emër dhe të paktën një fushëveprim."
@@ -8513,6 +8544,15 @@ msgid "Its properties are what a recruiter's software and a file manager read: t
 msgstr "Vetitë e tij janë ato që lexojnë programi i një rekrutuesi dhe një menaxher skedarësh: titulli, autori e të tjera. Fillimisht janë ato që skedari ka pasur gjithmonë; ndryshojini vetëm për këtë skedar."
 
 #: src/postulo/core/models.py
+msgid "its street"
+msgstr ""
+
+#: src/postulo/templates/partials/postal_addresses.html
+#, python-format
+msgid "Its street will be looked up with %(service)s shortly."
+msgstr ""
+
+#: src/postulo/core/models.py
 #, fuzzy
 msgid "its town"
 msgstr "në qytetin e saj"
@@ -9255,6 +9295,10 @@ msgstr "gjatësia gjeografike"
 #: src/postulo/templates/jobs/address_place.html
 msgid "Longitude"
 msgstr "Gjatësia gjeografike"
+
+#: src/postulo/core/models.py
+msgid "look-up service address"
+msgstr ""
 
 #: src/postulo/jobs/slow.py
 msgid "Looking for a logo"
@@ -10450,6 +10494,10 @@ msgstr "Askush që keni regjistruar"
 msgid "Nobody, or the person below"
 msgstr "Askush, ose personi më poshtë"
 
+#: src/postulo/jobs/geocoding.py
+msgid "Nominatim (OpenStreetMap)"
+msgstr ""
+
 #: src/postulo/accounts/addressing.py
 msgctxt "gender"
 msgid "Non-binary"
@@ -11177,6 +11225,10 @@ msgstr "Çaktivizuar, sepse moduli të cilit i përket është çaktivizuar."
 #: src/postulo/templates/settings/account.html
 msgid "Off. A code from an authenticator app, asked for after the password, means a leaked password alone is not enough."
 msgstr "Çaktivizuar. Një kod nga një aplikacion vërtetimi, i kërkuar pas fjalëkalimit, do të thotë se vetëm një fjalëkalim i rrjedhur nuk mjafton."
+
+#: src/postulo/jobs/geocoding.py
+msgid "Off: pins stay at the postcode or the town, worked out on this instance"
+msgstr ""
 
 #: src/postulo/applications/analytics.py src/postulo/applications/models.py
 msgid "Offer"
@@ -12147,6 +12199,10 @@ msgstr "telefon"
 #: src/postulo/applications/models.py
 msgid "Phone screen"
 msgstr "Intervistë telefonike paraprake"
+
+#: src/postulo/jobs/geocoding.py
+msgid "Photon"
+msgstr ""
 
 #: src/postulo/templates/documents/letter_detail.html
 msgid "Pick an application and the placeholders are filled in from it."
@@ -13806,6 +13862,10 @@ msgstr "Ruajeni kompaninë për të shtuar një identifikues tjetër."
 msgid "Save this first, then come back and agree."
 msgstr "Ruajeni këtë së pari, pastaj kthehuni dhe pranoni."
 
+#: src/postulo/templates/server/maps.html
+msgid "Save this page to start them again, or switch them off."
+msgstr ""
+
 #: src/postulo/templates/accounts/profile.html
 msgid "Save to add another identifier."
 msgstr "Ruajeni për të shtuar një identifikues tjetër."
@@ -14074,6 +14134,10 @@ msgstr "Dërgo një mesazh prove"
 msgid "Send a test message to"
 msgstr "Dërgo një mesazh prove te"
 
+#: src/postulo/core/models.py
+msgid "send addresses to the service"
+msgstr ""
+
 #: src/postulo/templates/connections/list.html
 msgid "Send everything"
 msgstr "Dërgo gjithçka"
@@ -14131,6 +14195,10 @@ msgstr "Dërgohet së pari, nëpërmjet kutisë suaj dalëse, me CV-në, letrën
 #: src/postulo/documents/models.py
 msgid "sent on"
 msgstr "dërguar më"
+
+#: src/postulo/templates/server/record_of_processing.html
+msgid "Sent the street, postcode, town, region and country of companies' addresses, and of the addresses of people and contacts that are shown on the map. Never who an address belongs to."
+msgstr ""
 
 #: src/postulo/documents/models.py
 msgid "sent to"
@@ -15066,6 +15134,23 @@ msgstr "ruajtur në"
 #: src/postulo/plugins/forms.py
 msgid "Stored; leave blank to keep the current value."
 msgstr "I ruajtur; lëreni bosh për të mbajtur vlerën aktuale."
+
+#: src/postulo/core/models.py
+#: src/postulo/templates/server/record_of_processing.html
+msgid "street look-ups"
+msgstr ""
+
+#: src/postulo/core/server_forms.py
+msgid "Street look-ups"
+msgstr ""
+
+#: src/postulo/templates/server/maps.html
+msgid "Street look-ups are off. Pins stay at the postcode or the town, worked out on this instance, and no address is sent anywhere. A pin can still be placed by hand."
+msgstr ""
+
+#: src/postulo/core/server_forms.py
+msgid "Street look-ups send addresses to the service: tick this to say so."
+msgstr ""
 
 #: src/postulo/templates/account/partials/password_meter.html
 msgid "Strong"
@@ -17081,6 +17166,10 @@ msgstr "Serveri i refuzoi ato kredenciale: %(detail)s"
 msgid "The server that accepts the mail — its name, not an address."
 msgstr "Serveri që pranon postën — emri i tij, jo një adresë."
 
+#: src/postulo/core/server_forms.py
+msgid "The service's base address. Left empty with Nominatim, OpenStreetMap's public instance is used: https://nominatim.openstreetmap.org. For your own: for example https://photon.example.org"
+msgstr ""
+
 #: src/postulo/plugins/fetching.py
 msgid "The site asked us to slow down (429). Try again in a few minutes."
 msgstr "Faqja na kërkoi të ngadalësojmë (429). Provoni sërish pas disa minutash."
@@ -17733,6 +17822,10 @@ msgstr "Kjo nuk është vlerë që %(kind)s pranon këtu, ndaj shtohet si Tjetë
 #: src/postulo/resume/candidate.py
 msgid "This is not text."
 msgstr "Ky nuk është tekst."
+
+#: src/postulo/templates/server/maps.html
+msgid "This is OpenStreetMap's public Nominatim. Its policy asks not to be sent personal data, allows one request a second for the whole instance, and lets its operators block an application without notice. An instance with many people on it should run a geocoder of its own."
+msgstr ""
 
 #: src/postulo/templates/jobs/capture_page.html
 msgid "This is the beginning. The whole of it is in the download."
@@ -18391,6 +18484,10 @@ msgstr "Përdor Gravatar-in tim"
 #: src/postulo/accounts/models.py
 msgid "use my Gravatar"
 msgstr "përdor Gravatar-in tim"
+
+#: src/postulo/jobs/geocoding.py
+msgid "Use the service's web address, starting with https://."
+msgstr ""
 
 #: src/postulo/api/routers/applications.py
 msgid "Use the status or interviews endpoints; the timeline records those itself."
@@ -19267,8 +19364,8 @@ msgid "Where somebody can check it. A CV prints it as a link."
 msgstr "Ku dikush mund ta kontrollojë. Një CV e printon si një lidhje."
 
 #: src/postulo/templates/server/maps.html
-msgid "Where the companies' map takes the tiles it is drawn on."
-msgstr "Nga i merr harta e kompanive pllakat mbi të cilat vizatohet."
+msgid "Where the companies' map takes the tiles it is drawn on, and whether addresses are pinned at their street."
+msgstr ""
 
 #: src/postulo/jobs/models.py
 msgid "where the logo came from"
@@ -19363,6 +19460,10 @@ msgstr "Ku qëndron sot kërkimi juaj për punë."
 #: src/postulo/core/help.py
 msgid "Wherever post reaches you, with one of them marked as the one to use. Documents never print a street: they print that one's town and country, unless “Location” says otherwise."
 msgstr "Kudo ku ju arrin posta, me njërën prej tyre të shënuar si ajo që duhet përdorur. Dokumentet nuk printojnë kurrë rrugën: printojnë qytetin dhe vendin e asaj adrese, përveç kur “Vendndodhja” thotë ndryshe."
+
+#: src/postulo/core/server_forms.py
+msgid "Whether an address with a street is pinned at its street. The service is sent the address's street, postcode, town, region and country, never who it belongs to. Otherwise pins stay at the postcode or the town."
+msgstr ""
 
 #: src/postulo/core/models.py
 msgid "Whether anyone who finds the address may create an account."

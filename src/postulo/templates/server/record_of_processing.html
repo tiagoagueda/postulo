@@ -44,9 +44,19 @@
       {% translate "Who receives it" %}
       <c-slot name="subtitle">{% translate "Every kind of connection on this instance, by plugin, with how many there are. What each one is called and where it talks belongs to its owner, and is not on this page; secrets are stored encrypted and shown to nobody." %}</c-slot>
     </c-section-title>
-    {% if record.recipients %}
+    {% if record.recipients or record.geocoder %}
       <div class="card p-0">
         <ul class="divide-y divide-ink-100 dark:divide-ink-800">
+          {% if record.geocoder %}
+            <li class="px-4 py-3" data-recipient="geocoder">
+              <div class="flex flex-wrap items-baseline gap-x-2 gap-y-1">
+                <span class="font-medium">{{ record.geocoder.name }}</span>
+                <span class="badge" data-tone="grey">{% translate "street look-ups" %}</span>
+                <span class="text-sm text-ink-500 dark:text-ink-400">{{ record.geocoder.url }}</span>
+              </div>
+              <p class="mt-1 text-sm text-ink-500 dark:text-ink-400">{% translate "Sent the street, postcode, town, region and country of companies' addresses, and of the addresses of people and contacts that are shown on the map. Never who an address belongs to." %}</p>
+            </li>
+          {% endif %}
           {% for recipient in record.recipients %}
             <li class="px-4 py-3">
               <div class="flex flex-wrap items-baseline gap-x-2 gap-y-1">

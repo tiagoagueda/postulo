@@ -55,6 +55,9 @@ ENV_OVERRIDES = {
     "map_tiles": "POSTULO_MAP_TILES",
     "map_tile_url": "POSTULO_MAP_TILE_URL",
     "map_tile_attribution": "POSTULO_MAP_TILE_ATTRIBUTION",
+    # Street look-ups for the map's pins (#913); `postulo.jobs.geocoding` reads them.
+    "geocoder": "POSTULO_GEOCODER",
+    "geocoder_url": "POSTULO_GEOCODER_URL",
 }
 
 #: Email field on the policy row → the key the SMTP backend wants. One mapping, so the

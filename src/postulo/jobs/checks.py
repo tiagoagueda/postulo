@@ -1,4 +1,5 @@
-"""System checks for the jobs app: the ESCO data directory (#535) and the map's tiles (#898).
+"""System checks for the jobs app: the ESCO data directory (#535), the map's tiles (#898) and
+its street look-ups (#913).
 
 The loader refuses to read a directory holding two revisions of either file, and the refusal
 used to surface at the first listing saved. `manage.py check`, which the entrypoint runs
@@ -10,7 +11,7 @@ from __future__ import annotations
 from django.conf import settings
 from django.core.checks import Error, register
 
-from postulo.jobs import esco, tiles
+from postulo.jobs import esco, geocoding, tiles
 
 
 @register("postulo")
@@ -56,5 +57,35 @@ def map_tile_url(app_configs, **kwargs):
             hint="Use an https:// template with {z}, {x} and {y}, such as "
             "https://tiles.example.org/{z}/{x}/{y}.png, or a path on this instance's origin.",
             id="postulo.E042",
+        )
+    ]
+
+
+@register("postulo")
+def geocoder(app_configs, **kwargs):
+    """`POSTULO_GEOCODER` names no service, or `POSTULO_GEOCODER_URL` is no base address (#913).
+
+    Either way no street is looked up; this says why before anybody wonders.
+    """
+    service = getattr(settings, "POSTULO_GEOCODER", "")
+    if not service:
+        return []
+    allowed = (geocoding.OFF, *geocoding.SERVICES)
+    if service not in allowed:
+        return [
+            Error(
+                f"POSTULO_GEOCODER is {service!r}; it must be one of: {', '.join(allowed)}.",
+                hint="Set it in the environment, or unset it to leave the choice to the page.",
+                id="postulo.E043",
+            )
+        ]
+    url = getattr(settings, "POSTULO_GEOCODER_URL", "")
+    if service == geocoding.OFF or not url or not (problem := geocoding.url_problem(url)):
+        return []
+    return [
+        Error(
+            f"POSTULO_GEOCODER_URL is {url!r}: {problem}",
+            hint="Use the service's base address, such as https://photon.example.org.",
+            id="postulo.E044",
         )
     ]

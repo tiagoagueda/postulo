@@ -637,7 +637,14 @@ def record_of_processing() -> dict:
         .annotate(n=Count("pk"))
         .order_by("kind", "plugin")
     ]
-    return {"purposes": purposes, "recipients": recipients}
+    # The street look-ups' service, where they are on (#913): a recipient of the instance's,
+    # not of a connection, sent the addresses on the map -- companies', and people's and
+    # contacts' where they are shown there.
+    from postulo.jobs import geocoding
+
+    in_force = geocoding.current()
+    geocoder = {"name": in_force.name, "url": in_force.url} if in_force else None
+    return {"purposes": purposes, "recipients": recipients, "geocoder": geocoder}
 
 
 # ---------------------------------------------------------------------- the notice

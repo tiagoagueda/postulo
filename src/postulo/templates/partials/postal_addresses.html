@@ -172,6 +172,9 @@
               {% else %}
                 {% translate "Not on the map: no postcode or town that the offline tables know." %}
               {% endif %}
+              {% if status.looking_up %}
+                {% blocktranslate trimmed with service=status.looking_up %}Its street will be looked up with {{ service }} shortly.{% endblocktranslate %}
+              {% endif %}
               <a href="{{ status.url }}" class="inline-block min-h-6 py-0.5 underline">{% if status.by_hand %}{% translate "Move it" %}{% else %}{% translate "Place it by hand" %}{% endif %}</a>
             </p>
           {% endif %}

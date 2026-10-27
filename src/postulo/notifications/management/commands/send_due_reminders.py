@@ -181,7 +181,7 @@ class Command(BaseCommand):
         from postulo.core.slow import reap_archives
         from postulo.documents import scrub
         from postulo.documents.archiving import send_pending
-        from postulo.jobs import pages
+        from postulo.jobs import geocoding, pages
         from postulo.jobs.closing import announce_closing_postings
         from postulo.notifications import inbox, webhooks
         from postulo.plugins import policy
@@ -205,6 +205,9 @@ class Command(BaseCommand):
             copies_sent, copies_failed = send_pending()
             hooks_sent, hooks_failed = webhooks.send_pending()
             syncs_ran, syncs_failed = run_syncs(budget=budget)
+            # Streets looked up for the map's pins (#913): a few a pass, one a second, so the
+            # addresses saved before the setting was switched on are found slowly too.
+            streets_pinned, streets_missed = geocoding.run()
             # The two things #247 leaves lying about: an export archive holding a whole
             # account, and a week of errand rows nobody is watching any more. Reaped on the
             # pass that already exists rather than by a second timer.
@@ -255,6 +258,11 @@ class Command(BaseCommand):
             self.stdout.write(f"{when} {syncs_ran} syncs ran, {syncs_failed} failed")
         if hooks_sent or hooks_failed:
             self.stdout.write(f"{when} {hooks_sent} webhooks delivered, {hooks_failed} failed")
+        if streets_pinned or streets_missed:
+            self.stdout.write(
+                f"{when} {streets_pinned} addresses pinned at their street, "
+                f"{streets_missed} not found"
+            )
         if reaped:
             self.stdout.write(f"{when} {reaped} finished errands and expired archives removed")
         if pages_gone:
