@@ -294,6 +294,7 @@ def pinned_addresses(person) -> list[dict]:
     from postulo.accounts.models import Profile
     from postulo.core import phones
     from postulo.core.models import PostalAddress
+    from postulo.core.templatetags.postulo import avatar_url, logo_url
 
     from . import placing
     from .models import Contact
@@ -321,6 +322,7 @@ def pinned_addresses(person) -> list[dict]:
                 True,
             )
             state = company.legal_state if company.legal_state != LegalState.ACTIVE else ""
+            picture = logo_url(company)
         elif row.content_type_id == contact_type:
             contact = contacts.get(row.object_id)
             if contact is None:
@@ -330,10 +332,10 @@ def pinned_addresses(person) -> list[dict]:
                 reverse("jobs:contact_update", args=[contact.pk]),
                 False,
             )
-            state = ""
+            state = picture = ""
         else:
             name, url, is_company = str(_("You")), reverse("accounts:profile"), False
-            state = ""
+            state, picture = "", avatar_url(person)
         lat, lon = row.latitude, row.longitude
         if row.placed_by not in placing.KEPT and row.place_key() != row.placed_from:
             placed = places_data_place(row)
@@ -352,6 +354,9 @@ def pinned_addresses(person) -> list[dict]:
                 #: A company's legal state when it is not active (#941): the map draws
                 #: such a pin differently and says why in its title.
                 "state": state,
+                #: The company's logo or the person's own picture, which the map draws as
+                #: the pin (#914); a contact has none, and an initials tile is not a pin.
+                "picture": picture,
                 "key": f"{row.content_type_id}:{row.object_id}",
                 "primary": row.is_primary,
                 "lat": lat,
@@ -908,6 +913,7 @@ class CompanyMapView(LoginRequiredMixin, TemplateView):
                 "company": entry["key"] if entry["company"] else "",
                 "state": entry["state"],
                 "state_label": str(LegalState(entry["state"]).label) if entry["state"] else "",
+                "picture": entry["picture"],
             }
             for entry in pinned
             if entry["lat"] is not None

@@ -661,3 +661,40 @@ def test_the_clusters_are_counted_in_the_readers_words(client, user):
 
     assert 'data-map-cluster="Companies here: {count}"' in html
     assert "leaflet.markercluster.js" in html and "MarkerCluster.css" in html
+
+
+def test_a_pin_carries_the_holders_picture_where_there_is_one(client, user, monkeypatch, tmp_path):
+    """A company's logo, the person's own picture, and a contact never (#914)."""
+    from postulo.jobs.models import Contact
+
+    with_cities(monkeypatch, tmp_path, LISBON)
+    with_logo = Company.objects.create(owner=user, name="Aperture", has_logo=True)
+    without = Company.objects.create(owner=user, name="Black Mesa")
+    someone = Contact.objects.create(owner=user, company=without, name="Caroline")
+    for holder in (with_logo, without):
+        an_address(user, holder)
+    an_address(user, someone, on_map=True)
+    an_address(user, user.profile, on_map=True)
+    user.profile.has_avatar = True
+    user.profile.save()
+
+    pictures = {entry["name"]: entry["picture"] for entry in page(client, user).context["drawn"]}
+
+    logo = reverse("jobs:company_logo", args=[with_logo.pk])
+    assert pictures["Aperture"].startswith(f"{logo}?v=")
+    assert pictures["You"].startswith(f"{reverse('accounts:avatar', args=[user.pk])}?v=")
+    assert pictures["Black Mesa"] == "" and pictures["Caroline"] == ""
+
+
+def test_a_picture_pin_falls_back_to_the_dot_and_keeps_its_name():
+    """Built only when drawn, decorative inside a marker that is named, and a dot on error."""
+    from pathlib import Path
+
+    script = (Path(__file__).resolve().parents[1] / "src/postulo/static/js/app.js").read_text(
+        encoding="utf-8"
+    )
+    drawing = script[script.index("var PictureIcon") : script.index("layer.addTo(map)")]
+
+    assert 'image.alt = ""' in drawing and "alt: entry.name" in drawing
+    assert '"error"' in drawing and "marker.setIcon" in drawing
+    assert "innerHTML" not in drawing and "html: '" not in drawing, "the address is not markup"

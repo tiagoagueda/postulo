@@ -3122,6 +3122,49 @@ html {
   }
 }
 
+/* A pin drawn as its holder's picture (#914): the company's logo or the person's own, in
+   Basecoat's avatar, filling the same 24-pixel box less a ring in the brand's colour so it reads
+   as a pin over any tile. The tile is reached as the icon's one child, because `.avatar` is
+   Basecoat's to define and `basecoat.css`'s to paint. The dot is not drawn under it; a dissolved
+   company's picture is grey and ringed grey, one in administration ringed amber, as their dots
+   are. An outline, not a shadow, because a forced-colours theme drops shadows and keeps
+   outlines, painting them in its own text colour. */
+.map-canvas .map-pin-picture::after {
+  content: none;
+}
+
+.map-canvas .map-pin-picture > span {
+  position: absolute;
+  inset: 2px;
+  background: white;
+  outline: 2px solid var(--color-brand-600);
+
+  @variant dark {
+    background: var(--color-ink-900);
+    outline-color: var(--color-brand-400);
+  }
+}
+
+.map-canvas .map-pin-picture.map-pin-dissolved > span {
+  outline-color: var(--color-ink-500);
+
+  @variant dark {
+    outline-color: var(--color-ink-300);
+  }
+}
+
+.map-canvas .map-pin-picture.map-pin-dissolved > span > img {
+  filter: grayscale(1);
+}
+
+.map-canvas .map-pin-picture.map-pin-administration > span {
+  outline-color: var(--color-amber-500);
+
+  @variant dark {
+    outline-color: var(--color-amber-400);
+  }
+}
+
 .map-canvas .map-cluster {
   display: flex;
   align-items: center;

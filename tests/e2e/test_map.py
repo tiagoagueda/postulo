@@ -7,6 +7,7 @@ answered here with a one-pixel image, and what the browser *sent* is what is che
 from __future__ import annotations
 
 import base64
+import re
 
 import pytest
 from playwright.sync_api import Page, expect
@@ -463,3 +464,34 @@ def test_a_dissolved_company_is_drawn_apart_and_says_why_in_its_title(
     expect(
         page.locator(".map-pin:not(.map-pin-dissolved):not(.map-pin-administration)")
     ).to_have_attribute("title", "Fine Ltd · Work")
+
+
+def test_a_company_with_a_logo_is_pinned_as_it_and_a_broken_one_as_the_dot(
+    live_server, page: Page, applicant
+):
+    """The pin is the logo, decorative inside a marker that keeps the company's name (#914);
+    a logo that will not load gives the marker its dot back."""
+    from django.core.files.base import ContentFile
+
+    from postulo.jobs import logos, placing
+    from postulo.jobs.models import Company
+
+    shown = Company.objects.create(owner=applicant, name="Logo Ltd", location="Aveiro, PT")
+    logos.store(shown, ContentFile(PIXEL), source="upload")
+    broken = Company.objects.create(owner=applicant, name="Broken Ltd", location="Faro, PT")
+    Company.objects.filter(pk=broken.pk).update(has_logo=True)  # nothing behind it: a 404
+    for company, lat, lon in ((shown, 40.64, -8.65), (broken, 37.02, -7.93)):
+        placing.place_by_hand(company.postal_addresses.get(), lat, lon)
+    breaches, _ = watch(page)
+
+    sign_in(page, live_server.url, "/jobs/companies/map/")
+
+    pin = page.locator(".map-pin-picture")
+    expect(pin).to_have_count(1)
+    expect(pin).to_have_attribute("title", "Logo Ltd · Work")
+    expect(pin.locator(".avatar.rounded img")).to_have_attribute("alt", "")
+    expect(pin.locator("img")).to_have_js_property("naturalWidth", 1)
+    dot = page.locator(".map-pin[title='Broken Ltd · Work']")
+    expect(dot).not_to_have_class(re.compile("map-pin-picture"))
+    expect(dot.locator("img")).to_have_count(0)
+    assert breaches == []

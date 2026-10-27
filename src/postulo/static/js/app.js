@@ -8922,7 +8922,38 @@
             },
           })
         : L.layerGroup();
-      markers.forEach(function (entry) {
+      // A pin whose holder has a picture is drawn as it (#914): the company's logo, rounded
+      // as its tile is, or the person's own, round. The marker's title and alt still name the
+      // holder, so the picture inside is decorative. One that fails to load gives its marker
+      // back the dot, now and whenever a cluster draws it again.
+      var drawn = [];
+      // Built each time Leaflet draws the marker, so a picture is asked for only once its pin
+      // is out of a cluster and on the map, never all of them as the page opens.
+      var PictureIcon = L.DivIcon.extend({
+        createIcon: function (old) {
+          var tile = document.createElement("span");
+          tile.className = "avatar " + this.options.shape;
+          var image = document.createElement("img");
+          image.alt = "";
+          image.setAttribute("data-pin", String(this.options.pin));
+          image.src = this.options.picture;
+          tile.appendChild(image);
+          this.options.html = tile;
+          return L.DivIcon.prototype.createIcon.call(this, old);
+        },
+      });
+      canvas.addEventListener(
+        "error",
+        function (event) {
+          var image = event.target;
+          var marker = image && image.closest && image.closest(".map-pin-picture") && drawn[image.getAttribute("data-pin")];
+          if (marker) {
+            marker.setIcon(L.divIcon({ className: marker.options.pinClass, iconSize: [24, 24] }));
+          }
+        },
+        true
+      );
+      markers.forEach(function (entry, index) {
         var point = [entry.lat, entry.lon];
         points.push(point);
         // A company that is dissolved or in administration is drawn differently (#941), and
@@ -8931,8 +8962,18 @@
         if (entry.state) {
           pinClass += " map-pin-" + entry.state;
         }
-        L.marker(point, {
-          icon: L.divIcon({ className: pinClass, iconSize: [24, 24] }),
+        var icon = entry.picture
+          ? new PictureIcon({
+              className: pinClass + " map-pin-picture",
+              iconSize: [24, 24],
+              picture: entry.picture,
+              shape: entry.company ? "rounded" : "rounded-full",
+              pin: index,
+            })
+          : L.divIcon({ className: pinClass, iconSize: [24, 24] });
+        drawn[index] = L.marker(point, {
+          icon: icon,
+          pinClass: pinClass,
           title: entry.name + (entry.what ? " · " + entry.what : "") + (entry.state_label ? " · " + entry.state_label : ""),
           alt: entry.name,
           company: entry.company,

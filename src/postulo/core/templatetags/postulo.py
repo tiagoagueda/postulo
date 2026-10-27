@@ -333,6 +333,23 @@ def _tile(
     )
 
 
+def avatar_url(user) -> str:
+    """The address of ``user``'s picture, stamped so a new one is never an old cache entry, or
+    ``""`` when they have none. The tile below and the map's pins (#914) both draw it."""
+    profile = getattr(user, "profile", None) if getattr(user, "pk", None) else None
+    if profile is None or not getattr(profile, "picture", None):
+        return ""
+    return f"{reverse('accounts:avatar', args=[user.pk])}?v={profile.picture_version}"
+
+
+def logo_url(company) -> str:
+    """The address of ``company``'s logo, stamped as `avatar_url` is, or ``""``."""
+    if company is None or not getattr(company, "has_logo", False):
+        return ""
+    stamp = int(company.logo_fetched_at.timestamp()) if company.logo_fetched_at else 0
+    return f"{reverse('jobs:company_logo', args=[company.pk])}?v={stamp}"
+
+
 @register.simple_tag
 def avatar(user, css_class: str = "size-7 text-xs") -> str:
     """An initials tile for ``user``, until a picture exists to show instead.
@@ -343,11 +360,8 @@ def avatar(user, css_class: str = "size-7 text-xs") -> str:
     button (#282). The colour is a stable function of the display name, so it is the
     same on every page and every device.
     """
-    profile = getattr(user, "profile", None) if getattr(user, "pk", None) else None
-    picture = getattr(profile, "picture", None) if profile is not None else None
-    if picture:
-        url = reverse("accounts:avatar", args=[user.pk])
-        return _tile(css_class, "rounded-full", picture=f"{url}?v={profile.picture_version}")
+    if picture := avatar_url(user):
+        return _tile(css_class, "rounded-full", picture=picture)
     name = user.display_name or ""
     colour = AVATAR_COLOURS[zlib.crc32(name.encode("utf-8")) % len(AVATAR_COLOURS)]
     return _tile(css_class, "rounded-full", colour=colour, letters=initials_for(user))
@@ -364,10 +378,8 @@ def company_logo(company, css_class: str = "size-6 text-[0.6rem]") -> str:
     """
     if company is None:
         return ""
-    if getattr(company, "has_logo", False):
-        url = reverse("jobs:company_logo", args=[company.pk])
-        stamp = int(company.logo_fetched_at.timestamp()) if company.logo_fetched_at else 0
-        return _tile(css_class, "rounded", picture=f"{url}?v={stamp}")
+    if picture := logo_url(company):
+        return _tile(css_class, "rounded", picture=picture)
     name = (company.name or "").strip()
     colour = AVATAR_COLOURS[zlib.crc32(name.encode("utf-8")) % len(AVATAR_COLOURS)]
     letters = "".join(word[0] for word in name.replace(".", " ").split()[:2]).upper() or "?"

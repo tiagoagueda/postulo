@@ -9105,6 +9105,50 @@ html {
     }
   }
 }
+.map-canvas .map-pin-picture::after {
+  content: none;
+}
+.map-canvas .map-pin-picture > span {
+  position: absolute;
+  inset: 2px;
+  background: white;
+  outline: 2px solid var(--color-brand-600);
+  &:where([data-theme="dark"], [data-theme="dark"] *) {
+    background: var(--color-ink-900);
+    outline-color: var(--color-brand-400);
+  }
+  @media (prefers-color-scheme: dark) {
+    &:where(:root:not([data-theme="light"]), :root:not([data-theme="light"]) *) {
+      background: var(--color-ink-900);
+      outline-color: var(--color-brand-400);
+    }
+  }
+}
+.map-canvas .map-pin-picture.map-pin-dissolved > span {
+  outline-color: var(--color-ink-500);
+  &:where([data-theme="dark"], [data-theme="dark"] *) {
+    outline-color: var(--color-ink-300);
+  }
+  @media (prefers-color-scheme: dark) {
+    &:where(:root:not([data-theme="light"]), :root:not([data-theme="light"]) *) {
+      outline-color: var(--color-ink-300);
+    }
+  }
+}
+.map-canvas .map-pin-picture.map-pin-dissolved > span > img {
+  filter: grayscale(1);
+}
+.map-canvas .map-pin-picture.map-pin-administration > span {
+  outline-color: var(--color-amber-500);
+  &:where([data-theme="dark"], [data-theme="dark"] *) {
+    outline-color: var(--color-amber-400);
+  }
+  @media (prefers-color-scheme: dark) {
+    &:where(:root:not([data-theme="light"]), :root:not([data-theme="light"]) *) {
+      outline-color: var(--color-amber-400);
+    }
+  }
+}
 .map-canvas .map-cluster {
   display: flex;
   align-items: center;

@@ -267,6 +267,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### ✨ Added
 
+- A map pin whose holder has a picture is drawn as it: the company's logo, or your own picture on your own addresses, ringed in the brand's colour; a contact keeps the dot, and a picture that fails to load gives its pin the dot back. (#914)
 - An address with a street can be pinned at its street by Nominatim, Photon or addok, off by default and switched on with the operator's consent; the scheduler looks one address up a second, existing ones included, and never moves a pin placed by hand. (#913)
 - With Postulo installed, a Postulo link followed from mail, chat or an extension opens in the app where the browser captures links, and reuses an open app window, taken to the link's address; the browser suite asks the full Chromium whether it would install Postulo, signed in and signed out. (#899)
 - The languages each release must carry complete are listed once, in `messages_tool.SELECTED`: 0.5 adds fr-CA, en-CA, es-MX, be, cnr, fo, nn, rm, az, kk, zh-Hans, zh-Hant, Arabic, Hindi, Urdu, Bengali and Indonesian to 0.4's 39, and every release gate reads it. (#347)
