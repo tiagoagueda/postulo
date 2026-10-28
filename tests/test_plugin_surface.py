@@ -863,3 +863,27 @@ def test_the_services_that_write_import_neither_a_user_nor_a_profile():
         if line.startswith(("from ", "import "))
     ]
     assert not [line for line in imports if "accounts" in line or "auth" in line]
+
+
+def test_the_surface_holds_what_a_theme_needs_to_check_its_own_files():
+    """A theme's files reach its document through `{% load theme_assets %}`; the surface
+    holds what a plugin's own tests check them with, and the two ceilings (#343)."""
+    from django.template import engines
+
+    from postulo.documents import theme_assets
+    from postulo.plugins import api
+
+    for name in (
+        "MAX_THEME_ASSET_BYTES",
+        "MAX_THEME_DOCUMENT_BYTES",
+        "ThemeAssetRefused",
+        "load_theme_asset",
+    ):
+        assert name in api.__all__, name
+    assert api.load_theme_asset is theme_assets.load
+    assert api.ThemeAssetRefused is theme_assets.Refused
+    assert api.MAX_THEME_ASSET_BYTES == theme_assets.MAX_ASSET_BYTES
+    assert api.MAX_THEME_DOCUMENT_BYTES == theme_assets.MAX_DOCUMENT_BYTES
+    # The template library loads by that name, and the tag outside a document writes nothing.
+    template = engines["django"].from_string("{% load theme_assets %}[{% theme_asset 'x.svg' %}]")
+    assert template.render({}) == "[]"

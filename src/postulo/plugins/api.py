@@ -138,6 +138,10 @@ if TYPE_CHECKING:  # pragma: no cover - the names `__getattr__` resolves at run 
     from postulo.documents.formats import register as register_document_format
     from postulo.documents.outline import Outline
     from postulo.documents.rendering import PersonCard, person_card
+    from postulo.documents.theme_assets import MAX_ASSET_BYTES as MAX_THEME_ASSET_BYTES
+    from postulo.documents.theme_assets import MAX_DOCUMENT_BYTES as MAX_THEME_DOCUMENT_BYTES
+    from postulo.documents.theme_assets import Refused as ThemeAssetRefused
+    from postulo.documents.theme_assets import load as load_theme_asset
     from postulo.documents.themes import Kind as ThemeKind
     from postulo.documents.themes import Theme
     from postulo.jobs.history import record_listing_event
@@ -225,6 +229,8 @@ __all__ = [
     "EVENTS",
     "MAIL",
     "MAX_IMPORT_BYTES",
+    "MAX_THEME_ASSET_BYTES",
+    "MAX_THEME_DOCUMENT_BYTES",
     "MEDIUMS",
     "TEXT",
     "AddressRow",
@@ -286,6 +292,7 @@ __all__ = [
     "TestResult",
     "TextMessage",
     "Theme",
+    "ThemeAssetRefused",
     "ThemeKind",
     "Transfer",
     "TransportPlugin",
@@ -318,6 +325,7 @@ __all__ = [
     "language_tag",
     "link_service_of",
     "links_for",
+    "load_theme_asset",
     "manifest_of",
     "medium_of",
     "messaging_service_of",
@@ -551,6 +559,19 @@ _ELSEWHERE: dict[str, tuple[str, str]] = {
     "language_matches": ("postulo.core.languages", "matches"),
     "language_override": ("postulo.core.languages", "override"),
     "language_tag": ("postulo.core.languages", "tag"),
+    # ------------------------------------------------- a theme's own files (#343)
+    # A theme writes a file from its own package into its document with the template tag
+    # ``{% load theme_assets %}{% theme_asset "logo.svg" %}``: an SVG as sanitised markup,
+    # an image as a ``data:`` address, a font as an ``@font-face`` rule, chosen by what the
+    # file's bytes are. Nothing is fetched while drawing; the file is in the HTML before the
+    # renderer starts. These are for a plugin's own tests: `load_theme_asset(package, name)`
+    # reads, checks and prepares one file as the tag would, and raises `ThemeAssetRefused`
+    # with the reason where the tag would write nothing; the two ceilings are what one file,
+    # and all of one document's, may weigh.
+    "MAX_THEME_ASSET_BYTES": ("postulo.documents.theme_assets", "MAX_ASSET_BYTES"),
+    "MAX_THEME_DOCUMENT_BYTES": ("postulo.documents.theme_assets", "MAX_DOCUMENT_BYTES"),
+    "ThemeAssetRefused": ("postulo.documents.theme_assets", "Refused"),
+    "load_theme_asset": ("postulo.documents.theme_assets", "load"),
 }
 
 

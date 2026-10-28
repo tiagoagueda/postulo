@@ -26,6 +26,7 @@ reason to add one for a plugin that only parses adverts.
 from __future__ import annotations
 
 import logging
+from dataclasses import replace
 from pathlib import Path
 
 from postulo.documents import themes
@@ -134,4 +135,26 @@ def register_plugin_themes(plugin, module_name: str = "") -> int:
             getattr(plugin, "name", module_name),
         )
 
-    return sum(1 for one in declared if themes.register(one))
+    # Each theme reads its files from the plugin's own package, whatever it wrote in
+    # `package`: a theme that could name another package could inline that one's files
+    # (#343).
+    package = package_of(module_name)
+    return sum(1 for one in declared if themes.register(replace(one, package=package)))
+
+
+def package_of(module_name: str) -> str:
+    """The package a theme's own files are read from: the plugin's module, or the package
+    holding it, the way a plugin's logo is found (`logos`).
+
+    Empty for a plugin that is a module at the top level, with no package of its own: the
+    directory holding it is ``site-packages``, which is everybody's.
+    """
+    import importlib.util
+
+    try:
+        spec = importlib.util.find_spec(module_name)
+    except (ImportError, ValueError):
+        spec = None
+    if spec is not None and spec.submodule_search_locations:
+        return module_name
+    return module_name.rpartition(".")[0]

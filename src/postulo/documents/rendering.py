@@ -17,7 +17,7 @@ from postulo.core import languages, personal
 
 from . import formats as file_formats
 from . import properties as file_properties
-from . import themes
+from . import theme_assets, themes
 from .models import (
     CV,
     CoverLetter,
@@ -505,6 +505,15 @@ def cv_contact(cv: CV) -> dict | None:
     return contact_details(cv.owner, cv) if cv.show_contact_details else None
 
 
+def _inliner(theme_name: str) -> theme_assets.Inliner:
+    """What writes the theme's own files into this one document (#343).
+
+    The theme `themes.template_for` sets the document in, the default included: one per
+    document, because the ceiling on what a theme inlines is a ceiling per document.
+    """
+    return theme_assets.Inliner(themes.find(theme_name) or themes.find(themes.DEFAULT))
+
+
 def render_cv_html(cv: CV, *, nonce=None, properties=None) -> str:
     """Render a CV variant to a complete, self-contained HTML document.
 
@@ -534,6 +543,7 @@ def render_cv_html(cv: CV, *, nonce=None, properties=None) -> str:
                 "contact": contact,
                 "document_direction": document_direction(cv),
                 "csp_nonce": nonce,
+                theme_assets.CONTEXT_KEY: _inliner(cv.theme),
                 **_properties_context(cv, contact["name"] if contact else "", properties),
             },
         )
@@ -889,6 +899,7 @@ def render_letter_html(
                 "recipient": values["company"],
                 "document_direction": document_direction(letter),
                 "csp_nonce": nonce,
+                theme_assets.CONTEXT_KEY: _inliner(letter.theme),
                 **_properties_context(letter, contact["name"], properties),
             },
         )

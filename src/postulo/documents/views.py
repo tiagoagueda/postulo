@@ -377,19 +377,30 @@ def _nonce(request: HttpRequest) -> str | None:
     return str(nonce) if nonce is not None else None
 
 
-#: The one policy under which a preview may be framed by its own editing page (#293).
+#: The one policy a document preview is served under: the instance's, with two directives
+#: changed, and on the two preview views alone.
 #:
-#: A framed document is refused by *its own* headers, not by the page framing it: the
-#: instance-wide policy says `frame-ancestors 'none'` and `X-Frame-Options: DENY`, which is
-#: right for every page a person operates and wrong for the two documents that exist to be
-#: looked at from beside their controls. The override is the instance policy with that one
-#: directive turned to `'self'`, so the nonce the preview's `<style>` needs is still in it;
-#: the `X-Frame-Options` decorator below says the same thing in the older header for the
-#: browsers that still read it. Both are on the preview views alone.
-FRAMEABLE_BY_OURSELVES = {**settings.SECURE_CSP, "frame-ancestors": [CSP.SELF]}
+#: **Framed by its own editing page (#293).** A framed document is refused by *its own*
+#: headers, not by the page framing it: the instance-wide policy says `frame-ancestors
+#: 'none'` and `X-Frame-Options: DENY`, which is right for every page a person operates and
+#: wrong for the two documents that exist to be looked at from beside their controls. Here
+#: that one directive is `'self'`, so the nonce the preview's `<style>` needs is still in
+#: it; the `X-Frame-Options` decorator below says the same thing in the older header for the
+#: browsers that still read it.
+#:
+#: **A `data:` font (#343).** A theme's own typeface reaches its document as an
+#: `@font-face` rule with a `data:` source, because the renderer fetches nothing, and the
+#: preview is the same HTML. `font-src 'self'` refused it, so the preview drew in another
+#: font than the PDF. Allowed here and nowhere else: Postulo's own pages carry no font
+#: they did not serve, and a `data:` font on them would be one that markup put there.
+PREVIEW_POLICY = {
+    **settings.SECURE_CSP,
+    "frame-ancestors": [CSP.SELF],
+    "font-src": [*settings.SECURE_CSP["font-src"], "data:"],
+}
 
 
-@method_decorator(csp_override(FRAMEABLE_BY_OURSELVES), name="dispatch")
+@method_decorator(csp_override(PREVIEW_POLICY), name="dispatch")
 @method_decorator(xframe_options_sameorigin, name="dispatch")
 class CVPreviewView(OwnedObjectMixin, View):
     """The CV as HTML, exactly as the PDF renderer will see it.
@@ -601,7 +612,7 @@ class CoverLetterDeleteView(ConfirmDeleteMixin, OwnedObjectMixin, DeleteView):
     success_url = reverse_lazy("documents:letter_list")
 
 
-@method_decorator(csp_override(FRAMEABLE_BY_OURSELVES), name="dispatch")
+@method_decorator(csp_override(PREVIEW_POLICY), name="dispatch")
 @method_decorator(xframe_options_sameorigin, name="dispatch")
 class CoverLetterPreviewView(OwnedObjectMixin, View):
     """Preview a letter, optionally as it would read for one application.

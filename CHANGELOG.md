@@ -268,6 +268,7 @@ All notable changes to Postulo are recorded here. The format follows
 ### ✨ Added
 
 - A map pin whose holder has a picture is drawn as it: the company's logo, or your own picture on your own addresses, ringed in the brand's colour; a contact keeps the dot, and a picture that fails to load gives its pin the dot back. (#914)
+- A plugin theme can carry its own fonts, SVG drawings and images: {% theme_asset %} writes them into the document before drawing, so nothing is fetched; the preview alone allows a data: font, and check_fonts and Overview say which scripts a theme's font draws. (#343)
 - An address with a street can be pinned at its street by Nominatim, Photon or addok, off by default and switched on with the operator's consent; the scheduler looks one address up a second, existing ones included, and never moves a pin placed by hand. (#913)
 - With Postulo installed, a Postulo link followed from mail, chat or an extension opens in the app where the browser captures links, and reuses an open app window, taken to the link's address; the browser suite asks the full Chromium whether it would install Postulo, signed in and signed out. (#899)
 - A publication can be filled in from its DOI (Look up, via doi.org) and suggested from your stored ORCID record, only when you press: blanks only, nothing kept until you save, 20 presses an hour (POSTULO_LOOKUP_RATE), and a publication-lookups feature to switch it off. (#688)

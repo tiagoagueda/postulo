@@ -85,6 +85,29 @@
             {% endif %}
           </dd>
         </div>
+        {% comment %} A theme's own fonts, each with the scripts it declares, those it does
+           not draw in red: a document in one of those is set in the server's fonts (#343).
+           Absent when no installed theme brings a font. {% endcomment %}
+        {% if theme_fonts %}
+          <div class="flex justify-between gap-4" data-theme-fonts>
+            <dt class="text-ink-500 dark:text-ink-400">{% translate "Theme fonts" %}</dt>
+            <dd class="min-w-0 text-end">
+              {% for font in theme_fonts %}
+                <span class="block">
+                  <bdi>{{ font.theme }}</bdi> · <code>{{ font.name }}</code>:
+                  {% if font.readable %}
+                    {% for script, drawable in font.scripts %}{% if not forloop.first %}, {% endif %}<span class="{% if not drawable %}text-red-600 dark:text-red-400{% endif %}">{{ script }}</span>{% endfor %}
+                  {% else %}
+                    <span class="text-red-600 dark:text-red-400">{% translate "cannot be read" %}</span>
+                  {% endif %}
+                </span>
+              {% endfor %}
+              <span class="block text-xs text-ink-500 dark:text-ink-400">
+                {% translate "A document in a script shown in red is set in the server's fonts instead." %}
+              </span>
+            </dd>
+          </div>
+        {% endif %}
         <div class="flex justify-between gap-4">
           <dt class="text-ink-500 dark:text-ink-400">{% translate "Queued tasks" %}</dt>
           <dd>{% if queued_tasks is not None %}{{ queued_tasks }}{% else %}—{% endif %}</dd>

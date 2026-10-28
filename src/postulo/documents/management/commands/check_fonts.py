@@ -21,7 +21,7 @@ from __future__ import annotations
 from django.core.management.base import BaseCommand, CommandError
 
 from postulo.core import languages
-from postulo.documents import fonts
+from postulo.documents import fonts, theme_assets
 
 
 class Command(BaseCommand):
@@ -31,6 +31,7 @@ class Command(BaseCommand):
     )
 
     def handle(self, *args, **options) -> None:
+        self._theme_fonts()
         offered = sorted(languages.scripts_offered())
         answer = fonts.renderable_scripts()
         if answer is None:
@@ -77,3 +78,28 @@ class Command(BaseCommand):
                     "in every style they are written in."
                 )
             )
+
+    def _theme_fonts(self) -> None:
+        """What each installed theme's own fonts draw of the scripts they declare (#343).
+
+        Asked of the font file's own character map, the same character the server's fonts
+        are asked for. Said, and never a reason to exit non-zero: a document in a script a
+        theme's font does not draw is set in the server's fonts instead, which is what the
+        rest of this command checks.
+        """
+        for check in theme_assets.theme_fonts():
+            where = f"{check.name}, theme {check.theme}"
+            if check.problem:
+                self.stdout.write(self.style.WARNING(f"cannot read  {where}: {check.problem}"))
+                continue
+            for script, drawn in check.scripts:
+                name = languages.script_name(script)
+                if drawn:
+                    self.stdout.write(self.style.SUCCESS(f"draws      {name} in {where}"))
+                else:
+                    self.stdout.write(
+                        self.style.WARNING(
+                            f"declared, not drawn  {name} in {where}: such a document "
+                            "is set in the server's fonts"
+                        )
+                    )

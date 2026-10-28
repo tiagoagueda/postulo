@@ -176,6 +176,26 @@ def _font_scripts() -> list[tuple[str, bool]] | None:
     return sorted((languages.script_name(script), drawable) for script, drawable in answer.items())
 
 
+def _theme_fonts() -> list[dict]:
+    """Each font an installed theme declares, and which of its declared scripts it draws.
+
+    Read from the font files themselves, so it answers where WeasyPrint's libraries are
+    absent too; a theme with no fonts of its own is not listed (#343).
+    """
+    from postulo.core import languages
+    from postulo.documents import theme_assets
+
+    return [
+        {
+            "theme": check.theme,
+            "name": check.name,
+            "scripts": [(languages.script_name(script), drawn) for script, drawn in check.scripts],
+            "readable": not check.problem,
+        }
+        for check in theme_assets.theme_fonts()
+    ]
+
+
 def _queued_tasks() -> int | None:
     try:
         from django_tasks_db.models import DBTaskResult
@@ -210,6 +230,8 @@ class OverviewView(ServerSectionMixin, TemplateView):
                 # the scripts the offered languages need this machine's fonts draw.
                 # ``None`` says the machine cannot be asked (#74).
                 "font_scripts": _font_scripts(),
+                # And the fonts a theme brings in its own package, read the same way (#343).
+                "theme_fonts": _theme_fonts(),
                 "media_root": filestore.root(),
                 # What the scrub last found wrong, across every account: a count and no more,
                 # as the rest of this page is (#663).

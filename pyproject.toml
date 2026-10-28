@@ -75,6 +75,13 @@ dependencies = [
     "markdown-it-py>=4.2,<5",
     "nh3>=0.3.7,<0.4",
     "icalendar>=7.1.3",
+    # A theme's own files (#343): fontTools reads a font a theme brings, to check it draws the
+    # scripts it says it does, and tinycss2 with cssselect2 turn an inlined SVG's `<style>`
+    # into presentation attributes. All three already arrive with WeasyPrint; named because
+    # `documents/theme_assets.py` imports them itself.
+    "fonttools>=4.64",
+    "tinycss2>=1.5",
+    "cssselect2>=0.10",
 ]
 
 [project.optional-dependencies]

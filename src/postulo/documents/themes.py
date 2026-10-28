@@ -48,7 +48,7 @@ template.
 from __future__ import annotations
 
 import logging
-from collections.abc import Mapping
+from collections.abc import Mapping, Sequence
 from dataclasses import dataclass, field
 
 from django.core.exceptions import ValidationError
@@ -96,6 +96,16 @@ class Theme:
     templates: Mapping[str, str] = field(default_factory=dict)
     #: Who provides it, in words, for the page that lists them. Empty for Postulo's own.
     provider: str = ""
+    #: Each font file the theme carries → the scripts it draws, by ISO 15924 code:
+    #: ``{"fonts/Vellum.woff2": ("Latn", "Grek")}``. The declaration `theme_asset` and
+    #: ``check_fonts`` hold the file to: a document in a script its fonts do not both declare
+    #: and draw is set in the server's fonts instead (#343, #74). A font missing from it is
+    #: not written at all, since nothing would be known about what it draws.
+    font_scripts: Mapping[str, Sequence[str]] = field(default_factory=dict)
+    #: The package the theme's own files are read from (#343). Set when a plugin's themes are
+    #: registered, to the package the plugin is defined in, whatever the plugin wrote here: a
+    #: theme reads its own files and nobody else's. Empty for Postulo's own, which carry none.
+    package: str = ""
 
     def sets(self, kind: str) -> bool:
         return kind in self.templates
