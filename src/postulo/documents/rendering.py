@@ -44,6 +44,7 @@ SECTION_LABELS = {
     "education": _("Education"),
     "project": _("Projects"),
     "publication": _("Publications"),
+    "citation": _("Citations"),
     "link": _("Links"),
     "skillgroup": _("Skills"),
     "certification": _("Certifications"),
@@ -678,6 +679,17 @@ def _section_blocks(cv: CV, section: Section, *, as_portfolio: bool) -> list:
                         )
                     ]
                 ),
+                *([file_formats.paragraph(one.item.summary)] if one.item.summary.strip() else []),
+            )
+        ]
+    elif section.kind == "citation":
+        # The count, its source and its month, after the paper's title where it counts one,
+        # with the person's line under it: the words the themes print (#697).
+        return [
+            block
+            for one in entries
+            for block in (
+                file_formats.bullets([one.item.cv_line]),
                 *([file_formats.paragraph(one.item.summary)] if one.item.summary.strip() else []),
             )
         ]

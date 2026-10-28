@@ -1366,6 +1366,13 @@ msgstr "%(title)s Hakuna jibu: %(detail)s"
 msgid "%(title)s still answers."
 msgstr "%(title)s bado inajibu."
 
+#: src/postulo/resume/models.py
+#, python-format
+msgid "%(title)s: cited %(count)s time (%(source)s, %(date)s)"
+msgid_plural "%(title)s: cited %(count)s times (%(source)s, %(date)s)"
+msgstr[0] ""
+msgstr[1] ""
+
 #: src/postulo/jobs/vcards.py
 #, fuzzy, python-format
 msgid "%(total)s address"
@@ -2171,6 +2178,10 @@ msgstr "Kikomo hakiwezi kutekelezwa peke yake: kukimbia kavu inasema nini sera i
 #, fuzzy
 msgid "A line at the end, which names nobody. A reference from your career is printed only once the person has agreed, whatever this says."
 msgstr "Mwisho wa mstari, ambayo hakuna mtu anayeita. Kumbuka kutoka kwa kazi yako huchapishwa mara tu mtu amekubali, chochote hii inasema."
+
+#: src/postulo/resume/forms.py
+msgid "A line of your own, such as what the count covers."
+msgstr ""
 
 #: src/postulo/resume/forms.py
 #, fuzzy
@@ -3383,6 +3394,10 @@ msgstr "Orodha zote"
 msgid "All of them are offered, and a language added in a later release will be too."
 msgstr "Wote ni inapatikana, na lugha aliongeza katika kutolewa baadaye pia."
 
+#: src/postulo/resume/forms.py
+msgid "All of your work"
+msgstr ""
+
 #: src/postulo/core/help.py
 #, fuzzy
 msgid "All optional, and none of it is worked out from anything else. None of it is printed until a CV is set to print it, one by one, under “Choose which details” on the CV."
@@ -4194,6 +4209,10 @@ msgstr "Kama tangazo la kazi linavyoeleza — jiji, eneo, nchi. Maandishi huru: 
 #, fuzzy
 msgid "As the posting words it. The ISCO-08 code the words match in the ESCO classification follows the posting, in the language you read; a title that matches nothing has no code, and that is not a lesser kind of job."
 msgstr "Kama maneno ya kuandika. Msimbo wa ISCO-08 ambao maneno yanalingana na uainishaji wa ESCO unafuata chapisho, kwa lugha unayosoma; cheo ambacho hakilingani na msimbo, na hiyo sio aina ndogo ya kazi."
+
+#: src/postulo/resume/forms.py
+msgid "As the source states it on the day you read it."
+msgstr ""
 
 #: src/postulo/templates/documents/letter_detail.html
 #, fuzzy
@@ -5283,6 +5302,10 @@ msgstr "Chagua moja ya mistari katika maelezo yako."
 msgid "Choose one of your own contacts."
 msgstr "Chagua moja ya mawasiliano yako mwenyewe."
 
+#: src/postulo/resume/forms.py src/postulo/resume/models.py
+msgid "Choose one of your own publications."
+msgstr ""
+
 #: src/postulo/templates/help/telephone_numbers.html
 #, fuzzy
 msgid "Choose the country the number is in and type the number the way it is written there. Or type it in full, starting with +, and the country chosen is ignored. It is kept in the international form, so it can be dialled from anywhere, and documents print it grouped the way its country writes it."
@@ -5334,9 +5357,34 @@ msgid "Chosen for this CV"
 msgstr "Kuchaguliwa kwa CV hii"
 
 #: src/postulo/resume/models.py
+msgid "citation count"
+msgstr ""
+
+#: src/postulo/resume/registry.py
+msgid "Citation count"
+msgstr ""
+
+#: src/postulo/resume/models.py
 #, fuzzy
 msgid "citation key"
 msgstr "maneno muhimu"
+
+#: src/postulo/documents/rendering.py src/postulo/resume/candidate.py
+#: src/postulo/resume/registry.py src/postulo/resume/views_candidate.py
+#: src/postulo/templates/resume/preview.html
+msgid "Citations"
+msgstr ""
+
+#: src/postulo/resume/models.py
+msgid "citations"
+msgstr ""
+
+#: src/postulo/resume/models.py
+#, python-format
+msgid "Cited %(count)s time (%(source)s, %(date)s)"
+msgid_plural "Cited %(count)s times (%(source)s, %(date)s)"
+msgstr[0] ""
+msgstr[1] ""
 
 #: src/postulo/core/personal.py
 #, fuzzy
@@ -5945,6 +5993,10 @@ msgstr "Imehesabiwa kutoka kwenye matangazo ya kazi yaliyorekodiwa hapa; hakuna 
 #, fuzzy
 msgid "Counted from the timeline, so interviews recorded before the diary existed are in."
 msgstr "Kulingana na ratiba, hivyo mahojiano yaliyoandikwa kabla ya diary kuwepo ni katika."
+
+#: src/postulo/resume/models.py
+msgid "counted on"
+msgstr ""
 
 #: src/postulo/core/models.py src/postulo/core/postal.py
 #: src/postulo/resume/models.py
@@ -8925,6 +8977,10 @@ msgstr "Kiasi gani cha nafasi ya kuondoka"
 msgid "How much you sent, month by month, so a quiet stretch is visible."
 msgstr "Na kwa mwezi unapolifuatia."
 
+#: src/postulo/resume/registry.py
+msgid "How often your work has been cited, as a source counted it on a given day: for all of it, or for one publication. Postulo counts nothing itself."
+msgstr ""
+
 #: src/postulo/templates/help/your_details.html
 #, fuzzy, python-format
 msgid "How Postulo behaves for you, such as its theme, its language and your account, is not here: it is under <a href=\"%(settings_url)s\" class=\"underline\">Settings</a>."
@@ -10521,6 +10577,10 @@ msgstr "Acha kama ilivyo"
 #, fuzzy
 msgid "Leave it empty for a single day or when it has no end."
 msgstr "Acha kwa siku moja au wakati hauna mwisho."
+
+#: src/postulo/resume/forms.py
+msgid "Leave it empty for all of your work together, as a profile page counts it; choose a publication for the count of that one."
+msgstr ""
 
 #: src/postulo/resume/forms.py
 #, fuzzy
@@ -17694,7 +17754,7 @@ msgstr "Panga kwa %(column)s, kubwa zaidi kwanza"
 msgid "Sort by %(column)s, lowest first"
 msgstr "Panga kwa %(column)s, ndogo zaidi kwanza"
 
-#: src/postulo/jobs/models.py
+#: src/postulo/jobs/models.py src/postulo/resume/models.py
 #, fuzzy
 msgid "source"
 msgstr "chanzo"
@@ -19429,6 +19489,10 @@ msgstr "Tarehe ambayo wewe unataka kutuma. Sema: Leteni hoja zenu kama nyinyi ni
 msgid "The day it was true or reported, not today's date unless it is."
 msgstr "Siku hiyo ilikuwa ya kweli au iliyoripotiwa, si tarehe ya leo isipokuwa kama ni kweli."
 
+#: src/postulo/resume/forms.py
+msgid "The day you read the count. A count changes, so a CV prints the month and the year beside it."
+msgstr ""
+
 #: src/postulo/templates/server/plugins.html
 #, fuzzy
 msgid "The default for every account. One person's exceptions are on their row under People. Switching a plugin off stops it being used and deletes nothing."
@@ -19572,6 +19636,10 @@ msgstr "Faili ina aina nyingine ya aina hii, na mtu ana moja ya kila mmoja."
 #, fuzzy
 msgid "The file has two groups under the number it names."
 msgstr "Orodha hiyo ina makundi mawili chini ya jina lake."
+
+#: src/postulo/resume/candidate.py
+msgid "The file has two publications under the number it names, so it will be a count for all of your work."
+msgstr ""
 
 #: src/postulo/templates/jobs/contact_vcards.html
 #, fuzzy, python-format
@@ -20074,6 +20142,10 @@ msgid_plural "The page was not drawn within %(seconds)s seconds, so it was left.
 msgstr[0] "Ukurasa haukuchorwa ndani ya sekunde %(seconds)s, kwa hiyo uliachwa."
 msgstr[1] "Ukurasa haukuchorwa ndani ya sekunde %(seconds)s, kwa hiyo uliachwa."
 
+#: src/postulo/resume/forms.py
+msgid "The page you read it on. A CV does not print it."
+msgstr ""
+
 #: src/postulo/jobs/forms.py
 #, fuzzy
 msgid "The part of the economy it is in. Narrows the suggestions below, and an industry of your own added here is filed under it."
@@ -20181,6 +20253,14 @@ msgstr "Anwani ya ishara ya mtoa huduma itaelekezwa, na Postulo haifuati."
 #, fuzzy
 msgid "The public employment service you are registered with. Add it under Companies, as a public employment service, if it is not here."
 msgstr "Huduma ya ajira ya umma ambayo umejiandikisha nayo. Ongeza chini ya makampuni, kama huduma ya ajira ya umma, ikiwa sio hapa."
+
+#: src/postulo/resume/candidate.py
+msgid "The publication it counts cannot be added, so it will be a count for all of your work."
+msgstr ""
+
+#: src/postulo/resume/candidate.py
+msgid "The publication it counts is not in the file, so it will be a count for all of your work."
+msgstr ""
 
 #: src/postulo/applications/views.py
 #, fuzzy
@@ -21461,6 +21541,10 @@ msgstr "Muda wa"
 #, fuzzy
 msgid "timeout in seconds"
 msgstr "muda katika sekunde"
+
+#: src/postulo/resume/models.py
+msgid "times cited"
+msgstr ""
 
 #: src/postulo/documents/forms.py
 #, fuzzy
@@ -23239,6 +23323,10 @@ msgstr "Wakati <em>Kanuni za anwani kwa nchi</em> zimewashwa kwako, sehemu za sa
 #, fuzzy
 msgid "Who awarded it, as a CV should print it. It is linked to the company of that name among yours, and added to your companies if there is none."
 msgstr "Ni nani aliyempa, kama CV inapaswa kuichapisha. Ni kuunganishwa na kampuni ya jina hilo miongoni mwenu, na aliongeza kwa makampuni yako kama hakuna."
+
+#: src/postulo/resume/forms.py
+msgid "Who counted: Google Scholar, Scopus, Web of Science or any other. Postulo counts nothing itself."
+msgstr ""
 
 #: src/postulo/resume/forms.py
 #, fuzzy

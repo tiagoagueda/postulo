@@ -593,7 +593,7 @@ def archive_of(user):
 
 
 def test_the_format_is_75_and_says_what_75_added():
-    assert export.FORMAT_VERSION == 75
+    assert export.FORMAT_VERSION >= 75
     with open(export.__file__, encoding="utf-8") as source:
         assert "75 added a company's status" in source.read()
 

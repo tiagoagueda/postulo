@@ -1366,6 +1366,13 @@ msgstr "%(title)s n'a pas répondu : %(detail)s"
 msgid "%(title)s still answers."
 msgstr "%(title)s répond toujours."
 
+#: src/postulo/resume/models.py
+#, python-format
+msgid "%(title)s: cited %(count)s time (%(source)s, %(date)s)"
+msgid_plural "%(title)s: cited %(count)s times (%(source)s, %(date)s)"
+msgstr[0] ""
+msgstr[1] ""
+
 #: src/postulo/jobs/vcards.py
 #, python-format
 msgid "%(total)s address"
@@ -2061,6 +2068,10 @@ msgstr "Une limite ne s'applique jamais d'elle-même : la simulation dit ce que
 #: src/postulo/documents/models.py
 msgid "A line at the end, which names nobody. A reference from your career is printed only once the person has agreed, whatever this says."
 msgstr "Une ligne à la fin, qui ne nomme personne. Une référence de votre parcours ne figure sur le CV qu'une fois que la personne a donné son accord, quoi que dise ce réglage."
+
+#: src/postulo/resume/forms.py
+msgid "A line of your own, such as what the count covers."
+msgstr ""
 
 #: src/postulo/resume/forms.py
 msgid "A line or two. It prints under the dates on a CV."
@@ -3069,6 +3080,10 @@ msgstr "Toutes les annonces"
 msgid "All of them are offered, and a language added in a later release will be too."
 msgstr "Toutes sont proposées, et une langue ajoutée dans une version ultérieure le sera aussi."
 
+#: src/postulo/resume/forms.py
+msgid "All of your work"
+msgstr ""
+
 #: src/postulo/core/help.py
 msgid "All optional, and none of it is worked out from anything else. None of it is printed until a CV is set to print it, one by one, under “Choose which details” on the CV."
 msgstr "Tout est facultatif, et rien n'est déduit d'autre chose. Rien n'est imprimé tant qu'un CV n'est pas réglé pour l'imprimer, un par un, sous « Choisir les informations » sur le CV."
@@ -3744,6 +3759,10 @@ msgstr "Tel que l'annonce le formule — une ville, une région, un pays. Texte 
 #: src/postulo/jobs/forms.py
 msgid "As the posting words it. The ISCO-08 code the words match in the ESCO classification follows the posting, in the language you read; a title that matches nothing has no code, and that is not a lesser kind of job."
 msgstr "Tel que l'annonce le formule. Le code ISCO-08 auquel ces mots correspondent dans la classification ESCO suit l'annonce, dans la langue que vous lisez; un intitulé qui ne correspond à rien n'a pas de code, et ce n'est pas pour autant un emploi de second rang."
+
+#: src/postulo/resume/forms.py
+msgid "As the source states it on the day you read it."
+msgstr ""
 
 #: src/postulo/templates/documents/letter_detail.html
 msgid "As they will read it"
@@ -4643,6 +4662,10 @@ msgstr "Choisissez l'une des lignes de vos coordonnées."
 msgid "Choose one of your own contacts."
 msgstr "Choisissez l'un de vos propres contacts."
 
+#: src/postulo/resume/forms.py src/postulo/resume/models.py
+msgid "Choose one of your own publications."
+msgstr ""
+
 #: src/postulo/templates/help/telephone_numbers.html
 msgid "Choose the country the number is in and type the number the way it is written there. Or type it in full, starting with +, and the country chosen is ignored. It is kept in the international form, so it can be dialled from anywhere, and documents print it grouped the way its country writes it."
 msgstr "Choisissez le pays du numéro et saisissez le numéro comme on l'écrit dans ce pays. Ou saisissez-le en entier, en le faisant commencer par +, et le pays choisi est ignoré. Il est conservé sous forme internationale, pour pouvoir être composé de partout, et les documents l'impriment groupé comme son pays l'écrit."
@@ -4684,8 +4707,33 @@ msgid "Chosen for this CV"
 msgstr "Choisi pour ce CV"
 
 #: src/postulo/resume/models.py
+msgid "citation count"
+msgstr ""
+
+#: src/postulo/resume/registry.py
+msgid "Citation count"
+msgstr ""
+
+#: src/postulo/resume/models.py
 msgid "citation key"
 msgstr "clé de citation"
+
+#: src/postulo/documents/rendering.py src/postulo/resume/candidate.py
+#: src/postulo/resume/registry.py src/postulo/resume/views_candidate.py
+#: src/postulo/templates/resume/preview.html
+msgid "Citations"
+msgstr ""
+
+#: src/postulo/resume/models.py
+msgid "citations"
+msgstr ""
+
+#: src/postulo/resume/models.py
+#, python-format
+msgid "Cited %(count)s time (%(source)s, %(date)s)"
+msgid_plural "Cited %(count)s times (%(source)s, %(date)s)"
+msgstr[0] ""
+msgstr[1] ""
 
 #: src/postulo/core/personal.py
 msgid "Citizen of an EU or EEA country, or of Switzerland"
@@ -5189,6 +5237,10 @@ msgstr "Compté à partir des annonces enregistrées ici; personne ne l'a signal
 #: src/postulo/templates/widgets/interviews_summary.html
 msgid "Counted from the timeline, so interviews recorded before the diary existed are in."
 msgstr "Compté à partir de la chronologie, donc les entrevues enregistrées avant l'existence de l'agenda sont incluses."
+
+#: src/postulo/resume/models.py
+msgid "counted on"
+msgstr ""
 
 #: src/postulo/core/models.py src/postulo/core/postal.py
 #: src/postulo/resume/models.py
@@ -7662,6 +7714,10 @@ msgstr "Quelle place laisser"
 msgid "How much you sent, month by month, so a quiet stretch is visible."
 msgstr "Combien vous avez envoyé, mois par mois, pour qu'une période creuse se voie."
 
+#: src/postulo/resume/registry.py
+msgid "How often your work has been cited, as a source counted it on a given day: for all of it, or for one publication. Postulo counts nothing itself."
+msgstr ""
+
 #: src/postulo/templates/help/your_details.html
 #, python-format
 msgid "How Postulo behaves for you, such as its theme, its language and your account, is not here: it is under <a href=\"%(settings_url)s\" class=\"underline\">Settings</a>."
@@ -8988,6 +9044,10 @@ msgstr "Laisser tel quel"
 #: src/postulo/resume/forms.py
 msgid "Leave it empty for a single day or when it has no end."
 msgstr "Laissez vide pour un seul jour ou s'il n'a pas de fin."
+
+#: src/postulo/resume/forms.py
+msgid "Leave it empty for all of your work together, as a profile page counts it; choose a publication for the count of that one."
+msgstr ""
 
 #: src/postulo/resume/forms.py
 msgid "Leave it empty if it does not expire."
@@ -14942,7 +15002,7 @@ msgstr "Trier par %(column)s, du plus élevé au plus bas"
 msgid "Sort by %(column)s, lowest first"
 msgstr "Trier par %(column)s, du plus bas au plus élevé"
 
-#: src/postulo/jobs/models.py
+#: src/postulo/jobs/models.py src/postulo/resume/models.py
 msgid "source"
 msgstr "source"
 
@@ -16412,6 +16472,10 @@ msgstr "La date à laquelle vous comptez l'avoir envoyée. Ce n'est pas un rappe
 msgid "The day it was true or reported, not today's date unless it is."
 msgstr "Le jour où c'était vrai ou signalé, pas la date du jour sauf si c'est le cas."
 
+#: src/postulo/resume/forms.py
+msgid "The day you read the count. A count changes, so a CV prints the month and the year beside it."
+msgstr ""
+
 #: src/postulo/templates/server/plugins.html
 msgid "The default for every account. One person's exceptions are on their row under People. Switching a plugin off stops it being used and deletes nothing."
 msgstr "La valeur par défaut pour tous les comptes. Les exceptions propres à une personne figurent sur sa ligne dans Personnes. Désactiver un plugin empêche son utilisation et ne supprime rien."
@@ -16531,6 +16595,10 @@ msgstr "Le fichier en contient un autre de ce type, et une personne en a un de c
 #: src/postulo/resume/candidate.py
 msgid "The file has two groups under the number it names."
 msgstr "Le fichier contient deux groupes sous le numéro indiqué."
+
+#: src/postulo/resume/candidate.py
+msgid "The file has two publications under the number it names, so it will be a count for all of your work."
+msgstr ""
 
 #: src/postulo/templates/jobs/contact_vcards.html
 #, python-format
@@ -16954,6 +17022,10 @@ msgid_plural "The page was not drawn within %(seconds)s seconds, so it was left.
 msgstr[0] "La page n'a pas été générée en moins de %(seconds)s seconde; elle a donc été abandonnée."
 msgstr[1] "La page n'a pas été générée en moins de %(seconds)s secondes; elle a donc été abandonnée."
 
+#: src/postulo/resume/forms.py
+msgid "The page you read it on. A CV does not print it."
+msgstr ""
+
 #: src/postulo/jobs/forms.py
 msgid "The part of the economy it is in. Narrows the suggestions below, and an industry of your own added here is filed under it."
 msgstr "La partie de l'économie dont elle relève. Restreint les suggestions ci-dessous, et un secteur d'activité à vous ajouté ici y est classé."
@@ -17042,6 +17114,14 @@ msgstr "L'adresse de jeton du fournisseur a redirigé, et Postulo ne suit pas le
 #: src/postulo/applications/forms.py
 msgid "The public employment service you are registered with. Add it under Companies, as a public employment service, if it is not here."
 msgstr "Le service public de l'emploi auprès duquel vous êtes inscrit. S'il n'est pas dans la liste, ajoutez-le dans Entreprises, en tant que service public de l'emploi."
+
+#: src/postulo/resume/candidate.py
+msgid "The publication it counts cannot be added, so it will be a count for all of your work."
+msgstr ""
+
+#: src/postulo/resume/candidate.py
+msgid "The publication it counts is not in the file, so it will be a count for all of your work."
+msgstr ""
 
 #: src/postulo/applications/views.py
 msgid "The reason was not kept: only an application that was rejected, withdrawn or ghosted has one."
@@ -18113,6 +18193,10 @@ msgstr "Délai d'expiration"
 #: src/postulo/core/models.py
 msgid "timeout in seconds"
 msgstr "délai d'expiration en secondes"
+
+#: src/postulo/resume/models.py
+msgid "times cited"
+msgstr ""
 
 #: src/postulo/documents/forms.py
 msgid "Title"
@@ -19569,6 +19653,10 @@ msgstr "Tant que <em>Règles d'adresse par pays</em> est activé pour vous, les 
 #: src/postulo/resume/forms.py
 msgid "Who awarded it, as a CV should print it. It is linked to the company of that name among yours, and added to your companies if there is none."
 msgstr "L'organisme qui l'a délivrée, tel qu'il doit figurer sur un CV. Il est lié à l'entreprise de ce nom parmi les vôtres, et ajouté à vos entreprises s'il n'y en a pas."
+
+#: src/postulo/resume/forms.py
+msgid "Who counted: Google Scholar, Scopus, Web of Science or any other. Postulo counts nothing itself."
+msgstr ""
 
 #: src/postulo/resume/forms.py
 msgid "Who gave it, as a CV should print it. It is linked to the company of that name among yours, and added to your companies if there is none."

@@ -53,6 +53,17 @@ SECTIONS: dict[str, SectionSpec] = {
         _("Publications"),
         _("Papers, books, chapters, theses, datasets and software, as a bibliography lists them."),
     ),
+    "citation": SectionSpec(
+        "citation",
+        resume_models.Citation,
+        resume_forms.CitationForm,
+        _("Citation count"),
+        _("Citations"),
+        _(
+            "How often your work has been cited, as a source counted it on a given day: for "
+            "all of it, or for one publication. Postulo counts nothing itself."
+        ),
+    ),
     "skill-group": SectionSpec(
         "skill-group",
         resume_models.SkillGroup,
@@ -151,6 +162,7 @@ OVERVIEW_ORDER = (
     "education",
     "project",
     "publication",
+    "citation",
     "link",
     "skill-group",
     "certification",

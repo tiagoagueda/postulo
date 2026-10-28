@@ -121,6 +121,15 @@
       </section>
     {% endif %}
 
+    {% if citations %}
+      <section class="mb-8">
+        <c-section-title>{% translate "Citations" %}</c-section-title>
+        <div class="card space-y-1 text-sm">
+          {% for item in citations %}<p><bdi>{{ item.cv_line }}</bdi></p>{% endfor %}
+        </div>
+      </section>
+    {% endif %}
+
     {% if honours %}
       <section class="mb-8">
         <c-section-title>{% translate "Honours and awards" %}</c-section-title>

@@ -35,6 +35,7 @@ from . import companies, importing, lookups, ordering, publications, translating
 from . import forms as resume_forms
 from .models import (
     Certification,
+    Citation,
     Course,
     DrivingLicence,
     Education,
@@ -71,6 +72,9 @@ def get_section(slug: str):
 def _for_overview(model, user):
     """One section's rows, a skill group with its skills so it does not ask twice (#559)."""
     rows = model.objects.for_user(user)
+    if model is Citation:
+        # Each line names its paper, which is one join rather than one query a line (#697).
+        return rows.select_related("publication")
     return rows.prefetch_related("skills") if model is SkillGroup else rows
 
 
@@ -135,6 +139,7 @@ class ResumeOverviewView(OwnedObjectMixin, TemplateView):
             "education": Education.objects.for_user(user).count(),
             "project": Project.objects.for_user(user).count(),
             "publication": Publication.objects.for_user(user).count(),
+            "citation": Citation.objects.for_user(user).count(),
             "skill": Skill.objects.for_user(user).count(),
             "certification": Certification.objects.for_user(user).count(),
             "honour": Honour.objects.for_user(user).count(),
@@ -483,6 +488,7 @@ class ResumePreviewView(OwnedObjectMixin, View):
                 "education": Education.objects.for_user(user),
                 "projects": Project.objects.for_user(user),
                 "publications": Publication.objects.for_user(user),
+                "citations": Citation.objects.for_user(user).select_related("publication"),
                 "links": Link.objects.for_user(user),
                 "skill_groups": SkillGroup.objects.for_user(user).prefetch_related("skills"),
                 "certifications": Certification.objects.for_user(user),

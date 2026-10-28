@@ -1285,6 +1285,12 @@ msgstr "%(title)s没有响应：%(detail)s"
 msgid "%(title)s still answers."
 msgstr "%(title)s仍有响应。"
 
+#: src/postulo/resume/models.py
+#, python-format
+msgid "%(title)s: cited %(count)s time (%(source)s, %(date)s)"
+msgid_plural "%(title)s: cited %(count)s times (%(source)s, %(date)s)"
+msgstr[0] ""
+
 #: src/postulo/jobs/vcards.py
 #, python-format
 msgid "%(total)s address"
@@ -1971,6 +1977,10 @@ msgstr "限制从不会自行执行：试运行会显示该策略会涉及哪些
 #: src/postulo/documents/models.py
 msgid "A line at the end, which names nobody. A reference from your career is printed only once the person has agreed, whatever this says."
 msgstr "末尾的一行，不提及任何人的姓名。无论此处如何填写，你职业经历中的推荐人只有在本人同意后才会被打印。"
+
+#: src/postulo/resume/forms.py
+msgid "A line of your own, such as what the count covers."
+msgstr ""
 
 #: src/postulo/resume/forms.py
 msgid "A line or two. It prints under the dates on a CV."
@@ -2988,6 +2998,10 @@ msgstr "所有职位"
 msgid "All of them are offered, and a language added in a later release will be too."
 msgstr "所有语言都可选，以后版本新增的语言也会提供。"
 
+#: src/postulo/resume/forms.py
+msgid "All of your work"
+msgstr ""
+
 #: src/postulo/core/help.py
 msgid "All optional, and none of it is worked out from anything else. None of it is printed until a CV is set to print it, one by one, under “Choose which details” on the CV."
 msgstr "全部可选，且都不会从其他信息推断。在简历的“选择显示哪些资料”中逐项设置打印之前，都不会打印。"
@@ -3666,6 +3680,10 @@ msgstr "按招聘信息的原文填写——城市、地区、国家。自由文
 #: src/postulo/jobs/forms.py
 msgid "As the posting words it. The ISCO-08 code the words match in the ESCO classification follows the posting, in the language you read; a title that matches nothing has no code, and that is not a lesser kind of job."
 msgstr "按招聘信息的原文填写。这些文字在 ESCO 分类中匹配到的 ISCO-08 代码会以你所读的语言显示在招聘信息后；没有匹配的职位名称没有代码，但这并不意味着它是次一等的工作。"
+
+#: src/postulo/resume/forms.py
+msgid "As the source states it on the day you read it."
+msgstr ""
 
 #: src/postulo/templates/documents/letter_detail.html
 msgid "As they will read it"
@@ -4576,6 +4594,10 @@ msgstr "请从你的资料中选择一行。"
 msgid "Choose one of your own contacts."
 msgstr "请选择你自己的联系人。"
 
+#: src/postulo/resume/forms.py src/postulo/resume/models.py
+msgid "Choose one of your own publications."
+msgstr ""
+
 #: src/postulo/templates/help/telephone_numbers.html
 msgid "Choose the country the number is in and type the number the way it is written there. Or type it in full, starting with +, and the country chosen is ignored. It is kept in the international form, so it can be dialled from anywhere, and documents print it grouped the way its country writes it."
 msgstr "选择号码所在的国家，并按当地的写法输入号码。也可以输入以 + 开头的完整号码，此时会忽略所选国家。号码以国际格式保存，因此可以从任何地方拨打，文档会按其所属国家的习惯分组打印。"
@@ -4617,8 +4639,32 @@ msgid "Chosen for this CV"
 msgstr "已为此简历选择"
 
 #: src/postulo/resume/models.py
+msgid "citation count"
+msgstr ""
+
+#: src/postulo/resume/registry.py
+msgid "Citation count"
+msgstr ""
+
+#: src/postulo/resume/models.py
 msgid "citation key"
 msgstr "引用键"
+
+#: src/postulo/documents/rendering.py src/postulo/resume/candidate.py
+#: src/postulo/resume/registry.py src/postulo/resume/views_candidate.py
+#: src/postulo/templates/resume/preview.html
+msgid "Citations"
+msgstr ""
+
+#: src/postulo/resume/models.py
+msgid "citations"
+msgstr ""
+
+#: src/postulo/resume/models.py
+#, python-format
+msgid "Cited %(count)s time (%(source)s, %(date)s)"
+msgid_plural "Cited %(count)s times (%(source)s, %(date)s)"
+msgstr[0] ""
 
 #: src/postulo/core/personal.py
 msgid "Citizen of an EU or EEA country, or of Switzerland"
@@ -5127,6 +5173,10 @@ msgstr "根据这里记录的职位统计得出；没有人报告过。"
 #: src/postulo/templates/widgets/interviews_summary.html
 msgid "Counted from the timeline, so interviews recorded before the diary existed are in."
 msgstr "根据时间线统计，因此日程功能出现之前记录的面试也包括在内。"
+
+#: src/postulo/resume/models.py
+msgid "counted on"
+msgstr ""
 
 #: src/postulo/core/models.py src/postulo/core/postal.py
 #: src/postulo/resume/models.py
@@ -7622,6 +7672,10 @@ msgstr "留出多少空间"
 msgid "How much you sent, month by month, so a quiet stretch is visible."
 msgstr "每月发送了多少申请，从而看出空闲的时段。"
 
+#: src/postulo/resume/registry.py
+msgid "How often your work has been cited, as a source counted it on a given day: for all of it, or for one publication. Postulo counts nothing itself."
+msgstr ""
+
 #: src/postulo/templates/help/your_details.html
 #, python-format
 msgid "How Postulo behaves for you, such as its theme, its language and your account, is not here: it is under <a href=\"%(settings_url)s\" class=\"underline\">Settings</a>."
@@ -8957,6 +9011,10 @@ msgstr "保持原样"
 #: src/postulo/resume/forms.py
 msgid "Leave it empty for a single day or when it has no end."
 msgstr "如果只有一天或没有结束日期，请留空。"
+
+#: src/postulo/resume/forms.py
+msgid "Leave it empty for all of your work together, as a profile page counts it; choose a publication for the count of that one."
+msgstr ""
 
 #: src/postulo/resume/forms.py
 msgid "Leave it empty if it does not expire."
@@ -14958,7 +15016,7 @@ msgstr "按%(column)s排序，从高到低"
 msgid "Sort by %(column)s, lowest first"
 msgstr "按%(column)s排序，从低到高"
 
-#: src/postulo/jobs/models.py
+#: src/postulo/jobs/models.py src/postulo/resume/models.py
 msgid "source"
 msgstr "来源"
 
@@ -16446,6 +16504,10 @@ msgstr "你打算在此日期前发送。这不是提醒——如果想收到通
 msgid "The day it was true or reported, not today's date unless it is."
 msgstr "它属实或被报告的那一天；除非恰好是今天，否则不要填今天的日期。"
 
+#: src/postulo/resume/forms.py
+msgid "The day you read the count. A count changes, so a CV prints the month and the year beside it."
+msgstr ""
+
 #: src/postulo/templates/server/plugins.html
 msgid "The default for every account. One person's exceptions are on their row under People. Switching a plugin off stops it being used and deletes nothing."
 msgstr "所有账户的默认设置。个人的例外设置在“人员”下各自的行中。关闭插件只会停止使用它，不会删除任何内容。"
@@ -16565,6 +16627,10 @@ msgstr "文件中还有另一个同类型的条目，而一个人每种只能有
 #: src/postulo/resume/candidate.py
 msgid "The file has two groups under the number it names."
 msgstr "文件中在同一编号下有两个组。"
+
+#: src/postulo/resume/candidate.py
+msgid "The file has two publications under the number it names, so it will be a count for all of your work."
+msgstr ""
 
 #: src/postulo/templates/jobs/contact_vcards.html
 #, python-format
@@ -16986,6 +17052,10 @@ msgid "The page was not drawn within %(seconds)s second, so it was left."
 msgid_plural "The page was not drawn within %(seconds)s seconds, so it was left."
 msgstr[0] "页面未能在%(seconds)s秒内绘制完成，因此已放弃。"
 
+#: src/postulo/resume/forms.py
+msgid "The page you read it on. A CV does not print it."
+msgstr ""
+
 #: src/postulo/jobs/forms.py
 msgid "The part of the economy it is in. Narrows the suggestions below, and an industry of your own added here is filed under it."
 msgstr "它所属的经济门类。会缩小下方的建议范围，你在这里添加的自定义行业也会归入其中。"
@@ -17074,6 +17144,14 @@ msgstr "提供商的令牌地址发生了重定向，Postulo 不会跟随。"
 #: src/postulo/applications/forms.py
 msgid "The public employment service you are registered with. Add it under Companies, as a public employment service, if it is not here."
 msgstr "你所登记的公共就业服务机构。如果这里没有，请在“公司”下将其添加为公共就业服务机构。"
+
+#: src/postulo/resume/candidate.py
+msgid "The publication it counts cannot be added, so it will be a count for all of your work."
+msgstr ""
+
+#: src/postulo/resume/candidate.py
+msgid "The publication it counts is not in the file, so it will be a count for all of your work."
+msgstr ""
 
 #: src/postulo/applications/views.py
 msgid "The reason was not kept: only an application that was rejected, withdrawn or ghosted has one."
@@ -18151,6 +18229,10 @@ msgstr "超时"
 #: src/postulo/core/models.py
 msgid "timeout in seconds"
 msgstr "超时（秒）"
+
+#: src/postulo/resume/models.py
+msgid "times cited"
+msgstr ""
 
 #: src/postulo/documents/forms.py
 msgid "Title"
@@ -19620,6 +19702,10 @@ msgstr "当你开启了<em>按国家的地址规则</em>时，每行的各部分
 #: src/postulo/resume/forms.py
 msgid "Who awarded it, as a CV should print it. It is linked to the company of that name among yours, and added to your companies if there is none."
 msgstr "颁发方，按简历上应显示的方式填写。它会关联到你的公司中同名的那家；若没有，则添加到你的公司中。"
+
+#: src/postulo/resume/forms.py
+msgid "Who counted: Google Scholar, Scopus, Web of Science or any other. Postulo counts nothing itself."
+msgstr ""
 
 #: src/postulo/resume/forms.py
 msgid "Who gave it, as a CV should print it. It is linked to the company of that name among yours, and added to your companies if there is none."

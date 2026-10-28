@@ -63,6 +63,7 @@ DATE_FIELDS = {
     "expires_on",
     "first_issued_on",
     "awarded_on",
+    "as_of",
 }
 
 
@@ -368,6 +369,33 @@ def _course_hours(value, report: ImportReport, entry: dict) -> int | None:
         f"{high:,}, and were left out"
     )
     return None
+
+
+def _citation_as_written(values: dict, report: ImportReport) -> dict | None:
+    """A citation count as the form would have kept it, or nothing where it cannot be (#697).
+
+    A row written straight to the model would keep a count of nought or of a billion, and an
+    entry with no day would not be written at all. The count is held to the form's own
+    bounds, from the model, and the day is required as the form requires it; either missing
+    restores no entry, and the report says so.
+    """
+    from postulo.resume.models import Citation
+
+    source = str(values.get("source") or "")[:80]
+    count = values.get("count")
+    low, high = Citation.COUNT_MIN, Citation.COUNT_MAX
+    if not (isinstance(count, int) and not isinstance(count, bool) and low <= count <= high):
+        report.skipped.append(
+            f"Citation count from {source!r}: {str(count)[:20]!r} is not a whole number from "
+            f"{low} to {high:,}, and the entry was left out"
+        )
+        return None
+    if not values.get("as_of"):
+        report.skipped.append(
+            f"Citation count from {source!r}: it has no date it was counted on, and was left out"
+        )
+        return None
+    return values
 
 
 def _event_choice(value, choices, report: ImportReport, entry: dict, label: str) -> str:
@@ -1431,6 +1459,10 @@ def _load(user, archive: zipfile.ZipFile, *, force: bool = False, into=None) -> 
             # constructor sees the entry and linked once the companies exist. An archive
             # without it restores every entry unlinked (#683).
             company_name = entry.pop("company", "") if key in LINKED_TO_A_COMPANY else ""
+            # The paper a citation count names, by its id in this file, taken out before
+            # `_carried` drops it as a relation and resolved through what has been made: the
+            # publications come first (#697).
+            publication_id = entry.pop("publication_id", None) if key == "citations" else None
             values = {}
             for name, value in _carried(
                 entry, RESUME_FIELDS[key], report, f"A {key} entry"
@@ -1463,6 +1495,19 @@ def _load(user, archive: zipfile.ZipFile, *, force: bool = False, into=None) -> 
                 values = _licence_as_written(values, report)
                 if values is None:
                     continue
+            if key == "citations":
+                values = _citation_as_written(values, report)
+                if values is None:
+                    continue
+                named = publication_id if isinstance(publication_id, int | str) else None
+                paper = resume_map.get("publications", {}).get(named)
+                if publication_id is not None and paper is None:
+                    report.skipped.append(
+                        f"Citation count from {str(values.get('source'))[:80]!r}: the "
+                        "publication it counts is not in the file, so it was restored as a count "
+                        "for the whole body of work"
+                    )
+                values["publication"] = paper
             if key == "languages":
                 # A code is read as a claim, as any language code is: shaped like a tag or
                 # nothing. An archive from before format 50 has none, and a name that is

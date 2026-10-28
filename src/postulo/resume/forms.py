@@ -5,6 +5,7 @@ from __future__ import annotations
 from django import forms
 from django.db import models as django_models
 from django.urls import reverse_lazy
+from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 from postulo.core import language_names, languages, phones, postal
@@ -15,6 +16,7 @@ from postulo.jobs.forms import OwnerScopedModelForm
 from . import driving, publications, translatable
 from .models import (
     Certification,
+    Citation,
     Course,
     DrivingLicence,
     Education,
@@ -924,6 +926,80 @@ class PublicationForm(ResumeItemForm):
             self.cleaned_data.get("entry_type", ""), self.cleaned_data.get
         )
         return [str(self.fields[name].label or name) for name in lacking if name in self.fields]
+
+
+class CitationForm(ResumeItemForm):
+    """How often your work has been cited, by whom and on what day (#697).
+
+    Typed, never looked up: the record works with no bibliographic service in sight. The day
+    is required and proposed as today, which is the day somebody usually reads a count off a
+    profile page; the source is text, with the usual services offered as suggestions.
+    """
+
+    class Meta:
+        model = Citation
+        fields = ("count", "source", "as_of", "publication", "url", "summary", "order")
+        widgets = {
+            "source": forms.TextInput(attrs={"list": "citation-source-suggestions"}),
+            "count": forms.NumberInput(
+                attrs={"min": Citation.COUNT_MIN, "max": Citation.COUNT_MAX}
+            ),
+            "as_of": DATE_WIDGET,
+        }
+        help_texts = {
+            "count": _("As the source states it on the day you read it."),
+            "source": _(
+                "Who counted: Google Scholar, Scopus, Web of Science or any other. Postulo "
+                "counts nothing itself."
+            ),
+            "as_of": _(
+                "The day you read the count. A count changes, so a CV prints the month and the "
+                "year beside it."
+            ),
+            "publication": _(
+                "Leave it empty for all of your work together, as a profile page counts it; "
+                "choose a publication for the count of that one."
+            ),
+            "url": _("The page you read it on. A CV does not print it."),
+            "summary": _("A line of your own, such as what the count covers."),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if not self.is_bound and not self.instance.pk and not self.initial.get("as_of"):
+            # Proposed and not assumed: the box holds today, and the person may change it.
+            self.initial["as_of"] = timezone.localdate()
+
+    def scope_querysets(self) -> None:
+        self.fields["publication"].queryset = (
+            Publication.objects.for_user(self.user)
+            if self.user is not None
+            else Publication.objects.none()
+        )
+        self.fields["publication"].empty_label = _("All of your work")
+        self.fields["publication"].error_messages["invalid_choice"] = _(
+            "Choose one of your own publications."
+        )
+
+    @property
+    def datalists(self) -> dict[str, list[str]]:
+        """The sources this person has counted from before, then the usual ones."""
+        own = (
+            list(
+                Citation.objects.for_user(self.user)
+                .order_by("source")
+                .values_list("source", flat=True)
+                .distinct()
+            )
+            if self.user is not None
+            else []
+        )
+        return {
+            "citation-source-suggestions": [
+                *own,
+                *(name for name in Citation.SOURCES if name not in own),
+            ]
+        }
 
 
 class TranslationForm(forms.Form):

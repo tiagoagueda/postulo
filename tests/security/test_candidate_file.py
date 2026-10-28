@@ -1119,3 +1119,67 @@ def test_an_allowance_spent_in_an_earlier_draw_answers_nothing_in_the_next(user,
     # And the button, which redraws the plan, adds nothing that was free either.
     candidate.apply(user, candidate.read(numbers_in_a_file("+351912345999")))
     assert not user.profile.phone_numbers.exists()
+
+
+# --------------------------------------------------------------- citation counts (#697)
+
+
+@pytest.mark.parametrize(
+    "bad",
+    [
+        {"source": MARKUP, "count": 3, "as_of": "2026-09-01"},
+        {"source": "S" * 5000, "count": 3, "as_of": "2026-09-01"},
+        {"source": "S", "count": 0, "as_of": "2026-09-01"},
+        {"source": "S", "count": -5, "as_of": "2026-09-01"},
+        {"source": "S", "count": 10**12, "as_of": "2026-09-01"},
+        {"source": "S", "count": True, "as_of": "2026-09-01"},
+        {"source": "S", "count": "12", "as_of": "2026-09-01"},
+        {"source": "S", "count": 3.5, "as_of": "2026-09-01"},
+        {"source": "S", "count": 3},
+        {"source": "S", "count": 3, "as_of": MARKUP},
+        {"source": "S", "count": 3, "as_of": "2026-09-01", "url": SCRIPT},
+        {"source": "S", "count": 3, "as_of": "2026-09-01", "summary": "S" * 200_000},
+        {"source": "e\x00", "count": 3, "as_of": "2026-09-01"},
+    ],
+)
+def test_a_hostile_or_over_long_citation_count_is_a_refused_row_and_stores_nothing(user, bad):
+    from postulo.resume.models import Citation
+
+    data = a_file(resume={"citations": [bad]})
+
+    plan = candidate.plan(user, candidate.read(data))
+    candidate.apply(user, candidate.read(data))
+
+    for kept in Citation.objects.for_user(user):
+        # Whatever was kept is what the form keeps: bounded, and never a script address.
+        assert len(kept.source) <= 200 and 1 <= kept.count <= 10_000_000
+        assert not kept.url.startswith("javascript:")
+    assert outcomes(plan, "citations") in ([candidate.REFUSED], [candidate.ADD])
+
+
+@pytest.mark.parametrize("named", [[1], {"id": 1}, "1", 2**70, -1, True])
+def test_a_citation_count_naming_a_paper_by_anything_but_its_id_names_none(user, named):
+    """A file's local id is never looked up in the database, and a strange one names nothing:
+    the count is one for the whole body of work, and nobody's paper is reached (#697)."""
+    from postulo.resume.models import Citation, Publication
+
+    theirs = Publication.objects.create(owner=user, title="Mine already")
+    data = a_file(
+        resume={
+            "citations": [
+                {
+                    "id": 1,
+                    "source": "Scopus",
+                    "count": 3,
+                    "as_of": "2026-09-01",
+                    "publication_id": named,
+                }
+            ]
+        }
+    )
+
+    candidate.apply(user, candidate.read(data))
+
+    kept = Citation.objects.for_user(user).get()
+    assert kept.publication is None
+    assert theirs.citations.count() == 0

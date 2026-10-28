@@ -185,6 +185,31 @@ def test_a_career_hit_links_to_a_section_the_career_page_has(client, user):
         assert f'id="{fragment}"' in page, hit.subtitle
 
 
+def test_a_citation_count_is_found_by_its_source_and_its_paper(client, user):
+    """By who counted, by what the person says of it and by the paper it counts (#697)."""
+    from urllib.parse import urlsplit
+
+    from postulo.resume.models import Citation, Publication
+
+    paper = Publication.objects.create(owner=user, title="Zorbco optics")
+    Citation.objects.create(
+        owner=user,
+        source="Quillfeather Index",
+        count=12,
+        as_of=dt.date(2026, 9, 1),
+        publication=paper,
+        summary="Self-citations left out",
+    )
+    client.force_login(user)
+    page = client.get(reverse("resume:overview")).content.decode()
+
+    for query in ("Quillfeather", "Self-citations", "Zorbco"):
+        hits = [h for h in kinds(searching.search(user, query))["career"].hits if h.id]
+        counted = [h for h in hits if h.subtitle == "citation count"]
+        assert counted, query
+        assert f'id="{urlsplit(counted[0].url).fragment}"' in page
+
+
 def test_the_text_you_sent_says_where_it_went(user, world):
     groups = kinds(searching.search(user, "calibration"))
     hit = groups["sent"].hits[0]

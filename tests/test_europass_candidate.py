@@ -1112,6 +1112,24 @@ def test_nothing_is_read_as_an_honour():
     assert not hasattr(record, "honours")
 
 
+def test_no_citation_count_is_invented_from_a_file(user):
+    """The Candidate has no element for a count, and a count is not read out of prose: a
+    made-up section of citations arrives as projects, as every made-up section does (#697)."""
+    from postulo.resume.models import Citation
+
+    data = candidate_xml(
+        "<Others><Title>Citations</Title><Other><Title>Cited 1,240 times</Title>"
+        "<Description>&lt;p&gt;Scopus, September 2026.&lt;/p&gt;</Description></Other></Others>"
+        "<PublicationHistory><Publication><Title>A paper</Title></Publication></PublicationHistory>"
+    )
+
+    record = europass.read(data)
+
+    assert not hasattr(record, "citations")
+    assert record.projects == [{"name": "Cited 1,240 times", "summary": "Scopus, September 2026."}]
+    assert not Citation.objects.exists()
+
+
 def test_an_element_with_no_name_is_not_a_membership():
     data = candidate_xml(
         "<NetworksAndMemberships><NetworkAndMembership><Description>x</Description>"

@@ -1285,6 +1285,12 @@ msgstr "%(title)s tidak menjawab: %(detail)s"
 msgid "%(title)s still answers."
 msgstr "%(title)s masih menjawab."
 
+#: src/postulo/resume/models.py
+#, python-format
+msgid "%(title)s: cited %(count)s time (%(source)s, %(date)s)"
+msgid_plural "%(title)s: cited %(count)s times (%(source)s, %(date)s)"
+msgstr[0] ""
+
 #: src/postulo/jobs/vcards.py
 #, python-format
 msgid "%(total)s address"
@@ -1974,6 +1980,10 @@ msgstr "Batas tidak pernah diterapkan dengan sendirinya: uji coba menunjukkan ap
 #: src/postulo/documents/models.py
 msgid "A line at the end, which names nobody. A reference from your career is printed only once the person has agreed, whatever this says."
 msgstr "Satu baris di akhir, yang tidak menyebut nama siapa pun. Referensi dari riwayat karier Anda dicetak hanya setelah orangnya setuju, apa pun yang tertulis di sini."
+
+#: src/postulo/resume/forms.py
+msgid "A line of your own, such as what the count covers."
+msgstr ""
 
 #: src/postulo/resume/forms.py
 msgid "A line or two. It prints under the dates on a CV."
@@ -2986,6 +2996,10 @@ msgstr "Semua lowongan"
 msgid "All of them are offered, and a language added in a later release will be too."
 msgstr "Semuanya ditawarkan, begitu pula bahasa yang ditambahkan dalam rilis berikutnya."
 
+#: src/postulo/resume/forms.py
+msgid "All of your work"
+msgstr ""
+
 #: src/postulo/core/help.py
 #, fuzzy
 msgid "All optional, and none of it is worked out from anything else. None of it is printed until a CV is set to print it, one by one, under “Choose which details” on the CV."
@@ -3664,6 +3678,10 @@ msgstr "Sesuai kata-kata di lowongan — kota, wilayah, negara. Teks bebas: tida
 #: src/postulo/jobs/forms.py
 msgid "As the posting words it. The ISCO-08 code the words match in the ESCO classification follows the posting, in the language you read; a title that matches nothing has no code, and that is not a lesser kind of job."
 msgstr "Sesuai kata-kata di lowongan. Kode ISCO-08 yang cocok dengan kata-kata tersebut dalam klasifikasi ESCO mengikuti lowongan, dalam bahasa yang Anda baca; jabatan yang tidak cocok dengan apa pun tidak memiliki kode, dan itu bukan pekerjaan yang lebih rendah."
+
+#: src/postulo/resume/forms.py
+msgid "As the source states it on the day you read it."
+msgstr ""
 
 #: src/postulo/templates/documents/letter_detail.html
 msgid "As they will read it"
@@ -4564,6 +4582,10 @@ msgstr "Pilih salah satu baris di data pribadi Anda."
 msgid "Choose one of your own contacts."
 msgstr "Pilih salah satu kontak Anda sendiri."
 
+#: src/postulo/resume/forms.py src/postulo/resume/models.py
+msgid "Choose one of your own publications."
+msgstr ""
+
 #: src/postulo/templates/help/telephone_numbers.html
 msgid "Choose the country the number is in and type the number the way it is written there. Or type it in full, starting with +, and the country chosen is ignored. It is kept in the international form, so it can be dialled from anywhere, and documents print it grouped the way its country writes it."
 msgstr "Pilih negara asal nomor itu dan ketik nomornya seperti cara penulisannya di sana. Atau ketik secara lengkap, diawali dengan +, dan negara yang dipilih akan diabaikan. Nomor disimpan dalam bentuk internasional, sehingga dapat dihubungi dari mana saja, dan dokumen mencetaknya dengan pengelompokan sesuai cara penulisan di negaranya."
@@ -4606,8 +4628,32 @@ msgid "Chosen for this CV"
 msgstr "Terpilih untuk CV ini"
 
 #: src/postulo/resume/models.py
+msgid "citation count"
+msgstr ""
+
+#: src/postulo/resume/registry.py
+msgid "Citation count"
+msgstr ""
+
+#: src/postulo/resume/models.py
 msgid "citation key"
 msgstr "kunci kutipan"
+
+#: src/postulo/documents/rendering.py src/postulo/resume/candidate.py
+#: src/postulo/resume/registry.py src/postulo/resume/views_candidate.py
+#: src/postulo/templates/resume/preview.html
+msgid "Citations"
+msgstr ""
+
+#: src/postulo/resume/models.py
+msgid "citations"
+msgstr ""
+
+#: src/postulo/resume/models.py
+#, python-format
+msgid "Cited %(count)s time (%(source)s, %(date)s)"
+msgid_plural "Cited %(count)s times (%(source)s, %(date)s)"
+msgstr[0] ""
 
 #: src/postulo/core/personal.py
 msgid "Citizen of an EU or EEA country, or of Switzerland"
@@ -5112,6 +5158,10 @@ msgstr "Dihitung dari daftar tercatat di sini, tidak ada yang melaporkan itu."
 #: src/postulo/templates/widgets/interviews_summary.html
 msgid "Counted from the timeline, so interviews recorded before the diary existed are in."
 msgstr "Dihitung dari linimasa, jadi wawancara yang dicatat sebelum agenda ada juga ikut terhitung."
+
+#: src/postulo/resume/models.py
+msgid "counted on"
+msgstr ""
 
 #: src/postulo/core/models.py src/postulo/core/postal.py
 #: src/postulo/resume/models.py
@@ -7600,6 +7650,10 @@ msgstr "Seberapa banyak ruang yang disisakan"
 msgid "How much you sent, month by month, so a quiet stretch is visible."
 msgstr "Berapa banyak yang Anda kirim, bulan demi bulan, sehingga masa sepi terlihat."
 
+#: src/postulo/resume/registry.py
+msgid "How often your work has been cited, as a source counted it on a given day: for all of it, or for one publication. Postulo counts nothing itself."
+msgstr ""
+
 #: src/postulo/templates/help/your_details.html
 #, fuzzy, python-format
 msgid "How Postulo behaves for you, such as its theme, its language and your account, is not here: it is under <a href=\"%(settings_url)s\" class=\"underline\">Settings</a>."
@@ -8929,6 +8983,10 @@ msgstr "Biarkan saja"
 #: src/postulo/resume/forms.py
 msgid "Leave it empty for a single day or when it has no end."
 msgstr "Kosongkan untuk satu hari saja atau jika tidak ada tanggal akhirnya."
+
+#: src/postulo/resume/forms.py
+msgid "Leave it empty for all of your work together, as a profile page counts it; choose a publication for the count of that one."
+msgstr ""
 
 #: src/postulo/resume/forms.py
 msgid "Leave it empty if it does not expire."
@@ -14892,7 +14950,7 @@ msgstr "Urutkan menurut %(column)s, tertinggi lebih dulu"
 msgid "Sort by %(column)s, lowest first"
 msgstr "Urutkan menurut %(column)s, terendah lebih dulu"
 
-#: src/postulo/jobs/models.py
+#: src/postulo/jobs/models.py src/postulo/resume/models.py
 msgid "source"
 msgstr "sumber"
 
@@ -16368,6 +16426,10 @@ msgstr "Tanggal paling lambat Anda berniat mengirimnya. Ini bukan pengingat — 
 msgid "The day it was true or reported, not today's date unless it is."
 msgstr "Hari itu benar atau dilaporkan, bukan tanggal hari ini kecuali itu."
 
+#: src/postulo/resume/forms.py
+msgid "The day you read the count. A count changes, so a CV prints the month and the year beside it."
+msgstr ""
+
 #: src/postulo/templates/server/plugins.html
 msgid "The default for every account. One person's exceptions are on their row under People. Switching a plugin off stops it being used and deletes nothing."
 msgstr "Bawaan untuk setiap akun. Pengecualian untuk satu orang ada di barisnya di bagian Orang. Menonaktifkan plugin menghentikan penggunaannya dan tidak menghapus apa pun."
@@ -16487,6 +16549,10 @@ msgstr "Berkas ini memuat satu lagi dari jenis ini, dan setiap orang hanya memil
 #: src/postulo/resume/candidate.py
 msgid "The file has two groups under the number it names."
 msgstr "Berkas ini memuat dua grup dengan nomor yang disebutkannya."
+
+#: src/postulo/resume/candidate.py
+msgid "The file has two publications under the number it names, so it will be a count for all of your work."
+msgstr ""
 
 #: src/postulo/templates/jobs/contact_vcards.html
 #, python-format
@@ -16905,6 +16971,10 @@ msgid "The page was not drawn within %(seconds)s second, so it was left."
 msgid_plural "The page was not drawn within %(seconds)s seconds, so it was left."
 msgstr[0] "Halaman tidak selesai digambar dalam %(seconds)s detik, jadi proses itu dihentikan."
 
+#: src/postulo/resume/forms.py
+msgid "The page you read it on. A CV does not print it."
+msgstr ""
+
 #: src/postulo/jobs/forms.py
 msgid "The part of the economy it is in. Narrows the suggestions below, and an industry of your own added here is filed under it."
 msgstr "Bagian ekonomi tempat perusahaan ini berada. Mempersempit saran di bawah, dan industri buatan Anda sendiri yang ditambahkan di sini disimpan di bawahnya."
@@ -16993,6 +17063,14 @@ msgstr "Alamat token penyedia dialihkan, dan Postulo tidak mengikutinya."
 #: src/postulo/applications/forms.py
 msgid "The public employment service you are registered with. Add it under Companies, as a public employment service, if it is not here."
 msgstr "Layanan ketenagakerjaan publik tempat Anda terdaftar. Tambahkan di bagian Perusahaan, sebagai layanan ketenagakerjaan publik, jika belum ada di sini."
+
+#: src/postulo/resume/candidate.py
+msgid "The publication it counts cannot be added, so it will be a count for all of your work."
+msgstr ""
+
+#: src/postulo/resume/candidate.py
+msgid "The publication it counts is not in the file, so it will be a count for all of your work."
+msgstr ""
 
 #: src/postulo/applications/views.py
 msgid "The reason was not kept: only an application that was rejected, withdrawn or ghosted has one."
@@ -18068,6 +18146,10 @@ msgstr "Batas waktu"
 #: src/postulo/core/models.py
 msgid "timeout in seconds"
 msgstr "batas waktu dalam detik"
+
+#: src/postulo/resume/models.py
+msgid "times cited"
+msgstr ""
 
 #: src/postulo/documents/forms.py
 msgid "Title"
@@ -19530,6 +19612,10 @@ msgstr "Selama <em>Aturan alamat per negara</em> diaktifkan untuk Anda, bagian-b
 #: src/postulo/resume/forms.py
 msgid "Who awarded it, as a CV should print it. It is linked to the company of that name among yours, and added to your companies if there is none."
 msgstr "Pemberinya, seperti yang seharusnya dicetak di CV. Ditautkan ke perusahaan dengan nama itu di antara perusahaan Anda, dan ditambahkan ke perusahaan Anda jika belum ada."
+
+#: src/postulo/resume/forms.py
+msgid "Who counted: Google Scholar, Scopus, Web of Science or any other. Postulo counts nothing itself."
+msgstr ""
 
 #: src/postulo/resume/forms.py
 msgid "Who gave it, as a CV should print it. It is linked to the company of that name among yours, and added to your companies if there is none."

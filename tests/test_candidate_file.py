@@ -399,6 +399,8 @@ def fingerprint() -> str:
 #: 19 added courses (#695).
 #: 20 added the company of a course's provider, read back as a hint (#695).
 #: 21 added presentations, conferences and seminars (#694).
+#: 22 wrote the form of address, the pronouns and the gender as concepts (#921).
+#: 23 added citation counts, each naming the publication it counts by its local id (#697).
 SHAPES = {
     1: "0941165cc7c21c64",
     2: "fe525ea84b2b6f93",
@@ -422,6 +424,7 @@ SHAPES = {
     20: "67a8f18ac8a96597",
     21: "60a629657bd09269",
     22: "60a629657bd09269",
+    23: "6d75c5c20783da0d",
 }
 
 

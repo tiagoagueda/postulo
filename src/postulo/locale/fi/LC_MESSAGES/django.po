@@ -1366,6 +1366,13 @@ msgstr "%(title)s ei vastannut: %(detail)s"
 msgid "%(title)s still answers."
 msgstr "%(title)s vastaa yhä."
 
+#: src/postulo/resume/models.py
+#, python-format
+msgid "%(title)s: cited %(count)s time (%(source)s, %(date)s)"
+msgid_plural "%(title)s: cited %(count)s times (%(source)s, %(date)s)"
+msgstr[0] ""
+msgstr[1] ""
+
 #: src/postulo/jobs/vcards.py
 #, python-format
 msgid "%(total)s address"
@@ -2067,6 +2074,10 @@ msgstr "Rajaa ei koskaan panna täytäntöön itsestään: koeajo kertoo, mihin 
 #: src/postulo/documents/models.py
 msgid "A line at the end, which names nobody. A reference from your career is printed only once the person has agreed, whatever this says."
 msgstr "Rivi lopussa, jossa ei nimetä ketään. Urasi suosittelija tulostetaan vain, jos henkilö on antanut suostumuksensa, sanoipa tämä mitä tahansa."
+
+#: src/postulo/resume/forms.py
+msgid "A line of your own, such as what the count covers."
+msgstr ""
 
 #: src/postulo/resume/forms.py
 msgid "A line or two. It prints under the dates on a CV."
@@ -3083,6 +3094,10 @@ msgstr "Kaikki ilmoitukset"
 msgid "All of them are offered, and a language added in a later release will be too."
 msgstr "Kaikkia tarjotaan, samoin myöhemmässä julkaisussa lisättävää kieltä."
 
+#: src/postulo/resume/forms.py
+msgid "All of your work"
+msgstr ""
+
 #: src/postulo/core/help.py
 msgid "All optional, and none of it is worked out from anything else. None of it is printed until a CV is set to print it, one by one, under “Choose which details” on the CV."
 msgstr "Kaikki on valinnaista, eikä mitään niistä päätellä mistään muusta. Mitään niistä ei tulosteta ennen kuin ansioluettelo asetetaan tulostamaan ne yksi kerrallaan ansioluettelon kohdassa ”Valitse, mitkä tiedot”."
@@ -3760,6 +3775,10 @@ msgstr "Sellaisena kuin ilmoitus sen ilmaisee — kaupunki, alue, maa. Vapaata t
 #: src/postulo/jobs/forms.py
 msgid "As the posting words it. The ISCO-08 code the words match in the ESCO classification follows the posting, in the language you read; a title that matches nothing has no code, and that is not a lesser kind of job."
 msgstr "Sellaisena kuin ilmoitus sen ilmaisee. ISCO-08-koodi, jota sanat vastaavat ESCO-luokituksessa, seuraa ilmoitusta lukemallasi kielellä; nimike, joka ei vastaa mitään, ei saa koodia, eikä se ole vähäisempi työ."
+
+#: src/postulo/resume/forms.py
+msgid "As the source states it on the day you read it."
+msgstr ""
 
 #: src/postulo/templates/documents/letter_detail.html
 msgid "As they will read it"
@@ -4665,6 +4684,10 @@ msgstr "Valitse jokin tiedoissasi olevista riveistä."
 msgid "Choose one of your own contacts."
 msgstr "Valitse yksi omista yhteyshenkilöistäsi."
 
+#: src/postulo/resume/forms.py src/postulo/resume/models.py
+msgid "Choose one of your own publications."
+msgstr ""
+
 #: src/postulo/templates/help/telephone_numbers.html
 msgid "Choose the country the number is in and type the number the way it is written there. Or type it in full, starting with +, and the country chosen is ignored. It is kept in the international form, so it can be dialled from anywhere, and documents print it grouped the way its country writes it."
 msgstr "Valitse maa, jossa numero on, ja kirjoita numero siellä kirjoitettavalla tavalla. Tai kirjoita se kokonaan alkaen +-merkillä, jolloin valittu maa jätetään huomiotta. Se tallennetaan kansainvälisessä muodossa, jotta siihen voi soittaa mistä tahansa, ja asiakirjat tulostavat sen ryhmiteltynä sen maan tavan mukaan."
@@ -4706,8 +4729,33 @@ msgid "Chosen for this CV"
 msgstr "Valittu tähän ansioluetteloon"
 
 #: src/postulo/resume/models.py
+msgid "citation count"
+msgstr ""
+
+#: src/postulo/resume/registry.py
+msgid "Citation count"
+msgstr ""
+
+#: src/postulo/resume/models.py
 msgid "citation key"
 msgstr "viiteavain"
+
+#: src/postulo/documents/rendering.py src/postulo/resume/candidate.py
+#: src/postulo/resume/registry.py src/postulo/resume/views_candidate.py
+#: src/postulo/templates/resume/preview.html
+msgid "Citations"
+msgstr ""
+
+#: src/postulo/resume/models.py
+msgid "citations"
+msgstr ""
+
+#: src/postulo/resume/models.py
+#, python-format
+msgid "Cited %(count)s time (%(source)s, %(date)s)"
+msgid_plural "Cited %(count)s times (%(source)s, %(date)s)"
+msgstr[0] ""
+msgstr[1] ""
 
 #: src/postulo/core/personal.py
 msgid "Citizen of an EU or EEA country, or of Switzerland"
@@ -5213,6 +5261,10 @@ msgstr "Laskettu täällä kirjatuista ilmoituksista; kukaan ei ole raportoinut 
 #: src/postulo/templates/widgets/interviews_summary.html
 msgid "Counted from the timeline, so interviews recorded before the diary existed are in."
 msgstr "Laskettu aikajanalta, joten ennen kalenterin olemassaoloa kirjatut haastattelut ovat mukana."
+
+#: src/postulo/resume/models.py
+msgid "counted on"
+msgstr ""
 
 #: src/postulo/core/models.py src/postulo/core/postal.py
 #: src/postulo/resume/models.py
@@ -7726,6 +7778,10 @@ msgstr "Kuinka paljon tilaa jätetään"
 msgid "How much you sent, month by month, so a quiet stretch is visible."
 msgstr "Kuinka paljon lähetit kuukausittain, jotta hiljainen jakso näkyy."
 
+#: src/postulo/resume/registry.py
+msgid "How often your work has been cited, as a source counted it on a given day: for all of it, or for one publication. Postulo counts nothing itself."
+msgstr ""
+
 #: src/postulo/templates/help/your_details.html
 #, python-format
 msgid "How Postulo behaves for you, such as its theme, its language and your account, is not here: it is under <a href=\"%(settings_url)s\" class=\"underline\">Settings</a>."
@@ -9059,6 +9115,10 @@ msgstr "Jätä se ennalleen"
 #: src/postulo/resume/forms.py
 msgid "Leave it empty for a single day or when it has no end."
 msgstr "Jätä tyhjäksi, jos kyse on yhdestä päivästä tai sillä ei ole loppua."
+
+#: src/postulo/resume/forms.py
+msgid "Leave it empty for all of your work together, as a profile page counts it; choose a publication for the count of that one."
+msgstr ""
 
 #: src/postulo/resume/forms.py
 msgid "Leave it empty if it does not expire."
@@ -15061,7 +15121,7 @@ msgstr "Järjestä sarakkeen %(column)s mukaan, suurin ensin"
 msgid "Sort by %(column)s, lowest first"
 msgstr "Järjestä sarakkeen %(column)s mukaan, pienin ensin"
 
-#: src/postulo/jobs/models.py
+#: src/postulo/jobs/models.py src/postulo/resume/models.py
 msgid "source"
 msgstr "lähde"
 
@@ -16541,6 +16601,10 @@ msgstr "Päivämäärä, johon mennessä aiot lähettää sen. Se ei ole muistut
 msgid "The day it was true or reported, not today's date unless it is."
 msgstr "Päivä, jolloin tämä piti paikkansa tai siitä raportoitiin – ei tämä päivä, ellei se ole sama."
 
+#: src/postulo/resume/forms.py
+msgid "The day you read the count. A count changes, so a CV prints the month and the year beside it."
+msgstr ""
+
 #: src/postulo/templates/server/plugins.html
 msgid "The default for every account. One person's exceptions are on their row under People. Switching a plugin off stops it being used and deletes nothing."
 msgstr "Oletus jokaiselle tilille. Yksittäisen henkilön poikkeukset ovat hänen rivillään kohdassa Henkilöt. Liitännäisen poistaminen käytöstä lopettaa sen käytön eikä poista mitään."
@@ -16660,6 +16724,10 @@ msgstr "Tiedostossa on toinen samantyyppinen, ja henkilöllä on kutakin vain yk
 #: src/postulo/resume/candidate.py
 msgid "The file has two groups under the number it names."
 msgstr "Tiedostossa on kaksi ryhmää samalla numerolla."
+
+#: src/postulo/resume/candidate.py
+msgid "The file has two publications under the number it names, so it will be a count for all of your work."
+msgstr ""
 
 #: src/postulo/templates/jobs/contact_vcards.html
 #, python-format
@@ -17084,6 +17152,10 @@ msgid_plural "The page was not drawn within %(seconds)s seconds, so it was left.
 msgstr[0] "Sivua ei saatu piirrettyä %(seconds)s sekunnissa, joten siitä luovuttiin."
 msgstr[1] "Sivua ei saatu piirrettyä %(seconds)s sekunnissa, joten siitä luovuttiin."
 
+#: src/postulo/resume/forms.py
+msgid "The page you read it on. A CV does not print it."
+msgstr ""
+
 #: src/postulo/jobs/forms.py
 msgid "The part of the economy it is in. Narrows the suggestions below, and an industry of your own added here is filed under it."
 msgstr "Talouden osa-alue, johon se kuuluu. Rajaa alla olevia ehdotuksia, ja tähän lisäämäsi oma toimiala tallennetaan sen alle."
@@ -17172,6 +17244,14 @@ msgstr "Palveluntarjoajan tunnusosoite teki uudelleenohjauksen, eikä Postulo se
 #: src/postulo/applications/forms.py
 msgid "The public employment service you are registered with. Add it under Companies, as a public employment service, if it is not here."
 msgstr "Julkinen työvoimapalvelu, johon olet rekisteröitynyt. Jos sitä ei ole tässä, lisää se kohtaan Yritykset julkisena työvoimapalveluna."
+
+#: src/postulo/resume/candidate.py
+msgid "The publication it counts cannot be added, so it will be a count for all of your work."
+msgstr ""
+
+#: src/postulo/resume/candidate.py
+msgid "The publication it counts is not in the file, so it will be a count for all of your work."
+msgstr ""
 
 #: src/postulo/applications/views.py
 msgid "The reason was not kept: only an application that was rejected, withdrawn or ghosted has one."
@@ -18247,6 +18327,10 @@ msgstr "Aikakatkaisu"
 #: src/postulo/core/models.py
 msgid "timeout in seconds"
 msgstr "aikakatkaisu sekunteina"
+
+#: src/postulo/resume/models.py
+msgid "times cited"
+msgstr ""
 
 #: src/postulo/documents/forms.py
 msgid "Title"
@@ -19715,6 +19799,10 @@ msgstr "Kun <em>Maakohtaiset osoitesäännöt</em> on sinulle käytössä, rivin
 #: src/postulo/resume/forms.py
 msgid "Who awarded it, as a CV should print it. It is linked to the company of that name among yours, and added to your companies if there is none."
 msgstr "Myöntäjä niin kuin ansioluettelon pitäisi se tulostaa. Se linkitetään samannimiseen yritykseesi, ja jos sellaista ei ole, se lisätään yrityksiisi."
+
+#: src/postulo/resume/forms.py
+msgid "Who counted: Google Scholar, Scopus, Web of Science or any other. Postulo counts nothing itself."
+msgstr ""
 
 #: src/postulo/resume/forms.py
 msgid "Who gave it, as a CV should print it. It is linked to the company of that name among yours, and added to your companies if there is none."

@@ -68,6 +68,7 @@ from postulo.jobs.models import (
 from postulo.plugins.base import JobPostingData
 from postulo.resume.models import (
     Certification,
+    Citation,
     Course,
     DrivingLicence,
     Education,
@@ -413,6 +414,7 @@ class Command(BaseCommand):
             Experience,
             Education,
             Project,
+            Citation,
             Publication,
             Certification,
             Course,
@@ -547,6 +549,25 @@ class Command(BaseCommand):
                 doi="10.1000/182",
                 order=0,
             )
+        ]
+        # Typed, as a person would from a profile page: one for the whole body of work and
+        # one for the paper (#697).
+        citations = [
+            Citation.objects.create(
+                owner=user,
+                source="Google Scholar",
+                count=184,
+                as_of=dt.date(2026, 9, 1),
+                order=0,
+            ),
+            Citation.objects.create(
+                owner=user,
+                source="Scopus",
+                count=37,
+                as_of=dt.date(2026, 9, 1),
+                publication=publications[0],
+                order=1,
+            ),
         ]
         certifications = [
             Certification.objects.create(
@@ -930,6 +951,7 @@ class Command(BaseCommand):
                     groups["Infrastructure"],
                     *projects,
                     *publications,
+                    *citations,
                     *certifications,
                     *honours,
                     *memberships,

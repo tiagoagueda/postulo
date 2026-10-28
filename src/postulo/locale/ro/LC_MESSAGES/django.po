@@ -1447,6 +1447,14 @@ msgstr "%(title)s nu a răspuns: %(detail)s"
 msgid "%(title)s still answers."
 msgstr "%(title)s încă răspunde."
 
+#: src/postulo/resume/models.py
+#, python-format
+msgid "%(title)s: cited %(count)s time (%(source)s, %(date)s)"
+msgid_plural "%(title)s: cited %(count)s times (%(source)s, %(date)s)"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+
 #: src/postulo/jobs/vcards.py
 #, python-format
 msgid "%(total)s address"
@@ -2165,6 +2173,10 @@ msgstr "O limită nu este niciodată aplicată de la sine: simularea spune ce ar
 #: src/postulo/documents/models.py
 msgid "A line at the end, which names nobody. A reference from your career is printed only once the person has agreed, whatever this says."
 msgstr "Un rând la final, care nu numește pe nimeni. O referință din cariera dumneavoastră este tipărită doar după ce persoana și-a dat acordul, indiferent ce spune acest text."
+
+#: src/postulo/resume/forms.py
+msgid "A line of your own, such as what the count covers."
+msgstr ""
 
 #: src/postulo/resume/forms.py
 msgid "A line or two. It prints under the dates on a CV."
@@ -3193,6 +3205,10 @@ msgstr "Toate anunțurile"
 msgid "All of them are offered, and a language added in a later release will be too."
 msgstr "Sunt oferite toate, iar o limbă adăugată într-o versiune ulterioară la fel."
 
+#: src/postulo/resume/forms.py
+msgid "All of your work"
+msgstr ""
+
 #: src/postulo/core/help.py
 #, fuzzy
 msgid "All optional, and none of it is worked out from anything else. None of it is printed until a CV is set to print it, one by one, under “Choose which details” on the CV."
@@ -3879,6 +3895,10 @@ msgstr "Așa cum o formulează anunțul — un oraș, o regiune, o țară. Text 
 #: src/postulo/jobs/forms.py
 msgid "As the posting words it. The ISCO-08 code the words match in the ESCO classification follows the posting, in the language you read; a title that matches nothing has no code, and that is not a lesser kind of job."
 msgstr "Așa cum îl formulează anunțul. Codul ISCO-08 pe care cuvintele îl potrivesc în clasificarea ESCO urmează anunțul, în limba în care citiți; un titlu care nu se potrivește cu nimic nu are cod, iar asta nu înseamnă un post de rang inferior."
+
+#: src/postulo/resume/forms.py
+msgid "As the source states it on the day you read it."
+msgstr ""
 
 #: src/postulo/templates/documents/letter_detail.html
 msgid "As they will read it"
@@ -4791,6 +4811,10 @@ msgstr "Alegeți unul dintre rândurile din datele dumneavoastră."
 msgid "Choose one of your own contacts."
 msgstr "Alegeți unul dintre propriile contacte."
 
+#: src/postulo/resume/forms.py src/postulo/resume/models.py
+msgid "Choose one of your own publications."
+msgstr ""
+
 #: src/postulo/templates/help/telephone_numbers.html
 msgid "Choose the country the number is in and type the number the way it is written there. Or type it in full, starting with +, and the country chosen is ignored. It is kept in the international form, so it can be dialled from anywhere, and documents print it grouped the way its country writes it."
 msgstr "Alegeți țara în care se află numărul și introduceți numărul așa cum se scrie acolo. Sau introduceți-l complet, începând cu +, iar țara aleasă este ignorată. Este păstrat în forma internațională, astfel încât să poată fi format de oriunde, iar documentele îl tipăresc grupat așa cum îl scrie țara sa."
@@ -4832,8 +4856,34 @@ msgid "Chosen for this CV"
 msgstr "Ales pentru acest CV"
 
 #: src/postulo/resume/models.py
+msgid "citation count"
+msgstr ""
+
+#: src/postulo/resume/registry.py
+msgid "Citation count"
+msgstr ""
+
+#: src/postulo/resume/models.py
 msgid "citation key"
 msgstr "cheie de citare"
+
+#: src/postulo/documents/rendering.py src/postulo/resume/candidate.py
+#: src/postulo/resume/registry.py src/postulo/resume/views_candidate.py
+#: src/postulo/templates/resume/preview.html
+msgid "Citations"
+msgstr ""
+
+#: src/postulo/resume/models.py
+msgid "citations"
+msgstr ""
+
+#: src/postulo/resume/models.py
+#, python-format
+msgid "Cited %(count)s time (%(source)s, %(date)s)"
+msgid_plural "Cited %(count)s times (%(source)s, %(date)s)"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
 
 #: src/postulo/core/personal.py
 msgid "Citizen of an EU or EEA country, or of Switzerland"
@@ -5339,6 +5389,10 @@ msgstr "Calculat din anunțurile înregistrate aici; nu l-a raportat nimeni."
 #: src/postulo/templates/widgets/interviews_summary.html
 msgid "Counted from the timeline, so interviews recorded before the diary existed are in."
 msgstr "Numărate din cronologie, așa că interviurile înregistrate înainte să existe agenda sunt incluse."
+
+#: src/postulo/resume/models.py
+msgid "counted on"
+msgstr ""
 
 #: src/postulo/core/models.py src/postulo/core/postal.py
 #: src/postulo/resume/models.py
@@ -7835,6 +7889,10 @@ msgstr "Cât spațiu să lăsați"
 msgid "How much you sent, month by month, so a quiet stretch is visible."
 msgstr "Cât ați trimis, lună de lună, ca o perioadă fără activitate să fie vizibilă."
 
+#: src/postulo/resume/registry.py
+msgid "How often your work has been cited, as a source counted it on a given day: for all of it, or for one publication. Postulo counts nothing itself."
+msgstr ""
+
 #: src/postulo/templates/help/your_details.html
 #, python-format
 msgid "How Postulo behaves for you, such as its theme, its language and your account, is not here: it is under <a href=\"%(settings_url)s\" class=\"underline\">Settings</a>."
@@ -9170,6 +9228,10 @@ msgstr "Lăsați-l așa cum este"
 #: src/postulo/resume/forms.py
 msgid "Leave it empty for a single day or when it has no end."
 msgstr "Lăsați-l gol pentru o singură zi sau când nu are sfârșit."
+
+#: src/postulo/resume/forms.py
+msgid "Leave it empty for all of your work together, as a profile page counts it; choose a publication for the count of that one."
+msgstr ""
 
 #: src/postulo/resume/forms.py
 msgid "Leave it empty if it does not expire."
@@ -15197,7 +15259,7 @@ msgstr "Sortați după %(column)s, descrescător"
 msgid "Sort by %(column)s, lowest first"
 msgstr "Sortați după %(column)s, crescător"
 
-#: src/postulo/jobs/models.py
+#: src/postulo/jobs/models.py src/postulo/resume/models.py
 msgid "source"
 msgstr "sursă"
 
@@ -16681,6 +16743,10 @@ msgstr "Data până la care intenționați să-l fi trimis. Nu este un memento �
 msgid "The day it was true or reported, not today's date unless it is."
 msgstr "Ziua în care a fost valabil sau raportat, nu data de astăzi, decât dacă este aceeași."
 
+#: src/postulo/resume/forms.py
+msgid "The day you read the count. A count changes, so a CV prints the month and the year beside it."
+msgstr ""
+
 #: src/postulo/templates/server/plugins.html
 msgid "The default for every account. One person's exceptions are on their row under People. Switching a plugin off stops it being used and deletes nothing."
 msgstr "Valoarea implicită pentru fiecare cont. Excepțiile unei persoane se află pe rândul ei din Persoane. Dezactivarea unui plugin îl scoate din uz și nu șterge nimic."
@@ -16800,6 +16866,10 @@ msgstr "Fișierul are încă unul de acest tip, iar o persoană are câte unul d
 #: src/postulo/resume/candidate.py
 msgid "The file has two groups under the number it names."
 msgstr "Fișierul are două grupuri sub numărul pe care îl indică."
+
+#: src/postulo/resume/candidate.py
+msgid "The file has two publications under the number it names, so it will be a count for all of your work."
+msgstr ""
 
 #: src/postulo/templates/jobs/contact_vcards.html
 #, python-format
@@ -17229,6 +17299,10 @@ msgstr[0] "Pagina nu a fost randată în %(seconds)s secundă, așa că a fost a
 msgstr[1] "Pagina nu a fost randată în %(seconds)s secunde, așa că a fost abandonată."
 msgstr[2] "Pagina nu a fost randată în %(seconds)s de secunde, așa că a fost abandonată."
 
+#: src/postulo/resume/forms.py
+msgid "The page you read it on. A CV does not print it."
+msgstr ""
+
 #: src/postulo/jobs/forms.py
 msgid "The part of the economy it is in. Narrows the suggestions below, and an industry of your own added here is filed under it."
 msgstr "Partea economiei în care se află. Restrânge sugestiile de mai jos, iar un domeniu de activitate propriu adăugat aici este încadrat în ea."
@@ -17317,6 +17391,14 @@ msgstr "Adresa de token a furnizorului a făcut o redirecționare, iar Postulo n
 #: src/postulo/applications/forms.py
 msgid "The public employment service you are registered with. Add it under Companies, as a public employment service, if it is not here."
 msgstr "Serviciul public de ocupare a forței de muncă la care sunteți înregistrat. Adăugați-l la Companii, ca serviciu public de ocupare a forței de muncă, dacă nu este aici."
+
+#: src/postulo/resume/candidate.py
+msgid "The publication it counts cannot be added, so it will be a count for all of your work."
+msgstr ""
+
+#: src/postulo/resume/candidate.py
+msgid "The publication it counts is not in the file, so it will be a count for all of your work."
+msgstr ""
 
 #: src/postulo/applications/views.py
 msgid "The reason was not kept: only an application that was rejected, withdrawn or ghosted has one."
@@ -18395,6 +18477,10 @@ msgstr "Expirare"
 #: src/postulo/core/models.py
 msgid "timeout in seconds"
 msgstr "expirare în secunde"
+
+#: src/postulo/resume/models.py
+msgid "times cited"
+msgstr ""
 
 #: src/postulo/documents/forms.py
 msgid "Title"
@@ -19861,6 +19947,10 @@ msgstr "Cât timp <em>Reguli de adresă pe țări</em> este activat pentru dumne
 #: src/postulo/resume/forms.py
 msgid "Who awarded it, as a CV should print it. It is linked to the company of that name among yours, and added to your companies if there is none."
 msgstr "Cine a acordat-o, așa cum ar trebui să apară pe un CV. Este legat de compania cu acest nume dintre ale dumneavoastră și este adăugat la companiile dumneavoastră dacă nu există."
+
+#: src/postulo/resume/forms.py
+msgid "Who counted: Google Scholar, Scopus, Web of Science or any other. Postulo counts nothing itself."
+msgstr ""
 
 #: src/postulo/resume/forms.py
 msgid "Who gave it, as a CV should print it. It is linked to the company of that name among yours, and added to your companies if there is none."

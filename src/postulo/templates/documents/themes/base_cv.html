@@ -159,6 +159,17 @@
             {% endfor %}
           </ul>
 
+        {% elif section.kind == 'citation' %}
+          {% comment %} “Cited 1,240 times (Scopus, September 2026)”, after the paper's title where it counts one (`Citation.cv_line`: the words the text and Word files carry), with the person's line under it (#697). {% endcomment %}
+          <ul class="citations">
+            {% for entry in section.items %}
+              <li>
+                <bdi>{{ entry.item.cv_line }}</bdi>
+                {% if entry.item.summary %}<p>{{ entry.item.summary }}</p>{% endif %}
+              </li>
+            {% endfor %}
+          </ul>
+
         {% elif section.kind == 'honour' %}
           {% comment %} The title, who gave it and the year, as a certification is set; the summary is for the record (#693). {% endcomment %}
           <ul class="honours">

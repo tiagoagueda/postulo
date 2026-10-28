@@ -674,6 +674,110 @@ class Publication(ResumeItem):
         return publications.doi_url(self.doi)
 
 
+class Citation(ResumeItem):
+    """How often the person's published work has been cited, by whom and when (#697).
+
+    A count, not the citing works: “cited 1,240 times (Scopus, September 2026)” is what a
+    researcher's CV prints, and a list of every paper that cites one would copy a
+    publication's whole shape per row, with no ceiling, and be stale the day it was typed.
+
+    ``source`` is whoever counted, as text: Google Scholar, Scopus, Web of Science or
+    anything else, because services come and go and one instance's source is another's. The
+    form offers the usual ones as suggestions and never as a closed list. ``count`` is a
+    whole number from 1 to 10,000,000: nobody lists “cited 0 times”. ``as_of`` is required,
+    because a count with no date is a claim that cannot age, and an undated one on a CV is the
+    one thing here that can quietly mislead.
+
+    ``publication`` is one of the owner's publications (#687), or empty for the body of work
+    as a whole -- the common case, read off a profile page that no paper owns. Deleting the
+    paper deletes its counts: a count of nothing means nothing. Postulo counts nothing
+    itself and builds no profile address from the person's identifiers; the person types
+    the count, and ``url`` is the page they read it on. Only ``summary`` is translated: a
+    source is somebody's name and a count is a number.
+    """
+
+    COUNT_MIN = 1
+    COUNT_MAX = 10_000_000
+
+    #: Offered in the form's list of suggestions, and nothing more: any other name is kept.
+    SOURCES = ("Google Scholar", "Scopus", "Web of Science", "Crossref", "OpenCitations")
+
+    source = models.CharField(_("source"), max_length=200)
+    count = models.PositiveIntegerField(
+        _("times cited"),
+        validators=[MinValueValidator(COUNT_MIN), MaxValueValidator(COUNT_MAX)],
+    )
+    as_of = models.DateField(_("counted on"))
+    publication = models.ForeignKey(
+        Publication,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name="citations",
+        verbose_name=_("publication"),
+    )
+    url = models.URLField(_("link"), blank=True)
+    summary = models.CharField(_("summary"), max_length=300, blank=True)
+
+    class Meta(ResumeItem.Meta):
+        verbose_name = _("citation count")
+        verbose_name_plural = _("citations")
+
+    def __str__(self) -> str:
+        return self.cv_line
+
+    def clean(self) -> None:
+        super().clean()
+        self._check_publication_is_the_owners()
+
+    def _check_publication_is_the_owners(self) -> None:
+        from django.core.exceptions import ValidationError
+
+        paper = self.publication if self.publication_id else None
+        # A form validates before its owner is stamped, and checks the choice itself.
+        if paper is not None and self.owner_id and paper.owner_id != self.owner_id:
+            raise ValidationError({"publication": _("Choose one of your own publications.")})
+
+    def save(self, *args, **kwargs):
+        # As a reference's contact: a column is not a permission, so somebody else's paper is
+        # refused here whoever writes the row, and not only by the form.
+        self._check_publication_is_the_owners()
+        return super().save(*args, **kwargs)
+
+    @property
+    def cv_line(self) -> str:
+        """“Cited 1,240 times (Scopus, September 2026)”, in the language being read.
+
+        The number grouped as that language groups it, the date as its month and year and the
+        plural the language's own, after the paper's title where the count is one paper's:
+        the line the themes, the text and the Word file print. Two messages rather than a
+        title glued on, so that a translator decides how the two halves join.
+        """
+        values = {
+            "count": formats.number_format(self.count, force_grouping=True),
+            "source": self.source,
+            "date": formats.date_format(self.as_of, "YEAR_MONTH_FORMAT") if self.as_of else "",
+        }
+        if self.publication_id:
+            values["title"] = self.publication.title
+            return (
+                ngettext(
+                    "%(title)s: cited %(count)s time (%(source)s, %(date)s)",
+                    "%(title)s: cited %(count)s times (%(source)s, %(date)s)",
+                    self.count or 0,
+                )
+                % values
+            )
+        return (
+            ngettext(
+                "Cited %(count)s time (%(source)s, %(date)s)",
+                "Cited %(count)s times (%(source)s, %(date)s)",
+                self.count or 0,
+            )
+            % values
+        )
+
+
 class Proficiency(models.TextChoices):
     """The Common European Framework levels, plus the two ends people actually write.
 

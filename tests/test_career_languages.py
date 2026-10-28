@@ -102,6 +102,13 @@ def test_an_honour_translates_only_its_summary():
     assert translating.fields_for(Honour) == ("summary",)
 
 
+def test_a_citation_translates_its_summary_only():
+    """A source is somebody's name and a count is a number; the person's line is theirs (#697)."""
+    from postulo.resume.models import Citation
+
+    assert translating.fields_for(Citation) == ("summary",)
+
+
 def test_a_membership_translates_role_and_summary_not_organisation():
     """The body keeps its name, as an employer does; what the person was in it is theirs (#693)."""
     from postulo.resume.models import Membership

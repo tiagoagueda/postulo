@@ -204,6 +204,13 @@ def _one_of_each(user) -> dict:
         ),
         "project": lambda: m.Project.objects.create(owner=user, name="Turret firmware"),
         "publication": lambda: m.Publication.objects.create(owner=user, title="On portals"),
+        "citation": lambda: m.Citation.objects.create(
+            owner=user,
+            source="Scopus",
+            count=1240,
+            as_of=dt.date(2026, 9, 1),
+            publication=m.Publication.objects.create(owner=user, title="On mirrors"),
+        ),
         "skill-group": lambda: m.SkillGroup.objects.create(owner=user, name="Languages"),
         "certification": lambda: m.Certification.objects.create(
             owner=user, name="CKA", issuer="CNCF"

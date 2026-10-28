@@ -104,10 +104,13 @@ MAX_CONTACT_ROWS = 20
 #: How many rows go to the database in one statement.
 BATCH = ordering.BATCH
 
-#: What an entry writes as a number and not as text: a level (#684) and a course's hours (#695).
-#: The form reads a level as a choice and the hours within their bounds, so a number outside
-#: either is a refused row like a word is.
-NUMBERS = frozenset({"eqf_level", "hours"})
+#: What an entry writes as a number and not as text: a level (#684), a course's hours (#695) and
+#: how often a work was cited (#697). The form reads a level as a choice and the others within
+#: their bounds, so a number outside any of them is a refused row like a word is.
+NUMBERS = frozenset({"eqf_level", "hours", "count"})
+#: The largest number handed to a form as written: above every bound a form has (a citation
+#: count's ten million), and short of a number whose text is itself the burden.
+MAX_NUMBER = 10**9
 
 #: What an entry writes as a list of texts and not as one: a licence's categories (#691). Held
 #: as that list, bounded, and read by the form as the ticked boxes it would have been.
@@ -182,8 +185,18 @@ class Kind:
     @property
     def held(self) -> tuple[str, ...]:
         """What is kept of an entry between reading the file and confirming it."""
-        extra = ("group_id",) if self.block == "skills" else ()
+        extra = (PARENTS[self.block][1],) if self.block in PARENTS else ()
         return ("id", "order", *self.fields, *self.hints, *extra)
+
+
+#: The kinds whose entry names another of the file's by its local id, as the block it names
+#: and the field that names it: a skill its group, a citation count its publication (#697).
+#: The entry it names is part of what makes this one itself -- *Python* under two groups is
+#: two skills, and a count of one paper is not the count of another.
+PARENTS = {
+    "skills": ("skill_groups", "group_id"),
+    "citations": ("publications", "publication_id"),
+}
 
 
 #: In the order the review shows them, which is the order the career page does -- and with
@@ -275,6 +288,19 @@ KINDS: tuple[Kind, ...] = (
         label="title",
         sub="container_title",
         identity=lambda get: _publication_identity(get),
+    ),
+    Kind(
+        block="citations",
+        model=resume.Citation,
+        form=resume_forms.CitationForm,
+        title=gettext_lazy("Citations"),
+        fields=("source", "count", "as_of", "url", "summary"),
+        # A count is who counted, the paper it counts (which `_Planner._entry` adds, as a
+        # skill's group) and the day: a later count from the same source is another entry, and
+        # the review says there is one like it with other dates (#697).
+        names=("source",),
+        dates=("as_of",),
+        label="source",
     ),
     Kind(
         block="links",
@@ -637,7 +663,7 @@ class Row:
     instance: Any = None
     #: What the account already holds that this is.
     existing: Any = None
-    #: The group a skill sits under.
+    #: The group a skill sits under, or the publication a citation count is of (#697).
     parent: Row | None = None
     #: A detail to fill in: the field, and what to put in it.
     fill: tuple[str, str] | None = None
@@ -865,7 +891,7 @@ class _Planner:
                     wrong.append((name, _not_text()))
             elif name in NUMBERS and isinstance(value, int) and not isinstance(value, bool):
                 # A level is written as the number it is; the form judges whether it is one.
-                data[name] = str(value) if abs(value) < 10**6 else ""
+                data[name] = str(value) if abs(value) < MAX_NUMBER else ""
                 if not data[name]:
                     wrong.append((name, _not_text()))
             elif not isinstance(value, str):
@@ -1439,11 +1465,21 @@ class _Planner:
             for name in kind.names
         )
         dates = tuple(get(name) or None for name in kind.dates)
-        return (group, *names, *dates) if kind.block == "skills" else (*names, *dates)
+        return (group, *names, *dates) if kind.block in PARENTS else (*names, *dates)
 
-    def _alike(self, kind: Kind, get: Callable[[str], Any]) -> tuple:
+    def _alike(self, kind: Kind, get: Callable[[str], Any], group: str = "") -> tuple:
         """The key without its dates: the same post, held at another time."""
-        return tuple(fold(get(name)) for name in kind.names)
+        names = tuple(fold(get(name)) for name in kind.names)
+        return (group, *names) if kind.block in PARENTS else names
+
+    @staticmethod
+    def _parent_of(item) -> str:
+        """What an entry the account holds sits under, folded: a group's name, a paper's title."""
+        if getattr(item, "group_id", None):
+            return fold(item.group.name)
+        if getattr(item, "publication_id", None):
+            return fold(item.publication.title)
+        return ""
 
     def _entries(self, kind: Kind) -> Section:
         section = Section(kind.block, kind.title, kind=kind)
@@ -1451,14 +1487,16 @@ class _Planner:
         standing = kind.model.objects.for_user(self.user)
         if kind.block == "skills":
             standing = standing.select_related("group")
+        if kind.block == "citations":
+            standing = standing.select_related("publication")
         mine: dict[tuple, Any] = {}
         alike: set[tuple] = set()
         for item in standing:
-            group = fold(item.group.name) if getattr(item, "group_id", None) else ""
+            group = self._parent_of(item)
             says = partial(getattr, item)
             for key in self._keys(kind, says, group):
                 mine.setdefault(key, item)
-            alike.add(self._alike(kind, says))
+            alike.add(self._alike(kind, says, group))
         seen: dict[tuple, Row] = {}
         for position, entry in enumerate(self.held.get(kind.block) or []):
             if not isinstance(entry, dict):
@@ -1492,6 +1530,11 @@ class _Planner:
         if kind.block == "skills":
             group = self._group_of(entry, row)
             row.sub = self._group_name(row)
+        if kind.block == "citations":
+            if valid:
+                # The line a CV would print, which says more than the source alone.
+                row.label = str(instance)
+            group = self._paper_of(entry, row)
         if not valid:
             row.outcome = REFUSED
             row.notes = [*self._problems(form, wrong), *row.notes]
@@ -1524,7 +1567,7 @@ class _Planner:
                 if name not in kind.names and name not in kind.dates
             ):
                 row.notes.append(_("The file words it differently. Yours is left as it is."))
-        elif kind.dates and self._alike(kind, said.get) in alike:
+        elif kind.dates and self._alike(kind, said.get, group) in alike:
             row.notes.append(
                 _("You have one like it with other dates. Both will be in your record.")
             )
@@ -1567,6 +1610,45 @@ class _Planner:
             return ""
         row.parent = group
         return fold(group.target.name)
+
+    def _paper_of(self, entry: dict, row: Row) -> str:
+        """Which publication a citation count is of, folded, or nothing for the whole body.
+
+        Never a reason to refuse the count (#697): a paper the file does not hold, or holds
+        and cannot add, leaves the count as one for the body of work as a whole, and the
+        review says so before anything is added.
+        """
+        named = entry.get("publication_id")
+        if named is None:
+            return ""
+        paper = self.named.get("publications", {}).get(_whole_number(named))
+        if paper is None:
+            row.notes.append(
+                _(
+                    "The publication it counts is not in the file, so it will be a count for "
+                    "all of your work."
+                )
+            )
+            return ""
+        if paper is AMBIGUOUS:
+            row.notes.append(
+                _(
+                    "The file has two publications under the number it names, so it will be a "
+                    "count for all of your work."
+                )
+            )
+            return ""
+        if paper.outcome == REFUSED:
+            row.notes.append(
+                _(
+                    "The publication it counts cannot be added, so it will be a count for all "
+                    "of your work."
+                )
+            )
+            return ""
+        row.parent = paper
+        row.sub = str(paper.target.title)[:200]
+        return fold(paper.target.title)
 
     @staticmethod
     def _group_name(row: Row) -> str:
@@ -1800,6 +1882,9 @@ def _place(user, kind: Kind, rows: list[Row]) -> None:
         if kind.block == "publications":
             item.cite_key = item.free_cite_key(taken)
             taken.add(item.cite_key)
+        if kind.block == "citations":
+            # The publication was added, or found, by the section before this one (#697).
+            item.publication = row.parent.target if row.parent is not None else None
         if kind.block == "skills":
             item.group = row.parent.target if row.parent is not None else None
             # `bulk_create` calls no `save`, which is where a skill works out which ESCO

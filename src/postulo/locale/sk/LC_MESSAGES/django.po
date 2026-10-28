@@ -1447,6 +1447,14 @@ msgstr "%(title)s neodpovedá: %(detail)s"
 msgid "%(title)s still answers."
 msgstr "%(title)s stále odpovedá."
 
+#: src/postulo/resume/models.py
+#, python-format
+msgid "%(title)s: cited %(count)s time (%(source)s, %(date)s)"
+msgid_plural "%(title)s: cited %(count)s times (%(source)s, %(date)s)"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+
 #: src/postulo/jobs/vcards.py
 #, python-format
 msgid "%(total)s address"
@@ -2163,6 +2171,10 @@ msgstr "Limit sa nikdy nevynucuje sám: skúšobný beh povie, čoho by sa pravi
 #: src/postulo/documents/models.py
 msgid "A line at the end, which names nobody. A reference from your career is printed only once the person has agreed, whatever this says."
 msgstr "Riadok na konci, ktorý nikoho nemenuje. Referencia z vašej kariéry sa vytlačí, až keď s tým osoba súhlasí, nech tu je čokoľvek."
+
+#: src/postulo/resume/forms.py
+msgid "A line of your own, such as what the count covers."
+msgstr ""
 
 #: src/postulo/resume/forms.py
 msgid "A line or two. It prints under the dates on a CV."
@@ -3189,6 +3201,10 @@ msgstr "Všetky inzeráty"
 msgid "All of them are offered, and a language added in a later release will be too."
 msgstr "Ponúkajú sa všetky a jazyk pridaný v neskoršom vydaní sa bude ponúkať tiež."
 
+#: src/postulo/resume/forms.py
+msgid "All of your work"
+msgstr ""
+
 #: src/postulo/core/help.py
 msgid "All optional, and none of it is worked out from anything else. None of it is printed until a CV is set to print it, one by one, under “Choose which details” on the CV."
 msgstr "Všetko je voliteľné a nič z toho sa neodvodzuje z ničoho iného. Nič z toho sa netlačí, kým to životopis nemá nastavené, jednotlivo, v časti „Vybrať údaje“ v životopise."
@@ -3873,6 +3889,10 @@ msgstr "Tak, ako ho uvádza inzerát – mesto, región, krajina. Voľný text: 
 #: src/postulo/jobs/forms.py
 msgid "As the posting words it. The ISCO-08 code the words match in the ESCO classification follows the posting, in the language you read; a title that matches nothing has no code, and that is not a lesser kind of job."
 msgstr "Tak, ako ho uvádza inzerát. Kód ISCO-08, ktorému slová zodpovedajú v klasifikácii ESCO, sa zobrazí pri inzeráte v jazyku, v ktorom čítate; názov, ktorý ničomu nezodpovedá, kód nemá, a to neznamená menej cennú prácu."
+
+#: src/postulo/resume/forms.py
+msgid "As the source states it on the day you read it."
+msgstr ""
 
 #: src/postulo/templates/documents/letter_detail.html
 msgid "As they will read it"
@@ -4780,6 +4800,10 @@ msgstr "Vyberte jeden z riadkov vo svojich údajoch."
 msgid "Choose one of your own contacts."
 msgstr "Vyberte jeden z vašich vlastných kontaktov."
 
+#: src/postulo/resume/forms.py src/postulo/resume/models.py
+msgid "Choose one of your own publications."
+msgstr ""
+
 #: src/postulo/templates/help/telephone_numbers.html
 msgid "Choose the country the number is in and type the number the way it is written there. Or type it in full, starting with +, and the country chosen is ignored. It is kept in the international form, so it can be dialled from anywhere, and documents print it grouped the way its country writes it."
 msgstr "Vyberte krajinu, v ktorej je číslo, a napíšte číslo tak, ako sa tam píše. Alebo ho napíšte celé, začínajúc znakom +, a zvolená krajina sa ignoruje. Uchová sa v medzinárodnom tvare, takže sa dá vytočiť odkiaľkoľvek, a dokumenty ho vytlačia zoskupené tak, ako ho píše jeho krajina."
@@ -4821,8 +4845,34 @@ msgid "Chosen for this CV"
 msgstr "Vybrané pre tento životopis"
 
 #: src/postulo/resume/models.py
+msgid "citation count"
+msgstr ""
+
+#: src/postulo/resume/registry.py
+msgid "Citation count"
+msgstr ""
+
+#: src/postulo/resume/models.py
 msgid "citation key"
 msgstr "citačný kľúč"
+
+#: src/postulo/documents/rendering.py src/postulo/resume/candidate.py
+#: src/postulo/resume/registry.py src/postulo/resume/views_candidate.py
+#: src/postulo/templates/resume/preview.html
+msgid "Citations"
+msgstr ""
+
+#: src/postulo/resume/models.py
+msgid "citations"
+msgstr ""
+
+#: src/postulo/resume/models.py
+#, python-format
+msgid "Cited %(count)s time (%(source)s, %(date)s)"
+msgid_plural "Cited %(count)s times (%(source)s, %(date)s)"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
 
 #: src/postulo/core/personal.py
 msgid "Citizen of an EU or EEA country, or of Switzerland"
@@ -5328,6 +5378,10 @@ msgstr "Spočítané z inzerátov zaznamenaných tu; nikto to nenahlásil."
 #: src/postulo/templates/widgets/interviews_summary.html
 msgid "Counted from the timeline, so interviews recorded before the diary existed are in."
 msgstr "Počítané z časovej osi, takže pohovory zaznamenané pred vznikom diára sú zahrnuté."
+
+#: src/postulo/resume/models.py
+msgid "counted on"
+msgstr ""
 
 #: src/postulo/core/models.py src/postulo/core/postal.py
 #: src/postulo/resume/models.py
@@ -7819,6 +7873,10 @@ msgstr "Koľko miesta nechať"
 msgid "How much you sent, month by month, so a quiet stretch is visible."
 msgstr "Koľko ste posielali mesiac po mesiaci, aby bolo vidieť tiché obdobie."
 
+#: src/postulo/resume/registry.py
+msgid "How often your work has been cited, as a source counted it on a given day: for all of it, or for one publication. Postulo counts nothing itself."
+msgstr ""
+
 #: src/postulo/templates/help/your_details.html
 #, python-format
 msgid "How Postulo behaves for you, such as its theme, its language and your account, is not here: it is under <a href=\"%(settings_url)s\" class=\"underline\">Settings</a>."
@@ -9152,6 +9210,10 @@ msgstr "Nechať tak"
 #: src/postulo/resume/forms.py
 msgid "Leave it empty for a single day or when it has no end."
 msgstr "Nechajte prázdne, ak ide o jeden deň alebo ak nemá koniec."
+
+#: src/postulo/resume/forms.py
+msgid "Leave it empty for all of your work together, as a profile page counts it; choose a publication for the count of that one."
+msgstr ""
 
 #: src/postulo/resume/forms.py
 msgid "Leave it empty if it does not expire."
@@ -15181,7 +15243,7 @@ msgstr "Zoradiť podľa stĺpca %(column)s, od najvyššieho"
 msgid "Sort by %(column)s, lowest first"
 msgstr "Zoradiť podľa stĺpca %(column)s, od najnižšieho"
 
-#: src/postulo/jobs/models.py
+#: src/postulo/jobs/models.py src/postulo/resume/models.py
 msgid "source"
 msgstr "zdroj"
 
@@ -16667,6 +16729,10 @@ msgstr "Dátum, dokedy ho chcete mať odoslaný. Nie je to pripomienka – ak ch
 msgid "The day it was true or reported, not today's date unless it is."
 msgstr "Deň, keď to platilo alebo bolo nahlásené – nie dnešný dátum, pokiaľ nejde práve o neho."
 
+#: src/postulo/resume/forms.py
+msgid "The day you read the count. A count changes, so a CV prints the month and the year beside it."
+msgstr ""
+
 #: src/postulo/templates/server/plugins.html
 msgid "The default for every account. One person's exceptions are on their row under People. Switching a plugin off stops it being used and deletes nothing."
 msgstr "Predvolené pre každý účet. Výnimky pre jednotlivú osobu sú v jej riadku v sekcii Ľudia. Vypnutie zásuvného modulu zastaví jeho používanie a nič nemaže."
@@ -16786,6 +16852,10 @@ msgstr "Súbor obsahuje ďalší údaj tohto typu a osoba má od každého len j
 #: src/postulo/resume/candidate.py
 msgid "The file has two groups under the number it names."
 msgstr "Súbor má dve skupiny pod číslom, ktoré uvádza."
+
+#: src/postulo/resume/candidate.py
+msgid "The file has two publications under the number it names, so it will be a count for all of your work."
+msgstr ""
 
 #: src/postulo/templates/jobs/contact_vcards.html
 #, python-format
@@ -17216,6 +17286,10 @@ msgstr[0] "Stránka sa nevykreslila do %(seconds)s sekundy, preto sa od nej upus
 msgstr[1] "Stránka sa nevykreslila do %(seconds)s sekúnd, preto sa od nej upustilo."
 msgstr[2] "Stránka sa nevykreslila do %(seconds)s sekúnd, preto sa od nej upustilo."
 
+#: src/postulo/resume/forms.py
+msgid "The page you read it on. A CV does not print it."
+msgstr ""
+
 #: src/postulo/jobs/forms.py
 msgid "The part of the economy it is in. Narrows the suggestions below, and an industry of your own added here is filed under it."
 msgstr "Časť hospodárstva, do ktorej patrí. Zužuje návrhy nižšie a vlastné odvetvie pridané tu sa zaradí pod ňu."
@@ -17304,6 +17378,14 @@ msgstr "Adresa tokenu poskytovateľa presmerovala a Postulo presmerovanie nesled
 #: src/postulo/applications/forms.py
 msgid "The public employment service you are registered with. Add it under Companies, as a public employment service, if it is not here."
 msgstr "Verejná služba zamestnanosti, v ktorej ste zaregistrovaní. Ak tu nie je, pridajte ju vo Firmách ako verejnú službu zamestnanosti."
+
+#: src/postulo/resume/candidate.py
+msgid "The publication it counts cannot be added, so it will be a count for all of your work."
+msgstr ""
+
+#: src/postulo/resume/candidate.py
+msgid "The publication it counts is not in the file, so it will be a count for all of your work."
+msgstr ""
 
 #: src/postulo/applications/views.py
 msgid "The reason was not kept: only an application that was rejected, withdrawn or ghosted has one."
@@ -18382,6 +18464,10 @@ msgstr "Časový limit"
 #: src/postulo/core/models.py
 msgid "timeout in seconds"
 msgstr "časový limit v sekundách"
+
+#: src/postulo/resume/models.py
+msgid "times cited"
+msgstr ""
 
 #: src/postulo/documents/forms.py
 msgid "Title"
@@ -19853,6 +19939,10 @@ msgstr "Kým je pre vás zapnuté <em>Pravidlá adries podľa krajiny</em>, čas
 #: src/postulo/resume/forms.py
 msgid "Who awarded it, as a CV should print it. It is linked to the company of that name among yours, and added to your companies if there is none."
 msgstr "Kto ho udelil, tak, ako to má životopis vytlačiť. Prepojí sa s firmou s týmto názvom medzi vašimi firmami, a ak taká nie je, pridá sa k vašim firmám."
+
+#: src/postulo/resume/forms.py
+msgid "Who counted: Google Scholar, Scopus, Web of Science or any other. Postulo counts nothing itself."
+msgstr ""
 
 #: src/postulo/resume/forms.py
 msgid "Who gave it, as a CV should print it. It is linked to the company of that name among yours, and added to your companies if there is none."

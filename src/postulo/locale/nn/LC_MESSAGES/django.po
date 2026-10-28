@@ -1366,6 +1366,13 @@ msgstr "%(title)s svarte ikkje: %(detail)s"
 msgid "%(title)s still answers."
 msgstr "%(title)s svarer framleis."
 
+#: src/postulo/resume/models.py
+#, python-format
+msgid "%(title)s: cited %(count)s time (%(source)s, %(date)s)"
+msgid_plural "%(title)s: cited %(count)s times (%(source)s, %(date)s)"
+msgstr[0] ""
+msgstr[1] ""
+
 #: src/postulo/jobs/vcards.py
 #, python-format
 msgid "%(total)s address"
@@ -2061,6 +2068,10 @@ msgstr "Ei grense blir aldri handheva av seg sjølv: prøvekøyringa seier kva l
 #: src/postulo/documents/models.py
 msgid "A line at the end, which names nobody. A reference from your career is printed only once the person has agreed, whatever this says."
 msgstr "Ei linje til slutt, som ikkje namngjev nokon. Ein referanse frå karrieren din blir berre vist når personen har sagt ja, uansett kva som står her."
+
+#: src/postulo/resume/forms.py
+msgid "A line of your own, such as what the count covers."
+msgstr ""
 
 #: src/postulo/resume/forms.py
 msgid "A line or two. It prints under the dates on a CV."
@@ -3072,6 +3083,10 @@ msgstr "Alle utlysingar"
 msgid "All of them are offered, and a language added in a later release will be too."
 msgstr "Alle blir tilbodne, og eit språk som kjem til i ei seinare utgåve, blir det òg."
 
+#: src/postulo/resume/forms.py
+msgid "All of your work"
+msgstr ""
+
 #: src/postulo/core/help.py
 msgid "All optional, and none of it is worked out from anything else. None of it is printed until a CV is set to print it, one by one, under “Choose which details” on the CV."
 msgstr "Alt er valfritt, og ingenting av det blir rekna ut frå noko anna. Ingenting av det blir skrive ut før ein CV er sett opp til å skrive det ut, eitt for eitt, under «Vel kva for opplysningar» på CV-en."
@@ -3748,6 +3763,10 @@ msgstr "Slik stillingsannonsen formulerer det – ein by, ein region, eit land. 
 #: src/postulo/jobs/forms.py
 msgid "As the posting words it. The ISCO-08 code the words match in the ESCO classification follows the posting, in the language you read; a title that matches nothing has no code, and that is not a lesser kind of job."
 msgstr "Slik stillingsannonsen formulerer det. ISCO-08-koden som orda samsvarar med i ESCO-klassifikasjonen, følgjer stillingsannonsen, på språket du les; ein tittel som ikkje samsvarar med noko, har ingen kode, og det gjer ikkje jobben mindre verd."
+
+#: src/postulo/resume/forms.py
+msgid "As the source states it on the day you read it."
+msgstr ""
 
 #: src/postulo/templates/documents/letter_detail.html
 msgid "As they will read it"
@@ -4649,6 +4668,10 @@ msgstr "Vel ei av radene i opplysningane dine."
 msgid "Choose one of your own contacts."
 msgstr "Vel ein av dine eigne kontaktar."
 
+#: src/postulo/resume/forms.py src/postulo/resume/models.py
+msgid "Choose one of your own publications."
+msgstr ""
+
 #: src/postulo/templates/help/telephone_numbers.html
 msgid "Choose the country the number is in and type the number the way it is written there. Or type it in full, starting with +, and the country chosen is ignored. It is kept in the international form, so it can be dialled from anywhere, and documents print it grouped the way its country writes it."
 msgstr "Vel landet nummeret er i, og skriv nummeret slik det blir skrive der. Eller skriv det heilt, med + først, så blir det valde landet ignorert. Det blir teke vare på i internasjonal form, så det kan ringjast frå kvar som helst, og dokument viser det gruppert slik landet skriv det."
@@ -4690,8 +4713,33 @@ msgid "Chosen for this CV"
 msgstr "Vald for denne CV-en"
 
 #: src/postulo/resume/models.py
+msgid "citation count"
+msgstr ""
+
+#: src/postulo/resume/registry.py
+msgid "Citation count"
+msgstr ""
+
+#: src/postulo/resume/models.py
 msgid "citation key"
 msgstr "siteringsnøkkel"
+
+#: src/postulo/documents/rendering.py src/postulo/resume/candidate.py
+#: src/postulo/resume/registry.py src/postulo/resume/views_candidate.py
+#: src/postulo/templates/resume/preview.html
+msgid "Citations"
+msgstr ""
+
+#: src/postulo/resume/models.py
+msgid "citations"
+msgstr ""
+
+#: src/postulo/resume/models.py
+#, python-format
+msgid "Cited %(count)s time (%(source)s, %(date)s)"
+msgid_plural "Cited %(count)s times (%(source)s, %(date)s)"
+msgstr[0] ""
+msgstr[1] ""
 
 #: src/postulo/core/personal.py
 msgid "Citizen of an EU or EEA country, or of Switzerland"
@@ -5196,6 +5244,10 @@ msgstr "Rekna ut frå utlysingane som er registrerte her; ingen har meldt det."
 #: src/postulo/templates/widgets/interviews_summary.html
 msgid "Counted from the timeline, so interviews recorded before the diary existed are in."
 msgstr "Talt frå tidslinja, så intervju som vart registrerte før kalenderen fanst, er med."
+
+#: src/postulo/resume/models.py
+msgid "counted on"
+msgstr ""
 
 #: src/postulo/core/models.py src/postulo/core/postal.py
 #: src/postulo/resume/models.py
@@ -7679,6 +7731,10 @@ msgstr "Kor mykje luft det skal vere"
 msgid "How much you sent, month by month, so a quiet stretch is visible."
 msgstr "Kor mykje du sende, månad for månad, så ein stille periode blir synleg."
 
+#: src/postulo/resume/registry.py
+msgid "How often your work has been cited, as a source counted it on a given day: for all of it, or for one publication. Postulo counts nothing itself."
+msgstr ""
+
 #: src/postulo/templates/help/your_details.html
 #, python-format
 msgid "How Postulo behaves for you, such as its theme, its language and your account, is not here: it is under <a href=\"%(settings_url)s\" class=\"underline\">Settings</a>."
@@ -9016,6 +9072,10 @@ msgstr "La det vere som det er"
 #: src/postulo/resume/forms.py
 msgid "Leave it empty for a single day or when it has no end."
 msgstr "La feltet stå tomt for éin enkelt dag, eller når det ikkje har nokon slutt."
+
+#: src/postulo/resume/forms.py
+msgid "Leave it empty for all of your work together, as a profile page counts it; choose a publication for the count of that one."
+msgstr ""
 
 #: src/postulo/resume/forms.py
 msgid "Leave it empty if it does not expire."
@@ -14998,7 +15058,7 @@ msgstr "Sorter etter %(column)s, høgaste først"
 msgid "Sort by %(column)s, lowest first"
 msgstr "Sorter etter %(column)s, lågaste først"
 
-#: src/postulo/jobs/models.py
+#: src/postulo/jobs/models.py src/postulo/resume/models.py
 msgid "source"
 msgstr "kjelde"
 
@@ -16486,6 +16546,10 @@ msgstr "Datoen du har tenkt å ha sendt det innan. Det er ikkje ei påminning �
 msgid "The day it was true or reported, not today's date unless it is."
 msgstr "Dagen det var sant eller vart meldt, ikkje dagens dato med mindre det er han."
 
+#: src/postulo/resume/forms.py
+msgid "The day you read the count. A count changes, so a CV prints the month and the year beside it."
+msgstr ""
+
 #: src/postulo/templates/server/plugins.html
 msgid "The default for every account. One person's exceptions are on their row under People. Switching a plugin off stops it being used and deletes nothing."
 msgstr "Standarden for alle kontoar. Unntaka for ein person står på rada til personen under Personar. Når eit programtillegg blir slått av, blir det ikkje lenger brukt, og ingenting blir sletta."
@@ -16605,6 +16669,10 @@ msgstr "Fila har ein til av denne typen, og ein person har éin av kvar."
 #: src/postulo/resume/candidate.py
 msgid "The file has two groups under the number it names."
 msgstr "Fila har to grupper under nummeret ho oppgir."
+
+#: src/postulo/resume/candidate.py
+msgid "The file has two publications under the number it names, so it will be a count for all of your work."
+msgstr ""
 
 #: src/postulo/templates/jobs/contact_vcards.html
 #, python-format
@@ -17032,6 +17100,10 @@ msgid_plural "The page was not drawn within %(seconds)s seconds, so it was left.
 msgstr[0] "Sida vart ikkje gjengitt innan %(seconds)s sekund, så det vart gjeve opp."
 msgstr[1] "Sida vart ikkje gjengitt innan %(seconds)s sekund, så det vart gjeve opp."
 
+#: src/postulo/resume/forms.py
+msgid "The page you read it on. A CV does not print it."
+msgstr ""
+
 #: src/postulo/jobs/forms.py
 msgid "The part of the economy it is in. Narrows the suggestions below, and an industry of your own added here is filed under it."
 msgstr "Den delen av økonomien det høyrer til. Avgrensar forslaga nedanfor, og ein eigen bransje som blir lagd til her, blir arkivert under han."
@@ -17120,6 +17192,14 @@ msgstr "Token-adressa til leverandøren omdirigerte, og Postulo følgjer ikkje o
 #: src/postulo/applications/forms.py
 msgid "The public employment service you are registered with. Add it under Companies, as a public employment service, if it is not here."
 msgstr "Den offentlege arbeidsformidlinga du er registrert hos. Legg henne til under Selskap, som offentleg arbeidsformidling, dersom ho ikkje er her."
+
+#: src/postulo/resume/candidate.py
+msgid "The publication it counts cannot be added, so it will be a count for all of your work."
+msgstr ""
+
+#: src/postulo/resume/candidate.py
+msgid "The publication it counts is not in the file, so it will be a count for all of your work."
+msgstr ""
 
 #: src/postulo/applications/views.py
 msgid "The reason was not kept: only an application that was rejected, withdrawn or ghosted has one."
@@ -18197,6 +18277,10 @@ msgstr "Tidsavbrot"
 #: src/postulo/core/models.py
 msgid "timeout in seconds"
 msgstr "tidsavbrot i sekund"
+
+#: src/postulo/resume/models.py
+msgid "times cited"
+msgstr ""
 
 #: src/postulo/documents/forms.py
 msgid "Title"
@@ -19662,6 +19746,10 @@ msgstr "Medan <em>Adressereglar etter land</em> er slått på for deg, blir dela
 #: src/postulo/resume/forms.py
 msgid "Who awarded it, as a CV should print it. It is linked to the company of that name among yours, and added to your companies if there is none."
 msgstr "Kven som tildelte det, slik ein CV skal vise det. Det blir knytt til selskapet med det namnet blant dine, og lagt til blant selskapa dine dersom det ikkje finst noko."
+
+#: src/postulo/resume/forms.py
+msgid "Who counted: Google Scholar, Scopus, Web of Science or any other. Postulo counts nothing itself."
+msgstr ""
 
 #: src/postulo/resume/forms.py
 msgid "Who gave it, as a CV should print it. It is linked to the company of that name among yours, and added to your companies if there is none."

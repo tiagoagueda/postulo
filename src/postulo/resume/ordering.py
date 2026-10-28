@@ -35,6 +35,8 @@ DATE_FIELDS: dict[str, str] = {
     "Membership": "start_date",
     "Course": "end_date",
     "Participation": "start_date",
+    # The latest count first: the one a CV is most likely to print (#697).
+    "Citation": "as_of",
 }
 
 DIRECTIONS = ("up", "down")

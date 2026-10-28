@@ -227,7 +227,13 @@ logger = logging.getLogger(__name__)
 #: the company it became part of (by name, as ``parent`` is), and ``hiring_signals``: its dated
 #: entries, each a ``kind``, the day it is ``noted_on``, a ``source_url`` and who noted it. An
 #: archive without them restores every company as active, with no entries (#941).
-FORMAT_VERSION = 75
+#: 76 added ``citations`` in the career: how often the person's work has been cited, each a
+#: ``source`` as text, a ``count`` from 1 to 10,000,000, the day it was counted (``as_of``), a
+#: link and a summary, and the local id of the publication it counts (``publication_id``) or
+#: none for the whole body of work. An archive without them restores none; one with a count
+#: out of bounds or no date restores that entry not at all, and one naming a publication the
+#: file does not hold restores it as a count for the whole body of work, and says so (#697).
+FORMAT_VERSION = 76
 
 
 def industry_entry(industry) -> str | dict:
@@ -303,7 +309,11 @@ def industry_entry(industry) -> str | dict:
 #: 22 wrote ``form_of_address``, ``pronouns`` and ``gender`` as concepts, as the archive does;
 #: a file's words are read back as the concepts they name, and shown as words in the language
 #: of the career record (#921).
-CANDIDATE_FORMAT = 22
+#: 23 added ``citations``, read back through the form a person would have typed one into, so a
+#: count outside 1 to 10,000,000 or a missing date is a refused row; the same count is the same
+#: source, publication and day, and a publication the file does not hold leaves the count as one
+#: for the whole body of work, and says so (#697).
+CANDIDATE_FORMAT = 23
 
 MANIFEST_NAME = "postulo.json"
 MEDIA_PREFIX = "media/"
@@ -405,6 +415,7 @@ TRANSLATION_SECTIONS = {
     "membership": "memberships",
     "course": "courses",
     "participation": "participations",
+    "citation": "citations",
     "link": "links",
 }
 TAG_FIELDS = ("id", "name", "slug", "colour", "icon")
@@ -696,6 +707,9 @@ RESUME_FIELDS = {
         "cite_key",
         "order",
     ),
+    # After the publications, so that a reader meets the paper a count names before the
+    # count (#697): by its local id in this file, or none for the whole body of work.
+    "citations": ("id", "source", "count", "as_of", "publication_id", "url", "summary", "order"),
     "skill_groups": ("id", "name", "order"),
     # The ESCO skill the name matches, beside the name (#266): written for whoever reads the
     # file, and never read back -- the importers work it out again from the name.
@@ -792,6 +806,7 @@ RESUME_MODELS = {
     "education": "Education",
     "projects": "Project",
     "publications": "Publication",
+    "citations": "Citation",
     "skill_groups": "SkillGroup",
     "skills": "Skill",
     "certifications": "Certification",

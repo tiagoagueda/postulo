@@ -1366,6 +1366,13 @@ msgstr "%(title)s সাড়া দেয়নি: %(detail)s"
 msgid "%(title)s still answers."
 msgstr "%(title)s এখনও সাড়া দেয়।"
 
+#: src/postulo/resume/models.py
+#, python-format
+msgid "%(title)s: cited %(count)s time (%(source)s, %(date)s)"
+msgid_plural "%(title)s: cited %(count)s times (%(source)s, %(date)s)"
+msgstr[0] ""
+msgstr[1] ""
+
 #: src/postulo/jobs/vcards.py
 #, fuzzy, python-format
 msgid "%(total)s address"
@@ -2171,6 +2178,10 @@ msgstr "কোনো সীমা নিজে থেকে কার্যক�
 #, fuzzy
 msgid "A line at the end, which names nobody. A reference from your career is printed only once the person has agreed, whatever this says."
 msgstr "শেষে একটি লাইন, যাতে কারও নাম থাকে না। এখানে যা-ই লেখা থাকুক, আপনার কর্মজীবনের কোনো রেফারেন্স কেবল তখনই দেখানো হয় যখন সেই ব্যক্তি সম্মতি দিয়েছেন।"
+
+#: src/postulo/resume/forms.py
+msgid "A line of your own, such as what the count covers."
+msgstr ""
 
 #: src/postulo/resume/forms.py
 #, fuzzy
@@ -3383,6 +3394,10 @@ msgstr "সব বিজ্ঞাপন"
 msgid "All of them are offered, and a language added in a later release will be too."
 msgstr "সব ভাষাই দেওয়া হচ্ছে, এবং পরের কোনো রিলিজে যোগ হওয়া ভাষাও দেওয়া হবে।"
 
+#: src/postulo/resume/forms.py
+msgid "All of your work"
+msgstr ""
+
 #: src/postulo/core/help.py
 #, fuzzy
 msgid "All optional, and none of it is worked out from anything else. None of it is printed until a CV is set to print it, one by one, under “Choose which details” on the CV."
@@ -4194,6 +4209,10 @@ msgstr "বিজ্ঞাপনে যেভাবে লেখা — এক�
 #, fuzzy
 msgid "As the posting words it. The ISCO-08 code the words match in the ESCO classification follows the posting, in the language you read; a title that matches nothing has no code, and that is not a lesser kind of job."
 msgstr "বিজ্ঞাপনে যেভাবে লেখা। শব্দগুলো ESCO শ্রেণিবিভাগে যে ISCO-08 কোডের সঙ্গে মেলে, সেটি বিজ্ঞাপনের ভাষা অনুসরণ করে, আপনি যে ভাষায় পড়েন সেই ভাষায়; যে পদের নাম কিছুর সঙ্গে মেলে না, তার কোনো কোড নেই, আর তাতে চাকরিটি কোনোভাবে কম গুরুত্বপূর্ণ হয়ে যায় না।"
+
+#: src/postulo/resume/forms.py
+msgid "As the source states it on the day you read it."
+msgstr ""
 
 #: src/postulo/templates/documents/letter_detail.html
 #, fuzzy
@@ -5283,6 +5302,10 @@ msgstr "আপনার বিবরণের সারিগুলোর এক
 msgid "Choose one of your own contacts."
 msgstr "আপনার নিজের পরিচিতিগুলোর মধ্যে একজনকে বেছে নিন।"
 
+#: src/postulo/resume/forms.py src/postulo/resume/models.py
+msgid "Choose one of your own publications."
+msgstr ""
+
 #: src/postulo/templates/help/telephone_numbers.html
 #, fuzzy
 msgid "Choose the country the number is in and type the number the way it is written there. Or type it in full, starting with +, and the country chosen is ignored. It is kept in the international form, so it can be dialled from anywhere, and documents print it grouped the way its country writes it."
@@ -5334,9 +5357,34 @@ msgid "Chosen for this CV"
 msgstr "এই সিভির জন্য বেছে নেওয়া"
 
 #: src/postulo/resume/models.py
+msgid "citation count"
+msgstr ""
+
+#: src/postulo/resume/registry.py
+msgid "Citation count"
+msgstr ""
+
+#: src/postulo/resume/models.py
 #, fuzzy
 msgid "citation key"
 msgstr "উদ্ধৃতি কী"
+
+#: src/postulo/documents/rendering.py src/postulo/resume/candidate.py
+#: src/postulo/resume/registry.py src/postulo/resume/views_candidate.py
+#: src/postulo/templates/resume/preview.html
+msgid "Citations"
+msgstr ""
+
+#: src/postulo/resume/models.py
+msgid "citations"
+msgstr ""
+
+#: src/postulo/resume/models.py
+#, python-format
+msgid "Cited %(count)s time (%(source)s, %(date)s)"
+msgid_plural "Cited %(count)s times (%(source)s, %(date)s)"
+msgstr[0] ""
+msgstr[1] ""
 
 #: src/postulo/core/personal.py
 #, fuzzy
@@ -5945,6 +5993,10 @@ msgstr "এখানে নথিভুক্ত বিজ্ঞপ্তিগ�
 #, fuzzy
 msgid "Counted from the timeline, so interviews recorded before the diary existed are in."
 msgstr "সময়রেখা থেকে গোনা হয়েছে, তাই দিনপঞ্জি চালু হওয়ার আগে রেকর্ড করা সাক্ষাৎকারগুলোও এতে আছে।"
+
+#: src/postulo/resume/models.py
+msgid "counted on"
+msgstr ""
 
 #: src/postulo/core/models.py src/postulo/core/postal.py
 #: src/postulo/resume/models.py
@@ -8925,6 +8977,10 @@ msgstr "কতটা ফাঁকা জায়গা রাখা হবে"
 msgid "How much you sent, month by month, so a quiet stretch is visible."
 msgstr "মাসে মাসে আপনি কতগুলো পাঠিয়েছেন, যাতে কোনো নিষ্ক্রিয় সময় চোখে পড়ে।"
 
+#: src/postulo/resume/registry.py
+msgid "How often your work has been cited, as a source counted it on a given day: for all of it, or for one publication. Postulo counts nothing itself."
+msgstr ""
+
 #: src/postulo/templates/help/your_details.html
 #, fuzzy, python-format
 msgid "How Postulo behaves for you, such as its theme, its language and your account, is not here: it is under <a href=\"%(settings_url)s\" class=\"underline\">Settings</a>."
@@ -10521,6 +10577,10 @@ msgstr "বাদ দাও এটা যেমন"
 #, fuzzy
 msgid "Leave it empty for a single day or when it has no end."
 msgstr "একদিনের জন্য হলে বা এর কোনো শেষ না থাকলে এটি খালি রাখুন।"
+
+#: src/postulo/resume/forms.py
+msgid "Leave it empty for all of your work together, as a profile page counts it; choose a publication for the count of that one."
+msgstr ""
 
 #: src/postulo/resume/forms.py
 #, fuzzy
@@ -17694,7 +17754,7 @@ msgstr "%(column)s অনুযায়ী সাজান, সবচেয়�
 msgid "Sort by %(column)s, lowest first"
 msgstr "%(column)s অনুযায়ী সাজান, সবচেয়ে কমটি আগে"
 
-#: src/postulo/jobs/models.py
+#: src/postulo/jobs/models.py src/postulo/resume/models.py
 #, fuzzy
 msgid "source"
 msgstr "উৎস"
@@ -19429,6 +19489,10 @@ msgstr "যে তারিখের মধ্যে আপনি এটি প�
 msgid "The day it was true or reported, not today's date unless it is."
 msgstr "যে দিন এটি সত্য ছিল বা জানানো হয়েছিল, আজকের তারিখ নয়, যদি না সেটিই হয়।"
 
+#: src/postulo/resume/forms.py
+msgid "The day you read the count. A count changes, so a CV prints the month and the year beside it."
+msgstr ""
+
 #: src/postulo/templates/server/plugins.html
 #, fuzzy
 msgid "The default for every account. One person's exceptions are on their row under People. Switching a plugin off stops it being used and deletes nothing."
@@ -19572,6 +19636,10 @@ msgstr "ফাইলে এই ধরনের আরেকটি আছে, অ
 #, fuzzy
 msgid "The file has two groups under the number it names."
 msgstr "ফাইলটি যে নম্বর উল্লেখ করে, তার অধীনে দুটি গ্রুপ আছে।"
+
+#: src/postulo/resume/candidate.py
+msgid "The file has two publications under the number it names, so it will be a count for all of your work."
+msgstr ""
 
 #: src/postulo/templates/jobs/contact_vcards.html
 #, fuzzy, python-format
@@ -20074,6 +20142,10 @@ msgid_plural "The page was not drawn within %(seconds)s seconds, so it was left.
 msgstr[0] "%(seconds)s সেকেন্ডের মধ্যে পৃষ্ঠাটি আঁকা হয়নি, তাই এটি ছেড়ে দেওয়া হয়েছে।"
 msgstr[1] "%(seconds)s সেকেন্ডের মধ্যে পৃষ্ঠাটি আঁকা হয়নি, তাই এটি ছেড়ে দেওয়া হয়েছে।"
 
+#: src/postulo/resume/forms.py
+msgid "The page you read it on. A CV does not print it."
+msgstr ""
+
 #: src/postulo/jobs/forms.py
 #, fuzzy
 msgid "The part of the economy it is in. Narrows the suggestions below, and an industry of your own added here is filed under it."
@@ -20181,6 +20253,14 @@ msgstr "প্রদানকারীর টোকেনের ওয়েব 
 #, fuzzy
 msgid "The public employment service you are registered with. Add it under Companies, as a public employment service, if it is not here."
 msgstr "আপনি যে সরকারি কর্মসংস্থান সেবায় নিবন্ধিত। এখানে না থাকলে “কোম্পানি” অংশে সরকারি কর্মসংস্থান সেবা হিসেবে এটি যোগ করুন।"
+
+#: src/postulo/resume/candidate.py
+msgid "The publication it counts cannot be added, so it will be a count for all of your work."
+msgstr ""
+
+#: src/postulo/resume/candidate.py
+msgid "The publication it counts is not in the file, so it will be a count for all of your work."
+msgstr ""
 
 #: src/postulo/applications/views.py
 #, fuzzy
@@ -21461,6 +21541,10 @@ msgstr "টাইমআউট"
 #, fuzzy
 msgid "timeout in seconds"
 msgstr "টাইমআউট (সেকেন্ডে)"
+
+#: src/postulo/resume/models.py
+msgid "times cited"
+msgstr ""
 
 #: src/postulo/documents/forms.py
 #, fuzzy
@@ -23239,6 +23323,10 @@ msgstr "আপনার জন্য <em>দেশ অনুযায়ী ঠ�
 #, fuzzy
 msgid "Who awarded it, as a CV should print it. It is linked to the company of that name among yours, and added to your companies if there is none."
 msgstr "কে এটি প্রদান করেছে, সিভিতে যেভাবে দেখানো উচিত। এটি আপনার কোম্পানিগুলোর মধ্যে ওই নামের কোম্পানির সঙ্গে যুক্ত করা হয়, আর তেমন কোনোটি না থাকলে আপনার কোম্পানিগুলোতে যোগ করা হয়।"
+
+#: src/postulo/resume/forms.py
+msgid "Who counted: Google Scholar, Scopus, Web of Science or any other. Postulo counts nothing itself."
+msgstr ""
 
 #: src/postulo/resume/forms.py
 #, fuzzy

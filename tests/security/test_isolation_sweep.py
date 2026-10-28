@@ -967,6 +967,7 @@ def form_table(user, mine=None) -> dict:
         jobs.JobPostingForm: [{"user": user}],
         jobs.ListingEventForm: [{"user": user}],
         resume.CertificationForm: [{"user": user}],
+        resume.CitationForm: [{"user": user}],
         resume.CourseForm: [{"user": user}],
         resume.DrivingLicenceForm: [{"user": user}],
         resume.EducationForm: [{"user": user}],
@@ -1006,6 +1007,7 @@ OFFERED = {
     ("JobPostingForm", "company"),
     ("ListingEventForm", "contact"),
     ("ReferenceForm", "contact"),
+    ("CitationForm", "publication"),
     ("ListingEventForm", "document"),
     ("ReminderForm", "application"),
     ("AppointmentForm", "company"),
@@ -1043,6 +1045,10 @@ def test_no_form_offers_a_choice_that_is_somebody_elses(user, other_user):
     theirs.save()
     for make in (tag, industry, upload, contact, company, posting):
         make(other_user)
+    from postulo.resume.models import Publication
+
+    # A paper of theirs, which a citation count of this person's must never offer (#697).
+    Publication.objects.create(owner=other_user, title="Their paper")
 
     offered: set[tuple[str, str]] = set()
     for form_class, calls in form_table(user, mine).items():
@@ -1293,6 +1299,76 @@ def test_somebody_elses_event_is_on_no_page_of_mine(client, user, other_user):
     assert "Zebra symposium" not in client.get(reverse("resume:preview")).content.decode()
     assert search.search(user, "Zebra") == []
     assert search.search(user, "Quokka") == []
+
+
+# ------------------------------------------------------------ citation counts (#697)
+
+
+@pytest.mark.parametrize("name", ["item_update", "item_delete", "item_languages"])
+def test_somebody_elses_citation_count_is_not_found(client, user, other_user, name):
+    import datetime as dt
+
+    from postulo.resume.models import Citation
+
+    theirs = Citation.objects.create(
+        owner=other_user, source="Scopus", count=12, as_of=dt.date(2026, 9, 1)
+    )
+    client.force_login(user)
+    url = reverse(f"resume:{name}", args=["citation", theirs.pk])
+
+    assert client.get(url).status_code == 404
+    assert client.post(url).status_code == 404
+    move = reverse("resume:item_move", args=["citation", theirs.pk, "up"])
+    assert client.post(move).status_code == 404
+    assert Citation.objects.filter(pk=theirs.pk).exists()
+
+
+def test_somebody_elses_citation_count_is_on_no_page_of_mine(client, user, other_user):
+    import datetime as dt
+
+    from postulo.core import search
+    from postulo.resume.models import Citation, Publication
+
+    paper = Publication.objects.create(owner=other_user, title="Quokka optics")
+    Citation.objects.create(
+        owner=other_user,
+        source="Zebra Index",
+        count=12,
+        as_of=dt.date(2026, 9, 1),
+        publication=paper,
+    )
+    client.force_login(user)
+
+    assert "Zebra Index" not in client.get(reverse("resume:overview")).content.decode()
+    assert "Zebra Index" not in client.get(reverse("resume:preview")).content.decode()
+    assert search.search(user, "Zebra") == []
+    assert search.search(user, "Quokka") == []
+
+
+def test_a_citation_count_cannot_name_somebody_elses_publication(client, user, other_user):
+    """Refused by the form, which never offers it, and by the save, whoever writes the row."""
+    import datetime as dt
+
+    from django.core.exceptions import ValidationError
+
+    from postulo.resume.models import Citation, Publication
+
+    theirs = Publication.objects.create(owner=other_user, title="Their paper")
+    client.force_login(user)
+
+    response = client.post(
+        reverse("resume:item_create", args=["citation"]),
+        {"source": "Scopus", "count": "3", "as_of": "2026-09-01", "publication": theirs.pk},
+    )
+
+    assert response.status_code == 200
+    assert "Choose one of your own publications." in response.content.decode()
+    assert not Citation.objects.filter(owner=user).exists()
+    with pytest.raises(ValidationError):
+        Citation.objects.create(
+            owner=user, source="Scopus", count=3, as_of=dt.date(2026, 9, 1), publication=theirs
+        )
+    assert not Citation.objects.filter(owner=user).exists()
 
 
 # -------------------------------------------- the sweep proves it can fail (#825)

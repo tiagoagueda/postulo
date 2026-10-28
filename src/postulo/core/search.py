@@ -581,6 +581,13 @@ def search_career(user, query: str, limit: int) -> Found:
             "title",
             lambda r: r.title,
         ),
+        # A count by who counted, what the person says of it and the paper it counts (#697).
+        (
+            resume.Citation,
+            ("source", "summary", "publication__title"),
+            "source",
+            lambda r: str(r),
+        ),
         (resume.Certification, ("name", "issuer"), "name", lambda r: r.name),
         (resume.Honour, ("title", "awarded_by"), "title", lambda r: r.title),
         (resume.Membership, ("organisation", "role"), "organisation", lambda r: r.organisation),

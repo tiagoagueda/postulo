@@ -613,7 +613,8 @@ def _read_memberships(profile, record: Record) -> None:
     ``validFrom`` and ``validTo`` attributes are the period. The title or the name is the
     organisation as written -- “Member of the University's Film-Making Society” is the
     schema's own example, and splitting it into a role and a body would be a guess.
-    Nothing is read as an honour: the format has no element for one.
+    Nothing is read as an honour, nor as a citation count (#697): the format has no element
+    for either, and a count is not something to infer from prose.
     """
     networks = _find(profile, "NetworksAndMemberships")
     for item in _all(networks, "NetworkAndMembership") if networks is not None else []:

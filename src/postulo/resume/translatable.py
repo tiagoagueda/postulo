@@ -44,6 +44,9 @@ TRANSLATABLE: dict[str, tuple[str, ...]] = {
     # A membership's organisation stays as written, as an experience's does; what the person
     # was in it and what they say of it are theirs to put into another language (#693).
     "membership": ("role", "summary"),
+    # A citation count's source is somebody's name and its count a number; the line the
+    # person adds about it is theirs (#697).
+    "citation": ("summary",),
 }
 
 #: The models that translate nothing, each with its reason: a decision written down, not an

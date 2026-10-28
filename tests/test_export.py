@@ -1067,3 +1067,112 @@ def test_the_candidate_file_carries_no_document_link(user):
     _proof_of(user, Education.objects.create(owner=user, institution="A", qualification="B"))
 
     assert "proves" not in json.dumps(export_module.build_candidate_document(user))
+
+
+# ------------------------------------------------------------- citation counts (#697)
+
+
+def _counts(user):
+    from postulo.resume.models import Citation
+
+    paper = Publication.objects.create(owner=user, title="On portals", authors="Morgan, Alex")
+    of_it = Citation.objects.create(
+        owner=user,
+        source="Scopus",
+        count=1240,
+        as_of=dt.date(2026, 9, 14),
+        publication=paper,
+        summary="Excluding self-citations",
+        url="https://example.org/profile",
+    )
+    whole = Citation.objects.create(
+        owner=user, source="Google Scholar", count=3100, as_of=dt.date(2026, 9, 1)
+    )
+    return of_it, whole
+
+
+def test_a_citation_count_and_the_paper_it_counts_survive_the_round_trip(user, other_user):
+    from postulo.resume.models import Citation
+
+    of_it, whole = _counts(user)
+    cv = CV.objects.create(owner=user, name="Research")
+    for order, entry in enumerate((of_it, whole)):
+        CVItem.objects.create(
+            owner=user,
+            cv=cv,
+            content_type=ContentType.objects.get_for_model(Citation),
+            object_id=entry.pk,
+            order=order,
+        )
+    archive, document = read_archive(user)
+    assert document["postulo"]["format"] == export_module.FORMAT_VERSION >= 76
+    written = {row["source"]: row for row in document["resume"]["citations"]}
+    assert written["Scopus"]["publication_id"] == of_it.publication_id
+    assert written["Google Scholar"]["publication_id"] is None
+
+    importer.load(other_user, archive)
+
+    back = {row.source: row for row in Citation.objects.for_user(other_user)}
+    scopus = back["Scopus"]
+    assert (scopus.count, scopus.as_of, scopus.summary, scopus.url) == (
+        1240,
+        dt.date(2026, 9, 14),
+        "Excluding self-citations",
+        "https://example.org/profile",
+    )
+    assert scopus.publication == Publication.objects.for_user(other_user).get()
+    assert back["Google Scholar"].publication is None
+    restored = CV.objects.for_user(other_user).get()
+    assert [item.item for item in restored.items.order_by("order")] == [
+        scopus,
+        back["Google Scholar"],
+    ]
+
+
+def test_an_archive_from_before_citation_counts_still_loads(user, other_user):
+    from postulo.resume.models import Citation
+
+    _counts(user)
+    _archive, document = read_archive(user)
+    document["postulo"]["format"] = 75
+    del document["resume"]["citations"]
+
+    _restored(document, other_user)
+
+    assert Publication.objects.for_user(other_user).count() == 1
+    assert not Citation.objects.for_user(other_user).exists()
+
+
+def test_a_count_whose_paper_is_not_in_the_archive_counts_the_whole_and_says_so(user, other_user):
+    from postulo.resume.models import Citation
+
+    _counts(user)
+    _archive, document = read_archive(user)
+    document["resume"]["publications"] = []
+
+    report = _restored(document, other_user)
+
+    assert {c.source: c.publication for c in Citation.objects.for_user(other_user)} == {
+        "Scopus": None,
+        "Google Scholar": None,
+    }
+    assert any("whole body of work" in line for line in report.skipped)
+
+
+@pytest.mark.parametrize(
+    "change", [{"count": 0}, {"count": 10**9}, {"count": "9"}, {"as_of": None}]
+)
+def test_a_count_the_page_would_refuse_is_not_restored_and_the_report_says_so(
+    user, other_user, change
+):
+    from postulo.resume.models import Citation
+
+    _counts(user)
+    _archive, document = read_archive(user)
+    for row in document["resume"]["citations"]:
+        row.update(change)
+
+    report = _restored(document, other_user)
+
+    assert not Citation.objects.for_user(other_user).exists()
+    assert sum("Citation count" in line for line in report.skipped) == 2

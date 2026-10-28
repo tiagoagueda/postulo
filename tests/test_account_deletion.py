@@ -24,6 +24,7 @@ from postulo.jobs import logos
 from postulo.jobs.models import Company, CompanyLogo, Contact, JobPosting
 from postulo.plugins.models import Connection
 from postulo.resume.models import (
+    Citation,
     Course,
     DrivingLicence,
     Honour,
@@ -67,7 +68,10 @@ def fill(user) -> dict[str, Path]:
         owner=user, application=application, summary="x", due_at="2030-01-01T09:00Z"
     )
     cv = CV.objects.create(owner=user, name="CV")
-    Publication.objects.create(owner=user, title="A paper", authors="Morgan, Alex")
+    counted = Publication.objects.create(owner=user, title="A paper", authors="Morgan, Alex")
+    Citation.objects.create(
+        owner=user, source="Scopus", count=12, as_of=dt.date(2026, 9, 1), publication=counted
+    )
     DrivingLicence.objects.create(owner=user, country="PT", categories=["B"])
     Honour.objects.create(owner=user, title="Best paper")
     Membership.objects.create(owner=user, organisation="A chess club")
@@ -124,6 +128,7 @@ def test_deleting_removes_every_owned_row_and_every_file(
         UploadedDocument,
         ApiToken,
         Publication,
+        Citation,
         DrivingLicence,
         Honour,
         Membership,

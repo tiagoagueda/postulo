@@ -1366,6 +1366,13 @@ msgstr "%(title)s сілтемесі жауап бермеді: %(detail)s"
 msgid "%(title)s still answers."
 msgstr "%(title)s сілтемесі әлі де жауап береді."
 
+#: src/postulo/resume/models.py
+#, python-format
+msgid "%(title)s: cited %(count)s time (%(source)s, %(date)s)"
+msgid_plural "%(title)s: cited %(count)s times (%(source)s, %(date)s)"
+msgstr[0] ""
+msgstr[1] ""
+
 #: src/postulo/jobs/vcards.py
 #, python-format
 msgid "%(total)s address"
@@ -2061,6 +2068,10 @@ msgstr "Шектеу ешқашан өздігінен қолданылмайд�
 #: src/postulo/documents/models.py
 msgid "A line at the end, which names nobody. A reference from your career is printed only once the person has agreed, whatever this says."
 msgstr "Соңындағы ешкімнің атын атамайтын жол. Мансабыңыздағы кепілдеме, мұнда не жазылғанына қарамастан, адам келісім бергеннен кейін ғана басып шығарылады."
+
+#: src/postulo/resume/forms.py
+msgid "A line of your own, such as what the count covers."
+msgstr ""
 
 #: src/postulo/resume/forms.py
 msgid "A line or two. It prints under the dates on a CV."
@@ -3076,6 +3087,10 @@ msgstr "Барлық вакансиялар"
 msgid "All of them are offered, and a language added in a later release will be too."
 msgstr "Барлығы ұсынылады, кейінгі шығарылымда қосылатын тіл де ұсынылады."
 
+#: src/postulo/resume/forms.py
+msgid "All of your work"
+msgstr ""
+
 #: src/postulo/core/help.py
 msgid "All optional, and none of it is worked out from anything else. None of it is printed until a CV is set to print it, one by one, under “Choose which details” on the CV."
 msgstr "Барлығы міндетті емес және ешқайсысы басқа нәрседен шығарылмайды. Түйіндемеде «Қай деректерді көрсетуді таңдау» бөлімінде әрқайсысын бір-бірлеп басып шығару белгіленбейінше, олардың ешқайсысы басылмайды."
@@ -3760,6 +3775,10 @@ msgstr "Вакансияда жазылғандай — қала, аймақ, е
 #, fuzzy
 msgid "As the posting words it. The ISCO-08 code the words match in the ESCO classification follows the posting, in the language you read; a title that matches nothing has no code, and that is not a lesser kind of job."
 msgstr "Вакансияда жазылғандай. ESCO жіктеуішінде осы сөздерге сәйкес келетін ISCO-08 коды вакансияның мәтініне қарай, сіз оқитын тілде анықталады; ештеңеге сәйкес келмейтін атаудың коды болмайды, бірақ бұл жұмыстың төмен түрі дегенді білдірмейді."
+
+#: src/postulo/resume/forms.py
+msgid "As the source states it on the day you read it."
+msgstr ""
 
 #: src/postulo/templates/documents/letter_detail.html
 msgid "As they will read it"
@@ -4670,6 +4689,10 @@ msgstr "Деректеріңіздегі жолдардың бірін таңд�
 msgid "Choose one of your own contacts."
 msgstr "Өз контактілеріңіздің бірін таңдаңыз."
 
+#: src/postulo/resume/forms.py src/postulo/resume/models.py
+msgid "Choose one of your own publications."
+msgstr ""
+
 #: src/postulo/templates/help/telephone_numbers.html
 msgid "Choose the country the number is in and type the number the way it is written there. Or type it in full, starting with +, and the country chosen is ignored. It is kept in the international form, so it can be dialled from anywhere, and documents print it grouped the way its country writes it."
 msgstr "Нөмір тиесілі елді таңдап, нөмірді сол елде жазылатындай енгізіңіз. Немесе оны + белгісінен бастап толық енгізіңіз, сонда таңдалған ел ескерілмейді. Ол халықаралық пішінде сақталады, сондықтан оған кез келген жерден қоңырау шалуға болады, ал құжаттарда ол өз елінде жазылатындай топтастырылып басылады."
@@ -4711,8 +4734,33 @@ msgid "Chosen for this CV"
 msgstr "Осы түйіндеме үшін таңдалған"
 
 #: src/postulo/resume/models.py
+msgid "citation count"
+msgstr ""
+
+#: src/postulo/resume/registry.py
+msgid "Citation count"
+msgstr ""
+
+#: src/postulo/resume/models.py
 msgid "citation key"
 msgstr "библиографиялық кілт"
+
+#: src/postulo/documents/rendering.py src/postulo/resume/candidate.py
+#: src/postulo/resume/registry.py src/postulo/resume/views_candidate.py
+#: src/postulo/templates/resume/preview.html
+msgid "Citations"
+msgstr ""
+
+#: src/postulo/resume/models.py
+msgid "citations"
+msgstr ""
+
+#: src/postulo/resume/models.py
+#, python-format
+msgid "Cited %(count)s time (%(source)s, %(date)s)"
+msgid_plural "Cited %(count)s times (%(source)s, %(date)s)"
+msgstr[0] ""
+msgstr[1] ""
 
 #: src/postulo/core/personal.py
 msgid "Citizen of an EU or EEA country, or of Switzerland"
@@ -5223,6 +5271,10 @@ msgstr "Осында тіркелген вакансиялар бойынша е
 #, fuzzy
 msgid "Counted from the timeline, so interviews recorded before the diary existed are in."
 msgstr "Хронологиядан есептеледі, сондықтан күнделік пайда болғанға дейін тіркелген сұхбаттар да кіреді."
+
+#: src/postulo/resume/models.py
+msgid "counted on"
+msgstr ""
 
 #: src/postulo/core/models.py src/postulo/core/postal.py
 #: src/postulo/resume/models.py
@@ -7722,6 +7774,10 @@ msgstr "Қанша бос орын қалдыру"
 msgid "How much you sent, month by month, so a quiet stretch is visible."
 msgstr "Ай сайын қанша жібергеніңіз, үзілістер көрініп тұруы үшін."
 
+#: src/postulo/resume/registry.py
+msgid "How often your work has been cited, as a source counted it on a given day: for all of it, or for one publication. Postulo counts nothing itself."
+msgstr ""
+
 #: src/postulo/templates/help/your_details.html
 #, python-format
 msgid "How Postulo behaves for you, such as its theme, its language and your account, is not here: it is under <a href=\"%(settings_url)s\" class=\"underline\">Settings</a>."
@@ -9061,6 +9117,10 @@ msgstr "Сол күйінде қалдыру"
 #: src/postulo/resume/forms.py
 msgid "Leave it empty for a single day or when it has no end."
 msgstr "Бір күндік болса немесе аяқталу күні болмаса, бос қалдырыңыз."
+
+#: src/postulo/resume/forms.py
+msgid "Leave it empty for all of your work together, as a profile page counts it; choose a publication for the count of that one."
+msgstr ""
 
 #: src/postulo/resume/forms.py
 msgid "Leave it empty if it does not expire."
@@ -15042,7 +15102,7 @@ msgstr "%(column)s бағаны бойынша сұрыптау, ең үлкен
 msgid "Sort by %(column)s, lowest first"
 msgstr "%(column)s бағаны бойынша сұрыптау, ең кішісінен бастап"
 
-#: src/postulo/jobs/models.py
+#: src/postulo/jobs/models.py src/postulo/resume/models.py
 msgid "source"
 msgstr "дереккөз"
 
@@ -16516,6 +16576,10 @@ msgstr "Оны қай күнге дейін жіберуді жоспарлап 
 msgid "The day it was true or reported, not today's date unless it is."
 msgstr "Бұл шын болған немесе хабарланған күн; ол дәл бүгін болмаса, бүгінгі күнді қоймаңыз."
 
+#: src/postulo/resume/forms.py
+msgid "The day you read the count. A count changes, so a CV prints the month and the year beside it."
+msgstr ""
+
 #: src/postulo/templates/server/plugins.html
 msgid "The default for every account. One person's exceptions are on their row under People. Switching a plugin off stops it being used and deletes nothing."
 msgstr "Әр тіркелгі үшін әдепкі мән. Жеке адамның ерекшеліктері «Адамдар» бөліміндегі оның жолында. Плагинді сөндіру оның пайдаланылуын тоқтатады және ештеңені жоймайды."
@@ -16635,6 +16699,10 @@ msgstr "Файлда осы түрдің тағы біреуі бар, ал ад
 #: src/postulo/resume/candidate.py
 msgid "The file has two groups under the number it names."
 msgstr "Файлда ол көрсеткен нөмірмен екі топ бар."
+
+#: src/postulo/resume/candidate.py
+msgid "The file has two publications under the number it names, so it will be a count for all of your work."
+msgstr ""
 
 #: src/postulo/templates/jobs/contact_vcards.html
 #, python-format
@@ -17058,6 +17126,10 @@ msgid_plural "The page was not drawn within %(seconds)s seconds, so it was left.
 msgstr[0] "Бет %(seconds)s секунд ішінде салынбады, сондықтан тоқтатылды."
 msgstr[1] "Бет %(seconds)s секунд ішінде салынбады, сондықтан тоқтатылды."
 
+#: src/postulo/resume/forms.py
+msgid "The page you read it on. A CV does not print it."
+msgstr ""
+
 #: src/postulo/jobs/forms.py
 msgid "The part of the economy it is in. Narrows the suggestions below, and an industry of your own added here is filed under it."
 msgstr "Ол жататын экономика бөлігі. Төмендегі ұсынылған мәндерді тарылтады, ал осы жерде қосылған өз салаңыз осының астына орналастырылады."
@@ -17146,6 +17218,14 @@ msgstr "Провайдердің токен мекенжайы қайта бағ
 #: src/postulo/applications/forms.py
 msgid "The public employment service you are registered with. Add it under Companies, as a public employment service, if it is not here."
 msgstr "Сіз тіркелген мемлекеттік жұмыспен қамту қызметі. Егер ол мұнда болмаса, оны «Компаниялар» бөлімінде мемлекеттік жұмыспен қамту қызметі ретінде қосыңыз."
+
+#: src/postulo/resume/candidate.py
+msgid "The publication it counts cannot be added, so it will be a count for all of your work."
+msgstr ""
+
+#: src/postulo/resume/candidate.py
+msgid "The publication it counts is not in the file, so it will be a count for all of your work."
+msgstr ""
 
 #: src/postulo/applications/views.py
 msgid "The reason was not kept: only an application that was rejected, withdrawn or ghosted has one."
@@ -18222,6 +18302,10 @@ msgstr "Күту уақыты"
 #: src/postulo/core/models.py
 msgid "timeout in seconds"
 msgstr "күту уақыты, секундпен"
+
+#: src/postulo/resume/models.py
+msgid "times cited"
+msgstr ""
 
 #: src/postulo/documents/forms.py
 msgid "Title"
@@ -19683,6 +19767,10 @@ msgstr "<em>Елдер бойынша мекенжай ережелері</em> �
 #: src/postulo/resume/forms.py
 msgid "Who awarded it, as a CV should print it. It is linked to the company of that name among yours, and added to your companies if there is none."
 msgstr "Кім марапаттады, түйіндемеде көрсетілуге тиіс түрде. Ол сіздің компанияларыңыздың арасындағы осы атаулы компаниямен байланыстырылады, ал ондай компания болмаса, компанияларыңызға қосылады."
+
+#: src/postulo/resume/forms.py
+msgid "Who counted: Google Scholar, Scopus, Web of Science or any other. Postulo counts nothing itself."
+msgstr ""
 
 #: src/postulo/resume/forms.py
 msgid "Who gave it, as a CV should print it. It is linked to the company of that name among yours, and added to your companies if there is none."
