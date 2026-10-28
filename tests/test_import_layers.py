@@ -102,6 +102,12 @@ LAYERS: list[tuple[str, tuple[str, ...]]] = [
             # Which entry of the career a file proves (#669): looks the models up by name
             # and imports nothing of Postulo's, read by the upload that holds the link.
             "postulo.documents.proofs",
+            # What an exported file says about itself (#480), and its default on the profile
+            # (#878): the record holds the choice, so it reads the choices and bounds from
+            # here. It cleans what is typed with the Word writer's `clean`, and the writer,
+            # like it, imports nothing of Postulo's but the foundation.
+            "postulo.documents.properties",
+            "postulo.documents.docx",
             # The words of a Word or OpenDocument file (#877): a zip reader and nothing of
             # Postulo's, called by the upload that holds the file.
             "postulo.documents.readers",

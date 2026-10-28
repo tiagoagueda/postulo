@@ -2068,6 +2068,10 @@ msgstr "विभाग का नाम आवश्यक है।"
 msgid "A destination needs an age recipient to encrypt to: nothing leaves this server unencrypted."
 msgstr ""
 
+#: src/postulo/accounts/forms.py
+msgid "A document has none of its own, so it starts empty."
+msgstr ""
+
 #: src/postulo/templates/server/overview.html
 msgid "A document in a script shown in red is set in the server's fonts instead."
 msgstr ""
@@ -2708,6 +2712,10 @@ msgstr "छोड़ी गई पहचान प्रणाली किस�
 #, fuzzy
 msgid "A school, a company, a platform: as a CV should print it. It is linked to the company of that name among yours, and added to your companies if there is none."
 msgstr "कोई स्कूल, कंपनी, प्लेटफ़ॉर्म: जैसा CV पर दिखना चाहिए। इसे आपकी कंपनियों में उसी नाम वाली कंपनी से जोड़ा जाता है, और अगर ऐसी कोई नहीं है तो आपकी कंपनियों में जोड़ दिया जाता है।"
+
+#: src/postulo/documents/properties.py
+msgid "A screen reader reads a file in the language it declares, and the PDF standard for accessibility, PDF/UA, requires one. So stripping all metadata keeps the language unless you choose to leave it out here as well."
+msgstr ""
 
 #: src/postulo/core/models.py
 #, fuzzy
@@ -3534,6 +3542,10 @@ msgstr "%(names)s में भी"
 #, fuzzy
 msgid "Always on: Postulo cannot work without it."
 msgstr "हमेशा चालू: Postulo इसके बिना काम नहीं कर सकता।"
+
+#: src/postulo/documents/properties.py
+msgid "Always this"
+msgstr ""
 
 #: src/postulo/core/models.py
 #, fuzzy
@@ -4409,10 +4421,18 @@ msgstr "ऑस्ट्रेलिया"
 msgid "authentication"
 msgstr "ऑथेंटिकेशन"
 
-#: src/postulo/documents/forms.py
+#: src/postulo/accounts/forms.py src/postulo/documents/forms.py
 #, fuzzy
 msgid "Author"
 msgstr "लेखक"
+
+#: src/postulo/accounts/models.py
+msgid "author"
+msgstr ""
+
+#: src/postulo/accounts/models.py
+msgid "author of exported files"
+msgstr ""
 
 #: src/postulo/resume/models.py
 #, fuzzy
@@ -5159,6 +5179,10 @@ msgstr "इसके जारी किए सर्टिफ़िकेट"
 #, fuzzy
 msgid "Change"
 msgstr "बदलें"
+
+#: src/postulo/templates/cotton/file_properties.html
+msgid "Change it in Settings"
+msgstr ""
 
 #: src/postulo/templates/settings/account.html
 #, fuzzy
@@ -7209,6 +7233,10 @@ msgstr "हर एक को अभी जैसा है वैसा ही �
 msgid "Each part has a question mark of its own, beside its title, with one sentence about it when you rest on it and the whole of its help when you press it. <em>Save</em> at the bottom keeps everything you changed; removing a saved row asks first and takes effect at once."
 msgstr "हर भाग के शीर्षक के पास उसका अपना प्रश्नचिह्न है: उस पर पॉइंटर रखने पर एक वाक्य की जानकारी मिलती है और दबाने पर उसकी पूरी सहायता। नीचे <em>सहेजें</em> आपके सभी बदलाव सहेजता है; सहेजी गई पंक्ति को हटाने से पहले पूछा जाता है और यह तुरंत लागू होता है।"
 
+#: src/postulo/templates/settings/export.html
+msgid "Each property"
+msgstr ""
+
 #: src/postulo/templates/widgets/funnel.html
 #, fuzzy
 msgid "Each stage counts applications that ever reached it, whatever happened afterwards."
@@ -7607,6 +7635,10 @@ msgstr "हर दिन"
 msgid "Every document exactly as it left, frozen at the moment it was sent. These are never regenerated, however much the CV they came from has changed since."
 msgstr "हर डॉक्यूमेंट ठीक वैसा ही, जैसा वह गया था, भेजे जाने के पल पर फ़्रीज़ किया हुआ। इन्हें कभी दोबारा नहीं बनाया जाता, भले ही जिस CV से ये बने थे वह तब से कितना भी बदल गया हो।"
 
+#: src/postulo/accounts/forms.py
+msgid "Every file goes without a title, an author, a subject or keywords, whatever is chosen below or typed for one file, and a PDF without the name of the program that drew it. The language stays unless you leave it out below as well."
+msgstr ""
+
 #: src/postulo/plugins/syncing.py
 #, fuzzy
 msgid "Every four hours"
@@ -7701,6 +7733,10 @@ msgstr "हर कोई एक प्रशासक के रूप में
 #, fuzzy
 msgid "Everything"
 msgstr "सब कुछ"
+
+#: src/postulo/templates/settings/export.html
+msgid "Everything at once"
+msgstr ""
 
 #: src/postulo/templates/accounts/delete_account.html
 #, fuzzy
@@ -7837,9 +7873,11 @@ msgstr "समय-सीमा खत्म होने की तारीख"
 msgid "Explaining what went wrong often means saying which connection, which company or which document it happened to. Nothing here contains a document's contents, but treat this page as you would the rest of the instance before you share any of it."
 msgstr "कोई गड़बड़ी समझाने के लिए अक्सर यह बताना पड़ता है कि वह किस कनेक्शन, किस कंपनी या किस डॉक्यूमेंट के साथ हुई। यहां किसी डॉक्यूमेंट की सामग्री नहीं होती, फिर भी इसका कोई भी हिस्सा शेयर करने से पहले इस पेज को बाकी इंस्टेंस की तरह ही संभालें।"
 
+#: src/postulo/accounts/settings_views.py src/postulo/core/settings_sections.py
 #: src/postulo/templates/cotton/transfer_group.html
 #: src/postulo/templates/jobs/company_detail.html
 #: src/postulo/templates/jobs/company_places.html
+#: src/postulo/templates/settings/export.html
 #, fuzzy
 msgid "Export"
 msgstr "एक्सपोर्ट करें"
@@ -8490,6 +8528,18 @@ msgstr "इस स्तर से"
 #, fuzzy
 msgid "from status"
 msgstr "पिछली स्थिति"
+
+#: src/postulo/documents/properties.py
+msgid "From the document"
+msgstr ""
+
+#: src/postulo/accounts/forms.py
+msgid "From the document is the name the document prints, and nothing where it prints none."
+msgstr ""
+
+#: src/postulo/accounts/forms.py
+msgid "From the document is your name and the kind of document: “Alex Morgan — CV”."
+msgstr ""
 
 #: src/postulo/core/models.py
 #, fuzzy
@@ -10488,10 +10538,18 @@ msgstr "कीबोर्ड: <kbd class=\"kbd\">Ctrl</kbd>+<kbd class=\"kbd\">
 msgid "Keys: <kbd class=\"kbd\">d</kbd> discards and moves on, <kbd class=\"kbd\">j</kbd> skips to the next, <kbd class=\"kbd\">Ctrl</kbd>+<kbd class=\"kbd\">Enter</kbd> saves and moves on — while nothing is being typed."
 msgstr "कीबोर्ड: <kbd class=\"kbd\">d</kbd> खारिज करके आगे बढ़ता है, <kbd class=\"kbd\">j</kbd> अगले पर जाता है, <kbd class=\"kbd\">Ctrl</kbd>+<kbd class=\"kbd\">Enter</kbd> सेव करके आगे बढ़ता है — जब कुछ टाइप नहीं हो रहा हो।"
 
-#: src/postulo/documents/forms.py
+#: src/postulo/accounts/forms.py src/postulo/documents/forms.py
 #, fuzzy
 msgid "Keywords"
 msgstr "कीवर्ड"
+
+#: src/postulo/accounts/models.py
+msgid "keywords"
+msgstr ""
+
+#: src/postulo/accounts/models.py
+msgid "keywords of exported files"
+msgstr ""
 
 #: src/postulo/documents/models.py src/postulo/plugins/models.py
 #, fuzzy
@@ -10541,6 +10599,10 @@ msgstr "नए खातों की भाषा"
 #, fuzzy
 msgid "language not said"
 msgstr "भाषा नहीं बताई गई"
+
+#: src/postulo/accounts/models.py
+msgid "language of exported files"
+msgstr ""
 
 #: src/postulo/accounts/models.py
 #, fuzzy
@@ -10790,7 +10852,7 @@ msgstr "जब तक यह जारी है, इसे खाली छो�
 msgid "Leave it empty while it is still going; a CV then prints “since”."
 msgstr "जब तक यह जारी है, इसे खाली छोड़ें; तब CV पर “से” दिखता है।"
 
-#: src/postulo/applications/ical_import.py
+#: src/postulo/applications/ical_import.py src/postulo/documents/properties.py
 #, fuzzy
 msgid "Leave it out"
 msgstr "इसे छोड़ दें"
@@ -16732,6 +16794,7 @@ msgstr "शनिवार"
 #: src/postulo/templates/settings/accessibility.html
 #: src/postulo/templates/settings/appearance.html
 #: src/postulo/templates/settings/capture.html
+#: src/postulo/templates/settings/export.html
 #: src/postulo/templates/settings/locale.html
 #: src/postulo/templates/settings/plugins.html
 #, fuzzy
@@ -18325,6 +18388,14 @@ msgstr ""
 msgid "Street look-ups send addresses to the service: tick this to say so."
 msgstr ""
 
+#: src/postulo/accounts/forms.py
+msgid "Strip all metadata"
+msgstr ""
+
+#: src/postulo/accounts/models.py
+msgid "strip all metadata"
+msgstr ""
+
 #: src/postulo/templates/account/partials/password_meter.html
 #, fuzzy
 msgid "Strong"
@@ -18335,15 +18406,19 @@ msgstr "मज़बूत"
 msgid "Study"
 msgstr "पढ़ाई"
 
-#: src/postulo/documents/forms.py
+#: src/postulo/accounts/forms.py src/postulo/documents/forms.py
 #, fuzzy
 msgid "Subject"
 msgstr "विषय"
 
-#: src/postulo/documents/models.py
+#: src/postulo/accounts/models.py src/postulo/documents/models.py
 #, fuzzy
 msgid "subject"
 msgstr "विषय"
+
+#: src/postulo/accounts/models.py
+msgid "subject of exported files"
+msgstr ""
 
 #: src/postulo/templates/resume/overview.html
 msgid "Suggest from my ORCID record"
@@ -19597,6 +19672,10 @@ msgstr ""
 msgid "The association, society or club, as a CV should print it. It is linked to the company of that name among yours, and added to your companies if there is none. A membership of a union, a party or a congregation says something about you, and is yours to leave off any CV; nothing here asks for one."
 msgstr "एसोसिएशन, सोसाइटी या क्लब, जैसा CV पर दिखना चाहिए। इसे आपकी कंपनियों में उसी नाम वाली कंपनी से जोड़ा जाता है, और अगर ऐसी कोई नहीं है तो आपकी कंपनियों में जोड़ दिया जाता है। किसी यूनियन, पार्टी या धार्मिक समुदाय की सदस्यता आपके बारे में कुछ बताती है, और उसे किसी भी CV से हटाना आपकी मर्ज़ी है; यहां कुछ भी इसकी मांग नहीं करता।"
 
+#: src/postulo/accounts/forms.py
+msgid "The author every file names"
+msgstr ""
+
 #: src/postulo/documents/forms.py
 #, fuzzy
 msgid "The author, and the title with your name in it, go into the PDF's properties, as they always have. Untick it to send files without them."
@@ -20214,6 +20293,10 @@ msgstr "“%(name)s” के लिए की बदल दी गई है।
 msgid "The key the connection secrets are under is not in the archive. Restore with the same <code>.env</code> the archive was written under, or those secrets cannot be read."
 msgstr "जिस की से कनेक्शन के सीक्रेट एन्क्रिप्ट हैं, वह आर्काइव में नहीं है। उसी <code>.env</code> के साथ रीस्टोर करें जिसके साथ आर्काइव लिखा गया था, वरना वे सीक्रेट पढ़े नहीं जा सकेंगे।"
 
+#: src/postulo/accounts/forms.py
+msgid "The keywords every file carries"
+msgstr ""
+
 #: src/postulo/documents/integrity.py
 #, fuzzy
 msgid "the kind of file its name says"
@@ -20224,6 +20307,10 @@ msgstr "फ़ाइल के नाम में बताए गए प्र
 #, fuzzy
 msgid "The kinds of identifier this instance adds to the ones Postulo ships, for a person, for a company or for both: a staff number, a register Postulo has no scheme for. Written in JSON."
 msgstr "पहचानकर्ताओं के वे प्रकार जिन्हें यह इंस्टेंस Postulo के साथ आने वाले प्रकारों में जोड़ता है, किसी व्यक्ति, किसी कंपनी या दोनों के लिए: जैसे कर्मचारी संख्या, या कोई ऐसा रजिस्टर जिसके लिए Postulo में कोई पहचान प्रणाली नहीं है। JSON में लिखा जाता है।"
+
+#: src/postulo/accounts/forms.py
+msgid "The language every file declares"
+msgstr ""
 
 #: src/postulo/resume/forms.py
 #, fuzzy
@@ -20965,6 +21052,10 @@ msgstr "शुरू होने की वह तारीख जो उन्
 msgid "The stored mail credentials cannot be read on this instance."
 msgstr "सेव किए गए मेल क्रेडेंशियल इस इंस्टेंस पर पढ़े नहीं जा सकते।"
 
+#: src/postulo/accounts/forms.py
+msgid "The subject every file carries"
+msgstr ""
+
 #: src/postulo/documents/forms.py
 #, fuzzy
 msgid "The subject has to be one line."
@@ -21028,6 +21119,10 @@ msgstr ""
 #, fuzzy, python-format
 msgid "The time zone is set by the environment: <code>%(variable)s</code> = %(zone)s. Remove it from the environment to change it here."
 msgstr "टाइम ज़ोन एनवायरनमेंट से सेट है: <code>%(variable)s</code> = %(zone)s। इसे यहां बदलने के लिए एनवायरनमेंट से हटाएं।"
+
+#: src/postulo/accounts/forms.py
+msgid "The title every file carries"
+msgstr ""
 
 #: src/postulo/documents/models.py
 #, fuzzy
@@ -21290,6 +21385,10 @@ msgstr "ये रेफ़रेंस छोड़ दिए गए हैं,
 #, fuzzy, python-format
 msgid "These skills print the name the ESCO classification gives them in %(tongue)s, because you have not written one of your own:"
 msgstr "ये कौशल वह नाम दिखाते हैं जो ESCO वर्गीकरण उन्हें %(tongue)s में देता है, क्योंकि आपने अपना नाम नहीं लिखा है:"
+
+#: src/postulo/templates/cotton/file_properties.html
+msgid "These start from what your settings give every file."
+msgstr ""
 
 #: src/postulo/applications/models.py
 #, fuzzy
@@ -21664,6 +21763,10 @@ msgstr ""
 msgid "This is the beginning. The whole of it is in the download."
 msgstr "यह शुरुआत है। पूरा डाउनलोड में है।"
 
+#: src/postulo/templates/settings/export.html
+msgid "This is the default for every file. On a CV or a letter you can still change what one file says before you export it."
+msgstr ""
+
 #: src/postulo/templates/documents/send.html
 #, fuzzy
 msgid "This is the letter as it will be frozen. Edit it first, or freeze it anyway."
@@ -21979,16 +22082,21 @@ msgstr "टाइमआउट (सेकंड में)"
 msgid "times cited"
 msgstr ""
 
-#: src/postulo/documents/forms.py
+#: src/postulo/accounts/forms.py src/postulo/documents/forms.py
 #, fuzzy
 msgid "Title"
 msgstr "शीर्षक"
 
-#: src/postulo/documents/models.py src/postulo/jobs/models.py
-#: src/postulo/notifications/models.py src/postulo/resume/models.py
+#: src/postulo/accounts/models.py src/postulo/documents/models.py
+#: src/postulo/jobs/models.py src/postulo/notifications/models.py
+#: src/postulo/resume/models.py
 #, fuzzy
 msgid "title"
 msgstr "शीर्षक"
+
+#: src/postulo/accounts/models.py
+msgid "title of exported files"
+msgstr ""
 
 #: src/postulo/templates/jobs/capture_page.html
 #, fuzzy
@@ -22274,6 +22382,10 @@ msgstr "पुष्टि करने के लिए यूज़रने�
 #, fuzzy
 msgid "Type to find one, or add a new one"
 msgstr "खोजने के लिए टाइप करें, या नया जोड़ें"
+
+#: src/postulo/accounts/forms.py
+msgid "Type what every file is to say here, or choose where it comes from."
+msgstr ""
 
 #: src/postulo/templates/accounts/delete_account.html
 #, fuzzy, python-format
@@ -23219,6 +23331,10 @@ msgstr "रखे गए रिकॉर्ड को क्या मिलत�
 msgid "What the map is drawn on. Tiles fetched from another server tell that server each viewer's address and the area they look at."
 msgstr "मैप किस पर बनाया जाता है। किसी दूसरे सर्वर से लाई गई टाइलें उस सर्वर को हर देखने वाले का नेटवर्क पता और वह इलाका बता देती हैं जिसे वह देख रहा है।"
 
+#: src/postulo/templates/settings/export.html
+msgid "What the PDF, Word and OpenDocument files you export say about themselves: the properties a file manager, a viewer or a recruiter's software reads, beside the words."
+msgstr ""
+
 #: src/postulo/templates/applications/suggestion_list.html
 #, fuzzy
 msgid "What the plugins that read for you think happened. Nothing here is in your record until you say so."
@@ -23528,6 +23644,10 @@ msgstr "आवेदन कहां और क्यों खत्म हो�
 
 #: src/postulo/core/server_forms.py
 msgid "Where each archive is sent once it has been written and checked."
+msgstr ""
+
+#: src/postulo/templates/settings/export.html
+msgid "Where each comes from in every file you export. Postulo writes no date into a file, and no program's name into a Word or OpenDocument file."
 msgstr ""
 
 #: src/postulo/resume/forms.py
@@ -24865,6 +24985,10 @@ msgstr "आपकी भूमिका"
 msgctxt "role at an event"
 msgid "your role"
 msgstr "आपकी भूमिका"
+
+#: src/postulo/templates/cotton/file_properties.html
+msgid "Your settings strip all metadata from the files you export: no title, author, subject or keywords, and a PDF without the program's name."
+msgstr ""
 
 #: src/postulo/templates/applications/tag_form.html
 #, fuzzy

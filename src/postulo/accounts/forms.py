@@ -40,6 +40,12 @@ from postulo.core import (
 )
 from postulo.core.formsets import RowsAlreadyGone
 from postulo.core.identifiers import IdentifierRow, OneOfEachKind, SchemeSelect, offering
+from postulo.documents.properties import (
+    FIELD_NAMES,
+    KEYWORDS_HELP,
+    LANGUAGE_KEPT,
+    MetadataSource,
+)
 
 from . import addresses, addressing, avatars, claims, identifiers, primary_identifier
 from .models import ADDRESSING_MAX_LENGTH, Invite, PersonIdentifier, Profile
@@ -1328,6 +1334,102 @@ class CaptureKeepingForm(forms.ModelForm):
             field = self.fields[name]
             field.disabled = True
             field.help_text = format_lazy("{} {}", self.LOCKED, field.help_text)
+
+
+class ExportMetadataForm(forms.ModelForm):
+    """Settings → Export: what every PDF, Word and OpenDocument file says about itself (#878).
+
+    For each of the five properties a file carries, where it comes from -- the document, as
+    an export always took it; a value of the person's own; or nowhere -- and the value, for
+    the second. One switch over all of them, *Strip all metadata*, which leaves the language
+    unless that field is left out as well: the page says why.
+
+    This is the default for every file. The export dialog of a CV or a letter still edits the
+    properties of one file over it, as it edited the document's own values before there was a
+    default; a choice of *where from* in that dialog, one document at a time, is for later.
+    """
+
+    #: The properties, in the order the page lists them: `documents.properties.FIELD_NAMES`.
+    PROPERTIES = FIELD_NAMES
+
+    #: Under a value somebody chose to fix and then left empty.
+    WANTS_A_VALUE = _("Type what every file is to say here, or choose where it comes from.")
+
+    class Meta:
+        model = Profile
+        fields = (
+            "export_strip_metadata",
+            *(f"export_{name}{end}" for name in FIELD_NAMES for end in ("_source", "")),
+        )
+        widgets = {f"export_{name}_source": forms.RadioSelect for name in FIELD_NAMES}
+        labels = {
+            "export_strip_metadata": _("Strip all metadata"),
+            "export_title_source": _("Title"),
+            "export_title": _("The title every file carries"),
+            "export_author_source": _("Author"),
+            "export_author": _("The author every file names"),
+            "export_subject_source": _("Subject"),
+            "export_subject": _("The subject every file carries"),
+            "export_keywords_source": _("Keywords"),
+            "export_keywords": _("The keywords every file carries"),
+            "export_language_source": _("Language"),
+            "export_language": _("The language every file declares"),
+        }
+        help_texts = {
+            "export_strip_metadata": _(
+                "Every file goes without a title, an author, a subject or keywords, whatever "
+                "is chosen below or typed for one file, and a PDF without the name of the "
+                "program that drew it. The language stays unless you leave it out below as "
+                "well."
+            ),
+            "export_title_source": _(
+                "From the document is your name and the kind of document: “Alex Morgan — CV”."
+            ),
+            "export_author_source": _(
+                "From the document is the name the document prints, and nothing where it "
+                "prints none."
+            ),
+            "export_subject_source": _("A document has none of its own, so it starts empty."),
+            "export_keywords_source": KEYWORDS_HELP,
+            "export_language_source": LANGUAGE_KEPT,
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        held = self["export_language"].value()
+        self.fields["export_language"].widget = LanguageSelect(
+            choices=with_what_is_held([("", "—"), *languages.LANGUAGES], held)
+        )
+        # Each value goes with its choice and is drawn under it; the choice says what the
+        # value is for, and a screen reader hears the two together through the help.
+        for name in FIELD_NAMES:
+            self.fields[f"export_{name}"].required = False
+
+    def clean(self):
+        """A value fixed for every file has to be there, and is kept only where it is used.
+
+        A value somebody typed and then turned away from is cleared rather than kept behind
+        the choice: a property nobody can see on the page should not wait in the row to be
+        written into a file the next time the choice is touched.
+        """
+        cleaned = super().clean()
+        for name in FIELD_NAMES:
+            source = cleaned.get(f"export_{name}_source")
+            value = (cleaned.get(f"export_{name}") or "").strip()
+            if source == MetadataSource.FIXED and not value:
+                self.add_error(f"export_{name}", self.WANTS_A_VALUE)
+            elif source != MetadataSource.FIXED:
+                cleaned[f"export_{name}"] = ""
+            else:
+                cleaned[f"export_{name}"] = value
+        return cleaned
+
+    def properties(self) -> list[dict]:
+        """Each property as the page draws it: the choice, then the value under it."""
+        return [
+            {"name": name, "source": self[f"export_{name}_source"], "value": self[f"export_{name}"]}
+            for name in FIELD_NAMES
+        ]
 
 
 class AppearanceForm(forms.ModelForm):

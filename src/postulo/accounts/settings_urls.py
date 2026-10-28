@@ -21,5 +21,6 @@ urlpatterns = [
         views.ForgetRememberedPlacesView.as_view(),
         name="capture_forget",
     ),
+    path("export/", views.ExportView.as_view(), name="export"),
     path("plugins/", views.PluginsView.as_view(), name="plugins"),
 ]

@@ -119,7 +119,7 @@ def written_file(request: HttpRequest, document, outline, key: str):
     return handed_over(
         content,
         content_type=chosen.content_type,
-        name=f"{outline.title}.{chosen.extension}",
+        name=f"{outline.name}.{chosen.extension}",
     )
 
 

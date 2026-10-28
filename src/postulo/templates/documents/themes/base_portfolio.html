@@ -22,7 +22,15 @@
   filing -- "Backend, English" -- and the model's help text says as much (#223).
 {% endcomment %}
     <title>{{ document_title }}</title>
-    {% if contact %}<meta name="author" content="{{ contact.name }}">{% endif %}
+    {% comment %} The properties as `base_cv.html` writes them: the author where the contact
+       block is shown and the export carries its properties, the subject and the keywords where
+       somebody typed them (#480), and what the renderer is to take out (#878). This read
+       `contact.name` before, so a portfolio exported without its properties named its author
+       all the same. {% endcomment %}
+    {% if document_author %}<meta name="author" content="{{ document_author }}">{% endif %}
+    {% if document_subject %}<meta name="description" content="{{ document_subject }}">{% endif %}
+    {% if document_keywords %}<meta name="keywords" content="{{ document_keywords }}">{% endif %}
+    {% if document_scrub %}<meta name="{{ scrub_meta }}" content="{{ document_scrub }}">{% endif %}
     {% comment %} The nonce is there on the preview page, where a browser's content security
        policy would otherwise refuse the inlined stylesheet; the PDF renderer is given none
        and the attribute is left out (#232).

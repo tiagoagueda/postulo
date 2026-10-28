@@ -89,6 +89,15 @@ BUILTIN: tuple[SettingsSection, ...] = (
         icon="search",
         order=32,
     ),
+    # What an exported PDF, Word or OpenDocument file says about itself (#878): beside
+    # Capture, because it is the same kind of choice -- what a file carries about this person.
+    SettingsSection(
+        slug="export",
+        label=_("Export"),
+        url_name="settings:export",
+        icon="file-down",
+        order=33,
+    ),
     SettingsSection(
         slug="connections",
         label=_("Connections"),

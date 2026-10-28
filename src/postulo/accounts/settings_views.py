@@ -31,6 +31,7 @@ from .forms import (
     AccountForm,
     AppearanceForm,
     CaptureKeepingForm,
+    ExportMetadataForm,
     LocaleForm,
 )
 from .models import Profile
@@ -257,6 +258,20 @@ class CaptureView(ProfileSectionView):
         }
         context["no_renderer"] = rendering.why_not()
         return context
+
+
+class ExportView(ProfileSectionView):
+    """What every file this person exports says about itself, by default (#878).
+
+    The title, the author, the subject, the keywords and the language a PDF, a Word file and
+    an OpenDocument file carry, each from the document, fixed, or left out, and one switch
+    that strips them all but the language. A choice for one file is made in the export
+    dialog, over this.
+    """
+
+    form_class = ExportMetadataForm
+    template_name = "settings/export.html"
+    section_title = _("Export")
 
 
 class ForgetRememberedPlacesView(LoginRequiredMixin, View):

@@ -108,28 +108,53 @@ def neutral_title(document) -> str:
 
 def file_title(document, chosen: file_properties.Properties | None = None) -> str:
     """What the file is called and titled, under this choice: the document's own title, the
-    one typed for it, or the neutral one where the properties were left out (#480)."""
+    one typed for it, the one its owner's Settings → Export give every file, or the neutral
+    one where the properties -- or the title -- were left out (#480, #878)."""
     chosen = chosen or file_properties.DEFAULT
-    if not chosen.include:
-        return neutral_title(document)
-    return chosen.title or document_title(document)
+    resolved = file_properties.resolve(
+        {"title": document_title(document)},
+        chosen,
+        file_properties.Policy.of(getattr(document, "owner", None)),
+        neutral_title=neutral_title(document),
+    )
+    return resolved["title"] or neutral_title(document)
+
+
+def went_with_properties(document, chosen: file_properties.Properties | None = None) -> bool:
+    """Whether a file of ``document`` goes with its properties: not where the export dialog
+    said *without* (#480), and not where its owner's Settings → Export strip every file
+    (#878). What `RenderedDocument.with_properties` records, and *Sent documents* says."""
+    chosen = chosen or file_properties.DEFAULT
+    return chosen.include and not file_properties.Policy.of(document.owner).strip
 
 
 def file_defaults(document) -> dict:
     """What a file will say about itself when nothing is changed: the values the form that
-    shows them starts from, and the ones the export has always written (#480)."""
+    shows them starts from (#480).
+
+    The document's own values as its owner's Settings → Export have them (#878): a field
+    they leave out starts blank, and blank in that form means *the default*, so an export
+    nobody touched is the default and not today's values typed back in over it.
+    ``strip_all`` is whether those settings strip every file, which the form says in place
+    of fields it would ignore.
+    """
     language = document_language(document)
+    policy = file_properties.Policy.of(document.owner)
     with languages.override(language):
         if isinstance(document, CV):
             contact = cv_contact(document)
         else:
             contact = contact_details(document.owner)
-        return {
-            "with_properties": True,
-            "title": document_title(document),
-            "author": contact["name"] if contact else "",
-            "language": language,
-        }
+        resolved = file_properties.resolve(
+            {
+                "title": document_title(document),
+                "author": contact["name"] if contact else "",
+                "language": language,
+            },
+            file_properties.DEFAULT,
+            policy,
+        )
+        return {"with_properties": True, "strip_all": policy.strip, **resolved}
 
 
 def _properties_context(document, author: str, chosen) -> dict:
@@ -137,24 +162,28 @@ def _properties_context(document, author: str, chosen) -> dict:
     WeasyPrint is handed a PDF's properties (#480).
 
     The same fields every format is given, resolved once: `file_properties.apply` does it for
-    the outline, and this does it for the page.
+    the outline, and this does it for the page. The page keeps its `lang` where the language
+    is left out of the properties, because the renderer hyphenates and picks its fonts by
+    it; ``document_scrub`` tells the renderer to take the `/Lang` out of the file instead,
+    and the producer as well where everything is stripped (#878).
     """
     chosen = chosen or file_properties.DEFAULT
     language = document_language(document)
-    if not chosen.include:
-        return {
-            "document_title": neutral_title(document),
-            "document_author": "",
-            "document_subject": "",
-            "document_keywords": "",
-            "document_language": language,
-        }
+    policy = file_properties.Policy.of(getattr(document, "owner", None))
+    resolved = file_properties.resolve(
+        {"title": document_title(document), "author": author, "language": language},
+        chosen,
+        policy,
+        neutral_title=neutral_title(document),
+    )
     return {
-        "document_title": chosen.title or document_title(document),
-        "document_author": chosen.author or author,
-        "document_subject": chosen.subject,
-        "document_keywords": chosen.keywords,
-        "document_language": chosen.language or language,
+        "document_title": resolved["title"],
+        "document_author": resolved["author"],
+        "document_subject": resolved["subject"],
+        "document_keywords": resolved["keywords"],
+        "document_language": resolved["language"] or language,
+        "document_scrub": file_properties.scrubbed(resolved, policy),
+        "scrub_meta": file_properties.SCRUB_META,
     }
 
 
@@ -792,7 +821,10 @@ def cv_outline(cv: CV, properties=None) -> file_formats.Outline:
             blocks=tuple(blocks),
         )
         return file_properties.apply(
-            outline, properties or file_properties.DEFAULT, neutral_title=neutral_title(cv)
+            outline,
+            properties or file_properties.DEFAULT,
+            neutral_title=neutral_title(cv),
+            policy=file_properties.Policy.of(cv.owner),
         )
 
 
@@ -943,7 +975,10 @@ def letter_outline(letter: CoverLetter, application=None, properties=None) -> fi
             blocks=tuple(blocks),
         )
         return file_properties.apply(
-            outline, properties or file_properties.DEFAULT, neutral_title=neutral_title(letter)
+            outline,
+            properties or file_properties.DEFAULT,
+            neutral_title=neutral_title(letter),
+            policy=file_properties.Policy.of(letter.owner),
         )
 
 
@@ -1122,7 +1157,8 @@ def snapshot_cv(
 
     document = RenderedDocument(
         owner=cv.owner,
-        with_properties=chosen.include,
+        # A file its owner's settings stripped went without them too (#878).
+        with_properties=went_with_properties(cv, chosen),
         title=title,
         # Written down now rather than read back off the source later: the source can be
         # edited, and is cleared outright when it is deleted, and this is the record of
@@ -1205,7 +1241,8 @@ def snapshot_letter(
 
     document = RenderedDocument(
         owner=letter.owner,
-        with_properties=chosen.include,
+        # A file its owner's settings stripped went without them too (#878).
+        with_properties=went_with_properties(letter, chosen),
         title=title,
         kind=letter.document_kind,
         # Frozen with the document, for the reason `snapshot_cv` gives (#283).

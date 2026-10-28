@@ -1895,6 +1895,10 @@ msgstr "部門需要名稱。"
 msgid "A destination needs an age recipient to encrypt to: nothing leaves this server unencrypted."
 msgstr ""
 
+#: src/postulo/accounts/forms.py
+msgid "A document has none of its own, so it starts empty."
+msgstr ""
+
 #: src/postulo/templates/server/overview.html
 msgid "A document in a script shown in red is set in the server's fonts instead."
 msgstr ""
@@ -2421,6 +2425,10 @@ msgstr "略去的識別碼類型不會繪製在公司摘要中。這類識別碼
 #: src/postulo/resume/forms.py
 msgid "A school, a company, a platform: as a CV should print it. It is linked to the company of that name among yours, and added to your companies if there is none."
 msgstr "學校、公司或平台：照履歷應印出的方式填寫。會連結到您的公司中同名的那一家，若沒有則會新增到您的公司中。"
+
+#: src/postulo/documents/properties.py
+msgid "A screen reader reads a file in the language it declares, and the PDF standard for accessibility, PDF/UA, requires one. So stripping all metadata keeps the language unless you choose to leave it out here as well."
+msgstr ""
 
 #: src/postulo/core/models.py
 msgid "A second signal beside the word, never instead of it."
@@ -3120,6 +3128,10 @@ msgstr "也在 %(names)s 中"
 #, fuzzy
 msgid "Always on: Postulo cannot work without it."
 msgstr "一律啟用：Postulo 少了它無法運作。"
+
+#: src/postulo/documents/properties.py
+msgid "Always this"
+msgstr ""
 
 #: src/postulo/core/models.py
 msgid "Amber"
@@ -3857,9 +3869,17 @@ msgstr "澳洲"
 msgid "authentication"
 msgstr "驗證"
 
-#: src/postulo/documents/forms.py
+#: src/postulo/accounts/forms.py src/postulo/documents/forms.py
 msgid "Author"
 msgstr "作者"
+
+#: src/postulo/accounts/models.py
+msgid "author"
+msgstr ""
+
+#: src/postulo/accounts/models.py
+msgid "author of exported files"
+msgstr ""
 
 #: src/postulo/resume/models.py
 msgid "authors"
@@ -4490,6 +4510,10 @@ msgstr "其頒發的證照"
 #: src/postulo/templates/settings/locale.html
 msgid "Change"
 msgstr "變更"
+
+#: src/postulo/templates/cotton/file_properties.html
+msgid "Change it in Settings"
+msgstr ""
 
 #: src/postulo/templates/settings/account.html
 msgid "Change password"
@@ -6213,6 +6237,10 @@ msgstr "每一份都會依照目前的樣子凍結，讓對方收到的內容日
 msgid "Each part has a question mark of its own, beside its title, with one sentence about it when you rest on it and the whole of its help when you press it. <em>Save</em> at the bottom keeps everything you changed; removing a saved row asks first and takes effect at once."
 msgstr "每個部分的標題旁都有自己的問號：游標停在上面時會顯示一句說明，按下時則會顯示完整說明。底部的<em>儲存</em>會保存您變更的所有內容；移除已儲存的列會先詢問，並立即生效。"
 
+#: src/postulo/templates/settings/export.html
+msgid "Each property"
+msgstr ""
+
 #: src/postulo/templates/widgets/funnel.html
 msgid "Each stage counts applications that ever reached it, whatever happened afterwards."
 msgstr "每個階段計算曾經到達該階段的應徵數，無論之後發生什麼事。"
@@ -6548,6 +6576,10 @@ msgstr "每天"
 msgid "Every document exactly as it left, frozen at the moment it was sent. These are never regenerated, however much the CV they came from has changed since."
 msgstr "每份文件都與送出時完全相同，凍結在送出的那一刻。無論來源履歷之後變更了多少，這些文件都絕不會重新產生。"
 
+#: src/postulo/accounts/forms.py
+msgid "Every file goes without a title, an author, a subject or keywords, whatever is chosen below or typed for one file, and a PDF without the name of the program that drew it. The language stays unless you leave it out below as well."
+msgstr ""
+
 #: src/postulo/plugins/syncing.py
 msgid "Every four hours"
 msgstr "每 4 小時"
@@ -6624,6 +6656,10 @@ msgstr "所有人的（以管理員身分）"
 #: src/postulo/jobs/listing_views.py src/postulo/templates/server/logs.html
 msgid "Everything"
 msgstr "全部"
+
+#: src/postulo/templates/settings/export.html
+msgid "Everything at once"
+msgstr ""
 
 #: src/postulo/templates/accounts/delete_account.html
 msgid "Everything goes, at once, and nobody can bring it back. Take your export first."
@@ -6739,9 +6775,11 @@ msgstr "到期日"
 msgid "Explaining what went wrong often means saying which connection, which company or which document it happened to. Nothing here contains a document's contents, but treat this page as you would the rest of the instance before you share any of it."
 msgstr "說明出錯的地方時，經常需要指出是哪個連線、哪家公司或哪份文件發生問題。這裡不包含任何文件內容，但在分享任何部分之前，請像對待此站台的其他內容一樣謹慎處理此頁面。"
 
+#: src/postulo/accounts/settings_views.py src/postulo/core/settings_sections.py
 #: src/postulo/templates/cotton/transfer_group.html
 #: src/postulo/templates/jobs/company_detail.html
 #: src/postulo/templates/jobs/company_places.html
+#: src/postulo/templates/settings/export.html
 msgid "Export"
 msgstr "匯出"
 
@@ -7297,6 +7335,18 @@ msgstr "起始等級"
 #: src/postulo/applications/models.py
 msgid "from status"
 msgstr "原狀態"
+
+#: src/postulo/documents/properties.py
+msgid "From the document"
+msgstr ""
+
+#: src/postulo/accounts/forms.py
+msgid "From the document is the name the document prints, and nothing where it prints none."
+msgstr ""
+
+#: src/postulo/accounts/forms.py
+msgid "From the document is your name and the kind of document: “Alex Morgan — CV”."
+msgstr ""
 
 #: src/postulo/core/models.py
 msgid "from Wikidata"
@@ -8980,9 +9030,17 @@ msgstr "按鍵：<kbd class=\"kbd\">Ctrl</kbd>+<kbd class=\"kbd\">Enter</kbd> �
 msgid "Keys: <kbd class=\"kbd\">d</kbd> discards and moves on, <kbd class=\"kbd\">j</kbd> skips to the next, <kbd class=\"kbd\">Ctrl</kbd>+<kbd class=\"kbd\">Enter</kbd> saves and moves on — while nothing is being typed."
 msgstr "按鍵：<kbd class=\"kbd\">d</kbd> 捨棄並前往下一筆，<kbd class=\"kbd\">j</kbd> 略過到下一筆，<kbd class=\"kbd\">Ctrl</kbd>+<kbd class=\"kbd\">Enter</kbd> 儲存並前往下一筆——僅在沒有輸入文字時有效。"
 
-#: src/postulo/documents/forms.py
+#: src/postulo/accounts/forms.py src/postulo/documents/forms.py
 msgid "Keywords"
 msgstr "關鍵字"
+
+#: src/postulo/accounts/models.py
+msgid "keywords"
+msgstr ""
+
+#: src/postulo/accounts/models.py
+msgid "keywords of exported files"
+msgstr ""
 
 #: src/postulo/documents/models.py src/postulo/plugins/models.py
 msgid "label"
@@ -9023,6 +9081,10 @@ msgstr "新帳號的語言"
 #: src/postulo/templates/documents/upload_list.html
 msgid "language not said"
 msgstr "未註明語言"
+
+#: src/postulo/accounts/models.py
+msgid "language of exported files"
+msgstr ""
 
 #: src/postulo/accounts/models.py
 msgid "language of your career record"
@@ -9230,7 +9292,7 @@ msgstr "仍在進行中時請留空；履歷會印出「至今」。"
 msgid "Leave it empty while it is still going; a CV then prints “since”."
 msgstr "仍在進行中時請留空；履歷會印出「起」。"
 
-#: src/postulo/applications/ical_import.py
+#: src/postulo/applications/ical_import.py src/postulo/documents/properties.py
 msgid "Leave it out"
 msgstr "略過"
 
@@ -14221,6 +14283,7 @@ msgstr "星期六"
 #: src/postulo/templates/settings/accessibility.html
 #: src/postulo/templates/settings/appearance.html
 #: src/postulo/templates/settings/capture.html
+#: src/postulo/templates/settings/export.html
 #: src/postulo/templates/settings/locale.html
 #: src/postulo/templates/settings/plugins.html
 msgid "Save"
@@ -15564,6 +15627,14 @@ msgstr ""
 msgid "Street look-ups send addresses to the service: tick this to say so."
 msgstr ""
 
+#: src/postulo/accounts/forms.py
+msgid "Strip all metadata"
+msgstr ""
+
+#: src/postulo/accounts/models.py
+msgid "strip all metadata"
+msgstr ""
+
 #: src/postulo/templates/account/partials/password_meter.html
 #, fuzzy
 msgid "Strong"
@@ -15574,13 +15645,17 @@ msgstr "強"
 msgid "Study"
 msgstr "進修"
 
-#: src/postulo/documents/forms.py
+#: src/postulo/accounts/forms.py src/postulo/documents/forms.py
 msgid "Subject"
 msgstr "主旨"
 
-#: src/postulo/documents/models.py
+#: src/postulo/accounts/models.py src/postulo/documents/models.py
 msgid "subject"
 msgstr "主旨"
+
+#: src/postulo/accounts/models.py
+msgid "subject of exported files"
+msgstr ""
 
 #: src/postulo/templates/resume/overview.html
 msgid "Suggest from my ORCID record"
@@ -16663,6 +16738,10 @@ msgstr ""
 msgid "The association, society or club, as a CV should print it. It is linked to the company of that name among yours, and added to your companies if there is none. A membership of a union, a party or a congregation says something about you, and is yours to leave off any CV; nothing here asks for one."
 msgstr "協會、學會或社團，以履歷上應印出的名稱填寫。此名稱會連結到您公司中同名的那一家；若沒有，則會加入您的公司。工會、政黨或宗教團體的會員資格會透露您的個人資訊，是否從履歷中省略由您決定；這裡沒有任何欄位要求填寫。"
 
+#: src/postulo/accounts/forms.py
+msgid "The author every file names"
+msgstr ""
+
 #: src/postulo/documents/forms.py
 msgid "The author, and the title with your name in it, go into the PDF's properties, as they always have. Untick it to send files without them."
 msgstr "作者，以及含有您姓名的標題，會一如以往寫入 PDF 的屬性中。取消勾選即可傳送不含這些資訊的檔案。"
@@ -17183,6 +17262,10 @@ msgstr "「%(name)s」的金鑰已被替換。這把金鑰是它的索引與在�
 msgid "The key the connection secrets are under is not in the archive. Restore with the same <code>.env</code> the archive was written under, or those secrets cannot be read."
 msgstr "連線機密資訊所使用的金鑰不在封存檔中。請使用寫出此封存檔時所用的同一個 <code>.env</code> 還原，否則將無法讀取那些機密資訊。"
 
+#: src/postulo/accounts/forms.py
+msgid "The keywords every file carries"
+msgstr ""
+
 #: src/postulo/documents/integrity.py
 msgid "the kind of file its name says"
 msgstr "名稱所示類型的檔案"
@@ -17191,6 +17274,10 @@ msgstr "名稱所示類型的檔案"
 #: src/postulo/templates/server/plugins.html
 msgid "The kinds of identifier this instance adds to the ones Postulo ships, for a person, for a company or for both: a staff number, a register Postulo has no scheme for. Written in JSON."
 msgstr "此站台在 Postulo 內建的識別碼之外新增的識別碼類型，適用於個人、公司或兩者：例如員工編號，或 Postulo 沒有對應類型的登記機構。以 JSON 撰寫。"
+
+#: src/postulo/accounts/forms.py
+msgid "The language every file declares"
+msgstr ""
 
 #: src/postulo/resume/forms.py
 msgid "The language the work is written in."
@@ -17820,6 +17907,10 @@ msgstr "對方提議的到職日期（若有）。"
 msgid "The stored mail credentials cannot be read on this instance."
 msgstr "此站台無法讀取已儲存的郵件認證資訊。"
 
+#: src/postulo/accounts/forms.py
+msgid "The subject every file carries"
+msgstr ""
+
 #: src/postulo/documents/forms.py
 msgid "The subject has to be one line."
 msgstr "主旨只能有一行。"
@@ -17875,6 +17966,10 @@ msgstr ""
 #, python-format
 msgid "The time zone is set by the environment: <code>%(variable)s</code> = %(zone)s. Remove it from the environment to change it here."
 msgstr "時區由環境設定：<code>%(variable)s</code> = %(zone)s。請從環境中移除此設定，才能在此變更。"
+
+#: src/postulo/accounts/forms.py
+msgid "The title every file carries"
+msgstr ""
 
 #: src/postulo/documents/models.py
 msgid "The town and country from your details, never a street."
@@ -18094,6 +18189,10 @@ msgstr "下列推薦人未列出，因為他們尚未同意被提及："
 #, python-format
 msgid "These skills print the name the ESCO classification gives them in %(tongue)s, because you have not written one of your own:"
 msgstr "這些技能會印出 ESCO 分類在 %(tongue)s 中為其取的名稱，因為您尚未自行填寫名稱："
+
+#: src/postulo/templates/cotton/file_properties.html
+msgid "These start from what your settings give every file."
+msgstr ""
 
 #: src/postulo/applications/models.py
 msgid "They did not show up"
@@ -18408,6 +18507,10 @@ msgstr ""
 msgid "This is the beginning. The whole of it is in the download."
 msgstr "這只是開頭部分。完整內容請見下載檔案。"
 
+#: src/postulo/templates/settings/export.html
+msgid "This is the default for every file. On a CV or a letter you can still change what one file says before you export it."
+msgstr ""
+
 #: src/postulo/templates/documents/send.html
 msgid "This is the letter as it will be frozen. Edit it first, or freeze it anyway."
 msgstr "這是信函定稿時的樣子。請先編輯，或直接定稿。"
@@ -18674,16 +18777,21 @@ msgstr "逾時秒數"
 msgid "times cited"
 msgstr ""
 
-#: src/postulo/documents/forms.py
+#: src/postulo/accounts/forms.py src/postulo/documents/forms.py
 #, fuzzy
 msgid "Title"
 msgstr "標題"
 
-#: src/postulo/documents/models.py src/postulo/jobs/models.py
-#: src/postulo/notifications/models.py src/postulo/resume/models.py
+#: src/postulo/accounts/models.py src/postulo/documents/models.py
+#: src/postulo/jobs/models.py src/postulo/notifications/models.py
+#: src/postulo/resume/models.py
 #, fuzzy
 msgid "title"
 msgstr "標題"
+
+#: src/postulo/accounts/models.py
+msgid "title of exported files"
+msgstr ""
 
 #: src/postulo/templates/jobs/capture_page.html
 msgid "Title, as it was read"
@@ -18921,6 +19029,10 @@ msgstr "請輸入使用者名稱 %(username)s 以確認"
 #: src/postulo/templates/partials/label_attrs.html
 msgid "Type to find one, or add a new one"
 msgstr "輸入以搜尋，或新增一個"
+
+#: src/postulo/accounts/forms.py
+msgid "Type what every file is to say here, or choose where it comes from."
+msgstr ""
 
 #: src/postulo/templates/accounts/delete_account.html
 #, python-format
@@ -19708,6 +19820,10 @@ msgstr "保留的紀錄會取得的內容"
 msgid "What the map is drawn on. Tiles fetched from another server tell that server each viewer's address and the area they look at."
 msgstr "地圖的底圖。從其他伺服器抓取的圖磚會讓該伺服器得知每位檢視者的位址及其檢視的區域。"
 
+#: src/postulo/templates/settings/export.html
+msgid "What the PDF, Word and OpenDocument files you export say about themselves: the properties a file manager, a viewer or a recruiter's software reads, beside the words."
+msgstr ""
+
 #: src/postulo/templates/applications/suggestion_list.html
 msgid "What the plugins that read for you think happened. Nothing here is in your record until you say so."
 msgstr "為您讀取內容的外掛程式所判斷的事件。在您同意之前，這裡的任何內容都不會加入您的紀錄。"
@@ -19963,6 +20079,10 @@ msgstr "應徵在何處結束及其原因"
 
 #: src/postulo/core/server_forms.py
 msgid "Where each archive is sent once it has been written and checked."
+msgstr ""
+
+#: src/postulo/templates/settings/export.html
+msgid "Where each comes from in every file you export. Postulo writes no date into a file, and no program's name into a Word or OpenDocument file."
 msgstr ""
 
 #: src/postulo/resume/forms.py
@@ -21072,6 +21192,10 @@ msgstr "您的角色"
 msgctxt "role at an event"
 msgid "your role"
 msgstr "您的角色"
+
+#: src/postulo/templates/cotton/file_properties.html
+msgid "Your settings strip all metadata from the files you export: no title, author, subject or keywords, and a PDF without the program's name."
+msgstr ""
 
 #: src/postulo/templates/applications/tag_form.html
 msgid "your tag"

@@ -1993,6 +1993,10 @@ msgstr "Een afdeling heeft een naam nodig."
 msgid "A destination needs an age recipient to encrypt to: nothing leaves this server unencrypted."
 msgstr ""
 
+#: src/postulo/accounts/forms.py
+msgid "A document has none of its own, so it starts empty."
+msgstr ""
+
 #: src/postulo/templates/server/overview.html
 msgid "A document in a script shown in red is set in the server's fonts instead."
 msgstr ""
@@ -2520,6 +2524,10 @@ msgstr "Een weggelaten schema wordt niet getoond in de samenvatting van een bedr
 #: src/postulo/resume/forms.py
 msgid "A school, a company, a platform: as a CV should print it. It is linked to the company of that name among yours, and added to your companies if there is none."
 msgstr "Een school, een bedrijf, een platform: zoals een cv het moet afdrukken. Het wordt gekoppeld aan het bedrijf met die naam onder uw bedrijven, en aan uw bedrijven toegevoegd als dat er niet is."
+
+#: src/postulo/documents/properties.py
+msgid "A screen reader reads a file in the language it declares, and the PDF standard for accessibility, PDF/UA, requires one. So stripping all metadata keeps the language unless you choose to leave it out here as well."
+msgstr ""
 
 #: src/postulo/core/models.py
 msgid "A second signal beside the word, never instead of it."
@@ -3220,6 +3228,10 @@ msgstr "Ook in %(names)s"
 #: src/postulo/plugins/policy.py
 msgid "Always on: Postulo cannot work without it."
 msgstr "Altijd aan: Postulo kan niet zonder."
+
+#: src/postulo/documents/properties.py
+msgid "Always this"
+msgstr ""
 
 #: src/postulo/core/models.py
 msgid "Amber"
@@ -3955,9 +3967,17 @@ msgstr "Australië"
 msgid "authentication"
 msgstr "authenticatie"
 
-#: src/postulo/documents/forms.py
+#: src/postulo/accounts/forms.py src/postulo/documents/forms.py
 msgid "Author"
 msgstr "Auteur"
+
+#: src/postulo/accounts/models.py
+msgid "author"
+msgstr ""
+
+#: src/postulo/accounts/models.py
+msgid "author of exported files"
+msgstr ""
 
 #: src/postulo/resume/models.py
 msgid "authors"
@@ -4583,6 +4603,10 @@ msgstr "Certificeringen die het heeft afgegeven"
 #: src/postulo/templates/settings/locale.html
 msgid "Change"
 msgstr "Wijzigen"
+
+#: src/postulo/templates/cotton/file_properties.html
+msgid "Change it in Settings"
+msgstr ""
 
 #: src/postulo/templates/settings/account.html
 msgid "Change password"
@@ -6295,6 +6319,10 @@ msgstr "Elk wordt bevroren zoals het nu is, zodat wat ze ontvingen leesbaar blij
 msgid "Each part has a question mark of its own, beside its title, with one sentence about it when you rest on it and the whole of its help when you press it. <em>Save</em> at the bottom keeps everything you changed; removing a saved row asks first and takes effect at once."
 msgstr "Elk onderdeel heeft een eigen vraagteken naast de titel, met één zin uitleg als u de aanwijzer erop houdt en de volledige hulp als u erop drukt. <em>Opslaan</em> onderaan bewaart alles wat u hebt gewijzigd; het verwijderen van een opgeslagen rij vraagt eerst om bevestiging en gaat meteen in."
 
+#: src/postulo/templates/settings/export.html
+msgid "Each property"
+msgstr ""
+
 #: src/postulo/templates/widgets/funnel.html
 msgid "Each stage counts applications that ever reached it, whatever happened afterwards."
 msgstr "Elke fase telt sollicitaties die haar ooit bereikten, wat er daarna ook gebeurde."
@@ -6629,6 +6657,10 @@ msgstr "Elke dag"
 msgid "Every document exactly as it left, frozen at the moment it was sent. These are never regenerated, however much the CV they came from has changed since."
 msgstr "Elk document precies zoals het is verstuurd, bevroren op het moment van versturen. Ze worden nooit opnieuw gegenereerd, hoezeer het cv waaruit ze komen sindsdien ook is veranderd."
 
+#: src/postulo/accounts/forms.py
+msgid "Every file goes without a title, an author, a subject or keywords, whatever is chosen below or typed for one file, and a PDF without the name of the program that drew it. The language stays unless you leave it out below as well."
+msgstr ""
+
 #: src/postulo/plugins/syncing.py
 msgid "Every four hours"
 msgstr "Elke vier uur"
@@ -6705,6 +6737,10 @@ msgstr "Van iedereen, als beheerder"
 #: src/postulo/jobs/listing_views.py src/postulo/templates/server/logs.html
 msgid "Everything"
 msgstr "Alles"
+
+#: src/postulo/templates/settings/export.html
+msgid "Everything at once"
+msgstr ""
 
 #: src/postulo/templates/accounts/delete_account.html
 msgid "Everything goes, at once, and nobody can bring it back. Take your export first."
@@ -6821,9 +6857,11 @@ msgstr "verloopt op"
 msgid "Explaining what went wrong often means saying which connection, which company or which document it happened to. Nothing here contains a document's contents, but treat this page as you would the rest of the instance before you share any of it."
 msgstr "Uitleggen wat er misging, betekent vaak zeggen bij welke koppeling, welk bedrijf of welk document het gebeurde. Hier staat niets van de inhoud van een document, maar behandel deze pagina zoals de rest van de instantie voordat u er iets van deelt."
 
+#: src/postulo/accounts/settings_views.py src/postulo/core/settings_sections.py
 #: src/postulo/templates/cotton/transfer_group.html
 #: src/postulo/templates/jobs/company_detail.html
 #: src/postulo/templates/jobs/company_places.html
+#: src/postulo/templates/settings/export.html
 msgid "Export"
 msgstr "Exporteren"
 
@@ -7374,6 +7412,18 @@ msgstr "Vanaf niveau"
 #: src/postulo/applications/models.py
 msgid "from status"
 msgstr "van status"
+
+#: src/postulo/documents/properties.py
+msgid "From the document"
+msgstr ""
+
+#: src/postulo/accounts/forms.py
+msgid "From the document is the name the document prints, and nothing where it prints none."
+msgstr ""
+
+#: src/postulo/accounts/forms.py
+msgid "From the document is your name and the kind of document: “Alex Morgan — CV”."
+msgstr ""
 
 #: src/postulo/core/models.py
 msgid "from Wikidata"
@@ -9048,9 +9098,17 @@ msgstr "Toetsen: <kbd class=\"kbd\">Ctrl</kbd>+<kbd class=\"kbd\">Enter</kbd> sl
 msgid "Keys: <kbd class=\"kbd\">d</kbd> discards and moves on, <kbd class=\"kbd\">j</kbd> skips to the next, <kbd class=\"kbd\">Ctrl</kbd>+<kbd class=\"kbd\">Enter</kbd> saves and moves on — while nothing is being typed."
 msgstr "Toetsen: <kbd class=\"kbd\">d</kbd> verwerpt en gaat verder, <kbd class=\"kbd\">j</kbd> slaat over naar de volgende, <kbd class=\"kbd\">Ctrl</kbd>+<kbd class=\"kbd\">Enter</kbd> slaat op en gaat verder — zolang er niets wordt getypt."
 
-#: src/postulo/documents/forms.py
+#: src/postulo/accounts/forms.py src/postulo/documents/forms.py
 msgid "Keywords"
 msgstr "Trefwoorden"
+
+#: src/postulo/accounts/models.py
+msgid "keywords"
+msgstr ""
+
+#: src/postulo/accounts/models.py
+msgid "keywords of exported files"
+msgstr ""
 
 #: src/postulo/documents/models.py src/postulo/plugins/models.py
 msgid "label"
@@ -9091,6 +9149,10 @@ msgstr "Taal voor nieuwe accounts"
 #: src/postulo/templates/documents/upload_list.html
 msgid "language not said"
 msgstr "taal niet opgegeven"
+
+#: src/postulo/accounts/models.py
+msgid "language of exported files"
+msgstr ""
 
 #: src/postulo/accounts/models.py
 msgid "language of your career record"
@@ -9299,7 +9361,7 @@ msgstr "Laat het leeg zolang het nog loopt; een cv drukt dan “heden” af."
 msgid "Leave it empty while it is still going; a CV then prints “since”."
 msgstr "Laat het leeg zolang het nog loopt; een cv drukt dan “sinds” af."
 
-#: src/postulo/applications/ical_import.py
+#: src/postulo/applications/ical_import.py src/postulo/documents/properties.py
 msgid "Leave it out"
 msgstr "Weglaten"
 
@@ -14283,6 +14345,7 @@ msgstr "Zaterdag"
 #: src/postulo/templates/settings/accessibility.html
 #: src/postulo/templates/settings/appearance.html
 #: src/postulo/templates/settings/capture.html
+#: src/postulo/templates/settings/export.html
 #: src/postulo/templates/settings/locale.html
 #: src/postulo/templates/settings/plugins.html
 msgid "Save"
@@ -15620,6 +15683,14 @@ msgstr ""
 msgid "Street look-ups send addresses to the service: tick this to say so."
 msgstr ""
 
+#: src/postulo/accounts/forms.py
+msgid "Strip all metadata"
+msgstr ""
+
+#: src/postulo/accounts/models.py
+msgid "strip all metadata"
+msgstr ""
+
 #: src/postulo/templates/account/partials/password_meter.html
 msgid "Strong"
 msgstr "Sterk"
@@ -15628,13 +15699,17 @@ msgstr "Sterk"
 msgid "Study"
 msgstr "Studie"
 
-#: src/postulo/documents/forms.py
+#: src/postulo/accounts/forms.py src/postulo/documents/forms.py
 msgid "Subject"
 msgstr "Onderwerp"
 
-#: src/postulo/documents/models.py
+#: src/postulo/accounts/models.py src/postulo/documents/models.py
 msgid "subject"
 msgstr "onderwerp"
+
+#: src/postulo/accounts/models.py
+msgid "subject of exported files"
+msgstr ""
 
 #: src/postulo/templates/resume/overview.html
 msgid "Suggest from my ORCID record"
@@ -16718,6 +16793,10 @@ msgstr ""
 msgid "The association, society or club, as a CV should print it. It is linked to the company of that name among yours, and added to your companies if there is none. A membership of a union, a party or a congregation says something about you, and is yours to leave off any CV; nothing here asks for one."
 msgstr "De vereniging, het genootschap of de club, zoals een cv het moet afdrukken. Het wordt gekoppeld aan het bedrijf met die naam onder uw bedrijven, en aan uw bedrijven toegevoegd als dat er niet is. Een lidmaatschap van een vakbond, een partij of een geloofsgemeenschap zegt iets over u, en het is aan u om het van elk cv weg te laten; niets hier vraagt erom."
 
+#: src/postulo/accounts/forms.py
+msgid "The author every file names"
+msgstr ""
+
 #: src/postulo/documents/forms.py
 msgid "The author, and the title with your name in it, go into the PDF's properties, as they always have. Untick it to send files without them."
 msgstr "De auteur, en de titel met uw naam erin, komen in de eigenschappen van de pdf, zoals altijd. Vink dit uit om bestanden zonder die gegevens te versturen."
@@ -17240,6 +17319,10 @@ msgstr "De sleutel voor “%(name)s” is vervangen. Die sleutel is het enige wa
 msgid "The key the connection secrets are under is not in the archive. Restore with the same <code>.env</code> the archive was written under, or those secrets cannot be read."
 msgstr "De sleutel waarmee de geheimen van de koppelingen zijn versleuteld, zit niet in het archief. Zet terug met dezelfde <code>.env</code> als waarmee het archief is geschreven, anders kunnen die geheimen niet worden gelezen."
 
+#: src/postulo/accounts/forms.py
+msgid "The keywords every file carries"
+msgstr ""
+
 #: src/postulo/documents/integrity.py
 msgid "the kind of file its name says"
 msgstr "het soort bestand dat de naam aangeeft"
@@ -17248,6 +17331,10 @@ msgstr "het soort bestand dat de naam aangeeft"
 #: src/postulo/templates/server/plugins.html
 msgid "The kinds of identifier this instance adds to the ones Postulo ships, for a person, for a company or for both: a staff number, a register Postulo has no scheme for. Written in JSON."
 msgstr "De soorten identificatiecodes die deze instantie toevoegt aan die welke Postulo meelevert, voor een persoon, voor een bedrijf of voor beide: een personeelsnummer, een register waarvoor Postulo geen schema heeft. Geschreven in JSON."
+
+#: src/postulo/accounts/forms.py
+msgid "The language every file declares"
+msgstr ""
 
 #: src/postulo/resume/forms.py
 msgid "The language the work is written in."
@@ -17875,6 +17962,10 @@ msgstr "De startdatum die zij voorstelden, als ze er een voorstelden."
 msgid "The stored mail credentials cannot be read on this instance."
 msgstr "De opgeslagen inloggegevens voor de mail kunnen op deze instantie niet worden gelezen."
 
+#: src/postulo/accounts/forms.py
+msgid "The subject every file carries"
+msgstr ""
+
 #: src/postulo/documents/forms.py
 msgid "The subject has to be one line."
 msgstr "Het onderwerp moet uit één regel bestaan."
@@ -17929,6 +18020,10 @@ msgstr ""
 #, python-format
 msgid "The time zone is set by the environment: <code>%(variable)s</code> = %(zone)s. Remove it from the environment to change it here."
 msgstr "De tijdzone is ingesteld door de omgeving: <code>%(variable)s</code> = %(zone)s. Verwijder de variabele uit de omgeving om dit hier te kunnen wijzigen."
+
+#: src/postulo/accounts/forms.py
+msgid "The title every file carries"
+msgstr ""
 
 #: src/postulo/documents/models.py
 msgid "The town and country from your details, never a street."
@@ -18149,6 +18244,10 @@ msgstr "Deze referenties worden weggelaten, omdat ze er niet mee hebben ingestem
 #, python-format
 msgid "These skills print the name the ESCO classification gives them in %(tongue)s, because you have not written one of your own:"
 msgstr "Deze vaardigheden drukken de naam af die de ESCO-classificatie ze geeft in %(tongue)s, omdat u er geen eigen hebt geschreven:"
+
+#: src/postulo/templates/cotton/file_properties.html
+msgid "These start from what your settings give every file."
+msgstr ""
 
 #: src/postulo/applications/models.py
 msgid "They did not show up"
@@ -18463,6 +18562,10 @@ msgstr ""
 msgid "This is the beginning. The whole of it is in the download."
 msgstr "Dit is het begin. Het geheel staat in de download."
 
+#: src/postulo/templates/settings/export.html
+msgid "This is the default for every file. On a CV or a letter you can still change what one file says before you export it."
+msgstr ""
+
 #: src/postulo/templates/documents/send.html
 msgid "This is the letter as it will be frozen. Edit it first, or freeze it anyway."
 msgstr "Dit is de brief zoals hij bevroren wordt. Bewerk hem eerst, of bevries hem toch."
@@ -18729,14 +18832,19 @@ msgstr "time-out in seconden"
 msgid "times cited"
 msgstr ""
 
-#: src/postulo/documents/forms.py
+#: src/postulo/accounts/forms.py src/postulo/documents/forms.py
 msgid "Title"
 msgstr "Titel"
 
-#: src/postulo/documents/models.py src/postulo/jobs/models.py
-#: src/postulo/notifications/models.py src/postulo/resume/models.py
+#: src/postulo/accounts/models.py src/postulo/documents/models.py
+#: src/postulo/jobs/models.py src/postulo/notifications/models.py
+#: src/postulo/resume/models.py
 msgid "title"
 msgstr "titel"
+
+#: src/postulo/accounts/models.py
+msgid "title of exported files"
+msgstr ""
 
 #: src/postulo/templates/jobs/capture_page.html
 msgid "Title, as it was read"
@@ -18974,6 +19082,10 @@ msgstr "Typ de gebruikersnaam, %(username)s, ter bevestiging"
 #: src/postulo/templates/partials/label_attrs.html
 msgid "Type to find one, or add a new one"
 msgstr "Typ om er een te vinden, of voeg een nieuwe toe"
+
+#: src/postulo/accounts/forms.py
+msgid "Type what every file is to say here, or choose where it comes from."
+msgstr ""
 
 #: src/postulo/templates/accounts/delete_account.html
 #, python-format
@@ -19760,6 +19872,10 @@ msgstr "Wat het bewaarde item overneemt"
 msgid "What the map is drawn on. Tiles fetched from another server tell that server each viewer's address and the area they look at."
 msgstr "Waarop de kaart wordt getekend. Tegels die van een andere server worden opgehaald, vertellen die server het adres van elke kijker en het gebied waarnaar wordt gekeken."
 
+#: src/postulo/templates/settings/export.html
+msgid "What the PDF, Word and OpenDocument files you export say about themselves: the properties a file manager, a viewer or a recruiter's software reads, beside the words."
+msgstr ""
+
 #: src/postulo/templates/applications/suggestion_list.html
 msgid "What the plugins that read for you think happened. Nothing here is in your record until you say so."
 msgstr "Wat de plugins die voor u lezen denken dat er is gebeurd. Niets hiervan komt in uw dossier tot u dat aangeeft."
@@ -20014,6 +20130,10 @@ msgstr "Waar en waarom sollicitaties eindigen"
 
 #: src/postulo/core/server_forms.py
 msgid "Where each archive is sent once it has been written and checked."
+msgstr ""
+
+#: src/postulo/templates/settings/export.html
+msgid "Where each comes from in every file you export. Postulo writes no date into a file, and no program's name into a Word or OpenDocument file."
 msgstr ""
 
 #: src/postulo/resume/forms.py
@@ -21124,6 +21244,10 @@ msgstr "uw functie"
 msgctxt "role at an event"
 msgid "your role"
 msgstr "uw rol"
+
+#: src/postulo/templates/cotton/file_properties.html
+msgid "Your settings strip all metadata from the files you export: no title, author, subject or keywords, and a PDF without the program's name."
+msgstr ""
 
 #: src/postulo/templates/applications/tag_form.html
 msgid "your tag"

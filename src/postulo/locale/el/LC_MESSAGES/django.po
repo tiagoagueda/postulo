@@ -1996,6 +1996,10 @@ msgstr "Το τμήμα χρειάζεται όνομα."
 msgid "A destination needs an age recipient to encrypt to: nothing leaves this server unencrypted."
 msgstr ""
 
+#: src/postulo/accounts/forms.py
+msgid "A document has none of its own, so it starts empty."
+msgstr ""
+
 #: src/postulo/templates/server/overview.html
 msgid "A document in a script shown in red is set in the server's fonts instead."
 msgstr ""
@@ -2528,6 +2532,10 @@ msgstr "Ένα σχήμα που παραλείπεται δεν εμφανίζ�
 #: src/postulo/resume/forms.py
 msgid "A school, a company, a platform: as a CV should print it. It is linked to the company of that name among yours, and added to your companies if there is none."
 msgstr "Ένα σχολείο, μια εταιρεία, μια πλατφόρμα: όπως πρέπει να το τυπώνει ένα βιογραφικό. Συνδέεται με την ομώνυμη εταιρεία από τις δικές σας και προστίθεται στις εταιρείες σας αν δεν υπάρχει."
+
+#: src/postulo/documents/properties.py
+msgid "A screen reader reads a file in the language it declares, and the PDF standard for accessibility, PDF/UA, requires one. So stripping all metadata keeps the language unless you choose to leave it out here as well."
+msgstr ""
 
 #: src/postulo/core/models.py
 msgid "A second signal beside the word, never instead of it."
@@ -3241,6 +3249,10 @@ msgstr "Επίσης στα %(names)s"
 #, fuzzy
 msgid "Always on: Postulo cannot work without it."
 msgstr "Πάντα ενεργό: το Postulo δεν μπορεί να λειτουργήσει χωρίς αυτό."
+
+#: src/postulo/documents/properties.py
+msgid "Always this"
+msgstr ""
 
 #: src/postulo/core/models.py
 #, fuzzy
@@ -3992,9 +4004,17 @@ msgstr "Αυστραλία"
 msgid "authentication"
 msgstr "έλεγχος ταυτότητας"
 
-#: src/postulo/documents/forms.py
+#: src/postulo/accounts/forms.py src/postulo/documents/forms.py
 msgid "Author"
 msgstr "Συγγραφέας"
+
+#: src/postulo/accounts/models.py
+msgid "author"
+msgstr ""
+
+#: src/postulo/accounts/models.py
+msgid "author of exported files"
+msgstr ""
 
 #: src/postulo/resume/models.py
 msgid "authors"
@@ -4629,6 +4649,10 @@ msgstr "Πιστοποιήσεις που εξέδωσε"
 #: src/postulo/templates/settings/locale.html
 msgid "Change"
 msgstr "Αλλαγή"
+
+#: src/postulo/templates/cotton/file_properties.html
+msgid "Change it in Settings"
+msgstr ""
 
 #: src/postulo/templates/settings/account.html
 msgid "Change password"
@@ -6355,6 +6379,10 @@ msgstr "Το καθένα παγώνει όπως είναι τώρα, ώστε 
 msgid "Each part has a question mark of its own, beside its title, with one sentence about it when you rest on it and the whole of its help when you press it. <em>Save</em> at the bottom keeps everything you changed; removing a saved row asks first and takes effect at once."
 msgstr "Κάθε ενότητα έχει δικό της ερωτηματικό δίπλα στον τίτλο της, με μία πρόταση γι' αυτήν όταν τοποθετείτε τον δείκτη πάνω του και ολόκληρη τη βοήθειά της όταν το πατάτε. Η <em>Αποθήκευση</em> στο κάτω μέρος κρατά όλα όσα αλλάξατε· η αφαίρεση μιας αποθηκευμένης γραμμής ζητά πρώτα επιβεβαίωση και ισχύει αμέσως."
 
+#: src/postulo/templates/settings/export.html
+msgid "Each property"
+msgstr ""
+
 #: src/postulo/templates/widgets/funnel.html
 msgid "Each stage counts applications that ever reached it, whatever happened afterwards."
 msgstr "Κάθε στάδιο μετρά τις αιτήσεις που έφτασαν ποτέ σε αυτό, ό,τι κι αν συνέβη μετά."
@@ -6687,6 +6715,10 @@ msgstr "Κάθε μέρα"
 msgid "Every document exactly as it left, frozen at the moment it was sent. These are never regenerated, however much the CV they came from has changed since."
 msgstr "Κάθε έγγραφο ακριβώς όπως έφυγε, παγωμένο τη στιγμή της αποστολής. Δεν αναδημιουργούνται ποτέ, όσο κι αν άλλαξε από τότε το βιογραφικό από το οποίο προήλθαν."
 
+#: src/postulo/accounts/forms.py
+msgid "Every file goes without a title, an author, a subject or keywords, whatever is chosen below or typed for one file, and a PDF without the name of the program that drew it. The language stays unless you leave it out below as well."
+msgstr ""
+
 #: src/postulo/plugins/syncing.py
 msgid "Every four hours"
 msgstr "Κάθε τέσσερις ώρες"
@@ -6763,6 +6795,10 @@ msgstr "Όλων, ως διαχειριστής"
 #: src/postulo/jobs/listing_views.py src/postulo/templates/server/logs.html
 msgid "Everything"
 msgstr "Όλα"
+
+#: src/postulo/templates/settings/export.html
+msgid "Everything at once"
+msgstr ""
 
 #: src/postulo/templates/accounts/delete_account.html
 msgid "Everything goes, at once, and nobody can bring it back. Take your export first."
@@ -6878,9 +6914,11 @@ msgstr "λήγει στις"
 msgid "Explaining what went wrong often means saying which connection, which company or which document it happened to. Nothing here contains a document's contents, but treat this page as you would the rest of the instance before you share any of it."
 msgstr "Το να εξηγήσει κανείς τι πήγε στραβά συχνά σημαίνει να πει σε ποια σύνδεση, σε ποια εταιρεία ή σε ποιο έγγραφο συνέβη. Εδώ δεν υπάρχει το περιεχόμενο κανενός εγγράφου, αλλά αντιμετωπίστε αυτή τη σελίδα όπως την υπόλοιπη εγκατάσταση πριν μοιραστείτε οτιδήποτε από αυτήν."
 
+#: src/postulo/accounts/settings_views.py src/postulo/core/settings_sections.py
 #: src/postulo/templates/cotton/transfer_group.html
 #: src/postulo/templates/jobs/company_detail.html
 #: src/postulo/templates/jobs/company_places.html
+#: src/postulo/templates/settings/export.html
 msgid "Export"
 msgstr "Εξαγωγή"
 
@@ -7440,6 +7478,18 @@ msgstr "Από το επίπεδο"
 #: src/postulo/applications/models.py
 msgid "from status"
 msgstr "από κατάσταση"
+
+#: src/postulo/documents/properties.py
+msgid "From the document"
+msgstr ""
+
+#: src/postulo/accounts/forms.py
+msgid "From the document is the name the document prints, and nothing where it prints none."
+msgstr ""
+
+#: src/postulo/accounts/forms.py
+msgid "From the document is your name and the kind of document: “Alex Morgan — CV”."
+msgstr ""
 
 #: src/postulo/core/models.py
 msgid "from Wikidata"
@@ -9123,9 +9173,17 @@ msgstr "Πλήκτρα: <kbd class=\"kbd\">Ctrl</kbd>+<kbd class=\"kbd\">Enter</
 msgid "Keys: <kbd class=\"kbd\">d</kbd> discards and moves on, <kbd class=\"kbd\">j</kbd> skips to the next, <kbd class=\"kbd\">Ctrl</kbd>+<kbd class=\"kbd\">Enter</kbd> saves and moves on — while nothing is being typed."
 msgstr "Πλήκτρα: το <kbd class=\"kbd\">d</kbd> απορρίπτει και προχωρά, το <kbd class=\"kbd\">j</kbd> μεταβαίνει στο επόμενο, το <kbd class=\"kbd\">Ctrl</kbd>+<kbd class=\"kbd\">Enter</kbd> αποθηκεύει και προχωρά — όσο δεν πληκτρολογείτε τίποτα."
 
-#: src/postulo/documents/forms.py
+#: src/postulo/accounts/forms.py src/postulo/documents/forms.py
 msgid "Keywords"
 msgstr "Λέξεις-κλειδιά"
+
+#: src/postulo/accounts/models.py
+msgid "keywords"
+msgstr ""
+
+#: src/postulo/accounts/models.py
+msgid "keywords of exported files"
+msgstr ""
 
 #: src/postulo/documents/models.py src/postulo/plugins/models.py
 msgid "label"
@@ -9166,6 +9224,10 @@ msgstr "Γλώσσα για νέους λογαριασμούς"
 #: src/postulo/templates/documents/upload_list.html
 msgid "language not said"
 msgstr "η γλώσσα δεν δηλώθηκε"
+
+#: src/postulo/accounts/models.py
+msgid "language of exported files"
+msgstr ""
 
 #: src/postulo/accounts/models.py
 msgid "language of your career record"
@@ -9373,7 +9435,7 @@ msgstr "Αφήστε το κενό όσο συνεχίζεται ακόμη· έ
 msgid "Leave it empty while it is still going; a CV then prints “since”."
 msgstr "Αφήστε το κενό όσο συνεχίζεται· τότε ένα βιογραφικό τυπώνει «από»."
 
-#: src/postulo/applications/ical_import.py
+#: src/postulo/applications/ical_import.py src/postulo/documents/properties.py
 msgid "Leave it out"
 msgstr "Παράλειψη"
 
@@ -14392,6 +14454,7 @@ msgstr "Σάββατο"
 #: src/postulo/templates/settings/accessibility.html
 #: src/postulo/templates/settings/appearance.html
 #: src/postulo/templates/settings/capture.html
+#: src/postulo/templates/settings/export.html
 #: src/postulo/templates/settings/locale.html
 #: src/postulo/templates/settings/plugins.html
 msgid "Save"
@@ -15746,6 +15809,14 @@ msgstr ""
 msgid "Street look-ups send addresses to the service: tick this to say so."
 msgstr ""
 
+#: src/postulo/accounts/forms.py
+msgid "Strip all metadata"
+msgstr ""
+
+#: src/postulo/accounts/models.py
+msgid "strip all metadata"
+msgstr ""
+
 #: src/postulo/templates/account/partials/password_meter.html
 #, fuzzy
 msgid "Strong"
@@ -15755,13 +15826,17 @@ msgstr "Ισχυρός"
 msgid "Study"
 msgstr "Σπουδές"
 
-#: src/postulo/documents/forms.py
+#: src/postulo/accounts/forms.py src/postulo/documents/forms.py
 msgid "Subject"
 msgstr "Θέμα"
 
-#: src/postulo/documents/models.py
+#: src/postulo/accounts/models.py src/postulo/documents/models.py
 msgid "subject"
 msgstr "θέμα"
+
+#: src/postulo/accounts/models.py
+msgid "subject of exported files"
+msgstr ""
 
 #: src/postulo/templates/resume/overview.html
 msgid "Suggest from my ORCID record"
@@ -16848,6 +16923,10 @@ msgstr ""
 msgid "The association, society or club, as a CV should print it. It is linked to the company of that name among yours, and added to your companies if there is none. A membership of a union, a party or a congregation says something about you, and is yours to leave off any CV; nothing here asks for one."
 msgstr "Η ένωση, ο σύλλογος ή η λέσχη, όπως πρέπει να το τυπώνει ένα βιογραφικό. Συνδέεται με την ομώνυμη εταιρεία από τις δικές σας και προστίθεται στις εταιρείες σας αν δεν υπάρχει. Η ιδιότητα μέλους σε συνδικάτο, κόμμα ή θρησκευτική κοινότητα λέει κάτι για εσάς, και εσείς αποφασίζετε αν θα την παραλείψετε από οποιοδήποτε βιογραφικό· τίποτα εδώ δεν τη ζητά."
 
+#: src/postulo/accounts/forms.py
+msgid "The author every file names"
+msgstr ""
+
 #: src/postulo/documents/forms.py
 msgid "The author, and the title with your name in it, go into the PDF's properties, as they always have. Untick it to send files without them."
 msgstr "Ο συγγραφέας, και ο τίτλος με το όνομά σας, μπαίνουν στις ιδιότητες του PDF, όπως πάντα. Αποεπιλέξτε το για να στέλνετε αρχεία χωρίς αυτά."
@@ -17372,6 +17451,10 @@ msgstr "Το κλειδί για το «%(name)s» αντικαταστάθηκ�
 msgid "The key the connection secrets are under is not in the archive. Restore with the same <code>.env</code> the archive was written under, or those secrets cannot be read."
 msgstr "Το κλειδί που προστατεύει τα μυστικά των συνδέσεων δεν περιλαμβάνεται στο αρχείο. Κάντε την επαναφορά με το ίδιο <code>.env</code> με το οποίο γράφτηκε το αρχείο, αλλιώς αυτά τα μυστικά δεν θα μπορούν να διαβαστούν."
 
+#: src/postulo/accounts/forms.py
+msgid "The keywords every file carries"
+msgstr ""
+
 #: src/postulo/documents/integrity.py
 msgid "the kind of file its name says"
 msgstr "το είδος του αρχείου που λέει το όνομά του"
@@ -17380,6 +17463,10 @@ msgstr "το είδος του αρχείου που λέει το όνομά τ
 #: src/postulo/templates/server/plugins.html
 msgid "The kinds of identifier this instance adds to the ones Postulo ships, for a person, for a company or for both: a staff number, a register Postulo has no scheme for. Written in JSON."
 msgstr "Τα είδη αναγνωριστικών που αυτή η εγκατάσταση προσθέτει σε όσα παρέχει το Postulo, για ένα άτομο, για μια εταιρεία ή και για τα δύο: έναν αριθμό προσωπικού, ένα μητρώο για το οποίο το Postulo δεν έχει σχήμα. Γραμμένα σε JSON."
+
+#: src/postulo/accounts/forms.py
+msgid "The language every file declares"
+msgstr ""
 
 #: src/postulo/resume/forms.py
 msgid "The language the work is written in."
@@ -18012,6 +18099,10 @@ msgstr "Η ημερομηνία έναρξης που πρότειναν, αν �
 msgid "The stored mail credentials cannot be read on this instance."
 msgstr "Τα αποθηκευμένα διαπιστευτήρια αλληλογραφίας δεν μπορούν να διαβαστούν σε αυτή την εγκατάσταση."
 
+#: src/postulo/accounts/forms.py
+msgid "The subject every file carries"
+msgstr ""
+
 #: src/postulo/documents/forms.py
 msgid "The subject has to be one line."
 msgstr "Το θέμα πρέπει να είναι μία γραμμή."
@@ -18066,6 +18157,10 @@ msgstr ""
 #, python-format
 msgid "The time zone is set by the environment: <code>%(variable)s</code> = %(zone)s. Remove it from the environment to change it here."
 msgstr "Η ζώνη ώρας ορίζεται από το περιβάλλον: <code>%(variable)s</code> = %(zone)s. Αφαιρέστε το από το περιβάλλον για να την αλλάξετε εδώ."
+
+#: src/postulo/accounts/forms.py
+msgid "The title every file carries"
+msgstr ""
 
 #: src/postulo/documents/models.py
 msgid "The town and country from your details, never a street."
@@ -18287,6 +18382,10 @@ msgstr "Αυτές οι συστάσεις παραλείπονται, επει�
 #, fuzzy, python-format
 msgid "These skills print the name the ESCO classification gives them in %(tongue)s, because you have not written one of your own:"
 msgstr "Αυτές οι δεξιότητες εκτυπώνουν το όνομα που τους δίνει η ταξινόμηση ESCO στα %(tongue)s, επειδή δεν έχετε γράψει δικό σας:"
+
+#: src/postulo/templates/cotton/file_properties.html
+msgid "These start from what your settings give every file."
+msgstr ""
 
 #: src/postulo/applications/models.py
 msgid "They did not show up"
@@ -18600,6 +18699,10 @@ msgstr ""
 msgid "This is the beginning. The whole of it is in the download."
 msgstr "Αυτή είναι η αρχή. Ολόκληρο το περιεχόμενο βρίσκεται στο αρχείο λήψης."
 
+#: src/postulo/templates/settings/export.html
+msgid "This is the default for every file. On a CV or a letter you can still change what one file says before you export it."
+msgstr ""
+
 #: src/postulo/templates/documents/send.html
 msgid "This is the letter as it will be frozen. Edit it first, or freeze it anyway."
 msgstr "Αυτή είναι η επιστολή όπως θα παγώσει. Επεξεργαστείτε την πρώτα ή παγώστε την ως έχει."
@@ -18867,14 +18970,19 @@ msgstr "χρονικό όριο σε δευτερόλεπτα"
 msgid "times cited"
 msgstr ""
 
-#: src/postulo/documents/forms.py
+#: src/postulo/accounts/forms.py src/postulo/documents/forms.py
 msgid "Title"
 msgstr "Τίτλος"
 
-#: src/postulo/documents/models.py src/postulo/jobs/models.py
-#: src/postulo/notifications/models.py src/postulo/resume/models.py
+#: src/postulo/accounts/models.py src/postulo/documents/models.py
+#: src/postulo/jobs/models.py src/postulo/notifications/models.py
+#: src/postulo/resume/models.py
 msgid "title"
 msgstr "τίτλος"
+
+#: src/postulo/accounts/models.py
+msgid "title of exported files"
+msgstr ""
 
 #: src/postulo/templates/jobs/capture_page.html
 msgid "Title, as it was read"
@@ -19120,6 +19228,10 @@ msgstr "Πληκτρολογήστε το όνομα χρήστη, %(username)s,
 #, fuzzy
 msgid "Type to find one, or add a new one"
 msgstr "Πληκτρολογήστε για αναζήτηση ή προσθέστε νέα καταχώριση"
+
+#: src/postulo/accounts/forms.py
+msgid "Type what every file is to say here, or choose where it comes from."
+msgstr ""
 
 #: src/postulo/templates/accounts/delete_account.html
 #, python-format
@@ -19911,6 +20023,10 @@ msgstr "Τι παίρνει η εγγραφή που διατηρείται"
 msgid "What the map is drawn on. Tiles fetched from another server tell that server each viewer's address and the area they look at."
 msgstr "Πάνω σε τι σχεδιάζεται ο χάρτης. Τα πλακίδια που ανακτώνται από άλλον διακομιστή του γνωστοποιούν τη διεύθυνση κάθε επισκέπτη και την περιοχή που βλέπει."
 
+#: src/postulo/templates/settings/export.html
+msgid "What the PDF, Word and OpenDocument files you export say about themselves: the properties a file manager, a viewer or a recruiter's software reads, beside the words."
+msgstr ""
+
 #: src/postulo/templates/applications/suggestion_list.html
 msgid "What the plugins that read for you think happened. Nothing here is in your record until you say so."
 msgstr "Τι πιστεύουν ότι συνέβη τα πρόσθετα που διαβάζουν για λογαριασμό σας. Τίποτα από αυτά δεν μπαίνει στο αρχείο σας μέχρι να το επιβεβαιώσετε."
@@ -20164,6 +20280,10 @@ msgstr "Πού και γιατί τελειώνουν οι αιτήσεις"
 
 #: src/postulo/core/server_forms.py
 msgid "Where each archive is sent once it has been written and checked."
+msgstr ""
+
+#: src/postulo/templates/settings/export.html
+msgid "Where each comes from in every file you export. Postulo writes no date into a file, and no program's name into a Word or OpenDocument file."
 msgstr ""
 
 #: src/postulo/resume/forms.py
@@ -21276,6 +21396,10 @@ msgstr "ο ρόλος σας"
 msgctxt "role at an event"
 msgid "your role"
 msgstr "ο ρόλος σας"
+
+#: src/postulo/templates/cotton/file_properties.html
+msgid "Your settings strip all metadata from the files you export: no title, author, subject or keywords, and a PDF without the program's name."
+msgstr ""
 
 #: src/postulo/templates/applications/tag_form.html
 msgid "your tag"

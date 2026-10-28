@@ -582,6 +582,8 @@ def signed_in_paths(a, c, me, entry=None, recovery_link: str = "", things=None) 
         "/settings/account/",
         # What a person's captures keep of the page they were read from (#256).
         "/settings/capture/",
+        # What every exported file says about itself (#878).
+        "/settings/export/",
         "/settings/connections/",
         "/settings/plugins/",
         "/settings/connections/add/",

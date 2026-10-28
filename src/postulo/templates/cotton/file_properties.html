@@ -9,6 +9,17 @@
    browser sends nothing for an unticked box, and nothing has to mean *with*, for the links
    that were written before there was a choice. The last value of a name is the one read, so
    a ticked box wins over it. {% endcomment %}
+{% comment %} Where the person's Settings → Export strip every file (#878) the fields would be
+   taken out again whatever they said, so the dialog says that instead, and posts nothing: an
+   export with nothing chosen is the default. Elsewhere the fields start from that default,
+   and the line under them says where it is set. {% endcomment %}
+{% load i18n %}
+{% if form.stripped %}
+  <p class="text-sm" data-metadata-stripped>
+    {% translate "Your settings strip all metadata from the files you export: no title, author, subject or keywords, and a PDF without the program's name." %}
+    <a href="{% url 'settings:export' %}" class="underline">{% translate "Change it in Settings" %}</a>
+  </p>
+{% else %}
 <input type="hidden" name="with_properties" value="0">
 <c-field :field="form.with_properties" />
 <c-field :field="form.title" />
@@ -16,3 +27,8 @@
 <c-field :field="form.subject" />
 <c-field :field="form.keywords" />
 <c-field :field="form.language" />
+<p class="text-xs text-ink-500 dark:text-ink-400">
+  {% translate "These start from what your settings give every file." %}
+  <a href="{% url 'settings:export' %}" class="underline">{% translate "Change it in Settings" %}</a>
+</p>
+{% endif %}

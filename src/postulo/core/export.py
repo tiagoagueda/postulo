@@ -233,7 +233,12 @@ logger = logging.getLogger(__name__)
 #: none for the whole body of work. An archive without them restores none; one with a count
 #: out of bounds or no date restores that entry not at all, and one naming a publication the
 #: file does not hold restores it as a count for the whole body of work, and says so (#697).
-FORMAT_VERSION = 76
+#: 77 added what the person's exported files say about themselves, by default, on the profile:
+#: ``export_strip_metadata``, and for each of the title, the author, the subject, the keywords
+#: and the language an ``export_<name>_source`` (``document``, ``fixed`` or ``omit``) and an
+#: ``export_<name>`` value. A privacy choice, so a restore keeps it; each is read back through
+#: its column, and an archive without them restores every file as it always was (#878).
+FORMAT_VERSION = 77
 
 
 def industry_entry(industry) -> str | dict:
@@ -320,6 +325,15 @@ MEDIA_PREFIX = "media/"
 
 # What is written for each kind of record. Declared here so the assembly below reads as
 # the shape of the document rather than as a wall of field names.
+#: The profile's Settings → Export (#878), written and read back as the other preferences are.
+EXPORT_METADATA_FIELDS = (
+    "export_strip_metadata",
+    *(
+        f"export_{name}{end}"
+        for name in ("title", "author", "subject", "keywords", "language")
+        for end in ("_source", "")
+    ),
+)
 PROFILE_FIELDS = (
     # Before the name, and apart from it (#309): stored as the text, so they travel as it.
     "form_of_address",
@@ -379,6 +393,9 @@ PROFILE_FIELDS = (
     "keep_page_rendering",
     "closing_notice_days",
     "save_as_you_go",
+    # What every exported file says about itself (#878): a privacy choice, like what a
+    # capture keeps, so a restore that reset it would put a name back into files.
+    *EXPORT_METADATA_FIELDS,
 )
 #: What the candidate document takes from the profile: what a CV prints, and the language
 #: the career is written in, which its translations are translations *from*. Everything
@@ -904,8 +921,15 @@ def _profile_block(profile, names: tuple[str, ...] = PROFILE_FIELDS) -> dict:
     """
     if not profile:
         return {}
+    written = _fields(profile, names)
+    # The language every exported file declares is blank unless one was fixed (#878), and a
+    # blank is no language: it is written as null rather than as a tag that is empty, so the
+    # profile keeps its shape and the importer, which takes null for "nobody said", restores
+    # it blank, which is what it was.
+    if "export_language" in written and not written["export_language"]:
+        written["export_language"] = None
     return {
-        **_fields(profile, names),
+        **written,
         "phone_numbers": _phone_numbers(profile),
         "postal_addresses": _postal_addresses(profile),
         "web_links": _web_links(profile),

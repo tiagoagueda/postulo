@@ -135,6 +135,8 @@ def test_a_plugin_can_add_a_section(client, user):
             "account",
             # What a capture keeps of its page (#256).
             "capture",
+            # What an exported file says about itself (#878).
+            "export",
             "connections",
             "plugins",
             "tokens",

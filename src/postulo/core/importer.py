@@ -35,6 +35,7 @@ from .export import (
     CONTACT_FIELDS,
     CV_FIELDS,
     EVENT_FIELDS,
+    EXPORT_METADATA_FIELDS,
     FORMAT_VERSION,
     INTERVIEW_FIELDS,
     LETTER_FIELDS,
@@ -159,6 +160,10 @@ _CHECKED_PROFILE_FIELDS = frozenset(
         "keep_page_rendering",
         "closing_notice_days",
         "save_as_you_go",
+        # What every exported file says about itself (#878): a source that is not one of
+        # the three, a value longer than its column or a language that is not a tag is
+        # refused, and the default stays.
+        *EXPORT_METADATA_FIELDS,
         # The personal details (#679, #680): each held to its column's own rule, the one the
         # form, the API and the candidate file are held to, and a value it refuses is left
         # out and said in the report (`_PERSONAL_FIELDS`).

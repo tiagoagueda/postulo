@@ -1995,6 +1995,10 @@ msgstr "Deild þarf heiti."
 msgid "A destination needs an age recipient to encrypt to: nothing leaves this server unencrypted."
 msgstr ""
 
+#: src/postulo/accounts/forms.py
+msgid "A document has none of its own, so it starts empty."
+msgstr ""
+
 #: src/postulo/templates/server/overview.html
 msgid "A document in a script shown in red is set in the server's fonts instead."
 msgstr ""
@@ -2525,6 +2529,10 @@ msgstr "Kerfi sem er sleppt er ekki teiknað í samantekt fyrirtækis. Því er 
 #: src/postulo/resume/forms.py
 msgid "A school, a company, a platform: as a CV should print it. It is linked to the company of that name among yours, and added to your companies if there is none."
 msgstr "Skóli, fyrirtæki, vettvangur: eins og ferilskrá ætti að birta það. Það er tengt við fyrirtækið með því heiti meðal fyrirtækjanna þinna og bætt við þau ef ekkert slíkt er til."
+
+#: src/postulo/documents/properties.py
+msgid "A screen reader reads a file in the language it declares, and the PDF standard for accessibility, PDF/UA, requires one. So stripping all metadata keeps the language unless you choose to leave it out here as well."
+msgstr ""
 
 #: src/postulo/core/models.py
 msgid "A second signal beside the word, never instead of it."
@@ -3231,6 +3239,10 @@ msgstr "Einnig á %(names)s"
 #: src/postulo/plugins/policy.py
 msgid "Always on: Postulo cannot work without it."
 msgstr "Alltaf kveikt: Postulo virkar ekki án þessa."
+
+#: src/postulo/documents/properties.py
+msgid "Always this"
+msgstr ""
 
 #: src/postulo/core/models.py
 msgid "Amber"
@@ -3974,9 +3986,17 @@ msgstr "Ástralía"
 msgid "authentication"
 msgstr "auðkenning"
 
-#: src/postulo/documents/forms.py
+#: src/postulo/accounts/forms.py src/postulo/documents/forms.py
 msgid "Author"
 msgstr "Höfundur"
+
+#: src/postulo/accounts/models.py
+msgid "author"
+msgstr ""
+
+#: src/postulo/accounts/models.py
+msgid "author of exported files"
+msgstr ""
 
 #: src/postulo/resume/models.py
 msgid "authors"
@@ -4609,6 +4629,10 @@ msgstr "Vottanir sem það gaf út"
 #: src/postulo/templates/settings/locale.html
 msgid "Change"
 msgstr "Breyta"
+
+#: src/postulo/templates/cotton/file_properties.html
+msgid "Change it in Settings"
+msgstr ""
 
 #: src/postulo/templates/settings/account.html
 msgid "Change password"
@@ -6331,6 +6355,10 @@ msgstr "Hvert þeirra er fryst eins og það er núna, svo það sem viðtakendu
 msgid "Each part has a question mark of its own, beside its title, with one sentence about it when you rest on it and the whole of its help when you press it. <em>Save</em> at the bottom keeps everything you changed; removing a saved row asks first and takes effect at once."
 msgstr "Hver hluti hefur sitt eigið spurningarmerki við hliðina á titli sínum, með einni setningu um hlutann þegar þú heldur bendlinum yfir því og allri hjálpinni þegar þú ýtir á það. <em>Vista</em> neðst geymir allt sem þú breyttir; ef vistuð röð er fjarlægð er spurt fyrst og það tekur gildi strax."
 
+#: src/postulo/templates/settings/export.html
+msgid "Each property"
+msgstr ""
+
 #: src/postulo/templates/widgets/funnel.html
 msgid "Each stage counts applications that ever reached it, whatever happened afterwards."
 msgstr "Hvert þrep telur umsóknir sem komust einhvern tíma þangað, hvað sem gerðist síðan."
@@ -6660,6 +6688,10 @@ msgstr "Daglega"
 msgid "Every document exactly as it left, frozen at the moment it was sent. These are never regenerated, however much the CV they came from has changed since."
 msgstr "Hvert skjal nákvæmlega eins og það fór, fryst á þeirri stundu sem það var sent. Þau eru aldrei búin til aftur, sama hversu mikið ferilskráin sem þau komu úr hefur breyst síðan."
 
+#: src/postulo/accounts/forms.py
+msgid "Every file goes without a title, an author, a subject or keywords, whatever is chosen below or typed for one file, and a PDF without the name of the program that drew it. The language stays unless you leave it out below as well."
+msgstr ""
+
 #: src/postulo/plugins/syncing.py
 msgid "Every four hours"
 msgstr "Á fjögurra klukkustunda fresti"
@@ -6736,6 +6768,10 @@ msgstr "Allra, sem stjórnandi"
 #: src/postulo/jobs/listing_views.py src/postulo/templates/server/logs.html
 msgid "Everything"
 msgstr "Allt"
+
+#: src/postulo/templates/settings/export.html
+msgid "Everything at once"
+msgstr ""
 
 #: src/postulo/templates/accounts/delete_account.html
 msgid "Everything goes, at once, and nobody can bring it back. Take your export first."
@@ -6853,9 +6889,11 @@ msgstr "rennur út þann"
 msgid "Explaining what went wrong often means saying which connection, which company or which document it happened to. Nothing here contains a document's contents, but treat this page as you would the rest of the instance before you share any of it."
 msgstr "Að útskýra hvað fór úrskeiðis þýðir oft að nefna hvaða tenging, hvaða fyrirtæki eða hvaða skjal átti í hlut. Ekkert hér inniheldur efni skjals, en farðu með þessa síðu eins og afganginn af uppsetningunni áður en þú deilir einhverju af henni."
 
+#: src/postulo/accounts/settings_views.py src/postulo/core/settings_sections.py
 #: src/postulo/templates/cotton/transfer_group.html
 #: src/postulo/templates/jobs/company_detail.html
 #: src/postulo/templates/jobs/company_places.html
+#: src/postulo/templates/settings/export.html
 msgid "Export"
 msgstr "Flytja út"
 
@@ -7408,6 +7446,18 @@ msgstr "Frá stigi"
 #: src/postulo/applications/models.py
 msgid "from status"
 msgstr "frá stöðu"
+
+#: src/postulo/documents/properties.py
+msgid "From the document"
+msgstr ""
+
+#: src/postulo/accounts/forms.py
+msgid "From the document is the name the document prints, and nothing where it prints none."
+msgstr ""
+
+#: src/postulo/accounts/forms.py
+msgid "From the document is your name and the kind of document: “Alex Morgan — CV”."
+msgstr ""
 
 #: src/postulo/core/models.py
 msgid "from Wikidata"
@@ -9100,9 +9150,17 @@ msgstr "Lyklar: <kbd class=\"kbd\">Ctrl</kbd>+<kbd class=\"kbd\">Enter</kbd> vis
 msgid "Keys: <kbd class=\"kbd\">d</kbd> discards and moves on, <kbd class=\"kbd\">j</kbd> skips to the next, <kbd class=\"kbd\">Ctrl</kbd>+<kbd class=\"kbd\">Enter</kbd> saves and moves on — while nothing is being typed."
 msgstr "Lyklar: <kbd class=\"kbd\">d</kbd> hendir og heldur áfram, <kbd class=\"kbd\">j</kbd> fer í það næsta, <kbd class=\"kbd\">Ctrl</kbd>+<kbd class=\"kbd\">Enter</kbd> vistar og heldur áfram — meðan ekkert er verið að slá inn."
 
-#: src/postulo/documents/forms.py
+#: src/postulo/accounts/forms.py src/postulo/documents/forms.py
 msgid "Keywords"
 msgstr "Efnisorð"
+
+#: src/postulo/accounts/models.py
+msgid "keywords"
+msgstr ""
+
+#: src/postulo/accounts/models.py
+msgid "keywords of exported files"
+msgstr ""
 
 #: src/postulo/documents/models.py src/postulo/plugins/models.py
 msgid "label"
@@ -9143,6 +9201,10 @@ msgstr "Tungumál fyrir nýja reikninga"
 #: src/postulo/templates/documents/upload_list.html
 msgid "language not said"
 msgstr "tungumál ekki tilgreint"
+
+#: src/postulo/accounts/models.py
+msgid "language of exported files"
+msgstr ""
 
 #: src/postulo/accounts/models.py
 msgid "language of your career record"
@@ -9349,7 +9411,7 @@ msgstr "Skildu þetta eftir autt meðan það stendur enn yfir; ferilskrá birti
 msgid "Leave it empty while it is still going; a CV then prints “since”."
 msgstr "Skildu þetta eftir autt meðan það stendur enn yfir; ferilskrá birtir þá „frá“."
 
-#: src/postulo/applications/ical_import.py
+#: src/postulo/applications/ical_import.py src/postulo/documents/properties.py
 msgid "Leave it out"
 msgstr "Sleppa því"
 
@@ -14354,6 +14416,7 @@ msgstr "laugardagur"
 #: src/postulo/templates/settings/accessibility.html
 #: src/postulo/templates/settings/appearance.html
 #: src/postulo/templates/settings/capture.html
+#: src/postulo/templates/settings/export.html
 #: src/postulo/templates/settings/locale.html
 #: src/postulo/templates/settings/plugins.html
 msgid "Save"
@@ -15700,6 +15763,14 @@ msgstr ""
 msgid "Street look-ups send addresses to the service: tick this to say so."
 msgstr ""
 
+#: src/postulo/accounts/forms.py
+msgid "Strip all metadata"
+msgstr ""
+
+#: src/postulo/accounts/models.py
+msgid "strip all metadata"
+msgstr ""
+
 #: src/postulo/templates/account/partials/password_meter.html
 #, fuzzy
 msgid "Strong"
@@ -15709,13 +15780,17 @@ msgstr "Sterkt"
 msgid "Study"
 msgstr "Nám"
 
-#: src/postulo/documents/forms.py
+#: src/postulo/accounts/forms.py src/postulo/documents/forms.py
 msgid "Subject"
 msgstr "Efni"
 
-#: src/postulo/documents/models.py
+#: src/postulo/accounts/models.py src/postulo/documents/models.py
 msgid "subject"
 msgstr "efni"
+
+#: src/postulo/accounts/models.py
+msgid "subject of exported files"
+msgstr ""
 
 #: src/postulo/templates/resume/overview.html
 msgid "Suggest from my ORCID record"
@@ -16798,6 +16873,10 @@ msgstr ""
 msgid "The association, society or club, as a CV should print it. It is linked to the company of that name among yours, and added to your companies if there is none. A membership of a union, a party or a congregation says something about you, and is yours to leave off any CV; nothing here asks for one."
 msgstr "Félagið, samtökin eða klúbburinn, eins og ferilskrá ætti að birta það. Það er tengt við fyrirtækið með því heiti meðal fyrirtækjanna þinna og bætt við þau ef ekkert slíkt er til. Aðild að stéttarfélagi, stjórnmálaflokki eða trúfélagi segir eitthvað um þig og þér er frjálst að sleppa henni á hvaða ferilskrá sem er; ekkert hér biður um slíkt."
 
+#: src/postulo/accounts/forms.py
+msgid "The author every file names"
+msgstr ""
+
 #: src/postulo/documents/forms.py
 msgid "The author, and the title with your name in it, go into the PDF's properties, as they always have. Untick it to send files without them."
 msgstr "Höfundurinn, og titillinn með nafninu þínu, fara í eiginleika PDF-skrárinnar, eins og alltaf hefur verið. Taktu hakið af til að senda skrár án þeirra."
@@ -17322,6 +17401,10 @@ msgstr "Lyklinum fyrir „%(name)s“ var skipt út. Sá lykill er það eina se
 msgid "The key the connection secrets are under is not in the archive. Restore with the same <code>.env</code> the archive was written under, or those secrets cannot be read."
 msgstr "Lykillinn sem leynilyklar tenginganna eru dulritaðir með er ekki í safnskránni. Endurheimtu með sömu <code>.env</code> og safnskráin var skrifuð með, annars er ekki hægt að lesa þá leynilykla."
 
+#: src/postulo/accounts/forms.py
+msgid "The keywords every file carries"
+msgstr ""
+
 #: src/postulo/documents/integrity.py
 msgid "the kind of file its name says"
 msgstr "sú tegund skráar sem heitið segir til um"
@@ -17330,6 +17413,10 @@ msgstr "sú tegund skráar sem heitið segir til um"
 #: src/postulo/templates/server/plugins.html
 msgid "The kinds of identifier this instance adds to the ones Postulo ships, for a person, for a company or for both: a staff number, a register Postulo has no scheme for. Written in JSON."
 msgstr "Tegundir auðkenna sem þessi uppsetning bætir við þær sem fylgja Postulo, fyrir manneskju, fyrirtæki eða bæði: starfsmannanúmer, skrá sem Postulo hefur ekkert kerfi fyrir. Skrifað í JSON."
+
+#: src/postulo/accounts/forms.py
+msgid "The language every file declares"
+msgstr ""
 
 #: src/postulo/resume/forms.py
 msgid "The language the work is written in."
@@ -17962,6 +18049,10 @@ msgstr "Upphafsdagurinn sem þau lögðu til, ef einhver var."
 msgid "The stored mail credentials cannot be read on this instance."
 msgstr "Ekki er hægt að lesa vistaðar innskráningarupplýsingar fyrir póst á þessari uppsetningu."
 
+#: src/postulo/accounts/forms.py
+msgid "The subject every file carries"
+msgstr ""
+
 #: src/postulo/documents/forms.py
 msgid "The subject has to be one line."
 msgstr "Efnið verður að vera ein lína."
@@ -18017,6 +18108,10 @@ msgstr ""
 #, python-format
 msgid "The time zone is set by the environment: <code>%(variable)s</code> = %(zone)s. Remove it from the environment to change it here."
 msgstr "Tímabeltið er stillt af umhverfinu: <code>%(variable)s</code> = %(zone)s. Fjarlægðu það úr umhverfinu til að breyta því hér."
+
+#: src/postulo/accounts/forms.py
+msgid "The title every file carries"
+msgstr ""
 
 #: src/postulo/documents/models.py
 msgid "The town and country from your details, never a street."
@@ -18238,6 +18333,10 @@ msgstr "Þessum meðmælendum er sleppt, því þeir hafa ekki samþykkt að ver
 #, fuzzy, python-format
 msgid "These skills print the name the ESCO classification gives them in %(tongue)s, because you have not written one of your own:"
 msgstr "Þessi færni birtist með heitinu sem ESCO-flokkunin gefur henni á %(tongue)s, því þú hefur ekki skrifað eigið heiti:"
+
+#: src/postulo/templates/cotton/file_properties.html
+msgid "These start from what your settings give every file."
+msgstr ""
 
 #: src/postulo/applications/models.py
 msgid "They did not show up"
@@ -18553,6 +18652,10 @@ msgstr ""
 msgid "This is the beginning. The whole of it is in the download."
 msgstr "Þetta er byrjunin. Allt er í niðurhalinu."
 
+#: src/postulo/templates/settings/export.html
+msgid "This is the default for every file. On a CV or a letter you can still change what one file says before you export it."
+msgstr ""
+
 #: src/postulo/templates/documents/send.html
 msgid "This is the letter as it will be frozen. Edit it first, or freeze it anyway."
 msgstr "Svona verður bréfið fryst. Breyttu því fyrst, eða frystu það samt."
@@ -18820,14 +18923,19 @@ msgstr "tímamörk í sekúndum"
 msgid "times cited"
 msgstr ""
 
-#: src/postulo/documents/forms.py
+#: src/postulo/accounts/forms.py src/postulo/documents/forms.py
 msgid "Title"
 msgstr "Titill"
 
-#: src/postulo/documents/models.py src/postulo/jobs/models.py
-#: src/postulo/notifications/models.py src/postulo/resume/models.py
+#: src/postulo/accounts/models.py src/postulo/documents/models.py
+#: src/postulo/jobs/models.py src/postulo/notifications/models.py
+#: src/postulo/resume/models.py
 msgid "title"
 msgstr "titill"
+
+#: src/postulo/accounts/models.py
+msgid "title of exported files"
+msgstr ""
 
 #: src/postulo/templates/jobs/capture_page.html
 msgid "Title, as it was read"
@@ -19066,6 +19174,10 @@ msgstr "Sláðu inn notandanafnið, %(username)s, til að staðfesta"
 #: src/postulo/templates/partials/label_attrs.html
 msgid "Type to find one, or add a new one"
 msgstr "Skrifaðu til að finna eitt, eða bættu við nýju"
+
+#: src/postulo/accounts/forms.py
+msgid "Type what every file is to say here, or choose where it comes from."
+msgstr ""
 
 #: src/postulo/templates/accounts/delete_account.html
 #, python-format
@@ -19855,6 +19967,10 @@ msgstr "Hvað færslan sem haldið er tekur"
 msgid "What the map is drawn on. Tiles fetched from another server tell that server each viewer's address and the area they look at."
 msgstr "Á hverju kortið er teiknað. Flísar sem sóttar eru frá öðrum þjóni segja þeim þjóni vistfang hvers áhorfanda og svæðið sem hann skoðar."
 
+#: src/postulo/templates/settings/export.html
+msgid "What the PDF, Word and OpenDocument files you export say about themselves: the properties a file manager, a viewer or a recruiter's software reads, beside the words."
+msgstr ""
+
 #: src/postulo/templates/applications/suggestion_list.html
 msgid "What the plugins that read for you think happened. Nothing here is in your record until you say so."
 msgstr "Það sem viðbæturnar sem lesa fyrir þig telja að hafi gerst. Ekkert hér fer í skráninguna þína fyrr en þú segir til."
@@ -20109,6 +20225,10 @@ msgstr "Hvar og hvers vegna umsóknum lýkur"
 
 #: src/postulo/core/server_forms.py
 msgid "Where each archive is sent once it has been written and checked."
+msgstr ""
+
+#: src/postulo/templates/settings/export.html
+msgid "Where each comes from in every file you export. Postulo writes no date into a file, and no program's name into a Word or OpenDocument file."
 msgstr ""
 
 #: src/postulo/resume/forms.py
@@ -21223,6 +21343,10 @@ msgstr "starfið þitt"
 msgctxt "role at an event"
 msgid "your role"
 msgstr "hlutverk þitt"
+
+#: src/postulo/templates/cotton/file_properties.html
+msgid "Your settings strip all metadata from the files you export: no title, author, subject or keywords, and a PDF without the program's name."
+msgstr ""
 
 #: src/postulo/templates/applications/tag_form.html
 msgid "your tag"

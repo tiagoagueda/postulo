@@ -1,0 +1,46 @@
+{% extends "settings/base.html" %}
+{% load i18n %}
+
+{% block content %}
+  <div class="max-w-2xl">
+    {% comment %} What every exported file says about itself, by default (#878). One card per
+       property: where it comes from, as a group of three choices, and under it the value for
+       *Always this*. The value is drawn whatever is chosen, so the page works with scripts off;
+       the form keeps it only where it is used. The switch over all of them is first, because
+       it is the one most people come here for, and its help says what it leaves. {% endcomment %}
+    <c-page-title>
+      {% translate "Export" %}
+      <c-slot name="subtitle">
+      {% translate "What the PDF, Word and OpenDocument files you export say about themselves: the properties a file manager, a viewer or a recruiter's software reads, beside the words." %}
+      </c-slot>
+    </c-page-title>
+
+    <form method="post" novalidate>
+      {% csrf_token %}
+      <div class="card mb-6">
+        <c-section-title>
+          {% translate "Everything at once" %}
+        </c-section-title>
+        <c-field :field="form.export_strip_metadata" />
+      </div>
+
+      <div class="card mb-6">
+        <c-section-title>
+          {% translate "Each property" %}
+          <c-slot name="subtitle">{% translate "Where each comes from in every file you export. Postulo writes no date into a file, and no program's name into a Word or OpenDocument file." %}</c-slot>
+        </c-section-title>
+        {% for property in form.properties %}
+          <div class="mb-2" data-export-property="{{ property.name }}">
+            <c-field :field="property.source" />
+            <c-field :field="property.value" />
+          </div>
+        {% endfor %}
+      </div>
+      <button type="submit" class="btn">{% translate "Save" %}</button>
+    </form>
+
+    <p class="mt-4 text-xs text-ink-500 dark:text-ink-400">
+      {% translate "This is the default for every file. On a CV or a letter you can still change what one file says before you export it." %}
+    </p>
+  </div>
+{% endblock %}

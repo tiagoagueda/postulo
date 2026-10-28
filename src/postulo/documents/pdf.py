@@ -31,6 +31,7 @@ import hashlib
 import importlib
 import logging
 import os
+import re
 import subprocess
 import sys
 import time
@@ -93,6 +94,64 @@ WEASYPRINT_PDF_OPTIONS = {"pdf_variant": "pdf/ua-1"}
 #: The same two things asked of Chromium, which spells them differently. ``outline`` is the
 #: bookmark tree, which WeasyPrint writes from the headings without being asked.
 CHROMIUM_PDF_OPTIONS = {"tagged": True, "outline": True}
+
+
+#: The entries of a PDF's information dictionary that name the program that drew it and when:
+#: WeasyPrint always writes ``/Producer``, and the other three where the page asks for them
+#: (`<meta name="generator">`, `dcterms.created`, `dcterms.modified`), which a theme a plugin
+#: ships might.
+PRODUCER_ENTRIES = ("Producer", "Creator", "CreationDate", "ModDate")
+#: The same, as WeasyPrint writes them into the XMP packet beside the dictionary: the producer
+#: as an attribute, the other three as elements.
+_XMP_PRODUCER = re.compile(rb'\s+pdf:Producer="[^"]*"')
+_XMP_DATED_NAMES = rb"(?:CreatorTool|CreateDate|ModifyDate)"
+_XMP_DATED = re.compile(rb"<xmp:" + _XMP_DATED_NAMES + rb">[^<]*</xmp:" + _XMP_DATED_NAMES + rb">")
+
+
+def finish(document, pdf) -> None:
+    """Take out of a drawn PDF what the page asked to have taken out (#878).
+
+    WeasyPrint has no option for leaving its name out of a file: it writes ``/Producer`` into
+    the information dictionary and ``pdf:Producer`` into the XMP packet whatever it is
+    asked. It does take a *finisher*, called with the document and the `pydyf.PDF` after
+    everything is in place and before a byte is written, and this is that: the file is
+    changed before it exists, so nothing is parsed and nothing written twice.
+
+    What to take out is said by the page, in a `<meta>` of its own
+    (`properties.SCRUB_META`), because the backend is handed a page and nothing else:
+    ``producer`` takes out the program and the dates, from the dictionary and from the XMP
+    packet; ``language`` takes out the `/Lang` the page's `lang` put in the catalogue, which
+    the page keeps because the renderer hyphenates and picks its fonts by it. A page that
+    says neither -- every page, until somebody chooses -- is written as it always was.
+
+    Duck-typed against `pydyf` rather than importing it, so that it can be tested where
+    WeasyPrint's system libraries are not installed.
+    """
+    from .properties import SCRUB_META
+
+    words = set(str(document.metadata.custom.get(SCRUB_META, "")).split())
+    if "producer" in words:
+        for key in PRODUCER_ENTRIES:
+            pdf.info.pop(key, None)
+        for stream in _metadata_streams(pdf):
+            stream.stream = [_without_producer(part) for part in stream.stream]
+    if "language" in words:
+        pdf.catalog.pop("Lang", None)
+
+
+def _without_producer(part):
+    """One piece of an XMP packet without the program and the dates in it."""
+    if not isinstance(part, bytes):
+        return part
+    return _XMP_DATED.sub(b"", _XMP_PRODUCER.sub(b"", part))
+
+
+def _metadata_streams(pdf):
+    """The XMP packets in ``pdf``: the streams whose type is ``/Metadata``."""
+    for drawn in pdf.objects:
+        extra = getattr(drawn, "extra", None)
+        if isinstance(extra, dict) and extra.get("Type") == "/Metadata":
+            yield drawn
 
 
 class PDFBackendUnavailable(RuntimeError):
@@ -216,10 +275,17 @@ class WeasyPrintBackend:
         yield self
 
     def render(self, html: str) -> bytes:
-        # Nothing but the document and the variant goes to `write_pdf`. Its `stylesheets` and
-        # `xmp_metadata` arguments were the two that ignored the document's fetcher and built
-        # one of their own until WeasyPrint 70 (CVE-2026-55073); Postulo passes neither (#163).
-        return self.document(html).write_pdf(**WEASYPRINT_PDF_OPTIONS)
+        # Nothing but the document, the variant and the finisher goes to `write_pdf`. Its
+        # `stylesheets` and `xmp_metadata` arguments were the two that ignored the document's
+        # fetcher and built one of their own until WeasyPrint 70 (CVE-2026-55073); Postulo
+        # passes neither (#163). The finisher fetches nothing: it reads what is already drawn,
+        # and is handed over only to a page that asks for something to be taken out (#878),
+        # so an ordinary render is asked for exactly what it always was. A page whose words
+        # happen to hold the name is harmless: `finish` reads the parsed `<meta>`, not text.
+        from .properties import SCRUB_META
+
+        extra = {"finisher": finish} if SCRUB_META in html else {}
+        return self.document(html).write_pdf(**extra, **WEASYPRINT_PDF_OPTIONS)
 
     def document(self, html: str):
         """The WeasyPrint document `render` writes, holding the only fetcher it may use."""

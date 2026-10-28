@@ -213,7 +213,10 @@ def _keywords(text: str) -> list[str]:
 
 def _meta(outline: Outline) -> str:
     """The file's own properties. No dates and no generator: see the note at the top."""
-    fields = [f"<dc:title>{escape(clean(outline.title))}</dc:title>"]
+    # A title is left out only where the person left it out (#878); otherwise there is one.
+    fields = []
+    if outline.title:
+        fields.append(f"<dc:title>{escape(clean(outline.title))}</dc:title>")
     if outline.subject:
         fields.append(f"<dc:description>{escape(clean(outline.subject))}</dc:description>")
         fields.append(f"<dc:subject>{escape(clean(outline.subject))}</dc:subject>")
@@ -226,7 +229,7 @@ def _meta(outline: Outline) -> str:
             f"<meta:initial-creator>{escape(clean(outline.author))}</meta:initial-creator>"
         )
     tag = languages.tag(clean(outline.language))
-    if tag:
+    if tag and outline.declares_language:
         fields.append(f"<dc:language>{escape(tag)}</dc:language>")
     return (
         DECLARATION

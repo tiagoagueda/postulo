@@ -31,6 +31,13 @@ from postulo.core.personal import (
     validate_nationalities,
 )
 from postulo.core.stored_pictures import StoredPicture
+from postulo.documents.properties import (
+    MAX_AUTHOR,
+    MAX_KEYWORDS,
+    MAX_SUBJECT,
+    MAX_TITLE,
+    MetadataSource,
+)
 
 from . import identifiers
 from .validators import USERNAME_MAX_LENGTH, slug_from_email, username_validator
@@ -552,6 +559,49 @@ class Profile(models.Model):
     #: this says whether it *does*. Saving the field, not the form, is the only "draft" an
     #: existing record needs.
     save_as_you_go = models.BooleanField(_("save as I go"), default=False)
+    #: What every PDF, Word and OpenDocument file this person exports says about itself, by
+    #: default (#878): for each of the five properties, the document's own value (what an
+    #: export always wrote), a value of their own, or nothing; and one switch that leaves
+    #: everything out but the language. Read by `documents.properties.Policy`, which is the
+    #: one place the five pairs are turned into what a file carries. A choice made in the
+    #: export dialog for one file still goes over it, as it did before there was a default;
+    #: the switch goes over that as well, because *strip all* is a promise about every file.
+    export_strip_metadata = models.BooleanField(_("strip all metadata"), default=False)
+    export_title_source = models.CharField(
+        _("title of exported files"),
+        max_length=10,
+        choices=MetadataSource,
+        default=MetadataSource.DOCUMENT,
+    )
+    export_title = models.CharField(_("title"), max_length=MAX_TITLE, blank=True)
+    export_author_source = models.CharField(
+        _("author of exported files"),
+        max_length=10,
+        choices=MetadataSource,
+        default=MetadataSource.DOCUMENT,
+    )
+    export_author = models.CharField(_("author"), max_length=MAX_AUTHOR, blank=True)
+    export_subject_source = models.CharField(
+        _("subject of exported files"),
+        max_length=10,
+        choices=MetadataSource,
+        default=MetadataSource.DOCUMENT,
+    )
+    export_subject = models.CharField(_("subject"), max_length=MAX_SUBJECT, blank=True)
+    export_keywords_source = models.CharField(
+        _("keywords of exported files"),
+        max_length=10,
+        choices=MetadataSource,
+        default=MetadataSource.DOCUMENT,
+    )
+    export_keywords = models.CharField(_("keywords"), max_length=MAX_KEYWORDS, blank=True)
+    export_language_source = models.CharField(
+        _("language of exported files"),
+        max_length=10,
+        choices=MetadataSource,
+        default=MetadataSource.DOCUMENT,
+    )
+    export_language = LanguageField(_("language"), blank=True)
     #: How each table is laid out — which columns, in what order, how many rows a page
     #: holds — keyed by the table's name. A preference, so it follows the account.
     table_settings = models.JSONField(_("table settings"), default=dict, blank=True)

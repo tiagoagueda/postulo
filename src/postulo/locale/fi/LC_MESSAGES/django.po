@@ -1995,6 +1995,10 @@ msgstr "Osastolle tarvitaan nimi."
 msgid "A destination needs an age recipient to encrypt to: nothing leaves this server unencrypted."
 msgstr ""
 
+#: src/postulo/accounts/forms.py
+msgid "A document has none of its own, so it starts empty."
+msgstr ""
+
 #: src/postulo/templates/server/overview.html
 msgid "A document in a script shown in red is set in the server's fonts instead."
 msgstr ""
@@ -2520,6 +2524,10 @@ msgstr "Pois jätettyä tunnistetyyppiä ei näytetä yrityksen yhteenvedossa. S
 #: src/postulo/resume/forms.py
 msgid "A school, a company, a platform: as a CV should print it. It is linked to the company of that name among yours, and added to your companies if there is none."
 msgstr "Koulu, yritys, alusta: niin kuin ansioluettelon pitäisi se tulostaa. Se linkitetään samannimiseen yritykseesi, ja jos sellaista ei ole, se lisätään yrityksiisi."
+
+#: src/postulo/documents/properties.py
+msgid "A screen reader reads a file in the language it declares, and the PDF standard for accessibility, PDF/UA, requires one. So stripping all metadata keeps the language unless you choose to leave it out here as well."
+msgstr ""
 
 #: src/postulo/core/models.py
 msgid "A second signal beside the word, never instead of it."
@@ -3224,6 +3232,10 @@ msgstr "Myös kielellä %(names)s"
 #: src/postulo/plugins/policy.py
 msgid "Always on: Postulo cannot work without it."
 msgstr "Aina päällä: Postulo ei toimi ilman sitä."
+
+#: src/postulo/documents/properties.py
+msgid "Always this"
+msgstr ""
 
 #: src/postulo/core/models.py
 msgid "Amber"
@@ -3956,9 +3968,17 @@ msgstr "Australia"
 msgid "authentication"
 msgstr "tunnistautuminen"
 
-#: src/postulo/documents/forms.py
+#: src/postulo/accounts/forms.py src/postulo/documents/forms.py
 msgid "Author"
 msgstr "Tekijä"
+
+#: src/postulo/accounts/models.py
+msgid "author"
+msgstr ""
+
+#: src/postulo/accounts/models.py
+msgid "author of exported files"
+msgstr ""
 
 #: src/postulo/resume/models.py
 msgid "authors"
@@ -4584,6 +4604,10 @@ msgstr "Sen myöntämät sertifikaatit"
 #: src/postulo/templates/settings/locale.html
 msgid "Change"
 msgstr "Vaihda"
+
+#: src/postulo/templates/cotton/file_properties.html
+msgid "Change it in Settings"
+msgstr ""
 
 #: src/postulo/templates/settings/account.html
 msgid "Change password"
@@ -6303,6 +6327,10 @@ msgstr "Jokainen niistä jäädytetään sellaisena kuin se nyt on, jotta se, mi
 msgid "Each part has a question mark of its own, beside its title, with one sentence about it when you rest on it and the whole of its help when you press it. <em>Save</em> at the bottom keeps everything you changed; removing a saved row asks first and takes effect at once."
 msgstr "Jokaisella osalla on oma kysymysmerkkinsä otsikkonsa vieressä: yksi lause siitä, kun pidät osoitinta sen päällä, ja koko ohje, kun painat sitä. <em>Tallenna</em> alareunassa säilyttää kaiken, mitä muutit; tallennetun rivin poistaminen kysyy ensin ja tulee voimaan heti."
 
+#: src/postulo/templates/settings/export.html
+msgid "Each property"
+msgstr ""
+
 #: src/postulo/templates/widgets/funnel.html
 msgid "Each stage counts applications that ever reached it, whatever happened afterwards."
 msgstr "Kukin vaihe laskee mukaan hakemukset, jotka ovat joskus edenneet siihen, riippumatta siitä, mitä sen jälkeen tapahtui."
@@ -6635,6 +6663,10 @@ msgstr "Joka päivä"
 msgid "Every document exactly as it left, frozen at the moment it was sent. These are never regenerated, however much the CV they came from has changed since."
 msgstr "Jokainen asiakirja täsmälleen sellaisena kuin se lähti, jäädytettynä lähetyshetkeen. Niitä ei koskaan muodosteta uudelleen, vaikka ansioluettelo, josta ne tehtiin, olisi sen jälkeen muuttunut kuinka paljon tahansa."
 
+#: src/postulo/accounts/forms.py
+msgid "Every file goes without a title, an author, a subject or keywords, whatever is chosen below or typed for one file, and a PDF without the name of the program that drew it. The language stays unless you leave it out below as well."
+msgstr ""
+
 #: src/postulo/plugins/syncing.py
 msgid "Every four hours"
 msgstr "Neljän tunnin välein"
@@ -6713,6 +6745,10 @@ msgstr "Kaikkien, ylläpitäjänä"
 #: src/postulo/jobs/listing_views.py src/postulo/templates/server/logs.html
 msgid "Everything"
 msgstr "Kaikki"
+
+#: src/postulo/templates/settings/export.html
+msgid "Everything at once"
+msgstr ""
 
 #: src/postulo/templates/accounts/delete_account.html
 msgid "Everything goes, at once, and nobody can bring it back. Take your export first."
@@ -6828,9 +6864,11 @@ msgstr "vanhenemispäivä"
 msgid "Explaining what went wrong often means saying which connection, which company or which document it happened to. Nothing here contains a document's contents, but treat this page as you would the rest of the instance before you share any of it."
 msgstr "Sen selittäminen, mikä meni pieleen, tarkoittaa usein sen kertomista, mihin yhteyteen, yritykseen tai asiakirjaan se liittyi. Täällä ei ole minkään asiakirjan sisältöä, mutta käsittele tätä sivua samoin kuin muuta instanssia, ennen kuin jaat siitä mitään."
 
+#: src/postulo/accounts/settings_views.py src/postulo/core/settings_sections.py
 #: src/postulo/templates/cotton/transfer_group.html
 #: src/postulo/templates/jobs/company_detail.html
 #: src/postulo/templates/jobs/company_places.html
+#: src/postulo/templates/settings/export.html
 msgid "Export"
 msgstr "Vie"
 
@@ -7392,6 +7430,18 @@ msgstr "Tasolta"
 #, fuzzy
 msgid "from status"
 msgstr "edellinen tila"
+
+#: src/postulo/documents/properties.py
+msgid "From the document"
+msgstr ""
+
+#: src/postulo/accounts/forms.py
+msgid "From the document is the name the document prints, and nothing where it prints none."
+msgstr ""
+
+#: src/postulo/accounts/forms.py
+msgid "From the document is your name and the kind of document: “Alex Morgan — CV”."
+msgstr ""
 
 #: src/postulo/core/models.py
 msgid "from Wikidata"
@@ -9071,9 +9121,17 @@ msgstr "Näppäimet: <kbd class=\"kbd\">Ctrl</kbd>+<kbd class=\"kbd\">Enter</kbd
 msgid "Keys: <kbd class=\"kbd\">d</kbd> discards and moves on, <kbd class=\"kbd\">j</kbd> skips to the next, <kbd class=\"kbd\">Ctrl</kbd>+<kbd class=\"kbd\">Enter</kbd> saves and moves on — while nothing is being typed."
 msgstr "Näppäimet: <kbd class=\"kbd\">d</kbd> hylkää ja siirtyy eteenpäin, <kbd class=\"kbd\">j</kbd> siirtyy seuraavaan, <kbd class=\"kbd\">Ctrl</kbd>+<kbd class=\"kbd\">Enter</kbd> tallentaa ja siirtyy eteenpäin — kun et ole kirjoittamassa mitään."
 
-#: src/postulo/documents/forms.py
+#: src/postulo/accounts/forms.py src/postulo/documents/forms.py
 msgid "Keywords"
 msgstr "Avainsanat"
+
+#: src/postulo/accounts/models.py
+msgid "keywords"
+msgstr ""
+
+#: src/postulo/accounts/models.py
+msgid "keywords of exported files"
+msgstr ""
 
 #: src/postulo/documents/models.py src/postulo/plugins/models.py
 #, fuzzy
@@ -9115,6 +9173,10 @@ msgstr "Uusien tilien kieli"
 #: src/postulo/templates/documents/upload_list.html
 msgid "language not said"
 msgstr "kieltä ei mainittu"
+
+#: src/postulo/accounts/models.py
+msgid "language of exported files"
+msgstr ""
 
 #: src/postulo/accounts/models.py
 msgid "language of your career record"
@@ -9323,7 +9385,7 @@ msgstr "Jätä tyhjäksi, jos se on vielä käynnissä; ansioluettelossa lukee s
 msgid "Leave it empty while it is still going; a CV then prints “since”."
 msgstr "Jätä tyhjäksi, jos se on yhä käynnissä; ansioluettelo tulostaa silloin ”alkaen”."
 
-#: src/postulo/applications/ical_import.py
+#: src/postulo/applications/ical_import.py src/postulo/documents/properties.py
 msgid "Leave it out"
 msgstr "Jätä se pois"
 
@@ -14318,6 +14380,7 @@ msgstr "Lauantai"
 #: src/postulo/templates/settings/accessibility.html
 #: src/postulo/templates/settings/appearance.html
 #: src/postulo/templates/settings/capture.html
+#: src/postulo/templates/settings/export.html
 #: src/postulo/templates/settings/locale.html
 #: src/postulo/templates/settings/plugins.html
 msgid "Save"
@@ -15657,6 +15720,14 @@ msgstr ""
 msgid "Street look-ups send addresses to the service: tick this to say so."
 msgstr ""
 
+#: src/postulo/accounts/forms.py
+msgid "Strip all metadata"
+msgstr ""
+
+#: src/postulo/accounts/models.py
+msgid "strip all metadata"
+msgstr ""
+
 #: src/postulo/templates/account/partials/password_meter.html
 msgid "Strong"
 msgstr "Vahva"
@@ -15665,13 +15736,17 @@ msgstr "Vahva"
 msgid "Study"
 msgstr "Opiskelu"
 
-#: src/postulo/documents/forms.py
+#: src/postulo/accounts/forms.py src/postulo/documents/forms.py
 msgid "Subject"
 msgstr "Aihe"
 
-#: src/postulo/documents/models.py
+#: src/postulo/accounts/models.py src/postulo/documents/models.py
 msgid "subject"
 msgstr "aihe"
+
+#: src/postulo/accounts/models.py
+msgid "subject of exported files"
+msgstr ""
 
 #: src/postulo/templates/resume/overview.html
 msgid "Suggest from my ORCID record"
@@ -16753,6 +16828,10 @@ msgstr ""
 msgid "The association, society or club, as a CV should print it. It is linked to the company of that name among yours, and added to your companies if there is none. A membership of a union, a party or a congregation says something about you, and is yours to leave off any CV; nothing here asks for one."
 msgstr "Yhdistys, seura tai kerho niin kuin ansioluettelon pitäisi se tulostaa. Se linkitetään samannimiseen yritykseesi, ja jos sellaista ei ole, se lisätään yrityksiisi. Ammattiliiton, puolueen tai seurakunnan jäsenyys kertoo sinusta jotain, ja voit jättää sen pois mistä tahansa ansioluettelosta; mikään täällä ei vaadi sitä."
 
+#: src/postulo/accounts/forms.py
+msgid "The author every file names"
+msgstr ""
+
 #: src/postulo/documents/forms.py
 msgid "The author, and the title with your name in it, go into the PDF's properties, as they always have. Untick it to send files without them."
 msgstr "Tekijä ja nimesi sisältävä otsikko tallennetaan PDF:n ominaisuuksiin, kuten aina ennenkin. Poista valinta, jos haluat lähettää tiedostot ilman niitä."
@@ -17275,6 +17354,10 @@ msgstr "Kohteen ”%(name)s” avain vaihdettiin. Avain on ainoa asia sen hakemi
 msgid "The key the connection secrets are under is not in the archive. Restore with the same <code>.env</code> the archive was written under, or those secrets cannot be read."
 msgstr "Avain, jolla yhteyksien salaisuudet on salattu, ei ole arkistossa. Palauta käyttäen samaa <code>.env</code>-tiedostoa, jolla arkisto kirjoitettiin, tai salaisuuksia ei voi lukea."
 
+#: src/postulo/accounts/forms.py
+msgid "The keywords every file carries"
+msgstr ""
+
 #: src/postulo/documents/integrity.py
 msgid "the kind of file its name says"
 msgstr "sen nimen mukainen tiedostotyyppi"
@@ -17283,6 +17366,10 @@ msgstr "sen nimen mukainen tiedostotyyppi"
 #: src/postulo/templates/server/plugins.html
 msgid "The kinds of identifier this instance adds to the ones Postulo ships, for a person, for a company or for both: a staff number, a register Postulo has no scheme for. Written in JSON."
 msgstr "Tunnistetyypit, jotka tämä instanssi lisää Postulon mukana tuleviin, henkilölle, yritykselle tai molemmille: henkilöstönumero, rekisteri, jolle Postulolla ei ole tunnistetyyppiä. Kirjoitetaan JSON-muodossa."
+
+#: src/postulo/accounts/forms.py
+msgid "The language every file declares"
+msgstr ""
 
 #: src/postulo/resume/forms.py
 msgid "The language the work is written in."
@@ -17910,6 +17997,10 @@ msgstr "Heidän ehdottamansa aloituspäivä, jos sellainen oli."
 msgid "The stored mail credentials cannot be read on this instance."
 msgstr "Tallennettuja sähköpostin tunnistetietoja ei voi lukea tässä instanssissa."
 
+#: src/postulo/accounts/forms.py
+msgid "The subject every file carries"
+msgstr ""
+
 #: src/postulo/documents/forms.py
 msgid "The subject has to be one line."
 msgstr "Aiheen on oltava yhdellä rivillä."
@@ -17964,6 +18055,10 @@ msgstr ""
 #, python-format
 msgid "The time zone is set by the environment: <code>%(variable)s</code> = %(zone)s. Remove it from the environment to change it here."
 msgstr "Aikavyöhykkeen asettaa ympäristö: <code>%(variable)s</code> = %(zone)s. Poista se ympäristöstä, jos haluat muuttaa sitä täällä."
+
+#: src/postulo/accounts/forms.py
+msgid "The title every file carries"
+msgstr ""
 
 #: src/postulo/documents/models.py
 msgid "The town and country from your details, never a street."
@@ -18185,6 +18280,10 @@ msgstr "Nämä suosittelijat jätetään pois, koska he eivät ole suostuneet ni
 #, python-format
 msgid "These skills print the name the ESCO classification gives them in %(tongue)s, because you have not written one of your own:"
 msgstr "Nämä taidot tulostavat nimen, jonka ESCO-luokitus antaa niille kielellä %(tongue)s, koska et ole kirjoittanut omaa:"
+
+#: src/postulo/templates/cotton/file_properties.html
+msgid "These start from what your settings give every file."
+msgstr ""
 
 #: src/postulo/applications/models.py
 #, fuzzy
@@ -18499,6 +18598,10 @@ msgstr ""
 msgid "This is the beginning. The whole of it is in the download."
 msgstr "Tämä on alku. Koko teksti on ladattavassa tiedostossa."
 
+#: src/postulo/templates/settings/export.html
+msgid "This is the default for every file. On a CV or a letter you can still change what one file says before you export it."
+msgstr ""
+
 #: src/postulo/templates/documents/send.html
 msgid "This is the letter as it will be frozen. Edit it first, or freeze it anyway."
 msgstr "Tämä on kirje sellaisena kuin se jäädytetään. Muokkaa sitä ensin, tai jäädytä se silti."
@@ -18765,14 +18868,19 @@ msgstr "aikakatkaisu sekunteina"
 msgid "times cited"
 msgstr ""
 
-#: src/postulo/documents/forms.py
+#: src/postulo/accounts/forms.py src/postulo/documents/forms.py
 msgid "Title"
 msgstr "Nimi"
 
-#: src/postulo/documents/models.py src/postulo/jobs/models.py
-#: src/postulo/notifications/models.py src/postulo/resume/models.py
+#: src/postulo/accounts/models.py src/postulo/documents/models.py
+#: src/postulo/jobs/models.py src/postulo/notifications/models.py
+#: src/postulo/resume/models.py
 msgid "title"
 msgstr "otsikko"
+
+#: src/postulo/accounts/models.py
+msgid "title of exported files"
+msgstr ""
 
 #: src/postulo/templates/jobs/capture_page.html
 msgid "Title, as it was read"
@@ -19013,6 +19121,10 @@ msgstr "Vahvista kirjoittamalla käyttäjätunnus %(username)s"
 #: src/postulo/templates/partials/label_attrs.html
 msgid "Type to find one, or add a new one"
 msgstr "Kirjoita hakeaksesi tai lisää uusi"
+
+#: src/postulo/accounts/forms.py
+msgid "Type what every file is to say here, or choose where it comes from."
+msgstr ""
 
 #: src/postulo/templates/accounts/delete_account.html
 #, python-format
@@ -19799,6 +19911,10 @@ msgstr "Mitä säilytetty tietue saa"
 msgid "What the map is drawn on. Tiles fetched from another server tell that server each viewer's address and the area they look at."
 msgstr "Minkä päälle kartta piirretään. Toiselta palvelimelta haetut karttatiilet kertovat sille palvelimelle jokaisen katsojan osoitteen ja alueen, jota tämä katsoo."
 
+#: src/postulo/templates/settings/export.html
+msgid "What the PDF, Word and OpenDocument files you export say about themselves: the properties a file manager, a viewer or a recruiter's software reads, beside the words."
+msgstr ""
+
 #: src/postulo/templates/applications/suggestion_list.html
 msgid "What the plugins that read for you think happened. Nothing here is in your record until you say so."
 msgstr "Mitä puolestasi lukevat liitännäiset arvelevat tapahtuneen. Mikään tästä ei ole tiedoissasi ennen kuin sanot niin."
@@ -20052,6 +20168,10 @@ msgstr "Missä ja miksi hakemukset päättyvät"
 
 #: src/postulo/core/server_forms.py
 msgid "Where each archive is sent once it has been written and checked."
+msgstr ""
+
+#: src/postulo/templates/settings/export.html
+msgid "Where each comes from in every file you export. Postulo writes no date into a file, and no program's name into a Word or OpenDocument file."
 msgstr ""
 
 #: src/postulo/resume/forms.py
@@ -21158,6 +21278,10 @@ msgstr "tehtäväsi"
 msgctxt "role at an event"
 msgid "your role"
 msgstr "roolisi"
+
+#: src/postulo/templates/cotton/file_properties.html
+msgid "Your settings strip all metadata from the files you export: no title, author, subject or keywords, and a PDF without the program's name."
+msgstr ""
 
 #: src/postulo/templates/applications/tag_form.html
 msgid "your tag"

@@ -230,7 +230,10 @@ def _styles(outline: Outline) -> str:
 
 def _properties(outline: Outline) -> str:
     """The file's own properties. No dates: see the note on `EPOCH`."""
-    fields = [f"<dc:title>{escape(clean(outline.title))}</dc:title>"]
+    # A title is left out only where the person left it out (#878); otherwise there is one.
+    fields = []
+    if outline.title:
+        fields.append(f"<dc:title>{escape(clean(outline.title))}</dc:title>")
     if outline.author:
         fields.append(f"<dc:creator>{escape(clean(outline.author))}</dc:creator>")
     if outline.subject:
@@ -238,7 +241,7 @@ def _properties(outline: Outline) -> str:
     if outline.keywords:
         fields.append(f"<cp:keywords>{escape(clean(outline.keywords))}</cp:keywords>")
     tag = languages.tag(clean(outline.language))
-    if tag:
+    if tag and outline.declares_language:
         fields.append(f"<dc:language>{escape(tag)}</dc:language>")
     return (
         DECLARATION

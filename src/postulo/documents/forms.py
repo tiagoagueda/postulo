@@ -847,6 +847,12 @@ class FilePropertiesForm(forms.Form):
         ),
     )
 
+    @property
+    def stripped(self) -> bool:
+        """Whether the person's Settings → Export strip every file (#878), so that the dialog
+        says so in place of fields whose values would be taken out again."""
+        return bool(self.initial.get("strip_all"))
+
 
 def _upload_choice(upload: UploadedDocument) -> str:
     """A file as a choice: a reference letter says who wrote it, and when it stops being good."""

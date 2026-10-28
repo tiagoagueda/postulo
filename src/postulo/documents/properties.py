@@ -18,6 +18,20 @@ Postulo's own writers; the PDF renderer adds its own name where it adds one, and
 
 **Everything typed is text in somebody else's XML or PDF.** It is cut to a length here and
 escaped where it is written (`docx.clean`, `escape`).
+
+**A default for every file, under Settings → Export (#878).** For each field the person says
+whether a file carries the document's own value (what it always did), a value of their own,
+or nothing; and one switch, *Strip all metadata*, leaves out everything but the language. The
+language stays unless that field is turned off as well, and the page says why: a screen reader
+reads the file in it, and PDF/UA requires it. `Policy` is that choice and `resolve` the one
+place the layers meet: the document's values, then the default, then whatever was typed for
+one file in the export dialog -- which still goes over the default, as it went over the
+document's value before there was one -- and *strip all* last, because it is a promise about
+every file. Stripping also takes the PDF renderer's own name out of a PDF (`pdf.finish`).
+
+A language left out leaves the file's *properties*, not its text: a Word file still marks its
+paragraphs as being in it and a PDF is still drawn with it -- the hyphenation, the fonts a
+script needs -- and only the `dc:language` and the PDF's `/Lang` are gone.
 """
 
 from __future__ import annotations
@@ -25,6 +39,7 @@ from __future__ import annotations
 from collections.abc import Mapping
 from dataclasses import dataclass, replace
 
+from django.db import models
 from django.utils.translation import gettext_lazy as _
 
 from postulo.core import languages
@@ -50,6 +65,13 @@ WHAT_IS_KEPT = _(
     "instead of your name. It keeps its language and a title, because a screen reader "
     "announces both and the PDF standard for accessibility requires them. The program that "
     "draws a PDF may still name itself."
+)
+
+#: Why *Strip all metadata* keeps the language, said where the language is chosen (#878).
+LANGUAGE_KEPT = _(
+    "A screen reader reads a file in the language it declares, and the PDF standard for "
+    "accessibility, PDF/UA, requires one. So stripping all metadata keeps the language "
+    "unless you choose to leave it out here as well."
 )
 
 KEYWORDS_HELP = _(
@@ -118,27 +140,139 @@ class Properties:
 DEFAULT = Properties()
 
 
-def apply(outline: Outline, chosen: Properties, *, neutral_title: str) -> Outline:
-    """The outline as the file should describe itself, under this choice.
+class MetadataSource(models.TextChoices):
+    """Where one property of an exported file comes from, by default (#878)."""
 
-    Without properties the title is the neutral one and the author, subject and keywords
-    are empty; whatever was typed beside the choice is ignored, because a person who said
-    *without* did not mean *except for what I typed*. The language stays (see the note at
-    the top).
+    DOCUMENT = "document", _("From the document")
+    FIXED = "fixed", _("Always this")
+    OMIT = "omit", _("Leave it out")
+
+
+#: What *Strip all metadata* takes out. Not the language: see the note at the top.
+STRIPPED = ("title", "author", "subject", "keywords")
+
+#: What a page tells the PDF renderer to take out of the file once it is drawn, as the content
+#: of a `<meta>` element of this name (`pdf.finish`), in words from `SCRUB_WORDS`. WeasyPrint
+#: reads a `<meta>` it does not know into its "custom" metadata, which it writes into a PDF
+#: only when asked to, and Postulo never asks; so the element reaches the renderer and goes
+#: no further.
+SCRUB_META = "postulo-scrub"
+#: ``producer``: the renderer's name, and a program and dates where it writes them;
+#: ``language``: the `/Lang` the page's `lang` puts in the file.
+SCRUB_WORDS = ("producer", "language")
+
+
+@dataclass(frozen=True)
+class Policy:
+    """What a person's Settings → Export say every exported file carries (#878).
+
+    ``rules`` is a ``(field, source, value)`` triple for each of `FIELD_NAMES`; a field it
+    does not name comes from the document. ``strip`` is *Strip all metadata*.
     """
-    if not chosen.include:
-        return replace(
-            outline,
-            title=neutral_title or outline.title,
-            author="",
-            subject="",
-            keywords="",
+
+    strip: bool = False
+    rules: tuple[tuple[str, str, str], ...] = ()
+
+    @classmethod
+    def of(cls, owner) -> Policy:
+        """The policy on ``owner``'s profile, or the one nobody chose where there is none."""
+        profile = getattr(owner, "profile", None) if owner is not None else None
+        if profile is None:
+            return NO_POLICY
+        return cls(
+            strip=bool(getattr(profile, "export_strip_metadata", False)),
+            rules=tuple(
+                (
+                    name,
+                    getattr(profile, f"export_{name}_source", MetadataSource.DOCUMENT),
+                    getattr(profile, f"export_{name}", ""),
+                )
+                for name in FIELD_NAMES
+            ),
         )
+
+    def default_for(self, name: str, found: str) -> str:
+        """What the field says by default, given what the document says (``found``).
+
+        A fixed value is read through the same bounds as one typed in the export dialog, so a
+        row written some other way -- an archive, the shell -- is held to them too, and a
+        fixed language that is not a tag is no language rather than a `lang` a viewer reads.
+        """
+        for field, source, value in self.rules:
+            if field != name:
+                continue
+            if source == MetadataSource.OMIT:
+                return ""
+            if source == MetadataSource.FIXED:
+                return getattr(Properties.from_data({name: value}), name)
+        return found
+
+
+#: The policy of somebody who has never opened Settings → Export: today's behaviour.
+NO_POLICY = Policy()
+
+
+def resolve(
+    found: Mapping[str, str],
+    chosen: Properties,
+    policy: Policy = NO_POLICY,
+    *,
+    neutral_title: str = "",
+) -> dict[str, str]:
+    """What a file carries for each of `FIELD_NAMES`, empty where it carries nothing.
+
+    ``found`` is what the document says for each; ``chosen`` what the export dialog said for
+    this one file; ``policy`` the person's default. Without properties (`chosen.include`
+    false) the title is the neutral one -- none, where the default leaves the title out --
+    and the author, subject and keywords are empty whatever was typed: somebody who said
+    *without* did not mean *except for what I typed*.
+    """
+    resolved = {name: policy.default_for(name, found.get(name) or "") for name in FIELD_NAMES}
+    if not chosen.include:
+        title = (neutral_title or resolved["title"]) if resolved["title"] else ""
+        resolved.update(title=title, author="", subject="", keywords="")
+    else:
+        resolved.update(
+            {name: getattr(chosen, name) for name in FIELD_NAMES if getattr(chosen, name)}
+        )
+    if policy.strip:
+        resolved.update(dict.fromkeys(STRIPPED, ""))
+    return resolved
+
+
+def scrubbed(resolved: Mapping[str, str], policy: Policy) -> str:
+    """What the PDF renderer is told to take out of the file, as `SCRUB_META` says it."""
+    words = []
+    if policy.strip:
+        words.append("producer")
+    if not resolved.get("language"):
+        words.append("language")
+    return " ".join(words)
+
+
+def apply(
+    outline: Outline, chosen: Properties, *, neutral_title: str, policy: Policy = NO_POLICY
+) -> Outline:
+    """The outline as the file should describe itself, under this choice and this default.
+
+    A language left out of the properties stays the language of the text: the outline keeps
+    it and says it is not declared (`Outline.declares_language`), so the writers leave it out
+    of the properties and still set the paragraphs in it. A file whose title was left out is
+    still called something on the way out: the neutral title (`Outline.file_name`).
+    """
+    resolved = resolve(
+        {name: getattr(outline, name) for name in FIELD_NAMES},
+        chosen,
+        policy,
+        neutral_title=neutral_title,
+    )
     return replace(
         outline,
-        title=chosen.title or outline.title,
-        author=chosen.author or outline.author,
-        subject=chosen.subject,
-        keywords=chosen.keywords,
-        language=chosen.language or outline.language,
+        title=resolved["title"],
+        author=resolved["author"],
+        subject=resolved["subject"],
+        keywords=resolved["keywords"],
+        language=resolved["language"] or outline.language,
+        declares_language=bool(resolved["language"]),
+        file_name=resolved["title"] or neutral_title or outline.title,
     )

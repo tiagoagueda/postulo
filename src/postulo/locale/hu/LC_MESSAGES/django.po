@@ -1990,6 +1990,10 @@ msgstr "A részlegnek nevet kell adni."
 msgid "A destination needs an age recipient to encrypt to: nothing leaves this server unencrypted."
 msgstr ""
 
+#: src/postulo/accounts/forms.py
+msgid "A document has none of its own, so it starts empty."
+msgstr ""
+
 #: src/postulo/templates/server/overview.html
 msgid "A document in a script shown in red is set in the server's fonts instead."
 msgstr ""
@@ -2515,6 +2519,10 @@ msgstr "A kihagyott azonosítási rendszer nem jelenik meg a cégek összefoglal
 #: src/postulo/resume/forms.py
 msgid "A school, a company, a platform: as a CV should print it. It is linked to the company of that name among yours, and added to your companies if there is none."
 msgstr "Iskola, cég, platform: ahogyan az önéletrajzon szerepelnie kell. Az Ön cégei közül az azonos nevűhöz lesz kapcsolva, és ha nincs ilyen, bekerül a cégei közé."
+
+#: src/postulo/documents/properties.py
+msgid "A screen reader reads a file in the language it declares, and the PDF standard for accessibility, PDF/UA, requires one. So stripping all metadata keeps the language unless you choose to leave it out here as well."
+msgstr ""
 
 #: src/postulo/core/models.py
 msgid "A second signal beside the word, never instead of it."
@@ -3213,6 +3221,10 @@ msgstr "Ezeken a nyelveken is: %(names)s"
 #: src/postulo/plugins/policy.py
 msgid "Always on: Postulo cannot work without it."
 msgstr "Mindig bekapcsolva: a Postulo nem működik nélküle."
+
+#: src/postulo/documents/properties.py
+msgid "Always this"
+msgstr ""
 
 #: src/postulo/core/models.py
 msgid "Amber"
@@ -3944,9 +3956,17 @@ msgstr "Ausztrália"
 msgid "authentication"
 msgstr "hitelesítés"
 
-#: src/postulo/documents/forms.py
+#: src/postulo/accounts/forms.py src/postulo/documents/forms.py
 msgid "Author"
 msgstr "Szerző"
+
+#: src/postulo/accounts/models.py
+msgid "author"
+msgstr ""
+
+#: src/postulo/accounts/models.py
+msgid "author of exported files"
+msgstr ""
 
 #: src/postulo/resume/models.py
 msgid "authors"
@@ -4570,6 +4590,10 @@ msgstr "Az általa kiadott tanúsítványok"
 #: src/postulo/templates/settings/locale.html
 msgid "Change"
 msgstr "Módosítás"
+
+#: src/postulo/templates/cotton/file_properties.html
+msgid "Change it in Settings"
+msgstr ""
 
 #: src/postulo/templates/settings/account.html
 msgid "Change password"
@@ -6274,6 +6298,10 @@ msgstr "Mindegyik a mostani állapotában véglegesítve, így olvasható marad,
 msgid "Each part has a question mark of its own, beside its title, with one sentence about it when you rest on it and the whole of its help when you press it. <em>Save</em> at the bottom keeps everything you changed; removing a saved row asks first and takes effect at once."
 msgstr "Minden résznek saját kérdőjele van a címe mellett: ha fölé viszi az egeret, egy mondatot mutat róla, ha megnyomja, a teljes súgóját. Az alul lévő <em>Mentés</em> minden módosítást megőriz; egy mentett sor eltávolítása előbb megerősítést kér, és azonnal érvénybe lép."
 
+#: src/postulo/templates/settings/export.html
+msgid "Each property"
+msgstr ""
+
 #: src/postulo/templates/widgets/funnel.html
 msgid "Each stage counts applications that ever reached it, whatever happened afterwards."
 msgstr "Minden fázis azokat a jelentkezéseket számolja, amelyek valaha eljutottak odáig, bármi történt is utána."
@@ -6603,6 +6631,10 @@ msgstr "Minden nap"
 msgid "Every document exactly as it left, frozen at the moment it was sent. These are never regenerated, however much the CV they came from has changed since."
 msgstr "Minden dokumentum pontosan úgy, ahogy elment, az elküldés pillanatában véglegesítve. Soha nem készülnek újra, bármennyit változott is azóta az önéletrajz, amelyből készültek."
 
+#: src/postulo/accounts/forms.py
+msgid "Every file goes without a title, an author, a subject or keywords, whatever is chosen below or typed for one file, and a PDF without the name of the program that drew it. The language stays unless you leave it out below as well."
+msgstr ""
+
 #: src/postulo/plugins/syncing.py
 msgid "Every four hours"
 msgstr "Négyóránként"
@@ -6679,6 +6711,10 @@ msgstr "Mindenkié, rendszergazdaként"
 #: src/postulo/jobs/listing_views.py src/postulo/templates/server/logs.html
 msgid "Everything"
 msgstr "Minden"
+
+#: src/postulo/templates/settings/export.html
+msgid "Everything at once"
+msgstr ""
 
 #: src/postulo/templates/accounts/delete_account.html
 msgid "Everything goes, at once, and nobody can bring it back. Take your export first."
@@ -6794,9 +6830,11 @@ msgstr "lejárat napja"
 msgid "Explaining what went wrong often means saying which connection, which company or which document it happened to. Nothing here contains a document's contents, but treat this page as you would the rest of the instance before you share any of it."
 msgstr "Annak elmagyarázásához, hogy mi romlott el, gyakran meg kell nevezni, melyik kapcsolattal, melyik céggel vagy melyik dokumentummal történt. Itt egyetlen dokumentum tartalma sem szerepel, de mielőtt bármit megosztana belőle, kezelje ezt az oldalt úgy, mint a példány többi részét."
 
+#: src/postulo/accounts/settings_views.py src/postulo/core/settings_sections.py
 #: src/postulo/templates/cotton/transfer_group.html
 #: src/postulo/templates/jobs/company_detail.html
 #: src/postulo/templates/jobs/company_places.html
+#: src/postulo/templates/settings/export.html
 msgid "Export"
 msgstr "Exportálás"
 
@@ -7342,6 +7380,18 @@ msgstr "Ettől a szinttől"
 #: src/postulo/applications/models.py
 msgid "from status"
 msgstr "korábbi állapot"
+
+#: src/postulo/documents/properties.py
+msgid "From the document"
+msgstr ""
+
+#: src/postulo/accounts/forms.py
+msgid "From the document is the name the document prints, and nothing where it prints none."
+msgstr ""
+
+#: src/postulo/accounts/forms.py
+msgid "From the document is your name and the kind of document: “Alex Morgan — CV”."
+msgstr ""
 
 #: src/postulo/core/models.py
 msgid "from Wikidata"
@@ -9008,9 +9058,17 @@ msgstr "Billentyűk: a <kbd class=\"kbd\">Ctrl</kbd>+<kbd class=\"kbd\">Enter</k
 msgid "Keys: <kbd class=\"kbd\">d</kbd> discards and moves on, <kbd class=\"kbd\">j</kbd> skips to the next, <kbd class=\"kbd\">Ctrl</kbd>+<kbd class=\"kbd\">Enter</kbd> saves and moves on — while nothing is being typed."
 msgstr "Billentyűk: a <kbd class=\"kbd\">d</kbd> elvet és továbblép, a <kbd class=\"kbd\">j</kbd> a következőre ugrik, a <kbd class=\"kbd\">Ctrl</kbd>+<kbd class=\"kbd\">Enter</kbd> ment és továbblép — amíg nem gépel semmit."
 
-#: src/postulo/documents/forms.py
+#: src/postulo/accounts/forms.py src/postulo/documents/forms.py
 msgid "Keywords"
 msgstr "Kulcsszavak"
+
+#: src/postulo/accounts/models.py
+msgid "keywords"
+msgstr ""
+
+#: src/postulo/accounts/models.py
+msgid "keywords of exported files"
+msgstr ""
 
 #: src/postulo/documents/models.py src/postulo/plugins/models.py
 msgid "label"
@@ -9051,6 +9109,10 @@ msgstr "Új fiókok nyelve"
 #: src/postulo/templates/documents/upload_list.html
 msgid "language not said"
 msgstr "nincs megadva nyelv"
+
+#: src/postulo/accounts/models.py
+msgid "language of exported files"
+msgstr ""
 
 #: src/postulo/accounts/models.py
 msgid "language of your career record"
@@ -9257,7 +9319,7 @@ msgstr "Hagyja üresen, amíg még tart; ekkor az önéletrajzon a „jelenleg�
 msgid "Leave it empty while it is still going; a CV then prints “since”."
 msgstr "Hagyja üresen, amíg még tart; ekkor az önéletrajzon „… óta” formában szerepel."
 
-#: src/postulo/applications/ical_import.py
+#: src/postulo/applications/ical_import.py src/postulo/documents/properties.py
 msgid "Leave it out"
 msgstr "Kihagyás"
 
@@ -14218,6 +14280,7 @@ msgstr "szombat"
 #: src/postulo/templates/settings/accessibility.html
 #: src/postulo/templates/settings/appearance.html
 #: src/postulo/templates/settings/capture.html
+#: src/postulo/templates/settings/export.html
 #: src/postulo/templates/settings/locale.html
 #: src/postulo/templates/settings/plugins.html
 msgid "Save"
@@ -15548,6 +15611,14 @@ msgstr ""
 msgid "Street look-ups send addresses to the service: tick this to say so."
 msgstr ""
 
+#: src/postulo/accounts/forms.py
+msgid "Strip all metadata"
+msgstr ""
+
+#: src/postulo/accounts/models.py
+msgid "strip all metadata"
+msgstr ""
+
 #: src/postulo/templates/account/partials/password_meter.html
 msgid "Strong"
 msgstr "Erős"
@@ -15556,13 +15627,17 @@ msgstr "Erős"
 msgid "Study"
 msgstr "Tanulás"
 
-#: src/postulo/documents/forms.py
+#: src/postulo/accounts/forms.py src/postulo/documents/forms.py
 msgid "Subject"
 msgstr "Tárgy"
 
-#: src/postulo/documents/models.py
+#: src/postulo/accounts/models.py src/postulo/documents/models.py
 msgid "subject"
 msgstr "tárgy"
+
+#: src/postulo/accounts/models.py
+msgid "subject of exported files"
+msgstr ""
 
 #: src/postulo/templates/resume/overview.html
 msgid "Suggest from my ORCID record"
@@ -16638,6 +16713,10 @@ msgstr ""
 msgid "The association, society or club, as a CV should print it. It is linked to the company of that name among yours, and added to your companies if there is none. A membership of a union, a party or a congregation says something about you, and is yours to leave off any CV; nothing here asks for one."
 msgstr "Az egyesület, társaság vagy klub, ahogyan az önéletrajzon szerepelnie kell. Az Ön cégei közül az azonos nevűhöz lesz kapcsolva, és ha nincs ilyen, bekerül a cégei közé. A szakszervezeti, párt- vagy egyházi tagság elárul valamit Önről, és Ön dönti el, hogy kihagyja-e bármelyik önéletrajzból; itt semmi sem kér ilyet."
 
+#: src/postulo/accounts/forms.py
+msgid "The author every file names"
+msgstr ""
+
 #: src/postulo/documents/forms.py
 msgid "The author, and the title with your name in it, go into the PDF's properties, as they always have. Untick it to send files without them."
 msgstr "A szerző és a nevét tartalmazó cím bekerül a PDF tulajdonságai közé, ahogy eddig is. Törölje a jelölést, ha nélkülük szeretné elküldeni a fájlokat."
@@ -17160,6 +17239,10 @@ msgstr "A(z) „%(name)s” kulcsa lecserélve. Csak ez a kulcs áll az indexe �
 msgid "The key the connection secrets are under is not in the archive. Restore with the same <code>.env</code> the archive was written under, or those secrets cannot be read."
 msgstr "A kulcs, amellyel a kapcsolatok titkai titkosítva vannak, nincs az archívumban. Ugyanazzal a <code>.env</code> fájllal állítsa vissza, amellyel az archívum készült, különben ezek a titkok nem olvashatók."
 
+#: src/postulo/accounts/forms.py
+msgid "The keywords every file carries"
+msgstr ""
+
 #: src/postulo/documents/integrity.py
 msgid "the kind of file its name says"
 msgstr "a neve szerinti fájltípus"
@@ -17168,6 +17251,10 @@ msgstr "a neve szerinti fájltípus"
 #: src/postulo/templates/server/plugins.html
 msgid "The kinds of identifier this instance adds to the ones Postulo ships, for a person, for a company or for both: a staff number, a register Postulo has no scheme for. Written in JSON."
 msgstr "Azok az azonosítótípusok, amelyekkel ez a példány kiegészíti a Postulo beépített típusait, személyhez, céghez vagy mindkettőhöz: egy törzsszám, egy nyilvántartás, amelyhez a Postulónak nincs azonosítási rendszere. JSON formátumban megadva."
+
+#: src/postulo/accounts/forms.py
+msgid "The language every file declares"
+msgstr ""
 
 #: src/postulo/resume/forms.py
 msgid "The language the work is written in."
@@ -17794,6 +17881,10 @@ msgstr "A javasolt kezdés dátuma, ha volt ilyen."
 msgid "The stored mail credentials cannot be read on this instance."
 msgstr "A mentett levelezési hitelesítő adatok ezen a példányon nem olvashatók."
 
+#: src/postulo/accounts/forms.py
+msgid "The subject every file carries"
+msgstr ""
+
 #: src/postulo/documents/forms.py
 msgid "The subject has to be one line."
 msgstr "A tárgy csak egy sor lehet."
@@ -17848,6 +17939,10 @@ msgstr ""
 #, python-format
 msgid "The time zone is set by the environment: <code>%(variable)s</code> = %(zone)s. Remove it from the environment to change it here."
 msgstr "Az időzónát a környezet állítja be: <code>%(variable)s</code> = %(zone)s. Távolítsa el a környezetből, hogy itt módosíthassa."
+
+#: src/postulo/accounts/forms.py
+msgid "The title every file carries"
+msgstr ""
 
 #: src/postulo/documents/models.py
 msgid "The town and country from your details, never a street."
@@ -18068,6 +18163,10 @@ msgstr "Ezek a referenciák kimaradnak, mert nem járultak hozzá, hogy megnevez
 #, python-format
 msgid "These skills print the name the ESCO classification gives them in %(tongue)s, because you have not written one of your own:"
 msgstr "Ezeknél a készségeknél az a név szerepel, amelyet az ESCO-osztályozás ad nekik %(tongue)s nyelven, mert nem írt saját nevet:"
+
+#: src/postulo/templates/cotton/file_properties.html
+msgid "These start from what your settings give every file."
+msgstr ""
 
 #: src/postulo/applications/models.py
 msgid "They did not show up"
@@ -18382,6 +18481,10 @@ msgstr ""
 msgid "This is the beginning. The whole of it is in the download."
 msgstr "Ez az eleje. Az egész a letöltésben van."
 
+#: src/postulo/templates/settings/export.html
+msgid "This is the default for every file. On a CV or a letter you can still change what one file says before you export it."
+msgstr ""
+
 #: src/postulo/templates/documents/send.html
 msgid "This is the letter as it will be frozen. Edit it first, or freeze it anyway."
 msgstr "Ez a levél abban a formában, ahogyan véglegesítve lesz. Előbb szerkessze, vagy véglegesítse mindenképp."
@@ -18647,14 +18750,19 @@ msgstr "időtúllépés másodpercben"
 msgid "times cited"
 msgstr ""
 
-#: src/postulo/documents/forms.py
+#: src/postulo/accounts/forms.py src/postulo/documents/forms.py
 msgid "Title"
 msgstr "Cím"
 
-#: src/postulo/documents/models.py src/postulo/jobs/models.py
-#: src/postulo/notifications/models.py src/postulo/resume/models.py
+#: src/postulo/accounts/models.py src/postulo/documents/models.py
+#: src/postulo/jobs/models.py src/postulo/notifications/models.py
+#: src/postulo/resume/models.py
 msgid "title"
 msgstr "cím"
+
+#: src/postulo/accounts/models.py
+msgid "title of exported files"
+msgstr ""
 
 #: src/postulo/templates/jobs/capture_page.html
 msgid "Title, as it was read"
@@ -18890,6 +18998,10 @@ msgstr "A megerősítéshez írja be a felhasználónevet: %(username)s"
 #: src/postulo/templates/partials/label_attrs.html
 msgid "Type to find one, or add a new one"
 msgstr "Gépeljen a kereséshez, vagy adjon hozzá újat"
+
+#: src/postulo/accounts/forms.py
+msgid "Type what every file is to say here, or choose where it comes from."
+msgstr ""
 
 #: src/postulo/templates/accounts/delete_account.html
 #, python-format
@@ -19671,6 +19783,10 @@ msgstr "Amit a megtartott tétel átvesz"
 msgid "What the map is drawn on. Tiles fetched from another server tell that server each viewer's address and the area they look at."
 msgstr "Amire a térkép rajzolódik. A más kiszolgálóról letöltött csempék elárulják annak a kiszolgálónak minden néző címét és a nézett területet."
 
+#: src/postulo/templates/settings/export.html
+msgid "What the PDF, Word and OpenDocument files you export say about themselves: the properties a file manager, a viewer or a recruiter's software reads, beside the words."
+msgstr ""
+
 #: src/postulo/templates/applications/suggestion_list.html
 msgid "What the plugins that read for you think happened. Nothing here is in your record until you say so."
 msgstr "Ami az Ön helyett olvasó bővítmények szerint történt. Semmi sem kerül be az adatai közé, amíg jóvá nem hagyja."
@@ -19923,6 +20039,10 @@ msgstr "Hol és miért érnek véget a jelentkezések"
 
 #: src/postulo/core/server_forms.py
 msgid "Where each archive is sent once it has been written and checked."
+msgstr ""
+
+#: src/postulo/templates/settings/export.html
+msgid "Where each comes from in every file you export. Postulo writes no date into a file, and no program's name into a Word or OpenDocument file."
 msgstr ""
 
 #: src/postulo/resume/forms.py
@@ -21028,6 +21148,10 @@ msgstr "az Ön szerepe"
 msgctxt "role at an event"
 msgid "your role"
 msgstr "az Ön szerepe"
+
+#: src/postulo/templates/cotton/file_properties.html
+msgid "Your settings strip all metadata from the files you export: no title, author, subject or keywords, and a PDF without the program's name."
+msgstr ""
 
 #: src/postulo/templates/applications/tag_form.html
 msgid "your tag"

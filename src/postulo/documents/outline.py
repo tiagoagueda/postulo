@@ -70,3 +70,15 @@ class Outline:
     subject: str = ""
     keywords: str = ""
     blocks: tuple[Block, ...] = ()
+    #: Whether the file's properties name ``language`` (#878). Off where the person left the
+    #: language out of what their files say about themselves: the text is still in it, and a
+    #: writer still sets the paragraphs in it, but the properties do not say so.
+    declares_language: bool = True
+    #: What the file is called on the way out, where that is not its ``title``: a file whose
+    #: title was left out still needs a name (#878). Empty means the title.
+    file_name: str = ""
+
+    @property
+    def name(self) -> str:
+        """What the file is called when it is handed over."""
+        return self.file_name or self.title
