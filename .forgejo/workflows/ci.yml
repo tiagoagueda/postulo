@@ -30,14 +30,38 @@ on:
   push:
     # `main` and every release branch. Work moved onto per-release branches after 0.2.0
     # closed, and for a while nothing pushed there was checked at all: the filter said
-    # `main` and the commits were going somewhere else. A branch whose name starts with a
-    # digit is a release branch here -- 0.3.0, 0.4.0, and whatever follows them.
-    branches: [main, "[0-9]*"]
+    # `main` and the commits were going somewhere else. A release branch is named for its
+    # version, 0.3.0, 0.4.0, so the filter asks for three numbers and two dots.
+    #
+    # Not `"[0-9]*"`, which is what it was. Since every issue has a branch named after its
+    # number (#940), `933-date-pickers` matched it too, and one push to an issue branch ran
+    # this workflow twice, on `push` and on `pull_request`, for the same commit, plus both
+    # legs of Every Python: 122 runner-minutes on a runner with two slots, where 48 test
+    # exactly as much (#1033). An issue branch is checked by its pull request, which runs on
+    # every push to it; a branch pushed before its pull request exists is unchecked until it
+    # does, so open one early, as a draft if the work is unfinished. `main` keeps its push
+    # run because the release gate and the dev image's wait read its `(push)` statuses.
+    branches: [main, "[0-9]*.[0-9]*.[0-9]*"]
   pull_request:
   schedule:
     # The dependency audit below also runs weekly, so a vulnerability disclosed in a
     # library is noticed even in a week when nothing was pushed.
     - cron: "17 6 * * 1"
+
+# A newer push to the same pull request or branch cancels the run it supersedes: nobody
+# reads the result of a commit that is no longer the tip, and on two slots it delays the one
+# they will read (#1033). `dev-image.yml` does the same, so this Forgejo honours the block.
+# `main` is never cancelled: every commit on it keeps its own run, keyed on the commit
+# rather than the branch, because the release gate reads each commit's statuses and the dev
+# image waits for its own commit's CI. The event is in the key as well, so the weekly run on
+# `main` cannot cancel a push run of the same commit. A pull request is keyed on its number.
+concurrency:
+  group: >-
+    ${{ github.workflow }}-${{ github.event_name }}-${{
+    github.event_name == 'pull_request' && github.event.pull_request.number
+    || github.ref_name == 'main' && github.sha
+    || github.ref }}
+  cancel-in-progress: true
 
 # Every job here only reads the repository, which is what a job has without asking. There
 # is no `permissions:` block on purpose: Forgejo 16 does not support the field and warns

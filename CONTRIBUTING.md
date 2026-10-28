@@ -75,6 +75,15 @@ stylesheet has not drifted from its source. Coverage is measured on the 3.14 leg
 `npm ci` has installed the Tailwind CLI: `tests/test_stylesheet.py` rebuilds it and compares,
 which is the difference between finding out before the push and after it.
 
+A push to an issue branch does not run CI on its own; its pull request does, on every push
+to it. Open the pull request when you push the branch, as a draft (a title beginning `WIP:`
+in Forgejo) if the work is unfinished, and CI runs on each push from then on. Only `main`
+and release branches (`0.3.0`) run CI on a push. The runner is one host taking two jobs at
+a time, and while issue branches matched the push filter as well, every push to one ran CI
+twice for the same commit, once for the push and once for the pull request, and the *Every
+Python* legs besides (#1033). A newer push to the same pull request cancels the run it
+supersedes; a run on `main` is never cancelled.
+
 There is also a browser suite, `tests/e2e`: some 650 tests in a real Chromium against a live
 server, with axe-core and a walk of every page. It is left out of the default run because it
 needs a browser:

@@ -16,12 +16,23 @@ name: Every Python
 
 on:
   push:
-    # Release branches only; `main` is `ci.yml`'s alone.
-    branches: ["[0-9]*"]
+    # Release branches only; `main` is `ci.yml`'s alone. Three numbers and two dots, as in
+    # `ci.yml`: the old `"[0-9]*"` matched every issue branch too (#940), and each push to
+    # one ran both legs here for nothing the release gate would ever read (#1033).
+    branches: ["[0-9]*.[0-9]*.[0-9]*"]
   schedule:
     # The same morning as `ci.yml`'s weekly run, half an hour after it.
     - cron: "47 6 * * 1"
   workflow_dispatch:
+
+# A newer push to the same release branch cancels the run it supersedes; `main`, which this
+# workflow sees only from the weekly run and by hand, is keyed on the commit and never
+# cancelled. `ci.yml` says why at more length (#1033).
+concurrency:
+  group: >-
+    ${{ github.workflow }}-${{ github.event_name }}-${{
+    github.ref_name == 'main' && github.sha || github.ref }}
+  cancel-in-progress: true
 
 # No `permissions:` block: reading is what a job has without asking, and Forgejo 16 ignores
 # the field and warns about it (#727).

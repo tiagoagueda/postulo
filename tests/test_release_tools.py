@@ -488,6 +488,54 @@ def test_ci_and_every_python_together_test_every_supported_python():
     assert rest["strategy"]["matrix"]["python-version"] == list(supported[:-1])
 
 
+def test_an_issue_branch_is_checked_by_its_pull_request_alone():
+    """The push filters take `main` and release branches, never an issue branch (#1033).
+
+    `"[0-9]*"` was meant for 0.3.0 and matched `933-date-pickers` too, so every push to an
+    issue branch ran CI twice and Every Python besides. Forgejo's branch filters are globs in
+    which `*` stops at a slash, which `fnmatch` stands in for here."""
+    from fnmatch import fnmatchcase
+
+    import yaml
+
+    workflows = ROOT / ".forgejo" / "workflows"
+
+    def triggers(name):
+        # YAML 1.1 reads the key `on` as true.
+        return yaml.safe_load((workflows / name).read_text(encoding="utf-8"))[True]
+
+    def runs_on(filters, branch):
+        return any(fnmatchcase(branch, pattern) for pattern in filters)
+
+    ci = triggers("ci.yml")["push"]["branches"]
+    every = triggers("every-python.yml")["push"]["branches"]
+    for branch in ("933-date-pickers", "1033-ci-triggers", "1-x", "sec2-12", "weblate"):
+        assert not runs_on(ci, branch), branch
+        assert not runs_on(every, branch), branch
+    for branch in ("0.3.0", "0.10.0", "1.0.0"):
+        assert runs_on(ci, branch), branch
+        assert runs_on(every, branch), branch
+    assert runs_on(ci, "main") and not runs_on(every, "main")
+    assert "pull_request" in triggers("ci.yml")
+
+
+def test_a_superseded_run_is_cancelled_and_main_never_is():
+    """A newer push cancels an older run of the same pull request or branch; every commit on
+    `main` keeps its own run, which the release gate and the dev image read (#1033)."""
+    import yaml
+
+    workflows = ROOT / ".forgejo" / "workflows"
+    for name in ("ci.yml", "every-python.yml"):
+        block = yaml.safe_load((workflows / name).read_text(encoding="utf-8"))["concurrency"]
+        assert block["cancel-in-progress"] is True, name
+        group = block["group"]
+        # Keyed on the commit on `main`, so no two runs there share a group, and on the
+        # event, so the weekly run cannot cancel a push run of the same commit.
+        assert "github.ref_name == 'main' && github.sha" in group, name
+        assert "github.event_name }}" in group, name
+        assert "github.workflow" in group, name
+
+
 def test_a_push_alone_is_all_a_push_is_asked_for(monkeypatch):
     asking(monkeypatch, A_PUSH)
 

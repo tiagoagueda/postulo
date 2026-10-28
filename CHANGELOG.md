@@ -162,6 +162,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🔧 Changed
 
+- A push to an issue branch no longer runs CI by itself: its pull request runs it, on every push, so open one early, as a draft if the work is unfinished. Only main and release branches run CI on a push, and a newer push to the same pull request cancels the run it supersedes, never on main. (#1033)
 - On a phone the navigation bar at the foot of the window holds every item, in your order, and no More: it keeps one row and scrolls sideways when they do not fit, fades out the end that has more past it, and keeps the page you are on and the link you tab to in view. (#912)
 - A language menu shows a language's variants under its own name (Português: Portugal, Brasil; 中文 by script), its search box finds a language by its English name too, and a browser asking for plain pt, es, fr, en or zh gets pt-BR, es-MX, fr-FR, en-GB or zh-Hans. (#1053)
 - Lines without spaces break where a reader expects: Chinese and Japanese take the strict kinsoku set, Korean keeps its words whole (word-break: keep-all), and the image names libthai0, which Pango breaks Thai between words with. (#1052)
