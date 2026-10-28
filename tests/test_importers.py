@@ -48,7 +48,7 @@ def test_europass_ships_in_the_box():
 def test_it_says_what_it_is():
     plugin = EuropassImporter()
     assert plugin.kind == "importer"
-    assert plugin.label == "Europass"
+    assert plugin.label == "Europass import"
     assert str(plugin.description)
     # Postulo's own, because that is the truth: a built-in ships with the application and
     # changes when it does. The two built-in connected plugins already do the same.
@@ -369,7 +369,7 @@ def test_the_refusal_names_what_is_installed(client, user, installed):
 
     response = client.post(url, {"file": _upload("cv.docx", WORD_FILE)}, follow=True)
 
-    assert b"What is installed reads: HR-XML, Europass." in response.content
+    assert b"What is installed reads: HR-XML, Europass import." in response.content
 
 
 @pytest.mark.parametrize(

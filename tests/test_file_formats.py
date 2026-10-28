@@ -32,7 +32,7 @@ SUB_MODULES = {
     "format-icalendar": ("iCalendar", "calendar-days"),
     "format-vcard": ("vCard", "contact-round"),
     "format-geojson": ("GeoJSON", "map"),
-    "europass": ("Europass", "id-card"),
+    "europass": ("Europass import", "id-card"),
 }
 
 
@@ -114,6 +114,19 @@ def test_transfers_follow_their_modules(user):
     assert "details-vcard-export" not in keys(transfers.DETAILS, transfers.EXPORT, user)
     assert "career-europass-import" not in keys(transfers.CAREER, transfers.IMPORT, user)
     assert "career-record-import" in keys(transfers.CAREER, transfers.IMPORT, user)
+
+
+def test_the_europass_import_menu_says_what_the_plugins_page_says(user):
+    """One name for the importer wherever it is shown, and not the theme's (#911).
+
+    Postulo Templates has a CV theme laid out like the Europass CV; "Europass" alone named
+    both. The menu entry and the plugin's label are the same words so a person who meets the
+    one recognises the other.
+    """
+    offered = {t.key: t for t in transfers.offered(transfers.CAREER, transfers.IMPORT, user)}
+    manifest = base.manifest_of(registry.find_any("europass"))
+    assert str(offered["career-europass-import"].label) == str(manifest.label)
+    assert str(manifest.label) == "Europass import"
 
 
 def test_the_document_formats_follow_their_modules(user):

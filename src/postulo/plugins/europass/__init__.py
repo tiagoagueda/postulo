@@ -35,7 +35,11 @@ _CANDIDATE = re.compile(rb"<(?:[A-Za-z_][\w.-]*:)?Candidate[\s>/]")
 @declares(
     shipped(
         name="europass",
-        label=_("Europass"),
+        # "Europass import" and not plain "Europass": Postulo Templates has a CV theme
+        # called after the same format, and a person switching "Europass" off, or reading
+        # about it in help, could not tell which one was meant. The name stays, because
+        # the policies people have saved are keyed on it; only the words shown change (#911).
+        label=_("Europass import"),
         kind="importer",
         parent="file-formats",
         categories=("files",),

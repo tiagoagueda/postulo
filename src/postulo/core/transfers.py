@@ -157,7 +157,8 @@ def register_the_ones_postulo_has() -> None:
             "career-europass-import",
             CAREER,
             IMPORT,
-            _("Europass"),
+            # The importer's own label, so the menu and the plugins page say one thing (#911).
+            _("Europass import"),
             _to("resume:europass_import"),
             100,
             "europass",
