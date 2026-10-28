@@ -201,6 +201,37 @@ ORCID's terms bar using its public API in a revenue-generating service, which is
 operator's to judge, and `tests/security/test_outbound.py` and
 `tests/test_publication_lookup.py` hold the rest.
 
+**A register lookup tells a register which company somebody is looking at (#1021).** With the
+*Register lookup* plugin on, a person who may change a company can press *Look up* beside its
+register number or LEI, and the server asks that country's register (France's API Recherche
+d'entreprises, Norway's Enhetsregisteret, Finland's YTJ, Czechia's ARES, Poland's KRS) or
+GLEIF. What leaves the instance is the number, in the address asked for, with Postulo's user
+agent: no name, no address, no cookie, nothing about the person. The register still learns
+from the instance's address that somebody there is interested in that company, which on a
+personal instance is close to saying who, so the rules are these:
+
+- **Off until an administrator switches it on.** The plugin ships with the instance's row set
+  to off (`plugins` migration 0012); the page shows no button and the view answers 404 until
+  *Server settings → Plugins* turns it on, for everybody or for chosen accounts.
+- **A press, one company, bounded.** Never on a page load, a save, an import or a schedule.
+  Each press spends the account's `POSTULO_REGISTER_LOOKUP_RATE` (30 an hour by default),
+  before the request, whichever register answers.
+- **Only the hosts an adapter declares.** The request is made by Postulo through the
+  public-only client (rule 5), with a deadline, a body limit and no redirects, and only to an
+  `https` address on a host the adapter named; an adapter from another package
+  (`postulo.register_adapters`) builds the address and reads the JSON, and cannot make the
+  server dial anywhere else or take a country Postulo already answers for.
+- **What comes back is a stranger's text, and nothing is kept unseen.** Every string is
+  cleaned of control and direction characters and cut to its column, codes are checked
+  against Postulo's own tables, and the review page keeps only what the person ticks. A
+  French company whose details are not public (`statut_diffusion` other than `O`) has no
+  address offered; Norway's *removed for legal reasons* is said and nothing is held.
+- **The record of processing names each register** while the plugin is on for anybody, with
+  its hosts, what it is sent and its licence.
+
+`tests/test_register_lookup.py` and the register tests in `tests/security/test_outbound.py`
+hold these.
+
 ## What is out of scope
 
 - The operator's own machine. Root on the host reads everything; that is true of any

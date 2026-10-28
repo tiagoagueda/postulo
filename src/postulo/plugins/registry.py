@@ -38,6 +38,7 @@ from .base import (
     IMPORTER_GROUP,
     LINK_SERVICE_GROUP,
     MESSAGING_SERVICE_GROUP,
+    REGISTER_ADAPTER_GROUP,
     TRANSPORT_GROUP,
     ConnectedPlugin,
     FeaturePlugin,
@@ -46,6 +47,7 @@ from .base import (
     JobPostingData,
     LinkServicePlugin,
     MessagingServicePlugin,
+    RegisterAdapterPlugin,
     SourcePlugin,
     TransportPlugin,
 )
@@ -75,6 +77,8 @@ ENTRY_POINT_GROUP = "postulo.sources"
 #: until there is a contract worth promising (#109).
 #: A **link-service** plugin is the same shape with its group open: a registry of the
 #: services a web link can be on, which a package installed beside Postulo may add to (#305).
+#: A **register-adapter** plugin is open the same way: the company registers *Register lookup*
+#: may ask, one per country, which a package for another country may add to (#1021).
 GROUPS = {
     "source": ENTRY_POINT_GROUP,
     "importer": IMPORTER_GROUP,
@@ -83,6 +87,7 @@ GROUPS = {
     "identifier": IDENTIFIER_GROUP,
     "link-service": LINK_SERVICE_GROUP,
     "messaging-service": MESSAGING_SERVICE_GROUP,
+    "register-adapter": REGISTER_ADAPTER_GROUP,
     **CONNECTED_KINDS,
 }
 
@@ -111,6 +116,7 @@ def _protocol_for(kind: str):
         "identifier": IdentifierPlugin,
         "link-service": LinkServicePlugin,
         "messaging-service": MessagingServicePlugin,
+        "register-adapter": RegisterAdapterPlugin,
     }.get(kind, ConnectedPlugin)
 
 

@@ -27,6 +27,7 @@ class CoreConfig(AppConfig):
         from postulo.plugins.phone_numbers import PhoneNumbersFeature
         from postulo.plugins.postal_rules import PostalRulesFeature
         from postulo.plugins.publication_lookups import PublicationLookupsFeature
+        from postulo.plugins.register_lookup import RegisterLookupFeature
         from postulo.plugins.repositories import RepositoriesFeature
         from postulo.plugins.social_profiles import SocialProfilesFeature
         from postulo.plugins.websites import WebsitesFeature
@@ -70,6 +71,8 @@ class CoreConfig(AppConfig):
         registry.register_builtin("feature", WikidataFeature)
         # A publication filled from its DOI, or suggested from an ORCID record, on a press (#688).
         registry.register_builtin("feature", PublicationLookupsFeature)
+        # A company's register entry, read on a press, off until an administrator says (#1021).
+        registry.register_builtin("feature", RegisterLookupFeature)
         registry.register_builtin("feature", PhoneNumbersFeature)
         # How somebody is reached on Signal, Matrix, Telegram, XMPP (#682).
         registry.register_builtin("feature", MessagingContactsFeature)

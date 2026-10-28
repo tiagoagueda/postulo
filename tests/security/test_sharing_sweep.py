@@ -26,6 +26,18 @@ from .test_isolation_sweep import API, FACTORIES, route_of
 
 pytestmark = pytest.mark.django_db
 
+
+@pytest.fixture(autouse=True)
+def _register_lookup_on(db):
+    """Register lookup starts off for the instance (#1021); a write grant reaches its page
+    only while it is on, so the sweep runs with it on."""
+    from postulo.core.memo import forget_decisions
+    from postulo.plugins.models import PluginPolicy
+
+    PluginPolicy.objects.filter(plugin="register-lookup", person=None).delete()
+    forget_decisions()
+
+
 READ = {
     "jobs:company_detail",
     "jobs:company_logo",
@@ -49,6 +61,7 @@ WRITE = {
     "jobs:contact_remove_row",
     "jobs:company_wikidata",
     "jobs:company_names",
+    "jobs:company_register",
     "jobs:company_signal_add",
     "jobs:company_signal_edit",
     "jobs:company_signal_remove",

@@ -18,6 +18,7 @@ class PluginsConfig(AppConfig):
         from .installing import activate
         from .link_services import LinkServices
         from .messaging_services import MessagingServices
+        from .register_lookup import RegisterAdapters
         from .registry import (
             load_everything,
             register_builtin,
@@ -33,6 +34,9 @@ class PluginsConfig(AppConfig):
         register_builtin("link-service", LinkServices)
         # And the services a messaging handle can be on, the same way (#682).
         register_builtin("messaging-service", MessagingServices)
+        # And the company registers Register lookup may ask (#1021): a registry, which the
+        # feature beside it switches.
+        register_builtin("register-adapter", RegisterAdapters)
         register_builtin_locales()
         register_builtin_themes()
         # And now import what is installed, so a plugin that will not load says so in the

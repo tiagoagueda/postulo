@@ -610,6 +610,9 @@ def would_remove_line(would_remove: dict) -> str:
 def record_of_processing() -> dict:
     """What the instance processes, why, and who receives it — drawn at read time.
 
+    And which outside services it may call on a person's press (`outside_services`): the
+    company registers, while *Register lookup* is on (#1021).
+
     Every installed plugin is a purpose: what it is, and the one line it says it does.
     Every connection is a recipient, counted by plugin and kind: the label and the
     configuration of a connection are its owner's (a mail server and a login name), and an
@@ -644,7 +647,27 @@ def record_of_processing() -> dict:
 
     in_force = geocoding.current()
     geocoder = {"name": in_force.name, "url": in_force.url} if in_force else None
-    return {"purposes": purposes, "recipients": recipients, "geocoder": geocoder}
+    return {
+        "purposes": purposes,
+        "recipients": recipients,
+        "geocoder": geocoder,
+        "services": outside_services(),
+    }
+
+
+def outside_services() -> list[dict]:
+    """The outside services a person's press can make this instance call, and what each is
+    sent (#1021).
+
+    Drawn like the rest: from the company-register adapters installed, and only while
+    *Register lookup* is on for the instance or for somebody on it, because a register this
+    instance will never ask is not a recipient of anything.
+    """
+    from postulo.jobs import register_lookup
+
+    if not register_lookup.offered_anywhere():
+        return []
+    return register_lookup.services()
 
 
 # ---------------------------------------------------------------------- the notice

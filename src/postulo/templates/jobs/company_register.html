@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% blocktranslate trimmed with register=adapter.label %}From {{ register }}{% endblocktranslate %}{% endblock %}
+
+{% block content %}
+  <div class="max-w-2xl">
+    <c-page-title>
+      {% blocktranslate trimmed with register=adapter.label %}From {{ register }}{% endblocktranslate %}
+      <c-slot name="subtitle"><bdi>{{ company.name }}</bdi> · {{ held.value }}</c-slot>
+    </c-page-title>
+    {% comment %} What the register said, before anything is kept (#1021), modelled on the
+       Wikidata review (#673). A register's answer is a stranger's text, so each value is the
+       plain text it was cleaned to, in its own direction. Every offer is a checkbox that
+       starts unticked: nothing is kept that was not chosen, and nothing is replaced that the
+       page did not name. {% endcomment %}
+    <div class="card mb-4" data-register-record>
+      <p class="mb-3 text-sm">
+        {% blocktranslate trimmed with register=adapter.label %}{{ register }} has an entry for this number.{% endblocktranslate %}
+        {% if page %}<a href="{{ page }}" rel="noopener noreferrer external" target="_blank" class="text-brand-600 underline dark:text-brand-400">{% translate "Open it there" %}</a>{% endif %}
+      </p>
+      <dl class="space-y-1 text-sm">
+        {% if record.name %}<div class="flex flex-wrap gap-x-3"><dt class="w-40 text-ink-500 dark:text-ink-400">{% translate "Official name" %}</dt><dd><bdi>{{ record.name }}</bdi></dd></div>{% endif %}
+        {% if record.address %}<div class="flex flex-wrap gap-x-3"><dt class="w-40 text-ink-500 dark:text-ink-400">{% translate "Registered office" %}</dt><dd><bdi>{{ record.address.street }}{% if record.address.postcode or record.address.municipality %}, {{ record.address.postcode }} {{ record.address.municipality }}{% endif %}</bdi>{% if record.address.country %} ({{ record.address.country }}){% endif %}</dd></div>{% endif %}
+        {% if record.state_words or record.state %}<div class="flex flex-wrap gap-x-3"><dt class="w-40 text-ink-500 dark:text-ink-400">{% translate "State" %}</dt><dd><bdi>{{ record.state_words|default:record.state }}</bdi>{% if record.state_since %} · {{ record.state_since|date:"DATE_FORMAT" }}{% endif %}</dd></div>{% endif %}
+        {% if record.activity %}<div class="flex flex-wrap gap-x-3"><dt class="w-40 text-ink-500 dark:text-ink-400">{% translate "Activity" %}</dt><dd><span class="tabular-nums">{{ record.activity }}</span>{% if record.activity_words %} · <bdi>{{ record.activity_words }}</bdi>{% endif %}</dd></div>{% endif %}
+        {% if record.registered_as %}<div class="flex flex-wrap gap-x-3"><dt class="w-40 text-ink-500 dark:text-ink-400">{% translate "Register number" %}</dt><dd><bdi>{{ record.registered_as }}</bdi>{% if record.jurisdiction %} ({{ record.jurisdiction }}{% if record.registered_at %}, {{ record.registered_at }}{% endif %}){% endif %}</dd></div>{% endif %}
+      </dl>
+    </div>
+
+    {% comment %} The LEI cross-check (#935): GLEIF's register number against the one stored,
+       told and never refused. A register may be right where the LEI record is not. {% endcomment %}
+    {% if offers.comparison %}
+      <div class="alert mb-4" data-variant="{% if offers.comparison.result == 'differs' %}warning{% else %}info{% endif %}" data-register-comparison="{{ offers.comparison.result }}">
+        {% if offers.comparison.result == "differs" %}
+          {% blocktranslate trimmed with stored=offers.comparison.stored found=offers.comparison.found %}The LEI record gives the register number <bdi>{{ found }}</bdi>, and this company has <bdi>{{ stored }}</bdi>. One of them may be out of date, or the company may be registered in more than one place.{% endblocktranslate %}
+        {% else %}
+          {% blocktranslate trimmed with stored=offers.comparison.stored %}The LEI record gives the same register number as this company's, <bdi>{{ stored }}</bdi>.{% endblocktranslate %}
+        {% endif %}
+      </div>
+    {% endif %}
+
+    <form method="post" id="register-keep">
+      {% csrf_token %}
+      <fieldset class="card mb-4" data-register-offers>
+        <legend class="legend-title">{% translate "What to keep" %}</legend>
+        {% if offers.name or offers.address or offers.state or offers.industry or offers.register %}
+          <div class="space-y-2 text-sm">
+            {% if offers.name %}
+              <label class="flex items-start gap-2"><input type="checkbox" class="input mt-0.5" name="take" value="name"> <span>{% blocktranslate trimmed with name=offers.name.value current=company.name %}Use <bdi>{{ name }}</bdi> as its name, in place of <bdi>{{ current }}</bdi>{% endblocktranslate %}</span></label>
+            {% endif %}
+            {% if offers.address %}
+              <label class="flex items-start gap-2"><input type="checkbox" class="input mt-0.5" name="take" value="address"> <span>{% blocktranslate trimmed with address=offers.address.value %}Add <bdi>{{ address }}</bdi> to its addresses, as its registered office{% endblocktranslate %}</span></label>
+            {% endif %}
+            {% if offers.state %}
+              <label class="flex items-start gap-2"><input type="checkbox" class="input mt-0.5" name="take" value="state"> <span>{% if offers.state.since %}{% blocktranslate trimmed with state=offers.state.label date=offers.state.since|date:"DATE_FORMAT" %}Record it as {{ state }} since {{ date }}{% endblocktranslate %}{% else %}{% blocktranslate trimmed with state=offers.state.label %}Record it as {{ state }}{% endblocktranslate %}{% endif %}</span></label>
+            {% endif %}
+            {% if offers.industry %}
+              <label class="flex items-start gap-2"><input type="checkbox" class="input mt-0.5" name="take" value="industry"> <span>{% blocktranslate trimmed with industry=offers.industry.value division=offers.industry.division %}Add the industry {{ industry }} (NACE {{ division }}){% endblocktranslate %}</span></label>
+            {% endif %}
+            {% if offers.register %}
+              <label class="flex items-start gap-2"><input type="checkbox" class="input mt-0.5" name="take" value="register"> <span>{% blocktranslate trimmed with number=offers.register.value %}Add the register number <bdi>{{ number }}</bdi>{% endblocktranslate %}</span></label>
+            {% endif %}
+          </div>
+        {% else %}
+          <p class="text-sm text-ink-500 dark:text-ink-400">{% translate "Nothing here differs from what the company already has." %}</p>
+        {% endif %}
+        {% for note in offers.notes %}
+          <p class="mt-2 text-xs text-ink-500 dark:text-ink-400">{{ note }}</p>
+        {% endfor %}
+      </fieldset>
+      {% comment %} Attribution as the register's licence asks for it (CC BY 4.0, NLOD 2.0, the
+         Licence Ouverte), and the source named where no licence is given. {% endcomment %}
+      <p class="mb-4 text-xs text-ink-500 dark:text-ink-400" data-register-attribution>
+        {% blocktranslate trimmed with source=adapter.source %}Source: {{ source }}.{% endblocktranslate %}
+        {% if adapter.licence %}{% if adapter.licence_url %}<a href="{{ adapter.licence_url }}" rel="noopener noreferrer external license" target="_blank" class="underline">{{ adapter.licence }}</a>{% else %}{{ adapter.licence }}{% endif %}.{% endif %}
+        {% if retrieved %}{% blocktranslate trimmed with when=retrieved|date:"DATETIME_FORMAT" %}Retrieved {{ when }}.{% endblocktranslate %}{% endif %}
+        {% translate "Only what you tick is kept; nothing else on the company changes." %}
+      </p>
+      <div class="flex flex-wrap items-center gap-3">
+        <button type="submit" name="keep" value="1" class="btn">{% translate "Keep what is ticked" %}</button>
+        <a href="{{ back }}" class="btn" data-variant="ghost">{% translate "Cancel" %}</a>
+      </div>
+    </form>
+  </div>
+{% endblock %}

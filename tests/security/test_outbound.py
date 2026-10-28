@@ -1872,3 +1872,86 @@ def test_an_orcid_that_fails_its_check_digit_is_never_sent(monkeypatch):
             lookups.from_orcid(value)
 
     assert seen == []
+
+
+# ------------------------------------------------- a company register's lookup (#1021)
+#
+# *Register lookup* asks a fixed set of public hosts, each named by the adapter that answers
+# for a country. The request goes through the public-only client like a logo does: a register
+# whose name answers with a private address is refused whatever the operator allowed for
+# connections, the socket goes to the address that was checked, and nothing is followed.
+
+
+def _register_client(monkeypatch, transport):
+    real = http.public_only_client
+    monkeypatch.setattr(
+        http, "public_only_client", lambda **kwargs: real(transport=transport, **kwargs)
+    )
+
+
+def test_a_register_lookup_dials_the_address_it_approved(monkeypatch):
+    from postulo.jobs import register_lookup
+    from postulo.plugins.register_lookup import adapters
+
+    resolving(monkeypatch, {"data.brreg.no": PUBLIC})
+    transport, seen = recorder(404)
+    _register_client(monkeypatch, transport)
+
+    with pytest.raises(register_lookup.LookupRefused):
+        register_lookup.lookup(adapters.NORWAY, "NO 923609016")
+
+    assert str(seen[0].url.host) == "93.184.216.34", "the socket went to the approved address"
+    assert seen[0].headers["Host"] == "data.brreg.no"
+
+
+@pytest.mark.parametrize("allowed", [False, True])
+def test_a_register_on_a_private_address_is_refused_whatever_connections_allow(
+    monkeypatch, settings, allowed
+):
+    from postulo.jobs import register_lookup
+    from postulo.plugins.register_lookup import adapters
+
+    settings.POSTULO_CONNECTIONS_ALLOW_PRIVATE = allowed
+    resolving(monkeypatch, {})
+    transport, seen = recorder()
+    _register_client(monkeypatch, transport)
+
+    with pytest.raises(register_lookup.LookupRefused):
+        register_lookup.lookup(adapters.GLEIF, "529900W18LQJJN6SJ336")
+
+    assert seen == [], "nothing was sent"
+
+
+def test_a_register_that_redirects_onto_the_network_is_not_followed(monkeypatch):
+    from postulo.jobs import register_lookup
+    from postulo.plugins.register_lookup import adapters
+
+    resolving(monkeypatch, {"api-krs.ms.gov.pl": PUBLIC})
+    seen: list[httpx.Request] = []
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        seen.append(snapshot(request))
+        return httpx.Response(302, headers={"Location": "http://192.168.1.50/"})
+
+    _register_client(monkeypatch, httpx.MockTransport(handler))
+
+    with pytest.raises(register_lookup.LookupRefused, match="somewhere else"):
+        register_lookup.lookup(adapters.POLAND, "PL 0000019193")
+
+    assert len(seen) == 1, "the hop onto the network was never opened"
+
+
+def test_every_register_postulo_ships_is_asked_on_its_own_public_name_over_https():
+    """The destinations are a fixed list, and the list is the adapters' own declarations."""
+    from postulo.plugins.register_lookup import adapters
+
+    hosts = {host for adapter in adapters.ADAPTERS for host in adapter.hosts}
+
+    assert hosts == {
+        "recherche-entreprises.api.gouv.fr",
+        "data.brreg.no",
+        "avoindata.prh.fi",
+        "ares.gov.cz",
+        "api-krs.ms.gov.pl",
+        "api.gleif.org",
+    }

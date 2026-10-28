@@ -141,6 +141,10 @@ REACHING_PAST: dict[str, dict[str, str]] = {
     # handles, which is a declaration and nothing else (#682).
     "messaging_services": {},
     "messaging_contacts": {},
+    # Register lookup and the registers it may ask (#1021): a feature that is a declaration,
+    # and a registry built from names on the surface, as a package for another country would
+    # build its own.
+    "register_lookup": {},
     "builtin": {},
     "phone_numbers": {},
     "email_addresses": {},
@@ -289,6 +293,7 @@ def test_the_plugins_that_hold_no_data_need_only_the_surface():
     assert reaching("postulo.plugins.link_services") == {SURFACE}
     assert reaching("postulo.plugins.messaging_services") == {SURFACE}
     assert reaching("postulo.plugins.messaging_contacts") == {SURFACE}
+    assert reaching("postulo.plugins.register_lookup") == {SURFACE}
 
 
 def test_no_plugin_postulo_ships_reaches_for_a_model():
@@ -513,6 +518,23 @@ def test_a_plugin_binds_to_the_listing_of_a_record_it_holds_and_never_chooses_th
     with pytest.raises(TypeError):
         api.record_listing_event(company, summary="Not a listing")
     assert len(listing_history(posting)) == 1
+
+
+def test_the_surface_holds_what_a_register_adapter_needs():
+    """How a company register is asked, and what it hands back (#1021).
+
+    The registry's own classes and not copies, or an adapter a package for another country
+    made would not be one *Register lookup* recognised.
+    """
+    from postulo.jobs import register_lookup
+    from postulo.plugins import api, base
+
+    for name in ("RegisterAdapter", "RegisterAdapterPlugin", "RegisterAddress", "RegisterRecord"):
+        assert name in api.__all__, name
+    assert api.RegisterAdapter is register_lookup.Adapter
+    assert api.RegisterAddress is register_lookup.Address
+    assert api.RegisterRecord is register_lookup.Record
+    assert api.RegisterAdapterPlugin is base.RegisterAdapterPlugin
 
 
 def test_the_surface_holds_what_a_registry_of_link_services_needs():

@@ -345,7 +345,7 @@ def test_only_an_administrator_decides_anything(client, user, route):
     response = client.post(url, {f"row:{PLUGIN}": "1"})
 
     assert response.status_code in {302, 403, 404}
-    assert not PluginPolicy.objects.exists()
+    assert not PluginPolicy.objects.filter(plugin=PLUGIN).exists()
 
 
 def test_a_change_is_written_to_the_log(client, admin, user, caplog):

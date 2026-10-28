@@ -54,6 +54,11 @@ may add to: `LinkService` is one entry, `LinkServicePlugin` what holds them, and
 **A messaging handle is on a service too (#682)**, a registry of its own: `MessagingService`
 is one entry, `MessagingServicePlugin` what holds them, `messaging_service_of` the read.
 
+**A company register can be asked through it (#1021)**: `RegisterAdapter` is how one
+register is asked about one number, `RegisterRecord` and `RegisterAddress` what it hands back,
+and `RegisterAdapterPlugin` the registry that holds them. An adapter builds an address and reads
+JSON; Postulo makes the request.
+
 **Companies, departments and the person's card are on it too (#328)**: the records and
 their vocabularies, a holder's numbers, addresses and links as plain values, the person's own
 card (read only: nothing here writes a `User` or a `Profile`), and the calls that write a
@@ -138,6 +143,9 @@ if TYPE_CHECKING:  # pragma: no cover - the names `__getattr__` resolves at run 
     from postulo.jobs.history import record_listing_event
     from postulo.jobs.models import Company, CompanyKind, Contact, Department
     from postulo.jobs.places import resolve as place_of
+    from postulo.jobs.register_lookup import Adapter as RegisterAdapter
+    from postulo.jobs.register_lookup import Address as RegisterAddress
+    from postulo.jobs.register_lookup import Record as RegisterRecord
     from postulo.jobs.surface import (
         Refused,
         SavedRows,
@@ -192,6 +200,7 @@ from .base import (
     Manifest,
     MessagingServicePlugin,
     OutboxPlugin,
+    RegisterAdapterPlugin,
     SourcePlugin,
     StorePlugin,
     SyncPlugin,
@@ -263,6 +272,10 @@ __all__ = [
     "PostalAddressKind",
     "Record",
     "Refused",
+    "RegisterAdapter",
+    "RegisterAdapterPlugin",
+    "RegisterAddress",
+    "RegisterRecord",
     "SavedRows",
     "SourcePlugin",
     "StorePlugin",
@@ -431,6 +444,16 @@ _ELSEWHERE: dict[str, tuple[str, str]] = {
     # reads one back by key, or `None` for *Other* and for a key nothing installed knows.
     "MessagingService": ("postulo.core.messaging_services", "Service"),
     "messaging_service_of": ("postulo.core.messaging_services", "find"),
+    # ------------------------------------------------- how a company register is asked (#1021)
+    # A `register-adapter` plugin adds entries to the registry *Register lookup* reads: one
+    # `RegisterAdapter` per register -- a key, a name, the scheme and country it answers for,
+    # the hosts it may be asked on, how to build the address for a number and how to read the
+    # JSON that comes back into a `RegisterRecord` (with a `RegisterAddress`). The adapter
+    # never makes the request: Postulo does, through the public-only client, to those hosts
+    # alone, under the feature's switch and the account's allowance.
+    "RegisterAdapter": ("postulo.jobs.register_lookup", "Adapter"),
+    "RegisterAddress": ("postulo.jobs.register_lookup", "Address"),
+    "RegisterRecord": ("postulo.jobs.register_lookup", "Record"),
     # ----------------------------------------- companies, departments and the person (#328)
     # What a sync of contacts needs and could not reach: the companies and departments a
     # card is filed under, the vocabularies it maps onto, and the person's own card. All of

@@ -84,8 +84,16 @@ GOVERNED_KINDS = ("source", "notifier", "store", "sync", "importer", "feature", 
 #: A **link-service** plugin is the other registry, of the services a web link can be on,
 #: and is here for the identifier's reason: no person holds an opinion about what
 #: ``linkedin`` means (#305). So is a **messaging-service** plugin, the registry of the
-#: services a handle can be on (#682).
-UNGOVERNED_KINDS = ("transport", "identifier", "link-service", "messaging-service")
+#: services a handle can be on (#682). So is a **register-adapter** plugin (#1021): it says how
+#: a country's register is asked, and whether anything is asked at all is the decision of the
+#: ``register-lookup`` feature, which is governed like any other.
+UNGOVERNED_KINDS = (
+    "transport",
+    "identifier",
+    "link-service",
+    "messaging-service",
+    "register-adapter",
+)
 
 
 @dataclass(frozen=True)

@@ -194,6 +194,11 @@ EXCUSED: dict[str, str] = {
         "fetch it sends you to the company's page, so the walk never finds it drawn (#673)"
     ),
     "jobs:company_names": "a form's answer that adds or removes one name and goes back (#673)",
+    "jobs:company_register": (
+        "what a press of Look up brought back from a company register, held in the session; "
+        "without a lookup it sends you to the company's page, and the walk makes no request "
+        "to a register, so it never finds it drawn (#1021)"
+    ),
     "jobs:company_signal_add": "a POST from the company form that adds a hiring entry (#941)",
     "jobs:company_signal_edit": "a POST from the company form that changes a hiring entry (#941)",
     "jobs:company_signal_remove": "a POST from the company form that removes a hiring entry (#941)",

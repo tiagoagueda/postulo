@@ -72,4 +72,33 @@
       <c-empty variant="quiet">{% translate "No connections. This instance talks to nothing outside itself, which is the shortest recipient list there is." %}</c-empty>
     {% endif %}
   </section>
+
+  {% comment %} The outside services a person's press can make the instance call (#1021): the
+     company registers, listed while Register lookup is on for anybody. Drawn from the
+     adapters installed, like the rest of the page. {% endcomment %}
+  {% if record.services %}
+    <section class="mt-8" data-outside-services>
+      <c-section-title>
+        {% translate "Outside services it may call" %}
+        <c-slot name="subtitle">{% translate "Asked only when somebody presses for it, one company at a time. Each is sent what is listed and nothing about the person asking." %}</c-slot>
+      </c-section-title>
+      <div class="card p-0">
+        <ul class="divide-y divide-ink-100 dark:divide-ink-800">
+          {% for service in record.services %}
+            <li class="px-4 py-3" data-outside-service="{{ service.key }}">
+              <div class="flex flex-wrap items-baseline gap-x-2 gap-y-1">
+                <span class="font-medium">{{ service.label }}</span>
+                {% for host in service.hosts %}<code class="text-xs">{{ host }}</code>{% endfor %}
+              </div>
+              <p class="mt-1 text-sm text-ink-500 dark:text-ink-400">
+                {{ service.source }}.
+                {% blocktranslate trimmed with what=service.sends %}Sent: {{ what }}.{% endblocktranslate %}
+                {% if service.licence %}{% blocktranslate trimmed with licence=service.licence %}Its data are under {{ licence }}.{% endblocktranslate %}{% endif %}
+              </p>
+            </li>
+          {% endfor %}
+        </ul>
+      </div>
+    </section>
+  {% endif %}
 {% endblock %}

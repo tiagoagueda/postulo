@@ -135,6 +135,23 @@
     </div>
   {% endif %}
 
+  {% comment %} Look up beside a register number or an LEI (#1021): one form per identifier a
+     register answers for, while Register lookup is on and the reader may keep what comes
+     back. A press is one request to that register; nothing is kept until the review page
+     is ticked. {% endcomment %}
+  {% if register_lookups %}
+    <div class="-mt-4 mb-6 flex flex-wrap items-center gap-2 text-sm" data-register-lookups>
+      {% for lookup in register_lookups %}
+        <form method="post" action="{% url 'jobs:company_register' company.pk %}">
+          {% csrf_token %}
+          <input type="hidden" name="scheme" value="{{ lookup.scheme }}">
+          <button type="submit" class="btn" data-variant="outline" data-size="sm" data-register-lookup="{{ lookup.scheme }}">{% icon "search" %}{% blocktranslate trimmed with register=lookup.label %}Look up in {{ register }}{% endblocktranslate %}<span class="sr-only">: {{ lookup.value }}</span></button>
+        </form>
+      {% endfor %}
+      <span class="text-xs text-ink-500 dark:text-ink-400">{% translate "One request to that register, carrying the number alone; nothing is kept until you say so." %}</span>
+    </div>
+  {% endif %}
+
   {% comment %} What it answers on and where it is (#329): its mailbox, its numbers -- the
      primary alone while several are off, as a contact's -- and its addresses, each on a line
      of its own, before its links. {% endcomment %}

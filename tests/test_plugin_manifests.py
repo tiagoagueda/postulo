@@ -136,7 +136,7 @@ def test_every_plugin_postulo_ships_declares_the_full_set():
     assert not missing, "\n".join(missing)
 
 
-def test_these_are_the_plugins_that_ship_across_ten_kinds():
+def test_these_are_the_plugins_that_ship_across_eleven_kinds():
     """Named rather than counted, so that losing one to a bad import is a failure rather
     than a quiet absence — and so that adding one is a line somebody wrote.
 
@@ -168,6 +168,11 @@ def test_these_are_the_plugins_that_ship_across_ten_kinds():
     `messaging-services` is the same for a messaging handle (#682), and `messaging-contacts`
     governs whether a person and their contacts may hold handles at all.
 
+    `register-adapters` is a third vocabulary, and a kind of its own too: the company
+    registers *Register lookup* may ask, one per country, which a package for another country
+    may add to; `register-lookup` is the feature that decides whether any is asked, and it is
+    the one feature that starts off (#1021).
+
     `multiple-fields` is a module with no behaviour of its own: the parent of the six features
     that let a field hold more than one value (#875), whose switch is theirs, and
     `builtin-notifications` is the same for the three notifiers that ship (#876), and
@@ -179,7 +184,7 @@ def test_these_are_the_plugins_that_ship_across_ten_kinds():
         for classes in registry.builtins().values()
         for plugin_class in classes
     }
-    assert len(registry.builtins()) == 10, sorted(registry.builtins())
+    assert len(registry.builtins()) == 11, sorted(registry.builtins())
 
     assert found == {
         "board",
@@ -207,6 +212,8 @@ def test_these_are_the_plugins_that_ship_across_ten_kinds():
         "maps",
         "wikidata",
         "publication-lookups",
+        "register-lookup",
+        "register-adapters",
         "multiple-fields",
         "builtin-notifications",
         "file-formats",

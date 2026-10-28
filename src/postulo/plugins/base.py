@@ -655,6 +655,41 @@ class MessagingServicePlugin(Protocol):
     services: tuple
 
 
+# ------------------------------------------------------------- register adapters
+
+#: Where a package that knows how to ask another country's company register registers
+#: itself (#1021). Open, as the link-service group is, and for a like reason: an adapter is
+#: a country, the hosts it may ask, how to build the address for a number and how to read the
+#: answer, and Postulo makes the request itself, through the guarded client, under the
+#: feature's switch and the account's allowance. A registry somebody else wrote can add a
+#: country; it cannot dial anywhere its own declaration does not name, and it cannot take a
+#: country Postulo already answers for.
+REGISTER_ADAPTER_GROUP = "postulo.register_adapters"
+
+
+@runtime_checkable
+class RegisterAdapterPlugin(Protocol):
+    """A registry of the company registers *Register lookup* may ask (#1021).
+
+    The shape of a link-service plugin: it is not asked to *do* anything, and it holds no
+    rows. It answers "which register answers for this country, and how is its answer read",
+    each entry a `RegisterAdapter` from the plugin surface. Whether anything is asked at all
+    is the ``register-lookup`` feature's decision, never the registry's, so this kind is not
+    switched on its own.
+
+    **It does not reach the network itself.** An adapter builds the address and reads the
+    JSON it is handed; the request, the deadline, the size limit and the allowance are
+    Postulo's.
+    """
+
+    #: The identifier the registry keys on.
+    name: str
+    #: What kind of plugin this is; always ``"register-adapter"``.
+    kind: str
+    #: The adapters it contributes, each a `RegisterAdapter` from the plugin surface.
+    adapters: tuple
+
+
 # --------------------------------------------------------------------- features
 
 #: Where something that *changes what Postulo keeps* registers itself.

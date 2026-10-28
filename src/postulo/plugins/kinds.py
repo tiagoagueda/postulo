@@ -34,6 +34,7 @@ LABELS: dict[str, str] = {
     "identifier": _("Identifiers"),
     "link-service": _("Link services"),
     "messaging-service": _("Messaging services"),
+    "register-adapter": _("Company registers"),
 }
 
 #: The badge tone each kind wears: `data-tone` on a `.badge`, painted in
@@ -50,6 +51,7 @@ TONES: dict[str, str] = {
     "identifier": "violet",
     "link-service": "blue",
     "messaging-service": "blue",
+    "register-adapter": "violet",
 }
 
 

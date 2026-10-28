@@ -29,6 +29,18 @@ from django.utils import timezone
 
 pytestmark = pytest.mark.django_db
 
+
+@pytest.fixture(autouse=True)
+def _register_lookup_on(db):
+    """Register lookup starts off for the instance (#1021), and a page that is a 404 to
+    everybody proves nothing about somebody else's record: the sweep runs with it on."""
+    from postulo.core.memo import forget_decisions
+    from postulo.plugins.models import PluginPolicy
+
+    PluginPolicy.objects.filter(plugin="register-lookup", person=None).delete()
+    forget_decisions()
+
+
 #: Patterns that name no owned record, and why. Keep this honest.
 EXCUSED: dict[str, str] = {
     "accounts:invite_accept": (
@@ -581,6 +593,8 @@ FACTORIES: dict[str, Callable] = {
     # its names in other languages, and what Wikidata said of it (#673)
     "jobs:company_wikidata": pk_of(company),
     "jobs:company_names": pk_of(company),
+    # what its register said, and keeping what was ticked (#1021)
+    "jobs:company_register": pk_of(company),
     # its dated hiring signals (#941)
     "jobs:company_signal_add": pk_of(company),
     "jobs:company_signal_edit": pk_of(company_signal),

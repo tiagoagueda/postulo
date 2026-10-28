@@ -207,6 +207,15 @@ def lookup(user) -> None:
     consume("lookup", user, rate_for("POSTULO_LOOKUP_RATE"))
 
 
+def register_lookup(user) -> None:
+    """One *Look up* in a company register, against the account's own allowance (#1021).
+
+    Spent once per press, whichever register answers and however many addresses it is asked
+    at: the act is what is bounded, and Poland's second address is part of one act.
+    """
+    consume("register-lookup", user, rate_for("POSTULO_REGISTER_LOOKUP_RATE"))
+
+
 def api(token) -> None:
     """Per token rather than per account, so revoking one revokes its allowance with it."""
     consume("api", token, rate_for("POSTULO_API_RATE"))

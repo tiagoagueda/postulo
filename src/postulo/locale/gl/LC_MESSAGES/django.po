@@ -1196,6 +1196,51 @@ msgstr "%(provider)s non permite que unha aplicación envíe pola súa conta. Es
 msgid "%(record)s points at %(names)s, which %(grantee)s cannot see and which is not yours to share. Nothing was shared."
 msgstr "%(record)s apunta a %(names)s, que %(grantee)s non pode ver e que non podes compartir. Non se compartiu nada."
 
+#: src/postulo/jobs/register_lookup.py
+#, python-format
+msgid "%(register)s answered %(status)s."
+msgstr ""
+
+#: src/postulo/jobs/register_lookup.py
+#, python-format
+msgid "%(register)s asked for fewer requests. Try again later."
+msgstr ""
+
+#: src/postulo/jobs/register_lookup.py
+#, python-format
+msgid "%(register)s could not be reached."
+msgstr ""
+
+#: src/postulo/templates/jobs/company_register.html
+#, python-format
+msgid "%(register)s has an entry for this number."
+msgstr ""
+
+#: src/postulo/jobs/register_lookup.py
+#, python-format
+msgid "%(register)s has removed this entry."
+msgstr ""
+
+#: src/postulo/jobs/register_lookup.py
+#, python-format
+msgid "%(register)s sent the request somewhere else."
+msgstr ""
+
+#: src/postulo/jobs/register_lookup.py
+#, python-format
+msgid "%(register)s took too long to answer."
+msgstr ""
+
+#: src/postulo/jobs/register_lookup.py
+#, python-format
+msgid "%(register)s's answer could not be read."
+msgstr ""
+
+#: src/postulo/jobs/register_lookup.py
+#, python-format
+msgid "%(register)s's answer was larger than one company's should be."
+msgstr ""
+
 #: src/postulo/core/gdpr.py
 #, python-format
 msgid "%(removed)s; %(kept)s"
@@ -2737,6 +2782,10 @@ msgstr "Accións para %(what)s"
 msgid "Active"
 msgstr "Activa"
 
+#: src/postulo/templates/jobs/company_register.html
+msgid "Activity"
+msgstr ""
+
 #: src/postulo/templates/applications/application_detail.html
 #: src/postulo/templates/jobs/company_detail.html
 #: src/postulo/templates/jobs/company_form.html
@@ -2751,6 +2800,11 @@ msgstr "Engadir"
 #, python-format
 msgid "Add %(name)s"
 msgstr "Engadir %(name)s"
+
+#: src/postulo/templates/jobs/company_register.html
+#, python-format
+msgid "Add <bdi>%(address)s</bdi> to its addresses, as its registered office"
+msgstr ""
 
 #: src/postulo/templates/jobs/company_list.html
 msgid "Add a company"
@@ -2838,6 +2892,16 @@ msgstr "Engadir as tarxetas que marquei"
 #: src/postulo/templates/resume/overview.html
 msgid "Add the first one."
 msgstr "Engade a primeira."
+
+#: src/postulo/templates/jobs/company_register.html
+#, python-format
+msgid "Add the industry %(industry)s (NACE %(division)s)"
+msgstr ""
+
+#: src/postulo/templates/jobs/company_register.html
+#, python-format
+msgid "Add the register number <bdi>%(number)s</bdi>"
+msgstr ""
 
 #: src/postulo/templates/resume/publication_orcid.html
 msgid "Add the ticked works"
@@ -3344,6 +3408,11 @@ msgstr "Xa se estaba a facer outra copia de seguranza."
 msgid "Another invitation"
 msgstr "Outro convite"
 
+#: src/postulo/jobs/register_views.py
+#, python-format
+msgid "Another of your companies already has the register number %(number)s."
+msgstr ""
+
 #: src/postulo/api/idempotency.py
 msgid "Another request is using this Idempotency-Key; try again in a moment."
 msgstr "Outra petición está a usar esta Idempotency-Key; téntao de novo nun momento."
@@ -3790,6 +3859,10 @@ msgstr "Asia"
 msgid "Asked"
 msgstr "Consultada"
 
+#: src/postulo/templates/server/record_of_processing.html
+msgid "Asked only when somebody presses for it, one company at a time. Each is sent what is listed and nothing about the person asking."
+msgstr ""
+
 #: src/postulo/applications/analytics.py src/postulo/applications/models.py
 msgid "Assessment"
 msgstr "Avaliación"
@@ -4235,6 +4308,7 @@ msgstr "Enderezo de retorno que rexistrar nel"
 #: src/postulo/templates/jobs/address_place.html
 #: src/postulo/templates/jobs/capture_page_forget.html
 #: src/postulo/templates/jobs/company_form.html
+#: src/postulo/templates/jobs/company_register.html
 #: src/postulo/templates/jobs/company_wikidata.html
 #: src/postulo/templates/jobs/contact_form.html
 #: src/postulo/templates/jobs/industry_form.html
@@ -5011,6 +5085,10 @@ msgstr "nome da empresa"
 #: src/postulo/jobs/models.py
 msgid "company names"
 msgstr "nomes da empresa"
+
+#: src/postulo/plugins/kinds.py
+msgid "Company registers"
+msgstr ""
 
 #: src/postulo/jobs/views.py
 msgid "Company updated."
@@ -7161,6 +7239,11 @@ msgstr "de %(name)s"
 msgid "From %(name)s."
 msgstr "De %(name)s."
 
+#: src/postulo/templates/jobs/company_register.html
+#, python-format
+msgid "From %(register)s"
+msgstr ""
+
 #: src/postulo/templates/cotton/date_picker.html
 #, python-format
 msgid "From %(start)s to %(end)s"
@@ -8579,6 +8662,15 @@ msgstr "Funciona ata o %(when)s, ou ata que se use ou se revogue."
 msgid "It works."
 msgstr "Funciona."
 
+#: src/postulo/jobs/register_views.py
+msgid "Its address is already listed."
+msgstr ""
+
+#: src/postulo/templates/server/record_of_processing.html
+#, python-format
+msgid "Its data are under %(licence)s."
+msgstr ""
+
 #: src/postulo/applications/ical_import.py
 msgid "Its date could not be read."
 msgstr "Non se puido ler a súa data."
@@ -8594,6 +8686,10 @@ msgstr "O seu ficheiro coincide co que asinou o repositorio oficial."
 #: src/postulo/jobs/models.py
 msgid "Its general mailbox, such as jobs@ or info@. A person's address goes on a contact."
 msgstr "O seu correo xeral, como jobs@ ou info@. O enderezo dunha persoa vai nun contacto."
+
+#: src/postulo/jobs/register_views.py
+msgid "Its industry is already listed."
+msgstr ""
 
 #: src/postulo/templates/jobs/company_wikidata.html
 msgid "Its legal state"
@@ -8733,6 +8829,10 @@ msgstr "Conservar estes"
 msgid "Keep this view as"
 msgstr "Conservar esta vista como"
 
+#: src/postulo/templates/jobs/company_register.html
+msgid "Keep what is ticked"
+msgstr ""
+
 #: src/postulo/templates/server/capture.html
 msgid "Keeping a page Postulo was allowed to fetch, for the person who asked for it, asks nothing more of robots.txt: no page is fetched a second time to keep it."
 msgstr "Conservar unha páxina que o Postulo tiña permiso para obter, para a persoa que a pediu, non require nada máis de robots.txt: ningunha páxina se obtén unha segunda vez para conservala."
@@ -8802,6 +8902,11 @@ msgstr "Conservado agora nesta instancia"
 #: src/postulo/templates/server/capture.html
 msgid "Kept pages are never deleted by the instance, only by the person whose they are."
 msgstr "A instancia nunca elimina as páxinas conservadas; só as pode eliminar a persoa á que pertencen."
+
+#: src/postulo/jobs/register_views.py
+#, python-format
+msgid "Kept what %(register)s said."
+msgstr ""
 
 #: src/postulo/jobs/views.py
 msgid "Kept what Wikidata said."
@@ -9385,6 +9490,11 @@ msgstr "Lonxitude"
 
 #: src/postulo/templates/resume/item_form.html
 msgid "Look up"
+msgstr ""
+
+#: src/postulo/templates/jobs/company_detail.html
+#, python-format
+msgid "Look up in %(register)s"
 msgstr ""
 
 #: src/postulo/core/models.py
@@ -10402,6 +10512,10 @@ msgstr "Non hai ofertas rexistradas en ningunha parte deste grupo."
 msgid "No postings recorded for this company."
 msgstr "Non hai ofertas rexistradas para esta empresa."
 
+#: src/postulo/jobs/register_views.py
+msgid "No register this instance asks answers for that number."
+msgstr ""
+
 #: src/postulo/jobs/page_views.py
 msgid "No rendering was kept of that page."
 msgstr "Non se conservou ningunha versión xerada desa páxina."
@@ -10971,6 +11085,10 @@ msgstr "Aquí non se pode cambiar nada: constrúese a partir das entradas do doc
 msgid "Nothing here can install a plugin: this environment has neither uv nor pip. Postulo's own image ships uv; an image built without it needs one of the two on the path."
 msgstr "Aquí nada pode instalar un complemento: este contorno non ten nin uv nin pip. A imaxe propia do Postulo inclúe uv; unha imaxe construída sen el precisa un dos dous na ruta."
 
+#: src/postulo/templates/jobs/company_register.html
+msgid "Nothing here differs from what the company already has."
+msgstr ""
+
 #: src/postulo/templates/jobs/industry_list.html
 msgid "Nothing here matches that. Only fields you have actually used appear on this page."
 msgstr "Aquí non hai nada que coincida. Nesta páxina só aparecen os ramos que de verdade usaches."
@@ -11197,6 +11315,10 @@ msgstr "Non se conservou nada desa páxina."
 msgid "Nothing was kept of this page"
 msgstr "Non se conservou nada desta páxina"
 
+#: src/postulo/jobs/register_views.py
+msgid "Nothing was kept."
+msgstr ""
+
 #: src/postulo/core/gdpr.py
 msgid "Nothing was left to remove."
 msgstr "Non quedaba nada que quitar."
@@ -11394,6 +11516,10 @@ msgstr "Propostas lado a lado"
 #: src/postulo/plugins/models.py src/postulo/plugins/provenance.py
 msgid "Official"
 msgstr "Oficial"
+
+#: src/postulo/templates/jobs/company_register.html
+msgid "Official name"
+msgstr ""
 
 #: src/postulo/core/models.py
 msgid "Older backups are deleted only after a new one has been written and checked. Archives you uploaded are never deleted by this."
@@ -11636,6 +11762,10 @@ msgid_plural "%(total)s records were added. Nothing you already had was changed 
 msgstr[0] "Engadiuse un rexistro. Non se cambiou nin se quitou nada do que xa tiñas."
 msgstr[1] "Engadíronse %(total)s rexistros. Non se cambiou nin se quitou nada do que xa tiñas."
 
+#: src/postulo/templates/jobs/company_detail.html
+msgid "One request to that register, carrying the number alone; nothing is kept until you say so."
+msgstr ""
+
 #: src/postulo/templates/jobs/company_form.html
 msgid "One request to www.wikidata.org for this company's item; nothing is kept until you say so."
 msgstr "Unha petición a www.wikidata.org para o elemento desta empresa; non se conserva nada ata que ti o digas."
@@ -11792,6 +11922,10 @@ msgstr "Só a conta do propio operador pode deixar de ter o rol de administrador
 msgid "Only the year prints on a CV, so the day makes no difference."
 msgstr "Nun CV só se mostra o ano, así que o día non cambia nada."
 
+#: src/postulo/templates/jobs/company_register.html
+msgid "Only what you tick is kept; nothing else on the company changes."
+msgstr ""
+
 #: src/postulo/templates/server/design.html
 msgid "Open a dialog with a choice in it"
 msgstr "Abrir un diálogo cunha opción dentro"
@@ -11815,6 +11949,10 @@ msgstr "Abrir así"
 #: src/postulo/templates/jobs/capture_review.html
 msgid "Open it"
 msgstr "Abrilo"
+
+#: src/postulo/templates/jobs/company_register.html
+msgid "Open it there"
+msgstr ""
 
 #: src/postulo/templates/documents/cv_detail.html
 #: src/postulo/templates/documents/letter_detail.html
@@ -11995,6 +12133,10 @@ msgstr "Resultados"
 #: src/postulo/core/design.py src/postulo/templates/server/design.html
 msgid "Outline"
 msgstr "Contorno"
+
+#: src/postulo/templates/server/record_of_processing.html
+msgid "Outside services it may call"
+msgstr ""
 
 #: src/postulo/templates/applications/calendar.html
 msgid "Overdue"
@@ -13269,6 +13411,16 @@ msgstr "Rexistrar unha proposta"
 msgid "Record and change: applications, listings, notes, reminders, letters, your details. A call that changes a record answers with the whole record, timeline and contacts included, so this can see what it touches"
 msgstr "Rexistrar e cambiar: candidaturas, ofertas, notas, recordatorios, cartas, os teus datos. Unha chamada que cambia un rexistro responde co rexistro enteiro, incluídos a cronoloxía e os contactos, para que isto poida ver o que modifica"
 
+#: src/postulo/templates/jobs/company_register.html
+#, python-format
+msgid "Record it as %(state)s"
+msgstr ""
+
+#: src/postulo/templates/jobs/company_register.html
+#, python-format
+msgid "Record it as %(state)s since %(date)s"
+msgstr ""
+
 #: src/postulo/templates/jobs/company_wikidata.html
 #, python-format
 msgid "Record it as acquired or merged into <bdi>%(name)s</bdi>"
@@ -13477,6 +13629,10 @@ msgstr "Rexeitado: %(fields)s. Consulta %(member)s para ver que falla en cada un
 msgid "region"
 msgstr "rexión"
 
+#: src/postulo/templates/jobs/company_register.html
+msgid "Register number"
+msgstr ""
+
 #: src/postulo/templates/connections/form.html
 msgid "Register this address with the provider"
 msgstr "Rexistrar este enderezo no provedor"
@@ -13488,6 +13644,11 @@ msgstr "Rexistra primeiro esta instancia no provedor e garda o ID de cliente."
 #: src/postulo/plugins/consent.py
 msgid "Register this instance with the provider first, and save the client id."
 msgstr "Rexistra primeiro esta instancia no provedor e garda o ID de cliente."
+
+#: src/postulo/jobs/register_views.py
+#: src/postulo/templates/jobs/company_register.html
+msgid "Registered office"
+msgstr ""
 
 #: src/postulo/templates/server/signin.html
 msgid "Registration is open: anyone who finds the address may create an account."
@@ -13729,6 +13890,11 @@ msgstr "Conservación"
 #: src/postulo/applications/models.py
 msgid "retired on"
 msgstr "retirado o"
+
+#: src/postulo/templates/jobs/company_register.html
+#, python-format
+msgid "Retrieved %(when)s."
+msgstr ""
 
 #: src/postulo/documents/models.py
 msgid "reusable template"
@@ -14312,6 +14478,11 @@ msgstr "Enviada coa captura polo navegador que estaba a mostrar a páxina"
 #: src/postulo/templates/jobs/contact_form.html
 msgid "Sent with:"
 msgstr "Enviada con:"
+
+#: src/postulo/templates/server/record_of_processing.html
+#, python-format
+msgid "Sent: %(what)s."
+msgstr ""
 
 #: src/postulo/jobs/forms.py
 msgid "Separate several with commas. Anything new joins your list."
@@ -15031,6 +15202,11 @@ msgstr "A orixe é o campo «atopada a través de» dunha oferta. Cubre ese camp
 msgid "source version"
 msgstr "versión do lector"
 
+#: src/postulo/templates/jobs/company_register.html
+#, python-format
+msgid "Source: %(source)s."
+msgstr ""
+
 #: src/postulo/templates/widgets/sources.html
 msgid "Sources"
 msgstr "Orixes"
@@ -15110,7 +15286,8 @@ msgstr "STARTTLS, tras conectar"
 msgid "state"
 msgstr "estado"
 
-#: src/postulo/jobs/tables.py src/postulo/templates/server/person_recovery.html
+#: src/postulo/jobs/tables.py src/postulo/templates/jobs/company_register.html
+#: src/postulo/templates/server/person_recovery.html
 msgid "State"
 msgstr "Estado"
 
@@ -15573,6 +15750,10 @@ msgstr "texto sen a súa disposición"
 #: src/postulo/core/search.py
 msgid "Text you sent"
 msgstr "Texto que enviaches"
+
+#: src/postulo/jobs/register_views.py
+msgid "That address could not be added."
+msgstr ""
 
 #: src/postulo/jobs/logos.py
 #, python-format
@@ -16053,6 +16234,10 @@ msgstr "Esa ligazón xa non funcionará."
 msgid "That name cannot be checked just now."
 msgstr "Non se pode comprobar ese nome agora mesmo."
 
+#: src/postulo/jobs/register_lookup.py
+msgid "That number cannot be asked of this register."
+msgstr ""
+
 #: src/postulo/core/phones.py
 msgid "That number has no area code."
 msgstr "Ese número non ten prefixo de zona."
@@ -16424,6 +16609,10 @@ msgstr "A empresa á que pertence esta, se pertence a algunha."
 msgid "The company you are applying to"
 msgstr "A empresa á que presentas a candidatura"
 
+#: src/postulo/jobs/register_lookup.py
+msgid "the company's LEI"
+msgstr ""
+
 #: src/postulo/core/web_links.py
 msgid "The company's LinkedIn page, or wherever it posts."
 msgstr "A páxina de LinkedIn da empresa, ou onde publique."
@@ -16431,6 +16620,10 @@ msgstr "A páxina de LinkedIn da empresa, ou onde publique."
 #: src/postulo/core/web_links.py
 msgid "The company's own pages: its LinkedIn page, its Mastodon or Bluesky account, its YouTube channel — as many as are worth keeping, with one marked as the one to show."
 msgstr "As páxinas propias da empresa: a súa páxina de LinkedIn, a súa conta de Mastodon ou Bluesky, a súa canle de YouTube — tantas como merezan a pena, con unha marcada como a que se amosa."
+
+#: src/postulo/jobs/register_lookup.py
+msgid "the company's register number"
+msgstr ""
 
 #: src/postulo/documents/archiving.py src/postulo/notifications/webhooks.py
 msgid "The connection is gone or switched off."
@@ -16822,6 +17015,21 @@ msgstr "A última pendente."
 msgid "The last ten things the timeline recorded, whichever application they were on."
 msgstr "As últimas dez cousas que rexistrou a cronoloxía, fosen da candidatura que fosen."
 
+#: src/postulo/jobs/register_views.py
+#, python-format
+msgid "The LEI record gives the register number %(number)s, which is not one a register number here can be."
+msgstr ""
+
+#: src/postulo/templates/jobs/company_register.html
+#, python-format
+msgid "The LEI record gives the register number <bdi>%(found)s</bdi>, and this company has <bdi>%(stored)s</bdi>. One of them may be out of date, or the company may be registered in more than one place."
+msgstr ""
+
+#: src/postulo/templates/jobs/company_register.html
+#, python-format
+msgid "The LEI record gives the same register number as this company's, <bdi>%(stored)s</bdi>."
+msgstr ""
+
 #: src/postulo/resume/forms.py
 msgid "The level of the qualification in the European Qualifications Framework, which a diploma or its supplement may state. Postulo never works it out from the qualification’s name."
 msgstr "O nivel da cualificación no Marco europeo de cualificacións (MEC), que pode indicar un diploma ou o seu suplemento. O Postulo nunca o deduce do nome da cualificación."
@@ -17143,6 +17351,18 @@ msgstr "O rexistro do que trata esta instancia e de quen o recibe."
 #: src/postulo/documents/models.py
 msgid "The referee sends it themselves"
 msgstr "A persoa de referencia envíaa ela mesma"
+
+#: src/postulo/jobs/register_lookup.py
+msgid "The register has no entry with that number."
+msgstr ""
+
+#: src/postulo/jobs/register_lookup.py
+msgid "The register's address is not one it declared."
+msgstr ""
+
+#: src/postulo/jobs/register_lookup.py
+msgid "The register's answer could not be read."
+msgstr ""
 
 #: src/postulo/jobs/rendering.py
 msgid "The renderer could not be started."
@@ -17554,6 +17774,10 @@ msgstr "Aquí non hai ningún alcume que ler."
 #: src/postulo/jobs/pages.py
 msgid "There is no kept source to draw from, and a rendering is drawn from it."
 msgstr "Non hai ningunha fonte conservada desde a que debuxar, e a versión xerada debúxase a partir dela."
+
+#: src/postulo/jobs/register_lookup.py
+msgid "There is no number to look up."
+msgstr ""
 
 #: src/postulo/core/server_views.py
 msgid "There is no repository by that name."
@@ -18599,6 +18823,11 @@ msgstr "Usar"
 msgid "Use 3 to 32 lowercase letters, digits, dots, underscores or hyphens, starting and ending with a letter or digit."
 msgstr "Usa de 3 a 32 minúsculas, cifras, puntos, guións baixos ou guións, comezando e rematando cunha letra ou unha cifra."
 
+#: src/postulo/templates/jobs/company_register.html
+#, python-format
+msgid "Use <bdi>%(name)s</bdi> as its name, in place of <bdi>%(current)s</bdi>"
+msgstr ""
+
 #: src/postulo/jobs/tiles.py
 msgid "Use an https:// address, or a path starting with / on this instance's own address."
 msgstr "Usa un enderezo https:// ou unha ruta que comece por / no propio enderezo desta instancia."
@@ -19292,6 +19521,10 @@ msgstr "Que facer ao respecto, nunha frase."
 #: src/postulo/applications/forms.py
 msgid "What to do. It is what the reminder says when it falls due."
 msgstr "Que facer. É o que di o recordatorio cando vence."
+
+#: src/postulo/templates/jobs/company_register.html
+msgid "What to keep"
+msgstr ""
 
 #: src/postulo/templates/applications/report.html
 msgid "What type of employer"

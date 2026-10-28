@@ -1196,6 +1196,51 @@ msgstr "%(provider)s провайдері қолданбаға өз бетінш
 msgid "%(record)s points at %(names)s, which %(grantee)s cannot see and which is not yours to share. Nothing was shared."
 msgstr "%(record)s жазбасы %(names)s жазбасына сілтейді, оны %(grantee)s алушы көре алмайды және оны бөлісу сіздің құқығыңызда емес. Ештеңе бөлісілмеді."
 
+#: src/postulo/jobs/register_lookup.py
+#, python-format
+msgid "%(register)s answered %(status)s."
+msgstr ""
+
+#: src/postulo/jobs/register_lookup.py
+#, python-format
+msgid "%(register)s asked for fewer requests. Try again later."
+msgstr ""
+
+#: src/postulo/jobs/register_lookup.py
+#, python-format
+msgid "%(register)s could not be reached."
+msgstr ""
+
+#: src/postulo/templates/jobs/company_register.html
+#, python-format
+msgid "%(register)s has an entry for this number."
+msgstr ""
+
+#: src/postulo/jobs/register_lookup.py
+#, python-format
+msgid "%(register)s has removed this entry."
+msgstr ""
+
+#: src/postulo/jobs/register_lookup.py
+#, python-format
+msgid "%(register)s sent the request somewhere else."
+msgstr ""
+
+#: src/postulo/jobs/register_lookup.py
+#, python-format
+msgid "%(register)s took too long to answer."
+msgstr ""
+
+#: src/postulo/jobs/register_lookup.py
+#, python-format
+msgid "%(register)s's answer could not be read."
+msgstr ""
+
+#: src/postulo/jobs/register_lookup.py
+#, python-format
+msgid "%(register)s's answer was larger than one company's should be."
+msgstr ""
+
 #: src/postulo/core/gdpr.py
 #, python-format
 msgid "%(removed)s; %(kept)s"
@@ -2739,6 +2784,10 @@ msgstr "Әрекеттер: %(what)s"
 msgid "Active"
 msgstr "Белсенді"
 
+#: src/postulo/templates/jobs/company_register.html
+msgid "Activity"
+msgstr ""
+
 #: src/postulo/templates/applications/application_detail.html
 #: src/postulo/templates/jobs/company_detail.html
 #: src/postulo/templates/jobs/company_form.html
@@ -2753,6 +2802,11 @@ msgstr "Қосу"
 #, python-format
 msgid "Add %(name)s"
 msgstr "Қосу: %(name)s"
+
+#: src/postulo/templates/jobs/company_register.html
+#, python-format
+msgid "Add <bdi>%(address)s</bdi> to its addresses, as its registered office"
+msgstr ""
 
 #: src/postulo/templates/jobs/company_list.html
 msgid "Add a company"
@@ -2841,6 +2895,16 @@ msgstr "Мен белгілеген визиткаларды қосу"
 #: src/postulo/templates/resume/overview.html
 msgid "Add the first one."
 msgstr "Біріншісін қосыңыз."
+
+#: src/postulo/templates/jobs/company_register.html
+#, python-format
+msgid "Add the industry %(industry)s (NACE %(division)s)"
+msgstr ""
+
+#: src/postulo/templates/jobs/company_register.html
+#, python-format
+msgid "Add the register number <bdi>%(number)s</bdi>"
+msgstr ""
 
 #: src/postulo/templates/resume/publication_orcid.html
 msgid "Add the ticked works"
@@ -3352,6 +3416,11 @@ msgstr "Басқа сақтық көшірме жасалып жатқан ед�
 msgid "Another invitation"
 msgstr "Тағы бір шақыру"
 
+#: src/postulo/jobs/register_views.py
+#, python-format
+msgid "Another of your companies already has the register number %(number)s."
+msgstr ""
+
 #: src/postulo/api/idempotency.py
 msgid "Another request is using this Idempotency-Key; try again in a moment."
 msgstr "Бұл Idempotency-Key кілтін басқа сұрау пайдаланып жатыр; біраздан кейін қайталап көріңіз."
@@ -3805,6 +3874,10 @@ msgstr "Азия"
 msgid "Asked"
 msgstr "Сұралды"
 
+#: src/postulo/templates/server/record_of_processing.html
+msgid "Asked only when somebody presses for it, one company at a time. Each is sent what is listed and nothing about the person asking."
+msgstr ""
+
 #: src/postulo/applications/analytics.py src/postulo/applications/models.py
 msgid "Assessment"
 msgstr "Бағалау"
@@ -4256,6 +4329,7 @@ msgstr "Онда тіркелетін кері шақыру мекенжайы"
 #: src/postulo/templates/jobs/address_place.html
 #: src/postulo/templates/jobs/capture_page_forget.html
 #: src/postulo/templates/jobs/company_form.html
+#: src/postulo/templates/jobs/company_register.html
 #: src/postulo/templates/jobs/company_wikidata.html
 #: src/postulo/templates/jobs/contact_form.html
 #: src/postulo/templates/jobs/industry_form.html
@@ -5038,6 +5112,10 @@ msgstr "компания атауы"
 #: src/postulo/jobs/models.py
 msgid "company names"
 msgstr "компания атаулары"
+
+#: src/postulo/plugins/kinds.py
+msgid "Company registers"
+msgstr ""
 
 #: src/postulo/jobs/views.py
 msgid "Company updated."
@@ -7212,6 +7290,11 @@ msgstr "кепілдеме беруші: %(name)s"
 msgid "From %(name)s."
 msgstr "Дереккөз: %(name)s."
 
+#: src/postulo/templates/jobs/company_register.html
+#, python-format
+msgid "From %(register)s"
+msgstr ""
+
 #: src/postulo/templates/cotton/date_picker.html
 #, python-format
 msgid "From %(start)s to %(end)s"
@@ -8647,6 +8730,15 @@ msgstr "Ол пайдаланылғанша немесе күші жойылға
 msgid "It works."
 msgstr "Жұмыс істейді."
 
+#: src/postulo/jobs/register_views.py
+msgid "Its address is already listed."
+msgstr ""
+
+#: src/postulo/templates/server/record_of_processing.html
+#, python-format
+msgid "Its data are under %(licence)s."
+msgstr ""
+
 #: src/postulo/applications/ical_import.py
 msgid "Its date could not be read."
 msgstr "Оның күнін оқу мүмкін болмады."
@@ -8662,6 +8754,10 @@ msgstr "Оның файлы ресми репозиторий қол қойға�
 #: src/postulo/jobs/models.py
 msgid "Its general mailbox, such as jobs@ or info@. A person's address goes on a contact."
 msgstr "Оның жалпы пошта жәшігі, мысалы, jobs@ немесе info@. Адамның мекенжайы контактіге жазылады."
+
+#: src/postulo/jobs/register_views.py
+msgid "Its industry is already listed."
+msgstr ""
 
 #: src/postulo/templates/jobs/company_wikidata.html
 msgid "Its legal state"
@@ -8804,6 +8900,10 @@ msgstr "Бұларды сақтау"
 msgid "Keep this view as"
 msgstr "Бұл көріністі мына атпен сақтау"
 
+#: src/postulo/templates/jobs/company_register.html
+msgid "Keep what is ticked"
+msgstr ""
+
 #: src/postulo/templates/server/capture.html
 msgid "Keeping a page Postulo was allowed to fetch, for the person who asked for it, asks nothing more of robots.txt: no page is fetched a second time to keep it."
 msgstr "Postulo-ға жүктеуге рұқсат етілген бетті оны сұраған адам үшін сақтау robots.txt файлынан қосымша ештеңе сұрамайды: оны сақтау үшін ешбір бет екінші рет жүктелмейді."
@@ -8874,6 +8974,11 @@ msgstr "Қазір осы данада сақталған"
 #: src/postulo/templates/server/capture.html
 msgid "Kept pages are never deleted by the instance, only by the person whose they are."
 msgstr "Сақталған беттерді дана ешқашан жоймайды, тек олардың иесі ғана жояды."
+
+#: src/postulo/jobs/register_views.py
+#, python-format
+msgid "Kept what %(register)s said."
+msgstr ""
 
 #: src/postulo/jobs/views.py
 msgid "Kept what Wikidata said."
@@ -9461,6 +9566,11 @@ msgstr "Бойлық"
 
 #: src/postulo/templates/resume/item_form.html
 msgid "Look up"
+msgstr ""
+
+#: src/postulo/templates/jobs/company_detail.html
+#, python-format
+msgid "Look up in %(register)s"
 msgstr ""
 
 #: src/postulo/core/models.py
@@ -10483,6 +10593,10 @@ msgstr "Бұл топтың ешбір жерінде вакансиялар т�
 msgid "No postings recorded for this company."
 msgstr "Бұл компания үшін вакансиялар тіркелмеген."
 
+#: src/postulo/jobs/register_views.py
+msgid "No register this instance asks answers for that number."
+msgstr ""
+
 #: src/postulo/jobs/page_views.py
 msgid "No rendering was kept of that page."
 msgstr "Ол беттің кескіні сақталмаған."
@@ -11055,6 +11169,10 @@ msgstr "Мұнда ештеңені өзгерту мүмкін емес: мәт
 msgid "Nothing here can install a plugin: this environment has neither uv nor pip. Postulo's own image ships uv; an image built without it needs one of the two on the path."
 msgstr "Мұнда плагин орнататын ештеңе жоқ: бұл ортада uv та, pip те жоқ. Postulo-ның өз контейнер бейнесінде uv бар; онсыз жасалған бейнеде осы екеуінің бірі PATH жолында болуы керек."
 
+#: src/postulo/templates/jobs/company_register.html
+msgid "Nothing here differs from what the company already has."
+msgstr ""
+
 #: src/postulo/templates/jobs/industry_list.html
 #, fuzzy
 msgid "Nothing here matches that. Only fields you have actually used appear on this page."
@@ -11282,6 +11400,10 @@ msgstr "Ол беттен ештеңе сақталмаған."
 msgid "Nothing was kept of this page"
 msgstr "Бұл беттен ештеңе сақталмаған"
 
+#: src/postulo/jobs/register_views.py
+msgid "Nothing was kept."
+msgstr ""
+
 #: src/postulo/core/gdpr.py
 msgid "Nothing was left to remove."
 msgstr "Алып тастайтын ештеңе қалмады."
@@ -11481,6 +11603,10 @@ msgstr "Ұсыныстарды қатар салыстыру"
 #: src/postulo/plugins/models.py src/postulo/plugins/provenance.py
 msgid "Official"
 msgstr "Ресми"
+
+#: src/postulo/templates/jobs/company_register.html
+msgid "Official name"
+msgstr ""
 
 #: src/postulo/core/models.py
 msgid "Older backups are deleted only after a new one has been written and checked. Archives you uploaded are never deleted by this."
@@ -11725,6 +11851,10 @@ msgid_plural "%(total)s records were added. Nothing you already had was changed 
 msgstr[0] "Бір жазба қосылды. Бұрыннан бар деректеріңіздің ешқайсысы өзгертілмеді не алынып тасталмады."
 msgstr[1] "%(total)s жазба қосылды. Бұрыннан бар деректеріңіздің ешқайсысы өзгертілмеді не алынып тасталмады."
 
+#: src/postulo/templates/jobs/company_detail.html
+msgid "One request to that register, carrying the number alone; nothing is kept until you say so."
+msgstr ""
+
 #: src/postulo/templates/jobs/company_form.html
 msgid "One request to www.wikidata.org for this company's item; nothing is kept until you say so."
 msgstr "Осы компанияның элементі үшін www.wikidata.org сайтына бір сұрау; сіз айтпайынша ештеңе сақталмайды."
@@ -11882,6 +12012,10 @@ msgstr "Оператордың әкімші құқығын тек операто
 msgid "Only the year prints on a CV, so the day makes no difference."
 msgstr "Түйіндемеде тек жыл көрсетіледі, сондықтан күннің маңызы жоқ."
 
+#: src/postulo/templates/jobs/company_register.html
+msgid "Only what you tick is kept; nothing else on the company changes."
+msgstr ""
+
 #: src/postulo/templates/server/design.html
 msgid "Open a dialog with a choice in it"
 msgstr "Таңдауы бар диалог терезесін ашу"
@@ -11905,6 +12039,10 @@ msgstr "Осылай ашу"
 #: src/postulo/templates/jobs/capture_review.html
 msgid "Open it"
 msgstr "Оны ашу"
+
+#: src/postulo/templates/jobs/company_register.html
+msgid "Open it there"
+msgstr ""
 
 #: src/postulo/templates/documents/cv_detail.html
 #: src/postulo/templates/documents/letter_detail.html
@@ -12085,6 +12223,10 @@ msgstr "Нәтижелер"
 #: src/postulo/core/design.py src/postulo/templates/server/design.html
 msgid "Outline"
 msgstr "Контур"
+
+#: src/postulo/templates/server/record_of_processing.html
+msgid "Outside services it may call"
+msgstr ""
 
 #: src/postulo/templates/applications/calendar.html
 msgid "Overdue"
@@ -13361,6 +13503,16 @@ msgstr "Ұсынысты тіркеу"
 msgid "Record and change: applications, listings, notes, reminders, letters, your details. A call that changes a record answers with the whole record, timeline and contacts included, so this can see what it touches"
 msgstr "Тіркеу және өзгерту: өтінімдер, вакансиялар, ескертпелер, еске салғыштар, хаттар, сіздің деректеріңіз. Жазбаны өзгертетін сұрау хронологиясы мен контактілерін қоса бүкіл жазбаны қайтарады, сондықтан бұл өзі өзгертетін нәрсені көре алады"
 
+#: src/postulo/templates/jobs/company_register.html
+#, python-format
+msgid "Record it as %(state)s"
+msgstr ""
+
+#: src/postulo/templates/jobs/company_register.html
+#, python-format
+msgid "Record it as %(state)s since %(date)s"
+msgstr ""
+
 #: src/postulo/templates/jobs/company_wikidata.html
 #, python-format
 msgid "Record it as acquired or merged into <bdi>%(name)s</bdi>"
@@ -13569,6 +13721,10 @@ msgstr "Қабылданбады: %(fields)s. Әрқайсысының қате�
 msgid "region"
 msgstr "аймақ"
 
+#: src/postulo/templates/jobs/company_register.html
+msgid "Register number"
+msgstr ""
+
 #: src/postulo/templates/connections/form.html
 msgid "Register this address with the provider"
 msgstr "Бұл мекенжайды провайдерде тіркеу"
@@ -13580,6 +13736,11 @@ msgstr "Алдымен осы дананы провайдерде тіркеп, 
 #: src/postulo/plugins/consent.py
 msgid "Register this instance with the provider first, and save the client id."
 msgstr "Алдымен осы дананы провайдерде тіркеп, клиент идентификаторын сақтаңыз."
+
+#: src/postulo/jobs/register_views.py
+#: src/postulo/templates/jobs/company_register.html
+msgid "Registered office"
+msgstr ""
 
 #: src/postulo/templates/server/signin.html
 msgid "Registration is open: anyone who finds the address may create an account."
@@ -13821,6 +13982,11 @@ msgstr "Сақтау мерзімі"
 #: src/postulo/applications/models.py
 msgid "retired on"
 msgstr "тоқтатылған күні"
+
+#: src/postulo/templates/jobs/company_register.html
+#, python-format
+msgid "Retrieved %(when)s."
+msgstr ""
 
 #: src/postulo/documents/models.py
 msgid "reusable template"
@@ -14403,6 +14569,11 @@ msgstr "Бетті ашып тұрған браузер түсіріліммен
 #: src/postulo/templates/jobs/contact_form.html
 msgid "Sent with:"
 msgstr "Бірге жіберілген:"
+
+#: src/postulo/templates/server/record_of_processing.html
+#, python-format
+msgid "Sent: %(what)s."
+msgstr ""
 
 #: src/postulo/jobs/forms.py
 msgid "Separate several with commas. Anything new joins your list."
@@ -15127,6 +15298,11 @@ msgstr "Дереккөз — вакансиядағы «Қайдан табыл�
 msgid "source version"
 msgstr "дереккөз нұсқасы"
 
+#: src/postulo/templates/jobs/company_register.html
+#, python-format
+msgid "Source: %(source)s."
+msgstr ""
+
 #: src/postulo/templates/widgets/sources.html
 msgid "Sources"
 msgstr "Дереккөздер"
@@ -15206,7 +15382,8 @@ msgstr "STARTTLS, қосылғаннан кейін"
 msgid "state"
 msgstr "күйі"
 
-#: src/postulo/jobs/tables.py src/postulo/templates/server/person_recovery.html
+#: src/postulo/jobs/tables.py src/postulo/templates/jobs/company_register.html
+#: src/postulo/templates/server/person_recovery.html
 msgid "State"
 msgstr "Күйі"
 
@@ -15670,6 +15847,10 @@ msgstr "рәсімделусіз мәтін"
 #: src/postulo/core/search.py
 msgid "Text you sent"
 msgstr "Сіз жіберген мәтін"
+
+#: src/postulo/jobs/register_views.py
+msgid "That address could not be added."
+msgstr ""
 
 #: src/postulo/jobs/logos.py
 #, python-format
@@ -16151,6 +16332,10 @@ msgstr "Бұл сілтеме енді жұмыс істемейді."
 msgid "That name cannot be checked just now."
 msgstr "Бұл атауды дәл қазір тексеру мүмкін емес."
 
+#: src/postulo/jobs/register_lookup.py
+msgid "That number cannot be asked of this register."
+msgstr ""
+
 #: src/postulo/core/phones.py
 msgid "That number has no area code."
 msgstr "Бұл нөмірде аймақ коды жоқ."
@@ -16523,6 +16708,10 @@ msgstr "Бұл компания тиесілі компания, егер онд
 msgid "The company you are applying to"
 msgstr "Өтінім беріп жатқан компанияңыз"
 
+#: src/postulo/jobs/register_lookup.py
+msgid "the company's LEI"
+msgstr ""
+
 #: src/postulo/core/web_links.py
 msgid "The company's LinkedIn page, or wherever it posts."
 msgstr "Компанияның LinkedIn беті немесе ол жазбалар жариялайтын басқа орын."
@@ -16530,6 +16719,10 @@ msgstr "Компанияның LinkedIn беті немесе ол жазбал�
 #: src/postulo/core/web_links.py
 msgid "The company's own pages: its LinkedIn page, its Mastodon or Bluesky account, its YouTube channel — as many as are worth keeping, with one marked as the one to show."
 msgstr "Компанияның өз беттері: LinkedIn беті, Mastodon немесе Bluesky тіркелгісі, YouTube арнасы — сақтауға тұрарлықтың бәрі, біреуі көрсетілетін бет ретінде белгіленеді."
+
+#: src/postulo/jobs/register_lookup.py
+msgid "the company's register number"
+msgstr ""
 
 #: src/postulo/documents/archiving.py src/postulo/notifications/webhooks.py
 msgid "The connection is gone or switched off."
@@ -16922,6 +17115,21 @@ msgstr "Күтудегі соңғысы."
 msgid "The last ten things the timeline recorded, whichever application they were on."
 msgstr "Хронология тіркеген соңғы он оқиға, қай өтінімге қатысты болса да."
 
+#: src/postulo/jobs/register_views.py
+#, python-format
+msgid "The LEI record gives the register number %(number)s, which is not one a register number here can be."
+msgstr ""
+
+#: src/postulo/templates/jobs/company_register.html
+#, python-format
+msgid "The LEI record gives the register number <bdi>%(found)s</bdi>, and this company has <bdi>%(stored)s</bdi>. One of them may be out of date, or the company may be registered in more than one place."
+msgstr ""
+
+#: src/postulo/templates/jobs/company_register.html
+#, python-format
+msgid "The LEI record gives the same register number as this company's, <bdi>%(stored)s</bdi>."
+msgstr ""
+
 #: src/postulo/resume/forms.py
 msgid "The level of the qualification in the European Qualifications Framework, which a diploma or its supplement may state. Postulo never works it out from the qualification’s name."
 msgstr "Еуропалық біліктілік шеңберіндегі біліктілік деңгейі; ол дипломда немесе оның қосымшасында көрсетілуі мүмкін. Postulo оны біліктіліктің атауынан ешқашан анықтамайды."
@@ -17243,6 +17451,18 @@ msgstr "Осы дана өңдейтін деректердің және ола�
 #: src/postulo/documents/models.py
 msgid "The referee sends it themselves"
 msgstr "Кепілдеме беруші оны өзі жібереді"
+
+#: src/postulo/jobs/register_lookup.py
+msgid "The register has no entry with that number."
+msgstr ""
+
+#: src/postulo/jobs/register_lookup.py
+msgid "The register's address is not one it declared."
+msgstr ""
+
+#: src/postulo/jobs/register_lookup.py
+msgid "The register's answer could not be read."
+msgstr ""
 
 #: src/postulo/jobs/rendering.py
 msgid "The renderer could not be started."
@@ -17657,6 +17877,10 @@ msgstr "Мұнда оқитын мессенджердегі ат жоқ."
 #: src/postulo/jobs/pages.py
 msgid "There is no kept source to draw from, and a rendering is drawn from it."
 msgstr "Салу үшін сақталған бет коды жоқ, ал бет кескіні соның негізінде салынады."
+
+#: src/postulo/jobs/register_lookup.py
+msgid "There is no number to look up."
+msgstr ""
 
 #: src/postulo/core/server_views.py
 msgid "There is no repository by that name."
@@ -18703,6 +18927,11 @@ msgstr "Пайдалану"
 msgid "Use 3 to 32 lowercase letters, digits, dots, underscores or hyphens, starting and ending with a letter or digit."
 msgstr "Әріппен немесе цифрмен басталып, аяқталатын 3–32 кіші әріп, цифр, нүкте, астын сызу таңбасы немесе дефис пайдаланыңыз."
 
+#: src/postulo/templates/jobs/company_register.html
+#, python-format
+msgid "Use <bdi>%(name)s</bdi> as its name, in place of <bdi>%(current)s</bdi>"
+msgstr ""
+
 #: src/postulo/jobs/tiles.py
 msgid "Use an https:// address, or a path starting with / on this instance's own address."
 msgstr "https:// мекенжайын немесе осы дананың өз мекенжайындағы / таңбасынан басталатын жолды пайдаланыңыз."
@@ -19399,6 +19628,10 @@ msgstr "Бұл жағдайда не істеу керектігі, бір сө�
 #: src/postulo/applications/forms.py
 msgid "What to do. It is what the reminder says when it falls due."
 msgstr "Не істеу керек. Еске салғыштың мерзімі келгенде дәл осы мәтін көрсетіледі."
+
+#: src/postulo/templates/jobs/company_register.html
+msgid "What to keep"
+msgstr ""
 
 #: src/postulo/templates/applications/report.html
 msgid "What type of employer"

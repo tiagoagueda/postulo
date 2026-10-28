@@ -1054,6 +1054,13 @@ class CompanyDetailView(SharedObjectMixin, DetailView):
         # Which of the company's identifiers do not fit together, worked out as the page is
         # drawn and told, never refused (#675). Hidden ones count: a warning concerns them too.
         context["identifier_findings"] = identifiers.findings(self.object.identifiers.all())
+        # *Look up* beside a register number or an LEI, where a register answers for it and
+        # the feature is on (#1021); only for who may keep what it brings back.
+        from . import register_views
+
+        context["register_lookups"] = (
+            register_views.lookups_for(self.object, person) if context["can_write"] else []
+        )
         # The data-subject export beside each contact, while the feature offers it (#297).
         from postulo.core import gdpr
 

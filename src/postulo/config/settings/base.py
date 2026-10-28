@@ -506,6 +506,11 @@ POSTULO_WIKIDATA_RATE = env("POSTULO_WIKIDATA_RATE", default="60/h")
 # (#688): one request to doi.org or to pub.orcid.org per press, spent before the request and
 # so spent whether the service answers or not.
 POSTULO_LOOKUP_RATE = env("POSTULO_LOOKUP_RATE", default="20/h")
+# *Look up* in a company register, per account (#1021): one company per press, to a
+# government's service whose terms ask for a few requests a second at most (France's says 7
+# per address, Czechia's blocks past 500 a minute). Thirty an hour is a morning of tidying
+# companies, and nowhere near what a register would notice.
+POSTULO_REGISTER_LOOKUP_RATE = env("POSTULO_REGISTER_LOOKUP_RATE", default="30/h")
 # Per token rather than per account, so revoking one revokes its allowance with it.
 POSTULO_API_RATE = env("POSTULO_API_RATE", default="600/h")
 # What every token of one account may do together (#799), since tokens are free to make.

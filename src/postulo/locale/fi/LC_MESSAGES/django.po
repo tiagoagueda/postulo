@@ -1196,6 +1196,51 @@ msgstr "%(provider)s ei anna sovelluksen lähettää itsenäisesti. Valitse ”K
 msgid "%(record)s points at %(names)s, which %(grantee)s cannot see and which is not yours to share. Nothing was shared."
 msgstr "%(record)s viittaa kohteeseen %(names)s, jota %(grantee)s ei näe ja jota sinä et voi jakaa. Mitään ei jaettu."
 
+#: src/postulo/jobs/register_lookup.py
+#, python-format
+msgid "%(register)s answered %(status)s."
+msgstr ""
+
+#: src/postulo/jobs/register_lookup.py
+#, python-format
+msgid "%(register)s asked for fewer requests. Try again later."
+msgstr ""
+
+#: src/postulo/jobs/register_lookup.py
+#, python-format
+msgid "%(register)s could not be reached."
+msgstr ""
+
+#: src/postulo/templates/jobs/company_register.html
+#, python-format
+msgid "%(register)s has an entry for this number."
+msgstr ""
+
+#: src/postulo/jobs/register_lookup.py
+#, python-format
+msgid "%(register)s has removed this entry."
+msgstr ""
+
+#: src/postulo/jobs/register_lookup.py
+#, python-format
+msgid "%(register)s sent the request somewhere else."
+msgstr ""
+
+#: src/postulo/jobs/register_lookup.py
+#, python-format
+msgid "%(register)s took too long to answer."
+msgstr ""
+
+#: src/postulo/jobs/register_lookup.py
+#, python-format
+msgid "%(register)s's answer could not be read."
+msgstr ""
+
+#: src/postulo/jobs/register_lookup.py
+#, python-format
+msgid "%(register)s's answer was larger than one company's should be."
+msgstr ""
+
 #: src/postulo/core/gdpr.py
 #, python-format
 msgid "%(removed)s; %(kept)s"
@@ -2745,6 +2790,10 @@ msgstr "Toiminnot kohteelle %(what)s"
 msgid "Active"
 msgstr "Toiminnassa"
 
+#: src/postulo/templates/jobs/company_register.html
+msgid "Activity"
+msgstr ""
+
 #: src/postulo/templates/applications/application_detail.html
 #: src/postulo/templates/jobs/company_detail.html
 #: src/postulo/templates/jobs/company_form.html
@@ -2759,6 +2808,11 @@ msgstr "Lisää"
 #, python-format
 msgid "Add %(name)s"
 msgstr "Lisää %(name)s"
+
+#: src/postulo/templates/jobs/company_register.html
+#, python-format
+msgid "Add <bdi>%(address)s</bdi> to its addresses, as its registered office"
+msgstr ""
 
 #: src/postulo/templates/jobs/company_list.html
 msgid "Add a company"
@@ -2849,6 +2903,16 @@ msgstr "Lisää valitsemani kortit"
 #: src/postulo/templates/resume/overview.html
 msgid "Add the first one."
 msgstr "Lisää ensimmäinen."
+
+#: src/postulo/templates/jobs/company_register.html
+#, python-format
+msgid "Add the industry %(industry)s (NACE %(division)s)"
+msgstr ""
+
+#: src/postulo/templates/jobs/company_register.html
+#, python-format
+msgid "Add the register number <bdi>%(number)s</bdi>"
+msgstr ""
 
 #: src/postulo/templates/resume/publication_orcid.html
 msgid "Add the ticked works"
@@ -3358,6 +3422,11 @@ msgstr "Toinen varmuuskopiointi oli jo käynnissä."
 msgid "Another invitation"
 msgstr "Toinen kutsu"
 
+#: src/postulo/jobs/register_views.py
+#, python-format
+msgid "Another of your companies already has the register number %(number)s."
+msgstr ""
+
 #: src/postulo/api/idempotency.py
 msgid "Another request is using this Idempotency-Key; try again in a moment."
 msgstr "Toinen pyyntö käyttää tätä Idempotency-Key-avainta; yritä hetken kuluttua uudelleen."
@@ -3803,6 +3872,10 @@ msgstr "Aasia"
 #: src/postulo/resume/models.py
 msgid "Asked"
 msgstr "Pyydetty"
+
+#: src/postulo/templates/server/record_of_processing.html
+msgid "Asked only when somebody presses for it, one company at a time. Each is sent what is listed and nothing about the person asking."
+msgstr ""
 
 #: src/postulo/applications/analytics.py src/postulo/applications/models.py
 msgid "Assessment"
@@ -4252,6 +4325,7 @@ msgstr "Paluu-URL, joka rekisteröidään palveluntarjoajalle"
 #: src/postulo/templates/jobs/address_place.html
 #: src/postulo/templates/jobs/capture_page_forget.html
 #: src/postulo/templates/jobs/company_form.html
+#: src/postulo/templates/jobs/company_register.html
 #: src/postulo/templates/jobs/company_wikidata.html
 #: src/postulo/templates/jobs/contact_form.html
 #: src/postulo/templates/jobs/industry_form.html
@@ -5033,6 +5107,10 @@ msgstr "yrityksen nimi"
 #: src/postulo/jobs/models.py
 msgid "company names"
 msgstr "yritysten nimet"
+
+#: src/postulo/plugins/kinds.py
+msgid "Company registers"
+msgstr ""
 
 #: src/postulo/jobs/views.py
 msgid "Company updated."
@@ -7212,6 +7290,11 @@ msgstr "lähteestä %(name)s"
 msgid "From %(name)s."
 msgstr "Lähettäjä: %(name)s."
 
+#: src/postulo/templates/jobs/company_register.html
+#, python-format
+msgid "From %(register)s"
+msgstr ""
+
 #: src/postulo/templates/cotton/date_picker.html
 #, python-format
 msgid "From %(start)s to %(end)s"
@@ -8645,6 +8728,15 @@ msgstr "Se on voimassa %(when)s asti tai kunnes se käytetään tai perutaan."
 msgid "It works."
 msgstr "Se toimii."
 
+#: src/postulo/jobs/register_views.py
+msgid "Its address is already listed."
+msgstr ""
+
+#: src/postulo/templates/server/record_of_processing.html
+#, python-format
+msgid "Its data are under %(licence)s."
+msgstr ""
+
 #: src/postulo/applications/ical_import.py
 msgid "Its date could not be read."
 msgstr "Sen päivämäärää ei voitu lukea."
@@ -8660,6 +8752,10 @@ msgstr "Tiedosto vastaa sitä, minkä virallinen liitännäislähde on allekirjo
 #: src/postulo/jobs/models.py
 msgid "Its general mailbox, such as jobs@ or info@. A person's address goes on a contact."
 msgstr "Sen yleinen sähköpostilaatikko, kuten jobs@ tai info@. Henkilön osoite merkitään yhteyshenkilölle."
+
+#: src/postulo/jobs/register_views.py
+msgid "Its industry is already listed."
+msgstr ""
 
 #: src/postulo/templates/jobs/company_wikidata.html
 msgid "Its legal state"
@@ -8801,6 +8897,10 @@ msgstr "Säilytä nämä"
 msgid "Keep this view as"
 msgstr "Tallenna tämä näkymä nimellä"
 
+#: src/postulo/templates/jobs/company_register.html
+msgid "Keep what is ticked"
+msgstr ""
+
 #: src/postulo/templates/server/capture.html
 msgid "Keeping a page Postulo was allowed to fetch, for the person who asked for it, asks nothing more of robots.txt: no page is fetched a second time to keep it."
 msgstr "Kun Postulo säilyttää sivun, jonka se sai hakea, sen pyytäneelle henkilölle, robots.txt:ltä ei tarvita mitään lisää: sivua ei haeta toista kertaa säilyttämistä varten."
@@ -8870,6 +8970,11 @@ msgstr "Säilytetään nyt tässä instanssissa"
 #: src/postulo/templates/server/capture.html
 msgid "Kept pages are never deleted by the instance, only by the person whose they are."
 msgstr "Instanssi ei koskaan poista säilytettyjä sivuja; vain henkilö, jolle ne kuuluvat, voi poistaa ne."
+
+#: src/postulo/jobs/register_views.py
+#, python-format
+msgid "Kept what %(register)s said."
+msgstr ""
 
 #: src/postulo/jobs/views.py
 msgid "Kept what Wikidata said."
@@ -9458,6 +9563,11 @@ msgstr "Pituusaste"
 
 #: src/postulo/templates/resume/item_form.html
 msgid "Look up"
+msgstr ""
+
+#: src/postulo/templates/jobs/company_detail.html
+#, python-format
+msgid "Look up in %(register)s"
 msgstr ""
 
 #: src/postulo/core/models.py
@@ -10483,6 +10593,10 @@ msgstr "Tässä konsernissa ei ole missään kirjattuja ilmoituksia."
 msgid "No postings recorded for this company."
 msgstr "Tälle yritykselle ei ole kirjattu ilmoituksia."
 
+#: src/postulo/jobs/register_views.py
+msgid "No register this instance asks answers for that number."
+msgstr ""
+
 #: src/postulo/jobs/page_views.py
 msgid "No rendering was kept of that page."
 msgstr "Siitä sivusta ei säilytetty renderöintiä."
@@ -11055,6 +11169,10 @@ msgstr "Tässä mitään ei voi muuttaa: se rakennetaan asiakirjan merkinnöist�
 msgid "Nothing here can install a plugin: this environment has neither uv nor pip. Postulo's own image ships uv; an image built without it needs one of the two on the path."
 msgstr "Täältä ei voi asentaa liitännäistä: tässä ympäristössä ei ole uv:tä eikä pipiä. Postulon oma levykuva sisältää uv:n; ilman sitä rakennettu levykuva tarvitsee jommankumman hakupolkuun."
 
+#: src/postulo/templates/jobs/company_register.html
+msgid "Nothing here differs from what the company already has."
+msgstr ""
+
 #: src/postulo/templates/jobs/industry_list.html
 #, fuzzy
 msgid "Nothing here matches that. Only fields you have actually used appear on this page."
@@ -11282,6 +11400,10 @@ msgstr "Siitä sivusta ei säilytetty mitään."
 msgid "Nothing was kept of this page"
 msgstr "Tästä sivusta ei säilytetty mitään"
 
+#: src/postulo/jobs/register_views.py
+msgid "Nothing was kept."
+msgstr ""
+
 #: src/postulo/core/gdpr.py
 msgid "Nothing was left to remove."
 msgstr "Poistettavaa ei jäänyt."
@@ -11480,6 +11602,10 @@ msgstr "Tarjoukset rinnakkain"
 #: src/postulo/plugins/models.py src/postulo/plugins/provenance.py
 msgid "Official"
 msgstr "Virallinen"
+
+#: src/postulo/templates/jobs/company_register.html
+msgid "Official name"
+msgstr ""
 
 #: src/postulo/core/models.py
 msgid "Older backups are deleted only after a new one has been written and checked. Archives you uploaded are never deleted by this."
@@ -11724,6 +11850,10 @@ msgid_plural "%(total)s records were added. Nothing you already had was changed 
 msgstr[0] "Yksi tietue lisättiin. Mitään aiempaa ei muutettu eikä poistettu."
 msgstr[1] "%(total)s tietuetta lisättiin. Mitään aiempaa ei muutettu eikä poistettu."
 
+#: src/postulo/templates/jobs/company_detail.html
+msgid "One request to that register, carrying the number alone; nothing is kept until you say so."
+msgstr ""
+
 #: src/postulo/templates/jobs/company_form.html
 msgid "One request to www.wikidata.org for this company's item; nothing is kept until you say so."
 msgstr "Yksi pyyntö osoitteeseen www.wikidata.org tämän yrityksen kohteesta; mitään ei tallenneta ennen kuin sanot niin."
@@ -11880,6 +12010,10 @@ msgstr "Vain palvelimen ylläpitäjän oma tili voi lakata olemasta ylläpitäj�
 msgid "Only the year prints on a CV, so the day makes no difference."
 msgstr "Ansioluetteloon tulostetaan vain vuosi, joten päivällä ei ole merkitystä."
 
+#: src/postulo/templates/jobs/company_register.html
+msgid "Only what you tick is kept; nothing else on the company changes."
+msgstr ""
+
 #: src/postulo/templates/server/design.html
 msgid "Open a dialog with a choice in it"
 msgstr "Avaa valintaikkuna, jossa on valinta"
@@ -11903,6 +12037,10 @@ msgstr "Avaa tällaisena"
 #: src/postulo/templates/jobs/capture_review.html
 msgid "Open it"
 msgstr "Avaa se"
+
+#: src/postulo/templates/jobs/company_register.html
+msgid "Open it there"
+msgstr ""
 
 #: src/postulo/templates/documents/cv_detail.html
 #: src/postulo/templates/documents/letter_detail.html
@@ -12083,6 +12221,10 @@ msgstr "Tulokset"
 #: src/postulo/core/design.py src/postulo/templates/server/design.html
 msgid "Outline"
 msgstr "Ääriviiva"
+
+#: src/postulo/templates/server/record_of_processing.html
+msgid "Outside services it may call"
+msgstr ""
 
 #: src/postulo/templates/applications/calendar.html
 msgid "Overdue"
@@ -13372,6 +13514,16 @@ msgstr "Kirjaa tarjous"
 msgid "Record and change: applications, listings, notes, reminders, letters, your details. A call that changes a record answers with the whole record, timeline and contacts included, so this can see what it touches"
 msgstr "Tallentaminen ja muuttaminen: hakemukset, ilmoitukset, muistiinpanot, muistutukset, kirjeet, omat tietosi. Tietuetta muuttava kutsu vastaa koko tietueella aikajanoineen ja yhteyshenkilöineen, joten tämä näkee, mihin se koskee"
 
+#: src/postulo/templates/jobs/company_register.html
+#, python-format
+msgid "Record it as %(state)s"
+msgstr ""
+
+#: src/postulo/templates/jobs/company_register.html
+#, python-format
+msgid "Record it as %(state)s since %(date)s"
+msgstr ""
+
 #: src/postulo/templates/jobs/company_wikidata.html
 #, python-format
 msgid "Record it as acquired or merged into <bdi>%(name)s</bdi>"
@@ -13581,6 +13733,10 @@ msgstr "Hylätty: %(fields)s. Katso kohdasta %(member)s, mikä kussakin on viall
 msgid "region"
 msgstr "alue"
 
+#: src/postulo/templates/jobs/company_register.html
+msgid "Register number"
+msgstr ""
+
 #: src/postulo/templates/connections/form.html
 msgid "Register this address with the provider"
 msgstr "Rekisteröi tämä osoite palveluntarjoajalle"
@@ -13592,6 +13748,11 @@ msgstr "Rekisteröi tämä instanssi ensin palveluntarjoajalle ja tallenna asiak
 #: src/postulo/plugins/consent.py
 msgid "Register this instance with the provider first, and save the client id."
 msgstr "Rekisteröi tämä instanssi ensin palveluntarjoajalle ja tallenna asiakastunnus."
+
+#: src/postulo/jobs/register_views.py
+#: src/postulo/templates/jobs/company_register.html
+msgid "Registered office"
+msgstr ""
 
 #: src/postulo/templates/server/signin.html
 msgid "Registration is open: anyone who finds the address may create an account."
@@ -13837,6 +13998,11 @@ msgstr "Säilytys"
 #, fuzzy
 msgid "retired on"
 msgstr "lakkautettu"
+
+#: src/postulo/templates/jobs/company_register.html
+#, python-format
+msgid "Retrieved %(when)s."
+msgstr ""
 
 #: src/postulo/documents/models.py
 msgid "reusable template"
@@ -14422,6 +14588,11 @@ msgstr "Sivua katsonut selain lähetti kaappauksen mukana"
 #: src/postulo/templates/jobs/contact_form.html
 msgid "Sent with:"
 msgstr "Mukana lähetetty:"
+
+#: src/postulo/templates/server/record_of_processing.html
+#, python-format
+msgid "Sent: %(what)s."
+msgstr ""
 
 #: src/postulo/jobs/forms.py
 msgid "Separate several with commas. Anything new joins your list."
@@ -15147,6 +15318,11 @@ msgstr "Lähde on ilmoituksen ”löydetty”-kenttä. Täytä se, niin tämä t
 msgid "source version"
 msgstr "lähteen versio"
 
+#: src/postulo/templates/jobs/company_register.html
+#, python-format
+msgid "Source: %(source)s."
+msgstr ""
+
 #: src/postulo/templates/widgets/sources.html
 msgid "Sources"
 msgstr "Lähteet"
@@ -15227,7 +15403,8 @@ msgstr "STARTTLS, yhdistämisen jälkeen"
 msgid "state"
 msgstr "tila"
 
-#: src/postulo/jobs/tables.py src/postulo/templates/server/person_recovery.html
+#: src/postulo/jobs/tables.py src/postulo/templates/jobs/company_register.html
+#: src/postulo/templates/server/person_recovery.html
 msgid "State"
 msgstr "Tila"
 
@@ -15696,6 +15873,10 @@ msgstr "teksti ilman ulkoasua"
 #: src/postulo/core/search.py
 msgid "Text you sent"
 msgstr "Lähettämäsi teksti"
+
+#: src/postulo/jobs/register_views.py
+msgid "That address could not be added."
+msgstr ""
 
 #: src/postulo/jobs/logos.py
 #, python-format
@@ -16178,6 +16359,10 @@ msgstr "Tuo linkki ei enää toimi."
 msgid "That name cannot be checked just now."
 msgstr "Nimeä ei voi tarkistaa juuri nyt."
 
+#: src/postulo/jobs/register_lookup.py
+msgid "That number cannot be asked of this register."
+msgstr ""
+
 #: src/postulo/core/phones.py
 msgid "That number has no area code."
 msgstr "Tässä numerossa ei ole suuntanumeroa."
@@ -16549,6 +16734,10 @@ msgstr "Yritys, johon tämä kuuluu, jos se kuuluu johonkin."
 msgid "The company you are applying to"
 msgstr "Yritys, johon haet"
 
+#: src/postulo/jobs/register_lookup.py
+msgid "the company's LEI"
+msgstr ""
+
 #: src/postulo/core/web_links.py
 msgid "The company's LinkedIn page, or wherever it posts."
 msgstr "Yrityksen LinkedIn-sivu tai mikä tahansa paikka, jossa se julkaisee."
@@ -16556,6 +16745,10 @@ msgstr "Yrityksen LinkedIn-sivu tai mikä tahansa paikka, jossa se julkaisee."
 #: src/postulo/core/web_links.py
 msgid "The company's own pages: its LinkedIn page, its Mastodon or Bluesky account, its YouTube channel — as many as are worth keeping, with one marked as the one to show."
 msgstr "Yrityksen omat sivut: sen LinkedIn-sivu, Mastodon- tai Bluesky-tili, YouTube-kanava – niin monta kuin kannattaa säilyttää, ja yksi niistä merkittynä näytettäväksi."
+
+#: src/postulo/jobs/register_lookup.py
+msgid "the company's register number"
+msgstr ""
 
 #: src/postulo/documents/archiving.py src/postulo/notifications/webhooks.py
 msgid "The connection is gone or switched off."
@@ -16947,6 +17140,21 @@ msgstr "Viimeinen odottava."
 msgid "The last ten things the timeline recorded, whichever application they were on."
 msgstr "Kymmenen viimeisintä aikajanan merkintää hakemuksesta riippumatta."
 
+#: src/postulo/jobs/register_views.py
+#, python-format
+msgid "The LEI record gives the register number %(number)s, which is not one a register number here can be."
+msgstr ""
+
+#: src/postulo/templates/jobs/company_register.html
+#, python-format
+msgid "The LEI record gives the register number <bdi>%(found)s</bdi>, and this company has <bdi>%(stored)s</bdi>. One of them may be out of date, or the company may be registered in more than one place."
+msgstr ""
+
+#: src/postulo/templates/jobs/company_register.html
+#, python-format
+msgid "The LEI record gives the same register number as this company's, <bdi>%(stored)s</bdi>."
+msgstr ""
+
 #: src/postulo/resume/forms.py
 msgid "The level of the qualification in the European Qualifications Framework, which a diploma or its supplement may state. Postulo never works it out from the qualification’s name."
 msgstr "Tutkinnon taso eurooppalaisessa tutkintojen viitekehyksessä, jonka tutkintotodistus tai sen liite voi ilmoittaa. Postulo ei koskaan päättele sitä tutkinnon nimestä."
@@ -17269,6 +17477,18 @@ msgstr "Seloste siitä, mitä tämä instanssi käsittelee ja kuka tiedot saa."
 #: src/postulo/documents/models.py
 msgid "The referee sends it themselves"
 msgstr "Suosittelija lähettää sen itse"
+
+#: src/postulo/jobs/register_lookup.py
+msgid "The register has no entry with that number."
+msgstr ""
+
+#: src/postulo/jobs/register_lookup.py
+msgid "The register's address is not one it declared."
+msgstr ""
+
+#: src/postulo/jobs/register_lookup.py
+msgid "The register's answer could not be read."
+msgstr ""
 
 #: src/postulo/jobs/rendering.py
 msgid "The renderer could not be started."
@@ -17681,6 +17901,10 @@ msgstr "Tässä ei ole luettavaa käyttäjänimeä."
 #: src/postulo/jobs/pages.py
 msgid "There is no kept source to draw from, and a rendering is drawn from it."
 msgstr "Säilytettyä lähdettä ei ole, ja renderöinti piirretään siitä."
+
+#: src/postulo/jobs/register_lookup.py
+msgid "There is no number to look up."
+msgstr ""
 
 #: src/postulo/core/server_views.py
 msgid "There is no repository by that name."
@@ -18733,6 +18957,11 @@ msgstr "Käyttö"
 msgid "Use 3 to 32 lowercase letters, digits, dots, underscores or hyphens, starting and ending with a letter or digit."
 msgstr "Käytä 3–32 pientä kirjainta, numeroa, pistettä, alaviivaa tai yhdysmerkkiä; alussa ja lopussa kirjain tai numero."
 
+#: src/postulo/templates/jobs/company_register.html
+#, python-format
+msgid "Use <bdi>%(name)s</bdi> as its name, in place of <bdi>%(current)s</bdi>"
+msgstr ""
+
 #: src/postulo/jobs/tiles.py
 msgid "Use an https:// address, or a path starting with / on this instance's own address."
 msgstr "Käytä https://-osoitetta tai polkua, joka alkaa merkillä / tämän instanssin omassa osoitteessa."
@@ -19430,6 +19659,10 @@ msgstr "Mitä asialle voi tehdä, yhdellä lauseella."
 #: src/postulo/applications/forms.py
 msgid "What to do. It is what the reminder says when it falls due."
 msgstr "Mitä pitää tehdä. Tämän muistutus kertoo, kun se laukeaa."
+
+#: src/postulo/templates/jobs/company_register.html
+msgid "What to keep"
+msgstr ""
 
 #: src/postulo/templates/applications/report.html
 msgid "What type of employer"

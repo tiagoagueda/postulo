@@ -1196,6 +1196,51 @@ msgstr "%(provider)s nem engedi, hogy egy alkalmazás önállóan küldjön. Vá
 msgid "%(record)s points at %(names)s, which %(grantee)s cannot see and which is not yours to share. Nothing was shared."
 msgstr "%(record)s a következőre hivatkozik: %(names)s, amelyet %(grantee)s nem láthat, és amelyet Ön nem oszthat meg. Semmi sem lett megosztva."
 
+#: src/postulo/jobs/register_lookup.py
+#, python-format
+msgid "%(register)s answered %(status)s."
+msgstr ""
+
+#: src/postulo/jobs/register_lookup.py
+#, python-format
+msgid "%(register)s asked for fewer requests. Try again later."
+msgstr ""
+
+#: src/postulo/jobs/register_lookup.py
+#, python-format
+msgid "%(register)s could not be reached."
+msgstr ""
+
+#: src/postulo/templates/jobs/company_register.html
+#, python-format
+msgid "%(register)s has an entry for this number."
+msgstr ""
+
+#: src/postulo/jobs/register_lookup.py
+#, python-format
+msgid "%(register)s has removed this entry."
+msgstr ""
+
+#: src/postulo/jobs/register_lookup.py
+#, python-format
+msgid "%(register)s sent the request somewhere else."
+msgstr ""
+
+#: src/postulo/jobs/register_lookup.py
+#, python-format
+msgid "%(register)s took too long to answer."
+msgstr ""
+
+#: src/postulo/jobs/register_lookup.py
+#, python-format
+msgid "%(register)s's answer could not be read."
+msgstr ""
+
+#: src/postulo/jobs/register_lookup.py
+#, python-format
+msgid "%(register)s's answer was larger than one company's should be."
+msgstr ""
+
 #: src/postulo/core/gdpr.py
 #, python-format
 msgid "%(removed)s; %(kept)s"
@@ -2739,6 +2784,10 @@ msgstr "Műveletek ehhez: %(what)s"
 msgid "Active"
 msgstr "Aktív"
 
+#: src/postulo/templates/jobs/company_register.html
+msgid "Activity"
+msgstr ""
+
 #: src/postulo/templates/applications/application_detail.html
 #: src/postulo/templates/jobs/company_detail.html
 #: src/postulo/templates/jobs/company_form.html
@@ -2753,6 +2802,11 @@ msgstr "Hozzáadás"
 #, python-format
 msgid "Add %(name)s"
 msgstr "%(name)s hozzáadása"
+
+#: src/postulo/templates/jobs/company_register.html
+#, python-format
+msgid "Add <bdi>%(address)s</bdi> to its addresses, as its registered office"
+msgstr ""
 
 #: src/postulo/templates/jobs/company_list.html
 msgid "Add a company"
@@ -2840,6 +2894,16 @@ msgstr "A bejelölt névjegyek hozzáadása"
 #: src/postulo/templates/resume/overview.html
 msgid "Add the first one."
 msgstr "Adja hozzá az elsőt."
+
+#: src/postulo/templates/jobs/company_register.html
+#, python-format
+msgid "Add the industry %(industry)s (NACE %(division)s)"
+msgstr ""
+
+#: src/postulo/templates/jobs/company_register.html
+#, python-format
+msgid "Add the register number <bdi>%(number)s</bdi>"
+msgstr ""
 
 #: src/postulo/templates/resume/publication_orcid.html
 msgid "Add the ticked works"
@@ -3347,6 +3411,11 @@ msgstr "Egy másik biztonsági mentés már futott."
 msgid "Another invitation"
 msgstr "Újabb meghívó"
 
+#: src/postulo/jobs/register_views.py
+#, python-format
+msgid "Another of your companies already has the register number %(number)s."
+msgstr ""
+
 #: src/postulo/api/idempotency.py
 msgid "Another request is using this Idempotency-Key; try again in a moment."
 msgstr "Egy másik kérés éppen ezt az Idempotency-Key kulcsot használja; próbálja újra egy pillanat múlva."
@@ -3793,6 +3862,10 @@ msgstr "Ázsia"
 msgid "Asked"
 msgstr "Megkérdezve"
 
+#: src/postulo/templates/server/record_of_processing.html
+msgid "Asked only when somebody presses for it, one company at a time. Each is sent what is listed and nothing about the person asking."
+msgstr ""
+
 #: src/postulo/applications/analytics.py src/postulo/applications/models.py
 msgid "Assessment"
 msgstr "Felmérés"
@@ -4238,6 +4311,7 @@ msgstr "A szolgáltatónál regisztrálandó visszahívási cím"
 #: src/postulo/templates/jobs/address_place.html
 #: src/postulo/templates/jobs/capture_page_forget.html
 #: src/postulo/templates/jobs/company_form.html
+#: src/postulo/templates/jobs/company_register.html
 #: src/postulo/templates/jobs/company_wikidata.html
 #: src/postulo/templates/jobs/contact_form.html
 #: src/postulo/templates/jobs/industry_form.html
@@ -5014,6 +5088,10 @@ msgstr "cégnév"
 #: src/postulo/jobs/models.py
 msgid "company names"
 msgstr "cégnevek"
+
+#: src/postulo/plugins/kinds.py
+msgid "Company registers"
+msgstr ""
 
 #: src/postulo/jobs/views.py
 msgid "Company updated."
@@ -7165,6 +7243,11 @@ msgstr "írta: %(name)s"
 msgid "From %(name)s."
 msgstr "Forrás: %(name)s."
 
+#: src/postulo/templates/jobs/company_register.html
+#, python-format
+msgid "From %(register)s"
+msgstr ""
+
 #: src/postulo/templates/cotton/date_picker.html
 #, python-format
 msgid "From %(start)s to %(end)s"
@@ -8584,6 +8667,15 @@ msgstr "Eddig működik: %(when)s, vagy amíg fel nem használják vagy vissza n
 msgid "It works."
 msgstr "Működik."
 
+#: src/postulo/jobs/register_views.py
+msgid "Its address is already listed."
+msgstr ""
+
+#: src/postulo/templates/server/record_of_processing.html
+#, python-format
+msgid "Its data are under %(licence)s."
+msgstr ""
+
 #: src/postulo/applications/ical_import.py
 msgid "Its date could not be read."
 msgstr "A dátuma nem olvasható be."
@@ -8599,6 +8691,10 @@ msgstr "A fájlja megegyezik azzal, amit a hivatalos tároló aláírt."
 #: src/postulo/jobs/models.py
 msgid "Its general mailbox, such as jobs@ or info@. A person's address goes on a contact."
 msgstr "Az általános postafiókja, pl. jobs@ vagy info@. Egy személy címe a kapcsolattartónál adható meg."
+
+#: src/postulo/jobs/register_views.py
+msgid "Its industry is already listed."
+msgstr ""
 
 #: src/postulo/templates/jobs/company_wikidata.html
 msgid "Its legal state"
@@ -8738,6 +8834,10 @@ msgstr "Ezek megtartása"
 msgid "Keep this view as"
 msgstr "Ennek a nézetnek a mentése ezen a néven"
 
+#: src/postulo/templates/jobs/company_register.html
+msgid "Keep what is ticked"
+msgstr ""
+
 #: src/postulo/templates/server/capture.html
 msgid "Keeping a page Postulo was allowed to fetch, for the person who asked for it, asks nothing more of robots.txt: no page is fetched a second time to keep it."
 msgstr "Egy olyan oldal megőrzése, amelyet a Postulo letölthetett, annak a személynek, aki kérte, nem igényel semmi többet a robots.txt-től: egyetlen oldalt sem töltünk le másodszor a megőrzés kedvéért."
@@ -8807,6 +8907,11 @@ msgstr "Jelenleg ezen a példányon megőrizve"
 #: src/postulo/templates/server/capture.html
 msgid "Kept pages are never deleted by the instance, only by the person whose they are."
 msgstr "A megőrzött oldalakat a példány soha nem törli, csak az, akihez tartoznak."
+
+#: src/postulo/jobs/register_views.py
+#, python-format
+msgid "Kept what %(register)s said."
+msgstr ""
 
 #: src/postulo/jobs/views.py
 msgid "Kept what Wikidata said."
@@ -9390,6 +9495,11 @@ msgstr "Földrajzi hosszúság"
 
 #: src/postulo/templates/resume/item_form.html
 msgid "Look up"
+msgstr ""
+
+#: src/postulo/templates/jobs/company_detail.html
+#, python-format
+msgid "Look up in %(register)s"
 msgstr ""
 
 #: src/postulo/core/models.py
@@ -10408,6 +10518,10 @@ msgstr "Ebben a cégcsoportban sehol nincs feljegyzett hirdetés."
 msgid "No postings recorded for this company."
 msgstr "Ehhez a céghez nincs feljegyzett hirdetés."
 
+#: src/postulo/jobs/register_views.py
+msgid "No register this instance asks answers for that number."
+msgstr ""
+
 #: src/postulo/jobs/page_views.py
 msgid "No rendering was kept of that page."
 msgstr "Erről az oldalról nem maradt meg oldalkép."
@@ -10978,6 +11092,10 @@ msgstr "Itt semmi sem módosítható: a dokumentum bejegyzéseiből épül fel, 
 msgid "Nothing here can install a plugin: this environment has neither uv nor pip. Postulo's own image ships uv; an image built without it needs one of the two on the path."
 msgstr "Innen nem telepíthető bővítmény: ebben a környezetben nincs se uv, se pip. A Postulo saját lemezképe tartalmazza az uv-t; a nélküle épített lemezképnek a kettő egyikére van szüksége az elérési úton."
 
+#: src/postulo/templates/jobs/company_register.html
+msgid "Nothing here differs from what the company already has."
+msgstr ""
+
 #: src/postulo/templates/jobs/industry_list.html
 msgid "Nothing here matches that. Only fields you have actually used appear on this page."
 msgstr "Itt semmi sem felel meg ennek. Ezen az oldalon csak a ténylegesen használt ágazatok jelennek meg."
@@ -11204,6 +11322,10 @@ msgstr "Erről az oldalról semmi sem maradt meg."
 msgid "Nothing was kept of this page"
 msgstr "Ebből az oldalból semmi sem maradt meg"
 
+#: src/postulo/jobs/register_views.py
+msgid "Nothing was kept."
+msgstr ""
+
 #: src/postulo/core/gdpr.py
 msgid "Nothing was left to remove."
 msgstr "Nem maradt semmi eltávolítandó."
@@ -11401,6 +11523,10 @@ msgstr "Ajánlatok egymás mellett"
 #: src/postulo/plugins/models.py src/postulo/plugins/provenance.py
 msgid "Official"
 msgstr "Hivatalos"
+
+#: src/postulo/templates/jobs/company_register.html
+msgid "Official name"
+msgstr ""
 
 #: src/postulo/core/models.py
 msgid "Older backups are deleted only after a new one has been written and checked. Archives you uploaded are never deleted by this."
@@ -11643,6 +11769,10 @@ msgid_plural "%(total)s records were added. Nothing you already had was changed 
 msgstr[0] "Egy tétel hozzáadva. A meglévő adatai közül semmi sem módosult, és semmi sem lett eltávolítva."
 msgstr[1] "%(total)s tétel hozzáadva. A meglévő adatai közül semmi sem módosult, és semmi sem lett eltávolítva."
 
+#: src/postulo/templates/jobs/company_detail.html
+msgid "One request to that register, carrying the number alone; nothing is kept until you say so."
+msgstr ""
+
 #: src/postulo/templates/jobs/company_form.html
 msgid "One request to www.wikidata.org for this company's item; nothing is kept until you say so."
 msgstr "Egyetlen kérés a www.wikidata.org felé a cég Wikidata-eleméért; semmi sem marad meg, amíg Ön jóvá nem hagyja."
@@ -11799,6 +11929,10 @@ msgstr "Csak az üzemeltető saját fiókja veszítheti el az adminisztrátori j
 msgid "Only the year prints on a CV, so the day makes no difference."
 msgstr "Az önéletrajzon csak az év szerepel, így a nap nem számít."
 
+#: src/postulo/templates/jobs/company_register.html
+msgid "Only what you tick is kept; nothing else on the company changes."
+msgstr ""
+
 #: src/postulo/templates/server/design.html
 msgid "Open a dialog with a choice in it"
 msgstr "Egy választást tartalmazó párbeszédablak megnyitása"
@@ -11822,6 +11956,10 @@ msgstr "Megnyitás így"
 #: src/postulo/templates/jobs/capture_review.html
 msgid "Open it"
 msgstr "Megnyitás"
+
+#: src/postulo/templates/jobs/company_register.html
+msgid "Open it there"
+msgstr ""
 
 #: src/postulo/templates/documents/cv_detail.html
 #: src/postulo/templates/documents/letter_detail.html
@@ -12002,6 +12140,10 @@ msgstr "Eredmények"
 #: src/postulo/core/design.py src/postulo/templates/server/design.html
 msgid "Outline"
 msgstr "Körvonalas"
+
+#: src/postulo/templates/server/record_of_processing.html
+msgid "Outside services it may call"
+msgstr ""
 
 #: src/postulo/templates/applications/calendar.html
 msgid "Overdue"
@@ -13276,6 +13418,16 @@ msgstr "Ajánlat feljegyzése"
 msgid "Record and change: applications, listings, notes, reminders, letters, your details. A call that changes a record answers with the whole record, timeline and contacts included, so this can see what it touches"
 msgstr "Feljegyzés és módosítás: jelentkezések, hirdetések, jegyzetek, emlékeztetők, levelek, elérhetőségei. Egy tételt módosító hívás a teljes tétellel válaszol, az idővonallal és a kapcsolattartókkal együtt, így az ügyfél látja, mit érint"
 
+#: src/postulo/templates/jobs/company_register.html
+#, python-format
+msgid "Record it as %(state)s"
+msgstr ""
+
+#: src/postulo/templates/jobs/company_register.html
+#, python-format
+msgid "Record it as %(state)s since %(date)s"
+msgstr ""
+
 #: src/postulo/templates/jobs/company_wikidata.html
 #, python-format
 msgid "Record it as acquired or merged into <bdi>%(name)s</bdi>"
@@ -13485,6 +13637,10 @@ msgstr "Elutasítva: %(fields)s. Hogy mindegyikkel mi a baj, azt itt találja: %
 msgid "region"
 msgstr "régió"
 
+#: src/postulo/templates/jobs/company_register.html
+msgid "Register number"
+msgstr ""
+
 #: src/postulo/templates/connections/form.html
 msgid "Register this address with the provider"
 msgstr "A cím regisztrálása a szolgáltatónál"
@@ -13496,6 +13652,11 @@ msgstr "Előbb regisztrálja ezt a példányt a szolgáltatónál, és mentse el
 #: src/postulo/plugins/consent.py
 msgid "Register this instance with the provider first, and save the client id."
 msgstr "Előbb regisztrálja ezt a példányt a szolgáltatónál, és mentse el az ügyfél-azonosítót."
+
+#: src/postulo/jobs/register_views.py
+#: src/postulo/templates/jobs/company_register.html
+msgid "Registered office"
+msgstr ""
 
 #: src/postulo/templates/server/signin.html
 msgid "Registration is open: anyone who finds the address may create an account."
@@ -13737,6 +13898,11 @@ msgstr "Megőrzés"
 #: src/postulo/applications/models.py
 msgid "retired on"
 msgstr "visszavonás időpontja"
+
+#: src/postulo/templates/jobs/company_register.html
+#, python-format
+msgid "Retrieved %(when)s."
+msgstr ""
 
 #: src/postulo/documents/models.py
 msgid "reusable template"
@@ -14320,6 +14486,11 @@ msgstr "A rögzítéssel együtt küldte az a böngésző, amelyben az oldal meg
 #: src/postulo/templates/jobs/contact_form.html
 msgid "Sent with:"
 msgstr "Elküldve ezekkel:"
+
+#: src/postulo/templates/server/record_of_processing.html
+#, python-format
+msgid "Sent: %(what)s."
+msgstr ""
 
 #: src/postulo/jobs/forms.py
 msgid "Separate several with commas. Anything new joins your list."
@@ -15041,6 +15212,11 @@ msgstr "A forrás a hirdetés „Forrás” mezője. Töltse ki, és ez a tábl�
 msgid "source version"
 msgstr "beolvasó verziója"
 
+#: src/postulo/templates/jobs/company_register.html
+#, python-format
+msgid "Source: %(source)s."
+msgstr ""
+
 #: src/postulo/templates/widgets/sources.html
 msgid "Sources"
 msgstr "Források"
@@ -15120,7 +15296,8 @@ msgstr "STARTTLS, csatlakozás után"
 msgid "state"
 msgstr "állapot"
 
-#: src/postulo/jobs/tables.py src/postulo/templates/server/person_recovery.html
+#: src/postulo/jobs/tables.py src/postulo/templates/jobs/company_register.html
+#: src/postulo/templates/server/person_recovery.html
 msgid "State"
 msgstr "Állapot"
 
@@ -15583,6 +15760,10 @@ msgstr "szöveg elrendezés nélkül"
 #: src/postulo/core/search.py
 msgid "Text you sent"
 msgstr "Elküldött szövegek"
+
+#: src/postulo/jobs/register_views.py
+msgid "That address could not be added."
+msgstr ""
 
 #: src/postulo/jobs/logos.py
 #, python-format
@@ -16063,6 +16244,10 @@ msgstr "Ez a hivatkozás nem fog többé működni."
 msgid "That name cannot be checked just now."
 msgstr "Ezt a nevet most nem lehet ellenőrizni."
 
+#: src/postulo/jobs/register_lookup.py
+msgid "That number cannot be asked of this register."
+msgstr ""
+
 #: src/postulo/core/phones.py
 msgid "That number has no area code."
 msgstr "Ennek a számnak nincs körzetszáma."
@@ -16434,6 +16619,10 @@ msgstr "A cég, amelyhez ez tartozik, ha tartozik valamelyikhez."
 msgid "The company you are applying to"
 msgstr "A cég, ahová jelentkezik"
 
+#: src/postulo/jobs/register_lookup.py
+msgid "the company's LEI"
+msgstr ""
+
 #: src/postulo/core/web_links.py
 msgid "The company's LinkedIn page, or wherever it posts."
 msgstr "A cég LinkedIn-oldala, vagy bárhol, ahol közzétesz."
@@ -16441,6 +16630,10 @@ msgstr "A cég LinkedIn-oldala, vagy bárhol, ahol közzétesz."
 #: src/postulo/core/web_links.py
 msgid "The company's own pages: its LinkedIn page, its Mastodon or Bluesky account, its YouTube channel — as many as are worth keeping, with one marked as the one to show."
 msgstr "A cég saját oldalai: LinkedIn-oldala, Mastodon- vagy Bluesky-fiókja, YouTube-csatornája – annyi, amennyit érdemes megőrizni, az egyiket megjelenítendőként megjelölve."
+
+#: src/postulo/jobs/register_lookup.py
+msgid "the company's register number"
+msgstr ""
 
 #: src/postulo/documents/archiving.py src/postulo/notifications/webhooks.py
 msgid "The connection is gone or switched off."
@@ -16832,6 +17025,21 @@ msgstr "Az utolsó várakozó."
 msgid "The last ten things the timeline recorded, whichever application they were on."
 msgstr "Az idővonal utolsó tíz bejegyzése, bármelyik jelentkezéshez tartozzanak is."
 
+#: src/postulo/jobs/register_views.py
+#, python-format
+msgid "The LEI record gives the register number %(number)s, which is not one a register number here can be."
+msgstr ""
+
+#: src/postulo/templates/jobs/company_register.html
+#, python-format
+msgid "The LEI record gives the register number <bdi>%(found)s</bdi>, and this company has <bdi>%(stored)s</bdi>. One of them may be out of date, or the company may be registered in more than one place."
+msgstr ""
+
+#: src/postulo/templates/jobs/company_register.html
+#, python-format
+msgid "The LEI record gives the same register number as this company's, <bdi>%(stored)s</bdi>."
+msgstr ""
+
 #: src/postulo/resume/forms.py
 msgid "The level of the qualification in the European Qualifications Framework, which a diploma or its supplement may state. Postulo never works it out from the qualification’s name."
 msgstr "A képesítés szintje az Európai Képesítési Keretrendszerben (EKKR), amelyet az oklevél vagy annak melléklete feltüntethet. A Postulo soha nem a képesítés nevéből vezeti le."
@@ -17153,6 +17361,18 @@ msgstr "Az adatkezelési nyilvántartás: mit dolgoz fel ez a példány, és ki 
 #: src/postulo/documents/models.py
 msgid "The referee sends it themselves"
 msgstr "A referenciaszemély maga küldi el"
+
+#: src/postulo/jobs/register_lookup.py
+msgid "The register has no entry with that number."
+msgstr ""
+
+#: src/postulo/jobs/register_lookup.py
+msgid "The register's address is not one it declared."
+msgstr ""
+
+#: src/postulo/jobs/register_lookup.py
+msgid "The register's answer could not be read."
+msgstr ""
 
 #: src/postulo/jobs/rendering.py
 msgid "The renderer could not be started."
@@ -17564,6 +17784,10 @@ msgstr "Itt nincs beolvasható azonosító."
 #: src/postulo/jobs/pages.py
 msgid "There is no kept source to draw from, and a rendering is drawn from it."
 msgstr "Nincs megőrzött forrás, amelyből meg lehetne rajzolni, pedig az oldalkép abból készül."
+
+#: src/postulo/jobs/register_lookup.py
+msgid "There is no number to look up."
+msgstr ""
 
 #: src/postulo/core/server_views.py
 msgid "There is no repository by that name."
@@ -18608,6 +18832,11 @@ msgstr "Használat"
 msgid "Use 3 to 32 lowercase letters, digits, dots, underscores or hyphens, starting and ending with a letter or digit."
 msgstr "Használjon 3–32 kisbetűt, számjegyet, pontot, aláhúzást vagy kötőjelet, betűvel vagy számjeggyel kezdve és végződve."
 
+#: src/postulo/templates/jobs/company_register.html
+#, python-format
+msgid "Use <bdi>%(name)s</bdi> as its name, in place of <bdi>%(current)s</bdi>"
+msgstr ""
+
 #: src/postulo/jobs/tiles.py
 msgid "Use an https:// address, or a path starting with / on this instance's own address."
 msgstr "https:// kezdetű címet adjon meg, vagy egy /-rel kezdődő útvonalat a példány saját címén."
@@ -19302,6 +19531,10 @@ msgstr "Mit tegyen ilyenkor, egy mondatban."
 #: src/postulo/applications/forms.py
 msgid "What to do. It is what the reminder says when it falls due."
 msgstr "Mi a teendő. Ezt mondja az emlékeztető, amikor esedékessé válik."
+
+#: src/postulo/templates/jobs/company_register.html
+msgid "What to keep"
+msgstr ""
 
 #: src/postulo/templates/applications/report.html
 msgid "What type of employer"

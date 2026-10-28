@@ -2,7 +2,15 @@ from django.urls import path
 
 from postulo.core import modules
 
-from . import capture_views, page_views, share_views, status_views, vcard_views, views
+from . import (
+    capture_views,
+    page_views,
+    register_views,
+    share_views,
+    status_views,
+    vcard_views,
+    views,
+)
 
 app_name = "jobs"
 
@@ -32,6 +40,12 @@ urlpatterns = [
         name="company_wikidata",
     ),
     path("companies/<int:pk>/names/", views.CompanyNamesView.as_view(), name="company_names"),
+    # Look up in a company register, what came back, and keeping what was ticked (#1021).
+    path(
+        "companies/<int:pk>/register/",
+        register_views.CompanyRegisterView.as_view(),
+        name="company_register",
+    ),
     # Its dated hiring signals (#941): add one, change one, take one off.
     path(
         "companies/<int:pk>/signals/",

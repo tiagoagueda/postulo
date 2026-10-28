@@ -1276,6 +1276,51 @@ msgstr "%(provider)s nu permite unei aplicații să trimită singură. Alegeți 
 msgid "%(record)s points at %(names)s, which %(grantee)s cannot see and which is not yours to share. Nothing was shared."
 msgstr "%(record)s trimite la %(names)s, pe care %(grantee)s nu le poate vedea și care nu vă aparțin pentru a le partaja. Nu s-a partajat nimic."
 
+#: src/postulo/jobs/register_lookup.py
+#, python-format
+msgid "%(register)s answered %(status)s."
+msgstr ""
+
+#: src/postulo/jobs/register_lookup.py
+#, python-format
+msgid "%(register)s asked for fewer requests. Try again later."
+msgstr ""
+
+#: src/postulo/jobs/register_lookup.py
+#, python-format
+msgid "%(register)s could not be reached."
+msgstr ""
+
+#: src/postulo/templates/jobs/company_register.html
+#, python-format
+msgid "%(register)s has an entry for this number."
+msgstr ""
+
+#: src/postulo/jobs/register_lookup.py
+#, python-format
+msgid "%(register)s has removed this entry."
+msgstr ""
+
+#: src/postulo/jobs/register_lookup.py
+#, python-format
+msgid "%(register)s sent the request somewhere else."
+msgstr ""
+
+#: src/postulo/jobs/register_lookup.py
+#, python-format
+msgid "%(register)s took too long to answer."
+msgstr ""
+
+#: src/postulo/jobs/register_lookup.py
+#, python-format
+msgid "%(register)s's answer could not be read."
+msgstr ""
+
+#: src/postulo/jobs/register_lookup.py
+#, python-format
+msgid "%(register)s's answer was larger than one company's should be."
+msgstr ""
+
 #: src/postulo/core/gdpr.py
 #, python-format
 msgid "%(removed)s; %(kept)s"
@@ -2851,6 +2896,10 @@ msgstr "Acțiuni pentru %(what)s"
 msgid "Active"
 msgstr "Activă"
 
+#: src/postulo/templates/jobs/company_register.html
+msgid "Activity"
+msgstr ""
+
 #: src/postulo/templates/applications/application_detail.html
 #: src/postulo/templates/jobs/company_detail.html
 #: src/postulo/templates/jobs/company_form.html
@@ -2865,6 +2914,11 @@ msgstr "Adăugați"
 #, python-format
 msgid "Add %(name)s"
 msgstr "Adăugați %(name)s"
+
+#: src/postulo/templates/jobs/company_register.html
+#, python-format
+msgid "Add <bdi>%(address)s</bdi> to its addresses, as its registered office"
+msgstr ""
 
 #: src/postulo/templates/jobs/company_list.html
 msgid "Add a company"
@@ -2954,6 +3008,16 @@ msgstr "Adăugați fișele pe care le-am bifat"
 #, fuzzy
 msgid "Add the first one."
 msgstr "Adăugați primul element."
+
+#: src/postulo/templates/jobs/company_register.html
+#, python-format
+msgid "Add the industry %(industry)s (NACE %(division)s)"
+msgstr ""
+
+#: src/postulo/templates/jobs/company_register.html
+#, python-format
+msgid "Add the register number <bdi>%(number)s</bdi>"
+msgstr ""
 
 #: src/postulo/templates/resume/publication_orcid.html
 msgid "Add the ticked works"
@@ -3474,6 +3538,11 @@ msgstr "O altă copie de rezervă era deja în curs."
 msgid "Another invitation"
 msgstr "Altă invitație"
 
+#: src/postulo/jobs/register_views.py
+#, python-format
+msgid "Another of your companies already has the register number %(number)s."
+msgstr ""
+
 #: src/postulo/api/idempotency.py
 msgid "Another request is using this Idempotency-Key; try again in a moment."
 msgstr "O altă cerere folosește acest Idempotency-Key; încercați din nou în câteva momente."
@@ -3924,6 +3993,10 @@ msgstr "Asia"
 #, fuzzy
 msgid "Asked"
 msgstr "Întrebat"
+
+#: src/postulo/templates/server/record_of_processing.html
+msgid "Asked only when somebody presses for it, one company at a time. Each is sent what is listed and nothing about the person asking."
+msgstr ""
 
 #: src/postulo/applications/analytics.py src/postulo/applications/models.py
 msgid "Assessment"
@@ -4376,6 +4449,7 @@ msgstr "URL de callback de înregistrat la furnizor"
 #: src/postulo/templates/jobs/address_place.html
 #: src/postulo/templates/jobs/capture_page_forget.html
 #: src/postulo/templates/jobs/company_form.html
+#: src/postulo/templates/jobs/company_register.html
 #: src/postulo/templates/jobs/company_wikidata.html
 #: src/postulo/templates/jobs/contact_form.html
 #: src/postulo/templates/jobs/industry_form.html
@@ -5160,6 +5234,10 @@ msgstr "numele companiei"
 #: src/postulo/jobs/models.py
 msgid "company names"
 msgstr "numele companiilor"
+
+#: src/postulo/plugins/kinds.py
+msgid "Company registers"
+msgstr ""
 
 #: src/postulo/jobs/views.py
 msgid "Company updated."
@@ -7332,6 +7410,11 @@ msgstr "de la %(name)s"
 msgid "From %(name)s."
 msgstr "De la %(name)s."
 
+#: src/postulo/templates/jobs/company_register.html
+#, python-format
+msgid "From %(register)s"
+msgstr ""
+
 #: src/postulo/templates/cotton/date_picker.html
 #, python-format
 msgid "From %(start)s to %(end)s"
@@ -8761,6 +8844,15 @@ msgstr "Funcționează până la %(when)s sau până este folosit ori revocat."
 msgid "It works."
 msgstr "Funcționează."
 
+#: src/postulo/jobs/register_views.py
+msgid "Its address is already listed."
+msgstr ""
+
+#: src/postulo/templates/server/record_of_processing.html
+#, python-format
+msgid "Its data are under %(licence)s."
+msgstr ""
+
 #: src/postulo/applications/ical_import.py
 msgid "Its date could not be read."
 msgstr "Data nu a putut fi citită."
@@ -8776,6 +8868,10 @@ msgstr "Fișierul său corespunde cu ceea ce a semnat depozitul oficial."
 #: src/postulo/jobs/models.py
 msgid "Its general mailbox, such as jobs@ or info@. A person's address goes on a contact."
 msgstr "Căsuța poștală generală, cum ar fi jobs@ sau info@. Adresa unei persoane se trece la un contact."
+
+#: src/postulo/jobs/register_views.py
+msgid "Its industry is already listed."
+msgstr ""
 
 #: src/postulo/templates/jobs/company_wikidata.html
 msgid "Its legal state"
@@ -8915,6 +9011,10 @@ msgstr "Păstrați-le"
 msgid "Keep this view as"
 msgstr "Păstrați această vizualizare ca"
 
+#: src/postulo/templates/jobs/company_register.html
+msgid "Keep what is ticked"
+msgstr ""
+
 #: src/postulo/templates/server/capture.html
 msgid "Keeping a page Postulo was allowed to fetch, for the person who asked for it, asks nothing more of robots.txt: no page is fetched a second time to keep it."
 msgstr "Păstrarea unei pagini pe care Postulo avea voie să o preia, pentru persoana care a cerut-o, nu cere nimic în plus de la robots.txt: nicio pagină nu este preluată a doua oară pentru a fi păstrată."
@@ -8984,6 +9084,11 @@ msgstr "Păstrat acum pe această instanță"
 #: src/postulo/templates/server/capture.html
 msgid "Kept pages are never deleted by the instance, only by the person whose they are."
 msgstr "Paginile păstrate nu sunt șterse niciodată de instanță, ci doar de persoana căreia îi aparțin."
+
+#: src/postulo/jobs/register_views.py
+#, python-format
+msgid "Kept what %(register)s said."
+msgstr ""
 
 #: src/postulo/jobs/views.py
 msgid "Kept what Wikidata said."
@@ -9574,6 +9679,11 @@ msgstr "Longitudine"
 
 #: src/postulo/templates/resume/item_form.html
 msgid "Look up"
+msgstr ""
+
+#: src/postulo/templates/jobs/company_detail.html
+#, python-format
+msgid "Look up in %(register)s"
 msgstr ""
 
 #: src/postulo/core/models.py
@@ -10599,6 +10709,10 @@ msgstr "Niciun anunț înregistrat nicăieri în acest grup."
 msgid "No postings recorded for this company."
 msgstr "Niciun anunț înregistrat pentru această companie."
 
+#: src/postulo/jobs/register_views.py
+msgid "No register this instance asks answers for that number."
+msgstr ""
+
 #: src/postulo/jobs/page_views.py
 msgid "No rendering was kept of that page."
 msgstr "Nu s-a păstrat nicio redare a acelei pagini."
@@ -11181,6 +11295,10 @@ msgstr "Nimic de aici nu poate fi schimbat: este construit din intrările docume
 msgid "Nothing here can install a plugin: this environment has neither uv nor pip. Postulo's own image ships uv; an image built without it needs one of the two on the path."
 msgstr "Nimic de aici nu poate instala un plugin: acest mediu nu are nici uv, nici pip. Imaginea proprie a Postulo include uv; o imagine construită fără el are nevoie de unul dintre cele două în PATH."
 
+#: src/postulo/templates/jobs/company_register.html
+msgid "Nothing here differs from what the company already has."
+msgstr ""
+
 #: src/postulo/templates/jobs/industry_list.html
 msgid "Nothing here matches that. Only fields you have actually used appear on this page."
 msgstr "Nimic de aici nu se potrivește. Pe această pagină apar doar câmpurile pe care le-ați folosit efectiv."
@@ -11408,6 +11526,10 @@ msgstr "Nu s-a păstrat nimic din acea pagină."
 msgid "Nothing was kept of this page"
 msgstr "Nu s-a păstrat nimic din această pagină"
 
+#: src/postulo/jobs/register_views.py
+msgid "Nothing was kept."
+msgstr ""
+
 #: src/postulo/core/gdpr.py
 msgid "Nothing was left to remove."
 msgstr "Nu mai era nimic de eliminat."
@@ -11605,6 +11727,10 @@ msgstr "Oferte alăturate"
 #: src/postulo/plugins/models.py src/postulo/plugins/provenance.py
 msgid "Official"
 msgstr "Oficial"
+
+#: src/postulo/templates/jobs/company_register.html
+msgid "Official name"
+msgstr ""
 
 #: src/postulo/core/models.py
 msgid "Older backups are deleted only after a new one has been written and checked. Archives you uploaded are never deleted by this."
@@ -11861,6 +11987,10 @@ msgstr[0] "A fost adăugată o înregistrare. Nimic din ce aveați deja nu a fos
 msgstr[1] "Au fost adăugate %(total)s înregistrări. Nimic din ce aveați deja nu a fost modificat sau eliminat."
 msgstr[2] "Au fost adăugate %(total)s de înregistrări. Nimic din ce aveați deja nu a fost modificat sau eliminat."
 
+#: src/postulo/templates/jobs/company_detail.html
+msgid "One request to that register, carrying the number alone; nothing is kept until you say so."
+msgstr ""
+
 #: src/postulo/templates/jobs/company_form.html
 msgid "One request to www.wikidata.org for this company's item; nothing is kept until you say so."
 msgstr "O singură cerere către www.wikidata.org pentru elementul acestei companii; nu se păstrează nimic până nu confirmați."
@@ -12022,6 +12152,10 @@ msgstr "Doar contul propriu al operatorului poate înceta să mai fie administra
 msgid "Only the year prints on a CV, so the day makes no difference."
 msgstr "Pe un CV se tipărește doar anul, deci ziua nu contează."
 
+#: src/postulo/templates/jobs/company_register.html
+msgid "Only what you tick is kept; nothing else on the company changes."
+msgstr ""
+
 #: src/postulo/templates/server/design.html
 msgid "Open a dialog with a choice in it"
 msgstr "Deschideți o fereastră de dialog cu o opțiune"
@@ -12046,6 +12180,10 @@ msgstr "Deschideți ca aceasta"
 #: src/postulo/templates/jobs/capture_review.html
 msgid "Open it"
 msgstr "Deschideți-l"
+
+#: src/postulo/templates/jobs/company_register.html
+msgid "Open it there"
+msgstr ""
 
 #: src/postulo/templates/documents/cv_detail.html
 #: src/postulo/templates/documents/letter_detail.html
@@ -12227,6 +12365,10 @@ msgstr "Rezultate"
 #: src/postulo/core/design.py src/postulo/templates/server/design.html
 msgid "Outline"
 msgstr "Contur"
+
+#: src/postulo/templates/server/record_of_processing.html
+msgid "Outside services it may call"
+msgstr ""
 
 #: src/postulo/templates/applications/calendar.html
 msgid "Overdue"
@@ -13516,6 +13658,16 @@ msgstr "Înregistrați o ofertă"
 msgid "Record and change: applications, listings, notes, reminders, letters, your details. A call that changes a record answers with the whole record, timeline and contacts included, so this can see what it touches"
 msgstr "Înregistrare și modificare: candidaturi, anunțuri, note, mementouri, scrisori, datele dumneavoastră. Un apel care modifică o înregistrare răspunde cu întreaga înregistrare, inclusiv cronologia și contactele, astfel încât acesta poate vedea ce atinge"
 
+#: src/postulo/templates/jobs/company_register.html
+#, python-format
+msgid "Record it as %(state)s"
+msgstr ""
+
+#: src/postulo/templates/jobs/company_register.html
+#, python-format
+msgid "Record it as %(state)s since %(date)s"
+msgstr ""
+
 #: src/postulo/templates/jobs/company_wikidata.html
 #, python-format
 msgid "Record it as acquired or merged into <bdi>%(name)s</bdi>"
@@ -13726,6 +13878,10 @@ msgstr "Refuzat: %(fields)s. Consultați %(member)s pentru ce este greșit la fi
 msgid "region"
 msgstr "regiune"
 
+#: src/postulo/templates/jobs/company_register.html
+msgid "Register number"
+msgstr ""
+
 #: src/postulo/templates/connections/form.html
 msgid "Register this address with the provider"
 msgstr "Înregistrați această adresă la furnizor"
@@ -13737,6 +13893,11 @@ msgstr "Înregistrați mai întâi această instanță la furnizor și salvați 
 #: src/postulo/plugins/consent.py
 msgid "Register this instance with the provider first, and save the client id."
 msgstr "Înregistrați mai întâi această instanță la furnizor și salvați identificatorul de client."
+
+#: src/postulo/jobs/register_views.py
+#: src/postulo/templates/jobs/company_register.html
+msgid "Registered office"
+msgstr ""
 
 #: src/postulo/templates/server/signin.html
 msgid "Registration is open: anyone who finds the address may create an account."
@@ -13978,6 +14139,11 @@ msgstr "Păstrare"
 #: src/postulo/applications/models.py
 msgid "retired on"
 msgstr "retras la"
+
+#: src/postulo/templates/jobs/company_register.html
+#, python-format
+msgid "Retrieved %(when)s."
+msgstr ""
 
 #: src/postulo/documents/models.py
 msgid "reusable template"
@@ -14561,6 +14727,11 @@ msgstr "Trimis cu captura, de browserul care vedea pagina"
 #: src/postulo/templates/jobs/contact_form.html
 msgid "Sent with:"
 msgstr "Trimis cu:"
+
+#: src/postulo/templates/server/record_of_processing.html
+#, python-format
+msgid "Sent: %(what)s."
+msgstr ""
 
 #: src/postulo/jobs/forms.py
 msgid "Separate several with commas. Anything new joins your list."
@@ -15284,6 +15455,11 @@ msgstr "Sursa este câmpul „găsit prin” al unui anunț. Completați-l și a
 msgid "source version"
 msgstr "versiunea sursei"
 
+#: src/postulo/templates/jobs/company_register.html
+#, python-format
+msgid "Source: %(source)s."
+msgstr ""
+
 #: src/postulo/templates/widgets/sources.html
 msgid "Sources"
 msgstr "Surse"
@@ -15363,7 +15539,8 @@ msgstr "STARTTLS, după conectare"
 msgid "state"
 msgstr "stare"
 
-#: src/postulo/jobs/tables.py src/postulo/templates/server/person_recovery.html
+#: src/postulo/jobs/tables.py src/postulo/templates/jobs/company_register.html
+#: src/postulo/templates/server/person_recovery.html
 msgid "State"
 msgstr "Stare"
 
@@ -15833,6 +16010,10 @@ msgstr "text fără aranjarea în pagină"
 #: src/postulo/core/search.py
 msgid "Text you sent"
 msgstr "Textul pe care l-ați trimis"
+
+#: src/postulo/jobs/register_views.py
+msgid "That address could not be added."
+msgstr ""
 
 #: src/postulo/jobs/logos.py
 #, python-format
@@ -16317,6 +16498,10 @@ msgstr "Acel link nu va mai funcționa."
 msgid "That name cannot be checked just now."
 msgstr "Numele nu poate fi verificat acum."
 
+#: src/postulo/jobs/register_lookup.py
+msgid "That number cannot be asked of this register."
+msgstr ""
+
 #: src/postulo/core/phones.py
 msgid "That number has no area code."
 msgstr "Numărul nu are prefix zonal."
@@ -16691,6 +16876,10 @@ msgstr "Compania din care face parte aceasta, dacă face parte din vreuna."
 msgid "The company you are applying to"
 msgstr "Compania la care candidați"
 
+#: src/postulo/jobs/register_lookup.py
+msgid "the company's LEI"
+msgstr ""
+
 #: src/postulo/core/web_links.py
 msgid "The company's LinkedIn page, or wherever it posts."
 msgstr "Pagina LinkedIn a companiei sau oriunde publică."
@@ -16698,6 +16887,10 @@ msgstr "Pagina LinkedIn a companiei sau oriunde publică."
 #: src/postulo/core/web_links.py
 msgid "The company's own pages: its LinkedIn page, its Mastodon or Bluesky account, its YouTube channel — as many as are worth keeping, with one marked as the one to show."
 msgstr "Paginile proprii ale companiei: pagina LinkedIn, contul Mastodon sau Bluesky, canalul YouTube — câte merită păstrate, cu una marcată ca cea de afișat."
+
+#: src/postulo/jobs/register_lookup.py
+msgid "the company's register number"
+msgstr ""
 
 #: src/postulo/documents/archiving.py src/postulo/notifications/webhooks.py
 msgid "The connection is gone or switched off."
@@ -17092,6 +17285,21 @@ msgstr "Ultima care aștepta."
 msgid "The last ten things the timeline recorded, whichever application they were on."
 msgstr "Ultimele zece lucruri consemnate de cronologie, la oricare candidatură."
 
+#: src/postulo/jobs/register_views.py
+#, python-format
+msgid "The LEI record gives the register number %(number)s, which is not one a register number here can be."
+msgstr ""
+
+#: src/postulo/templates/jobs/company_register.html
+#, python-format
+msgid "The LEI record gives the register number <bdi>%(found)s</bdi>, and this company has <bdi>%(stored)s</bdi>. One of them may be out of date, or the company may be registered in more than one place."
+msgstr ""
+
+#: src/postulo/templates/jobs/company_register.html
+#, python-format
+msgid "The LEI record gives the same register number as this company's, <bdi>%(stored)s</bdi>."
+msgstr ""
+
 #: src/postulo/resume/forms.py
 msgid "The level of the qualification in the European Qualifications Framework, which a diploma or its supplement may state. Postulo never works it out from the qualification’s name."
 msgstr "Nivelul calificării în Cadrul european al calificărilor, pe care îl poate menționa o diplomă sau suplimentul acesteia. Postulo nu îl deduce niciodată din denumirea calificării."
@@ -17416,6 +17624,18 @@ msgstr "Registrul a ceea ce prelucrează această instanță și al celor care p
 #: src/postulo/documents/models.py
 msgid "The referee sends it themselves"
 msgstr "Persoana de referință o trimite personal"
+
+#: src/postulo/jobs/register_lookup.py
+msgid "The register has no entry with that number."
+msgstr ""
+
+#: src/postulo/jobs/register_lookup.py
+msgid "The register's address is not one it declared."
+msgstr ""
+
+#: src/postulo/jobs/register_lookup.py
+msgid "The register's answer could not be read."
+msgstr ""
 
 #: src/postulo/jobs/rendering.py
 msgid "The renderer could not be started."
@@ -17828,6 +18048,10 @@ msgstr "Aici nu există niciun nume de utilizator de citit."
 #: src/postulo/jobs/pages.py
 msgid "There is no kept source to draw from, and a rendering is drawn from it."
 msgstr "Nu există nicio sursă păstrată din care să se genereze, iar o redare se generează din ea."
+
+#: src/postulo/jobs/register_lookup.py
+msgid "There is no number to look up."
+msgstr ""
 
 #: src/postulo/core/server_views.py
 msgid "There is no repository by that name."
@@ -18879,6 +19103,11 @@ msgstr "Folosiți"
 msgid "Use 3 to 32 lowercase letters, digits, dots, underscores or hyphens, starting and ending with a letter or digit."
 msgstr "Folosiți între 3 și 32 de litere mici, cifre, puncte, liniuțe de subliniere sau cratime, începând și terminând cu o literă sau o cifră."
 
+#: src/postulo/templates/jobs/company_register.html
+#, python-format
+msgid "Use <bdi>%(name)s</bdi> as its name, in place of <bdi>%(current)s</bdi>"
+msgstr ""
+
 #: src/postulo/jobs/tiles.py
 msgid "Use an https:// address, or a path starting with / on this instance's own address."
 msgstr "Folosiți o adresă https:// sau o cale care începe cu / pe adresa proprie a acestei instanțe."
@@ -19577,6 +19806,10 @@ msgstr "Ce e de făcut în privința asta, într-o propoziție."
 #: src/postulo/applications/forms.py
 msgid "What to do. It is what the reminder says when it falls due."
 msgstr "Ce este de făcut. Este ceea ce spune mementoul când devine scadent."
+
+#: src/postulo/templates/jobs/company_register.html
+msgid "What to keep"
+msgstr ""
 
 #: src/postulo/templates/applications/report.html
 msgid "What type of employer"

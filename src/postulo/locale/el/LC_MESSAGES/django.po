@@ -1196,6 +1196,51 @@ msgstr "Ο πάροχος %(provider)s δεν επιτρέπει σε μια ε�
 msgid "%(record)s points at %(names)s, which %(grantee)s cannot see and which is not yours to share. Nothing was shared."
 msgstr "%(record)s: παραπέμπει σε %(names)s, που δεν μπορεί να δει ο αποδέκτης %(grantee)s και που δεν σας ανήκει για να το μοιραστείτε. Δεν μοιράστηκε τίποτα."
 
+#: src/postulo/jobs/register_lookup.py
+#, python-format
+msgid "%(register)s answered %(status)s."
+msgstr ""
+
+#: src/postulo/jobs/register_lookup.py
+#, python-format
+msgid "%(register)s asked for fewer requests. Try again later."
+msgstr ""
+
+#: src/postulo/jobs/register_lookup.py
+#, python-format
+msgid "%(register)s could not be reached."
+msgstr ""
+
+#: src/postulo/templates/jobs/company_register.html
+#, python-format
+msgid "%(register)s has an entry for this number."
+msgstr ""
+
+#: src/postulo/jobs/register_lookup.py
+#, python-format
+msgid "%(register)s has removed this entry."
+msgstr ""
+
+#: src/postulo/jobs/register_lookup.py
+#, python-format
+msgid "%(register)s sent the request somewhere else."
+msgstr ""
+
+#: src/postulo/jobs/register_lookup.py
+#, python-format
+msgid "%(register)s took too long to answer."
+msgstr ""
+
+#: src/postulo/jobs/register_lookup.py
+#, python-format
+msgid "%(register)s's answer could not be read."
+msgstr ""
+
+#: src/postulo/jobs/register_lookup.py
+#, python-format
+msgid "%(register)s's answer was larger than one company's should be."
+msgstr ""
+
 #: src/postulo/core/gdpr.py
 #, python-format
 msgid "%(removed)s; %(kept)s"
@@ -2757,6 +2802,10 @@ msgstr "Ενέργειες για %(what)s"
 msgid "Active"
 msgstr "Ενεργή"
 
+#: src/postulo/templates/jobs/company_register.html
+msgid "Activity"
+msgstr ""
+
 #: src/postulo/templates/applications/application_detail.html
 #: src/postulo/templates/jobs/company_detail.html
 #: src/postulo/templates/jobs/company_form.html
@@ -2771,6 +2820,11 @@ msgstr "Προσθήκη"
 #, python-format
 msgid "Add %(name)s"
 msgstr "Προσθήκη %(name)s"
+
+#: src/postulo/templates/jobs/company_register.html
+#, python-format
+msgid "Add <bdi>%(address)s</bdi> to its addresses, as its registered office"
+msgstr ""
 
 #: src/postulo/templates/jobs/company_list.html
 msgid "Add a company"
@@ -2861,6 +2915,16 @@ msgstr "Προσθήκη των καρτών που επέλεξα"
 #, fuzzy
 msgid "Add the first one."
 msgstr "Προσθέστε την πρώτη."
+
+#: src/postulo/templates/jobs/company_register.html
+#, python-format
+msgid "Add the industry %(industry)s (NACE %(division)s)"
+msgstr ""
+
+#: src/postulo/templates/jobs/company_register.html
+#, python-format
+msgid "Add the register number <bdi>%(number)s</bdi>"
+msgstr ""
 
 #: src/postulo/templates/resume/publication_orcid.html
 msgid "Add the ticked works"
@@ -3377,6 +3441,11 @@ msgstr "Εκτελούνταν ήδη άλλη λήψη αντιγράφου α�
 msgid "Another invitation"
 msgstr "Άλλη πρόσκληση"
 
+#: src/postulo/jobs/register_views.py
+#, python-format
+msgid "Another of your companies already has the register number %(number)s."
+msgstr ""
+
 #: src/postulo/api/idempotency.py
 msgid "Another request is using this Idempotency-Key; try again in a moment."
 msgstr "Ένα άλλο αίτημα χρησιμοποιεί αυτό το Idempotency-Key· δοκιμάστε ξανά σε λίγο."
@@ -3838,6 +3907,10 @@ msgstr "Ασία"
 msgid "Asked"
 msgstr "Ερωτήθηκε"
 
+#: src/postulo/templates/server/record_of_processing.html
+msgid "Asked only when somebody presses for it, one company at a time. Each is sent what is listed and nothing about the person asking."
+msgstr ""
+
 #: src/postulo/applications/analytics.py src/postulo/applications/models.py
 msgid "Assessment"
 msgstr "Αξιολόγηση"
@@ -4294,6 +4367,7 @@ msgstr "Διεύθυνση επιστροφής για καταχώριση στ
 #: src/postulo/templates/jobs/address_place.html
 #: src/postulo/templates/jobs/capture_page_forget.html
 #: src/postulo/templates/jobs/company_form.html
+#: src/postulo/templates/jobs/company_register.html
 #: src/postulo/templates/jobs/company_wikidata.html
 #: src/postulo/templates/jobs/contact_form.html
 #: src/postulo/templates/jobs/industry_form.html
@@ -5083,6 +5157,10 @@ msgstr "επωνυμία εταιρείας"
 #: src/postulo/jobs/models.py
 msgid "company names"
 msgstr "επωνυμίες εταιρειών"
+
+#: src/postulo/plugins/kinds.py
+msgid "Company registers"
+msgstr ""
 
 #: src/postulo/jobs/views.py
 msgid "Company updated."
@@ -7261,6 +7339,11 @@ msgstr "από %(name)s"
 msgid "From %(name)s."
 msgstr "Από %(name)s."
 
+#: src/postulo/templates/jobs/company_register.html
+#, python-format
+msgid "From %(register)s"
+msgstr ""
+
 #: src/postulo/templates/cotton/date_picker.html
 #, python-format
 msgid "From %(start)s to %(end)s"
@@ -8694,6 +8777,15 @@ msgstr "Λειτουργεί έως %(when)s, ή μέχρι να χρησιμο�
 msgid "It works."
 msgstr "Λειτουργεί."
 
+#: src/postulo/jobs/register_views.py
+msgid "Its address is already listed."
+msgstr ""
+
+#: src/postulo/templates/server/record_of_processing.html
+#, python-format
+msgid "Its data are under %(licence)s."
+msgstr ""
+
 #: src/postulo/applications/ical_import.py
 msgid "Its date could not be read."
 msgstr "Δεν ήταν δυνατή η ανάγνωση της ημερομηνίας της."
@@ -8709,6 +8801,10 @@ msgstr "Το αρχείο του ταιριάζει με αυτό που υπέ�
 #: src/postulo/jobs/models.py
 msgid "Its general mailbox, such as jobs@ or info@. A person's address goes on a contact."
 msgstr "Η γενική θυρίδα αλληλογραφίας της, όπως jobs@ ή info@. Η διεύθυνση ενός ατόμου καταχωρίζεται σε επαφή."
+
+#: src/postulo/jobs/register_views.py
+msgid "Its industry is already listed."
+msgstr ""
 
 #: src/postulo/templates/jobs/company_wikidata.html
 msgid "Its legal state"
@@ -8851,6 +8947,10 @@ msgstr "Διατήρηση αυτών"
 msgid "Keep this view as"
 msgstr "Αποθήκευση αυτής της προβολής ως"
 
+#: src/postulo/templates/jobs/company_register.html
+msgid "Keep what is ticked"
+msgstr ""
+
 #: src/postulo/templates/server/capture.html
 msgid "Keeping a page Postulo was allowed to fetch, for the person who asked for it, asks nothing more of robots.txt: no page is fetched a second time to keep it."
 msgstr "Η διατήρηση μιας σελίδας που το Postulo είχε άδεια να ανακτήσει, για το άτομο που τη ζήτησε, δεν ζητά τίποτα παραπάνω από το robots.txt: καμία σελίδα δεν ανακτάται δεύτερη φορά για να διατηρηθεί."
@@ -8922,6 +9022,11 @@ msgstr "Διατηρείται πλέον σε αυτήν την εγκατάσ�
 #: src/postulo/templates/server/capture.html
 msgid "Kept pages are never deleted by the instance, only by the person whose they are."
 msgstr "Οι σελίδες που κρατήθηκαν δεν διαγράφονται ποτέ από την εγκατάσταση, μόνο από το άτομο στο οποίο ανήκουν."
+
+#: src/postulo/jobs/register_views.py
+#, python-format
+msgid "Kept what %(register)s said."
+msgstr ""
 
 #: src/postulo/jobs/views.py
 msgid "Kept what Wikidata said."
@@ -9509,6 +9614,11 @@ msgstr "Γεωγραφικό μήκος"
 
 #: src/postulo/templates/resume/item_form.html
 msgid "Look up"
+msgstr ""
+
+#: src/postulo/templates/jobs/company_detail.html
+#, python-format
+msgid "Look up in %(register)s"
 msgstr ""
 
 #: src/postulo/core/models.py
@@ -10539,6 +10649,10 @@ msgstr "Δεν έχουν καταγραφεί αγγελίες πουθενά �
 msgid "No postings recorded for this company."
 msgstr "Δεν έχουν καταγραφεί αγγελίες για αυτή την εταιρεία."
 
+#: src/postulo/jobs/register_views.py
+msgid "No register this instance asks answers for that number."
+msgstr ""
+
 #: src/postulo/jobs/page_views.py
 msgid "No rendering was kept of that page."
 msgstr "Δεν κρατήθηκε απόδοση αυτής της σελίδας."
@@ -11118,6 +11232,10 @@ msgstr "Τίποτα εδώ δεν μπορεί να αλλάξει: δημιο�
 msgid "Nothing here can install a plugin: this environment has neither uv nor pip. Postulo's own image ships uv; an image built without it needs one of the two on the path."
 msgstr "Τίποτα εδώ δεν μπορεί να εγκαταστήσει πρόσθετο: αυτό το περιβάλλον δεν έχει ούτε uv ούτε pip. Η εικόνα του ίδιου του Postulo περιλαμβάνει το uv· μια εικόνα που δημιουργήθηκε χωρίς αυτό χρειάζεται ένα από τα δύο στη διαδρομή (PATH)."
 
+#: src/postulo/templates/jobs/company_register.html
+msgid "Nothing here differs from what the company already has."
+msgstr ""
+
 #: src/postulo/templates/jobs/industry_list.html
 #, fuzzy
 msgid "Nothing here matches that. Only fields you have actually used appear on this page."
@@ -11347,6 +11465,10 @@ msgstr "Δεν κρατήθηκε τίποτα από αυτή τη σελίδα
 msgid "Nothing was kept of this page"
 msgstr "Δεν κρατήθηκε τίποτα από αυτή τη σελίδα"
 
+#: src/postulo/jobs/register_views.py
+msgid "Nothing was kept."
+msgstr ""
+
 #: src/postulo/core/gdpr.py
 msgid "Nothing was left to remove."
 msgstr "Δεν είχε μείνει τίποτα προς αφαίρεση."
@@ -11544,6 +11666,10 @@ msgstr "Προσφορές δίπλα δίπλα"
 #: src/postulo/plugins/models.py src/postulo/plugins/provenance.py
 msgid "Official"
 msgstr "Επίσημο"
+
+#: src/postulo/templates/jobs/company_register.html
+msgid "Official name"
+msgstr ""
 
 #: src/postulo/core/models.py
 msgid "Older backups are deleted only after a new one has been written and checked. Archives you uploaded are never deleted by this."
@@ -11789,6 +11915,10 @@ msgid_plural "%(total)s records were added. Nothing you already had was changed 
 msgstr[0] "Προστέθηκε μία εγγραφή. Τίποτα από όσα είχατε ήδη δεν άλλαξε ούτε αφαιρέθηκε."
 msgstr[1] "Προστέθηκαν %(total)s εγγραφές. Τίποτα από όσα είχατε ήδη δεν άλλαξε ούτε αφαιρέθηκε."
 
+#: src/postulo/templates/jobs/company_detail.html
+msgid "One request to that register, carrying the number alone; nothing is kept until you say so."
+msgstr ""
+
 #: src/postulo/templates/jobs/company_form.html
 msgid "One request to www.wikidata.org for this company's item; nothing is kept until you say so."
 msgstr "Ένα αίτημα στο www.wikidata.org για το αντικείμενο αυτής της εταιρείας· τίποτα δεν διατηρείται μέχρι να το πείτε."
@@ -11946,6 +12076,10 @@ msgstr "Μόνο ο ίδιος ο υπεύθυνος λειτουργίας μπ
 msgid "Only the year prints on a CV, so the day makes no difference."
 msgstr "Σε ένα βιογραφικό τυπώνεται μόνο το έτος, οπότε η ημέρα δεν έχει σημασία."
 
+#: src/postulo/templates/jobs/company_register.html
+msgid "Only what you tick is kept; nothing else on the company changes."
+msgstr ""
+
 #: src/postulo/templates/server/design.html
 msgid "Open a dialog with a choice in it"
 msgstr "Άνοιγμα παραθύρου διαλόγου με μια επιλογή"
@@ -11970,6 +12104,10 @@ msgstr "Άνοιγμα ως αυτό"
 #: src/postulo/templates/jobs/capture_review.html
 msgid "Open it"
 msgstr "Άνοιγμα"
+
+#: src/postulo/templates/jobs/company_register.html
+msgid "Open it there"
+msgstr ""
 
 #: src/postulo/templates/documents/cv_detail.html
 #: src/postulo/templates/documents/letter_detail.html
@@ -12153,6 +12291,10 @@ msgstr "Αποτελέσματα"
 #: src/postulo/core/design.py src/postulo/templates/server/design.html
 msgid "Outline"
 msgstr "Περίγραμμα"
+
+#: src/postulo/templates/server/record_of_processing.html
+msgid "Outside services it may call"
+msgstr ""
 
 #: src/postulo/templates/applications/calendar.html
 msgid "Overdue"
@@ -13444,6 +13586,16 @@ msgstr "Καταγραφή προσφοράς"
 msgid "Record and change: applications, listings, notes, reminders, letters, your details. A call that changes a record answers with the whole record, timeline and contacts included, so this can see what it touches"
 msgstr "Καταγραφή και αλλαγή: αιτήσεις, αγγελίες, σημειώσεις, υπενθυμίσεις, επιστολές, τα στοιχεία σας. Μια κλήση που αλλάζει μια εγγραφή απαντά με ολόκληρη την εγγραφή, μαζί με το χρονολόγιο και τις επαφές, ώστε να φαίνεται τι επηρεάζει"
 
+#: src/postulo/templates/jobs/company_register.html
+#, python-format
+msgid "Record it as %(state)s"
+msgstr ""
+
+#: src/postulo/templates/jobs/company_register.html
+#, python-format
+msgid "Record it as %(state)s since %(date)s"
+msgstr ""
+
 #: src/postulo/templates/jobs/company_wikidata.html
 #, python-format
 msgid "Record it as acquired or merged into <bdi>%(name)s</bdi>"
@@ -13654,6 +13806,10 @@ msgstr "Απορρίφθηκε: %(fields)s. Δείτε το %(member)s για τ
 msgid "region"
 msgstr "περιφέρεια"
 
+#: src/postulo/templates/jobs/company_register.html
+msgid "Register number"
+msgstr ""
+
 #: src/postulo/templates/connections/form.html
 msgid "Register this address with the provider"
 msgstr "Καταχωρίστε αυτή τη διεύθυνση στον πάροχο"
@@ -13665,6 +13821,11 @@ msgstr "Καταχωρίστε πρώτα αυτή την εγκατάσταση
 #: src/postulo/plugins/consent.py
 msgid "Register this instance with the provider first, and save the client id."
 msgstr "Καταχωρίστε πρώτα αυτή την εγκατάσταση στον πάροχο και αποθηκεύστε το αναγνωριστικό πελάτη."
+
+#: src/postulo/jobs/register_views.py
+#: src/postulo/templates/jobs/company_register.html
+msgid "Registered office"
+msgstr ""
 
 #: src/postulo/templates/server/signin.html
 msgid "Registration is open: anyone who finds the address may create an account."
@@ -13911,6 +14072,11 @@ msgstr "Διατήρηση"
 #, fuzzy
 msgid "retired on"
 msgstr "καταργήθηκε στις"
+
+#: src/postulo/templates/jobs/company_register.html
+#, python-format
+msgid "Retrieved %(when)s."
+msgstr ""
 
 #: src/postulo/documents/models.py
 msgid "reusable template"
@@ -14500,6 +14666,11 @@ msgstr "Στάλθηκε με την καταγραφή, από το πρόγρ�
 #: src/postulo/templates/jobs/contact_form.html
 msgid "Sent with:"
 msgstr "Στάλθηκε με:"
+
+#: src/postulo/templates/server/record_of_processing.html
+#, python-format
+msgid "Sent: %(what)s."
+msgstr ""
 
 #: src/postulo/jobs/forms.py
 msgid "Separate several with commas. Anything new joins your list."
@@ -15233,6 +15404,11 @@ msgstr "Η πηγή είναι το πεδίο «βρέθηκε μέσω» μι�
 msgid "source version"
 msgstr "έκδοση πηγής"
 
+#: src/postulo/templates/jobs/company_register.html
+#, python-format
+msgid "Source: %(source)s."
+msgstr ""
+
 #: src/postulo/templates/widgets/sources.html
 msgid "Sources"
 msgstr "Πηγές"
@@ -15315,7 +15491,8 @@ msgstr "STARTTLS, μετά τη σύνδεση"
 msgid "state"
 msgstr "κατάσταση"
 
-#: src/postulo/jobs/tables.py src/postulo/templates/server/person_recovery.html
+#: src/postulo/jobs/tables.py src/postulo/templates/jobs/company_register.html
+#: src/postulo/templates/server/person_recovery.html
 msgid "State"
 msgstr "Κατάσταση"
 
@@ -15790,6 +15967,10 @@ msgstr "κείμενο χωρίς τη διάταξή του"
 #: src/postulo/core/search.py
 msgid "Text you sent"
 msgstr "Κείμενο που στείλατε"
+
+#: src/postulo/jobs/register_views.py
+msgid "That address could not be added."
+msgstr ""
 
 #: src/postulo/jobs/logos.py
 #, fuzzy, python-format
@@ -16272,6 +16453,10 @@ msgstr "Αυτός ο σύνδεσμος δεν θα λειτουργεί πια
 msgid "That name cannot be checked just now."
 msgstr "Αυτό το όνομα δεν μπορεί να ελεγχθεί αυτή τη στιγμή."
 
+#: src/postulo/jobs/register_lookup.py
+msgid "That number cannot be asked of this register."
+msgstr ""
+
 #: src/postulo/core/phones.py
 msgid "That number has no area code."
 msgstr "Αυτός ο αριθμός δεν έχει κωδικό περιοχής."
@@ -16644,6 +16829,10 @@ msgstr "Η εταιρεία στην οποία ανήκει αυτή, αν αν
 msgid "The company you are applying to"
 msgstr "Η εταιρεία στην οποία κάνετε αίτηση"
 
+#: src/postulo/jobs/register_lookup.py
+msgid "the company's LEI"
+msgstr ""
+
 #: src/postulo/core/web_links.py
 msgid "The company's LinkedIn page, or wherever it posts."
 msgstr "Η σελίδα της εταιρείας στο LinkedIn ή όπου αλλού δημοσιεύει."
@@ -16651,6 +16840,10 @@ msgstr "Η σελίδα της εταιρείας στο LinkedIn ή όπου α
 #: src/postulo/core/web_links.py
 msgid "The company's own pages: its LinkedIn page, its Mastodon or Bluesky account, its YouTube channel — as many as are worth keeping, with one marked as the one to show."
 msgstr "Οι σελίδες της ίδιας της εταιρείας: η σελίδα της στο LinkedIn, ο λογαριασμός της στο Mastodon ή στο Bluesky, το κανάλι της στο YouTube — όσες αξίζει να κρατηθούν, με μία επισημασμένη ως αυτή που εμφανίζεται."
+
+#: src/postulo/jobs/register_lookup.py
+msgid "the company's register number"
+msgstr ""
 
 #: src/postulo/documents/archiving.py src/postulo/notifications/webhooks.py
 msgid "The connection is gone or switched off."
@@ -17045,6 +17238,21 @@ msgstr "Η τελευταία σε αναμονή."
 msgid "The last ten things the timeline recorded, whichever application they were on."
 msgstr "Τα δέκα τελευταία συμβάντα που κατέγραψε το χρονολόγιο, σε όποια αίτηση κι αν αφορούσαν."
 
+#: src/postulo/jobs/register_views.py
+#, python-format
+msgid "The LEI record gives the register number %(number)s, which is not one a register number here can be."
+msgstr ""
+
+#: src/postulo/templates/jobs/company_register.html
+#, python-format
+msgid "The LEI record gives the register number <bdi>%(found)s</bdi>, and this company has <bdi>%(stored)s</bdi>. One of them may be out of date, or the company may be registered in more than one place."
+msgstr ""
+
+#: src/postulo/templates/jobs/company_register.html
+#, python-format
+msgid "The LEI record gives the same register number as this company's, <bdi>%(stored)s</bdi>."
+msgstr ""
+
 #: src/postulo/resume/forms.py
 msgid "The level of the qualification in the European Qualifications Framework, which a diploma or its supplement may state. Postulo never works it out from the qualification’s name."
 msgstr "Το επίπεδο του τίτλου στο Ευρωπαϊκό Πλαίσιο Επαγγελματικών Προσόντων, το οποίο μπορεί να αναφέρει ένα δίπλωμα ή το συμπλήρωμά του. Το Postulo δεν το συμπεραίνει ποτέ από την ονομασία του τίτλου."
@@ -17370,6 +17578,18 @@ msgstr "Το αρχείο όσων επεξεργάζεται αυτή η εγκ
 #: src/postulo/documents/models.py
 msgid "The referee sends it themselves"
 msgstr "Ο συστάτης τη στέλνει ο ίδιος"
+
+#: src/postulo/jobs/register_lookup.py
+msgid "The register has no entry with that number."
+msgstr ""
+
+#: src/postulo/jobs/register_lookup.py
+msgid "The register's address is not one it declared."
+msgstr ""
+
+#: src/postulo/jobs/register_lookup.py
+msgid "The register's answer could not be read."
+msgstr ""
 
 #: src/postulo/jobs/rendering.py
 msgid "The renderer could not be started."
@@ -17783,6 +18003,10 @@ msgstr "Δεν υπάρχει όνομα χρήστη εδώ για ανάγνω
 #: src/postulo/jobs/pages.py
 msgid "There is no kept source to draw from, and a rendering is drawn from it."
 msgstr "Δεν υπάρχει πηγή που κρατήθηκε για να γίνει η απόδοση, και η απόδοση γίνεται από αυτήν."
+
+#: src/postulo/jobs/register_lookup.py
+msgid "There is no number to look up."
+msgstr ""
 
 #: src/postulo/core/server_views.py
 msgid "There is no repository by that name."
@@ -18840,6 +19064,11 @@ msgstr "Χρήση"
 msgid "Use 3 to 32 lowercase letters, digits, dots, underscores or hyphens, starting and ending with a letter or digit."
 msgstr "Χρησιμοποιήστε 3 έως 32 πεζά γράμματα, ψηφία, τελείες, κάτω παύλες ή παύλες, ξεκινώντας και τελειώνοντας με γράμμα ή ψηφίο."
 
+#: src/postulo/templates/jobs/company_register.html
+#, python-format
+msgid "Use <bdi>%(name)s</bdi> as its name, in place of <bdi>%(current)s</bdi>"
+msgstr ""
+
 #: src/postulo/jobs/tiles.py
 msgid "Use an https:// address, or a path starting with / on this instance's own address."
 msgstr "Χρησιμοποιήστε μια διεύθυνση https:// ή μια διαδρομή που ξεκινά με / στη διεύθυνση αυτής της εγκατάστασης."
@@ -19542,6 +19771,10 @@ msgstr "Τι να κάνετε γι’ αυτό, σε μία πρόταση."
 #: src/postulo/applications/forms.py
 msgid "What to do. It is what the reminder says when it falls due."
 msgstr "Τι να κάνετε. Είναι αυτό που λέει η υπενθύμιση όταν λήξει η προθεσμία της."
+
+#: src/postulo/templates/jobs/company_register.html
+msgid "What to keep"
+msgstr ""
 
 #: src/postulo/templates/applications/report.html
 msgid "What type of employer"
