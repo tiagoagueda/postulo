@@ -1256,14 +1256,64 @@ msgstr "%(scheme)s: det er ikke det vanlige formatet."
 msgid "%(sent)s, %(failed)s; each document says which."
 msgstr "%(sent)s, %(failed)s; hvert dokument viser om det ble sendt."
 
+#: src/postulo/resume/lookups.py
+#, python-format
+msgid "%(service)s answered %(status)s."
+msgstr ""
+
+#: src/postulo/resume/lookups.py
+#, python-format
+msgid "%(service)s asked for fewer requests. Try again later."
+msgstr ""
+
+#: src/postulo/resume/lookups.py
+#, python-format
+msgid "%(service)s could not be reached."
+msgstr ""
+
+#: src/postulo/resume/lookups.py
+#, python-format
+msgid "%(service)s has no record in a form Postulo reads."
+msgstr ""
+
 #: src/postulo/core/web_links.py src/postulo/jobs/surface.py
 #, python-format
 msgid "%(service)s is already used by another row."
 msgstr "%(service)s brukes allerede av en annen rad."
 
+#: src/postulo/resume/lookups.py
+#, python-format
+msgid "%(service)s knows no such identifier."
+msgstr ""
+
+#: src/postulo/resume/lookups.py
+#, python-format
+msgid "%(service)s redirected too many times."
+msgstr ""
+
 #: src/postulo/jobs/geocoding.py
 #, python-format
 msgid "%(service)s refused the look-ups (%(status)s). They are stopped."
+msgstr ""
+
+#: src/postulo/resume/lookups.py
+#, python-format
+msgid "%(service)s sent the request somewhere else."
+msgstr ""
+
+#: src/postulo/resume/lookups.py
+#, python-format
+msgid "%(service)s sent the request to an address Postulo does not dial."
+msgstr ""
+
+#: src/postulo/resume/lookups.py
+#, python-format
+msgid "%(service)s took too long to answer."
+msgstr ""
+
+#: src/postulo/resume/views.py
+#, python-format
+msgid "%(service)s, through doi.org, had nothing for the boxes that are empty."
 msgstr ""
 
 #: src/postulo/core/templatetags/postulo.py
@@ -2792,6 +2842,10 @@ msgstr "Legg til kortene jeg krysset av"
 msgid "Add the first one."
 msgstr "Legg til den første."
 
+#: src/postulo/templates/resume/publication_orcid.html
+msgid "Add the ticked works"
+msgstr ""
+
 #: src/postulo/templates/documents/cv_detail.html
 msgid "Add these"
 msgstr "Legg til disse"
@@ -2829,6 +2883,10 @@ msgstr "Legg til det jeg valgte"
 msgid "Add what is new"
 msgstr "Legg til det som er nytt"
 
+#: src/postulo/resume/views.py
+msgid "Add your ORCID on Your details first."
+msgstr ""
+
 #: src/postulo/jobs/models.py src/postulo/jobs/tables.py
 msgid "Added"
 msgstr "Lagt til"
@@ -2836,6 +2894,13 @@ msgstr "Lagt til"
 #: src/postulo/plugins/models.py
 msgid "added"
 msgstr "lagt til"
+
+#: src/postulo/resume/views.py
+#, python-format
+msgid "Added %(count)d publication from your ORCID record, with no authors: ORCID's list has none. Open it and press Look up beside its DOI for the rest."
+msgid_plural "Added %(count)d publications from your ORCID record, with no authors: ORCID's list has none. Open each and press Look up beside its DOI for the rest."
+msgstr[0] ""
+msgstr[1] ""
 
 #: src/postulo/documents/views.py
 #, python-format
@@ -4187,6 +4252,7 @@ msgstr "Callback-adresse som skal registreres hos den"
 #: src/postulo/templates/partials/confirm_delete.html
 #: src/postulo/templates/partials/table/cell.html
 #: src/postulo/templates/resume/item_form.html
+#: src/postulo/templates/resume/publication_orcid.html
 #: src/postulo/templates/server/backup_delete.html
 #: src/postulo/templates/server/identifier_schemes.html
 #: src/postulo/templates/server/person_delete.html
@@ -5843,6 +5909,10 @@ msgstr "Består ikke kontrollen"
 msgid "DOI"
 msgstr "DOI"
 
+#: src/postulo/resume/lookups.py
+msgid "doi.org's answer was not a record Postulo can read."
+msgstr ""
+
 #: src/postulo/core/models.py src/postulo/templates/core/dashboard.html
 #: src/postulo/templates/core/partials/errand_state.html
 #: src/postulo/templates/cotton/reminder_actions.html
@@ -6776,6 +6846,11 @@ msgstr "Filer du allerede har"
 msgid "Fill in from"
 msgstr "Fyll inn fra"
 
+#: src/postulo/resume/views.py
+#, python-format
+msgid "Filled in from %(service)s, through doi.org: %(fields)s. Check them; nothing is kept until you save."
+msgstr ""
+
 #: src/postulo/templates/documents/letter_detail.html
 msgid "Filled in when the letter is sent with an application."
 msgstr "Fylles ut når brevet sendes med en søknad."
@@ -7134,6 +7209,10 @@ msgstr "fra karrieren din"
 #: src/postulo/jobs/tables.py
 msgid "From your career"
 msgstr "Fra karrieren din"
+
+#: src/postulo/templates/resume/publication_orcid.html
+msgid "From your ORCID record"
+msgstr ""
 
 #: src/postulo/templates/documents/application_documents.html
 msgid "Frozen at the moment of sending"
@@ -9180,6 +9259,10 @@ msgstr "lenke i lageret"
 msgid "Link services"
 msgstr "Lenketjenester"
 
+#: src/postulo/resume/forms.py
+msgid "Linked on a CV as https://doi.org/…. Postulo asks doi.org about it only when you press Look up."
+msgstr ""
+
 #: src/postulo/templates/resume/item_form.html
 msgid "Linked to the company"
 msgstr "Knyttet til selskapet"
@@ -9311,6 +9394,10 @@ msgstr "lengdegrad"
 #: src/postulo/templates/jobs/address_place.html
 msgid "Longitude"
 msgstr "Lengdegrad"
+
+#: src/postulo/templates/resume/item_form.html
+msgid "Look up"
+msgstr ""
 
 #: src/postulo/core/models.py
 msgid "look-up service address"
@@ -11175,6 +11262,10 @@ msgstr "Ingenting ble sendt i denne perioden."
 msgid "Nothing was sent in this period. That is what the report says, and it is a fact like any other."
 msgstr "Ingenting ble sendt i denne perioden. Det er det rapporten sier, og det er et faktum som alle andre."
 
+#: src/postulo/resume/views.py
+msgid "Nothing was ticked, so nothing was added."
+msgstr ""
+
 #: src/postulo/documents/forms.py
 msgid "Nothing yet"
 msgstr "Ingenting ennå"
@@ -11834,6 +11925,10 @@ msgstr "Eller last opp en"
 #: src/postulo/resume/views.py
 msgid "ORCID"
 msgstr "ORCID"
+
+#: src/postulo/resume/lookups.py
+msgid "ORCID's answer was not a list of works."
+msgstr ""
 
 #: src/postulo/documents/models.py src/postulo/resume/models.py
 msgid "order"
@@ -14191,6 +14286,10 @@ msgstr "Sende som deg selv"
 msgid "Sending failed: %(error)s"
 msgstr "Sending mislyktes: %(error)s"
 
+#: src/postulo/templates/resume/item_form.html
+msgid "Sends the DOI to doi.org, which passes it to Crossref or DataCite, and nothing else about you. Only the empty boxes are filled, and nothing is kept until you save."
+msgstr ""
+
 #: src/postulo/notifications/models.py
 #: src/postulo/templates/applications/report.html
 #: src/postulo/templates/server/design.html
@@ -15195,6 +15294,10 @@ msgstr "Emne"
 msgid "subject"
 msgstr "emne"
 
+#: src/postulo/templates/resume/overview.html
+msgid "Suggest from my ORCID record"
+msgstr ""
+
 #: src/postulo/applications/models.py
 msgid "suggested by"
 msgstr "foreslått av"
@@ -15839,6 +15942,10 @@ msgstr "Det er større enn %(limit)s, som er det meste denne installasjonen beho
 msgid "That is not a %(kind)s, whatever it was sent as."
 msgstr "Det er ikke en %(kind)s, uansett hva den ble sendt som."
 
+#: src/postulo/resume/lookups.py
+msgid "That is not a DOI."
+msgstr ""
+
 #: src/postulo/core/kind_files.py
 msgid "That is not a file this page reads. It reads the JSON file it offers to download for this kind of record, as Postulo writes it, and nothing else."
 msgstr "Det er ikke en fil denne siden leser. Den leser JSON-filen den tilbyr for nedlasting for denne typen oppføringer, slik Postulo skriver den, og ingenting annet."
@@ -15936,6 +16043,10 @@ msgstr "Det er ikke en offentlig Ed25519-nøkkel: %(error)s"
 #: src/postulo/applications/ical_reader.py
 msgid "That is not an iCalendar file."
 msgstr "Det er ikke en iCalendar-fil."
+
+#: src/postulo/resume/lookups.py
+msgid "That is not an ORCID."
+msgstr ""
 
 #: src/postulo/applications/views.py
 msgid "That is not an outcome Postulo recognises."
@@ -16179,6 +16290,16 @@ msgstr "Adressen folk ser at den kom fra. Mange servere nekter å sende som en a
 #, fuzzy
 msgid "The agency or employment service it went through, from the companies you have recorded. Companies in Employment activities, and public employment services, are offered first; add that industry to a company to have it offered here. The company on the posting stays the employer."
 msgstr "Byrået eller arbeidsformidlingen den gikk gjennom, blant selskapene du har registrert. Selskaper i bransjen Arbeidskrafttjenester, og offentlige arbeidsformidlinger, tilbys først; legg til den bransjen på et selskap for å få det tilbudt her. Selskapet i stillingsannonsen forblir arbeidsgiveren."
+
+#: src/postulo/resume/lookups.py
+#, python-format
+msgid "The answer from %(service)s could not be read."
+msgstr ""
+
+#: src/postulo/resume/lookups.py
+#, python-format
+msgid "The answer from %(service)s was larger than a record should be."
+msgstr ""
 
 #: src/postulo/jobs/models.py
 msgid "The application deadline, if stated."
@@ -18032,6 +18153,13 @@ msgstr "Kryss av for en kategori, eller skriv den nasjonale nedenfor."
 msgid "Tick as many as fit. The list is your own — Industries, beside Companies, is where it is kept."
 msgstr "Kryss av for så mange som passer. Listen er din egen – den ligger under Bransjer, ved siden av Selskaper."
 
+#: src/postulo/resume/views.py
+#, python-format
+msgid "Tick at most %(count)d at a time; nothing was added."
+msgid_plural "Tick at most %(count)d at a time; nothing was added."
+msgstr[0] ""
+msgstr[1] ""
+
 #: src/postulo/resume/forms.py
 msgid "Tick each category the licence lists: none implies another, so somebody who holds A ticks A. A CV prints the codes."
 msgstr "Kryss av for hver kategori førerkortet viser: ingen innebærer en annen, så den som har A, krysser av for A. En CV skriver ut kodene."
@@ -18047,6 +18175,11 @@ msgstr "Kryss av rader for å gjøre noe med flere samtidig."
 #: src/postulo/applications/forms.py
 msgid "Tick the box to add the listing anyway."
 msgstr "Kryss av i boksen for å legge til utlysningen likevel."
+
+#: src/postulo/templates/resume/publication_orcid.html
+#, python-format
+msgid "Tick the works to add, at most %(most)s at a time. ORCID lists a title, a type, a date, the journal and the DOI, and no authors: once added, open a publication and press Look up beside its DOI for the rest."
+msgstr ""
 
 #: src/postulo/jobs/capture_views.py
 msgid "Ticked, the listing becomes an application straight away. Otherwise it waits in your listings for you to decide."
@@ -18328,6 +18461,10 @@ msgstr "kildetype"
 #: src/postulo/jobs/models.py
 msgid "type of thing it points at"
 msgstr "typen ting den peker på"
+
+#: src/postulo/resume/lookups.py src/postulo/resume/views.py
+msgid "Type the DOI first."
+msgstr ""
 
 #: src/postulo/accounts/forms.py src/postulo/jobs/forms.py
 msgid "Type the identifier."
@@ -19836,6 +19973,10 @@ msgstr "Arbeidsform"
 msgid "working arrangement"
 msgstr "arbeidsform"
 
+#: src/postulo/templates/resume/publication_orcid.html
+msgid "Works in your ORCID record"
+msgstr ""
+
 #: src/postulo/resume/models.py
 msgctxt "type of event"
 msgid "Workshop"
@@ -20017,6 +20158,10 @@ msgstr "Du har allerede en annen av denne typen."
 #: src/postulo/jobs/forms.py
 msgid "You already have that industry."
 msgstr "Du har allerede den bransjen."
+
+#: src/postulo/templates/resume/publication_orcid.html
+msgid "You already have this one."
+msgstr ""
 
 #: src/postulo/resume/candidate.py
 msgid "You already hold the most nationalities a profile can."
@@ -20377,6 +20522,10 @@ msgstr "Notatene og avgjørelsene dine om den er bare dine."
 msgid "Your notes on it, your decisions about it and your applications stay yours: sharing it never shares them."
 msgstr "Notatene dine om den, avgjørelsene dine om den og søknadene dine forblir dine: å dele den deler aldri dem."
 
+#: src/postulo/resume/views.py
+msgid "Your ORCID record lists no public works."
+msgstr ""
+
 #: src/postulo/documents/models.py
 msgid "Your own name"
 msgstr "Ditt eget navn"
@@ -20436,6 +20585,13 @@ msgstr "Oppføringen din (JSON)"
 #: src/postulo/templates/resume/europass_import.html
 msgid "Your record as a file"
 msgstr "Dataene dine som fil"
+
+#: src/postulo/templates/resume/publication_orcid.html
+#, python-format
+msgid "Your record lists %(total)s public work; the first %(most)s are shown."
+msgid_plural "Your record lists %(total)s public works; the first %(most)s are shown."
+msgstr[0] ""
+msgstr[1] ""
 
 #: src/postulo/resume/models.py
 msgid "your role"

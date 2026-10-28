@@ -20,6 +20,18 @@ urlpatterns = [
     path("skills/suggestions/", views.SkillSuggestionsView.as_view(), name="skill_suggestions"),
     path("links/check/", views.LinkCheckView.as_view(), name="link_check_all"),
     path("links/<int:pk>/check/", views.LinkCheckView.as_view(), name="link_check"),
+    # *Look up* beside a publication's DOI, and *Suggest from my ORCID record* (#688).
+    path(
+        "publication/lookup/",
+        views.PublicationLookupNewView.as_view(),
+        name="publication_lookup_new",
+    ),
+    path(
+        "publication/<int:pk>/lookup/",
+        views.PublicationLookupView.as_view(),
+        name="publication_lookup",
+    ),
+    path("publications/orcid/", views.PublicationOrcidView.as_view(), name="publication_orcid"),
     path("<slug:section>/new/", views.ResumeItemCreateView.as_view(), name="item_create"),
     path("<slug:section>/<int:pk>/edit/", views.ResumeItemUpdateView.as_view(), name="item_update"),
     path(

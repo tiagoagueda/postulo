@@ -197,6 +197,16 @@ def wikidata(user) -> None:
     consume("wikidata", user, rate_for("POSTULO_WIKIDATA_RATE"))
 
 
+def lookup(user) -> None:
+    """One *Look up* of a DOI or one *Suggest from my ORCID record* (#688).
+
+    Spent before the request is made, so a service that refuses, times out or answers
+    nonsense has still cost one: the allowance bounds what this server asks of a scholarly
+    service on a person's behalf, and a failure is still a request.
+    """
+    consume("lookup", user, rate_for("POSTULO_LOOKUP_RATE"))
+
+
 def api(token) -> None:
     """Per token rather than per account, so revoking one revokes its allowance with it."""
     consume("api", token, rate_for("POSTULO_API_RATE"))

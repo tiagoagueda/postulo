@@ -1256,14 +1256,64 @@ msgstr "%(scheme)s: hori ez da ohiko formatua."
 msgid "%(sent)s, %(failed)s; each document says which."
 msgstr "%(sent)s, %(failed)s; dokumentu bakoitzak adierazten du zein."
 
+#: src/postulo/resume/lookups.py
+#, python-format
+msgid "%(service)s answered %(status)s."
+msgstr ""
+
+#: src/postulo/resume/lookups.py
+#, python-format
+msgid "%(service)s asked for fewer requests. Try again later."
+msgstr ""
+
+#: src/postulo/resume/lookups.py
+#, python-format
+msgid "%(service)s could not be reached."
+msgstr ""
+
+#: src/postulo/resume/lookups.py
+#, python-format
+msgid "%(service)s has no record in a form Postulo reads."
+msgstr ""
+
 #: src/postulo/core/web_links.py src/postulo/jobs/surface.py
 #, python-format
 msgid "%(service)s is already used by another row."
 msgstr "%(service)s zerbitzua beste errenkada batek erabiltzen du jada."
 
+#: src/postulo/resume/lookups.py
+#, python-format
+msgid "%(service)s knows no such identifier."
+msgstr ""
+
+#: src/postulo/resume/lookups.py
+#, python-format
+msgid "%(service)s redirected too many times."
+msgstr ""
+
 #: src/postulo/jobs/geocoding.py
 #, python-format
 msgid "%(service)s refused the look-ups (%(status)s). They are stopped."
+msgstr ""
+
+#: src/postulo/resume/lookups.py
+#, python-format
+msgid "%(service)s sent the request somewhere else."
+msgstr ""
+
+#: src/postulo/resume/lookups.py
+#, python-format
+msgid "%(service)s sent the request to an address Postulo does not dial."
+msgstr ""
+
+#: src/postulo/resume/lookups.py
+#, python-format
+msgid "%(service)s took too long to answer."
+msgstr ""
+
+#: src/postulo/resume/views.py
+#, python-format
+msgid "%(service)s, through doi.org, had nothing for the boxes that are empty."
 msgstr ""
 
 #: src/postulo/core/templatetags/postulo.py
@@ -2796,6 +2846,10 @@ msgstr "Gehitu markatu ditudan txartelak"
 msgid "Add the first one."
 msgstr "Gehitu lehena."
 
+#: src/postulo/templates/resume/publication_orcid.html
+msgid "Add the ticked works"
+msgstr ""
+
 #: src/postulo/templates/documents/cv_detail.html
 msgid "Add these"
 msgstr "Gehitu hauek"
@@ -2833,6 +2887,10 @@ msgstr "Gehitu aukeratu dudana"
 msgid "Add what is new"
 msgstr "Gehitu berria dena"
 
+#: src/postulo/resume/views.py
+msgid "Add your ORCID on Your details first."
+msgstr ""
+
 #: src/postulo/jobs/models.py src/postulo/jobs/tables.py
 msgid "Added"
 msgstr "Gehituta"
@@ -2840,6 +2898,13 @@ msgstr "Gehituta"
 #: src/postulo/plugins/models.py
 msgid "added"
 msgstr "gehituta"
+
+#: src/postulo/resume/views.py
+#, python-format
+msgid "Added %(count)d publication from your ORCID record, with no authors: ORCID's list has none. Open it and press Look up beside its DOI for the rest."
+msgid_plural "Added %(count)d publications from your ORCID record, with no authors: ORCID's list has none. Open each and press Look up beside its DOI for the rest."
+msgstr[0] ""
+msgstr[1] ""
 
 #: src/postulo/documents/views.py
 #, python-format
@@ -4195,6 +4260,7 @@ msgstr "Bertan erregistratu beharreko itzulera-helbidea"
 #: src/postulo/templates/partials/confirm_delete.html
 #: src/postulo/templates/partials/table/cell.html
 #: src/postulo/templates/resume/item_form.html
+#: src/postulo/templates/resume/publication_orcid.html
 #: src/postulo/templates/server/backup_delete.html
 #: src/postulo/templates/server/identifier_schemes.html
 #: src/postulo/templates/server/person_delete.html
@@ -5852,6 +5918,10 @@ msgstr "Ez da egiaztatzen"
 msgid "DOI"
 msgstr "DOI"
 
+#: src/postulo/resume/lookups.py
+msgid "doi.org's answer was not a record Postulo can read."
+msgstr ""
+
 #: src/postulo/core/models.py src/postulo/templates/core/dashboard.html
 #: src/postulo/templates/core/partials/errand_state.html
 #: src/postulo/templates/cotton/reminder_actions.html
@@ -6778,6 +6848,11 @@ msgstr "Jada dituzun fitxategiak"
 msgid "Fill in from"
 msgstr "Bete hemendik"
 
+#: src/postulo/resume/views.py
+#, python-format
+msgid "Filled in from %(service)s, through doi.org: %(fields)s. Check them; nothing is kept until you save."
+msgstr ""
+
 #: src/postulo/templates/documents/letter_detail.html
 msgid "Filled in when the letter is sent with an application."
 msgstr "Gutuna hautagaitza batekin bidaltzean betetzen da."
@@ -7138,6 +7213,10 @@ msgstr "zure ibilbidetik"
 #: src/postulo/jobs/tables.py
 msgid "From your career"
 msgstr "Zure ibilbidetik"
+
+#: src/postulo/templates/resume/publication_orcid.html
+msgid "From your ORCID record"
+msgstr ""
 
 #: src/postulo/templates/documents/application_documents.html
 msgid "Frozen at the moment of sending"
@@ -9171,6 +9250,10 @@ msgstr "esteka biltegian"
 msgid "Link services"
 msgstr "Esteka-zerbitzuak"
 
+#: src/postulo/resume/forms.py
+msgid "Linked on a CV as https://doi.org/…. Postulo asks doi.org about it only when you press Look up."
+msgstr ""
+
 #: src/postulo/templates/resume/item_form.html
 msgid "Linked to the company"
 msgstr "Enpresari lotuta"
@@ -9304,6 +9387,10 @@ msgstr "longitudea"
 #: src/postulo/templates/jobs/address_place.html
 msgid "Longitude"
 msgstr "Longitudea"
+
+#: src/postulo/templates/resume/item_form.html
+msgid "Look up"
+msgstr ""
 
 #: src/postulo/core/models.py
 msgid "look-up service address"
@@ -11163,6 +11250,10 @@ msgstr "Aldi honetan ez zen ezer bidali."
 msgid "Nothing was sent in this period. That is what the report says, and it is a fact like any other."
 msgstr "Aldi honetan ez zen ezer bidali. Hori dio txostenak, eta beste edozein bezalako egitatea da."
 
+#: src/postulo/resume/views.py
+msgid "Nothing was ticked, so nothing was added."
+msgstr ""
+
 #: src/postulo/documents/forms.py
 msgid "Nothing yet"
 msgstr "Ezer ez oraindik"
@@ -11819,6 +11910,10 @@ msgstr "Edo igo bat"
 #: src/postulo/resume/views.py
 msgid "ORCID"
 msgstr "ORCID"
+
+#: src/postulo/resume/lookups.py
+msgid "ORCID's answer was not a list of works."
+msgstr ""
 
 #: src/postulo/documents/models.py src/postulo/resume/models.py
 msgid "order"
@@ -14183,6 +14278,10 @@ msgstr "Zure izenean bidaltzea"
 msgid "Sending failed: %(error)s"
 msgstr "Bidalketak huts egin du: %(error)s"
 
+#: src/postulo/templates/resume/item_form.html
+msgid "Sends the DOI to doi.org, which passes it to Crossref or DataCite, and nothing else about you. Only the empty boxes are filled, and nothing is kept until you save."
+msgstr ""
+
 #: src/postulo/notifications/models.py
 #: src/postulo/templates/applications/report.html
 #: src/postulo/templates/server/design.html
@@ -15191,6 +15290,10 @@ msgstr "Gaia"
 msgid "subject"
 msgstr "gaia"
 
+#: src/postulo/templates/resume/overview.html
+msgid "Suggest from my ORCID record"
+msgstr ""
+
 #: src/postulo/applications/models.py
 msgid "suggested by"
 msgstr "iradokitzailea"
@@ -15835,6 +15938,10 @@ msgstr "Hori %(limit)s baino handiagoa da, eta hori da instantzia honek gordetze
 msgid "That is not a %(kind)s, whatever it was sent as."
 msgstr "Hori ez da %(kind)s motakoa, edozein gisa bidali dela ere."
 
+#: src/postulo/resume/lookups.py
+msgid "That is not a DOI."
+msgstr ""
+
 #: src/postulo/core/kind_files.py
 msgid "That is not a file this page reads. It reads the JSON file it offers to download for this kind of record, as Postulo writes it, and nothing else."
 msgstr "Hori ez da orri honek irakurtzen duen fitxategi bat. Erregistro mota honetarako deskargatzeko eskaintzen duen JSON fitxategia irakurtzen du, Postulok idazten duen bezala, eta ez besterik."
@@ -15932,6 +16039,10 @@ msgstr "Hori ez da Ed25519 gako publiko bat: %(error)s"
 #: src/postulo/applications/ical_reader.py
 msgid "That is not an iCalendar file."
 msgstr "Hori ez da iCalendar fitxategi bat."
+
+#: src/postulo/resume/lookups.py
+msgid "That is not an ORCID."
+msgstr ""
 
 #: src/postulo/applications/views.py
 msgid "That is not an outcome Postulo recognises."
@@ -16174,6 +16285,16 @@ msgstr "Jendeak ikusten duen igorle-helbidea. Zerbitzari askok uko egiten diote 
 #: src/postulo/applications/forms.py
 msgid "The agency or employment service it went through, from the companies you have recorded. Companies in Employment activities, and public employment services, are offered first; add that industry to a company to have it offered here. The company on the posting stays the employer."
 msgstr "Hautagaitza zein agentzia edo enplegu-zerbitzuren bidez joan zen, erregistratu dituzun enpresen artetik. «Enplegu-jarduerak» jarduerako enpresak eta enplegu-zerbitzu publikoak eskaintzen dira lehenik; gehitu jarduera hori enpresa bati hemen eskain dadin. Iragarkiko enpresak enplegatzailea izaten jarraitzen du."
+
+#: src/postulo/resume/lookups.py
+#, python-format
+msgid "The answer from %(service)s could not be read."
+msgstr ""
+
+#: src/postulo/resume/lookups.py
+#, python-format
+msgid "The answer from %(service)s was larger than a record should be."
+msgstr ""
 
 #: src/postulo/jobs/models.py
 msgid "The application deadline, if stated."
@@ -18027,6 +18148,13 @@ msgstr "Markatu kategoria bat, edo idatzi nazionala behean."
 msgid "Tick as many as fit. The list is your own — Industries, beside Companies, is where it is kept."
 msgstr "Markatu egokiak diren guztiak. Zerrenda zurea da: «Jarduerak» atalean dago, «Enpresak» ondoan."
 
+#: src/postulo/resume/views.py
+#, python-format
+msgid "Tick at most %(count)d at a time; nothing was added."
+msgid_plural "Tick at most %(count)d at a time; nothing was added."
+msgstr[0] ""
+msgstr[1] ""
+
 #: src/postulo/resume/forms.py
 #, fuzzy
 msgid "Tick each category the licence lists: none implies another, so somebody who holds A ticks A. A CV prints the codes."
@@ -18043,6 +18171,11 @@ msgstr "Markatu errenkadak hainbatekin batera jarduteko."
 #: src/postulo/applications/forms.py
 msgid "Tick the box to add the listing anyway."
 msgstr "Markatu laukia iragarkia hala ere gehitzeko."
+
+#: src/postulo/templates/resume/publication_orcid.html
+#, python-format
+msgid "Tick the works to add, at most %(most)s at a time. ORCID lists a title, a type, a date, the journal and the DOI, and no authors: once added, open a publication and press Look up beside its DOI for the rest."
+msgstr ""
 
 #: src/postulo/jobs/capture_views.py
 msgid "Ticked, the listing becomes an application straight away. Otherwise it waits in your listings for you to decide."
@@ -18330,6 +18463,10 @@ msgstr "iturri mota"
 #: src/postulo/jobs/models.py
 msgid "type of thing it points at"
 msgstr "adierazten duen gauza mota"
+
+#: src/postulo/resume/lookups.py src/postulo/resume/views.py
+msgid "Type the DOI first."
+msgstr ""
 
 #: src/postulo/accounts/forms.py src/postulo/jobs/forms.py
 msgid "Type the identifier."
@@ -19839,6 +19976,10 @@ msgstr "Lan-modua"
 msgid "working arrangement"
 msgstr "lan-modua"
 
+#: src/postulo/templates/resume/publication_orcid.html
+msgid "Works in your ORCID record"
+msgstr ""
+
 #: src/postulo/resume/models.py
 msgctxt "type of event"
 msgid "Workshop"
@@ -20017,6 +20158,10 @@ msgstr "Dagoeneko baduzu mota honetako beste bat."
 #: src/postulo/jobs/forms.py
 msgid "You already have that industry."
 msgstr "Jarduera hori jada baduzu."
+
+#: src/postulo/templates/resume/publication_orcid.html
+msgid "You already have this one."
+msgstr ""
 
 #: src/postulo/resume/candidate.py
 msgid "You already hold the most nationalities a profile can."
@@ -20376,6 +20521,10 @@ msgstr "Zure oharrak eta horri buruzko erabakiak zureak dira soilik."
 msgid "Your notes on it, your decisions about it and your applications stay yours: sharing it never shares them."
 msgstr "Horri buruzko zure oharrak, zure erabakiak eta zure hautagaitzak zureak dira beti: partekatzeak ez ditu inoiz partekatzen."
 
+#: src/postulo/resume/views.py
+msgid "Your ORCID record lists no public works."
+msgstr ""
+
 #: src/postulo/documents/models.py
 msgid "Your own name"
 msgstr "Zure izena"
@@ -20434,6 +20583,13 @@ msgstr "Zure erregistroa (JSON)"
 #: src/postulo/templates/resume/europass_import.html
 msgid "Your record as a file"
 msgstr "Zure erregistroa fitxategi gisa"
+
+#: src/postulo/templates/resume/publication_orcid.html
+#, python-format
+msgid "Your record lists %(total)s public work; the first %(most)s are shown."
+msgid_plural "Your record lists %(total)s public works; the first %(most)s are shown."
+msgstr[0] ""
+msgstr[1] ""
 
 #: src/postulo/resume/models.py
 msgid "your role"

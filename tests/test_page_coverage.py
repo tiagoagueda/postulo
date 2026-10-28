@@ -256,6 +256,18 @@ EXCUSED: dict[str, str] = {
     ),
     "resume:link_check": "a POST that asks whether one link still answers",
     "resume:link_check_all": "a POST that asks the same of every link",
+    "resume:publication_lookup_new": (
+        "a POST from a new publication's form, *Look up*, which draws that form back with "
+        "the empty boxes filled; the form, `/career/publication/new/`, is walked (#688)"
+    ),
+    "resume:publication_lookup": (
+        "a POST from a saved publication's form, *Look up*, which draws that form back with "
+        "the empty boxes filled; a GET is refused (#688)"
+    ),
+    "resume:publication_orcid": (
+        "what a press of Suggest from my ORCID record brought back, held in the session; "
+        "without a fetch it sends you to Your career, so the walk never finds it drawn (#688)"
+    ),
     "server:plugin_action": "a POST that installs, removes or disables a plugin",
     "server:plugin_policy": (
         "a POST that sets the instance default for each plugin; the form is on the "

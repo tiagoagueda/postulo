@@ -53,6 +53,18 @@
                  class="text-sm text-brand-600 underline dark:text-brand-400">
                 {% translate "Add" %}
               </a>
+            {% elif section.spec.slug == 'publication' and orcid_suggestions %}
+              {% comment %} Shown only to a person who stored their own ORCID, and only while
+                 the publication-lookups feature is on: one request to ORCID per press, and a
+                 page to choose from before anything is added (#688). {% endcomment %}
+              <form method="post" action="{% url 'resume:publication_orcid' %}" class="ms-auto" data-orcid-suggest>
+                {% csrf_token %}
+                <button type="submit" class="text-sm text-ink-600 underline hover:text-ink-900 dark:text-ink-300 dark:hover:text-ink-100">{% translate "Suggest from my ORCID record" %}</button>
+              </form>
+              <a href="{% url 'resume:item_create' section.spec.slug %}"
+                 class="text-sm text-brand-600 underline dark:text-brand-400">
+                {% translate "Add" %}
+              </a>
             {% else %}
               <a href="{% url 'resume:item_create' section.spec.slug %}"
                  class="ms-auto text-sm text-brand-600 underline dark:text-brand-400">

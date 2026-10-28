@@ -1175,14 +1175,64 @@ msgstr "%(scheme)s：這不是常見的格式。"
 msgid "%(sent)s, %(failed)s; each document says which."
 msgstr "%(sent)s，%(failed)s；每份文件會說明是哪一種。"
 
+#: src/postulo/resume/lookups.py
+#, python-format
+msgid "%(service)s answered %(status)s."
+msgstr ""
+
+#: src/postulo/resume/lookups.py
+#, python-format
+msgid "%(service)s asked for fewer requests. Try again later."
+msgstr ""
+
+#: src/postulo/resume/lookups.py
+#, python-format
+msgid "%(service)s could not be reached."
+msgstr ""
+
+#: src/postulo/resume/lookups.py
+#, python-format
+msgid "%(service)s has no record in a form Postulo reads."
+msgstr ""
+
 #: src/postulo/core/web_links.py src/postulo/jobs/surface.py
 #, python-format
 msgid "%(service)s is already used by another row."
 msgstr "%(service)s 已被另一列使用。"
 
+#: src/postulo/resume/lookups.py
+#, python-format
+msgid "%(service)s knows no such identifier."
+msgstr ""
+
+#: src/postulo/resume/lookups.py
+#, python-format
+msgid "%(service)s redirected too many times."
+msgstr ""
+
 #: src/postulo/jobs/geocoding.py
 #, python-format
 msgid "%(service)s refused the look-ups (%(status)s). They are stopped."
+msgstr ""
+
+#: src/postulo/resume/lookups.py
+#, python-format
+msgid "%(service)s sent the request somewhere else."
+msgstr ""
+
+#: src/postulo/resume/lookups.py
+#, python-format
+msgid "%(service)s sent the request to an address Postulo does not dial."
+msgstr ""
+
+#: src/postulo/resume/lookups.py
+#, python-format
+msgid "%(service)s took too long to answer."
+msgstr ""
+
+#: src/postulo/resume/views.py
+#, python-format
+msgid "%(service)s, through doi.org, had nothing for the boxes that are empty."
 msgstr ""
 
 #: src/postulo/core/templatetags/postulo.py
@@ -2689,6 +2739,10 @@ msgstr "新增我勾選的名片"
 msgid "Add the first one."
 msgstr "新增第一個。"
 
+#: src/postulo/templates/resume/publication_orcid.html
+msgid "Add the ticked works"
+msgstr ""
+
 #: src/postulo/templates/documents/cv_detail.html
 msgid "Add these"
 msgstr "新增這些"
@@ -2726,6 +2780,10 @@ msgstr "新增我選擇的項目"
 msgid "Add what is new"
 msgstr "新增新的項目"
 
+#: src/postulo/resume/views.py
+msgid "Add your ORCID on Your details first."
+msgstr ""
+
 #: src/postulo/jobs/models.py src/postulo/jobs/tables.py
 msgid "Added"
 msgstr "已新增"
@@ -2733,6 +2791,12 @@ msgstr "已新增"
 #: src/postulo/plugins/models.py
 msgid "added"
 msgstr "已新增"
+
+#: src/postulo/resume/views.py
+#, python-format
+msgid "Added %(count)d publication from your ORCID record, with no authors: ORCID's list has none. Open it and press Look up beside its DOI for the rest."
+msgid_plural "Added %(count)d publications from your ORCID record, with no authors: ORCID's list has none. Open each and press Look up beside its DOI for the rest."
+msgstr[0] ""
 
 #: src/postulo/documents/views.py
 #, python-format
@@ -4088,6 +4152,7 @@ msgstr "向其註冊用的回呼網址"
 #: src/postulo/templates/partials/confirm_delete.html
 #: src/postulo/templates/partials/table/cell.html
 #: src/postulo/templates/resume/item_form.html
+#: src/postulo/templates/resume/publication_orcid.html
 #: src/postulo/templates/server/backup_delete.html
 #: src/postulo/templates/server/identifier_schemes.html
 #: src/postulo/templates/server/person_delete.html
@@ -5753,6 +5818,10 @@ msgstr "驗證失敗"
 msgid "DOI"
 msgstr "DOI"
 
+#: src/postulo/resume/lookups.py
+msgid "doi.org's answer was not a record Postulo can read."
+msgstr ""
+
 #: src/postulo/core/models.py src/postulo/templates/core/dashboard.html
 #: src/postulo/templates/core/partials/errand_state.html
 #: src/postulo/templates/cotton/reminder_actions.html
@@ -6682,6 +6751,11 @@ msgstr "您已有的檔案"
 msgid "Fill in from"
 msgstr "填入來源"
 
+#: src/postulo/resume/views.py
+#, python-format
+msgid "Filled in from %(service)s, through doi.org: %(fields)s. Check them; nothing is kept until you save."
+msgstr ""
+
 #: src/postulo/templates/documents/letter_detail.html
 msgid "Filled in when the letter is sent with an application."
 msgstr "信函隨應徵送出時自動填入。"
@@ -7045,6 +7119,10 @@ msgstr "來自您的職涯"
 #: src/postulo/jobs/tables.py
 msgid "From your career"
 msgstr "來自您的職涯"
+
+#: src/postulo/templates/resume/publication_orcid.html
+msgid "From your ORCID record"
+msgstr ""
 
 #: src/postulo/templates/documents/application_documents.html
 msgid "Frozen at the moment of sending"
@@ -9093,6 +9171,10 @@ msgstr "存放區中的連結"
 msgid "Link services"
 msgstr "連結服務"
 
+#: src/postulo/resume/forms.py
+msgid "Linked on a CV as https://doi.org/…. Postulo asks doi.org about it only when you press Look up."
+msgstr ""
+
 #: src/postulo/templates/resume/item_form.html
 msgid "Linked to the company"
 msgstr "已連結到公司"
@@ -9227,6 +9309,10 @@ msgstr "經度"
 #: src/postulo/templates/jobs/address_place.html
 msgid "Longitude"
 msgstr "經度"
+
+#: src/postulo/templates/resume/item_form.html
+msgid "Look up"
+msgstr ""
 
 #: src/postulo/core/models.py
 msgid "look-up service address"
@@ -11093,6 +11179,10 @@ msgstr "此期間未寄出任何內容。"
 msgid "Nothing was sent in this period. That is what the report says, and it is a fact like any other."
 msgstr "此期間未寄出任何內容。報告如實呈現這一點，這和其他任何事實一樣都是事實。"
 
+#: src/postulo/resume/views.py
+msgid "Nothing was ticked, so nothing was added."
+msgstr ""
+
 #: src/postulo/documents/forms.py
 msgid "Nothing yet"
 msgstr "尚無內容"
@@ -11740,6 +11830,10 @@ msgstr "或上傳一份"
 #: src/postulo/resume/views.py
 msgid "ORCID"
 msgstr "ORCID"
+
+#: src/postulo/resume/lookups.py
+msgid "ORCID's answer was not a list of works."
+msgstr ""
 
 #: src/postulo/documents/models.py src/postulo/resume/models.py
 msgid "order"
@@ -14106,6 +14200,10 @@ msgstr "以您自己的身分傳送"
 msgid "Sending failed: %(error)s"
 msgstr "傳送失敗：%(error)s"
 
+#: src/postulo/templates/resume/item_form.html
+msgid "Sends the DOI to doi.org, which passes it to Crossref or DataCite, and nothing else about you. Only the empty boxes are filled, and nothing is kept until you save."
+msgstr ""
+
 #: src/postulo/notifications/models.py
 #: src/postulo/templates/applications/report.html
 #: src/postulo/templates/server/design.html
@@ -15117,6 +15215,10 @@ msgstr "主旨"
 msgid "subject"
 msgstr "主旨"
 
+#: src/postulo/templates/resume/overview.html
+msgid "Suggest from my ORCID record"
+msgstr ""
+
 #: src/postulo/applications/models.py
 msgid "suggested by"
 msgstr "建議者"
@@ -15761,6 +15863,10 @@ msgstr "這超過 %(limit)s，也就是此站台保存的上限。"
 msgid "That is not a %(kind)s, whatever it was sent as."
 msgstr "這不是 %(kind)s，無論它是以何種形式傳送的。"
 
+#: src/postulo/resume/lookups.py
+msgid "That is not a DOI."
+msgstr ""
+
 #: src/postulo/core/kind_files.py
 msgid "That is not a file this page reads. It reads the JSON file it offers to download for this kind of record, as Postulo writes it, and nothing else."
 msgstr "這不是此頁面可讀取的檔案。此頁面只讀取它為此類紀錄提供下載的 JSON 檔案（即 Postulo 所寫出的格式），不讀取其他檔案。"
@@ -15858,6 +15964,10 @@ msgstr "這不是 Ed25519 公開金鑰：%(error)s"
 #: src/postulo/applications/ical_reader.py
 msgid "That is not an iCalendar file."
 msgstr "這不是 iCalendar 檔案。"
+
+#: src/postulo/resume/lookups.py
+msgid "That is not an ORCID."
+msgstr ""
 
 #: src/postulo/applications/views.py
 msgid "That is not an outcome Postulo recognises."
@@ -16098,6 +16208,16 @@ msgstr "收件人看到的寄件地址。許多伺服器會拒絕以非其託管
 #: src/postulo/applications/forms.py
 msgid "The agency or employment service it went through, from the companies you have recorded. Companies in Employment activities, and public employment services, are offered first; add that industry to a company to have it offered here. The company on the posting stays the employer."
 msgstr "透過的仲介機構或就業服務機構，從您記錄的公司中選擇。屬於「就業服務業」產業的公司及公共就業服務機構會優先列出；為公司加上該產業，即可讓它出現在這裡。徵才啟事上的公司仍是雇主。"
+
+#: src/postulo/resume/lookups.py
+#, python-format
+msgid "The answer from %(service)s could not be read."
+msgstr ""
+
+#: src/postulo/resume/lookups.py
+#, python-format
+msgid "The answer from %(service)s was larger than a record should be."
+msgstr ""
 
 #: src/postulo/jobs/models.py
 msgid "The application deadline, if stated."
@@ -17953,6 +18073,12 @@ msgstr "勾選一個類別，或在下方填寫本國的類別。"
 msgid "Tick as many as fit. The list is your own — Industries, beside Companies, is where it is kept."
 msgstr "勾選所有符合的項目。清單是您自己的——位於「公司」旁的「產業」就是存放清單的地方。"
 
+#: src/postulo/resume/views.py
+#, python-format
+msgid "Tick at most %(count)d at a time; nothing was added."
+msgid_plural "Tick at most %(count)d at a time; nothing was added."
+msgstr[0] ""
+
 #: src/postulo/resume/forms.py
 msgid "Tick each category the licence lists: none implies another, so somebody who holds A ticks A. A CV prints the codes."
 msgstr "勾選駕照上列出的每一個類別：各類別之間不互相涵蓋，因此持有 A 類者就勾選 A。履歷會印出這些代碼。"
@@ -17968,6 +18094,11 @@ msgstr "勾選多列即可一次對多列執行操作。"
 #: src/postulo/applications/forms.py
 msgid "Tick the box to add the listing anyway."
 msgstr "勾選此方框，仍要新增此職缺。"
+
+#: src/postulo/templates/resume/publication_orcid.html
+#, python-format
+msgid "Tick the works to add, at most %(most)s at a time. ORCID lists a title, a type, a date, the journal and the DOI, and no authors: once added, open a publication and press Look up beside its DOI for the rest."
+msgstr ""
 
 #: src/postulo/jobs/capture_views.py
 msgid "Ticked, the listing becomes an application straight away. Otherwise it waits in your listings for you to decide."
@@ -18253,6 +18384,10 @@ msgstr "來源類型"
 #: src/postulo/jobs/models.py
 msgid "type of thing it points at"
 msgstr "它所指的事物的類型"
+
+#: src/postulo/resume/lookups.py src/postulo/resume/views.py
+msgid "Type the DOI first."
+msgstr ""
 
 #: src/postulo/accounts/forms.py src/postulo/jobs/forms.py
 msgid "Type the identifier."
@@ -19766,6 +19901,10 @@ msgstr "工作型態"
 msgid "working arrangement"
 msgstr "工作型態"
 
+#: src/postulo/templates/resume/publication_orcid.html
+msgid "Works in your ORCID record"
+msgstr ""
+
 #: src/postulo/resume/models.py
 msgctxt "type of event"
 msgid "Workshop"
@@ -19947,6 +20086,10 @@ msgstr "您已經有另一個此類型的項目。"
 #: src/postulo/jobs/forms.py
 msgid "You already have that industry."
 msgstr "您已經有這個產業。"
+
+#: src/postulo/templates/resume/publication_orcid.html
+msgid "You already have this one."
+msgstr ""
 
 #: src/postulo/resume/candidate.py
 msgid "You already hold the most nationalities a profile can."
@@ -20306,6 +20449,10 @@ msgstr "您對它的備註和決定只屬於您。"
 msgid "Your notes on it, your decisions about it and your applications stay yours: sharing it never shares them."
 msgstr "您對它的備註、決定和應徵仍只屬於您：共用它絕不會共用這些內容。"
 
+#: src/postulo/resume/views.py
+msgid "Your ORCID record lists no public works."
+msgstr ""
+
 #: src/postulo/documents/models.py
 msgid "Your own name"
 msgstr "您自己的姓名"
@@ -20364,6 +20511,12 @@ msgstr "您的紀錄（JSON）"
 #: src/postulo/templates/resume/europass_import.html
 msgid "Your record as a file"
 msgstr "將您的紀錄匯出為檔案"
+
+#: src/postulo/templates/resume/publication_orcid.html
+#, python-format
+msgid "Your record lists %(total)s public work; the first %(most)s are shown."
+msgid_plural "Your record lists %(total)s public works; the first %(most)s are shown."
+msgstr[0] ""
 
 #: src/postulo/resume/models.py
 msgid "your role"

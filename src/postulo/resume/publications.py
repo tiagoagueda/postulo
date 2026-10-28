@@ -13,7 +13,8 @@ series of proceedings, and ``institution`` for ``school`` and ``organization`` a
 column names are Postulo's; the mapping to BibTeX's lives here with the type.
 
 **Nothing here is looked up.** A DOI is checked for its shape and stored bare; it is linked
-as ``https://doi.org/<doi>`` and never resolved by this code.
+as ``https://doi.org/<doi>`` and never resolved by this code. Asking doi.org or ORCID about a
+publication is `lookups`, and only at a person's press (#688).
 """
 
 from __future__ import annotations

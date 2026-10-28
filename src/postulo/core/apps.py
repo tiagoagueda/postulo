@@ -26,6 +26,7 @@ class CoreConfig(AppConfig):
         from postulo.plugins.multiple_fields import MultipleFieldsFeature
         from postulo.plugins.phone_numbers import PhoneNumbersFeature
         from postulo.plugins.postal_rules import PostalRulesFeature
+        from postulo.plugins.publication_lookups import PublicationLookupsFeature
         from postulo.plugins.repositories import RepositoriesFeature
         from postulo.plugins.social_profiles import SocialProfilesFeature
         from postulo.plugins.websites import WebsitesFeature
@@ -67,6 +68,8 @@ class CoreConfig(AppConfig):
         registry.register_builtin("feature", MultipleFieldsFeature)
         # A company's names and place, read from its Wikidata item on a press (#673, #701).
         registry.register_builtin("feature", WikidataFeature)
+        # A publication filled from its DOI, or suggested from an ORCID record, on a press (#688).
+        registry.register_builtin("feature", PublicationLookupsFeature)
         registry.register_builtin("feature", PhoneNumbersFeature)
         # How somebody is reached on Signal, Matrix, Telegram, XMPP (#682).
         registry.register_builtin("feature", MessagingContactsFeature)

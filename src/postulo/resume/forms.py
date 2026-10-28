@@ -876,6 +876,14 @@ class PublicationForm(ResumeItemForm):
         field.required = False
         choices = [("", _("Not stated")), *languages.LANGUAGES]
         field.widget = LanguageSelect(choices=with_what_is_held(choices, self["language"].value()))
+        # Where *Look up* is offered beside it, "never looks it up" is no longer true (#688).
+        from . import lookups
+
+        if user is not None and lookups.offered(user):
+            self.fields["doi"].help_text = _(
+                "Linked on a CV as https://doi.org/…. Postulo asks doi.org about it only when "
+                "you press Look up."
+            )
 
     @property
     def current_type(self) -> str:

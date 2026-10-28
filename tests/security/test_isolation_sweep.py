@@ -342,6 +342,12 @@ def link(owner):
     return Link.objects.create(owner=owner, title="Their site", url="https://example.org", order=0)
 
 
+def publication(owner):
+    from postulo.resume.models import Publication
+
+    return Publication.objects.create(owner=owner, title="Their paper", doi="10.1000/182")
+
+
 def connection(owner):
     from postulo.plugins.models import Connection
 
@@ -613,6 +619,9 @@ FACTORIES: dict[str, Callable] = {
     "resume:item_move": pk_of(experience, section="experience", direction="up"),
     "resume:item_update": pk_of(experience, section="experience"),
     "resume:link_check": pk_of(link),
+    # *Look up* on somebody else's publication (#688): the record is never read, and nothing
+    # is asked of doi.org on its behalf.
+    "resume:publication_lookup": pk_of(publication),
 }
 
 #: The JSON API: the same, with the method each route answers and a body that passes its

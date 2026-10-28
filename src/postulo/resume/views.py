@@ -31,7 +31,7 @@ from postulo.jobs import esco
 from postulo.jobs.views import UserFormKwargsMixin
 from postulo.plugins import base
 
-from . import companies, importing, ordering, translating
+from . import companies, importing, lookups, ordering, publications, translating
 from . import forms as resume_forms
 from .models import (
     Certification,
@@ -128,6 +128,8 @@ class ResumeOverviewView(OwnedObjectMixin, TemplateView):
             entry: {"count": number, "key": proofs.key_of(entry)}
             for entry, number in proofs.counts_for(everything).items()
         }
+        # *Suggest from my ORCID record*, for a person who has stored their own (#688).
+        context["orcid_suggestions"] = bool(lookups.offered(user) and own_orcid(user))
         context["counts"] = {
             "experience": Experience.objects.for_user(user).count(),
             "education": Education.objects.for_user(user).count(),
@@ -307,6 +309,21 @@ class SectionFormMixin(UserFormKwargsMixin):
         context["section"] = self.section
         if self.section.slug == "reference":
             context.update(self.contact_links())
+        if self.section.slug == "publication" and lookups.offered(self.request.user):
+            # *Look up* beside the DOI posts the whole form here, and is drawn back (#688).
+            pk = getattr(getattr(self, "object", None), "pk", None)
+            context["lookup_url"] = (
+                reverse("resume:publication_lookup", args=[pk])
+                if pk
+                else reverse("resume:publication_lookup_new")
+            )
+            # Said outright, because the form drawn back by *Look up* is at the lookup's
+            # address, and *Save* there must still save.
+            context["form_action"] = (
+                reverse("resume:item_update", args=["publication", pk])
+                if pk
+                else reverse("resume:item_create", args=["publication"])
+            )
         return context
 
     def contact_links(self) -> dict:
@@ -559,6 +576,259 @@ class LinkCheckView(OwnedObjectMixin, View):
                 % {"count": ok},
             )
         return redirect(safe_next(request, fallback))
+
+
+def own_orcid(user) -> str:
+    """The ORCID the person stored on *Your details*, checked; never one typed into a request.
+
+    So a press can only ever list the person's own works, and never be a way of reading
+    somebody else's list through this server (#688).
+    """
+    from postulo.accounts.identifiers import ORCID
+    from postulo.accounts.models import PersonIdentifier
+
+    values = PersonIdentifier.objects.filter(profile__user=user, scheme=ORCID).values_list(
+        "value", flat=True
+    )
+    return next((found for value in values if (found := lookups.valid_orcid(value))), "")
+
+
+class PublicationLookupMixin:
+    """*Look up* beside a publication's DOI: one request to doi.org, and the form drawn back.
+
+    The button posts the whole form here (``formaction``), so it works with scripts off. The
+    DOI typed is looked up, the boxes still empty are filled from what came back, and the form
+    is drawn again **unsaved**, with a line saying which boxes and from which service: the
+    form is the review, and nothing is kept until the person presses *Save* (#688). What was
+    typed is never replaced. The allowance is spent before the request, so a failure costs
+    one too, and nothing is tried again.
+    """
+
+    http_method_names = ["post"]
+
+    def setup(self, request: HttpRequest, *args, **kwargs) -> None:
+        kwargs["section"] = "publication"
+        super().setup(request, *args, **kwargs)
+
+    def dispatch(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
+        # Switched off, the address answers as if it did not exist.
+        if request.user.is_authenticated and not lookups.offered(request.user):
+            raise Http404
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_form_kwargs(self) -> dict:
+        kwargs = super().get_form_kwargs()
+        kwargs.pop("data", None)
+        kwargs.pop("files", None)
+        kwargs["initial"] = self.looked_up
+        return kwargs
+
+    def post(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
+        self.object = self.get_object() if "pk" in kwargs else None
+        form_class = self.get_form_class()
+        current = {name: request.POST.get(name, "") for name in form_class.base_fields}
+        self.looked_up = current
+        try:
+            if not publications.normalise_doi(current.get("doi")):
+                raise lookups.LookupRefused(_("Type the DOI first."))
+            throttle.lookup(request.user)
+            found = lookups.from_doi(current["doi"])
+        except throttle.TooOften as too_often:
+            messages.error(request, str(too_often))
+        except lookups.LookupRefused as refused:
+            messages.error(request, str(refused))
+        else:
+            # The type is never blank. On a new entry still on the type it opened with, nobody
+            # has chosen one yet, and a record that says *chapter* is a better guess.
+            type_is_blank = self.object is None and current.get("entry_type") in (
+                "",
+                publications.DEFAULT_TYPE,
+            )
+            self.looked_up, filled = lookups.fill(
+                current, found.values, type_is_blank=type_is_blank
+            )
+            say_what_was_filled(request, found, filled, form_class)
+        return self.render_to_response(self.get_context_data(form=self.get_form()))
+
+
+def say_what_was_filled(request, found, filled, form_class) -> None:
+    """Which boxes *Look up* filled, by their labels, and which service the words came from."""
+    if not filled:
+        messages.info(
+            request,
+            _("%(service)s, through doi.org, had nothing for the boxes that are empty.")
+            % {"service": found.service},
+        )
+        return
+    labels = [str(form_class.base_fields[name].label) for name in filled]
+    messages.success(
+        request,
+        _(
+            "Filled in from %(service)s, through doi.org: %(fields)s. Check them; nothing is "
+            "kept until you save."
+        )
+        % {"service": found.service, "fields": ", ".join(labels)},
+    )
+
+
+@method_decorator(transaction.non_atomic_requests, name="dispatch")
+class PublicationLookupNewView(PublicationLookupMixin, ResumeItemCreateView):
+    """*Look up* on a publication that is not saved yet."""
+
+
+@method_decorator(transaction.non_atomic_requests, name="dispatch")
+class PublicationLookupView(PublicationLookupMixin, ResumeItemUpdateView):
+    """*Look up* on one of the person's publications: somebody else's is a 404."""
+
+
+@method_decorator(transaction.non_atomic_requests, name="dispatch")
+class PublicationOrcidView(LoginRequiredMixin, View):
+    """*Suggest from my ORCID record*, the works it lists, and adding the ones ticked (#688).
+
+    A POST with nothing more asks ORCID once for the person's own record -- the ORCID stored
+    on *Your details*, never one in the request -- and holds the list in the session, not in
+    the database. The GET shows it: each public work, marked where the person already holds
+    it (the same DOI, else the same title and year), and none ticked. A POST of ``add`` adds
+    what was ticked, at most `lookups.MAX_ADDED`, from the summary alone: no authors, since a
+    summary has none, and *Look up* beside each DOI fills the rest at the person's press.
+    """
+
+    template_name = "resume/publication_orcid.html"
+    held_key = "publication-orcid"
+
+    def dispatch(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
+        if request.user.is_authenticated and not lookups.offered(request.user):
+            raise Http404
+        return super().dispatch(request, *args, **kwargs)
+
+    @staticmethod
+    def back() -> str:
+        return reverse("resume:overview") + "#section-publication"
+
+    def get(self, request: HttpRequest) -> HttpResponse:
+        held = request.session.get(self.held_key)
+        if not held:
+            return redirect(self.back())
+        mine = list(Publication.objects.for_user(request.user).only("title", "date", "doi"))
+        works = [
+            {
+                **work,
+                "index": index,
+                "held": lookups.is_held(work, mine),
+                "type_label": publications.TYPES.get(
+                    work.get("entry_type"), publications.TYPES["misc"]
+                ).label,
+                "year": publications.year_of(work.get("date") or ""),
+            }
+            for index, work in enumerate(held.get("works") or [])
+        ]
+        return render(
+            request,
+            self.template_name,
+            {
+                "orcid": held.get("orcid", ""),
+                "works": works,
+                "total": held.get("total", len(works)),
+                "most_shown": lookups.MAX_WORKS,
+                "most_added": lookups.MAX_ADDED,
+                "back": self.back(),
+            },
+        )
+
+    def post(self, request: HttpRequest) -> HttpResponse:
+        if "add" in request.POST:
+            return self.add(request)
+        orcid = own_orcid(request.user)
+        if not orcid:
+            messages.error(request, _("Add your ORCID on Your details first."))
+            return redirect(self.back())
+        try:
+            throttle.lookup(request.user)
+            works, total = lookups.from_orcid(orcid)
+        except throttle.TooOften as too_often:
+            messages.error(request, str(too_often))
+            return redirect(self.back())
+        except lookups.LookupRefused as refused:
+            messages.error(request, str(refused))
+            return redirect(self.back())
+        if not works:
+            messages.info(request, _("Your ORCID record lists no public works."))
+            return redirect(self.back())
+        request.session[self.held_key] = {"orcid": orcid, "works": works, "total": total}
+        return redirect("resume:publication_orcid")
+
+    def add(self, request: HttpRequest) -> HttpResponse:
+        held = request.session.get(self.held_key) or {}
+        works = held.get("works") or []
+        ticked = sorted(
+            {
+                int(value)
+                for value in request.POST.getlist("work")
+                if value.isdecimal() and int(value) < len(works)
+            }
+        )
+        if not ticked:
+            messages.info(request, _("Nothing was ticked, so nothing was added."))
+            return redirect("resume:publication_orcid" if works else self.back())
+        if len(ticked) > lookups.MAX_ADDED:
+            messages.error(
+                request,
+                ngettext(
+                    "Tick at most %(count)d at a time; nothing was added.",
+                    "Tick at most %(count)d at a time; nothing was added.",
+                    lookups.MAX_ADDED,
+                )
+                % {"count": lookups.MAX_ADDED},
+            )
+            return redirect("resume:publication_orcid")
+        added = create_from_orcid(request.user, [works[index] for index in ticked])
+        request.session.pop(self.held_key, None)
+        messages.success(
+            request,
+            ngettext(
+                "Added %(count)d publication from your ORCID record, with no authors: ORCID's "
+                "list has none. Open it and press Look up beside its DOI for the rest.",
+                "Added %(count)d publications from your ORCID record, with no authors: ORCID's "
+                "list has none. Open each and press Look up beside its DOI for the rest.",
+                added,
+            )
+            % {"count": added},
+        )
+        return redirect(self.back())
+
+
+def create_from_orcid(owner, works: list[dict]) -> int:
+    """Each work as a publication of ``owner``'s, from what the session holds, re-checked.
+
+    The session is the server's own, but what is in it came from ORCID, so each value is held
+    again to the column and the rule it goes into (#688).
+    """
+    added = 0
+    with transaction.atomic():
+        for work in works:
+            values = publications.sanitise(
+                {
+                    "entry_type": work.get("entry_type", ""),
+                    "date": work.get("date", ""),
+                    "doi": work.get("doi", ""),
+                    "cite_key": "",
+                },
+                set(),
+            )
+            title = lookups.clean(work.get("title"), 500)
+            if not title:
+                continue
+            item = Publication.objects.create(
+                owner=owner,
+                title=title,
+                container_title=lookups.clean(work.get("container_title"), 300),
+                entry_type=values["entry_type"],
+                date=values["date"],
+                doi=values["doi"],
+            )
+            ordering.place_new(item)
+            added += 1
+    return added
 
 
 class EuropassImportView(LoginRequiredMixin, TemplateView):

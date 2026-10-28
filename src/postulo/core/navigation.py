@@ -144,6 +144,10 @@ CAREER_NAMES: tuple[str, ...] = (
     "resume:skill_suggestions",
     "resume:link_check_all",
     "resume:link_check",
+    # *Look up* beside a publication's DOI, and the ORCID review (#688).
+    "resume:publication_lookup_new",
+    "resume:publication_lookup",
+    "resume:publication_orcid",
     "resume:item_create",
     "resume:item_update",
     "resume:item_delete",

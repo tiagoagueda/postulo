@@ -502,6 +502,10 @@ POSTULO_FETCH_RATE = env("POSTULO_FETCH_RATE", default="300/h")
 # *Fetch from Wikidata*, per account (#673): one item per press, to a fixed public host whose
 # policy asks clients to go gently.
 POSTULO_WIKIDATA_RATE = env("POSTULO_WIKIDATA_RATE", default="60/h")
+# *Look up* beside a publication's DOI and *Suggest from my ORCID record*, together, per account
+# (#688): one request to doi.org or to pub.orcid.org per press, spent before the request and
+# so spent whether the service answers or not.
+POSTULO_LOOKUP_RATE = env("POSTULO_LOOKUP_RATE", default="20/h")
 # Per token rather than per account, so revoking one revokes its allowance with it.
 POSTULO_API_RATE = env("POSTULO_API_RATE", default="600/h")
 # What every token of one account may do together (#799), since tokens are free to make.

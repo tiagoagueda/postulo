@@ -206,6 +206,7 @@ def test_these_are_the_plugins_that_ship_across_ten_kinds():
         "gdpr",
         "maps",
         "wikidata",
+        "publication-lookups",
         "multiple-fields",
         "builtin-notifications",
         "file-formats",

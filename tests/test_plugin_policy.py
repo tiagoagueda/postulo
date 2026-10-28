@@ -531,3 +531,38 @@ def test_an_installed_plugin_cannot_take_the_name_of_one_that_ships_inside_postu
     finally:
         monkeypatch.undo()
         registry.plugins("notifier", refresh=True)
+
+
+def test_switched_off_publication_lookups_offer_nothing_and_answer_nothing(client, user):
+    """Both buttons go, and both addresses answer as if they were not there (#688)."""
+    from postulo.accounts.models import PersonIdentifier
+    from postulo.plugins.publication_lookups import PUBLICATION_LOOKUPS
+    from postulo.resume.models import Publication
+
+    PersonIdentifier.objects.create(
+        profile=user.profile, scheme="orcid", value="0000-0002-1825-0097"
+    )
+    held = Publication.objects.create(owner=user, title="Mine")
+    client.force_login(user)
+    overview = reverse("resume:overview")
+    new_form = reverse("resume:item_create", args=["publication"])
+    lookup_new = reverse("resume:publication_lookup_new")
+    lookup = reverse("resume:publication_lookup", args=[held.pk])
+    orcid = reverse("resume:publication_orcid")
+    assert "Suggest from my ORCID record" in client.get(overview).content.decode()
+    assert lookup_new in client.get(new_form).content.decode()
+
+    PluginPolicy.objects.create(
+        plugin=PUBLICATION_LOOKUPS, person=None, state=PluginPolicy.State.FORCED_OFF
+    )
+    policy.forget_decisions()
+
+    assert "Suggest from my ORCID record" not in client.get(overview).content.decode()
+    form_page = client.get(new_form).content.decode()
+    assert "formaction" not in form_page and "Look up" not in form_page
+    assert "never looks it up" in form_page
+    edit_page = client.get(reverse("resume:item_update", args=["publication", held.pk]))
+    assert lookup not in edit_page.content.decode()
+    for address in (lookup_new, lookup, orcid):
+        assert client.post(address, {"doi": "10.1000/182"}).status_code == 404
+    assert client.get(orcid).status_code == 404

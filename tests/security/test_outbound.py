@@ -40,6 +40,7 @@ from postulo.core import destinations
 from postulo.jobs import logos
 from postulo.plugins import fetching, http, public_addresses
 from postulo.plugins.base import CaptureError
+from postulo.resume import lookups
 
 PUBLIC = [ipaddress.ip_address("93.184.216.34")]
 
@@ -1728,3 +1729,146 @@ def test_a_private_address_for_a_connection_names_the_switch_and_does_not_advise
     assert "POSTULO_CONNECTIONS_ALLOW_PRIVATE" in message
     assert "posting" not in message and "Paste" not in message
     assert refusal.value.transient is False
+
+
+# ------------------------------------------- a publication's DOI and an ORCID record (#688)
+#
+# The first requests Postulo makes to a scholarly service. Fixed hosts, the identifier in the
+# path alone, and the same guard, limits and deadline as anything fetched from a stranger:
+# doi.org passes the request on to whoever registered the DOI, and that is a redirect like
+# any other.
+
+LOOKUP_DOI = "10.1038/s41586-020-2649-2"
+CSL_JSON = "application/vnd.citationstyles.csl+json"
+
+#: The two lookups, each with its byte limit and the media type its answer comes in.
+LOOKUPS = {
+    "a DOI": (lambda: lookups.from_doi(LOOKUP_DOI), lookups.DOI_BYTES, CSL_JSON),
+    "an ORCID record": (
+        lambda: lookups.from_orcid("0000-0002-1825-0097"),
+        lookups.ORCID_BYTES,
+        "application/json",
+    ),
+}
+
+
+@pytest.mark.django_db
+def test_a_doi_redirected_to_a_private_address_is_refused_and_the_page_says_nothing_of_it(
+    monkeypatch, client, user
+):
+    from django.urls import reverse
+
+    resolving(monkeypatch, {"doi.org": PUBLIC})
+    seen: list[httpx.Request] = []
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        seen.append(snapshot(request))
+        return httpx.Response(
+            302, headers={"Location": "https://metadata.internal.example/secret-path"}
+        )
+
+    real = http.public_only_client
+    monkeypatch.setattr(
+        http,
+        "public_only_client",
+        lambda **kwargs: real(transport=httpx.MockTransport(handler), **kwargs),
+    )
+
+    with pytest.raises(lookups.LookupRefused) as refused:
+        lookups.from_doi(LOOKUP_DOI)
+    assert len(seen) == 1, "the private address was never dialled"
+    assert "internal" not in str(refused.value) and "secret" not in str(refused.value)
+
+    client.force_login(user)
+    page = client.post(
+        reverse("resume:publication_lookup_new"),
+        {"doi": LOOKUP_DOI, "entry_type": "article", "title": ""},
+    ).content.decode()
+    assert "does not dial" in page
+    assert "metadata.internal.example" not in page and "secret-path" not in page
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize("what", LOOKUPS)
+def test_a_lookup_answer_larger_than_its_limit_stops_at_the_limit(monkeypatch, what):
+    ask, limit, kind = LOOKUPS[what]
+    body = Trickle(chunks=limit // CHUNK * 4)
+    serving(
+        monkeypatch,
+        lambda request: httpx.Response(200, headers={"Content-Type": kind}, stream=body),
+    )
+
+    with pytest.raises(lookups.LookupRefused, match="larger than"):
+        ask()
+
+    assert limit < body.sent <= limit + CHUNK, "read past the limit by one chunk at most"
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize("what", LOOKUPS)
+def test_a_lookup_answer_declared_too_large_is_not_read_at_all(monkeypatch, what):
+    ask, limit, kind = LOOKUPS[what]
+    body = Trickle(chunks=4)
+    headers = {"Content-Type": kind, "Content-Length": str(limit * 2)}
+    serving(monkeypatch, lambda request: httpx.Response(200, headers=headers, stream=body))
+
+    with pytest.raises(lookups.LookupRefused, match="larger than"):
+        ask()
+
+    assert body.sent == 0
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize("what", LOOKUPS)
+def test_a_lookup_answer_that_trickles_in_runs_out_of_time(monkeypatch, what):
+    ask, _limit, kind = LOOKUPS[what]
+    clock = stopped_clock(monkeypatch)
+
+    def five_seconds_later():
+        clock.now += 5
+
+    body = Trickle(chunks=1000, size=1024, tick=five_seconds_later)
+    serving(
+        monkeypatch,
+        lambda request: httpx.Response(200, headers={"Content-Type": kind}, stream=body),
+    )
+
+    with pytest.raises(lookups.LookupRefused, match="too long"):
+        ask()
+
+    assert body.sent <= 3 * 1024, "it stopped at ten seconds, not at the end"
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    "doi",
+    [
+        "10.1000/@evil.example",
+        "10.1000//evil.example/x",
+        "10.1000/x?host=evil.example",
+        "10.1000/x#@evil.example",
+    ],
+)
+def test_the_doi_is_only_ever_in_the_path_of_doi_org(monkeypatch, doi):
+    seen = serving(monkeypatch, lambda request: httpx.Response(404))
+
+    with pytest.raises(lookups.LookupRefused):
+        lookups.from_doi(doi)
+
+    (request,) = seen
+    assert request.headers["Host"] == "doi.org"
+    assert request.extensions["sni_hostname"] == "doi.org"
+    assert str(request.url.host) == "93.184.216.34", "the address the guard approved"
+    assert request.url.query == b"" and request.url.fragment == ""
+    assert "evil.example" in request.url.raw_path.decode(), "in the path, and nowhere else"
+
+
+@pytest.mark.django_db
+def test_an_orcid_that_fails_its_check_digit_is_never_sent(monkeypatch):
+    seen = serving(monkeypatch, lambda request: httpx.Response(404))
+
+    for value in ("0000-0002-1825-0098", "../../v3.0/x", "0000-0002-1825-0097/../../admin"):
+        with pytest.raises(lookups.LookupRefused):
+            lookups.from_orcid(value)
+
+    assert seen == []

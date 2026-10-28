@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% translate "From your ORCID record" %}{% endblock %}
+
+{% block content %}
+  <div class="max-w-3xl">
+    <c-page-title>
+      {% translate "From your ORCID record" %}
+      <c-slot name="subtitle">{{ orcid }}</c-slot>
+    </c-page-title>
+    {% comment %} What ORCID listed, before anything is added (#688). A record is curated by its
+       holder and may say anything, so each value is shown as the plain text it was cleaned to,
+       in its own direction; none is ticked, and only what is ticked is added. {% endcomment %}
+    <p class="mb-4 text-sm text-ink-500 dark:text-ink-400">
+      {% blocktranslate trimmed with most=most_added %}
+        Tick the works to add, at most {{ most }} at a time. ORCID lists a title, a type, a date,
+        the journal and the DOI, and no authors: once added, open a publication and press Look up
+        beside its DOI for the rest.
+      {% endblocktranslate %}
+    </p>
+    {% if total > most_shown %}
+      <p class="mb-4 text-sm text-ink-500 dark:text-ink-400" data-orcid-more>
+        {% blocktranslate trimmed with most=most_shown count total=total %}
+          Your record lists {{ total }} public work; the first {{ most }} are shown.
+        {% plural %}
+          Your record lists {{ total }} public works; the first {{ most }} are shown.
+        {% endblocktranslate %}
+      </p>
+    {% endif %}
+    <form method="post">
+      {% csrf_token %}
+      <fieldset class="card mb-4 p-0">
+        <legend class="sr-only">{% translate "Works in your ORCID record" %}</legend>
+        <ul class="divide-y divide-ink-100 dark:divide-ink-800" data-orcid-works>
+          {% for work in works %}
+            <li class="px-4 py-3">
+              <label class="flex items-start gap-3">
+                <input type="checkbox" class="input mt-1" name="work" value="{{ work.index }}">
+                <span class="min-w-0">
+                  <span class="block font-medium"><bdi>{{ work.title }}</bdi></span>
+                  <span class="block text-sm text-ink-500 dark:text-ink-400">
+                    {{ work.type_label }}{% if work.container_title %} · <bdi>{{ work.container_title }}</bdi>{% endif %}{% if work.year %} · {{ work.year }}{% endif %}{% if work.doi %} · <bdi dir="ltr">{{ work.doi }}</bdi>{% endif %}
+                  </span>
+                  {% if work.held %}
+                    <span class="block text-xs text-ink-500 dark:text-ink-400" data-orcid-held>{% translate "You already have this one." %}</span>
+                  {% endif %}
+                </span>
+              </label>
+            </li>
+          {% endfor %}
+        </ul>
+      </fieldset>
+      <div class="flex flex-wrap items-center gap-3">
+        <button type="submit" name="add" value="1" class="btn">{% translate "Add the ticked works" %}</button>
+        <a href="{{ back }}" class="btn" data-variant="ghost">{% translate "Cancel" %}</a>
+      </div>
+    </form>
+  </div>
+{% endblock %}

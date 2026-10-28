@@ -181,6 +181,26 @@ follows are promises:
   `POSTULO_CAPTURE_RATE`. The sentences are the ones the person is owed, and
   `tests/security/test_outbound.py` pins them. Awaiting the owner's confirmation at review.
 
+**A publication's DOI and a person's ORCID leave the instance only at a press (#688).** *Look
+up* beside a publication's DOI asks `doi.org` for that one record, which doi.org passes to the
+agency that registered it (Crossref's `api.crossref.org`, DataCite's `data.crosscite.org`,
+mEDRA's); *Suggest from my ORCID record* asks `pub.orcid.org` for the public works of the ORCID
+the person stored on *Your details*, never one typed into the request, so it cannot read
+another researcher's list through the instance. What leaves is the identifier, in the path of
+a fixed host, and the project's `User-Agent`; no email address, the person's or the
+operator's, and nothing else about the account. What the services learn is that this
+instance's address asked about that DOI or that ORCID, which Crossref keeps 90 days. Nothing
+is asked on a page load, a save, an import, a schedule or a worker, nothing is retried, and
+the answer is untrusted text: a short list of fields, stripped of markup, control and
+bidirectional characters, cut to each column and drawn escaped, with the abstract, the
+references and the record's own links never read into anything. Nothing is stored until the
+person saves the form or ticks a work. Each press spends `POSTULO_LOOKUP_RATE` (20 an hour)
+whether or not the service answers, through the public-only client with three https redirects
+at most, 2 MiB or 4 MiB and ten seconds. The `publication-lookups` feature switches both off;
+ORCID's terms bar using its public API in a revenue-generating service, which is the
+operator's to judge, and `tests/security/test_outbound.py` and
+`tests/test_publication_lookup.py` hold the rest.
+
 ## What is out of scope
 
 - The operator's own machine. Root on the host reads everything; that is true of any

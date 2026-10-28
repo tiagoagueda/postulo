@@ -12,8 +12,15 @@
       <div class="mb-6"></div>
     {% endif %}
 
-    <form method="post" novalidate>
+    <form method="post" novalidate{% if form_action %} action="{{ form_action }}"{% endif %}>
       {% csrf_token %}
+      {% if lookup_url %}
+        {% comment %} Enter in a box submits with the form's first button, and *Look up* below
+           comes before *Save*: this copy of *Save*, first and out of sight, keeps Enter saving
+           (#688). It is skipped by the keyboard and by a screen reader, which reach the real
+           one at the end. {% endcomment %}
+        <button type="submit" class="sr-only" tabindex="-1" aria-hidden="true">{% translate "Save" %}</button>
+      {% endif %}
       {% if form.non_field_errors %}
         <div class="alert mb-4" data-variant="error">{{ form.non_field_errors }}</div>
       {% endif %}
@@ -38,6 +45,17 @@
                    chosen. Hidden is not refused: a hidden box is posted and kept. {% endcomment %}
                 <div data-type-field="{{ follows.types }}"{% if follows.hidden %} hidden{% endif %}>
                   <c-field :field="field" />
+                  {% if field.name == 'doi' and lookup_url %}
+                    {% comment %} *Look up* (#688): posts the whole form to the lookup, which draws
+                       it back with the empty boxes filled and nothing saved, so it works with
+                       scripts off. {% endcomment %}
+                    <div class="-mt-2 mb-4 flex flex-wrap items-center gap-3" data-publication-lookup>
+                      <button type="submit" class="btn" data-variant="outline" formaction="{{ lookup_url }}">{% translate "Look up" %}</button>
+                      <p class="min-w-0 flex-1 basis-60 text-xs text-ink-500 dark:text-ink-400">
+                        {% translate "Sends the DOI to doi.org, which passes it to Crossref or DataCite, and nothing else about you. Only the empty boxes are filled, and nothing is kept until you save." %}
+                      </p>
+                    </div>
+                  {% endif %}
                 </div>
               {% else %}
                 <c-field :field="field" />

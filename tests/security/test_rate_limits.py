@@ -632,3 +632,72 @@ def test_the_page_bounds_a_grantee_in_the_same_way(client, person, shared_compan
 
     assert "already have a company" in first.content.decode()
     assert "Too many requests" in second.content.decode()
+
+
+# ------------------------------------------------------ publication lookups (#688)
+
+
+def _lookup(client):
+    return client.post(
+        reverse("resume:publication_lookup_new"),
+        {"doi": "10.1000/182", "entry_type": "article", "title": ""},
+    )
+
+
+@pytest.fixture
+def failing_lookups(monkeypatch):
+    """Both lookups failing as a service that answers 503 does, counting each request."""
+    from postulo.resume import lookups
+
+    asked: list[str] = []
+
+    def refuse(identifier):
+        asked.append(identifier)
+        raise lookups.LookupRefused("doi.org asked for fewer requests. Try again later.")
+
+    monkeypatch.setattr(lookups, "from_doi", refuse)
+    monkeypatch.setattr(lookups, "from_orcid", refuse)
+    return asked
+
+
+@override_settings(POSTULO_LOOKUP_RATE="2/h")
+def test_a_lookup_is_spent_even_when_the_service_fails(client, person, failing_lookups):
+    client.force_login(person)
+
+    for _ in range(2):
+        assert "fewer requests" in _lookup(client).content.decode()
+    refused = _lookup(client).content.decode()
+
+    assert "Too many requests" in refused
+    assert len(failing_lookups) == 2, "refused before any request was made"
+
+
+@override_settings(POSTULO_LOOKUP_RATE="1/h")
+def test_the_lookup_allowance_is_per_account(client, person, other, failing_lookups):
+    client.force_login(person)
+    _lookup(client)
+    assert "Too many requests" in _lookup(client).content.decode()
+
+    client.force_login(other)
+    assert "Too many requests" not in _lookup(client).content.decode()
+    assert len(failing_lookups) == 2
+
+
+@override_settings(POSTULO_LOOKUP_RATE="1/h")
+def test_the_doi_and_the_orcid_buttons_share_one_allowance(client, person, failing_lookups):
+    from postulo.accounts.models import PersonIdentifier
+
+    PersonIdentifier.objects.create(
+        profile=person.profile, scheme="orcid", value="0000-0002-1825-0097"
+    )
+    client.force_login(person)
+    _lookup(client)
+
+    response = client.post(reverse("resume:publication_orcid"), follow=True)
+
+    assert "Too many requests" in response.content.decode()
+    assert len(failing_lookups) == 1
+
+
+def test_the_lookup_allowance_is_set_and_readable_by_default():
+    assert throttle.rate_for("POSTULO_LOOKUP_RATE") == throttle.Rate(20, 3600)

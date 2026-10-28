@@ -1256,14 +1256,64 @@ msgstr "%(scheme)s: यह सामान्य रूप नहीं है�
 msgid "%(sent)s, %(failed)s; each document says which."
 msgstr "%(sent)s, %(failed)s; हर डॉक्यूमेंट पर लिखा है कि उसका क्या हुआ।"
 
+#: src/postulo/resume/lookups.py
+#, python-format
+msgid "%(service)s answered %(status)s."
+msgstr ""
+
+#: src/postulo/resume/lookups.py
+#, python-format
+msgid "%(service)s asked for fewer requests. Try again later."
+msgstr ""
+
+#: src/postulo/resume/lookups.py
+#, python-format
+msgid "%(service)s could not be reached."
+msgstr ""
+
+#: src/postulo/resume/lookups.py
+#, python-format
+msgid "%(service)s has no record in a form Postulo reads."
+msgstr ""
+
 #: src/postulo/core/web_links.py src/postulo/jobs/surface.py
 #, fuzzy, python-format
 msgid "%(service)s is already used by another row."
 msgstr "%(service)s पहले से किसी अन्य पंक्ति में उपयोग हो रही है।"
 
+#: src/postulo/resume/lookups.py
+#, python-format
+msgid "%(service)s knows no such identifier."
+msgstr ""
+
+#: src/postulo/resume/lookups.py
+#, python-format
+msgid "%(service)s redirected too many times."
+msgstr ""
+
 #: src/postulo/jobs/geocoding.py
 #, python-format
 msgid "%(service)s refused the look-ups (%(status)s). They are stopped."
+msgstr ""
+
+#: src/postulo/resume/lookups.py
+#, python-format
+msgid "%(service)s sent the request somewhere else."
+msgstr ""
+
+#: src/postulo/resume/lookups.py
+#, python-format
+msgid "%(service)s sent the request to an address Postulo does not dial."
+msgstr ""
+
+#: src/postulo/resume/lookups.py
+#, python-format
+msgid "%(service)s took too long to answer."
+msgstr ""
+
+#: src/postulo/resume/views.py
+#, python-format
+msgid "%(service)s, through doi.org, had nothing for the boxes that are empty."
 msgstr ""
 
 #: src/postulo/core/templatetags/postulo.py
@@ -3050,6 +3100,10 @@ msgstr "मेरे टिक किए कार्ड जोड़ें"
 msgid "Add the first one."
 msgstr "पहली एंट्री जोड़ें।"
 
+#: src/postulo/templates/resume/publication_orcid.html
+msgid "Add the ticked works"
+msgstr ""
+
 #: src/postulo/templates/documents/cv_detail.html
 #, fuzzy
 msgid "Add these"
@@ -3096,6 +3150,10 @@ msgstr "मेरे चुने हुए जोड़ें"
 msgid "Add what is new"
 msgstr "जो नया है उसे जोड़ें"
 
+#: src/postulo/resume/views.py
+msgid "Add your ORCID on Your details first."
+msgstr ""
+
 #: src/postulo/jobs/models.py src/postulo/jobs/tables.py
 #, fuzzy
 msgid "Added"
@@ -3105,6 +3163,13 @@ msgstr "जोड़ा गया"
 #, fuzzy
 msgid "added"
 msgstr "जोड़ा गया"
+
+#: src/postulo/resume/views.py
+#, python-format
+msgid "Added %(count)d publication from your ORCID record, with no authors: ORCID's list has none. Open it and press Look up beside its DOI for the rest."
+msgid_plural "Added %(count)d publications from your ORCID record, with no authors: ORCID's list has none. Open each and press Look up beside its DOI for the rest."
+msgstr[0] ""
+msgstr[1] ""
 
 #: src/postulo/documents/views.py
 #, fuzzy, python-format
@@ -4714,6 +4779,7 @@ msgstr "इसके साथ रजिस्टर करने के लि�
 #: src/postulo/templates/partials/confirm_delete.html
 #: src/postulo/templates/partials/table/cell.html
 #: src/postulo/templates/resume/item_form.html
+#: src/postulo/templates/resume/publication_orcid.html
 #: src/postulo/templates/server/backup_delete.html
 #: src/postulo/templates/server/identifier_schemes.html
 #: src/postulo/templates/server/person_delete.html
@@ -6702,6 +6768,10 @@ msgstr "जांच में सही नहीं"
 msgid "DOI"
 msgstr "DOI"
 
+#: src/postulo/resume/lookups.py
+msgid "doi.org's answer was not a record Postulo can read."
+msgstr ""
+
 #: src/postulo/core/models.py src/postulo/templates/core/dashboard.html
 #: src/postulo/templates/core/partials/errand_state.html
 #: src/postulo/templates/cotton/reminder_actions.html
@@ -7818,6 +7888,11 @@ msgstr "आपके पास पहले से मौजूद फ़ाइ�
 msgid "Fill in from"
 msgstr "किससे भरें"
 
+#: src/postulo/resume/views.py
+#, python-format
+msgid "Filled in from %(service)s, through doi.org: %(fields)s. Check them; nothing is kept until you save."
+msgstr ""
+
 #: src/postulo/templates/documents/letter_detail.html
 #, fuzzy
 msgid "Filled in when the letter is sent with an application."
@@ -8239,6 +8314,10 @@ msgstr "आपके करियर से"
 #, fuzzy
 msgid "From your career"
 msgstr "आपके करियर से"
+
+#: src/postulo/templates/resume/publication_orcid.html
+msgid "From your ORCID record"
+msgstr ""
 
 #: src/postulo/templates/documents/application_documents.html
 #, fuzzy
@@ -10687,6 +10766,10 @@ msgstr "स्टोर में लिंक"
 msgid "Link services"
 msgstr "लिंक सेवाएं"
 
+#: src/postulo/resume/forms.py
+msgid "Linked on a CV as https://doi.org/…. Postulo asks doi.org about it only when you press Look up."
+msgstr ""
+
 #: src/postulo/templates/resume/item_form.html
 #, fuzzy
 msgid "Linked to the company"
@@ -10847,6 +10930,10 @@ msgstr "देशांतर"
 #, fuzzy
 msgid "Longitude"
 msgstr "देशांतर"
+
+#: src/postulo/templates/resume/item_form.html
+msgid "Look up"
+msgstr ""
 
 #: src/postulo/core/models.py
 msgid "look-up service address"
@@ -13082,6 +13169,10 @@ msgstr "इस अवधि में कुछ नहीं भेजा गय
 msgid "Nothing was sent in this period. That is what the report says, and it is a fact like any other."
 msgstr "इस अवधि में कुछ नहीं भेजा गया। रिपोर्ट यही बताती है, और यह भी बाकी तथ्यों जैसा ही एक तथ्य है।"
 
+#: src/postulo/resume/views.py
+msgid "Nothing was ticked, so nothing was added."
+msgstr ""
+
 #: src/postulo/documents/forms.py
 #, fuzzy
 msgid "Nothing yet"
@@ -13854,6 +13945,10 @@ msgstr "या कोई फ़ाइल अपलोड करें"
 #, fuzzy
 msgid "ORCID"
 msgstr "ORCID"
+
+#: src/postulo/resume/lookups.py
+msgid "ORCID's answer was not a list of works."
+msgstr ""
 
 #: src/postulo/documents/models.py src/postulo/resume/models.py
 #, fuzzy
@@ -16683,6 +16778,10 @@ msgstr "अपने नाम से भेजना"
 msgid "Sending failed: %(error)s"
 msgstr "भेजना विफल रहा: %(error)s"
 
+#: src/postulo/templates/resume/item_form.html
+msgid "Sends the DOI to doi.org, which passes it to Crossref or DataCite, and nothing else about you. Only the empty boxes are filled, and nothing is kept until you save."
+msgstr ""
+
 #: src/postulo/notifications/models.py
 #: src/postulo/templates/applications/report.html
 #: src/postulo/templates/server/design.html
@@ -17877,6 +17976,10 @@ msgstr "विषय"
 msgid "subject"
 msgstr "विषय"
 
+#: src/postulo/templates/resume/overview.html
+msgid "Suggest from my ORCID record"
+msgstr ""
+
 #: src/postulo/applications/models.py
 #, fuzzy
 msgid "suggested by"
@@ -18632,6 +18735,10 @@ msgstr "यह %(limit)s से बड़ा है, और यह इंस्�
 msgid "That is not a %(kind)s, whatever it was sent as."
 msgstr "यह %(kind)s नहीं है, चाहे इसे किसी भी रूप में भेजा गया हो।"
 
+#: src/postulo/resume/lookups.py
+msgid "That is not a DOI."
+msgstr ""
+
 #: src/postulo/core/kind_files.py
 #, fuzzy
 msgid "That is not a file this page reads. It reads the JSON file it offers to download for this kind of record, as Postulo writes it, and nothing else."
@@ -18746,6 +18853,10 @@ msgstr "यह Ed25519 पब्लिक की नहीं है: %(error)s"
 #, fuzzy
 msgid "That is not an iCalendar file."
 msgstr "वह iCalendar फ़ाइल नहीं है।"
+
+#: src/postulo/resume/lookups.py
+msgid "That is not an ORCID."
+msgstr ""
 
 #: src/postulo/applications/views.py
 #, fuzzy
@@ -19023,6 +19134,16 @@ msgstr "वह पता जिससे लोगों को मेल आय
 #, fuzzy
 msgid "The agency or employment service it went through, from the companies you have recorded. Companies in Employment activities, and public employment services, are offered first; add that industry to a company to have it offered here. The company on the posting stays the employer."
 msgstr "वह एजेंसी या रोज़गार सेवा जिसके ज़रिए आवेदन गया, आपकी दर्ज की गई कंपनियों में से। रोज़गार गतिविधियां उद्योग वाली कंपनियां और सार्वजनिक रोज़गार सेवाएं पहले दिखाई जाती हैं; किसी कंपनी को यहां दिखाने के लिए उसमें यह उद्योग जोड़ें। विज्ञापन वाली कंपनी ही नियोक्ता बनी रहती है।"
+
+#: src/postulo/resume/lookups.py
+#, python-format
+msgid "The answer from %(service)s could not be read."
+msgstr ""
+
+#: src/postulo/resume/lookups.py
+#, python-format
+msgid "The answer from %(service)s was larger than a record should be."
+msgstr ""
 
 #: src/postulo/jobs/models.py
 #, fuzzy
@@ -21237,6 +21358,13 @@ msgstr "कोई श्रेणी टिक करें, या नीचे
 msgid "Tick as many as fit. The list is your own — Industries, beside Companies, is where it is kept."
 msgstr "जितने सही बैठें, उतने टिक करें। यह सूची आपकी अपनी है — इसे कंपनियां के बगल में उद्योग में रखा जाता है।"
 
+#: src/postulo/resume/views.py
+#, python-format
+msgid "Tick at most %(count)d at a time; nothing was added."
+msgid_plural "Tick at most %(count)d at a time; nothing was added."
+msgstr[0] ""
+msgstr[1] ""
+
 #: src/postulo/resume/forms.py
 #, fuzzy
 msgid "Tick each category the licence lists: none implies another, so somebody who holds A ticks A. A CV prints the codes."
@@ -21256,6 +21384,11 @@ msgstr "एक साथ कई पंक्तियों पर काम क
 #, fuzzy
 msgid "Tick the box to add the listing anyway."
 msgstr "फिर भी लिस्टिंग जोड़ने के लिए बॉक्स चुनें।"
+
+#: src/postulo/templates/resume/publication_orcid.html
+#, python-format
+msgid "Tick the works to add, at most %(most)s at a time. ORCID lists a title, a type, a date, the journal and the DOI, and no authors: once added, open a publication and press Look up beside its DOI for the rest."
+msgstr ""
 
 #: src/postulo/jobs/capture_views.py
 #, fuzzy
@@ -21600,6 +21733,10 @@ msgstr "स्रोत का प्रकार"
 #, fuzzy
 msgid "type of thing it points at"
 msgstr "यह किस प्रकार की चीज़ की ओर इशारा करता है"
+
+#: src/postulo/resume/lookups.py src/postulo/resume/views.py
+msgid "Type the DOI first."
+msgstr ""
 
 #: src/postulo/accounts/forms.py src/postulo/jobs/forms.py
 #, fuzzy
@@ -23431,6 +23568,10 @@ msgstr "काम का तरीका"
 msgid "working arrangement"
 msgstr "काम का तरीका"
 
+#: src/postulo/templates/resume/publication_orcid.html
+msgid "Works in your ORCID record"
+msgstr ""
+
 #: src/postulo/resume/models.py
 #, fuzzy
 msgctxt "type of event"
@@ -23646,6 +23787,10 @@ msgstr "आपके पास इस प्रकार का एक और �
 #, fuzzy
 msgid "You already have that industry."
 msgstr "वह उद्योग आपके पास पहले से है।"
+
+#: src/postulo/templates/resume/publication_orcid.html
+msgid "You already have this one."
+msgstr ""
 
 #: src/postulo/resume/candidate.py
 #, fuzzy
@@ -24078,6 +24223,10 @@ msgstr "इस पर आपके नोट और निर्णय केव
 msgid "Your notes on it, your decisions about it and your applications stay yours: sharing it never shares them."
 msgstr "इस पर आपके नोट, इसके बारे में आपके निर्णय और आपके आवेदन आपके ही रहते हैं: इसे साझा करने से वे कभी साझा नहीं होते।"
 
+#: src/postulo/resume/views.py
+msgid "Your ORCID record lists no public works."
+msgstr ""
+
 #: src/postulo/documents/models.py
 #, fuzzy
 msgid "Your own name"
@@ -24150,6 +24299,13 @@ msgstr "आपका डेटा (JSON)"
 #, fuzzy
 msgid "Your record as a file"
 msgstr "आपका डेटा फ़ाइल में"
+
+#: src/postulo/templates/resume/publication_orcid.html
+#, python-format
+msgid "Your record lists %(total)s public work; the first %(most)s are shown."
+msgid_plural "Your record lists %(total)s public works; the first %(most)s are shown."
+msgstr[0] ""
+msgstr[1] ""
 
 #: src/postulo/resume/models.py
 #, fuzzy
