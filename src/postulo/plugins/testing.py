@@ -32,6 +32,11 @@ reach for it, and a new entry is a decision somebody makes on purpose. A stale e
 failure too — see `unused_allowances` — because one nobody removed hides the next real
 dependency behind it.
 
+**And a backup destination held to its contract (#325).** `assert_is_a_backup_destination`
+sends one small archive through a destination, lists it and deletes it, which is everything
+Postulo's retention relies on: a destination whose ``list`` does not return what it was sent
+would never have an old archive removed.
+
 **And what a call wrote, read back (#270).** `record_listing_event` is on the surface and the
 rows it writes are not: the model is Postulo's to change. A plugin that binds things to a
 listing still has to see, in its own tests, what its call wrote -- `listing_history` is
@@ -170,6 +175,55 @@ def assert_imports_only_the_surface(
     assert not stale, (
         f"{package} no longer imports {stale}. Delete those entries from `allowed`: the "
         f"list is the map of what is left to do, and a stale entry hides the next one."
+    )
+
+
+def assert_is_a_backup_destination(plugin, config: dict, *, tmp_path: Path) -> None:
+    """Hold a backup destination to its contract, against a configuration of your own (#325).
+
+    For a destination's own test suite, pointed at something it controls -- a fake server, a
+    temporary bucket, a directory. Sends one small archive the way Postulo hands one over,
+    and fails unless the plugin answers to the protocol, gives back a reference with an id,
+    lists that reference, and deletes it so that it is no longer listed. Retention depends on
+    the last two: Postulo only ever deletes what ``list`` returned.
+
+    ``tmp_path`` is a directory the archive is written into; pytest's fixture of that name is
+    the usual one.
+    """
+    import datetime as dt
+
+    from .base import BackupArchive, BackupDestinationPlugin, BackupManifest, BackupRef, FieldSpec
+
+    assert isinstance(plugin, BackupDestinationPlugin), (
+        f"{plugin!r} does not provide name, version, kind, label, config_fields, test, send, "
+        "list and delete"
+    )
+    assert plugin.kind == "backup-destination", f"its kind is {plugin.kind!r}"
+    assert all(isinstance(spec, FieldSpec) for spec in plugin.config_fields())
+
+    payload = b"age-encryption.org/v1\n" + bytes(range(256)) * 64
+    path = Path(tmp_path) / "postulo-backup-20260101-030000.tar.gz.age"
+    path.write_bytes(payload)
+    archive = BackupArchive(name=path.name, size=len(payload), _path=path)
+    manifest = BackupManifest(
+        archive="postulo-backup-20260101-030000.tar.gz",
+        created_at=dt.datetime(2026, 1, 1, 3, 0, tzinfo=dt.UTC),
+        version="0.0.0",
+        engine="sqlite",
+        instance="Postulo",
+        counts=(("users", 1),),
+    )
+
+    reference = plugin.send(archive, manifest, config)
+    assert isinstance(reference, BackupRef), f"send returned {reference!r}, not a BackupRef"
+    assert str(reference.id), "a reference needs an id the destination can find it by"
+    listed = plugin.list(config)
+    assert all(isinstance(item, BackupRef) for item in listed), "list returns BackupRefs"
+    found = [item for item in listed if item.id == reference.id]
+    assert found, f"{reference.id!r} was sent and is not listed"
+    plugin.delete(found[0], config)
+    assert all(item.id != reference.id for item in plugin.list(config)), (
+        f"{reference.id!r} is still listed after it was deleted"
     )
 
 

@@ -245,6 +245,13 @@ class OverviewView(ServerSectionMixin, TemplateView):
                 # administrator opens first says so (#242).
                 "backup_failed": site.current().backup_last_error,
                 "backup_missed": backups.is_missed(site.current()),
+                # And a copy that did not reach the backup destination, as a failed run does
+                # (#325). Only while one is chosen: a destination taken away has nothing to fail.
+                "backup_offsite_failed": (
+                    site.current().backup_offsite_last_error
+                    if site.current().backup_destination
+                    else ""
+                ),
                 # Whether the slow work is sent off at all, and whether whoever was meant
                 # to do it has been round lately (#247). Both, because the interesting
                 # state is the disagreement: a queue switched on and a worker that has

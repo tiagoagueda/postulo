@@ -59,6 +59,17 @@ urlpatterns = [
     path("backups/run/", backups.BackupRunView.as_view(), name="backup_run"),
     path("backups/upload/", backups.BackupUploadView.as_view(), name="backup_upload"),
     path(
+        "backups/destination/",
+        backups.BackupDestinationView.as_view(),
+        name="backup_destination",
+    ),
+    path(
+        "backups/destination/test/",
+        backups.BackupDestinationTestView.as_view(),
+        name="backup_destination_test",
+    ),
+    path("backups/<str:name>/send/", backups.BackupSendView.as_view(), name="backup_send"),
+    path(
         "backups/<str:name>/download/", backups.BackupDownloadView.as_view(), name="backup_download"
     ),
     path("backups/<str:name>/verify/", backups.BackupVerifyView.as_view(), name="backup_verify"),

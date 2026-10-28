@@ -647,6 +647,8 @@ def signed_in_paths(a, c, me, entry=None, recovery_link: str = "", things=None) 
         "/career/file/",
         "/server/logs/",
         "/server/backups/",
+        # Where the archives go besides this disk, and the key they are encrypted to (#325).
+        "/server/backups/destination/",
         "/accounts/invitations/new/",
         f"/server/people/{me.pk}/recovery/",
         # The two halves of a recovery link, walked in order: the first sets the ticket in

@@ -1236,6 +1236,11 @@ msgstr "Is é %(name)s uimhir %(place)s sna haitheantóirí anois."
 msgid "%(name)s is now number %(place)s in the navigation."
 msgstr "Tá %(name)s in uimhir %(place)s sa nascleanúint anois."
 
+#: src/postulo/core/views_backups.py
+#, python-format
+msgid "%(name)s is queued; the scheduler sends it on its next pass."
+msgstr ""
+
 #: src/postulo/core/server_views.py
 #, python-format
 msgid "%(name)s is removed. Restart Postulo to be sure nothing of it is left loaded."
@@ -1416,7 +1421,7 @@ msgstr "%(period)s: roghnaigh ceann eile"
 msgid "%(person)s is the last member of %(name)s, which still owns records. Give them to somebody, or delete them, first."
 msgstr "Is é %(person)s an ball deireanach de %(name)s, a bhfuil taifid fós ar úinéireacht aige. Tabhair do dhuine éigin iad, nó scrios iad, ar dtús."
 
-#: src/postulo/plugins/forms.py
+#: src/postulo/core/server_forms.py src/postulo/plugins/forms.py
 #, python-format
 msgid "%(plugin)s could not check these settings: %(error)s"
 msgstr "Níorbh fhéidir le %(plugin)s na socruithe seo a sheiceáil: %(error)s"
@@ -2279,6 +2284,10 @@ msgstr "Gorm domhain. Deich gcéim, agus úsáideann an comhéadan dornán acu."
 #: src/postulo/jobs/surface.py
 msgid "A department needs a name."
 msgstr "Tá ainm de dhíth ar roinn."
+
+#: src/postulo/core/server_forms.py
+msgid "A destination needs an age recipient to encrypt to: nothing leaves this server unencrypted."
+msgstr ""
 
 #: src/postulo/templates/server/overview.html
 msgid "A document in a script shown in red is set in the server's fonts instead."
@@ -3410,6 +3419,10 @@ msgstr "Aeraspás"
 msgid "Africa"
 msgstr "An Afraic"
 
+#: src/postulo/core/models.py
+msgid "age recipient"
+msgstr ""
+
 #: src/postulo/templates/widgets/sources.html
 msgid "Agency"
 msgstr "Gníomhaireacht"
@@ -4111,6 +4124,10 @@ msgstr "Printíseacht"
 msgid "Archived"
 msgstr "Cartlannaithe"
 
+#: src/postulo/templates/server/backup_destination.html
+msgid "Archives are encrypted with age before they leave."
+msgstr ""
+
 #: src/postulo/templates/jobs/capture_page_forget.html
 #: src/postulo/templates/partials/confirm_delete.html
 msgid "Are you sure?"
@@ -4338,6 +4355,7 @@ msgid "Back in your listings."
 msgstr "Ar ais i d’fhógraí poist."
 
 #: src/postulo/templates/server/backup_delete.html
+#: src/postulo/templates/server/backup_destination.html
 #: src/postulo/templates/server/backup_restore.html
 msgid "Back to Backups"
 msgstr "Ar ais chuig Cúltacaí"
@@ -4433,6 +4451,23 @@ msgstr "Cúlchríoch"
 #: src/postulo/templates/server/overview.html
 msgid "Background work"
 msgstr "Obair sa chúlra"
+
+#: src/postulo/core/models.py
+msgid "backup destination"
+msgstr ""
+
+#: src/postulo/plugins/kinds.py
+#: src/postulo/templates/server/backup_destination.html
+msgid "Backup destination"
+msgstr ""
+
+#: src/postulo/core/models.py
+msgid "backup destination configuration"
+msgstr ""
+
+#: src/postulo/core/models.py
+msgid "backup destination secrets"
+msgstr ""
 
 #: src/postulo/core/server_sections.py src/postulo/core/views_backups.py
 #: src/postulo/templates/server/backups.html
@@ -5039,6 +5074,10 @@ msgstr "Roghanna"
 msgid "Choose a country from the list."
 msgstr "Roghnaigh tír ón liosta."
 
+#: src/postulo/core/views_backups.py
+msgid "Choose a destination and save it first."
+msgstr ""
+
 #: src/postulo/resume/views.py
 msgid "Choose a Europass file first."
 msgstr "Roghnaigh comhad Europass ar dtús."
@@ -5128,6 +5167,10 @@ msgstr "Roghnaigh an tír ina bhfuil an uimhir agus clóscríobh an uimhir mar a
 #: src/postulo/templates/accounts/profile.html
 msgid "Choose the date of birth from a calendar"
 msgstr "Roghnaigh an dáta breithe ó fhéilire"
+
+#: src/postulo/templates/server/backups.html
+msgid "Choose the destination"
+msgstr ""
 
 #: src/postulo/templates/resume/europass_import.html
 msgid "Choose the PDF you downloaded from europass.europa.eu, as it is: the CV is attached inside it, and that is what Postulo reads. Older Europass files read too: the XML and PDF of the editor before 2020, and the JSON of its web service. Postulo works out which it is, shows you what is in it, and writes nothing until you say so."
@@ -6241,6 +6284,10 @@ msgstr "Dearadh"
 msgid "Design (Behance, Dribbble…)"
 msgstr "Dearadh (Behance, Dribbble…)"
 
+#: src/postulo/core/server_forms.py
+msgid "Destination"
+msgstr ""
+
 #: src/postulo/core/design.py
 #, fuzzy
 msgid "Destructive"
@@ -6916,6 +6963,11 @@ msgstr "Gach cuntas ar an tsuiteáil seo. Feiceann riarthóirí cuntais, ach ní
 msgid "Every application, in order"
 msgstr "Gach iarratas, in ord"
 
+#: src/postulo/templates/server/backups.html
+#, python-format
+msgid "Every archive is encrypted to your age recipient and sent to %(label)s once it has been written and checked. An archive that has not arrived there is never deleted here."
+msgstr ""
+
 #: src/postulo/templates/jobs/company_places.html
 msgid "Every company address on the map, with the company's name, page, industries and how precise its point is: at its town, its postcode, by hand or from Wikidata. A contact's address and your own are never in it."
 msgstr "Gach seoladh cuideachta ar an léarscáil, le hainm agus leathanach na cuideachta, a tionscail agus cé chomh beacht is atá pointe an tseolta: ag a bhaile, ag a chód poist, de láimh nó ó Wikidata. Ní bhíonn seoladh teagmhálaí ná do sheoladh féin ann riamh."
@@ -7188,6 +7240,7 @@ msgid "Extra small"
 msgstr "An-bheag"
 
 #: src/postulo/core/models.py src/postulo/documents/models.py
+#: src/postulo/templates/server/backups.html
 msgid "Failed"
 msgstr "Theip air"
 
@@ -8931,6 +8984,11 @@ msgstr "Baintear den teagmhálaí seo anois é, gan fanacht le Sábháil, agus n
 msgid "It comes off your details now, without waiting for Save, and cannot be put back."
 msgstr "Baintear de do shonraí anois é, gan fanacht le Sábháil, agus ní féidir é a chur ar ais."
 
+#: src/postulo/core/offsite.py
+#, python-format
+msgid "It could not be encrypted: %(error)s"
+msgstr ""
+
 #: src/postulo/plugins/installing.py
 msgid "it could not be imported"
 msgstr "níorbh fhéidir é a iompórtáil"
@@ -9247,6 +9305,10 @@ msgstr "Coinnigh mo nótaí"
 msgid "keep the newest"
 msgstr "coinnigh na cinn is nuaí"
 
+#: src/postulo/core/models.py
+msgid "keep the newest there"
+msgstr ""
+
 #: src/postulo/templates/jobs/merge.html
 msgid "Keep the other one instead"
 msgstr "Coinnigh an ceann eile ina ionad"
@@ -9503,6 +9565,10 @@ msgstr "earráid dheireanach"
 msgid "Last name"
 msgstr "Sloinne"
 
+#: src/postulo/templates/server/backups.html
+msgid "Last one that arrived"
+msgstr ""
+
 #: src/postulo/plugins/models.py
 msgid "last pushed"
 msgstr "seolta go deireanach"
@@ -9576,6 +9642,10 @@ msgstr "Foghlaim a rinne tú, le teastas freastail nó gan é. Baineann clár a 
 #: src/postulo/templates/resume/translations.html
 msgid "Leave a box empty and that line prints as it is written above it."
 msgstr "Fág bosca folamh agus priontálfar an líne sin mar atá sí scríofa os a cionn."
+
+#: src/postulo/core/models.py
+msgid "Leave blank to keep as many there as here. 0 never deletes anything there. Only archives Postulo sent itself are ever deleted, and only after a new one has arrived."
+msgstr ""
 
 #: src/postulo/core/server_forms.py
 msgid "Leave blank to keep the one already stored."
@@ -10782,6 +10852,10 @@ msgstr "Níl"
 msgid "No address and no key, so nothing is offered from it."
 msgstr "Gan seoladh agus gan eochair, mar sin ní chuirtear aon rud ar fáil uaidh."
 
+#: src/postulo/core/offsite.py
+msgid "No age recipient is set, and nothing leaves this machine unencrypted."
+msgstr ""
+
 #: src/postulo/applications/forms.py
 msgid "No agency"
 msgstr "Gan gníomhaireacht"
@@ -10797,6 +10871,10 @@ msgstr "Ní bhaintear le hiarratas ar bith, mar sin ní athraíonn aon amlíne."
 #: src/postulo/templates/jobs/company_detail.html
 msgid "No appointments yet."
 msgstr "Níl aon choinní fós."
+
+#: src/postulo/templates/server/backup_destination.html
+msgid "No backup destination plugin is installed. Postulo ships none and names no provider: install one under Plugins, then choose it here."
+msgstr ""
 
 #: src/postulo/templates/server/backups.html
 msgid "No backups yet. Take one above."
@@ -10954,6 +11032,10 @@ msgstr "Gan meáin"
 #: src/postulo/documents/printing.py
 msgid "No messaging handle"
 msgstr "Gan ainm úsáideora teachtaireachtaí"
+
+#: src/postulo/templates/server/backups.html
+msgid "No more retries: send it again when the destination is fixed."
+msgstr ""
 
 #: src/postulo/documents/pdf.py
 #, python-format
@@ -11242,6 +11324,14 @@ msgstr "Níl aon cheann fós. Priontálann doiciméid an t-ainm thuas i ngach te
 msgid "None yet. This entry prints its original text on every CV."
 msgstr "Ceann ar bith go fóill. Priontálann an iontráil seo a téacs bunaidh ar gach CV."
 
+#: src/postulo/core/server_forms.py
+msgid "None — backups stay on this server"
+msgstr ""
+
+#: src/postulo/templates/server/backups.html
+msgid "None: the archives stay on this server. A destination keeps a copy somewhere else, encrypted before it leaves."
+msgstr ""
+
 #: src/postulo/applications/models.py
 msgid "Normal"
 msgstr "Gnáthach"
@@ -11373,6 +11463,10 @@ msgstr "Gan sábháil"
 #: src/postulo/templates/settings/_save_status.html
 msgid "Not saved: Postulo could not be reached. Press Save when it can."
 msgstr "Gan sábháil: níorbh fhéidir teacht ar Postulo. Brúigh Sábháil nuair is féidir."
+
+#: src/postulo/templates/server/backups.html
+msgid "Not sent"
+msgstr ""
 
 #: src/postulo/templates/applications/partials/application_card.html
 msgid "Not sent yet"
@@ -11926,6 +12020,14 @@ msgstr "Múchta, mar go dteastaíonn %(names)s uaidh, atá múchta nó nach bhfu
 msgid "Off, because the module it belongs to is off."
 msgstr "Múchta, mar go bhfuil an modúl lena mbaineann sé múchta."
 
+#: src/postulo/templates/server/backups.html
+msgid "Off-site"
+msgstr ""
+
+#: src/postulo/templates/server/backups.html
+msgid "Off-site copies"
+msgstr ""
+
 #: src/postulo/templates/settings/account.html
 msgid "Off. A code from an authenticator app, asked for after the password, means a leaked password alone is not enough."
 msgstr "Múchta. Má iarrtar cód ó aip fhíordheimhnithe tar éis an phasfhocail, ní leor pasfhocal sceite amháin."
@@ -12457,6 +12559,10 @@ msgstr "Níl cead ach ag an oibreoir riail faoi do chuntas féin nó faoi cheann
 #: src/postulo/core/server_views.py
 msgid "Only the operator's own account can stop being an administrator."
 msgstr "Níl ach cuntas an oibreora féin in ann éirí as a bheith ina riarthóir."
+
+#: src/postulo/templates/server/backup_destination.html
+msgid "Only the public key, the recipient, is kept here. Keep the identity that opens the archives somewhere other than this server, and keep a copy of it: without it no archive sent can be opened. Restoring starts by decrypting one by hand, as the wiki page about backups says."
+msgstr ""
 
 #: src/postulo/resume/forms.py
 msgid "Only the year prints on a CV, so the day makes no difference."
@@ -14401,6 +14507,14 @@ msgstr "Bain {label}"
 msgid "removed on the other side"
 msgstr "bainte ar an taobh eile"
 
+#: src/postulo/core/models.py
+msgid "Removed there"
+msgstr ""
+
+#: src/postulo/templates/server/backups.html
+msgid "Removed there by retention"
+msgstr ""
+
 #: src/postulo/templates/documents/partials/comparison_line.html
 msgid "Removed:"
 msgstr "Baineadh:"
@@ -14674,6 +14788,7 @@ msgstr "Dé Sathairn"
 #: src/postulo/templates/partials/table/cell.html
 #: src/postulo/templates/resume/item_form.html
 #: src/postulo/templates/resume/translations.html
+#: src/postulo/templates/server/backup_destination.html
 #: src/postulo/templates/server/backups.html
 #: src/postulo/templates/server/capture.html
 #: src/postulo/templates/server/data_protection.html
@@ -14979,6 +15094,10 @@ msgctxt "type of event"
 msgid "Seminar"
 msgstr "Seimineár"
 
+#: src/postulo/templates/server/backups.html
+msgid "Send"
+msgstr ""
+
 #: src/postulo/templates/server/email.html
 msgid "Send a real message"
 msgstr "Seol fíortheachtaireacht"
@@ -15020,8 +15139,9 @@ msgstr "Theip ar an seoladh: %(error)s"
 msgid "Sends the DOI to doi.org, which passes it to Crossref or DataCite, and nothing else about you. Only the empty boxes are filled, and nothing is kept until you save."
 msgstr ""
 
-#: src/postulo/notifications/models.py
+#: src/postulo/core/models.py src/postulo/notifications/models.py
 #: src/postulo/templates/applications/report.html
+#: src/postulo/templates/server/backups.html
 #: src/postulo/templates/server/design.html
 #: src/postulo/templates/widgets/_source_table.html
 #: src/postulo/templates/widgets/industries.html
@@ -15784,6 +15904,10 @@ msgstr "Chuaigh rud éigin cearr. Tá na sonraí i log an fhreastalaí."
 msgid "Something worth knowing."
 msgstr "Rud is fiú a fhios a bheith agat air."
 
+#: src/postulo/templates/server/backup_destination.html
+msgid "Somewhere besides this server where every archive is sent once it has been written and checked, encrypted first."
+msgstr ""
+
 #: src/postulo/templates/server/design.html
 msgid "Somewhere else"
 msgstr "Áit éigin eile"
@@ -16340,6 +16464,7 @@ msgid "Terms not recorded"
 msgstr "Téarmaí nár taifeadadh"
 
 #: src/postulo/templates/connections/list.html
+#: src/postulo/templates/server/backup_destination.html
 msgid "Test"
 msgstr "Tástáil"
 
@@ -16351,6 +16476,10 @@ msgstr "Theip ar an tástáil: %(message)s"
 #: src/postulo/templates/server/email.html
 msgid "Test the connection"
 msgstr "Tástáil an nasc"
+
+#: src/postulo/templates/server/backup_destination.html
+msgid "Test the destination"
+msgstr ""
 
 #: src/postulo/documents/models.py src/postulo/resume/models.py
 msgid "text"
@@ -16805,6 +16934,14 @@ msgstr "Ní aitheantóir míre Wikidata é sin."
 msgid "That is not an address Postulo can use."
 msgstr "Ní seoladh é sin ar féidir le Postulo a úsáid."
 
+#: src/postulo/core/offsite.py
+msgid "That is not an age recipient. It starts age1 and is 62 characters long."
+msgstr ""
+
+#: src/postulo/core/offsite.py
+msgid "That is not an age recipient: its checksum does not match."
+msgstr ""
+
 #: src/postulo/plugins/catalogue.py
 #, python-format
 msgid "That is not an Ed25519 public key: %(error)s"
@@ -17028,10 +17165,20 @@ msgstr[2] "Coinnítear na %(count)d chomhad a dtagraíonn a stair dóibh san ái
 msgstr[3] "Coinnítear na %(count)d gcomhad a dtagraíonn a stair dóibh san áit a bhfuil siad."
 msgstr[4] "Coinnítear na %(count)d comhad a dtagraíonn a stair dóibh san áit a bhfuil siad."
 
+#: src/postulo/templates/server/backups.html
+#, python-format
+msgid "The %(name)s destination is chosen but not installed, so nothing is being sent."
+msgstr ""
+
 #: src/postulo/documents/pdf.py
 #, python-format
 msgid "The %(name)s PDF backend is configured but not usable. %(hint)s"
 msgstr "Tá an t-inneall PDF %(name)s cumraithe ach níl sé inúsáidte. %(hint)s"
+
+#: src/postulo/core/offsite.py
+#, python-format
+msgid "The %(plugin)s destination is not installed or not chosen."
+msgstr ""
 
 #: src/postulo/documents/archiving.py src/postulo/plugins/syncing.py
 #, python-format
@@ -17095,6 +17242,19 @@ msgstr "An feidhmchlár a cláraíodh leis an soláthraí. Ní rún é: is é an
 #: src/postulo/core/mail_choices.py
 msgid "The application sends on its own"
 msgstr "Seolann an feidhmchlár as a stuaim féin"
+
+#: src/postulo/core/offsite.py
+msgid "The archive does not verify."
+msgstr ""
+
+#: src/postulo/core/offsite.py
+#, python-format
+msgid "The archive does not verify: %(problem)s"
+msgstr ""
+
+#: src/postulo/core/offsite.py
+msgid "The archive is no longer on this server."
+msgstr ""
 
 #: src/postulo/templates/server/backup_restore.html
 msgid "The archive is signed by this instance's key."
@@ -17335,6 +17495,18 @@ msgstr ""
 #: src/postulo/templates/server/plugins.html
 msgid "The default for every account. One person's exceptions are on their row under People. Switching a plugin off stops it being used and deletes nothing."
 msgstr "An réamhshocrú do gach cuntas. Tá eisceachtaí duine ar a ró faoi Daoine. Nuair a mhúchtar breiseán, ní úsáidtear é a thuilleadh agus ní scriostar aon rud."
+
+#: src/postulo/core/views_backups.py
+msgid "The destination answered."
+msgstr ""
+
+#: src/postulo/core/offsite.py
+msgid "The destination did not say where it put the archive."
+msgstr ""
+
+#: src/postulo/core/offsite.py
+msgid "The destination gave no answer."
+msgstr ""
 
 #: src/postulo/jobs/capture_views.py
 msgid "the discarded captures"
@@ -17663,6 +17835,10 @@ msgstr "Gnás na teanga"
 msgid "The last backup failed."
 msgstr "Theip ar an gcúltaca deireanach."
 
+#: src/postulo/templates/server/overview.html
+msgid "The last backup sent to the destination did not arrive."
+msgstr ""
+
 #: src/postulo/templates/applications/report.html
 msgid "The last few weeks"
 msgstr "Na seachtainí beaga seo caite"
@@ -17680,6 +17856,10 @@ msgstr[4] "Theip ar na %(counter)s teachtaireacht is déanaí a ndearna an tsuit
 #: src/postulo/templates/jobs/capture_review.html
 msgid "The last one waiting."
 msgstr "An ceann deireanach atá ag fanacht."
+
+#: src/postulo/templates/server/backups.html
+msgid "The last send failed."
+msgstr ""
 
 #: src/postulo/applications/widgets.py
 msgid "The last ten things the timeline recorded, whichever application they were on."
@@ -18008,6 +18188,10 @@ msgstr "Rinne seoladh comhartha an tsoláthraí atreorú, agus ní leanann Postu
 msgid "The public employment service you are registered with. Add it under Companies, as a public employment service, if it is not here."
 msgstr "An tseirbhís fostaíochta poiblí a bhfuil tú cláraithe léi. Cuir leis í faoi Chuideachtaí, mar sheirbhís fostaíochta poiblí, mura bhfuil sí anseo."
 
+#: src/postulo/core/models.py
+msgid "The public key every archive is encrypted to before it leaves, starting age1. Keep the identity that opens them somewhere other than this server."
+msgstr ""
+
 #: src/postulo/resume/candidate.py
 msgid "The publication it counts cannot be added, so it will be a count for all of your work."
 msgstr ""
@@ -18309,6 +18493,11 @@ msgstr "Níl an uimhir ghutháin a roghnaíodh don CV seo i do shonraí a thuill
 msgid "The telephone number of %(name)s was not added."
 msgstr "Níor cuireadh uimhir theileafóin %(name)s leis."
 
+#: src/postulo/core/views_backups.py
+#, python-format
+msgid "The test failed: %(problem)s"
+msgstr ""
+
 #: src/postulo/templates/documents/cv_text.html
 msgid "The text of this document"
 msgstr "Téacs na cáipéise seo"
@@ -18316,6 +18505,10 @@ msgstr "Téacs na cáipéise seo"
 #: src/postulo/templates/server/design.html
 msgid "The thing to do next"
 msgstr "An chéad rud eile le déanamh"
+
+#: src/postulo/core/offsite.py
+msgid "The time for this send ran out before it began."
+msgstr ""
 
 #: src/postulo/templates/server/defaults.html
 #, python-format
@@ -18455,6 +18648,10 @@ msgstr "Tá grúpa den ainm sin cheana féin."
 #: src/postulo/jobs/slow.py
 msgid "There is no address to fetch it from again."
 msgstr "Níl aon seoladh ann le é a fháil arís."
+
+#: src/postulo/core/views_backups.py
+msgid "There is no backup destination to send to."
+msgstr ""
 
 #: src/postulo/documents/archiving.py
 msgid "There is no file to send."
@@ -19265,6 +19462,11 @@ msgstr "cumraíocht an iompair"
 msgid "transport secrets"
 msgstr "rúin an iompair"
 
+#: src/postulo/templates/server/backups.html
+#, python-format
+msgid "Tried again at %(when)s."
+msgstr ""
+
 #: src/postulo/templates/server/overview.html
 msgid "Trusted:"
 msgstr "Iontaofa:"
@@ -19619,6 +19821,10 @@ msgstr "úsáideoirí"
 msgid "Uses the saved settings, and sends to a real inbox. Test the connection first if you have just changed something."
 msgstr "Úsáideann sé na socruithe sábháilte agus seolann sé chuig fíorbhosca isteach. Tástáil an nasc ar dtús má d’athraigh tú rud éigin díreach anois."
 
+#: src/postulo/templates/server/backup_destination.html
+msgid "Uses the saved settings. Nothing is stored there."
+msgstr ""
+
 #: src/postulo/templates/api/token_list.html
 msgid "Using a token"
 msgstr "Comhartha a úsáid"
@@ -19723,6 +19929,7 @@ msgid "Voluntary support is this project's only income: one person writes it, an
 msgstr "Is í an tacaíocht dheonach an t-aon ioncam atá ag an tionscadal seo: duine amháin a scríobhann é, agus níl aon rud dlite ná á dhíghlasáil ag aon chuid de seo. Deirtear uair amháin é, anseo, leis an duine a ritheann an tsuiteáil — riamh leis na daoine a úsáideann í chun obair a lorg, agus do go leor acu sin is é an t-airgead an rud mícheart le tabhairt."
 
 #: src/postulo/core/models.py src/postulo/notifications/models.py
+#: src/postulo/templates/server/backups.html
 msgid "Waiting"
 msgstr "Ag fanacht"
 
@@ -20405,9 +20612,17 @@ msgstr "Nuair atá roghchlár <em>Seirbhís</em> ag cárta, roghnaigh an tseirbh
 msgid "Where a value leads: an http or https address with <code dir=\"ltr\">{value}</code> where the identifier goes, after the host. <code dir=\"ltr\">person_link</code> is the address for a person, where that is another one."
 msgstr "Cá dtéann luach: seoladh http nó https le <code dir=\"ltr\">{value}</code> san áit a dtéann an t-aitheantóir, i ndiaidh an óstaigh. Is é <code dir=\"ltr\">person_link</code> an seoladh do dhuine, nuair is seoladh eile é."
 
+#: src/postulo/templates/server/backup_destination.html
+msgid "Where and how"
+msgstr ""
+
 #: src/postulo/applications/widgets.py
 msgid "Where and why applications end"
 msgstr "Cá háit agus cén fáth a gcríochnaíonn iarratais"
+
+#: src/postulo/core/server_forms.py
+msgid "Where each archive is sent once it has been written and checked."
+msgstr ""
 
 #: src/postulo/resume/forms.py
 msgid "Where it can be read about. A CV does not print it."

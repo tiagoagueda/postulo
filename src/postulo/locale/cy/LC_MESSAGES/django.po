@@ -1156,6 +1156,11 @@ msgstr "Mae %(name)s bellach yn rhif %(place)s yn y dynodyddion."
 msgid "%(name)s is now number %(place)s in the navigation."
 msgstr "Mae %(name)s bellach yn rhif %(place)s yn y llywio."
 
+#: src/postulo/core/views_backups.py
+#, python-format
+msgid "%(name)s is queued; the scheduler sends it on its next pass."
+msgstr ""
+
 #: src/postulo/core/server_views.py
 #, python-format
 msgid "%(name)s is removed. Restart Postulo to be sure nothing of it is left loaded."
@@ -1336,7 +1341,7 @@ msgstr "%(period)s: dewiswch un arall"
 msgid "%(person)s is the last member of %(name)s, which still owns records. Give them to somebody, or delete them, first."
 msgstr "%(person)s yw aelod olaf %(name)s, sy'n dal yn berchen ar gofnodion. Rhowch nhw i rywun, neu dilëwch nhw, yn gyntaf."
 
-#: src/postulo/plugins/forms.py
+#: src/postulo/core/server_forms.py src/postulo/plugins/forms.py
 #, python-format
 msgid "%(plugin)s could not check these settings: %(error)s"
 msgstr "Ni allai %(plugin)s wirio'r gosodiadau hyn: %(error)s"
@@ -2176,6 +2181,10 @@ msgstr "Glas dwfn. Deg cam, ac mae'r rhyngwyneb yn defnyddio llond llaw ohonynt.
 #: src/postulo/jobs/surface.py
 msgid "A department needs a name."
 msgstr "Mae angen enw ar adran."
+
+#: src/postulo/core/server_forms.py
+msgid "A destination needs an age recipient to encrypt to: nothing leaves this server unencrypted."
+msgstr ""
 
 #: src/postulo/templates/server/overview.html
 msgid "A document in a script shown in red is set in the server's fonts instead."
@@ -3291,6 +3300,10 @@ msgstr "Awyrofod"
 msgid "Africa"
 msgstr "Affrica"
 
+#: src/postulo/core/models.py
+msgid "age recipient"
+msgstr ""
+
 #: src/postulo/templates/widgets/sources.html
 msgid "Agency"
 msgstr "Asiantaeth"
@@ -3978,6 +3991,10 @@ msgstr "Prentisiaeth"
 msgid "Archived"
 msgstr "Wedi'i archifo"
 
+#: src/postulo/templates/server/backup_destination.html
+msgid "Archives are encrypted with age before they leave."
+msgstr ""
+
 #: src/postulo/templates/jobs/capture_page_forget.html
 #: src/postulo/templates/partials/confirm_delete.html
 msgid "Are you sure?"
@@ -4204,6 +4221,7 @@ msgid "Back in your listings."
 msgstr "Yn ôl yn eich hysbysebion."
 
 #: src/postulo/templates/server/backup_delete.html
+#: src/postulo/templates/server/backup_destination.html
 #: src/postulo/templates/server/backup_restore.html
 msgid "Back to Backups"
 msgstr "Yn ôl i'r copïau wrth gefn"
@@ -4299,6 +4317,23 @@ msgstr "Backend"
 #: src/postulo/templates/server/overview.html
 msgid "Background work"
 msgstr "Gwaith cefndir"
+
+#: src/postulo/core/models.py
+msgid "backup destination"
+msgstr ""
+
+#: src/postulo/plugins/kinds.py
+#: src/postulo/templates/server/backup_destination.html
+msgid "Backup destination"
+msgstr ""
+
+#: src/postulo/core/models.py
+msgid "backup destination configuration"
+msgstr ""
+
+#: src/postulo/core/models.py
+msgid "backup destination secrets"
+msgstr ""
 
 #: src/postulo/core/server_sections.py src/postulo/core/views_backups.py
 #: src/postulo/templates/server/backups.html
@@ -4899,6 +4934,10 @@ msgstr "Dewisiadau"
 msgid "Choose a country from the list."
 msgstr "Dewiswch wlad o'r rhestr."
 
+#: src/postulo/core/views_backups.py
+msgid "Choose a destination and save it first."
+msgstr ""
+
 #: src/postulo/resume/views.py
 msgid "Choose a Europass file first."
 msgstr "Dewiswch ffeil Europass yn gyntaf."
@@ -4988,6 +5027,10 @@ msgstr "Dewiswch y wlad y mae'r rhif ynddi a theipiwch y rhif yn y ffordd y caif
 #: src/postulo/templates/accounts/profile.html
 msgid "Choose the date of birth from a calendar"
 msgstr "Dewis y dyddiad geni o galendr"
+
+#: src/postulo/templates/server/backups.html
+msgid "Choose the destination"
+msgstr ""
 
 #: src/postulo/templates/resume/europass_import.html
 msgid "Choose the PDF you downloaded from europass.europa.eu, as it is: the CV is attached inside it, and that is what Postulo reads. Older Europass files read too: the XML and PDF of the editor before 2020, and the JSON of its web service. Postulo works out which it is, shows you what is in it, and writes nothing until you say so."
@@ -6095,6 +6138,10 @@ msgstr "Dyluniad"
 msgid "Design (Behance, Dribbble…)"
 msgstr "Dylunio (Behance, Dribbble…)"
 
+#: src/postulo/core/server_forms.py
+msgid "Destination"
+msgstr ""
+
 #: src/postulo/core/design.py
 msgid "Destructive"
 msgstr "Distrywiol"
@@ -6767,6 +6814,11 @@ msgstr "Pob cyfrif yn y gosodiad hwn. Mae gweinyddwyr yn gweld cyfrifon, byth no
 msgid "Every application, in order"
 msgstr "Pob cais, mewn trefn"
 
+#: src/postulo/templates/server/backups.html
+#, python-format
+msgid "Every archive is encrypted to your age recipient and sent to %(label)s once it has been written and checked. An archive that has not arrived there is never deleted here."
+msgstr ""
+
 #: src/postulo/templates/jobs/company_places.html
 msgid "Every company address on the map, with the company's name, page, industries and how precise its point is: at its town, its postcode, by hand or from Wikidata. A contact's address and your own are never in it."
 msgstr "Pob cyfeiriad cwmni ar y map, gydag enw'r cwmni, ei dudalen, ei ddiwydiannau a pha mor fanwl yw ei bwynt: yn ei dref, yn ei god post, â llaw neu o Wikidata. Nid yw cyfeiriad cyswllt na'ch cyfeiriad chi eich hun byth ynddo."
@@ -7037,6 +7089,7 @@ msgid "Extra small"
 msgstr "Bach iawn"
 
 #: src/postulo/core/models.py src/postulo/documents/models.py
+#: src/postulo/templates/server/backups.html
 msgid "Failed"
 msgstr "Methodd"
 
@@ -8759,6 +8812,11 @@ msgstr "Mae'n cael ei dynnu oddi ar y cyswllt hwn nawr, heb aros am Cadw, ac ni 
 msgid "It comes off your details now, without waiting for Save, and cannot be put back."
 msgstr "Mae'n dod oddi ar eich manylion nawr, heb aros am Cadw, ac ni ellir ei roi'n ôl."
 
+#: src/postulo/core/offsite.py
+#, python-format
+msgid "It could not be encrypted: %(error)s"
+msgstr ""
+
 #: src/postulo/plugins/installing.py
 msgid "it could not be imported"
 msgstr "nid oedd modd ei fewnforio"
@@ -9073,6 +9131,10 @@ msgstr "Cadw fy nodiadau"
 msgid "keep the newest"
 msgstr "cadw'r mwyaf diweddar"
 
+#: src/postulo/core/models.py
+msgid "keep the newest there"
+msgstr ""
+
 #: src/postulo/templates/jobs/merge.html
 msgid "Keep the other one instead"
 msgstr "Cadw'r llall yn lle hynny"
@@ -9327,6 +9389,10 @@ msgstr "gwall diwethaf"
 msgid "Last name"
 msgstr "Cyfenw"
 
+#: src/postulo/templates/server/backups.html
+msgid "Last one that arrived"
+msgstr ""
+
 #: src/postulo/plugins/models.py
 msgid "last pushed"
 msgstr "gwthiwyd ddiwethaf"
@@ -9398,6 +9464,10 @@ msgstr "Dysgu a wnaethoch, gyda thystysgrif presenoldeb neu hebddi. Mae rhaglen 
 #: src/postulo/templates/resume/translations.html
 msgid "Leave a box empty and that line prints as it is written above it."
 msgstr "Gadewch flwch yn wag ac fe argraffir y llinell honno fel y mae uwch ei phen."
+
+#: src/postulo/core/models.py
+msgid "Leave blank to keep as many there as here. 0 never deletes anything there. Only archives Postulo sent itself are ever deleted, and only after a new one has arrived."
+msgstr ""
 
 #: src/postulo/core/server_forms.py
 msgid "Leave blank to keep the one already stored."
@@ -10585,6 +10655,10 @@ msgstr "Na"
 msgid "No address and no key, so nothing is offered from it."
 msgstr "Nid oes cyfeiriad nac allwedd, felly ni chynigir dim ohono."
 
+#: src/postulo/core/offsite.py
+msgid "No age recipient is set, and nothing leaves this machine unencrypted."
+msgstr ""
+
 #: src/postulo/applications/forms.py
 msgid "No agency"
 msgstr "Dim asiantaeth"
@@ -10600,6 +10674,10 @@ msgstr "Nid oes unrhyw gais yn cael ei gyffwrdd, felly nid oes unrhyw linell ams
 #: src/postulo/templates/jobs/company_detail.html
 msgid "No appointments yet."
 msgstr "Dim apwyntiadau eto."
+
+#: src/postulo/templates/server/backup_destination.html
+msgid "No backup destination plugin is installed. Postulo ships none and names no provider: install one under Plugins, then choose it here."
+msgstr ""
 
 #: src/postulo/templates/server/backups.html
 msgid "No backups yet. Take one above."
@@ -10757,6 +10835,10 @@ msgstr "Dim cyfryngau"
 #: src/postulo/documents/printing.py
 msgid "No messaging handle"
 msgstr "Dim enw defnyddiwr negeseua"
+
+#: src/postulo/templates/server/backups.html
+msgid "No more retries: send it again when the destination is fixed."
+msgstr ""
 
 #: src/postulo/documents/pdf.py
 #, python-format
@@ -11041,6 +11123,14 @@ msgstr "Dim eto. Mae dogfennau'n argraffu'r enw uchod ym mhob iaith."
 msgid "None yet. This entry prints its original text on every CV."
 msgstr "Dim eto. Mae'r cofnod hwn yn argraffu ei destun gwreiddiol ar bob CV."
 
+#: src/postulo/core/server_forms.py
+msgid "None — backups stay on this server"
+msgstr ""
+
+#: src/postulo/templates/server/backups.html
+msgid "None: the archives stay on this server. A destination keeps a copy somewhere else, encrypted before it leaves."
+msgstr ""
+
 #: src/postulo/applications/models.py
 msgid "Normal"
 msgstr "Arferol"
@@ -11172,6 +11262,10 @@ msgstr "Heb ei gadw"
 #: src/postulo/templates/settings/_save_status.html
 msgid "Not saved: Postulo could not be reached. Press Save when it can."
 msgstr "Heb ei gadw: nid oedd modd cyrraedd Postulo. Pwyswch Cadw pan fydd modd."
+
+#: src/postulo/templates/server/backups.html
+msgid "Not sent"
+msgstr ""
 
 #: src/postulo/templates/applications/partials/application_card.html
 msgid "Not sent yet"
@@ -11721,6 +11815,14 @@ msgstr "I ffwrdd, oherwydd mae arno angen %(names)s, sydd i ffwrdd neu heb ei os
 msgid "Off, because the module it belongs to is off."
 msgstr "I ffwrdd, oherwydd mae'r modiwl y mae'n perthyn iddo i ffwrdd."
 
+#: src/postulo/templates/server/backups.html
+msgid "Off-site"
+msgstr ""
+
+#: src/postulo/templates/server/backups.html
+msgid "Off-site copies"
+msgstr ""
+
 #: src/postulo/templates/settings/account.html
 msgid "Off. A code from an authenticator app, asked for after the password, means a leaked password alone is not enough."
 msgstr "Wedi'i ddiffodd. Mae cod o ap dilysu, y gofynnir amdano ar ôl y cyfrinair, yn golygu nad yw cyfrinair sydd wedi gollwng ar ei ben ei hun yn ddigon."
@@ -12232,6 +12334,10 @@ msgstr "Dim ond y gweithredwr all newid rheol am eich cyfrif eich hun neu un o'c
 #: src/postulo/core/server_views.py
 msgid "Only the operator's own account can stop being an administrator."
 msgstr "Dim ond cyfrif y gweithredwr ei hun all roi'r gorau i fod yn weinyddwr."
+
+#: src/postulo/templates/server/backup_destination.html
+msgid "Only the public key, the recipient, is kept here. Keep the identity that opens the archives somewhere other than this server, and keep a copy of it: without it no archive sent can be opened. Restoring starts by decrypting one by hand, as the wiki page about backups says."
+msgstr ""
 
 #: src/postulo/resume/forms.py
 msgid "Only the year prints on a CV, so the day makes no difference."
@@ -14140,6 +14246,14 @@ msgstr "Tynnu {label}"
 msgid "removed on the other side"
 msgstr "wedi'i dynnu ar yr ochr arall"
 
+#: src/postulo/core/models.py
+msgid "Removed there"
+msgstr ""
+
+#: src/postulo/templates/server/backups.html
+msgid "Removed there by retention"
+msgstr ""
+
 #: src/postulo/templates/documents/partials/comparison_line.html
 msgid "Removed:"
 msgstr "Tynnwyd:"
@@ -14410,6 +14524,7 @@ msgstr "Dydd Sadwrn"
 #: src/postulo/templates/partials/table/cell.html
 #: src/postulo/templates/resume/item_form.html
 #: src/postulo/templates/resume/translations.html
+#: src/postulo/templates/server/backup_destination.html
 #: src/postulo/templates/server/backups.html
 #: src/postulo/templates/server/capture.html
 #: src/postulo/templates/server/data_protection.html
@@ -14714,6 +14829,10 @@ msgctxt "type of event"
 msgid "Seminar"
 msgstr "Seminar"
 
+#: src/postulo/templates/server/backups.html
+msgid "Send"
+msgstr ""
+
 #: src/postulo/templates/server/email.html
 msgid "Send a real message"
 msgstr "Anfon neges go iawn"
@@ -14755,8 +14874,9 @@ msgstr "Methodd anfon: %(error)s"
 msgid "Sends the DOI to doi.org, which passes it to Crossref or DataCite, and nothing else about you. Only the empty boxes are filled, and nothing is kept until you save."
 msgstr ""
 
-#: src/postulo/notifications/models.py
+#: src/postulo/core/models.py src/postulo/notifications/models.py
 #: src/postulo/templates/applications/report.html
+#: src/postulo/templates/server/backups.html
 #: src/postulo/templates/server/design.html
 #: src/postulo/templates/widgets/_source_table.html
 #: src/postulo/templates/widgets/industries.html
@@ -15504,6 +15624,10 @@ msgstr "Aeth rhywbeth o'i le. Mae'r manylion yn nyddlyfr y gweinydd."
 msgid "Something worth knowing."
 msgstr "Rhywbeth sy'n werth ei wybod."
 
+#: src/postulo/templates/server/backup_destination.html
+msgid "Somewhere besides this server where every archive is sent once it has been written and checked, encrypted first."
+msgstr ""
+
 #: src/postulo/templates/server/design.html
 msgid "Somewhere else"
 msgstr "Rhywle arall"
@@ -16061,6 +16185,7 @@ msgid "Terms not recorded"
 msgstr "Telerau heb eu cofnodi"
 
 #: src/postulo/templates/connections/list.html
+#: src/postulo/templates/server/backup_destination.html
 msgid "Test"
 msgstr "Profi"
 
@@ -16072,6 +16197,10 @@ msgstr "Methodd y prawf: %(message)s"
 #: src/postulo/templates/server/email.html
 msgid "Test the connection"
 msgstr "Profi'r cysylltiad"
+
+#: src/postulo/templates/server/backup_destination.html
+msgid "Test the destination"
+msgstr ""
 
 #: src/postulo/documents/models.py src/postulo/resume/models.py
 msgid "text"
@@ -16519,6 +16648,14 @@ msgstr "Nid yw hwnnw'n ddynodydd eitem Wikidata."
 msgid "That is not an address Postulo can use."
 msgstr "Nid yw hwnnw'n gyfeiriad y gall Postulo ei ddefnyddio."
 
+#: src/postulo/core/offsite.py
+msgid "That is not an age recipient. It starts age1 and is 62 characters long."
+msgstr ""
+
+#: src/postulo/core/offsite.py
+msgid "That is not an age recipient: its checksum does not match."
+msgstr ""
+
 #: src/postulo/plugins/catalogue.py
 #, python-format
 msgid "That is not an Ed25519 public key: %(error)s"
@@ -16738,10 +16875,20 @@ msgstr[1] "Mae'r %(count)d ffeil y mae ei hanes yn pwyntio atynt yn cael eu cadw
 msgstr[2] "Mae'r %(count)d ffeil y mae ei hanes yn pwyntio atynt yn cael eu cadw lle maen nhw."
 msgstr[3] "Mae'r %(count)d ffeil y mae ei hanes yn pwyntio atynt yn cael eu cadw lle maen nhw."
 
+#: src/postulo/templates/server/backups.html
+#, python-format
+msgid "The %(name)s destination is chosen but not installed, so nothing is being sent."
+msgstr ""
+
 #: src/postulo/documents/pdf.py
 #, fuzzy, python-format
 msgid "The %(name)s PDF backend is configured but not usable. %(hint)s"
 msgstr "Mae'r injan PDF %(name)s wedi'i ffurfweddu ond nid oes modd ei defnyddio. %(hint)s"
+
+#: src/postulo/core/offsite.py
+#, python-format
+msgid "The %(plugin)s destination is not installed or not chosen."
+msgstr ""
 
 #: src/postulo/documents/archiving.py src/postulo/plugins/syncing.py
 #, python-format
@@ -16804,6 +16951,19 @@ msgstr "Y rhaglen sydd wedi'i chofrestru gyda'r darparwr. Nid cyfrinach mohoni: 
 #: src/postulo/core/mail_choices.py
 msgid "The application sends on its own"
 msgstr "Mae'r rhaglen yn anfon ar ei phen ei hun"
+
+#: src/postulo/core/offsite.py
+msgid "The archive does not verify."
+msgstr ""
+
+#: src/postulo/core/offsite.py
+#, python-format
+msgid "The archive does not verify: %(problem)s"
+msgstr ""
+
+#: src/postulo/core/offsite.py
+msgid "The archive is no longer on this server."
+msgstr ""
 
 #: src/postulo/templates/server/backup_restore.html
 msgid "The archive is signed by this instance's key."
@@ -17041,6 +17201,18 @@ msgstr ""
 #: src/postulo/templates/server/plugins.html
 msgid "The default for every account. One person's exceptions are on their row under People. Switching a plugin off stops it being used and deletes nothing."
 msgstr "Y diofyn ar gyfer pob cyfrif. Mae eithriadau un person ar ei res o dan Bobl. Mae diffodd ategyn yn atal ei ddefnyddio ac nid yw'n dileu dim."
+
+#: src/postulo/core/views_backups.py
+msgid "The destination answered."
+msgstr ""
+
+#: src/postulo/core/offsite.py
+msgid "The destination did not say where it put the archive."
+msgstr ""
+
+#: src/postulo/core/offsite.py
+msgid "The destination gave no answer."
+msgstr ""
 
 #: src/postulo/jobs/capture_views.py
 msgid "the discarded captures"
@@ -17365,6 +17537,10 @@ msgstr "Arfer yr iaith"
 msgid "The last backup failed."
 msgstr "Methodd y copi wrth gefn olaf."
 
+#: src/postulo/templates/server/overview.html
+msgid "The last backup sent to the destination did not arrive."
+msgstr ""
+
 #: src/postulo/templates/applications/report.html
 msgid "The last few weeks"
 msgstr "Yr ychydig wythnosau diwethaf"
@@ -17381,6 +17557,10 @@ msgstr[3] "Methodd y %(counter)s neges ddiwethaf y ceisiodd y gosodiad hwn eu ha
 #: src/postulo/templates/jobs/capture_review.html
 msgid "The last one waiting."
 msgstr "Yr olaf a oedd yn aros."
+
+#: src/postulo/templates/server/backups.html
+msgid "The last send failed."
+msgstr ""
 
 #: src/postulo/applications/widgets.py
 msgid "The last ten things the timeline recorded, whichever application they were on."
@@ -17703,6 +17883,10 @@ msgstr "Ailgyfeiriodd cyfeiriad tocynnau'r darparwr, ac nid yw Postulo yn dilyn 
 msgid "The public employment service you are registered with. Add it under Companies, as a public employment service, if it is not here."
 msgstr "Y gwasanaeth cyflogaeth cyhoeddus rydych wedi cofrestru gydag ef. Ychwanegwch ef o dan Cwmnïau, fel gwasanaeth cyflogaeth cyhoeddus, os nad yw yma."
 
+#: src/postulo/core/models.py
+msgid "The public key every archive is encrypted to before it leaves, starting age1. Keep the identity that opens them somewhere other than this server."
+msgstr ""
+
 #: src/postulo/resume/candidate.py
 msgid "The publication it counts cannot be added, so it will be a count for all of your work."
 msgstr ""
@@ -18001,6 +18185,11 @@ msgstr "Nid yw'r rhif ffôn a ddewiswyd ar gyfer y CV hwn yn eich manylion mwyac
 msgid "The telephone number of %(name)s was not added."
 msgstr "Ni chafodd rhif ffôn %(name)s ei ychwanegu."
 
+#: src/postulo/core/views_backups.py
+#, python-format
+msgid "The test failed: %(problem)s"
+msgstr ""
+
 #: src/postulo/templates/documents/cv_text.html
 msgid "The text of this document"
 msgstr "Testun y ddogfen hon"
@@ -18008,6 +18197,10 @@ msgstr "Testun y ddogfen hon"
 #: src/postulo/templates/server/design.html
 msgid "The thing to do next"
 msgstr "Y peth i'w wneud nesaf"
+
+#: src/postulo/core/offsite.py
+msgid "The time for this send ran out before it began."
+msgstr ""
 
 #: src/postulo/templates/server/defaults.html
 #, python-format
@@ -18142,6 +18335,10 @@ msgstr "Mae grŵp o'r enw hwnnw eisoes."
 #: src/postulo/jobs/slow.py
 msgid "There is no address to fetch it from again."
 msgstr "Nid oes cyfeiriad i'w nôl ohono eto."
+
+#: src/postulo/core/views_backups.py
+msgid "There is no backup destination to send to."
+msgstr ""
 
 #: src/postulo/documents/archiving.py
 msgid "There is no file to send."
@@ -18946,6 +19143,11 @@ msgstr "ffurfweddiad y cludiant"
 msgid "transport secrets"
 msgstr "cyfrinachau'r cludiant"
 
+#: src/postulo/templates/server/backups.html
+#, python-format
+msgid "Tried again at %(when)s."
+msgstr ""
+
 #: src/postulo/templates/server/overview.html
 msgid "Trusted:"
 msgstr "Dibynadwy:"
@@ -19298,6 +19500,10 @@ msgstr "defnyddwyr"
 msgid "Uses the saved settings, and sends to a real inbox. Test the connection first if you have just changed something."
 msgstr "Yn defnyddio'r gosodiadau a gadwyd, ac yn anfon i flwch derbyn go iawn. Profwch y cysylltiad yn gyntaf os ydych newydd newid rhywbeth."
 
+#: src/postulo/templates/server/backup_destination.html
+msgid "Uses the saved settings. Nothing is stored there."
+msgstr ""
+
 #: src/postulo/templates/api/token_list.html
 msgid "Using a token"
 msgstr "Defnyddio tocyn"
@@ -19402,6 +19608,7 @@ msgid "Voluntary support is this project's only income: one person writes it, an
 msgstr "Cefnogaeth wirfoddol yw unig incwm y prosiect hwn: un person sy'n ei ysgrifennu, ac nid oes dim yn ddyledus nac yn cael ei ddatgloi gan hyn. Caiff ei ddweud unwaith, yma, wrth bwy bynnag sy'n rhedeg y gosodiad — byth wrth y bobl sy'n ei ddefnyddio i chwilio am waith, ac i lawer ohonynt arian yw'r peth anghywir i'w roi."
 
 #: src/postulo/core/models.py src/postulo/notifications/models.py
+#: src/postulo/templates/server/backups.html
 msgid "Waiting"
 msgstr "Yn aros"
 
@@ -20080,9 +20287,17 @@ msgstr "Lle mae gan gerdyn ddewislen <em>Gwasanaeth</em>, dewiswch y gwasanaeth 
 msgid "Where a value leads: an http or https address with <code dir=\"ltr\">{value}</code> where the identifier goes, after the host. <code dir=\"ltr\">person_link</code> is the address for a person, where that is another one."
 msgstr "I ble mae gwerth yn arwain: cyfeiriad http neu https gyda <code dir=\"ltr\">{value}</code> lle mae'r dynodydd yn mynd, ar ôl y gwesteiwr. <code dir=\"ltr\">person_link</code> yw'r cyfeiriad ar gyfer person, lle mae hwnnw'n un gwahanol."
 
+#: src/postulo/templates/server/backup_destination.html
+msgid "Where and how"
+msgstr ""
+
 #: src/postulo/applications/widgets.py
 msgid "Where and why applications end"
 msgstr "Ble a pham mae ceisiadau'n dod i ben"
+
+#: src/postulo/core/server_forms.py
+msgid "Where each archive is sent once it has been written and checked."
+msgstr ""
 
 #: src/postulo/resume/forms.py
 msgid "Where it can be read about. A CV does not print it."

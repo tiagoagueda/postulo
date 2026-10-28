@@ -996,6 +996,11 @@ msgstr "%(name)s: βρίσκεται πλέον στη θέση %(place)s στα
 msgid "%(name)s is now number %(place)s in the navigation."
 msgstr "%(name)s: τώρα στη θέση %(place)s της πλοήγησης."
 
+#: src/postulo/core/views_backups.py
+#, python-format
+msgid "%(name)s is queued; the scheduler sends it on its next pass."
+msgstr ""
+
 #: src/postulo/core/server_views.py
 #, python-format
 msgid "%(name)s is removed. Restart Postulo to be sure nothing of it is left loaded."
@@ -1176,7 +1181,7 @@ msgstr "%(period)s: επιλέξτε κάτι άλλο"
 msgid "%(person)s is the last member of %(name)s, which still owns records. Give them to somebody, or delete them, first."
 msgstr "%(person)s: είναι το τελευταίο μέλος της ομάδας %(name)s, η οποία κατέχει ακόμα εγγραφές. Δώστε τις πρώτα σε κάποιον ή διαγράψτε τις."
 
-#: src/postulo/plugins/forms.py
+#: src/postulo/core/server_forms.py src/postulo/plugins/forms.py
 #, python-format
 msgid "%(plugin)s could not check these settings: %(error)s"
 msgstr "Το %(plugin)s δεν μπόρεσε να ελέγξει αυτές τις ρυθμίσεις: %(error)s"
@@ -1986,6 +1991,10 @@ msgstr "Ένα βαθύ μπλε. Δέκα αποχρώσεις, από τις �
 #: src/postulo/jobs/surface.py
 msgid "A department needs a name."
 msgstr "Το τμήμα χρειάζεται όνομα."
+
+#: src/postulo/core/server_forms.py
+msgid "A destination needs an age recipient to encrypt to: nothing leaves this server unencrypted."
+msgstr ""
 
 #: src/postulo/templates/server/overview.html
 msgid "A document in a script shown in red is set in the server's fonts instead."
@@ -3104,6 +3113,10 @@ msgstr "Αεροδιαστημική"
 msgid "Africa"
 msgstr "Αφρική"
 
+#: src/postulo/core/models.py
+msgid "age recipient"
+msgstr ""
+
 #: src/postulo/templates/widgets/sources.html
 #, fuzzy
 msgid "Agency"
@@ -3799,6 +3812,10 @@ msgstr "Μαθητεία"
 msgid "Archived"
 msgstr "Αρχειοθετήθηκε"
 
+#: src/postulo/templates/server/backup_destination.html
+msgid "Archives are encrypted with age before they leave."
+msgstr ""
+
 #: src/postulo/templates/jobs/capture_page_forget.html
 #: src/postulo/templates/partials/confirm_delete.html
 msgid "Are you sure?"
@@ -4032,6 +4049,7 @@ msgid "Back in your listings."
 msgstr "Ξανά στις αγγελίες σας."
 
 #: src/postulo/templates/server/backup_delete.html
+#: src/postulo/templates/server/backup_destination.html
 #: src/postulo/templates/server/backup_restore.html
 msgid "Back to Backups"
 msgstr "Επιστροφή στα αντίγραφα ασφαλείας"
@@ -4128,6 +4146,23 @@ msgstr "Backend"
 #: src/postulo/templates/server/overview.html
 msgid "Background work"
 msgstr "Εργασίες παρασκηνίου"
+
+#: src/postulo/core/models.py
+msgid "backup destination"
+msgstr ""
+
+#: src/postulo/plugins/kinds.py
+#: src/postulo/templates/server/backup_destination.html
+msgid "Backup destination"
+msgstr ""
+
+#: src/postulo/core/models.py
+msgid "backup destination configuration"
+msgstr ""
+
+#: src/postulo/core/models.py
+msgid "backup destination secrets"
+msgstr ""
 
 #: src/postulo/core/server_sections.py src/postulo/core/views_backups.py
 #: src/postulo/templates/server/backups.html
@@ -4733,6 +4768,10 @@ msgstr "Επιλογές"
 msgid "Choose a country from the list."
 msgstr "Επιλέξτε μια χώρα από τη λίστα."
 
+#: src/postulo/core/views_backups.py
+msgid "Choose a destination and save it first."
+msgstr ""
+
 #: src/postulo/resume/views.py
 msgid "Choose a Europass file first."
 msgstr "Επιλέξτε πρώτα ένα αρχείο Europass."
@@ -4822,6 +4861,10 @@ msgstr "Επιλέξτε τη χώρα στην οποία ανήκει ο αρ�
 #: src/postulo/templates/accounts/profile.html
 msgid "Choose the date of birth from a calendar"
 msgstr "Επιλέξτε την ημερομηνία γέννησης από ένα ημερολόγιο"
+
+#: src/postulo/templates/server/backups.html
+msgid "Choose the destination"
+msgstr ""
 
 #: src/postulo/templates/resume/europass_import.html
 msgid "Choose the PDF you downloaded from europass.europa.eu, as it is: the CV is attached inside it, and that is what Postulo reads. Older Europass files read too: the XML and PDF of the editor before 2020, and the JSON of its web service. Postulo works out which it is, shows you what is in it, and writes nothing until you say so."
@@ -5939,6 +5982,10 @@ msgstr "Σχεδίαση"
 msgid "Design (Behance, Dribbble…)"
 msgstr "Σχεδιασμός (Behance, Dribbble…)"
 
+#: src/postulo/core/server_forms.py
+msgid "Destination"
+msgstr ""
+
 #: src/postulo/core/design.py
 msgid "Destructive"
 msgstr "Καταστροφικό"
@@ -6611,6 +6658,11 @@ msgstr "Κάθε λογαριασμός σε αυτή την εγκατάστα�
 msgid "Every application, in order"
 msgstr "Όλες οι αιτήσεις, με τη σειρά"
 
+#: src/postulo/templates/server/backups.html
+#, python-format
+msgid "Every archive is encrypted to your age recipient and sent to %(label)s once it has been written and checked. An archive that has not arrived there is never deleted here."
+msgstr ""
+
 #: src/postulo/templates/jobs/company_places.html
 msgid "Every company address on the map, with the company's name, page, industries and how precise its point is: at its town, its postcode, by hand or from Wikidata. A contact's address and your own are never in it."
 msgstr "Κάθε διεύθυνση εταιρείας στον χάρτη, με την επωνυμία, τη σελίδα και τους κλάδους της εταιρείας και με το πόσο ακριβές είναι το σημείο της: στην πόλη της, στον ταχυδρομικό της κώδικα, με το χέρι ή από τα Wikidata. Η διεύθυνση μιας επαφής και η δική σας δεν περιλαμβάνονται ποτέ."
@@ -6881,6 +6933,7 @@ msgid "Extra small"
 msgstr "Πολύ μικρό"
 
 #: src/postulo/core/models.py src/postulo/documents/models.py
+#: src/postulo/templates/server/backups.html
 msgid "Failed"
 msgstr "Απέτυχε"
 
@@ -8619,6 +8672,11 @@ msgstr "Αφαιρείται από αυτή την επαφή αμέσως, χ�
 msgid "It comes off your details now, without waiting for Save, and cannot be put back."
 msgstr "Αφαιρείται τώρα από τα στοιχεία σας, χωρίς να περιμένει την Αποθήκευση, και δεν μπορεί να επανέλθει."
 
+#: src/postulo/core/offsite.py
+#, python-format
+msgid "It could not be encrypted: %(error)s"
+msgstr ""
+
 #: src/postulo/plugins/installing.py
 msgid "it could not be imported"
 msgstr "δεν ήταν δυνατή η εισαγωγή"
@@ -8935,6 +8993,10 @@ msgstr "Διατήρηση των σημειώσεών μου"
 msgid "keep the newest"
 msgstr "διατήρηση των νεότερων"
 
+#: src/postulo/core/models.py
+msgid "keep the newest there"
+msgstr ""
+
 #: src/postulo/templates/jobs/merge.html
 msgid "Keep the other one instead"
 msgstr "Διατήρηση του άλλου αντί γι’ αυτό"
@@ -9190,6 +9252,10 @@ msgstr "τελευταίο σφάλμα"
 msgid "Last name"
 msgstr "Επώνυμο"
 
+#: src/postulo/templates/server/backups.html
+msgid "Last one that arrived"
+msgstr ""
+
 #: src/postulo/plugins/models.py
 msgid "last pushed"
 msgstr "τελευταία αποστολή"
@@ -9261,6 +9327,10 @@ msgstr "Μαθήματα που παρακολουθήσατε, με ή χωρί
 #: src/postulo/templates/resume/translations.html
 msgid "Leave a box empty and that line prints as it is written above it."
 msgstr "Αφήστε ένα πλαίσιο κενό και η γραμμή τυπώνεται όπως είναι γραμμένη από πάνω."
+
+#: src/postulo/core/models.py
+msgid "Leave blank to keep as many there as here. 0 never deletes anything there. Only archives Postulo sent itself are ever deleted, and only after a new one has arrived."
+msgstr ""
 
 #: src/postulo/core/server_forms.py
 #, fuzzy
@@ -10457,6 +10527,10 @@ msgstr "Όχι"
 msgid "No address and no key, so nothing is offered from it."
 msgstr "Χωρίς διεύθυνση και χωρίς κλειδί, οπότε δεν προσφέρεται τίποτα από αυτόν."
 
+#: src/postulo/core/offsite.py
+msgid "No age recipient is set, and nothing leaves this machine unencrypted."
+msgstr ""
+
 #: src/postulo/applications/forms.py
 msgid "No agency"
 msgstr "Χωρίς πρακτορείο"
@@ -10472,6 +10546,10 @@ msgstr "Καμία αίτηση δεν τροποποιείται, οπότε κ
 #: src/postulo/templates/jobs/company_detail.html
 msgid "No appointments yet."
 msgstr "Δεν υπάρχουν ραντεβού ακόμα."
+
+#: src/postulo/templates/server/backup_destination.html
+msgid "No backup destination plugin is installed. Postulo ships none and names no provider: install one under Plugins, then choose it here."
+msgstr ""
 
 #: src/postulo/templates/server/backups.html
 msgid "No backups yet. Take one above."
@@ -10630,6 +10708,10 @@ msgstr "Χωρίς μέσο"
 #: src/postulo/documents/printing.py
 msgid "No messaging handle"
 msgstr "Χωρίς όνομα χρήστη υπηρεσίας μηνυμάτων"
+
+#: src/postulo/templates/server/backups.html
+msgid "No more retries: send it again when the destination is fixed."
+msgstr ""
 
 #: src/postulo/documents/pdf.py
 #, python-format
@@ -10920,6 +11002,14 @@ msgstr "Κανένα ακόμα. Τα έγγραφα τυπώνουν το πα�
 msgid "None yet. This entry prints its original text on every CV."
 msgstr "Καμία ακόμη. Αυτή η καταχώριση τυπώνει το αρχικό της κείμενο σε κάθε βιογραφικό."
 
+#: src/postulo/core/server_forms.py
+msgid "None — backups stay on this server"
+msgstr ""
+
+#: src/postulo/templates/server/backups.html
+msgid "None: the archives stay on this server. A destination keeps a copy somewhere else, encrypted before it leaves."
+msgstr ""
+
 #: src/postulo/applications/models.py
 #, fuzzy
 msgid "Normal"
@@ -11054,6 +11144,10 @@ msgstr "Δεν αποθηκεύτηκε"
 #: src/postulo/templates/settings/_save_status.html
 msgid "Not saved: Postulo could not be reached. Press Save when it can."
 msgstr "Δεν αποθηκεύτηκε: δεν ήταν δυνατή η επικοινωνία με το Postulo. Πατήστε «Αποθήκευση» όταν θα είναι δυνατή."
+
+#: src/postulo/templates/server/backups.html
+msgid "Not sent"
+msgstr ""
 
 #: src/postulo/templates/applications/partials/application_card.html
 msgid "Not sent yet"
@@ -11601,6 +11695,14 @@ msgstr "Απενεργοποιημένο, επειδή χρειάζεται %(na
 msgid "Off, because the module it belongs to is off."
 msgstr "Απενεργοποιημένο, επειδή η ενότητα στην οποία ανήκει είναι απενεργοποιημένη."
 
+#: src/postulo/templates/server/backups.html
+msgid "Off-site"
+msgstr ""
+
+#: src/postulo/templates/server/backups.html
+msgid "Off-site copies"
+msgstr ""
+
 #: src/postulo/templates/settings/account.html
 msgid "Off. A code from an authenticator app, asked for after the password, means a leaked password alone is not enough."
 msgstr "Ανενεργός. Ένας κωδικός από εφαρμογή ελέγχου ταυτότητας, που ζητείται μετά τον κωδικό πρόσβασης, σημαίνει ότι ένας κωδικός πρόσβασης που διέρρευσε δεν αρκεί από μόνος του."
@@ -12079,6 +12181,10 @@ msgstr "Μόνο ο υπεύθυνος λειτουργίας μπορεί να 
 #, fuzzy
 msgid "Only the operator's own account can stop being an administrator."
 msgstr "Μόνο ο ίδιος ο υπεύθυνος λειτουργίας μπορεί να αφαιρέσει τον ρόλο του διαχειριστή από τον δικό του λογαριασμό."
+
+#: src/postulo/templates/server/backup_destination.html
+msgid "Only the public key, the recipient, is kept here. Keep the identity that opens the archives somewhere other than this server, and keep a copy of it: without it no archive sent can be opened. Restoring starts by decrypting one by hand, as the wiki page about backups says."
+msgstr ""
 
 #: src/postulo/resume/forms.py
 msgid "Only the year prints on a CV, so the day makes no difference."
@@ -13990,6 +14096,14 @@ msgstr "Αφαίρεση {label}"
 msgid "removed on the other side"
 msgstr "αφαιρέθηκε από την άλλη πλευρά"
 
+#: src/postulo/core/models.py
+msgid "Removed there"
+msgstr ""
+
+#: src/postulo/templates/server/backups.html
+msgid "Removed there by retention"
+msgstr ""
+
 #: src/postulo/templates/documents/partials/comparison_line.html
 msgid "Removed:"
 msgstr "Αφαιρέθηκε:"
@@ -14261,6 +14375,7 @@ msgstr "Σάββατο"
 #: src/postulo/templates/partials/table/cell.html
 #: src/postulo/templates/resume/item_form.html
 #: src/postulo/templates/resume/translations.html
+#: src/postulo/templates/server/backup_destination.html
 #: src/postulo/templates/server/backups.html
 #: src/postulo/templates/server/capture.html
 #: src/postulo/templates/server/data_protection.html
@@ -14571,6 +14686,10 @@ msgctxt "type of event"
 msgid "Seminar"
 msgstr "Σεμινάριο"
 
+#: src/postulo/templates/server/backups.html
+msgid "Send"
+msgstr ""
+
 #: src/postulo/templates/server/email.html
 msgid "Send a real message"
 msgstr "Αποστολή πραγματικού μηνύματος"
@@ -14613,8 +14732,9 @@ msgstr "Η αποστολή απέτυχε: %(error)s"
 msgid "Sends the DOI to doi.org, which passes it to Crossref or DataCite, and nothing else about you. Only the empty boxes are filled, and nothing is kept until you save."
 msgstr ""
 
-#: src/postulo/notifications/models.py
+#: src/postulo/core/models.py src/postulo/notifications/models.py
 #: src/postulo/templates/applications/report.html
+#: src/postulo/templates/server/backups.html
 #: src/postulo/templates/server/design.html
 #: src/postulo/templates/widgets/_source_table.html
 #: src/postulo/templates/widgets/industries.html
@@ -15372,6 +15492,10 @@ msgstr "Κάτι πήγε στραβά. Το αρχείο καταγραφής �
 msgid "Something worth knowing."
 msgstr "Κάτι που αξίζει να γνωρίζετε."
 
+#: src/postulo/templates/server/backup_destination.html
+msgid "Somewhere besides this server where every archive is sent once it has been written and checked, encrypted first."
+msgstr ""
+
 #: src/postulo/templates/server/design.html
 msgid "Somewhere else"
 msgstr "Κάπου αλλού"
@@ -15933,6 +16057,7 @@ msgid "Terms not recorded"
 msgstr "Οι όροι δεν καταγράφηκαν"
 
 #: src/postulo/templates/connections/list.html
+#: src/postulo/templates/server/backup_destination.html
 msgid "Test"
 msgstr "Δοκιμή"
 
@@ -15944,6 +16069,10 @@ msgstr "Η δοκιμή απέτυχε: %(message)s"
 #: src/postulo/templates/server/email.html
 msgid "Test the connection"
 msgstr "Δοκιμή της σύνδεσης"
+
+#: src/postulo/templates/server/backup_destination.html
+msgid "Test the destination"
+msgstr ""
 
 #: src/postulo/documents/models.py src/postulo/resume/models.py
 msgid "text"
@@ -16385,6 +16514,14 @@ msgstr "Αυτό δεν είναι αναγνωριστικό αντικειμέ
 msgid "That is not an address Postulo can use."
 msgstr "Αυτή δεν είναι διεύθυνση που μπορεί να χρησιμοποιήσει το Postulo."
 
+#: src/postulo/core/offsite.py
+msgid "That is not an age recipient. It starts age1 and is 62 characters long."
+msgstr ""
+
+#: src/postulo/core/offsite.py
+msgid "That is not an age recipient: its checksum does not match."
+msgstr ""
+
 #: src/postulo/plugins/catalogue.py
 #, python-format
 msgid "That is not an Ed25519 public key: %(error)s"
@@ -16600,10 +16737,20 @@ msgid_plural "The %(count)d files its history points at are kept where they are.
 msgstr[0] "Το %(count)d αρχείο στο οποίο παραπέμπει το ιστορικό του παραμένει εκεί όπου βρίσκεται."
 msgstr[1] "Τα %(count)d αρχεία στα οποία παραπέμπει το ιστορικό του παραμένουν εκεί όπου βρίσκονται."
 
+#: src/postulo/templates/server/backups.html
+#, python-format
+msgid "The %(name)s destination is chosen but not installed, so nothing is being sent."
+msgstr ""
+
 #: src/postulo/documents/pdf.py
 #, python-format
 msgid "The %(name)s PDF backend is configured but not usable. %(hint)s"
 msgstr "Η μηχανή PDF %(name)s είναι ρυθμισμένη αλλά δεν μπορεί να χρησιμοποιηθεί. %(hint)s"
+
+#: src/postulo/core/offsite.py
+#, python-format
+msgid "The %(plugin)s destination is not installed or not chosen."
+msgstr ""
 
 #: src/postulo/documents/archiving.py src/postulo/plugins/syncing.py
 #, python-format
@@ -16666,6 +16813,19 @@ msgstr "Η εφαρμογή που είναι καταχωρισμένη στο�
 #: src/postulo/core/mail_choices.py
 msgid "The application sends on its own"
 msgstr "Η εφαρμογή στέλνει μόνη της"
+
+#: src/postulo/core/offsite.py
+msgid "The archive does not verify."
+msgstr ""
+
+#: src/postulo/core/offsite.py
+#, python-format
+msgid "The archive does not verify: %(problem)s"
+msgstr ""
+
+#: src/postulo/core/offsite.py
+msgid "The archive is no longer on this server."
+msgstr ""
 
 #: src/postulo/templates/server/backup_restore.html
 msgid "The archive is signed by this instance's key."
@@ -16904,6 +17064,18 @@ msgstr ""
 #: src/postulo/templates/server/plugins.html
 msgid "The default for every account. One person's exceptions are on their row under People. Switching a plugin off stops it being used and deletes nothing."
 msgstr "Η προεπιλογή για κάθε λογαριασμό. Οι εξαιρέσεις ενός ατόμου βρίσκονται στη γραμμή του στην ενότητα «Άτομα». Η απενεργοποίηση ενός πρόσθετου σταματά τη χρήση του και δεν διαγράφει τίποτα."
+
+#: src/postulo/core/views_backups.py
+msgid "The destination answered."
+msgstr ""
+
+#: src/postulo/core/offsite.py
+msgid "The destination did not say where it put the archive."
+msgstr ""
+
+#: src/postulo/core/offsite.py
+msgid "The destination gave no answer."
+msgstr ""
 
 #: src/postulo/jobs/capture_views.py
 msgid "the discarded captures"
@@ -17226,6 +17398,10 @@ msgstr "Όπως συνηθίζεται στη γλώσσα"
 msgid "The last backup failed."
 msgstr "Το τελευταίο αντίγραφο ασφαλείας απέτυχε."
 
+#: src/postulo/templates/server/overview.html
+msgid "The last backup sent to the destination did not arrive."
+msgstr ""
+
 #: src/postulo/templates/applications/report.html
 msgid "The last few weeks"
 msgstr "Οι τελευταίες εβδομάδες"
@@ -17241,6 +17417,10 @@ msgstr[1] "Τα τελευταία %(counter)s μηνύματα που προσ�
 #, fuzzy
 msgid "The last one waiting."
 msgstr "Η τελευταία σε αναμονή."
+
+#: src/postulo/templates/server/backups.html
+msgid "The last send failed."
+msgstr ""
 
 #: src/postulo/applications/widgets.py
 msgid "The last ten things the timeline recorded, whichever application they were on."
@@ -17562,6 +17742,10 @@ msgstr "Η διεύθυνση διακριτικών του παρόχου έκ�
 msgid "The public employment service you are registered with. Add it under Companies, as a public employment service, if it is not here."
 msgstr "Η δημόσια υπηρεσία απασχόλησης στην οποία έχετε εγγραφεί. Αν δεν υπάρχει εδώ, προσθέστε την στις Εταιρείες ως δημόσια υπηρεσία απασχόλησης."
 
+#: src/postulo/core/models.py
+msgid "The public key every archive is encrypted to before it leaves, starting age1. Keep the identity that opens them somewhere other than this server."
+msgstr ""
+
 #: src/postulo/resume/candidate.py
 msgid "The publication it counts cannot be added, so it will be a count for all of your work."
 msgstr ""
@@ -17861,6 +18045,11 @@ msgstr "Ο αριθμός τηλεφώνου που επιλέχθηκε για 
 msgid "The telephone number of %(name)s was not added."
 msgstr "Ο αριθμός τηλεφώνου του/της %(name)s δεν προστέθηκε."
 
+#: src/postulo/core/views_backups.py
+#, python-format
+msgid "The test failed: %(problem)s"
+msgstr ""
+
 #: src/postulo/templates/documents/cv_text.html
 msgid "The text of this document"
 msgstr "Το κείμενο αυτού του εγγράφου"
@@ -17868,6 +18057,10 @@ msgstr "Το κείμενο αυτού του εγγράφου"
 #: src/postulo/templates/server/design.html
 msgid "The thing to do next"
 msgstr "Αυτό που πρέπει να γίνει στη συνέχεια"
+
+#: src/postulo/core/offsite.py
+msgid "The time for this send ran out before it began."
+msgstr ""
 
 #: src/postulo/templates/server/defaults.html
 #, python-format
@@ -18003,6 +18196,10 @@ msgstr "Υπάρχει ήδη μια ομάδα με αυτό το όνομα."
 #: src/postulo/jobs/slow.py
 msgid "There is no address to fetch it from again."
 msgstr "Δεν υπάρχει διεύθυνση από την οποία να ληφθεί ξανά."
+
+#: src/postulo/core/views_backups.py
+msgid "There is no backup destination to send to."
+msgstr ""
 
 #: src/postulo/documents/archiving.py
 msgid "There is no file to send."
@@ -18803,6 +19000,11 @@ msgstr "ρυθμίσεις μεταφορέα"
 msgid "transport secrets"
 msgstr "μυστικά μεταφορέα"
 
+#: src/postulo/templates/server/backups.html
+#, python-format
+msgid "Tried again at %(when)s."
+msgstr ""
+
 #: src/postulo/templates/server/overview.html
 #, fuzzy
 msgid "Trusted:"
@@ -19161,6 +19363,10 @@ msgstr "χρήστες"
 msgid "Uses the saved settings, and sends to a real inbox. Test the connection first if you have just changed something."
 msgstr "Χρησιμοποιεί τις αποθηκευμένες ρυθμίσεις και στέλνει σε πραγματικό γραμματοκιβώτιο. Δοκιμάστε πρώτα τη σύνδεση αν μόλις αλλάξατε κάτι."
 
+#: src/postulo/templates/server/backup_destination.html
+msgid "Uses the saved settings. Nothing is stored there."
+msgstr ""
+
 #: src/postulo/templates/api/token_list.html
 msgid "Using a token"
 msgstr "Χρήση διακριτικού"
@@ -19267,6 +19473,7 @@ msgid "Voluntary support is this project's only income: one person writes it, an
 msgstr "Η εθελοντική υποστήριξη είναι το μόνο έσοδο αυτού του έργου: το γράφει ένα άτομο και τίποτα δεν οφείλεται ούτε ξεκλειδώνεται με αυτήν. Αναφέρεται μία φορά, εδώ, σε όποιον διαχειρίζεται την εγκατάσταση — ποτέ στους ανθρώπους που τη χρησιμοποιούν για να βρουν δουλειά· για πολλούς από αυτούς, τα χρήματα δεν είναι το κατάλληλο πράγμα για να δώσουν."
 
 #: src/postulo/core/models.py src/postulo/notifications/models.py
+#: src/postulo/templates/server/backups.html
 msgid "Waiting"
 msgstr "Σε αναμονή"
 
@@ -19947,9 +20154,17 @@ msgstr "Όπου μια κάρτα έχει μενού <em>Υπηρεσία</em>
 msgid "Where a value leads: an http or https address with <code dir=\"ltr\">{value}</code> where the identifier goes, after the host. <code dir=\"ltr\">person_link</code> is the address for a person, where that is another one."
 msgstr "Πού οδηγεί μια τιμή: μια διεύθυνση http ή https με <code dir=\"ltr\">{value}</code> εκεί όπου μπαίνει το αναγνωριστικό, μετά τον κεντρικό υπολογιστή. Το <code dir=\"ltr\">person_link</code> είναι η διεύθυνση για ένα άτομο, όπου αυτή είναι διαφορετική."
 
+#: src/postulo/templates/server/backup_destination.html
+msgid "Where and how"
+msgstr ""
+
 #: src/postulo/applications/widgets.py
 msgid "Where and why applications end"
 msgstr "Πού και γιατί τελειώνουν οι αιτήσεις"
+
+#: src/postulo/core/server_forms.py
+msgid "Where each archive is sent once it has been written and checked."
+msgstr ""
 
 #: src/postulo/resume/forms.py
 msgid "Where it can be read about. A CV does not print it."

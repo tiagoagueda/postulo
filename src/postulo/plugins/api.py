@@ -59,6 +59,11 @@ register is asked about one number, `RegisterRecord` and `RegisterAddress` what 
 and `RegisterAdapterPlugin` the registry that holds them. An adapter builds an address and reads
 JSON; Postulo makes the request.
 
+**A backup can leave the machine (#325)**: `BackupDestinationPlugin` is what keeps the
+instance's archives somewhere else, `BackupArchive` what it is handed (already encrypted to the
+operator's age recipient), `BackupManifest` what the archive says about itself in plain values,
+and `BackupRef` where the destination put it.
+
 **Companies, departments and the person's card are on it too (#328)**: the records and
 their vocabularies, a holder's numbers, addresses and links as plain values, the person's own
 card (read only: nothing here writes a `User` or a `Profile`), and the calls that write a
@@ -185,6 +190,11 @@ from .base import (
     MAX_IMPORT_BYTES,
     MEDIUMS,
     TEXT,
+    # --------------------------- what a backup destination is handed, and gives back (#325)
+    BackupArchive,
+    BackupDestinationPlugin,
+    BackupManifest,
+    BackupRef,
     # ------------------------------------------------- the protocols to satisfy
     ConnectedPlugin,
     # ------------------------------- what a plugin raises when the other side has finished
@@ -237,6 +247,10 @@ __all__ = [
     "Application",
     "Appointment",
     "AppointmentHow",
+    "BackupArchive",
+    "BackupDestinationPlugin",
+    "BackupManifest",
+    "BackupRef",
     "BodyRefused",
     "CalendarEntry",
     "CalendarRefused",

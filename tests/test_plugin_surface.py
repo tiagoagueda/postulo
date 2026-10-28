@@ -364,6 +364,33 @@ def test_the_surface_holds_the_store_contract():
     assert api.StorePlugin is not None
 
 
+def test_the_surface_holds_the_backup_destination_contract():
+    """What a destination satisfies, is handed and gives back (#325), all on the surface."""
+    from postulo.plugins import api, base
+
+    assert api.BackupDestinationPlugin is base.BackupDestinationPlugin
+    assert api.BackupArchive is base.BackupArchive
+    assert api.BackupManifest is base.BackupManifest
+    assert api.BackupRef is base.BackupRef
+    for method in ("config_fields", "test", "send", "list", "delete"):
+        assert hasattr(api.BackupDestinationPlugin, method), method
+
+
+def test_a_backup_destination_written_elsewhere_passes_the_published_check(tmp_path):
+    """A destination needs nothing past the surface, and the published check agrees (#325)."""
+    package = tmp_path / "postulo_vault"
+    package.mkdir()
+    (package / "__init__.py").write_text(
+        "from postulo.plugins.api import (\n"
+        "    BackupArchive, BackupDestinationPlugin, BackupManifest, BackupRef, FieldSpec,\n"
+        "    TestResult, client,\n"
+        ")\n",
+        encoding="utf-8",
+    )
+
+    assert_imports_only_the_surface(package, package="postulo_vault")
+
+
 def test_importing_the_surface_touches_no_database():
     """It is reachable before the app registry is ready, so it must cost nothing to import."""
     import importlib

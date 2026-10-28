@@ -248,10 +248,40 @@ def take() -> Path:
         report = write_backup()
         # `write_backup` has just verified it, so the page does not need to again.
         remember_check(report.path, True)
+        # And it is the archive a destination is waiting for, if one is chosen (#325).
+        queue_send(report.path)
         return report.path
     finally:
         if cache.get(LOCK_KEY) == token:
             cache.delete(LOCK_KEY)
+
+
+def queue_send(path: Path, *, quietly: bool = True):
+    """Queue the archive just verified for the backup destination, if there is one (#325).
+
+    Only one of Postulo's own archives, in its own directory and written by it: one written
+    elsewhere by ``manage.py backup /somewhere`` is the operator's to carry, and one somebody
+    uploaded to restore from was never ours to send. Returns the row, or ``None``.
+
+    ``quietly`` (the default) never raises: the archive is written and verified whatever
+    happens to its copy, and a backup must not be reported as failed because the queue
+    could not be written.
+    """
+    from . import offsite_queue
+
+    try:
+        try:
+            found = archive_path(path.name)
+        except NotAnArchive:
+            return None
+        if found.resolve() != Path(path).resolve() or path.name.startswith("postulo-upload-"):
+            return None
+        return offsite_queue.enqueue(path.name)
+    except Exception:
+        if not quietly:
+            raise
+        logger.exception("Could not queue %s for the backup destination.", path.name)
+        return None
 
 
 # ---------------------------------------------------------------------------- the clock
@@ -340,11 +370,23 @@ def apply_retention(keep: int) -> list[str]:
     """Delete the backups the scheduler or somebody wrote beyond the newest ``keep``.
 
     Called only after a new archive has verified, and never touches an uploaded one: that is
-    somebody's file to restore from, not a copy this schedule made.
+    somebody's file to restore from, not a copy this schedule made. Nor one the backup
+    destination has not received yet (#325): until it has, it is the only copy there is, and a
+    destination that is failing must not cost the archives it failed to take.
     """
+    from . import offsite_queue
+
     listed = [a for a in archives() if not a.uploaded]
+    try:
+        waiting = offsite_queue.held_back()
+    except Exception:
+        logger.exception("Could not ask which backups are waiting for the destination.")
+        return []
     gone = []
     for old in listed[max(keep, 1) :]:
+        if old.name in waiting:
+            logger.info("Retention kept %s: it has not reached the destination yet.", old.name)
+            continue
         try:
             delete(old.name)
         except (NotAnArchive, OSError):

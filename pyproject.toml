@@ -82,6 +82,11 @@ dependencies = [
     "fonttools>=4.64",
     "tinycss2>=1.5",
     "cssselect2>=0.10",
+    # age encryption for an archive before it leaves for a backup destination (#325): the Rust
+    # `rage` behind it, abi3 wheels for linux amd64 and aarch64, no compiler. MIT. Only
+    # `core/offsite.py` imports it, and only for X25519 recipients: 1.2.0 to 1.2.2 could be
+    # made to run a program by a plugin recipient's name (GHSA-47h8-jmp3-9f28).
+    "pyrage>=1.4,<2",
 ]
 
 [project.optional-dependencies]

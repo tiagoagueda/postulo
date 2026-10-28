@@ -1076,6 +1076,11 @@ msgstr "%(name)s је сада број %(place)s међу идентифика�
 msgid "%(name)s is now number %(place)s in the navigation."
 msgstr "%(name)s је сада број %(place)s у навигацији."
 
+#: src/postulo/core/views_backups.py
+#, python-format
+msgid "%(name)s is queued; the scheduler sends it on its next pass."
+msgstr ""
+
 #: src/postulo/core/server_views.py
 #, python-format
 msgid "%(name)s is removed. Restart Postulo to be sure nothing of it is left loaded."
@@ -1256,7 +1261,7 @@ msgstr "%(period)s: изаберите други"
 msgid "%(person)s is the last member of %(name)s, which still owns records. Give them to somebody, or delete them, first."
 msgstr "%(person)s је последњи члан групе %(name)s, која још увек поседује записе. Прво их предајте некоме или их обришите."
 
-#: src/postulo/plugins/forms.py
+#: src/postulo/core/server_forms.py src/postulo/plugins/forms.py
 #, python-format
 msgid "%(plugin)s could not check these settings: %(error)s"
 msgstr "%(plugin)s није могао да провери ова подешавања: %(error)s"
@@ -2079,6 +2084,10 @@ msgstr "Тамноплава. Десет нијанси, од којих инт�
 #: src/postulo/jobs/surface.py
 msgid "A department needs a name."
 msgstr "Одељење мора имати назив."
+
+#: src/postulo/core/server_forms.py
+msgid "A destination needs an age recipient to encrypt to: nothing leaves this server unencrypted."
+msgstr ""
 
 #: src/postulo/templates/server/overview.html
 msgid "A document in a script shown in red is set in the server's fonts instead."
@@ -3189,6 +3198,10 @@ msgstr "Ваздухопловство"
 msgid "Africa"
 msgstr "Африка"
 
+#: src/postulo/core/models.py
+msgid "age recipient"
+msgstr ""
+
 #: src/postulo/templates/widgets/sources.html
 msgid "Agency"
 msgstr "Агенција"
@@ -3873,6 +3886,10 @@ msgstr "Приправништво"
 msgid "Archived"
 msgstr "Архивирано"
 
+#: src/postulo/templates/server/backup_destination.html
+msgid "Archives are encrypted with age before they leave."
+msgstr ""
+
 #: src/postulo/templates/jobs/capture_page_forget.html
 #: src/postulo/templates/partials/confirm_delete.html
 msgid "Are you sure?"
@@ -4098,6 +4115,7 @@ msgid "Back in your listings."
 msgstr "Поново у вашим огласима."
 
 #: src/postulo/templates/server/backup_delete.html
+#: src/postulo/templates/server/backup_destination.html
 #: src/postulo/templates/server/backup_restore.html
 msgid "Back to Backups"
 msgstr "Назад на Резервне копије"
@@ -4193,6 +4211,23 @@ msgstr "Backend"
 #: src/postulo/templates/server/overview.html
 msgid "Background work"
 msgstr "Позадински послови"
+
+#: src/postulo/core/models.py
+msgid "backup destination"
+msgstr ""
+
+#: src/postulo/plugins/kinds.py
+#: src/postulo/templates/server/backup_destination.html
+msgid "Backup destination"
+msgstr ""
+
+#: src/postulo/core/models.py
+msgid "backup destination configuration"
+msgstr ""
+
+#: src/postulo/core/models.py
+msgid "backup destination secrets"
+msgstr ""
 
 #: src/postulo/core/server_sections.py src/postulo/core/views_backups.py
 #: src/postulo/templates/server/backups.html
@@ -4795,6 +4830,10 @@ msgstr "Понуђене опције"
 msgid "Choose a country from the list."
 msgstr "Изаберите државу са списка."
 
+#: src/postulo/core/views_backups.py
+msgid "Choose a destination and save it first."
+msgstr ""
+
 #: src/postulo/resume/views.py
 msgid "Choose a Europass file first."
 msgstr "Прво изаберите Europass датотеку."
@@ -4884,6 +4923,10 @@ msgstr "Изаберите државу у којој је број и унес�
 #: src/postulo/templates/accounts/profile.html
 msgid "Choose the date of birth from a calendar"
 msgstr "Изаберите датум рођења из календара"
+
+#: src/postulo/templates/server/backups.html
+msgid "Choose the destination"
+msgstr ""
 
 #: src/postulo/templates/resume/europass_import.html
 msgid "Choose the PDF you downloaded from europass.europa.eu, as it is: the CV is attached inside it, and that is what Postulo reads. Older Europass files read too: the XML and PDF of the editor before 2020, and the JSON of its web service. Postulo works out which it is, shows you what is in it, and writes nothing until you say so."
@@ -5994,6 +6037,10 @@ msgstr "Дизајн"
 msgid "Design (Behance, Dribbble…)"
 msgstr "Дизајн (Behance, Dribbble…)"
 
+#: src/postulo/core/server_forms.py
+msgid "Destination"
+msgstr ""
+
 #: src/postulo/core/design.py
 #, fuzzy
 msgid "Destructive"
@@ -6665,6 +6712,11 @@ msgstr "Сви налози на овој инстанци. Администра
 msgid "Every application, in order"
 msgstr "Све пријаве, редом"
 
+#: src/postulo/templates/server/backups.html
+#, python-format
+msgid "Every archive is encrypted to your age recipient and sent to %(label)s once it has been written and checked. An archive that has not arrived there is never deleted here."
+msgstr ""
+
 #: src/postulo/templates/jobs/company_places.html
 msgid "Every company address on the map, with the company's name, page, industries and how precise its point is: at its town, its postcode, by hand or from Wikidata. A contact's address and your own are never in it."
 msgstr "Свака адреса компаније на мапи, са називом компаније, њеном страницом, делатностима и прецизношћу тачке: у месту, по поштанском броју, ручно или са Wikidata. Адреса контакта и ваша сопствена адреса никада нису у њој."
@@ -6933,6 +6985,7 @@ msgid "Extra small"
 msgstr "Врло мало"
 
 #: src/postulo/core/models.py src/postulo/documents/models.py
+#: src/postulo/templates/server/backups.html
 msgid "Failed"
 msgstr "Није успело"
 
@@ -8667,6 +8720,11 @@ msgstr "Уклања се са овог контакта одмах, без че
 msgid "It comes off your details now, without waiting for Save, and cannot be put back."
 msgstr "Уклања се из ваших података одмах, без чекања на Сачувај, и не може се вратити."
 
+#: src/postulo/core/offsite.py
+#, python-format
+msgid "It could not be encrypted: %(error)s"
+msgstr ""
+
 #: src/postulo/plugins/installing.py
 msgid "it could not be imported"
 msgstr "није могло да се увезе"
@@ -8985,6 +9043,10 @@ msgstr "Задржи моје белешке"
 msgid "keep the newest"
 msgstr "задржи најновијих"
 
+#: src/postulo/core/models.py
+msgid "keep the newest there"
+msgstr ""
+
 #: src/postulo/templates/jobs/merge.html
 msgid "Keep the other one instead"
 msgstr "Задржи другу"
@@ -9240,6 +9302,10 @@ msgstr "последња грешка"
 msgid "Last name"
 msgstr "Презиме"
 
+#: src/postulo/templates/server/backups.html
+msgid "Last one that arrived"
+msgstr ""
+
 #: src/postulo/plugins/models.py
 msgid "last pushed"
 msgstr "последњи пут послато"
@@ -9311,6 +9377,10 @@ msgstr "Обука коју сте прошли, са потврдом о пох
 #: src/postulo/templates/resume/translations.html
 msgid "Leave a box empty and that line prints as it is written above it."
 msgstr "Оставите поље празно и тај ред се штампа онако како је написан изнад."
+
+#: src/postulo/core/models.py
+msgid "Leave blank to keep as many there as here. 0 never deletes anything there. Only archives Postulo sent itself are ever deleted, and only after a new one has arrived."
+msgstr ""
 
 #: src/postulo/core/server_forms.py
 msgid "Leave blank to keep the one already stored."
@@ -10504,6 +10574,10 @@ msgstr "Не"
 msgid "No address and no key, so nothing is offered from it."
 msgstr "Ни адресе ни кључа, па се одатле ништа не нуди."
 
+#: src/postulo/core/offsite.py
+msgid "No age recipient is set, and nothing leaves this machine unencrypted."
+msgstr ""
+
 #: src/postulo/applications/forms.py
 msgid "No agency"
 msgstr "Без агенције"
@@ -10519,6 +10593,10 @@ msgstr "Ниједна пријава није дирнута, па се ниј�
 #: src/postulo/templates/jobs/company_detail.html
 msgid "No appointments yet."
 msgstr "Још нема термина."
+
+#: src/postulo/templates/server/backup_destination.html
+msgid "No backup destination plugin is installed. Postulo ships none and names no provider: install one under Plugins, then choose it here."
+msgstr ""
 
 #: src/postulo/templates/server/backups.html
 msgid "No backups yet. Take one above."
@@ -10677,6 +10755,10 @@ msgstr "Нема медијских датотека"
 #: src/postulo/documents/printing.py
 msgid "No messaging handle"
 msgstr "Без налога за поруке"
+
+#: src/postulo/templates/server/backups.html
+msgid "No more retries: send it again when the destination is fixed."
+msgstr ""
 
 #: src/postulo/documents/pdf.py
 #, python-format
@@ -10963,6 +11045,14 @@ msgstr "Још ниједан. На документима се горњи на�
 msgid "None yet. This entry prints its original text on every CV."
 msgstr "Још нема. Овај унос штампа свој изворни текст на сваком CV-ју."
 
+#: src/postulo/core/server_forms.py
+msgid "None — backups stay on this server"
+msgstr ""
+
+#: src/postulo/templates/server/backups.html
+msgid "None: the archives stay on this server. A destination keeps a copy somewhere else, encrypted before it leaves."
+msgstr ""
+
 #: src/postulo/applications/models.py
 msgid "Normal"
 msgstr "Нормално"
@@ -11094,6 +11184,10 @@ msgstr "Није сачувано"
 #: src/postulo/templates/settings/_save_status.html
 msgid "Not saved: Postulo could not be reached. Press Save when it can."
 msgstr "Није сачувано: Postulo није био доступан. Притисните Сачувај када буде."
+
+#: src/postulo/templates/server/backups.html
+msgid "Not sent"
+msgstr ""
 
 #: src/postulo/templates/applications/partials/application_card.html
 msgid "Not sent yet"
@@ -11642,6 +11736,14 @@ msgstr "Искључено, јер му је потребно %(names)s, што 
 msgid "Off, because the module it belongs to is off."
 msgstr "Искључено, јер је искључен модул коме припада."
 
+#: src/postulo/templates/server/backups.html
+msgid "Off-site"
+msgstr ""
+
+#: src/postulo/templates/server/backups.html
+msgid "Off-site copies"
+msgstr ""
+
 #: src/postulo/templates/settings/account.html
 msgid "Off. A code from an authenticator app, asked for after the password, means a leaked password alone is not enough."
 msgstr "Искључено. Код из апликације за потврду идентитета, који се тражи након лозинке, значи да сама процурела лозинка није довољна."
@@ -12139,6 +12241,10 @@ msgstr "Само оператер може да мења правило које
 #: src/postulo/core/server_views.py
 msgid "Only the operator's own account can stop being an administrator."
 msgstr "Само сопствени налог администратора инстанце може престати да буде администратор."
+
+#: src/postulo/templates/server/backup_destination.html
+msgid "Only the public key, the recipient, is kept here. Keep the identity that opens the archives somewhere other than this server, and keep a copy of it: without it no archive sent can be opened. Restoring starts by decrypting one by hand, as the wiki page about backups says."
+msgstr ""
 
 #: src/postulo/resume/forms.py
 msgid "Only the year prints on a CV, so the day makes no difference."
@@ -14047,6 +14153,14 @@ msgstr "Уклони {label}"
 msgid "removed on the other side"
 msgstr "уклоњено са друге стране"
 
+#: src/postulo/core/models.py
+msgid "Removed there"
+msgstr ""
+
+#: src/postulo/templates/server/backups.html
+msgid "Removed there by retention"
+msgstr ""
+
 #: src/postulo/templates/documents/partials/comparison_line.html
 msgid "Removed:"
 msgstr "Уклоњено:"
@@ -14316,6 +14430,7 @@ msgstr "Субота"
 #: src/postulo/templates/partials/table/cell.html
 #: src/postulo/templates/resume/item_form.html
 #: src/postulo/templates/resume/translations.html
+#: src/postulo/templates/server/backup_destination.html
 #: src/postulo/templates/server/backups.html
 #: src/postulo/templates/server/capture.html
 #: src/postulo/templates/server/data_protection.html
@@ -14621,6 +14736,10 @@ msgctxt "type of event"
 msgid "Seminar"
 msgstr "Семинар"
 
+#: src/postulo/templates/server/backups.html
+msgid "Send"
+msgstr ""
+
 #: src/postulo/templates/server/email.html
 msgid "Send a real message"
 msgstr "Пошаљи стварну поруку"
@@ -14662,8 +14781,9 @@ msgstr "Слање није успело: %(error)s"
 msgid "Sends the DOI to doi.org, which passes it to Crossref or DataCite, and nothing else about you. Only the empty boxes are filled, and nothing is kept until you save."
 msgstr ""
 
-#: src/postulo/notifications/models.py
+#: src/postulo/core/models.py src/postulo/notifications/models.py
 #: src/postulo/templates/applications/report.html
+#: src/postulo/templates/server/backups.html
 #: src/postulo/templates/server/design.html
 #: src/postulo/templates/widgets/_source_table.html
 #: src/postulo/templates/widgets/industries.html
@@ -15409,6 +15529,10 @@ msgstr "Дошло је до грешке. Детаљи су у дневнику
 msgid "Something worth knowing."
 msgstr "Нешто што вреди знати."
 
+#: src/postulo/templates/server/backup_destination.html
+msgid "Somewhere besides this server where every archive is sent once it has been written and checked, encrypted first."
+msgstr ""
+
 #: src/postulo/templates/server/design.html
 msgid "Somewhere else"
 msgstr "Негде другде"
@@ -15967,6 +16091,7 @@ msgid "Terms not recorded"
 msgstr "Услови нису забележени"
 
 #: src/postulo/templates/connections/list.html
+#: src/postulo/templates/server/backup_destination.html
 msgid "Test"
 msgstr "Тестирај"
 
@@ -15978,6 +16103,10 @@ msgstr "Тест није успео: %(message)s"
 #: src/postulo/templates/server/email.html
 msgid "Test the connection"
 msgstr "Тестирај везу"
+
+#: src/postulo/templates/server/backup_destination.html
+msgid "Test the destination"
+msgstr ""
 
 #: src/postulo/documents/models.py src/postulo/resume/models.py
 msgid "text"
@@ -16420,6 +16549,14 @@ msgstr "То није идентификатор Wikidata ставке."
 msgid "That is not an address Postulo can use."
 msgstr "То није адреса коју Postulo може да користи."
 
+#: src/postulo/core/offsite.py
+msgid "That is not an age recipient. It starts age1 and is 62 characters long."
+msgstr ""
+
+#: src/postulo/core/offsite.py
+msgid "That is not an age recipient: its checksum does not match."
+msgstr ""
+
 #: src/postulo/plugins/catalogue.py
 #, python-format
 msgid "That is not an Ed25519 public key: %(error)s"
@@ -16637,10 +16774,20 @@ msgstr[0] "%(count)d датотека на коју указује истори�
 msgstr[1] "%(count)d датотеке на које указује историја остају тамо где јесу."
 msgstr[2] "%(count)d датотека на које указује историја остају тамо где јесу."
 
+#: src/postulo/templates/server/backups.html
+#, python-format
+msgid "The %(name)s destination is chosen but not installed, so nothing is being sent."
+msgstr ""
+
 #: src/postulo/documents/pdf.py
 #, python-format
 msgid "The %(name)s PDF backend is configured but not usable. %(hint)s"
 msgstr "PDF позадински систем %(name)s је конфигурисан, али није употребљив. %(hint)s"
+
+#: src/postulo/core/offsite.py
+#, python-format
+msgid "The %(plugin)s destination is not installed or not chosen."
+msgstr ""
 
 #: src/postulo/documents/archiving.py src/postulo/plugins/syncing.py
 #, python-format
@@ -16704,6 +16851,19 @@ msgstr "Апликација регистрована код пружаоца у
 #: src/postulo/core/mail_choices.py
 msgid "The application sends on its own"
 msgstr "Апликација шаље самостално"
+
+#: src/postulo/core/offsite.py
+msgid "The archive does not verify."
+msgstr ""
+
+#: src/postulo/core/offsite.py
+#, python-format
+msgid "The archive does not verify: %(problem)s"
+msgstr ""
+
+#: src/postulo/core/offsite.py
+msgid "The archive is no longer on this server."
+msgstr ""
 
 #: src/postulo/templates/server/backup_restore.html
 msgid "The archive is signed by this instance's key."
@@ -16941,6 +17101,18 @@ msgstr ""
 #: src/postulo/templates/server/plugins.html
 msgid "The default for every account. One person's exceptions are on their row under People. Switching a plugin off stops it being used and deletes nothing."
 msgstr "Подразумевано за сваки налог. Изузеци једне особе су у њеном реду под Људи. Искључивање додатка зауставља његову употребу и не брише ништа."
+
+#: src/postulo/core/views_backups.py
+msgid "The destination answered."
+msgstr ""
+
+#: src/postulo/core/offsite.py
+msgid "The destination did not say where it put the archive."
+msgstr ""
+
+#: src/postulo/core/offsite.py
+msgid "The destination gave no answer."
+msgstr ""
 
 #: src/postulo/jobs/capture_views.py
 #, fuzzy
@@ -17265,6 +17437,10 @@ msgstr "Уобичајено за језик"
 msgid "The last backup failed."
 msgstr "Последња резервна копија није успела."
 
+#: src/postulo/templates/server/overview.html
+msgid "The last backup sent to the destination did not arrive."
+msgstr ""
+
 #: src/postulo/templates/applications/report.html
 msgid "The last few weeks"
 msgstr "Последњих неколико недеља"
@@ -17281,6 +17457,10 @@ msgstr[2] "Последњих %(counter)s порука које је ова ин
 #, fuzzy
 msgid "The last one waiting."
 msgstr "Последње које је чекало."
+
+#: src/postulo/templates/server/backups.html
+msgid "The last send failed."
+msgstr ""
 
 #: src/postulo/applications/widgets.py
 msgid "The last ten things the timeline recorded, whichever application they were on."
@@ -17603,6 +17783,10 @@ msgstr "Адреса пружаоца услуге за токене преус�
 msgid "The public employment service you are registered with. Add it under Companies, as a public employment service, if it is not here."
 msgstr "Јавна служба за запошљавање код које сте пријављени. Ако је нема овде, додајте је у одељку Компаније као јавну службу за запошљавање."
 
+#: src/postulo/core/models.py
+msgid "The public key every archive is encrypted to before it leaves, starting age1. Keep the identity that opens them somewhere other than this server."
+msgstr ""
+
 #: src/postulo/resume/candidate.py
 msgid "The publication it counts cannot be added, so it will be a count for all of your work."
 msgstr ""
@@ -17902,6 +18086,11 @@ msgstr "Број телефона изабран за овај CV више ни�
 msgid "The telephone number of %(name)s was not added."
 msgstr "Број телефона за %(name)s није додат."
 
+#: src/postulo/core/views_backups.py
+#, python-format
+msgid "The test failed: %(problem)s"
+msgstr ""
+
 #: src/postulo/templates/documents/cv_text.html
 msgid "The text of this document"
 msgstr "Текст овог документа"
@@ -17909,6 +18098,10 @@ msgstr "Текст овог документа"
 #: src/postulo/templates/server/design.html
 msgid "The thing to do next"
 msgstr "Следећи корак"
+
+#: src/postulo/core/offsite.py
+msgid "The time for this send ran out before it began."
+msgstr ""
 
 #: src/postulo/templates/server/defaults.html
 #, python-format
@@ -18044,6 +18237,10 @@ msgstr "Група с тим називом већ постоји."
 #: src/postulo/jobs/slow.py
 msgid "There is no address to fetch it from again."
 msgstr "Нема адресе са које би се поново преузео."
+
+#: src/postulo/core/views_backups.py
+msgid "There is no backup destination to send to."
+msgstr ""
 
 #: src/postulo/documents/archiving.py
 msgid "There is no file to send."
@@ -18845,6 +19042,11 @@ msgstr "конфигурација преноса"
 msgid "transport secrets"
 msgstr "тајне преноса"
 
+#: src/postulo/templates/server/backups.html
+#, python-format
+msgid "Tried again at %(when)s."
+msgstr ""
+
 #: src/postulo/templates/server/overview.html
 msgid "Trusted:"
 msgstr "Поуздани:"
@@ -19198,6 +19400,10 @@ msgstr "корисници"
 msgid "Uses the saved settings, and sends to a real inbox. Test the connection first if you have just changed something."
 msgstr "Користи сачувана подешавања и шаље у стварно пријемно сандуче. Прво тестирајте везу ако сте управо нешто променили."
 
+#: src/postulo/templates/server/backup_destination.html
+msgid "Uses the saved settings. Nothing is stored there."
+msgstr ""
+
 #: src/postulo/templates/api/token_list.html
 msgid "Using a token"
 msgstr "Коришћење токена"
@@ -19303,6 +19509,7 @@ msgid "Voluntary support is this project's only income: one person writes it, an
 msgstr "Добровољна подршка је једини приход овог пројекта: пише га једна особа, и ништа се овим не дугује нити откључава. То се каже једном, овде, ономе ко води инстанцу — никада људима који је користе да би нашли посао, а за многе од њих новац није оно што треба да дају."
 
 #: src/postulo/core/models.py src/postulo/notifications/models.py
+#: src/postulo/templates/server/backups.html
 msgid "Waiting"
 msgstr "На чекању"
 
@@ -19982,9 +20189,17 @@ msgstr "Где картица има мени <em>Услуга</em>, изабе�
 msgid "Where a value leads: an http or https address with <code dir=\"ltr\">{value}</code> where the identifier goes, after the host. <code dir=\"ltr\">person_link</code> is the address for a person, where that is another one."
 msgstr "Куда води вредност: http или https адреса са <code dir=\"ltr\">{value}</code> на месту идентификатора, после хоста. <code dir=\"ltr\">person_link</code> је адреса за особу, ако је другачија."
 
+#: src/postulo/templates/server/backup_destination.html
+msgid "Where and how"
+msgstr ""
+
 #: src/postulo/applications/widgets.py
 msgid "Where and why applications end"
 msgstr "Где и зашто се пријаве завршавају"
+
+#: src/postulo/core/server_forms.py
+msgid "Where each archive is sent once it has been written and checked."
+msgstr ""
 
 #: src/postulo/resume/forms.py
 msgid "Where it can be read about. A CV does not print it."

@@ -32,6 +32,7 @@ from importlib import metadata
 from importlib.metadata import entry_points
 
 from .base import (
+    BACKUP_DESTINATION_GROUP,
     CONNECTED_KINDS,
     FEATURE_GROUP,
     IDENTIFIER_GROUP,
@@ -40,6 +41,7 @@ from .base import (
     MESSAGING_SERVICE_GROUP,
     REGISTER_ADAPTER_GROUP,
     TRANSPORT_GROUP,
+    BackupDestinationPlugin,
     ConnectedPlugin,
     FeaturePlugin,
     IdentifierPlugin,
@@ -79,6 +81,10 @@ ENTRY_POINT_GROUP = "postulo.sources"
 #: services a web link can be on, which a package installed beside Postulo may add to (#305).
 #: A **register-adapter** plugin is open the same way: the company registers *Register lookup*
 #: may ask, one per country, which a package for another country may add to (#1021).
+#:
+#: A **backup-destination** plugin is a transport's kind of thing for archives: instance
+#: plumbing that keeps the backups somewhere besides this disk, chosen by an administrator
+#: and owned by nobody, so that nobody's account leaving stops the copies (#325).
 GROUPS = {
     "source": ENTRY_POINT_GROUP,
     "importer": IMPORTER_GROUP,
@@ -88,6 +94,7 @@ GROUPS = {
     "link-service": LINK_SERVICE_GROUP,
     "messaging-service": MESSAGING_SERVICE_GROUP,
     "register-adapter": REGISTER_ADAPTER_GROUP,
+    "backup-destination": BACKUP_DESTINATION_GROUP,
     **CONNECTED_KINDS,
 }
 
@@ -117,6 +124,7 @@ def _protocol_for(kind: str):
         "link-service": LinkServicePlugin,
         "messaging-service": MessagingServicePlugin,
         "register-adapter": RegisterAdapterPlugin,
+        "backup-destination": BackupDestinationPlugin,
     }.get(kind, ConnectedPlugin)
 
 

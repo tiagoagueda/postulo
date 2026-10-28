@@ -234,6 +234,7 @@ SITE_SECRET_COLUMNS = (
     "email_oauth_secrets_encrypted",
     "transport_secrets_encrypted",
     "text_secrets_encrypted",
+    "backup_destination_secrets_encrypted",
 )
 
 

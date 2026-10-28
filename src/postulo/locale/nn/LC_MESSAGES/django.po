@@ -996,6 +996,11 @@ msgstr "%(name)s er no nummer %(place)s blant identifikatorane."
 msgid "%(name)s is now number %(place)s in the navigation."
 msgstr "%(name)s er no nummer %(place)s i navigasjonen."
 
+#: src/postulo/core/views_backups.py
+#, python-format
+msgid "%(name)s is queued; the scheduler sends it on its next pass."
+msgstr ""
+
 #: src/postulo/core/server_views.py
 #, python-format
 msgid "%(name)s is removed. Restart Postulo to be sure nothing of it is left loaded."
@@ -1176,7 +1181,7 @@ msgstr "%(period)s: vel ein annan"
 msgid "%(person)s is the last member of %(name)s, which still owns records. Give them to somebody, or delete them, first."
 msgstr "%(person)s er det siste medlemmet i %(name)s, som framleis eig oppføringar. Gi dei til nokon, eller slett dei, først."
 
-#: src/postulo/plugins/forms.py
+#: src/postulo/core/server_forms.py src/postulo/plugins/forms.py
 #, python-format
 msgid "%(plugin)s could not check these settings: %(error)s"
 msgstr "%(plugin)s kunne ikkje kontrollere desse innstillingane: %(error)s"
@@ -1979,6 +1984,10 @@ msgstr "Ein djup blåfarge. Ti steg, og grensesnittet brukar ei handfull av dei.
 #: src/postulo/jobs/surface.py
 msgid "A department needs a name."
 msgstr "Ei avdeling treng eit namn."
+
+#: src/postulo/core/server_forms.py
+msgid "A destination needs an age recipient to encrypt to: nothing leaves this server unencrypted."
+msgstr ""
 
 #: src/postulo/templates/server/overview.html
 msgid "A document in a script shown in red is set in the server's fonts instead."
@@ -3081,6 +3090,10 @@ msgstr "Luft- og romfart"
 msgid "Africa"
 msgstr "Afrika"
 
+#: src/postulo/core/models.py
+msgid "age recipient"
+msgstr ""
+
 #: src/postulo/templates/widgets/sources.html
 msgid "Agency"
 msgstr "Byrå"
@@ -3757,6 +3770,10 @@ msgstr "Læreplass"
 msgid "Archived"
 msgstr "Arkivert"
 
+#: src/postulo/templates/server/backup_destination.html
+msgid "Archives are encrypted with age before they leave."
+msgstr ""
+
 #: src/postulo/templates/jobs/capture_page_forget.html
 #: src/postulo/templates/partials/confirm_delete.html
 msgid "Are you sure?"
@@ -3982,6 +3999,7 @@ msgid "Back in your listings."
 msgstr "Tilbake i utlysingane dine."
 
 #: src/postulo/templates/server/backup_delete.html
+#: src/postulo/templates/server/backup_destination.html
 #: src/postulo/templates/server/backup_restore.html
 msgid "Back to Backups"
 msgstr "Tilbake til Tryggingskopiar"
@@ -4078,6 +4096,23 @@ msgstr "Baksystem"
 #: src/postulo/templates/server/overview.html
 msgid "Background work"
 msgstr "Bakgrunnsarbeid"
+
+#: src/postulo/core/models.py
+msgid "backup destination"
+msgstr ""
+
+#: src/postulo/plugins/kinds.py
+#: src/postulo/templates/server/backup_destination.html
+msgid "Backup destination"
+msgstr ""
+
+#: src/postulo/core/models.py
+msgid "backup destination configuration"
+msgstr ""
+
+#: src/postulo/core/models.py
+msgid "backup destination secrets"
+msgstr ""
 
 #: src/postulo/core/server_sections.py src/postulo/core/views_backups.py
 #: src/postulo/templates/server/backups.html
@@ -4672,6 +4707,10 @@ msgstr "Val"
 msgid "Choose a country from the list."
 msgstr "Vel eit land frå lista."
 
+#: src/postulo/core/views_backups.py
+msgid "Choose a destination and save it first."
+msgstr ""
+
 #: src/postulo/resume/views.py
 msgid "Choose a Europass file first."
 msgstr "Vel ei Europass-fil først."
@@ -4761,6 +4800,10 @@ msgstr "Vel landet nummeret er i, og skriv nummeret slik det blir skrive der. El
 #: src/postulo/templates/accounts/profile.html
 msgid "Choose the date of birth from a calendar"
 msgstr "Vel fødselsdatoen i ein kalender"
+
+#: src/postulo/templates/server/backups.html
+msgid "Choose the destination"
+msgstr ""
 
 #: src/postulo/templates/resume/europass_import.html
 msgid "Choose the PDF you downloaded from europass.europa.eu, as it is: the CV is attached inside it, and that is what Postulo reads. Older Europass files read too: the XML and PDF of the editor before 2020, and the JSON of its web service. Postulo works out which it is, shows you what is in it, and writes nothing until you say so."
@@ -5863,6 +5906,10 @@ msgstr "Utforming"
 msgid "Design (Behance, Dribbble…)"
 msgstr "Design (Behance, Dribbble…)"
 
+#: src/postulo/core/server_forms.py
+msgid "Destination"
+msgstr ""
+
 #: src/postulo/core/design.py
 msgid "Destructive"
 msgstr "Destruktiv"
@@ -6528,6 +6575,11 @@ msgstr "Alle kontoane på denne installasjonen. Administratorar ser kontoar, ald
 msgid "Every application, in order"
 msgstr "Alle søknadene, i rekkjefølgje"
 
+#: src/postulo/templates/server/backups.html
+#, python-format
+msgid "Every archive is encrypted to your age recipient and sent to %(label)s once it has been written and checked. An archive that has not arrived there is never deleted here."
+msgstr ""
+
 #: src/postulo/templates/jobs/company_places.html
 msgid "Every company address on the map, with the company's name, page, industries and how precise its point is: at its town, its postcode, by hand or from Wikidata. A contact's address and your own are never in it."
 msgstr "Kvar selskapsadresse på kartet, med namnet til selskapet, sida til selskapet, bransjane og kor presist punktet er: ved byen, ved postnummeret, sett manuelt eller frå Wikidata. Adressa til ein kontakt og di eiga er aldri med."
@@ -6798,6 +6850,7 @@ msgid "Extra small"
 msgstr "Ekstra liten"
 
 #: src/postulo/core/models.py src/postulo/documents/models.py
+#: src/postulo/templates/server/backups.html
 msgid "Failed"
 msgstr "Mislukka"
 
@@ -8526,6 +8579,11 @@ msgstr "Det blir fjerna frå denne kontakten no, utan å vente på Lagre, og kan
 msgid "It comes off your details now, without waiting for Save, and cannot be put back."
 msgstr "Det blir fjerna frå opplysningane dine no, utan å vente på Lagre, og kan ikkje setjast tilbake."
 
+#: src/postulo/core/offsite.py
+#, python-format
+msgid "It could not be encrypted: %(error)s"
+msgstr ""
+
 #: src/postulo/plugins/installing.py
 msgid "it could not be imported"
 msgstr "det kunne ikkje importerast"
@@ -8843,6 +8901,10 @@ msgstr "Behald notata mine"
 msgid "keep the newest"
 msgstr "behald dei nyaste"
 
+#: src/postulo/core/models.py
+msgid "keep the newest there"
+msgstr ""
+
 #: src/postulo/templates/jobs/merge.html
 msgid "Keep the other one instead"
 msgstr "Behald den andre i staden"
@@ -9098,6 +9160,10 @@ msgstr "siste feil"
 msgid "Last name"
 msgstr "Etternamn"
 
+#: src/postulo/templates/server/backups.html
+msgid "Last one that arrived"
+msgstr ""
+
 #: src/postulo/plugins/models.py
 msgid "last pushed"
 msgstr "sist sendt"
@@ -9169,6 +9235,10 @@ msgstr "Opplæring du har teke, med eller utan kursbevis. Eit program som førte
 #: src/postulo/templates/resume/translations.html
 msgid "Leave a box empty and that line prints as it is written above it."
 msgstr "La ein boks stå tom, så blir den linja vist slik ho er skriven over boksen."
+
+#: src/postulo/core/models.py
+msgid "Leave blank to keep as many there as here. 0 never deletes anything there. Only archives Postulo sent itself are ever deleted, and only after a new one has arrived."
+msgstr ""
 
 #: src/postulo/core/server_forms.py
 msgid "Leave blank to keep the one already stored."
@@ -10361,6 +10431,10 @@ msgstr "Nei"
 msgid "No address and no key, so nothing is offered from it."
 msgstr "Inga adresse og ingen nøkkel, så ingenting blir tilbode derifrå."
 
+#: src/postulo/core/offsite.py
+msgid "No age recipient is set, and nothing leaves this machine unencrypted."
+msgstr ""
+
 #: src/postulo/applications/forms.py
 msgid "No agency"
 msgstr "Ikkje noko byrå"
@@ -10376,6 +10450,10 @@ msgstr "Ingen søknad blir rørt, så inga tidslinje blir endra."
 #: src/postulo/templates/jobs/company_detail.html
 msgid "No appointments yet."
 msgstr "Ingen avtalar enno."
+
+#: src/postulo/templates/server/backup_destination.html
+msgid "No backup destination plugin is installed. Postulo ships none and names no provider: install one under Plugins, then choose it here."
+msgstr ""
 
 #: src/postulo/templates/server/backups.html
 msgid "No backups yet. Take one above."
@@ -10533,6 +10611,10 @@ msgstr "Ingen media"
 #: src/postulo/documents/printing.py
 msgid "No messaging handle"
 msgstr "Ikkje noko brukarnamn for meldingsteneste"
+
+#: src/postulo/templates/server/backups.html
+msgid "No more retries: send it again when the destination is fixed."
+msgstr ""
 
 #: src/postulo/documents/pdf.py
 #, python-format
@@ -10816,6 +10898,14 @@ msgstr "Ingen enno. Dokument viser namnet ovanfor på alle språk."
 msgid "None yet. This entry prints its original text on every CV."
 msgstr "Ingen enno. Denne oppføringa viser originalteksten sin på alle CV-ar."
 
+#: src/postulo/core/server_forms.py
+msgid "None — backups stay on this server"
+msgstr ""
+
+#: src/postulo/templates/server/backups.html
+msgid "None: the archives stay on this server. A destination keeps a copy somewhere else, encrypted before it leaves."
+msgstr ""
+
 #: src/postulo/applications/models.py
 msgid "Normal"
 msgstr "Normal"
@@ -10947,6 +11037,10 @@ msgstr "Ikkje lagra"
 #: src/postulo/templates/settings/_save_status.html
 msgid "Not saved: Postulo could not be reached. Press Save when it can."
 msgstr "Ikkje lagra: fekk ikkje kontakt med Postulo. Trykk på Lagre når det går."
+
+#: src/postulo/templates/server/backups.html
+msgid "Not sent"
+msgstr ""
 
 #: src/postulo/templates/applications/partials/application_card.html
 msgid "Not sent yet"
@@ -11492,6 +11586,14 @@ msgstr "Av, fordi det treng %(names)s, som er slått av eller ikkje installert."
 msgid "Off, because the module it belongs to is off."
 msgstr "Av, fordi modulen det høyrer til, er slått av."
 
+#: src/postulo/templates/server/backups.html
+msgid "Off-site"
+msgstr ""
+
+#: src/postulo/templates/server/backups.html
+msgid "Off-site copies"
+msgstr ""
+
 #: src/postulo/templates/settings/account.html
 msgid "Off. A code from an authenticator app, asked for after the password, means a leaked password alone is not enough."
 msgstr "Av. Ein kode frå ein autentiseringsapp, som du blir beden om etter passordet, gjer at eit lekt passord åleine ikkje er nok."
@@ -11968,6 +12070,10 @@ msgstr "Berre den driftsansvarlege kan endre ein regel om din eigen konto eller 
 #: src/postulo/core/server_views.py
 msgid "Only the operator's own account can stop being an administrator."
 msgstr "Berre kontoen til den driftsansvarlege sjølv kan slutte å vere administrator."
+
+#: src/postulo/templates/server/backup_destination.html
+msgid "Only the public key, the recipient, is kept here. Keep the identity that opens the archives somewhere other than this server, and keep a copy of it: without it no archive sent can be opened. Restoring starts by decrypting one by hand, as the wiki page about backups says."
+msgstr ""
 
 #: src/postulo/resume/forms.py
 msgid "Only the year prints on a CV, so the day makes no difference."
@@ -13864,6 +13970,14 @@ msgstr "Fjern {label}"
 msgid "removed on the other side"
 msgstr "fjerna på den andre sida"
 
+#: src/postulo/core/models.py
+msgid "Removed there"
+msgstr ""
+
+#: src/postulo/templates/server/backups.html
+msgid "Removed there by retention"
+msgstr ""
+
 #: src/postulo/templates/documents/partials/comparison_line.html
 msgid "Removed:"
 msgstr "Fjerna:"
@@ -14131,6 +14245,7 @@ msgstr "laurdag"
 #: src/postulo/templates/partials/table/cell.html
 #: src/postulo/templates/resume/item_form.html
 #: src/postulo/templates/resume/translations.html
+#: src/postulo/templates/server/backup_destination.html
 #: src/postulo/templates/server/backups.html
 #: src/postulo/templates/server/capture.html
 #: src/postulo/templates/server/data_protection.html
@@ -14436,6 +14551,10 @@ msgctxt "type of event"
 msgid "Seminar"
 msgstr "Seminar"
 
+#: src/postulo/templates/server/backups.html
+msgid "Send"
+msgstr ""
+
 #: src/postulo/templates/server/email.html
 msgid "Send a real message"
 msgstr "Send ei ekte melding"
@@ -14477,8 +14596,9 @@ msgstr "Sending mislukka: %(error)s"
 msgid "Sends the DOI to doi.org, which passes it to Crossref or DataCite, and nothing else about you. Only the empty boxes are filled, and nothing is kept until you save."
 msgstr ""
 
-#: src/postulo/notifications/models.py
+#: src/postulo/core/models.py src/postulo/notifications/models.py
 #: src/postulo/templates/applications/report.html
+#: src/postulo/templates/server/backups.html
 #: src/postulo/templates/server/design.html
 #: src/postulo/templates/widgets/_source_table.html
 #: src/postulo/templates/widgets/industries.html
@@ -15223,6 +15343,10 @@ msgstr "Noko gjekk gale. Loggen på tenaren har detaljane."
 msgid "Something worth knowing."
 msgstr "Noko som er verdt å vite."
 
+#: src/postulo/templates/server/backup_destination.html
+msgid "Somewhere besides this server where every archive is sent once it has been written and checked, encrypted first."
+msgstr ""
+
 #: src/postulo/templates/server/design.html
 msgid "Somewhere else"
 msgstr "Ein annan stad"
@@ -15780,6 +15904,7 @@ msgid "Terms not recorded"
 msgstr "Vilkåra er ikkje registrerte"
 
 #: src/postulo/templates/connections/list.html
+#: src/postulo/templates/server/backup_destination.html
 msgid "Test"
 msgstr "Test"
 
@@ -15791,6 +15916,10 @@ msgstr "Testen mislukkast: %(message)s"
 #: src/postulo/templates/server/email.html
 msgid "Test the connection"
 msgstr "Test tilkoplinga"
+
+#: src/postulo/templates/server/backup_destination.html
+msgid "Test the destination"
+msgstr ""
 
 #: src/postulo/documents/models.py src/postulo/resume/models.py
 msgid "text"
@@ -16234,6 +16363,14 @@ msgstr "Det er ikkje identifikatoren til eit Wikidata-element."
 msgid "That is not an address Postulo can use."
 msgstr "Det er ikkje ei adresse Postulo kan bruke."
 
+#: src/postulo/core/offsite.py
+msgid "That is not an age recipient. It starts age1 and is 62 characters long."
+msgstr ""
+
+#: src/postulo/core/offsite.py
+msgid "That is not an age recipient: its checksum does not match."
+msgstr ""
+
 #: src/postulo/plugins/catalogue.py
 #, python-format
 msgid "That is not an Ed25519 public key: %(error)s"
@@ -16448,10 +16585,20 @@ msgid_plural "The %(count)d files its history points at are kept where they are.
 msgstr[0] "Den %(count)d fila historikken peikar på, blir verande der ho er."
 msgstr[1] "Dei %(count)d filene historikken peikar på, blir verande der dei er."
 
+#: src/postulo/templates/server/backups.html
+#, python-format
+msgid "The %(name)s destination is chosen but not installed, so nothing is being sent."
+msgstr ""
+
 #: src/postulo/documents/pdf.py
 #, python-format
 msgid "The %(name)s PDF backend is configured but not usable. %(hint)s"
 msgstr "PDF-motoren %(name)s er sett opp, men kan ikkje brukast. %(hint)s"
+
+#: src/postulo/core/offsite.py
+#, python-format
+msgid "The %(plugin)s destination is not installed or not chosen."
+msgstr ""
 
 #: src/postulo/documents/archiving.py src/postulo/plugins/syncing.py
 #, python-format
@@ -16516,6 +16663,19 @@ msgstr "Programmet som er registrert hos leverandøren. Ikkje ein løyndom: det 
 #, fuzzy
 msgid "The application sends on its own"
 msgstr "Programmet sender på eiga hand"
+
+#: src/postulo/core/offsite.py
+msgid "The archive does not verify."
+msgstr ""
+
+#: src/postulo/core/offsite.py
+#, python-format
+msgid "The archive does not verify: %(problem)s"
+msgstr ""
+
+#: src/postulo/core/offsite.py
+msgid "The archive is no longer on this server."
+msgstr ""
 
 #: src/postulo/templates/server/backup_restore.html
 msgid "The archive is signed by this instance's key."
@@ -16754,6 +16914,18 @@ msgstr ""
 #: src/postulo/templates/server/plugins.html
 msgid "The default for every account. One person's exceptions are on their row under People. Switching a plugin off stops it being used and deletes nothing."
 msgstr "Standarden for alle kontoar. Unntaka for ein person står på rada til personen under Personar. Når eit programtillegg blir slått av, blir det ikkje lenger brukt, og ingenting blir sletta."
+
+#: src/postulo/core/views_backups.py
+msgid "The destination answered."
+msgstr ""
+
+#: src/postulo/core/offsite.py
+msgid "The destination did not say where it put the archive."
+msgstr ""
+
+#: src/postulo/core/offsite.py
+msgid "The destination gave no answer."
+msgstr ""
 
 #: src/postulo/jobs/capture_views.py
 msgid "the discarded captures"
@@ -17075,6 +17247,10 @@ msgstr "Det vanlege for språket"
 msgid "The last backup failed."
 msgstr "Den siste tryggingskopien mislukkast."
 
+#: src/postulo/templates/server/overview.html
+msgid "The last backup sent to the destination did not arrive."
+msgstr ""
+
 #: src/postulo/templates/applications/report.html
 msgid "The last few weeks"
 msgstr "Dei siste vekene"
@@ -17089,6 +17265,10 @@ msgstr[1] "Dei siste %(counter)s meldingane denne installasjonen prøvde å send
 #: src/postulo/templates/jobs/capture_review.html
 msgid "The last one waiting."
 msgstr "Den siste som ventar."
+
+#: src/postulo/templates/server/backups.html
+msgid "The last send failed."
+msgstr ""
 
 #: src/postulo/applications/widgets.py
 msgid "The last ten things the timeline recorded, whichever application they were on."
@@ -17409,6 +17589,10 @@ msgstr "Token-adressa til leverandøren omdirigerte, og Postulo følgjer ikkje o
 msgid "The public employment service you are registered with. Add it under Companies, as a public employment service, if it is not here."
 msgstr "Den offentlege arbeidsformidlinga du er registrert hos. Legg henne til under Selskap, som offentleg arbeidsformidling, dersom ho ikkje er her."
 
+#: src/postulo/core/models.py
+msgid "The public key every archive is encrypted to before it leaves, starting age1. Keep the identity that opens them somewhere other than this server."
+msgstr ""
+
 #: src/postulo/resume/candidate.py
 msgid "The publication it counts cannot be added, so it will be a count for all of your work."
 msgstr ""
@@ -17709,6 +17893,11 @@ msgstr "Telefonnummeret som er valt for denne CV-en, finst ikkje lenger i opplys
 msgid "The telephone number of %(name)s was not added."
 msgstr "Telefonnummeret til %(name)s vart ikkje lagt til."
 
+#: src/postulo/core/views_backups.py
+#, python-format
+msgid "The test failed: %(problem)s"
+msgstr ""
+
 #: src/postulo/templates/documents/cv_text.html
 msgid "The text of this document"
 msgstr "Teksten i dette dokumentet"
@@ -17716,6 +17905,10 @@ msgstr "Teksten i dette dokumentet"
 #: src/postulo/templates/server/design.html
 msgid "The thing to do next"
 msgstr "Det neste du skal gjere"
+
+#: src/postulo/core/offsite.py
+msgid "The time for this send ran out before it began."
+msgstr ""
 
 #: src/postulo/templates/server/defaults.html
 #, python-format
@@ -17850,6 +18043,10 @@ msgstr "Det finst allereie ei gruppe med det namnet."
 #: src/postulo/jobs/slow.py
 msgid "There is no address to fetch it from again."
 msgstr "Det finst inga adresse å hente det frå på nytt."
+
+#: src/postulo/core/views_backups.py
+msgid "There is no backup destination to send to."
+msgstr ""
 
 #: src/postulo/documents/archiving.py
 msgid "There is no file to send."
@@ -18644,6 +18841,11 @@ msgstr "transportoppsett"
 msgid "transport secrets"
 msgstr "transportløyndomar"
 
+#: src/postulo/templates/server/backups.html
+#, python-format
+msgid "Tried again at %(when)s."
+msgstr ""
+
 #: src/postulo/templates/server/overview.html
 msgid "Trusted:"
 msgstr "Klarert:"
@@ -18996,6 +19198,10 @@ msgstr "brukarar"
 msgid "Uses the saved settings, and sends to a real inbox. Test the connection first if you have just changed something."
 msgstr "Brukar dei lagra innstillingane og sender til ein ekte innboks. Test tilkoplinga først dersom du nett har endra noko."
 
+#: src/postulo/templates/server/backup_destination.html
+msgid "Uses the saved settings. Nothing is stored there."
+msgstr ""
+
 #: src/postulo/templates/api/token_list.html
 msgid "Using a token"
 msgstr "Bruke eit token"
@@ -19100,6 +19306,7 @@ msgid "Voluntary support is this project's only income: one person writes it, an
 msgstr "Frivillig støtte er den einaste inntekta til dette prosjektet: éin person skriv det, og ingenting blir skuldig eller låst opp av noko av dette. Det blir sagt éin gong, her, til den som driftar installasjonen – aldri til dei som brukar henne til å leite etter arbeid, og for mange av dei er pengar feil ting å gje."
 
 #: src/postulo/core/models.py src/postulo/notifications/models.py
+#: src/postulo/templates/server/backups.html
 msgid "Waiting"
 msgstr "Ventar"
 
@@ -19780,9 +19987,17 @@ msgstr "Der eit kort har ein <em>Teneste</em>-meny, vel du tenesta adressa ligg 
 msgid "Where a value leads: an http or https address with <code dir=\"ltr\">{value}</code> where the identifier goes, after the host. <code dir=\"ltr\">person_link</code> is the address for a person, where that is another one."
 msgstr "Kvar ein verdi fører: ei http- eller https-adresse med <code dir=\"ltr\">{value}</code> der identifikatoren skal stå, etter vertsnamnet. <code dir=\"ltr\">person_link</code> er adressa for ein person, når ho er ei anna."
 
+#: src/postulo/templates/server/backup_destination.html
+msgid "Where and how"
+msgstr ""
+
 #: src/postulo/applications/widgets.py
 msgid "Where and why applications end"
 msgstr "Kvar og kvifor søknader endar"
+
+#: src/postulo/core/server_forms.py
+msgid "Where each archive is sent once it has been written and checked."
+msgstr ""
 
 #: src/postulo/resume/forms.py
 msgid "Where it can be read about. A CV does not print it."

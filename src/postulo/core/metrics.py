@@ -284,6 +284,34 @@ def collect() -> list[Metric]:
             [({}, row.backup_failures or 0)],
         )
     )
+    # ---- and the copies sent somewhere else, which fail for reasons of their own: a full
+    # bucket, a password changed at the provider (#325).
+    metrics.append(
+        Metric(
+            "postulo_backup_offsite_last_success_timestamp_seconds",
+            "gauge",
+            (
+                "When an archive last reached the backup destination, encrypted, as a Unix "
+                "time. 0 when none has."
+            ),
+            [
+                (
+                    {},
+                    row.backup_offsite_last_ok_at.timestamp()
+                    if row.backup_offsite_last_ok_at
+                    else 0,
+                )
+            ],
+        )
+    )
+    metrics.append(
+        Metric(
+            "postulo_backup_offsite_failures_total",
+            "counter",
+            "Attempts to send an archive to the backup destination that failed.",
+            [({}, row.backup_offsite_failures or 0)],
+        )
+    )
 
     installed = installing.read_record()
     metrics.append(

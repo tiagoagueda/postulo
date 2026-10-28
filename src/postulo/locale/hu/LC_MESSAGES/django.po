@@ -996,6 +996,11 @@ msgstr "A(z) %(name)s mostantól a(z) %(place)s. helyen áll az azonosítók kö
 msgid "%(name)s is now number %(place)s in the navigation."
 msgstr "A(z) %(name)s mostantól a(z) %(place)s. helyen áll a navigációban."
 
+#: src/postulo/core/views_backups.py
+#, python-format
+msgid "%(name)s is queued; the scheduler sends it on its next pass."
+msgstr ""
+
 #: src/postulo/core/server_views.py
 #, python-format
 msgid "%(name)s is removed. Restart Postulo to be sure nothing of it is left loaded."
@@ -1176,7 +1181,7 @@ msgstr "%(period)s: másik időszak választása"
 msgid "%(person)s is the last member of %(name)s, which still owns records. Give them to somebody, or delete them, first."
 msgstr "%(person)s a(z) %(name)s utolsó tagja, amely még mindig rendelkezik rekordokkal. Előbb adja át őket valakinek, vagy törölje őket."
 
-#: src/postulo/plugins/forms.py
+#: src/postulo/core/server_forms.py src/postulo/plugins/forms.py
 #, python-format
 msgid "%(plugin)s could not check these settings: %(error)s"
 msgstr "A(z) %(plugin)s nem tudta ellenőrizni ezeket a beállításokat: %(error)s"
@@ -1980,6 +1985,10 @@ msgstr "Mélykék. Tíz árnyalat, amelyekből a felület néhányat használ."
 #: src/postulo/jobs/surface.py
 msgid "A department needs a name."
 msgstr "A részlegnek nevet kell adni."
+
+#: src/postulo/core/server_forms.py
+msgid "A destination needs an age recipient to encrypt to: nothing leaves this server unencrypted."
+msgstr ""
 
 #: src/postulo/templates/server/overview.html
 msgid "A document in a script shown in red is set in the server's fonts instead."
@@ -3081,6 +3090,10 @@ msgstr "Repülés és űripar"
 msgid "Africa"
 msgstr "Afrika"
 
+#: src/postulo/core/models.py
+msgid "age recipient"
+msgstr ""
+
 #: src/postulo/templates/widgets/sources.html
 msgid "Agency"
 msgstr "Ügynökség"
@@ -3757,6 +3770,10 @@ msgstr "Tanulószerződés"
 msgid "Archived"
 msgstr "Archiválva"
 
+#: src/postulo/templates/server/backup_destination.html
+msgid "Archives are encrypted with age before they leave."
+msgstr ""
+
 #: src/postulo/templates/jobs/capture_page_forget.html
 #: src/postulo/templates/partials/confirm_delete.html
 msgid "Are you sure?"
@@ -3982,6 +3999,7 @@ msgid "Back in your listings."
 msgstr "Visszakerült a hirdetései közé."
 
 #: src/postulo/templates/server/backup_delete.html
+#: src/postulo/templates/server/backup_destination.html
 #: src/postulo/templates/server/backup_restore.html
 msgid "Back to Backups"
 msgstr "Vissza a biztonsági mentésekhez"
@@ -4077,6 +4095,23 @@ msgstr "Háttérrendszer"
 #: src/postulo/templates/server/overview.html
 msgid "Background work"
 msgstr "Háttérmunka"
+
+#: src/postulo/core/models.py
+msgid "backup destination"
+msgstr ""
+
+#: src/postulo/plugins/kinds.py
+#: src/postulo/templates/server/backup_destination.html
+msgid "Backup destination"
+msgstr ""
+
+#: src/postulo/core/models.py
+msgid "backup destination configuration"
+msgstr ""
+
+#: src/postulo/core/models.py
+msgid "backup destination secrets"
+msgstr ""
 
 #: src/postulo/core/server_sections.py src/postulo/core/views_backups.py
 #: src/postulo/templates/server/backups.html
@@ -4671,6 +4706,10 @@ msgstr "Választási lehetőségek"
 msgid "Choose a country from the list."
 msgstr "Válasszon egy országot a listából."
 
+#: src/postulo/core/views_backups.py
+msgid "Choose a destination and save it first."
+msgstr ""
+
 #: src/postulo/resume/views.py
 msgid "Choose a Europass file first."
 msgstr "Előbb válasszon egy Europass-fájlt."
@@ -4760,6 +4799,10 @@ msgstr "Válassza ki az országot, ahol a szám van, és írja be úgy, ahogyan 
 #: src/postulo/templates/accounts/profile.html
 msgid "Choose the date of birth from a calendar"
 msgstr "Születési dátum kiválasztása naptárból"
+
+#: src/postulo/templates/server/backups.html
+msgid "Choose the destination"
+msgstr ""
 
 #: src/postulo/templates/resume/europass_import.html
 msgid "Choose the PDF you downloaded from europass.europa.eu, as it is: the CV is attached inside it, and that is what Postulo reads. Older Europass files read too: the XML and PDF of the editor before 2020, and the JSON of its web service. Postulo works out which it is, shows you what is in it, and writes nothing until you say so."
@@ -5861,6 +5904,10 @@ msgstr "Megjelenés"
 msgid "Design (Behance, Dribbble…)"
 msgstr "Dizájn (Behance, Dribbble…)"
 
+#: src/postulo/core/server_forms.py
+msgid "Destination"
+msgstr ""
+
 #: src/postulo/core/design.py
 msgid "Destructive"
 msgstr "Veszélyes"
@@ -6527,6 +6574,11 @@ msgstr "A példány összes fiókja. A rendszergazdák látják a fiókokat, de 
 msgid "Every application, in order"
 msgstr "Minden jelentkezés, sorrendben"
 
+#: src/postulo/templates/server/backups.html
+#, python-format
+msgid "Every archive is encrypted to your age recipient and sent to %(label)s once it has been written and checked. An archive that has not arrived there is never deleted here."
+msgstr ""
+
 #: src/postulo/templates/jobs/company_places.html
 msgid "Every company address on the map, with the company's name, page, industries and how precise its point is: at its town, its postcode, by hand or from Wikidata. A contact's address and your own are never in it."
 msgstr "A térképen szereplő összes cégcím a cég nevével, oldalával, ágazataival és azzal, hogy mennyire pontos a pontja: a település vagy az irányítószám alapján, kézzel elhelyezve vagy a Wikidatából. Egy kapcsolattartó címe és az Ön saját címe sosem kerül bele."
@@ -6795,6 +6847,7 @@ msgid "Extra small"
 msgstr "Nagyon kicsi"
 
 #: src/postulo/core/models.py src/postulo/documents/models.py
+#: src/postulo/templates/server/backups.html
 msgid "Failed"
 msgstr "Sikertelen"
 
@@ -8511,6 +8564,11 @@ msgstr "Azonnal eltávolításra kerül erről a kapcsolattartóról, a Mentés 
 msgid "It comes off your details now, without waiting for Save, and cannot be put back."
 msgstr "Azonnal lekerül az adatai közül, a Mentés megnyomása nélkül, és nem állítható vissza."
 
+#: src/postulo/core/offsite.py
+#, python-format
+msgid "It could not be encrypted: %(error)s"
+msgstr ""
+
 #: src/postulo/plugins/installing.py
 msgid "it could not be imported"
 msgstr "nem sikerült importálni"
@@ -8822,6 +8880,10 @@ msgstr "Jegyzeteim megtartása"
 msgid "keep the newest"
 msgstr "megőrzött legújabb biztonsági mentések"
 
+#: src/postulo/core/models.py
+msgid "keep the newest there"
+msgstr ""
+
 #: src/postulo/templates/jobs/merge.html
 msgid "Keep the other one instead"
 msgstr "Inkább a másik megtartása"
@@ -9075,6 +9137,10 @@ msgstr "utolsó hiba"
 msgid "Last name"
 msgstr "Vezetéknév"
 
+#: src/postulo/templates/server/backups.html
+msgid "Last one that arrived"
+msgstr ""
+
 #: src/postulo/plugins/models.py
 msgid "last pushed"
 msgstr "utolsó feltöltés"
@@ -9146,6 +9212,10 @@ msgstr "Elvégzett képzés, részvételi igazolással vagy anélkül. Az okleve
 #: src/postulo/templates/resume/translations.html
 msgid "Leave a box empty and that line prints as it is written above it."
 msgstr "Ha egy mezőt üresen hagy, az a sor úgy szerepel, ahogy fölötte írva van."
+
+#: src/postulo/core/models.py
+msgid "Leave blank to keep as many there as here. 0 never deletes anything there. Only archives Postulo sent itself are ever deleted, and only after a new one has arrived."
+msgstr ""
 
 #: src/postulo/core/server_forms.py
 msgid "Leave blank to keep the one already stored."
@@ -10327,6 +10397,10 @@ msgstr "Nem"
 msgid "No address and no key, so nothing is offered from it."
 msgstr "Nincs cím és nincs kulcs, ezért semmit sem kínál."
 
+#: src/postulo/core/offsite.py
+msgid "No age recipient is set, and nothing leaves this machine unencrypted."
+msgstr ""
+
 #: src/postulo/applications/forms.py
 msgid "No agency"
 msgstr "Nincs ügynökség"
@@ -10342,6 +10416,10 @@ msgstr "Egyetlen jelentkezéshez sem nyúl, így az idővonalak nem változnak."
 #: src/postulo/templates/jobs/company_detail.html
 msgid "No appointments yet."
 msgstr "Még nincs találkozó."
+
+#: src/postulo/templates/server/backup_destination.html
+msgid "No backup destination plugin is installed. Postulo ships none and names no provider: install one under Plugins, then choose it here."
+msgstr ""
 
 #: src/postulo/templates/server/backups.html
 msgid "No backups yet. Take one above."
@@ -10499,6 +10577,10 @@ msgstr "Nincs média"
 #: src/postulo/documents/printing.py
 msgid "No messaging handle"
 msgstr "Nincs üzenetküldő azonosító"
+
+#: src/postulo/templates/server/backups.html
+msgid "No more retries: send it again when the destination is fixed."
+msgstr ""
 
 #: src/postulo/documents/pdf.py
 #, python-format
@@ -10783,6 +10865,14 @@ msgstr "Még nincs. A dokumentumokban minden nyelven a fenti név szerepel."
 msgid "None yet. This entry prints its original text on every CV."
 msgstr "Még nincs. Ez a bejegyzés minden önéletrajzban az eredeti szövegével szerepel."
 
+#: src/postulo/core/server_forms.py
+msgid "None — backups stay on this server"
+msgstr ""
+
+#: src/postulo/templates/server/backups.html
+msgid "None: the archives stay on this server. A destination keeps a copy somewhere else, encrypted before it leaves."
+msgstr ""
+
 #: src/postulo/applications/models.py
 msgid "Normal"
 msgstr "Normál"
@@ -10914,6 +11004,10 @@ msgstr "Nincs mentve"
 #: src/postulo/templates/settings/_save_status.html
 msgid "Not saved: Postulo could not be reached. Press Save when it can."
 msgstr "Nincs mentve: a Postulo nem érhető el. Nyomja meg a Mentés gombot, amikor ismét elérhető."
+
+#: src/postulo/templates/server/backups.html
+msgid "Not sent"
+msgstr ""
 
 #: src/postulo/templates/applications/partials/application_card.html
 msgid "Not sent yet"
@@ -11458,6 +11552,14 @@ msgstr "Kikapcsolva, mert ezek kellenek hozzá, de ki vannak kapcsolva vagy ninc
 msgid "Off, because the module it belongs to is off."
 msgstr "Kikapcsolva, mert az a modul, amelyhez tartozik, ki van kapcsolva."
 
+#: src/postulo/templates/server/backups.html
+msgid "Off-site"
+msgstr ""
+
+#: src/postulo/templates/server/backups.html
+msgid "Off-site copies"
+msgstr ""
+
 #: src/postulo/templates/settings/account.html
 msgid "Off. A code from an authenticator app, asked for after the password, means a leaked password alone is not enough."
 msgstr "Kikapcsolva. Ha a jelszó után egy hitelesítő alkalmazás kódját is kéri a rendszer, egy kiszivárgott jelszó önmagában nem elég."
@@ -11932,6 +12034,10 @@ msgstr "Csak az üzemeltető módosíthat az Ön fiókjára vagy valamelyik csop
 #: src/postulo/core/server_views.py
 msgid "Only the operator's own account can stop being an administrator."
 msgstr "Csak az üzemeltető saját fiókja veszítheti el az adminisztrátori jogot."
+
+#: src/postulo/templates/server/backup_destination.html
+msgid "Only the public key, the recipient, is kept here. Keep the identity that opens the archives somewhere other than this server, and keep a copy of it: without it no archive sent can be opened. Restoring starts by decrypting one by hand, as the wiki page about backups says."
+msgstr ""
 
 #: src/postulo/resume/forms.py
 msgid "Only the year prints on a CV, so the day makes no difference."
@@ -13821,6 +13927,14 @@ msgstr "{label} eltávolítása"
 msgid "removed on the other side"
 msgstr "a másik oldalon eltávolítva"
 
+#: src/postulo/core/models.py
+msgid "Removed there"
+msgstr ""
+
+#: src/postulo/templates/server/backups.html
+msgid "Removed there by retention"
+msgstr ""
+
 #: src/postulo/templates/documents/partials/comparison_line.html
 msgid "Removed:"
 msgstr "Eltávolítva:"
@@ -14087,6 +14201,7 @@ msgstr "szombat"
 #: src/postulo/templates/partials/table/cell.html
 #: src/postulo/templates/resume/item_form.html
 #: src/postulo/templates/resume/translations.html
+#: src/postulo/templates/server/backup_destination.html
 #: src/postulo/templates/server/backups.html
 #: src/postulo/templates/server/capture.html
 #: src/postulo/templates/server/data_protection.html
@@ -14392,6 +14507,10 @@ msgctxt "type of event"
 msgid "Seminar"
 msgstr "Szeminárium"
 
+#: src/postulo/templates/server/backups.html
+msgid "Send"
+msgstr ""
+
 #: src/postulo/templates/server/email.html
 msgid "Send a real message"
 msgstr "Valódi üzenet küldése"
@@ -14433,8 +14552,9 @@ msgstr "A küldés sikertelen: %(error)s"
 msgid "Sends the DOI to doi.org, which passes it to Crossref or DataCite, and nothing else about you. Only the empty boxes are filled, and nothing is kept until you save."
 msgstr ""
 
-#: src/postulo/notifications/models.py
+#: src/postulo/core/models.py src/postulo/notifications/models.py
 #: src/postulo/templates/applications/report.html
+#: src/postulo/templates/server/backups.html
 #: src/postulo/templates/server/design.html
 #: src/postulo/templates/widgets/_source_table.html
 #: src/postulo/templates/widgets/industries.html
@@ -15181,6 +15301,10 @@ msgstr "Valami hiba történt. A részletek a kiszolgáló naplójában találha
 msgid "Something worth knowing."
 msgstr "Valami, amit érdemes tudni."
 
+#: src/postulo/templates/server/backup_destination.html
+msgid "Somewhere besides this server where every archive is sent once it has been written and checked, encrypted first."
+msgstr ""
+
 #: src/postulo/templates/server/design.html
 msgid "Somewhere else"
 msgstr "Valahol máshol"
@@ -15729,6 +15853,7 @@ msgid "Terms not recorded"
 msgstr "A feltételek nincsenek feljegyezve"
 
 #: src/postulo/templates/connections/list.html
+#: src/postulo/templates/server/backup_destination.html
 msgid "Test"
 msgstr "Tesztelés"
 
@@ -15740,6 +15865,10 @@ msgstr "A teszt sikertelen: %(message)s"
 #: src/postulo/templates/server/email.html
 msgid "Test the connection"
 msgstr "Kapcsolat tesztelése"
+
+#: src/postulo/templates/server/backup_destination.html
+msgid "Test the destination"
+msgstr ""
 
 #: src/postulo/documents/models.py src/postulo/resume/models.py
 msgid "text"
@@ -16178,6 +16307,14 @@ msgstr "Ez nem egy Wikidata-elem azonosítója."
 msgid "That is not an address Postulo can use."
 msgstr "Ez nem olyan cím, amelyet a Postulo használni tud."
 
+#: src/postulo/core/offsite.py
+msgid "That is not an age recipient. It starts age1 and is 62 characters long."
+msgstr ""
+
+#: src/postulo/core/offsite.py
+msgid "That is not an age recipient: its checksum does not match."
+msgstr ""
+
 #: src/postulo/plugins/catalogue.py
 #, python-format
 msgid "That is not an Ed25519 public key: %(error)s"
@@ -16391,10 +16528,20 @@ msgid_plural "The %(count)d files its history points at are kept where they are.
 msgstr[0] "Az előzményeiben hivatkozott %(count)d fájl a helyén marad."
 msgstr[1] "Az előzményeiben hivatkozott %(count)d fájl a helyén marad."
 
+#: src/postulo/templates/server/backups.html
+#, python-format
+msgid "The %(name)s destination is chosen but not installed, so nothing is being sent."
+msgstr ""
+
 #: src/postulo/documents/pdf.py
 #, python-format
 msgid "The %(name)s PDF backend is configured but not usable. %(hint)s"
 msgstr "A(z) %(name)s PDF-motor be van állítva, de nem használható. %(hint)s"
+
+#: src/postulo/core/offsite.py
+#, python-format
+msgid "The %(plugin)s destination is not installed or not chosen."
+msgstr ""
 
 #: src/postulo/documents/archiving.py src/postulo/plugins/syncing.py
 #, python-format
@@ -16457,6 +16604,19 @@ msgstr "A szolgáltatónál regisztrált alkalmazás. Ez nem titok: a mellette l
 #: src/postulo/core/mail_choices.py
 msgid "The application sends on its own"
 msgstr "Az alkalmazás önállóan küld"
+
+#: src/postulo/core/offsite.py
+msgid "The archive does not verify."
+msgstr ""
+
+#: src/postulo/core/offsite.py
+#, python-format
+msgid "The archive does not verify: %(problem)s"
+msgstr ""
+
+#: src/postulo/core/offsite.py
+msgid "The archive is no longer on this server."
+msgstr ""
 
 #: src/postulo/templates/server/backup_restore.html
 msgid "The archive is signed by this instance's key."
@@ -16694,6 +16854,18 @@ msgstr ""
 #: src/postulo/templates/server/plugins.html
 msgid "The default for every account. One person's exceptions are on their row under People. Switching a plugin off stops it being used and deletes nothing."
 msgstr "Az alapértelmezés minden fiókra. Egy személy kivételei az ő sorában vannak a Személyek alatt. Egy bővítmény kikapcsolása megállítja a használatát, és semmit sem töröl."
+
+#: src/postulo/core/views_backups.py
+msgid "The destination answered."
+msgstr ""
+
+#: src/postulo/core/offsite.py
+msgid "The destination did not say where it put the archive."
+msgstr ""
+
+#: src/postulo/core/offsite.py
+msgid "The destination gave no answer."
+msgstr ""
 
 #: src/postulo/jobs/capture_views.py
 msgid "the discarded captures"
@@ -17014,6 +17186,10 @@ msgstr "A nyelv szokásos beállítása"
 msgid "The last backup failed."
 msgstr "A legutóbbi biztonsági mentés sikertelen volt."
 
+#: src/postulo/templates/server/overview.html
+msgid "The last backup sent to the destination did not arrive."
+msgstr ""
+
 #: src/postulo/templates/applications/report.html
 msgid "The last few weeks"
 msgstr "Az elmúlt néhány hét"
@@ -17028,6 +17204,10 @@ msgstr[1] "Az utolsó %(counter)s üzenet, amelyet ez a példány el akart küld
 #: src/postulo/templates/jobs/capture_review.html
 msgid "The last one waiting."
 msgstr "Az utolsó várakozó."
+
+#: src/postulo/templates/server/backups.html
+msgid "The last send failed."
+msgstr ""
 
 #: src/postulo/applications/widgets.py
 msgid "The last ten things the timeline recorded, whichever application they were on."
@@ -17345,6 +17525,10 @@ msgstr "A szolgáltató tokencíme átirányított, és a Postulo nem követi az
 msgid "The public employment service you are registered with. Add it under Companies, as a public employment service, if it is not here."
 msgstr "Az állami foglalkoztatási szolgálat, amelynél regisztrálva van. Ha nincs itt, adja hozzá a Cégek alatt, állami foglalkoztatási szolgálatként."
 
+#: src/postulo/core/models.py
+msgid "The public key every archive is encrypted to before it leaves, starting age1. Keep the identity that opens them somewhere other than this server."
+msgstr ""
+
 #: src/postulo/resume/candidate.py
 msgid "The publication it counts cannot be added, so it will be a count for all of your work."
 msgstr ""
@@ -17643,6 +17827,11 @@ msgstr "Az ehhez az önéletrajzhoz kiválasztott telefonszám már nincs az el�
 msgid "The telephone number of %(name)s was not added."
 msgstr "Ennek a személynek a telefonszáma nem lett hozzáadva: %(name)s."
 
+#: src/postulo/core/views_backups.py
+#, python-format
+msgid "The test failed: %(problem)s"
+msgstr ""
+
 #: src/postulo/templates/documents/cv_text.html
 msgid "The text of this document"
 msgstr "A dokumentum szövege"
@@ -17650,6 +17839,10 @@ msgstr "A dokumentum szövege"
 #: src/postulo/templates/server/design.html
 msgid "The thing to do next"
 msgstr "A következő teendő"
+
+#: src/postulo/core/offsite.py
+msgid "The time for this send ran out before it began."
+msgstr ""
 
 #: src/postulo/templates/server/defaults.html
 #, python-format
@@ -17784,6 +17977,10 @@ msgstr "Már van ilyen nevű csoport."
 #: src/postulo/jobs/slow.py
 msgid "There is no address to fetch it from again."
 msgstr "Nincs cím, ahonnan újra le lehetne tölteni."
+
+#: src/postulo/core/views_backups.py
+msgid "There is no backup destination to send to."
+msgstr ""
 
 #: src/postulo/documents/archiving.py
 msgid "There is no file to send."
@@ -18576,6 +18773,11 @@ msgstr "levélküldés beállításai"
 msgid "transport secrets"
 msgstr "levélküldés titkai"
 
+#: src/postulo/templates/server/backups.html
+#, python-format
+msgid "Tried again at %(when)s."
+msgstr ""
+
 #: src/postulo/templates/server/overview.html
 msgid "Trusted:"
 msgstr "Megbízható:"
@@ -18927,6 +19129,10 @@ msgstr "felhasználók"
 msgid "Uses the saved settings, and sends to a real inbox. Test the connection first if you have just changed something."
 msgstr "A mentett beállításokat használja, és valódi postafiókba küld. Ha épp módosított valamit, előbb tesztelje a kapcsolatot."
 
+#: src/postulo/templates/server/backup_destination.html
+msgid "Uses the saved settings. Nothing is stored there."
+msgstr ""
+
 #: src/postulo/templates/api/token_list.html
 msgid "Using a token"
 msgstr "Token használata"
@@ -19031,6 +19237,7 @@ msgid "Voluntary support is this project's only income: one person writes it, an
 msgstr "Az önkéntes támogatás e projekt egyetlen bevétele: egyetlen ember írja, és semmi sem jár érte, semmi sem válik elérhetővé általa. Egyszer hangzik el, itt, a példány üzemeltetőjének — soha azoknak, akik munkát keresnek vele, és közülük sokaknak a pénz amúgy sem az, amit adni kellene."
 
 #: src/postulo/core/models.py src/postulo/notifications/models.py
+#: src/postulo/templates/server/backups.html
 msgid "Waiting"
 msgstr "Várakozik"
 
@@ -19706,9 +19913,17 @@ msgstr "Ahol egy kártyán <em>Szolgáltatás</em> menü van, válassza ki azt a
 msgid "Where a value leads: an http or https address with <code dir=\"ltr\">{value}</code> where the identifier goes, after the host. <code dir=\"ltr\">person_link</code> is the address for a person, where that is another one."
 msgstr "Ahová egy érték vezet: egy http- vagy https-cím, a gazdagép után <code dir=\"ltr\">{value}</code> azon a helyen, ahová az azonosító kerül. A <code dir=\"ltr\">person_link</code> a személy címe, ha az másik."
 
+#: src/postulo/templates/server/backup_destination.html
+msgid "Where and how"
+msgstr ""
+
 #: src/postulo/applications/widgets.py
 msgid "Where and why applications end"
 msgstr "Hol és miért érnek véget a jelentkezések"
+
+#: src/postulo/core/server_forms.py
+msgid "Where each archive is sent once it has been written and checked."
+msgstr ""
 
 #: src/postulo/resume/forms.py
 msgid "Where it can be read about. A CV does not print it."

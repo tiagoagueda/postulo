@@ -29,3 +29,11 @@ def scheduled_backup() -> None:
     from . import backups
 
     backups.run_scheduled()
+
+
+@task()
+def offsite_backups() -> None:
+    """Send what is due to the backup destination, in a worker, off the scheduler's pass (#325)."""
+    from . import offsite
+
+    offsite.send_pending()

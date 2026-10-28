@@ -1316,6 +1316,11 @@ msgstr "أصبح %(name)s الآن في الموضع %(place)s في المعرّ
 msgid "%(name)s is now number %(place)s in the navigation."
 msgstr "أصبح %(name)s الآن في الموضع %(place)s في شريط التنقل."
 
+#: src/postulo/core/views_backups.py
+#, python-format
+msgid "%(name)s is queued; the scheduler sends it on its next pass."
+msgstr ""
+
 #: src/postulo/core/server_views.py
 #, python-format
 msgid "%(name)s is removed. Restart Postulo to be sure nothing of it is left loaded."
@@ -1496,7 +1501,7 @@ msgstr "%(period)s: اختيار فترة أخرى"
 msgid "%(person)s is the last member of %(name)s, which still owns records. Give them to somebody, or delete them, first."
 msgstr "%(person)s هو آخر عضو في %(name)s، التي لا تزال تملك سجلات. انقل ملكيتها إلى شخص آخر أو احذفها أولًا."
 
-#: src/postulo/plugins/forms.py
+#: src/postulo/core/server_forms.py src/postulo/plugins/forms.py
 #, python-format
 msgid "%(plugin)s could not check these settings: %(error)s"
 msgstr "تعذّر على %(plugin)s التحقق من هذه الإعدادات: %(error)s"
@@ -2370,6 +2375,10 @@ msgstr "أزرق داكن. عشر درجات، تستخدم الواجهة بض�
 #: src/postulo/jobs/surface.py
 msgid "A department needs a name."
 msgstr "يحتاج القسم إلى اسم."
+
+#: src/postulo/core/server_forms.py
+msgid "A destination needs an age recipient to encrypt to: nothing leaves this server unencrypted."
+msgstr ""
 
 #: src/postulo/templates/server/overview.html
 msgid "A document in a script shown in red is set in the server's fonts instead."
@@ -3503,6 +3512,10 @@ msgstr "الطيران والفضاء"
 msgid "Africa"
 msgstr "أفريقيا"
 
+#: src/postulo/core/models.py
+msgid "age recipient"
+msgstr ""
+
 #: src/postulo/templates/widgets/sources.html
 msgid "Agency"
 msgstr "وكالة توظيف"
@@ -4201,6 +4214,10 @@ msgstr "تدريب مهني"
 msgid "Archived"
 msgstr "مؤرشف"
 
+#: src/postulo/templates/server/backup_destination.html
+msgid "Archives are encrypted with age before they leave."
+msgstr ""
+
 #: src/postulo/templates/jobs/capture_page_forget.html
 #: src/postulo/templates/partials/confirm_delete.html
 msgid "Are you sure?"
@@ -4426,6 +4443,7 @@ msgid "Back in your listings."
 msgstr "عاد إلى إعلاناتك."
 
 #: src/postulo/templates/server/backup_delete.html
+#: src/postulo/templates/server/backup_destination.html
 #: src/postulo/templates/server/backup_restore.html
 msgid "Back to Backups"
 msgstr "العودة إلى النسخ الاحتياطية"
@@ -4522,6 +4540,23 @@ msgstr "الواجهة الخلفية"
 #: src/postulo/templates/server/overview.html
 msgid "Background work"
 msgstr "العمل في الخلفية"
+
+#: src/postulo/core/models.py
+msgid "backup destination"
+msgstr ""
+
+#: src/postulo/plugins/kinds.py
+#: src/postulo/templates/server/backup_destination.html
+msgid "Backup destination"
+msgstr ""
+
+#: src/postulo/core/models.py
+msgid "backup destination configuration"
+msgstr ""
+
+#: src/postulo/core/models.py
+msgid "backup destination secrets"
+msgstr ""
 
 #: src/postulo/core/server_sections.py src/postulo/core/views_backups.py
 #: src/postulo/templates/server/backups.html
@@ -5126,6 +5161,10 @@ msgstr "الخيارات"
 msgid "Choose a country from the list."
 msgstr "اختر بلدًا من القائمة."
 
+#: src/postulo/core/views_backups.py
+msgid "Choose a destination and save it first."
+msgstr ""
+
 #: src/postulo/resume/views.py
 msgid "Choose a Europass file first."
 msgstr "اختر ملف Europass أولًا."
@@ -5215,6 +5254,10 @@ msgstr "اختر البلد الذي ينتمي إليه الرقم واكتب �
 #: src/postulo/templates/accounts/profile.html
 msgid "Choose the date of birth from a calendar"
 msgstr "اختيار تاريخ الميلاد من التقويم"
+
+#: src/postulo/templates/server/backups.html
+msgid "Choose the destination"
+msgstr ""
 
 #: src/postulo/templates/resume/europass_import.html
 msgid "Choose the PDF you downloaded from europass.europa.eu, as it is: the CV is attached inside it, and that is what Postulo reads. Older Europass files read too: the XML and PDF of the editor before 2020, and the JSON of its web service. Postulo works out which it is, shows you what is in it, and writes nothing until you say so."
@@ -6332,6 +6375,10 @@ msgstr "التصميم"
 msgid "Design (Behance, Dribbble…)"
 msgstr "التصميم (Behance، Dribbble…)"
 
+#: src/postulo/core/server_forms.py
+msgid "Destination"
+msgstr ""
+
 #: src/postulo/core/design.py
 #, fuzzy
 msgid "Destructive"
@@ -7002,6 +7049,11 @@ msgstr "كل الحسابات على هذا المثيل. يرى المسؤول�
 msgid "Every application, in order"
 msgstr "كل الطلبات، بالترتيب"
 
+#: src/postulo/templates/server/backups.html
+#, python-format
+msgid "Every archive is encrypted to your age recipient and sent to %(label)s once it has been written and checked. An archive that has not arrived there is never deleted here."
+msgstr ""
+
 #: src/postulo/templates/jobs/company_places.html
 msgid "Every company address on the map, with the company's name, page, industries and how precise its point is: at its town, its postcode, by hand or from Wikidata. A contact's address and your own are never in it."
 msgstr "كل عناوين الشركات على الخريطة، مع اسم الشركة وصفحتها ومجالات نشاطها ومدى دقة موضعها: عند مدينتها، أو رمزها البريدي، أو يدويًا، أو من Wikidata. لا يتضمن أبدًا عنوان جهة اتصال ولا عنوانك."
@@ -7273,6 +7325,7 @@ msgid "Extra small"
 msgstr "صغير جدًا"
 
 #: src/postulo/core/models.py src/postulo/documents/models.py
+#: src/postulo/templates/server/backups.html
 msgid "Failed"
 msgstr "فشل"
 
@@ -9006,6 +9059,11 @@ msgstr "يُزال من جهة الاتصال هذه الآن، دون انتظ�
 msgid "It comes off your details now, without waiting for Save, and cannot be put back."
 msgstr "يُزال من بياناتك الآن، دون انتظار الحفظ، ولا يمكن إرجاعه."
 
+#: src/postulo/core/offsite.py
+#, python-format
+msgid "It could not be encrypted: %(error)s"
+msgstr ""
+
 #: src/postulo/plugins/installing.py
 msgid "it could not be imported"
 msgstr "تعذّر استيراده"
@@ -9325,6 +9383,10 @@ msgstr "الاحتفاظ بملاحظاتي"
 msgid "keep the newest"
 msgstr "عدد النسخ الأحدث التي يُحتفظ بها"
 
+#: src/postulo/core/models.py
+msgid "keep the newest there"
+msgstr ""
+
 #: src/postulo/templates/jobs/merge.html
 msgid "Keep the other one instead"
 msgstr "الاحتفاظ بالآخر بدلًا منه"
@@ -9579,6 +9641,10 @@ msgstr "آخر خطأ"
 msgid "Last name"
 msgstr "اسم العائلة"
 
+#: src/postulo/templates/server/backups.html
+msgid "Last one that arrived"
+msgstr ""
+
 #: src/postulo/plugins/models.py
 msgid "last pushed"
 msgstr "آخر إرسال"
@@ -9650,6 +9716,10 @@ msgstr "تعلّم تلقيته، مع شهادة حضور أو من دونها.
 #: src/postulo/templates/resume/translations.html
 msgid "Leave a box empty and that line prints as it is written above it."
 msgstr "اترك أي مربع فارغًا وسيظهر ذلك السطر كما هو مكتوب فوقه."
+
+#: src/postulo/core/models.py
+msgid "Leave blank to keep as many there as here. 0 never deletes anything there. Only archives Postulo sent itself are ever deleted, and only after a new one has arrived."
+msgstr ""
 
 #: src/postulo/core/server_forms.py
 msgid "Leave blank to keep the one already stored."
@@ -10845,6 +10915,10 @@ msgstr "لا"
 msgid "No address and no key, so nothing is offered from it."
 msgstr "لا عنوان ولا مفتاح، لذا لا يُعرض منه أي شيء."
 
+#: src/postulo/core/offsite.py
+msgid "No age recipient is set, and nothing leaves this machine unencrypted."
+msgstr ""
+
 #: src/postulo/applications/forms.py
 msgid "No agency"
 msgstr "بلا وكالة توظيف"
@@ -10860,6 +10934,10 @@ msgstr "لا يتأثر أي طلب، لذا لا يتغير أي خط زمني.
 #: src/postulo/templates/jobs/company_detail.html
 msgid "No appointments yet."
 msgstr "لا توجد مواعيد بعد."
+
+#: src/postulo/templates/server/backup_destination.html
+msgid "No backup destination plugin is installed. Postulo ships none and names no provider: install one under Plugins, then choose it here."
+msgstr ""
 
 #: src/postulo/templates/server/backups.html
 msgid "No backups yet. Take one above."
@@ -11017,6 +11095,10 @@ msgstr "لا توجد وسائط"
 #: src/postulo/documents/printing.py
 msgid "No messaging handle"
 msgstr "بلا اسم حساب في خدمة مراسلة"
+
+#: src/postulo/templates/server/backups.html
+msgid "No more retries: send it again when the destination is fixed."
+msgstr ""
 
 #: src/postulo/documents/pdf.py
 #, python-format
@@ -11300,6 +11382,14 @@ msgstr "لا يوجد بعد. تُظهر المستندات الاسم أعلا�
 msgid "None yet. This entry prints its original text on every CV."
 msgstr "لا شيء بعد. يظهر هذا البند بنصه الأصلي في كل سيرة ذاتية."
 
+#: src/postulo/core/server_forms.py
+msgid "None — backups stay on this server"
+msgstr ""
+
+#: src/postulo/templates/server/backups.html
+msgid "None: the archives stay on this server. A destination keeps a copy somewhere else, encrypted before it leaves."
+msgstr ""
+
 #: src/postulo/applications/models.py
 #, fuzzy
 msgid "Normal"
@@ -11435,6 +11525,10 @@ msgstr "لم يُحفظ"
 #: src/postulo/templates/settings/_save_status.html
 msgid "Not saved: Postulo could not be reached. Press Save when it can."
 msgstr "لم يُحفظ: تعذّر الوصول إلى Postulo. اضغط «حفظ» عندما يصبح ذلك ممكنًا."
+
+#: src/postulo/templates/server/backups.html
+msgid "Not sent"
+msgstr ""
 
 #: src/postulo/templates/applications/partials/application_card.html
 msgid "Not sent yet"
@@ -11991,6 +12085,14 @@ msgstr "معطّل لأنه يحتاج إلى %(names)s، وهو معطّل أو
 msgid "Off, because the module it belongs to is off."
 msgstr "معطّل لأن الوحدة التي ينتمي إليها معطّلة."
 
+#: src/postulo/templates/server/backups.html
+msgid "Off-site"
+msgstr ""
+
+#: src/postulo/templates/server/backups.html
+msgid "Off-site copies"
+msgstr ""
+
 #: src/postulo/templates/settings/account.html
 msgid "Off. A code from an authenticator app, asked for after the password, means a leaked password alone is not enough."
 msgstr "معطّلة. رمز من تطبيق المصادقة، يُطلب بعد كلمة المرور، يعني أن تسريب كلمة المرور وحده لا يكفي."
@@ -12538,6 +12640,10 @@ msgstr "لا يمكن إلا للمشغّل تعديل قاعدة تخص حسا�
 #: src/postulo/core/server_views.py
 msgid "Only the operator's own account can stop being an administrator."
 msgstr "لا يمكن إلا لحساب المشغّل نفسه أن يكفّ عن كونه مسؤولًا."
+
+#: src/postulo/templates/server/backup_destination.html
+msgid "Only the public key, the recipient, is kept here. Keep the identity that opens the archives somewhere other than this server, and keep a copy of it: without it no archive sent can be opened. Restoring starts by decrypting one by hand, as the wiki page about backups says."
+msgstr ""
 
 #: src/postulo/resume/forms.py
 msgid "Only the year prints on a CV, so the day makes no difference."
@@ -14466,6 +14572,14 @@ msgstr "إزالة {label}"
 msgid "removed on the other side"
 msgstr "أُزيل في الطرف الآخر"
 
+#: src/postulo/core/models.py
+msgid "Removed there"
+msgstr ""
+
+#: src/postulo/templates/server/backups.html
+msgid "Removed there by retention"
+msgstr ""
+
 #: src/postulo/templates/documents/partials/comparison_line.html
 msgid "Removed:"
 msgstr "أُزيل:"
@@ -14735,6 +14849,7 @@ msgstr "السبت"
 #: src/postulo/templates/partials/table/cell.html
 #: src/postulo/templates/resume/item_form.html
 #: src/postulo/templates/resume/translations.html
+#: src/postulo/templates/server/backup_destination.html
 #: src/postulo/templates/server/backups.html
 #: src/postulo/templates/server/capture.html
 #: src/postulo/templates/server/data_protection.html
@@ -15040,6 +15155,10 @@ msgctxt "type of event"
 msgid "Seminar"
 msgstr "ندوة"
 
+#: src/postulo/templates/server/backups.html
+msgid "Send"
+msgstr ""
+
 #: src/postulo/templates/server/email.html
 msgid "Send a real message"
 msgstr "إرسال رسالة حقيقية"
@@ -15081,8 +15200,9 @@ msgstr "فشل الإرسال: %(error)s"
 msgid "Sends the DOI to doi.org, which passes it to Crossref or DataCite, and nothing else about you. Only the empty boxes are filled, and nothing is kept until you save."
 msgstr ""
 
-#: src/postulo/notifications/models.py
+#: src/postulo/core/models.py src/postulo/notifications/models.py
 #: src/postulo/templates/applications/report.html
+#: src/postulo/templates/server/backups.html
 #: src/postulo/templates/server/design.html
 #: src/postulo/templates/widgets/_source_table.html
 #: src/postulo/templates/widgets/industries.html
@@ -15834,6 +15954,10 @@ msgstr "حدث خطأ ما. التفاصيل في سجل الخادم."
 msgid "Something worth knowing."
 msgstr "معلومة تستحق المعرفة."
 
+#: src/postulo/templates/server/backup_destination.html
+msgid "Somewhere besides this server where every archive is sent once it has been written and checked, encrypted first."
+msgstr ""
+
 #: src/postulo/templates/server/design.html
 msgid "Somewhere else"
 msgstr "مكان آخر"
@@ -16392,6 +16516,7 @@ msgid "Terms not recorded"
 msgstr "الشروط غير مُسجَّلة"
 
 #: src/postulo/templates/connections/list.html
+#: src/postulo/templates/server/backup_destination.html
 msgid "Test"
 msgstr "اختبار"
 
@@ -16403,6 +16528,10 @@ msgstr "فشل الاختبار: %(message)s"
 #: src/postulo/templates/server/email.html
 msgid "Test the connection"
 msgstr "اختبار الاتصال"
+
+#: src/postulo/templates/server/backup_destination.html
+msgid "Test the destination"
+msgstr ""
 
 #: src/postulo/documents/models.py src/postulo/resume/models.py
 msgid "text"
@@ -16853,6 +16982,14 @@ msgstr "هذا ليس معرّف عنصر في Wikidata."
 msgid "That is not an address Postulo can use."
 msgstr "هذا ليس عنوانًا يمكن أن يستخدمه Postulo."
 
+#: src/postulo/core/offsite.py
+msgid "That is not an age recipient. It starts age1 and is 62 characters long."
+msgstr ""
+
+#: src/postulo/core/offsite.py
+msgid "That is not an age recipient: its checksum does not match."
+msgstr ""
+
 #: src/postulo/plugins/catalogue.py
 #, python-format
 msgid "That is not an Ed25519 public key: %(error)s"
@@ -17079,10 +17216,20 @@ msgstr[3] "تبقى %(count)d ملفات يشير إليها سجل تغييرا
 msgstr[4] "يبقى %(count)d ملفًا يشير إليها سجل تغييراته في أماكنها."
 msgstr[5] "يبقى %(count)d ملف يشير إليها سجل تغييراته في أماكنها."
 
+#: src/postulo/templates/server/backups.html
+#, python-format
+msgid "The %(name)s destination is chosen but not installed, so nothing is being sent."
+msgstr ""
+
 #: src/postulo/documents/pdf.py
 #, python-format
 msgid "The %(name)s PDF backend is configured but not usable. %(hint)s"
 msgstr "واجهة PDF الخلفية %(name)s مُعدّة لكنها غير صالحة للاستخدام. %(hint)s"
+
+#: src/postulo/core/offsite.py
+#, python-format
+msgid "The %(plugin)s destination is not installed or not chosen."
+msgstr ""
 
 #: src/postulo/documents/archiving.py src/postulo/plugins/syncing.py
 #, python-format
@@ -17145,6 +17292,19 @@ msgstr "التطبيق المسجّل لدى المزوّد. ليس سرًا: ا
 #: src/postulo/core/mail_choices.py
 msgid "The application sends on its own"
 msgstr "يرسل التطبيق من تلقاء نفسه"
+
+#: src/postulo/core/offsite.py
+msgid "The archive does not verify."
+msgstr ""
+
+#: src/postulo/core/offsite.py
+#, python-format
+msgid "The archive does not verify: %(problem)s"
+msgstr ""
+
+#: src/postulo/core/offsite.py
+msgid "The archive is no longer on this server."
+msgstr ""
 
 #: src/postulo/templates/server/backup_restore.html
 msgid "The archive is signed by this instance's key."
@@ -17382,6 +17542,18 @@ msgstr ""
 #: src/postulo/templates/server/plugins.html
 msgid "The default for every account. One person's exceptions are on their row under People. Switching a plugin off stops it being used and deletes nothing."
 msgstr "الإعداد الافتراضي لكل حساب. استثناءات كل شخص موجودة في صفه ضمن الأشخاص. تعطيل مكوّن إضافي يوقف استخدامه ولا يحذف أي شيء."
+
+#: src/postulo/core/views_backups.py
+msgid "The destination answered."
+msgstr ""
+
+#: src/postulo/core/offsite.py
+msgid "The destination did not say where it put the archive."
+msgstr ""
+
+#: src/postulo/core/offsite.py
+msgid "The destination gave no answer."
+msgstr ""
 
 #: src/postulo/jobs/capture_views.py
 msgid "the discarded captures"
@@ -17711,6 +17883,10 @@ msgstr "المعتاد في اللغة"
 msgid "The last backup failed."
 msgstr "فشلت آخر نسخة احتياطية."
 
+#: src/postulo/templates/server/overview.html
+msgid "The last backup sent to the destination did not arrive."
+msgstr ""
+
 #: src/postulo/templates/applications/report.html
 msgid "The last few weeks"
 msgstr "الأسابيع القليلة الماضية"
@@ -17729,6 +17905,10 @@ msgstr[5] "فشلت آخر %(counter)s رسالة حاول هذا المثيل �
 #: src/postulo/templates/jobs/capture_review.html
 msgid "The last one waiting."
 msgstr "هذا آخر التقاط منتظر."
+
+#: src/postulo/templates/server/backups.html
+msgid "The last send failed."
+msgstr ""
 
 #: src/postulo/applications/widgets.py
 msgid "The last ten things the timeline recorded, whichever application they were on."
@@ -18054,6 +18234,10 @@ msgstr "أعاد عنوان الرمز المميز لدى المزوّد الت
 msgid "The public employment service you are registered with. Add it under Companies, as a public employment service, if it is not here."
 msgstr "خدمة التوظيف العامة التي أنت مسجّل لديها. أضفها ضمن الشركات، بوصفها خدمة توظيف عامة، إن لم تكن هنا."
 
+#: src/postulo/core/models.py
+msgid "The public key every archive is encrypted to before it leaves, starting age1. Keep the identity that opens them somewhere other than this server."
+msgstr ""
+
 #: src/postulo/resume/candidate.py
 msgid "The publication it counts cannot be added, so it will be a count for all of your work."
 msgstr ""
@@ -18352,6 +18536,11 @@ msgstr "لم يعد رقم الهاتف المختار لهذه السيرة ا�
 msgid "The telephone number of %(name)s was not added."
 msgstr "لم يُضَف رقم هاتف %(name)s."
 
+#: src/postulo/core/views_backups.py
+#, python-format
+msgid "The test failed: %(problem)s"
+msgstr ""
+
 #: src/postulo/templates/documents/cv_text.html
 msgid "The text of this document"
 msgstr "نص هذا المستند"
@@ -18359,6 +18548,10 @@ msgstr "نص هذا المستند"
 #: src/postulo/templates/server/design.html
 msgid "The thing to do next"
 msgstr "الخطوة التالية"
+
+#: src/postulo/core/offsite.py
+msgid "The time for this send ran out before it began."
+msgstr ""
 
 #: src/postulo/templates/server/defaults.html
 #, python-format
@@ -18493,6 +18686,10 @@ msgstr "توجد مجموعة بهذا الاسم بالفعل."
 #: src/postulo/jobs/slow.py
 msgid "There is no address to fetch it from again."
 msgstr "لا يوجد عنوان لجلبه منه مجددًا."
+
+#: src/postulo/core/views_backups.py
+msgid "There is no backup destination to send to."
+msgstr ""
 
 #: src/postulo/documents/archiving.py
 msgid "There is no file to send."
@@ -19303,6 +19500,11 @@ msgstr "إعدادات الناقل"
 msgid "transport secrets"
 msgstr "أسرار الناقل"
 
+#: src/postulo/templates/server/backups.html
+#, python-format
+msgid "Tried again at %(when)s."
+msgstr ""
+
 #: src/postulo/templates/server/overview.html
 msgid "Trusted:"
 msgstr "موثوق:"
@@ -19655,6 +19857,10 @@ msgstr "المستخدمون"
 msgid "Uses the saved settings, and sends to a real inbox. Test the connection first if you have just changed something."
 msgstr "يستخدم الإعدادات المحفوظة، ويرسل إلى صندوق بريد وارد حقيقي. اختبر الاتصال أولًا إن كنت قد غيّرت شيئًا للتو."
 
+#: src/postulo/templates/server/backup_destination.html
+msgid "Uses the saved settings. Nothing is stored there."
+msgstr ""
+
 #: src/postulo/templates/api/token_list.html
 msgid "Using a token"
 msgstr "استخدام رمز مميز"
@@ -19759,6 +19965,7 @@ msgid "Voluntary support is this project's only income: one person writes it, an
 msgstr "الدعم الطوعي هو الدخل الوحيد لهذا المشروع: يكتبه شخص واحد، ولا شيء مستحق أو يُفتح مقابل أي من هذا. يُقال ذلك مرة واحدة، هنا، لمن يدير المثيل — ولا يُقال أبدًا لمن يستخدمونه للبحث عن عمل، فالمال بالنسبة إلى كثير منهم ليس ما ينبغي أن يقدّموه."
 
 #: src/postulo/core/models.py src/postulo/notifications/models.py
+#: src/postulo/templates/server/backups.html
 msgid "Waiting"
 msgstr "قيد الانتظار"
 
@@ -20434,9 +20641,17 @@ msgstr "إذا كانت البطاقة تحتوي على قائمة <em>الخد
 msgid "Where a value leads: an http or https address with <code dir=\"ltr\">{value}</code> where the identifier goes, after the host. <code dir=\"ltr\">person_link</code> is the address for a person, where that is another one."
 msgstr "إلى أين تقود القيمة: عنوان http أو https فيه <code dir=\"ltr\">{value}</code> في موضع المعرّف، بعد اسم المضيف. <code dir=\"ltr\">person_link</code> هو العنوان الخاص بالشخص، حين يكون مختلفًا."
 
+#: src/postulo/templates/server/backup_destination.html
+msgid "Where and how"
+msgstr ""
+
 #: src/postulo/applications/widgets.py
 msgid "Where and why applications end"
 msgstr "أين تنتهي طلبات التوظيف ولماذا"
+
+#: src/postulo/core/server_forms.py
+msgid "Where each archive is sent once it has been written and checked."
+msgstr ""
 
 #: src/postulo/resume/forms.py
 msgid "Where it can be read about. A CV does not print it."

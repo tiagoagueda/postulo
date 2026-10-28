@@ -1076,6 +1076,11 @@ msgstr "%(name)s dabar identifikatorių sąraše yra %(place)s vietoje."
 msgid "%(name)s is now number %(place)s in the navigation."
 msgstr "%(name)s dabar naršymo juostoje yra %(place)s vietoje."
 
+#: src/postulo/core/views_backups.py
+#, python-format
+msgid "%(name)s is queued; the scheduler sends it on its next pass."
+msgstr ""
+
 #: src/postulo/core/server_views.py
 #, python-format
 msgid "%(name)s is removed. Restart Postulo to be sure nothing of it is left loaded."
@@ -1256,7 +1261,7 @@ msgstr "%(period)s: pasirinkti kitą"
 msgid "%(person)s is the last member of %(name)s, which still owns records. Give them to somebody, or delete them, first."
 msgstr "%(person)s yra paskutinis grupės %(name)s narys, o ji dar turi įrašų. Pirmiausia perduokite juos kam nors arba ištrinkite."
 
-#: src/postulo/plugins/forms.py
+#: src/postulo/core/server_forms.py src/postulo/plugins/forms.py
 #, python-format
 msgid "%(plugin)s could not check these settings: %(error)s"
 msgstr "%(plugin)s nepavyko patikrinti šių nustatymų: %(error)s"
@@ -2076,6 +2081,10 @@ msgstr "Sodri mėlyna. Dešimt atspalvių, iš kurių sąsaja naudoja vos kelis.
 #: src/postulo/jobs/surface.py
 msgid "A department needs a name."
 msgstr "Padaliniui reikia pavadinimo."
+
+#: src/postulo/core/server_forms.py
+msgid "A destination needs an age recipient to encrypt to: nothing leaves this server unencrypted."
+msgstr ""
 
 #: src/postulo/templates/server/overview.html
 msgid "A document in a script shown in red is set in the server's fonts instead."
@@ -3183,6 +3192,10 @@ msgstr "Aviacija ir kosmosas"
 msgid "Africa"
 msgstr "Afrika"
 
+#: src/postulo/core/models.py
+msgid "age recipient"
+msgstr ""
+
 #: src/postulo/templates/widgets/sources.html
 msgid "Agency"
 msgstr "Agentūra"
@@ -3863,6 +3876,10 @@ msgstr "Pameistrystė"
 msgid "Archived"
 msgstr "Archyvuota"
 
+#: src/postulo/templates/server/backup_destination.html
+msgid "Archives are encrypted with age before they leave."
+msgstr ""
+
 #: src/postulo/templates/jobs/capture_page_forget.html
 #: src/postulo/templates/partials/confirm_delete.html
 msgid "Are you sure?"
@@ -4086,6 +4103,7 @@ msgid "Back in your listings."
 msgstr "Grąžinta į jūsų skelbimus."
 
 #: src/postulo/templates/server/backup_delete.html
+#: src/postulo/templates/server/backup_destination.html
 #: src/postulo/templates/server/backup_restore.html
 msgid "Back to Backups"
 msgstr "Atgal į atsargines kopijas"
@@ -4181,6 +4199,23 @@ msgstr "Posistemė"
 #: src/postulo/templates/server/overview.html
 msgid "Background work"
 msgstr "Foninis darbas"
+
+#: src/postulo/core/models.py
+msgid "backup destination"
+msgstr ""
+
+#: src/postulo/plugins/kinds.py
+#: src/postulo/templates/server/backup_destination.html
+msgid "Backup destination"
+msgstr ""
+
+#: src/postulo/core/models.py
+msgid "backup destination configuration"
+msgstr ""
+
+#: src/postulo/core/models.py
+msgid "backup destination secrets"
+msgstr ""
 
 #: src/postulo/core/server_sections.py src/postulo/core/views_backups.py
 #: src/postulo/templates/server/backups.html
@@ -4776,6 +4811,10 @@ msgstr "Pasirinkimai"
 msgid "Choose a country from the list."
 msgstr "Pasirinkite šalį iš sąrašo."
 
+#: src/postulo/core/views_backups.py
+msgid "Choose a destination and save it first."
+msgstr ""
+
 #: src/postulo/resume/views.py
 msgid "Choose a Europass file first."
 msgstr "Pirmiausia pasirinkite Europass failą."
@@ -4865,6 +4904,10 @@ msgstr "Pasirinkite šalį, kuriai priklauso numeris, ir įveskite numerį taip,
 #: src/postulo/templates/accounts/profile.html
 msgid "Choose the date of birth from a calendar"
 msgstr "Pasirinkti gimimo datą kalendoriuje"
+
+#: src/postulo/templates/server/backups.html
+msgid "Choose the destination"
+msgstr ""
 
 #: src/postulo/templates/resume/europass_import.html
 msgid "Choose the PDF you downloaded from europass.europa.eu, as it is: the CV is attached inside it, and that is what Postulo reads. Older Europass files read too: the XML and PDF of the editor before 2020, and the JSON of its web service. Postulo works out which it is, shows you what is in it, and writes nothing until you say so."
@@ -5968,6 +6011,10 @@ msgstr "Dizainas"
 msgid "Design (Behance, Dribbble…)"
 msgstr "Dizainas (Behance, Dribbble…)"
 
+#: src/postulo/core/server_forms.py
+msgid "Destination"
+msgstr ""
+
 #: src/postulo/core/design.py
 msgid "Destructive"
 msgstr "Naikinamasis"
@@ -6635,6 +6682,11 @@ msgstr "Visos šio egzemplioriaus paskyros. Administratoriai mato paskyras, bet 
 msgid "Every application, in order"
 msgstr "Visos paraiškos iš eilės"
 
+#: src/postulo/templates/server/backups.html
+#, python-format
+msgid "Every archive is encrypted to your age recipient and sent to %(label)s once it has been written and checked. An archive that has not arrived there is never deleted here."
+msgstr ""
+
 #: src/postulo/templates/jobs/company_places.html
 msgid "Every company address on the map, with the company's name, page, industries and how precise its point is: at its town, its postcode, by hand or from Wikidata. A contact's address and your own are never in it."
 msgstr "Kiekvienas žemėlapyje esantis įmonės adresas su įmonės pavadinimu, puslapiu, šakomis ir tuo, kaip tiksliai pažymėtas jo taškas: gyvenvietėje, pagal pašto kodą, ranka ar iš Wikidata. Kontaktų ir jūsų pačių adresų jame niekada nėra."
@@ -6903,6 +6955,7 @@ msgid "Extra small"
 msgstr "Labai mažas"
 
 #: src/postulo/core/models.py src/postulo/documents/models.py
+#: src/postulo/templates/server/backups.html
 msgid "Failed"
 msgstr "Nepavyko"
 
@@ -8621,6 +8674,11 @@ msgstr "Jis iš šio kontakto pašalinamas iš karto, nelaukiant mygtuko „Išs
 msgid "It comes off your details now, without waiting for Save, and cannot be put back."
 msgstr "Jis iš karto pašalinamas iš jūsų duomenų, nelaukiant „Išsaugoti“, ir jo nebegalima atkurti."
 
+#: src/postulo/core/offsite.py
+#, python-format
+msgid "It could not be encrypted: %(error)s"
+msgstr ""
+
 #: src/postulo/plugins/installing.py
 msgid "it could not be imported"
 msgstr "jo nepavyko importuoti"
@@ -8933,6 +8991,10 @@ msgstr "Palikti mano pastabas"
 msgid "keep the newest"
 msgstr "kiek naujausių saugoti"
 
+#: src/postulo/core/models.py
+msgid "keep the newest there"
+msgstr ""
+
 #: src/postulo/templates/jobs/merge.html
 msgid "Keep the other one instead"
 msgstr "Vietoj to palikti kitą"
@@ -9186,6 +9248,10 @@ msgstr "paskutinė klaida"
 msgid "Last name"
 msgstr "Pavardė"
 
+#: src/postulo/templates/server/backups.html
+msgid "Last one that arrived"
+msgstr ""
+
 #: src/postulo/plugins/models.py
 msgid "last pushed"
 msgstr "paskutinį kartą išsiųsta"
@@ -9257,6 +9323,10 @@ msgstr "Mokymai, kuriuose dalyvavote, su lankymo pažymėjimu ar be jo. Programa
 #: src/postulo/templates/resume/translations.html
 msgid "Leave a box empty and that line prints as it is written above it."
 msgstr "Palikite laukelį tuščią, ir ta eilutė bus pateikta taip, kaip parašyta virš jo."
+
+#: src/postulo/core/models.py
+msgid "Leave blank to keep as many there as here. 0 never deletes anything there. Only archives Postulo sent itself are ever deleted, and only after a new one has arrived."
+msgstr ""
 
 #: src/postulo/core/server_forms.py
 msgid "Leave blank to keep the one already stored."
@@ -10439,6 +10509,10 @@ msgstr "Ne"
 msgid "No address and no key, so nothing is offered from it."
 msgstr "Nėra nei adreso, nei rakto, todėl iš jos nieko nesiūloma."
 
+#: src/postulo/core/offsite.py
+msgid "No age recipient is set, and nothing leaves this machine unencrypted."
+msgstr ""
+
 #: src/postulo/applications/forms.py
 msgid "No agency"
 msgstr "Be agentūros"
@@ -10454,6 +10528,10 @@ msgstr "Neliečiama jokia paraiška, todėl chronologijos nesikeičia."
 #: src/postulo/templates/jobs/company_detail.html
 msgid "No appointments yet."
 msgstr "Susitikimų dar nėra."
+
+#: src/postulo/templates/server/backup_destination.html
+msgid "No backup destination plugin is installed. Postulo ships none and names no provider: install one under Plugins, then choose it here."
+msgstr ""
 
 #: src/postulo/templates/server/backups.html
 msgid "No backups yet. Take one above."
@@ -10611,6 +10689,10 @@ msgstr "Medijos failų nėra"
 #: src/postulo/documents/printing.py
 msgid "No messaging handle"
 msgstr "Nėra slapyvardžio"
+
+#: src/postulo/templates/server/backups.html
+msgid "No more retries: send it again when the destination is fixed."
+msgstr ""
 
 #: src/postulo/documents/pdf.py
 #, python-format
@@ -10895,6 +10977,14 @@ msgstr "Kol kas nėra. Dokumentuose visomis kalbomis pateikiamas aukščiau nuro
 msgid "None yet. This entry prints its original text on every CV."
 msgstr "Kol kas nė vienos. Šis įrašas kiekviename CV pateikiamas pradiniu tekstu."
 
+#: src/postulo/core/server_forms.py
+msgid "None — backups stay on this server"
+msgstr ""
+
+#: src/postulo/templates/server/backups.html
+msgid "None: the archives stay on this server. A destination keeps a copy somewhere else, encrypted before it leaves."
+msgstr ""
+
 #: src/postulo/applications/models.py
 msgid "Normal"
 msgstr "Įprastas"
@@ -11026,6 +11116,10 @@ msgstr "Neišsaugota"
 #: src/postulo/templates/settings/_save_status.html
 msgid "Not saved: Postulo could not be reached. Press Save when it can."
 msgstr "Neišsaugota: nepavyko pasiekti Postulo. Paspauskite „Išsaugoti“, kai jis vėl bus pasiekiamas."
+
+#: src/postulo/templates/server/backups.html
+msgid "Not sent"
+msgstr ""
 
 #: src/postulo/templates/applications/partials/application_card.html
 msgid "Not sent yet"
@@ -11572,6 +11666,14 @@ msgstr "Išjungta, nes reikalingi papildiniai išjungti arba neįdiegti: %(names
 msgid "Off, because the module it belongs to is off."
 msgstr "Išjungta, nes išjungtas modulis, kuriam jis priklauso."
 
+#: src/postulo/templates/server/backups.html
+msgid "Off-site"
+msgstr ""
+
+#: src/postulo/templates/server/backups.html
+msgid "Off-site copies"
+msgstr ""
+
 #: src/postulo/templates/settings/account.html
 msgid "Off. A code from an authenticator app, asked for after the password, means a leaked password alone is not enough."
 msgstr "Išjungta. Kodas iš autentifikavimo programėlės, prašomas po slaptažodžio, reiškia, kad vien nutekėjusio slaptažodžio neužtenka."
@@ -12065,6 +12167,10 @@ msgstr "Taisyklę dėl jūsų paskyros ar vienos iš jūsų grupių gali keisti 
 #: src/postulo/core/server_views.py
 msgid "Only the operator's own account can stop being an administrator."
 msgstr "Atimti administratoriaus teises iš operatoriaus paskyros gali tik pats operatorius."
+
+#: src/postulo/templates/server/backup_destination.html
+msgid "Only the public key, the recipient, is kept here. Keep the identity that opens the archives somewhere other than this server, and keep a copy of it: without it no archive sent can be opened. Restoring starts by decrypting one by hand, as the wiki page about backups says."
+msgstr ""
 
 #: src/postulo/resume/forms.py
 msgid "Only the year prints on a CV, so the day makes no difference."
@@ -13961,6 +14067,14 @@ msgstr "Pašalinti {label}"
 msgid "removed on the other side"
 msgstr "pašalinta kitoje pusėje"
 
+#: src/postulo/core/models.py
+msgid "Removed there"
+msgstr ""
+
+#: src/postulo/templates/server/backups.html
+msgid "Removed there by retention"
+msgstr ""
+
 #: src/postulo/templates/documents/partials/comparison_line.html
 msgid "Removed:"
 msgstr "Pašalinta:"
@@ -14227,6 +14341,7 @@ msgstr "Šeštadienis"
 #: src/postulo/templates/partials/table/cell.html
 #: src/postulo/templates/resume/item_form.html
 #: src/postulo/templates/resume/translations.html
+#: src/postulo/templates/server/backup_destination.html
 #: src/postulo/templates/server/backups.html
 #: src/postulo/templates/server/capture.html
 #: src/postulo/templates/server/data_protection.html
@@ -14532,6 +14647,10 @@ msgctxt "type of event"
 msgid "Seminar"
 msgstr "Seminaras"
 
+#: src/postulo/templates/server/backups.html
+msgid "Send"
+msgstr ""
+
 #: src/postulo/templates/server/email.html
 msgid "Send a real message"
 msgstr "Siųsti tikrą laišką"
@@ -14573,8 +14692,9 @@ msgstr "Nepavyko išsiųsti: %(error)s"
 msgid "Sends the DOI to doi.org, which passes it to Crossref or DataCite, and nothing else about you. Only the empty boxes are filled, and nothing is kept until you save."
 msgstr ""
 
-#: src/postulo/notifications/models.py
+#: src/postulo/core/models.py src/postulo/notifications/models.py
 #: src/postulo/templates/applications/report.html
+#: src/postulo/templates/server/backups.html
 #: src/postulo/templates/server/design.html
 #: src/postulo/templates/widgets/_source_table.html
 #: src/postulo/templates/widgets/industries.html
@@ -15321,6 +15441,10 @@ msgstr "Įvyko klaida. Išsami informacija – serverio žurnale."
 msgid "Something worth knowing."
 msgstr "Tai verta žinoti."
 
+#: src/postulo/templates/server/backup_destination.html
+msgid "Somewhere besides this server where every archive is sent once it has been written and checked, encrypted first."
+msgstr ""
+
 #: src/postulo/templates/server/design.html
 msgid "Somewhere else"
 msgstr "Kitur"
@@ -15869,6 +15993,7 @@ msgid "Terms not recorded"
 msgstr "Sąlygos neįrašytos"
 
 #: src/postulo/templates/connections/list.html
+#: src/postulo/templates/server/backup_destination.html
 msgid "Test"
 msgstr "Išbandyti"
 
@@ -15880,6 +16005,10 @@ msgstr "Bandymas nepavyko: %(message)s"
 #: src/postulo/templates/server/email.html
 msgid "Test the connection"
 msgstr "Išbandyti ryšį"
+
+#: src/postulo/templates/server/backup_destination.html
+msgid "Test the destination"
+msgstr ""
 
 #: src/postulo/documents/models.py src/postulo/resume/models.py
 msgid "text"
@@ -16321,6 +16450,14 @@ msgstr "Tai ne Wikidata elemento identifikatorius."
 msgid "That is not an address Postulo can use."
 msgstr "Tai nėra adresas, kurį Postulo gali naudoti."
 
+#: src/postulo/core/offsite.py
+msgid "That is not an age recipient. It starts age1 and is 62 characters long."
+msgstr ""
+
+#: src/postulo/core/offsite.py
+msgid "That is not an age recipient: its checksum does not match."
+msgstr ""
+
 #: src/postulo/plugins/catalogue.py
 #, python-format
 msgid "That is not an Ed25519 public key: %(error)s"
@@ -16537,10 +16674,20 @@ msgstr[0] "%(count)d failas, į kurį rodo istorija, paliekamas savo vietoje."
 msgstr[1] "%(count)d failai, į kuriuos rodo istorija, paliekami savo vietoje."
 msgstr[2] "%(count)d failų, į kuriuos rodo istorija, paliekama savo vietoje."
 
+#: src/postulo/templates/server/backups.html
+#, python-format
+msgid "The %(name)s destination is chosen but not installed, so nothing is being sent."
+msgstr ""
+
 #: src/postulo/documents/pdf.py
 #, python-format
 msgid "The %(name)s PDF backend is configured but not usable. %(hint)s"
 msgstr "PDF variklis %(name)s sukonfigūruotas, bet jo naudoti negalima. %(hint)s"
+
+#: src/postulo/core/offsite.py
+#, python-format
+msgid "The %(plugin)s destination is not installed or not chosen."
+msgstr ""
 
 #: src/postulo/documents/archiving.py src/postulo/plugins/syncing.py
 #, python-format
@@ -16603,6 +16750,19 @@ msgstr "Pas teikėją užregistruota programa. Tai ne paslaptis – paslaptis yr
 #: src/postulo/core/mail_choices.py
 msgid "The application sends on its own"
 msgstr "Programa siunčia savarankiškai"
+
+#: src/postulo/core/offsite.py
+msgid "The archive does not verify."
+msgstr ""
+
+#: src/postulo/core/offsite.py
+#, python-format
+msgid "The archive does not verify: %(problem)s"
+msgstr ""
+
+#: src/postulo/core/offsite.py
+msgid "The archive is no longer on this server."
+msgstr ""
 
 #: src/postulo/templates/server/backup_restore.html
 msgid "The archive is signed by this instance's key."
@@ -16840,6 +17000,18 @@ msgstr ""
 #: src/postulo/templates/server/plugins.html
 msgid "The default for every account. One person's exceptions are on their row under People. Switching a plugin off stops it being used and deletes nothing."
 msgstr "Numatytoji reikšmė kiekvienai paskyrai. Vieno asmens išimtys nurodytos jo eilutėje skiltyje „Žmonės“. Išjungus papildinį, jis nebenaudojamas, ir niekas neištrinama."
+
+#: src/postulo/core/views_backups.py
+msgid "The destination answered."
+msgstr ""
+
+#: src/postulo/core/offsite.py
+msgid "The destination did not say where it put the archive."
+msgstr ""
+
+#: src/postulo/core/offsite.py
+msgid "The destination gave no answer."
+msgstr ""
 
 #: src/postulo/jobs/capture_views.py
 msgid "the discarded captures"
@@ -17162,6 +17334,10 @@ msgstr "Kalbai įprasta"
 msgid "The last backup failed."
 msgstr "Paskutinė atsarginė kopija nepavyko."
 
+#: src/postulo/templates/server/overview.html
+msgid "The last backup sent to the destination did not arrive."
+msgstr ""
+
 #: src/postulo/templates/applications/report.html
 msgid "The last few weeks"
 msgstr "Pastarosios kelios savaitės"
@@ -17177,6 +17353,10 @@ msgstr[2] "Nepavyko išsiųsti paskutinių %(counter)s laiškų, kuriuos bandė 
 #: src/postulo/templates/jobs/capture_review.html
 msgid "The last one waiting."
 msgstr "Paskutinis laukiantis."
+
+#: src/postulo/templates/server/backups.html
+msgid "The last send failed."
+msgstr ""
 
 #: src/postulo/applications/widgets.py
 msgid "The last ten things the timeline recorded, whichever application they were on."
@@ -17496,6 +17676,10 @@ msgstr "Teikėjo žetono adresas peradresavo kitur, o Postulo peradresavimais ne
 msgid "The public employment service you are registered with. Add it under Companies, as a public employment service, if it is not here."
 msgstr "Valstybinė užimtumo tarnyba, kurioje esate užsiregistravę. Jei jos čia nėra, pridėkite ją skiltyje „Įmonės“ kaip valstybinę užimtumo tarnybą."
 
+#: src/postulo/core/models.py
+msgid "The public key every archive is encrypted to before it leaves, starting age1. Keep the identity that opens them somewhere other than this server."
+msgstr ""
+
 #: src/postulo/resume/candidate.py
 msgid "The publication it counts cannot be added, so it will be a count for all of your work."
 msgstr ""
@@ -17794,6 +17978,11 @@ msgstr "Šiam CV pasirinkto telefono numerio jūsų duomenyse nebėra, todėl ne
 msgid "The telephone number of %(name)s was not added."
 msgstr "Asmens %(name)s telefono numeris nepridėtas."
 
+#: src/postulo/core/views_backups.py
+#, python-format
+msgid "The test failed: %(problem)s"
+msgstr ""
+
 #: src/postulo/templates/documents/cv_text.html
 msgid "The text of this document"
 msgstr "Šio dokumento tekstas"
@@ -17801,6 +17990,10 @@ msgstr "Šio dokumento tekstas"
 #: src/postulo/templates/server/design.html
 msgid "The thing to do next"
 msgstr "Tai, ką daryti toliau"
+
+#: src/postulo/core/offsite.py
+msgid "The time for this send ran out before it began."
+msgstr ""
 
 #: src/postulo/templates/server/defaults.html
 #, python-format
@@ -17935,6 +18128,10 @@ msgstr "Grupė tokiu pavadinimu jau yra."
 #: src/postulo/jobs/slow.py
 msgid "There is no address to fetch it from again."
 msgstr "Nėra adreso, iš kurio būtų galima jį gauti dar kartą."
+
+#: src/postulo/core/views_backups.py
+msgid "There is no backup destination to send to."
+msgstr ""
 
 #: src/postulo/documents/archiving.py
 msgid "There is no file to send."
@@ -18731,6 +18928,11 @@ msgstr "perdavimo konfigūracija"
 msgid "transport secrets"
 msgstr "perdavimo paslaptys"
 
+#: src/postulo/templates/server/backups.html
+#, python-format
+msgid "Tried again at %(when)s."
+msgstr ""
+
 #: src/postulo/templates/server/overview.html
 msgid "Trusted:"
 msgstr "Patikimi:"
@@ -19082,6 +19284,10 @@ msgstr "naudotojai"
 msgid "Uses the saved settings, and sends to a real inbox. Test the connection first if you have just changed something."
 msgstr "Naudoja išsaugotus nustatymus ir siunčia į tikrą pašto dėžutę. Jei ką tik ką nors pakeitėte, pirmiausia išbandykite ryšį."
 
+#: src/postulo/templates/server/backup_destination.html
+msgid "Uses the saved settings. Nothing is stored there."
+msgstr ""
+
 #: src/postulo/templates/api/token_list.html
 msgid "Using a token"
 msgstr "Žetono naudojimas"
@@ -19186,6 +19392,7 @@ msgid "Voluntary support is this project's only income: one person writes it, an
 msgstr "Savanoriška parama – vienintelės šio projekto pajamos: jį rašo vienas žmogus, ir už tai niekas nėra skolingas ir nieko neatrakinama. Tai sakoma vieną kartą, čia, tam, kas prižiūri egzempliorių, – niekada tiems, kurie juo naudojasi ieškodami darbo, o daugeliui jų pinigai – visai ne tai, ką reikėtų duoti."
 
 #: src/postulo/core/models.py src/postulo/notifications/models.py
+#: src/postulo/templates/server/backups.html
 msgid "Waiting"
 msgstr "Laukiama"
 
@@ -19861,9 +20068,17 @@ msgstr "Jei kortelė turi meniu <em>Paslauga</em>, pasirinkite paslaugą, kurioj
 msgid "Where a value leads: an http or https address with <code dir=\"ltr\">{value}</code> where the identifier goes, after the host. <code dir=\"ltr\">person_link</code> is the address for a person, where that is another one."
 msgstr "Kur veda reikšmė: http ar https adresas su <code dir=\"ltr\">{value}</code> ten, kur eina identifikatorius, po serverio vardo. <code dir=\"ltr\">person_link</code> yra asmens adresas, kai jis kitoks."
 
+#: src/postulo/templates/server/backup_destination.html
+msgid "Where and how"
+msgstr ""
+
 #: src/postulo/applications/widgets.py
 msgid "Where and why applications end"
 msgstr "Kur ir kodėl paraiškos baigiasi"
+
+#: src/postulo/core/server_forms.py
+msgid "Where each archive is sent once it has been written and checked."
+msgstr ""
 
 #: src/postulo/resume/forms.py
 msgid "Where it can be read about. A CV does not print it."

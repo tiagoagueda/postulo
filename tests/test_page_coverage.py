@@ -302,6 +302,13 @@ EXCUSED: dict[str, str] = {
     "server:backup_upload": "a POST that keeps an archive after checking it",
     "server:backup_verify": "a POST that checks one archive, then returns to the list",
     "server:backup_download": "an archive arriving as a download",
+    "server:backup_destination_test": (
+        "a POST that asks the chosen backup destination to prove its settings; the form that "
+        "reaches it is on the destination page, which the suite visits"
+    ),
+    "server:backup_send": (
+        "a POST that queues one archive for the backup destination, then returns to the list"
+    ),
     "server:backup_delete": (
         "a confirmation page for one named archive file, and the walk has no archive to name; "
         "its markup is the one the People deletion page already has, which is visited"

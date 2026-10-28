@@ -95,6 +95,10 @@ EXCUSED: dict[str, str] = {
         "administrators only, and a file named in the address rather than an owned record; "
         "tests/security/test_backups_page.py"
     ),
+    "server:backup_send": (
+        "administrators only, and a file named in the address rather than an owned record; "
+        "tests/security/test_backups_page.py"
+    ),
     "server:backup_verify": (
         "administrators only, and a file named in the address rather than an owned record; "
         "tests/security/test_backups_page.py"

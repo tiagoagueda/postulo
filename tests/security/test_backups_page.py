@@ -63,6 +63,11 @@ def every_address(name: str) -> list[tuple[str, str]]:
         ("get", reverse("server:backup_delete", args=[name])),
         ("post", reverse("server:backup_delete", args=[name])),
         ("get", reverse("server:backup_restore", args=[name])),
+        # Where the archives go besides this disk (#325).
+        ("get", reverse("server:backup_destination")),
+        ("post", reverse("server:backup_destination")),
+        ("post", reverse("server:backup_destination_test")),
+        ("post", reverse("server:backup_send", args=[name])),
     ]
 
 
@@ -172,8 +177,8 @@ def test_the_last_trusted_archive_is_not_deleted(client, admin):
 )
 def test_a_name_that_is_not_one_of_ours_is_a_404(client, admin, name):
     sign_in_properly(client, admin)
-    for action in ("download", "verify", "delete", "restore"):
-        ask = client.post if action == "verify" else client.get
+    for action in ("download", "verify", "delete", "restore", "send"):
+        ask = client.post if action in ("verify", "send") else client.get
         response = ask(f"/server/backups/{name}/{action}/")
         assert response.status_code == 404, (name, action)
 
@@ -270,3 +275,42 @@ def test_one_of_ours_is_kept_and_leads_to_its_restore_page(client, admin):
     assert len(kept) == 1 and kept[0].startswith("postulo-upload-")
     assert 'data-restore="verified"' in response.content.decode()
     assert backups.archives()[0].uploaded
+
+
+# ------------------------------------------------------------- the destination (#325)
+
+
+def test_the_destination_page_never_draws_a_stored_secret(client, admin):
+    from postulo.core.memo import forget_current
+    from postulo.core.models import SiteSettings
+    from postulo.plugins import registry
+    from tests.test_backup_destinations import FakeVault
+
+    registry.register_builtin("backup-destination", FakeVault)
+    try:
+        row = SiteSettings.get()
+        row.backup_destination = "fake-vault"
+        row.backup_destination_config = {"bucket": "nightly"}
+        row.backup_destination_secrets = {"token": "never-on-a-page-0451"}
+        row.save()
+        forget_current()
+        client.force_login(admin)
+
+        for url in (reverse("server:backup_destination"), reverse("server:backups")):
+            html = client.get(url).content.decode()
+            assert "never-on-a-page-0451" not in html, url
+        assert "never-on-a-page-0451" not in row.backup_destination_secrets_encrypted
+    finally:
+        registry.unregister_builtin("backup-destination", FakeVault)
+
+
+def test_send_cannot_be_pointed_at_a_file_that_is_not_an_archive(client, admin, settings):
+    from postulo.core.models import OffsiteBackup
+
+    (settings.POSTULO_BACKUP_DIR / "notes.txt").write_text("x", encoding="utf-8")
+    client.force_login(admin)
+
+    response = client.post("/server/backups/notes.txt/send/")
+
+    assert response.status_code == 404
+    assert not OffsiteBackup.objects.exists()

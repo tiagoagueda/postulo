@@ -916,6 +916,11 @@ msgstr "%(name)s现在是标识符中的第%(place)s个。"
 msgid "%(name)s is now number %(place)s in the navigation."
 msgstr "%(name)s现在是导航中的第%(place)s个。"
 
+#: src/postulo/core/views_backups.py
+#, python-format
+msgid "%(name)s is queued; the scheduler sends it on its next pass."
+msgstr ""
+
 #: src/postulo/core/server_views.py
 #, python-format
 msgid "%(name)s is removed. Restart Postulo to be sure nothing of it is left loaded."
@@ -1096,7 +1101,7 @@ msgstr "%(period)s：选择其他时段"
 msgid "%(person)s is the last member of %(name)s, which still owns records. Give them to somebody, or delete them, first."
 msgstr "%(person)s是%(name)s的最后一名成员，而该分组仍拥有记录。请先将它们转交给他人或删除。"
 
-#: src/postulo/plugins/forms.py
+#: src/postulo/core/server_forms.py src/postulo/plugins/forms.py
 #, python-format
 msgid "%(plugin)s could not check these settings: %(error)s"
 msgstr "%(plugin)s无法检查这些设置：%(error)s"
@@ -1887,6 +1892,10 @@ msgstr "深蓝色。共十级色阶，界面只用到其中几级。"
 #: src/postulo/jobs/surface.py
 msgid "A department needs a name."
 msgstr "部门需要一个名称。"
+
+#: src/postulo/core/server_forms.py
+msgid "A destination needs an age recipient to encrypt to: nothing leaves this server unencrypted."
+msgstr ""
 
 #: src/postulo/templates/server/overview.html
 msgid "A document in a script shown in red is set in the server's fonts instead."
@@ -2993,6 +3002,10 @@ msgstr "航空航天"
 msgid "Africa"
 msgstr "非洲"
 
+#: src/postulo/core/models.py
+msgid "age recipient"
+msgstr ""
+
 #: src/postulo/templates/widgets/sources.html
 #, fuzzy
 msgid "Agency"
@@ -3673,6 +3686,10 @@ msgstr "学徒"
 msgid "Archived"
 msgstr "已归档"
 
+#: src/postulo/templates/server/backup_destination.html
+msgid "Archives are encrypted with age before they leave."
+msgstr ""
+
 #: src/postulo/templates/jobs/capture_page_forget.html
 #: src/postulo/templates/partials/confirm_delete.html
 msgid "Are you sure?"
@@ -3902,6 +3919,7 @@ msgid "Back in your listings."
 msgstr "已回到你的职位中。"
 
 #: src/postulo/templates/server/backup_delete.html
+#: src/postulo/templates/server/backup_destination.html
 #: src/postulo/templates/server/backup_restore.html
 msgid "Back to Backups"
 msgstr "返回备份"
@@ -3997,6 +4015,23 @@ msgstr "后端"
 #: src/postulo/templates/server/overview.html
 msgid "Background work"
 msgstr "后台任务"
+
+#: src/postulo/core/models.py
+msgid "backup destination"
+msgstr ""
+
+#: src/postulo/plugins/kinds.py
+#: src/postulo/templates/server/backup_destination.html
+msgid "Backup destination"
+msgstr ""
+
+#: src/postulo/core/models.py
+msgid "backup destination configuration"
+msgstr ""
+
+#: src/postulo/core/models.py
+msgid "backup destination secrets"
+msgstr ""
 
 #: src/postulo/core/server_sections.py src/postulo/core/views_backups.py
 #: src/postulo/templates/server/backups.html
@@ -4598,6 +4633,10 @@ msgstr "选项"
 msgid "Choose a country from the list."
 msgstr "请从列表中选择一个国家。"
 
+#: src/postulo/core/views_backups.py
+msgid "Choose a destination and save it first."
+msgstr ""
+
 #: src/postulo/resume/views.py
 msgid "Choose a Europass file first."
 msgstr "请先选择 Europass 文件。"
@@ -4687,6 +4726,10 @@ msgstr "选择号码所在的国家，并按当地的写法输入号码。也可
 #: src/postulo/templates/accounts/profile.html
 msgid "Choose the date of birth from a calendar"
 msgstr "从日历中选择出生日期"
+
+#: src/postulo/templates/server/backups.html
+msgid "Choose the destination"
+msgstr ""
 
 #: src/postulo/templates/resume/europass_import.html
 msgid "Choose the PDF you downloaded from europass.europa.eu, as it is: the CV is attached inside it, and that is what Postulo reads. Older Europass files read too: the XML and PDF of the editor before 2020, and the JSON of its web service. Postulo works out which it is, shows you what is in it, and writes nothing until you say so."
@@ -5792,6 +5835,10 @@ msgstr "设计"
 msgid "Design (Behance, Dribbble…)"
 msgstr "设计（Behance、Dribbble……）"
 
+#: src/postulo/core/server_forms.py
+msgid "Destination"
+msgstr ""
+
 #: src/postulo/core/design.py
 msgid "Destructive"
 msgstr "破坏性"
@@ -6466,6 +6513,11 @@ msgstr "此实例上的所有账户。管理员可以看到账户，但绝不会
 msgid "Every application, in order"
 msgstr "所有申请，按顺序排列"
 
+#: src/postulo/templates/server/backups.html
+#, python-format
+msgid "Every archive is encrypted to your age recipient and sent to %(label)s once it has been written and checked. An archive that has not arrived there is never deleted here."
+msgstr ""
+
 #: src/postulo/templates/jobs/company_places.html
 msgid "Every company address on the map, with the company's name, page, industries and how precise its point is: at its town, its postcode, by hand or from Wikidata. A contact's address and your own are never in it."
 msgstr "地图上的每个公司地址，附带公司的名称、页面、行业以及其位置的精确程度：按城镇、按邮政编码、手动或来自 Wikidata。联系人的地址和你自己的地址从不包含在内。"
@@ -6734,6 +6786,7 @@ msgid "Extra small"
 msgstr "特小"
 
 #: src/postulo/core/models.py src/postulo/documents/models.py
+#: src/postulo/templates/server/backups.html
 msgid "Failed"
 msgstr "失败"
 
@@ -8468,6 +8521,11 @@ msgstr "它会立即从此联系人移除，无需点击“保存”，且无法
 msgid "It comes off your details now, without waiting for Save, and cannot be put back."
 msgstr "它会立即从你的资料中移除，无需等待保存，且无法恢复。"
 
+#: src/postulo/core/offsite.py
+#, python-format
+msgid "It could not be encrypted: %(error)s"
+msgstr ""
+
 #: src/postulo/plugins/installing.py
 msgid "it could not be imported"
 msgstr "无法导入"
@@ -8783,6 +8841,10 @@ msgstr "保留我的备注"
 msgid "keep the newest"
 msgstr "保留最新的"
 
+#: src/postulo/core/models.py
+msgid "keep the newest there"
+msgstr ""
+
 #: src/postulo/templates/jobs/merge.html
 msgid "Keep the other one instead"
 msgstr "改为保留另一个"
@@ -9037,6 +9099,10 @@ msgstr "上次错误"
 msgid "Last name"
 msgstr "姓"
 
+#: src/postulo/templates/server/backups.html
+msgid "Last one that arrived"
+msgstr ""
+
 #: src/postulo/plugins/models.py
 msgid "last pushed"
 msgstr "上次推送"
@@ -9108,6 +9174,10 @@ msgstr "你参加过的学习，无论是否有结业证书。获得学位或文
 #: src/postulo/templates/resume/translations.html
 msgid "Leave a box empty and that line prints as it is written above it."
 msgstr "某个框留空时，该行按其上方所写的内容打印。"
+
+#: src/postulo/core/models.py
+msgid "Leave blank to keep as many there as here. 0 never deletes anything there. Only archives Postulo sent itself are ever deleted, and only after a new one has arrived."
+msgstr ""
 
 #: src/postulo/core/server_forms.py
 msgid "Leave blank to keep the one already stored."
@@ -10304,6 +10374,10 @@ msgstr "否"
 msgid "No address and no key, so nothing is offered from it."
 msgstr "没有地址也没有密钥，因此不会从中提供任何内容。"
 
+#: src/postulo/core/offsite.py
+msgid "No age recipient is set, and nothing leaves this machine unencrypted."
+msgstr ""
+
 #: src/postulo/applications/forms.py
 msgid "No agency"
 msgstr "无中介"
@@ -10319,6 +10393,10 @@ msgstr "不会改动任何申请，因此时间线不变。"
 #: src/postulo/templates/jobs/company_detail.html
 msgid "No appointments yet."
 msgstr "还没有约见。"
+
+#: src/postulo/templates/server/backup_destination.html
+msgid "No backup destination plugin is installed. Postulo ships none and names no provider: install one under Plugins, then choose it here."
+msgstr ""
 
 #: src/postulo/templates/server/backups.html
 msgid "No backups yet. Take one above."
@@ -10478,6 +10556,10 @@ msgstr "无媒体"
 #: src/postulo/documents/printing.py
 msgid "No messaging handle"
 msgstr "无通讯账号"
+
+#: src/postulo/templates/server/backups.html
+msgid "No more retries: send it again when the destination is fixed."
+msgstr ""
 
 #: src/postulo/documents/pdf.py
 #, python-format
@@ -10761,6 +10843,14 @@ msgstr "还没有。文档会在所有语言中打印上面的名称。"
 msgid "None yet. This entry prints its original text on every CV."
 msgstr "还没有。此条目在每份简历上都打印其原文。"
 
+#: src/postulo/core/server_forms.py
+msgid "None — backups stay on this server"
+msgstr ""
+
+#: src/postulo/templates/server/backups.html
+msgid "None: the archives stay on this server. A destination keeps a copy somewhere else, encrypted before it leaves."
+msgstr ""
+
 #: src/postulo/applications/models.py
 msgid "Normal"
 msgstr "常规"
@@ -10893,6 +10983,10 @@ msgstr "未保存"
 #: src/postulo/templates/settings/_save_status.html
 msgid "Not saved: Postulo could not be reached. Press Save when it can."
 msgstr "未保存：无法连接 Postulo。可以连接时请按“保存”。"
+
+#: src/postulo/templates/server/backups.html
+msgid "Not sent"
+msgstr ""
 
 #: src/postulo/templates/applications/partials/application_card.html
 msgid "Not sent yet"
@@ -11439,6 +11533,14 @@ msgstr "已关闭，因为它需要%(names)s，而其已关闭或未安装。"
 msgid "Off, because the module it belongs to is off."
 msgstr "已关闭，因为它所属的模块已关闭。"
 
+#: src/postulo/templates/server/backups.html
+msgid "Off-site"
+msgstr ""
+
+#: src/postulo/templates/server/backups.html
+msgid "Off-site copies"
+msgstr ""
+
 #: src/postulo/templates/settings/account.html
 msgid "Off. A code from an authenticator app, asked for after the password, means a leaked password alone is not enough."
 msgstr "关闭。登录时在密码之后再要求输入身份验证器应用中的验证码，这样仅泄露密码是不够的。"
@@ -11900,6 +12002,10 @@ msgstr "只有运维人员可以更改与你自己的账户或你所在分组相
 #: src/postulo/core/server_views.py
 msgid "Only the operator's own account can stop being an administrator."
 msgstr "只有运维人员自己的账户才能取消管理员身份。"
+
+#: src/postulo/templates/server/backup_destination.html
+msgid "Only the public key, the recipient, is kept here. Keep the identity that opens the archives somewhere other than this server, and keep a copy of it: without it no archive sent can be opened. Restoring starts by decrypting one by hand, as the wiki page about backups says."
+msgstr ""
 
 #: src/postulo/resume/forms.py
 msgid "Only the year prints on a CV, so the day makes no difference."
@@ -13806,6 +13912,14 @@ msgstr "移除{label}"
 msgid "removed on the other side"
 msgstr "已在另一端移除"
 
+#: src/postulo/core/models.py
+msgid "Removed there"
+msgstr ""
+
+#: src/postulo/templates/server/backups.html
+msgid "Removed there by retention"
+msgstr ""
+
 #: src/postulo/templates/documents/partials/comparison_line.html
 msgid "Removed:"
 msgstr "已移除："
@@ -14077,6 +14191,7 @@ msgstr "星期六"
 #: src/postulo/templates/partials/table/cell.html
 #: src/postulo/templates/resume/item_form.html
 #: src/postulo/templates/resume/translations.html
+#: src/postulo/templates/server/backup_destination.html
 #: src/postulo/templates/server/backups.html
 #: src/postulo/templates/server/capture.html
 #: src/postulo/templates/server/data_protection.html
@@ -14383,6 +14498,10 @@ msgctxt "type of event"
 msgid "Seminar"
 msgstr "研讨会"
 
+#: src/postulo/templates/server/backups.html
+msgid "Send"
+msgstr ""
+
 #: src/postulo/templates/server/email.html
 msgid "Send a real message"
 msgstr "发送真实消息"
@@ -14424,8 +14543,9 @@ msgstr "发送失败：%(error)s"
 msgid "Sends the DOI to doi.org, which passes it to Crossref or DataCite, and nothing else about you. Only the empty boxes are filled, and nothing is kept until you save."
 msgstr ""
 
-#: src/postulo/notifications/models.py
+#: src/postulo/core/models.py src/postulo/notifications/models.py
 #: src/postulo/templates/applications/report.html
+#: src/postulo/templates/server/backups.html
 #: src/postulo/templates/server/design.html
 #: src/postulo/templates/widgets/_source_table.html
 #: src/postulo/templates/widgets/industries.html
@@ -15181,6 +15301,10 @@ msgstr "出错了。详细信息请查看服务器日志。"
 msgid "Something worth knowing."
 msgstr "值得了解的信息。"
 
+#: src/postulo/templates/server/backup_destination.html
+msgid "Somewhere besides this server where every archive is sent once it has been written and checked, encrypted first."
+msgstr ""
+
 #: src/postulo/templates/server/design.html
 msgid "Somewhere else"
 msgstr "其他地方"
@@ -15744,6 +15868,7 @@ msgid "Terms not recorded"
 msgstr "未记录条款"
 
 #: src/postulo/templates/connections/list.html
+#: src/postulo/templates/server/backup_destination.html
 msgid "Test"
 msgstr "测试"
 
@@ -15755,6 +15880,10 @@ msgstr "测试失败：%(message)s"
 #: src/postulo/templates/server/email.html
 msgid "Test the connection"
 msgstr "测试连接"
+
+#: src/postulo/templates/server/backup_destination.html
+msgid "Test the destination"
+msgstr ""
 
 #: src/postulo/documents/models.py src/postulo/resume/models.py
 msgid "text"
@@ -16195,6 +16324,14 @@ msgstr "这不是 Wikidata 条目的标识符。"
 msgid "That is not an address Postulo can use."
 msgstr "Postulo 无法使用该地址。"
 
+#: src/postulo/core/offsite.py
+msgid "That is not an age recipient. It starts age1 and is 62 characters long."
+msgstr ""
+
+#: src/postulo/core/offsite.py
+msgid "That is not an age recipient: its checksum does not match."
+msgstr ""
+
 #: src/postulo/plugins/catalogue.py
 #, python-format
 msgid "That is not an Ed25519 public key: %(error)s"
@@ -16406,10 +16543,20 @@ msgid "The %(count)d file its history points at is kept where it is."
 msgid_plural "The %(count)d files its history points at are kept where they are."
 msgstr[0] "其历史记录指向的%(count)d个文件会原地保留。"
 
+#: src/postulo/templates/server/backups.html
+#, python-format
+msgid "The %(name)s destination is chosen but not installed, so nothing is being sent."
+msgstr ""
+
 #: src/postulo/documents/pdf.py
 #, python-format
 msgid "The %(name)s PDF backend is configured but not usable. %(hint)s"
 msgstr "%(name)s PDF 后端已配置，但无法使用。%(hint)s"
+
+#: src/postulo/core/offsite.py
+#, python-format
+msgid "The %(plugin)s destination is not installed or not chosen."
+msgstr ""
 
 #: src/postulo/documents/archiving.py src/postulo/plugins/syncing.py
 #, python-format
@@ -16473,6 +16620,19 @@ msgstr "在提供方注册的应用。它不是机密：机密是它旁边的那
 #, fuzzy
 msgid "The application sends on its own"
 msgstr "由应用自行发送"
+
+#: src/postulo/core/offsite.py
+msgid "The archive does not verify."
+msgstr ""
+
+#: src/postulo/core/offsite.py
+#, python-format
+msgid "The archive does not verify: %(problem)s"
+msgstr ""
+
+#: src/postulo/core/offsite.py
+msgid "The archive is no longer on this server."
+msgstr ""
 
 #: src/postulo/templates/server/backup_restore.html
 msgid "The archive is signed by this instance's key."
@@ -16712,6 +16872,18 @@ msgstr ""
 #: src/postulo/templates/server/plugins.html
 msgid "The default for every account. One person's exceptions are on their row under People. Switching a plugin off stops it being used and deletes nothing."
 msgstr "所有账户的默认设置。个人的例外设置在“人员”下各自的行中。关闭插件只会停止使用它，不会删除任何内容。"
+
+#: src/postulo/core/views_backups.py
+msgid "The destination answered."
+msgstr ""
+
+#: src/postulo/core/offsite.py
+msgid "The destination did not say where it put the archive."
+msgstr ""
+
+#: src/postulo/core/offsite.py
+msgid "The destination gave no answer."
+msgstr ""
 
 #: src/postulo/jobs/capture_views.py
 msgid "the discarded captures"
@@ -17030,6 +17202,10 @@ msgstr "语言默认"
 msgid "The last backup failed."
 msgstr "上次备份失败。"
 
+#: src/postulo/templates/server/overview.html
+msgid "The last backup sent to the destination did not arrive."
+msgstr ""
+
 #: src/postulo/templates/applications/report.html
 msgid "The last few weeks"
 msgstr "最近几周"
@@ -17043,6 +17219,10 @@ msgstr[0] "此实例最近尝试发送的%(counter)s封邮件发送失败。最�
 #: src/postulo/templates/jobs/capture_review.html
 msgid "The last one waiting."
 msgstr "最后一个待处理的。"
+
+#: src/postulo/templates/server/backups.html
+msgid "The last send failed."
+msgstr ""
 
 #: src/postulo/applications/widgets.py
 msgid "The last ten things the timeline recorded, whichever application they were on."
@@ -17361,6 +17541,10 @@ msgstr "提供商的令牌地址发生了重定向，Postulo 不会跟随。"
 msgid "The public employment service you are registered with. Add it under Companies, as a public employment service, if it is not here."
 msgstr "你所登记的公共就业服务机构。如果这里没有，请在“公司”下将其添加为公共就业服务机构。"
 
+#: src/postulo/core/models.py
+msgid "The public key every archive is encrypted to before it leaves, starting age1. Keep the identity that opens them somewhere other than this server."
+msgstr ""
+
 #: src/postulo/resume/candidate.py
 msgid "The publication it counts cannot be added, so it will be a count for all of your work."
 msgstr ""
@@ -17662,6 +17846,11 @@ msgstr "为此简历选择的电话号码已不在你的资料中，因此不会
 msgid "The telephone number of %(name)s was not added."
 msgstr "未添加%(name)s的电话号码。"
 
+#: src/postulo/core/views_backups.py
+#, python-format
+msgid "The test failed: %(problem)s"
+msgstr ""
+
 #: src/postulo/templates/documents/cv_text.html
 msgid "The text of this document"
 msgstr "此文档的文本"
@@ -17669,6 +17858,10 @@ msgstr "此文档的文本"
 #: src/postulo/templates/server/design.html
 msgid "The thing to do next"
 msgstr "下一步要做的事"
+
+#: src/postulo/core/offsite.py
+msgid "The time for this send ran out before it began."
+msgstr ""
 
 #: src/postulo/templates/server/defaults.html
 #, python-format
@@ -17804,6 +17997,10 @@ msgstr "已有同名分组。"
 #: src/postulo/jobs/slow.py
 msgid "There is no address to fetch it from again."
 msgstr "没有可以重新获取的地址。"
+
+#: src/postulo/core/views_backups.py
+msgid "There is no backup destination to send to."
+msgstr ""
 
 #: src/postulo/documents/archiving.py
 msgid "There is no file to send."
@@ -18598,6 +18795,11 @@ msgstr "传输配置"
 msgid "transport secrets"
 msgstr "传输机密信息"
 
+#: src/postulo/templates/server/backups.html
+#, python-format
+msgid "Tried again at %(when)s."
+msgstr ""
+
 #: src/postulo/templates/server/overview.html
 msgid "Trusted:"
 msgstr "受信任："
@@ -18951,6 +19153,10 @@ msgstr "用户"
 msgid "Uses the saved settings, and sends to a real inbox. Test the connection first if you have just changed something."
 msgstr "使用已保存的设置，并发送到真实的收件箱。如果你刚修改了设置，请先测试连接。"
 
+#: src/postulo/templates/server/backup_destination.html
+msgid "Uses the saved settings. Nothing is stored there."
+msgstr ""
+
 #: src/postulo/templates/api/token_list.html
 msgid "Using a token"
 msgstr "使用令牌"
@@ -19055,6 +19261,7 @@ msgid "Voluntary support is this project's only income: one person writes it, an
 msgstr "自愿资助是这个项目唯一的收入：它由一个人编写，这里的任何内容都不涉及欠款或解锁功能。这句话只在这里说一次，只对运行此实例的人说——绝不对使用它找工作的人说，对他们中的许多人来说，钱并不是合适的回报。"
 
 #: src/postulo/core/models.py src/postulo/notifications/models.py
+#: src/postulo/templates/server/backups.html
 msgid "Waiting"
 msgstr "等待中"
 
@@ -19737,9 +19944,17 @@ msgstr "如果卡片有<em>服务</em>菜单，请选择该地址所在的服务
 msgid "Where a value leads: an http or https address with <code dir=\"ltr\">{value}</code> where the identifier goes, after the host. <code dir=\"ltr\">person_link</code> is the address for a person, where that is another one."
 msgstr "值所指向的位置：一个 http 或 https 地址，在主机之后、标识符所在的位置写<code dir=\"ltr\">{value}</code>。<code dir=\"ltr\">person_link</code>是指向个人的地址（如果它与前者不同）。"
 
+#: src/postulo/templates/server/backup_destination.html
+msgid "Where and how"
+msgstr ""
+
 #: src/postulo/applications/widgets.py
 msgid "Where and why applications end"
 msgstr "申请在何处结束以及原因"
+
+#: src/postulo/core/server_forms.py
+msgid "Where each archive is sent once it has been written and checked."
+msgstr ""
 
 #: src/postulo/resume/forms.py
 msgid "Where it can be read about. A CV does not print it."

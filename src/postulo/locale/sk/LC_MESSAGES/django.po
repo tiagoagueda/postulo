@@ -1076,6 +1076,11 @@ msgstr "%(name)s je teraz v identifikátoroch na pozícii %(place)s."
 msgid "%(name)s is now number %(place)s in the navigation."
 msgstr "%(name)s je teraz v navigácii na mieste %(place)s."
 
+#: src/postulo/core/views_backups.py
+#, python-format
+msgid "%(name)s is queued; the scheduler sends it on its next pass."
+msgstr ""
+
 #: src/postulo/core/server_views.py
 #, python-format
 msgid "%(name)s is removed. Restart Postulo to be sure nothing of it is left loaded."
@@ -1256,7 +1261,7 @@ msgstr "%(period)s: vyberte iné obdobie"
 msgid "%(person)s is the last member of %(name)s, which still owns records. Give them to somebody, or delete them, first."
 msgstr "%(person)s je posledný člen skupiny %(name)s, ktorá stále vlastní záznamy. Najprv ich niekomu odovzdajte alebo ich vymažte."
 
-#: src/postulo/plugins/forms.py
+#: src/postulo/core/server_forms.py src/postulo/plugins/forms.py
 #, python-format
 msgid "%(plugin)s could not check these settings: %(error)s"
 msgstr "%(plugin)s nemohol tieto nastavenia skontrolovať: %(error)s"
@@ -2081,6 +2086,10 @@ msgstr "Tmavomodrá. Desať odtieňov, z ktorých rozhranie používa len nieko�
 #: src/postulo/jobs/surface.py
 msgid "A department needs a name."
 msgstr "Oddelenie potrebuje názov."
+
+#: src/postulo/core/server_forms.py
+msgid "A destination needs an age recipient to encrypt to: nothing leaves this server unencrypted."
+msgstr ""
 
 #: src/postulo/templates/server/overview.html
 msgid "A document in a script shown in red is set in the server's fonts instead."
@@ -3197,6 +3206,10 @@ msgstr "Letectvo a kozmonautika"
 msgid "Africa"
 msgstr "Afrika"
 
+#: src/postulo/core/models.py
+msgid "age recipient"
+msgstr ""
+
 #: src/postulo/templates/widgets/sources.html
 msgid "Agency"
 msgstr "Agentúra"
@@ -3883,6 +3896,10 @@ msgstr "Učňovský pomer"
 msgid "Archived"
 msgstr "Archivované"
 
+#: src/postulo/templates/server/backup_destination.html
+msgid "Archives are encrypted with age before they leave."
+msgstr ""
+
 #: src/postulo/templates/jobs/capture_page_forget.html
 #: src/postulo/templates/partials/confirm_delete.html
 msgid "Are you sure?"
@@ -4110,6 +4127,7 @@ msgid "Back in your listings."
 msgstr "Opäť medzi vašimi inzerátmi."
 
 #: src/postulo/templates/server/backup_delete.html
+#: src/postulo/templates/server/backup_destination.html
 #: src/postulo/templates/server/backup_restore.html
 msgid "Back to Backups"
 msgstr "Späť na zálohy"
@@ -4205,6 +4223,23 @@ msgstr "Backend"
 #: src/postulo/templates/server/overview.html
 msgid "Background work"
 msgstr "Práca na pozadí"
+
+#: src/postulo/core/models.py
+msgid "backup destination"
+msgstr ""
+
+#: src/postulo/plugins/kinds.py
+#: src/postulo/templates/server/backup_destination.html
+msgid "Backup destination"
+msgstr ""
+
+#: src/postulo/core/models.py
+msgid "backup destination configuration"
+msgstr ""
+
+#: src/postulo/core/models.py
+msgid "backup destination secrets"
+msgstr ""
 
 #: src/postulo/core/server_sections.py src/postulo/core/views_backups.py
 #: src/postulo/templates/server/backups.html
@@ -4804,6 +4839,10 @@ msgstr "Možnosti"
 msgid "Choose a country from the list."
 msgstr "Vyberte krajinu zo zoznamu."
 
+#: src/postulo/core/views_backups.py
+msgid "Choose a destination and save it first."
+msgstr ""
+
 #: src/postulo/resume/views.py
 msgid "Choose a Europass file first."
 msgstr "Najprv vyberte súbor Europass."
@@ -4893,6 +4932,10 @@ msgstr "Vyberte krajinu, v ktorej je číslo, a napíšte číslo tak, ako sa ta
 #: src/postulo/templates/accounts/profile.html
 msgid "Choose the date of birth from a calendar"
 msgstr "Vyberte dátum narodenia z kalendára"
+
+#: src/postulo/templates/server/backups.html
+msgid "Choose the destination"
+msgstr ""
 
 #: src/postulo/templates/resume/europass_import.html
 msgid "Choose the PDF you downloaded from europass.europa.eu, as it is: the CV is attached inside it, and that is what Postulo reads. Older Europass files read too: the XML and PDF of the editor before 2020, and the JSON of its web service. Postulo works out which it is, shows you what is in it, and writes nothing until you say so."
@@ -6001,6 +6044,10 @@ msgstr "Dizajn"
 msgid "Design (Behance, Dribbble…)"
 msgstr "Dizajn (Behance, Dribbble…)"
 
+#: src/postulo/core/server_forms.py
+msgid "Destination"
+msgstr ""
+
 #: src/postulo/core/design.py
 msgid "Destructive"
 msgstr "Deštruktívne"
@@ -6672,6 +6719,11 @@ msgstr "Všetky účty v tejto inštancii. Správcovia vidia účty, nikdy nie p
 msgid "Every application, in order"
 msgstr "Všetky žiadosti v poradí"
 
+#: src/postulo/templates/server/backups.html
+#, python-format
+msgid "Every archive is encrypted to your age recipient and sent to %(label)s once it has been written and checked. An archive that has not arrived there is never deleted here."
+msgstr ""
+
 #: src/postulo/templates/jobs/company_places.html
 msgid "Every company address on the map, with the company's name, page, industries and how precise its point is: at its town, its postcode, by hand or from Wikidata. A contact's address and your own are never in it."
 msgstr "Každá adresa firmy na mape s názvom firmy, jej stránkou, odvetviami a presnosťou jej bodu: podľa mesta, podľa PSČ, ručne alebo z Wikidata. Adresy kontaktov ani vaša vlastná adresa v ňom nikdy nie sú."
@@ -6940,6 +6992,7 @@ msgid "Extra small"
 msgstr "Extra malé"
 
 #: src/postulo/core/models.py src/postulo/documents/models.py
+#: src/postulo/templates/server/backups.html
 msgid "Failed"
 msgstr "Zlyhalo"
 
@@ -8669,6 +8722,11 @@ msgstr "Z tohto kontaktu sa odstráni hneď, bez čakania na Uložiť, a nedá s
 msgid "It comes off your details now, without waiting for Save, and cannot be put back."
 msgstr "Odstráni sa z vašich údajov hneď, bez čakania na tlačidlo Uložiť, a nedá sa vrátiť."
 
+#: src/postulo/core/offsite.py
+#, python-format
+msgid "It could not be encrypted: %(error)s"
+msgstr ""
+
 #: src/postulo/plugins/installing.py
 msgid "it could not be imported"
 msgstr "nepodarilo sa importovať"
@@ -8981,6 +9039,10 @@ msgstr "Ponechať moje poznámky"
 msgid "keep the newest"
 msgstr "ponechať najnovšie"
 
+#: src/postulo/core/models.py
+msgid "keep the newest there"
+msgstr ""
+
 #: src/postulo/templates/jobs/merge.html
 msgid "Keep the other one instead"
 msgstr "Ponechať radšej to druhé"
@@ -9236,6 +9298,10 @@ msgstr "posledná chyba"
 msgid "Last name"
 msgstr "Priezvisko"
 
+#: src/postulo/templates/server/backups.html
+msgid "Last one that arrived"
+msgstr ""
+
 #: src/postulo/plugins/models.py
 msgid "last pushed"
 msgstr "naposledy odoslané"
@@ -9307,6 +9373,10 @@ msgstr "Vzdelávanie, ktoré ste absolvovali, s potvrdením o účasti alebo bez
 #: src/postulo/templates/resume/translations.html
 msgid "Leave a box empty and that line prints as it is written above it."
 msgstr "Nechajte pole prázdne a tento riadok sa vytlačí tak, ako je napísaný nad ním."
+
+#: src/postulo/core/models.py
+msgid "Leave blank to keep as many there as here. 0 never deletes anything there. Only archives Postulo sent itself are ever deleted, and only after a new one has arrived."
+msgstr ""
 
 #: src/postulo/core/server_forms.py
 msgid "Leave blank to keep the one already stored."
@@ -10494,6 +10564,10 @@ msgstr "Nie"
 msgid "No address and no key, so nothing is offered from it."
 msgstr "Bez adresy a bez kľúča, takže sa z neho nič neponúka."
 
+#: src/postulo/core/offsite.py
+msgid "No age recipient is set, and nothing leaves this machine unencrypted."
+msgstr ""
+
 #: src/postulo/applications/forms.py
 msgid "No agency"
 msgstr "Bez agentúry"
@@ -10509,6 +10583,10 @@ msgstr "Nemení sa nijaká žiadosť, takže sa nezmení ani časová os."
 #: src/postulo/templates/jobs/company_detail.html
 msgid "No appointments yet."
 msgstr "Zatiaľ žiadne stretnutia."
+
+#: src/postulo/templates/server/backup_destination.html
+msgid "No backup destination plugin is installed. Postulo ships none and names no provider: install one under Plugins, then choose it here."
+msgstr ""
 
 #: src/postulo/templates/server/backups.html
 msgid "No backups yet. Take one above."
@@ -10666,6 +10744,10 @@ msgstr "Žiadne médiá"
 #: src/postulo/documents/printing.py
 msgid "No messaging handle"
 msgstr "Žiadne používateľské meno v komunikačnej službe"
+
+#: src/postulo/templates/server/backups.html
+msgid "No more retries: send it again when the destination is fixed."
+msgstr ""
 
 #: src/postulo/documents/pdf.py
 #, python-format
@@ -10951,6 +11033,14 @@ msgstr "Zatiaľ žiadne. Dokumenty uvádzajú názov vyššie vo všetkých jazy
 msgid "None yet. This entry prints its original text on every CV."
 msgstr "Zatiaľ žiadne. Tento záznam sa v každom životopise vytlačí s pôvodným textom."
 
+#: src/postulo/core/server_forms.py
+msgid "None — backups stay on this server"
+msgstr ""
+
+#: src/postulo/templates/server/backups.html
+msgid "None: the archives stay on this server. A destination keeps a copy somewhere else, encrypted before it leaves."
+msgstr ""
+
 #: src/postulo/applications/models.py
 msgid "Normal"
 msgstr "Normálna"
@@ -11083,6 +11173,10 @@ msgstr "Neuložené"
 #: src/postulo/templates/settings/_save_status.html
 msgid "Not saved: Postulo could not be reached. Press Save when it can."
 msgstr "Neuložené: Postulo nie je dostupné. Stlačte Uložiť, keď bude."
+
+#: src/postulo/templates/server/backups.html
+msgid "Not sent"
+msgstr ""
 
 #: src/postulo/templates/applications/partials/application_card.html
 msgid "Not sent yet"
@@ -11631,6 +11725,14 @@ msgstr "Vypnuté, pretože vyžaduje: %(names)s – vypnuté alebo nenainštalov
 msgid "Off, because the module it belongs to is off."
 msgstr "Vypnuté, pretože modul, do ktorého patrí, je vypnutý."
 
+#: src/postulo/templates/server/backups.html
+msgid "Off-site"
+msgstr ""
+
+#: src/postulo/templates/server/backups.html
+msgid "Off-site copies"
+msgstr ""
+
 #: src/postulo/templates/settings/account.html
 msgid "Off. A code from an authenticator app, asked for after the password, means a leaked password alone is not enough."
 msgstr "Vypnuté. Kód z overovacej aplikácie, vyžadovaný po hesle, znamená, že uniknuté heslo samo nestačí."
@@ -12124,6 +12226,10 @@ msgstr "Pravidlo o vašom vlastnom účte alebo o niektorej z vašich skupín m�
 #: src/postulo/core/server_views.py
 msgid "Only the operator's own account can stop being an administrator."
 msgstr "Prestať byť správcom môže iba vlastný účet správcu servera."
+
+#: src/postulo/templates/server/backup_destination.html
+msgid "Only the public key, the recipient, is kept here. Keep the identity that opens the archives somewhere other than this server, and keep a copy of it: without it no archive sent can be opened. Restoring starts by decrypting one by hand, as the wiki page about backups says."
+msgstr ""
 
 #: src/postulo/resume/forms.py
 msgid "Only the year prints on a CV, so the day makes no difference."
@@ -14033,6 +14139,14 @@ msgstr "Odstrániť {label}"
 msgid "removed on the other side"
 msgstr "odstránené na druhej strane"
 
+#: src/postulo/core/models.py
+msgid "Removed there"
+msgstr ""
+
+#: src/postulo/templates/server/backups.html
+msgid "Removed there by retention"
+msgstr ""
+
 #: src/postulo/templates/documents/partials/comparison_line.html
 msgid "Removed:"
 msgstr "Odstránené:"
@@ -14305,6 +14419,7 @@ msgstr "Sobota"
 #: src/postulo/templates/partials/table/cell.html
 #: src/postulo/templates/resume/item_form.html
 #: src/postulo/templates/resume/translations.html
+#: src/postulo/templates/server/backup_destination.html
 #: src/postulo/templates/server/backups.html
 #: src/postulo/templates/server/capture.html
 #: src/postulo/templates/server/data_protection.html
@@ -14611,6 +14726,10 @@ msgctxt "type of event"
 msgid "Seminar"
 msgstr "Seminár"
 
+#: src/postulo/templates/server/backups.html
+msgid "Send"
+msgstr ""
+
 #: src/postulo/templates/server/email.html
 msgid "Send a real message"
 msgstr "Odoslať skutočnú správu"
@@ -14652,8 +14771,9 @@ msgstr "Odoslanie zlyhalo: %(error)s"
 msgid "Sends the DOI to doi.org, which passes it to Crossref or DataCite, and nothing else about you. Only the empty boxes are filled, and nothing is kept until you save."
 msgstr ""
 
-#: src/postulo/notifications/models.py
+#: src/postulo/core/models.py src/postulo/notifications/models.py
 #: src/postulo/templates/applications/report.html
+#: src/postulo/templates/server/backups.html
 #: src/postulo/templates/server/design.html
 #: src/postulo/templates/widgets/_source_table.html
 #: src/postulo/templates/widgets/industries.html
@@ -15408,6 +15528,10 @@ msgstr "Niečo sa pokazilo. Podrobnosti sú v logu servera."
 msgid "Something worth knowing."
 msgstr "Niečo, čo sa oplatí vedieť."
 
+#: src/postulo/templates/server/backup_destination.html
+msgid "Somewhere besides this server where every archive is sent once it has been written and checked, encrypted first."
+msgstr ""
+
 #: src/postulo/templates/server/design.html
 msgid "Somewhere else"
 msgstr "Niekde inde"
@@ -15963,6 +16087,7 @@ msgid "Terms not recorded"
 msgstr "Podmienky nezaznamenané"
 
 #: src/postulo/templates/connections/list.html
+#: src/postulo/templates/server/backup_destination.html
 msgid "Test"
 msgstr "Otestovať"
 
@@ -15974,6 +16099,10 @@ msgstr "Test zlyhal: %(message)s"
 #: src/postulo/templates/server/email.html
 msgid "Test the connection"
 msgstr "Otestovať pripojenie"
+
+#: src/postulo/templates/server/backup_destination.html
+msgid "Test the destination"
+msgstr ""
 
 #: src/postulo/documents/models.py src/postulo/resume/models.py
 msgid "text"
@@ -16418,6 +16547,14 @@ msgstr "To nie je identifikátor položky Wikidata."
 msgid "That is not an address Postulo can use."
 msgstr "Toto nie je adresa, ktorú Postulo môže použiť."
 
+#: src/postulo/core/offsite.py
+msgid "That is not an age recipient. It starts age1 and is 62 characters long."
+msgstr ""
+
+#: src/postulo/core/offsite.py
+msgid "That is not an age recipient: its checksum does not match."
+msgstr ""
+
 #: src/postulo/plugins/catalogue.py
 #, python-format
 msgid "That is not an Ed25519 public key: %(error)s"
@@ -16634,10 +16771,20 @@ msgstr[0] "%(count)d súbor, na ktorý odkazuje jeho história, zostane na svojo
 msgstr[1] "%(count)d súbory, na ktoré odkazuje jeho história, zostanú na svojom mieste."
 msgstr[2] "%(count)d súborov, na ktoré odkazuje jeho história, zostane na svojom mieste."
 
+#: src/postulo/templates/server/backups.html
+#, python-format
+msgid "The %(name)s destination is chosen but not installed, so nothing is being sent."
+msgstr ""
+
 #: src/postulo/documents/pdf.py
 #, python-format
 msgid "The %(name)s PDF backend is configured but not usable. %(hint)s"
 msgstr "Nástroj PDF %(name)s je nastavený, ale nedá sa použiť. %(hint)s"
+
+#: src/postulo/core/offsite.py
+#, python-format
+msgid "The %(plugin)s destination is not installed or not chosen."
+msgstr ""
 
 #: src/postulo/documents/archiving.py src/postulo/plugins/syncing.py
 #, python-format
@@ -16700,6 +16847,19 @@ msgstr "Aplikácia zaregistrovaná u poskytovateľa. Nie je tajná: tajný je k�
 #: src/postulo/core/mail_choices.py
 msgid "The application sends on its own"
 msgstr "Aplikácia odosiela samostatne"
+
+#: src/postulo/core/offsite.py
+msgid "The archive does not verify."
+msgstr ""
+
+#: src/postulo/core/offsite.py
+#, python-format
+msgid "The archive does not verify: %(problem)s"
+msgstr ""
+
+#: src/postulo/core/offsite.py
+msgid "The archive is no longer on this server."
+msgstr ""
 
 #: src/postulo/templates/server/backup_restore.html
 msgid "The archive is signed by this instance's key."
@@ -16937,6 +17097,18 @@ msgstr ""
 #: src/postulo/templates/server/plugins.html
 msgid "The default for every account. One person's exceptions are on their row under People. Switching a plugin off stops it being used and deletes nothing."
 msgstr "Predvolené pre každý účet. Výnimky pre jednotlivú osobu sú v jej riadku v sekcii Ľudia. Vypnutie zásuvného modulu zastaví jeho používanie a nič nemaže."
+
+#: src/postulo/core/views_backups.py
+msgid "The destination answered."
+msgstr ""
+
+#: src/postulo/core/offsite.py
+msgid "The destination did not say where it put the archive."
+msgstr ""
+
+#: src/postulo/core/offsite.py
+msgid "The destination gave no answer."
+msgstr ""
 
 #: src/postulo/jobs/capture_views.py
 msgid "the discarded captures"
@@ -17260,6 +17432,10 @@ msgstr "Zvyklosť jazyka"
 msgid "The last backup failed."
 msgstr "Posledná záloha zlyhala."
 
+#: src/postulo/templates/server/overview.html
+msgid "The last backup sent to the destination did not arrive."
+msgstr ""
+
 #: src/postulo/templates/applications/report.html
 msgid "The last few weeks"
 msgstr "Posledné týždne"
@@ -17275,6 +17451,10 @@ msgstr[2] "Posledných %(counter)s správ, ktoré sa táto inštancia pokúsila 
 #: src/postulo/templates/jobs/capture_review.html
 msgid "The last one waiting."
 msgstr "Posledné čakajúce."
+
+#: src/postulo/templates/server/backups.html
+msgid "The last send failed."
+msgstr ""
 
 #: src/postulo/applications/widgets.py
 msgid "The last ten things the timeline recorded, whichever application they were on."
@@ -17595,6 +17775,10 @@ msgstr "Adresa tokenu poskytovateľa presmerovala a Postulo presmerovanie nesled
 msgid "The public employment service you are registered with. Add it under Companies, as a public employment service, if it is not here."
 msgstr "Verejná služba zamestnanosti, v ktorej ste zaregistrovaní. Ak tu nie je, pridajte ju vo Firmách ako verejnú službu zamestnanosti."
 
+#: src/postulo/core/models.py
+msgid "The public key every archive is encrypted to before it leaves, starting age1. Keep the identity that opens them somewhere other than this server."
+msgstr ""
+
 #: src/postulo/resume/candidate.py
 msgid "The publication it counts cannot be added, so it will be a count for all of your work."
 msgstr ""
@@ -17895,6 +18079,11 @@ msgstr "Telefónne číslo zvolené pre tento životopis už nie je vo vašich �
 msgid "The telephone number of %(name)s was not added."
 msgstr "Telefónne číslo osoby %(name)s sa nepridalo."
 
+#: src/postulo/core/views_backups.py
+#, python-format
+msgid "The test failed: %(problem)s"
+msgstr ""
+
 #: src/postulo/templates/documents/cv_text.html
 msgid "The text of this document"
 msgstr "Text tohto dokumentu"
@@ -17902,6 +18091,10 @@ msgstr "Text tohto dokumentu"
 #: src/postulo/templates/server/design.html
 msgid "The thing to do next"
 msgstr "Ďalší krok"
+
+#: src/postulo/core/offsite.py
+msgid "The time for this send ran out before it began."
+msgstr ""
 
 #: src/postulo/templates/server/defaults.html
 #, python-format
@@ -18037,6 +18230,10 @@ msgstr "Skupina s týmto názvom už existuje."
 #: src/postulo/jobs/slow.py
 msgid "There is no address to fetch it from again."
 msgstr "Nie je k dispozícii adresa, z ktorej by sa to dalo znova načítať."
+
+#: src/postulo/core/views_backups.py
+msgid "There is no backup destination to send to."
+msgstr ""
 
 #: src/postulo/documents/archiving.py
 msgid "There is no file to send."
@@ -18838,6 +19035,11 @@ msgstr "konfigurácia prenosu"
 msgid "transport secrets"
 msgstr "tajné kľúče prenosu"
 
+#: src/postulo/templates/server/backups.html
+#, python-format
+msgid "Tried again at %(when)s."
+msgstr ""
+
 #: src/postulo/templates/server/overview.html
 msgid "Trusted:"
 msgstr "Dôveryhodné:"
@@ -19191,6 +19393,10 @@ msgstr "používatelia"
 msgid "Uses the saved settings, and sends to a real inbox. Test the connection first if you have just changed something."
 msgstr "Používa uložené nastavenia a odosiela do skutočnej schránky. Ak ste práve niečo zmenili, otestujte najprv pripojenie."
 
+#: src/postulo/templates/server/backup_destination.html
+msgid "Uses the saved settings. Nothing is stored there."
+msgstr ""
+
 #: src/postulo/templates/api/token_list.html
 msgid "Using a token"
 msgstr "Použitie tokenu"
@@ -19296,6 +19502,7 @@ msgid "Voluntary support is this project's only income: one person writes it, an
 msgstr "Dobrovoľná podpora je jediným príjmom tohto projektu: píše ho jeden človek a nič z toho nezakladá záväzok ani nič neodomyká. Hovorí sa to len raz, tu, tomu, kto prevádzkuje inštanciu – nikdy nie ľuďom, ktorí ju používajú na hľadanie práce; pre mnohých z nich peniaze nie sú to správne, čo by mali dávať."
 
 #: src/postulo/core/models.py src/postulo/notifications/models.py
+#: src/postulo/templates/server/backups.html
 msgid "Waiting"
 msgstr "Čaká"
 
@@ -19975,9 +20182,17 @@ msgstr "Kde má karta zoznam <em>Služba</em>, vyberte službu, na ktorej je adr
 msgid "Where a value leads: an http or https address with <code dir=\"ltr\">{value}</code> where the identifier goes, after the host. <code dir=\"ltr\">person_link</code> is the address for a person, where that is another one."
 msgstr "Kam hodnota vedie: adresa http alebo https s <code dir=\"ltr\">{value}</code> tam, kde ide identifikátor, za hostiteľom. <code dir=\"ltr\">person_link</code> je adresa pre osobu, ak je to iná."
 
+#: src/postulo/templates/server/backup_destination.html
+msgid "Where and how"
+msgstr ""
+
 #: src/postulo/applications/widgets.py
 msgid "Where and why applications end"
 msgstr "Kde a prečo žiadosti končia"
+
+#: src/postulo/core/server_forms.py
+msgid "Where each archive is sent once it has been written and checked."
+msgstr ""
 
 #: src/postulo/resume/forms.py
 msgid "Where it can be read about. A CV does not print it."

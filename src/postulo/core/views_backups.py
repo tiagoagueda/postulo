@@ -43,7 +43,7 @@ from django.views.generic import UpdateView
 
 from postulo.accounts.reauth import reauthentication_required
 
-from . import backups, errands, site
+from . import backups, errands, offsite, site
 from .backup import (
     AUTHENTIC,
     BackupError,
@@ -54,7 +54,7 @@ from .backup import (
     verify_backup,
 )
 from .models import Errand, ErrandState, SiteSettings
-from .server_forms import BackupScheduleForm
+from .server_forms import BackupDestinationForm, BackupScheduleForm
 from .server_views import ServerSectionMixin
 from .views_errands import state_context
 
@@ -134,8 +134,16 @@ class BackupsView(BackupsMixin, UpdateView):
         asked = self.request.GET.get("errand", "")
         if asked.isdigit():
             errand = Errand.objects.for_user(self.request.user).filter(pk=int(asked)).first()
+        destination = offsite.selected()
+        sends = offsite.states(archive.name for archive in listed)
+        for archive in listed:
+            # Where each one went (#325): sent, waiting, or failed in the plugin's words.
+            archive.offsite = sends.get(archive.name)
         context.update(
             {
+                "destination": destination,
+                "destination_missing": bool(row.backup_destination) and destination is None,
+                "offsite_max_attempts": offsite.MAX_ATTEMPTS,
                 "archives": listed,
                 "backup_dir": backups.directory(),
                 "free_bytes": free,
@@ -346,3 +354,99 @@ class BackupRestoreView(BackupsMixin, View):
                 "instance": site.instance_name(),
             },
         )
+
+
+class BackupDestinationView(BackupsMixin, UpdateView):
+    """Where the archives go besides this disk, and what they are encrypted to (#325).
+
+    A page of its own rather than a second form on the list, because a destination's fields
+    depend on which one is chosen and the page that draws them has to come back with them.
+    Saving it writes a line naming who, and which destination, to the log.
+    """
+
+    model = SiteSettings
+    form_class = BackupDestinationForm
+    template_name = "server/backup_destination.html"
+
+    def get_object(self, queryset=None) -> SiteSettings:
+        return SiteSettings.get()
+
+    def get_success_url(self) -> str:
+        return reverse("server:backup_destination")
+
+    def form_valid(self, form):
+        before = SiteSettings.get().backup_destination
+        form.instance.updated_by = self.request.user
+        response = super().form_valid(form)
+        after = self.object.backup_destination
+        logger.warning(
+            "Backup destination %s by %s (was %s).",
+            f"set to {after}" if after else "removed",
+            self.request.user.get_username(),
+            before or "none",
+        )
+        messages.success(self.request, _("Saved."))
+        return response
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update(
+            {
+                "installed": offsite.available(),
+                "destination": offsite.selected(),
+                "plugin_fields": context["form"].plugin_fields(),
+            }
+        )
+        return context
+
+
+class BackupDestinationTestView(BackupsMixin, View):
+    """*Test*: the chosen destination proves its settings, without storing an archive."""
+
+    def post(self, request: HttpRequest) -> HttpResponse:
+        plugin = offsite.selected()
+        if plugin is None:
+            messages.error(request, _("Choose a destination and save it first."))
+            return redirect("server:backup_destination")
+        try:
+            result = offsite.test(plugin, offsite.configuration())
+        except Exception as error:  # an unreadable secret, said rather than raised
+            result = None
+            messages.error(request, str(error))
+        if result is not None:
+            logger.info(
+                "Backup destination %s tested by %s: %s",
+                plugin.name,
+                request.user.get_username(),
+                "worked" if result.ok else "failed",
+            )
+            if result.ok:
+                messages.success(request, result.message or _("The destination answered."))
+            else:
+                messages.error(
+                    request,
+                    _("The test failed: %(problem)s") % {"problem": result.message or "?"},
+                )
+        return redirect("server:backup_destination")
+
+
+class BackupSendView(BackupsMixin, View):
+    """*Send* beside one archive: queue it for the destination, now. Never sent here."""
+
+    def post(self, request: HttpRequest, name: str) -> HttpResponse:
+        _archive(name)
+        if offsite.selected() is None:
+            messages.error(request, _("There is no backup destination to send to."))
+            return redirect("server:backups")
+        try:
+            offsite.send_again(name)
+        except backups.NotAnArchive as missing:
+            raise Http404 from missing
+        logger.info(
+            "Backup %s queued for the destination by %s.", name, request.user.get_username()
+        )
+        messages.success(
+            request,
+            _("%(name)s is queued; the scheduler sends it on its next pass.") % {"name": name},
+        )
+        return redirect("server:backups")

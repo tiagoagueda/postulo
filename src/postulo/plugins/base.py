@@ -1132,3 +1132,117 @@ class SyncPlugin(ConnectedPlugin, Protocol):
     """
 
     def sync(self, connection, config: dict) -> SyncReport: ...
+
+
+# ------------------------------------------------------------ backup destinations
+
+#: Where something that keeps the instance's backups somewhere else registers itself (#325).
+BACKUP_DESTINATION_GROUP = "postulo.backups"
+
+
+@dataclass(frozen=True)
+class BackupArchive:
+    """One backup as it leaves this machine: already encrypted, read in chunks.
+
+    What a destination is handed is never the archive on the disk. The core encrypts that
+    to the operator's age recipient first (#325), into a file of its own that is deleted
+    once the send is over, and this is that file: its ``name`` (the archive's own, with
+    ``.age`` after it), its ``size`` in bytes, and two ways to read it. Nothing here is a
+    path, so a destination cannot reach for the unencrypted archive beside it by mistake.
+    """
+
+    name: str
+    size: int
+    _path: object = field(repr=False, compare=False, default=None)
+
+    def open(self):
+        """The encrypted bytes, as a binary file opened for reading. Close it."""
+        return open(self._path, "rb")
+
+    def chunks(self, size: int = 1 << 20):
+        """The encrypted bytes, ``size`` at a time, for a request body that streams."""
+        with self.open() as handle:
+            while chunk := handle.read(size):
+                yield chunk
+
+
+@dataclass(frozen=True)
+class BackupManifest:
+    """What an archive says about itself, as plain values, for naming and for logging.
+
+    Never written beside the archive in clear: the archive is encrypted and this is not, so
+    a destination that kept it next to the file would be publishing what the encryption
+    hides -- the counts of accounts and applications among it. ``archive`` is the name of
+    the archive on this machine, without ``.age``.
+    """
+
+    archive: str
+    created_at: dt.datetime | None = None
+    version: str = ""
+    engine: str = ""
+    instance: str = ""
+    counts: tuple[tuple[str, int], ...] = ()
+
+
+@dataclass(frozen=True)
+class BackupRef:
+    """Where a destination put one archive: an id of its choosing and a label for a person.
+
+    ``id`` is whatever the destination needs to find the archive again -- a path, an object
+    key, a file id -- and is handed back to it unchanged by ``delete``. ``label`` is what
+    the *Backups* list shows, the remote name, and is never parsed. ``created_at`` is when
+    the destination says it was stored, where it knows.
+    """
+
+    id: str
+    label: str = ""
+    created_at: dt.datetime | None = None
+
+
+@runtime_checkable
+class BackupDestinationPlugin(Protocol):
+    """Somewhere the instance's backups are kept besides its own disk (#325).
+
+    Like a transport, a destination is the operator's plumbing: chosen once for the instance
+    under *Server settings → Backups*, configured from ``config_fields()`` with the secret
+    ones encrypted, and not under the per-person plugin policy. Nobody's account owns it,
+    so nobody leaving stops the off-site copies.
+
+    ``send(archive, manifest, config)`` puts one archive there and returns a
+    :class:`BackupRef`, or raises with a sentence for the operator: the scheduler retries it
+    with a growing wait and shows the sentence on the list. The archive is a
+    :class:`BackupArchive`, encrypted before it reaches you. ``list(config)`` returns the
+    references of every archive the destination holds there, and ``delete(reference,
+    config)`` removes one of them. Postulo's retention only ever deletes a reference that
+    ``list`` returned and that it sent itself, and only after a send has been confirmed.
+
+    Every request goes through ``api.client()``, and the send runs inside a deadline that
+    ends before the scheduler's claim on it does, so a client that is not Postulo's is an
+    upload nobody can stop. ``validate(config) -> dict[str, list[str]]`` is optional, as it
+    is for a connected plugin, and runs when the form is submitted.
+    """
+
+    name: str
+    version: str
+    kind: str
+    label: str
+
+    def config_fields(self) -> list[FieldSpec]:
+        """What the *Backups* section asks for. Drawn by Postulo, as a transport's are."""
+        ...
+
+    def test(self, config: dict) -> TestResult:
+        """Prove the configuration without storing an archive, and say how it went."""
+        ...
+
+    def send(self, archive: BackupArchive, manifest: BackupManifest, config: dict) -> BackupRef:
+        """Store one archive; return where it went. Raise to fail, in the operator's words."""
+        ...
+
+    def list(self, config: dict) -> list[BackupRef]:
+        """Every archive kept there, as references ``delete`` accepts."""
+        ...
+
+    def delete(self, reference: BackupRef, config: dict) -> None:
+        """Remove one archive ``list`` returned. Raise if it could not be removed."""
+        ...

@@ -24,6 +24,14 @@ class Command(BaseCommand):
             help="Leave the media directory out. The database alone cannot be restored usefully.",
         )
         parser.add_argument(
+            "--no-send",
+            action="store_true",
+            help=(
+                "Do not queue this archive for the backup destination. Only an archive "
+                "written into POSTULO_BACKUP_DIR is ever queued."
+            ),
+        )
+        parser.add_argument(
             "--no-plugins",
             action="store_true",
             help=(
@@ -41,6 +49,17 @@ class Command(BaseCommand):
             )
         except BackupError as error:
             raise CommandError(str(error)) from error
+        queued = None
+        if not options["no_send"]:
+            # Into the directory, and only there: one written elsewhere is the operator's to
+            # carry, and `queue` refuses it (#325). The scheduler sends it.
+            from postulo.core import backups, offsite
+
+            backups.remember_check(report.path, True)
+            try:
+                queued = offsite.queue(report.path)
+            except Exception as error:  # the archive is written; say so, and why it waits
+                self.stderr.write(f"  not queued for the backup destination: {error}")
 
         size_mb = report.bytes / (1024 * 1024)
         self.stdout.write(self.style.SUCCESS(f"Backed up to {report.path} ({size_mb:.1f} MB)"))
@@ -59,6 +78,11 @@ class Command(BaseCommand):
         self.stdout.write(
             "  verified: the manifest reads back and the database matches its checksum"
         )
+        if queued is not None:
+            self.stdout.write(
+                f"  queued for the {queued.destination} destination, encrypted to its age "
+                "recipient; the scheduler sends it"
+            )
         self.stdout.write(
             "  the key the connection secrets are under is NOT in the archive: keep .env "
             "somewhere this file is not, and read `manage.py restore --help` before you need it"

@@ -245,6 +245,22 @@ class Command(BaseCommand):
         except Exception:
             logger.exception("Could not start the scheduled backup")
 
+        # The copies on their way to the backup destination, after everything above and for
+        # the same reason: an upload can take an hour, and the reminders this pass carried
+        # have gone by the time it starts. Claimed row by row, so it needs no lease of the
+        # pass's, and held to a deadline inside its own (#325).
+        try:
+            from postulo.core import errands, offsite
+
+            queue = None
+            if errands.worker_expected():
+                from postulo.core.tasks import offsite_backups
+
+                queue = offsite_backups.enqueue
+            offsite.start_sending(queue=queue)
+        except Exception:
+            logger.exception("Could not send the backups waiting for the destination")
+
         when = f"{timezone.now():%Y-%m-%d %H:%M}"
         if stamped:
             self.stdout.write(f"{when} {stamped} reminders due, {delivered} deliveries")

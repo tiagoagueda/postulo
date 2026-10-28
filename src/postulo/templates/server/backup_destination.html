@@ -1,0 +1,79 @@
+{% extends "server/base.html" %}
+{% load i18n postulo %}
+
+{% block measure %}max-w-2xl{% endblock %}{# this page keeps the measure: see `server/base.html` (#320) #}
+
+{% block content %}
+  <c-page-title>
+    {% translate "Backup destination" %}
+    <c-slot name="subtitle">
+    {% translate "Somewhere besides this server where every archive is sent once it has been written and checked, encrypted first." %}
+    </c-slot>
+  </c-page-title>
+
+  <p class="mb-6 text-sm"><a href="{% url 'server:backups' %}" class="underline">{% translate "Back to Backups" %}</a></p>
+
+  {% comment %} Said before the form, because it is the one thing about this page an
+     administrator has to act on away from it: the identity that opens the archives is never
+     on the instance, so losing it loses every copy sent (#325). {% endcomment %}
+  <div class="alert mb-6" data-variant="info" role="note">
+    <div>
+      <p class="font-medium">{% translate "Archives are encrypted with age before they leave." %}</p>
+      <p class="text-sm">
+        {% blocktranslate trimmed %}
+          Only the public key, the recipient, is kept here. Keep the identity that opens the
+          archives somewhere other than this server, and keep a copy of it: without it no
+          archive sent can be opened. Restoring starts by decrypting one by hand, as the wiki
+          page about backups says.
+        {% endblocktranslate %}
+      </p>
+    </div>
+  </div>
+
+  {% if not installed %}
+    <div class="card mb-6" data-no-destination>
+      <p class="text-sm">
+        {% translate "No backup destination plugin is installed. Postulo ships none and names no provider: install one under Plugins, then choose it here." %}
+      </p>
+    </div>
+  {% endif %}
+
+  <form method="post" novalidate>
+    {% csrf_token %}
+    <div class="card mb-4">
+      <c-section-title>{% translate "Where and how" %}</c-section-title>
+      {% if form.non_field_errors %}
+        <div class="alert mb-4 text-sm" data-variant="error" role="alert">
+          <div>{% for error in form.non_field_errors %}<p>{{ error }}</p>{% endfor %}</div>
+        </div>
+      {% endif %}
+      <c-field :field="form.backup_destination" />
+      <c-field :field="form.backup_recipient" />
+      <c-field :field="form.backup_remote_keep" />
+    </div>
+
+    {% if plugin_fields %}
+      <div class="card mb-4" data-destination-fields="{{ form.plugin.name }}">
+        <c-section-title>{{ form.plugin.label }}</c-section-title>
+        {% for field in plugin_fields %}
+          <c-field :field="field" />
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    <div class="mb-8 flex flex-wrap items-center gap-2">
+      <button type="submit" class="btn">{% translate "Save" %}</button>
+    </div>
+  </form>
+
+  {% if destination %}
+    <form method="post" action="{% url 'server:backup_destination_test' %}" class="card mb-4">
+      {% csrf_token %}
+      <c-section-title>
+        {% translate "Test the destination" %}
+        <c-slot name="subtitle">{% translate "Uses the saved settings. Nothing is stored there." %}</c-slot>
+      </c-section-title>
+      <button type="submit" class="btn" data-variant="outline">{% translate "Test" %}</button>
+    </form>
+  {% endif %}
+{% endblock %}

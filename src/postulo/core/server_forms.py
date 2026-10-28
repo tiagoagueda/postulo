@@ -891,3 +891,136 @@ class BackupScheduleForm(forms.ModelForm):
     class Meta:
         model = SiteSettings
         fields = ("backup_schedule", "backup_hour", "backup_weekday", "backup_keep")
+
+
+class BackupDestinationForm(forms.ModelForm):
+    """Where the backups go besides this disk, and the key they are encrypted to (#325).
+
+    Drawn the way the mail transport's settings are (`EmailForm._add_transport_fields`): a
+    chooser among the installed destinations, the recipient and the remote retention, then
+    the chosen plugin's own fields from its `FieldSpec`s. A secret is stored encrypted under
+    the field key, never drawn back, and kept when its box is left blank.
+
+    **The fields follow the destination being chosen**, not only the one stored: choosing
+    another draws its fields on the page that comes back, with whatever it requires marked
+    as missing, and nothing is saved until they are filled. Its settings start empty, since
+    another plugin's settings mean nothing to it.
+
+    **No destination without a recipient.** Nothing leaves this machine unencrypted, so a
+    destination is refused here until there is an age recipient to encrypt to.
+    """
+
+    #: Prefix for the plugin's own fields, so its `keep` cannot collide with a column.
+    PREFIX = "destination__"
+
+    class Meta:
+        model = SiteSettings
+        fields = ("backup_recipient", "backup_remote_keep")
+
+    def __init__(self, *args, **kwargs):
+        from postulo.plugins import base
+
+        from . import offsite
+
+        super().__init__(*args, **kwargs)
+        installed = offsite.available()
+        self.fields["backup_destination"] = forms.ChoiceField(
+            label=_("Destination"),
+            choices=[("", _("None — backups stay on this server"))]
+            + [(item.name, base.label_of(item)) for item in installed],
+            required=False,
+            help_text=_("Where each archive is sent once it has been written and checked."),
+        )
+        self.order_fields(["backup_destination", "backup_recipient", "backup_remote_keep"])
+        stored = self.instance.backup_destination or ""
+        self.initial.setdefault("backup_destination", stored)
+        asked = self.data.get("backup_destination", stored) if self.is_bound else stored
+        self.plugin = next((item for item in installed if item.name == asked), None)
+        #: Whether the destination is being changed, so the stored settings do not apply.
+        self.switching = self.plugin is not None and self.plugin.name != stored
+        self.specs = list(self.plugin.config_fields()) if self.plugin is not None else []
+        held = set() if self.switching else set(self.instance.backup_destination_secrets)
+        config = {} if self.switching else dict(self.instance.backup_destination_config or {})
+        from postulo.plugins.forms import form_field_for
+
+        for spec in self.specs:
+            key = f"{self.PREFIX}{spec.name}"
+            self.fields[key] = form_field_for(spec, has_value=spec.name in held)
+            if not (spec.type == "password" or spec.secret):
+                self.initial.setdefault(key, config.get(spec.name, spec.default))
+
+    def plugin_fields(self):
+        return [self[f"{self.PREFIX}{spec.name}"] for spec in self.specs]
+
+    def _answers(self) -> tuple[dict, dict]:
+        """The plugin's settings as they will be stored: what was typed over what is kept."""
+        row = self.instance
+        if self.switching:
+            plain, secret = {}, {}
+        else:
+            plain = dict(row.backup_destination_config or {})
+            secret = dict(row.backup_destination_secrets)
+        for spec in self.specs:
+            value = self.cleaned_data.get(f"{self.PREFIX}{spec.name}")
+            if spec.type == "password" or spec.secret:
+                if value:
+                    secret[spec.name] = value
+            else:
+                plain[spec.name] = value if value is not None else ""
+        return plain, secret
+
+    def clean_backup_recipient(self) -> str:
+        from . import offsite
+
+        value = (self.cleaned_data.get("backup_recipient") or "").strip()
+        if value:
+            try:
+                offsite.parse_recipient(value)
+            except offsite.RecipientRefused as refused:
+                raise forms.ValidationError(str(refused)) from refused
+        return value
+
+    def clean(self):
+        cleaned = super().clean()
+        chosen = cleaned.get("backup_destination") or ""
+        if chosen and "backup_recipient" not in self.errors and not cleaned.get("backup_recipient"):
+            self.add_error(
+                "backup_recipient",
+                _(
+                    "A destination needs an age recipient to encrypt to: nothing leaves this "
+                    "server unencrypted."
+                ),
+            )
+        validate = getattr(self.plugin, "validate", None)
+        if not chosen or validate is None or self.errors:
+            return cleaned
+        plain, secret = self._answers()
+        try:
+            problems = validate({**plain, **secret}) or {}
+        except Exception as error:
+            raise forms.ValidationError(
+                _("%(plugin)s could not check these settings: %(error)s")
+                % {"plugin": self.plugin.label, "error": f"{type(error).__name__}: {error}"}
+            ) from error
+        for name, messages in problems.items():
+            key = f"{self.PREFIX}{name}"
+            field = key if name and key in self.fields else None
+            for message in [messages] if isinstance(messages, str) else messages:
+                self.add_error(field, message)
+        return cleaned
+
+    def save(self, commit=True):
+        row = super().save(commit=False)
+        chosen = self.cleaned_data.get("backup_destination") or ""
+        row.backup_destination = chosen
+        if not chosen:
+            # No destination: nothing of one is kept, the secrets least of all.
+            row.backup_destination_config = {}
+            row.backup_destination_secrets = {}
+        else:
+            plain, secret = self._answers()
+            row.backup_destination_config = plain
+            row.backup_destination_secrets = secret
+        if commit:
+            row.save()
+        return row

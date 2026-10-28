@@ -87,12 +87,17 @@ GOVERNED_KINDS = ("source", "notifier", "store", "sync", "importer", "feature", 
 #: services a handle can be on (#682). So is a **register-adapter** plugin (#1021): it says how
 #: a country's register is asked, and whether anything is asked at all is the decision of the
 #: ``register-lookup`` feature, which is governed like any other.
+#:
+#: A **backup-destination** plugin is here for the transport's reason: where the instance's
+#: archives are kept is the operator's plumbing, and *forced off* for one person would mean
+#: nothing at all, since nobody's data is copied on their own behalf (#325).
 UNGOVERNED_KINDS = (
     "transport",
     "identifier",
     "link-service",
     "messaging-service",
     "register-adapter",
+    "backup-destination",
 )
 
 

@@ -65,6 +65,52 @@
     </form>
   </div>
 
+  {% comment %} Where the archives go besides this disk (#325). Its settings are a page of
+     their own, because a destination's fields depend on which one is chosen. {% endcomment %}
+  <div class="card mb-6" data-backup-destination="{{ object.backup_destination }}">
+    <c-section-title>{% translate "Off-site copies" %}</c-section-title>
+    {% if destination %}
+      <p class="mb-2 text-sm">
+        {% blocktranslate with label=destination.label trimmed %}
+          Every archive is encrypted to your age recipient and sent to {{ label }} once it
+          has been written and checked. An archive that has not arrived there is never
+          deleted here.
+        {% endblocktranslate %}
+      </p>
+      <dl class="mb-4 grid gap-x-6 gap-y-2 text-sm sm:grid-cols-[12rem_1fr]">
+        <dt class="text-ink-500 dark:text-ink-400">{% translate "Last one that arrived" %}</dt>
+        <dd>
+          {% if object.backup_offsite_last_ok_at %}
+            <time datetime="{{ object.backup_offsite_last_ok_at|date:'Y-m-d' }}">{{ object.backup_offsite_last_ok_at|date:"DATETIME_FORMAT" }}</time>
+          {% else %}
+            {% translate "none yet" %}
+          {% endif %}
+        </dd>
+      </dl>
+      {% if object.backup_offsite_last_error %}
+        <div class="alert mb-4 text-sm" data-variant="error" role="note" data-offsite-error>
+          <div>
+            <p class="font-medium">{% translate "The last send failed." %}</p>
+            <p class="wrap-anywhere">{{ object.backup_offsite_last_error }}</p>
+          </div>
+        </div>
+      {% endif %}
+    {% elif destination_missing %}
+      <div class="alert mb-4 text-sm" data-variant="warning" role="note" data-destination-missing>
+        <div>
+          {% blocktranslate with name=object.backup_destination trimmed %}
+            The {{ name }} destination is chosen but not installed, so nothing is being sent.
+          {% endblocktranslate %}
+        </div>
+      </div>
+    {% else %}
+      <p class="mb-4 text-sm text-ink-500 dark:text-ink-400">
+        {% translate "None: the archives stay on this server. A destination keeps a copy somewhere else, encrypted before it leaves." %}
+      </p>
+    {% endif %}
+    <a href="{% url 'server:backup_destination' %}" class="btn" data-variant="outline" data-size="sm">{% translate "Choose the destination" %}</a>
+  </div>
+
   <c-scroll-box class="card mb-2 p-0" label="{% translate 'Backups' %}">
     <table class="table" data-backups>
       <caption class="sr-only">{% translate "Backups, newest first" %}</caption>
@@ -76,6 +122,7 @@
           <th scope="col">{% translate "Database" %}</th>
           <th scope="col">{% translate "Records" %}</th>
           <th scope="col">{% translate "Checked" %}</th>
+          {% if destination %}<th scope="col">{% translate "Off-site" %}</th>{% endif %}
           <th scope="col"><span class="sr-only">{% translate "Actions" %}</span></th>
         </tr>
       </thead>
@@ -104,6 +151,33 @@
                 <span class="badge" data-tone="grey">{% translate "Not checked yet" %}</span>
               {% endif %}
             </td>
+            {% if destination %}
+              <td class="align-top" data-offsite="{{ archive.offsite.state|default:'none' }}">
+                {% comment %} Sent (when, and the name there), waiting, or failed in the
+                   plugin's own words; in words as well as in colour (#325). {% endcomment %}
+                {% with sent=archive.offsite %}
+                  {% if not sent %}
+                    {% if not archive.uploaded %}<span class="badge" data-tone="grey">{% translate "Not sent" %}</span>{% else %}—{% endif %}
+                  {% elif sent.state == "sent" %}
+                    <span class="badge" data-tone="green">{% translate "Sent" %}</span>
+                    <span class="block text-xs"><time datetime="{{ sent.sent_at|date:'Y-m-d' }}">{{ sent.sent_at|date:"DATETIME_FORMAT" }}</time></span>
+                    <span class="block text-xs wrap-anywhere"><code>{{ sent.remote_label }}</code></span>
+                  {% elif sent.state == "removed" %}
+                    <span class="badge" data-tone="grey">{% translate "Removed there by retention" %}</span>
+                  {% elif sent.state == "failed" %}
+                    <span class="badge" data-tone="rose">{% translate "Failed" %}</span>
+                    <span class="block text-xs wrap-anywhere">{{ sent.last_error }}</span>
+                    {% if sent.attempts >= offsite_max_attempts %}
+                      <span class="block text-xs">{% translate "No more retries: send it again when the destination is fixed." %}</span>
+                    {% elif sent.next_attempt_at %}
+                      <span class="block text-xs">{% blocktranslate with when=sent.next_attempt_at|date:"DATETIME_FORMAT" trimmed %}Tried again at {{ when }}.{% endblocktranslate %}</span>
+                    {% endif %}
+                  {% else %}
+                    <span class="badge" data-tone="amber">{% translate "Waiting" %}</span>
+                  {% endif %}
+                {% endwith %}
+              </td>
+            {% endif %}
             <td class="align-top">
               <div class="flex flex-wrap items-center gap-2">
                 <form method="post" action="{% url 'server:backup_verify' archive.name %}">
@@ -111,6 +185,12 @@
                   <button type="submit" class="btn" data-variant="outline" data-size="sm">{% translate "Check" %}<span class="sr-only"> {{ archive.name }}</span></button>
                 </form>
                 {% if may_download %}<a href="{% url 'server:backup_download' archive.name %}" class="btn" data-variant="outline" data-size="sm">{% icon "download" %}{% translate "Download" %}<span class="sr-only"> {{ archive.name }}</span></a>{% endif %}
+                {% if destination and not archive.uploaded and archive.offsite.state != "sent" and archive.offsite.state != "removed" and archive.offsite.state != "pending" %}
+                  <form method="post" action="{% url 'server:backup_send' archive.name %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn" data-variant="outline" data-size="sm">{% translate "Send" %}<span class="sr-only"> {{ archive.name }}</span></button>
+                  </form>
+                {% endif %}
                 <a href="{% url 'server:backup_restore' archive.name %}" class="btn" data-variant="outline" data-size="sm">{% translate "Restore" %}<span class="sr-only"> {{ archive.name }}</span></a>
                 <a href="{% url 'server:backup_delete' archive.name %}" class="btn" data-variant="ghost" data-size="sm">{% translate "Delete" %}<span class="sr-only"> {{ archive.name }}</span></a>
               </div>
@@ -118,7 +198,7 @@
           </tr>
         {% empty %}
           <tr>
-            <td colspan="7" class="py-6 text-center text-ink-500 dark:text-ink-400">
+            <td colspan="{% if destination %}8{% else %}7{% endif %}" class="py-6 text-center text-ink-500 dark:text-ink-400">
               {% translate "No backups yet. Take one above." %}
             </td>
           </tr>

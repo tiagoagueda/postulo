@@ -1570,6 +1570,51 @@ class SiteSettings(models.Model):
     #: Backups that failed since this row was made: the counter the metric exports.
     backup_failures = models.PositiveIntegerField(default=0, editable=False)
 
+    # --- where the backups go besides this disk (#325) --------------------------------
+    #
+    #: The backup-destination plugin that receives each verified archive, by name. Blank is
+    #: none, which is what every instance has until an administrator chooses: Postulo ships
+    #: no destination and names no provider. The same trio a transport has -- the name, its
+    #: plain settings and its secrets -- because it is the same kind of thing, the
+    #: operator's plumbing, and a row nobody owns cannot be deleted with somebody's account.
+    backup_destination = models.CharField(_("backup destination"), max_length=60, blank=True)
+    backup_destination_config = models.JSONField(
+        _("backup destination configuration"), default=dict, blank=True
+    )
+    backup_destination_secrets_encrypted = models.TextField(
+        _("backup destination secrets"), blank=True, editable=False
+    )
+    #: The age recipient every archive is encrypted to before a destination sees it: a
+    #: public key, `age1…`. The identity that opens them is never on the instance, which is
+    #: the point -- a stolen copy of the destination, or of this database, opens nothing.
+    backup_recipient = models.CharField(
+        _("age recipient"),
+        max_length=100,
+        blank=True,
+        help_text=_(
+            "The public key every archive is encrypted to before it leaves, starting age1. "
+            "Keep the identity that opens them somewhere other than this server."
+        ),
+    )
+    #: How many archives to keep there. Blank keeps as many as are kept here; 0 deletes
+    #: nothing there, for a credential that may write and not delete.
+    backup_remote_keep = models.PositiveSmallIntegerField(
+        _("keep the newest there"),
+        null=True,
+        blank=True,
+        validators=[MaxValueValidator(365)],
+        help_text=_(
+            "Leave blank to keep as many there as here. 0 never deletes anything there. "
+            "Only archives Postulo sent itself are ever deleted, and only after a new one "
+            "has arrived."
+        ),
+    )
+    #: The last archive that reached the destination, the failures since this row was made
+    #: (the counter the metric exports), and the last failure's words, cleared by a success.
+    backup_offsite_last_ok_at = models.DateTimeField(null=True, blank=True, editable=False)
+    backup_offsite_failures = models.PositiveIntegerField(default=0, editable=False)
+    backup_offsite_last_error = models.TextField(blank=True, editable=False)
+
     updated_at = models.DateTimeField(_("updated at"), auto_now=True)
     updated_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
@@ -1670,6 +1715,19 @@ class SiteSettings(models.Model):
         self.text_secrets_encrypted = secrets.encrypt(values or {})
 
     @property
+    def backup_destination_secrets(self) -> dict:
+        """The backup destination's secret settings, decrypted (#325)."""
+        from postulo.plugins import secrets
+
+        return secrets.decrypt(self.backup_destination_secrets_encrypted)
+
+    @backup_destination_secrets.setter
+    def backup_destination_secrets(self, values: dict) -> None:
+        from postulo.plugins import secrets
+
+        self.backup_destination_secrets_encrypted = secrets.encrypt(values or {})
+
+    @property
     def transport_secrets(self) -> dict:
         """The selected transport's secret settings, decrypted."""
         from postulo.plugins import secrets
@@ -1716,3 +1774,57 @@ class SiteSettings(models.Model):
         """Whether one is stored. The page may say this much and nothing more: a masked
         field of the right length gives away the length."""
         return bool(self.email_password_encrypted)
+
+
+class OffsiteState(models.TextChoices):
+    PENDING = "pending", _("Waiting")
+    SENT = "sent", _("Sent")
+    FAILED = "failed", _("Failed")
+    #: Sent, and later deleted there by the remote retention.
+    REMOVED = "removed", _("Removed there")
+
+
+class OffsiteBackup(models.Model):
+    """One archive on its way to the backup destination, or already there (#325).
+
+    The document copy's shape (`documents.DocumentCopy`), for the document copy's reasons: a
+    row per archive and destination, sent by the scheduler rather than by a request, retried
+    with a growing wait, held by a lease while it is being sent, and saying in words what
+    happened to it. Nobody owns it -- it is the instance's -- and only an administrator ever
+    sees one.
+
+    The archive is named, never a path: `core.backups.archive_path` turns the name into a
+    file, with every check that page makes.
+    """
+
+    archive = models.CharField(max_length=120)
+    #: The plugin it is for. A row stays with the destination it was made for, so changing
+    #: the destination neither sends an old row somewhere new nor forgets where one went.
+    destination = models.CharField(max_length=60)
+    state = models.CharField(
+        max_length=10, choices=OffsiteState.choices, default=OffsiteState.PENDING
+    )
+    attempts = models.PositiveSmallIntegerField(default=0)
+    next_attempt_at = models.DateTimeField(null=True, blank=True)
+    last_attempt_at = models.DateTimeField(null=True, blank=True)
+    #: The lease a sender holds while it works. Long enough for a large upload, and the
+    #: send itself is held to a deadline that ends before it does.
+    claimed_until = models.DateTimeField(null=True, blank=True)
+    sent_at = models.DateTimeField(null=True, blank=True)
+    removed_at = models.DateTimeField(null=True, blank=True)
+    #: What the destination said: its id, handed back to it unchanged, and the label shown.
+    remote_id = models.CharField(max_length=500, blank=True)
+    remote_label = models.CharField(max_length=500, blank=True)
+    last_error = models.CharField(max_length=500, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["archive", "destination"], name="one_offsite_copy_per_destination"
+            )
+        ]
+        indexes = [models.Index(fields=["destination", "state", "next_attempt_at"])]
+
+    def __str__(self) -> str:
+        return f"{self.archive} → {self.destination}"

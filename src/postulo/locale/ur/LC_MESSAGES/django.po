@@ -996,6 +996,11 @@ msgstr "%(name)s اب شناخت کنندہ میں عدد %(place)s ہے۔."
 msgid "%(name)s is now number %(place)s in the navigation."
 msgstr "%(name)s اب انفلیشن میں تعداد %(place)s ہے۔."
 
+#: src/postulo/core/views_backups.py
+#, python-format
+msgid "%(name)s is queued; the scheduler sends it on its next pass."
+msgstr ""
+
 #: src/postulo/core/server_views.py
 #, fuzzy, python-format
 msgid "%(name)s is removed. Restart Postulo to be sure nothing of it is left loaded."
@@ -1176,7 +1181,7 @@ msgstr "%(period)s: دوسرے منتخب کریں"
 msgid "%(person)s is the last member of %(name)s, which still owns records. Give them to somebody, or delete them, first."
 msgstr "%(person)s %(name)s کا آخری ممبر ہے جو اب تک ریکارڈ رکھتا ہے۔ ان کو کسی کو دے، یا ان کو حذف، پہلے."
 
-#: src/postulo/plugins/forms.py
+#: src/postulo/core/server_forms.py src/postulo/plugins/forms.py
 #, fuzzy, python-format
 msgid "%(plugin)s could not check these settings: %(error)s"
 msgstr "%(plugin)s ان ترتیبات کا جائزہ نہیں لے سکے: %(error)s"
@@ -2058,6 +2063,10 @@ msgstr "ایک گہرا نیلا. دس قدم، جن میں سے interface ای�
 #, fuzzy
 msgid "A department needs a name."
 msgstr "ایک ڈیپارٹمنٹ کو نام کی ضرورت ہوتی ہے ۔."
+
+#: src/postulo/core/server_forms.py
+msgid "A destination needs an age recipient to encrypt to: nothing leaves this server unencrypted."
+msgstr ""
 
 #: src/postulo/templates/server/overview.html
 msgid "A document in a script shown in red is set in the server's fonts instead."
@@ -3381,6 +3390,10 @@ msgstr "عام جگہ"
 msgid "Africa"
 msgstr "افریقہ"
 
+#: src/postulo/core/models.py
+msgid "age recipient"
+msgstr ""
+
 #: src/postulo/templates/widgets/sources.html
 #, fuzzy
 msgid "Agency"
@@ -4186,6 +4199,10 @@ msgstr "پیشہ ورانہ"
 msgid "Archived"
 msgstr "محفوظہ:"
 
+#: src/postulo/templates/server/backup_destination.html
+msgid "Archives are encrypted with age before they leave."
+msgstr ""
+
 #: src/postulo/templates/jobs/capture_page_forget.html
 #: src/postulo/templates/partials/confirm_delete.html
 #, fuzzy
@@ -4460,6 +4477,7 @@ msgid "Back in your listings."
 msgstr "آپ کی فہرست میں واپس."
 
 #: src/postulo/templates/server/backup_delete.html
+#: src/postulo/templates/server/backup_destination.html
 #: src/postulo/templates/server/backup_restore.html
 #, fuzzy
 msgid "Back to Backups"
@@ -4578,6 +4596,23 @@ msgstr "فولڈرز"
 #, fuzzy
 msgid "Background work"
 msgstr "کام"
+
+#: src/postulo/core/models.py
+msgid "backup destination"
+msgstr ""
+
+#: src/postulo/plugins/kinds.py
+#: src/postulo/templates/server/backup_destination.html
+msgid "Backup destination"
+msgstr ""
+
+#: src/postulo/core/models.py
+msgid "backup destination configuration"
+msgstr ""
+
+#: src/postulo/core/models.py
+msgid "backup destination secrets"
+msgstr ""
 
 #: src/postulo/core/server_sections.py src/postulo/core/views_backups.py
 #: src/postulo/templates/server/backups.html
@@ -5287,6 +5322,10 @@ msgstr "انتخاب"
 msgid "Choose a country from the list."
 msgstr "فہرست سے ملک منتخب کریں۔."
 
+#: src/postulo/core/views_backups.py
+msgid "Choose a destination and save it first."
+msgstr ""
+
 #: src/postulo/resume/views.py
 #, fuzzy
 msgid "Choose a Europass file first."
@@ -5397,6 +5436,10 @@ msgstr "ملک منتخب کر کے اس کا نمبر وہاں درج کیا گ
 #, fuzzy
 msgid "Choose the date of birth from a calendar"
 msgstr "کیلنڈر سے تاریخ پیدائش منتخب کریں"
+
+#: src/postulo/templates/server/backups.html
+msgid "Choose the destination"
+msgstr ""
 
 #: src/postulo/templates/resume/europass_import.html
 #, fuzzy
@@ -6716,6 +6759,10 @@ msgstr "ڈیزائن"
 msgid "Design (Behance, Dribbble…)"
 msgstr "ڈیزائن (Behance, Dribble.."
 
+#: src/postulo/core/server_forms.py
+msgid "Destination"
+msgstr ""
+
 #: src/postulo/core/design.py
 #, fuzzy
 msgid "Destructive"
@@ -7525,6 +7572,11 @@ msgstr "اس مثال کے ہر حساب سے ۔ منتظمین اکاؤنٹ د�
 msgid "Every application, in order"
 msgstr "ہر اطلاق، ترتیب سے"
 
+#: src/postulo/templates/server/backups.html
+#, python-format
+msgid "Every archive is encrypted to your age recipient and sent to %(label)s once it has been written and checked. An archive that has not arrived there is never deleted here."
+msgstr ""
+
 #: src/postulo/templates/jobs/company_places.html
 #, fuzzy
 msgid "Every company address on the map, with the company's name, page, industries and how precise its point is: at its town, its postcode, by hand or from Wikidata. A contact's address and your own are never in it."
@@ -7848,6 +7900,7 @@ msgid "Extra small"
 msgstr "ایک چھوٹا سا"
 
 #: src/postulo/core/models.py src/postulo/documents/models.py
+#: src/postulo/templates/server/backups.html
 #, fuzzy
 msgid "Failed"
 msgstr "ناکام ہوا"
@@ -9908,6 +9961,11 @@ msgstr "اب یہ رابطہ ختم ہو جاتا ہے، بغیر بچنے کے�
 msgid "It comes off your details now, without waiting for Save, and cannot be put back."
 msgstr "اب آپ کی تفصیلات ختم ہو جاتی ہیں، بغیر بچ جانے کے، اور واپس نہیں کیا جا سکتا."
 
+#: src/postulo/core/offsite.py
+#, python-format
+msgid "It could not be encrypted: %(error)s"
+msgstr ""
+
 #: src/postulo/plugins/installing.py
 #, fuzzy
 msgid "it could not be imported"
@@ -10280,6 +10338,10 @@ msgstr "اپنے نوٹس رکھیں"
 msgid "keep the newest"
 msgstr "نیا سلسلہ جاری رکھیں"
 
+#: src/postulo/core/models.py
+msgid "keep the newest there"
+msgstr ""
+
 #: src/postulo/templates/jobs/merge.html
 #, fuzzy
 msgid "Keep the other one instead"
@@ -10584,6 +10646,10 @@ msgstr "آخری غلطی"
 msgid "Last name"
 msgstr "آخری نام"
 
+#: src/postulo/templates/server/backups.html
+msgid "Last one that arrived"
+msgstr ""
+
 #: src/postulo/plugins/models.py
 #, fuzzy
 msgid "last pushed"
@@ -10670,6 +10736,10 @@ msgstr "اِس کے علاوہ آپ نے گواہی دینے کی سند بھی 
 #, fuzzy
 msgid "Leave a box empty and that line prints as it is written above it."
 msgstr "بکس خالی چھوڑ دو اور یہ لائن چھاپتا ہے جیسا کہ اس کے اوپر لکھا گیا ہے۔."
+
+#: src/postulo/core/models.py
+msgid "Leave blank to keep as many there as here. 0 never deletes anything there. Only archives Postulo sent itself are ever deleted, and only after a new one has arrived."
+msgstr ""
 
 #: src/postulo/core/server_forms.py
 #, fuzzy
@@ -12094,6 +12164,10 @@ msgstr "نہیں"
 msgid "No address and no key, so nothing is offered from it."
 msgstr "کوئی پتہ اور کوئی کلید نہیں، اس لیے اس سے کچھ پیش کیا جاتا ہے۔."
 
+#: src/postulo/core/offsite.py
+msgid "No age recipient is set, and nothing leaves this machine unencrypted."
+msgstr ""
+
 #: src/postulo/applications/forms.py
 #, fuzzy
 msgid "No agency"
@@ -12113,6 +12187,10 @@ msgstr "کوئی بھی اطلاق نہیں ہوتا لہٰذا کوئی بھی 
 #, fuzzy
 msgid "No appointments yet."
 msgstr "ابھی تک کوئی تقرری."
+
+#: src/postulo/templates/server/backup_destination.html
+msgid "No backup destination plugin is installed. Postulo ships none and names no provider: install one under Plugins, then choose it here."
+msgstr ""
 
 #: src/postulo/templates/server/backups.html
 #, fuzzy
@@ -12303,6 +12381,10 @@ msgstr "کوئی میڈیا نہیں"
 #, fuzzy
 msgid "No messaging handle"
 msgstr "نصب نہیں کیا جاسکتا"
+
+#: src/postulo/templates/server/backups.html
+msgid "No more retries: send it again when the destination is fixed."
+msgstr ""
 
 #: src/postulo/documents/pdf.py
 #, fuzzy, python-format
@@ -12648,6 +12730,14 @@ msgstr "ابھی تک نہیں. دستاویزات ہر زبان میں اوپر
 msgid "None yet. This entry prints its original text on every CV."
 msgstr "ابھی تک نہیں. یہ داخلہ ہر سی وی پر اپنا اصل متن چھاپتا ہے۔."
 
+#: src/postulo/core/server_forms.py
+msgid "None — backups stay on this server"
+msgstr ""
+
+#: src/postulo/templates/server/backups.html
+msgid "None: the archives stay on this server. A destination keeps a copy somewhere else, encrypted before it leaves."
+msgstr ""
+
 #: src/postulo/applications/models.py
 #, fuzzy
 msgid "Normal"
@@ -12810,6 +12900,10 @@ msgstr "محفوظ نہیں کیا گیا"
 #, fuzzy
 msgid "Not saved: Postulo could not be reached. Press Save when it can."
 msgstr "محفوظ نہ ہو سکے: پوسٹلو تک نہ پہنچ سکا۔ جب یہ ممکن ہو تو محفوظ کرو."
+
+#: src/postulo/templates/server/backups.html
+msgid "Not sent"
+msgstr ""
 
 #: src/postulo/templates/applications/partials/application_card.html
 #, fuzzy
@@ -13459,6 +13553,14 @@ msgstr "بند ہے، کیونکہ اسے %(names)s درکار ہے، جو بن�
 msgid "Off, because the module it belongs to is off."
 msgstr "بند ہے، کیونکہ یہ ختم ہونے والا ہے."
 
+#: src/postulo/templates/server/backups.html
+msgid "Off-site"
+msgstr ""
+
+#: src/postulo/templates/server/backups.html
+msgid "Off-site copies"
+msgstr ""
+
 #: src/postulo/templates/settings/account.html
 #, fuzzy
 msgid "Off. A code from an authenticator app, asked for after the password, means a leaked password alone is not enough."
@@ -14009,6 +14111,10 @@ msgstr "صرف آپ کے اکاؤنٹ یا آپ کے گروپ میں سے کسی
 #, fuzzy
 msgid "Only the operator's own account can stop being an administrator."
 msgstr "صرف خود کار اکاؤنٹ ایک منتظم ہونے سے روک سکتا ہے۔."
+
+#: src/postulo/templates/server/backup_destination.html
+msgid "Only the public key, the recipient, is kept here. Keep the identity that opens the archives somewhere other than this server, and keep a copy of it: without it no archive sent can be opened. Restoring starts by decrypting one by hand, as the wiki page about backups says."
+msgstr ""
 
 #: src/postulo/resume/forms.py
 #, fuzzy
@@ -16285,6 +16391,14 @@ msgstr "{label} ہٹائیں"
 msgid "removed on the other side"
 msgstr "دوسری طرف"
 
+#: src/postulo/core/models.py
+msgid "Removed there"
+msgstr ""
+
+#: src/postulo/templates/server/backups.html
+msgid "Removed there by retention"
+msgstr ""
+
 #: src/postulo/templates/documents/partials/comparison_line.html
 #, fuzzy
 msgid "Removed:"
@@ -16601,6 +16715,7 @@ msgstr "سبت"
 #: src/postulo/templates/partials/table/cell.html
 #: src/postulo/templates/resume/item_form.html
 #: src/postulo/templates/resume/translations.html
+#: src/postulo/templates/server/backup_destination.html
 #: src/postulo/templates/server/backups.html
 #: src/postulo/templates/server/capture.html
 #: src/postulo/templates/server/data_protection.html
@@ -16968,6 +17083,10 @@ msgctxt "type of event"
 msgid "Seminar"
 msgstr "سیمینار"
 
+#: src/postulo/templates/server/backups.html
+msgid "Send"
+msgstr ""
+
 #: src/postulo/templates/server/email.html
 #, fuzzy
 msgid "Send a real message"
@@ -17016,8 +17135,9 @@ msgstr "بھیجنے میں ناکامی: %(error)s"
 msgid "Sends the DOI to doi.org, which passes it to Crossref or DataCite, and nothing else about you. Only the empty boxes are filled, and nothing is kept until you save."
 msgstr ""
 
-#: src/postulo/notifications/models.py
+#: src/postulo/core/models.py src/postulo/notifications/models.py
 #: src/postulo/templates/applications/report.html
+#: src/postulo/templates/server/backups.html
 #: src/postulo/templates/server/design.html
 #: src/postulo/templates/widgets/_source_table.html
 #: src/postulo/templates/widgets/industries.html
@@ -17918,6 +18038,10 @@ msgstr "کچھ غلط ہو گیا. سرور لاگ تفصیلات رکھتا ہ�
 msgid "Something worth knowing."
 msgstr "کچھ معلوم."
 
+#: src/postulo/templates/server/backup_destination.html
+msgid "Somewhere besides this server where every archive is sent once it has been written and checked, encrypted first."
+msgstr ""
+
 #: src/postulo/templates/server/design.html
 #, fuzzy
 msgid "Somewhere else"
@@ -18571,6 +18695,7 @@ msgid "Terms not recorded"
 msgstr "مقررہ مدت"
 
 #: src/postulo/templates/connections/list.html
+#: src/postulo/templates/server/backup_destination.html
 #, fuzzy
 msgid "Test"
 msgstr "جانچ"
@@ -18584,6 +18709,10 @@ msgstr "ٹیسٹ ناکام ہوا: %(message)s"
 #, fuzzy
 msgid "Test the connection"
 msgstr "اتصال مدون کریں"
+
+#: src/postulo/templates/server/backup_destination.html
+msgid "Test the destination"
+msgstr ""
 
 #: src/postulo/documents/models.py src/postulo/resume/models.py
 #, fuzzy
@@ -19093,6 +19222,14 @@ msgstr "یہ ویکیڈاٹا آئٹم شناخت کنندہ نہیں ہے."
 msgid "That is not an address Postulo can use."
 msgstr "یہ کوئی پتہ نہیں ہے."
 
+#: src/postulo/core/offsite.py
+msgid "That is not an age recipient. It starts age1 and is 62 characters long."
+msgstr ""
+
+#: src/postulo/core/offsite.py
+msgid "That is not an age recipient: its checksum does not match."
+msgstr ""
+
 #: src/postulo/plugins/catalogue.py
 #, fuzzy, python-format
 msgid "That is not an Ed25519 public key: %(error)s"
@@ -19338,10 +19475,20 @@ msgid_plural "The %(count)d files its history points at are kept where they are.
 msgstr[0] "%(count)d اس کے تاریخی نکات کو جہاں ہے وہاں رکھا جاتا ہے۔."
 msgstr[1] "%(count)d کی فائلوں کو اس کے تاریخ کے نکات کہاں رکھے جاتے ہیں۔."
 
+#: src/postulo/templates/server/backups.html
+#, python-format
+msgid "The %(name)s destination is chosen but not installed, so nothing is being sent."
+msgstr ""
+
 #: src/postulo/documents/pdf.py
 #, fuzzy, python-format
 msgid "The %(name)s PDF backend is configured but not usable. %(hint)s"
 msgstr "%(name)s PDF Backende is no no no nodoble. %(hint)s"
+
+#: src/postulo/core/offsite.py
+#, python-format
+msgid "The %(plugin)s destination is not installed or not chosen."
+msgstr ""
 
 #: src/postulo/documents/archiving.py src/postulo/plugins/syncing.py
 #, fuzzy, python-format
@@ -19412,6 +19559,19 @@ msgstr "درخواست فراہم کُنندہ سے درج کی گئی ہے. ک�
 #, fuzzy
 msgid "The application sends on its own"
 msgstr "اطلاق اپنے اوپر بھیجتا ہے۔"
+
+#: src/postulo/core/offsite.py
+msgid "The archive does not verify."
+msgstr ""
+
+#: src/postulo/core/offsite.py
+#, python-format
+msgid "The archive does not verify: %(problem)s"
+msgstr ""
+
+#: src/postulo/core/offsite.py
+msgid "The archive is no longer on this server."
+msgstr ""
 
 #: src/postulo/templates/server/backup_restore.html
 #, fuzzy
@@ -19698,6 +19858,18 @@ msgstr ""
 #, fuzzy
 msgid "The default for every account. One person's exceptions are on their row under People. Switching a plugin off stops it being used and deletes nothing."
 msgstr "ہر حساب کے لیے ایک شخص کی غیر جانبداری ان کے زیر سایہ ہے۔ اسے استعمال کرنے اور کسی چیز کو ختم کرنے سے سوئچ کرنے سے انکار کر دیا جاتا ہے ۔."
+
+#: src/postulo/core/views_backups.py
+msgid "The destination answered."
+msgstr ""
+
+#: src/postulo/core/offsite.py
+msgid "The destination did not say where it put the archive."
+msgstr ""
+
+#: src/postulo/core/offsite.py
+msgid "The destination gave no answer."
+msgstr ""
 
 #: src/postulo/jobs/capture_views.py
 #, fuzzy
@@ -20074,6 +20246,10 @@ msgstr "زبان عام ہے۔"
 msgid "The last backup failed."
 msgstr "آخری بیک اپ ناکام رہا۔."
 
+#: src/postulo/templates/server/overview.html
+msgid "The last backup sent to the destination did not arrive."
+msgstr ""
+
 #: src/postulo/templates/applications/report.html
 #, fuzzy
 msgid "The last few weeks"
@@ -20090,6 +20266,10 @@ msgstr[1] "اس انسٹینس نے جو آخری %(counter)s پیغامات ب�
 #, fuzzy
 msgid "The last one waiting."
 msgstr "آخری انتظار."
+
+#: src/postulo/templates/server/backups.html
+msgid "The last send failed."
+msgstr ""
 
 #: src/postulo/applications/widgets.py
 #, fuzzy
@@ -20470,6 +20650,10 @@ msgstr "فراہم کنندہ کی نشان دہی کی گئی ہے اور پو�
 msgid "The public employment service you are registered with. Add it under Companies, as a public employment service, if it is not here."
 msgstr "سرکاری ملازمت کی خدمت آپ کے ساتھ رجسٹرڈ ہے۔ اِس کا مطلب ہے کہ اِس کام میں حصہ لیں ۔."
 
+#: src/postulo/core/models.py
+msgid "The public key every archive is encrypted to before it leaves, starting age1. Keep the identity that opens them somewhere other than this server."
+msgstr ""
+
 #: src/postulo/resume/candidate.py
 msgid "The publication it counts cannot be added, so it will be a count for all of your work."
 msgstr ""
@@ -20821,6 +21005,11 @@ msgstr "اس سی وی وی کے لئے منتخب کردہ ٹیلی فون نم
 msgid "The telephone number of %(name)s was not added."
 msgstr "%(name)s کا ٹیلیفون نمبر شامل نہیں کیا گیا۔."
 
+#: src/postulo/core/views_backups.py
+#, python-format
+msgid "The test failed: %(problem)s"
+msgstr ""
+
 #: src/postulo/templates/documents/cv_text.html
 #, fuzzy
 msgid "The text of this document"
@@ -20830,6 +21019,10 @@ msgstr "اس دستاویز کا متن"
 #, fuzzy
 msgid "The thing to do next"
 msgstr "اگلے کام"
+
+#: src/postulo/core/offsite.py
+msgid "The time for this send ran out before it began."
+msgstr ""
 
 #: src/postulo/templates/server/defaults.html
 #, fuzzy, python-format
@@ -20989,6 +21182,10 @@ msgstr "اس نام کا ایک گروپ پہلے ہی موجود ہے۔."
 #, fuzzy
 msgid "There is no address to fetch it from again."
 msgstr "اس کو دوبارہ سے نافذ کرنے کا کوئی پتا نہیں۔."
+
+#: src/postulo/core/views_backups.py
+msgid "There is no backup destination to send to."
+msgstr ""
 
 #: src/postulo/documents/archiving.py
 #, fuzzy
@@ -21936,6 +22133,11 @@ msgstr "نقل و حمل"
 msgid "transport secrets"
 msgstr "چھپے رازوں کو نقل کریں"
 
+#: src/postulo/templates/server/backups.html
+#, python-format
+msgid "Tried again at %(when)s."
+msgstr ""
+
 #: src/postulo/templates/server/overview.html
 #, fuzzy
 msgid "Trusted:"
@@ -22358,6 +22560,10 @@ msgstr "صارفین"
 msgid "Uses the saved settings, and sends to a real inbox. Test the connection first if you have just changed something."
 msgstr "محفوظ شدہ ترتیبات استعمال کرتا ہے اور اصل میں باکس بھیج دیتا ہے۔ پہلے اتصال کا ٹیسٹ کريں اگر آپ نے کچھ بدل دیا ہے."
 
+#: src/postulo/templates/server/backup_destination.html
+msgid "Uses the saved settings. Nothing is stored there."
+msgstr ""
+
 #: src/postulo/templates/api/token_list.html
 #, fuzzy
 msgid "Using a token"
@@ -22484,6 +22690,7 @@ msgid "Voluntary support is this project's only income: one person writes it, an
 msgstr "رضاکارانہ تعاون اس منصوبے کی واحد آمدنی ہے: ایک شخص اسے لکھتا ہے اور اس میں سے کوئی بھی قرض یا نامزد نہیں ہوتا۔ ایک مرتبہ کہا جاتا ہے کہ جو لوگ اس مثال کو چلانے کیلئے دوڑتے ہیں وہ کبھی بھی کام کی تلاش میں نہیں رہتے ۔."
 
 #: src/postulo/core/models.py src/postulo/notifications/models.py
+#: src/postulo/templates/server/backups.html
 #, fuzzy
 msgid "Waiting"
 msgstr "انتظار کریں"
@@ -23310,10 +23517,18 @@ msgstr "جہاں کسی کارڈ کے پاس ایک <em> کی کمی ہے </em> 
 msgid "Where a value leads: an http or https address with <code dir=\"ltr\">{value}</code> where the identifier goes, after the host. <code dir=\"ltr\">person_link</code> is the address for a person, where that is another one."
 msgstr "قدر کہاں لے جاتی ہے: ایک http یا https پتا جس میں ہوسٹ کے بعد، جہاں شناخت کنندہ آتا ہے، <code dir=\"ltr\">{value}</code> ہو۔ <code dir=\"ltr\">person_link</code> کسی شخص کا پتا ہے، جہاں وہ مختلف ہو۔"
 
+#: src/postulo/templates/server/backup_destination.html
+msgid "Where and how"
+msgstr ""
+
 #: src/postulo/applications/widgets.py
 #, fuzzy
 msgid "Where and why applications end"
 msgstr "کہاں اور کیوں اطلاق ختم ہوتا ہے"
+
+#: src/postulo/core/server_forms.py
+msgid "Where each archive is sent once it has been written and checked."
+msgstr ""
 
 #: src/postulo/resume/forms.py
 #, fuzzy
