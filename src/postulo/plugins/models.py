@@ -10,7 +10,7 @@ from __future__ import annotations
 
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
-from django.db import models, transaction
+from django.db import IntegrityError, models, transaction
 from django.utils.translation import gettext_lazy as _
 
 from postulo.core.models import OwnedModel
@@ -383,6 +383,22 @@ class Connection(OwnedModel):
             self.save(update_fields=["last_ok_at", "last_error", "updated_at"])
 
 
+class AlreadyPaired(Exception):
+    """A remote item already paired with another record on the same connection (#326).
+
+    ``link`` is the pairing that holds it, so a plugin can say which record that is, or ask
+    the person whether to move the item over (#327). Raised by :meth:`SyncLink.bind` in
+    place of the database's bare ``IntegrityError``, which named neither side.
+    """
+
+    def __init__(self, link: SyncLink):
+        self.link = link
+        super().__init__(
+            f"{link.collection} {link.uid} is already paired with "
+            f"{link.content_type.model} {link.object_id}"
+        )
+
+
 class SyncLink(OwnedModel):
     """One local record's twin on the other side of a sync connection.
 
@@ -391,7 +407,35 @@ class SyncLink(OwnedModel):
     on it. A contact stays a contact; that it also lives in an address book is this
     connection's business. When the other side deletes the twin, the link is kept with
     ``remote_gone`` set rather than the local record deleted: a swipe on a phone must not
-    erase an interview.
+    erase an interview. Setting ``remote_gone``, and clearing it, is the plugin's job;
+    :meth:`bind` clears it unless told otherwise, because a record bound again is paired
+    again.
+
+    **Where the twin lives, and which twin it is (#326).** ``collection`` is the address of
+    the address book, calendar or task list holding the twin, blank where a plugin has no
+    such thing. A UID is unique only within its collection (RFC 6352 §5.1, RFC 4791 §4.1),
+    so a twin is keyed on its collection and its UID; ``remote_href`` is a cache of where it
+    was last found, which a server may change (RFC 4791 §5.3.2). ``slot`` is a short key the
+    plugin chooses, naming which of a record's twins this is — an application's "submit"
+    task beside its "hear back" task, an interview's event beside its task. Blank means the
+    only one, which is every row written before there were slots. It is free text, because
+    one plugin's slots mean nothing to another, and not ``role``, which on a contact is
+    already a job title.
+
+    **One remote item, one record.** On one connection, a collection and a UID that are both
+    set belong to one paired record at most; :meth:`bind` raises :class:`AlreadyPaired`
+    rather than write one card into a contact and a department at once.
+
+    **Undoing a pairing keeps the row (#326).** :meth:`unbind` marks it ``unpaired_at``
+    instead of deleting it. A plugin that pairs by UID would otherwise pair the two again on
+    its next run, or push the record as a new item and adopt the item as a new record. An
+    unpaired row says "leave both sides alone": the plugin skips the record and the item
+    until either is bound again, and the row no longer counts towards the rule above, so
+    the item may be paired with another record.
+
+    Pairings are not in the personal export (#326): connections are not, nor their secrets,
+    and a pairing without its connection points at a server the importing instance has no
+    credentials for. A connection added again pairs again by UID.
     """
 
     connection = models.ForeignKey(
@@ -401,47 +445,135 @@ class SyncLink(OwnedModel):
     object_id = models.PositiveBigIntegerField()
     target = GenericForeignKey("content_type", "object_id")
 
+    slot = models.CharField(_("slot"), max_length=50, blank=True)
+    collection = models.CharField(_("collection"), max_length=500, blank=True)
     remote_href = models.CharField(_("remote address"), max_length=500, blank=True)
     uid = models.CharField(_("identifier"), max_length=200, blank=True)
     etag = models.CharField(_("version tag"), max_length=200, blank=True)
     local_hash = models.CharField(_("last pushed"), max_length=64, blank=True)
     last_synced_at = models.DateTimeField(_("last synced"), null=True, blank=True)
     remote_gone = models.BooleanField(_("removed on the other side"), default=False)
+    unpaired_at = models.DateTimeField(_("unpaired"), null=True, blank=True)
 
     class Meta:
         verbose_name = _("sync link")
         verbose_name_plural = _("sync links")
         constraints = [
             models.UniqueConstraint(
-                fields=("connection", "content_type", "object_id"), name="synclink_one_per_record"
+                fields=("connection", "content_type", "object_id", "slot"),
+                name="synclink_one_per_record_slot",
+            ),
+            # Rows written before #326 have a blank collection, so this does not reach them
+            # until the plugin fills it in, after settling any two links holding one UID.
+            models.UniqueConstraint(
+                fields=("connection", "collection", "uid"),
+                condition=~models.Q(collection="")
+                & ~models.Q(uid="")
+                & models.Q(unpaired_at__isnull=True),
+                name="synclink_one_record_per_item",
             ),
         ]
-        indexes = [models.Index(fields=("connection", "remote_href"))]
+        indexes = [
+            models.Index(fields=("connection", "remote_href")),
+            models.Index(fields=("connection", "collection", "uid")),
+        ]
 
     def __str__(self) -> str:
-        return f"{self.content_type.model} {self.object_id} ↔ {self.remote_href or self.uid}"
+        slot = f" [{self.slot}]" if self.slot else ""
+        return f"{self.content_type.model} {self.object_id}{slot} ↔ {self.remote_href or self.uid}"
+
+    @property
+    def paired(self) -> bool:
+        """False once :meth:`unbind` has undone the pairing and nothing has bound it again."""
+        return self.unpaired_at is None
 
     @classmethod
-    def for_record(cls, connection: Connection, record):
-        """The link of ``record`` on ``connection``, or ``None``."""
+    def for_record(cls, connection: Connection, record, slot: str = ""):
+        """The link of ``record`` in ``slot`` on ``connection``, or ``None``.
+
+        An unpaired link is returned too: check :attr:`paired` before syncing through it.
+        """
         return cls.objects.filter(
             connection=connection,
             content_type=ContentType.objects.get_for_model(record),
             object_id=record.pk,
+            slot=slot,
         ).first()
 
     @classmethod
     def of_model(cls, connection: Connection, model):
+        """Every link of ``model`` on ``connection``: every slot, paired or not."""
         return cls.objects.filter(
             connection=connection, content_type=ContentType.objects.get_for_model(model)
         )
 
     @classmethod
-    def bind(cls, connection: Connection, record, **values) -> SyncLink:
-        link, _created = cls.objects.update_or_create(
-            connection=connection,
-            content_type=ContentType.objects.get_for_model(record),
-            object_id=record.pk,
-            defaults={"owner": connection.owner, **values},
+    def for_remote(cls, connection: Connection, collection: str, uid: str):
+        """The link of the item ``uid`` in ``collection``, from the remote side, or ``None``.
+
+        The paired link where there is one. Otherwise the one most recently unpaired, which
+        tells the plugin that a person undid this pairing and the item is to be left alone.
+        """
+        return (
+            cls.objects.filter(connection=connection, collection=collection, uid=uid)
+            .order_by(models.F("unpaired_at").desc(nulls_first=True), "-pk")
+            .first()
         )
+
+    @classmethod
+    def bind(cls, connection: Connection, record, slot: str = "", **values) -> SyncLink:
+        """Pair ``record``, in ``slot``, with its twin: create the link or update it.
+
+        A record bound again is paired again, so ``unpaired_at`` is cleared, and so is
+        ``remote_gone`` unless the caller passes it. A remote item already paired with
+        another record on this connection raises :class:`AlreadyPaired`.
+        """
+        values.setdefault("remote_gone", False)
+        content_type = ContentType.objects.get_for_model(record)
+        try:
+            with transaction.atomic():
+                link, _created = cls.objects.update_or_create(
+                    connection=connection,
+                    content_type=content_type,
+                    object_id=record.pk,
+                    slot=slot,
+                    defaults={"owner": connection.owner, **values, "unpaired_at": None},
+                )
+        except IntegrityError:
+            holder = cls._holder(connection, content_type, record, slot, values)
+            if holder is None:
+                raise
+            raise AlreadyPaired(holder) from None
+        return link
+
+    @classmethod
+    def _holder(cls, connection, content_type, record, slot, values):
+        """The other record's link holding the item ``bind`` was asked to pair, if any."""
+        current = cls.for_record(connection, record, slot)
+        collection = values.get("collection", current.collection if current else "")
+        uid = values.get("uid", current.uid if current else "")
+        if not (collection and uid):
+            return None
+        return (
+            cls.objects.filter(
+                connection=connection, collection=collection, uid=uid, unpaired_at=None
+            )
+            .exclude(content_type=content_type, object_id=record.pk, slot=slot)
+            .first()
+        )
+
+    @classmethod
+    def unbind(cls, connection: Connection, record, slot: str = ""):
+        """Undo the pairing of ``record`` in ``slot``, leaving the record and the item alone.
+
+        The row is kept, marked unpaired, so that a plugin pairing by UID does not pair the
+        two again on its next run; :meth:`bind` pairs them again. Returns the link, or
+        ``None`` where there was none. Calling it twice keeps the time of the first.
+        """
+        from django.utils import timezone
+
+        link = cls.for_record(connection, record, slot)
+        if link is not None and link.unpaired_at is None:
+            link.unpaired_at = timezone.now()
+            link.save(update_fields=["unpaired_at", "updated_at"])
         return link

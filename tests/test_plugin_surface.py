@@ -435,6 +435,7 @@ def test_the_surface_holds_what_a_sync_needs():
     from postulo.plugins import api
 
     for name in (
+        "AlreadyPaired",
         "Application",
         "Appointment",
         "AppointmentHow",
@@ -623,9 +624,10 @@ def test_the_surface_hands_over_the_same_object_the_core_uses():
     from postulo.applications.models import Application
     from postulo.notifications.base import Notification
     from postulo.plugins import api
-    from postulo.plugins.models import SyncLink
+    from postulo.plugins.models import AlreadyPaired, SyncLink
 
     assert api.SyncLink is SyncLink
+    assert api.AlreadyPaired is AlreadyPaired, "what bind raises is what a plugin catches"
     assert api.Application is Application
     assert api.Notification is Notification
 

@@ -16,7 +16,7 @@ from postulo.jobs.models import Company, Contact
 from postulo.plugins import registry, syncing
 from postulo.plugins.base import FieldSpec, SyncPlugin, SyncReport
 from postulo.plugins.base import TestResult as Outcome  # not a test class, despite the name
-from postulo.plugins.models import Connection, SyncLink
+from postulo.plugins.models import AlreadyPaired, Connection, SyncLink
 
 pytestmark = pytest.mark.django_db
 
@@ -89,6 +89,12 @@ def a_sync(user, label="Phone", *, enabled=True, **config):
 def a_contact(user, name="Cave Johnson"):
     company = Company.objects.create(owner=user, name="Aperture Science")
     return Contact.objects.create(owner=user, company=company, name=name)
+
+
+def contacts(user, *names):
+    """Several contacts at one company, for the tests where two records want one item."""
+    company = Company.objects.create(owner=user, name="Aperture Science")
+    return [Contact.objects.create(owner=user, company=company, name=name) for name in names]
 
 
 # ---------------------------------------------------------------- the pieces
@@ -311,6 +317,176 @@ def test_links_are_one_per_record_per_connection_and_die_with_it(user, other_use
     assert link.target is None, (
         "a record deleted here leaves a dangling link for the plugin to clean"
     )
+
+
+# ------------------------------------------- collections, slots and unpairing (#326)
+
+
+def test_one_record_holds_a_twin_per_slot(user):
+    """An interview's event beside its task: two twins of one record, one per slot."""
+    connection = a_sync(user)
+    contact = a_contact(user)
+    SyncLink.bind(connection, contact, collection="/cal/", uid="event-1")
+    SyncLink.bind(connection, contact, slot="task", collection="/tasks/", uid="task-1")
+    SyncLink.bind(connection, contact, slot="task", etag='"2"')
+
+    assert SyncLink.objects.count() == 2, "binding a slot again updates its own row"
+    assert SyncLink.for_record(connection, contact).uid == "event-1"
+    task = SyncLink.for_record(connection, contact, "task")
+    assert (task.uid, task.etag) == ("task-1", '"2"')
+    assert SyncLink.for_record(connection, contact, "hear-back") is None
+    assert set(SyncLink.of_model(connection, Contact).values_list("slot", flat=True)) == {
+        "",
+        "task",
+    }
+
+
+def test_one_uid_in_two_collections_is_two_items(user):
+    """A UID is unique only within its collection (RFC 6352 §5.1, RFC 4791 §4.1)."""
+    connection = a_sync(user)
+    work, home = contacts(user, "Cave Johnson", "GLaDOS")
+    SyncLink.bind(connection, work, collection="/books/work/", uid="same")
+    SyncLink.bind(connection, home, collection="/books/home/", uid="same")
+
+    assert SyncLink.for_remote(connection, "/books/work/", "same").target == work
+    assert SyncLink.for_remote(connection, "/books/home/", "same").target == home
+    assert SyncLink.for_remote(connection, "/books/other/", "same") is None
+    assert SyncLink.for_remote(a_sync(user, "Tablet"), "/books/work/", "same") is None
+
+
+def test_one_remote_item_is_paired_with_one_record(user):
+    """A second record is refused the item, with the pairing that holds it named."""
+    connection = a_sync(user)
+    first, second = contacts(user, "Cave Johnson", "GLaDOS")
+    held = SyncLink.bind(connection, first, collection="/book/", uid="card")
+
+    with pytest.raises(AlreadyPaired) as refused:
+        SyncLink.bind(connection, second, collection="/book/", uid="card")
+    assert refused.value.link == held
+    assert refused.value.link.target == first
+    assert SyncLink.for_record(connection, second) is None, "nothing half-written"
+
+    # Filling in the collection afterwards meets the same rule.
+    SyncLink.bind(connection, second, uid="card")
+    with pytest.raises(AlreadyPaired):
+        SyncLink.bind(connection, second, collection="/book/")
+    # Another connection, or a blank collection (every row before #326), is not held to it.
+    SyncLink.bind(a_sync(user, "Tablet"), second, collection="/book/", uid="card")
+    other, third = (
+        Contact.objects.create(owner=user, company=first.company, name=name)
+        for name in ("Wheatley", "Chell")
+    )
+    SyncLink.bind(connection, other, uid="loose")
+    SyncLink.bind(connection, third, uid="loose")
+
+
+def test_the_database_holds_the_rule_too(user):
+    """A plugin writing past `bind` meets the constraint itself."""
+    from django.db import IntegrityError, transaction
+
+    connection = a_sync(user)
+    first, second = contacts(user, "Cave Johnson", "GLaDOS")
+    SyncLink.bind(connection, first, collection="/book/", uid="card")
+    link = SyncLink.bind(connection, second, collection="/book/", uid="other")
+    link.uid = "card"
+    with pytest.raises(IntegrityError), transaction.atomic():
+        link.save()
+
+
+def test_unbind_keeps_the_row_unpaired_and_bind_pairs_it_again(user):
+    connection = a_sync(user)
+    contact = a_contact(user)
+    SyncLink.bind(connection, contact, collection="/book/", uid="card", etag='"1"')
+
+    link = SyncLink.unbind(connection, contact)
+    assert link.paired is False
+    assert SyncLink.objects.count() == 1, "the row stays, so the plugin leaves both alone"
+    kept = SyncLink.for_record(connection, contact)
+    assert (kept.collection, kept.uid, kept.etag) == ("/book/", "card", '"1"')
+    assert kept.unpaired_at is not None
+    assert SyncLink.for_remote(connection, "/book/", "card") == kept
+    when = kept.unpaired_at
+    SyncLink.unbind(connection, contact)
+    assert SyncLink.for_record(connection, contact).unpaired_at == when, "the first time stays"
+    contact.refresh_from_db()  # the record itself is untouched
+    assert SyncLink.unbind(connection, contact, "task") is None
+
+    relinked = SyncLink.bind(connection, contact, etag='"2"')
+    assert relinked.pk == kept.pk
+    assert relinked.paired
+    assert SyncLink.for_record(connection, contact).unpaired_at is None
+
+
+def test_an_unpaired_item_may_be_paired_with_another_record(user):
+    """An unpaired row does not count: the item is free, and `for_remote` finds the new pair."""
+    connection = a_sync(user)
+    first, second = contacts(user, "Cave Johnson", "GLaDOS")
+    SyncLink.bind(connection, first, collection="/book/", uid="card")
+    SyncLink.unbind(connection, first)
+
+    moved = SyncLink.bind(connection, second, collection="/book/", uid="card")
+    assert SyncLink.for_remote(connection, "/book/", "card") == moved
+    with pytest.raises(AlreadyPaired) as refused:
+        SyncLink.bind(connection, first)
+    assert refused.value.link == moved
+    assert not SyncLink.for_record(connection, first).paired
+
+
+def test_bind_clears_remote_gone_unless_told(user):
+    connection = a_sync(user)
+    contact = a_contact(user)
+    SyncLink.bind(connection, contact, uid="card", remote_gone=True)
+    assert SyncLink.for_record(connection, contact).remote_gone is True
+
+    SyncLink.bind(connection, contact, etag='"2"')
+    assert SyncLink.for_record(connection, contact).remote_gone is False
+    SyncLink.bind(connection, contact, remote_gone=True)
+    assert SyncLink.for_record(connection, contact).remote_gone is True
+
+
+@pytest.mark.django_db(transaction=True)
+def test_the_migration_keeps_every_link(user):
+    """Every existing link survives, blank in what #326 adds, even two holding one UID.
+
+    A re-added DAV connection can hold two links with one UID (postulo/postulo-dav#7); the
+    new rule does not reach them while their collection is blank.
+    """
+    from django.contrib.contenttypes.models import ContentType
+    from django.db import connection as db
+    from django.db.migrations.executor import MigrationExecutor
+
+    # The records are made with today's models: the migration does not touch them.
+    cave, caroline = contacts(user, "Cave", "Caroline")
+    kind = ContentType.objects.get_for_model(Contact).pk
+    before = [("plugins", "0012_register_lookup_starts_off")]
+    after = [("plugins", "0013_synclink_slots")]
+    executor = MigrationExecutor(db)
+    executor.migrate(before)
+    old = executor.loader.project_state(before).apps
+    sync = old.get_model("plugins", "Connection").objects.create(
+        owner_id=user.pk, kind="sync", plugin="mirror", label="Phone"
+    )
+    for record in (cave, caroline):
+        old.get_model("plugins", "SyncLink").objects.create(
+            owner_id=user.pk,
+            connection=sync,
+            content_type_id=kind,
+            object_id=record.pk,
+            remote_href=f"/book/{record.name}.vcf",
+            uid="same",
+        )
+
+    executor = MigrationExecutor(db)
+    executor.migrate(after)
+    new = executor.loader.project_state(after).apps
+    rows = new.get_model("plugins", "SyncLink").objects.order_by("remote_href")
+    assert list(rows.values_list("remote_href", "uid", "collection", "slot", "unpaired_at")) == [
+        ("/book/Caroline.vcf", "same", "", "", None),
+        ("/book/Cave.vcf", "same", "", "", None),
+    ]
+
+    # Leave the database at the latest migration for whatever runs next.
+    MigrationExecutor(db).migrate(MigrationExecutor(db).loader.graph.leaf_nodes())
 
 
 def test_a_deactivated_account_is_not_synced(user):

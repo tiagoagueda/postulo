@@ -182,7 +182,7 @@ if TYPE_CHECKING:  # pragma: no cover - the names `__getattr__` resolves at run 
         read_body,
         until,
     )
-    from .models import SyncLink
+    from .models import AlreadyPaired, SyncLink
 
 from .base import (
     # ------------------------------------------ what a transport carries, and how
@@ -244,6 +244,7 @@ __all__ = [
     "MEDIUMS",
     "TEXT",
     "AddressRow",
+    "AlreadyPaired",
     "Application",
     "Appointment",
     "AppointmentHow",
@@ -411,6 +412,9 @@ _ELSEWHERE: dict[str, tuple[str, str]] = {
     # identifier, the version tag, a hash of what was last pushed. Kept beside the record
     # rather than on it, so a contact stays a contact.
     "SyncLink": ("postulo.plugins.models", "SyncLink"),
+    # What `SyncLink.bind` raises for a remote item another record already holds on the
+    # connection (#326), carrying that record's link rather than a bare IntegrityError.
+    "AlreadyPaired": ("postulo.plugins.models", "AlreadyPaired"),
     # ------------------------------------------------- and the five ways to write to one
     # Never by saving a model: the timeline has to read the same whoever wrote to it, and
     # an automatism has to be undoable by hand, which is what the `actor` on each of these
