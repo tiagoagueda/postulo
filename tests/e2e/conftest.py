@@ -37,6 +37,23 @@ pytest.importorskip("playwright", reason="the browser tests need the e2e depende
 EMAIL = "alex.morgan@example.org"
 PASSWORD = "correct-horse-battery-staple"  # a test account's password, not a secret
 
+
+# ------------------------------------------------------------------ the live server's database
+@pytest.fixture(scope="session")
+def live_server(django_db_setup, live_server):
+    """pytest-django's live server, started once the test database is there (#1024).
+
+    A browser run keeps its database in a file, so that each request thread has a connection
+    of its own (`django_db_modify_db_settings` in `tests/conftest.py` says why). pytest-django
+    decides which connections to hand to the server's threads as it starts it, by asking each
+    whether it is in memory -- and the font check below starts the server before any test has
+    asked for the database, while the connection still names `:memory:`, the setting the file
+    replaces. Asked then, it answered yes, and the server shared the test thread's connection
+    all the same. With the database set up first, the server finds the file and shares nothing.
+    """
+    return live_server
+
+
 # -------------------------------------------------------------------- live server cleanup
 # Every database wrapper this process creates, beside a weak reference to the thread that
 # created it. Held rather than looked up, because a wrapper a dead thread created is
@@ -139,11 +156,15 @@ def _no_service_worker_in_a_context_a_test_opens_itself():
 
     `browser_context_args` reaches only the `page` and `context` fixtures, and 79 contexts
     in 37 files are opened by hand -- a phone viewport, scripts off -- so in those the
-    worker installed and fetched the offline page after all. The live server shares one
-    in-memory SQLite connection between its request threads, and that fetch, answered
+    worker installed and fetched the offline page after all. The live server then shared
+    one in-memory SQLite connection between its request threads, and that fetch, answered
     while the next test's page was asking for the job list, hung both requests inside
     SQLite until the five-minute timeout stopped the browser job, twice in a row on
-    #1041. A test that does want the worker still says `service_workers="allow"`.
+    #1041. A browser run keeps its database in a file since #1024, so each request thread
+    has a connection of its own (`django_db_modify_db_settings` in `tests/conftest.py`);
+    the worker stays blocked all the same, as a request nobody asked for, still in flight
+    when the test is over. A test that does want the worker still says
+    `service_workers="allow"`.
     """
     from playwright.sync_api import Browser
 

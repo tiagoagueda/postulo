@@ -190,10 +190,19 @@ def test_the_slash_key_still_finds_the_box(page: Page, live_server, tables):
 def held(monkeypatch):
     """Hold the server's answer to one question until the test lets it go.
 
-    `held.only(view, wanted)` makes `view` wait before answering any request `wanted` says
-    yes to; `held.arrived` is set when such a request has reached the server, and
-    `held.release` lets it answer. Held on the server rather than in the browser's routing,
-    so the second request is free to overtake the first, which is the case being tested."""
+    `held.only(view, wanted)` makes the server wait before sending `view`'s answer to any
+    request `wanted` says yes to; `held.arrived` is set when such an answer is ready, and
+    `held.release` lets it go. Held on the server rather than in the browser's routing, so
+    the second request is free to overtake the first, which is the case being tested.
+
+    Held once the answer is made, outside the request's transaction, as a slow network
+    holds it. Inside the view it would hold the transaction open too, and since the browser
+    tests keep their database in a file opened as an instance opens its own (#1024), every
+    request's transaction takes the write lock as it begins: the newer request would wait
+    behind the held one, as it would behind a slow view on an instance, and could never
+    overtake it. On the in-memory database the two shared a connection and there was no
+    lock to wait for."""
+    from django.core.handlers.base import BaseHandler
 
     class Held:
         def __init__(self):
@@ -201,15 +210,17 @@ def held(monkeypatch):
             self.release = threading.Event()
 
         def only(self, view, wanted):
-            original = view.get
+            original = BaseHandler.get_response
 
-            def get(view_self, request, *args, **kwargs):
-                if wanted(request):
+            def get_response(handler, request):
+                response = original(handler, request)
+                match = request.resolver_match
+                if match and getattr(match.func, "view_class", None) is view and wanted(request):
                     self.arrived.set()
                     self.release.wait(10)
-                return original(view_self, request, *args, **kwargs)
+                return response
 
-            monkeypatch.setattr(view, "get", get)
+            monkeypatch.setattr(BaseHandler, "get_response", get_response)
 
     holding = Held()
     yield holding

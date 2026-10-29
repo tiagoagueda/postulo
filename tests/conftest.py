@@ -1,7 +1,61 @@
+import shutil
+import tempfile
+from pathlib import Path
+
 import pytest
 from django.contrib.auth import get_user_model
 
+from postulo.config import sqlite
 from postulo.core import site
+
+
+@pytest.fixture(scope="session")
+def django_db_modify_db_settings(django_db_modify_db_settings_parallel_suffix, request):
+    """A run with browser tests in it keeps its database in a file (#1024).
+
+    The suite's database is SQLite in memory, which is what makes it quick. An in-memory
+    database is a single connection, so pytest-django's live server hands the test thread's
+    connection to every thread it answers a request on; and every request is a transaction
+    (`ATOMIC_REQUESTS`), so two requests in flight at once tangled their transactions in the
+    one wrapper's bookkeeping. One committed under the other's savepoint, and the browser job
+    died of `no such savepoint` and then of 1,829 `TransactionManagementError`s, a few hundred
+    tests in, at random: run again alone, every one of them passed.
+    `tests/e2e/test_live_server_connections.py` plays that order out.
+
+    In a file every thread opens a connection of its own, and pytest-django passes none of
+    them along: it shares only an in-memory one. The file is opened as the instance opens its
+    own (`config/sqlite.py`, #206): a transaction takes the write lock as it begins, so a
+    second request waits its turn for twenty seconds at most rather than failing at once, and
+    under WAL the test thread reads while a request writes. One file per process, in a
+    directory named after the xdist worker, removed when the run is over.
+
+    The price is the instance's own: requests take turns, a page that only reads included,
+    so a test that holds a request inside its view holds every other request behind it. The
+    alternative, SQLite's deferred transactions, would let readers through, but a request
+    that reads and then writes -- a session, a rate-limit count in the database cache, a
+    field saved as it is typed -- fails at once with *database is locked* when another wrote
+    in between, since SQLite does not wait out an upgrade (#206): the random failure this is
+    here to end, in another form, and one an instance never meets. So a test that wants a
+    slow answer holds it after the view, as `held` in `e2e/test_site_search.py` does.
+
+    Only when the run has a browser test in it. The rest of the suite has no live server, and
+    stays in memory; a PostgreSQL run (`POSTULO_TEST_DATABASE_URL`) is left as it is.
+    """
+    from django.conf import settings
+
+    database = settings.DATABASES["default"]
+    browsing = any(item.get_closest_marker("e2e") for item in request.session.items)
+    if not browsing or not sqlite.is_sqlite(database):
+        yield
+        return
+    worker = getattr(request.config, "workerinput", {}).get("workerid", "main")
+    directory = Path(tempfile.mkdtemp(prefix=f"postulo-e2e-{worker}-"))
+    database.setdefault("TEST", {})["NAME"] = str(directory / "postulo.sqlite3")
+    options = database.setdefault("OPTIONS", {})
+    for key, value in sqlite.FILE_OPTIONS.items():
+        options.setdefault(key, value)
+    yield
+    shutil.rmtree(directory, ignore_errors=True)
 
 
 @pytest.fixture
