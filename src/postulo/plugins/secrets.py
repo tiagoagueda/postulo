@@ -102,6 +102,37 @@ def backup_mac(payload: bytes) -> str:
     return hmac.new(key, payload, hashlib.sha256).hexdigest()
 
 
+def posting_key(owner_id: int, url_key: str) -> str:
+    """An opaque name for one posting of one account, for a client to group captures by (#711).
+
+    The browser extension counts the postings waiting for review once each, merging Postulo's
+    list with its own unsent captures, and it carried a port of `same_url` to do it: two copies
+    of one rule, which drift, and the day they did the badge and the review list would disagree
+    with Postulo about what is one posting. This hands it the grouping instead. Two captures
+    with one ``url_key`` -- the address as `same_url` reduces it -- get one key, and a client
+    compares keys without knowing what they stand for.
+
+    **Why keyed, and not the address.** A token that only holds ``captures`` is not told the
+    addresses of what is waiting (#761), and a normalised address on each row would give them
+    back. A bare SHA of it would too, a guess at a time: an address is not a secret anybody
+    chose, and a job board numbers its own. So it is an HMAC under a key derived from the
+    instance's key, under a domain prefix of its own like `backup_mac`, and it says nothing to
+    whoever lacks that key.
+
+    **Why the account is in it.** Within one account a token can already ask
+    ``POST /captures/known`` whether an address is waiting, so a key it could test a guess
+    against tells it nothing new. Across accounts it would: one person could name the postings
+    in another's queue by matching keys. The owner's id makes two accounts' keys unrelated.
+
+    An empty ``url_key`` -- an address that names no host, which `same_url` cannot match with
+    anything -- has an empty key, so that such captures are not all taken for one posting.
+    """
+    if not url_key:
+        return ""
+    key = hashlib.sha256(b"postulo-posting-key:" + _material().encode("utf-8")).digest()
+    return hmac.new(key, f"{owner_id}\n{url_key}".encode(), hashlib.sha256).hexdigest()
+
+
 def encrypt(data: dict) -> str:
     """Serialise and encrypt; an empty dict becomes an empty string."""
     if not data:

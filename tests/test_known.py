@@ -17,6 +17,7 @@ from postulo.api.models import ApiToken
 from postulo.core.addresses import same_url
 from postulo.jobs.known import known
 from postulo.jobs.models import Capture, CaptureStatus, Company, JobPosting
+from postulo.plugins import secrets
 
 pytestmark = pytest.mark.django_db
 
@@ -241,6 +242,8 @@ def test_the_api_answers_per_posting_and_stores_nothing(client, user):
     ] == [elsewhere.pk, listing.pk]
     assert second["listings"] == [] and third == {
         "url": "https://example.org/jobs/999",
+        # What a capture of it would be grouped by on the list (#711).
+        "posting_key": secrets.posting_key(user.pk, "example.org/jobs/999"),
         "listings": [],
         "captures": [],
         "similar": [],

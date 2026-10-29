@@ -47,10 +47,11 @@ from pydantic import AfterValidator, ConfigDict, Field
 from pydantic import ValidationError as PydanticValidationError
 
 from postulo.core import errands, site, throttle
-from postulo.core.addresses import page_address
+from postulo.core.addresses import page_address, same_url
 from postulo.jobs import pages, remembered
 from postulo.jobs.known import known
 from postulo.jobs.models import Capture, CaptureStatus
+from postulo.plugins import secrets
 from postulo.plugins.base import CaptureError, JobPostingData
 from postulo.plugins.fetching import fetch_page
 
@@ -318,10 +319,25 @@ class KnownCaptureOut(Schema):
     review_url: str
 
 
+#: What `posting_key` is, said once for the two shapes that carry it (#711).
+POSTING_KEY = (
+    "An opaque name for the posting at this address, for a client to group captures by: two "
+    "captures of one posting -- its address however it was spelled, with or without `www.`, "
+    "http or https, a trailing slash, in either case -- have the same key, and two postings "
+    "different keys. It is a keyed hash, stable for as long as the instance's key is, and "
+    "there is no way back from it to the address. It is not comparable across accounts. "
+    "Empty for an address that names no host, which matches nothing else."
+)
+
+
 class KnownOut(Schema):
     """What the owner already holds for one address: told, so they can decide (#178)."""
 
     url: str
+    posting_key: str = Field(
+        description=POSTING_KEY + " The key a capture of this address has, or would have, "
+        "on the list of captures."
+    )
     listings: list[KnownListingOut]
     captures: list[KnownCaptureOut]
     similar: list[KnownListingOut]
@@ -356,6 +372,7 @@ class KeptOut(Schema):
 class CaptureOut(Schema):
     id: int
     url: str
+    posting_key: str = Field(description=POSTING_KEY)
     title: str
     company_name: str
     location: str
@@ -397,6 +414,9 @@ def _as_output(request, capture: Capture, *, keeping=None, note: str = "") -> di
     return {
         "id": capture.pk,
         "url": capture.url,
+        # Told to a token that only sends pages as well: it groups the queue without naming
+        # anything in it, which the address `_as_listed` blanks would (#711, #761).
+        "posting_key": secrets.posting_key(capture.owner_id, capture.url_key),
         "title": data.get("title", ""),
         "company_name": data.get("company_name", ""),
         "location": data.get("location", ""),
@@ -889,6 +909,9 @@ def known_captures(request, payload: KnownIn):
         answers.append(
             {
                 "url": asked.url,
+                # What the asked address would be keyed as on the list, so a client can merge
+                # what it has not sent yet with what is waiting here (#711).
+                "posting_key": secrets.posting_key(owner.pk, same_url(asked.url)),
                 "listings": [listing(posting) for posting in seen.listings],
                 "captures": [waiting(capture) for capture in seen.captures],
                 # The soft match by title tells a captures-only token whether the owner holds a

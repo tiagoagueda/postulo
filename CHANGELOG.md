@@ -269,6 +269,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### ✨ Added
 
+- Every capture on the API carries a `posting_key`, the same for two captures of one posting and different for two, so a client counts the postings waiting for review without copying `same_url()`; a keyed hash told to a captures-only token too, and answered per address by `/captures/known` (#711)
 - A map pin whose holder has a picture is drawn as it: the company's logo, or your own picture on your own addresses, ringed in the brand's colour; a contact keeps the dot, and a picture that fails to load gives its pin the dot back. (#914)
 - A plugin theme can carry its own fonts, SVG drawings and images: {% theme_asset %} writes them into the document before drawing, so nothing is fetched; the preview alone allows a data: font, and check_fonts and Overview say which scripts a theme's font draws. (#343)
 - A backup destination plugin kind (`postulo.backups`): chosen under Server settings → Backups, it receives each verified archive encrypted to an age recipient, retried by the scheduler, with remote retention and its own metrics; a waiting archive is never rotated here. (#325)
