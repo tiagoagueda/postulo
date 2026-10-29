@@ -61,10 +61,24 @@ OFFICE = "http://schemas.openxmlformats.org/officeDocument/2006/relationships"
 #: The deepest heading a style is written for. An outline asking for a deeper one gets this.
 DEEPEST_HEADING = 3
 
-#: A4, in twentieths of a point, with the margin the PDF has (`pdf.PAGE_MARGIN`, 18 mm).
-PAGE_WIDTH = 11906
-PAGE_HEIGHT = 16838
+#: The margin the PDF has (`pdf.PAGE_MARGIN`, 18 mm), in twentieths of a point. The paper is
+#: the outline's (#344), measured by `twips`; A4 portrait is 11906 by 16838.
 PAGE_MARGIN = 1021
+
+#: Twentieths of a point in a millimetre: 1440 to the inch, 25.4 millimetres to the inch.
+TWIPS_PER_MM = 1440 / 25.4
+
+
+def twips(millimetres: float) -> int:
+    return round(millimetres * TWIPS_PER_MM)
+
+
+def page_size(paper) -> str:
+    """The section's ``<w:pgSz>``: the width and the height already turned, and the
+    orientation said as well, since Word reads it to decide which way to feed the sheet."""
+    orient = ' w:orient="landscape"' if paper.landscape else ""
+    return f'<w:pgSz w:w="{twips(paper.width_mm)}" w:h="{twips(paper.height_mm)}"{orient}/>'
+
 
 #: Everything XML 1.0 will not carry, escaped or otherwise.
 UNWRITABLE = re.compile("[^\t\n\r -퟿-�\U00010000-\U0010ffff]")
@@ -167,7 +181,7 @@ def _document(outline: Outline) -> str:
             paragraphs.append(_paragraph(block.text.strip(), rtl=rtl))
     section = (
         "<w:sectPr>"
-        f'<w:pgSz w:w="{PAGE_WIDTH}" w:h="{PAGE_HEIGHT}"/>'
+        f"{page_size(outline.paper)}"
         f'<w:pgMar w:top="{PAGE_MARGIN}" w:right="{PAGE_MARGIN}" w:bottom="{PAGE_MARGIN}" '
         f'w:left="{PAGE_MARGIN}" w:header="709" w:footer="709" w:gutter="0"/>'
         f"{'<w:bidi/>' if rtl else ''}"

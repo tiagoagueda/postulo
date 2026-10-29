@@ -110,13 +110,24 @@ class Theme:
     #: registered, to the package the plugin is defined in, whatever the plugin wrote here: a
     #: theme reads its own files and nobody else's. Empty for Postulo's own, which carry none.
     package: str = ""
+    #: The papers the theme prints on (#344): a list for every kind it sets, or a mapping of
+    #: kind to list, each entry a paper's key (``"a4-portrait"``, ``"letter-landscape"``) or
+    #: ``"any"`` for a *fluid* theme that prints on every paper Postulo has. Nothing declared
+    #: -- for the theme, or for one kind of a mapping -- is A4 portrait only, which is what
+    #: every theme written before there was a choice was drawn on. `paper.declared` reads it.
+    papers: Sequence[str] | Mapping[str, Sequence[str]] = ()
 
     def sets(self, kind: str) -> bool:
         return kind in self.templates
 
 
 def _shipped(name: str, label) -> Theme:
-    """One of Postulo's own: a directory named after it, one template per kind."""
+    """One of Postulo's own: a directory named after it, one template per kind.
+
+    Fluid, every one of them (#344): the columns are fractions of the page and the margins
+    a theme writes are the same on every side, so nothing in them was measured for A4, and
+    `tests/test_pdf_render.py` draws each kind on every paper to keep it so.
+    """
     return Theme(
         name=name,
         label=label,
@@ -126,10 +137,12 @@ def _shipped(name: str, label) -> Theme:
             Kind.LETTER: f"documents/themes/{name}/letter.html",
             Kind.REPORT: f"documents/themes/{name}/report.html",
         },
+        papers=("any",),
     )
 
 
-#: The themes Postulo ships. Both set everything, which is the rule the tests hold them to.
+#: The themes Postulo ships. Both set everything, on every paper, which is the rule the tests
+#: hold them to.
 BUILT_IN: tuple[Theme, ...] = (
     _shipped("plain", _("Plain")),
     _shipped("classic", _("Classic")),

@@ -56,8 +56,14 @@ NAMESPACES = (
 #: The deepest heading a style is written for, as in the Word file.
 DEEPEST_HEADING = 3
 
-#: A4, with the margin the PDF has (`pdf.PAGE_MARGIN`, 18 mm).
+#: The margin the PDF has (`pdf.PAGE_MARGIN`, 18 mm). The paper is the outline's (#344).
 PAGE_MARGIN = "18mm"
+
+
+def _millimetres(value: float) -> str:
+    """``210mm``, ``215.9mm``: as short as the number allows."""
+    return f"{value:g}mm"
+
 
 #: Points, and the space above and below in millimetres, per heading level.
 HEADINGS = {1: (18, "0mm", "2.1mm"), 2: (13, "4.9mm", "2.8mm"), 3: (11, "2.8mm", "0.7mm")}
@@ -194,7 +200,10 @@ def _styles(outline: Outline) -> str:
         "</office:styles>"
         "<office:automatic-styles>"
         '<style:page-layout style:name="pm1">'
-        '<style:page-layout-properties fo:page-width="210mm" fo:page-height="297mm" '
+        "<style:page-layout-properties "
+        f'fo:page-width="{_millimetres(outline.paper.width_mm)}" '
+        f'fo:page-height="{_millimetres(outline.paper.height_mm)}" '
+        f'style:print-orientation="{outline.paper.orientation}" '
         f'fo:margin-top="{PAGE_MARGIN}" fo:margin-bottom="{PAGE_MARGIN}" '
         f'fo:margin-left="{PAGE_MARGIN}" fo:margin-right="{PAGE_MARGIN}"'
         f"{direction}/>"

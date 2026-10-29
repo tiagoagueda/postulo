@@ -31,6 +31,8 @@ from postulo.core.personal import (
     validate_nationalities,
 )
 from postulo.core.stored_pictures import StoredPicture
+from postulo.documents.paper import CHOICES as PAPER_CHOICES
+from postulo.documents.paper import MAX_KEY_LENGTH as PAPER_KEY_LENGTH
 from postulo.documents.properties import (
     MAX_AUTHOR,
     MAX_KEYWORDS,
@@ -412,6 +414,12 @@ class Profile(models.Model):
     #: place. Empty is `plain` for every kind, which is how every report was drawn before;
     #: `documents.themes.remembered` reads it and `remember` writes it.
     document_themes = models.JSONField(_("document themes"), default=dict, blank=True)
+    #: The paper this person's documents are printed on unless one export chooses another
+    #: (#344): a key of `documents.paper`, and blank for the instance's default, which is what
+    #: an account that never chose follows -- so an administrator's change reaches it.
+    paper = models.CharField(
+        _("paper"), max_length=PAPER_KEY_LENGTH, blank=True, choices=PAPER_CHOICES
+    )
     #: Keys from postulo.core.navigation that this person has chosen not to see in the
     #: main navigation. Everything there is reachable another way, so hiding one takes
     #: nothing away; the row across the top is what runs out of room first.

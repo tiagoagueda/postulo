@@ -16,8 +16,9 @@ from django.utils.translation import gettext_lazy as _
 from postulo.core import languages, personal
 
 from . import formats as file_formats
+from . import paper as papers
+from . import paper_choice, theme_assets, themes
 from . import properties as file_properties
-from . import theme_assets, themes
 from .models import (
     CV,
     CoverLetter,
@@ -543,7 +544,7 @@ def _inliner(theme_name: str) -> theme_assets.Inliner:
     return theme_assets.Inliner(themes.find(theme_name) or themes.find(themes.DEFAULT))
 
 
-def render_cv_html(cv: CV, *, nonce=None, properties=None) -> str:
+def render_cv_html(cv: CV, *, nonce=None, properties=None, paper: str = "") -> str:
     """Render a CV variant to a complete, self-contained HTML document.
 
     ``nonce`` is for the preview page alone: the browser's content security policy refuses
@@ -561,10 +562,15 @@ def render_cv_html(cv: CV, *, nonce=None, properties=None) -> str:
 
     ``properties`` is the choice about what the file says about itself (#480): left out, or
     edited. None is what it always was.
+
+    ``paper`` is the key of the paper one export chose (#344), and empty for the person's
+    default; one the theme does not print on raises `CannotRender`, as a kind it does not
+    set does. The theme is told the paper, and Postulo writes the page rule for it.
     """
+    chosen = paper_choice.for_document(cv.theme, cv.theme_kind, cv.owner, paper)
     with languages.override(document_language(cv)):
         contact = cv_contact(cv)
-        return render_to_string(
+        html = render_to_string(
             themes.template_for(cv.theme, cv.theme_kind),
             {
                 "cv": cv,
@@ -572,10 +578,12 @@ def render_cv_html(cv: CV, *, nonce=None, properties=None) -> str:
                 "contact": contact,
                 "document_direction": document_direction(cv),
                 "csp_nonce": nonce,
+                "paper": chosen,
                 theme_assets.CONTEXT_KEY: _inliner(cv.theme),
                 **_properties_context(cv, contact["name"] if contact else "", properties),
             },
         )
+    return papers.with_paper(html, chosen, nonce=nonce)
 
 
 # ------------------------------------------------------- a CV as its words (#236)
@@ -780,13 +788,13 @@ def _section_blocks(cv: CV, section: Section, *, as_portfolio: bool) -> list:
     return [file_formats.bullets(lines)]
 
 
-def cv_outline(cv: CV, properties=None) -> file_formats.Outline:
+def cv_outline(cv: CV, properties=None, paper: str = "") -> file_formats.Outline:
     """A CV variant as its words: what plain text, Word and a comparison are made of.
 
     Built from `build_sections`, in the document's own language, for the reason
     `render_cv_html` gives -- and with the contact block left off where the person left it
     off, the author's name with it. ``properties`` is what the file is to say about itself
-    (#480).
+    (#480), and ``paper`` the key of the one its pages are set on, where it has pages (#344).
     """
     language = document_language(cv)
     with languages.override(language):
@@ -819,6 +827,7 @@ def cv_outline(cv: CV, properties=None) -> file_formats.Outline:
             direction=document_direction(cv),
             author=contact["name"] if contact else "",
             blocks=tuple(blocks),
+            paper=paper_choice.for_file(cv.owner, paper),
         )
         return file_properties.apply(
             outline,
@@ -903,7 +912,13 @@ def unfilled_placeholders(letter: CoverLetter, application=None) -> list[str]:
 
 
 def render_letter_html(
-    letter: CoverLetter, application=None, *, mark_empty: bool = False, nonce=None, properties=None
+    letter: CoverLetter,
+    application=None,
+    *,
+    mark_empty: bool = False,
+    nonce=None,
+    properties=None,
+    paper: str = "",
 ) -> str:
     """Render a cover letter, with its placeholders filled in.
 
@@ -911,12 +926,14 @@ def render_letter_html(
     `{{ date }}` was written in one language under a heading printed in another was the
     plainest version of this: two dates, two languages, one page.
 
-    ``properties`` is the choice about what the file says about itself (#480).
+    ``properties`` is the choice about what the file says about itself (#480), and ``paper``
+    the paper, as `render_cv_html` takes it (#344).
     """
+    chosen = paper_choice.for_document(letter.theme, themes.Kind.LETTER, letter.owner, paper)
     with languages.override(document_language(letter)):
         values = letter_values(letter, application)
         contact = contact_details(letter.owner)
-        return render_to_string(
+        html = render_to_string(
             themes.template_for(letter.theme, themes.Kind.LETTER),
             {
                 "letter": letter,
@@ -931,13 +948,17 @@ def render_letter_html(
                 "recipient": values["company"],
                 "document_direction": document_direction(letter),
                 "csp_nonce": nonce,
+                "paper": chosen,
                 theme_assets.CONTEXT_KEY: _inliner(letter.theme),
                 **_properties_context(letter, contact["name"], properties),
             },
         )
+    return papers.with_paper(html, chosen, nonce=nonce)
 
 
-def letter_outline(letter: CoverLetter, application=None, properties=None) -> file_formats.Outline:
+def letter_outline(
+    letter: CoverLetter, application=None, properties=None, paper: str = ""
+) -> file_formats.Outline:
     """A letter as its words, for the formats that are not a page (#480).
 
     What the page says, in the order it says it: the sender, who it is for, the date, the
@@ -973,6 +994,7 @@ def letter_outline(letter: CoverLetter, application=None, properties=None) -> fi
             direction=document_direction(letter),
             author=contact.get("name", ""),
             blocks=tuple(blocks),
+            paper=paper_choice.for_file(letter.owner, paper),
         )
         return file_properties.apply(
             outline,
@@ -1111,7 +1133,13 @@ def already_exported(cv: CV, *, html: str = "", checksum: str = "") -> RenderedD
 
 
 def snapshot_cv(
-    cv: CV, *, application=None, backend=None, content: bytes | None = None, properties=None
+    cv: CV,
+    *,
+    application=None,
+    backend=None,
+    content: bytes | None = None,
+    properties=None,
+    paper: str = "",
 ) -> RenderedDocument:
     """Freeze a CV as a PDF, exactly as it stands now.
 
@@ -1131,9 +1159,12 @@ def snapshot_cv(
     ``properties`` is what the file was told to say about itself, and it is part of what is
     recorded (#480): a copy without its properties is not the file with them, so the markup
     differs, and `with_properties` says which was filed.
+
+    ``paper`` is what the export chose (#344), and is in the markup too: the same CV on
+    another paper is another file.
     """
     chosen = properties or file_properties.DEFAULT
-    html = render_cv_html(cv, properties=chosen)
+    html = render_cv_html(cv, properties=chosen, paper=paper)
     if application is None:
         filed = already_exported(cv, html=html)
         if filed is not None:
@@ -1237,17 +1268,19 @@ def snapshot_letter(
     backend=None,
     content: bytes | None = None,
     properties=None,
+    paper: str = "",
 ) -> RenderedDocument:
     """Freeze a cover letter as a PDF, with its placeholders already resolved.
 
     ``content`` is the PDF just mailed, filed as it is rather than drawn again (#361).
     ``properties`` is what the file was told to say about itself, recorded as it is on a
-    CV's (#480).
+    CV's (#480); ``paper`` is as `snapshot_cv` takes it (#344).
     """
     chosen = properties or file_properties.DEFAULT
     if content is None:
         content = html_to_pdf(
-            render_letter_html(letter, application, properties=chosen), backend=backend
+            render_letter_html(letter, application, properties=chosen, paper=paper),
+            backend=backend,
         )
     # The recipient's name, not the person's own filing name for this draft (#223).
     language = document_language(letter)

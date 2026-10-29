@@ -6,6 +6,8 @@ from django import forms
 from django.utils.translation import gettext_lazy as _
 from django.utils.translation import ngettext
 
+from postulo.documents import paper
+
 from . import identifiers, site
 from .language_field import LanguageChoiceField, LanguagesChoiceField
 from .models import SiteSettings
@@ -401,7 +403,14 @@ class OfferedLanguagesForm(forms.ModelForm):
 class DefaultsForm(PinnedPolicyForm):
     class Meta:
         model = SiteSettings
-        fields = ("instance_name", "tagline", "motto", "default_language", "default_time_zone")
+        fields = (
+            "instance_name",
+            "tagline",
+            "motto",
+            "default_language",
+            "default_time_zone",
+            "default_paper",
+        )
 
     def __init__(self, *args, **kwargs):
         from django.conf import settings
@@ -424,6 +433,17 @@ class DefaultsForm(PinnedPolicyForm):
             label=_("Time zone for new accounts"),
             help_text=_("What a new account starts with. Each person can change theirs."),
             choices=lambda: time_zone_choices(default=settings.TIME_ZONE),
+            required=False,
+        )
+        # Every account that has not chosen its own follows this, not only new ones, so a
+        # change here reaches them (#344). The blank choice is A4 portrait, said as such.
+        self.fields["default_paper"] = forms.ChoiceField(
+            label=_("Paper for documents"),
+            help_text=_(
+                "What a CV, a letter or a report is printed on unless its owner chooses "
+                "another. A theme that does not print on it uses A4, portrait."
+            ),
+            choices=[("", _("Not set here — A4, portrait")), *paper.CHOICES],
             required=False,
         )
 

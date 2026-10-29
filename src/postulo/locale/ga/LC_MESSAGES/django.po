@@ -3003,6 +3003,14 @@ msgstr "A1 — tosaitheoir"
 msgid "A2 — elementary"
 msgstr "A2 — bunúsach"
 
+#: src/postulo/documents/paper.py
+msgid "A4, landscape"
+msgstr ""
+
+#: src/postulo/documents/paper.py
+msgid "A4, portrait"
+msgstr ""
+
 #: src/postulo/accounts/models.py
 msgid "Abbreviated"
 msgstr "Giorraithe"
@@ -6459,6 +6467,7 @@ msgstr ""
 #: src/postulo/templates/cotton/documents_nav.html
 #: src/postulo/templates/documents/application_documents.html
 #: src/postulo/templates/documents/rendered_list.html
+#: src/postulo/templates/server/defaults.html
 msgid "Documents"
 msgstr "Doiciméid"
 
@@ -9520,6 +9529,10 @@ msgstr "Lipéad amháin"
 msgid "Labels only"
 msgstr "Lipéid amháin"
 
+#: src/postulo/documents/paper.py
+msgid "landscape"
+msgstr ""
+
 #: src/postulo/accounts/forms.py src/postulo/documents/forms.py
 #: src/postulo/resume/forms.py src/postulo/resume/registry.py
 #: src/postulo/templates/jobs/company_form.html
@@ -11567,6 +11580,10 @@ msgid "not set"
 msgstr "gan socrú"
 
 #: src/postulo/core/server_forms.py
+msgid "Not set here — A4, portrait"
+msgstr ""
+
+#: src/postulo/core/server_forms.py
 msgid "Not set here — the environment or the default applies"
 msgstr "Níor socraíodh anseo — tá feidhm ag an timpeallacht nó ag an réamhshocrú"
 
@@ -12977,6 +12994,24 @@ msgctxt "role at an event"
 msgid "Panellist"
 msgstr "Ball painéil"
 
+#: src/postulo/accounts/models.py
+msgid "paper"
+msgstr ""
+
+#: src/postulo/documents/forms.py
+#: src/postulo/templates/applications/report.html
+#: src/postulo/templates/settings/export.html
+msgid "Paper"
+msgstr ""
+
+#: src/postulo/core/models.py
+msgid "paper for documents"
+msgstr ""
+
+#: src/postulo/core/server_forms.py
+msgid "Paper for documents"
+msgstr ""
+
 #: src/postulo/resume/publications.py
 msgid "Paper in proceedings"
 msgstr "Páipéar in imeachtaí comhdhála"
@@ -13408,6 +13443,10 @@ msgstr "Punann"
 msgid "Portfolios, profiles and videos you pointed them at."
 msgstr "Punanna, próifílí agus físeáin ar dhírigh tú orthu iad."
 
+#: src/postulo/documents/paper.py
+msgid "portrait"
+msgstr ""
+
 #: src/postulo/templates/server/design.html
 msgid "Portugal"
 msgstr "An Phortaingéil"
@@ -13522,6 +13561,10 @@ msgstr "Níl a fhios ag Postulo conas é sin a dhéanamh le lógó."
 #: src/postulo/applications/ical_import.py
 msgid "Postulo does not know that time zone."
 msgstr "Níl an crios ama sin ar eolas ag Postulo."
+
+#: src/postulo/documents/paper_choice.py
+msgid "Postulo does not print on that paper. Choose another."
+msgstr ""
 
 #: src/postulo/jobs/forms.py
 msgid "Postulo fetches it once and keeps a copy; the address is never shown to a browser. PNG, JPEG, GIF or WebP."
@@ -17293,6 +17336,11 @@ msgstr "Níl an breiseán %(plugin)s suiteáilte."
 msgid "The %(theme)s theme does not set this type of document."
 msgstr "Ní shocraíonn an téama %(theme)s an cineál seo doiciméid."
 
+#: src/postulo/documents/paper.py
+#, python-format
+msgid "The %(theme)s theme prints this only on: %(papers)s."
+msgstr ""
+
 #: src/postulo/templates/server/logs.html
 msgid "The /logs endpoint is on and has no token."
 msgstr "Tá an críochphointe /logs ar siúl agus níl comhartha aige."
@@ -18213,6 +18261,10 @@ msgstr[4] "Níor tarraingíodh an leathanach laistigh de %(seconds)s soicind, ma
 msgid "The page you read it on. A CV does not print it."
 msgstr ""
 
+#: src/postulo/accounts/forms.py
+msgid "The paper every document is printed on"
+msgstr ""
+
 #: src/postulo/jobs/forms.py
 msgid "The part of the economy it is in. Narrows the suggestions below, and an industry of your own added here is filed under it."
 msgstr "An chuid den gheilleagar ina bhfuil sé. Cúngaíonn sé na moltaí thíos, agus comhdaítear faoi tionscal de do chuid féin a chuirtear leis anseo."
@@ -19047,6 +19099,10 @@ msgstr "Tuairiscíodh go raibh an chuideachta seo ag déanamh daoine iomarcach a
 msgid "This entry prints its original text on every CV."
 msgstr "Priontálann an iontráil seo a téacs bunaidh ar gach CV."
 
+#: src/postulo/documents/forms.py
+msgid "This export only. Your default is under Settings → Export."
+msgstr ""
+
 #: src/postulo/api/routers/companies.py
 msgid "This field is required."
 msgstr "Tá an réimse seo riachtanach."
@@ -19141,6 +19197,11 @@ msgstr "tá an tsuiteáil seo cothrom le dáta"
 #: src/postulo/accounts/forms.py
 msgid "This instance keeps one address per account, so another cannot be added."
 msgstr "Coinníonn an tsuiteáil seo seoladh amháin in aghaidh an chuntais, mar sin ní féidir ceann eile a chur leis."
+
+#: src/postulo/accounts/forms.py
+#, python-format
+msgid "This instance's default: %(paper)s"
+msgstr ""
 
 #: src/postulo/accounts/views.py
 #, python-format
@@ -19877,6 +19938,18 @@ msgstr "Comhaid uaslódáilte"
 msgid "Uploaded. Nothing here signed this file, so nothing vouches for it."
 msgstr "Uaslódáilte. Níor shínigh aon rud anseo an comhad seo, mar sin níl aon rud ag deimhniú gur iontaofa é."
 
+#: src/postulo/documents/paper.py
+msgid "US Letter"
+msgstr ""
+
+#: src/postulo/documents/paper.py
+msgid "US Letter, landscape"
+msgstr ""
+
+#: src/postulo/documents/paper.py
+msgid "US Letter, portrait"
+msgstr ""
+
 #: src/postulo/templates/server/plugin_access.html
 msgid "Use"
 msgstr "Úsáid"
@@ -20241,6 +20314,10 @@ msgstr "An t-ainm a thabharfadh comhad leabharliosta air. Litreacha, digití agu
 #: src/postulo/templates/server/design.html
 msgid "What a component asks for"
 msgstr "An méid a iarrann comhpháirt"
+
+#: src/postulo/core/server_forms.py
+msgid "What a CV, a letter or a report is printed on unless its owner chooses another. A theme that does not print on it uses A4, portrait."
+msgstr ""
 
 #: src/postulo/templates/server/design.html
 msgid "What a field is for, shown while the field is hovered or has the focus. A format the field requires stays under it instead."
@@ -20699,6 +20776,10 @@ msgstr "An t-ainm a lorgóidh tú faoi. Ní phriontáiltear ar an litir é riamh
 #: src/postulo/templates/settings/capture.html
 msgid "What your captures keep"
 msgstr "An méid a choinníonn do ghabhálacha"
+
+#: src/postulo/accounts/forms.py
+msgid "What your CVs, letters and reports are printed on, and the pages of a Word or OpenDocument file. One export can still choose another, among the papers its theme prints on."
+msgstr ""
 
 #: src/postulo/core/help.py
 msgid "What your documents print under your name: a headline, where you are, and how to reach you."

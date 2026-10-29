@@ -56,6 +56,17 @@
             {% endfor %}
           </select>
         </div>
+        {% comment %} The paper (#344): only what the theme prints on, from this person's
+           default, and in words why the others are missing where some are. {% endcomment %}
+        <div class="field w-auto">
+          <label for="report-paper">{% translate "Paper" %}</label>
+          <select name="paper" id="report-paper"{% if paper_restriction %} aria-describedby="report-paper-why"{% endif %}>
+            {% for value, label in paper_choices %}
+              <option value="{{ value }}" {% if value == chosen_paper %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+          </select>
+          {% if paper_restriction %}<p id="report-paper-why" class="text-xs text-ink-500 dark:text-ink-400">{{ paper_restriction }}</p>{% endif %}
+        </div>
         <button type="submit" class="btn">{% translate "File it as a PDF" %}</button>
       </form>
     </div>

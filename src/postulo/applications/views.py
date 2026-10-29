@@ -1501,12 +1501,27 @@ class ReportView(LoginRequiredMixin, View):
                 "chosen_theme": reports.theme_for(request.user),
                 "language_choices": reports.offered_languages(),
                 "chosen_language": reports.language_for(request.user),
+                # And the paper (#344): the ones the theme prints on, starting from this
+                # person's default, and why the others are not there where some are not.
+                **_paper_choices(request.user, reports.theme_for(request.user)),
                 "kind": period.kind,
                 "on_month": period.start.strftime("%Y-%m"),
                 "on_quarter": f"{period.start.year}-Q{(period.start.month - 1) // 3 + 1}",
                 "weeks": period.days // 7,
             },
         )
+
+
+def _paper_choices(user, theme: str) -> dict:
+    """The report page's paper picker: what it offers, what it starts on, and why (#344)."""
+    from postulo.documents import paper as papers
+    from postulo.documents import paper_choice
+
+    return {
+        "paper_choices": papers.choices(papers.offered(theme, themes.Kind.REPORT)),
+        "chosen_paper": paper_choice.for_document(theme, themes.Kind.REPORT, user).key,
+        "paper_restriction": papers.restriction(theme, themes.Kind.REPORT),
+    }
 
 
 class ReportCSVView(LoginRequiredMixin, View):
@@ -1544,31 +1559,34 @@ class ReportPDFView(LoginRequiredMixin, View):
     def _html(self, request: HttpRequest) -> tuple:
         # The theme and the language the address asks for, where it asks; otherwise the
         # remembered theme and the default language, as the errand would draw it (#340). A GET
-        # remembers nothing: it writes nothing.
+        # remembers nothing: it writes nothing. The paper likewise (#344).
         report, html, _theme, _language = reports.draw(
             request.user,
             reports.period_from(request.GET),
             theme=request.GET.get("theme", ""),
             language=request.GET.get("language", ""),
+            paper=request.GET.get("paper", ""),
         )
         return report, html
 
-    def _back_to_the_page(self, request: HttpRequest, report, unavailable) -> HttpResponse:
+    def _back_to_the_page(self, request: HttpRequest, period, unavailable) -> HttpResponse:
         messages.error(request, str(unavailable))
-        return redirect(
-            f"{reverse('applications:report')}?{urlencode(reports.as_query(report.period))}"
-        )
+        return redirect(f"{reverse('applications:report')}?{urlencode(reports.as_query(period))}")
 
     def get(self, request: HttpRequest) -> HttpResponse:
         from postulo.documents.pdf import PDFBackendUnavailable, draft_pdf
 
-        report, html = self._html(request)
+        try:
+            report, html = self._html(request)
+        except themes.CannotRender as refused:
+            # A paper the theme does not print on, asked for in the address (#344).
+            return self._back_to_the_page(request, reports.period_from(request.GET), refused)
         try:
             # A draft: handed over and filed nowhere, so the same report asked for twice is
             # the same bytes drawn twice, and the second may have the first's (#220).
             pdf = draft_pdf(html)
         except PDFBackendUnavailable as unavailable:
-            return self._back_to_the_page(request, report, unavailable)
+            return self._back_to_the_page(request, report.period, unavailable)
         response = HttpResponse(pdf, content_type="application/pdf")
         name = reports.filename(report, "pdf")
         response["Content-Disposition"] = f'attachment; filename="{name}"'
@@ -1576,6 +1594,7 @@ class ReportPDFView(LoginRequiredMixin, View):
 
     def post(self, request: HttpRequest) -> HttpResponse:
         from postulo.core import errands
+        from postulo.documents import paper_choice
 
         # Building the report reads the whole record and then a renderer draws it, so the
         # press sends the work off and lands on the page that watches it (#247). What the
@@ -1586,6 +1605,13 @@ class ReportPDFView(LoginRequiredMixin, View):
         # remembered, so the next report is drawn the same way without being asked; one the
         # form would not have offered is not, and the remembered one draws instead.
         theme = reports.theme_for(request.user, request.POST.get("theme", ""))
+        # The paper is checked against that theme here, before anything is sent off: one it
+        # does not print on is said on the page rather than on an errand's (#344).
+        paper = request.POST.get("paper", "")
+        try:
+            paper_choice.for_document(theme, themes.Kind.REPORT, request.user, paper)
+        except themes.CannotRender as refused:
+            return self._back_to_the_page(request, reports.period_from(request.GET), refused)
         if request.POST.get("theme", "") == theme:
             themes.remember(getattr(request.user, "profile", None), themes.Kind.REPORT, theme)
         errand = errands.send(
@@ -1596,6 +1622,7 @@ class ReportPDFView(LoginRequiredMixin, View):
             query=reports.as_query(reports.period_from(request.GET)),
             theme=theme,
             language=reports.language_for(request.user, request.POST.get("language", "")),
+            paper=paper,
         )
         return redirect("core:errand", pk=errand.pk)
 

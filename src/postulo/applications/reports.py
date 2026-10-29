@@ -768,7 +768,7 @@ def as_context(report: Report) -> dict:
     }
 
 
-def draw(user, period: Period, *, theme: str = "", language: str = "", nonce=None):
+def draw(user, period: Period, *, theme: str = "", language: str = "", nonce=None, paper: str = ""):
     """Build the report and set it: ``(report, html, theme, language)``, the last two being
     what it was actually drawn in. Raises `CannotRender`.
 
@@ -777,14 +777,19 @@ def draw(user, period: Period, *, theme: str = "", language: str = "", nonce=Non
     checked here (`theme_for`, `language_for`), so whatever reaches this is drawn in a theme
     that sets reports and a language the instance offers. Everything happens inside that
     language -- the figures' labels as well as the page around them -- whoever is drawing.
+
+    ``paper`` is the key of the paper asked for (#344), and empty for the person's default; a
+    paper the theme does not print on raises `CannotRender`, before anything is built.
     """
     from django.template.loader import render_to_string
 
     from postulo.core import languages
-    from postulo.documents import theme_assets, themes
+    from postulo.documents import paper as papers
+    from postulo.documents import paper_choice, theme_assets, themes
 
     name = theme_for(user, theme)
     language = language_for(user, language)
+    chosen = paper_choice.for_document(name, themes.Kind.REPORT, user, paper)
     with languages.override(language):
         report = build(user, period)
         html = render_to_string(
@@ -795,7 +800,8 @@ def draw(user, period: Period, *, theme: str = "", language: str = "", nonce=Non
                 "document_direction": languages.direction(language),
                 "document_title": title_of(report),
                 "csp_nonce": nonce,
+                "paper": chosen,
                 theme_assets.CONTEXT_KEY: theme_assets.Inliner(themes.find(name)),
             },
         )
-    return report, html, name, language
+    return report, papers.with_paper(html, chosen, nonce=nonce), name, language

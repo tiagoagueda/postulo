@@ -35,16 +35,20 @@ def render_a_cv(errand) -> dict:
     from .pdf import PDFBackendUnavailable
     from .properties import Properties
     from .rendering import snapshot_cv
+    from .themes import CannotRender
 
     cv = CV.objects.filter(pk=errand.payload.get("cv_id"), owner=errand.owner).first()
     if cv is None:
         raise Refused(_("That CV is no longer here."))
     try:
         document = snapshot_cv(
-            cv, properties=Properties.from_data(errand.payload.get("properties"))
+            cv,
+            properties=Properties.from_data(errand.payload.get("properties")),
+            # Checked on the page that sent this; the theme may have changed since (#344).
+            paper=str(errand.payload.get("paper") or ""),
         )
-    except PDFBackendUnavailable as unavailable:
-        raise Refused(str(unavailable)) from unavailable
+    except (PDFBackendUnavailable, CannotRender) as refused:
+        raise Refused(str(refused)) from refused
     # The same CV exported twice is one version, and saying "created" of a PDF that was
     # filed last week would be the page telling somebody something that did not happen.
     if getattr(document, "already_filed", False):

@@ -22,7 +22,7 @@ from postulo.jobs.models import Contact
 from postulo.resume.models import Link
 from postulo.resume.registry import OVERVIEW_ORDER, SECTIONS
 
-from . import integrity, proofs, readers, themes
+from . import integrity, paper, paper_choice, proofs, readers, themes
 from .kinds import PROOF_KINDS, DocumentKind
 from .models import (
     CV,
@@ -852,6 +852,39 @@ class FilePropertiesForm(forms.Form):
         """Whether the person's Settings → Export strip every file (#878), so that the dialog
         says so in place of fields whose values would be taken out again."""
         return bool(self.initial.get("strip_all"))
+
+
+class PaperForm(forms.Form):
+    """The paper one export is drawn on (#344), chosen beside the buttons that draw it.
+
+    Offers what the document's theme prints on and nothing else, starting on the paper the
+    export would be drawn on if nobody touched it -- the person's default, then the
+    instance's, as far as the theme prints on it -- and says in its help why the others are
+    not there, where some are not. Never validated as a form, like `FilePropertiesForm`:
+    what is posted is read by `paper_choice.for_document`, which refuses a paper the theme does not
+    print on in a sentence of its own.
+
+    On a CV the select belongs to the page's ``file-properties`` form by its ``form``
+    attribute (``form_id``), so that it can sit beside *Download draft PDF* and still be
+    posted by every button that makes a file; a Word or an OpenDocument file takes the same
+    choice (`paper_choice.for_file`). On a letter it is inside the form that draws the draft.
+    """
+
+    #: Said under the picker always; the theme's restriction goes after it, where it has one.
+    HELP = _("This export only. Your default is under Settings → Export.")
+
+    paper = forms.ChoiceField(label=_("Paper"), required=False, help_text=HELP)
+
+    def __init__(self, *args, theme: str, kind: str, owner, form_id: str = "", **kwargs):
+        super().__init__(*args, **kwargs)
+        field = self.fields["paper"]
+        field.choices = paper.choices(paper.offered(theme, kind))
+        restriction = paper.restriction(theme, kind)
+        if restriction:
+            field.help_text = format_lazy("{} {}", restriction, self.HELP)
+        if form_id:
+            field.widget.attrs["form"] = form_id
+        self.initial.setdefault("paper", paper_choice.for_document(theme, kind, owner).key)
 
 
 def _upload_choice(upload: UploadedDocument) -> str:

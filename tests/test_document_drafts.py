@@ -324,7 +324,10 @@ def test_a_letter_with_no_application_to_choose_still_offers_the_draft(client, u
 
     page = client.get(letter.get_absolute_url()).content.decode()
 
-    assert f'href="{reverse("documents:letter_draft", args=[letter.pk])}"' in page
+    # A form that GETs it since #344, so that the paper chosen beside it goes with it.
+    assert (
+        f'<form method="get" action="{reverse("documents:letter_draft", args=[letter.pk])}"' in page
+    )
 
 
 # ------------------------------------------------- an export is filed once per version

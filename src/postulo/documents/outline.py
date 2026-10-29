@@ -12,6 +12,9 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
+from .paper import DEFAULT as DEFAULT_PAPER
+from .paper import Paper
+
 #: The three things an outline is made of.
 HEADING = "heading"
 PARAGRAPH = "paragraph"
@@ -77,6 +80,9 @@ class Outline:
     #: What the file is called on the way out, where that is not its ``title``: a file whose
     #: title was left out still needs a name (#878). Empty means the title.
     file_name: str = ""
+    #: The paper a format that has pages sets them on (#344): the Word and the OpenDocument
+    #: writers do, plain text has none. What the export chose, or the person's default.
+    paper: Paper = DEFAULT_PAPER
 
     @property
     def name(self) -> str:

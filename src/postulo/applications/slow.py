@@ -42,8 +42,11 @@ def render_a_report(errand) -> dict:
             period,
             theme=str(payload.get("theme") or ""),
             language=str(payload.get("language") or ""),
+            # Checked against the theme on the page that sent this (#344); an errand sent
+            # before there was a choice carries none, and is drawn on the default.
+            paper=str(payload.get("paper") or ""),
         )
-    except CannotRender as refused:  # pragma: no cover - `theme_for` offers only setters
+    except CannotRender as refused:
         raise Refused(str(refused)) from refused
     # `snapshot_report` writes down the language and the theme it was drawn in, so what was
     # handed over says what it is either way (#283, #340).

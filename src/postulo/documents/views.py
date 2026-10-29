@@ -31,7 +31,8 @@ from postulo.core.redirects import safe_next
 from postulo.jobs.views import UserFormKwargsMixin
 from postulo.resume import ordering, translating
 
-from . import comparing, formats, kinds, printing, proofs, rendering, themes
+from . import comparing, formats, kinds, paper_choice, printing, proofs, rendering, themes
+from . import paper as papers
 from . import pdf as renderers
 from .forms import (
     AddCVItemsForm,
@@ -39,6 +40,7 @@ from .forms import (
     CVForm,
     CVItemForm,
     FilePropertiesForm,
+    PaperForm,
     SendDocumentsForm,
     UploadedDocumentForm,
 )
@@ -93,6 +95,17 @@ def chosen_properties(request: HttpRequest) -> Properties:
     then it is what it always was.
     """
     return Properties.from_data(request.POST if request.method == "POST" else request.GET)
+
+
+def chosen_paper(request: HttpRequest) -> str:
+    """The key of the paper one export chose (#344), or ``""`` for the person's default.
+
+    Posted with the rest of the page's choice by every button that makes a file, or carried
+    by a link. Not checked here: `paper_choice.for_document` checks it against the theme that will
+    draw it, and refuses one it does not print on.
+    """
+    data = request.POST if request.method == "POST" else request.GET
+    return str(data.get("paper", ""))[: papers.MAX_KEY_LENGTH]
 
 
 def written_file(request: HttpRequest, document, outline, key: str):
@@ -241,6 +254,13 @@ class CVDetailView(OwnedObjectMixin, DetailView):
         # What the file will say about itself, before anybody exports it (#480).
         context["properties_form"] = FilePropertiesForm(
             initial=rendering.file_defaults(self.object)
+        )
+        # And the paper, among the ones its theme prints on (#344).
+        context["paper_form"] = PaperForm(
+            theme=self.object.theme,
+            kind=self.object.theme_kind,
+            owner=self.object.owner,
+            form_id="file-properties",
         )
         # Which entries will print their original text, said here rather than discovered in
         # the PDF an employer already has (#131).
@@ -437,6 +457,14 @@ class CVExportView(OwnedObjectMixin, PDFErrorMixin, View):
         from postulo.core import errands
 
         cv = get_object_or_404(self.get_queryset(), pk=pk)
+        # A paper the theme does not print on is said here, on the CV's page, rather than on
+        # the page of an errand that could only fail (#344).
+        paper = chosen_paper(request)
+        try:
+            paper_choice.for_document(cv.theme, cv.theme_kind, cv.owner, paper)
+        except themes.CannotRender as refused:
+            messages.error(request, str(refused))
+            return redirect(cv.get_absolute_url())
         # Sent off rather than waited for: on the Chromium backend this is a browser launch
         # and then a render, and it was holding a request open for all of it (#247).
         errand = errands.send(
@@ -445,6 +473,7 @@ class CVExportView(OwnedObjectMixin, PDFErrorMixin, View):
             subject=cv,
             cv_id=cv.pk,
             properties=chosen_properties(request).as_data(),
+            paper=paper,
         )
         return redirect("core:errand", pk=errand.pk)
 
@@ -459,7 +488,8 @@ class CVDraftView(OwnedObjectMixin, DraftMixin, View):
     def get(self, request: HttpRequest, pk: int) -> HttpResponse:
         cv = get_object_or_404(self.get_queryset(), pk=pk)
         chosen = chosen_properties(request)
-        return self.draft(request, cv, lambda: render_cv_html(cv, properties=chosen))
+        paper = chosen_paper(request)
+        return self.draft(request, cv, lambda: render_cv_html(cv, properties=chosen, paper=paper))
 
     #: The page's form posts, so that what it chose is not in an address (#480).
     post = get
@@ -521,7 +551,10 @@ class CVDownloadView(OwnedObjectMixin, View):
         # A format may be a plugin's, and its failing is not a reason to show somebody a
         # traceback about their own CV: `written_file` says it in a sentence.
         return written_file(
-            request, cv, rendering.cv_outline(cv, chosen_properties(request)), format
+            request,
+            cv,
+            rendering.cv_outline(cv, chosen_properties(request), chosen_paper(request)),
+            format,
         )
 
     #: The page's form posts what it chose (#480).
@@ -577,6 +610,9 @@ class CoverLetterDetailView(OwnedObjectMixin, DetailView):
         context["formats"] = formats.offered_to(self.request.user)
         context["properties_form"] = FilePropertiesForm(
             initial=rendering.file_defaults(self.object)
+        )
+        context["paper_form"] = PaperForm(
+            theme=self.object.theme, kind=themes.Kind.LETTER, owner=self.object.owner
         )
         return context
 
@@ -676,10 +712,13 @@ class CoverLetterDraftView(OwnedObjectMixin, DraftMixin, View):
         letter = get_object_or_404(self.get_queryset(), pk=pk)
         application = chosen_application(request)
         chosen = chosen_properties(request)
+        paper = chosen_paper(request)
         return self.draft(
             request,
             letter,
-            lambda: render_letter_html(letter, application, mark_empty=True, properties=chosen),
+            lambda: render_letter_html(
+                letter, application, mark_empty=True, properties=chosen, paper=paper
+            ),
         )
 
     #: The page's form posts what it chose (#480).
@@ -703,7 +742,7 @@ class CoverLetterDownloadView(OwnedObjectMixin, View):
         if formats.get_for(request.user, format) is None:
             raise Http404("No such format.")
         outline = rendering.letter_outline(
-            letter, chosen_application(request), chosen_properties(request)
+            letter, chosen_application(request), chosen_properties(request), chosen_paper(request)
         )
         return written_file(request, letter, outline, format)
 

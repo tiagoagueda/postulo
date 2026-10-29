@@ -215,6 +215,12 @@
            beside this one and queued it for every store, once a try. A draft is the same
            PDF and no record: a link, because it changes nothing, and it says so under
            itself because the two buttons are otherwise one word apart (#236). {% endcomment %}
+        {% comment %} The paper (#344): only what this CV's theme prints on, from your default,
+           and why the others are missing where some are. It belongs to the form below by its
+           `form` attribute, so Export PDF, the draft and every format are drawn on it. {% endcomment %}
+        <div class="mt-3" data-paper>
+          <c-field :field="paper_form.paper" />
+        </div>
         <button type="submit" class="btn mt-3 w-full" data-variant="outline"
                 form="file-properties"
                 formaction="{% url 'documents:cv_draft' cv.pk %}">{% translate "Download draft PDF" %}</button>

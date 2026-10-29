@@ -18,6 +18,11 @@ from django.db.models import Q
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
+# The papers a document may be printed on (#344), for the instance's default. A module of
+# plain values that imports no model, so a column here can name them.
+from postulo.documents.paper import CHOICES as PAPER_CHOICES
+from postulo.documents.paper import MAX_KEY_LENGTH as MAX_PAPER_KEY
+
 from . import phones, slugs
 from .language_field import LanguageField
 
@@ -1385,6 +1390,13 @@ class SiteSettings(models.Model):
     #: instance offers, and two rules where one will do is how the two drift apart.
     offered_languages = models.JSONField(_("languages offered"), default=list, blank=True)
     default_time_zone = models.CharField(_("default time zone"), max_length=64, blank=True)
+    #: The paper a document is printed on unless its owner chooses another (#344): a key of
+    #: `documents.paper` (``a4-portrait``, ``letter-landscape``), and blank for "not set here",
+    #: which is A4 portrait. Set by the administrator, who knows where the instance is used,
+    #: rather than guessed from a language.
+    default_paper = models.CharField(
+        _("paper for documents"), max_length=MAX_PAPER_KEY, blank=True, choices=PAPER_CHOICES
+    )
 
     # --- how this instance sends mail --------------------------------------------------
     #

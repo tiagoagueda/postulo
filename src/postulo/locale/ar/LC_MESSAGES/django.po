@@ -3088,6 +3088,14 @@ msgstr "A1 — مبتدئ"
 msgid "A2 — elementary"
 msgstr "A2 — أساسي"
 
+#: src/postulo/documents/paper.py
+msgid "A4, landscape"
+msgstr ""
+
+#: src/postulo/documents/paper.py
+msgid "A4, portrait"
+msgstr ""
+
 #: src/postulo/accounts/models.py
 msgid "Abbreviated"
 msgstr "مختصر"
@@ -6550,6 +6558,7 @@ msgstr ""
 #: src/postulo/templates/cotton/documents_nav.html
 #: src/postulo/templates/documents/application_documents.html
 #: src/postulo/templates/documents/rendered_list.html
+#: src/postulo/templates/server/defaults.html
 msgid "Documents"
 msgstr "المستندات"
 
@@ -9597,6 +9606,10 @@ msgstr "تسمية فقط"
 msgid "Labels only"
 msgstr "تسميات فقط"
 
+#: src/postulo/documents/paper.py
+msgid "landscape"
+msgstr ""
+
 #: src/postulo/accounts/forms.py src/postulo/documents/forms.py
 #: src/postulo/resume/forms.py src/postulo/resume/registry.py
 #: src/postulo/templates/jobs/company_form.html
@@ -11629,6 +11642,10 @@ msgid "not set"
 msgstr "غير مُعيَّن"
 
 #: src/postulo/core/server_forms.py
+msgid "Not set here — A4, portrait"
+msgstr ""
+
+#: src/postulo/core/server_forms.py
 msgid "Not set here — the environment or the default applies"
 msgstr "غير مُعيَّن هنا — تُطبَّق البيئة أو القيمة الافتراضية"
 
@@ -13060,6 +13077,24 @@ msgctxt "role at an event"
 msgid "Panellist"
 msgstr "عضو في حلقة نقاش"
 
+#: src/postulo/accounts/models.py
+msgid "paper"
+msgstr ""
+
+#: src/postulo/documents/forms.py
+#: src/postulo/templates/applications/report.html
+#: src/postulo/templates/settings/export.html
+msgid "Paper"
+msgstr ""
+
+#: src/postulo/core/models.py
+msgid "paper for documents"
+msgstr ""
+
+#: src/postulo/core/server_forms.py
+msgid "Paper for documents"
+msgstr ""
+
 #: src/postulo/resume/publications.py
 msgid "Paper in proceedings"
 msgstr "ورقة في وقائع مؤتمر"
@@ -13484,6 +13519,10 @@ msgstr "معرض الأعمال"
 msgid "Portfolios, profiles and videos you pointed them at."
 msgstr "معارض الأعمال والملفات الشخصية ومقاطع الفيديو التي أحلتهم إليها."
 
+#: src/postulo/documents/paper.py
+msgid "portrait"
+msgstr ""
+
 #: src/postulo/templates/server/design.html
 msgid "Portugal"
 msgstr "البرتغال"
@@ -13595,6 +13634,10 @@ msgstr "لا يعرف Postulo كيف يفعل ذلك بشعار."
 #: src/postulo/applications/ical_import.py
 msgid "Postulo does not know that time zone."
 msgstr "لا يعرف Postulo هذه المنطقة الزمنية."
+
+#: src/postulo/documents/paper_choice.py
+msgid "Postulo does not print on that paper. Choose another."
+msgstr ""
 
 #: src/postulo/jobs/forms.py
 msgid "Postulo fetches it once and keeps a copy; the address is never shown to a browser. PNG, JPEG, GIF or WebP."
@@ -17344,6 +17387,11 @@ msgstr "المكوّن الإضافي %(plugin)s غير مثبّت."
 msgid "The %(theme)s theme does not set this type of document."
 msgstr "لا توفّر السمة %(theme)s هذا النوع من المستندات."
 
+#: src/postulo/documents/paper.py
+#, python-format
+msgid "The %(theme)s theme prints this only on: %(papers)s."
+msgstr ""
+
 #: src/postulo/templates/server/logs.html
 msgid "The /logs endpoint is on and has no token."
 msgstr "نقطة النهاية /logs مفعّلة وليس لها رمز مميز."
@@ -18260,6 +18308,10 @@ msgstr[5] "لم تُولَّد الصفحة خلال %(seconds)s ثانية، ل
 msgid "The page you read it on. A CV does not print it."
 msgstr ""
 
+#: src/postulo/accounts/forms.py
+msgid "The paper every document is printed on"
+msgstr ""
+
 #: src/postulo/jobs/forms.py
 msgid "The part of the economy it is in. Narrows the suggestions below, and an industry of your own added here is filed under it."
 msgstr "الجزء من الاقتصاد الذي تنتمي إليه. يضيّق الاقتراحات أدناه، ومجال النشاط الخاص بك الذي تضيفه هنا يُصنَّف ضمنه."
@@ -19085,6 +19137,10 @@ msgstr "أُبلغ عن قيام هذه الشركة بتسريح موظفين �
 msgid "This entry prints its original text on every CV."
 msgstr "يطبع هذا البند نصه الأصلي في كل سيرة ذاتية."
 
+#: src/postulo/documents/forms.py
+msgid "This export only. Your default is under Settings → Export."
+msgstr ""
+
 #: src/postulo/api/routers/companies.py
 msgid "This field is required."
 msgstr "هذا الحقل مطلوب."
@@ -19179,6 +19235,11 @@ msgstr "هذا المثيل محدّث"
 #: src/postulo/accounts/forms.py
 msgid "This instance keeps one address per account, so another cannot be added."
 msgstr "يحتفظ هذا المثيل بعنوان واحد لكل حساب، لذا لا يمكن إضافة عنوان آخر."
+
+#: src/postulo/accounts/forms.py
+#, python-format
+msgid "This instance's default: %(paper)s"
+msgstr ""
 
 #: src/postulo/accounts/views.py
 #, python-format
@@ -19914,6 +19975,18 @@ msgstr "الملفات المرفوعة"
 msgid "Uploaded. Nothing here signed this file, so nothing vouches for it."
 msgstr "تم الرفع. لم يوقّع أي شيء هنا هذا الملف، لذا لا شيء يضمنه."
 
+#: src/postulo/documents/paper.py
+msgid "US Letter"
+msgstr ""
+
+#: src/postulo/documents/paper.py
+msgid "US Letter, landscape"
+msgstr ""
+
+#: src/postulo/documents/paper.py
+msgid "US Letter, portrait"
+msgstr ""
+
 #: src/postulo/templates/server/plugin_access.html
 msgid "Use"
 msgstr "الاستخدام"
@@ -20276,6 +20349,10 @@ msgstr "الاسم الذي يسمّيه به ملف المراجع الببلي
 #: src/postulo/templates/server/design.html
 msgid "What a component asks for"
 msgstr "ما يطلبه المكوّن"
+
+#: src/postulo/core/server_forms.py
+msgid "What a CV, a letter or a report is printed on unless its owner chooses another. A theme that does not print on it uses A4, portrait."
+msgstr ""
 
 #: src/postulo/templates/server/design.html
 msgid "What a field is for, shown while the field is hovered or has the focus. A format the field requires stays under it instead."
@@ -20729,6 +20806,10 @@ msgstr "الاسم الذي ستبحث عنه به. لا يظهر أبدًا ف�
 #: src/postulo/templates/settings/capture.html
 msgid "What your captures keep"
 msgstr "ما تحتفظ به التقاطاتك"
+
+#: src/postulo/accounts/forms.py
+msgid "What your CVs, letters and reports are printed on, and the pages of a Word or OpenDocument file. One export can still choose another, among the papers its theme prints on."
+msgstr ""
 
 #: src/postulo/core/help.py
 msgid "What your documents print under your name: a headline, where you are, and how to reach you."

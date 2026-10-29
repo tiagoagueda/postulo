@@ -79,6 +79,10 @@
                 </option>
               {% endfor %}
             </select>
+            {% comment %} The paper the draft is drawn on (#344): only what the letter's theme
+               prints on, from your default. The preview ignores it; a page is a page on
+               screen. {% endcomment %}
+            <c-field :field="paper_form.paper" />
             <button type="submit" class="btn w-full" data-variant="outline">{% translate "Read it below" %}</button>
             {% comment %} The same choice, as the PDF it would be (#236). A second button on
                the one form rather than a second chooser: `formaction` sends what is chosen
@@ -93,8 +97,12 @@
           <p class="text-sm text-ink-500 dark:text-ink-400">
             {% translate "Once you have an application, you can read this letter as it will reach them." %}
           </p>
-          <a href="{% url 'documents:letter_draft' letter.pk %}"
-             class="btn mt-3 w-full" data-variant="outline">{% translate "Download draft PDF" %}</a>
+          {% comment %} A form rather than the link it was, so that the paper goes with it
+             (#344). A GET still: it changes nothing. {% endcomment %}
+          <form method="get" action="{% url 'documents:letter_draft' letter.pk %}" class="mt-3 space-y-3">
+            <c-field :field="paper_form.paper" />
+            <button type="submit" class="btn w-full" data-variant="outline">{% translate "Download draft PDF" %}</button>
+          </form>
         {% endif %}
         <p class="mt-2 text-xs text-ink-500 dark:text-ink-400">
           {% translate "A draft is kept nowhere, and marks whatever it has nothing to fill in. A letter is filed when you record what you sent with an application." %}

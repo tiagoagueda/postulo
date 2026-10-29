@@ -172,6 +172,8 @@ _CHECKED_PROFILE_FIELDS = frozenset(
         "birth_country",
         "nationality_scope",
         "gender",
+        # The paper (#344): one of the papers there are, or blank for the instance's.
+        "paper",
     }
 )
 #: The checked fields a refusal of which the report says: they are the person's own facts,

@@ -36,6 +36,13 @@
           </div>
         {% endfor %}
       </div>
+
+      {% comment %} The paper (#344): not a property, but a default for every file in the same
+         way, and chosen per export in the same dialog. {% endcomment %}
+      <div class="card mb-6">
+        <c-section-title>{% translate "Paper" %}</c-section-title>
+        <c-field :field="form.paper" />
+      </div>
       <button type="submit" class="btn">{% translate "Save" %}</button>
     </form>
 

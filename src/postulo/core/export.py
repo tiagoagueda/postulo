@@ -246,7 +246,11 @@ logger = logging.getLogger(__name__)
 #: 79 added ``actor`` on a reminder: who last made, changed, moved, ticked or unticked it when
 #: that was not the person -- an API token, a calendar file, a plugin. An archive without it
 #: restores every reminder as the person's own doing (#331).
-FORMAT_VERSION = 79
+#: 80 added ``paper`` on the profile: the paper the person's documents are printed on, a key
+#: such as ``a4-portrait`` or ``letter-landscape``, and blank for the instance's default. An
+#: archive without it restores the instance's default; a value that is not one of the papers
+#: is refused and the default stays (#344).
+FORMAT_VERSION = 80
 
 
 def industry_entry(industry) -> str | dict:
@@ -368,6 +372,9 @@ PROFILE_FIELDS = (
     # The document theme chosen for each kind with no row of its own (#340), read back through
     # `themes.remembered_from_archive`.
     "document_themes",
+    # The paper every document is printed on, blank for the instance's (#344), read back
+    # against the column's choices.
+    "paper",
     "table_settings",
     # An arrangement belongs to the account, so it travels with the account (#123). The
     # seen set goes too: without it a restore would announce every widget in Postulo as

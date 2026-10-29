@@ -40,6 +40,8 @@ from postulo.core import (
 )
 from postulo.core.formsets import RowsAlreadyGone
 from postulo.core.identifiers import IdentifierRow, OneOfEachKind, SchemeSelect, offering
+from postulo.documents import paper as paper_sizes
+from postulo.documents import paper_choice
 from postulo.documents.properties import (
     FIELD_NAMES,
     KEYWORDS_HELP,
@@ -1360,6 +1362,7 @@ class ExportMetadataForm(forms.ModelForm):
         fields = (
             "export_strip_metadata",
             *(f"export_{name}{end}" for name in FIELD_NAMES for end in ("_source", "")),
+            "paper",
         )
         widgets = {f"export_{name}_source": forms.RadioSelect for name in FIELD_NAMES}
         labels = {
@@ -1374,6 +1377,7 @@ class ExportMetadataForm(forms.ModelForm):
             "export_keywords": _("The keywords every file carries"),
             "export_language_source": _("Language"),
             "export_language": _("The language every file declares"),
+            "paper": _("The paper every document is printed on"),
         }
         help_texts = {
             "export_strip_metadata": _(
@@ -1392,10 +1396,24 @@ class ExportMetadataForm(forms.ModelForm):
             "export_subject_source": _("A document has none of its own, so it starts empty."),
             "export_keywords_source": KEYWORDS_HELP,
             "export_language_source": LANGUAGE_KEPT,
+            "paper": _(
+                "What your CVs, letters and reports are printed on, and the pages of a Word "
+                "or OpenDocument file. One export can still choose another, among the papers "
+                "its theme prints on."
+            ),
         }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        # Blank follows the instance, and says what that is today (#344).
+        self.fields["paper"].choices = [
+            (
+                "",
+                _("This instance's default: %(paper)s")
+                % {"paper": paper_choice.instance_default().label},
+            ),
+            *paper_sizes.CHOICES,
+        ]
         held = self["export_language"].value()
         self.fields["export_language"].widget = LanguageSelect(
             choices=with_what_is_held([("", "—"), *languages.LANGUAGES], held)

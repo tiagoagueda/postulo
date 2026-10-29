@@ -54,6 +54,13 @@
       </p>
     </div>
 
+    {% comment %} What a document is printed on (#344): the administrator's, because where an
+       instance is used is something its administrator knows and a language does not. {% endcomment %}
+    <div class="card mb-6">
+      <c-section-title>{% translate "Documents" %}</c-section-title>
+      <c-field :field="form.default_paper" />
+    </div>
+
     <button type="submit" class="btn">{% translate "Save" %}</button>
   </form>
 

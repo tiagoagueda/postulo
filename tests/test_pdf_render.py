@@ -31,8 +31,8 @@ import pytest
 from django.contrib.contenttypes.models import ContentType
 from django.urls import reverse
 
+from postulo.documents import paper, rendering, themes
 from postulo.documents import pdf as pdf_options
-from postulo.documents import rendering, themes
 from postulo.documents.models import CV, CoverLetter, CVItem
 from postulo.documents.pdf import WeasyPrintBackend
 from postulo.resume.models import Experience, Link
@@ -153,6 +153,50 @@ def test_the_report_draws(client, user, settings):
 
     assert response["Content-Type"] == "application/pdf"
     assert response.content.startswith(b"%PDF-")
+
+
+#: Every shipped theme, every kind it sets, the report included, on every paper it says it
+#: prints on (#344): for Postulo's own, all four.
+ON_PAPER = [
+    (theme.name, kind, one.key)
+    for theme in themes.BUILT_IN
+    for kind in themes.Kind.values
+    if theme.sets(kind)
+    for one in paper.declared(theme, kind)
+]
+
+#: A line with nowhere to wrap, which is what finds a column measured for one paper only.
+LONG_ADDRESS = "https://example.org/" + "a" * 180
+
+
+@pytest.mark.parametrize("theme,kind,chosen", ON_PAPER)
+def test_every_kind_draws_on_every_paper_at_its_size(user, experience, theme, kind, chosen):
+    """The page is the paper chosen, turned the way chosen, and nothing runs off it (#344)."""
+    from postulo.applications import reports
+
+    experience.summary = f"Kept the services up. See {LONG_ADDRESS}"
+    experience.save()
+    if kind == themes.Kind.LETTER:
+        letter = CoverLetter.objects.create(
+            owner=user, name="General", subject="Hello", body=f"See {LONG_ADDRESS}", theme=theme
+        )
+        html = rendering.render_letter_html(letter, paper=chosen)
+    elif kind == themes.Kind.REPORT:
+        _report, html, _theme, _language = reports.draw(
+            user, reports.period_from({}), theme=theme, paper=chosen
+        )
+    else:
+        cv = selection(user, experience, kind=kind, theme=theme)
+        html = rendering.render_cv_html(cv, paper=chosen)
+
+    wanted = paper.find(chosen)
+    pages = WeasyPrintBackend().document(html).render().pages
+    assert pages, "nothing was drawn"
+    for page in pages:
+        # WeasyPrint measures in CSS pixels, 96 to the inch.
+        assert page.width == pytest.approx(wanted.width_mm / 25.4 * 96, abs=1)
+        assert page.height == pytest.approx(wanted.height_mm / 25.4 * 96, abs=1)
+        assert not overflowing(page), f"something is drawn past the edge of {chosen}"
 
 
 def test_the_shipped_themes_are_all_here():

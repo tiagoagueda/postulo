@@ -2686,6 +2686,14 @@ msgstr "A1 — débutant"
 msgid "A2 — elementary"
 msgstr "A2 — élémentaire"
 
+#: src/postulo/documents/paper.py
+msgid "A4, landscape"
+msgstr ""
+
+#: src/postulo/documents/paper.py
+msgid "A4, portrait"
+msgstr ""
+
 #: src/postulo/accounts/models.py
 msgid "Abbreviated"
 msgstr "Abrégés"
@@ -6075,6 +6083,7 @@ msgstr ""
 #: src/postulo/templates/cotton/documents_nav.html
 #: src/postulo/templates/documents/application_documents.html
 #: src/postulo/templates/documents/rendered_list.html
+#: src/postulo/templates/server/defaults.html
 msgid "Documents"
 msgstr "Documents"
 
@@ -9088,6 +9097,10 @@ msgstr "Libellé seul"
 msgid "Labels only"
 msgstr "Libellés seuls"
 
+#: src/postulo/documents/paper.py
+msgid "landscape"
+msgstr ""
+
 #: src/postulo/accounts/forms.py src/postulo/documents/forms.py
 #: src/postulo/resume/forms.py src/postulo/resume/registry.py
 #: src/postulo/templates/jobs/company_form.html
@@ -11098,6 +11111,10 @@ msgid "not set"
 msgstr "non défini"
 
 #: src/postulo/core/server_forms.py
+msgid "Not set here — A4, portrait"
+msgstr ""
+
+#: src/postulo/core/server_forms.py
 msgid "Not set here — the environment or the default applies"
 msgstr "Non défini ici — l'environnement ou la valeur par défaut s'applique"
 
@@ -12435,6 +12452,24 @@ msgctxt "role at an event"
 msgid "Panellist"
 msgstr "Participant à une table ronde"
 
+#: src/postulo/accounts/models.py
+msgid "paper"
+msgstr ""
+
+#: src/postulo/documents/forms.py
+#: src/postulo/templates/applications/report.html
+#: src/postulo/templates/settings/export.html
+msgid "Paper"
+msgstr ""
+
+#: src/postulo/core/models.py
+msgid "paper for documents"
+msgstr ""
+
+#: src/postulo/core/server_forms.py
+msgid "Paper for documents"
+msgstr ""
+
 #: src/postulo/resume/publications.py
 msgid "Paper in proceedings"
 msgstr "Article dans des actes de conférence"
@@ -12857,6 +12892,10 @@ msgstr "Portfolio"
 msgid "Portfolios, profiles and videos you pointed them at."
 msgstr "Portfolios, profils et vidéos que vous leur avez indiqués."
 
+#: src/postulo/documents/paper.py
+msgid "portrait"
+msgstr ""
+
 #: src/postulo/templates/server/design.html
 msgid "Portugal"
 msgstr "Portugal"
@@ -12967,6 +13006,10 @@ msgstr "Postulo ne sait pas faire cela à un logo."
 #: src/postulo/applications/ical_import.py
 msgid "Postulo does not know that time zone."
 msgstr "Postulo ne connaît pas ce fuseau horaire."
+
+#: src/postulo/documents/paper_choice.py
+msgid "Postulo does not print on that paper. Choose another."
+msgstr ""
 
 #: src/postulo/jobs/forms.py
 msgid "Postulo fetches it once and keeps a copy; the address is never shown to a browser. PNG, JPEG, GIF or WebP."
@@ -16642,6 +16685,11 @@ msgstr "Le plugin %(plugin)s n'est pas installé."
 msgid "The %(theme)s theme does not set this type of document."
 msgstr "Le thème %(theme)s ne met pas en page ce type de document."
 
+#: src/postulo/documents/paper.py
+#, python-format
+msgid "The %(theme)s theme prints this only on: %(papers)s."
+msgstr ""
+
 #: src/postulo/templates/server/logs.html
 msgid "The /logs endpoint is on and has no token."
 msgstr "Le point d'accès /logs est actif et n'a pas de jeton."
@@ -17537,6 +17585,10 @@ msgstr[1] "La page n'a pas été générée en moins de %(seconds)s secondes ;
 msgid "The page you read it on. A CV does not print it."
 msgstr ""
 
+#: src/postulo/accounts/forms.py
+msgid "The paper every document is printed on"
+msgstr ""
+
 #: src/postulo/jobs/forms.py
 msgid "The part of the economy it is in. Narrows the suggestions below, and an industry of your own added here is filed under it."
 msgstr "La partie de l'économie dont elle relève. Restreint les suggestions ci-dessous, et un secteur d'activité à vous ajouté ici y est classé."
@@ -18356,6 +18408,10 @@ msgstr "Cette entreprise a été signalée comme procédant à des licenciements
 msgid "This entry prints its original text on every CV."
 msgstr "Le texte d'origine de cette entrée figure sur tous les CV."
 
+#: src/postulo/documents/forms.py
+msgid "This export only. Your default is under Settings → Export."
+msgstr ""
+
 #: src/postulo/api/routers/companies.py
 msgid "This field is required."
 msgstr "Ce champ est obligatoire."
@@ -18450,6 +18506,11 @@ msgstr "cette instance est à jour"
 #: src/postulo/accounts/forms.py
 msgid "This instance keeps one address per account, so another cannot be added."
 msgstr "Cette instance n'accepte qu'une adresse par compte : impossible d'en ajouter une autre."
+
+#: src/postulo/accounts/forms.py
+#, python-format
+msgid "This instance's default: %(paper)s"
+msgstr ""
 
 #: src/postulo/accounts/views.py
 #, python-format
@@ -19170,6 +19231,18 @@ msgstr "Fichiers déposés"
 msgid "Uploaded. Nothing here signed this file, so nothing vouches for it."
 msgstr "Déposé. Rien ici n'a signé ce fichier, donc rien ne s'en porte garant."
 
+#: src/postulo/documents/paper.py
+msgid "US Letter"
+msgstr ""
+
+#: src/postulo/documents/paper.py
+msgid "US Letter, landscape"
+msgstr ""
+
+#: src/postulo/documents/paper.py
+msgid "US Letter, portrait"
+msgstr ""
+
 #: src/postulo/templates/server/plugin_access.html
 msgid "Use"
 msgstr "Utilisation"
@@ -19531,6 +19604,10 @@ msgstr "La clé qu'un fichier de bibliographie lui donnerait. Lettres, chiffres 
 #: src/postulo/templates/server/design.html
 msgid "What a component asks for"
 msgstr "Ce qu'un composant demande"
+
+#: src/postulo/core/server_forms.py
+msgid "What a CV, a letter or a report is printed on unless its owner chooses another. A theme that does not print on it uses A4, portrait."
+msgstr ""
 
 #: src/postulo/templates/server/design.html
 msgid "What a field is for, shown while the field is hovered or has the focus. A format the field requires stays under it instead."
@@ -19984,6 +20061,10 @@ msgstr "Le nom sous lequel vous la retrouverez. Il n'est jamais imprimé sur la 
 #: src/postulo/templates/settings/capture.html
 msgid "What your captures keep"
 msgstr "Ce que vos captures conservent"
+
+#: src/postulo/accounts/forms.py
+msgid "What your CVs, letters and reports are printed on, and the pages of a Word or OpenDocument file. One export can still choose another, among the papers its theme prints on."
+msgstr ""
 
 #: src/postulo/core/help.py
 msgid "What your documents print under your name: a headline, where you are, and how to reach you."

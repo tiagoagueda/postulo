@@ -44,8 +44,9 @@ from django.utils.translation import gettext_lazy as _
 
 logger = logging.getLogger(__name__)
 
-#: A4 with margins wide enough that nothing is lost to a printer's unprintable edge.
-PAGE_FORMAT = "A4"
+#: Margins wide enough that nothing is lost to a printer's unprintable edge. The paper is not
+#: a constant any more: it is the one chosen for the document (#344), which Postulo writes into
+#: the page, where WeasyPrint reads its ``@page`` rule and Chromium is told it (`paper.read_from`).
 PAGE_MARGIN = "18mm"
 
 #: How many *draft* renders one worker keeps, and how large one may be to be worth keeping.
@@ -356,7 +357,23 @@ class ChromiumBackend:
             return backend.render(html)
 
     @staticmethod
-    def _draw(browser, html: str) -> bytes:
+    def page_size(html: str) -> dict:
+        """What Chromium is told about the paper: the width and the height of the one chosen.
+
+        Read from the page, which is the only thing a backend is handed: Postulo writes the
+        paper into every document it draws (`paper.with_paper`), and a page that carries none
+        -- something drawn by hand, a plugin's renderer -- is A4 portrait, as everything was.
+        Given as a width and a height, already turned, rather than a format and
+        ``landscape``: Chromium's ``format`` knows no paper by Postulo's key, and the two
+        together are one more thing to get the wrong way round (#344).
+        """
+        from .paper import DEFAULT, read_from
+
+        chosen = read_from(html) or DEFAULT
+        return {"width": f"{chosen.width_mm}mm", "height": f"{chosen.height_mm}mm"}
+
+    @classmethod
+    def _draw(cls, browser, html: str) -> bytes:
         page = browser.new_page()
         try:
             # The document is self-contained: themes inline their CSS, so there is nothing
@@ -366,7 +383,7 @@ class ChromiumBackend:
             page.route("**/*", lambda route: route.abort())
             page.set_content(html, wait_until="load")
             return page.pdf(
-                format=PAGE_FORMAT,
+                **cls.page_size(html),
                 print_background=True,
                 margin={
                     "top": PAGE_MARGIN,

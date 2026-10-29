@@ -99,6 +99,11 @@ LAYERS: list[tuple[str, tuple[str, ...]]] = [
             "postulo.documents.filestore",
             "postulo.documents.integrity",
             "postulo.documents.outline",
+            # The papers a document is printed on (#344): plain values, what a theme declares
+            # and the page rule, read by the two records that keep a default and by the
+            # outline. Which one a document gets reads those records, so it is a feature of its
+            # own (`documents.paper_choice`).
+            "postulo.documents.paper",
             # Which entry of the career a file proves (#669): looks the models up by name
             # and imports nothing of Postulo's, read by the upload that holds the link.
             "postulo.documents.proofs",
