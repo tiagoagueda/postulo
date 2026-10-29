@@ -95,7 +95,37 @@ class ProfileView(
         context["section_nav"] = self._section_nav(context)
         context["refused"] = self._refused(context)
         context["tips"] = not context["refused"]
+        context["unsaved_fields"] = self._unsaved_fields(context)
         return context
+
+    @staticmethod
+    def _unsaved_fields(context: dict) -> list[str]:
+        """The names of the fields a refused save brought back changed (#927).
+
+        A refusal draws the page again with what was typed in it, so in the browser every
+        field is what it was loaded with, and `app.js` cannot tell a changed card from one
+        left alone. Nothing at all was saved, so every field that differs from what is held
+        is unsaved, and its card is marked again on load. Empty on any other page.
+        """
+        if not context.get("refused"):
+            return []
+        names = []
+        form = context.get("form")
+        if form is not None and form.is_bound:
+            names += [form.add_prefix(name) for name in form.changed_data]
+        blocks = [
+            context.get("identifiers"),
+            context.get("numbers"),
+            context.get("messaging"),
+            context.get("addresses"),
+        ]
+        blocks += list(context.get("links") or [])
+        for block in blocks:
+            if block is None or not block.is_bound:
+                continue
+            for row in block.forms:
+                names += [row.add_prefix(name) for name in row.changed_data]
+        return names
 
     @staticmethod
     def _refused(context: dict) -> bool:

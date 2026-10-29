@@ -1942,6 +1942,39 @@
       dark:bg-ink-950 dark:text-ink-50;
   }
 
+  /*
+   * A card of *Your details* holding a change that has not been saved (#927): a soft amber
+   * ring outside its border, put on and taken off by `app.js`, which also writes "Not saved"
+   * in the card's title -- the words are the signal and the ring is where the eye goes (SC
+   * 1.4.1). Amber is the tone the page already gives to "kept as it was".
+   *
+   * An outline and not a ring of box-shadow, because forced colours throw a shadow away and
+   * keep an outline, repainted in a colour of the theme. Amber 600 is 3.06:1 against the
+   * light page and 500 is 9.4:1 against the dark one, so the ring clears SC 1.4.11 in both.
+   *
+   * Keyed on the attribute and not on the card's class, which is Basecoat's and painted in
+   * `basecoat.css`; and not `data-unsaved`, which is the mark of a field that saves as it
+   * goes (#656) and which the guard looks for anywhere inside a form.
+   */
+  [data-card-unsaved] {
+    @apply outline-2 outline-offset-2 outline-amber-600 dark:outline-amber-500;
+  }
+
+  /* The same mark on the section's entry in the menu beside the cards: a dot, with the words
+     beside it for a screen reader only. 700 on the light track (4.6:1) and 400 on the dark
+     one (9:1), so the dot is a graphic that clears 3:1 wherever the entry is drawn. */
+  [data-card-unsaved-dot] {
+    @apply size-2 shrink-0 rounded-full bg-amber-700 dark:bg-amber-400;
+  }
+
+  /* Forced colours paint every background the theme's, which would take the dot away. */
+  @media (forced-colors: active) {
+    [data-card-unsaved-dot] {
+      forced-color-adjust: none;
+      background-color: CanvasText;
+    }
+  }
+
   .tab-nav {
     @apply inline-flex max-w-full flex-wrap items-center gap-1 rounded-lg bg-ink-100 p-1 dark:bg-ink-800;
   }

@@ -57,6 +57,15 @@
          `tips` and `refused` are the view's: while anything on the page has been refused,
          no help on it is a tooltip and every card's sentence is under its title, because
          that is when it is wanted and nothing may lie over a refusal. {% endcomment %}
+      {% comment %} What `app.js` marks a card with while it holds a change that has not been
+         saved (#927): "Not saved" in the card's title, as a badge, and a dot on the card's
+         entry in the menu with the same words for a screen reader. Here so that the words
+         are translated with the page's; with scripts off nothing is drawn.
+
+         `data-changed-fields` is the fields a refused save brought back changed: the page is
+         drawn with what was typed, so a field is what it was loaded with and only the server
+         can say it is not what is saved. {% endcomment %}
+      <template data-card-unsaved-parts data-changed-fields="{{ unsaved_fields|join:' ' }}"><span class="badge ms-2 align-middle" data-tone="amber" data-card-unsaved-badge>{% translate "Not saved" %}</span><span data-card-unsaved-dot><span class="sr-only">{% translate "Not saved" %}</span></span></template>
       {% comment %} From `2xl` the cards are the cells of a grid, filled row by row, so the
          source order -- which a keyboard and a screen reader follow -- is also the order
          across and then down (#871). The margins the cards carry are the single column's;

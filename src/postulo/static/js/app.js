@@ -2029,6 +2029,174 @@
     event.returnValue = "";
   });
 
+  /* ------------------------------------------------- which card is not saved (#927)
+   *
+   * *Your details* is one form of a dozen cards, and the guard above knows only that the
+   * form holds something unsaved -- not where. A card holding a change is marked: the
+   * attribute `data-card-unsaved` (the stylesheet's soft amber ring), "Not saved" as a
+   * badge in its title, and a dot on its entry in the section menu with the same words for
+   * a screen reader. The words and the dot are the page's, in a <template>, so they are
+   * translated with everything else.
+   *
+   * **A card is changed while a field in it differs from what the page was loaded with**,
+   * and the mark comes off when every one is back: the `default` of each kind of field, as
+   * the browser keeps it, and a file box while it holds a file. Nothing is announced: the
+   * badge is text in the title, found when the card is read, and a live region speaking on
+   * a keystroke would be noise.
+   *
+   * **Not `data-unsaved`**, which is a field that saves as it goes (#656): `settleGuard`
+   * looks for it anywhere in a form, and a card wearing it would hold the guard up for ever.
+   *
+   * A refused save draws the page with what was typed in it, so the defaults are the typed
+   * values and nothing differs; the server names the fields it found changed, and their
+   * cards are marked on load and stay marked until a save, whatever is typed after. Saving
+   * is a new page, which is what clears every mark.
+   */
+  var CARD_PARTS = "template[data-card-unsaved-parts]";
+
+  function cardOf(field) {
+    var form = field && field.form;
+    if (!form || !form.querySelector(CARD_PARTS) || !field.closest) {
+      return null;
+    }
+    var card = field.closest("[data-cards] > *");
+    return card && form.contains(card) ? card : null;
+  }
+
+  function selectDiffers(select) {
+    if (select.multiple) {
+      return Array.prototype.some.call(select.options, function (option) {
+        return option.selected !== option.defaultSelected;
+      });
+    }
+    // A single menu with nothing marked `selected` starts on its first option that can be
+    // chosen, which is not a change.
+    var first = -1;
+    var marked = -1;
+    Array.prototype.forEach.call(select.options, function (option, index) {
+      if (option.defaultSelected) {
+        marked = index;
+      }
+      if (first === -1 && !option.disabled) {
+        first = index;
+      }
+    });
+    return select.selectedIndex !== (marked === -1 ? first : marked);
+  }
+
+  function fieldDiffers(field) {
+    if (!field.name) {
+      return false;
+    }
+    if (field.tagName === "SELECT") {
+      return selectDiffers(field);
+    }
+    if (field.tagName === "TEXTAREA") {
+      return field.value !== field.defaultValue;
+    }
+    switch (field.type) {
+      case "hidden":
+      case "submit":
+      case "button":
+      case "reset":
+      case "image":
+        return false;
+      case "checkbox":
+      case "radio":
+        return field.checked !== field.defaultChecked;
+      case "file":
+        return Boolean(field.files && field.files.length);
+      default:
+        return field.value !== field.defaultValue;
+    }
+  }
+
+  function cardDiffers(card) {
+    return Array.prototype.some.call(card.querySelectorAll(WATCHED), fieldDiffers);
+  }
+
+  function cardTitle(card) {
+    return card.querySelector(":scope > header > :is(h2, h3), :scope > legend");
+  }
+
+  function cardMenuEntry(card) {
+    return card.id
+      ? document.querySelector('[data-section-link="' + CSS.escape(card.id) + '"]')
+      : null;
+  }
+
+  function cardPart(card, selector) {
+    var parts = card.closest("form").querySelector(CARD_PARTS);
+    return parts.content.querySelector(selector).cloneNode(true);
+  }
+
+  function markCard(card, why) {
+    if (card.hasAttribute("data-card-unsaved")) {
+      return;
+    }
+    card.setAttribute("data-card-unsaved", why);
+    var title = cardTitle(card);
+    if (title) {
+      title.appendChild(cardPart(card, "[data-card-unsaved-badge]"));
+    }
+    var entry = cardMenuEntry(card);
+    if (entry) {
+      // After the section's name and before the count of its rows, which ends the entry.
+      var name = entry.querySelector(":scope > .min-w-0");
+      entry.insertBefore(cardPart(card, "[data-card-unsaved-dot]"), name ? name.nextSibling : null);
+    }
+  }
+
+  function unmarkCard(card) {
+    if (!card.hasAttribute("data-card-unsaved")) {
+      return;
+    }
+    card.removeAttribute("data-card-unsaved");
+    var title = cardTitle(card);
+    var badge = title && title.querySelector("[data-card-unsaved-badge]");
+    if (badge) {
+      badge.remove();
+    }
+    var entry = cardMenuEntry(card);
+    var dot = entry && entry.querySelector("[data-card-unsaved-dot]");
+    if (dot) {
+      dot.remove();
+    }
+  }
+
+  function followCard(event) {
+    var field = watchedField(event);
+    var card = cardOf(field);
+    if (!card || card.getAttribute("data-card-unsaved") === "refused") {
+      return;
+    }
+    if (cardDiffers(card)) {
+      markCard(card, "changed");
+    } else {
+      unmarkCard(card);
+    }
+  }
+
+  document.addEventListener("input", followCard);
+  document.addEventListener("change", followCard);
+
+  Array.prototype.forEach.call(document.querySelectorAll(CARD_PARTS), function (parts) {
+    var form = parts.closest("form");
+    (parts.getAttribute("data-changed-fields") || "").split(" ").forEach(function (name) {
+      if (!name || !form) {
+        return;
+      }
+      // A field drawn as several boxes posts each as the name with a suffix (`name_0`).
+      var field =
+        form.querySelector('[name="' + CSS.escape(name) + '"]') ||
+        form.querySelector('[name^="' + CSS.escape(name + "_") + '"]');
+      var card = field && cardOf(field);
+      if (card) {
+        markCard(card, "refused");
+      }
+    });
+  });
+
   /* ------------------------------------------ asking in Postulo's words when leaving (#657)
    *
    * `beforeunload` cannot be worded or translated, and it is all a page gets for the tab

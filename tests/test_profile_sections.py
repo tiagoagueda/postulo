@@ -97,3 +97,67 @@ def test_the_label_over_the_list_is_the_hook_and_keeps_its_text(client, user):
     label = re.search(r"<p[^>]*data-section-label[^>]*>(.*?)</p>", html, re.S)
     assert label and label.group(1).strip() == "On this page"
     assert "aria-live" not in label.group(0), "the list's aria-current already says where you are"
+
+
+# ------------------------------------------------------------ a card not saved (#927)
+
+
+def unsaved_parts(html: str) -> re.Match:
+    """The page's <template> of what `app.js` marks an unsaved card with."""
+    found = re.search(
+        r'<template data-card-unsaved-parts data-changed-fields="([^"]*)">(.*?)</template>',
+        html,
+        re.S,
+    )
+    assert found, "the parts are in the page for the script to copy"
+    return found
+
+
+def test_the_words_an_unsaved_card_is_marked_with_are_the_pages(client, user):
+    """Translated with the page, a badge in the amber tone and a dot with hidden words."""
+    client.force_login(user)
+    html = client.get(reverse("accounts:profile")).content.decode()
+
+    parts = unsaved_parts(html)
+    assert parts.group(1) == "", "nothing is unsaved on a page just loaded"
+    assert re.search(
+        r'<span class="badge[^"]*" data-tone="amber" data-card-unsaved-badge>Not saved</span>',
+        parts.group(2),
+    )
+    assert '<span data-card-unsaved-dot><span class="sr-only">Not saved</span></span>' in (
+        parts.group(2)
+    )
+    assert "data-unsaved" not in html.replace("data-card-unsaved", ""), (
+        "the mark of a field that saves as it goes, which the guard looks for (#656)"
+    )
+
+
+def test_a_refused_save_names_the_fields_it_brought_back_changed(client, user):
+    """The page is drawn with what was typed, so only the server can say what differs."""
+    user.first_name, user.last_name = "Alex", "Morgan"
+    user.save()
+    client.force_login(user)
+
+    response = client.post(
+        reverse("accounts:profile"),
+        {
+            "first_name": "Alexandra",
+            "last_name": "Morgan",
+            "form_of_address": "",
+            "form_of_address_other": "",
+            "pronouns": "",
+            "pronouns_other": "",
+            "headline": "",
+            "location": "",
+            "record_language": "",
+            "birth_day": "30",
+            "birth_month": "2",
+            "birth_year": "1990",
+        },
+    )
+
+    assert response.status_code == 200
+    changed = unsaved_parts(response.content.decode()).group(1).split()
+    assert "first_name" in changed
+    assert "birth_day" in changed
+    assert "last_name" not in changed, "typed as it is held, so not a change"

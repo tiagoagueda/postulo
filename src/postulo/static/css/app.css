@@ -1450,6 +1450,9 @@
   .text-start {
     text-align: start;
   }
+  .align-middle {
+    vertical-align: middle;
+  }
   .align-text-bottom {
     vertical-align: text-bottom;
   }
@@ -7937,6 +7940,41 @@
       &:where(:root:not([data-theme="light"]), :root:not([data-theme="light"]) *) {
         color: var(--color-ink-50);
       }
+    }
+  }
+  [data-card-unsaved] {
+    outline-style: var(--tw-outline-style);
+    outline-width: 2px;
+    outline-offset: 2px;
+    outline-color: var(--color-amber-600);
+    &:where([data-theme="dark"], [data-theme="dark"] *) {
+      outline-color: var(--color-amber-500);
+    }
+    @media (prefers-color-scheme: dark) {
+      &:where(:root:not([data-theme="light"]), :root:not([data-theme="light"]) *) {
+        outline-color: var(--color-amber-500);
+      }
+    }
+  }
+  [data-card-unsaved-dot] {
+    width: calc(var(--spacing) * 2);
+    height: calc(var(--spacing) * 2);
+    flex-shrink: 0;
+    border-radius: calc(infinity * 1px);
+    background-color: var(--color-amber-700);
+    &:where([data-theme="dark"], [data-theme="dark"] *) {
+      background-color: var(--color-amber-400);
+    }
+    @media (prefers-color-scheme: dark) {
+      &:where(:root:not([data-theme="light"]), :root:not([data-theme="light"]) *) {
+        background-color: var(--color-amber-400);
+      }
+    }
+  }
+  @media (forced-colors: active) {
+    [data-card-unsaved-dot] {
+      forced-color-adjust: none;
+      background-color: CanvasText;
     }
   }
   .tab-nav {
