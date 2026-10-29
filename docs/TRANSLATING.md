@@ -125,9 +125,9 @@ the ambiguous words (`ligação` is both a *Connection* and a *link*) to a speak
 entry is a draft.
 
 That was done in the repository, before translations moved to Weblate. **A new variant is
-now started in Weblate**: `extract` creates its empty catalogue, Weblate drafts it by machine
-where it has a model for it, and a speaker adapts the drafts there -- with the sibling beside
-them, since Weblate shows the other languages' translations of the same string.
+now started in Weblate**: `extract` creates its empty catalogue, and a speaker translates it
+there -- with the sibling beside each string, since Weblate shows the other languages'
+translations of the same one, which is where adapting a variant starts.
 
 **Check the plural rule rather than copying it.** Brazilian Portuguese treats zero as plural
 — *0 candidaturas* — where European Portuguese says *0 candidatura*. That is one line, and
@@ -151,7 +151,9 @@ msgstr "Bewerbungen"
 
 Unlike gettext's own compiler, Postulo **compiles a draft**, so a language is usable on day
 one rather than English in the gaps -- unless the draft would fail to format, having lost a
-`%(placeholder)s`, which is left out and shows in English (`check` names it). Anyone using
+`%(placeholder)s`, which is left out and shows in English (`check` names it, and fails when a
+language has more of them than `src/postulo/locale/excluded-drafts.txt` records: see
+[The tool](#the-tool)). Anyone using
 `msgfmt` on these catalogues needs `--use-fuzzy` to see the same. The flag used to be called
 `draft`; it was renamed when translations moved to Weblate, which never clears a flag it does
 not know.
@@ -200,7 +202,7 @@ and `compilemessages` shell out to `xgettext` and `msgfmt` for:
 ```sh
 uv run python scripts/messages.py extract          # refresh every catalogue from the source
 uv run python scripts/messages.py extract --check  # fail if a catalogue is out of date (CI)
-uv run python scripts/messages.py check            # placeholders and plural forms agree (CI)
+uv run python scripts/messages.py check            # placeholders, plural forms, drafts left out (CI)
 uv run python scripts/messages.py compile          # write the .mo files Django loads, and status.json
 uv run python scripts/messages.py stats            # how far along each language is
 uv run python scripts/messages.py guard            # no commit since origin/main writes a translation (CI)
@@ -219,6 +221,15 @@ string and drops the ones the source no longer has. `check` refuses a translatio
 invented a `%(placeholder)s`, a plural entry with the wrong number of forms for its
 language, and a plural form that drops the count where its rule also covers twenty-one. Both run on every push, so a pull request that adds a string without a slot for
 it, or a translation that would raise at render time, does not get in.
+
+A **draft** with one of those problems is not refused but left out of the `.mo` file, so the
+page shows it in English. Their number is held per catalogue set and language by
+`src/postulo/locale/excluded-drafts.txt`, a line each (`postulo ur 51`), and **may only go
+down** (#910): a language with more than its line fails `check`, in Weblate's pull requests as
+in any other, and one with fewer is told to lower its line, which the commit after Weblate's
+pull request does. The drafts counted there were left by machine translation, before it was
+switched off, and each waits for a speaker to fix it in Weblate. A plugin repository keeps the
+same file in its own `locale/`; without one, every language is held at zero.
 
 Compiled `.mo` files are build artefacts and are not committed, and neither is
 `locale/status.json`, which `compile` writes beside them for the language picker; the
@@ -253,15 +264,17 @@ plugin and browser extension with strings of its own. From a speaker's point of 
 
 **What comes in from the other side.** Weblate follows `main`: a Forgejo webhook tells it of
 every push, so a string added in a commit is in Weblate within minutes, in every language,
-with an empty slot -- and Weblate's machine translation drafts it as *needs editing* in every
-language it has a model for (LibreTranslate on the same host; the African languages,
-Croatian, Maltese and some others have none, and wait for a speaker).
+with an empty slot, and it stays empty until a speaker translates it. Weblate's automatic
+translation is switched off: its LibreTranslate drafts lost placeholders, mistook meanings and
+mixed varieties (#910), and the catalogues still carry many of them as *needs editing*, waiting
+for a speaker to review them like any other draft.
 
 ### What a commit does with a string
 
-- **A new string** gets an empty slot in every catalogue (`extract`). Weblate drafts it.
+- **A new string** gets an empty slot in every catalogue (`extract`), and waits for a speaker
+  in Weblate.
 - **A changed English string** is a new string: its old translations go with the old one,
-  and Weblate drafts the new one. A speaker sees the previous translation among Weblate's
+  and the new one waits for a speaker, who sees the previous translation among Weblate's
   suggestions.
 - **A removed string** goes from every catalogue, and from Weblate on its next update.
 - **A renamed string**, in bulk, is the case below.
@@ -352,8 +365,7 @@ help rather than fight that.
    no work — that was done in #67 and is held by a lint and a browser suite that visits the
    application in a right-to-left language.
 4. `uv run python scripts/messages.py extract` creates the catalogue, empty, and the commit
-   carries it. Weblate picks it up from `main` and drafts it by machine where it can; a
-   speaker takes it from there in Weblate.
+   carries it. Weblate picks it up from `main`, and a speaker translates it there.
 
 ## Adding a language without a developer
 

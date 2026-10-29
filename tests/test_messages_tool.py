@@ -470,3 +470,80 @@ def test_a_draft_with_markup_is_left_out_of_the_file_and_a_reviewed_one_fails_ch
     assert tool.problems_in(
         tool.Catalogue(header=header, messages={(None, "Written by someone"): reviewed}), "fr-FR"
     )
+
+
+# ------------------------------------------ the ratchet on drafts left out (#910)
+
+
+def _break_a_draft(tool, locale, folder, code):
+    """Give a language a draft that invents a placeholder, as a machine draft used to."""
+    path = locale / folder / "LC_MESSAGES" / "django.po"
+    catalogue = tool.parse(path.read_text(encoding="utf-8"))
+    message = catalogue.messages[(None, "Hello, world")]
+    message.msgstr = ["Bonjour, %(monde)s"]
+    message.flags = ["fuzzy"]
+    path.write_text(tool.dump(catalogue, code), encoding="utf-8", newline="\n")
+
+
+def test_a_new_draft_left_out_fails_check_and_names_the_language(tool, plugin_repo, capsys):
+    tool.use(plugin_repo)
+    assert tool.cmd_extract(check=False) == 0
+    locale = plugin_repo / "src" / "postulo_example" / "locale"
+    _break_a_draft(tool, locale, "fr_FR", "fr-FR")
+    capsys.readouterr()
+
+    assert tool.cmd_check() == 1, "no file is zero recorded, so one left out is one too many"
+    out = capsys.readouterr().out
+    assert "fr-FR: 1 draft(s) left out of the .mo files, more than the 0 recorded" in out
+    assert "src/postulo_example/locale/excluded-drafts.txt" in out
+
+    (locale / "excluded-drafts.txt").write_text(
+        "# recorded\npostulo-example fr-FR 1\n", encoding="utf-8"
+    )
+    assert tool.cmd_check() == 0, "at the recorded number it passes"
+    assert "more than" not in capsys.readouterr().out
+
+    _break_a_draft(tool, locale, "pt_PT", "pt-PT")
+    assert tool.cmd_check() == 1, "a draft in another language is counted for that language"
+    out = capsys.readouterr().out
+    assert "pt-PT: 1 draft(s) left out of the .mo files, more than the 0 recorded" in out
+    assert "fr-FR: 1 draft(s) left out of the .mo files, more than" not in out
+
+
+def test_fewer_drafts_left_out_than_recorded_asks_for_the_number_to_be_lowered(
+    tool, plugin_repo, capsys
+):
+    tool.use(plugin_repo)
+    assert tool.cmd_extract(check=False) == 0
+    locale = plugin_repo / "src" / "postulo_example" / "locale"
+    _break_a_draft(tool, locale, "fr_FR", "fr-FR")
+    (locale / "excluded-drafts.txt").write_text(
+        "postulo-example fr-FR 3\npostulo-example de 2\n", encoding="utf-8"
+    )
+    capsys.readouterr()
+
+    assert tool.cmd_check() == 0, "a fix arrives in Weblate's pull request, which must pass"
+    out = capsys.readouterr().out
+    assert "fr-FR: 1 draft(s) left out of the .mo files, fewer than the 3 recorded" in out
+    assert "to 'postulo-example fr-FR 1'" in out
+    assert "de: 0 draft(s) left out of the .mo files, fewer than the 2 recorded" in out
+    assert "by removing its line" in out
+
+
+def test_a_malformed_line_in_the_record_is_refused(tool, plugin_repo):
+    tool.use(plugin_repo)
+    assert tool.cmd_extract(check=False) == 0
+    locale = plugin_repo / "src" / "postulo_example" / "locale"
+    (locale / "excluded-drafts.txt").write_text("postulo-example fr-FR many\n", encoding="utf-8")
+    with pytest.raises(SystemExit, match="expected '<set> <language> <count>'"):
+        tool.cmd_check()
+
+
+def test_postulos_record_names_only_sets_and_languages_it_has(tool):
+    """A typo in the record would hold a number nothing ever counts against."""
+    tool.use(REPO)
+    sets = {subject.name for subject in tool.catalogue_sets()}
+    languages = set(tool.translated_languages())
+    for name, code in tool.recorded_excluded_drafts():
+        assert name in sets, name
+        assert code in languages, code

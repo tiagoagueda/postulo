@@ -9,7 +9,8 @@ that every contributor and every build can run it.
     uv run python scripts/messages.py extract --check  # fail if a .po is out of date
     uv run python scripts/messages.py compile          # the .mo files Django loads, and status.json
     uv run python scripts/messages.py stats            # how far along each language is
-    uv run python scripts/messages.py check            # placeholders and plural forms agree
+    uv run python scripts/messages.py check            # placeholders and plural forms agree,
+                                                       # and no language leaves out more drafts
 
 **A plugin repository runs the same commands against itself** as ``postulo-messages``,
 the console script this module is installed as, from the repository's root (#187). A
@@ -1183,15 +1184,85 @@ def placeholder_problems(message: Message, code: str) -> list[str]:
     return found
 
 
+#: The file in the project's own ``locale/`` that records, per catalogue set and language, how
+#: many drafts ``check`` finds with a problem and ``compile`` leaves out (#910).
+EXCLUDED_DRAFTS = "excluded-drafts.txt"
+
+
+def excluded_drafts_path() -> Path:
+    return project().locale / EXCLUDED_DRAFTS
+
+
+def recorded_excluded_drafts() -> dict[tuple[str, str], int]:
+    """The recorded numbers, by catalogue set and language; a pair not listed is zero.
+
+    One line each, ``<set> <language> <count>``, with ``#`` comments: the same shape as the
+    other lists in this repository that may only shrink. A project with no file has recorded
+    zero everywhere, which is what a plugin repository starts from.
+    """
+    path = excluded_drafts_path()
+    if not path.exists():
+        return {}
+    found: dict[tuple[str, str], int] = {}
+    for number, line in enumerate(path.read_text(encoding="utf-8").splitlines(), 1):
+        line = line.strip()
+        if not line or line.startswith("#"):
+            continue
+        parts = line.split()
+        if len(parts) != 3 or not parts[2].isdigit():
+            raise SystemExit(f"{path}:{number}: expected '<set> <language> <count>', not {line!r}")
+        found[(parts[0], parts[1])] = int(parts[2])
+    return found
+
+
+def ratchet_excluded_drafts(counted: dict[tuple[str, str], int]) -> tuple[list[str], list[str]]:
+    """Each language whose drafts left out of the .mo files grew past the recorded number,
+    and each one that fell below it (#910).
+
+    A draft with a problem is not compiled, so a page shows it in English, and until this
+    nothing counted them: Weblate's machine drafting once left 1,684 of them, and a new one
+    only showed as one more line in a long list of warnings. The number per language may
+    only go down. Going up fails ``check``, which runs on every pull request, Weblate's
+    included. Going down is said, not failed: the fix arrives in Weblate's pull request,
+    which carries catalogues and nothing else, so lowering the number is the next commit's
+    job -- the lead's, or whoever lands it.
+    """
+    recorded = recorded_excluded_drafts()
+    where = excluded_drafts_path().relative_to(project().root).as_posix()
+    core = core_set().name
+    grew: list[str] = []
+    fell: list[str] = []
+    for key in sorted(set(counted) | set(recorded)):
+        name, code = key
+        now, before = counted.get(key, 0), recorded.get(key, 0)
+        label = f"{code}" if name == core else f"{name} {code}"
+        if now > before:
+            grew.append(
+                f"{label}: {now} draft(s) left out of the .mo files, more than the {before} "
+                f"recorded in {where}"
+            )
+        elif now < before:
+            line = f"to '{name} {code} {now}'" if now else "by removing its line"
+            fell.append(
+                f"{label}: {now} draft(s) left out of the .mo files, fewer than the {before} "
+                f"recorded: lower it in {where} {line}"
+            )
+    return grew, fell
+
+
 def cmd_check() -> int:
-    """Fail on a problem in a reviewed entry; name the ones in drafts.
+    """Fail on a problem in a reviewed entry; name the ones in drafts, and count them.
 
     A draft with a problem is a machine translation nobody has read: it is not compiled
     (`compile_catalogue`), so it cannot break a page, and Weblate shows the same failing
     check beside it for whoever reads it next. Failing the build on it would turn every one
-    of Weblate's pull requests red for something only a speaker can fix.
+    of Weblate's pull requests red for something only a speaker can fix. What does fail is
+    a language with more of them than ``locale/excluded-drafts.txt`` records
+    (`ratchet_excluded_drafts`, #910): those already there wait for a speaker, and a new one
+    does not get in.
     """
     failures = warnings = 0
+    counted: dict[tuple[str, str], int] = {}
     for subject in catalogue_sets():
         where = "" if subject.is_core else f"{subject.name} "
         for code in translated_languages():
@@ -1205,16 +1276,33 @@ def cmd_check() -> int:
             if not same_plural_rule(plural_forms, PLURAL_FORMS.get(code, "")):
                 print(f"{where}{code}: Plural-Forms is not the rule postulo.core.languages has")
                 failures += 1
+            excluded = 0
             for message in catalogue.messages.values():
-                for problem in message_problems(message, code):
+                problems = message_problems(message, code)
+                if message.draft and problems:
+                    excluded += 1
+                for problem in problems:
                     if message.draft:
                         print(f"{where}{code}: (draft, not compiled) {problem}")
                         warnings += 1
                     else:
                         print(f"{where}{code}: {problem}")
                         failures += 1
+            if excluded:
+                counted[(subject.name, code)] = excluded
     if warnings:
         print(f"{warnings} draft(s) with a problem, left out of the .mo files")
+    grew, fell = ratchet_excluded_drafts(counted)
+    for line in grew:
+        print(line)
+    if grew:
+        print(
+            "A draft left out of the .mo files shows in English. Fix the new one(s) in "
+            "Weblate; raise the number only in a commit that says why (#910)."
+        )
+        failures += len(grew)
+    for line in fell:
+        print(line)
     print("no problems" if not failures else f"{failures} problem(s)")
     return 1 if failures else 0
 
