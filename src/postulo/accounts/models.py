@@ -404,6 +404,14 @@ class Profile(models.Model):
     record_language = LanguageField(_("language of your career record"), blank=True)
     time_zone = models.CharField(_("time zone"), max_length=64, blank=True)
     theme = models.CharField(_("theme"), max_length=10, choices=Theme, default=Theme.SYSTEM)
+    #: The document theme this person last chose for each kind of document that has no row
+    #: of its own to keep one on (#340): ``{"report": "classic"}``. Not `theme` above, which
+    #: is the light or dark of the interface and has nothing to do with a page that is
+    #: printed. A report is computed when it is asked for and stored nowhere, so the choice
+    #: made beside its button is remembered here, and #341 and #342 keep theirs in the same
+    #: place. Empty is `plain` for every kind, which is how every report was drawn before;
+    #: `documents.themes.remembered` reads it and `remember` writes it.
+    document_themes = models.JSONField(_("document themes"), default=dict, blank=True)
     #: Keys from postulo.core.navigation that this person has chosen not to see in the
     #: main navigation. Everything there is reachable another way, so hiding one takes
     #: nothing away; the row across the top is what runs out of room first.

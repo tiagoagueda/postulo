@@ -238,7 +238,12 @@ logger = logging.getLogger(__name__)
 #: and the language an ``export_<name>_source`` (``document``, ``fixed`` or ``omit``) and an
 #: ``export_<name>`` value. A privacy choice, so a restore keeps it; each is read back through
 #: its column, and an archive without them restores every file as it always was (#878).
-FORMAT_VERSION = 77
+#: 78 added ``document_themes`` on the profile: the document theme last chosen for each kind
+#: that has no row of its own, ``{"report": "classic"}``; and ``theme`` on a sent document: the
+#: name of the theme that drew it. An archive without them restores every report in ``plain``
+#: and every sent document with no theme recorded; a kind Postulo does not have is passed over
+#: (#340).
+FORMAT_VERSION = 78
 
 
 def industry_entry(industry) -> str | dict:
@@ -357,6 +362,9 @@ PROFILE_FIELDS = (
     "record_language",
     "time_zone",
     "theme",
+    # The document theme chosen for each kind with no row of its own (#340), read back through
+    # `themes.remembered_from_archive`.
+    "document_themes",
     "table_settings",
     # An arrangement belongs to the account, so it travels with the account (#123). The
     # seen set goes too: without it a restore would announce every widget in Postulo as
@@ -642,6 +650,9 @@ SENT_FIELDS = (
     # Whether the file carried its properties (#480). Absent from an archive written before
     # format 42, which restores as with them, as every file was.
     "with_properties",
+    # The theme that drew it (#340). Absent from an archive written before format 77, which
+    # restores with none recorded, as every file had.
+    "theme",
 )
 CAPTURE_FIELDS = (
     "id",

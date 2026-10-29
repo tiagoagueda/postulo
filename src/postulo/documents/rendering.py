@@ -1167,6 +1167,8 @@ def snapshot_cv(
         # What the model says it is, rather than a constant: a portfolio filed as a CV is a
         # document an employment office or a store would then mislabel (#133).
         kind=cv.document_kind,
+        # The theme that drew it, which a CV can later change and a filed copy must not (#340).
+        theme=themes.drawn_by(cv.theme),
         source=cv,
         application=application,
         sent_to=sent_to(application),
@@ -1180,7 +1182,16 @@ def snapshot_cv(
     return document
 
 
-def snapshot_report(owner, *, title: str, html: str, filename: str, backend=None):
+def snapshot_report(
+    owner,
+    *,
+    title: str,
+    html: str,
+    filename: str,
+    backend=None,
+    theme: str = "",
+    language: str = "",
+):
     """Freeze a report as a PDF, filed under Sent documents like a CV is (#162).
 
     A report is computed from the record and never stored as a page; what is stored is
@@ -1189,6 +1200,9 @@ def snapshot_report(owner, *, title: str, html: str, filename: str, backend=None
     an identical text is an identical report, and the one already filed is handed back
     rather than a twin. Nothing links a report to a source -- there is no model behind
     it -- so `source` stays empty, which every reader already copes with.
+
+    ``theme`` and ``language`` are what it was drawn in (#340), written down with it as a
+    CV's are; a caller that passes no language means the one in force.
     """
     from .models import DocumentKind
 
@@ -1206,8 +1220,9 @@ def snapshot_report(owner, *, title: str, html: str, filename: str, backend=None
         title=title,
         kind=DocumentKind.REPORT,
         # A report has no source document; the language it is in is the one it was just
-        # rendered in, which is the request's (#283).
-        language=languages.current(),
+        # rendered in (#283), chosen on its page since #340.
+        language=language or languages.current(),
+        theme=themes.drawn_by(theme) if theme else "",
         source_text=html,
         checksum=RenderedDocument.checksum_for(content),
     )
@@ -1245,8 +1260,9 @@ def snapshot_letter(
         with_properties=went_with_properties(letter, chosen),
         title=title,
         kind=letter.document_kind,
-        # Frozen with the document, for the reason `snapshot_cv` gives (#283).
+        # Frozen with the document, for the reason `snapshot_cv` gives (#283, #340).
         language=language,
+        theme=themes.drawn_by(letter.theme),
         source=letter,
         application=application,
         sent_to=sent_to(application),

@@ -22,41 +22,41 @@ from postulo.core.errands import Refused, handler
 @handler("report_pdf", working=_("Drawing the report"))
 def render_a_report(errand) -> dict:
     """Build the report for a period, draw it, and file it under Sent documents."""
-    from django.template.loader import render_to_string
     from django.urls import reverse
 
     from postulo.documents.pdf import PDFBackendUnavailable
     from postulo.documents.rendering import snapshot_report
+    from postulo.documents.themes import CannotRender
 
     from . import reports
 
-    period = reports.period_from(errand.payload.get("query") or {})
-    # The worker has no request to have chosen a language, so `errands.perform` has put the
-    # person's own in force: the report is drawn in what they read Postulo in, as the draft
-    # the GET serves is (#568, #383).
-    profile = getattr(errand.owner, "profile", None)
-    with languages.override(getattr(profile, "language", "")):
-        report = reports.build(errand.owner, period)
-        # `render_to_string` rather than the view's `render`: there is no request here, and no
-        # context processor runs, so the language and direction the template declares are passed
-        # in as the CV and letter renderers pass theirs (#568). `snapshot_report` writes down the
-        # language it drew in, so what was handed over says what it is either way (#283).
-        language = languages.current()
-        html = render_to_string(
-            "applications/report_print.html",
-            {
-                "report": report,
-                "document_language": language,
-                "document_direction": languages.direction(language),
-            },
+    payload = errand.payload or {}
+    period = reports.period_from(payload.get("query") or {})
+    # The worker has no request to have chosen a language, so the one chosen on the page
+    # travels with the errand, and the theme with it (#340). An errand sent before either was
+    # chosen there carries neither: the report is drawn in the person's remembered theme and in
+    # the language a CV of theirs with none would be, as the draft the GET serves is (#568).
+    try:
+        report, html, theme, language = reports.draw(
+            errand.owner,
+            period,
+            theme=str(payload.get("theme") or ""),
+            language=str(payload.get("language") or ""),
         )
-        title = str(_("Job search report · %(period)s")) % {"period": report.period.label}
+    except CannotRender as refused:  # pragma: no cover - `theme_for` offers only setters
+        raise Refused(str(refused)) from refused
+    # `snapshot_report` writes down the language and the theme it was drawn in, so what was
+    # handed over says what it is either way (#283, #340).
+    with languages.override(language):
+        title = reports.title_of(report)
         try:
             document = snapshot_report(
                 errand.owner,
                 title=title,
                 html=html,
                 filename=reports.filename(report, "pdf"),
+                theme=theme,
+                language=language,
             )
         except PDFBackendUnavailable as unavailable:
             raise Refused(str(unavailable)) from unavailable

@@ -1,0 +1,45 @@
+{% extends "documents/themes/base_report.html" %}
+{% comment %} The report as it was drawn before it had a theme (#56, #340): what somebody who
+   never chooses one is handed, so nothing about it changed when themes arrived. {% endcomment %}
+
+{% block page_styles %}
+    @page {
+      size: A4;
+      margin: 18mm;
+      @bottom-center {
+        content: counter(page) " / " counter(pages);
+        font: 8pt "DejaVu Sans", sans-serif;
+        color: #666;
+      }
+    }
+    body {
+      font: 10pt/1.45 "DejaVu Sans", sans-serif;
+      color: #111;
+      margin: 0;
+      /* A long address in the evidence breaks rather than running off the page (#235). */
+      overflow-wrap: anywhere;
+    }
+    h1 { font-size: 16pt; margin: 0 0 2mm; }
+    h2 { font-size: 11pt; margin: 8mm 0 2mm; border-bottom: 0.4pt solid #999; padding-bottom: 1mm; }
+    .meta { color: #444; font-size: 9pt; margin: 0 0 6mm; }
+    .meta div { margin-bottom: 0.5mm; }
+    .figures { display: flex; flex-wrap: wrap; gap: 6mm; margin-bottom: 4mm; }
+    .figure { min-inline-size: 30mm; }
+    .figure .value { font-size: 14pt; font-weight: bold; }
+    .figure .name { font-size: 8pt; color: #555; }
+    table { inline-size: 100%; border-collapse: collapse; font-size: 8.5pt; }
+    th, td { text-align: start; padding: 1.5mm 2mm; vertical-align: top; }
+    thead th { border-bottom: 0.6pt solid #333; font-size: 8pt; text-transform: uppercase; }
+    tbody tr { border-bottom: 0.3pt solid #ddd; }
+    thead { display: table-header-group; }
+    tr { page-break-inside: avoid; }
+    .weeks td { padding: 0.8mm 2mm; }
+    .weeks .when { inline-size: 34mm; white-space: nowrap; }
+    .count { inline-size: 22mm; text-align: end; white-space: nowrap; }
+    .weeks .count { inline-size: 14mm; }
+    .part { color: #777; font-size: 7.5pt; }
+    .bar { block-size: 2.6mm; background: #2f5d8a; }
+    .bar-track { background: #e8e8e8; block-size: 2.6mm; }
+    .none { color: #777; }
+    .note { font-size: 8pt; color: #555; margin-top: 2mm; }
+{% endblock %}

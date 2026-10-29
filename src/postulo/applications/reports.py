@@ -635,3 +635,167 @@ def as_csv(report: Report) -> str:
 def filename(report: Report, suffix: str) -> str:
     """A name that says what the file is about without being opened."""
     return f"postulo-report-{report.period.start:%Y-%m-%d}-{report.period.end:%Y-%m-%d}.{suffix}"
+
+
+# ------------------------------------------------------------ the document (#340)
+
+
+def offered_languages() -> list[tuple[str, str]]:
+    """The languages a report may be drawn in: the instance's own, each under its own name."""
+    from postulo.core import languages
+
+    return list(languages.LANGUAGES)
+
+
+def language_for(user, asked="") -> str:
+    """The language a report is drawn in: the one asked for where it is offered, else the
+    one a CV with no language of its own is drawn in -- the person's profile language, then
+    the instance's (#340).
+
+    Whoever draws it: the page and the worker both ask here, so the PDF a GET hands back
+    and the one the errand files for the same choice are in the same language.
+    """
+    from types import SimpleNamespace
+
+    from postulo.core import languages
+    from postulo.documents.models import document_language
+
+    wanted = languages.tag(asked) if languages.well_formed(asked) else ""
+    if wanted not in dict(offered_languages()):
+        wanted = ""
+    return document_language(SimpleNamespace(owner=user, language=wanted))
+
+
+def theme_for(user, asked="") -> str:
+    """The theme a report is drawn in: the one asked for where it sets reports, else the
+    one this person last chose (`themes.remembered`), else `plain` (#340)."""
+    from postulo.documents import themes
+
+    theme = themes.find(asked) if asked else None
+    if theme is not None and theme.sets(themes.Kind.REPORT):
+        return theme.name
+    return themes.remembered(getattr(user, "profile", None), themes.Kind.REPORT)
+
+
+def title_of(report: Report) -> str:
+    """What the document is called, in the language it is being drawn in."""
+    return str(_("Job search report · %(period)s")) % {"period": report.period.label}
+
+
+def as_context(report: Report) -> dict:
+    """The report as a theme's template is handed it: plain values and nothing else (#340).
+
+    Strings, numbers, dates and lists and mappings of them, and never a model or the
+    dataclasses above, which are not on the plugin surface: a theme from a plugin reads the
+    same names Postulo's own do, and what it is handed cannot reach the database or change
+    shape under it when this module does. The names are the contract written in the wiki's
+    *Writing a plugin*.
+
+    Built inside the language the report is drawn in, so every label in it -- a period's
+    name, a status, a sector -- is already in that language.
+
+    The evidence rows are the ones the page shows, without how somebody got there or how it
+    ended (#239): who referred somebody is their own business and another person's name, and
+    a theme is not told it.
+    """
+    cadence = report.cadence
+    return {
+        "person": report.person,
+        "office": report.office,
+        "adviser": report.adviser,
+        "produced_at": report.produced_at,
+        "period": {
+            "label": str(report.period.label),
+            "start": report.period.start,
+            "end": report.period.end,
+            "kind": report.period.kind,
+            "days": report.period.days,
+        },
+        "total": report.total,
+        "drafts": report.drafts,
+        "through_service": report.through_service,
+        "appointments_attended": report.appointments_attended,
+        "cadence": {
+            "weeks": [
+                {
+                    "start": week.start,
+                    "end": week.end,
+                    "label": str(week.label),
+                    "count": week.count,
+                    "empty": week.empty,
+                    "partial": week.partial,
+                    "in_progress": week.in_progress,
+                }
+                for week in cadence.weeks
+            ],
+            "total": cadence.total,
+            "per_week": cadence.per_week,
+            "longest_gap": cadence.longest_gap,
+            "current_run": cadence.current_run,
+            "empty_weeks": cadence.empty_weeks,
+            "busiest": cadence.busiest,
+        },
+        "happened": {
+            "replies": report.happened.replies,
+            "interviews": report.happened.interviews,
+            "offers": report.happened.offers,
+            "rejections": report.happened.rejections,
+        },
+        "evidence": [
+            {
+                "applied_on": row.applied_on,
+                "company": row.company,
+                "role": row.role,
+                "source": row.source,
+                "url": row.url,
+                "status": row.status,
+                "last_activity_on": row.last_activity_on,
+            }
+            for row in report.evidence
+        ],
+        "sources": [{"name": str(row.name), "count": row.count} for row in report.sources],
+        "industries": [
+            {
+                "name": str(row.name),
+                "count": row.count,
+                "code": row.code,
+                "children": [
+                    {"name": str(child.name), "count": child.count} for child in row.children
+                ],
+            }
+            for row in report.industries
+        ],
+    }
+
+
+def draw(user, period: Period, *, theme: str = "", language: str = "", nonce=None):
+    """Build the report and set it: ``(report, html, theme, language)``, the last two being
+    what it was actually drawn in. Raises `CannotRender`.
+
+    The one place a report becomes a document, for the GET that hands one back and the
+    errand that files one (#340). ``theme`` and ``language`` are what was asked for, each
+    checked here (`theme_for`, `language_for`), so whatever reaches this is drawn in a theme
+    that sets reports and a language the instance offers. Everything happens inside that
+    language -- the figures' labels as well as the page around them -- whoever is drawing.
+    """
+    from django.template.loader import render_to_string
+
+    from postulo.core import languages
+    from postulo.documents import theme_assets, themes
+
+    name = theme_for(user, theme)
+    language = language_for(user, language)
+    with languages.override(language):
+        report = build(user, period)
+        html = render_to_string(
+            themes.template_for(name, themes.Kind.REPORT),
+            {
+                **as_context(report),
+                "document_language": language,
+                "document_direction": languages.direction(language),
+                "document_title": title_of(report),
+                "csp_nonce": nonce,
+                theme_assets.CONTEXT_KEY: theme_assets.Inliner(themes.find(name)),
+            },
+        )
+    return report, html, name, language

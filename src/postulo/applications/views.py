@@ -28,7 +28,7 @@ from django.views.generic import (
     UpdateView,
 )
 
-from postulo.core import deletions, languages, tables
+from postulo.core import deletions, tables
 from postulo.core.mixins import (
     ConfirmDeleteMixin,
     OwnedObjectMixin,
@@ -39,6 +39,7 @@ from postulo.core.models import Tag
 from postulo.core.params import as_pk
 from postulo.core.redirects import safe_next
 from postulo.core.search import application_match, clean_query
+from postulo.documents import themes
 from postulo.jobs.history import history_of
 from postulo.jobs.models import Company
 from postulo.jobs.views import UserFormKwargsMixin
@@ -1442,6 +1443,13 @@ class ReportView(LoginRequiredMixin, View):
                     else ""
                 ),
                 "week_choices": reports.WEEK_CHOICES,
+                # What the document is drawn in, offered beside the button that files it
+                # (#340): the theme this person last chose, and the language a CV with none
+                # of its own would be in.
+                "theme_choices": themes.choices_for(themes.Kind.REPORT),
+                "chosen_theme": reports.theme_for(request.user),
+                "language_choices": reports.offered_languages(),
+                "chosen_language": reports.language_for(request.user),
                 "kind": period.kind,
                 "on_month": period.start.strftime("%Y-%m"),
                 "on_quarter": f"{period.start.year}-Q{(period.start.month - 1) // 3 + 1}",
@@ -1483,18 +1491,16 @@ class ReportPDFView(LoginRequiredMixin, View):
     """
 
     def _html(self, request: HttpRequest) -> tuple:
-        report = reports.build(request.user, reports.period_from(request.GET))
-        language = languages.current()
-        html = render(
-            request,
-            "applications/report_print.html",
-            {
-                "report": report,
-                "document_language": language,
-                "document_direction": languages.direction(language),
-            },
-        ).content
-        return report, html.decode()
+        # The theme and the language the address asks for, where it asks; otherwise the
+        # remembered theme and the default language, as the errand would draw it (#340). A GET
+        # remembers nothing: it writes nothing.
+        report, html, _theme, _language = reports.draw(
+            request.user,
+            reports.period_from(request.GET),
+            theme=request.GET.get("theme", ""),
+            language=request.GET.get("language", ""),
+        )
+        return report, html
 
     def _back_to_the_page(self, request: HttpRequest, report, unavailable) -> HttpResponse:
         messages.error(request, str(unavailable))
@@ -1524,12 +1530,21 @@ class ReportPDFView(LoginRequiredMixin, View):
         # press sends the work off and lands on the page that watches it (#247). What the
         # press *means* has not changed: it files the report under Sent documents, where
         # the finished errand points.
+        #
+        # The theme and the language are chosen beside the button (#340). The theme is
+        # remembered, so the next report is drawn the same way without being asked; one the
+        # form would not have offered is not, and the remembered one draws instead.
+        theme = reports.theme_for(request.user, request.POST.get("theme", ""))
+        if request.POST.get("theme", "") == theme:
+            themes.remember(getattr(request.user, "profile", None), themes.Kind.REPORT, theme)
         errand = errands.send(
             "report_pdf",
             request.user,
             # The period as it is resolved here, in this person's zone: neither the worker's
             # zone nor a queue that crosses midnight gets to choose it (#383).
             query=reports.as_query(reports.period_from(request.GET)),
+            theme=theme,
+            language=reports.language_for(request.user, request.POST.get("language", "")),
         )
         return redirect("core:errand", pk=errand.pk)
 

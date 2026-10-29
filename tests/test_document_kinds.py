@@ -330,7 +330,7 @@ def test_a_report_is_a_kind_postulo_makes_and_an_email_is_not(user):
 
     report = kinds.get(DocumentKind.REPORT)
     assert report is not None and report.authored
-    assert kinds.theme_kind_for(DocumentKind.REPORT) == "", "its own print template, no theme"
+    assert kinds.theme_kind_for(DocumentKind.REPORT) == themes.Kind.REPORT, "set by a theme (#340)"
     assert "email" not in {kind.key for kind in kinds.REGISTRY.values()}
     assert any(spec.name.endswith("report") for spec in stores.kind_specs()), (
         "a store gets a switch for reports like any other kind"

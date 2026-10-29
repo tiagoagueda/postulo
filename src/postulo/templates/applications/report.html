@@ -25,17 +25,37 @@
         </p>
       {% endif %}
     </div>
-    <div class="flex flex-wrap items-center gap-2">
+    <div class="flex flex-wrap items-end gap-2">
       <a href="{% url 'applications:report_csv' %}?{{ request.GET.urlencode }}" class="btn" data-variant="ghost">
         {% translate "Download CSV" %}
       </a>
       {% comment %} A form rather than a link: the press files the report under Sent
          documents as well as handing it over, and a GET must never leave a record behind
          (#162). It answers with the page that watches the drawing rather than with the
-         file, so it is not marked as a download any more (#247). {% endcomment %}
+         file, so it is not marked as a download any more (#247).
+
+         What the document is drawn in is chosen beside the button that draws it (#340): the
+         theme, which is remembered for the next report, and the language, which starts on
+         the one a CV with none of its own is drawn in. {% endcomment %}
       <form method="post" action="{% url 'applications:report_pdf' %}?{{ request.GET.urlencode }}"
-            class="inline">
+            class="flex flex-wrap items-end gap-2">
         {% csrf_token %}
+        <div class="field w-auto">
+          <label for="report-theme">{% translate "Theme" %}</label>
+          <select name="theme" id="report-theme">
+            {% for value, label in theme_choices %}
+              <option value="{{ value }}" {% if value == chosen_theme %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="field w-auto">
+          <label for="report-language">{% translate "Language of the report" %}</label>
+          <select name="language" id="report-language">
+            {% for code, name in language_choices %}
+              <option value="{{ code }}" lang="{{ code }}" {% if code == chosen_language %}selected{% endif %}>{{ name }}</option>
+            {% endfor %}
+          </select>
+        </div>
         <button type="submit" class="btn">{% translate "File it as a PDF" %}</button>
       </form>
     </div>

@@ -71,6 +71,10 @@ class Kind(models.TextChoices):
     CV = "cv", _("CV")
     PORTFOLIO = "portfolio", _("Portfolio")
     LETTER = "letter", _("Letter")
+    #: The job-search report (#340). It has no row of its own to hold a theme, so the
+    #: person's choice is remembered on their profile (`remembered`) rather than on the
+    #: document, and its template is handed plain values rather than a model.
+    REPORT = "report", _("Report")
 
 
 #: The theme a document falls back to. It sets every kind, which is what makes it a safe
@@ -120,6 +124,7 @@ def _shipped(name: str, label) -> Theme:
             Kind.CV: f"documents/themes/{name}/cv.html",
             Kind.PORTFOLIO: f"documents/themes/{name}/portfolio.html",
             Kind.LETTER: f"documents/themes/{name}/letter.html",
+            Kind.REPORT: f"documents/themes/{name}/report.html",
         },
     )
 
@@ -240,6 +245,72 @@ def template_for(name: str, kind: str) -> str:
             % {"theme": theme.label}
         )
     return theme.templates[kind]
+
+
+def drawn_by(name: str) -> str:
+    """The name of the theme that actually draws a document asked to be set in ``name``.
+
+    What `template_for` resolves to, said as a name: an unknown name is drawn by `plain`,
+    and a filed document records the theme that drew it rather than the one it asked for
+    (#340), because the record is of what was handed over.
+    """
+    theme = find(name) or find(DEFAULT)
+    return theme.name if theme is not None else DEFAULT
+
+
+# ------------------------------------------------- a choice remembered per person (#340)
+
+
+def remembered(profile, kind: str) -> str:
+    """The theme this person last chose for ``kind``, or `DEFAULT`.
+
+    For the kinds that have no row of their own to keep a theme on -- a report is computed
+    when it is asked for and stored nowhere (#56) -- the choice is kept on the profile, one
+    name per kind (`Profile.document_themes`). A name that no installed theme answers to, or
+    one whose theme no longer sets the kind, gives `DEFAULT`: the plugin that brought it was
+    removed, and the report is still drawn rather than refused, for the reason an unknown
+    name on a CV falls back (#132).
+    """
+    held = getattr(profile, "document_themes", None) or {}
+    name = held.get(kind) if isinstance(held, dict) else None
+    theme = find(name) if isinstance(name, str) else None
+    return theme.name if theme is not None and theme.sets(kind) else DEFAULT
+
+
+def remember(profile, kind: str, name: str) -> None:
+    """Keep ``name`` as this person's theme for ``kind``. The caller has checked it is offered.
+
+    Saved at once, and only the one column: a report's form is pressed while the page is
+    being read, and nothing else on the profile is the form's to write.
+    """
+    if profile is None or getattr(profile, "pk", None) is None:
+        return
+    held = dict(profile.document_themes or {})
+    if held.get(kind) == name:
+        return
+    held[kind] = name
+    profile.document_themes = held
+    profile.save(update_fields=["document_themes"])
+
+
+def remembered_from_archive(value) -> dict[str, str] | None:
+    """What an archive's ``document_themes`` may restore, or ``None`` where it is no mapping.
+
+    A claim like everything else in a file (#354): a kind Postulo does not have is passed
+    over, and a name the column could not hold is too. A name no theme here answers to is
+    kept, since it may be a plugin's that is installed later, and `remembered` reads it as
+    `DEFAULT` until then.
+    """
+    if not isinstance(value, dict):
+        return None
+    return {
+        kind: name
+        for kind, name in value.items()
+        if kind in Kind.values
+        and isinstance(name, str)
+        and 0 < len(name) <= MAX_NAME_LENGTH
+        and "\x00" not in name
+    }
 
 
 @deconstructible

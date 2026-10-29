@@ -28,7 +28,9 @@ composed, rendered and dated by #56, and what adopting it adds is the delivery h
 report somebody downloads is filed under Sent documents like a CV, and copied to a store
 the same way. It is frozen at that moment and never on a page view, because a snapshot
 and a page are different things and freezing one per view would fill the store with
-near-identical PDFs. An *email* is **not** a kind. An email that is a message is something
+near-identical PDFs. It was laid out by a print template of its own until #340 gave it a
+theme vocabulary, so a plugin may offer a report as it offers a letter. An *email* is
+**not** a kind. An email that is a message is something
 a transport carries, and a kind that composed mail beside a transport that carries it
 would put a document feature behind the account-recovery lock #104 puts on the last
 transport. What is worth keeping about an email to a recruiter -- the text as sent,
@@ -173,9 +175,9 @@ def register_the_ones_postulo_has() -> None:
             authored=True,
             theme_kind=themes.Kind.LETTER,
         ),
-        # Composed here, from the record, at the moment somebody downloads it; laid out
-        # by its own print template rather than a theme, so no theme vocabulary (#162).
-        Kind(DocumentKind.REPORT, _("Report"), authored=True),
+        # Composed here, from the record, at the moment somebody files it (#162), and set
+        # by a theme since #340, the person's choice remembered on their profile.
+        Kind(DocumentKind.REPORT, _("Report"), authored=True, theme_kind=themes.Kind.REPORT),
         # Held rather than authored: somebody else issues these, and Postulo keeps the file.
         Kind(DocumentKind.CERTIFICATE, _("Certificate")),
         Kind(DocumentKind.DIPLOMA, _("Diploma")),

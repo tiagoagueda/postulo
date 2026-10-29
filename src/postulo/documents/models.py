@@ -1046,6 +1046,14 @@ class RenderedDocument(RecordsALanguage, OwnedModel):
     #: or vanish under a record whose whole purpose is that it cannot. Not editable, like
     #: everything else about a frozen document.
     language = LanguageField(_("language"), blank=True, editable=False)
+    #: The theme that drew this PDF, by name, written at the snapshot as the language is and
+    #: for the same reason (#340). A CV's theme can be changed afterwards, and a report has no
+    #: row to hold one at all: what was handed over says what it was set in either way. The
+    #: name of the theme that actually drew it -- `plain` for a name nothing answered to --
+    #: and blank for a document frozen before this was kept, or uploaded rather than drawn.
+    theme = models.CharField(
+        _("theme"), max_length=themes.MAX_NAME_LENGTH, blank=True, editable=False
+    )
 
     source_text = models.TextField(_("text as sent"), blank=True)
     #: The words of a CV without their setting, kept beside the markup they were set in.

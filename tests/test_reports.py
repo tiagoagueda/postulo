@@ -31,6 +31,9 @@ pytestmark = pytest.mark.django_db
 PAGE = "applications:report"
 CSV = "applications:report_csv"
 PDF = "applications:report_pdf"
+#: The template the report was drawn from before it had a theme, and the one it still is
+#: drawn from by anybody who never chose one (#340).
+PLAIN = "documents/themes/plain/report.html"
 
 
 def sent(user, *, on: dt.date, company="Aperture Science", role="Research Engineer", source=""):
@@ -451,7 +454,7 @@ def test_the_report_is_addressed_to_the_office_when_there_is_one(client, user):
     page = client.get(reverse(PAGE), {"month": "2026-03"}).content.decode()
     assert "For France Travail" in page and "Camille Durand" in page
     assert "Through the public employment service" in page
-    document = render_to_string("applications/report_print.html", {"report": report})
+    document = render_to_string(PLAIN, reports.as_context(report))
     assert "For France Travail" in document and "Camille Durand" in document
 
 
@@ -561,7 +564,7 @@ def test_the_pdf_says_who_it_is_about_and_when_it_was_made(client, user, setting
     sent(user, on=dt.date(2026, 3, 4))
     report = reports.build(user, march(), today=dt.date(2026, 3, 31))
 
-    html = render_to_string("applications/report_print.html", {"report": report})
+    html = render_to_string(PLAIN, reports.as_context(report))
 
     assert user.display_name in html
     assert str(report.produced_at.year) in html
@@ -580,7 +583,7 @@ def test_a_filed_report_declares_its_language_and_direction(user, monkeypatch, l
     user.profile.save()
     drawn: list[str] = []
 
-    def snapshot(owner, *, title, html, filename, backend=None):
+    def snapshot(owner, *, title, html, filename, **drawn_in):
         drawn.append(html)
         raise errands.Refused("stop here")
 
@@ -596,7 +599,11 @@ def test_the_pdf_document_names_no_side_of_the_page():
     """A report written in Hebrew lays out from the other edge, and WeasyPrint honours it."""
     from pathlib import Path
 
-    css = Path("src/postulo/templates/applications/report_print.html").read_text(encoding="utf-8")
+    folder = Path("src/postulo/templates/documents/themes")
+    css = "".join(
+        path.read_text(encoding="utf-8")
+        for path in (folder / "base_report.html", *folder.glob("*/report.html"))
+    )
 
     for physical in (
         "margin-left",

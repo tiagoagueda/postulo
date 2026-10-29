@@ -107,9 +107,7 @@ def test_nothing_on_a_page_is_uppercased_by_the_stylesheet():
     found = [
         path.name
         for path in sorted(TEMPLATES.rglob("*.html"))
-        if "uppercase" in path.read_text(encoding="utf-8")
-        and "themes" not in path.parts
-        and path.name != "report_print.html"
+        if "uppercase" in path.read_text(encoding="utf-8") and "themes" not in path.parts
     ]
     assert not found, found
 

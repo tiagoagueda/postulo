@@ -79,8 +79,9 @@ def test_the_scan_is_the_interface_and_nothing_else():
     assert '@import "tailwindcss" source(none);' in source
     assert '@source "../../src/postulo";' in source
     assert '@source not "../../src/postulo/static/css";' in source
+    # The report's print template is a theme's since #340, and inside that directory.
     assert '@source not "../../src/postulo/templates/documents/themes";' in source
-    assert '@source not "../../src/postulo/templates/applications/report_print.html";' in source
+    assert "report_print.html" not in source
 
 
 def test_no_physical_utility_is_compiled_at_all():

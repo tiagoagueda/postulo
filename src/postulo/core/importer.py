@@ -218,6 +218,13 @@ def _profile_value(profile, name: str, value):
             return personal.clean_nationalities(value)
         except ValidationError:
             return _REFUSED
+    if name == "document_themes":
+        # A mapping of kinds to theme names, held to the kinds there are and the length the
+        # name may be (#340); a name no theme here answers to is kept, and reads as `plain`.
+        from postulo.documents import themes
+
+        kept = themes.remembered_from_archive(value)
+        return _REFUSED if kept is None else kept
     if name in {"identifier_order", "hidden_identifiers"}:
         from postulo.core import identifier_order
 
@@ -1245,7 +1252,7 @@ def _load(user, archive: zipfile.ZipFile, *, force: bool = False, into=None) -> 
     from postulo.core import identifiers as scheme_registry
     from postulo.core import pictures
     from postulo.core.models import Tag, TagIcon, nearest_tone
-    from postulo.documents import printing
+    from postulo.documents import printing, themes
     from postulo.documents.models import (
         CV,
         CoverLetter,
@@ -2302,6 +2309,11 @@ def _load(user, archive: zipfile.ZipFile, *, force: bool = False, into=None) -> 
         # A boolean, or the default: an archive from before format 42 has no key, and a value
         # that is not one is not a reason to refuse the file (#480).
         with_properties = sent_entry.pop("with_properties", True) is not False
+        # A name the column can hold, or none (#340): what drew a file is a fact about it, and
+        # a value that is not one is not a reason to refuse the file.
+        theme = sent_entry.pop("theme", "")
+        if not isinstance(theme, str) or len(theme) > themes.MAX_NAME_LENGTH or "\x00" in theme:
+            theme = ""
 
         figures = {"checksum": sent_entry.get("checksum")}
         sent = RenderedDocument(
@@ -2309,6 +2321,7 @@ def _load(user, archive: zipfile.ZipFile, *, force: bool = False, into=None) -> 
             application=application,
             source=source,
             with_properties=with_properties,
+            theme=theme,
             **_carried(
                 sent_entry, SENT_FIELDS, report, "A sent document", "source_text", "plain_text"
             ),

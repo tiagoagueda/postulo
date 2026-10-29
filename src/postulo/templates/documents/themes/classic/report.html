@@ -1,0 +1,51 @@
+{% extends "documents/themes/base_report.html" %}
+{% comment %} The report in the classic theme (#340): the same page as `plain`'s, set in the
+   serif and with the small capitals the classic CV and letter use, so a report filed beside
+   them looks like the same person's papers. {% endcomment %}
+
+{% block page_styles %}
+    @page {
+      size: A4;
+      margin: 20mm;
+      @bottom-center {
+        content: counter(page) " / " counter(pages);
+        font: 8pt "Palatino Linotype", Palatino, Georgia, "Times New Roman", "Noto Serif", "DejaVu Serif", serif;
+        color: #4a4f5a;
+      }
+    }
+    body {
+      font: 10pt/1.5 "Palatino Linotype", Palatino, Georgia, "Times New Roman", "Noto Serif", "Noto Serif Ethiopic", "Noto Naskh Arabic", "DejaVu Serif", serif;
+      color: #16181d;
+      margin: 0;
+      /* A long address in the evidence breaks rather than running off the page (#235). */
+      overflow-wrap: anywhere;
+    }
+    /* Urdu is set in Nastaliq and Arabic stays in Naskh, as in the classic letter (#1054). */
+    body:lang(ur) {
+      font-family: "Noto Nastaliq Urdu", "Palatino Linotype", Palatino, Georgia, "Times New Roman", "Noto Serif", "Noto Naskh Arabic", serif;
+      line-height: 2;
+    }
+    h1 { font-size: 17pt; font-weight: 600; font-variant: small-caps; letter-spacing: 0.02em; margin: 0 0 2mm; }
+    h2 { font-size: 11.5pt; font-weight: 600; font-variant: small-caps; letter-spacing: 0.02em; margin: 8mm 0 2mm; border-bottom: 0.5pt solid #c7cad1; padding-bottom: 1mm; }
+    .meta { color: #4a4f5a; font-size: 9pt; margin: 0 0 6mm; padding-bottom: 3mm; border-bottom: 0.5pt solid #c7cad1; }
+    .meta div { margin-bottom: 0.5mm; }
+    .figures { display: flex; flex-wrap: wrap; gap: 6mm; margin-bottom: 4mm; }
+    .figure { min-inline-size: 30mm; }
+    .figure .value { font-size: 14pt; font-weight: 600; }
+    .figure .name { font-size: 8pt; color: #4a4f5a; }
+    table { inline-size: 100%; border-collapse: collapse; font-size: 8.5pt; }
+    th, td { text-align: start; padding: 1.5mm 2mm; vertical-align: top; }
+    thead th { border-bottom: 0.6pt solid #4a4f5a; font-size: 8.5pt; font-variant: small-caps; }
+    tbody tr { border-bottom: 0.3pt solid #e1e3e8; }
+    thead { display: table-header-group; }
+    tr { page-break-inside: avoid; }
+    .weeks td { padding: 0.8mm 2mm; }
+    .weeks .when { inline-size: 34mm; white-space: nowrap; }
+    .count { inline-size: 22mm; text-align: end; white-space: nowrap; }
+    .weeks .count { inline-size: 14mm; }
+    .part { color: #6b7180; font-size: 7.5pt; }
+    .bar { block-size: 2.6mm; background: #4a4f5a; }
+    .bar-track { background: #eceef1; block-size: 2.6mm; }
+    .none { color: #6b7180; }
+    .note { font-size: 8pt; color: #4a4f5a; margin-top: 2mm; }
+{% endblock %}
