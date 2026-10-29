@@ -94,6 +94,17 @@ operator needs to decide whether to hurry, and a breaking change the line that s
 to do; `tests/test_changelog.py` holds *Unreleased* to the length. Never create a release
 tag; releases are a deliberate, separate act.
 
+## How a change reaches main
+
+Every change reaches `main` through a pull request (`CONTRIBUTING.md`, *How a change
+reaches main*, #940). Work on a branch named after the issue (`940-pull-requests`), open a
+pull request whose description says `Closes #N`, and leave the merge to the maintainer,
+once CI is green. **Never commit on `main` and never `git push origin <branch>:main`**,
+even where the server would take it. Code is squash-merged, so the pull request's title
+and description become the commit on `main`: write them as a commit message. Weblate's
+pull requests are merged with a merge commit, never squashed. A wiki commit naming the
+same issue is pushed when the pull request merges, not before.
+
 ## Working with AI
 
 AI-written code is welcome here on the same terms as any other: a person proposes it,

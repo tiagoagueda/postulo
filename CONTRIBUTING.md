@@ -52,6 +52,33 @@ uv run manage.py createsuperuser
 uv run manage.py runserver
 ```
 
+## How a change reaches main
+
+Every change reaches `main` through a pull request, the maintainer's included, and nothing
+is committed or pushed to `main` directly (#940).
+
+- **A branch per issue**, named after it: `909-map`, `1024-e2e-settings`. One issue per pull
+  request where it can be; one that closes two says so.
+- **The description says `Closes #N`** for every issue the pull request closes, so Forgejo
+  closes them when it merges, and links the wiki change it needs (*Documentation*, below).
+- **It is merged once CI is green.** Pull requests are where CI runs, and every push to the
+  branch runs it again. A commit that only mends a test or a catalogue after a merge is a
+  small pull request of its own, not a push to `main`.
+- **Code is squash-merged.** The branch may hold as many commits as the work took; `main`
+  gets one, whose title is the pull request's with its number after it:
+  `Let a theme carry its own fonts, drawings and images (#343) (#1070)`. Write the pull
+  request's title and description as that commit's message, imperative and saying why.
+- **Weblate's pull requests are merged with a merge commit**, never squashed, so its
+  commits reach `main` as Weblate made them: `scripts/messages.py guard` knows a translation
+  by its committer, and Weblate, which pulls `main` back, finds its own commits there rather
+  than a copy it would conflict with (*Translations*, below).
+- **`main` takes signed commits only**, and Forgejo signs the commit a merge makes.
+- **There is no "branch must be up to date before merging" rule**, deliberately. CI runs on
+  one runner that takes two jobs at a time, and the rule would cost every open pull request
+  a full CI run again after each merge, some fifty minutes of the runner's time each. A merge
+  is a push to `main`, and `main`'s own CI run checks the combination instead; when that
+  run is red, mending it comes first, through a pull request like any other.
+
 ## Before you open a pull request
 
 ```sh
@@ -65,9 +92,9 @@ uv run pytest -m heavy -p no:xdist  # what needs a process to itself; CI runs it
 npm run build:css            # only if you touched assets/css/ or a template's classes
 ```
 
-Continuous integration runs the suite on Python 3.14 for every push, and on 3.12 and 3.13
-in its *Every Python* workflow: weekly, on release branches, and whenever it is started by
-hand. The rest of the above runs once, in its *Checks* job, together with the catalogue checks,
+Continuous integration runs the suite on Python 3.14 for every pull request and every push
+to `main` or a release branch, and on 3.12 and 3.13 in its *Every Python* workflow: weekly,
+on release branches, and whenever it is started by hand. The rest of the above runs once, in its *Checks* job, together with the catalogue checks,
 `manage.py check --deploy` against production settings, and a check that the committed
 stylesheet has not drifted from its source. Coverage is measured on the 3.14 leg only, and
 `fail_under` in `pyproject.toml` is the floor it has to clear; run
@@ -84,21 +111,26 @@ twice for the same commit, once for the push and once for the pull request, and 
 Python* legs besides (#1033). A newer push to the same pull request cancels the run it
 supersedes; a run on `main` is never cancelled.
 
-There is also a browser suite, `tests/e2e`: some 650 tests in a real Chromium against a live
+There is also a browser suite, `tests/e2e`: about 930 tests in a real Chromium against a live
 server, with axe-core and a walk of every page. It is left out of the default run because it
 needs a browser:
 
 ```sh
 uv sync --group e2e
 uv run playwright install chromium
-uv run pytest -m e2e -n 4        # about eight minutes on four workers; CI runs it on one
+uv run pytest -m e2e -n 4        # CI runs it in one process
 ```
 
-CI runs it on every push, and a failure is run again alone with a trace. Run it before a pull
-request that touches a template, a stylesheet or a script.
+In one process it is slow: CI's run of 28 October 2026 took about forty minutes for some
+nine hundred browser tests, the longest job of a CI run. Whether the runner gets more room
+for it, or the job a second worker, is followed in #1033.
+
+CI runs it for every pull request and on `main`, and a failure is run again alone with a
+trace. Run it before a pull request that touches a template, a stylesheet or a script.
 
 **What belongs in it, and how to keep it fast.** It grew from 149 tests to 645 in five days of
-October 2026, and every one costs seconds where a unit test costs milliseconds (#726).
+October 2026 and passed 900 within the month, and every one costs seconds where a unit test
+costs milliseconds (#726).
 
 - A browser test is for what needs a browser: scripts, layout, focus, the content security
   policy. Markup, permissions, redirects and what a form saves belong in the unit suite,
@@ -514,7 +546,7 @@ git clone https://source.tiagoagueda.com/postulo/postulo.wiki.git
 
 Pages are written and committed there, and nowhere else: there is no copy in this repository
 to keep in step (#169). A change that needs a page ships with one — a commit to the wiki that
-names the same issue as the code, pushed when the code is.
+names the same issue as the code, pushed when the pull request merges.
 
 - **A file name is a page name.** `Installing-Postulo.md` is the page *Installing Postulo*.
   `Home.md` is the front page, and `_Sidebar.md` is the navigation beside every page, so a
@@ -660,10 +692,13 @@ End the entry with the issue it closes, in brackets: `(#42)`.
    `postulo/postulo:X.Y`) to the new minor, or an install runs the last release (#403).
 4. `python scripts/release_tools.py check vX.Y.Z` says whether the three agree, and that
    both compose files name this minor.
-5. Commit and push. A push tests the newest Python only, so start *Actions → Every Python*
-   on `main` as well, which runs the unit tests on the others, and **wait for CI and Every
-   Python to pass on that commit**. Then tag it and push the tag:
-   `git tag vX.Y.Z && git push origin vX.Y.Z`. The release workflow asks Forgejo for the
+5. Commit steps 1b to 3b on a branch and open a pull request for them, as for any change
+   (*How a change reaches main*); merge it once CI is green. The merge makes a new commit
+   on `main`, and CI runs again on it. That run tests the newest Python only, so start
+   *Actions → Every Python* on `main` as well, which runs the unit tests on the others, and
+   **wait for CI and Every Python to pass on the merged commit**. Then bring `main` down,
+   tag that commit and push the tag (a tag is not a change to `main`, so it needs no pull
+   request): `git switch main && git pull && git tag vX.Y.Z && git push origin vX.Y.Z`. The release workflow asks Forgejo for the
    tagged commit's statuses and refuses a tag on which any test leg, the browser job, the
    checks (lint, migrations, catalogues, and the committed stylesheet, icons and scripts),
    the PostgreSQL job or the security audit are not a success, or on which a supported Python has no passed leg (`release_tools.py check vX.Y.Z --ci` is the same question, from a
@@ -723,7 +758,8 @@ A leaked key means a new key: add it to `provenance.OFFICIAL_KEYS`, write a migr
 the official row the new one, and sign again. An instance that has not upgraded keeps trusting what
 the old key signed, and no more.
 
-Every push to `main` that CI passes builds an image and publishes it as **`:dev`**,
+Every push to `main` that CI passes, which is to say every merged pull request, builds an
+image and publishes it as **`:dev`**,
 alongside a pinnable `:<version>-dev.<short sha>` — `dev-image.yml`. The job starts with the
 push and waits for the commit's CI (`scripts/release_tools.py wait-ci`), so a commit the
 tests failed on is never published, and the build does not compete with the tests for the
