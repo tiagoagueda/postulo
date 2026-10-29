@@ -679,6 +679,14 @@ def account_is_empty(user) -> bool:
 SAFE_UID = re.compile(r"[A-Za-z0-9@._-]{1,64}")
 
 
+def _reminder_actor(entry: dict) -> str:
+    """Who last changed a reminder, when not the person: text, held to its column (#331).
+    An archive older than format 79 has none, and every reminder in it is the person's own."""
+    from postulo.applications.models import Reminder
+
+    return str(entry.get("actor") or "")[: Reminder._meta.get_field("actor").max_length]
+
+
 def _restored_uid(model, user, raw) -> dict:
     """``{"uid": …}`` for a record whose calendar identifier can travel, or nothing.
 
@@ -1655,6 +1663,8 @@ def _load(user, archive: zipfile.ZipFile, *, force: bool = False, into=None) -> 
             source=str(reminder_entry.get("source") or "")[:60],
             note=str(reminder_entry.get("note") or ""),
             retired_at=_dt(reminder_entry.get("retired_at")),
+            # Format 79 (#331): who last changed it, when not the person.
+            actor=_reminder_actor(reminder_entry),
             **_restored_uid(Reminder, user, reminder_entry.get("uid")),
         )
         report.reminders += 1
@@ -1852,6 +1862,7 @@ def _load(user, archive: zipfile.ZipFile, *, force: bool = False, into=None) -> 
                     summary=str(reminder_entry.get("summary", ""))[:250],
                     due_at=_dt(reminder_entry.get("due_at")),
                     done_at=_dt(reminder_entry.get("done_at")),
+                    actor=_reminder_actor(reminder_entry),
                     **_restored_uid(Reminder, user, reminder_entry.get("uid")),
                 )
                 report.reminders += 1
@@ -2003,6 +2014,7 @@ def _load(user, archive: zipfile.ZipFile, *, force: bool = False, into=None) -> 
                         summary=reminder_entry.get("summary", ""),
                         due_at=_dt(reminder_entry.get("due_at")),
                         done_at=_dt(reminder_entry.get("done_at")),
+                        actor=_reminder_actor(reminder_entry),
                         **_restored_uid(Reminder, user, reminder_entry.get("uid")),
                     )
                     report.reminders += 1

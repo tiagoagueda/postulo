@@ -8,6 +8,7 @@
 # jobs/merging.py moves everybody's rows once _same_owner has checked that everybody who saw
 # the other record sees the kept one (#896).
 # jobs/geocoding.py walks every account's addresses in the scheduler, as its one caller (#913).
+# The reminders router reads through owned_or_404, which scopes to the token's owner (#331).
 api/routers/applications.py::_detail::Application
 api/routers/applications.py::list_applications::Application
 api/routers/common.py::referrer_and_agency_or_422::Company
@@ -33,6 +34,7 @@ api/routers/reminders.py::change_reminder::Application
 api/routers/reminders.py::change_reminder::Reminder
 api/routers/reminders.py::complete_reminder::Reminder
 api/routers/reminders.py::delete_reminder::Reminder
+api/routers/reminders.py::reopen_reminder::Reminder
 api/routers/reminders.py::list_reminders::Reminder
 applications/services.py::change_status::Application
 applications/services.py::retire_reminders_of::Reminder

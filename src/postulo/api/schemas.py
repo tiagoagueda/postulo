@@ -798,6 +798,11 @@ class ReminderOut(Schema):
     due_at: dt.datetime
     done_at: dt.datetime | None = None
     notified_at: dt.datetime | None = None
+    actor: str = Field(
+        "",
+        description="Who last made, changed, moved, ticked or unticked it, when it was not the "
+        "person: `API token phone`, a plugin. Blank for the person's own hand",
+    )
     updated_at: dt.datetime
 
 
@@ -955,9 +960,9 @@ class ReminderPatch(Schema):
     application" and "do not touch the application" is the difference between a `PATCH` and
     a replacement, and `application_id: None` means the first.
 
-    ``done_at`` is not here. Marking one done goes through ``/complete``, which is a verb
-    rather than a column, and a client that could write the stamp directly could write one
-    in the future or in the wrong order.
+    ``done_at`` is not here. Marking one done goes through ``/complete``, and undoing that
+    through ``/reopen`` (#331), which are verbs rather than a column, and a client that could
+    write the stamp directly could write one in the future or in the wrong order.
     """
 
     application_id: RowId | None = None
@@ -1672,6 +1677,7 @@ def reminder_out(reminder) -> dict:
         "due_at": reminder.due_at,
         "done_at": reminder.done_at,
         "notified_at": reminder.notified_at,
+        "actor": reminder.actor,
         "updated_at": reminder.updated_at,
     }
 

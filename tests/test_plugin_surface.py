@@ -444,16 +444,22 @@ def test_the_surface_holds_what_a_sync_needs():
         "Interview",
         "InterviewOutcome",
         "LinkKind",
+        "Reminder",
         "Suggestion",
         "SyncLink",
         "add_appointment",
         "calendar_status",
+        "change_reminder",
+        "complete_reminder",
+        "create_reminder",
         "event_lines",
         "get_or_create_company",
         "phone_number_is_taken",
+        "postpone_reminder",
         "primary_phone_number",
         "primary_web_link",
         "record_event",
+        "reopen_reminder",
         "reschedule_interview",
         "save_phone_number",
         "save_web_link",
@@ -461,6 +467,16 @@ def test_the_surface_holds_what_a_sync_needs():
         "suggest",
     ):
         assert getattr(api, name) is not None, name
+
+
+def test_a_reminder_on_the_surface_is_the_cores_own_class():
+    """What a sync of a task list reads and writes (#331): the record, read with
+    `Reminder.objects.for_user()`, and the services, never the model's save."""
+    from postulo.applications import models, services
+    from postulo.plugins import api
+
+    assert api.Reminder is models.Reminder
+    assert api.reopen_reminder is services.reopen_reminder
 
 
 def test_the_surface_holds_the_calendar_reader_and_the_task_writer():

@@ -243,7 +243,10 @@ logger = logging.getLogger(__name__)
 #: name of the theme that drew it. An archive without them restores every report in ``plain``
 #: and every sent document with no theme recorded; a kind Postulo does not have is passed over
 #: (#340).
-FORMAT_VERSION = 78
+#: 79 added ``actor`` on a reminder: who last made, changed, moved, ticked or unticked it when
+#: that was not the person -- an API token, a calendar file, a plugin. An archive without it
+#: restores every reminder as the person's own doing (#331).
+FORMAT_VERSION = 79
 
 
 def industry_entry(industry) -> str | dict:
@@ -564,7 +567,17 @@ LISTING_EVENT_FIELDS = (
     "actor",
     "created_at",
 )
-REMINDER_FIELDS = ("id", "uid", "summary", "due_at", "done_at", "source", "note", "retired_at")
+REMINDER_FIELDS = (
+    "id",
+    "uid",
+    "summary",
+    "due_at",
+    "done_at",
+    "source",
+    "note",
+    "retired_at",
+    "actor",
+)
 APPOINTMENT_FIELDS = (
     "id",
     "uid",

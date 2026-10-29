@@ -8,9 +8,15 @@ from ninja.pagination import paginate
 
 from postulo.applications import agenda
 from postulo.applications.models import Application, Reminder
-from postulo.applications.services import postpone_reminder
 
-from ..auth import scope
+# Under other names: the handlers below bear `complete_reminder`, `change_reminder` and
+# `reopen_reminder`, URL names the isolation sweep reads, so the services step aside (#331).
+from postulo.applications.services import change_reminder as change_service
+from postulo.applications.services import complete_reminder as complete_service
+from postulo.applications.services import create_reminder, postpone_reminder
+from postulo.applications.services import reopen_reminder as reopen_service
+
+from ..auth import actor_of, scope
 from ..paging import AFTER_ID, UPDATED_SINCE, Moment, Page, RowId, changed_since
 from ..problems import refuses
 from ..schemas import ReminderIn, ReminderOut, ReminderPatch, reminder_out
@@ -56,8 +62,12 @@ def add_reminder(request, payload: ReminderIn):
         application = owned(request, Application.objects).filter(pk=payload.application_id).first()
         if application is None:
             raise HttpError(404, _("No such application."))
-    reminder = Reminder.objects.create(
-        owner=owner, application=application, summary=payload.summary, due_at=payload.due_at
+    reminder = create_reminder(
+        owner,
+        application=application,
+        summary=payload.summary,
+        due=payload.due_at,
+        actor=actor_of(request),
     )
     return Status(201, reminder_out(reminder))
 
@@ -67,7 +77,25 @@ def add_reminder(request, payload: ReminderIn):
 )
 def complete_reminder(request, pk: int):
     reminder = owned_or_404(request, Reminder.objects, pk)
-    reminder.complete()
+    complete_service(reminder, actor=actor_of(request))
+    return reminder_out(reminder)
+
+
+@router.post(
+    "/{int:pk}/reopen",
+    response=ReminderOut,
+    auth=scope("write"),
+    summary="Mark a reminder not done",
+)
+def reopen_reminder(request, pk: int):
+    """Undo ``/complete``: the reminder is outstanding again (#331).
+
+    What a phone's task list can do, so the API and the page can do it too. It is **not**
+    announced again: the announced stamp stays as it was, and a reminder is announced again
+    only when it is moved (``PATCH`` with a ``due_at``). One not done is answered as it is.
+    """
+    reminder = owned_or_404(request, Reminder.objects, pk)
+    reopen_service(reminder, actor=actor_of(request))
     return reminder_out(reminder)
 
 
@@ -85,6 +113,7 @@ def change_reminder(request, pk: int, payload: ReminderPatch):
     """
     reminder = owned_or_404(request, Reminder.objects, pk)
     data = payload.dict(exclude_unset=True)
+    changes = {}
     if "application_id" in data:
         application = None
         if data["application_id"] is not None:
@@ -93,12 +122,13 @@ def change_reminder(request, pk: int, payload: ReminderPatch):
             )
             if application is None:
                 raise HttpError(404, _("No such application."))
-        reminder.application = application
+        changes["application"] = application
     if data.get("summary") is not None:
-        reminder.summary = data["summary"]
-    reminder.save()
+        changes["summary"] = data["summary"]
+    actor = actor_of(request)
+    change_service(reminder, actor=actor, **changes)
     if data.get("due_at") is not None:
-        postpone_reminder(reminder, data["due_at"])
+        postpone_reminder(reminder, data["due_at"], actor=actor)
     return reminder_out(reminder)
 
 

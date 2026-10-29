@@ -335,8 +335,10 @@ def reminder_event(reminder: Reminder) -> Event:
 
 
 def _reminder_detail(reminder: Reminder) -> str:
-    """The second line of a reminder: its role if it is about an application, and the plugin
-    that placed it if one did, so the person sees where it came from (#887)."""
+    """The second line of a reminder: its role if it is about an application, the plugin
+    that placed it if one did, so the person sees where it came from (#887), and who last
+    changed it when that was not the person -- *via API token phone* -- in the words a
+    timeline entry uses for its actor (#331)."""
     parts = []
     if reminder.application_id is not None:
         parts.append(reminder.application.posting.title)
@@ -347,6 +349,8 @@ def _reminder_detail(reminder: Reminder) -> str:
         parts.append(str(getattr(plugin, "label", "") or reminder.source))
     if reminder.note:
         parts.append(reminder.note)
+    if reminder.actor:
+        parts.append(str(_("via %(actor)s") % {"actor": reminder.actor}))
     return " · ".join(parts)
 
 

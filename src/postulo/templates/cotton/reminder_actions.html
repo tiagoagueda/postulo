@@ -54,6 +54,18 @@
         <button type="submit" role="menuitem">{% icon "check" %}{% translate "Done" %}</button>
       </form>
     {% endif %}
+    {% comment %} *Not done* (#331): in the menu whatever the room, since undoing a tick is
+       rare, and a phone that syncs a task list can untick one, so the page has to be able to
+       as well. It does not announce the reminder again; moving it does. {% endcomment %}
+    {% if reminder.is_done %}
+      <form method="post" action="{% url 'applications:reminder_reopen' reminder.pk %}" role="none"
+            {% if target %}hx-post="{% url 'applications:reminder_reopen' reminder.pk %}"
+              hx-target="{{ target }}" hx-swap="outerHTML"{% endif %}>
+        {% csrf_token %}
+        {% if next_url %}<input type="hidden" name="next" value="{{ next_url }}">{% endif %}
+        <button type="submit" role="menuitem" data-reminder-reopen>{% icon "circle-dashed" %}{% translate "Not done" %}</button>
+      </form>
+    {% endif %}
     {% if not reminder.is_done %}
       <form method="post" action="{% url 'applications:reminder_later' reminder.pk %}" role="none"
             {% if target %}hx-post="{% url 'applications:reminder_later' reminder.pk %}"

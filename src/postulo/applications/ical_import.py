@@ -300,6 +300,7 @@ def apply(user, rows: list[Row], filename: str) -> Report:
                     source="",
                     application=form.cleaned_data.get("application"),
                     done=entry.completed,
+                    actor=actor,
                 )
                 report.reminders += 1
     return report

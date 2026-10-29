@@ -9,6 +9,7 @@ that the caller invokes on purpose is easier to read and easier to test.
 from __future__ import annotations
 
 import datetime as dt
+import types
 
 from django.core.exceptions import ValidationError
 from django.db import IntegrityError, transaction
@@ -549,11 +550,12 @@ def schedule_interview(
     _tell_interview(interview, moved=False, actor=actor)
     due = starts_at - INTERVIEW_REMINDER_LEAD
     if remind and due > now:
-        interview.reminder = Reminder.objects.create(
-            owner=application.owner,
+        interview.reminder = create_reminder(
+            application.owner,
             application=application,
             summary=_interview_reminder_summary(interview),
-            due_at=due,
+            due=due,
+            actor=actor,
         )
         interview.save(update_fields=["reminder", "updated_at"])
     return interview
@@ -594,15 +596,15 @@ def sync_appointment_reminder(appointment, *, remind: bool) -> None:
         return
     summary = _appointment_reminder_summary(appointment)
     if reminder is None:
-        appointment.reminder = Reminder.objects.create(
-            owner=appointment.owner, summary=summary, due_at=due
-        )
+        appointment.reminder = create_reminder(appointment.owner, summary=summary, due=due)
         appointment.save(update_fields=["reminder", "updated_at"])
     elif (reminder.summary, reminder.due_at) != (summary, due):
-        # The stamp goes with the time, as `postpone_reminder` explains: a reminder moved into
-        # the future has not been announced yet.
-        reminder.summary, reminder.due_at, reminder.notified_at = summary, due, None
-        reminder.save(update_fields=["summary", "due_at", "notified_at", "updated_at"])
+        # Reworded, because the words name the time, and moved through `postpone_reminder`,
+        # so the stamp goes with the time: a reminder moved into the future has not been
+        # announced yet (#331).
+        change_reminder(reminder, summary=summary)
+        if reminder.due_at != due:
+            postpone_reminder(reminder, due)
 
 
 @transaction.atomic
@@ -683,11 +685,10 @@ def reschedule_interview(interview: Interview, *, starts_at, ends_at, actor: str
         if due > timezone.now():
             # Announced again at the new time, even if the old one had already been -- and
             # worded again, because the words name the time (#224).
-            reminder.due_at, reminder.notified_at = due, None
-            reminder.summary = _interview_reminder_summary(interview)
-            reminder.save(update_fields=["due_at", "notified_at", "summary", "updated_at"])
+            change_reminder(reminder, summary=_interview_reminder_summary(interview), actor=actor)
+            postpone_reminder(reminder, due, actor=actor)
         else:
-            reminder.complete()
+            complete_reminder(reminder, actor=actor)
     return interview
 
 
@@ -768,7 +769,7 @@ def settle_interview(
 
     reminder = interview.reminder
     if reminder is not None and not reminder.is_done:
-        reminder.complete()
+        complete_reminder(reminder, actor=actor)
     return interview
 
 
@@ -819,8 +820,132 @@ def later_time(choice: str, reminder: Reminder, *, now=None) -> dt.datetime | No
     return moved.astimezone(dt.UTC).astimezone(zone)
 
 
-def postpone_reminder(reminder: Reminder, due: dt.datetime) -> Reminder:
+#: The hour a reminder made for a day falls due at, when the day is all that was given: the
+#: start of a working morning, rather than a midnight that would announce it in the night.
+#: *New reminder* on a calendar day opens at it, and `create_reminder` and `postpone_reminder`
+#: read a bare date at it (#331).
+REMINDER_HOUR = 9
+
+
+def _reminder_field(name: str) -> int:
+    return Reminder._meta.get_field(name).max_length
+
+
+def reminder_moment(owner, due) -> dt.datetime:
+    """``due`` as the instant a reminder falls due: a datetime as it is, a date at nine.
+
+    Nine in the **owner's** zone -- their profile's, else the instance's -- and not the active
+    one (#331). A sync that turns a phone's task into a reminder runs outside any request, and
+    only the request middleware activates a zone, so the active zone there is the server's,
+    whoever the reminder is for. A naive datetime is read in the same zone, for the same
+    reason.
+    """
+    from postulo.notifications.service import zone_for
+
+    if isinstance(due, dt.datetime):
+        return timezone.make_aware(due, zone_for(owner)) if timezone.is_naive(due) else due
+    return dt.datetime.combine(due, dt.time(REMINDER_HOUR), tzinfo=zone_for(owner))
+
+
+def _refuse_strangers_application(owner, application) -> None:
+    """A reminder is about one of its owner's applications or about none (#331).
+
+    A ``ValueError`` rather than a row pointing into somebody else's search: the API and the
+    form look the application up among the person's own first, so this is the line a plugin
+    meets, which is handed records and could mix two people's up.
+    """
+    if application is not None and application.owner_id != owner.pk:
+        raise ValueError("That application is someone else's.")
+
+
+def _cut_summary(summary: str) -> str:
+    """Held to the column, as `suggest` holds what it is handed; empty is refused, since a
+    reminder that says nothing cannot be acted on."""
+    summary = (summary or "").strip()[: _reminder_field("summary")]
+    if not summary:
+        raise ValueError("A reminder needs something to say.")
+    return summary
+
+
+@transaction.atomic
+def create_reminder(
+    owner,
+    *,
+    summary: str,
+    due,
+    application: Application | None = None,
+    actor: str = "",
+    uid: str = "",
+    source: str = "",
+    note: str = "",
+) -> Reminder:
+    """Make a reminder for ``owner`` (#331). The one way a reminder comes to be.
+
+    The form, *Snooze*, ``POST /reminders``, an interview's day-ahead reminder, an offer's
+    answer-by one, an appointment's, and `add_reminder` for a plugin or a calendar file all
+    come through here, so a rule about a new reminder is written once.
+
+    ``due`` is a moment, or a date for nine in the morning in the owner's zone
+    (`reminder_moment`). ``application`` has to be the owner's own, or it is a ``ValueError``.
+    The summary is cut to the column's 250 characters, and an empty one is refused. ``actor``
+    names who made it when the person did not -- ``API token phone``, a plugin -- and is drawn
+    beside it.
+
+    ``uid``, ``source`` and ``note`` are `add_reminder`'s: the calendar identifier a task
+    arrived with, the plugin that placed it, and what that plugin said. Left out, the column
+    mints a uid and the reminder is the person's own.
+    """
+    _refuse_strangers_application(owner, application)
+    return Reminder.objects.create(
+        **({"uid": uid} if uid else {}),
+        owner=owner,
+        application=application,
+        summary=_cut_summary(summary),
+        due_at=reminder_moment(owner, due),
+        source=source[: _reminder_field("source")],
+        note=note,
+        actor=actor[: _reminder_field("actor")],
+    )
+
+
+@transaction.atomic
+def change_reminder(
+    reminder: Reminder,
+    *,
+    summary: str | types.EllipsisType = ...,
+    application: Application | types.EllipsisType | None = ...,
+    actor: str = "",
+) -> Reminder:
+    """Change what a reminder says, or which application it is about (#331).
+
+    Each left out (``...``) is left alone; ``application=None`` means *about none*. The same
+    refusal and the same cut as `create_reminder`. When the time is to move as well, that is
+    `postpone_reminder`, which is where the announced stamp is decided. A call that changes
+    nothing writes nothing, and so does not put its ``actor`` on a reminder it did not touch.
+    """
+    fields = []
+    if summary is not ...:
+        summary = _cut_summary(summary)
+        if summary != reminder.summary:
+            reminder.summary = summary
+            fields.append("summary")
+    if application is not ...:
+        _refuse_strangers_application(reminder.owner, application)
+        if (application.pk if application is not None else None) != reminder.application_id:
+            reminder.application = application
+            fields.append("application")
+    if fields:
+        reminder.actor = actor[: _reminder_field("actor")]
+        reminder.save(update_fields=[*fields, "actor", "updated_at"])
+    return reminder
+
+
+@transaction.atomic
+def postpone_reminder(reminder: Reminder, due, *, actor: str = "") -> Reminder:
     """Move a reminder to ``due``, and let it be announced again there (#238).
+
+    ``due`` is a moment, or a date for nine in the morning in the owner's zone, as
+    `create_reminder` reads one (#331); ``actor`` names who moved it when the person did not.
 
     The stamp has to go with the time. It is the record of *this one has been dealt with*,
     and a reminder somebody has deliberately moved into the future has not been: leaving
@@ -829,13 +954,52 @@ def postpone_reminder(reminder: Reminder, due: dt.datetime) -> Reminder:
     reason since #224; this is that rule with a name.
 
     A reminder already done is left alone. Postponing something that is finished is either a
-    mistake or a request to reopen it, and reopening is not what a button called *Later*
-    should quietly do.
+    mistake or a request to reopen it, and reopening is `reopen_reminder`, not what a button
+    called *Later* should quietly do.
     """
     if reminder.is_done:
         return reminder
-    reminder.due_at, reminder.notified_at = due, None
-    reminder.save(update_fields=["due_at", "notified_at", "updated_at"])
+    reminder.due_at, reminder.notified_at = reminder_moment(reminder.owner, due), None
+    reminder.actor = actor[: _reminder_field("actor")]
+    reminder.save(update_fields=["due_at", "notified_at", "actor", "updated_at"])
+    return reminder
+
+
+@transaction.atomic
+def complete_reminder(reminder: Reminder, *, at=None, actor: str = "") -> Reminder:
+    """Tick a reminder off, at ``at`` or now (#331).
+
+    ``at`` is for a sync, which learns of a tick on a phone up to a day after it was made and
+    should record when it was done, not when it heard. **Never in the future**: that is a
+    ``ValueError``, because a reminder done tomorrow is not done. One already done keeps the
+    moment it was done at, and who did it.
+    """
+    now = timezone.now()
+    if at is not None and at > now:
+        raise ValueError("A reminder cannot have been done in the future.")
+    if reminder.is_done:
+        return reminder
+    reminder.done_at = at or now
+    reminder.actor = actor[: _reminder_field("actor")]
+    reminder.save(update_fields=["done_at", "actor", "updated_at"])
+    return reminder
+
+
+@transaction.atomic
+def reopen_reminder(reminder: Reminder, *, actor: str = "") -> Reminder:
+    """Undo *Done*: the reminder is outstanding again (#331).
+
+    **It is not announced again** (the maintainer's decision on #331): the announced stamp is
+    left as it was, which is `postpone_reminder`'s rule read the other way -- what is
+    announced again is what was moved, and a tick undone by mistake should not ring twice. A
+    reminder never announced, because it was ticked off before it fell due, still is when its
+    time comes. To have it announced again, move it. One not done is left alone.
+    """
+    if not reminder.is_done:
+        return reminder
+    reminder.done_at = None
+    reminder.actor = actor[: _reminder_field("actor")]
+    reminder.save(update_fields=["done_at", "actor", "updated_at"])
     return reminder
 
 
@@ -852,6 +1016,7 @@ def add_reminder(
     note: str = "",
     application=None,
     done: bool = False,
+    actor: str = "",
 ) -> Reminder:
     """Put a dated entry on the calendar for ``owner``, or move the one this ``uid`` already is.
 
@@ -865,31 +1030,48 @@ def add_reminder(
     Refused with a ``ValueError`` when ``uid`` is already a reminder the person made and the
     caller is a plugin (or the other way round): a plugin may not overwrite what a person wrote,
     nor a person's import what a plugin placed.
+
+    **A new entry is made by `create_reminder`** (#331), and ticked off by `complete_reminder`
+    when it arrives done: this is the uid-keyed, source-guarded way in, layered over the one way
+    a reminder comes to be, rather than a second writer beside it. That way round because the
+    plain act is the general one -- the form, the API and the interviews make reminders with no
+    uid to match and no source to guard -- and what this adds, finding the entry again, is the
+    part only a calendar needs. ``actor`` is recorded on what it makes or moves, as there.
     """
     if not uid or not summary:
         raise ValueError("A calendar entry needs a uid and a summary.")
     existing = Reminder.objects.filter(owner=owner, uid=uid).first()
     if existing is None:
-        return Reminder.objects.create(
-            owner=owner,
+        made = create_reminder(
+            owner,
+            summary=summary,
+            due=due_at,
             application=application,
-            summary=summary[:250],
-            due_at=due_at,
+            actor=actor,
             uid=uid,
-            source=source[:60],
+            source=source,
             note=note,
-            done_at=timezone.now() if done else None,
         )
+        return complete_reminder(made, actor=actor) if done else made
     if existing.source != source[:60]:
         raise ValueError("That calendar entry was placed by someone else.")
     moved_later = due_at > existing.due_at
     existing.summary, existing.note = summary[:250], note
     existing.due_at, existing.retired_at = due_at, None
+    existing.actor = actor[: _reminder_field("actor")]
     if moved_later:
         # Moved into the future, so not yet announced, as `postpone_reminder` says.
         existing.notified_at = None
     existing.save(
-        update_fields=["summary", "note", "due_at", "retired_at", "notified_at", "updated_at"]
+        update_fields=[
+            "summary",
+            "note",
+            "due_at",
+            "retired_at",
+            "notified_at",
+            "actor",
+            "updated_at",
+        ]
     )
     return existing
 
@@ -973,7 +1155,7 @@ def _answer_reminder_summary(offer: Offer) -> str:
     )
 
 
-def _remind_to_answer(offer: Offer) -> None:
+def _remind_to_answer(offer: Offer, *, actor: str = "") -> None:
     """A reminder the day before the answer is due, kept in step with the date (#237).
 
     Made when the date is set, moved when it moves, ticked off when it is taken away or has
@@ -981,35 +1163,34 @@ def _remind_to_answer(offer: Offer) -> None:
     new time rather than silenced by the stamp from the old one. Called only when the date
     is what changed: a reminder that was ticked off, put off or deleted is the person's
     answer to it, and an edit to something else must not undo that (#442).
+
+    Nine in the morning in the owner's zone, through `reminder_moment`, as every reminder made
+    for a day is (#331); a new date brings back one that was ticked off through
+    `reopen_reminder`, and then moves it, so it is announced at the new date.
     """
     reminder = offer.reminder
     if offer.answer_by is None:
         if reminder is not None and not reminder.is_done:
-            reminder.complete()
+            complete_reminder(reminder, actor=actor)
         return
-    due = timezone.make_aware(
-        dt.datetime.combine(offer.answer_by - ANSWER_REMINDER_LEAD, dt.time(9, 0)),
-        timezone.get_current_timezone(),
-    )
+    due = reminder_moment(offer.owner, offer.answer_by - ANSWER_REMINDER_LEAD)
     if due <= timezone.now():
         if reminder is not None and not reminder.is_done:
-            reminder.complete()
+            complete_reminder(reminder, actor=actor)
         return
     if reminder is None:
-        offer.reminder = Reminder.objects.create(
-            owner=offer.owner,
+        offer.reminder = create_reminder(
+            offer.owner,
             application=offer.application,
             summary=_answer_reminder_summary(offer),
-            due_at=due,
+            due=due,
+            actor=actor,
         )
         offer.save(update_fields=["reminder", "updated_at"])
     else:
-        reminder.summary = _answer_reminder_summary(offer)
-        reminder.save(update_fields=["summary", "updated_at"])
-        if reminder.is_done:
-            reminder.done_at = None
-            reminder.save(update_fields=["done_at", "updated_at"])
-        postpone_reminder(reminder, due)
+        change_reminder(reminder, summary=_answer_reminder_summary(offer), actor=actor)
+        reopen_reminder(reminder, actor=actor)
+        postpone_reminder(reminder, due, actor=actor)
 
 
 @transaction.atomic
@@ -1025,7 +1206,7 @@ def record_offer(application: Application, *, actor: str = "", **fields) -> Offe
     entry = record_event(
         application, kind=EventKind.OFFER, summary=_offer_summary(offer, revised=False), actor=actor
     )
-    _remind_to_answer(offer)
+    _remind_to_answer(offer, actor=actor)
     _tell_offer(offer, entry, revised=False, actor=actor)
     order = list(BOARD_STATUSES)
     if application.status in order and order.index(application.status) < order.index(Status.OFFER):
@@ -1052,11 +1233,11 @@ OFFER_TERMS = frozenset(
 
 
 @transaction.atomic
-def withdraw_offer(offer: Offer) -> None:
+def withdraw_offer(offer: Offer, *, actor: str = "") -> None:
     """Delete an offer and tick off its answer-by reminder (#444)."""
     reminder = offer.reminder
     if reminder is not None and not reminder.is_done:
-        reminder.complete()
+        complete_reminder(reminder, actor=actor)
     offer.delete()
 
 
@@ -1078,6 +1259,6 @@ def revise_offer(offer: Offer, *, changed=None, actor: str = "") -> Offer:
         actor=actor,
     )
     if changed is None or "answer_by" in changed:
-        _remind_to_answer(offer)
+        _remind_to_answer(offer, actor=actor)
     _tell_offer(offer, entry, revised=True, actor=actor)
     return offer

@@ -68,6 +68,10 @@ and `BackupRef` where the destination put it.
 their vocabularies, a holder's numbers, addresses and links as plain values, the person's own
 card (read only: nothing here writes a `User` or a `Profile`), and the calls that write a
 company, a department, a contact and their rows, each taking an `actor`.
+
+**Reminders are on it (#331)**: `Reminder`, read with `Reminder.objects.for_user(user)`, and
+one call each to make, change, move, tick off and untick one, each taking an `actor`, so a
+plugin keeping a task list in step never saves the model.
 """
 
 from __future__ import annotations
@@ -89,13 +93,19 @@ if TYPE_CHECKING:  # pragma: no cover - the names `__getattr__` resolves at run 
         EventKind,
         Interview,
         InterviewOutcome,
+        Reminder,
         Suggestion,
     )
     from postulo.applications.services import (
         add_appointment,
         add_reminder,
+        change_reminder,
+        complete_reminder,
+        create_reminder,
         get_or_create_company,
+        postpone_reminder,
         record_event,
+        reopen_reminder,
         reschedule_interview,
         retire_reminder,
         settle_interview,
@@ -297,6 +307,7 @@ __all__ = [
     "RegisterAdapterPlugin",
     "RegisterAddress",
     "RegisterRecord",
+    "Reminder",
     "SavedRows",
     "SourcePlugin",
     "StorePlugin",
@@ -323,9 +334,12 @@ __all__ = [
     "addresses_for",
     "approve_host",
     "calendar_status",
+    "change_reminder",
     "check_destination",
     "client",
+    "complete_reminder",
     "create_contact",
+    "create_reminder",
     "deadline_in",
     "declares",
     "description_of",
@@ -348,6 +362,7 @@ __all__ = [
     "person_card",
     "phone_number_is_taken",
     "place_of",
+    "postpone_reminder",
     "primary_phone_number",
     "primary_web_link",
     "public_only_client",
@@ -359,6 +374,7 @@ __all__ = [
     "register_document_format",
     "register_transfer",
     "reminder_lines",
+    "reopen_reminder",
     "reschedule_interview",
     "retire_reminder",
     "safe_next",
@@ -522,6 +538,24 @@ _ELSEWHERE: dict[str, tuple[str, str]] = {
     "get_or_create_department": ("postulo.jobs.surface", "get_or_create_department"),
     "create_contact": ("postulo.jobs.surface", "create_contact"),
     "update_contact": ("postulo.jobs.surface", "update_contact"),
+    # ------------------------------------------------------------------ reminders (#331)
+    # What a sync of a task list needs: the record, read with `Reminder.objects.for_user()`,
+    # and one call for each thing a task can have done to it. Never by saving the model. Each
+    # takes an `actor`, recorded on the reminder and drawn beside it, so a reminder ticked off
+    # by a phone says so. `create_reminder` and `change_reminder` refuse another person's
+    # application and cut the summary to 250 characters; `create_reminder` and
+    # `postpone_reminder` read a date as nine in the morning in the owner's zone, outside any
+    # request; `postpone_reminder` lets a moved reminder be announced again;
+    # `complete_reminder` takes the moment it was done, never in the future; and
+    # `reopen_reminder` does not announce it again. `add_reminder` above is the uid-keyed way in
+    # and makes a new entry through `create_reminder`. `change_status` stays off: a phone's
+    # tick is not a person moving an application, and `suggest` is how a plugin proposes one.
+    "Reminder": ("postulo.applications.models", "Reminder"),
+    "create_reminder": ("postulo.applications.services", "create_reminder"),
+    "change_reminder": ("postulo.applications.services", "change_reminder"),
+    "postpone_reminder": ("postulo.applications.services", "postpone_reminder"),
+    "complete_reminder": ("postulo.applications.services", "complete_reminder"),
+    "reopen_reminder": ("postulo.applications.services", "reopen_reminder"),
     "save_phone_numbers": ("postulo.jobs.surface", "save_phone_numbers"),
     "save_postal_addresses": ("postulo.jobs.surface", "save_postal_addresses"),
     "save_web_links": ("postulo.jobs.surface", "save_web_links"),

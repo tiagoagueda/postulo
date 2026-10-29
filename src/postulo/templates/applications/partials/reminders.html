@@ -23,6 +23,10 @@
             <p class="text-sm">{{ reminder.summary }}</p>
             <p class="text-xs {% if reminder.is_overdue %}text-red-600 dark:text-red-400{% else %}text-ink-500 dark:text-ink-400{% endif %}">
               {{ reminder.due_at|date:"DATETIME_FORMAT" }}
+              {% comment %} Who last changed it, when not the person (#331), in the timeline's words. {% endcomment %}
+              {% if reminder.actor %}
+                <span data-actor>· {% blocktranslate with actor=reminder.actor trimmed %}via {{ actor }}{% endblocktranslate %}</span>
+              {% endif %}
             </p>
           </div>
           <c-reminder-actions :reminder="reminder"

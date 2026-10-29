@@ -680,6 +680,12 @@ class Reminder(OwnedModel):
     #: When the plugin that placed it ended it, or was removed. A retired entry is kept and
     #: neither drawn nor announced; the plugin placing it again brings it back (#887).
     retired_at = models.DateTimeField(_("retired on"), null=True, blank=True)
+    #: Who last made, changed, moved, ticked or unticked it, when that was not the person
+    #: themselves: an API token, a calendar file, a plugin keeping a phone's task list in step.
+    #: Blank for the person's own hand. Drawn beside it in words, as a timeline entry's actor
+    #: is, so a reminder ticked off by a phone says so (#331). Written by the services in
+    #: `applications.services` and nowhere else.
+    actor = models.CharField(_("changed by"), max_length=120, blank=True)
 
     objects = ReminderQuerySet.as_manager()
 
@@ -709,6 +715,8 @@ class Reminder(OwnedModel):
         return not self.is_done and self.due_at <= timezone.now()
 
     def complete(self) -> None:
+        """Tick it off now, with nobody named. What a test sets a scene with; everything
+        Postulo itself does goes through `complete_reminder`, which records who did (#331)."""
         if self.done_at is None:
             self.done_at = timezone.now()
             self.save(update_fields=["done_at", "updated_at"])

@@ -73,13 +73,18 @@ from .models import (
 )
 from .services import (
     DEFAULT_INTERVIEW_LENGTH,
+    REMINDER_HOUR,
+    change_reminder,
     change_status,
+    complete_reminder,
     create_application,
+    create_reminder,
     get_or_create_company,
     later_time,
     postpone_reminder,
     record_event,
     record_offer,
+    reopen_reminder,
     reschedule_interview,
     revise_offer,
     schedule_interview,
@@ -859,9 +864,6 @@ class ReminderListView(RedirectView):
         return f"{reverse('applications:calendar')}?{query.urlencode()}"
 
 
-#: The hour a reminder made for a day starts at, when the day is all that was chosen: the
-#: start of a working morning, rather than a midnight that would announce it in the night.
-REMINDER_HOUR = 9
 #: The hour an appointment opens at when it is made from a day of the calendar (#888).
 APPOINTMENT_HOUR = 10
 
@@ -890,15 +892,27 @@ class ReminderFormMixin:
         return context
 
 
-class ReminderCreateView(
-    ReminderFormMixin, OwnedObjectMixin, UserFormKwargsMixin, OwnerFormMixin, CreateView
-):
+class ReminderCreateView(ReminderFormMixin, OwnedObjectMixin, UserFormKwargsMixin, CreateView):
     """A new reminder: from the calendar, where the day clicked is its day (#316), from an
-    application's page, where the application is its application, or from nowhere."""
+    application's page, where the application is its application, or from nowhere.
+
+    Made by `create_reminder`, not by the form's save (#331): the form reads and checks what
+    was typed, and the service is the one way a reminder comes to be, here as from the API or
+    a plugin.
+    """
 
     model = Reminder
     form_class = ReminderForm
     template_name = "applications/reminder_form.html"
+
+    def form_valid(self, form):
+        self.object = create_reminder(
+            self.request.user,
+            summary=form.cleaned_data["summary"],
+            due=form.cleaned_data["due_at"],
+            application=form.cleaned_data.get("application"),
+        )
+        return HttpResponseRedirect(self.get_success_url())
 
     def asked_application(self):
         application_id = as_pk(self.request.GET.get("application"))
@@ -930,8 +944,30 @@ class ReminderCompleteView(OwnedObjectMixin, View):
 
     def post(self, request, pk: int) -> HttpResponse:
         reminder = get_object_or_404(self.get_queryset(), pk=pk)
-        reminder.complete()
+        complete_reminder(reminder)
         messages.success(request, _("Marked as done."))
+        if wants_a_detail_fragment(request) and reminder.application_id:
+            return detail_fragments(request, reminder.application, target="reminders")
+        return redirect(safe_next(request, agenda.reminders_address()))
+
+
+class ReminderReopenView(OwnedObjectMixin, View):
+    """*Not done*: undo *Done* (#331).
+
+    A phone syncing a task list can untick a task, and the page could not untick what the phone
+    could. Through `reopen_reminder`, which leaves the announced stamp as it was: a tick undone
+    by mistake does not ring a second time. Shown beside a done reminder, which only the
+    calendar draws; an application's page lists what is outstanding, so it answers there with
+    the list it would have drawn anyway.
+    """
+
+    def get_queryset(self):
+        return Reminder.objects.for_user(self.request.user)
+
+    def post(self, request, pk: int) -> HttpResponse:
+        reminder = get_object_or_404(self.get_queryset(), pk=pk)
+        reopen_reminder(reminder)
+        messages.success(request, _("Marked as not done."))
         if wants_a_detail_fragment(request) and reminder.application_id:
             return detail_fragments(request, reminder.application, target="reminders")
         return redirect(safe_next(request, agenda.reminders_address()))
@@ -950,6 +986,10 @@ class ReminderUpdateView(ReminderFormMixin, OwnedObjectMixin, UserFormKwargsMixi
 
     The stamp goes with the time, through the same service *Later* uses: a reminder moved
     into the future has not been announced yet, whatever the column says.
+
+    Written by `change_reminder` and `postpone_reminder`, not by the form's save (#331). A done
+    reminder is not moved -- `postpone_reminder` leaves one alone -- so a new time for one is
+    refused on the form rather than dropped without a word: *Not done* comes first.
     """
 
     model = Reminder
@@ -966,11 +1006,22 @@ class ReminderUpdateView(ReminderFormMixin, OwnedObjectMixin, UserFormKwargsMixi
         # The form shows and posts the minute; a time set by *Later* or *Snooze* once kept
         # its seconds, so only a difference at the minute is a move (#445).
         moved = to_the_minute(form.cleaned_data["due_at"]) != to_the_minute(self.due_before)
-        response = super().form_valid(form)
+        # Read again: validating the form wrote what was posted onto the instance it holds,
+        # and the services compare against what is stored.
+        reminder = self.get_queryset().get(pk=self.object.pk)
+        if moved and reminder.is_done:
+            form.add_error("due_at", _("It is already done."))
+            return self.form_invalid(form)
+        change_reminder(
+            reminder,
+            summary=form.cleaned_data["summary"],
+            application=form.cleaned_data.get("application"),
+        )
         if moved:
-            postpone_reminder(self.object, self.object.due_at)
+            postpone_reminder(reminder, form.cleaned_data["due_at"])
+        self.object = reminder
         messages.success(self.request, _("Reminder updated."))
-        return response
+        return HttpResponseRedirect(self.get_success_url())
 
 
 class ReminderDeleteView(ReminderFormMixin, ConfirmDeleteMixin, OwnedObjectMixin, DeleteView):
@@ -1145,8 +1196,8 @@ class ApplicationQuietActionView(OwnedObjectMixin, View):
             )
             messages.success(request, _("Follow-up recorded."))
         elif action == "snooze":
-            Reminder.objects.create(
-                owner=request.user,
+            create_reminder(
+                request.user,
                 application=application,
                 summary=str(
                     _("Chase %(company)s about %(role)s")
@@ -1155,7 +1206,7 @@ class ApplicationQuietActionView(OwnedObjectMixin, View):
                         "role": application.posting.title,
                     }
                 ),
-                due_at=quiet.snooze_until(),
+                due=quiet.snooze_until(),
             )
             messages.success(request, _("Snoozed for two weeks."))
         else:
