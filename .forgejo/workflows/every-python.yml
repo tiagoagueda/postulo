@@ -136,21 +136,25 @@ jobs:
           DJANGO_SETTINGS_MODULE: postulo.config.settings.test
 
       - name: Test
-        # Two processes, not `-n auto` (#233): the jobs of this workflow share one host, and
-        # `auto` gave each of them a worker per host core. Run 539 spent 59 minutes on a
+        # Three processes, not `-n auto` (#233): the jobs of this workflow share one host,
+        # and `auto` gave each of them a worker per host core. Run 539 spent 59 minutes on a
         # suite that takes 4 serially, and starved every other job on the box -- the
         # postgres leg took 27 minutes over 41 tests, the browser leg 12 minutes to install
         # Chromium, the image scan an hour -- until the runner's limit ended them. The
         # in-memory database and the temporary directories are each process's own.
+        #
+        # Three fit the job container's 2 GB since #1033, once a worker stopped keeping every
+        # language it met and one worker took `tests/test_translations.py` (`--dist
+        # loadgroup`); `ci.yml` has the measurements.
         if: matrix.python-version != '3.14'
-        run: uv run pytest -n 2 --durations=25
+        run: uv run pytest -n 3 --dist loadgroup --durations=25
         timeout-minutes: 30
 
       - name: Test, and measure what the suite covers
         # On one leg only: measuring slows the run, and three copies of the same number are
         # not three facts. `fail_under` in pyproject.toml is the floor it must clear.
         if: matrix.python-version == '3.14'
-        run: uv run pytest -n 2 --durations=25 --cov --cov-report=term-missing
+        run: uv run pytest -n 3 --dist loadgroup --durations=25 --cov --cov-report=term-missing
         timeout-minutes: 30
 
       - name: Test what needs a process to itself

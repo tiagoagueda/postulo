@@ -153,6 +153,92 @@ def _no_inherited_drafts():
     pdf.forget_drafts()
 
 
+#: How many languages a worker carries from one test file into the next before it lets go of
+#: what it holds for each of them; see `release_languages`. The source language, the
+#: instance's, and the one or two a file switches to.
+LANGUAGES_KEPT = 4
+
+
+@pytest.hookimpl(wrapper=True)
+def pytest_runtest_teardown(item, nextitem):
+    """After the last test of a file, a worker lets go of what it holds per language (#1033).
+
+    After the file's own fixtures are torn down, so a module fixture that pointed Django at
+    catalogues of its own has put the real ones back first.
+    """
+    try:
+        return (yield)
+    finally:
+        if nextitem is None or nextitem.path != item.path:
+            release_languages()
+
+
+def release_languages(kept: int = LANGUAGES_KEPT) -> None:
+    """Drop the per-language caches of a process that has met more than ``kept`` languages.
+
+    Three caches hold something for every language a process has ever used, for as long as
+    it lives. On an instance that is right: a process serves the few languages its people
+    read, and each is paid for once. A test worker is the one process that meets all 86 of
+    them -- the suite renders every page in every language, reads month names in each and
+    looks up every language's name in every other -- and then carries them through the
+    thousands of tests left. Measured one process through the suite in order (2026-10-29),
+    they were most of what made a worker grow towards 1 GB, and CI could not give the unit
+    job a third worker inside its 2 GB container (#1033):
+
+    - **The compiled catalogues**: Django's merged translation per language
+      (`trans_real._translations`) and, below it, Python's own cache of every `.mo` file
+      it ever opened (`gettext._translations`), one per catalogue set per language -- 2,717
+      of them, about 110 MB. Python's cache is keyed by path, so the catalogues a fixture
+      compiled into a temporary directory stayed in it after the directory was gone.
+    - **The URL tables**: Django builds `reverse()`'s lookup tables once per active
+      language, in every resolver of the tree and in each namespace resolver it caches,
+      although Postulo translates no route: about 1.3 MB a language, 350,000 objects for all
+      of them.
+    - **CLDR's locale data**: Babel keeps every locale it loads, with its parents, and
+      `language_names` keeps the `Locale` objects; naming languages in every language loads
+      all of them, about 75 MB.
+
+    All three fill again on demand, so a file that uses a language after this pays a few
+    milliseconds to load it again. Most files use one or two and never reach ``kept``, so
+    for them nothing is dropped. The memory freed is not handed back to the system, but the
+    next file reuses it rather than growing the worker further.
+    """
+    import gettext
+
+    from babel import localedata
+    from django.urls import URLResolver, clear_url_caches, get_resolver
+    from django.utils.translation import trans_real
+
+    from postulo.core import language_names
+
+    opened = {Path(path).parent.parent.name for _class, path in gettext._translations}
+    if len(trans_real._translations) > kept or len(opened) > kept:
+        trans_real._translations = {}
+        trans_real._default = None
+        gettext._translations.clear()
+
+    root = get_resolver()
+    if len(root._reverse_dict) > kept:
+
+        def forget(resolver):
+            resolver._reverse_dict.clear()
+            resolver._namespace_dict.clear()
+            resolver._app_dict.clear()
+            for pattern in resolver.url_patterns:
+                if isinstance(pattern, URLResolver):
+                    forget(pattern)
+
+        # The resolvers `include()` made live in the URL modules, not in a cache, so their
+        # tables are emptied in place; the cached ones, namespace resolvers included, go.
+        forget(root)
+        clear_url_caches()
+
+    # A locale loads its parents too (`root`, `en`, `en_001`...), hence more than one each.
+    if len(localedata._cache) > 3 * kept:
+        language_names._locale.cache_clear()
+        localedata._cache.clear()
+
+
 #: A handful of ESCO skills in three languages, for the tests that need the skills file and
 #: must not need the real one (#266). Identifiers and names as v1.2.1 has them, bar the last
 #: three: a skill with no French name, and two that share a Portuguese one.

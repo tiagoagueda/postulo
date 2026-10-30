@@ -85,7 +85,8 @@ is committed or pushed to `main` directly (#940).
 uv run ruff format .
 uv run ruff check --fix .
 uv run pytest -n auto        # every core; plain `uv run pytest` is the same suite, slower
-                             # (CI runs `-n 2`: its jobs share one host, see ci.yml)
+                             # (CI runs `-n 3 --dist loadgroup`: its jobs share one
+                             # host and a 2 GB container, see ci.yml)
 uv run manage.py makemigrations --check --dry-run
 uv run pytest -m step         # the catalogue and static-file checks CI's Checks job runs
 uv run pytest -m heavy -p no:xdist  # what needs a process to itself; CI runs it after the suite

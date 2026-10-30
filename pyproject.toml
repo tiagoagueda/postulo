@@ -206,6 +206,8 @@ markers = [
     "release: a promise that must hold in a published version, not in every commit",
     "step: the same check a step of CI's Checks job makes once per push; run with `-m step`",
     "heavy: needs a process to itself for its memory; CI runs these after the suite with `-m heavy`",
+    # xdist registers its own, but only when it is loaded, and `-p no:xdist` runs collect too.
+    "xdist_group: one worker takes the whole group under `--dist loadgroup`, as CI runs (#1033)",
 ]
 filterwarnings = ["error"]
 # A test still running after five minutes has its threads' stacks written to the log, so a

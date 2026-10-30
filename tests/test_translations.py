@@ -26,6 +26,13 @@ from django.utils import translation
 
 from postulo.core import languages
 
+#: The whole file goes to one worker when xdist is asked to keep groups together, which is
+#: how CI runs the suite (`--dist loadgroup`, #1033). Its `catalogues` fixture parses every
+#: catalogue of every set, over 250 MB for as long as the file runs. Under plain `load`
+#: every worker handed any test from here parsed them all, and they were handed them at the
+#: same time, near the end of the suite, when each worker was at its largest.
+pytestmark = pytest.mark.xdist_group("catalogues")
+
 REPO = Path(__file__).resolve().parents[1]
 CODES = [code for code, _name in languages.LANGUAGES if code != languages.SOURCE]
 
@@ -69,12 +76,20 @@ def tool():
 
 @pytest.fixture(scope="module")
 def catalogues(tool):
-    """Every catalogue in the repository, by (set, language)."""
-    return {
-        (subject.name, code): tool.parse(tool.po_path(code, subject).read_text(encoding="utf-8"))
-        for subject in SETS
-        for code in CODES
-    }
+    """Every catalogue in the repository, by (set, language).
+
+    Without each message's source references and comments, which nothing here reads and
+    which were a third of the 400 MB the whole set took while the file ran (#1033): the
+    same file names and the same comments, once per language.
+    """
+
+    def read(code, subject):
+        catalogue = tool.parse(tool.po_path(code, subject).read_text(encoding="utf-8"))
+        for message in catalogue.messages.values():
+            message.references = message.comments = message.translator = ()
+        return catalogue
+
+    return {(subject.name, code): read(code, subject) for subject in SETS for code in CODES}
 
 
 @pytest.fixture(scope="module")
