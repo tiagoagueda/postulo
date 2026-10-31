@@ -733,7 +733,24 @@ CONNECTED_KINDS = {
     "sync": "postulo.syncs",
 }
 
-FIELD_TYPES = ("text", "url", "email", "password", "integer", "boolean", "choice", "textarea")
+FIELD_TYPES = (
+    "text",
+    "url",
+    "email",
+    "password",
+    "integer",
+    "boolean",
+    "choice",
+    "textarea",
+    "discovered",
+)
+
+#: Field types only a person's connection can draw (#332). A ``discovered`` field is chosen
+#: from what the plugin's ``discover`` found on the other service, and only a connection has
+#: a service of its own to ask and a form to look from: a transport or a backup destination
+#: is the operator's plumbing, configured on a server page, and declaring one there gets a
+#: sentence saying so in place of a control.
+CONNECTION_ONLY_TYPES = ("discovered",)
 
 
 @dataclass(frozen=True)
@@ -743,6 +760,12 @@ class FieldSpec:
     Postulo builds the connection form from these, so a plugin never renders HTML and a
     person never sees a form Postulo did not draw. A ``secret`` field is stored encrypted
     and is never shown back; ``choices`` are ``(value, label)`` pairs for ``choice``.
+
+    ``modes`` are ``(value, label)`` pairs for ``discovered`` (#332): a field holding several
+    of the options the plugin's ``discover`` found on the service, each in one of these modes
+    -- for a calendar server, *read*, *write*, *read and write*. It is drawn as a table, one
+    row per option, each with a select offering *Not used* and the modes that option allows,
+    and it is stored as a dict of option value to mode, for the chosen options only.
     """
 
     name: str
@@ -753,12 +776,44 @@ class FieldSpec:
     secret: bool = False
     default: str | int | bool | None = None
     choices: tuple[tuple[str, str], ...] = ()
+    modes: tuple[tuple[str, str], ...] = ()
 
     def __post_init__(self) -> None:
         if self.type not in FIELD_TYPES:
             raise ValueError(f"Unknown field type {self.type!r}; use one of {FIELD_TYPES}.")
         if self.type == "choice" and not self.choices:
             raise ValueError(f"Field {self.name!r} is a choice with no choices.")
+        if self.type == "discovered":
+            if not self.modes:
+                raise ValueError(f"Field {self.name!r} is discovered with no modes.")
+            if self.secret:
+                # What was found is drawn on the page and kept in the plain configuration.
+                raise ValueError(f"Field {self.name!r} is discovered, and cannot be secret.")
+            if any(not value for value, _label in self.modes):
+                # A blank value is *Not used*, which Postulo offers first on every row.
+                raise ValueError(f"Field {self.name!r} has a mode with no value.")
+        elif self.modes:
+            raise ValueError(f"Field {self.name!r} has modes, which only a discovered field takes.")
+
+
+@dataclass(frozen=True)
+class DiscoveredOption:
+    """One thing a plugin's ``discover`` found on the service: an address book, a folder (#332).
+
+    ``value`` is what the plugin knows it by and gets back in the configuration -- for a
+    calendar server, the collection's address. ``label`` is what the person reads. ``group``
+    gathers rows under a heading ("Address books"); ``note`` is a few words beside the label
+    ("Read only on the server"). ``modes`` narrows the field's modes for this option, by
+    value -- a collection the account may only read offers only *read* -- and empty means
+    every mode the field declares. Nothing here is secret: it is drawn on the page and kept
+    in the connection's plain configuration.
+    """
+
+    value: str
+    label: str
+    group: str = ""
+    modes: tuple[str, ...] = ()
+    note: str = ""
 
 
 @dataclass(frozen=True)
@@ -944,6 +999,14 @@ class ConnectedPlugin(Protocol):
       Postulo's script to know something -- the browser notifier's public key (#209). Names
       are lowercase words joined by hyphens; anything else is dropped, and every value is
       escaped. Nothing secret belongs here: it is in the page.
+    - ``discover(config) -> dict[str, list[DiscoveredOption]]`` asks the service what there
+      is to choose from, for each ``discovered`` field, keyed by the field's name (#332). It
+      runs only when the person presses *Look on the server* on a saved connection's form --
+      never when the page opens, never on *Save* -- with the configuration as last saved,
+      behind the same allowance and the same handling as *Test*. What it raises is shown to
+      the person as the reason nothing was found, in its own words, and the options found
+      last time stay. Postulo keeps what it finds in the connection's configuration and
+      draws the choice; holding its requests to what was chosen stays the plugin's job.
     """
 
     name: str

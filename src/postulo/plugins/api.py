@@ -78,6 +78,11 @@ with `InterviewKind` its vocabulary and `InterviewRefused` what it raises, refus
 and the API are; and `calendar_items`, the Calendar page's dated things for a person and a
 range of days as plain values (`CalendarItem`, in `CalendarItems`), a whole day with the
 `DayEntry` that `day_lines` writes as the feed does.
+
+**A connection's form can offer what is on the service (#332)**: a `FieldSpec` of type
+``discovered`` declares its ``modes``, and a plugin's optional ``discover(config)`` answers with
+a `DiscoveredOption` for each thing it found. Postulo keeps them and draws the choice; the plugin
+still holds its requests to what was chosen.
 """
 
 from __future__ import annotations
@@ -229,6 +234,7 @@ from .base import (
     ConnectionUnusable,
     # -------------------------------------------------- what a plugin declares
     Consent,
+    DiscoveredOption,
     # ------------------------------------------- what a store is handed, and gives back
     DocumentMetadata,
     ExternalRef,
@@ -294,6 +300,7 @@ __all__ = [
     "DayEntry",
     "Department",
     "DestinationRefused",
+    "DiscoveredOption",
     "DocumentFormat",
     "DocumentMetadata",
     "EventKind",

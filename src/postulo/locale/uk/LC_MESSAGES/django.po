@@ -1277,6 +1277,16 @@ msgstr "%(person)s — останній учасник групи %(name)s, як
 msgid "%(plugin)s could not check these settings: %(error)s"
 msgstr "%(plugin)s не зміг перевірити ці налаштування: %(error)s"
 
+#: src/postulo/plugins/views.py
+#, python-format
+msgid "%(plugin)s could not look on the server: %(message)s"
+msgstr ""
+
+#: src/postulo/plugins/views.py
+#, python-format
+msgid "%(plugin)s has nothing to look for."
+msgstr ""
+
 #: src/postulo/core/mail_auth.py
 #, python-format
 msgid "%(provider)s does not let an application send on its own."
@@ -4008,6 +4018,11 @@ msgstr "Як файл"
 #: src/postulo/templates/jobs/move_owner.html
 msgid "As an administrator you may also give it to anybody: type their username below instead."
 msgstr "Як адміністратор ви також можете передати це будь-кому: натомість введіть ім’я користувача нижче."
+
+#: src/postulo/templates/connections/partials/option_table.html
+#, python-format
+msgid "As found on %(when)s."
+msgstr ""
 
 #: src/postulo/resume/forms.py
 msgid "As it was published."
@@ -7550,10 +7565,22 @@ msgstr "форма звертання"
 msgid "Format"
 msgstr "Формат"
 
+#: src/postulo/plugins/views.py
+#, python-format
+msgid "Found %(count)d option on the server. Choose what to use, then save."
+msgid_plural "Found %(count)d options on the server. Choose what to use, then save."
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+
 #: src/postulo/jobs/slow.py
 #, python-format
 msgid "Found a logo at %(url)s."
 msgstr "Знайдено логотип за адресою %(url)s."
+
+#: src/postulo/templates/connections/partials/option_table.html
+msgid "Found on the server"
+msgstr ""
 
 #: src/postulo/jobs/models.py
 msgid "Found on their website"
@@ -8940,6 +8967,10 @@ msgstr "не вдалося імпортувати"
 msgid "it did not finish importing within %(seconds)ss"
 msgstr "імпорт не завершився за %(seconds)s с"
 
+#: src/postulo/plugins/views.py
+msgid "It did not say what it found."
+msgstr ""
+
 #: src/postulo/templates/server/backups.html
 msgid "it failed"
 msgstr "не вдалося"
@@ -9982,6 +10013,10 @@ msgstr "довгота"
 msgid "Longitude"
 msgstr "Довгота"
 
+#: src/postulo/templates/connections/form.html
+msgid "Look on the server"
+msgstr ""
+
 #: src/postulo/templates/resume/item_form.html
 msgid "Look up"
 msgstr ""
@@ -10990,6 +11025,10 @@ msgstr "Листів такого виду поки немає."
 msgid "No letters yet. A cover letter is for one posting; a motivation letter tells your story; a speculative letter goes where nothing is advertised; a follow-up note comes after an interview."
 msgstr "Листів поки немає. Супровідний лист — для однієї вакансії; мотиваційний розповідає вашу історію; ініціативний надсилають туди, де нічого не оголошено; лист після співбесіди надсилають, коли вона вже відбулася."
 
+#: src/postulo/templates/connections/partials/option_table.html
+msgid "No longer on the server"
+msgstr ""
+
 #: src/postulo/jobs/models.py
 msgid "No longer shared"
 msgstr "Спільний доступ припинено"
@@ -11392,6 +11431,10 @@ msgstr "Не зіставлено із заявкою."
 msgid "Not offered at all, and kept that way while it stays off."
 msgstr "Взагалі не пропонується і залишається таким, поки це вимкнено."
 
+#: src/postulo/plugins/forms.py
+msgid "Not offered here: this is chosen from what a person's connection finds on its service, and a server setting has no such service to look on."
+msgstr ""
+
 #: src/postulo/templates/jobs/company_map.html
 msgid "Not on the map: neither its postcode nor its town is in the offline tables."
 msgstr "Немає на карті: ні її поштового індексу, ні міста немає в офлайн-таблицях."
@@ -11493,6 +11536,10 @@ msgstr "ще не перевірено"
 #, python-format
 msgid "not to be sent after %(date)s"
 msgstr "не надсилати після %(date)s"
+
+#: src/postulo/plugins/forms.py
+msgid "Not used"
+msgstr ""
 
 #: src/postulo/templates/documents/cv_detail.html
 #, python-format
@@ -11613,6 +11660,10 @@ msgstr "Нічого не додано. Позначте потрібні кар
 #: src/postulo/templates/cotton/identifier_findings.html
 msgid "Nothing has been changed, and none of this stops you saving. Only you know which of them is right."
 msgstr "Нічого не змінено, і ніщо з цього не заважає вам зберегти. Лише ви знаєте, що з цього правильно."
+
+#: src/postulo/templates/connections/partials/option_table.html
+msgid "Nothing has been looked for yet. Look on the server to see what is there."
+msgstr ""
 
 #: src/postulo/templates/server/logs.html
 msgid "Nothing has been recorded yet"
@@ -11859,6 +11910,11 @@ msgstr "Нічого не підключено. Ніхто ні на що не �
 #: src/postulo/accounts/settings_views.py src/postulo/core/server_views.py
 msgid "Nothing was different."
 msgstr "Нічого не відрізнялося."
+
+#: src/postulo/templates/connections/partials/option_table.html
+#, python-format
+msgid "Nothing was found on the server on %(when)s."
+msgstr ""
 
 #: src/postulo/core/server_views.py
 msgid "Nothing was installed."
@@ -14790,6 +14846,10 @@ msgstr "Збережіть компанію, щоб додати ще один �
 msgid "Save this first, then come back and agree."
 msgstr "Спершу збережіть це, потім поверніться і погодьтеся."
 
+#: src/postulo/templates/connections/partials/option_table.html
+msgid "Save this first, then look on the server to choose from what is there."
+msgstr ""
+
 #: src/postulo/templates/server/maps.html
 msgid "Save this page to start them again, or switch them off."
 msgstr ""
@@ -15601,6 +15661,10 @@ msgstr "Вхід за допомогою токена"
 #: src/postulo/templates/server/signin.html
 msgid "Signs in to an existing account by e-mail"
 msgstr "Входить до наявного облікового запису за адресою електронної пошти"
+
+#: src/postulo/templates/connections/form.html
+msgid "Signs in with the settings as last saved and lists what is there. Nothing you have typed here is saved until you save."
+msgstr ""
 
 #: src/postulo/jobs/models.py
 msgid "since"
@@ -19750,6 +19814,7 @@ msgstr ""
 msgid "US Letter, portrait"
 msgstr ""
 
+#: src/postulo/templates/connections/partials/option_table.html
 #: src/postulo/templates/server/plugin_access.html
 msgid "Use"
 msgstr "Використати"

@@ -1197,6 +1197,16 @@ msgstr "%(person)s: είναι το τελευταίο μέλος της ομά�
 msgid "%(plugin)s could not check these settings: %(error)s"
 msgstr "Το %(plugin)s δεν μπόρεσε να ελέγξει αυτές τις ρυθμίσεις: %(error)s"
 
+#: src/postulo/plugins/views.py
+#, python-format
+msgid "%(plugin)s could not look on the server: %(message)s"
+msgstr ""
+
+#: src/postulo/plugins/views.py
+#, python-format
+msgid "%(plugin)s has nothing to look for."
+msgstr ""
+
 #: src/postulo/core/mail_auth.py
 #, python-format
 msgid "%(provider)s does not let an application send on its own."
@@ -3912,6 +3922,11 @@ msgstr "Ως αρχείο"
 #: src/postulo/templates/jobs/move_owner.html
 msgid "As an administrator you may also give it to anybody: type their username below instead."
 msgstr "Ως διαχειριστής μπορείτε επίσης να το δώσετε σε οποιονδήποτε: πληκτρολογήστε το όνομα χρήστη του παρακάτω."
+
+#: src/postulo/templates/connections/partials/option_table.html
+#, python-format
+msgid "As found on %(when)s."
+msgstr ""
 
 #: src/postulo/resume/forms.py
 msgid "As it was published."
@@ -7463,10 +7478,21 @@ msgstr "τρόπος προσφώνησης"
 msgid "Format"
 msgstr "Μορφή"
 
+#: src/postulo/plugins/views.py
+#, python-format
+msgid "Found %(count)d option on the server. Choose what to use, then save."
+msgid_plural "Found %(count)d options on the server. Choose what to use, then save."
+msgstr[0] ""
+msgstr[1] ""
+
 #: src/postulo/jobs/slow.py
 #, python-format
 msgid "Found a logo at %(url)s."
 msgstr "Βρέθηκε λογότυπο στο %(url)s."
+
+#: src/postulo/templates/connections/partials/option_table.html
+msgid "Found on the server"
+msgstr ""
 
 #: src/postulo/jobs/models.py
 msgid "Found on their website"
@@ -8849,6 +8875,10 @@ msgstr "δεν ήταν δυνατή η εισαγωγή"
 msgid "it did not finish importing within %(seconds)ss"
 msgstr "δεν ολοκλήρωσε την εισαγωγή μέσα σε %(seconds)s δευτ."
 
+#: src/postulo/plugins/views.py
+msgid "It did not say what it found."
+msgstr ""
+
 #: src/postulo/templates/server/backups.html
 msgid "it failed"
 msgstr "απέτυχε"
@@ -9886,6 +9916,10 @@ msgstr "γεωγραφικό μήκος"
 msgid "Longitude"
 msgstr "Γεωγραφικό μήκος"
 
+#: src/postulo/templates/connections/form.html
+msgid "Look on the server"
+msgstr ""
+
 #: src/postulo/templates/resume/item_form.html
 msgid "Look up"
 msgstr ""
@@ -10896,6 +10930,10 @@ msgstr "Δεν υπάρχουν ακόμη επιστολές αυτού του 
 msgid "No letters yet. A cover letter is for one posting; a motivation letter tells your story; a speculative letter goes where nothing is advertised; a follow-up note comes after an interview."
 msgstr "Δεν υπάρχουν ακόμη επιστολές. Η συνοδευτική επιστολή αφορά μία αγγελία· η επιστολή κινήτρων λέει την ιστορία σας· η αυθόρμητη επιστολή απευθύνεται εκεί όπου δεν υπάρχει αγγελία· το σημείωμα μετά τη συνέντευξη στέλνεται μετά από μια συνέντευξη."
 
+#: src/postulo/templates/connections/partials/option_table.html
+msgid "No longer on the server"
+msgstr ""
+
 #: src/postulo/jobs/models.py
 msgid "No longer shared"
 msgstr "Δεν είναι πλέον κοινόχρηστο"
@@ -11304,6 +11342,10 @@ msgstr "Δεν αντιστοιχίστηκε σε αίτηση."
 msgid "Not offered at all, and kept that way while it stays off."
 msgstr "Δεν προσφέρεται καθόλου, και μένει έτσι όσο παραμένει απενεργοποιημένο."
 
+#: src/postulo/plugins/forms.py
+msgid "Not offered here: this is chosen from what a person's connection finds on its service, and a server setting has no such service to look on."
+msgstr ""
+
 #: src/postulo/templates/jobs/company_map.html
 msgid "Not on the map: neither its postcode nor its town is in the offline tables."
 msgstr "Εκτός χάρτη: ούτε ο ταχυδρομικός της κώδικας ούτε η πόλη της υπάρχουν στους πίνακες εκτός σύνδεσης."
@@ -11406,6 +11448,10 @@ msgstr "δεν δοκιμάστηκε ακόμη"
 #, python-format
 msgid "not to be sent after %(date)s"
 msgstr "να μη σταλεί μετά τις %(date)s"
+
+#: src/postulo/plugins/forms.py
+msgid "Not used"
+msgstr ""
 
 #: src/postulo/templates/documents/cv_detail.html
 #, fuzzy, python-format
@@ -11524,6 +11570,10 @@ msgstr "Δεν έχει προστεθεί τίποτα. Επιλέξτε τις
 #: src/postulo/templates/cotton/identifier_findings.html
 msgid "Nothing has been changed, and none of this stops you saving. Only you know which of them is right."
 msgstr "Τίποτα δεν έχει αλλάξει, και τίποτα από αυτά δεν σας εμποδίζει να αποθηκεύσετε. Μόνο εσείς ξέρετε ποιο από αυτά είναι σωστό."
+
+#: src/postulo/templates/connections/partials/option_table.html
+msgid "Nothing has been looked for yet. Look on the server to see what is there."
+msgstr ""
 
 #: src/postulo/templates/server/logs.html
 msgid "Nothing has been recorded yet"
@@ -11769,6 +11819,11 @@ msgstr "Δεν συνδέθηκε τίποτα. Κανείς δεν συμφών
 #: src/postulo/accounts/settings_views.py src/postulo/core/server_views.py
 msgid "Nothing was different."
 msgstr "Τίποτα δεν ήταν διαφορετικό."
+
+#: src/postulo/templates/connections/partials/option_table.html
+#, python-format
+msgid "Nothing was found on the server on %(when)s."
+msgstr ""
 
 #: src/postulo/core/server_views.py
 msgid "Nothing was installed."
@@ -14678,6 +14733,10 @@ msgstr "Αποθηκεύστε την εταιρεία για να προσθέ�
 msgid "Save this first, then come back and agree."
 msgstr "Αποθηκεύστε το πρώτα, μετά επιστρέψτε και συμφωνήστε."
 
+#: src/postulo/templates/connections/partials/option_table.html
+msgid "Save this first, then look on the server to choose from what is there."
+msgstr ""
+
 #: src/postulo/templates/server/maps.html
 msgid "Save this page to start them again, or switch them off."
 msgstr ""
@@ -15497,6 +15556,10 @@ msgstr "Σύνδεση με διακριτικό"
 #: src/postulo/templates/server/signin.html
 msgid "Signs in to an existing account by e-mail"
 msgstr "Συνδέεται σε υπάρχοντα λογαριασμό μέσω email"
+
+#: src/postulo/templates/connections/form.html
+msgid "Signs in with the settings as last saved and lists what is there. Nothing you have typed here is saved until you save."
+msgstr ""
 
 #: src/postulo/jobs/models.py
 msgid "since"
@@ -19647,6 +19710,7 @@ msgstr ""
 msgid "US Letter, portrait"
 msgstr ""
 
+#: src/postulo/templates/connections/partials/option_table.html
 #: src/postulo/templates/server/plugin_access.html
 msgid "Use"
 msgstr "Χρήση"

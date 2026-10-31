@@ -1197,6 +1197,16 @@ msgstr "%(person)s és l'últim membre de %(name)s, que encara és propietari de
 msgid "%(plugin)s could not check these settings: %(error)s"
 msgstr "%(plugin)s no ha pogut comprovar aquesta configuració: %(error)s"
 
+#: src/postulo/plugins/views.py
+#, python-format
+msgid "%(plugin)s could not look on the server: %(message)s"
+msgstr ""
+
+#: src/postulo/plugins/views.py
+#, python-format
+msgid "%(plugin)s has nothing to look for."
+msgstr ""
+
 #: src/postulo/core/mail_auth.py
 #, python-format
 msgid "%(provider)s does not let an application send on its own."
@@ -3904,6 +3914,11 @@ msgstr "Com a fitxer"
 #: src/postulo/templates/jobs/move_owner.html
 msgid "As an administrator you may also give it to anybody: type their username below instead."
 msgstr "Com a administrador, també el podeu donar a qualsevol persona: escriviu-ne el nom d'usuari a sota."
+
+#: src/postulo/templates/connections/partials/option_table.html
+#, python-format
+msgid "As found on %(when)s."
+msgstr ""
 
 #: src/postulo/resume/forms.py
 msgid "As it was published."
@@ -7442,10 +7457,21 @@ msgstr "tractament"
 msgid "Format"
 msgstr "Format"
 
+#: src/postulo/plugins/views.py
+#, python-format
+msgid "Found %(count)d option on the server. Choose what to use, then save."
+msgid_plural "Found %(count)d options on the server. Choose what to use, then save."
+msgstr[0] ""
+msgstr[1] ""
+
 #: src/postulo/jobs/slow.py
 #, python-format
 msgid "Found a logo at %(url)s."
 msgstr "S'ha trobat un logotip a %(url)s."
+
+#: src/postulo/templates/connections/partials/option_table.html
+msgid "Found on the server"
+msgstr ""
 
 #: src/postulo/jobs/models.py
 msgid "Found on their website"
@@ -8826,6 +8852,10 @@ msgstr "no s'ha pogut importar"
 msgid "it did not finish importing within %(seconds)ss"
 msgstr "no s'ha acabat d'importar en %(seconds)s s"
 
+#: src/postulo/plugins/views.py
+msgid "It did not say what it found."
+msgstr ""
+
 #: src/postulo/templates/server/backups.html
 msgid "it failed"
 msgstr "ha fallat"
@@ -9860,6 +9890,10 @@ msgstr "longitud"
 msgid "Longitude"
 msgstr "Longitud"
 
+#: src/postulo/templates/connections/form.html
+msgid "Look on the server"
+msgstr ""
+
 #: src/postulo/templates/resume/item_form.html
 msgid "Look up"
 msgstr ""
@@ -10863,6 +10897,10 @@ msgstr "Encara no hi ha cartes d'aquest tipus."
 msgid "No letters yet. A cover letter is for one posting; a motivation letter tells your story; a speculative letter goes where nothing is advertised; a follow-up note comes after an interview."
 msgstr "Encara no hi ha cartes. Una carta de presentació és per a una oferta; una carta de motivació explica la vostra història; una carta espontània va on no s'ha anunciat res; una nota de seguiment ve després d'una entrevista."
 
+#: src/postulo/templates/connections/partials/option_table.html
+msgid "No longer on the server"
+msgstr ""
+
 #: src/postulo/jobs/models.py
 msgid "No longer shared"
 msgstr "Ja no es comparteix"
@@ -11262,6 +11300,10 @@ msgstr "No s'ha associat a cap candidatura."
 msgid "Not offered at all, and kept that way while it stays off."
 msgstr "No s'ofereix gens, i continua així mentre estigui desactivat."
 
+#: src/postulo/plugins/forms.py
+msgid "Not offered here: this is chosen from what a person's connection finds on its service, and a server setting has no such service to look on."
+msgstr ""
+
 #: src/postulo/templates/jobs/company_map.html
 msgid "Not on the map: neither its postcode nor its town is in the offline tables."
 msgstr "No és al mapa: ni el codi postal ni la població són a les taules fora de línia."
@@ -11363,6 +11405,10 @@ msgstr "encara no provat"
 #, python-format
 msgid "not to be sent after %(date)s"
 msgstr "no s'ha d'enviar després del %(date)s"
+
+#: src/postulo/plugins/forms.py
+msgid "Not used"
+msgstr ""
 
 #: src/postulo/templates/documents/cv_detail.html
 #, python-format
@@ -11481,6 +11527,10 @@ msgstr "No s'ha afegit res. Marqueu les targetes que vulgueu; al costat de cadas
 #: src/postulo/templates/cotton/identifier_findings.html
 msgid "Nothing has been changed, and none of this stops you saving. Only you know which of them is right."
 msgstr "No s'ha canviat res, i res d'això no us impedeix desar. Només vosaltres sabeu quin és el correcte."
+
+#: src/postulo/templates/connections/partials/option_table.html
+msgid "Nothing has been looked for yet. Look on the server to see what is there."
+msgstr ""
 
 #: src/postulo/templates/server/logs.html
 msgid "Nothing has been recorded yet"
@@ -11724,6 +11774,11 @@ msgstr "No s'ha connectat res. Ningú no ha acceptat res."
 #: src/postulo/accounts/settings_views.py src/postulo/core/server_views.py
 msgid "Nothing was different."
 msgstr "No hi havia res diferent."
+
+#: src/postulo/templates/connections/partials/option_table.html
+#, python-format
+msgid "Nothing was found on the server on %(when)s."
+msgstr ""
 
 #: src/postulo/core/server_views.py
 msgid "Nothing was installed."
@@ -14631,6 +14686,10 @@ msgstr "Deseu l'empresa per afegir-hi un altre identificador."
 msgid "Save this first, then come back and agree."
 msgstr "Deseu això primer i després torneu i accepteu-ho."
 
+#: src/postulo/templates/connections/partials/option_table.html
+msgid "Save this first, then look on the server to choose from what is there."
+msgstr ""
+
 #: src/postulo/templates/server/maps.html
 msgid "Save this page to start them again, or switch them off."
 msgstr ""
@@ -15445,6 +15504,10 @@ msgstr "Inici de sessió amb un testimoni"
 #, fuzzy
 msgid "Signs in to an existing account by e-mail"
 msgstr "Inicia la sessió en un compte existent a partir del correu electrònic"
+
+#: src/postulo/templates/connections/form.html
+msgid "Signs in with the settings as last saved and lists what is there. Nothing you have typed here is saved until you save."
+msgstr ""
 
 #: src/postulo/jobs/models.py
 msgid "since"
@@ -19595,6 +19658,7 @@ msgstr ""
 msgid "US Letter, portrait"
 msgstr ""
 
+#: src/postulo/templates/connections/partials/option_table.html
 #: src/postulo/templates/server/plugin_access.html
 #, fuzzy
 msgid "Use"

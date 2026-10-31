@@ -872,6 +872,77 @@ def test_the_upload_form_with_its_metadata_box_has_no_violations(
     assert not found, describe(f"the upload form ({scheme})", found)
 
 
+class _Collections:
+    """A connected plugin that finds things on its service, for the form below (#332)."""
+
+    name = "a11y-collections"
+    version = "0.1"
+    kind = "sync"
+    label = "Collections"
+
+    def config_fields(self):
+        from postulo.plugins.base import FieldSpec
+
+        return [
+            FieldSpec("url", "Server", type="url"),
+            FieldSpec(
+                "collections",
+                "Collections",
+                type="discovered",
+                modes=(("read", "Read"), ("write", "Write")),
+            ),
+        ]
+
+    def test(self, config):
+        from postulo.plugins.base import TestResult
+
+        return TestResult(True)
+
+    def discover(self, config):
+        from postulo.plugins.base import DiscoveredOption
+
+        return {
+            "collections": [
+                DiscoveredOption("/card/home/", "Home", group="Address books"),
+                DiscoveredOption("/cal/work/", "Work", group="Calendars", note="Read only"),
+            ]
+        }
+
+    def sync(self, connection):  # pragma: no cover - never run here
+        raise NotImplementedError
+
+
+@pytest.mark.parametrize("scheme", ["light", "dark"])
+def test_a_connection_form_showing_what_was_found_has_no_violations(
+    live_server, page: Page, axe_source, applicant, scheme
+):
+    """*Look on the server*, pressed, draws a table of what was found: one labelled select per
+    option, in groups, with *Not used* first (#332)."""
+    from postulo.plugins import registry
+    from postulo.plugins.models import Connection
+
+    registry.register_builtin("sync", _Collections)
+    try:
+        connection = Connection.objects.create(
+            owner=applicant,
+            kind="sync",
+            plugin=_Collections.name,
+            label="My server",
+            config={"url": "https://dav.example.org/", "interval": "60"},
+        )
+        page.emulate_media(color_scheme=scheme)
+        sign_in(page, live_server.url)
+        page.goto(f"{live_server.url}/settings/connections/{connection.pk}/")
+        page.get_by_role("button", name="Look on the server").click()
+        select = page.get_by_role("combobox", name="Work")
+        expect(select).to_be_visible()
+        expect(page.locator("[data-discovered] caption")).to_have_text("Collections")
+        found = violations_on(page, axe_source)
+        assert not found, describe(f"a connection form with found options ({scheme})", found)
+    finally:
+        registry.unregister_builtin("sync", _Collections)
+
+
 @pytest.mark.parametrize("scheme", ["light", "dark"])
 def test_the_contact_and_capture_forms_in_two_columns_have_no_violations(
     live_server, page: Page, axe_source, furnished, scheme

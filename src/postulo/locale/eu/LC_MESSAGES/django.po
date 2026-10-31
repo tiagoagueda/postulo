@@ -1197,6 +1197,16 @@ msgstr "%(person)s da %(name)s taldearen azken kidea, eta talde horrek oraindik 
 msgid "%(plugin)s could not check these settings: %(error)s"
 msgstr "%(plugin)s pluginak ezin izan ditu ezarpen hauek egiaztatu: %(error)s"
 
+#: src/postulo/plugins/views.py
+#, python-format
+msgid "%(plugin)s could not look on the server: %(message)s"
+msgstr ""
+
+#: src/postulo/plugins/views.py
+#, python-format
+msgid "%(plugin)s has nothing to look for."
+msgstr ""
+
 #: src/postulo/core/mail_auth.py
 #, python-format
 msgid "%(provider)s does not let an application send on its own."
@@ -3894,6 +3904,11 @@ msgstr "Fitxategi gisa"
 #: src/postulo/templates/jobs/move_owner.html
 msgid "As an administrator you may also give it to anybody: type their username below instead."
 msgstr "Administratzaile gisa edonori ere eman diezaiokezu: idatzi haren erabiltzaile-izena behean."
+
+#: src/postulo/templates/connections/partials/option_table.html
+#, python-format
+msgid "As found on %(when)s."
+msgstr ""
 
 #: src/postulo/resume/forms.py
 msgid "As it was published."
@@ -7416,10 +7431,21 @@ msgstr "tratamendua"
 msgid "Format"
 msgstr "Formatua"
 
+#: src/postulo/plugins/views.py
+#, python-format
+msgid "Found %(count)d option on the server. Choose what to use, then save."
+msgid_plural "Found %(count)d options on the server. Choose what to use, then save."
+msgstr[0] ""
+msgstr[1] ""
+
 #: src/postulo/jobs/slow.py
 #, python-format
 msgid "Found a logo at %(url)s."
 msgstr "Logotipo bat aurkitu da %(url)s helbidean."
+
+#: src/postulo/templates/connections/partials/option_table.html
+msgid "Found on the server"
+msgstr ""
 
 #: src/postulo/jobs/models.py
 msgid "Found on their website"
@@ -8796,6 +8822,10 @@ msgstr "ezin izan da inportatu"
 msgid "it did not finish importing within %(seconds)ss"
 msgstr "ez zen %(seconds)s segundotan inportatzen amaitu"
 
+#: src/postulo/plugins/views.py
+msgid "It did not say what it found."
+msgstr ""
+
 #: src/postulo/templates/server/backups.html
 msgid "it failed"
 msgstr "huts egin du"
@@ -9827,6 +9857,10 @@ msgstr "longitudea"
 msgid "Longitude"
 msgstr "Longitudea"
 
+#: src/postulo/templates/connections/form.html
+msgid "Look on the server"
+msgstr ""
+
 #: src/postulo/templates/resume/item_form.html
 msgid "Look up"
 msgstr ""
@@ -10828,6 +10862,10 @@ msgstr "Oraindik ez dago mota honetako gutunik."
 msgid "No letters yet. A cover letter is for one posting; a motivation letter tells your story; a speculative letter goes where nothing is advertised; a follow-up note comes after an interview."
 msgstr "Oraindik gutunik ez. Aurkezpen-gutuna iragarki baterako da; motibazio-gutunak zure istorioa kontatzen du; ekimen-gutuna ezer iragarri ez den lekura doa; jarraipen-oharra elkarrizketa baten ondoren dator."
 
+#: src/postulo/templates/connections/partials/option_table.html
+msgid "No longer on the server"
+msgstr ""
+
 #: src/postulo/jobs/models.py
 msgid "No longer shared"
 msgstr "Jada ez dago partekatuta"
@@ -11227,6 +11265,10 @@ msgstr "Ez da hautagaitza batekin lotu."
 msgid "Not offered at all, and kept that way while it stays off."
 msgstr "Ez da batere eskaintzen, eta horrela jarraituko du itzalita dagoen bitartean."
 
+#: src/postulo/plugins/forms.py
+msgid "Not offered here: this is chosen from what a person's connection finds on its service, and a server setting has no such service to look on."
+msgstr ""
+
 #: src/postulo/templates/jobs/company_map.html
 msgid "Not on the map: neither its postcode nor its town is in the offline tables."
 msgstr "Ez dago mapan: ez bere posta-kodea ez bere herria ez daude lineaz kanpoko tauletan."
@@ -11328,6 +11370,10 @@ msgstr "oraindik probatu gabe"
 #, python-format
 msgid "not to be sent after %(date)s"
 msgstr "%(date)s datatik aurrera ez bidaltzekoa"
+
+#: src/postulo/plugins/forms.py
+msgid "Not used"
+msgstr ""
 
 #: src/postulo/templates/documents/cv_detail.html
 #, python-format
@@ -11448,6 +11494,10 @@ msgstr "Ez da ezer gehitu. Markatu nahi dituzun txartelak; bakoitza zer bihurtuk
 #: src/postulo/templates/cotton/identifier_findings.html
 msgid "Nothing has been changed, and none of this stops you saving. Only you know which of them is right."
 msgstr "Ez da ezer aldatu, eta honek ez dizu gordetzea eragozten. Zuk bakarrik dakizu horietako zein den zuzena."
+
+#: src/postulo/templates/connections/partials/option_table.html
+msgid "Nothing has been looked for yet. Look on the server to see what is there."
+msgstr ""
 
 #: src/postulo/templates/server/logs.html
 msgid "Nothing has been recorded yet"
@@ -11690,6 +11740,11 @@ msgstr "Ez da ezer konektatu. Inork ez du ezer onartu."
 #: src/postulo/accounts/settings_views.py src/postulo/core/server_views.py
 msgid "Nothing was different."
 msgstr "Ez zegoen ezer desberdinik."
+
+#: src/postulo/templates/connections/partials/option_table.html
+#, python-format
+msgid "Nothing was found on the server on %(when)s."
+msgstr ""
 
 #: src/postulo/core/server_views.py
 msgid "Nothing was installed."
@@ -14584,6 +14639,10 @@ msgstr "Gorde enpresa beste identifikatzaile bat gehitzeko."
 msgid "Save this first, then come back and agree."
 msgstr "Gorde hau lehenik, eta itzuli gero onartzeko."
 
+#: src/postulo/templates/connections/partials/option_table.html
+msgid "Save this first, then look on the server to choose from what is there."
+msgstr ""
+
 #: src/postulo/templates/server/maps.html
 msgid "Save this page to start them again, or switch them off."
 msgstr ""
@@ -15396,6 +15455,10 @@ msgstr "Saio-hasiera token batekin"
 #: src/postulo/templates/server/signin.html
 msgid "Signs in to an existing account by e-mail"
 msgstr "Lehendik dagoen kontu batean hasten du saioa, helbide elektronikoaren bidez"
+
+#: src/postulo/templates/connections/form.html
+msgid "Signs in with the settings as last saved and lists what is there. Nothing you have typed here is saved until you save."
+msgstr ""
 
 #: src/postulo/jobs/models.py
 #, fuzzy
@@ -19527,6 +19590,7 @@ msgstr ""
 msgid "US Letter, portrait"
 msgstr ""
 
+#: src/postulo/templates/connections/partials/option_table.html
 #: src/postulo/templates/server/plugin_access.html
 msgid "Use"
 msgstr "Erabili"

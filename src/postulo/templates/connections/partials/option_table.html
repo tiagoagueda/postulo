@@ -1,0 +1,58 @@
+{% load i18n %}
+{% comment %} A `discovered` field (#332): what the plugin found on the service, one row per
+   option, each with a select offering *Not used* first and then the modes that option allows.
+   A real table, with a caption and header cells, and each select labelled by its option's
+   name, so it reads and works without a script. An option chosen once and no longer found
+   keeps its row, its last label and its mode, until somebody sets it to *Not used*.
+
+   Handed `table`, a `plugin.forms.OptionTable`. {% endcomment %}
+<div class="mb-4" data-discovered="{{ table.name }}">
+  {% if table.rows %}
+    <c-scroll-box class="mb-1" label="{{ table.label }}">
+      <table class="table">
+        <caption class="label text-start">{{ table.label }}</caption>
+        <thead>
+          <tr>
+            <th scope="col">{% translate "Found on the server" %}</th>
+            <th scope="col">{% translate "Use" %}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for row, field in table.rows %}
+            {% ifchanged row.group %}
+              {% if row.group %}
+                <tr><th scope="colgroup" colspan="2" data-discovered-group>{{ row.group }}</th></tr>
+              {% endif %}
+            {% endifchanged %}
+            <tr{% if row.gone %} data-gone{% endif %}>
+              <th scope="row" class="font-normal">
+                <label for="{{ field.id_for_label }}"><bdi>{{ row.label }}</bdi></label>
+                {% if row.gone %}
+                  <span class="block text-xs text-ink-500 dark:text-ink-400">{% translate "No longer on the server" %}</span>
+                {% elif row.note %}
+                  <span class="block text-xs text-ink-500 dark:text-ink-400">{{ row.note }}</span>
+                {% endif %}
+                {% for error in field.errors %}<span class="block text-xs text-red-600 dark:text-red-400">{{ error }}</span>{% endfor %}
+              </th>
+              <td>{{ field }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </c-scroll-box>
+  {% else %}
+    <p class="label">{{ table.label }}</p>
+  {% endif %}
+  <p class="text-xs text-ink-500 dark:text-ink-400">
+    {% if table.unsaved %}
+      {% translate "Save this first, then look on the server to choose from what is there." %}
+    {% elif not table.found_at %}
+      {% translate "Nothing has been looked for yet. Look on the server to see what is there." %}
+    {% elif not table.rows %}
+      {% blocktranslate with when=table.found_at|date:"DATETIME_FORMAT" trimmed %}Nothing was found on the server on {{ when }}.{% endblocktranslate %}
+    {% else %}
+      {% blocktranslate with when=table.found_at|date:"DATETIME_FORMAT" trimmed %}As found on {{ when }}.{% endblocktranslate %}
+    {% endif %}
+    {% if table.help %}{{ table.help }}{% endif %}
+  </p>
+</div>

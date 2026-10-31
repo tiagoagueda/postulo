@@ -1357,6 +1357,16 @@ msgstr "%(person)s huwa l-aħħar membru ta' %(name)s, li għadu sid ta' rekords
 msgid "%(plugin)s could not check these settings: %(error)s"
 msgstr "%(plugin)s ma setax jiċċekkja dawn is-settings: %(error)s"
 
+#: src/postulo/plugins/views.py
+#, python-format
+msgid "%(plugin)s could not look on the server: %(message)s"
+msgstr ""
+
+#: src/postulo/plugins/views.py
+#, python-format
+msgid "%(plugin)s has nothing to look for."
+msgstr ""
+
 #: src/postulo/core/mail_auth.py
 #, python-format
 msgid "%(provider)s does not let an application send on its own."
@@ -4127,6 +4137,11 @@ msgstr "Bħala fajl"
 #: src/postulo/templates/jobs/move_owner.html
 msgid "As an administrator you may also give it to anybody: type their username below instead."
 msgstr "Bħala amministratur tista' wkoll tagħtih lil kulħadd: ikteb l-isem tal-utent tiegħu hawn taħt minflok."
+
+#: src/postulo/templates/connections/partials/option_table.html
+#, python-format
+msgid "As found on %(when)s."
+msgstr ""
 
 #: src/postulo/resume/forms.py
 msgid "As it was published."
@@ -7678,10 +7693,23 @@ msgstr "forma ta' indirizzar"
 msgid "Format"
 msgstr "Format"
 
+#: src/postulo/plugins/views.py
+#, python-format
+msgid "Found %(count)d option on the server. Choose what to use, then save."
+msgid_plural "Found %(count)d options on the server. Choose what to use, then save."
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+
 #: src/postulo/jobs/slow.py
 #, python-format
 msgid "Found a logo at %(url)s."
 msgstr "Instab logo fi %(url)s."
+
+#: src/postulo/templates/connections/partials/option_table.html
+msgid "Found on the server"
+msgstr ""
 
 #: src/postulo/jobs/models.py
 msgid "Found on their website"
@@ -9077,6 +9105,10 @@ msgstr "ma setax jiġi impurtat"
 msgid "it did not finish importing within %(seconds)ss"
 msgstr "ma spiċċax jimporta fi żmien %(seconds)ss"
 
+#: src/postulo/plugins/views.py
+msgid "It did not say what it found."
+msgstr ""
+
 #: src/postulo/templates/server/backups.html
 msgid "it failed"
 msgstr "falliet"
@@ -10124,6 +10156,10 @@ msgstr "lonġitudni"
 msgid "Longitude"
 msgstr "Lonġitudni"
 
+#: src/postulo/templates/connections/form.html
+msgid "Look on the server"
+msgstr ""
+
 #: src/postulo/templates/resume/item_form.html
 msgid "Look up"
 msgstr ""
@@ -11139,6 +11175,10 @@ msgstr "Għad m'hemm l-ebda ittra ta' dan it-tip."
 msgid "No letters yet. A cover letter is for one posting; a motivation letter tells your story; a speculative letter goes where nothing is advertised; a follow-up note comes after an interview."
 msgstr "Għad m'hemm l-ebda ittra. Ittra ta' akkumpanjament hija għal avviż wieħed; ittra ta' motivazzjoni tirrakkonta l-istorja tiegħek; ittra spontanja tmur fejn ma jkun hemm xejn reklamat; nota ta' segwitu tiġi wara intervista."
 
+#: src/postulo/templates/connections/partials/option_table.html
+msgid "No longer on the server"
+msgstr ""
+
 #: src/postulo/jobs/models.py
 msgid "No longer shared"
 msgstr "M'għadux kondiviż"
@@ -11542,6 +11582,10 @@ msgstr "Mhux marbuta ma' applikazzjoni."
 msgid "Not offered at all, and kept that way while it stays off."
 msgstr "Mhux offrut xejn, u jinżamm hekk sakemm jibqa' mitfi."
 
+#: src/postulo/plugins/forms.py
+msgid "Not offered here: this is chosen from what a person's connection finds on its service, and a server setting has no such service to look on."
+msgstr ""
+
 #: src/postulo/templates/jobs/company_map.html
 msgid "Not on the map: neither its postcode nor its town is in the offline tables."
 msgstr "Mhux fuq il-mappa: la l-kodiċi postali u lanqas il-belt tagħha ma jinsabu fit-tabelli offline."
@@ -11643,6 +11687,10 @@ msgstr "għadu mhux ittestjat"
 #, python-format
 msgid "not to be sent after %(date)s"
 msgstr "mhux biex tintbagħat wara %(date)s"
+
+#: src/postulo/plugins/forms.py
+msgid "Not used"
+msgstr ""
 
 #: src/postulo/templates/documents/cv_detail.html
 #, fuzzy, python-format
@@ -11766,6 +11814,10 @@ msgstr "Ma żdied xejn. Immarka l-karti li trid; x'issir kull waħda, u x'minnha
 #: src/postulo/templates/cotton/identifier_findings.html
 msgid "Nothing has been changed, and none of this stops you saving. Only you know which of them is right."
 msgstr "Ma nbidel xejn, u xejn minn dan ma jwaqqfek milli tissejvja. Int biss taf liema minnhom huwa t-tajjeb."
+
+#: src/postulo/templates/connections/partials/option_table.html
+msgid "Nothing has been looked for yet. Look on the server to see what is there."
+msgstr ""
 
 #: src/postulo/templates/server/logs.html
 msgid "Nothing has been recorded yet"
@@ -12011,6 +12063,11 @@ msgstr "Xejn ma ġie konness. Ħadd ma qabel ma' xejn."
 #: src/postulo/accounts/settings_views.py src/postulo/core/server_views.py
 msgid "Nothing was different."
 msgstr "Xejn ma kien differenti."
+
+#: src/postulo/templates/connections/partials/option_table.html
+#, python-format
+msgid "Nothing was found on the server on %(when)s."
+msgstr ""
 
 #: src/postulo/core/server_views.py
 msgid "Nothing was installed."
@@ -14985,6 +15042,10 @@ msgstr "Issejvja l-kumpanija biex iżżid identifikatur ieħor."
 msgid "Save this first, then come back and agree."
 msgstr "Issejvja dan l-ewwel, imbagħad erġa' lura u aqbel."
 
+#: src/postulo/templates/connections/partials/option_table.html
+msgid "Save this first, then look on the server to choose from what is there."
+msgstr ""
+
 #: src/postulo/templates/server/maps.html
 msgid "Save this page to start them again, or switch them off."
 msgstr ""
@@ -15813,6 +15874,10 @@ msgstr "Dħul b'token"
 #: src/postulo/templates/server/signin.html
 msgid "Signs in to an existing account by e-mail"
 msgstr "Jidħol f'kont eżistenti bl-email"
+
+#: src/postulo/templates/connections/form.html
+msgid "Signs in with the settings as last saved and lists what is there. Nothing you have typed here is saved until you save."
+msgstr ""
 
 #: src/postulo/jobs/models.py
 msgid "since"
@@ -20007,6 +20072,7 @@ msgstr ""
 msgid "US Letter, portrait"
 msgstr ""
 
+#: src/postulo/templates/connections/partials/option_table.html
 #: src/postulo/templates/server/plugin_access.html
 msgid "Use"
 msgstr "Uża"

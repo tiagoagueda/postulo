@@ -7,7 +7,8 @@ import logging
 from django import forms
 from django.utils.translation import gettext_lazy as _
 
-from .base import FieldSpec, call_with_user
+from . import discovery
+from .base import CONNECTION_ONLY_TYPES, FieldSpec, call_with_user
 from .models import Connection, PluginRepository
 
 logger = logging.getLogger(__name__)
@@ -105,6 +106,19 @@ def kind_specs(plugin) -> list[FieldSpec]:
 
 def form_field_for(spec: FieldSpec, *, has_value: bool = False) -> forms.Field:
     common = {"label": spec.label, "help_text": spec.help, "required": spec.required}
+    if spec.type in CONNECTION_ONLY_TYPES:
+        # Drawn here only by a server page -- a transport's or a backup destination's -- since
+        # a connection draws its found options as a table of its own (#332). There is no
+        # service of the person's to look on, so the field is a sentence and keeps nothing.
+        return forms.CharField(
+            label=spec.label,
+            required=False,
+            disabled=True,
+            help_text=_(
+                "Not offered here: this is chosen from what a person's connection finds on "
+                "its service, and a server setting has no such service to look on."
+            ),
+        )
     if spec.type == "password" or spec.secret:
         # A stored secret is never shown back. The field is optional while one exists,
         # because leaving it blank means keeping it. A secret may be several lines —
@@ -141,6 +155,29 @@ def form_field_for(spec: FieldSpec, *, has_value: bool = False) -> forms.Field:
     return forms.CharField(max_length=500, **common)
 
 
+class OptionTable:
+    """A ``discovered`` field as the form draws it: one select per option found (#332).
+
+    Not a Django field, because what it holds is not one value: each row is a field of its
+    own, ``plugin_<name>__<key>``, so that each select has a label naming its option and the
+    page works without a script. `ConnectionForm` puts the rows back together on save.
+    """
+
+    #: What the template asks to tell this from a bound field.
+    is_option_table = True
+
+    def __init__(self, form: ConnectionForm, spec: FieldSpec, rows: list[discovery.Row]):
+        self.spec = spec
+        self.name = spec.name
+        self.label = spec.label
+        self.help = spec.help
+        self.rows = [(row, form[f"plugin_{spec.name}__{row.key}"]) for row in rows]
+        config = form.instance.config if form.instance.pk else {}
+        self.found_at = discovery.found_at(config)
+        #: Not saved yet, so there is nothing to look on the server with.
+        self.unsaved = not form.instance.pk
+
+
 class ConnectionForm(forms.ModelForm):
     """Label and switch from the model, everything else from the plugin's field specs."""
 
@@ -157,7 +194,12 @@ class ConnectionForm(forms.ModelForm):
         ) + kind_specs(plugin)
         existing_config = dict(self.instance.config) if self.instance.pk else {}
         existing_secrets = self.instance.secrets if self.instance.pk else {}
+        #: Each ``discovered`` field's rows, by the field's name (#332).
+        self.option_rows: dict[str, list[discovery.Row]] = {}
         for spec in self.specs:
+            if spec.type == "discovered":
+                self._add_option_rows(spec, existing_config)
+                continue
             has_value = spec.name in existing_secrets if spec.secret else False
             field = form_field_for(spec, has_value=has_value)
             if not spec.secret:
@@ -170,9 +212,31 @@ class ConnectionForm(forms.ModelForm):
             # field's own initial; the plugin's label is the sensible starting point.
             self.initial["label"] = plugin.label
 
+    def _add_option_rows(self, spec: FieldSpec, config: dict) -> None:
+        """One select per option found, *Not used* first, then the modes the option allows."""
+        rows = discovery.rows(spec, config)
+        self.option_rows[spec.name] = rows
+        for row in rows:
+            choices = [("", _("Not used")), *row.modes]
+            field = forms.ChoiceField(
+                choices=choices, label=row.label, required=False, initial=row.mode
+            )
+            field.widget.attrs["class"] = "select"
+            self.fields[f"plugin_{spec.name}__{row.key}"] = field
+
     def plugin_fields(self):
-        """The bound fields the plugin asked for, in the order it asked."""
-        return [self[f"plugin_{spec.name}"] for spec in self.specs]
+        """What the plugin asked for, in the order it asked: bound fields and option tables."""
+        return [
+            OptionTable(self, spec, self.option_rows[spec.name])
+            if spec.type == "discovered"
+            else self[f"plugin_{spec.name}"]
+            for spec in self.specs
+        ]
+
+    @property
+    def can_look(self) -> bool:
+        """Whether the form offers *Look on the server*: a plugin with ``discover``, saved."""
+        return bool(self.instance.pk) and discovery.can_look(self.plugin, self.specs)
 
     def _merged(self) -> tuple[dict, dict]:
         """Configuration and secrets as they will be stored: what was typed over what is kept."""
@@ -180,6 +244,14 @@ class ConnectionForm(forms.ModelForm):
         config = dict(connection.config) if connection.pk else {}
         secrets = connection.secrets if connection.pk else {}
         for spec in self.specs:
+            if spec.type == "discovered":
+                # The chosen options and their modes; a row on *Not used* is not kept (#332).
+                config[spec.name] = {
+                    row.value: mode
+                    for row in self.option_rows[spec.name]
+                    if (mode := self.cleaned_data.get(f"plugin_{spec.name}__{row.key}"))
+                }
+                continue
             value = self.cleaned_data.get(f"plugin_{spec.name}")
             if spec.secret:
                 if value:
@@ -187,7 +259,7 @@ class ConnectionForm(forms.ModelForm):
                 # blank: keep what is stored
             else:
                 config[spec.name] = value if value is not None else ""
-        return config, secrets
+        return discovery.keep_only_chosen_gone(config, self.specs), secrets
 
     def clean(self) -> dict:
         """Let the plugin look at the whole configuration once every field is in order.

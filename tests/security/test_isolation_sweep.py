@@ -549,6 +549,7 @@ FACTORIES: dict[str, Callable] = {
     "connections:backfill": pk_of(store_connection),
     "connections:consent": pk_of(connection),
     "connections:delete": pk_of(connection),
+    "connections:discover": pk_of(connection),
     "connections:edit": pk_of(connection),
     "connections:sync_now": pk_of(sync_connection),
     "connections:test": pk_of(connection),

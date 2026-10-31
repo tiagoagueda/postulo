@@ -1197,6 +1197,16 @@ msgstr "%(person)s, hâlâ kayıtlara sahip olan %(name)s grubunun son üyesidir
 msgid "%(plugin)s could not check these settings: %(error)s"
 msgstr "%(plugin)s bu ayarları denetleyemedi: %(error)s"
 
+#: src/postulo/plugins/views.py
+#, python-format
+msgid "%(plugin)s could not look on the server: %(message)s"
+msgstr ""
+
+#: src/postulo/plugins/views.py
+#, python-format
+msgid "%(plugin)s has nothing to look for."
+msgstr ""
+
 #: src/postulo/core/mail_auth.py
 #, python-format
 msgid "%(provider)s does not let an application send on its own."
@@ -3877,6 +3887,11 @@ msgstr "Bir dosya olarak"
 #: src/postulo/templates/jobs/move_owner.html
 msgid "As an administrator you may also give it to anybody: type their username below instead."
 msgstr "Yönetici olarak bunu herhangi birine de verebilirsiniz: bunun yerine kullanıcı adını aşağıya yazın."
+
+#: src/postulo/templates/connections/partials/option_table.html
+#, python-format
+msgid "As found on %(when)s."
+msgstr ""
 
 #: src/postulo/resume/forms.py
 msgid "As it was published."
@@ -7418,10 +7433,21 @@ msgstr "hitap şekli"
 msgid "Format"
 msgstr "Biçim"
 
+#: src/postulo/plugins/views.py
+#, python-format
+msgid "Found %(count)d option on the server. Choose what to use, then save."
+msgid_plural "Found %(count)d options on the server. Choose what to use, then save."
+msgstr[0] ""
+msgstr[1] ""
+
 #: src/postulo/jobs/slow.py
 #, python-format
 msgid "Found a logo at %(url)s."
 msgstr "%(url)s adresinde bir logo bulundu."
+
+#: src/postulo/templates/connections/partials/option_table.html
+msgid "Found on the server"
+msgstr ""
 
 #: src/postulo/jobs/models.py
 msgid "Found on their website"
@@ -8807,6 +8833,10 @@ msgstr "içe aktarılamadı"
 msgid "it did not finish importing within %(seconds)ss"
 msgstr "%(seconds)s saniye içinde içe aktarma tamamlanmadı"
 
+#: src/postulo/plugins/views.py
+msgid "It did not say what it found."
+msgstr ""
+
 #: src/postulo/templates/server/backups.html
 msgid "it failed"
 msgstr "başarısız oldu"
@@ -9844,6 +9874,10 @@ msgstr "boylam"
 msgid "Longitude"
 msgstr "Boylam"
 
+#: src/postulo/templates/connections/form.html
+msgid "Look on the server"
+msgstr ""
+
 #: src/postulo/templates/resume/item_form.html
 msgid "Look up"
 msgstr ""
@@ -10848,6 +10882,10 @@ msgstr "Henüz bu türden mektup yok."
 msgid "No letters yet. A cover letter is for one posting; a motivation letter tells your story; a speculative letter goes where nothing is advertised; a follow-up note comes after an interview."
 msgstr "Henüz mektup yok. Ön yazı tek bir ilan içindir; niyet mektubu hikâyenizi anlatır; girişim mektubu hiçbir ilanın olmadığı yere gider; takip notu bir görüşmeden sonra gelir."
 
+#: src/postulo/templates/connections/partials/option_table.html
+msgid "No longer on the server"
+msgstr ""
+
 #: src/postulo/jobs/models.py
 msgid "No longer shared"
 msgstr "Artık paylaşılmıyor"
@@ -11249,6 +11287,10 @@ msgstr "Bir başvuruyla eşleştirilmedi."
 msgid "Not offered at all, and kept that way while it stays off."
 msgstr "Hiç sunulmaz ve kapalı kaldığı sürece öyle kalır."
 
+#: src/postulo/plugins/forms.py
+msgid "Not offered here: this is chosen from what a person's connection finds on its service, and a server setting has no such service to look on."
+msgstr ""
+
 #: src/postulo/templates/jobs/company_map.html
 msgid "Not on the map: neither its postcode nor its town is in the offline tables."
 msgstr "Haritada değil: ne posta kodu ne de yerleşim yeri çevrimdışı tablolarda var."
@@ -11351,6 +11393,10 @@ msgstr "henüz sınanmadı"
 #, python-format
 msgid "not to be sent after %(date)s"
 msgstr "%(date)s tarihinden sonra gönderilmeyecek"
+
+#: src/postulo/plugins/forms.py
+msgid "Not used"
+msgstr ""
 
 #: src/postulo/templates/documents/cv_detail.html
 #, python-format
@@ -11469,6 +11515,10 @@ msgstr "Hiçbir şey eklenmedi. İstediğiniz kartları işaretleyin; her birini
 #: src/postulo/templates/cotton/identifier_findings.html
 msgid "Nothing has been changed, and none of this stops you saving. Only you know which of them is right."
 msgstr "Hiçbir şey değiştirilmedi ve bunların hiçbiri kaydetmenize engel değil. Hangisinin doğru olduğunu yalnızca siz bilirsiniz."
+
+#: src/postulo/templates/connections/partials/option_table.html
+msgid "Nothing has been looked for yet. Look on the server to see what is there."
+msgstr ""
 
 #: src/postulo/templates/server/logs.html
 msgid "Nothing has been recorded yet"
@@ -11712,6 +11762,11 @@ msgstr "Hiçbir şey bağlanmadı. Kimse hiçbir şeyi onaylamadı."
 #: src/postulo/accounts/settings_views.py src/postulo/core/server_views.py
 msgid "Nothing was different."
 msgstr "Hiçbir şey farklı değildi."
+
+#: src/postulo/templates/connections/partials/option_table.html
+#, python-format
+msgid "Nothing was found on the server on %(when)s."
+msgstr ""
 
 #: src/postulo/core/server_views.py
 msgid "Nothing was installed."
@@ -14610,6 +14665,10 @@ msgstr "Başka bir tanımlayıcı eklemek için şirketi kaydedin."
 msgid "Save this first, then come back and agree."
 msgstr "Önce bunu kaydedin, sonra dönüp onaylayın."
 
+#: src/postulo/templates/connections/partials/option_table.html
+msgid "Save this first, then look on the server to choose from what is there."
+msgstr ""
+
 #: src/postulo/templates/server/maps.html
 msgid "Save this page to start them again, or switch them off."
 msgstr ""
@@ -15426,6 +15485,10 @@ msgstr "Belirteçle giriş yapma"
 #: src/postulo/templates/server/signin.html
 msgid "Signs in to an existing account by e-mail"
 msgstr "Var olan bir hesaba e-posta ile giriş yapar"
+
+#: src/postulo/templates/connections/form.html
+msgid "Signs in with the settings as last saved and lists what is there. Nothing you have typed here is saved until you save."
+msgstr ""
 
 #: src/postulo/jobs/models.py
 #, fuzzy
@@ -19564,6 +19627,7 @@ msgstr ""
 msgid "US Letter, portrait"
 msgstr ""
 
+#: src/postulo/templates/connections/partials/option_table.html
 #: src/postulo/templates/server/plugin_access.html
 msgid "Use"
 msgstr "Kullan"

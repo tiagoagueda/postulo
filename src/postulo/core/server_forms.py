@@ -858,6 +858,7 @@ class EmailForm(PinnedPolicyForm):
     def _transport_answers(self) -> tuple[dict, dict]:
         """What was typed for the transport's own fields, split into plain and secret."""
         from postulo.notifications import transport as transports
+        from postulo.plugins import base
 
         chosen = transports.selected()
         if chosen is None or chosen.name == transports.DEFAULT_TRANSPORT:
@@ -865,7 +866,8 @@ class EmailForm(PinnedPolicyForm):
         plain, secret = {}, {}
         for spec in chosen.config_fields():
             key = f"{self.TRANSPORT_PREFIX}{spec.name}"
-            if key not in self.cleaned_data:
+            if key not in self.cleaned_data or spec.type in base.CONNECTION_ONLY_TYPES:
+                # A connection-only field is a sentence here and keeps nothing (#332).
                 continue
             value = self.cleaned_data[key]
             if spec.type == "password" or spec.secret:
@@ -974,6 +976,8 @@ class BackupDestinationForm(forms.ModelForm):
 
     def _answers(self) -> tuple[dict, dict]:
         """The plugin's settings as they will be stored: what was typed over what is kept."""
+        from postulo.plugins.base import CONNECTION_ONLY_TYPES
+
         row = self.instance
         if self.switching:
             plain, secret = {}, {}
@@ -981,6 +985,9 @@ class BackupDestinationForm(forms.ModelForm):
             plain = dict(row.backup_destination_config or {})
             secret = dict(row.backup_destination_secrets)
         for spec in self.specs:
+            if spec.type in CONNECTION_ONLY_TYPES:
+                # A sentence here, keeping nothing: only a connection looks on a service (#332).
+                continue
             value = self.cleaned_data.get(f"{self.PREFIX}{spec.name}")
             if spec.type == "password" or spec.secret:
                 if value:

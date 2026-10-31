@@ -1197,6 +1197,16 @@ msgstr "%(person)s es el último miembro de %(name)s, que todavía posee registr
 msgid "%(plugin)s could not check these settings: %(error)s"
 msgstr "%(plugin)s no pudo comprobar esta configuración: %(error)s"
 
+#: src/postulo/plugins/views.py
+#, python-format
+msgid "%(plugin)s could not look on the server: %(message)s"
+msgstr ""
+
+#: src/postulo/plugins/views.py
+#, python-format
+msgid "%(plugin)s has nothing to look for."
+msgstr ""
+
 #: src/postulo/core/mail_auth.py
 #, python-format
 msgid "%(provider)s does not let an application send on its own."
@@ -3880,6 +3890,11 @@ msgstr "Como archivo"
 #: src/postulo/templates/jobs/move_owner.html
 msgid "As an administrator you may also give it to anybody: type their username below instead."
 msgstr "Como administrador, también puede cedérselo a cualquier persona: en ese caso, escriba abajo su nombre de usuario."
+
+#: src/postulo/templates/connections/partials/option_table.html
+#, python-format
+msgid "As found on %(when)s."
+msgstr ""
 
 #: src/postulo/resume/forms.py
 msgid "As it was published."
@@ -7405,10 +7420,21 @@ msgstr "tratamiento"
 msgid "Format"
 msgstr "Formato"
 
+#: src/postulo/plugins/views.py
+#, python-format
+msgid "Found %(count)d option on the server. Choose what to use, then save."
+msgid_plural "Found %(count)d options on the server. Choose what to use, then save."
+msgstr[0] ""
+msgstr[1] ""
+
 #: src/postulo/jobs/slow.py
 #, python-format
 msgid "Found a logo at %(url)s."
 msgstr "Se encontró un logotipo en %(url)s."
+
+#: src/postulo/templates/connections/partials/option_table.html
+msgid "Found on the server"
+msgstr ""
 
 #: src/postulo/jobs/models.py
 msgid "Found on their website"
@@ -8785,6 +8811,10 @@ msgstr "no se pudo importar"
 msgid "it did not finish importing within %(seconds)ss"
 msgstr "no terminó de importarse en %(seconds)ss"
 
+#: src/postulo/plugins/views.py
+msgid "It did not say what it found."
+msgstr ""
+
 #: src/postulo/templates/server/backups.html
 msgid "it failed"
 msgstr "falló"
@@ -9814,6 +9844,10 @@ msgstr "longitud"
 msgid "Longitude"
 msgstr "Longitud"
 
+#: src/postulo/templates/connections/form.html
+msgid "Look on the server"
+msgstr ""
+
 #: src/postulo/templates/resume/item_form.html
 msgid "Look up"
 msgstr ""
@@ -10819,6 +10853,10 @@ msgstr "Todavía no hay cartas de este tipo."
 msgid "No letters yet. A cover letter is for one posting; a motivation letter tells your story; a speculative letter goes where nothing is advertised; a follow-up note comes after an interview."
 msgstr "Todavía no hay cartas. Una carta de presentación es para un anuncio; una carta de motivación cuenta su historia; una carta espontánea va donde no se anuncia nada; una nota de seguimiento llega después de una entrevista."
 
+#: src/postulo/templates/connections/partials/option_table.html
+msgid "No longer on the server"
+msgstr ""
+
 #: src/postulo/jobs/models.py
 msgid "No longer shared"
 msgstr "Ya no se comparte"
@@ -11223,6 +11261,10 @@ msgstr "Sin candidatura asociada."
 msgid "Not offered at all, and kept that way while it stays off."
 msgstr "No se ofrece en absoluto, y se conserva así mientras siga desactivado."
 
+#: src/postulo/plugins/forms.py
+msgid "Not offered here: this is chosen from what a person's connection finds on its service, and a server setting has no such service to look on."
+msgstr ""
+
 #: src/postulo/templates/jobs/company_map.html
 msgid "Not on the map: neither its postcode nor its town is in the offline tables."
 msgstr "No está en el mapa: ni su código postal ni su localidad figuran en las tablas sin conexión."
@@ -11324,6 +11366,10 @@ msgstr "aún no probado"
 #, python-format
 msgid "not to be sent after %(date)s"
 msgstr "no enviar después del %(date)s"
+
+#: src/postulo/plugins/forms.py
+msgid "Not used"
+msgstr ""
 
 #: src/postulo/templates/documents/cv_detail.html
 #, python-format
@@ -11442,6 +11488,10 @@ msgstr "No se ha añadido nada. Marque las tarjetas que quiera; al lado de cada 
 #: src/postulo/templates/cotton/identifier_findings.html
 msgid "Nothing has been changed, and none of this stops you saving. Only you know which of them is right."
 msgstr "No se ha cambiado nada, y nada de esto le impide guardar. Solo usted sabe cuál es el correcto."
+
+#: src/postulo/templates/connections/partials/option_table.html
+msgid "Nothing has been looked for yet. Look on the server to see what is there."
+msgstr ""
 
 #: src/postulo/templates/server/logs.html
 msgid "Nothing has been recorded yet"
@@ -11686,6 +11736,11 @@ msgstr "No se conectó nada. Nadie aceptó nada."
 #: src/postulo/accounts/settings_views.py src/postulo/core/server_views.py
 msgid "Nothing was different."
 msgstr "No había ninguna diferencia."
+
+#: src/postulo/templates/connections/partials/option_table.html
+#, python-format
+msgid "Nothing was found on the server on %(when)s."
+msgstr ""
 
 #: src/postulo/core/server_views.py
 msgid "Nothing was installed."
@@ -14582,6 +14637,10 @@ msgstr "Guarde la empresa para añadir otro identificador."
 msgid "Save this first, then come back and agree."
 msgstr "Guarde esto primero y luego vuelva para aceptar."
 
+#: src/postulo/templates/connections/partials/option_table.html
+msgid "Save this first, then look on the server to choose from what is there."
+msgstr ""
+
 #: src/postulo/templates/server/maps.html
 msgid "Save this page to start them again, or switch them off."
 msgstr ""
@@ -15391,6 +15450,10 @@ msgstr "Inicio de sesión con un token"
 #: src/postulo/templates/server/signin.html
 msgid "Signs in to an existing account by e-mail"
 msgstr "Inicia sesión en una cuenta existente por correo"
+
+#: src/postulo/templates/connections/form.html
+msgid "Signs in with the settings as last saved and lists what is there. Nothing you have typed here is saved until you save."
+msgstr ""
 
 #: src/postulo/jobs/models.py
 msgid "since"
@@ -19519,6 +19582,7 @@ msgstr ""
 msgid "US Letter, portrait"
 msgstr ""
 
+#: src/postulo/templates/connections/partials/option_table.html
 #: src/postulo/templates/server/plugin_access.html
 msgid "Use"
 msgstr "Usar"

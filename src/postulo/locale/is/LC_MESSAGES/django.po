@@ -1197,6 +1197,16 @@ msgstr "%(person)s er síðasti meðlimur %(name)s, sem á enn færslur. Gefðu 
 msgid "%(plugin)s could not check these settings: %(error)s"
 msgstr "%(plugin)s gat ekki athugað þessar stillingar: %(error)s"
 
+#: src/postulo/plugins/views.py
+#, python-format
+msgid "%(plugin)s could not look on the server: %(message)s"
+msgstr ""
+
+#: src/postulo/plugins/views.py
+#, python-format
+msgid "%(plugin)s has nothing to look for."
+msgstr ""
+
 #: src/postulo/core/mail_auth.py
 #, python-format
 msgid "%(provider)s does not let an application send on its own."
@@ -3897,6 +3907,11 @@ msgstr "Sem skrá"
 #: src/postulo/templates/jobs/move_owner.html
 msgid "As an administrator you may also give it to anybody: type their username below instead."
 msgstr "Sem stjórnandi geturðu líka gefið það hverjum sem er: sláðu inn notandanafn viðkomandi hér fyrir neðan í staðinn."
+
+#: src/postulo/templates/connections/partials/option_table.html
+#, python-format
+msgid "As found on %(when)s."
+msgstr ""
 
 #: src/postulo/resume/forms.py
 msgid "As it was published."
@@ -7432,10 +7447,21 @@ msgstr "ávarp"
 msgid "Format"
 msgstr "Snið"
 
+#: src/postulo/plugins/views.py
+#, python-format
+msgid "Found %(count)d option on the server. Choose what to use, then save."
+msgid_plural "Found %(count)d options on the server. Choose what to use, then save."
+msgstr[0] ""
+msgstr[1] ""
+
 #: src/postulo/jobs/slow.py
 #, python-format
 msgid "Found a logo at %(url)s."
 msgstr "Fann merki á %(url)s."
+
+#: src/postulo/templates/connections/partials/option_table.html
+msgid "Found on the server"
+msgstr ""
 
 #: src/postulo/jobs/models.py
 msgid "Found on their website"
@@ -8829,6 +8855,10 @@ msgstr "ekki tókst að flytja hana inn"
 msgid "it did not finish importing within %(seconds)ss"
 msgstr "innflutningi hennar var ekki lokið innan %(seconds)s s"
 
+#: src/postulo/plugins/views.py
+msgid "It did not say what it found."
+msgstr ""
+
 #: src/postulo/templates/server/backups.html
 msgid "it failed"
 msgstr "það mistókst"
@@ -9861,6 +9891,10 @@ msgstr "lengdargráða"
 msgid "Longitude"
 msgstr "Lengdargráða"
 
+#: src/postulo/templates/connections/form.html
+msgid "Look on the server"
+msgstr ""
+
 #: src/postulo/templates/resume/item_form.html
 msgid "Look up"
 msgstr ""
@@ -10868,6 +10902,10 @@ msgstr "Engin bréf af þessari gerð enn."
 msgid "No letters yet. A cover letter is for one posting; a motivation letter tells your story; a speculative letter goes where nothing is advertised; a follow-up note comes after an interview."
 msgstr "Engin bréf enn. Kynningarbréf er fyrir eina auglýsingu; áhugabréf segir sögu þína; óumbeðin umsókn fer þangað sem ekkert er auglýst; eftirfylgnibréf kemur eftir viðtal."
 
+#: src/postulo/templates/connections/partials/option_table.html
+msgid "No longer on the server"
+msgstr ""
+
 #: src/postulo/jobs/models.py
 msgid "No longer shared"
 msgstr "Ekki lengur deilt"
@@ -11270,6 +11308,10 @@ msgstr "Ekki tengt við umsókn."
 msgid "Not offered at all, and kept that way while it stays off."
 msgstr "Alls ekki í boði, og helst þannig meðan slökkt er á því."
 
+#: src/postulo/plugins/forms.py
+msgid "Not offered here: this is chosen from what a person's connection finds on its service, and a server setting has no such service to look on."
+msgstr ""
+
 #: src/postulo/templates/jobs/company_map.html
 msgid "Not on the map: neither its postcode nor its town is in the offline tables."
 msgstr "Ekki á kortinu: hvorki póstnúmer þess né staður er í ónettengdu töflunum."
@@ -11371,6 +11413,10 @@ msgstr "ekki prófað enn"
 #, python-format
 msgid "not to be sent after %(date)s"
 msgstr "ekki til sendingar eftir %(date)s"
+
+#: src/postulo/plugins/forms.py
+msgid "Not used"
+msgstr ""
 
 #: src/postulo/templates/documents/cv_detail.html
 #, fuzzy, python-format
@@ -11489,6 +11535,10 @@ msgstr "Engu hefur verið bætt við. Hakaðu við kortin sem þú vilt; hvað h
 #: src/postulo/templates/cotton/identifier_findings.html
 msgid "Nothing has been changed, and none of this stops you saving. Only you know which of them is right."
 msgstr "Engu hefur verið breytt, og ekkert af þessu kemur í veg fyrir að þú vistir. Aðeins þú veist hvert þeirra er rétt."
+
+#: src/postulo/templates/connections/partials/option_table.html
+msgid "Nothing has been looked for yet. Look on the server to see what is there."
+msgstr ""
 
 #: src/postulo/templates/server/logs.html
 msgid "Nothing has been recorded yet"
@@ -11733,6 +11783,11 @@ msgstr "Ekkert var tengt. Enginn samþykkti neitt."
 #: src/postulo/accounts/settings_views.py src/postulo/core/server_views.py
 msgid "Nothing was different."
 msgstr "Ekkert var frábrugðið."
+
+#: src/postulo/templates/connections/partials/option_table.html
+#, python-format
+msgid "Nothing was found on the server on %(when)s."
+msgstr ""
 
 #: src/postulo/core/server_views.py
 msgid "Nothing was installed."
@@ -14639,6 +14694,10 @@ msgstr "Vistaðu fyrirtækið til að bæta við öðru auðkenni."
 msgid "Save this first, then come back and agree."
 msgstr "Vistaðu þetta fyrst, komdu svo aftur og samþykktu."
 
+#: src/postulo/templates/connections/partials/option_table.html
+msgid "Save this first, then look on the server to choose from what is there."
+msgstr ""
+
 #: src/postulo/templates/server/maps.html
 msgid "Save this page to start them again, or switch them off."
 msgstr ""
@@ -15452,6 +15511,10 @@ msgstr "Innskráning með teikni"
 #: src/postulo/templates/server/signin.html
 msgid "Signs in to an existing account by e-mail"
 msgstr "Skráir inn á fyrirliggjandi reikning með tölvupósti"
+
+#: src/postulo/templates/connections/form.html
+msgid "Signs in with the settings as last saved and lists what is there. Nothing you have typed here is saved until you save."
+msgstr ""
 
 #: src/postulo/jobs/models.py
 msgid "since"
@@ -19594,6 +19657,7 @@ msgstr ""
 msgid "US Letter, portrait"
 msgstr ""
 
+#: src/postulo/templates/connections/partials/option_table.html
 #: src/postulo/templates/server/plugin_access.html
 msgid "Use"
 msgstr "Nota"

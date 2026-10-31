@@ -12,6 +12,12 @@
 
     <form method="post" novalidate>
       {% csrf_token %}
+      {% if form.can_look %}
+        {% comment %} Enter in a box submits with the form's first button, and *Look on the
+           server* below comes before *Save*: this copy of *Save*, first and out of sight, keeps
+           Enter saving, as on #688's *Look up*. {% endcomment %}
+        <button type="submit" class="sr-only" tabindex="-1" aria-hidden="true">{% translate "Save" %}</button>
+      {% endif %}
       {% if form.non_field_errors %}
         <div class="alert mb-4" data-variant="error">{{ form.non_field_errors }}</div>
       {% endif %}
@@ -26,8 +32,24 @@
         {% comment %} A checkbox comes out as a horizontal field, box first, and everything
            else as a column; the component knows which (#290). {% endcomment %}
         {% for field in form.plugin_fields %}
-          <c-field :field="field" />
+          {% if field.is_option_table %}
+            {% include "connections/partials/option_table.html" with table=field %}
+          {% else %}
+            <c-field :field="field" />
+          {% endif %}
         {% endfor %}
+        {% if form.can_look %}
+          {% comment %} *Look on the server* (#332): posts the whole form to the look, which asks
+             the service with the settings as last saved and draws the form back as it was
+             typed, with what it found. Nothing typed is saved, so it works with scripts off
+             and costs one sign-in per press, never one per page view. {% endcomment %}
+          <div class="flex flex-wrap items-center gap-3" data-discover>
+            <button type="submit" class="btn" data-variant="outline" formaction="{% url 'connections:discover' connection.pk %}">{% translate "Look on the server" %}</button>
+            <p class="min-w-0 flex-1 basis-60 text-xs text-ink-500 dark:text-ink-400">
+              {% translate "Signs in with the settings as last saved and lists what is there. Nothing you have typed here is saved until you save." %}
+            </p>
+          </div>
+        {% endif %}
       </div>
 
       <div class="flex items-center gap-3">

@@ -13,6 +13,8 @@ urlpatterns = [
     path("add/<str:kind>/<str:name>/", views.ConnectionFormView.as_view(), name="create"),
     path("<int:pk>/", views.ConnectionFormView.as_view(), name="edit"),
     path("<int:pk>/test/", views.ConnectionTestView.as_view(), name="test"),
+    # *Look on the server* (#332): a POST from the connection's own form, which draws it again.
+    path("<int:pk>/look/", views.ConnectionDiscoverView.as_view(), name="discover"),
     # One callback for the whole instance: the address an operator registers with a provider
     # by hand, once, rather than once per plugin (#150).
     path("consent/", views.ConnectionConsentCallbackView.as_view(), name="consent_callback"),

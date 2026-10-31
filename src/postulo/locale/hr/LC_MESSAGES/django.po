@@ -1277,6 +1277,16 @@ msgstr "%(person)s posljednji je član grupe %(name)s, koja još posjeduje zapis
 msgid "%(plugin)s could not check these settings: %(error)s"
 msgstr "%(plugin)s nije mogao provjeriti ove postavke: %(error)s"
 
+#: src/postulo/plugins/views.py
+#, python-format
+msgid "%(plugin)s could not look on the server: %(message)s"
+msgstr ""
+
+#: src/postulo/plugins/views.py
+#, python-format
+msgid "%(plugin)s has nothing to look for."
+msgstr ""
+
 #: src/postulo/core/mail_auth.py
 #, python-format
 msgid "%(provider)s does not let an application send on its own."
@@ -3989,6 +3999,11 @@ msgstr "Kao datoteka"
 #: src/postulo/templates/jobs/move_owner.html
 msgid "As an administrator you may also give it to anybody: type their username below instead."
 msgstr "Kao administrator možete to predati i bilo kome: umjesto toga upišite njegovo korisničko ime ispod."
+
+#: src/postulo/templates/connections/partials/option_table.html
+#, python-format
+msgid "As found on %(when)s."
+msgstr ""
 
 #: src/postulo/resume/forms.py
 msgid "As it was published."
@@ -7530,10 +7545,22 @@ msgstr "oblik oslovljavanja"
 msgid "Format"
 msgstr "Format"
 
+#: src/postulo/plugins/views.py
+#, python-format
+msgid "Found %(count)d option on the server. Choose what to use, then save."
+msgid_plural "Found %(count)d options on the server. Choose what to use, then save."
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+
 #: src/postulo/jobs/slow.py
 #, python-format
 msgid "Found a logo at %(url)s."
 msgstr "Pronađen logotip na %(url)s."
+
+#: src/postulo/templates/connections/partials/option_table.html
+msgid "Found on the server"
+msgstr ""
 
 #: src/postulo/jobs/models.py
 msgid "Found on their website"
@@ -8914,6 +8941,10 @@ msgstr "nije se mogla uvesti"
 msgid "it did not finish importing within %(seconds)ss"
 msgstr "uvoz nije završen u %(seconds)ss"
 
+#: src/postulo/plugins/views.py
+msgid "It did not say what it found."
+msgstr ""
+
 #: src/postulo/templates/server/backups.html
 msgid "it failed"
 msgstr "nije uspjelo"
@@ -9954,6 +9985,10 @@ msgstr "zemljopisna dužina"
 msgid "Longitude"
 msgstr "Geografska dužina"
 
+#: src/postulo/templates/connections/form.html
+msgid "Look on the server"
+msgstr ""
+
 #: src/postulo/templates/resume/item_form.html
 msgid "Look up"
 msgstr ""
@@ -10962,6 +10997,10 @@ msgstr "Još nema pisama ove vrste."
 msgid "No letters yet. A cover letter is for one posting; a motivation letter tells your story; a speculative letter goes where nothing is advertised; a follow-up note comes after an interview."
 msgstr "Još nema pisama. Popratno pismo odnosi se na jedan oglas; motivacijsko pismo pripovijeda vašu priču; otvorena zamolba šalje se tamo gdje ništa nije oglašeno; bilješka nakon razgovora dolazi poslije razgovora."
 
+#: src/postulo/templates/connections/partials/option_table.html
+msgid "No longer on the server"
+msgstr ""
+
 #: src/postulo/jobs/models.py
 msgid "No longer shared"
 msgstr "Više nije podijeljeno"
@@ -11369,6 +11408,10 @@ msgstr "Nije povezano s prijavom."
 msgid "Not offered at all, and kept that way while it stays off."
 msgstr "Uopće se ne nudi i tako ostaje dok je isključeno."
 
+#: src/postulo/plugins/forms.py
+msgid "Not offered here: this is chosen from what a person's connection finds on its service, and a server setting has no such service to look on."
+msgstr ""
+
 #: src/postulo/templates/jobs/company_map.html
 msgid "Not on the map: neither its postcode nor its town is in the offline tables."
 msgstr "Nije na karti: ni poštanski broj ni mjesto nisu u izvanmrežnim tablicama."
@@ -11471,6 +11514,10 @@ msgstr "još nije testirano"
 #, python-format
 msgid "not to be sent after %(date)s"
 msgstr "ne slati nakon %(date)s"
+
+#: src/postulo/plugins/forms.py
+msgid "Not used"
+msgstr ""
 
 #: src/postulo/templates/documents/cv_detail.html
 #, fuzzy, python-format
@@ -11591,6 +11638,10 @@ msgstr "Ništa nije dodano. Označite kartice koje želite; pokraj svake piše �
 #: src/postulo/templates/cotton/identifier_findings.html
 msgid "Nothing has been changed, and none of this stops you saving. Only you know which of them is right."
 msgstr "Ništa nije promijenjeno i ništa od ovoga ne sprječava spremanje. Samo vi znate koji je od njih točan."
+
+#: src/postulo/templates/connections/partials/option_table.html
+msgid "Nothing has been looked for yet. Look on the server to see what is there."
+msgstr ""
 
 #: src/postulo/templates/server/logs.html
 msgid "Nothing has been recorded yet"
@@ -11835,6 +11886,11 @@ msgstr "Ništa nije povezano. Nitko ni na što nije pristao."
 #: src/postulo/accounts/settings_views.py src/postulo/core/server_views.py
 msgid "Nothing was different."
 msgstr "Ništa nije bilo drukčije."
+
+#: src/postulo/templates/connections/partials/option_table.html
+#, python-format
+msgid "Nothing was found on the server on %(when)s."
+msgstr ""
 
 #: src/postulo/core/server_views.py
 msgid "Nothing was installed."
@@ -14769,6 +14825,10 @@ msgstr "Spremite tvrtku kako biste dodali još jedan identifikator."
 msgid "Save this first, then come back and agree."
 msgstr "Prvo ovo spremite, pa se vratite i pristanite."
 
+#: src/postulo/templates/connections/partials/option_table.html
+msgid "Save this first, then look on the server to choose from what is there."
+msgstr ""
+
 #: src/postulo/templates/server/maps.html
 msgid "Save this page to start them again, or switch them off."
 msgstr ""
@@ -15581,6 +15641,10 @@ msgstr "Prijava tokenom"
 #: src/postulo/templates/server/signin.html
 msgid "Signs in to an existing account by e-mail"
 msgstr "Prijava na postojeći račun e-poštom"
+
+#: src/postulo/templates/connections/form.html
+msgid "Signs in with the settings as last saved and lists what is there. Nothing you have typed here is saved until you save."
+msgstr ""
 
 #: src/postulo/jobs/models.py
 #, fuzzy
@@ -19744,6 +19808,7 @@ msgstr ""
 msgid "US Letter, portrait"
 msgstr ""
 
+#: src/postulo/templates/connections/partials/option_table.html
 #: src/postulo/templates/server/plugin_access.html
 #, fuzzy
 msgid "Use"

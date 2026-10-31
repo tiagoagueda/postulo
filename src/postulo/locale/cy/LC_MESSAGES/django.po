@@ -1357,6 +1357,16 @@ msgstr "%(person)s yw aelod olaf %(name)s, sy'n dal yn berchen ar gofnodion. Rho
 msgid "%(plugin)s could not check these settings: %(error)s"
 msgstr "Ni allai %(plugin)s wirio'r gosodiadau hyn: %(error)s"
 
+#: src/postulo/plugins/views.py
+#, python-format
+msgid "%(plugin)s could not look on the server: %(message)s"
+msgstr ""
+
+#: src/postulo/plugins/views.py
+#, python-format
+msgid "%(plugin)s has nothing to look for."
+msgstr ""
+
 #: src/postulo/core/mail_auth.py
 #, python-format
 msgid "%(provider)s does not let an application send on its own."
@@ -4095,6 +4105,11 @@ msgstr "Fel ffeil"
 #: src/postulo/templates/jobs/move_owner.html
 msgid "As an administrator you may also give it to anybody: type their username below instead."
 msgstr "Fel gweinyddwr gallwch hefyd ei roi i unrhyw un: teipiwch eu henw defnyddiwr isod yn lle hynny."
+
+#: src/postulo/templates/connections/partials/option_table.html
+#, python-format
+msgid "As found on %(when)s."
+msgstr ""
 
 #: src/postulo/resume/forms.py
 msgid "As it was published."
@@ -7614,10 +7629,23 @@ msgstr "teitl"
 msgid "Format"
 msgstr "Fformat"
 
+#: src/postulo/plugins/views.py
+#, python-format
+msgid "Found %(count)d option on the server. Choose what to use, then save."
+msgid_plural "Found %(count)d options on the server. Choose what to use, then save."
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+
 #: src/postulo/jobs/slow.py
 #, python-format
 msgid "Found a logo at %(url)s."
 msgstr "Canfuwyd logo yn %(url)s."
+
+#: src/postulo/templates/connections/partials/option_table.html
+msgid "Found on the server"
+msgstr ""
 
 #: src/postulo/jobs/models.py
 msgid "Found on their website"
@@ -8993,6 +9021,10 @@ msgstr "nid oedd modd ei fewnforio"
 msgid "it did not finish importing within %(seconds)ss"
 msgstr "ni orffennodd fewnforio o fewn %(seconds)s eiliad"
 
+#: src/postulo/plugins/views.py
+msgid "It did not say what it found."
+msgstr ""
+
 #: src/postulo/templates/server/backups.html
 msgid "it failed"
 msgstr "methodd"
@@ -10023,6 +10055,10 @@ msgstr "hydred"
 msgid "Longitude"
 msgstr "Hydred"
 
+#: src/postulo/templates/connections/form.html
+msgid "Look on the server"
+msgstr ""
+
 #: src/postulo/templates/resume/item_form.html
 msgid "Look up"
 msgstr ""
@@ -11028,6 +11064,10 @@ msgstr "Dim llythyrau o'r math hwn eto."
 msgid "No letters yet. A cover letter is for one posting; a motivation letter tells your story; a speculative letter goes where nothing is advertised; a follow-up note comes after an interview."
 msgstr "Dim llythyrau eto. Mae llythyr eglurhaol ar gyfer un hysbyseb; mae llythyr cymhelliant yn adrodd eich stori; mae llythyr digymell yn mynd lle nad oes dim wedi'i hysbysebu; daw nodyn dilyniant ar ôl cyfweliad."
 
+#: src/postulo/templates/connections/partials/option_table.html
+msgid "No longer on the server"
+msgstr ""
+
 #: src/postulo/jobs/models.py
 msgid "No longer shared"
 msgstr "Heb ei rannu mwyach"
@@ -11427,6 +11467,10 @@ msgstr "Heb ei gysylltu â chais."
 msgid "Not offered at all, and kept that way while it stays off."
 msgstr "Nid yw'n cael ei gynnig o gwbl, ac mae'n aros felly tra bo wedi'i ddiffodd."
 
+#: src/postulo/plugins/forms.py
+msgid "Not offered here: this is chosen from what a person's connection finds on its service, and a server setting has no such service to look on."
+msgstr ""
+
 #: src/postulo/templates/jobs/company_map.html
 msgid "Not on the map: neither its postcode nor its town is in the offline tables."
 msgstr "Nid yw ar y map: nid yw ei god post na'i dref yn y tablau all-lein."
@@ -11528,6 +11572,10 @@ msgstr "heb ei brofi eto"
 #, python-format
 msgid "not to be sent after %(date)s"
 msgstr "nid i'w anfon ar ôl %(date)s"
+
+#: src/postulo/plugins/forms.py
+msgid "Not used"
+msgstr ""
 
 #: src/postulo/templates/documents/cv_detail.html
 #, python-format
@@ -11649,6 +11697,10 @@ msgstr "Nid oes dim wedi'i ychwanegu. Ticiwch y cardiau rydych eu heisiau; mae'r
 #: src/postulo/templates/cotton/identifier_findings.html
 msgid "Nothing has been changed, and none of this stops you saving. Only you know which of them is right."
 msgstr "Nid oes dim wedi'i newid, ac nid yw dim o hyn yn eich atal rhag cadw. Dim ond chi sy'n gwybod pa un ohonynt sy'n gywir."
+
+#: src/postulo/templates/connections/partials/option_table.html
+msgid "Nothing has been looked for yet. Look on the server to see what is there."
+msgstr ""
 
 #: src/postulo/templates/server/logs.html
 msgid "Nothing has been recorded yet"
@@ -11893,6 +11945,11 @@ msgstr "Ni chysylltwyd dim. Ni chytunodd neb i ddim."
 #: src/postulo/accounts/settings_views.py src/postulo/core/server_views.py
 msgid "Nothing was different."
 msgstr "Nid oedd dim yn wahanol."
+
+#: src/postulo/templates/connections/partials/option_table.html
+#, python-format
+msgid "Nothing was found on the server on %(when)s."
+msgstr ""
 
 #: src/postulo/core/server_views.py
 msgid "Nothing was installed."
@@ -14830,6 +14887,10 @@ msgstr "Cadwch y cwmni i ychwanegu dynodydd arall."
 msgid "Save this first, then come back and agree."
 msgstr "Cadwch hwn yn gyntaf, yna dewch yn ôl a chytuno."
 
+#: src/postulo/templates/connections/partials/option_table.html
+msgid "Save this first, then look on the server to choose from what is there."
+msgstr ""
+
 #: src/postulo/templates/server/maps.html
 msgid "Save this page to start them again, or switch them off."
 msgstr ""
@@ -15637,6 +15698,10 @@ msgstr "Mewngofnodi gyda thocyn"
 #: src/postulo/templates/server/signin.html
 msgid "Signs in to an existing account by e-mail"
 msgstr "Yn mewngofnodi i gyfrif sy'n bodoli drwy e-bost"
+
+#: src/postulo/templates/connections/form.html
+msgid "Signs in with the settings as last saved and lists what is there. Nothing you have typed here is saved until you save."
+msgstr ""
 
 #: src/postulo/jobs/models.py
 msgid "since"
@@ -19789,6 +19854,7 @@ msgstr ""
 msgid "US Letter, portrait"
 msgstr ""
 
+#: src/postulo/templates/connections/partials/option_table.html
 #: src/postulo/templates/server/plugin_access.html
 msgid "Use"
 msgstr "Defnyddio"

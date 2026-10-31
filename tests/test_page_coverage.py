@@ -295,6 +295,10 @@ EXCUSED: dict[str, str] = {
     "server:person_admin": "a POST that grants or removes administrator rights",
     "server:person_active": "a POST that suspends or restores an account",
     "connections:test": "a POST that tries a connection and reports back",
+    "connections:discover": (
+        "a POST from a connection's form that asks its service what there is to choose from and "
+        "draws the form again (#332)"
+    ),
     "connections:sync_now": "a POST that runs one synchronisation immediately",
     "connections:backfill": "a POST that queues everything a store has not received",
     "api:token_revoke": "a POST that withdraws an API token",

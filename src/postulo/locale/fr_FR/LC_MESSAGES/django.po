@@ -1197,6 +1197,16 @@ msgstr "%(person)s est le dernier membre de %(name)s, qui possède encore des fi
 msgid "%(plugin)s could not check these settings: %(error)s"
 msgstr "%(plugin)s n'a pas pu vérifier ces réglages : %(error)s"
 
+#: src/postulo/plugins/views.py
+#, python-format
+msgid "%(plugin)s could not look on the server: %(message)s"
+msgstr ""
+
+#: src/postulo/plugins/views.py
+#, python-format
+msgid "%(plugin)s has nothing to look for."
+msgstr ""
+
 #: src/postulo/core/mail_auth.py
 #, python-format
 msgid "%(provider)s does not let an application send on its own."
@@ -3866,6 +3876,11 @@ msgstr "Sous forme de fichier"
 #: src/postulo/templates/jobs/move_owner.html
 msgid "As an administrator you may also give it to anybody: type their username below instead."
 msgstr "En tant qu'administrateur, vous pouvez aussi la donner à n'importe qui : saisissez plutôt son nom d'utilisateur ci-dessous."
+
+#: src/postulo/templates/connections/partials/option_table.html
+#, python-format
+msgid "As found on %(when)s."
+msgstr ""
 
 #: src/postulo/resume/forms.py
 msgid "As it was published."
@@ -7364,10 +7379,21 @@ msgstr "civilité"
 msgid "Format"
 msgstr "Format"
 
+#: src/postulo/plugins/views.py
+#, python-format
+msgid "Found %(count)d option on the server. Choose what to use, then save."
+msgid_plural "Found %(count)d options on the server. Choose what to use, then save."
+msgstr[0] ""
+msgstr[1] ""
+
 #: src/postulo/jobs/slow.py
 #, python-format
 msgid "Found a logo at %(url)s."
 msgstr "Logo trouvé à l'adresse %(url)s."
+
+#: src/postulo/templates/connections/partials/option_table.html
+msgid "Found on the server"
+msgstr ""
 
 #: src/postulo/jobs/models.py
 msgid "Found on their website"
@@ -8736,6 +8762,10 @@ msgstr "il n'a pas pu être importé"
 msgid "it did not finish importing within %(seconds)ss"
 msgstr "son importation ne s'est pas terminée en %(seconds)s s"
 
+#: src/postulo/plugins/views.py
+msgid "It did not say what it found."
+msgstr ""
+
 #: src/postulo/templates/server/backups.html
 msgid "it failed"
 msgstr "échouée"
@@ -9762,6 +9792,10 @@ msgstr "longitude"
 msgid "Longitude"
 msgstr "Longitude"
 
+#: src/postulo/templates/connections/form.html
+msgid "Look on the server"
+msgstr ""
+
 #: src/postulo/templates/resume/item_form.html
 msgid "Look up"
 msgstr ""
@@ -10757,6 +10791,10 @@ msgstr "Aucune lettre de ce type pour l'instant."
 msgid "No letters yet. A cover letter is for one posting; a motivation letter tells your story; a speculative letter goes where nothing is advertised; a follow-up note comes after an interview."
 msgstr "Aucune lettre pour l'instant. Une lettre de motivation vise une annonce ; une lettre de présentation raconte votre parcours ; une lettre de candidature spontanée va là où rien n'est publié ; une note de relance vient après un entretien."
 
+#: src/postulo/templates/connections/partials/option_table.html
+msgid "No longer on the server"
+msgstr ""
+
 #: src/postulo/jobs/models.py
 msgid "No longer shared"
 msgstr "Plus partagée"
@@ -11155,6 +11193,10 @@ msgstr "Non rapprochée d'une candidature."
 msgid "Not offered at all, and kept that way while it stays off."
 msgstr "Pas proposé du tout, et cela reste ainsi tant qu'il est désactivé."
 
+#: src/postulo/plugins/forms.py
+msgid "Not offered here: this is chosen from what a person's connection finds on its service, and a server setting has no such service to look on."
+msgstr ""
+
 #: src/postulo/templates/jobs/company_map.html
 msgid "Not on the map: neither its postcode nor its town is in the offline tables."
 msgstr "Absente de la carte : ni son code postal ni sa ville ne figurent dans les tables hors ligne."
@@ -11256,6 +11298,10 @@ msgstr "pas encore testé"
 #, python-format
 msgid "not to be sent after %(date)s"
 msgstr "à ne pas envoyer après le %(date)s"
+
+#: src/postulo/plugins/forms.py
+msgid "Not used"
+msgstr ""
 
 #: src/postulo/templates/documents/cv_detail.html
 #, python-format
@@ -11374,6 +11420,10 @@ msgstr "Rien n'a été ajouté. Cochez les fiches voulues ; ce que chacune dev
 #: src/postulo/templates/cotton/identifier_findings.html
 msgid "Nothing has been changed, and none of this stops you saving. Only you know which of them is right."
 msgstr "Rien n'a été modifié, et rien de tout cela ne vous empêche d'enregistrer. Vous seul savez lequel est le bon."
+
+#: src/postulo/templates/connections/partials/option_table.html
+msgid "Nothing has been looked for yet. Look on the server to see what is there."
+msgstr ""
 
 #: src/postulo/templates/server/logs.html
 msgid "Nothing has been recorded yet"
@@ -11616,6 +11666,11 @@ msgstr "Rien n'a été connecté. Personne n'a consenti à quoi que ce soit."
 #: src/postulo/accounts/settings_views.py src/postulo/core/server_views.py
 msgid "Nothing was different."
 msgstr "Rien n'a changé."
+
+#: src/postulo/templates/connections/partials/option_table.html
+#, python-format
+msgid "Nothing was found on the server on %(when)s."
+msgstr ""
 
 #: src/postulo/core/server_views.py
 msgid "Nothing was installed."
@@ -14492,6 +14547,10 @@ msgstr "Enregistrez l'entreprise pour ajouter un autre identifiant."
 msgid "Save this first, then come back and agree."
 msgstr "Enregistrez ceci d'abord, puis revenez consentir."
 
+#: src/postulo/templates/connections/partials/option_table.html
+msgid "Save this first, then look on the server to choose from what is there."
+msgstr ""
+
 #: src/postulo/templates/server/maps.html
 msgid "Save this page to start them again, or switch them off."
 msgstr ""
@@ -15296,6 +15355,10 @@ msgstr "Connexion avec un jeton"
 #: src/postulo/templates/server/signin.html
 msgid "Signs in to an existing account by e-mail"
 msgstr "Connexion à un compte existant par e-mail"
+
+#: src/postulo/templates/connections/form.html
+msgid "Signs in with the settings as last saved and lists what is there. Nothing you have typed here is saved until you save."
+msgstr ""
 
 #: src/postulo/jobs/models.py
 msgid "since"
@@ -19399,6 +19462,7 @@ msgstr ""
 msgid "US Letter, portrait"
 msgstr ""
 
+#: src/postulo/templates/connections/partials/option_table.html
 #: src/postulo/templates/server/plugin_access.html
 msgid "Use"
 msgstr "Utilisation"

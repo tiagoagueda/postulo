@@ -1277,6 +1277,16 @@ msgstr "%(person)s je posledný člen skupiny %(name)s, ktorá stále vlastní z
 msgid "%(plugin)s could not check these settings: %(error)s"
 msgstr "%(plugin)s nemohol tieto nastavenia skontrolovať: %(error)s"
 
+#: src/postulo/plugins/views.py
+#, python-format
+msgid "%(plugin)s could not look on the server: %(message)s"
+msgstr ""
+
+#: src/postulo/plugins/views.py
+#, python-format
+msgid "%(plugin)s has nothing to look for."
+msgstr ""
+
 #: src/postulo/core/mail_auth.py
 #, python-format
 msgid "%(provider)s does not let an application send on its own."
@@ -3998,6 +4008,11 @@ msgstr "Ako súbor"
 #: src/postulo/templates/jobs/move_owner.html
 msgid "As an administrator you may also give it to anybody: type their username below instead."
 msgstr "Ako správca ho môžete odovzdať aj komukoľvek: namiesto toho nižšie zadajte jeho používateľské meno."
+
+#: src/postulo/templates/connections/partials/option_table.html
+#, python-format
+msgid "As found on %(when)s."
+msgstr ""
 
 #: src/postulo/resume/forms.py
 msgid "As it was published."
@@ -7519,10 +7534,22 @@ msgstr "oslovenie"
 msgid "Format"
 msgstr "Formát"
 
+#: src/postulo/plugins/views.py
+#, python-format
+msgid "Found %(count)d option on the server. Choose what to use, then save."
+msgid_plural "Found %(count)d options on the server. Choose what to use, then save."
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+
 #: src/postulo/jobs/slow.py
 #, python-format
 msgid "Found a logo at %(url)s."
 msgstr "Logo nájdené na %(url)s."
+
+#: src/postulo/templates/connections/partials/option_table.html
+msgid "Found on the server"
+msgstr ""
 
 #: src/postulo/jobs/models.py
 msgid "Found on their website"
@@ -8901,6 +8928,10 @@ msgstr "nepodarilo sa importovať"
 msgid "it did not finish importing within %(seconds)ss"
 msgstr "import sa nedokončil do %(seconds)ss"
 
+#: src/postulo/plugins/views.py
+msgid "It did not say what it found."
+msgstr ""
+
 #: src/postulo/templates/server/backups.html
 msgid "it failed"
 msgstr "nepodarilo sa"
@@ -9932,6 +9963,10 @@ msgstr "zemepisná dĺžka"
 msgid "Longitude"
 msgstr "Zemepisná dĺžka"
 
+#: src/postulo/templates/connections/form.html
+msgid "Look on the server"
+msgstr ""
+
 #: src/postulo/templates/resume/item_form.html
 msgid "Look up"
 msgstr ""
@@ -10935,6 +10970,10 @@ msgstr "Zatiaľ žiadne listy tohto druhu."
 msgid "No letters yet. A cover letter is for one posting; a motivation letter tells your story; a speculative letter goes where nothing is advertised; a follow-up note comes after an interview."
 msgstr "Zatiaľ žiadne listy. Motivačný list je pre jeden inzerát; všeobecný motivačný list rozpráva váš príbeh; nevyžiadaný motivačný list ide tam, kde nič neinzerujú; následná správa prichádza po pohovore."
 
+#: src/postulo/templates/connections/partials/option_table.html
+msgid "No longer on the server"
+msgstr ""
+
 #: src/postulo/jobs/models.py
 msgid "No longer shared"
 msgstr "Už sa nezdieľa"
@@ -11336,6 +11375,10 @@ msgstr "Nepriradené k žiadosti."
 msgid "Not offered at all, and kept that way while it stays off."
 msgstr "Vôbec sa neponúka a zostane to tak, kým je vypnuté."
 
+#: src/postulo/plugins/forms.py
+msgid "Not offered here: this is chosen from what a person's connection finds on its service, and a server setting has no such service to look on."
+msgstr ""
+
 #: src/postulo/templates/jobs/company_map.html
 msgid "Not on the map: neither its postcode nor its town is in the offline tables."
 msgstr "Nie je na mape: jej PSČ ani mesto nie sú v offline tabuľkách."
@@ -11437,6 +11480,10 @@ msgstr "zatiaľ neotestované"
 #, python-format
 msgid "not to be sent after %(date)s"
 msgstr "neposielať po %(date)s"
+
+#: src/postulo/plugins/forms.py
+msgid "Not used"
+msgstr ""
 
 #: src/postulo/templates/documents/cv_detail.html
 #, python-format
@@ -11556,6 +11603,10 @@ msgstr "Nič sa nepridalo. Zaškrtnite karty, ktoré chcete; čím by sa každá
 #: src/postulo/templates/cotton/identifier_findings.html
 msgid "Nothing has been changed, and none of this stops you saving. Only you know which of them is right."
 msgstr "Nič sa nezmenilo a nič z toho vám nebráni v uložení. Len vy viete, ktoré z nich je správne."
+
+#: src/postulo/templates/connections/partials/option_table.html
+msgid "Nothing has been looked for yet. Look on the server to see what is there."
+msgstr ""
 
 #: src/postulo/templates/server/logs.html
 msgid "Nothing has been recorded yet"
@@ -11800,6 +11851,11 @@ msgstr "Nič sa nepripojilo. Nikto s ničím nesúhlasil."
 #: src/postulo/accounts/settings_views.py src/postulo/core/server_views.py
 msgid "Nothing was different."
 msgstr "Nič sa nelíšilo."
+
+#: src/postulo/templates/connections/partials/option_table.html
+#, python-format
+msgid "Nothing was found on the server on %(when)s."
+msgstr ""
 
 #: src/postulo/core/server_views.py
 msgid "Nothing was installed."
@@ -14723,6 +14779,10 @@ msgstr "Uložte firmu, aby ste mohli pridať ďalší identifikátor."
 msgid "Save this first, then come back and agree."
 msgstr "Najprv to uložte, potom sa vráťte a súhlaste."
 
+#: src/postulo/templates/connections/partials/option_table.html
+msgid "Save this first, then look on the server to choose from what is there."
+msgstr ""
+
 #: src/postulo/templates/server/maps.html
 msgid "Save this page to start them again, or switch them off."
 msgstr ""
@@ -15537,6 +15597,10 @@ msgstr "Prihlasovanie tokenom"
 #, fuzzy
 msgid "Signs in to an existing account by e-mail"
 msgstr "Prihlasuje do existujúceho účtu podľa e-mailovej adresy"
+
+#: src/postulo/templates/connections/form.html
+msgid "Signs in with the settings as last saved and lists what is there. Nothing you have typed here is saved until you save."
+msgstr ""
 
 #: src/postulo/jobs/models.py
 msgid "since"
@@ -19680,6 +19744,7 @@ msgstr ""
 msgid "US Letter, portrait"
 msgstr ""
 
+#: src/postulo/templates/connections/partials/option_table.html
 #: src/postulo/templates/server/plugin_access.html
 msgid "Use"
 msgstr "Použiť"

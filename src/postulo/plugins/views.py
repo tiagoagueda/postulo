@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import logging
 import re
+from collections.abc import Mapping
 
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -438,6 +439,51 @@ class ConnectionConsentCallbackView(LoginRequiredMixin, View):
         return redirect("server:email")
 
 
+def _too_often(request: HttpRequest) -> str:
+    """The sentence refusing one more call on somebody's server just now, or empty.
+
+    A test is a real message, or a real request to somebody's server, at a press of a button.
+    Bounded per account, as the text transport's sends are (#232). *Look on the server* signs
+    in with the same password, so it spends the same allowance (#332): two buttons are not
+    twice the sign-ins.
+    """
+    from postulo.core import throttle
+
+    try:
+        throttle.consume(
+            "connection-test", request.user, throttle.rate_for("POSTULO_CONNECTION_TEST_RATE")
+        )
+    except throttle.TooOften as too_often:
+        return ngettext(
+            "That is a lot of tests. Try again in %(seconds)d second.",
+            "That is a lot of tests. Try again in %(seconds)d seconds.",
+            too_often.retry_after,
+        ) % {"seconds": too_often.retry_after}
+    return ""
+
+
+def _on_the_server(request: HttpRequest, connection: Connection, plugin, method):
+    """Call ``method(config)`` on the connected server: ``(True, answer)`` or ``(False, why)``.
+
+    What *Test* and *Look on the server* share: for a connection that authenticates by
+    consent, the first thing to prove is that the grant still stands -- a provider refusing
+    to renew is not a failure a mail server can report, and "consent was withdrawn" is fixed
+    by agreeing again rather than by editing a field (#150). Whatever the plugin raises comes
+    back as a sentence in its own words, and is logged.
+    """
+    from . import consent as consent_flow
+
+    try:
+        if consent_flow.wanted_by(plugin, connection.config) is not None:
+            consent_flow.access_token(connection)
+        return True, call_with_user(method, connection.full_config, user=request.user)
+    except (consent_flow.ConsentWithdrawn, consent_flow.ConsentFailed, SecretsUnreadable) as error:
+        return False, str(error)
+    except Exception as error:
+        logger.exception("Calling %r for connection %s failed", plugin.name, connection.pk)
+        return False, f"{type(error).__name__}: {error}"
+
+
 @method_decorator(transaction.non_atomic_requests, name="dispatch")
 class ConnectionTestView(OwnedObjectMixin, View):
     """*Test*: a login or a real request to the connected server, then what came of it.
@@ -457,51 +503,133 @@ class ConnectionTestView(OwnedObjectMixin, View):
             return redirect("connections:list")
         if refused := _switched_off(request, connection):
             return refused
-        from postulo.core import throttle
-
-        # A test is a real message, or a real request to somebody's server, at a press of
-        # a button. Bounded per account, as the text transport's sends are (#232).
-        try:
-            throttle.consume(
-                "connection-test", request.user, throttle.rate_for("POSTULO_CONNECTION_TEST_RATE")
-            )
-        except throttle.TooOften as too_often:
-            messages.error(
-                request,
-                ngettext(
-                    "That is a lot of tests. Try again in %(seconds)d second.",
-                    "That is a lot of tests. Try again in %(seconds)d seconds.",
-                    too_often.retry_after,
-                )
-                % {"seconds": too_often.retry_after},
-            )
+        if too_often := _too_often(request):
+            messages.error(request, too_often)
             return redirect("connections:list")
-        from . import consent as consent_flow
-
-        try:
-            # For a connection that authenticates by consent, the first thing to prove is
-            # that the grant still stands: a provider refusing to renew is not a failure a
-            # mail server can report, and "consent was withdrawn" is fixed by agreeing again
-            # rather than by editing a field (#150).
-            if consent_flow.wanted_by(plugin, connection.config) is not None:
-                consent_flow.access_token(connection)
-            result = call_with_user(plugin.test, connection.full_config, user=request.user)
-            ok, message = bool(result.ok), str(result.message or "")
-        except consent_flow.ConsentWithdrawn as error:
-            ok, message = False, str(error)
-        except consent_flow.ConsentFailed as error:
-            ok, message = False, str(error)
-        except SecretsUnreadable as error:
-            ok, message = False, str(error)
-        except Exception as error:
-            logger.exception("Testing connection %s failed", connection.pk)
-            ok, message = False, f"{type(error).__name__}: {error}"
+        ok, result = _on_the_server(request, connection, plugin, plugin.test)
+        if ok:
+            try:
+                ok, message = bool(result.ok), str(result.message or "")
+            except AttributeError as error:
+                logger.exception("Testing connection %s gave no result", connection.pk)
+                ok, message = False, f"{type(error).__name__}: {error}"
+        else:
+            message = result
         connection.record_test(ok, message)
         if ok:
             messages.success(request, message or _("It works."))
         else:
             messages.error(request, _("Test failed: %(message)s") % {"message": message})
         return redirect("connections:list")
+
+
+@method_decorator(transaction.non_atomic_requests, name="dispatch")
+class ConnectionDiscoverView(ConnectionFormView):
+    """*Look on the server*: ask the plugin what there is to choose from, and draw the form again.
+
+    A POST from its own button on a saved connection's form, never on page load or on *Save*,
+    which would sign in on every page view or change what *Save* only stores (#332). The whole
+    form is posted here, as #688's *Look up* posts its form: what was typed is drawn back as it
+    was and nothing of it is saved. The plugin is asked with the configuration as last saved,
+    which is what holds the password it signs in with.
+
+    What it finds is kept in the connection's configuration (`discovery.KEY`), in a short
+    transaction of its own once the server has answered, as *Test* records its outcome (#357);
+    a failure is a sentence, and what was found last time stays as it was.
+    """
+
+    http_method_names = ["post"]
+
+    def post(self, request: HttpRequest, pk: int | None = None, kind=None, name=None):
+        from . import discovery
+
+        connection = get_object_or_404(self.get_queryset(), pk=pk)
+        plugin = connection.plugin_instance
+        if plugin is None:
+            messages.error(request, _("That plugin is no longer installed."))
+            return redirect("connections:list")
+        if refused := _switched_off(request, connection):
+            return refused
+        specs = self._specs(plugin, connection)
+        if not discovery.can_look(plugin, specs):
+            messages.error(
+                request, _("%(plugin)s has nothing to look for.") % {"plugin": plugin.label}
+            )
+            return redirect("connections:edit", pk=connection.pk)
+        if too_often := _too_often(request):
+            messages.error(request, too_often)
+        else:
+            ok, found = _on_the_server(request, connection, plugin, plugin.discover)
+            if ok and not isinstance(found, Mapping):
+                logger.error("Plugin %r discovered %r, not a mapping", plugin.name, found)
+                ok, found = False, str(_("It did not say what it found."))
+            if ok:
+                with transaction.atomic():
+                    fresh = self.get_queryset().select_for_update().get(pk=connection.pk)
+                    fresh.config = discovery.record(fresh.config, specs, found)
+                    fresh.save(update_fields=["config", "updated_at"])
+                connection.refresh_from_db()
+                count = sum(
+                    len(discovery.tidy(spec, found.get(spec.name)))
+                    for spec in discovery.specs_of(specs)
+                )
+                messages.success(
+                    request,
+                    ngettext(
+                        "Found %(count)d option on the server. Choose what to use, then save.",
+                        "Found %(count)d options on the server. Choose what to use, then save.",
+                        count,
+                    )
+                    % {"count": count},
+                )
+            else:
+                messages.error(
+                    request,
+                    _("%(plugin)s could not look on the server: %(message)s")
+                    % {"plugin": plugin.label, "message": found},
+                )
+        try:
+            form = ConnectionForm(plugin, instance=connection)
+        except SecretsUnreadable:
+            # Already said: the plugin could not be asked without them.
+            connection.secrets_encrypted = ""
+            form = ConnectionForm(plugin, instance=connection)
+        form.initial.update(_as_typed(form, request.POST))
+        return self._render(request, form, connection, plugin)
+
+    @staticmethod
+    def _specs(plugin, connection) -> list:
+        """The fields the form draws, without reading a secret to find them."""
+        from .forms import kind_specs
+
+        return list(call_with_user(plugin.config_fields, user=connection.owner)) + kind_specs(
+            plugin
+        )
+
+
+def _as_typed(form: ConnectionForm, posted) -> dict:
+    """What was posted, as a form's initial values, so that looking loses nothing typed (#332).
+
+    Only when the whole form came: a press from anywhere else posts no label, and an absent
+    tick box would otherwise read as one unticked. A secret is never drawn back, here as
+    anywhere: a password typed and not saved has to be typed again.
+    """
+    from django import forms as django_forms
+
+    if "label" not in posted:
+        return {}
+    secret = {
+        f"plugin_{spec.name}" for spec in form.specs if spec.secret or spec.type == "password"
+    }
+    initial = {}
+    for name, field in form.fields.items():
+        if name in secret:
+            continue
+        if isinstance(field, django_forms.BooleanField):
+            initial[name] = name in posted
+        elif name in posted:
+            initial[name] = posted.get(name)
+    return initial
 
 
 class ConnectionBackfillView(OwnedObjectMixin, View):

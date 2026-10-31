@@ -1197,6 +1197,16 @@ msgstr "%(person)s on ryhmän %(name)s viimeinen jäsen, ja ryhmä omistaa yhä 
 msgid "%(plugin)s could not check these settings: %(error)s"
 msgstr "%(plugin)s ei voinut tarkistaa näitä asetuksia: %(error)s"
 
+#: src/postulo/plugins/views.py
+#, python-format
+msgid "%(plugin)s could not look on the server: %(message)s"
+msgstr ""
+
+#: src/postulo/plugins/views.py
+#, python-format
+msgid "%(plugin)s has nothing to look for."
+msgstr ""
+
 #: src/postulo/core/mail_auth.py
 #, python-format
 msgid "%(provider)s does not let an application send on its own."
@@ -3882,6 +3892,11 @@ msgstr "Tiedostona"
 #: src/postulo/templates/jobs/move_owner.html
 msgid "As an administrator you may also give it to anybody: type their username below instead."
 msgstr "Ylläpitäjänä voit antaa sen myös kenelle tahansa: kirjoita sen sijaan hänen käyttäjätunnuksensa alle."
+
+#: src/postulo/templates/connections/partials/option_table.html
+#, python-format
+msgid "As found on %(when)s."
+msgstr ""
 
 #: src/postulo/resume/forms.py
 msgid "As it was published."
@@ -7411,10 +7426,21 @@ msgstr "puhuttelumuoto"
 msgid "Format"
 msgstr "Muoto"
 
+#: src/postulo/plugins/views.py
+#, python-format
+msgid "Found %(count)d option on the server. Choose what to use, then save."
+msgid_plural "Found %(count)d options on the server. Choose what to use, then save."
+msgstr[0] ""
+msgstr[1] ""
+
 #: src/postulo/jobs/slow.py
 #, python-format
 msgid "Found a logo at %(url)s."
 msgstr "Logo löytyi osoitteesta %(url)s."
+
+#: src/postulo/templates/connections/partials/option_table.html
+msgid "Found on the server"
+msgstr ""
 
 #: src/postulo/jobs/models.py
 msgid "Found on their website"
@@ -8802,6 +8828,10 @@ msgstr "sitä ei voitu tuoda"
 msgid "it did not finish importing within %(seconds)ss"
 msgstr "sen tuonti ei valmistunut %(seconds)s sekunnissa"
 
+#: src/postulo/plugins/views.py
+msgid "It did not say what it found."
+msgstr ""
+
 #: src/postulo/templates/server/backups.html
 msgid "it failed"
 msgstr "se epäonnistui"
@@ -9835,6 +9865,10 @@ msgstr "pituusaste"
 msgid "Longitude"
 msgstr "Pituusaste"
 
+#: src/postulo/templates/connections/form.html
+msgid "Look on the server"
+msgstr ""
+
 #: src/postulo/templates/resume/item_form.html
 msgid "Look up"
 msgstr ""
@@ -10840,6 +10874,10 @@ msgstr "Tämän tyyppisiä kirjeitä ei vielä ole."
 msgid "No letters yet. A cover letter is for one posting; a motivation letter tells your story; a speculative letter goes where nothing is advertised; a follow-up note comes after an interview."
 msgstr "Kirjeitä ei vielä ole. Saatekirje koskee yhtä työpaikkailmoitusta; motivaatiokirje kertoo tarinasi; avoin hakemus lähetetään sinne, missä paikkaa ei ole ilmoitettu; seurantaviesti lähetetään haastattelun jälkeen."
 
+#: src/postulo/templates/connections/partials/option_table.html
+msgid "No longer on the server"
+msgstr ""
+
 #: src/postulo/jobs/models.py
 msgid "No longer shared"
 msgstr "Ei enää jaettu"
@@ -11241,6 +11279,10 @@ msgstr "Ei liitetty hakemukseen."
 msgid "Not offered at all, and kept that way while it stays off."
 msgstr "Ei tarjolla lainkaan, ja pysyy sellaisena niin kauan kuin tämä on pois päältä."
 
+#: src/postulo/plugins/forms.py
+msgid "Not offered here: this is chosen from what a person's connection finds on its service, and a server setting has no such service to look on."
+msgstr ""
+
 #: src/postulo/templates/jobs/company_map.html
 msgid "Not on the map: neither its postcode nor its town is in the offline tables."
 msgstr "Ei kartalla: sen postinumeroa tai kaupunkia ei löydy paikallisista taulukoista."
@@ -11342,6 +11384,10 @@ msgstr "ei vielä testattu"
 #, python-format
 msgid "not to be sent after %(date)s"
 msgstr "ei lähetetä %(date)s jälkeen"
+
+#: src/postulo/plugins/forms.py
+msgid "Not used"
+msgstr ""
 
 #: src/postulo/templates/documents/cv_detail.html
 #, python-format
@@ -11461,6 +11507,10 @@ msgstr "Mitään ei ole lisätty. Valitse haluamasi kortit; kunkin vieressä ker
 #: src/postulo/templates/cotton/identifier_findings.html
 msgid "Nothing has been changed, and none of this stops you saving. Only you know which of them is right."
 msgstr "Mitään ei ole muutettu, eikä mikään tästä estä tallentamasta. Vain sinä tiedät, mikä niistä on oikein."
+
+#: src/postulo/templates/connections/partials/option_table.html
+msgid "Nothing has been looked for yet. Look on the server to see what is there."
+msgstr ""
 
 #: src/postulo/templates/server/logs.html
 msgid "Nothing has been recorded yet"
@@ -11704,6 +11754,11 @@ msgstr "Mitään ei yhdistetty. Kukaan ei antanut suostumusta mihinkään."
 #: src/postulo/accounts/settings_views.py src/postulo/core/server_views.py
 msgid "Nothing was different."
 msgstr "Mikään ei ollut toisin."
+
+#: src/postulo/templates/connections/partials/option_table.html
+#, python-format
+msgid "Nothing was found on the server on %(when)s."
+msgstr ""
 
 #: src/postulo/core/server_views.py
 msgid "Nothing was installed."
@@ -14603,6 +14658,10 @@ msgstr "Tallenna yritys, niin voit lisätä toisen tunnisteen."
 msgid "Save this first, then come back and agree."
 msgstr "Tallenna tämä ensin ja palaa sitten antamaan suostumus."
 
+#: src/postulo/templates/connections/partials/option_table.html
+msgid "Save this first, then look on the server to choose from what is there."
+msgstr ""
+
 #: src/postulo/templates/server/maps.html
 msgid "Save this page to start them again, or switch them off."
 msgstr ""
@@ -15414,6 +15473,10 @@ msgstr "Kirjautuminen tunnuksella"
 #: src/postulo/templates/server/signin.html
 msgid "Signs in to an existing account by e-mail"
 msgstr "Kirjautuu olemassa olevaan tiliin sähköpostilla"
+
+#: src/postulo/templates/connections/form.html
+msgid "Signs in with the settings as last saved and lists what is there. Nothing you have typed here is saved until you save."
+msgstr ""
 
 #: src/postulo/jobs/models.py
 msgid "since"
@@ -19539,6 +19602,7 @@ msgstr ""
 msgid "US Letter, portrait"
 msgstr ""
 
+#: src/postulo/templates/connections/partials/option_table.html
 #: src/postulo/templates/server/plugin_access.html
 #, fuzzy
 msgid "Use"

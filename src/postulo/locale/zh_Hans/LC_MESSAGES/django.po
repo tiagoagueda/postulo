@@ -1117,6 +1117,16 @@ msgstr "%(person)s是%(name)s的最后一名成员，而该分组仍拥有记录
 msgid "%(plugin)s could not check these settings: %(error)s"
 msgstr "%(plugin)s无法检查这些设置：%(error)s"
 
+#: src/postulo/plugins/views.py
+#, python-format
+msgid "%(plugin)s could not look on the server: %(message)s"
+msgstr ""
+
+#: src/postulo/plugins/views.py
+#, python-format
+msgid "%(plugin)s has nothing to look for."
+msgstr ""
+
 #: src/postulo/core/mail_auth.py
 #, python-format
 msgid "%(provider)s does not let an application send on its own."
@@ -3785,6 +3795,11 @@ msgstr "以文件形式"
 #: src/postulo/templates/jobs/move_owner.html
 msgid "As an administrator you may also give it to anybody: type their username below instead."
 msgstr "作为管理员，你也可以把它转交给任何人：请改为在下面输入其用户名。"
+
+#: src/postulo/templates/connections/partials/option_table.html
+#, python-format
+msgid "As found on %(when)s."
+msgstr ""
 
 #: src/postulo/resume/forms.py
 msgid "As it was published."
@@ -7312,10 +7327,20 @@ msgstr "称呼"
 msgid "Format"
 msgstr "格式"
 
+#: src/postulo/plugins/views.py
+#, python-format
+msgid "Found %(count)d option on the server. Choose what to use, then save."
+msgid_plural "Found %(count)d options on the server. Choose what to use, then save."
+msgstr[0] ""
+
 #: src/postulo/jobs/slow.py
 #, python-format
 msgid "Found a logo at %(url)s."
 msgstr "在%(url)s找到了标志。"
+
+#: src/postulo/templates/connections/partials/option_table.html
+msgid "Found on the server"
+msgstr ""
 
 #: src/postulo/jobs/models.py
 msgid "Found on their website"
@@ -8696,6 +8721,10 @@ msgstr "无法导入"
 msgid "it did not finish importing within %(seconds)ss"
 msgstr "未能在%(seconds)s秒内完成导入"
 
+#: src/postulo/plugins/views.py
+msgid "It did not say what it found."
+msgstr ""
+
 #: src/postulo/templates/server/backups.html
 msgid "it failed"
 msgstr "失败了"
@@ -9737,6 +9766,10 @@ msgstr "经度"
 msgid "Longitude"
 msgstr "经度"
 
+#: src/postulo/templates/connections/form.html
+msgid "Look on the server"
+msgstr ""
+
 #: src/postulo/templates/resume/item_form.html
 msgid "Look up"
 msgstr ""
@@ -10742,6 +10775,10 @@ msgstr "还没有此类信函。"
 msgid "No letters yet. A cover letter is for one posting; a motivation letter tells your story; a speculative letter goes where nothing is advertised; a follow-up note comes after an interview."
 msgstr "还没有信函。求职信针对一条招聘信息；动机信讲述你的经历；自荐信投给没有发布招聘的地方；跟进信在面试后发送。"
 
+#: src/postulo/templates/connections/partials/option_table.html
+msgid "No longer on the server"
+msgstr ""
+
 #: src/postulo/jobs/models.py
 msgid "No longer shared"
 msgstr "不再共享"
@@ -11141,6 +11178,10 @@ msgstr "未匹配到任何申请。"
 msgid "Not offered at all, and kept that way while it stays off."
 msgstr "完全不提供，并在关闭期间保持如此。"
 
+#: src/postulo/plugins/forms.py
+msgid "Not offered here: this is chosen from what a person's connection finds on its service, and a server setting has no such service to look on."
+msgstr ""
+
 #: src/postulo/templates/jobs/company_map.html
 msgid "Not on the map: neither its postcode nor its town is in the offline tables."
 msgstr "不在地图上：离线表中既没有其邮政编码，也没有其城镇。"
@@ -11243,6 +11284,10 @@ msgstr "尚未测试"
 #, python-format
 msgid "not to be sent after %(date)s"
 msgstr "%(date)s之后不得发送"
+
+#: src/postulo/plugins/forms.py
+msgid "Not used"
+msgstr ""
 
 #: src/postulo/templates/documents/cv_detail.html
 #, python-format
@@ -11360,6 +11405,10 @@ msgstr "尚未添加任何内容。勾选你想要的卡片；每张卡片将变
 #: src/postulo/templates/cotton/identifier_findings.html
 msgid "Nothing has been changed, and none of this stops you saving. Only you know which of them is right."
 msgstr "没有更改任何内容，这些也都不会阻止你保存。只有你知道哪个是对的。"
+
+#: src/postulo/templates/connections/partials/option_table.html
+msgid "Nothing has been looked for yet. Look on the server to see what is there."
+msgstr ""
 
 #: src/postulo/templates/server/logs.html
 msgid "Nothing has been recorded yet"
@@ -11603,6 +11652,11 @@ msgstr "未建立任何连接。没有人同意任何事项。"
 #: src/postulo/accounts/settings_views.py src/postulo/core/server_views.py
 msgid "Nothing was different."
 msgstr "没有任何不同。"
+
+#: src/postulo/templates/connections/partials/option_table.html
+#, python-format
+msgid "Nothing was found on the server on %(when)s."
+msgstr ""
 
 #: src/postulo/core/server_views.py
 msgid "Nothing was installed."
@@ -14491,6 +14545,10 @@ msgstr "保存公司后即可添加另一个标识符。"
 msgid "Save this first, then come back and agree."
 msgstr "请先保存，然后回来同意。"
 
+#: src/postulo/templates/connections/partials/option_table.html
+msgid "Save this first, then look on the server to choose from what is there."
+msgstr ""
+
 #: src/postulo/templates/server/maps.html
 msgid "Save this page to start them again, or switch them off."
 msgstr ""
@@ -15305,6 +15363,10 @@ msgstr "使用令牌登录"
 #: src/postulo/templates/server/signin.html
 msgid "Signs in to an existing account by e-mail"
 msgstr "通过电子邮件登录已有账户"
+
+#: src/postulo/templates/connections/form.html
+msgid "Signs in with the settings as last saved and lists what is there. Nothing you have typed here is saved until you save."
+msgstr ""
 
 #: src/postulo/jobs/models.py
 #, fuzzy
@@ -19436,6 +19498,7 @@ msgstr ""
 msgid "US Letter, portrait"
 msgstr ""
 
+#: src/postulo/templates/connections/partials/option_table.html
 #: src/postulo/templates/server/plugin_access.html
 msgid "Use"
 msgstr "使用"
