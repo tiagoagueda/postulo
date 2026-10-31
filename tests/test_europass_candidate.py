@@ -101,10 +101,20 @@ class Attached:
     length: str = "direct"
     #: The stream's bytes as written, for a test that wants them wrong on purpose.
     body: bytes | None = None
-    subtype: str = "text#2Fxml"
+    #: The stream's ``/Subtype``, or None for none.
+    subtype: str | None = "text#2Fxml"
+    #: Whether the stream says ``/Type /EmbeddedFile``, which ISO 32000-1 makes optional.
+    typed: bool = True
+    #: Which of the file specification's ``/F`` and ``/UF`` carry ``name``.
+    named_by: tuple[str, ...] = ("F", "UF")
 
 
-def europass_pdf(*attached: Attached, object_streams: bool = False, encrypt: bool = False) -> bytes:
+def europass_pdf(
+    *attached: Attached,
+    object_streams: bool = False,
+    encrypt: bool = False,
+    listed: tuple[str, ...] = ("tree", "af"),
+) -> bytes:
     """A one-page PDF carrying ``attached`` the way the Europass editor's PDFs carry the CV.
 
     After ISO 32000-1 and after the only public description of the editor's output (#244):
@@ -114,7 +124,8 @@ def europass_pdf(*attached: Attached, object_streams: bool = False, encrypt: boo
     catalogue, the pages and the file specifications go into an object stream and the
     cross-reference table becomes a stream -- which is how pdf-lib, the library the
     editor's PDFs are reported to come from, saves by default. Not a copy of a real
-    download, which nobody here has.
+    download, which nobody here has. ``listed`` says where the catalogue names the file
+    specifications: its ``tree`` (``/EmbeddedFiles``), its ``af`` (``/AF``), or both.
     """
     plain: dict[int, bytes] = {}
     streams: dict[int, bytes] = {}
@@ -130,7 +141,9 @@ def europass_pdf(*attached: Attached, object_streams: bool = False, encrypt: boo
         else:
             body = one.data
         names = b" ".join(b"/" + name.encode() for name in one.filters)
-        entries = [b"/Type /EmbeddedFile", b"/Subtype /" + one.subtype.encode()]
+        entries = [b"/Type /EmbeddedFile"] if one.typed else []
+        if one.subtype is not None:
+            entries.append(b"/Subtype /" + one.subtype.encode())
         entries.append(b"/Params << /Size %d >>" % len(one.data))
         if one.filters:
             entries.append(b"/Filter " + (names if len(one.filters) == 1 else b"[" + names + b"]"))
@@ -143,18 +156,21 @@ def europass_pdf(*attached: Attached, object_streams: bool = False, encrypt: boo
         # One entry a line, as some writers do: it is what would let a name ending in
         # "stream" pass for the keyword, were the keyword not anchored on the ">>".
         streams[stream] = b"<<\n" + b"\n".join(entries) + b"\n>>\nstream\n" + body + b"\nendstream"
-        plain[spec] = (
-            b"<< /Type /Filespec /F (%s) /UF (%s) /EF << /F %d 0 R >> /Desc (Europass) "
-            b"/AFRelationship /Data >>" % (one.name.encode(), one.name.encode(), stream)
-        )
+        named = b"".join(b"/%s (%s) " % (key.encode(), one.name.encode()) for key in one.named_by)
+        plain[spec] = b"<< /Type /Filespec %s/EF << /F %d 0 R >> /Desc (Europass) " % (
+            named,
+            stream,
+        ) + (b"/AFRelationship /Data >>")
         specs.append((one.name.encode(), spec))
 
     tree = b" ".join(b"(%s) %d 0 R" % (name, ref) for name, ref in specs)
     af = b" ".join(b"%d 0 R" % ref for _name, ref in specs)
-    plain[1] = (
-        b"<< /Type /Catalog /Pages 2 0 R /Names << /EmbeddedFiles << /Names [%s] >> >> "
-        b"/AF [%s] >>" % (tree, af)
-    )
+    catalogue = [b"<< /Type /Catalog /Pages 2 0 R"]
+    if "tree" in listed:
+        catalogue.append(b"/Names << /EmbeddedFiles << /Names [%s] >> >>" % tree)
+    if "af" in listed:
+        catalogue.append(b"/AF [%s]" % af)
+    plain[1] = b" ".join([*catalogue, b">>"])
     plain[2] = b"<< /Type /Pages /Kids [3 0 R] /Count 1 >>"
     plain[3] = b"<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] >>"
     encrypt_ref = b""
@@ -869,6 +885,124 @@ def test_only_so_many_attachments_are_looked_at():
 
     with pytest.raises(europass.EuropassError, match="none of them is a Europass CV"):
         europass.read(europass_pdf(*notes, attachment()))
+
+
+# ------------------------------------------- the PDFs real downloads come in (#318)
+
+#: A real Candidate XML inside a PDF Google Docs wrote; its README says where it is from.
+GOOGLE_DOCS_PDF = DATA / "europass-vatanasov" / "test_with_attachment.pdf"
+
+
+def test_a_real_download_reads():
+    """The nearest thing to a real download the project may commit: a Candidate XML the
+    europass.europa.eu editor wrote, with invented details, attached to a PDF that Google
+    Docs wrote -- not the editor's own PDF, which nobody here has yet (#318). Its attachment
+    is a bare stream: no ``/Type``, ``/Subtype`` or ``/Filter``, named by ``/UF`` alone,
+    reached only from ``/EmbeddedFiles``. Until #318 the reader said it had nothing attached.
+    """
+    data = GOOGLE_DOCS_PDF.read_bytes()
+    assert b"/Type /EmbeddedFile" not in data and b"/AF" not in data, "the shape it stands for"
+
+    record = europass.read(data)
+
+    assert record.source == "pdf-candidate"
+    assert record.counts() == {
+        "experience": 4,
+        "education": 2,
+        "languages": 2,
+        "skills": 0,
+        "projects": 0,
+        "memberships": 0,
+        "participations": 0,
+        "references": 0,
+    }
+    assert record.skipped == []
+
+
+@pytest.mark.parametrize("object_streams", [False, True], ids=["plain", "object-streams"])
+@pytest.mark.parametrize(
+    "listed", [("tree", "af"), ("tree",), ("af",)], ids=["tree-and-af", "tree", "af"]
+)
+@pytest.mark.parametrize(
+    "name,named_by",
+    [
+        ("attachment.xml", ("F", "UF")),
+        ("attachment.xml", ("UF",)),
+        ("attachment.xml", ("F",)),
+        ("/srv/europass/tmp/4f1c/attachment.xml", ("F", "UF")),
+    ],
+    ids=["f-and-uf", "uf", "f", "a-server-path"],
+)
+def test_the_pdf_the_editor_gives_out_today_reads(object_streams, listed, name, named_by):
+    """The shape real downloads of October 2026 were seen to have: an ``/EmbeddedFile``
+    of ``/Subtype /text/xml``, Flate-compressed, named ``attachment.xml`` by ``/F`` and
+    ``/UF``, listed in the catalogue's ``/AF``. An older one named it by a path on the
+    server. None of those may be committed, so the PDF is built here."""
+    data = europass_pdf(
+        Attached(name, CANDIDATE.read_bytes(), named_by=named_by),
+        object_streams=object_streams,
+        listed=listed,
+    )
+
+    record = europass.read(data)
+
+    assert record.source == "pdf-candidate"
+    assert record.counts()["experience"] == 2
+
+
+@pytest.mark.parametrize("object_streams", [False, True], ids=["plain", "object-streams"])
+@pytest.mark.parametrize("listed", [("tree",), ("af",)], ids=["tree", "af"])
+@pytest.mark.parametrize(
+    "options",
+    [
+        {"typed": True, "subtype": None, "filters": ()},
+        {"typed": False, "subtype": None, "filters": ()},
+        {"typed": False, "subtype": None},
+        {"typed": False, "subtype": "text#2Fxml", "named_by": ("UF",)},
+    ],
+    ids=["type-only-stored", "bare-stored", "bare-flate", "subtype-without-type"],
+)
+def test_an_attachment_reads_with_or_without_type_and_subtype(object_streams, listed, options):
+    """``/Type`` and ``/Subtype`` are both optional (ISO 32000-1, 7.11.4). A genuine editor
+    PDF of May 2026 stored its attachment uncompressed with ``/Type`` and no ``/Subtype``;
+    the Google Docs one has neither. Without ``/Type`` the stream is found from the file
+    specification's ``/EF``, even when that is packed in an object stream."""
+    data = europass_pdf(attachment(**options), object_streams=object_streams, listed=listed)
+
+    assert europass.read(data).counts()["experience"] == 2
+
+
+def test_one_attachment_reached_two_ways_is_read_once():
+    """Named in ``/EmbeddedFiles``, listed in ``/AF`` and marked ``/Type /EmbeddedFile``:
+    three ways to one stream, and one attachment."""
+    assert len(pdf.attachments(europass_pdf(attachment()), limit=europass.MAX_BYTES)) == 1
+
+
+def test_an_ef_that_points_at_nothing_finds_nothing():
+    """A reference to an object the file does not have, or to one that is not a stream, is
+    not an attachment, and nothing is fetched to look for it."""
+    data = europass_pdf(attachment(typed=False)).replace(
+        b"/EF << /F 5 0 R >>", b"/EF << /F 99 0 R >>"
+    )
+    assert pdf.attachments(data, limit=europass.MAX_BYTES) == []
+
+    pointing_at_the_catalogue = data.replace(b"/F 99 0 R", b"/F 1 0 R")
+    with pytest.raises(europass.EuropassError, match="nothing attached"):
+        europass.read(pointing_at_the_catalogue)
+
+
+def test_object_streams_are_opened_only_so_far():
+    """Looking for a packed file specification unpacks the object streams under one cap for
+    all of them: forty that each unpack past it end the search at the first."""
+    bomb = zlib.compress(b"\0" * (europass.MAX_BYTES + 1024), 9)
+    container = (
+        b"%d 0 obj\n<< /Type /ObjStm /N 1 /First 4 /Filter /FlateDecode /Length %d >>\n"
+        b"stream\n%s\nendstream\nendobj\n"
+    )
+    data = b"%PDF-1.7\n" + b"".join(container % (n, len(bomb), bomb) for n in range(1, 40))
+
+    with pytest.raises(europass.EuropassError, match="nothing attached"):
+        europass.read(data)
 
 
 # ------------------------------------------------------------ the page and the command
