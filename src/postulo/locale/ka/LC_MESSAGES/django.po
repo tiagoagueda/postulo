@@ -1482,11 +1482,19 @@ msgstr[0] "%(total)s დოკუმენტი ამას ადასტუ
 msgstr[1] "%(total)s დოკუმენტი ამას ადასტურებს"
 
 #: src/postulo/templates/documents/cv_list.html
+#: src/postulo/templates/documents/themes/base_calendar.html
 #, python-format
 msgid "%(total)s entry"
 msgid_plural "%(total)s entries"
 msgstr[0] "%(total)s ჩანაწერი"
 msgstr[1] "%(total)s ჩანაწერი"
+
+#: src/postulo/templates/applications/calendar_print.html
+#, python-format
+msgid "%(total)s entry."
+msgid_plural "%(total)s entries."
+msgstr[0] ""
+msgstr[1] ""
 
 #: src/postulo/templates/resume/overview.html
 #, python-format
@@ -3213,6 +3221,10 @@ msgstr[1] "ყველა %(counter)s — %(label)s"
 msgid "All columns"
 msgstr "ყველა სვეტი"
 
+#: src/postulo/templates/documents/themes/base_calendar.html
+msgid "All day"
+msgstr ""
+
 #: src/postulo/templates/applications/application_detail.html
 msgid "All documents"
 msgstr "ყველა დოკუმენტი"
@@ -3875,6 +3887,7 @@ msgstr "ისე, როგორც CV-ში უნდა დაიბეჭ�
 msgid "As a CV should print it. It is linked to the company of that name among yours, and added to your companies if there is none."
 msgstr "ისე, როგორც CV-ში უნდა დაიბეჭდოს. ის დაუკავშირდება თქვენს კომპანიებს შორის ამავე სახელის კომპანიას, ხოლო თუ ასეთი არ არის, თქვენს კომპანიებს დაემატება."
 
+#: src/postulo/templates/applications/calendar_print.html
 #: src/postulo/templates/core/table_export.html
 msgid "As a document"
 msgstr ""
@@ -4138,6 +4151,10 @@ msgstr "ამ აღების გადახედვაზე დაბრ
 #: src/postulo/core/help.py
 msgid "Back to the calendar"
 msgstr "კალენდარზე დაბრუნება"
+
+#: src/postulo/templates/applications/calendar_print.html
+msgid "Back to the calendar, to change any of this"
+msgstr ""
 
 #: src/postulo/core/help.py
 msgid "Back to the dashboard"
@@ -4410,7 +4427,8 @@ msgid "C2 — proficient"
 msgstr "C2 — თავისუფალი"
 
 #: src/postulo/core/help.py src/postulo/core/navigation.py
-#: src/postulo/core/views.py src/postulo/plugins/categories.py
+#: src/postulo/core/views.py src/postulo/documents/themes.py
+#: src/postulo/plugins/categories.py
 #: src/postulo/templates/applications/application_detail.html
 #: src/postulo/templates/applications/calendar.html
 #: src/postulo/templates/applications/ical_import.html
@@ -4429,6 +4447,11 @@ msgstr "კალენდრის იდენტიფიკატორი"
 #: src/postulo/templates/applications/calendar.html
 msgid "Calendar views"
 msgstr "კალენდრის ხედები"
+
+#: src/postulo/applications/calendar_print.py
+#, python-format
+msgid "Calendar · %(period)s"
+msgstr ""
 
 #: src/postulo/applications/models.py src/postulo/jobs/models.py
 msgid "Call"
@@ -6273,6 +6296,7 @@ msgstr "ჩამოტვირთვა"
 msgid "Download it as text"
 msgstr "ტექსტად ჩამოტვირთვა"
 
+#: src/postulo/templates/applications/calendar_print.html
 #: src/postulo/templates/core/table_export.html
 msgid "Download PDF"
 msgstr ""
@@ -6839,7 +6863,9 @@ msgstr "ყველასი"
 msgid "Everybody's, as an administrator"
 msgstr "ყველასი, ადმინისტრატორის სტატუსით"
 
-#: src/postulo/jobs/tables.py src/postulo/templates/server/logs.html
+#: src/postulo/jobs/tables.py
+#: src/postulo/templates/applications/calendar_print.html
+#: src/postulo/templates/server/logs.html
 msgid "Everything"
 msgstr "ყველაფერი"
 
@@ -9311,6 +9337,7 @@ msgstr "ენა მითითებული არ არის"
 msgid "language of exported files"
 msgstr ""
 
+#: src/postulo/templates/applications/calendar_print.html
 #: src/postulo/templates/core/table_export.html
 msgid "Language of the document"
 msgstr ""
@@ -10057,6 +10084,10 @@ msgstr "სამაგისტრო ნაშრომი"
 #: src/postulo/accounts/models.py
 msgid "Match the operating system"
 msgstr "ოპერაციული სისტემის მიხედვით"
+
+#: src/postulo/templates/applications/calendar_print.html
+msgid "Matching"
+msgstr ""
 
 #: src/postulo/plugins/models.py
 msgid "may change its settings"
@@ -11555,6 +11586,7 @@ msgid "Nothing in the diary. When one is offered, schedule it from the applicati
 msgstr "კალენდარში არაფერია. როცა გასაუბრებას შემოგთავაზებენ, დანიშნეთ ის განაცხადის გვერდიდან."
 
 #: src/postulo/templates/applications/calendar.html
+#: src/postulo/templates/documents/themes/base_calendar.html
 msgid "Nothing in this period."
 msgstr "ამ პერიოდში არაფერია."
 
@@ -11641,6 +11673,7 @@ msgid "Nothing on the other service is touched. You can connect it again later."
 msgstr "მეორე სერვისზე არაფერი შეიცვლება. მოგვიანებით შეგიძლიათ ხელახლა დააკავშიროთ."
 
 #: src/postulo/templates/applications/calendar.html
+#: src/postulo/templates/documents/themes/base_calendar.html
 msgid "Nothing on this day."
 msgstr "ამ დღეს არაფერია."
 
@@ -12723,6 +12756,7 @@ msgid "paper"
 msgstr ""
 
 #: src/postulo/documents/forms.py
+#: src/postulo/templates/applications/calendar_print.html
 #: src/postulo/templates/applications/report.html
 #: src/postulo/templates/core/table_export.html
 #: src/postulo/templates/settings/export.html
@@ -12880,6 +12914,7 @@ msgstr "წელიწადში"
 
 #: src/postulo/applications/forms.py
 #: src/postulo/templates/applications/calendar.html
+#: src/postulo/templates/applications/calendar_print.html
 #: src/postulo/templates/applications/report.html
 msgid "Period"
 msgstr "პერიოდი"
@@ -13460,6 +13495,14 @@ msgstr "მთავარი"
 msgid "Primary"
 msgstr "მთავარი"
 
+#: src/postulo/templates/applications/calendar.html
+msgid "Print"
+msgstr ""
+
+#: src/postulo/templates/applications/calendar_print.html
+msgid "Print the calendar"
+msgstr ""
+
 #: src/postulo/documents/models.py
 msgid "print the EQF level of my qualifications"
 msgstr "ჩემი კვალიფიკაციების EQF დონის დაბეჭდვა"
@@ -13541,6 +13584,7 @@ msgstr "პრემიები, სტიპენდიები და წ�
 msgid "Proceedings"
 msgstr "კონფერენციის მასალები"
 
+#: src/postulo/templates/documents/themes/base_calendar.html
 #: src/postulo/templates/documents/themes/base_list.html
 msgid "Produced by Postulo from this person's own records."
 msgstr ""
@@ -13549,6 +13593,7 @@ msgstr ""
 msgid "Produced by Postulo from this person's own records. Postulo sets no target: how many applications a period should hold is a benefit regime's rule or the person's own."
 msgstr "შექმნილია Postulo-ს მიერ ამ ადამიანის საკუთარი ჩანაწერებიდან. Postulo არანაირ სამიზნე მაჩვენებელს არ ადგენს: რამდენი განაცხადი უნდა გაიგზავნოს პერიოდში, შემწეობის სისტემის ან თავად ამ ადამიანის წესია."
 
+#: src/postulo/templates/documents/themes/base_calendar.html
 #: src/postulo/templates/documents/themes/base_list.html
 #: src/postulo/templates/documents/themes/base_report.html
 #, python-format
@@ -15372,6 +15417,7 @@ msgid "Show this period"
 msgstr "ამ პერიოდის ჩვენება"
 
 #: src/postulo/jobs/tables.py
+#: src/postulo/templates/applications/calendar_print.html
 #: src/postulo/templates/jobs/partials/whose_form.html
 msgid "Showing"
 msgstr "ნაჩვენებია"
@@ -17955,6 +18001,10 @@ msgstr "ანაზღაურება"
 msgid "The people who will vouch for you, kept as contacts. A CV prints one only once they have agreed, and never their email address or number unless you say so."
 msgstr "ადამიანები, რომლებიც თქვენ შესახებ რეკომენდაციას მოგცემენ, კონტაქტებად შენახული. CV რეკომენდატორს მხოლოდ მისი თანხმობის შემდეგ ბეჭდავს, მის ელფოსტის მისამართს ან ნომერს კი — არასოდეს, თუ თავად არ მიუთითებთ."
 
+#: src/postulo/templates/applications/calendar_print.html
+msgid "The period on screen as a PDF, with every entry of every day and none of the buttons. Downloaded, and not kept in Postulo."
+msgstr ""
+
 #: src/postulo/applications/forms.py
 msgid "The person at the company this went through, where there was one."
 msgstr "კომპანიის ადამიანი, რომლის მეშვეობითაც ეს წავიდა, თუ ასეთი იყო."
@@ -18450,6 +18500,7 @@ msgstr "მათი მომხმარებლის სახელი ა
 msgid "theme"
 msgstr "თემა"
 
+#: src/postulo/templates/applications/calendar_print.html
 #: src/postulo/templates/applications/report.html
 #: src/postulo/templates/core/table_export.html
 msgid "Theme"
@@ -19778,6 +19829,10 @@ msgstr "ვიდეო"
 msgid "Video call"
 msgstr "ვიდეოზარი"
 
+#: src/postulo/templates/applications/calendar_print.html
+msgid "View"
+msgstr ""
+
 #: src/postulo/core/views_tables.py
 msgid "View forgotten."
 msgstr "ხედი დავიწყებულია."
@@ -20163,6 +20218,7 @@ msgstr "რა სფეროში იყო, თუ კვალიფიკ�
 msgid "What it was. Another capture of the same advert is added from the review screen, so it is not offered here."
 msgstr "რა იყო ეს. იმავე ვაკანსიის სხვა აღება გადახედვის ეკრანიდან ემატება, ამიტომ აქ არ არის შეთავაზებული."
 
+#: src/postulo/templates/applications/calendar_print.html
 #: src/postulo/templates/core/table_export.html
 msgid "What it will hold"
 msgstr ""

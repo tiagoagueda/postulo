@@ -2,7 +2,7 @@ from django.urls import path
 
 from postulo.core import modules
 
-from . import views, views_ical
+from . import views, views_calendar_print, views_ical
 
 app_name = "applications"
 
@@ -55,6 +55,17 @@ urlpatterns = [
     ),
     path("interviews/", views.InterviewListView.as_view(), name="interview_list"),
     path("calendar/", views.CalendarView.as_view(), name="calendar"),
+    # The view on screen printed as a themed PDF, downloaded and never filed (#342).
+    path(
+        "calendar/print/",
+        views_calendar_print.CalendarPrintView.as_view(),
+        name="calendar_print",
+    ),
+    path(
+        "calendar/print/file",
+        views_calendar_print.CalendarPrintFileView.as_view(),
+        name="calendar_print_file",
+    ),
     path(
         "calendar/download.ics",
         icalendar(views_ical.CalendarDownloadView.as_view()),

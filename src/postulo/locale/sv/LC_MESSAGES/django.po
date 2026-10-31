@@ -1482,11 +1482,19 @@ msgstr[0] "%(total)s dokument bevisar detta"
 msgstr[1] "%(total)s dokument bevisar detta"
 
 #: src/postulo/templates/documents/cv_list.html
+#: src/postulo/templates/documents/themes/base_calendar.html
 #, python-format
 msgid "%(total)s entry"
 msgid_plural "%(total)s entries"
 msgstr[0] "%(total)s post"
 msgstr[1] "%(total)s poster"
+
+#: src/postulo/templates/applications/calendar_print.html
+#, python-format
+msgid "%(total)s entry."
+msgid_plural "%(total)s entries."
+msgstr[0] ""
+msgstr[1] ""
 
 #: src/postulo/templates/resume/overview.html
 #, python-format
@@ -3222,6 +3230,10 @@ msgstr[1] "Alla %(counter)s i %(label)s"
 msgid "All columns"
 msgstr "Alla kolumner"
 
+#: src/postulo/templates/documents/themes/base_calendar.html
+msgid "All day"
+msgstr ""
+
 #: src/postulo/templates/applications/application_detail.html
 msgid "All documents"
 msgstr "Alla dokument"
@@ -3884,6 +3896,7 @@ msgstr "Så som ett CV ska skriva ut det. Ett namn som är en färdighet i ESCO-
 msgid "As a CV should print it. It is linked to the company of that name among yours, and added to your companies if there is none."
 msgstr "Så som ett CV ska skriva ut det. Det kopplas till företaget med det namnet bland dina, och läggs till bland dina företag om det inte finns något."
 
+#: src/postulo/templates/applications/calendar_print.html
 #: src/postulo/templates/core/table_export.html
 msgid "As a document"
 msgstr ""
@@ -4146,6 +4159,10 @@ msgstr "Tillbaka till granskningen av den här infångningen"
 #: src/postulo/core/help.py
 msgid "Back to the calendar"
 msgstr "Tillbaka till kalendern"
+
+#: src/postulo/templates/applications/calendar_print.html
+msgid "Back to the calendar, to change any of this"
+msgstr ""
 
 #: src/postulo/core/help.py
 msgid "Back to the dashboard"
@@ -4416,7 +4433,8 @@ msgid "C2 — proficient"
 msgstr "C2 – mycket avancerad"
 
 #: src/postulo/core/help.py src/postulo/core/navigation.py
-#: src/postulo/core/views.py src/postulo/plugins/categories.py
+#: src/postulo/core/views.py src/postulo/documents/themes.py
+#: src/postulo/plugins/categories.py
 #: src/postulo/templates/applications/application_detail.html
 #: src/postulo/templates/applications/calendar.html
 #: src/postulo/templates/applications/ical_import.html
@@ -4435,6 +4453,11 @@ msgstr "kalenderidentifierare"
 #: src/postulo/templates/applications/calendar.html
 msgid "Calendar views"
 msgstr "Kalendervyer"
+
+#: src/postulo/applications/calendar_print.py
+#, python-format
+msgid "Calendar · %(period)s"
+msgstr ""
 
 #: src/postulo/applications/models.py src/postulo/jobs/models.py
 msgid "Call"
@@ -6281,6 +6304,7 @@ msgstr "Ladda ned den"
 msgid "Download it as text"
 msgstr "Ladda ned den som text"
 
+#: src/postulo/templates/applications/calendar_print.html
 #: src/postulo/templates/core/table_export.html
 msgid "Download PDF"
 msgstr ""
@@ -6847,7 +6871,9 @@ msgstr "Allas"
 msgid "Everybody's, as an administrator"
 msgstr "Allas, som administratör"
 
-#: src/postulo/jobs/tables.py src/postulo/templates/server/logs.html
+#: src/postulo/jobs/tables.py
+#: src/postulo/templates/applications/calendar_print.html
+#: src/postulo/templates/server/logs.html
 msgid "Everything"
 msgstr "Allt"
 
@@ -9308,6 +9334,7 @@ msgstr "språk inte angivet"
 msgid "language of exported files"
 msgstr ""
 
+#: src/postulo/templates/applications/calendar_print.html
 #: src/postulo/templates/core/table_export.html
 msgid "Language of the document"
 msgstr ""
@@ -10047,6 +10074,10 @@ msgstr "Masteruppsats"
 #: src/postulo/accounts/models.py
 msgid "Match the operating system"
 msgstr "Följ operativsystemet"
+
+#: src/postulo/templates/applications/calendar_print.html
+msgid "Matching"
+msgstr ""
 
 #: src/postulo/plugins/models.py
 msgid "may change its settings"
@@ -11537,6 +11568,7 @@ msgid "Nothing in the diary. When one is offered, schedule it from the applicati
 msgstr "Inget i kalendern. När en intervju erbjuds, boka in den från ansökans sida."
 
 #: src/postulo/templates/applications/calendar.html
+#: src/postulo/templates/documents/themes/base_calendar.html
 msgid "Nothing in this period."
 msgstr "Ingenting under den här perioden."
 
@@ -11623,6 +11655,7 @@ msgid "Nothing on the other service is touched. You can connect it again later."
 msgstr "Inget på den andra tjänsten påverkas. Du kan ansluta den igen senare."
 
 #: src/postulo/templates/applications/calendar.html
+#: src/postulo/templates/documents/themes/base_calendar.html
 msgid "Nothing on this day."
 msgstr "Ingenting den här dagen."
 
@@ -12703,6 +12736,7 @@ msgid "paper"
 msgstr ""
 
 #: src/postulo/documents/forms.py
+#: src/postulo/templates/applications/calendar_print.html
 #: src/postulo/templates/applications/report.html
 #: src/postulo/templates/core/table_export.html
 #: src/postulo/templates/settings/export.html
@@ -12858,6 +12892,7 @@ msgstr "Per år"
 
 #: src/postulo/applications/forms.py
 #: src/postulo/templates/applications/calendar.html
+#: src/postulo/templates/applications/calendar_print.html
 #: src/postulo/templates/applications/report.html
 msgid "Period"
 msgstr "Period"
@@ -13441,6 +13476,14 @@ msgstr "primärt"
 msgid "Primary"
 msgstr "Primär"
 
+#: src/postulo/templates/applications/calendar.html
+msgid "Print"
+msgstr ""
+
+#: src/postulo/templates/applications/calendar_print.html
+msgid "Print the calendar"
+msgstr ""
+
 #: src/postulo/documents/models.py
 msgid "print the EQF level of my qualifications"
 msgstr "skriv ut EQF-nivån för mina kvalifikationer"
@@ -13522,6 +13565,7 @@ msgstr "Priser, stipendier och utmärkelser: erkännanden som någon har gett di
 msgid "Proceedings"
 msgstr "Konferenshandlingar"
 
+#: src/postulo/templates/documents/themes/base_calendar.html
 #: src/postulo/templates/documents/themes/base_list.html
 msgid "Produced by Postulo from this person's own records."
 msgstr ""
@@ -13530,6 +13574,7 @@ msgstr ""
 msgid "Produced by Postulo from this person's own records. Postulo sets no target: how many applications a period should hold is a benefit regime's rule or the person's own."
 msgstr "Framställd av Postulo ur den här personens egna uppgifter. Postulo sätter inget mål: hur många ansökningar en period bör innehålla är en regel från ett ersättningssystem eller personens egen."
 
+#: src/postulo/templates/documents/themes/base_calendar.html
 #: src/postulo/templates/documents/themes/base_list.html
 #: src/postulo/templates/documents/themes/base_report.html
 #, python-format
@@ -15351,6 +15396,7 @@ msgid "Show this period"
 msgstr "Visa den här perioden"
 
 #: src/postulo/jobs/tables.py
+#: src/postulo/templates/applications/calendar_print.html
 #: src/postulo/templates/jobs/partials/whose_form.html
 msgid "Showing"
 msgstr "Visar"
@@ -17932,6 +17978,10 @@ msgstr "Lönen"
 msgid "The people who will vouch for you, kept as contacts. A CV prints one only once they have agreed, and never their email address or number unless you say so."
 msgstr "Personerna som kan gå i god för dig, sparade som kontakter. Ett CV skriver bara ut en referens när personen har sagt ja, och aldrig deras e-postadress eller nummer om du inte anger det."
 
+#: src/postulo/templates/applications/calendar_print.html
+msgid "The period on screen as a PDF, with every entry of every day and none of the buttons. Downloaded, and not kept in Postulo."
+msgstr ""
+
 #: src/postulo/applications/forms.py
 msgid "The person at the company this went through, where there was one."
 msgstr "Personen på företaget som detta gick via, om det fanns någon."
@@ -18426,6 +18476,7 @@ msgstr "Deras användarnamn eller e-postadress på den här instansen, exakt."
 msgid "theme"
 msgstr "tema"
 
+#: src/postulo/templates/applications/calendar_print.html
 #: src/postulo/templates/applications/report.html
 #: src/postulo/templates/core/table_export.html
 msgid "Theme"
@@ -19750,6 +19801,10 @@ msgstr "Video"
 msgid "Video call"
 msgstr "Videosamtal"
 
+#: src/postulo/templates/applications/calendar_print.html
+msgid "View"
+msgstr ""
+
 #: src/postulo/core/views_tables.py
 msgid "View forgotten."
 msgstr "Vyn har glömts."
@@ -20134,6 +20189,7 @@ msgstr "Vilket ämne den gällde, där kvalifikationens namn inte säger det."
 msgid "What it was. Another capture of the same advert is added from the review screen, so it is not offered here."
 msgstr "Vad den var. En annan infångning av samma annons läggs till från granskningsskärmen, så den erbjuds inte här."
 
+#: src/postulo/templates/applications/calendar_print.html
 #: src/postulo/templates/core/table_export.html
 msgid "What it will hold"
 msgstr ""

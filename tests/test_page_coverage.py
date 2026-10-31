@@ -72,6 +72,10 @@ EXCUSED: dict[str, str] = {
         "link is on the calendar page, which the suite visits (#661)"
     ),
     "applications:reminder_calendar": "a feed of every reminder as iCalendar tasks (#661)",
+    "applications:calendar_print_file": (
+        "the calendar's view on screen as a PDF arriving as a download, filed nowhere; the "
+        "print page that offers it, `applications:calendar_print`, is walked (#342)"
+    ),
     "accounts:avatar": "an image, served through a permission check",
     "jobs:company_logo": "a company's logo image, served from this instance",
     "connections:logo": (

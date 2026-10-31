@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% translate "Print the calendar" %}{% endblock %}
+
+{% block content %}
+  {% comment %} What a print of the calendar will hold, before anybody presses anything
+     (#342): the view and the period on screen, the kinds shown and the search, and how many
+     entries -- every one of them, where the month on screen draws two a day. Shaped as a
+     list's export page is (#341). {% endcomment %}
+  <div class="max-w-3xl">
+    <c-page-title>
+      {% translate "Print the calendar" %}
+      <c-slot name="subtitle">
+        {% blocktranslate trimmed %}
+          The period on screen as a PDF, with every entry of every day and none of the
+          buttons. Downloaded, and not kept in Postulo.
+        {% endblocktranslate %}
+      </c-slot>
+    </c-page-title>
+
+    <section class="card mb-6" aria-labelledby="print-what" data-print-summary>
+      <c-section-title id="print-what">{% translate "What it will hold" %}</c-section-title>
+      <p class="text-sm" data-print-count>
+        {% blocktranslate trimmed count total=print.count %}
+          {{ total }} entry.
+        {% plural %}
+          {{ total }} entries.
+        {% endblocktranslate %}
+      </p>
+      <dl class="mt-3 grid gap-x-4 gap-y-1 text-sm sm:grid-cols-[max-content_1fr]">
+        <dt class="font-medium">{% translate "View" %}</dt>
+        <dd data-print-view>{{ print.view_label }}</dd>
+        <dt class="font-medium">{% translate "Period" %}</dt>
+        <dd data-print-period>{{ print.title }}</dd>
+        <dt class="font-medium">{% translate "Showing" %}</dt>
+        <dd data-print-kinds>{% if print.narrowed %}{{ print.kinds|join:", " }}{% else %}{% translate "Everything" %}{% endif %}</dd>
+        {% if print.search %}
+          <dt class="font-medium">{% translate "Matching" %}</dt>
+          <dd><bdi>“{{ print.search }}”</bdi></dd>
+        {% endif %}
+      </dl>
+      <p class="mt-3 text-sm">
+        <a href="{{ back }}" class="underline">{% translate "Back to the calendar, to change any of this" %}</a>
+      </p>
+    </section>
+
+    <section class="card" aria-labelledby="print-how">
+      <c-section-title id="print-how">{% translate "As a document" %}</c-section-title>
+      {% comment %} A post, so the theme is remembered for the next print as the report's and a
+         list's are (#340, #341); the calendar's question rides in the address. {% endcomment %}
+      <form method="post" action="{% url 'applications:calendar_print_file' %}{% if query %}?{{ query }}{% endif %}"
+            class="flex flex-wrap items-end gap-3">
+        {% csrf_token %}
+        <div class="field w-auto">
+          <label for="print-theme">{% translate "Theme" %}</label>
+          <select name="theme" id="print-theme">
+            {% for value, label in theme_choices %}
+              <option value="{{ value }}" {% if value == chosen_theme %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="field w-auto">
+          <label for="print-language">{% translate "Language of the document" %}</label>
+          <select name="language" id="print-language">
+            {% for code, name in language_choices %}
+              <option value="{{ code }}" lang="{{ code }}" {% if code == chosen_language %}selected{% endif %}>{{ name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="field w-auto">
+          <label for="print-paper">{% translate "Paper" %}</label>
+          <select name="paper" id="print-paper"{% if paper_restriction %} aria-describedby="print-paper-why"{% endif %}>
+            {% for value, label in paper_choices %}
+              <option value="{{ value }}" {% if value == chosen_paper %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+          </select>
+          {% if paper_restriction %}<p id="print-paper-why" class="text-xs text-ink-500 dark:text-ink-400">{{ paper_restriction }}</p>{% endif %}
+        </div>
+        <button type="submit" class="btn" data-print-pdf>{% translate "Download PDF" %}</button>
+      </form>
+    </section>
+  </div>
+{% endblock %}

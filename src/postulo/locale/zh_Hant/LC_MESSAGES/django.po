@@ -1395,10 +1395,17 @@ msgid_plural "%(total)s documents prove this"
 msgstr[0] "%(total)s 份文件可證明此項"
 
 #: src/postulo/templates/documents/cv_list.html
+#: src/postulo/templates/documents/themes/base_calendar.html
 #, python-format
 msgid "%(total)s entry"
 msgid_plural "%(total)s entries"
 msgstr[0] "%(total)s 筆項目"
+
+#: src/postulo/templates/applications/calendar_print.html
+#, python-format
+msgid "%(total)s entry."
+msgid_plural "%(total)s entries."
+msgstr[0] ""
 
 #: src/postulo/templates/resume/overview.html
 #, fuzzy, python-format
@@ -3112,6 +3119,10 @@ msgstr[0] "%(label)s 中的全部 %(counter)s 項"
 msgid "All columns"
 msgstr "所有欄"
 
+#: src/postulo/templates/documents/themes/base_calendar.html
+msgid "All day"
+msgstr ""
+
 #: src/postulo/templates/applications/application_detail.html
 msgid "All documents"
 msgstr "所有文件"
@@ -3779,6 +3790,7 @@ msgstr "照履歷應印出的方式填寫。名稱若是 ESCO 分類中的技能
 msgid "As a CV should print it. It is linked to the company of that name among yours, and added to your companies if there is none."
 msgstr "照履歷應印出的方式填寫。會連結到您的公司中同名的那一家，若沒有則會新增到您的公司中。"
 
+#: src/postulo/templates/applications/calendar_print.html
 #: src/postulo/templates/core/table_export.html
 msgid "As a document"
 msgstr ""
@@ -4043,6 +4055,10 @@ msgstr "返回審閱此擷取項目"
 #: src/postulo/core/help.py
 msgid "Back to the calendar"
 msgstr "返回行事曆"
+
+#: src/postulo/templates/applications/calendar_print.html
+msgid "Back to the calendar, to change any of this"
+msgstr ""
 
 #: src/postulo/core/help.py
 msgid "Back to the dashboard"
@@ -4316,7 +4332,8 @@ msgid "C2 — proficient"
 msgstr "C2——精通"
 
 #: src/postulo/core/help.py src/postulo/core/navigation.py
-#: src/postulo/core/views.py src/postulo/plugins/categories.py
+#: src/postulo/core/views.py src/postulo/documents/themes.py
+#: src/postulo/plugins/categories.py
 #: src/postulo/templates/applications/application_detail.html
 #: src/postulo/templates/applications/calendar.html
 #: src/postulo/templates/applications/ical_import.html
@@ -4335,6 +4352,11 @@ msgstr "行事曆識別碼"
 #: src/postulo/templates/applications/calendar.html
 msgid "Calendar views"
 msgstr "行事曆檢視"
+
+#: src/postulo/applications/calendar_print.py
+#, python-format
+msgid "Calendar · %(period)s"
+msgstr ""
 
 #: src/postulo/applications/models.py src/postulo/jobs/models.py
 msgid "Call"
@@ -6189,6 +6211,7 @@ msgstr "下載"
 msgid "Download it as text"
 msgstr "下載為文字檔"
 
+#: src/postulo/templates/applications/calendar_print.html
 #: src/postulo/templates/core/table_export.html
 msgid "Download PDF"
 msgstr ""
@@ -6759,7 +6782,9 @@ msgstr "所有人的"
 msgid "Everybody's, as an administrator"
 msgstr "所有人的（以管理員身分）"
 
-#: src/postulo/jobs/tables.py src/postulo/templates/server/logs.html
+#: src/postulo/jobs/tables.py
+#: src/postulo/templates/applications/calendar_print.html
+#: src/postulo/templates/server/logs.html
 msgid "Everything"
 msgstr "全部"
 
@@ -9229,6 +9254,7 @@ msgstr "未註明語言"
 msgid "language of exported files"
 msgstr ""
 
+#: src/postulo/templates/applications/calendar_print.html
 #: src/postulo/templates/core/table_export.html
 msgid "Language of the document"
 msgstr ""
@@ -9971,6 +9997,10 @@ msgstr "碩士論文"
 #: src/postulo/accounts/models.py
 msgid "Match the operating system"
 msgstr "與作業系統一致"
+
+#: src/postulo/templates/applications/calendar_print.html
+msgid "Matching"
+msgstr ""
 
 #: src/postulo/plugins/models.py
 msgid "may change its settings"
@@ -11467,6 +11497,7 @@ msgid "Nothing in the diary. When one is offered, schedule it from the applicati
 msgstr "行程中沒有任何項目。對方提出面試時，請從應徵頁面安排。"
 
 #: src/postulo/templates/applications/calendar.html
+#: src/postulo/templates/documents/themes/base_calendar.html
 msgid "Nothing in this period."
 msgstr "此期間沒有任何項目。"
 
@@ -11554,6 +11585,7 @@ msgid "Nothing on the other service is touched. You can connect it again later."
 msgstr "另一項服務上的任何內容都不會變動。您之後可以再次連線。"
 
 #: src/postulo/templates/applications/calendar.html
+#: src/postulo/templates/documents/themes/base_calendar.html
 msgid "Nothing on this day."
 msgstr "這一天沒有任何項目。"
 
@@ -12623,6 +12655,7 @@ msgid "paper"
 msgstr ""
 
 #: src/postulo/documents/forms.py
+#: src/postulo/templates/applications/calendar_print.html
 #: src/postulo/templates/applications/report.html
 #: src/postulo/templates/core/table_export.html
 #: src/postulo/templates/settings/export.html
@@ -12778,6 +12811,7 @@ msgstr "每年"
 
 #: src/postulo/applications/forms.py
 #: src/postulo/templates/applications/calendar.html
+#: src/postulo/templates/applications/calendar_print.html
 #: src/postulo/templates/applications/report.html
 msgid "Period"
 msgstr "期間"
@@ -13366,6 +13400,14 @@ msgstr "主要"
 msgid "Primary"
 msgstr "主要"
 
+#: src/postulo/templates/applications/calendar.html
+msgid "Print"
+msgstr ""
+
+#: src/postulo/templates/applications/calendar_print.html
+msgid "Print the calendar"
+msgstr ""
+
 #: src/postulo/documents/models.py
 msgid "print the EQF level of my qualifications"
 msgstr "印出我資格的 EQF 等級"
@@ -13446,6 +13488,7 @@ msgstr "獎項、獎學金與殊榮：他人給予您的肯定。"
 msgid "Proceedings"
 msgstr "會議論文集"
 
+#: src/postulo/templates/documents/themes/base_calendar.html
 #: src/postulo/templates/documents/themes/base_list.html
 msgid "Produced by Postulo from this person's own records."
 msgstr ""
@@ -13454,6 +13497,7 @@ msgstr ""
 msgid "Produced by Postulo from this person's own records. Postulo sets no target: how many applications a period should hold is a benefit regime's rule or the person's own."
 msgstr "由 Postulo 依此人自己的紀錄產生。Postulo 不設定任何目標：一個期間應包含多少筆應徵，是由福利制度的規定或此人自己決定。"
 
+#: src/postulo/templates/documents/themes/base_calendar.html
 #: src/postulo/templates/documents/themes/base_list.html
 #: src/postulo/templates/documents/themes/base_report.html
 #, python-format
@@ -15278,6 +15322,7 @@ msgid "Show this period"
 msgstr "顯示此期間"
 
 #: src/postulo/jobs/tables.py
+#: src/postulo/templates/applications/calendar_print.html
 #: src/postulo/templates/jobs/partials/whose_form.html
 #, fuzzy
 msgid "Showing"
@@ -17859,6 +17904,10 @@ msgstr "薪資"
 msgid "The people who will vouch for you, kept as contacts. A CV prints one only once they have agreed, and never their email address or number unless you say so."
 msgstr "願意為您擔保的人，以聯絡人形式保存。履歷只在對方同意後才會列印，除非您另行指定，否則絕不列印其電子郵件地址或電話號碼。"
 
+#: src/postulo/templates/applications/calendar_print.html
+msgid "The period on screen as a PDF, with every entry of every day and none of the buttons. Downloaded, and not kept in Postulo."
+msgstr ""
+
 #: src/postulo/applications/forms.py
 msgid "The person at the company this went through, where there was one."
 msgstr "此應徵所透過的公司聯絡人（如果有的話）。"
@@ -18355,6 +18404,7 @@ msgstr "對方在此站台上的使用者名稱或電子郵件地址，須完全
 msgid "theme"
 msgstr "主題"
 
+#: src/postulo/templates/applications/calendar_print.html
 #: src/postulo/templates/applications/report.html
 #: src/postulo/templates/core/table_export.html
 msgid "Theme"
@@ -19679,6 +19729,10 @@ msgstr "視訊"
 msgid "Video call"
 msgstr "視訊通話"
 
+#: src/postulo/templates/applications/calendar_print.html
+msgid "View"
+msgstr ""
+
 #: src/postulo/core/views_tables.py
 msgid "View forgotten."
 msgstr "已忘記此檢視。"
@@ -20066,6 +20120,7 @@ msgstr "就讀的領域（若資格名稱中未說明）。"
 msgid "What it was. Another capture of the same advert is added from the review screen, so it is not offered here."
 msgstr "項目類型。同一則廣告的另一個擷取項目要從審閱畫面加入，因此不會在此提供。"
 
+#: src/postulo/templates/applications/calendar_print.html
 #: src/postulo/templates/core/table_export.html
 msgid "What it will hold"
 msgstr ""

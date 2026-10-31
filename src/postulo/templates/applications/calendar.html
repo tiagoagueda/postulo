@@ -209,15 +209,23 @@
     {% comment %} Four shapes of the same days (#861), now beside the period they change: month
        first, and the agenda for a phone, where a month grid is thirty-one cells of nothing.
        Links, so each is an address; the open one is filled and carries `aria-current`. {% endcomment %}
-    <div class="button-group max-sm:w-full sm:justify-self-end" role="group" aria-label="{% translate 'Calendar views' %}" data-views>
-      {% comment %} Each with its icon and its word (#904): the word in `.btn-label`, so below
-         `sm` the group draws icons alone and above it the buttons follow the person's choice
-         of icons, labels or both (#852); `aria-label` keeps the name whichever shows. {% endcomment %}
-      {% for view, label, url, current, view_icon in page.switcher %}
-        <a href="{{ url }}" class="btn max-sm:min-w-0 max-sm:flex-1" data-variant="{% if current %}primary{% else %}outline{% endif %}"
-           aria-label="{{ label }}" data-view="{{ view }}"
-           {% if current %}aria-current="page"{% endif %}>{% icon view_icon %}<span class="btn-label">{{ label }}</span></a>
-      {% endfor %}
+    {% comment %} *Print* beside them (#342): the view on screen as a PDF set by a theme, every
+       entry of the period and none of the buttons. It opens a short page that says what the
+       print will hold and offers a theme, a language and a paper, as a list's export does
+       (#341); its address carries this page's question, so it prints the period on screen. {% endcomment %}
+    <div class="flex flex-wrap items-center gap-2 max-sm:w-full sm:justify-self-end">
+      <div class="button-group max-sm:w-full" role="group" aria-label="{% translate 'Calendar views' %}" data-views>
+        {% comment %} Each with its icon and its word (#904): the word in `.btn-label`, so below
+           `sm` the group draws icons alone and above it the buttons follow the person's choice
+           of icons, labels or both (#852); `aria-label` keeps the name whichever shows. {% endcomment %}
+        {% for view, label, url, current, view_icon in page.switcher %}
+          <a href="{{ url }}" class="btn max-sm:min-w-0 max-sm:flex-1" data-variant="{% if current %}primary{% else %}outline{% endif %}"
+             aria-label="{{ label }}" data-view="{{ view }}"
+             {% if current %}aria-current="page"{% endif %}>{% icon view_icon %}<span class="btn-label">{{ label }}</span></a>
+        {% endfor %}
+      </div>
+      <a href="{% url 'applications:calendar_print' %}{% if request.GET %}?{{ request.GET.urlencode }}{% endif %}"
+         class="btn" data-variant="outline" data-calendar-print>{% icon "printer" %}{% translate "Print" %}</a>
     </div>
   </nav>
 

@@ -1482,11 +1482,19 @@ msgstr[0] "%(total)s documento acredita isto"
 msgstr[1] "%(total)s documentos acreditan isto"
 
 #: src/postulo/templates/documents/cv_list.html
+#: src/postulo/templates/documents/themes/base_calendar.html
 #, python-format
 msgid "%(total)s entry"
 msgid_plural "%(total)s entries"
 msgstr[0] "%(total)s entrada"
 msgstr[1] "%(total)s entradas"
+
+#: src/postulo/templates/applications/calendar_print.html
+#, python-format
+msgid "%(total)s entry."
+msgid_plural "%(total)s entries."
+msgstr[0] ""
+msgstr[1] ""
 
 #: src/postulo/templates/resume/overview.html
 #, python-format
@@ -3206,6 +3214,10 @@ msgstr[1] "Todos os resultados (%(counter)s) en %(label)s"
 msgid "All columns"
 msgstr "Todas as columnas"
 
+#: src/postulo/templates/documents/themes/base_calendar.html
+msgid "All day"
+msgstr ""
+
 #: src/postulo/templates/applications/application_detail.html
 msgid "All documents"
 msgstr "Todos os documentos"
@@ -3865,6 +3877,7 @@ msgstr "Tal como debería mostralo un CV. Un nome que é unha competencia na cla
 msgid "As a CV should print it. It is linked to the company of that name among yours, and added to your companies if there is none."
 msgstr "Tal como debería mostrala un CV. Lígase á empresa con ese nome entre as túas, e engádese ás túas empresas se non hai ningunha."
 
+#: src/postulo/templates/applications/calendar_print.html
 #: src/postulo/templates/core/table_export.html
 msgid "As a document"
 msgstr ""
@@ -4127,6 +4140,10 @@ msgstr "Volver á revisión desta captura"
 #: src/postulo/core/help.py
 msgid "Back to the calendar"
 msgstr "Volver ao calendario"
+
+#: src/postulo/templates/applications/calendar_print.html
+msgid "Back to the calendar, to change any of this"
+msgstr ""
 
 #: src/postulo/core/help.py
 msgid "Back to the dashboard"
@@ -4396,7 +4413,8 @@ msgid "C2 — proficient"
 msgstr "C2 — mestría"
 
 #: src/postulo/core/help.py src/postulo/core/navigation.py
-#: src/postulo/core/views.py src/postulo/plugins/categories.py
+#: src/postulo/core/views.py src/postulo/documents/themes.py
+#: src/postulo/plugins/categories.py
 #: src/postulo/templates/applications/application_detail.html
 #: src/postulo/templates/applications/calendar.html
 #: src/postulo/templates/applications/ical_import.html
@@ -4415,6 +4433,11 @@ msgstr "identificador de calendario"
 #: src/postulo/templates/applications/calendar.html
 msgid "Calendar views"
 msgstr "Vistas do calendario"
+
+#: src/postulo/applications/calendar_print.py
+#, python-format
+msgid "Calendar · %(period)s"
+msgstr ""
 
 #: src/postulo/applications/models.py src/postulo/jobs/models.py
 msgid "Call"
@@ -6249,6 +6272,7 @@ msgstr "Descargalo"
 msgid "Download it as text"
 msgstr "Descargala como texto"
 
+#: src/postulo/templates/applications/calendar_print.html
 #: src/postulo/templates/core/table_export.html
 msgid "Download PDF"
 msgstr ""
@@ -6812,7 +6836,9 @@ msgstr "De todos"
 msgid "Everybody's, as an administrator"
 msgstr "De todos, como administrador"
 
-#: src/postulo/jobs/tables.py src/postulo/templates/server/logs.html
+#: src/postulo/jobs/tables.py
+#: src/postulo/templates/applications/calendar_print.html
+#: src/postulo/templates/server/logs.html
 msgid "Everything"
 msgstr "Todo"
 
@@ -9255,6 +9281,7 @@ msgstr "idioma non indicado"
 msgid "language of exported files"
 msgstr ""
 
+#: src/postulo/templates/applications/calendar_print.html
 #: src/postulo/templates/core/table_export.html
 msgid "Language of the document"
 msgstr ""
@@ -9989,6 +10016,10 @@ msgstr "Traballo de fin de máster"
 #: src/postulo/accounts/models.py
 msgid "Match the operating system"
 msgstr "Seguir o sistema operativo"
+
+#: src/postulo/templates/applications/calendar_print.html
+msgid "Matching"
+msgstr ""
 
 #: src/postulo/plugins/models.py
 msgid "may change its settings"
@@ -11474,6 +11505,7 @@ msgid "Nothing in the diary. When one is offered, schedule it from the applicati
 msgstr "Non hai nada na axenda. Cando che ofrezan unha, prográmaa desde a páxina da candidatura."
 
 #: src/postulo/templates/applications/calendar.html
+#: src/postulo/templates/documents/themes/base_calendar.html
 msgid "Nothing in this period."
 msgstr "Nada neste período."
 
@@ -11559,6 +11591,7 @@ msgid "Nothing on the other service is touched. You can connect it again later."
 msgstr "Non se toca nada do outro servizo. Podes volver conectarte máis tarde."
 
 #: src/postulo/templates/applications/calendar.html
+#: src/postulo/templates/documents/themes/base_calendar.html
 msgid "Nothing on this day."
 msgstr "Nada neste día."
 
@@ -12635,6 +12668,7 @@ msgid "paper"
 msgstr ""
 
 #: src/postulo/documents/forms.py
+#: src/postulo/templates/applications/calendar_print.html
 #: src/postulo/templates/applications/report.html
 #: src/postulo/templates/core/table_export.html
 #: src/postulo/templates/settings/export.html
@@ -12790,6 +12824,7 @@ msgstr "Ao ano"
 
 #: src/postulo/applications/forms.py
 #: src/postulo/templates/applications/calendar.html
+#: src/postulo/templates/applications/calendar_print.html
 #: src/postulo/templates/applications/report.html
 msgid "Period"
 msgstr "Período"
@@ -13368,6 +13403,14 @@ msgstr "principal"
 msgid "Primary"
 msgstr "Principal"
 
+#: src/postulo/templates/applications/calendar.html
+msgid "Print"
+msgstr ""
+
+#: src/postulo/templates/applications/calendar_print.html
+msgid "Print the calendar"
+msgstr ""
+
 #: src/postulo/documents/models.py
 msgid "print the EQF level of my qualifications"
 msgstr "mostrar o nivel MEC das miñas cualificacións"
@@ -13448,6 +13491,7 @@ msgstr "Premios, bolsas e distincións: recoñecemento que alguén che concedeu.
 msgid "Proceedings"
 msgstr "Actas"
 
+#: src/postulo/templates/documents/themes/base_calendar.html
 #: src/postulo/templates/documents/themes/base_list.html
 msgid "Produced by Postulo from this person's own records."
 msgstr ""
@@ -13456,6 +13500,7 @@ msgstr ""
 msgid "Produced by Postulo from this person's own records. Postulo sets no target: how many applications a period should hold is a benefit regime's rule or the person's own."
 msgstr "Elaborado polo Postulo a partir dos rexistros desta persoa. O Postulo non fixa ningún obxectivo: cantas candidaturas debe conter un período é unha regra do réxime de prestacións ou da propia persoa."
 
+#: src/postulo/templates/documents/themes/base_calendar.html
 #: src/postulo/templates/documents/themes/base_list.html
 #: src/postulo/templates/documents/themes/base_report.html
 #, python-format
@@ -15265,6 +15310,7 @@ msgid "Show this period"
 msgstr "Mostrar este período"
 
 #: src/postulo/jobs/tables.py
+#: src/postulo/templates/applications/calendar_print.html
 #: src/postulo/templates/jobs/partials/whose_form.html
 msgid "Showing"
 msgstr "Amosando"
@@ -17827,6 +17873,10 @@ msgstr "O salario"
 msgid "The people who will vouch for you, kept as contacts. A CV prints one only once they have agreed, and never their email address or number unless you say so."
 msgstr "As persoas que responden por ti, conservadas como contactos. Un CV só mostra unha cando xa aceptou, e nunca o seu enderezo de correo electrónico nin o seu número salvo que ti o indiques."
 
+#: src/postulo/templates/applications/calendar_print.html
+msgid "The period on screen as a PDF, with every entry of every day and none of the buttons. Downloaded, and not kept in Postulo."
+msgstr ""
+
 #: src/postulo/applications/forms.py
 msgid "The person at the company this went through, where there was one."
 msgstr "A persoa da empresa a través da que foi, se a houbo."
@@ -18321,6 +18371,7 @@ msgstr "O seu nome de usuario ou enderezo de correo electrónico nesta instancia
 msgid "theme"
 msgstr "tema"
 
+#: src/postulo/templates/applications/calendar_print.html
 #: src/postulo/templates/applications/report.html
 #: src/postulo/templates/core/table_export.html
 msgid "Theme"
@@ -19641,6 +19692,10 @@ msgstr "Vídeo"
 msgid "Video call"
 msgstr "Videochamada"
 
+#: src/postulo/templates/applications/calendar_print.html
+msgid "View"
+msgstr ""
+
 #: src/postulo/core/views_tables.py
 msgid "View forgotten."
 msgstr "Vista esquecida."
@@ -20023,6 +20078,7 @@ msgstr "En que era, cando o nome da cualificación non o di."
 msgid "What it was. Another capture of the same advert is added from the review screen, so it is not offered here."
 msgstr "Que foi. Outra captura da mesma oferta engádese desde a pantalla de revisión, así que non se ofrece aquí."
 
+#: src/postulo/templates/applications/calendar_print.html
 #: src/postulo/templates/core/table_export.html
 msgid "What it will hold"
 msgstr ""

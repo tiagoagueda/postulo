@@ -186,6 +186,25 @@ def a_wide_list(user, theme, chosen) -> str:
     return html
 
 
+def a_full_month(user, theme, chosen) -> str:
+    """A month with a long reminder and five on one day, in the month's grid (#342)."""
+    import datetime as dt
+
+    from django.test import RequestFactory
+
+    from postulo.applications import calendar_print
+    from postulo.applications.models import Reminder
+
+    due = dt.datetime(2026, 9, 15, 9, tzinfo=dt.UTC)
+    Reminder.objects.create(owner=user, summary=f"Read {LONG_ADDRESS}", due_at=due)
+    for number in range(5):
+        Reminder.objects.create(owner=user, summary=f"Chase {number}", due_at=due)
+    request = RequestFactory().get("/", {"month": "2026-09"})
+    request.user = user
+    html, _theme, _language = calendar_print.draw(request, theme=theme, paper=chosen)
+    return html
+
+
 @pytest.mark.parametrize("theme,kind,chosen", ON_PAPER)
 def test_every_kind_draws_on_every_paper_at_its_size(user, experience, theme, kind, chosen):
     """The page is the paper chosen, turned the way chosen, and nothing runs off it (#344)."""
@@ -204,6 +223,8 @@ def test_every_kind_draws_on_every_paper_at_its_size(user, experience, theme, ki
         )
     elif kind == themes.Kind.LIST:
         html = a_wide_list(user, theme, chosen)
+    elif kind == themes.Kind.CALENDAR:
+        html = a_full_month(user, theme, chosen)
     else:
         cv = selection(user, experience, kind=kind, theme=theme)
         html = rendering.render_cv_html(cv, paper=chosen)

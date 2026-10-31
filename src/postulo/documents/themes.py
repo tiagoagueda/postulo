@@ -82,6 +82,11 @@ class Kind(models.TextChoices):
     #: came from. Like a report it has no row to keep a theme on, so the choice is
     #: remembered on the profile, and its template is handed plain values.
     LIST = "list", _("List")
+    #: The Calendar, printed (#342): a month, a week, a day or an agenda, of the view on
+    #: screen. One kind for the four, because what a theme is handed is the same shape for
+    #: each -- the period, its days and each day's entries -- and the view says which to draw.
+    #: Remembered on the profile and handed plain values, as a report and a list are.
+    CALENDAR = "calendar", _("Calendar")
 
 
 #: The theme a document falls back to. It sets every kind, which is what makes it a safe
@@ -144,6 +149,7 @@ def _shipped(name: str, label) -> Theme:
             Kind.LETTER: f"documents/themes/{name}/letter.html",
             Kind.REPORT: f"documents/themes/{name}/report.html",
             Kind.LIST: f"documents/themes/{name}/list.html",
+            Kind.CALENDAR: f"documents/themes/{name}/calendar.html",
         },
         papers=("any",),
     )

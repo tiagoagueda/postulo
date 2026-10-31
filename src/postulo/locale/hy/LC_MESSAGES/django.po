@@ -1482,11 +1482,19 @@ msgstr[0] "%(total)s փաստաթուղթ է հաստատում սա"
 msgstr[1] "%(total)s փաստաթուղթ է հաստատում սա"
 
 #: src/postulo/templates/documents/cv_list.html
+#: src/postulo/templates/documents/themes/base_calendar.html
 #, python-format
 msgid "%(total)s entry"
 msgid_plural "%(total)s entries"
 msgstr[0] "%(total)s գրառում"
 msgstr[1] "%(total)s գրառում"
+
+#: src/postulo/templates/applications/calendar_print.html
+#, python-format
+msgid "%(total)s entry."
+msgid_plural "%(total)s entries."
+msgstr[0] ""
+msgstr[1] ""
 
 #: src/postulo/templates/resume/overview.html
 #, python-format
@@ -3212,6 +3220,10 @@ msgstr[1] "Բոլորը (%(counter)s)՝ %(label)s"
 msgid "All columns"
 msgstr "Բոլոր սյուները"
 
+#: src/postulo/templates/documents/themes/base_calendar.html
+msgid "All day"
+msgstr ""
+
 #: src/postulo/templates/applications/application_detail.html
 msgid "All documents"
 msgstr "Բոլոր փաստաթղթերը"
@@ -3874,6 +3886,7 @@ msgstr "Ինչպես պետք է տպվի CV-ում։ Անվանումը, որը
 msgid "As a CV should print it. It is linked to the company of that name among yours, and added to your companies if there is none."
 msgstr "Ինչպես պետք է տպվի CV-ում։ Այն կապվում է ձեր ընկերություններից նույն անվանումն ունեցողի հետ և ավելացվում է ձեր ընկերություններին, եթե այդպիսին չկա։"
 
+#: src/postulo/templates/applications/calendar_print.html
 #: src/postulo/templates/core/table_export.html
 msgid "As a document"
 msgstr ""
@@ -4138,6 +4151,10 @@ msgstr "Վերադառնալ այս որսի վերանայմանը"
 #: src/postulo/core/help.py
 msgid "Back to the calendar"
 msgstr "Վերադառնալ օրացույց"
+
+#: src/postulo/templates/applications/calendar_print.html
+msgid "Back to the calendar, to change any of this"
+msgstr ""
 
 #: src/postulo/core/help.py
 msgid "Back to the dashboard"
@@ -4410,7 +4427,8 @@ msgid "C2 — proficient"
 msgstr "C2 — կատարյալ"
 
 #: src/postulo/core/help.py src/postulo/core/navigation.py
-#: src/postulo/core/views.py src/postulo/plugins/categories.py
+#: src/postulo/core/views.py src/postulo/documents/themes.py
+#: src/postulo/plugins/categories.py
 #: src/postulo/templates/applications/application_detail.html
 #: src/postulo/templates/applications/calendar.html
 #: src/postulo/templates/applications/ical_import.html
@@ -4429,6 +4447,11 @@ msgstr "օրացույցի նույնացուցիչ"
 #: src/postulo/templates/applications/calendar.html
 msgid "Calendar views"
 msgstr "Օրացույցի տեսքեր"
+
+#: src/postulo/applications/calendar_print.py
+#, python-format
+msgid "Calendar · %(period)s"
+msgstr ""
 
 #: src/postulo/applications/models.py src/postulo/jobs/models.py
 msgid "Call"
@@ -6276,6 +6299,7 @@ msgstr "Ներբեռնել այն"
 msgid "Download it as text"
 msgstr "Ներբեռնել որպես տեքստ"
 
+#: src/postulo/templates/applications/calendar_print.html
 #: src/postulo/templates/core/table_export.html
 msgid "Download PDF"
 msgstr ""
@@ -6839,7 +6863,9 @@ msgstr "Բոլորինը"
 msgid "Everybody's, as an administrator"
 msgstr "Բոլորինը՝ որպես ադմինիստրատոր"
 
-#: src/postulo/jobs/tables.py src/postulo/templates/server/logs.html
+#: src/postulo/jobs/tables.py
+#: src/postulo/templates/applications/calendar_print.html
+#: src/postulo/templates/server/logs.html
 msgid "Everything"
 msgstr "Ամեն ինչ"
 
@@ -9290,6 +9316,7 @@ msgstr "լեզուն նշված չէ"
 msgid "language of exported files"
 msgstr ""
 
+#: src/postulo/templates/applications/calendar_print.html
 #: src/postulo/templates/core/table_export.html
 msgid "Language of the document"
 msgstr ""
@@ -10030,6 +10057,10 @@ msgstr "Մագիստրոսական թեզ"
 #: src/postulo/accounts/models.py
 msgid "Match the operating system"
 msgstr "Հետևել օպերացիոն համակարգին"
+
+#: src/postulo/templates/applications/calendar_print.html
+msgid "Matching"
+msgstr ""
 
 #: src/postulo/plugins/models.py
 msgid "may change its settings"
@@ -11521,6 +11552,7 @@ msgid "Nothing in the diary. When one is offered, schedule it from the applicati
 msgstr "Օրացույցում ոչինչ չկա։ Երբ ձեզ հարցազրույց առաջարկեն, նշանակեք այն դիմումի էջից։"
 
 #: src/postulo/templates/applications/calendar.html
+#: src/postulo/templates/documents/themes/base_calendar.html
 msgid "Nothing in this period."
 msgstr "Այս ժամանակահատվածում ոչինչ չկա։"
 
@@ -11606,6 +11638,7 @@ msgid "Nothing on the other service is touched. You can connect it again later."
 msgstr "Մյուս ծառայությունում ոչինչ չի փոխվում։ Կարող եք ավելի ուշ նորից միացնել այն։"
 
 #: src/postulo/templates/applications/calendar.html
+#: src/postulo/templates/documents/themes/base_calendar.html
 msgid "Nothing on this day."
 msgstr "Այս օրը ոչինչ չկա։"
 
@@ -12683,6 +12716,7 @@ msgid "paper"
 msgstr ""
 
 #: src/postulo/documents/forms.py
+#: src/postulo/templates/applications/calendar_print.html
 #: src/postulo/templates/applications/report.html
 #: src/postulo/templates/core/table_export.html
 #: src/postulo/templates/settings/export.html
@@ -12838,6 +12872,7 @@ msgstr "Տարեկան"
 
 #: src/postulo/applications/forms.py
 #: src/postulo/templates/applications/calendar.html
+#: src/postulo/templates/applications/calendar_print.html
 #: src/postulo/templates/applications/report.html
 msgid "Period"
 msgstr "Ժամանակահատված"
@@ -13419,6 +13454,14 @@ msgstr "հիմնական"
 msgid "Primary"
 msgstr "Հիմնական"
 
+#: src/postulo/templates/applications/calendar.html
+msgid "Print"
+msgstr ""
+
+#: src/postulo/templates/applications/calendar_print.html
+msgid "Print the calendar"
+msgstr ""
+
 #: src/postulo/documents/models.py
 msgid "print the EQF level of my qualifications"
 msgstr "տպել իմ որակավորումների EQF մակարդակը"
@@ -13499,6 +13542,7 @@ msgstr "Մրցանակներ, կրթաթոշակներ և պարգևներ՝ ճ�
 msgid "Proceedings"
 msgstr "Գիտաժողովի նյութեր"
 
+#: src/postulo/templates/documents/themes/base_calendar.html
 #: src/postulo/templates/documents/themes/base_list.html
 msgid "Produced by Postulo from this person's own records."
 msgstr ""
@@ -13507,6 +13551,7 @@ msgstr ""
 msgid "Produced by Postulo from this person's own records. Postulo sets no target: how many applications a period should hold is a benefit regime's rule or the person's own."
 msgstr "Ստեղծվել է Postulo-ի կողմից՝ այս անձի սեփական գրառումներից։ Postulo-ն ոչ մի նպատակ չի սահմանում․ թե քանի դիմում պետք է լինի մեկ ժամանակահատվածում, որոշում է նպաստների համակարգը կամ հենց այդ անձը։"
 
+#: src/postulo/templates/documents/themes/base_calendar.html
 #: src/postulo/templates/documents/themes/base_list.html
 #: src/postulo/templates/documents/themes/base_report.html
 #, python-format
@@ -15323,6 +15368,7 @@ msgid "Show this period"
 msgstr "Ցուցադրել այս ժամանակահատվածը"
 
 #: src/postulo/jobs/tables.py
+#: src/postulo/templates/applications/calendar_print.html
 #: src/postulo/templates/jobs/partials/whose_form.html
 msgid "Showing"
 msgstr "Ցուցադրվում է"
@@ -17899,6 +17945,10 @@ msgstr "Վարձատրությունը"
 msgid "The people who will vouch for you, kept as contacts. A CV prints one only once they have agreed, and never their email address or number unless you say so."
 msgstr "Այն մարդիկ, ովքեր հանձնարարական կտան ձեր մասին, պահված որպես կոնտակտներ։ CV-ն որևէ մեկին տպում է միայն նրա համաձայնությունից հետո, և երբեք՝ նրա էլ. փոստի հասցեն կամ հեռախոսահամարը, եթե դուք դա չեք նշել։"
 
+#: src/postulo/templates/applications/calendar_print.html
+msgid "The period on screen as a PDF, with every entry of every day and none of the buttons. Downloaded, and not kept in Postulo."
+msgstr ""
+
 #: src/postulo/applications/forms.py
 msgid "The person at the company this went through, where there was one."
 msgstr "Ընկերության այն մարդը, ում միջոցով սա անցավ, եթե այդպիսին կար։"
@@ -18393,6 +18443,7 @@ msgstr "Նրա օգտանունը կամ էլ. փոստի հասցեն այս տ
 msgid "theme"
 msgstr "թեմա"
 
+#: src/postulo/templates/applications/calendar_print.html
 #: src/postulo/templates/applications/report.html
 #: src/postulo/templates/core/table_export.html
 msgid "Theme"
@@ -19722,6 +19773,10 @@ msgstr "Տեսանյութ"
 msgid "Video call"
 msgstr "Տեսազանգ"
 
+#: src/postulo/templates/applications/calendar_print.html
+msgid "View"
+msgstr ""
+
 #: src/postulo/core/views_tables.py
 msgid "View forgotten."
 msgstr "Տեսքը մոռացվեց։"
@@ -20107,6 +20162,7 @@ msgstr "Թե ինչ բնագավառում էր, եթե որակավորման �
 msgid "What it was. Another capture of the same advert is added from the review screen, so it is not offered here."
 msgstr "Թե ինչ էր այն։ Նույն հայտարարության մեկ այլ որս ավելացվում է վերանայման էկրանից, ուստի այստեղ չի առաջարկվում։"
 
+#: src/postulo/templates/applications/calendar_print.html
 #: src/postulo/templates/core/table_export.html
 msgid "What it will hold"
 msgstr ""

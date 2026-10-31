@@ -1569,12 +1569,21 @@ msgstr[1] "%(total)s dokumenta to dokazuju"
 msgstr[2] "%(total)s dokumenata to dokazuje"
 
 #: src/postulo/templates/documents/cv_list.html
+#: src/postulo/templates/documents/themes/base_calendar.html
 #, python-format
 msgid "%(total)s entry"
 msgid_plural "%(total)s entries"
 msgstr[0] "%(total)s unos"
 msgstr[1] "%(total)s unosa"
 msgstr[2] "%(total)s unosa"
+
+#: src/postulo/templates/applications/calendar_print.html
+#, python-format
+msgid "%(total)s entry."
+msgid_plural "%(total)s entries."
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
 
 #: src/postulo/templates/resume/overview.html
 #, python-format
@@ -3323,6 +3332,10 @@ msgstr[2] "Svih %(counter)s u %(label)s"
 msgid "All columns"
 msgstr "Svi stupci"
 
+#: src/postulo/templates/documents/themes/base_calendar.html
+msgid "All day"
+msgstr ""
+
 #: src/postulo/templates/applications/application_detail.html
 msgid "All documents"
 msgstr "Svi dokumenti"
@@ -3988,6 +4001,7 @@ msgstr "Onako kako ga životopis treba ispisati. Naziv koji je vještina u klasi
 msgid "As a CV should print it. It is linked to the company of that name among yours, and added to your companies if there is none."
 msgstr "Onako kako bi ga životopis trebao ispisati. Povezuje se s istoimenom tvrtkom među vašima, a dodaje se u vaše tvrtke ako takve nema."
 
+#: src/postulo/templates/applications/calendar_print.html
 #: src/postulo/templates/core/table_export.html
 msgid "As a document"
 msgstr ""
@@ -4253,6 +4267,10 @@ msgstr "Natrag na pregled ovog hvatanja"
 #: src/postulo/core/help.py
 msgid "Back to the calendar"
 msgstr "Natrag na kalendar"
+
+#: src/postulo/templates/applications/calendar_print.html
+msgid "Back to the calendar, to change any of this"
+msgstr ""
 
 #: src/postulo/core/help.py
 msgid "Back to the dashboard"
@@ -4525,7 +4543,8 @@ msgid "C2 — proficient"
 msgstr "C2 — vrsno"
 
 #: src/postulo/core/help.py src/postulo/core/navigation.py
-#: src/postulo/core/views.py src/postulo/plugins/categories.py
+#: src/postulo/core/views.py src/postulo/documents/themes.py
+#: src/postulo/plugins/categories.py
 #: src/postulo/templates/applications/application_detail.html
 #: src/postulo/templates/applications/calendar.html
 #: src/postulo/templates/applications/ical_import.html
@@ -4544,6 +4563,11 @@ msgstr "identifikator kalendara"
 #: src/postulo/templates/applications/calendar.html
 msgid "Calendar views"
 msgstr "Prikazi kalendara"
+
+#: src/postulo/applications/calendar_print.py
+#, python-format
+msgid "Calendar · %(period)s"
+msgstr ""
 
 #: src/postulo/applications/models.py src/postulo/jobs/models.py
 msgid "Call"
@@ -6400,6 +6424,7 @@ msgstr "Preuzmi"
 msgid "Download it as text"
 msgstr "Preuzmi kao tekst"
 
+#: src/postulo/templates/applications/calendar_print.html
 #: src/postulo/templates/core/table_export.html
 msgid "Download PDF"
 msgstr ""
@@ -6970,7 +6995,9 @@ msgstr "Svih"
 msgid "Everybody's, as an administrator"
 msgstr "Svačiji, kao administrator"
 
-#: src/postulo/jobs/tables.py src/postulo/templates/server/logs.html
+#: src/postulo/jobs/tables.py
+#: src/postulo/templates/applications/calendar_print.html
+#: src/postulo/templates/server/logs.html
 msgid "Everything"
 msgstr "Sve"
 
@@ -9443,6 +9470,7 @@ msgstr "jezik nije naveden"
 msgid "language of exported files"
 msgstr ""
 
+#: src/postulo/templates/applications/calendar_print.html
 #: src/postulo/templates/core/table_export.html
 msgid "Language of the document"
 msgstr ""
@@ -10186,6 +10214,10 @@ msgstr "Diplomski rad"
 #: src/postulo/accounts/models.py
 msgid "Match the operating system"
 msgstr "Prati operacijski sustav"
+
+#: src/postulo/templates/applications/calendar_print.html
+msgid "Matching"
+msgstr ""
 
 #: src/postulo/plugins/models.py
 msgid "may change its settings"
@@ -11691,6 +11723,7 @@ msgid "Nothing in the diary. When one is offered, schedule it from the applicati
 msgstr "Ništa u dnevniku. Kad vam ponude razgovor, zakažite ga sa stranice prijave."
 
 #: src/postulo/templates/applications/calendar.html
+#: src/postulo/templates/documents/themes/base_calendar.html
 msgid "Nothing in this period."
 msgstr "Ništa u ovom razdoblju."
 
@@ -11776,6 +11809,7 @@ msgid "Nothing on the other service is touched. You can connect it again later."
 msgstr "Na drugoj se usluzi ništa ne dira. Možete je ponovno povezati kasnije."
 
 #: src/postulo/templates/applications/calendar.html
+#: src/postulo/templates/documents/themes/base_calendar.html
 msgid "Nothing on this day."
 msgstr "Ništa na ovaj dan."
 
@@ -12882,6 +12916,7 @@ msgid "paper"
 msgstr ""
 
 #: src/postulo/documents/forms.py
+#: src/postulo/templates/applications/calendar_print.html
 #: src/postulo/templates/applications/report.html
 #: src/postulo/templates/core/table_export.html
 #: src/postulo/templates/settings/export.html
@@ -13038,6 +13073,7 @@ msgstr "Godišnje"
 
 #: src/postulo/applications/forms.py
 #: src/postulo/templates/applications/calendar.html
+#: src/postulo/templates/applications/calendar_print.html
 #: src/postulo/templates/applications/report.html
 msgid "Period"
 msgstr "Razdoblje"
@@ -13622,6 +13658,14 @@ msgstr "glavni"
 msgid "Primary"
 msgstr "Glavna"
 
+#: src/postulo/templates/applications/calendar.html
+msgid "Print"
+msgstr ""
+
+#: src/postulo/templates/applications/calendar_print.html
+msgid "Print the calendar"
+msgstr ""
+
 #: src/postulo/documents/models.py
 msgid "print the EQF level of my qualifications"
 msgstr "ispiši razinu EKO-a mojih kvalifikacija"
@@ -13703,6 +13747,7 @@ msgstr "Nagrade, stipendije i odlikovanja: priznanja koja vam je netko dodijelio
 msgid "Proceedings"
 msgstr "Zbornik radova"
 
+#: src/postulo/templates/documents/themes/base_calendar.html
 #: src/postulo/templates/documents/themes/base_list.html
 msgid "Produced by Postulo from this person's own records."
 msgstr ""
@@ -13711,6 +13756,7 @@ msgstr ""
 msgid "Produced by Postulo from this person's own records. Postulo sets no target: how many applications a period should hold is a benefit regime's rule or the person's own."
 msgstr "Izradio Postulo iz vlastitih zapisa ove osobe. Postulo ne postavlja nikakav cilj: koliko prijava razdoblje treba sadržavati pravilo je sustava naknada ili same osobe."
 
+#: src/postulo/templates/documents/themes/base_calendar.html
 #: src/postulo/templates/documents/themes/base_list.html
 #: src/postulo/templates/documents/themes/base_report.html
 #, python-format
@@ -15546,6 +15592,7 @@ msgid "Show this period"
 msgstr "Prikaži ovo razdoblje"
 
 #: src/postulo/jobs/tables.py
+#: src/postulo/templates/applications/calendar_print.html
 #: src/postulo/templates/jobs/partials/whose_form.html
 msgid "Showing"
 msgstr "Prikazano"
@@ -18149,6 +18196,10 @@ msgstr "Plaća"
 msgid "The people who will vouch for you, kept as contacts. A CV prints one only once they have agreed, and never their email address or number unless you say so."
 msgstr "Osobe koje će jamčiti za vas, sačuvane kao kontakti. Životopis ispisuje osobu tek kad pristane, a njezinu adresu e-pošte ili broj nikad, osim ako vi tako odlučite."
 
+#: src/postulo/templates/applications/calendar_print.html
+msgid "The period on screen as a PDF, with every entry of every day and none of the buttons. Downloaded, and not kept in Postulo."
+msgstr ""
+
 #: src/postulo/applications/forms.py
 msgid "The person at the company this went through, where there was one."
 msgstr "Osoba u tvrtki preko koje je išlo, ako ju je bilo."
@@ -18644,6 +18695,7 @@ msgstr "Njihovo korisničko ime ili adresa e-pošte na ovoj instanci, točno."
 msgid "theme"
 msgstr "tema"
 
+#: src/postulo/templates/applications/calendar_print.html
 #: src/postulo/templates/applications/report.html
 #: src/postulo/templates/core/table_export.html
 msgid "Theme"
@@ -19983,6 +20035,10 @@ msgstr "Videozapis"
 msgid "Video call"
 msgstr "Videopoziv"
 
+#: src/postulo/templates/applications/calendar_print.html
+msgid "View"
+msgstr ""
+
 #: src/postulo/core/views_tables.py
 msgid "View forgotten."
 msgstr "Prikaz je zaboravljen."
@@ -20370,6 +20426,7 @@ msgstr "U kojem je području bila, ako to naziv kvalifikacije ne kaže."
 msgid "What it was. Another capture of the same advert is added from the review screen, so it is not offered here."
 msgstr "Što je bilo. Drugo hvatanje istog oglasa dodaje se sa zaslona pregleda, pa se ovdje ne nudi."
 
+#: src/postulo/templates/applications/calendar_print.html
 #: src/postulo/templates/core/table_export.html
 msgid "What it will hold"
 msgstr ""

@@ -1,0 +1,49 @@
+{% extends "documents/themes/base_calendar.html" %}
+{% comment %} The calendar in the plain theme (#342): the list's type and rules (#341), and each
+   entry marked at its start by its kind's colour, as on screen -- the words say the kind too. {% endcomment %}
+
+{% block page_styles %}
+    @page {
+      margin: 12mm;
+      @bottom-center {
+        content: counter(page) " / " counter(pages);
+        font: 7.5pt "DejaVu Sans", sans-serif;
+        color: #666;
+      }
+    }
+    body {
+      font: 9pt/1.4 "DejaVu Sans", sans-serif;
+      color: #111;
+      margin: 0;
+      /* An address or a long name breaks rather than running off the page (#235). */
+      overflow-wrap: anywhere;
+    }
+    h1 { font-size: 14pt; margin: 0 0 2mm; }
+    h2 { font-size: 10pt; margin: 0 0 1.5mm; padding-bottom: 1mm; border-bottom: 0.5pt solid #ccc; }
+    .meta { color: #444; font-size: 8pt; margin: 0 0 5mm; }
+    .meta div { margin-bottom: 0.5mm; }
+    table.month { inline-size: 100%; border-collapse: collapse; table-layout: fixed; font-size: 7.5pt; }
+    table.month th { font-size: 7pt; text-transform: uppercase; text-align: start; padding: 1mm 1.2mm; border-bottom: 0.6pt solid #333; }
+    table.month td { vertical-align: top; padding: 1mm 1.2mm; border: 0.3pt solid #ccc; block-size: 22mm; }
+    table.month td.outside { background: #f4f4f4; color: #777; }
+    table.month td.today .number { font-weight: bold; text-decoration: underline; }
+    table.month tr { page-break-inside: avoid; }
+    .number { font-size: 8pt; margin-bottom: 0.8mm; }
+    .entry { border-inline-start: 1.2pt solid #999; padding-inline-start: 1mm; margin-bottom: 0.6mm; }
+    .day { margin-bottom: 4mm; page-break-inside: avoid; }
+    .day ul { list-style: none; margin: 0; padding: 0; }
+    .day li { display: flex; gap: 3mm; padding-block: 0.8mm; padding-inline-start: 1.5mm; }
+    .day .what { min-inline-size: 0; }
+    .day .time { flex: none; inline-size: 22mm; font-variant-numeric: tabular-nums; color: #444; }
+    .said { color: #555; }
+    .detail { color: #555; }
+    .over .title { text-decoration: line-through; }
+    .kind-interview { border-color: #2563eb; }
+    .kind-reminder { border-color: #d97706; }
+    .kind-deadline { border-color: #e11d48; }
+    .kind-closing { border-color: #0d9488; }
+    .kind-answer { border-color: #7c3aed; }
+    .kind-appointment { border-color: #0284c7; }
+    .nothing { color: #777; margin: 0; }
+    .note { font-size: 7.5pt; color: #555; margin-top: 3mm; }
+{% endblock %}

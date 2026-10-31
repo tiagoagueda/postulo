@@ -1569,12 +1569,21 @@ msgstr[1] "%(total)s dokumenty to dokladajú"
 msgstr[2] "%(total)s dokumentov to dokladá"
 
 #: src/postulo/templates/documents/cv_list.html
+#: src/postulo/templates/documents/themes/base_calendar.html
 #, python-format
 msgid "%(total)s entry"
 msgid_plural "%(total)s entries"
 msgstr[0] "%(total)s položka"
 msgstr[1] "%(total)s položky"
 msgstr[2] "%(total)s položiek"
+
+#: src/postulo/templates/applications/calendar_print.html
+#, python-format
+msgid "%(total)s entry."
+msgid_plural "%(total)s entries."
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
 
 #: src/postulo/templates/resume/overview.html
 #, python-format
@@ -3329,6 +3338,10 @@ msgstr[2] "Všetkých %(counter)s v %(label)s"
 msgid "All columns"
 msgstr "Všetky stĺpce"
 
+#: src/postulo/templates/documents/themes/base_calendar.html
+msgid "All day"
+msgstr ""
+
 #: src/postulo/templates/applications/application_detail.html
 msgid "All documents"
 msgstr "Všetky dokumenty"
@@ -3997,6 +4010,7 @@ msgstr "Tak, ako ho má životopis vytlačiť. Názov, ktorý je zručnosťou v 
 msgid "As a CV should print it. It is linked to the company of that name among yours, and added to your companies if there is none."
 msgstr "Tak, ako to má životopis vytlačiť. Prepojí sa s firmou s týmto názvom medzi vašimi firmami, a ak taká nie je, pridá sa k vašim firmám."
 
+#: src/postulo/templates/applications/calendar_print.html
 #: src/postulo/templates/core/table_export.html
 msgid "As a document"
 msgstr ""
@@ -4260,6 +4274,10 @@ msgstr "Späť na kontrolu tohto zachytenia"
 #: src/postulo/core/help.py
 msgid "Back to the calendar"
 msgstr "Späť do kalendára"
+
+#: src/postulo/templates/applications/calendar_print.html
+msgid "Back to the calendar, to change any of this"
+msgstr ""
 
 #: src/postulo/core/help.py
 msgid "Back to the dashboard"
@@ -4531,7 +4549,8 @@ msgid "C2 — proficient"
 msgstr "C2 – zdatný"
 
 #: src/postulo/core/help.py src/postulo/core/navigation.py
-#: src/postulo/core/views.py src/postulo/plugins/categories.py
+#: src/postulo/core/views.py src/postulo/documents/themes.py
+#: src/postulo/plugins/categories.py
 #: src/postulo/templates/applications/application_detail.html
 #: src/postulo/templates/applications/calendar.html
 #: src/postulo/templates/applications/ical_import.html
@@ -4550,6 +4569,11 @@ msgstr "identifikátor kalendára"
 #: src/postulo/templates/applications/calendar.html
 msgid "Calendar views"
 msgstr "Zobrazenia kalendára"
+
+#: src/postulo/applications/calendar_print.py
+#, python-format
+msgid "Calendar · %(period)s"
+msgstr ""
 
 #: src/postulo/applications/models.py src/postulo/jobs/models.py
 msgid "Call"
@@ -6396,6 +6420,7 @@ msgstr "Stiahnuť"
 msgid "Download it as text"
 msgstr "Stiahnuť ako text"
 
+#: src/postulo/templates/applications/calendar_print.html
 #: src/postulo/templates/core/table_export.html
 msgid "Download PDF"
 msgstr ""
@@ -6963,7 +6988,9 @@ msgstr "Všetkých"
 msgid "Everybody's, as an administrator"
 msgstr "Všetkých, ako správca"
 
-#: src/postulo/jobs/tables.py src/postulo/templates/server/logs.html
+#: src/postulo/jobs/tables.py
+#: src/postulo/templates/applications/calendar_print.html
+#: src/postulo/templates/server/logs.html
 msgid "Everything"
 msgstr "Všetko"
 
@@ -9423,6 +9450,7 @@ msgstr "jazyk neuvedený"
 msgid "language of exported files"
 msgstr ""
 
+#: src/postulo/templates/applications/calendar_print.html
 #: src/postulo/templates/core/table_export.html
 msgid "Language of the document"
 msgstr ""
@@ -10163,6 +10191,10 @@ msgstr "Diplomová práca"
 #: src/postulo/accounts/models.py
 msgid "Match the operating system"
 msgstr "Riadiť sa operačným systémom"
+
+#: src/postulo/templates/applications/calendar_print.html
+msgid "Matching"
+msgstr ""
 
 #: src/postulo/plugins/models.py
 msgid "may change its settings"
@@ -11656,6 +11688,7 @@ msgid "Nothing in the diary. When one is offered, schedule it from the applicati
 msgstr "V kalendári nič nie je. Keď vám pohovor ponúknu, naplánujte ho zo stránky žiadosti."
 
 #: src/postulo/templates/applications/calendar.html
+#: src/postulo/templates/documents/themes/base_calendar.html
 msgid "Nothing in this period."
 msgstr "V tomto období nič nie je."
 
@@ -11741,6 +11774,7 @@ msgid "Nothing on the other service is touched. You can connect it again later."
 msgstr "Na druhej službe sa ničoho nedotkneme. Neskôr ju môžete pripojiť znova."
 
 #: src/postulo/templates/applications/calendar.html
+#: src/postulo/templates/documents/themes/base_calendar.html
 msgid "Nothing on this day."
 msgstr "V tento deň nič nie je."
 
@@ -12842,6 +12876,7 @@ msgid "paper"
 msgstr ""
 
 #: src/postulo/documents/forms.py
+#: src/postulo/templates/applications/calendar_print.html
 #: src/postulo/templates/applications/report.html
 #: src/postulo/templates/core/table_export.html
 #: src/postulo/templates/settings/export.html
@@ -12997,6 +13032,7 @@ msgstr "Za rok"
 
 #: src/postulo/applications/forms.py
 #: src/postulo/templates/applications/calendar.html
+#: src/postulo/templates/applications/calendar_print.html
 #: src/postulo/templates/applications/report.html
 msgid "Period"
 msgstr "Obdobie"
@@ -13580,6 +13616,14 @@ msgstr "hlavné"
 msgid "Primary"
 msgstr "Hlavná"
 
+#: src/postulo/templates/applications/calendar.html
+msgid "Print"
+msgstr ""
+
+#: src/postulo/templates/applications/calendar_print.html
+msgid "Print the calendar"
+msgstr ""
+
 #: src/postulo/documents/models.py
 msgid "print the EQF level of my qualifications"
 msgstr "vytlačiť úroveň EKR mojich kvalifikácií"
@@ -13660,6 +13704,7 @@ msgstr "Ceny, štipendiá a vyznamenania: uznanie, ktoré vám niekto udelil."
 msgid "Proceedings"
 msgstr "Zborník"
 
+#: src/postulo/templates/documents/themes/base_calendar.html
 #: src/postulo/templates/documents/themes/base_list.html
 msgid "Produced by Postulo from this person's own records."
 msgstr ""
@@ -13668,6 +13713,7 @@ msgstr ""
 msgid "Produced by Postulo from this person's own records. Postulo sets no target: how many applications a period should hold is a benefit regime's rule or the person's own."
 msgstr "Vytvorené programom Postulo z vlastných záznamov tejto osoby. Postulo nestanovuje žiadny cieľ: koľko žiadostí má za obdobie pribudnúť, určuje pravidlo systému dávok alebo samotná osoba."
 
+#: src/postulo/templates/documents/themes/base_calendar.html
 #: src/postulo/templates/documents/themes/base_list.html
 #: src/postulo/templates/documents/themes/base_report.html
 #, python-format
@@ -15500,6 +15546,7 @@ msgid "Show this period"
 msgstr "Zobraziť toto obdobie"
 
 #: src/postulo/jobs/tables.py
+#: src/postulo/templates/applications/calendar_print.html
 #: src/postulo/templates/jobs/partials/whose_form.html
 #, fuzzy
 msgid "Showing"
@@ -18090,6 +18137,10 @@ msgstr "Odmena"
 msgid "The people who will vouch for you, kept as contacts. A CV prints one only once they have agreed, and never their email address or number unless you say so."
 msgstr "Ľudia, ktorí sa za vás zaručia, uchovávaní ako kontakty. Životopis vytlačí osobu až vtedy, keď súhlasí, a nikdy jej e-mailovú adresu ani číslo, pokiaľ to neurčíte."
 
+#: src/postulo/templates/applications/calendar_print.html
+msgid "The period on screen as a PDF, with every entry of every day and none of the buttons. Downloaded, and not kept in Postulo."
+msgstr ""
+
 #: src/postulo/applications/forms.py
 msgid "The person at the company this went through, where there was one."
 msgstr "Osoba vo firme, cez ktorú to šlo, ak nejaká bola."
@@ -18587,6 +18638,7 @@ msgstr "Jeho používateľské meno alebo e-mailová adresa v tejto inštancii, 
 msgid "theme"
 msgstr "motív"
 
+#: src/postulo/templates/applications/calendar_print.html
 #: src/postulo/templates/applications/report.html
 #: src/postulo/templates/core/table_export.html
 msgid "Theme"
@@ -19918,6 +19970,10 @@ msgstr "Video"
 msgid "Video call"
 msgstr "Videohovor"
 
+#: src/postulo/templates/applications/calendar_print.html
+msgid "View"
+msgstr ""
+
 #: src/postulo/core/views_tables.py
 msgid "View forgotten."
 msgstr "Zobrazenie zabudnuté."
@@ -20304,6 +20360,7 @@ msgstr "V akom odbore, ak to názov kvalifikácie neuvádza."
 msgid "What it was. Another capture of the same advert is added from the review screen, so it is not offered here."
 msgstr "Čo to bolo. Ďalšie zachytenie toho istého inzerátu sa pridáva z obrazovky kontroly, preto sa tu neponúka."
 
+#: src/postulo/templates/applications/calendar_print.html
 #: src/postulo/templates/core/table_export.html
 msgid "What it will hold"
 msgstr ""

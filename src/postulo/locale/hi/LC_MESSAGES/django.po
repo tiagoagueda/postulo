@@ -1482,11 +1482,19 @@ msgstr[0] "%(total)s डॉक्यूमेंट इसे साबित �
 msgstr[1] "%(total)s डॉक्यूमेंट इसे साबित करते हैं"
 
 #: src/postulo/templates/documents/cv_list.html
+#: src/postulo/templates/documents/themes/base_calendar.html
 #, fuzzy, python-format
 msgid "%(total)s entry"
 msgid_plural "%(total)s entries"
 msgstr[0] "%(total)s एंट्री"
 msgstr[1] "%(total)s एंट्रियां"
+
+#: src/postulo/templates/applications/calendar_print.html
+#, python-format
+msgid "%(total)s entry."
+msgid_plural "%(total)s entries."
+msgstr[0] ""
+msgstr[1] ""
 
 #: src/postulo/templates/resume/overview.html
 #, fuzzy, python-format
@@ -3516,6 +3524,10 @@ msgstr[1] "%(label)s में सभी %(counter)s"
 msgid "All columns"
 msgstr "सभी कॉलम"
 
+#: src/postulo/templates/documents/themes/base_calendar.html
+msgid "All day"
+msgstr ""
+
 #: src/postulo/templates/applications/application_detail.html
 #, fuzzy
 msgid "All documents"
@@ -4304,6 +4316,7 @@ msgstr "जैसा CV पर दिखना चाहिए। जो ना�
 msgid "As a CV should print it. It is linked to the company of that name among yours, and added to your companies if there is none."
 msgstr "जैसा CV पर दिखना चाहिए। इसे आपकी कंपनियों में उसी नाम वाली कंपनी से जोड़ा जाता है, और अगर ऐसी कोई नहीं है तो आपकी कंपनियों में जोड़ दिया जाता है।"
 
+#: src/postulo/templates/applications/calendar_print.html
 #: src/postulo/templates/core/table_export.html
 msgid "As a document"
 msgstr ""
@@ -4617,6 +4630,10 @@ msgstr "इस कैप्चर की जांच पर वापस जा
 #, fuzzy
 msgid "Back to the calendar"
 msgstr "कैलेंडर पर वापस जाएं"
+
+#: src/postulo/templates/applications/calendar_print.html
+msgid "Back to the calendar, to change any of this"
+msgstr ""
 
 #: src/postulo/core/help.py
 #, fuzzy
@@ -4941,7 +4958,8 @@ msgid "C2 — proficient"
 msgstr "C2 — प्रवीण"
 
 #: src/postulo/core/help.py src/postulo/core/navigation.py
-#: src/postulo/core/views.py src/postulo/plugins/categories.py
+#: src/postulo/core/views.py src/postulo/documents/themes.py
+#: src/postulo/plugins/categories.py
 #: src/postulo/templates/applications/application_detail.html
 #: src/postulo/templates/applications/calendar.html
 #: src/postulo/templates/applications/ical_import.html
@@ -4964,6 +4982,11 @@ msgstr "कैलेंडर पहचानकर्ता"
 #, fuzzy
 msgid "Calendar views"
 msgstr "कैलेंडर व्यू"
+
+#: src/postulo/applications/calendar_print.py
+#, python-format
+msgid "Calendar · %(period)s"
+msgstr ""
 
 #: src/postulo/applications/models.py src/postulo/jobs/models.py
 #, fuzzy
@@ -7154,6 +7177,7 @@ msgstr "इसे डाउनलोड करें"
 msgid "Download it as text"
 msgstr "टेक्स्ट के रूप में डाउनलोड करें"
 
+#: src/postulo/templates/applications/calendar_print.html
 #: src/postulo/templates/core/table_export.html
 msgid "Download PDF"
 msgstr ""
@@ -7836,7 +7860,9 @@ msgstr "हर कोई"
 msgid "Everybody's, as an administrator"
 msgstr "हर कोई एक प्रशासक के रूप में"
 
-#: src/postulo/jobs/tables.py src/postulo/templates/server/logs.html
+#: src/postulo/jobs/tables.py
+#: src/postulo/templates/applications/calendar_print.html
+#: src/postulo/templates/server/logs.html
 #, fuzzy
 msgid "Everything"
 msgstr "सब कुछ"
@@ -10749,6 +10775,7 @@ msgstr "भाषा नहीं बताई गई"
 msgid "language of exported files"
 msgstr ""
 
+#: src/postulo/templates/applications/calendar_print.html
 #: src/postulo/templates/core/table_export.html
 msgid "Language of the document"
 msgstr ""
@@ -11636,6 +11663,10 @@ msgstr "मास्टर की थीसिस"
 #, fuzzy
 msgid "Match the operating system"
 msgstr "ऑपरेटिंग सिस्टम के जैसा"
+
+#: src/postulo/templates/applications/calendar_print.html
+msgid "Matching"
+msgstr ""
 
 #: src/postulo/plugins/models.py
 #, fuzzy
@@ -13412,6 +13443,7 @@ msgid "Nothing in the diary. When one is offered, schedule it from the applicati
 msgstr "एजेंडा में कुछ नहीं है। जब इंटरव्यू के लिए बुलाया जाए, तो उसे आवेदन के पेज से शेड्यूल करें।"
 
 #: src/postulo/templates/applications/calendar.html
+#: src/postulo/templates/documents/themes/base_calendar.html
 #, fuzzy
 msgid "Nothing in this period."
 msgstr "इस अवधि में कुछ नहीं है।"
@@ -13512,6 +13544,7 @@ msgid "Nothing on the other service is touched. You can connect it again later."
 msgstr "दूसरी सेवा पर कुछ भी नहीं बदला जाता। आप इसे बाद में फिर से कनेक्ट कर सकते हैं।"
 
 #: src/postulo/templates/applications/calendar.html
+#: src/postulo/templates/documents/themes/base_calendar.html
 #, fuzzy
 msgid "Nothing on this day."
 msgstr "इस दिन कुछ नहीं है।"
@@ -14781,6 +14814,7 @@ msgid "paper"
 msgstr ""
 
 #: src/postulo/documents/forms.py
+#: src/postulo/templates/applications/calendar_print.html
 #: src/postulo/templates/applications/report.html
 #: src/postulo/templates/core/table_export.html
 #: src/postulo/templates/settings/export.html
@@ -14968,6 +15002,7 @@ msgstr "प्रति वर्ष"
 
 #: src/postulo/applications/forms.py
 #: src/postulo/templates/applications/calendar.html
+#: src/postulo/templates/applications/calendar_print.html
 #: src/postulo/templates/applications/report.html
 #, fuzzy
 msgid "Period"
@@ -15664,6 +15699,14 @@ msgstr "मुख्य"
 msgid "Primary"
 msgstr "मुख्य"
 
+#: src/postulo/templates/applications/calendar.html
+msgid "Print"
+msgstr ""
+
+#: src/postulo/templates/applications/calendar_print.html
+msgid "Print the calendar"
+msgstr ""
+
 #: src/postulo/documents/models.py
 #, fuzzy
 msgid "print the EQF level of my qualifications"
@@ -15764,6 +15807,7 @@ msgstr "पुरस्कार, स्कॉलरशिप और सम्�
 msgid "Proceedings"
 msgstr "प्रोसीडिंग्स"
 
+#: src/postulo/templates/documents/themes/base_calendar.html
 #: src/postulo/templates/documents/themes/base_list.html
 msgid "Produced by Postulo from this person's own records."
 msgstr ""
@@ -15773,6 +15817,7 @@ msgstr ""
 msgid "Produced by Postulo from this person's own records. Postulo sets no target: how many applications a period should hold is a benefit regime's rule or the person's own."
 msgstr "Postulo ने यह रिपोर्ट इस व्यक्ति के अपने रिकॉर्ड से बनाई है। Postulo कोई लक्ष्य तय नहीं करता: किसी अवधि में कितने आवेदन होने चाहिए, यह किसी सरकारी भत्ता योजना का नियम है या उस व्यक्ति का अपना।"
 
+#: src/postulo/templates/documents/themes/base_calendar.html
 #: src/postulo/templates/documents/themes/base_list.html
 #: src/postulo/templates/documents/themes/base_report.html
 #, fuzzy, python-format
@@ -17932,6 +17977,7 @@ msgid "Show this period"
 msgstr "यह अवधि दिखाएं"
 
 #: src/postulo/jobs/tables.py
+#: src/postulo/templates/applications/calendar_print.html
 #: src/postulo/templates/jobs/partials/whose_form.html
 #, fuzzy
 msgid "Showing"
@@ -20946,6 +20992,10 @@ msgstr "वेतन"
 msgid "The people who will vouch for you, kept as contacts. A CV prints one only once they have agreed, and never their email address or number unless you say so."
 msgstr "वे लोग जो आपके बारे में गवाही देंगे, संपर्क के रूप में रखे गए। CV किसी को तभी दिखाता है जब वे सहमत हो जाएं, और उनका ईमेल पता या नंबर कभी नहीं, जब तक आप न कहें।"
 
+#: src/postulo/templates/applications/calendar_print.html
+msgid "The period on screen as a PDF, with every entry of every day and none of the buttons. Downloaded, and not kept in Postulo."
+msgstr ""
+
 #: src/postulo/applications/forms.py
 #, fuzzy
 msgid "The person at the company this went through, where there was one."
@@ -21531,6 +21581,7 @@ msgstr "इस इंस्टेंस पर उनका उपयोगक�
 msgid "theme"
 msgstr "थीम"
 
+#: src/postulo/templates/applications/calendar_print.html
 #: src/postulo/templates/applications/report.html
 #: src/postulo/templates/core/table_export.html
 msgid "Theme"
@@ -23096,6 +23147,10 @@ msgstr "वीडियो"
 msgid "Video call"
 msgstr "वीडियो कॉल"
 
+#: src/postulo/templates/applications/calendar_print.html
+msgid "View"
+msgstr ""
+
 #: src/postulo/core/views_tables.py
 #, fuzzy
 msgid "View forgotten."
@@ -23559,6 +23614,7 @@ msgstr "यह किस विषय में थी, जहां योग�
 msgid "What it was. Another capture of the same advert is added from the review screen, so it is not offered here."
 msgstr "यह क्या था। उसी विज्ञापन का दूसरा कैप्चर जांच वाली स्क्रीन से जोड़ा जाता है, इसलिए वह यहां नहीं दिया गया है।"
 
+#: src/postulo/templates/applications/calendar_print.html
 #: src/postulo/templates/core/table_export.html
 msgid "What it will hold"
 msgstr ""

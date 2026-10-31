@@ -1743,6 +1743,7 @@ msgstr[3] "Cruthaíonn %(total)s ndoiciméad é seo"
 msgstr[4] "Cruthaíonn %(total)s doiciméad é seo"
 
 #: src/postulo/templates/documents/cv_list.html
+#: src/postulo/templates/documents/themes/base_calendar.html
 #, python-format
 msgid "%(total)s entry"
 msgid_plural "%(total)s entries"
@@ -1751,6 +1752,16 @@ msgstr[1] "%(total)s iontráil"
 msgstr[2] "%(total)s iontráil"
 msgstr[3] "%(total)s n-iontráil"
 msgstr[4] "%(total)s iontráil"
+
+#: src/postulo/templates/applications/calendar_print.html
+#, python-format
+msgid "%(total)s entry."
+msgid_plural "%(total)s entries."
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+msgstr[4] ""
 
 #: src/postulo/templates/resume/overview.html
 #, python-format
@@ -3550,6 +3561,10 @@ msgstr[4] "Gach ceann de na %(counter)s i %(label)s"
 msgid "All columns"
 msgstr "Gach colún"
 
+#: src/postulo/templates/documents/themes/base_calendar.html
+msgid "All day"
+msgstr ""
+
 #: src/postulo/templates/applications/application_detail.html
 msgid "All documents"
 msgstr "Gach doiciméad"
@@ -4229,6 +4244,7 @@ msgstr "Mar ba cheart do CV é a phriontáil. Aithnítear ainm atá ina scil sa 
 msgid "As a CV should print it. It is linked to the company of that name among yours, and added to your companies if there is none."
 msgstr "Mar ba cheart do CV é a phriontáil. Nasctar é leis an gcuideachta den ainm sin i measc do chuideachtaí, agus cuirtear le do chuideachtaí é mura bhfuil ceann ann."
 
+#: src/postulo/templates/applications/calendar_print.html
 #: src/postulo/templates/core/table_export.html
 msgid "As a document"
 msgstr ""
@@ -4492,6 +4508,10 @@ msgstr "Ar ais chuig athbhreithniú na gabhála seo"
 #: src/postulo/core/help.py
 msgid "Back to the calendar"
 msgstr "Ar ais chuig an bhféilire"
+
+#: src/postulo/templates/applications/calendar_print.html
+msgid "Back to the calendar, to change any of this"
+msgstr ""
 
 #: src/postulo/core/help.py
 msgid "Back to the dashboard"
@@ -4766,7 +4786,8 @@ msgid "C2 — proficient"
 msgstr "C2 — oilte"
 
 #: src/postulo/core/help.py src/postulo/core/navigation.py
-#: src/postulo/core/views.py src/postulo/plugins/categories.py
+#: src/postulo/core/views.py src/postulo/documents/themes.py
+#: src/postulo/plugins/categories.py
 #: src/postulo/templates/applications/application_detail.html
 #: src/postulo/templates/applications/calendar.html
 #: src/postulo/templates/applications/ical_import.html
@@ -4785,6 +4806,11 @@ msgstr "aitheantóir féilire"
 #: src/postulo/templates/applications/calendar.html
 msgid "Calendar views"
 msgstr "Amhairc féilire"
+
+#: src/postulo/applications/calendar_print.py
+#, python-format
+msgid "Calendar · %(period)s"
+msgstr ""
 
 #: src/postulo/applications/models.py src/postulo/jobs/models.py
 msgid "Call"
@@ -6642,6 +6668,7 @@ msgstr "Íoslódáil é"
 msgid "Download it as text"
 msgstr "Íoslódáil mar théacs é"
 
+#: src/postulo/templates/applications/calendar_print.html
 #: src/postulo/templates/core/table_export.html
 msgid "Download PDF"
 msgstr ""
@@ -7214,7 +7241,9 @@ msgstr "Le gach duine"
 msgid "Everybody's, as an administrator"
 msgstr "Le gach duine, mar riarthóir"
 
-#: src/postulo/jobs/tables.py src/postulo/templates/server/logs.html
+#: src/postulo/jobs/tables.py
+#: src/postulo/templates/applications/calendar_print.html
+#: src/postulo/templates/server/logs.html
 msgid "Everything"
 msgstr "Gach rud"
 
@@ -9696,6 +9725,7 @@ msgstr "teanga gan lua"
 msgid "language of exported files"
 msgstr ""
 
+#: src/postulo/templates/applications/calendar_print.html
 #: src/postulo/templates/core/table_export.html
 msgid "Language of the document"
 msgstr ""
@@ -10444,6 +10474,10 @@ msgstr "Tráchtas máistreachta"
 #: src/postulo/accounts/models.py
 msgid "Match the operating system"
 msgstr "Lean an córas oibriúcháin"
+
+#: src/postulo/templates/applications/calendar_print.html
+msgid "Matching"
+msgstr ""
 
 #: src/postulo/plugins/models.py
 #, fuzzy
@@ -11956,6 +11990,7 @@ msgid "Nothing in the diary. When one is offered, schedule it from the applicati
 msgstr "Níl aon rud sa dialann. Nuair a thairgtear ceann, sceidealaigh é ó leathanach an iarratais."
 
 #: src/postulo/templates/applications/calendar.html
+#: src/postulo/templates/documents/themes/base_calendar.html
 msgid "Nothing in this period."
 msgstr "Níl aon rud sa tréimhse seo."
 
@@ -12043,6 +12078,7 @@ msgid "Nothing on the other service is touched. You can connect it again later."
 msgstr "Ní bhaintear le haon rud ar an tseirbhís eile. Is féidir leat é a nascadh arís níos déanaí."
 
 #: src/postulo/templates/applications/calendar.html
+#: src/postulo/templates/documents/themes/base_calendar.html
 msgid "Nothing on this day."
 msgstr "Níl aon rud ar an lá seo."
 
@@ -13183,6 +13219,7 @@ msgid "paper"
 msgstr ""
 
 #: src/postulo/documents/forms.py
+#: src/postulo/templates/applications/calendar_print.html
 #: src/postulo/templates/applications/report.html
 #: src/postulo/templates/core/table_export.html
 #: src/postulo/templates/settings/export.html
@@ -13338,6 +13375,7 @@ msgstr "In aghaidh na bliana"
 
 #: src/postulo/applications/forms.py
 #: src/postulo/templates/applications/calendar.html
+#: src/postulo/templates/applications/calendar_print.html
 #: src/postulo/templates/applications/report.html
 msgid "Period"
 msgstr "Tréimhse"
@@ -13936,6 +13974,14 @@ msgstr "príomhcheann"
 msgid "Primary"
 msgstr "Príomhcheann"
 
+#: src/postulo/templates/applications/calendar.html
+msgid "Print"
+msgstr ""
+
+#: src/postulo/templates/applications/calendar_print.html
+msgid "Print the calendar"
+msgstr ""
+
 #: src/postulo/documents/models.py
 msgid "print the EQF level of my qualifications"
 msgstr "leibhéal EQF mo cháilíochtaí a phriontáil"
@@ -14016,6 +14062,7 @@ msgstr "Duaiseanna, scoláireachtaí agus gradaim: aitheantas a thug duine éigi
 msgid "Proceedings"
 msgstr "Imeachtaí comhdhála"
 
+#: src/postulo/templates/documents/themes/base_calendar.html
 #: src/postulo/templates/documents/themes/base_list.html
 msgid "Produced by Postulo from this person's own records."
 msgstr ""
@@ -14024,6 +14071,7 @@ msgstr ""
 msgid "Produced by Postulo from this person's own records. Postulo sets no target: how many applications a period should hold is a benefit regime's rule or the person's own."
 msgstr "Táirgthe ag Postulo ó thaifid an duine seo féin. Ní shocraíonn Postulo aon sprioc: is riail de chuid córais sochair nó riail an duine féin í cé mhéad iarratas ba cheart a bheith i dtréimhse."
 
+#: src/postulo/templates/documents/themes/base_calendar.html
 #: src/postulo/templates/documents/themes/base_list.html
 #: src/postulo/templates/documents/themes/base_report.html
 #, python-format
@@ -15879,6 +15927,7 @@ msgid "Show this period"
 msgstr "Taispeáin an tréimhse seo"
 
 #: src/postulo/jobs/tables.py
+#: src/postulo/templates/applications/calendar_print.html
 #: src/postulo/templates/jobs/partials/whose_form.html
 msgid "Showing"
 msgstr "Ag taispeáint"
@@ -18509,6 +18558,10 @@ msgstr "An pá"
 msgid "The people who will vouch for you, kept as contacts. A CV prints one only once they have agreed, and never their email address or number unless you say so."
 msgstr "Na daoine a mholfaidh thú, coinnithe mar theagmhálaithe. Ní phriontálann CV duine acu go dtí go mbeidh sé tar éis aontú, agus ní phriontálann sé a seoladh ríomhphoist ná a n-uimhir riamh mura ndeir tú é."
 
+#: src/postulo/templates/applications/calendar_print.html
+msgid "The period on screen as a PDF, with every entry of every day and none of the buttons. Downloaded, and not kept in Postulo."
+msgstr ""
+
 #: src/postulo/applications/forms.py
 msgid "The person at the company this went through, where there was one."
 msgstr "An duine sa chuideachta trínar chuaigh sé seo, nuair a bhí duine ann."
@@ -19011,6 +19064,7 @@ msgstr "A ainm úsáideora nó a sheoladh ríomhphoist ar an tsuiteáil seo, go 
 msgid "theme"
 msgstr "téama"
 
+#: src/postulo/templates/applications/calendar_print.html
 #: src/postulo/templates/applications/report.html
 #: src/postulo/templates/core/table_export.html
 msgid "Theme"
@@ -20351,6 +20405,10 @@ msgstr "Físeán"
 msgid "Video call"
 msgstr "Físghlao"
 
+#: src/postulo/templates/applications/calendar_print.html
+msgid "View"
+msgstr ""
+
 #: src/postulo/core/views_tables.py
 msgid "View forgotten."
 msgstr "Rinneadh dearmad ar an radharc."
@@ -20737,6 +20795,7 @@ msgstr "An réimse ina raibh sé, mura luann ainm na cáilíochta é."
 msgid "What it was. Another capture of the same advert is added from the review screen, so it is not offered here."
 msgstr "Cad a bhí ann. Cuirtear gabháil eile den fhógra poist céanna leis ón scáileán athbhreithnithe, mar sin ní thairgtear anseo é."
 
+#: src/postulo/templates/applications/calendar_print.html
 #: src/postulo/templates/core/table_export.html
 msgid "What it will hold"
 msgstr ""

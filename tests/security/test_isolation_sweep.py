@@ -1459,3 +1459,44 @@ def test_a_capture_cannot_be_bound_across_accounts(client, user, other_user):
     assert bind(theirs.pk, my_listing.pk).status_code == 404, "somebody else's capture"
     assert bind(mine.pk, their_listing.pk).status_code == 404, "somebody else's listing"
     assert bind(mine.pk, my_listing.pk).status_code == 302, "their own pair is bound"
+
+
+# ------------------------------------------------------------ the calendar printed (#342)
+
+
+def test_somebody_elses_calendar_never_prints(client, user, other_user, monkeypatch, settings):
+    """The print of the calendar names no record in its address, so the sweep above has
+    nothing to swap; what it must never do is print another person's month. Their interview,
+    reminder, deadline, closing date and appointment are on neither the print page nor the
+    PDF, in any of the four views, and the PDF is handed over uncached."""
+    from postulo.applications.models import Reminder
+    from postulo.applications.services import schedule_interview
+
+    settings.POSTULO_PUBLIC_URL = ""
+    seen: list[str] = []
+    monkeypatch.setattr(
+        "postulo.documents.pdf.draft_pdf", lambda html, *a, **k: seen.append(html) or b"%PDF-"
+    )
+    day = timezone.localdate()
+    moment = timezone.now()
+    theirs = application(other_user)
+    theirs.deadline = day
+    theirs.save()
+    theirs.posting.closes_at = day
+    theirs.posting.save()
+    schedule_interview(theirs, kind="video", starts_at=moment, remind=False)
+    Reminder.objects.create(owner=other_user, summary="Zebra reminder", due_at=moment)
+    theirs_too = appointment(other_user)
+    theirs_too.starts_at = moment
+    theirs_too.save()
+    client.force_login(user)
+
+    for view in ("month", "week", "day", "agenda"):
+        query = {"view": view, "on": day.isoformat()}
+        page = client.get(reverse("applications:calendar_print"), query).content.decode()
+        response = client.get(reverse("applications:calendar_print_file"), query)
+        assert response.status_code == 200, view
+        assert "no-store" in response["Cache-Control"], view
+        assert "0 entries" in page and "0 entries" in seen[-1], view
+        for said in ("Zebra", "Theirs Office", theirs.posting.title, theirs.posting.company.name):
+            assert said not in page and said not in seen[-1], (view, said)

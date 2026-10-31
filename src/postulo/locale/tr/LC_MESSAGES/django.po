@@ -1482,11 +1482,19 @@ msgstr[0] "%(total)s belge bunu kanıtlıyor"
 msgstr[1] "%(total)s belge bunu kanıtlıyor"
 
 #: src/postulo/templates/documents/cv_list.html
+#: src/postulo/templates/documents/themes/base_calendar.html
 #, python-format
 msgid "%(total)s entry"
 msgid_plural "%(total)s entries"
 msgstr[0] "%(total)s girdi"
 msgstr[1] "%(total)s girdi"
+
+#: src/postulo/templates/applications/calendar_print.html
+#, python-format
+msgid "%(total)s entry."
+msgid_plural "%(total)s entries."
+msgstr[0] ""
+msgstr[1] ""
 
 #: src/postulo/templates/resume/overview.html
 #, python-format
@@ -3214,6 +3222,10 @@ msgstr[1] "%(label)s içindeki %(counter)s tanenin tümü"
 msgid "All columns"
 msgstr "Tüm sütunlar"
 
+#: src/postulo/templates/documents/themes/base_calendar.html
+msgid "All day"
+msgstr ""
+
 #: src/postulo/templates/applications/application_detail.html
 msgid "All documents"
 msgstr "Tüm belgeler"
@@ -3876,6 +3888,7 @@ msgstr "Bir CV'nin yazdırması gerektiği gibi. ESCO sınıflandırmasında bir
 msgid "As a CV should print it. It is linked to the company of that name among yours, and added to your companies if there is none."
 msgstr "CV'de basılması gerektiği gibi. Şirketleriniz arasındaki o adlı şirkete bağlanır, yoksa şirketlerinize eklenir."
 
+#: src/postulo/templates/applications/calendar_print.html
 #: src/postulo/templates/core/table_export.html
 msgid "As a document"
 msgstr ""
@@ -4147,6 +4160,10 @@ msgstr "Bu yakalamayı gözden geçirmeye dön"
 #: src/postulo/core/help.py
 msgid "Back to the calendar"
 msgstr "Takvime dön"
+
+#: src/postulo/templates/applications/calendar_print.html
+msgid "Back to the calendar, to change any of this"
+msgstr ""
 
 #: src/postulo/core/help.py
 msgid "Back to the dashboard"
@@ -4420,7 +4437,8 @@ msgid "C2 — proficient"
 msgstr "C2 — yetkin"
 
 #: src/postulo/core/help.py src/postulo/core/navigation.py
-#: src/postulo/core/views.py src/postulo/plugins/categories.py
+#: src/postulo/core/views.py src/postulo/documents/themes.py
+#: src/postulo/plugins/categories.py
 #: src/postulo/templates/applications/application_detail.html
 #: src/postulo/templates/applications/calendar.html
 #: src/postulo/templates/applications/ical_import.html
@@ -4439,6 +4457,11 @@ msgstr "takvim tanımlayıcısı"
 #: src/postulo/templates/applications/calendar.html
 msgid "Calendar views"
 msgstr "Takvim görünümleri"
+
+#: src/postulo/applications/calendar_print.py
+#, python-format
+msgid "Calendar · %(period)s"
+msgstr ""
 
 #: src/postulo/applications/models.py src/postulo/jobs/models.py
 msgid "Call"
@@ -6288,6 +6311,7 @@ msgstr "İndir"
 msgid "Download it as text"
 msgstr "Metin olarak indir"
 
+#: src/postulo/templates/applications/calendar_print.html
 #: src/postulo/templates/core/table_export.html
 msgid "Download PDF"
 msgstr ""
@@ -6860,7 +6884,9 @@ msgstr "Herkesinki"
 msgid "Everybody's, as an administrator"
 msgstr "Herkesinki, yönetici olarak"
 
-#: src/postulo/jobs/tables.py src/postulo/templates/server/logs.html
+#: src/postulo/jobs/tables.py
+#: src/postulo/templates/applications/calendar_print.html
+#: src/postulo/templates/server/logs.html
 msgid "Everything"
 msgstr "Her şey"
 
@@ -9333,6 +9359,7 @@ msgstr "dil belirtilmemiş"
 msgid "language of exported files"
 msgstr ""
 
+#: src/postulo/templates/applications/calendar_print.html
 #: src/postulo/templates/core/table_export.html
 msgid "Language of the document"
 msgstr ""
@@ -10072,6 +10099,10 @@ msgstr "Yüksek lisans tezi"
 #: src/postulo/accounts/models.py
 msgid "Match the operating system"
 msgstr "İşletim sistemiyle aynı"
+
+#: src/postulo/templates/applications/calendar_print.html
+msgid "Matching"
+msgstr ""
 
 #: src/postulo/plugins/models.py
 msgid "may change its settings"
@@ -11566,6 +11597,7 @@ msgid "Nothing in the diary. When one is offered, schedule it from the applicati
 msgstr "Ajandada hiçbir şey yok. Size bir görüşme önerildiğinde onu başvurunun sayfasından planlayın."
 
 #: src/postulo/templates/applications/calendar.html
+#: src/postulo/templates/documents/themes/base_calendar.html
 msgid "Nothing in this period."
 msgstr "Bu dönemde hiçbir şey yok."
 
@@ -11652,6 +11684,7 @@ msgid "Nothing on the other service is touched. You can connect it again later."
 msgstr "Diğer hizmette hiçbir şeye dokunulmuyor. Daha sonra yeniden bağlanabilirsiniz."
 
 #: src/postulo/templates/applications/calendar.html
+#: src/postulo/templates/documents/themes/base_calendar.html
 msgid "Nothing on this day."
 msgstr "Bu günde hiçbir şey yok."
 
@@ -12733,6 +12766,7 @@ msgid "paper"
 msgstr ""
 
 #: src/postulo/documents/forms.py
+#: src/postulo/templates/applications/calendar_print.html
 #: src/postulo/templates/applications/report.html
 #: src/postulo/templates/core/table_export.html
 #: src/postulo/templates/settings/export.html
@@ -12890,6 +12924,7 @@ msgstr "Yıllık"
 
 #: src/postulo/applications/forms.py
 #: src/postulo/templates/applications/calendar.html
+#: src/postulo/templates/applications/calendar_print.html
 #: src/postulo/templates/applications/report.html
 msgid "Period"
 msgstr "Dönem"
@@ -13472,6 +13507,14 @@ msgstr "birincil"
 msgid "Primary"
 msgstr "Birincil"
 
+#: src/postulo/templates/applications/calendar.html
+msgid "Print"
+msgstr ""
+
+#: src/postulo/templates/applications/calendar_print.html
+msgid "Print the calendar"
+msgstr ""
+
 #: src/postulo/documents/models.py
 msgid "print the EQF level of my qualifications"
 msgstr "yeterliliklerimin EQF düzeyini bas"
@@ -13552,6 +13595,7 @@ msgstr "Ödüller, burslar ve onur belgeleri: birinin size verdiği takdir."
 msgid "Proceedings"
 msgstr "Bildiriler"
 
+#: src/postulo/templates/documents/themes/base_calendar.html
 #: src/postulo/templates/documents/themes/base_list.html
 msgid "Produced by Postulo from this person's own records."
 msgstr ""
@@ -13560,6 +13604,7 @@ msgstr ""
 msgid "Produced by Postulo from this person's own records. Postulo sets no target: how many applications a period should hold is a benefit regime's rule or the person's own."
 msgstr "Bu kişinin kendi kayıtlarından Postulo tarafından üretilmiştir. Postulo hiçbir hedef koymaz: bir dönemin kaç başvuru içermesi gerektiği bir yardım rejiminin ya da kişinin kendi kuralıdır."
 
+#: src/postulo/templates/documents/themes/base_calendar.html
 #: src/postulo/templates/documents/themes/base_list.html
 #: src/postulo/templates/documents/themes/base_report.html
 #, python-format
@@ -15390,6 +15435,7 @@ msgid "Show this period"
 msgstr "Bu dönemi göster"
 
 #: src/postulo/jobs/tables.py
+#: src/postulo/templates/applications/calendar_print.html
 #: src/postulo/templates/jobs/partials/whose_form.html
 #, fuzzy
 msgid "Showing"
@@ -17977,6 +18023,10 @@ msgstr "Ücret"
 msgid "The people who will vouch for you, kept as contacts. A CV prints one only once they have agreed, and never their email address or number unless you say so."
 msgstr "Size kefil olacak kişiler, kişi olarak tutulur. CV yalnızca kabul edenleri basar; siz belirtmedikçe e-posta adreslerini veya numaralarını asla basmaz."
 
+#: src/postulo/templates/applications/calendar_print.html
+msgid "The period on screen as a PDF, with every entry of every day and none of the buttons. Downloaded, and not kept in Postulo."
+msgstr ""
+
 #: src/postulo/applications/forms.py
 msgid "The person at the company this went through, where there was one."
 msgstr "Varsa, bunun üzerinden geçtiği şirketteki kişi."
@@ -18472,6 +18522,7 @@ msgstr "Bu kurulumdaki kullanıcı adı ya da e-posta adresi, tam olarak."
 msgid "theme"
 msgstr "tema"
 
+#: src/postulo/templates/applications/calendar_print.html
 #: src/postulo/templates/applications/report.html
 #: src/postulo/templates/core/table_export.html
 msgid "Theme"
@@ -19800,6 +19851,10 @@ msgstr "Video"
 msgid "Video call"
 msgstr "Görüntülü arama"
 
+#: src/postulo/templates/applications/calendar_print.html
+msgid "View"
+msgstr ""
+
 #: src/postulo/core/views_tables.py
 msgid "View forgotten."
 msgstr "Görünüm unutuldu."
@@ -20192,6 +20247,7 @@ msgstr "Yeterliliğin adı söylemiyorsa, hangi alanda olduğu."
 msgid "What it was. Another capture of the same advert is added from the review screen, so it is not offered here."
 msgstr "Ne olduğu. Aynı ilanın başka bir yakalaması inceleme ekranından eklenir, bu yüzden burada sunulmaz."
 
+#: src/postulo/templates/applications/calendar_print.html
 #: src/postulo/templates/core/table_export.html
 msgid "What it will hold"
 msgstr ""

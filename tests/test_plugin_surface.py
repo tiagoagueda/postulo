@@ -477,6 +477,27 @@ def test_the_surface_holds_what_a_sync_needs():
         assert getattr(api, name) is not None, name
 
 
+def test_a_theme_can_set_the_calendar_and_an_item_says_what_it_is():
+    """A plugin theme for the printed calendar sets `ThemeKind.CALENDAR` (#342), and a
+    `CalendarItem` says what it is in the page's words (`said`), as the print does."""
+    import datetime as dt
+
+    from postulo.plugins import api
+
+    assert api.ThemeKind.CALENDAR == "calendar"
+    done = api.CalendarItem(
+        kind="reminder",
+        title="Chase",
+        detail="",
+        day=dt.date(2026, 9, 1),
+        over=True,
+        path="/",
+        uid="x",
+    )
+    assert done.said == "Done reminder:"
+    assert api.CalendarItem(**{**done.__dict__, "kind": "deadline", "over": False}).said == ""
+
+
 def test_a_reminder_on_the_surface_is_the_cores_own_class():
     """What a sync of a task list reads and writes (#331): the record, read with
     `Reminder.objects.for_user()`, and the services, never the model's save."""

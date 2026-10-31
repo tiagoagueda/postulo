@@ -1569,12 +1569,21 @@ msgstr[1] "%(total)s documente dovedesc acest lucru"
 msgstr[2] "%(total)s de documente dovedesc acest lucru"
 
 #: src/postulo/templates/documents/cv_list.html
+#: src/postulo/templates/documents/themes/base_calendar.html
 #, python-format
 msgid "%(total)s entry"
 msgid_plural "%(total)s entries"
 msgstr[0] "%(total)s intrare"
 msgstr[1] "%(total)s intrări"
 msgstr[2] "%(total)s de intrări"
+
+#: src/postulo/templates/applications/calendar_print.html
+#, python-format
+msgid "%(total)s entry."
+msgid_plural "%(total)s entries."
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
 
 #: src/postulo/templates/resume/overview.html
 #, python-format
@@ -3333,6 +3342,10 @@ msgstr[2] "Toate cele %(counter)s din %(label)s"
 msgid "All columns"
 msgstr "Toate coloanele"
 
+#: src/postulo/templates/documents/themes/base_calendar.html
+msgid "All day"
+msgstr ""
+
 #: src/postulo/templates/applications/application_detail.html
 msgid "All documents"
 msgstr "Toate documentele"
@@ -4003,6 +4016,7 @@ msgstr "Așa cum ar trebui să-l tipărească un CV. Un nume care este o abilita
 msgid "As a CV should print it. It is linked to the company of that name among yours, and added to your companies if there is none."
 msgstr "Așa cum ar trebui să o tipărească un CV. Este legată de compania cu acest nume dintre ale dumneavoastră și adăugată la companiile dumneavoastră dacă nu există."
 
+#: src/postulo/templates/applications/calendar_print.html
 #: src/postulo/templates/core/table_export.html
 msgid "As a document"
 msgstr ""
@@ -4267,6 +4281,10 @@ msgstr "Înapoi la revizuirea acestei capturi"
 #: src/postulo/core/help.py
 msgid "Back to the calendar"
 msgstr "Înapoi la calendar"
+
+#: src/postulo/templates/applications/calendar_print.html
+msgid "Back to the calendar, to change any of this"
+msgstr ""
 
 #: src/postulo/core/help.py
 msgid "Back to the dashboard"
@@ -4539,7 +4557,8 @@ msgid "C2 — proficient"
 msgstr "C2 — experimentat"
 
 #: src/postulo/core/help.py src/postulo/core/navigation.py
-#: src/postulo/core/views.py src/postulo/plugins/categories.py
+#: src/postulo/core/views.py src/postulo/documents/themes.py
+#: src/postulo/plugins/categories.py
 #: src/postulo/templates/applications/application_detail.html
 #: src/postulo/templates/applications/calendar.html
 #: src/postulo/templates/applications/ical_import.html
@@ -4558,6 +4577,11 @@ msgstr "identificator de calendar"
 #: src/postulo/templates/applications/calendar.html
 msgid "Calendar views"
 msgstr "Vizualizări de calendar"
+
+#: src/postulo/applications/calendar_print.py
+#, python-format
+msgid "Calendar · %(period)s"
+msgstr ""
 
 #: src/postulo/applications/models.py src/postulo/jobs/models.py
 msgid "Call"
@@ -6412,6 +6436,7 @@ msgstr "Descărcați-o"
 msgid "Download it as text"
 msgstr "Descărcați-o ca text"
 
+#: src/postulo/templates/applications/calendar_print.html
 #: src/postulo/templates/core/table_export.html
 msgid "Download PDF"
 msgstr ""
@@ -6978,7 +7003,9 @@ msgstr "Ale tuturor"
 msgid "Everybody's, as an administrator"
 msgstr "Ale tuturor, ca administrator"
 
-#: src/postulo/jobs/tables.py src/postulo/templates/server/logs.html
+#: src/postulo/jobs/tables.py
+#: src/postulo/templates/applications/calendar_print.html
+#: src/postulo/templates/server/logs.html
 msgid "Everything"
 msgstr "Tot"
 
@@ -9440,6 +9467,7 @@ msgstr "limbă nespecificată"
 msgid "language of exported files"
 msgstr ""
 
+#: src/postulo/templates/applications/calendar_print.html
 #: src/postulo/templates/core/table_export.html
 msgid "Language of the document"
 msgstr ""
@@ -10184,6 +10212,10 @@ msgstr "Teză de master"
 #: src/postulo/accounts/models.py
 msgid "Match the operating system"
 msgstr "La fel ca sistemul de operare"
+
+#: src/postulo/templates/applications/calendar_print.html
+msgid "Matching"
+msgstr ""
 
 #: src/postulo/plugins/models.py
 msgid "may change its settings"
@@ -11687,6 +11719,7 @@ msgid "Nothing in the diary. When one is offered, schedule it from the applicati
 msgstr "Nimic în agendă. Când vi se oferă unul, programați-l din pagina candidaturii."
 
 #: src/postulo/templates/applications/calendar.html
+#: src/postulo/templates/documents/themes/base_calendar.html
 msgid "Nothing in this period."
 msgstr "Nimic în această perioadă."
 
@@ -11773,6 +11806,7 @@ msgid "Nothing on the other service is touched. You can connect it again later."
 msgstr "Nimic de pe celălalt serviciu nu este modificat. Îl puteți conecta din nou mai târziu."
 
 #: src/postulo/templates/applications/calendar.html
+#: src/postulo/templates/documents/themes/base_calendar.html
 msgid "Nothing on this day."
 msgstr "Nimic în această zi."
 
@@ -12871,6 +12905,7 @@ msgid "paper"
 msgstr ""
 
 #: src/postulo/documents/forms.py
+#: src/postulo/templates/applications/calendar_print.html
 #: src/postulo/templates/applications/report.html
 #: src/postulo/templates/core/table_export.html
 #: src/postulo/templates/settings/export.html
@@ -13026,6 +13061,7 @@ msgstr "Pe an"
 
 #: src/postulo/applications/forms.py
 #: src/postulo/templates/applications/calendar.html
+#: src/postulo/templates/applications/calendar_print.html
 #: src/postulo/templates/applications/report.html
 msgid "Period"
 msgstr "Perioadă"
@@ -13608,6 +13644,14 @@ msgstr "principal"
 msgid "Primary"
 msgstr "Principal"
 
+#: src/postulo/templates/applications/calendar.html
+msgid "Print"
+msgstr ""
+
+#: src/postulo/templates/applications/calendar_print.html
+msgid "Print the calendar"
+msgstr ""
+
 #: src/postulo/documents/models.py
 msgid "print the EQF level of my qualifications"
 msgstr "tipărește nivelul CEC al calificărilor mele"
@@ -13688,6 +13732,7 @@ msgstr "Premii, burse și distincții: recunoașteri pe care vi le-a acordat cin
 msgid "Proceedings"
 msgstr "Volume de conferință"
 
+#: src/postulo/templates/documents/themes/base_calendar.html
 #: src/postulo/templates/documents/themes/base_list.html
 msgid "Produced by Postulo from this person's own records."
 msgstr ""
@@ -13696,6 +13741,7 @@ msgstr ""
 msgid "Produced by Postulo from this person's own records. Postulo sets no target: how many applications a period should hold is a benefit regime's rule or the person's own."
 msgstr "Produs de Postulo din înregistrările proprii ale acestei persoane. Postulo nu stabilește nicio țintă: câte candidaturi ar trebui să conțină o perioadă este o regulă a regimului de indemnizații sau a persoanei însăși."
 
+#: src/postulo/templates/documents/themes/base_calendar.html
 #: src/postulo/templates/documents/themes/base_list.html
 #: src/postulo/templates/documents/themes/base_report.html
 #, python-format
@@ -15520,6 +15566,7 @@ msgid "Show this period"
 msgstr "Afișați această perioadă"
 
 #: src/postulo/jobs/tables.py
+#: src/postulo/templates/applications/calendar_print.html
 #: src/postulo/templates/jobs/partials/whose_form.html
 msgid "Showing"
 msgstr "Se afișează"
@@ -18103,6 +18150,10 @@ msgstr "Remunerația"
 msgid "The people who will vouch for you, kept as contacts. A CV prints one only once they have agreed, and never their email address or number unless you say so."
 msgstr "Persoanele care vă vor recomanda, păstrate ca contacte. Un CV tipărește o astfel de persoană doar după ce aceasta și-a dat acordul și niciodată adresa ei de e-mail sau numărul ei, decât dacă hotărâți altfel."
 
+#: src/postulo/templates/applications/calendar_print.html
+msgid "The period on screen as a PDF, with every entry of every day and none of the buttons. Downloaded, and not kept in Postulo."
+msgstr ""
+
 #: src/postulo/applications/forms.py
 msgid "The person at the company this went through, where there was one."
 msgstr "Persoana de la companie prin care a trecut, dacă a existat una."
@@ -18598,6 +18649,7 @@ msgstr "Numele său de utilizator sau adresa de e-mail de pe această instanță
 msgid "theme"
 msgstr "temă"
 
+#: src/postulo/templates/applications/calendar_print.html
 #: src/postulo/templates/applications/report.html
 #: src/postulo/templates/core/table_export.html
 msgid "Theme"
@@ -19926,6 +19978,10 @@ msgstr "Videoclip"
 msgid "Video call"
 msgstr "Apel video"
 
+#: src/postulo/templates/applications/calendar_print.html
+msgid "View"
+msgstr ""
+
 #: src/postulo/core/views_tables.py
 msgid "View forgotten."
 msgstr "Vizualizare uitată."
@@ -20311,6 +20367,7 @@ msgstr "În ce domeniu a fost, acolo unde numele calificării nu o spune."
 msgid "What it was. Another capture of the same advert is added from the review screen, so it is not offered here."
 msgstr "Ce a fost. O altă captură a aceluiași anunț se adaugă din ecranul de revizuire, așa că nu este oferită aici."
 
+#: src/postulo/templates/applications/calendar_print.html
 #: src/postulo/templates/core/table_export.html
 msgid "What it will hold"
 msgstr ""

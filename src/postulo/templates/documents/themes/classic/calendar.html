@@ -1,0 +1,48 @@
+{% extends "documents/themes/base_calendar.html" %}
+{% comment %} The calendar in the classic theme (#342): the serif and the small capitals of the
+   classic report and list (#340, #341), so a month printed beside a CV looks like the same
+   person's papers. {% endcomment %}
+
+{% block page_styles %}
+    @page {
+      margin: 14mm;
+      @bottom-center {
+        content: counter(page) " / " counter(pages);
+        font: 7.5pt "Palatino Linotype", Palatino, Georgia, "Times New Roman", "Noto Serif", "DejaVu Serif", serif;
+        color: #4a4f5a;
+      }
+    }
+    body {
+      font: 9pt/1.45 "Palatino Linotype", Palatino, Georgia, "Times New Roman", "Noto Serif", "Noto Serif Ethiopic", "Noto Naskh Arabic", "DejaVu Serif", serif;
+      color: #16181d;
+      margin: 0;
+      /* An address or a long name breaks rather than running off the page (#235). */
+      overflow-wrap: anywhere;
+    }
+    /* Urdu is set in Nastaliq and Arabic stays in Naskh, as in the classic letter (#1054). */
+    body:lang(ur) {
+      font-family: "Noto Nastaliq Urdu", "Palatino Linotype", Palatino, Georgia, "Times New Roman", "Noto Serif", "Noto Naskh Arabic", serif;
+      line-height: 2;
+    }
+    h1 { font-size: 15pt; font-weight: 600; font-variant: small-caps; letter-spacing: 0.02em; margin: 0 0 2mm; }
+    h2 { font-size: 10pt; font-weight: 600; font-variant: small-caps; margin: 0 0 1.5mm; padding-bottom: 1mm; border-bottom: 0.5pt solid #c7cad1; }
+    .meta { color: #4a4f5a; font-size: 8pt; margin: 0 0 5mm; padding-bottom: 2.5mm; border-bottom: 0.5pt solid #c7cad1; }
+    .meta div { margin-bottom: 0.5mm; }
+    table.month { inline-size: 100%; border-collapse: collapse; table-layout: fixed; font-size: 7.5pt; }
+    table.month th { font-size: 8pt; font-variant: small-caps; text-align: start; padding: 1mm 1.2mm; border-bottom: 0.6pt solid #4a4f5a; }
+    table.month td { vertical-align: top; padding: 1mm 1.2mm; border: 0.3pt solid #d5d8de; block-size: 22mm; }
+    table.month td.outside { color: #8a8f99; }
+    table.month td.today .number { font-weight: 700; text-decoration: underline; }
+    table.month tr { page-break-inside: avoid; }
+    .number { font-size: 8.5pt; margin-bottom: 0.8mm; }
+    .entry { margin-bottom: 0.6mm; }
+    .day { margin-bottom: 4mm; page-break-inside: avoid; }
+    .day ul { list-style: none; margin: 0; padding: 0; }
+    .day li { display: flex; gap: 3mm; padding: 0.6mm 0; border-bottom: 0.3pt solid #e1e3e8; }
+    .day .what { min-inline-size: 0; }
+    .day .time { flex: none; inline-size: 22mm; font-variant-numeric: tabular-nums; color: #4a4f5a; }
+    .said, .detail { color: #4a4f5a; font-style: italic; }
+    .over .title { text-decoration: line-through; }
+    .nothing { color: #8a8f99; font-style: italic; margin: 0; }
+    .note { font-size: 7.5pt; color: #4a4f5a; margin-top: 3mm; }
+{% endblock %}

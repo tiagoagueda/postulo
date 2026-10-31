@@ -1,0 +1,98 @@
+{% load i18n %}<!DOCTYPE html>
+{% comment %} The Calendar printed (#342): the month, week, day or agenda that was on screen, set
+   by a theme.
+
+   **One template for the four views.** `calendar_print.as_context` hands each the same shape:
+   the period's name, who printed it and when, the kinds shown and the search, ``days`` -- every
+   day of the period with its entries -- and for a month and a week ``weeks``, the same days in
+   rows of seven. This draws a month as a grid, and a week, a day and an agenda as days one under
+   another; an agenda leaves out the days with nothing on, as the page does.
+
+   **Every entry.** The screen's month holds two a day and counts the rest; paper holds them
+   all. Nothing that is a control is here: no buttons, no legend, no navigation.
+
+   **Plain values, and no model**, as for a report and a list (#340, #341). An entry is its
+   kind, its two lines, its time or none for a whole day, and whether it is over -- a reminder
+   done, an interview cancelled, a deadline already met -- which is struck through *and* said
+   in words, because a printed page may be grey.
+
+   **Every side is logical**, for the reason `base_report.html` gives, and the paper is
+   Postulo's to write (#344). A month is drawn on its side unless somebody chose otherwise.
+{% endcomment %}
+<html lang="{{ document_language }}" dir="{{ document_direction|default:'ltr' }}">
+<head>
+  <meta charset="utf-8">
+  <title>{{ document_title }}</title>
+  <style{% if csp_nonce %} nonce="{{ csp_nonce }}"{% endif %}>{% block page_styles %}{% endblock %}</style>
+</head>
+<body class="view-{{ view }}">
+  <h1><bdi>{{ title }}</bdi></h1>
+  <div class="meta">
+    <div><strong><bdi>{{ person }}</bdi></strong> · {{ view_label }}</div>
+    <div>{% blocktranslate with produced=produced_at|date:"DATETIME_FORMAT" %}Produced on {{ produced }}{% endblocktranslate %}</div>
+    <div>
+      {% blocktranslate trimmed count total=count %}
+        {{ total }} entry
+      {% plural %}
+        {{ total }} entries
+      {% endblocktranslate %}{% if narrowed %} · {{ kinds|join:", " }}{% endif %}{% if search %} · <bdi>“{{ search }}”</bdi>{% endif %}
+    </div>
+  </div>
+
+  {% if view == "month" %}
+    <table class="month">
+      <thead>
+        <tr>
+          {% for name in weekdays %}<th>{{ name }}</th>{% endfor %}
+        </tr>
+      </thead>
+      <tbody>
+        {% for week in weeks %}
+          <tr>
+            {% for day in week %}
+              <td class="{% if day.outside %}outside{% endif %}{% if day.today %} today{% endif %}">
+                <div class="number">{{ day.date|date:"j" }}</div>
+                {% for entry in day.entries %}
+                  <div class="entry kind-{{ entry.kind }}{% if entry.over %} over{% endif %}">
+                    {% if not entry.all_day %}<span class="time">{{ entry.starts_at|date:"TIME_FORMAT" }}</span>{% endif %}
+                    {% if entry.said %}<span class="said">{{ entry.said }}</span>{% endif %}
+                    <bdi class="title">{{ entry.title }}</bdi>
+                  </div>
+                {% endfor %}
+              </td>
+            {% endfor %}
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    {% for day in days %}
+      {% if day.entries or view != "agenda" %}
+        <section class="day{% if day.today %} today{% endif %}">
+          <h2>{{ day.date|date:"l" }} {{ day.date|date:"DATE_FORMAT" }}</h2>
+          {% if day.entries %}
+            <ul>
+              {% for entry in day.entries %}
+                <li class="entry kind-{{ entry.kind }}{% if entry.over %} over{% endif %}">
+                  <span class="time">{% if entry.all_day %}{% translate "All day" %}{% else %}{{ entry.starts_at|date:"TIME_FORMAT" }}{% if entry.ends_at %}–{{ entry.ends_at|date:"TIME_FORMAT" }}{% endif %}{% endif %}</span>
+                  <span class="what">
+                    {% if entry.said %}<span class="said">{{ entry.said }}</span>{% endif %}
+                    <bdi class="title">{{ entry.title }}</bdi>{% if entry.detail %} <span class="detail">· <bdi>{{ entry.detail }}</bdi></span>{% endif %}
+                  </span>
+                </li>
+              {% endfor %}
+            </ul>
+          {% else %}
+            <p class="nothing">{% translate "Nothing on this day." %}</p>
+          {% endif %}
+        </section>
+      {% endif %}
+    {% endfor %}
+    {% if view == "agenda" and not count %}
+      <p class="nothing">{% translate "Nothing in this period." %}</p>
+    {% endif %}
+  {% endif %}
+
+  <p class="note">{% translate "Produced by Postulo from this person's own records." %}</p>
+</body>
+</html>

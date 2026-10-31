@@ -166,3 +166,30 @@ def test_without_a_script_the_name_opens_the_form(browser: Browser, live_server,
         expect(page.locator("[data-period] h2")).to_contain_text("16 Sep 2026 to 30 Sep 2026")
     finally:
         context.close()
+
+
+# ------------------------------------------------------------------ printing it (#342)
+
+
+def test_print_beside_the_views_prints_the_view_on_screen(
+    live_server, page: Page, applicant, monkeypatch
+):
+    """*Print* sits beside the views, opens the page that says what the print will hold for
+    the view on screen, and its button hands over a PDF."""
+    monkeypatch.setattr("postulo.documents.pdf.draft_pdf", lambda html, *a, **k: b"%PDF-1.7 e2e")
+    page.set_viewport_size({"width": 1280, "height": 800})
+    sign_in(page, live_server.url, "/applications/calendar/?view=week&on=2026-09-14")
+
+    views = page.locator("[data-views]").bounding_box()
+    button = page.get_by_role("link", name="Print")
+    box = button.bounding_box()
+    assert abs(box["y"] - views["y"]) <= 4 and box["x"] >= views["x"] + views["width"], (
+        "on the same line as the views, after them"
+    )
+    button.click()
+
+    expect(page).to_have_url(re.compile(r"/applications/calendar/print/\?view=week&on=2026-09-14"))
+    expect(page.locator("[data-print-view]")).to_have_text("Week")
+    with page.expect_download() as download:
+        page.locator("[data-print-pdf]").click()
+    assert download.value.suggested_filename == "postulo-calendar-week-2026-09-14.pdf"

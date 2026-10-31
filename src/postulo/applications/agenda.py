@@ -918,7 +918,7 @@ def _build(
             on=on,
             start=start,
             end=end,
-            title=formats.date_format(first_of_month(on), "YEAR_MONTH_FORMAT"),
+            title=period_title(view, on, start),
             earlier=url_for(view, previous_month(on), kinds),
             later=url_for(view, next_month(on), kinds),
             today=url_for(view, today, kinds),
@@ -937,7 +937,7 @@ def _build(
             on=on,
             start=start,
             end=end,
-            title=_("Week of %(day)s") % {"day": formats.date_format(start, "DATE_FORMAT")},
+            title=period_title(view, on, start),
             earlier=url_for(view, start - dt.timedelta(days=7), kinds),
             later=url_for(view, end, kinds),
             today=url_for(view, today, kinds),
@@ -954,7 +954,7 @@ def _build(
             on=on,
             start=start,
             end=end,
-            title=f"{formats.date_format(on, 'l')} {formats.date_format(on, 'DATE_FORMAT')}",
+            title=period_title(view, on, start),
             earlier=url_for(view, on - dt.timedelta(days=1), kinds),
             later=url_for(view, end, kinds),
             today=url_for(view, today, kinds),
@@ -963,21 +963,11 @@ def _build(
             kinds=kinds,
         )
     # An end day chosen in the range picker (#933), or the thirty days an agenda always ran.
-    on, until = agenda_span(on, until)
-    start = on
-    end = (until or default_until(on)) + dt.timedelta(days=1)
+    on, start, end, until = span(view, on, until)
     length = end - start
     events = events_between(user, start, end, kinds)
     showing_reminders = REMINDER in kinds
-    if until is None:
-        title = ngettext_lazy(
-            "%(days)s day from %(day)s", "%(days)s days from %(day)s", AGENDA_DAYS
-        ) % {"days": AGENDA_DAYS, "day": formats.date_format(on, "DATE_FORMAT")}
-    else:
-        title = _("%(start)s to %(end)s") % {
-            "start": formats.date_format(on, "DATE_FORMAT"),
-            "end": formats.date_format(until, "DATE_FORMAT"),
-        }
+    title = period_title(view, on, start, until)
     # Earlier and later step by the length asked for, and keep it; so does *Today*.
     last = length - dt.timedelta(days=1)
     return Page(
@@ -998,27 +988,91 @@ def _build(
     )
 
 
-def page_for(params, user, *, today: dt.date | None = None) -> Page:
-    """The page a request asks for: ``?month=2026-09``, or ``?view=week&on=2026-09-15``, or
-    ``?view=agenda&on=2026-09-15&until=2026-10-31``.
+def span(view: str, on: dt.date, until: dt.date | None = None):
+    """``(on, start, end, until)`` for one view on one day: the day it is on, its first day,
+    the day after its last, and an agenda's last day as `agenda_span` leaves it.
+
+    The month is whole weeks, the week starts on the person's first weekday, and an agenda
+    whose end came the wrong way round is on its other end, so ``on`` may move.
+    """
+    if view == "month":
+        start, end = month_range(on)
+        return on, start, end, None
+    if view == "week":
+        start = week_start(on)
+        return on, start, start + dt.timedelta(days=7), None
+    if view == "day":
+        return on, on, on + dt.timedelta(days=1), None
+    on, until = agenda_span(on, until)
+    return on, on, (until or default_until(on)) + dt.timedelta(days=1), until
+
+
+def period_title(view: str, on: dt.date, start: dt.date, until: dt.date | None = None) -> str:
+    """What the period is called, in the language in force: the month, *Week of …*, the day,
+    or the agenda's days. The same words over the page and at the head of its print (#342)."""
+    if view == "month":
+        return formats.date_format(first_of_month(on), "YEAR_MONTH_FORMAT")
+    if view == "week":
+        return _("Week of %(day)s") % {"day": formats.date_format(start, "DATE_FORMAT")}
+    if view == "day":
+        return f"{formats.date_format(on, 'l')} {formats.date_format(on, 'DATE_FORMAT')}"
+    if until is None:
+        return ngettext_lazy(
+            "%(days)s day from %(day)s", "%(days)s days from %(day)s", AGENDA_DAYS
+        ) % {"days": AGENDA_DAYS, "day": formats.date_format(on, "DATE_FORMAT")}
+    return _("%(start)s to %(end)s") % {
+        "start": formats.date_format(on, "DATE_FORMAT"),
+        "end": formats.date_format(until, "DATE_FORMAT"),
+    }
+
+
+@dataclass(frozen=True)
+class Asked:
+    """What an address asks of the calendar: the view, the day, the kinds, the search and an
+    agenda's last day. Read once by `asked_for`, for the page and for its print (#342)."""
+
+    view: str
+    on: dt.date
+    kinds: frozenset[str]
+    search: str = ""
+    until: dt.date | None = None
+
+
+def asked_for(params, *, today: dt.date | None = None) -> Asked:
+    """What ``?month=2026-09``, ``?view=week&on=2026-09-15`` or
+    ``?view=agenda&on=2026-09-15&until=2026-10-31`` asks for.
 
     Anything unreadable falls back to today, in the shape asked for: an address somebody
-    mistyped still gets a calendar rather than an error about dates.
+    mistyped still gets a calendar rather than an error about dates. A view nobody knows is
+    the month.
     """
     today = today or timezone.localdate()
     view = params.get("view", "") or DEFAULT_VIEW
     on = day_from(params.get("on", "")) or month_from(params.get("month", "")) or today
     if view == DEFAULT_VIEW and "on" not in params and "month" in params:
         on = month_from(params.get("month", "")) or today
-    return build(
-        user,
-        view,
-        on,
-        today=today,
+    return Asked(
+        view=view if view in VIEWS else DEFAULT_VIEW,
+        on=on,
         kinds=kinds_from(params.get("kinds", "")),
         search=params.get("q", "")[:200],
         # The agenda's last day (#933); an unreadable one is the thirty days.
         until=day_from(params.get("until", "")) if view == "agenda" else None,
+    )
+
+
+def page_for(params, user, *, today: dt.date | None = None) -> Page:
+    """The page a request asks for (`asked_for`)."""
+    today = today or timezone.localdate()
+    asked = asked_for(params, today=today)
+    return build(
+        user,
+        asked.view,
+        asked.on,
+        today=today,
+        kinds=asked.kinds,
+        search=asked.search,
+        until=asked.until,
     )
 
 
@@ -1179,6 +1233,19 @@ class Item:
     def all_day(self) -> bool:
         return self.starts_at is None
 
+    @property
+    def said(self) -> str:
+        """What this is, in words, for a reader who cannot see which colour it is: what the
+        page says before the title (`Event.said`), in the language in force. Empty where the
+        title already says it -- a deadline, a closing date or an answer due that is not over.
+
+        For whatever is drawn from items rather than from events -- a printed calendar (#342)
+        -- so the words that say a reminder is done or an interview cancelled are the page's.
+        """
+        if (self.kind, self.state) in SPOKEN_STATES:
+            return str(SPOKEN_STATES[(self.kind, self.state)])
+        return str(SPOKEN.get((self.kind, self.over), ""))
+
 
 @dataclass(frozen=True)
 class Items:
@@ -1268,8 +1335,31 @@ def items_between(user, start: dt.date, end: dt.date, *, kinds=None) -> Items:
                     "lasting name in a calendar."
                 )
             )
-        if not wanted or end <= start:
-            return Items(withheld=withheld)
-        events = events_between(user, start, end, kinds=wanted)
-        items = tuple(_day_item(e) if e.all_day else _moment_item(e) for e in events)
+        items = _items(user, start, end, wanted)
     return Items(items=items, withheld=withheld)
+
+
+def _items(user, start: dt.date, end: dt.date, wanted) -> tuple[Item, ...]:
+    """The items of the kinds ``wanted`` on a day in ``[start, end)``, in the zone and the
+    language in force."""
+    if not wanted or end <= start:
+        return ()
+    events = events_between(user, start, end, kinds=wanted)
+    return tuple(_day_item(e) if e.all_day else _moment_item(e) for e in events)
+
+
+def printed_items(user, start: dt.date, end: dt.date, *, kinds=None) -> tuple[Item, ...]:
+    """Everything on ``user``'s calendar on a day in ``[start, end)``, for a printed calendar
+    (#342): the items `items_between` answers with, read the same way, with two differences.
+
+    **In the zone and the language in force**, not the person's own whoever calls: a request
+    has already put their zone in force, and the language is the one the document is written
+    in, chosen beside the button.
+
+    **Every whole day**, whether or not the instance has a public address. `items_between`
+    leaves them out there because their name in somebody's calendar would collide; a page on
+    paper names nothing in anybody's calendar, and a deadline missing from it is a deadline
+    missed.
+    """
+    wanted = ALL_KINDS if kinds is None else frozenset(kinds) & ALL_KINDS
+    return _items(user, start, end, wanted)

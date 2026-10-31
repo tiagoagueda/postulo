@@ -546,6 +546,8 @@ def signed_in_paths(a, c, me, entry=None, recovery_link: str = "", things=None) 
         "/applications/calendar/?view=day",
         "/applications/calendar/import/",
         "/applications/calendar/?view=agenda",
+        # What a print of the calendar will hold, and the choices for its document (#342).
+        "/applications/calendar/print/?view=week&kinds=reminder",
         # What the reminders page was: the agenda narrowed to them (#316).
         "/applications/calendar/?view=agenda&kinds=reminder",
         "/applications/new/",

@@ -1482,11 +1482,19 @@ msgstr[0] "%(total)s skjal sannar þetta"
 msgstr[1] "%(total)s skjöl sanna þetta"
 
 #: src/postulo/templates/documents/cv_list.html
+#: src/postulo/templates/documents/themes/base_calendar.html
 #, python-format
 msgid "%(total)s entry"
 msgid_plural "%(total)s entries"
 msgstr[0] "%(total)s færsla"
 msgstr[1] "%(total)s færslur"
+
+#: src/postulo/templates/applications/calendar_print.html
+#, python-format
+msgid "%(total)s entry."
+msgid_plural "%(total)s entries."
+msgstr[0] ""
+msgstr[1] ""
 
 #: src/postulo/templates/resume/overview.html
 #, python-format
@@ -3227,6 +3235,10 @@ msgstr[1] "Allar %(counter)s í %(label)s"
 msgid "All columns"
 msgstr "Allir dálkar"
 
+#: src/postulo/templates/documents/themes/base_calendar.html
+msgid "All day"
+msgstr ""
+
 #: src/postulo/templates/applications/application_detail.html
 msgid "All documents"
 msgstr "Öll skjöl"
@@ -3896,6 +3908,7 @@ msgstr "Eins og ferilskrá ætti að birta það. Heiti sem er færni í ESCO-fl
 msgid "As a CV should print it. It is linked to the company of that name among yours, and added to your companies if there is none."
 msgstr "Eins og ferilskrá ætti að birta það. Það er tengt við fyrirtækið með því heiti meðal fyrirtækjanna þinna og bætt við þau ef ekkert slíkt er til."
 
+#: src/postulo/templates/applications/calendar_print.html
 #: src/postulo/templates/core/table_export.html
 msgid "As a document"
 msgstr ""
@@ -4160,6 +4173,10 @@ msgstr "Aftur í yfirferð þessa grips"
 #: src/postulo/core/help.py
 msgid "Back to the calendar"
 msgstr "Aftur í dagatalið"
+
+#: src/postulo/templates/applications/calendar_print.html
+msgid "Back to the calendar, to change any of this"
+msgstr ""
 
 #: src/postulo/core/help.py
 msgid "Back to the dashboard"
@@ -4436,7 +4453,8 @@ msgid "C2 — proficient"
 msgstr "C2 — mikil færni"
 
 #: src/postulo/core/help.py src/postulo/core/navigation.py
-#: src/postulo/core/views.py src/postulo/plugins/categories.py
+#: src/postulo/core/views.py src/postulo/documents/themes.py
+#: src/postulo/plugins/categories.py
 #: src/postulo/templates/applications/application_detail.html
 #: src/postulo/templates/applications/calendar.html
 #: src/postulo/templates/applications/ical_import.html
@@ -4455,6 +4473,11 @@ msgstr "dagatalsauðkenni"
 #: src/postulo/templates/applications/calendar.html
 msgid "Calendar views"
 msgstr "Dagatalssýnir"
+
+#: src/postulo/applications/calendar_print.py
+#, python-format
+msgid "Calendar · %(period)s"
+msgstr ""
 
 #: src/postulo/applications/models.py src/postulo/jobs/models.py
 msgid "Call"
@@ -6309,6 +6332,7 @@ msgstr "Sækja hana"
 msgid "Download it as text"
 msgstr "Sækja það sem texta"
 
+#: src/postulo/templates/applications/calendar_print.html
 #: src/postulo/templates/core/table_export.html
 msgid "Download PDF"
 msgstr ""
@@ -6873,7 +6897,9 @@ msgstr "Allra"
 msgid "Everybody's, as an administrator"
 msgstr "Allra, sem stjórnandi"
 
-#: src/postulo/jobs/tables.py src/postulo/templates/server/logs.html
+#: src/postulo/jobs/tables.py
+#: src/postulo/templates/applications/calendar_print.html
+#: src/postulo/templates/server/logs.html
 msgid "Everything"
 msgstr "Allt"
 
@@ -9352,6 +9378,7 @@ msgstr "tungumál ekki tilgreint"
 msgid "language of exported files"
 msgstr ""
 
+#: src/postulo/templates/applications/calendar_print.html
 #: src/postulo/templates/core/table_export.html
 msgid "Language of the document"
 msgstr ""
@@ -10092,6 +10119,10 @@ msgstr "Meistararitgerð"
 #: src/postulo/accounts/models.py
 msgid "Match the operating system"
 msgstr "Fylgja stýrikerfinu"
+
+#: src/postulo/templates/applications/calendar_print.html
+msgid "Matching"
+msgstr ""
 
 #: src/postulo/plugins/models.py
 msgid "may change its settings"
@@ -11587,6 +11618,7 @@ msgid "Nothing in the diary. When one is offered, schedule it from the applicati
 msgstr "Ekkert í dagbókinni. Þegar þér er boðið viðtal skaltu bóka það á síðu umsóknarinnar."
 
 #: src/postulo/templates/applications/calendar.html
+#: src/postulo/templates/documents/themes/base_calendar.html
 msgid "Nothing in this period."
 msgstr "Ekkert á þessu tímabili."
 
@@ -11672,6 +11704,7 @@ msgid "Nothing on the other service is touched. You can connect it again later."
 msgstr "Engu er breytt á hinni þjónustunni. Þú getur tengt hana aftur síðar."
 
 #: src/postulo/templates/applications/calendar.html
+#: src/postulo/templates/documents/themes/base_calendar.html
 msgid "Nothing on this day."
 msgstr "Ekkert þennan dag."
 
@@ -12756,6 +12789,7 @@ msgid "paper"
 msgstr ""
 
 #: src/postulo/documents/forms.py
+#: src/postulo/templates/applications/calendar_print.html
 #: src/postulo/templates/applications/report.html
 #: src/postulo/templates/core/table_export.html
 #: src/postulo/templates/settings/export.html
@@ -12913,6 +12947,7 @@ msgstr "Á ári"
 
 #: src/postulo/applications/forms.py
 #: src/postulo/templates/applications/calendar.html
+#: src/postulo/templates/applications/calendar_print.html
 #: src/postulo/templates/applications/report.html
 msgid "Period"
 msgstr "Tímabil"
@@ -13496,6 +13531,14 @@ msgstr "aðal"
 msgid "Primary"
 msgstr "Aðal"
 
+#: src/postulo/templates/applications/calendar.html
+msgid "Print"
+msgstr ""
+
+#: src/postulo/templates/applications/calendar_print.html
+msgid "Print the calendar"
+msgstr ""
+
 #: src/postulo/documents/models.py
 msgid "print the EQF level of my qualifications"
 msgstr "birta EQF-þrep menntunar minnar"
@@ -13576,6 +13619,7 @@ msgstr "Verðlaun, styrkir og viðurkenningar: viðurkenning sem einhver veitti 
 msgid "Proceedings"
 msgstr "Ráðstefnurit"
 
+#: src/postulo/templates/documents/themes/base_calendar.html
 #: src/postulo/templates/documents/themes/base_list.html
 msgid "Produced by Postulo from this person's own records."
 msgstr ""
@@ -13584,6 +13628,7 @@ msgstr ""
 msgid "Produced by Postulo from this person's own records. Postulo sets no target: how many applications a period should hold is a benefit regime's rule or the person's own."
 msgstr "Búið til af Postulo úr eigin færslum viðkomandi. Postulo setur ekkert markmið: hversu margar umsóknir tímabil ætti að innihalda er regla bótakerfis eða viðkomandi sjálfs."
 
+#: src/postulo/templates/documents/themes/base_calendar.html
 #: src/postulo/templates/documents/themes/base_list.html
 #: src/postulo/templates/documents/themes/base_report.html
 #, python-format
@@ -15415,6 +15460,7 @@ msgid "Show this period"
 msgstr "Sýna þetta tímabil"
 
 #: src/postulo/jobs/tables.py
+#: src/postulo/templates/applications/calendar_print.html
 #: src/postulo/templates/jobs/partials/whose_form.html
 msgid "Showing"
 msgstr "Sýnir"
@@ -18004,6 +18050,10 @@ msgstr "Launin"
 msgid "The people who will vouch for you, kept as contacts. A CV prints one only once they have agreed, and never their email address or number unless you say so."
 msgstr "Fólkið sem mun mæla með þér, geymt sem tengiliðir. Ferilskrá birtir meðmælanda aðeins þegar hann hefur samþykkt, og aldrei netfang hans eða númer nema þú segir til um það."
 
+#: src/postulo/templates/applications/calendar_print.html
+msgid "The period on screen as a PDF, with every entry of every day and none of the buttons. Downloaded, and not kept in Postulo."
+msgstr ""
+
 #: src/postulo/applications/forms.py
 msgid "The person at the company this went through, where there was one."
 msgstr "Manneskjan hjá fyrirtækinu sem þetta fór í gegnum, ef einhver var."
@@ -18500,6 +18550,7 @@ msgstr "Notandanafn eða netfang viðkomandi á þessari uppsetningu, nákvæmle
 msgid "theme"
 msgstr "þema"
 
+#: src/postulo/templates/applications/calendar_print.html
 #: src/postulo/templates/applications/report.html
 #: src/postulo/templates/core/table_export.html
 msgid "Theme"
@@ -19829,6 +19880,10 @@ msgstr "Myndband"
 msgid "Video call"
 msgstr "Myndsímtal"
 
+#: src/postulo/templates/applications/calendar_print.html
+msgid "View"
+msgstr ""
+
 #: src/postulo/core/views_tables.py
 msgid "View forgotten."
 msgstr "Sýn gleymd."
@@ -20217,6 +20272,7 @@ msgstr "Í hverju þetta var, þar sem heiti prófgráðunnar segir það ekki."
 msgid "What it was. Another capture of the same advert is added from the review screen, so it is not offered here."
 msgstr "Hvað þetta var. Öðru gripi af sömu auglýsingu er bætt við af yfirferðarskjánum, svo það er ekki í boði hér."
 
+#: src/postulo/templates/applications/calendar_print.html
 #: src/postulo/templates/core/table_export.html
 msgid "What it will hold"
 msgstr ""

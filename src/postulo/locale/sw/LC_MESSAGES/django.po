@@ -1482,11 +1482,19 @@ msgstr[0] "Hati %(total)s inathibitisha hili"
 msgstr[1] "Hati %(total)s zinathibitisha hili"
 
 #: src/postulo/templates/documents/cv_list.html
+#: src/postulo/templates/documents/themes/base_calendar.html
 #, fuzzy, python-format
 msgid "%(total)s entry"
 msgid_plural "%(total)s entries"
 msgstr[0] "Kiingizo %(total)s"
 msgstr[1] "Viingizo %(total)s"
+
+#: src/postulo/templates/applications/calendar_print.html
+#, python-format
+msgid "%(total)s entry."
+msgid_plural "%(total)s entries."
+msgstr[0] ""
+msgstr[1] ""
 
 #: src/postulo/templates/resume/overview.html
 #, fuzzy, python-format
@@ -3516,6 +3524,10 @@ msgstr[1] "Zote %(counter)s katika %(label)s"
 msgid "All columns"
 msgstr "Vipengele vyote"
 
+#: src/postulo/templates/documents/themes/base_calendar.html
+msgid "All day"
+msgstr ""
+
 #: src/postulo/templates/applications/application_detail.html
 #, fuzzy
 msgid "All documents"
@@ -4304,6 +4316,7 @@ msgstr "Kwa mfano, CV inapaswa kuchapishwa. Jina ambalo ni ujuzi katika uainisha
 msgid "As a CV should print it. It is linked to the company of that name among yours, and added to your companies if there is none."
 msgstr "Kwa mfano, CV inapaswa kuchapishwa. Ni kuunganishwa na kampuni ya jina hilo miongoni mwenu, na aliongeza kwa makampuni yako kama hakuna."
 
+#: src/postulo/templates/applications/calendar_print.html
 #: src/postulo/templates/core/table_export.html
 msgid "As a document"
 msgstr ""
@@ -4617,6 +4630,10 @@ msgstr "Rejea kwenye uchambuzi huu"
 #, fuzzy
 msgid "Back to the calendar"
 msgstr "Kurudi kwenye kalenda"
+
+#: src/postulo/templates/applications/calendar_print.html
+msgid "Back to the calendar, to change any of this"
+msgstr ""
 
 #: src/postulo/core/help.py
 #, fuzzy
@@ -4941,7 +4958,8 @@ msgid "C2 — proficient"
 msgstr "C2 - Uwezo"
 
 #: src/postulo/core/help.py src/postulo/core/navigation.py
-#: src/postulo/core/views.py src/postulo/plugins/categories.py
+#: src/postulo/core/views.py src/postulo/documents/themes.py
+#: src/postulo/plugins/categories.py
 #: src/postulo/templates/applications/application_detail.html
 #: src/postulo/templates/applications/calendar.html
 #: src/postulo/templates/applications/ical_import.html
@@ -4964,6 +4982,11 @@ msgstr "tarehe ya utambulisho"
 #, fuzzy
 msgid "Calendar views"
 msgstr "Maoni ya kalenda"
+
+#: src/postulo/applications/calendar_print.py
+#, python-format
+msgid "Calendar · %(period)s"
+msgstr ""
 
 #: src/postulo/applications/models.py src/postulo/jobs/models.py
 #, fuzzy
@@ -7154,6 +7177,7 @@ msgstr "Download ya ya ya"
 msgid "Download it as text"
 msgstr "Download kama maandishi"
 
+#: src/postulo/templates/applications/calendar_print.html
 #: src/postulo/templates/core/table_export.html
 msgid "Download PDF"
 msgstr ""
@@ -7836,7 +7860,9 @@ msgstr "Kila mtu"
 msgid "Everybody's, as an administrator"
 msgstr "Kila mtu, kama kiongozi"
 
-#: src/postulo/jobs/tables.py src/postulo/templates/server/logs.html
+#: src/postulo/jobs/tables.py
+#: src/postulo/templates/applications/calendar_print.html
+#: src/postulo/templates/server/logs.html
 #, fuzzy
 msgid "Everything"
 msgstr "Kila kitu kila kitu"
@@ -10749,6 +10775,7 @@ msgstr "lugha ambayo haikutajwa"
 msgid "language of exported files"
 msgstr ""
 
+#: src/postulo/templates/applications/calendar_print.html
 #: src/postulo/templates/core/table_export.html
 msgid "Language of the document"
 msgstr ""
@@ -11636,6 +11663,10 @@ msgstr "Thesis ya Mwalimu"
 #, fuzzy
 msgid "Match the operating system"
 msgstr "Kulinganisha mfumo wa uendeshaji"
+
+#: src/postulo/templates/applications/calendar_print.html
+msgid "Matching"
+msgstr ""
 
 #: src/postulo/plugins/models.py
 #, fuzzy
@@ -13412,6 +13443,7 @@ msgid "Nothing in the diary. When one is offered, schedule it from the applicati
 msgstr "Hakuna kitu kwenye diary. Wakati moja inapotolewa, ratiba kutoka ukurasa wa maombi."
 
 #: src/postulo/templates/applications/calendar.html
+#: src/postulo/templates/documents/themes/base_calendar.html
 #, fuzzy
 msgid "Nothing in this period."
 msgstr "Hakuna chochote katika kipindi hiki."
@@ -13512,6 +13544,7 @@ msgid "Nothing on the other service is touched. You can connect it again later."
 msgstr "Hakuna chochote kwenye huduma nyingine. Unaweza kuwasiliana naye baadaye."
 
 #: src/postulo/templates/applications/calendar.html
+#: src/postulo/templates/documents/themes/base_calendar.html
 #, fuzzy
 msgid "Nothing on this day."
 msgstr "Hakuna chochote siku hiyo."
@@ -14781,6 +14814,7 @@ msgid "paper"
 msgstr ""
 
 #: src/postulo/documents/forms.py
+#: src/postulo/templates/applications/calendar_print.html
 #: src/postulo/templates/applications/report.html
 #: src/postulo/templates/core/table_export.html
 #: src/postulo/templates/settings/export.html
@@ -14968,6 +15002,7 @@ msgstr "Kwa mwaka"
 
 #: src/postulo/applications/forms.py
 #: src/postulo/templates/applications/calendar.html
+#: src/postulo/templates/applications/calendar_print.html
 #: src/postulo/templates/applications/report.html
 #, fuzzy
 msgid "Period"
@@ -15664,6 +15699,14 @@ msgstr "msingi wa msingi"
 msgid "Primary"
 msgstr "Msingi wa msingi"
 
+#: src/postulo/templates/applications/calendar.html
+msgid "Print"
+msgstr ""
+
+#: src/postulo/templates/applications/calendar_print.html
+msgid "Print the calendar"
+msgstr ""
+
 #: src/postulo/documents/models.py
 #, fuzzy
 msgid "print the EQF level of my qualifications"
@@ -15764,6 +15807,7 @@ msgstr "Tuzo, masomo na tofauti: kutambua mtu aliyekupa."
 msgid "Proceedings"
 msgstr "Hatua za"
 
+#: src/postulo/templates/documents/themes/base_calendar.html
 #: src/postulo/templates/documents/themes/base_list.html
 msgid "Produced by Postulo from this person's own records."
 msgstr ""
@@ -15773,6 +15817,7 @@ msgstr ""
 msgid "Produced by Postulo from this person's own records. Postulo sets no target: how many applications a period should hold is a benefit regime's rule or the person's own."
 msgstr "Imetayarishwa na Postulo kutoka kwa kumbukumbu za mtu huyo. Postulo haitoi lengo: ni programu ngapi za kipindi zinapaswa kushikilia ni utawala wa faida au mtu mwenyewe."
 
+#: src/postulo/templates/documents/themes/base_calendar.html
 #: src/postulo/templates/documents/themes/base_list.html
 #: src/postulo/templates/documents/themes/base_report.html
 #, fuzzy, python-format
@@ -17932,6 +17977,7 @@ msgid "Show this period"
 msgstr "Kuonyesha kipindi hiki"
 
 #: src/postulo/jobs/tables.py
+#: src/postulo/templates/applications/calendar_print.html
 #: src/postulo/templates/jobs/partials/whose_form.html
 #, fuzzy
 msgid "Showing"
@@ -20946,6 +20992,10 @@ msgstr "Malipo ya"
 msgid "The people who will vouch for you, kept as contacts. A CV prints one only once they have agreed, and never their email address or number unless you say so."
 msgstr "Watu ambao wanawasiliana na wewe, wanawasiliana na wewe. CV inachapisha moja tu baada ya kukubaliana, na kamwe anwani yao ya barua pepe au nambari isipokuwa unasema hivyo."
 
+#: src/postulo/templates/applications/calendar_print.html
+msgid "The period on screen as a PDF, with every entry of every day and none of the buttons. Downloaded, and not kept in Postulo."
+msgstr ""
+
 #: src/postulo/applications/forms.py
 #, fuzzy
 msgid "The person at the company this went through, where there was one."
@@ -21531,6 +21581,7 @@ msgstr "Jina la mtumiaji au anwani ya barua pepe kwenye tukio hili, hasa."
 msgid "theme"
 msgstr "mada ya mada"
 
+#: src/postulo/templates/applications/calendar_print.html
 #: src/postulo/templates/applications/report.html
 #: src/postulo/templates/core/table_export.html
 msgid "Theme"
@@ -23096,6 +23147,10 @@ msgstr "Video ya video"
 msgid "Video call"
 msgstr "Ujumbe wa video"
 
+#: src/postulo/templates/applications/calendar_print.html
+msgid "View"
+msgstr ""
+
 #: src/postulo/core/views_tables.py
 #, fuzzy
 msgid "View forgotten."
@@ -23559,6 +23614,7 @@ msgstr "Nini ilikuwa katika, ambapo jina la sifa si kusema."
 msgid "What it was. Another capture of the same advert is added from the review screen, so it is not offered here."
 msgstr "Ilikuwa nini. Ukamataji mwingine wa tangazo hilo unaongezwa kutoka kwenye skrini ya ukaguzi, kwa hivyo haipatikani hapa."
 
+#: src/postulo/templates/applications/calendar_print.html
 #: src/postulo/templates/core/table_export.html
 msgid "What it will hold"
 msgstr ""

@@ -20,9 +20,10 @@ def test_the_switch_is_in_the_period_row_aligned_to_the_end(client, user):
     html = page(client)
 
     nav = re.search(r"<nav[^>]*data-period.*?</nav>", html, re.S)[0]
-    views = re.search(
-        r'<div class="button-group[^"]*justify-self-end[^"]*"[^>]*data-views>(.*?)</div>', nav, re.S
-    )[1]
+    # The switch and *Print* (#342) share one box, the one aligned to the end.
+    end = re.search(r'<div class="[^"]*justify-self-end[^"]*">\s*<div class="button-group', nav)
+    assert end, "the box holding the switch is not aligned to the end"
+    views = re.search(r'<div class="button-group[^"]*"[^>]*data-views>(.*?)</div>', nav, re.S)[1]
     # Each word in its label span, beside its icon, since #904.
     words = re.findall(r'<span class="btn-label">\s*([A-Za-z]+)\s*</span>\s*</a>', views)
     assert words == ["Month", "Week", "Day", "Agenda"]

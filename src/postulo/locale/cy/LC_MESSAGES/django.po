@@ -1656,6 +1656,7 @@ msgstr[2] "Mae %(total)s dogfen yn profi hyn"
 msgstr[3] "Mae %(total)s dogfen yn profi hyn"
 
 #: src/postulo/templates/documents/cv_list.html
+#: src/postulo/templates/documents/themes/base_calendar.html
 #, python-format
 msgid "%(total)s entry"
 msgid_plural "%(total)s entries"
@@ -1663,6 +1664,15 @@ msgstr[0] "%(total)s cofnod"
 msgstr[1] "%(total)s gofnod"
 msgstr[2] "%(total)s cofnod"
 msgstr[3] "%(total)s cofnod"
+
+#: src/postulo/templates/applications/calendar_print.html
+#, python-format
+msgid "%(total)s entry."
+msgid_plural "%(total)s entries."
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
 
 #: src/postulo/templates/resume/overview.html
 #, python-format
@@ -3426,6 +3436,10 @@ msgstr[3] "Pob un o'r %(counter)s yn %(label)s"
 msgid "All columns"
 msgstr "Pob colofn"
 
+#: src/postulo/templates/documents/themes/base_calendar.html
+msgid "All day"
+msgstr ""
+
 #: src/postulo/templates/applications/application_detail.html
 msgid "All documents"
 msgstr "Pob dogfen"
@@ -4094,6 +4108,7 @@ msgstr "Fel y dylai CV ei argraffu. Caiff enw sy'n sgil yn nosbarthiad ESCO ei a
 msgid "As a CV should print it. It is linked to the company of that name among yours, and added to your companies if there is none."
 msgstr "Fel y dylai CV ei argraffu. Caiff ei gysylltu â'r cwmni o'r enw hwnnw ymhlith eich cwmnïau chi, a'i ychwanegu at eich cwmnïau os nad oes un."
 
+#: src/postulo/templates/applications/calendar_print.html
 #: src/postulo/templates/core/table_export.html
 msgid "As a document"
 msgstr ""
@@ -4356,6 +4371,10 @@ msgstr "Yn ôl i adolygu'r cipiad hwn"
 #: src/postulo/core/help.py
 msgid "Back to the calendar"
 msgstr "Yn ôl i'r calendr"
+
+#: src/postulo/templates/applications/calendar_print.html
+msgid "Back to the calendar, to change any of this"
+msgstr ""
 
 #: src/postulo/core/help.py
 msgid "Back to the dashboard"
@@ -4626,7 +4645,8 @@ msgid "C2 — proficient"
 msgstr "C2 — hyfedr"
 
 #: src/postulo/core/help.py src/postulo/core/navigation.py
-#: src/postulo/core/views.py src/postulo/plugins/categories.py
+#: src/postulo/core/views.py src/postulo/documents/themes.py
+#: src/postulo/plugins/categories.py
 #: src/postulo/templates/applications/application_detail.html
 #: src/postulo/templates/applications/calendar.html
 #: src/postulo/templates/applications/ical_import.html
@@ -4645,6 +4665,11 @@ msgstr "dynodydd calendr"
 #: src/postulo/templates/applications/calendar.html
 msgid "Calendar views"
 msgstr "Gweddau'r calendr"
+
+#: src/postulo/applications/calendar_print.py
+#, python-format
+msgid "Calendar · %(period)s"
+msgstr ""
 
 #: src/postulo/applications/models.py src/postulo/jobs/models.py
 msgid "Call"
@@ -6496,6 +6521,7 @@ msgstr "Ei llwytho i lawr"
 msgid "Download it as text"
 msgstr "Ei llwytho i lawr fel testun"
 
+#: src/postulo/templates/applications/calendar_print.html
 #: src/postulo/templates/core/table_export.html
 msgid "Download PDF"
 msgstr ""
@@ -7062,7 +7088,9 @@ msgstr "Rhai pawb"
 msgid "Everybody's, as an administrator"
 msgstr "Rhai pawb, fel gweinyddwr"
 
-#: src/postulo/jobs/tables.py src/postulo/templates/server/logs.html
+#: src/postulo/jobs/tables.py
+#: src/postulo/templates/applications/calendar_print.html
+#: src/postulo/templates/server/logs.html
 msgid "Everything"
 msgstr "Popeth"
 
@@ -9517,6 +9545,7 @@ msgstr "iaith heb ei nodi"
 msgid "language of exported files"
 msgstr ""
 
+#: src/postulo/templates/applications/calendar_print.html
 #: src/postulo/templates/core/table_export.html
 msgid "Language of the document"
 msgstr ""
@@ -10255,6 +10284,10 @@ msgstr "Traethawd gradd meistr"
 #: src/postulo/accounts/models.py
 msgid "Match the operating system"
 msgstr "Cydweddu â'r system weithredu"
+
+#: src/postulo/templates/applications/calendar_print.html
+msgid "Matching"
+msgstr ""
 
 #: src/postulo/plugins/models.py
 #, fuzzy
@@ -11750,6 +11783,7 @@ msgid "Nothing in the diary. When one is offered, schedule it from the applicati
 msgstr "Dim byd yn y dyddiadur. Pan gynigir un i chi, trefnwch ef o dudalen y cais."
 
 #: src/postulo/templates/applications/calendar.html
+#: src/postulo/templates/documents/themes/base_calendar.html
 msgid "Nothing in this period."
 msgstr "Dim byd yn y cyfnod hwn."
 
@@ -11835,6 +11869,7 @@ msgid "Nothing on the other service is touched. You can connect it again later."
 msgstr "Ni chyffyrddir â dim ar y gwasanaeth arall. Gallwch gysylltu eto'n nes ymlaen."
 
 #: src/postulo/templates/applications/calendar.html
+#: src/postulo/templates/documents/themes/base_calendar.html
 msgid "Nothing on this day."
 msgstr "Dim byd ar y diwrnod hwn."
 
@@ -12952,6 +12987,7 @@ msgid "paper"
 msgstr ""
 
 #: src/postulo/documents/forms.py
+#: src/postulo/templates/applications/calendar_print.html
 #: src/postulo/templates/applications/report.html
 #: src/postulo/templates/core/table_export.html
 #: src/postulo/templates/settings/export.html
@@ -13107,6 +13143,7 @@ msgstr "Y flwyddyn"
 
 #: src/postulo/applications/forms.py
 #: src/postulo/templates/applications/calendar.html
+#: src/postulo/templates/applications/calendar_print.html
 #: src/postulo/templates/applications/report.html
 msgid "Period"
 msgstr "Cyfnod"
@@ -13690,6 +13727,14 @@ msgstr "prif"
 msgid "Primary"
 msgstr "Prif"
 
+#: src/postulo/templates/applications/calendar.html
+msgid "Print"
+msgstr ""
+
+#: src/postulo/templates/applications/calendar_print.html
+msgid "Print the calendar"
+msgstr ""
+
 #: src/postulo/documents/models.py
 msgid "print the EQF level of my qualifications"
 msgstr "argraffu lefel EQF fy nghymwysterau"
@@ -13770,6 +13815,7 @@ msgstr "Gwobrau, ysgoloriaethau a rhagoriaethau: cydnabyddiaeth a roddodd rhywun
 msgid "Proceedings"
 msgstr "Trafodion"
 
+#: src/postulo/templates/documents/themes/base_calendar.html
 #: src/postulo/templates/documents/themes/base_list.html
 msgid "Produced by Postulo from this person's own records."
 msgstr ""
@@ -13778,6 +13824,7 @@ msgstr ""
 msgid "Produced by Postulo from this person's own records. Postulo sets no target: how many applications a period should hold is a benefit regime's rule or the person's own."
 msgstr "Cynhyrchwyd gan Postulo o gofnodion y person hwn ei hun. Nid yw Postulo yn gosod targed: mater i drefn budd-daliadau neu i'r person ei hun yw faint o geisiadau y dylai cyfnod eu cynnwys."
 
+#: src/postulo/templates/documents/themes/base_calendar.html
 #: src/postulo/templates/documents/themes/base_list.html
 #: src/postulo/templates/documents/themes/base_report.html
 #, python-format
@@ -15604,6 +15651,7 @@ msgid "Show this period"
 msgstr "Dangos y cyfnod hwn"
 
 #: src/postulo/jobs/tables.py
+#: src/postulo/templates/applications/calendar_print.html
 #: src/postulo/templates/jobs/partials/whose_form.html
 msgid "Showing"
 msgstr "Yn dangos"
@@ -18201,6 +18249,10 @@ msgstr "Y tâl"
 msgid "The people who will vouch for you, kept as contacts. A CV prints one only once they have agreed, and never their email address or number unless you say so."
 msgstr "Y bobl a fydd yn siarad drosoch, wedi'u cadw fel pobl gyswllt. Dim ond ar ôl iddynt gytuno y mae CV yn argraffu un, a byth eu cyfeiriad e-bost na'u rhif oni bai eich bod yn dweud hynny."
 
+#: src/postulo/templates/applications/calendar_print.html
+msgid "The period on screen as a PDF, with every entry of every day and none of the buttons. Downloaded, and not kept in Postulo."
+msgstr ""
+
 #: src/postulo/applications/forms.py
 msgid "The person at the company this went through, where there was one."
 msgstr "Y person yn y cwmni yr aeth hwn drwyddo, lle'r oedd un."
@@ -18695,6 +18747,7 @@ msgstr "Eu henw defnyddiwr neu eu cyfeiriad e-bost yn y gosodiad hwn, yn union."
 msgid "theme"
 msgstr "thema"
 
+#: src/postulo/templates/applications/calendar_print.html
 #: src/postulo/templates/applications/report.html
 #: src/postulo/templates/core/table_export.html
 msgid "Theme"
@@ -20027,6 +20080,10 @@ msgstr "Fideo"
 msgid "Video call"
 msgstr "Galwad fideo"
 
+#: src/postulo/templates/applications/calendar_print.html
+msgid "View"
+msgstr ""
+
 #: src/postulo/core/views_tables.py
 msgid "View forgotten."
 msgstr "Anghofiwyd y wedd."
@@ -20412,6 +20469,7 @@ msgstr "Ym mha faes yr oedd, lle nad yw enw'r cymhwyster yn dweud."
 msgid "What it was. Another capture of the same advert is added from the review screen, so it is not offered here."
 msgstr "Beth ydoedd. Mae cipiad arall o'r un hysbyseb yn cael ei ychwanegu o'r sgrin adolygu, felly nid yw'n cael ei gynnig yma."
 
+#: src/postulo/templates/applications/calendar_print.html
 #: src/postulo/templates/core/table_export.html
 msgid "What it will hold"
 msgstr ""
