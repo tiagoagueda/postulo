@@ -7,6 +7,8 @@ model's example in two languages.
 
 from __future__ import annotations
 
+import dataclasses
+import datetime
 import hashlib
 import json
 from pathlib import Path
@@ -230,3 +232,173 @@ def test_the_api_says_the_seal_was_not_checked(client, user, credential):
     assert response.status_code == 200, response.content
     seals = {row["title"]: row["seal"] for row in response.json()["items"]}
     assert seals == {"Micro-credential": "unchecked", "Scan": None}
+
+
+# ------------------------------------------------------------- what it states (stage 2)
+
+
+def _read(path, language="en"):
+    from postulo.plugins.europass import credential
+
+    return credential.read(path.read_bytes(), language)
+
+
+def test_a_certificate_of_participation_says_what_it_is_and_states_no_level():
+    summary = _read(CERTIFICATE)
+    assert summary.title == "EDC Updates Webinar"
+    assert summary.awarded_by == ["European Digital Credentials for Learning Support Team"]
+    assert summary.awarded_on == datetime.date(2023, 6, 28)
+    assert summary.eqf_level is None, "never guessed where it is not stated"
+
+
+@pytest.mark.parametrize("path", [MICRO_SEALED, MICRO_BARE], ids=["sealed", "bare"])
+def test_a_micro_credential_reads_the_same_sealed_or_not(path):
+    summary = _read(path)
+    assert summary.title == "Digital micro-credential creation"
+    assert summary.awarded_by == ["University of Zed"], "who awarded it, not who sealed it"
+    assert summary.awarded_on == datetime.date(2022, 12, 31)
+    assert summary.eqf_level == 6
+
+
+def test_a_language_map_gives_the_readers_language_else_english():
+    assert _read(EXAMPLE, "fr").title == "une sorte de réussite scolaire"
+    assert _read(EXAMPLE, "fr-CA").title == "une sorte de réussite scolaire"
+    assert _read(EXAMPLE, "en-GB").title == "some kind of learning achievement"
+    assert _read(EXAMPLE, "pt-PT").title == "some kind of learning achievement"
+    assert _read(EXAMPLE).awarded_by == ["some legal name of the organistion"]
+    assert _read(EXAMPLE).awarded_on == datetime.date(2010, 10, 1)
+
+
+def _credential(**changes) -> dict:
+    found = credentials.credential_in(MICRO_BARE.read_bytes())
+    found.update(changes)
+    return found
+
+
+def test_a_file_that_is_half_right_gives_the_half():
+    from postulo.plugins.europass import credential
+
+    broken = _credential(
+        credentialSubject={
+            "hasClaim": [
+                5,
+                {
+                    "type": "LearningAchievement",
+                    "title": {"en": "Kept"},
+                    "awardedBy": {"awardingBody": [{"legalName": 3}, "x", {"legalName": "A"}]},
+                    "specifiedBy": {"eqfLevel": {"id": "http://data.europa.eu/snb/eqf/9"}},
+                },
+            ]
+        },
+        validFrom="not a date",
+        issued="2024-02-30",
+        issuanceDate=None,
+    )
+    summary = credential.summarise(broken, "en")
+    assert summary.title == "Kept"
+    assert summary.awarded_by == ["A"]
+    assert summary.awarded_on is None
+    assert summary.eqf_level is None, "a level that does not exist is not a level"
+
+
+def test_a_claim_with_no_title_falls_back_to_what_the_credential_displays():
+    from postulo.plugins.europass import credential
+
+    found = _credential(
+        credentialSubject={"hasClaim": {"type": "LearningActivity"}},
+        displayParameter={"title": {"en": "Shown title"}},
+    )
+    assert credential.summarise(found, "en").title == "Shown title"
+
+
+def test_a_credential_names_nothing_personal():
+    """The subject's names, identifiers and birth date are in the file and stay there."""
+    data = MICRO_SEALED.read_bytes()
+    subject = credentials.credential_in(data)["credentialSubject"]
+    personal = [
+        str(value)
+        for key in ("givenName", "familyName", "fullName", "dateOfBirth", "nationalID")
+        for value in (
+            subject.get(key).values() if isinstance(subject.get(key), dict) else [subject.get(key)]
+        )
+        if value
+    ]
+    assert personal, "the fixture does carry them"
+    said = repr(dataclasses.asdict(_read(MICRO_SEALED)))
+    for value in personal:
+        assert value[:10] not in said
+
+
+def test_the_old_xml_is_refused_by_the_reader_too():
+    from postulo.plugins.europass import credential
+
+    with pytest.raises(credential.CredentialRefused, match="Europass wallet"):
+        credential.read(OLD_XML)
+    with pytest.raises(credential.CredentialRefused):
+        credential.read(b'{"type": "VerifiableCredential"}')
+
+
+def test_nothing_is_fetched_whatever_the_context_names(monkeypatch):
+    import socket
+
+    from postulo.plugins.europass import credential
+
+    def refuse(*args, **kwargs):
+        raise AssertionError("a credential was read with the network")
+
+    monkeypatch.setattr(socket.socket, "connect", refuse)
+    monkeypatch.setattr(socket, "getaddrinfo", refuse)
+    found = _credential(**{"@context": ["http://attacker.example/context.jsonld"]})
+    data = json.dumps(found).encode()
+    assert credential.read(data, "en").title == "Digital micro-credential creation"
+
+
+# ----------------------------------------------------------------- on the page
+
+
+def test_the_page_says_what_the_credential_states_beside_the_unchecked_seal(
+    client, user, credential
+):
+    client.force_login(user)
+    html = client.get(reverse("documents:upload_update", args=[credential.pk])).content.decode()
+    assert "data-credential" in html
+    assert 'data-seal="unchecked"' in html
+    assert "Digital micro-credential creation" in html
+    assert "University of Zed" in html
+    assert 'data-eqf="6"' in html
+    subject = credentials.credential_in(MICRO_SEALED.read_bytes())["credentialSubject"]
+    assert subject["familyName"]["en"] not in html, "nothing about the person"
+    credential.refresh_from_db()
+    assert credential.text == "", "and nothing kept beside the file"
+
+
+def test_what_a_credential_says_is_escaped(client, user):
+    hostile = _credential(
+        credentialSubject={"hasClaim": {"title": {"en": "<script>alert(1)</script>"}, "type": "X"}}
+    )
+    document = UploadedDocument.objects.create(
+        owner=user,
+        title="Credential",
+        kind="certificate",
+        file=SimpleUploadedFile("c.jsonld", json.dumps(hostile).encode()),
+    )
+    client.force_login(user)
+    html = client.get(reverse("documents:upload_update", args=[document.pk])).content.decode()
+    assert "<script>alert(1)" not in html
+    assert "&lt;script&gt;alert(1)&lt;/script&gt;" in html
+
+
+def test_only_the_owner_sees_what_a_credential_says(client, other_user, credential):
+    client.force_login(other_user)
+    url = reverse("documents:upload_update", args=[credential.pk])
+    assert client.get(url).status_code == 404
+
+
+def test_with_europass_off_the_file_is_kept_and_not_read(client, user, credential):
+    from postulo.plugins.models import PluginPolicy
+
+    PluginPolicy.objects.create(plugin="europass", person=user, state=PluginPolicy.State.FORCED_OFF)
+    client.force_login(user)
+    html = client.get(reverse("documents:upload_update", args=[credential.pk])).content.decode()
+    assert 'data-seal="unchecked"' in html, "the seal is said whatever reads the file"
+    assert "University of Zed" not in html

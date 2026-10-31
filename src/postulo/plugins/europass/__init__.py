@@ -46,7 +46,8 @@ _CANDIDATE = re.compile(rb"<(?:[A-Za-z_][\w.-]*:)?Candidate[\s>/]")
         icon="id-card",
         description=_(
             "The European CV format: the PDF europass.europa.eu gives you and the XML "
-            "attached to it, and the older XML and JSON of the Europass service before it."
+            "attached to it, and the older XML and JSON of the Europass service before it. "
+            "Also reads what a European Digital Credential you keep under Files states."
         ),
     )
 )

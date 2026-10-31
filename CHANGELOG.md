@@ -274,6 +274,7 @@ All notable changes to Postulo are recorded here. The format follows
 ### ✨ Added
 
 - A European Digital Credential (the JSON-LD file the Europass wallet gives you, sealed or not) can be uploaded as a certificate, diploma or diploma supplement and is kept byte for byte, labelled "Seal not checked by Postulo" on the Files page and in the API. (#670)
+- A European Digital Credential's edit page shows what it states: its title, who awarded it, when, and its EQF level where it gives one. Read from the file by Europass import each time, nothing fetched and nothing personal read or kept. (#670)
 - A plugin can make an interview with `schedule_interview`, refused exactly as the form and the API are (the kind, the end, the people now checked in the service), and read a person's deadlines, closing dates and other dated things in their own time zone with `calendar_items`. (#330)
 - Export a table whole: Applications, Companies and Listings each have *Export*, which writes every row in your columns, filters and sort as a PDF set by a theme (a new list kind, offered and remembered like the report's; landscape by default) or as a CSV of the same rows, downloaded and never filed (#341)
 - A connection's form can offer what is on the other service: a plugin's `discover` lists what it finds when you press Look on the server, and you choose several, each in a mode the plugin offers (read, write), from a table that keeps one that vanished in sight until you let it go (#332)

@@ -825,6 +825,35 @@ class UploadUpdateView(OwnedObjectMixin, UserFormKwargsMixin, UpdateView):
     template_name = "documents/upload_form.html"
     success_url = reverse_lazy("documents:upload_list")
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        if self.object.is_credential:
+            context["credential"] = credential_summary(self.request.user, self.object)
+        return context
+
+
+def credential_summary(user, document: UploadedDocument) -> dict:
+    """What a European Digital Credential says, read from the file now (#670).
+
+    Read by the Europass plugin, where it is on for this person, and kept nowhere: the file
+    is the record, and a summary stored beside it would be a second copy of what it says
+    about somebody. ``read`` is ``False`` where the plugin is off, so the page says only that
+    the seal was not checked; ``refused`` is the sentence where it could not be read.
+    """
+    from postulo.plugins.europass import credential
+    from postulo.plugins.policy import decide
+
+    if not decide("europass", user).on:
+        return {"read": False}
+    try:
+        with document.file.open("rb") as handle:
+            data = handle.read(credential.credentials.MAX_BYTES + 1)
+        return {"read": True, "summary": credential.read(data)}
+    except credential.CredentialRefused as refused:
+        return {"read": True, "refused": str(refused)}
+    except OSError:
+        return {"read": True, "refused": _("The file could not be opened.")}
+
 
 class UploadDeleteView(ConfirmDeleteMixin, OwnedObjectMixin, DeleteView):
     model = UploadedDocument

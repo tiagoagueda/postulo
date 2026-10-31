@@ -32,6 +32,35 @@
           <c-field :field="field" />
         {% endfor %}
       </div>
+      {% if form.instance.is_credential %}
+        {% comment %} What a European Digital Credential states, read from the file each time
+           this page is drawn and kept nowhere else (#670). The seal is never checked here,
+           and the page says so: grey, never a tick, never absent. {% endcomment %}
+        <section class="card mb-6" data-credential aria-labelledby="credential-title">
+          <h2 id="credential-title" class="mb-2 font-semibold">{% translate "What this credential says" %}</h2>
+          <p class="mb-3"><span class="badge" data-tone="grey" data-seal="unchecked">{% translate "Seal not checked by Postulo" %}</span></p>
+          {% if credential.summary %}
+            <dl class="grid gap-x-4 gap-y-1 text-sm sm:grid-cols-[auto_1fr]">
+              <dt class="text-ink-500 dark:text-ink-400">{% translate "Title" %}</dt>
+              <dd><bdi>{{ credential.summary.title|default:_("Not stated") }}</bdi></dd>
+              <dt class="text-ink-500 dark:text-ink-400">{% translate "Awarded by" %}</dt>
+              <dd>{% for body in credential.summary.awarded_by %}<bdi>{{ body }}</bdi>{% if not forloop.last %}; {% endif %}{% empty %}{% translate "Not stated" %}{% endfor %}</dd>
+              <dt class="text-ink-500 dark:text-ink-400">{% translate "Awarded on" %}</dt>
+              <dd>{% if credential.summary.awarded_on %}{{ credential.summary.awarded_on|date:"DATE_FORMAT" }}{% else %}{% translate "Not stated" %}{% endif %}</dd>
+              <dt class="text-ink-500 dark:text-ink-400">{% translate "EQF level" %}</dt>
+              <dd data-eqf="{{ credential.summary.eqf_level|default_if_none:'' }}">{{ credential.summary.eqf_level|default_if_none:_("Not stated") }}</dd>
+            </dl>
+            <p class="mt-3 text-xs text-ink-500 dark:text-ink-400">
+              {% blocktranslate trimmed %}
+                What the file states, as it states it. Postulo has not checked who sealed it,
+                and nothing about it was sent anywhere to read it.
+              {% endblocktranslate %}
+            </p>
+          {% elif credential.refused %}
+            <p class="text-sm" data-credential-refused>{{ credential.refused }}</p>
+          {% endif %}
+        </section>
+      {% endif %}
       {% if form.takes_reference %}
         {% comment %} A group of its own, always drawn for a new file so it works with scripts
            off: the kind is chosen on this same page, and a letter of any other kind simply
