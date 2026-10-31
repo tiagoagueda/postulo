@@ -689,6 +689,17 @@ def _reminder_actor(entry: dict) -> str:
     return str(entry.get("actor") or "")[: Reminder._meta.get_field("actor").max_length]
 
 
+def _reminder_origin(entry: dict) -> dict:
+    """Format 66 (#887): which plugin placed a reminder, what it said, and when it ended it.
+    Every reminder carries them, top-level or nested under an application or an appointment
+    (#1081); an archive without them is a reminder somebody made."""
+    return {
+        "source": str(entry.get("source") or "")[:60],
+        "note": str(entry.get("note") or ""),
+        "retired_at": _dt(entry.get("retired_at")),
+    }
+
+
 def _restored_uid(model, user, raw) -> dict:
     """``{"uid": …}`` for a record whose calendar identifier can travel, or nothing.
 
@@ -1660,11 +1671,7 @@ def _load(user, archive: zipfile.ZipFile, *, force: bool = False, into=None) -> 
             summary=reminder_entry.get("summary", ""),
             due_at=due_at,
             done_at=_dt(reminder_entry.get("done_at")),
-            # Format 66 (#887): which plugin placed it, what it said, and when it ended it. An
-            # archive without them is a reminder somebody made.
-            source=str(reminder_entry.get("source") or "")[:60],
-            note=str(reminder_entry.get("note") or ""),
-            retired_at=_dt(reminder_entry.get("retired_at")),
+            **_reminder_origin(reminder_entry),
             # Format 79 (#331): who last changed it, when not the person.
             actor=_reminder_actor(reminder_entry),
             **_restored_uid(Reminder, user, reminder_entry.get("uid")),
@@ -1864,6 +1871,7 @@ def _load(user, archive: zipfile.ZipFile, *, force: bool = False, into=None) -> 
                     summary=str(reminder_entry.get("summary", ""))[:250],
                     due_at=_dt(reminder_entry.get("due_at")),
                     done_at=_dt(reminder_entry.get("done_at")),
+                    **_reminder_origin(reminder_entry),
                     actor=_reminder_actor(reminder_entry),
                     **_restored_uid(Reminder, user, reminder_entry.get("uid")),
                 )
@@ -2016,6 +2024,7 @@ def _load(user, archive: zipfile.ZipFile, *, force: bool = False, into=None) -> 
                         summary=reminder_entry.get("summary", ""),
                         due_at=_dt(reminder_entry.get("due_at")),
                         done_at=_dt(reminder_entry.get("done_at")),
+                        **_reminder_origin(reminder_entry),
                         actor=_reminder_actor(reminder_entry),
                         **_restored_uid(Reminder, user, reminder_entry.get("uid")),
                     )
