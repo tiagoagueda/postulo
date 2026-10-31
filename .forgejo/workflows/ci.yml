@@ -344,7 +344,7 @@ jobs:
           DJANGO_SETTINGS_MODULE: postulo.config.settings.test
 
       - name: Test
-        # Three processes, not `-n auto` (#233): the jobs of this workflow share one host,
+        # Two processes, not `-n auto` (#233): the jobs of this workflow share one host,
         # and `auto` gave each of them a worker per host core. Run 539 spent 59 minutes on a
         # suite that takes 4 serially, and starved every other job on the box -- the
         # postgres leg took 27 minutes over 41 tests, the browser leg 12 minutes to install
@@ -365,15 +365,22 @@ jobs:
         # peaked at 606, 754 and 965 MB, the last the one given the catalogues, before they
         # were trimmed by a further 130 MB. A worker past 700 MB again is worth a look before
         # anything adds a fourth.
+        #
+        # Back to two since #1184: on 31 October a worker was killed again in this 2 GB (runs
+        # 1778 and 1793, both in the measured step, `--cov` adding to each worker), and xdist,
+        # having replaced it, never finished, so the job hung to the runner's deadline with
+        # every test it reached passed. `--max-worker-restart=0` makes a killed worker fail
+        # the job at once, with the test it was running in the report. Three are for #1033 to
+        # measure again.
         if: matrix.python-version != '3.14'
-        run: uv run pytest -n 3 --dist loadgroup --durations=25
+        run: uv run pytest -n 2 --max-worker-restart=0 --dist loadgroup --durations=25
         timeout-minutes: 30
 
       - name: Test, and measure what the suite covers
         # On one leg only: measuring slows the run, and three copies of the same number are
         # not three facts. `fail_under` in pyproject.toml is the floor it must clear.
         if: matrix.python-version == '3.14'
-        run: uv run pytest -n 3 --dist loadgroup --durations=25 --cov --cov-report=term-missing
+        run: uv run pytest -n 2 --max-worker-restart=0 --dist loadgroup --durations=25 --cov --cov-report=term-missing
         timeout-minutes: 30
 
       - name: Test what needs a process to itself
