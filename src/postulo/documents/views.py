@@ -840,6 +840,7 @@ def credential_summary(user, document: UploadedDocument) -> dict:
     about somebody. ``read`` is ``False`` where the plugin is off, so the page says only that
     the seal was not checked; ``refused`` is the sentence where it could not be read.
     """
+    from postulo.core import languages
     from postulo.plugins.europass import credential
     from postulo.plugins.policy import decide
 
@@ -848,7 +849,8 @@ def credential_summary(user, document: UploadedDocument) -> dict:
     try:
         with document.file.open("rb") as handle:
             data = handle.read(credential.credentials.MAX_BYTES + 1)
-        return {"read": True, "summary": credential.read(data)}
+        # The plugin is told the language rather than asking Django (#337).
+        return {"read": True, "summary": credential.read(data, languages.current())}
     except credential.CredentialRefused as refused:
         return {"read": True, "refused": str(refused)}
     except OSError:

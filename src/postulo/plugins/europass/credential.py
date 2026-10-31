@@ -38,7 +38,6 @@ import datetime as dt
 import re
 from dataclasses import dataclass, field
 
-from django.utils.translation import get_language
 from django.utils.translation import gettext_lazy as _
 
 from postulo.documents import credentials
@@ -93,7 +92,7 @@ def _objects(value, limit: int) -> list[dict]:
 def _words(value, language: str) -> str:
     """Text out of a language map, in the reader's language, else English, else the first.
 
-    A plain string is taken as it is. Whitespace is collapsed, so a value cannot lay out a
+    A plain string is kept as written. Whitespace is collapsed, so a value cannot lay out a
     page; everything shown is escaped by the template that shows it.
     """
     if isinstance(value, str):
@@ -155,7 +154,6 @@ def summarise(credential: dict, language: str = "") -> Summary:
     Of one claim: the first with a title, the achievement before any other. A transcript
     holds many, and the one a CV names is the qualification, not its parts.
     """
-    language = language or get_language() or ""
     claims = _claims(credential)
     claim = next((one for one in claims if _words(one.get("title"), language)), None)
     claim = claim or (claims[0] if claims else {})
