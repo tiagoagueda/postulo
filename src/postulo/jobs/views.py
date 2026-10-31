@@ -218,6 +218,10 @@ class CompanyListView(PageOrFragmentMixin, OwnedObjectMixin, ListView):
             queryset = queryset.distinct()
         return queryset
 
+    def table_rows(self):
+        """Every row the table answers with, unpaginated, for an export of it (#341)."""
+        return self.get_queryset()
+
     def _within_group(self, queryset):
         """Narrow to one ownership tree, when `?group=` names a company in one.
 

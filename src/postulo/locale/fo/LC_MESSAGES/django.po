@@ -486,6 +486,7 @@ msgid_plural "%(counter)s of your records are shared with others: they keep a co
 msgstr[0] "%(counter)s av tínum skrásetingum er deild við onnur: tey varðveita eitt avrit av tí, sum teirra egnu skrásetingar hava brúk fyri, og fáa at vita, at hon er farin."
 msgstr[1] "%(counter)s av tínum skrásetingum eru deildar við onnur: tey varðveita eitt avrit av tí, sum teirra egnu skrásetingar hava brúk fyri, og fáa at vita, at tær eru farnar."
 
+#: src/postulo/jobs/tables.py
 #: src/postulo/templates/jobs/partials/company_row.html
 #, python-format
 msgid "%(counter)s open listing"
@@ -794,6 +795,16 @@ msgstr "%(language)s: %(fields)s"
 #, python-format
 msgid "%(later)s must be after %(earlier)s."
 msgstr "%(later)s má vera aftan á %(earlier)s."
+
+#: src/postulo/core/tables.py
+#, python-format
+msgid "%(least)s to %(most)s"
+msgstr ""
+
+#: src/postulo/core/list_export.py
+#, python-format
+msgid "%(list)s · %(date)s"
+msgstr ""
 
 #: src/postulo/jobs/models.py
 #, python-format
@@ -1509,6 +1520,20 @@ msgid_plural "%(total)s records are in the file."
 msgstr[0] "%(total)s skráseting er í fíluni."
 msgstr[1] "%(total)s skrásetingar eru í fíluni."
 
+#: src/postulo/templates/documents/themes/base_list.html
+#, python-format
+msgid "%(total)s row"
+msgid_plural "%(total)s rows"
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/postulo/templates/core/table_export.html
+#, python-format
+msgid "%(total)s row matches."
+msgid_plural "%(total)s rows match."
+msgstr[0] ""
+msgstr[1] ""
+
 #: src/postulo/jobs/vcards.py
 #, python-format
 msgid "%(total)s telephone number"
@@ -1938,6 +1963,11 @@ msgstr "Ein cron-linja á vertsteldini virkar framvegis á sama hátt og er lýs
 msgid "A CSV file"
 msgstr "Ein CSV-fíla"
 
+#: src/postulo/templates/core/table_export.html
+#, python-format
+msgid "A CSV holds the first %(limit)s."
+msgstr ""
+
 #: src/postulo/documents/forms.py
 msgid "A CV leads with a career, a portfolio with work. It decides which themes are offered below."
 msgstr "Ein lívsrás setur starvsleiðina fremst, ein verkmappa verkini. Tað avger, hvørji tema verða boðin niðanfyri."
@@ -2332,6 +2362,11 @@ msgstr "Eitt loyniorð ella eitt app-loyniorð"
 #: src/postulo/documents/integrity.py
 msgid "a PDF"
 msgstr "ein PDF-fíla"
+
+#: src/postulo/templates/core/table_export.html
+#, python-format
+msgid "A PDF holds the first %(limit)s of them and says so."
+msgstr ""
 
 #: src/postulo/templates/server/design.html
 msgid "A person, a company or a plugin, as initials on a colour until there is a picture."
@@ -3749,8 +3784,8 @@ msgid "Applications, with their timelines"
 msgstr "Umsóknir við tíðarlinjum sínum"
 
 #: src/postulo/applications/analytics.py src/postulo/applications/models.py
-#: src/postulo/applications/tables.py src/postulo/jobs/listing_views.py
-#: src/postulo/jobs/models.py src/postulo/templates/core/import_csv_map.html
+#: src/postulo/applications/tables.py src/postulo/jobs/models.py
+#: src/postulo/jobs/tables.py src/postulo/templates/core/import_csv_map.html
 msgid "Applied"
 msgstr "Søkt um"
 
@@ -3893,6 +3928,10 @@ msgstr "Soleiðis sum ein lívsrás eigur at vísa tað. Eitt navn, sum er ein f
 msgid "As a CV should print it. It is linked to the company of that name among yours, and added to your companies if there is none."
 msgstr "Soleiðis sum ein lívsrás eigur at vísa tað. Tað verður knýtt at fyritøkuni við tí navninum millum tínar, og lagt afturat fyritøkunum hjá tær, um eingin er."
 
+#: src/postulo/templates/core/table_export.html
+msgid "As a document"
+msgstr ""
+
 #: src/postulo/templates/documents/letter_detail.html
 msgid "As a file"
 msgstr "Sum fíla"
@@ -3923,6 +3962,7 @@ msgstr "pr."
 msgid "As of"
 msgstr "Pr."
 
+#: src/postulo/jobs/tables.py
 #: src/postulo/templates/jobs/partials/company_row.html
 #: src/postulo/templates/jobs/partials/company_status.html
 #, fuzzy, python-format
@@ -3999,6 +4039,11 @@ msgstr "kl."
 msgid "at least"
 msgstr "minst"
 
+#: src/postulo/core/tables.py
+#, python-format
+msgid "at least %(least)s"
+msgstr ""
+
 #: src/postulo/core/server_forms.py
 msgid "At least one language has to be offered, or nobody can read anything."
 msgstr "Í minsta lagi eitt mál má bjóðast, annars kann eingin lesa nakað."
@@ -4006,6 +4051,11 @@ msgstr "Í minsta lagi eitt mál má bjóðast, annars kann eingin lesa nakað."
 #: src/postulo/templates/cotton/table/filter.html
 msgid "at most"
 msgstr "mest"
+
+#: src/postulo/core/tables.py
+#, python-format
+msgid "at most %(most)s"
+msgstr ""
 
 #: src/postulo/accounts/forms.py
 msgid "Atlantic Ocean"
@@ -4161,6 +4211,10 @@ msgstr "Aftur til starvslýsingina, sum henda fangingin varð til"
 #: src/postulo/templates/core/dashboard.html
 msgid "Back to the standard arrangement"
 msgstr "Aftur til vanligu skipanina"
+
+#: src/postulo/templates/core/table_export.html
+msgid "Back to the table, to change any of this"
+msgstr ""
 
 #: src/postulo/core/views_tables.py
 msgid "Back to the usual columns."
@@ -5063,7 +5117,7 @@ msgstr "Lat aftur"
 msgid "Close search"
 msgstr "Lat leiting aftur"
 
-#: src/postulo/jobs/listing_views.py src/postulo/jobs/models.py
+#: src/postulo/jobs/models.py src/postulo/jobs/tables.py
 msgid "Closed"
 msgstr "Lokað"
 
@@ -5151,6 +5205,7 @@ msgstr "litur"
 msgid "Column in the file"
 msgstr "Kolonna í fíluni"
 
+#: src/postulo/templates/core/table_export.html
 #: src/postulo/templates/partials/table/columns.html
 msgid "Columns"
 msgstr "Kolonnur"
@@ -6153,7 +6208,7 @@ msgstr "Vraka tær"
 msgid "Discard this capture"
 msgstr "Vraka hesa fangingina"
 
-#: src/postulo/jobs/listing_views.py src/postulo/jobs/models.py
+#: src/postulo/jobs/models.py src/postulo/jobs/tables.py
 #: src/postulo/templates/jobs/capture_list.html
 msgid "Discarded"
 msgstr "Vrakað"
@@ -6292,6 +6347,7 @@ msgid "Download companies.geojson"
 msgstr "Tak niður companies.geojson"
 
 #: src/postulo/templates/applications/report.html
+#: src/postulo/templates/core/table_export.html
 msgid "Download CSV"
 msgstr "Tak CSV niður"
 
@@ -6313,6 +6369,10 @@ msgstr "Tak hana niður"
 #, fuzzy
 msgid "Download it as text"
 msgstr "Tak hana niður sum tekst"
+
+#: src/postulo/templates/core/table_export.html
+msgid "Download PDF"
+msgstr ""
 
 #: src/postulo/templates/core/kind_file.html
 #: src/postulo/templates/resume/candidate_file.html
@@ -6852,6 +6912,10 @@ msgstr "Allar starvslýsingar, sum tú hevur lagt til merkis, inntil tú tekur a
 msgid "Every role you have held. Write the highlights once; tailor them per CV later."
 msgstr "Øll størv, tú hevur havt. Skriva hádeplarnar eina ferð; laga teir til hvørja lívsrás seinni."
 
+#: src/postulo/templates/core/table_export.html
+msgid "Every row of the table as it is now, not only the page on screen: your columns in your order, with its filters and its sort. Downloaded, and not kept in Postulo."
+msgstr ""
+
 #: src/postulo/templates/server/design.html
 #, fuzzy
 msgid "Every step derived from one radius, so there is one number to change."
@@ -6885,7 +6949,7 @@ msgstr "Hjá øllum"
 msgid "Everybody's, as an administrator"
 msgstr "Hjá øllum, sum umsitari"
 
-#: src/postulo/jobs/listing_views.py src/postulo/templates/server/logs.html
+#: src/postulo/jobs/tables.py src/postulo/templates/server/logs.html
 msgid "Everything"
 msgstr "Alt"
 
@@ -7016,9 +7080,15 @@ msgstr "At greiða frá, hvat gekk galið, merkir ofta at siga, hvørjum samband
 #: src/postulo/templates/cotton/transfer_group.html
 #: src/postulo/templates/jobs/company_detail.html
 #: src/postulo/templates/jobs/company_places.html
+#: src/postulo/templates/partials/table/export.html
 #: src/postulo/templates/settings/export.html
 msgid "Export"
 msgstr "Flyt út"
+
+#: src/postulo/templates/core/table_export.html
+#, python-format
+msgid "Export %(list)s"
+msgstr ""
 
 #: src/postulo/core/models.py
 msgid "export archive"
@@ -7538,6 +7608,16 @@ msgstr "Frá %(name)s."
 msgid "From %(register)s"
 msgstr ""
 
+#: src/postulo/core/tables.py
+#, python-format
+msgid "from %(start)s"
+msgstr ""
+
+#: src/postulo/core/tables.py
+#, python-format
+msgid "from %(start)s to %(end)s"
+msgstr ""
+
 #: src/postulo/templates/cotton/date_picker.html
 #, python-format
 msgid "From %(start)s to %(end)s"
@@ -7842,6 +7922,10 @@ msgstr "Brutto, undan skatti. Annar endin einsamallur er í lagi — tær flestu
 #: src/postulo/templates/server/plugin_access.html
 msgid "group"
 msgstr "bólkur"
+
+#: src/postulo/jobs/tables.py
+msgid "Group"
+msgstr ""
 
 #: src/postulo/core/views_access.py
 msgid "Group deleted."
@@ -9342,6 +9426,10 @@ msgstr "mál ikki ásett"
 msgid "language of exported files"
 msgstr ""
 
+#: src/postulo/templates/core/table_export.html
+msgid "Language of the document"
+msgstr ""
+
 #: src/postulo/templates/applications/report.html
 msgid "Language of the report"
 msgstr ""
@@ -9603,6 +9691,12 @@ msgstr "Er tað tómt, vísa lívsrásirnar hjá tær „%(place)s“: býin og 
 msgid "Left empty it is today. Capturing a posting you applied to last week is common."
 msgstr "Er tað tómt, er tað í dag. Tað er vanligt at fanga eina starvslýsing, sum tú søkti um í síðstu viku."
 
+#: src/postulo/templates/core/table_export.html
+#: src/postulo/templates/documents/themes/base_list.html
+#, python-format
+msgid "Left out, because they hold nothing to write: %(columns)s."
+msgstr ""
+
 #: src/postulo/jobs/industries.py
 #, fuzzy
 msgid "Legal"
@@ -9774,6 +9868,10 @@ msgstr "Leinki til staðirnar, sum ein starvsleiting kemur aftur til: borðið, 
 #: src/postulo/templates/documents/application_documents.html
 msgid "Links you pointed them at"
 msgstr "Leinki, tú vísti teimum til"
+
+#: src/postulo/documents/themes.py
+msgid "List"
+msgstr ""
 
 #: src/postulo/resume/views.py
 #, fuzzy
@@ -10513,6 +10611,11 @@ msgstr "Avmarka"
 #: src/postulo/templates/partials/table/views.html
 msgid "Narrow and sort the table the way you want it, then keep it under a name."
 msgstr "Avmarka og raða talvuni, sum tú vilt hava hana, og varðveit hana so undir einum navni."
+
+#: src/postulo/templates/core/table_export.html
+#: src/postulo/templates/documents/themes/base_list.html
+msgid "Narrowed by"
+msgstr ""
 
 #: src/postulo/resume/forms.py
 msgid "National letters or classes the list lacks, as the licence prints them. A CV prints them after the codes."
@@ -11623,6 +11726,7 @@ msgid "Nothing matches “%(term)s”"
 msgstr "Einki samsvarar við „%(term)s“"
 
 #: src/postulo/templates/base.html
+#: src/postulo/templates/documents/themes/base_list.html
 msgid "Nothing matches."
 msgstr "Einki samsvarar."
 
@@ -11847,6 +11951,10 @@ msgstr "Einki enn. Eitt stað verður goymt, tá ið tú rættar ein teig undir 
 #: src/postulo/jobs/vcards.py
 msgid "Nothing: an earlier card in this file is the same one."
 msgstr "Einki: eitt kort fyrr í hesi fíluni er tað sama."
+
+#: src/postulo/templates/core/table_export.html
+msgid "Nothing: every row."
+msgstr ""
 
 #: src/postulo/jobs/vcards.py
 msgid "Nothing: the card has no name."
@@ -12552,6 +12660,10 @@ msgstr ""
 msgid "order"
 msgstr "raðfylgja"
 
+#: src/postulo/templates/core/table_export.html
+msgid "Order"
+msgstr ""
+
 #: src/postulo/templates/server/design.html
 msgid "Ordinary text, which most of the interface is."
 msgstr "Vanligur tekstur, sum tað mesta av markamótinum er."
@@ -12759,6 +12871,7 @@ msgstr ""
 
 #: src/postulo/documents/forms.py
 #: src/postulo/templates/applications/report.html
+#: src/postulo/templates/core/table_export.html
 #: src/postulo/templates/settings/export.html
 msgid "Paper"
 msgstr ""
@@ -13601,10 +13714,15 @@ msgstr "Virðislønir, stipendir og heiðursmerki: viðurkenning, sum onkur hevu
 msgid "Proceedings"
 msgstr "Ráðstevnurit"
 
+#: src/postulo/templates/documents/themes/base_list.html
+msgid "Produced by Postulo from this person's own records."
+msgstr ""
+
 #: src/postulo/templates/documents/themes/base_report.html
 msgid "Produced by Postulo from this person's own records. Postulo sets no target: how many applications a period should hold is a benefit regime's rule or the person's own."
 msgstr "Framleitt av Postulo úr egnu skrásetingum hjá hesum persóni. Postulo setir einki mál: hvussu nógvar umsóknir eitt tíðarskeið skal hava, er ein regla í einari stuðulsskipan ella persónsins egna."
 
+#: src/postulo/templates/documents/themes/base_list.html
 #: src/postulo/templates/documents/themes/base_report.html
 #, python-format
 msgid "Produced on %(produced)s"
@@ -14873,7 +14991,7 @@ msgstr "heimildir"
 msgid "Screening"
 msgstr "Forkanning"
 
-#: src/postulo/templates/core/search.html
+#: src/postulo/core/tables.py src/postulo/templates/core/search.html
 #: src/postulo/templates/cotton/site_search.html
 #: src/postulo/templates/jobs/industry_list.html
 msgid "Search"
@@ -15368,7 +15486,7 @@ msgstr "Set á úrvalslista"
 msgid "Shortlist them"
 msgstr "Set tær á úrvalslista"
 
-#: src/postulo/jobs/listing_views.py src/postulo/jobs/models.py
+#: src/postulo/jobs/models.py src/postulo/jobs/tables.py
 msgid "Shortlisted"
 msgstr "Á úrvalslista"
 
@@ -15479,6 +15597,7 @@ msgstr "Vís hendan bústaðin á kortinum?"
 msgid "Show this period"
 msgstr "Vís hetta tíðarskeiðið"
 
+#: src/postulo/jobs/tables.py
 #: src/postulo/templates/jobs/partials/whose_form.html
 msgid "Showing"
 msgstr "Vísir"
@@ -15862,6 +15981,16 @@ msgstr "Raða eftir %(column)s, hægsta fyrst"
 #, python-format
 msgid "Sort by %(column)s, lowest first"
 msgstr "Raða eftir %(column)s, lægsta fyrst"
+
+#: src/postulo/core/tables.py
+#, python-format
+msgid "Sorted by %(column)s, highest first"
+msgstr ""
+
+#: src/postulo/core/tables.py
+#, python-format
+msgid "Sorted by %(column)s, lowest first"
+msgstr ""
 
 #: src/postulo/jobs/models.py src/postulo/resume/models.py
 msgid "source"
@@ -17424,6 +17553,10 @@ msgstr "Avritið kundi ikki sendast; skjalið sigur hví."
 msgid "The credit the tiles' licence asks for, drawn on the map as plain text. For example: © OpenStreetMap contributors"
 msgstr "Tilvísingin, sum loyvið hjá kortflísunum krevur, teknað á landakortið sum reinur tekstur. Til dømis: © OpenStreetMap contributors"
 
+#: src/postulo/templates/core/table_export.html
+msgid "The CSV is the same rows in the same language, for a spreadsheet; the theme and the paper are for the PDF."
+msgstr ""
+
 #: src/postulo/templates/settings/appearance.html
 msgid "The dashboard lists open applications nothing has happened to for a while, with nothing planned. Recruiters' own advice clusters around two to three weeks."
 msgstr "Yvirlitið listar opnar umsóknir, sum einki er hent við í eina tíð, og har einki er ætlað. Ráðini hjá setanarráðgevum sjálvum liggja um tvær til tríggjar vikur."
@@ -17662,6 +17795,11 @@ msgid "The first %(count)s is read, and the rest are not."
 msgid_plural "The first %(count)s are read, and the rest are not."
 msgstr[0] "Tann fyrsti %(count)s verður lisin, og restin ikki."
 msgstr[1] "Teir fyrstu %(count)s verða lisnir, og restin ikki."
+
+#: src/postulo/templates/documents/themes/base_list.html
+#, python-format
+msgid "The first %(count)s of %(total)s rows; the rest are in the table."
+msgstr ""
 
 #: src/postulo/templates/documents/cv_form.html
 msgid "The first choice in each list follows your details: mark another number as primary there and this CV prints it. One you choose here stays, whatever becomes primary. If you later delete it from your details, this CV prints none of that kind until you choose again, and never another in its place. What you have already sent does not change."
@@ -18583,6 +18721,7 @@ msgid "theme"
 msgstr "tema"
 
 #: src/postulo/templates/applications/report.html
+#: src/postulo/templates/core/table_export.html
 msgid "Theme"
 msgstr ""
 
@@ -19352,7 +19491,7 @@ msgstr "skal sendast av %(name)s"
 msgid "to be sent by the referee"
 msgstr "skal sendast av viðmælaranum"
 
-#: src/postulo/jobs/listing_views.py
+#: src/postulo/jobs/tables.py
 #, fuzzy
 msgid "To decide"
 msgstr "At taka støðu til"
@@ -19647,6 +19786,11 @@ msgstr "Óútgivið"
 #: src/postulo/resume/models.py
 msgid "until"
 msgstr "til"
+
+#: src/postulo/core/tables.py
+#, python-format
+msgid "until %(end)s"
+msgstr ""
 
 #: src/postulo/resume/models.py
 #, python-format
@@ -20292,6 +20436,10 @@ msgstr "Hvat tað var í, har navnið á førleikaprógvinum ikki sigur tað."
 msgid "What it was. Another capture of the same advert is added from the review screen, so it is not offered here."
 msgstr "Hvat tað var. Ein onnur fanging av somu starvslýsing verður løgd afturat frá eftirkanningarsíðuni, so hon verður ikki boðin her."
 
+#: src/postulo/templates/core/table_export.html
+msgid "What it will hold"
+msgstr ""
+
 #: src/postulo/templates/jobs/merge.html
 msgid "What moves"
 msgstr "Hvat verður flutt"
@@ -20904,6 +21052,10 @@ msgstr "Hvønn tú hittir. Fólkini, sum tú hevur skrásett hjá hesi fyritøku
 #, fuzzy
 msgid "Whoever put you forward, from the people you have recorded — at this company, at another, or at none. The figures count what each referrer led to."
 msgstr "Tann, sum vísti á teg, úr fólkunum, sum tú hevur skrásett — hjá hesi fyritøkuni, hjá aðrari ella ongari. Tølini telja, hvat hvør, sum vísti á teg, førdi við sær."
+
+#: src/postulo/jobs/tables.py
+msgid "Whose"
+msgstr ""
 
 #: src/postulo/templates/partials/import_owner.html
 msgid "Whose they become"

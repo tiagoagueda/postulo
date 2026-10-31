@@ -612,6 +612,7 @@ msgstr[1] "%(counter)s mir-rekords tiegħek huma kondiviżi ma' oħrajn: huma j�
 msgstr[2] "%(counter)s mir-rekords tiegħek huma kondiviżi ma' oħrajn: huma jżommu kopja ta' dak li jeħtieġu r-rekords tagħhom, u jiġu mgħarrfa li m'għadhomx hemm."
 msgstr[3] "%(counter)s mir-rekords tiegħek huma kondiviżi ma' oħrajn: huma jżommu kopja ta' dak li jeħtieġu r-rekords tagħhom, u jiġu mgħarrfa li m'għadhomx hemm."
 
+#: src/postulo/jobs/tables.py
 #: src/postulo/templates/jobs/partials/company_row.html
 #, fuzzy, python-format
 msgid "%(counter)s open listing"
@@ -944,6 +945,16 @@ msgstr "%(language)s: %(fields)s"
 #, python-format
 msgid "%(later)s must be after %(earlier)s."
 msgstr "%(later)s irid ikun wara %(earlier)s."
+
+#: src/postulo/core/tables.py
+#, python-format
+msgid "%(least)s to %(most)s"
+msgstr ""
+
+#: src/postulo/core/list_export.py
+#, python-format
+msgid "%(list)s · %(date)s"
+msgstr ""
 
 #: src/postulo/jobs/models.py
 #, python-format
@@ -1697,6 +1708,24 @@ msgstr[1] "%(total)s rekords jinsabu fil-fajl."
 msgstr[2] "%(total)s rekord jinsabu fil-fajl."
 msgstr[3] "%(total)s rekord jinsabu fil-fajl."
 
+#: src/postulo/templates/documents/themes/base_list.html
+#, python-format
+msgid "%(total)s row"
+msgid_plural "%(total)s rows"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+
+#: src/postulo/templates/core/table_export.html
+#, python-format
+msgid "%(total)s row matches."
+msgid_plural "%(total)s rows match."
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+
 #: src/postulo/jobs/vcards.py
 #, python-format
 msgid "%(total)s telephone number"
@@ -2130,6 +2159,11 @@ msgstr "Linja cron fuq il-host għadha taħdem bl-istess mod u hija deskritta fi
 msgid "A CSV file"
 msgstr "Fajl CSV"
 
+#: src/postulo/templates/core/table_export.html
+#, python-format
+msgid "A CSV holds the first %(limit)s."
+msgstr ""
+
 #: src/postulo/documents/forms.py
 msgid "A CV leads with a career, a portfolio with work. It decides which themes are offered below."
 msgstr "CV jibda b'karriera, portafoll b'xogħol. Jiddeċiedi liema temi jiġu offruti hawn taħt."
@@ -2523,6 +2557,11 @@ msgstr "Password, jew password tal-app"
 #: src/postulo/documents/integrity.py
 msgid "a PDF"
 msgstr "PDF"
+
+#: src/postulo/templates/core/table_export.html
+#, python-format
+msgid "A PDF holds the first %(limit)s of them and says so."
+msgstr ""
 
 #: src/postulo/templates/server/design.html
 msgid "A person, a company or a plugin, as initials on a colour until there is a picture."
@@ -3932,8 +3971,8 @@ msgid "Applications, with their timelines"
 msgstr "Applikazzjonijiet, bil-kronoloġiji tagħhom"
 
 #: src/postulo/applications/analytics.py src/postulo/applications/models.py
-#: src/postulo/applications/tables.py src/postulo/jobs/listing_views.py
-#: src/postulo/jobs/models.py src/postulo/templates/core/import_csv_map.html
+#: src/postulo/applications/tables.py src/postulo/jobs/models.py
+#: src/postulo/jobs/tables.py src/postulo/templates/core/import_csv_map.html
 #, fuzzy
 msgid "Applied"
 msgstr "Applikat"
@@ -4077,6 +4116,10 @@ msgstr "Kif CV għandu jistampah. Isem li huwa ħila fil-klassifikazzjoni ESCO j
 msgid "As a CV should print it. It is linked to the company of that name among yours, and added to your companies if there is none."
 msgstr "Kif għandu jistampaha CV. Tintrabat mal-kumpanija b'dak l-isem fost tiegħek, u tiżdied mal-kumpaniji tiegħek jekk ma jkun hemm l-ebda waħda."
 
+#: src/postulo/templates/core/table_export.html
+msgid "As a document"
+msgstr ""
+
 #: src/postulo/templates/documents/letter_detail.html
 msgid "As a file"
 msgstr "Bħala fajl"
@@ -4107,6 +4150,7 @@ msgstr "aġġornat sa"
 msgid "As of"
 msgstr "Aġġornat sa"
 
+#: src/postulo/jobs/tables.py
 #: src/postulo/templates/jobs/partials/company_row.html
 #: src/postulo/templates/jobs/partials/company_status.html
 #, fuzzy, python-format
@@ -4185,6 +4229,11 @@ msgstr "fil-ħin"
 msgid "at least"
 msgstr "mill-inqas"
 
+#: src/postulo/core/tables.py
+#, python-format
+msgid "at least %(least)s"
+msgstr ""
+
 #: src/postulo/core/server_forms.py
 msgid "At least one language has to be offered, or nobody can read anything."
 msgstr "Trid tiġi offruta mill-inqas lingwa waħda, inkella ħadd ma jista' jaqra xejn."
@@ -4192,6 +4241,11 @@ msgstr "Trid tiġi offruta mill-inqas lingwa waħda, inkella ħadd ma jista' jaq
 #: src/postulo/templates/cotton/table/filter.html
 msgid "at most"
 msgstr "l-aktar"
+
+#: src/postulo/core/tables.py
+#, python-format
+msgid "at most %(most)s"
+msgstr ""
 
 #: src/postulo/accounts/forms.py
 msgid "Atlantic Ocean"
@@ -4346,6 +4400,10 @@ msgstr "Lura għall-avviż li sar minn dan il-qbid"
 #: src/postulo/templates/core/dashboard.html
 msgid "Back to the standard arrangement"
 msgstr "Lura għall-arranġament standard"
+
+#: src/postulo/templates/core/table_export.html
+msgid "Back to the table, to change any of this"
+msgstr ""
 
 #: src/postulo/core/views_tables.py
 msgid "Back to the usual columns."
@@ -5242,7 +5300,7 @@ msgstr "Agħlaq"
 msgid "Close search"
 msgstr "Agħlaq it-tfittxija"
 
-#: src/postulo/jobs/listing_views.py src/postulo/jobs/models.py
+#: src/postulo/jobs/models.py src/postulo/jobs/tables.py
 #, fuzzy
 msgid "Closed"
 msgstr "Magħluq"
@@ -5333,6 +5391,7 @@ msgstr "kulur"
 msgid "Column in the file"
 msgstr "Kolonna fil-fajl"
 
+#: src/postulo/templates/core/table_export.html
 #: src/postulo/templates/partials/table/columns.html
 msgid "Columns"
 msgstr "Kolonni"
@@ -6318,7 +6377,7 @@ msgstr "Skartahom"
 msgid "Discard this capture"
 msgstr "Skarta dan il-qbid"
 
-#: src/postulo/jobs/listing_views.py src/postulo/jobs/models.py
+#: src/postulo/jobs/models.py src/postulo/jobs/tables.py
 #: src/postulo/templates/jobs/capture_list.html
 msgid "Discarded"
 msgstr "Skartat"
@@ -6455,6 +6514,7 @@ msgid "Download companies.geojson"
 msgstr "Niżżel companies.geojson"
 
 #: src/postulo/templates/applications/report.html
+#: src/postulo/templates/core/table_export.html
 msgid "Download CSV"
 msgstr "Niżżel CSV"
 
@@ -6474,6 +6534,10 @@ msgstr "Niżżlu"
 #: src/postulo/templates/jobs/capture_page.html
 msgid "Download it as text"
 msgstr "Niżżlu bħala test"
+
+#: src/postulo/templates/core/table_export.html
+msgid "Download PDF"
+msgstr ""
 
 #: src/postulo/templates/core/kind_file.html
 #: src/postulo/templates/resume/candidate_file.html
@@ -7000,6 +7064,10 @@ msgstr "Kull avviż li nnutajt, sakemm tiddeċiedi: poġġih fil-lista qasira, s
 msgid "Every role you have held. Write the highlights once; tailor them per CV later."
 msgstr "Kull rwol li kellek. Ikteb il-punti ewlenin darba; adattahom għal kull CV wara."
 
+#: src/postulo/templates/core/table_export.html
+msgid "Every row of the table as it is now, not only the page on screen: your columns in your order, with its filters and its sort. Downloaded, and not kept in Postulo."
+msgstr ""
+
 #: src/postulo/templates/server/design.html
 msgid "Every step derived from one radius, so there is one number to change."
 msgstr "Kull pass derivat minn raġġ wieħed, għalhekk hemm numru wieħed biss li trid tbiddel."
@@ -7032,7 +7100,7 @@ msgstr "Ta' kulħadd"
 msgid "Everybody's, as an administrator"
 msgstr "Ta' kulħadd, bħala amministratur"
 
-#: src/postulo/jobs/listing_views.py src/postulo/templates/server/logs.html
+#: src/postulo/jobs/tables.py src/postulo/templates/server/logs.html
 msgid "Everything"
 msgstr "Kollox"
 
@@ -7160,9 +7228,15 @@ msgstr "Li tispjega x'mar ħażin ħafna drabi jfisser li tgħid ma' liema konne
 #: src/postulo/templates/cotton/transfer_group.html
 #: src/postulo/templates/jobs/company_detail.html
 #: src/postulo/templates/jobs/company_places.html
+#: src/postulo/templates/partials/table/export.html
 #: src/postulo/templates/settings/export.html
 msgid "Export"
 msgstr "Esporta"
+
+#: src/postulo/templates/core/table_export.html
+#, python-format
+msgid "Export %(list)s"
+msgstr ""
 
 #: src/postulo/core/models.py
 msgid "export archive"
@@ -7684,6 +7758,16 @@ msgstr "Mingħand %(name)s."
 msgid "From %(register)s"
 msgstr ""
 
+#: src/postulo/core/tables.py
+#, python-format
+msgid "from %(start)s"
+msgstr ""
+
+#: src/postulo/core/tables.py
+#, python-format
+msgid "from %(start)s to %(end)s"
+msgstr ""
+
 #: src/postulo/templates/cotton/date_picker.html
 #, python-format
 msgid "From %(start)s to %(end)s"
@@ -7987,6 +8071,10 @@ msgstr "Gross, qabel it-taxxa. Tarf wieħed waħdu huwa tajjeb — il-biċċa l-
 #: src/postulo/templates/server/plugin_access.html
 msgid "group"
 msgstr "grupp"
+
+#: src/postulo/jobs/tables.py
+msgid "Group"
+msgstr ""
 
 #: src/postulo/core/views_access.py
 msgid "Group deleted."
@@ -9487,6 +9575,10 @@ msgstr "lingwa mhux iddikjarata"
 msgid "language of exported files"
 msgstr ""
 
+#: src/postulo/templates/core/table_export.html
+msgid "Language of the document"
+msgstr ""
+
 #: src/postulo/templates/applications/report.html
 msgid "Language of the report"
 msgstr ""
@@ -9748,6 +9840,12 @@ msgstr "Jekk jitħalla vojt, is-CVs tiegħek jistampaw “%(place)s”: il-belt 
 msgid "Left empty it is today. Capturing a posting you applied to last week is common."
 msgstr "Jekk jitħalla vojt, ikun illum. Huwa komuni li taqbad avviż li applikajt għalih il-ġimgħa l-oħra."
 
+#: src/postulo/templates/core/table_export.html
+#: src/postulo/templates/documents/themes/base_list.html
+#, python-format
+msgid "Left out, because they hold nothing to write: %(columns)s."
+msgstr ""
+
 #: src/postulo/jobs/industries.py
 msgid "Legal"
 msgstr "Legali"
@@ -9918,6 +10016,10 @@ msgstr "Links lejn il-postijiet li tfittxija għax-xogħol terġa' lura għaliho
 #, fuzzy
 msgid "Links you pointed them at"
 msgstr "Links li bgħatthom lejhom"
+
+#: src/postulo/documents/themes.py
+msgid "List"
+msgstr ""
 
 #: src/postulo/resume/views.py
 msgid "listening"
@@ -10654,6 +10756,11 @@ msgstr "Dejjaq"
 #: src/postulo/templates/partials/table/views.html
 msgid "Narrow and sort the table the way you want it, then keep it under a name."
 msgstr "Iffiltra u ordna t-tabella kif tixtieq, imbagħad żommha taħt isem."
+
+#: src/postulo/templates/core/table_export.html
+#: src/postulo/templates/documents/themes/base_list.html
+msgid "Narrowed by"
+msgstr ""
 
 #: src/postulo/resume/forms.py
 msgid "National letters or classes the list lacks, as the licence prints them. A CV prints them after the codes."
@@ -11759,6 +11866,7 @@ msgid "Nothing matches “%(term)s”"
 msgstr "Xejn ma jaqbel ma' “%(term)s”"
 
 #: src/postulo/templates/base.html
+#: src/postulo/templates/documents/themes/base_list.html
 msgid "Nothing matches."
 msgstr "Xejn ma jaqbel."
 
@@ -11977,6 +12085,10 @@ msgstr "Għad xejn. Post jiġi miftakar meta tikkoreġi qasam waqt ir-reviżjoni
 #: src/postulo/jobs/vcards.py
 msgid "Nothing: an earlier card in this file is the same one."
 msgstr "Xejn: karta preċedenti f'dan il-fajl hija l-istess waħda."
+
+#: src/postulo/templates/core/table_export.html
+msgid "Nothing: every row."
+msgstr ""
 
 #: src/postulo/jobs/vcards.py
 msgid "Nothing: the card has no name."
@@ -12705,6 +12817,10 @@ msgstr ""
 msgid "order"
 msgstr "ordni"
 
+#: src/postulo/templates/core/table_export.html
+msgid "Order"
+msgstr ""
+
 #: src/postulo/templates/server/design.html
 msgid "Ordinary text, which most of the interface is."
 msgstr "Test ordinarju, li huwa l-biċċa l-kbira tal-interface."
@@ -12910,6 +13026,7 @@ msgstr ""
 
 #: src/postulo/documents/forms.py
 #: src/postulo/templates/applications/report.html
+#: src/postulo/templates/core/table_export.html
 #: src/postulo/templates/settings/export.html
 msgid "Paper"
 msgstr ""
@@ -13732,10 +13849,15 @@ msgstr "Premjijiet, boroż ta' studju u distinzjonijiet: rikonoxximent li xi ħa
 msgid "Proceedings"
 msgstr "Atti ta' konferenza"
 
+#: src/postulo/templates/documents/themes/base_list.html
+msgid "Produced by Postulo from this person's own records."
+msgstr ""
+
 #: src/postulo/templates/documents/themes/base_report.html
 msgid "Produced by Postulo from this person's own records. Postulo sets no target: how many applications a period should hold is a benefit regime's rule or the person's own."
 msgstr "Prodott minn Postulo mir-rekords ta' din il-persuna stess. Postulo ma jistabbilixxi ebda mira: kemm applikazzjonijiet għandu jkun fih perjodu hija regola ta' skema ta' benefiċċji jew tal-persuna nnifisha."
 
+#: src/postulo/templates/documents/themes/base_list.html
 #: src/postulo/templates/documents/themes/base_report.html
 #, python-format
 msgid "Produced on %(produced)s"
@@ -14991,7 +15113,7 @@ msgstr "ambiti"
 msgid "Screening"
 msgstr "Għażla preliminari"
 
-#: src/postulo/templates/core/search.html
+#: src/postulo/core/tables.py src/postulo/templates/core/search.html
 #: src/postulo/templates/cotton/site_search.html
 #: src/postulo/templates/jobs/industry_list.html
 msgid "Search"
@@ -15487,7 +15609,7 @@ msgstr "Shortlist"
 msgid "Shortlist them"
 msgstr "Poġġihom fix-shortlist"
 
-#: src/postulo/jobs/listing_views.py src/postulo/jobs/models.py
+#: src/postulo/jobs/models.py src/postulo/jobs/tables.py
 #, fuzzy
 msgid "Shortlisted"
 msgstr "Fix-shortlist"
@@ -15593,6 +15715,7 @@ msgstr "Turi dan l-indirizz fuq il-mappa?"
 msgid "Show this period"
 msgstr "Uri dan il-perjodu"
 
+#: src/postulo/jobs/tables.py
 #: src/postulo/templates/jobs/partials/whose_form.html
 msgid "Showing"
 msgstr "Qed jintwera"
@@ -15966,6 +16089,16 @@ msgstr "Issortja skont %(column)s, l-ogħla l-ewwel"
 #, python-format
 msgid "Sort by %(column)s, lowest first"
 msgstr "Issortja skont %(column)s, l-inqas l-ewwel"
+
+#: src/postulo/core/tables.py
+#, python-format
+msgid "Sorted by %(column)s, highest first"
+msgstr ""
+
+#: src/postulo/core/tables.py
+#, python-format
+msgid "Sorted by %(column)s, lowest first"
+msgstr ""
 
 #: src/postulo/jobs/models.py src/postulo/resume/models.py
 msgid "source"
@@ -17533,6 +17666,10 @@ msgstr "Il-kopja ma setgħetx tintbagħat; id-dokument jgħid għaliex."
 msgid "The credit the tiles' licence asks for, drawn on the map as plain text. For example: © OpenStreetMap contributors"
 msgstr "Il-kreditu li titlob il-liċenzja tat-tiles, imfassal fuq il-mappa bħala test sempliċi. Pereżempju: © OpenStreetMap contributors"
 
+#: src/postulo/templates/core/table_export.html
+msgid "The CSV is the same rows in the same language, for a spreadsheet; the theme and the paper are for the PDF."
+msgstr ""
+
 #: src/postulo/templates/settings/appearance.html
 msgid "The dashboard lists open applications nothing has happened to for a while, with nothing planned. Recruiters' own advice clusters around two to three weeks."
 msgstr "Id-dashboard jelenka applikazzjonijiet miftuħa li xejn ma ġara fihom għal xi żmien, bla xejn ippjanat. Il-parir tar-reklutaturi nfushom idur madwar ġimagħtejn sa tlieta."
@@ -17779,6 +17916,11 @@ msgstr[0] "L-ewwel %(count)s jinqara, u l-bqija le."
 msgstr[1] "L-ewwel %(count)s jinqraw, u l-bqija le."
 msgstr[2] "L-ewwel %(count)s jinqraw, u l-bqija le."
 msgstr[3] "L-ewwel %(count)s jinqraw, u l-bqija le."
+
+#: src/postulo/templates/documents/themes/base_list.html
+#, python-format
+msgid "The first %(count)s of %(total)s rows; the rest are in the table."
+msgstr ""
 
 #: src/postulo/templates/documents/cv_form.html
 msgid "The first choice in each list follows your details: mark another number as primary there and this CV prints it. One you choose here stays, whatever becomes primary. If you later delete it from your details, this CV prints none of that kind until you choose again, and never another in its place. What you have already sent does not change."
@@ -18699,6 +18841,7 @@ msgid "theme"
 msgstr "tema"
 
 #: src/postulo/templates/applications/report.html
+#: src/postulo/templates/core/table_export.html
 msgid "Theme"
 msgstr ""
 
@@ -19479,7 +19622,7 @@ msgstr "li għandha tintbagħat minn %(name)s"
 msgid "to be sent by the referee"
 msgstr "li għandha tintbagħat mir-referent"
 
-#: src/postulo/jobs/listing_views.py
+#: src/postulo/jobs/tables.py
 msgid "To decide"
 msgstr "X'tiddeċiedi"
 
@@ -19773,6 +19916,11 @@ msgstr "Mhux ippubblikat"
 #: src/postulo/resume/models.py
 msgid "until"
 msgstr "sa"
+
+#: src/postulo/core/tables.py
+#, python-format
+msgid "until %(end)s"
+msgstr ""
 
 #: src/postulo/resume/models.py
 #, python-format
@@ -20427,6 +20575,10 @@ msgstr "F'xiex kien, fejn l-isem tal-kwalifika ma jgħidx."
 msgid "What it was. Another capture of the same advert is added from the review screen, so it is not offered here."
 msgstr "X'kien. Qbid ieħor tal-istess avviż jiżdied mill-iskrin tar-reviżjoni, għalhekk mhux offrut hawnhekk."
 
+#: src/postulo/templates/core/table_export.html
+msgid "What it will hold"
+msgstr ""
+
 #: src/postulo/templates/jobs/merge.html
 msgid "What moves"
 msgstr "X'jiċċaqlaq"
@@ -21042,6 +21194,10 @@ msgstr "Min se tiltaqa' miegħu. Il-persuni li rreġistrajt f'din il-kumpanija h
 #, fuzzy
 msgid "Whoever put you forward, from the people you have recorded — at this company, at another, or at none. The figures count what each referrer led to."
 msgstr "Min poġġik 'il quddiem, mill-persuni li rreġistrajt — f'din il-kumpanija, f'oħra, jew f'ebda waħda. Il-figuri jgħoddu dak li wassal għalih kull min irrakkomanda."
+
+#: src/postulo/jobs/tables.py
+msgid "Whose"
+msgstr ""
 
 #: src/postulo/templates/partials/import_owner.html
 msgid "Whose they become"

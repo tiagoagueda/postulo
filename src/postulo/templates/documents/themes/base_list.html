@@ -1,0 +1,82 @@
+{% load i18n %}<!DOCTYPE html>
+{% comment %} A list exported from one of Postulo's tables, as a document (#341), set by a theme.
+
+   **One template for every list.** Applications, companies, listings and any table added
+   later are the same shape here: a title, who made it and when, what narrowed it and how it
+   is sorted, then the column labels and the rows. `list_export.as_context` builds that from
+   whichever table it was, so a theme sets the shape of a list rather than any one list.
+
+   **Plain values, and no model**, as for a report (#340): strings, numbers, booleans and a
+   date, in lists and mappings. Every cell is text already written in the document's language
+   -- the dates in its format, a status in its words -- and an empty cell is an empty string,
+   which this prints as a dash, as the table does.
+
+   **Every side is logical**, for the reason `base_report.html` gives, and the paper is
+   Postulo's to write (#344): a theme writes its margins and leaves the size alone. Lists are
+   wide, so they are drawn on their side unless somebody chose otherwise.
+{% endcomment %}
+<html lang="{{ document_language }}" dir="{{ document_direction|default:'ltr' }}">
+<head>
+  <meta charset="utf-8">
+  <title>{{ document_title }}</title>
+  <style{% if csp_nonce %} nonce="{{ csp_nonce }}"{% endif %}>{% block page_styles %}{% endblock %}</style>
+</head>
+<body>
+  <h1><bdi>{{ title }}</bdi></h1>
+  <div class="meta">
+    <div><strong><bdi>{{ person }}</bdi></strong></div>
+    <div>{% blocktranslate with produced=produced_at|date:"DATETIME_FORMAT" %}Produced on {{ produced }}{% endblocktranslate %}</div>
+    <div>
+      {% if truncated %}
+        {% blocktranslate trimmed with count=count total=total %}
+          The first {{ count }} of {{ total }} rows; the rest are in the table.
+        {% endblocktranslate %}
+      {% else %}
+        {% blocktranslate trimmed count total=total %}
+          {{ total }} row
+        {% plural %}
+          {{ total }} rows
+        {% endblocktranslate %}
+      {% endif %}
+    </div>
+    {% if filters %}
+      <div class="filters">{% translate "Narrowed by" %}:
+        {% for filter in filters %}<bdi>{{ filter.label }}{% if filter.value %}: {{ filter.value }}{% endif %}</bdi>{% if not forloop.last %}; {% endif %}{% endfor %}
+      </div>
+    {% endif %}
+    {% if sort %}<div>{{ sort.words }}</div>{% endif %}
+  </div>
+
+  {% if rows %}
+    <table>
+      <thead>
+        <tr>
+          {% for column in columns %}
+            <th>{{ column.label }}</th>
+          {% endfor %}
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in rows %}
+          <tr>
+            {% for cell in row %}
+              <td><bdi>{{ cell|default:"—" }}</bdi></td>
+            {% endfor %}
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p>{% translate "Nothing matches." %}</p>
+  {% endif %}
+
+  {% if left_out %}
+    <p class="note">
+      {% blocktranslate trimmed with columns=left_out|join:", " %}
+        Left out, because they hold nothing to write: {{ columns }}.
+      {% endblocktranslate %}
+    </p>
+  {% endif %}
+  <p class="note">{% translate "Produced by Postulo from this person's own records." %}</p>
+</body>
+</html>

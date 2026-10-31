@@ -258,6 +258,17 @@ class ApplicationListView(PageOrFragmentMixin, OwnedObjectMixin, ApplicationFilt
             return self.filter_queryset(
                 queryset.with_quiet_flag(quiet.threshold_for(self.request.user))
             ).filter(status__in=list(BOARD_STATUSES))
+        return self.table_rows(queryset)
+
+    def table_rows(self, queryset=None):
+        """Every row the table answers with, in its order and unpaginated: what the page
+        draws a page of, and what an export writes whole (#341).
+
+        The table's shape whatever the person last chose, because an export is of the table:
+        the board leaves the settled applications out, and a list of what matches cannot.
+        """
+        if queryset is None:
+            queryset = super().get_queryset().with_display_data()
         return self.table.apply(self.filter_queryset(queryset.with_table_data()))
 
     def shape_url(self, shape: str) -> str:

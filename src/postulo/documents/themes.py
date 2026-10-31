@@ -75,6 +75,13 @@ class Kind(models.TextChoices):
     #: person's choice is remembered on their profile (`remembered`) rather than on the
     #: document, and its template is handed plain values rather than a model.
     REPORT = "report", _("Report")
+    #: A list, exported from one of Postulo's tables (#341): applications, companies,
+    #: listings, and any table added later. One kind for every list rather than one per
+    #: list, because what a theme sets is the shape of a table -- a heading, the filters in
+    #: words, column labels and rows of text -- and that shape is the same whichever table it
+    #: came from. Like a report it has no row to keep a theme on, so the choice is
+    #: remembered on the profile, and its template is handed plain values.
+    LIST = "list", _("List")
 
 
 #: The theme a document falls back to. It sets every kind, which is what makes it a safe
@@ -136,6 +143,7 @@ def _shipped(name: str, label) -> Theme:
             Kind.PORTFOLIO: f"documents/themes/{name}/portfolio.html",
             Kind.LETTER: f"documents/themes/{name}/letter.html",
             Kind.REPORT: f"documents/themes/{name}/report.html",
+            Kind.LIST: f"documents/themes/{name}/list.html",
         },
         papers=("any",),
     )

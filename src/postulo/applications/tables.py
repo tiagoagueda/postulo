@@ -6,7 +6,7 @@ from django.utils.translation import gettext_lazy as _
 from django.utils.translation import ngettext_lazy
 
 from postulo.core.models import Tag
-from postulo.core.tables import Column, ExtraFilter, Table, register
+from postulo.core.tables import Column, ExtraFilter, Table, day_text, moment_text, register
 
 from .models import Channel, Priority, Status
 
@@ -45,6 +45,8 @@ class ApplicationsTable(Table):
         "%(count)d application changed.", "%(count)d applications changed.", "count"
     )
     search_label = _("Search applications")
+    rows_from = "postulo.applications.views.ApplicationListView"
+    page_name = "applications:list"
     columns = (
         Column(
             "role",
@@ -157,3 +159,39 @@ class ApplicationsTable(Table):
         if user is None or not user.is_authenticated:
             return ()
         return tuple(Tag.objects.for_user(user).values_list("slug", "name"))
+
+    def text(self, row, column: Column) -> str:
+        """Each cell as `application_row.html` draws it, in words (#341). The tags are
+        written out here, every one; on the page they hide under the role when their column
+        is off, and an export writes the columns that were chosen and nothing else."""
+        posting = row.posting
+        match column.key:
+            case "role":
+                return posting.title
+            case "company":
+                return posting.company.name
+            case "location":
+                return posting.location
+            case "status":
+                return str(row.get_status_display())
+            case "applied":
+                return day_text(row.applied_at)
+            case "deadline":
+                return day_text(row.deadline)
+            case "priority":
+                return str(row.get_priority_display())
+            case "channel":
+                return str(row.get_channel_display()) if row.channel else ""
+            case "salary":
+                return posting.salary_display
+            case "tags":
+                return ", ".join(tag.name for tag in row.tags.all())
+            case "last_activity":
+                return day_text(getattr(row, "last_activity_at", None))
+            case "next_reminder":
+                return moment_text(getattr(row, "next_reminder_at", None))
+            case "next_interview":
+                return moment_text(getattr(row, "next_interview_at", None))
+            case "created":
+                return day_text(row.created_at)
+        return ""

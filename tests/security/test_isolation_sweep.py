@@ -113,6 +113,16 @@ EXCUSED: dict[str, str] = {
     ),
     "core:table_settings": "a table's name in the address, and the settings are the caller's",
     "core:table_views": "a table's name in the address, and the views are the caller's",
+    "core:table_export": (
+        "a table's name in the address, and the rows are the caller's table's, asked of the "
+        "page's own view; tests/test_list_export.py exports each table with another account's "
+        "records beside the caller's (#341)"
+    ),
+    "core:table_export_file": (
+        "a table's name in the address, and the rows are the caller's table's, asked of the "
+        "page's own view; tests/test_list_export.py exports each table with another account's "
+        "records beside the caller's (#341)"
+    ),
     "resume:item_create": "a section's name in the address, and no record",
     "settings:save_field": (
         "a section and a field in the address, and no record: it always writes the "

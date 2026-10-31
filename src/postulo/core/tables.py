@@ -101,6 +101,10 @@ class Column:
     #: icon and an icon is not a name -- and a table of controls all called *Edit* is a list
     #: of links that all say the same thing (#252).
     edit_label: str = ""
+    #: Whether an export of the table writes this column (#341). Every column that shows a
+    #: value does; one that is a row of buttons would not, and the export says which of the
+    #: person's columns it left out rather than dropping them in silence.
+    exported: bool = True
 
     def __post_init__(self) -> None:
         if self.editable and not self.edit_label:
@@ -399,6 +403,13 @@ class Table:
     #: and its placeholder both. The page says it wants that by filling `base.html`'s
     #: `site_search` block; this is only the words.
     search_label: str = ""
+    #: The list view this table is drawn by, as a dotted path (#341). An export asks it for
+    #: every row the table answers with -- `table_rows()`, the page's own queryset
+    #: unpaginated -- so the export can never narrow by something the page does not, or
+    #: miss something it does. Empty for a table nothing exports.
+    rows_from: str = ""
+    #: The name of that view's address, for the way back from an export of it.
+    page_name: str = ""
 
     def __init__(self, request, settings: dict | None = None):
         self.request = request
@@ -1025,6 +1036,106 @@ class Table:
         """
         return bool(self.narrow_controls)
 
+    # ------------------------------------------------------- the table as a document (#341)
+
+    def text(self, row, column: Column) -> str:
+        """What one cell of ``row`` says, as plain text in the language in force.
+
+        What the page draws, without the drawing: the words, the dates in the reader's
+        format and zone, a list as a run separated by commas, and nothing at all for a cell
+        the page fills with a dash. A table that is exported answers for every column it
+        exports; the default says nothing.
+        """
+        return ""
+
+    @property
+    def exported_columns(self) -> list[Column]:
+        """The person's columns, in their order, that an export writes."""
+        return [column for column in self.visible if column.exported]
+
+    @property
+    def left_out(self) -> list[Column]:
+        """The person's columns an export does not write, for the export to say so."""
+        return [column for column in self.visible if not column.exported]
+
+    def param_in_words(self, name: str, value: str) -> tuple[str, str] | None:
+        """A parameter that narrows the table with no control of its own (`extra_params`),
+        as a name and a value in words, or ``None`` for one not worth saying.
+
+        The search is said here, for every table; a table with a tab or a scope says its
+        own by answering for it.
+        """
+        if name == "q":
+            return str(_("Search")), value
+        return None
+
+    def in_words(self) -> list[dict[str, str]]:
+        """Everything narrowing the table, as ``{"label", "value"}`` pairs in words (#341).
+
+        What an exported list prints under its title, because a list that does not say what
+        it was narrowed to is a list somebody will take for all of it. The values are what
+        the controls show -- a choice's label rather than its key, a date in the reader's
+        format -- and a flag has no value, since its name is the whole of what it says.
+        """
+        from django.utils import formats
+
+        def day(text: str) -> str:
+            value = _date(text)
+            return formats.date_format(value, "DATE_FORMAT") if value else text
+
+        said: list[dict[str, str]] = []
+        for name in self.extra_params:
+            value = self.given(name)
+            words = self.param_in_words(name, value) if value else None
+            if words is not None:
+                said.append({"label": words[0], "value": words[1]})
+        for control in self.narrow_controls:
+            if not control.active:
+                continue
+            if control.kind == "flag":
+                value = ""
+            elif control.kind == "choice":
+                value = str(dict(control.choices).get(control.value, control.value))
+            elif control.kind == "date":
+                start, end = day(control.value_from), day(control.value_to)
+                if start and end:
+                    value = str(_("from %(start)s to %(end)s") % {"start": start, "end": end})
+                elif start:
+                    value = str(_("from %(start)s") % {"start": start})
+                else:
+                    value = str(_("until %(end)s") % {"end": end})
+            elif control.kind == "number":
+                least, most = control.value_from, control.value_to
+                if least and most:
+                    value = str(_("%(least)s to %(most)s") % {"least": least, "most": most})
+                elif least:
+                    value = str(_("at least %(least)s") % {"least": least})
+                else:
+                    value = str(_("at most %(most)s") % {"most": most})
+            else:
+                value = control.value
+            said.append({"label": str(control.label), "value": value})
+        return said
+
+    def sort_in_words(self) -> dict:
+        """The sort in force as ``{"column", "descending", "words"}``, or an empty mapping
+        where the table's order is a column nobody can sort by."""
+        key = self.sort.removeprefix("-")
+        column = self.by_key.get(key)
+        if column is None:
+            return {}
+        descending = self.sort.startswith("-")
+        words = (
+            _("Sorted by %(column)s, highest first")
+            if descending
+            else _("Sorted by %(column)s, lowest first")
+        )
+        return {
+            "column": str(column.label),
+            "descending": descending,
+            "words": str(words % {"column": str(column.label)}),
+        }
+
     # ---------------------------------------------------------------- settings
 
     @classmethod
@@ -1098,6 +1209,29 @@ class Table:
         if isinstance((current or {}).get("views"), list):
             cleaned["views"] = current["views"]
         return cleaned
+
+
+def day_text(value) -> str:
+    """A date, or the day a moment falls on in the reader's zone, as the page writes it:
+    ``DATE_FORMAT`` in the language in force. Nothing for nothing (#341)."""
+    from django.utils import formats, timezone
+
+    if value is None or value == "":
+        return ""
+    if isinstance(value, dt.datetime) and timezone.is_aware(value):
+        value = timezone.localtime(value)
+    return formats.date_format(value, "DATE_FORMAT")
+
+
+def moment_text(value) -> str:
+    """A moment in the reader's zone, as the page writes it: ``DATETIME_FORMAT`` (#341)."""
+    from django.utils import formats, timezone
+
+    if value is None or value == "":
+        return ""
+    if isinstance(value, dt.datetime) and timezone.is_aware(value):
+        value = timezone.localtime(value)
+    return formats.date_format(value, "DATETIME_FORMAT")
 
 
 def _date(text: str) -> dt.date | None:

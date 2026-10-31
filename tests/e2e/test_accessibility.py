@@ -524,6 +524,10 @@ def signed_in_paths(a, c, me, entry=None, recovery_link: str = "", things=None) 
         "/applications/?view=board&status=applied",
         "/applications/report/",
         "/applications/report/?period=weeks&weeks=8",
+        # What an export of a table will hold, and the choices for its document (#341).
+        "/tables/applications/export/?status=applied&sort=role",
+        "/tables/companies/export/",
+        "/tables/listings/export/?state=all",
         f"/applications/{a.pk}/",
         f"/applications/{a.pk}/edit/",
         f"/applications/{a.pk}/interviews/new/",

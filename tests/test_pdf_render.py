@@ -169,6 +169,23 @@ ON_PAPER = [
 LONG_ADDRESS = "https://example.org/" + "a" * 180
 
 
+def a_wide_list(user, theme, chosen) -> str:
+    """The companies table in every column it has, one company with a long address (#341)."""
+    from django.test import RequestFactory
+
+    from postulo.core import list_export, tables
+    from postulo.jobs.models import Company
+    from postulo.jobs.tables import CompaniesTable
+
+    Company.objects.create(owner=user, name="Aperture Science", website=LONG_ADDRESS)
+    keys = [column.key for column in CompaniesTable.columns]
+    tables.save_settings(user, "companies", {"columns": keys})
+    request = RequestFactory().get("/")
+    request.user = user
+    html, _theme, _language = list_export.draw(request, "companies", theme=theme, paper=chosen)
+    return html
+
+
 @pytest.mark.parametrize("theme,kind,chosen", ON_PAPER)
 def test_every_kind_draws_on_every_paper_at_its_size(user, experience, theme, kind, chosen):
     """The page is the paper chosen, turned the way chosen, and nothing runs off it (#344)."""
@@ -185,6 +202,8 @@ def test_every_kind_draws_on_every_paper_at_its_size(user, experience, theme, ki
         _report, html, _theme, _language = reports.draw(
             user, reports.period_from({}), theme=theme, paper=chosen
         )
+    elif kind == themes.Kind.LIST:
+        html = a_wide_list(user, theme, chosen)
     else:
         cv = selection(user, experience, kind=kind, theme=theme)
         html = rendering.render_cv_html(cv, paper=chosen)

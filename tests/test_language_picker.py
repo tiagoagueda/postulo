@@ -380,7 +380,9 @@ def test_a_variant_knows_its_whole_name_and_keeps_its_percentage():
     assert brasil.full == "português (Brasil) (40%)"
 
 
-def test_a_language_the_instance_offers_in_one_form_is_a_plain_option(settings_row_pt_br):
+def test_a_language_the_instance_offers_in_one_form_is_a_plain_option(
+    settings_row_pt_br, names_alone
+):
     from postulo.accounts.forms import grouped_by_language, language_choices
 
     grouped = grouped_by_language(language_choices())
@@ -414,7 +416,9 @@ def test_every_language_menu_draws_the_groups_with_their_language():
     assert "data-chosen" not in deutsch, "a language in one form is named whole already"
 
 
-def test_the_instance_default_is_chosen_from_the_same_groups(client, django_user_model):
+def test_the_instance_default_is_chosen_from_the_same_groups(
+    client, django_user_model, names_alone
+):
     admin = django_user_model.objects.create_user(
         email="admin@example.org", username="admin", password="x", is_staff=True
     )
@@ -442,6 +446,18 @@ def test_a_row_can_be_found_by_its_english_name(page):
     row = re.search(r'data-language-search="([^"]*)">\s*<input[^>]*value="de"', picker(page))
 
     assert row and "German" in row[1] and "Deutsch" in row[1]
+
+
+@pytest.fixture
+def names_alone(monkeypatch):
+    """No catalogue status, so every option is a name alone (#341).
+
+    What these tests are about is how the options are grouped and named, not how far along
+    today's catalogues are: a language under 95% carries its percentage beside its name, and
+    every branch that adds strings lowers that until Weblate catches up. The percentage has
+    tests of its own above, each pinning the status it reads.
+    """
+    monkeypatch.setattr(languages, "translation_status", lambda: {})
 
 
 @pytest.fixture

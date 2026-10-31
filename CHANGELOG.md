@@ -274,6 +274,7 @@ All notable changes to Postulo are recorded here. The format follows
 ### ✨ Added
 
 - A plugin can make an interview with `schedule_interview`, refused exactly as the form and the API are (the kind, the end, the people now checked in the service), and read a person's deadlines, closing dates and other dated things in their own time zone with `calendar_items`. (#330)
+- Export a table whole: Applications, Companies and Listings each have *Export*, which writes every row in your columns, filters and sort as a PDF set by a theme (a new list kind, offered and remembered like the report's; landscape by default) or as a CSV of the same rows, downloaded and never filed (#341)
 - Choose the paper: A4 or US Letter, portrait or landscape, set for the instance under Server settings → Defaults, for yourself under Settings → Export, and per export; a theme declares the papers it prints on (none is A4 portrait only), and Chromium, WeasyPrint, Word and OpenDocument honour it (#344)
 - Every capture on the API carries a `posting_key`, the same for two captures of one posting and different for two, so a client counts the postings waiting for review without copying `same_url()`; a keyed hash told to a captures-only token too, and answered per address by `/captures/known` (#711)
 - On Your details, a card holding a change not yet saved is ringed in soft amber, says "Not saved" beside its title, and has a dot on its entry in the section menu; undoing the change takes the mark off, and a refused save marks again the cards it brought back changed. (#927)

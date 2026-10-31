@@ -149,6 +149,10 @@ EXCUSED: dict[str, str] = {
     "core:import_csv_forget": "a POST that discards the stashed spreadsheet",
     "core:table_settings": "a POST that records which columns a table shows",
     "core:table_views": "a POST that keeps, forgets or defaults a saved view, from a visited page",
+    "core:table_export_file": (
+        "a table as a PDF or a CSV arriving as a download, filed nowhere; the export page that "
+        "offers it, `core:table_export`, is walked (#341)"
+    ),
     "applications:board": "a redirect to Applications in its board shape, for bookmarks (#102)",
     "applications:reminder_list": (
         "a redirect to the calendar's agenda narrowed to reminders, for bookmarks; the agenda "

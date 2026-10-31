@@ -675,6 +675,7 @@ msgstr[2] "Tá %(counter)s de do thaifid roinnte le daoine eile: coinníonn siad
 msgstr[3] "Tá %(counter)s de do thaifid roinnte le daoine eile: coinníonn siad cóip den mhéid a theastaíonn óna dtaifid féin, agus cuirtear in iúl dóibh go bhfuil siad imithe."
 msgstr[4] "Tá %(counter)s de do thaifid roinnte le daoine eile: coinníonn siad cóip den mhéid a theastaíonn óna dtaifid féin, agus cuirtear in iúl dóibh go bhfuil siad imithe."
 
+#: src/postulo/jobs/tables.py
 #: src/postulo/templates/jobs/partials/company_row.html
 #, python-format
 msgid "%(counter)s open listing"
@@ -1019,6 +1020,16 @@ msgstr "%(language)s: %(fields)s"
 #, python-format
 msgid "%(later)s must be after %(earlier)s."
 msgstr "Caithfidh %(later)s a bheith i ndiaidh %(earlier)s."
+
+#: src/postulo/core/tables.py
+#, python-format
+msgid "%(least)s to %(most)s"
+msgstr ""
+
+#: src/postulo/core/list_export.py
+#, python-format
+msgid "%(list)s · %(date)s"
+msgstr ""
 
 #: src/postulo/jobs/models.py
 #, python-format
@@ -1791,6 +1802,26 @@ msgstr[2] "Tá %(total)s thaifead sa chomhad."
 msgstr[3] "Tá %(total)s dtaifead sa chomhad."
 msgstr[4] "Tá %(total)s taifead sa chomhad."
 
+#: src/postulo/templates/documents/themes/base_list.html
+#, python-format
+msgid "%(total)s row"
+msgid_plural "%(total)s rows"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+msgstr[4] ""
+
+#: src/postulo/templates/core/table_export.html
+#, python-format
+msgid "%(total)s row matches."
+msgid_plural "%(total)s rows match."
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+msgstr[4] ""
+
 #: src/postulo/jobs/vcards.py
 #, python-format
 msgid "%(total)s telephone number"
@@ -2228,6 +2259,11 @@ msgstr "Oibríonn líne cron ar an óstríomhaire ar an mbealach céanna fós, a
 msgid "A CSV file"
 msgstr "Comhad CSV"
 
+#: src/postulo/templates/core/table_export.html
+#, python-format
+msgid "A CSV holds the first %(limit)s."
+msgstr ""
+
 #: src/postulo/documents/forms.py
 msgid "A CV leads with a career, a portfolio with work. It decides which themes are offered below."
 msgstr "Cuireann CV gairm chun tosaigh, agus punann obair. Socraíonn sé seo na téamaí a thairgtear thíos."
@@ -2617,6 +2653,11 @@ msgstr "Pasfhocal, nó pasfhocal aipe"
 #: src/postulo/documents/integrity.py
 msgid "a PDF"
 msgstr "comhad PDF"
+
+#: src/postulo/templates/core/table_export.html
+#, python-format
+msgid "A PDF holds the first %(limit)s of them and says so."
+msgstr ""
 
 #: src/postulo/templates/server/design.html
 msgid "A person, a company or a plugin, as initials on a colour until there is a picture."
@@ -4033,8 +4074,8 @@ msgid "Applications, with their timelines"
 msgstr "Iarratais, lena n-amlínte"
 
 #: src/postulo/applications/analytics.py src/postulo/applications/models.py
-#: src/postulo/applications/tables.py src/postulo/jobs/listing_views.py
-#: src/postulo/jobs/models.py src/postulo/templates/core/import_csv_map.html
+#: src/postulo/applications/tables.py src/postulo/jobs/models.py
+#: src/postulo/jobs/tables.py src/postulo/templates/core/import_csv_map.html
 msgid "Applied"
 msgstr "Iarratas déanta"
 
@@ -4178,6 +4219,10 @@ msgstr "Mar ba cheart do CV é a phriontáil. Aithnítear ainm atá ina scil sa 
 msgid "As a CV should print it. It is linked to the company of that name among yours, and added to your companies if there is none."
 msgstr "Mar ba cheart do CV é a phriontáil. Nasctar é leis an gcuideachta den ainm sin i measc do chuideachtaí, agus cuirtear le do chuideachtaí é mura bhfuil ceann ann."
 
+#: src/postulo/templates/core/table_export.html
+msgid "As a document"
+msgstr ""
+
 #: src/postulo/templates/documents/letter_detail.html
 msgid "As a file"
 msgstr "Mar chomhad"
@@ -4206,6 +4251,7 @@ msgstr "amhail"
 msgid "As of"
 msgstr "Amhail"
 
+#: src/postulo/jobs/tables.py
 #: src/postulo/templates/jobs/partials/company_row.html
 #: src/postulo/templates/jobs/partials/company_status.html
 #, python-format
@@ -4280,6 +4326,11 @@ msgstr "ag"
 msgid "at least"
 msgstr "ar a laghad"
 
+#: src/postulo/core/tables.py
+#, python-format
+msgid "at least %(least)s"
+msgstr ""
+
 #: src/postulo/core/server_forms.py
 msgid "At least one language has to be offered, or nobody can read anything."
 msgstr "Caithfear teanga amháin ar a laghad a thairiscint, nó ní féidir le duine ar bith aon rud a léamh."
@@ -4287,6 +4338,11 @@ msgstr "Caithfear teanga amháin ar a laghad a thairiscint, nó ní féidir le d
 #: src/postulo/templates/cotton/table/filter.html
 msgid "at most"
 msgstr "ar a mhéad"
+
+#: src/postulo/core/tables.py
+#, python-format
+msgid "at most %(most)s"
+msgstr ""
 
 #: src/postulo/accounts/forms.py
 msgid "Atlantic Ocean"
@@ -4442,6 +4498,10 @@ msgstr "Ar ais chuig an bhfógra poist a rinneadh den ghabháil seo"
 #: src/postulo/templates/core/dashboard.html
 msgid "Back to the standard arrangement"
 msgstr "Ar ais go dtí an leagan amach caighdeánach"
+
+#: src/postulo/templates/core/table_export.html
+msgid "Back to the table, to change any of this"
+msgstr ""
 
 #: src/postulo/core/views_tables.py
 msgid "Back to the usual columns."
@@ -5338,7 +5398,7 @@ msgstr "Dún"
 msgid "Close search"
 msgstr "Dún an cuardach"
 
-#: src/postulo/jobs/listing_views.py src/postulo/jobs/models.py
+#: src/postulo/jobs/models.py src/postulo/jobs/tables.py
 msgid "Closed"
 msgstr "Dúnta"
 
@@ -5425,6 +5485,7 @@ msgstr "dath"
 msgid "Column in the file"
 msgstr "Colún sa chomhad"
 
+#: src/postulo/templates/core/table_export.html
 #: src/postulo/templates/partials/table/columns.html
 msgid "Columns"
 msgstr "Colúin"
@@ -6407,7 +6468,7 @@ msgstr "Caith i leataobh iad"
 msgid "Discard this capture"
 msgstr "Caith an ghabháil seo i leataobh"
 
-#: src/postulo/jobs/listing_views.py src/postulo/jobs/models.py
+#: src/postulo/jobs/models.py src/postulo/jobs/tables.py
 #: src/postulo/templates/jobs/capture_list.html
 msgid "Discarded"
 msgstr "Caite i leataobh"
@@ -6545,6 +6606,7 @@ msgid "Download companies.geojson"
 msgstr "Íoslódáil companies.geojson"
 
 #: src/postulo/templates/applications/report.html
+#: src/postulo/templates/core/table_export.html
 msgid "Download CSV"
 msgstr "Íoslódáil CSV"
 
@@ -6564,6 +6626,10 @@ msgstr "Íoslódáil é"
 #: src/postulo/templates/jobs/capture_page.html
 msgid "Download it as text"
 msgstr "Íoslódáil mar théacs é"
+
+#: src/postulo/templates/core/table_export.html
+msgid "Download PDF"
+msgstr ""
 
 #: src/postulo/templates/core/kind_file.html
 #: src/postulo/templates/resume/candidate_file.html
@@ -7095,6 +7161,10 @@ msgstr "Gach fógra poist a thug tú faoi deara, go dtí go gcinneann tú: cuir 
 msgid "Every role you have held. Write the highlights once; tailor them per CV later."
 msgstr "Gach ról a bhí agat. Scríobh na buaicphointí uair amháin; cuir in oiriúint iad de réir CV níos déanaí."
 
+#: src/postulo/templates/core/table_export.html
+msgid "Every row of the table as it is now, not only the page on screen: your columns in your order, with its filters and its sort. Downloaded, and not kept in Postulo."
+msgstr ""
+
 #: src/postulo/templates/server/design.html
 msgid "Every step derived from one radius, so there is one number to change."
 msgstr "Gach céim díorthaithe ó gha amháin, mar sin tá uimhir amháin le hathrú."
@@ -7129,7 +7199,7 @@ msgstr "Le gach duine"
 msgid "Everybody's, as an administrator"
 msgstr "Le gach duine, mar riarthóir"
 
-#: src/postulo/jobs/listing_views.py src/postulo/templates/server/logs.html
+#: src/postulo/jobs/tables.py src/postulo/templates/server/logs.html
 msgid "Everything"
 msgstr "Gach rud"
 
@@ -7256,9 +7326,15 @@ msgstr "Is minic gur gá a rá cén nasc, cén chuideachta nó cén doiciméad l
 #: src/postulo/templates/cotton/transfer_group.html
 #: src/postulo/templates/jobs/company_detail.html
 #: src/postulo/templates/jobs/company_places.html
+#: src/postulo/templates/partials/table/export.html
 #: src/postulo/templates/settings/export.html
 msgid "Export"
 msgstr "Easpórtáil"
+
+#: src/postulo/templates/core/table_export.html
+#, python-format
+msgid "Export %(list)s"
+msgstr ""
 
 #: src/postulo/core/models.py
 msgid "export archive"
@@ -7778,6 +7854,16 @@ msgstr "Ó %(name)s."
 msgid "From %(register)s"
 msgstr ""
 
+#: src/postulo/core/tables.py
+#, python-format
+msgid "from %(start)s"
+msgstr ""
+
+#: src/postulo/core/tables.py
+#, python-format
+msgid "from %(start)s to %(end)s"
+msgstr ""
+
 #: src/postulo/templates/cotton/date_picker.html
 #, python-format
 msgid "From %(start)s to %(end)s"
@@ -8079,6 +8165,10 @@ msgstr "Comhlán, roimh cháin. Is leor ceann amháin ina aonar — tugann formh
 #: src/postulo/templates/server/plugin_access.html
 msgid "group"
 msgstr "grúpa"
+
+#: src/postulo/jobs/tables.py
+msgid "Group"
+msgstr ""
 
 #: src/postulo/core/views_access.py
 msgid "Group deleted."
@@ -9573,6 +9663,10 @@ msgstr "teanga gan lua"
 msgid "language of exported files"
 msgstr ""
 
+#: src/postulo/templates/core/table_export.html
+msgid "Language of the document"
+msgstr ""
+
 #: src/postulo/templates/applications/report.html
 msgid "Language of the report"
 msgstr ""
@@ -9834,6 +9928,12 @@ msgstr "Má fhágtar bán é, priontálann do CVanna “%(place)s”: baile agus
 msgid "Left empty it is today. Capturing a posting you applied to last week is common."
 msgstr "Má fhágtar folamh é, is é an lá inniu atá ann. Is gnách fógra poist a ndearna tú iarratas air an tseachtain seo caite a ghabháil."
 
+#: src/postulo/templates/core/table_export.html
+#: src/postulo/templates/documents/themes/base_list.html
+#, python-format
+msgid "Left out, because they hold nothing to write: %(columns)s."
+msgstr ""
+
 #: src/postulo/jobs/industries.py
 msgid "Legal"
 msgstr "Dlí"
@@ -10002,6 +10102,10 @@ msgstr "Naisc chuig na háiteanna a bhfilleann cuardach poist orthu: an clár, n
 #: src/postulo/templates/documents/application_documents.html
 msgid "Links you pointed them at"
 msgstr "Naisc a thaispeáin tú dóibh"
+
+#: src/postulo/documents/themes.py
+msgid "List"
+msgstr ""
 
 #: src/postulo/resume/views.py
 msgid "listening"
@@ -10738,6 +10842,11 @@ msgstr "Caolaigh"
 #: src/postulo/templates/partials/table/views.html
 msgid "Narrow and sort the table the way you want it, then keep it under a name."
 msgstr "Cúngaigh agus sórtáil an tábla mar is mian leat, ansin coinnigh faoi ainm é."
+
+#: src/postulo/templates/core/table_export.html
+#: src/postulo/templates/documents/themes/base_list.html
+msgid "Narrowed by"
+msgstr ""
 
 #: src/postulo/resume/forms.py
 msgid "National letters or classes the list lacks, as the licence prints them. A CV prints them after the codes."
@@ -11847,6 +11956,7 @@ msgid "Nothing matches “%(term)s”"
 msgstr "Ní mheaitseálann aon rud “%(term)s”"
 
 #: src/postulo/templates/base.html
+#: src/postulo/templates/documents/themes/base_list.html
 msgid "Nothing matches."
 msgstr "Ní mheaitseálann aon rud."
 
@@ -12064,6 +12174,10 @@ msgstr "Faic go fóill. Cuimhnítear ar áit nuair a cheartaíonn tú réimse ar
 #: src/postulo/jobs/vcards.py
 msgid "Nothing: an earlier card in this file is the same one."
 msgstr "Faic: is é cárta níos luaithe sa chomhad seo an ceann céanna."
+
+#: src/postulo/templates/core/table_export.html
+msgid "Nothing: every row."
+msgstr ""
 
 #: src/postulo/jobs/vcards.py
 msgid "Nothing: the card has no name."
@@ -12804,6 +12918,10 @@ msgstr ""
 msgid "order"
 msgstr "ord"
 
+#: src/postulo/templates/core/table_export.html
+msgid "Order"
+msgstr ""
+
 #: src/postulo/templates/server/design.html
 msgid "Ordinary text, which most of the interface is."
 msgstr "Gnáth-théacs, rud atá i bhformhór an chomhéadain."
@@ -13008,6 +13126,7 @@ msgstr ""
 
 #: src/postulo/documents/forms.py
 #: src/postulo/templates/applications/report.html
+#: src/postulo/templates/core/table_export.html
 #: src/postulo/templates/settings/export.html
 msgid "Paper"
 msgstr ""
@@ -13839,10 +13958,15 @@ msgstr "Duaiseanna, scoláireachtaí agus gradaim: aitheantas a thug duine éigi
 msgid "Proceedings"
 msgstr "Imeachtaí comhdhála"
 
+#: src/postulo/templates/documents/themes/base_list.html
+msgid "Produced by Postulo from this person's own records."
+msgstr ""
+
 #: src/postulo/templates/documents/themes/base_report.html
 msgid "Produced by Postulo from this person's own records. Postulo sets no target: how many applications a period should hold is a benefit regime's rule or the person's own."
 msgstr "Táirgthe ag Postulo ó thaifid an duine seo féin. Ní shocraíonn Postulo aon sprioc: is riail de chuid córais sochair nó riail an duine féin í cé mhéad iarratas ba cheart a bheith i dtréimhse."
 
+#: src/postulo/templates/documents/themes/base_list.html
 #: src/postulo/templates/documents/themes/base_report.html
 #, python-format
 msgid "Produced on %(produced)s"
@@ -15097,7 +15221,7 @@ msgstr "raonta"
 msgid "Screening"
 msgstr "Scagadh"
 
-#: src/postulo/templates/core/search.html
+#: src/postulo/core/tables.py src/postulo/templates/core/search.html
 #: src/postulo/templates/cotton/site_search.html
 #: src/postulo/templates/jobs/industry_list.html
 msgid "Search"
@@ -15583,7 +15707,7 @@ msgstr "Gearrliosta"
 msgid "Shortlist them"
 msgstr "Gearrliostaigh iad"
 
-#: src/postulo/jobs/listing_views.py src/postulo/jobs/models.py
+#: src/postulo/jobs/models.py src/postulo/jobs/tables.py
 msgid "Shortlisted"
 msgstr "Ar an ngearrliosta"
 
@@ -15692,6 +15816,7 @@ msgstr "An dtaispeánfar an seoladh seo ar an léarscáil?"
 msgid "Show this period"
 msgstr "Taispeáin an tréimhse seo"
 
+#: src/postulo/jobs/tables.py
 #: src/postulo/templates/jobs/partials/whose_form.html
 msgid "Showing"
 msgstr "Ag taispeáint"
@@ -16063,6 +16188,16 @@ msgstr "Sórtáil de réir %(column)s, is airde ar dtús"
 #, python-format
 msgid "Sort by %(column)s, lowest first"
 msgstr "Sórtáil de réir %(column)s, is ísle ar dtús"
+
+#: src/postulo/core/tables.py
+#, python-format
+msgid "Sorted by %(column)s, highest first"
+msgstr ""
+
+#: src/postulo/core/tables.py
+#, python-format
+msgid "Sorted by %(column)s, lowest first"
+msgstr ""
 
 #: src/postulo/jobs/models.py src/postulo/resume/models.py
 msgid "source"
@@ -17631,6 +17766,10 @@ msgstr "Níorbh fhéidir an chóip a sheoladh; deir an doiciméad cén fáth."
 msgid "The credit the tiles' licence asks for, drawn on the map as plain text. For example: © OpenStreetMap contributors"
 msgstr "An admháil a iarrann ceadúnas na dtíleanna, tarraingthe ar an léarscáil mar ghnáth-théacs. Mar shampla: © OpenStreetMap contributors"
 
+#: src/postulo/templates/core/table_export.html
+msgid "The CSV is the same rows in the same language, for a spreadsheet; the theme and the paper are for the PDF."
+msgstr ""
+
 #: src/postulo/templates/settings/appearance.html
 msgid "The dashboard lists open applications nothing has happened to for a while, with nothing planned. Recruiters' own advice clusters around two to three weeks."
 msgstr "Liostaíonn an painéal iarratais oscailte nár tharla aon rud dóibh le tamall, gan aon rud beartaithe. Bíonn comhairle na n-earcaitheoirí féin thart ar dhá go trí seachtaine."
@@ -17873,6 +18012,11 @@ msgstr[1] "Léitear an chéad %(count)s, agus ní léitear an chuid eile."
 msgstr[2] "Léitear an chéad %(count)s, agus ní léitear an chuid eile."
 msgstr[3] "Léitear an chéad %(count)s, agus ní léitear an chuid eile."
 msgstr[4] "Léitear an chéad %(count)s, agus ní léitear an chuid eile."
+
+#: src/postulo/templates/documents/themes/base_list.html
+#, python-format
+msgid "The first %(count)s of %(total)s rows; the rest are in the table."
+msgstr ""
 
 #: src/postulo/templates/documents/cv_form.html
 msgid "The first choice in each list follows your details: mark another number as primary there and this CV prints it. One you choose here stays, whatever becomes primary. If you later delete it from your details, this CV prints none of that kind until you choose again, and never another in its place. What you have already sent does not change."
@@ -18802,6 +18946,7 @@ msgid "theme"
 msgstr "téama"
 
 #: src/postulo/templates/applications/report.html
+#: src/postulo/templates/core/table_export.html
 msgid "Theme"
 msgstr ""
 
@@ -19579,7 +19724,7 @@ msgstr "le seoladh ag %(name)s"
 msgid "to be sent by the referee"
 msgstr "le seoladh ag an teistiméir"
 
-#: src/postulo/jobs/listing_views.py
+#: src/postulo/jobs/tables.py
 msgid "To decide"
 msgstr "Le cinneadh"
 
@@ -19876,6 +20021,11 @@ msgstr "Neamhfhoilsithe"
 #: src/postulo/resume/models.py
 msgid "until"
 msgstr "go dtí"
+
+#: src/postulo/core/tables.py
+#, python-format
+msgid "until %(end)s"
+msgstr ""
 
 #: src/postulo/resume/models.py
 #, python-format
@@ -20520,6 +20670,10 @@ msgstr "An réimse ina raibh sé, mura luann ainm na cáilíochta é."
 msgid "What it was. Another capture of the same advert is added from the review screen, so it is not offered here."
 msgstr "Cad a bhí ann. Cuirtear gabháil eile den fhógra poist céanna leis ón scáileán athbhreithnithe, mar sin ní thairgtear anseo é."
 
+#: src/postulo/templates/core/table_export.html
+msgid "What it will hold"
+msgstr ""
+
 #: src/postulo/templates/jobs/merge.html
 msgid "What moves"
 msgstr "An méid a bhogann"
@@ -21136,6 +21290,10 @@ msgstr "Na daoine a bhfuil tú ag bualadh leo. Tairgtear na daoine atá taifeadt
 #, fuzzy
 msgid "Whoever put you forward, from the people you have recorded — at this company, at another, or at none. The figures count what each referrer led to."
 msgstr "An té a mhol thú, as na daoine a thaifead tú — sa chuideachta seo, i gcuideachta eile, nó gan chuideachta ar bith. Áiríonn na figiúirí an toradh a bhí ar gach tarchuirtheoir."
+
+#: src/postulo/jobs/tables.py
+msgid "Whose"
+msgstr ""
 
 #: src/postulo/templates/partials/import_owner.html
 msgid "Whose they become"

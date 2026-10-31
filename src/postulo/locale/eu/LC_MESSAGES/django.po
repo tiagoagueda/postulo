@@ -486,6 +486,7 @@ msgid_plural "%(counter)s of your records are shared with others: they keep a co
 msgstr[0] "Zure erregistroetako bat besteekin partekatuta dago: haien erregistroek behar dutenaren kopia bat gordetzen dute, eta desagertu dela jakinarazten zaie."
 msgstr[1] "Zure erregistroetako %(counter)s besteekin partekatuta daude: haien erregistroek behar dutenaren kopia bat gordetzen dute, eta desagertu direla jakinarazten zaie."
 
+#: src/postulo/jobs/tables.py
 #: src/postulo/templates/jobs/partials/company_row.html
 #, python-format
 msgid "%(counter)s open listing"
@@ -794,6 +795,16 @@ msgstr "%(language)s: %(fields)s"
 #, python-format
 msgid "%(later)s must be after %(earlier)s."
 msgstr "%(later)s eremuak %(earlier)s eremuaren ondorengoa izan behar du."
+
+#: src/postulo/core/tables.py
+#, python-format
+msgid "%(least)s to %(most)s"
+msgstr ""
+
+#: src/postulo/core/list_export.py
+#, python-format
+msgid "%(list)s · %(date)s"
+msgstr ""
 
 #: src/postulo/jobs/models.py
 #, python-format
@@ -1509,6 +1520,20 @@ msgid_plural "%(total)s records are in the file."
 msgstr[0] "%(total)s erregistro dago fitxategian."
 msgstr[1] "%(total)s erregistro daude fitxategian."
 
+#: src/postulo/templates/documents/themes/base_list.html
+#, python-format
+msgid "%(total)s row"
+msgid_plural "%(total)s rows"
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/postulo/templates/core/table_export.html
+#, python-format
+msgid "%(total)s row matches."
+msgid_plural "%(total)s rows match."
+msgstr[0] ""
+msgstr[1] ""
+
 #: src/postulo/jobs/vcards.py
 #, python-format
 msgid "%(total)s telephone number"
@@ -1934,6 +1959,11 @@ msgstr "Ostalariko cron lerro batek modu berean funtzionatzen du oraindik, eta b
 msgid "A CSV file"
 msgstr "CSV fitxategi bat"
 
+#: src/postulo/templates/core/table_export.html
+#, python-format
+msgid "A CSV holds the first %(limit)s."
+msgstr ""
+
 #: src/postulo/documents/forms.py
 msgid "A CV leads with a career, a portfolio with work. It decides which themes are offered below."
 msgstr "CV bat ibilbidearekin hasten da; portfolio bat, lanekin. Horrek erabakitzen du behean zer gai eskaintzen diren."
@@ -2325,6 +2355,11 @@ msgstr "Pasahitz bat, edo aplikazio-pasahitz bat"
 #: src/postulo/documents/integrity.py
 msgid "a PDF"
 msgstr "PDF bat"
+
+#: src/postulo/templates/core/table_export.html
+#, python-format
+msgid "A PDF holds the first %(limit)s of them and says so."
+msgstr ""
 
 #: src/postulo/templates/server/design.html
 msgid "A person, a company or a plugin, as initials on a colour until there is a picture."
@@ -3703,8 +3738,8 @@ msgid "Applications, with their timelines"
 msgstr "Hautagaitzak, beren denbora-lerroekin"
 
 #: src/postulo/applications/analytics.py src/postulo/applications/models.py
-#: src/postulo/applications/tables.py src/postulo/jobs/listing_views.py
-#: src/postulo/jobs/models.py src/postulo/templates/core/import_csv_map.html
+#: src/postulo/applications/tables.py src/postulo/jobs/models.py
+#: src/postulo/jobs/tables.py src/postulo/templates/core/import_csv_map.html
 msgid "Applied"
 msgstr "Aurkeztuta"
 
@@ -3848,6 +3883,10 @@ msgstr "CV batek inprimatu beharko lukeen bezala. ESCO sailkapenean gaitasun bat
 msgid "As a CV should print it. It is linked to the company of that name among yours, and added to your companies if there is none."
 msgstr "CV batek inprimatu beharko lukeen bezala. Zure enpresen artean izen hori duenari lotzen zaio, eta zure enpresetara gehitzen da halakorik ez badago."
 
+#: src/postulo/templates/core/table_export.html
+msgid "As a document"
+msgstr ""
+
 #: src/postulo/templates/documents/letter_detail.html
 msgid "As a file"
 msgstr "Fitxategi gisa"
@@ -3879,6 +3918,7 @@ msgstr "data honetan"
 msgid "As of"
 msgstr "Data"
 
+#: src/postulo/jobs/tables.py
 #: src/postulo/templates/jobs/partials/company_row.html
 #: src/postulo/templates/jobs/partials/company_status.html
 #, python-format
@@ -3954,6 +3994,11 @@ msgstr "hemen:"
 msgid "at least"
 msgstr "gutxienez"
 
+#: src/postulo/core/tables.py
+#, python-format
+msgid "at least %(least)s"
+msgstr ""
+
 #: src/postulo/core/server_forms.py
 msgid "At least one language has to be offered, or nobody can read anything."
 msgstr "Gutxienez hizkuntza bat eskaini behar da, bestela inork ezin du ezer irakurri."
@@ -3961,6 +4006,11 @@ msgstr "Gutxienez hizkuntza bat eskaini behar da, bestela inork ezin du ezer ira
 #: src/postulo/templates/cotton/table/filter.html
 msgid "at most"
 msgstr "gehienez"
+
+#: src/postulo/core/tables.py
+#, python-format
+msgid "at most %(most)s"
+msgstr ""
 
 #: src/postulo/accounts/forms.py
 msgid "Atlantic Ocean"
@@ -4113,6 +4163,10 @@ msgstr "Itzuli kaptura hau bihurtu den iragarkira"
 #: src/postulo/templates/core/dashboard.html
 msgid "Back to the standard arrangement"
 msgstr "Itzuli antolaketa estandarrera"
+
+#: src/postulo/templates/core/table_export.html
+msgid "Back to the table, to change any of this"
+msgstr ""
 
 #: src/postulo/core/views_tables.py
 msgid "Back to the usual columns."
@@ -4998,7 +5052,7 @@ msgstr "Itxi"
 msgid "Close search"
 msgstr "Itxi bilaketa"
 
-#: src/postulo/jobs/listing_views.py src/postulo/jobs/models.py
+#: src/postulo/jobs/models.py src/postulo/jobs/tables.py
 msgid "Closed"
 msgstr "Itxita"
 
@@ -5086,6 +5140,7 @@ msgstr "kolorea"
 msgid "Column in the file"
 msgstr "Fitxategiko zutabea"
 
+#: src/postulo/templates/core/table_export.html
 #: src/postulo/templates/partials/table/columns.html
 msgid "Columns"
 msgstr "Zutabeak"
@@ -6065,7 +6120,7 @@ msgstr "Baztertu"
 msgid "Discard this capture"
 msgstr "Baztertu kaptura hau"
 
-#: src/postulo/jobs/listing_views.py src/postulo/jobs/models.py
+#: src/postulo/jobs/models.py src/postulo/jobs/tables.py
 #: src/postulo/templates/jobs/capture_list.html
 msgid "Discarded"
 msgstr "Baztertuta"
@@ -6202,6 +6257,7 @@ msgid "Download companies.geojson"
 msgstr "Deskargatu companies.geojson"
 
 #: src/postulo/templates/applications/report.html
+#: src/postulo/templates/core/table_export.html
 msgid "Download CSV"
 msgstr "Deskargatu CSVa"
 
@@ -6221,6 +6277,10 @@ msgstr "Deskargatu"
 #: src/postulo/templates/jobs/capture_page.html
 msgid "Download it as text"
 msgstr "Deskargatu testu gisa"
+
+#: src/postulo/templates/core/table_export.html
+msgid "Download PDF"
+msgstr ""
 
 #: src/postulo/templates/core/kind_file.html
 #: src/postulo/templates/resume/candidate_file.html
@@ -6750,6 +6810,10 @@ msgstr "Ikusi dituzun iragarki guztiak, erabakitzen duzun arte: zerrenda laburre
 msgid "Every role you have held. Write the highlights once; tailor them per CV later."
 msgstr "Izan duzun lanpostu bakoitza. Idatzi nabarmendutakoak behin; egokitu CV bakoitzerako geroago."
 
+#: src/postulo/templates/core/table_export.html
+msgid "Every row of the table as it is now, not only the page on screen: your columns in your order, with its filters and its sort. Downloaded, and not kept in Postulo."
+msgstr ""
+
 #: src/postulo/templates/server/design.html
 msgid "Every step derived from one radius, so there is one number to change."
 msgstr "Urrats guztiak erradio bakar batetik eratortzen dira, beraz, zenbaki bakarra aldatu behar da."
@@ -6782,7 +6846,7 @@ msgstr "Denena"
 msgid "Everybody's, as an administrator"
 msgstr "Denena, administratzaile gisa"
 
-#: src/postulo/jobs/listing_views.py src/postulo/templates/server/logs.html
+#: src/postulo/jobs/tables.py src/postulo/templates/server/logs.html
 msgid "Everything"
 msgstr "Dena"
 
@@ -6908,9 +6972,15 @@ msgstr "Zer okertu den azaltzeak sarri esan nahi du zein konexiori, zein enpresa
 #: src/postulo/templates/cotton/transfer_group.html
 #: src/postulo/templates/jobs/company_detail.html
 #: src/postulo/templates/jobs/company_places.html
+#: src/postulo/templates/partials/table/export.html
 #: src/postulo/templates/settings/export.html
 msgid "Export"
 msgstr "Esportatu"
+
+#: src/postulo/templates/core/table_export.html
+#, python-format
+msgid "Export %(list)s"
+msgstr ""
 
 #: src/postulo/core/models.py
 msgid "export archive"
@@ -7426,6 +7496,16 @@ msgstr "Jatorria: %(name)s."
 msgid "From %(register)s"
 msgstr ""
 
+#: src/postulo/core/tables.py
+#, python-format
+msgid "from %(start)s"
+msgstr ""
+
+#: src/postulo/core/tables.py
+#, python-format
+msgid "from %(start)s to %(end)s"
+msgstr ""
+
 #: src/postulo/templates/cotton/date_picker.html
 #, python-format
 msgid "From %(start)s to %(end)s"
@@ -7729,6 +7809,10 @@ msgstr "Gordina, zergen aurretik. Mutur bat bakarrik ere ondo dago: iragarki geh
 #: src/postulo/templates/server/plugin_access.html
 msgid "group"
 msgstr "taldea"
+
+#: src/postulo/jobs/tables.py
+msgid "Group"
+msgstr ""
 
 #: src/postulo/core/views_access.py
 msgid "Group deleted."
@@ -9202,6 +9286,10 @@ msgstr "hizkuntza adierazi gabe"
 msgid "language of exported files"
 msgstr ""
 
+#: src/postulo/templates/core/table_export.html
+msgid "Language of the document"
+msgstr ""
+
 #: src/postulo/templates/applications/report.html
 msgid "Language of the report"
 msgstr ""
@@ -9459,6 +9547,12 @@ msgstr "Hutsik utziz gero, zure CVek «%(place)s» inprimatzen dute: zure posta-
 msgid "Left empty it is today. Capturing a posting you applied to last week is common."
 msgstr "Hutsik utziz gero, gaurko data da. Ohikoa da joan den astean hautagaitza aurkeztu zenion iragarki bat kapturatzea."
 
+#: src/postulo/templates/core/table_export.html
+#: src/postulo/templates/documents/themes/base_list.html
+#, python-format
+msgid "Left out, because they hold nothing to write: %(columns)s."
+msgstr ""
+
 #: src/postulo/jobs/industries.py
 msgid "Legal"
 msgstr "Zuzenbidea"
@@ -9625,6 +9719,10 @@ msgstr "Lan-bilaketa batean behin eta berriz itzultzen zaren lekuetarako estekak
 #: src/postulo/templates/documents/application_documents.html
 msgid "Links you pointed them at"
 msgstr "Haiei adierazi zenizkien estekak"
+
+#: src/postulo/documents/themes.py
+msgid "List"
+msgstr ""
 
 #: src/postulo/resume/views.py
 msgid "listening"
@@ -10351,6 +10449,11 @@ msgstr "Murriztu"
 #: src/postulo/templates/partials/table/views.html
 msgid "Narrow and sort the table the way you want it, then keep it under a name."
 msgstr "Murriztu eta ordenatu taula nahi duzun moduan, eta gorde izen batekin."
+
+#: src/postulo/templates/core/table_export.html
+#: src/postulo/templates/documents/themes/base_list.html
+msgid "Narrowed by"
+msgstr ""
 
 #: src/postulo/resume/forms.py
 msgid "National letters or classes the list lacks, as the licence prints them. A CV prints them after the codes."
@@ -11443,6 +11546,7 @@ msgid "Nothing matches “%(term)s”"
 msgstr "Ezer ez dator bat «%(term)s» bilaketarekin"
 
 #: src/postulo/templates/base.html
+#: src/postulo/templates/documents/themes/base_list.html
 msgid "Nothing matches."
 msgstr "Ez dago bat datorren ezer."
 
@@ -11660,6 +11764,10 @@ msgstr "Oraindik ezer ez. Leku bat gogoratzen da berrikustean eremu bat zuzentze
 #: src/postulo/jobs/vcards.py
 msgid "Nothing: an earlier card in this file is the same one."
 msgstr "Ezer ez: fitxategi honetako aurreko txartel bat bera da."
+
+#: src/postulo/templates/core/table_export.html
+msgid "Nothing: every row."
+msgstr ""
 
 #: src/postulo/jobs/vcards.py
 msgid "Nothing: the card has no name."
@@ -12342,6 +12450,10 @@ msgstr ""
 msgid "order"
 msgstr "ordena"
 
+#: src/postulo/templates/core/table_export.html
+msgid "Order"
+msgstr ""
+
 #: src/postulo/templates/server/design.html
 msgid "Ordinary text, which most of the interface is."
 msgstr "Testu arrunta; interfazearen gehiena halakoa da."
@@ -12544,6 +12656,7 @@ msgstr ""
 
 #: src/postulo/documents/forms.py
 #: src/postulo/templates/applications/report.html
+#: src/postulo/templates/core/table_export.html
 #: src/postulo/templates/settings/export.html
 msgid "Paper"
 msgstr ""
@@ -13358,10 +13471,15 @@ msgstr "Sariak, bekak eta bereizgarriak: norbaitek eman zizun aitorpena."
 msgid "Proceedings"
 msgstr "Biltzar-aktak"
 
+#: src/postulo/templates/documents/themes/base_list.html
+msgid "Produced by Postulo from this person's own records."
+msgstr ""
+
 #: src/postulo/templates/documents/themes/base_report.html
 msgid "Produced by Postulo from this person's own records. Postulo sets no target: how many applications a period should hold is a benefit regime's rule or the person's own."
 msgstr "Postulok sortua, pertsona honen beraren erregistroetatik abiatuta. Postulok ez du helbururik ezartzen: aldi batek zenbat hautagaitza izan behar dituen prestazio-sistema baten araua da edo pertsonarena berarena."
 
+#: src/postulo/templates/documents/themes/base_list.html
 #: src/postulo/templates/documents/themes/base_report.html
 #, python-format
 msgid "Produced on %(produced)s"
@@ -14591,7 +14709,7 @@ msgstr "esparruak"
 msgid "Screening"
 msgstr "Lehen hautaketa"
 
-#: src/postulo/templates/core/search.html
+#: src/postulo/core/tables.py src/postulo/templates/core/search.html
 #: src/postulo/templates/cotton/site_search.html
 #: src/postulo/templates/jobs/industry_list.html
 msgid "Search"
@@ -15078,7 +15196,7 @@ msgstr "Sartu zerrenda laburrean"
 msgid "Shortlist them"
 msgstr "Sartu hautaketa-zerrendan"
 
-#: src/postulo/jobs/listing_views.py src/postulo/jobs/models.py
+#: src/postulo/jobs/models.py src/postulo/jobs/tables.py
 msgid "Shortlisted"
 msgstr "Zerrenda laburrean"
 
@@ -15183,6 +15301,7 @@ msgstr "Erakutsi helbide hau mapan?"
 msgid "Show this period"
 msgstr "Erakutsi aldi hau"
 
+#: src/postulo/jobs/tables.py
 #: src/postulo/templates/jobs/partials/whose_form.html
 msgid "Showing"
 msgstr "Erakusten"
@@ -15549,6 +15668,16 @@ msgstr "Ordenatu %(column)s zutabearen arabera, handiena lehenik"
 #, python-format
 msgid "Sort by %(column)s, lowest first"
 msgstr "Ordenatu %(column)s zutabearen arabera, txikiena lehenik"
+
+#: src/postulo/core/tables.py
+#, python-format
+msgid "Sorted by %(column)s, highest first"
+msgstr ""
+
+#: src/postulo/core/tables.py
+#, python-format
+msgid "Sorted by %(column)s, lowest first"
+msgstr ""
 
 #: src/postulo/jobs/models.py src/postulo/resume/models.py
 msgid "source"
@@ -17093,6 +17222,10 @@ msgstr "Kopia ezin izan da bidali; dokumentuak dio zergatik."
 msgid "The credit the tiles' licence asks for, drawn on the map as plain text. For example: © OpenStreetMap contributors"
 msgstr "Lauzen lizentziak eskatzen duen aitortza, mapan testu arrunt gisa marraztua. Adibidez: © OpenStreetMap contributors"
 
+#: src/postulo/templates/core/table_export.html
+msgid "The CSV is the same rows in the same language, for a spreadsheet; the theme and the paper are for the PDF."
+msgstr ""
+
 #: src/postulo/templates/settings/appearance.html
 msgid "The dashboard lists open applications nothing has happened to for a while, with nothing planned. Recruiters' own advice clusters around two to three weeks."
 msgstr "Panelak aspaldi ezer gertatu ez zaien eta ezer aurreikusita ez duten hautagaitza irekiak zerrendatzen ditu. Kontratatzaileen beraien aholkuak bi edo hiru asteren inguruan biltzen dira."
@@ -17329,6 +17462,11 @@ msgid "The first %(count)s is read, and the rest are not."
 msgid_plural "The first %(count)s are read, and the rest are not."
 msgstr[0] "Lehena irakurtzen da, eta gainerakoak ez."
 msgstr[1] "Lehenengo %(count)s irakurtzen dira, eta gainerakoak ez."
+
+#: src/postulo/templates/documents/themes/base_list.html
+#, python-format
+msgid "The first %(count)s of %(total)s rows; the rest are in the table."
+msgstr ""
 
 #: src/postulo/templates/documents/cv_form.html
 msgid "The first choice in each list follows your details: mark another number as primary there and this CV prints it. One you choose here stays, whatever becomes primary. If you later delete it from your details, this CV prints none of that kind until you choose again, and never another in its place. What you have already sent does not change."
@@ -18235,6 +18373,7 @@ msgid "theme"
 msgstr "gaia"
 
 #: src/postulo/templates/applications/report.html
+#: src/postulo/templates/core/table_export.html
 msgid "Theme"
 msgstr ""
 
@@ -19004,7 +19143,7 @@ msgstr "%(name)s pertsonak bidaltzekoa"
 msgid "to be sent by the referee"
 msgstr "erreferentzia-pertsonak bidaltzekoa"
 
-#: src/postulo/jobs/listing_views.py
+#: src/postulo/jobs/tables.py
 msgid "To decide"
 msgstr "Erabakitzeko"
 
@@ -19297,6 +19436,11 @@ msgstr "Argitaratu gabea"
 #: src/postulo/resume/models.py
 msgid "until"
 msgstr "arte"
+
+#: src/postulo/core/tables.py
+#, python-format
+msgid "until %(end)s"
+msgstr ""
 
 #: src/postulo/resume/models.py
 #, python-format
@@ -19942,6 +20086,10 @@ msgstr "Zeren arlokoa zen, tituluaren izenak esaten ez duenean."
 msgid "What it was. Another capture of the same advert is added from the review screen, so it is not offered here."
 msgstr "Zer zen. Iragarki beraren beste kaptura bat berrikuspen-pantailatik gehitzen da, beraz, ez da hemen eskaintzen."
 
+#: src/postulo/templates/core/table_export.html
+msgid "What it will hold"
+msgstr ""
+
 #: src/postulo/templates/jobs/merge.html
 msgid "What moves"
 msgstr "Zer mugitzen den"
@@ -20551,6 +20699,10 @@ msgstr "Norekin elkartuko zaren. Enpresa honetan erregistratu dituzun pertsonak 
 #: src/postulo/applications/forms.py
 msgid "Whoever put you forward, from the people you have recorded — at this company, at another, or at none. The figures count what each referrer led to."
 msgstr "Zu proposatu zintuena, erregistratu dituzun pertsonen artean: enpresa honetan, beste batean edo inongo enpresatan ez. Zifrek gomendatzaile bakoitzak zer ekarri zuen zenbatzen dute."
+
+#: src/postulo/jobs/tables.py
+msgid "Whose"
+msgstr ""
 
 #: src/postulo/templates/partials/import_owner.html
 msgid "Whose they become"

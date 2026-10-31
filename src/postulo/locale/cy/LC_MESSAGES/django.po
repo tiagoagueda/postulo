@@ -612,6 +612,7 @@ msgstr[1] "Mae %(counter)s o'ch cofnodion wedi'u rhannu ag eraill: maent yn cadw
 msgstr[2] "Mae %(counter)s o'ch cofnodion wedi'u rhannu ag eraill: maent yn cadw copi o'r hyn sydd ei angen ar eu cofnodion eu hunain, ac yn cael gwybod eu bod wedi mynd."
 msgstr[3] "Mae %(counter)s o'ch cofnodion wedi'u rhannu ag eraill: maent yn cadw copi o'r hyn sydd ei angen ar eu cofnodion eu hunain, ac yn cael gwybod eu bod wedi mynd."
 
+#: src/postulo/jobs/tables.py
 #: src/postulo/templates/jobs/partials/company_row.html
 #, python-format
 msgid "%(counter)s open listing"
@@ -944,6 +945,16 @@ msgstr "%(language)s: %(fields)s"
 #, python-format
 msgid "%(later)s must be after %(earlier)s."
 msgstr "Rhaid i %(later)s fod ar ôl %(earlier)s."
+
+#: src/postulo/core/tables.py
+#, python-format
+msgid "%(least)s to %(most)s"
+msgstr ""
+
+#: src/postulo/core/list_export.py
+#, python-format
+msgid "%(list)s · %(date)s"
+msgstr ""
 
 #: src/postulo/jobs/models.py
 #, python-format
@@ -1697,6 +1708,24 @@ msgstr[1] "Mae %(total)s gofnod yn y ffeil."
 msgstr[2] "Mae %(total)s cofnod yn y ffeil."
 msgstr[3] "Mae %(total)s cofnod yn y ffeil."
 
+#: src/postulo/templates/documents/themes/base_list.html
+#, python-format
+msgid "%(total)s row"
+msgid_plural "%(total)s rows"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+
+#: src/postulo/templates/core/table_export.html
+#, python-format
+msgid "%(total)s row matches."
+msgid_plural "%(total)s rows match."
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+
 #: src/postulo/jobs/vcards.py
 #, python-format
 msgid "%(total)s telephone number"
@@ -2125,6 +2154,11 @@ msgstr "Mae llinell cron ar y gwesteiwr yn dal i weithio yr un ffordd, ac fe'i d
 msgid "A CSV file"
 msgstr "Ffeil CSV"
 
+#: src/postulo/templates/core/table_export.html
+#, python-format
+msgid "A CSV holds the first %(limit)s."
+msgstr ""
+
 #: src/postulo/documents/forms.py
 msgid "A CV leads with a career, a portfolio with work. It decides which themes are offered below."
 msgstr "Mae CV yn arwain gyda gyrfa, portffolio gyda gwaith. Mae'n penderfynu pa themâu sy'n cael eu cynnig isod."
@@ -2511,6 +2545,11 @@ msgstr "Cyfrinair, neu gyfrinair ap"
 #: src/postulo/documents/integrity.py
 msgid "a PDF"
 msgstr "PDF"
+
+#: src/postulo/templates/core/table_export.html
+#, python-format
+msgid "A PDF holds the first %(limit)s of them and says so."
+msgstr ""
 
 #: src/postulo/templates/server/design.html
 msgid "A person, a company or a plugin, as initials on a colour until there is a picture."
@@ -3903,8 +3942,8 @@ msgid "Applications, with their timelines"
 msgstr "Ceisiadau, gyda'u llinellau amser"
 
 #: src/postulo/applications/analytics.py src/postulo/applications/models.py
-#: src/postulo/applications/tables.py src/postulo/jobs/listing_views.py
-#: src/postulo/jobs/models.py src/postulo/templates/core/import_csv_map.html
+#: src/postulo/applications/tables.py src/postulo/jobs/models.py
+#: src/postulo/jobs/tables.py src/postulo/templates/core/import_csv_map.html
 msgid "Applied"
 msgstr "Wedi gwneud cais"
 
@@ -4045,6 +4084,10 @@ msgstr "Fel y dylai CV ei argraffu. Caiff enw sy'n sgil yn nosbarthiad ESCO ei a
 msgid "As a CV should print it. It is linked to the company of that name among yours, and added to your companies if there is none."
 msgstr "Fel y dylai CV ei argraffu. Caiff ei gysylltu â'r cwmni o'r enw hwnnw ymhlith eich cwmnïau chi, a'i ychwanegu at eich cwmnïau os nad oes un."
 
+#: src/postulo/templates/core/table_export.html
+msgid "As a document"
+msgstr ""
+
 #: src/postulo/templates/documents/letter_detail.html
 msgid "As a file"
 msgstr "Fel ffeil"
@@ -4074,6 +4117,7 @@ msgstr "fel ar"
 msgid "As of"
 msgstr "Fel ar"
 
+#: src/postulo/jobs/tables.py
 #: src/postulo/templates/jobs/partials/company_row.html
 #: src/postulo/templates/jobs/partials/company_status.html
 #, python-format
@@ -4149,6 +4193,11 @@ msgstr "am"
 msgid "at least"
 msgstr "o leiaf"
 
+#: src/postulo/core/tables.py
+#, python-format
+msgid "at least %(least)s"
+msgstr ""
+
 #: src/postulo/core/server_forms.py
 msgid "At least one language has to be offered, or nobody can read anything."
 msgstr "Rhaid cynnig o leiaf un iaith, neu ni all neb ddarllen dim."
@@ -4156,6 +4205,11 @@ msgstr "Rhaid cynnig o leiaf un iaith, neu ni all neb ddarllen dim."
 #: src/postulo/templates/cotton/table/filter.html
 msgid "at most"
 msgstr "ar y mwyaf"
+
+#: src/postulo/core/tables.py
+#, python-format
+msgid "at most %(most)s"
+msgstr ""
 
 #: src/postulo/accounts/forms.py
 msgid "Atlantic Ocean"
@@ -4308,6 +4362,10 @@ msgstr "Yn ôl i'r hysbyseb a grëwyd o'r cipiad hwn"
 #: src/postulo/templates/core/dashboard.html
 msgid "Back to the standard arrangement"
 msgstr "Yn ôl i'r drefn safonol"
+
+#: src/postulo/templates/core/table_export.html
+msgid "Back to the table, to change any of this"
+msgstr ""
 
 #: src/postulo/core/views_tables.py
 msgid "Back to the usual columns."
@@ -5196,7 +5254,7 @@ msgstr "Cau"
 msgid "Close search"
 msgstr "Cau'r chwiliad"
 
-#: src/postulo/jobs/listing_views.py src/postulo/jobs/models.py
+#: src/postulo/jobs/models.py src/postulo/jobs/tables.py
 msgid "Closed"
 msgstr "Wedi cau"
 
@@ -5284,6 +5342,7 @@ msgstr "lliw"
 msgid "Column in the file"
 msgstr "Colofn yn y ffeil"
 
+#: src/postulo/templates/core/table_export.html
 #: src/postulo/templates/partials/table/columns.html
 msgid "Columns"
 msgstr "Colofnau"
@@ -6260,7 +6319,7 @@ msgstr "Eu taflu"
 msgid "Discard this capture"
 msgstr "Gwaredu'r cipiad hwn"
 
-#: src/postulo/jobs/listing_views.py src/postulo/jobs/models.py
+#: src/postulo/jobs/models.py src/postulo/jobs/tables.py
 #: src/postulo/templates/jobs/capture_list.html
 #, fuzzy
 msgid "Discarded"
@@ -6400,6 +6459,7 @@ msgid "Download companies.geojson"
 msgstr "Llwytho companies.geojson i lawr"
 
 #: src/postulo/templates/applications/report.html
+#: src/postulo/templates/core/table_export.html
 msgid "Download CSV"
 msgstr "Llwytho CSV i lawr"
 
@@ -6420,6 +6480,10 @@ msgstr "Ei llwytho i lawr"
 #: src/postulo/templates/jobs/capture_page.html
 msgid "Download it as text"
 msgstr "Ei llwytho i lawr fel testun"
+
+#: src/postulo/templates/core/table_export.html
+msgid "Download PDF"
+msgstr ""
 
 #: src/postulo/templates/core/kind_file.html
 #: src/postulo/templates/resume/candidate_file.html
@@ -6945,6 +7009,10 @@ msgstr "Pob hysbyseb rydych wedi sylwi arni, nes i chi benderfynu: ei rhoi ar y 
 msgid "Every role you have held. Write the highlights once; tailor them per CV later."
 msgstr "Pob swydd rydych wedi'i dal. Ysgrifennwch yr uchafbwyntiau unwaith; addaswch nhw fesul CV yn nes ymlaen."
 
+#: src/postulo/templates/core/table_export.html
+msgid "Every row of the table as it is now, not only the page on screen: your columns in your order, with its filters and its sort. Downloaded, and not kept in Postulo."
+msgstr ""
+
 #: src/postulo/templates/server/design.html
 msgid "Every step derived from one radius, so there is one number to change."
 msgstr "Pob cam yn deillio o un radiws, felly mae un rhif i'w newid."
@@ -6979,7 +7047,7 @@ msgstr "Rhai pawb"
 msgid "Everybody's, as an administrator"
 msgstr "Rhai pawb, fel gweinyddwr"
 
-#: src/postulo/jobs/listing_views.py src/postulo/templates/server/logs.html
+#: src/postulo/jobs/tables.py src/postulo/templates/server/logs.html
 msgid "Everything"
 msgstr "Popeth"
 
@@ -7105,9 +7173,15 @@ msgstr "Mae egluro beth aeth o'i le yn aml yn golygu dweud pa gysylltiad, pa gwm
 #: src/postulo/templates/cotton/transfer_group.html
 #: src/postulo/templates/jobs/company_detail.html
 #: src/postulo/templates/jobs/company_places.html
+#: src/postulo/templates/partials/table/export.html
 #: src/postulo/templates/settings/export.html
 msgid "Export"
 msgstr "Allforio"
+
+#: src/postulo/templates/core/table_export.html
+#, python-format
+msgid "Export %(list)s"
+msgstr ""
 
 #: src/postulo/core/models.py
 msgid "export archive"
@@ -7619,6 +7693,16 @@ msgstr "Gan %(name)s."
 msgid "From %(register)s"
 msgstr ""
 
+#: src/postulo/core/tables.py
+#, python-format
+msgid "from %(start)s"
+msgstr ""
+
+#: src/postulo/core/tables.py
+#, python-format
+msgid "from %(start)s to %(end)s"
+msgstr ""
+
 #: src/postulo/templates/cotton/date_picker.html
 #, python-format
 msgid "From %(start)s to %(end)s"
@@ -7919,6 +8003,10 @@ msgstr "Gros, cyn treth. Mae un pen ar ei ben ei hun yn iawn — mae'r rhan fwya
 #: src/postulo/templates/server/plugin_access.html
 msgid "group"
 msgstr "grŵp"
+
+#: src/postulo/jobs/tables.py
+msgid "Group"
+msgstr ""
 
 #: src/postulo/core/views_access.py
 msgid "Group deleted."
@@ -9397,6 +9485,10 @@ msgstr "iaith heb ei nodi"
 msgid "language of exported files"
 msgstr ""
 
+#: src/postulo/templates/core/table_export.html
+msgid "Language of the document"
+msgstr ""
+
 #: src/postulo/templates/applications/report.html
 msgid "Language of the report"
 msgstr ""
@@ -9653,6 +9745,12 @@ msgstr "Os gadewir yn wag, mae eich CVs yn argraffu “%(place)s”: tref a gwla
 msgid "Left empty it is today. Capturing a posting you applied to last week is common."
 msgstr "Os caiff ei adael yn wag, heddiw yw hi. Mae cipio hysbyseb y gwnaethoch gais amdani'r wythnos diwethaf yn beth cyffredin."
 
+#: src/postulo/templates/core/table_export.html
+#: src/postulo/templates/documents/themes/base_list.html
+#, python-format
+msgid "Left out, because they hold nothing to write: %(columns)s."
+msgstr ""
+
 #: src/postulo/jobs/industries.py
 msgid "Legal"
 msgstr "Cyfreithiol"
@@ -9819,6 +9917,10 @@ msgstr "Dolenni i'r llefydd y mae chwilio am waith yn dychwelyd atynt: y bwrdd, 
 #: src/postulo/templates/documents/application_documents.html
 msgid "Links you pointed them at"
 msgstr "Dolenni y cyfeirioch chi nhw atynt"
+
+#: src/postulo/documents/themes.py
+msgid "List"
+msgstr ""
 
 #: src/postulo/resume/views.py
 msgid "listening"
@@ -10545,6 +10647,11 @@ msgstr "Cyfyngu"
 #: src/postulo/templates/partials/table/views.html
 msgid "Narrow and sort the table the way you want it, then keep it under a name."
 msgstr "Culhewch a threfnwch y tabl fel y mynnwch, yna cadwch ef o dan enw."
+
+#: src/postulo/templates/core/table_export.html
+#: src/postulo/templates/documents/themes/base_list.html
+msgid "Narrowed by"
+msgstr ""
 
 #: src/postulo/resume/forms.py
 msgid "National letters or classes the list lacks, as the licence prints them. A CV prints them after the codes."
@@ -11642,6 +11749,7 @@ msgid "Nothing matches “%(term)s”"
 msgstr "Nid oes dim yn cyfateb i “%(term)s”"
 
 #: src/postulo/templates/base.html
+#: src/postulo/templates/documents/themes/base_list.html
 msgid "Nothing matches."
 msgstr "Nid oes dim yn cyfateb."
 
@@ -11859,6 +11967,10 @@ msgstr "Dim byd eto. Caiff lle ei gofio pan fyddwch yn cywiro maes wrth adolygu 
 #: src/postulo/jobs/vcards.py
 msgid "Nothing: an earlier card in this file is the same one."
 msgstr "Dim: mae cerdyn cynharach yn y ffeil hon yr un un."
+
+#: src/postulo/templates/core/table_export.html
+msgid "Nothing: every row."
+msgstr ""
 
 #: src/postulo/jobs/vcards.py
 msgid "Nothing: the card has no name."
@@ -12578,6 +12690,10 @@ msgstr ""
 msgid "order"
 msgstr "trefn"
 
+#: src/postulo/templates/core/table_export.html
+msgid "Order"
+msgstr ""
+
 #: src/postulo/templates/server/design.html
 msgid "Ordinary text, which most of the interface is."
 msgstr "Testun cyffredin, sef y rhan fwyaf o'r rhyngwyneb."
@@ -12780,6 +12896,7 @@ msgstr ""
 
 #: src/postulo/documents/forms.py
 #: src/postulo/templates/applications/report.html
+#: src/postulo/templates/core/table_export.html
 #: src/postulo/templates/settings/export.html
 msgid "Paper"
 msgstr ""
@@ -13596,10 +13713,15 @@ msgstr "Gwobrau, ysgoloriaethau a rhagoriaethau: cydnabyddiaeth a roddodd rhywun
 msgid "Proceedings"
 msgstr "Trafodion"
 
+#: src/postulo/templates/documents/themes/base_list.html
+msgid "Produced by Postulo from this person's own records."
+msgstr ""
+
 #: src/postulo/templates/documents/themes/base_report.html
 msgid "Produced by Postulo from this person's own records. Postulo sets no target: how many applications a period should hold is a benefit regime's rule or the person's own."
 msgstr "Cynhyrchwyd gan Postulo o gofnodion y person hwn ei hun. Nid yw Postulo yn gosod targed: mater i drefn budd-daliadau neu i'r person ei hun yw faint o geisiadau y dylai cyfnod eu cynnwys."
 
+#: src/postulo/templates/documents/themes/base_list.html
 #: src/postulo/templates/documents/themes/base_report.html
 #, python-format
 msgid "Produced on %(produced)s"
@@ -14832,7 +14954,7 @@ msgstr "cwmpasau"
 msgid "Screening"
 msgstr "Sgrinio"
 
-#: src/postulo/templates/core/search.html
+#: src/postulo/core/tables.py src/postulo/templates/core/search.html
 #: src/postulo/templates/cotton/site_search.html
 #: src/postulo/templates/jobs/industry_list.html
 msgid "Search"
@@ -15315,7 +15437,7 @@ msgstr "Rhestr fer"
 msgid "Shortlist them"
 msgstr "Eu rhoi ar y rhestr fer"
 
-#: src/postulo/jobs/listing_views.py src/postulo/jobs/models.py
+#: src/postulo/jobs/models.py src/postulo/jobs/tables.py
 msgid "Shortlisted"
 msgstr "Ar y rhestr fer"
 
@@ -15420,6 +15542,7 @@ msgstr "Dangos y cyfeiriad hwn ar y map?"
 msgid "Show this period"
 msgstr "Dangos y cyfnod hwn"
 
+#: src/postulo/jobs/tables.py
 #: src/postulo/templates/jobs/partials/whose_form.html
 msgid "Showing"
 msgstr "Yn dangos"
@@ -15783,6 +15906,16 @@ msgstr "Trefnu yn ôl %(column)s, yr uchaf yn gyntaf"
 #, python-format
 msgid "Sort by %(column)s, lowest first"
 msgstr "Trefnu yn ôl %(column)s, yr isaf yn gyntaf"
+
+#: src/postulo/core/tables.py
+#, python-format
+msgid "Sorted by %(column)s, highest first"
+msgstr ""
+
+#: src/postulo/core/tables.py
+#, python-format
+msgid "Sorted by %(column)s, lowest first"
+msgstr ""
 
 #: src/postulo/jobs/models.py src/postulo/resume/models.py
 msgid "source"
@@ -17337,6 +17470,10 @@ msgstr "Ni ellid anfon y copi; mae'r ddogfen yn dweud pam."
 msgid "The credit the tiles' licence asks for, drawn on the map as plain text. For example: © OpenStreetMap contributors"
 msgstr "Y gydnabyddiaeth y mae trwydded y teils yn gofyn amdani, wedi'i llunio ar y map fel testun plaen. Er enghraifft: © cyfranwyr OpenStreetMap"
 
+#: src/postulo/templates/core/table_export.html
+msgid "The CSV is the same rows in the same language, for a spreadsheet; the theme and the paper are for the PDF."
+msgstr ""
+
 #: src/postulo/templates/settings/appearance.html
 msgid "The dashboard lists open applications nothing has happened to for a while, with nothing planned. Recruiters' own advice clusters around two to three weeks."
 msgstr "Mae'r dangosfwrdd yn rhestru ceisiadau agored nad oes dim wedi digwydd iddynt ers tro, heb ddim wedi'i drefnu. Mae cyngor y recriwtwyr eu hunain yn casglu o gwmpas dwy i dair wythnos."
@@ -17576,6 +17713,11 @@ msgstr[0] "Darllenir y %(count)s cyntaf, ac nid y gweddill."
 msgstr[1] "Darllenir y %(count)s cyntaf, ac nid y gweddill."
 msgstr[2] "Darllenir y %(count)s cyntaf, ac nid y gweddill."
 msgstr[3] "Darllenir y %(count)s cyntaf, ac nid y gweddill."
+
+#: src/postulo/templates/documents/themes/base_list.html
+#, python-format
+msgid "The first %(count)s of %(total)s rows; the rest are in the table."
+msgstr ""
 
 #: src/postulo/templates/documents/cv_form.html
 msgid "The first choice in each list follows your details: mark another number as primary there and this CV prints it. One you choose here stays, whatever becomes primary. If you later delete it from your details, this CV prints none of that kind until you choose again, and never another in its place. What you have already sent does not change."
@@ -18489,6 +18631,7 @@ msgid "theme"
 msgstr "thema"
 
 #: src/postulo/templates/applications/report.html
+#: src/postulo/templates/core/table_export.html
 msgid "Theme"
 msgstr ""
 
@@ -19261,7 +19404,7 @@ msgstr "i'w anfon gan %(name)s"
 msgid "to be sent by the referee"
 msgstr "i'w anfon gan y canolwr"
 
-#: src/postulo/jobs/listing_views.py
+#: src/postulo/jobs/tables.py
 msgid "To decide"
 msgstr "I benderfynu"
 
@@ -19555,6 +19698,11 @@ msgstr "Heb ei gyhoeddi"
 #: src/postulo/resume/models.py
 msgid "until"
 msgstr "tan"
+
+#: src/postulo/core/tables.py
+#, python-format
+msgid "until %(end)s"
+msgstr ""
 
 #: src/postulo/resume/models.py
 #, python-format
@@ -20198,6 +20346,10 @@ msgstr "Ym mha faes yr oedd, lle nad yw enw'r cymhwyster yn dweud."
 msgid "What it was. Another capture of the same advert is added from the review screen, so it is not offered here."
 msgstr "Beth ydoedd. Mae cipiad arall o'r un hysbyseb yn cael ei ychwanegu o'r sgrin adolygu, felly nid yw'n cael ei gynnig yma."
 
+#: src/postulo/templates/core/table_export.html
+msgid "What it will hold"
+msgstr ""
+
 #: src/postulo/templates/jobs/merge.html
 msgid "What moves"
 msgstr "Beth sy'n symud"
@@ -20808,6 +20960,10 @@ msgstr "Pwy rydych yn cyfarfod â nhw. Cynigir y bobl rydych wedi'u cofnodi yn y
 #: src/postulo/applications/forms.py
 msgid "Whoever put you forward, from the people you have recorded — at this company, at another, or at none. The figures count what each referrer led to."
 msgstr "Pwy bynnag a'ch argymhellodd, o'r bobl rydych wedi'u cofnodi — yn y cwmni hwn, mewn un arall, neu heb gwmni. Mae'r ffigurau'n cyfrif yr hyn a ddeilliodd o bob un a'ch argymhellodd."
+
+#: src/postulo/jobs/tables.py
+msgid "Whose"
+msgstr ""
 
 #: src/postulo/templates/partials/import_owner.html
 msgid "Whose they become"

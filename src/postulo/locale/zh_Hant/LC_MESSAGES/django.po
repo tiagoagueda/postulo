@@ -423,6 +423,7 @@ msgid "%(counter)s of your records is shared with others: they keep a copy of wh
 msgid_plural "%(counter)s of your records are shared with others: they keep a copy of what their own records need, and are told they are gone."
 msgstr[0] "您有 %(counter)s 筆紀錄與他人共用：他們會保留自己紀錄所需內容的副本，並會收到該紀錄已移除的通知。"
 
+#: src/postulo/jobs/tables.py
 #: src/postulo/templates/jobs/partials/company_row.html
 #, python-format
 msgid "%(counter)s open listing"
@@ -719,6 +720,16 @@ msgstr "%(language)s：%(fields)s"
 #, python-format
 msgid "%(later)s must be after %(earlier)s."
 msgstr "%(later)s 必須晚於 %(earlier)s。"
+
+#: src/postulo/core/tables.py
+#, python-format
+msgid "%(least)s to %(most)s"
+msgstr ""
+
+#: src/postulo/core/list_export.py
+#, python-format
+msgid "%(list)s · %(date)s"
+msgstr ""
 
 #: src/postulo/jobs/models.py
 #, python-format
@@ -1415,6 +1426,18 @@ msgid "%(total)s record is in the file."
 msgid_plural "%(total)s records are in the file."
 msgstr[0] "檔案中有 %(total)s 筆紀錄。"
 
+#: src/postulo/templates/documents/themes/base_list.html
+#, python-format
+msgid "%(total)s row"
+msgid_plural "%(total)s rows"
+msgstr[0] ""
+
+#: src/postulo/templates/core/table_export.html
+#, python-format
+msgid "%(total)s row matches."
+msgid_plural "%(total)s rows match."
+msgstr[0] ""
+
 #: src/postulo/jobs/vcards.py
 #, python-format
 msgid "%(total)s telephone number"
@@ -1833,6 +1856,11 @@ msgstr "在主機上使用 cron 排程的方式仍然有效，說明請見 wiki 
 msgid "A CSV file"
 msgstr "CSV 檔案"
 
+#: src/postulo/templates/core/table_export.html
+#, python-format
+msgid "A CSV holds the first %(limit)s."
+msgstr ""
+
 #: src/postulo/documents/forms.py
 msgid "A CV leads with a career, a portfolio with work. It decides which themes are offered below."
 msgstr "履歷以職涯為主，作品集以作品為主。這會決定下方提供哪些主題。"
@@ -2222,6 +2250,11 @@ msgstr "密碼或應用程式密碼"
 #: src/postulo/documents/integrity.py
 msgid "a PDF"
 msgstr "PDF 檔"
+
+#: src/postulo/templates/core/table_export.html
+#, python-format
+msgid "A PDF holds the first %(limit)s of them and says so."
+msgstr ""
 
 #: src/postulo/templates/server/design.html
 msgid "A person, a company or a plugin, as initials on a colour until there is a picture."
@@ -3594,8 +3627,8 @@ msgid "Applications, with their timelines"
 msgstr "應徵及其時間軸"
 
 #: src/postulo/applications/analytics.py src/postulo/applications/models.py
-#: src/postulo/applications/tables.py src/postulo/jobs/listing_views.py
-#: src/postulo/jobs/models.py src/postulo/templates/core/import_csv_map.html
+#: src/postulo/applications/tables.py src/postulo/jobs/models.py
+#: src/postulo/jobs/tables.py src/postulo/templates/core/import_csv_map.html
 msgid "Applied"
 msgstr "已應徵"
 
@@ -3736,6 +3769,10 @@ msgstr "照履歷應印出的方式填寫。名稱若是 ESCO 分類中的技能
 msgid "As a CV should print it. It is linked to the company of that name among yours, and added to your companies if there is none."
 msgstr "照履歷應印出的方式填寫。會連結到您的公司中同名的那一家，若沒有則會新增到您的公司中。"
 
+#: src/postulo/templates/core/table_export.html
+msgid "As a document"
+msgstr ""
+
 #: src/postulo/templates/documents/letter_detail.html
 msgid "As a file"
 msgstr "以檔案形式"
@@ -3764,6 +3801,7 @@ msgstr "截至"
 msgid "As of"
 msgstr "截至"
 
+#: src/postulo/jobs/tables.py
 #: src/postulo/templates/jobs/partials/company_row.html
 #: src/postulo/templates/jobs/partials/company_status.html
 #, python-format
@@ -3840,6 +3878,11 @@ msgstr "於"
 msgid "at least"
 msgstr "至少"
 
+#: src/postulo/core/tables.py
+#, python-format
+msgid "at least %(least)s"
+msgstr ""
+
 #: src/postulo/core/server_forms.py
 msgid "At least one language has to be offered, or nobody can read anything."
 msgstr "至少必須提供一種語言，否則沒有人能閱讀任何內容。"
@@ -3847,6 +3890,11 @@ msgstr "至少必須提供一種語言，否則沒有人能閱讀任何內容。
 #: src/postulo/templates/cotton/table/filter.html
 msgid "at most"
 msgstr "最多"
+
+#: src/postulo/core/tables.py
+#, python-format
+msgid "at most %(most)s"
+msgstr ""
 
 #: src/postulo/accounts/forms.py
 msgid "Atlantic Ocean"
@@ -4001,6 +4049,10 @@ msgstr "返回此擷取項目所建立的職缺"
 #: src/postulo/templates/core/dashboard.html
 msgid "Back to the standard arrangement"
 msgstr "恢復標準排列"
+
+#: src/postulo/templates/core/table_export.html
+msgid "Back to the table, to change any of this"
+msgstr ""
 
 #: src/postulo/core/views_tables.py
 msgid "Back to the usual columns."
@@ -4889,7 +4941,7 @@ msgstr "關閉"
 msgid "Close search"
 msgstr "關閉搜尋"
 
-#: src/postulo/jobs/listing_views.py src/postulo/jobs/models.py
+#: src/postulo/jobs/models.py src/postulo/jobs/tables.py
 #, fuzzy
 msgid "Closed"
 msgstr "已關閉"
@@ -4980,6 +5032,7 @@ msgstr "顏色"
 msgid "Column in the file"
 msgstr "檔案中的欄"
 
+#: src/postulo/templates/core/table_export.html
 #: src/postulo/templates/partials/table/columns.html
 msgid "Columns"
 msgstr "欄"
@@ -5961,7 +6014,7 @@ msgstr "捨棄這些"
 msgid "Discard this capture"
 msgstr "捨棄此擷取項目"
 
-#: src/postulo/jobs/listing_views.py src/postulo/jobs/models.py
+#: src/postulo/jobs/models.py src/postulo/jobs/tables.py
 #: src/postulo/templates/jobs/capture_list.html
 msgid "Discarded"
 msgstr "已捨棄"
@@ -6100,6 +6153,7 @@ msgid "Download companies.geojson"
 msgstr "下載 companies.geojson"
 
 #: src/postulo/templates/applications/report.html
+#: src/postulo/templates/core/table_export.html
 msgid "Download CSV"
 msgstr "下載 CSV"
 
@@ -6119,6 +6173,10 @@ msgstr "下載"
 #: src/postulo/templates/jobs/capture_page.html
 msgid "Download it as text"
 msgstr "下載為文字檔"
+
+#: src/postulo/templates/core/table_export.html
+msgid "Download PDF"
+msgstr ""
 
 #: src/postulo/templates/core/kind_file.html
 #: src/postulo/templates/resume/candidate_file.html
@@ -6650,6 +6708,10 @@ msgstr "您注意到的每則徵才啟事，在您做出決定之前都在這裡
 msgid "Every role you have held. Write the highlights once; tailor them per CV later."
 msgstr "您擔任過的每個職位。重點只需寫一次，之後再為每份履歷調整。"
 
+#: src/postulo/templates/core/table_export.html
+msgid "Every row of the table as it is now, not only the page on screen: your columns in your order, with its filters and its sort. Downloaded, and not kept in Postulo."
+msgstr ""
+
 #: src/postulo/templates/server/design.html
 msgid "Every step derived from one radius, so there is one number to change."
 msgstr "每一級都由同一個圓角半徑推導而來，因此只需要修改一個數字。"
@@ -6682,7 +6744,7 @@ msgstr "所有人的"
 msgid "Everybody's, as an administrator"
 msgstr "所有人的（以管理員身分）"
 
-#: src/postulo/jobs/listing_views.py src/postulo/templates/server/logs.html
+#: src/postulo/jobs/tables.py src/postulo/templates/server/logs.html
 msgid "Everything"
 msgstr "全部"
 
@@ -6808,9 +6870,15 @@ msgstr "說明出錯的地方時，經常需要指出是哪個連線、哪家公
 #: src/postulo/templates/cotton/transfer_group.html
 #: src/postulo/templates/jobs/company_detail.html
 #: src/postulo/templates/jobs/company_places.html
+#: src/postulo/templates/partials/table/export.html
 #: src/postulo/templates/settings/export.html
 msgid "Export"
 msgstr "匯出"
+
+#: src/postulo/templates/core/table_export.html
+#, python-format
+msgid "Export %(list)s"
+msgstr ""
 
 #: src/postulo/core/models.py
 msgid "export archive"
@@ -7330,6 +7398,16 @@ msgstr "來自 %(name)s。"
 msgid "From %(register)s"
 msgstr ""
 
+#: src/postulo/core/tables.py
+#, python-format
+msgid "from %(start)s"
+msgstr ""
+
+#: src/postulo/core/tables.py
+#, python-format
+msgid "from %(start)s to %(end)s"
+msgstr ""
+
 #: src/postulo/templates/cotton/date_picker.html
 #, python-format
 msgid "From %(start)s to %(end)s"
@@ -7636,6 +7714,10 @@ msgstr "稅前總額。只填一端也可以——大多數徵才啟事只會列
 #: src/postulo/templates/server/plugin_access.html
 msgid "group"
 msgstr "群組"
+
+#: src/postulo/jobs/tables.py
+msgid "Group"
+msgstr ""
 
 #: src/postulo/core/views_access.py
 msgid "Group deleted."
@@ -9118,6 +9200,10 @@ msgstr "未註明語言"
 msgid "language of exported files"
 msgstr ""
 
+#: src/postulo/templates/core/table_export.html
+msgid "Language of the document"
+msgstr ""
+
 #: src/postulo/templates/applications/report.html
 msgid "Language of the report"
 msgstr ""
@@ -9375,6 +9461,12 @@ msgstr "若留空，您的履歷會印出「%(place)s」：也就是您主要郵
 msgid "Left empty it is today. Capturing a posting you applied to last week is common."
 msgstr "若留空，即為今天。擷取上週已應徵的徵才啟事是很常見的事。"
 
+#: src/postulo/templates/core/table_export.html
+#: src/postulo/templates/documents/themes/base_list.html
+#, python-format
+msgid "Left out, because they hold nothing to write: %(columns)s."
+msgstr ""
+
 #: src/postulo/jobs/industries.py
 msgid "Legal"
 msgstr "法律服務業"
@@ -9544,6 +9636,10 @@ msgstr "通往求職時常會回頭查看之處的連結：看板、履歷、公
 #: src/postulo/templates/documents/application_documents.html
 msgid "Links you pointed them at"
 msgstr "您提供給他們的連結"
+
+#: src/postulo/documents/themes.py
+msgid "List"
+msgstr ""
 
 #: src/postulo/resume/views.py
 msgid "listening"
@@ -10276,6 +10372,11 @@ msgstr "窄"
 #: src/postulo/templates/partials/table/views.html
 msgid "Narrow and sort the table the way you want it, then keep it under a name."
 msgstr "依您需要篩選並排序表格，然後以一個名稱儲存。"
+
+#: src/postulo/templates/core/table_export.html
+#: src/postulo/templates/documents/themes/base_list.html
+msgid "Narrowed by"
+msgstr ""
 
 #: src/postulo/resume/forms.py
 msgid "National letters or classes the list lacks, as the licence prints them. A CV prints them after the codes."
@@ -11370,6 +11471,7 @@ msgid "Nothing matches “%(term)s”"
 msgstr "沒有符合「%(term)s」的項目"
 
 #: src/postulo/templates/base.html
+#: src/postulo/templates/documents/themes/base_list.html
 msgid "Nothing matches."
 msgstr "沒有符合的項目。"
 
@@ -11587,6 +11689,10 @@ msgstr "尚無內容。當您在審閱時修正欄位，且您輸入的值出現
 #: src/postulo/jobs/vcards.py
 msgid "Nothing: an earlier card in this file is the same one."
 msgstr "無：此檔案中較前面的一張名片就是同一張。"
+
+#: src/postulo/templates/core/table_export.html
+msgid "Nothing: every row."
+msgstr ""
 
 #: src/postulo/jobs/vcards.py
 msgid "Nothing: the card has no name."
@@ -12260,6 +12366,10 @@ msgstr ""
 msgid "order"
 msgstr "順序"
 
+#: src/postulo/templates/core/table_export.html
+msgid "Order"
+msgstr ""
+
 #: src/postulo/templates/server/design.html
 msgid "Ordinary text, which most of the interface is."
 msgstr "一般文字，介面大部分都是這種。"
@@ -12460,6 +12570,7 @@ msgstr ""
 
 #: src/postulo/documents/forms.py
 #: src/postulo/templates/applications/report.html
+#: src/postulo/templates/core/table_export.html
 #: src/postulo/templates/settings/export.html
 msgid "Paper"
 msgstr ""
@@ -13281,10 +13392,15 @@ msgstr "獎項、獎學金與殊榮：他人給予您的肯定。"
 msgid "Proceedings"
 msgstr "會議論文集"
 
+#: src/postulo/templates/documents/themes/base_list.html
+msgid "Produced by Postulo from this person's own records."
+msgstr ""
+
 #: src/postulo/templates/documents/themes/base_report.html
 msgid "Produced by Postulo from this person's own records. Postulo sets no target: how many applications a period should hold is a benefit regime's rule or the person's own."
 msgstr "由 Postulo 依此人自己的紀錄產生。Postulo 不設定任何目標：一個期間應包含多少筆應徵，是由福利制度的規定或此人自己決定。"
 
+#: src/postulo/templates/documents/themes/base_list.html
 #: src/postulo/templates/documents/themes/base_report.html
 #, python-format
 msgid "Produced on %(produced)s"
@@ -14513,7 +14629,7 @@ msgstr "範圍"
 msgid "Screening"
 msgstr "初步篩選"
 
-#: src/postulo/templates/core/search.html
+#: src/postulo/core/tables.py src/postulo/templates/core/search.html
 #: src/postulo/templates/cotton/site_search.html
 #: src/postulo/templates/jobs/industry_list.html
 msgid "Search"
@@ -14998,7 +15114,7 @@ msgstr "候選名單"
 msgid "Shortlist them"
 msgstr "加入候選名單"
 
-#: src/postulo/jobs/listing_views.py src/postulo/jobs/models.py
+#: src/postulo/jobs/models.py src/postulo/jobs/tables.py
 msgid "Shortlisted"
 msgstr "已列入候選名單"
 
@@ -15103,6 +15219,7 @@ msgstr "要在地圖上顯示這個地址嗎？"
 msgid "Show this period"
 msgstr "顯示此期間"
 
+#: src/postulo/jobs/tables.py
 #: src/postulo/templates/jobs/partials/whose_form.html
 #, fuzzy
 msgid "Showing"
@@ -15471,6 +15588,16 @@ msgstr "依 %(column)s 排序，由高到低"
 #, python-format
 msgid "Sort by %(column)s, lowest first"
 msgstr "依 %(column)s 排序，由低到高"
+
+#: src/postulo/core/tables.py
+#, python-format
+msgid "Sorted by %(column)s, highest first"
+msgstr ""
+
+#: src/postulo/core/tables.py
+#, python-format
+msgid "Sorted by %(column)s, lowest first"
+msgstr ""
 
 #: src/postulo/jobs/models.py src/postulo/resume/models.py
 msgid "source"
@@ -17015,6 +17142,10 @@ msgstr "無法寄出副本；文件中說明了原因。"
 msgid "The credit the tiles' licence asks for, drawn on the map as plain text. For example: © OpenStreetMap contributors"
 msgstr "圖磚授權所要求的出處標示，以純文字繪製在地圖上。例如：© OpenStreetMap 貢獻者"
 
+#: src/postulo/templates/core/table_export.html
+msgid "The CSV is the same rows in the same language, for a spreadsheet; the theme and the paper are for the PDF."
+msgstr ""
+
 #: src/postulo/templates/settings/appearance.html
 msgid "The dashboard lists open applications nothing has happened to for a while, with nothing planned. Recruiters' own advice clusters around two to three weeks."
 msgstr "儀表板會列出一段時間沒有任何進展、也沒有任何安排的進行中應徵。招募人員自己的建議大多落在兩到三週。"
@@ -17248,6 +17379,11 @@ msgstr "第一個"
 msgid "The first %(count)s is read, and the rest are not."
 msgid_plural "The first %(count)s are read, and the rest are not."
 msgstr[0] "只會讀取前 %(count)s 個，其餘不讀取。"
+
+#: src/postulo/templates/documents/themes/base_list.html
+#, python-format
+msgid "The first %(count)s of %(total)s rows; the rest are in the table."
+msgstr ""
 
 #: src/postulo/templates/documents/cv_form.html
 msgid "The first choice in each list follows your details: mark another number as primary there and this CV prints it. One you choose here stays, whatever becomes primary. If you later delete it from your details, this CV prints none of that kind until you choose again, and never another in its place. What you have already sent does not change."
@@ -18158,6 +18294,7 @@ msgid "theme"
 msgstr "主題"
 
 #: src/postulo/templates/applications/report.html
+#: src/postulo/templates/core/table_export.html
 msgid "Theme"
 msgstr ""
 
@@ -18925,7 +19062,7 @@ msgstr "由 %(name)s 寄送"
 msgid "to be sent by the referee"
 msgstr "由推薦人寄送"
 
-#: src/postulo/jobs/listing_views.py
+#: src/postulo/jobs/tables.py
 msgid "To decide"
 msgstr "待決定"
 
@@ -19216,6 +19353,11 @@ msgstr "未出版"
 #: src/postulo/resume/models.py
 msgid "until"
 msgstr "至"
+
+#: src/postulo/core/tables.py
+#, python-format
+msgid "until %(end)s"
+msgstr ""
 
 #: src/postulo/resume/models.py
 #, python-format
@@ -19861,6 +20003,10 @@ msgstr "就讀的領域（若資格名稱中未說明）。"
 msgid "What it was. Another capture of the same advert is added from the review screen, so it is not offered here."
 msgstr "項目類型。同一則廣告的另一個擷取項目要從審閱畫面加入，因此不會在此提供。"
 
+#: src/postulo/templates/core/table_export.html
+msgid "What it will hold"
+msgstr ""
+
 #: src/postulo/templates/jobs/merge.html
 msgid "What moves"
 msgstr "會移動的內容"
@@ -20474,6 +20620,10 @@ msgstr "您要會面的人。會列出您在此公司記錄的人員，以及已
 #: src/postulo/applications/forms.py
 msgid "Whoever put you forward, from the people you have recorded — at this company, at another, or at none. The figures count what each referrer led to."
 msgstr "推薦您的人，從您記錄的人員中選擇——無論是在此公司、其他公司，或不屬於任何公司。統計數字會計算每位推薦人帶來的結果。"
+
+#: src/postulo/jobs/tables.py
+msgid "Whose"
+msgstr ""
 
 #: src/postulo/templates/partials/import_owner.html
 #, fuzzy

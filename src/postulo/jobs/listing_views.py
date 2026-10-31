@@ -27,17 +27,9 @@ from postulo.core.search import clean_query, listing_match
 
 from . import whose
 from .forms import JobPostingForm
-from .models import LISTING_FILTERS, Capture, CaptureStatus, DiscardReason, JobPosting, ListingState
+from .models import LISTING_FILTERS, Capture, CaptureStatus, DiscardReason, JobPosting
+from .tables import TAB_LABELS as FILTER_LABELS
 from .tables import ListingsTable
-
-FILTER_LABELS = {
-    "undecided": _("To decide"),
-    ListingState.SHORTLISTED: _("Shortlisted"),
-    ListingState.DISCARDED: _("Discarded"),
-    "applied": _("Applied"),
-    "closed": _("Closed"),
-    "all": _("Everything"),
-}
 
 
 class ListingListView(PageOrFragmentMixin, OwnedObjectMixin, ListView):
@@ -111,6 +103,10 @@ class ListingListView(PageOrFragmentMixin, OwnedObjectMixin, ListView):
         if search:
             queryset = queryset.filter(listing_match(search))
         return self.table.apply(queryset)
+
+    def table_rows(self):
+        """Every row the table answers with, unpaginated, for an export of it (#341)."""
+        return self.get_queryset()
 
     def get_context_data(self, **kwargs) -> dict:
         context = super().get_context_data(**kwargs)

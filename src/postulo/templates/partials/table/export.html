@@ -1,0 +1,10 @@
+{% load i18n postulo %}
+{% comment %} *Export*, beside Columns and Views (#341): the table as it is now, whole, as a PDF
+   set by a theme or as a CSV. A form that sends the address the table is at, which the
+   submit handler reads off the address bar as the form is sent (`data-next-here`, #623), so
+   a filter changed since the page loaded is in it; with no script the page's own address
+   is, and without a script every filter reloads the page. {% endcomment %}
+<form method="get" action="{% url 'core:table_export' table.name %}" data-table-export>
+  <input type="hidden" name="from" value="{{ request.get_full_path }}" data-next-here>
+  <button type="submit" class="btn" data-variant="outline">{% icon "download" %} {% translate "Export" %}</button>
+</form>

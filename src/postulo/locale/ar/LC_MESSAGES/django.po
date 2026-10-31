@@ -738,6 +738,7 @@ msgstr[3] "%(counter)s من سجلاتك مشتركة مع آخرين: يحتف�
 msgstr[4] "%(counter)s من سجلاتك مشتركة مع آخرين: يحتفظون بنسخة مما تحتاجه سجلاتهم، ويُبلَّغون بأنها حُذفت."
 msgstr[5] "%(counter)s من سجلاتك مشتركة مع آخرين: يحتفظون بنسخة مما تحتاجه سجلاتهم، ويُبلَّغون بأنها حُذفت."
 
+#: src/postulo/jobs/tables.py
 #: src/postulo/templates/jobs/partials/company_row.html
 #, python-format
 msgid "%(counter)s open listing"
@@ -1094,6 +1095,16 @@ msgstr "%(language)s: %(fields)s"
 #, python-format
 msgid "%(later)s must be after %(earlier)s."
 msgstr "يجب أن يكون %(later)s بعد %(earlier)s."
+
+#: src/postulo/core/tables.py
+#, python-format
+msgid "%(least)s to %(most)s"
+msgstr ""
+
+#: src/postulo/core/list_export.py
+#, python-format
+msgid "%(list)s · %(date)s"
+msgstr ""
 
 #: src/postulo/jobs/models.py
 #, python-format
@@ -1885,6 +1896,28 @@ msgstr[3] "يوجد %(total)s سجلات في الملف."
 msgstr[4] "يوجد %(total)s سجلًا في الملف."
 msgstr[5] "يوجد %(total)s سجل في الملف."
 
+#: src/postulo/templates/documents/themes/base_list.html
+#, python-format
+msgid "%(total)s row"
+msgid_plural "%(total)s rows"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+msgstr[4] ""
+msgstr[5] ""
+
+#: src/postulo/templates/core/table_export.html
+#, python-format
+msgid "%(total)s row matches."
+msgid_plural "%(total)s rows match."
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+msgstr[4] ""
+msgstr[5] ""
+
 #: src/postulo/jobs/vcards.py
 #, python-format
 msgid "%(total)s telephone number"
@@ -2319,6 +2352,11 @@ msgstr "لا يزال سطر cron على المضيف يعمل بالطريقة 
 msgid "A CSV file"
 msgstr "ملف CSV"
 
+#: src/postulo/templates/core/table_export.html
+#, python-format
+msgid "A CSV holds the first %(limit)s."
+msgstr ""
+
 #: src/postulo/documents/forms.py
 msgid "A CV leads with a career, a portfolio with work. It decides which themes are offered below."
 msgstr "تبدأ السيرة الذاتية بالمسار المهني، ويبدأ معرض الأعمال بالأعمال. ويحدد ذلك السمات المعروضة أدناه."
@@ -2707,6 +2745,11 @@ msgstr "كلمة مرور، أو كلمة مرور التطبيق"
 #: src/postulo/documents/integrity.py
 msgid "a PDF"
 msgstr "ملف PDF"
+
+#: src/postulo/templates/core/table_export.html
+#, python-format
+msgid "A PDF holds the first %(limit)s of them and says so."
+msgstr ""
 
 #: src/postulo/templates/server/design.html
 msgid "A person, a company or a plugin, as initials on a colour until there is a picture."
@@ -4126,8 +4169,8 @@ msgid "Applications, with their timelines"
 msgstr "طلبات التوظيف، مع خطوطها الزمنية"
 
 #: src/postulo/applications/analytics.py src/postulo/applications/models.py
-#: src/postulo/applications/tables.py src/postulo/jobs/listing_views.py
-#: src/postulo/jobs/models.py src/postulo/templates/core/import_csv_map.html
+#: src/postulo/applications/tables.py src/postulo/jobs/models.py
+#: src/postulo/jobs/tables.py src/postulo/templates/core/import_csv_map.html
 msgid "Applied"
 msgstr "تم التقديم"
 
@@ -4267,6 +4310,10 @@ msgstr "كما ينبغي أن يظهر في السيرة الذاتية. الا
 msgid "As a CV should print it. It is linked to the company of that name among yours, and added to your companies if there is none."
 msgstr "كما ينبغي أن يظهر في السيرة الذاتية. يُربط بالشركة التي تحمل هذا الاسم بين شركاتك، ويُضاف إلى شركاتك إن لم توجد."
 
+#: src/postulo/templates/core/table_export.html
+msgid "As a document"
+msgstr ""
+
 #: src/postulo/templates/documents/letter_detail.html
 msgid "As a file"
 msgstr "كملف"
@@ -4295,6 +4342,7 @@ msgstr "اعتبارًا من"
 msgid "As of"
 msgstr "اعتبارًا من"
 
+#: src/postulo/jobs/tables.py
 #: src/postulo/templates/jobs/partials/company_row.html
 #: src/postulo/templates/jobs/partials/company_status.html
 #, python-format
@@ -4371,6 +4419,11 @@ msgstr "في الساعة"
 msgid "at least"
 msgstr "على الأقل"
 
+#: src/postulo/core/tables.py
+#, python-format
+msgid "at least %(least)s"
+msgstr ""
+
 #: src/postulo/core/server_forms.py
 msgid "At least one language has to be offered, or nobody can read anything."
 msgstr "يجب إتاحة لغة واحدة على الأقل، وإلا فلن يستطيع أحد قراءة أي شيء."
@@ -4378,6 +4431,11 @@ msgstr "يجب إتاحة لغة واحدة على الأقل، وإلا فلن 
 #: src/postulo/templates/cotton/table/filter.html
 msgid "at most"
 msgstr "على الأكثر"
+
+#: src/postulo/core/tables.py
+#, python-format
+msgid "at most %(most)s"
+msgstr ""
 
 #: src/postulo/accounts/forms.py
 msgid "Atlantic Ocean"
@@ -4530,6 +4588,10 @@ msgstr "العودة إلى الإعلان الذي أصبح عليه هذا ا�
 #: src/postulo/templates/core/dashboard.html
 msgid "Back to the standard arrangement"
 msgstr "العودة إلى الترتيب القياسي"
+
+#: src/postulo/templates/core/table_export.html
+msgid "Back to the table, to change any of this"
+msgstr ""
 
 #: src/postulo/core/views_tables.py
 msgid "Back to the usual columns."
@@ -5426,7 +5488,7 @@ msgstr "إغلاق"
 msgid "Close search"
 msgstr "إغلاق البحث"
 
-#: src/postulo/jobs/listing_views.py src/postulo/jobs/models.py
+#: src/postulo/jobs/models.py src/postulo/jobs/tables.py
 msgid "Closed"
 msgstr "مُغلق"
 
@@ -5514,6 +5576,7 @@ msgstr "اللون"
 msgid "Column in the file"
 msgstr "العمود في الملف"
 
+#: src/postulo/templates/core/table_export.html
 #: src/postulo/templates/partials/table/columns.html
 msgid "Columns"
 msgstr "الأعمدة"
@@ -6498,7 +6561,7 @@ msgstr "استبعادها"
 msgid "Discard this capture"
 msgstr "استبعاد هذا الالتقاط"
 
-#: src/postulo/jobs/listing_views.py src/postulo/jobs/models.py
+#: src/postulo/jobs/models.py src/postulo/jobs/tables.py
 #: src/postulo/templates/jobs/capture_list.html
 msgid "Discarded"
 msgstr "مُستبعَد"
@@ -6636,6 +6699,7 @@ msgid "Download companies.geojson"
 msgstr "تنزيل companies.geojson"
 
 #: src/postulo/templates/applications/report.html
+#: src/postulo/templates/core/table_export.html
 msgid "Download CSV"
 msgstr "تنزيل CSV"
 
@@ -6656,6 +6720,10 @@ msgstr "تنزيله"
 #, fuzzy
 msgid "Download it as text"
 msgstr "تنزيلها كنص"
+
+#: src/postulo/templates/core/table_export.html
+msgid "Download PDF"
+msgstr ""
 
 #: src/postulo/templates/core/kind_file.html
 #: src/postulo/templates/resume/candidate_file.html
@@ -7180,6 +7248,10 @@ msgstr "كل إعلان لاحظته، إلى أن تقرر: ترشيحه للم
 msgid "Every role you have held. Write the highlights once; tailor them per CV later."
 msgstr "كل وظيفة شغلتها. اكتب أبرز النقاط مرة واحدة، ثم كيّفها لكل سيرة ذاتية لاحقًا."
 
+#: src/postulo/templates/core/table_export.html
+msgid "Every row of the table as it is now, not only the page on screen: your columns in your order, with its filters and its sort. Downloaded, and not kept in Postulo."
+msgstr ""
+
 #: src/postulo/templates/server/design.html
 msgid "Every step derived from one radius, so there is one number to change."
 msgstr "كل درجة مشتقة من نصف قطر واحد، فلا يوجد سوى رقم واحد لتغييره."
@@ -7214,7 +7286,7 @@ msgstr "ما يخص الجميع"
 msgid "Everybody's, as an administrator"
 msgstr "ما يخص الجميع، بصفتك مسؤولًا"
 
-#: src/postulo/jobs/listing_views.py src/postulo/templates/server/logs.html
+#: src/postulo/jobs/tables.py src/postulo/templates/server/logs.html
 msgid "Everything"
 msgstr "كل شيء"
 
@@ -7340,9 +7412,15 @@ msgstr "كثيرًا ما يعني شرح الخطأ ذكر الاتصال أو 
 #: src/postulo/templates/cotton/transfer_group.html
 #: src/postulo/templates/jobs/company_detail.html
 #: src/postulo/templates/jobs/company_places.html
+#: src/postulo/templates/partials/table/export.html
 #: src/postulo/templates/settings/export.html
 msgid "Export"
 msgstr "تصدير"
+
+#: src/postulo/templates/core/table_export.html
+#, python-format
+msgid "Export %(list)s"
+msgstr ""
 
 #: src/postulo/core/models.py
 msgid "export archive"
@@ -7860,6 +7938,16 @@ msgstr "من %(name)s."
 msgid "From %(register)s"
 msgstr ""
 
+#: src/postulo/core/tables.py
+#, python-format
+msgid "from %(start)s"
+msgstr ""
+
+#: src/postulo/core/tables.py
+#, python-format
+msgid "from %(start)s to %(end)s"
+msgstr ""
+
 #: src/postulo/templates/cotton/date_picker.html
 #, python-format
 msgid "From %(start)s to %(end)s"
@@ -8161,6 +8249,10 @@ msgstr "إجمالي، قبل الضريبة. لا بأس بطرف واحد وح
 #: src/postulo/templates/server/plugin_access.html
 msgid "group"
 msgstr "المجموعة"
+
+#: src/postulo/jobs/tables.py
+msgid "Group"
+msgstr ""
 
 #: src/postulo/core/views_access.py
 msgid "Group deleted."
@@ -9650,6 +9742,10 @@ msgstr "اللغة غير محددة"
 msgid "language of exported files"
 msgstr ""
 
+#: src/postulo/templates/core/table_export.html
+msgid "Language of the document"
+msgstr ""
+
 #: src/postulo/templates/applications/report.html
 msgid "Language of the report"
 msgstr ""
@@ -9906,6 +10002,12 @@ msgstr "إن تُرك فارغًا، تُظهر سيرك الذاتية «%(plac
 msgid "Left empty it is today. Capturing a posting you applied to last week is common."
 msgstr "إن تُرك فارغًا فهو تاريخ اليوم. من الشائع التقاط إعلان تقدّمت إليه الأسبوع الماضي."
 
+#: src/postulo/templates/core/table_export.html
+#: src/postulo/templates/documents/themes/base_list.html
+#, python-format
+msgid "Left out, because they hold nothing to write: %(columns)s."
+msgstr ""
+
 #: src/postulo/jobs/industries.py
 msgid "Legal"
 msgstr "الخدمات القانونية"
@@ -10073,6 +10175,10 @@ msgstr "روابط إلى الأماكن التي يعود إليها البحث
 #: src/postulo/templates/documents/application_documents.html
 msgid "Links you pointed them at"
 msgstr "الروابط التي وجّهتهم إليها"
+
+#: src/postulo/documents/themes.py
+msgid "List"
+msgstr ""
 
 #: src/postulo/resume/views.py
 msgid "listening"
@@ -10803,6 +10909,11 @@ msgstr "تضييق"
 #: src/postulo/templates/partials/table/views.html
 msgid "Narrow and sort the table the way you want it, then keep it under a name."
 msgstr "ضيّق الجدول ورتّبه كما تريد، ثم احتفظ به تحت اسم."
+
+#: src/postulo/templates/core/table_export.html
+#: src/postulo/templates/documents/themes/base_list.html
+msgid "Narrowed by"
+msgstr ""
 
 #: src/postulo/resume/forms.py
 msgid "National letters or classes the list lacks, as the licence prints them. A CV prints them after the codes."
@@ -11911,6 +12022,7 @@ msgid "Nothing matches “%(term)s”"
 msgstr "لا شيء يطابق «%(term)s»"
 
 #: src/postulo/templates/base.html
+#: src/postulo/templates/documents/themes/base_list.html
 msgid "Nothing matches."
 msgstr "لا شيء يطابق."
 
@@ -12129,6 +12241,10 @@ msgstr "لا شيء بعد. يُحفظ المكان عندما تصحّح حقل
 #: src/postulo/jobs/vcards.py
 msgid "Nothing: an earlier card in this file is the same one."
 msgstr "لا شيء: بطاقة سابقة في هذا الملف هي البطاقة نفسها."
+
+#: src/postulo/templates/core/table_export.html
+msgid "Nothing: every row."
+msgstr ""
 
 #: src/postulo/jobs/vcards.py
 msgid "Nothing: the card has no name."
@@ -12886,6 +13002,10 @@ msgstr ""
 msgid "order"
 msgstr "الترتيب"
 
+#: src/postulo/templates/core/table_export.html
+msgid "Order"
+msgstr ""
+
 #: src/postulo/templates/server/design.html
 msgid "Ordinary text, which most of the interface is."
 msgstr "نص عادي، وهو معظم الواجهة."
@@ -13091,6 +13211,7 @@ msgstr ""
 
 #: src/postulo/documents/forms.py
 #: src/postulo/templates/applications/report.html
+#: src/postulo/templates/core/table_export.html
 #: src/postulo/templates/settings/export.html
 msgid "Paper"
 msgstr ""
@@ -13909,10 +14030,15 @@ msgstr "الجوائز والمنح الدراسية والأوسمة: تقدي�
 msgid "Proceedings"
 msgstr "وقائع مؤتمر"
 
+#: src/postulo/templates/documents/themes/base_list.html
+msgid "Produced by Postulo from this person's own records."
+msgstr ""
+
 #: src/postulo/templates/documents/themes/base_report.html
 msgid "Produced by Postulo from this person's own records. Postulo sets no target: how many applications a period should hold is a benefit regime's rule or the person's own."
 msgstr "أعدّه Postulo من سجلات هذا الشخص نفسه. لا يحدد Postulo أي هدف: عدد الطلبات الذي ينبغي أن تضمه الفترة قاعدة يضعها نظام الإعانات أو يضعها الشخص نفسه."
 
+#: src/postulo/templates/documents/themes/base_list.html
 #: src/postulo/templates/documents/themes/base_report.html
 #, python-format
 msgid "Produced on %(produced)s"
@@ -15158,7 +15284,7 @@ msgstr "النطاقات"
 msgid "Screening"
 msgstr "فرز أولي"
 
-#: src/postulo/templates/core/search.html
+#: src/postulo/core/tables.py src/postulo/templates/core/search.html
 #: src/postulo/templates/cotton/site_search.html
 #: src/postulo/templates/jobs/industry_list.html
 msgid "Search"
@@ -15645,7 +15771,7 @@ msgstr "ترشيح للمتابعة"
 msgid "Shortlist them"
 msgstr "إدراجها في القائمة المختصرة"
 
-#: src/postulo/jobs/listing_views.py src/postulo/jobs/models.py
+#: src/postulo/jobs/models.py src/postulo/jobs/tables.py
 msgid "Shortlisted"
 msgstr "مُرشَّح"
 
@@ -15750,6 +15876,7 @@ msgstr "هل تريد عرض هذا العنوان على الخريطة؟"
 msgid "Show this period"
 msgstr "عرض هذه الفترة"
 
+#: src/postulo/jobs/tables.py
 #: src/postulo/templates/jobs/partials/whose_form.html
 msgid "Showing"
 msgstr "عرض"
@@ -16113,6 +16240,16 @@ msgstr "فرز حسب %(column)s، من الأعلى إلى الأدنى"
 #, python-format
 msgid "Sort by %(column)s, lowest first"
 msgstr "فرز حسب %(column)s، من الأدنى إلى الأعلى"
+
+#: src/postulo/core/tables.py
+#, python-format
+msgid "Sorted by %(column)s, highest first"
+msgstr ""
+
+#: src/postulo/core/tables.py
+#, python-format
+msgid "Sorted by %(column)s, lowest first"
+msgstr ""
 
 #: src/postulo/jobs/models.py src/postulo/resume/models.py
 msgid "source"
@@ -17678,6 +17815,10 @@ msgstr "تعذّر إرسال النسخة؛ والمستند يذكر السب�
 msgid "The credit the tiles' licence asks for, drawn on the map as plain text. For example: © OpenStreetMap contributors"
 msgstr "الإسناد الذي يشترطه ترخيص البلاطات، ويُعرض على الخريطة كنص عادي. مثلًا: © OpenStreetMap contributors"
 
+#: src/postulo/templates/core/table_export.html
+msgid "The CSV is the same rows in the same language, for a spreadsheet; the theme and the paper are for the PDF."
+msgstr ""
+
 #: src/postulo/templates/settings/appearance.html
 msgid "The dashboard lists open applications nothing has happened to for a while, with nothing planned. Recruiters' own advice clusters around two to three weeks."
 msgstr "تعرض لوحة المعلومات الطلبات المفتوحة التي لم يحدث فيها شيء منذ مدة، ولا شيء مخطط لها. وتتمحور نصائح مسؤولي التوظيف أنفسهم حول أسبوعين إلى ثلاثة أسابيع."
@@ -17922,6 +18063,11 @@ msgstr[2] "يُقرأ أول %(count)s فقط، ولا يُقرأ الباقي."
 msgstr[3] "يُقرأ أول %(count)s فقط، ولا يُقرأ الباقي."
 msgstr[4] "يُقرأ أول %(count)s فقط، ولا يُقرأ الباقي."
 msgstr[5] "يُقرأ أول %(count)s فقط، ولا يُقرأ الباقي."
+
+#: src/postulo/templates/documents/themes/base_list.html
+#, python-format
+msgid "The first %(count)s of %(total)s rows; the rest are in the table."
+msgstr ""
 
 #: src/postulo/templates/documents/cv_form.html
 msgid "The first choice in each list follows your details: mark another number as primary there and this CV prints it. One you choose here stays, whatever becomes primary. If you later delete it from your details, this CV prints none of that kind until you choose again, and never another in its place. What you have already sent does not change."
@@ -18840,6 +18986,7 @@ msgid "theme"
 msgstr "السمة"
 
 #: src/postulo/templates/applications/report.html
+#: src/postulo/templates/core/table_export.html
 msgid "Theme"
 msgstr ""
 
@@ -19618,7 +19765,7 @@ msgstr "سيرسله %(name)s"
 msgid "to be sent by the referee"
 msgstr "سيرسله المُزكّي"
 
-#: src/postulo/jobs/listing_views.py
+#: src/postulo/jobs/tables.py
 msgid "To decide"
 msgstr "بانتظار القرار"
 
@@ -19913,6 +20060,11 @@ msgstr "غير منشور"
 #: src/postulo/resume/models.py
 msgid "until"
 msgstr "حتى"
+
+#: src/postulo/core/tables.py
+#, python-format
+msgid "until %(end)s"
+msgstr ""
 
 #: src/postulo/resume/models.py
 #, python-format
@@ -20553,6 +20705,10 @@ msgstr "مجال الدراسة، حين لا يذكره اسم المؤهل."
 msgid "What it was. Another capture of the same advert is added from the review screen, so it is not offered here."
 msgstr "ما كان عليه. يُضاف التقاط آخر للإعلان نفسه من شاشة المراجعة، لذا لا يُعرض هنا."
 
+#: src/postulo/templates/core/table_export.html
+msgid "What it will hold"
+msgstr ""
+
 #: src/postulo/templates/jobs/merge.html
 msgid "What moves"
 msgstr "ما يُنقل"
@@ -21161,6 +21317,10 @@ msgstr "من ستقابل. يُعرض الأشخاص الذين سجّلتهم �
 #: src/postulo/applications/forms.py
 msgid "Whoever put you forward, from the people you have recorded — at this company, at another, or at none. The figures count what each referrer led to."
 msgstr "من رشّحك، من بين الأشخاص الذين سجّلتهم — في هذه الشركة أو في غيرها أو بلا شركة. تحسب الأرقام ما أدى إليه كل ترشيح."
+
+#: src/postulo/jobs/tables.py
+msgid "Whose"
+msgstr ""
 
 #: src/postulo/templates/partials/import_owner.html
 msgid "Whose they become"

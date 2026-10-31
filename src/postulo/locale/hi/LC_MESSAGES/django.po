@@ -486,6 +486,7 @@ msgid_plural "%(counter)s of your records are shared with others: they keep a co
 msgstr[0] "आपके रिकॉर्डों में से %(counter)s दूसरों के साथ साझा है: उनके पास उसकी एक प्रति रहती है जिसकी उनके अपने रिकॉर्डों को ज़रूरत है, और उन्हें बताया जाता है कि यह अब नहीं है।"
 msgstr[1] "आपके रिकॉर्डों में से %(counter)s दूसरों के साथ साझा हैं: उनके पास उनकी प्रतियाँ रहती हैं जिनकी उनके अपने रिकॉर्डों को ज़रूरत है, और उन्हें बताया जाता है कि ये अब नहीं हैं।"
 
+#: src/postulo/jobs/tables.py
 #: src/postulo/templates/jobs/partials/company_row.html
 #, fuzzy, python-format
 msgid "%(counter)s open listing"
@@ -794,6 +795,16 @@ msgstr "%(language)s: %(fields)s"
 #, fuzzy, python-format
 msgid "%(later)s must be after %(earlier)s."
 msgstr "%(later)s को %(earlier)s के बाद होना चाहिए।"
+
+#: src/postulo/core/tables.py
+#, python-format
+msgid "%(least)s to %(most)s"
+msgstr ""
+
+#: src/postulo/core/list_export.py
+#, python-format
+msgid "%(list)s · %(date)s"
+msgstr ""
 
 #: src/postulo/jobs/models.py
 #, fuzzy, python-format
@@ -1509,6 +1520,20 @@ msgid_plural "%(total)s records are in the file."
 msgstr[0] "फ़ाइल में %(total)s रिकॉर्ड है।"
 msgstr[1] "फ़ाइल में %(total)s रिकॉर्ड हैं।"
 
+#: src/postulo/templates/documents/themes/base_list.html
+#, python-format
+msgid "%(total)s row"
+msgid_plural "%(total)s rows"
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/postulo/templates/core/table_export.html
+#, python-format
+msgid "%(total)s row matches."
+msgid_plural "%(total)s rows match."
+msgstr[0] ""
+msgstr[1] ""
+
 #: src/postulo/jobs/vcards.py
 #, fuzzy, python-format
 msgid "%(total)s telephone number"
@@ -1994,6 +2019,11 @@ msgstr "होस्ट पर cron की पंक्ति अब भी प�
 msgid "A CSV file"
 msgstr "एक CSV फ़ाइल"
 
+#: src/postulo/templates/core/table_export.html
+#, python-format
+msgid "A CSV holds the first %(limit)s."
+msgstr ""
+
 #: src/postulo/documents/forms.py
 #, fuzzy
 msgid "A CV leads with a career, a portfolio with work. It decides which themes are offered below."
@@ -2464,6 +2494,11 @@ msgstr "पासवर्ड, या ऐप पासवर्ड"
 #, fuzzy
 msgid "a PDF"
 msgstr "PDF"
+
+#: src/postulo/templates/core/table_export.html
+#, python-format
+msgid "A PDF holds the first %(limit)s of them and says so."
+msgstr ""
 
 #: src/postulo/templates/server/design.html
 #, fuzzy
@@ -4092,8 +4127,8 @@ msgid "Applications, with their timelines"
 msgstr "आवेदन, उनकी टाइमलाइन के साथ"
 
 #: src/postulo/applications/analytics.py src/postulo/applications/models.py
-#: src/postulo/applications/tables.py src/postulo/jobs/listing_views.py
-#: src/postulo/jobs/models.py src/postulo/templates/core/import_csv_map.html
+#: src/postulo/applications/tables.py src/postulo/jobs/models.py
+#: src/postulo/jobs/tables.py src/postulo/templates/core/import_csv_map.html
 #, fuzzy
 msgid "Applied"
 msgstr "भेजा गया"
@@ -4259,6 +4294,10 @@ msgstr "जैसा CV पर दिखना चाहिए। जो ना�
 msgid "As a CV should print it. It is linked to the company of that name among yours, and added to your companies if there is none."
 msgstr "जैसा CV पर दिखना चाहिए। इसे आपकी कंपनियों में उसी नाम वाली कंपनी से जोड़ा जाता है, और अगर ऐसी कोई नहीं है तो आपकी कंपनियों में जोड़ दिया जाता है।"
 
+#: src/postulo/templates/core/table_export.html
+msgid "As a document"
+msgstr ""
+
 #: src/postulo/templates/documents/letter_detail.html
 #, fuzzy
 msgid "As a file"
@@ -4294,6 +4333,7 @@ msgstr "जैसा"
 msgid "As of"
 msgstr "के रूप में"
 
+#: src/postulo/jobs/tables.py
 #: src/postulo/templates/jobs/partials/company_row.html
 #: src/postulo/templates/jobs/partials/company_status.html
 #, fuzzy, python-format
@@ -4383,6 +4423,11 @@ msgstr "समय"
 msgid "at least"
 msgstr "कम से कम"
 
+#: src/postulo/core/tables.py
+#, python-format
+msgid "at least %(least)s"
+msgstr ""
+
 #: src/postulo/core/server_forms.py
 #, fuzzy
 msgid "At least one language has to be offered, or nobody can read anything."
@@ -4392,6 +4437,11 @@ msgstr "कम से कम एक भाषा उपलब्ध होनी
 #, fuzzy
 msgid "at most"
 msgstr "ज़्यादा से ज़्यादा"
+
+#: src/postulo/core/tables.py
+#, python-format
+msgid "at most %(most)s"
+msgstr ""
 
 #: src/postulo/accounts/forms.py
 #, fuzzy
@@ -4578,6 +4628,10 @@ msgstr "उस विज्ञापन पर वापस जाएं जो 
 #, fuzzy
 msgid "Back to the standard arrangement"
 msgstr "मानक व्यवस्था पर वापस जाएं"
+
+#: src/postulo/templates/core/table_export.html
+msgid "Back to the table, to change any of this"
+msgstr ""
 
 #: src/postulo/core/views_tables.py
 #, fuzzy
@@ -5625,7 +5679,7 @@ msgstr "बंद करें"
 msgid "Close search"
 msgstr "खोज बंद करें"
 
-#: src/postulo/jobs/listing_views.py src/postulo/jobs/models.py
+#: src/postulo/jobs/models.py src/postulo/jobs/tables.py
 #, fuzzy
 msgid "Closed"
 msgstr "बंद"
@@ -5730,6 +5784,7 @@ msgstr "रंग"
 msgid "Column in the file"
 msgstr "फ़ाइल का कॉलम"
 
+#: src/postulo/templates/core/table_export.html
 #: src/postulo/templates/partials/table/columns.html
 #, fuzzy
 msgid "Columns"
@@ -6897,7 +6952,7 @@ msgstr "इन्हें खारिज करें"
 msgid "Discard this capture"
 msgstr "यह कैप्चर खारिज करें"
 
-#: src/postulo/jobs/listing_views.py src/postulo/jobs/models.py
+#: src/postulo/jobs/models.py src/postulo/jobs/tables.py
 #: src/postulo/templates/jobs/capture_list.html
 #, fuzzy
 msgid "Discarded"
@@ -7058,6 +7113,7 @@ msgid "Download companies.geojson"
 msgstr "companies.geojson डाउनलोड करें"
 
 #: src/postulo/templates/applications/report.html
+#: src/postulo/templates/core/table_export.html
 #, fuzzy
 msgid "Download CSV"
 msgstr "CSV डाउनलोड करें"
@@ -7082,6 +7138,10 @@ msgstr "इसे डाउनलोड करें"
 #, fuzzy
 msgid "Download it as text"
 msgstr "टेक्स्ट के रूप में डाउनलोड करें"
+
+#: src/postulo/templates/core/table_export.html
+msgid "Download PDF"
+msgstr ""
 
 #: src/postulo/templates/core/kind_file.html
 #: src/postulo/templates/resume/candidate_file.html
@@ -7718,6 +7778,10 @@ msgstr "हर वह विज्ञापन जिस पर आपकी न
 msgid "Every role you have held. Write the highlights once; tailor them per CV later."
 msgstr "हर वह पद जिस पर आप रहे हैं। मुख्य बातें एक बार लिखें; बाद में हर CV के हिसाब से बदलें।"
 
+#: src/postulo/templates/core/table_export.html
+msgid "Every row of the table as it is now, not only the page on screen: your columns in your order, with its filters and its sort. Downloaded, and not kept in Postulo."
+msgstr ""
+
 #: src/postulo/templates/server/design.html
 #, fuzzy
 msgid "Every step derived from one radius, so there is one number to change."
@@ -7757,7 +7821,7 @@ msgstr "हर कोई"
 msgid "Everybody's, as an administrator"
 msgstr "हर कोई एक प्रशासक के रूप में"
 
-#: src/postulo/jobs/listing_views.py src/postulo/templates/server/logs.html
+#: src/postulo/jobs/tables.py src/postulo/templates/server/logs.html
 #, fuzzy
 msgid "Everything"
 msgstr "सब कुछ"
@@ -7905,10 +7969,16 @@ msgstr "कोई गड़बड़ी समझाने के लिए अ�
 #: src/postulo/templates/cotton/transfer_group.html
 #: src/postulo/templates/jobs/company_detail.html
 #: src/postulo/templates/jobs/company_places.html
+#: src/postulo/templates/partials/table/export.html
 #: src/postulo/templates/settings/export.html
 #, fuzzy
 msgid "Export"
 msgstr "एक्सपोर्ट करें"
+
+#: src/postulo/templates/core/table_export.html
+#, python-format
+msgid "Export %(list)s"
+msgstr ""
 
 #: src/postulo/core/models.py
 #, fuzzy
@@ -8517,6 +8587,16 @@ msgstr "%(name)s से।"
 msgid "From %(register)s"
 msgstr ""
 
+#: src/postulo/core/tables.py
+#, python-format
+msgid "from %(start)s"
+msgstr ""
+
+#: src/postulo/core/tables.py
+#, python-format
+msgid "from %(start)s to %(end)s"
+msgstr ""
+
 #: src/postulo/templates/cotton/date_picker.html
 #, fuzzy, python-format
 msgid "From %(start)s to %(end)s"
@@ -8874,6 +8954,10 @@ msgstr "कुल, टैक्स से पहले। सिर्फ़ ए
 #, fuzzy
 msgid "group"
 msgstr "समूह"
+
+#: src/postulo/jobs/tables.py
+msgid "Group"
+msgstr ""
 
 #: src/postulo/core/views_access.py
 #, fuzzy
@@ -10635,6 +10719,10 @@ msgstr "भाषा नहीं बताई गई"
 msgid "language of exported files"
 msgstr ""
 
+#: src/postulo/templates/core/table_export.html
+msgid "Language of the document"
+msgstr ""
+
 #: src/postulo/templates/applications/report.html
 msgid "Language of the report"
 msgstr ""
@@ -10942,6 +11030,12 @@ msgstr "खाली छोड़ने पर, आपके CV “%(place)s” 
 msgid "Left empty it is today. Capturing a posting you applied to last week is common."
 msgstr "खाली छोड़ने पर आज की तारीख ली जाती है। पिछले हफ़्ते जिस विज्ञापन के लिए आवेदन किया था, उसे कैप्चर करना आम बात है।"
 
+#: src/postulo/templates/core/table_export.html
+#: src/postulo/templates/documents/themes/base_list.html
+#, python-format
+msgid "Left out, because they hold nothing to write: %(columns)s."
+msgstr ""
+
 #: src/postulo/jobs/industries.py
 #, fuzzy
 msgid "Legal"
@@ -11147,6 +11241,10 @@ msgstr "उन जगहों के लिंक जहां नौकरी 
 #, fuzzy
 msgid "Links you pointed them at"
 msgstr "जिन लिंक की ओर आपने उनका ध्यान दिलाया"
+
+#: src/postulo/documents/themes.py
+msgid "List"
+msgstr ""
 
 #: src/postulo/resume/views.py
 #, fuzzy
@@ -12010,6 +12108,11 @@ msgstr "सीमित करें"
 #, fuzzy
 msgid "Narrow and sort the table the way you want it, then keep it under a name."
 msgstr "टेबल को अपनी पसंद से सीमित करें और क्रम से लगाएं, फिर उसे किसी नाम से रखें।"
+
+#: src/postulo/templates/core/table_export.html
+#: src/postulo/templates/documents/themes/base_list.html
+msgid "Narrowed by"
+msgstr ""
 
 #: src/postulo/resume/forms.py
 #, fuzzy
@@ -13318,6 +13421,7 @@ msgid "Nothing matches “%(term)s”"
 msgstr "“%(term)s” से कुछ भी मेल नहीं खाता"
 
 #: src/postulo/templates/base.html
+#: src/postulo/templates/documents/themes/base_list.html
 #, fuzzy
 msgid "Nothing matches."
 msgstr "कुछ भी मेल नहीं खाता।"
@@ -13581,6 +13685,10 @@ msgstr "अभी तक कुछ नहीं। जब आप जांच �
 #, fuzzy
 msgid "Nothing: an earlier card in this file is the same one."
 msgstr "कुछ नहीं: इस फ़ाइल में यही कार्ड इससे पहले आ चुका है।"
+
+#: src/postulo/templates/core/table_export.html
+msgid "Nothing: every row."
+msgstr ""
 
 #: src/postulo/jobs/vcards.py
 #, fuzzy
@@ -14377,6 +14485,10 @@ msgstr ""
 msgid "order"
 msgstr "क्रम"
 
+#: src/postulo/templates/core/table_export.html
+msgid "Order"
+msgstr ""
+
 #: src/postulo/templates/server/design.html
 #, fuzzy
 msgid "Ordinary text, which most of the interface is."
@@ -14615,6 +14727,7 @@ msgstr ""
 
 #: src/postulo/documents/forms.py
 #: src/postulo/templates/applications/report.html
+#: src/postulo/templates/core/table_export.html
 #: src/postulo/templates/settings/export.html
 msgid "Paper"
 msgstr ""
@@ -15596,11 +15709,16 @@ msgstr "पुरस्कार, स्कॉलरशिप और सम्�
 msgid "Proceedings"
 msgstr "प्रोसीडिंग्स"
 
+#: src/postulo/templates/documents/themes/base_list.html
+msgid "Produced by Postulo from this person's own records."
+msgstr ""
+
 #: src/postulo/templates/documents/themes/base_report.html
 #, fuzzy
 msgid "Produced by Postulo from this person's own records. Postulo sets no target: how many applications a period should hold is a benefit regime's rule or the person's own."
 msgstr "Postulo ने यह रिपोर्ट इस व्यक्ति के अपने रिकॉर्ड से बनाई है। Postulo कोई लक्ष्य तय नहीं करता: किसी अवधि में कितने आवेदन होने चाहिए, यह किसी सरकारी भत्ता योजना का नियम है या उस व्यक्ति का अपना।"
 
+#: src/postulo/templates/documents/themes/base_list.html
 #: src/postulo/templates/documents/themes/base_report.html
 #, fuzzy, python-format
 msgid "Produced on %(produced)s"
@@ -17054,7 +17172,7 @@ msgstr "स्कोप"
 msgid "Screening"
 msgstr "स्क्रीनिंग"
 
-#: src/postulo/templates/core/search.html
+#: src/postulo/core/tables.py src/postulo/templates/core/search.html
 #: src/postulo/templates/cotton/site_search.html
 #: src/postulo/templates/jobs/industry_list.html
 #, fuzzy
@@ -17625,7 +17743,7 @@ msgstr "शॉर्टलिस्ट करें"
 msgid "Shortlist them"
 msgstr "इन्हें शॉर्टलिस्ट करें"
 
-#: src/postulo/jobs/listing_views.py src/postulo/jobs/models.py
+#: src/postulo/jobs/models.py src/postulo/jobs/tables.py
 #, fuzzy
 msgid "Shortlisted"
 msgstr "शॉर्टलिस्ट किया"
@@ -17754,6 +17872,7 @@ msgstr "इस पते को मानचित्र पर दिखाए�
 msgid "Show this period"
 msgstr "यह अवधि दिखाएं"
 
+#: src/postulo/jobs/tables.py
 #: src/postulo/templates/jobs/partials/whose_form.html
 #, fuzzy
 msgid "Showing"
@@ -18197,6 +18316,16 @@ msgstr "%(column)s के हिसाब से क्रम से लगा�
 #, fuzzy, python-format
 msgid "Sort by %(column)s, lowest first"
 msgstr "%(column)s के हिसाब से क्रम से लगाएं, सबसे कम पहले"
+
+#: src/postulo/core/tables.py
+#, python-format
+msgid "Sorted by %(column)s, highest first"
+msgstr ""
+
+#: src/postulo/core/tables.py
+#, python-format
+msgid "Sorted by %(column)s, lowest first"
+msgstr ""
 
 #: src/postulo/jobs/models.py src/postulo/resume/models.py
 #, fuzzy
@@ -19986,6 +20115,10 @@ msgstr "कॉपी नहीं भेजी जा सकी; डॉक्य
 msgid "The credit the tiles' licence asks for, drawn on the map as plain text. For example: © OpenStreetMap contributors"
 msgstr "टाइल के लाइसेंस में मांगा गया श्रेय, जो मैप पर सादे टेक्स्ट के रूप में दिखाया जाता है। उदाहरण के लिए: © OpenStreetMap contributors"
 
+#: src/postulo/templates/core/table_export.html
+msgid "The CSV is the same rows in the same language, for a spreadsheet; the theme and the paper are for the PDF."
+msgstr ""
+
 #: src/postulo/templates/settings/appearance.html
 #, fuzzy
 msgid "The dashboard lists open applications nothing has happened to for a while, with nothing planned. Recruiters' own advice clusters around two to three weeks."
@@ -20263,6 +20396,11 @@ msgid "The first %(count)s is read, and the rest are not."
 msgid_plural "The first %(count)s are read, and the rest are not."
 msgstr[0] "पहला %(count)s पढ़ा जाता है, और बाकी नहीं।"
 msgstr[1] "पहले %(count)s पढ़े जाते हैं, और बाकी नहीं।"
+
+#: src/postulo/templates/documents/themes/base_list.html
+#, python-format
+msgid "The first %(count)s of %(total)s rows; the rest are in the table."
+msgstr ""
 
 #: src/postulo/templates/documents/cv_form.html
 #, fuzzy
@@ -21331,6 +21469,7 @@ msgid "theme"
 msgstr "थीम"
 
 #: src/postulo/templates/applications/report.html
+#: src/postulo/templates/core/table_export.html
 msgid "Theme"
 msgstr ""
 
@@ -22233,7 +22372,7 @@ msgstr "%(name)s द्वारा भेजा जाएगा"
 msgid "to be sent by the referee"
 msgstr "रेफ़री द्वारा भेजा जाएगा"
 
-#: src/postulo/jobs/listing_views.py
+#: src/postulo/jobs/tables.py
 #, fuzzy
 msgid "To decide"
 msgstr "तय करना है"
@@ -22582,6 +22721,11 @@ msgstr "अप्रकाशित"
 #, fuzzy
 msgid "until"
 msgstr "तक"
+
+#: src/postulo/core/tables.py
+#, python-format
+msgid "until %(end)s"
+msgstr ""
 
 #: src/postulo/resume/models.py
 #, fuzzy, python-format
@@ -23351,6 +23495,10 @@ msgstr "यह किस विषय में थी, जहां योग�
 msgid "What it was. Another capture of the same advert is added from the review screen, so it is not offered here."
 msgstr "यह क्या था। उसी विज्ञापन का दूसरा कैप्चर जांच वाली स्क्रीन से जोड़ा जाता है, इसलिए वह यहां नहीं दिया गया है।"
 
+#: src/postulo/templates/core/table_export.html
+msgid "What it will hold"
+msgstr ""
+
 #: src/postulo/templates/jobs/merge.html
 #, fuzzy
 msgid "What moves"
@@ -24097,6 +24245,10 @@ msgstr "आप किससे मिल रहे हैं। इस कंप
 #, fuzzy
 msgid "Whoever put you forward, from the people you have recorded — at this company, at another, or at none. The figures count what each referrer led to."
 msgstr "जिसने आपको रेफ़र किया, आपके दर्ज किए गए लोगों में से — इस कंपनी में, किसी दूसरी कंपनी में, या किसी में नहीं। आंकड़े गिनते हैं कि हर रेफ़र करने वाले से क्या नतीजा निकला।"
+
+#: src/postulo/jobs/tables.py
+msgid "Whose"
+msgstr ""
 
 #: src/postulo/templates/partials/import_owner.html
 #, fuzzy

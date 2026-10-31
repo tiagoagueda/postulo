@@ -486,6 +486,7 @@ msgid_plural "%(counter)s of your records are shared with others: they keep a co
 msgstr[0] "%(counter)s av dina poster delas med andra: de behåller en kopia av det deras egna poster behöver och får veta att den är borta."
 msgstr[1] "%(counter)s av dina poster delas med andra: de behåller en kopia av det deras egna poster behöver och får veta att de är borta."
 
+#: src/postulo/jobs/tables.py
 #: src/postulo/templates/jobs/partials/company_row.html
 #, python-format
 msgid "%(counter)s open listing"
@@ -794,6 +795,16 @@ msgstr "%(language)s: %(fields)s"
 #, python-format
 msgid "%(later)s must be after %(earlier)s."
 msgstr "%(later)s måste vara efter %(earlier)s."
+
+#: src/postulo/core/tables.py
+#, python-format
+msgid "%(least)s to %(most)s"
+msgstr ""
+
+#: src/postulo/core/list_export.py
+#, python-format
+msgid "%(list)s · %(date)s"
+msgstr ""
 
 #: src/postulo/jobs/models.py
 #, python-format
@@ -1509,6 +1520,20 @@ msgid_plural "%(total)s records are in the file."
 msgstr[0] "%(total)s post finns i filen."
 msgstr[1] "%(total)s poster finns i filen."
 
+#: src/postulo/templates/documents/themes/base_list.html
+#, python-format
+msgid "%(total)s row"
+msgid_plural "%(total)s rows"
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/postulo/templates/core/table_export.html
+#, python-format
+msgid "%(total)s row matches."
+msgid_plural "%(total)s rows match."
+msgstr[0] ""
+msgstr[1] ""
+
 #: src/postulo/jobs/vcards.py
 #, python-format
 msgid "%(total)s telephone number"
@@ -1934,6 +1959,11 @@ msgstr "En cron-rad på värddatorn fungerar fortfarande på samma sätt och bes
 msgid "A CSV file"
 msgstr "En CSV-fil"
 
+#: src/postulo/templates/core/table_export.html
+#, python-format
+msgid "A CSV holds the first %(limit)s."
+msgstr ""
+
 #: src/postulo/documents/forms.py
 msgid "A CV leads with a career, a portfolio with work. It decides which themes are offered below."
 msgstr "Ett CV inleds med en karriär, en portfölj med verk. Det avgör vilka teman som erbjuds nedan."
@@ -2324,6 +2354,11 @@ msgstr "Ett lösenord eller ett applösenord"
 #: src/postulo/documents/integrity.py
 msgid "a PDF"
 msgstr "en PDF"
+
+#: src/postulo/templates/core/table_export.html
+#, python-format
+msgid "A PDF holds the first %(limit)s of them and says so."
+msgstr ""
 
 #: src/postulo/templates/server/design.html
 msgid "A person, a company or a plugin, as initials on a colour until there is a picture."
@@ -3698,8 +3733,8 @@ msgid "Applications, with their timelines"
 msgstr "Ansökningar, med sina tidslinjer"
 
 #: src/postulo/applications/analytics.py src/postulo/applications/models.py
-#: src/postulo/applications/tables.py src/postulo/jobs/listing_views.py
-#: src/postulo/jobs/models.py src/postulo/templates/core/import_csv_map.html
+#: src/postulo/applications/tables.py src/postulo/jobs/models.py
+#: src/postulo/jobs/tables.py src/postulo/templates/core/import_csv_map.html
 msgid "Applied"
 msgstr "Skickad"
 
@@ -3839,6 +3874,10 @@ msgstr "Så som ett CV ska skriva ut det. Ett namn som är en färdighet i ESCO-
 msgid "As a CV should print it. It is linked to the company of that name among yours, and added to your companies if there is none."
 msgstr "Så som ett CV ska skriva ut det. Det kopplas till företaget med det namnet bland dina, och läggs till bland dina företag om det inte finns något."
 
+#: src/postulo/templates/core/table_export.html
+msgid "As a document"
+msgstr ""
+
 #: src/postulo/templates/documents/letter_detail.html
 msgid "As a file"
 msgstr "Som fil"
@@ -3867,6 +3906,7 @@ msgstr "per"
 msgid "As of"
 msgstr "Per"
 
+#: src/postulo/jobs/tables.py
 #: src/postulo/templates/jobs/partials/company_row.html
 #: src/postulo/templates/jobs/partials/company_status.html
 #, python-format
@@ -3942,6 +3982,11 @@ msgstr "vid"
 msgid "at least"
 msgstr "minst"
 
+#: src/postulo/core/tables.py
+#, python-format
+msgid "at least %(least)s"
+msgstr ""
+
 #: src/postulo/core/server_forms.py
 msgid "At least one language has to be offered, or nobody can read anything."
 msgstr "Minst ett språk måste erbjudas, annars kan ingen läsa något."
@@ -3949,6 +3994,11 @@ msgstr "Minst ett språk måste erbjudas, annars kan ingen läsa något."
 #: src/postulo/templates/cotton/table/filter.html
 msgid "at most"
 msgstr "högst"
+
+#: src/postulo/core/tables.py
+#, python-format
+msgid "at most %(most)s"
+msgstr ""
 
 #: src/postulo/accounts/forms.py
 msgid "Atlantic Ocean"
@@ -4102,6 +4152,10 @@ msgstr "Tillbaka till annonsen som den här infångningen blev"
 #: src/postulo/templates/core/dashboard.html
 msgid "Back to the standard arrangement"
 msgstr "Tillbaka till standarduppställningen"
+
+#: src/postulo/templates/core/table_export.html
+msgid "Back to the table, to change any of this"
+msgstr ""
 
 #: src/postulo/core/views_tables.py
 msgid "Back to the usual columns."
@@ -4983,7 +5037,7 @@ msgstr "Stäng"
 msgid "Close search"
 msgstr "Stäng sökning"
 
-#: src/postulo/jobs/listing_views.py src/postulo/jobs/models.py
+#: src/postulo/jobs/models.py src/postulo/jobs/tables.py
 msgid "Closed"
 msgstr "Stängd"
 
@@ -5071,6 +5125,7 @@ msgstr "färg"
 msgid "Column in the file"
 msgstr "Kolumn i filen"
 
+#: src/postulo/templates/core/table_export.html
 #: src/postulo/templates/partials/table/columns.html
 msgid "Columns"
 msgstr "Kolumner"
@@ -6052,7 +6107,7 @@ msgstr "Förkasta dem"
 msgid "Discard this capture"
 msgstr "Kassera denna infångning"
 
-#: src/postulo/jobs/listing_views.py src/postulo/jobs/models.py
+#: src/postulo/jobs/models.py src/postulo/jobs/tables.py
 #: src/postulo/templates/jobs/capture_list.html
 msgid "Discarded"
 msgstr "Kasserad"
@@ -6190,6 +6245,7 @@ msgid "Download companies.geojson"
 msgstr "Ladda ned companies.geojson"
 
 #: src/postulo/templates/applications/report.html
+#: src/postulo/templates/core/table_export.html
 msgid "Download CSV"
 msgstr "Ladda ned CSV"
 
@@ -6209,6 +6265,10 @@ msgstr "Ladda ned den"
 #: src/postulo/templates/jobs/capture_page.html
 msgid "Download it as text"
 msgstr "Ladda ned den som text"
+
+#: src/postulo/templates/core/table_export.html
+msgid "Download PDF"
+msgstr ""
 
 #: src/postulo/templates/core/kind_file.html
 #: src/postulo/templates/resume/candidate_file.html
@@ -6736,6 +6796,10 @@ msgstr "Varje annons du har lagt märke till, tills du bestämmer dig: sätt den
 msgid "Every role you have held. Write the highlights once; tailor them per CV later."
 msgstr "Varje roll du har haft. Skriv höjdpunkterna en gång; anpassa dem per CV senare."
 
+#: src/postulo/templates/core/table_export.html
+msgid "Every row of the table as it is now, not only the page on screen: your columns in your order, with its filters and its sort. Downloaded, and not kept in Postulo."
+msgstr ""
+
 #: src/postulo/templates/server/design.html
 msgid "Every step derived from one radius, so there is one number to change."
 msgstr "Varje steg härleds från en enda radie, så det finns ett tal att ändra."
@@ -6768,7 +6832,7 @@ msgstr "Allas"
 msgid "Everybody's, as an administrator"
 msgstr "Allas, som administratör"
 
-#: src/postulo/jobs/listing_views.py src/postulo/templates/server/logs.html
+#: src/postulo/jobs/tables.py src/postulo/templates/server/logs.html
 msgid "Everything"
 msgstr "Allt"
 
@@ -6894,9 +6958,15 @@ msgstr "Att förklara vad som gick fel innebär ofta att säga vilken anslutning
 #: src/postulo/templates/cotton/transfer_group.html
 #: src/postulo/templates/jobs/company_detail.html
 #: src/postulo/templates/jobs/company_places.html
+#: src/postulo/templates/partials/table/export.html
 #: src/postulo/templates/settings/export.html
 msgid "Export"
 msgstr "Exportera"
+
+#: src/postulo/templates/core/table_export.html
+#, python-format
+msgid "Export %(list)s"
+msgstr ""
 
 #: src/postulo/core/models.py
 msgid "export archive"
@@ -7415,6 +7485,16 @@ msgstr "Från %(name)s."
 msgid "From %(register)s"
 msgstr ""
 
+#: src/postulo/core/tables.py
+#, python-format
+msgid "from %(start)s"
+msgstr ""
+
+#: src/postulo/core/tables.py
+#, python-format
+msgid "from %(start)s to %(end)s"
+msgstr ""
+
 #: src/postulo/templates/cotton/date_picker.html
 #, python-format
 msgid "From %(start)s to %(end)s"
@@ -7717,6 +7797,10 @@ msgstr "Brutto, före skatt. Ena gränsen räcker – de flesta annonser anger b
 #: src/postulo/templates/server/plugin_access.html
 msgid "group"
 msgstr "grupp"
+
+#: src/postulo/jobs/tables.py
+msgid "Group"
+msgstr ""
 
 #: src/postulo/core/views_access.py
 msgid "Group deleted."
@@ -9194,6 +9278,10 @@ msgstr "språk inte angivet"
 msgid "language of exported files"
 msgstr ""
 
+#: src/postulo/templates/core/table_export.html
+msgid "Language of the document"
+msgstr ""
+
 #: src/postulo/templates/applications/report.html
 msgid "Language of the report"
 msgstr ""
@@ -9451,6 +9539,12 @@ msgstr "Om det lämnas tomt skriver dina CV:n ut ”%(place)s”: ort och land f
 msgid "Left empty it is today. Capturing a posting you applied to last week is common."
 msgstr "Lämnas det tomt blir det i dag. Att fånga in en annons du sökte förra veckan är vanligt."
 
+#: src/postulo/templates/core/table_export.html
+#: src/postulo/templates/documents/themes/base_list.html
+#, python-format
+msgid "Left out, because they hold nothing to write: %(columns)s."
+msgstr ""
+
 #: src/postulo/jobs/industries.py
 msgid "Legal"
 msgstr "Juridik"
@@ -9618,6 +9712,10 @@ msgstr "Länkar till de ställen man återvänder till under jobbsökandet: tavl
 #: src/postulo/templates/documents/application_documents.html
 msgid "Links you pointed them at"
 msgstr "Länkar du hänvisade dem till"
+
+#: src/postulo/documents/themes.py
+msgid "List"
+msgstr ""
 
 #: src/postulo/resume/views.py
 msgid "listening"
@@ -10342,6 +10440,11 @@ msgstr "Avgränsa"
 #: src/postulo/templates/partials/table/views.html
 msgid "Narrow and sort the table the way you want it, then keep it under a name."
 msgstr "Avgränsa och sortera tabellen som du vill och spara den sedan under ett namn."
+
+#: src/postulo/templates/core/table_export.html
+#: src/postulo/templates/documents/themes/base_list.html
+msgid "Narrowed by"
+msgstr ""
 
 #: src/postulo/resume/forms.py
 msgid "National letters or classes the list lacks, as the licence prints them. A CV prints them after the codes."
@@ -11436,6 +11539,7 @@ msgid "Nothing matches “%(term)s”"
 msgstr "Inget matchar ”%(term)s”"
 
 #: src/postulo/templates/base.html
+#: src/postulo/templates/documents/themes/base_list.html
 msgid "Nothing matches."
 msgstr "Inget matchar."
 
@@ -11654,6 +11758,10 @@ msgstr "Inget ännu. En plats sparas när du rättar ett fält vid granskningen 
 #: src/postulo/jobs/vcards.py
 msgid "Nothing: an earlier card in this file is the same one."
 msgstr "Inget: ett tidigare kort i den här filen är samma kort."
+
+#: src/postulo/templates/core/table_export.html
+msgid "Nothing: every row."
+msgstr ""
 
 #: src/postulo/jobs/vcards.py
 msgid "Nothing: the card has no name."
@@ -12337,6 +12445,10 @@ msgstr ""
 msgid "order"
 msgstr "ordning"
 
+#: src/postulo/templates/core/table_export.html
+msgid "Order"
+msgstr ""
+
 #: src/postulo/templates/server/design.html
 msgid "Ordinary text, which most of the interface is."
 msgstr "Vanlig text, vilket det mesta av gränssnittet är."
@@ -12537,6 +12649,7 @@ msgstr ""
 
 #: src/postulo/documents/forms.py
 #: src/postulo/templates/applications/report.html
+#: src/postulo/templates/core/table_export.html
 #: src/postulo/templates/settings/export.html
 msgid "Paper"
 msgstr ""
@@ -13354,10 +13467,15 @@ msgstr "Priser, stipendier och utmärkelser: erkännanden som någon har gett di
 msgid "Proceedings"
 msgstr "Konferenshandlingar"
 
+#: src/postulo/templates/documents/themes/base_list.html
+msgid "Produced by Postulo from this person's own records."
+msgstr ""
+
 #: src/postulo/templates/documents/themes/base_report.html
 msgid "Produced by Postulo from this person's own records. Postulo sets no target: how many applications a period should hold is a benefit regime's rule or the person's own."
 msgstr "Framställd av Postulo ur den här personens egna uppgifter. Postulo sätter inget mål: hur många ansökningar en period bör innehålla är en regel från ett ersättningssystem eller personens egen."
 
+#: src/postulo/templates/documents/themes/base_list.html
 #: src/postulo/templates/documents/themes/base_report.html
 #, python-format
 msgid "Produced on %(produced)s"
@@ -14584,7 +14702,7 @@ msgstr "behörigheter"
 msgid "Screening"
 msgstr "Urval"
 
-#: src/postulo/templates/core/search.html
+#: src/postulo/core/tables.py src/postulo/templates/core/search.html
 #: src/postulo/templates/cotton/site_search.html
 #: src/postulo/templates/jobs/industry_list.html
 msgid "Search"
@@ -15068,7 +15186,7 @@ msgstr "Kortlista"
 msgid "Shortlist them"
 msgstr "Sätt dem på kortlistan"
 
-#: src/postulo/jobs/listing_views.py src/postulo/jobs/models.py
+#: src/postulo/jobs/models.py src/postulo/jobs/tables.py
 msgid "Shortlisted"
 msgstr "På kortlistan"
 
@@ -15173,6 +15291,7 @@ msgstr "Visa den här adressen på kartan?"
 msgid "Show this period"
 msgstr "Visa den här perioden"
 
+#: src/postulo/jobs/tables.py
 #: src/postulo/templates/jobs/partials/whose_form.html
 msgid "Showing"
 msgstr "Visar"
@@ -15536,6 +15655,16 @@ msgstr "Sortera efter %(column)s, högsta först"
 #, python-format
 msgid "Sort by %(column)s, lowest first"
 msgstr "Sortera efter %(column)s, lägsta först"
+
+#: src/postulo/core/tables.py
+#, python-format
+msgid "Sorted by %(column)s, highest first"
+msgstr ""
+
+#: src/postulo/core/tables.py
+#, python-format
+msgid "Sorted by %(column)s, lowest first"
+msgstr ""
 
 #: src/postulo/jobs/models.py src/postulo/resume/models.py
 msgid "source"
@@ -17082,6 +17211,10 @@ msgstr "Kopian kunde inte skickas; dokumentet visar varför."
 msgid "The credit the tiles' licence asks for, drawn on the map as plain text. For example: © OpenStreetMap contributors"
 msgstr "Den källhänvisning som kartrutornas licens kräver, visad på kartan som vanlig text. Till exempel: © OpenStreetMap-bidragsgivare"
 
+#: src/postulo/templates/core/table_export.html
+msgid "The CSV is the same rows in the same language, for a spreadsheet; the theme and the paper are for the PDF."
+msgstr ""
+
 #: src/postulo/templates/settings/appearance.html
 msgid "The dashboard lists open applications nothing has happened to for a while, with nothing planned. Recruiters' own advice clusters around two to three weeks."
 msgstr "Översikten listar öppna ansökningar där ingenting har hänt på ett tag, utan något planerat. Rekryterarnas egna råd landar runt två till tre veckor."
@@ -17318,6 +17451,11 @@ msgid "The first %(count)s is read, and the rest are not."
 msgid_plural "The first %(count)s are read, and the rest are not."
 msgstr[0] "Den första %(count)s läses, men inte resten."
 msgstr[1] "De första %(count)s läses, men inte resten."
+
+#: src/postulo/templates/documents/themes/base_list.html
+#, python-format
+msgid "The first %(count)s of %(total)s rows; the rest are in the table."
+msgstr ""
 
 #: src/postulo/templates/documents/cv_form.html
 msgid "The first choice in each list follows your details: mark another number as primary there and this CV prints it. One you choose here stays, whatever becomes primary. If you later delete it from your details, this CV prints none of that kind until you choose again, and never another in its place. What you have already sent does not change."
@@ -18226,6 +18364,7 @@ msgid "theme"
 msgstr "tema"
 
 #: src/postulo/templates/applications/report.html
+#: src/postulo/templates/core/table_export.html
 msgid "Theme"
 msgstr ""
 
@@ -18991,7 +19130,7 @@ msgstr "ska skickas av %(name)s"
 msgid "to be sent by the referee"
 msgstr "ska skickas av referenspersonen"
 
-#: src/postulo/jobs/listing_views.py
+#: src/postulo/jobs/tables.py
 msgid "To decide"
 msgstr "Att ta ställning till"
 
@@ -19285,6 +19424,11 @@ msgstr "Opublicerad"
 #: src/postulo/resume/models.py
 msgid "until"
 msgstr "till"
+
+#: src/postulo/core/tables.py
+#, python-format
+msgid "until %(end)s"
+msgstr ""
 
 #: src/postulo/resume/models.py
 #, python-format
@@ -19926,6 +20070,10 @@ msgstr "Vilket ämne den gällde, där kvalifikationens namn inte säger det."
 msgid "What it was. Another capture of the same advert is added from the review screen, so it is not offered here."
 msgstr "Vad den var. En annan infångning av samma annons läggs till från granskningsskärmen, så den erbjuds inte här."
 
+#: src/postulo/templates/core/table_export.html
+msgid "What it will hold"
+msgstr ""
+
 #: src/postulo/templates/jobs/merge.html
 msgid "What moves"
 msgstr "Det som flyttas"
@@ -20538,6 +20686,10 @@ msgstr "Vem du träffar. Personerna du har registrerat på det här företaget e
 #: src/postulo/applications/forms.py
 msgid "Whoever put you forward, from the people you have recorded — at this company, at another, or at none. The figures count what each referrer led to."
 msgstr "Den som rekommenderade dig, bland personerna du har registrerat – på det här företaget, på ett annat eller på inget. Siffrorna räknar vad varje tipsare ledde till."
+
+#: src/postulo/jobs/tables.py
+msgid "Whose"
+msgstr ""
 
 #: src/postulo/templates/partials/import_owner.html
 msgid "Whose they become"

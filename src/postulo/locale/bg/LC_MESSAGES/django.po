@@ -486,6 +486,7 @@ msgid_plural "%(counter)s of your records are shared with others: they keep a co
 msgstr[0] "%(counter)s от вашите записи е споделен с други: те запазват копие на това, от което се нуждаят собствените им записи, и получават известие, че е премахнат."
 msgstr[1] "%(counter)s от вашите записи са споделени с други: те запазват копие на това, от което се нуждаят собствените им записи, и получават известие, че са премахнати."
 
+#: src/postulo/jobs/tables.py
 #: src/postulo/templates/jobs/partials/company_row.html
 #, python-format
 msgid "%(counter)s open listing"
@@ -794,6 +795,16 @@ msgstr "%(language)s: %(fields)s"
 #, python-format
 msgid "%(later)s must be after %(earlier)s."
 msgstr "%(later)s трябва да е след %(earlier)s."
+
+#: src/postulo/core/tables.py
+#, python-format
+msgid "%(least)s to %(most)s"
+msgstr ""
+
+#: src/postulo/core/list_export.py
+#, python-format
+msgid "%(list)s · %(date)s"
+msgstr ""
 
 #: src/postulo/jobs/models.py
 #, python-format
@@ -1509,6 +1520,20 @@ msgid_plural "%(total)s records are in the file."
 msgstr[0] "%(total)s запис е във файла."
 msgstr[1] "%(total)s записа са във файла."
 
+#: src/postulo/templates/documents/themes/base_list.html
+#, python-format
+msgid "%(total)s row"
+msgid_plural "%(total)s rows"
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/postulo/templates/core/table_export.html
+#, python-format
+msgid "%(total)s row matches."
+msgid_plural "%(total)s rows match."
+msgstr[0] ""
+msgstr[1] ""
+
 #: src/postulo/jobs/vcards.py
 #, python-format
 msgid "%(total)s telephone number"
@@ -1933,6 +1958,11 @@ msgstr "Ред в cron на хоста все още работи по същи�
 msgid "A CSV file"
 msgstr "CSV файл"
 
+#: src/postulo/templates/core/table_export.html
+#, python-format
+msgid "A CSV holds the first %(limit)s."
+msgstr ""
+
 #: src/postulo/documents/forms.py
 msgid "A CV leads with a career, a portfolio with work. It decides which themes are offered below."
 msgstr "Автобиографията започва с кариерата, портфолиото — с работите. Това определя кои теми се предлагат по-долу."
@@ -2323,6 +2353,11 @@ msgstr "Парола или парола за приложение"
 #: src/postulo/documents/integrity.py
 msgid "a PDF"
 msgstr "PDF файл"
+
+#: src/postulo/templates/core/table_export.html
+#, python-format
+msgid "A PDF holds the first %(limit)s of them and says so."
+msgstr ""
 
 #: src/postulo/templates/server/design.html
 msgid "A person, a company or a plugin, as initials on a colour until there is a picture."
@@ -3703,8 +3738,8 @@ msgid "Applications, with their timelines"
 msgstr "Кандидатури с хронологиите им"
 
 #: src/postulo/applications/analytics.py src/postulo/applications/models.py
-#: src/postulo/applications/tables.py src/postulo/jobs/listing_views.py
-#: src/postulo/jobs/models.py src/postulo/templates/core/import_csv_map.html
+#: src/postulo/applications/tables.py src/postulo/jobs/models.py
+#: src/postulo/jobs/tables.py src/postulo/templates/core/import_csv_map.html
 msgid "Applied"
 msgstr "Кандидатствано"
 
@@ -3847,6 +3882,10 @@ msgstr "Както трябва да се отпечата в автобиогр
 msgid "As a CV should print it. It is linked to the company of that name among yours, and added to your companies if there is none."
 msgstr "Както трябва да се отпечата в автобиографията. Свързва се с компанията с това име сред вашите и се добавя към компаниите ви, ако няма такава."
 
+#: src/postulo/templates/core/table_export.html
+msgid "As a document"
+msgstr ""
+
 #: src/postulo/templates/documents/letter_detail.html
 msgid "As a file"
 msgstr "Като файл"
@@ -3875,6 +3914,7 @@ msgstr "към"
 msgid "As of"
 msgstr "Към"
 
+#: src/postulo/jobs/tables.py
 #: src/postulo/templates/jobs/partials/company_row.html
 #: src/postulo/templates/jobs/partials/company_status.html
 #, python-format
@@ -3951,6 +3991,11 @@ msgstr "в"
 msgid "at least"
 msgstr "поне"
 
+#: src/postulo/core/tables.py
+#, python-format
+msgid "at least %(least)s"
+msgstr ""
+
 #: src/postulo/core/server_forms.py
 msgid "At least one language has to be offered, or nobody can read anything."
 msgstr "Поне един език трябва да се предлага, иначе никой не може да чете нищо."
@@ -3958,6 +4003,11 @@ msgstr "Поне един език трябва да се предлага, ин
 #: src/postulo/templates/cotton/table/filter.html
 msgid "at most"
 msgstr "най-много"
+
+#: src/postulo/core/tables.py
+#, python-format
+msgid "at most %(most)s"
+msgstr ""
 
 #: src/postulo/accounts/forms.py
 msgid "Atlantic Ocean"
@@ -4113,6 +4163,10 @@ msgstr "Обратно към обявата, в която се превърн�
 #: src/postulo/templates/core/dashboard.html
 msgid "Back to the standard arrangement"
 msgstr "Обратно към стандартната подредба"
+
+#: src/postulo/templates/core/table_export.html
+msgid "Back to the table, to change any of this"
+msgstr ""
 
 #: src/postulo/core/views_tables.py
 msgid "Back to the usual columns."
@@ -5000,7 +5054,7 @@ msgstr "Затваряне"
 msgid "Close search"
 msgstr "Затваряне на търсенето"
 
-#: src/postulo/jobs/listing_views.py src/postulo/jobs/models.py
+#: src/postulo/jobs/models.py src/postulo/jobs/tables.py
 msgid "Closed"
 msgstr "Затворена"
 
@@ -5089,6 +5143,7 @@ msgstr "цвят"
 msgid "Column in the file"
 msgstr "Колона във файла"
 
+#: src/postulo/templates/core/table_export.html
 #: src/postulo/templates/partials/table/columns.html
 msgid "Columns"
 msgstr "Колони"
@@ -6069,7 +6124,7 @@ msgstr "Отхвърляне"
 msgid "Discard this capture"
 msgstr "Отхвърляне на това прихващане"
 
-#: src/postulo/jobs/listing_views.py src/postulo/jobs/models.py
+#: src/postulo/jobs/models.py src/postulo/jobs/tables.py
 #: src/postulo/templates/jobs/capture_list.html
 msgid "Discarded"
 msgstr "Отхвърлена"
@@ -6207,6 +6262,7 @@ msgid "Download companies.geojson"
 msgstr "Изтегляне на companies.geojson"
 
 #: src/postulo/templates/applications/report.html
+#: src/postulo/templates/core/table_export.html
 msgid "Download CSV"
 msgstr "Изтегляне на CSV"
 
@@ -6226,6 +6282,10 @@ msgstr "Изтеглете го"
 #: src/postulo/templates/jobs/capture_page.html
 msgid "Download it as text"
 msgstr "Изтеглете го като текст"
+
+#: src/postulo/templates/core/table_export.html
+msgid "Download PDF"
+msgstr ""
 
 #: src/postulo/templates/core/kind_file.html
 #: src/postulo/templates/resume/candidate_file.html
@@ -6753,6 +6813,10 @@ msgstr "Всяка обява, която сте забелязали, дока�
 msgid "Every role you have held. Write the highlights once; tailor them per CV later."
 msgstr "Всяка длъжност, която сте заемали. Напишете акцентите веднъж; после ги нагаждайте за всяка автобиография."
 
+#: src/postulo/templates/core/table_export.html
+msgid "Every row of the table as it is now, not only the page on screen: your columns in your order, with its filters and its sort. Downloaded, and not kept in Postulo."
+msgstr ""
+
 #: src/postulo/templates/server/design.html
 msgid "Every step derived from one radius, so there is one number to change."
 msgstr "Всяка стъпка е изведена от един радиус, така че има едно число за промяна."
@@ -6785,7 +6849,7 @@ msgstr "На всички"
 msgid "Everybody's, as an administrator"
 msgstr "На всички, като администратор"
 
-#: src/postulo/jobs/listing_views.py src/postulo/templates/server/logs.html
+#: src/postulo/jobs/tables.py src/postulo/templates/server/logs.html
 msgid "Everything"
 msgstr "Всичко"
 
@@ -6911,9 +6975,15 @@ msgstr "Обяснението какво се е объркало често и
 #: src/postulo/templates/cotton/transfer_group.html
 #: src/postulo/templates/jobs/company_detail.html
 #: src/postulo/templates/jobs/company_places.html
+#: src/postulo/templates/partials/table/export.html
 #: src/postulo/templates/settings/export.html
 msgid "Export"
 msgstr "Експорт"
+
+#: src/postulo/templates/core/table_export.html
+#, python-format
+msgid "Export %(list)s"
+msgstr ""
 
 #: src/postulo/core/models.py
 msgid "export archive"
@@ -7431,6 +7501,16 @@ msgstr "От %(name)s."
 msgid "From %(register)s"
 msgstr ""
 
+#: src/postulo/core/tables.py
+#, python-format
+msgid "from %(start)s"
+msgstr ""
+
+#: src/postulo/core/tables.py
+#, python-format
+msgid "from %(start)s to %(end)s"
+msgstr ""
+
 #: src/postulo/templates/cotton/date_picker.html
 #, python-format
 msgid "From %(start)s to %(end)s"
@@ -7734,6 +7814,10 @@ msgstr "Бруто, преди данъци. Достатъчна е и само
 #: src/postulo/templates/server/plugin_access.html
 msgid "group"
 msgstr "група"
+
+#: src/postulo/jobs/tables.py
+msgid "Group"
+msgstr ""
 
 #: src/postulo/core/views_access.py
 msgid "Group deleted."
@@ -9217,6 +9301,10 @@ msgstr "езикът не е посочен"
 msgid "language of exported files"
 msgstr ""
 
+#: src/postulo/templates/core/table_export.html
+msgid "Language of the document"
+msgstr ""
+
 #: src/postulo/templates/applications/report.html
 msgid "Language of the report"
 msgstr ""
@@ -9473,6 +9561,12 @@ msgstr "Ако е празно, автобиографиите ви отпеча
 msgid "Left empty it is today. Capturing a posting you applied to last week is common."
 msgstr "Ако е празно, е днешната дата. Често се случва да прихванете обява, по която сте кандидатствали миналата седмица."
 
+#: src/postulo/templates/core/table_export.html
+#: src/postulo/templates/documents/themes/base_list.html
+#, python-format
+msgid "Left out, because they hold nothing to write: %(columns)s."
+msgstr ""
+
 #: src/postulo/jobs/industries.py
 msgid "Legal"
 msgstr "Правни услуги"
@@ -9640,6 +9734,10 @@ msgstr "Връзки към местата, към които търсенето
 #: src/postulo/templates/documents/application_documents.html
 msgid "Links you pointed them at"
 msgstr "Връзки, към които ги насочихте"
+
+#: src/postulo/documents/themes.py
+msgid "List"
+msgstr ""
 
 #: src/postulo/resume/views.py
 msgid "listening"
@@ -10365,6 +10463,11 @@ msgstr "Стесняване"
 #: src/postulo/templates/partials/table/views.html
 msgid "Narrow and sort the table the way you want it, then keep it under a name."
 msgstr "Стеснете и подредете таблицата, както искате, после я запазете под някакво име."
+
+#: src/postulo/templates/core/table_export.html
+#: src/postulo/templates/documents/themes/base_list.html
+msgid "Narrowed by"
+msgstr ""
 
 #: src/postulo/resume/forms.py
 msgid "National letters or classes the list lacks, as the licence prints them. A CV prints them after the codes."
@@ -11467,6 +11570,7 @@ msgid "Nothing matches “%(term)s”"
 msgstr "Нищо не отговаря на „%(term)s“"
 
 #: src/postulo/templates/base.html
+#: src/postulo/templates/documents/themes/base_list.html
 msgid "Nothing matches."
 msgstr "Нищо не съвпада."
 
@@ -11685,6 +11789,10 @@ msgstr "Още нищо. Място се запомня, когато попра
 #: src/postulo/jobs/vcards.py
 msgid "Nothing: an earlier card in this file is the same one."
 msgstr "Нищо: по-ранна карта в този файл е същата."
+
+#: src/postulo/templates/core/table_export.html
+msgid "Nothing: every row."
+msgstr ""
 
 #: src/postulo/jobs/vcards.py
 msgid "Nothing: the card has no name."
@@ -12371,6 +12479,10 @@ msgstr ""
 msgid "order"
 msgstr "поредност"
 
+#: src/postulo/templates/core/table_export.html
+msgid "Order"
+msgstr ""
+
 #: src/postulo/templates/server/design.html
 msgid "Ordinary text, which most of the interface is."
 msgstr "Обикновен текст, какъвто е по-голямата част от интерфейса."
@@ -12571,6 +12683,7 @@ msgstr ""
 
 #: src/postulo/documents/forms.py
 #: src/postulo/templates/applications/report.html
+#: src/postulo/templates/core/table_export.html
 #: src/postulo/templates/settings/export.html
 msgid "Paper"
 msgstr ""
@@ -13389,10 +13502,15 @@ msgstr "Награди, стипендии и отличия: признание
 msgid "Proceedings"
 msgstr "Сборник с доклади"
 
+#: src/postulo/templates/documents/themes/base_list.html
+msgid "Produced by Postulo from this person's own records."
+msgstr ""
+
 #: src/postulo/templates/documents/themes/base_report.html
 msgid "Produced by Postulo from this person's own records. Postulo sets no target: how many applications a period should hold is a benefit regime's rule or the person's own."
 msgstr "Изготвено от Postulo от собствените записи на този човек. Postulo не поставя никаква цел: колко кандидатури трябва да съдържа един период е правило на системата за обезщетения или на самия човек."
 
+#: src/postulo/templates/documents/themes/base_list.html
 #: src/postulo/templates/documents/themes/base_report.html
 #, python-format
 msgid "Produced on %(produced)s"
@@ -14624,7 +14742,7 @@ msgstr "обхвати"
 msgid "Screening"
 msgstr "Предварителен подбор"
 
-#: src/postulo/templates/core/search.html
+#: src/postulo/core/tables.py src/postulo/templates/core/search.html
 #: src/postulo/templates/cotton/site_search.html
 #: src/postulo/templates/jobs/industry_list.html
 msgid "Search"
@@ -15110,7 +15228,7 @@ msgstr "Кратък списък"
 msgid "Shortlist them"
 msgstr "Добавяне в краткия списък"
 
-#: src/postulo/jobs/listing_views.py src/postulo/jobs/models.py
+#: src/postulo/jobs/models.py src/postulo/jobs/tables.py
 msgid "Shortlisted"
 msgstr "В краткия списък"
 
@@ -15215,6 +15333,7 @@ msgstr "Да се покаже ли този адрес на картата?"
 msgid "Show this period"
 msgstr "Показване на този период"
 
+#: src/postulo/jobs/tables.py
 #: src/postulo/templates/jobs/partials/whose_form.html
 #, fuzzy
 msgid "Showing"
@@ -15580,6 +15699,16 @@ msgstr "Подреждане по %(column)s, в низходящ ред"
 #, python-format
 msgid "Sort by %(column)s, lowest first"
 msgstr "Подреждане по %(column)s, във възходящ ред"
+
+#: src/postulo/core/tables.py
+#, python-format
+msgid "Sorted by %(column)s, highest first"
+msgstr ""
+
+#: src/postulo/core/tables.py
+#, python-format
+msgid "Sorted by %(column)s, lowest first"
+msgstr ""
 
 #: src/postulo/jobs/models.py src/postulo/resume/models.py
 msgid "source"
@@ -17121,6 +17250,10 @@ msgstr "Копието не можа да бъде изпратено; доку�
 msgid "The credit the tiles' licence asks for, drawn on the map as plain text. For example: © OpenStreetMap contributors"
 msgstr "Указанието за авторство, което изисква лицензът на плочките, показано на картата като обикновен текст. Например: © OpenStreetMap contributors"
 
+#: src/postulo/templates/core/table_export.html
+msgid "The CSV is the same rows in the same language, for a spreadsheet; the theme and the paper are for the PDF."
+msgstr ""
+
 #: src/postulo/templates/settings/appearance.html
 msgid "The dashboard lists open applications nothing has happened to for a while, with nothing planned. Recruiters' own advice clusters around two to three weeks."
 msgstr "Таблото за управление изброява отворени кандидатури, с които от известно време нищо не се е случило и нищо не е планирано. Самите рекрутери най-често съветват да се изчакат две до три седмици."
@@ -17357,6 +17490,11 @@ msgid "The first %(count)s is read, and the rest are not."
 msgid_plural "The first %(count)s are read, and the rest are not."
 msgstr[0] "Прочита се първият %(count)s, останалите — не."
 msgstr[1] "Прочитат се първите %(count)s, останалите — не."
+
+#: src/postulo/templates/documents/themes/base_list.html
+#, python-format
+msgid "The first %(count)s of %(total)s rows; the rest are in the table."
+msgstr ""
 
 #: src/postulo/templates/documents/cv_form.html
 msgid "The first choice in each list follows your details: mark another number as primary there and this CV prints it. One you choose here stays, whatever becomes primary. If you later delete it from your details, this CV prints none of that kind until you choose again, and never another in its place. What you have already sent does not change."
@@ -18269,6 +18407,7 @@ msgid "theme"
 msgstr "тема"
 
 #: src/postulo/templates/applications/report.html
+#: src/postulo/templates/core/table_export.html
 msgid "Theme"
 msgstr ""
 
@@ -19032,7 +19171,7 @@ msgstr "да бъде изпратено от %(name)s"
 msgid "to be sent by the referee"
 msgstr "да бъде изпратено от препоръчителя"
 
-#: src/postulo/jobs/listing_views.py
+#: src/postulo/jobs/tables.py
 msgid "To decide"
 msgstr "За решаване"
 
@@ -19324,6 +19463,11 @@ msgstr "Непубликувано"
 #: src/postulo/resume/models.py
 msgid "until"
 msgstr "до"
+
+#: src/postulo/core/tables.py
+#, python-format
+msgid "until %(end)s"
+msgstr ""
 
 #: src/postulo/resume/models.py
 #, python-format
@@ -19972,6 +20116,10 @@ msgstr "В каква област е, когато името на квалиф
 msgid "What it was. Another capture of the same advert is added from the review screen, so it is not offered here."
 msgstr "Какво е било. Друго прихващане на същата обява се добавя от екрана за преглед, затова не се предлага тук."
 
+#: src/postulo/templates/core/table_export.html
+msgid "What it will hold"
+msgstr ""
+
 #: src/postulo/templates/jobs/merge.html
 msgid "What moves"
 msgstr "Какво се премества"
@@ -20584,6 +20732,10 @@ msgstr "С кого се срещате. Предлагат се записан�
 #: src/postulo/applications/forms.py
 msgid "Whoever put you forward, from the people you have recorded — at this company, at another, or at none. The figures count what each referrer led to."
 msgstr "Който и да ви е препоръчал, от записаните от вас хора — в тази компания, в друга или в никоя. Числата отчитат до какво е довел всеки препоръчител."
+
+#: src/postulo/jobs/tables.py
+msgid "Whose"
+msgstr ""
 
 #: src/postulo/templates/partials/import_owner.html
 msgid "Whose they become"

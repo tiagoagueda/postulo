@@ -549,6 +549,7 @@ msgstr[0] "%(counter)s vaš zapis dijeli se s drugima: oni zadržavaju kopiju on
 msgstr[1] "%(counter)s vaša zapisa dijele se s drugima: oni zadržavaju kopiju onoga što je potrebno njihovim vlastitim zapisima i dobijaju obavještenje da ih više nema."
 msgstr[2] "%(counter)s vaših zapisa dijeli se s drugima: oni zadržavaju kopiju onoga što je potrebno njihovim vlastitim zapisima i dobijaju obavještenje da ih više nema."
 
+#: src/postulo/jobs/tables.py
 #: src/postulo/templates/jobs/partials/company_row.html
 #, python-format
 msgid "%(counter)s open listing"
@@ -869,6 +870,16 @@ msgstr "%(language)s: %(fields)s"
 #, python-format
 msgid "%(later)s must be after %(earlier)s."
 msgstr "%(later)s mora biti nakon %(earlier)s."
+
+#: src/postulo/core/tables.py
+#, python-format
+msgid "%(least)s to %(most)s"
+msgstr ""
+
+#: src/postulo/core/list_export.py
+#, python-format
+msgid "%(list)s · %(date)s"
+msgstr ""
 
 #: src/postulo/jobs/models.py
 #, python-format
@@ -1603,6 +1614,22 @@ msgstr[0] "%(total)s zapis je u datoteci."
 msgstr[1] "%(total)s zapisa su u datoteci."
 msgstr[2] "%(total)s zapisa je u datoteci."
 
+#: src/postulo/templates/documents/themes/base_list.html
+#, python-format
+msgid "%(total)s row"
+msgid_plural "%(total)s rows"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+
+#: src/postulo/templates/core/table_export.html
+#, python-format
+msgid "%(total)s row matches."
+msgid_plural "%(total)s rows match."
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+
 #: src/postulo/jobs/vcards.py
 #, python-format
 msgid "%(total)s telephone number"
@@ -2027,6 +2054,11 @@ msgstr "Cron red na hostu i dalje radi na isti način i opisan je na wiki strani
 msgid "A CSV file"
 msgstr "CSV datoteka"
 
+#: src/postulo/templates/core/table_export.html
+#, python-format
+msgid "A CSV holds the first %(limit)s."
+msgstr ""
+
 #: src/postulo/documents/forms.py
 msgid "A CV leads with a career, a portfolio with work. It decides which themes are offered below."
 msgstr "CV počinje karijerom, a portfolio radovima. To određuje koje se teme nude ispod."
@@ -2416,6 +2448,11 @@ msgstr "Lozinka ili lozinka aplikacije"
 #: src/postulo/documents/integrity.py
 msgid "a PDF"
 msgstr "PDF"
+
+#: src/postulo/templates/core/table_export.html
+#, python-format
+msgid "A PDF holds the first %(limit)s of them and says so."
+msgstr ""
 
 #: src/postulo/templates/server/design.html
 msgid "A person, a company or a plugin, as initials on a colour until there is a picture."
@@ -3800,8 +3837,8 @@ msgid "Applications, with their timelines"
 msgstr "Prijave, s njihovim vremenskim linijama"
 
 #: src/postulo/applications/analytics.py src/postulo/applications/models.py
-#: src/postulo/applications/tables.py src/postulo/jobs/listing_views.py
-#: src/postulo/jobs/models.py src/postulo/templates/core/import_csv_map.html
+#: src/postulo/applications/tables.py src/postulo/jobs/models.py
+#: src/postulo/jobs/tables.py src/postulo/templates/core/import_csv_map.html
 msgid "Applied"
 msgstr "Prijavljeno"
 
@@ -3943,6 +3980,10 @@ msgstr "Onako kako bi ga CV trebao ispisati. Naziv koji je vještina u klasifika
 msgid "As a CV should print it. It is linked to the company of that name among yours, and added to your companies if there is none."
 msgstr "Onako kako bi to CV trebao ispisati. Povezuje se s istoimenom kompanijom među vašima, a dodaje se vašim kompanijama ako takve nema."
 
+#: src/postulo/templates/core/table_export.html
+msgid "As a document"
+msgstr ""
+
 #: src/postulo/templates/documents/letter_detail.html
 msgid "As a file"
 msgstr "Kao datoteka"
@@ -3971,6 +4012,7 @@ msgstr "na dan"
 msgid "As of"
 msgstr "Na dan"
 
+#: src/postulo/jobs/tables.py
 #: src/postulo/templates/jobs/partials/company_row.html
 #: src/postulo/templates/jobs/partials/company_status.html
 #, python-format
@@ -4049,6 +4091,11 @@ msgstr "u"
 msgid "at least"
 msgstr "najmanje"
 
+#: src/postulo/core/tables.py
+#, python-format
+msgid "at least %(least)s"
+msgstr ""
+
 #: src/postulo/core/server_forms.py
 msgid "At least one language has to be offered, or nobody can read anything."
 msgstr "Mora se nuditi barem jedan jezik, inače niko ništa ne može pročitati."
@@ -4056,6 +4103,11 @@ msgstr "Mora se nuditi barem jedan jezik, inače niko ništa ne može pročitati
 #: src/postulo/templates/cotton/table/filter.html
 msgid "at most"
 msgstr "najviše"
+
+#: src/postulo/core/tables.py
+#, python-format
+msgid "at most %(most)s"
+msgstr ""
 
 #: src/postulo/accounts/forms.py
 msgid "Atlantic Ocean"
@@ -4210,6 +4262,10 @@ msgstr "Nazad na oglas koji je nastao iz ovog hvatanja"
 #: src/postulo/templates/core/dashboard.html
 msgid "Back to the standard arrangement"
 msgstr "Nazad na standardni raspored"
+
+#: src/postulo/templates/core/table_export.html
+msgid "Back to the table, to change any of this"
+msgstr ""
 
 #: src/postulo/core/views_tables.py
 msgid "Back to the usual columns."
@@ -5099,7 +5155,7 @@ msgstr "Zatvori"
 msgid "Close search"
 msgstr "Zatvori pretragu"
 
-#: src/postulo/jobs/listing_views.py src/postulo/jobs/models.py
+#: src/postulo/jobs/models.py src/postulo/jobs/tables.py
 msgid "Closed"
 msgstr "Zatvoreno"
 
@@ -5186,6 +5242,7 @@ msgstr "boja"
 msgid "Column in the file"
 msgstr "Kolona u datoteci"
 
+#: src/postulo/templates/core/table_export.html
 #: src/postulo/templates/partials/table/columns.html
 msgid "Columns"
 msgstr "Kolone"
@@ -6165,7 +6222,7 @@ msgstr "Odbaci ih"
 msgid "Discard this capture"
 msgstr "Odbaci ovaj uhvaćeni oglas"
 
-#: src/postulo/jobs/listing_views.py src/postulo/jobs/models.py
+#: src/postulo/jobs/models.py src/postulo/jobs/tables.py
 #: src/postulo/templates/jobs/capture_list.html
 msgid "Discarded"
 msgstr "Odbačeno"
@@ -6301,6 +6358,7 @@ msgid "Download companies.geojson"
 msgstr "Preuzmi companies.geojson"
 
 #: src/postulo/templates/applications/report.html
+#: src/postulo/templates/core/table_export.html
 msgid "Download CSV"
 msgstr "Preuzmi CSV"
 
@@ -6321,6 +6379,10 @@ msgstr "Preuzmi"
 #: src/postulo/templates/jobs/capture_page.html
 msgid "Download it as text"
 msgstr "Preuzmi kao tekst"
+
+#: src/postulo/templates/core/table_export.html
+msgid "Download PDF"
+msgstr ""
 
 #: src/postulo/templates/core/kind_file.html
 #: src/postulo/templates/resume/candidate_file.html
@@ -6850,6 +6912,10 @@ msgstr "Svaki oglas koji ste primijetili, dok ne odlučite: stavite ga u uži iz
 msgid "Every role you have held. Write the highlights once; tailor them per CV later."
 msgstr "Svako radno mjesto koje ste imali. Ono najvažnije napišite jednom; kasnije to prilagodite za svaki CV."
 
+#: src/postulo/templates/core/table_export.html
+msgid "Every row of the table as it is now, not only the page on screen: your columns in your order, with its filters and its sort. Downloaded, and not kept in Postulo."
+msgstr ""
+
 #: src/postulo/templates/server/design.html
 msgid "Every step derived from one radius, so there is one number to change."
 msgstr "Svaki korak izveden je iz jednog radijusa, pa treba promijeniti samo jedan broj."
@@ -6882,7 +6948,7 @@ msgstr "Svačije"
 msgid "Everybody's, as an administrator"
 msgstr "Svačije, kao administrator"
 
-#: src/postulo/jobs/listing_views.py src/postulo/templates/server/logs.html
+#: src/postulo/jobs/tables.py src/postulo/templates/server/logs.html
 msgid "Everything"
 msgstr "Sve"
 
@@ -7008,9 +7074,15 @@ msgstr "Objasniti šta je pošlo po zlu često znači reći na koju se vezu, koj
 #: src/postulo/templates/cotton/transfer_group.html
 #: src/postulo/templates/jobs/company_detail.html
 #: src/postulo/templates/jobs/company_places.html
+#: src/postulo/templates/partials/table/export.html
 #: src/postulo/templates/settings/export.html
 msgid "Export"
 msgstr "Izvezi"
+
+#: src/postulo/templates/core/table_export.html
+#, python-format
+msgid "Export %(list)s"
+msgstr ""
 
 #: src/postulo/core/models.py
 msgid "export archive"
@@ -7527,6 +7599,16 @@ msgstr "Od %(name)s."
 msgid "From %(register)s"
 msgstr ""
 
+#: src/postulo/core/tables.py
+#, python-format
+msgid "from %(start)s"
+msgstr ""
+
+#: src/postulo/core/tables.py
+#, python-format
+msgid "from %(start)s to %(end)s"
+msgstr ""
+
 #: src/postulo/templates/cotton/date_picker.html
 #, python-format
 msgid "From %(start)s to %(end)s"
@@ -7828,6 +7910,10 @@ msgstr "Bruto, prije poreza. Dovoljna je i samo jedna granica — većina oglasa
 #: src/postulo/templates/server/plugin_access.html
 msgid "group"
 msgstr "grupa"
+
+#: src/postulo/jobs/tables.py
+msgid "Group"
+msgstr ""
 
 #: src/postulo/core/views_access.py
 msgid "Group deleted."
@@ -9313,6 +9399,10 @@ msgstr "jezik nije naveden"
 msgid "language of exported files"
 msgstr ""
 
+#: src/postulo/templates/core/table_export.html
+msgid "Language of the document"
+msgstr ""
+
 #: src/postulo/templates/applications/report.html
 msgid "Language of the report"
 msgstr ""
@@ -9572,6 +9662,12 @@ msgstr "Ako ostane prazno, vaši CV-ovi ispisuju „%(place)s“: mjesto i drža
 msgid "Left empty it is today. Capturing a posting you applied to last week is common."
 msgstr "Ako se ostavi prazno, uzima se današnji dan. Uobičajeno je hvatati oglas na koji ste se prijavili prošle sedmice."
 
+#: src/postulo/templates/core/table_export.html
+#: src/postulo/templates/documents/themes/base_list.html
+#, python-format
+msgid "Left out, because they hold nothing to write: %(columns)s."
+msgstr ""
+
 #: src/postulo/jobs/industries.py
 msgid "Legal"
 msgstr "Pravo"
@@ -9740,6 +9836,10 @@ msgstr "Linkovi na mjesta kojima se potraga za poslom vraća: tabla, CV-ovi, kom
 #: src/postulo/templates/documents/application_documents.html
 msgid "Links you pointed them at"
 msgstr "Linkovi na koje ste ih uputili"
+
+#: src/postulo/documents/themes.py
+msgid "List"
+msgstr ""
 
 #: src/postulo/resume/views.py
 msgid "listening"
@@ -10469,6 +10569,11 @@ msgstr "Suzi"
 #: src/postulo/templates/partials/table/views.html
 msgid "Narrow and sort the table the way you want it, then keep it under a name."
 msgstr "Suzite i sortirajte tabelu kako želite, a zatim je sačuvajte pod nekim nazivom."
+
+#: src/postulo/templates/core/table_export.html
+#: src/postulo/templates/documents/themes/base_list.html
+msgid "Narrowed by"
+msgstr ""
 
 #: src/postulo/resume/forms.py
 msgid "National letters or classes the list lacks, as the licence prints them. A CV prints them after the codes."
@@ -11568,6 +11673,7 @@ msgid "Nothing matches “%(term)s”"
 msgstr "Ništa ne odgovara upitu „%(term)s“"
 
 #: src/postulo/templates/base.html
+#: src/postulo/templates/documents/themes/base_list.html
 msgid "Nothing matches."
 msgstr "Ništa ne odgovara."
 
@@ -11786,6 +11892,10 @@ msgstr "Još ništa. Mjesto se pamti kad ispravite polje pri pregledu, a vrijedn
 #: src/postulo/jobs/vcards.py
 msgid "Nothing: an earlier card in this file is the same one."
 msgstr "Ništa: ranija kartica u ovoj datoteci je ista."
+
+#: src/postulo/templates/core/table_export.html
+msgid "Nothing: every row."
+msgstr ""
 
 #: src/postulo/jobs/vcards.py
 msgid "Nothing: the card has no name."
@@ -12489,6 +12599,10 @@ msgstr ""
 msgid "order"
 msgstr "redoslijed"
 
+#: src/postulo/templates/core/table_export.html
+msgid "Order"
+msgstr ""
+
 #: src/postulo/templates/server/design.html
 msgid "Ordinary text, which most of the interface is."
 msgstr "Običan tekst, od kojeg je napravljen veći dio sučelja."
@@ -12691,6 +12805,7 @@ msgstr ""
 
 #: src/postulo/documents/forms.py
 #: src/postulo/templates/applications/report.html
+#: src/postulo/templates/core/table_export.html
 #: src/postulo/templates/settings/export.html
 msgid "Paper"
 msgstr ""
@@ -13508,10 +13623,15 @@ msgstr "Nagrade, stipendije i odlikovanja: priznanja koja vam je neko dodijelio.
 msgid "Proceedings"
 msgstr "Zbornik radova"
 
+#: src/postulo/templates/documents/themes/base_list.html
+msgid "Produced by Postulo from this person's own records."
+msgstr ""
+
 #: src/postulo/templates/documents/themes/base_report.html
 msgid "Produced by Postulo from this person's own records. Postulo sets no target: how many applications a period should hold is a benefit regime's rule or the person's own."
 msgstr "Izradio Postulo iz vlastitih zapisa ove osobe. Postulo ne postavlja nikakav cilj: koliko prijava period treba da sadrži pravilo je sistema naknada ili same osobe."
 
+#: src/postulo/templates/documents/themes/base_list.html
 #: src/postulo/templates/documents/themes/base_report.html
 #, python-format
 msgid "Produced on %(produced)s"
@@ -14746,7 +14866,7 @@ msgstr "opsezi"
 msgid "Screening"
 msgstr "Predselekcija"
 
-#: src/postulo/templates/core/search.html
+#: src/postulo/core/tables.py src/postulo/templates/core/search.html
 #: src/postulo/templates/cotton/site_search.html
 #: src/postulo/templates/jobs/industry_list.html
 msgid "Search"
@@ -15232,7 +15352,7 @@ msgstr "Stavi u uži izbor"
 msgid "Shortlist them"
 msgstr "Uvrsti ih u uži izbor"
 
-#: src/postulo/jobs/listing_views.py src/postulo/jobs/models.py
+#: src/postulo/jobs/models.py src/postulo/jobs/tables.py
 msgid "Shortlisted"
 msgstr "U užem izboru"
 
@@ -15337,6 +15457,7 @@ msgstr "Prikazati ovu adresu na mapi?"
 msgid "Show this period"
 msgstr "Prikaži ovaj period"
 
+#: src/postulo/jobs/tables.py
 #: src/postulo/templates/jobs/partials/whose_form.html
 msgid "Showing"
 msgstr "Prikazano"
@@ -15702,6 +15823,16 @@ msgstr "Sortiraj po koloni %(column)s, od najveće vrijednosti"
 #, python-format
 msgid "Sort by %(column)s, lowest first"
 msgstr "Sortiraj po koloni %(column)s, od najmanje vrijednosti"
+
+#: src/postulo/core/tables.py
+#, python-format
+msgid "Sorted by %(column)s, highest first"
+msgstr ""
+
+#: src/postulo/core/tables.py
+#, python-format
+msgid "Sorted by %(column)s, lowest first"
+msgstr ""
 
 #: src/postulo/jobs/models.py src/postulo/resume/models.py
 msgid "source"
@@ -17257,6 +17388,10 @@ msgstr "Kopija se nije mogla poslati; dokument kaže zašto."
 msgid "The credit the tiles' licence asks for, drawn on the map as plain text. For example: © OpenStreetMap contributors"
 msgstr "Navođenje izvora koje zahtijeva licenca pločica, ispisano na mapi kao običan tekst. Na primjer: © OpenStreetMap contributors"
 
+#: src/postulo/templates/core/table_export.html
+msgid "The CSV is the same rows in the same language, for a spreadsheet; the theme and the paper are for the PDF."
+msgstr ""
+
 #: src/postulo/templates/settings/appearance.html
 msgid "The dashboard lists open applications nothing has happened to for a while, with nothing planned. Recruiters' own advice clusters around two to three weeks."
 msgstr "Pregled navodi otvorene prijave u kojima se već neko vrijeme ništa nije desilo, bez ičega planiranog. Savjeti samih regrutera okupljaju se oko dvije do tri sedmice."
@@ -17496,6 +17631,11 @@ msgid_plural "The first %(count)s are read, and the rest are not."
 msgstr[0] "Čita se prvi %(count)s, a ostali ne."
 msgstr[1] "Čitaju se prva %(count)s, a ostali ne."
 msgstr[2] "Čita se prvih %(count)s, a ostali ne."
+
+#: src/postulo/templates/documents/themes/base_list.html
+#, python-format
+msgid "The first %(count)s of %(total)s rows; the rest are in the table."
+msgstr ""
 
 #: src/postulo/templates/documents/cv_form.html
 msgid "The first choice in each list follows your details: mark another number as primary there and this CV prints it. One you choose here stays, whatever becomes primary. If you later delete it from your details, this CV prints none of that kind until you choose again, and never another in its place. What you have already sent does not change."
@@ -18414,6 +18554,7 @@ msgid "theme"
 msgstr "tema"
 
 #: src/postulo/templates/applications/report.html
+#: src/postulo/templates/core/table_export.html
 msgid "Theme"
 msgstr ""
 
@@ -19185,7 +19326,7 @@ msgstr "šalje %(name)s"
 msgid "to be sent by the referee"
 msgstr "šalje osoba za preporuku"
 
-#: src/postulo/jobs/listing_views.py
+#: src/postulo/jobs/tables.py
 msgid "To decide"
 msgstr "Za odluku"
 
@@ -19481,6 +19622,11 @@ msgstr "Neobjavljeno"
 #: src/postulo/resume/models.py
 msgid "until"
 msgstr "do"
+
+#: src/postulo/core/tables.py
+#, python-format
+msgid "until %(end)s"
+msgstr ""
 
 #: src/postulo/resume/models.py
 #, python-format
@@ -20133,6 +20279,10 @@ msgstr "Iz čega je bila, tamo gdje naziv kvalifikacije to ne kaže."
 msgid "What it was. Another capture of the same advert is added from the review screen, so it is not offered here."
 msgstr "Šta je to bilo. Drugo hvatanje istog oglasa dodaje se s ekrana pregleda, pa se ovdje ne nudi."
 
+#: src/postulo/templates/core/table_export.html
+msgid "What it will hold"
+msgstr ""
+
 #: src/postulo/templates/jobs/merge.html
 msgid "What moves"
 msgstr "Šta se premješta"
@@ -20744,6 +20894,10 @@ msgstr "S kim se sastajete. Nude se ljudi koje ste zabilježili u ovoj kompaniji
 #: src/postulo/applications/forms.py
 msgid "Whoever put you forward, from the people you have recorded — at this company, at another, or at none. The figures count what each referrer led to."
 msgstr "Ko vas je preporučio, od ljudi koje ste zabilježili — u ovoj kompaniji, u drugoj ili ni u jednoj. Brojke pokazuju do čega je dovela svaka preporuka."
+
+#: src/postulo/jobs/tables.py
+msgid "Whose"
+msgstr ""
 
 #: src/postulo/templates/partials/import_owner.html
 msgid "Whose they become"

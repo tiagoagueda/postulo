@@ -486,6 +486,7 @@ msgid_plural "%(counter)s of your records are shared with others: they keep a co
 msgstr[0] "%(counter)s van uw items wordt met anderen gedeeld: zij bewaren een kopie van wat hun eigen items nodig hebben, en krijgen te horen dat het weg is."
 msgstr[1] "%(counter)s van uw items worden met anderen gedeeld: zij bewaren een kopie van wat hun eigen items nodig hebben, en krijgen te horen dat ze weg zijn."
 
+#: src/postulo/jobs/tables.py
 #: src/postulo/templates/jobs/partials/company_row.html
 #, python-format
 msgid "%(counter)s open listing"
@@ -794,6 +795,16 @@ msgstr "%(language)s: %(fields)s"
 #, python-format
 msgid "%(later)s must be after %(earlier)s."
 msgstr "%(later)s moet na %(earlier)s liggen."
+
+#: src/postulo/core/tables.py
+#, python-format
+msgid "%(least)s to %(most)s"
+msgstr ""
+
+#: src/postulo/core/list_export.py
+#, python-format
+msgid "%(list)s · %(date)s"
+msgstr ""
 
 #: src/postulo/jobs/models.py
 #, python-format
@@ -1509,6 +1520,20 @@ msgid_plural "%(total)s records are in the file."
 msgstr[0] "Er staat %(total)s item in het bestand."
 msgstr[1] "Er staan %(total)s items in het bestand."
 
+#: src/postulo/templates/documents/themes/base_list.html
+#, python-format
+msgid "%(total)s row"
+msgid_plural "%(total)s rows"
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/postulo/templates/core/table_export.html
+#, python-format
+msgid "%(total)s row matches."
+msgid_plural "%(total)s rows match."
+msgstr[0] ""
+msgstr[1] ""
+
 #: src/postulo/jobs/vcards.py
 #, python-format
 msgid "%(total)s telephone number"
@@ -1932,6 +1957,11 @@ msgstr "Een cronregel op de host werkt nog steeds op dezelfde manier en wordt be
 msgid "A CSV file"
 msgstr "Een CSV-bestand"
 
+#: src/postulo/templates/core/table_export.html
+#, python-format
+msgid "A CSV holds the first %(limit)s."
+msgstr ""
+
 #: src/postulo/documents/forms.py
 msgid "A CV leads with a career, a portfolio with work. It decides which themes are offered below."
 msgstr "Een cv begint met een loopbaan, een portfolio met werk. Het bepaalt welke thema’s hieronder worden aangeboden."
@@ -2320,6 +2350,11 @@ msgstr "Een wachtwoord, of een app-wachtwoord"
 #: src/postulo/documents/integrity.py
 msgid "a PDF"
 msgstr "een pdf"
+
+#: src/postulo/templates/core/table_export.html
+#, python-format
+msgid "A PDF holds the first %(limit)s of them and says so."
+msgstr ""
 
 #: src/postulo/templates/server/design.html
 msgid "A person, a company or a plugin, as initials on a colour until there is a picture."
@@ -3691,8 +3726,8 @@ msgid "Applications, with their timelines"
 msgstr "Sollicitaties, met hun tijdlijnen"
 
 #: src/postulo/applications/analytics.py src/postulo/applications/models.py
-#: src/postulo/applications/tables.py src/postulo/jobs/listing_views.py
-#: src/postulo/jobs/models.py src/postulo/templates/core/import_csv_map.html
+#: src/postulo/applications/tables.py src/postulo/jobs/models.py
+#: src/postulo/jobs/tables.py src/postulo/templates/core/import_csv_map.html
 msgid "Applied"
 msgstr "Gesolliciteerd"
 
@@ -3832,6 +3867,10 @@ msgstr "Zoals een cv het moet afdrukken. Een naam die een vaardigheid in de ESCO
 msgid "As a CV should print it. It is linked to the company of that name among yours, and added to your companies if there is none."
 msgstr "Zoals een cv het moet afdrukken. Het wordt gekoppeld aan het bedrijf met die naam onder uw bedrijven, en aan uw bedrijven toegevoegd als dat er niet is."
 
+#: src/postulo/templates/core/table_export.html
+msgid "As a document"
+msgstr ""
+
 #: src/postulo/templates/documents/letter_detail.html
 msgid "As a file"
 msgstr "Als bestand"
@@ -3862,6 +3901,7 @@ msgstr "per"
 msgid "As of"
 msgstr "Per"
 
+#: src/postulo/jobs/tables.py
 #: src/postulo/templates/jobs/partials/company_row.html
 #: src/postulo/templates/jobs/partials/company_status.html
 #, fuzzy, python-format
@@ -3938,6 +3978,11 @@ msgstr "bij"
 msgid "at least"
 msgstr "minstens"
 
+#: src/postulo/core/tables.py
+#, python-format
+msgid "at least %(least)s"
+msgstr ""
+
 #: src/postulo/core/server_forms.py
 msgid "At least one language has to be offered, or nobody can read anything."
 msgstr "Er moet minstens één taal worden aangeboden, anders kan niemand iets lezen."
@@ -3945,6 +3990,11 @@ msgstr "Er moet minstens één taal worden aangeboden, anders kan niemand iets l
 #: src/postulo/templates/cotton/table/filter.html
 msgid "at most"
 msgstr "hooguit"
+
+#: src/postulo/core/tables.py
+#, python-format
+msgid "at most %(most)s"
+msgstr ""
 
 #: src/postulo/accounts/forms.py
 msgid "Atlantic Ocean"
@@ -4097,6 +4147,10 @@ msgstr "Terug naar de vacature die van deze vastlegging is gemaakt"
 #: src/postulo/templates/core/dashboard.html
 msgid "Back to the standard arrangement"
 msgstr "Terug naar de standaardindeling"
+
+#: src/postulo/templates/core/table_export.html
+msgid "Back to the table, to change any of this"
+msgstr ""
 
 #: src/postulo/core/views_tables.py
 msgid "Back to the usual columns."
@@ -4980,7 +5034,7 @@ msgstr "Sluiten"
 msgid "Close search"
 msgstr "Zoeken sluiten"
 
-#: src/postulo/jobs/listing_views.py src/postulo/jobs/models.py
+#: src/postulo/jobs/models.py src/postulo/jobs/tables.py
 msgid "Closed"
 msgstr "Gesloten"
 
@@ -5067,6 +5121,7 @@ msgstr "kleur"
 msgid "Column in the file"
 msgstr "Kolom in het bestand"
 
+#: src/postulo/templates/core/table_export.html
 #: src/postulo/templates/partials/table/columns.html
 msgid "Columns"
 msgstr "Kolommen"
@@ -6042,7 +6097,7 @@ msgstr "Verwerpen"
 msgid "Discard this capture"
 msgstr "Deze vastlegging verwerpen"
 
-#: src/postulo/jobs/listing_views.py src/postulo/jobs/models.py
+#: src/postulo/jobs/models.py src/postulo/jobs/tables.py
 #: src/postulo/templates/jobs/capture_list.html
 msgid "Discarded"
 msgstr "Verworpen"
@@ -6181,6 +6236,7 @@ msgid "Download companies.geojson"
 msgstr "companies.geojson downloaden"
 
 #: src/postulo/templates/applications/report.html
+#: src/postulo/templates/core/table_export.html
 msgid "Download CSV"
 msgstr "CSV downloaden"
 
@@ -6200,6 +6256,10 @@ msgstr "Downloaden"
 #: src/postulo/templates/jobs/capture_page.html
 msgid "Download it as text"
 msgstr "Downloaden als tekst"
+
+#: src/postulo/templates/core/table_export.html
+msgid "Download PDF"
+msgstr ""
 
 #: src/postulo/templates/core/kind_file.html
 #: src/postulo/templates/resume/candidate_file.html
@@ -6731,6 +6791,10 @@ msgstr "Elke vacature die u hebt opgemerkt, totdat u beslist: op de shortlist ze
 msgid "Every role you have held. Write the highlights once; tailor them per CV later."
 msgstr "Elke functie die u hebt vervuld. Schrijf de hoogtepunten één keer op; stem ze later per cv af."
 
+#: src/postulo/templates/core/table_export.html
+msgid "Every row of the table as it is now, not only the page on screen: your columns in your order, with its filters and its sort. Downloaded, and not kept in Postulo."
+msgstr ""
+
 #: src/postulo/templates/server/design.html
 msgid "Every step derived from one radius, so there is one number to change."
 msgstr "Elke stap is afgeleid van één straal, dus er is één getal om te wijzigen."
@@ -6763,7 +6827,7 @@ msgstr "Van iedereen"
 msgid "Everybody's, as an administrator"
 msgstr "Van iedereen, als beheerder"
 
-#: src/postulo/jobs/listing_views.py src/postulo/templates/server/logs.html
+#: src/postulo/jobs/tables.py src/postulo/templates/server/logs.html
 msgid "Everything"
 msgstr "Alles"
 
@@ -6890,9 +6954,15 @@ msgstr "Uitleggen wat er misging, betekent vaak zeggen bij welke koppeling, welk
 #: src/postulo/templates/cotton/transfer_group.html
 #: src/postulo/templates/jobs/company_detail.html
 #: src/postulo/templates/jobs/company_places.html
+#: src/postulo/templates/partials/table/export.html
 #: src/postulo/templates/settings/export.html
 msgid "Export"
 msgstr "Exporteren"
+
+#: src/postulo/templates/core/table_export.html
+#, python-format
+msgid "Export %(list)s"
+msgstr ""
 
 #: src/postulo/core/models.py
 msgid "export archive"
@@ -7408,6 +7478,16 @@ msgstr "Van %(name)s."
 msgid "From %(register)s"
 msgstr ""
 
+#: src/postulo/core/tables.py
+#, python-format
+msgid "from %(start)s"
+msgstr ""
+
+#: src/postulo/core/tables.py
+#, python-format
+msgid "from %(start)s to %(end)s"
+msgstr ""
+
 #: src/postulo/templates/cotton/date_picker.html
 #, python-format
 msgid "From %(start)s to %(end)s"
@@ -7709,6 +7789,10 @@ msgstr "Bruto, vóór belasting. Eén uiteinde alleen is prima — de meeste vac
 #: src/postulo/templates/server/plugin_access.html
 msgid "group"
 msgstr "groep"
+
+#: src/postulo/jobs/tables.py
+msgid "Group"
+msgstr ""
 
 #: src/postulo/core/views_access.py
 msgid "Group deleted."
@@ -9186,6 +9270,10 @@ msgstr "taal niet opgegeven"
 msgid "language of exported files"
 msgstr ""
 
+#: src/postulo/templates/core/table_export.html
+msgid "Language of the document"
+msgstr ""
+
 #: src/postulo/templates/applications/report.html
 msgid "Language of the report"
 msgstr ""
@@ -9444,6 +9532,12 @@ msgstr "Blijft het leeg, dan drukken uw cv’s “%(place)s” af: de plaats en 
 msgid "Left empty it is today. Capturing a posting you applied to last week is common."
 msgstr "Leeg gelaten is het vandaag. Een vacature vastleggen waarop u vorige week hebt gesolliciteerd, komt vaak voor."
 
+#: src/postulo/templates/core/table_export.html
+#: src/postulo/templates/documents/themes/base_list.html
+#, python-format
+msgid "Left out, because they hold nothing to write: %(columns)s."
+msgstr ""
+
 #: src/postulo/jobs/industries.py
 msgid "Legal"
 msgstr "Juridisch"
@@ -9612,6 +9706,10 @@ msgstr "Links naar de plekken waar een zoektocht steeds naar teruggaat: het bord
 #: src/postulo/templates/documents/application_documents.html
 msgid "Links you pointed them at"
 msgstr "Links waar u ze op wees"
+
+#: src/postulo/documents/themes.py
+msgid "List"
+msgstr ""
 
 #: src/postulo/resume/views.py
 msgid "listening"
@@ -10338,6 +10436,11 @@ msgstr "Smal"
 #: src/postulo/templates/partials/table/views.html
 msgid "Narrow and sort the table the way you want it, then keep it under a name."
 msgstr "Verfijn en sorteer de tabel zoals u wilt en sla haar dan op onder een naam."
+
+#: src/postulo/templates/core/table_export.html
+#: src/postulo/templates/documents/themes/base_list.html
+msgid "Narrowed by"
+msgstr ""
 
 #: src/postulo/resume/forms.py
 msgid "National letters or classes the list lacks, as the licence prints them. A CV prints them after the codes."
@@ -11431,6 +11534,7 @@ msgid "Nothing matches “%(term)s”"
 msgstr "Niets komt overeen met “%(term)s”"
 
 #: src/postulo/templates/base.html
+#: src/postulo/templates/documents/themes/base_list.html
 msgid "Nothing matches."
 msgstr "Niets komt overeen."
 
@@ -11648,6 +11752,10 @@ msgstr "Nog niets. Een plaats wordt onthouden wanneer u bij het controleren een 
 #: src/postulo/jobs/vcards.py
 msgid "Nothing: an earlier card in this file is the same one."
 msgstr "Niets: een eerdere kaart in dit bestand is dezelfde."
+
+#: src/postulo/templates/core/table_export.html
+msgid "Nothing: every row."
+msgstr ""
 
 #: src/postulo/jobs/vcards.py
 msgid "Nothing: the card has no name."
@@ -12334,6 +12442,10 @@ msgstr ""
 msgid "order"
 msgstr "volgorde"
 
+#: src/postulo/templates/core/table_export.html
+msgid "Order"
+msgstr ""
+
 #: src/postulo/templates/server/design.html
 msgid "Ordinary text, which most of the interface is."
 msgstr "Gewone tekst, waaruit het grootste deel van de interface bestaat."
@@ -12535,6 +12647,7 @@ msgstr ""
 
 #: src/postulo/documents/forms.py
 #: src/postulo/templates/applications/report.html
+#: src/postulo/templates/core/table_export.html
 #: src/postulo/templates/settings/export.html
 msgid "Paper"
 msgstr ""
@@ -13347,10 +13460,15 @@ msgstr "Prijzen, beurzen en onderscheidingen: erkenning die iemand u gaf."
 msgid "Proceedings"
 msgstr "Congresbundel"
 
+#: src/postulo/templates/documents/themes/base_list.html
+msgid "Produced by Postulo from this person's own records."
+msgstr ""
+
 #: src/postulo/templates/documents/themes/base_report.html
 msgid "Produced by Postulo from this person's own records. Postulo sets no target: how many applications a period should hold is a benefit regime's rule or the person's own."
 msgstr "Gemaakt door Postulo uit de eigen gegevens van deze persoon. Postulo stelt geen doel: hoeveel sollicitaties een periode moet bevatten, is een regel van een uitkeringsstelsel of van de persoon zelf."
 
+#: src/postulo/templates/documents/themes/base_list.html
 #: src/postulo/templates/documents/themes/base_report.html
 #, python-format
 msgid "Produced on %(produced)s"
@@ -14575,7 +14693,7 @@ msgstr "scopes"
 msgid "Screening"
 msgstr "Screening"
 
-#: src/postulo/templates/core/search.html
+#: src/postulo/core/tables.py src/postulo/templates/core/search.html
 #: src/postulo/templates/cotton/site_search.html
 #: src/postulo/templates/jobs/industry_list.html
 msgid "Search"
@@ -15057,7 +15175,7 @@ msgstr "Shortlist"
 msgid "Shortlist them"
 msgstr "Op de shortlist zetten"
 
-#: src/postulo/jobs/listing_views.py src/postulo/jobs/models.py
+#: src/postulo/jobs/models.py src/postulo/jobs/tables.py
 msgid "Shortlisted"
 msgstr "Op de shortlist"
 
@@ -15162,6 +15280,7 @@ msgstr "Dit adres op de kaart tonen?"
 msgid "Show this period"
 msgstr "Deze periode tonen"
 
+#: src/postulo/jobs/tables.py
 #: src/postulo/templates/jobs/partials/whose_form.html
 #, fuzzy
 msgid "Showing"
@@ -15529,6 +15648,16 @@ msgstr "Sorteren op %(column)s, hoogste eerst"
 #, python-format
 msgid "Sort by %(column)s, lowest first"
 msgstr "Sorteren op %(column)s, laagste eerst"
+
+#: src/postulo/core/tables.py
+#, python-format
+msgid "Sorted by %(column)s, highest first"
+msgstr ""
+
+#: src/postulo/core/tables.py
+#, python-format
+msgid "Sorted by %(column)s, lowest first"
+msgstr ""
 
 #: src/postulo/jobs/models.py src/postulo/resume/models.py
 msgid "source"
@@ -17070,6 +17199,10 @@ msgstr "De kopie kon niet worden verzonden; het document vermeldt waarom."
 msgid "The credit the tiles' licence asks for, drawn on the map as plain text. For example: © OpenStreetMap contributors"
 msgstr "De bronvermelding die de licentie van de tegels vraagt, als platte tekst op de kaart getoond. Bijvoorbeeld: © OpenStreetMap-bijdragers"
 
+#: src/postulo/templates/core/table_export.html
+msgid "The CSV is the same rows in the same language, for a spreadsheet; the theme and the paper are for the PDF."
+msgstr ""
+
 #: src/postulo/templates/settings/appearance.html
 msgid "The dashboard lists open applications nothing has happened to for a while, with nothing planned. Recruiters' own advice clusters around two to three weeks."
 msgstr "Het dashboard toont openstaande sollicitaties waar al een tijd niets mee is gebeurd, zonder dat er iets gepland is. Recruiters zelf adviseren meestal twee à drie weken."
@@ -17305,6 +17438,11 @@ msgid "The first %(count)s is read, and the rest are not."
 msgid_plural "The first %(count)s are read, and the rest are not."
 msgstr[0] "De eerste %(count)s wordt gelezen, de rest niet."
 msgstr[1] "De eerste %(count)s worden gelezen, de rest niet."
+
+#: src/postulo/templates/documents/themes/base_list.html
+#, python-format
+msgid "The first %(count)s of %(total)s rows; the rest are in the table."
+msgstr ""
 
 #: src/postulo/templates/documents/cv_form.html
 msgid "The first choice in each list follows your details: mark another number as primary there and this CV prints it. One you choose here stays, whatever becomes primary. If you later delete it from your details, this CV prints none of that kind until you choose again, and never another in its place. What you have already sent does not change."
@@ -18212,6 +18350,7 @@ msgid "theme"
 msgstr "thema"
 
 #: src/postulo/templates/applications/report.html
+#: src/postulo/templates/core/table_export.html
 msgid "Theme"
 msgstr ""
 
@@ -18979,7 +19118,7 @@ msgstr "te versturen door %(name)s"
 msgid "to be sent by the referee"
 msgstr "te versturen door de referentie"
 
-#: src/postulo/jobs/listing_views.py
+#: src/postulo/jobs/tables.py
 msgid "To decide"
 msgstr "Te beslissen"
 
@@ -19270,6 +19409,11 @@ msgstr "Niet gepubliceerd"
 #: src/postulo/resume/models.py
 msgid "until"
 msgstr "tot"
+
+#: src/postulo/core/tables.py
+#, python-format
+msgid "until %(end)s"
+msgstr ""
 
 #: src/postulo/resume/models.py
 #, python-format
@@ -19914,6 +20058,10 @@ msgstr "Het vakgebied, waar de naam van de kwalificatie dat niet aangeeft."
 msgid "What it was. Another capture of the same advert is added from the review screen, so it is not offered here."
 msgstr "Wat het was. Een andere vastlegging van dezelfde advertentie wordt toegevoegd vanuit het controlescherm, dus ze wordt hier niet aangeboden."
 
+#: src/postulo/templates/core/table_export.html
+msgid "What it will hold"
+msgstr ""
+
 #: src/postulo/templates/jobs/merge.html
 msgid "What moves"
 msgstr "Wat wordt verplaatst"
@@ -20524,6 +20672,10 @@ msgstr "Met wie u een afspraak hebt. De mensen die u bij dit bedrijf hebt vastge
 #: src/postulo/applications/forms.py
 msgid "Whoever put you forward, from the people you have recorded — at this company, at another, or at none. The figures count what each referrer led to."
 msgstr "Wie u heeft aangedragen, uit de personen die u hebt vastgelegd — bij dit bedrijf, bij een ander of bij geen enkel bedrijf. De cijfers tellen waartoe elke doorverwijzer heeft geleid."
+
+#: src/postulo/jobs/tables.py
+msgid "Whose"
+msgstr ""
 
 #: src/postulo/templates/partials/import_owner.html
 msgid "Whose they become"

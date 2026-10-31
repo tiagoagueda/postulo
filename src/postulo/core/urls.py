@@ -8,6 +8,7 @@ from . import (
     views_help,
     views_import,
     views_kind_files,
+    views_list_export,
     views_logs,
     views_metrics,
     views_search,
@@ -68,4 +69,15 @@ urlpatterns = [
     path("import/forget/", views_import.import_csv_forget, name="import_csv_forget"),
     path("tables/<slug:name>/settings/", views_tables.table_settings, name="table_settings"),
     path("tables/<slug:name>/views/", views_tables.table_views, name="table_views"),
+    # A table exported whole, as a themed PDF or a CSV, downloaded and never filed (#341).
+    path(
+        "tables/<slug:name>/export/",
+        views_list_export.TableExportView.as_view(),
+        name="table_export",
+    ),
+    path(
+        "tables/<slug:name>/export/file",
+        views_list_export.TableExportFileView.as_view(),
+        name="table_export_file",
+    ),
 ]

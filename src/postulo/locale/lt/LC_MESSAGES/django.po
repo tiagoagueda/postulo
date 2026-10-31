@@ -549,6 +549,7 @@ msgstr[0] "%(counter)s jūsų įrašu dalijamasi su kitais: jie pasilieka savo �
 msgstr[1] "%(counter)s jūsų įrašais dalijamasi su kitais: jie pasilieka savo įrašams reikalingą kopiją ir gauna pranešimą, kad jų nebėra."
 msgstr[2] "%(counter)s jūsų įrašų dalijamasi su kitais: jie pasilieka savo įrašams reikalingą kopiją ir gauna pranešimą, kad jų nebėra."
 
+#: src/postulo/jobs/tables.py
 #: src/postulo/templates/jobs/partials/company_row.html
 #, python-format
 msgid "%(counter)s open listing"
@@ -869,6 +870,16 @@ msgstr "%(language)s: %(fields)s"
 #, python-format
 msgid "%(later)s must be after %(earlier)s."
 msgstr "%(later)s turi būti vėliau nei %(earlier)s."
+
+#: src/postulo/core/tables.py
+#, python-format
+msgid "%(least)s to %(most)s"
+msgstr ""
+
+#: src/postulo/core/list_export.py
+#, python-format
+msgid "%(list)s · %(date)s"
+msgstr ""
 
 #: src/postulo/jobs/models.py
 #, python-format
@@ -1603,6 +1614,22 @@ msgstr[0] "Faile yra %(total)s įrašas."
 msgstr[1] "Faile yra %(total)s įrašai."
 msgstr[2] "Faile yra %(total)s įrašų."
 
+#: src/postulo/templates/documents/themes/base_list.html
+#, python-format
+msgid "%(total)s row"
+msgid_plural "%(total)s rows"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+
+#: src/postulo/templates/core/table_export.html
+#, python-format
+msgid "%(total)s row matches."
+msgid_plural "%(total)s rows match."
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+
 #: src/postulo/jobs/vcards.py
 #, python-format
 msgid "%(total)s telephone number"
@@ -2025,6 +2052,11 @@ msgstr "Cron eilutė pagrindiniame kompiuteryje vis dar veikia taip pat; ji apra
 msgid "A CSV file"
 msgstr "CSV failas"
 
+#: src/postulo/templates/core/table_export.html
+#, python-format
+msgid "A CSV holds the first %(limit)s."
+msgstr ""
+
 #: src/postulo/documents/forms.py
 msgid "A CV leads with a career, a portfolio with work. It decides which themes are offered below."
 msgstr "CV pradedamas karjera, darbų aplankas – darbais. Tai lemia, kurie apipavidalinimai siūlomi toliau."
@@ -2411,6 +2443,11 @@ msgstr "Slaptažodis arba programos slaptažodis"
 #: src/postulo/documents/integrity.py
 msgid "a PDF"
 msgstr "PDF failas"
+
+#: src/postulo/templates/core/table_export.html
+#, python-format
+msgid "A PDF holds the first %(limit)s of them and says so."
+msgstr ""
 
 #: src/postulo/templates/server/design.html
 msgid "A person, a company or a plugin, as initials on a colour until there is a picture."
@@ -3788,8 +3825,8 @@ msgid "Applications, with their timelines"
 msgstr "Paraiškos su jų chronologijomis"
 
 #: src/postulo/applications/analytics.py src/postulo/applications/models.py
-#: src/postulo/applications/tables.py src/postulo/jobs/listing_views.py
-#: src/postulo/jobs/models.py src/postulo/templates/core/import_csv_map.html
+#: src/postulo/applications/tables.py src/postulo/jobs/models.py
+#: src/postulo/jobs/tables.py src/postulo/templates/core/import_csv_map.html
 msgid "Applied"
 msgstr "Pateikta"
 
@@ -3929,6 +3966,10 @@ msgstr "Taip, kaip turėtų būti pateikta CV. Pavadinimas, kuris yra ESCO klasi
 msgid "As a CV should print it. It is linked to the company of that name among yours, and added to your companies if there is none."
 msgstr "Taip, kaip turėtų būti pateikta CV. Susiejama su tokio pavadinimo įmone iš jūsų įmonių, o jei tokios nėra, pridedama prie jūsų įmonių."
 
+#: src/postulo/templates/core/table_export.html
+msgid "As a document"
+msgstr ""
+
 #: src/postulo/templates/documents/letter_detail.html
 msgid "As a file"
 msgstr "Kaip failas"
@@ -3957,6 +3998,7 @@ msgstr "nuo"
 msgid "As of"
 msgstr "Nuo"
 
+#: src/postulo/jobs/tables.py
 #: src/postulo/templates/jobs/partials/company_row.html
 #: src/postulo/templates/jobs/partials/company_status.html
 #, python-format
@@ -4031,6 +4073,11 @@ msgstr "laikas"
 msgid "at least"
 msgstr "ne mažiau kaip"
 
+#: src/postulo/core/tables.py
+#, python-format
+msgid "at least %(least)s"
+msgstr ""
+
 #: src/postulo/core/server_forms.py
 msgid "At least one language has to be offered, or nobody can read anything."
 msgstr "Turi būti siūloma bent viena kalba, kitaip niekas nieko neperskaitys."
@@ -4038,6 +4085,11 @@ msgstr "Turi būti siūloma bent viena kalba, kitaip niekas nieko neperskaitys."
 #: src/postulo/templates/cotton/table/filter.html
 msgid "at most"
 msgstr "ne daugiau kaip"
+
+#: src/postulo/core/tables.py
+#, python-format
+msgid "at most %(most)s"
+msgstr ""
 
 #: src/postulo/accounts/forms.py
 msgid "Atlantic Ocean"
@@ -4190,6 +4242,10 @@ msgstr "Atgal į skelbimą, kuriuo tapo šis fiksavimas"
 #: src/postulo/templates/core/dashboard.html
 msgid "Back to the standard arrangement"
 msgstr "Grąžinti standartinį išdėstymą"
+
+#: src/postulo/templates/core/table_export.html
+msgid "Back to the table, to change any of this"
+msgstr ""
 
 #: src/postulo/core/views_tables.py
 msgid "Back to the usual columns."
@@ -5072,7 +5128,7 @@ msgstr "Uždaryti"
 msgid "Close search"
 msgstr "Uždaryti paiešką"
 
-#: src/postulo/jobs/listing_views.py src/postulo/jobs/models.py
+#: src/postulo/jobs/models.py src/postulo/jobs/tables.py
 msgid "Closed"
 msgstr "Nebegalioja"
 
@@ -5159,6 +5215,7 @@ msgstr "spalva"
 msgid "Column in the file"
 msgstr "Stulpelis faile"
 
+#: src/postulo/templates/core/table_export.html
 #: src/postulo/templates/partials/table/columns.html
 msgid "Columns"
 msgstr "Stulpeliai"
@@ -6132,7 +6189,7 @@ msgstr "Išmesti juos"
 msgid "Discard this capture"
 msgstr "Išmesti šį fiksavimą"
 
-#: src/postulo/jobs/listing_views.py src/postulo/jobs/models.py
+#: src/postulo/jobs/models.py src/postulo/jobs/tables.py
 #: src/postulo/templates/jobs/capture_list.html
 msgid "Discarded"
 msgstr "Išmestas"
@@ -6268,6 +6325,7 @@ msgid "Download companies.geojson"
 msgstr "Atsisiųsti companies.geojson"
 
 #: src/postulo/templates/applications/report.html
+#: src/postulo/templates/core/table_export.html
 msgid "Download CSV"
 msgstr "Atsisiųsti CSV"
 
@@ -6287,6 +6345,10 @@ msgstr "Atsisiųsti"
 #: src/postulo/templates/jobs/capture_page.html
 msgid "Download it as text"
 msgstr "Atsisiųsti kaip tekstą"
+
+#: src/postulo/templates/core/table_export.html
+msgid "Download PDF"
+msgstr ""
 
 #: src/postulo/templates/core/kind_file.html
 #: src/postulo/templates/resume/candidate_file.html
@@ -6813,6 +6875,10 @@ msgstr "Kiekvienas pastebėtas skelbimas, kol nuspręsite: atrinkti, išmesti ar
 msgid "Every role you have held. Write the highlights once; tailor them per CV later."
 msgstr "Visos pareigos, kurias esate ėję. Akcentus surašykite vieną kartą, o vėliau pritaikykite kiekvienam CV."
 
+#: src/postulo/templates/core/table_export.html
+msgid "Every row of the table as it is now, not only the page on screen: your columns in your order, with its filters and its sort. Downloaded, and not kept in Postulo."
+msgstr ""
+
 #: src/postulo/templates/server/design.html
 msgid "Every step derived from one radius, so there is one number to change."
 msgstr "Kiekviena pakopa išvesta iš vieno spindulio, todėl keisti reikia tik vieną skaičių."
@@ -6845,7 +6911,7 @@ msgstr "Visų"
 msgid "Everybody's, as an administrator"
 msgstr "Visų, kaip administratoriaus"
 
-#: src/postulo/jobs/listing_views.py src/postulo/templates/server/logs.html
+#: src/postulo/jobs/tables.py src/postulo/templates/server/logs.html
 msgid "Everything"
 msgstr "Viskas"
 
@@ -6971,9 +7037,15 @@ msgstr "Paaiškinant, kas nepavyko, dažnai tenka nurodyti, su kuriuo ryšiu, į
 #: src/postulo/templates/cotton/transfer_group.html
 #: src/postulo/templates/jobs/company_detail.html
 #: src/postulo/templates/jobs/company_places.html
+#: src/postulo/templates/partials/table/export.html
 #: src/postulo/templates/settings/export.html
 msgid "Export"
 msgstr "Eksportuoti"
+
+#: src/postulo/templates/core/table_export.html
+#, python-format
+msgid "Export %(list)s"
+msgstr ""
 
 #: src/postulo/core/models.py
 msgid "export archive"
@@ -7484,6 +7556,16 @@ msgstr "Iš failo %(name)s."
 msgid "From %(register)s"
 msgstr ""
 
+#: src/postulo/core/tables.py
+#, python-format
+msgid "from %(start)s"
+msgstr ""
+
+#: src/postulo/core/tables.py
+#, python-format
+msgid "from %(start)s to %(end)s"
+msgstr ""
+
 #: src/postulo/templates/cotton/date_picker.html
 #, python-format
 msgid "From %(start)s to %(end)s"
@@ -7783,6 +7865,10 @@ msgstr "Bruto, neatskaičius mokesčių. Pakanka vienos ribos – dauguma skelbi
 #: src/postulo/templates/server/plugin_access.html
 msgid "group"
 msgstr "grupė"
+
+#: src/postulo/jobs/tables.py
+msgid "Group"
+msgstr ""
 
 #: src/postulo/core/views_access.py
 msgid "Group deleted."
@@ -9257,6 +9343,10 @@ msgstr "kalba nenurodyta"
 msgid "language of exported files"
 msgstr ""
 
+#: src/postulo/templates/core/table_export.html
+msgid "Language of the document"
+msgstr ""
+
 #: src/postulo/templates/applications/report.html
 msgid "Language of the report"
 msgstr ""
@@ -9512,6 +9602,12 @@ msgstr "Palikus tuščią, jūsų CV pateiks „%(place)s“: pagrindinio pašto
 msgid "Left empty it is today. Capturing a posting you applied to last week is common."
 msgstr "Palikus tuščią – šiandien. Įprasta užfiksuoti skelbimą, į kurį kandidatavote praėjusią savaitę."
 
+#: src/postulo/templates/core/table_export.html
+#: src/postulo/templates/documents/themes/base_list.html
+#, python-format
+msgid "Left out, because they hold nothing to write: %(columns)s."
+msgstr ""
+
 #: src/postulo/jobs/industries.py
 msgid "Legal"
 msgstr "Teisinės paslaugos"
@@ -9678,6 +9774,10 @@ msgstr "Nuorodos į vietas, į kurias darbo paieškoje vis grįžtama: lenta, CV
 #: src/postulo/templates/documents/application_documents.html
 msgid "Links you pointed them at"
 msgstr "Nuorodos, į kurias juos nukreipėte"
+
+#: src/postulo/documents/themes.py
+msgid "List"
+msgstr ""
 
 #: src/postulo/resume/views.py
 msgid "listening"
@@ -10400,6 +10500,11 @@ msgstr "Susiaurinti"
 #: src/postulo/templates/partials/table/views.html
 msgid "Narrow and sort the table the way you want it, then keep it under a name."
 msgstr "Susiaurinkite ir surikiuokite lentelę, kaip norite, tada išsaugokite ją su pavadinimu."
+
+#: src/postulo/templates/core/table_export.html
+#: src/postulo/templates/documents/themes/base_list.html
+msgid "Narrowed by"
+msgstr ""
 
 #: src/postulo/resume/forms.py
 msgid "National letters or classes the list lacks, as the licence prints them. A CV prints them after the codes."
@@ -11493,6 +11598,7 @@ msgid "Nothing matches “%(term)s”"
 msgstr "Pagal „%(term)s“ nieko nerasta"
 
 #: src/postulo/templates/base.html
+#: src/postulo/templates/documents/themes/base_list.html
 msgid "Nothing matches."
 msgstr "Nieko nerasta."
 
@@ -11710,6 +11816,10 @@ msgstr "Kol kas nieko. Vieta įsimenama, kai peržiūros metu pataisote lauką i
 #: src/postulo/jobs/vcards.py
 msgid "Nothing: an earlier card in this file is the same one."
 msgstr "Nieko: ankstesnė šio failo kortelė yra ta pati."
+
+#: src/postulo/templates/core/table_export.html
+msgid "Nothing: every row."
+msgstr ""
 
 #: src/postulo/jobs/vcards.py
 msgid "Nothing: the card has no name."
@@ -12410,6 +12520,10 @@ msgstr ""
 msgid "order"
 msgstr "tvarka"
 
+#: src/postulo/templates/core/table_export.html
+msgid "Order"
+msgstr ""
+
 #: src/postulo/templates/server/design.html
 msgid "Ordinary text, which most of the interface is."
 msgstr "Paprastas tekstas – jo sąsajoje daugiausia."
@@ -12611,6 +12725,7 @@ msgstr ""
 
 #: src/postulo/documents/forms.py
 #: src/postulo/templates/applications/report.html
+#: src/postulo/templates/core/table_export.html
 #: src/postulo/templates/settings/export.html
 msgid "Paper"
 msgstr ""
@@ -13423,10 +13538,15 @@ msgstr "Prizai, stipendijos ir pagyrimai: kieno nors jums suteiktas pripažinima
 msgid "Proceedings"
 msgstr "Konferencijos darbai"
 
+#: src/postulo/templates/documents/themes/base_list.html
+msgid "Produced by Postulo from this person's own records."
+msgstr ""
+
 #: src/postulo/templates/documents/themes/base_report.html
 msgid "Produced by Postulo from this person's own records. Postulo sets no target: how many applications a period should hold is a benefit regime's rule or the person's own."
 msgstr "Parengė Postulo pagal paties asmens įrašus. Postulo nenustato jokio tikslo: kiek paraiškų turėtų būti per laikotarpį, nustato išmokų sistemos taisyklės arba pats asmuo."
 
+#: src/postulo/templates/documents/themes/base_list.html
 #: src/postulo/templates/documents/themes/base_report.html
 #, python-format
 msgid "Produced on %(produced)s"
@@ -14650,7 +14770,7 @@ msgstr "teisės"
 msgid "Screening"
 msgstr "Atranka"
 
-#: src/postulo/templates/core/search.html
+#: src/postulo/core/tables.py src/postulo/templates/core/search.html
 #: src/postulo/templates/cotton/site_search.html
 #: src/postulo/templates/jobs/industry_list.html
 msgid "Search"
@@ -15132,7 +15252,7 @@ msgstr "Atrinkti"
 msgid "Shortlist them"
 msgstr "Atrinkti juos"
 
-#: src/postulo/jobs/listing_views.py src/postulo/jobs/models.py
+#: src/postulo/jobs/models.py src/postulo/jobs/tables.py
 msgid "Shortlisted"
 msgstr "Atrinktas"
 
@@ -15237,6 +15357,7 @@ msgstr "Rodyti šį adresą žemėlapyje?"
 msgid "Show this period"
 msgstr "Rodyti šį laikotarpį"
 
+#: src/postulo/jobs/tables.py
 #: src/postulo/templates/jobs/partials/whose_form.html
 msgid "Showing"
 msgstr "Rodoma"
@@ -15600,6 +15721,16 @@ msgstr "Rikiuoti pagal stulpelį %(column)s, didžiausios reikšmės viršuje"
 #, python-format
 msgid "Sort by %(column)s, lowest first"
 msgstr "Rikiuoti pagal stulpelį %(column)s, mažiausios reikšmės viršuje"
+
+#: src/postulo/core/tables.py
+#, python-format
+msgid "Sorted by %(column)s, highest first"
+msgstr ""
+
+#: src/postulo/core/tables.py
+#, python-format
+msgid "Sorted by %(column)s, lowest first"
+msgstr ""
 
 #: src/postulo/jobs/models.py src/postulo/resume/models.py
 msgid "source"
@@ -17136,6 +17267,10 @@ msgstr "Kopijos nepavyko išsiųsti; priežastis nurodyta dokumente."
 msgid "The credit the tiles' licence asks for, drawn on the map as plain text. For example: © OpenStreetMap contributors"
 msgstr "Plytelių licencijos reikalaujamas autorystės nurodymas, rodomas žemėlapyje kaip grynasis tekstas. Pavyzdžiui: © OpenStreetMap contributors"
 
+#: src/postulo/templates/core/table_export.html
+msgid "The CSV is the same rows in the same language, for a spreadsheet; the theme and the paper are for the PDF."
+msgstr ""
+
 #: src/postulo/templates/settings/appearance.html
 msgid "The dashboard lists open applications nothing has happened to for a while, with nothing planned. Recruiters' own advice clusters around two to three weeks."
 msgstr "Skydelyje rodomos atviros paraiškos, kuriose kurį laiką nieko nevyko ir nieko nesuplanuota. Patys atrankos specialistai dažniausiai pataria laukti dviejų–trijų savaičių."
@@ -17373,6 +17508,11 @@ msgid_plural "The first %(count)s are read, and the rest are not."
 msgstr[0] "Nuskaitomos tik pirmosios eilutės (%(count)s), kitos – ne."
 msgstr[1] "Nuskaitomos tik pirmosios eilutės (%(count)s), kitos – ne."
 msgstr[2] "Nuskaitomos tik pirmosios eilutės (%(count)s), kitos – ne."
+
+#: src/postulo/templates/documents/themes/base_list.html
+#, python-format
+msgid "The first %(count)s of %(total)s rows; the rest are in the table."
+msgstr ""
 
 #: src/postulo/templates/documents/cv_form.html
 msgid "The first choice in each list follows your details: mark another number as primary there and this CV prints it. One you choose here stays, whatever becomes primary. If you later delete it from your details, this CV prints none of that kind until you choose again, and never another in its place. What you have already sent does not change."
@@ -18282,6 +18422,7 @@ msgid "theme"
 msgstr "apipavidalinimas"
 
 #: src/postulo/templates/applications/report.html
+#: src/postulo/templates/core/table_export.html
 msgid "Theme"
 msgstr ""
 
@@ -19049,7 +19190,7 @@ msgstr "turi išsiųsti %(name)s"
 msgid "to be sent by the referee"
 msgstr "turi išsiųsti rekomendacijos davėjas"
 
-#: src/postulo/jobs/listing_views.py
+#: src/postulo/jobs/tables.py
 msgid "To decide"
 msgstr "Laukia sprendimo"
 
@@ -19340,6 +19481,11 @@ msgstr "Nepublikuotas darbas"
 #: src/postulo/resume/models.py
 msgid "until"
 msgstr "iki"
+
+#: src/postulo/core/tables.py
+#, python-format
+msgid "until %(end)s"
+msgstr ""
 
 #: src/postulo/resume/models.py
 #, python-format
@@ -19980,6 +20126,10 @@ msgstr "Kokioje srityje, jei kvalifikacijos pavadinimas to nenurodo."
 msgid "What it was. Another capture of the same advert is added from the review screen, so it is not offered here."
 msgstr "Kas tai buvo. Kitas to paties skelbimo fiksavimas pridedamas iš peržiūros ekrano, todėl čia nesiūlomas."
 
+#: src/postulo/templates/core/table_export.html
+msgid "What it will hold"
+msgstr ""
+
 #: src/postulo/templates/jobs/merge.html
 msgid "What moves"
 msgstr "Kas perkeliama"
@@ -20588,6 +20738,10 @@ msgstr "Su kuo susitinkate. Siūlomi jūsų įrašyti šios įmonės žmonės ir
 #: src/postulo/applications/forms.py
 msgid "Whoever put you forward, from the people you have recorded — at this company, at another, or at none. The figures count what each referrer led to."
 msgstr "Kas jus rekomendavo – iš jūsų įrašytų žmonių šioje įmonėje, kitoje ar jokioje. Skaičiai rodo, ką davė kiekvieno rekomendavusio asmens rekomendacijos."
+
+#: src/postulo/jobs/tables.py
+msgid "Whose"
+msgstr ""
 
 #: src/postulo/templates/partials/import_owner.html
 msgid "Whose they become"

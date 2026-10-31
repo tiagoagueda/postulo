@@ -3,7 +3,7 @@
 from django.utils.translation import gettext_lazy as _
 from django.utils.translation import ngettext_lazy
 
-from postulo.core.tables import Column, ExtraFilter, Table, register
+from postulo.core.tables import Column, ExtraFilter, Table, day_text, register
 
 from . import identifiers, industries
 from .models import (
@@ -11,8 +11,21 @@ from .models import (
     DiscardReason,
     EmploymentType,
     LegalState,
+    ListingState,
     RemoteType,
 )
+
+#: The tabs above the listings table, in words: the page draws them, and an export of the
+#: table says which one it was taken on (#341). Here rather than beside the page, because the
+#: table is below the page and both read them.
+TAB_LABELS = {
+    "undecided": _("To decide"),
+    ListingState.SHORTLISTED: _("Shortlisted"),
+    ListingState.DISCARDED: _("Discarded"),
+    "applied": _("Applied"),
+    "closed": _("Closed"),
+    "all": _("Everything"),
+}
 
 
 class SectorChoices:
@@ -43,6 +56,8 @@ class CompaniesTable(Table):
         "%(count)d company changed.", "%(count)d companies changed.", "count"
     )
     search_label = _("Search companies")
+    rows_from = "postulo.jobs.views.CompanyListView"
+    page_name = "jobs:company_list"
 
     def arranged(self, columns):
         """The identifier columns in the order set under Settings → Appearance (#672).
@@ -228,6 +243,56 @@ class CompaniesTable(Table):
         ),
     )
 
+    def param_in_words(self, name: str, value: str) -> tuple[str, str] | None:
+        """Whose companies, and the group the table is narrowed to (#341)."""
+        if name == "whose":
+            return _whose_in_words(self.request, value)
+        if name == "group":
+            return str(_("Group")), value
+        return super().param_in_words(name, value)
+
+    def text(self, row, column: Column) -> str:
+        """Each cell as `company_row.html` draws it, in words (#341). Every industry, where
+        the page counts the ones past four; a link's address, where the page draws a word."""
+        key = column.key
+        if key.startswith("id_"):
+            identifier = row.identifier(key.removeprefix("id_"))
+            return identifier.value if identifier is not None else ""
+        match key:
+            case "name":
+                return row.name
+            case "location":
+                return row.location
+            case "sector":
+                return ", ".join(str(name) for _letter, name, *_look in row.sector_looks)
+            case "industry":
+                return ", ".join(industry.name for industry in row.industries.all())
+            case "postings":
+                return str(getattr(row, "posting_count", 0) or 0)
+            case "applications":
+                return str(getattr(row, "application_count", 0) or 0)
+            case "contacts":
+                return str(getattr(row, "contact_count", 0) or 0)
+            case "parent":
+                return row.parent.name if row.parent and getattr(row, "parent_seen", False) else ""
+            case "status":
+                return _company_status(row)
+            case "kind":
+                return str(row.get_kind_display())
+            case "from_career":
+                return str(_("Yes") if row.from_career else _("No"))
+            case "website":
+                return row.website
+            case "careers":
+                return row.careers_url
+            case "notes":
+                return row.notes or ""
+            case "last_activity":
+                return day_text(getattr(row, "last_activity_at", None))
+            case "created":
+                return day_text(row.created_at)
+        return ""
+
 
 @register
 class ListingsTable(Table):
@@ -257,6 +322,8 @@ class ListingsTable(Table):
         "%(count)d listing changed.", "%(count)d listings changed.", "count"
     )
     search_label = _("Search listings")
+    rows_from = "postulo.jobs.listing_views.ListingListView"
+    page_name = "listings:list"
     columns = (
         # The role, which opens the posting; the pencil beside it renames where it sits,
         # exactly as a company's name does (#135, #252).
@@ -374,3 +441,98 @@ class ListingsTable(Table):
         # three listings that mentioned a technology.
         Column("description", _("Description"), filter="text", lookups=("description",)),
     )
+
+    def param_in_words(self, name: str, value: str) -> tuple[str, str] | None:
+        """The tab and whose listings (#341). The tab is said by `in_words` whether or not
+        the address names it, since a bare address is *To decide*."""
+        if name == "whose":
+            return _whose_in_words(self.request, value)
+        if name == "state":
+            return None
+        return super().param_in_words(name, value)
+
+    def in_words(self) -> list[dict[str, str]]:
+        """The tab first: a list of listings is always one tab's, *To decide* unless the
+        address names another, and a list that did not say so would read as all of them."""
+        from .models import LISTING_FILTERS
+
+        wanted = self.params.get("state", "undecided")
+        if wanted not in LISTING_FILTERS and wanted != "all":
+            wanted = "undecided"
+        named = TAB_LABELS.get(wanted) or dict(ListingState.choices).get(wanted, wanted)
+        tab = {"label": str(_("Showing")), "value": str(named)}
+        return [tab, *super().in_words()]
+
+    def text(self, row, column: Column) -> str:
+        """Each cell as `listing_row.html` draws it, in words (#341). The buttons at the end
+        of a row are not a column, so there is nothing of them to leave out."""
+        match column.key:
+            case "title":
+                return row.title
+            case "company":
+                return row.company.name if row.company_id else ""
+            case "location":
+                return row.location
+            case "closes":
+                return day_text(row.closes_at)
+            case "state":
+                return str(row.derived_state_label)
+            case "noted":
+                return day_text(getattr(row, "noted_at", None))
+            case "source":
+                return row.source
+            case "remote":
+                return str(row.get_remote_type_display()) if row.remote_type else ""
+            case "employment":
+                return str(row.get_employment_type_display()) if row.employment_type else ""
+            case "salary":
+                return row.salary_display
+            case "posted":
+                return day_text(row.posted_at)
+            case "discarded":
+                return str(row.get_discard_reason_display()) if row.discard_reason else ""
+            case "applications":
+                return str(getattr(row, "application_count", 0) or 0)
+            case "url":
+                return row.url
+            case "description":
+                return row.description_text
+        return ""
+
+
+def _whose_in_words(request, value: str) -> tuple[str, str] | None:
+    """Whose records a list holds, in words, where the address chose and may (#896, #341)."""
+    from . import whose
+
+    offered = dict(whose.offered(request.user))
+    if not value or value not in offered:
+        return None
+    return str(_("Whose")), str(offered[value])
+
+
+def _company_status(company) -> str:
+    """The status cell in words (#941): the legal state when it is not active, the latest
+    hiring signal -- as of its date, once stale -- and the listings still open where nobody
+    has a current word."""
+    from django.utils.translation import gettext, ngettext
+
+    said = []
+    if company.legal_state != LegalState.ACTIVE:
+        said.append(str(company.get_legal_state_display()))
+    kind = getattr(company, "signal_kind", "")
+    if kind:
+        signal = company.signal_kind_label
+        if not getattr(company, "signal_now", ""):
+            # The page's own words, so the export says it as the cell does.
+            when = gettext("as of %(date)s") % {
+                "date": day_text(getattr(company, "signal_on", None))
+            }
+            signal = f"{signal} · {when}"
+        said.append(signal)
+    count = getattr(company, "open_listing_count", 0) or 0
+    if count and not getattr(company, "signal_now", ""):
+        said.append(
+            ngettext("%(counter)s open listing", "%(counter)s open listings", count)
+            % {"counter": count}
+        )
+    return " · ".join(said)

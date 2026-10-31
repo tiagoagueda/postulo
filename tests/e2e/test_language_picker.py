@@ -182,8 +182,18 @@ def test_a_language_is_found_by_its_english_name_or_its_own(page: Page, live_ser
     assert sorted(shown_rows(picker)) == ["fr-CA", "fr-FR"]
 
 
+@pytest.fixture
+def names_alone(monkeypatch):
+    """No catalogue status, so every option is a name alone, whatever today's catalogues
+    hold: a branch that adds strings puts a percentage beside a language under 95% until
+    Weblate catches up (#341). `tests/test_language_picker.py` pins the percentages."""
+    from postulo.core import languages
+
+    monkeypatch.setattr(languages, "translation_status", lambda: {})
+
+
 def test_the_instance_default_menu_is_grouped_and_found_by_either_name(
-    page: Page, live_server, applicant
+    page: Page, live_server, applicant, names_alone
 ):
     """The select on *Server settings -> Defaults*: the box every long select has, which
     reads what an option says it is called as well as its words."""

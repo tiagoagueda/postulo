@@ -1,0 +1,31 @@
+{% extends "documents/themes/base_list.html" %}
+{% comment %} A list in the plain theme (#341): the report's type and rules (#340), at a
+   smaller size, because a list is many columns across a page on its side. {% endcomment %}
+
+{% block page_styles %}
+    @page {
+      margin: 12mm;
+      @bottom-center {
+        content: counter(page) " / " counter(pages);
+        font: 7.5pt "DejaVu Sans", sans-serif;
+        color: #666;
+      }
+    }
+    body {
+      font: 8.5pt/1.4 "DejaVu Sans", sans-serif;
+      color: #111;
+      margin: 0;
+      /* An address or a long name breaks rather than running off the page (#235). */
+      overflow-wrap: anywhere;
+    }
+    h1 { font-size: 14pt; margin: 0 0 2mm; }
+    .meta { color: #444; font-size: 8pt; margin: 0 0 5mm; }
+    .meta div { margin-bottom: 0.5mm; }
+    table { inline-size: 100%; border-collapse: collapse; font-size: 8pt; }
+    th, td { text-align: start; padding: 1.2mm 1.6mm; vertical-align: top; }
+    thead th { border-bottom: 0.6pt solid #333; font-size: 7.5pt; text-transform: uppercase; }
+    tbody tr { border-bottom: 0.3pt solid #ddd; }
+    thead { display: table-header-group; }
+    tr { page-break-inside: avoid; }
+    .note { font-size: 7.5pt; color: #555; margin-top: 3mm; }
+{% endblock %}
