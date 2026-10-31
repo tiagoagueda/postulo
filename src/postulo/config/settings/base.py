@@ -569,6 +569,11 @@ POSTULO_CONNECTION_TEST_RATE = env("POSTULO_CONNECTION_TEST_RATE", default="10/h
 # real requests to somebody's server; the scheduler runs a connection at most every fifteen
 # minutes, so the button is for the odd moment and not for a loop.
 POSTULO_CONNECTION_SYNC_RATE = env("POSTULO_CONNECTION_SYNC_RATE", default="20/h")
+# Questions one account may put to a sync connection's plugin in an hour from its *Pairing* page
+# (#327): a search, *Show unpaired*, or the one item a pairing is about to be made with, each
+# asked again of the server, live. A person pairing an address book by hand asks a few a
+# minute; this bounds a script, not a person.
+POSTULO_CONNECTION_PAIRING_RATE = env("POSTULO_CONNECTION_PAIRING_RATE", default="120/h")
 # What the skill box asks for as somebody types, per account (#266): names from the ESCO
 # classification beginning with what has been typed. A request at each pause in typing is a
 # handful a skill, so six hundred an hour is a long afternoon of writing a career down, and

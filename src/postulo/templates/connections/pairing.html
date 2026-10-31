@@ -1,0 +1,191 @@
+{% extends "settings/base.html" %}
+{% load i18n %}
+
+{% comment %} A sync connection's *Pairing* page (#327).
+
+   What is paired comes from `SyncLink` alone, so the page opens without asking anybody. What
+   is not paired comes from the plugin, on a search or on *Show unpaired*, into the live
+   region below; the form is a plain GET that htmx swaps into that region when scripts run.
+   Everything the plugin says -- a label, a second line, a collection, an address -- is
+   escaped text, and never a link. {% endcomment %}
+{% block content %}
+  <div class="max-w-4xl">
+    <c-page-title>
+      {% blocktranslate with label=connection.label trimmed %}Pairing on {{ label }}{% endblocktranslate %}
+      <c-slot name="subtitle">
+        {% translate "Pair what is on the other side with your own records, or undo a pairing. Both sides are kept either way." %}
+      </c-slot>
+    </c-page-title>
+
+    {% if chosen %}
+      <div class="alert mb-4" data-variant="info" data-pairing-for>
+        <p>
+          {% blocktranslate with name=chosen.name trimmed %}Choose an item to pair with <bdi>{{ name }}</bdi>.{% endblocktranslate %}
+          <a href="{{ chosen.url }}" class="text-brand-600 underline dark:text-brand-400">{% translate "Back to it" %}</a>
+        </p>
+      </div>
+    {% endif %}
+
+    <div class="mb-4 flex flex-wrap items-center gap-3">
+      <form method="post" action="{% url 'connections:sync_now' connection.pk %}">
+        {% csrf_token %}
+        <button type="submit" class="btn" data-variant="outline">{% translate "Sync now" %}</button>
+      </form>
+      <a href="{% url 'connections:list' %}" class="btn" data-variant="ghost">{% translate "Back to connections" %}</a>
+    </div>
+
+    <section class="card mb-6" aria-labelledby="pairing-find">
+      <c-section-title id="pairing-find">
+        {% translate "Find on the other side" %}
+        <c-slot name="subtitle">{% blocktranslate with plugin=plugin.label trimmed %}Asks {{ plugin }} now. Nothing it answers is kept here.{% endblocktranslate %}</c-slot>
+      </c-section-title>
+      <form method="get" action="{% url 'connections:pairing' connection.pk %}" role="search"
+            class="flex flex-wrap items-end gap-3"
+            hx-get="{% url 'connections:pairing' connection.pk %}" hx-target="#pairing-results"
+            hx-select="#pairing-results" hx-swap="outerHTML" data-pairing-search>
+        {% if chosen %}<input type="hidden" name="for" value="{{ chosen.value }}">{% endif %}
+        <div class="grid min-w-0 flex-1 basis-60 gap-1">
+          <label for="pairing-q" class="label">{% translate "Search" %}</label>
+          <input type="search" id="pairing-q" name="q" value="{{ words }}" class="input" maxlength="200">
+        </div>
+        <div class="grid gap-1">
+          <label for="pairing-kind" class="label">{% translate "To pair with" %}</label>
+          <select id="pairing-kind" name="kind" class="select">
+            <option value="">{% translate "Anything" %}</option>
+            {% for value, label in kinds %}
+              <option value="{{ value }}"{% if value == kind %} selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <button type="submit" class="btn">{% translate "Search" %}</button>
+        <button type="submit" class="btn" data-variant="outline" name="unpaired" value="1">{% translate "Show unpaired" %}</button>
+      </form>
+
+      <div id="pairing-results" class="mt-4" aria-live="polite" data-pairing-results>
+        {% if error %}
+          <div class="alert" data-variant="error"><p>{{ error }}</p></div>
+        {% elif asked %}
+          {% if rows %}
+            <c-scroll-box label="{% translate 'Items found' %}">
+              <table class="table">
+                <caption class="label text-start">
+                  {% if unpaired and not words %}{% translate "Not paired yet" %}{% else %}{% translate "Found on the other side" %}{% endif %}
+                </caption>
+                <thead>
+                  <tr>
+                    <th scope="col">{% translate "Item" %}</th>
+                    <th scope="col">{% translate "Can pair with" %}</th>
+                    <th scope="col">{% translate "Paired with" %}</th>
+                    <th scope="col"><span class="sr-only">{% translate "Actions" %}</span></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for row in rows %}
+                    <tr data-pairing-item>
+                      <th scope="row" class="font-normal">
+                        <bdi class="font-medium">{{ row.item.label }}</bdi>
+                        {% if row.item.detail %}<span class="block text-xs text-ink-500 dark:text-ink-400"><bdi>{{ row.item.detail }}</bdi></span>{% endif %}
+                        {% if row.item.collection_label %}<span class="block text-xs text-ink-500 dark:text-ink-400"><bdi>{{ row.item.collection_label }}</bdi></span>{% endif %}
+                      </th>
+                      <td class="text-sm">{{ row.kinds|join:", " }}</td>
+                      <td class="text-sm">
+                        {% if row.holder %}
+                          {% if row.holder.url %}<a href="{{ row.holder.url }}" class="text-brand-600 underline dark:text-brand-400"><bdi>{{ row.holder.name }}</bdi></a>{% else %}{% translate "A record since deleted" %}{% endif %}
+                        {% else %}
+                          <span class="text-ink-500 dark:text-ink-400">{% translate "Nothing" %}</span>
+                        {% endif %}
+                      </td>
+                      <td class="text-end">
+                        {% if chosen and row.offers_chosen and not row.holder %}
+                          <form method="post" action="{% url 'connections:pairing_apply' connection.pk %}">
+                            {% csrf_token %}
+                            <input type="hidden" name="collection" value="{{ row.item.collection }}">
+                            <input type="hidden" name="uid" value="{{ row.item.uid }}">
+                            <input type="hidden" name="kind" value="{{ chosen.kind }}">
+                            <input type="hidden" name="record" value="{{ chosen.record.pk }}">
+                            <input type="hidden" name="action" value="pair">
+                            <input type="hidden" name="next" value="{{ chosen.url }}">
+                            <button type="submit" class="btn" data-size="xs">{% translate "Pair" %}<span class="sr-only">: <bdi>{{ row.item.label }}</bdi></span></button>
+                          </form>
+                        {% elif not row.holder %}
+                          <a href="{{ row.choose_url }}" class="btn" data-variant="outline" data-size="xs">{% translate "Choose a record" %}<span class="sr-only">: <bdi>{{ row.item.label }}</bdi></span></a>
+                        {% endif %}
+                      </td>
+                    </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </c-scroll-box>
+          {% else %}
+            <c-empty variant="row">{% translate "Nothing found on the other side." %}</c-empty>
+          {% endif %}
+        {% endif %}
+      </div>
+    </section>
+
+    <section class="card" aria-labelledby="pairing-paired">
+      <c-section-title id="pairing-paired">
+        {% translate "Paired" %}
+        <c-slot name="subtitle">{% translate "As the last sync left them. Unpairing keeps both sides, and the next sync leaves them alone." %}</c-slot>
+      </c-section-title>
+      {% if links %}
+        <c-scroll-box label="{% translate 'Paired records' %}">
+          <table class="table" data-pairing-links>
+            <caption class="sr-only">{% blocktranslate with label=connection.label trimmed %}Records paired on {{ label }}{% endblocktranslate %}</caption>
+            <thead>
+              <tr>
+                <th scope="col">{% translate "Record" %}</th>
+                <th scope="col">{% translate "On the other side" %}</th>
+                <th scope="col">{% translate "State" %}</th>
+                <th scope="col"><span class="sr-only">{% translate "Actions" %}</span></th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for row in links %}
+                <tr data-pairing-link{% if row.link.remote_gone %} data-gone{% endif %}>
+                  <th scope="row" class="font-normal">
+                    {% if row.url %}
+                      <a href="{{ row.url }}" class="text-brand-600 underline dark:text-brand-400"><bdi>{{ row.name }}</bdi></a>
+                      <span class="block text-xs text-ink-500 dark:text-ink-400">{{ row.kind }}</span>
+                    {% else %}
+                      {% translate "A record since deleted" %}
+                    {% endif %}
+                  </th>
+                  <td class="text-sm wrap-anywhere"><bdi>{{ row.link.remote_href|default:row.link.uid }}</bdi></td>
+                  <td class="text-sm">
+                    {% if row.link.remote_gone %}
+                      {% translate "Removed on the other side" %}
+                    {% elif row.link.last_synced_at %}
+                      {% blocktranslate with when=row.link.last_synced_at|date:"DATETIME_FORMAT" trimmed %}Last synced {{ when }}{% endblocktranslate %}
+                    {% else %}
+                      {% translate "Not synced yet" %}
+                    {% endif %}
+                  </td>
+                  <td>
+                    <div class="flex flex-wrap justify-end gap-1">
+                      {% if row.link.remote_gone and row.url %}
+                        <a href="{% url 'connections:pairing' connection.pk %}?for={{ row.key }}-{{ row.record.pk }}" class="btn" data-variant="outline" data-size="xs" data-pair-again>{% translate "Pair again" %}<span class="sr-only">: <bdi>{{ row.name }}</bdi></span></a>
+                        <form method="post" action="{% url 'connections:pairing_renew' connection.pk %}">
+                          {% csrf_token %}
+                          <input type="hidden" name="link" value="{{ row.link.pk }}">
+                          <button type="submit" class="btn" data-variant="ghost" data-size="xs">{% blocktranslate with plugin=plugin.label trimmed %}Let {{ plugin }} make a new one{% endblocktranslate %}<span class="sr-only">: <bdi>{{ row.name }}</bdi></span></button>
+                        </form>
+                      {% endif %}
+                      <form method="post" action="{% url 'connections:pairing_unpair' connection.pk %}">
+                        {% csrf_token %}
+                        <input type="hidden" name="link" value="{{ row.link.pk }}">
+                        <button type="submit" class="btn" data-variant="ghost" data-size="xs">{% translate "Unpair" %}<span class="sr-only">: <bdi>{{ row.name|default:row.link.uid }}</bdi></span></button>
+                      </form>
+                    </div>
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </c-scroll-box>
+      {% else %}
+        <c-empty variant="row">{% translate "Nothing is paired on this connection yet." %}</c-empty>
+      {% endif %}
+    </section>
+  </div>
+{% endblock %}

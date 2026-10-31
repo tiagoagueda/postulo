@@ -400,6 +400,45 @@ def sync_connection(owner):
     )
 
 
+class _Pairable:
+    """A sync plugin with a *Pairing* page (#327), installed for this module's tests."""
+
+    name = "sweep-pairable"
+    version = "0.1"
+    kind = "sync"
+    label = "Pairable"
+
+    def config_fields(self):
+        return []
+
+    def test(self, config):  # pragma: no cover - never run here
+        raise NotImplementedError
+
+    def remote_items(self, config, search="", kind="", key=None):  # pragma: no cover
+        return []
+
+    def sync(self, connection, config):  # pragma: no cover - never run here
+        raise NotImplementedError
+
+
+@pytest.fixture(autouse=True)
+def _pairable():
+    from postulo.plugins import registry
+
+    registry.register_builtin("sync", _Pairable)
+    yield
+    registry.unregister_builtin("sync", _Pairable)
+
+
+def pairable_connection(owner):
+    """A synchronisation whose plugin pairs by hand, which *Pairing* is for (#327)."""
+    from postulo.plugins.models import Connection
+
+    return Connection.objects.create(
+        owner=owner, kind="sync", plugin=_Pairable.name, label="Their phone", config={}
+    )
+
+
 def token(owner):
     from postulo.api.models import ApiToken
 
@@ -552,6 +591,12 @@ FACTORIES: dict[str, Callable] = {
     "connections:discover": pk_of(connection),
     "connections:edit": pk_of(connection),
     "connections:sync_now": pk_of(sync_connection),
+    # *Pairing* (#327): somebody else's sync connection, its items and its links.
+    "connections:pairing": pk_of(pairable_connection),
+    "connections:pairing_item": pk_of(pairable_connection),
+    "connections:pairing_apply": pk_of(pairable_connection),
+    "connections:pairing_unpair": pk_of(pairable_connection),
+    "connections:pairing_renew": pk_of(pairable_connection),
     "connections:test": pk_of(connection),
     # documents
     "documents:application_documents": pk_of(application),
@@ -1500,3 +1545,38 @@ def test_somebody_elses_calendar_never_prints(client, user, other_user, monkeypa
         assert "0 entries" in page and "0 entries" in seen[-1], view
         for said in ("Zebra", "Theirs Office", theirs.posting.title, theirs.posting.company.name):
             assert said not in page and said not in seen[-1], (view, said)
+
+
+def test_a_pairing_cannot_reach_across_accounts(client, user, other_user):
+    """What a pairing names in its body is looked up among the person's own too (#327):
+    somebody else's record, and somebody else's link, are each a 404 on the person's own
+    connection, and an address in the form is never what the link keeps."""
+    from postulo.plugins.models import SyncLink
+
+    mine = pairable_connection(user)
+    their_contact = contact(other_user)
+    their_link = SyncLink.bind(
+        pairable_connection(other_user), their_contact, collection="/c/", uid="x"
+    )
+    client.force_login(user)
+
+    def post(name, **data):
+        return client.post(reverse(name, kwargs={"pk": mine.pk}), data)
+
+    assert (
+        post(
+            "connections:pairing_apply",
+            collection="/c/",
+            uid="x",
+            kind="contact",
+            record=their_contact.pk,
+            action="pair",
+            remote_href="https://attacker.example/",
+        ).status_code
+        == 404
+    ), "somebody else's record"
+    assert post("connections:pairing_unpair", link=their_link.pk).status_code == 404
+    assert post("connections:pairing_renew", link=their_link.pk).status_code == 404
+    their_link.refresh_from_db()
+    assert their_link.paired
+    assert post("connections:pairing_unpair").status_code == 302, "their own page, no link named"

@@ -83,6 +83,12 @@ range of days as plain values (`CalendarItem`, in `CalendarItems`), a whole day 
 ``discovered`` declares its ``modes``, and a plugin's optional ``discover(config)`` answers with
 a `DiscoveredOption` for each thing it found. Postulo keeps them and draws the choice; the plugin
 still holds its requests to what was chosen.
+
+**A sync connection can be paired by hand (#327)**: a sync plugin's optional
+``remote_items(config, search, kind, key)`` answers with a `RemoteItem` for each item on the
+other side a person may pair with one of `RECORD_KINDS`, and its optional ``fill_record`` makes
+or fills a record from one through the services above. Postulo draws the page, asks live, and
+writes the `SyncLink`.
 """
 
 from __future__ import annotations
@@ -222,6 +228,7 @@ from .base import (
     MAIL,
     MAX_IMPORT_BYTES,
     MEDIUMS,
+    RECORD_KINDS,  # what an item may be paired with by hand (#327)
     TEXT,
     # --------------------------- what a backup destination is handed, and gives back (#325)
     BackupArchive,
@@ -249,6 +256,7 @@ from .base import (
     MessagingServicePlugin,
     OutboxPlugin,
     RegisterAdapterPlugin,
+    RemoteItem,  # an item a sync offers to pair by hand (#327)
     SourcePlugin,
     StorePlugin,
     SyncPlugin,
@@ -276,6 +284,7 @@ __all__ = [
     "MAX_THEME_ASSET_BYTES",
     "MAX_THEME_DOCUMENT_BYTES",
     "MEDIUMS",
+    "RECORD_KINDS",
     "TEXT",
     "AddressRow",
     "AlreadyPaired",
@@ -338,6 +347,7 @@ __all__ = [
     "RegisterAddress",
     "RegisterRecord",
     "Reminder",
+    "RemoteItem",
     "SavedRows",
     "SourcePlugin",
     "StorePlugin",

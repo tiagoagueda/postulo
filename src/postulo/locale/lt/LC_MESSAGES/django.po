@@ -1277,6 +1277,11 @@ msgstr "%(person)s yra paskutinis grupės %(name)s narys, o ji dar turi įrašų
 msgid "%(plugin)s could not check these settings: %(error)s"
 msgstr "%(plugin)s nepavyko patikrinti šių nustatymų: %(error)s"
 
+#: src/postulo/plugins/views_pairing.py
+#, python-format
+msgid "%(plugin)s could not do that: %(message)s"
+msgstr ""
+
 #: src/postulo/plugins/views.py
 #, python-format
 msgid "%(plugin)s could not look on the server: %(message)s"
@@ -1285,6 +1290,11 @@ msgstr ""
 #: src/postulo/plugins/views.py
 #, python-format
 msgid "%(plugin)s has nothing to look for."
+msgstr ""
+
+#: src/postulo/plugins/views_pairing.py
+#, python-format
+msgid "%(plugin)s makes a new one on its next run."
 msgstr ""
 
 #: src/postulo/core/mail_auth.py
@@ -2405,6 +2415,11 @@ msgstr "Vardas nėra tapatybė: du tyrėjai gali turėti tą patį vardą, o vie
 msgid "A new one"
 msgstr "Naujas"
 
+#: src/postulo/templates/connections/pairing_item.html
+#, python-format
+msgid "A new one: %(kind)s"
+msgstr ""
+
 #: src/postulo/templates/server/design.html
 msgid "A number and what it counts. The colour is a second signal, never the only one."
 msgstr "Skaičius ir tai, ką jis skaičiuoja. Spalva yra antrasis signalas, niekada ne vienintelis."
@@ -2595,6 +2610,10 @@ msgstr "Tuščias žurnalas – būtent toks, kokio norite."
 #: src/postulo/resume/forms.py
 msgid "A range such as 41–52, or one page."
 msgstr "Intervalas, pvz., 41–52, arba vienas puslapis."
+
+#: src/postulo/templates/connections/pairing.html
+msgid "A record since deleted"
+msgstr ""
 
 #: src/postulo/documents/forms.py
 msgid "A referee who is not a contact yet. Their name is enough; it is added to your contacts without a company, and is used instead of the choice above."
@@ -2946,6 +2965,7 @@ msgid "Across the whole file, rows are skipped for want of a company or a role. 
 msgstr "Visame faile eilutės praleidžiamos, jei trūksta įmonės ar pareigų. Jau įrašytos eilutės randamos ir praleidžiamos importuojant."
 
 #: src/postulo/templates/accounts/invite_list.html
+#: src/postulo/templates/connections/pairing.html
 #: src/postulo/templates/documents/rendered_list.html
 #: src/postulo/templates/server/backups.html
 #: src/postulo/templates/server/people.html
@@ -3367,6 +3387,11 @@ msgstr "Jau nuspręsta —"
 msgid "Already in your record"
 msgstr "Jau yra jūsų duomenyse"
 
+#: src/postulo/templates/connections/pairing_item.html
+#, python-format
+msgid "Already paired with <bdi>%(name)s</bdi>. Unpair it on the pairing page to pair it with something else."
+msgstr ""
+
 #: src/postulo/applications/agenda.py
 msgid "Already sent —"
 msgstr "Jau išsiųsta —"
@@ -3692,6 +3717,10 @@ msgstr "Bet kuris sektorius"
 msgid "Anyone holding the link may use it, once. Send it however you like."
 msgstr "Bet kas, turintis nuorodą, gali ja pasinaudoti vieną kartą. Siųskite ją, kaip jums patogu."
 
+#: src/postulo/templates/connections/pairing.html
+msgid "Anything"
+msgstr ""
+
 #: src/postulo/resume/forms.py
 msgid "Anything a reader should know, in a few words."
 msgstr "Tai, ką skaitytojas turėtų žinoti, keliais žodžiais."
@@ -3744,7 +3773,7 @@ msgstr "API žetonai"
 msgid "Appearance"
 msgstr "Išvaizda"
 
-#: src/postulo/applications/ical_import.py
+#: src/postulo/applications/ical_import.py src/postulo/plugins/pairing.py
 #: src/postulo/templates/applications/suggestion_list.html
 #: src/postulo/templates/base.html
 #: src/postulo/templates/documents/letter_detail.html
@@ -4042,6 +4071,10 @@ msgstr "Grynuoju tekstu"
 msgid "As the institution words it. Kept in your record; a CV does not print it yet."
 msgstr "Taip, kaip formuluoja institucija. Saugoma jūsų karjeros apraše; CV kol kas nepateikiama."
 
+#: src/postulo/templates/connections/pairing.html
+msgid "As the last sync left them. Unpairing keeps both sides, and the next sync leaves them alone."
+msgstr ""
+
 #: src/postulo/jobs/forms.py
 msgid "As the posting words it — a city, a region, a country. Free text: nothing is looked up anywhere."
 msgstr "Kaip ją formuluoja skelbimas – miestas, regionas, šalis. Laisvas tekstas: niekur nieko neieškoma."
@@ -4080,6 +4113,11 @@ msgstr "Paprašyta"
 
 #: src/postulo/templates/server/record_of_processing.html
 msgid "Asked only when somebody presses for it, one company at a time. Each is sent what is listed and nothing about the person asking."
+msgstr ""
+
+#: src/postulo/templates/connections/pairing.html
+#, python-format
+msgid "Asks %(plugin)s now. Nothing it answers is kept here."
 msgstr ""
 
 #: src/postulo/applications/analytics.py src/postulo/applications/models.py
@@ -4217,6 +4255,10 @@ msgstr "Grąžinta į jūsų skelbimus."
 msgid "Back to Backups"
 msgstr "Atgal į atsargines kopijas"
 
+#: src/postulo/templates/connections/pairing.html
+msgid "Back to connections"
+msgstr ""
+
 #: src/postulo/core/help.py
 msgid "Back to Documents"
 msgstr "Atgal į skiltį „Dokumentai“"
@@ -4224,6 +4266,10 @@ msgstr "Atgal į skiltį „Dokumentai“"
 #: src/postulo/templates/accounts/invite_created.html
 msgid "Back to invitations"
 msgstr "Atgal į kvietimus"
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Back to it"
+msgstr ""
 
 #: src/postulo/core/help.py
 msgid "Back to Listings"
@@ -4557,6 +4603,10 @@ msgstr "Skambutis"
 msgid "Callback to register with it"
 msgstr "Grąžinimo URL, kurį reikia užregistruoti pas teikėją"
 
+#: src/postulo/templates/connections/pairing.html
+msgid "Can pair with"
+msgstr ""
+
 #: src/postulo/templates/accounts/invite_form.html
 #: src/postulo/templates/accounts/profile.html
 #: src/postulo/templates/applications/application_form.html
@@ -4568,6 +4618,7 @@ msgstr "Grąžinimo URL, kurį reikia užregistruoti pas teikėją"
 #: src/postulo/templates/applications/tag_form.html
 #: src/postulo/templates/connections/confirm_delete.html
 #: src/postulo/templates/connections/form.html
+#: src/postulo/templates/connections/pairing_item.html
 #: src/postulo/templates/cotton/dialog.html
 #: src/postulo/templates/documents/cv_form.html
 #: src/postulo/templates/documents/cv_item_form.html
@@ -4938,6 +4989,10 @@ msgstr "Ženkliukai ir žymos"
 msgid "Choices"
 msgstr "Pasirinkimai"
 
+#: src/postulo/templates/connections/pairing_item.html
+msgid "Choose"
+msgstr ""
+
 #: src/postulo/core/personal.py
 msgid "Choose a country from the list."
 msgstr "Pasirinkite šalį iš sąrašo."
@@ -4984,6 +5039,18 @@ msgstr "Pasirinkite naują slaptažodį"
 msgid "Choose a package first."
 msgstr "Pirmiausia pasirinkite paketą."
 
+#: src/postulo/plugins/views_pairing.py
+msgid "Choose a pairing."
+msgstr ""
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Choose a record"
+msgstr ""
+
+#: src/postulo/plugins/views_pairing.py
+msgid "Choose a record to pair it with."
+msgstr ""
+
 #: src/postulo/applications/ical_import.py
 msgid "Choose a time zone"
 msgstr "Pasirinkite laiko juostą"
@@ -4995,6 +5062,11 @@ msgstr "Pasirinkite archyvą, kurį norite įkelti."
 #: src/postulo/core/mail_auth.py
 msgid "Choose an identity provider and save it first."
 msgstr "Pirmiausia pasirinkite tapatybės teikėją ir išsaugokite."
+
+#: src/postulo/templates/connections/pairing.html
+#, python-format
+msgid "Choose an item to pair with <bdi>%(name)s</bdi>."
+msgstr ""
 
 #: src/postulo/templates/core/import_csv_map.html
 msgid "Choose another file"
@@ -5051,6 +5123,10 @@ msgstr "Pasirinkite identifikatoriaus tipą."
 #: src/postulo/templates/documents/cv_detail.html
 msgid "Choose what it prints instead"
 msgstr "Pasirinkti, ką pateikti vietoj to"
+
+#: src/postulo/plugins/views_pairing.py
+msgid "Choose what to do with the item."
+msgstr ""
 
 #: src/postulo/jobs/status_views.py
 msgid "Choose what was reported and the date."
@@ -5338,6 +5414,7 @@ msgstr "Įmonių, skelbimų, paraiškų, fiksavimų ir dokumentų jame taip pat 
 #: src/postulo/applications/forms.py src/postulo/applications/reports.py
 #: src/postulo/applications/tables.py src/postulo/core/csv_import.py
 #: src/postulo/jobs/models.py src/postulo/jobs/tables.py
+#: src/postulo/plugins/pairing.py
 #: src/postulo/templates/applications/report.html
 #: src/postulo/templates/base.html
 #: src/postulo/templates/core/import_csv_map.html
@@ -5483,6 +5560,7 @@ msgid "Connection security"
 msgstr "Ryšio sauga"
 
 #: src/postulo/core/settings_sections.py src/postulo/plugins/views.py
+#: src/postulo/plugins/views_pairing.py
 #: src/postulo/templates/connections/list.html
 msgid "Connections"
 msgstr "Ryšiai"
@@ -5507,7 +5585,7 @@ msgstr "Konsultavimas"
 msgid "contact"
 msgstr "kontaktas"
 
-#: src/postulo/templates/jobs/contact_form.html
+#: src/postulo/plugins/pairing.py src/postulo/templates/jobs/contact_form.html
 msgid "Contact"
 msgstr "Kontaktas"
 
@@ -6103,7 +6181,7 @@ msgstr "tankis"
 msgid "department"
 msgstr "padalinys"
 
-#: src/postulo/jobs/forms.py
+#: src/postulo/jobs/forms.py src/postulo/plugins/pairing.py
 #: src/postulo/templates/applications/application_detail.html
 msgid "Department"
 msgstr "Padalinys"
@@ -7278,9 +7356,18 @@ msgstr "Failai, kuriuos jau turėjote, priešingai nei Postulo sugeneruoti dokum
 msgid "Files you have already"
 msgstr "Failai, kuriuos jau turite"
 
+#: src/postulo/templates/connections/pairing_item.html
+#, python-format
+msgid "Fill from %(plugin)s and pair"
+msgstr ""
+
 #: src/postulo/templates/documents/letter_detail.html
 msgid "Fill in from"
 msgstr "Užpildyti pagal"
+
+#: src/postulo/templates/connections/pairing_item.html
+msgid "Fill once, without pairing"
+msgstr ""
 
 #: src/postulo/resume/views.py
 #, python-format
@@ -7322,6 +7409,10 @@ msgstr "Ieškoti kalbos"
 #: src/postulo/templates/jobs/company_form.html
 msgid "Find logo"
 msgstr "Rasti logotipą"
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Find on the other side"
+msgstr ""
 
 #: src/postulo/templates/jobs/industry_list.html
 msgid "Find one"
@@ -7531,6 +7622,10 @@ msgstr[2] ""
 #, python-format
 msgid "Found a logo at %(url)s."
 msgstr "Rastas logotipas adresu %(url)s."
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Found on the other side"
+msgstr ""
 
 #: src/postulo/templates/connections/partials/option_table.html
 msgid "Found on the server"
@@ -8728,7 +8823,7 @@ msgstr "Vidinė"
 msgid "Internship"
 msgstr "Stažuotė"
 
-#: src/postulo/applications/models.py
+#: src/postulo/applications/models.py src/postulo/plugins/pairing.py
 msgid "Interview"
 msgstr "Pokalbis"
 
@@ -8902,13 +8997,21 @@ msgstr ""
 msgid "it could not be imported"
 msgstr "jo nepavyko importuoti"
 
+#: src/postulo/plugins/pairing.py
+msgid "It did not fill the record it was given."
+msgstr ""
+
 #: src/postulo/plugins/installing.py
 #, python-format
 msgid "it did not finish importing within %(seconds)ss"
 msgstr "jo importavimas nesibaigė per %(seconds)s s"
 
-#: src/postulo/plugins/views.py
+#: src/postulo/plugins/pairing.py src/postulo/plugins/views.py
 msgid "It did not say what it found."
+msgstr ""
+
+#: src/postulo/plugins/pairing.py
+msgid "It did not say what it made."
 msgstr ""
 
 #: src/postulo/templates/server/backups.html
@@ -9066,6 +9169,14 @@ msgstr "Galioja iki %(when)s arba kol bus panaudotas ar atšauktas."
 #: src/postulo/plugins/views.py
 msgid "It works."
 msgstr "Veikia."
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Item"
+msgstr ""
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Items found"
+msgstr ""
 
 #: src/postulo/jobs/register_views.py
 msgid "Its address is already listed."
@@ -9534,6 +9645,11 @@ msgstr "Paskutinis pasiektas etapas"
 msgid "last synced"
 msgstr "paskutinį kartą sinchronizuota"
 
+#: src/postulo/templates/connections/pairing.html
+#, python-format
+msgid "Last synced %(when)s"
+msgstr ""
+
 #: src/postulo/api/models.py
 msgid "last used"
 msgstr "naudotas paskutinį kartą"
@@ -9678,6 +9794,11 @@ msgstr "Teisinė informacija"
 #: src/postulo/jobs/models.py
 msgid "legal state"
 msgstr "teisinis statusas"
+
+#: src/postulo/templates/connections/pairing.html
+#, python-format
+msgid "Let %(plugin)s make a new one"
+msgstr ""
 
 #: src/postulo/core/server_forms.py
 msgid "Let a capture keep a rendering of its page"
@@ -9986,6 +10107,11 @@ msgstr "Mažosios raidės, skaitmenys, taškai, apatiniai brūkšniai ir brūkš
 #: src/postulo/templates/server/person_recovery.html
 msgid "Made"
 msgstr "Sukurta"
+
+#: src/postulo/plugins/views_pairing.py
+#, python-format
+msgid "Made %(record)s from %(item)s, without pairing them."
+msgstr ""
 
 #: src/postulo/core/models.py
 msgid "mail failures in a row"
@@ -11230,6 +11356,10 @@ msgstr "Nė viena jūsų įmonė neturi tokio pavadinimo ar identifikatoriaus."
 msgid "None of your own yet. A CV in another language prints the name the ESCO classification gives this skill there, and the name as you wrote it where the classification gives none."
 msgstr "Savų dar nėra. Kitos kalbos CV pateikia pavadinimą, kurį šiam įgūdžiui toje kalboje suteikia ESCO klasifikacija, o ten, kur klasifikacija jo nesuteikia, – pavadinimą, kaip jį parašėte."
 
+#: src/postulo/templates/connections/pairing_item.html
+msgid "None of your records matches."
+msgstr ""
+
 #: src/postulo/templates/applications/partials/reminders.html
 msgid "None outstanding."
 msgstr "Neatliktų nėra."
@@ -11370,6 +11500,10 @@ msgstr "Puslapyje nenurodyta — numatytoji reikšmė. Saugoma tik kartu su suma
 msgid "Not one of these"
 msgstr "Nė viena iš šių"
 
+#: src/postulo/templates/connections/pairing.html
+msgid "Not paired yet"
+msgstr ""
+
 #: src/postulo/jobs/forms.py
 msgid "Not part of another company"
 msgstr "Nepriklauso kitai įmonei"
@@ -11446,6 +11580,10 @@ msgstr "Nerodoma · %(name)s"
 #: src/postulo/resume/models.py
 msgid "Not stated"
 msgstr "Nenurodyta"
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Not synced yet"
+msgstr ""
 
 #: src/postulo/templates/connections/list.html
 msgid "not tested yet"
@@ -11534,6 +11672,10 @@ msgstr "pastabos apie įmones"
 msgid "notes on contacts"
 msgstr "pastabos apie kontaktus"
 
+#: src/postulo/templates/connections/pairing.html
+msgid "Nothing"
+msgstr ""
+
 #: src/postulo/templates/server/plugins.html
 msgid "nothing"
 msgstr "nieko"
@@ -11557,6 +11699,10 @@ msgid_plural "Nothing fills in %(names)s, so they go out blank."
 msgstr[0] "Nėra kuo užpildyti %(names)s, todėl jis bus išsiųstas tuščias."
 msgstr[1] "Nėra kuo užpildyti %(names)s, todėl jie bus išsiųsti tušti."
 msgstr[2] "Nėra kuo užpildyti %(names)s, todėl jie bus išsiųsti tušti."
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Nothing found on the other side."
+msgstr ""
 
 #: src/postulo/templates/jobs/posting_detail.html
 msgid "Nothing has arrived about this one yet."
@@ -11656,6 +11802,10 @@ msgstr "Čia dar nieko neįdiegta. Papildiniai laikomi aplanke %(directory)s, du
 #: src/postulo/templates/server/plugins.html
 msgid "Nothing is installed that a person can hold an opinion about."
 msgstr "Nėra įdiegta nieko, apie ką asmuo galėtų turėti nuomonę."
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Nothing is paired on this connection yet."
+msgstr ""
 
 #: src/postulo/templates/jobs/capture_form.html
 msgid "Nothing is saved until you have reviewed it."
@@ -12107,6 +12257,10 @@ msgstr "Fiksavimų peržiūroje „d“ išmeta ir pereina prie kito, o „j“ 
 #, python-format
 msgid "On the map at %(how)s."
 msgstr "Žemėlapyje pažymėta: %(how)s."
+
+#: src/postulo/templates/connections/pairing.html
+msgid "On the other side"
+msgstr ""
 
 #: src/postulo/templates/applications/suggestion_list.html
 msgid "On the timeline"
@@ -12799,6 +12953,65 @@ msgstr "Iš fiksavimų išsaugoti puslapiai"
 #: src/postulo/templates/partials/table/pagination.html
 msgid "Pagination"
 msgstr "Puslapiavimas"
+
+#: src/postulo/templates/connections/pairing.html
+#: src/postulo/templates/connections/pairing_item.html
+msgid "Pair"
+msgstr ""
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Pair again"
+msgstr ""
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Pair what is on the other side with your own records, or undo a pairing. Both sides are kept either way."
+msgstr ""
+
+#: src/postulo/templates/cotton/pairing_line.html
+#, python-format
+msgid "Pair with an item on <bdi>%(connection)s</bdi>…"
+msgstr ""
+
+#: src/postulo/templates/connections/pairing_item.html
+#, python-format
+msgid "Pair with: %(kind)s"
+msgstr ""
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Paired"
+msgstr ""
+
+#: src/postulo/plugins/views_pairing.py
+#, python-format
+msgid "Paired %(item)s with %(record)s. The next sync compares the two."
+msgstr ""
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Paired records"
+msgstr ""
+
+#: src/postulo/templates/cotton/pairing_line.html
+#, python-format
+msgid "Paired through <bdi>%(connection)s</bdi>, last synced %(when)s"
+msgstr ""
+
+#: src/postulo/templates/cotton/pairing_line.html
+#, python-format
+msgid "Paired through <bdi>%(connection)s</bdi>, not synced yet"
+msgstr ""
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Paired with"
+msgstr ""
+
+#: src/postulo/templates/connections/list.html
+msgid "Pairing"
+msgstr ""
+
+#: src/postulo/templates/connections/pairing.html
+#, python-format
+msgid "Pairing on %(label)s"
+msgstr ""
 
 #: src/postulo/applications/models.py
 msgid "Panel"
@@ -14012,6 +14225,8 @@ msgid "Recipient"
 msgstr "Gavėjas"
 
 #: src/postulo/templates/applications/partials/status_card.html
+#: src/postulo/templates/connections/pairing.html
+#: src/postulo/templates/connections/pairing_item.html
 msgid "Record"
 msgstr "Įrašyti"
 
@@ -14141,6 +14356,11 @@ msgid_plural "Records older than %(cutoff)s (%(days)s days). Nothing was removed
 msgstr[0] "Įrašai, senesni nei %(cutoff)s (%(days)s diena). Nieko nepašalinta; tai ataskaita, pagal kurią būtų atliktas ištrynimas."
 msgstr[1] "Įrašai, senesni nei %(cutoff)s (%(days)s dienos). Nieko nepašalinta; tai ataskaita, pagal kurią būtų atliktas ištrynimas."
 msgstr[2] "Įrašai, senesni nei %(cutoff)s (%(days)s dienų). Nieko nepašalinta; tai ataskaita, pagal kurią būtų atliktas ištrynimas."
+
+#: src/postulo/templates/connections/pairing.html
+#, python-format
+msgid "Records paired on %(label)s"
+msgstr ""
 
 #: src/postulo/templates/server/person_recovery.html
 msgid "Recovery"
@@ -14323,6 +14543,7 @@ msgstr "Priminti dieną prieš"
 msgid "reminder"
 msgstr "priminimas"
 
+#: src/postulo/plugins/pairing.py
 #: src/postulo/templates/applications/reminder_form.html
 #: src/postulo/templates/base.html
 msgid "Reminder"
@@ -14425,6 +14646,15 @@ msgstr "Pašalinti {label}"
 #: src/postulo/plugins/models.py
 msgid "removed on the other side"
 msgstr "pašalinta kitoje pusėje"
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Removed on the other side"
+msgstr ""
+
+#: src/postulo/templates/cotton/pairing_line.html
+#, python-format
+msgid "Removed on the other side of <bdi>%(connection)s</bdi>"
+msgstr ""
 
 #: src/postulo/core/models.py
 msgid "Removed there"
@@ -14876,7 +15106,9 @@ msgstr "teisės"
 msgid "Screening"
 msgstr "Atranka"
 
-#: src/postulo/core/tables.py src/postulo/templates/core/search.html
+#: src/postulo/core/tables.py src/postulo/templates/connections/pairing.html
+#: src/postulo/templates/connections/pairing_item.html
+#: src/postulo/templates/core/search.html
 #: src/postulo/templates/cotton/site_search.html
 #: src/postulo/templates/jobs/industry_list.html
 msgid "Search"
@@ -14918,6 +15150,10 @@ msgstr "Ieškoti kalendoriuje"
 #: src/postulo/documents/views.py
 msgid "Search what you sent"
 msgstr "Ieškoti to, ką išsiuntėte"
+
+#: src/postulo/templates/connections/pairing_item.html
+msgid "Search your records"
+msgstr ""
 
 #: src/postulo/core/server_forms.py
 msgid "Seconds to wait for the server before giving up."
@@ -15463,6 +15699,10 @@ msgstr "Rodyti šį adresą žemėlapyje?"
 msgid "Show this period"
 msgstr "Rodyti šį laikotarpį"
 
+#: src/postulo/templates/connections/pairing.html
+msgid "Show unpaired"
+msgstr ""
+
 #: src/postulo/jobs/tables.py
 #: src/postulo/templates/applications/calendar_print.html
 #: src/postulo/templates/jobs/partials/whose_form.html
@@ -15952,7 +16192,8 @@ msgstr "STARTTLS, prisijungus"
 msgid "state"
 msgstr "būsena"
 
-#: src/postulo/jobs/tables.py src/postulo/templates/jobs/company_register.html
+#: src/postulo/jobs/tables.py src/postulo/templates/connections/pairing.html
+#: src/postulo/templates/jobs/company_register.html
 #: src/postulo/templates/server/person_recovery.html
 msgid "State"
 msgstr "Būsena"
@@ -16203,6 +16444,7 @@ msgid "sync links"
 msgstr "sinchronizavimo saitai"
 
 #: src/postulo/templates/connections/list.html
+#: src/postulo/templates/connections/pairing.html
 msgid "Sync now"
 msgstr "Sinchronizuoti dabar"
 
@@ -16714,6 +16956,14 @@ msgstr "Šis vaizdas daug didesnis, nei reikia."
 msgid "That invitation has already been accepted and cannot be revoked."
 msgstr "Tas kvietimas jau priimtas, todėl jo nebegalima atšaukti."
 
+#: src/postulo/plugins/views.py
+#, python-format
+msgid "That is a lot of questions to the server. Try again in %(seconds)d second."
+msgid_plural "That is a lot of questions to the server. Try again in %(seconds)d seconds."
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+
 #: src/postulo/core/server_views.py
 msgid "That is a lot of recovery links. Try again shortly."
 msgstr "Per daug atkūrimo nuorodų. Netrukus bandykite dar kartą."
@@ -16916,6 +17166,23 @@ msgstr "Tai visos paskyros eksportas. Šis puslapis nuskaito tik failą, kurį p
 msgid "That is the last administrator. Appoint another first."
 msgstr "Tai paskutinis administratorius. Pirmiausia paskirkite kitą."
 
+#: src/postulo/plugins/pairing.py
+msgid "That item cannot be made into one of those."
+msgstr ""
+
+#: src/postulo/plugins/views_pairing.py
+msgid "That item cannot be paired with one of those."
+msgstr ""
+
+#: src/postulo/plugins/views_pairing.py
+#, python-format
+msgid "That item is already paired with %(record)s. Unpair it first."
+msgstr ""
+
+#: src/postulo/plugins/pairing.py
+msgid "That item is no longer on the other side."
+msgstr ""
+
 #: src/postulo/templates/account/recovery_unusable.html
 msgid "That link cannot be used"
 msgstr "Šios nuorodos naudoti negalima"
@@ -17006,6 +17273,10 @@ msgstr[2] "Tas puslapis keliavo ilgiau nei %(seconds)s sekundžių, todėl nebuv
 #, python-format
 msgid "That page was sent with the content encoding “%(coding)s”, which Postulo does not unpack, so it was not read."
 msgstr "Tas puslapis buvo išsiųstas su turinio kodavimu „%(coding)s“, kurio Postulo neišpakuoja, todėl jis nebuvo nuskaitytas."
+
+#: src/postulo/plugins/views_pairing.py
+msgid "That pairing still has its other side."
+msgstr ""
 
 #: src/postulo/applications/forms.py
 msgid "That person is not recorded at this service."
@@ -19314,6 +19585,10 @@ msgstr "Laukia sprendimo"
 msgid "To hand over a posting (needs the captures scope):"
 msgstr "Norėdami perduoti skelbimą (reikia teisės captures):"
 
+#: src/postulo/templates/connections/pairing.html
+msgid "To pair with"
+msgstr ""
+
 #: src/postulo/templates/documents/cv_detail.html
 msgid "To see where the pages break. A draft is kept nowhere; Export PDF is what files a version."
 msgstr "Kad matytumėte, kur lūžta puslapiai. Juodraštis niekur nesaugomas; versiją įrašo tik „Eksportuoti PDF“."
@@ -19440,6 +19715,7 @@ msgid "Two-factor authentication"
 msgstr "Dviejų veiksnių autentifikavimas"
 
 #: src/postulo/accounts/models.py src/postulo/jobs/tables.py
+#: src/postulo/templates/connections/pairing_item.html
 #: src/postulo/templates/cotton/identifier_row.html
 #: src/postulo/templates/jobs/capture_page.html
 #: src/postulo/templates/partials/phone_numbers.html
@@ -19586,8 +19862,18 @@ msgstr "Kitaip nei telefono numeris, adresas šiame egzemplioriuje gali būti sa
 msgid "Unlike a telephone number, an address is not kept once on this instance, because people share a home; you cannot list the same one twice yourself. The bin removes a row at once, after asking, without waiting for <em>Save</em>."
 msgstr "Kitaip nei telefono numeris, adresas šiame egzemplioriuje gali būti įrašytas ne vieną kartą, nes žmonės gyvena kartu; tik pats to paties adreso du kartus įrašyti negalite. Šiukšlinė pašalina eilutę iš karto, prieš tai paklaususi, nelaukdama <em>Išsaugoti</em>."
 
+#: src/postulo/templates/connections/pairing.html
+#: src/postulo/templates/cotton/pairing_line.html
+msgid "Unpair"
+msgstr ""
+
 #: src/postulo/plugins/models.py
 msgid "unpaired"
+msgstr ""
+
+#: src/postulo/plugins/views_pairing.py
+#, python-format
+msgid "Unpaired. Both sides are kept, and %(connection)s leaves them alone."
 msgstr ""
 
 #: src/postulo/resume/publications.py
@@ -21242,9 +21528,14 @@ msgstr "Taip: atėjęs per tapatybės teikėją prijungiamas iš karto, nepraša
 msgid "Yes: somebody who has forgotten their password can ask for a code at their primary address and type it back. A code rather than a link, because mail scanners follow links and would spend one before the person read it. It is never a second factor: an authenticator app is still asked for. Offered only while this instance's mail is actually getting through."
 msgstr "Taip: pamiršęs slaptažodį gali paprašyti kodo savo pagrindiniu el. pašto adresu ir jį įvesti. Kodas, o ne nuoroda, nes pašto skeneriai atidaro nuorodas ir ją išnaudotų dar žmogui neperskaičius laiško. Tai niekada nėra antrasis veiksnys: autentifikavimo programėlės vis tiek prašoma. Siūloma tik tol, kol šio egzemplioriaus laiškai iš tikrųjų pasiekia gavėjus."
 
-#: src/postulo/jobs/views.py
+#: src/postulo/jobs/views.py src/postulo/plugins/pairing.py
 msgid "You"
 msgstr "Jūs"
+
+#: src/postulo/plugins/pairing.py
+#, python-format
+msgid "You (%(name)s)"
+msgstr ""
 
 #: src/postulo/api/routers/companies.py src/postulo/jobs/forms.py
 #: src/postulo/jobs/surface.py
@@ -21706,6 +21997,10 @@ msgid_plural "Your record lists %(total)s public works; the first %(most)s are s
 msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
+
+#: src/postulo/templates/connections/pairing_item.html
+msgid "Your records"
+msgstr ""
 
 #: src/postulo/resume/models.py
 msgid "your role"

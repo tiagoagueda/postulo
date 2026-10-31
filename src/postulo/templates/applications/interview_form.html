@@ -71,5 +71,8 @@
         <a href="{{ application.get_absolute_url }}" class="btn" data-variant="ghost">{% translate "Cancel" %}</a>
       </div>
     </form>
+    {% if form.instance.pk %}
+      <c-pairing-line :record="form.instance" class="mt-8" />
+    {% endif %}
   </div>
 {% endblock %}

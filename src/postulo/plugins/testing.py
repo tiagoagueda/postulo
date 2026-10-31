@@ -42,6 +42,12 @@ rows it writes are not: the model is Postulo's to change. A plugin that binds th
 listing still has to see, in its own tests, what its call wrote -- `listing_history` is
 that, as plain values, so a plugin's test suite can assert on the outcome without depending
 on the table underneath it.
+
+**And pairing by hand, as the page does it (#327).** `pair_by_hand`, `unpair_by_hand` and
+`create_by_hand` go through what a sync connection's *Pairing* page goes through -- the item
+asked of the plugin again by its key, the address taken from that answer, the record made by
+the plugin's ``fill_record`` and checked -- without a browser, so a sync plugin's own tests can
+see what its next run makes of each.
 """
 
 from __future__ import annotations
@@ -261,3 +267,65 @@ def listing_history(record) -> list[dict]:
             }
         )
     return entries
+
+
+def _on_the_server(connection):
+    """What the page's call to the plugin does, without a request: an answer or a sentence."""
+
+    def call(method):
+        try:
+            return True, method(connection.full_config)
+        except Exception as error:
+            return False, f"{type(error).__name__}: {error}"
+
+    return call
+
+
+def pair_by_hand(connection, record, *, collection: str, uid: str):
+    """Pair ``record`` with the item ``(collection, uid)`` as *Pair* on the page does (#327).
+
+    The plugin is asked for the item by its key, and the `SyncLink` is written from its
+    answer, with no version tag, for its next run to compare. Raises `AlreadyPaired` for an
+    item another record holds, and `postulo.plugins.pairing.Refusal` for one the plugin no
+    longer has or that cannot be paired with a record of this kind. Returns the link.
+    """
+    from . import pairing
+
+    plugin = connection.plugin_instance
+    item = pairing.find(_on_the_server(connection), plugin, collection, uid)
+    if pairing.kind_of(record) not in item.kinds:
+        raise pairing.Refusal("That item cannot be paired with one of those.")
+    return pairing.pair(connection, item, record)
+
+
+def unpair_by_hand(connection, record, slot: str = ""):
+    """Undo ``record``'s pairing in ``slot`` as *Unpair* does: both sides kept, the row too.
+
+    Returns the link, or ``None`` where there was none to undo.
+    """
+    from . import pairing
+    from .models import SyncLink
+
+    link = SyncLink.for_record(connection, record, slot)
+    if link is None or not link.paired:
+        return None
+    return pairing.unpair(link)
+
+
+def create_by_hand(connection, *, collection: str, uid: str, kind: str, into=None, pair=True):
+    """Have the plugin make a ``kind`` from an item, or fill ``into``, as the page does.
+
+    The plugin's ``fill_record`` is called with the item as it answers for it now, and what it
+    returns is held to the same check: a record of ``kind``, the connection owner's own, and
+    ``into`` itself when one was given. Then it is paired with the item, unless ``pair`` is
+    false -- the one-off import. Returns the record.
+    """
+    from . import pairing
+
+    plugin = connection.plugin_instance
+    on_the_server = _on_the_server(connection)
+    item = pairing.find(on_the_server, plugin, collection, uid)
+    record = pairing.fill(on_the_server, plugin, connection, item, kind, into=into)
+    if pair:
+        pairing.pair(connection, item, record)
+    return record

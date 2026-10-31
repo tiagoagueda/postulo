@@ -309,6 +309,20 @@ def furnished(applicant):
     connection = Connection.objects.create(
         owner=applicant, kind="notifier", plugin="email", label="My email"
     )
+    # A sync connection whose plugin pairs by hand, so its *Pairing* pages exist (#327): one
+    # contact paired, and the company's twin gone, so the page draws both states. The plugin
+    # answers from a list in memory and asks nothing of anybody.
+    from postulo.plugins import registry
+    from postulo.plugins.models import SyncLink
+
+    registry.register_builtin("sync", _Pairable)
+    pairing_connection = Connection.objects.create(
+        owner=applicant,
+        kind="sync",
+        plugin=_Pairable.name,
+        label="My phone",
+        config={"url": "https://dav.example.org/", "interval": "60"},
+    )
     # A suggestion a plugin filed that nothing has matched to an application: the state in
     # which the accept form carries a select, which #167 measured at 45 pixels over the edge
     # of a phone in English and the walk had never reached. Filed through the service, as a
@@ -397,7 +411,17 @@ def furnished(applicant):
     applicant.is_staff = True
     applicant.is_superuser = True
     applicant.save()
-    return {
+    SyncLink.bind(
+        pairing_connection,
+        company.contacts.first(),
+        collection="/cards/",
+        uid="ada",
+        remote_href="/cards/ada.vcf",
+        last_synced_at=timezone.now(),
+    )
+    SyncLink.bind(pairing_connection, company, collection="/cards/", uid="acme", remote_gone=True)
+    yield {
+        "pairing": pairing_connection,
         "application": application,
         "ended": ended,
         "duplicate": duplicate,
@@ -431,6 +455,52 @@ def furnished(applicant):
             owner=applicant, municipality="Cambridge", country="GB", is_primary=True
         ),
     }
+    registry.unregister_builtin("sync", _Pairable)
+
+
+class _Pairable:
+    """A sync plugin that pairs by hand, for the walk's *Pairing* pages (#327)."""
+
+    name = "a11y-pairable"
+    version = "0.1"
+    kind = "sync"
+    label = "Pairable"
+
+    def config_fields(self):
+        from postulo.plugins.base import FieldSpec
+
+        return [FieldSpec("url", "Server", type="url")]
+
+    def test(self, config):
+        from postulo.plugins.base import TestResult
+
+        return TestResult(True)
+
+    def remote_items(self, config, search="", kind="", key=None):
+        from postulo.plugins.base import RemoteItem
+
+        items = [
+            RemoteItem(
+                "/cards/",
+                uid,
+                label,
+                collection_label="Cards",
+                href=f"/cards/{uid}.vcf",
+                detail=detail,
+                kinds=("contact", "company"),
+            )
+            for uid, label, detail in (
+                ("ada", "Ada Lovelace", "Analyst"),
+                ("acme", "Acme Ltd", "Lisbon"),
+                ("grace", "Grace Hopper", "Rear admiral"),
+            )
+        ]
+        if key is not None:
+            return [item for item in items if item.key == tuple(key)]
+        return [item for item in items if search.lower() in item.label.lower()]
+
+    def sync(self, connection, config):  # pragma: no cover - never run here
+        raise NotImplementedError
 
 
 #: A picture a browser will actually draw: one pixel, which the page stretches to the
@@ -505,6 +575,7 @@ def signed_in_paths(a, c, me, entry=None, recovery_link: str = "", things=None) 
     appointment = it.get("appointment", a)
     offer = it.get("offer", a)
     connection = it.get("connection", a)
+    pairing = it.get("pairing", a)
     errand = it.get("errand", a)
     import_errand = it.get("import_errand", a)
     ended = it.get("ended", a)
@@ -733,6 +804,11 @@ def signed_in_paths(a, c, me, entry=None, recovery_link: str = "", things=None) 
         "/settings/connections/add/notifier/webhook/",
         f"/settings/connections/{connection.pk}/",
         f"/settings/connections/{connection.pk}/delete/",
+        # A sync connection's *Pairing* page (#327): as it opens, from what is paired; with
+        # what the plugin found, in the live region; and one item with the records to pair.
+        f"/settings/connections/{pairing.pk}/pairing/",
+        f"/settings/connections/{pairing.pk}/pairing/?unpaired=1",
+        f"/settings/connections/{pairing.pk}/pairing/item/?collection=/cards/&uid=grace&kind=contact",
         *(
             [
                 f"/career/experience/{entry.pk}/edit/",
@@ -943,6 +1019,25 @@ def test_a_connection_form_showing_what_was_found_has_no_violations(
         assert not found, describe(f"a connection form with found options ({scheme})", found)
     finally:
         registry.unregister_builtin("sync", _Collections)
+
+
+@pytest.mark.parametrize("scheme", ["light", "dark"])
+def test_the_pairing_page_with_what_the_plugin_found_has_no_violations(
+    live_server, page: Page, axe_source, furnished, scheme
+):
+    """*Show unpaired* on a sync connection's *Pairing* page brings a table with a caption into
+    the live region, beside the table of what is paired, gone ones too (#327)."""
+    connection = furnished["pairing"]
+    page.emulate_media(color_scheme=scheme)
+    sign_in(page, live_server.url)
+    page.goto(f"{live_server.url}/settings/connections/{connection.pk}/pairing/")
+    expect(page.locator("[data-pairing-links] [data-gone]")).to_have_count(1)
+    page.get_by_role("button", name="Show unpaired").click()
+    results = page.locator("#pairing-results[aria-live=polite]")
+    expect(results.locator("caption")).to_have_text("Not paired yet")
+    expect(results.get_by_role("row", name="Grace Hopper")).to_be_visible()
+    found = violations_on(page, axe_source)
+    assert not found, describe(f"the pairing page ({scheme})", found)
 
 
 @pytest.mark.parametrize("scheme", ["light", "dark"])
@@ -1280,6 +1375,7 @@ def walked_url_names() -> frozenset[str]:
                     "reminder",
                     "offer",
                     "connection",
+                    "pairing",
                     "address",
                 ),
                 stand_in,

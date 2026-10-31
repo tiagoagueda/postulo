@@ -304,6 +304,16 @@ EXCUSED: dict[str, str] = {
         "draws the form again (#332)"
     ),
     "connections:sync_now": "a POST that runs one synchronisation immediately",
+    "connections:pairing_apply": (
+        "a POST from a sync connection's pairing pages that pairs an item, or has the plugin "
+        "make a record from it, then goes back to the page it came from (#327)"
+    ),
+    "connections:pairing_unpair": (
+        "a POST from the pairing page or a record's page that undoes one pairing (#327)"
+    ),
+    "connections:pairing_renew": (
+        "a POST from the pairing page that forgets a pairing whose other side is gone (#327)"
+    ),
     "connections:backfill": "a POST that queues everything a store has not received",
     "api:token_revoke": "a POST that withdraws an API token",
     # `settings:index` used to sit here with the same reason and was removed in #167: the

@@ -1197,6 +1197,11 @@ msgstr "%(person)s er síðasti meðlimur %(name)s, sem á enn færslur. Gefðu 
 msgid "%(plugin)s could not check these settings: %(error)s"
 msgstr "%(plugin)s gat ekki athugað þessar stillingar: %(error)s"
 
+#: src/postulo/plugins/views_pairing.py
+#, python-format
+msgid "%(plugin)s could not do that: %(message)s"
+msgstr ""
+
 #: src/postulo/plugins/views.py
 #, python-format
 msgid "%(plugin)s could not look on the server: %(message)s"
@@ -1205,6 +1210,11 @@ msgstr ""
 #: src/postulo/plugins/views.py
 #, python-format
 msgid "%(plugin)s has nothing to look for."
+msgstr ""
+
+#: src/postulo/plugins/views_pairing.py
+#, python-format
+msgid "%(plugin)s makes a new one on its next run."
 msgstr ""
 
 #: src/postulo/core/mail_auth.py
@@ -2314,6 +2324,11 @@ msgstr "Nafn er ekki auðkenni: tveir rannsakendur deila einu, og einn rannsakan
 msgid "A new one"
 msgstr "Nýtt"
 
+#: src/postulo/templates/connections/pairing_item.html
+#, python-format
+msgid "A new one: %(kind)s"
+msgstr ""
+
 #: src/postulo/templates/server/design.html
 msgid "A number and what it counts. The colour is a second signal, never the only one."
 msgstr "Tala og það sem hún telur. Liturinn er annað merki, aldrei það eina."
@@ -2504,6 +2519,10 @@ msgstr "Fáorður annáll er sá sem þú vilt."
 #: src/postulo/resume/forms.py
 msgid "A range such as 41–52, or one page."
 msgstr "Bil eins og 41–52, eða ein blaðsíða."
+
+#: src/postulo/templates/connections/pairing.html
+msgid "A record since deleted"
+msgstr ""
 
 #: src/postulo/documents/forms.py
 msgid "A referee who is not a contact yet. Their name is enough; it is added to your contacts without a company, and is used instead of the choice above."
@@ -2858,6 +2877,7 @@ msgid "Across the whole file, rows are skipped for want of a company or a role. 
 msgstr "Í allri skránni er röðum sleppt ef fyrirtæki eða starf vantar. Raðir sem eru þegar skráðar finnast og þeim er sleppt um leið og flutt er inn."
 
 #: src/postulo/templates/accounts/invite_list.html
+#: src/postulo/templates/connections/pairing.html
 #: src/postulo/templates/documents/rendered_list.html
 #: src/postulo/templates/server/backups.html
 #: src/postulo/templates/server/people.html
@@ -3279,6 +3299,11 @@ msgstr "Þegar ákveðið —"
 msgid "Already in your record"
 msgstr "Nú þegar í gögnunum þínum"
 
+#: src/postulo/templates/connections/pairing_item.html
+#, python-format
+msgid "Already paired with <bdi>%(name)s</bdi>. Unpair it on the pairing page to pair it with something else."
+msgstr ""
+
 #: src/postulo/applications/agenda.py
 msgid "Already sent —"
 msgstr "Þegar sent —"
@@ -3606,6 +3631,10 @@ msgstr "Hvaða geiri sem er"
 msgid "Anyone holding the link may use it, once. Send it however you like."
 msgstr "Hver sem hefur tengilinn getur notað hann, einu sinni. Sendu hann eftir hvaða leið sem þú vilt."
 
+#: src/postulo/templates/connections/pairing.html
+msgid "Anything"
+msgstr ""
+
 #: src/postulo/resume/forms.py
 msgid "Anything a reader should know, in a few words."
 msgstr "Allt sem lesandi ætti að vita, í fáum orðum."
@@ -3659,7 +3688,7 @@ msgstr "API-teikn"
 msgid "Appearance"
 msgstr "Útlit"
 
-#: src/postulo/applications/ical_import.py
+#: src/postulo/applications/ical_import.py src/postulo/plugins/pairing.py
 #: src/postulo/templates/applications/suggestion_list.html
 #: src/postulo/templates/base.html
 #: src/postulo/templates/documents/letter_detail.html
@@ -3964,6 +3993,10 @@ msgstr "Sem hreinn texti"
 msgid "As the institution words it. Kept in your record; a CV does not print it yet."
 msgstr "Eins og stofnunin orðar það. Geymt í ferilskráningunni þinni; ferilskrá birtir það ekki enn."
 
+#: src/postulo/templates/connections/pairing.html
+msgid "As the last sync left them. Unpairing keeps both sides, and the next sync leaves them alone."
+msgstr ""
+
 #: src/postulo/jobs/forms.py
 msgid "As the posting words it — a city, a region, a country. Free text: nothing is looked up anywhere."
 msgstr "Eins og auglýsingin orðar það — borg, svæði, land. Frjáls texti: hvergi er flett upp."
@@ -4002,6 +4035,11 @@ msgstr "Spurt"
 
 #: src/postulo/templates/server/record_of_processing.html
 msgid "Asked only when somebody presses for it, one company at a time. Each is sent what is listed and nothing about the person asking."
+msgstr ""
+
+#: src/postulo/templates/connections/pairing.html
+#, python-format
+msgid "Asks %(plugin)s now. Nothing it answers is kept here."
 msgstr ""
 
 #: src/postulo/applications/analytics.py src/postulo/applications/models.py
@@ -4140,6 +4178,10 @@ msgstr "Komið aftur í auglýsingarnar þínar."
 msgid "Back to Backups"
 msgstr "Aftur í Öryggisafrit"
 
+#: src/postulo/templates/connections/pairing.html
+msgid "Back to connections"
+msgstr ""
+
 #: src/postulo/core/help.py
 msgid "Back to Documents"
 msgstr "Aftur í Skjöl"
@@ -4147,6 +4189,10 @@ msgstr "Aftur í Skjöl"
 #: src/postulo/templates/accounts/invite_created.html
 msgid "Back to invitations"
 msgstr "Til baka í boð"
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Back to it"
+msgstr ""
 
 #: src/postulo/core/help.py
 msgid "Back to Listings"
@@ -4487,6 +4533,10 @@ msgstr "Símtal"
 msgid "Callback to register with it"
 msgstr "Svarslóð til að skrá hjá henni"
 
+#: src/postulo/templates/connections/pairing.html
+msgid "Can pair with"
+msgstr ""
+
 #: src/postulo/templates/accounts/invite_form.html
 #: src/postulo/templates/accounts/profile.html
 #: src/postulo/templates/applications/application_form.html
@@ -4498,6 +4548,7 @@ msgstr "Svarslóð til að skrá hjá henni"
 #: src/postulo/templates/applications/tag_form.html
 #: src/postulo/templates/connections/confirm_delete.html
 #: src/postulo/templates/connections/form.html
+#: src/postulo/templates/connections/pairing_item.html
 #: src/postulo/templates/cotton/dialog.html
 #: src/postulo/templates/documents/cv_form.html
 #: src/postulo/templates/documents/cv_item_form.html
@@ -4872,6 +4923,10 @@ msgstr "Smáspjöld og merki"
 msgid "Choices"
 msgstr "Valkostir"
 
+#: src/postulo/templates/connections/pairing_item.html
+msgid "Choose"
+msgstr ""
+
 #: src/postulo/core/personal.py
 msgid "Choose a country from the list."
 msgstr "Veldu land af listanum."
@@ -4918,6 +4973,18 @@ msgstr "Veldu nýtt lykilorð"
 msgid "Choose a package first."
 msgstr "Veldu pakka fyrst."
 
+#: src/postulo/plugins/views_pairing.py
+msgid "Choose a pairing."
+msgstr ""
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Choose a record"
+msgstr ""
+
+#: src/postulo/plugins/views_pairing.py
+msgid "Choose a record to pair it with."
+msgstr ""
+
 #: src/postulo/applications/ical_import.py
 msgid "Choose a time zone"
 msgstr "Veldu tímabelti"
@@ -4929,6 +4996,11 @@ msgstr "Veldu safnskrá til að hlaða upp."
 #: src/postulo/core/mail_auth.py
 msgid "Choose an identity provider and save it first."
 msgstr "Veldu fyrst auðkennisveitu og vistaðu hana."
+
+#: src/postulo/templates/connections/pairing.html
+#, python-format
+msgid "Choose an item to pair with <bdi>%(name)s</bdi>."
+msgstr ""
 
 #: src/postulo/templates/core/import_csv_map.html
 msgid "Choose another file"
@@ -4985,6 +5057,10 @@ msgstr "Veldu hvers konar auðkenni þetta er."
 #: src/postulo/templates/documents/cv_detail.html
 msgid "Choose what it prints instead"
 msgstr "Velja frekar hvað hún birtir"
+
+#: src/postulo/plugins/views_pairing.py
+msgid "Choose what to do with the item."
+msgstr ""
 
 #: src/postulo/jobs/status_views.py
 msgid "Choose what was reported and the date."
@@ -5272,6 +5348,7 @@ msgstr "Fyrirtæki, auglýsingar, umsóknir, grip og skjöl eru heldur ekki í h
 #: src/postulo/applications/forms.py src/postulo/applications/reports.py
 #: src/postulo/applications/tables.py src/postulo/core/csv_import.py
 #: src/postulo/jobs/models.py src/postulo/jobs/tables.py
+#: src/postulo/plugins/pairing.py
 #: src/postulo/templates/applications/report.html
 #: src/postulo/templates/base.html
 #: src/postulo/templates/core/import_csv_map.html
@@ -5420,6 +5497,7 @@ msgid "Connection security"
 msgstr "Öryggi tengingar"
 
 #: src/postulo/core/settings_sections.py src/postulo/plugins/views.py
+#: src/postulo/plugins/views_pairing.py
 #: src/postulo/templates/connections/list.html
 msgid "Connections"
 msgstr "Tengingar"
@@ -5444,7 +5522,7 @@ msgstr "Ráðgjöf"
 msgid "contact"
 msgstr "tengiliður"
 
-#: src/postulo/templates/jobs/contact_form.html
+#: src/postulo/plugins/pairing.py src/postulo/templates/jobs/contact_form.html
 msgid "Contact"
 msgstr "Tengiliður"
 
@@ -6044,7 +6122,7 @@ msgstr "þéttleiki"
 msgid "department"
 msgstr "deild"
 
-#: src/postulo/jobs/forms.py
+#: src/postulo/jobs/forms.py src/postulo/plugins/pairing.py
 #: src/postulo/templates/applications/application_detail.html
 msgid "Department"
 msgstr "Deild"
@@ -7228,9 +7306,18 @@ msgstr "Skrár sem þú áttir þegar, ólíkt skjölum sem Postulo bjó til."
 msgid "Files you have already"
 msgstr "Skrár sem þú átt þegar"
 
+#: src/postulo/templates/connections/pairing_item.html
+#, python-format
+msgid "Fill from %(plugin)s and pair"
+msgstr ""
+
 #: src/postulo/templates/documents/letter_detail.html
 msgid "Fill in from"
 msgstr "Fylla inn úr"
+
+#: src/postulo/templates/connections/pairing_item.html
+msgid "Fill once, without pairing"
+msgstr ""
 
 #: src/postulo/resume/views.py
 #, python-format
@@ -7272,6 +7359,10 @@ msgstr "Finna tungumál"
 #: src/postulo/templates/jobs/company_form.html
 msgid "Find logo"
 msgstr "Finna merki"
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Find on the other side"
+msgstr ""
 
 #: src/postulo/templates/jobs/industry_list.html
 #, fuzzy
@@ -7484,6 +7575,10 @@ msgstr[1] ""
 #, python-format
 msgid "Found a logo at %(url)s."
 msgstr "Fann merki á %(url)s."
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Found on the other side"
+msgstr ""
 
 #: src/postulo/templates/connections/partials/option_table.html
 msgid "Found on the server"
@@ -8701,7 +8796,7 @@ msgstr "Innri"
 msgid "Internship"
 msgstr "Starfsnám"
 
-#: src/postulo/applications/models.py
+#: src/postulo/applications/models.py src/postulo/plugins/pairing.py
 msgid "Interview"
 msgstr "Viðtal"
 
@@ -8876,13 +8971,21 @@ msgstr ""
 msgid "it could not be imported"
 msgstr "ekki tókst að flytja hana inn"
 
+#: src/postulo/plugins/pairing.py
+msgid "It did not fill the record it was given."
+msgstr ""
+
 #: src/postulo/plugins/installing.py
 #, python-format
 msgid "it did not finish importing within %(seconds)ss"
 msgstr "innflutningi hennar var ekki lokið innan %(seconds)s s"
 
-#: src/postulo/plugins/views.py
+#: src/postulo/plugins/pairing.py src/postulo/plugins/views.py
 msgid "It did not say what it found."
+msgstr ""
+
+#: src/postulo/plugins/pairing.py
+msgid "It did not say what it made."
 msgstr ""
 
 #: src/postulo/templates/server/backups.html
@@ -9040,6 +9143,14 @@ msgstr "Það gildir til %(when)s, eða þar til það er notað eða afturkalla
 #: src/postulo/plugins/views.py
 msgid "It works."
 msgstr "Það virkar."
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Item"
+msgstr ""
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Items found"
+msgstr ""
 
 #: src/postulo/jobs/register_views.py
 msgid "Its address is already listed."
@@ -9511,6 +9622,11 @@ msgstr "Síðasta þrep sem náðist"
 msgid "last synced"
 msgstr "síðast samstillt"
 
+#: src/postulo/templates/connections/pairing.html
+#, python-format
+msgid "Last synced %(when)s"
+msgstr ""
+
 #: src/postulo/api/models.py
 msgid "last used"
 msgstr "síðast notað"
@@ -9656,6 +9772,11 @@ msgstr "Lagaleg tilkynning"
 #: src/postulo/jobs/models.py
 msgid "legal state"
 msgstr "lagaleg staða"
+
+#: src/postulo/templates/connections/pairing.html
+#, python-format
+msgid "Let %(plugin)s make a new one"
+msgstr ""
 
 #: src/postulo/core/server_forms.py
 msgid "Let a capture keep a rendering of its page"
@@ -9966,6 +10087,11 @@ msgstr "Lágstafir, tölustafir, punktar, undirstrik og bandstrik."
 #, fuzzy
 msgid "Made"
 msgstr "Búið til"
+
+#: src/postulo/plugins/views_pairing.py
+#, python-format
+msgid "Made %(record)s from %(item)s, without pairing them."
+msgstr ""
 
 #: src/postulo/core/models.py
 msgid "mail failures in a row"
@@ -11217,6 +11343,10 @@ msgstr "Ekkert fyrirtækja þinna hefur þetta heiti eða auðkenni."
 msgid "None of your own yet. A CV in another language prints the name the ESCO classification gives this skill there, and the name as you wrote it where the classification gives none."
 msgstr "Ekkert eigið heiti enn. Ferilskrá á öðru tungumáli birtir heitið sem ESCO-flokkunin gefur þessari færni þar, og heitið eins og þú skrifaðir það þar sem flokkunin gefur ekkert."
 
+#: src/postulo/templates/connections/pairing_item.html
+msgid "None of your records matches."
+msgstr ""
+
 #: src/postulo/templates/applications/partials/reminders.html
 msgid "None outstanding."
 msgstr "Ekkert útistandandi."
@@ -11359,6 +11489,10 @@ msgstr "Ekki á síðunni — sjálfgefið gildi. Aðeins geymt við hlið upph�
 msgid "Not one of these"
 msgstr "Ekkert af þessu"
 
+#: src/postulo/templates/connections/pairing.html
+msgid "Not paired yet"
+msgstr ""
+
 #: src/postulo/jobs/forms.py
 msgid "Not part of another company"
 msgstr "Ekki hluti af öðru fyrirtæki"
@@ -11435,6 +11569,10 @@ msgstr "Ekki sýnt · %(name)s"
 #: src/postulo/resume/models.py
 msgid "Not stated"
 msgstr "Ekki tilgreint"
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Not synced yet"
+msgstr ""
 
 #: src/postulo/templates/connections/list.html
 msgid "not tested yet"
@@ -11523,6 +11661,10 @@ msgstr "athugasemdir um fyrirtæki"
 msgid "notes on contacts"
 msgstr "athugasemdir um tengiliði"
 
+#: src/postulo/templates/connections/pairing.html
+msgid "Nothing"
+msgstr ""
+
 #: src/postulo/templates/server/plugins.html
 msgid "nothing"
 msgstr "ekkert"
@@ -11545,6 +11687,10 @@ msgid "Nothing fills in %(names)s, so it goes out blank."
 msgid_plural "Nothing fills in %(names)s, so they go out blank."
 msgstr[0] "Ekkert fyllir út %(names)s, svo það fer út autt."
 msgstr[1] "Ekkert fyllir út %(names)s, svo þau fara út auð."
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Nothing found on the other side."
+msgstr ""
 
 #: src/postulo/templates/jobs/posting_detail.html
 msgid "Nothing has arrived about this one yet."
@@ -11644,6 +11790,10 @@ msgstr "Ekkert er uppsett hér enn. Viðbætur eru geymdar í %(directory)s, á 
 #: src/postulo/templates/server/plugins.html
 msgid "Nothing is installed that a person can hold an opinion about."
 msgstr "Ekkert er uppsett sem manneskja gæti haft skoðun á."
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Nothing is paired on this connection yet."
+msgstr ""
 
 #: src/postulo/templates/jobs/capture_form.html
 msgid "Nothing is saved until you have reviewed it."
@@ -12099,6 +12249,10 @@ msgstr "Í yfirferð gripa hendir „d“ og heldur áfram og „j“ sleppir; �
 #, python-format
 msgid "On the map at %(how)s."
 msgstr "Á kortinu: %(how)s."
+
+#: src/postulo/templates/connections/pairing.html
+msgid "On the other side"
+msgstr ""
 
 #: src/postulo/templates/applications/suggestion_list.html
 msgid "On the timeline"
@@ -12773,6 +12927,65 @@ msgstr "Síður geymdar úr gripum"
 #: src/postulo/templates/partials/table/pagination.html
 msgid "Pagination"
 msgstr "Síðuskipting"
+
+#: src/postulo/templates/connections/pairing.html
+#: src/postulo/templates/connections/pairing_item.html
+msgid "Pair"
+msgstr ""
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Pair again"
+msgstr ""
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Pair what is on the other side with your own records, or undo a pairing. Both sides are kept either way."
+msgstr ""
+
+#: src/postulo/templates/cotton/pairing_line.html
+#, python-format
+msgid "Pair with an item on <bdi>%(connection)s</bdi>…"
+msgstr ""
+
+#: src/postulo/templates/connections/pairing_item.html
+#, python-format
+msgid "Pair with: %(kind)s"
+msgstr ""
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Paired"
+msgstr ""
+
+#: src/postulo/plugins/views_pairing.py
+#, python-format
+msgid "Paired %(item)s with %(record)s. The next sync compares the two."
+msgstr ""
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Paired records"
+msgstr ""
+
+#: src/postulo/templates/cotton/pairing_line.html
+#, python-format
+msgid "Paired through <bdi>%(connection)s</bdi>, last synced %(when)s"
+msgstr ""
+
+#: src/postulo/templates/cotton/pairing_line.html
+#, python-format
+msgid "Paired through <bdi>%(connection)s</bdi>, not synced yet"
+msgstr ""
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Paired with"
+msgstr ""
+
+#: src/postulo/templates/connections/list.html
+msgid "Pairing"
+msgstr ""
+
+#: src/postulo/templates/connections/pairing.html
+#, python-format
+msgid "Pairing on %(label)s"
+msgstr ""
 
 #: src/postulo/applications/models.py
 #, fuzzy
@@ -13997,6 +14210,8 @@ msgid "Recipient"
 msgstr "Viðtakandi"
 
 #: src/postulo/templates/applications/partials/status_card.html
+#: src/postulo/templates/connections/pairing.html
+#: src/postulo/templates/connections/pairing_item.html
 msgid "Record"
 msgstr "Skrá"
 
@@ -14126,6 +14341,11 @@ msgid "Records older than %(cutoff)s (%(days)s day). Nothing was removed; this i
 msgid_plural "Records older than %(cutoff)s (%(days)s days). Nothing was removed; this is the report a deletion would be made from."
 msgstr[0] "Færslur eldri en %(cutoff)s (%(days)s dagur). Engu var eytt; þetta er skýrslan sem eyðing yrði byggð á."
 msgstr[1] "Færslur eldri en %(cutoff)s (%(days)s dagar). Engu var eytt; þetta er skýrslan sem eyðing yrði byggð á."
+
+#: src/postulo/templates/connections/pairing.html
+#, python-format
+msgid "Records paired on %(label)s"
+msgstr ""
 
 #: src/postulo/templates/server/person_recovery.html
 msgid "Recovery"
@@ -14310,6 +14530,7 @@ msgstr "Minna mig á það daginn áður"
 msgid "reminder"
 msgstr "áminning"
 
+#: src/postulo/plugins/pairing.py
 #: src/postulo/templates/applications/reminder_form.html
 #: src/postulo/templates/base.html
 msgid "Reminder"
@@ -14413,6 +14634,15 @@ msgstr "Fjarlægja {label}"
 #: src/postulo/plugins/models.py
 msgid "removed on the other side"
 msgstr "fjarlægt hinum megin"
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Removed on the other side"
+msgstr ""
+
+#: src/postulo/templates/cotton/pairing_line.html
+#, python-format
+msgid "Removed on the other side of <bdi>%(connection)s</bdi>"
+msgstr ""
 
 #: src/postulo/core/models.py
 msgid "Removed there"
@@ -14869,7 +15099,9 @@ msgstr "heimildir"
 msgid "Screening"
 msgstr "Forval"
 
-#: src/postulo/core/tables.py src/postulo/templates/core/search.html
+#: src/postulo/core/tables.py src/postulo/templates/connections/pairing.html
+#: src/postulo/templates/connections/pairing_item.html
+#: src/postulo/templates/core/search.html
 #: src/postulo/templates/cotton/site_search.html
 #: src/postulo/templates/jobs/industry_list.html
 msgid "Search"
@@ -14911,6 +15143,10 @@ msgstr "Leita í dagatalinu"
 #: src/postulo/documents/views.py
 msgid "Search what you sent"
 msgstr "Leita í því sem þú sendir"
+
+#: src/postulo/templates/connections/pairing_item.html
+msgid "Search your records"
+msgstr ""
 
 #: src/postulo/core/server_forms.py
 msgid "Seconds to wait for the server before giving up."
@@ -15459,6 +15695,10 @@ msgstr "Sýna þetta heimilisfang á kortinu?"
 msgid "Show this period"
 msgstr "Sýna þetta tímabil"
 
+#: src/postulo/templates/connections/pairing.html
+msgid "Show unpaired"
+msgstr ""
+
 #: src/postulo/jobs/tables.py
 #: src/postulo/templates/applications/calendar_print.html
 #: src/postulo/templates/jobs/partials/whose_form.html
@@ -15956,7 +16196,8 @@ msgstr "STARTTLS, eftir tengingu"
 msgid "state"
 msgstr "staða"
 
-#: src/postulo/jobs/tables.py src/postulo/templates/jobs/company_register.html
+#: src/postulo/jobs/tables.py src/postulo/templates/connections/pairing.html
+#: src/postulo/templates/jobs/company_register.html
 #: src/postulo/templates/server/person_recovery.html
 msgid "State"
 msgstr "Staða"
@@ -16213,6 +16454,7 @@ msgid "sync links"
 msgstr "samstillingartenglar"
 
 #: src/postulo/templates/connections/list.html
+#: src/postulo/templates/connections/pairing.html
 msgid "Sync now"
 msgstr "Samstilla núna"
 
@@ -16727,6 +16969,13 @@ msgstr "Þessi mynd er miklu stærri en hún þarf að vera."
 msgid "That invitation has already been accepted and cannot be revoked."
 msgstr "Það boð hefur þegar verið þegið og verður ekki afturkallað."
 
+#: src/postulo/plugins/views.py
+#, python-format
+msgid "That is a lot of questions to the server. Try again in %(seconds)d second."
+msgid_plural "That is a lot of questions to the server. Try again in %(seconds)d seconds."
+msgstr[0] ""
+msgstr[1] ""
+
 #: src/postulo/core/server_views.py
 msgid "That is a lot of recovery links. Try again shortly."
 msgstr "Þetta eru margir endurheimtartenglar. Reyndu aftur innan skamms."
@@ -16928,6 +17177,23 @@ msgstr "Þetta er útflutningur heils reiknings. Þessi síða les aðeins skrá
 msgid "That is the last administrator. Appoint another first."
 msgstr "Þetta er síðasti stjórnandinn. Skipaðu annan fyrst."
 
+#: src/postulo/plugins/pairing.py
+msgid "That item cannot be made into one of those."
+msgstr ""
+
+#: src/postulo/plugins/views_pairing.py
+msgid "That item cannot be paired with one of those."
+msgstr ""
+
+#: src/postulo/plugins/views_pairing.py
+#, python-format
+msgid "That item is already paired with %(record)s. Unpair it first."
+msgstr ""
+
+#: src/postulo/plugins/pairing.py
+msgid "That item is no longer on the other side."
+msgstr ""
+
 #: src/postulo/templates/account/recovery_unusable.html
 msgid "That link cannot be used"
 msgstr "Ekki er hægt að nota þennan tengil"
@@ -17017,6 +17283,10 @@ msgstr[1] "Sú síða var lengur en %(seconds)s sekúndur að berast, svo hún v
 #, python-format
 msgid "That page was sent with the content encoding “%(coding)s”, which Postulo does not unpack, so it was not read."
 msgstr "Sú síða var send með efniskóðuninni „%(coding)s“, sem Postulo afþjappar ekki, svo hún var ekki lesin."
+
+#: src/postulo/plugins/views_pairing.py
+msgid "That pairing still has its other side."
+msgstr ""
 
 #: src/postulo/applications/forms.py
 msgid "That person is not recorded at this service."
@@ -19329,6 +19599,10 @@ msgstr "Til ákvörðunar"
 msgid "To hand over a posting (needs the captures scope):"
 msgstr "Til að afhenda auglýsingu (krefst heimildarinnar captures):"
 
+#: src/postulo/templates/connections/pairing.html
+msgid "To pair with"
+msgstr ""
+
 #: src/postulo/templates/documents/cv_detail.html
 msgid "To see where the pages break. A draft is kept nowhere; Export PDF is what files a version."
 msgstr "Til að sjá hvar síðuskil verða. Drög eru hvergi geymd; Flytja út PDF er það sem skráir útgáfu."
@@ -19456,6 +19730,7 @@ msgid "Two-factor authentication"
 msgstr "Tveggja þátta auðkenning"
 
 #: src/postulo/accounts/models.py src/postulo/jobs/tables.py
+#: src/postulo/templates/connections/pairing_item.html
 #: src/postulo/templates/cotton/identifier_row.html
 #: src/postulo/templates/jobs/capture_page.html
 #: src/postulo/templates/partials/phone_numbers.html
@@ -19606,8 +19881,18 @@ msgstr "Ólíkt símanúmeri er heimilisfang ekki geymt bara einu sinni á þess
 msgid "Unlike a telephone number, an address is not kept once on this instance, because people share a home; you cannot list the same one twice yourself. The bin removes a row at once, after asking, without waiting for <em>Save</em>."
 msgstr "Ólíkt símanúmeri er heimilisfang ekki geymt aðeins einu sinni á þessari uppsetningu, því fólk deilir heimili; en ekki er hægt að skrá sama heimilisfangið tvisvar á sama reikningi. Ruslafatan fjarlægir röð strax, eftir að hafa spurt, án þess að bíða eftir <em>Vista</em>."
 
+#: src/postulo/templates/connections/pairing.html
+#: src/postulo/templates/cotton/pairing_line.html
+msgid "Unpair"
+msgstr ""
+
 #: src/postulo/plugins/models.py
 msgid "unpaired"
+msgstr ""
+
+#: src/postulo/plugins/views_pairing.py
+#, python-format
+msgid "Unpaired. Both sides are kept, and %(connection)s leaves them alone."
 msgstr ""
 
 #: src/postulo/resume/publications.py
@@ -21274,9 +21559,14 @@ msgstr "Já: sá sem kemur inn í gegnum auðkennisþjónustuna er skráður bei
 msgid "Yes: somebody who has forgotten their password can ask for a code at their primary address and type it back. A code rather than a link, because mail scanners follow links and would spend one before the person read it. It is never a second factor: an authenticator app is still asked for. Offered only while this instance's mail is actually getting through."
 msgstr "Já: sá sem hefur gleymt lykilorðinu sínu getur beðið um kóða á aðalnetfangið sitt og slegið hann inn. Kóða en ekki tengil, því að póstskannar fylgja tenglum og myndu nota hann upp áður en viðkomandi læsi hann. Þetta er aldrei annar þáttur: áfram er beðið um auðkenningarforritið. Aðeins í boði á meðan póstur þessarar uppsetningar kemst raunverulega til skila."
 
-#: src/postulo/jobs/views.py
+#: src/postulo/jobs/views.py src/postulo/plugins/pairing.py
 msgid "You"
 msgstr "Þú"
+
+#: src/postulo/plugins/pairing.py
+#, python-format
+msgid "You (%(name)s)"
+msgstr ""
 
 #: src/postulo/api/routers/companies.py src/postulo/jobs/forms.py
 #: src/postulo/jobs/surface.py
@@ -21737,6 +22027,10 @@ msgid "Your record lists %(total)s public work; the first %(most)s are shown."
 msgid_plural "Your record lists %(total)s public works; the first %(most)s are shown."
 msgstr[0] ""
 msgstr[1] ""
+
+#: src/postulo/templates/connections/pairing_item.html
+msgid "Your records"
+msgstr ""
 
 #: src/postulo/resume/models.py
 msgid "your role"

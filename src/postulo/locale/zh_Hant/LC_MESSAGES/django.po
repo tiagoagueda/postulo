@@ -1117,6 +1117,11 @@ msgstr "%(person)s 是 %(name)s 的最後一位成員，而該群組仍擁有紀
 msgid "%(plugin)s could not check these settings: %(error)s"
 msgstr "%(plugin)s 無法檢查這些設定：%(error)s"
 
+#: src/postulo/plugins/views_pairing.py
+#, python-format
+msgid "%(plugin)s could not do that: %(message)s"
+msgstr ""
+
 #: src/postulo/plugins/views.py
 #, python-format
 msgid "%(plugin)s could not look on the server: %(message)s"
@@ -1125,6 +1130,11 @@ msgstr ""
 #: src/postulo/plugins/views.py
 #, python-format
 msgid "%(plugin)s has nothing to look for."
+msgstr ""
+
+#: src/postulo/plugins/views_pairing.py
+#, python-format
+msgid "%(plugin)s makes a new one on its next run."
 msgstr ""
 
 #: src/postulo/core/mail_auth.py
@@ -2210,6 +2220,11 @@ msgstr "姓名不等於身分：兩位研究人員可能同名，一位研究人
 msgid "A new one"
 msgstr "新項目"
 
+#: src/postulo/templates/connections/pairing_item.html
+#, python-format
+msgid "A new one: %(kind)s"
+msgstr ""
+
 #: src/postulo/templates/server/design.html
 msgid "A number and what it counts. The colour is a second signal, never the only one."
 msgstr "數字及其計算的對象。色彩是輔助訊號，絕不是唯一的訊號。"
@@ -2398,6 +2413,10 @@ msgstr "記錄檔越安靜越好。"
 #: src/postulo/resume/forms.py
 msgid "A range such as 41–52, or one page."
 msgstr "範圍，例如 41–52，或單一頁碼。"
+
+#: src/postulo/templates/connections/pairing.html
+msgid "A record since deleted"
+msgstr ""
 
 #: src/postulo/documents/forms.py
 msgid "A referee who is not a contact yet. Their name is enough; it is added to your contacts without a company, and is used instead of the choice above."
@@ -2748,6 +2767,7 @@ msgid "Across the whole file, rows are skipped for want of a company or a role. 
 msgstr "整個檔案中，缺少公司或職位的列都會略過。已經記錄過的列會在匯入時找出並略過。"
 
 #: src/postulo/templates/accounts/invite_list.html
+#: src/postulo/templates/connections/pairing.html
 #: src/postulo/templates/documents/rendered_list.html
 #: src/postulo/templates/server/backups.html
 #: src/postulo/templates/server/people.html
@@ -3163,6 +3183,11 @@ msgstr "已決定——"
 msgid "Already in your record"
 msgstr "已在您的紀錄中"
 
+#: src/postulo/templates/connections/pairing_item.html
+#, python-format
+msgid "Already paired with <bdi>%(name)s</bdi>. Unpair it on the pairing page to pair it with something else."
+msgstr ""
+
 #: src/postulo/applications/agenda.py
 msgid "Already sent —"
 msgstr "已傳送——"
@@ -3489,6 +3514,10 @@ msgstr "任何行業類別"
 msgid "Anyone holding the link may use it, once. Send it however you like."
 msgstr "任何持有此連結的人都可以使用它，但只能使用一次。您可以用任何方式傳送。"
 
+#: src/postulo/templates/connections/pairing.html
+msgid "Anything"
+msgstr ""
+
 #: src/postulo/resume/forms.py
 msgid "Anything a reader should know, in a few words."
 msgstr "讀者應知道的任何資訊，簡短幾個字即可。"
@@ -3542,7 +3571,7 @@ msgstr "API 權杖"
 msgid "Appearance"
 msgstr "外觀"
 
-#: src/postulo/applications/ical_import.py
+#: src/postulo/applications/ical_import.py src/postulo/plugins/pairing.py
 #: src/postulo/templates/applications/suggestion_list.html
 #: src/postulo/templates/base.html
 #: src/postulo/templates/documents/letter_detail.html
@@ -3843,6 +3872,10 @@ msgstr "以純文字形式"
 msgid "As the institution words it. Kept in your record; a CV does not print it yet."
 msgstr "依該機構的寫法。保留在您的紀錄中；履歷目前還不會印出。"
 
+#: src/postulo/templates/connections/pairing.html
+msgid "As the last sync left them. Unpairing keeps both sides, and the next sync leaves them alone."
+msgstr ""
+
 #: src/postulo/jobs/forms.py
 msgid "As the posting words it — a city, a region, a country. Free text: nothing is looked up anywhere."
 msgstr "依徵才啟事上的寫法——城市、地區或國家。自由輸入：不會在任何地方查詢。"
@@ -3882,6 +3915,11 @@ msgstr "已詢問"
 
 #: src/postulo/templates/server/record_of_processing.html
 msgid "Asked only when somebody presses for it, one company at a time. Each is sent what is listed and nothing about the person asking."
+msgstr ""
+
+#: src/postulo/templates/connections/pairing.html
+#, python-format
+msgid "Asks %(plugin)s now. Nothing it answers is kept here."
 msgstr ""
 
 #: src/postulo/applications/analytics.py src/postulo/applications/models.py
@@ -4020,6 +4058,10 @@ msgstr "已重新放回您的職缺中。"
 msgid "Back to Backups"
 msgstr "返回「備份」"
 
+#: src/postulo/templates/connections/pairing.html
+msgid "Back to connections"
+msgstr ""
+
 #: src/postulo/core/help.py
 msgid "Back to Documents"
 msgstr "返回文件"
@@ -4027,6 +4069,10 @@ msgstr "返回文件"
 #: src/postulo/templates/accounts/invite_created.html
 msgid "Back to invitations"
 msgstr "返回邀請"
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Back to it"
+msgstr ""
 
 #: src/postulo/core/help.py
 msgid "Back to Listings"
@@ -4367,6 +4413,10 @@ msgstr "通話"
 msgid "Callback to register with it"
 msgstr "向其註冊用的回呼網址"
 
+#: src/postulo/templates/connections/pairing.html
+msgid "Can pair with"
+msgstr ""
+
 #: src/postulo/templates/accounts/invite_form.html
 #: src/postulo/templates/accounts/profile.html
 #: src/postulo/templates/applications/application_form.html
@@ -4378,6 +4428,7 @@ msgstr "向其註冊用的回呼網址"
 #: src/postulo/templates/applications/tag_form.html
 #: src/postulo/templates/connections/confirm_delete.html
 #: src/postulo/templates/connections/form.html
+#: src/postulo/templates/connections/pairing_item.html
 #: src/postulo/templates/cotton/dialog.html
 #: src/postulo/templates/documents/cv_form.html
 #: src/postulo/templates/documents/cv_item_form.html
@@ -4750,6 +4801,10 @@ msgstr "小標籤與標籤"
 msgid "Choices"
 msgstr "選項"
 
+#: src/postulo/templates/connections/pairing_item.html
+msgid "Choose"
+msgstr ""
+
 #: src/postulo/core/personal.py
 msgid "Choose a country from the list."
 msgstr "請從清單中選擇國家。"
@@ -4796,6 +4851,18 @@ msgstr "選擇新的密碼"
 msgid "Choose a package first."
 msgstr "請先選擇套件。"
 
+#: src/postulo/plugins/views_pairing.py
+msgid "Choose a pairing."
+msgstr ""
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Choose a record"
+msgstr ""
+
+#: src/postulo/plugins/views_pairing.py
+msgid "Choose a record to pair it with."
+msgstr ""
+
 #: src/postulo/applications/ical_import.py
 msgid "Choose a time zone"
 msgstr "選擇時區"
@@ -4807,6 +4874,11 @@ msgstr "請選擇要上傳的封存檔。"
 #: src/postulo/core/mail_auth.py
 msgid "Choose an identity provider and save it first."
 msgstr "請先選擇身分識別提供者並儲存。"
+
+#: src/postulo/templates/connections/pairing.html
+#, python-format
+msgid "Choose an item to pair with <bdi>%(name)s</bdi>."
+msgstr ""
 
 #: src/postulo/templates/core/import_csv_map.html
 msgid "Choose another file"
@@ -4863,6 +4935,10 @@ msgstr "請選擇識別碼的類型。"
 #: src/postulo/templates/documents/cv_detail.html
 msgid "Choose what it prints instead"
 msgstr "選擇改為列印的內容"
+
+#: src/postulo/plugins/views_pairing.py
+msgid "Choose what to do with the item."
+msgstr ""
 
 #: src/postulo/jobs/status_views.py
 msgid "Choose what was reported and the date."
@@ -5153,6 +5229,7 @@ msgstr "公司、職缺、應徵、擷取項目與文件也不在其中。那些
 #: src/postulo/applications/forms.py src/postulo/applications/reports.py
 #: src/postulo/applications/tables.py src/postulo/core/csv_import.py
 #: src/postulo/jobs/models.py src/postulo/jobs/tables.py
+#: src/postulo/plugins/pairing.py
 #: src/postulo/templates/applications/report.html
 #: src/postulo/templates/base.html
 #: src/postulo/templates/core/import_csv_map.html
@@ -5300,6 +5377,7 @@ msgid "Connection security"
 msgstr "連線安全性"
 
 #: src/postulo/core/settings_sections.py src/postulo/plugins/views.py
+#: src/postulo/plugins/views_pairing.py
 #: src/postulo/templates/connections/list.html
 msgid "Connections"
 msgstr "連線"
@@ -5324,7 +5402,7 @@ msgstr "顧問業"
 msgid "contact"
 msgstr "聯絡人"
 
-#: src/postulo/templates/jobs/contact_form.html
+#: src/postulo/plugins/pairing.py src/postulo/templates/jobs/contact_form.html
 msgid "Contact"
 msgstr "聯絡人"
 
@@ -5924,7 +6002,7 @@ msgstr "密度"
 msgid "department"
 msgstr "部門"
 
-#: src/postulo/jobs/forms.py
+#: src/postulo/jobs/forms.py src/postulo/plugins/pairing.py
 #: src/postulo/templates/applications/application_detail.html
 msgid "Department"
 msgstr "部門"
@@ -7111,9 +7189,18 @@ msgstr "您原本就有的檔案，而不是 Postulo 產生的文件。"
 msgid "Files you have already"
 msgstr "您已有的檔案"
 
+#: src/postulo/templates/connections/pairing_item.html
+#, python-format
+msgid "Fill from %(plugin)s and pair"
+msgstr ""
+
 #: src/postulo/templates/documents/letter_detail.html
 msgid "Fill in from"
 msgstr "填入來源"
+
+#: src/postulo/templates/connections/pairing_item.html
+msgid "Fill once, without pairing"
+msgstr ""
 
 #: src/postulo/resume/views.py
 #, python-format
@@ -7155,6 +7242,10 @@ msgstr "尋找語言"
 #: src/postulo/templates/jobs/company_form.html
 msgid "Find logo"
 msgstr "尋找標誌"
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Find on the other side"
+msgstr ""
 
 #: src/postulo/templates/jobs/industry_list.html
 msgid "Find one"
@@ -7368,6 +7459,10 @@ msgstr[0] ""
 #, python-format
 msgid "Found a logo at %(url)s."
 msgstr "在 %(url)s 找到標誌。"
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Found on the other side"
+msgstr ""
 
 #: src/postulo/templates/connections/partials/option_table.html
 msgid "Found on the server"
@@ -8578,7 +8673,7 @@ msgstr "內部"
 msgid "Internship"
 msgstr "實習"
 
-#: src/postulo/applications/models.py
+#: src/postulo/applications/models.py src/postulo/plugins/pairing.py
 msgid "Interview"
 msgstr "面試"
 
@@ -8753,13 +8848,21 @@ msgstr ""
 msgid "it could not be imported"
 msgstr "無法匯入"
 
+#: src/postulo/plugins/pairing.py
+msgid "It did not fill the record it was given."
+msgstr ""
+
 #: src/postulo/plugins/installing.py
 #, python-format
 msgid "it did not finish importing within %(seconds)ss"
 msgstr "未能在 %(seconds)s 秒內完成匯入"
 
-#: src/postulo/plugins/views.py
+#: src/postulo/plugins/pairing.py src/postulo/plugins/views.py
 msgid "It did not say what it found."
+msgstr ""
+
+#: src/postulo/plugins/pairing.py
+msgid "It did not say what it made."
 msgstr ""
 
 #: src/postulo/templates/server/backups.html
@@ -8917,6 +9020,14 @@ msgstr "有效期限至 %(when)s，或直到被使用或撤銷為止。"
 #: src/postulo/plugins/views.py
 msgid "It works."
 msgstr "運作正常。"
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Item"
+msgstr ""
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Items found"
+msgstr ""
 
 #: src/postulo/jobs/register_views.py
 msgid "Its address is already listed."
@@ -9388,6 +9499,11 @@ msgstr "到達的最後階段"
 msgid "last synced"
 msgstr "上次同步"
 
+#: src/postulo/templates/connections/pairing.html
+#, python-format
+msgid "Last synced %(when)s"
+msgstr ""
+
 #: src/postulo/api/models.py
 msgid "last used"
 msgstr "上次使用"
@@ -9533,6 +9649,11 @@ msgstr "法律聲明"
 #: src/postulo/jobs/models.py
 msgid "legal state"
 msgstr "法律狀態"
+
+#: src/postulo/templates/connections/pairing.html
+#, python-format
+msgid "Let %(plugin)s make a new one"
+msgstr ""
 
 #: src/postulo/core/server_forms.py
 msgid "Let a capture keep a rendering of its page"
@@ -9847,6 +9968,11 @@ msgstr "小寫字母、數字、句點、底線與連字號。"
 #: src/postulo/templates/server/person_recovery.html
 msgid "Made"
 msgstr "建立時間"
+
+#: src/postulo/plugins/views_pairing.py
+#, python-format
+msgid "Made %(record)s from %(item)s, without pairing them."
+msgstr ""
 
 #: src/postulo/core/models.py
 msgid "mail failures in a row"
@@ -11099,6 +11225,10 @@ msgstr "您的公司中沒有任何一家使用此名稱或識別碼。"
 msgid "None of your own yet. A CV in another language prints the name the ESCO classification gives this skill there, and the name as you wrote it where the classification gives none."
 msgstr "您尚未自訂名稱。其他語言的履歷會印出 ESCO 分類在該語言中為此技能提供的名稱；若分類沒有提供，則印出您所寫的名稱。"
 
+#: src/postulo/templates/connections/pairing_item.html
+msgid "None of your records matches."
+msgstr ""
+
 #: src/postulo/templates/applications/partials/reminders.html
 msgid "None outstanding."
 msgstr "沒有未完成的項目。"
@@ -11241,6 +11371,10 @@ msgstr "不在頁面上——這是預設值。只與金額一起保存。"
 msgid "Not one of these"
 msgstr "都不是"
 
+#: src/postulo/templates/connections/pairing.html
+msgid "Not paired yet"
+msgstr ""
+
 #: src/postulo/jobs/forms.py
 msgid "Not part of another company"
 msgstr "不隸屬於其他公司"
@@ -11317,6 +11451,10 @@ msgstr "未顯示 · %(name)s"
 #: src/postulo/resume/models.py
 msgid "Not stated"
 msgstr "未註明"
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Not synced yet"
+msgstr ""
 
 #: src/postulo/templates/connections/list.html
 msgid "not tested yet"
@@ -11405,6 +11543,10 @@ msgstr "公司備註"
 msgid "notes on contacts"
 msgstr "聯絡人備註"
 
+#: src/postulo/templates/connections/pairing.html
+msgid "Nothing"
+msgstr ""
+
 #: src/postulo/templates/server/plugins.html
 msgid "nothing"
 msgstr "無"
@@ -11426,6 +11568,10 @@ msgstr "沒有到期的項目。儀表板圖塊在清單原本位置留下的低
 msgid "Nothing fills in %(names)s, so it goes out blank."
 msgid_plural "Nothing fills in %(names)s, so they go out blank."
 msgstr[0] "沒有任何內容會填入 %(names)s，因此將以空白送出。"
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Nothing found on the other side."
+msgstr ""
 
 #: src/postulo/templates/jobs/posting_detail.html
 msgid "Nothing has arrived about this one yet."
@@ -11525,6 +11671,10 @@ msgstr "此處尚未安裝任何外掛程式。外掛程式存放在資料磁碟
 #, fuzzy
 msgid "Nothing is installed that a person can hold an opinion about."
 msgstr "尚未安裝任何可讓使用者自行決定啟用與否的項目。"
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Nothing is paired on this connection yet."
+msgstr ""
 
 #: src/postulo/templates/jobs/capture_form.html
 msgid "Nothing is saved until you have reviewed it."
@@ -11981,6 +12131,10 @@ msgstr "在擷取項目審閱頁面上，「d」會捨棄並前往下一筆，�
 #, fuzzy, python-format
 msgid "On the map at %(how)s."
 msgstr "在地圖上的定位依據：%(how)s。"
+
+#: src/postulo/templates/connections/pairing.html
+msgid "On the other side"
+msgstr ""
 
 #: src/postulo/templates/applications/suggestion_list.html
 msgid "On the timeline"
@@ -12640,6 +12794,65 @@ msgstr "從擷取項目保留的頁面"
 #: src/postulo/templates/partials/table/pagination.html
 msgid "Pagination"
 msgstr "分頁"
+
+#: src/postulo/templates/connections/pairing.html
+#: src/postulo/templates/connections/pairing_item.html
+msgid "Pair"
+msgstr ""
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Pair again"
+msgstr ""
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Pair what is on the other side with your own records, or undo a pairing. Both sides are kept either way."
+msgstr ""
+
+#: src/postulo/templates/cotton/pairing_line.html
+#, python-format
+msgid "Pair with an item on <bdi>%(connection)s</bdi>…"
+msgstr ""
+
+#: src/postulo/templates/connections/pairing_item.html
+#, python-format
+msgid "Pair with: %(kind)s"
+msgstr ""
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Paired"
+msgstr ""
+
+#: src/postulo/plugins/views_pairing.py
+#, python-format
+msgid "Paired %(item)s with %(record)s. The next sync compares the two."
+msgstr ""
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Paired records"
+msgstr ""
+
+#: src/postulo/templates/cotton/pairing_line.html
+#, python-format
+msgid "Paired through <bdi>%(connection)s</bdi>, last synced %(when)s"
+msgstr ""
+
+#: src/postulo/templates/cotton/pairing_line.html
+#, python-format
+msgid "Paired through <bdi>%(connection)s</bdi>, not synced yet"
+msgstr ""
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Paired with"
+msgstr ""
+
+#: src/postulo/templates/connections/list.html
+msgid "Pairing"
+msgstr ""
+
+#: src/postulo/templates/connections/pairing.html
+#, python-format
+msgid "Pairing on %(label)s"
+msgstr ""
 
 #: src/postulo/applications/models.py
 msgid "Panel"
@@ -13863,6 +14076,8 @@ msgid "Recipient"
 msgstr "收件人"
 
 #: src/postulo/templates/applications/partials/status_card.html
+#: src/postulo/templates/connections/pairing.html
+#: src/postulo/templates/connections/pairing_item.html
 #, fuzzy
 msgid "Record"
 msgstr "紀錄"
@@ -13990,6 +14205,11 @@ msgstr "重複的紀錄，以及待決定的事項"
 msgid "Records older than %(cutoff)s (%(days)s day). Nothing was removed; this is the report a deletion would be made from."
 msgid_plural "Records older than %(cutoff)s (%(days)s days). Nothing was removed; this is the report a deletion would be made from."
 msgstr[0] "早於 %(cutoff)s（%(days)s 天）的紀錄。未移除任何內容；這是刪除作業所依據的報告。"
+
+#: src/postulo/templates/connections/pairing.html
+#, python-format
+msgid "Records paired on %(label)s"
+msgstr ""
 
 #: src/postulo/templates/server/person_recovery.html
 msgid "Recovery"
@@ -14174,6 +14394,7 @@ msgstr "在前一天提醒我"
 msgid "reminder"
 msgstr "提醒"
 
+#: src/postulo/plugins/pairing.py
 #: src/postulo/templates/applications/reminder_form.html
 #: src/postulo/templates/base.html
 msgid "Reminder"
@@ -14276,6 +14497,15 @@ msgstr "移除 {label}"
 #: src/postulo/plugins/models.py
 msgid "removed on the other side"
 msgstr "已在另一端移除"
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Removed on the other side"
+msgstr ""
+
+#: src/postulo/templates/cotton/pairing_line.html
+#, python-format
+msgid "Removed on the other side of <bdi>%(connection)s</bdi>"
+msgstr ""
 
 #: src/postulo/core/models.py
 msgid "Removed there"
@@ -14731,7 +14961,9 @@ msgstr "範圍"
 msgid "Screening"
 msgstr "初步篩選"
 
-#: src/postulo/core/tables.py src/postulo/templates/core/search.html
+#: src/postulo/core/tables.py src/postulo/templates/connections/pairing.html
+#: src/postulo/templates/connections/pairing_item.html
+#: src/postulo/templates/core/search.html
 #: src/postulo/templates/cotton/site_search.html
 #: src/postulo/templates/jobs/industry_list.html
 msgid "Search"
@@ -14773,6 +15005,10 @@ msgstr "搜尋行事曆"
 #: src/postulo/documents/views.py
 msgid "Search what you sent"
 msgstr "搜尋您寄出的內容"
+
+#: src/postulo/templates/connections/pairing_item.html
+msgid "Search your records"
+msgstr ""
 
 #: src/postulo/core/server_forms.py
 msgid "Seconds to wait for the server before giving up."
@@ -15321,6 +15557,10 @@ msgstr "要在地圖上顯示這個地址嗎？"
 msgid "Show this period"
 msgstr "顯示此期間"
 
+#: src/postulo/templates/connections/pairing.html
+msgid "Show unpaired"
+msgstr ""
+
 #: src/postulo/jobs/tables.py
 #: src/postulo/templates/applications/calendar_print.html
 #: src/postulo/templates/jobs/partials/whose_form.html
@@ -15818,7 +16058,8 @@ msgstr "STARTTLS，連線後"
 msgid "state"
 msgstr "狀態"
 
-#: src/postulo/jobs/tables.py src/postulo/templates/jobs/company_register.html
+#: src/postulo/jobs/tables.py src/postulo/templates/connections/pairing.html
+#: src/postulo/templates/jobs/company_register.html
 #: src/postulo/templates/server/person_recovery.html
 msgid "State"
 msgstr "狀態"
@@ -16076,6 +16317,7 @@ msgid "sync links"
 msgstr "同步連結"
 
 #: src/postulo/templates/connections/list.html
+#: src/postulo/templates/connections/pairing.html
 msgid "Sync now"
 msgstr "立即同步"
 
@@ -16592,6 +16834,12 @@ msgstr "該圖片遠大於所需的大小。"
 msgid "That invitation has already been accepted and cannot be revoked."
 msgstr "該邀請已被接受，無法撤銷。"
 
+#: src/postulo/plugins/views.py
+#, python-format
+msgid "That is a lot of questions to the server. Try again in %(seconds)d second."
+msgid_plural "That is a lot of questions to the server. Try again in %(seconds)d seconds."
+msgstr[0] ""
+
 #: src/postulo/core/server_views.py
 msgid "That is a lot of recovery links. Try again shortly."
 msgstr "復原連結的要求次數過多。請稍後再試。"
@@ -16791,6 +17039,23 @@ msgstr "這是整個帳號的匯出檔。此頁面只讀取它本身提供下載
 msgid "That is the last administrator. Appoint another first."
 msgstr "這是最後一位管理員。請先指派另一位。"
 
+#: src/postulo/plugins/pairing.py
+msgid "That item cannot be made into one of those."
+msgstr ""
+
+#: src/postulo/plugins/views_pairing.py
+msgid "That item cannot be paired with one of those."
+msgstr ""
+
+#: src/postulo/plugins/views_pairing.py
+#, python-format
+msgid "That item is already paired with %(record)s. Unpair it first."
+msgstr ""
+
+#: src/postulo/plugins/pairing.py
+msgid "That item is no longer on the other side."
+msgstr ""
+
 #: src/postulo/templates/account/recovery_unusable.html
 msgid "That link cannot be used"
 msgstr "無法使用此連結"
@@ -16879,6 +17144,10 @@ msgstr[0] "該頁面的傳送時間超過 %(seconds)s 秒，因此未讀取。"
 #, python-format
 msgid "That page was sent with the content encoding “%(coding)s”, which Postulo does not unpack, so it was not read."
 msgstr "該頁面以內容編碼「%(coding)s」傳送，Postulo 無法解開此編碼，因此未讀取。"
+
+#: src/postulo/plugins/views_pairing.py
+msgid "That pairing still has its other side."
+msgstr ""
 
 #: src/postulo/applications/forms.py
 #, fuzzy
@@ -19182,6 +19451,10 @@ msgstr "待決定"
 msgid "To hand over a posting (needs the captures scope):"
 msgstr "交付徵才啟事（需要 captures 範圍）："
 
+#: src/postulo/templates/connections/pairing.html
+msgid "To pair with"
+msgstr ""
+
 #: src/postulo/templates/documents/cv_detail.html
 msgid "To see where the pages break. A draft is kept nowhere; Export PDF is what files a version."
 msgstr "用來查看分頁位置。草稿不會保存在任何地方；「匯出 PDF」才會歸檔一個版本。"
@@ -19308,6 +19581,7 @@ msgid "Two-factor authentication"
 msgstr "雙重驗證"
 
 #: src/postulo/accounts/models.py src/postulo/jobs/tables.py
+#: src/postulo/templates/connections/pairing_item.html
 #: src/postulo/templates/cotton/identifier_row.html
 #: src/postulo/templates/jobs/capture_page.html
 #: src/postulo/templates/partials/phone_numbers.html
@@ -19454,8 +19728,18 @@ msgstr "與電話號碼不同，地址在此站台上不只保存一次——人
 msgid "Unlike a telephone number, an address is not kept once on this instance, because people share a home; you cannot list the same one twice yourself. The bin removes a row at once, after asking, without waiting for <em>Save</em>."
 msgstr "與電話號碼不同，地址在此站台上不只保存一次，因為人們會同住一處；但您自己無法重複列出相同的地址。垃圾桶圖示會在詢問後立即移除該列，不必等到按下<em>儲存</em>。"
 
+#: src/postulo/templates/connections/pairing.html
+#: src/postulo/templates/cotton/pairing_line.html
+msgid "Unpair"
+msgstr ""
+
 #: src/postulo/plugins/models.py
 msgid "unpaired"
+msgstr ""
+
+#: src/postulo/plugins/views_pairing.py
+#, python-format
+msgid "Unpaired. Both sides are kept, and %(connection)s leaves them alone."
 msgstr ""
 
 #: src/postulo/resume/publications.py
@@ -21123,9 +21407,14 @@ msgstr "是：透過身分識別提供者前來的人會直接登入，不會再
 msgid "Yes: somebody who has forgotten their password can ask for a code at their primary address and type it back. A code rather than a link, because mail scanners follow links and would spend one before the person read it. It is never a second factor: an authenticator app is still asked for. Offered only while this instance's mail is actually getting through."
 msgstr "是：忘記密碼的人可以要求將代碼寄到其主要電子郵件地址，再輸入該代碼。之所以用代碼而非連結，是因為郵件掃描程式會開啟連結，可能在本人讀到之前就把它用掉。這絕不是第二重驗證：仍會要求驗證器應用程式。只有在此站台的郵件確實能寄達時才會提供。"
 
-#: src/postulo/jobs/views.py
+#: src/postulo/jobs/views.py src/postulo/plugins/pairing.py
 msgid "You"
 msgstr "您"
+
+#: src/postulo/plugins/pairing.py
+#, python-format
+msgid "You (%(name)s)"
+msgstr ""
 
 #: src/postulo/api/routers/companies.py src/postulo/jobs/forms.py
 #: src/postulo/jobs/surface.py
@@ -21582,6 +21871,10 @@ msgstr "將您的紀錄匯出為檔案"
 msgid "Your record lists %(total)s public work; the first %(most)s are shown."
 msgid_plural "Your record lists %(total)s public works; the first %(most)s are shown."
 msgstr[0] ""
+
+#: src/postulo/templates/connections/pairing_item.html
+msgid "Your records"
+msgstr ""
 
 #: src/postulo/resume/models.py
 msgid "your role"

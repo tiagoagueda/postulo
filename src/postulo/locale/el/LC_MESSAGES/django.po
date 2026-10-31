@@ -1197,6 +1197,11 @@ msgstr "%(person)s: είναι το τελευταίο μέλος της ομά�
 msgid "%(plugin)s could not check these settings: %(error)s"
 msgstr "Το %(plugin)s δεν μπόρεσε να ελέγξει αυτές τις ρυθμίσεις: %(error)s"
 
+#: src/postulo/plugins/views_pairing.py
+#, python-format
+msgid "%(plugin)s could not do that: %(message)s"
+msgstr ""
+
 #: src/postulo/plugins/views.py
 #, python-format
 msgid "%(plugin)s could not look on the server: %(message)s"
@@ -1205,6 +1210,11 @@ msgstr ""
 #: src/postulo/plugins/views.py
 #, python-format
 msgid "%(plugin)s has nothing to look for."
+msgstr ""
+
+#: src/postulo/plugins/views_pairing.py
+#, python-format
+msgid "%(plugin)s makes a new one on its next run."
 msgstr ""
 
 #: src/postulo/core/mail_auth.py
@@ -2316,6 +2326,11 @@ msgstr "Ένα όνομα δεν είναι ταυτότητα: δύο ερευ�
 msgid "A new one"
 msgstr "Ένα νέο"
 
+#: src/postulo/templates/connections/pairing_item.html
+#, python-format
+msgid "A new one: %(kind)s"
+msgstr ""
+
 #: src/postulo/templates/server/design.html
 msgid "A number and what it counts. The colour is a second signal, never the only one."
 msgstr "Ένας αριθμός και αυτό που μετρά. Το χρώμα είναι δεύτερο σήμα, ποτέ το μοναδικό."
@@ -2506,6 +2521,10 @@ msgstr "Ένα ήσυχο αρχείο καταγραφής είναι αυτό 
 #: src/postulo/resume/forms.py
 msgid "A range such as 41–52, or one page."
 msgstr "Ένα εύρος όπως 41–52, ή μία σελίδα."
+
+#: src/postulo/templates/connections/pairing.html
+msgid "A record since deleted"
+msgstr ""
 
 #: src/postulo/documents/forms.py
 msgid "A referee who is not a contact yet. Their name is enough; it is added to your contacts without a company, and is used instead of the choice above."
@@ -2863,6 +2882,7 @@ msgid "Across the whole file, rows are skipped for want of a company or a role. 
 msgstr "Σε ολόκληρο το αρχείο, γραμμές παραλείπονται λόγω έλλειψης εταιρείας ή θέσης. Οι γραμμές που έχουν ήδη καταγραφεί εντοπίζονται και παραλείπονται κατά την εισαγωγή."
 
 #: src/postulo/templates/accounts/invite_list.html
+#: src/postulo/templates/connections/pairing.html
 #: src/postulo/templates/documents/rendered_list.html
 #: src/postulo/templates/server/backups.html
 #: src/postulo/templates/server/people.html
@@ -3288,6 +3308,11 @@ msgstr "Έχει ήδη αποφασιστεί —"
 msgid "Already in your record"
 msgstr "Ήδη στα δεδομένα σας"
 
+#: src/postulo/templates/connections/pairing_item.html
+#, python-format
+msgid "Already paired with <bdi>%(name)s</bdi>. Unpair it on the pairing page to pair it with something else."
+msgstr ""
+
 #: src/postulo/applications/agenda.py
 msgid "Already sent —"
 msgstr "Έχει ήδη σταλεί —"
@@ -3615,6 +3640,10 @@ msgstr "Οποιοσδήποτε τομέας"
 msgid "Anyone holding the link may use it, once. Send it however you like."
 msgstr "Όποιος έχει τον σύνδεσμο μπορεί να τον χρησιμοποιήσει μία φορά. Στείλτε τον με όποιον τρόπο θέλετε."
 
+#: src/postulo/templates/connections/pairing.html
+msgid "Anything"
+msgstr ""
+
 #: src/postulo/resume/forms.py
 msgid "Anything a reader should know, in a few words."
 msgstr "Οτιδήποτε πρέπει να ξέρει ένας αναγνώστης, με λίγα λόγια."
@@ -3671,7 +3700,7 @@ msgstr "Διακριτικά API"
 msgid "Appearance"
 msgstr "Εμφάνιση"
 
-#: src/postulo/applications/ical_import.py
+#: src/postulo/applications/ical_import.py src/postulo/plugins/pairing.py
 #: src/postulo/templates/applications/suggestion_list.html
 #: src/postulo/templates/base.html
 #: src/postulo/templates/documents/letter_detail.html
@@ -3978,6 +4007,10 @@ msgstr "Ως απλό κείμενο"
 msgid "As the institution words it. Kept in your record; a CV does not print it yet."
 msgstr "Όπως το διατυπώνει το ίδρυμα. Διατηρείται στο ιστορικό σας· ένα βιογραφικό δεν το τυπώνει ακόμη."
 
+#: src/postulo/templates/connections/pairing.html
+msgid "As the last sync left them. Unpairing keeps both sides, and the next sync leaves them alone."
+msgstr ""
+
 #: src/postulo/jobs/forms.py
 msgid "As the posting words it — a city, a region, a country. Free text: nothing is looked up anywhere."
 msgstr "Όπως το διατυπώνει η αγγελία — μια πόλη, μια περιοχή, μια χώρα. Ελεύθερο κείμενο: τίποτα δεν αναζητείται πουθενά."
@@ -4018,6 +4051,11 @@ msgstr "Ερωτήθηκε"
 
 #: src/postulo/templates/server/record_of_processing.html
 msgid "Asked only when somebody presses for it, one company at a time. Each is sent what is listed and nothing about the person asking."
+msgstr ""
+
+#: src/postulo/templates/connections/pairing.html
+#, python-format
+msgid "Asks %(plugin)s now. Nothing it answers is kept here."
 msgstr ""
 
 #: src/postulo/applications/analytics.py src/postulo/applications/models.py
@@ -4160,6 +4198,10 @@ msgstr "Ξανά στις αγγελίες σας."
 msgid "Back to Backups"
 msgstr "Επιστροφή στα αντίγραφα ασφαλείας"
 
+#: src/postulo/templates/connections/pairing.html
+msgid "Back to connections"
+msgstr ""
+
 #: src/postulo/core/help.py
 msgid "Back to Documents"
 msgstr "Επιστροφή στα έγγραφα"
@@ -4167,6 +4209,10 @@ msgstr "Επιστροφή στα έγγραφα"
 #: src/postulo/templates/accounts/invite_created.html
 msgid "Back to invitations"
 msgstr "Πίσω στις προσκλήσεις"
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Back to it"
+msgstr ""
 
 #: src/postulo/core/help.py
 msgid "Back to Listings"
@@ -4506,6 +4552,10 @@ msgstr "Κλήση"
 msgid "Callback to register with it"
 msgstr "Διεύθυνση επιστροφής για καταχώριση στον πάροχο"
 
+#: src/postulo/templates/connections/pairing.html
+msgid "Can pair with"
+msgstr ""
+
 #: src/postulo/templates/accounts/invite_form.html
 #: src/postulo/templates/accounts/profile.html
 #: src/postulo/templates/applications/application_form.html
@@ -4517,6 +4567,7 @@ msgstr "Διεύθυνση επιστροφής για καταχώριση στ
 #: src/postulo/templates/applications/tag_form.html
 #: src/postulo/templates/connections/confirm_delete.html
 #: src/postulo/templates/connections/form.html
+#: src/postulo/templates/connections/pairing_item.html
 #: src/postulo/templates/cotton/dialog.html
 #: src/postulo/templates/documents/cv_form.html
 #: src/postulo/templates/documents/cv_item_form.html
@@ -4892,6 +4943,10 @@ msgstr "Chips και ετικέτες"
 msgid "Choices"
 msgstr "Επιλογές"
 
+#: src/postulo/templates/connections/pairing_item.html
+msgid "Choose"
+msgstr ""
+
 #: src/postulo/core/personal.py
 msgid "Choose a country from the list."
 msgstr "Επιλέξτε μια χώρα από τη λίστα."
@@ -4938,6 +4993,18 @@ msgstr "Επιλέξτε νέο κωδικό πρόσβασης"
 msgid "Choose a package first."
 msgstr "Επιλέξτε πρώτα ένα πακέτο."
 
+#: src/postulo/plugins/views_pairing.py
+msgid "Choose a pairing."
+msgstr ""
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Choose a record"
+msgstr ""
+
+#: src/postulo/plugins/views_pairing.py
+msgid "Choose a record to pair it with."
+msgstr ""
+
 #: src/postulo/applications/ical_import.py
 msgid "Choose a time zone"
 msgstr "Επιλέξτε μια ζώνη ώρας"
@@ -4949,6 +5016,11 @@ msgstr "Επιλέξτε ένα αρχείο για αποστολή."
 #: src/postulo/core/mail_auth.py
 msgid "Choose an identity provider and save it first."
 msgstr "Επιλέξτε πρώτα πάροχο ταυτότητας και αποθηκεύστε τον."
+
+#: src/postulo/templates/connections/pairing.html
+#, python-format
+msgid "Choose an item to pair with <bdi>%(name)s</bdi>."
+msgstr ""
 
 #: src/postulo/templates/core/import_csv_map.html
 msgid "Choose another file"
@@ -5005,6 +5077,10 @@ msgstr "Επιλέξτε τον τύπο αναγνωριστικού."
 #: src/postulo/templates/documents/cv_detail.html
 msgid "Choose what it prints instead"
 msgstr "Επιλέξτε τι θα εκτυπώνεται στη θέση του"
+
+#: src/postulo/plugins/views_pairing.py
+msgid "Choose what to do with the item."
+msgstr ""
 
 #: src/postulo/jobs/status_views.py
 msgid "Choose what was reported and the date."
@@ -5298,6 +5374,7 @@ msgstr "Ούτε οι εταιρείες, οι αγγελίες, οι αιτήσ
 #: src/postulo/applications/forms.py src/postulo/applications/reports.py
 #: src/postulo/applications/tables.py src/postulo/core/csv_import.py
 #: src/postulo/jobs/models.py src/postulo/jobs/tables.py
+#: src/postulo/plugins/pairing.py
 #: src/postulo/templates/applications/report.html
 #: src/postulo/templates/base.html
 #: src/postulo/templates/core/import_csv_map.html
@@ -5444,6 +5521,7 @@ msgid "Connection security"
 msgstr "Ασφάλεια σύνδεσης"
 
 #: src/postulo/core/settings_sections.py src/postulo/plugins/views.py
+#: src/postulo/plugins/views_pairing.py
 #: src/postulo/templates/connections/list.html
 msgid "Connections"
 msgstr "Συνδέσεις"
@@ -5468,7 +5546,7 @@ msgstr "Συμβουλευτική"
 msgid "contact"
 msgstr "επαφή"
 
-#: src/postulo/templates/jobs/contact_form.html
+#: src/postulo/plugins/pairing.py src/postulo/templates/jobs/contact_form.html
 msgid "Contact"
 msgstr "Επαφή"
 
@@ -6071,7 +6149,7 @@ msgstr "πυκνότητα"
 msgid "department"
 msgstr "τμήμα"
 
-#: src/postulo/jobs/forms.py
+#: src/postulo/jobs/forms.py src/postulo/plugins/pairing.py
 #: src/postulo/templates/applications/application_detail.html
 msgid "Department"
 msgstr "Τμήμα"
@@ -7256,9 +7334,18 @@ msgstr "Αρχεία που είχατε ήδη, σε αντίθεση με έγ
 msgid "Files you have already"
 msgstr "Αρχεία που έχετε ήδη"
 
+#: src/postulo/templates/connections/pairing_item.html
+#, python-format
+msgid "Fill from %(plugin)s and pair"
+msgstr ""
+
 #: src/postulo/templates/documents/letter_detail.html
 msgid "Fill in from"
 msgstr "Συμπλήρωση από"
+
+#: src/postulo/templates/connections/pairing_item.html
+msgid "Fill once, without pairing"
+msgstr ""
 
 #: src/postulo/resume/views.py
 #, python-format
@@ -7300,6 +7387,10 @@ msgstr "Εύρεση γλώσσας"
 #: src/postulo/templates/jobs/company_form.html
 msgid "Find logo"
 msgstr "Εύρεση λογότυπου"
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Find on the other side"
+msgstr ""
 
 #: src/postulo/templates/jobs/industry_list.html
 #, fuzzy
@@ -7515,6 +7606,10 @@ msgstr[1] ""
 #, python-format
 msgid "Found a logo at %(url)s."
 msgstr "Βρέθηκε λογότυπο στο %(url)s."
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Found on the other side"
+msgstr ""
 
 #: src/postulo/templates/connections/partials/option_table.html
 msgid "Found on the server"
@@ -8722,7 +8817,7 @@ msgstr "Εσωτερικό"
 msgid "Internship"
 msgstr "Πρακτική άσκηση"
 
-#: src/postulo/applications/models.py
+#: src/postulo/applications/models.py src/postulo/plugins/pairing.py
 msgid "Interview"
 msgstr "Συνέντευξη"
 
@@ -8896,13 +8991,21 @@ msgstr ""
 msgid "it could not be imported"
 msgstr "δεν ήταν δυνατή η εισαγωγή"
 
+#: src/postulo/plugins/pairing.py
+msgid "It did not fill the record it was given."
+msgstr ""
+
 #: src/postulo/plugins/installing.py
 #, python-format
 msgid "it did not finish importing within %(seconds)ss"
 msgstr "δεν ολοκλήρωσε την εισαγωγή μέσα σε %(seconds)s δευτ."
 
-#: src/postulo/plugins/views.py
+#: src/postulo/plugins/pairing.py src/postulo/plugins/views.py
 msgid "It did not say what it found."
+msgstr ""
+
+#: src/postulo/plugins/pairing.py
+msgid "It did not say what it made."
 msgstr ""
 
 #: src/postulo/templates/server/backups.html
@@ -9061,6 +9164,14 @@ msgstr "Λειτουργεί έως %(when)s, ή μέχρι να χρησιμο�
 #: src/postulo/plugins/views.py
 msgid "It works."
 msgstr "Λειτουργεί."
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Item"
+msgstr ""
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Items found"
+msgstr ""
 
 #: src/postulo/jobs/register_views.py
 msgid "Its address is already listed."
@@ -9534,6 +9645,11 @@ msgstr "Τελευταίο στάδιο που έφτασε"
 msgid "last synced"
 msgstr "τελευταίος συγχρονισμός"
 
+#: src/postulo/templates/connections/pairing.html
+#, python-format
+msgid "Last synced %(when)s"
+msgstr ""
+
 #: src/postulo/api/models.py
 msgid "last used"
 msgstr "τελευταία χρήση"
@@ -9680,6 +9796,11 @@ msgstr "Νομικές πληροφορίες"
 #: src/postulo/jobs/models.py
 msgid "legal state"
 msgstr "νομική κατάσταση"
+
+#: src/postulo/templates/connections/pairing.html
+#, python-format
+msgid "Let %(plugin)s make a new one"
+msgstr ""
 
 #: src/postulo/core/server_forms.py
 msgid "Let a capture keep a rendering of its page"
@@ -9991,6 +10112,11 @@ msgstr "Πεζά γράμματα, ψηφία, τελείες, κάτω παύλ
 #, fuzzy
 msgid "Made"
 msgstr "Δημιουργήθηκε"
+
+#: src/postulo/plugins/views_pairing.py
+#, python-format
+msgid "Made %(record)s from %(item)s, without pairing them."
+msgstr ""
 
 #: src/postulo/core/models.py
 msgid "mail failures in a row"
@@ -11248,6 +11374,10 @@ msgstr "Καμία από τις εταιρείες σας δεν έχει αυ�
 msgid "None of your own yet. A CV in another language prints the name the ESCO classification gives this skill there, and the name as you wrote it where the classification gives none."
 msgstr "Κανένα δικό σας ακόμη. Ένα βιογραφικό σε άλλη γλώσσα εκτυπώνει το όνομα που δίνει η ταξινόμηση ESCO σε αυτή τη δεξιότητα εκεί, και το όνομα όπως το γράψατε όπου η ταξινόμηση δεν δίνει κανένα."
 
+#: src/postulo/templates/connections/pairing_item.html
+msgid "None of your records matches."
+msgstr ""
+
 #: src/postulo/templates/applications/partials/reminders.html
 msgid "None outstanding."
 msgstr "Καμία εκκρεμότητα."
@@ -11394,6 +11524,10 @@ msgstr "Δεν υπάρχει στη σελίδα — προεπιλογή. Κρ
 msgid "Not one of these"
 msgstr "Καμία από αυτές"
 
+#: src/postulo/templates/connections/pairing.html
+msgid "Not paired yet"
+msgstr ""
+
 #: src/postulo/jobs/forms.py
 msgid "Not part of another company"
 msgstr "Δεν ανήκει σε άλλη εταιρεία"
@@ -11470,6 +11604,10 @@ msgstr "Δεν εμφανίζεται · %(name)s"
 #: src/postulo/resume/models.py
 msgid "Not stated"
 msgstr "Δεν δηλώνεται"
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Not synced yet"
+msgstr ""
 
 #: src/postulo/templates/connections/list.html
 msgid "not tested yet"
@@ -11558,6 +11696,10 @@ msgstr "σημειώσεις για εταιρείες"
 msgid "notes on contacts"
 msgstr "σημειώσεις για επαφές"
 
+#: src/postulo/templates/connections/pairing.html
+msgid "Nothing"
+msgstr ""
+
 #: src/postulo/templates/server/plugins.html
 msgid "nothing"
 msgstr "τίποτα"
@@ -11580,6 +11722,10 @@ msgid "Nothing fills in %(names)s, so it goes out blank."
 msgid_plural "Nothing fills in %(names)s, so they go out blank."
 msgstr[0] "Τίποτα δεν συμπληρώνει το πεδίο %(names)s, οπότε θα σταλεί κενό."
 msgstr[1] "Τίποτα δεν συμπληρώνει τα πεδία %(names)s, οπότε θα σταλούν κενά."
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Nothing found on the other side."
+msgstr ""
 
 #: src/postulo/templates/jobs/posting_detail.html
 msgid "Nothing has arrived about this one yet."
@@ -11680,6 +11826,10 @@ msgstr "Δεν έχει εγκατασταθεί ακόμη τίποτα εδώ.
 #: src/postulo/templates/server/plugins.html
 msgid "Nothing is installed that a person can hold an opinion about."
 msgstr "Δεν έχει εγκατασταθεί τίποτα για το οποίο ένα άτομο να μπορεί να έχει άποψη."
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Nothing is paired on this connection yet."
+msgstr ""
 
 #: src/postulo/templates/jobs/capture_form.html
 msgid "Nothing is saved until you have reviewed it."
@@ -12134,6 +12284,10 @@ msgstr "Στον έλεγχο καταγραφών, το «d» απορρίπτ�
 #, fuzzy, python-format
 msgid "On the map at %(how)s."
 msgstr "Στον χάρτη: %(how)s."
+
+#: src/postulo/templates/connections/pairing.html
+msgid "On the other side"
+msgstr ""
 
 #: src/postulo/templates/applications/suggestion_list.html
 msgid "On the timeline"
@@ -12811,6 +12965,65 @@ msgstr "Σελίδες που κρατήθηκαν από καταγραφές"
 #: src/postulo/templates/partials/table/pagination.html
 msgid "Pagination"
 msgstr "Σελιδοποίηση"
+
+#: src/postulo/templates/connections/pairing.html
+#: src/postulo/templates/connections/pairing_item.html
+msgid "Pair"
+msgstr ""
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Pair again"
+msgstr ""
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Pair what is on the other side with your own records, or undo a pairing. Both sides are kept either way."
+msgstr ""
+
+#: src/postulo/templates/cotton/pairing_line.html
+#, python-format
+msgid "Pair with an item on <bdi>%(connection)s</bdi>…"
+msgstr ""
+
+#: src/postulo/templates/connections/pairing_item.html
+#, python-format
+msgid "Pair with: %(kind)s"
+msgstr ""
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Paired"
+msgstr ""
+
+#: src/postulo/plugins/views_pairing.py
+#, python-format
+msgid "Paired %(item)s with %(record)s. The next sync compares the two."
+msgstr ""
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Paired records"
+msgstr ""
+
+#: src/postulo/templates/cotton/pairing_line.html
+#, python-format
+msgid "Paired through <bdi>%(connection)s</bdi>, last synced %(when)s"
+msgstr ""
+
+#: src/postulo/templates/cotton/pairing_line.html
+#, python-format
+msgid "Paired through <bdi>%(connection)s</bdi>, not synced yet"
+msgstr ""
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Paired with"
+msgstr ""
+
+#: src/postulo/templates/connections/list.html
+msgid "Pairing"
+msgstr ""
+
+#: src/postulo/templates/connections/pairing.html
+#, python-format
+msgid "Pairing on %(label)s"
+msgstr ""
 
 #: src/postulo/applications/models.py
 msgid "Panel"
@@ -14037,6 +14250,8 @@ msgid "Recipient"
 msgstr "Παραλήπτης"
 
 #: src/postulo/templates/applications/partials/status_card.html
+#: src/postulo/templates/connections/pairing.html
+#: src/postulo/templates/connections/pairing_item.html
 msgid "Record"
 msgstr "Καταγραφή"
 
@@ -14164,6 +14379,11 @@ msgid "Records older than %(cutoff)s (%(days)s day). Nothing was removed; this i
 msgid_plural "Records older than %(cutoff)s (%(days)s days). Nothing was removed; this is the report a deletion would be made from."
 msgstr[0] "Εγγραφές παλαιότερες από %(cutoff)s (%(days)s ημέρα). Δεν αφαιρέθηκε τίποτα· αυτή είναι η αναφορά από την οποία θα γινόταν μια διαγραφή."
 msgstr[1] "Εγγραφές παλαιότερες από %(cutoff)s (%(days)s ημέρες). Δεν αφαιρέθηκε τίποτα· αυτή είναι η αναφορά από την οποία θα γινόταν μια διαγραφή."
+
+#: src/postulo/templates/connections/pairing.html
+#, python-format
+msgid "Records paired on %(label)s"
+msgstr ""
 
 #: src/postulo/templates/server/person_recovery.html
 msgid "Recovery"
@@ -14348,6 +14568,7 @@ msgstr "Υπενθύμιση μία ημέρα πριν"
 msgid "reminder"
 msgstr "υπενθύμιση"
 
+#: src/postulo/plugins/pairing.py
 #: src/postulo/templates/applications/reminder_form.html
 #: src/postulo/templates/base.html
 msgid "Reminder"
@@ -14450,6 +14671,15 @@ msgstr "Αφαίρεση {label}"
 #: src/postulo/plugins/models.py
 msgid "removed on the other side"
 msgstr "αφαιρέθηκε από την άλλη πλευρά"
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Removed on the other side"
+msgstr ""
+
+#: src/postulo/templates/cotton/pairing_line.html
+#, python-format
+msgid "Removed on the other side of <bdi>%(connection)s</bdi>"
+msgstr ""
 
 #: src/postulo/core/models.py
 msgid "Removed there"
@@ -14909,7 +15139,9 @@ msgstr "εύρη"
 msgid "Screening"
 msgstr "Προεπιλογή"
 
-#: src/postulo/core/tables.py src/postulo/templates/core/search.html
+#: src/postulo/core/tables.py src/postulo/templates/connections/pairing.html
+#: src/postulo/templates/connections/pairing_item.html
+#: src/postulo/templates/core/search.html
 #: src/postulo/templates/cotton/site_search.html
 #: src/postulo/templates/jobs/industry_list.html
 msgid "Search"
@@ -14951,6 +15183,10 @@ msgstr "Αναζήτηση στο ημερολόγιο"
 #: src/postulo/documents/views.py
 msgid "Search what you sent"
 msgstr "Αναζήτηση σε όσα στείλατε"
+
+#: src/postulo/templates/connections/pairing_item.html
+msgid "Search your records"
+msgstr ""
 
 #: src/postulo/core/server_forms.py
 msgid "Seconds to wait for the server before giving up."
@@ -15505,6 +15741,10 @@ msgstr "Εμφάνιση αυτής της διεύθυνσης στον χάρ�
 msgid "Show this period"
 msgstr "Εμφάνιση αυτής της περιόδου"
 
+#: src/postulo/templates/connections/pairing.html
+msgid "Show unpaired"
+msgstr ""
+
 #: src/postulo/jobs/tables.py
 #: src/postulo/templates/applications/calendar_print.html
 #: src/postulo/templates/jobs/partials/whose_form.html
@@ -16003,7 +16243,8 @@ msgstr "STARTTLS, μετά τη σύνδεση"
 msgid "state"
 msgstr "κατάσταση"
 
-#: src/postulo/jobs/tables.py src/postulo/templates/jobs/company_register.html
+#: src/postulo/jobs/tables.py src/postulo/templates/connections/pairing.html
+#: src/postulo/templates/jobs/company_register.html
 #: src/postulo/templates/server/person_recovery.html
 msgid "State"
 msgstr "Κατάσταση"
@@ -16261,6 +16502,7 @@ msgid "sync links"
 msgstr "σύνδεσμοι συγχρονισμού"
 
 #: src/postulo/templates/connections/list.html
+#: src/postulo/templates/connections/pairing.html
 msgid "Sync now"
 msgstr "Συγχρονισμός τώρα"
 
@@ -16776,6 +17018,13 @@ msgstr "Αυτή η εικόνα είναι πολύ μεγαλύτερη από
 msgid "That invitation has already been accepted and cannot be revoked."
 msgstr "Αυτή η πρόσκληση έχει ήδη γίνει αποδεκτή και δεν μπορεί να ανακληθεί."
 
+#: src/postulo/plugins/views.py
+#, python-format
+msgid "That is a lot of questions to the server. Try again in %(seconds)d second."
+msgid_plural "That is a lot of questions to the server. Try again in %(seconds)d seconds."
+msgstr[0] ""
+msgstr[1] ""
+
 #: src/postulo/core/server_views.py
 msgid "That is a lot of recovery links. Try again shortly."
 msgstr "Ζητήθηκαν πάρα πολλοί σύνδεσμοι ανάκτησης. Δοκιμάστε ξανά σε λίγο."
@@ -16978,6 +17227,23 @@ msgstr "Αυτή είναι η εξαγωγή ενός ολόκληρου λογ
 msgid "That is the last administrator. Appoint another first."
 msgstr "Αυτός είναι ο τελευταίος διαχειριστής. Ορίστε πρώτα άλλον."
 
+#: src/postulo/plugins/pairing.py
+msgid "That item cannot be made into one of those."
+msgstr ""
+
+#: src/postulo/plugins/views_pairing.py
+msgid "That item cannot be paired with one of those."
+msgstr ""
+
+#: src/postulo/plugins/views_pairing.py
+#, python-format
+msgid "That item is already paired with %(record)s. Unpair it first."
+msgstr ""
+
+#: src/postulo/plugins/pairing.py
+msgid "That item is no longer on the other side."
+msgstr ""
+
 #: src/postulo/templates/account/recovery_unusable.html
 msgid "That link cannot be used"
 msgstr "Αυτός ο σύνδεσμος δεν μπορεί να χρησιμοποιηθεί"
@@ -17067,6 +17333,10 @@ msgstr[1] "Αυτή η σελίδα άργησε περισσότερο από %
 #, python-format
 msgid "That page was sent with the content encoding “%(coding)s”, which Postulo does not unpack, so it was not read."
 msgstr "Αυτή η σελίδα στάλθηκε με κωδικοποίηση περιεχομένου «%(coding)s», την οποία το Postulo δεν αποσυμπιέζει, οπότε δεν διαβάστηκε."
+
+#: src/postulo/plugins/views_pairing.py
+msgid "That pairing still has its other side."
+msgstr ""
 
 #: src/postulo/applications/forms.py
 msgid "That person is not recorded at this service."
@@ -19378,6 +19648,10 @@ msgstr "Προς απόφαση"
 msgid "To hand over a posting (needs the captures scope):"
 msgstr "Για να παραδώσετε μια αγγελία (χρειάζεται το εύρος captures):"
 
+#: src/postulo/templates/connections/pairing.html
+msgid "To pair with"
+msgstr ""
+
 #: src/postulo/templates/documents/cv_detail.html
 msgid "To see where the pages break. A draft is kept nowhere; Export PDF is what files a version."
 msgstr "Για να δείτε πού αλλάζουν οι σελίδες. Ένα πρόχειρο δεν φυλάσσεται πουθενά· η «Εξαγωγή PDF» είναι αυτό που αρχειοθετεί μια έκδοση."
@@ -19509,6 +19783,7 @@ msgid "Two-factor authentication"
 msgstr "Έλεγχος ταυτότητας δύο παραγόντων"
 
 #: src/postulo/accounts/models.py src/postulo/jobs/tables.py
+#: src/postulo/templates/connections/pairing_item.html
 #: src/postulo/templates/cotton/identifier_row.html
 #: src/postulo/templates/jobs/capture_page.html
 #: src/postulo/templates/partials/phone_numbers.html
@@ -19659,8 +19934,18 @@ msgstr "Σε αντίθεση με έναν αριθμό τηλεφώνου, μ�
 msgid "Unlike a telephone number, an address is not kept once on this instance, because people share a home; you cannot list the same one twice yourself. The bin removes a row at once, after asking, without waiting for <em>Save</em>."
 msgstr "Σε αντίθεση με έναν αριθμό τηλεφώνου, μια διεύθυνση δεν καταχωρίζεται μία μόνο φορά σε αυτή την εγκατάσταση, επειδή οι άνθρωποι μοιράζονται ένα σπίτι· εσείς όμως δεν μπορείτε να καταχωρίσετε την ίδια δύο φορές. Ο κάδος αφαιρεί μια γραμμή αμέσως, αφού ρωτήσει, χωρίς να περιμένει την <em>Αποθήκευση</em>."
 
+#: src/postulo/templates/connections/pairing.html
+#: src/postulo/templates/cotton/pairing_line.html
+msgid "Unpair"
+msgstr ""
+
 #: src/postulo/plugins/models.py
 msgid "unpaired"
+msgstr ""
+
+#: src/postulo/plugins/views_pairing.py
+#, python-format
+msgid "Unpaired. Both sides are kept, and %(connection)s leaves them alone."
 msgstr ""
 
 #: src/postulo/resume/publications.py
@@ -21328,9 +21613,14 @@ msgstr "Ναι: όποιος έρχεται μέσω του παρόχου τα�
 msgid "Yes: somebody who has forgotten their password can ask for a code at their primary address and type it back. A code rather than a link, because mail scanners follow links and would spend one before the person read it. It is never a second factor: an authenticator app is still asked for. Offered only while this instance's mail is actually getting through."
 msgstr "Ναι: όποιος ξέχασε τον κωδικό πρόσβασής του μπορεί να ζητήσει έναν κωδικό στην κύρια διεύθυνσή του και να τον πληκτρολογήσει. Κωδικός και όχι σύνδεσμος, γιατί οι σαρωτές αλληλογραφίας ακολουθούν συνδέσμους και θα τον χρησιμοποιούσαν πριν τον διαβάσει το άτομο. Δεν είναι ποτέ δεύτερος παράγοντας: η εφαρμογή ελέγχου ταυτότητας ζητείται ούτως ή άλλως. Προσφέρεται μόνο όσο η αλληλογραφία αυτής της εγκατάστασης παραδίδεται πραγματικά."
 
-#: src/postulo/jobs/views.py
+#: src/postulo/jobs/views.py src/postulo/plugins/pairing.py
 msgid "You"
 msgstr "Εσείς"
+
+#: src/postulo/plugins/pairing.py
+#, python-format
+msgid "You (%(name)s)"
+msgstr ""
 
 #: src/postulo/api/routers/companies.py src/postulo/jobs/forms.py
 #: src/postulo/jobs/surface.py
@@ -21790,6 +22080,10 @@ msgid "Your record lists %(total)s public work; the first %(most)s are shown."
 msgid_plural "Your record lists %(total)s public works; the first %(most)s are shown."
 msgstr[0] ""
 msgstr[1] ""
+
+#: src/postulo/templates/connections/pairing_item.html
+msgid "Your records"
+msgstr ""
 
 #: src/postulo/resume/models.py
 msgid "your role"

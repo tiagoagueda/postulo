@@ -1197,6 +1197,11 @@ msgstr "%(person)s е последниот член на %(name)s, која сè
 msgid "%(plugin)s could not check these settings: %(error)s"
 msgstr "%(plugin)s не можеше да ги провери овие поставки: %(error)s"
 
+#: src/postulo/plugins/views_pairing.py
+#, python-format
+msgid "%(plugin)s could not do that: %(message)s"
+msgstr ""
+
 #: src/postulo/plugins/views.py
 #, python-format
 msgid "%(plugin)s could not look on the server: %(message)s"
@@ -1205,6 +1210,11 @@ msgstr ""
 #: src/postulo/plugins/views.py
 #, python-format
 msgid "%(plugin)s has nothing to look for."
+msgstr ""
+
+#: src/postulo/plugins/views_pairing.py
+#, python-format
+msgid "%(plugin)s makes a new one on its next run."
 msgstr ""
 
 #: src/postulo/core/mail_auth.py
@@ -2305,6 +2315,11 @@ msgstr "Името не е идентитет: двајца истражувач
 msgid "A new one"
 msgstr "Нов"
 
+#: src/postulo/templates/connections/pairing_item.html
+#, python-format
+msgid "A new one: %(kind)s"
+msgstr ""
+
 #: src/postulo/templates/server/design.html
 msgid "A number and what it counts. The colour is a second signal, never the only one."
 msgstr "Број и она што го брои. Бојата е втор сигнал, никогаш единствениот."
@@ -2496,6 +2511,10 @@ msgstr "Тивок дневник е оној што го сакате."
 #: src/postulo/resume/forms.py
 msgid "A range such as 41–52, or one page."
 msgstr "Опсег како 41–52 или една страница."
+
+#: src/postulo/templates/connections/pairing.html
+msgid "A record since deleted"
+msgstr ""
 
 #: src/postulo/documents/forms.py
 msgid "A referee who is not a contact yet. Their name is enough; it is added to your contacts without a company, and is used instead of the choice above."
@@ -2847,6 +2866,7 @@ msgid "Across the whole file, rows are skipped for want of a company or a role. 
 msgstr "Низ целата датотека, редовите без компанија или работно место се прескокнуваат. Веќе запишаните редови се пронаоѓаат и прескокнуваат при увозот."
 
 #: src/postulo/templates/accounts/invite_list.html
+#: src/postulo/templates/connections/pairing.html
 #: src/postulo/templates/documents/rendered_list.html
 #: src/postulo/templates/server/backups.html
 #: src/postulo/templates/server/people.html
@@ -3265,6 +3285,11 @@ msgstr "Веќе одлучено —"
 msgid "Already in your record"
 msgstr "Веќе е во вашиот запис"
 
+#: src/postulo/templates/connections/pairing_item.html
+#, python-format
+msgid "Already paired with <bdi>%(name)s</bdi>. Unpair it on the pairing page to pair it with something else."
+msgstr ""
+
 #: src/postulo/applications/agenda.py
 msgid "Already sent —"
 msgstr "Веќе испратено —"
@@ -3590,6 +3615,10 @@ msgstr "Секој сектор"
 msgid "Anyone holding the link may use it, once. Send it however you like."
 msgstr "Секој што ја има врската може да ја искористи, еднаш. Испратете ја како сакате."
 
+#: src/postulo/templates/connections/pairing.html
+msgid "Anything"
+msgstr ""
+
 #: src/postulo/resume/forms.py
 msgid "Anything a reader should know, in a few words."
 msgstr "Сè што читателот треба да знае, во неколку зборови."
@@ -3642,7 +3671,7 @@ msgstr "API токени"
 msgid "Appearance"
 msgstr "Изглед"
 
-#: src/postulo/applications/ical_import.py
+#: src/postulo/applications/ical_import.py src/postulo/plugins/pairing.py
 #: src/postulo/templates/applications/suggestion_list.html
 #: src/postulo/templates/base.html
 #: src/postulo/templates/documents/letter_detail.html
@@ -3945,6 +3974,10 @@ msgstr "Како обичен текст"
 msgid "As the institution words it. Kept in your record; a CV does not print it yet."
 msgstr "Како што го формулира институцијата. Се чува во вашиот запис; CV сè уште не го печати."
 
+#: src/postulo/templates/connections/pairing.html
+msgid "As the last sync left them. Unpairing keeps both sides, and the next sync leaves them alone."
+msgstr ""
+
 #: src/postulo/jobs/forms.py
 msgid "As the posting words it — a city, a region, a country. Free text: nothing is looked up anywhere."
 msgstr "Онака како што го формулира огласот — град, регион, држава. Слободен текст: ништо не се бара никаде."
@@ -3983,6 +4016,11 @@ msgstr "Побарано"
 
 #: src/postulo/templates/server/record_of_processing.html
 msgid "Asked only when somebody presses for it, one company at a time. Each is sent what is listed and nothing about the person asking."
+msgstr ""
+
+#: src/postulo/templates/connections/pairing.html
+#, python-format
+msgid "Asks %(plugin)s now. Nothing it answers is kept here."
 msgstr ""
 
 #: src/postulo/applications/analytics.py src/postulo/applications/models.py
@@ -4123,6 +4161,10 @@ msgstr "Повторно во вашите огласи."
 msgid "Back to Backups"
 msgstr "Назад кон „Резервни копии“"
 
+#: src/postulo/templates/connections/pairing.html
+msgid "Back to connections"
+msgstr ""
+
 #: src/postulo/core/help.py
 msgid "Back to Documents"
 msgstr "Назад кон Документи"
@@ -4130,6 +4172,10 @@ msgstr "Назад кон Документи"
 #: src/postulo/templates/accounts/invite_created.html
 msgid "Back to invitations"
 msgstr "Назад кон поканите"
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Back to it"
+msgstr ""
 
 #: src/postulo/core/help.py
 msgid "Back to Listings"
@@ -4468,6 +4514,10 @@ msgstr "Повик"
 msgid "Callback to register with it"
 msgstr "Повратна адреса за регистрација кај него"
 
+#: src/postulo/templates/connections/pairing.html
+msgid "Can pair with"
+msgstr ""
+
 #: src/postulo/templates/accounts/invite_form.html
 #: src/postulo/templates/accounts/profile.html
 #: src/postulo/templates/applications/application_form.html
@@ -4479,6 +4529,7 @@ msgstr "Повратна адреса за регистрација кај не�
 #: src/postulo/templates/applications/tag_form.html
 #: src/postulo/templates/connections/confirm_delete.html
 #: src/postulo/templates/connections/form.html
+#: src/postulo/templates/connections/pairing_item.html
 #: src/postulo/templates/cotton/dialog.html
 #: src/postulo/templates/documents/cv_form.html
 #: src/postulo/templates/documents/cv_item_form.html
@@ -4852,6 +4903,10 @@ msgstr "Чипови и ознаки"
 msgid "Choices"
 msgstr "Избори"
 
+#: src/postulo/templates/connections/pairing_item.html
+msgid "Choose"
+msgstr ""
+
 #: src/postulo/core/personal.py
 msgid "Choose a country from the list."
 msgstr "Изберете држава од списокот."
@@ -4898,6 +4953,18 @@ msgstr "Изберете нова лозинка"
 msgid "Choose a package first."
 msgstr "Прво изберете пакет."
 
+#: src/postulo/plugins/views_pairing.py
+msgid "Choose a pairing."
+msgstr ""
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Choose a record"
+msgstr ""
+
+#: src/postulo/plugins/views_pairing.py
+msgid "Choose a record to pair it with."
+msgstr ""
+
 #: src/postulo/applications/ical_import.py
 msgid "Choose a time zone"
 msgstr "Изберете временска зона"
@@ -4909,6 +4976,11 @@ msgstr "Изберете архива за поставување."
 #: src/postulo/core/mail_auth.py
 msgid "Choose an identity provider and save it first."
 msgstr "Прво изберете давател на идентитет и зачувајте го."
+
+#: src/postulo/templates/connections/pairing.html
+#, python-format
+msgid "Choose an item to pair with <bdi>%(name)s</bdi>."
+msgstr ""
 
 #: src/postulo/templates/core/import_csv_map.html
 msgid "Choose another file"
@@ -4965,6 +5037,10 @@ msgstr "Изберете каков идентификатор е ова."
 #: src/postulo/templates/documents/cv_detail.html
 msgid "Choose what it prints instead"
 msgstr "Наместо тоа, изберете што да печати"
+
+#: src/postulo/plugins/views_pairing.py
+msgid "Choose what to do with the item."
+msgstr ""
 
 #: src/postulo/jobs/status_views.py
 msgid "Choose what was reported and the date."
@@ -5252,6 +5328,7 @@ msgstr "Компаниите, огласите, пријавите, зачува
 #: src/postulo/applications/forms.py src/postulo/applications/reports.py
 #: src/postulo/applications/tables.py src/postulo/core/csv_import.py
 #: src/postulo/jobs/models.py src/postulo/jobs/tables.py
+#: src/postulo/plugins/pairing.py
 #: src/postulo/templates/applications/report.html
 #: src/postulo/templates/base.html
 #: src/postulo/templates/core/import_csv_map.html
@@ -5397,6 +5474,7 @@ msgid "Connection security"
 msgstr "Безбедност на врската"
 
 #: src/postulo/core/settings_sections.py src/postulo/plugins/views.py
+#: src/postulo/plugins/views_pairing.py
 #: src/postulo/templates/connections/list.html
 msgid "Connections"
 msgstr "Врски"
@@ -5421,7 +5499,7 @@ msgstr "Консалтинг"
 msgid "contact"
 msgstr "контакт"
 
-#: src/postulo/templates/jobs/contact_form.html
+#: src/postulo/plugins/pairing.py src/postulo/templates/jobs/contact_form.html
 msgid "Contact"
 msgstr "Контакт"
 
@@ -6019,7 +6097,7 @@ msgstr "густина"
 msgid "department"
 msgstr "оддел"
 
-#: src/postulo/jobs/forms.py
+#: src/postulo/jobs/forms.py src/postulo/plugins/pairing.py
 #: src/postulo/templates/applications/application_detail.html
 msgid "Department"
 msgstr "Оддел"
@@ -7194,9 +7272,18 @@ msgstr "Датотеки што веќе сте ги имале, за разли
 msgid "Files you have already"
 msgstr "Датотеки што веќе ги имате"
 
+#: src/postulo/templates/connections/pairing_item.html
+#, python-format
+msgid "Fill from %(plugin)s and pair"
+msgstr ""
+
 #: src/postulo/templates/documents/letter_detail.html
 msgid "Fill in from"
 msgstr "Пополни од"
+
+#: src/postulo/templates/connections/pairing_item.html
+msgid "Fill once, without pairing"
+msgstr ""
 
 #: src/postulo/resume/views.py
 #, python-format
@@ -7238,6 +7325,10 @@ msgstr "Најди јазик"
 #: src/postulo/templates/jobs/company_form.html
 msgid "Find logo"
 msgstr "Најди лого"
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Find on the other side"
+msgstr ""
 
 #: src/postulo/templates/jobs/industry_list.html
 #, fuzzy
@@ -7452,6 +7543,10 @@ msgstr[1] ""
 #, python-format
 msgid "Found a logo at %(url)s."
 msgstr "Најдено е лого на %(url)s."
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Found on the other side"
+msgstr ""
 
 #: src/postulo/templates/connections/partials/option_table.html
 msgid "Found on the server"
@@ -8654,7 +8749,7 @@ msgstr "Внатрешно"
 msgid "Internship"
 msgstr "Пракса"
 
-#: src/postulo/applications/models.py
+#: src/postulo/applications/models.py src/postulo/plugins/pairing.py
 msgid "Interview"
 msgstr "Интервју"
 
@@ -8829,13 +8924,21 @@ msgstr ""
 msgid "it could not be imported"
 msgstr "не можеше да се увезе"
 
+#: src/postulo/plugins/pairing.py
+msgid "It did not fill the record it was given."
+msgstr ""
+
 #: src/postulo/plugins/installing.py
 #, python-format
 msgid "it did not finish importing within %(seconds)ss"
 msgstr "не заврши со увезувањето за %(seconds)sс"
 
-#: src/postulo/plugins/views.py
+#: src/postulo/plugins/pairing.py src/postulo/plugins/views.py
 msgid "It did not say what it found."
+msgstr ""
+
+#: src/postulo/plugins/pairing.py
+msgid "It did not say what it made."
 msgstr ""
 
 #: src/postulo/templates/server/backups.html
@@ -8992,6 +9095,14 @@ msgstr "Важи до %(when)s или додека не се искористи 
 #: src/postulo/plugins/views.py
 msgid "It works."
 msgstr "Работи."
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Item"
+msgstr ""
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Items found"
+msgstr ""
 
 #: src/postulo/jobs/register_views.py
 msgid "Its address is already listed."
@@ -9464,6 +9575,11 @@ msgstr "Последна достигната фаза"
 msgid "last synced"
 msgstr "последен пат синхронизирано"
 
+#: src/postulo/templates/connections/pairing.html
+#, python-format
+msgid "Last synced %(when)s"
+msgstr ""
+
 #: src/postulo/api/models.py
 msgid "last used"
 msgstr "последен пат користено"
@@ -9609,6 +9725,11 @@ msgstr "Правно известување"
 #: src/postulo/jobs/models.py
 msgid "legal state"
 msgstr "правна состојба"
+
+#: src/postulo/templates/connections/pairing.html
+#, python-format
+msgid "Let %(plugin)s make a new one"
+msgstr ""
 
 #: src/postulo/core/server_forms.py
 msgid "Let a capture keep a rendering of its page"
@@ -9920,6 +10041,11 @@ msgstr "Мали букви, цифри, точки, долни црти и цр
 #, fuzzy
 msgid "Made"
 msgstr "Направено"
+
+#: src/postulo/plugins/views_pairing.py
+#, python-format
+msgid "Made %(record)s from %(item)s, without pairing them."
+msgstr ""
 
 #: src/postulo/core/models.py
 msgid "mail failures in a row"
@@ -11168,6 +11294,10 @@ msgstr "Ниедна од вашите компании нема ова име �
 msgid "None of your own yet. A CV in another language prints the name the ESCO classification gives this skill there, and the name as you wrote it where the classification gives none."
 msgstr "Сè уште нема ваши. CV на друг јазик го печати името што класификацијата ESCO ѝ го дава на оваа вештина на тој јазик, а името како што го напишавте таму каде што класификацијата не дава ниедно."
 
+#: src/postulo/templates/connections/pairing_item.html
+msgid "None of your records matches."
+msgstr ""
+
 #: src/postulo/templates/applications/partials/reminders.html
 msgid "None outstanding."
 msgstr "Нема ништо што чека."
@@ -11308,6 +11438,10 @@ msgstr "Не е на страницата — стандардна вредно�
 msgid "Not one of these"
 msgstr "Ниту едно од овие"
 
+#: src/postulo/templates/connections/pairing.html
+msgid "Not paired yet"
+msgstr ""
+
 #: src/postulo/jobs/forms.py
 msgid "Not part of another company"
 msgstr "Не е дел од друга компанија"
@@ -11384,6 +11518,10 @@ msgstr "Не е прикажано · %(name)s"
 #: src/postulo/resume/models.py
 msgid "Not stated"
 msgstr "Не е наведено"
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Not synced yet"
+msgstr ""
 
 #: src/postulo/templates/connections/list.html
 msgid "not tested yet"
@@ -11472,6 +11610,10 @@ msgstr "белешки за компании"
 msgid "notes on contacts"
 msgstr "белешки за контакти"
 
+#: src/postulo/templates/connections/pairing.html
+msgid "Nothing"
+msgstr ""
+
 #: src/postulo/templates/server/plugins.html
 msgid "nothing"
 msgstr "ништо"
@@ -11494,6 +11636,10 @@ msgid "Nothing fills in %(names)s, so it goes out blank."
 msgid_plural "Nothing fills in %(names)s, so they go out blank."
 msgstr[0] "%(names)s не се пополнува со ништо, па заминува празно."
 msgstr[1] "%(names)s не се пополнуваат со ништо, па заминуваат празни."
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Nothing found on the other side."
+msgstr ""
 
 #: src/postulo/templates/jobs/posting_detail.html
 #, fuzzy
@@ -11593,6 +11739,10 @@ msgstr "Тука сè уште не е инсталирано ништо. Дод
 #: src/postulo/templates/server/plugins.html
 msgid "Nothing is installed that a person can hold an opinion about."
 msgstr "Не е инсталирано ништо за што лицето би можело да има мислење."
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Nothing is paired on this connection yet."
+msgstr ""
 
 #: src/postulo/templates/jobs/capture_form.html
 msgid "Nothing is saved until you have reviewed it."
@@ -12045,6 +12195,10 @@ msgstr "При прегледот на зачуваните огласи „d“
 #, python-format
 msgid "On the map at %(how)s."
 msgstr "На картата: %(how)s."
+
+#: src/postulo/templates/connections/pairing.html
+msgid "On the other side"
+msgstr ""
 
 #: src/postulo/templates/applications/suggestion_list.html
 msgid "On the timeline"
@@ -12718,6 +12872,65 @@ msgstr "Страници задржани од зачуваните огласи
 #: src/postulo/templates/partials/table/pagination.html
 msgid "Pagination"
 msgstr "Страничење"
+
+#: src/postulo/templates/connections/pairing.html
+#: src/postulo/templates/connections/pairing_item.html
+msgid "Pair"
+msgstr ""
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Pair again"
+msgstr ""
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Pair what is on the other side with your own records, or undo a pairing. Both sides are kept either way."
+msgstr ""
+
+#: src/postulo/templates/cotton/pairing_line.html
+#, python-format
+msgid "Pair with an item on <bdi>%(connection)s</bdi>…"
+msgstr ""
+
+#: src/postulo/templates/connections/pairing_item.html
+#, python-format
+msgid "Pair with: %(kind)s"
+msgstr ""
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Paired"
+msgstr ""
+
+#: src/postulo/plugins/views_pairing.py
+#, python-format
+msgid "Paired %(item)s with %(record)s. The next sync compares the two."
+msgstr ""
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Paired records"
+msgstr ""
+
+#: src/postulo/templates/cotton/pairing_line.html
+#, python-format
+msgid "Paired through <bdi>%(connection)s</bdi>, last synced %(when)s"
+msgstr ""
+
+#: src/postulo/templates/cotton/pairing_line.html
+#, python-format
+msgid "Paired through <bdi>%(connection)s</bdi>, not synced yet"
+msgstr ""
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Paired with"
+msgstr ""
+
+#: src/postulo/templates/connections/list.html
+msgid "Pairing"
+msgstr ""
+
+#: src/postulo/templates/connections/pairing.html
+#, python-format
+msgid "Pairing on %(label)s"
+msgstr ""
 
 #: src/postulo/applications/models.py
 #, fuzzy
@@ -13937,6 +14150,8 @@ msgid "Recipient"
 msgstr "Примач"
 
 #: src/postulo/templates/applications/partials/status_card.html
+#: src/postulo/templates/connections/pairing.html
+#: src/postulo/templates/connections/pairing_item.html
 msgid "Record"
 msgstr "Запиши"
 
@@ -14065,6 +14280,11 @@ msgid "Records older than %(cutoff)s (%(days)s day). Nothing was removed; this i
 msgid_plural "Records older than %(cutoff)s (%(days)s days). Nothing was removed; this is the report a deletion would be made from."
 msgstr[0] "Записи постари од %(cutoff)s (%(days)s ден). Ништо не е отстрането; ова е извештајот врз основа на кој би се направило бришење."
 msgstr[1] "Записи постари од %(cutoff)s (%(days)s дена). Ништо не е отстрането; ова е извештајот врз основа на кој би се направило бришење."
+
+#: src/postulo/templates/connections/pairing.html
+#, python-format
+msgid "Records paired on %(label)s"
+msgstr ""
 
 #: src/postulo/templates/server/person_recovery.html
 msgid "Recovery"
@@ -14248,6 +14468,7 @@ msgstr "Потсети ме ден порано"
 msgid "reminder"
 msgstr "потсетник"
 
+#: src/postulo/plugins/pairing.py
 #: src/postulo/templates/applications/reminder_form.html
 #: src/postulo/templates/base.html
 msgid "Reminder"
@@ -14350,6 +14571,15 @@ msgstr "Отстрани {label}"
 #: src/postulo/plugins/models.py
 msgid "removed on the other side"
 msgstr "отстрането на другата страна"
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Removed on the other side"
+msgstr ""
+
+#: src/postulo/templates/cotton/pairing_line.html
+#, python-format
+msgid "Removed on the other side of <bdi>%(connection)s</bdi>"
+msgstr ""
 
 #: src/postulo/core/models.py
 msgid "Removed there"
@@ -14806,7 +15036,9 @@ msgstr "опсези"
 msgid "Screening"
 msgstr "Прв круг"
 
-#: src/postulo/core/tables.py src/postulo/templates/core/search.html
+#: src/postulo/core/tables.py src/postulo/templates/connections/pairing.html
+#: src/postulo/templates/connections/pairing_item.html
+#: src/postulo/templates/core/search.html
 #: src/postulo/templates/cotton/site_search.html
 #: src/postulo/templates/jobs/industry_list.html
 msgid "Search"
@@ -14848,6 +15080,10 @@ msgstr "Пребарај го календарот"
 #: src/postulo/documents/views.py
 msgid "Search what you sent"
 msgstr "Пребарај го тоа што сте го испратиле"
+
+#: src/postulo/templates/connections/pairing_item.html
+msgid "Search your records"
+msgstr ""
 
 #: src/postulo/core/server_forms.py
 msgid "Seconds to wait for the server before giving up."
@@ -15394,6 +15630,10 @@ msgstr "Да се прикаже оваа адреса на картата?"
 msgid "Show this period"
 msgstr "Прикажи го овој период"
 
+#: src/postulo/templates/connections/pairing.html
+msgid "Show unpaired"
+msgstr ""
+
 #: src/postulo/jobs/tables.py
 #: src/postulo/templates/applications/calendar_print.html
 #: src/postulo/templates/jobs/partials/whose_form.html
@@ -15885,7 +16125,8 @@ msgstr "STARTTLS, по поврзувањето"
 msgid "state"
 msgstr "состојба"
 
-#: src/postulo/jobs/tables.py src/postulo/templates/jobs/company_register.html
+#: src/postulo/jobs/tables.py src/postulo/templates/connections/pairing.html
+#: src/postulo/templates/jobs/company_register.html
 #: src/postulo/templates/server/person_recovery.html
 #, fuzzy
 msgid "State"
@@ -16138,6 +16379,7 @@ msgid "sync links"
 msgstr "врски за синхронизација"
 
 #: src/postulo/templates/connections/list.html
+#: src/postulo/templates/connections/pairing.html
 msgid "Sync now"
 msgstr "Синхронизирај сега"
 
@@ -16653,6 +16895,13 @@ msgstr "Таа слика е многу поголема отколку што �
 msgid "That invitation has already been accepted and cannot be revoked."
 msgstr "Таа покана е веќе прифатена и не може да се отповика."
 
+#: src/postulo/plugins/views.py
+#, python-format
+msgid "That is a lot of questions to the server. Try again in %(seconds)d second."
+msgid_plural "That is a lot of questions to the server. Try again in %(seconds)d seconds."
+msgstr[0] ""
+msgstr[1] ""
+
 #: src/postulo/core/server_views.py
 msgid "That is a lot of recovery links. Try again shortly."
 msgstr "Побаравте премногу врски за враќање. Обидете се повторно наскоро."
@@ -16853,6 +17102,23 @@ msgstr "Тоа е извозот на цела сметка. Оваа стран
 msgid "That is the last administrator. Appoint another first."
 msgstr "Тоа е последниот администратор. Прво назначете друг."
 
+#: src/postulo/plugins/pairing.py
+msgid "That item cannot be made into one of those."
+msgstr ""
+
+#: src/postulo/plugins/views_pairing.py
+msgid "That item cannot be paired with one of those."
+msgstr ""
+
+#: src/postulo/plugins/views_pairing.py
+#, python-format
+msgid "That item is already paired with %(record)s. Unpair it first."
+msgstr ""
+
+#: src/postulo/plugins/pairing.py
+msgid "That item is no longer on the other side."
+msgstr ""
+
 #: src/postulo/templates/account/recovery_unusable.html
 msgid "That link cannot be used"
 msgstr "Таа врска не може да се употреби"
@@ -16942,6 +17208,10 @@ msgstr[1] "На таа страница ѝ требаше повеќе од %(se
 #, python-format
 msgid "That page was sent with the content encoding “%(coding)s”, which Postulo does not unpack, so it was not read."
 msgstr "Таа страница е испратена со кодирање на содржината „%(coding)s“, кое Postulo не го распакува, па не е прочитана."
+
+#: src/postulo/plugins/views_pairing.py
+msgid "That pairing still has its other side."
+msgstr ""
 
 #: src/postulo/applications/forms.py
 msgid "That person is not recorded at this service."
@@ -19243,6 +19513,10 @@ msgstr "За одлучување"
 msgid "To hand over a posting (needs the captures scope):"
 msgstr "За предавање оглас (бара опсег captures):"
 
+#: src/postulo/templates/connections/pairing.html
+msgid "To pair with"
+msgstr ""
+
 #: src/postulo/templates/documents/cv_detail.html
 msgid "To see where the pages break. A draft is kept nowhere; Export PDF is what files a version."
 msgstr "За да видите каде се кршат страниците. Нацртот не се чува никаде; „Извези PDF“ е она што заведува верзија."
@@ -19368,6 +19642,7 @@ msgid "Two-factor authentication"
 msgstr "Двофакторска потврда на идентитет"
 
 #: src/postulo/accounts/models.py src/postulo/jobs/tables.py
+#: src/postulo/templates/connections/pairing_item.html
 #: src/postulo/templates/cotton/identifier_row.html
 #: src/postulo/templates/jobs/capture_page.html
 #: src/postulo/templates/partials/phone_numbers.html
@@ -19517,8 +19792,18 @@ msgstr "За разлика од телефонски број, адресата
 msgid "Unlike a telephone number, an address is not kept once on this instance, because people share a home; you cannot list the same one twice yourself. The bin removes a row at once, after asking, without waiting for <em>Save</em>."
 msgstr "За разлика од телефонскиот број, адресата не се чува само еднаш на оваа инстанца, бидејќи луѓето делат дом; сами не можете да ја наведете истата двапати. Кантата го отстранува редот веднаш, откако ќе ве праша, без да чека <em>Зачувај</em>."
 
+#: src/postulo/templates/connections/pairing.html
+#: src/postulo/templates/cotton/pairing_line.html
+msgid "Unpair"
+msgstr ""
+
 #: src/postulo/plugins/models.py
 msgid "unpaired"
+msgstr ""
+
+#: src/postulo/plugins/views_pairing.py
+#, python-format
+msgid "Unpaired. Both sides are kept, and %(connection)s leaves them alone."
 msgstr ""
 
 #: src/postulo/resume/publications.py
@@ -21173,9 +21458,14 @@ msgstr "Да: оној што доаѓа преку давателот на ид
 msgid "Yes: somebody who has forgotten their password can ask for a code at their primary address and type it back. A code rather than a link, because mail scanners follow links and would spend one before the person read it. It is never a second factor: an authenticator app is still asked for. Offered only while this instance's mail is actually getting through."
 msgstr "Да: кој ја заборавил лозинката може да побара код на својата главна адреса и да го внесе тука. Код, а не врска, зашто скенерите на пошта ги следат врските и би ја потрошиле пред лицето да ја прочита. Никогаш не е втор фактор: апликацијата за автентикација сепак се бара. Се нуди само додека поштата на оваа инстанца навистина стигнува."
 
-#: src/postulo/jobs/views.py
+#: src/postulo/jobs/views.py src/postulo/plugins/pairing.py
 msgid "You"
 msgstr "Вие"
+
+#: src/postulo/plugins/pairing.py
+#, python-format
+msgid "You (%(name)s)"
+msgstr ""
 
 #: src/postulo/api/routers/companies.py src/postulo/jobs/forms.py
 #: src/postulo/jobs/surface.py
@@ -21635,6 +21925,10 @@ msgid "Your record lists %(total)s public work; the first %(most)s are shown."
 msgid_plural "Your record lists %(total)s public works; the first %(most)s are shown."
 msgstr[0] ""
 msgstr[1] ""
+
+#: src/postulo/templates/connections/pairing_item.html
+msgid "Your records"
+msgstr ""
 
 #: src/postulo/resume/models.py
 msgid "your role"

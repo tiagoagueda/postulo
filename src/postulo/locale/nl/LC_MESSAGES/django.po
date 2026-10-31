@@ -1197,6 +1197,11 @@ msgstr "%(person)s is het laatste lid van %(name)s, dat nog items bezit. Geef ze
 msgid "%(plugin)s could not check these settings: %(error)s"
 msgstr "%(plugin)s kon deze instellingen niet controleren: %(error)s"
 
+#: src/postulo/plugins/views_pairing.py
+#, python-format
+msgid "%(plugin)s could not do that: %(message)s"
+msgstr ""
+
 #: src/postulo/plugins/views.py
 #, python-format
 msgid "%(plugin)s could not look on the server: %(message)s"
@@ -1205,6 +1210,11 @@ msgstr ""
 #: src/postulo/plugins/views.py
 #, python-format
 msgid "%(plugin)s has nothing to look for."
+msgstr ""
+
+#: src/postulo/plugins/views_pairing.py
+#, python-format
+msgid "%(plugin)s makes a new one on its next run."
 msgstr ""
 
 #: src/postulo/core/mail_auth.py
@@ -2310,6 +2320,11 @@ msgstr "Een naam is geen identiteit: twee onderzoekers delen er een, en één on
 msgid "A new one"
 msgstr "Een nieuwe"
 
+#: src/postulo/templates/connections/pairing_item.html
+#, python-format
+msgid "A new one: %(kind)s"
+msgstr ""
+
 #: src/postulo/templates/server/design.html
 msgid "A number and what it counts. The colour is a second signal, never the only one."
 msgstr "Een getal en wat het telt. De kleur is een tweede signaal, nooit het enige."
@@ -2500,6 +2515,10 @@ msgstr "Een stil logboek is precies wat u wilt."
 #: src/postulo/resume/forms.py
 msgid "A range such as 41–52, or one page."
 msgstr "Een bereik zoals 41–52, of één pagina."
+
+#: src/postulo/templates/connections/pairing.html
+msgid "A record since deleted"
+msgstr ""
 
 #: src/postulo/documents/forms.py
 msgid "A referee who is not a contact yet. Their name is enough; it is added to your contacts without a company, and is used instead of the choice above."
@@ -2850,6 +2869,7 @@ msgid "Across the whole file, rows are skipped for want of a company or a role. 
 msgstr "Over het hele bestand worden rijen overgeslagen bij gebrek aan een bedrijf of een functie. Reeds vastgelegde rijen worden tijdens het importeren herkend en overgeslagen."
 
 #: src/postulo/templates/accounts/invite_list.html
+#: src/postulo/templates/connections/pairing.html
 #: src/postulo/templates/documents/rendered_list.html
 #: src/postulo/templates/server/backups.html
 #: src/postulo/templates/server/people.html
@@ -3268,6 +3288,11 @@ msgstr "Al besloten —"
 msgid "Already in your record"
 msgstr "Al in uw dossier"
 
+#: src/postulo/templates/connections/pairing_item.html
+#, python-format
+msgid "Already paired with <bdi>%(name)s</bdi>. Unpair it on the pairing page to pair it with something else."
+msgstr ""
+
 #: src/postulo/applications/agenda.py
 msgid "Already sent —"
 msgstr "Al verzonden —"
@@ -3591,6 +3616,10 @@ msgstr "Elke sector"
 msgid "Anyone holding the link may use it, once. Send it however you like."
 msgstr "Iedereen met de link kan hem één keer gebruiken. Verstuur hem zoals u wilt."
 
+#: src/postulo/templates/connections/pairing.html
+msgid "Anything"
+msgstr ""
+
 #: src/postulo/resume/forms.py
 msgid "Anything a reader should know, in a few words."
 msgstr "Alles wat een lezer moet weten, in een paar woorden."
@@ -3643,7 +3672,7 @@ msgstr "API-tokens"
 msgid "Appearance"
 msgstr "Weergave"
 
-#: src/postulo/applications/ical_import.py
+#: src/postulo/applications/ical_import.py src/postulo/plugins/pairing.py
 #: src/postulo/templates/applications/suggestion_list.html
 #: src/postulo/templates/base.html
 #: src/postulo/templates/documents/letter_detail.html
@@ -3944,6 +3973,10 @@ msgstr "Als platte tekst"
 msgid "As the institution words it. Kept in your record; a CV does not print it yet."
 msgstr "Zoals de instelling het formuleert. Bewaard in uw loopbaangegevens; een cv drukt het nog niet af."
 
+#: src/postulo/templates/connections/pairing.html
+msgid "As the last sync left them. Unpairing keeps both sides, and the next sync leaves them alone."
+msgstr ""
+
 #: src/postulo/jobs/forms.py
 msgid "As the posting words it — a city, a region, a country. Free text: nothing is looked up anywhere."
 msgstr "Zoals de vacature het formuleert — een stad, een regio, een land. Vrije tekst: nergens wordt iets opgezocht."
@@ -3983,6 +4016,11 @@ msgstr "Gevraagd"
 
 #: src/postulo/templates/server/record_of_processing.html
 msgid "Asked only when somebody presses for it, one company at a time. Each is sent what is listed and nothing about the person asking."
+msgstr ""
+
+#: src/postulo/templates/connections/pairing.html
+#, python-format
+msgid "Asks %(plugin)s now. Nothing it answers is kept here."
 msgstr ""
 
 #: src/postulo/applications/analytics.py src/postulo/applications/models.py
@@ -4121,6 +4159,10 @@ msgstr "Terug in uw vacatures."
 msgid "Back to Backups"
 msgstr "Terug naar Back-ups"
 
+#: src/postulo/templates/connections/pairing.html
+msgid "Back to connections"
+msgstr ""
+
 #: src/postulo/core/help.py
 msgid "Back to Documents"
 msgstr "Terug naar documenten"
@@ -4128,6 +4170,10 @@ msgstr "Terug naar documenten"
 #: src/postulo/templates/accounts/invite_created.html
 msgid "Back to invitations"
 msgstr "Terug naar uitnodigingen"
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Back to it"
+msgstr ""
 
 #: src/postulo/core/help.py
 msgid "Back to Listings"
@@ -4463,6 +4509,10 @@ msgstr "Belgesprek"
 msgid "Callback to register with it"
 msgstr "Callback-URL om bij de aanbieder te registreren"
 
+#: src/postulo/templates/connections/pairing.html
+msgid "Can pair with"
+msgstr ""
+
 #: src/postulo/templates/accounts/invite_form.html
 #: src/postulo/templates/accounts/profile.html
 #: src/postulo/templates/applications/application_form.html
@@ -4474,6 +4524,7 @@ msgstr "Callback-URL om bij de aanbieder te registreren"
 #: src/postulo/templates/applications/tag_form.html
 #: src/postulo/templates/connections/confirm_delete.html
 #: src/postulo/templates/connections/form.html
+#: src/postulo/templates/connections/pairing_item.html
 #: src/postulo/templates/cotton/dialog.html
 #: src/postulo/templates/documents/cv_form.html
 #: src/postulo/templates/documents/cv_item_form.html
@@ -4843,6 +4894,10 @@ msgstr "Chips en labels"
 msgid "Choices"
 msgstr "Keuzes"
 
+#: src/postulo/templates/connections/pairing_item.html
+msgid "Choose"
+msgstr ""
+
 #: src/postulo/core/personal.py
 msgid "Choose a country from the list."
 msgstr "Kies een land uit de lijst."
@@ -4889,6 +4944,18 @@ msgstr "Kies een nieuw wachtwoord"
 msgid "Choose a package first."
 msgstr "Kies eerst een pakket."
 
+#: src/postulo/plugins/views_pairing.py
+msgid "Choose a pairing."
+msgstr ""
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Choose a record"
+msgstr ""
+
+#: src/postulo/plugins/views_pairing.py
+msgid "Choose a record to pair it with."
+msgstr ""
+
 #: src/postulo/applications/ical_import.py
 msgid "Choose a time zone"
 msgstr "Kies een tijdzone"
@@ -4900,6 +4967,11 @@ msgstr "Kies een archief om te uploaden."
 #: src/postulo/core/mail_auth.py
 msgid "Choose an identity provider and save it first."
 msgstr "Kies eerst een identiteitsprovider en sla die op."
+
+#: src/postulo/templates/connections/pairing.html
+#, python-format
+msgid "Choose an item to pair with <bdi>%(name)s</bdi>."
+msgstr ""
 
 #: src/postulo/templates/core/import_csv_map.html
 msgid "Choose another file"
@@ -4956,6 +5028,10 @@ msgstr "Kies het soort identificatiecode."
 #: src/postulo/templates/documents/cv_detail.html
 msgid "Choose what it prints instead"
 msgstr "Kiezen wat er in plaats daarvan wordt afgedrukt"
+
+#: src/postulo/plugins/views_pairing.py
+msgid "Choose what to do with the item."
+msgstr ""
 
 #: src/postulo/jobs/status_views.py
 msgid "Choose what was reported and the date."
@@ -5243,6 +5319,7 @@ msgstr "Bedrijven, vacatures, sollicitaties, vastleggingen en documenten zitten 
 #: src/postulo/applications/forms.py src/postulo/applications/reports.py
 #: src/postulo/applications/tables.py src/postulo/core/csv_import.py
 #: src/postulo/jobs/models.py src/postulo/jobs/tables.py
+#: src/postulo/plugins/pairing.py
 #: src/postulo/templates/applications/report.html
 #: src/postulo/templates/base.html
 #: src/postulo/templates/core/import_csv_map.html
@@ -5388,6 +5465,7 @@ msgid "Connection security"
 msgstr "Beveiliging van de verbinding"
 
 #: src/postulo/core/settings_sections.py src/postulo/plugins/views.py
+#: src/postulo/plugins/views_pairing.py
 #: src/postulo/templates/connections/list.html
 msgid "Connections"
 msgstr "Koppelingen"
@@ -5412,7 +5490,7 @@ msgstr "Consultancy"
 msgid "contact"
 msgstr "contactpersoon"
 
-#: src/postulo/templates/jobs/contact_form.html
+#: src/postulo/plugins/pairing.py src/postulo/templates/jobs/contact_form.html
 msgid "Contact"
 msgstr "Contactpersoon"
 
@@ -6009,7 +6087,7 @@ msgstr "dichtheid"
 msgid "department"
 msgstr "afdeling"
 
-#: src/postulo/jobs/forms.py
+#: src/postulo/jobs/forms.py src/postulo/plugins/pairing.py
 #: src/postulo/templates/applications/application_detail.html
 msgid "Department"
 msgstr "Afdeling"
@@ -7195,9 +7273,18 @@ msgstr "Bestanden die u al had, in tegenstelling tot documenten die Postulo heef
 msgid "Files you have already"
 msgstr "Bestanden die u al hebt"
 
+#: src/postulo/templates/connections/pairing_item.html
+#, python-format
+msgid "Fill from %(plugin)s and pair"
+msgstr ""
+
 #: src/postulo/templates/documents/letter_detail.html
 msgid "Fill in from"
 msgstr "Invullen vanuit"
+
+#: src/postulo/templates/connections/pairing_item.html
+msgid "Fill once, without pairing"
+msgstr ""
 
 #: src/postulo/resume/views.py
 #, python-format
@@ -7239,6 +7326,10 @@ msgstr "Taal zoeken"
 #: src/postulo/templates/jobs/company_form.html
 msgid "Find logo"
 msgstr "Logo zoeken"
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Find on the other side"
+msgstr ""
 
 #: src/postulo/templates/jobs/industry_list.html
 msgid "Find one"
@@ -7451,6 +7542,10 @@ msgstr[1] ""
 #, python-format
 msgid "Found a logo at %(url)s."
 msgstr "Een logo gevonden op %(url)s."
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Found on the other side"
+msgstr ""
 
 #: src/postulo/templates/connections/partials/option_table.html
 msgid "Found on the server"
@@ -8652,7 +8747,7 @@ msgstr "Intern"
 msgid "Internship"
 msgstr "Stage"
 
-#: src/postulo/applications/models.py
+#: src/postulo/applications/models.py src/postulo/plugins/pairing.py
 msgid "Interview"
 msgstr "Gesprek"
 
@@ -8828,13 +8923,21 @@ msgstr ""
 msgid "it could not be imported"
 msgstr "het kon niet worden geïmporteerd"
 
+#: src/postulo/plugins/pairing.py
+msgid "It did not fill the record it was given."
+msgstr ""
+
 #: src/postulo/plugins/installing.py
 #, python-format
 msgid "it did not finish importing within %(seconds)ss"
 msgstr "het was niet binnen %(seconds)ss klaar met importeren"
 
-#: src/postulo/plugins/views.py
+#: src/postulo/plugins/pairing.py src/postulo/plugins/views.py
 msgid "It did not say what it found."
+msgstr ""
+
+#: src/postulo/plugins/pairing.py
+msgid "It did not say what it made."
 msgstr ""
 
 #: src/postulo/templates/server/backups.html
@@ -8991,6 +9094,14 @@ msgstr "Het werkt tot %(when)s, of totdat het is gebruikt of ingetrokken."
 #: src/postulo/plugins/views.py
 msgid "It works."
 msgstr "Het werkt."
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Item"
+msgstr ""
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Items found"
+msgstr ""
 
 #: src/postulo/jobs/register_views.py
 msgid "Its address is already listed."
@@ -9460,6 +9571,11 @@ msgstr "Laatst bereikte fase"
 msgid "last synced"
 msgstr "laatst gesynchroniseerd"
 
+#: src/postulo/templates/connections/pairing.html
+#, python-format
+msgid "Last synced %(when)s"
+msgstr ""
+
 #: src/postulo/api/models.py
 msgid "last used"
 msgstr "laatst gebruikt"
@@ -9606,6 +9722,11 @@ msgstr "Juridische kennisgeving"
 #: src/postulo/jobs/models.py
 msgid "legal state"
 msgstr "juridische status"
+
+#: src/postulo/templates/connections/pairing.html
+#, python-format
+msgid "Let %(plugin)s make a new one"
+msgstr ""
 
 #: src/postulo/core/server_forms.py
 msgid "Let a capture keep a rendering of its page"
@@ -9916,6 +10037,11 @@ msgstr "Kleine letters, cijfers, punten, underscores en koppeltekens."
 #: src/postulo/templates/server/person_recovery.html
 msgid "Made"
 msgstr "Gemaakt"
+
+#: src/postulo/plugins/views_pairing.py
+#, python-format
+msgid "Made %(record)s from %(item)s, without pairing them."
+msgstr ""
 
 #: src/postulo/core/models.py
 msgid "mail failures in a row"
@@ -11164,6 +11290,10 @@ msgstr "Geen van uw bedrijven heeft deze naam of identificatiecode."
 msgid "None of your own yet. A CV in another language prints the name the ESCO classification gives this skill there, and the name as you wrote it where the classification gives none."
 msgstr "Nog geen eigen naam. Een cv in een andere taal drukt de naam af die de ESCO-classificatie in die taal aan deze vaardigheid geeft, en de naam zoals u hem schreef waar de classificatie er geen geeft."
 
+#: src/postulo/templates/connections/pairing_item.html
+msgid "None of your records matches."
+msgstr ""
+
 #: src/postulo/templates/applications/partials/reminders.html
 msgid "None outstanding."
 msgstr "Niets openstaand."
@@ -11304,6 +11434,10 @@ msgstr "Niet op de pagina — een standaardwaarde. Alleen bewaard naast een bedr
 msgid "Not one of these"
 msgstr "Geen van deze"
 
+#: src/postulo/templates/connections/pairing.html
+msgid "Not paired yet"
+msgstr ""
+
 #: src/postulo/jobs/forms.py
 msgid "Not part of another company"
 msgstr "Geen onderdeel van een ander bedrijf"
@@ -11380,6 +11514,10 @@ msgstr "Niet getoond · %(name)s"
 #: src/postulo/resume/models.py
 msgid "Not stated"
 msgstr "Niet vermeld"
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Not synced yet"
+msgstr ""
 
 #: src/postulo/templates/connections/list.html
 msgid "not tested yet"
@@ -11468,6 +11606,10 @@ msgstr "notities bij bedrijven"
 msgid "notes on contacts"
 msgstr "notities bij contactpersonen"
 
+#: src/postulo/templates/connections/pairing.html
+msgid "Nothing"
+msgstr ""
+
 #: src/postulo/templates/server/plugins.html
 msgid "nothing"
 msgstr "niets"
@@ -11490,6 +11632,10 @@ msgid "Nothing fills in %(names)s, so it goes out blank."
 msgid_plural "Nothing fills in %(names)s, so they go out blank."
 msgstr[0] "Niets vult %(names)s in, dus dat wordt leeg verstuurd."
 msgstr[1] "Niets vult %(names)s in, dus die worden leeg verstuurd."
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Nothing found on the other side."
+msgstr ""
 
 #: src/postulo/templates/jobs/posting_detail.html
 msgid "Nothing has arrived about this one yet."
@@ -11590,6 +11736,10 @@ msgstr "Hier is nog niets geïnstalleerd. Plugins staan in %(directory)s, op het
 #: src/postulo/templates/server/plugins.html
 msgid "Nothing is installed that a person can hold an opinion about."
 msgstr "Er is niets geïnstalleerd waarover iemand een mening kan hebben."
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Nothing is paired on this connection yet."
+msgstr ""
 
 #: src/postulo/templates/jobs/capture_form.html
 msgid "Nothing is saved until you have reviewed it."
@@ -12043,6 +12193,10 @@ msgstr "Bij het controleren van vastleggingen verwerpt “d” en gaat verder, e
 #, python-format
 msgid "On the map at %(how)s."
 msgstr "Op de kaart bij %(how)s."
+
+#: src/postulo/templates/connections/pairing.html
+msgid "On the other side"
+msgstr ""
 
 #: src/postulo/templates/applications/suggestion_list.html
 msgid "On the timeline"
@@ -12718,6 +12872,65 @@ msgstr "Uit vastleggingen bewaarde pagina’s"
 #: src/postulo/templates/partials/table/pagination.html
 msgid "Pagination"
 msgstr "Paginering"
+
+#: src/postulo/templates/connections/pairing.html
+#: src/postulo/templates/connections/pairing_item.html
+msgid "Pair"
+msgstr ""
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Pair again"
+msgstr ""
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Pair what is on the other side with your own records, or undo a pairing. Both sides are kept either way."
+msgstr ""
+
+#: src/postulo/templates/cotton/pairing_line.html
+#, python-format
+msgid "Pair with an item on <bdi>%(connection)s</bdi>…"
+msgstr ""
+
+#: src/postulo/templates/connections/pairing_item.html
+#, python-format
+msgid "Pair with: %(kind)s"
+msgstr ""
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Paired"
+msgstr ""
+
+#: src/postulo/plugins/views_pairing.py
+#, python-format
+msgid "Paired %(item)s with %(record)s. The next sync compares the two."
+msgstr ""
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Paired records"
+msgstr ""
+
+#: src/postulo/templates/cotton/pairing_line.html
+#, python-format
+msgid "Paired through <bdi>%(connection)s</bdi>, last synced %(when)s"
+msgstr ""
+
+#: src/postulo/templates/cotton/pairing_line.html
+#, python-format
+msgid "Paired through <bdi>%(connection)s</bdi>, not synced yet"
+msgstr ""
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Paired with"
+msgstr ""
+
+#: src/postulo/templates/connections/list.html
+msgid "Pairing"
+msgstr ""
+
+#: src/postulo/templates/connections/pairing.html
+#, python-format
+msgid "Pairing on %(label)s"
+msgstr ""
 
 #: src/postulo/applications/models.py
 #, fuzzy
@@ -13933,6 +14146,8 @@ msgid "Recipient"
 msgstr "Ontvanger"
 
 #: src/postulo/templates/applications/partials/status_card.html
+#: src/postulo/templates/connections/pairing.html
+#: src/postulo/templates/connections/pairing_item.html
 msgid "Record"
 msgstr "Vastleggen"
 
@@ -14060,6 +14275,11 @@ msgid "Records older than %(cutoff)s (%(days)s day). Nothing was removed; this i
 msgid_plural "Records older than %(cutoff)s (%(days)s days). Nothing was removed; this is the report a deletion would be made from."
 msgstr[0] "Items ouder dan %(cutoff)s (%(days)s dag). Er is niets verwijderd; dit is het rapport waarop een verwijdering zou worden gebaseerd."
 msgstr[1] "Items ouder dan %(cutoff)s (%(days)s dagen). Er is niets verwijderd; dit is het rapport waarop een verwijdering zou worden gebaseerd."
+
+#: src/postulo/templates/connections/pairing.html
+#, python-format
+msgid "Records paired on %(label)s"
+msgstr ""
 
 #: src/postulo/templates/server/person_recovery.html
 msgid "Recovery"
@@ -14243,6 +14463,7 @@ msgstr "Herinner me de dag ervoor"
 msgid "reminder"
 msgstr "herinnering"
 
+#: src/postulo/plugins/pairing.py
 #: src/postulo/templates/applications/reminder_form.html
 #: src/postulo/templates/base.html
 msgid "Reminder"
@@ -14345,6 +14566,15 @@ msgstr "{label} verwijderen"
 #: src/postulo/plugins/models.py
 msgid "removed on the other side"
 msgstr "aan de andere kant verwijderd"
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Removed on the other side"
+msgstr ""
+
+#: src/postulo/templates/cotton/pairing_line.html
+#, python-format
+msgid "Removed on the other side of <bdi>%(connection)s</bdi>"
+msgstr ""
 
 #: src/postulo/core/models.py
 msgid "Removed there"
@@ -14797,7 +15027,9 @@ msgstr "scopes"
 msgid "Screening"
 msgstr "Screening"
 
-#: src/postulo/core/tables.py src/postulo/templates/core/search.html
+#: src/postulo/core/tables.py src/postulo/templates/connections/pairing.html
+#: src/postulo/templates/connections/pairing_item.html
+#: src/postulo/templates/core/search.html
 #: src/postulo/templates/cotton/site_search.html
 #: src/postulo/templates/jobs/industry_list.html
 msgid "Search"
@@ -14839,6 +15071,10 @@ msgstr "Agenda doorzoeken"
 #: src/postulo/documents/views.py
 msgid "Search what you sent"
 msgstr "Doorzoeken wat u hebt verstuurd"
+
+#: src/postulo/templates/connections/pairing_item.html
+msgid "Search your records"
+msgstr ""
 
 #: src/postulo/core/server_forms.py
 msgid "Seconds to wait for the server before giving up."
@@ -15384,6 +15620,10 @@ msgstr "Dit adres op de kaart tonen?"
 msgid "Show this period"
 msgstr "Deze periode tonen"
 
+#: src/postulo/templates/connections/pairing.html
+msgid "Show unpaired"
+msgstr ""
+
 #: src/postulo/jobs/tables.py
 #: src/postulo/templates/applications/calendar_print.html
 #: src/postulo/templates/jobs/partials/whose_form.html
@@ -15878,7 +16118,8 @@ msgstr "STARTTLS, na het verbinden"
 msgid "state"
 msgstr "toestand"
 
-#: src/postulo/jobs/tables.py src/postulo/templates/jobs/company_register.html
+#: src/postulo/jobs/tables.py src/postulo/templates/connections/pairing.html
+#: src/postulo/templates/jobs/company_register.html
 #: src/postulo/templates/server/person_recovery.html
 #, fuzzy
 msgid "State"
@@ -16132,6 +16373,7 @@ msgid "sync links"
 msgstr "synchronisatiekoppelingen"
 
 #: src/postulo/templates/connections/list.html
+#: src/postulo/templates/connections/pairing.html
 msgid "Sync now"
 msgstr "Nu synchroniseren"
 
@@ -16648,6 +16890,13 @@ msgstr "Die afbeelding is veel groter dan nodig is."
 msgid "That invitation has already been accepted and cannot be revoked."
 msgstr "Die uitnodiging is al aanvaard en kan niet worden ingetrokken."
 
+#: src/postulo/plugins/views.py
+#, python-format
+msgid "That is a lot of questions to the server. Try again in %(seconds)d second."
+msgid_plural "That is a lot of questions to the server. Try again in %(seconds)d seconds."
+msgstr[0] ""
+msgstr[1] ""
+
 #: src/postulo/core/server_views.py
 msgid "That is a lot of recovery links. Try again shortly."
 msgstr "Dat zijn veel herstellinks. Probeer het straks opnieuw."
@@ -16848,6 +17097,23 @@ msgstr "Dat is de export van een heel account. Deze pagina leest alleen het best
 msgid "That is the last administrator. Appoint another first."
 msgstr "Dat is de laatste beheerder. Wijs eerst een andere aan."
 
+#: src/postulo/plugins/pairing.py
+msgid "That item cannot be made into one of those."
+msgstr ""
+
+#: src/postulo/plugins/views_pairing.py
+msgid "That item cannot be paired with one of those."
+msgstr ""
+
+#: src/postulo/plugins/views_pairing.py
+#, python-format
+msgid "That item is already paired with %(record)s. Unpair it first."
+msgstr ""
+
+#: src/postulo/plugins/pairing.py
+msgid "That item is no longer on the other side."
+msgstr ""
+
 #: src/postulo/templates/account/recovery_unusable.html
 msgid "That link cannot be used"
 msgstr "Die link kan niet worden gebruikt"
@@ -16937,6 +17203,10 @@ msgstr[1] "Die pagina deed er langer dan %(seconds)s seconden over om aan te kom
 #, python-format
 msgid "That page was sent with the content encoding “%(coding)s”, which Postulo does not unpack, so it was not read."
 msgstr "Die pagina is verstuurd met de inhoudscodering “%(coding)s”, die Postulo niet uitpakt, dus hij is niet gelezen."
+
+#: src/postulo/plugins/views_pairing.py
+msgid "That pairing still has its other side."
+msgstr ""
 
 #: src/postulo/applications/forms.py
 msgid "That person is not recorded at this service."
@@ -19240,6 +19510,10 @@ msgstr "Te beslissen"
 msgid "To hand over a posting (needs the captures scope):"
 msgstr "Om een vacature aan te leveren (vereist de scope captures):"
 
+#: src/postulo/templates/connections/pairing.html
+msgid "To pair with"
+msgstr ""
+
 #: src/postulo/templates/documents/cv_detail.html
 msgid "To see where the pages break. A draft is kept nowhere; Export PDF is what files a version."
 msgstr "Om te zien waar de pagina’s breken. Een concept wordt nergens bewaard; Pdf exporteren is wat een versie opslaat."
@@ -19365,6 +19639,7 @@ msgid "Two-factor authentication"
 msgstr "Tweefactorauthenticatie"
 
 #: src/postulo/accounts/models.py src/postulo/jobs/tables.py
+#: src/postulo/templates/connections/pairing_item.html
 #: src/postulo/templates/cotton/identifier_row.html
 #: src/postulo/templates/jobs/capture_page.html
 #: src/postulo/templates/partials/phone_numbers.html
@@ -19512,8 +19787,18 @@ msgstr "Anders dan een telefoonnummer wordt een adres op deze instantie niet maa
 msgid "Unlike a telephone number, an address is not kept once on this instance, because people share a home; you cannot list the same one twice yourself. The bin removes a row at once, after asking, without waiting for <em>Save</em>."
 msgstr "Anders dan een telefoonnummer wordt een adres niet maar één keer op deze instantie bewaard, omdat mensen een woning delen; zelf kunt u hetzelfde adres niet twee keer vermelden. De prullenbak verwijdert een rij direct, na bevestiging, zonder op <em>Opslaan</em> te wachten."
 
+#: src/postulo/templates/connections/pairing.html
+#: src/postulo/templates/cotton/pairing_line.html
+msgid "Unpair"
+msgstr ""
+
 #: src/postulo/plugins/models.py
 msgid "unpaired"
+msgstr ""
+
+#: src/postulo/plugins/views_pairing.py
+#, python-format
+msgid "Unpaired. Both sides are kept, and %(connection)s leaves them alone."
 msgstr ""
 
 #: src/postulo/resume/publications.py
@@ -21175,9 +21460,14 @@ msgstr "Ja: wie via de identiteitsaanbieder binnenkomt, wordt meteen ingelogd, z
 msgid "Yes: somebody who has forgotten their password can ask for a code at their primary address and type it back. A code rather than a link, because mail scanners follow links and would spend one before the person read it. It is never a second factor: an authenticator app is still asked for. Offered only while this instance's mail is actually getting through."
 msgstr "Ja: wie zijn of haar wachtwoord is vergeten, kan een code aanvragen op het primaire adres en die intypen. Een code en geen link, want mailscanners volgen links en zouden de link opgebruiken voordat de persoon hem heeft gelezen. Het is nooit een tweede factor: om de authenticator-app wordt nog steeds gevraagd. Alleen aangeboden zolang de mail van deze instantie daadwerkelijk aankomt."
 
-#: src/postulo/jobs/views.py
+#: src/postulo/jobs/views.py src/postulo/plugins/pairing.py
 msgid "You"
 msgstr "U"
+
+#: src/postulo/plugins/pairing.py
+#, python-format
+msgid "You (%(name)s)"
+msgstr ""
 
 #: src/postulo/api/routers/companies.py src/postulo/jobs/forms.py
 #: src/postulo/jobs/surface.py
@@ -21638,6 +21928,10 @@ msgid "Your record lists %(total)s public work; the first %(most)s are shown."
 msgid_plural "Your record lists %(total)s public works; the first %(most)s are shown."
 msgstr[0] ""
 msgstr[1] ""
+
+#: src/postulo/templates/connections/pairing_item.html
+msgid "Your records"
+msgstr ""
 
 #: src/postulo/resume/models.py
 msgid "your role"

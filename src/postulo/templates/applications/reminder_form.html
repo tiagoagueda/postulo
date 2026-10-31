@@ -25,5 +25,8 @@
         <a href="{{ cancel_url }}" class="btn" data-variant="ghost">{% translate "Cancel" %}</a>
       </div>
     </form>
+    {% if object %}
+      <c-pairing-line :record="object" class="mt-8" />
+    {% endif %}
   </div>
 {% endblock %}

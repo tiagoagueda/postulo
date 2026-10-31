@@ -1277,6 +1277,11 @@ msgstr "%(person)s — апошні ўдзельнік групы %(name)s, як
 msgid "%(plugin)s could not check these settings: %(error)s"
 msgstr "%(plugin)s не ўдалося праверыць гэтыя налады: %(error)s"
 
+#: src/postulo/plugins/views_pairing.py
+#, python-format
+msgid "%(plugin)s could not do that: %(message)s"
+msgstr ""
+
 #: src/postulo/plugins/views.py
 #, python-format
 msgid "%(plugin)s could not look on the server: %(message)s"
@@ -1285,6 +1290,11 @@ msgstr ""
 #: src/postulo/plugins/views.py
 #, python-format
 msgid "%(plugin)s has nothing to look for."
+msgstr ""
+
+#: src/postulo/plugins/views_pairing.py
+#, python-format
+msgid "%(plugin)s makes a new one on its next run."
 msgstr ""
 
 #: src/postulo/core/mail_auth.py
@@ -2407,6 +2417,11 @@ msgstr "Імя — гэта не асоба: у двух даследчыкаў 
 msgid "A new one"
 msgstr "Новы"
 
+#: src/postulo/templates/connections/pairing_item.html
+#, python-format
+msgid "A new one: %(kind)s"
+msgstr ""
+
 #: src/postulo/templates/server/design.html
 msgid "A number and what it counts. The colour is a second signal, never the only one."
 msgstr "Лік і тое, што ён лічыць. Колер — другі сігнал, ніколі не адзіны."
@@ -2597,6 +2612,10 @@ msgstr "Ціхі журнал — якраз тое, што трэба."
 #: src/postulo/resume/forms.py
 msgid "A range such as 41–52, or one page."
 msgstr "Дыяпазон, напрыклад 41–52, або адна старонка."
+
+#: src/postulo/templates/connections/pairing.html
+msgid "A record since deleted"
+msgstr ""
 
 #: src/postulo/documents/forms.py
 msgid "A referee who is not a contact yet. Their name is enough; it is added to your contacts without a company, and is used instead of the choice above."
@@ -2949,6 +2968,7 @@ msgid "Across the whole file, rows are skipped for want of a company or a role. 
 msgstr "Ва ўсім файле радкі прапускаюцца, калі ў іх няма кампаніі або пасады. Радкі, якія ўжо запісаны, выяўляюцца і прапускаюцца падчас імпарту."
 
 #: src/postulo/templates/accounts/invite_list.html
+#: src/postulo/templates/connections/pairing.html
 #: src/postulo/templates/documents/rendered_list.html
 #: src/postulo/templates/server/backups.html
 #: src/postulo/templates/server/people.html
@@ -3374,6 +3394,11 @@ msgstr "Ужо вырашана —"
 msgid "Already in your record"
 msgstr "Ужо ёсць у вашых даных"
 
+#: src/postulo/templates/connections/pairing_item.html
+#, python-format
+msgid "Already paired with <bdi>%(name)s</bdi>. Unpair it on the pairing page to pair it with something else."
+msgstr ""
+
 #: src/postulo/applications/agenda.py
 msgid "Already sent —"
 msgstr "Ужо адпраўлена —"
@@ -3701,6 +3726,10 @@ msgstr "Любы сектар"
 msgid "Anyone holding the link may use it, once. Send it however you like."
 msgstr "Кожны, хто мае гэту спасылку, можа скарыстацца ёю адзін раз. Адпраўце яе любым зручным спосабам."
 
+#: src/postulo/templates/connections/pairing.html
+msgid "Anything"
+msgstr ""
+
 #: src/postulo/resume/forms.py
 msgid "Anything a reader should know, in a few words."
 msgstr "Усё, што варта ведаць чытачу, у некалькіх словах."
@@ -3755,7 +3784,7 @@ msgstr "Токены API"
 msgid "Appearance"
 msgstr "Знешні выгляд"
 
-#: src/postulo/applications/ical_import.py
+#: src/postulo/applications/ical_import.py src/postulo/plugins/pairing.py
 #: src/postulo/templates/applications/suggestion_list.html
 #: src/postulo/templates/base.html
 #: src/postulo/templates/documents/letter_detail.html
@@ -4055,6 +4084,10 @@ msgstr "Як просты тэкст"
 msgid "As the institution words it. Kept in your record; a CV does not print it yet."
 msgstr "Так, як гэта фармулюе ўстанова. Захоўваецца ў вашых даных; у рэзюмэ пакуль не друкуецца."
 
+#: src/postulo/templates/connections/pairing.html
+msgid "As the last sync left them. Unpairing keeps both sides, and the next sync leaves them alone."
+msgstr ""
+
 #: src/postulo/jobs/forms.py
 msgid "As the posting words it — a city, a region, a country. Free text: nothing is looked up anywhere."
 msgstr "Так, як напісана ў аб'яве, — горад, рэгіён, краіна. Адвольны тэкст: нічога нідзе не шукаецца."
@@ -4093,6 +4126,11 @@ msgstr "Запытана"
 
 #: src/postulo/templates/server/record_of_processing.html
 msgid "Asked only when somebody presses for it, one company at a time. Each is sent what is listed and nothing about the person asking."
+msgstr ""
+
+#: src/postulo/templates/connections/pairing.html
+#, python-format
+msgid "Asks %(plugin)s now. Nothing it answers is kept here."
 msgstr ""
 
 #: src/postulo/applications/analytics.py src/postulo/applications/models.py
@@ -4232,6 +4270,10 @@ msgstr "Зноў у вашых аб'явах."
 msgid "Back to Backups"
 msgstr "Назад да рэзервовых копій"
 
+#: src/postulo/templates/connections/pairing.html
+msgid "Back to connections"
+msgstr ""
+
 #: src/postulo/core/help.py
 msgid "Back to Documents"
 msgstr "Назад да дакументаў"
@@ -4239,6 +4281,10 @@ msgstr "Назад да дакументаў"
 #: src/postulo/templates/accounts/invite_created.html
 msgid "Back to invitations"
 msgstr "Назад да запрашэнняў"
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Back to it"
+msgstr ""
 
 #: src/postulo/core/help.py
 msgid "Back to Listings"
@@ -4576,6 +4622,10 @@ msgstr "Званок"
 msgid "Callback to register with it"
 msgstr "Адрас зваротнага выкліку для рэгістрацыі ў пастаўшчыка"
 
+#: src/postulo/templates/connections/pairing.html
+msgid "Can pair with"
+msgstr ""
+
 #: src/postulo/templates/accounts/invite_form.html
 #: src/postulo/templates/accounts/profile.html
 #: src/postulo/templates/applications/application_form.html
@@ -4587,6 +4637,7 @@ msgstr "Адрас зваротнага выкліку для рэгістрац
 #: src/postulo/templates/applications/tag_form.html
 #: src/postulo/templates/connections/confirm_delete.html
 #: src/postulo/templates/connections/form.html
+#: src/postulo/templates/connections/pairing_item.html
 #: src/postulo/templates/cotton/dialog.html
 #: src/postulo/templates/documents/cv_form.html
 #: src/postulo/templates/documents/cv_item_form.html
@@ -4965,6 +5016,10 @@ msgstr "Чыпы і пазнакі"
 msgid "Choices"
 msgstr "Выбар"
 
+#: src/postulo/templates/connections/pairing_item.html
+msgid "Choose"
+msgstr ""
+
 #: src/postulo/core/personal.py
 msgid "Choose a country from the list."
 msgstr "Выберыце краіну са спісу."
@@ -5011,6 +5066,18 @@ msgstr "Выберыце новы пароль"
 msgid "Choose a package first."
 msgstr "Спачатку выберыце пакет."
 
+#: src/postulo/plugins/views_pairing.py
+msgid "Choose a pairing."
+msgstr ""
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Choose a record"
+msgstr ""
+
+#: src/postulo/plugins/views_pairing.py
+msgid "Choose a record to pair it with."
+msgstr ""
+
 #: src/postulo/applications/ical_import.py
 msgid "Choose a time zone"
 msgstr "Выберыце часавы пояс"
@@ -5022,6 +5089,11 @@ msgstr "Выберыце архіў для запампоўвання."
 #: src/postulo/core/mail_auth.py
 msgid "Choose an identity provider and save it first."
 msgstr "Спачатку выберыце пастаўшчыка ідэнтыфікацыі і захавайце яго."
+
+#: src/postulo/templates/connections/pairing.html
+#, python-format
+msgid "Choose an item to pair with <bdi>%(name)s</bdi>."
+msgstr ""
 
 #: src/postulo/templates/core/import_csv_map.html
 msgid "Choose another file"
@@ -5078,6 +5150,10 @@ msgstr "Выберыце тып ідэнтыфікатара."
 #: src/postulo/templates/documents/cv_detail.html
 msgid "Choose what it prints instead"
 msgstr "Выбраць, што друкаваць замест гэтага"
+
+#: src/postulo/plugins/views_pairing.py
+msgid "Choose what to do with the item."
+msgstr ""
 
 #: src/postulo/jobs/status_views.py
 msgid "Choose what was reported and the date."
@@ -5369,6 +5445,7 @@ msgstr "Кампаній, аб'яў, заявак, захопаў і дакум�
 #: src/postulo/applications/forms.py src/postulo/applications/reports.py
 #: src/postulo/applications/tables.py src/postulo/core/csv_import.py
 #: src/postulo/jobs/models.py src/postulo/jobs/tables.py
+#: src/postulo/plugins/pairing.py
 #: src/postulo/templates/applications/report.html
 #: src/postulo/templates/base.html
 #: src/postulo/templates/core/import_csv_map.html
@@ -5515,6 +5592,7 @@ msgid "Connection security"
 msgstr "Бяспека падключэння"
 
 #: src/postulo/core/settings_sections.py src/postulo/plugins/views.py
+#: src/postulo/plugins/views_pairing.py
 #: src/postulo/templates/connections/list.html
 msgid "Connections"
 msgstr "Падключэнні"
@@ -5539,7 +5617,7 @@ msgstr "Кансалтынг"
 msgid "contact"
 msgstr "кантакт"
 
-#: src/postulo/templates/jobs/contact_form.html
+#: src/postulo/plugins/pairing.py src/postulo/templates/jobs/contact_form.html
 msgid "Contact"
 msgstr "Кантакт"
 
@@ -6144,7 +6222,7 @@ msgstr "шчыльнасць"
 msgid "department"
 msgstr "аддзел"
 
-#: src/postulo/jobs/forms.py
+#: src/postulo/jobs/forms.py src/postulo/plugins/pairing.py
 #: src/postulo/templates/applications/application_detail.html
 msgid "Department"
 msgstr "Аддзел"
@@ -7329,9 +7407,18 @@ msgstr "Файлы, якія ў вас ужо былі, у адрозненне 
 msgid "Files you have already"
 msgstr "Файлы, якія ў вас ужо ёсць"
 
+#: src/postulo/templates/connections/pairing_item.html
+#, python-format
+msgid "Fill from %(plugin)s and pair"
+msgstr ""
+
 #: src/postulo/templates/documents/letter_detail.html
 msgid "Fill in from"
 msgstr "Запоўніць з"
+
+#: src/postulo/templates/connections/pairing_item.html
+msgid "Fill once, without pairing"
+msgstr ""
 
 #: src/postulo/resume/views.py
 #, python-format
@@ -7373,6 +7460,10 @@ msgstr "Знайсці мову"
 #: src/postulo/templates/jobs/company_form.html
 msgid "Find logo"
 msgstr "Знайсці лагатып"
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Find on the other side"
+msgstr ""
 
 #: src/postulo/templates/jobs/industry_list.html
 msgid "Find one"
@@ -7585,6 +7676,10 @@ msgstr[2] ""
 #, python-format
 msgid "Found a logo at %(url)s."
 msgstr "Знойдзена лагатып па адрасе %(url)s."
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Found on the other side"
+msgstr ""
 
 #: src/postulo/templates/connections/partials/option_table.html
 msgid "Found on the server"
@@ -8798,7 +8893,7 @@ msgstr "Унутраны"
 msgid "Internship"
 msgstr "Стажыроўка"
 
-#: src/postulo/applications/models.py
+#: src/postulo/applications/models.py src/postulo/plugins/pairing.py
 msgid "Interview"
 msgstr "Сумоўе"
 
@@ -8976,13 +9071,21 @@ msgstr ""
 msgid "it could not be imported"
 msgstr "не ўдалося імпартаваць"
 
+#: src/postulo/plugins/pairing.py
+msgid "It did not fill the record it was given."
+msgstr ""
+
 #: src/postulo/plugins/installing.py
 #, python-format
 msgid "it did not finish importing within %(seconds)ss"
 msgstr "імпарт не завяршыўся за %(seconds)s с"
 
-#: src/postulo/plugins/views.py
+#: src/postulo/plugins/pairing.py src/postulo/plugins/views.py
 msgid "It did not say what it found."
+msgstr ""
+
+#: src/postulo/plugins/pairing.py
+msgid "It did not say what it made."
 msgstr ""
 
 #: src/postulo/templates/server/backups.html
@@ -9146,6 +9249,14 @@ msgstr "Яно дзейнічае да %(when)s або пакуль ім не с
 #: src/postulo/plugins/views.py
 msgid "It works."
 msgstr "Працуе."
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Item"
+msgstr ""
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Items found"
+msgstr ""
 
 #: src/postulo/jobs/register_views.py
 msgid "Its address is already listed."
@@ -9621,6 +9732,11 @@ msgstr "Апошні дасягнуты этап"
 msgid "last synced"
 msgstr "апошняя сінхранізацыя"
 
+#: src/postulo/templates/connections/pairing.html
+#, python-format
+msgid "Last synced %(when)s"
+msgstr ""
+
 #: src/postulo/api/models.py
 msgid "last used"
 msgstr "апошняе выкарыстанне"
@@ -9769,6 +9885,11 @@ msgstr "Прававая інфармацыя"
 #: src/postulo/jobs/models.py
 msgid "legal state"
 msgstr "юрыдычны стан"
+
+#: src/postulo/templates/connections/pairing.html
+#, python-format
+msgid "Let %(plugin)s make a new one"
+msgstr ""
 
 #: src/postulo/core/server_forms.py
 msgid "Let a capture keep a rendering of its page"
@@ -10082,6 +10203,11 @@ msgstr "Малыя літары, лічбы, кропкі, падкрэслів�
 #: src/postulo/templates/server/person_recovery.html
 msgid "Made"
 msgstr "Створана"
+
+#: src/postulo/plugins/views_pairing.py
+#, python-format
+msgid "Made %(record)s from %(item)s, without pairing them."
+msgstr ""
 
 #: src/postulo/core/models.py
 msgid "mail failures in a row"
@@ -11343,6 +11469,10 @@ msgstr "Ні ў адной з вашых кампаній няма такой н
 msgid "None of your own yet. A CV in another language prints the name the ESCO classification gives this skill there, and the name as you wrote it where the classification gives none."
 msgstr "Уласных пакуль няма. Рэзюмэ на іншай мове друкуе назву, якую класіфікацыя ESCO дае гэтаму навыку на той мове, а там, дзе класіфікацыя назвы не дае, — назву, як вы яе напісалі."
 
+#: src/postulo/templates/connections/pairing_item.html
+msgid "None of your records matches."
+msgstr ""
+
 #: src/postulo/templates/applications/partials/reminders.html
 #, fuzzy
 msgid "None outstanding."
@@ -11486,6 +11616,10 @@ msgstr "Не са старонкі — прадвызначана. Захоўв�
 msgid "Not one of these"
 msgstr "Ні адзін з гэтых"
 
+#: src/postulo/templates/connections/pairing.html
+msgid "Not paired yet"
+msgstr ""
+
 #: src/postulo/jobs/forms.py
 msgid "Not part of another company"
 msgstr "Не ўваходзіць у іншую кампанію"
@@ -11562,6 +11696,10 @@ msgstr "Не паказваецца · %(name)s"
 #: src/postulo/resume/models.py
 msgid "Not stated"
 msgstr "Не ўказана"
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Not synced yet"
+msgstr ""
 
 #: src/postulo/templates/connections/list.html
 msgid "not tested yet"
@@ -11651,6 +11789,10 @@ msgstr "нататкі пра кампаніі"
 msgid "notes on contacts"
 msgstr "нататкі пра кантакты"
 
+#: src/postulo/templates/connections/pairing.html
+msgid "Nothing"
+msgstr ""
+
 #: src/postulo/templates/server/plugins.html
 msgid "nothing"
 msgstr "нічога"
@@ -11674,6 +11816,10 @@ msgid_plural "Nothing fills in %(names)s, so they go out blank."
 msgstr[0] "Няма чым запоўніць %(names)s, таму гэтае месца застанецца пустым."
 msgstr[1] "Няма чым запоўніць %(names)s, таму гэтыя месцы застануцца пустымі."
 msgstr[2] "Няма чым запоўніць %(names)s, таму гэтыя месцы застануцца пустымі."
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Nothing found on the other side."
+msgstr ""
 
 #: src/postulo/templates/jobs/posting_detail.html
 #, fuzzy
@@ -11776,6 +11922,10 @@ msgstr "Тут яшчэ нічога не ўсталявана. Убудовы �
 #: src/postulo/templates/server/plugins.html
 msgid "Nothing is installed that a person can hold an opinion about."
 msgstr "Не ўсталявана нічога, пра што чалавек мог бы мець сваю думку."
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Nothing is paired on this connection yet."
+msgstr ""
 
 #: src/postulo/templates/jobs/capture_form.html
 msgid "Nothing is saved until you have reviewed it."
@@ -12231,6 +12381,10 @@ msgstr "На старонцы разгляду захопаў «d» адхіля
 #, fuzzy, python-format
 msgid "On the map at %(how)s."
 msgstr "На мапе: %(how)s."
+
+#: src/postulo/templates/connections/pairing.html
+msgid "On the other side"
+msgstr ""
 
 #: src/postulo/templates/applications/suggestion_list.html
 msgid "On the timeline"
@@ -12930,6 +13084,65 @@ msgstr "Старонкі, захаваныя з захопаў"
 #: src/postulo/templates/partials/table/pagination.html
 msgid "Pagination"
 msgstr "Нумарацыя старонак"
+
+#: src/postulo/templates/connections/pairing.html
+#: src/postulo/templates/connections/pairing_item.html
+msgid "Pair"
+msgstr ""
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Pair again"
+msgstr ""
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Pair what is on the other side with your own records, or undo a pairing. Both sides are kept either way."
+msgstr ""
+
+#: src/postulo/templates/cotton/pairing_line.html
+#, python-format
+msgid "Pair with an item on <bdi>%(connection)s</bdi>…"
+msgstr ""
+
+#: src/postulo/templates/connections/pairing_item.html
+#, python-format
+msgid "Pair with: %(kind)s"
+msgstr ""
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Paired"
+msgstr ""
+
+#: src/postulo/plugins/views_pairing.py
+#, python-format
+msgid "Paired %(item)s with %(record)s. The next sync compares the two."
+msgstr ""
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Paired records"
+msgstr ""
+
+#: src/postulo/templates/cotton/pairing_line.html
+#, python-format
+msgid "Paired through <bdi>%(connection)s</bdi>, last synced %(when)s"
+msgstr ""
+
+#: src/postulo/templates/cotton/pairing_line.html
+#, python-format
+msgid "Paired through <bdi>%(connection)s</bdi>, not synced yet"
+msgstr ""
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Paired with"
+msgstr ""
+
+#: src/postulo/templates/connections/list.html
+msgid "Pairing"
+msgstr ""
+
+#: src/postulo/templates/connections/pairing.html
+#, python-format
+msgid "Pairing on %(label)s"
+msgstr ""
 
 #: src/postulo/applications/models.py
 #, fuzzy
@@ -14165,6 +14378,8 @@ msgid "Recipient"
 msgstr "Атрымальнік"
 
 #: src/postulo/templates/applications/partials/status_card.html
+#: src/postulo/templates/connections/pairing.html
+#: src/postulo/templates/connections/pairing_item.html
 msgid "Record"
 msgstr "Запісаць"
 
@@ -14294,6 +14509,11 @@ msgid_plural "Records older than %(cutoff)s (%(days)s days). Nothing was removed
 msgstr[0] "Запісы, старэйшыя за %(cutoff)s (%(days)s дзень). Нічога не выдалена; гэта справаздача, на падставе якой рабілася б выдаленне."
 msgstr[1] "Запісы, старэйшыя за %(cutoff)s (%(days)s дні). Нічога не выдалена; гэта справаздача, на падставе якой рабілася б выдаленне."
 msgstr[2] "Запісы, старэйшыя за %(cutoff)s (%(days)s дзён). Нічога не выдалена; гэта справаздача, на падставе якой рабілася б выдаленне."
+
+#: src/postulo/templates/connections/pairing.html
+#, python-format
+msgid "Records paired on %(label)s"
+msgstr ""
 
 #: src/postulo/templates/server/person_recovery.html
 msgid "Recovery"
@@ -14476,6 +14696,7 @@ msgstr "Нагадаць мне напярэдадні"
 msgid "reminder"
 msgstr "напамін"
 
+#: src/postulo/plugins/pairing.py
 #: src/postulo/templates/applications/reminder_form.html
 #: src/postulo/templates/base.html
 msgid "Reminder"
@@ -14578,6 +14799,15 @@ msgstr "Прыбраць {label}"
 #: src/postulo/plugins/models.py
 msgid "removed on the other side"
 msgstr "выдалена на другім баку"
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Removed on the other side"
+msgstr ""
+
+#: src/postulo/templates/cotton/pairing_line.html
+#, python-format
+msgid "Removed on the other side of <bdi>%(connection)s</bdi>"
+msgstr ""
 
 #: src/postulo/core/models.py
 msgid "Removed there"
@@ -15035,7 +15265,9 @@ msgstr "вобласці доступу"
 msgid "Screening"
 msgstr "Папярэдні адбор"
 
-#: src/postulo/core/tables.py src/postulo/templates/core/search.html
+#: src/postulo/core/tables.py src/postulo/templates/connections/pairing.html
+#: src/postulo/templates/connections/pairing_item.html
+#: src/postulo/templates/core/search.html
 #: src/postulo/templates/cotton/site_search.html
 #: src/postulo/templates/jobs/industry_list.html
 msgid "Search"
@@ -15077,6 +15309,10 @@ msgstr "Шукаць у календары"
 #: src/postulo/documents/views.py
 msgid "Search what you sent"
 msgstr "Шукаць у адпраўленым"
+
+#: src/postulo/templates/connections/pairing_item.html
+msgid "Search your records"
+msgstr ""
 
 #: src/postulo/core/server_forms.py
 msgid "Seconds to wait for the server before giving up."
@@ -15627,6 +15863,10 @@ msgstr "Паказаць гэты адрас на мапе?"
 msgid "Show this period"
 msgstr "Паказаць гэты перыяд"
 
+#: src/postulo/templates/connections/pairing.html
+msgid "Show unpaired"
+msgstr ""
+
 #: src/postulo/jobs/tables.py
 #: src/postulo/templates/applications/calendar_print.html
 #: src/postulo/templates/jobs/partials/whose_form.html
@@ -16121,7 +16361,8 @@ msgstr "STARTTLS, пасля падключэння"
 msgid "state"
 msgstr "стан"
 
-#: src/postulo/jobs/tables.py src/postulo/templates/jobs/company_register.html
+#: src/postulo/jobs/tables.py src/postulo/templates/connections/pairing.html
+#: src/postulo/templates/jobs/company_register.html
 #: src/postulo/templates/server/person_recovery.html
 msgid "State"
 msgstr "Стан"
@@ -16378,6 +16619,7 @@ msgid "sync links"
 msgstr "сувязі сінхранізацыі"
 
 #: src/postulo/templates/connections/list.html
+#: src/postulo/templates/connections/pairing.html
 msgid "Sync now"
 msgstr "Сінхранізаваць зараз"
 
@@ -16897,6 +17139,14 @@ msgstr "Гэтая выява значна большая, чым трэба."
 msgid "That invitation has already been accepted and cannot be revoked."
 msgstr "Гэтае запрашэнне ўжо прынята, і яго нельга адклікаць."
 
+#: src/postulo/plugins/views.py
+#, python-format
+msgid "That is a lot of questions to the server. Try again in %(seconds)d second."
+msgid_plural "That is a lot of questions to the server. Try again in %(seconds)d seconds."
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+
 #: src/postulo/core/server_views.py
 msgid "That is a lot of recovery links. Try again shortly."
 msgstr "Занадта шмат спасылак для аднаўлення доступу. Паспрабуйце крыху пазней."
@@ -17100,6 +17350,23 @@ msgstr "Гэта экспарт цэлага ўліковага запісу. Г
 msgid "That is the last administrator. Appoint another first."
 msgstr "Гэта апошні адміністратар. Спачатку прызначце іншага."
 
+#: src/postulo/plugins/pairing.py
+msgid "That item cannot be made into one of those."
+msgstr ""
+
+#: src/postulo/plugins/views_pairing.py
+msgid "That item cannot be paired with one of those."
+msgstr ""
+
+#: src/postulo/plugins/views_pairing.py
+#, python-format
+msgid "That item is already paired with %(record)s. Unpair it first."
+msgstr ""
+
+#: src/postulo/plugins/pairing.py
+msgid "That item is no longer on the other side."
+msgstr ""
+
 #: src/postulo/templates/account/recovery_unusable.html
 msgid "That link cannot be used"
 msgstr "Гэтай спасылкай нельга скарыстацца"
@@ -17190,6 +17457,10 @@ msgstr[2] "Гэтая старонка загружалася даўжэй за 
 #, python-format
 msgid "That page was sent with the content encoding “%(coding)s”, which Postulo does not unpack, so it was not read."
 msgstr "Гэтая старонка адпраўлена з кадаваннем змесціва «%(coding)s», якое Postulo не распакоўвае, таму яе не прачытана."
+
+#: src/postulo/plugins/views_pairing.py
+msgid "That pairing still has its other side."
+msgstr ""
 
 #: src/postulo/applications/forms.py
 msgid "That person is not recorded at this service."
@@ -19510,6 +19781,10 @@ msgstr "Трэба вырашыць"
 msgid "To hand over a posting (needs the captures scope):"
 msgstr "Каб перадаць аб'яву (патрабуе вобласці доступу captures):"
 
+#: src/postulo/templates/connections/pairing.html
+msgid "To pair with"
+msgstr ""
+
 #: src/postulo/templates/documents/cv_detail.html
 msgid "To see where the pages break. A draft is kept nowhere; Export PDF is what files a version."
 msgstr "Каб убачыць, дзе разрываюцца старонкі. Чарнавік нідзе не захоўваецца; версію захоўвае «Экспартаваць PDF»."
@@ -19639,6 +19914,7 @@ msgid "Two-factor authentication"
 msgstr "Двухфактарная аўтэнтыфікацыя"
 
 #: src/postulo/accounts/models.py src/postulo/jobs/tables.py
+#: src/postulo/templates/connections/pairing_item.html
 #: src/postulo/templates/cotton/identifier_row.html
 #: src/postulo/templates/jobs/capture_page.html
 #: src/postulo/templates/partials/phone_numbers.html
@@ -19785,8 +20061,18 @@ msgstr "У адрозненне ад нумара тэлефона, адрас �
 msgid "Unlike a telephone number, an address is not kept once on this instance, because people share a home; you cannot list the same one twice yourself. The bin removes a row at once, after asking, without waiting for <em>Save</em>."
 msgstr "У адрозненне ад нумара тэлефона, адрас не захоўваецца на гэтым усталяванні толькі адзін раз, бо людзі жывуць разам; самі вы не можаце запісаць адзін і той жа адрас двойчы. Кошык адразу прыбірае радок, папярэдне спытаўшы, не чакаючы націску <em>Захаваць</em>."
 
+#: src/postulo/templates/connections/pairing.html
+#: src/postulo/templates/cotton/pairing_line.html
+msgid "Unpair"
+msgstr ""
+
 #: src/postulo/plugins/models.py
 msgid "unpaired"
+msgstr ""
+
+#: src/postulo/plugins/views_pairing.py
+#, python-format
+msgid "Unpaired. Both sides are kept, and %(connection)s leaves them alone."
 msgstr ""
 
 #: src/postulo/resume/publications.py
@@ -21451,9 +21737,14 @@ msgstr "Так: хто прыходзіць праз пастаўшчыка ід
 msgid "Yes: somebody who has forgotten their password can ask for a code at their primary address and type it back. A code rather than a link, because mail scanners follow links and would spend one before the person read it. It is never a second factor: an authenticator app is still asked for. Offered only while this instance's mail is actually getting through."
 msgstr "Так: хто забыў пароль, можа запытаць код на свой асноўны адрас і ўвесці яго. Менавіта код, а не спасылка, бо паштовыя сканеры пераходзяць па спасылках і выкарысталі б яе раней, чым чалавек прачытае ліст. Гэта ніколі не другі фактар: праграма-аўтэнтыфікатар усё роўна запытваецца. Прапануецца, толькі пакуль пошта гэтага ўсталявання сапраўды даходзіць."
 
-#: src/postulo/jobs/views.py
+#: src/postulo/jobs/views.py src/postulo/plugins/pairing.py
 msgid "You"
 msgstr "Вы"
+
+#: src/postulo/plugins/pairing.py
+#, python-format
+msgid "You (%(name)s)"
+msgstr ""
 
 #: src/postulo/api/routers/companies.py src/postulo/jobs/forms.py
 #: src/postulo/jobs/surface.py
@@ -21915,6 +22206,10 @@ msgid_plural "Your record lists %(total)s public works; the first %(most)s are s
 msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
+
+#: src/postulo/templates/connections/pairing_item.html
+msgid "Your records"
+msgstr ""
 
 #: src/postulo/resume/models.py
 msgid "your role"

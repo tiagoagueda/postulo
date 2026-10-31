@@ -1197,6 +1197,11 @@ msgstr "%(person)s হলেন %(name)s-এর শেষ সদস্য, য�
 msgid "%(plugin)s could not check these settings: %(error)s"
 msgstr "%(plugin)s এই সেটিংস যাচাই করতে পারেনি: %(error)s"
 
+#: src/postulo/plugins/views_pairing.py
+#, python-format
+msgid "%(plugin)s could not do that: %(message)s"
+msgstr ""
+
 #: src/postulo/plugins/views.py
 #, python-format
 msgid "%(plugin)s could not look on the server: %(message)s"
@@ -1205,6 +1210,11 @@ msgstr ""
 #: src/postulo/plugins/views.py
 #, python-format
 msgid "%(plugin)s has nothing to look for."
+msgstr ""
+
+#: src/postulo/plugins/views_pairing.py
+#, python-format
+msgid "%(plugin)s makes a new one on its next run."
 msgstr ""
 
 #: src/postulo/core/mail_auth.py
@@ -2443,6 +2453,11 @@ msgstr "নাম কোনো পরিচয় নয়: দুজন গব
 msgid "A new one"
 msgstr "একটি নতুন"
 
+#: src/postulo/templates/connections/pairing_item.html
+#, python-format
+msgid "A new one: %(kind)s"
+msgstr ""
+
 #: src/postulo/templates/server/design.html
 #, fuzzy
 msgid "A number and what it counts. The colour is a second signal, never the only one."
@@ -2670,6 +2685,10 @@ msgstr "লগ যত চুপচাপ, তত ভালো।"
 #, fuzzy
 msgid "A range such as 41–52, or one page."
 msgstr "41–52-এর মতো একটি পরিসর, অথবা একটি পৃষ্ঠা।"
+
+#: src/postulo/templates/connections/pairing.html
+msgid "A record since deleted"
+msgstr ""
 
 #: src/postulo/documents/forms.py
 #, fuzzy
@@ -3091,6 +3110,7 @@ msgid "Across the whole file, rows are skipped for want of a company or a role. 
 msgstr "পুরো ফাইলজুড়ে, কোম্পানি বা পদ না থাকলে সারি বাদ দেওয়া হয়। যে সারিগুলো আগেই রেকর্ড করা আছে, সেগুলো ইমপোর্টের সময় খুঁজে বের করে বাদ দেওয়া হয়।"
 
 #: src/postulo/templates/accounts/invite_list.html
+#: src/postulo/templates/connections/pairing.html
 #: src/postulo/templates/documents/rendered_list.html
 #: src/postulo/templates/server/backups.html
 #: src/postulo/templates/server/people.html
@@ -3577,6 +3597,11 @@ msgstr "ইতিমধ্যে সিদ্ধান্ত নেওয়া 
 msgid "Already in your record"
 msgstr "আপনার রেকর্ডে আগে থেকেই আছে"
 
+#: src/postulo/templates/connections/pairing_item.html
+#, python-format
+msgid "Already paired with <bdi>%(name)s</bdi>. Unpair it on the pairing page to pair it with something else."
+msgstr ""
+
 #: src/postulo/applications/agenda.py
 #, fuzzy
 msgid "Already sent —"
@@ -3959,6 +3984,10 @@ msgstr "যেকোনো সেক্টর"
 msgid "Anyone holding the link may use it, once. Send it however you like."
 msgstr "লিঙ্কটি যাঁর কাছে থাকবে, তিনিই এটি একবার ব্যবহার করতে পারবেন। যেভাবে খুশি পাঠান।"
 
+#: src/postulo/templates/connections/pairing.html
+msgid "Anything"
+msgstr ""
+
 #: src/postulo/resume/forms.py
 #, fuzzy
 msgid "Anything a reader should know, in a few words."
@@ -4023,7 +4052,7 @@ msgstr "API টোকেন"
 msgid "Appearance"
 msgstr "চেহারা"
 
-#: src/postulo/applications/ical_import.py
+#: src/postulo/applications/ical_import.py src/postulo/plugins/pairing.py
 #: src/postulo/templates/applications/suggestion_list.html
 #: src/postulo/templates/base.html
 #: src/postulo/templates/documents/letter_detail.html
@@ -4378,6 +4407,10 @@ msgstr "প্লেন টেক্সট হিসেবে"
 msgid "As the institution words it. Kept in your record; a CV does not print it yet."
 msgstr "প্রতিষ্ঠানটি যেভাবে লেখে। আপনার রেকর্ডে রাখা হয়; সিভিতে এখনো দেখানো হয় না।"
 
+#: src/postulo/templates/connections/pairing.html
+msgid "As the last sync left them. Unpairing keeps both sides, and the next sync leaves them alone."
+msgstr ""
+
 #: src/postulo/jobs/forms.py
 #, fuzzy
 msgid "As the posting words it — a city, a region, a country. Free text: nothing is looked up anywhere."
@@ -4424,6 +4457,11 @@ msgstr "জিজ্ঞাসা করা হয়েছে"
 
 #: src/postulo/templates/server/record_of_processing.html
 msgid "Asked only when somebody presses for it, one company at a time. Each is sent what is listed and nothing about the person asking."
+msgstr ""
+
+#: src/postulo/templates/connections/pairing.html
+#, python-format
+msgid "Asks %(plugin)s now. Nothing it answers is kept here."
 msgstr ""
 
 #: src/postulo/applications/analytics.py src/postulo/applications/models.py
@@ -4589,6 +4627,10 @@ msgstr "আবার আপনার বিজ্ঞাপনগুলোতে 
 msgid "Back to Backups"
 msgstr "ব্যাকআপে ফিরে যান"
 
+#: src/postulo/templates/connections/pairing.html
+msgid "Back to connections"
+msgstr ""
+
 #: src/postulo/core/help.py
 #, fuzzy
 msgid "Back to Documents"
@@ -4598,6 +4640,10 @@ msgstr "নথিতে ফিরে যান"
 #, fuzzy
 msgid "Back to invitations"
 msgstr "আমন্ত্রণগুলোতে ফিরে যান"
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Back to it"
+msgstr ""
 
 #: src/postulo/core/help.py
 #, fuzzy
@@ -4998,6 +5044,10 @@ msgstr "ফোন কল"
 msgid "Callback to register with it"
 msgstr "এতে নিবন্ধন করার কলব্যাক"
 
+#: src/postulo/templates/connections/pairing.html
+msgid "Can pair with"
+msgstr ""
+
 #: src/postulo/templates/accounts/invite_form.html
 #: src/postulo/templates/accounts/profile.html
 #: src/postulo/templates/applications/application_form.html
@@ -5009,6 +5059,7 @@ msgstr "এতে নিবন্ধন করার কলব্যাক"
 #: src/postulo/templates/applications/tag_form.html
 #: src/postulo/templates/connections/confirm_delete.html
 #: src/postulo/templates/connections/form.html
+#: src/postulo/templates/connections/pairing_item.html
 #: src/postulo/templates/cotton/dialog.html
 #: src/postulo/templates/documents/cv_form.html
 #: src/postulo/templates/documents/cv_item_form.html
@@ -5445,6 +5496,10 @@ msgstr "চিপ ও ট্যাগ"
 msgid "Choices"
 msgstr "বিকল্প"
 
+#: src/postulo/templates/connections/pairing_item.html
+msgid "Choose"
+msgstr ""
+
 #: src/postulo/core/personal.py
 #, fuzzy
 msgid "Choose a country from the list."
@@ -5501,6 +5556,18 @@ msgstr "একটি নতুন পাসওয়ার্ড বেছে �
 msgid "Choose a package first."
 msgstr "প্রথমে একটি প্যাকেজ বেছে নিন।"
 
+#: src/postulo/plugins/views_pairing.py
+msgid "Choose a pairing."
+msgstr ""
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Choose a record"
+msgstr ""
+
+#: src/postulo/plugins/views_pairing.py
+msgid "Choose a record to pair it with."
+msgstr ""
+
 #: src/postulo/applications/ical_import.py
 #, fuzzy
 msgid "Choose a time zone"
@@ -5515,6 +5582,11 @@ msgstr "আপলোড করার জন্য একটি আর্কা�
 #, fuzzy
 msgid "Choose an identity provider and save it first."
 msgstr "প্রথমে একটি পরিচয় প্রদানকারী বেছে নিয়ে সংরক্ষণ করুন।"
+
+#: src/postulo/templates/connections/pairing.html
+#, python-format
+msgid "Choose an item to pair with <bdi>%(name)s</bdi>."
+msgstr ""
 
 #: src/postulo/templates/core/import_csv_map.html
 #, fuzzy
@@ -5583,6 +5655,10 @@ msgstr "শনাক্তকারীর ধরন বেছে নিন।"
 #, fuzzy
 msgid "Choose what it prints instead"
 msgstr "এর বদলে কী দেখাবে তা বেছে নিন"
+
+#: src/postulo/plugins/views_pairing.py
+msgid "Choose what to do with the item."
+msgstr ""
 
 #: src/postulo/jobs/status_views.py
 #, fuzzy
@@ -5923,6 +5999,7 @@ msgstr "কোম্পানি, বিজ্ঞাপন, আবেদন, ক
 #: src/postulo/applications/forms.py src/postulo/applications/reports.py
 #: src/postulo/applications/tables.py src/postulo/core/csv_import.py
 #: src/postulo/jobs/models.py src/postulo/jobs/tables.py
+#: src/postulo/plugins/pairing.py
 #: src/postulo/templates/applications/report.html
 #: src/postulo/templates/base.html
 #: src/postulo/templates/core/import_csv_map.html
@@ -6096,6 +6173,7 @@ msgid "Connection security"
 msgstr "সংযোগের নিরাপত্তা"
 
 #: src/postulo/core/settings_sections.py src/postulo/plugins/views.py
+#: src/postulo/plugins/views_pairing.py
 #: src/postulo/templates/connections/list.html
 #, fuzzy
 msgid "Connections"
@@ -6126,7 +6204,7 @@ msgstr "পরামর্শ সেবা"
 msgid "contact"
 msgstr "পরিচিতি"
 
-#: src/postulo/templates/jobs/contact_form.html
+#: src/postulo/plugins/pairing.py src/postulo/templates/jobs/contact_form.html
 #, fuzzy
 msgid "Contact"
 msgstr "পরিচিতি"
@@ -6837,7 +6915,7 @@ msgstr "ঘনত্ব"
 msgid "department"
 msgstr "বিভাগ"
 
-#: src/postulo/jobs/forms.py
+#: src/postulo/jobs/forms.py src/postulo/plugins/pairing.py
 #: src/postulo/templates/applications/application_detail.html
 #, fuzzy
 msgid "Department"
@@ -8251,10 +8329,19 @@ msgstr "আপনার কাছে আগে থেকেই থাকা ফ�
 msgid "Files you have already"
 msgstr "আপনার কাছে আগে থেকেই থাকা ফাইল"
 
+#: src/postulo/templates/connections/pairing_item.html
+#, python-format
+msgid "Fill from %(plugin)s and pair"
+msgstr ""
+
 #: src/postulo/templates/documents/letter_detail.html
 #, fuzzy
 msgid "Fill in from"
 msgstr "যেখান থেকে পূরণ হবে"
+
+#: src/postulo/templates/connections/pairing_item.html
+msgid "Fill once, without pairing"
+msgstr ""
 
 #: src/postulo/resume/views.py
 #, python-format
@@ -8303,6 +8390,10 @@ msgstr "একটি ভাষা খুঁজুন"
 #, fuzzy
 msgid "Find logo"
 msgstr "লোগো খুঁজুন"
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Find on the other side"
+msgstr ""
 
 #: src/postulo/templates/jobs/industry_list.html
 #, fuzzy
@@ -8550,6 +8641,10 @@ msgstr[1] ""
 #, fuzzy, python-format
 msgid "Found a logo at %(url)s."
 msgstr "%(url)s-এ একটি লোগো পাওয়া গেছে।"
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Found on the other side"
+msgstr ""
 
 #: src/postulo/templates/connections/partials/option_table.html
 msgid "Found on the server"
@@ -9976,7 +10071,7 @@ msgstr "অভ্যন্তরীণ"
 msgid "Internship"
 msgstr "ইন্টার্নশিপ"
 
-#: src/postulo/applications/models.py
+#: src/postulo/applications/models.py src/postulo/plugins/pairing.py
 #, fuzzy
 msgid "Interview"
 msgstr "সাক্ষাৎকার"
@@ -10185,13 +10280,21 @@ msgstr ""
 msgid "it could not be imported"
 msgstr "এটি ইমপোর্ট করা যায়নি"
 
+#: src/postulo/plugins/pairing.py
+msgid "It did not fill the record it was given."
+msgstr ""
+
 #: src/postulo/plugins/installing.py
 #, fuzzy, python-format
 msgid "it did not finish importing within %(seconds)ss"
 msgstr "এটি %(seconds)ss-এর মধ্যে ইমপোর্ট শেষ করেনি"
 
-#: src/postulo/plugins/views.py
+#: src/postulo/plugins/pairing.py src/postulo/plugins/views.py
 msgid "It did not say what it found."
+msgstr ""
+
+#: src/postulo/plugins/pairing.py
+msgid "It did not say what it made."
 msgstr ""
 
 #: src/postulo/templates/server/backups.html
@@ -10380,6 +10483,14 @@ msgstr "এটি %(when)s পর্যন্ত কাজ করবে, অথ�
 #, fuzzy
 msgid "It works."
 msgstr "এটি কাজ করছে।"
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Item"
+msgstr ""
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Items found"
+msgstr ""
 
 #: src/postulo/jobs/register_views.py
 msgid "Its address is already listed."
@@ -10934,6 +11045,11 @@ msgstr "সর্বশেষ যে ধাপে পৌঁছেছে"
 msgid "last synced"
 msgstr "শেষ সিঙ্ক"
 
+#: src/postulo/templates/connections/pairing.html
+#, python-format
+msgid "Last synced %(when)s"
+msgstr ""
+
 #: src/postulo/api/models.py
 #, fuzzy
 msgid "last used"
@@ -11107,6 +11223,11 @@ msgstr "আইনি নোটিশ"
 #, fuzzy
 msgid "legal state"
 msgstr "বৈধ অবস্থা"
+
+#: src/postulo/templates/connections/pairing.html
+#, python-format
+msgid "Let %(plugin)s make a new one"
+msgstr ""
 
 #: src/postulo/core/server_forms.py
 #, fuzzy
@@ -11480,6 +11601,11 @@ msgstr "ছোট হাতের অক্ষর, অঙ্ক, ডট, আন�
 #, fuzzy
 msgid "Made"
 msgstr "তৈরির সময়"
+
+#: src/postulo/plugins/views_pairing.py
+#, python-format
+msgid "Made %(record)s from %(item)s, without pairing them."
+msgstr ""
 
 #: src/postulo/core/models.py
 #, fuzzy
@@ -12972,6 +13098,10 @@ msgstr "আপনার কোনো কোম্পানির এই না�
 msgid "None of your own yet. A CV in another language prints the name the ESCO classification gives this skill there, and the name as you wrote it where the classification gives none."
 msgstr "আপনার নিজের লেখা এখনো কিছু নেই। অন্য ভাষার সিভি সেই ভাষায় ESCO শ্রেণিবিন্যাসে দক্ষতাটির দেওয়া নাম দেখায়, আর শ্রেণিবিন্যাসে কোনো নাম না থাকলে আপনি যেভাবে লিখেছেন সেই নামটি দেখায়।"
 
+#: src/postulo/templates/connections/pairing_item.html
+msgid "None of your records matches."
+msgstr ""
+
 #: src/postulo/templates/applications/partials/reminders.html
 #, fuzzy
 msgid "None outstanding."
@@ -13141,6 +13271,10 @@ msgstr "পৃষ্ঠায় নেই — একটি ডিফল্ট�
 msgid "Not one of these"
 msgstr "এগুলোর কোনোটিই নয়"
 
+#: src/postulo/templates/connections/pairing.html
+msgid "Not paired yet"
+msgstr ""
+
 #: src/postulo/jobs/forms.py
 #, fuzzy
 msgid "Not part of another company"
@@ -13231,6 +13365,10 @@ msgstr "দেখানো হচ্ছে না · %(name)s"
 #, fuzzy
 msgid "Not stated"
 msgstr "উল্লেখ করা হয়নি"
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Not synced yet"
+msgstr ""
 
 #: src/postulo/templates/connections/list.html
 #, fuzzy
@@ -13333,6 +13471,10 @@ msgstr "কোম্পানি সম্পর্কে নোট"
 msgid "notes on contacts"
 msgstr "নোটের মধ্যে নোট লিখুন"
 
+#: src/postulo/templates/connections/pairing.html
+msgid "Nothing"
+msgstr ""
+
 #: src/postulo/templates/server/plugins.html
 #, fuzzy
 msgid "nothing"
@@ -13358,6 +13500,10 @@ msgid "Nothing fills in %(names)s, so it goes out blank."
 msgid_plural "Nothing fills in %(names)s, so they go out blank."
 msgstr[0] "কোনো কিছুই %(names)s পূরণ করে না, তাই এটি ফাঁকা অবস্থায় যায়।"
 msgstr[1] "কোনো কিছুই %(names)s পূরণ করে না, তাই এগুলো ফাঁকা অবস্থায় যায়।"
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Nothing found on the other side."
+msgstr ""
 
 #: src/postulo/templates/jobs/posting_detail.html
 #, fuzzy
@@ -13473,6 +13619,10 @@ msgstr "এখানে এখনও কিছু ইনস্টল করা �
 #, fuzzy
 msgid "Nothing is installed that a person can hold an opinion about."
 msgstr "এমন কিছুই ইনস্টল করা নেই যা নিয়ে কোনো ব্যক্তি নিজের পছন্দ ঠিক করতে পারেন।"
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Nothing is paired on this connection yet."
+msgstr ""
 
 #: src/postulo/templates/jobs/capture_form.html
 #, fuzzy
@@ -14012,6 +14162,10 @@ msgstr "ক্যাপচার পর্যালোচনায়, “d” �
 #, fuzzy, python-format
 msgid "On the map at %(how)s."
 msgstr "মানচিত্রে আছে: %(how)s।"
+
+#: src/postulo/templates/connections/pairing.html
+msgid "On the other side"
+msgstr ""
 
 #: src/postulo/templates/applications/suggestion_list.html
 #, fuzzy
@@ -14797,6 +14951,65 @@ msgstr "ক্যাপচার থেকে রাখা পৃষ্ঠা"
 #, fuzzy
 msgid "Pagination"
 msgstr "পৃষ্ঠা নেভিগেশন"
+
+#: src/postulo/templates/connections/pairing.html
+#: src/postulo/templates/connections/pairing_item.html
+msgid "Pair"
+msgstr ""
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Pair again"
+msgstr ""
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Pair what is on the other side with your own records, or undo a pairing. Both sides are kept either way."
+msgstr ""
+
+#: src/postulo/templates/cotton/pairing_line.html
+#, python-format
+msgid "Pair with an item on <bdi>%(connection)s</bdi>…"
+msgstr ""
+
+#: src/postulo/templates/connections/pairing_item.html
+#, python-format
+msgid "Pair with: %(kind)s"
+msgstr ""
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Paired"
+msgstr ""
+
+#: src/postulo/plugins/views_pairing.py
+#, python-format
+msgid "Paired %(item)s with %(record)s. The next sync compares the two."
+msgstr ""
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Paired records"
+msgstr ""
+
+#: src/postulo/templates/cotton/pairing_line.html
+#, python-format
+msgid "Paired through <bdi>%(connection)s</bdi>, last synced %(when)s"
+msgstr ""
+
+#: src/postulo/templates/cotton/pairing_line.html
+#, python-format
+msgid "Paired through <bdi>%(connection)s</bdi>, not synced yet"
+msgstr ""
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Paired with"
+msgstr ""
+
+#: src/postulo/templates/connections/list.html
+msgid "Pairing"
+msgstr ""
+
+#: src/postulo/templates/connections/pairing.html
+#, python-format
+msgid "Pairing on %(label)s"
+msgstr ""
 
 #: src/postulo/applications/models.py
 #, fuzzy
@@ -16251,6 +16464,8 @@ msgid "Recipient"
 msgstr "প্রাপক"
 
 #: src/postulo/templates/applications/partials/status_card.html
+#: src/postulo/templates/connections/pairing.html
+#: src/postulo/templates/connections/pairing_item.html
 #, fuzzy
 msgid "Record"
 msgstr "রেকর্ড করুন"
@@ -16402,6 +16617,11 @@ msgid "Records older than %(cutoff)s (%(days)s day). Nothing was removed; this i
 msgid_plural "Records older than %(cutoff)s (%(days)s days). Nothing was removed; this is the report a deletion would be made from."
 msgstr[0] "%(cutoff)s-এর চেয়ে পুরোনো রেকর্ড (%(days)s দিন)। কিছুই সরানো হয়নি; এটি সেই প্রতিবেদন, যার ভিত্তিতে মোছা হতো।"
 msgstr[1] "%(cutoff)s-এর চেয়ে পুরোনো রেকর্ড (%(days)s দিন)। কিছুই সরানো হয়নি; এটি সেই প্রতিবেদন, যার ভিত্তিতে মোছা হতো।"
+
+#: src/postulo/templates/connections/pairing.html
+#, python-format
+msgid "Records paired on %(label)s"
+msgstr ""
 
 #: src/postulo/templates/server/person_recovery.html
 #, fuzzy
@@ -16623,6 +16843,7 @@ msgstr "আগের দিন আমাকে মনে করিয়ে দ�
 msgid "reminder"
 msgstr "অনুস্মারক"
 
+#: src/postulo/plugins/pairing.py
 #: src/postulo/templates/applications/reminder_form.html
 #: src/postulo/templates/base.html
 #, fuzzy
@@ -16744,6 +16965,15 @@ msgstr "{label} সরান"
 #, fuzzy
 msgid "removed on the other side"
 msgstr "অন্য দিকে সরানো হয়েছে"
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Removed on the other side"
+msgstr ""
+
+#: src/postulo/templates/cotton/pairing_line.html
+#, python-format
+msgid "Removed on the other side of <bdi>%(connection)s</bdi>"
+msgstr ""
 
 #: src/postulo/core/models.py
 msgid "Removed there"
@@ -17276,7 +17506,9 @@ msgstr "স্কোপ"
 msgid "Screening"
 msgstr "বাছাই চলছে"
 
-#: src/postulo/core/tables.py src/postulo/templates/core/search.html
+#: src/postulo/core/tables.py src/postulo/templates/connections/pairing.html
+#: src/postulo/templates/connections/pairing_item.html
+#: src/postulo/templates/core/search.html
 #: src/postulo/templates/cotton/site_search.html
 #: src/postulo/templates/jobs/industry_list.html
 #, fuzzy
@@ -17328,6 +17560,10 @@ msgstr "ক্যালেন্ডারে খুঁজুন"
 #, fuzzy
 msgid "Search what you sent"
 msgstr "আপনি যা পাঠিয়েছেন তা খুঁজুন"
+
+#: src/postulo/templates/connections/pairing_item.html
+msgid "Search your records"
+msgstr ""
 
 #: src/postulo/core/server_forms.py
 #, fuzzy
@@ -17976,6 +18212,10 @@ msgstr "মানচিত্রে এই ঠিকানাগুলি দে
 msgid "Show this period"
 msgstr "এই সময়কাল দেখান"
 
+#: src/postulo/templates/connections/pairing.html
+msgid "Show unpaired"
+msgstr ""
+
 #: src/postulo/jobs/tables.py
 #: src/postulo/templates/applications/calendar_print.html
 #: src/postulo/templates/jobs/partials/whose_form.html
@@ -18567,7 +18807,8 @@ msgstr "STARTTLS, সংযোগের পরে"
 msgid "state"
 msgstr "অবস্থা"
 
-#: src/postulo/jobs/tables.py src/postulo/templates/jobs/company_register.html
+#: src/postulo/jobs/tables.py src/postulo/templates/connections/pairing.html
+#: src/postulo/templates/jobs/company_register.html
 #: src/postulo/templates/server/person_recovery.html
 #, fuzzy
 msgid "State"
@@ -18862,6 +19103,7 @@ msgid "sync links"
 msgstr "সিঙ্ক লিঙ্কগুলো"
 
 #: src/postulo/templates/connections/list.html
+#: src/postulo/templates/connections/pairing.html
 #, fuzzy
 msgid "Sync now"
 msgstr "এখনই সিঙ্ক করুন"
@@ -19465,6 +19707,13 @@ msgstr "ছবিটি প্রয়োজনের চেয়ে অনে
 msgid "That invitation has already been accepted and cannot be revoked."
 msgstr "ওই আমন্ত্রণটি ইতিমধ্যে গ্রহণ করা হয়েছে, তাই এটি প্রত্যাহার করা যায় না।"
 
+#: src/postulo/plugins/views.py
+#, python-format
+msgid "That is a lot of questions to the server. Try again in %(seconds)d second."
+msgid_plural "That is a lot of questions to the server. Try again in %(seconds)d seconds."
+msgstr[0] ""
+msgstr[1] ""
+
 #: src/postulo/core/server_views.py
 #, fuzzy
 msgid "That is a lot of recovery links. Try again shortly."
@@ -19695,6 +19944,23 @@ msgstr "এটি একটি পুরো অ্যাকাউন্টের
 msgid "That is the last administrator. Appoint another first."
 msgstr "ইনি শেষ প্রশাসক। আগে অন্য কাউকে প্রশাসক করুন।"
 
+#: src/postulo/plugins/pairing.py
+msgid "That item cannot be made into one of those."
+msgstr ""
+
+#: src/postulo/plugins/views_pairing.py
+msgid "That item cannot be paired with one of those."
+msgstr ""
+
+#: src/postulo/plugins/views_pairing.py
+#, python-format
+msgid "That item is already paired with %(record)s. Unpair it first."
+msgstr ""
+
+#: src/postulo/plugins/pairing.py
+msgid "That item is no longer on the other side."
+msgstr ""
+
 #: src/postulo/templates/account/recovery_unusable.html
 #, fuzzy
 msgid "That link cannot be used"
@@ -19795,6 +20061,10 @@ msgstr[1] "পৃষ্ঠাটি আসতে %(seconds)s সেকেন্�
 #, fuzzy, python-format
 msgid "That page was sent with the content encoding “%(coding)s”, which Postulo does not unpack, so it was not read."
 msgstr "পৃষ্ঠাটি “%(coding)s” কনটেন্ট এনকোডিংয়ে পাঠানো হয়েছে, যা Postulo খোলে না, তাই এটি পড়া হয়নি।"
+
+#: src/postulo/plugins/views_pairing.py
+msgid "That pairing still has its other side."
+msgstr ""
 
 #: src/postulo/applications/forms.py
 #, fuzzy
@@ -22496,6 +22766,10 @@ msgstr "সিদ্ধান্ত বাকি"
 msgid "To hand over a posting (needs the captures scope):"
 msgstr "একটি বিজ্ঞাপন পাঠাতে (captures স্কোপ দরকার):"
 
+#: src/postulo/templates/connections/pairing.html
+msgid "To pair with"
+msgstr ""
+
 #: src/postulo/templates/documents/cv_detail.html
 #, fuzzy
 msgid "To see where the pages break. A draft is kept nowhere; Export PDF is what files a version."
@@ -22649,6 +22923,7 @@ msgid "Two-factor authentication"
 msgstr "দুই-ধাপের যাচাইকরণ"
 
 #: src/postulo/accounts/models.py src/postulo/jobs/tables.py
+#: src/postulo/templates/connections/pairing_item.html
 #: src/postulo/templates/cotton/identifier_row.html
 #: src/postulo/templates/jobs/capture_page.html
 #: src/postulo/templates/partials/phone_numbers.html
@@ -22822,8 +23097,18 @@ msgstr "ফোন নম্বরের মতো নয়, এই ইনস্
 msgid "Unlike a telephone number, an address is not kept once on this instance, because people share a home; you cannot list the same one twice yourself. The bin removes a row at once, after asking, without waiting for <em>Save</em>."
 msgstr "ফোন নম্বরের মতো নয়, একটি ঠিকানা এই ইনস্ট্যান্সে কেবল একবার রাখা হয় না, কারণ মানুষ একই বাড়িতে থাকে; তবে আপনি নিজে একই ঠিকানা দুবার তালিকাভুক্ত করতে পারবেন না। ময়লার ঝুড়ির বোতামটি জিজ্ঞেস করার পর সঙ্গে সঙ্গে একটি সারি সরিয়ে দেয়, <em>সংরক্ষণ করুন</em>-এর জন্য অপেক্ষা না করে।"
 
+#: src/postulo/templates/connections/pairing.html
+#: src/postulo/templates/cotton/pairing_line.html
+msgid "Unpair"
+msgstr ""
+
 #: src/postulo/plugins/models.py
 msgid "unpaired"
+msgstr ""
+
+#: src/postulo/plugins/views_pairing.py
+#, python-format
+msgid "Unpaired. Both sides are kept, and %(connection)s leaves them alone."
 msgstr ""
 
 #: src/postulo/resume/publications.py
@@ -24822,10 +25107,15 @@ msgstr "হ্যাঁ: পরিচয় প্রদানকারীর �
 msgid "Yes: somebody who has forgotten their password can ask for a code at their primary address and type it back. A code rather than a link, because mail scanners follow links and would spend one before the person read it. It is never a second factor: an authenticator app is still asked for. Offered only while this instance's mail is actually getting through."
 msgstr "হ্যাঁ: পাসওয়ার্ড ভুলে যাওয়া কেউ তাঁর প্রধান ইমেল ঠিকানায় একটি কোড চাইতে পারেন এবং সেটি টাইপ করে ফেরত দিতে পারেন। লিঙ্কের বদলে কোড, কারণ মেল স্ক্যানার লিঙ্ক অনুসরণ করে এবং ব্যক্তিটি পড়ার আগেই সেটি খরচ করে ফেলত। এটি কখনো দ্বিতীয় ধাপ নয়: অথেনটিকেটর অ্যাপ তখনও চাওয়া হয়। এই ইনস্ট্যান্সের মেল সত্যিই পৌঁছাতে থাকলে তবেই এটি দেওয়া হয়।"
 
-#: src/postulo/jobs/views.py
+#: src/postulo/jobs/views.py src/postulo/plugins/pairing.py
 #, fuzzy
 msgid "You"
 msgstr "আপনি"
+
+#: src/postulo/plugins/pairing.py
+#, python-format
+msgid "You (%(name)s)"
+msgstr ""
 
 #: src/postulo/api/routers/companies.py src/postulo/jobs/forms.py
 #: src/postulo/jobs/surface.py
@@ -25376,6 +25666,10 @@ msgid "Your record lists %(total)s public work; the first %(most)s are shown."
 msgid_plural "Your record lists %(total)s public works; the first %(most)s are shown."
 msgstr[0] ""
 msgstr[1] ""
+
+#: src/postulo/templates/connections/pairing_item.html
+msgid "Your records"
+msgstr ""
 
 #: src/postulo/resume/models.py
 #, fuzzy

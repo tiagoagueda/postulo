@@ -64,7 +64,7 @@
                   </p>
                 {% endif %}
               </div>
-              <div class="flex items-center gap-1">
+              <div class="flex flex-wrap items-center gap-1">
                 {% if row.plugin %}
                   <form method="post" action="{% url 'connections:test' row.connection.pk %}">
                     {% csrf_token %}
@@ -75,6 +75,9 @@
                       {% csrf_token %}
                       <button type="submit" class="btn" data-variant="ghost" data-size="xs">{% translate "Sync now" %}</button>
                     </form>
+                  {% endif %}
+                  {% if row.can_pair %}
+                    <a href="{% url 'connections:pairing' row.connection.pk %}" class="btn" data-variant="ghost" data-size="xs">{% translate "Pairing" %}<span class="sr-only">: <bdi>{{ row.connection.label }}</bdi></span></a>
                   {% endif %}
                   {% if row.is_store %}
                     <form method="post" action="{% url 'connections:backfill' row.connection.pk %}">

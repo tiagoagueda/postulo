@@ -1192,9 +1192,70 @@ class SyncPlugin(ConnectedPlugin, Protocol):
     returns a :class:`SyncReport`. It raises when it cannot run at all; a record it
     cannot handle is a note, not an exception. The scheduler calls it on the interval
     the connection carries; *Sync now* calls it at once.
+
+    Two more methods are optional, and give the connection a *Pairing* page (#327):
+
+    - ``remote_items(config, search="", kind="", key=None) -> list[RemoteItem]`` lists the
+      items on the other side a person may pair by hand -- the cards, the events, the tasks
+      -- narrowed by ``search`` (the words the person typed) and ``kind`` (one of
+      `RECORD_KINDS`, or empty for any), or, given ``key``, a ``(collection, uid)`` pair,
+      the one item it names, or nothing. It is asked live, when the page needs an item, with
+      the configuration as last saved and every wait on the network held to a short deadline:
+      answer from a search on the server rather than a full listing. Postulo keeps none of
+      it. A plugin without it gets no page.
+    - ``fill_record(connection, config, item, kind, into=None)`` makes a record of ``kind``
+      from ``item``, or fills ``into``, one of the person's own, and returns it. It writes
+      through the surface's services (`create_contact`, `update_company`, `create_reminder`
+      and the others) with the plugin as the ``actor``, and never saves a model. Postulo then
+      pairs the two with a `SyncLink`, unless the person asked for a one-off import.
     """
 
     def sync(self, connection, config: dict) -> SyncReport: ...
+
+
+#: The records a remote item may be paired with by hand, on a sync connection's *Pairing*
+#: page (#327). The core's words, not a plugin's: each is a kind of record Postulo has a page
+#: for, and ``you`` is the person's own *Your details*.
+RECORD_KINDS = (
+    "contact",
+    "company",
+    "department",
+    "you",
+    "interview",
+    "reminder",
+    "application",
+)
+
+
+@dataclass(frozen=True)
+class RemoteItem:
+    """One item on the other side of a sync, as a plugin offers it for pairing by hand (#327).
+
+    ``collection`` is the address of the address book, calendar or task list holding it, and
+    ``collection_label`` what the person reads for it; ``uid`` is what the item is known by
+    there. Together they are its key, the one a `SyncLink` keeps. ``href`` is its address,
+    ``label`` what it is called and ``detail`` a second line ("Acme, Lisbon"). ``kinds`` are
+    the `RECORD_KINDS` it may be paired with -- a card with a contact, a company or a
+    department, an event with an interview -- and ``slot`` the link's slot (#326), empty for
+    a record's only twin.
+
+    Plain text, every part of it: Postulo draws each as escaped text and never as a link, and
+    takes ``href`` only from the plugin's own answer, never from a form.
+    """
+
+    collection: str
+    uid: str
+    label: str
+    collection_label: str = ""
+    href: str = ""
+    detail: str = ""
+    kinds: tuple[str, ...] = ()
+    slot: str = ""
+
+    @property
+    def key(self) -> tuple[str, str]:
+        """What ``remote_items`` is handed to find this one again."""
+        return (self.collection, self.uid)
 
 
 # ------------------------------------------------------------ backup destinations

@@ -41,6 +41,8 @@
        2,214 it was at 2560. From `2xl` the column takes what the sidebar leaves and the
        cards lie in two of equal width (#871), so a text box is still about 600. {% endcomment %}
     <div class="min-w-0 max-w-2xl flex-1 2xl:max-w-[85.5rem]">
+    {% comment %} You, paired with a card on a sync connection (#327). {% endcomment %}
+    <c-pairing-line :record="request.user" class="mb-4" />
     <form method="post" enctype="multipart/form-data" novalidate>
       {% csrf_token %}
       {% if form.non_field_errors %}

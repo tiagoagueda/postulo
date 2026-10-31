@@ -1197,6 +1197,11 @@ msgstr "%(person)s on ryhmän %(name)s viimeinen jäsen, ja ryhmä omistaa yhä 
 msgid "%(plugin)s could not check these settings: %(error)s"
 msgstr "%(plugin)s ei voinut tarkistaa näitä asetuksia: %(error)s"
 
+#: src/postulo/plugins/views_pairing.py
+#, python-format
+msgid "%(plugin)s could not do that: %(message)s"
+msgstr ""
+
 #: src/postulo/plugins/views.py
 #, python-format
 msgid "%(plugin)s could not look on the server: %(message)s"
@@ -1205,6 +1210,11 @@ msgstr ""
 #: src/postulo/plugins/views.py
 #, python-format
 msgid "%(plugin)s has nothing to look for."
+msgstr ""
+
+#: src/postulo/plugins/views_pairing.py
+#, python-format
+msgid "%(plugin)s makes a new one on its next run."
 msgstr ""
 
 #: src/postulo/core/mail_auth.py
@@ -2311,6 +2321,11 @@ msgstr "Nimi ei ole identiteetti: kahdella tutkijalla voi olla sama nimi, ja yks
 msgid "A new one"
 msgstr "Uusi"
 
+#: src/postulo/templates/connections/pairing_item.html
+#, python-format
+msgid "A new one: %(kind)s"
+msgstr ""
+
 #: src/postulo/templates/server/design.html
 msgid "A number and what it counts. The colour is a second signal, never the only one."
 msgstr "Luku ja se, mitä se laskee. Väri on toinen signaali, ei koskaan ainoa."
@@ -2500,6 +2515,10 @@ msgstr "Hiljainen loki on se, jonka haluat."
 #: src/postulo/resume/forms.py
 msgid "A range such as 41–52, or one page."
 msgstr "Sivuväli, kuten 41–52, tai yksittäinen sivu."
+
+#: src/postulo/templates/connections/pairing.html
+msgid "A record since deleted"
+msgstr ""
 
 #: src/postulo/documents/forms.py
 msgid "A referee who is not a contact yet. Their name is enough; it is added to your contacts without a company, and is used instead of the choice above."
@@ -2851,6 +2870,7 @@ msgid "Across the whole file, rows are skipped for want of a company or a role. 
 msgstr "Koko tiedostossa rivejä ohitetaan, koska yritys tai rooli puuttuu. Jo kirjatut rivit löytyvät ja ohitetaan tuotaessa."
 
 #: src/postulo/templates/accounts/invite_list.html
+#: src/postulo/templates/connections/pairing.html
 #: src/postulo/templates/documents/rendered_list.html
 #: src/postulo/templates/server/backups.html
 #: src/postulo/templates/server/people.html
@@ -3272,6 +3292,11 @@ msgstr "Jo päätetty —"
 msgid "Already in your record"
 msgstr "Jo tiedoissasi"
 
+#: src/postulo/templates/connections/pairing_item.html
+#, python-format
+msgid "Already paired with <bdi>%(name)s</bdi>. Unpair it on the pairing page to pair it with something else."
+msgstr ""
+
 #: src/postulo/applications/agenda.py
 msgid "Already sent —"
 msgstr "Jo lähetetty —"
@@ -3594,6 +3619,10 @@ msgstr "Mikä tahansa sektori"
 msgid "Anyone holding the link may use it, once. Send it however you like."
 msgstr "Kuka tahansa linkin haltija voi käyttää sitä kerran. Lähetä se miten haluat."
 
+#: src/postulo/templates/connections/pairing.html
+msgid "Anything"
+msgstr ""
+
 #: src/postulo/resume/forms.py
 msgid "Anything a reader should know, in a few words."
 msgstr "Mitä lukijan pitäisi tietää, muutamalla sanalla."
@@ -3646,7 +3675,7 @@ msgstr "API-tunnukset"
 msgid "Appearance"
 msgstr "Ulkoasu"
 
-#: src/postulo/applications/ical_import.py
+#: src/postulo/applications/ical_import.py src/postulo/plugins/pairing.py
 #: src/postulo/templates/applications/suggestion_list.html
 #: src/postulo/templates/base.html
 #: src/postulo/templates/documents/letter_detail.html
@@ -3946,6 +3975,10 @@ msgstr "Pelkkänä tekstinä"
 msgid "As the institution words it. Kept in your record; a CV does not print it yet."
 msgstr "Oppilaitoksen sanamuodossa. Säilytetään uratiedoissasi; ansioluettelo ei vielä tulosta sitä."
 
+#: src/postulo/templates/connections/pairing.html
+msgid "As the last sync left them. Unpairing keeps both sides, and the next sync leaves them alone."
+msgstr ""
+
 #: src/postulo/jobs/forms.py
 msgid "As the posting words it — a city, a region, a country. Free text: nothing is looked up anywhere."
 msgstr "Sellaisena kuin ilmoitus sen ilmaisee — kaupunki, alue, maa. Vapaata tekstiä: mitään ei haeta mistään."
@@ -3984,6 +4017,11 @@ msgstr "Pyydetty"
 
 #: src/postulo/templates/server/record_of_processing.html
 msgid "Asked only when somebody presses for it, one company at a time. Each is sent what is listed and nothing about the person asking."
+msgstr ""
+
+#: src/postulo/templates/connections/pairing.html
+#, python-format
+msgid "Asks %(plugin)s now. Nothing it answers is kept here."
 msgstr ""
 
 #: src/postulo/applications/analytics.py src/postulo/applications/models.py
@@ -4122,6 +4160,10 @@ msgstr "Palautettu ilmoituksiisi."
 msgid "Back to Backups"
 msgstr "Takaisin varmuuskopioihin"
 
+#: src/postulo/templates/connections/pairing.html
+msgid "Back to connections"
+msgstr ""
+
 #: src/postulo/core/help.py
 msgid "Back to Documents"
 msgstr "Takaisin asiakirjoihin"
@@ -4129,6 +4171,10 @@ msgstr "Takaisin asiakirjoihin"
 #: src/postulo/templates/accounts/invite_created.html
 msgid "Back to invitations"
 msgstr "Takaisin kutsuihin"
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Back to it"
+msgstr ""
 
 #: src/postulo/core/help.py
 msgid "Back to Listings"
@@ -4464,6 +4510,10 @@ msgstr "Puhelu"
 msgid "Callback to register with it"
 msgstr "Paluu-URL, joka rekisteröidään palveluntarjoajalle"
 
+#: src/postulo/templates/connections/pairing.html
+msgid "Can pair with"
+msgstr ""
+
 #: src/postulo/templates/accounts/invite_form.html
 #: src/postulo/templates/accounts/profile.html
 #: src/postulo/templates/applications/application_form.html
@@ -4475,6 +4525,7 @@ msgstr "Paluu-URL, joka rekisteröidään palveluntarjoajalle"
 #: src/postulo/templates/applications/tag_form.html
 #: src/postulo/templates/connections/confirm_delete.html
 #: src/postulo/templates/connections/form.html
+#: src/postulo/templates/connections/pairing_item.html
 #: src/postulo/templates/cotton/dialog.html
 #: src/postulo/templates/documents/cv_form.html
 #: src/postulo/templates/documents/cv_item_form.html
@@ -4847,6 +4898,10 @@ msgstr "Merkit ja tunnisteet"
 msgid "Choices"
 msgstr "Valinnat"
 
+#: src/postulo/templates/connections/pairing_item.html
+msgid "Choose"
+msgstr ""
+
 #: src/postulo/core/personal.py
 msgid "Choose a country from the list."
 msgstr "Valitse maa luettelosta."
@@ -4893,6 +4948,18 @@ msgstr "Valitse uusi salasana"
 msgid "Choose a package first."
 msgstr "Valitse ensin paketti."
 
+#: src/postulo/plugins/views_pairing.py
+msgid "Choose a pairing."
+msgstr ""
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Choose a record"
+msgstr ""
+
+#: src/postulo/plugins/views_pairing.py
+msgid "Choose a record to pair it with."
+msgstr ""
+
 #: src/postulo/applications/ical_import.py
 msgid "Choose a time zone"
 msgstr "Valitse aikavyöhyke"
@@ -4904,6 +4971,11 @@ msgstr "Valitse palvelimelle ladattava arkisto."
 #: src/postulo/core/mail_auth.py
 msgid "Choose an identity provider and save it first."
 msgstr "Valitse ensin identiteetintarjoaja ja tallenna se."
+
+#: src/postulo/templates/connections/pairing.html
+#, python-format
+msgid "Choose an item to pair with <bdi>%(name)s</bdi>."
+msgstr ""
 
 #: src/postulo/templates/core/import_csv_map.html
 msgid "Choose another file"
@@ -4960,6 +5032,10 @@ msgstr "Valitse tunnisteen tyyppi."
 #: src/postulo/templates/documents/cv_detail.html
 msgid "Choose what it prints instead"
 msgstr "Valitse, mitä se tulostaa sen sijaan"
+
+#: src/postulo/plugins/views_pairing.py
+msgid "Choose what to do with the item."
+msgstr ""
 
 #: src/postulo/jobs/status_views.py
 msgid "Choose what was reported and the date."
@@ -5248,6 +5324,7 @@ msgstr "Yrityksiä, ilmoituksia, hakemuksia, kaappauksia ja asiakirjoja ei myös
 #: src/postulo/applications/forms.py src/postulo/applications/reports.py
 #: src/postulo/applications/tables.py src/postulo/core/csv_import.py
 #: src/postulo/jobs/models.py src/postulo/jobs/tables.py
+#: src/postulo/plugins/pairing.py
 #: src/postulo/templates/applications/report.html
 #: src/postulo/templates/base.html
 #: src/postulo/templates/core/import_csv_map.html
@@ -5393,6 +5470,7 @@ msgid "Connection security"
 msgstr "Yhteyden suojaus"
 
 #: src/postulo/core/settings_sections.py src/postulo/plugins/views.py
+#: src/postulo/plugins/views_pairing.py
 #: src/postulo/templates/connections/list.html
 msgid "Connections"
 msgstr "Yhteydet"
@@ -5417,7 +5495,7 @@ msgstr "Konsultointi"
 msgid "contact"
 msgstr "yhteyshenkilö"
 
-#: src/postulo/templates/jobs/contact_form.html
+#: src/postulo/plugins/pairing.py src/postulo/templates/jobs/contact_form.html
 msgid "Contact"
 msgstr "Yhteyshenkilö"
 
@@ -6015,7 +6093,7 @@ msgstr "tiheys"
 msgid "department"
 msgstr "osasto"
 
-#: src/postulo/jobs/forms.py
+#: src/postulo/jobs/forms.py src/postulo/plugins/pairing.py
 #: src/postulo/templates/applications/application_detail.html
 msgid "Department"
 msgstr "Osasto"
@@ -7202,10 +7280,19 @@ msgstr "Tiedostot, jotka sinulla jo oli, erotuksena Postulon muodostamista asiak
 msgid "Files you have already"
 msgstr "Tiedostot, jotka sinulla jo on"
 
+#: src/postulo/templates/connections/pairing_item.html
+#, python-format
+msgid "Fill from %(plugin)s and pair"
+msgstr ""
+
 #: src/postulo/templates/documents/letter_detail.html
 #, fuzzy
 msgid "Fill in from"
 msgstr "Täytä tiedoista"
+
+#: src/postulo/templates/connections/pairing_item.html
+msgid "Fill once, without pairing"
+msgstr ""
 
 #: src/postulo/resume/views.py
 #, python-format
@@ -7247,6 +7334,10 @@ msgstr "Etsi kieli"
 #: src/postulo/templates/jobs/company_form.html
 msgid "Find logo"
 msgstr "Etsi logo"
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Find on the other side"
+msgstr ""
 
 #: src/postulo/templates/jobs/industry_list.html
 #, fuzzy
@@ -7463,6 +7554,10 @@ msgstr[1] ""
 #, python-format
 msgid "Found a logo at %(url)s."
 msgstr "Logo löytyi osoitteesta %(url)s."
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Found on the other side"
+msgstr ""
 
 #: src/postulo/templates/connections/partials/option_table.html
 msgid "Found on the server"
@@ -8675,7 +8770,7 @@ msgstr "Sisäinen"
 msgid "Internship"
 msgstr "Harjoittelu"
 
-#: src/postulo/applications/models.py
+#: src/postulo/applications/models.py src/postulo/plugins/pairing.py
 msgid "Interview"
 msgstr "Haastattelu"
 
@@ -8849,13 +8944,21 @@ msgstr ""
 msgid "it could not be imported"
 msgstr "sitä ei voitu tuoda"
 
+#: src/postulo/plugins/pairing.py
+msgid "It did not fill the record it was given."
+msgstr ""
+
 #: src/postulo/plugins/installing.py
 #, python-format
 msgid "it did not finish importing within %(seconds)ss"
 msgstr "sen tuonti ei valmistunut %(seconds)s sekunnissa"
 
-#: src/postulo/plugins/views.py
+#: src/postulo/plugins/pairing.py src/postulo/plugins/views.py
 msgid "It did not say what it found."
+msgstr ""
+
+#: src/postulo/plugins/pairing.py
+msgid "It did not say what it made."
 msgstr ""
 
 #: src/postulo/templates/server/backups.html
@@ -9012,6 +9115,14 @@ msgstr "Se on voimassa %(when)s asti tai kunnes se käytetään tai perutaan."
 #: src/postulo/plugins/views.py
 msgid "It works."
 msgstr "Se toimii."
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Item"
+msgstr ""
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Items found"
+msgstr ""
 
 #: src/postulo/jobs/register_views.py
 msgid "Its address is already listed."
@@ -9485,6 +9596,11 @@ msgstr "Viimeksi saavutettu vaihe"
 msgid "last synced"
 msgstr "viimeksi synkronoitu"
 
+#: src/postulo/templates/connections/pairing.html
+#, python-format
+msgid "Last synced %(when)s"
+msgstr ""
+
 #: src/postulo/api/models.py
 msgid "last used"
 msgstr "viimeksi käytetty"
@@ -9630,6 +9746,11 @@ msgstr "Oikeudelliset tiedot"
 #: src/postulo/jobs/models.py
 msgid "legal state"
 msgstr "oikeudellinen tila"
+
+#: src/postulo/templates/connections/pairing.html
+#, python-format
+msgid "Let %(plugin)s make a new one"
+msgstr ""
 
 #: src/postulo/core/server_forms.py
 msgid "Let a capture keep a rendering of its page"
@@ -9940,6 +10061,11 @@ msgstr "Pieniä kirjaimia, numeroita, pisteitä, alaviivoja ja yhdysmerkkejä."
 #, fuzzy
 msgid "Made"
 msgstr "Tehty"
+
+#: src/postulo/plugins/views_pairing.py
+#, python-format
+msgid "Made %(record)s from %(item)s, without pairing them."
+msgstr ""
 
 #: src/postulo/core/models.py
 msgid "mail failures in a row"
@@ -11189,6 +11315,10 @@ msgstr "Millään yritykselläsi ei ole tätä nimeä tai tunnistetta."
 msgid "None of your own yet. A CV in another language prints the name the ESCO classification gives this skill there, and the name as you wrote it where the classification gives none."
 msgstr "Ei vielä omaa nimeä. Muunkielinen ansioluettelo tulostaa nimen, jonka ESCO-luokitus antaa taidolle kyseisellä kielellä, ja nimen sellaisena kuin kirjoitit sen, jos luokituksessa ei ole nimeä."
 
+#: src/postulo/templates/connections/pairing_item.html
+msgid "None of your records matches."
+msgstr ""
+
 #: src/postulo/templates/applications/partials/reminders.html
 msgid "None outstanding."
 msgstr "Ei avoimia."
@@ -11330,6 +11460,10 @@ msgstr "Ei ollut sivulla – oletusarvo. Säilytetään vain summan yhteydessä.
 msgid "Not one of these"
 msgstr "Ei mikään näistä"
 
+#: src/postulo/templates/connections/pairing.html
+msgid "Not paired yet"
+msgstr ""
+
 #: src/postulo/jobs/forms.py
 msgid "Not part of another company"
 msgstr "Ei osa toista yritystä"
@@ -11406,6 +11540,10 @@ msgstr "Ei näytetä · %(name)s"
 #: src/postulo/resume/models.py
 msgid "Not stated"
 msgstr "Ei ilmoitettu"
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Not synced yet"
+msgstr ""
 
 #: src/postulo/templates/connections/list.html
 msgid "not tested yet"
@@ -11495,6 +11633,10 @@ msgstr "yrityksiä koskevat muistiinpanot"
 msgid "notes on contacts"
 msgstr "yhteyshenkilöitä koskevat muistiinpanot"
 
+#: src/postulo/templates/connections/pairing.html
+msgid "Nothing"
+msgstr ""
+
 #: src/postulo/templates/server/plugins.html
 msgid "nothing"
 msgstr "ei mitään"
@@ -11517,6 +11659,10 @@ msgid "Nothing fills in %(names)s, so it goes out blank."
 msgid_plural "Nothing fills in %(names)s, so they go out blank."
 msgstr[0] "Mikään ei täytä kohtaa %(names)s, joten se lähtee tyhjänä."
 msgstr[1] "Mikään ei täytä kohtia %(names)s, joten ne lähtevät tyhjinä."
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Nothing found on the other side."
+msgstr ""
 
 #: src/postulo/templates/jobs/posting_detail.html
 msgid "Nothing has arrived about this one yet."
@@ -11616,6 +11762,10 @@ msgstr "Täällä ei ole vielä asennettu mitään. Liitännäiset sijaitsevat h
 #: src/postulo/templates/server/plugins.html
 msgid "Nothing is installed that a person can hold an opinion about."
 msgstr "Mitään sellaista ei ole asennettu, josta henkilöllä voisi olla mielipide."
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Nothing is paired on this connection yet."
+msgstr ""
 
 #: src/postulo/templates/jobs/capture_form.html
 msgid "Nothing is saved until you have reviewed it."
@@ -12069,6 +12219,10 @@ msgstr "Kaappausten tarkistuksessa ”d” hylkää ja siirtyy eteenpäin ja ”
 #, python-format
 msgid "On the map at %(how)s."
 msgstr "Kartalla: %(how)s."
+
+#: src/postulo/templates/connections/pairing.html
+msgid "On the other side"
+msgstr ""
 
 #: src/postulo/templates/applications/suggestion_list.html
 msgid "On the timeline"
@@ -12742,6 +12896,65 @@ msgstr "Kaappauksista säilytetyt sivut"
 #: src/postulo/templates/partials/table/pagination.html
 msgid "Pagination"
 msgstr "Sivutus"
+
+#: src/postulo/templates/connections/pairing.html
+#: src/postulo/templates/connections/pairing_item.html
+msgid "Pair"
+msgstr ""
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Pair again"
+msgstr ""
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Pair what is on the other side with your own records, or undo a pairing. Both sides are kept either way."
+msgstr ""
+
+#: src/postulo/templates/cotton/pairing_line.html
+#, python-format
+msgid "Pair with an item on <bdi>%(connection)s</bdi>…"
+msgstr ""
+
+#: src/postulo/templates/connections/pairing_item.html
+#, python-format
+msgid "Pair with: %(kind)s"
+msgstr ""
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Paired"
+msgstr ""
+
+#: src/postulo/plugins/views_pairing.py
+#, python-format
+msgid "Paired %(item)s with %(record)s. The next sync compares the two."
+msgstr ""
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Paired records"
+msgstr ""
+
+#: src/postulo/templates/cotton/pairing_line.html
+#, python-format
+msgid "Paired through <bdi>%(connection)s</bdi>, last synced %(when)s"
+msgstr ""
+
+#: src/postulo/templates/cotton/pairing_line.html
+#, python-format
+msgid "Paired through <bdi>%(connection)s</bdi>, not synced yet"
+msgstr ""
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Paired with"
+msgstr ""
+
+#: src/postulo/templates/connections/list.html
+msgid "Pairing"
+msgstr ""
+
+#: src/postulo/templates/connections/pairing.html
+#, python-format
+msgid "Pairing on %(label)s"
+msgstr ""
 
 #: src/postulo/applications/models.py
 msgid "Panel"
@@ -13965,6 +14178,8 @@ msgid "Recipient"
 msgstr "Vastaanottaja"
 
 #: src/postulo/templates/applications/partials/status_card.html
+#: src/postulo/templates/connections/pairing.html
+#: src/postulo/templates/connections/pairing_item.html
 msgid "Record"
 msgstr "Kirjaa"
 
@@ -14092,6 +14307,11 @@ msgid "Records older than %(cutoff)s (%(days)s day). Nothing was removed; this i
 msgid_plural "Records older than %(cutoff)s (%(days)s days). Nothing was removed; this is the report a deletion would be made from."
 msgstr[0] "Tietueet, jotka ovat vanhempia kuin %(cutoff)s (%(days)s päivä). Mitään ei poistettu; tämä on raportti, josta poisto tehtäisiin."
 msgstr[1] "Tietueet, jotka ovat vanhempia kuin %(cutoff)s (%(days)s päivää). Mitään ei poistettu; tämä on raportti, josta poisto tehtäisiin."
+
+#: src/postulo/templates/connections/pairing.html
+#, python-format
+msgid "Records paired on %(label)s"
+msgstr ""
 
 #: src/postulo/templates/server/person_recovery.html
 msgid "Recovery"
@@ -14275,6 +14495,7 @@ msgstr "Muistuta edellisenä päivänä"
 msgid "reminder"
 msgstr "muistutus"
 
+#: src/postulo/plugins/pairing.py
 #: src/postulo/templates/applications/reminder_form.html
 #: src/postulo/templates/base.html
 msgid "Reminder"
@@ -14378,6 +14599,15 @@ msgstr "Poista {label}"
 #: src/postulo/plugins/models.py
 msgid "removed on the other side"
 msgstr "poistettu toisessa päässä"
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Removed on the other side"
+msgstr ""
+
+#: src/postulo/templates/cotton/pairing_line.html
+#, python-format
+msgid "Removed on the other side of <bdi>%(connection)s</bdi>"
+msgstr ""
 
 #: src/postulo/core/models.py
 msgid "Removed there"
@@ -14831,7 +15061,9 @@ msgstr "käyttöoikeudet"
 msgid "Screening"
 msgstr "Esikarsinta"
 
-#: src/postulo/core/tables.py src/postulo/templates/core/search.html
+#: src/postulo/core/tables.py src/postulo/templates/connections/pairing.html
+#: src/postulo/templates/connections/pairing_item.html
+#: src/postulo/templates/core/search.html
 #: src/postulo/templates/cotton/site_search.html
 #: src/postulo/templates/jobs/industry_list.html
 msgid "Search"
@@ -14873,6 +15105,10 @@ msgstr "Etsi kalenterista"
 #: src/postulo/documents/views.py
 msgid "Search what you sent"
 msgstr "Etsi lähettämistäsi"
+
+#: src/postulo/templates/connections/pairing_item.html
+msgid "Search your records"
+msgstr ""
 
 #: src/postulo/core/server_forms.py
 msgid "Seconds to wait for the server before giving up."
@@ -15422,6 +15658,10 @@ msgstr "Näytetäänkö tämä osoite kartalla?"
 msgid "Show this period"
 msgstr "Näytä tämä jakso"
 
+#: src/postulo/templates/connections/pairing.html
+msgid "Show unpaired"
+msgstr ""
+
 #: src/postulo/jobs/tables.py
 #: src/postulo/templates/applications/calendar_print.html
 #: src/postulo/templates/jobs/partials/whose_form.html
@@ -15915,7 +16155,8 @@ msgstr "STARTTLS, yhdistämisen jälkeen"
 msgid "state"
 msgstr "tila"
 
-#: src/postulo/jobs/tables.py src/postulo/templates/jobs/company_register.html
+#: src/postulo/jobs/tables.py src/postulo/templates/connections/pairing.html
+#: src/postulo/templates/jobs/company_register.html
 #: src/postulo/templates/server/person_recovery.html
 msgid "State"
 msgstr "Tila"
@@ -16169,6 +16410,7 @@ msgid "sync links"
 msgstr "synkronointilinkit"
 
 #: src/postulo/templates/connections/list.html
+#: src/postulo/templates/connections/pairing.html
 msgid "Sync now"
 msgstr "Synkronoi nyt"
 
@@ -16682,6 +16924,13 @@ msgstr "Tuo kuva on paljon suurempi kuin sen tarvitsee olla."
 msgid "That invitation has already been accepted and cannot be revoked."
 msgstr "Tuo kutsu on jo hyväksytty, eikä sitä voi perua."
 
+#: src/postulo/plugins/views.py
+#, python-format
+msgid "That is a lot of questions to the server. Try again in %(seconds)d second."
+msgid_plural "That is a lot of questions to the server. Try again in %(seconds)d seconds."
+msgstr[0] ""
+msgstr[1] ""
+
 #: src/postulo/core/server_views.py
 msgid "That is a lot of recovery links. Try again shortly."
 msgstr "Palautuslinkkejä on pyydetty paljon. Yritä hetken päästä uudelleen."
@@ -16884,6 +17133,23 @@ msgstr "Tämä on kokonaisen tilin vienti. Tämä sivu lukee vain tiedoston, jon
 msgid "That is the last administrator. Appoint another first."
 msgstr "Tuo on viimeinen ylläpitäjä. Nimeä ensin toinen."
 
+#: src/postulo/plugins/pairing.py
+msgid "That item cannot be made into one of those."
+msgstr ""
+
+#: src/postulo/plugins/views_pairing.py
+msgid "That item cannot be paired with one of those."
+msgstr ""
+
+#: src/postulo/plugins/views_pairing.py
+#, python-format
+msgid "That item is already paired with %(record)s. Unpair it first."
+msgstr ""
+
+#: src/postulo/plugins/pairing.py
+msgid "That item is no longer on the other side."
+msgstr ""
+
 #: src/postulo/templates/account/recovery_unusable.html
 msgid "That link cannot be used"
 msgstr "Tuota linkkiä ei voi käyttää"
@@ -16973,6 +17239,10 @@ msgstr[1] "Sivun saapuminen kesti yli %(seconds)s sekuntia, joten sitä ei luett
 #, python-format
 msgid "That page was sent with the content encoding “%(coding)s”, which Postulo does not unpack, so it was not read."
 msgstr "Tuo sivu lähetettiin sisältökoodauksella ”%(coding)s”, jota Postulo ei pura, joten sitä ei luettu."
+
+#: src/postulo/plugins/views_pairing.py
+msgid "That pairing still has its other side."
+msgstr ""
 
 #: src/postulo/applications/forms.py
 msgid "That person is not recorded at this service."
@@ -19275,6 +19545,10 @@ msgstr "Päätettävät"
 msgid "To hand over a posting (needs the captures scope):"
 msgstr "Ilmoituksen luovuttaminen (vaatii captures-käyttöoikeuden):"
 
+#: src/postulo/templates/connections/pairing.html
+msgid "To pair with"
+msgstr ""
+
 #: src/postulo/templates/documents/cv_detail.html
 msgid "To see where the pages break. A draft is kept nowhere; Export PDF is what files a version."
 msgstr "Näet, mihin kohtiin sivut katkeavat. Luonnosta ei säilytetä mihinkään; versio arkistoidaan toiminnolla Vie PDF."
@@ -19403,6 +19677,7 @@ msgid "Two-factor authentication"
 msgstr "Kaksivaiheinen tunnistautuminen"
 
 #: src/postulo/accounts/models.py src/postulo/jobs/tables.py
+#: src/postulo/templates/connections/pairing_item.html
 #: src/postulo/templates/cotton/identifier_row.html
 #: src/postulo/templates/jobs/capture_page.html
 #: src/postulo/templates/partials/phone_numbers.html
@@ -19551,8 +19826,18 @@ msgstr "Toisin kuin puhelinnumero, osoite ei ole tässä instanssissa yksilölli
 msgid "Unlike a telephone number, an address is not kept once on this instance, because people share a home; you cannot list the same one twice yourself. The bin removes a row at once, after asking, without waiting for <em>Save</em>."
 msgstr "Toisin kuin puhelinnumero, osoite voi olla tässä instanssissa useammalla kuin yhdellä, koska ihmiset jakavat kodin; et kuitenkaan voi itse lisätä samaa osoitetta kahdesti. Roskakori poistaa rivin heti kysyttyään, odottamatta painiketta <em>Tallenna</em>."
 
+#: src/postulo/templates/connections/pairing.html
+#: src/postulo/templates/cotton/pairing_line.html
+msgid "Unpair"
+msgstr ""
+
 #: src/postulo/plugins/models.py
 msgid "unpaired"
+msgstr ""
+
+#: src/postulo/plugins/views_pairing.py
+#, python-format
+msgid "Unpaired. Both sides are kept, and %(connection)s leaves them alone."
 msgstr ""
 
 #: src/postulo/resume/publications.py
@@ -21212,9 +21497,14 @@ msgstr "Kyllä: tunnistuspalvelun kautta saapuva kirjataan suoraan sisään kysy
 msgid "Yes: somebody who has forgotten their password can ask for a code at their primary address and type it back. A code rather than a link, because mail scanners follow links and would spend one before the person read it. It is never a second factor: an authenticator app is still asked for. Offered only while this instance's mail is actually getting through."
 msgstr "Kyllä: salasanansa unohtanut voi pyytää koodin ensisijaiseen osoitteeseensa ja kirjoittaa sen takaisin. Koodi linkin sijaan, koska postiskannerit seuraavat linkkejä ja kuluttaisivat sen ennen kuin ihminen ehtii lukea viestin. Se ei ole koskaan toinen tekijä: todennussovellusta kysytään silti. Tarjolla vain niin kauan kuin tämän instanssin posti todella menee perille."
 
-#: src/postulo/jobs/views.py
+#: src/postulo/jobs/views.py src/postulo/plugins/pairing.py
 msgid "You"
 msgstr "Sinä"
+
+#: src/postulo/plugins/pairing.py
+#, python-format
+msgid "You (%(name)s)"
+msgstr ""
 
 #: src/postulo/api/routers/companies.py src/postulo/jobs/forms.py
 #: src/postulo/jobs/surface.py
@@ -21672,6 +21962,10 @@ msgid "Your record lists %(total)s public work; the first %(most)s are shown."
 msgid_plural "Your record lists %(total)s public works; the first %(most)s are shown."
 msgstr[0] ""
 msgstr[1] ""
+
+#: src/postulo/templates/connections/pairing_item.html
+msgid "Your records"
+msgstr ""
 
 #: src/postulo/resume/models.py
 msgid "your role"

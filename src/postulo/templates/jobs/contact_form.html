@@ -121,6 +121,9 @@
       </div>
     </section>
   {% endif %}
+  {% if object.pk %}
+    <c-pairing-line :record="object" class="mt-8 max-w-2xl" />
+  {% endif %}
   {% module_on "format-vcard" as vcard_on %}
   {% if object.pk and vcard_on %}
     <div class="mt-8 max-w-2xl">

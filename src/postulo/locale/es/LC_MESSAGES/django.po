@@ -1197,6 +1197,11 @@ msgstr "%(person)s es el último miembro de %(name)s, que todavía posee registr
 msgid "%(plugin)s could not check these settings: %(error)s"
 msgstr "%(plugin)s no pudo comprobar esta configuración: %(error)s"
 
+#: src/postulo/plugins/views_pairing.py
+#, python-format
+msgid "%(plugin)s could not do that: %(message)s"
+msgstr ""
+
 #: src/postulo/plugins/views.py
 #, python-format
 msgid "%(plugin)s could not look on the server: %(message)s"
@@ -1205,6 +1210,11 @@ msgstr ""
 #: src/postulo/plugins/views.py
 #, python-format
 msgid "%(plugin)s has nothing to look for."
+msgstr ""
+
+#: src/postulo/plugins/views_pairing.py
+#, python-format
+msgid "%(plugin)s makes a new one on its next run."
 msgstr ""
 
 #: src/postulo/core/mail_auth.py
@@ -2308,6 +2318,11 @@ msgstr "Un nombre no es una identidad: dos investigadores comparten uno, y un mi
 msgid "A new one"
 msgstr "Uno nuevo"
 
+#: src/postulo/templates/connections/pairing_item.html
+#, python-format
+msgid "A new one: %(kind)s"
+msgstr ""
+
 #: src/postulo/templates/server/design.html
 msgid "A number and what it counts. The colour is a second signal, never the only one."
 msgstr "Un número y lo que cuenta. El color es una segunda señal, nunca la única."
@@ -2498,6 +2513,10 @@ msgstr "Lo ideal es un registro tranquilo."
 #: src/postulo/resume/forms.py
 msgid "A range such as 41–52, or one page."
 msgstr "Un intervalo como 41–52, o una sola página."
+
+#: src/postulo/templates/connections/pairing.html
+msgid "A record since deleted"
+msgstr ""
 
 #: src/postulo/documents/forms.py
 msgid "A referee who is not a contact yet. Their name is enough; it is added to your contacts without a company, and is used instead of the choice above."
@@ -2849,6 +2868,7 @@ msgid "Across the whole file, rows are skipped for want of a company or a role. 
 msgstr "En todo el archivo, se omiten filas por falta de empresa o de puesto. Las filas ya registradas se detectan y se omiten al importar."
 
 #: src/postulo/templates/accounts/invite_list.html
+#: src/postulo/templates/connections/pairing.html
 #: src/postulo/templates/documents/rendered_list.html
 #: src/postulo/templates/server/backups.html
 #: src/postulo/templates/server/people.html
@@ -3268,6 +3288,11 @@ msgstr "Ya decidido —"
 msgid "Already in your record"
 msgstr "Ya en su registro"
 
+#: src/postulo/templates/connections/pairing_item.html
+#, python-format
+msgid "Already paired with <bdi>%(name)s</bdi>. Unpair it on the pairing page to pair it with something else."
+msgstr ""
+
 #: src/postulo/applications/agenda.py
 msgid "Already sent —"
 msgstr "Ya enviado —"
@@ -3591,6 +3616,10 @@ msgstr "Cualquier sección"
 msgid "Anyone holding the link may use it, once. Send it however you like."
 msgstr "Quien tenga el enlace puede usarlo, una vez. Envíelo como prefiera."
 
+#: src/postulo/templates/connections/pairing.html
+msgid "Anything"
+msgstr ""
+
 #: src/postulo/resume/forms.py
 msgid "Anything a reader should know, in a few words."
 msgstr "Lo que un lector debe saber, en pocas palabras."
@@ -3643,7 +3672,7 @@ msgstr "Tokens de API"
 msgid "Appearance"
 msgstr "Apariencia"
 
-#: src/postulo/applications/ical_import.py
+#: src/postulo/applications/ical_import.py src/postulo/plugins/pairing.py
 #: src/postulo/templates/applications/suggestion_list.html
 #: src/postulo/templates/base.html
 #: src/postulo/templates/documents/letter_detail.html
@@ -3944,6 +3973,10 @@ msgstr "Como texto sin formato"
 msgid "As the institution words it. Kept in your record; a CV does not print it yet."
 msgstr "Tal como lo formula la institución. Se guarda en su trayectoria; un CV todavía no lo imprime."
 
+#: src/postulo/templates/connections/pairing.html
+msgid "As the last sync left them. Unpairing keeps both sides, and the next sync leaves them alone."
+msgstr ""
+
 #: src/postulo/jobs/forms.py
 msgid "As the posting words it — a city, a region, a country. Free text: nothing is looked up anywhere."
 msgstr "Tal como lo expresa el anuncio: una ciudad, una región, un país. Texto libre: no se consulta nada en ningún sitio."
@@ -3983,6 +4016,11 @@ msgstr "Solicitada"
 
 #: src/postulo/templates/server/record_of_processing.html
 msgid "Asked only when somebody presses for it, one company at a time. Each is sent what is listed and nothing about the person asking."
+msgstr ""
+
+#: src/postulo/templates/connections/pairing.html
+#, python-format
+msgid "Asks %(plugin)s now. Nothing it answers is kept here."
 msgstr ""
 
 #: src/postulo/applications/analytics.py src/postulo/applications/models.py
@@ -4123,6 +4161,10 @@ msgstr "De vuelta en sus ofertas."
 msgid "Back to Backups"
 msgstr "Volver a Copias de seguridad"
 
+#: src/postulo/templates/connections/pairing.html
+msgid "Back to connections"
+msgstr ""
+
 #: src/postulo/core/help.py
 msgid "Back to Documents"
 msgstr "Volver a Documentos"
@@ -4130,6 +4172,10 @@ msgstr "Volver a Documentos"
 #: src/postulo/templates/accounts/invite_created.html
 msgid "Back to invitations"
 msgstr "Volver a las invitaciones"
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Back to it"
+msgstr ""
 
 #: src/postulo/core/help.py
 msgid "Back to Listings"
@@ -4464,6 +4510,10 @@ msgstr "Llamada"
 msgid "Callback to register with it"
 msgstr "URL de retorno que registrar en el proveedor"
 
+#: src/postulo/templates/connections/pairing.html
+msgid "Can pair with"
+msgstr ""
+
 #: src/postulo/templates/accounts/invite_form.html
 #: src/postulo/templates/accounts/profile.html
 #: src/postulo/templates/applications/application_form.html
@@ -4475,6 +4525,7 @@ msgstr "URL de retorno que registrar en el proveedor"
 #: src/postulo/templates/applications/tag_form.html
 #: src/postulo/templates/connections/confirm_delete.html
 #: src/postulo/templates/connections/form.html
+#: src/postulo/templates/connections/pairing_item.html
 #: src/postulo/templates/cotton/dialog.html
 #: src/postulo/templates/documents/cv_form.html
 #: src/postulo/templates/documents/cv_item_form.html
@@ -4847,6 +4898,10 @@ msgstr "Chips y etiquetas"
 msgid "Choices"
 msgstr "Opciones"
 
+#: src/postulo/templates/connections/pairing_item.html
+msgid "Choose"
+msgstr ""
+
 #: src/postulo/core/personal.py
 msgid "Choose a country from the list."
 msgstr "Elija un país de la lista."
@@ -4893,6 +4948,18 @@ msgstr "Elegir una nueva contraseña"
 msgid "Choose a package first."
 msgstr "Elija antes un paquete."
 
+#: src/postulo/plugins/views_pairing.py
+msgid "Choose a pairing."
+msgstr ""
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Choose a record"
+msgstr ""
+
+#: src/postulo/plugins/views_pairing.py
+msgid "Choose a record to pair it with."
+msgstr ""
+
 #: src/postulo/applications/ical_import.py
 msgid "Choose a time zone"
 msgstr "Elija una zona horaria"
@@ -4904,6 +4971,11 @@ msgstr "Elija un archivo para subir."
 #: src/postulo/core/mail_auth.py
 msgid "Choose an identity provider and save it first."
 msgstr "Elija primero un proveedor de identidad y guárdelo."
+
+#: src/postulo/templates/connections/pairing.html
+#, python-format
+msgid "Choose an item to pair with <bdi>%(name)s</bdi>."
+msgstr ""
 
 #: src/postulo/templates/core/import_csv_map.html
 msgid "Choose another file"
@@ -4960,6 +5032,10 @@ msgstr "Elija el tipo de identificador."
 #: src/postulo/templates/documents/cv_detail.html
 msgid "Choose what it prints instead"
 msgstr "Elegir lo que imprime en su lugar"
+
+#: src/postulo/plugins/views_pairing.py
+msgid "Choose what to do with the item."
+msgstr ""
 
 #: src/postulo/jobs/status_views.py
 msgid "Choose what was reported and the date."
@@ -5250,6 +5326,7 @@ msgstr "Tampoco están en él las empresas, ofertas, candidaturas, capturas ni d
 #: src/postulo/applications/forms.py src/postulo/applications/reports.py
 #: src/postulo/applications/tables.py src/postulo/core/csv_import.py
 #: src/postulo/jobs/models.py src/postulo/jobs/tables.py
+#: src/postulo/plugins/pairing.py
 #: src/postulo/templates/applications/report.html
 #: src/postulo/templates/base.html
 #: src/postulo/templates/core/import_csv_map.html
@@ -5396,6 +5473,7 @@ msgid "Connection security"
 msgstr "Seguridad de la conexión"
 
 #: src/postulo/core/settings_sections.py src/postulo/plugins/views.py
+#: src/postulo/plugins/views_pairing.py
 #: src/postulo/templates/connections/list.html
 msgid "Connections"
 msgstr "Conexiones"
@@ -5420,7 +5498,7 @@ msgstr "Consultoría"
 msgid "contact"
 msgstr "contacto"
 
-#: src/postulo/templates/jobs/contact_form.html
+#: src/postulo/plugins/pairing.py src/postulo/templates/jobs/contact_form.html
 msgid "Contact"
 msgstr "Contacto"
 
@@ -6020,7 +6098,7 @@ msgstr "densidad"
 msgid "department"
 msgstr "departamento"
 
-#: src/postulo/jobs/forms.py
+#: src/postulo/jobs/forms.py src/postulo/plugins/pairing.py
 #: src/postulo/templates/applications/application_detail.html
 msgid "Department"
 msgstr "Departamento"
@@ -7199,9 +7277,18 @@ msgstr "Archivos que ya tenía, a diferencia de los documentos generados por Pos
 msgid "Files you have already"
 msgstr "Archivos que ya tiene"
 
+#: src/postulo/templates/connections/pairing_item.html
+#, python-format
+msgid "Fill from %(plugin)s and pair"
+msgstr ""
+
 #: src/postulo/templates/documents/letter_detail.html
 msgid "Fill in from"
 msgstr "Rellenar a partir de"
+
+#: src/postulo/templates/connections/pairing_item.html
+msgid "Fill once, without pairing"
+msgstr ""
 
 #: src/postulo/resume/views.py
 #, python-format
@@ -7244,6 +7331,10 @@ msgstr "Buscar un idioma"
 #: src/postulo/templates/jobs/company_form.html
 msgid "Find logo"
 msgstr "Buscar logotipo"
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Find on the other side"
+msgstr ""
 
 #: src/postulo/templates/jobs/industry_list.html
 #, fuzzy
@@ -7457,6 +7548,10 @@ msgstr[1] ""
 #, python-format
 msgid "Found a logo at %(url)s."
 msgstr "Se encontró un logotipo en %(url)s."
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Found on the other side"
+msgstr ""
 
 #: src/postulo/templates/connections/partials/option_table.html
 msgid "Found on the server"
@@ -8658,7 +8753,7 @@ msgstr "Interno"
 msgid "Internship"
 msgstr "Prácticas"
 
-#: src/postulo/applications/models.py
+#: src/postulo/applications/models.py src/postulo/plugins/pairing.py
 msgid "Interview"
 msgstr "Entrevista"
 
@@ -8832,13 +8927,21 @@ msgstr ""
 msgid "it could not be imported"
 msgstr "no se pudo importar"
 
+#: src/postulo/plugins/pairing.py
+msgid "It did not fill the record it was given."
+msgstr ""
+
 #: src/postulo/plugins/installing.py
 #, python-format
 msgid "it did not finish importing within %(seconds)ss"
 msgstr "no terminó de importarse en %(seconds)ss"
 
-#: src/postulo/plugins/views.py
+#: src/postulo/plugins/pairing.py src/postulo/plugins/views.py
 msgid "It did not say what it found."
+msgstr ""
+
+#: src/postulo/plugins/pairing.py
+msgid "It did not say what it made."
 msgstr ""
 
 #: src/postulo/templates/server/backups.html
@@ -8995,6 +9098,14 @@ msgstr "Funciona hasta %(when)s, o hasta que se use o se revoque."
 #: src/postulo/plugins/views.py
 msgid "It works."
 msgstr "Funciona."
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Item"
+msgstr ""
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Items found"
+msgstr ""
 
 #: src/postulo/jobs/register_views.py
 msgid "Its address is already listed."
@@ -9465,6 +9576,11 @@ msgstr "Última etapa alcanzada"
 msgid "last synced"
 msgstr "última sincronización"
 
+#: src/postulo/templates/connections/pairing.html
+#, python-format
+msgid "Last synced %(when)s"
+msgstr ""
+
 #: src/postulo/api/models.py
 msgid "last used"
 msgstr "último uso"
@@ -9610,6 +9726,11 @@ msgstr "Aviso legal"
 #: src/postulo/jobs/models.py
 msgid "legal state"
 msgstr "situación jurídica"
+
+#: src/postulo/templates/connections/pairing.html
+#, python-format
+msgid "Let %(plugin)s make a new one"
+msgstr ""
 
 #: src/postulo/core/server_forms.py
 msgid "Let a capture keep a rendering of its page"
@@ -9918,6 +10039,11 @@ msgstr "Letras minúsculas, dígitos, puntos, guiones bajos y guiones."
 #: src/postulo/templates/server/person_recovery.html
 msgid "Made"
 msgstr "Creado"
+
+#: src/postulo/plugins/views_pairing.py
+#, python-format
+msgid "Made %(record)s from %(item)s, without pairing them."
+msgstr ""
 
 #: src/postulo/core/models.py
 msgid "mail failures in a row"
@@ -11171,6 +11297,10 @@ msgstr "Ninguna de sus empresas tiene este nombre o identificador."
 msgid "None of your own yet. A CV in another language prints the name the ESCO classification gives this skill there, and the name as you wrote it where the classification gives none."
 msgstr "Todavía ninguno propio. Un CV en otro idioma imprime el nombre que la clasificación ESCO da a esta habilidad en ese idioma, y el nombre tal como usted lo escribió cuando la clasificación no da ninguno."
 
+#: src/postulo/templates/connections/pairing_item.html
+msgid "None of your records matches."
+msgstr ""
+
 #: src/postulo/templates/applications/partials/reminders.html
 msgid "None outstanding."
 msgstr "Nada pendiente."
@@ -11312,6 +11442,10 @@ msgstr "No está en la página: es un valor predeterminado. Solo se conserva jun
 msgid "Not one of these"
 msgstr "Ninguno de estos"
 
+#: src/postulo/templates/connections/pairing.html
+msgid "Not paired yet"
+msgstr ""
+
 #: src/postulo/jobs/forms.py
 msgid "Not part of another company"
 msgstr "No forma parte de otra empresa"
@@ -11388,6 +11522,10 @@ msgstr "No mostrado · %(name)s"
 #: src/postulo/resume/models.py
 msgid "Not stated"
 msgstr "Sin indicar"
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Not synced yet"
+msgstr ""
 
 #: src/postulo/templates/connections/list.html
 msgid "not tested yet"
@@ -11476,6 +11614,10 @@ msgstr "notas sobre empresas"
 msgid "notes on contacts"
 msgstr "notas sobre contactos"
 
+#: src/postulo/templates/connections/pairing.html
+msgid "Nothing"
+msgstr ""
+
 #: src/postulo/templates/server/plugins.html
 msgid "nothing"
 msgstr "nada"
@@ -11498,6 +11640,10 @@ msgid "Nothing fills in %(names)s, so it goes out blank."
 msgid_plural "Nothing fills in %(names)s, so they go out blank."
 msgstr[0] "Nada rellena %(names)s, así que sale en blanco."
 msgstr[1] "Nada rellena %(names)s, así que salen en blanco."
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Nothing found on the other side."
+msgstr ""
 
 #: src/postulo/templates/jobs/posting_detail.html
 msgid "Nothing has arrived about this one yet."
@@ -11597,6 +11743,10 @@ msgstr "Aquí no hay nada instalado todavía. Los plugins se guardan en %(direct
 #: src/postulo/templates/server/plugins.html
 msgid "Nothing is installed that a person can hold an opinion about."
 msgstr "No hay nada instalado sobre lo que una persona pueda opinar."
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Nothing is paired on this connection yet."
+msgstr ""
 
 #: src/postulo/templates/jobs/capture_form.html
 msgid "Nothing is saved until you have reviewed it."
@@ -12051,6 +12201,10 @@ msgstr "En la revisión de capturas, «d» descarta y sigue y «j» salta; «/»
 #, fuzzy, python-format
 msgid "On the map at %(how)s."
 msgstr "En el mapa: %(how)s."
+
+#: src/postulo/templates/connections/pairing.html
+msgid "On the other side"
+msgstr ""
 
 #: src/postulo/templates/applications/suggestion_list.html
 msgid "On the timeline"
@@ -12727,6 +12881,65 @@ msgstr "Páginas conservadas de capturas"
 #: src/postulo/templates/partials/table/pagination.html
 msgid "Pagination"
 msgstr "Paginación"
+
+#: src/postulo/templates/connections/pairing.html
+#: src/postulo/templates/connections/pairing_item.html
+msgid "Pair"
+msgstr ""
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Pair again"
+msgstr ""
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Pair what is on the other side with your own records, or undo a pairing. Both sides are kept either way."
+msgstr ""
+
+#: src/postulo/templates/cotton/pairing_line.html
+#, python-format
+msgid "Pair with an item on <bdi>%(connection)s</bdi>…"
+msgstr ""
+
+#: src/postulo/templates/connections/pairing_item.html
+#, python-format
+msgid "Pair with: %(kind)s"
+msgstr ""
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Paired"
+msgstr ""
+
+#: src/postulo/plugins/views_pairing.py
+#, python-format
+msgid "Paired %(item)s with %(record)s. The next sync compares the two."
+msgstr ""
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Paired records"
+msgstr ""
+
+#: src/postulo/templates/cotton/pairing_line.html
+#, python-format
+msgid "Paired through <bdi>%(connection)s</bdi>, last synced %(when)s"
+msgstr ""
+
+#: src/postulo/templates/cotton/pairing_line.html
+#, python-format
+msgid "Paired through <bdi>%(connection)s</bdi>, not synced yet"
+msgstr ""
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Paired with"
+msgstr ""
+
+#: src/postulo/templates/connections/list.html
+msgid "Pairing"
+msgstr ""
+
+#: src/postulo/templates/connections/pairing.html
+#, python-format
+msgid "Pairing on %(label)s"
+msgstr ""
 
 #: src/postulo/applications/models.py
 msgid "Panel"
@@ -13945,6 +14158,8 @@ msgid "Recipient"
 msgstr "Destinatario"
 
 #: src/postulo/templates/applications/partials/status_card.html
+#: src/postulo/templates/connections/pairing.html
+#: src/postulo/templates/connections/pairing_item.html
 msgid "Record"
 msgstr "Registrar"
 
@@ -14072,6 +14287,11 @@ msgid "Records older than %(cutoff)s (%(days)s day). Nothing was removed; this i
 msgid_plural "Records older than %(cutoff)s (%(days)s days). Nothing was removed; this is the report a deletion would be made from."
 msgstr[0] "Registros anteriores a %(cutoff)s (%(days)s día). No se eliminó nada; este es el informe a partir del cual se haría una eliminación."
 msgstr[1] "Registros anteriores a %(cutoff)s (%(days)s días). No se eliminó nada; este es el informe a partir del cual se haría una eliminación."
+
+#: src/postulo/templates/connections/pairing.html
+#, python-format
+msgid "Records paired on %(label)s"
+msgstr ""
 
 #: src/postulo/templates/server/person_recovery.html
 msgid "Recovery"
@@ -14254,6 +14474,7 @@ msgstr "Recordármelo el día anterior"
 msgid "reminder"
 msgstr "recordatorio"
 
+#: src/postulo/plugins/pairing.py
 #: src/postulo/templates/applications/reminder_form.html
 #: src/postulo/templates/base.html
 msgid "Reminder"
@@ -14356,6 +14577,15 @@ msgstr "Quitar {label}"
 #: src/postulo/plugins/models.py
 msgid "removed on the other side"
 msgstr "eliminado en el otro lado"
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Removed on the other side"
+msgstr ""
+
+#: src/postulo/templates/cotton/pairing_line.html
+#, python-format
+msgid "Removed on the other side of <bdi>%(connection)s</bdi>"
+msgstr ""
 
 #: src/postulo/core/models.py
 msgid "Removed there"
@@ -14810,7 +15040,9 @@ msgstr "ámbitos"
 msgid "Screening"
 msgstr "Preselección"
 
-#: src/postulo/core/tables.py src/postulo/templates/core/search.html
+#: src/postulo/core/tables.py src/postulo/templates/connections/pairing.html
+#: src/postulo/templates/connections/pairing_item.html
+#: src/postulo/templates/core/search.html
 #: src/postulo/templates/cotton/site_search.html
 #: src/postulo/templates/jobs/industry_list.html
 msgid "Search"
@@ -14852,6 +15084,10 @@ msgstr "Buscar en el calendario"
 #: src/postulo/documents/views.py
 msgid "Search what you sent"
 msgstr "Buscar en lo enviado"
+
+#: src/postulo/templates/connections/pairing_item.html
+msgid "Search your records"
+msgstr ""
 
 #: src/postulo/core/server_forms.py
 msgid "Seconds to wait for the server before giving up."
@@ -15399,6 +15635,10 @@ msgstr "¿Mostrar esta dirección en el mapa?"
 msgid "Show this period"
 msgstr "Mostrar este periodo"
 
+#: src/postulo/templates/connections/pairing.html
+msgid "Show unpaired"
+msgstr ""
+
 #: src/postulo/jobs/tables.py
 #: src/postulo/templates/applications/calendar_print.html
 #: src/postulo/templates/jobs/partials/whose_form.html
@@ -15893,7 +16133,8 @@ msgstr "STARTTLS, tras conectar"
 msgid "state"
 msgstr "estado"
 
-#: src/postulo/jobs/tables.py src/postulo/templates/jobs/company_register.html
+#: src/postulo/jobs/tables.py src/postulo/templates/connections/pairing.html
+#: src/postulo/templates/jobs/company_register.html
 #: src/postulo/templates/server/person_recovery.html
 msgid "State"
 msgstr "Estado"
@@ -16147,6 +16388,7 @@ msgid "sync links"
 msgstr "enlaces de sincronización"
 
 #: src/postulo/templates/connections/list.html
+#: src/postulo/templates/connections/pairing.html
 msgid "Sync now"
 msgstr "Sincronizar ahora"
 
@@ -16666,6 +16908,13 @@ msgstr "Esa imagen es mucho más grande de lo necesario."
 msgid "That invitation has already been accepted and cannot be revoked."
 msgstr "Esa invitación ya fue aceptada y no puede revocarse."
 
+#: src/postulo/plugins/views.py
+#, python-format
+msgid "That is a lot of questions to the server. Try again in %(seconds)d second."
+msgid_plural "That is a lot of questions to the server. Try again in %(seconds)d seconds."
+msgstr[0] ""
+msgstr[1] ""
+
 #: src/postulo/core/server_views.py
 msgid "That is a lot of recovery links. Try again shortly."
 msgstr "Son muchos enlaces de recuperación. Inténtelo de nuevo en breve."
@@ -16866,6 +17115,23 @@ msgstr "Eso es la exportación de una cuenta entera. Esta página solo lee el ar
 msgid "That is the last administrator. Appoint another first."
 msgstr "Ese es el último administrador. Nombre a otro primero."
 
+#: src/postulo/plugins/pairing.py
+msgid "That item cannot be made into one of those."
+msgstr ""
+
+#: src/postulo/plugins/views_pairing.py
+msgid "That item cannot be paired with one of those."
+msgstr ""
+
+#: src/postulo/plugins/views_pairing.py
+#, python-format
+msgid "That item is already paired with %(record)s. Unpair it first."
+msgstr ""
+
+#: src/postulo/plugins/pairing.py
+msgid "That item is no longer on the other side."
+msgstr ""
+
 #: src/postulo/templates/account/recovery_unusable.html
 msgid "That link cannot be used"
 msgstr "Ese enlace no se puede usar"
@@ -16955,6 +17221,10 @@ msgstr[1] "Esa página tardó más de %(seconds)s segundos en llegar, así que n
 #, python-format
 msgid "That page was sent with the content encoding “%(coding)s”, which Postulo does not unpack, so it was not read."
 msgstr "Esa página se envió con la codificación de contenido «%(coding)s», que Postulo no descomprime, así que no se leyó."
+
+#: src/postulo/plugins/views_pairing.py
+msgid "That pairing still has its other side."
+msgstr ""
 
 #: src/postulo/applications/forms.py
 msgid "That person is not recorded at this service."
@@ -19259,6 +19529,10 @@ msgstr "Por decidir"
 msgid "To hand over a posting (needs the captures scope):"
 msgstr "Para entregar un anuncio (necesita el ámbito captures):"
 
+#: src/postulo/templates/connections/pairing.html
+msgid "To pair with"
+msgstr ""
+
 #: src/postulo/templates/documents/cv_detail.html
 msgid "To see where the pages break. A draft is kept nowhere; Export PDF is what files a version."
 msgstr "Para ver dónde se cortan las páginas. Un borrador no se guarda en ningún sitio; Exportar PDF es lo que archiva una versión."
@@ -19384,6 +19658,7 @@ msgid "Two-factor authentication"
 msgstr "Autenticación de dos factores"
 
 #: src/postulo/accounts/models.py src/postulo/jobs/tables.py
+#: src/postulo/templates/connections/pairing_item.html
 #: src/postulo/templates/cotton/identifier_row.html
 #: src/postulo/templates/jobs/capture_page.html
 #: src/postulo/templates/partials/phone_numbers.html
@@ -19531,8 +19806,18 @@ msgstr "A diferencia de un número de teléfono, una dirección no se guarda una
 msgid "Unlike a telephone number, an address is not kept once on this instance, because people share a home; you cannot list the same one twice yourself. The bin removes a row at once, after asking, without waiting for <em>Save</em>."
 msgstr "A diferencia de un número de teléfono, una dirección no se conserva una sola vez en esta instancia, porque varias personas comparten domicilio; usted no puede indicar la misma dos veces. La papelera elimina una fila al instante, tras preguntar, sin esperar a <em>Guardar</em>."
 
+#: src/postulo/templates/connections/pairing.html
+#: src/postulo/templates/cotton/pairing_line.html
+msgid "Unpair"
+msgstr ""
+
 #: src/postulo/plugins/models.py
 msgid "unpaired"
+msgstr ""
+
+#: src/postulo/plugins/views_pairing.py
+#, python-format
+msgid "Unpaired. Both sides are kept, and %(connection)s leaves them alone."
 msgstr ""
 
 #: src/postulo/resume/publications.py
@@ -21190,9 +21475,14 @@ msgstr "Sí: quien llega por el proveedor de identidad entra directamente, sin q
 msgid "Yes: somebody who has forgotten their password can ask for a code at their primary address and type it back. A code rather than a link, because mail scanners follow links and would spend one before the person read it. It is never a second factor: an authenticator app is still asked for. Offered only while this instance's mail is actually getting through."
 msgstr "Sí: quien haya olvidado su contraseña puede pedir un código en su dirección principal y escribirlo. Un código y no un enlace, porque los escáneres de correo siguen los enlaces y lo gastarían antes de que la persona lo leyera. Nunca es un segundo factor: se sigue pidiendo la aplicación de autenticación. Solo se ofrece mientras el correo de esta instancia llega de verdad."
 
-#: src/postulo/jobs/views.py
+#: src/postulo/jobs/views.py src/postulo/plugins/pairing.py
 msgid "You"
 msgstr "Usted"
+
+#: src/postulo/plugins/pairing.py
+#, python-format
+msgid "You (%(name)s)"
+msgstr ""
 
 #: src/postulo/api/routers/companies.py src/postulo/jobs/forms.py
 #: src/postulo/jobs/surface.py
@@ -21650,6 +21940,10 @@ msgid "Your record lists %(total)s public work; the first %(most)s are shown."
 msgid_plural "Your record lists %(total)s public works; the first %(most)s are shown."
 msgstr[0] ""
 msgstr[1] ""
+
+#: src/postulo/templates/connections/pairing_item.html
+msgid "Your records"
+msgstr ""
 
 #: src/postulo/resume/models.py
 msgid "your role"

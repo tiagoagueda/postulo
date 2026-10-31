@@ -1197,6 +1197,11 @@ msgstr "%(person)s a(z) %(name)s utolsó tagja, amely még mindig rendelkezik re
 msgid "%(plugin)s could not check these settings: %(error)s"
 msgstr "A(z) %(plugin)s nem tudta ellenőrizni ezeket a beállításokat: %(error)s"
 
+#: src/postulo/plugins/views_pairing.py
+#, python-format
+msgid "%(plugin)s could not do that: %(message)s"
+msgstr ""
+
 #: src/postulo/plugins/views.py
 #, python-format
 msgid "%(plugin)s could not look on the server: %(message)s"
@@ -1205,6 +1210,11 @@ msgstr ""
 #: src/postulo/plugins/views.py
 #, python-format
 msgid "%(plugin)s has nothing to look for."
+msgstr ""
+
+#: src/postulo/plugins/views_pairing.py
+#, python-format
+msgid "%(plugin)s makes a new one on its next run."
 msgstr ""
 
 #: src/postulo/core/mail_auth.py
@@ -2306,6 +2316,11 @@ msgstr "A név nem személyazonosság: két kutatónak lehet ugyanaz a neve, és
 msgid "A new one"
 msgstr "Egy új"
 
+#: src/postulo/templates/connections/pairing_item.html
+#, python-format
+msgid "A new one: %(kind)s"
+msgstr ""
+
 #: src/postulo/templates/server/design.html
 msgid "A number and what it counts. The colour is a second signal, never the only one."
 msgstr "Egy szám és amit számol. A szín csak másodlagos jelzés, soha nem az egyetlen."
@@ -2495,6 +2510,10 @@ msgstr "A csendes napló a jó napló."
 #: src/postulo/resume/forms.py
 msgid "A range such as 41–52, or one page."
 msgstr "Oldaltartomány, például 41–52, vagy egyetlen oldal."
+
+#: src/postulo/templates/connections/pairing.html
+msgid "A record since deleted"
+msgstr ""
 
 #: src/postulo/documents/forms.py
 msgid "A referee who is not a contact yet. Their name is enough; it is added to your contacts without a company, and is used instead of the choice above."
@@ -2845,6 +2864,7 @@ msgid "Across the whole file, rows are skipped for want of a company or a role. 
 msgstr "A teljes fájlban kihagyjuk azokat a sorokat, amelyekből hiányzik a cég vagy a munkakör. A már feljegyzett sorokat importáláskor felismerjük és kihagyjuk."
 
 #: src/postulo/templates/accounts/invite_list.html
+#: src/postulo/templates/connections/pairing.html
 #: src/postulo/templates/documents/rendered_list.html
 #: src/postulo/templates/server/backups.html
 #: src/postulo/templates/server/people.html
@@ -3261,6 +3281,11 @@ msgstr "Már eldöntve —"
 msgid "Already in your record"
 msgstr "Már szerepel az adatai között"
 
+#: src/postulo/templates/connections/pairing_item.html
+#, python-format
+msgid "Already paired with <bdi>%(name)s</bdi>. Unpair it on the pairing page to pair it with something else."
+msgstr ""
+
 #: src/postulo/applications/agenda.py
 msgid "Already sent —"
 msgstr "Már elküldve —"
@@ -3583,6 +3608,10 @@ msgstr "Bármely ágazat"
 msgid "Anyone holding the link may use it, once. Send it however you like."
 msgstr "Bárki, akinél a hivatkozás van, egyszer használhatja. Küldje el, ahogyan szeretné."
 
+#: src/postulo/templates/connections/pairing.html
+msgid "Anything"
+msgstr ""
+
 #: src/postulo/resume/forms.py
 msgid "Anything a reader should know, in a few words."
 msgstr "Amit egy olvasónak tudnia kell, néhány szóban."
@@ -3635,7 +3664,7 @@ msgstr "API-tokenek"
 msgid "Appearance"
 msgstr "Megjelenés"
 
-#: src/postulo/applications/ical_import.py
+#: src/postulo/applications/ical_import.py src/postulo/plugins/pairing.py
 #: src/postulo/templates/applications/suggestion_list.html
 #: src/postulo/templates/base.html
 #: src/postulo/templates/documents/letter_detail.html
@@ -3935,6 +3964,10 @@ msgstr "Egyszerű szövegként"
 msgid "As the institution words it. Kept in your record; a CV does not print it yet."
 msgstr "Ahogyan az intézmény megfogalmazza. Az adatai között megőrződik; az önéletrajzon egyelőre nem szerepel."
 
+#: src/postulo/templates/connections/pairing.html
+msgid "As the last sync left them. Unpairing keeps both sides, and the next sync leaves them alone."
+msgstr ""
+
 #: src/postulo/jobs/forms.py
 msgid "As the posting words it — a city, a region, a country. Free text: nothing is looked up anywhere."
 msgstr "Ahogyan a hirdetés megfogalmazza — egy város, egy régió, egy ország. Szabad szöveg: sehol semmit sem kérdez le."
@@ -3973,6 +4006,11 @@ msgstr "Megkérdezve"
 
 #: src/postulo/templates/server/record_of_processing.html
 msgid "Asked only when somebody presses for it, one company at a time. Each is sent what is listed and nothing about the person asking."
+msgstr ""
+
+#: src/postulo/templates/connections/pairing.html
+#, python-format
+msgid "Asks %(plugin)s now. Nothing it answers is kept here."
 msgstr ""
 
 #: src/postulo/applications/analytics.py src/postulo/applications/models.py
@@ -4110,6 +4148,10 @@ msgstr "Visszakerült a hirdetései közé."
 msgid "Back to Backups"
 msgstr "Vissza a biztonsági mentésekhez"
 
+#: src/postulo/templates/connections/pairing.html
+msgid "Back to connections"
+msgstr ""
+
 #: src/postulo/core/help.py
 msgid "Back to Documents"
 msgstr "Vissza a Dokumentumokhoz"
@@ -4117,6 +4159,10 @@ msgstr "Vissza a Dokumentumokhoz"
 #: src/postulo/templates/accounts/invite_created.html
 msgid "Back to invitations"
 msgstr "Vissza a meghívókhoz"
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Back to it"
+msgstr ""
 
 #: src/postulo/core/help.py
 msgid "Back to Listings"
@@ -4450,6 +4496,10 @@ msgstr "Hívás"
 msgid "Callback to register with it"
 msgstr "A szolgáltatónál regisztrálandó visszahívási cím"
 
+#: src/postulo/templates/connections/pairing.html
+msgid "Can pair with"
+msgstr ""
+
 #: src/postulo/templates/accounts/invite_form.html
 #: src/postulo/templates/accounts/profile.html
 #: src/postulo/templates/applications/application_form.html
@@ -4461,6 +4511,7 @@ msgstr "A szolgáltatónál regisztrálandó visszahívási cím"
 #: src/postulo/templates/applications/tag_form.html
 #: src/postulo/templates/connections/confirm_delete.html
 #: src/postulo/templates/connections/form.html
+#: src/postulo/templates/connections/pairing_item.html
 #: src/postulo/templates/cotton/dialog.html
 #: src/postulo/templates/documents/cv_form.html
 #: src/postulo/templates/documents/cv_item_form.html
@@ -4830,6 +4881,10 @@ msgstr "Chipek és címkék"
 msgid "Choices"
 msgstr "Választási lehetőségek"
 
+#: src/postulo/templates/connections/pairing_item.html
+msgid "Choose"
+msgstr ""
+
 #: src/postulo/core/personal.py
 msgid "Choose a country from the list."
 msgstr "Válasszon egy országot a listából."
@@ -4876,6 +4931,18 @@ msgstr "Válasszon új jelszót"
 msgid "Choose a package first."
 msgstr "Előbb válasszon csomagot."
 
+#: src/postulo/plugins/views_pairing.py
+msgid "Choose a pairing."
+msgstr ""
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Choose a record"
+msgstr ""
+
+#: src/postulo/plugins/views_pairing.py
+msgid "Choose a record to pair it with."
+msgstr ""
+
 #: src/postulo/applications/ical_import.py
 msgid "Choose a time zone"
 msgstr "Időzóna kiválasztása"
@@ -4887,6 +4954,11 @@ msgstr "Válassza ki a feltöltendő archívumot."
 #: src/postulo/core/mail_auth.py
 msgid "Choose an identity provider and save it first."
 msgstr "Előbb válasszon identitásszolgáltatót, és mentse el."
+
+#: src/postulo/templates/connections/pairing.html
+#, python-format
+msgid "Choose an item to pair with <bdi>%(name)s</bdi>."
+msgstr ""
 
 #: src/postulo/templates/core/import_csv_map.html
 msgid "Choose another file"
@@ -4943,6 +5015,10 @@ msgstr "Válassza ki, milyen fajta azonosító ez."
 #: src/postulo/templates/documents/cv_detail.html
 msgid "Choose what it prints instead"
 msgstr "Válassza ki, mi szerepeljen helyette"
+
+#: src/postulo/plugins/views_pairing.py
+msgid "Choose what to do with the item."
+msgstr ""
 
 #: src/postulo/jobs/status_views.py
 msgid "Choose what was reported and the date."
@@ -5229,6 +5305,7 @@ msgstr "A cégek, hirdetések, jelentkezések, rögzítések és dokumentumok sz
 #: src/postulo/applications/forms.py src/postulo/applications/reports.py
 #: src/postulo/applications/tables.py src/postulo/core/csv_import.py
 #: src/postulo/jobs/models.py src/postulo/jobs/tables.py
+#: src/postulo/plugins/pairing.py
 #: src/postulo/templates/applications/report.html
 #: src/postulo/templates/base.html
 #: src/postulo/templates/core/import_csv_map.html
@@ -5374,6 +5451,7 @@ msgid "Connection security"
 msgstr "Kapcsolat biztonsága"
 
 #: src/postulo/core/settings_sections.py src/postulo/plugins/views.py
+#: src/postulo/plugins/views_pairing.py
 #: src/postulo/templates/connections/list.html
 msgid "Connections"
 msgstr "Kapcsolatok"
@@ -5398,7 +5476,7 @@ msgstr "Tanácsadás"
 msgid "contact"
 msgstr "kapcsolattartó"
 
-#: src/postulo/templates/jobs/contact_form.html
+#: src/postulo/plugins/pairing.py src/postulo/templates/jobs/contact_form.html
 msgid "Contact"
 msgstr "Kapcsolattartó"
 
@@ -5993,7 +6071,7 @@ msgstr "sűrűség"
 msgid "department"
 msgstr "részleg"
 
-#: src/postulo/jobs/forms.py
+#: src/postulo/jobs/forms.py src/postulo/plugins/pairing.py
 #: src/postulo/templates/applications/application_detail.html
 msgid "Department"
 msgstr "Részleg"
@@ -7167,9 +7245,18 @@ msgstr "Fájlok, amelyek már megvoltak, szemben a Postulo által előállított
 msgid "Files you have already"
 msgstr "Meglévő fájlok"
 
+#: src/postulo/templates/connections/pairing_item.html
+#, python-format
+msgid "Fill from %(plugin)s and pair"
+msgstr ""
+
 #: src/postulo/templates/documents/letter_detail.html
 msgid "Fill in from"
 msgstr "Kitöltés ebből"
+
+#: src/postulo/templates/connections/pairing_item.html
+msgid "Fill once, without pairing"
+msgstr ""
 
 #: src/postulo/resume/views.py
 #, python-format
@@ -7211,6 +7298,10 @@ msgstr "Nyelv keresése"
 #: src/postulo/templates/jobs/company_form.html
 msgid "Find logo"
 msgstr "Logó keresése"
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Find on the other side"
+msgstr ""
 
 #: src/postulo/templates/jobs/industry_list.html
 msgid "Find one"
@@ -7419,6 +7510,10 @@ msgstr[1] ""
 #, python-format
 msgid "Found a logo at %(url)s."
 msgstr "Logó található itt: %(url)s."
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Found on the other side"
+msgstr ""
 
 #: src/postulo/templates/connections/partials/option_table.html
 msgid "Found on the server"
@@ -8614,7 +8709,7 @@ msgstr "Belső"
 msgid "Internship"
 msgstr "Gyakornoki program"
 
-#: src/postulo/applications/models.py
+#: src/postulo/applications/models.py src/postulo/plugins/pairing.py
 msgid "Interview"
 msgstr "Interjú"
 
@@ -8788,13 +8883,21 @@ msgstr ""
 msgid "it could not be imported"
 msgstr "nem sikerült importálni"
 
+#: src/postulo/plugins/pairing.py
+msgid "It did not fill the record it was given."
+msgstr ""
+
 #: src/postulo/plugins/installing.py
 #, python-format
 msgid "it did not finish importing within %(seconds)ss"
 msgstr "%(seconds)s másodpercen belül nem fejeződött be az importálás"
 
-#: src/postulo/plugins/views.py
+#: src/postulo/plugins/pairing.py src/postulo/plugins/views.py
 msgid "It did not say what it found."
+msgstr ""
+
+#: src/postulo/plugins/pairing.py
+msgid "It did not say what it made."
 msgstr ""
 
 #: src/postulo/templates/server/backups.html
@@ -8951,6 +9054,14 @@ msgstr "Eddig működik: %(when)s, vagy amíg fel nem használják vagy vissza n
 #: src/postulo/plugins/views.py
 msgid "It works."
 msgstr "Működik."
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Item"
+msgstr ""
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Items found"
+msgstr ""
 
 #: src/postulo/jobs/register_views.py
 msgid "Its address is already listed."
@@ -9419,6 +9530,11 @@ msgstr "Utolsó elért fázis"
 msgid "last synced"
 msgstr "utoljára szinkronizálva"
 
+#: src/postulo/templates/connections/pairing.html
+#, python-format
+msgid "Last synced %(when)s"
+msgstr ""
+
 #: src/postulo/api/models.py
 msgid "last used"
 msgstr "utoljára használva"
@@ -9563,6 +9679,11 @@ msgstr "Impresszum"
 #: src/postulo/jobs/models.py
 msgid "legal state"
 msgstr "jogállás"
+
+#: src/postulo/templates/connections/pairing.html
+#, python-format
+msgid "Let %(plugin)s make a new one"
+msgstr ""
 
 #: src/postulo/core/server_forms.py
 msgid "Let a capture keep a rendering of its page"
@@ -9871,6 +9992,11 @@ msgstr "Kisbetűk, számjegyek, pontok, aláhúzások és kötőjelek."
 #: src/postulo/templates/server/person_recovery.html
 msgid "Made"
 msgstr "Készült"
+
+#: src/postulo/plugins/views_pairing.py
+#, python-format
+msgid "Made %(record)s from %(item)s, without pairing them."
+msgstr ""
 
 #: src/postulo/core/models.py
 msgid "mail failures in a row"
@@ -11114,6 +11240,10 @@ msgstr "Egyik cégének sincs ilyen neve vagy azonosítója."
 msgid "None of your own yet. A CV in another language prints the name the ESCO classification gives this skill there, and the name as you wrote it where the classification gives none."
 msgstr "Még nincs saját. Egy másik nyelvű önéletrajzban az a név szerepel, amelyet az ESCO-osztályozás ott ad ennek a készségnek, ahol pedig az osztályozás nem ad nevet, ott az Ön által írt név."
 
+#: src/postulo/templates/connections/pairing_item.html
+msgid "None of your records matches."
+msgstr ""
+
 #: src/postulo/templates/applications/partials/reminders.html
 msgid "None outstanding."
 msgstr "Nincs függőben semmi."
@@ -11254,6 +11384,10 @@ msgstr "Nem szerepelt az oldalon — alapérték. Csak összeg mellett marad meg
 msgid "Not one of these"
 msgstr "Egyik sem ezek közül"
 
+#: src/postulo/templates/connections/pairing.html
+msgid "Not paired yet"
+msgstr ""
+
 #: src/postulo/jobs/forms.py
 msgid "Not part of another company"
 msgstr "Nem része másik cégnek"
@@ -11330,6 +11464,10 @@ msgstr "Nem látható · %(name)s"
 #: src/postulo/resume/models.py
 msgid "Not stated"
 msgstr "Nincs megadva"
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Not synced yet"
+msgstr ""
 
 #: src/postulo/templates/connections/list.html
 msgid "not tested yet"
@@ -11418,6 +11556,10 @@ msgstr "megjegyzések cégekhez"
 msgid "notes on contacts"
 msgstr "megjegyzések kapcsolatokhoz"
 
+#: src/postulo/templates/connections/pairing.html
+msgid "Nothing"
+msgstr ""
+
 #: src/postulo/templates/server/plugins.html
 msgid "nothing"
 msgstr "semmi"
@@ -11440,6 +11582,10 @@ msgid "Nothing fills in %(names)s, so it goes out blank."
 msgid_plural "Nothing fills in %(names)s, so they go out blank."
 msgstr[0] "Semmi sem tölti ki ezt: %(names)s, így üresen megy el."
 msgstr[1] "Semmi sem tölti ki ezeket: %(names)s, így üresen mennek el."
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Nothing found on the other side."
+msgstr ""
 
 #: src/postulo/templates/jobs/posting_detail.html
 msgid "Nothing has arrived about this one yet."
@@ -11538,6 +11684,10 @@ msgstr "Itt még semmi sincs telepítve. A bővítmények a(z) %(directory)s kö
 #: src/postulo/templates/server/plugins.html
 msgid "Nothing is installed that a person can hold an opinion about."
 msgstr "Nincs telepítve semmi, amiről egy személynek véleménye lehetne."
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Nothing is paired on this connection yet."
+msgstr ""
 
 #: src/postulo/templates/jobs/capture_form.html
 msgid "Nothing is saved until you have reviewed it."
@@ -11989,6 +12139,10 @@ msgstr "A rögzítések átnézésekor a „d” elveti az aktuálisat és tová
 #, python-format
 msgid "On the map at %(how)s."
 msgstr "Helye a térképen: %(how)s."
+
+#: src/postulo/templates/connections/pairing.html
+msgid "On the other side"
+msgstr ""
 
 #: src/postulo/templates/applications/suggestion_list.html
 msgid "On the timeline"
@@ -12660,6 +12814,65 @@ msgstr "A rögzítésekből megtartott oldalak"
 #: src/postulo/templates/partials/table/pagination.html
 msgid "Pagination"
 msgstr "Lapozás"
+
+#: src/postulo/templates/connections/pairing.html
+#: src/postulo/templates/connections/pairing_item.html
+msgid "Pair"
+msgstr ""
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Pair again"
+msgstr ""
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Pair what is on the other side with your own records, or undo a pairing. Both sides are kept either way."
+msgstr ""
+
+#: src/postulo/templates/cotton/pairing_line.html
+#, python-format
+msgid "Pair with an item on <bdi>%(connection)s</bdi>…"
+msgstr ""
+
+#: src/postulo/templates/connections/pairing_item.html
+#, python-format
+msgid "Pair with: %(kind)s"
+msgstr ""
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Paired"
+msgstr ""
+
+#: src/postulo/plugins/views_pairing.py
+#, python-format
+msgid "Paired %(item)s with %(record)s. The next sync compares the two."
+msgstr ""
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Paired records"
+msgstr ""
+
+#: src/postulo/templates/cotton/pairing_line.html
+#, python-format
+msgid "Paired through <bdi>%(connection)s</bdi>, last synced %(when)s"
+msgstr ""
+
+#: src/postulo/templates/cotton/pairing_line.html
+#, python-format
+msgid "Paired through <bdi>%(connection)s</bdi>, not synced yet"
+msgstr ""
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Paired with"
+msgstr ""
+
+#: src/postulo/templates/connections/list.html
+msgid "Pairing"
+msgstr ""
+
+#: src/postulo/templates/connections/pairing.html
+#, python-format
+msgid "Pairing on %(label)s"
+msgstr ""
 
 #: src/postulo/applications/models.py
 msgid "Panel"
@@ -13869,6 +14082,8 @@ msgid "Recipient"
 msgstr "Címzett"
 
 #: src/postulo/templates/applications/partials/status_card.html
+#: src/postulo/templates/connections/pairing.html
+#: src/postulo/templates/connections/pairing_item.html
 msgid "Record"
 msgstr "Feljegyzés"
 
@@ -13997,6 +14212,11 @@ msgid "Records older than %(cutoff)s (%(days)s day). Nothing was removed; this i
 msgid_plural "Records older than %(cutoff)s (%(days)s days). Nothing was removed; this is the report a deletion would be made from."
 msgstr[0] "Ennél régebbi tételek: %(cutoff)s (%(days)s nap). Semmi sem lett eltávolítva; ez az a jelentés, amely alapján a törlés történne."
 msgstr[1] "Ennél régebbi tételek: %(cutoff)s (%(days)s nap). Semmi sem lett eltávolítva; ez az a jelentés, amely alapján a törlés történne."
+
+#: src/postulo/templates/connections/pairing.html
+#, python-format
+msgid "Records paired on %(label)s"
+msgstr ""
 
 #: src/postulo/templates/server/person_recovery.html
 msgid "Recovery"
@@ -14179,6 +14399,7 @@ msgstr "Emlékeztessen előző nap"
 msgid "reminder"
 msgstr "emlékeztető"
 
+#: src/postulo/plugins/pairing.py
 #: src/postulo/templates/applications/reminder_form.html
 #: src/postulo/templates/base.html
 msgid "Reminder"
@@ -14281,6 +14502,15 @@ msgstr "{label} eltávolítása"
 #: src/postulo/plugins/models.py
 msgid "removed on the other side"
 msgstr "a másik oldalon eltávolítva"
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Removed on the other side"
+msgstr ""
+
+#: src/postulo/templates/cotton/pairing_line.html
+#, python-format
+msgid "Removed on the other side of <bdi>%(connection)s</bdi>"
+msgstr ""
 
 #: src/postulo/core/models.py
 msgid "Removed there"
@@ -14732,7 +14962,9 @@ msgstr "hatókörök"
 msgid "Screening"
 msgstr "Előszűrés"
 
-#: src/postulo/core/tables.py src/postulo/templates/core/search.html
+#: src/postulo/core/tables.py src/postulo/templates/connections/pairing.html
+#: src/postulo/templates/connections/pairing_item.html
+#: src/postulo/templates/core/search.html
 #: src/postulo/templates/cotton/site_search.html
 #: src/postulo/templates/jobs/industry_list.html
 msgid "Search"
@@ -14774,6 +15006,10 @@ msgstr "Keresés a naptárban"
 #: src/postulo/documents/views.py
 msgid "Search what you sent"
 msgstr "Keresés az elküldöttek között"
+
+#: src/postulo/templates/connections/pairing_item.html
+msgid "Search your records"
+msgstr ""
 
 #: src/postulo/core/server_forms.py
 msgid "Seconds to wait for the server before giving up."
@@ -15318,6 +15554,10 @@ msgstr "Megjeleníti ezt a címet a térképen?"
 msgid "Show this period"
 msgstr "Az időszak megjelenítése"
 
+#: src/postulo/templates/connections/pairing.html
+msgid "Show unpaired"
+msgstr ""
+
 #: src/postulo/jobs/tables.py
 #: src/postulo/templates/applications/calendar_print.html
 #: src/postulo/templates/jobs/partials/whose_form.html
@@ -15808,7 +16048,8 @@ msgstr "STARTTLS, csatlakozás után"
 msgid "state"
 msgstr "állapot"
 
-#: src/postulo/jobs/tables.py src/postulo/templates/jobs/company_register.html
+#: src/postulo/jobs/tables.py src/postulo/templates/connections/pairing.html
+#: src/postulo/templates/jobs/company_register.html
 #: src/postulo/templates/server/person_recovery.html
 msgid "State"
 msgstr "Állapot"
@@ -16059,6 +16300,7 @@ msgid "sync links"
 msgstr "szinkronizálási kapcsolatok"
 
 #: src/postulo/templates/connections/list.html
+#: src/postulo/templates/connections/pairing.html
 msgid "Sync now"
 msgstr "Szinkronizálás most"
 
@@ -16569,6 +16811,13 @@ msgstr "Ez a kép jóval nagyobb a szükségesnél."
 msgid "That invitation has already been accepted and cannot be revoked."
 msgstr "Ezt a meghívót már elfogadták, és nem vonható vissza."
 
+#: src/postulo/plugins/views.py
+#, python-format
+msgid "That is a lot of questions to the server. Try again in %(seconds)d second."
+msgid_plural "That is a lot of questions to the server. Try again in %(seconds)d seconds."
+msgstr[0] ""
+msgstr[1] ""
+
 #: src/postulo/core/server_views.py
 msgid "That is a lot of recovery links. Try again shortly."
 msgstr "Ez túl sok helyreállítási hivatkozás. Próbálja újra kicsit később."
@@ -16769,6 +17018,23 @@ msgstr "Ez egy teljes fiók exportja. Ez az oldal csak azt a fájlt olvassa be, 
 msgid "That is the last administrator. Appoint another first."
 msgstr "Ez az utolsó adminisztrátor. Előbb nevezzen ki másikat."
 
+#: src/postulo/plugins/pairing.py
+msgid "That item cannot be made into one of those."
+msgstr ""
+
+#: src/postulo/plugins/views_pairing.py
+msgid "That item cannot be paired with one of those."
+msgstr ""
+
+#: src/postulo/plugins/views_pairing.py
+#, python-format
+msgid "That item is already paired with %(record)s. Unpair it first."
+msgstr ""
+
+#: src/postulo/plugins/pairing.py
+msgid "That item is no longer on the other side."
+msgstr ""
+
 #: src/postulo/templates/account/recovery_unusable.html
 msgid "That link cannot be used"
 msgstr "Ez a hivatkozás nem használható"
@@ -16858,6 +17124,10 @@ msgstr[1] "Ennek az oldalnak %(seconds)s másodpercnél tovább tartott megérke
 #, python-format
 msgid "That page was sent with the content encoding “%(coding)s”, which Postulo does not unpack, so it was not read."
 msgstr "Ezt az oldalt a(z) „%(coding)s” tartalomkódolással küldték, amelyet a Postulo nem csomagol ki, ezért nem lett beolvasva."
+
+#: src/postulo/plugins/views_pairing.py
+msgid "That pairing still has its other side."
+msgstr ""
 
 #: src/postulo/applications/forms.py
 msgid "That person is not recorded at this service."
@@ -19156,6 +19426,10 @@ msgstr "Eldöntendő"
 msgid "To hand over a posting (needs the captures scope):"
 msgstr "Hirdetés átadásához (a captures hatókör szükséges):"
 
+#: src/postulo/templates/connections/pairing.html
+msgid "To pair with"
+msgstr ""
+
 #: src/postulo/templates/documents/cv_detail.html
 msgid "To see where the pages break. A draft is kept nowhere; Export PDF is what files a version."
 msgstr "Hogy lássa, hol törnek az oldalak. A vázlatot sehol sem őrizzük; a PDF exportálása az, ami egy változatot iktat."
@@ -19281,6 +19555,7 @@ msgid "Two-factor authentication"
 msgstr "Kétlépcsős azonosítás"
 
 #: src/postulo/accounts/models.py src/postulo/jobs/tables.py
+#: src/postulo/templates/connections/pairing_item.html
 #: src/postulo/templates/cotton/identifier_row.html
 #: src/postulo/templates/jobs/capture_page.html
 #: src/postulo/templates/partials/phone_numbers.html
@@ -19427,8 +19702,18 @@ msgstr "A telefonszámmal ellentétben egy cím ezen a példányon nem csak egys
 msgid "Unlike a telephone number, an address is not kept once on this instance, because people share a home; you cannot list the same one twice yourself. The bin removes a row at once, after asking, without waiting for <em>Save</em>."
 msgstr "A telefonszámmal ellentétben egy cím nem csak egyszer szerepelhet ezen a példányon, mert az emberek közös otthonban élhetnek; Ön azonban ugyanazt a címet nem veheti fel kétszer. A kuka megerősítés után azonnal eltávolít egy sort, a <em>Mentés</em> megvárása nélkül."
 
+#: src/postulo/templates/connections/pairing.html
+#: src/postulo/templates/cotton/pairing_line.html
+msgid "Unpair"
+msgstr ""
+
 #: src/postulo/plugins/models.py
 msgid "unpaired"
+msgstr ""
+
+#: src/postulo/plugins/views_pairing.py
+#, python-format
+msgid "Unpaired. Both sides are kept, and %(connection)s leaves them alone."
 msgstr ""
 
 #: src/postulo/resume/publications.py
@@ -21082,9 +21367,14 @@ msgstr "Igen: aki az identitásszolgáltatón keresztül érkezik, azonnal bejel
 msgid "Yes: somebody who has forgotten their password can ask for a code at their primary address and type it back. A code rather than a link, because mail scanners follow links and would spend one before the person read it. It is never a second factor: an authenticator app is still asked for. Offered only while this instance's mail is actually getting through."
 msgstr "Igen: aki elfelejtette a jelszavát, kérhet egy kódot az elsődleges címére, és beírhatja. Kódot és nem hivatkozást, mert a levélszűrők megnyitják a hivatkozásokat, és felhasználnák, mielőtt az illető elolvasná. Soha nem második tényező: a hitelesítő alkalmazást továbbra is kéri a rendszer. Csak addig érhető el, amíg a példány levelei ténylegesen célba érnek."
 
-#: src/postulo/jobs/views.py
+#: src/postulo/jobs/views.py src/postulo/plugins/pairing.py
 msgid "You"
 msgstr "Ön"
+
+#: src/postulo/plugins/pairing.py
+#, python-format
+msgid "You (%(name)s)"
+msgstr ""
 
 #: src/postulo/api/routers/companies.py src/postulo/jobs/forms.py
 #: src/postulo/jobs/surface.py
@@ -21542,6 +21832,10 @@ msgid "Your record lists %(total)s public work; the first %(most)s are shown."
 msgid_plural "Your record lists %(total)s public works; the first %(most)s are shown."
 msgstr[0] ""
 msgstr[1] ""
+
+#: src/postulo/templates/connections/pairing_item.html
+msgid "Your records"
+msgstr ""
 
 #: src/postulo/resume/models.py
 msgid "your role"

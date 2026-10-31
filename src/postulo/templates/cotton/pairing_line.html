@@ -1,0 +1,42 @@
+{% load i18n pairings %}
+<c-vars record quiet=False class="" />
+{% comment %} A record's pairings on the person's sync connections (#327):
+   `<c-pairing-line :record="company" />`, or `quiet` to draw nothing where nothing is paired --
+   a company's departments, each under the company.
+
+   "Paired through ‹connection›, last synced ‹date›", or "Removed on the other side", with
+   *Unpair* and *Pair with an item…*. Read from `SyncLink` alone, so a record's page never
+   waits on a server, and drawn only for the person's own record on their own connections.
+{% endcomment %}
+{% pairings_of record as pairing %}
+{% if pairing and pairing.links or pairing and not quiet %}
+  <div class="flex flex-col gap-1 text-sm {{ class }}" data-pairing-line>
+    {% for link, pairable in pairing.links %}
+      <div class="flex flex-wrap items-center gap-x-3 gap-y-1" data-pairing{% if link.remote_gone %} data-gone{% endif %}>
+        <p class="text-ink-600 dark:text-ink-300">
+          {% if quiet %}<bdi class="font-medium">{{ pairing.name }}</bdi>: {% endif %}
+          {% if link.remote_gone %}
+            {% blocktranslate with connection=link.connection.label trimmed %}Removed on the other side of <bdi>{{ connection }}</bdi>{% endblocktranslate %}
+          {% elif link.last_synced_at %}
+            {% blocktranslate with connection=link.connection.label when=link.last_synced_at|date:"DATETIME_FORMAT" trimmed %}Paired through <bdi>{{ connection }}</bdi>, last synced {{ when }}{% endblocktranslate %}
+          {% else %}
+            {% blocktranslate with connection=link.connection.label trimmed %}Paired through <bdi>{{ connection }}</bdi>, not synced yet{% endblocktranslate %}
+          {% endif %}
+        </p>
+        {% if pairable %}
+          <form method="post" action="{% url 'connections:pairing_unpair' link.connection_id %}">
+            {% csrf_token %}
+            <input type="hidden" name="link" value="{{ link.pk }}">
+            <input type="hidden" name="next" value="{{ pairing.here }}">
+            <button type="submit" class="btn" data-variant="ghost" data-size="xs">{% translate "Unpair" %}<span class="sr-only">: <bdi>{{ link.connection.label }}</bdi></span></button>
+          </form>
+        {% endif %}
+      </div>
+    {% endfor %}
+    {% if not quiet %}
+      {% for connection in pairing.connections %}
+        <p><a href="{% url 'connections:pairing' connection.pk %}?for={{ pairing.for }}" class="text-brand-600 underline dark:text-brand-400" data-pair-with>{% blocktranslate with connection=connection.label trimmed %}Pair with an item on <bdi>{{ connection }}</bdi>…{% endblocktranslate %}</a></p>
+      {% endfor %}
+    {% endif %}
+  </div>
+{% endif %}

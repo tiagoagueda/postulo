@@ -38,6 +38,11 @@
         {% endif %}
       </div>
       {% include "jobs/partials/company_status.html" %}
+      {% comment %} Its pairings on the person's sync connections, and its departments' (#327). {% endcomment %}
+      <c-pairing-line :record="company" class="mt-2" />
+      {% for department in company.departments.all %}
+        <c-pairing-line :record="department" quiet class="mt-1" />
+      {% endfor %}
       {% if company.is_employment_service %}
         <p class="text-sm text-ink-500 dark:text-ink-400">{{ company.get_kind_display }}</p>
       {% endif %}

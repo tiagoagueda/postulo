@@ -27,7 +27,7 @@ from django.views.generic import DeleteView, ListView
 from postulo.core.files import FILE_POLICY
 from postulo.core.mixins import OwnedObjectMixin
 
-from . import logos, registry
+from . import logos, pairing, registry
 from .base import CONNECTED_KINDS, call_with_user
 from .forms import ConnectionForm
 from .models import Connection
@@ -210,6 +210,8 @@ class ConnectionListView(OwnedObjectMixin, ListView):
                     "links": _links(plugin, connection),
                     "is_store": connection.kind == "store",
                     "is_sync": connection.kind == "sync",
+                    # A *Pairing* page, for a sync plugin that lists its items (#327).
+                    "can_pair": connection.kind == "sync" and pairing.can_pair(plugin),
                 }
             )
         context["rows"] = rows
@@ -439,21 +441,32 @@ class ConnectionConsentCallbackView(LoginRequiredMixin, View):
         return redirect("server:email")
 
 
-def _too_often(request: HttpRequest) -> str:
+def _too_often(request: HttpRequest, *, pairing: bool = False) -> str:
     """The sentence refusing one more call on somebody's server just now, or empty.
 
     A test is a real message, or a real request to somebody's server, at a press of a button.
     Bounded per account, as the text transport's sends are (#232). *Look on the server* signs
     in with the same password, so it spends the same allowance (#332): two buttons are not
     twice the sign-ins.
+
+    ``pairing`` spends the *Pairing* page's allowance instead (#327): a person pairing an
+    address book by hand asks the server many more times an hour than anybody tests it, and
+    doing so must not leave *Test* refused.
     """
     from postulo.core import throttle
 
+    scope, setting = ("connection-test", "POSTULO_CONNECTION_TEST_RATE")
+    if pairing:
+        scope, setting = ("connection-pairing", "POSTULO_CONNECTION_PAIRING_RATE")
     try:
-        throttle.consume(
-            "connection-test", request.user, throttle.rate_for("POSTULO_CONNECTION_TEST_RATE")
-        )
+        throttle.consume(scope, request.user, throttle.rate_for(setting))
     except throttle.TooOften as too_often:
+        if pairing:
+            return ngettext(
+                "That is a lot of questions to the server. Try again in %(seconds)d second.",
+                "That is a lot of questions to the server. Try again in %(seconds)d seconds.",
+                too_often.retry_after,
+            ) % {"seconds": too_often.retry_after}
         return ngettext(
             "That is a lot of tests. Try again in %(seconds)d second.",
             "That is a lot of tests. Try again in %(seconds)d seconds.",

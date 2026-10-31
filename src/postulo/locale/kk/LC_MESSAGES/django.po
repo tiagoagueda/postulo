@@ -1197,6 +1197,11 @@ msgstr "%(person)s — %(name)s тобының соңғы мүшесі, ал т�
 msgid "%(plugin)s could not check these settings: %(error)s"
 msgstr "%(plugin)s плагині бұл параметрлерді тексере алмады: %(error)s"
 
+#: src/postulo/plugins/views_pairing.py
+#, python-format
+msgid "%(plugin)s could not do that: %(message)s"
+msgstr ""
+
 #: src/postulo/plugins/views.py
 #, python-format
 msgid "%(plugin)s could not look on the server: %(message)s"
@@ -1205,6 +1210,11 @@ msgstr ""
 #: src/postulo/plugins/views.py
 #, python-format
 msgid "%(plugin)s has nothing to look for."
+msgstr ""
+
+#: src/postulo/plugins/views_pairing.py
+#, python-format
+msgid "%(plugin)s makes a new one on its next run."
 msgstr ""
 
 #: src/postulo/core/mail_auth.py
@@ -2305,6 +2315,11 @@ msgstr "Аты-жөн — сәйкестік емес: екі зерттеуші
 msgid "A new one"
 msgstr "Жаңасы"
 
+#: src/postulo/templates/connections/pairing_item.html
+#, python-format
+msgid "A new one: %(kind)s"
+msgstr ""
+
 #: src/postulo/templates/server/design.html
 msgid "A number and what it counts. The colour is a second signal, never the only one."
 msgstr "Сан және оның нені санайтыны. Түс — қосымша белгі ғана, ешқашан жалғыз белгі емес."
@@ -2494,6 +2509,10 @@ msgstr "Тыныш журнал — ең жақсы журнал."
 #: src/postulo/resume/forms.py
 msgid "A range such as 41–52, or one page."
 msgstr "41–52 сияқты аралық немесе бір бет."
+
+#: src/postulo/templates/connections/pairing.html
+msgid "A record since deleted"
+msgstr ""
 
 #: src/postulo/documents/forms.py
 msgid "A referee who is not a contact yet. Their name is enough; it is added to your contacts without a company, and is used instead of the choice above."
@@ -2845,6 +2864,7 @@ msgid "Across the whole file, rows are skipped for want of a company or a role. 
 msgstr "Бүкіл файл бойынша компаниясы немесе лауазымы жоқ жолдар өткізіп жіберіледі. Бұрыннан тіркелген жолдар импорттау кезінде анықталып, өткізіп жіберіледі."
 
 #: src/postulo/templates/accounts/invite_list.html
+#: src/postulo/templates/connections/pairing.html
 #: src/postulo/templates/documents/rendered_list.html
 #: src/postulo/templates/server/backups.html
 #: src/postulo/templates/server/people.html
@@ -3265,6 +3285,11 @@ msgstr "Шешім қабылданды —"
 msgid "Already in your record"
 msgstr "Деректеріңізде бұрыннан бар"
 
+#: src/postulo/templates/connections/pairing_item.html
+#, python-format
+msgid "Already paired with <bdi>%(name)s</bdi>. Unpair it on the pairing page to pair it with something else."
+msgstr ""
+
 #: src/postulo/applications/agenda.py
 msgid "Already sent —"
 msgstr "Жіберілді —"
@@ -3589,6 +3614,10 @@ msgstr "Кез келген сектор"
 msgid "Anyone holding the link may use it, once. Send it however you like."
 msgstr "Сілтемесі бар кез келген адам оны бір рет пайдалана алады. Оны қалаған тәсілмен жіберіңіз."
 
+#: src/postulo/templates/connections/pairing.html
+msgid "Anything"
+msgstr ""
+
 #: src/postulo/resume/forms.py
 msgid "Anything a reader should know, in a few words."
 msgstr "Оқырман білуі керек нәрсе, бірнеше сөзбен."
@@ -3642,7 +3671,7 @@ msgstr "API токендері"
 msgid "Appearance"
 msgstr "Сыртқы түрі"
 
-#: src/postulo/applications/ical_import.py
+#: src/postulo/applications/ical_import.py src/postulo/plugins/pairing.py
 #: src/postulo/templates/applications/suggestion_list.html
 #: src/postulo/templates/base.html
 #: src/postulo/templates/documents/letter_detail.html
@@ -3945,6 +3974,10 @@ msgstr "Қарапайым мәтін ретінде"
 msgid "As the institution words it. Kept in your record; a CV does not print it yet."
 msgstr "Мекеме жазғандай. Деректеріңізде сақталады; түйіндемеде әзірге көрсетілмейді."
 
+#: src/postulo/templates/connections/pairing.html
+msgid "As the last sync left them. Unpairing keeps both sides, and the next sync leaves them alone."
+msgstr ""
+
 #: src/postulo/jobs/forms.py
 msgid "As the posting words it — a city, a region, a country. Free text: nothing is looked up anywhere."
 msgstr "Вакансияда жазылғандай — қала, аймақ, ел. Еркін мәтін: ештеңе еш жерден ізделмейді."
@@ -3985,6 +4018,11 @@ msgstr "Сұралды"
 
 #: src/postulo/templates/server/record_of_processing.html
 msgid "Asked only when somebody presses for it, one company at a time. Each is sent what is listed and nothing about the person asking."
+msgstr ""
+
+#: src/postulo/templates/connections/pairing.html
+#, python-format
+msgid "Asks %(plugin)s now. Nothing it answers is kept here."
 msgstr ""
 
 #: src/postulo/applications/analytics.py src/postulo/applications/models.py
@@ -4125,6 +4163,10 @@ msgstr "Вакансияларыңызға қайтарылды."
 msgid "Back to Backups"
 msgstr "«Сақтық көшірмелер» бетіне оралу"
 
+#: src/postulo/templates/connections/pairing.html
+msgid "Back to connections"
+msgstr ""
+
 #: src/postulo/core/help.py
 msgid "Back to Documents"
 msgstr "«Құжаттар» бетіне оралу"
@@ -4132,6 +4174,10 @@ msgstr "«Құжаттар» бетіне оралу"
 #: src/postulo/templates/accounts/invite_created.html
 msgid "Back to invitations"
 msgstr "Шақырулар бетіне оралу"
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Back to it"
+msgstr ""
 
 #: src/postulo/core/help.py
 msgid "Back to Listings"
@@ -4468,6 +4514,10 @@ msgstr "Қоңырау"
 msgid "Callback to register with it"
 msgstr "Онда тіркелетін кері шақыру мекенжайы"
 
+#: src/postulo/templates/connections/pairing.html
+msgid "Can pair with"
+msgstr ""
+
 #: src/postulo/templates/accounts/invite_form.html
 #: src/postulo/templates/accounts/profile.html
 #: src/postulo/templates/applications/application_form.html
@@ -4479,6 +4529,7 @@ msgstr "Онда тіркелетін кері шақыру мекенжайы"
 #: src/postulo/templates/applications/tag_form.html
 #: src/postulo/templates/connections/confirm_delete.html
 #: src/postulo/templates/connections/form.html
+#: src/postulo/templates/connections/pairing_item.html
 #: src/postulo/templates/cotton/dialog.html
 #: src/postulo/templates/documents/cv_form.html
 #: src/postulo/templates/documents/cv_item_form.html
@@ -4852,6 +4903,10 @@ msgstr "Чиптер мен тегтер"
 msgid "Choices"
 msgstr "Нұсқалар"
 
+#: src/postulo/templates/connections/pairing_item.html
+msgid "Choose"
+msgstr ""
+
 #: src/postulo/core/personal.py
 msgid "Choose a country from the list."
 msgstr "Тізімнен елді таңдаңыз."
@@ -4898,6 +4953,18 @@ msgstr "Жаңа құпия сөз таңдау"
 msgid "Choose a package first."
 msgstr "Алдымен пакетті таңдаңыз."
 
+#: src/postulo/plugins/views_pairing.py
+msgid "Choose a pairing."
+msgstr ""
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Choose a record"
+msgstr ""
+
+#: src/postulo/plugins/views_pairing.py
+msgid "Choose a record to pair it with."
+msgstr ""
+
 #: src/postulo/applications/ical_import.py
 msgid "Choose a time zone"
 msgstr "Уақыт белдеуін таңдаңыз"
@@ -4909,6 +4976,11 @@ msgstr "Жүктеп салу үшін мұрағатты таңдаңыз."
 #: src/postulo/core/mail_auth.py
 msgid "Choose an identity provider and save it first."
 msgstr "Алдымен сәйкестендіру провайдерін таңдап, сақтаңыз."
+
+#: src/postulo/templates/connections/pairing.html
+#, python-format
+msgid "Choose an item to pair with <bdi>%(name)s</bdi>."
+msgstr ""
 
 #: src/postulo/templates/core/import_csv_map.html
 msgid "Choose another file"
@@ -4965,6 +5037,10 @@ msgstr "Идентификатор түрін таңдаңыз."
 #: src/postulo/templates/documents/cv_detail.html
 msgid "Choose what it prints instead"
 msgstr "Оның орнына не көрсетілетінін таңдау"
+
+#: src/postulo/plugins/views_pairing.py
+msgid "Choose what to do with the item."
+msgstr ""
 
 #: src/postulo/jobs/status_views.py
 msgid "Choose what was reported and the date."
@@ -5253,6 +5329,7 @@ msgstr "Компаниялар, вакансиялар, өтінімдер, тү
 #: src/postulo/applications/forms.py src/postulo/applications/reports.py
 #: src/postulo/applications/tables.py src/postulo/core/csv_import.py
 #: src/postulo/jobs/models.py src/postulo/jobs/tables.py
+#: src/postulo/plugins/pairing.py
 #: src/postulo/templates/applications/report.html
 #: src/postulo/templates/base.html
 #: src/postulo/templates/core/import_csv_map.html
@@ -5400,6 +5477,7 @@ msgid "Connection security"
 msgstr "Қосылым қауіпсіздігі"
 
 #: src/postulo/core/settings_sections.py src/postulo/plugins/views.py
+#: src/postulo/plugins/views_pairing.py
 #: src/postulo/templates/connections/list.html
 msgid "Connections"
 msgstr "Қосылымдар"
@@ -5424,7 +5502,7 @@ msgstr "Консалтинг"
 msgid "contact"
 msgstr "контакт"
 
-#: src/postulo/templates/jobs/contact_form.html
+#: src/postulo/plugins/pairing.py src/postulo/templates/jobs/contact_form.html
 msgid "Contact"
 msgstr "Контакт"
 
@@ -6025,7 +6103,7 @@ msgstr "тығыздық"
 msgid "department"
 msgstr "бөлім"
 
-#: src/postulo/jobs/forms.py
+#: src/postulo/jobs/forms.py src/postulo/plugins/pairing.py
 #: src/postulo/templates/applications/application_detail.html
 msgid "Department"
 msgstr "Бөлім"
@@ -7209,9 +7287,18 @@ msgstr "Postulo жасаған құжаттардан айырмашылығы, 
 msgid "Files you have already"
 msgstr "Бұрыннан бар файлдарыңыз"
 
+#: src/postulo/templates/connections/pairing_item.html
+#, python-format
+msgid "Fill from %(plugin)s and pair"
+msgstr ""
+
 #: src/postulo/templates/documents/letter_detail.html
 msgid "Fill in from"
 msgstr "Толтыру көзі"
+
+#: src/postulo/templates/connections/pairing_item.html
+msgid "Fill once, without pairing"
+msgstr ""
 
 #: src/postulo/resume/views.py
 #, python-format
@@ -7253,6 +7340,10 @@ msgstr "Тілді іздеу"
 #: src/postulo/templates/jobs/company_form.html
 msgid "Find logo"
 msgstr "Логотипті табу"
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Find on the other side"
+msgstr ""
 
 #: src/postulo/templates/jobs/industry_list.html
 msgid "Find one"
@@ -7465,6 +7556,10 @@ msgstr[1] ""
 #, python-format
 msgid "Found a logo at %(url)s."
 msgstr "Логотип табылды: %(url)s."
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Found on the other side"
+msgstr ""
 
 #: src/postulo/templates/connections/partials/option_table.html
 msgid "Found on the server"
@@ -8672,7 +8767,7 @@ msgstr "Ішкі"
 msgid "Internship"
 msgstr "Тағылымдама"
 
-#: src/postulo/applications/models.py
+#: src/postulo/applications/models.py src/postulo/plugins/pairing.py
 msgid "Interview"
 msgstr "Сұхбат"
 
@@ -8847,13 +8942,21 @@ msgstr ""
 msgid "it could not be imported"
 msgstr "оны импорттау мүмкін болмады"
 
+#: src/postulo/plugins/pairing.py
+msgid "It did not fill the record it was given."
+msgstr ""
+
 #: src/postulo/plugins/installing.py
 #, python-format
 msgid "it did not finish importing within %(seconds)ss"
 msgstr "ол %(seconds)s с ішінде импортталып бітпеді"
 
-#: src/postulo/plugins/views.py
+#: src/postulo/plugins/pairing.py src/postulo/plugins/views.py
 msgid "It did not say what it found."
+msgstr ""
+
+#: src/postulo/plugins/pairing.py
+msgid "It did not say what it made."
 msgstr ""
 
 #: src/postulo/templates/server/backups.html
@@ -9014,6 +9117,14 @@ msgstr "Ол пайдаланылғанша немесе күші жойылға
 #: src/postulo/plugins/views.py
 msgid "It works."
 msgstr "Жұмыс істейді."
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Item"
+msgstr ""
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Items found"
+msgstr ""
 
 #: src/postulo/jobs/register_views.py
 msgid "Its address is already listed."
@@ -9487,6 +9598,11 @@ msgstr "Жеткен соңғы кезең"
 msgid "last synced"
 msgstr "соңғы синхрондау"
 
+#: src/postulo/templates/connections/pairing.html
+#, python-format
+msgid "Last synced %(when)s"
+msgstr ""
+
 #: src/postulo/api/models.py
 msgid "last used"
 msgstr "соңғы пайдаланылған уақыты"
@@ -9633,6 +9749,11 @@ msgstr "Құқықтық ақпарат"
 #: src/postulo/jobs/models.py
 msgid "legal state"
 msgstr "құқықтық жағдай"
+
+#: src/postulo/templates/connections/pairing.html
+#, python-format
+msgid "Let %(plugin)s make a new one"
+msgstr ""
 
 #: src/postulo/core/server_forms.py
 msgid "Let a capture keep a rendering of its page"
@@ -9942,6 +10063,11 @@ msgstr "Кіші әріптер, цифрлар, нүктелер, астын с
 #: src/postulo/templates/server/person_recovery.html
 msgid "Made"
 msgstr "Жасалған"
+
+#: src/postulo/plugins/views_pairing.py
+#, python-format
+msgid "Made %(record)s from %(item)s, without pairing them."
+msgstr ""
 
 #: src/postulo/core/models.py
 msgid "mail failures in a row"
@@ -11189,6 +11315,10 @@ msgstr "Компанияларыңыздың ешқайсысында мұнда
 msgid "None of your own yet. A CV in another language prints the name the ESCO classification gives this skill there, and the name as you wrote it where the classification gives none."
 msgstr "Әзірге өзіңіздікі жоқ. Басқа тілдегі түйіндеме ESCO жіктеуіші бұл дағдыға сол тілде берген атауды, ал жіктеуіште атау жоқ жерде сіз жазған атауды басып шығарады."
 
+#: src/postulo/templates/connections/pairing_item.html
+msgid "None of your records matches."
+msgstr ""
+
 #: src/postulo/templates/applications/partials/reminders.html
 msgid "None outstanding."
 msgstr "Орындалмағандары жоқ."
@@ -11329,6 +11459,10 @@ msgstr "Бетте жоқ — әдепкі мән. Тек сомамен бір�
 msgid "Not one of these"
 msgstr "Бұлардың ешқайсысы емес"
 
+#: src/postulo/templates/connections/pairing.html
+msgid "Not paired yet"
+msgstr ""
+
 #: src/postulo/jobs/forms.py
 msgid "Not part of another company"
 msgstr "Басқа компанияның құрамында емес"
@@ -11405,6 +11539,10 @@ msgstr "Көрсетілмейді · %(name)s"
 #: src/postulo/resume/models.py
 msgid "Not stated"
 msgstr "Көрсетілмеген"
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Not synced yet"
+msgstr ""
 
 #: src/postulo/templates/connections/list.html
 msgid "not tested yet"
@@ -11494,6 +11632,10 @@ msgstr "компаниялар туралы ескертпелер"
 msgid "notes on contacts"
 msgstr "контактілер туралы ескертпелер"
 
+#: src/postulo/templates/connections/pairing.html
+msgid "Nothing"
+msgstr ""
+
 #: src/postulo/templates/server/plugins.html
 msgid "nothing"
 msgstr "ештеңе"
@@ -11516,6 +11658,10 @@ msgid "Nothing fills in %(names)s, so it goes out blank."
 msgid_plural "Nothing fills in %(names)s, so they go out blank."
 msgstr[0] "Мына толтырғышты ештеңе толтырмайды, сондықтан ол бос жіберіледі: %(names)s."
 msgstr[1] "Мына толтырғыштарды ештеңе толтырмайды, сондықтан олар бос жіберіледі: %(names)s."
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Nothing found on the other side."
+msgstr ""
 
 #: src/postulo/templates/jobs/posting_detail.html
 msgid "Nothing has arrived about this one yet."
@@ -11616,6 +11762,10 @@ msgstr "Мұнда әлі ештеңе орнатылмаған. Плагинд�
 #: src/postulo/templates/server/plugins.html
 msgid "Nothing is installed that a person can hold an opinion about."
 msgstr "Адам пікір білдіре алатын ештеңе орнатылмаған."
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Nothing is paired on this connection yet."
+msgstr ""
 
 #: src/postulo/templates/jobs/capture_form.html
 msgid "Nothing is saved until you have reviewed it."
@@ -12070,6 +12220,10 @@ msgstr "Түсірілімдерді қарап шығу бетінде «d» ш
 #, python-format
 msgid "On the map at %(how)s."
 msgstr "Картадағы орны: %(how)s."
+
+#: src/postulo/templates/connections/pairing.html
+msgid "On the other side"
+msgstr ""
 
 #: src/postulo/templates/applications/suggestion_list.html
 msgid "On the timeline"
@@ -12744,6 +12898,65 @@ msgstr "Түсірілімдерден сақталған беттер"
 #: src/postulo/templates/partials/table/pagination.html
 msgid "Pagination"
 msgstr "Беттерге бөлу"
+
+#: src/postulo/templates/connections/pairing.html
+#: src/postulo/templates/connections/pairing_item.html
+msgid "Pair"
+msgstr ""
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Pair again"
+msgstr ""
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Pair what is on the other side with your own records, or undo a pairing. Both sides are kept either way."
+msgstr ""
+
+#: src/postulo/templates/cotton/pairing_line.html
+#, python-format
+msgid "Pair with an item on <bdi>%(connection)s</bdi>…"
+msgstr ""
+
+#: src/postulo/templates/connections/pairing_item.html
+#, python-format
+msgid "Pair with: %(kind)s"
+msgstr ""
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Paired"
+msgstr ""
+
+#: src/postulo/plugins/views_pairing.py
+#, python-format
+msgid "Paired %(item)s with %(record)s. The next sync compares the two."
+msgstr ""
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Paired records"
+msgstr ""
+
+#: src/postulo/templates/cotton/pairing_line.html
+#, python-format
+msgid "Paired through <bdi>%(connection)s</bdi>, last synced %(when)s"
+msgstr ""
+
+#: src/postulo/templates/cotton/pairing_line.html
+#, python-format
+msgid "Paired through <bdi>%(connection)s</bdi>, not synced yet"
+msgstr ""
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Paired with"
+msgstr ""
+
+#: src/postulo/templates/connections/list.html
+msgid "Pairing"
+msgstr ""
+
+#: src/postulo/templates/connections/pairing.html
+#, python-format
+msgid "Pairing on %(label)s"
+msgstr ""
 
 #: src/postulo/applications/models.py
 msgid "Panel"
@@ -13954,6 +14167,8 @@ msgid "Recipient"
 msgstr "Алушы"
 
 #: src/postulo/templates/applications/partials/status_card.html
+#: src/postulo/templates/connections/pairing.html
+#: src/postulo/templates/connections/pairing_item.html
 msgid "Record"
 msgstr "Тіркеу"
 
@@ -14081,6 +14296,11 @@ msgid "Records older than %(cutoff)s (%(days)s day). Nothing was removed; this i
 msgid_plural "Records older than %(cutoff)s (%(days)s days). Nothing was removed; this is the report a deletion would be made from."
 msgstr[0] "%(cutoff)s күнінен ескі жазбалар (%(days)s күн). Ештеңе жойылмады; жою жасалса, осы есепке сүйенер еді."
 msgstr[1] "%(cutoff)s күнінен ескі жазбалар (%(days)s күн). Ештеңе жойылмады; жою жасалса, осы есепке сүйенер еді."
+
+#: src/postulo/templates/connections/pairing.html
+#, python-format
+msgid "Records paired on %(label)s"
+msgstr ""
 
 #: src/postulo/templates/server/person_recovery.html
 msgid "Recovery"
@@ -14263,6 +14483,7 @@ msgstr "Маған бір күн бұрын еске салу"
 msgid "reminder"
 msgstr "еске салғыш"
 
+#: src/postulo/plugins/pairing.py
 #: src/postulo/templates/applications/reminder_form.html
 #: src/postulo/templates/base.html
 msgid "Reminder"
@@ -14365,6 +14586,15 @@ msgstr "Алып тастау: {label}"
 #: src/postulo/plugins/models.py
 msgid "removed on the other side"
 msgstr "екінші жақта жойылған"
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Removed on the other side"
+msgstr ""
+
+#: src/postulo/templates/cotton/pairing_line.html
+#, python-format
+msgid "Removed on the other side of <bdi>%(connection)s</bdi>"
+msgstr ""
 
 #: src/postulo/core/models.py
 msgid "Removed there"
@@ -14815,7 +15045,9 @@ msgstr "рұқсат аялары"
 msgid "Screening"
 msgstr "Алғашқы іріктеу"
 
-#: src/postulo/core/tables.py src/postulo/templates/core/search.html
+#: src/postulo/core/tables.py src/postulo/templates/connections/pairing.html
+#: src/postulo/templates/connections/pairing_item.html
+#: src/postulo/templates/core/search.html
 #: src/postulo/templates/cotton/site_search.html
 #: src/postulo/templates/jobs/industry_list.html
 msgid "Search"
@@ -14857,6 +15089,10 @@ msgstr "Күнтізбеден іздеу"
 #: src/postulo/documents/views.py
 msgid "Search what you sent"
 msgstr "Жіберген нәрселеріңізден іздеу"
+
+#: src/postulo/templates/connections/pairing_item.html
+msgid "Search your records"
+msgstr ""
 
 #: src/postulo/core/server_forms.py
 msgid "Seconds to wait for the server before giving up."
@@ -15403,6 +15639,10 @@ msgstr "Бұл мекенжайды картада көрсету керек п�
 msgid "Show this period"
 msgstr "Осы уақыт аралығын көрсету"
 
+#: src/postulo/templates/connections/pairing.html
+msgid "Show unpaired"
+msgstr ""
+
 #: src/postulo/jobs/tables.py
 #: src/postulo/templates/applications/calendar_print.html
 #: src/postulo/templates/jobs/partials/whose_form.html
@@ -15894,7 +16134,8 @@ msgstr "STARTTLS, қосылғаннан кейін"
 msgid "state"
 msgstr "күйі"
 
-#: src/postulo/jobs/tables.py src/postulo/templates/jobs/company_register.html
+#: src/postulo/jobs/tables.py src/postulo/templates/connections/pairing.html
+#: src/postulo/templates/jobs/company_register.html
 #: src/postulo/templates/server/person_recovery.html
 msgid "State"
 msgstr "Күйі"
@@ -16146,6 +16387,7 @@ msgid "sync links"
 msgstr "синхрондау байланыстары"
 
 #: src/postulo/templates/connections/list.html
+#: src/postulo/templates/connections/pairing.html
 msgid "Sync now"
 msgstr "Қазір синхрондау"
 
@@ -16656,6 +16898,13 @@ msgstr "Бұл кескін қажетінен әлдеқайда үлкен."
 msgid "That invitation has already been accepted and cannot be revoked."
 msgstr "Бұл шақыру бұрын қабылданған, сондықтан оның күшін жою мүмкін емес."
 
+#: src/postulo/plugins/views.py
+#, python-format
+msgid "That is a lot of questions to the server. Try again in %(seconds)d second."
+msgid_plural "That is a lot of questions to the server. Try again in %(seconds)d seconds."
+msgstr[0] ""
+msgstr[1] ""
+
 #: src/postulo/core/server_views.py
 msgid "That is a lot of recovery links. Try again shortly."
 msgstr "Қалпына келтіру сілтемелері тым көп. Сәлден кейін қайталап көріңіз."
@@ -16857,6 +17106,23 @@ msgstr "Бұл — бүкіл тіркелгінің экспорты. Бұл б
 msgid "That is the last administrator. Appoint another first."
 msgstr "Бұл — соңғы әкімші. Алдымен басқасын тағайындаңыз."
 
+#: src/postulo/plugins/pairing.py
+msgid "That item cannot be made into one of those."
+msgstr ""
+
+#: src/postulo/plugins/views_pairing.py
+msgid "That item cannot be paired with one of those."
+msgstr ""
+
+#: src/postulo/plugins/views_pairing.py
+#, python-format
+msgid "That item is already paired with %(record)s. Unpair it first."
+msgstr ""
+
+#: src/postulo/plugins/pairing.py
+msgid "That item is no longer on the other side."
+msgstr ""
+
 #: src/postulo/templates/account/recovery_unusable.html
 msgid "That link cannot be used"
 msgstr "Бұл сілтемені пайдалану мүмкін емес"
@@ -16946,6 +17212,10 @@ msgstr[1] "Бет %(seconds)s секундтан ұзақ келді, сонды
 #, python-format
 msgid "That page was sent with the content encoding “%(coding)s”, which Postulo does not unpack, so it was not read."
 msgstr "Бет «%(coding)s» мазмұн кодтауымен жіберілген, Postulo оны ашпайды, сондықтан ол оқылмады."
+
+#: src/postulo/plugins/views_pairing.py
+msgid "That pairing still has its other side."
+msgstr ""
 
 #: src/postulo/applications/forms.py
 msgid "That person is not recorded at this service."
@@ -19250,6 +19520,10 @@ msgstr "Шешім күтуде"
 msgid "To hand over a posting (needs the captures scope):"
 msgstr "Вакансияны жіберу үшін (captures рұқсат аясы қажет):"
 
+#: src/postulo/templates/connections/pairing.html
+msgid "To pair with"
+msgstr ""
+
 #: src/postulo/templates/documents/cv_detail.html
 msgid "To see where the pages break. A draft is kept nowhere; Export PDF is what files a version."
 msgstr "Беттердің қай жерде бөлінетінін көру үшін. Нобай ешқайда сақталмайды; нұсқаны тек «PDF ретінде экспорттау» сақтайды."
@@ -19375,6 +19649,7 @@ msgid "Two-factor authentication"
 msgstr "Екі факторлы аутентификация"
 
 #: src/postulo/accounts/models.py src/postulo/jobs/tables.py
+#: src/postulo/templates/connections/pairing_item.html
 #: src/postulo/templates/cotton/identifier_row.html
 #: src/postulo/templates/jobs/capture_page.html
 #: src/postulo/templates/partials/phone_numbers.html
@@ -19521,8 +19796,18 @@ msgstr "Телефон нөмірінен айырмашылығы, мекенж
 msgid "Unlike a telephone number, an address is not kept once on this instance, because people share a home; you cannot list the same one twice yourself. The bin removes a row at once, after asking, without waiting for <em>Save</em>."
 msgstr "Телефон нөмірінен айырмашылығы, мекенжай осы данада бір рет қана сақталмайды, себебі адамдар бір үйде тұруы мүмкін; бірақ бір мекенжайды өзіңіз екі рет тізімге енгізе алмайсыз. Қоқыс жәшігі белгісі сұрағаннан кейін, <em>Сақтау</em> түймесін күтпей-ақ жолды бірден алып тастайды."
 
+#: src/postulo/templates/connections/pairing.html
+#: src/postulo/templates/cotton/pairing_line.html
+msgid "Unpair"
+msgstr ""
+
 #: src/postulo/plugins/models.py
 msgid "unpaired"
+msgstr ""
+
+#: src/postulo/plugins/views_pairing.py
+#, python-format
+msgid "Unpaired. Both sides are kept, and %(connection)s leaves them alone."
 msgstr ""
 
 #: src/postulo/resume/publications.py
@@ -21180,9 +21465,14 @@ msgstr "Иә: сәйкестендіру провайдері арқылы ке�
 msgid "Yes: somebody who has forgotten their password can ask for a code at their primary address and type it back. A code rather than a link, because mail scanners follow links and would spend one before the person read it. It is never a second factor: an authenticator app is still asked for. Offered only while this instance's mail is actually getting through."
 msgstr "Иә: құпия сөзін ұмытқан адам негізгі мекенжайына код сұрап, оны қайта енгізе алады. Сілтеме емес, код, себебі пошта сканерлері сілтемелерді ашады және адам хатты оқымай тұрып оны пайдаланып қояды. Бұл ешқашан екінші фактор емес: аутентификатор қолданбасы бәрібір сұралады. Осы дананың поштасы шынымен жетіп тұрғанда ғана ұсынылады."
 
-#: src/postulo/jobs/views.py
+#: src/postulo/jobs/views.py src/postulo/plugins/pairing.py
 msgid "You"
 msgstr "Сіз"
+
+#: src/postulo/plugins/pairing.py
+#, python-format
+msgid "You (%(name)s)"
+msgstr ""
 
 #: src/postulo/api/routers/companies.py src/postulo/jobs/forms.py
 #: src/postulo/jobs/surface.py
@@ -21642,6 +21932,10 @@ msgid "Your record lists %(total)s public work; the first %(most)s are shown."
 msgid_plural "Your record lists %(total)s public works; the first %(most)s are shown."
 msgstr[0] ""
 msgstr[1] ""
+
+#: src/postulo/templates/connections/pairing_item.html
+msgid "Your records"
+msgstr ""
 
 #: src/postulo/resume/models.py
 msgid "your role"

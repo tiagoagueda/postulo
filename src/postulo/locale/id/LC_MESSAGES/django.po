@@ -1117,6 +1117,11 @@ msgstr "%(person)s adalah anggota terakhir %(name)s, yang masih memiliki rekaman
 msgid "%(plugin)s could not check these settings: %(error)s"
 msgstr "%(plugin)s tidak dapat memeriksa pengaturan ini: %(error)s"
 
+#: src/postulo/plugins/views_pairing.py
+#, python-format
+msgid "%(plugin)s could not do that: %(message)s"
+msgstr ""
+
 #: src/postulo/plugins/views.py
 #, python-format
 msgid "%(plugin)s could not look on the server: %(message)s"
@@ -1125,6 +1130,11 @@ msgstr ""
 #: src/postulo/plugins/views.py
 #, python-format
 msgid "%(plugin)s has nothing to look for."
+msgstr ""
+
+#: src/postulo/plugins/views_pairing.py
+#, python-format
+msgid "%(plugin)s makes a new one on its next run."
 msgstr ""
 
 #: src/postulo/core/mail_auth.py
@@ -2214,6 +2224,11 @@ msgstr "Nama bukanlah identitas: dua peneliti dapat memiliki nama yang sama, dan
 msgid "A new one"
 msgstr "Yang baru"
 
+#: src/postulo/templates/connections/pairing_item.html
+#, python-format
+msgid "A new one: %(kind)s"
+msgstr ""
+
 #: src/postulo/templates/server/design.html
 msgid "A number and what it counts. The colour is a second signal, never the only one."
 msgstr "Angka dan apa yang dihitungnya. Warna adalah sinyal kedua, tidak pernah satu-satunya."
@@ -2404,6 +2419,10 @@ msgstr "Log yang sepi adalah log yang Anda harapkan."
 #: src/postulo/resume/forms.py
 msgid "A range such as 41–52, or one page."
 msgstr "Rentang seperti 41–52, atau satu halaman."
+
+#: src/postulo/templates/connections/pairing.html
+msgid "A record since deleted"
+msgstr ""
 
 #: src/postulo/documents/forms.py
 msgid "A referee who is not a contact yet. Their name is enough; it is added to your contacts without a company, and is used instead of the choice above."
@@ -2758,6 +2777,7 @@ msgid "Across the whole file, rows are skipped for want of a company or a role. 
 msgstr "Di seluruh berkas, baris dilewati jika tidak ada perusahaan atau peran. Baris yang sudah tercatat ditemukan dan dilewati saat diimpor."
 
 #: src/postulo/templates/accounts/invite_list.html
+#: src/postulo/templates/connections/pairing.html
 #: src/postulo/templates/documents/rendered_list.html
 #: src/postulo/templates/server/backups.html
 #: src/postulo/templates/server/people.html
@@ -3172,6 +3192,11 @@ msgstr "Sudah diputuskan —"
 msgid "Already in your record"
 msgstr "Sudah ada di catatan Anda"
 
+#: src/postulo/templates/connections/pairing_item.html
+#, python-format
+msgid "Already paired with <bdi>%(name)s</bdi>. Unpair it on the pairing page to pair it with something else."
+msgstr ""
+
 #: src/postulo/applications/agenda.py
 msgid "Already sent —"
 msgstr "Sudah dikirim —"
@@ -3494,6 +3519,10 @@ msgstr "Sektor apa pun"
 msgid "Anyone holding the link may use it, once. Send it however you like."
 msgstr "Siapa pun yang memegang tautan ini dapat menggunakannya, satu kali. Kirimkan dengan cara apa pun yang Anda suka."
 
+#: src/postulo/templates/connections/pairing.html
+msgid "Anything"
+msgstr ""
+
 #: src/postulo/resume/forms.py
 msgid "Anything a reader should know, in a few words."
 msgstr "Apa pun yang perlu diketahui pembaca, dalam beberapa kata."
@@ -3546,7 +3575,7 @@ msgstr "Token API"
 msgid "Appearance"
 msgstr "Tampilan"
 
-#: src/postulo/applications/ical_import.py
+#: src/postulo/applications/ical_import.py src/postulo/plugins/pairing.py
 #: src/postulo/templates/applications/suggestion_list.html
 #: src/postulo/templates/base.html
 #: src/postulo/templates/documents/letter_detail.html
@@ -3846,6 +3875,10 @@ msgstr "Sebagai teks biasa"
 msgid "As the institution words it. Kept in your record; a CV does not print it yet."
 msgstr "Seperti yang dituliskan institusinya. Disimpan di riwayat Anda; CV belum mencetaknya."
 
+#: src/postulo/templates/connections/pairing.html
+msgid "As the last sync left them. Unpairing keeps both sides, and the next sync leaves them alone."
+msgstr ""
+
 #: src/postulo/jobs/forms.py
 msgid "As the posting words it — a city, a region, a country. Free text: nothing is looked up anywhere."
 msgstr "Sesuai kata-kata di lowongan — kota, wilayah, negara. Teks bebas: tidak ada yang dicari di mana pun."
@@ -3884,6 +3917,11 @@ msgstr "Sudah ditanya"
 
 #: src/postulo/templates/server/record_of_processing.html
 msgid "Asked only when somebody presses for it, one company at a time. Each is sent what is listed and nothing about the person asking."
+msgstr ""
+
+#: src/postulo/templates/connections/pairing.html
+#, python-format
+msgid "Asks %(plugin)s now. Nothing it answers is kept here."
 msgstr ""
 
 #: src/postulo/applications/analytics.py src/postulo/applications/models.py
@@ -4021,6 +4059,10 @@ msgstr "Kembali ke lowongan Anda."
 msgid "Back to Backups"
 msgstr "Kembali ke Cadangan"
 
+#: src/postulo/templates/connections/pairing.html
+msgid "Back to connections"
+msgstr ""
+
 #: src/postulo/core/help.py
 msgid "Back to Documents"
 msgstr "Kembali ke Dokumen"
@@ -4028,6 +4070,10 @@ msgstr "Kembali ke Dokumen"
 #: src/postulo/templates/accounts/invite_created.html
 msgid "Back to invitations"
 msgstr "Kembali ke undangan"
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Back to it"
+msgstr ""
 
 #: src/postulo/core/help.py
 msgid "Back to Listings"
@@ -4361,6 +4407,10 @@ msgstr "Panggilan"
 msgid "Callback to register with it"
 msgstr "Callback yang didaftarkan ke penyedia itu"
 
+#: src/postulo/templates/connections/pairing.html
+msgid "Can pair with"
+msgstr ""
+
 #: src/postulo/templates/accounts/invite_form.html
 #: src/postulo/templates/accounts/profile.html
 #: src/postulo/templates/applications/application_form.html
@@ -4372,6 +4422,7 @@ msgstr "Callback yang didaftarkan ke penyedia itu"
 #: src/postulo/templates/applications/tag_form.html
 #: src/postulo/templates/connections/confirm_delete.html
 #: src/postulo/templates/connections/form.html
+#: src/postulo/templates/connections/pairing_item.html
 #: src/postulo/templates/cotton/dialog.html
 #: src/postulo/templates/documents/cv_form.html
 #: src/postulo/templates/documents/cv_item_form.html
@@ -4740,6 +4791,10 @@ msgstr "Chip dan tag"
 msgid "Choices"
 msgstr "Pilihan"
 
+#: src/postulo/templates/connections/pairing_item.html
+msgid "Choose"
+msgstr ""
+
 #: src/postulo/core/personal.py
 msgid "Choose a country from the list."
 msgstr "Pilih negara dari daftar."
@@ -4787,6 +4842,18 @@ msgstr "Pilih kata sandi baru"
 msgid "Choose a package first."
 msgstr "Pilih paket terlebih dahulu."
 
+#: src/postulo/plugins/views_pairing.py
+msgid "Choose a pairing."
+msgstr ""
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Choose a record"
+msgstr ""
+
+#: src/postulo/plugins/views_pairing.py
+msgid "Choose a record to pair it with."
+msgstr ""
+
 #: src/postulo/applications/ical_import.py
 msgid "Choose a time zone"
 msgstr "Pilih zona waktu"
@@ -4798,6 +4865,11 @@ msgstr "Pilih arsip untuk diunggah."
 #: src/postulo/core/mail_auth.py
 msgid "Choose an identity provider and save it first."
 msgstr "Pilih penyedia identitas dan simpan dulu."
+
+#: src/postulo/templates/connections/pairing.html
+#, python-format
+msgid "Choose an item to pair with <bdi>%(name)s</bdi>."
+msgstr ""
 
 #: src/postulo/templates/core/import_csv_map.html
 msgid "Choose another file"
@@ -4855,6 +4927,10 @@ msgstr "Pilih jenis pengenal."
 #: src/postulo/templates/documents/cv_detail.html
 msgid "Choose what it prints instead"
 msgstr "Pilih yang ditampilkan sebagai gantinya"
+
+#: src/postulo/plugins/views_pairing.py
+msgid "Choose what to do with the item."
+msgstr ""
 
 #: src/postulo/jobs/status_views.py
 #, fuzzy
@@ -5141,6 +5217,7 @@ msgstr "Perusahaan, lowongan, lamaran, tangkapan, dan dokumen juga tidak termasu
 #: src/postulo/applications/forms.py src/postulo/applications/reports.py
 #: src/postulo/applications/tables.py src/postulo/core/csv_import.py
 #: src/postulo/jobs/models.py src/postulo/jobs/tables.py
+#: src/postulo/plugins/pairing.py
 #: src/postulo/templates/applications/report.html
 #: src/postulo/templates/base.html
 #: src/postulo/templates/core/import_csv_map.html
@@ -5286,6 +5363,7 @@ msgid "Connection security"
 msgstr "Keamanan koneksi"
 
 #: src/postulo/core/settings_sections.py src/postulo/plugins/views.py
+#: src/postulo/plugins/views_pairing.py
 #: src/postulo/templates/connections/list.html
 msgid "Connections"
 msgstr "Koneksi"
@@ -5310,7 +5388,7 @@ msgstr "Konsultasi"
 msgid "contact"
 msgstr "kontak"
 
-#: src/postulo/templates/jobs/contact_form.html
+#: src/postulo/plugins/pairing.py src/postulo/templates/jobs/contact_form.html
 msgid "Contact"
 msgstr "Kontak"
 
@@ -5907,7 +5985,7 @@ msgstr "kepadatan"
 msgid "department"
 msgstr "departemen"
 
-#: src/postulo/jobs/forms.py
+#: src/postulo/jobs/forms.py src/postulo/plugins/pairing.py
 #: src/postulo/templates/applications/application_detail.html
 msgid "Department"
 msgstr "Departemen"
@@ -7086,9 +7164,18 @@ msgstr "Berkas yang sudah Anda miliki, bukan dokumen yang dibuat oleh Postulo."
 msgid "Files you have already"
 msgstr "Berkas yang sudah Anda miliki"
 
+#: src/postulo/templates/connections/pairing_item.html
+#, python-format
+msgid "Fill from %(plugin)s and pair"
+msgstr ""
+
 #: src/postulo/templates/documents/letter_detail.html
 msgid "Fill in from"
 msgstr "Isi dari"
+
+#: src/postulo/templates/connections/pairing_item.html
+msgid "Fill once, without pairing"
+msgstr ""
 
 #: src/postulo/resume/views.py
 #, python-format
@@ -7130,6 +7217,10 @@ msgstr "Cari bahasa"
 #: src/postulo/templates/jobs/company_form.html
 msgid "Find logo"
 msgstr "Cari logo"
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Find on the other side"
+msgstr ""
 
 #: src/postulo/templates/jobs/industry_list.html
 msgid "Find one"
@@ -7338,6 +7429,10 @@ msgstr[0] ""
 #, python-format
 msgid "Found a logo at %(url)s."
 msgstr "Logo ditemukan di %(url)s."
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Found on the other side"
+msgstr ""
 
 #: src/postulo/templates/connections/partials/option_table.html
 msgid "Found on the server"
@@ -8540,7 +8635,7 @@ msgstr "Internal"
 msgid "Internship"
 msgstr "Magang"
 
-#: src/postulo/applications/models.py
+#: src/postulo/applications/models.py src/postulo/plugins/pairing.py
 msgid "Interview"
 msgstr "Wawancara"
 
@@ -8715,13 +8810,21 @@ msgstr ""
 msgid "it could not be imported"
 msgstr "tidak dapat diimpor"
 
+#: src/postulo/plugins/pairing.py
+msgid "It did not fill the record it was given."
+msgstr ""
+
 #: src/postulo/plugins/installing.py
 #, python-format
 msgid "it did not finish importing within %(seconds)ss"
 msgstr "impornya tidak selesai dalam %(seconds)ss"
 
-#: src/postulo/plugins/views.py
+#: src/postulo/plugins/pairing.py src/postulo/plugins/views.py
 msgid "It did not say what it found."
+msgstr ""
+
+#: src/postulo/plugins/pairing.py
+msgid "It did not say what it made."
 msgstr ""
 
 #: src/postulo/templates/server/backups.html
@@ -8878,6 +8981,14 @@ msgstr "Berlaku hingga %(when)s, atau hingga digunakan atau dicabut."
 #: src/postulo/plugins/views.py
 msgid "It works."
 msgstr "Berfungsi."
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Item"
+msgstr ""
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Items found"
+msgstr ""
 
 #: src/postulo/jobs/register_views.py
 msgid "Its address is already listed."
@@ -9347,6 +9458,11 @@ msgstr "Tahap terakhir yang dicapai"
 msgid "last synced"
 msgstr "terakhir disinkronkan"
 
+#: src/postulo/templates/connections/pairing.html
+#, python-format
+msgid "Last synced %(when)s"
+msgstr ""
+
 #: src/postulo/api/models.py
 msgid "last used"
 msgstr "terakhir digunakan"
@@ -9494,6 +9610,11 @@ msgstr "Pemberitahuan hukum"
 #, fuzzy
 msgid "legal state"
 msgstr "keadaan legal"
+
+#: src/postulo/templates/connections/pairing.html
+#, python-format
+msgid "Let %(plugin)s make a new one"
+msgstr ""
 
 #: src/postulo/core/server_forms.py
 msgid "Let a capture keep a rendering of its page"
@@ -9802,6 +9923,11 @@ msgstr "Huruf kecil, angka, titik, garis bawah, dan tanda hubung."
 #: src/postulo/templates/server/person_recovery.html
 msgid "Made"
 msgstr "Dibuat"
+
+#: src/postulo/plugins/views_pairing.py
+#, python-format
+msgid "Made %(record)s from %(item)s, without pairing them."
+msgstr ""
 
 #: src/postulo/core/models.py
 msgid "mail failures in a row"
@@ -11050,6 +11176,10 @@ msgstr "Tidak ada perusahaan Anda yang memiliki nama atau pengenal ini."
 msgid "None of your own yet. A CV in another language prints the name the ESCO classification gives this skill there, and the name as you wrote it where the classification gives none."
 msgstr "Belum ada terjemahan Anda sendiri. CV dalam bahasa lain menampilkan nama yang diberikan klasifikasi ESCO untuk keterampilan ini dalam bahasa itu, dan nama seperti yang Anda tulis jika klasifikasi tidak memberikannya."
 
+#: src/postulo/templates/connections/pairing_item.html
+msgid "None of your records matches."
+msgstr ""
+
 #: src/postulo/templates/applications/partials/reminders.html
 msgid "None outstanding."
 msgstr "Tidak ada yang tertunda."
@@ -11190,6 +11320,10 @@ msgstr "Tidak ada di halaman — nilai bawaan. Disimpan hanya bersama jumlah."
 msgid "Not one of these"
 msgstr "Bukan salah satu dari ini"
 
+#: src/postulo/templates/connections/pairing.html
+msgid "Not paired yet"
+msgstr ""
+
 #: src/postulo/jobs/forms.py
 msgid "Not part of another company"
 msgstr "Bukan bagian dari perusahaan lain"
@@ -11267,6 +11401,10 @@ msgstr "Tidak ditampilkan · %(name)s"
 #: src/postulo/resume/models.py
 msgid "Not stated"
 msgstr "Tidak disebutkan"
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Not synced yet"
+msgstr ""
 
 #: src/postulo/templates/connections/list.html
 msgid "not tested yet"
@@ -11357,6 +11495,10 @@ msgstr "catatan pada perusahaan"
 msgid "notes on contacts"
 msgstr "catatan pada kontak"
 
+#: src/postulo/templates/connections/pairing.html
+msgid "Nothing"
+msgstr ""
+
 #: src/postulo/templates/server/plugins.html
 msgid "nothing"
 msgstr "tidak ada"
@@ -11378,6 +11520,10 @@ msgstr "Tidak ada yang jatuh tempo. Catatan tenang yang ditinggalkan petak dasbo
 msgid "Nothing fills in %(names)s, so it goes out blank."
 msgid_plural "Nothing fills in %(names)s, so they go out blank."
 msgstr[0] "Tidak ada yang mengisi %(names)s, jadi akan terkirim dalam keadaan kosong."
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Nothing found on the other side."
+msgstr ""
 
 #: src/postulo/templates/jobs/posting_detail.html
 msgid "Nothing has arrived about this one yet."
@@ -11475,6 +11621,10 @@ msgstr "Belum ada yang terpasang di sini. Plugin disimpan di %(directory)s, di v
 #: src/postulo/templates/server/plugins.html
 msgid "Nothing is installed that a person can hold an opinion about."
 msgstr "Tidak ada yang terpasang yang dapat diatur sendiri oleh seseorang."
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Nothing is paired on this connection yet."
+msgstr ""
 
 #: src/postulo/templates/jobs/capture_form.html
 msgid "Nothing is saved until you have reviewed it."
@@ -11926,6 +12076,10 @@ msgstr "Di tinjauan tangkapan, “d” membuang lalu lanjut dan “j” melewati
 #, python-format
 msgid "On the map at %(how)s."
 msgstr "Di peta pada %(how)s."
+
+#: src/postulo/templates/connections/pairing.html
+msgid "On the other side"
+msgstr ""
 
 #: src/postulo/templates/applications/suggestion_list.html
 msgid "On the timeline"
@@ -12578,6 +12732,65 @@ msgstr "Halaman yang disimpan dari tangkapan"
 #: src/postulo/templates/partials/table/pagination.html
 msgid "Pagination"
 msgstr "Penomoran halaman"
+
+#: src/postulo/templates/connections/pairing.html
+#: src/postulo/templates/connections/pairing_item.html
+msgid "Pair"
+msgstr ""
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Pair again"
+msgstr ""
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Pair what is on the other side with your own records, or undo a pairing. Both sides are kept either way."
+msgstr ""
+
+#: src/postulo/templates/cotton/pairing_line.html
+#, python-format
+msgid "Pair with an item on <bdi>%(connection)s</bdi>…"
+msgstr ""
+
+#: src/postulo/templates/connections/pairing_item.html
+#, python-format
+msgid "Pair with: %(kind)s"
+msgstr ""
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Paired"
+msgstr ""
+
+#: src/postulo/plugins/views_pairing.py
+#, python-format
+msgid "Paired %(item)s with %(record)s. The next sync compares the two."
+msgstr ""
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Paired records"
+msgstr ""
+
+#: src/postulo/templates/cotton/pairing_line.html
+#, python-format
+msgid "Paired through <bdi>%(connection)s</bdi>, last synced %(when)s"
+msgstr ""
+
+#: src/postulo/templates/cotton/pairing_line.html
+#, python-format
+msgid "Paired through <bdi>%(connection)s</bdi>, not synced yet"
+msgstr ""
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Paired with"
+msgstr ""
+
+#: src/postulo/templates/connections/list.html
+msgid "Pairing"
+msgstr ""
+
+#: src/postulo/templates/connections/pairing.html
+#, python-format
+msgid "Pairing on %(label)s"
+msgstr ""
 
 #: src/postulo/applications/models.py
 msgid "Panel"
@@ -13786,6 +13999,8 @@ msgid "Recipient"
 msgstr "Penerima"
 
 #: src/postulo/templates/applications/partials/status_card.html
+#: src/postulo/templates/connections/pairing.html
+#: src/postulo/templates/connections/pairing_item.html
 msgid "Record"
 msgstr "Catat"
 
@@ -13914,6 +14129,11 @@ msgstr "Rekaman ganda, dan hal yang perlu diputuskan"
 msgid "Records older than %(cutoff)s (%(days)s day). Nothing was removed; this is the report a deletion would be made from."
 msgid_plural "Records older than %(cutoff)s (%(days)s days). Nothing was removed; this is the report a deletion would be made from."
 msgstr[0] "Catatan yang lebih lama dari %(cutoff)s (%(days)s hari). Tidak ada yang dihapus; ini adalah laporan yang akan menjadi dasar penghapusan."
+
+#: src/postulo/templates/connections/pairing.html
+#, python-format
+msgid "Records paired on %(label)s"
+msgstr ""
 
 #: src/postulo/templates/server/person_recovery.html
 msgid "Recovery"
@@ -14096,6 +14316,7 @@ msgstr "Ingatkan saya sehari sebelumnya"
 msgid "reminder"
 msgstr "pengingat"
 
+#: src/postulo/plugins/pairing.py
 #: src/postulo/templates/applications/reminder_form.html
 #: src/postulo/templates/base.html
 msgid "Reminder"
@@ -14200,6 +14421,15 @@ msgstr "Keluarkan {label}"
 #: src/postulo/plugins/models.py
 msgid "removed on the other side"
 msgstr "dihapus di sisi lain"
+
+#: src/postulo/templates/connections/pairing.html
+msgid "Removed on the other side"
+msgstr ""
+
+#: src/postulo/templates/cotton/pairing_line.html
+#, python-format
+msgid "Removed on the other side of <bdi>%(connection)s</bdi>"
+msgstr ""
 
 #: src/postulo/core/models.py
 msgid "Removed there"
@@ -14652,7 +14882,9 @@ msgstr "cakupan"
 msgid "Screening"
 msgstr "Penyaringan"
 
-#: src/postulo/core/tables.py src/postulo/templates/core/search.html
+#: src/postulo/core/tables.py src/postulo/templates/connections/pairing.html
+#: src/postulo/templates/connections/pairing_item.html
+#: src/postulo/templates/core/search.html
 #: src/postulo/templates/cotton/site_search.html
 #: src/postulo/templates/jobs/industry_list.html
 msgid "Search"
@@ -14694,6 +14926,10 @@ msgstr "Cari di kalender"
 #: src/postulo/documents/views.py
 msgid "Search what you sent"
 msgstr "Cari apa yang Anda kirim"
+
+#: src/postulo/templates/connections/pairing_item.html
+msgid "Search your records"
+msgstr ""
 
 #: src/postulo/core/server_forms.py
 msgid "Seconds to wait for the server before giving up."
@@ -15240,6 +15476,10 @@ msgstr "Tampilkan alamat ini di peta?"
 msgid "Show this period"
 msgstr "Tampilkan periode ini"
 
+#: src/postulo/templates/connections/pairing.html
+msgid "Show unpaired"
+msgstr ""
+
 #: src/postulo/jobs/tables.py
 #: src/postulo/templates/applications/calendar_print.html
 #: src/postulo/templates/jobs/partials/whose_form.html
@@ -15738,7 +15978,8 @@ msgstr "STARTTLS, setelah terhubung"
 msgid "state"
 msgstr "status"
 
-#: src/postulo/jobs/tables.py src/postulo/templates/jobs/company_register.html
+#: src/postulo/jobs/tables.py src/postulo/templates/connections/pairing.html
+#: src/postulo/templates/jobs/company_register.html
 #: src/postulo/templates/server/person_recovery.html
 msgid "State"
 msgstr "Status"
@@ -15989,6 +16230,7 @@ msgid "sync links"
 msgstr "tautan sinkronisasi"
 
 #: src/postulo/templates/connections/list.html
+#: src/postulo/templates/connections/pairing.html
 msgid "Sync now"
 msgstr "Sinkronkan sekarang"
 
@@ -16501,6 +16743,12 @@ msgstr "Gambar itu jauh lebih besar dari yang diperlukan."
 msgid "That invitation has already been accepted and cannot be revoked."
 msgstr "Undangan itu sudah diterima dan tidak dapat dicabut."
 
+#: src/postulo/plugins/views.py
+#, python-format
+msgid "That is a lot of questions to the server. Try again in %(seconds)d second."
+msgid_plural "That is a lot of questions to the server. Try again in %(seconds)d seconds."
+msgstr[0] ""
+
 #: src/postulo/core/server_views.py
 msgid "That is a lot of recovery links. Try again shortly."
 msgstr "Terlalu banyak tautan pemulihan. Coba lagi sebentar lagi."
@@ -16701,6 +16949,23 @@ msgstr "Itu ekspor seluruh akun. Halaman ini hanya membaca berkas yang ditawarka
 msgid "That is the last administrator. Appoint another first."
 msgstr "Itu administrator terakhir. Tunjuk administrator lain terlebih dahulu."
 
+#: src/postulo/plugins/pairing.py
+msgid "That item cannot be made into one of those."
+msgstr ""
+
+#: src/postulo/plugins/views_pairing.py
+msgid "That item cannot be paired with one of those."
+msgstr ""
+
+#: src/postulo/plugins/views_pairing.py
+#, python-format
+msgid "That item is already paired with %(record)s. Unpair it first."
+msgstr ""
+
+#: src/postulo/plugins/pairing.py
+msgid "That item is no longer on the other side."
+msgstr ""
+
 #: src/postulo/templates/account/recovery_unusable.html
 msgid "That link cannot be used"
 msgstr "Tautan itu tidak dapat digunakan"
@@ -16790,6 +17055,10 @@ msgstr[0] "Halaman itu membutuhkan waktu lebih dari %(seconds)s detik untuk tiba
 #, python-format
 msgid "That page was sent with the content encoding “%(coding)s”, which Postulo does not unpack, so it was not read."
 msgstr "Halaman itu dikirim dengan pengodean konten “%(coding)s”, yang tidak dibongkar oleh Postulo, jadi tidak dibaca."
+
+#: src/postulo/plugins/views_pairing.py
+msgid "That pairing still has its other side."
+msgstr ""
 
 #: src/postulo/applications/forms.py
 msgid "That person is not recorded at this service."
@@ -19089,6 +19358,10 @@ msgstr "Belum diputuskan"
 msgid "To hand over a posting (needs the captures scope):"
 msgstr "Untuk menyerahkan lowongan (memerlukan cakupan captures):"
 
+#: src/postulo/templates/connections/pairing.html
+msgid "To pair with"
+msgstr ""
+
 #: src/postulo/templates/documents/cv_detail.html
 msgid "To see where the pages break. A draft is kept nowhere; Export PDF is what files a version."
 msgstr "Untuk melihat tempat pergantian halaman. Draf tidak disimpan di mana pun; Ekspor PDF-lah yang menyimpan versi."
@@ -19213,6 +19486,7 @@ msgid "Two-factor authentication"
 msgstr "Autentikasi dua faktor"
 
 #: src/postulo/accounts/models.py src/postulo/jobs/tables.py
+#: src/postulo/templates/connections/pairing_item.html
 #: src/postulo/templates/cotton/identifier_row.html
 #: src/postulo/templates/jobs/capture_page.html
 #: src/postulo/templates/partials/phone_numbers.html
@@ -19359,8 +19633,18 @@ msgstr "Tidak seperti nomor telepon, satu alamat tidak hanya disimpan sekali di 
 msgid "Unlike a telephone number, an address is not kept once on this instance, because people share a home; you cannot list the same one twice yourself. The bin removes a row at once, after asking, without waiting for <em>Save</em>."
 msgstr "Tidak seperti nomor telepon, alamat tidak dibatasi satu kali di instans ini, karena orang dapat tinggal serumah; Anda sendiri tidak dapat mencantumkan alamat yang sama dua kali. Tempat sampah langsung mengeluarkan satu baris, setelah bertanya, tanpa menunggu <em>Simpan</em>."
 
+#: src/postulo/templates/connections/pairing.html
+#: src/postulo/templates/cotton/pairing_line.html
+msgid "Unpair"
+msgstr ""
+
 #: src/postulo/plugins/models.py
 msgid "unpaired"
+msgstr ""
+
+#: src/postulo/plugins/views_pairing.py
+#, python-format
+msgid "Unpaired. Both sides are kept, and %(connection)s leaves them alone."
 msgstr ""
 
 #: src/postulo/resume/publications.py
@@ -21020,9 +21304,14 @@ msgstr "Ya: seseorang yang datang melalui penyedia identitas langsung masuk, tan
 msgid "Yes: somebody who has forgotten their password can ask for a code at their primary address and type it back. A code rather than a link, because mail scanners follow links and would spend one before the person read it. It is never a second factor: an authenticator app is still asked for. Offered only while this instance's mail is actually getting through."
 msgstr "Ya: seseorang yang lupa kata sandinya dapat meminta kode di alamat utamanya lalu mengetikkannya kembali. Kode, bukan tautan, karena pemindai email membuka tautan dan akan menghabiskannya sebelum orang itu membacanya. Ini tidak pernah menjadi faktor kedua: aplikasi autentikator tetap diminta. Ditawarkan hanya selama email instans ini benar-benar terkirim."
 
-#: src/postulo/jobs/views.py
+#: src/postulo/jobs/views.py src/postulo/plugins/pairing.py
 msgid "You"
 msgstr "Anda"
+
+#: src/postulo/plugins/pairing.py
+#, python-format
+msgid "You (%(name)s)"
+msgstr ""
 
 #: src/postulo/api/routers/companies.py src/postulo/jobs/forms.py
 #: src/postulo/jobs/surface.py
@@ -21476,6 +21765,10 @@ msgstr "Riwayat Anda sebagai berkas"
 msgid "Your record lists %(total)s public work; the first %(most)s are shown."
 msgid_plural "Your record lists %(total)s public works; the first %(most)s are shown."
 msgstr[0] ""
+
+#: src/postulo/templates/connections/pairing_item.html
+msgid "Your records"
+msgstr ""
 
 #: src/postulo/resume/models.py
 msgid "your role"

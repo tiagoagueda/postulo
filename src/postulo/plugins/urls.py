@@ -1,6 +1,6 @@
 from django.urls import path
 
-from . import views
+from . import views, views_pairing
 
 app_name = "connections"
 
@@ -21,5 +21,13 @@ urlpatterns = [
     path("<int:pk>/consent/", views.ConnectionConsentView.as_view(), name="consent"),
     path("<int:pk>/send-everything/", views.ConnectionBackfillView.as_view(), name="backfill"),
     path("<int:pk>/sync-now/", views.ConnectionSyncNowView.as_view(), name="sync_now"),
+    # *Pairing* (#327): a sync connection's items paired by hand with the person's records.
+    path("<int:pk>/pairing/", views_pairing.PairingView.as_view(), name="pairing"),
+    path("<int:pk>/pairing/item/", views_pairing.PairingItemView.as_view(), name="pairing_item"),
+    path("<int:pk>/pairing/apply/", views_pairing.PairingApplyView.as_view(), name="pairing_apply"),
+    path(
+        "<int:pk>/pairing/unpair/", views_pairing.PairingUnpairView.as_view(), name="pairing_unpair"
+    ),
+    path("<int:pk>/pairing/renew/", views_pairing.PairingRenewView.as_view(), name="pairing_renew"),
     path("<int:pk>/delete/", views.ConnectionDeleteView.as_view(), name="delete"),
 ]

@@ -1,0 +1,92 @@
+{% extends "settings/base.html" %}
+{% load i18n %}
+
+{% comment %} One item of a sync connection, as its plugin described it just now, and the
+   person's own records to pair it with (#327). One form: a record, or a new one, and what
+   to do with it. Only the item's key is posted; the plugin is asked for it again, so the
+   address the link keeps is never one a form carried. {% endcomment %}
+{% block content %}
+  <div class="max-w-3xl">
+    <c-page-title>
+      <bdi>{{ item.label }}</bdi>
+      <c-slot name="subtitle">
+        {% if item.detail %}<bdi>{{ item.detail }}</bdi> · {% endif %}{% if item.collection_label %}<bdi>{{ item.collection_label }}</bdi> · {% endif %}<bdi>{{ connection.label }}</bdi>
+      </c-slot>
+    </c-page-title>
+
+    {% if holder %}
+      <div class="alert mb-4" data-variant="warning" data-pairing-holder>
+        <p>
+          {% blocktranslate with name=holder.name|default:"?" trimmed %}Already paired with <bdi>{{ name }}</bdi>. Unpair it on the pairing page to pair it with something else.{% endblocktranslate %}
+        </p>
+      </div>
+    {% endif %}
+
+    <section class="card mb-4" aria-labelledby="pairing-records">
+      <c-section-title id="pairing-records">{% translate "Your records" %}</c-section-title>
+      <form method="get" action="{% url 'connections:pairing_item' connection.pk %}" role="search" class="flex flex-wrap items-end gap-3">
+        <input type="hidden" name="collection" value="{{ item.collection }}">
+        <input type="hidden" name="uid" value="{{ item.uid }}">
+        <div class="grid gap-1">
+          <label for="pairing-item-kind" class="label">{% translate "Type" %}</label>
+          <select id="pairing-item-kind" name="kind" class="select">
+            {% for value, label in kinds %}
+              <option value="{{ value }}"{% if value == kind %} selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="grid min-w-0 flex-1 basis-60 gap-1">
+          <label for="pairing-item-q" class="label">{% translate "Search your records" %}</label>
+          <input type="search" id="pairing-item-q" name="q" value="{{ words }}" class="input" maxlength="200">
+        </div>
+        <button type="submit" class="btn" data-variant="outline">{% translate "Search" %}</button>
+      </form>
+    </section>
+
+    <form method="post" action="{% url 'connections:pairing_apply' connection.pk %}" class="card" data-pairing-apply>
+      {% csrf_token %}
+      <input type="hidden" name="collection" value="{{ item.collection }}">
+      <input type="hidden" name="uid" value="{{ item.uid }}">
+      <input type="hidden" name="kind" value="{{ kind }}">
+      <input type="hidden" name="next" value="{{ back }}">
+      {% if records or can_fill %}
+        <c-scroll-box label="{{ kind_label }}">
+          <table class="table">
+            <caption class="label text-start">{% blocktranslate with kind=kind_label trimmed %}Pair with: {{ kind }}{% endblocktranslate %}</caption>
+            <thead>
+              <tr>
+                <th scope="col"><span class="sr-only">{% translate "Choose" %}</span></th>
+                <th scope="col">{% translate "Record" %}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% if can_fill %}
+                <tr>
+                  <td><input type="radio" class="input" name="record" value="new" id="pairing-record-new"></td>
+                  <th scope="row" class="font-normal"><label for="pairing-record-new">{% blocktranslate with kind=kind_label trimmed %}A new one: {{ kind }}{% endblocktranslate %}</label></th>
+                </tr>
+              {% endif %}
+              {% for row in records %}
+                <tr>
+                  <td><input type="radio" class="input" name="record" value="{{ row.record.pk }}" id="pairing-record-{{ row.record.pk }}"{% if forloop.first and not can_fill %} checked{% endif %}></td>
+                  <th scope="row" class="font-normal"><label for="pairing-record-{{ row.record.pk }}"><bdi>{{ row.name }}</bdi></label></th>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </c-scroll-box>
+        {% if not records %}<p class="mt-2 text-sm text-ink-500 dark:text-ink-400">{% translate "None of your records matches." %}</p>{% endif %}
+        <div class="mt-4 flex flex-wrap items-center gap-3">
+          <button type="submit" class="btn" name="action" value="pair">{% translate "Pair" %}</button>
+          {% if can_fill %}
+            <button type="submit" class="btn" data-variant="outline" name="action" value="fill">{% blocktranslate with plugin=plugin.label trimmed %}Fill from {{ plugin }} and pair{% endblocktranslate %}</button>
+            <button type="submit" class="btn" data-variant="ghost" name="action" value="import">{% translate "Fill once, without pairing" %}</button>
+          {% endif %}
+          <a href="{{ back }}" class="btn" data-variant="ghost">{% translate "Cancel" %}</a>
+        </div>
+      {% else %}
+        <c-empty variant="row">{% translate "None of your records matches." %}</c-empty>
+      {% endif %}
+    </form>
+  </div>
+{% endblock %}

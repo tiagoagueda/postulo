@@ -498,6 +498,28 @@ def test_a_theme_can_set_the_calendar_and_an_item_says_what_it_is():
     assert api.CalendarItem(**{**done.__dict__, "kind": "deadline", "over": False}).said == ""
 
 
+def test_the_surface_holds_what_a_sync_offers_to_pair_by_hand():
+    """A sync connection's *Pairing* page is drawn from what its plugin answers (#327): the
+    item it offers, and the kinds of record the core lets one be paired with."""
+    from postulo.plugins import api
+    from postulo.plugins.base import RECORD_KINDS, RemoteItem
+
+    assert api.RemoteItem is RemoteItem
+    assert api.RECORD_KINDS is RECORD_KINDS
+    assert set(api.RECORD_KINDS) == {
+        "contact",
+        "company",
+        "department",
+        "you",
+        "interview",
+        "reminder",
+        "application",
+    }
+    item = api.RemoteItem("/cards/", "ada", "Ada", kinds=("contact",))
+    assert item.key == ("/cards/", "ada")
+    assert (item.href, item.detail, item.collection_label, item.slot) == ("", "", "", "")
+
+
 def test_a_reminder_on_the_surface_is_the_cores_own_class():
     """What a sync of a task list reads and writes (#331): the record, read with
     `Reminder.objects.for_user()`, and the services, never the model's save."""
