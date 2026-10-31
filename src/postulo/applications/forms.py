@@ -721,10 +721,26 @@ class InterviewForm(OwnerScopedModelForm):
         self.fields["contacts"].queryset = contacts
 
     def clean(self):
+        """Refused as the service refuses it, in the service's words (#330).
+
+        `interview_refusals` is the rule the API and a plugin meet too, asked here about what
+        is left once each field has passed on its own. The people on an interview being
+        changed are not asked about: the list already offers only who may stay (#443).
+        """
+        from .services import interview_refusals
+
         cleaned = super().clean()
-        starts, ends = cleaned.get("starts_at"), cleaned.get("ends_at")
-        if starts and ends and ends <= starts:
-            self.add_error("ends_at", _("It cannot end before it starts."))
+        if self.application is None:
+            return cleaned
+        refusals = interview_refusals(
+            self.application,
+            kind=cleaned.get("kind"),
+            starts_at=cleaned.get("starts_at"),
+            ends_at=cleaned.get("ends_at"),
+            contacts=() if self.instance.pk else (cleaned.get("contacts") or ()),
+        )
+        for refusal in refusals:
+            self.add_error(refusal.field, str(refusal))
         return cleaned
 
 

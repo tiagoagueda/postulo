@@ -15,6 +15,7 @@ from postulo.applications.models import (
     InterviewKind,
 )
 from postulo.applications.services import (
+    InterviewRefused,
     reschedule_interview,
     schedule_interview,
     settle_interview,
@@ -104,20 +105,61 @@ def interview_calendar(request, pk: int):
     return response
 
 
-def _contacts(request, application: Application, ids: list[int]) -> list[Contact]:
-    """The application's company's people with these ids; anyone else is a 422."""
+def _not_at_the_company() -> HttpError:
+    return HttpError(
+        422,
+        _("%(field)s must all be people at the application's company.")
+        % {"field": "'contact_ids'"},
+    )
+
+
+def _ends_before_it_starts() -> HttpError:
+    return HttpError(
+        422,
+        _("%(later)s must be after %(earlier)s.")
+        % {"later": "'ends_at'", "earlier": "'starts_at'"},
+    )
+
+
+def _people(request, ids: list[int]) -> list[Contact]:
+    """The caller's own contacts with these ids; an id that is not one of them is a 422.
+
+    One answer for somebody else's contact and for one that does not exist, so the refusal
+    confirms nothing about another account. Whether they are at the right company is the
+    service's to say (#330).
+    """
     if not ids:
         return []
-    people = list(
-        owned(request, Contact.objects).filter(pk__in=ids, company=application.posting.company_id)
-    )
+    people = list(Contact.objects.for_user(request.auth.owner).filter(pk__in=ids))
     if len(people) != len(set(ids)):
-        raise HttpError(
-            422,
-            _("%(field)s must all be people at the application's company.")
-            % {"field": "'contact_ids'"},
-        )
+        raise _not_at_the_company()
     return people
+
+
+def _contacts(request, application: Application, ids: list[int]) -> list[Contact]:
+    """The application's company's people with these ids; anyone else is a 422."""
+    people = _people(request, ids)
+    if any(person.company_id != application.posting.company_id for person in people):
+        raise _not_at_the_company()
+    return people
+
+
+def _refused(refusal: InterviewRefused, payload: InterviewIn) -> HttpError:
+    """What `schedule_interview` refused, in the words this call has always answered with.
+
+    The service decides (#330); the API only keeps its own wording, which names the field as
+    the payload spells it -- a client written against these words should not find them changed.
+    """
+    if refusal.field == "kind":
+        try:
+            choice_or_422(payload.kind, InterviewKind, field="kind")
+        except HttpError as error:
+            return error
+    if refusal.field == "ends_at":
+        return _ends_before_it_starts()
+    if refusal.field == "contacts":
+        return _not_at_the_company()
+    return HttpError(422, str(refusal))
 
 
 @router.post("", response={201: InterviewOut}, auth=scope("write"), summary="Schedule an interview")
@@ -126,24 +168,22 @@ def add_interview(request, payload: InterviewIn):
     application = owned(request, Application.objects).filter(pk=payload.application_id).first()
     if application is None:
         raise HttpError(404, _("No such application."))
-    choice_or_422(payload.kind, InterviewKind, field="kind")
-    if payload.ends_at is not None and payload.ends_at <= payload.starts_at:
-        raise HttpError(
-            422,
-            _("%(later)s must be after %(earlier)s.")
-            % {"later": "'ends_at'", "earlier": "'starts_at'"},
+    try:
+        # The kind, the end and the people are the service's to refuse (#330), so this call,
+        # the form and a plugin are refused alike.
+        interview = schedule_interview(
+            application,
+            kind=payload.kind,
+            starts_at=payload.starts_at,
+            ends_at=payload.ends_at,
+            location=payload.location,
+            notes=payload.notes,
+            contacts=_people(request, payload.contact_ids),
+            remind=payload.remind,
+            actor=actor_of(request),
         )
-    interview = schedule_interview(
-        application,
-        kind=payload.kind,
-        starts_at=payload.starts_at,
-        ends_at=payload.ends_at,
-        location=payload.location,
-        notes=payload.notes,
-        contacts=_contacts(request, application, payload.contact_ids),
-        remind=payload.remind,
-        actor=actor_of(request),
-    )
+    except InterviewRefused as refusal:
+        raise _refused(refusal, payload) from refusal
     return Status(
         201, interview_out(request, owned_or_404(request, _queryset(request), interview.pk))
     )
@@ -165,11 +205,7 @@ def change_interview(request, pk: int, payload: InterviewPatch):
         interview.ends_at if starts_at == interview.starts_at else starts_at + interview.duration
     )
     if ends_at <= starts_at:
-        raise HttpError(
-            422,
-            _("%(later)s must be after %(earlier)s.")
-            % {"later": "'ends_at'", "earlier": "'starts_at'"},
-        )
+        raise _ends_before_it_starts()
     # Looked up before anything is saved, so a refusal leaves the interview as it was (#435).
     contacts = (
         None if contact_ids is None else _contacts(request, interview.application, contact_ids)

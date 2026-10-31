@@ -1130,3 +1130,146 @@ def reminders_file(reminders, absolute) -> str:
             public_identity(r.application.get_absolute_url()) if r.application_id else ""
         ),
     )
+
+
+# ------------------------------------------------------------------ for a plugin (#330)
+#
+# A calendar plugin pairing an event made elsewhere with something on Postulo needs the
+# calendar's dated things, and the ones that are not records it can read -- a deadline, a
+# closing date, an answer due -- were only on the page and in the feed. Rather than put
+# `Offer` and `JobPosting` on the surface and have a plugin restate which dates are over and
+# what they are called, it reads them here, from `events_between`, as plain values: the page,
+# the feed and a plugin then cannot disagree about somebody's month.
+
+#: The kinds that are whole days, and so have no name of their own to keep in a calendar.
+WHOLE_DAY_KINDS = frozenset({DEADLINE, CLOSING, ANSWER})
+
+
+@dataclass(frozen=True)
+class Item:
+    """One dated thing on a person's calendar, as plain values (#330).
+
+    ``kind`` is one of ``interview``, ``reminder``, ``deadline``, ``closing``, ``answer`` and
+    ``appointment``. ``title`` and ``detail`` are the two lines the page draws, in the
+    person's language. ``over`` is what the page draws struck through -- a reminder done, an
+    interview cancelled or not come to (``state`` says ``no_show`` for that one), a deadline
+    already sent, a listing already decided, an offer already answered.
+
+    A moment has ``starts_at``, and ``ends_at`` where it lasts, both in the person's own time
+    zone; a whole day has neither, only ``day``, and its ``entry`` -- the `DayEntry` the feed
+    writes for it, which `day_lines` turns into the same lines. ``day`` is the person's day
+    either way. ``path`` is the page it links to on this instance, to be joined with
+    ``POSTULO_PUBLIC_URL`` as any record's address is. ``uid`` is its name in a calendar: the
+    record's own for an interview, a reminder and an appointment, the entry's for a whole day.
+    """
+
+    kind: str
+    title: str
+    detail: str
+    day: dt.date
+    over: bool
+    path: str
+    uid: str
+    starts_at: dt.datetime | None = None
+    ends_at: dt.datetime | None = None
+    state: str = ""
+    entry: ical.DayEntry | None = None
+
+    @property
+    def all_day(self) -> bool:
+        return self.starts_at is None
+
+
+@dataclass(frozen=True)
+class Items:
+    """What `items_between` answers: the items, soonest first, and why any were left out.
+
+    ``withheld`` is empty, or says in the person's language why the whole days are not
+    there -- a plugin can put it in its report, where the person sees it.
+    """
+
+    items: tuple[Item, ...] = ()
+    withheld: str = ""
+
+    def __iter__(self):
+        return iter(self.items)
+
+    def __len__(self) -> int:
+        return len(self.items)
+
+
+def _moment_item(event: Event) -> Item:
+    record = event.interview or event.reminder or event.appointment
+    return Item(
+        kind=event.kind,
+        title=str(event.title),
+        detail=str(event.detail),
+        day=event.day,
+        over=event.muted,
+        path=event.url,
+        uid=record.uid if record is not None else "",
+        starts_at=timezone.localtime(event.starts_at),
+        ends_at=timezone.localtime(event.ends_at) if event.ends_at is not None else None,
+        state=event.state,
+    )
+
+
+def _day_item(event: Event) -> Item:
+    # `public_identity` stands in for the request a feed has: the address under the
+    # instance's public name, which is both the entry's link and what its name is made from.
+    (entry,) = day_entries([event], public_identity)
+    return Item(
+        kind=event.kind,
+        title=str(event.title),
+        detail=str(event.detail),
+        day=event.day,
+        over=event.muted,
+        path=event.url,
+        uid=entry.uid,
+        state=event.state,
+        entry=entry,
+    )
+
+
+def items_between(user, start: dt.date, end: dt.date, *, kinds=None) -> Items:
+    """Everything on ``user``'s calendar on a day in ``[start, end)``, as plain values (#330).
+
+    Read through `events_between`, the one place that decides what a deadline is, which ones
+    are over and what they are called, so a plugin sees what the Calendar page shows.
+    ``kinds`` narrows to some of `Item`'s kinds; a kind nobody knows is a ``ValueError``
+    rather than all of them, because a plugin's typo is not an address somebody mistyped. A
+    range longer than a year is a ``ValueError`` too, as the agenda brings one back to a year.
+
+    **In the person's own time zone and language**, whoever calls it: the days are their
+    days, and a scheduled sync has no request to have activated them.
+
+    **No whole days without ``POSTULO_PUBLIC_URL``.** A whole day's name in a calendar is a
+    UUID over its address, and with no public name a job outside a request has only a path:
+    a UUID over a path is the same in every instance, which is the collision between two
+    instances in one calendar that `ical` warns about. So deadlines, closing dates and answer
+    dates are left out, and ``withheld`` says why.
+    """
+    from postulo.core import preferences
+
+    wanted = ALL_KINDS if kinds is None else frozenset(str(kind) for kind in kinds)
+    unknown = wanted - ALL_KINDS
+    if unknown:
+        raise ValueError(f"{sorted(unknown)} are not kinds; each is one of {sorted(ALL_KINDS)}.")
+    if (end - start).days > AGENDA_MAX_DAYS:
+        raise ValueError(f"A range of at most {AGENDA_MAX_DAYS} days.")
+    withheld = ""
+    with preferences.as_person(user):
+        if wanted & WHOLE_DAY_KINDS and not public_identity("/"):
+            wanted -= WHOLE_DAY_KINDS
+            withheld = str(
+                _(
+                    "Deadlines, closing dates and answer dates are left out: this instance "
+                    "has no public address (POSTULO_PUBLIC_URL), and without one they have no "
+                    "lasting name in a calendar."
+                )
+            )
+        if not wanted or end <= start:
+            return Items(withheld=withheld)
+        events = events_between(user, start, end, kinds=wanted)
+        items = tuple(_day_item(e) if e.all_day else _moment_item(e) for e in events)
+    return Items(items=items, withheld=withheld)

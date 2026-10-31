@@ -493,6 +493,59 @@ def _interview_reminder_summary(interview: Interview) -> str:
     )
 
 
+class InterviewRefused(ValueError):
+    """An interview `schedule_interview` will not make, and why (#330).
+
+    ``field`` names the argument it is about -- ``kind``, ``ends_at`` or ``contacts`` -- so
+    the form can put the words under the field and the API can answer in the words it has
+    always used for it; the message is the reason, in the active language. A `ValueError`,
+    so a plugin catching the broad one catches this.
+    """
+
+    def __init__(self, message: str, *, field: str):
+        super().__init__(message)
+        self.field = field
+
+
+def interview_refusals(
+    application: Application, *, kind=None, starts_at=None, ends_at=None, contacts=()
+) -> list[InterviewRefused]:
+    """Every reason not to put this interview in the diary, or none (#330).
+
+    The rules lived in the callers: the form checked the end, the API the kind, the end and
+    the contacts, and a plugin calling `schedule_interview` checked nothing, because nothing
+    asked it to. They are here now, once, so the three are refused alike:
+
+    - a ``kind`` that is one of `InterviewKind`'s values;
+    - an end after the start, where an end is given (left out, it lasts an hour);
+    - everybody met one of the application's owner's own contacts, at the application's
+      company -- the people the form offers.
+
+    Each is checked only where it is given, so the form can ask about what it has left once
+    a field has failed on its own. The form's change of an interview leaves ``contacts``
+    out: somebody already on an interview who has since moved on stays on it (#443).
+    """
+    refusals: list[InterviewRefused] = []
+    if kind is not None and str(kind) not in InterviewKind.values:
+        refusals.append(InterviewRefused(str(_("That is not a kind of interview.")), field="kind"))
+    if starts_at is not None and ends_at is not None and ends_at <= starts_at:
+        refusals.append(
+            InterviewRefused(str(_("It cannot end before it starts.")), field="ends_at")
+        )
+    company_id = application.posting.company_id
+    if any(
+        contact.owner_id != application.owner_id or contact.company_id != company_id
+        for contact in contacts
+    ):
+        refusals.append(
+            InterviewRefused(
+                str(_("Everybody you meet has to be one of your contacts at that company.")),
+                field="contacts",
+            )
+        )
+    return refusals
+
+
 @transaction.atomic
 def schedule_interview(
     application: Application,
@@ -516,7 +569,18 @@ def schedule_interview(
     ``uid`` is the calendar identifier it is kept under, for a meeting that came out of a
     calendar file and so keeps the name that file gave it (#661); the column mints one when
     there is none.
+
+    The form, the API, a calendar file and a plugin all come through here (#330), so what
+    `interview_refusals` finds wrong is refused here, before anything is written, with the
+    first `InterviewRefused`. The reminder is made by `create_reminder`, the one way a
+    reminder comes to be (#331), with the same ``actor``.
     """
+    contacts = list(contacts)
+    refusals = interview_refusals(
+        application, kind=kind, starts_at=starts_at, ends_at=ends_at, contacts=contacts
+    )
+    if refusals:
+        raise refusals[0]
     ends_at = ends_at or starts_at + DEFAULT_INTERVIEW_LENGTH
     interview = Interview.objects.create(
         **({"uid": uid} if uid else {}),

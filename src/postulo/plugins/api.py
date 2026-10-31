@@ -72,6 +72,12 @@ company, a department, a contact and their rows, each taking an `actor`.
 **Reminders are on it (#331)**: `Reminder`, read with `Reminder.objects.for_user(user)`, and
 one call each to make, change, move, tick off and untick one, each taking an `actor`, so a
 plugin keeping a task list in step never saves the model.
+
+**An interview can be made through it, and the calendar read (#330)**: `schedule_interview`,
+with `InterviewKind` its vocabulary and `InterviewRefused` what it raises, refused as the form
+and the API are; and `calendar_items`, the Calendar page's dated things for a person and a
+range of days as plain values (`CalendarItem`, in `CalendarItems`), a whole day with the
+`DayEntry` that `day_lines` writes as the feed does.
 """
 
 from __future__ import annotations
@@ -82,7 +88,16 @@ if TYPE_CHECKING:  # pragma: no cover - the names `__getattr__` resolves at run 
     # Listed here so a reader, an editor and a linter all see the whole surface in one
     # place. They cannot be imported at module load: several are Django models and this
     # module is reachable before the app registry is ready.
-    from postulo.applications.ical import calendar_status, event_lines, reminder_lines
+    from postulo.applications.agenda import Item as CalendarItem
+    from postulo.applications.agenda import Items as CalendarItems
+    from postulo.applications.agenda import items_between as calendar_items
+    from postulo.applications.ical import (
+        DayEntry,
+        calendar_status,
+        day_lines,
+        event_lines,
+        reminder_lines,
+    )
     from postulo.applications.ical_reader import Entry as CalendarEntry
     from postulo.applications.ical_reader import Refused as CalendarRefused
     from postulo.applications.ical_reader import read as read_calendar
@@ -92,11 +107,13 @@ if TYPE_CHECKING:  # pragma: no cover - the names `__getattr__` resolves at run 
         AppointmentHow,
         EventKind,
         Interview,
+        InterviewKind,
         InterviewOutcome,
         Reminder,
         Suggestion,
     )
     from postulo.applications.services import (
+        InterviewRefused,
         add_appointment,
         add_reminder,
         change_reminder,
@@ -108,6 +125,7 @@ if TYPE_CHECKING:  # pragma: no cover - the names `__getattr__` resolves at run 
         reopen_reminder,
         reschedule_interview,
         retire_reminder,
+        schedule_interview,
         settle_interview,
     )
     from postulo.applications.suggestions import suggest
@@ -264,6 +282,8 @@ __all__ = [
     "BackupRef",
     "BodyRefused",
     "CalendarEntry",
+    "CalendarItem",
+    "CalendarItems",
     "CalendarRefused",
     "Company",
     "CompanyKind",
@@ -271,6 +291,7 @@ __all__ = [
     "ConnectionUnusable",
     "Consent",
     "Contact",
+    "DayEntry",
     "Department",
     "DestinationRefused",
     "DocumentFormat",
@@ -282,7 +303,9 @@ __all__ = [
     "ImportRefused",
     "ImporterPlugin",
     "Interview",
+    "InterviewKind",
     "InterviewOutcome",
+    "InterviewRefused",
     "JobPostingData",
     "LinkKind",
     "LinkRow",
@@ -333,6 +356,7 @@ __all__ = [
     "add_reminder",
     "addresses_for",
     "approve_host",
+    "calendar_items",
     "calendar_status",
     "change_reminder",
     "check_destination",
@@ -340,6 +364,7 @@ __all__ = [
     "complete_reminder",
     "create_contact",
     "create_reminder",
+    "day_lines",
     "deadline_in",
     "declares",
     "description_of",
@@ -383,6 +408,7 @@ __all__ = [
     "save_postal_addresses",
     "save_web_link",
     "save_web_links",
+    "schedule_interview",
     "settle_interview",
     "shipped",
     "suggest",
@@ -422,6 +448,7 @@ _ELSEWHERE: dict[str, tuple[str, str]] = {
     "Contact": ("postulo.jobs.models", "Contact"),
     "EventKind": ("postulo.applications.models", "EventKind"),
     "Interview": ("postulo.applications.models", "Interview"),
+    "InterviewKind": ("postulo.applications.models", "InterviewKind"),
     "InterviewOutcome": ("postulo.applications.models", "InterviewOutcome"),
     "Suggestion": ("postulo.applications.models", "Suggestion"),
     # What ties a local record to its twin on the other side: the remote address, the
@@ -445,6 +472,16 @@ _ELSEWHERE: dict[str, tuple[str, str]] = {
     "get_or_create_company": ("postulo.applications.services", "get_or_create_company"),
     "record_event": ("postulo.applications.services", "record_event"),
     "reschedule_interview": ("postulo.applications.services", "reschedule_interview"),
+    # `schedule_interview(application, kind=..., starts_at=..., ends_at=None, location="",
+    # notes="", contacts=(), remind=True, actor="", uid="")` is the one way an interview comes
+    # to be (#330): the `interview_scheduled` entry, the reminder a day ahead made by
+    # `create_reminder`, and one already over recorded as held. It refuses, before writing
+    # anything, a kind that is not an `InterviewKind`, an end not after the start, and anybody
+    # met who is not the owner's own contact at the application's company -- the form and the
+    # API are refused by the same rule -- with an `InterviewRefused`, a `ValueError` whose
+    # `field` names the argument.
+    "schedule_interview": ("postulo.applications.services", "schedule_interview"),
+    "InterviewRefused": ("postulo.applications.services", "InterviewRefused"),
     "settle_interview": ("postulo.applications.services", "settle_interview"),
     "suggest": ("postulo.applications.suggestions", "suggest"),
     # ------------------------------------------------ and the one way into a listing's
@@ -592,6 +629,21 @@ _ELSEWHERE: dict[str, tuple[str, str]] = {
     "CalendarRefused": ("postulo.applications.ical_reader", "Refused"),
     "read_calendar": ("postulo.applications.ical_reader", "read"),
     "reminder_lines": ("postulo.applications.ical", "reminder_lines"),
+    # And what else the calendar holds (#330). `calendar_items(user, start, end, kinds=None)`
+    # is the Calendar page's dated things on the days in `[start, end)` -- interviews,
+    # reminders, appointments, deadlines, closing dates, answers due -- as `CalendarItem`s,
+    # plain values: the kind, the two lines the page draws, the moment (in the person's zone)
+    # or the day, whether it is over, the page's path and a calendar `uid`. Read in the
+    # person's own zone and language whoever calls it, through the one place that decides what
+    # a deadline is. A whole day carries its `DayEntry`, which `day_lines` writes as the feed
+    # does. With `POSTULO_PUBLIC_URL` unset there are no whole days -- their name would be a
+    # UUID over a bare path, the same in every instance -- and `CalendarItems.withheld` says
+    # so. No `Offer` or `JobPosting`: values, so the page, the feed and a plugin agree.
+    "CalendarItem": ("postulo.applications.agenda", "Item"),
+    "CalendarItems": ("postulo.applications.agenda", "Items"),
+    "calendar_items": ("postulo.applications.agenda", "items_between"),
+    "DayEntry": ("postulo.applications.ical", "DayEntry"),
+    "day_lines": ("postulo.applications.ical", "day_lines"),
     # ------------------------------------------------------- what a page is read against
     # A source reading a page with no structured data has two questions only Postulo can
     # answer (#267): is this three-letter word a currency a job advert carries -- the list
