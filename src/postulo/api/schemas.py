@@ -1225,6 +1225,11 @@ class DocumentOut(Schema):
     verified_at: dt.datetime | None = Field(
         default=None, description="When an upload's file was last read against its record"
     )
+    seal: str | None = Field(
+        default=None,
+        description="For an upload that is a European Digital Credential: `unchecked`, because "
+        "Postulo keeps the file as it is and does not check its seal. Null for any other file",
+    )
     created_at: dt.datetime
     updated_at: dt.datetime
     download_url: str
@@ -1842,6 +1847,7 @@ def document_out(request, document, *, source: str) -> dict:
         "size": getattr(document, "size", None),
         "damage": getattr(document, "damage", "") or "",
         "verified_at": getattr(document, "verified_at", None),
+        "seal": "unchecked" if getattr(document, "is_credential", False) else None,
         "created_at": document.created_at,
         "updated_at": document.updated_at,
         "download_url": request.build_absolute_uri(

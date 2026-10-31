@@ -1,6 +1,7 @@
 # Vendored libraries and the compiled stylesheet are artefacts: reformatting them
-# only creates churn the next time they are regenerated.
-exclude: ^(src/postulo/static/js/vendor/|src/postulo/static/css/app\.css$|package-lock\.json$)
+# only creates churn the next time they are regenerated. A credential kept as a test fixture
+# is sealed over its exact bytes, so not even its last newline is added (#670).
+exclude: ^(src/postulo/static/js/vendor/|src/postulo/static/css/app\.css$|package-lock\.json$|tests/data/edc/)
 
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks

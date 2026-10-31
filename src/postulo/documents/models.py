@@ -35,7 +35,7 @@ from django.utils.translation import gettext_lazy as _
 from postulo.core.language_field import LanguageField
 from postulo.core.models import OwnedModel
 
-from . import integrity, kinds, themes
+from . import credentials, integrity, kinds, themes
 
 # The stored values of Postulo's own kinds live with the registry that describes them, which
 # no longer has to import this module to find them (#248). Handed out here as well, because
@@ -870,6 +870,18 @@ class UploadedDocument(RecordsALanguage, OwnedModel):
     def is_current(self) -> bool:
         """Whether anything supersedes this version."""
         return not self.replaced_by.exists()
+
+    @property
+    def is_credential(self) -> bool:
+        """Whether this is a European Digital Credential (#670).
+
+        By the extension, which is enough: a file with one of a credential's extensions was
+        judged a credential by what it holds when it arrived (`integrity.problem`), and is
+        refused otherwise. Its seal is never checked by Postulo, and every place that shows
+        one says so.
+        """
+        name = self.file.name if self.file else ""
+        return integrity.extension_of(name) in credentials.EXTENSIONS
 
     @property
     def download_name(self) -> str:

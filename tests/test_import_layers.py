@@ -98,6 +98,9 @@ LAYERS: list[tuple[str, tuple[str, ...]]] = [
             # foundation, and read by the record that holds the file.
             "postulo.documents.filestore",
             "postulo.documents.integrity",
+            # Whether a file is a European Digital Credential (#670): `json` and nothing of
+            # Postulo's, read by the check above and by the Europass plugin's reader.
+            "postulo.documents.credentials",
             "postulo.documents.outline",
             # The papers a document is printed on (#344): plain values, what a theme declares
             # and the page rule, read by the two records that keep a default and by the
