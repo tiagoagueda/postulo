@@ -153,7 +153,7 @@ corrected and reviewed at [translate.tiagoagueda.com](https://translate.tiagoagu
 
 <!-- languages:start (written by scripts/readme_languages.py; do not edit by hand) -->
 
-Postulo speaks **54 languages**, each named here as its speakers write it.
+Postulo speaks **57 languages**, each named here as its speakers write it.
 
 | | Language | What Postulo is |
 | --- | --- | --- |
@@ -207,7 +207,10 @@ Postulo speaks **54 languages**, each named here as its speakers write it.
 | <img src="https://source.tiagoagueda.com/postulo/postulo/raw/branch/main/src/postulo/static/flags/ua.svg" width="20" height="15" alt=""> | **<span lang="uk" dir="ltr">українська</span>** | <span lang="uk" dir="ltr">Postulo — це самостійно розміщуваний менеджер заявок на роботу: ваші заявки, резюме й супровідні листи на вашому власному сервері, без платних функцій.</span> |
 | <img src="https://source.tiagoagueda.com/postulo/postulo/raw/branch/main/src/postulo/static/flags/kz.svg" width="20" height="15" alt=""> | **<span lang="kk" dir="ltr">қазақ тілі</span>** | <span lang="kk" dir="ltr">Postulo — өз серверіңізде орнатылатын жұмыс өтінімдерін басқару құралы: өтінімдеріңіз, түйіндемелеріңіз және ілеспе хаттарыңыз өз серверіңізде, ақылы мүмкіндіктерсіз.</span> |
 | <img src="https://source.tiagoagueda.com/postulo/postulo/raw/branch/main/src/postulo/static/flags/am.svg" width="20" height="15" alt=""> | **<span lang="hy" dir="ltr">հայերեն</span>** | <span lang="hy" dir="ltr">Postulo-ն աշխատանքի դիմումների կառավարիչ է, որը տեղակայում եք ինքներդ․ ձեր դիմումները, CV-ները և մոտիվացիոն նամակները՝ ձեր սեփական սերվերում, առանց վճարովի գործառույթների։</span> |
+| <img src="https://source.tiagoagueda.com/postulo/postulo/raw/branch/main/src/postulo/static/flags/pk.svg" width="20" height="15" alt=""> | **<span lang="ur" dir="rtl">اردو</span>** | <span lang="ur" dir="rtl">Postulo ایک سیلف ہوسٹڈ ملازمت کی درخواستوں کا منیجر ہے: آپ کی درخواستیں، CV اور کور لیٹر آپ کے اپنے سرور پر، بغیر کسی ادائیگی والی خصوصیت کے۔</span> |
 |  | **<span lang="ar" dir="rtl">العربية</span>** | <span lang="ar" dir="rtl">Postulo مدير لطلبات التوظيف تستضيفه بنفسك: طلباتك وسيرك الذاتية وخطابات التقديم على خادمك الخاص، دون ميزات مدفوعة.</span> |
+| <img src="https://source.tiagoagueda.com/postulo/postulo/raw/branch/main/src/postulo/static/flags/in.svg" width="20" height="15" alt=""> | **<span lang="hi" dir="ltr">हिन्दी</span>** | <span lang="hi" dir="ltr">Postulo एक सेल्फ़-होस्टेड नौकरी आवेदन मैनेजर है: आपके आवेदन, CV और कवर लेटर आपके अपने सर्वर पर, बिना किसी पेड फ़ीचर के।</span> |
+| <img src="https://source.tiagoagueda.com/postulo/postulo/raw/branch/main/src/postulo/static/flags/bd.svg" width="20" height="15" alt=""> | **<span lang="bn" dir="ltr">বাংলা</span>** | <span lang="bn" dir="ltr">Postulo একটি স্ব-হোস্টেড চাকরির আবেদন ব্যবস্থাপক: আপনার আবেদন, সিভি ও কভার লেটার আপনার নিজের সার্ভারে, কোনো পেইড ফিচার ছাড়াই।</span> |
 | <img src="https://source.tiagoagueda.com/postulo/postulo/raw/branch/main/src/postulo/static/flags/ge.svg" width="20" height="15" alt=""> | **<span lang="ka" dir="ltr">ქართული</span>** | <span lang="ka" dir="ltr">Postulo არის საკუთარ სერვერზე განსათავსებელი სამუშაო განაცხადების მართვის პროგრამა: თქვენი განაცხადები, CV-ები და თანმხლები წერილები თქვენს საკუთარ სერვერზე, ფასიანი ფუნქციების გარეშე.</span> |
 | <img src="https://source.tiagoagueda.com/postulo/postulo/raw/branch/main/src/postulo/static/flags/cn.svg" width="20" height="15" alt=""> | **<span lang="zh-Hans" dir="ltr">简体中文</span>** | <span lang="zh-Hans" dir="ltr">Postulo 是一款自托管的求职申请管理工具：你的申请、简历和求职信都保存在你自己的服务器上，没有任何付费功能。</span> |
 | <img src="https://source.tiagoagueda.com/postulo/postulo/raw/branch/main/src/postulo/static/flags/tw.svg" width="20" height="15" alt=""> | **<span lang="zh-Hant" dir="ltr">繁體中文</span>** | <span lang="zh-Hant" dir="ltr">Postulo 是自行架設的求職應徵管理工具：您的應徵、履歷和求職信都在您自己的伺服器上，沒有任何付費功能。</span> |
