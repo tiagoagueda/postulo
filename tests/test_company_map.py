@@ -135,7 +135,9 @@ def test_the_map_is_drawn_by_leaflet_from_this_instance(client, user):
 
     assert "js/vendor/leaflet/leaflet.js" in html
     assert "js/vendor/leaflet/leaflet.css" in html
-    assert "unpkg.com" not in html and "cdn" not in html.lower().replace("cdnjs", "")
+    # Only the addresses the page loads from: a CSRF token is random text and can hold "cdn".
+    loaded = [url.lower() for url in re.findall(r'\b(?:src|href)="([^"]*)"', html)]
+    assert not [url for url in loaded if "unpkg.com" in url or "cdn" in url.replace("cdnjs", "")]
     client.force_login(user)
     elsewhere = client.get(reverse("jobs:company_list")).content.decode()
     assert "leaflet" not in elsewhere.lower(), "no other page loads it"
