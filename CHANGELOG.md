@@ -163,6 +163,7 @@ All notable changes to Postulo are recorded here. The format follows
 ### 🔧 Changed
 
 - CI runs the unit tests on three workers: a test worker now lets go of the catalogues, URL tables and CLDR locales of every language it met after each file that met more than four, and one worker takes the translation tests, so a worker stays far below the 1 GB it reached. (#1033)
+- CI keeps the compiled translations between runs, installs Chromium's libraries in one apt run, clones history without old files for Checks, names the heavy tests' file, and the test settings fetch no map tiles. (#1033)
 - A push to an issue branch no longer runs CI by itself: its pull request runs it, on every push, so open one early, as a draft if the work is unfinished. Only main and release branches run CI on a push, and a newer push to the same pull request cancels the run it supersedes, never on main. (#1033)
 - The importer that reads Europass files is called Europass import, on the plugins page and in Your career's Import menu, so it is no longer mistaken for the Europass CV theme from Postulo Templates; its internal name stays europass, so saved switches keep working. (#911)
 - Every change reaches main through a pull request: a branch per issue, Closes #N, squash-merged once CI is green (Weblate's with a merge commit); CONTRIBUTING.md, AGENTS.md and the release steps say so. (#940)

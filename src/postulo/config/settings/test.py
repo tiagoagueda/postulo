@@ -81,3 +81,11 @@ STORAGES["staticfiles"] = {
 # The fetch tests serve a page from a socket on a port of the operator system's choosing; the
 # restriction itself is tested with the setting put back (tests/test_hardening_780.py).
 POSTULO_FETCH_PORTS = "*"
+
+# The map draws the world's outline and fetches no tiles, whatever the environment says. With
+# OpenStreetMap, the default an instance gets, every browser walk through the companies' map
+# asked tile.openstreetmap.org for its tiles: seconds per walk, and a server outside the
+# project inside the gate (#1033). The tests about the tiles themselves choose OpenStreetMap
+# again, and answer the browser's requests for them without leaving the machine
+# (`tests/e2e/test_map.py`).
+POSTULO_MAP_TILES = "none"

@@ -101,10 +101,26 @@ jobs:
           # would hand it to every later step and any artifact that packs the tree.
           persist-credentials: false
 
-      - name: Install WeasyPrint's system libraries
+      - name: Install the system libraries of WeasyPrint and Chromium
+        # WeasyPrint's, as in the unit job, and in the same apt run the ones Playwright's
+        # `install --with-deps chromium` installed for Debian 12 (Playwright 1.62): the
+        # browser's libraries and the fonts a page falls back on for scripts DejaVu lacks.
+        # `--with-deps` ran apt again on every run, 29 s with the browser itself restored
+        # from the cache (#1033). Not xvfb, the one other package it installed: a headless
+        # browser draws without a display. A Playwright that needs another library names it
+        # when the browser fails to start; it goes here.
+        #
+        # Not `--only-shell` either, which would skip the full Chromium:
+        # `tests/e2e/test_web_app.py` starts it (`channel="chromium"`) to install the app.
         run: |
           apt-get update
-          apt-get install -y --no-install-recommends libpango-1.0-0 libpangoft2-1.0-0 libharfbuzz0b libharfbuzz-subset0 libfontconfig1 fonts-dejavu-core
+          apt-get install -y --no-install-recommends \
+            libpango-1.0-0 libpangoft2-1.0-0 libharfbuzz0b libharfbuzz-subset0 libfontconfig1 fonts-dejavu-core \
+            libasound2 libatk-bridge2.0-0 libatk1.0-0 libatspi2.0-0 libcairo2 libcups2 libdbus-1-3 \
+            libdrm2 libgbm1 libglib2.0-0 libnspr4 libnss3 libx11-6 libxcb1 libxcomposite1 \
+            libxdamage1 libxext6 libxfixes3 libxkbcommon0 libxrandr2 \
+            libfreetype6 fonts-noto-color-emoji fonts-unifont xfonts-scalable fonts-liberation \
+            fonts-ipafont-gothic fonts-wqy-zenhei fonts-tlwg-loma-otf fonts-freefont-ttf
           rm -rf /var/lib/apt/lists/*
 
       - name: Install uv
@@ -131,12 +147,29 @@ jobs:
         run: uv sync --locked --python 3.14 --group e2e
 
       - name: Install Chromium for Playwright
-        run: uv run playwright install --with-deps chromium
+        # The browser alone: its system libraries came with WeasyPrint's, above.
+        run: uv run playwright install chromium
 
       - name: Install axe-core for the accessibility checks
         run: npm ci
 
+      - name: Keep the compiled translations between runs
+        # Compiling every catalogue took 18 to 37 s of each job that runs tests (#1033), and
+        # the result changes only with what the key hashes: every catalogue, the compiler, the
+        # language table it reads and the version it writes into status.json. Exact keys only,
+        # on every event: an older set of `.mo` files is a set of stale translations, not a
+        # head start.
+        id: catalogues
+        uses: actions/cache@v4
+        continue-on-error: true
+        with:
+          path: |
+            src/postulo/**/LC_MESSAGES/django.mo
+            src/postulo/locale/status.json
+          key: catalogues-${{ hashFiles('src/postulo/**/LC_MESSAGES/django.po', 'scripts/messages.py', 'src/postulo/core/messages_tool.py', 'src/postulo/core/languages.py', 'src/postulo/__init__.py') }}
+
       - name: Compile the translations
+        if: steps.catalogues.outputs.cache-hit != 'true'
         run: uv run python scripts/messages.py compile
 
       - name: Drive the critical path in a browser
@@ -152,10 +185,19 @@ jobs:
         #
         # One process. Two (`-n 2 --dist worksteal`, #721) saved two minutes in run 723 and
         # cost three failures that passed alone: beside the unit job on the same six-core
-        # host, a Chromium went thirty seconds without answering a click. The suite runs on
-        # workers without change -- each gets its own live server, database and Chromium,
-        # and tests/e2e/conftest.py starts the long walks first -- so it goes back to two
-        # once this job stops sharing the host with the unit job (#726).
+        # host, a Chromium went thirty seconds without answering a click, and the job went
+        # back to one process (#726). The suite runs on workers without change -- each gets
+        # its own live server, database and Chromium, and tests/e2e/conftest.py starts the
+        # long walks first.
+        #
+        # Measured again once an issue branch ran CI once, through its pull request (#1033):
+        # two workers were green on runs 1658 and 1691 (29 October 2026), beside a unit job of
+        # two. Then the unit job went to three workers (#1085), and run 1720 (30 October)
+        # took 32 minutes instead of 24 and failed four tests that passed alone, the target
+        # size walk, the phone walk in dark, the site search's panel and the board's column
+        # names: three unit workers, two browser workers and the PostgreSQL job on six cores,
+        # run 723 again. Two browser workers need the unit job back on fewer workers, or a
+        # runner of their own.
         run: uv run pytest -m e2e --browser chromium --durations=25
         # Half again what the suite took on 4 October 2026, so a hang ends here, with
         # pytest's stack dump of the test that hung above it, rather than at the runner's
@@ -256,9 +298,25 @@ jobs:
         # `default-groups` would otherwise install it on every leg of the matrix (#233).
         run: uv sync --locked --python ${{ matrix.python-version }} --no-group e2e
 
+      - name: Keep the compiled translations between runs
+        # Compiling every catalogue took 18 to 37 s of each job that runs tests (#1033), and
+        # the result changes only with what the key hashes: every catalogue, the compiler, the
+        # language table it reads and the version it writes into status.json. Exact keys only,
+        # on every event: an older set of `.mo` files is a set of stale translations, not a
+        # head start.
+        id: catalogues
+        uses: actions/cache@v4
+        continue-on-error: true
+        with:
+          path: |
+            src/postulo/**/LC_MESSAGES/django.mo
+            src/postulo/locale/status.json
+          key: catalogues-${{ hashFiles('src/postulo/**/LC_MESSAGES/django.po', 'scripts/messages.py', 'src/postulo/core/messages_tool.py', 'src/postulo/core/languages.py', 'src/postulo/__init__.py') }}
+
       - name: Compile the translations
         # The suite reads compiled catalogues: a page in Portuguese is only Portuguese if
         # its `.mo` exists, and the `.mo` files are not committed.
+        if: steps.catalogues.outputs.cache-hit != 'true'
         run: uv run python scripts/messages.py compile
 
       - name: Keep the ESCO classification between runs
@@ -322,7 +380,11 @@ jobs:
         # The `heavy` tests, one process, after the suite: four-times-size hostile Markdown,
         # which in a worker grown through the rest of the suite took the 2 GB job container
         # over its limit and had the worker killed (2026-10-10).
-        run: uv run pytest -m heavy -p no:xdist
+        #
+        # By file: without one, pytest collected all 25,000 tests to keep the 19 marked, about
+        # 15 s of every run (#1033). A test marked `heavy` in another file has to be named
+        # here as well, which `tests/test_release_tools.py` holds.
+        run: uv run pytest -m heavy -p no:xdist tests/security/test_markdown.py
         timeout-minutes: 10
 
   checks:
@@ -345,6 +407,12 @@ jobs:
           # The whole history: the translation guard reads every commit of the push or the
           # pull request, and needs `origin/main` to find where a new branch began.
           fetch-depth: 0
+          # Every commit and tree, and the files of the checked-out commit alone: the whole
+          # pack is 569 MiB, and fetching it was 69 s of this job (#1033). What the guard reads
+          # of an older commit is its list of changed paths, which the trees hold, and the
+          # catalogues of the few that change one, which git fetches when asked. Forgejo
+          # advertises `filter`, so the server serves the partial clone.
+          filter: blob:none
 
       - name: Install uv
         run: |
@@ -551,7 +619,23 @@ jobs:
         # --extra postgres, which is where psycopg lives and what the image was missing.
         run: uv sync --locked --python 3.14 --extra postgres --no-group e2e
 
+      - name: Keep the compiled translations between runs
+        # Compiling every catalogue took 18 to 37 s of each job that runs tests (#1033), and
+        # the result changes only with what the key hashes: every catalogue, the compiler, the
+        # language table it reads and the version it writes into status.json. Exact keys only,
+        # on every event: an older set of `.mo` files is a set of stale translations, not a
+        # head start.
+        id: catalogues
+        uses: actions/cache@v4
+        continue-on-error: true
+        with:
+          path: |
+            src/postulo/**/LC_MESSAGES/django.mo
+            src/postulo/locale/status.json
+          key: catalogues-${{ hashFiles('src/postulo/**/LC_MESSAGES/django.po', 'scripts/messages.py', 'src/postulo/core/messages_tool.py', 'src/postulo/core/languages.py', 'src/postulo/__init__.py') }}
+
       - name: Compile the translations
+        if: steps.catalogues.outputs.cache-hit != 'true'
         run: uv run python scripts/messages.py compile
 
       - name: Run the database-facing tests against PostgreSQL

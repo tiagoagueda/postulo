@@ -229,7 +229,7 @@ def test_another_accounts_address_cannot_be_placed(client, user, other_user):
     assert place_by_hand(client, user, address, latitude="1", longitude="1").status_code == 404
 
 
-def test_the_place_page_draws_over_the_tiles_and_allows_only_them(client, user):
+def test_the_place_page_draws_over_the_tiles_and_allows_only_them(client, user, openstreetmap):
     company = Company.objects.create(owner=user, name="One", location="Lisbon")
     client.force_login(user)
 

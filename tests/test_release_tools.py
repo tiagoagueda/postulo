@@ -488,6 +488,30 @@ def test_ci_and_every_python_together_test_every_supported_python():
     assert rest["strategy"]["matrix"]["python-version"] == list(supported[:-1])
 
 
+def test_the_heavy_step_names_every_file_with_a_heavy_test():
+    """The `heavy` step runs the files it names and no others (#1033).
+
+    It named none, and pytest collected the whole suite to keep 19 tests. A file is named now
+    instead, so a test marked `heavy` anywhere else would be deselected from the suite by
+    `addopts` and never run by this step either: never run in CI at all.
+    """
+    import yaml
+
+    workflow = (ROOT / ".forgejo" / "workflows" / "ci.yml").read_text(encoding="utf-8")
+    steps = yaml.safe_load(workflow)["jobs"]["test"]["steps"]
+    run = next(step["run"] for step in steps if "-m heavy" in step.get("run", ""))
+    named = {part for part in run.split() if part.startswith("tests/")}
+    here = Path(__file__).resolve()
+    marked = {
+        path.relative_to(ROOT).as_posix()
+        for path in (ROOT / "tests").rglob("*.py")
+        if path.resolve() != here and "mark.heavy" in path.read_text(encoding="utf-8")
+    }
+    assert named, "the heavy step names its files"
+    assert "tests/security/test_markdown.py" in marked, "the search finds the marker"
+    assert marked <= named, f"marked `heavy` but not run by the heavy step: {marked - named}"
+
+
 def test_an_issue_branch_is_checked_by_its_pull_request_alone():
     """The push filters take `main` and release branches, never an issue branch (#1033).
 

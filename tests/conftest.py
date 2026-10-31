@@ -395,6 +395,20 @@ def german(monkeypatch):
 
 
 @pytest.fixture
+def openstreetmap(settings):
+    """The map's tiles from OpenStreetMap, the default an instance gets (#898).
+
+    The test settings draw the world's outline instead, so that no browser walk through the
+    companies' map asks a server outside the project for tiles (#1033). The tests about the
+    tiles themselves ask for OpenStreetMap here, and the browser's ones answer its requests
+    without leaving the machine.
+    """
+    from postulo.jobs import tiles
+
+    settings.POSTULO_MAP_TILES = tiles.OSM
+
+
+@pytest.fixture
 def atomic_requests(monkeypatch):
     """Requests run in a transaction each, as an instance runs them (#357).
 

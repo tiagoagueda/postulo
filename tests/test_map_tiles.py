@@ -20,6 +20,9 @@ from postulo.core.models import SiteSettings
 from postulo.jobs import tiles
 from postulo.jobs.models import Company
 
+#: OpenStreetMap, as on an instance: the test settings draw the outline instead (#1033).
+pytestmark = pytest.mark.usefixtures("openstreetmap")
+
 
 @pytest.fixture
 def staff(user):

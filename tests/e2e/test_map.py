@@ -14,7 +14,8 @@ from playwright.sync_api import Page, expect
 
 from tests.e2e.signing_in import sign_in
 
-pytestmark = pytest.mark.e2e
+#: OpenStreetMap, as on an instance: the test settings draw the outline instead (#1033).
+pytestmark = [pytest.mark.e2e, pytest.mark.usefixtures("openstreetmap")]
 
 #: The smallest PNG there is, so a tile request has an answer without leaving the machine.
 PIXEL = base64.b64decode(

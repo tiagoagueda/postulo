@@ -106,9 +106,25 @@ jobs:
         # `default-groups` would otherwise install it on every leg of the matrix (#233).
         run: uv sync --locked --python ${{ matrix.python-version }} --no-group e2e
 
+      - name: Keep the compiled translations between runs
+        # Compiling every catalogue took 18 to 37 s of each job that runs tests (#1033), and
+        # the result changes only with what the key hashes: every catalogue, the compiler, the
+        # language table it reads and the version it writes into status.json. Exact keys only,
+        # on every event: an older set of `.mo` files is a set of stale translations, not a
+        # head start.
+        id: catalogues
+        uses: actions/cache@v4
+        continue-on-error: true
+        with:
+          path: |
+            src/postulo/**/LC_MESSAGES/django.mo
+            src/postulo/locale/status.json
+          key: catalogues-${{ hashFiles('src/postulo/**/LC_MESSAGES/django.po', 'scripts/messages.py', 'src/postulo/core/messages_tool.py', 'src/postulo/core/languages.py', 'src/postulo/__init__.py') }}
+
       - name: Compile the translations
         # The suite reads compiled catalogues: a page in Portuguese is only Portuguese if
         # its `.mo` exists, and the `.mo` files are not committed.
+        if: steps.catalogues.outputs.cache-hit != 'true'
         run: uv run python scripts/messages.py compile
 
       - name: Keep the ESCO classification between runs
@@ -161,5 +177,9 @@ jobs:
         # The `heavy` tests, one process, after the suite: four-times-size hostile Markdown,
         # which in a worker grown through the rest of the suite took the 2 GB job container
         # over its limit and had the worker killed (2026-10-10).
-        run: uv run pytest -m heavy -p no:xdist
+        #
+        # By file: without one, pytest collected all 25,000 tests to keep the 19 marked, about
+        # 15 s of every run (#1033). A test marked `heavy` in another file has to be named
+        # here as well, which `tests/test_release_tools.py` holds.
+        run: uv run pytest -m heavy -p no:xdist tests/security/test_markdown.py
         timeout-minutes: 10
