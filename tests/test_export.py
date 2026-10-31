@@ -16,7 +16,13 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.urls import reverse
 from django.utils import timezone
 
-from postulo.applications.models import Application, ApplicationEvent, Reminder, Status
+from postulo.applications.models import (
+    Application,
+    ApplicationEvent,
+    Appointment,
+    Reminder,
+    Status,
+)
 from postulo.applications.services import change_status, record_event
 from postulo.core import export as export_module
 from postulo.core import importer
@@ -603,6 +609,41 @@ def test_a_reminder_about_no_application_comes_back_about_none(populated, other_
     mine = Reminder.objects.for_user(other_user)
     assert mine.get(summary="Chase").application_id is not None
     assert mine.get(summary="Renew passport").application_id is None
+
+
+def test_a_nested_reminder_keeps_its_source_note_and_retired_date(populated, other_user):
+    """Under an application or an appointment, a reminder came back as if somebody had made it,
+    and un-retired (#1081)."""
+    retired = timezone.now().replace(microsecond=0)
+    Reminder.objects.filter(owner=populated, summary="Chase").update(
+        source="dav", note="From the shared calendar", retired_at=retired
+    )
+    meeting_reminder = Reminder.objects.create(
+        owner=populated,
+        application=None,
+        summary="Meet the adviser",
+        due_at=timezone.now(),
+        source="francetravail",
+        note="Booked online",
+        retired_at=retired,
+    )
+    Appointment.objects.create(
+        owner=populated,
+        company=Company.objects.get(owner=populated),
+        starts_at=timezone.now() + dt.timedelta(days=2),
+        reminder=meeting_reminder,
+    )
+    archive, _document = read_archive(populated)
+
+    importer.load(other_user, archive)
+
+    mine = Reminder.objects.for_user(other_user)
+    for summary, source, note in (
+        ("Chase", "dav", "From the shared calendar"),
+        ("Meet the adviser", "francetravail", "Booked online"),
+    ):
+        reminder = mine.get(summary=summary)
+        assert (reminder.source, reminder.note, reminder.retired_at) == (source, note, retired)
 
 
 def test_an_archive_from_before_reminders_about_none_still_imports(populated, other_user):

@@ -385,6 +385,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 - The pairing pages head their record column with the noun, not the verb on the status card's button: the two now have separate entries to translate, so no language shows "Enregistrer" or "Erfassen" there (#1178)
 - A Europass PDF whose attached CV is not marked as an embedded file, such as one Google Docs wrote, is read through its file specification instead of being called empty, wherever the PDF lists it and whether or not it is compressed. (#318)
+- A reminder nested under an application or an appointment comes back from an account archive with the plugin that placed it, its note and the date it was retired, as a top-level one does, not as one somebody made and still open (#1081)
 - The browser tests keep their database in a file, so each request the live server answers has a connection of its own: two requests at once no longer share one in-memory SQLite connection and its transactions, which failed a run at random with `no such savepoint` and then every test after it. (#1024)
 - A capture of a page nothing could be read from is accepted when a title was typed for it, and its review says nothing read it; with no title it is still refused, naming the field. (#710)
 - Adding a contact through the API needs write access to the company, not only read access, so a company shared read-only can no longer be given contacts. (#328)
