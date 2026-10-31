@@ -2069,6 +2069,14 @@ msgstr "Bir taslak hiçbir yerde saklanmaz ve dolduracak bir şeyi olmayan her y
 msgid "A driving licence"
 msgstr "Sürücü belgesi"
 
+#: src/postulo/documents/integrity.py
+msgid "a European Digital Credential"
+msgstr ""
+
+#: src/postulo/documents/forms.py
+msgid "A European Digital Credential is kept as a certificate, a diploma or a diploma supplement."
+msgstr ""
+
 #: src/postulo/documents/properties.py
 msgid "A few words a search of your own files could use, separated by commas. Stuffing them does not help with applicant tracking software, and can count against an application."
 msgstr "Kendi dosyalarınızda yapılacak bir aramanın kullanabileceği, virgülle ayrılmış birkaç sözcük. Bunları doldurup taşırmak aday takip yazılımlarına yardımcı olmaz ve bir başvurunun aleyhine sayılabilir."
@@ -4133,9 +4141,17 @@ msgstr "Doğrulama bekliyor"
 msgid "awarded by"
 msgstr "veren"
 
+#: src/postulo/templates/documents/upload_form.html
+msgid "Awarded by"
+msgstr ""
+
 #: src/postulo/resume/models.py
 msgid "awarded on"
 msgstr "verilme tarihi"
+
+#: src/postulo/templates/documents/upload_form.html
+msgid "Awarded on"
+msgstr ""
 
 #: src/postulo/jobs/roles.py
 #, fuzzy
@@ -6770,6 +6786,7 @@ msgid "Entries in listing histories that came from them"
 msgstr "İlan geçmişlerinde onlardan gelen girdiler"
 
 #: src/postulo/resume/models.py
+#: src/postulo/templates/documents/upload_form.html
 msgid "EQF level"
 msgstr "EQF düzeyi"
 
@@ -11548,6 +11565,7 @@ msgstr "Gösterilmiyor · %(name)s"
 
 #: src/postulo/accounts/forms.py src/postulo/resume/forms.py
 #: src/postulo/resume/models.py
+#: src/postulo/templates/documents/upload_form.html
 msgid "Not stated"
 msgstr "Belirtilmemiş"
 
@@ -13097,8 +13115,8 @@ msgid "PDF renderer"
 msgstr "PDF oluşturucu"
 
 #: src/postulo/documents/forms.py
-msgid "PDF, Word, OpenDocument, RTF, plain text, PNG or JPEG. Postulo keeps it under a name of its own and changes nothing in it, except what the box below removes from a photograph: a PDF or a Word file keeps whatever it carries, such as its author."
-msgstr "PDF, Word, OpenDocument, RTF, düz metin, PNG ya da JPEG. Postulo dosyayı kendine ait bir adla saklar ve aşağıdaki kutunun bir fotoğraftan kaldırdıkları dışında içinde hiçbir şeyi değiştirmez: bir PDF ya da Word dosyası, yazarı gibi taşıdığı her şeyi korur."
+msgid "PDF, Word, OpenDocument, RTF, plain text, PNG or JPEG, or a European Digital Credential (JSON-LD) as a certificate, diploma or diploma supplement. Postulo keeps it under a name of its own and changes nothing in it, except what the box below removes from a photograph: a PDF or a Word file keeps whatever it carries, such as its author."
+msgstr ""
 
 #: src/postulo/templates/accounts/invite_list.html
 msgid "Pending"
@@ -15074,6 +15092,11 @@ msgstr "kapsamlar"
 msgid "Screening"
 msgstr "Ön eleme"
 
+#: src/postulo/templates/documents/upload_form.html
+#: src/postulo/templates/documents/upload_list.html
+msgid "Seal not checked by Postulo"
+msgstr ""
+
 #: src/postulo/core/tables.py src/postulo/templates/connections/pairing.html
 #: src/postulo/templates/connections/pairing_item.html
 #: src/postulo/templates/core/search.html
@@ -16956,6 +16979,10 @@ msgstr "O görüntü, olması gerekenden çok daha büyük."
 msgid "That invitation has already been accepted and cannot be revoked."
 msgstr "O davet zaten kabul edilmiş, iptal edilemez."
 
+#: src/postulo/documents/forms.py
+msgid "That is a European Digital Credential in the old XML format, which Postulo does not read. Download it again from your Europass wallet, where it has been converted, and upload that file."
+msgstr ""
+
 #: src/postulo/plugins/views.py
 #, python-format
 msgid "That is a lot of questions to the server. Try again in %(seconds)d second."
@@ -17783,6 +17810,10 @@ msgstr "%(name)s dosyası"
 #, python-format
 msgid "The file also holds %(names)s, which this page does not read."
 msgstr "Dosya ayrıca bu sayfanın okumadığı şunları da içeriyor: %(names)s."
+
+#: src/postulo/documents/views.py
+msgid "The file could not be opened."
+msgstr ""
 
 #: src/postulo/core/csv_import.py
 msgid "The file could not be read: a cell is over 128 KiB. A quotation mark that is never closed is the usual cause."
@@ -19529,6 +19560,7 @@ msgid "times cited"
 msgstr "atıf adedi"
 
 #: src/postulo/accounts/forms.py src/postulo/documents/forms.py
+#: src/postulo/templates/documents/upload_form.html
 msgid "Title"
 msgstr "Başlık"
 
@@ -20615,6 +20647,10 @@ msgstr "Rakamın ne başına olduğu. Yanında bir tutar olmadan hiçbir anlamı
 msgid "What the file says about itself"
 msgstr "Dosyanın kendisi hakkında ne söylediği"
 
+#: src/postulo/templates/documents/upload_form.html
+msgid "What the file states, as it states it. Postulo has not checked who sealed it, and nothing about it was sent anywhere to read it."
+msgstr ""
+
 #: src/postulo/accounts/models.py src/postulo/jobs/models.py
 msgid "What the identifier is, when the scheme is Other."
 msgstr "Şema “Diğer” olduğunda tanımlayıcının ne olduğu."
@@ -20667,6 +20703,10 @@ msgstr "Ne yapabilirler"
 #: src/postulo/templates/jobs/capture_page.html
 msgid "What this capture kept of the page it was read from, beside what was read from it."
 msgstr "Bu yakalamanın, okunduğu sayfadan sakladıkları; ondan okunanların yanında."
+
+#: src/postulo/templates/documents/upload_form.html
+msgid "What this credential says"
+msgstr ""
 
 #: src/postulo/templates/documents/cv_form.html
 msgid "What this CV prints about you"

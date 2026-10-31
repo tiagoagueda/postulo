@@ -2272,6 +2272,14 @@ msgstr "Osnutek se nikjer ne hrani in označi vse, česar nima s čim zapolniti.
 msgid "A driving licence"
 msgstr "Vozniško dovoljenje"
 
+#: src/postulo/documents/integrity.py
+msgid "a European Digital Credential"
+msgstr ""
+
+#: src/postulo/documents/forms.py
+msgid "A European Digital Credential is kept as a certificate, a diploma or a diploma supplement."
+msgstr ""
+
 #: src/postulo/documents/properties.py
 msgid "A few words a search of your own files could use, separated by commas. Stuffing them does not help with applicant tracking software, and can count against an application."
 msgstr "Nekaj besed, ločenih z vejicami, ki bi jih lahko uporabilo iskanje po vaših lastnih datotekah. Kopičenje ključnih besed ne pomaga pri sistemih za sledenje kandidatom in lahko prijavi celo škodi."
@@ -4358,9 +4366,17 @@ msgstr "Čaka na preverjanje"
 msgid "awarded by"
 msgstr "podeljevalec"
 
+#: src/postulo/templates/documents/upload_form.html
+msgid "Awarded by"
+msgstr ""
+
 #: src/postulo/resume/models.py
 msgid "awarded on"
 msgstr "podeljeno dne"
+
+#: src/postulo/templates/documents/upload_form.html
+msgid "Awarded on"
+msgstr ""
 
 #: src/postulo/jobs/roles.py
 #, fuzzy
@@ -6996,6 +7012,7 @@ msgid "Entries in listing histories that came from them"
 msgstr "Vnosi v zgodovinah oglasov, ki so izvirali iz njih"
 
 #: src/postulo/resume/models.py
+#: src/postulo/templates/documents/upload_form.html
 msgid "EQF level"
 msgstr "Raven EOK"
 
@@ -11793,6 +11810,7 @@ msgstr "Ni prikazano · %(name)s"
 
 #: src/postulo/accounts/forms.py src/postulo/resume/forms.py
 #: src/postulo/resume/models.py
+#: src/postulo/templates/documents/upload_form.html
 msgid "Not stated"
 msgstr "Ni navedeno"
 
@@ -13394,8 +13412,8 @@ msgid "PDF renderer"
 msgstr "Izrisovalnik PDF"
 
 #: src/postulo/documents/forms.py
-msgid "PDF, Word, OpenDocument, RTF, plain text, PNG or JPEG. Postulo keeps it under a name of its own and changes nothing in it, except what the box below removes from a photograph: a PDF or a Word file keeps whatever it carries, such as its author."
-msgstr "PDF, Word, OpenDocument, RTF, navadno besedilo, PNG ali JPEG. Postulo jo hrani pod lastnim imenom in v njej ne spremeni ničesar, razen tega, kar spodnje potrditveno polje odstrani iz fotografije: datoteka PDF ali Word obdrži vse, kar vsebuje, na primer avtorja."
+msgid "PDF, Word, OpenDocument, RTF, plain text, PNG or JPEG, or a European Digital Credential (JSON-LD) as a certificate, diploma or diploma supplement. Postulo keeps it under a name of its own and changes nothing in it, except what the box below removes from a photograph: a PDF or a Word file keeps whatever it carries, such as its author."
+msgstr ""
 
 #: src/postulo/templates/accounts/invite_list.html
 msgid "Pending"
@@ -15384,6 +15402,11 @@ msgstr "obsegi"
 msgid "Screening"
 msgstr "Predizbor"
 
+#: src/postulo/templates/documents/upload_form.html
+#: src/postulo/templates/documents/upload_list.html
+msgid "Seal not checked by Postulo"
+msgstr ""
+
 #: src/postulo/core/tables.py src/postulo/templates/connections/pairing.html
 #: src/postulo/templates/connections/pairing_item.html
 #: src/postulo/templates/core/search.html
@@ -17260,6 +17283,10 @@ msgstr "Ta slika je veliko večja, kot je potrebno."
 msgid "That invitation has already been accepted and cannot be revoked."
 msgstr "To vabilo je že sprejeto in ga ni mogoče preklicati."
 
+#: src/postulo/documents/forms.py
+msgid "That is a European Digital Credential in the old XML format, which Postulo does not read. Download it again from your Europass wallet, where it has been converted, and upload that file."
+msgstr ""
+
 #: src/postulo/plugins/views.py
 #, python-format
 msgid "That is a lot of questions to the server. Try again in %(seconds)d second."
@@ -18102,6 +18129,10 @@ msgstr "datoteka %(name)s"
 #, python-format
 msgid "The file also holds %(names)s, which this page does not read."
 msgstr "Datoteka vsebuje tudi %(names)s, česar ta stran ne bere."
+
+#: src/postulo/documents/views.py
+msgid "The file could not be opened."
+msgstr ""
 
 #: src/postulo/core/csv_import.py
 msgid "The file could not be read: a cell is over 128 KiB. A quotation mark that is never closed is the usual cause."
@@ -19874,6 +19905,7 @@ msgid "times cited"
 msgstr "število citiranj"
 
 #: src/postulo/accounts/forms.py src/postulo/documents/forms.py
+#: src/postulo/templates/documents/upload_form.html
 msgid "Title"
 msgstr "Naslov"
 
@@ -20957,6 +20989,10 @@ msgstr "Na kaj se številka nanaša. Brez zneska ob njej nič ne pomeni in se ta
 msgid "What the file says about itself"
 msgstr "Kaj datoteka pove o sebi"
 
+#: src/postulo/templates/documents/upload_form.html
+msgid "What the file states, as it states it. Postulo has not checked who sealed it, and nothing about it was sent anywhere to read it."
+msgstr ""
+
 #: src/postulo/accounts/models.py src/postulo/jobs/models.py
 msgid "What the identifier is, when the scheme is Other."
 msgstr "Kaj je identifikator, kadar je shema »Drugo«."
@@ -21008,6 +21044,10 @@ msgstr "Kaj lahko naredijo"
 #: src/postulo/templates/jobs/capture_page.html
 msgid "What this capture kept of the page it was read from, beside what was read from it."
 msgstr "Kar je ta zajem shranil od strani, iz katere je bil prebran, ob tem, kar je bilo iz nje prebrano."
+
+#: src/postulo/templates/documents/upload_form.html
+msgid "What this credential says"
+msgstr ""
 
 #: src/postulo/templates/documents/cv_form.html
 msgid "What this CV prints about you"

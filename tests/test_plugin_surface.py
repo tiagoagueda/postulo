@@ -118,6 +118,11 @@ REACHING_PAST: dict[str, dict[str, str]] = {
             "which Postulo's own matching of a typed name reads as well (#689). One table, "
             "not two; a name on the surface would be #109's to promise"
         ),
+        "postulo.documents.credentials": (
+            "`credential_in`: what a European Digital Credential file holds, sealed or not, "
+            "which the upload is judged by and this reads the facts from (#670). One reading "
+            "of a stranger's file, not two"
+        ),
         # `Record` used to be reached past the surface as well. It is on it since #105,
         # because a third-party importer has to fill the same one.
     },

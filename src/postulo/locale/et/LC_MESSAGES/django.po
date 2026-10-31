@@ -2069,6 +2069,14 @@ msgstr "Mustandit ei salvestata kuskile ja see märgib ära kõik, mida tal pole
 msgid "A driving licence"
 msgstr "Juhiluba"
 
+#: src/postulo/documents/integrity.py
+msgid "a European Digital Credential"
+msgstr ""
+
+#: src/postulo/documents/forms.py
+msgid "A European Digital Credential is kept as a certificate, a diploma or a diploma supplement."
+msgstr ""
+
 #: src/postulo/documents/properties.py
 msgid "A few words a search of your own files could use, separated by commas. Stuffing them does not help with applicant tracking software, and can count against an application."
 msgstr "Mõni sõna, mida teie enda failide otsing saaks kasutada, komadega eraldatult. Nende kuhjamine ei aita värbamissüsteemides ja võib kandideerimisele kahjuks tulla."
@@ -4124,10 +4132,18 @@ msgstr "Ootab kinnitust"
 msgid "awarded by"
 msgstr "andja"
 
+#: src/postulo/templates/documents/upload_form.html
+msgid "Awarded by"
+msgstr ""
+
 #: src/postulo/resume/models.py
 #, fuzzy
 msgid "awarded on"
 msgstr "andmise kuupäev"
+
+#: src/postulo/templates/documents/upload_form.html
+msgid "Awarded on"
+msgstr ""
 
 #: src/postulo/jobs/roles.py
 msgid "Awarding bodies"
@@ -6752,6 +6768,7 @@ msgid "Entries in listing histories that came from them"
 msgstr "Neist pärinevad kanded kuulutuste ajaloos"
 
 #: src/postulo/resume/models.py
+#: src/postulo/templates/documents/upload_form.html
 msgid "EQF level"
 msgstr "EKR tase"
 
@@ -11523,6 +11540,7 @@ msgstr "Ei kuvata · %(name)s"
 
 #: src/postulo/accounts/forms.py src/postulo/resume/forms.py
 #: src/postulo/resume/models.py
+#: src/postulo/templates/documents/upload_form.html
 msgid "Not stated"
 msgstr "Määramata"
 
@@ -13073,8 +13091,8 @@ msgid "PDF renderer"
 msgstr "PDF-renderdaja"
 
 #: src/postulo/documents/forms.py
-msgid "PDF, Word, OpenDocument, RTF, plain text, PNG or JPEG. Postulo keeps it under a name of its own and changes nothing in it, except what the box below removes from a photograph: a PDF or a Word file keeps whatever it carries, such as its author."
-msgstr "PDF, Word, OpenDocument, RTF, lihttekst, PNG või JPEG. Postulo hoiab seda oma nime all ega muuda selles midagi peale selle, mida allolev märkeruut fotolt eemaldab: PDF- või Word-fail jätab alles kõik, mida see sisaldab, näiteks autori."
+msgid "PDF, Word, OpenDocument, RTF, plain text, PNG or JPEG, or a European Digital Credential (JSON-LD) as a certificate, diploma or diploma supplement. Postulo keeps it under a name of its own and changes nothing in it, except what the box below removes from a photograph: a PDF or a Word file keeps whatever it carries, such as its author."
+msgstr ""
 
 #: src/postulo/templates/accounts/invite_list.html
 msgid "Pending"
@@ -15053,6 +15071,11 @@ msgstr "õigused"
 msgid "Screening"
 msgstr "Sõelumine"
 
+#: src/postulo/templates/documents/upload_form.html
+#: src/postulo/templates/documents/upload_list.html
+msgid "Seal not checked by Postulo"
+msgstr ""
+
 #: src/postulo/core/tables.py src/postulo/templates/connections/pairing.html
 #: src/postulo/templates/connections/pairing_item.html
 #: src/postulo/templates/core/search.html
@@ -16909,6 +16932,10 @@ msgstr "See pilt on palju suurem, kui vaja."
 msgid "That invitation has already been accepted and cannot be revoked."
 msgstr "See kutse on juba vastu võetud ja seda ei saa tühistada."
 
+#: src/postulo/documents/forms.py
+msgid "That is a European Digital Credential in the old XML format, which Postulo does not read. Download it again from your Europass wallet, where it has been converted, and upload that file."
+msgstr ""
+
 #: src/postulo/plugins/views.py
 #, python-format
 msgid "That is a lot of questions to the server. Try again in %(seconds)d second."
@@ -17735,6 +17762,10 @@ msgstr "fail %(name)s"
 #, python-format
 msgid "The file also holds %(names)s, which this page does not read."
 msgstr "Fail sisaldab ka järgmist: %(names)s, mida see leht ei loe."
+
+#: src/postulo/documents/views.py
+msgid "The file could not be opened."
+msgstr ""
 
 #: src/postulo/core/csv_import.py
 msgid "The file could not be read: a cell is over 128 KiB. A quotation mark that is never closed is the usual cause."
@@ -19477,6 +19508,7 @@ msgid "times cited"
 msgstr "tsiteeritud kordi"
 
 #: src/postulo/accounts/forms.py src/postulo/documents/forms.py
+#: src/postulo/templates/documents/upload_form.html
 msgid "Title"
 msgstr "Pealkiri"
 
@@ -20547,6 +20579,10 @@ msgstr "Mille kohta summa on. Ilma kõrvaloleva summata ei tähenda see midagi j
 msgid "What the file says about itself"
 msgstr "Mida fail enda kohta ütleb"
 
+#: src/postulo/templates/documents/upload_form.html
+msgid "What the file states, as it states it. Postulo has not checked who sealed it, and nothing about it was sent anywhere to read it."
+msgstr ""
+
 #: src/postulo/accounts/models.py src/postulo/jobs/models.py
 msgid "What the identifier is, when the scheme is Other."
 msgstr "Mis identifikaator see on, kui skeem on „Muu“."
@@ -20598,6 +20634,10 @@ msgstr "Mida nad saavad teha"
 #: src/postulo/templates/jobs/capture_page.html
 msgid "What this capture kept of the page it was read from, beside what was read from it."
 msgstr "Mida see jäädvustus säilitas lehest, millest see loeti, loetu kõrval."
+
+#: src/postulo/templates/documents/upload_form.html
+msgid "What this credential says"
+msgstr ""
 
 #: src/postulo/templates/documents/cv_form.html
 msgid "What this CV prints about you"

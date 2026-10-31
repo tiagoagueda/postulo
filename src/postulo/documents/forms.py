@@ -22,7 +22,7 @@ from postulo.jobs.models import Contact
 from postulo.resume.models import Link
 from postulo.resume.registry import OVERVIEW_ORDER, SECTIONS
 
-from . import integrity, paper, paper_choice, proofs, readers, themes
+from . import credentials, integrity, paper, paper_choice, proofs, readers, themes
 from .kinds import PROOF_KINDS, DocumentKind
 from .models import (
     CV,
@@ -536,6 +536,30 @@ class CoverLetterForm(ThemeChoiceMixin, LanguageChoiceMixin, OwnerScopedModelFor
         self.initial.setdefault("theme", LETTER_THEMES.get(kind, themes.DEFAULT))
 
 
+def _refuse_an_old_credential(uploaded) -> None:
+    """Say what to do with a credential in the old XML, before its extension is refused (#670).
+
+    The European Learning Model v2 wrote a credential as signed XML, and the Europass wallets
+    have converted every one they hold. "XML is not allowed" would leave somebody holding
+    such a file with nowhere to go; this says where the new one is.
+    """
+    if integrity.extension_of(getattr(uploaded, "name", "") or "") != "xml":
+        return
+    uploaded.seek(0)
+    head = uploaded.read(4096)
+    uploaded.seek(0)
+    if credentials.is_old_credential(head):
+        raise forms.ValidationError(OLD_CREDENTIAL, code="old_credential")
+
+
+#: What an old XML credential is told (#670).
+OLD_CREDENTIAL = _(
+    "That is a European Digital Credential in the old XML format, which Postulo does not "
+    "read. Download it again from your Europass wallet, where it has been converted, and "
+    "upload that file."
+)
+
+
 class UploadedDocumentForm(OwnerScopedModelForm):
     class Meta:
         model = UploadedDocument
@@ -545,9 +569,10 @@ class UploadedDocumentForm(OwnerScopedModelForm):
             "title": _("What you will look for it under."),
             "kind": _("What sort of thing it is, so the lists can be narrowed by it."),
             "file": _(
-                "PDF, Word, OpenDocument, RTF, plain text, PNG or JPEG. Postulo keeps it "
-                "under a name of its own and changes nothing in it, except what the box "
-                "below removes from a photograph: a PDF or a Word file keeps whatever it "
+                "PDF, Word, OpenDocument, RTF, plain text, PNG or JPEG, or a European Digital "
+                "Credential (JSON-LD) as a certificate, diploma or diploma supplement. Postulo "
+                "keeps it under a name of its own and changes nothing in it, except what the "
+                "box below removes from a photograph: a PDF or a Word file keeps whatever it "
                 "carries, such as its author."
             ),
             "notes": _("Yours. They go nowhere with the file."),
@@ -715,6 +740,17 @@ class UploadedDocumentForm(OwnerScopedModelForm):
             # came after.
             self.fields.pop("file", None)
             self.fields.pop("strip_metadata", None)
+        if "file" in self.fields:
+            # Before the extension's refusal and instead of it, so an old credential is told
+            # one thing, and the thing it can act on.
+            original = list(self.fields["file"].validators)
+
+            def validate(uploaded) -> None:
+                _refuse_an_old_credential(uploaded)
+                for validator in original:
+                    validator(uploaded)
+
+            self.fields["file"].validators = [validate]
         self.fields["replaces"].queryset = queryset
         self.fields["replaces"].label = _("Supersedes")
 
@@ -738,10 +774,30 @@ class UploadedDocumentForm(OwnerScopedModelForm):
     def clean(self):
         cleaned = super().clean()
         self._without_the_photos_metadata(cleaned)
+        self._credential_is_a_proof(cleaned)
         written, until = cleaned.get("written_on"), cleaned.get("valid_until")
         if written and until and until < written:
             self.add_error("valid_until", _("A letter cannot expire before it was written."))
         return cleaned
+
+    def _credential_is_a_proof(self, cleaned: dict) -> None:
+        """A European Digital Credential is kept as what it proves, and as nothing else (#670).
+
+        A certificate, a diploma or a diploma supplement: the kinds a credential is issued
+        as. Asked of a new file and of an existing one whose type is changed.
+        """
+        uploaded = cleaned.get("file") or self.instance.file
+        name = getattr(uploaded, "name", "") or ""
+        kind = cleaned.get("kind")
+        if kind and integrity.extension_of(name) in credentials.EXTENSIONS:
+            if kind not in PROOF_KINDS:
+                self.add_error(
+                    "kind",
+                    _(
+                        "A European Digital Credential is kept as a certificate, a diploma "
+                        "or a diploma supplement."
+                    ),
+                )
 
     def _without_the_photos_metadata(self, cleaned: dict) -> None:
         """Swap the upload for the same picture with its metadata cut out, if asked (#964).

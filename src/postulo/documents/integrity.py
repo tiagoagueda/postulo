@@ -28,9 +28,24 @@ from typing import IO
 
 from django.utils.translation import gettext as _
 
+from . import credentials
+
 #: The extensions an uploaded document may carry. Nine, as the field has always allowed: a
-#: narrower list would refuse what people already keep (#663).
-EXTENSIONS = ("pdf", "doc", "docx", "odt", "rtf", "txt", "png", "jpg", "jpeg")
+#: narrower list would refuse what people already keep (#663). And a European Digital
+#: Credential's two (#670), which hold a credential or are refused: a JSON file of any other
+#: sort is not a document.
+EXTENSIONS = (
+    "pdf",
+    "doc",
+    "docx",
+    "odt",
+    "rtf",
+    "txt",
+    "png",
+    "jpg",
+    "jpeg",
+    *credentials.EXTENSIONS,
+)
 
 #: How much of the start and of the end of a file is looked at.
 HEAD = 1024
@@ -51,6 +66,8 @@ def _description(extension: str) -> str:
         "png": _("a PNG picture"),
         "jpg": _("a JPEG picture"),
         "jpeg": _("a JPEG picture"),
+        "json": _("a European Digital Credential"),
+        "jsonld": _("a European Digital Credential"),
     }.get(extension, _("the kind of file its name says"))
 
 
@@ -107,7 +124,15 @@ def _picture_problem(extension: str, handle: IO[bytes]) -> bool:
     return False
 
 
+def _credential_problem(extension: str, handle: IO[bytes]) -> bool:
+    """Whether the file is *not* a verifiable credential (#670). Read under the cap, as JSON."""
+    handle.seek(0)
+    return not credentials.is_credential(handle.read(credentials.MAX_BYTES + 1))
+
+
 _CONTAINERS: dict[str, Callable[[str, IO[bytes]], bool]] = {
+    "json": _credential_problem,
+    "jsonld": _credential_problem,
     "odt": _zip_problem,
     "docx": _zip_problem,
     "png": _picture_problem,

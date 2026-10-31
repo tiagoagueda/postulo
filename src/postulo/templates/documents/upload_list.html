@@ -62,6 +62,11 @@
                 · {{ document.created_at|date:"DATE_FORMAT" }}
                 {% if not document.is_current %} · {% translate "superseded" %}{% endif %}
               </p>
+              {% comment %} A credential's seal is never checked here, and the row says so
+                 rather than saying nothing: grey, and never a tick (#670). {% endcomment %}
+              {% if document.is_credential %}
+                <p class="mt-1"><span class="badge" data-tone="grey" data-seal="unchecked">{% translate "Seal not checked by Postulo" %}</span></p>
+              {% endif %}
               {% if document.proves %}
                 <p class="text-xs text-ink-500 dark:text-ink-400" data-proves>
                   {% blocktranslate trimmed with entry=document.proves %}

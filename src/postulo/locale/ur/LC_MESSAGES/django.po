@@ -2075,6 +2075,14 @@ msgstr "مسودہ کہیں محفوظ نہیں ہوتا، اور جس چیز ک
 msgid "A driving licence"
 msgstr "ڈرائیونگ لائسنس"
 
+#: src/postulo/documents/integrity.py
+msgid "a European Digital Credential"
+msgstr ""
+
+#: src/postulo/documents/forms.py
+msgid "A European Digital Credential is kept as a certificate, a diploma or a diploma supplement."
+msgstr ""
+
 #: src/postulo/documents/properties.py
 msgid "A few words a search of your own files could use, separated by commas. Stuffing them does not help with applicant tracking software, and can count against an application."
 msgstr "چند الفاظ جن سے آپ کی اپنی فائلوں کی تلاش میں مدد مل سکے، کوما سے الگ کیے ہوئے۔ انہیں بھر مار سے ڈالنا درخواست دہندگان کو ٹریک کرنے والے سافٹ ویئر میں فائدہ نہیں دیتا، اور درخواست کے خلاف بھی جا سکتا ہے۔"
@@ -4136,9 +4144,17 @@ msgstr "تصدیق کا منتظر"
 msgid "awarded by"
 msgstr "عطا کنندہ"
 
+#: src/postulo/templates/documents/upload_form.html
+msgid "Awarded by"
+msgstr ""
+
 #: src/postulo/resume/models.py
 msgid "awarded on"
 msgstr "عطا کرنے کی تاریخ"
+
+#: src/postulo/templates/documents/upload_form.html
+msgid "Awarded on"
+msgstr ""
 
 #: src/postulo/jobs/roles.py
 msgid "Awarding bodies"
@@ -6766,6 +6782,7 @@ msgid "Entries in listing histories that came from them"
 msgstr "اشتہارات کے تاریخچوں میں وہ اندراجات جو ان سے آئے"
 
 #: src/postulo/resume/models.py
+#: src/postulo/templates/documents/upload_form.html
 msgid "EQF level"
 msgstr "EQF سطح"
 
@@ -11550,6 +11567,7 @@ msgstr "نہیں دکھایا گیا · %(name)s"
 
 #: src/postulo/accounts/forms.py src/postulo/resume/forms.py
 #: src/postulo/resume/models.py
+#: src/postulo/templates/documents/upload_form.html
 msgid "Not stated"
 msgstr "بیان نہیں کیا گیا"
 
@@ -13110,8 +13128,8 @@ msgid "PDF renderer"
 msgstr "PDF رینڈرر"
 
 #: src/postulo/documents/forms.py
-msgid "PDF, Word, OpenDocument, RTF, plain text, PNG or JPEG. Postulo keeps it under a name of its own and changes nothing in it, except what the box below removes from a photograph: a PDF or a Word file keeps whatever it carries, such as its author."
-msgstr "PDF، Word، OpenDocument، RTF، سادہ متن، PNG یا JPEG۔ Postulo اسے اپنے دیے ہوئے نام سے رکھتا ہے اور اس میں کچھ نہیں بدلتا، سوائے اس کے جو نیچے والا خانہ تصویر سے ہٹاتا ہے: PDF یا Word فائل میں جو کچھ بھی ہو، جیسے اس کا مصنف، وہ برقرار رہتا ہے۔"
+msgid "PDF, Word, OpenDocument, RTF, plain text, PNG or JPEG, or a European Digital Credential (JSON-LD) as a certificate, diploma or diploma supplement. Postulo keeps it under a name of its own and changes nothing in it, except what the box below removes from a photograph: a PDF or a Word file keeps whatever it carries, such as its author."
+msgstr ""
 
 #: src/postulo/templates/accounts/invite_list.html
 msgid "Pending"
@@ -15087,6 +15105,11 @@ msgstr "اسکوپس"
 msgid "Screening"
 msgstr "اسکریننگ"
 
+#: src/postulo/templates/documents/upload_form.html
+#: src/postulo/templates/documents/upload_list.html
+msgid "Seal not checked by Postulo"
+msgstr ""
+
 #: src/postulo/core/tables.py src/postulo/templates/connections/pairing.html
 #: src/postulo/templates/connections/pairing_item.html
 #: src/postulo/templates/core/search.html
@@ -16960,6 +16983,10 @@ msgstr "یہ تصویر ضرورت سے کہیں زیادہ بڑی ہے۔"
 msgid "That invitation has already been accepted and cannot be revoked."
 msgstr "وہ دعوت نامہ پہلے ہی قبول کیا جا چکا ہے اور اسے منسوخ نہیں کیا جا سکتا۔"
 
+#: src/postulo/documents/forms.py
+msgid "That is a European Digital Credential in the old XML format, which Postulo does not read. Download it again from your Europass wallet, where it has been converted, and upload that file."
+msgstr ""
+
 #: src/postulo/plugins/views.py
 #, python-format
 msgid "That is a lot of questions to the server. Try again in %(seconds)d second."
@@ -17791,6 +17818,10 @@ msgstr "فائل %(name)s"
 #, python-format
 msgid "The file also holds %(names)s, which this page does not read."
 msgstr "فائل میں %(names)s بھی ہیں، جنہیں یہ صفحہ نہیں پڑھتا۔"
+
+#: src/postulo/documents/views.py
+msgid "The file could not be opened."
+msgstr ""
 
 #: src/postulo/core/csv_import.py
 msgid "The file could not be read: a cell is over 128 KiB. A quotation mark that is never closed is the usual cause."
@@ -19547,6 +19578,7 @@ msgid "times cited"
 msgstr "حوالوں کی تعداد"
 
 #: src/postulo/accounts/forms.py src/postulo/documents/forms.py
+#: src/postulo/templates/documents/upload_form.html
 #, fuzzy
 msgid "Title"
 msgstr "عنوان"
@@ -20630,6 +20662,10 @@ msgstr "یہ رقم کس مدت کے حساب سے ہے۔ ساتھ میں کوئ
 msgid "What the file says about itself"
 msgstr "فائل اپنے بارے میں کیا کہتی ہے"
 
+#: src/postulo/templates/documents/upload_form.html
+msgid "What the file states, as it states it. Postulo has not checked who sealed it, and nothing about it was sent anywhere to read it."
+msgstr ""
+
 #: src/postulo/accounts/models.py src/postulo/jobs/models.py
 msgid "What the identifier is, when the scheme is Other."
 msgstr "شناخت کنندہ کیا ہے، جب اسکیم “دیگر” ہو۔"
@@ -20681,6 +20717,10 @@ msgstr "وہ کیا کر سکتے ہیں"
 #: src/postulo/templates/jobs/capture_page.html
 msgid "What this capture kept of the page it was read from, beside what was read from it."
 msgstr "اس کیپچر نے جس صفحے سے پڑھا تھا اس کا جو کچھ رکھا، اس سے پڑھی گئی معلومات کے ساتھ۔"
+
+#: src/postulo/templates/documents/upload_form.html
+msgid "What this credential says"
+msgstr ""
 
 #: src/postulo/templates/documents/cv_form.html
 msgid "What this CV prints about you"
