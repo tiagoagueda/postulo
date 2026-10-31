@@ -383,6 +383,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🐛 Fixed
 
+- The pairing pages head their record column with the noun, not the verb on the status card's button: the two now have separate entries to translate, so no language shows "Enregistrer" or "Erfassen" there (#1178)
 - The browser tests keep their database in a file, so each request the live server answers has a connection of its own: two requests at once no longer share one in-memory SQLite connection and its transactions, which failed a run at random with `no such savepoint` and then every test after it. (#1024)
 - A capture of a page nothing could be read from is accepted when a title was typed for it, and its review says nothing read it; with no title it is still refused, naming the field. (#710)
 - Adding a contact through the API needs write access to the company, not only read access, so a company shared read-only can no longer be given contacts. (#328)
