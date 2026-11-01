@@ -65,7 +65,10 @@ jobs:
         run: uv run --no-project python scripts/release_tools.py check "${GITHUB_REF_NAME}" --ci
 
       - name: Compile the translations into the package
-        run: uv run --no-project python scripts/messages.py compile
+        # In the project's environment, as everywhere else: compiling reads each catalogue's
+        # language through Django (ae0c6998a), and `--no-project` has no Django. v0.5.0's
+        # first release run stopped here.
+        run: uv run python scripts/messages.py compile
 
       - name: Build the sdist and the wheel
         run: uv build
