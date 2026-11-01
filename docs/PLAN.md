@@ -181,10 +181,12 @@ postulo/
 │   │   │                     # plugins Postulo ships -- each a package with its
 │   │   │                     # manifest, locale/ and code, none of it in core, and
 │   │   │                     # tests/test_plugin_surface.py saying so:
-│   │   ├── builtin/  europass/  email/  smtp/  own_mail/  localstore/  browser/
-│   │   ├── identifiers/  phone_numbers/  postal_rules/  email_addresses/
-│   │   ├── social_profiles/  websites/  employer_structure/  repositories/
-│   │   └── link_services/  messaging_services/  messaging_contacts/  maps/  gdpr/  webhook/
+│   │   ├── builtin/  builtin_notifications/  europass/  email/  smtp/  own_mail/
+│   │   ├── localstore/  browser/  file_formats/  multiple_fields/  identifiers/
+│   │   ├── phone_numbers/  postal_rules/  email_addresses/  social_profiles/  websites/
+│   │   ├── employer_structure/  repositories/  link_services/  messaging_services/
+│   │   ├── messaging_contacts/  maps/  gdpr/  webhook/  wikidata/
+│   │   └── publication_lookups/  register_lookup/
 │   └── api/                  # ninja routers, tokens, the change feed            (M4)
 └── tests/                    # incl. tests/security/ and the browser suite tests/e2e/
 ```
@@ -206,7 +208,8 @@ loaded nothing of Postulo's.
 (`postulo.wiki`, since #169): installing, configuration, hardening, every feature page,
 and *Writing a plugin*. So are the official plugins that live outside the box --
 `postulo-imap`, `postulo-apprise`, `postulo-dav`, `postulo-paperless`, `postulo-mcp` -- the
-two browser extensions, `postulo-chromium` and `postulo-firefox`, the reference plugin
+two browser extensions, `postulo-chromium` and `postulo-firefox`, the Thunderbird extension
+`postulo-thunderbird`, the reference plugin
 `postulo-helloworld`, and `postulo-templates`, the curated document templates. Each follows
 the guide and carries its own catalogues; none is needed to run Postulo.
 
@@ -312,8 +315,12 @@ findings, arrangeable widgets, Europass import, ORCID, the log and the metrics; 
 (2026-09-16) the rest of Europe, parent and child companies, reports, and the second
 audit's fixes; 0.4.0 (2026-10-04) Cotton and Basecoat components, the review sweep's fixes
 and the bug sweeps of the milestones after it, email sent from the person's own address,
-CV choices of which details print, and a listing's history; the languages that were to be Africa's milestone are now ordered by speakers
-(#269) across the releases after it.
+CV choices of which details print, and a listing's history; 0.5.0 (2026-11-01) sharing
+with people and groups, the map with street geocoding, sync pairings and the plugin
+surface for reminders and interviews, themed reports, printing and table export on A4 or
+US Letter, company registers and publication look-ups, European Digital Credentials, and
+the release's 56 selected languages (#347). The languages that were to be Africa's
+milestone are now ordered by speakers (#269) across the releases after it.
 
 **What was "deliberately after v1" and is now built.** The browser extension (two of them,
 Chromium and Firefox, on M4's API as intended), email ingestion (`postulo-imap`) and
@@ -350,9 +357,12 @@ disabled by default and never required.
    nobody notices. What still depends on contributors is **review**: every one of those
    catalogues is complete and none has been read by a native speaker. That review happens
    in Weblate at translate.tiagoagueda.com, one component per catalogue set, and since
-   #706 so does every translation: Weblate drafts new strings by machine, speakers correct
-   and approve them there, and Weblate sends them back as a pull request; a commit that
-   writes a translation anywhere else is refused (`scripts/messages.py guard`). The twenty-nine
+   #706 so does every translation: new strings are drafted there (Weblate's own machine
+   drafting was switched off in October 2026, its drafts too often wrong), speakers correct
+   and approve them, and Weblate sends them back as a pull request; a commit that writes a
+   translation anywhere else is refused (`scripts/messages.py guard`). A release carries
+   every string in the languages it selects, a draft counting (`messages_tool.SELECTED`,
+   `gate --release`, #347). The twenty-nine
    African catalogues exist and are empty, and a language is not offered until somebody
    has begun its catalogue — offering a language and handing back English is a promise
    with nothing behind it. Which language is begun next is decided by speakers, not by

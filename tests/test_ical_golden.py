@@ -97,7 +97,9 @@ def components(text: str) -> list[tuple]:
             if not isinstance(component[name], list)
             else (name, str([p.to_ical() for p in component[name]]), [])
             for name in component
-            if name != "DTSTAMP"
+            # The stamp is the moment of writing, and PRODID names the running version, so
+            # each changes with every run or release and says nothing about the writer.
+            if name not in ("DTSTAMP", "PRODID")
         )
         found.append((component.name, props))
     return found

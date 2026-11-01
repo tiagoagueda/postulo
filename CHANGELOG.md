@@ -6,6 +6,8 @@ All notable changes to Postulo are recorded here. The format follows
 
 ## [Unreleased]
 
+## [0.5.0] — 2026-11-01
+
 ### 🔒 Security
 
 - A photograph uploaded as a document has its location, time and camera cut out by default, without re-encoding the picture: a box on the upload form, ticked unless you untick it. (#964)
