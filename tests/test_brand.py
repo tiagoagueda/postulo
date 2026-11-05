@@ -96,6 +96,48 @@ def test_the_apple_icon_is_not_transparent():
         assert alpha.getextrema()[0] == 255, "every pixel is opaque"
 
 
+# -------------------------------------------------------- the vector mark
+
+VECTORS = Path(__file__).resolve().parents[1] / "assets" / "brand"
+
+
+@pytest.mark.parametrize(
+    "name",
+    [
+        "postulo.svg",
+        "postulo_pride.svg",
+        "postulo_swell.svg",
+        "postulo_pride_swell.svg",
+        "postulo_drift.svg",
+        "postulo_pride_drift.svg",
+    ],
+)
+def test_the_vector_mark_is_vectors_and_nothing_else(name):
+    """The redrawn mark beside the raster (#1218): seven sheets, each with its gradient.
+
+    It holds nothing that could reach outside the file or run: no embedded raster, no
+    script, no external reference. An animated file is plain SVG animation, which a browser
+    plays even when the file is an <img>.
+    """
+    from defusedxml import ElementTree
+
+    path = VECTORS / name
+    root = ElementTree.parse(path).getroot()
+    tags = {element.tag.rsplit("}", 1)[-1] for element in root.iter()}
+    forbidden = tags & {"image", "script", "foreignObject"}
+    assert not forbidden, forbidden
+    text = path.read_text(encoding="utf-8")
+    for namespace in ("http://www.w3.org/", "http://www.inkscape.org/"):
+        text = text.replace(namespace, "")
+    assert "http" not in text, "no external reference"
+    sheets = [e for e in root.iter() if (e.get("id") or "").startswith("sheet-")]
+    assert len(sheets) == 7, "seven paper sheets, front to back"
+    assert all(e.get("fill", "").startswith("url(#grad-") for e in sheets)
+    assert path.stat().st_size < 500 * 1024, "under the repository's large-file limit"
+    if "_swell" in name or "_drift" in name:
+        assert "animate" in tags, "an animated variant animates"
+
+
 # -------------------------------------------------------------- the pages
 
 

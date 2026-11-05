@@ -6,6 +6,10 @@ All notable changes to Postulo are recorded here. The format follows
 
 ## [Unreleased]
 
+### ✨ Added
+
+- The mark redrawn as vectors beside the raster, in assets/brand: postulo.svg, a pride variant (with its raster, postulo_pride.png), and two looping animations of each (Swell, Light drift) that start and end on the static mark. The raster stays the source of the served icons. (#1218)
+
 ## [0.5.0] — 2026-11-01
 
 ### 🔒 Security

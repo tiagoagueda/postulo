@@ -176,6 +176,24 @@ not an asset library.
 It is a work in progress and will change. Nothing should hard-code its colours: the
 stylesheet's `brand` palette is the source of truth for those.
 
+Beside the raster, `assets/brand/` holds the mark redrawn as vectors (#1218):
+
+- **`postulo.svg`:** seven paper sheets, front to back. Each is a Bézier path with its own
+  gradient (`grad-<sheet>`) and shadow filter (`shadow-<sheet>`), sampled from the raster.
+- **`postulo_pride.svg`:** the same sheets in the six pride colours, red to purple.
+  `postulo_pride.png` is the raster it was coloured from, 896 pixels on white, kept as made.
+- **`postulo_swell.svg`, `postulo_pride_swell.svg`:** an 8-second loop in which a slow
+  wave bends the edges between sheets while the outline and the counter stay still.
+- **`postulo_drift.svg`, `postulo_pride_drift.svg`:** an 8-second loop in which each
+  sheet's light turns and returns.
+
+The animation is plain SVG, so a browser plays it even when the file is an `<img>`. It
+cannot follow a reduced-motion setting by itself, so wherever an animated file is used,
+serve the static one to people who ask for less motion. The raster is still what
+`scripts/brand.py` reads; the vectors are not derived from it at build time and do not
+change the served icons. `tests/test_brand.py` holds them to pure vectors under the
+repository's 500 KB limit.
+
 ## Icons
 
 The interface uses [Lucide](https://lucide.dev) icons, inlined by the `{% icon %}` tag:
