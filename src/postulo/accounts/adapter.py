@@ -129,6 +129,7 @@ class AccountAdapter(DefaultAccountAdapter):
 
         by_name = ratelimit.consume(
             request,
+            app="allauth.account",  # the counts allauth keeps for its own sign-in (65.21)
             config=app_settings.RATE_LIMITS,
             action="login_failed",
             key=self._typed_name_key(**credentials),
@@ -143,7 +144,11 @@ class AccountAdapter(DefaultAccountAdapter):
             configured = str(app_settings.RATE_LIMITS.get("login_failed") or "")
             per_name = ",".join(r for r in configured.split(",") if r.strip().endswith("/key"))
             by_account = ratelimit.consume(
-                request, config={"login_failed": per_name}, action="login_failed", key=key
+                request,
+                app="allauth.account",
+                config={"login_failed": per_name},
+                action="login_failed",
+                key=key,
             )
             self._account_login_failed_rl_usage = by_account
             if not by_account:
@@ -165,6 +170,7 @@ class AccountAdapter(DefaultAccountAdapter):
         super()._delete_login_attempts_cached_email(request, **credentials)
         ratelimit.clear(
             request,
+            app="allauth.account",
             config=app_settings.RATE_LIMITS,
             action="login_failed",
             key=self._typed_name_key(**credentials),

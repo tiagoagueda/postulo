@@ -10,14 +10,28 @@ from __future__ import annotations
 import time
 
 
-def signed_in_recently(client, user) -> None:
-    from allauth.account.internal.flows.login import AUTHENTICATION_METHODS_SESSION_KEY
+def write_records(session, user, records: list[dict]) -> None:
+    """Put allauth's record of how ``user`` signed in into ``session``, as allauth itself does.
 
+    Since allauth 65.21 the records belong to one account: beside them it keeps whose they are,
+    and reading them for anyone else (or for nobody) gives nothing. So a test that writes the
+    records by hand writes the owner too, or every check that reads them sees no sign-in at all.
+    """
+    from allauth.account.internal.flows import login
+    from allauth.account.internal.userkit import user_id_to_str
+
+    session[login.AUTHENTICATION_METHODS_SESSION_KEY] = records
+    session[login._AUTHENTICATION_METHODS_USER_SESSION_KEY] = user_id_to_str(user)
+
+
+def signed_in_recently(client, user) -> None:
     client.force_login(user, backend="allauth.account.auth_backends.AuthenticationBackend")
     session = client.session
-    session[AUTHENTICATION_METHODS_SESSION_KEY] = [
-        {"method": "password", "at": time.time(), "email": user.email, "reauthenticated": True}
-    ]
+    write_records(
+        session,
+        user,
+        [{"method": "password", "at": time.time(), "email": user.email, "reauthenticated": True}],
+    )
     session.save()
 
 

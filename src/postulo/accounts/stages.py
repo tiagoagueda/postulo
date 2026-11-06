@@ -26,17 +26,18 @@ from allauth.mfa.stages import AuthenticateStage
 from django.http import HttpRequest
 
 
-def arrived_through_the_provider(request: HttpRequest) -> bool:
-    """Whether the most recent thing that authenticated this session was the provider.
+def arrived_through_the_provider(request: HttpRequest, user) -> bool:
+    """Whether the most recent thing that authenticated ``user`` in this session was the provider.
 
     allauth writes a record per authentication method into the session as it happens, and
     the social flow writes its own before the stages run. The *last* record is the one that
     matters: a session that started with a password and later connected a provider was not
-    opened by that provider.
+    opened by that provider. Since allauth 65.21 the records belong to one account and read
+    as empty for anyone else, so they are asked for the person signing in.
     """
     from allauth.account.authentication import get_authentication_records
 
-    records = get_authentication_records(request)
+    records = get_authentication_records(request, user)
     if not records:
         return False
     return records[-1].get("method") == "socialaccount"
@@ -51,6 +52,6 @@ class SecondFactorStage(AuthenticateStage):
 
         from postulo.core import site
 
-        if site.sso_is_second_factor() and arrived_through_the_provider(request):
+        if site.sso_is_second_factor() and arrived_through_the_provider(request, self.login.user):
             return False
         return True

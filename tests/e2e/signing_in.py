@@ -27,18 +27,21 @@ def sign_in(page: Page, base: str, path: str = "/", *, email: str = EMAIL) -> No
     an address -- would send the test to the reauthentication page. The record is good for
     allauth's five minutes, as a typed password is.
     """
-    from allauth.account.internal.flows.login import AUTHENTICATION_METHODS_SESSION_KEY
     from django.conf import settings
     from django.contrib.auth import get_user_model
     from django.test import Client
+
+    from tests.recently import write_records
 
     user = get_user_model().objects.get(email=email)
     client = Client()
     client.force_login(user, backend="allauth.account.auth_backends.AuthenticationBackend")
     session = client.session
-    session[AUTHENTICATION_METHODS_SESSION_KEY] = [
-        {"method": "password", "at": time.time(), "email": email, "reauthenticated": True}
-    ]
+    write_records(
+        session,
+        user,
+        [{"method": "password", "at": time.time(), "email": email, "reauthenticated": True}],
+    )
     session.save()
     page.context.add_cookies(
         [{"name": settings.SESSION_COOKIE_NAME, "value": session.session_key, "url": base}]

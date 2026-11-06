@@ -35,7 +35,8 @@ from django.utils.translation import gettext as _
 
 def signed_in_recently(request) -> bool:
     """Whether the newest sign-in on this session is within allauth's reauthentication window."""
-    records = get_authentication_records(request)
+    # The records belong to one account since allauth 65.21, so they are asked for this one.
+    records = get_authentication_records(request, request.user)
     return bool(records) and time.time() - records[-1]["at"] < app_settings.REAUTHENTICATION_TIMEOUT
 
 

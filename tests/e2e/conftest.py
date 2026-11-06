@@ -34,6 +34,19 @@ os.environ.setdefault("DJANGO_ALLOW_ASYNC_UNSAFE", "true")
 
 pytest.importorskip("playwright", reason="the browser tests need the e2e dependency group")
 
+
+@pytest.fixture(scope="session")
+def base_url() -> None:
+    """No base URL: every page is opened by its full address on the live server.
+
+    pytest-playwright 0.10 dropped pytest-base-url and brings its own stand-in for this
+    fixture, written as a session fixture on an instance, which pytest 9.2 deprecates. The
+    suite makes warnings errors, so that stand-in failed the first browser test and every
+    one after it. This fixture takes its place; nothing here ever used a base URL.
+    """
+    return None
+
+
 EMAIL = "alex.morgan@example.org"
 PASSWORD = "correct-horse-battery-staple"  # a test account's password, not a secret
 

@@ -8,7 +8,7 @@ declared contract: ``<c-field :field="form.company_name" />``.
 
 The tests here pin what the components render, and answer the four questions the spike had
 to answer before anything shipped: where the compiled form lives, what a broken component
-reports, whether the form renderer still composes, and why context isolation is off.
+reports, whether the form renderer still composes, and what context isolation costs.
 """
 
 from __future__ import annotations
@@ -272,14 +272,20 @@ def test_the_form_renderer_composes_with_the_component_loader(db):
     assert "<input" in html
 
 
-def test_isolation_would_run_every_context_processor_once_per_component(db, settings, monkeypatch):
-    """Why ``COTTON_ENABLE_CONTEXT_ISOLATION`` is off.
+def test_isolation_runs_the_context_processors_once_per_page(db, settings, monkeypatch):
+    """What cotton's context isolation costs, and why it is still off.
 
-    With it on, cotton renders each component in a fresh ``RequestContext``, which runs
-    every context processor again: the interface processor asks for the instance name, the
-    navigation and the installed version, and a form page draws twenty fields. Off, a
-    component sees the caller's context and reads only what its tag was given; the contract
-    is kept by convention and by the ``<c-vars>`` line, not by the engine.
+    Up to django-cotton 2.7, isolation (then ``COTTON_ENABLE_CONTEXT_ISOLATION``) rendered
+    each component in a fresh ``RequestContext``, which ran every context processor again:
+    the interface processor asks for the instance name, the navigation and the installed
+    version, and a form page draws twenty fields. Three fields cost seven passes, and that
+    was why it was off. Since 2.8 the setting is ``COTTON_ISOLATE_BY_DEFAULT`` and its
+    isolation carries the processors' results over instead of running them again, so it
+    costs one pass like no isolation. It stays off because a component still sees the
+    caller's context and reads only what its tag was given; that contract is kept by
+    convention and by the ``<c-vars>`` line, and turning isolation on is a change of its
+    own. This pins the cost, so a cotton that runs the processors per component again is
+    noticed.
     """
     from postulo.core import context_processors
 
@@ -296,7 +302,7 @@ def test_isolation_would_run_every_context_processor_once_per_component(db, sett
     source = '{% cotton field :field="form.name" / %}' * 3
 
     def rendered_with(isolation: bool) -> int:
-        settings.COTTON_ENABLE_CONTEXT_ISOLATION = isolation
+        settings.COTTON_ISOLATE_BY_DEFAULT = isolation
         # The engine imports its processors on the first request-bound render and keeps
         # them, so a page rendered by an earlier test has already pinned the real function.
         # Assigning TEMPLATES makes Django throw the engine away and build one that finds
@@ -308,8 +314,8 @@ def test_isolation_would_run_every_context_processor_once_per_component(db, sett
         return len(calls)
 
     assert rendered_with(False) == 1, "the page's own pass, and nothing per component"
-    # Three fields, each drawing its feedback as a component of its own: six more passes.
-    assert rendered_with(True) == 7, "the page's pass plus one per component, nested ones too"
+    # Three fields, each drawing its feedback as a component of its own: 2.7 ran six more.
+    assert rendered_with(True) == 1, "isolated, the components reuse the page's pass"
 
 
 ONE_MENU = (

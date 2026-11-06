@@ -5,9 +5,10 @@ from __future__ import annotations
 import time
 
 import pytest
-from allauth.account.internal.flows.login import AUTHENTICATION_METHODS_SESSION_KEY
 from django.contrib.auth import get_user_model
 from django.urls import reverse
+
+from tests.recently import write_records
 
 pytestmark = pytest.mark.django_db
 
@@ -25,9 +26,11 @@ def sso_only():
 def sign_in_at(client, user, seconds_ago):
     client.force_login(user, backend="allauth.account.auth_backends.AuthenticationBackend")
     session = client.session
-    session[AUTHENTICATION_METHODS_SESSION_KEY] = [
-        {"method": "socialaccount", "at": time.time() - seconds_ago, "provider": "oidc"}
-    ]
+    write_records(
+        session,
+        user,
+        [{"method": "socialaccount", "at": time.time() - seconds_ago, "provider": "oidc"}],
+    )
     session.save()
 
 

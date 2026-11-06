@@ -17,6 +17,7 @@ from django.contrib.sessions.middleware import SessionMiddleware
 from django.urls import reverse
 
 from postulo.accounts import stages
+from tests.recently import write_records
 
 pytestmark = pytest.mark.django_db
 
@@ -42,21 +43,25 @@ def a_request(rf):
 # ------------------------------------------------------- which method was used
 
 
-def test_the_last_method_used_is_the_one_that_counts(rf):
+def test_the_last_method_used_is_the_one_that_counts(rf, user):
     """A session opened with a password and later linked to a provider was not opened by it."""
-    from allauth.account.internal.flows.login import AUTHENTICATION_METHODS_SESSION_KEY
-
     request = a_request(rf)
-    assert not stages.arrived_through_the_provider(request), "nothing has happened yet"
+    assert not stages.arrived_through_the_provider(request, user), "nothing has happened yet"
 
-    request.session[AUTHENTICATION_METHODS_SESSION_KEY] = [{"method": "socialaccount"}]
-    assert stages.arrived_through_the_provider(request)
+    write_records(request.session, user, [{"method": "socialaccount"}])
+    assert stages.arrived_through_the_provider(request, user)
 
-    request.session[AUTHENTICATION_METHODS_SESSION_KEY] = [
-        {"method": "socialaccount"},
-        {"method": "password"},
-    ]
-    assert not stages.arrived_through_the_provider(request), "the password was the way in"
+    write_records(request.session, user, [{"method": "socialaccount"}, {"method": "password"}])
+    assert not stages.arrived_through_the_provider(request, user), "the password was the way in"
+
+
+def test_records_of_another_account_say_nothing(rf, user, django_user_model):
+    """allauth keeps whose records they are (65.21); somebody else's sign-in is not this one."""
+    other = django_user_model.objects.create_user(username="other", email="other@example.org")
+    request = a_request(rf)
+    write_records(request.session, other, [{"method": "socialaccount"}])
+
+    assert not stages.arrived_through_the_provider(request, user)
 
 
 # ------------------------------------------------------------- a password login
@@ -93,7 +98,6 @@ def test_a_passkey_needs_no_setting_because_it_is_already_two_factors(rf, user):
     configure — and a switch to put the prompt back would be a feature that only makes
     things worse.
     """
-    from allauth.account.internal.flows.login import AUTHENTICATION_METHODS_SESSION_KEY
     from allauth.mfa.webauthn.internal.flows import did_use_passwordless_login
 
     with_totp(user)
@@ -102,10 +106,10 @@ def test_a_passkey_needs_no_setting_because_it_is_already_two_factors(rf, user):
     request = a_request(rf)
     # Exactly the record allauth writes when somebody signs in with a passkey and nothing
     # else, which is the condition its own stage checks.
-    request.session[AUTHENTICATION_METHODS_SESSION_KEY] = [
-        {"method": "mfa", "type": "webauthn", "passwordless": True}
-    ]
-    assert did_use_passwordless_login(request), "the record this test rests on"
+    write_records(
+        request.session, user, [{"method": "mfa", "type": "webauthn", "passwordless": True}]
+    )
+    assert did_use_passwordless_login(request, user), "the record this test rests on"
 
     stage = stages.SecondFactorStage.__new__(stages.SecondFactorStage)
     stage.login = type("L", (), {"user": user})()
@@ -117,11 +121,9 @@ def test_a_passkey_needs_no_setting_because_it_is_already_two_factors(rf, user):
 
 def test_single_sign_on_is_asked_for_a_code_unless_the_operator_says_otherwise(rf, user):
     """Off by default: Postulo cannot see what the provider actually checked."""
-    from allauth.account.internal.flows.login import AUTHENTICATION_METHODS_SESSION_KEY
-
     with_totp(user)
     request = a_request(rf)
-    request.session[AUTHENTICATION_METHODS_SESSION_KEY] = [{"method": "socialaccount"}]
+    write_records(request.session, user, [{"method": "socialaccount"}])
 
     stage = stages.SecondFactorStage.__new__(stages.SecondFactorStage)
     stage.login = type("L", (), {"user": user})()
@@ -131,11 +133,9 @@ def test_single_sign_on_is_asked_for_a_code_unless_the_operator_says_otherwise(r
 
 def test_an_operator_can_say_the_provider_did_the_checking(rf, user, settings):
     settings.POSTULO_OIDC_IS_SECOND_FACTOR = True
-    from allauth.account.internal.flows.login import AUTHENTICATION_METHODS_SESSION_KEY
-
     with_totp(user)
     request = a_request(rf)
-    request.session[AUTHENTICATION_METHODS_SESSION_KEY] = [{"method": "socialaccount"}]
+    write_records(request.session, user, [{"method": "socialaccount"}])
 
     stage = stages.SecondFactorStage.__new__(stages.SecondFactorStage)
     stage.login = type("L", (), {"user": user})()
