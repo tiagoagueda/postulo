@@ -102,6 +102,17 @@ OPEN_STATUSES = frozenset(
     }
 )
 
+
+def open_condition() -> Q:
+    """What *open* means, as one condition (#1114).
+
+    Written once and used three times: `open()` filters by it, `closed()` excludes by it, and
+    the dashboard counts by it inside one statement that counts other things as well, where
+    a queryset method cannot be used. One condition, so the three cannot come to disagree.
+    """
+    return Q(status__in=list(OPEN_STATUSES))
+
+
 #: Statuses an application can go quiet in: open, and actually sent.
 QUIET_STATUSES = frozenset(OPEN_STATUSES - {Status.DRAFT})
 
@@ -203,10 +214,10 @@ class ApplicationQuerySet(models.QuerySet):
         return self.filter(owner=user)
 
     def open(self) -> ApplicationQuerySet:
-        return self.filter(status__in=list(OPEN_STATUSES))
+        return self.filter(open_condition())
 
     def closed(self) -> ApplicationQuerySet:
-        return self.exclude(status__in=list(OPEN_STATUSES))
+        return self.exclude(open_condition())
 
     def with_display_data(self) -> ApplicationQuerySet:
         """Load what every list and board template reads, in one round trip."""

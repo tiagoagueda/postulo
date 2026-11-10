@@ -303,6 +303,138 @@ def test_a_widget_cannot_see_what_another_one_computed(client, user):
     assert by_key["shortcuts"] == {}
 
 
+# ------------------------------------------------------- where things stand
+
+
+#: What one application in each status adds to *Still live*, *In conversation* and *Offers
+#: on the table*. Written out, and not read from the models, so that it is this table that
+#: has to be changed on purpose when a status moves from one side to the other.
+STANDS = {
+    "draft": (1, 0, 0),
+    "applied": (1, 0, 0),
+    "acknowledged": (1, 0, 0),
+    "screening": (1, 1, 0),
+    "interviewing": (1, 1, 0),
+    "assessment": (1, 1, 0),
+    "offer": (1, 0, 1),
+    "accepted": (0, 0, 0),
+    "rejected": (0, 0, 0),
+    "withdrawn": (0, 0, 0),
+    "ghosted": (0, 0, 0),
+}
+
+
+def an_application(owner, status: str, applied_at=None, mark: str = ""):
+    from postulo.applications.models import Application
+    from postulo.jobs.models import Company, JobPosting
+
+    company, _made = Company.objects.get_or_create(owner=owner, name="Aperture")
+    posting = JobPosting.objects.create(
+        owner=owner, company=company, title=f"Test Engineer {status} {mark}"
+    )
+    return Application.objects.create(
+        owner=owner, posting=posting, status=status, applied_at=applied_at
+    )
+
+
+def counters_of(person, now=None) -> dict:
+    """What the counters widget works out for this person, as the dashboard asks for it."""
+    from types import SimpleNamespace
+
+    sources = widgets.Sources(SimpleNamespace(user=person))
+    if now is not None:
+        sources.now = now
+    return widgets.get("counters").context(sources)
+
+
+def test_the_counters_are_one_question_to_the_database(user):
+    """Four numbers about the same applications were four counts, on every view of the
+    dashboard; they are one statement now, with each number a count of its own (#1114)."""
+    from django.db import connection
+    from django.test.utils import CaptureQueriesContext
+    from django.utils import timezone
+
+    for status in STANDS:
+        an_application(user, status, applied_at=timezone.now())
+
+    with CaptureQueriesContext(connection) as asked:
+        found = counters_of(user)
+
+    assert len(asked) == 1, [query["sql"] for query in asked]
+    assert found == {
+        "open_count": 7,
+        "interviewing_count": 3,
+        "offer_count": 1,
+        "applied_recently": 11,
+    }
+
+
+def test_every_status_counts_where_it_counted(user):
+    """One application in each status in turn, and the three numbers it moves: asking once
+    must not change what any of them says (#1114)."""
+    from postulo.applications.models import Application, Status
+
+    assert set(STANDS) == set(Status.values), "a status this table does not place"
+
+    for status, (live, talking, offers) in STANDS.items():
+        Application.objects.filter(owner=user).delete()
+        an_application(user, status)
+
+        assert counters_of(user) == {
+            "open_count": live,
+            "interviewing_count": talking,
+            "offer_count": offers,
+            "applied_recently": 0,
+        }, status
+
+
+def test_the_last_month_ends_where_it_ended(user):
+    """Thirty days back to the second is still *the last 30 days*, a second more is not,
+    and an application never sent is in neither (#1114)."""
+    import datetime as dt
+
+    from django.utils import timezone
+
+    now = timezone.now()
+    month = dt.timedelta(days=30)
+    an_application(user, "applied", applied_at=now, mark="today")
+    an_application(user, "rejected", applied_at=now - month, mark="edge")
+    an_application(user, "applied", applied_at=now - month - dt.timedelta(seconds=1), mark="old")
+    an_application(user, "draft", mark="unsent")
+
+    assert counters_of(user, now=now)["applied_recently"] == 2
+
+
+def test_the_counters_are_about_one_persons_applications(user, other_user):
+    """Somebody else's offer is not this person's, and an account with nothing recorded
+    reads four noughts and not four blanks (#1114)."""
+    from django.utils import timezone
+
+    an_application(other_user, "offer", applied_at=timezone.now())
+
+    assert counters_of(user) == {
+        "open_count": 0,
+        "interviewing_count": 0,
+        "offer_count": 0,
+        "applied_recently": 0,
+    }
+    assert counters_of(other_user)["offer_count"] == 1
+
+
+def test_open_and_closed_are_the_two_halves_of_one_condition(user):
+    """`open()`, `closed()` and the counter that says *Still live* read one condition, so
+    none of them can come to disagree about a status (#1114)."""
+    from postulo.applications.models import OPEN_STATUSES, Application, open_condition
+
+    for status in STANDS:
+        an_application(user, status)
+    mine = Application.objects.for_user(user)
+
+    assert set(mine.open().values_list("status", flat=True)) == set(OPEN_STATUSES)
+    assert set(mine.closed().values_list("status", flat=True)) == set(STANDS) - set(OPEN_STATUSES)
+    assert mine.filter(open_condition()).count() == mine.open().count() == 7
+
+
 def test_the_arranging_page_lists_what_is_on_and_what_is_off(client, user):
     choose(user, ["counters"])
     client.force_login(user)

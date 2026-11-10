@@ -36,19 +36,26 @@ def _suggestions(sources: Sources) -> dict:
 
 
 def _counters(sources: Sources) -> dict:
-    from .models import Status
+    """Four numbers about the same applications, asked for in one statement (#1114).
 
-    applications = sources.applications
-    return {
-        "open_count": applications.open().count(),
-        "interviewing_count": applications.filter(
-            status__in=[Status.SCREENING, Status.INTERVIEWING, Status.ASSESSMENT]
-        ).count(),
-        "offer_count": applications.filter(status=Status.OFFER).count(),
-        "applied_recently": applications.filter(
-            applied_at__gte=sources.now - timedelta(days=RECENT_DAYS)
-        ).count(),
-    }
+    Each was a count of its own, so the widget cost four queries on every view of the
+    dashboard. One pass with a condition on each count says the same four things.
+    """
+    from django.db.models import Count, Q
+
+    from .models import Status, open_condition
+
+    return sources.applications.aggregate(
+        open_count=Count("pk", filter=open_condition()),
+        interviewing_count=Count(
+            "pk",
+            filter=Q(status__in=[Status.SCREENING, Status.INTERVIEWING, Status.ASSESSMENT]),
+        ),
+        offer_count=Count("pk", filter=Q(status=Status.OFFER)),
+        applied_recently=Count(
+            "pk", filter=Q(applied_at__gte=sources.now - timedelta(days=RECENT_DAYS))
+        ),
+    )
 
 
 def _gone_quiet(sources: Sources) -> dict:
