@@ -25,14 +25,28 @@ from pathlib import Path
 
 import pytest
 
-# Playwright's synchronous API drives an event loop inside the test thread, and Django
-# refuses ORM calls from a thread that has a running loop unless told otherwise. Here the
-# test thread *is* that thread, on purpose, so the guard is switched off for this process.
-# It protects production code from accidental blocking in async views; it has nothing to
-# protect in a test that is blocking by design.
-os.environ.setdefault("DJANGO_ALLOW_ASYNC_UNSAFE", "true")
-
 pytest.importorskip("playwright", reason="the browser tests need the e2e dependency group")
+
+
+def pytest_collection_finish(session):
+    """Switch Django's async-safety guard off, when this run selected a browser test.
+
+    Playwright's synchronous API drives an event loop inside the test thread, and Django
+    refuses ORM calls from a thread that has a running loop unless told otherwise. Here the
+    test thread *is* that thread, on purpose. The guard protects production code from
+    accidental blocking in async views; it has nothing to protect in a test that is blocking
+    by design.
+
+    Here, not in a line run when this file is imported: a unit run imports this file too (it
+    collects `tests/e2e` and deselects by marker afterwards), and the line switched the guard
+    off for every unit test in every worker (#1160). Nor in a fixture: a conftest's autouse
+    fixtures are set up in alphabetical order, and the ones that start the browser and the
+    database would have to sort after it for ever. This runs once what is selected is known
+    and before any fixture exists.
+    """
+    here = Path(__file__).resolve().parent
+    if any(here in Path(str(item.path)).resolve().parents for item in session.items):
+        os.environ.setdefault("DJANGO_ALLOW_ASYNC_UNSAFE", "true")
 
 
 @pytest.fixture(scope="session")

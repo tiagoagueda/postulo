@@ -16,6 +16,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🐛 Fixed
 
+- The unit suite runs with Django's async-safety guard on again; the browser suite switches it off for itself alone. (#1160)
 - The monthly dependency run no longer ends red in a month when no dependency moved. (#1159)
 
 ## [0.5.0] — 2026-11-01
