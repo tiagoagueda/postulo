@@ -39,6 +39,7 @@ import subprocess
 import tarfile
 import tempfile
 import uuid
+from collections.abc import Callable
 from dataclasses import dataclass, field
 from pathlib import Path, PurePosixPath
 
@@ -145,15 +146,27 @@ def _signed_manifest(manifest: dict) -> str:
     return secrets.backup_mac(_canonical(unsigned))
 
 
-def _add_tree(archive: tarfile.TarFile, root: Path, prefix: str, digests: dict[str, str]) -> None:
+def _add_tree(
+    archive: tarfile.TarFile,
+    root: Path,
+    prefix: str,
+    digests: dict[str, str],
+    alive: Callable[[], None] | None = None,
+) -> None:
     """Add a directory under ``prefix``, plain files and directories only, noting each file's
-    SHA-256 as it goes in so that the integrity record needs no second read (#772)."""
+    SHA-256 as it goes in so that the integrity record needs no second read (#772).
+
+    ``alive`` is called for every entry: this walk is where a backup spends its minutes, so
+    it is where whoever holds the claim on "a backup is running" hears it still is (#1131).
+    """
     archive.add(root, arcname=prefix, recursive=False, filter=_plain_files_only)
     for current, directories, names in os.walk(root):
         directories.sort()
         for name in sorted(names + directories):
             path = Path(current) / name
             arcname = f"{prefix}/{path.relative_to(root).as_posix()}"
+            if alive is not None:
+                alive()
             if path.is_symlink() or not (path.is_file() or path.is_dir()):
                 continue
             if path.is_dir():
@@ -499,8 +512,14 @@ def write_backup(
     *,
     include_media: bool = True,
     include_plugins: bool = True,
+    alive: Callable[[], None] | None = None,
 ) -> BackupReport:
-    """Take a backup, verify it, and say what it holds."""
+    """Take a backup, verify it, and say what it holds.
+
+    ``alive``, when given, is called as the work goes on -- between the steps and for every
+    file that goes in -- so the caller can tell a backup that is running from one that was
+    killed (#1131). It is called often and must be cheap.
+    """
     from postulo.plugins import secrets
 
     path = resolve_target(target)
@@ -516,6 +535,8 @@ def write_backup(
     with tempfile.TemporaryDirectory(prefix="postulo-backup-") as scratch:
         dump = Path(scratch) / "database"
         member = dump_database(dump)
+        if alive is not None:
+            alive()
         manifest = {
             "postulo": {
                 "version": __version__,
@@ -563,9 +584,9 @@ def write_backup(
                 archive.addfile(info, io.BytesIO(manifest_bytes))
                 archive.add(dump, arcname=member)
                 if with_media:
-                    _add_tree(archive, media_root, MEDIA_PREFIX, digests)
+                    _add_tree(archive, media_root, MEDIA_PREFIX, digests, alive)
                 if with_plugins:
-                    _add_tree(archive, plugins_root, PLUGINS_PREFIX, digests)
+                    _add_tree(archive, plugins_root, PLUGINS_PREFIX, digests, alive)
                 # Last, because the digests are known only once the files are in. The manifest
                 # is first so the Backups page can read it without decompressing the rest.
                 record = {"members": digests, "database": manifest["database"]["sha256"]}
@@ -575,6 +596,8 @@ def write_backup(
                 tail.size = len(trailer)
                 tail.mtime = int(timezone.now().timestamp())
                 archive.addfile(tail, io.BytesIO(trailer))
+            if alive is not None:
+                alive()
             verify_backup(partial)
             # Within one directory, so the name appears with the whole archive behind it.
             os.replace(partial, path)

@@ -151,6 +151,25 @@ def take_a_backup(errand) -> dict:
     }
 
 
+def fail_interrupted_backups() -> int:
+    """Say so on a *Back up now* whose worker was killed. Called by the scheduler (#1131).
+
+    Every errand is given a day before it is called interrupted, because nothing says
+    whether its worker is alive. A backup does say: it renews its claim while it runs. So
+    one that began longer ago than the claim lasts, with no claim held, is not running.
+    """
+    from . import backups
+    from .errands import interrupt
+    from .models import Errand, ErrandState
+
+    if backups.running():
+        return 0
+    cutoff = timezone.now() - timedelta(seconds=backups.LOCK_SECONDS)
+    return interrupt(
+        Errand.objects.filter(kind="backup", state=ErrandState.WORKING, started_at__lt=cutoff)
+    )
+
+
 def reap_archives() -> int:
     """Delete the archives that have run out. Called by the scheduler.
 

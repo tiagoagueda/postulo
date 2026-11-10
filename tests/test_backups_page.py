@@ -15,6 +15,7 @@ import json
 import os
 import tarfile
 from pathlib import Path
+from types import SimpleNamespace
 from zoneinfo import ZoneInfo
 
 import pytest
@@ -23,7 +24,7 @@ from django.contrib.auth import get_user_model
 from django.urls import reverse
 from django.utils import timezone
 
-from postulo.core import backups, leases, metrics
+from postulo.core import backups, leases, metrics, slow, tasks
 from postulo.core.backup import BackupError
 from postulo.core.memo import forget_current
 from postulo.core.models import Errand, ErrandState, SiteSettings
@@ -211,11 +212,106 @@ def test_the_lock_is_held_by_one_backup_only(monkeypatch):
 
 def test_taking_one_releases_the_lock(monkeypatch):
     path = make_archive()
-    monkeypatch.setattr(backups, "write_backup", lambda: type("R", (), {"path": path})())
+    monkeypatch.setattr(backups, "write_backup", lambda **kw: type("R", (), {"path": path})())
 
     assert backups.take() == path
     assert not backups.running()
     assert backups.archives()[0].checked == "ok"
+
+
+def test_a_running_backup_renews_its_claim_and_a_killed_one_loses_it(monkeypatch):
+    """The claim lasted six hours so that it outlived the slowest backup, and a backup killed
+    half way held it for all six: the next scheduled slot was lost. Now it is short, and the
+    backup renews it as it writes (#1131)."""
+    from postulo.core.models import Lease
+
+    assert backups.LOCK_SECONDS <= 15 * 60, "a killed backup frees the schedule within minutes"
+    path = make_archive()
+    clock = [1000.0]
+    monkeypatch.setattr(backups.time, "monotonic", lambda: clock[0])
+    renewed = []
+    renew = leases.renew
+    monkeypatch.setattr(
+        leases,
+        "renew",
+        lambda key, token, seconds: renewed.append((key, seconds)) or renew(key, token, seconds),
+    )
+    mine = Lease.objects.filter(key=backups.LOCK_KEY)
+
+    def write_backup(alive=None):
+        alive()
+        assert renewed == [], "asked for every file, so it waits a minute between renewals"
+        clock[0] += backups.RENEW_SECONDS + 1
+        alive()
+        assert renewed == [(backups.LOCK_KEY, backups.LOCK_SECONDS)]
+        # The lease ran out anyway (a step that took longer than it lasts) and nobody took
+        # it: the backup holds it again.
+        mine.update(expires=timezone.now() - dt.timedelta(minutes=1))
+        assert not backups.running()
+        clock[0] += backups.RENEW_SECONDS + 1
+        alive()
+        assert backups.running()
+        # It ran out and another backup holds it now: that one's lease is left alone.
+        mine.update(token="another", expires=timezone.now() + dt.timedelta(minutes=1))
+        clock[0] += backups.RENEW_SECONDS + 1
+        alive()
+        assert mine.get().token == "another"
+        return type("R", (), {"path": path})()
+
+    monkeypatch.setattr(backups, "write_backup", write_backup)
+
+    assert backups.take() == path
+    assert mine.get().token == "another", "and not released by who does not hold it"
+    mine.delete()
+
+
+def test_a_backup_killed_half_way_does_not_refuse_the_button_for_a_day(
+    client, admin, settings, monkeypatch
+):
+    """Its errand stays *working* until the day-long sweep, and the page trusted the row: the
+    button said a backup was running, with no claim held and nothing to clear it (#1131)."""
+    settings.POSTULO_BACKGROUND_WORK = True
+    # A queue no worker is reading, so what is asked for stays waiting.
+    monkeypatch.setattr(tasks, "perform_errand", SimpleNamespace(enqueue=lambda pk: None))
+    dead = Errand.objects.create(kind="backup", owner=admin, payload={})
+    Errand.objects.filter(pk=dead.pk).update(
+        state=ErrandState.WORKING,
+        created_at=timezone.now() - dt.timedelta(minutes=30),
+        started_at=timezone.now() - dt.timedelta(minutes=30),
+    )
+    client.force_login(admin)
+
+    response = client.post(reverse("server:backup_run"), follow=True)
+
+    assert "already running" not in response.content.decode()
+    assert Errand.objects.filter(kind="backup").count() == 2
+
+    # And one asked for a moment ago, which no worker has picked up yet, still counts.
+    response = client.post(reverse("server:backup_run"), follow=True)
+    assert "already running" in response.content.decode()
+    assert Errand.objects.filter(kind="backup").count() == 2
+
+
+def test_a_backup_killed_half_way_says_it_was_interrupted_within_minutes(admin):
+    """The errand of a killed backup said *Taking a backup* for a day (#1131)."""
+    dead = Errand.objects.create(kind="backup", owner=admin, payload={})
+    young = Errand.objects.create(kind="backup", owner=admin, payload={})
+    Errand.objects.filter(pk=dead.pk).update(
+        state=ErrandState.WORKING, started_at=timezone.now() - dt.timedelta(minutes=30)
+    )
+    Errand.objects.filter(pk=young.pk).update(
+        state=ErrandState.WORKING, started_at=timezone.now() - dt.timedelta(minutes=1)
+    )
+
+    held = leases.take(backups.LOCK_KEY, 60)
+    assert slow.fail_interrupted_backups() == 0, "a backup holds the lease: it may be this one"
+    assert leases.release(backups.LOCK_KEY, held)
+    assert slow.fail_interrupted_backups() == 1
+
+    dead.refresh_from_db()
+    young.refresh_from_db()
+    assert dead.state == ErrandState.FAILED and "interrupted" in dead.error
+    assert young.state == ErrandState.WORKING
 
 
 # ------------------------------------------------------------------------ delete

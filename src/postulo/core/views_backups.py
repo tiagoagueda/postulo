@@ -92,12 +92,20 @@ def _archive(name: str):
 
 
 def _a_backup_is_running() -> bool:
+    """Whether to refuse a second *Back up now*.
+
+    The claim a running backup holds and renews is the answer (#1131). An unfinished errand
+    counts only while it is too young to have been given up on: one just asked for has not
+    reached its worker yet and holds no claim, and a second press must not queue a second.
+    Past that a row with no claim behind it is a backup that was killed, and it used to
+    refuse the button for a day.
+    """
     if backups.running():
         return True
     return Errand.objects.filter(
         kind="backup",
         state__in=(ErrandState.WAITING, ErrandState.WORKING),
-        created_at__gt=timezone.now() - dt.timedelta(hours=24),
+        created_at__gt=timezone.now() - dt.timedelta(seconds=backups.LOCK_SECONDS),
     ).exists()
 
 

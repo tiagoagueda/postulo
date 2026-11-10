@@ -247,7 +247,7 @@ def test_nothing_is_sent_without_a_recipient(chosen, vault):
 def test_an_archive_taken_by_the_page_or_the_schedule_is_queued(chosen, monkeypatch):
     written = []
 
-    def write_backup():
+    def write_backup(**kwargs):
         written.append(make_archive())
         return BackupReport(path=written[-1], bytes=written[-1].stat().st_size)
 

@@ -224,6 +224,18 @@ def test_a_backup_has_its_name_only_once_it_is_whole(tmp_path, monkeypatch):
     verify(report.path)
 
 
+def test_writing_an_archive_says_it_is_alive_for_every_file(tmp_path, settings):
+    """Nothing told the caller a backup was still going, so the claim on *a backup is
+    running* had to outlast the slowest one, and a killed backup held it for hours (#1131)."""
+    for name in ("one.pdf", "two.pdf", "three.pdf"):
+        a_media_file(settings, f"documents/{name}")
+    beats = []
+
+    write_backup(tmp_path / "instance.tar.gz", alive=lambda: beats.append(1))
+
+    assert len(beats) >= 3 + 2, "each file, and the steps before and after them"
+
+
 def test_media_can_be_left_out(tmp_path, settings):
     a_media_file(settings)
     report = write_backup(tmp_path / "db-only.tar.gz", include_media=False)

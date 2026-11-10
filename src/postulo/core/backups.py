@@ -16,8 +16,10 @@ reads the whole archive. The answer is kept in the cache against the file's name
 modification time, so a listing never re-hashes and a file that changed is not trusted for
 having been checked before.
 
-**One at a time**, whoever asks: a lease held for the length of a backup, so a second
-press, and the scheduler on the same minute, find out that one is running.
+**One at a time**, whoever asks: a lease held while a backup runs, so a second press, and
+the scheduler on the same minute, find out that one is running. The lease is short, and the
+backup renews it as it works (#1131), so one whose process was killed stops counting as
+running within minutes rather than hours.
 """
 
 from __future__ import annotations
@@ -27,6 +29,7 @@ import logging
 import re
 import shutil
 import tarfile
+import time
 from collections.abc import Callable
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -56,8 +59,13 @@ logger = logging.getLogger(__name__)
 NAME = re.compile(r"postulo-(backup|upload)-\d{8}-\d{6}(-\d+)?\.tar\.gz")
 
 LOCK_KEY = "postulo:backup:running"
-#: Longer than any backup should take; a crashed one frees the key by expiring.
-LOCK_SECONDS = 6 * 3600
+#: How long the claim lasts without being renewed. A running backup renews it; one whose
+#: process was killed cannot, and frees the key by letting it expire (#1131). It was six
+#: hours, long enough for the slowest backup, and so a killed one cost the next scheduled
+#: slot and, through its errand, a day of *Back up now*.
+LOCK_SECONDS = 10 * 60
+#: How often a running backup renews the claim, at most.
+RENEW_SECONDS = 60
 
 #: How old a half-written archive is before the scheduler removes it (#1123). No backup runs
 #: this long, so one this old belongs to a process that was killed.
@@ -245,6 +253,30 @@ def running() -> bool:
     return leases.held(LOCK_KEY)
 
 
+def _renewing(token: str) -> Callable[[], None]:
+    """What a running backup calls as it works, to keep the lease it holds (#1131).
+
+    Called for every file, so it asks the clock and nothing else until a minute has gone.
+    Only ever its own lease: one that ran out and was taken by another backup is left alone,
+    and one that ran out and is still this backup's row is held again. Never raises, because
+    a database that cannot be written for a moment is no reason to lose the archive being
+    written.
+    """
+    last = time.monotonic()
+
+    def renew() -> None:
+        nonlocal last
+        if time.monotonic() - last < RENEW_SECONDS:
+            return
+        last = time.monotonic()
+        try:
+            leases.renew(LOCK_KEY, token, LOCK_SECONDS)
+        except Exception:
+            logger.exception("Could not renew the lease of the running backup.")
+
+    return renew
+
+
 def take() -> Path:
     """Write one verified archive into the directory; remember that it verified.
 
@@ -255,7 +287,7 @@ def take() -> Path:
     if token is None:
         raise Busy
     try:
-        report = write_backup()
+        report = write_backup(alive=_renewing(token))
         # `write_backup` has just verified it, so the page does not need to again.
         remember_check(report.path, True)
         # And it is the archive a destination is waiting for, if one is chosen (#325).

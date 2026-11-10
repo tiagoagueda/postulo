@@ -171,7 +171,7 @@ def test_a_backup_keeps_its_lease_when_the_cache_is_emptied(monkeypatch):
     """The same for *Back up now* pressed while the scheduled backup runs (#1130)."""
     inner = []
 
-    def a_second_one_starts_meanwhile():
+    def a_second_one_starts_meanwhile(alive=None):
         cache.clear()
         inner.append(backups.running())
         with pytest.raises(backups.Busy):

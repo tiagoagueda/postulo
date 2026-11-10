@@ -199,9 +199,20 @@ def fail_interrupted(*, hours: int = 24) -> int:
     does not, and the errand says what happened.
     """
     cutoff = timezone.now() - timedelta(hours=hours)
-    return Errand.objects.filter(
-        state__in=(ErrandState.WAITING, ErrandState.WORKING), created_at__lt=cutoff
-    ).update(
+    return interrupt(
+        Errand.objects.filter(
+            state__in=(ErrandState.WAITING, ErrandState.WORKING), created_at__lt=cutoff
+        )
+    )
+
+
+def interrupt(rows) -> int:
+    """Mark these unfinished errands as interrupted, in the words their page shows.
+
+    For a kind of work that can tell sooner than `fail_interrupted`'s day that its worker
+    is gone, as a backup can (#1131).
+    """
+    return rows.update(
         state=ErrandState.FAILED,
         error=str(_("The work was interrupted before it finished. Please try again.")),
         finished_at=timezone.now(),

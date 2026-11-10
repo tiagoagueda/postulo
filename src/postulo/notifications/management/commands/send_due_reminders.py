@@ -250,6 +250,10 @@ class Command(BaseCommand):
             from postulo.core import backups
 
             backups.forget_partial()
+            # And a *Back up now* whose worker was killed says so now, not in a day (#1131).
+            from postulo.core.slow import fail_interrupted_backups
+
+            fail_interrupted_backups()
         except Exception:
             logger.exception("Could not remove half-written backups")
 
