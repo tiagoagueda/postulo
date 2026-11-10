@@ -36,6 +36,7 @@ from dataclasses import dataclass
 from datetime import timedelta
 
 from django.conf import settings
+from django.db.models import Q
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
@@ -190,18 +191,29 @@ def working_label(kind: str) -> str:
     return str(work.working) if work else str(_("Working"))
 
 
-def fail_interrupted(*, hours: int = 24) -> int:
+def fail_interrupted(*, hours: int = 24, working_hours: int = 1) -> int:
     """Say so on errands that were never finished, so their page stops promising (#474).
 
     A worker killed mid-task (a restart past its grace period, the kernel's out-of-memory
     killer during a render) leaves its errand *working* for ever, and the page of the person
     who asked goes on saying the work carries on without them. Past a generous deadline it
     does not, and the errand says what happened.
+
+    **Two deadlines, because the two states wait for different things (#1122).** A *waiting*
+    errand has not been touched, and a worker that comes back will still do it, so it keeps
+    the long one, counted from when it was asked for. A *working* errand was started and is
+    never started twice: an hour after it began -- every handler has its own timeout well
+    under that -- nobody is working on it, and a day is a long time to be told otherwise.
     """
-    cutoff = timezone.now() - timedelta(hours=hours)
+    now = timezone.now()
+    cutoff = now - timedelta(hours=hours)
+    working_cutoff = now - timedelta(hours=working_hours)
     return interrupt(
         Errand.objects.filter(
-            state__in=(ErrandState.WAITING, ErrandState.WORKING), created_at__lt=cutoff
+            Q(state=ErrandState.WAITING, created_at__lt=cutoff)
+            | Q(state=ErrandState.WORKING, started_at__lt=working_cutoff)
+            # A row marked *working* with no start written down has only its creation to go by.
+            | Q(state=ErrandState.WORKING, started_at__isnull=True, created_at__lt=cutoff)
         )
     )
 
@@ -209,8 +221,8 @@ def fail_interrupted(*, hours: int = 24) -> int:
 def interrupt(rows) -> int:
     """Mark these unfinished errands as interrupted, in the words their page shows.
 
-    For a kind of work that can tell sooner than `fail_interrupted`'s day that its worker
-    is gone, as a backup can (#1131).
+    For a kind of work that can tell sooner than `fail_interrupted` that its worker is gone,
+    as a backup can (#1131).
     """
     return rows.update(
         state=ErrandState.FAILED,

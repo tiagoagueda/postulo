@@ -14,7 +14,7 @@ import pytest
 from django.urls import reverse
 from django.utils import timezone
 
-from postulo.core import errands, site
+from postulo.core import errands, scheduler, site
 from postulo.core.models import Errand, ErrandState, SiteSettings
 
 pytestmark = pytest.mark.django_db
@@ -295,6 +295,47 @@ def test_an_unfinished_page_polls_and_a_finished_one_stops(a_kind, client, user,
     assert "hx-trigger" not in finished, "a finished fragment asks for nothing"
 
 
+def test_with_a_silent_worker_the_page_says_so_and_asks_less_often(a_kind, client, user, settings):
+    """A tab left open on work nobody was doing said *the work carries on without you* and
+    asked every two seconds, for up to a day. With no worker seen for five minutes it says
+    that instead, and asks every thirty seconds (#1122)."""
+    settings.POSTULO_BACKGROUND_WORK = True
+    client.force_login(user)
+    errand = errands.send("test_kind", user)
+    state_url = reverse("core:errand_state", args=[errand.pk])
+    silent = "The background worker has not been seen for a while."
+
+    seen = client.get(state_url).content.decode()
+    assert "The work carries on without you." in seen and silent not in seen
+    assert 'hx-trigger="every 2s"' in seen, "with a worker going round it is as it was"
+
+    scheduler.worker_beat(timezone.now() - dt.timedelta(minutes=6))
+    stale = client.get(state_url).content.decode()
+    assert silent in stale and "The work will start when it is back." in stale
+    assert "carries on without you" not in stale
+    assert 'hx-trigger="every 30s"' in stale
+    assert "Check again" in stale, "and it is still watchable with no script at all"
+    assert "aria-live" not in stale, "said inside the page's live region, not one of its own"
+
+    scheduler.worker_heartbeat_path().unlink()
+    never = client.get(state_url + "?dialog=1").content.decode()
+    assert silent in never and 'hx-trigger="every 30s"' in never
+    assert "?dialog=1" in never, "the polls of a dialog still ask for the dialog's wording"
+
+    page = client.get(reverse("core:errand", args=[errand.pk])).content.decode()
+    assert silent in page, "the page's first paint says it too"
+
+    # Being worked on: the worker is busy with this very errand, which is why it has not
+    # been round. The page goes on as it does for any work under way.
+    Errand.objects.filter(pk=errand.pk).update(state=ErrandState.WORKING, started_at=timezone.now())
+    working = client.get(state_url).content.decode()
+    assert silent not in working and 'hx-trigger="every 2s"' in working
+
+    errands.perform(errand.pk)
+    finished = client.get(state_url).content.decode()
+    assert silent not in finished and "hx-trigger" not in finished
+
+
 def test_the_poll_is_ownership_checked_not_only_the_press(a_kind, client, user, other_user):
     """A poll is a new address that names a piece of work, which is an address somebody
     will try with another row's number."""
@@ -327,8 +368,9 @@ def test_finished_errands_are_forgotten_after_a_week(a_kind, user):
 
 def test_an_errand_the_worker_never_finished_is_failed_with_a_sentence(a_kind, user):
     stuck = errands.send("test_kind", user)
+    # Counted from when the work began, since #1122; it was from when it was asked for.
     Errand.objects.filter(pk=stuck.pk).update(
-        state=ErrandState.WORKING, created_at=timezone.now() - dt.timedelta(days=2)
+        state=ErrandState.WORKING, started_at=timezone.now() - dt.timedelta(days=2)
     )
     busy = errands.send("test_kind", user)
     Errand.objects.filter(pk=busy.pk).update(state=ErrandState.WORKING)
@@ -340,6 +382,49 @@ def test_an_errand_the_worker_never_finished_is_failed_with_a_sentence(a_kind, u
     assert stuck.state == ErrandState.FAILED and stuck.is_finished
     assert "interrupted" in stuck.error
     assert busy.state == ErrandState.WORKING, "work that is still within its deadline is left"
+
+
+def test_work_that_began_over_an_hour_ago_is_interrupted_and_waiting_work_is_not(a_kind, user):
+    """A worker killed mid-task left its errand *working* for a day before the page said so,
+    because the deadline was counted from when the work was asked for. Work is never begun
+    twice, so an hour after it began it is called interrupted; work still *waiting* keeps
+    its day, since a worker that comes back will do it (#1122)."""
+    now = timezone.now()
+    killed = errands.send("test_kind", user)
+    Errand.objects.filter(pk=killed.pk).update(
+        state=ErrandState.WORKING, started_at=now - dt.timedelta(hours=2)
+    )
+    busy = errands.send("test_kind", user)
+    Errand.objects.filter(pk=busy.pk).update(
+        state=ErrandState.WORKING, started_at=now - dt.timedelta(minutes=30)
+    )
+    queued = errands.send("test_kind", user)
+    Errand.objects.filter(pk=queued.pk).update(
+        state=ErrandState.WAITING, created_at=now - dt.timedelta(hours=2)
+    )
+    forgotten = errands.send("test_kind", user)
+    Errand.objects.filter(pk=forgotten.pk).update(
+        state=ErrandState.WAITING, created_at=now - dt.timedelta(hours=25)
+    )
+
+    assert errands.fail_interrupted() == 2
+
+    states = {
+        name: Errand.objects.get(pk=errand.pk).state
+        for name, errand in {
+            "killed": killed,
+            "busy": busy,
+            "queued": queued,
+            "forgotten": forgotten,
+        }.items()
+    }
+    assert states == {
+        "killed": ErrandState.FAILED,
+        "busy": ErrandState.WORKING,
+        "queued": ErrandState.WAITING,
+        "forgotten": ErrandState.FAILED,
+    }
+    assert "interrupted" in Errand.objects.get(pk=killed.pk).error
 
 
 def test_a_subject_deleted_while_it_waited_leaves_the_errand_behind(a_kind, user, settings):

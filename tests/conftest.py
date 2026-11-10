@@ -153,6 +153,27 @@ def _no_inherited_drafts():
     pdf.forget_drafts()
 
 
+@pytest.fixture(scope="session")
+def _worker_heartbeat_file(tmp_path_factory) -> Path:
+    return tmp_path_factory.mktemp("worker") / "worker-heartbeat"
+
+
+@pytest.fixture(autouse=True)
+def _a_worker_that_is_going_round(_worker_heartbeat_file, settings):
+    """Every test starts with a worker that has just been round (#1122).
+
+    The page that watches a piece of slow work reads the worker's heartbeat, and says
+    something else when there is none or it is old. The file's default place is the
+    checkout's own `data/`, so without this a machine that once ran a worker and one that
+    never did were running different suites. A test about a silent worker writes an old
+    heartbeat, or removes the file, itself.
+    """
+    from postulo.core import scheduler
+
+    settings.POSTULO_WORKER_HEARTBEAT = _worker_heartbeat_file
+    scheduler.worker_beat()
+
+
 #: How many languages a worker carries from one test file into the next before it lets go of
 #: what it holds for each of them; see `release_languages`. The source language, the
 #: instance's, and the one or two a file switches to.

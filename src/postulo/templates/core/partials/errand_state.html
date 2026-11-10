@@ -56,7 +56,10 @@
       {% blocktranslate trimmed with what=working_label %}{{ what }}…{% endblocktranslate %}
     </p>
     <p class="mt-1 text-sm text-ink-500 dark:text-ink-400">
-      {% if in_dialog %}{% translate "You can close this. The work carries on without you." %}{% else %}{% translate "You can leave this page. The work carries on without you." %}{% endif %}
+      {% comment %} With no worker to be seen the work does not carry on, and saying that it
+         does is what kept somebody waiting for a day (#1122). Said in the same line, so the
+         page's live region announces it as it does every other change of state. {% endcomment %}
+      {% if worker_silent %}{% translate "The background worker has not been seen for a while. The work will start when it is back." %}{% elif in_dialog %}{% translate "You can close this. The work carries on without you." %}{% else %}{% translate "You can leave this page. The work carries on without you." %}{% endif %}
     </p>
     <noscript>
       <a href="{% url 'core:errand' errand.pk %}" class="btn mt-4" data-variant="outline">

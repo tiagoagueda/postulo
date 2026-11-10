@@ -14,17 +14,44 @@ so on its first paint.
 
 from __future__ import annotations
 
+from datetime import timedelta
+
 from django.contrib.auth.decorators import login_required
 from django.db import transaction
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404, render
+from django.utils import timezone
 
 from . import errands as errand_layer
-from .models import Errand
+from . import scheduler
+from .models import Errand, ErrandState
 
 #: How often the fragment asks again. Long enough not to be a load, short enough that a
 #: capture that took four seconds is not reported after ten.
 POLL_SECONDS = 2
+
+#: How long the worker may go unseen before the page stops saying the work carries on. The
+#: worker's own healthcheck calls it dead after the same five minutes (`docker/compose.yml`).
+WORKER_SILENT_AFTER = timedelta(minutes=5)
+
+#: How often the fragment asks while the worker is silent: nothing will change until it is
+#: back, and a tab left open is otherwise 1,800 requests an hour to say so (#1122).
+SILENT_POLL_SECONDS = 30
+
+
+def worker_silent() -> bool:
+    """Whether the worker has not been round lately, or never has here (#1122).
+
+    Read from the heartbeat the worker writes after each pass, which is the one thing the
+    web container can see of it. A heartbeat from the future is a clock that disagrees, not
+    a worker that has stopped.
+    """
+    seen = scheduler.worker_last_pass()
+    if seen is None:
+        return True
+    if timezone.is_naive(seen):
+        seen = timezone.make_aware(seen)
+    return timezone.now() - seen > WORKER_SILENT_AFTER
 
 
 def _errand(request: HttpRequest, pk: int) -> Errand:
@@ -37,11 +64,19 @@ def state_context(errand: Errand, *, in_dialog: bool = False, first: bool = Fals
     ``first`` is the answer to the press that started the work: the line has just appeared
     where a button was, so focus is sent to it, and again when the work finishes -- not on
     every poll in between, which would pull it out of whatever else is being read.
+
+    ``worker_silent`` is an errand still waiting to be started whose worker has not been
+    seen for five minutes: the line then says so instead of promising that the work carries
+    on, and asks again far less often (#1122). A finished errand never looks, and nor does
+    one that is being worked on: the worker writes its heartbeat between pieces of work, so
+    during one long piece it looks silent to exactly the page that is watching it work.
     """
+    silent = errand.state == ErrandState.WAITING and worker_silent()
     return {
         "errand": errand,
         "working_label": errand_layer.working_label(errand.kind),
-        "poll_seconds": POLL_SECONDS,
+        "poll_seconds": SILENT_POLL_SECONDS if silent else POLL_SECONDS,
+        "worker_silent": silent,
         "in_dialog": in_dialog,
         "focus_result": in_dialog and (first or errand.is_finished),
     }

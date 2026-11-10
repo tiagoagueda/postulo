@@ -29,7 +29,7 @@
   <div role="status" aria-live="polite" aria-atomic="true" id="backup-status" class="mb-6 empty:hidden">
     {% if errand_state %}
       <div class="card">
-        {% include "core/partials/errand_state.html" with errand=errand_state.errand working_label=errand_state.working_label poll_seconds=errand_state.poll_seconds in_dialog=False focus_result=False %}
+        {% include "core/partials/errand_state.html" with errand=errand_state.errand working_label=errand_state.working_label poll_seconds=errand_state.poll_seconds worker_silent=errand_state.worker_silent in_dialog=False focus_result=False %}
       </div>
     {% elif running %}
       <div class="card"><p class="font-medium">{% translate "A backup is running." %}</p></div>
