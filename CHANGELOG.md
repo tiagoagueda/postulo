@@ -19,6 +19,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🐛 Fixed
 
+- An image built from a working tree no longer carries the downloaded ESCO and GeoNames files or Python's bytecode directories. (#1141)
 - The GeoNames lookup databases a checkout builds are ignored by git, so a broad git add can no longer commit 30 MB of derived data. (#1161)
 - A stalled download in a CI set-up step ends in minutes with its step named, instead of holding a runner slot for hours. (#1138)
 - The release recipe and the release check no longer ask for Every Python to be started by hand, a run the check could never see. (#1189)

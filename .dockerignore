@@ -1,17 +1,27 @@
+# A pattern here is matched against the path from the context root, as Go's filepath.Match
+# does: `__pycache__` alone leaves out a directory of that name at the root and no other, so
+# what may sit at any depth is written `**/` (#1141).
+#
+# The two `src/postulo/jobs/data` lines are what `manage.py fetch_esco` and `fetch_geonames`
+# download into a working tree, 71 MB that `COPY src` carried into an image built from one,
+# where nothing reads it: the image keeps both under /app/data. The licence notes and the
+# NACE table beside them are committed and are not matched (`tests/test_ignore_files.py`).
 .git
 .github
 .forgejo
 .venv
-node_modules
+**/node_modules
 data
+src/postulo/jobs/data/esco-*
+src/postulo/jobs/data/geonames-*
 staticfiles
 .env
 .env.*
 !.env.example
 *.sqlite3
-__pycache__
-*.py[cod]
-.pytest_cache
+**/__pycache__
+**/*.py[cod]
+**/.pytest_cache
 .ruff_cache
 .coverage
 htmlcov
