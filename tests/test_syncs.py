@@ -7,11 +7,12 @@ import io
 from typing import ClassVar
 
 import pytest
-from django.core.cache import cache
 from django.core.management import call_command
 from django.urls import reverse
 from django.utils import timezone
 
+from postulo.core import leases
+from postulo.core.models import Lease
 from postulo.jobs.models import Company, Contact
 from postulo.plugins import registry, syncing
 from postulo.plugins.base import FieldSpec, SyncPlugin, SyncReport
@@ -408,21 +409,19 @@ def test_a_connection_runs_once_at_a_time(user, monkeypatch):
     assert len(inner) == 1 and inner[0].already_running
     assert "already running" in inner[0].notes[0]
     assert MirrorSync.runs == [], "the inner call never reached the plugin"
-    assert cache.add(syncing.lease_key(connection), "x", 5), "the lease is gone afterwards"
-    cache.delete(syncing.lease_key(connection))
+    assert leases.take(syncing.lease_key(connection), 5), "the lease is gone afterwards"
 
 
 def test_the_lease_is_let_go_when_the_plugin_raises(user):
     connection = a_sync(user)
     MirrorSync.fail_with = "boom"
     assert syncing.sync_connection(connection).error == "RuntimeError: boom"
-    assert cache.add(syncing.lease_key(connection), "x", 5)
-    cache.delete(syncing.lease_key(connection))
+    assert leases.take(syncing.lease_key(connection), 5)
 
 
 def test_sync_now_on_a_held_connection_says_so_and_does_not_run(client, user):
     connection = a_sync(user)
-    cache.add(syncing.lease_key(connection), "x", 60)
+    assert leases.take(syncing.lease_key(connection), 60)
     client.force_login(user)
     response = client.post(reverse("connections:sync_now", args=[connection.pk]), follow=True)
     assert "A sync of this connection is already running." in response.content.decode()
@@ -813,9 +812,8 @@ def test_a_run_that_outlived_its_lease_does_not_free_the_next_runs(user):
     """It deleted the key whatever it held, so a third run could start beside the second (#988)."""
     connection = a_sync(user)
     key = syncing.lease_key(connection)
-    MirrorSync.during = lambda: cache.set(key, "the-next-runs-token", 60)
+    MirrorSync.during = lambda: Lease.objects.filter(key=key).update(token="the-next-runs-token")
 
     syncing.sync_connection(connection)
 
-    assert cache.get(key) == "the-next-runs-token"
-    cache.delete(key)
+    assert Lease.objects.get(key=key).token == "the-next-runs-token"

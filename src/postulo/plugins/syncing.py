@@ -17,13 +17,11 @@ from __future__ import annotations
 import datetime as dt
 import logging
 import time
-import uuid
 
-from django.core.cache import cache
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
-from postulo.core import preferences
+from postulo.core import leases, preferences
 
 from .base import ConnectionUnusable, FieldSpec, SyncReport
 from .models import Connection
@@ -121,9 +119,8 @@ def sync_connection(connection: Connection) -> SyncReport:
     from the links it read at the start, so two overlapping runs would each do the other's
     work again. The run that cannot take the connection's lease returns a report that says
     so, without calling the plugin and without touching the connection (#586). The lease
-    is in the cache, which is a table of the same database, so a caller inside a
-    transaction would not make it visible to anyone else until it ended; *Sync now* is
-    therefore not atomic.
+    is a row (`core.leases`), so a caller inside a transaction would not make it visible
+    to anyone else until it ended; *Sync now* is therefore not atomic.
 
     Run as its owner, in their language and time zone, whoever started it: *Sync now* is
     inside their request and the scheduler is not, and what the run writes -- a timeline
@@ -131,8 +128,8 @@ def sync_connection(connection: Connection) -> SyncReport:
     depend on which one it was (#335).
     """
     key = lease_key(connection)
-    token = uuid.uuid4().hex
-    if not cache.add(key, token, LEASE_SECONDS):
+    token = leases.take(key, LEASE_SECONDS)
+    if token is None:
         return SyncReport(
             notes=[str(_("A sync of this connection is already running."))],
             already_running=True,
@@ -142,11 +139,9 @@ def sync_connection(connection: Connection) -> SyncReport:
             return _run_connection(connection)
     finally:
         # Only a lease that is still this run's (#988): one that outlived `LEASE_SECONDS` was
-        # taken by the next run, and deleting that would let a third start beside it. The
-        # cache has no atomic compare-and-delete, so what is left is the instant between
-        # the two calls, as in `scheduler.only_one_pass` (#576).
-        if cache.get(key) == token:
-            cache.delete(key)
+        # taken by the next run, and deleting that would let a third start beside it. One
+        # statement, as in `scheduler.only_one_pass` (#576, #1130).
+        leases.release(key, token)
 
 
 def _run_connection(connection: Connection) -> SyncReport:

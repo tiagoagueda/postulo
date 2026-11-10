@@ -12,14 +12,14 @@ from __future__ import annotations
 import datetime as dt
 
 import pytest
-from django.core.cache import cache
 from django.core.management import call_command
 from django.utils import timezone
 
 from postulo.applications.models import Application, Reminder, Status
 from postulo.applications.quiet import announce_quiet_applications
 from postulo.applications.services import change_status
-from postulo.core import metrics, scheduler
+from postulo.core import leases, metrics, scheduler
+from postulo.core.models import Lease
 from postulo.jobs.models import Company, JobPosting
 from postulo.notifications.management.commands.send_due_reminders import announce_due_reminders
 
@@ -29,9 +29,7 @@ pytestmark = pytest.mark.django_db
 @pytest.fixture(autouse=True)
 def heartbeat_in_a_temporary_place(settings, tmp_path):
     settings.POSTULO_SCHEDULER_HEARTBEAT = tmp_path / "scheduler-heartbeat"
-    cache.delete(scheduler.LEASE_KEY)
     yield
-    cache.delete(scheduler.LEASE_KEY)
 
 
 def an_application(user, *, quiet_days: int = 0) -> Application:
@@ -154,8 +152,8 @@ def test_a_pass_that_outlived_its_lease_leaves_the_later_pass_s_lease_alone():
     """The key expired mid-pass and a later pass took it; ending must not delete theirs (#576)."""
     with scheduler.only_one_pass(60) as mine:
         assert mine is True
-        cache.set(scheduler.LEASE_KEY, "a later pass", 60)
-    assert cache.get(scheduler.LEASE_KEY) == "a later pass"
+        Lease.objects.filter(key=scheduler.LEASE_KEY).update(token="a later pass")
+    assert Lease.objects.get(key=scheduler.LEASE_KEY).token == "a later pass"
     with scheduler.only_one_pass(60) as third:
         assert third is False, "so a third pass still finds the lease held"
 
@@ -164,7 +162,7 @@ def test_the_command_leaves_a_pass_already_running_alone(user, capsys):
     Reminder.objects.create(
         owner=user, summary="x", due_at=timezone.now() - dt.timedelta(minutes=5)
     )
-    cache.add(scheduler.LEASE_KEY, "somebody else", 60)
+    assert leases.take(scheduler.LEASE_KEY, 60), "somebody else's pass"
 
     call_command("send_due_reminders")
 

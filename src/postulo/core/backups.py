@@ -16,7 +16,7 @@ reads the whole archive. The answer is kept in the cache against the file's name
 modification time, so a listing never re-hashes and a file that changed is not trusted for
 having been checked before.
 
-**One at a time**, whoever asks: a cache key held for the length of a backup, so a second
+**One at a time**, whoever asks: a lease held for the length of a backup, so a second
 press, and the scheduler on the same minute, find out that one is running.
 """
 
@@ -27,7 +27,6 @@ import logging
 import re
 import shutil
 import tarfile
-import uuid
 from collections.abc import Callable
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -39,7 +38,7 @@ from django.db.models import F
 from django.utils import timezone
 from django.utils.translation import gettext as _
 
-from . import site
+from . import leases, site
 from .backup import (
     PARTIAL_PREFIX,
     PARTIAL_SUFFIX,
@@ -243,7 +242,7 @@ class Busy(Exception):
 
 
 def running() -> bool:
-    return cache.get(LOCK_KEY) is not None
+    return leases.held(LOCK_KEY)
 
 
 def take() -> Path:
@@ -252,8 +251,8 @@ def take() -> Path:
     Raises :class:`Busy` when another is running and :class:`BackupError` when the archive
     could not be written or did not verify.
     """
-    token = uuid.uuid4().hex
-    if not cache.add(LOCK_KEY, token, LOCK_SECONDS):
+    token = leases.take(LOCK_KEY, LOCK_SECONDS)
+    if token is None:
         raise Busy
     try:
         report = write_backup()
@@ -263,8 +262,7 @@ def take() -> Path:
         queue_send(report.path)
         return report.path
     finally:
-        if cache.get(LOCK_KEY) == token:
-            cache.delete(LOCK_KEY)
+        leases.release(LOCK_KEY, token)
 
 
 def queue_send(path: Path, *, quietly: bool = True):

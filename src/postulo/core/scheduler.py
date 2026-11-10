@@ -4,11 +4,12 @@ Postulo's scheduler is one command in a loop. That is the right size for a singl
 but it leaves two questions that a queue would have answered by itself: what stops two of
 them running at once, and how does anybody know it is still going round (#221).
 
-**The lease** is a cache key held for the length of one pass. It is a courtesy rather than a
-lock -- every step of a pass also claims its own rows before acting, which is what actually
-makes a second scheduler harmless -- and it exists so that the ordinary mistake, cron *and*
-``--loop`` at the same time (the Compose file offers both), costs nothing instead of doubling
-the work. A pass that dies holds the key until it expires, which is why it expires.
+**The lease** is a row held for the length of one pass (`core.leases`). It is a courtesy
+rather than a lock -- every step of a pass also claims its own rows before acting, which is
+what actually makes a second scheduler harmless -- and it exists so that the ordinary
+mistake, cron *and* ``--loop`` at the same time (the Compose file offers both), costs nothing
+instead of doubling the work. A pass that dies holds the lease until it expires, which is why
+it expires.
 
 **The heartbeat** is a file, not a cache key or a row, because of who has to read it. The
 scheduler's own container healthcheck has no database credentials and serves no port, and the
@@ -22,15 +23,15 @@ from __future__ import annotations
 import datetime as dt
 import os
 import tempfile
-import uuid
 from contextlib import contextmanager
 from pathlib import Path
 
 from django.conf import settings
-from django.core.cache import cache
 from django.utils import timezone
 
-#: The cache key one pass holds while it runs.
+from . import leases
+
+#: The lease one pass holds while it runs.
 LEASE_KEY = "postulo:scheduler:pass"
 
 
@@ -92,20 +93,18 @@ def last_pass(*, path: Path | None = None) -> dt.datetime | None:
 def only_one_pass(seconds: int):
     """Hold the pass lease, or yield ``False`` because somebody else has it.
 
-    The key holds a token that is this pass's own, and the end of the pass gives back only a
-    key that still holds it (#576). A pass that outlives its lease finds, when it ends, that
-    the key has expired and a later pass has taken it; deleting that one would let a third
-    pass start beside the later one. The cache offers no atomic compare-and-delete, so the
-    check and the delete are two calls, and what is left is the instant between them rather
-    than the whole of a long pass.
+    The lease holds a token that is this pass's own, and the end of the pass gives back only
+    a lease that still holds it (#576). A pass that outlives its lease finds, when it ends,
+    that it has expired and a later pass has taken it; deleting that one would let a third
+    pass start beside the later one. Taking and giving back are one statement each, so two
+    schedulers arriving together over an expired lease cannot both have it (#1130).
     """
-    token = uuid.uuid4().hex
-    got_it = cache.add(LEASE_KEY, token, max(seconds, 60))
+    token = leases.take(LEASE_KEY, max(seconds, 60))
     try:
-        yield bool(got_it)
+        yield token is not None
     finally:
-        if got_it and cache.get(LEASE_KEY) == token:
-            cache.delete(LEASE_KEY)
+        if token is not None:
+            leases.release(LEASE_KEY, token)
 
 
 def worker_beat(when=None) -> None:

@@ -175,6 +175,9 @@ LAYERS: list[tuple[str, tuple[str, ...]]] = [
             # Who may see, change and manage a shared record: the querysets the models of
             # companies, contacts and listings are built on (#896).
             "postulo.core.sharing",
+            # The lease a pass, a backup and a sync hold (#1130): three statements over one
+            # row, and `plugins.syncing` among the governance takes one.
+            "postulo.core.leases",
             "postulo.core.identifiers",
             "postulo.plugins.identifiers*",
             # What a web link's service is, which the model reads to name a row (#305). The

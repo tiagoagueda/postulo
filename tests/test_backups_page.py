@@ -20,11 +20,10 @@ from zoneinfo import ZoneInfo
 import pytest
 from allauth.account.models import EmailAddress
 from django.contrib.auth import get_user_model
-from django.core.cache import cache
 from django.urls import reverse
 from django.utils import timezone
 
-from postulo.core import backups, metrics
+from postulo.core import backups, leases, metrics
 from postulo.core.backup import BackupError
 from postulo.core.memo import forget_current
 from postulo.core.models import Errand, ErrandState, SiteSettings
@@ -195,7 +194,7 @@ def test_a_failed_backup_says_why_and_is_counted(client, admin, monkeypatch):
 
 
 def test_a_second_press_while_one_runs_says_so(client, admin):
-    cache.set(backups.LOCK_KEY, "someone", 60)
+    assert leases.take(backups.LOCK_KEY, 60), "someone else's backup"
     client.force_login(admin)
 
     response = client.post(reverse("server:backup_run"), follow=True)
@@ -205,7 +204,7 @@ def test_a_second_press_while_one_runs_says_so(client, admin):
 
 
 def test_the_lock_is_held_by_one_backup_only(monkeypatch):
-    cache.set(backups.LOCK_KEY, "someone", 60)
+    assert leases.take(backups.LOCK_KEY, 60), "someone else's backup"
     with pytest.raises(backups.Busy):
         backups.take()
 

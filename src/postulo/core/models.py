@@ -1840,3 +1840,21 @@ class OffsiteBackup(models.Model):
 
     def __str__(self) -> str:
         return f"{self.archive} → {self.destination}"
+
+
+class Lease(models.Model):
+    """Who is doing a thing that runs once at a time, and until when (#1130).
+
+    A scheduler pass, a backup, a sync of one connection. Read and written only by
+    `core.leases`, whose three statements each carry their own condition; nothing else
+    should save one. Nobody owns it and no page shows it.
+    """
+
+    key = models.CharField(max_length=200, unique=True)
+    #: The holder's own, so that only the holder gives the lease back or makes it longer.
+    token = models.CharField(max_length=32)
+    #: A holder that died lets go by this passing.
+    expires = models.DateTimeField()
+
+    def __str__(self) -> str:
+        return self.key
