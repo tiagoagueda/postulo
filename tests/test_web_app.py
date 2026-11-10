@@ -66,9 +66,7 @@ def test_the_launch_queue_takes_the_open_window_to_the_link():
     Going to the link's address is the page's job, through `launchQueue`; without it, a
     link followed while the app is open would only ever raise the window.
     """
-    script = (Path(__file__).resolve().parents[1] / "src/postulo/static/js/app.js").read_text(
-        encoding="utf-8"
-    )
+    script = (Path(__file__).resolve().parents[1] / "assets/js/app.js").read_text(encoding="utf-8")
 
     assert "window.launchQueue.setConsumer(" in script
     assert "launchParams.targetURL" in script

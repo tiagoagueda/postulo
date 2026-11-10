@@ -230,7 +230,7 @@ def test_no_handle_is_drawn_by_the_template(client, user):
 
 def test_the_handle_is_a_button_and_not_only_a_drag():
     """A control only a mouse can reach is a control half the people using this cannot."""
-    source = Path("src/postulo/static/js/app.js").read_text(encoding="utf-8")
+    source = Path("assets/js/app.js").read_text(encoding="utf-8")
     block = source.split("resizing a column")[1].split("/* ---")[0]
 
     assert 'handle.type = "button"' in block
@@ -240,7 +240,7 @@ def test_the_handle_is_a_button_and_not_only_a_drag():
 
 
 def test_the_handle_flips_with_the_reading_direction():
-    source = Path("src/postulo/static/js/app.js").read_text(encoding="utf-8")
+    source = Path("assets/js/app.js").read_text(encoding="utf-8")
     block = source.split("resizing a column")[1].split("/* ---")[0]
 
     assert block.count('direction === "rtl"') >= 2, "the drag and the keys both"

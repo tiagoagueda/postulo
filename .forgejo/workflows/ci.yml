@@ -528,12 +528,16 @@ jobs:
 
       # The compiled stylesheet is committed so that the application runs without Node.
       # That only works if it is kept in step with its source; the same goes for the
-      # icons, the vendored scripts and the mark.
+      # page script the browser is served (#1149), the icons, the vendored scripts and the mark.
       - run: npm ci
         timeout-minutes: 5
 
       - name: Rebuild the stylesheet
         run: npm run build:css
+
+      - name: Rebuild the page script
+        # The browser is served a copy of assets/js/app.js without its comments (#1149).
+        run: npm run build:js
 
       - name: Re-copy the icons
         run: npm run sync:icons
@@ -551,6 +555,8 @@ jobs:
           git config --global --add safe.directory "$GITHUB_WORKSPACE"
           git diff --exit-code -- src/postulo/static/css/app.css \
             || (echo "::error::app.css is stale. Run 'npm run build:css' and commit the result." && exit 1)
+          git diff --exit-code -- src/postulo/static/js/app.min.js \
+            || (echo "::error::app.min.js is stale. Run 'npm run build:js' and commit the result." && exit 1)
           test -z "$(git status --porcelain -- src/postulo/static/icons)" \
             || (echo "::error::static/icons disagrees with assets/icons.txt. Run 'npm run sync:icons' and commit the result." && git status --porcelain -- src/postulo/static/icons && exit 1)
           test -z "$(git status --porcelain -- src/postulo/static/brands)" \

@@ -64,9 +64,9 @@ search = filter_tests.search
 
 LIST = "applications:list"
 FORM = "application-filters"
-APP_JS = (
-    Path(__file__).resolve().parents[1] / "src" / "postulo" / "static" / "js" / "app.js"
-).read_text(encoding="utf-8")
+APP_JS = (Path(__file__).resolve().parents[1] / "assets" / "js" / "app.js").read_text(
+    encoding="utf-8"
+)
 
 
 class Headings(HTMLParser):

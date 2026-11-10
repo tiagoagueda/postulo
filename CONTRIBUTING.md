@@ -91,6 +91,7 @@ uv run manage.py makemigrations --check --dry-run
 uv run pytest -m step         # the catalogue and static-file checks CI's Checks job runs
 uv run pytest -m heavy -p no:xdist  # what needs a process to itself; CI runs it after the suite
 npm run build:css            # only if you touched assets/css/ or a template's classes
+npm run build:js             # only if you touched assets/js/app.js; commit static/js/app.min.js
 ```
 
 Continuous integration runs the suite on Python 3.14 for every pull request and every push
@@ -98,11 +99,18 @@ to `main` or a release branch, and on 3.12 and 3.13 in its *Every Python* workfl
 and on a push to `main` that changes the version or the lock file. (It can be started by hand
 too, to look; Forgejo records no status for such a run, so the release gate does not see it.) The rest of the above runs once, in its *Checks* job, together with the catalogue checks,
 `manage.py check --deploy` against production settings, and a check that the committed
-stylesheet has not drifted from its source. Coverage is measured on the 3.14 leg only, and
+stylesheet and the committed page script have not drifted from their sources. Coverage is measured on the 3.14 leg only, and
 `fail_under` in `pyproject.toml` is the floor it has to clear; run
 `uv run pytest -n auto --cov` to see the number yourself. So does `uv run pytest` on your machine, once
 `npm ci` has installed the Tailwind CLI: `tests/test_stylesheet.py` rebuilds it and compares,
 which is the difference between finding out before the push and after it.
+
+The page script is written in `assets/js/app.js`, comments and all, and the browser is served
+`src/postulo/static/js/app.min.js`: the same script without its comments and indentation,
+which were more than half of the script a first visit downloaded. `npm run build:js` writes it with
+esbuild, names are left as they are so an error reported from a browser still reads, and the
+result is committed. Change the source, never the built copy; `tests/test_built_script.py`
+rebuilds it and compares, as the stylesheet's test does.
 
 A push to an issue branch does not run CI on its own; its pull request does, on every push
 to it. Open the pull request when you push the branch, as a draft (a title beginning `WIP:`

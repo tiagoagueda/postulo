@@ -692,9 +692,7 @@ def test_a_picture_pin_falls_back_to_the_dot_and_keeps_its_name():
     """Built only when drawn, decorative inside a marker that is named, and a dot on error."""
     from pathlib import Path
 
-    script = (Path(__file__).resolve().parents[1] / "src/postulo/static/js/app.js").read_text(
-        encoding="utf-8"
-    )
+    script = (Path(__file__).resolve().parents[1] / "assets/js/app.js").read_text(encoding="utf-8")
     drawing = script[script.index("var PictureIcon") : script.index("layer.addTo(map)")]
 
     assert 'image.alt = ""' in drawing and "alt: entry.name" in drawing

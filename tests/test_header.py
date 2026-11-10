@@ -80,7 +80,7 @@ def test_the_header_floats_and_everything_that_has_to_clear_it_reads_one_height(
     static = root / "src" / "postulo" / "static"
     stylesheet = (static / "css" / "app.css").read_text(encoding="utf-8")
     assert "scroll-padding-top" in stylesheet and "--header-height" in stylesheet
-    script = (static / "js" / "app.js").read_text(encoding="utf-8")
+    script = (root / "assets" / "js" / "app.js").read_text(encoding="utf-8")
     assert '"--header-height"' in script
 
 
@@ -103,7 +103,7 @@ def test_the_bar_is_cleared_by_everything_that_has_to_clear_it():
     assert "scroll-padding-bottom: calc(" + fallback + " + 1rem)" in bar
     assert re.search(r"\.page-alert \{\s*bottom: calc\(" + re.escape(fallback), bar)
 
-    script = (static / "js" / "app.js").read_text(encoding="utf-8")
+    script = (root / "assets" / "js" / "app.js").read_text(encoding="utf-8")
     assert '"--bottom-bar-height"' in script and '"--header-height"' in script
     assert "ResizeObserver" in script, "a label that wraps changes a height, not the window"
 

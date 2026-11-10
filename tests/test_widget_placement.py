@@ -2,7 +2,7 @@
 
 > widgets organized by drag-drop
 
-A prerequisite rather than a refinement. `static/js/app.js` states the rule every drag in
+A prerequisite rather than a refinement. `assets/js/app.js` states the rule every drag in
 this application obeys — *drag and drop does not fire on touch screens and is not reachable
 from a keyboard, so it is an addition to the control that works everywhere, never a
 replacement for it* — and that makes the control the thing that has to exist first.

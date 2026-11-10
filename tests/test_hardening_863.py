@@ -29,7 +29,7 @@ def test_the_boxes_are_still_there_and_the_calendar_is_added_hidden_until_a_scri
 def test_the_script_fills_the_boxes_from_the_picker():
     from pathlib import Path
 
-    js = Path("src/postulo/static/js/app.js").read_text(encoding="utf-8")
+    js = Path("assets/js/app.js").read_text(encoding="utf-8")
 
     assert "readyBirthPicker" in js and 'box("bday-year").value = parts[1]' in js
     assert "date-picker-choose" in js and "readyDatePickers" in js

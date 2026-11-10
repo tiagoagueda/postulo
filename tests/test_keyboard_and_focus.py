@@ -27,7 +27,7 @@ from postulo.accounts.models import Profile
 pytestmark = pytest.mark.django_db
 
 ROOT = Path(__file__).resolve().parents[1]
-APP_JS = (ROOT / "src" / "postulo" / "static" / "js" / "app.js").read_text(encoding="utf-8")
+APP_JS = (ROOT / "assets" / "js" / "app.js").read_text(encoding="utf-8")
 COMPILED_CSS = (ROOT / "src" / "postulo" / "static" / "css" / "app.css").read_text(encoding="utf-8")
 SOURCE_CSS = (ROOT / "assets" / "css" / "app.css").read_text(encoding="utf-8")
 

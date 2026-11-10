@@ -31,8 +31,9 @@ Four commitments are stated in the README and are not negotiable in code:
 - The event log is the truth: change status through `change_status`, record with
   `record_event`, never poke fields directly.
 - Server-rendered templates with htmx and Tailwind v4 (`npm run build:css`; the compiled
-  CSS is committed). All JavaScript lives in `static/js/app.js` and vendored files —
-  the CSP forbids inline scripts. Django `{# #}` comments are single-line only.
+  CSS is committed). All JavaScript lives in `assets/js/app.js` and vendored files —
+  the CSP forbids inline scripts. The browser is served `static/js/app.min.js`, built from it
+  by `npm run build:js` and committed; never edit the built copy. Django `{# #}` comments are single-line only.
 - Markup used on more than one page is a component in `templates/cotton/` (django-cotton),
   called as `<c-field :field="form.name" />`, with a `<c-vars>` line at the top declaring
   what it takes. `{% include %}` is for a fragment of one page. A component can see the
@@ -75,11 +76,13 @@ uv run pytest -m e2e --browser chromium -n 4     # browser suite; what belongs t
 uv run python scripts/messages.py extract --check && uv run python scripts/messages.py check
 uv run python scripts/messages.py guard          # no translation written outside Weblate
 npm run build:css                                # then commit src/postulo/static/css/app.css
+npm run build:js                                 # after any change to assets/js/app.js; commit static/js/app.min.js
 ```
 
 The compiled stylesheet is committed, so a template that gains a class ships a class that does
 nothing until it is rebuilt. `tests/test_stylesheet.py` fails on a stale one wherever
-`node_modules` is installed.
+`node_modules` is installed. The same holds for the page script: `tests/test_built_script.py`
+fails while `static/js/app.min.js` is not what `assets/js/app.js` builds to.
 
 A feature ships with its tests, its wiki page (a commit to the `postulo.wiki` repository,
 beside this one, naming the same issue) and a CHANGELOG

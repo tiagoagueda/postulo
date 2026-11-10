@@ -96,6 +96,14 @@
 @source "../../src/postulo";
 
 /*
+ * The page script names classes too, and what is read is its source beside this directory.
+ * The copy the browser is served is built from it (`npm run build:js`, #1149) and is left out,
+ * so that the stylesheet never depends on whether the script was rebuilt first.
+ */
+@source "../js";
+@source not "../../src/postulo/static/js/app.min.js";
+
+/*
  * The gallery's swatches (#292). `source(none)` means a class is compiled only where the
  * scanner can see it written out, and these are built from the token list in Python -- so
  * `bg-ink-500` existed in an f-string, never in the stylesheet, and every swatch came out

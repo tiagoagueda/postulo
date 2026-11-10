@@ -62,7 +62,7 @@ def test_the_boxes_and_the_button_share_one_row_that_does_not_wrap(client, user)
 def test_the_script_follows_the_date_picker_dialog_pattern():
     from pathlib import Path
 
-    js = Path("src/postulo/static/js/app.js").read_text(encoding="utf-8")
+    js = Path("assets/js/app.js").read_text(encoding="utf-8")
 
     for key in (
         "ArrowLeft",

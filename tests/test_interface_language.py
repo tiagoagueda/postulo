@@ -28,7 +28,7 @@ from postulo.core.templatetags import postulo as tags
 
 pytestmark = pytest.mark.django_db
 
-APP_JS = Path(__file__).resolve().parents[1] / "src" / "postulo" / "static" / "js" / "app.js"
+APP_JS = Path(__file__).resolve().parents[1] / "assets" / "js" / "app.js"
 
 
 @pytest.fixture(scope="module")

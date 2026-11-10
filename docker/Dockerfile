@@ -1,6 +1,7 @@
 # Postulo, as one image.
 #
-# Three stages, and the runtime is the only one that ships. Node builds the stylesheet;
+# Three stages, and the runtime is the only one that ships. Node builds the stylesheet and
+# the page script;
 # Python builds the environment and compiles the catalogues; the runtime copies in what
 # runs and nothing else.
 #
@@ -36,6 +37,12 @@ COPY src ./src
 # minifying first saves 819 bytes of the 11 kB it sends -- which is not worth a stylesheet
 # nobody can read a diff of (#159).
 RUN npm run build:css
+
+# The page script the browser is served: assets/js/app.js without its comments, which are
+# over a third of it, and without its indentation (#1149). Built here for the reason the
+# stylesheet is, and by the command a contributor runs, so the image's copy and the committed
+# one are the same bytes. The commented source stays in `assets/` and is not in the image.
+RUN npm run build:js
 
 
 # --------------------------------------------------------------- python build
@@ -305,6 +312,7 @@ COPY --from=build /app/constraints.txt ./constraints.txt
 COPY --from=build /app/src ./src
 COPY manage.py ./
 COPY --from=styles /build/src/postulo/static/css/app.css ./src/postulo/static/css/app.css
+COPY --from=styles /build/src/postulo/static/js/app.min.js ./src/postulo/static/js/app.min.js
 
 # Collected once, at build time: the running container should not need to write to its
 # own image, and a read-only filesystem is a reasonable thing for an operator to want.

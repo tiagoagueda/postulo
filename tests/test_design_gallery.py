@@ -177,9 +177,7 @@ def test_there_are_three_planes_and_each_has_a_border_as_well(client, staff_user
 
 def test_the_masthead_is_raised_only_once_something_is_behind_it(client, staff_user):
     """With no script it keeps the border it always had, which is the whole fallback."""
-    script = (Path(__file__).resolve().parents[1] / "src/postulo/static/js/app.js").read_text(
-        "utf-8"
-    )
+    script = (Path(__file__).resolve().parents[1] / "assets/js/app.js").read_text("utf-8")
 
     assert "[data-site-header][data-scrolled]" in CSS
     assert 'setAttribute("data-scrolled"' in script

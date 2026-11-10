@@ -68,6 +68,6 @@ def test_the_worker_answers_only_a_page_load_and_only_on_a_failed_one():
 
 def test_signing_out_still_takes_the_worker_away():
     """#753's rule holds with the worker registered for everybody signed in."""
-    script = (WORKER.parents[0] / "app.js").read_text(encoding="utf-8")
+    script = (WORKER.parents[4] / "assets" / "js" / "app.js").read_text(encoding="utf-8")
 
     assert "registration.unregister()" in script

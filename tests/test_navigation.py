@@ -614,7 +614,7 @@ def test_the_bar_says_it_scrolls_with_a_fade_and_not_by_colour_alone():
 
 
 def test_the_script_marks_the_edges_and_keeps_the_current_and_focused_links_in_view():
-    script = (STATIC / "js" / "app.js").read_text(encoding="utf-8")
+    script = (STATIC.parents[2] / "assets" / "js" / "app.js").read_text(encoding="utf-8")
     assert '"data-overflow-start"' in script and '"data-overflow-end"' in script
     assert 'mainNav.addEventListener("scroll", markBarEdges' in script
     assert 'mainNav.addEventListener("focusin"' in script

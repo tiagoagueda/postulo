@@ -223,7 +223,7 @@ def test_the_script_does_not_replace_the_control_it_is_layered_over():
     """`app.js` states the rule; this is what holds the labels code to it."""
     from pathlib import Path
 
-    source = Path("src/postulo/static/js/app.js").read_text(encoding="utf-8")
+    source = Path("assets/js/app.js").read_text(encoding="utf-8")
     block = source.split("labelSources")[0].split("/* ---")[-1]
 
     assert "hidden = true" in source, "the native control is hidden, not removed"

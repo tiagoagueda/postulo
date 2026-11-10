@@ -402,7 +402,7 @@ def test_the_script_holds_no_words_of_its_own_for_a_select():
     """Whatever a select's control says comes from the page: `data-filter`, `data-empty` and
     `data-required` on `select-parts`. A sentence written into the script is a sentence
     nobody translates."""
-    script = (ROOT / "src" / "postulo" / "static" / "js" / "app.js").read_text(encoding="utf-8")
+    script = (ROOT / "assets" / "js" / "app.js").read_text(encoding="utf-8")
     section = script[script.index("--- selects") : script.index("a row off *Your details*")]
     assert "function buildSelect" in section and "function fillSelectList" in section
 

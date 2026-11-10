@@ -498,7 +498,7 @@ def test_no_string_in_the_source_is_a_code_in_another_spelling():
 
 def test_no_page_and_no_script_writes_a_code_in_another_spelling():
     other = re.compile(r"(?<![\w-])(" + "|".join(map(re.escape, OTHERWISE)) + r")(?![\w-])")
-    pages = [*(SRC / "templates").rglob("*.html"), SRC / "static" / "js" / "app.js"]
+    pages = [*(SRC / "templates").rglob("*.html"), REPO / "assets" / "js" / "app.js"]
     assert len(pages) > 100, "the reader found the templates"
 
     found = [

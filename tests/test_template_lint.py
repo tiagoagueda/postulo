@@ -154,7 +154,7 @@ def test_no_template_names_a_retired_button_class(path: Path):
 
 
 def test_the_script_names_no_retired_button_class_either():
-    script = Path(__file__).resolve().parents[1] / "src" / "postulo" / "static" / "js" / "app.js"
+    script = Path(__file__).resolve().parents[1] / "assets" / "js" / "app.js"
     assert not RETIRED_BUTTON.search(script.read_text(encoding="utf-8"))
 
 
@@ -184,7 +184,7 @@ def test_no_template_names_a_retired_field_class(path: Path):
 def test_nothing_else_names_a_retired_field_class_either():
     root = Path(__file__).resolve().parents[1]
     for path in (
-        root / "src" / "postulo" / "static" / "js" / "app.js",
+        root / "assets" / "js" / "app.js",
         root / "assets" / "css" / "app.css",
         root / "assets" / "css" / "basecoat.css",
     ):
@@ -305,7 +305,7 @@ def test_no_template_names_a_retired_pill_class(path: Path):
 
 
 def test_the_script_names_no_retired_pill_class_either():
-    script = Path(__file__).resolve().parents[1] / "src" / "postulo" / "static" / "js" / "app.js"
+    script = Path(__file__).resolve().parents[1] / "assets" / "js" / "app.js"
     assert not retired_pills(script.read_text(encoding="utf-8"))
 
 
@@ -452,7 +452,7 @@ def test_nothing_else_keeps_a_select_native():
             f"{path.name}: `data-native` set from Python. Write it on the select in its "
             "template, and list it in NATIVE_ON_PURPOSE."
         )
-    script = (SOURCE_ROOT / "static" / "js" / "app.js").read_text(encoding="utf-8")
+    script = (SOURCE_ROOT.parents[1] / "assets" / "js" / "app.js").read_text(encoding="utf-8")
     assert (
         'return !select.multiple && select.size <= 1 && !select.hasAttribute("data-native");'
         in script
