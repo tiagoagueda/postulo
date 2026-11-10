@@ -225,3 +225,79 @@ def test_with_scripts_off_the_form_is_what_it_is_today(browser, live_server, app
         context.close()
 
     assert stored(applicant, "density") == "compact"
+
+
+OFFLINE = "Not saved: Postulo could not be reached. Press Save when it can."
+FAILED = "Not saved: Postulo answered with an error. Press Save to try again."
+
+
+def test_a_change_made_with_no_connection_is_saved_when_it_returns(
+    page: Page, live_server, applicant
+):
+    """A field that could not be sent waited for *Save* and nothing else (#1157).
+
+    The connection coming back did nothing, so the change stayed unsaved on a page whose
+    whole promise is that it saves by itself.
+    """
+    open_appearance(page, live_server, applicant)
+    status = page.locator("[data-save-status]")
+
+    page.context.set_offline(True)
+    page.get_by_label("Compact").check()
+    expect(status).to_have_text(OFFLINE)
+    assert asked_to_leave(page) is True
+    assert stored(applicant, "density") == "comfortable"
+    page.context.set_offline(False)
+
+    expect(status).to_contain_text("Saved at")
+    assert stored(applicant, "density") == "compact"
+    assert asked_to_leave(page) is False
+
+
+def test_coming_back_to_the_tab_sends_it_again_and_a_second_failure_is_said_once(
+    page: Page, live_server, applicant
+):
+    """A retry that fails the same way must not write the same sentence again: a live
+    region is announced for what is put into it, and this one was already said (#1157)."""
+    open_appearance(page, live_server, applicant)
+    status = page.locator("[data-save-status]")
+    page.route("**/settings/*/field/**", lambda route: route.abort())
+    page.get_by_label("Compact").check()
+    expect(status).to_have_text(OFFLINE)
+    page.evaluate(
+        """() => {
+            window.saidAgain = 0;
+            new MutationObserver((changes) => { window.saidAgain += changes.length; }).observe(
+                document.querySelector("[data-save-status]"),
+                { childList: true, characterData: true, subtree: true }
+            );
+        }"""
+    )
+
+    with page.expect_event("requestfailed"):
+        page.evaluate("document.dispatchEvent(new Event('visibilitychange'))")
+    page.wait_for_timeout(200)
+
+    expect(status).to_have_text(OFFLINE)
+    assert page.evaluate("window.saidAgain") == 0
+    assert asked_to_leave(page) is True
+
+    page.unroute("**/settings/*/field/**")
+    page.evaluate("document.dispatchEvent(new Event('visibilitychange'))")
+    expect(status).to_contain_text("Saved at")
+    assert stored(applicant, "density") == "compact"
+
+
+def test_an_error_from_the_server_is_not_called_no_connection(page: Page, live_server, applicant):
+    """A 500 answers a page and not JSON, and reading it failed like a dropped connection
+    does: the person was told Postulo could not be reached when it had answered (#1157)."""
+    open_appearance(page, live_server, applicant)
+    page.route(
+        "**/settings/*/field/**",
+        lambda route: route.fulfill(status=500, content_type="text/html", body="<h1>No</h1>"),
+    )
+
+    page.get_by_label("Compact").check()
+
+    expect(page.locator("[data-save-status]")).to_have_text(FAILED)
+    assert asked_to_leave(page) is True

@@ -2377,7 +2377,9 @@
 
   function saveStatus(form, text) {
     var status = saveStatusBox(form);
-    if (status) {
+    // Only when the words change: a live region is announced for what is put into it, and
+    // a retry that fails the same way has nothing new to say (#1157).
+    if (status && status.textContent !== text) {
       status.textContent = text;
     }
   }
@@ -2450,8 +2452,26 @@
     }
   }
 
+  // The fields of a form whose last save could not be sent for want of a connection
+  // (#1157). They are sent again when the browser says the connection is back and when the
+  // tab is shown again, never on a timer: *Save* is always there.
+  function waitingFields(form) {
+    form.saveWaiting = form.saveWaiting || [];
+    return form.saveWaiting;
+  }
+
+  function stopWaiting(field) {
+    var waiting = waitingFields(field.form);
+    var at = waiting.indexOf(field);
+    if (at !== -1) {
+      waiting.splice(at, 1);
+    }
+  }
+
   function sendField(field) {
     var form = field.form;
+    stopWaiting(field);
+    var answered = false;
     var sent = new FormData(form);
     var body = new URLSearchParams();
     body.append("csrfmiddlewaretoken", sent.get("csrfmiddlewaretoken") || "");
@@ -2466,7 +2486,15 @@
       body: body
     })
       .then(function (response) {
-        return response.json();
+        // Postulo was reached, whatever it says next. A refusal is JSON with its own status
+        // sentence; an error page, or a proxy's, is neither and must not read as silence.
+        answered = true;
+        return response.json().then(function (answer) {
+          if (!answer || (!response.ok && !answer.status)) {
+            throw new Error("not the answer of the view");
+          }
+          return answer;
+        });
       })
       .then(function (answer) {
         if (answer.stamp) {
@@ -2490,14 +2518,22 @@
       })
       .catch(function () {
         var status = saveStatusBox(form);
+        if (answered) {
+          saveStatus(form, status ? status.dataset.failed : "");
+          return;
+        }
+        waitingFields(form).push(field);
         saveStatus(form, status ? status.dataset.offline : "");
       });
   }
 
-  function queueSave(field) {
+  function queueSave(field, again) {
     var form = field.form;
     var status = saveStatusBox(form);
-    saveStatus(form, status ? status.dataset.saving : "");
+    // A retry keeps the sentence that is there until it has something else to say.
+    if (!again) {
+      saveStatus(form, status ? status.dataset.saving : "");
+    }
     form.saveQueue = (form.saveQueue || Promise.resolve()).then(function () {
       return sendField(field);
     });
@@ -2533,6 +2569,27 @@
       queueSave(field);
     }
   });
+
+  function sendWaitingFields() {
+    if (document.visibilityState === "hidden" || navigator.onLine === false) {
+      return;
+    }
+    Array.prototype.forEach.call(
+      document.querySelectorAll("form[data-save-as-you-go]"),
+      function (form) {
+        waitingFields(form)
+          .splice(0)
+          .forEach(function (field) {
+            if (field.form === form) {
+              queueSave(field, true);
+            }
+          });
+      }
+    );
+  }
+
+  window.addEventListener("online", sendWaitingFields);
+  document.addEventListener("visibilitychange", sendWaitingFields);
 
   window.addEventListener("pageshow", function () {
     // Coming back to a page from the cache with yesterday's dirty mark on it would ask a
