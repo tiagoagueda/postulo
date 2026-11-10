@@ -370,7 +370,10 @@ jobs:
         run: uv run manage.py fetch_esco --revision "$ESCO_REVISION"
         env:
           DJANGO_SETTINGS_MODULE: postulo.config.settings.test
-        timeout-minutes: 10
+        # Half an hour: the download took about fourteen minutes on 10 November 2026, where
+        # it had taken half a minute, and ten were not enough the first time the cache was
+        # empty (#1110). The limit is there to end a hang, not to time the service.
+        timeout-minutes: 30
 
       - name: Test
         # Two processes, not `-n auto` (#233): the jobs of this workflow share one host,
