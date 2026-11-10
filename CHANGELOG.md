@@ -12,6 +12,13 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🔧 Changed
 
+- Pages that ask which plugins are switched on read the plugin policy in two queries instead of two per plugin, which takes 19 queries off a company's page. (#1112)
+- A page no longer asks the database whether the instance has any account or whether you are in a group, two queries fewer on every page when signed in. (#1115)
+- The dashboard's "Where things stand" counters are worked out in one database query, not four. (#1114)
+- The primary telephone number and primary web link of a contact are read from rows already loaded, so a sync over many contacts no longer makes two queries per contact. (#1171)
+- The metrics endpoint reads the migration files once per process to report postulo_migrations_applied, instead of at every scrape. (#1113)
+- The Server Overview asks the machine's fonts once per process which scripts they draw, instead of reloading them at every visit; a missing script is still checked again at each visit, and manage.py check_fonts always checks afresh. (#1133)
+- The ESCO occupations are downloaded as one zip read a language at a time, so each process holds about 2 MB of it instead of 15 MB; an instance that still has the earlier file keeps working, and running manage.py fetch_esco again replaces it. (#1110)
 - The page that watches a piece of background work asks about it less often the longer it has been running, and says the work was interrupted once it is past its deadline even on an instance with no scheduler. (#1154)
 - With several Postulo tabs open, only one of them checks for waiting browser notifications each minute, instead of every tab. (#1155)
 - The pages where a password is chosen no longer download the 1.7 MB strength-meter dictionaries until the password field is used. (#1150)
@@ -27,6 +34,8 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🐛 Fixed
 
+- Matching a typed country no longer loads every language's country names into each worker process, about 60 MB each; the names are stored with the city lookup when it is built. (#1109)
+- Reading a month name from a CSV date, or matching a typed language name, no longer loads every language into the worker and keeps it; that was about 115 MB and 66 MB per process. (#1086)
 - Leaving a page still asks first when an entry for the timeline, a status change or a dialog could not be saved because the request failed or was refused. (#1156)
 - On the Settings pages that save as you go, a change made with no connection is saved when the connection returns, and a server error is no longer described as Postulo being out of reach. (#1157)
 - A plugin or calendar import that places the same calendar entry again no longer rewrites it, so the dashboard's figures are not worked out again after every sync. (#1164)
