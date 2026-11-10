@@ -21,6 +21,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🐛 Fixed
 
+- Both image workflows start the image they built and wait for it to be healthy before publishing it, and the image check no longer depends on GeoNames answering. (#1143)
 - An image built from a working tree no longer carries the downloaded ESCO and GeoNames files or Python's bytecode directories. (#1141)
 - The GeoNames lookup databases a checkout builds are ignored by git, so a broad git add can no longer commit 30 MB of derived data. (#1161)
 - A stalled download in a CI set-up step ends in minutes with its step named, instead of holding a runner slot for hours. (#1138)

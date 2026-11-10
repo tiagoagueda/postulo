@@ -1,10 +1,15 @@
 #!/usr/bin/env bash
 # Build the container image and confirm it starts and answers.
 #
-# This lives here rather than in continuous integration because building an image needs
-# the runner to have a Docker daemon it is allowed to talk to, which forgejo-runner does
-# not provide by default. Run it wherever you do have Docker — it is exactly what a CI
-# job would do.
+# Run it wherever there is a Docker daemon you may talk to. The two image workflows run its
+# second half, on the image they have just built and scanned, before they publish anything:
+#
+#   ./scripts/check-image.sh --start-only postulo:dev-scan
+#
+# `--start-only` starts a tag that already exists, as a deployment runs it, and waits for
+# Docker's own health check. It reads no compose file, builds nothing and publishes no port:
+# a workflow's job is itself a container, and a port published on the host is not one it
+# can ask (#1143).
 #
 # Plenty of machines have Docker installed but do not put their user in the docker group,
 # which is a defensible choice given that the group is effectively root. Set DOCKER to
@@ -14,16 +19,25 @@
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+START_ONLY=""
+if [ "${1:-}" = "--start-only" ]; then
+    START_ONLY="yes"
+    shift
+fi
 TAG="${1:-postulo:check}"
-NAME="postulo-image-check"
+# Named for this process, so two checks on one daemon, a dev image and a release, do not
+# take each other's containers away.
+NAME="postulo-image-check-$$"
 # The second container: run as a deployment runs it, and judged by Docker's own check.
-DEPLOYED="postulo-image-check-deployed"
+DEPLOYED="postulo-image-check-deployed-$$"
 DOCKER="${DOCKER:-docker}"
 
 cleanup() { $DOCKER rm -f "$NAME" "$DEPLOYED" >/dev/null 2>&1 || true; }
 trap cleanup EXIT
 
 a_secret_key() { echo "check-only-$(head -c 32 /dev/urandom | base64 | tr -d '=+/')"; }
+
+if [ -z "$START_ONLY" ]; then
 
 # The PostgreSQL compose file, read the way an operator runs it: from the checkout, with
 # only the .env at its root holding the password (#582). It used to stop with "required
@@ -46,8 +60,12 @@ echo "Building $TAG"
 $DOCKER build --pull --build-arg POSTULO_APT_REFRESH="$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
     -f "$ROOT/docker/Dockerfile" -t "$TAG" "$ROOT"
 
+# POSTULO_SKIP_GEONAMES in both runs: a fresh container otherwise downloads and imports the
+# city table before it answers, which put download.geonames.org inside this check and its
+# slowness inside the first minute; a slow mirror failed the image (#1143).
 echo "Starting it"
 $DOCKER run -d --name "$NAME" -p 8000:8000 \
+    -e POSTULO_SKIP_GEONAMES=1 \
     -e POSTULO_SECRET_KEY="$(a_secret_key)" \
     -e POSTULO_ALLOWED_HOSTS=localhost,127.0.0.1 \
     -e POSTULO_SSL_REDIRECT=false \
@@ -72,6 +90,8 @@ if [ -z "$answered" ]; then
 fi
 echo "The image builds, starts, migrates and answers its health check."
 
+fi  # not --start-only
+
 # Then as an operator runs it: answering to its own name and nothing else, nothing
 # published, the redirect left on, and judged by Docker's own health check rather than by
 # a request from this side. That check asks 127.0.0.1 from inside the container, and it
@@ -81,13 +101,14 @@ echo "The image builds, starts, migrates and answers its health check."
 # allows the very host the check uses.
 echo "Starting it as a deployment would, answering only to its own name"
 $DOCKER run -d --name "$DEPLOYED" \
+    -e POSTULO_SKIP_GEONAMES=1 \
     -e POSTULO_SECRET_KEY="$(a_secret_key)" \
     -e POSTULO_ALLOWED_HOSTS=postulo.example.org \
     "$TAG" >/dev/null
 
 echo -n "Waiting for Docker to call it healthy"
-# The check waits twenty seconds and then asks every thirty, behind the migrations and
-# whatever a first start downloads, so this is given three minutes.
+# The check waits twenty seconds and then asks every thirty, behind the migrations, so this
+# is given three minutes.
 state=""
 for _ in $(seq 1 90); do
     state="$($DOCKER inspect --format '{{.State.Health.Status}}' "$DEPLOYED" 2>/dev/null || true)"

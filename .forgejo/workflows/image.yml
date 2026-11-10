@@ -125,6 +125,12 @@ jobs:
       - name: Scan it, with both scanners
         run: ./scripts/scan-image.sh postulo:scan
 
+      # Started, as a deployment starts it, before anything is published (#1143):
+      # `dev-image.yml` says why at more length. A release above all.
+      - name: Start it and wait for it to be healthy
+        run: ./scripts/check-image.sh --start-only postulo:scan
+        timeout-minutes: 6
+
       # The half nobody writes down. The scan that produced #155 and #157 also came back
       # clean on secrets and misconfiguration, and that result is worth keeping: it says
       # the image is in the state somebody thinks it is.

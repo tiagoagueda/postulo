@@ -816,7 +816,7 @@ as secrets. It is not on the tag trigger, because Forgejo schedules a job before
 skip it: a job asking for a label no runner advertises queues for ever and its run never
 finishes, which is how v0.2.0's release came to look unfinished long after it was published
 (#81). A workflow nobody starts cannot queue. Without a docker runner,
-`scripts/check-image.sh` builds and checks the image wherever there is a Docker daemon.
+`scripts/check-image.sh` builds and checks the image wherever there is a Docker daemon; both image workflows run its `--start-only` half on the image they have scanned, before they publish it.
 
 **The image is scanned before it is pushed.** `scripts/scan-image.sh` runs Trivy and Grype
 over it, and `image.yml` calls that same script rather than describing the intent a second

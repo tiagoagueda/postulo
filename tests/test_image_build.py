@@ -918,3 +918,52 @@ def test_nothing_fetches_the_apt_signing_key(path):
     assert "media/keys" not in text, "the signing key must be the committed file, not a download"
     assert not re.search(r"curl[^\n]*\.asc", text.replace("\\n", " ")), "no key is downloaded"
     assert "docker/apt.postgresql.org.asc" in text, "the committed key is what gets installed"
+
+
+# ------------------------------------------ started before it is published (#1143)
+
+
+@pytest.mark.parametrize("path", IMAGE_WORKFLOWS, ids=lambda p: p.name)
+def test_an_image_is_started_before_it_is_published(path: Path):
+    """Built and scanned clean is not able to start: an entrypoint, a settings check or a
+    migration on an empty volume fails only when the container runs, and the first place a
+    new image ran was the instance that follows its tag (#1143). Both workflows start the
+    image they scanned and wait for Docker to call it healthy, before the push."""
+    import yaml
+
+    steps = yaml.safe_load(path.read_text(encoding="utf-8"))["jobs"]["image"]["steps"]
+    runs = [str(step.get("run", "")) for step in steps]
+    scan = next(i for i, run in enumerate(runs) if "scan-image.sh" in run)
+    start = next(i for i, run in enumerate(runs) if "check-image.sh --start-only" in run)
+    push = next(i for i, run in enumerate(runs) if "--push" in run)
+
+    assert scan < start < push
+    scanned = runs[scan].split()[-1]
+    assert runs[start].split()[-1] == scanned, "the image that was scanned is the one started"
+    assert "timeout-minutes" in steps[start]
+
+
+def test_the_image_check_does_not_wait_on_geonames():
+    """A fresh container downloads the city table before it answers unless told not to,
+    which put an outside service inside the check: a slow mirror failed the image."""
+    script = (ROOT / "scripts" / "check-image.sh").read_text(encoding="utf-8")
+    folded = script.replace("\\\n", " ")
+    runs = [line for line in folded.splitlines() if "$DOCKER run -d" in line]
+
+    assert len(runs) == 2
+    for run in runs:
+        assert "-e POSTULO_SKIP_GEONAMES=1" in run, run
+
+
+def test_start_only_builds_nothing_and_publishes_no_port():
+    """What a workflow's job can do: it is a container itself, so it cannot ask a port
+    published on the host, and the image it checks is already built."""
+    script = (ROOT / "scripts" / "check-image.sh").read_text(encoding="utf-8")
+    skipped = script[
+        script.index('if [ -z "$START_ONLY" ]; then') : script.index("fi  # not --start-only")
+    ]
+    after = script[script.index("fi  # not --start-only") :]
+
+    assert "$DOCKER build" in skipped and "-p 8000:8000" in skipped and "compose" in skipped
+    assert "$DOCKER build" not in after and "-p " not in after and "compose" not in after
+    assert ".State.Health.Status" in after

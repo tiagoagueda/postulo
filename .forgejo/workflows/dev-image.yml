@@ -159,6 +159,15 @@ jobs:
       - name: Scan it, with both scanners
         run: ./scripts/scan-image.sh postulo:dev-scan
 
+      # Started, as a deployment starts it, before anything is published (#1143). Built and
+      # scanned clean is not the same as able to start: an entrypoint, a settings check or
+      # a migration on an empty volume fails only when the container runs, and until this
+      # step the first place a new image ran was the instance that follows the tag. The
+      # native image, the one just scanned; the other architecture is the same Dockerfile.
+      - name: Start it and wait for it to be healthy
+        run: ./scripts/check-image.sh --start-only postulo:dev-scan
+        timeout-minutes: 6
+
       # The scan above read the native build; this builds for both architectures and
       # pushes. It is a second builder with a cache of its own -- the logs name it
       # `postulo-dev`, a `docker-container` one, where the scan's is the daemon's -- so
