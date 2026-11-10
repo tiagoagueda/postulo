@@ -311,6 +311,51 @@ def test_month_names_are_read_in_the_offered_languages():
     assert csv_import.parse_date("end of October") is None
 
 
+def test_reading_a_month_name_loads_no_language_into_the_process(settings):
+    """The table of month names was made by drawing a month in each of the 85 languages,
+    and a language that has been drawn in stays: Django's catalogue for it merged with
+    Postulo's and every plugin's, 2,717 files and 115 MB that a worker kept from the first
+    date with a word in it (#1086). The names are read from the catalogues Django ships,
+    which are the ones that have them, and nothing of those is kept either."""
+    import gettext
+
+    from django.utils.translation import trans_real
+
+    trans_real.translation(settings.LANGUAGE_CODE)
+    csv_import._month_names.cache_clear()
+    languages_loaded = set(trans_real._translations)
+    files_opened = set(gettext._translations)
+
+    assert csv_import.parse_date("5 stycznia 2026") == dt.date(2026, 1, 5)
+    assert csv_import.parse_date("15. Oktober 2026") == dt.date(2026, 10, 15)
+
+    assert set(trans_real._translations) == languages_loaded
+    assert set(gettext._translations) == files_opened
+
+
+def test_the_month_names_are_the_ones_django_draws_a_date_with():
+    """Read from the files, the table is the one drawing a month in each language gave
+    (#1086): in full, abbreviated and as written inside a date, through a regional
+    catalogue and the one it falls back on, and, where two languages spell different
+    months alike, the month of the same one of them as before."""
+    from django.utils.dates import MONTHS, MONTHS_3, MONTHS_ALT
+
+    from postulo.core import languages
+
+    names = csv_import._month_names()
+
+    for code in ("de", "el", "hu", "pt-BR", "sr-Cyrl", "zh-Hans"):
+        with languages.override(code):
+            for number in range(1, 13):
+                for table in (MONTHS, MONTHS_3, MONTHS_ALT):
+                    drawn = str(table[number]).lower().rstrip(".")
+                    assert names[drawn] == number, (code, drawn)
+    # "mar" is March in fifty languages and November in Finnish; Czech comes before
+    # Croatian and Croatian before Polish, and each keeps the months it had.
+    clashes = ("mar", "srp", "listopad", "lis", "lip", "listopada")
+    assert [names[name] for name in clashes] == [3, 8, 11, 11, 6, 10]
+
+
 def test_french_headers_dates_and_statuses_import_as_they_mean(user):
     sheet = csv_import.read_sheet(FRENCH, "candidatures.csv")
     report = csv_import.perform(user, sheet, csv_import.guess_mapping(sheet.headers))

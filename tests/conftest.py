@@ -246,9 +246,10 @@ def release_languages(kept: int = LANGUAGES_KEPT) -> None:
       language, in every resolver of the tree and in each namespace resolver it caches,
       although Postulo translates no route: about 1.3 MB a language, 350,000 objects for all
       of them.
-    - **CLDR's locale data**: Babel keeps every locale it loads, with its parents, and
-      `language_names` keeps the `Locale` objects; naming languages in every language loads
-      all of them, about 75 MB.
+    - **CLDR's locale data**: Babel keeps every locale it loads, with its parents: all of
+      them, for a file that reads something of every language, about 75 MB.
+      `language_names` hands back the ones it reads and keeps a handful (#1086), and the
+      tests that ask Babel itself (`cldr_in_hand`, the recorded gaps) are what fills it.
 
     All three fill again on demand, so a file that uses a language after this pays a few
     milliseconds to load it again. Most files use one or two and never reach ``kept``, so

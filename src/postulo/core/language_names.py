@@ -17,6 +17,13 @@ order: CLDR's name in the language asked for, read through that language's own p
 `pt-AO` reads as `pt-PT` -- then what the language calls itself, then CLDR's English, then the
 code as it was given. A well-formed code nobody has a name for is shown as the code.
 
+**A locale is read and let go (#1086).** A locale is a language's whole CLDR data, and Babel
+keeps every one it has parsed for the life of the process. Each is read here with Babel
+handed it back (`borrowed_locales`): the few languages that names are being read in stay in
+hand (`LOCALES_KEPT`), what a language calls itself is kept as that word and not as its
+locale (`_itself`), and the table typed names are matched in (`_index`) is kept without the
+86 locales it is made from.
+
 **The capital is CLDR's, and Babel does not carry it.** CLDR writes a language as it falls
 in a sentence -- *inglês*, *anglais* -- and says in `contextTransforms` which languages
 capitalise it as a label (`titlecase-firstword`, for *languages*, standing alone or in a
@@ -36,6 +43,7 @@ import unicodedata
 from collections.abc import Iterator
 from contextlib import contextmanager
 from functools import lru_cache
+from typing import NamedTuple
 
 import babel
 from babel import Locale, UnknownLocaleError, localedata
@@ -52,6 +60,12 @@ CLDR_VERSION = "47"
 #: ones that say `titlecase-firstword` for *languages* standing alone or in a menu. European
 #: Portuguese sets the menu to `no-change` and inherits the other from `pt`, so it is here.
 CAPITALISED = frozenset({"cs", "da", "es", "fi", "fr", "hr", "it", "pt", "sk", "sv", "uk"})
+
+#: How many locales are kept in hand at once (#1086). A locale is a language's whole CLDR
+#: data, about 0.6 MB, and a process names languages in the few its people read: those stay,
+#: and any other is read when it is asked for and let go when these have been used since.
+#: What a language says of itself is not among them (`_itself`).
+LOCALES_KEPT = 8
 
 #: CLDR's codes for what is not a language: "multiple languages", "undetermined", "no
 #: linguistic content". Never offered.
@@ -121,19 +135,33 @@ def borrowed_locales() -> Iterator[None]:
                 del localedata._cache[loaded]
 
 
-@lru_cache(maxsize=256)
-def _locale(code) -> Locale | None:
-    """The locale for a language tag, or for the longest start of it there is data for."""
+def _read(code) -> Locale | None:
+    """The locale for a language tag, or for the longest start of it there is data for.
+
+    With its data read, and none of it left in Babel's cache (`borrowed_locales`): a
+    `Locale` loads its data at its first use and keeps it, so reading it here, inside the
+    block, makes the object the only thing that holds it. Whoever lets go of the object
+    lets go of the locale (#1086).
+    """
     parts = languages.tag(code).split("-")
     while parts and parts[0]:
         try:
-            return Locale.parse("_".join(parts))
+            with borrowed_locales():
+                locale = Locale.parse("_".join(parts))
+                locale.languages  # noqa: B018
+            return locale
         except (UnknownLocaleError, ValueError):
             parts.pop()
     return None
 
 
-def _cldr(code: str, locale: Locale | None) -> str:
+@lru_cache(maxsize=LOCALES_KEPT)
+def _locale(code) -> Locale | None:
+    """The locale for a language tag (`_read`), kept in hand while it is one of the last used."""
+    return _read(code)
+
+
+def _cldr(code: str, locale: Locale | _Itself | None) -> str:
     """CLDR's name for ``code`` in ``locale``, from the most to the least exact key."""
     if locale is None:
         return ""
@@ -146,12 +174,59 @@ def _cldr(code: str, locale: Locale | None) -> str:
     return ""
 
 
-def capitalised(name: str, in_language: str) -> str:
-    """A name as it is written standing alone on a CV, in the language it is written in."""
-    locale = _locale(in_language)
+class _Itself(NamedTuple):
+    """What a language's locale says of the language itself, which is all that is kept of it.
+
+    The name by each key CLDR may hold it under, the name of its country, and the language
+    the locale is of, as a `Locale` has them: `_cldr` and `_raised` read either.
+    """
+
+    language: str
+    languages: dict[str, str]
+    country: str
+
+
+@lru_cache(maxsize=1024)
+def _itself(code: str) -> _Itself | None:
+    """A language's locale, read for what it says of itself and let go (#1086).
+
+    What a language is called in itself is the fallback wherever another has no name for
+    it, and the heading and the labels of a menu of languages: one locale for each language
+    named, most of them for a single word. The word is kept, and the 0.6 MB it came with is
+    not, so a menu of 85 languages is 85 names in hand and not 85 locales.
+    """
+    locale = _read(code)
+    if locale is None:
+        return None
+    parts = code.split("-")
+    keys = ["_".join(parts[:count]) for count in range(len(parts), 0, -1)]
+    names = locale.languages
+    region = languages.region_of(code) or _likely_region(code)
+    return _Itself(
+        language=locale.language,
+        languages={key: names[key] for key in keys if names.get(key)},
+        country=locale.territories.get(region, "") if region else "",
+    )
+
+
+def _raised(name: str, locale: Locale | _Itself | None) -> str:
+    """A name with the capital the language of ``locale`` gives it standing alone."""
     if name and locale is not None and locale.language in CAPITALISED:
         return name[:1].upper() + name[1:]
     return name
+
+
+def capitalised(name: str, in_language: str) -> str:
+    """A name as it is written standing alone on a CV, in the language it is written in."""
+    return _raised(name, _locale(in_language))
+
+
+def _asked(code: str, in_language) -> Iterator[Locale | _Itself | None]:
+    """Where a name for ``code`` is looked for, in order, each read only when it is reached."""
+    if in_language:
+        yield _locale(in_language)
+    yield _itself(code)
+    yield _locale("en")
 
 
 def name(code, in_language="") -> str:
@@ -163,10 +238,10 @@ def name(code, in_language="") -> str:
     code = languages.tag(code)
     if not code:
         return ""
-    for shown in (in_language, code, "en"):
-        found = _cldr(code, _locale(shown)) if shown else ""
+    for locale in _asked(code, in_language):
+        found = _cldr(code, locale)
         if found:
-            return capitalised(found, shown)
+            return _raised(found, locale)
     return languages.native_name(code) or code
 
 
@@ -215,15 +290,30 @@ def _codes() -> dict[str, str]:
 @lru_cache(maxsize=1)
 def _index() -> dict[str, frozenset[str]]:
     """Every name of every offered language in English and in each language Postulo has a
-    catalogue for, folded, onto the codes it is the name of."""
+    catalogue for, folded, onto the codes it is the name of.
+
+    The table is what a process keeps, some 22,000 names. The 86 locales it is made from
+    are not: kept, they were 66 MB in every process that had matched one typed name (#1086).
+    """
     index: dict[str, set[str]] = {}
+    keys = [(_own(code), code) for code in offered()]
     for shown in ("en", *languages.NATIVE_NAMES):
-        locale = _locale(shown)
-        for code in offered():
-            found = locale.languages.get(_own(code)) if locale is not None else ""
+        # Read and let go, one at a time, and not through `_locale` (#1086): 86 locales
+        # through the few it keeps would only push out the ones that are in use.
+        locale = _read(shown)
+        if locale is None:
+            continue
+        names = locale.languages
+        for key, code in keys:
+            found = names.get(key)
             if found:
                 index.setdefault(fold(found), set()).add(code)
-    return {key: frozenset(codes) for key, codes in index.items()}
+    # Nearly every name is one language's alone: one set for each language, not for each name.
+    sets: dict[frozenset[str], frozenset[str]] = {}
+    return {
+        key: sets.setdefault(codes, codes)
+        for key, codes in ((key, frozenset(found)) for key, found in index.items())
+    }
 
 
 def match(text) -> str:
@@ -262,8 +352,9 @@ def family_name(code) -> str:
     (`capitalised`). The name on Postulo's own list where CLDR has none.
     """
     language = languages.primary(code)
-    found = _cldr(language, _locale(language)) if language else ""
-    return capitalised(found, language) if found else languages.native_name(code, str(code))
+    itself = _itself(language) if language else None
+    found = _cldr(language, itself)
+    return _raised(found, itself) if found else languages.native_name(code, str(code))
 
 
 def _names_a_script(code: str) -> bool:
@@ -290,10 +381,8 @@ def variant_name(code) -> str:
     own = languages.native_name(code, code)
     if _names_a_script(code) and not languages.region_of(code):
         return own
-    region = languages.region_of(code) or _likely_region(code)
-    locale = _locale(code)
-    found = locale.territories.get(region, "") if locale is not None and region else ""
-    return found or own
+    itself = _itself(code)
+    return (itself.country if itself is not None else "") or own
 
 
 @lru_cache(maxsize=1024)

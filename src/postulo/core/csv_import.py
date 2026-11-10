@@ -21,17 +21,20 @@ import base64
 import csv
 import datetime as dt
 import functools
+import gettext as gettext_module
 import io
 import re
 from dataclasses import dataclass, field
 from decimal import Decimal, InvalidOperation
+from pathlib import Path
 
+from django.conf import locale as djangos_own_catalogues
 from django.conf import settings
 from django.db import transaction
 from django.utils import timezone
-from django.utils.dates import MONTHS, MONTHS_3, MONTHS_ALT
+from django.utils.dates import MONTHS, MONTHS_3
 from django.utils.formats import date_format
-from django.utils.translation import gettext
+from django.utils.translation import gettext, override
 from django.utils.translation import gettext_lazy as _
 
 from postulo.notifications import slow
@@ -595,6 +598,29 @@ _MONTHS = {
 }
 
 
+#: Where Django keeps the catalogues it ships, which is where its month names are translated.
+_DJANGOS_OWN = Path(djangos_own_catalogues.__file__).parent
+
+#: How gettext keys the form of a month Django writes inside a date (`MONTHS_ALT`): the
+#: context `django.utils.dates` gives it, and the separator.
+_INSIDE_A_DATE = "alt. month\x04"
+
+
+def _djangos_own(language: str) -> list[dict]:
+    """What Django's own catalogues say in a language, the most exact first, read and let go.
+
+    The files gettext would open for it, in its order: `pt_PT` and then `pt`. Each is read
+    straight from its file and nothing is kept of it, neither here nor in gettext's cache
+    of every catalogue it ever opened. None where Django does not speak the language.
+    """
+    found = []
+    locale = languages.locale_dir_name(language)
+    for path in gettext_module.find("django", _DJANGOS_OWN, [locale], all=True):
+        with open(path, "rb") as handle:
+            found.append(gettext_module.GNUTranslations(handle)._catalog)
+    return found
+
+
 @functools.cache
 def _month_names() -> dict[str, int]:
     """Every month name Django knows in every offered language, by its lower-cased spelling.
@@ -602,13 +628,38 @@ def _month_names() -> dict[str, int]:
     The hand-written table above wins where two languages spell different months alike;
     Django's own abbreviations (and the genitive forms Polish and Russian use after a day)
     fill in the rest, so a sheet in German or Polish reads as one in French does (#394).
+
+    Read from the catalogues Django ships, which are the only ones that translate a month,
+    and not by drawing a month in each language (#1086): that activated all 85 of them,
+    and an active language is Django's catalogue merged with Postulo's and every plugin's,
+    kept for the life of the process. 2,717 files and 115 MB in a worker, for a table of
+    some 800 words. The words and their order are the ones a month drawn in each language
+    gave: its own catalogue first, then that of `LANGUAGE_CODE` for what it leaves out, as
+    Django falls back, then the English it is written in.
     """
     names = dict(_MONTHS)
+    with override(None):
+        english = [(str(MONTHS[number]), str(MONTHS_3[number])) for number in range(1, 13)]
+    default = settings.LANGUAGE_CODE
+    fallback: list[dict] | None = None
     for code, _name in settings.LANGUAGES:
-        with languages.override(code):
-            for number in range(1, 13):
-                for table in (MONTHS, MONTHS_3, MONTHS_ALT):
-                    names.setdefault(str(table[number]).lower().rstrip("."), number)
+        language = languages.catalogue(code)
+        said = _djangos_own(language)
+        if language != default and not language.startswith("en"):
+            if fallback is None:
+                fallback = _djangos_own(default)
+            said = said + fallback
+
+        def written(key: str, untranslated: str, said=said) -> str:
+            return next((catalogue[key] for catalogue in said if key in catalogue), untranslated)
+
+        for number, (full, short) in enumerate(english, start=1):
+            for name in (
+                written(full, full),
+                written(short, short),
+                written(_INSIDE_A_DATE + full, full),
+            ):
+                names.setdefault(name.lower().rstrip("."), number)
     return names
 
 

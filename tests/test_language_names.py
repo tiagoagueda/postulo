@@ -11,7 +11,7 @@ import json
 from pathlib import Path
 
 import pytest
-from babel import Locale
+from babel import Locale, localedata
 
 from postulo.core import language_names, languages
 
@@ -252,6 +252,47 @@ def test_an_ambiguous_or_unknown_name_is_nothing(typed):
     """What is put on a CV is never a guess: *Norwegian* is Bokmål or Nynorsk, *Chinese* is
     two scripts, *Portuguese* is two countries'."""
     assert language_names.match(typed) == ""
+
+
+# ------------------------------------------------------- what a process is left holding (#1086)
+
+
+def test_matching_a_typed_name_leaves_the_table_and_no_locale(monkeypatch):
+    """The table a typed name is matched in is made from 86 locales, and every one of them
+    stayed: Babel keeps each locale it parses and the `Locale` objects were kept here as
+    well, 66 MB in a process from the first CV it read a language off (#1086). Each is read
+    and let go, and a name typed in a language that is not the reader's is matched still."""
+    monkeypatch.setattr(localedata, "_cache", {})
+    language_names._index.cache_clear()
+    language_names._locale.cache_clear()
+
+    for typed, code in (("Alemão", "de"), ("Deutsch", "de"), ("ελληνικά", "el"), ("FRE", "fr")):
+        assert language_names.match(typed) == code, typed
+    assert language_names.match("Portuguese") == ""
+
+    assert localedata._cache == {}, "Babel was left holding a locale"
+    assert language_names._locale.cache_info().currsize <= language_names.LOCALES_KEPT
+
+
+def test_naming_languages_keeps_a_handful_of_locales_in_hand(monkeypatch):
+    """A language named in itself is its own locale read, and a name in a language is that
+    language's; every one of them was kept, which for the list of all 637 in a language that
+    names few of them is hundreds (#1086). The few last used are in hand and no other, and
+    one that was let go is read again with the same answer."""
+    monkeypatch.setattr(localedata, "_cache", {})
+    language_names._locale.cache_clear()
+    language_names._itself.cache_clear()
+    several = ("de", "el", "fi", "hu", "ja", "ko", "nl", "pl", "sv", "tr", "uk", "vi")
+    assert len(several) > language_names.LOCALES_KEPT
+
+    assert language_names.name("en", "pt-PT") == "Inglês"
+    assert [language_names.name(code) for code in several][:3] == ["Deutsch", "Ελληνικά", "Suomi"]
+    assert [language_names.name("en", shown) for shown in several][:2] == ["Englisch", "Αγγλικά"]
+
+    assert localedata._cache == {}, "Babel was left holding a locale"
+    assert language_names._locale.cache_info().currsize == language_names.LOCALES_KEPT
+    assert language_names.name("en", "pt-PT") == "Inglês"
+    assert language_names.name("de") == "Deutsch"
 
 
 # ------------------------------------------- a language among its own variants (#1053)
