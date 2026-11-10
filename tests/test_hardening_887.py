@@ -9,7 +9,7 @@ import zipfile
 import pytest
 from django.utils import timezone
 
-from postulo.applications import agenda
+from postulo.applications import agenda, analytics
 from postulo.applications.models import Reminder
 from postulo.applications.services import add_reminder, retire_reminder, retire_reminders_of
 from postulo.core import export, importer
@@ -65,6 +65,39 @@ def test_a_second_call_with_the_same_uid_updates_in_place_and_never_unticks(user
     assert (again.summary, again.note) == ("Declare (moved)", "Later")
     assert again.due_at > first.due_at
     assert again.done_at == done_at, "what the person ticked stays ticked"
+
+
+def test_a_second_identical_call_writes_nothing(user):
+    """Each sync rewrote every entry it had, so the figures were worked out again (#1164)."""
+    due = soon(3)
+
+    def place():
+        return add_reminder(
+            user, summary="Declare", due_at=due, uid="u1", source="p", note="the 15th", actor="p"
+        )
+
+    first = place()
+    stamp, key = first.updated_at, analytics.fingerprint(user)
+
+    again = place()
+
+    assert again.pk == first.pk
+    assert Reminder.objects.get(pk=first.pk).updated_at == stamp
+    assert analytics.fingerprint(user) == key
+    assert (first.changed, again.changed) == (True, False)
+
+
+def test_a_call_that_changes_an_entry_says_so(user):
+    """A changed note, or an entry brought back, is still written and reported (#1164)."""
+    made = add_reminder(user, summary="Declare", due_at=soon(3), uid="u1", source="p")
+    due = made.due_at
+
+    noted = add_reminder(user, summary="Declare", due_at=due, uid="u1", source="p", note="new")
+    assert noted.changed and Reminder.objects.get(pk=made.pk).note == "new"
+
+    retire_reminder(user, "u1")
+    back = add_reminder(user, summary="Declare", due_at=due, uid="u1", source="p", note="new")
+    assert back.changed and Reminder.objects.get(pk=made.pk).retired_at is None
 
 
 def test_moving_an_entry_later_lets_it_be_announced_again(user):

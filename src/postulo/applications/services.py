@@ -1091,6 +1091,10 @@ def add_reminder(
     person who ticked it keeps it ticked. ``source`` is the plugin's name, drawn beside the
     entry; blank is a person's own, as the import writes it.
 
+    A call that says what is already stored writes nothing (#1164), and the reminder returned
+    carries ``changed``: true when this call made or altered the entry, false when it left it
+    as it was, so a caller that counts what it pushed can count honestly.
+
     Refused with a ``ValueError`` when ``uid`` is already a reminder the person made and the
     caller is a plugin (or the other way round): a plugin may not overwrite what a person wrote,
     nor a person's import what a plugin placed.
@@ -1116,13 +1120,22 @@ def add_reminder(
             source=source,
             note=note,
         )
-        return complete_reminder(made, actor=actor) if done else made
+        made = complete_reminder(made, actor=actor) if done else made
+        made.changed = True
+        return made
     if existing.source != source[:60]:
         raise ValueError("That calendar entry was placed by someone else.")
+    wanted = (summary[:250], note, due_at, actor[: _reminder_field("actor")])
+    stored = (existing.summary, existing.note, existing.due_at, existing.actor)
+    if stored == wanted and existing.retired_at is None:
+        # A sync says the same thing every hour: writing it again would move `updated_at`,
+        # and with it the fingerprint the dashboard's figures are kept under (#1164).
+        existing.changed = False
+        return existing
     moved_later = due_at > existing.due_at
-    existing.summary, existing.note = summary[:250], note
-    existing.due_at, existing.retired_at = due_at, None
-    existing.actor = actor[: _reminder_field("actor")]
+    existing.summary, existing.note, existing.due_at, existing.actor = wanted
+    existing.retired_at = None
+    existing.changed = True
     if moved_later:
         # Moved into the future, so not yet announced, as `postpone_reminder` says.
         existing.notified_at = None
