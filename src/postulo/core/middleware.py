@@ -260,7 +260,46 @@ class UserPreferencesMiddleware:
             return None
         # Missing profiles are possible for rows created before the signal existed,
         # or by a fixture; they should degrade to instance defaults, not an error.
+        return profile_with_membership(user)
+
+
+def profile_with_membership(user):
+    """``user.profile``, read with whether they are in any group, in the one query (#1115).
+
+    The account menu offers *Your groups* to somebody who is in one, and asked the database
+    on every full page: an `EXISTS` of its own. The profile is read for every request of
+    somebody signed in, here, so the question rides along as ``in_groups`` on it and
+    `context_processors.ui` hands it to the menu.
+
+    The profile is then put where `user.profile` looks, both ways round, exactly as reading
+    it through the account would have: nothing later in the request reads it again. One that
+    is missing is remembered as missing, which is what Django does too.
+
+    For this request and no longer: the next one reads it again, so a group joined or left
+    is on the next page. A profile that came from anywhere else has no ``in_groups``, and
+    the menu then asks.
+    """
+    from django.contrib.auth import get_user_model
+    from django.db.models import Exists, OuterRef
+
+    # `request.user` is a lazy stand-in for the account; the caches belong to the account.
+    account = getattr(user, "_wrapped", user)
+    People = get_user_model()
+    if not isinstance(account, People):
         return getattr(user, "profile", None)
+    relation = People._meta.get_field("profile")
+    if relation.is_cached(account):
+        return relation.get_cached_value(account)
+    memberships = People.groups.through._base_manager.filter(user_id=OuterRef("user_id"))
+    profile = (
+        relation.related_model._base_manager.filter(user_id=account.pk)
+        .annotate(in_groups=Exists(memberships))
+        .first()
+    )
+    relation.set_cached_value(account, profile)
+    if profile is not None:
+        relation.field.set_cached_value(profile, account)
+    return profile
 
 
 class RequestIDMiddleware:

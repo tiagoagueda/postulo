@@ -2,6 +2,7 @@
 
 from django.conf import settings
 from django.http import HttpRequest
+from django.utils.functional import SimpleLazyObject
 from django.utils.translation import gettext as _
 
 # The running version is asked by pages and by the update check alike, so it lives with the
@@ -32,6 +33,19 @@ def theme_switch(choice: str) -> dict:
     }
 
 
+def has_groups(user, profile):
+    """Whether the account menu offers *Your groups*: whether this person is in any (#1115).
+
+    Known already where the middleware read the profile, which is every page of somebody
+    signed in (`middleware.profile_with_membership`). Anywhere else it is asked, and only if
+    the page turns out to draw the menu.
+    """
+    known = getattr(profile, "in_groups", None)
+    if known is not None:
+        return known
+    return SimpleLazyObject(lambda: user.groups.exists())
+
+
 def ui(request: HttpRequest) -> dict:
     """Interface-wide values: the resolved theme, the direction, the navigation, the policy."""
     from . import languages, navigation, weeks
@@ -54,7 +68,8 @@ def ui(request: HttpRequest) -> dict:
     breadcrumb_on_hover = False
     button_labels = "both"
     user = getattr(request, "user", None)
-    if user is not None and user.is_authenticated:
+    signed_in = user is not None and user.is_authenticated
+    if signed_in:
         profile = getattr(user, "profile", None)
         if profile:
             choice = profile.theme
@@ -104,7 +119,11 @@ def ui(request: HttpRequest) -> dict:
         "ui_button_labels": button_labels,
         "nav_items": navigation.visible_items(profile),
         "dashboard_hidden": navigation.dashboard_hidden(profile),
-        "registration_open": site.signup_open_now(),
+        # Sign-up is also open on an instance with no account at all, which is asked of the
+        # database, and was on every page. Somebody signed in is an account, so for them
+        # the question answers itself; a visitor is who the answer is for (#1115).
+        "registration_open": site.registration_open() if signed_in else site.signup_open_now(),
+        "has_groups": has_groups(user, profile) if signed_in else False,
         "instance_name": name,
         "instance_tagline": site.tagline(),
         # The footer's line, which the administrator sets (#835). Not the tagline, which

@@ -238,7 +238,7 @@
                 <a href="{% url 'resume:overview' %}" class="menu-item"{% account_row_current "career" %}>
                   {% icon "briefcase-business" %}{% translate "Your career" %}
                 </a>
-                {% if user.groups.exists %}
+                {% if has_groups %}
                   <a href="{% url 'accounts:groups' %}" class="menu-item">
                     {% icon "users" %}{% translate "Your groups" %}
                   </a>
