@@ -58,8 +58,42 @@ def several_allowed(person) -> bool:
     return bool(decide(PHONE_NUMBERS, person).on)
 
 
+#: What every holder calls its numbers, and so what a prefetch of them is filed under.
+_ROWS = "phone_numbers"
+
+
+def _prefetched(holder):
+    """The holder's numbers where a prefetch has already read them, or nothing (#1171)."""
+    held = getattr(holder, "_prefetched_objects_cache", None)
+    return held.get(_ROWS) if held else None
+
+
+def _forget_prefetched(holder) -> None:
+    """Drop the numbers a prefetch read for this holder, ahead of a write to them.
+
+    `primary_for` answers from those rows, so a writer handed the holder lets go of them
+    first: its own question about the primary is then asked of the database, and so is
+    whatever is asked after it. What Django's own managers do on `add` and `create`.
+    """
+    held = getattr(holder, "_prefetched_objects_cache", None)
+    if held:
+        held.pop(_ROWS, None)
+
+
 def primary_for(holder) -> PhoneNumber | None:
-    """The number to use for this holder, or nothing when it has none."""
+    """The number to use for this holder, or nothing when it has none.
+
+    Read from the holder's own rows where a prefetch has already brought them, and asked
+    of the database where none has (#1171): a sync that walks every contact loads their
+    numbers once, and was then paying a query per contact for a row it was holding. The
+    answer is the same either way, there being one primary per holder at most. As with
+    anything prefetched, it is as old as the prefetch -- the writers in this module let go
+    of it, a row changed some other way does not -- and a prefetch narrowed to some of the
+    rows answers about those.
+    """
+    rows = _prefetched(holder)
+    if rows is not None:
+        return next((row for row in rows if row.is_primary), None)
     return holder.phone_numbers.filter(is_primary=True).first()
 
 
@@ -418,6 +452,7 @@ def ensure_one_primary(holder) -> PhoneNumber | None:
     numbers and no primary shows none at all once the feature is switched off again. The
     primary afterwards comes back, or nothing when no number is left.
     """
+    _forget_prefetched(holder)
     wanted = holder.phone_numbers.filter(is_primary=True).first() or holder.phone_numbers.first()
     if wanted is not None:
         set_primary(wanted)
@@ -448,6 +483,7 @@ def save_only_number(holder, owner, typed: str) -> PhoneNumber | None:
     this whole module exists to avoid.
     """
     typed = (typed or "").strip()
+    _forget_prefetched(holder)
     primary = primary_for(holder)
     if not typed:
         if primary is not None:
@@ -586,6 +622,7 @@ class BasePhoneNumberFormSet(RowsAlreadyGone, generic_forms.BaseGenericInlineFor
         taken by another row in the same save (#461).
         """
         if commit:
+            _forget_prefetched(self.instance)
             remove_first(self)
         saved = super().save(commit=commit)
         if not commit:

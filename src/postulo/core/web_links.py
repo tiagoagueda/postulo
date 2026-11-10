@@ -238,8 +238,39 @@ def offered_kinds(person) -> list[str]:
     return [kind for kind in KINDS if several_allowed(person, kind)]
 
 
+#: What every holder calls its links, and so what a prefetch of them is filed under.
+_ROWS = "web_links"
+
+
+def _prefetched(holder):
+    """The holder's links where a prefetch has already read them, or nothing (#1171)."""
+    held = getattr(holder, "_prefetched_objects_cache", None)
+    return held.get(_ROWS) if held else None
+
+
+def _forget_prefetched(holder) -> None:
+    """Drop the links a prefetch read for this holder, ahead of a write to them.
+
+    `primary_for` answers from those rows, so a writer handed the holder lets go of them
+    first: its own question about the primary is then asked of the database, and so is
+    whatever is asked after it. What Django's own managers do on `add` and `create`.
+    """
+    held = getattr(holder, "_prefetched_objects_cache", None)
+    if held:
+        held.pop(_ROWS, None)
+
+
 def primary_for(holder, kind: str) -> WebLink | None:
-    """The link to show for this holder and kind, or nothing when it has none."""
+    """The link to show for this holder and kind, or nothing when it has none.
+
+    Read from the holder's own rows where a prefetch has already brought them, and asked
+    of the database where none has (#1171), for the reason and on the terms
+    `phone_numbers.primary_for` gives: the same answer, there being one primary of a kind
+    per holder at most, and as old as the prefetch it is read from.
+    """
+    rows = _prefetched(holder)
+    if rows is not None:
+        return next((row for row in rows if row.kind == kind and row.is_primary), None)
     return holder.web_links.filter(kind=kind, is_primary=True).first()
 
 
@@ -317,6 +348,7 @@ def ensure_one_primary(holder, kind: str) -> WebLink | None:
     all once the kind's feature is switched off again. The primary afterwards comes back,
     or nothing when no link of the kind is left.
     """
+    _forget_prefetched(holder)
     mine = holder.web_links.filter(kind=kind)
     wanted = mine.filter(is_primary=True).first() or mine.first()
     if wanted is not None:
@@ -352,6 +384,7 @@ def save_only_link(holder, owner, kind: str, typed: str) -> WebLink | None:
             typed = addresses.web_address(typed)
         except ValueError as error:
             raise ValidationError(str(error), code="address") from error
+    _forget_prefetched(holder)
     primary = primary_for(holder, kind)
     if not typed:
         if primary is not None:
@@ -466,6 +499,7 @@ def add_links(holder, owner, rows: list[dict]) -> list[WebLink]:
     keeps the primary it had, and failing that its first link of the kind becomes it --
     the rule the rows on the page follow.
     """
+    _forget_prefetched(holder)
     made: list[WebLink] = []
     wanted: dict[str, WebLink] = {}
     for row in rows:
@@ -1006,6 +1040,7 @@ class BaseWebLinkFormSet(RowsAlreadyGone, generic_forms.BaseGenericInlineFormSet
         taken by another row in the same save (#461).
         """
         if commit:
+            _forget_prefetched(self.instance)
             remove_first(self)
         saved = super().save(commit=commit)
         if not commit:
