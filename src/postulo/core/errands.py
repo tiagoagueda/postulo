@@ -218,6 +218,29 @@ def fail_interrupted(*, hours: int = 24, working_hours: int = 1) -> int:
     )
 
 
+def fail_if_interrupted(errand: Errand, *, hours: int = 24, working_hours: int = 1) -> bool:
+    """Call this one errand interrupted if it is past its deadline, and say whether it was.
+
+    For the page that watches it (#1154): `fail_interrupted` runs from the scheduler, and an
+    instance with a worker and no scheduler never ran it, so the page went on promising and
+    asking for as long as it was open. The same two deadlines, looked at on the row already
+    read, so that an errand within its deadline costs no statement; the write is taken back
+    if the errand has changed state since, which is a worker that got there first.
+    """
+    if errand.is_finished:
+        return False
+    now = timezone.now()
+    if errand.state == ErrandState.WORKING and errand.started_at is not None:
+        overdue = errand.started_at < now - timedelta(hours=working_hours)
+    else:
+        overdue = errand.created_at < now - timedelta(hours=hours)
+    if not overdue:
+        return False
+    interrupt(Errand.objects.filter(pk=errand.pk, state=errand.state))
+    errand.refresh_from_db()
+    return errand.state == ErrandState.FAILED
+
+
 def interrupt(rows) -> int:
     """Mark these unfinished errands as interrupted, in the words their page shows.
 

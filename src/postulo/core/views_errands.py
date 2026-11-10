@@ -30,6 +30,16 @@ from .models import Errand, ErrandState
 #: capture that took four seconds is not reported after ten.
 POLL_SECONDS = 2
 
+#: How often it asks once the errand is older than each age (#1154). Most errands finish in
+#: their first seconds, which stay as quick as they were; one that has run for minutes is
+#: not reported noticeably later for being asked about every fifteen seconds, and a tab left
+#: open on one that will never finish is no longer 1,800 requests an hour.
+POLL_BACK_OFF = (
+    (timedelta(minutes=10), 30),
+    (timedelta(minutes=2), 15),
+    (timedelta(seconds=20), 5),
+)
+
 #: How long the worker may go unseen before the page stops saying the work carries on. The
 #: worker's own healthcheck calls it dead after the same five minutes (`docker/compose.yml`).
 WORKER_SILENT_AFTER = timedelta(minutes=5)
@@ -54,8 +64,29 @@ def worker_silent() -> bool:
     return timezone.now() - seen > WORKER_SILENT_AFTER
 
 
+def poll_seconds(errand: Errand) -> int:
+    """How long the fragment waits before asking again, by the errand's age (#1154).
+
+    Decided here and carried by the fragment, so each answer sets the wait for the next
+    question and the page's script has nothing to know.
+    """
+    age = timezone.now() - errand.created_at
+    for older_than, seconds in POLL_BACK_OFF:
+        if age >= older_than:
+            return seconds
+    return POLL_SECONDS
+
+
 def _errand(request: HttpRequest, pk: int) -> Errand:
-    return get_object_or_404(Errand.objects.for_user(request.user), pk=pk)
+    """The errand, if it is theirs; called interrupted first if it is past its deadline.
+
+    The scheduler does that for every errand, but not on an instance that has none, and
+    not before its next pass: the page that is being watched stops promising, and stops
+    asking, on the first answer after the deadline (#1154).
+    """
+    errand = get_object_or_404(Errand.objects.for_user(request.user), pk=pk)
+    errand_layer.fail_if_interrupted(errand)
+    return errand
 
 
 def state_context(errand: Errand, *, in_dialog: bool = False, first: bool = False) -> dict:
@@ -75,7 +106,7 @@ def state_context(errand: Errand, *, in_dialog: bool = False, first: bool = Fals
     return {
         "errand": errand,
         "working_label": errand_layer.working_label(errand.kind),
-        "poll_seconds": SILENT_POLL_SECONDS if silent else POLL_SECONDS,
+        "poll_seconds": SILENT_POLL_SECONDS if silent else poll_seconds(errand),
         "worker_silent": silent,
         "in_dialog": in_dialog,
         "focus_result": in_dialog and (first or errand.is_finished),
@@ -99,6 +130,7 @@ def errand_state(request: HttpRequest, pk: int) -> HttpResponse:
 
     Out of the request's transaction: it reads one row and writes nothing, every two seconds,
     and on SQLite it queued for the write lock behind the very work it was watching (#1129).
+    Its one write is a single statement, once, for an errand past its deadline (#1154).
     """
     context = state_context(_errand(request, pk), in_dialog=request.GET.get("dialog") == "1")
     return render(request, "core/partials/errand_state.html", context)

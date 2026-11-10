@@ -336,6 +336,84 @@ def test_with_a_silent_worker_the_page_says_so_and_asks_less_often(a_kind, clien
     assert silent not in finished and "hx-trigger" not in finished
 
 
+def test_the_older_the_errand_the_less_often_its_page_asks(a_kind, client, user, settings):
+    """The fragment was asked for every two seconds for as long as the errand was unfinished,
+    which for a tab left open was 1,800 requests an hour. The first seconds stay as quick;
+    after that the wait grows with the errand's age, up to thirty seconds (#1154)."""
+    settings.POSTULO_BACKGROUND_WORK = True
+    client.force_login(user)
+    errand = errands.send("test_kind", user)
+    state_url = reverse("core:errand_state", args=[errand.pk])
+    now = timezone.now()
+
+    for age, seconds in (
+        (dt.timedelta(seconds=10), 2),
+        (dt.timedelta(seconds=30), 5),
+        (dt.timedelta(minutes=5), 15),
+        (dt.timedelta(minutes=30), 30),
+    ):
+        Errand.objects.filter(pk=errand.pk).update(created_at=now - age)
+        waiting = client.get(state_url).content.decode()
+        assert f'hx-trigger="every {seconds}s"' in waiting, age
+
+    # Work under way slows down the same way, and the dialog's polls keep their wording.
+    Errand.objects.filter(pk=errand.pk).update(
+        state=ErrandState.WORKING, started_at=now - dt.timedelta(minutes=4)
+    )
+    working = client.get(state_url + "?dialog=1").content.decode()
+    assert 'hx-trigger="every 30s"' in working and "?dialog=1" in working
+    assert "Check again" in working, "and it is still watchable with no script at all"
+
+
+def test_past_its_deadline_the_page_says_so_without_waiting_for_the_scheduler(
+    a_kind, client, user, settings
+):
+    """Only the scheduler called an unfinished errand interrupted, so on an instance with a
+    worker and no scheduler the page promised, and asked, for as long as it stayed open.
+    The first answer after the deadline now says what happened and asks no more (#1154)."""
+    settings.POSTULO_BACKGROUND_WORK = True
+    client.force_login(user)
+    now = timezone.now()
+
+    killed = errands.send("test_kind", user)
+    Errand.objects.filter(pk=killed.pk).update(
+        state=ErrandState.WORKING, started_at=now - dt.timedelta(hours=2)
+    )
+    polled = client.get(reverse("core:errand_state", args=[killed.pk])).content.decode()
+    assert "That did not work." in polled and "interrupted" in polled
+    assert "hx-trigger" not in polled, "and it stops asking"
+    killed.refresh_from_db()
+    assert killed.state == ErrandState.FAILED and killed.finished_at is not None
+
+    # With no script the page itself is the request made by hand, and answers the same.
+    forgotten = errands.send("test_kind", user)
+    Errand.objects.filter(pk=forgotten.pk).update(created_at=now - dt.timedelta(hours=25))
+    page = client.get(reverse("core:errand", args=[forgotten.pk])).content.decode()
+    assert "interrupted" in page and "hx-trigger" not in page
+
+    # Within their deadlines both are left alone: a worker that comes back will do the one,
+    # and somebody may well be doing the other.
+    queued = errands.send("test_kind", user)
+    Errand.objects.filter(pk=queued.pk).update(created_at=now - dt.timedelta(hours=2))
+    busy = errands.send("test_kind", user)
+    Errand.objects.filter(pk=busy.pk).update(
+        state=ErrandState.WORKING, started_at=now - dt.timedelta(minutes=30)
+    )
+    for errand in (queued, busy):
+        still = client.get(reverse("core:errand_state", args=[errand.pk])).content.decode()
+        assert "hx-trigger" in still and "interrupted" not in still
+    assert Errand.objects.get(pk=queued.pk).state == ErrandState.WAITING
+    assert Errand.objects.get(pk=busy.pk).state == ErrandState.WORKING
+
+    # Finished by the worker a moment before the deadline was looked at: its answer stands.
+    done = errands.send("test_kind", user)
+    Errand.objects.filter(pk=done.pk).update(created_at=now - dt.timedelta(hours=25))
+    stale = Errand.objects.get(pk=done.pk)
+    errands.perform(done.pk)
+    assert errands.fail_if_interrupted(stale) is False
+    assert Errand.objects.get(pk=done.pk).state == ErrandState.DONE
+
+
 def test_the_poll_is_ownership_checked_not_only_the_press(a_kind, client, user, other_user):
     """A poll is a new address that names a piece of work, which is an address somebody
     will try with another row's number."""
