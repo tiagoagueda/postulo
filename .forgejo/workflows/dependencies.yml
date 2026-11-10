@@ -49,6 +49,10 @@ jobs:
       image: node:22-bookworm
     outputs:
       changed: ${{ steps.lock.outputs.changed }}
+    env:
+      # `uv run` uses what the sync step built and does not put the browser group back
+      # (#1135). `uv lock` is not a sync and is unaffected.
+      UV_NO_SYNC: "1"
 
     steps:
       - uses: actions/checkout@v4
@@ -89,7 +93,8 @@ jobs:
 
       - name: Install the upgraded dependencies
         if: steps.lock.outputs.changed == 'true'
-        run: uv sync --locked --python 3.14 --no-group e2e
+        # Playwright the library and not the browser group, as the unit job of `ci.yml`.
+        run: uv sync --locked --python 3.14 --no-group e2e --extra chromium
 
       - name: Run a quick check against them
         # Ruff, migrations and the suite on Python 3.14 alone: enough that a lock which

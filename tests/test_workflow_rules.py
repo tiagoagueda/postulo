@@ -51,3 +51,47 @@ def test_the_monthly_proposal_does_nothing_when_nothing_moved():
 
     assert conditions[0] == "needs.upgrade.outputs.changed != 'true'", "the step that says so"
     assert conditions[1:] == [moved] * (len(conditions) - 1), "every other step is guarded"
+
+
+# ------------------------------------------- `uv run` uses what the sync step built (#1135)
+
+
+def sync_commands(job) -> list[str]:
+    return [step["run"] for step in job["steps"] if "uv sync" in str(step.get("run", ""))]
+
+
+def test_a_job_that_leaves_the_browser_group_out_keeps_it_out():
+    """`uv run` brings the environment back to the default groups before it runs anything,
+    and the browser group is one of them: a job that synced without it downloaded Playwright
+    on its first `uv run` all the same, 45 MB a run, under a comment that said it did not."""
+    narrow = [
+        (name, key, job)
+        for name, key, job in jobs()
+        if any("--no-group e2e" in command for command in sync_commands(job))
+    ]
+
+    assert {(name, key) for name, key, _ in narrow} == {
+        ("ci.yml", "test"),
+        ("ci.yml", "checks"),
+        ("ci.yml", "postgres"),
+        ("every-python.yml", "test"),
+        ("dependencies.yml", "upgrade"),
+    }
+    for name, key, job in narrow:
+        assert job.get("env", {}).get("UV_NO_SYNC") == "1", f"{name}: {key}"
+
+
+def test_the_unit_jobs_install_the_playwright_the_unit_tests_import():
+    """`tests/test_documents.py` imports `playwright.sync_api` to stand in for the fallback
+    renderer, so a job that runs the unit suite installs the library, through the `chromium`
+    extra, and neither the pytest plugin nor a browser."""
+    for name, key in (
+        ("ci.yml", "test"),
+        ("every-python.yml", "test"),
+        ("dependencies.yml", "upgrade"),
+    ):
+        (command,) = sync_commands(workflows()[name]["jobs"][key])
+        assert "--no-group e2e" in command and "--extra chromium" in command, f"{name}: {key}"
+    assert "import playwright.sync_api" in (ROOT / "tests" / "test_documents.py").read_text(
+        encoding="utf-8"
+    )

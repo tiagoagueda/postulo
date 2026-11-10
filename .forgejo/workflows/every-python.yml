@@ -56,6 +56,11 @@ jobs:
       # else needs installing, and the image is a fraction of the size of a full
       # Actions runner image.
       image: node:22-bookworm
+    env:
+      # `uv run` uses the environment the sync step built and never syncs again. Without
+      # this it brings the environment back to the default groups before every command,
+      # which reinstalled the browser group this job leaves out: 45 MB on every run (#1135).
+      UV_NO_SYNC: "1"
     strategy:
       fail-fast: false
       matrix:
@@ -102,9 +107,12 @@ jobs:
           restore-keys: ${{ github.event_name != 'pull_request' && format('uv-{0}-{1}-', runner.os, matrix.python-version) || '' }}
 
       - name: Install dependencies
-        # Without the browser group: Playwright is 136 MB of tool this job never starts, and
-        # `default-groups` would otherwise install it on every leg of the matrix (#233).
-        run: uv sync --locked --python ${{ matrix.python-version }} --no-group e2e
+        # Playwright the library, through the `chromium` extra, and not the browser group:
+        # `tests/test_documents.py` imports it to stand in for the fallback renderer, and no
+        # unit test needs pytest-playwright, whose plugin would otherwise load in every
+        # worker. The browser itself is never downloaded here. `UV_NO_SYNC` above is what
+        # makes this true: for months a plain `uv run` put the whole group back (#1135).
+        run: uv sync --locked --python ${{ matrix.python-version }} --no-group e2e --extra chromium
 
       - name: Keep the compiled translations between runs
         # Compiling every catalogue took 18 to 37 s of each job that runs tests (#1033), and
