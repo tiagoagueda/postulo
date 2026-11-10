@@ -9,6 +9,8 @@
 # the other record sees the kept one (#896).
 # jobs/geocoding.py walks every account's addresses in the scheduler, as its one caller (#913).
 # The reminders router reads through owned_or_404, which scopes to the token's owner (#331).
+# core/errands.py's fail_if_interrupted ends the one errand its caller, the errand page, has
+# already fetched through for_user; the statement names that row and the state it was in (#1154).
 # core/slow.py's fail_interrupted_backups is the scheduler's sweep of backup errands whose
 # process died, every administrator's, as fail_interrupted is for every kind (#1131).
 api/routers/applications.py::_detail::Application
@@ -49,6 +51,7 @@ core/backup.py::_counts::RenderedDocument
 core/backup.py::_counts::UploadedDocument
 core/errands.py::_finish::Errand
 core/errands.py::_run::Errand
+core/errands.py::fail_if_interrupted::Errand
 core/errands.py::fail_interrupted::Errand
 core/errands.py::forget_old::Errand
 core/gdpr.py::_listing_event_rows::ListingEvent

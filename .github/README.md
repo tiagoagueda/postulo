@@ -272,13 +272,14 @@ uv run playwright install chromium
 Postulo uses whichever works, preferring WeasyPrint. Export is optional: tracking
 applications and writing letters need no renderer at all.
 
-Node is **not** required to run Postulo: the compiled stylesheet is committed. It is
-only needed to change the CSS, or to add a Tailwind class a template did not use before,
-in which case:
+Node is **not** required to run Postulo: the compiled stylesheet and the page script the
+browser is served are committed. It is only needed to change the CSS, to add a Tailwind class
+a template did not use before, or to change the page script, in which case:
 
 ```sh
 npm install
 npm run watch:css            # or `npm run build:css` for a one-off
+npm run build:js             # after a change to assets/js/app.js
 ```
 
 To see it with data rather than an empty screen, fill an account with a fictional

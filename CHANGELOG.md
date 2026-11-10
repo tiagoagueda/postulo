@@ -12,6 +12,12 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🔧 Changed
 
+- The page that watches a piece of background work asks about it less often the longer it has been running, and says the work was interrupted once it is past its deadline even on an instance with no scheduler. (#1154)
+- With several Postulo tabs open, only one of them checks for waiting browser notifications each minute, instead of every tab. (#1155)
+- The pages where a password is chosen no longer download the 1.7 MB strength-meter dictionaries until the password field is used. (#1150)
+- With the map's tiles set to None, the world's outline is a static file the browser keeps, no longer 44 kB written into every map page. (#1153)
+- Avatars and company logos are kept in the browser's own cache for a year when asked for by their stamped address, and their tiles load only when they come near the screen. (#1158)
+- Pages load faster on a first visit and after each update: the script every page loads is sent without its comments, less than half the download it was. (#1149)
 - Building the image no longer re-installs every dependency after a README change, and a changed lock file reuses the builder's download cache. (#1140)
 - A dev image built by a push takes Debian's package updates once a day, not on every push; one started by hand and every release still ask when built. (#1139)
 - Every Python runs by itself on a push to main that changes the version or the lock file, so a release needs nothing started by hand. (#1137)
@@ -21,6 +27,8 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🐛 Fixed
 
+- Leaving a page still asks first when an entry for the timeline, a status change or a dialog could not be saved because the request failed or was refused. (#1156)
+- On the Settings pages that save as you go, a change made with no connection is saved when the connection returns, and a server error is no longer described as Postulo being out of reach. (#1157)
 - A plugin or calendar import that places the same calendar entry again no longer rewrites it, so the dashboard's figures are not worked out again after every sync. (#1164)
 - On SQLite, company logos, profile pictures, the service worker, the web app manifest and the progress line of slow work no longer wait for other requests that are writing. (#1129)
 - A sync connection that keeps failing is tried less and less often, at most once a day, and its card says when the next attempt is; a sync plugin can switch off a connection the other side has ended. (#1162)

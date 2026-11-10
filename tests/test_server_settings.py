@@ -333,7 +333,7 @@ def test_each_person_has_a_picture_that_says_nothing(client, admin, user):
         assert 'class="avatar ' in cells[0], "the tile, first"
         assert person.username in cells[1], "the username, beside it"
         if person == user:
-            assert re.search(r'<img src="[^"]+" alt="">', cells[0]), "a picture says nothing"
+            assert re.search(r'<img src="[^"]+" alt=""[^>]*>', cells[0]), "a picture says nothing"
         else:
             assert 'aria-hidden="true"' in cells[0], "and neither do the initials"
         assert "data-label" not in row.split("</td>", 1)[0], "nothing to introduce on a card"

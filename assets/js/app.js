@@ -7902,21 +7902,60 @@
     // Once a minute. A background tab's timers are slowed to about that anyway, and a reminder
     // is not so urgent that a second's accuracy is worth a request a second.
     var everyMinute = function () {
-      window.setInterval(collectNotices, 60000);
+      return window.setInterval(collectNotices, 60000);
     };
     // In one tab for all of them (#1155): every open tab asked each minute, hidden ones too,
     // so five tabs were five requests for the same notices. The tab that holds the lock asks;
-    // the others queue for it, and the next takes over when that tab closes or moves on,
-    // which is what a promise that never settles is for. A hidden tab may well be the one,
-    // since a notification is for somebody who is not looking. A tab brought to the front
-    // still asks at once, below. A browser without the lock asks from every tab, as before.
-    if (navigator.locks && navigator.locks.request) {
-      navigator.locks
-        .request("postulo-notices", function () {
-          everyMinute();
-          return new Promise(function () {});
-        })
-        .catch(everyMinute);
+    // the others queue for it, and the next takes over when that tab closes or moves on. A
+    // hidden tab may well be the one, since a notification is for somebody who is not looking.
+    // A tab brought to the front still asks at once, below. A browser without the lock asks
+    // from every tab, as before.
+    //
+    // The lock is given back, and a place in the queue given up, when the page is left, and
+    // asked for again if the page comes back: a page that holds a lock or waits for one is
+    // not kept for Back and Forward, and would be loaded afresh, its scroll and its unsent
+    // typing gone, for the sake of a timer.
+    if (navigator.locks && navigator.locks.request && window.AbortController) {
+      var leave = null;
+      var queue = function () {
+        var waiting = new AbortController();
+        var release = null;
+        var timer = null;
+        leave = function () {
+          waiting.abort();
+          if (timer !== null) {
+            window.clearInterval(timer);
+          }
+          if (release) {
+            release();
+          }
+          leave = null;
+        };
+        navigator.locks
+          .request("postulo-notices", { signal: waiting.signal }, function () {
+            timer = everyMinute();
+            return new Promise(function (resolve) {
+              release = resolve;
+            });
+          })
+          .catch(function (error) {
+            // Given up on purpose, above. Anything else: ask from this tab, as before.
+            if (!error || error.name !== "AbortError") {
+              everyMinute();
+            }
+          });
+      };
+      queue();
+      window.addEventListener("pagehide", function () {
+        if (leave) {
+          leave();
+        }
+      });
+      window.addEventListener("pageshow", function (event) {
+        if (event.persisted && !leave) {
+          queue();
+        }
+      });
     } else {
       everyMinute();
     }
