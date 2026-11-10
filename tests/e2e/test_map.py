@@ -83,10 +83,17 @@ def test_with_no_tiles_the_outline_is_drawn_and_nothing_is_fetched(live_server, 
     row.map_tiles = "none"
     row.save()
     breaches, tiles = watch(page)
+    asked: list[str] = []
+    page.on("request", lambda request: asked.append(request.url))
 
     sign_in(page, live_server.url, "/jobs/companies/map/")
 
     expect(page.locator("path.map-outline")).to_have_count(1)
+    # The outline is a file of this instance, asked for once, and not in the page (#1153).
+    assert [url for url in asked if "world-outline" in url] == [
+        f"{live_server.url}/static/maps/world-outline.json"
+    ]
+    assert page.locator("[data-map]").get_attribute("data-map-outline") is None
     credit = page.locator("footer [data-map-tile-credit]")
     expect(credit).to_have_text("Leaflet")  # no tiles, so nobody else to credit
     expect(page.locator(".map-pin, .map-cluster")).to_have_count(2)
@@ -193,6 +200,32 @@ def test_a_click_on_the_map_places_an_address_by_hand(live_server, page: Page, p
     address.refresh_from_db()
     assert address.placed_by == "manual"
     assert (address.latitude, address.longitude) != (40.64, -8.65)
+
+
+def test_with_no_tiles_the_outline_is_under_the_pin_where_one_is_placed(
+    live_server, page: Page, placed
+):
+    """#1153: the outline arrives after the pin is drawn, and must not be drawn over it."""
+    from postulo.core.models import SiteSettings
+    from postulo.jobs.models import Company
+
+    row = SiteSettings.get()
+    row.map_tiles = "none"
+    row.save()
+    address = Company.objects.get(owner=placed, name="Aveiro Labs").postal_addresses.get()
+    breaches, tiles = watch(page)
+
+    sign_in(page, live_server.url, f"/jobs/addresses/{address.pk}/place/")
+
+    canvas = page.locator("[data-map-pick].leaflet-container")
+    expect(canvas.locator("path.map-outline")).to_have_count(1)
+    expect(canvas.locator("path.map-dot")).to_have_count(1)
+    classes = canvas.locator("path.map-outline, path.map-dot").evaluate_all(
+        "paths => paths.map((path) => path.classList.contains('map-dot'))"
+    )
+    assert classes == [False, True], "the pin is drawn after the outline, so over it"
+    assert tiles == []
+    assert breaches == []
 
 
 # ------------------------------------- the buttons and the credit in the end corner (#909)

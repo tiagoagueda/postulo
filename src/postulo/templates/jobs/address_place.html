@@ -27,7 +27,7 @@
          data-map-max-zoom="{{ tiles.max_zoom }}"
          data-map-attribution="{{ tiles.attribution }}"
          data-map-attribution-url="{{ tiles.attribution_url }}"
-         {% if outline %}data-map-outline="{{ outline|as_json }}"{% endif %}
+         {% if not tiles.fetched %}data-map-outline-src="{% static 'maps/world-outline.json' %}"{% endif %}
          {% if address.is_placed %}data-map-point="{{ address.latitude|stringformat:'f' }},{{ address.longitude|stringformat:'f' }}"{% endif %}
          data-map-zoom-in="{% translate 'Zoom in' %}"
          data-map-zoom-out="{% translate 'Zoom out' %}"></div>

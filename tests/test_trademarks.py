@@ -43,7 +43,7 @@ THIRD_PARTY = {
     "src/postulo/static/js/vendor/leaflet": "LICENSE.txt",
     "src/postulo/static/js/vendor/leaflet.markercluster": "LICENSE.txt",
     "src/postulo/static/css": "basecoat.LICENSE.txt",
-    "src/postulo/templates/jobs/map": "LICENCE.txt",
+    "src/postulo/static/maps": "LICENCE.txt",
     "src/postulo/jobs/data": "LICENCE.md",
     "src/postulo/static/brands": "NOTICE.txt",
 }

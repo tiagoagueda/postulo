@@ -8945,8 +8945,8 @@
   /* ------------------------------------------------------------- the companies' map (#898)
    *
    * Leaflet draws the places the list beside it names, over the basemap the operator chose:
-   * tiles from the address in `data-map-tiles`, or, with none, the world's outline in
-   * `data-map-outline`. Everything arrives as data; a company's name only ever reaches the
+   * tiles from the address in `data-map-tiles`, or, with none, the world's outline, the static
+   * file `data-map-outline-src` names. Everything arrives as data; a company's name only ever reaches the
    * page through `textContent`. Leaflet itself loads after this script (it is the map page's
    * alone), so the map is drawn when that script's own load event says it has run.
    *
@@ -8969,6 +8969,33 @@
     } catch (error) {
       return [];
     }
+  }
+
+  // The world's outline, for a map with no tiles: one static file of rings that every such
+  // map shares and the browser keeps, where each page used to carry all of it (#1153). It is
+  // fetched from this instance and nowhere else, and it arrives after the map is drawn, so
+  // it is put under whatever is already there. Without it the map is its dots on a plain
+  // ground, and the list beside it says everything the map does.
+  function drawOutline(L, map, canvas) {
+    var address = canvas.getAttribute("data-map-outline-src");
+    if (!address || !window.fetch) {
+      return;
+    }
+    window
+      .fetch(address, { credentials: "same-origin" })
+      .then(function (response) {
+        return response.ok ? response.json() : [];
+      })
+      .then(function (rings) {
+        if (rings.length && canvas.isConnected) {
+          L.polygon(rings, { className: "map-outline", interactive: false, fillRule: "evenodd" })
+            .addTo(map)
+            .bringToBack();
+        }
+      })
+      .catch(function () {
+        // Offline, or the file not there: the map is drawn without its outline.
+      });
   }
 
   function placePopup(place) {
@@ -9191,10 +9218,7 @@
           referrerPolicy: "strict-origin-when-cross-origin",
         }).addTo(map);
       } else {
-        var rings = readJson(canvas, "data-map-outline");
-        if (rings.length) {
-          L.polygon(rings, { className: "map-outline", interactive: false, fillRule: "evenodd" }).addTo(map);
-        }
+        drawOutline(L, map, canvas);
       }
       // One marker per address (#703), gathered into clusters that count companies: two
       // offices of one company close together are one company in the cluster's number.
@@ -9334,10 +9358,7 @@
     if (tiles) {
       L.tileLayer(tiles, { attribution: credit, maxZoom: map.getMaxZoom(), referrerPolicy: "strict-origin-when-cross-origin" }).addTo(map);
     } else {
-      var rings = readJson(canvas, "data-map-outline");
-      if (rings.length) {
-        L.polygon(rings, { className: "map-outline", interactive: false, fillRule: "evenodd" }).addTo(map);
-      }
+      drawOutline(L, map, canvas);
     }
     var pin = null;
     function put(point, fly) {

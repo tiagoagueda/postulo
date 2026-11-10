@@ -15,7 +15,8 @@ origin alone (the site's own policy is ``same-origin``, which would send none).
 **A tile server of the operator's own**, by URL template: ``https://`` on another host, or a
 path on this instance's own origin, which then sends nothing anywhere.
 
-**None**: Leaflet draws the Natural Earth outline the SVG map used, and nothing is fetched.
+**None**: Leaflet draws the Natural Earth outline the SVG map used, a static file of this
+instance (``static/maps/world-outline.json``, #1153), and nothing is fetched from anywhere else.
 
 **The content security policy opens on the map page only, and only to the configured
 origin.** Every other page keeps ``img-src 'self' data:``, and the global policy never names

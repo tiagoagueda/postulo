@@ -56,7 +56,6 @@ from . import (
     logos,
     mapping,
     merging,
-    outline,
     status,
     tiles,
     whose,
@@ -782,7 +781,6 @@ class AddressPlaceView(LoginRequiredMixin, View):
             "address": address,
             "back": self._back(request, address),
             "tiles": current,
-            "outline": [] if current.fetched else outline.rings(),
         }
         response = render(request, self.template_name, context)
         response._csp_config = tiles.policy_for(current)
@@ -925,7 +923,6 @@ class CompanyMapView(LoginRequiredMixin, TemplateView):
         context["dataset_available"] = places_data.available()
         context["postcodes_available"] = places_data.postcodes_available()
         context["tiles"] = tiles.current()
-        context["outline"] = [] if context["tiles"].fetched else outline.rings()
         return context
 
     def render_to_response(self, context, **response_kwargs):

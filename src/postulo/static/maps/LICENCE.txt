@@ -1,10 +1,10 @@
 Natural Earth — the world's outline under the map's dots (#108)
 
-`world_outline.html` is the 1:110m country boundaries published by Natural Earth
-(https://www.naturalearthdata.com), one SVG path: the polygons cut at the antimeridian
-the way an equirectangular map is, simplified (Douglas-Peucker) to about 1,700 points,
-and projected equirectangularly — the same projection the map's dots use, so a point
-and the coast behind it agree.
+`world-outline.json` is the 1:110m country boundaries published by Natural Earth
+(https://www.naturalearthdata.com): the polygons cut at the antimeridian the way an
+equirectangular map is and simplified (Douglas-Peucker), written as closed rings of
+latitude and longitude in degrees, the form Leaflet draws (#1153). A ring inside
+another is a hole, so the file is drawn as one polygon with the even-odd rule.
 
 Natural Earth's data are in the public domain (the project's terms of use at
 https://www.naturalearthdata.com/about/terms-of-use/): no licence is asked, and this

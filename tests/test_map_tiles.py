@@ -9,9 +9,12 @@ plain text.
 
 from __future__ import annotations
 
+import json
 import re
+from pathlib import Path
 
 import pytest
+from django.contrib.staticfiles import finders
 from django.core.management import call_command
 from django.core.management.base import SystemCheckError
 from django.urls import reverse
@@ -89,6 +92,8 @@ def test_the_page_hands_leaflet_the_tiles_and_their_credit(client, user):
 
 
 def test_no_tiles_fetches_nothing_and_draws_the_outline(client, user):
+    """The world's rings were written into the page, 44 kB of them on every view; the page
+    now names the static file that holds them, which a browser keeps (#1153)."""
     choose(map_tiles=tiles.NONE)
 
     response = map_page(client, user)
@@ -96,16 +101,36 @@ def test_no_tiles_fetches_nothing_and_draws_the_outline(client, user):
 
     assert images_allowed(response).split() == ["img-src", "'self'", "data:"]
     assert 'data-map-tiles=""' in html
-    assert "data-map-outline=" in html
-    assert len(response.context["outline"]) > 100, "the world's rings, from the SVG's path"
+    assert 'data-map-outline-src="/static/maps/world-outline.json"' in html
+    assert "data-map-outline=" not in html, "the drawing itself is not in the page"
+    assert len(html) < 40_000, "the outline alone was more than this"
 
 
-def test_the_outline_is_the_svgs_own_drawing_turned_back_into_degrees():
-    from postulo.jobs import outline
+def test_the_place_page_names_the_outline_too_with_no_tiles(client, user):
+    """The page that places one address carried the same rings (#1153)."""
+    choose(map_tiles=tiles.NONE)
+    company = Company.objects.create(owner=user, name="One", location="Lisbon")
+    client.force_login(user)
+    address = company.postal_addresses.get(is_primary=True)
 
-    rings = outline.rings()
-    # The path starts "M358.1 107.5": x - 180 is the longitude, 90 - y the latitude.
-    assert rings[0][0] == (-17.5, 178.1)
+    html = client.get(reverse("jobs:address_place", args=[address.pk])).content.decode()
+
+    assert 'data-map-outline-src="/static/maps/world-outline.json"' in html
+    assert "data-map-outline=" not in html
+
+
+def test_the_outline_is_a_static_file_of_rings_in_degrees():
+    """The one copy of the drawing: closed rings of latitude and longitude, as Leaflet
+    takes them, where a template's SVG path used to be read on every start (#1153)."""
+    found = finders.find("maps/world-outline.json")
+    assert found, "the outline is a static file"
+
+    rings = json.loads(Path(found).read_text(encoding="utf-8"))
+
+    # The drawing starts in Fiji, as the SVG path it was made from did ("M358.1 107.5").
+    assert rings[0][0] == [-17.5, 178.1]
+    assert len(rings) == 278
+    assert all(len(ring) >= 3 for ring in rings)
     assert all(-90 <= lat <= 90 and -180 <= lon <= 180 for ring in rings for lat, lon in ring)
 
 

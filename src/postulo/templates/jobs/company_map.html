@@ -30,7 +30,7 @@
         <div class="map-canvas size-full" data-map role="region"
              aria-label="{% translate 'Map of the places listed' %}"
              data-map-places="{{ drawn|as_json }}"
-             {% if outline %}data-map-outline="{{ outline|as_json }}"{% endif %}
+             {% if not tiles.fetched %}data-map-outline-src="{% static 'maps/world-outline.json' %}"{% endif %}
              data-map-tiles="{{ tiles.url }}"
              data-map-max-zoom="{{ tiles.max_zoom }}"
              data-map-cluster="{% translate 'Companies here: {count}' %}"
