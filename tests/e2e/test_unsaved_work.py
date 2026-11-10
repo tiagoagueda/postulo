@@ -283,3 +283,64 @@ def test_closing_the_tab_still_raises_beforeunload(page: Page, live_server, lett
     asked = asked_before_leaving(page, lambda: page.goto(f"{live_server.url}/applications/"))
 
     assert asked
+
+
+@pytest.fixture
+def application(applicant):
+    from postulo.applications.models import Application, Status
+    from postulo.jobs.models import Company, JobPosting
+
+    company = Company.objects.create(owner=applicant, name="Aperture Science")
+    posting = JobPosting.objects.create(
+        owner=applicant, company=company, title="Test Engineer", description="x" * 4000
+    )
+    return Application.objects.create(owner=applicant, posting=posting, status=Status.APPLIED)
+
+
+def typed_entry(page: Page, live_server, application) -> None:
+    sign_in(page, live_server.url)
+    page.goto(f"{live_server.url}{application.get_absolute_url()}")
+    page.locator("#event-form input[name=summary]").fill("Spoke to the recruiter")
+
+
+def test_an_entry_that_could_not_be_sent_is_still_guarded(page: Page, live_server, application):
+    """A form htmx sends lost its mark as the request left, whatever came back (#1156).
+
+    The connection drops, the form stays on the page with the words in it, the alert says
+    the request failed, and the next link left without a question.
+    """
+    typed_entry(page, live_server, application)
+    page.route("**/events/**", lambda route: route.abort())
+
+    page.locator("#event-form").get_by_role("button", name="Add entry").click()
+    expect(page.locator("[data-htmx-alert]")).not_to_be_empty()
+    a_link(page).click()
+
+    expect(drawn(page)).to_be_visible()
+    expect(leave_dialog(page).get_by_role("button", name="Cancel")).to_be_focused()
+    leave_dialog(page).get_by_role("button", name="Cancel").click()
+    expect(page.locator("#event-form input[name=summary]")).to_have_value("Spoke to the recruiter")
+
+
+def test_an_entry_the_server_failed_on_is_still_guarded(page: Page, live_server, application):
+    """An answer htmx does not swap leaves the form as it was, so it is not saved (#1156)."""
+    typed_entry(page, live_server, application)
+    page.route("**/events/**", lambda route: route.fulfill(status=500, body="no"))
+
+    page.locator("#event-form").get_by_role("button", name="Add entry").click()
+    expect(page.locator("[data-htmx-alert]")).not_to_be_empty()
+    a_link(page).click()
+
+    expect(drawn(page)).to_be_visible()
+
+
+def test_an_entry_that_was_added_is_not_asked_about(page: Page, live_server, application):
+    """The other half: a save that worked is finished with, and leaving asks nothing (#1156)."""
+    typed_entry(page, live_server, application)
+
+    page.locator("#event-form").get_by_role("button", name="Add entry").click()
+    expect(page.locator("#timeline")).to_contain_text("Spoke to the recruiter")
+    with page.expect_navigation():
+        a_link(page).click()
+
+    expect(page).to_have_url(re.compile(r"/applications/$"))

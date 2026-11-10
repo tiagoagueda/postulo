@@ -218,9 +218,9 @@
     }
   });
 
-  /* Four events rather than one: `htmx:afterRequest` is not raised when the request never
-   * reached the server, and a target left `aria-busy` for ever is a table announced as
-   * loading long after everybody has given up on it. */
+  /* Four events rather than one. htmx 2 raises `htmx:afterRequest` after a failure as well,
+   * so the other three are a second chance and not the only one: a target left `aria-busy`
+   * for ever is a table announced as loading long after everybody has given up on it. */
   ["htmx:afterRequest", "htmx:responseError", "htmx:sendError", "htmx:timeout"].forEach(
     function (name) {
       document.addEventListener(name, function (event) {
@@ -1986,16 +1986,30 @@
   document.addEventListener("submit", function (event) {
     // Only this form. The other forms on the page still hold whatever was typed into
     // them, and this submit is about to take the page away from all of them.
-    if (event.target && event.target.tagName === "FORM") {
-      delete event.target.dataset.dirty;
+    // And not a form htmx sends (#1156): the page stays, so its mark waits for the answer.
+    var form = event.target;
+    if (form && form.tagName === "FORM" && !sentByHtmx(form)) {
+      delete form.dataset.dirty;
     }
   });
 
-  // htmx leaves the page where it is, so a form it sends and swaps away is finished with
-  // in the same sense a submitted one is.
+  function sentByHtmx(form) {
+    return form.hasAttribute("hx-post") || form.hasAttribute("hx-get");
+  }
+
+  // htmx leaves the page where it is, so a form it sent is finished with only once the
+  // answer says it was taken (#1156). `afterRequest` also follows a refusal htmx does not
+  // swap, a dropped connection and a timeout, and after those the form is still on the page
+  // with what was typed in it: the mark stays, and leaving asks. Only the form's own
+  // submission counts, not a request something else inside it made.
   document.addEventListener("htmx:afterRequest", function (event) {
-    var form = event.target && event.target.closest ? event.target.closest("form") : null;
-    if (form) {
+    var detail = event.detail || {};
+    var sender = detail.elt;
+    if (!detail.successful || !sender) {
+      return;
+    }
+    var form = sender.tagName === "FORM" ? sender : sender.form;
+    if (form && (sender === form || sender.type === "submit")) {
       delete form.dataset.dirty;
     }
   });
