@@ -7856,7 +7856,25 @@
     collectNotices();
     // Once a minute. A background tab's timers are slowed to about that anyway, and a reminder
     // is not so urgent that a second's accuracy is worth a request a second.
-    window.setInterval(collectNotices, 60000);
+    var everyMinute = function () {
+      window.setInterval(collectNotices, 60000);
+    };
+    // In one tab for all of them (#1155): every open tab asked each minute, hidden ones too,
+    // so five tabs were five requests for the same notices. The tab that holds the lock asks;
+    // the others queue for it, and the next takes over when that tab closes or moves on,
+    // which is what a promise that never settles is for. A hidden tab may well be the one,
+    // since a notification is for somebody who is not looking. A tab brought to the front
+    // still asks at once, below. A browser without the lock asks from every tab, as before.
+    if (navigator.locks && navigator.locks.request) {
+      navigator.locks
+        .request("postulo-notices", function () {
+          everyMinute();
+          return new Promise(function () {});
+        })
+        .catch(everyMinute);
+    } else {
+      everyMinute();
+    }
     document.addEventListener("visibilitychange", function () {
       if (document.visibilityState === "visible") {
         collectNotices();
