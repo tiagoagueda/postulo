@@ -775,16 +775,28 @@ jobs:
         #
         # This audit lags the advisories themselves (OSV had nothing for Django 6.1.1 when
         # 6.1.2 fixed four issues, #986), so SECURITY.md also asks for a manual check.
+        #
+        # `uvx`, not `uv run --with`: inside the project `uv run` first built the project's
+        # whole environment, a managed Python, every locked package and Postulo itself, and
+        # pip-audit never looked at it; it audits the file it is given (#1166). `uv export`
+        # reads the lock and needs no environment either.
+        #
+        # `--disable-pip --no-deps`: the export already names every package at its locked
+        # version, so there is nothing for pip to resolve, and resolving meant downloading
+        # every package a second time. Measured on 10 November 2026: 3 s rather than 60, and
+        # the same answer. Every line of the export is looked up, whatever its marker.
         run: |
           uv export --no-emit-project --all-groups --all-extras --format requirements-txt --no-hashes \
             > /tmp/locked-requirements.txt
-          uv run --with pip-audit==2.10.1 pip-audit --strict --progress-spinner off \
+          uvx pip-audit==2.10.1 --strict --progress-spinner off --disable-pip --no-deps \
             -r /tmp/locked-requirements.txt
+        timeout-minutes: 10
 
       - name: Audit the asset build's Node dependencies
-        run: |
-          npm ci
-          npm audit --audit-level=high
+        # From the lock alone, which is everything `npm audit` reports on: `npm ci` installed
+        # every package of the asset build, Tailwind's binaries included, only to be read (#1166).
+        run: npm audit --package-lock-only --audit-level=high
+        timeout-minutes: 5
 
       - name: Audit the workflows themselves
         # A workflow is code that runs with the repository's credentials; zizmor checks
