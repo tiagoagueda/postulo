@@ -21,6 +21,13 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🐛 Fixed
 
+- A plugin or calendar import that places the same calendar entry again no longer rewrites it, so the dashboard's figures are not worked out again after every sync. (#1164)
+- On SQLite, company logos, profile pictures, the service worker, the web app manifest and the progress line of slow work no longer wait for other requests that are writing. (#1129)
+- A sync connection that keeps failing is tried less and less often, at most once a day, and its card says when the next attempt is; a sync plugin can switch off a connection the other side has ended. (#1162)
+- A backup cut short by a full disk, a restart or a failed check no longer leaves a file that the Backups page lists as a backup and that retention counts among the ones to keep. (#1123)
+- On PostgreSQL, two scheduler passes, two backups or two syncs of one connection can no longer start together after an earlier run died; the leases are kept in the database, not the cache. (#1130)
+- A backup killed half way no longer blocks scheduled backups for six hours and Back up now for a day; both are free again within about ten minutes. (#1131)
+- An errand page no longer says the work carries on when the background worker has not been seen for five minutes: it says so and checks every 30 seconds, and work interrupted mid-task is reported after an hour instead of a day. (#1122)
 - Both image workflows start the image they built and wait for it to be healthy before publishing it, and the image check no longer depends on GeoNames answering. (#1143)
 - An image built from a working tree no longer carries the downloaded ESCO and GeoNames files or Python's bytecode directories. (#1141)
 - The GeoNames lookup databases a checkout builds are ignored by git, so a broad git add can no longer commit 30 MB of derived data. (#1161)
