@@ -1,5 +1,5 @@
-"""System checks for the jobs app: the ESCO data directory (#535), the map's tiles (#898) and
-its street look-ups (#913).
+"""System checks for the jobs app: the ESCO data directory (#535), the map's tiles (#898), its
+street look-ups (#913) and the country names it matches a typed country against (#1109).
 
 The loader refuses to read a directory holding two revisions of either file, and the refusal
 used to surface at the first listing saved. `manage.py check`, which the entrypoint runs
@@ -9,9 +9,9 @@ before gunicorn starts, names the state instead.
 from __future__ import annotations
 
 from django.conf import settings
-from django.core.checks import Error, register
+from django.core.checks import Error, Warning, register
 
-from postulo.jobs import esco, geocoding, tiles
+from postulo.jobs import esco, geocoding, places, tiles
 
 
 @register("postulo")
@@ -87,5 +87,32 @@ def geocoder(app_configs, **kwargs):
             f"POSTULO_GEOCODER_URL is {url!r}: {problem}",
             hint="Use the service's base address, such as https://photon.example.org.",
             id="postulo.E044",
+        )
+    ]
+
+
+@register("postulo")
+def country_names(app_configs, **kwargs):
+    """The map's country names were read from another CLDR, or for other languages (#1109).
+
+    They are read out of CLDR once, when `fetch_geonames` builds the lookup, and not again:
+    a Babel that carries a newer CLDR, or a Postulo that has a language more, leaves the
+    lookup with the names it was built with. A country typed by one of the names it lacks
+    then narrows nothing, which is a wrong dot on a map and not an error anybody sees.
+    Nothing is said where there is no lookup, or one that is built again at its first use.
+    """
+    written = places.lookup_stamp()
+    now = places.current_stamp()
+    if written is None or written == now:
+        return []
+    if written.get("cldr") != now["cldr"]:
+        what = f"CLDR {written.get('cldr') or '?'}, and this Postulo carries CLDR {now['cldr']}"
+    else:
+        what = "another list of languages than this Postulo has"
+    return [
+        Warning(
+            f"The country names in {places.LOOKUP_FILE} were read from {what}.",
+            hint="Run 'manage.py fetch_geonames' to build the lookup again.",
+            id="postulo.W003",
         )
     ]

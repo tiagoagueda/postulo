@@ -34,7 +34,7 @@ from pathlib import Path
 
 from babel import Locale, UnknownLocaleError
 
-from postulo.core import languages
+from postulo.core import language_names, languages
 
 logger = logging.getLogger(__name__)
 
@@ -51,7 +51,8 @@ DATA_DIR = Path(
 CITIES_FILE = "geonames-cities1000.txt"
 COUNTRIES_FILE = "geonames-countryinfo.txt"
 
-#: What the cities table is indexed into at provisioning, so no process parses it (#399).
+#: What the cities table is indexed into at provisioning, so no process parses it (#399),
+#: and the countries' names with it, so none reads them out of CLDR (#1109).
 LOOKUP_FILE = "geonames-cities1000.sqlite"
 
 #: GeoNames' postal codes, the step between a town and a street (#702): a centroid per
@@ -93,7 +94,7 @@ def _lookup_path() -> Path:
     return DATA_DIR / LOOKUP_FILE
 
 
-def build_lookup(cities: Path, target: Path) -> int:
+def build_lookup(cities: Path, target: Path, countries: Path | None = None) -> int:
     """Write the lookup database for the table at ``cities`` to ``target``; the city count.
 
     Every name a city answers to, folded (its own, its ascii name and the alternates the
@@ -101,7 +102,14 @@ def build_lookup(cities: Path, target: Path) -> int:
     the table in memory. "Lisboa" answers to "Lisbon" because the table says so, not
     because the matcher believes it. ``manage.py fetch_geonames`` runs this once at
     provisioning; the file is replaced atomically, so a reader never sees half of one.
+
+    The countries go in beside the cities (#1109): every name a country answers to, from
+    the table at ``countries`` (the one beside ``cities`` unless another is named) and from
+    CLDR, with what they were read from (`current_stamp`). Without that table there are
+    no country names, and a typed country narrows nothing.
     """
+    if countries is None:
+        countries = cities.with_name(COUNTRIES_FILE)
     target.parent.mkdir(parents=True, exist_ok=True)
     # Its own name per builder: three workers meeting an old install each build, and
     # none may write into another's half-made file.
@@ -115,6 +123,9 @@ def build_lookup(cities: Path, target: Path) -> int:
             " country TEXT, population INTEGER);"
             "CREATE TABLE names (key TEXT, city INTEGER, PRIMARY KEY (key, city))"
             " WITHOUT ROWID;"
+            "CREATE TABLE countries (key TEXT, code TEXT, PRIMARY KEY (key, code))"
+            " WITHOUT ROWID;"
+            "CREATE TABLE about (key TEXT PRIMARY KEY, value TEXT) WITHOUT ROWID;"
         )
         count = 0
         with cities.open(encoding="utf-8") as handle:
@@ -138,11 +149,114 @@ def build_lookup(cities: Path, target: Path) -> int:
                 connection.executemany(
                     "INSERT INTO names VALUES (?, ?)", [(key, count) for key in keys if key]
                 )
+        connection.executemany("INSERT INTO countries VALUES (?, ?)", _country_names(countries))
+        connection.executemany("INSERT INTO about VALUES (?, ?)", current_stamp().items())
         connection.commit()
     finally:
         connection.close()
     os.replace(temporary, target)
     return count
+
+
+def _country_names(path: Path) -> list[tuple[str, str]]:
+    """Every name a country answers to, folded, with the code the cities carry.
+
+    ``countryInfo.txt`` has, by column, the ISO code (0), the ISO3 code (1) and the English
+    name (4); the capital (5) and the postal-code format (13) are not names of the country
+    and are not read, which is what made "Victoria" the Seychelles (#534). The file has no
+    names in other languages, so those come from the CLDR tables Babel carries, in every
+    language Postulo speaks: "España", "Deutschland" and "Ελλάδα" are names of a country
+    too. A name two countries share is there once for each, and the matcher then says
+    nothing rather than guess. Lines starting with ``#`` are the file's own header.
+
+    Read when the lookup is built and at no other time (#1109): the names of 250 countries
+    in 85 languages are every one of those languages' CLDR data loaded, which Babel would
+    then keep (`_translated_countries` hands each back).
+    """
+    if not path.is_file():
+        return []
+    names: set[tuple[str, str]] = set()
+    for line in path.read_text(encoding="utf-8").splitlines():
+        if line.startswith("#"):
+            continue
+        columns = line.split("\t")
+        if len(columns) < 5 or not columns[0]:
+            continue
+        for name in (columns[0], columns[1], columns[4]):
+            key = fold(name)
+            if key:
+                names.add((key, columns[0]))
+    known = frozenset(code for _key, code in names if len(code) == 2)
+    if known:
+        for code, name in _translated_countries(known):
+            key = fold(name)
+            if key:
+                names.add((key, code))
+    return sorted(names)
+
+
+def _translated_countries(known: frozenset[str]) -> Iterator[tuple[str, str]]:
+    """Each ``(code, name)`` CLDR gives a country of ``known``, in each language Postulo has.
+
+    Only the codes ``countryInfo.txt`` lists: CLDR also names regions ("Europe", "World")
+    and codes with no country, which no city carries.
+
+    One language at a time, each handed back to Babel before the next is read (#1109):
+    a locale is its language's whole CLDR data, and all of them at once are 60 MB that a
+    process which only wanted the names would hold until the last one was read.
+    """
+    for tag in languages.NATIVE_NAMES:
+        with language_names.borrowed_locales():
+            try:
+                territories = Locale.parse(tag, sep="-").territories
+            except (UnknownLocaleError, ValueError):
+                continue
+            found = [(code, name) for code, name in territories.items() if code in known]
+        yield from found
+
+
+def current_stamp() -> dict[str, str]:
+    """What a lookup built now says its country names were read from (#1109).
+
+    The version of CLDR Babel carries and the languages Postulo has: a Babel upgrade
+    renames a country here and there, and a new language brings its own names for all of
+    them. Either leaves a lookup that was built before it short of names, and
+    `postulo.jobs.checks` says so at start-up.
+    """
+    return {
+        "cldr": language_names.cldr_version(),
+        "languages": " ".join(sorted(languages.NATIVE_NAMES)),
+    }
+
+
+def lookup_stamp(lookup: Path | None = None) -> dict[str, str] | None:
+    """What the lookup on this machine says its country names were read from.
+
+    ``None`` where there is no lookup, or one from before it carried the countries.
+    """
+    lookup = lookup or _lookup_path()
+    if not lookup.is_file():
+        return None
+    connection = sqlite3.connect(f"{lookup.as_uri()}?mode=ro", uri=True)
+    try:
+        return dict(connection.execute("SELECT key, value FROM about").fetchall())
+    except sqlite3.Error:
+        return None
+    finally:
+        connection.close()
+
+
+def _up_to_date(lookup: Path, cities: Path) -> bool:
+    """Whether the lookup at ``lookup`` was made from the tables as they are now."""
+    if not lookup.is_file():
+        return False
+    made = lookup.stat().st_mtime_ns
+    countries = cities.with_name(COUNTRIES_FILE)
+    if made < cities.stat().st_mtime_ns:
+        return False
+    if countries.is_file() and made < countries.stat().st_mtime_ns:
+        return False
+    return lookup_stamp(lookup) is not None
 
 
 @lru_cache(maxsize=1)
@@ -151,8 +265,9 @@ def _index() -> Path | None:
 
     Provisioning writes it beside the table (``fetch_geonames``), so this is a path
     and no request parses anything. An install that has the table from before the
-    lookup existed, or whose lookup is older than its table, gets it built here once,
-    beside the table, or in a temporary directory where that one is not writable.
+    lookup existed, whose lookup is older than its tables, or whose lookup is from before
+    it carried the countries (#1109), gets it built here once, beside the table, or in a
+    temporary directory where that one is not writable.
     """
     path = _cities_file()
     if path is None:
@@ -166,7 +281,7 @@ def _index() -> Path | None:
             )
         return None
     lookup = _lookup_path()
-    if lookup.is_file() and lookup.stat().st_mtime_ns >= path.stat().st_mtime_ns:
+    if _up_to_date(lookup, path):
         return lookup
     try:
         build_lookup(path, lookup)
@@ -196,55 +311,25 @@ def _candidates(key: str) -> list[dict]:
     ]
 
 
-@lru_cache(maxsize=1)
-def _countries() -> dict[str, frozenset[str]]:
-    """A country's name to the code the cities carry: its ISO codes and its names.
+def _countries(key: str) -> frozenset[str] | None:
+    """The codes of the countries that answer to the folded name ``key``.
 
-    ``countryInfo.txt`` has, by column, the ISO code (0), the ISO3 code (1) and the English
-    name (4); the capital (5) and the postal-code format (13) are not names of the country
-    and are not read, which is what made "Victoria" the Seychelles (#534). The file has no
-    names in other languages, so those come from the CLDR tables Babel carries, in every
-    language Postulo speaks: "España", "Deutschland" and "Ελλάδα" are names of a country
-    too. A name two countries share keeps both codes, and the matcher then says nothing
-    rather than guess. Lines starting with ``#`` are the file's own header.
+    ``None`` for a name no country has, which narrows nothing. One indexed read of the
+    lookup, as a city is (#1109): the names were put there when it was built, so no
+    process reads a locale to answer, and none holds the table. A lookup with no countries
+    in it answers as one whose country table was never downloaded.
     """
-    path = DATA_DIR / COUNTRIES_FILE
-    if not path.is_file():
-        return {}
-    names: dict[str, set[str]] = {}
-    for line in path.read_text(encoding="utf-8").splitlines():
-        if line.startswith("#"):
-            continue
-        columns = line.split("	")
-        if len(columns) < 5 or not columns[0]:
-            continue
-        for name in (columns[0], columns[1], columns[4]):
-            key = fold(name)
-            if key:
-                names.setdefault(key, set()).add(columns[0])
-    for code, name in _translated_countries(
-        frozenset(code for codes in names.values() for code in codes if len(code) == 2)
-    ):
-        key = fold(name)
-        if key:
-            names.setdefault(key, set()).add(code)
-    return {key: frozenset(codes) for key, codes in names.items()}
-
-
-def _translated_countries(known: frozenset[str]) -> Iterator[tuple[str, str]]:
-    """Each ``(code, name)`` CLDR gives a country of ``known``, in each language Postulo has.
-
-    Only the codes ``countryInfo.txt`` lists: CLDR also names regions ("Europe", "World")
-    and codes with no country, which no city carries.
-    """
-    for tag in languages.NATIVE_NAMES:
-        try:
-            territories = Locale.parse(tag, sep="-").territories
-        except (UnknownLocaleError, ValueError):
-            continue
-        for code, name in territories.items():
-            if code in known:
-                yield code, name
+    lookup = _index()
+    if lookup is None or not key:
+        return None
+    connection = sqlite3.connect(f"{lookup.as_uri()}?mode=ro", uri=True)
+    try:
+        found = connection.execute("SELECT code FROM countries WHERE key = ?", (key,)).fetchall()
+    except sqlite3.OperationalError:
+        return None
+    finally:
+        connection.close()
+    return frozenset(code for (code,) in found) or None
 
 
 def postcode_key(code: str) -> str:
@@ -399,7 +484,7 @@ def resolve(text: str) -> dict | None:
     if not candidates:
         return None
     if country:
-        codes = _countries().get(fold(country))
+        codes = _countries(fold(country))
         if codes is not None:
             inside = [row for row in candidates if row["country"] in codes]
             if not inside:

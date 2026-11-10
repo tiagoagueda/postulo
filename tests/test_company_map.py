@@ -19,11 +19,9 @@ from postulo.jobs.models import Company
 
 @pytest.fixture(autouse=True)
 def fresh_loader():
-    for cached in (places._index, places._countries):
-        cached.cache_clear()
+    places._index.cache_clear()
     yield
-    for cached in (places._index, places._countries):
-        cached.cache_clear()
+    places._index.cache_clear()
 
 
 def page(client, user):

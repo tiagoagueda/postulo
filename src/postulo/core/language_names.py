@@ -33,10 +33,12 @@ catalogue for, and to the version of CLDR those were read from.
 from __future__ import annotations
 
 import unicodedata
+from collections.abc import Iterator
+from contextlib import contextmanager
 from functools import lru_cache
 
 import babel
-from babel import Locale, UnknownLocaleError
+from babel import Locale, UnknownLocaleError, localedata
 
 from . import languages
 
@@ -92,6 +94,31 @@ ISO_639_2 = {
 def cldr_version() -> str:
     """The version of CLDR the installed Babel carries."""
     return str(babel.core.get_global("cldr")["version"])
+
+
+@contextmanager
+def borrowed_locales() -> Iterator[None]:
+    """CLDR's locales, read inside the block and handed back at the end of it (#1109).
+
+    Babel keeps every locale it has parsed for the life of the process, each with its
+    parents and whole: its dates, its units and its numbers, about 0.6 MB apiece. A table
+    made from a few hundred names of each of Postulo's languages therefore left 95 of them
+    behind, some 60 MB a process, to be read once. What Babel held before the block it still
+    holds after it; what the block loaded is dropped, and is read again from its file the
+    next time anybody asks for it, so nothing that is using a locale is disturbed.
+
+    The cache is Babel's own business (`babel.localedata._cache`), which is why Babel is
+    pinned to one minor version and `tests/test_places.py` holds this to what it promises.
+    """
+    # Under Babel's own lock both times: another thread may be loading a locale meanwhile.
+    with localedata._cache_lock:
+        held = set(localedata._cache)
+    try:
+        yield
+    finally:
+        with localedata._cache_lock:
+            for loaded in set(localedata._cache) - held:
+                del localedata._cache[loaded]
 
 
 @lru_cache(maxsize=256)

@@ -42,11 +42,9 @@ def no_cities(tmp_path, monkeypatch):
     """No table of cities, whatever this machine has downloaded: a place is named only
     where a test says the table knows it."""
     monkeypatch.setattr(places, "DATA_DIR", tmp_path)
-    for cached in (places._index, places._countries):
-        cached.cache_clear()
+    places._index.cache_clear()
     yield tmp_path
-    for cached in (places._index, places._countries):
-        cached.cache_clear()
+    places._index.cache_clear()
 
 
 @pytest.fixture
@@ -54,8 +52,7 @@ def cities(no_cities):
     """A table that knows Lisbon and Porto, and nothing else."""
     rows = [city_row("Lisbon", "PT"), city_row("Porto", "PT")]
     (no_cities / places.CITIES_FILE).write_text("\n".join(rows) + "\n", encoding="utf-8")
-    for cached in (places._index, places._countries):
-        cached.cache_clear()
+    places._index.cache_clear()
 
 
 # ------------------------------------------------------------------ the title line

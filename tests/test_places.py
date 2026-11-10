@@ -7,10 +7,17 @@ with the classification.
 
 from __future__ import annotations
 
-import pytest
+import os
+import sqlite3
 
+import pytest
+from babel import Locale, localedata
+
+from postulo.core import language_names, languages
 from postulo.jobs import places
 from postulo.jobs.models import Company
+
+pytestmark = pytest.mark.usefixtures("cldr_in_hand")
 
 
 def city_row(
@@ -100,11 +107,9 @@ COUNTRIES = (
 @pytest.fixture(autouse=True)
 def fresh_loader():
     """The loader caches what it reads; a test that writes a table wants a fresh read."""
-    for cached in (places._index, places._countries):
-        cached.cache_clear()
+    places._index.cache_clear()
     yield
-    for cached in (places._index, places._countries):
-        cached.cache_clear()
+    places._index.cache_clear()
 
 
 @pytest.fixture
@@ -347,8 +352,8 @@ def test_a_region_that_is_also_a_capital_is_not_a_country(data_dir):
         answer = places.resolve(text)
         assert answer is not None, text
         assert answer["country"] == "AU"
-    assert "victoria" not in places._countries()
-    assert "#iso" not in places._countries()
+    assert places._countries("victoria") is None
+    assert places._countries("#iso") is None
 
 
 def test_a_country_is_known_by_its_codes_and_its_english_name(data_dir):
@@ -382,12 +387,163 @@ def test_a_country_name_two_countries_share_keeps_both(data_dir, monkeypatch):
     monkeypatch.setattr(
         places, "_translated_countries", lambda known: iter([("PT", "Iberia"), ("DE", "Iberia")])
     )
-    places._countries.cache_clear()
-    try:
-        assert places._countries()["iberia"] == {"PT", "DE"}
-        assert places.resolve("Valencia, Iberia") is None
-    finally:
-        places._countries.cache_clear()
+    assert places._countries("iberia") == {"PT", "DE"}
+    assert places.resolve("Valencia, Iberia") is None
+
+
+# ------------------------------------------- the countries are in the lookup (#1109)
+
+
+def refuse_cldr(known):
+    raise AssertionError("CLDR was read to match a country")
+
+
+def test_a_country_is_matched_without_reading_a_locale(data_dir, monkeypatch):
+    """Matching the first typed country read CLDR's names of every country in each of
+    Postulo's 85 languages, and Babel kept every locale it was handed: 95 of them, about
+    57 MB in each process for the rest of its life (#1109). The names are in the lookup
+    since it was built, so a match is a read of it and loads no locale at all."""
+    places.build_lookup(data_dir / places.CITIES_FILE, data_dir / places.LOOKUP_FILE)
+    monkeypatch.setattr(places, "_translated_countries", refuse_cldr)
+    monkeypatch.setattr(localedata, "_cache", {})
+
+    for text, code in (
+        ("Valencia, España", "ES"),
+        ("Valencia, VEN", "VE"),
+        ("Porto, Πορτογαλία", "PT"),
+        ("Tokyo, Japão", "JP"),
+        ("Springfield, Irlande", "IE"),
+    ):
+        assert places.resolve(text)["country"] == code, text
+    assert places.resolve("Lisboa, Deutschland") is None
+
+    assert localedata._cache == {}, "a locale was loaded to match a country"
+
+
+def test_building_the_lookup_hands_back_the_locales_it_read(data_dir, monkeypatch):
+    """The build is the one place the names are read out of CLDR, and on an install from
+    before the countries were in the lookup it runs in a process that serves requests
+    afterwards (#1109). What Babel held before, it holds after, and nothing more."""
+    monkeypatch.setattr(localedata, "_cache", {})
+    assert Locale.parse("pt_PT").territories["DE"] == "Alemanha"
+    held = set(localedata._cache)
+    assert "pt_PT" in held
+
+    places.build_lookup(data_dir / places.CITIES_FILE, data_dir / places.LOOKUP_FILE)
+
+    assert set(localedata._cache) == held
+    assert places.resolve("Berlin, Deutschland")["country"] == "DE"
+
+
+def test_a_country_is_known_by_its_name_in_every_language_postulo_has(data_dir):
+    """Every language's names, as they were when each match read them out of CLDR (#1109):
+    a country typed in a language that is not the reader's own is a country still."""
+    codes = [line.split("\t")[0] for line in COUNTRIES.splitlines()[1:]]
+    named = 0
+    for tag in languages.NATIVE_NAMES:
+        territories = Locale.parse(tag, sep="-").territories
+        for code in codes:
+            key = places.fold(territories.get(code, ""))
+            if key:
+                named += 1
+                assert code in places._countries(key), (tag, code)
+    assert named > 70 * len(codes), "most languages name every country of the table"
+
+
+def test_a_lookup_from_before_the_countries_is_built_again(data_dir):
+    """An install provisioned before #1109 has a lookup with the cities and nothing else.
+    It is built again at its first use, as one from before the lookup existed is (#399),
+    so a typed country narrows on it as it did."""
+    lookup = data_dir / places.LOOKUP_FILE
+    places.build_lookup(data_dir / places.CITIES_FILE, lookup)
+    connection = sqlite3.connect(lookup)
+    connection.executescript("DROP TABLE countries; DROP TABLE about;")
+    connection.close()
+    assert places.lookup_stamp() is None
+
+    assert places.resolve("Springfield, Ireland")["country"] == "IE"
+
+    assert places.lookup_stamp() == places.current_stamp()
+
+
+def test_a_lookup_without_its_countries_narrows_nothing(data_dir):
+    """As where the country table was never downloaded: no error, and no country (#1109)."""
+    lookup = data_dir / places.LOOKUP_FILE
+    places.build_lookup(data_dir / places.CITIES_FILE, lookup)
+    connection = sqlite3.connect(lookup)
+    connection.executescript("DROP TABLE countries;")
+    connection.close()
+
+    assert places._countries("ireland") is None
+    assert places.resolve("Springfield, Ireland")["country"] == "US"
+
+
+def test_without_the_country_table_a_typed_country_narrows_nothing(data_dir, monkeypatch):
+    """No table of countries, no names of them, and CLDR is not read for none (#1109)."""
+    (data_dir / places.COUNTRIES_FILE).unlink()
+    monkeypatch.setattr(places, "_translated_countries", refuse_cldr)
+
+    assert places.resolve("Springfield, Ireland")["country"] == "US"
+    assert places.lookup_stamp() == places.current_stamp()
+
+
+def test_a_lookup_built_again_is_what_the_next_match_reads(data_dir):
+    """Nothing of the countries is held in a process (#1109): what `fetch_geonames` builds
+    in another one is the next answer in this one, with no cache to clear in between."""
+    assert places.resolve("Valencia, Hispania")["country"] == "VE", "no such country yet"
+
+    more = COUNTRIES + country_row("ES", "ESP", "Hispania", "Madrid") + "\n"
+    (data_dir / places.COUNTRIES_FILE).write_text(more, encoding="utf-8")
+    places.build_lookup(data_dir / places.CITIES_FILE, data_dir / places.LOOKUP_FILE)
+
+    assert places.resolve("Valencia, Hispania")["country"] == "ES"
+
+
+def test_a_country_table_newer_than_the_lookup_is_indexed_again(data_dir):
+    """A country table put there by hand after the lookup was made is read at the next
+    start, as a newer city table is (#1109)."""
+    lookup = data_dir / places.LOOKUP_FILE
+    places.build_lookup(data_dir / places.CITIES_FILE, lookup)
+    more = COUNTRIES + country_row("ES", "ESP", "Hispania", "Madrid") + "\n"
+    (data_dir / places.COUNTRIES_FILE).write_text(more, encoding="utf-8")
+    later = lookup.stat().st_mtime_ns + 5_000_000_000
+    os.utime(data_dir / places.COUNTRIES_FILE, ns=(later, later))
+    places._index.cache_clear()
+
+    assert places.resolve("Valencia, Hispania")["country"] == "ES"
+
+
+def test_start_up_says_when_the_country_names_are_from_another_cldr(data_dir, monkeypatch):
+    """The names are read once, so a Babel upgrade does not reach them by itself (#1109):
+    the lookup says which CLDR it was built from, and `manage.py check` says when that is
+    not the one this Postulo carries. The names it has are matched meanwhile."""
+    from postulo.jobs import checks
+
+    assert checks.country_names(None) == [], "no lookup, nothing to say"
+    places.build_lookup(data_dir / places.CITIES_FILE, data_dir / places.LOOKUP_FILE)
+    assert checks.country_names(None) == []
+
+    monkeypatch.setattr(language_names, "cldr_version", lambda: "99")
+    problems = checks.country_names(None)
+
+    assert [problem.id for problem in problems] == ["postulo.W003"]
+    assert "CLDR 99" in problems[0].msg and language_names.CLDR_VERSION in problems[0].msg
+    assert "fetch_geonames" in problems[0].hint
+    places._index.cache_clear()
+    assert places.resolve("Valencia, España")["country"] == "ES"
+
+
+def test_start_up_says_when_postulo_has_a_language_the_names_were_not_read_in(
+    data_dir, monkeypatch
+):
+    """A language added since the lookup was built has its own names for every country,
+    and the lookup has none of them (#1109)."""
+    from postulo.jobs import checks
+
+    places.build_lookup(data_dir / places.CITIES_FILE, data_dir / places.LOOKUP_FILE)
+    monkeypatch.setitem(languages.NATIVE_NAMES, "tlh", "tlhIngan Hol")
+
+    assert [problem.id for problem in checks.country_names(None)] == ["postulo.W003"]
 
 
 def test_a_save_reads_the_lookup_and_never_parses_the_table(data_dir, monkeypatch, user):

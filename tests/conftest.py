@@ -291,6 +291,27 @@ def release_languages(kept: int = LANGUAGES_KEPT) -> None:
         localedata._cache.clear()
 
 
+@pytest.fixture(scope="module")
+def cldr_in_hand():
+    """Every language's CLDR data, read once for a file that builds the map's lookup (#1109).
+
+    The build reads every country's name in each of Postulo's languages and hands back the
+    locales it loaded, so a file that builds a lookup per test would read all 85 again for
+    each one, about a second a time. What Babel holds already is not handed back,
+    so with them loaded here once the builds of the file read nothing. `release_languages`
+    drops them at the end of the file, as it does for any file that met this many.
+    """
+    from babel import Locale, UnknownLocaleError
+
+    from postulo.core import languages
+
+    for tag in languages.NATIVE_NAMES:
+        try:
+            Locale.parse(tag, sep="-").territories  # noqa: B018
+        except (UnknownLocaleError, ValueError):
+            continue
+
+
 #: A handful of ESCO skills in three languages, for the tests that need the skills file and
 #: must not need the real one (#266). Identifiers and names as v1.2.1 has them, bar the last
 #: three: a skill with no French name, and two that share a Portuguese one.

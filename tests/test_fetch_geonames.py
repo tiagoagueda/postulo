@@ -16,6 +16,8 @@ from django.core.management.base import CommandError
 from postulo.jobs import places
 from postulo.jobs.management.commands import fetch_geonames
 
+pytestmark = pytest.mark.usefixtures("cldr_in_hand")
+
 
 def table_row(name: str, country: str, population: int, alternates: str = "") -> str:
     return "\t".join(
@@ -129,11 +131,9 @@ class FakeClient:
 
 @pytest.fixture(autouse=True)
 def fresh_loader():
-    for cached in (places._index, places._countries):
-        cached.cache_clear()
+    places._index.cache_clear()
     yield
-    for cached in (places._index, places._countries):
-        cached.cache_clear()
+    places._index.cache_clear()
 
 
 @pytest.fixture
@@ -185,6 +185,23 @@ def test_the_file_the_command_writes_is_one_the_loader_reads(run, data_dir):
     assert places.resolve("Lisbon") is not None
     assert places.resolve("Lisbon")["country"] == "PT"
     assert places.resolve("Springfield") is None
+
+
+def test_the_command_reads_the_countries_names_into_the_lookup(run, data_dir, monkeypatch):
+    """Provisioning is where the countries' names are read out of CLDR, in every language
+    Postulo has, and stamped with the CLDR they came from (#1109). A match afterwards reads
+    the lookup, and CLDR not at all."""
+    run(answers_for())
+
+    assert places.lookup_stamp() == places.current_stamp()
+
+    def refuse(known):
+        raise AssertionError("CLDR was read to match a country")
+
+    monkeypatch.setattr(places, "_translated_countries", refuse)
+    assert places.resolve("Berlin, Deutschland")["country"] == "DE"
+    assert places.resolve("Lisbon, Portogallo")["country"] == "PT"
+    assert places.resolve("Lisbon, Alemanha") is None
 
 
 def test_the_download_identifies_itself_the_way_the_policy_asks(monkeypatch, data_dir):

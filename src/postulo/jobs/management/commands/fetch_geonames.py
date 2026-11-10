@@ -90,12 +90,12 @@ class Command(BaseCommand):
         self._validate(cities, countries)
         self._write(places.DATA_DIR / places.CITIES_FILE, cities)
         self._write(places.DATA_DIR / places.COUNTRIES_FILE, countries)
-        # The table is parsed here, once, into the lookup the saves read (#399).
+        # The table is parsed here, once, into the lookup the saves read (#399), and the
+        # countries' names are read out of CLDR into it, once, with it (#1109).
         places.build_lookup(places.DATA_DIR / places.CITIES_FILE, places._lookup_path())
         # The loader caches what it has read, and this process may have read the
         # absence; the new file is the state now.
         places._index.cache_clear()
-        places._countries.cache_clear()
         self.stdout.write(
             self.style.SUCCESS(
                 "Wrote the city table, its lookup and the country table. A location is "
@@ -231,14 +231,12 @@ class Command(BaseCommand):
             try:
                 places.DATA_DIR = pathlib.Path(staging)
                 places._index.cache_clear()
-                places._countries.cache_clear()
                 for city in REQUIRED_CITIES:
                     if places.resolve(city) is None:
                         problems.append(f"{city} is not in the table the download answered with")
             finally:
                 places.DATA_DIR = original
                 places._index.cache_clear()
-                places._countries.cache_clear()
         return problems
 
     def _write(self, target, text: str) -> None:
