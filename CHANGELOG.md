@@ -19,6 +19,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🐛 Fixed
 
+- The GeoNames lookup databases a checkout builds are ignored by git, so a broad git add can no longer commit 30 MB of derived data. (#1161)
 - A stalled download in a CI set-up step ends in minutes with its step named, instead of holding a runner slot for hours. (#1138)
 - The release recipe and the release check no longer ask for Every Python to be started by hand, a run the check could never see. (#1189)
 - The unit suite runs with Django's async-safety guard on again; the browser suite switches it off for itself alone. (#1160)
