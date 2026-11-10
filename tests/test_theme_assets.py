@@ -192,6 +192,33 @@ def test_the_overview_lists_a_theme_font_and_the_script_it_does_not_draw(client,
     assert re.search(r'<span class="text-red-600[^"]*">Greek</span>', row)
 
 
+def test_a_theme_font_is_read_once_and_not_each_time_it_is_listed(vellum, monkeypatch):
+    """The Overview lists the theme fonts at every visit, and reads no file for it (#1133).
+
+    `load` keeps what it read of a package's file for the life of the process, so the list
+    is given a second time from what the first one read, and `forget` is what reads again.
+    """
+    read = []
+    real = theme_assets.read
+
+    def counting(package, name):
+        read.append(name)
+        return real(package, name)
+
+    monkeypatch.setattr(theme_assets, "read", counting)
+    theme_assets.forget()
+
+    first = theme_assets.theme_fonts()
+    second = theme_assets.theme_fonts()
+
+    assert read == ["fonts/Vellum.woff2"]
+    assert second == first and [check.name for check in first] == ["fonts/Vellum.woff2"]
+
+    theme_assets.forget()
+    assert theme_assets.theme_fonts() == first
+    assert read == ["fonts/Vellum.woff2"] * 2, "forgotten, the file is read again"
+
+
 # ------------------------------------------------------------ what is refused
 
 

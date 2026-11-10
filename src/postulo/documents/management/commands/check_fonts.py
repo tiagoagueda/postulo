@@ -33,7 +33,9 @@ class Command(BaseCommand):
     def handle(self, *args, **options) -> None:
         self._theme_fonts()
         offered = sorted(languages.scripts_offered())
-        answer = fonts.renderable_scripts()
+        # Asked of the fonts as they are now, never from what a process remembers: this is
+        # what an operator runs after installing a font package (#1133).
+        answer = fonts.renderable_scripts_now()
         if answer is None:
             self.stdout.write(
                 "WeasyPrint's system libraries are not on this machine, so the "

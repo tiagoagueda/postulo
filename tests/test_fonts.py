@@ -395,7 +395,7 @@ def _answered(monkeypatch, nastaliq: bool) -> None:
 
     answer = dict.fromkeys(languages.scripts_offered(), True)
     answer["Aran"] = nastaliq
-    monkeypatch.setattr(fonts, "renderable_scripts", lambda: answer)
+    monkeypatch.setattr(fonts, "renderable_scripts_now", lambda: answer)
 
 
 def test_check_fonts_says_whether_urdu_is_drawn_in_nastaliq(monkeypatch):
@@ -423,3 +423,206 @@ def test_the_image_names_libthai_for_breaking_thai():
     text = DOCKERFILE.read_text(encoding="utf-8")
     body = "\n".join(line for line in text.splitlines() if not line.lstrip().startswith("#"))
     assert re.search(r"\blibthai0\b", body), "the image does not install libthai0"
+
+
+# ------------------------------------------ asked once, not at every visit (#1133)
+
+
+class _Machine:
+    """A machine's fonts, stood in for: what it draws, and how often it was asked.
+
+    `loads` counts the times fontconfig was loaded (`fonts._handles`) and `probes` the
+    fonts looked up (`fonts._script_drawable`), the two costs a visit of the Overview
+    paid. Nothing here depends on the fonts of the machine the suite runs on, and it runs
+    where WeasyPrint's libraries cannot be loaded at all.
+    """
+
+    def __init__(self) -> None:
+        self.loads = 0
+        self.probes: list[tuple[str, str]] = []
+        #: The languages, and the families, this machine has no font for.
+        self.missing: set[str] = set()
+        self.askable = True
+
+    def handles(self):
+        self.loads += 1
+        if not self.askable:
+            return None
+        return "ffi", f"font-map-{self.loads}", "gobject", "pango", "harfbuzz"
+
+    def drawable(
+        self, ffi, font_map, gobject, pango, harfbuzz, language_tag, sample, *, family=None
+    ):
+        self.probes.append((font_map, family or language_tag))
+        return (family or language_tag) not in self.missing
+
+
+@pytest.fixture
+def machine(monkeypatch):
+    from postulo.documents import fonts
+
+    stood_in = _Machine()
+    monkeypatch.setattr(fonts, "_handles", stood_in.handles)
+    monkeypatch.setattr(fonts, "_script_drawable", stood_in.drawable)
+    return stood_in
+
+
+def _everything_offered() -> list[str]:
+    """The codes an answer carries, in its order: the scripts, then the styles."""
+    return sorted(languages.scripts_offered()) + sorted(languages.styles_offered())
+
+
+@pytest.mark.django_db
+def test_the_overview_asks_the_fonts_once_and_not_at_every_visit(client, machine):
+    """Every visit loaded fontconfig again and looked a font up for every script (#1133).
+
+    Loading fontconfig reads the cache of every font the machine has, several hundred faces
+    in the image, to say what it said at the last visit. A machine that draws everything
+    offered is asked once by a process, and the row reads the same afterwards.
+    """
+    from django.contrib.auth import get_user_model
+    from django.urls import reverse
+
+    admin = get_user_model().objects.create_user(
+        email="admin@example.org", password="not-a-real-password", is_staff=True
+    )
+    client.force_login(admin)
+
+    def row() -> str:
+        html = client.get(reverse("server:overview")).content.decode()
+        found = html[html.index("data-fonts=") :]
+        return found[: found.index("</dd>")]
+
+    first = row()
+    assert (machine.loads, len(machine.probes)) == (1, len(_everything_offered()))
+
+    second = row()
+    assert (machine.loads, len(machine.probes)) == (1, len(_everything_offered())), (
+        "the second visit asked the fonts again"
+    )
+    assert second == first
+    assert 'data-fonts="listed"' in second and "Arabic (Nastaliq)" in second
+
+
+def test_the_answer_kept_is_the_answer_given_in_the_same_order(machine):
+    """What is remembered is what the machine said, and a caller's copy is its own (#1133)."""
+    from postulo.documents import fonts
+
+    first = fonts.renderable_scripts()
+    assert list(first) == _everything_offered()
+    assert all(first.values())
+
+    first.clear()
+    again = fonts.renderable_scripts()
+
+    assert list(again) == _everything_offered()
+    assert all(again.values())
+    assert machine.loads == 1
+
+
+@pytest.mark.parametrize(
+    ("missing", "code"),
+    [("ara", "Arab"), ("Noto Nastaliq Urdu", "Aran")],
+    ids=["a script", "a style"],
+)
+def test_an_answer_with_something_missing_is_asked_again(machine, missing, code):
+    """Only a complete answer is kept (#1133).
+
+    Something missing is what an administrator installs a font package to put right, and
+    a font installed a minute ago has to count at the next visit, without a restart. So
+    the machine is asked again until it draws everything, and not after.
+    """
+    from postulo.documents import fonts
+
+    machine.missing = {missing}
+    assert fonts.renderable_scripts()[code] is False
+    assert fonts.renderable_scripts()[code] is False
+    assert machine.loads == 2
+
+    machine.missing = set()
+    assert fonts.renderable_scripts()[code] is True
+    assert machine.loads == 3, "the fonts as they are now, not the ones loaded before"
+
+    assert fonts.renderable_scripts()[code] is True
+    assert machine.loads == 3
+
+
+def test_a_machine_that_could_not_be_asked_is_asked_again(machine):
+    """*Cannot be checked* is not an answer to keep either (#1133)."""
+    from postulo.documents import fonts
+
+    machine.askable = False
+    assert fonts.renderable_scripts() is None
+    assert fonts.renderable_scripts() is None
+
+    machine.askable = True
+    assert fonts.renderable_scripts() == dict.fromkeys(_everything_offered(), True)
+
+
+def test_a_language_offered_since_is_asked_about(machine, monkeypatch):
+    """The answer kept is for what was offered when it was given (#1133).
+
+    An administrator who offers a language in another script, or one set in a style of its
+    own, is shown that one too, asked of the fonts as they are then.
+    """
+    from postulo.documents import fonts
+
+    monkeypatch.setattr(languages, "scripts_offered", lambda: {"Grek"})
+    monkeypatch.setattr(languages, "styles_offered", lambda: set())
+    assert fonts.renderable_scripts() == {"Grek": True}
+    assert fonts.renderable_scripts() == {"Grek": True}
+    assert machine.loads == 1
+
+    monkeypatch.setattr(languages, "scripts_offered", lambda: {"Grek", "Arab"})
+    assert fonts.renderable_scripts() == {"Arab": True, "Grek": True}
+    assert machine.loads == 2
+
+    monkeypatch.setattr(languages, "styles_offered", lambda: {"Aran"})
+    assert fonts.renderable_scripts() == {"Arab": True, "Grek": True, "Aran": True}
+    assert machine.loads == 3
+
+    assert fonts.renderable_scripts() == {"Arab": True, "Grek": True, "Aran": True}
+    assert machine.loads == 3
+
+
+def test_check_fonts_asks_the_machine_as_it_is_now(machine):
+    """The command is the fresh check, whatever the process remembers (#1133)."""
+    from io import StringIO
+
+    from django.core.management import CommandError, call_command
+
+    from postulo.documents import fonts
+
+    assert all(fonts.renderable_scripts().values())
+    assert machine.loads == 1
+
+    out = StringIO()
+    call_command("check_fonts", stdout=out)
+    assert machine.loads == 2, "the command answered from what the process remembered"
+    assert "Every script the offered languages need, this machine draws." in out.getvalue()
+
+    machine.missing = {"ara"}
+    with pytest.raises(CommandError, match="Arabic would come out as boxes"):
+        call_command("check_fonts", stdout=StringIO())
+    assert machine.loads == 3
+
+
+def test_the_questions_the_tests_ask_share_one_font_map(machine):
+    """`script_draws` and `family_draws` loaded fontconfig at every call (#1133).
+
+    The files that skip by them ask once in every test. The map they share is this
+    machine's own, so it is put down before and after a test that stands in for it.
+    """
+    from postulo.documents import fonts
+
+    fonts._kept_handles.cache_clear()
+    try:
+        assert fonts.script_draws("Arab") is True
+        assert fonts.script_draws("Grek") is True
+        assert fonts.family_draws("Noto Nastaliq Urdu", "urd", "ں") is True
+        machine.missing = {"hye"}
+        assert fonts.script_draws("Armn") is False
+        assert machine.loads == 1
+        assert {font_map for font_map, _asked in machine.probes} == {"font-map-1"}
+    finally:
+        fonts._kept_handles.cache_clear()

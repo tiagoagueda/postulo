@@ -22,6 +22,7 @@ command say *cannot check*, and that is the truth.
 
 from __future__ import annotations
 
+import functools
 import struct
 
 #: Script, by its ISO 15924 code → the probe the renderer's own matching would answer for it.
@@ -161,16 +162,64 @@ def _format4_covers(table: bytes, offset: int, codepoint: int) -> bool:
     return False
 
 
+#: The complete answer this process was last given, with the scripts and the styles that
+#: were offered when it asked (#1133); see `renderable_scripts`.
+_complete: tuple[frozenset[str], frozenset[str], dict[str, bool]] | None = None
+
+
+def forget() -> None:
+    """Drop the answer this process is keeping, so the next one is asked of the machine.
+
+    The font map `script_draws` and `family_draws` share is left: it is the machine's own,
+    and what the suite calls this for, between two tests, is an answer a test made up.
+    """
+    global _complete
+    _complete = None
+
+
 def renderable_scripts() -> dict[str, bool] | None:
     """For every script the offered languages need, whether this machine draws it.
 
     ``None`` when WeasyPrint's native libraries are absent from this machine: the
     question cannot be answered here, and an answer of *no* would be a lie. The
     page and the command say what they actually know.
+
+    Asking loads fontconfig, which reads the cache of every font the machine has, and
+    looks a font up for every script; the Overview asked at every visit (#1133). So an
+    answer is kept for the life of the process, for the scripts and styles offered when
+    it was given, once it is complete: everything offered is drawn. Fonts are not taken
+    away from under a running process, so that answer stands. One with something missing,
+    and a machine that could not be asked, are asked again the next time: that is the
+    state an administrator installs a font package to change, and a font installed a
+    minute ago has to count without a restart. `renderable_scripts_now` asks the machine
+    whatever is kept here.
+    """
+    global _complete
+    from postulo.core import languages
+
+    scripts = frozenset(languages.scripts_offered())
+    styles = frozenset(languages.styles_offered())
+    if _complete is not None and _complete[:2] == (scripts, styles):
+        return dict(_complete[2])
+    answer = _asked(scripts, styles)
+    if answer is not None and all(answer.values()):
+        _complete = (scripts, styles, dict(answer))
+    return answer
+
+
+def renderable_scripts_now() -> dict[str, bool] | None:
+    """The same question, asked of the fonts this machine has at this moment (#1133).
+
+    For `check_fonts`, which an operator runs after installing a font package and which
+    has to answer for the machine as it is, whatever a process remembers.
     """
     from postulo.core import languages
 
-    offered = languages.scripts_offered()
+    return _asked(languages.scripts_offered(), languages.styles_offered())
+
+
+def _asked(offered, styles) -> dict[str, bool] | None:
+    """Each of these scripts, then each of these styles, asked of freshly loaded fonts."""
     if not offered:
         return {}
     handles = _handles()
@@ -194,7 +243,7 @@ def renderable_scripts() -> dict[str, bool] | None:
         )
     # The styles after the scripts, under codes of their own: a script drawn in the wrong
     # style is legible, and that is a different answer from boxes (#1054).
-    for style in sorted(languages.styles_offered()):
+    for style in sorted(styles):
         style_probe = STYLE_PROBES.get(style)
         if style_probe is None:
             answer[style] = False
@@ -213,7 +262,7 @@ def family_draws(family: str, language_tag: str, sample: str) -> bool | None:
     tests that look for a family among a PDF's fonts ask this first, so that a machine
     without the family skips them rather than failing them (#1054).
     """
-    handles = _handles()
+    handles = _kept_handles()
     if handles is None:
         return None
     ffi, font_map, gobject, pango, harfbuzz = handles
@@ -228,7 +277,7 @@ def script_draws(script: str) -> bool | None:
     ``None`` where nothing can be asked. For the tests that lay a script out through
     WeasyPrint and skip on a machine that would draw it as boxes (#1052).
     """
-    handles = _handles()
+    handles = _kept_handles()
     if handles is None:
         return None
     ffi, font_map, gobject, pango, harfbuzz = handles
@@ -236,8 +285,24 @@ def script_draws(script: str) -> bool | None:
     return _script_drawable(ffi, font_map, gobject, pango, harfbuzz, language_tag, sample)
 
 
+@functools.cache
+def _kept_handles():
+    """The handles `script_draws` and `family_draws` ask, loaded once by a process (#1133).
+
+    The tests that skip by those two ask once each, and every question loaded fontconfig
+    again. They want the fonts the machine has while the suite runs, which one map answers;
+    the page and the command do not ask here, because theirs is the question a font
+    installed since has to change.
+    """
+    return _handles()
+
+
 def _handles():
-    """WeasyPrint's native handles and a font map wired the way it wires its own, or None."""
+    """WeasyPrint's native handles and a font map wired the way it wires its own, or None.
+
+    Loaded afresh at every call: the configuration is read, and with it the cache of every
+    font installed on the machine at that moment.
+    """
     from postulo.documents.pdf import _is_importable
 
     if not _is_importable("weasyprint"):

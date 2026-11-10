@@ -169,6 +169,21 @@ def _no_inherited_migration_answer():
     metrics.forget_migrations()
 
 
+@pytest.fixture(autouse=True)
+def _no_inherited_fonts_answer():
+    """No test is told which scripts this machine draws by an earlier test (#1133).
+
+    `documents.fonts` keeps a complete answer for the life of the process, and the suite is
+    one process: a test that stands in for the machine's fonts and says they draw
+    everything would otherwise be answering for every Overview drawn after it.
+    """
+    from postulo.documents import fonts
+
+    fonts.forget()
+    yield
+    fonts.forget()
+
+
 @pytest.fixture(scope="session")
 def _worker_heartbeat_file(tmp_path_factory) -> Path:
     return tmp_path_factory.mktemp("worker") / "worker-heartbeat"
