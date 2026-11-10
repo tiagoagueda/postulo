@@ -257,7 +257,9 @@ COPY docker/apt.postgresql.org.asc /tmp/apt.postgresql.org.asc
 # runs. Whoever builds passes the moment they are building at. The workflows do, one moment
 # for a run and the same one to both of its builds, so the image that is scanned and the
 # image that is published asked Debian the same question; `scripts/scan-image.sh` and
-# `scripts/check-image.sh` do when they build. By hand:
+# `scripts/check-image.sh` do when they build. A dev image built by a push passes the day and
+# not the second, so the first of a day asks and the rest of that day reuse the layer (#1139);
+# a release always asks. By hand:
 #     docker build --pull --build-arg POSTULO_APT_REFRESH="$(date -u +%Y-%m-%dT%H:%M:%SZ)" ...
 #
 # Built without it the layer may be one the cache remembers, which is what `docker compose

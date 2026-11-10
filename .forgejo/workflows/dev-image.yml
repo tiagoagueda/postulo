@@ -124,9 +124,25 @@ jobs:
       # of the day the layer was first built.
       #
       # The clock and not the run's number, so a run started again asks again.
+      #
+      # A day, for a push: the first dev image of a UTC day asks Debian, and the later ones
+      # that day, four to six of them, reuse the layer in both builders. To the second, as
+      # it was, every push ran the layer again: 282 s of arm64 under emulation, and its
+      # amd64 copy, twice, for packages that had not changed since the morning (#1139). What
+      # #300 fixed was a layer frozen for weeks; a day is well inside that.
+      #
+      # To the second when the workflow is started by hand, so that doing so still means
+      # "ask now", and always for a release (`image.yml`).
       - name: Note the moment Debian is asked
         id: moment
-        run: echo "asked=$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> "$GITHUB_OUTPUT"
+        env:
+          EVENT: ${{ github.event_name }}
+        run: |
+          if [ "$EVENT" = "workflow_dispatch" ]; then
+            echo "asked=$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> "$GITHUB_OUTPUT"
+          else
+            echo "asked=$(date -u +%Y-%m-%d)" >> "$GITHUB_OUTPUT"
+          fi
 
       # Into this runner's daemon first, so there is something to scan before anything is
       # published. `--pull`, so the base image is asked for as well, whatever this builder

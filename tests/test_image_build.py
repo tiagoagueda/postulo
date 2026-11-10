@@ -509,6 +509,29 @@ def test_the_image_scanned_and_the_image_published_are_built_at_one_moment(path:
         assert 'POSTULO_APT_REFRESH="$ASKED"' in step["run"], step["run"]
 
 
+def test_a_pushed_dev_image_asks_debian_once_a_day_and_a_release_every_time():
+    """The moment is the cache key of the layer that takes Debian's updates. To the second,
+    every push to `main` ran that layer again in both builders, under emulation for arm64,
+    for packages that had not moved since the morning (#1139). A dev image built by a push
+    asks once a day; one started by hand, and every release, asks when it is built."""
+    import yaml
+
+    def moment(name):
+        steps = yaml.safe_load(
+            (ROOT / ".forgejo" / "workflows" / name).read_text(encoding="utf-8")
+        )["jobs"]["image"]
+        return next(step for step in steps["steps"] if step.get("id") == "moment")
+
+    dev = moment("dev-image.yml")
+    by_hand, pushed = dev["run"].split("else")
+    assert dev["env"]["EVENT"] == "${{ github.event_name }}"
+    assert '"$EVENT" = "workflow_dispatch"' in by_hand and "%H:%M:%SZ" in by_hand
+    assert "$(date -u +%Y-%m-%d)" in pushed and "%H" not in pushed
+
+    release = moment("image.yml")
+    assert "%H:%M:%SZ" in release["run"] and "else" not in release["run"]
+
+
 @pytest.mark.parametrize("path", IMAGE_SCRIPTS, ids=lambda p: p.name)
 def test_a_script_that_builds_passes_the_moment_it_runs_at(path: Path):
     """A person scanning by hand wants the image a build would make now."""
