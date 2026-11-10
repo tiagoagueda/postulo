@@ -2696,11 +2696,56 @@
     return values;
   }
 
+  // zxcvbn is 1.7 MB of dictionaries, and most people who open a page with a password to
+  // choose were paying for it before touching the field (#1150). The page names the files
+  // on the meter's template and they are fetched here, once, when the field first has
+  // focus: `async = false` makes inserted scripts run in the order they were inserted.
+  // Whatever was typed while they were arriving is estimated when the last one has run, so
+  // nobody has to press another key; until then the meter says nothing, which is true.
+  var zxcvbnAsked = false;
+
+  function fetchZxcvbn() {
+    var template = document.getElementById("password-meter");
+    if (zxcvbnAsked || !template) {
+      return;
+    }
+    zxcvbnAsked = true;
+    var urls = (template.getAttribute("data-scripts") || "").split(/\s+/).filter(Boolean);
+    urls.forEach(function (url, index) {
+      var script = document.createElement("script");
+      script.src = url;
+      script.async = false;
+      if (index === urls.length - 1) {
+        script.addEventListener("load", function () {
+          document.querySelectorAll("input[data-password-meter]").forEach(estimatePassword);
+        });
+      }
+      document.head.appendChild(script);
+    });
+  }
+
+  // The display goes in on focus, before anything is written into it: a live region that
+  // is created and filled in the same task is not announced by every screen reader.
+  document.addEventListener("focusin", function (event) {
+    var input = event.target;
+    if (!input.matches || !input.matches("input[data-password-meter]")) {
+      return;
+    }
+    meterFor(input);
+    fetchZxcvbn();
+  });
+
+  // `input` as well as focus: a password manager can fill the field without focusing it.
   document.addEventListener("input", function (event) {
     var input = event.target;
     if (!input.matches || !input.matches("input[data-password-meter]")) {
       return;
     }
+    fetchZxcvbn();
+    estimatePassword(input);
+  });
+
+  function estimatePassword(input) {
     var display = meterFor(input);
     var checker = readyZxcvbn();
     if (!display || !checker) {
@@ -2743,7 +2788,7 @@
     var advice = result.feedback.warning || (result.feedback.suggestions || [])[0] || "";
     var wanted = pack && pack === reading && advice && result.score < 3;
     suggestion.textContent = wanted ? " · " + advice : "";
-  });
+  }
 
   // The panels that are not menus -- the column chooser, the saved views, the language
   // picker -- are <details> elements, which open and close themselves and are

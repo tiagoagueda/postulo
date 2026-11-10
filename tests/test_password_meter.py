@@ -34,6 +34,26 @@ def test_the_sign_up_form_carries_the_meter(client, settings):
     assert "at least 12 characters" in html, "Django's rules stay listed beneath the field"
 
 
+def test_the_dictionaries_are_named_on_the_page_and_not_loaded_with_it(client, settings):
+    """Opening sign-up fetched 1.7 MB of zxcvbn before anybody touched the field (#1150).
+
+    The three files were `<script>` elements, so everyone who opened a page with a password
+    to choose downloaded and compiled them, whether or not they typed one. The page now only
+    names them, in order, on the meter's template; the page script fetches them when the
+    field is first focused.
+    """
+    settings.POSTULO_REGISTRATION_OPEN = True
+    html = client.get(reverse("account_signup")).content.decode()
+    names = ("core.js", "language-common.js", "language-en.js")
+    for line in html.splitlines():
+        assert not ("<script" in line and "zxcvbn" in line), line
+    named = html.split('data-scripts="', 1)[1].split('"', 1)[0].split()
+    assert len(named) == 3, "core first, then the two dictionaries it is configured with"
+    for url, name in zip(named, names, strict=True):
+        assert url.startswith(settings.STATIC_URL + "js/vendor/zxcvbn/"), url
+        assert url.endswith(name), "the order is the order they must run in"
+
+
 def test_change_and_set_password_carry_the_meter(client):
     signed_in(client)
     change = client.get(reverse("account_change_password"), follow=True).content.decode()
