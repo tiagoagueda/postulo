@@ -201,7 +201,9 @@ def _problems(recorded: dict[str, str], ref: str, *, every_python: bool) -> list
             if not any(leg.match(context) for context in recorded):
                 problems.append(
                     f"no unit tests on Python {python} for {ref}: a push tests the newest "
-                    "Python only; start *Every Python* by hand on this commit for the rest"
+                    "Python only, and *Every Python* runs the rest by itself when a push to "
+                    "main changes the version or the lock file; wait for that run on this "
+                    "commit (one started by hand records no status this check can read)"
                 )
     return problems
 
@@ -215,8 +217,10 @@ def ci_problems(
     about the commit the tag points at, whichever branch it was pushed from.
 
     A push to `main` runs the unit tests on the newest Python alone, so a release also needs
-    a leg on every supported Python, which the *Every Python* workflow, started by hand on
-    the commit, provides (#713); ``every_python=False`` asks only what a push's own run answers.
+    a leg on every supported Python, which the *Every Python* workflow provides (#713). It
+    starts by itself on the push that changes the version (#1137); a run started by hand
+    records no commit status, so it can never answer this (#1189). ``every_python=False``
+    asks only what a push's own run answers.
     """
     recorded = _statuses(ref, server=server, repository=repository, token=token)
     return _problems(recorded, ref, every_python=every_python)

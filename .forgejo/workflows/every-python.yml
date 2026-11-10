@@ -3,10 +3,14 @@
 # `ci.yml` runs the unit tests on the newest supported Python alone, on every push: the
 # runner takes two jobs at a time, each leg cost twelve minutes of one, and in the fortnight
 # measured before the change the legs only ever failed together, on real faults. The older
-# Pythons the classifiers promise run here instead -- weekly, on every release branch, and
-# whenever somebody starts it by hand, which the release recipe in CONTRIBUTING.md does
-# before a tag. The release gate (`scripts/release_tools.py`) asks for a passed leg on every
-# supported Python, from either workflow.
+# Pythons the classifiers promise run here instead: weekly, and by themselves on a push to
+# `main` that changes the version or the lock file. The release gate
+# (`scripts/release_tools.py`) asks for a passed leg on every supported Python, from either
+# workflow, and it reads commit statuses, which only a run started by a push records.
+#
+# It can also be started by hand, to look: Forgejo records no commit status for such a run,
+# so the release gate never sees it, however green it is. Releasing 0.5.0 found that out
+# (#1189).
 #
 # A workflow of its own rather than a matrix that changes with the event, because this
 # Forgejo expands a matrix before it knows the event, and rather than legs skipped with a
@@ -16,18 +20,30 @@ name: Every Python
 
 on:
   push:
-    # Release branches only; `main` is `ci.yml`'s alone. Three numbers and two dots, as in
-    # `ci.yml`: the old `"[0-9]*"` matched every issue branch too (#940), and each push to
-    # one ran both legs here for nothing the release gate would ever read (#1033).
-    branches: ["[0-9]*.[0-9]*.[0-9]*"]
+    # `main`, and only when the push changes one of two files (#1137).
+    #
+    # The version file, which a release's pull request always changes (*Making a release*,
+    # step 3): its merge starts these legs on the very commit that will be tagged, so the
+    # release gate finds them without anybody starting anything.
+    #
+    # The lock file, so that a dependency which drops an older Python is found the day it
+    # lands and not the next Monday. About sixteen pushes a month, half an hour each.
+    #
+    # Not release branches any more: one `push:` holds one `branches`/`paths` pair, so the
+    # paths would narrow them too, and since #940 every release goes through `main`.
+    # Issue branches never: each push to one ran both legs here for nothing the release
+    # gate would ever read (#1033).
+    branches: [main]
+    paths:
+      - src/postulo/__init__.py
+      - uv.lock
   schedule:
     # The same morning as `weekly.yml`, half an hour after it.
     - cron: "47 6 * * 1"
   workflow_dispatch:
 
-# A newer push to the same release branch cancels the run it supersedes; `main`, which this
-# workflow sees only from the weekly run and by hand, is keyed on the commit and never
-# cancelled. `ci.yml` says why at more length (#1033).
+# `main` is keyed on the commit and never cancelled: the release gate reads each commit's
+# own statuses. `ci.yml` says why at more length (#1033).
 concurrency:
   group: >-
     ${{ github.workflow }}-${{ github.event_name }}-${{

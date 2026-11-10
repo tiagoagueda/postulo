@@ -95,7 +95,8 @@ npm run build:css            # only if you touched assets/css/ or a template's c
 
 Continuous integration runs the suite on Python 3.14 for every pull request and every push
 to `main` or a release branch, and on 3.12 and 3.13 in its *Every Python* workflow: weekly,
-on release branches, and whenever it is started by hand. The rest of the above runs once, in its *Checks* job, together with the catalogue checks,
+and on a push to `main` that changes the version or the lock file. (It can be started by hand
+too, to look; Forgejo records no status for such a run, so the release gate does not see it.) The rest of the above runs once, in its *Checks* job, together with the catalogue checks,
 `manage.py check --deploy` against production settings, and a check that the committed
 stylesheet has not drifted from its source. Coverage is measured on the 3.14 leg only, and
 `fail_under` in `pyproject.toml` is the floor it has to clear; run
@@ -713,9 +714,12 @@ End the entry with the issue it closes, in brackets: `(#42)`.
    both compose files name this minor.
 5. Commit steps 1b to 3b on a branch and open a pull request for them, as for any change
    (*How a change reaches main*); merge it once CI is green. The merge makes a new commit
-   on `main`, and CI runs again on it. That run tests the newest Python only, so start
-   *Actions → Every Python* on `main` as well, which runs the unit tests on the others, and
-   **wait for CI and Every Python to pass on the merged commit**. Then bring `main` down,
+   on `main`, and CI runs again on it. That run tests the newest Python only; *Every
+   Python* runs the unit tests on the others, and starts by itself on this merge, because
+   the merge changes the version in `src/postulo/__init__.py` (#1137). Do not start it by
+   hand: Forgejo records no commit status for a run started that way, so the release
+   workflow cannot see it, which is how 0.5.0 came to need a release branch pushed at the
+   last minute (#1189). **Wait for CI and Every Python to pass on the merged commit**. Then bring `main` down,
    tag that commit and push the tag (a tag is not a change to `main`, so it needs no pull
    request): `git switch main && git pull && git tag vX.Y.Z && git push origin vX.Y.Z`. The release workflow asks Forgejo for the
    tagged commit's statuses and refuses a tag on which any test leg, the browser job, the

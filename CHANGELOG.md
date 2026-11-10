@@ -12,12 +12,14 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🔧 Changed
 
+- Every Python runs by itself on a push to main that changes the version or the lock file, so a release needs nothing started by hand. (#1137)
 - The weekly scheduled run is the dependency audit and the ESCO check alone, in a workflow of its own, not the whole of CI. (#1136)
 - CI jobs that leave the browser tests' packages out no longer download them anyway on their first command. (#1135)
 - CI's security job audits the two lock files without installing the project or the asset build's packages. (#1166)
 
 ### 🐛 Fixed
 
+- The release recipe and the release check no longer ask for Every Python to be started by hand, a run the check could never see. (#1189)
 - The unit suite runs with Django's async-safety guard on again; the browser suite switches it off for itself alone. (#1160)
 - The monthly dependency run no longer ends red in a month when no dependency moved. (#1159)
 

@@ -436,16 +436,19 @@ def test_a_push_alone_does_not_make_a_release(monkeypatch):
         "no unit tests on Python 3.12",
         "no unit tests on Python 3.13",
     ]
-    assert all("start *Every Python* by hand" in p for p in problems), problems
+    assert all("*Every Python* runs the rest by itself" in p for p in problems), problems
+    # Starting it by hand is what the message used to ask for, and what cannot work (#1189).
+    assert all("started by hand records no status" in p for p in problems), problems
 
 
-def test_a_push_and_every_python_by_hand_make_a_release(monkeypatch):
+def test_a_push_and_every_python_on_the_same_commit_make_a_release(monkeypatch):
+    """The statuses a release's merge leaves: CI's, and Every Python's own push run (#1137)."""
     asking(
         monkeypatch,
         statuses(
             *PUSHED,
-            ("Every Python / Unit tests (Python 3.12) (workflow_dispatch)", "success"),
-            ("Every Python / Unit tests (Python 3.13) (workflow_dispatch)", "success"),
+            ("Every Python / Unit tests (Python 3.12) (push)", "success"),
+            ("Every Python / Unit tests (Python 3.13) (push)", "success"),
         ),
     )
 
@@ -538,9 +541,29 @@ def test_an_issue_branch_is_checked_by_its_pull_request_alone():
         assert not runs_on(every, branch), branch
     for branch in ("0.3.0", "0.10.0", "1.0.0"):
         assert runs_on(ci, branch), branch
-        assert runs_on(every, branch), branch
-    assert runs_on(ci, "main") and not runs_on(every, "main")
+    assert runs_on(ci, "main")
     assert "pull_request" in triggers("ci.yml")
+
+
+def test_every_python_starts_by_itself_on_the_push_a_release_is_tagged_from():
+    """A release's pull request changes the version file, so its merge into `main` starts the
+    older Pythons on the commit that will be tagged, with statuses the gate can read. Before
+    this the recipe said to start the workflow by hand, and Forgejo records no commit status
+    for a run started that way: the gate could not see it (#1137, #1189).
+
+    The lock file starts it too, so a dependency that drops an older Python fails that day."""
+    import yaml
+
+    workflow = yaml.safe_load(
+        (ROOT / ".forgejo" / "workflows" / "every-python.yml").read_text(encoding="utf-8")
+    )
+    push = workflow[True]["push"]
+
+    assert push["branches"] == ["main"]
+    assert sorted(push["paths"]) == ["src/postulo/__init__.py", "uv.lock"]
+    assert (ROOT / "src" / "postulo" / "__init__.py").is_file()
+    assert "__version__" in (ROOT / "src" / "postulo" / "__init__.py").read_text(encoding="utf-8")
+    assert "schedule" in workflow[True], "the weekly run stays"
 
 
 def test_a_superseded_run_is_cancelled_and_main_never_is():

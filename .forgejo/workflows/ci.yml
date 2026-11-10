@@ -253,8 +253,8 @@ jobs:
       fail-fast: false
       matrix:
         # The newest Python alone, on every push (#713). The older ones the project supports
-        # run the same job in `every-python.yml`, weekly, on release branches and when started
-        # by hand; a release needs them all (`scripts/release_tools.py`). In the measured
+        # run the same job in `every-python.yml`, weekly and on a push to `main` that changes
+        # the version or the lock; a release needs them all (`scripts/release_tools.py`). In the measured
         # fortnight before this the three legs only ever failed together, on real faults.
         # Not a matrix computed from the event: this Forgejo expands a matrix before it knows
         # the event, so such an expression always takes its last branch (#713).
