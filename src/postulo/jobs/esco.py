@@ -35,8 +35,19 @@ few megabytes, and a repository is not where reference data that size is kept. S
 still no step in a request that reaches for the internet to ask what a word means.
 Without the file Postulo runs on: a title matches no code and the title box offers
 nothing, which is the same state as a title that matches nothing, and not a failure.
-The revision is recorded inside the file, so whatever ``esco-*.json`` is in the
+The revision is recorded inside the file, so whatever ``esco-occupations-*.zip`` is in the
 directory is what the loader reads.
+
+**The names are read a language at a time (#1110).** The file was one JSON document, and
+reading it put every name in all 28 languages in each process to answer a reader in one:
+fifteen megabytes held, thirty at the peak. So it is a zip, as the skills are: one member
+says how the classification is built -- the revision, the languages, each unit group's
+major group, each occupation's unit group and NACE divisions -- and there is a member of
+names per language, in the same order. `classification` holds the first, and a language's
+names are read when somebody first reads in it, with the English ones that stand in where
+it has none. An ``esco-<revision>.json``, which is what a release before this one
+downloaded, is still read where there is no zip, the same way and at the cost of parsing it
+once per language; the next ``manage.py fetch_esco`` replaces it.
 
 **The terms are EUPL 1.2**, as the ESCO services publish them; ``data/ESCO-LICENCE.md``
 says on whose terms, with the attribution and the changes, the way NACE's does.
@@ -56,8 +67,8 @@ type rather than guessed at afterwards.
 **The skills are a file of their own, and never in memory all at once.** 13,939 skills in
 28 languages are about fifteen megabytes of names, and parsed as one JSON document they
 would put every language in memory to answer one reader. So ``fetch_esco`` writes
-``esco-skills-<revision>.zip`` beside the occupations: a zip rather than a JSON file, whose
-name the occupations' guard therefore does not match, with a guard of its own refusing two.
+``esco-skills-<revision>.zip`` beside the occupations: a zip, under a name the occupations'
+guard does not match, with a guard of its own refusing two.
 Inside it are the identifiers, one per line and sorted, and one member per language whose
 line *n* is the name of identifier *n*, empty where the classification publishes none. A
 language is read when somebody first needs it -- the reader's, the record's, the one a CV
@@ -106,35 +117,156 @@ ABSENT = {
     "occupations": {},
 }
 
+#: What the files are called in the data directory: the occupations with their unit groups,
+#: the same as a release before #1110 downloaded them, and the skills.
+OCCUPATIONS_PATTERN = "esco-occupations-*.zip"
+LEGACY_PATTERN = "esco-*.json"
+SKILLS_PATTERN = "esco-skills-*.zip"
+
+#: The members of ``esco-occupations-<revision>.zip``: what the file says about itself and
+#: how the classification is built, and a member of names per language. A member of names
+#: is ``{"unit_groups": [...], "occupations": [...]}``, each list in the order the first
+#: member keeps its entries and empty where the classification publishes no name.
+OCCUPATIONS_ABOUT = "about.json"
+OCCUPATIONS_NAMES = "names/{language}.json"
+
+#: The two kinds of entry the classification holds, as the file and a member of names key
+#: them.
+KINDS = ("unit_groups", "occupations")
+
+#: How many languages' names are held as the file has them: the one being read and English,
+#: which stands in where it has none. They are what a language's matching is built from,
+#: once, and a third of a megabyte each (measured on v1.2.1) that nothing asks for again; a
+#: language that has left and is wanted for something not yet built is read again.
+NAMES_HELD = 2
+
 #: Once is enough to say the file is not there; the absence is not an error to repeat.
 _warned = False
+
+#: And once to say it is the file of an earlier release.
+_warned_legacy = False
 
 
 def data_file() -> Path | None:
     """The classification in the data directory, or None where it has not been downloaded.
 
-    One revision at a time: ``manage.py fetch_esco`` writes ``esco-<revision>.json`` and
-    deletes the one it replaces, so two files, which only a hand-filled directory has, are a
-    state to be reported (`postulo.jobs.checks` does it at start-up), not a choice to be made.
+    One revision at a time: ``manage.py fetch_esco`` writes
+    ``esco-occupations-<revision>.zip`` and deletes the one it replaces, so two files, which
+    only a hand-filled directory has, are a state to be reported (`postulo.jobs.checks` does
+    it at start-up), not a choice to be made.
+
+    The ``esco-<revision>.json`` of a release before #1110 is what is read where there is no
+    zip, so an instance that has just been upgraded keeps its codes; beside a zip it is what
+    ``fetch_esco`` is about to delete, and is not read.
     """
-    files = sorted(DATA_DIR.glob("esco-*.json"))
-    if len(files) > 1:
-        names = ", ".join(file.name for file in files)
-        raise RuntimeError(
-            f"two ESCO classifications in {DATA_DIR} ({names}); delete the one being replaced"
-        )
-    return files[0] if files else None
+    for pattern in (OCCUPATIONS_PATTERN, LEGACY_PATTERN):
+        files = sorted(DATA_DIR.glob(pattern))
+        if len(files) > 1:
+            names = ", ".join(file.name for file in files)
+            raise RuntimeError(
+                f"two ESCO classifications in {DATA_DIR} ({names}); delete the one being replaced"
+            )
+        if files:
+            return files[0]
+    return None
+
+
+def is_legacy(path: Path | None) -> bool:
+    """Whether ``path`` is the classification as a release before #1110 downloaded it."""
+    return path is not None and path.suffix == ".json"
+
+
+def structure_of(document: dict) -> dict:
+    """A whole classification less its names: what `classification` holds, and what
+    ``manage.py fetch_esco`` writes as the first member of the file."""
+    return {
+        **document,
+        **{
+            kind: {
+                code: {key: value for key, value in entry.items() if key != "names"}
+                for code, entry in document[kind].items()
+            }
+            for kind in KINDS
+        },
+    }
+
+
+def names_of(document: dict, language: str) -> dict[str, list[str]]:
+    """One language's names out of a whole classification: a member of names, as
+    ``manage.py fetch_esco`` writes it and `_names` reads it."""
+    return {
+        kind: [entry.get("names", {}).get(language) or "" for entry in document[kind].values()]
+        for kind in KINDS
+    }
+
+
+def _stamped(path: Path, name: str = "") -> tuple[tuple, str]:
+    """One member of a file ``manage.py fetch_esco`` wrote, as text, and what tells that file
+    from one that replaces it: its name, when it was written and its size.
+
+    The member is empty where the file has none of that name; with no name, the text is the
+    file's own, which is how the ``.json`` of an earlier release is read. The file is asked
+    what it is through the handle it is read by, so the answer is about what was read.
+    """
+    with path.open("rb") as handle:
+        status = os.fstat(handle.fileno())
+        stamp = (path.name, status.st_mtime_ns, status.st_size)
+        if not name:
+            return stamp, handle.read().decode("utf-8")
+        with zipfile.ZipFile(handle) as archive:
+            try:
+                return stamp, archive.read(name).decode("utf-8")
+            except KeyError:
+                return stamp, ""
+
+
+def _member(path: Path | None, name: str) -> str:
+    """One member of a file ``manage.py fetch_esco`` wrote, as text; empty where the file or
+    the member is not. The occupations and the skills are both read through `_stamped`."""
+    return _stamped(path, name)[1] if path is not None else ""
+
+
+def _part(language: str = "") -> tuple[tuple, dict]:
+    """One part of the occupations file, and what tells the file it came out of from another:
+    how the classification is built, or, for a ``language``, the names in it.
+
+    Nothing, told by nothing, where there is no file. An earlier release's file is parsed
+    whole for each part and only the part is kept, so it costs a parse per language read
+    rather than every language held.
+    """
+    global _warned_legacy
+    for _look in range(2):
+        path = data_file()
+        if path is None:
+            break
+        try:
+            if not is_legacy(path):
+                member = OCCUPATIONS_NAMES.format(language=language) if language else ""
+                stamp, text = _stamped(path, member or OCCUPATIONS_ABOUT)
+                return stamp, json.loads(text or "{}")
+            stamp, text = _stamped(path)
+        except FileNotFoundError:
+            # Replaced between being listed and being opened: its replacement is there now.
+            continue
+        if not _warned_legacy:
+            _warned_legacy = True
+            logger.warning(
+                "The ESCO classification in %s is %s, the file an earlier release of Postulo "
+                "downloaded, which is read whole for each language. Run 'manage.py "
+                "fetch_esco' to replace it.",
+                DATA_DIR,
+                path.name,
+            )
+        document = json.loads(text)
+        return stamp, names_of(document, language) if language else structure_of(document)
+    return (), {}
 
 
 @lru_cache(maxsize=1)
-def classification() -> dict:
-    """The whole file: the revision, the languages, the unit groups, the occupations.
-
-    The empty document where the file has not been downloaded; ``manage.py fetch_esco``
-    is how it gets there.
-    """
-    path = data_file()
-    if path is None:
+def _structure() -> tuple[tuple, dict]:
+    """What `classification` answers, and which file it was read out of."""
+    stamp, document = _part()
+    if not stamp:
         global _warned
         if not _warned:
             _warned = True
@@ -143,8 +275,73 @@ def classification() -> dict:
                 "code and the title box offers no unit groups. Run 'manage.py fetch_esco' "
                 "to download it in place."
             )
-        return ABSENT
-    return json.loads(path.read_text(encoding="utf-8"))
+    return stamp, document or ABSENT
+
+
+def classification() -> dict:
+    """How the classification is built, and none of its names (#1110): the revision, the
+    languages, each unit group's major group, each occupation's unit group and NACE divisions.
+
+    The names are read a language at a time, by `_names`. The empty document where the file
+    has not been downloaded; ``manage.py fetch_esco`` is how it gets there.
+    """
+    return _structure()[1]
+
+
+@lru_cache(maxsize=NAMES_HELD)
+def _names(language: str) -> tuple[tuple, tuple[str, ...], tuple[str, ...]]:
+    """One language's names as the file has them, after which file that was: the unit
+    groups' and then the occupations', each in the order `classification` keeps its entries
+    and empty where the classification publishes none.
+
+    Read when somebody first needs the language, and only that member of the file (#1110).
+    A language the file has no member for has no names here, and reads the English.
+    """
+    stamp, found = _part(language)
+    return stamp, tuple(found.get(KINDS[0]) or ()), tuple(found.get(KINDS[1]) or ())
+
+
+def _held(reading: str) -> tuple[dict, tuple, tuple]:
+    """How the classification is built, and its names in ``reading`` and in English as
+    ``(unit groups, occupations)``, all three out of one file.
+
+    The three are read when each is first needed, and ``manage.py fetch_esco`` may replace
+    the file in between on an instance that is running, which is how an instance gets its
+    next revision. The names of one revision would then be laid against the entries of
+    another. So each part remembers the file it came out of, and where they differ
+    everything this process holds is dropped and read again: it moves to the new file
+    whole, rather than answering from two.
+    """
+    for _attempt in range(2):
+        stamp, document = _structure()
+        names, english = _names(reading), _names(FALLBACK)
+        if names[0] == english[0] == stamp:
+            break
+        forget()
+    else:
+        raise RuntimeError(f"the ESCO classification in {DATA_DIR} changed while it was read")
+
+    def fitted(columns) -> tuple:
+        fit = []
+        for kind, column in zip(KINDS, columns, strict=True):
+            column = column or ("",) * len(document[kind])
+            if len(column) != len(document[kind]):
+                raise RuntimeError(f"{data_file()} is not a file 'manage.py fetch_esco' wrote")
+            fit.append(column)
+        return tuple(fit)
+
+    return document, fitted(names[1:]), fitted(english[1:])
+
+
+@lru_cache(maxsize=32)
+def _unit_group_names(reading: str) -> dict[str, str]:
+    """``{code: name}`` for every unit group, in code order, as one language reads them: the
+    English name where the language has none, and empty where there is neither."""
+    document, (names, _occupations), (english, _english_occupations) = _held(reading)
+    return {
+        code: name or fallback
+        for code, name, fallback in zip(document["unit_groups"], names, english, strict=True)
+    }
 
 
 def revision() -> str:
@@ -170,11 +367,7 @@ def _reading(language: str = "") -> str:
 
 def unit_groups(language: str = "") -> list[tuple[str, str]]:
     """Every ISCO-08 unit group as ``(code, name)``, in code order, in the reader's language."""
-    reading = _reading(language)
-    return [
-        (code, entry["names"].get(reading) or entry["names"].get(FALLBACK, code))
-        for code, entry in classification()["unit_groups"].items()
-    ]
+    return [(code, name or code) for code, name in _unit_group_names(_reading(language)).items()]
 
 
 def name_for(code: str, language: str = "") -> str:
@@ -183,11 +376,7 @@ def name_for(code: str, language: str = "") -> str:
     Empty rather than the code, because a code that has gone from a later revision belongs
     to a person's record that keeps its name — it is not something to print at them.
     """
-    entry = classification()["unit_groups"].get(code)
-    if entry is None:
-        return ""
-    reading = _reading(language)
-    return entry["names"].get(reading) or entry["names"].get(FALLBACK, "")
+    return _unit_group_names(_reading(language)).get(code, "")
 
 
 def major_of(code: str) -> str:
@@ -218,9 +407,9 @@ def _occupations_by_name(reading: str) -> dict[str, str]:
     better than an arbitrary one.
     """
     groups: dict[str, set[str]] = {}
-    for entry in classification()["occupations"].values():
-        label = entry["names"].get(reading) or entry["names"].get(FALLBACK, "")
-        for folded in _forms(label):
+    document, (_groups, names), (_english_groups, english) = _held(reading)
+    for entry, name, fallback in zip(document["occupations"].values(), names, english, strict=True):
+        for folded in _forms(name or fallback):
             groups.setdefault(folded, set()).add(entry["isco"])
     return {name: next(iter(found)) for name, found in groups.items() if len(found) == 1}
 
@@ -228,10 +417,7 @@ def _occupations_by_name(reading: str) -> dict[str, str]:
 @lru_cache(maxsize=32)
 def _unit_groups_by_name(reading: str) -> dict[str, str]:
     """``{folded unit group name: code}`` for one language, the level the picker offers."""
-    return {
-        _fold(entry["names"].get(reading) or entry["names"].get(FALLBACK, "")): code
-        for code, entry in classification()["unit_groups"].items()
-    }
+    return {_fold(name): code for code, name in _unit_group_names(reading).items()}
 
 
 def code_for(name: str, language: str = "") -> str:
@@ -339,29 +525,17 @@ _warned_skills = False
 def skills_file() -> Path | None:
     """The skills in the data directory, or None where they have not been downloaded.
 
-    One revision at a time, for the reason `data_file` gives. ``esco-*.json`` does not match
-    this file's name, so the occupations' guard stays what it was, and this is the same
-    guard for the skills.
+    One revision at a time, for the reason `data_file` gives. Neither of the occupations'
+    patterns matches this file's name, so their guard stays what it was, and this is the
+    same guard for the skills.
     """
-    files = sorted(DATA_DIR.glob("esco-skills-*.zip"))
+    files = sorted(DATA_DIR.glob(SKILLS_PATTERN))
     if len(files) > 1:
         names = ", ".join(file.name for file in files)
         raise RuntimeError(
             f"two ESCO skills files in {DATA_DIR} ({names}); delete the one being replaced"
         )
     return files[0] if files else None
-
-
-def _member(name: str) -> str:
-    """One member of the skills file, as text; empty where the file or the member is not."""
-    path = skills_file()
-    if path is None:
-        return ""
-    with zipfile.ZipFile(path) as archive:
-        try:
-            return archive.read(name).decode("utf-8")
-        except KeyError:
-            return ""
 
 
 @lru_cache(maxsize=1)
@@ -381,7 +555,7 @@ def skills_about() -> dict:
                 "place."
             )
         return ABSENT_SKILLS
-    return json.loads(_member(SKILLS_ABOUT) or "null") or ABSENT_SKILLS
+    return json.loads(_member(skills_file(), SKILLS_ABOUT) or "null") or ABSENT_SKILLS
 
 
 def skills_available() -> bool:
@@ -403,7 +577,7 @@ def _skill_identifiers() -> tuple[str, ...]:
     """
     if not skills_available():
         return ()
-    identifiers = tuple(_member(SKILLS_IDENTIFIERS).split("\n"))
+    identifiers = tuple(_member(skills_file(), SKILLS_IDENTIFIERS).split("\n"))
     if any(later <= earlier for earlier, later in pairwise(identifiers)):
         raise RuntimeError(f"{skills_file()} is not a file 'manage.py fetch_esco' wrote")
     return identifiers
@@ -426,7 +600,8 @@ def _skill_names(language: str) -> tuple[str, ...]:
     identifiers = _skill_identifiers()
     if not identifiers or language not in skills_about()["languages"]:
         return ()
-    names = tuple(_member(SKILLS_NAMES.format(language=language)).split("\n"))
+    member = SKILLS_NAMES.format(language=language)
+    names = tuple(_member(skills_file(), member).split("\n"))
     if len(names) != len(identifiers):
         raise RuntimeError(f"{skills_file()} is not a file 'manage.py fetch_esco' wrote")
     return names
@@ -559,9 +734,11 @@ def forget() -> None:
     For the tests, which point `DATA_DIR` somewhere else, and for anything that has just
     replaced a file and wants the new one read rather than the one held.
     """
-    global _warned, _warned_skills
+    global _warned, _warned_legacy, _warned_skills
     for cached in (
-        classification,
+        _structure,
+        _names,
+        _unit_group_names,
         _occupations_by_name,
         _unit_groups_by_name,
         _divisions_by_group,
@@ -571,4 +748,4 @@ def forget() -> None:
         _skill_order,
     ):
         cached.cache_clear()
-    _warned = _warned_skills = False
+    _warned = _warned_legacy = _warned_skills = False

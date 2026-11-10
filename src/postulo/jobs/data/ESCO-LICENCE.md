@@ -2,12 +2,16 @@
 
 Postulo keeps a copy of the ESCO classification in `src/postulo/jobs/data/`, in two files:
 
-- `esco-<revision>.json`: the **ISCO-08** unit groups that structure the **ESCO**
+- `esco-occupations-<revision>.zip`: the **ISCO-08** unit groups that structure the **ESCO**
   classification — the European Commission's classification of skills, competences,
   qualifications and occupations — and the ESCO occupations mapped to them, with the name
   of each in every language the classification is published in. (The counts and the
   language list are pinned by `tests/test_esco.py`, against the published shape of v1.2.1:
-  3,039 occupations, 436 unit groups, 28 languages.)
+  3,039 occupations, 436 unit groups, 28 languages.) About 1 MB as it is kept, compressed:
+  one member says how the classification is built and each language's names are a member
+  of their own, so one language's names are read at a time (#1110). Releases before that
+  kept it as one document, `esco-<revision>.json`, which is still read where it is the
+  file an instance holds, and which the next run of the command replaces.
 - `esco-skills-<revision>.zip`: the ESCO **skills**, the class the classification's API
   names `skill`, which holds the knowledge concepts beside the skills and competences —
   13,939 of them in v1.2.1 — each as its identifier and its preferred name in each of the
@@ -62,8 +66,8 @@ web-service API — the machine-facing access the ESCO services document, on the
 under *Use ESCO → Use ESCO Services (API)* — for every unit group, occupation and skill in
 every language, checks the answer against the shape the loader reads, and writes both files
 beside the code that reads them, or neither. The revision is recorded inside each file
-rather than in a variable name, so whatever `esco-*.json` and `esco-skills-*.zip` are in
-`data/` are what runs. There is still no step in a request that reaches for the internet
+rather than in a variable name, so whatever `esco-occupations-*.zip` and
+`esco-skills-*.zip` are in `data/` are what runs. There is still no step in a request that reaches for the internet
 for reference data, and without the files Postulo runs on with no codes and no recognised
 skills. To replace them: run the command with the next version, bump the tests to the
 revision they now hold, and delete the files being replaced — a code or a skill a person's

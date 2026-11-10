@@ -27,7 +27,7 @@ from postulo.jobs import esco
 from postulo.resume import candidate, importing, translating
 from postulo.resume.models import Skill, SkillGroup, Translation
 
-from .conftest import ESCO_SKILLS, write_esco_skills
+from .conftest import ESCO_SKILLS, write_esco_occupations, write_esco_skills
 
 #: The suggestions are counted in the cache, and the cache is a table.
 pytestmark = pytest.mark.django_db
@@ -65,10 +65,14 @@ def test_without_the_file_a_skill_matches_nothing_and_nothing_is_offered(no_esco
 
 
 def test_the_skills_file_leaves_the_occupations_guard_as_it_was(esco_skills):
-    """The occupations' loader refuses two `esco-*.json`; the skills are not one of those,
-    and have a guard of their own."""
+    """The occupations' loader refuses two `esco-occupations-*.zip`, or two of the
+    `esco-*.json` an earlier release downloaded; the skills are neither, and have a guard of
+    their own."""
+    assert esco.data_file() is None, "the skills are not taken for the occupations"
     (esco_skills / "esco-9.9.9.json").write_text(json.dumps(esco.ABSENT), encoding="utf-8")
     assert esco.data_file().name == "esco-9.9.9.json"
+    write_esco_occupations(esco_skills, {})
+    assert esco.data_file().name == "esco-occupations-9.9.9.zip"
     assert esco.skills_file().name == "esco-skills-9.9.9.zip"
 
     write_esco_skills(esco_skills, revision="9.9.10")

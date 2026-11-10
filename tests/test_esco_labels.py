@@ -11,11 +11,12 @@ import pytest
 
 from postulo.jobs import esco
 
+from .conftest import write_esco_occupations
+
 
 @pytest.fixture
-def classification(monkeypatch):
+def classification(tmp_path, monkeypatch):
     document = {
-        "revision": "test",
         "languages": ["en", "fr"],
         "unit_groups": {
             "2512": {"names": {"en": "Software developers", "fr": "Développeurs de logiciels"}},
@@ -37,12 +38,12 @@ def classification(monkeypatch):
             "e": {"isco": "5132", "names": {"en": "bar server", "fr": "serveur de salle"}},
         },
     }
-    monkeypatch.setattr(esco, "classification", lambda: document)
-    esco._occupations_by_name.cache_clear()
-    esco._unit_groups_by_name.cache_clear()
+    # As a file, the way the loader reads one: the names are a member per language (#1110).
+    write_esco_occupations(tmp_path, document, revision="test")
+    monkeypatch.setattr(esco, "DATA_DIR", tmp_path)
+    esco.forget()
     yield
-    esco._occupations_by_name.cache_clear()
-    esco._unit_groups_by_name.cache_clear()
+    esco.forget()
 
 
 def test_either_form_of_a_gendered_label_finds_its_code(classification):

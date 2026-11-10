@@ -375,6 +375,21 @@ def write_esco_skills(directory, skills=None, revision: str = "9.9.9"):
     return target
 
 
+def write_esco_occupations(directory, document, revision: str = "9.9.9"):
+    """Write an occupations file into ``directory`` the way `fetch_esco` writes one.
+
+    ``document`` is the classification whole, each entry with its ``names`` by language, as
+    the harvest assembles it; what it leaves out is filled in as the absent document has it.
+    """
+    from postulo.jobs import esco
+    from postulo.jobs.management.commands import fetch_esco
+
+    whole = {**esco.ABSENT, "revision": f"ESCO v{revision}", **document}
+    target = directory / f"esco-occupations-{revision}.zip"
+    fetch_esco.write_occupations(target, whole)
+    return target
+
+
 @pytest.fixture
 def esco_skills(tmp_path, monkeypatch):
     """The ESCO skills, as the small file above, where the loader looks for them.

@@ -362,9 +362,9 @@ def classified(tmp_path, monkeypatch):
     Written here rather than read from the download, which a checkout does not have: the
     question is how a reader's language is matched to the file's, not what the file says.
     """
-    import json
-
     from postulo.jobs import esco
+
+    from .conftest import write_esco_occupations
 
     names = {
         "en": "Systems analysts",
@@ -372,12 +372,10 @@ def classified(tmp_path, monkeypatch):
         "pt": "Analistas de sistemas",
     }
     document = {
-        **esco.ABSENT,
-        "revision": "ESCO for a test",
         "languages": sorted(names),
         "unit_groups": {"2511": {"major": "2", "names": names}},
     }
-    (tmp_path / "esco-0.json").write_text(json.dumps(document), encoding="utf-8")
+    write_esco_occupations(tmp_path, document, revision="0")
     monkeypatch.setattr(esco, "DATA_DIR", tmp_path)
     esco.forget()
     yield names

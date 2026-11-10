@@ -118,14 +118,49 @@ def test_an_english_occupation_name_finds_its_unit_group():
     """The matching that makes a French listing and a Portuguese CV comparable: the title
     is found among the occupation names, and the unit group it belongs to is the code.
     """
-    document = esco.classification()
+    entries = esco.classification()["occupations"].values()
+    _file, _unit_groups, names = esco._names("en")
+    assert len(names) == len(entries) == 3039 and all(names)
     groups: dict[str, set[str]] = {}
-    for entry in document["occupations"].values():
-        groups.setdefault(entry["names"]["en"], set()).add(entry["isco"])
-    for entry in document["occupations"].values():
+    for entry, name in zip(entries, names, strict=True):
+        groups.setdefault(name, set()).add(entry["isco"])
+    for entry, name in zip(entries, names, strict=True):
         # A name that sits in two unit groups has no code from the occupations (#533).
-        if len(groups[entry["names"]["en"]]) == 1:
-            assert esco.code_for(entry["names"]["en"], "en") == entry["isco"]
+        if len(groups[name]) == 1:
+            assert esco.code_for(name, "en") == entry["isco"]
+
+
+def test_a_process_holds_how_it_is_built_and_the_names_it_reads_and_no_more(monkeypatch):
+    """The whole classification was one document, parsed and kept in every process: 6.3 MB
+    of names in 28 languages, 14.6 MB held and twice that at the peak, to answer a reader in
+    one (#1110). What is held is how it is built, without a name in it, and a French reader
+    costs the French names and the English that stand in for a missing one, each read once.
+    """
+    read = []
+    stamped = esco._stamped
+
+    def watched(path, name=""):
+        read.append(name or path.name)
+        return stamped(path, name)
+
+    monkeypatch.setattr(esco, "_stamped", watched)
+    esco.forget()
+    try:
+        for _again in range(2):
+            assert esco.name_for("2511", "fr") == "Analystes de systèmes"
+            assert esco.code_for("Analystes de systèmes", "fr-FR") == "2511"
+            assert esco.code_for("systems analysts", "fr") == "2511"
+            assert len(esco.suggestions(language="fr")) == 436
+
+        document = esco.classification()
+        assert all("names" not in entry for kind in esco.KINDS for entry in document[kind].values())
+        if esco.is_legacy(esco.data_file()):
+            # The file an earlier release downloaded: parsed once for each of the three.
+            assert read == [esco.data_file().name] * 3
+        else:
+            assert sorted(read) == ["about.json", "names/en.json", "names/fr.json"]
+    finally:
+        esco.forget()
 
 
 def test_the_suggestions_are_the_unit_groups_and_only_them():

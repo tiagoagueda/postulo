@@ -86,7 +86,8 @@ env:
   UV_INSTALLER_SHA256: "37b82230b28617c6c24fa52364fa28aa37f2aa40c114809a623f6b064a9730e5"
   # The ESCO revision the unit legs download, and the key their copy of it is kept under:
   # the loader refuses a directory holding two revisions (`jobs/esco.py`), so the key is the
-  # revision and nothing else (#714).
+  # revision and nothing else (#714) but the layout of the files, `zip` since the occupations
+  # became one too: a copy kept as the `.json` they were is not what the legs test (#1110).
   ESCO_REVISION: "1.2.1"
 
 jobs:
@@ -356,9 +357,9 @@ jobs:
         continue-on-error: true
         with:
           path: |
-            src/postulo/jobs/data/esco-${{ env.ESCO_REVISION }}.json
+            src/postulo/jobs/data/esco-occupations-${{ env.ESCO_REVISION }}.zip
             src/postulo/jobs/data/esco-skills-${{ env.ESCO_REVISION }}.zip
-          key: esco-${{ env.ESCO_REVISION }}
+          key: esco-zip-${{ env.ESCO_REVISION }}
         timeout-minutes: 10
 
       - name: Download the ESCO classification

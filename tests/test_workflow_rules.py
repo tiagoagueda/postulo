@@ -136,6 +136,26 @@ def test_the_weekly_esco_check_downloads_and_reads_no_cache():
         assert env[pin] == workflows()["ci.yml"]["env"][pin], pin
 
 
+def test_the_unit_jobs_keep_the_files_fetch_esco_writes_and_not_an_earlier_layout():
+    """The occupations became a zip (#1110). A unit job that still kept `esco-<revision>.json`
+    would find its copy and skip the download, and every run would test the loader on the file
+    of an earlier release; kept under the key that file was kept under, the same."""
+    from postulo.jobs import esco
+
+    revision = "${{ env.ESCO_REVISION }}"
+    written = sorted(
+        f"src/postulo/jobs/data/{pattern.replace('*', revision)}"
+        for pattern in (esco.OCCUPATIONS_PATTERN, esco.SKILLS_PATTERN)
+    )
+    for name in ("ci.yml", "every-python.yml"):
+        steps = workflows()[name]["jobs"]["test"]["steps"]
+        (kept,) = [step for step in steps if step.get("id") == "esco"]
+
+        assert sorted(kept["with"]["path"].splitlines()) == written, name
+        assert kept["with"]["key"] not in ("esco-" + revision, ""), name
+        assert revision in kept["with"]["key"], name
+
+
 # ------------------------------------ no step waits for ever on the network (#1138)
 
 #: What a step's text holds when it reaches the network to set a job up.

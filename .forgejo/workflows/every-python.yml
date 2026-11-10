@@ -167,9 +167,9 @@ jobs:
         continue-on-error: true
         with:
           path: |
-            src/postulo/jobs/data/esco-${{ env.ESCO_REVISION }}.json
+            src/postulo/jobs/data/esco-occupations-${{ env.ESCO_REVISION }}.zip
             src/postulo/jobs/data/esco-skills-${{ env.ESCO_REVISION }}.zip
-          key: esco-${{ env.ESCO_REVISION }}
+          key: esco-zip-${{ env.ESCO_REVISION }}
         timeout-minutes: 10
 
       - name: Download the ESCO classification

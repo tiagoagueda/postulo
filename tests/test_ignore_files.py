@@ -18,10 +18,15 @@ from postulo.jobs import places
 ROOT = Path(__file__).resolve().parents[1]
 DATA = "src/postulo/jobs/data"
 
-#: Every file the two fetch commands leave in the data directory, or write on the way.
+#: Every file the two fetch commands leave in the data directory, or write on the way. The
+#: `.json` is the occupations as a release before #1110 downloaded them, which a checkout
+#: may still hold.
 DOWNLOADED = (
-    "esco-1.2.1.json",
+    "esco-occupations-1.2.1.zip",
     "esco-skills-1.2.1.zip",
+    "esco-occupations-1.2.1.zip.tmp",
+    "esco-skills-1.2.1.zip.tmp",
+    "esco-1.2.1.json",
     "esco-1.2.1.json.tmp",
     places.CITIES_FILE,
     places.COUNTRIES_FILE,

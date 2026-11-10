@@ -189,12 +189,25 @@ def harvest(monkeypatch):
     return run
 
 
+def written(directory, revision="9.9.9") -> dict:
+    """The classification the command wrote, put back together whole: how it is built, and
+    each entry's names out of the members that keep them a language at a time (#1110)."""
+    with zipfile.ZipFile(directory / f"esco-occupations-{revision}.zip") as archive:
+        document = json.loads(archive.read(esco.OCCUPATIONS_ABOUT))
+        for language in document["languages"]:
+            names = json.loads(archive.read(esco.OCCUPATIONS_NAMES.format(language=language)))
+            for kind in esco.KINDS:
+                for entry, name in zip(document[kind].values(), names[kind], strict=True):
+                    assert "names" not in entry or language not in entry["names"]
+                    if name:
+                        entry.setdefault("names", {})[language] = name
+    return document
+
+
 def test_the_harvest_is_reshaped_to_the_shape_the_loader_reads(data_dir, harvest):
     harvest(tables())
 
-    path = data_dir / "esco-9.9.9.json"
-    assert path.exists()
-    document = json.loads(path.read_text(encoding="utf-8"))
+    document = written(data_dir)
     assert list(document) == [
         "revision",
         "source",
@@ -235,7 +248,7 @@ def test_the_occupations_are_searched_in_full_and_keep_their_nace_divisions(data
 
     client = harvest(pages)
 
-    document = json.loads((data_dir / "esco-9.9.9.json").read_text(encoding="utf-8"))
+    document = written(data_dir)
     assert document["occupations"]["2512.1.1"]["nace"] == ["62", "63"]
     assert document["occupations"]["2512.1.1"]["names"] == {
         "en": "Software developer",
@@ -251,7 +264,7 @@ def test_the_occupations_are_searched_in_full_and_keep_their_nace_divisions(data
 def test_the_occupations_are_indexed_within_their_unit_group(data_dir, harvest):
     harvest(tables())
 
-    document = json.loads((data_dir / "esco-9.9.9.json").read_text(encoding="utf-8"))
+    document = written(data_dir)
     assert sorted(document["occupations"]) == ["2511.1", "2512.1", "2512.1.1"]
 
 
@@ -287,7 +300,7 @@ def test_a_refusal_is_reported_with_the_apis_answer(data_dir, harvest):
 def test_the_revision_is_asked_with_the_prefix_the_api_wants(data_dir, harvest):
     client = harvest(tables("v1.2.1"), revision="1.2.1")
 
-    assert (data_dir / "esco-1.2.1.json").exists()
+    assert (data_dir / "esco-occupations-1.2.1.zip").exists()
     assert (data_dir / "esco-skills-1.2.1.zip").exists()
     assert {request["selectedVersion"] for request in client.requests} == {"v1.2.1"}
     assert {request.get("isInScheme") or request["type"] for request in client.requests} == {
@@ -318,7 +331,7 @@ def test_the_pages_are_followed_until_the_total_is_in(data_dir, harvest, monkeyp
     }
 
     client = harvest(pages)
-    document = json.loads((data_dir / "esco-9.9.9.json").read_text(encoding="utf-8"))
+    document = written(data_dir)
     assert sorted(document["unit_groups"]) == ["2511", "2512"]
     assert sorted(document["occupations"]) == ["2511.1", "2512.1", "2512.1.1"]
     skills = zipfile.ZipFile(data_dir / "esco-skills-9.9.9.zip")
@@ -345,15 +358,69 @@ def test_the_file_the_command_writes_is_one_the_loader_reads(data_dir, harvest, 
     assert esco.name_for("2512", "fr") == "Concepteurs de logiciels"
 
 
+def test_the_occupations_are_written_one_language_to_a_member(data_dir, harvest):
+    """One JSON document of every name in every language was what the loader had to parse
+    whole and keep, to answer a reader in one (#1110). How the classification is built is
+    one member, with no name in it, and each language's names are a member of their own,
+    in the order of the entries and empty where the classification publishes none."""
+    groups = [dict(item) for item in GROUPS]
+    groups[2]["preferredLabel"] = {"en": "Software developers"}
+    harvest({**tables(), (ISCO_SCHEME, "v9.9.9", 0): Answer(page(groups))})
+
+    archive = zipfile.ZipFile(data_dir / "esco-occupations-9.9.9.zip")
+    assert sorted(archive.namelist()) == ["about.json", "names/en.json", "names/fr.json"]
+    about = json.loads(archive.read(esco.OCCUPATIONS_ABOUT))
+    assert about["revision"] == "ESCO v9.9.9" and about["languages"] == ["en", "fr"]
+    assert about["unit_groups"] == {"2511": {"major": "2"}, "2512": {"major": "2"}}
+    assert about["occupations"] == {
+        "2511.1": {"isco": "2511", "nace": []},
+        "2512.1": {"isco": "2512", "nace": []},
+        "2512.1.1": {"isco": "2512", "nace": []},
+    }
+    assert json.loads(archive.read("names/en.json")) == {
+        "unit_groups": ["Computer associate occupations", "Software developers"],
+        "occupations": ["Chief executive", "Web developer", "Software developer"],
+    }
+    assert json.loads(archive.read("names/fr.json")) == {
+        "unit_groups": ["Associés en informatique", ""],
+        "occupations": ["Directeur général", "Développeur web", "Développeur logiciel"],
+    }
+
+
+def test_the_same_harvest_is_the_same_occupations_file(data_dir, harvest):
+    harvest(tables())
+    first = (data_dir / "esco-occupations-9.9.9.zip").read_bytes()
+    harvest(tables())
+
+    assert (data_dir / "esco-occupations-9.9.9.zip").read_bytes() == first
+
+
 def test_data_file_reports_its_states(tmp_path, monkeypatch):
     monkeypatch.setattr(esco, "DATA_DIR", tmp_path)
 
     assert esco.data_file() is None
+    (tmp_path / "esco-occupations-1.2.1.zip").write_bytes(b"")
+    assert esco.data_file().name == "esco-occupations-1.2.1.zip"
+    (tmp_path / "esco-occupations-2.0.0.zip").write_bytes(b"")
+    with pytest.raises(RuntimeError, match="two ESCO classifications"):
+        esco.data_file()
+
+
+def test_data_file_still_finds_the_file_of_an_earlier_release(tmp_path, monkeypatch):
+    """An instance upgraded past #1110 holds `esco-<revision>.json` and nothing else until
+    `fetch_esco` is next run: that file is the classification, and beside the zip that
+    replaces it, which the command writes before it deletes, it is no longer read."""
+    monkeypatch.setattr(esco, "DATA_DIR", tmp_path)
+
     (tmp_path / "esco-1.2.1.json").write_text("{}", encoding="utf-8")
     assert esco.data_file().name == "esco-1.2.1.json"
+    assert esco.is_legacy(esco.data_file())
     (tmp_path / "esco-2.0.0.json").write_text("{}", encoding="utf-8")
     with pytest.raises(RuntimeError, match="two ESCO classifications"):
         esco.data_file()
+    (tmp_path / "esco-occupations-2.0.0.zip").write_bytes(b"")
+    assert esco.data_file().name == "esco-occupations-2.0.0.zip"
+    assert not esco.is_legacy(esco.data_file())
 
 
 def test_the_absent_document_is_the_file_shape_with_nothing_in_it():
@@ -450,31 +517,52 @@ def test_the_directory_can_be_moved_to_the_data_volume(monkeypatch, tmp_path):
 
 def test_a_new_revision_leaves_only_the_new_two_files(data_dir, harvest):
     """The directory goes from one revision to one, so no read in between is refused (#535)."""
-    (data_dir / "esco-1.2.1.json").write_text("{}", encoding="utf-8")
+    (data_dir / "esco-occupations-1.2.1.zip").write_bytes(b"")
     (data_dir / "esco-skills-1.2.1.zip").write_bytes(b"")
 
     harvest(tables())
 
     assert sorted(p.name for p in data_dir.iterdir()) == [
-        "esco-9.9.9.json",
+        "esco-occupations-9.9.9.zip",
+        "esco-skills-9.9.9.zip",
+    ]
+
+
+@pytest.mark.parametrize("earlier", ["esco-9.9.9.json", "esco-1.2.1.json"])
+def test_a_run_takes_away_the_file_of_an_earlier_release(data_dir, harvest, earlier):
+    """The occupations a release before #1110 downloaded are `esco-<revision>.json`. The run
+    that writes the zip deletes it, of the same revision or of another, so the directory is
+    left holding what the loader reads and nothing it would have to choose from."""
+    (data_dir / earlier).write_text("{}", encoding="utf-8")
+    (data_dir / "esco-skills-9.9.9.zip").write_bytes(b"")
+
+    harvest(tables())
+
+    assert sorted(p.name for p in data_dir.iterdir()) == [
+        "esco-occupations-9.9.9.zip",
         "esco-skills-9.9.9.zip",
     ]
 
 
 def test_a_refused_run_keeps_the_previous_revision(data_dir, harvest):
     (data_dir / "esco-1.2.1.json").write_text("{}", encoding="utf-8")
+    (data_dir / "esco-occupations-1.2.0.zip").write_bytes(b"")
     pages = {**tables(), (SKILL_TYPE, "v9.9.9", 0): Answer(page(SKILLS[:2], total=3))}
     pages[(SKILL_TYPE, "v9.9.9", 1)] = Answer(page([], total=3))
 
     with pytest.raises(CommandError, match="said 3 concepts"):
         harvest(pages)
 
-    assert [p.name for p in data_dir.iterdir()] == ["esco-1.2.1.json"]
+    assert sorted(p.name for p in data_dir.iterdir()) == [
+        "esco-1.2.1.json",
+        "esco-occupations-1.2.0.zip",
+    ]
 
 
 @pytest.mark.parametrize(
     ("names", "check_id"),
     [
+        (("esco-occupations-1.2.1.zip", "esco-occupations-1.2.2.zip"), "postulo.E040"),
         (("esco-1.2.1.json", "esco-1.2.2.json"), "postulo.E040"),
         (("esco-skills-1.2.1.zip", "esco-skills-1.2.2.zip"), "postulo.E041"),
     ],

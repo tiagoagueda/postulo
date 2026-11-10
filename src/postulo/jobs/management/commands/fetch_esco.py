@@ -1,6 +1,6 @@
 """Download the ESCO classification in place, where the loader reads it (#266).
 
-``postulo/jobs/esco.py`` reads ``data/esco-<revision>.json`` and
+``postulo/jobs/esco.py`` reads ``data/esco-occupations-<revision>.zip`` and
 ``data/esco-skills-<revision>.zip``; this command is how the two files get there. It asks
 the ESCO web-service API, the machine-facing access the ESCO services document at
 https://esco.ec.europa.eu/en/use-esco/use-esco-services-api/esco-web-service-api, for
@@ -32,6 +32,13 @@ full form. So the occupations are searched in full, in pages small enough to be 
 megabytes each, and each code is cut to its division, ``62.1`` to ``62``: the level
 ``industries.py`` holds. A code that is not a division of the vendored classification is
 left out and counted, rather than refusing the harvest.
+
+**The occupations are written a language to a member, as the skills are (#1110).** They
+were one JSON document, ``esco-<revision>.json``, which the loader had to parse whole and
+hold in all 28 languages to answer a reader in one. The harvest is still assembled and
+checked as that one document, and then written as a zip: how the classification is built
+in one member, and the names of each language in a member of their own. A run deletes the
+``.json`` an earlier release left, with the revision it replaces.
 """
 
 from __future__ import annotations
@@ -178,15 +185,12 @@ class Command(BaseCommand):
         # Nothing is written until both halves are good, so a run that fails leaves the
         # files it would have replaced exactly as they were.
         DATA_DIR.mkdir(parents=True, exist_ok=True)
-        target = DATA_DIR / f"esco-{version}.json"
-        temporary = target.with_name(target.name + ".tmp")
-        payload = json.dumps(document, ensure_ascii=False, indent=2) + "\n"
-        temporary.write_text(payload, encoding="utf-8")
-        os.replace(temporary, target)
+        target = DATA_DIR / f"esco-occupations-{version}.zip"
+        size = write_occupations(target, document)
         self.stdout.write(
             f"Wrote {target}: {len(document['unit_groups'])} unit groups and "
-            f"{len(document['occupations'])} occupations, revision "
-            f"{document['revision']}."
+            f"{len(document['occupations'])} occupations in {len(document['languages'])} "
+            f"languages, revision {document['revision']}, {size / 1_000_000:.1f} MB."
         )
         if unknown:
             self.stdout.write(
@@ -205,10 +209,13 @@ class Command(BaseCommand):
             )
         # Both new files are written and checked, so the files they replace can go: the
         # loader reads one revision at a time, and a directory holding two refuses every
-        # read until somebody deletes the old ones, which this command already knows.
+        # read until somebody deletes the old ones, which this command already knows. The
+        # `.json` is the occupations as a release before #1110 wrote them, of any revision:
+        # the zip just written is what is read from here on.
         replaced = sorted(
             p
-            for p in (*DATA_DIR.glob("esco-*.json"), *DATA_DIR.glob("esco-skills-*.zip"))
+            for pattern in (esco.OCCUPATIONS_PATTERN, esco.LEGACY_PATTERN, esco.SKILLS_PATTERN)
+            for p in DATA_DIR.glob(pattern)
             if p not in (target, skills_target)
         )
         for old in replaced:
@@ -382,7 +389,7 @@ class Command(BaseCommand):
         return response
 
     def _document(self, units, occupations, version) -> dict:
-        """The file, in the order and shape the tests read it."""
+        """The classification whole, in the order and shape it is checked in and written from."""
         by_group: dict[str, list[str]] = defaultdict(list)
         for identifier, entry in occupations.items():
             by_group[entry["code"][:4]].append(identifier)
@@ -500,22 +507,48 @@ class Command(BaseCommand):
 def write_skills(target: Path, about: dict, identifiers: list[str], names: dict) -> int:
     """Write the skills file `esco.py` reads, whole or not at all; its size in bytes.
 
-    A zip, so that one language's names can be read without the other twenty-seven, and
-    compressed, because names in twenty-eight languages are mostly letters it has seen.
-    Each member carries the same fixed date, so the same harvest is the same file.
+    A zip, so that one language's names can be read without the other twenty-seven.
+    """
+    members = {
+        esco.SKILLS_ABOUT: json.dumps(about, ensure_ascii=False, indent=2) + "\n",
+        esco.SKILLS_IDENTIFIERS: "\n".join(identifiers),
+    }
+    for language, column in names.items():
+        members[esco.SKILLS_NAMES.format(language=language)] = "\n".join(column)
+    return write_members(target, members)
+
+
+def write_occupations(target: Path, document: dict) -> int:
+    """Write the occupations file `esco.py` reads, whole or not at all; its size in bytes.
+
+    ``document`` is the whole classification, every name in every language. What is written
+    is how it is built, less the names, and then a member of names per language, each in
+    the order of the entries: the loader reads the first and the languages somebody reads
+    in, and never the rest (#1110). JSON rather than lines, so that a name is kept exactly
+    as the classification gives it, whatever is in it.
+    """
+    members = {
+        esco.OCCUPATIONS_ABOUT: json.dumps(esco.structure_of(document), ensure_ascii=False) + "\n"
+    }
+    for language in document["languages"]:
+        members[esco.OCCUPATIONS_NAMES.format(language=language)] = (
+            json.dumps(esco.names_of(document, language), ensure_ascii=False) + "\n"
+        )
+    return write_members(target, members)
+
+
+def write_members(target: Path, members: dict[str, str]) -> int:
+    """Write a zip of text members, whole or not at all; its size in bytes.
+
+    Compressed, because names in twenty-eight languages are mostly letters it has seen, and
+    each member under the same fixed date, so the same harvest is the same file.
     """
     temporary = target.with_name(target.name + ".tmp")
-
-    def put(archive, name: str, text: str) -> None:
-        member = zipfile.ZipInfo(name, date_time=(1980, 1, 1, 0, 0, 0))
-        member.compress_type = zipfile.ZIP_DEFLATED
-        archive.writestr(member, text.encode("utf-8"), compresslevel=9)
-
     with zipfile.ZipFile(temporary, "w") as archive:
-        put(archive, esco.SKILLS_ABOUT, json.dumps(about, ensure_ascii=False, indent=2) + "\n")
-        put(archive, esco.SKILLS_IDENTIFIERS, "\n".join(identifiers))
-        for language, column in names.items():
-            put(archive, esco.SKILLS_NAMES.format(language=language), "\n".join(column))
+        for name, text in members.items():
+            member = zipfile.ZipInfo(name, date_time=(1980, 1, 1, 0, 0, 0))
+            member.compress_type = zipfile.ZIP_DEFLATED
+            archive.writestr(member, text.encode("utf-8"), compresslevel=9)
     os.replace(temporary, target)
     return target.stat().st_size
 
