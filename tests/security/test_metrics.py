@@ -12,6 +12,8 @@ from __future__ import annotations
 import re
 
 import pytest
+from django.db import connection
+from django.test.utils import CaptureQueriesContext
 from django.urls import reverse
 
 pytestmark = pytest.mark.django_db
@@ -146,6 +148,107 @@ def test_a_label_never_carries_an_address(client, on):
 
 def test_the_answer_is_never_cached(client, on):
     assert "no-store" in fetch(client)["Cache-Control"]
+
+
+# --------------------------------------------------- what a scrape costs (#1113)
+
+
+@pytest.fixture
+def graphs(monkeypatch):
+    """Each migration graph built from the migration files while the test runs."""
+    from django.db.migrations.loader import MigrationLoader
+
+    built = []
+    real = MigrationLoader.build_graph
+
+    def counting(self):
+        built.append(self)
+        return real(self)
+
+    monkeypatch.setattr(MigrationLoader, "build_graph", counting)
+    return built
+
+
+def _leaf_migration() -> tuple[str, str]:
+    """One migration nothing depends on, so it can be marked unapplied and applied again."""
+    from django.db.migrations.loader import MigrationLoader
+
+    return sorted(MigrationLoader(connection).graph.leaf_nodes())[0]
+
+
+def test_the_migrations_are_read_once_and_not_at_every_scrape(client, on, graphs):
+    """Every scrape read every migration file of every app to say the same 1 (#1113).
+
+    New migrations arrive only with new code, and new code is a new process, so a process
+    that has seen them all applied has its answer: the second scrape builds no graph and
+    does not read the table of applied migrations.
+    """
+    assert "postulo_migrations_applied 1" in fetch(client).content.decode()
+    assert len(graphs) == 1
+
+    with CaptureQueriesContext(connection) as queries:
+        body = fetch(client).content.decode()
+
+    assert "postulo_migrations_applied 1" in body
+    assert len(graphs) == 1, "the second scrape built the migration graph again"
+    assert not [query["sql"] for query in queries if "django_migrations" in query["sql"]]
+
+
+def test_an_instance_behind_on_its_migrations_is_asked_again_at_every_scrape(client, on):
+    """Only a yes is remembered (#1113).
+
+    A process that started before `migrate` had finished says 0, and has to say 1 at the
+    first scrape after it has: a no kept for the life of the process would be an alert
+    that never clears.
+    """
+    from django.db.migrations.recorder import MigrationRecorder
+
+    leaf = _leaf_migration()
+    recorder = MigrationRecorder(connection)
+    recorder.record_unapplied(*leaf)
+
+    assert "postulo_migrations_applied 0" in fetch(client).content.decode()
+    assert "postulo_migrations_applied 0" in fetch(client).content.decode()
+
+    recorder.record_applied(*leaf)
+
+    assert "postulo_migrations_applied 1" in fetch(client).content.decode()
+
+
+def test_a_question_that_could_not_be_asked_is_asked_again(client, on, monkeypatch):
+    """A check that raised says 0, and is not what the process remembers (#1113)."""
+    from django.db.migrations.executor import MigrationExecutor
+
+    def broken(self, targets, clean_start=False):
+        raise RuntimeError("the migration table could not be read")
+
+    with monkeypatch.context() as patched:
+        patched.setattr(MigrationExecutor, "migration_plan", broken)
+        assert "postulo_migrations_applied 0" in fetch(client).content.decode()
+
+    assert "postulo_migrations_applied 1" in fetch(client).content.decode()
+
+
+def test_a_new_process_asks_about_its_own_migrations(client, on, graphs):
+    """What one process remembered is nothing to the next one (#1113).
+
+    An upgrade is new code in a new process, which starts with nothing remembered: it
+    reads its own migration files and says 0 until they are applied. `forget_migrations`
+    stands in for the new process here, as it does between two tests.
+    """
+    from django.db.migrations.recorder import MigrationRecorder
+
+    from postulo.core import metrics
+
+    leaf = _leaf_migration()
+    assert "postulo_migrations_applied 1" in fetch(client).content.decode()
+
+    metrics.forget_migrations()
+    MigrationRecorder(connection).record_unapplied(*leaf)
+    built = len(graphs)
+
+    assert "postulo_migrations_applied 0" in fetch(client).content.decode()
+    assert len(graphs) == built + 1
 
 
 def test_the_administration_page_says_whether_they_are_open(

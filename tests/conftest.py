@@ -153,6 +153,22 @@ def _no_inherited_drafts():
     pdf.forget_drafts()
 
 
+@pytest.fixture(autouse=True)
+def _no_inherited_migration_answer():
+    """No test is told the migrations are applied because an earlier test's scrape found so
+    (#1113).
+
+    `metrics` keeps a yes for the life of the process, and the suite is one process: a test
+    that marks a migration unapplied, or stands in for the check, would otherwise be answered
+    by whichever test scraped `/metrics` before it.
+    """
+    from postulo.core import metrics
+
+    metrics.forget_migrations()
+    yield
+    metrics.forget_migrations()
+
+
 @pytest.fixture(scope="session")
 def _worker_heartbeat_file(tmp_path_factory) -> Path:
     return tmp_path_factory.mktemp("worker") / "worker-heartbeat"

@@ -22,7 +22,9 @@ mean a write to the database on every request. The reverse proxy in front alread
 these numbers, sees every request, and is where they belong — *Hardening* says so.
 
 Everything below is computed at scrape time from the database, so it is the same answer
-whichever worker replies.
+whichever worker replies. The one thing a worker keeps from one scrape to the next is that
+it has found the migrations applied: only new code brings new ones, and new code is a new
+process (#1113).
 """
 
 from __future__ import annotations
@@ -90,15 +92,43 @@ def _database_is_reachable() -> bool:
         return False
 
 
+#: Whether this process has already found every migration applied (#1113). Only a yes is
+#: kept: new migrations arrive with new code and new code is a new process, so a yes cannot
+#: turn into a no under a running one, while a no turns into a yes the moment `migrate`
+#: finishes and has to be noticed. Set by the first scrape that finds it so, never at
+#: import or start-up, so a process that began before `migrate` did is not holding an
+#: answer from before it ran.
+_migrations_found_applied = False
+
+
+def forget_migrations() -> None:
+    """Drop what this process found, so the next scrape reads the migrations again."""
+    global _migrations_found_applied
+    _migrations_found_applied = False
+
+
 def _migrations_are_applied() -> bool:
+    """Whether nothing is left to migrate, asked of the database until the answer is yes.
+
+    Asking means building the graph of every migration file of every app and reading the
+    table of what has been applied, which cost more than the rest of the scrape put
+    together and was paid at every one (#1113). A no, and a question that could not be
+    asked, are asked again at the next scrape.
+    """
+    global _migrations_found_applied
+    if _migrations_found_applied:
+        return True
+
     from django.db.migrations.executor import MigrationExecutor
 
     try:
         executor = MigrationExecutor(connection)
         targets = executor.loader.graph.leaf_nodes()
-        return not executor.migration_plan(targets)
+        applied = not executor.migration_plan(targets)
     except Exception:
         return False
+    _migrations_found_applied = applied
+    return applied
 
 
 def collect() -> list[Metric]:
