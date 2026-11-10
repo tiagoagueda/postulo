@@ -27,7 +27,7 @@ from django.views.generic import DeleteView, ListView
 from postulo.core.files import FILE_POLICY
 from postulo.core.mixins import OwnedObjectMixin
 
-from . import logos, pairing, registry
+from . import logos, pairing, registry, syncing
 from .base import CONNECTED_KINDS, call_with_user
 from .forms import ConnectionForm
 from .models import Connection
@@ -210,6 +210,10 @@ class ConnectionListView(OwnedObjectMixin, ListView):
                     "links": _links(plugin, connection),
                     "is_store": connection.kind == "store",
                     "is_sync": connection.kind == "sync",
+                    # When a failing sync is tried next, since it waits longer each time (#1162).
+                    "next_attempt": (
+                        syncing.next_attempt(connection) if connection.kind == "sync" else None
+                    ),
                     # A *Pairing* page, for a sync plugin that lists its items (#327).
                     "can_pair": connection.kind == "sync" and pairing.can_pair(plugin),
                 }

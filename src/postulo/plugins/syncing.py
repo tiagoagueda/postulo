@@ -14,6 +14,7 @@ reads and writes those through the connection; nothing else in Postulo knows the
 
 from __future__ import annotations
 
+import datetime as dt
 import logging
 import time
 import uuid
@@ -24,7 +25,7 @@ from django.utils.translation import gettext_lazy as _
 
 from postulo.core import preferences
 
-from .base import FieldSpec, SyncReport
+from .base import ConnectionUnusable, FieldSpec, SyncReport
 from .models import Connection
 from .policy import allows
 from .secrets import SecretsUnreadable
@@ -42,6 +43,9 @@ DEFAULT_INTERVAL = "60"
 
 #: How long a connection's lease lasts if the run holding it dies without letting go.
 LEASE_SECONDS = 15 * 60
+
+#: The longest a failing connection waits between two attempts: the longest interval offered.
+LONGEST_WAIT = dt.timedelta(days=1)
 
 
 def kind_specs() -> list[FieldSpec]:
@@ -67,12 +71,43 @@ def interval_minutes(connection: Connection) -> int:
         return int(DEFAULT_INTERVAL)
 
 
+def wait_after_last_run(connection: Connection) -> dt.timedelta:
+    """How long the scheduler leaves a connection alone after its last run.
+
+    Its interval while it works. While it fails, the time it has been failing, where that is
+    longer, and never more than a day: a sync whose password was changed used to dial the
+    mail or calendar server every interval for ever, 96 refused sign-ins a day at the
+    shortest one (#1162). Counting from the last run that worked (or from when the
+    connection was made, if none has) doubles the wait at each failure -- 1 h, 2 h, 4 h --
+    with no counter to keep, and the first run that works clears the error and with it the
+    wait.
+    """
+    interval = dt.timedelta(minutes=interval_minutes(connection))
+    if not connection.last_error or connection.synced_at is None:
+        return interval
+    since = connection.last_ok_at or connection.created_at
+    if since is None:
+        return interval
+    return min(max(interval, connection.synced_at - since), LONGEST_WAIT)
+
+
 def is_due(connection: Connection, now=None) -> bool:
     now = now or timezone.now()
     if connection.synced_at is None:
         return True
-    elapsed = (now - connection.synced_at).total_seconds() / 60
-    return elapsed >= interval_minutes(connection)
+    return now - connection.synced_at >= wait_after_last_run(connection)
+
+
+def next_attempt(connection: Connection, now=None):
+    """When the scheduler will next try a sync that is failing, for its card; else ``None``.
+
+    Said only while there is something to wait for: a connection that works, is switched
+    off or is already due has no such time, and *Sync now* does not wait for it at all.
+    """
+    if not (connection.enabled and connection.last_error and connection.synced_at):
+        return None
+    when = connection.synced_at + wait_after_last_run(connection)
+    return when if when > (now or timezone.now()) else None
 
 
 def lease_key(connection: Connection) -> str:
@@ -130,6 +165,17 @@ def _run_connection(connection: Connection) -> SyncReport:
             report = plugin.sync(connection, connection.full_config)
         except SecretsUnreadable as error:
             report = SyncReport(error=str(error))
+        except ConnectionUnusable as dead:
+            # Not a failure to try again: the plugin says the other side has ended this
+            # connection. A store and a notifier saying so were heard (#243, #216); a sync
+            # was logged as a crash and dialled again next interval (#1162). Switched off
+            # with the reason in the plugin's own words. Only a plugin decides this: a run
+            # that merely fails is slowed down by `wait_after_last_run`, never switched off.
+            logger.warning(
+                "Sync %r says connection %s is finished: %s", connection.plugin, connection.pk, dead
+            )
+            connection.retire(str(dead), keep_secrets=dead.keep_secrets)
+            report = SyncReport(error=str(dead))
         except Exception as error:
             logger.exception("Sync %r failed for connection %s", connection.plugin, connection.pk)
             report = SyncReport(error=f"{type(error).__name__}: {error}")

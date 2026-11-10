@@ -238,6 +238,142 @@ def test_a_failing_sync_is_recorded_and_tried_again_on_the_next_interval(user):
     assert "gone plugin is not installed" in report.error
 
 
+def test_a_sync_that_keeps_failing_is_tried_less_and_less_often(user):
+    """A failing sync was dialled every interval for ever; now the wait doubles, to a day (#1162).
+
+    The wait is the time it has been failing, so 1 h, 2 h, 4 h, and never more than a day
+    nor less than its interval. One run that works puts it back on its interval.
+    """
+    connection = a_sync(user, interval="60")
+    worked = timezone.now() - dt.timedelta(days=30)
+    hour = dt.timedelta(hours=1)
+
+    def last_failed(last_run):
+        connection.last_ok_at = worked
+        connection.last_error = "Sign-in refused"
+        connection.synced_at = last_run
+
+    # The first failure, an hour after it last worked: tried again an hour later, as before.
+    last_failed(worked + hour)
+    assert not syncing.is_due(connection, worked + hour + dt.timedelta(minutes=59))
+    assert syncing.is_due(connection, worked + 2 * hour)
+    # Failing for four hours: the next attempt is four hours on, not one.
+    last_failed(worked + 4 * hour)
+    assert not syncing.is_due(connection, worked + 5 * hour)
+    assert not syncing.is_due(connection, worked + 7 * hour + dt.timedelta(minutes=59))
+    assert syncing.is_due(connection, worked + 8 * hour)
+    # Failing for a week: once a day, and no slower.
+    last_failed(worked + dt.timedelta(days=7))
+    ran = connection.synced_at
+    assert not syncing.is_due(connection, ran + 23 * hour)
+    assert syncing.is_due(connection, ran + 24 * hour)
+    assert syncing.next_attempt(connection, ran + hour) == ran + dt.timedelta(days=1)
+    assert syncing.next_attempt(connection, ran + 25 * hour) is None, "due, so nothing to wait for"
+
+    # It works again: back on its interval.
+    connection.last_error = ""
+    connection.last_ok_at = ran
+    assert syncing.is_due(connection, ran + hour)
+    assert syncing.next_attempt(connection, ran) is None
+
+
+def test_a_sync_that_never_worked_backs_off_from_when_it_was_made(user):
+    """With no run that ever worked, the failing time counts from its creation (#1162)."""
+    connection = a_sync(user, interval="15")
+    made = connection.created_at
+    connection.last_error = "No such server"
+    connection.synced_at = made + dt.timedelta(hours=3)
+    assert not syncing.is_due(connection, connection.synced_at + dt.timedelta(hours=2))
+    assert syncing.is_due(connection, connection.synced_at + dt.timedelta(hours=3))
+
+
+def test_the_scheduler_leaves_a_failing_sync_until_its_longer_wait_is_over(user):
+    """The pass itself, not only the sum: a sync failing for days is not run hourly (#1162)."""
+    connection = a_sync(user, interval="60")
+    now = timezone.now()
+    Connection.objects.filter(pk=connection.pk).update(
+        last_ok_at=now - dt.timedelta(days=3),
+        synced_at=now - dt.timedelta(hours=2),
+        last_error="Sign-in refused",
+    )
+    assert syncing.run_syncs() == (0, 0), "two hours after a failure that has lasted days"
+    assert MirrorSync.runs == []
+
+    Connection.objects.filter(pk=connection.pk).update(synced_at=now - dt.timedelta(hours=25))
+    assert syncing.run_syncs() == (1, 0)
+
+
+def test_sync_now_does_not_wait_for_a_failing_sync(client, user):
+    """The back-off is the scheduler's; a person who has fixed it presses Sync now (#1162)."""
+    connection = a_sync(user)
+    now = timezone.now()
+    Connection.objects.filter(pk=connection.pk).update(
+        last_ok_at=now - dt.timedelta(days=3),
+        synced_at=now - dt.timedelta(minutes=5),
+        last_error="Sign-in refused",
+    )
+    client.force_login(user)
+    client.post(reverse("connections:sync_now", args=[connection.pk]))
+    connection.refresh_from_db()
+    assert len(MirrorSync.runs) == 1 and connection.last_error == ""
+
+
+def test_a_failing_sync_says_when_it_will_be_tried_next(client, user):
+    """So that a sync waiting longer between attempts is not taken for one that stopped (#1162)."""
+    connection = a_sync(user)
+    client.force_login(user)
+    assert "Next attempt" not in client.get(reverse("connections:list")).content.decode()
+
+    now = timezone.now()
+    Connection.objects.filter(pk=connection.pk).update(
+        last_ok_at=now - dt.timedelta(days=3),
+        synced_at=now - dt.timedelta(hours=2),
+        last_error="Sign-in refused",
+    )
+    html = client.get(reverse("connections:list")).content.decode()
+    assert "Sign-in refused" in html and "Next attempt" in html
+
+    Connection.objects.filter(pk=connection.pk).update(enabled=False)
+    assert "Next attempt" not in client.get(reverse("connections:list")).content.decode()
+
+
+def test_a_sync_that_says_its_connection_is_finished_switches_it_off(user, monkeypatch):
+    """A sync raising ConnectionUnusable was logged as a crash and dialled again (#1162).
+
+    Stores and notifiers have had this since #216 and #243: the connection is switched off
+    with the plugin's sentence, and its secrets go unless the plugin asked to keep them.
+    """
+    from postulo.plugins.api import ConnectionUnusable
+
+    def finished(self, connection, config):
+        raise ConnectionUnusable("That account was closed.", keep_secrets=True)
+
+    monkeypatch.setattr(MirrorSync, "sync", finished)
+    connection = a_sync(user)
+    connection.secrets = {"password": "hunter2"}
+    connection.save()
+
+    report = syncing.sync_connection(connection)
+    assert report.error == "That account was closed."
+    connection.refresh_from_db()
+    assert connection.enabled is False
+    assert connection.last_error == "That account was closed."
+    assert connection.secrets == {"password": "hunter2"}, "the plugin asked to keep them"
+    assert syncing.run_syncs() == (0, 0), "a connection switched off is not run"
+
+    monkeypatch.setattr(
+        MirrorSync,
+        "sync",
+        lambda self, connection, config: (_ for _ in ()).throw(ConnectionUnusable("Revoked.")),
+    )
+    other = a_sync(user, "Tablet")
+    other.secrets = {"password": "hunter2"}
+    other.save()
+    syncing.sync_connection(other)
+    other.refresh_from_db()
+    assert other.enabled is False and other.secrets == {}
+
+
 def test_the_scheduler_command_reports_syncs(user):
     a_sync(user)
     out = io.StringIO()

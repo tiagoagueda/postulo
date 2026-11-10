@@ -63,6 +63,13 @@
                     {% blocktranslate with when=row.connection.synced_at|date:"DATETIME_FORMAT" report=row.connection.last_summary trimmed %}Last run {{ when }}: {{ report }}{% endblocktranslate %}
                   </p>
                 {% endif %}
+                {% comment %} A sync that keeps failing waits longer between attempts; saying when
+                   the next one is keeps that from reading as a sync that stopped (#1162). {% endcomment %}
+                {% if row.next_attempt %}
+                  <p class="text-xs text-ink-500 dark:text-ink-400" data-next-attempt>
+                    {% blocktranslate with when=row.next_attempt|date:"DATETIME_FORMAT" trimmed %}Next attempt {{ when }}{% endblocktranslate %}
+                  </p>
+                {% endif %}
               </div>
               <div class="flex flex-wrap items-center gap-1">
                 {% if row.plugin %}
