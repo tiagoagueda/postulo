@@ -27,7 +27,7 @@ from django.views.generic import (
 from postulo.accounts import removals
 from postulo.core import deletions, identifier_order, slugs, tables, throttle
 from postulo.core.cells import EditableCellView
-from postulo.core.files import serve_stored_picture
+from postulo.core.files import picture_cache_control, serve_stored_picture
 from postulo.core.mixins import (
     MANAGE,
     READ,
@@ -1477,7 +1477,9 @@ class CompanyLogoView(OwnedObjectMixin, View):
 
     It is a row beside the company (#662) and comes out only through here, which is what
     lets the content security policy keep saying ``img-src 'self'``. The address carries
-    the moment it was fetched, so a new logo is never hidden behind an old cache entry.
+    the moment it was fetched, so a new logo is never hidden behind an old cache entry,
+    and an answer to that stamped address may stay in the browser's own cache for a year;
+    one with no stamp, or an old one, for a day (#1158).
 
     Out of the request's transaction: two reads and no write, asked for once per card on a
     board, and on SQLite each would have queued for the write lock (#1129).
@@ -1495,7 +1497,7 @@ class CompanyLogoView(OwnedObjectMixin, View):
         # one written beside the bytes, and an SVG is a vector with its own extension.
         suffix = ".svg" if logo.media_type == "image/svg+xml" else ".png"
         response = serve_stored_picture(logo, download_name=f"logo{suffix}")
-        response["Cache-Control"] = "private, max-age=86400"
+        response["Cache-Control"] = picture_cache_control(request, company.logo_version)
         return response
 
 

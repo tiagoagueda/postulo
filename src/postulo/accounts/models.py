@@ -710,8 +710,11 @@ class Profile(models.Model):
 
     @property
     def picture_version(self) -> int:
-        """Changes whenever the profile does, so a browser cache never shows an old face."""
-        return int(self.updated_at.timestamp()) if self.updated_at else 0
+        """Changes whenever the profile does, so a browser cache never shows an old face.
+
+        To the microsecond, which is what the column keeps: the stamped address is cached
+        for a year, and two pictures set within one second must not share it (#1158)."""
+        return int(self.updated_at.timestamp() * 1_000_000) if self.updated_at else 0
 
 
 class ProfilePicture(StoredPicture):

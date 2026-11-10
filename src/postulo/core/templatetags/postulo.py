@@ -294,6 +294,7 @@ def _tile(
     colour: str = "",
     letters: str = "",
     glyph: str = "",
+    lazy: bool = True,
 ) -> str:
     """Basecoat's `avatar` (#291): a box that holds a picture, or initials on a colour.
 
@@ -302,6 +303,12 @@ def _tile(
     inside it, because Basecoat sets a size of its own on the inner span and a utility on
     that span is what overrides it. The picture is decorative and the initials are hidden
     from assistive technology: each stands beside its name.
+
+    The picture is fetched when it comes near the screen and decoded off the main thread
+    (#1158): a board or a table of companies asked for every logo on it at once, the ones
+    far below included. No ``width`` or ``height``: the box is sized by its classes and the
+    picture is laid over it, so nothing moves when it arrives. ``lazy=False`` is for the
+    one tile that is always on screen, which should not wait for the layout to be asked for.
     """
     classes = css_class.split()
     box = " ".join(c for c in classes if not c.startswith("text-"))
@@ -310,7 +317,11 @@ def _tile(
     # it safe cannot close the attribute (#805).
     if picture:
         return format_html(
-            '<span class="avatar {} {}"><img src="{}" alt=""></span>', box, shape, picture
+            '<span class="avatar {} {}"><img src="{}" alt=""{} decoding="async"></span>',
+            box,
+            shape,
+            picture,
+            mark_safe(' loading="lazy"') if lazy else "",
         )
     if glyph:
         # Inside the inner span, as the initials are (#901): Basecoat centres what is in that
@@ -346,22 +357,22 @@ def logo_url(company) -> str:
     """The address of ``company``'s logo, stamped as `avatar_url` is, or ``""``."""
     if company is None or not getattr(company, "has_logo", False):
         return ""
-    stamp = int(company.logo_fetched_at.timestamp()) if company.logo_fetched_at else 0
-    return f"{reverse('jobs:company_logo', args=[company.pk])}?v={stamp}"
+    return f"{reverse('jobs:company_logo', args=[company.pk])}?v={company.logo_version}"
 
 
 @register.simple_tag
-def avatar(user, css_class: str = "size-7 text-xs") -> str:
+def avatar(user, css_class: str = "size-7 text-xs", lazy: bool = True) -> str:
     """An initials tile for ``user``, until a picture exists to show instead.
 
     Decorative: the picture and the initials are both hidden from assistive
     technology, and the caller provides the name -- the person's name beside it, or
     the control's own ``aria-label`` where it stands alone as the masthead's account
     button (#282). The colour is a stable function of the display name, so it is the
-    same on every page and every device.
+    same on every page and every device. ``lazy=False`` is the masthead's: its picture is on
+    screen on every page and is fetched with the page rather than once it is laid out (#1158).
     """
     if picture := avatar_url(user):
-        return _tile(css_class, "rounded-full", picture=picture)
+        return _tile(css_class, "rounded-full", picture=picture, lazy=lazy)
     name = user.display_name or ""
     colour = AVATAR_COLOURS[zlib.crc32(name.encode("utf-8")) % len(AVATAR_COLOURS)]
     return _tile(css_class, "rounded-full", colour=colour, letters=initials_for(user))

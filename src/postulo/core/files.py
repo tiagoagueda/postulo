@@ -203,6 +203,27 @@ def serve_stored_picture(row, *, download_name: str) -> HttpResponse:
     return response
 
 
+#: How long a browser may keep a picture it asked for by its stamped address: a year, and
+#: without asking again, because a new picture is a new address (#1158).
+STAMPED_PICTURE_CACHE = "private, max-age=31536000, immutable"
+#: And one asked for with no stamp, or an old one: a day, as before, since that address
+#: goes on answering with whatever the picture is now.
+UNSTAMPED_PICTURE_CACHE = "private, max-age=86400"
+
+
+def picture_cache_control(request: HttpRequest, version: int) -> str:
+    """The ``Cache-Control`` for a stored picture, by whether the address names this picture.
+
+    ``version`` is the stamp the page wrote into the address as ``?v=``. Only a request that
+    carries exactly it is for one picture and no other, so only that answer may be kept for
+    long; anything else keeps the day it always had. ``private`` either way: the picture is
+    one person's, and a cache shared between people must not hold it (#1158).
+    """
+    if version and request.GET.get("v") == str(version):
+        return STAMPED_PICTURE_CACHE
+    return UNSTAMPED_PICTURE_CACHE
+
+
 #: What text a stranger wrote is answered as, and the whole of it. Never anything a name
 #: or a client suggested: the point of the function below is that this cannot vary.
 PLAIN_TEXT = "text/plain; charset=utf-8"

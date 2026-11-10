@@ -23,7 +23,7 @@ from django.views import View
 from django.views.generic import CreateView, ListView, TemplateView, UpdateView
 
 from postulo.core.context_processors import theme_switch
-from postulo.core.files import serve_stored_picture
+from postulo.core.files import picture_cache_control, serve_stored_picture
 from postulo.core.link_services import KIND_ICONS, OTHER_ICON
 from postulo.core.mixins import (
     MessagingHandlesMixin,
@@ -371,8 +371,8 @@ class AvatarView(LoginRequiredMixin, View):
 
     The picture is a row beside the profile (#662) and comes out only through here, so the
     content security policy can keep saying ``img-src 'self'``. A face is not a CV, so the
-    cache may keep it for a day; the address changes with the profile, so a new picture is
-    never hidden by an old cache entry.
+    browser's own cache may keep it: for a year when the address carries the profile's
+    current stamp, since a new picture is a new address, and for a day otherwise (#1158).
 
     Out of the request's transaction: two reads and no write, on every page that shows a
     face, and on SQLite each would have queued for the write lock (#1129).
@@ -389,7 +389,7 @@ class AvatarView(LoginRequiredMixin, View):
         if picture is None:
             raise Http404
         response = serve_stored_picture(picture, download_name="picture.png")
-        response["Cache-Control"] = "private, max-age=86400"
+        response["Cache-Control"] = picture_cache_control(request, profile.picture_version)
         return response
 
 

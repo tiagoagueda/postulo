@@ -500,7 +500,71 @@ def test_the_tile_is_basecoats_avatar_with_the_sizes_where_the_stylesheet_reads_
     assert '<span class="text-xs">AM</span>' in initials and 'aria-hidden="true"' in initials
 
     picture = _tile("size-24 text-3xl", "rounded", picture="/p.png?v=2")
-    assert picture == '<span class="avatar size-24 rounded"><img src="/p.png?v=2" alt=""></span>'
+    assert picture == (
+        '<span class="avatar size-24 rounded">'
+        '<img src="/p.png?v=2" alt="" loading="lazy" decoding="async"></span>'
+    )
+
+
+def test_a_picture_tile_waits_until_it_is_near_the_screen_except_in_the_masthead(client, user):
+    """Every tile's picture was fetched with the page, the ones far down a board or a table
+    included (#1158). Now a tile says it may wait and be decoded off the main thread; the
+    masthead's own, which is on screen on every page, is still fetched at once. No width or
+    height is written: the box is sized by its classes and the picture is laid over it."""
+    from postulo.core.templatetags.postulo import _tile
+
+    waiting = _tile("size-6", "rounded", picture="/logo?v=1")
+    assert 'loading="lazy"' in waiting and 'decoding="async"' in waiting
+    assert "width=" not in waiting and "height=" not in waiting
+    at_once = _tile("size-7", "rounded-full", picture="/me?v=1", lazy=False)
+    assert "loading=" not in at_once and 'decoding="async"' in at_once
+
+    client.force_login(user)
+    profile_page(
+        client,
+        user,
+        picture=SimpleUploadedFile("me.jpg", picture_bytes(), content_type="image/jpeg"),
+    )
+    page = client.get(reverse("accounts:profile")).content.decode()
+    tiles = [
+        tag for tag in page.split("<img ")[1:] if reverse("accounts:avatar", args=[user.pk]) in tag
+    ]
+    tiles = [tag.split(">", 1)[0] for tag in tiles]
+    assert len(tiles) >= 3, "the masthead's, the menu's and the page's own"
+    assert "loading=" not in tiles[0], "the masthead's own picture is fetched with the page"
+    assert all('loading="lazy"' in tag for tag in tiles[1:])
+
+
+def test_a_stamped_picture_is_kept_for_a_year_and_an_unstamped_one_for_a_day(client, user):
+    """The picture's address carries a stamp that changes with the picture, yet the answer
+    was cached for a day whatever was asked for, so every face was fetched again each day
+    (#1158). The stamped address is now kept for a year; one with no stamp, or with an old
+    one, keeps the day, because that address goes on answering with whatever the picture
+    is now. Private in every case, and a new picture is a new address."""
+    from postulo.core.templatetags.postulo import avatar_url
+
+    client.force_login(user)
+    profile_page(
+        client,
+        user,
+        picture=SimpleUploadedFile("me.jpg", picture_bytes(), content_type="image/jpeg"),
+    )
+    user.refresh_from_db()
+    stamped = avatar_url(user)
+    bare = reverse("accounts:avatar", args=[user.pk])
+    assert stamped.startswith(f"{bare}?v=")
+
+    assert client.get(stamped)["Cache-Control"] == "private, max-age=31536000, immutable"
+    assert client.get(bare)["Cache-Control"] == "private, max-age=86400"
+    assert client.get(f"{bare}?v=1")["Cache-Control"] == "private, max-age=86400"
+    assert client.get(f"{bare}?v=")["Cache-Control"] == "private, max-age=86400"
+
+    profile = Profile.objects.get(user=user)
+    avatars.store(profile, "upload", avatars.process(picture_bytes(size=(200, 200))))
+    user.refresh_from_db()
+    assert avatar_url(user) != stamped, "a new picture is a new address"
+    assert client.get(stamped)["Cache-Control"] == "private, max-age=86400", "the old stamp"
+    assert client.get(avatar_url(user))["Cache-Control"].endswith("immutable")
 
 
 def test_the_profile_page_is_no_longer_short_of_pixels():

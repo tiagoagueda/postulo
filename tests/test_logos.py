@@ -461,6 +461,36 @@ def test_the_logo_is_served_from_this_instance_and_only_to_its_owner(
     assert client.get(reverse("jobs:company_logo", args=[company.pk])).status_code == 404
 
 
+def test_a_stamped_logo_is_kept_for_a_year_and_a_changed_logo_changes_the_address(
+    client, user, company
+):
+    """A logo's address carries the moment it was kept, yet every answer was cached for a day
+    only, so a board asked for each logo again every day (#1158). The stamped address is
+    now kept for a year, privately; one with no stamp or an old one keeps the day. That is
+    safe only while a changed logo changes the address, so that is pinned here too: the
+    stamp is to the microsecond, and two logos set within one second do not share one."""
+    from postulo.core.templatetags.postulo import company_logo, logo_url
+
+    logos.store(company, logos.process(an_image()), source="upload")
+    bare = reverse("jobs:company_logo", args=[company.pk])
+    first = logo_url(Company.objects.get(pk=company.pk))
+    assert first.startswith(f"{bare}?v=")
+
+    client.force_login(user)
+    assert client.get(first)["Cache-Control"] == "private, max-age=31536000, immutable"
+    assert client.get(bare)["Cache-Control"] == "private, max-age=86400"
+    assert client.get(f"{bare}?v=0")["Cache-Control"] == "private, max-age=86400"
+
+    logos.store(company, logos.process(an_image(colour=(200, 20, 20, 255))), source="upload")
+    second = logo_url(Company.objects.get(pk=company.pk))
+    assert second != first, "a changed logo is a new address"
+    assert client.get(first)["Cache-Control"] == "private, max-age=86400", "the old stamp"
+    assert client.get(second)["Cache-Control"] == "private, max-age=31536000, immutable"
+
+    tile = company_logo(Company.objects.get(pk=company.pk))
+    assert 'loading="lazy"' in tile and 'decoding="async"' in tile
+
+
 def test_a_company_page_shows_the_logo_and_never_the_far_address(client, user, company, web):
     client.force_login(user)
     html = client.get(company.get_absolute_url()).content.decode()

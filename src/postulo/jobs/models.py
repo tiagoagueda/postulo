@@ -719,6 +719,13 @@ class Company(OwnNote, PrincipalOwnedModel):
         return reverse("jobs:company_detail", args=[self.pk])
 
     @property
+    def logo_version(self) -> int:
+        """The stamp in the logo's address: the moment it was kept, to the microsecond, so
+        two logos set within one second never share an address a browser keeps for a year
+        (#1158). Nothing when there is no such moment, and then nothing is cached for long."""
+        return int(self.logo_fetched_at.timestamp() * 1_000_000) if self.logo_fetched_at else 0
+
+    @property
     def has_nace_industry(self) -> bool:
         """Whether any of its industries is a division of the NACE list (#686).
 
