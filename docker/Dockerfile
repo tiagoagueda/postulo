@@ -57,8 +57,12 @@ ENV UV_COMPILE_BYTECODE=1 \
 
 WORKDIR /app
 
-# Dependencies first, so a change to the application does not re-resolve them.
-COPY pyproject.toml uv.lock README.md ./
+# Dependencies first, so a change to the application does not re-resolve them. The two files
+# that decide them and nothing else: README.md, which pyproject.toml names as the project's
+# readme, is only read when the project itself is built, at the second sync below. Copied
+# here it made every README change, and the language tables are rewritten whenever
+# translations land, install every dependency again for both architectures (#1140).
+COPY pyproject.toml uv.lock ./
 
 # `--no-default-groups`, not `--no-dev`. `--no-dev` omits the group called `dev` and
 # nothing else, and `pyproject.toml` declares two — `dev` and `e2e` — with both in
@@ -68,11 +72,13 @@ COPY pyproject.toml uv.lock README.md ./
 # Naming the groups to exclude would need editing every time one is added; excluding all
 # of them and asking for the extra by name stays right on its own.
 #
-# `--no-cache`: uv unpacks every wheel into ~/.cache/uv and keeps it, 296 MB of it (#154).
-# This
-# stage no longer ships, so the cache would go away regardless — the flag stays because it
-# also keeps the build's own disk use honest, and because the reasoning that put it here is
-# the reasoning that says not to write what nothing reads.
+# `--mount=type=cache`: uv's download cache lives in the builder's own storage, outside every
+# layer. uv unpacks each wheel into ~/.cache/uv and keeps it, 296 MB that once shipped in the
+# image (#154), which is why these lines said `--no-cache` for a long time. This stage has not
+# shipped since the build became multi-stage, so all the flag still did was make each rebuild
+# of the layer download every wheel again; with the mount a changed lock mostly copies from
+# the builder's disk, and nothing of it can reach an image (#1140). `UV_LINK_MODE=copy` above
+# is what a cache on another filesystem needs.
 #
 # Twice, and `--no-install-project` only on the first. `uv sync` installs the project as well
 # as its dependencies, and before `COPY src` there is no project to install: with one sync
@@ -87,12 +93,15 @@ COPY pyproject.toml uv.lock README.md ./
 # offer up, which nobody in this repository ever had (#219). 3 MB of psycopg binary is a
 # small price for the second engine the project documents actually working; the alternative
 # — a separate tag for it — is two images to build, scan and publish.
-RUN uv sync --locked --no-default-groups --extra server --extra postgres --no-cache --no-install-project
+RUN --mount=type=cache,target=/root/.cache/uv \
+    uv sync --locked --no-default-groups --extra server --extra postgres --no-install-project
 
+COPY README.md ./
 COPY src ./src
 COPY scripts/messages.py ./scripts/messages.py
 
-RUN uv sync --locked --no-default-groups --extra server --extra postgres --no-cache
+RUN --mount=type=cache,target=/root/.cache/uv \
+    uv sync --locked --no-default-groups --extra server --extra postgres
 
 # The translation catalogues are committed as .po text; Django reads the compiled .mo,
 # which this writes in plain Python — no gettext in the image. Every set of them, since a
@@ -124,11 +133,12 @@ RUN python scripts/messages.py compile \
 RUN uv export --locked --no-dev --extra server --extra postgres --no-hashes \
         --no-emit-project --output-file /app/constraints.txt
 ARG POSTULO_EXTRA_PACKAGES=""
-RUN if [ -n "$POSTULO_EXTRA_PACKAGES" ]; then \
+RUN --mount=type=cache,target=/root/.cache/uv \
+    if [ -n "$POSTULO_EXTRA_PACKAGES" ]; then \
         apt-get update \
         && apt-get upgrade -y \
         && apt-get install -y --no-install-recommends git \
-        && uv pip install --no-cache --constraint /app/constraints.txt $POSTULO_EXTRA_PACKAGES \
+        && uv pip install --constraint /app/constraints.txt $POSTULO_EXTRA_PACKAGES \
         && rm -rf /var/lib/apt/lists/*; \
     fi
 

@@ -63,7 +63,8 @@ def test_the_reader_finds_what_it_is_looking_for():
 
 #: The lines that build the runtime environment. Read rather than run, because nothing here
 #: builds an image (#81) and the last three mistakes in this file all looked correct.
-SYNC = re.compile(r"^RUN uv sync .*$", re.M)
+#: A sync, with the cache mount it runs under folded onto its line.
+SYNC = re.compile(r"^RUN (?:--mount=\S+ \\\n +)?uv sync .*$", re.M)
 
 
 def sync_lines() -> list[str]:
@@ -106,14 +107,38 @@ def test_the_sync_excludes_every_dependency_group():
         assert "--no-dev" not in line, "names one group and misses the others"
 
 
-def test_the_sync_keeps_no_download_cache():
-    """uv unpacks every wheel into its cache and keeps it: 296 MB of a single-stage image.
+def test_the_sync_keeps_its_download_cache_out_of_every_layer():
+    """uv unpacks every wheel into its cache and keeps it: 296 MB of a single-stage image
+    (#154). Deleting it in a later layer frees nothing, so it must never be written into one.
 
-    Deleting it in a later layer frees nothing — the bytes are already below — so it has to
-    not be written in the first place.
+    `--no-cache` did that and made every rebuild download every wheel again. A cache mount
+    keeps the cache in the builder's storage, in no layer at all, and a changed lock is
+    mostly a local copy (#1140).
     """
+    text = DOCKERFILE.read_text(encoding="utf-8")
     for line in sync_lines():
-        assert "--no-cache" in line, line
+        assert "--mount=type=cache,target=/root/.cache/uv" in line, line
+        assert "--no-cache" not in line, line
+    assert "uv pip install --no-cache" not in text
+    runtime = text[text.rindex("\nFROM ") :]
+    assert ".cache" not in "\n".join(
+        line for line in runtime.splitlines() if not line.lstrip().startswith("#")
+    ), "nothing of a cache is copied into the image that ships"
+
+
+def test_the_readme_is_not_part_of_what_decides_the_dependencies():
+    """README.md is rewritten whenever translations land (its language tables). Copied in
+    before the first sync it was part of that layer's key, and each such commit installed
+    every dependency again, for both architectures, in both builders (#1140). Only the
+    project's own build reads it, and that is the second sync."""
+    text = DOCKERFILE.read_text(encoding="utf-8")
+    first, second = (found.start() for found in SYNC.finditer(text))
+
+    assert "COPY pyproject.toml uv.lock ./" in text[:first]
+    assert "README.md" not in "\n".join(
+        line for line in text[:first].splitlines() if line.startswith("COPY")
+    )
+    assert "COPY README.md ./" in text[first:second]
 
 
 def test_the_image_carries_the_driver_for_the_engine_it_is_offered():

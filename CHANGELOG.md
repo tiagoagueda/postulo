@@ -12,6 +12,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🔧 Changed
 
+- Building the image no longer re-installs every dependency after a README change, and a changed lock file reuses the builder's download cache. (#1140)
 - A dev image built by a push takes Debian's package updates once a day, not on every push; one started by hand and every release still ask when built. (#1139)
 - Every Python runs by itself on a push to main that changes the version or the lock file, so a release needs nothing started by hand. (#1137)
 - The weekly scheduled run is the dependency audit and the ESCO check alone, in a workflow of its own, not the whole of CI. (#1136)
