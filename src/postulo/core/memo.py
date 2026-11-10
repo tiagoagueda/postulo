@@ -29,6 +29,12 @@ site = Local()
 #: asks the policy table, and a company's page asks it six times -- once per mark it draws --
 #: for six identical answers. Cleared at every request boundary and whenever a policy row is
 #: written.
+#:
+#: The rows those answers are made from are kept beside them, in the same holder, read once
+#: for each person asked about (#1112): each first answer used to read its own. So whatever
+#: drops the answers drops the rows, and the list of what does is longer for it: an access
+#: rule written or deleted, a row deleted through a queryset, and somebody joining or leaving
+#: a group, which decides which rules reach them (`plugins.apps`).
 decisions = Local()
 
 
@@ -47,7 +53,7 @@ def forget_current() -> None:
 
 
 def forget_decisions() -> None:
-    """Drop this thread's memoised plugin decisions. See `decisions`."""
+    """Drop this thread's plugin decisions and the rows they came from. See `decisions`."""
     try:
         del decisions.answers
     except AttributeError:

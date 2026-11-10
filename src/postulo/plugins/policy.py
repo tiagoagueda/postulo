@@ -165,11 +165,21 @@ def access_for(plugin_name: str, person):
     pk = getattr(person, "pk", None)
     if not pk:
         return None
+    # Asked afresh, for the one plugin: this is what the administration pages call, about
+    # whoever they are drawing, and what `may_change_settings` rests on. A decision reads
+    # the request's rows instead (`_rows_for`), and both end in `_rule_among` (#1112).
     rules = list(
         PluginAccess.objects.filter(plugin=plugin_name).filter(
             models.Q(person_id=pk) | models.Q(group__user=pk)
         )
     )
+    return _rule_among(plugin_name, pk, rules)
+
+
+def _rule_among(plugin_name: str, pk, rules: list):
+    """The one rule these come to for an account: its own, or its groups' read together."""
+    from .models import PluginAccess
+
     for rule in rules:
         if rule.person_id == pk:
             return rule
@@ -297,16 +307,61 @@ def children_of(plugin_name: str) -> list[str]:
     ]
 
 
-def _answers() -> dict:
-    """This request's answers, in `memo.decisions` (#231)."""
+def _held() -> tuple:
+    """What this request remembers, in `memo.decisions`: the stamp, the answers, the rows.
+
+    One holder for both, so that whatever forgets the answers forgets the rows they were made
+    from in the same breath, and a plugin installed or removed drops the two together (#1112).
+    """
     from .installing import record_stamp
 
     stamp = record_stamp()
     held = getattr(memo.decisions, "answers", None)
     if held is None or held[0] != stamp:
-        held = (stamp, {})
+        held = (stamp, {}, {})
         memo.decisions.answers = held
-    return held[1]
+    return held
+
+
+def _answers() -> dict:
+    """This request's answers, in `memo.decisions` (#231)."""
+    return _held()[1]
+
+
+def _rows_for(person) -> tuple[dict, dict]:
+    """Every row that can reach this person, read once a request: two queries (#1112).
+
+    The policy rows -- the instance's and the person's own, by plugin and then by whose they
+    are -- and the access rules for the account or its groups, by plugin. Each first answer
+    used to read its own, so a page asking about ten plugins made twenty queries for rows
+    that, on most instances, are not there at all.
+
+    For the request and no longer, like the answers beside them: `forget_decisions` drops
+    both, and it is called at every request boundary, when a policy row or an access rule is
+    written or deleted, when somebody joins or leaves a group, and when a person changes
+    their own choice. Never across requests, where another worker's write would not be heard.
+
+    Who decided comes with the row, since a row an administrator wrote is read for its name
+    every time the plugin is asked about.
+    """
+    from .models import PluginAccess, PluginPolicy
+
+    pk = getattr(person, "pk", None)
+    rows = _held()[2]
+    if pk not in rows:
+        policies: dict = {}
+        for row in PluginPolicy.objects.filter(models_person_filter(person)).select_related(
+            "decided_by"
+        ):
+            policies.setdefault(row.plugin, {})[row.person_id] = row
+        access: dict = {}
+        if pk:
+            for rule in PluginAccess.objects.filter(
+                models.Q(person_id=pk) | models.Q(group__user=pk)
+            ):
+                access.setdefault(rule.plugin, []).append(rule)
+        rows[pk] = (policies, access)
+    return rows[pk]
 
 
 def decide(plugin_name: str, person) -> Decision:
@@ -340,12 +395,8 @@ def _decide(plugin_name: str, person) -> Decision:
             on=False, offered=True, theirs=False, decided_by="requires", because=tuple(wanting)
         )
 
-    rows = {
-        row.person_id: row
-        for row in PluginPolicy.objects.filter(plugin=plugin_name).filter(
-            models_person_filter(person)
-        )
-    }
+    policies, access = _rows_for(person)
+    rows = policies.get(plugin_name, {})
     row = rows.get(getattr(person, "pk", None)) or rows.get(None)
     state = row.state if row else PluginPolicy.State.AVAILABLE
 
@@ -357,7 +408,7 @@ def _decide(plugin_name: str, person) -> Decision:
     # is an exception to the default and never to an administrator's row for this very person.
     rule = None
     if state != PluginPolicy.State.FORCED_OFF and getattr(row, "person_id", None) is None:
-        rule = access_for(plugin_name, person)
+        rule = _rule_among(plugin_name, getattr(person, "pk", None), access.get(plugin_name, []))
     if rule is not None:
         if not rule.may_use:
             return Decision(on=False, offered=False, theirs=False, decided_by="access")
