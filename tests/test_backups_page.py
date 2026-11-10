@@ -12,6 +12,7 @@ import datetime as dt
 import hashlib
 import io
 import json
+import os
 import tarfile
 from pathlib import Path
 from zoneinfo import ZoneInfo
@@ -386,6 +387,37 @@ def test_retention_keeps_the_newest_and_spares_uploads(settings):
         "postulo-backup-20260103-030000.tar.gz",
     ]
     assert uploaded.exists()
+
+
+def test_retention_does_not_count_a_half_written_archive():
+    """A backup cut short used to sit under an archive's name and take the place of a good
+    one among the newest kept; now it is a file retention never sees (#1123)."""
+    for day in range(1, 4):
+        make_archive(f"2026010{day}-030000")
+    partial = backups.directory() / ".postulo-backup-0123abcd.partial"
+    partial.write_bytes(b"cut short")
+
+    gone = backups.apply_retention(2)
+
+    assert gone == ["postulo-backup-20260101-030000.tar.gz"]
+    assert partial.name not in [archive.name for archive in backups.archives()]
+
+
+def test_the_scheduler_removes_a_half_written_archive_once_it_is_old():
+    """A killed backup cannot remove its own file, and nothing lists it, so it would hold
+    room on the volume for ever. One still being written is left alone (#1123)."""
+    kept = make_archive()
+    stale = backups.directory() / ".postulo-backup-0123abcd.partial"
+    stale.write_bytes(b"cut short")
+    seven_hours_ago = timezone.now().timestamp() - 7 * 3600
+    os.utime(stale, (seven_hours_ago, seven_hours_ago))
+    fresh = backups.directory() / ".postulo-backup-4567cdef.partial"
+    fresh.write_bytes(b"being written")
+
+    assert backups.forget_partial() == 1
+
+    assert not stale.exists()
+    assert fresh.exists() and kept.exists()
 
 
 def test_old_ones_go_only_after_the_new_one_verified(monkeypatch):

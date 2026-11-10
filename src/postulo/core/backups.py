@@ -40,7 +40,14 @@ from django.utils import timezone
 from django.utils.translation import gettext as _
 
 from . import site
-from .backup import BackupError, read_manifest, verify_backup, write_backup
+from .backup import (
+    PARTIAL_PREFIX,
+    PARTIAL_SUFFIX,
+    BackupError,
+    read_manifest,
+    verify_backup,
+    write_backup,
+)
 from .memo import forget_current
 
 logger = logging.getLogger(__name__)
@@ -52,6 +59,10 @@ NAME = re.compile(r"postulo-(backup|upload)-\d{8}-\d{6}(-\d+)?\.tar\.gz")
 LOCK_KEY = "postulo:backup:running"
 #: Longer than any backup should take; a crashed one frees the key by expiring.
 LOCK_SECONDS = 6 * 3600
+
+#: How old a half-written archive is before the scheduler removes it (#1123). No backup runs
+#: this long, so one this old belongs to a process that was killed.
+PARTIAL_SECONDS = 6 * 3600
 
 #: How long past a slot the scheduler may be before the page calls the run missed.
 MISSED_AFTER = dt.timedelta(hours=2)
@@ -395,6 +406,31 @@ def apply_retention(keep: int) -> list[str]:
         gone.append(old.name)
     if gone:
         logger.info("Retention kept the newest %s backups and removed %s.", keep, len(gone))
+    return gone
+
+
+def forget_partial(now: dt.datetime | None = None) -> int:
+    """Remove what a backup killed half way left behind. Called by the scheduler (#1123).
+
+    A backup that fails removes its own half-written file. One whose process was killed
+    cannot, and the file would hold room on the volume for ever: nothing lists it.
+    """
+    root = directory()
+    if not root.is_dir():
+        return 0
+    cutoff = (now or timezone.now()).timestamp() - PARTIAL_SECONDS
+    gone = 0
+    for entry in root.glob(f"{PARTIAL_PREFIX}*{PARTIAL_SUFFIX}"):
+        try:
+            if entry.is_symlink() or not entry.is_file() or entry.stat().st_mtime > cutoff:
+                continue
+            entry.unlink()
+        except OSError:
+            logger.warning("Could not remove the half-written backup %s.", entry.name)
+            continue
+        gone += 1
+    if gone:
+        logger.info("Removed %s half-written backups nobody was writing any more.", gone)
     return gone
 
 

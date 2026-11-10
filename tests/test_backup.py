@@ -175,6 +175,55 @@ def test_a_directory_target_gets_a_timestamped_file(tmp_path):
     assert report.path.parent == tmp_path / "default"
 
 
+def test_a_backup_cut_short_leaves_no_file_behind(tmp_path, settings, monkeypatch):
+    """An archive was written under its final name, so one that failed half way stayed in
+    the directory looking like a backup, and retention counted it as one (#1123)."""
+    a_media_file(settings)
+    target = tmp_path / "backups"
+
+    def disk_full(*args, **kwargs):
+        raise OSError("No space left on device")
+
+    monkeypatch.setattr(backup_module, "_add_tree", disk_full)
+    with pytest.raises(OSError, match="No space left"):
+        write_backup(target)
+
+    assert list(target.iterdir()) == []
+
+
+def test_a_backup_that_does_not_verify_leaves_no_file_behind(tmp_path, monkeypatch):
+    """Verifying came after the file had its name, so a failed check left it there (#1123)."""
+    target = tmp_path / "backups"
+
+    def refuses(path):
+        raise BackupError("The database in the archive does not match its checksum.")
+
+    monkeypatch.setattr(backup_module, "verify_backup", refuses)
+    with pytest.raises(BackupError):
+        write_backup(target)
+
+    assert list(target.iterdir()) == []
+
+
+def test_a_backup_has_its_name_only_once_it_is_whole(tmp_path, monkeypatch):
+    """While it is written and checked the file is a dot-file nothing lists; afterwards the
+    directory holds the archive and nothing else (#1123)."""
+    target = tmp_path / "backups"
+    seen = []
+    verify = backup_module.verify_backup
+
+    def watching(path):
+        seen.extend(entry.name for entry in target.iterdir())
+        return verify(path)
+
+    monkeypatch.setattr(backup_module, "verify_backup", watching)
+    report = write_backup(target)
+
+    assert len(seen) == 1 and seen[0].startswith(".") and seen[0].endswith(".partial")
+    assert [entry.name for entry in target.iterdir()] == [report.path.name]
+    verify(report.path)
+
+
 def test_media_can_be_left_out(tmp_path, settings):
     a_media_file(settings)
     report = write_backup(tmp_path / "db-only.tar.gz", include_media=False)

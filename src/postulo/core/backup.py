@@ -38,6 +38,7 @@ import sqlite3
 import subprocess
 import tarfile
 import tempfile
+import uuid
 from dataclasses import dataclass, field
 from pathlib import Path, PurePosixPath
 
@@ -63,6 +64,10 @@ MANIFEST = "manifest.json"
 INTEGRITY = "integrity.json"
 MEDIA_PREFIX = "media"
 PLUGINS_PREFIX = "plugins"
+#: What an archive is called while it is being written (#1123): a dot-file beside the name it
+#: will have, which nothing lists as a backup.
+PARTIAL_PREFIX = ".postulo-backup-"
+PARTIAL_SUFFIX = ".partial"
 
 
 class BackupError(Exception):
@@ -545,30 +550,38 @@ def write_backup(
         manifest_bytes = json.dumps(manifest, indent=2).encode("utf-8")
         digests: dict[str, str] = {}
 
-        with tarfile.open(path, "w:gz") as archive:
-            info = tarfile.TarInfo(MANIFEST)
-            info.size = len(manifest_bytes)
-            info.mtime = int(timezone.now().timestamp())
-            archive.addfile(info, io.BytesIO(manifest_bytes))
-            archive.add(dump, arcname=member)
-            if with_media:
-                _add_tree(archive, media_root, MEDIA_PREFIX, digests)
-            if with_plugins:
-                _add_tree(archive, plugins_root, PLUGINS_PREFIX, digests)
-            # Last, because the digests are known only once the files are in. The manifest is
-            # first so the Backups page can read it without decompressing the rest.
-            from postulo.plugins import secrets as _secrets
+        # Under a name the Backups page does not list, and under its own only once it has
+        # verified (#1123): written straight to its final name, an archive cut short by a
+        # full disk or a killed container stayed there looking like a backup, and retention
+        # counted it as one of the newest and deleted a good one to make room for it.
+        partial = path.with_name(f"{PARTIAL_PREFIX}{uuid.uuid4().hex}{PARTIAL_SUFFIX}")
+        try:
+            with tarfile.open(partial, "w:gz") as archive:
+                info = tarfile.TarInfo(MANIFEST)
+                info.size = len(manifest_bytes)
+                info.mtime = int(timezone.now().timestamp())
+                archive.addfile(info, io.BytesIO(manifest_bytes))
+                archive.add(dump, arcname=member)
+                if with_media:
+                    _add_tree(archive, media_root, MEDIA_PREFIX, digests)
+                if with_plugins:
+                    _add_tree(archive, plugins_root, PLUGINS_PREFIX, digests)
+                # Last, because the digests are known only once the files are in. The manifest
+                # is first so the Backups page can read it without decompressing the rest.
+                record = {"members": digests, "database": manifest["database"]["sha256"]}
+                mac = secrets.backup_mac(_canonical(record))
+                trailer = json.dumps({**record, "mac": mac}).encode("utf-8")
+                tail = tarfile.TarInfo(INTEGRITY)
+                tail.size = len(trailer)
+                tail.mtime = int(timezone.now().timestamp())
+                archive.addfile(tail, io.BytesIO(trailer))
+            verify_backup(partial)
+            # Within one directory, so the name appears with the whole archive behind it.
+            os.replace(partial, path)
+        except BaseException:
+            partial.unlink(missing_ok=True)
+            raise
 
-            record = {"members": digests, "database": manifest["database"]["sha256"]}
-            trailer = json.dumps({**record, "mac": _secrets.backup_mac(_canonical(record))}).encode(
-                "utf-8"
-            )
-            tail = tarfile.TarInfo(INTEGRITY)
-            tail.size = len(trailer)
-            tail.mtime = int(timezone.now().timestamp())
-            archive.addfile(tail, io.BytesIO(trailer))
-
-    verify_backup(path)
     return BackupReport(
         path=path,
         bytes=path.stat().st_size,

@@ -244,6 +244,14 @@ class Command(BaseCommand):
             backups.start_if_due(queue=queue)
         except Exception:
             logger.exception("Could not start the scheduled backup")
+        # What a backup killed half way left in the directory, once it is too old to be one
+        # that is still being written (#1123).
+        try:
+            from postulo.core import backups
+
+            backups.forget_partial()
+        except Exception:
+            logger.exception("Could not remove half-written backups")
 
         # The copies on their way to the backup destination, after everything above and for
         # the same reason: an upload can take an hour, and the reminders this pass carried
