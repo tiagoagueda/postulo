@@ -40,10 +40,12 @@ jobs:
 
       - name: Install uv
         run: |
-          curl -LsSf "https://astral.sh/uv/${UV_VERSION}/install.sh" -o /tmp/uv-install.sh
+          curl -LsSf --retry 3 --retry-all-errors --connect-timeout 10 --max-time 120 \
+            "https://astral.sh/uv/${UV_VERSION}/install.sh" -o /tmp/uv-install.sh
           echo "${UV_INSTALLER_SHA256}  /tmp/uv-install.sh" | sha256sum -c -
           sh /tmp/uv-install.sh
           echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+        timeout-minutes: 5
 
       - name: Audit the Python dependencies
         run: |
@@ -61,6 +63,7 @@ jobs:
         run: >
           uvx zizmor==1.30.1 --offline --no-progress --config .forgejo/zizmor.yml
           --min-severity medium .forgejo/workflows/*.yml
+        timeout-minutes: 10
 
   esco:
     name: ESCO still answers in the shape the loader reads
@@ -81,13 +84,16 @@ jobs:
 
       - name: Install uv
         run: |
-          curl -LsSf "https://astral.sh/uv/${UV_VERSION}/install.sh" -o /tmp/uv-install.sh
+          curl -LsSf --retry 3 --retry-all-errors --connect-timeout 10 --max-time 120 \
+            "https://astral.sh/uv/${UV_VERSION}/install.sh" -o /tmp/uv-install.sh
           echo "${UV_INSTALLER_SHA256}  /tmp/uv-install.sh" | sha256sum -c -
           sh /tmp/uv-install.sh
           echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+        timeout-minutes: 5
 
       - name: Install dependencies
         run: uv sync --locked --python 3.14 --no-group e2e
+        timeout-minutes: 5
 
       - name: Download the ESCO classification
         run: uv run manage.py fetch_esco --revision "$ESCO_REVISION"

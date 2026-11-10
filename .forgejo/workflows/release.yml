@@ -49,10 +49,12 @@ jobs:
 
       - name: Install uv
         run: |
-          curl -LsSf "https://astral.sh/uv/${UV_VERSION}/install.sh" -o /tmp/uv-install.sh
+          curl -LsSf --retry 3 --retry-all-errors --connect-timeout 10 --max-time 120 \
+            "https://astral.sh/uv/${UV_VERSION}/install.sh" -o /tmp/uv-install.sh
           echo "${UV_INSTALLER_SHA256}  /tmp/uv-install.sh" | sha256sum -c -
           sh /tmp/uv-install.sh
           echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+        timeout-minutes: 5
 
       - name: Refuse a tag that disagrees with the code or the changelog, or whose CI did not pass
         # `--ci` asks Forgejo for the commit statuses of the tagged commit and refuses unless

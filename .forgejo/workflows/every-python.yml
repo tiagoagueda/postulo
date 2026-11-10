@@ -103,13 +103,16 @@ jobs:
           apt-get update
           apt-get install -y --no-install-recommends libpango-1.0-0 libpangoft2-1.0-0 libharfbuzz0b libharfbuzz-subset0 libfontconfig1 fonts-dejavu-core
           rm -rf /var/lib/apt/lists/*
+        timeout-minutes: 5
 
       - name: Install uv
         run: |
-          curl -LsSf "https://astral.sh/uv/${UV_VERSION}/install.sh" -o /tmp/uv-install.sh
+          curl -LsSf --retry 3 --retry-all-errors --connect-timeout 10 --max-time 120 \
+            "https://astral.sh/uv/${UV_VERSION}/install.sh" -o /tmp/uv-install.sh
           echo "${UV_INSTALLER_SHA256}  /tmp/uv-install.sh" | sha256sum -c -
           sh /tmp/uv-install.sh
           echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+        timeout-minutes: 5
 
       - name: Keep uv's downloads between runs
         # Forgejo's runner serves the cache API the action talks to. Should this instance's
@@ -121,6 +124,7 @@ jobs:
           path: ~/.cache/uv
           key: uv-${{ runner.os }}-${{ matrix.python-version }}-${{ hashFiles('uv.lock') }}
           restore-keys: ${{ github.event_name != 'pull_request' && format('uv-{0}-{1}-', runner.os, matrix.python-version) || '' }}
+        timeout-minutes: 10
 
       - name: Install dependencies
         # Playwright the library, through the `chromium` extra, and not the browser group:
@@ -129,6 +133,7 @@ jobs:
         # worker. The browser itself is never downloaded here. `UV_NO_SYNC` above is what
         # makes this true: for months a plain `uv run` put the whole group back (#1135).
         run: uv sync --locked --python ${{ matrix.python-version }} --no-group e2e --extra chromium
+        timeout-minutes: 5
 
       - name: Keep the compiled translations between runs
         # Compiling every catalogue took 18 to 37 s of each job that runs tests (#1033), and
@@ -144,6 +149,7 @@ jobs:
             src/postulo/**/LC_MESSAGES/django.mo
             src/postulo/locale/status.json
           key: catalogues-${{ hashFiles('src/postulo/**/LC_MESSAGES/django.po', 'scripts/messages.py', 'src/postulo/core/messages_tool.py', 'src/postulo/core/languages.py', 'src/postulo/__init__.py') }}
+        timeout-minutes: 10
 
       - name: Compile the translations
         # The suite reads compiled catalogues: a page in Portuguese is only Portuguese if
@@ -164,6 +170,7 @@ jobs:
             src/postulo/jobs/data/esco-${{ env.ESCO_REVISION }}.json
             src/postulo/jobs/data/esco-skills-${{ env.ESCO_REVISION }}.zip
           key: esco-${{ env.ESCO_REVISION }}
+        timeout-minutes: 10
 
       - name: Download the ESCO classification
         # Not committed: megabytes of reference data, the occupations and the skills, and
@@ -173,6 +180,7 @@ jobs:
         run: uv run manage.py fetch_esco --revision "$ESCO_REVISION"
         env:
           DJANGO_SETTINGS_MODULE: postulo.config.settings.test
+        timeout-minutes: 10
 
       - name: Test
         # Two processes, not `-n auto` (#233): the jobs of this workflow share one host,

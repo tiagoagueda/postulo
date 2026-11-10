@@ -66,13 +66,16 @@ jobs:
           apt-get update
           apt-get install -y --no-install-recommends libpango-1.0-0 libpangoft2-1.0-0 libharfbuzz0b libharfbuzz-subset0 libfontconfig1 fonts-dejavu-core
           rm -rf /var/lib/apt/lists/*
+        timeout-minutes: 5
 
       - name: Install uv
         run: |
-          curl -LsSf "https://astral.sh/uv/${UV_VERSION}/install.sh" -o /tmp/uv-install.sh
+          curl -LsSf --retry 3 --retry-all-errors --connect-timeout 10 --max-time 120 \
+            "https://astral.sh/uv/${UV_VERSION}/install.sh" -o /tmp/uv-install.sh
           echo "${UV_INSTALLER_SHA256}  /tmp/uv-install.sh" | sha256sum -c -
           sh /tmp/uv-install.sh
           echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+        timeout-minutes: 5
 
       - name: Upgrade the lock
         id: lock
@@ -95,6 +98,7 @@ jobs:
         if: steps.lock.outputs.changed == 'true'
         # Playwright the library and not the browser group, as the unit job of `ci.yml`.
         run: uv sync --locked --python 3.14 --no-group e2e --extra chromium
+        timeout-minutes: 5
 
       - name: Run a quick check against them
         # Ruff, migrations and the suite on Python 3.14 alone: enough that a lock which

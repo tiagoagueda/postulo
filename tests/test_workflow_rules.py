@@ -134,3 +134,55 @@ def test_the_weekly_esco_check_downloads_and_reads_no_cache():
     assert any("fetch_esco" in str(step.get("run", "")) for step in esco["steps"])
     for pin in ("UV_VERSION", "UV_INSTALLER_SHA256", "ESCO_REVISION"):
         assert env[pin] == workflows()["ci.yml"]["env"][pin], pin
+
+
+# ------------------------------------ no step waits for ever on the network (#1138)
+
+#: What a step's text holds when it reaches the network to set a job up.
+REACHES_THE_NETWORK = (
+    "apt-get ",
+    "astral.sh/uv/",
+    "uv sync",
+    "npm ci",
+    "playwright install",
+    "fetch_esco",
+    "uvx ",
+)
+
+
+def test_every_set_up_step_that_reaches_the_network_has_a_time_limit():
+    """This runner ignores a job's `timeout-minutes`, so a download that stalls without
+    failing ran until the runner's own limit, hours later, holding one of its two slots.
+    A limit on the step ends it in minutes, with the step named."""
+    unlimited = []
+    for name, key, job in jobs():
+        for step in job["steps"]:
+            text = str(step.get("run", "")) + str(step.get("uses", ""))
+            reaches = any(mark in text for mark in REACHES_THE_NETWORK) or "actions/cache@" in text
+            if reaches and "timeout-minutes" not in step:
+                unlimited.append(f"{name}: {key}: {step.get('name') or text[:40]}")
+
+    assert unlimited == []
+
+
+def test_no_job_relies_on_a_time_limit_of_its_own():
+    """The runner does not honour one, so a job that had it would only look protected."""
+    assert [f"{name}: {key}" for name, key, job in jobs() if "timeout-minutes" in job] == []
+
+
+def test_the_installer_download_retries_and_gives_up():
+    """curl retries nothing and waits for ever unless told otherwise; uv and apt do both by
+    themselves. The checksum on the next line is unchanged, so a retry cannot let a different
+    script through."""
+    downloads = [
+        str(step["run"])
+        for _, _, job in jobs()
+        for step in job["steps"]
+        if "astral.sh/uv/" in str(step.get("run", ""))
+    ]
+
+    assert downloads, "the search finds the installer steps"
+    for run in downloads:
+        for flag in ("--retry 3", "--retry-all-errors", "--connect-timeout 10", "--max-time 120"):
+            assert flag in run, flag
+        assert "sha256sum -c -" in run

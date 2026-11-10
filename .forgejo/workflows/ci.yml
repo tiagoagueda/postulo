@@ -20,10 +20,16 @@
 # browser job waited nineteen minutes for a slot behind the unit legs and the checks, and
 # a push took 55 minutes to report (#712).
 #
-# Time limits sit on the steps that run the tests, not on the jobs: this runner
-# (forgejo-runner 6.4) ignores a job's `timeout-minutes` and honours a step's. Both were
-# tried on a throwaway branch (#712), and a job-level `if` was found to fail its job rather
-# than skip it, which is why nothing here is skipped that way.
+# Time limits sit on steps, not on jobs: this runner (forgejo-runner 6.4) ignores a job's
+# `timeout-minutes` and honours a step's. Both were tried on a throwaway branch (#712), and a
+# job-level `if` was found to fail its job rather than skip it, which is why nothing here is
+# skipped that way.
+#
+# Every step that reaches the network has a limit, not only the ones that run tests: a
+# mirror that stalls without failing held one of the runner's two slots until the runner's
+# own limit, three hours, with the next push queued behind it (#1138). The numbers are
+# literal and generous, several times what the step takes on a loaded host; they are there
+# to end a hang, not to time a run. `tests/test_workflow_rules.py` holds every workflow to it.
 name: CI
 
 on:
@@ -121,13 +127,16 @@ jobs:
             libfreetype6 fonts-noto-color-emoji fonts-unifont xfonts-scalable fonts-liberation \
             fonts-ipafont-gothic fonts-wqy-zenhei fonts-tlwg-loma-otf fonts-freefont-ttf
           rm -rf /var/lib/apt/lists/*
+        timeout-minutes: 5
 
       - name: Install uv
         run: |
-          curl -LsSf "https://astral.sh/uv/${UV_VERSION}/install.sh" -o /tmp/uv-install.sh
+          curl -LsSf --retry 3 --retry-all-errors --connect-timeout 10 --max-time 120 \
+            "https://astral.sh/uv/${UV_VERSION}/install.sh" -o /tmp/uv-install.sh
           echo "${UV_INSTALLER_SHA256}  /tmp/uv-install.sh" | sha256sum -c -
           sh /tmp/uv-install.sh
           echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+        timeout-minutes: 5
 
       # Only a push to a branch the project controls may fall back to an older cache by prefix: on
       # a pull request the key is exact, so a run of somebody else's code cannot read or seed what
@@ -141,16 +150,20 @@ jobs:
             ~/.cache/ms-playwright
           key: browser-${{ runner.os }}-${{ hashFiles('uv.lock') }}
           restore-keys: ${{ github.event_name != 'pull_request' && format('browser-{0}-', runner.os) || '' }}
+        timeout-minutes: 10
 
       - name: Install dependencies
         run: uv sync --locked --python 3.14 --group e2e
+        timeout-minutes: 5
 
       - name: Install Chromium for Playwright
         # The browser alone: its system libraries came with WeasyPrint's, above.
         run: uv run playwright install chromium
+        timeout-minutes: 10
 
       - name: Install axe-core for the accessibility checks
         run: npm ci
+        timeout-minutes: 5
 
       - name: Keep the compiled translations between runs
         # Compiling every catalogue took 18 to 37 s of each job that runs tests (#1033), and
@@ -166,6 +179,7 @@ jobs:
             src/postulo/**/LC_MESSAGES/django.mo
             src/postulo/locale/status.json
           key: catalogues-${{ hashFiles('src/postulo/**/LC_MESSAGES/django.po', 'scripts/messages.py', 'src/postulo/core/messages_tool.py', 'src/postulo/core/languages.py', 'src/postulo/__init__.py') }}
+        timeout-minutes: 10
 
       - name: Compile the translations
         if: steps.catalogues.outputs.cache-hit != 'true'
@@ -278,13 +292,16 @@ jobs:
           apt-get update
           apt-get install -y --no-install-recommends libpango-1.0-0 libpangoft2-1.0-0 libharfbuzz0b libharfbuzz-subset0 libfontconfig1 fonts-dejavu-core
           rm -rf /var/lib/apt/lists/*
+        timeout-minutes: 5
 
       - name: Install uv
         run: |
-          curl -LsSf "https://astral.sh/uv/${UV_VERSION}/install.sh" -o /tmp/uv-install.sh
+          curl -LsSf --retry 3 --retry-all-errors --connect-timeout 10 --max-time 120 \
+            "https://astral.sh/uv/${UV_VERSION}/install.sh" -o /tmp/uv-install.sh
           echo "${UV_INSTALLER_SHA256}  /tmp/uv-install.sh" | sha256sum -c -
           sh /tmp/uv-install.sh
           echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+        timeout-minutes: 5
 
       - name: Keep uv's downloads between runs
         # Forgejo's runner serves the cache API the action talks to. Should this instance's
@@ -296,6 +313,7 @@ jobs:
           path: ~/.cache/uv
           key: uv-${{ runner.os }}-${{ matrix.python-version }}-${{ hashFiles('uv.lock') }}
           restore-keys: ${{ github.event_name != 'pull_request' && format('uv-{0}-{1}-', runner.os, matrix.python-version) || '' }}
+        timeout-minutes: 10
 
       - name: Install dependencies
         # Playwright the library, through the `chromium` extra, and not the browser group:
@@ -304,6 +322,7 @@ jobs:
         # worker. The browser itself is never downloaded here. `UV_NO_SYNC` above is what
         # makes this true: for months a plain `uv run` put the whole group back (#1135).
         run: uv sync --locked --python ${{ matrix.python-version }} --no-group e2e --extra chromium
+        timeout-minutes: 5
 
       - name: Keep the compiled translations between runs
         # Compiling every catalogue took 18 to 37 s of each job that runs tests (#1033), and
@@ -319,6 +338,7 @@ jobs:
             src/postulo/**/LC_MESSAGES/django.mo
             src/postulo/locale/status.json
           key: catalogues-${{ hashFiles('src/postulo/**/LC_MESSAGES/django.po', 'scripts/messages.py', 'src/postulo/core/messages_tool.py', 'src/postulo/core/languages.py', 'src/postulo/__init__.py') }}
+        timeout-minutes: 10
 
       - name: Compile the translations
         # The suite reads compiled catalogues: a page in Portuguese is only Portuguese if
@@ -339,6 +359,7 @@ jobs:
             src/postulo/jobs/data/esco-${{ env.ESCO_REVISION }}.json
             src/postulo/jobs/data/esco-skills-${{ env.ESCO_REVISION }}.zip
           key: esco-${{ env.ESCO_REVISION }}
+        timeout-minutes: 10
 
       - name: Download the ESCO classification
         # Not committed: megabytes of reference data, the occupations and the skills, and
@@ -348,6 +369,7 @@ jobs:
         run: uv run manage.py fetch_esco --revision "$ESCO_REVISION"
         env:
           DJANGO_SETTINGS_MODULE: postulo.config.settings.test
+        timeout-minutes: 10
 
       - name: Test
         # Two processes, not `-n auto` (#233): the jobs of this workflow share one host,
@@ -432,10 +454,12 @@ jobs:
 
       - name: Install uv
         run: |
-          curl -LsSf "https://astral.sh/uv/${UV_VERSION}/install.sh" -o /tmp/uv-install.sh
+          curl -LsSf --retry 3 --retry-all-errors --connect-timeout 10 --max-time 120 \
+            "https://astral.sh/uv/${UV_VERSION}/install.sh" -o /tmp/uv-install.sh
           echo "${UV_INSTALLER_SHA256}  /tmp/uv-install.sh" | sha256sum -c -
           sh /tmp/uv-install.sh
           echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+        timeout-minutes: 5
 
       - name: Keep uv's downloads between runs
         uses: actions/cache@v4
@@ -444,9 +468,11 @@ jobs:
           path: ~/.cache/uv
           key: uv-${{ runner.os }}-3.14-${{ hashFiles('uv.lock') }}
           restore-keys: ${{ github.event_name != 'pull_request' && format('uv-{0}-3.14-', runner.os) || '' }}
+        timeout-minutes: 10
 
       - name: Install dependencies
         run: uv sync --locked --python 3.14 --no-group e2e
+        timeout-minutes: 5
 
       - name: Lint
         run: |
@@ -504,6 +530,7 @@ jobs:
       # That only works if it is kept in step with its source; the same goes for the
       # icons, the vendored scripts and the mark.
       - run: npm ci
+        timeout-minutes: 5
 
       - name: Rebuild the stylesheet
         run: npm run build:css
@@ -592,6 +619,7 @@ jobs:
           apt-get update
           apt-get install -y --no-install-recommends libpango-1.0-0 libpangoft2-1.0-0 libharfbuzz0b libharfbuzz-subset0 libfontconfig1 fonts-dejavu-core
           rm -rf /var/lib/apt/lists/*
+        timeout-minutes: 5
 
       - name: Install the PostgreSQL client tools
         # From PostgreSQL's own repository and by major version, exactly as
@@ -608,6 +636,7 @@ jobs:
           apt-get install -y --no-install-recommends postgresql-client-17
           rm -rf /var/lib/apt/lists/*
           pg_dump --version
+        timeout-minutes: 5
 
       - name: Find this run's database server
         # `db` resolves to every run's server on the shared network; only this run's
@@ -628,14 +657,17 @@ jobs:
 
       - name: Install uv
         run: |
-          curl -LsSf "https://astral.sh/uv/${UV_VERSION}/install.sh" -o /tmp/uv-install.sh
+          curl -LsSf --retry 3 --retry-all-errors --connect-timeout 10 --max-time 120 \
+            "https://astral.sh/uv/${UV_VERSION}/install.sh" -o /tmp/uv-install.sh
           echo "${UV_INSTALLER_SHA256}  /tmp/uv-install.sh" | sha256sum -c -
           sh /tmp/uv-install.sh
           echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+        timeout-minutes: 5
 
       - name: Install dependencies
         # --extra postgres, which is where psycopg lives and what the image was missing.
         run: uv sync --locked --python 3.14 --extra postgres --no-group e2e
+        timeout-minutes: 5
 
       - name: Keep the compiled translations between runs
         # Compiling every catalogue took 18 to 37 s of each job that runs tests (#1033), and
@@ -651,6 +683,7 @@ jobs:
             src/postulo/**/LC_MESSAGES/django.mo
             src/postulo/locale/status.json
           key: catalogues-${{ hashFiles('src/postulo/**/LC_MESSAGES/django.po', 'scripts/messages.py', 'src/postulo/core/messages_tool.py', 'src/postulo/core/languages.py', 'src/postulo/__init__.py') }}
+        timeout-minutes: 10
 
       - name: Compile the translations
         if: steps.catalogues.outputs.cache-hit != 'true'
@@ -767,10 +800,12 @@ jobs:
 
       - name: Install uv
         run: |
-          curl -LsSf "https://astral.sh/uv/${UV_VERSION}/install.sh" -o /tmp/uv-install.sh
+          curl -LsSf --retry 3 --retry-all-errors --connect-timeout 10 --max-time 120 \
+            "https://astral.sh/uv/${UV_VERSION}/install.sh" -o /tmp/uv-install.sh
           echo "${UV_INSTALLER_SHA256}  /tmp/uv-install.sh" | sha256sum -c -
           sh /tmp/uv-install.sh
           echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+        timeout-minutes: 5
 
       - name: Audit the Python dependencies
         # The lock file rather than the installed environment, and the difference is why
@@ -832,3 +867,4 @@ jobs:
         run: >
           uvx zizmor==1.30.1 --offline --no-progress --config .forgejo/zizmor.yml
           --min-severity medium .forgejo/workflows/*.yml
+        timeout-minutes: 10
