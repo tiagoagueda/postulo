@@ -1474,12 +1474,16 @@ class CompanyUpdateView(
         return super().form_valid(form)
 
 
+@method_decorator(transaction.non_atomic_requests, name="dispatch")
 class CompanyLogoView(OwnedObjectMixin, View):
     """Serve a company's logo — from this instance, never from anybody else's server.
 
     It is a row beside the company (#662) and comes out only through here, which is what
     lets the content security policy keep saying ``img-src 'self'``. The address carries
     the moment it was fetched, so a new logo is never hidden behind an old cache entry.
+
+    Out of the request's transaction: two reads and no write, asked for once per card on a
+    board, and on SQLite each would have queued for the write lock (#1129).
     """
 
     def get_queryset(self):

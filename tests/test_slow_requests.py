@@ -87,6 +87,18 @@ ORDINARY = [
 ]
 
 
+#: Views that are not slow but only read, and are asked for many at a time or on a timer
+#: (#1129). A name here is a promise that the view writes nothing, which the test below it
+#: holds each one to.
+READ_ONLY = [
+    ("jobs:company_logo", (1,)),
+    ("accounts:avatar", (1,)),
+    ("notifications:worker", ()),
+    ("core:manifest", ()),
+    ("core:errand_state", (1,)),
+]
+
+
 def opts_out(name: str, args: tuple) -> bool:
     """Whether the view answering this address has left the request's transaction."""
     match = resolve(reverse(name, args=args))
@@ -101,6 +113,55 @@ def test_the_slow_views_do_not_hold_the_database_while_they_work(name, args):
 @pytest.mark.parametrize("name,args", ORDINARY, ids=lambda value: str(value))
 def test_an_ordinary_view_still_runs_inside_one(name, args):
     assert not opts_out(name, args), f"{name} left the request's transaction"
+
+
+@pytest.mark.parametrize("name,args", READ_ONLY, ids=lambda value: str(value))
+def test_a_view_that_only_reads_does_not_queue_for_the_write_lock(name, args):
+    """On SQLite a request's transaction takes the write lock as it begins, so a logo, a
+    picture, the service worker, the manifest and the poll of a piece of slow work each
+    waited behind every writer to read a row or nothing at all: fifty logos on a board were
+    fifty turns at the lock, and the poll queued behind the work it was watching (#1129)."""
+    assert opts_out(name, args), f"{name} still runs inside the request's transaction"
+
+
+def test_the_views_that_only_read_write_nothing(client, user):
+    """Leaving the request's transaction is safe only for a view with nothing to roll back,
+    so each of them is asked for here and every statement it sent is looked at (#1129)."""
+    from django.test.utils import CaptureQueriesContext
+
+    from postulo.accounts.models import Profile, ProfilePicture
+    from postulo.core.models import Errand
+    from postulo.jobs.models import CompanyLogo
+
+    picture = b"\x89PNG\r\n\x1a\nnot really a png"
+    company = Company.objects.create(owner=user, name="Aperture Science", has_logo=True)
+    CompanyLogo.objects.create(company=company, data=picture, media_type="image/png")
+    profile, _created = Profile.objects.get_or_create(user=user)
+    Profile.objects.filter(pk=profile.pk).update(has_avatar=True)
+    ProfilePicture.objects.create(
+        profile=profile, kind=ProfilePicture.UPLOAD, data=picture, media_type="image/png"
+    )
+    errand = Errand.objects.create(owner=user, kind="export")
+    client.force_login(user)
+    addresses = [
+        reverse("jobs:company_logo", args=(company.pk,)),
+        reverse("accounts:avatar", args=(user.pk,)),
+        reverse("notifications:worker"),
+        reverse("core:manifest"),
+        reverse("core:errand_state", args=(errand.pk,)),
+        reverse("core:errand_state", args=(errand.pk,)) + "?dialog=1",
+    ]
+
+    for address in addresses:
+        with CaptureQueriesContext(connection) as sent:
+            response = client.get(address)
+        assert response.status_code == 200, address
+        written = [
+            query["sql"]
+            for query in sent.captured_queries
+            if query["sql"].lstrip().upper().startswith(("INSERT", "UPDATE", "DELETE", "REPLACE"))
+        ]
+        assert not written, f"{address} wrote: {written}"
 
 
 def depth() -> int:

@@ -7,7 +7,7 @@ import json
 import logging
 from pathlib import Path
 
-from django.db import connection
+from django.db import connection, transaction
 from django.http import HttpRequest, HttpResponse, JsonResponse
 from django.shortcuts import render
 from django.urls import reverse
@@ -137,6 +137,9 @@ def csp_report(request: HttpRequest) -> HttpResponse:
     return HttpResponse(status=204)
 
 
+# Out of the request's transaction: it reads the instance's settings and writes nothing,
+# and on SQLite it queued for the write lock to do so (#1129).
+@transaction.non_atomic_requests
 def manifest(request: HttpRequest) -> JsonResponse:
     """The web app manifest, so a browser installs Postulo as an app of its own (#895).
 

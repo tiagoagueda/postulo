@@ -32,6 +32,12 @@ Three options together make two writers take turns instead:
   company and profile forms with a picture to fetch, the capture API, connection tests and
   consent, *Send now* to a store, and the staff pages that call a mail host or a catalogue.
   The plugin install still occupies a worker for as long as it takes, but holds no lock.
+
+  #1129 added the other kind: views that are not slow but only read, and are asked for many
+  at a time or on a timer, so that each queued for a lock it had no use for. A company's
+  logo, a person's picture, the service worker, the web app manifest and the poll of a piece
+  of slow work carry the same decorator; under WAL a read outside a transaction waits for
+  nobody. The notices poll stays inside one: it deletes and marks, and the two go together.
 * ``journal_mode=WAL`` -- readers stop blocking the writer and the writer stops blocking
   readers, which is what makes the serialisation above cheap. WAL keeps two files beside
   the database, ``-wal`` and ``-shm``, in the same directory; the backup uses SQLite's own

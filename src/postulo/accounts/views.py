@@ -365,6 +365,7 @@ class RemoveRowView(LoginRequiredMixin, View):
         return redirect(back)
 
 
+@method_decorator(transaction.non_atomic_requests, name="dispatch")
 class AvatarView(LoginRequiredMixin, View):
     """Serve a person's picture: their own, or anyone's to an administrator.
 
@@ -372,6 +373,9 @@ class AvatarView(LoginRequiredMixin, View):
     content security policy can keep saying ``img-src 'self'``. A face is not a CV, so the
     cache may keep it for a day; the address changes with the profile, so a new picture is
     never hidden by an old cache entry.
+
+    Out of the request's transaction: two reads and no write, on every page that shows a
+    face, and on SQLite each would have queued for the write lock (#1129).
     """
 
     def get(self, request: HttpRequest, pk: int) -> HttpResponse:

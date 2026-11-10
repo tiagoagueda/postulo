@@ -15,6 +15,7 @@ so on its first paint.
 from __future__ import annotations
 
 from django.contrib.auth.decorators import login_required
+from django.db import transaction
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404, render
 
@@ -56,8 +57,13 @@ def errand_page(request: HttpRequest, pk: int) -> HttpResponse:
     return render(request, "core/errand.html", _context(_errand(request, pk)))
 
 
+@transaction.non_atomic_requests
 @login_required
 def errand_state(request: HttpRequest, pk: int) -> HttpResponse:
-    """The fragment the page polls. Ownership checked here, not only on the POST."""
+    """The fragment the page polls. Ownership checked here, not only on the POST.
+
+    Out of the request's transaction: it reads one row and writes nothing, every two seconds,
+    and on SQLite it queued for the write lock behind the very work it was watching (#1129).
+    """
     context = state_context(_errand(request, pk), in_dialog=request.GET.get("dialog") == "1")
     return render(request, "core/partials/errand_state.html", context)

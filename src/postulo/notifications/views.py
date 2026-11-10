@@ -10,6 +10,7 @@ from __future__ import annotations
 import functools
 from pathlib import Path
 
+from django.db import transaction
 from django.http import HttpRequest, HttpResponse, JsonResponse
 from django.views.decorators.http import require_GET, require_POST
 
@@ -23,6 +24,9 @@ def _worker_source() -> bytes:
     return WORKER.read_bytes()
 
 
+# Out of the request's transaction: it asks the database nothing, and on SQLite it took
+# the write lock to say so (#1129).
+@transaction.non_atomic_requests
 @require_GET
 def worker(request: HttpRequest) -> HttpResponse:
     """The service worker, from the root so that its scope is the whole site.
