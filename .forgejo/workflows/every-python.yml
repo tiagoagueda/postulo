@@ -21,7 +21,7 @@ on:
     # one ran both legs here for nothing the release gate would ever read (#1033).
     branches: ["[0-9]*.[0-9]*.[0-9]*"]
   schedule:
-    # The same morning as `ci.yml`'s weekly run, half an hour after it.
+    # The same morning as `weekly.yml`, half an hour after it.
     - cron: "47 6 * * 1"
   workflow_dispatch:
 
@@ -138,10 +138,9 @@ jobs:
       - name: Keep the ESCO classification between runs
         # Downloading it took half a minute of every leg and asked an outside service
         # on every push, and a slow or rate-limited answer failed the leg (#714). The
-        # weekly run does not look here, so it always downloads, and that download stays
-        # the check that the API still answers in the shape the loader reads.
+        # check that the API still answers in the shape the loader reads is `weekly.yml`'s,
+        # which downloads with no cache every Monday (#1136).
         id: esco
-        if: github.event_name != 'schedule'
         uses: actions/cache@v4
         continue-on-error: true
         with:

@@ -49,8 +49,8 @@ were the only thing that mattered.
 
 The process, so that it is the same every time and needs no thinking on a bad day:
 
-1. **Notice.** The `security` job in CI audits every locked dependency on every push and
-   every Monday; the maintainer is also subscribed to the security announcements of the
+1. **Notice.** The `security` job in CI audits every locked dependency on every push, and
+   the *Weekly* workflow runs the same job every Monday; the maintainer is also subscribed to the security announcements of the
    direct dependencies (Django, django-allauth, django-ninja, Pillow, WeasyPrint, httpx,
    cryptography). A failing audit is a page, not a chore. **The audit lags**, so once a
    week, and before every release, also check by hand: the security announcements and the

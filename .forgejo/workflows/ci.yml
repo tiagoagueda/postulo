@@ -43,18 +43,17 @@ on:
     # run because the release gate and the dev image's wait read its `(push)` statuses.
     branches: [main, "[0-9]*.[0-9]*.[0-9]*"]
   pull_request:
-  schedule:
-    # The dependency audit below also runs weekly, so a vulnerability disclosed in a
-    # library is noticed even in a week when nothing was pushed.
-    - cron: "17 6 * * 1"
+  # No `schedule:` here. The weekly run was the whole of CI, about 50 runner-minutes, for
+  # the two things a week without a push would miss: the dependency audit and the check
+  # that ESCO still answers. Those two run weekly in `weekly.yml` (#1136).
 
 # A newer push to the same pull request or branch cancels the run it supersedes: nobody
 # reads the result of a commit that is no longer the tip, and on two slots it delays the one
 # they will read (#1033). `dev-image.yml` does the same, so this Forgejo honours the block.
 # `main` is never cancelled: every commit on it keeps its own run, keyed on the commit
 # rather than the branch, because the release gate reads each commit's statuses and the dev
-# image waits for its own commit's CI. The event is in the key as well, so the weekly run on
-# `main` cannot cancel a push run of the same commit. A pull request is keyed on its number.
+# image waits for its own commit's CI. The event is in the key as well, so a run started
+# another way cannot cancel a push run of the same commit. A pull request is keyed on its number.
 concurrency:
   group: >-
     ${{ github.workflow }}-${{ github.event_name }}-${{
@@ -330,10 +329,9 @@ jobs:
       - name: Keep the ESCO classification between runs
         # Downloading it took half a minute of every leg and asked an outside service
         # on every push, and a slow or rate-limited answer failed the leg (#714). The
-        # weekly run does not look here, so it always downloads, and that download stays
-        # the check that the API still answers in the shape the loader reads.
+        # check that the API still answers in the shape the loader reads is `weekly.yml`'s,
+        # which downloads with no cache every Monday (#1136).
         id: esco
-        if: github.event_name != 'schedule'
         uses: actions/cache@v4
         continue-on-error: true
         with:
@@ -753,7 +751,9 @@ jobs:
     # commitments is to keep them as secure as it knows how. Part of that is noticing a
     # vulnerability disclosed in a dependency without anyone having to remember to look:
     # every Python package in the lock file and every Node package used to build the
-    # assets is checked against the advisory databases, on every push and every week.
+    # assets is checked against the advisory databases, on every push here and every week
+    # in `weekly.yml`, which holds a copy of this job (`tests/test_workflow_rules.py` keeps
+    # the two the same).
     runs-on: ubuntu-latest
     container:
       image: node:22-bookworm

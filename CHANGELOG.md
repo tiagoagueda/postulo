@@ -12,6 +12,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🔧 Changed
 
+- The weekly scheduled run is the dependency audit and the ESCO check alone, in a workflow of its own, not the whole of CI. (#1136)
 - CI jobs that leave the browser tests' packages out no longer download them anyway on their first command. (#1135)
 - CI's security job audits the two lock files without installing the project or the asset build's packages. (#1166)
 

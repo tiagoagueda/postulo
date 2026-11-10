@@ -76,6 +76,7 @@ def test_a_job_that_leaves_the_browser_group_out_keeps_it_out():
         ("ci.yml", "postgres"),
         ("every-python.yml", "test"),
         ("dependencies.yml", "upgrade"),
+        ("weekly.yml", "esco"),
     }
     for name, key, job in narrow:
         assert job.get("env", {}).get("UV_NO_SYNC") == "1", f"{name}: {key}"
@@ -95,3 +96,41 @@ def test_the_unit_jobs_install_the_playwright_the_unit_tests_import():
     assert "import playwright.sync_api" in (ROOT / "tests" / "test_documents.py").read_text(
         encoding="utf-8"
     )
+
+
+# ------------------------------------------------ what runs weekly, and only that (#1136)
+
+
+def triggers(name: str) -> dict:
+    # YAML 1.1 reads the key `on` as true.
+    return workflows()[name][True]
+
+
+def test_the_whole_of_ci_does_not_run_on_a_schedule():
+    """The weekly run of `ci.yml` cost about 50 runner-minutes to get an audit and an ESCO
+    check; a week without a push misses nothing else that a push would have tested."""
+    assert "schedule" not in triggers("ci.yml")
+    assert "schedule" in triggers("weekly.yml")
+    assert set(workflows()["weekly.yml"]["jobs"]) == {"security", "esco"}
+
+
+def test_the_weekly_audit_is_the_audit_a_push_runs():
+    """SECURITY.md promises the audit weekly as well as on every push. The weekly copy is
+    the same job, step for step: an advisory ignored in one is ignored in the other, and
+    `tests/test_security_audit.py` holds every one of those to its reason."""
+    on_a_push = workflows()["ci.yml"]["jobs"]["security"]
+    weekly = workflows()["weekly.yml"]["jobs"]["security"]
+
+    assert weekly == on_a_push
+
+
+def test_the_weekly_esco_check_downloads_and_reads_no_cache():
+    """The unit jobs keep the classification between runs, so they stopped being the check
+    that the service still answers in the shape the loader reads. This job is that check."""
+    esco = workflows()["weekly.yml"]["jobs"]["esco"]
+    env = workflows()["weekly.yml"]["env"]
+
+    assert not any("actions/cache" in str(step.get("uses", "")) for step in esco["steps"])
+    assert any("fetch_esco" in str(step.get("run", "")) for step in esco["steps"])
+    for pin in ("UV_VERSION", "UV_INSTALLER_SHA256", "ESCO_REVISION"):
+        assert env[pin] == workflows()["ci.yml"]["env"][pin], pin
