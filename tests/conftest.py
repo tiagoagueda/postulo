@@ -1,5 +1,6 @@
 import shutil
 import tempfile
+import time
 from pathlib import Path
 
 import pytest
@@ -199,10 +200,22 @@ def _a_worker_that_is_going_round(_worker_heartbeat_file, settings):
     never did were running different suites. A test about a silent worker writes an old
     heartbeat, or removes the file, itself.
     """
-    from postulo.core import scheduler
+    from django.utils import timezone
 
     settings.POSTULO_WORKER_HEARTBEAT = _worker_heartbeat_file
-    scheduler.worker_beat()
+    # Written in place, not through `scheduler.beat`, which moves a temporary file over the
+    # old one so that a healthcheck never reads half a line. Nothing reads this one mid-write,
+    # and on Windows the move, made twenty thousand times in a run, was now and then refused
+    # ("Access is denied") while something else had the file open: one test in a whole run
+    # errored at setup for it. A write that is refused is tried again.
+    for attempt in range(5):
+        try:
+            _worker_heartbeat_file.write_text(timezone.now().isoformat(), encoding="utf-8")
+            break
+        except PermissionError:
+            if attempt == 4:
+                raise
+            time.sleep(0.05)
 
 
 #: How many languages a worker carries from one test file into the next before it lets go of
