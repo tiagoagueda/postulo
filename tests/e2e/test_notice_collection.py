@@ -60,14 +60,34 @@ def becomes(page: Page, expression: str, wanted: int) -> None:
     raise AssertionError(f"{expression} stayed {seen!r}, not {wanted!r}")
 
 
+def asked(page: Page, act: str) -> None:
+    """Do ``act`` in the page and see it ask for what is waiting, and be answered.
+
+    The script lets one request finish before it sends the next, so an ask made while an
+    earlier one is still open is dropped, on purpose. A loaded machine keeps one open for
+    longer than a test takes to reach its next line, which is how this test once waited
+    thirty seconds for a request the page had rightly not sent. So the answer is waited for,
+    not the request, and an ask that was dropped is made again.
+    """
+    from playwright.sync_api import TimeoutError as PlaywrightTimeout
+
+    def waiting(response) -> bool:
+        request = response.request
+        return request.method == "POST" and request.url.endswith(reverse("notifications:waiting"))
+
+    for _attempt in range(15):
+        try:
+            with page.expect_response(waiting, timeout=2000):
+                page.evaluate(act)
+            return
+        except PlaywrightTimeout:
+            continue
+    raise AssertionError(f"the page never asked after {act}")
+
+
 def ring(page: Page) -> None:
     """A minute passes in this tab, and it asks for what is waiting."""
-    with page.expect_request(
-        lambda request: (
-            request.method == "POST" and request.url.endswith(reverse("notifications:waiting"))
-        )
-    ):
-        page.evaluate("window.everyMinute.forEach((run) => run())")
+    asked(page, "window.everyMinute.forEach((run) => run())")
 
 
 def test_one_tab_asks_each_minute_and_the_next_takes_over_when_it_closes(
@@ -91,8 +111,7 @@ def test_one_tab_asks_each_minute_and_the_next_takes_over_when_it_closes(
     assert other.evaluate(TIMERS) == 0, "it waits for the first tab's turn to end"
 
     # A tab brought to the front still asks at once, whoever holds the turn.
-    with other.expect_request(lambda request: request.method == "POST"):
-        other.evaluate("document.dispatchEvent(new Event('visibilitychange'))")
+    asked(other, "document.dispatchEvent(new Event('visibilitychange'))")
 
     page.close()
     becomes(other, TIMERS, 1)
