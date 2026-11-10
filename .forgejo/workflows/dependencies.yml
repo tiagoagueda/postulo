@@ -127,23 +127,33 @@ jobs:
   propose:
     name: Push the branch and open the pull request
     needs: upgrade
-    if: needs.upgrade.outputs.changed == 'true'
+    # No `if` on the job: this runner fails a job whose `if` is false instead of skipping it
+    # (`ci.yml` says where that was found), so a month in which nothing moved would end red.
+    # Every step carries the condition instead, as the steps of `upgrade` do (#1159).
     runs-on: ubuntu-latest
     container:
       image: node:22-bookworm
 
     steps:
+      - name: Say so when nothing moved
+        if: needs.upgrade.outputs.changed != 'true'
+        run: |
+          echo "The lock did not move this month, so there is nothing to propose." >> "$GITHUB_STEP_SUMMARY"
+
       - uses: actions/checkout@v4
+        if: needs.upgrade.outputs.changed == 'true'
         with:
           persist-credentials: false
 
       - name: Fetch the two files
+        if: needs.upgrade.outputs.changed == 'true'
         uses: actions/download-artifact@v3
         with:
           name: dependency-lock
           path: handoff
 
       - name: Check and commit them
+        if: needs.upgrade.outputs.changed == 'true'
         run: |
           # Exactly two regular files, and nothing else, whatever the artifact holds.
           [ "$(find handoff -mindepth 1 | wc -l)" = "2" ]
@@ -171,6 +181,7 @@ jobs:
           echo "$branch" > /tmp/branch
 
       - name: Push the branch and open the pull request
+        if: needs.upgrade.outputs.changed == 'true'
         env:
           # Through the environment, never expanded into the script: a value that reaches a
           # shell as text is data, one pasted into it is code.

@@ -14,6 +14,10 @@ All notable changes to Postulo are recorded here. The format follows
 
 - CI's security job audits the two lock files without installing the project or the asset build's packages. (#1166)
 
+### 🐛 Fixed
+
+- The monthly dependency run no longer ends red in a month when no dependency moved. (#1159)
+
 ## [0.5.0] — 2026-11-01
 
 ### 🔒 Security
