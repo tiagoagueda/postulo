@@ -10,6 +10,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 - Applications can go quiet after a different number of days for each status, or for what they were applied through, set beside the usual number under Settings → Appearance; each application's page says when it will count as quiet. (#1099)
 - Offers can now be recorded, changed and deleted through the API, not only read, with the same checks, timeline entries and answer-by reminders as the page. (#1101)
+- A CV can be downloaded as Europass and as JSON Resume, each switched on under Extend file formats, and the CV's page says what each format leaves out. (#1100)
 - SQLite instances keep their write-ahead log to 64 MB and refresh the query planner's statistics once a day, and manage.py compact_database (with --dry-run) gives back the space deleted records leave in the file; Server Overview shows how much that is. (#1128)
 - The mark redrawn as vectors beside the raster, in assets/brand: postulo.svg, a pride variant (with its raster, postulo_pride.png), and two looping animations of each (Swell, Light drift) that start and end on the static mark. The raster stays the source of the served icons. (#1218)
 
