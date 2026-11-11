@@ -723,6 +723,9 @@ API: dict[str, tuple[str, Callable, dict]] = {
     "postulo-api:record_outcome": ("post", pk_of(interview), {"outcome": "done"}),
     "postulo-api:interview_calendar": ("get", pk_of(interview), {}),
     "postulo-api:get_offer": ("get", pk_of(offer), {}),
+    # Changing and deleting somebody else's offer (#1101).
+    "postulo-api:change_offer": ("patch", pk_of(offer), {"notes": "x"}),
+    "postulo-api:delete_offer": ("delete", pk_of(offer), {}),
     "postulo-api:get_listing": ("get", pk_of(posting), {}),
     # An entry for somebody else's listing's history (#270).
     "postulo-api:add_listing_event": ("post", pk_of(posting), {"summary": "x"}),
@@ -941,6 +944,18 @@ def _reminder_patch(user, other):
     )
 
 
+def _offer_post(user, other):
+    """An offer recorded on somebody else's application (#1101)."""
+    base = {"base_amount": "1000", "currency": "EUR"}
+    return (
+        "postulo-api:add_offer",
+        {},
+        "post",
+        {**base, "application_id": application(other).pk},
+        {**base, "application_id": MISSING},
+    )
+
+
 #: Where an id arrives in a body and not in an address. Each builds
 #: `(route, kwargs, method, body_with_theirs, body_with_a_missing_one)`; the two answers
 #: have to be the same, and nothing may have been made or changed by either.
@@ -960,14 +975,16 @@ BODIES: dict[str, Callable] = {
     ),
     "reminder application_id (POST)": _reminder_post,
     "reminder application_id (PATCH)": _reminder_patch,
+    "offer application_id (POST)": _offer_post,
 }
 
 
 def _state() -> tuple:
     """Everything a body could have made or changed."""
-    from postulo.applications.models import Interview, Reminder
+    from postulo.applications.models import Interview, Offer, Reminder
 
     return (
+        sorted(Offer.objects.values_list("pk", "application_id", "notes")),
         sorted(Interview.objects.values_list("pk", "application_id", "notes")),
         sorted(
             (i.pk, tuple(sorted(i.contacts.values_list("pk", flat=True))))

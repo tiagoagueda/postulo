@@ -305,6 +305,145 @@ def test_the_api_reads_offers(client, user, application):
     assert [row["id"] for row in detail["offers"]] == [offer.pk]
 
 
+# ---------------------------------------------------- writing through the API (#1101)
+
+
+def send(client, method, path, body, headers):
+    import json
+
+    return getattr(client, method)(
+        path, data=json.dumps(body), content_type="application/json", **headers
+    )
+
+
+def test_the_api_records_an_offer_as_the_page_does(client, user, application):
+    """Offers could be read and not recorded: an agent that moved an application to *Offer*
+    could not write down what was offered. Recorded here, it is the page's offer -- the
+    timeline entry signed by the token, the answer-by reminder, the move to *Offer*."""
+    response = send(
+        client,
+        "post",
+        "/api/v1/offers",
+        {
+            "application_id": application.pk,
+            "base_amount": "5000",
+            "currency": "eur",
+            "period": "month",
+            "answer_by": a_week_out().isoformat(),
+            "benefits": "Pension",
+        },
+        token_for(user, "read write"),
+    )
+
+    assert response.status_code == 201, response.content
+    body = response.json()
+    offer = Offer.objects.get(pk=body["id"])
+    assert offer.currency == "EUR", "upper-cased, as the form does"
+    assert Decimal(body["yearly_amount"]) == 60000
+    assert body["reminder_id"] == offer.reminder_id is not None
+    application.refresh_from_db()
+    assert application.status == Status.OFFER
+    entry = application.events.filter(kind=EventKind.OFFER).get()
+    assert entry.summary.startswith("Offer received") and entry.actor == "API token test"
+
+
+def test_the_api_refuses_an_offer_the_page_would_refuse(client, user, application):
+    """The form's rules, not a copy of them: an amount with no currency, and a code that is
+    not one, are refused as a body of the wrong shape is, and nothing is written."""
+    headers = token_for(user, "read write")
+    no_currency = send(
+        client,
+        "post",
+        "/api/v1/offers",
+        {"application_id": application.pk, "base_amount": "5000"},
+        headers,
+    )
+    not_a_code = send(
+        client,
+        "post",
+        "/api/v1/offers",
+        {"application_id": application.pk, "currency": "EU1"},
+        headers,
+    )
+
+    for response in (no_currency, not_a_code):
+        assert response.status_code == 422, response.content
+        assert response["Content-Type"] == "application/problem+json"
+        body = response.json()
+        assert body["type"].endswith("#validation-failed")
+        assert "currency" in body["detail"]
+        assert [error["loc"] for error in body["errors"]] == [["body", "payload", "currency"]]
+    assert no_currency.json()["errors"][0]["msg"] == "Say which currency the amount is in."
+    assert not Offer.objects.exists()
+
+
+def test_the_api_changes_an_offer_as_the_page_does(client, user, application):
+    """A term changed is a revision on the timeline and moves the reminder; the notes alone
+    are not; a date sent as null is taken away and its reminder ticked off."""
+    offer = record_offer(
+        application, base_amount=Decimal("65000"), currency="EUR", answer_by=a_week_out()
+    )
+    headers = token_for(user, "read write")
+    path = f"/api/v1/offers/{offer.pk}"
+    revisions = application.events.filter(kind=EventKind.OFFER, summary__startswith="Offer revised")
+
+    notes = send(client, "patch", path, {"notes": "Spoke to Cave"}, headers)
+    assert notes.status_code == 200, notes.content
+    assert notes.json()["notes"] == "Spoke to Cave" and notes.json()["base_amount"] is not None
+    assert not revisions.exists()
+
+    raised = send(client, "patch", path, {"base_amount": "70000"}, headers)
+    assert Decimal(raised.json()["base_amount"]) == 70000
+    assert revisions.count() == 1
+
+    cleared = send(client, "patch", path, {"answer_by": None}, headers)
+    assert cleared.json()["answer_by"] is None
+    assert Reminder.objects.get(pk=offer.reminder_id).done_at is not None
+
+    refused = send(client, "patch", path, {"currency": ""}, headers)
+    assert refused.status_code == 422
+    offer.refresh_from_db()
+    assert offer.currency == "EUR", "a refused change saves nothing"
+
+
+def test_the_api_deletes_an_offer_as_the_page_does(client, user, application):
+    offer = record_offer(
+        application, base_amount=Decimal("65000"), currency="EUR", answer_by=a_week_out()
+    )
+
+    response = client.delete(f"/api/v1/offers/{offer.pk}", **token_for(user, "read write"))
+
+    assert response.status_code == 204
+    assert not Offer.objects.filter(pk=offer.pk).exists()
+    assert Reminder.objects.get(pk=offer.reminder_id).done_at is not None
+
+
+def test_writing_an_offer_takes_the_write_scope(client, user, application):
+    """As for an interview or a reminder: a token that may read may not write."""
+    offer = record_offer(application, base_amount=Decimal("65000"), currency="EUR")
+    reader = token_for(user, "read")
+    path = f"/api/v1/offers/{offer.pk}"
+
+    answers = [
+        send(client, "post", "/api/v1/offers", {"application_id": application.pk}, reader),
+        send(client, "patch", path, {"notes": "x"}, reader),
+        client.delete(path, **reader),
+    ]
+
+    assert [response.status_code for response in answers] == [403, 403, 403]
+    assert {response.json()["scope"] for response in answers} == {"write"}
+    assert Offer.objects.get().notes == ""
+
+
+def test_the_description_says_what_writing_an_offer_can_refuse():
+    from postulo.api.api import api
+
+    paths = api.get_openapi_schema()["paths"]
+    assert {403, 404, 413, 422} <= set(paths["/api/v1/offers"]["post"]["responses"])
+    assert {403, 404, 422} <= set(paths["/api/v1/offers/{pk}"]["patch"]["responses"])
+    assert {403, 404} <= set(paths["/api/v1/offers/{pk}"]["delete"]["responses"])
+
+
 # ------------------------------------------------------------- export and import
 
 

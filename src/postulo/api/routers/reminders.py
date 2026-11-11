@@ -139,8 +139,8 @@ def delete_reminder(request, pk: int):
     A reminder is a note somebody wrote to themselves, holds no history and is referred to
     by nothing; deleting one loses a line they typed and nothing else. That is not true of
     an application, a company or a timeline entry, each of which is a record of something
-    that happened, so *nothing is deleted through the API* remains the rule everywhere
-    else (#238).
+    that happened, so *nothing is deleted through the API* remains the rule for those
+    (#238). An offer can be, as the page allows (#1101), and a company's hiring signal.
     """
     owned_or_404(request, Reminder.objects, pk).delete()
     return Status(204, None)

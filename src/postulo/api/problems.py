@@ -267,6 +267,27 @@ def install(api) -> None:
         )
 
 
+def form_refused(form) -> Refused:
+    """A Django form's refusal, in the shape the API's own validation answers with (#1101).
+
+    Where a call hands its body to the form the page uses, so that the page and the API
+    refuse alike, what the form said is turned into the same `validation-failed` document
+    a body of the wrong shape gets: `detail` names the fields, and `errors` holds one entry
+    per message, with its `loc` spelled as the body's fields are. The messages are the
+    form's, already in the token owner's language.
+    """
+    errors = [
+        {
+            "type": message.get("code") or "invalid",
+            "loc": ["body", "payload"] + ([] if field == "__all__" else [field]),
+            "msg": message["message"],
+        }
+        for field, messages in form.errors.get_json_data().items()
+        for message in messages
+    ]
+    return Refused(422, _validation_sentence(errors), kind="validation-failed", errors=errors)
+
+
 def _validation_sentence(errors: list[dict]) -> str:
     """One line naming what was refused, because `detail` has to be readable on its own.
 

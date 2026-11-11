@@ -9,6 +9,8 @@
 # the other record sees the kept one (#896).
 # jobs/geocoding.py walks every account's addresses in the scheduler, as its one caller (#913).
 # The reminders router reads through owned_or_404, which scopes to the token's owner (#331).
+# The offers router finds the application an offer is recorded on through owned(), which
+# scopes to the token's owner, as add_interview and add_reminder do (#1101).
 # core/errands.py's fail_if_interrupted ends the one errand its caller, the errand page, has
 # already fetched through for_user; the statement names that row and the state it was in (#1154).
 # core/slow.py's fail_interrupted_backups is the scheduler's sweep of backup errands whose
@@ -31,6 +33,7 @@ api/routers/listings.py::add_listing_event::JobPosting
 api/routers/listings.py::add_listing_event::UploadedDocument
 api/routers/listings.py::apply::Application
 api/routers/offers.py::_queryset::Offer
+api/routers/offers.py::add_offer::Application
 api/routers/reminders.py::add_reminder::Application
 api/routers/reminders.py::calendar_feed::Reminder
 api/routers/reminders.py::change_reminder::Application

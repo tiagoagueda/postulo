@@ -918,6 +918,56 @@ class OfferOut(Schema):
     updated_at: dt.datetime
 
 
+#: What `period` takes, said once for both bodies below.
+_OFFER_PERIOD = "year, month, day or hour: what `base_amount` covers."
+
+
+class OfferIn(Schema):
+    """An offer to record on one of the caller's applications (#1101).
+
+    The types only. What makes an offer acceptable -- a currency that is one, a currency
+    beside an amount, a period from the list, the lengths -- is the interface's offer form's
+    to say, and the call hands the body to that form, so the page and the API refuse alike.
+    """
+
+    application_id: RowId
+    base_amount: Decimal | None = Field(default=None, description="The figure, before tax")
+    currency: str = Field(default="", description="An ISO 4217 code; needed with an amount")
+    period: str = Field(default="year", description=_OFFER_PERIOD)
+    variable_pay: str = Field(default="", max_length=BODY_MAX_CHARS, description=LONG_TEXT)
+    equity: str = Field(default="", max_length=BODY_MAX_CHARS, description=LONG_TEXT)
+    benefits: str = Field(default="", max_length=BODY_MAX_CHARS, description=LONG_TEXT)
+    location: str = ""
+    holidays: int | None = Field(default=None, description="Days a year")
+    starts_on: dt.date | None = None
+    answer_by: dt.date | None = Field(
+        default=None, description="Puts a reminder on the day before, as the page does"
+    )
+    notes: str = Field(default="", max_length=BODY_MAX_CHARS, description=LONG_TEXT)
+
+
+class OfferPatch(Schema):
+    """Only the fields sent change (#1101).
+
+    Read with ``exclude_unset``, as a reminder's patch is: a field left out is left alone,
+    and a ``null`` sent clears it -- the way to take an answer-by date away, which ticks its
+    reminder off. The result goes through the interface's offer form, so a patch that would
+    leave the offer as the page would refuse it is refused, and nothing is saved.
+    """
+
+    base_amount: Decimal | None = None
+    currency: str | None = None
+    period: str | None = Field(default=None, description=_OFFER_PERIOD)
+    variable_pay: str | None = Field(default=None, max_length=BODY_MAX_CHARS)
+    equity: str | None = Field(default=None, max_length=BODY_MAX_CHARS)
+    benefits: str | None = Field(default=None, max_length=BODY_MAX_CHARS)
+    location: str | None = None
+    holidays: int | None = None
+    starts_on: dt.date | None = None
+    answer_by: dt.date | None = None
+    notes: str | None = Field(default=None, max_length=BODY_MAX_CHARS)
+
+
 class ApplicationDetailOut(ApplicationOut):
     events: list[EventOut]
     reminders: list[ReminderOut]
