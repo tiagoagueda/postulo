@@ -6,12 +6,168 @@ adds that tag to the document. It happened once, and the accessibility suite fou
 the Columns menu having vanished into a stray ``<details>``. This is the cheaper check.
 """
 
+import inspect
 import re
+import sys
+import traceback
 from pathlib import Path
 
 import pytest
 
-TEMPLATES = sorted((Path(__file__).resolve().parents[1] / "src" / "postulo").rglob("*.html"))
+SOURCE_ROOT = Path(__file__).resolve().parents[1] / "src" / "postulo"
+TEMPLATES = sorted(SOURCE_ROOT.rglob("*.html"))
+
+
+def template_name(path: Path) -> str:
+    return path.relative_to(SOURCE_ROOT).as_posix()
+
+
+# ------------------------------------------------- every lint, once per template
+
+#: The lints that read one template, in the order they are written below. Each takes the
+#: template's path and asserts; one whose rule does not apply to a template skips it.
+TEMPLATE_LINTS: list = []
+
+
+def template_lint(function):
+    """Have `test_a_template_passes_every_lint` run ``function`` over every template."""
+    TEMPLATE_LINTS.append(function)
+    return function
+
+
+def lint_failures(path: Path, skipped: list[str] | None = None) -> list[str]:
+    """What each lint that fails on a template says, under the lint's name.
+
+    Every lint runs whatever the one before it found, so one mistake in a template does not
+    hide the next. A lint that skips the template is left out, as its own test was skipped,
+    and its name and reason go into ``skipped`` when one is handed in.
+    """
+    said = []
+    for lint in TEMPLATE_LINTS:
+        where = f"{lint.__name__} ({Path(__file__).name}, line {lint.__code__.co_firstlineno})"
+        try:
+            lint(path)
+        except pytest.skip.Exception as reason:
+            if skipped is not None:
+                skipped.append(f"{lint.__name__}: {reason.msg}")
+            continue
+        except (AssertionError, pytest.fail.Exception) as error:
+            said.append(f"{where}\n{getattr(error, 'msg', None) or error}")
+        except Exception:
+            # Not a finding but a lint that broke: its traceback is what its own test showed.
+            said.append(f"{where}\n{traceback.format_exc().rstrip()}")
+    return said
+
+
+@pytest.mark.parametrize("path", TEMPLATES, ids=template_name)
+def test_a_template_passes_every_lint(path: Path, record_property):
+    """One test for each template, which runs every lint below over it (#1033).
+
+    Each lint used to be a test of its own for each template, and the seventeen of them were
+    5,559 of the suite's items: collected by the controller and again by every worker, for
+    checks that take a millisecond each. What fails is said as it was: every lint that
+    fails, by name, with the lines and the advice its own message gives. A lint that does
+    not apply to the template is named with its reason, in the report's properties and
+    under a failure, where its own skipped test used to say it.
+    """
+    skipped: list[str] = []
+    failures = lint_failures(path, skipped)
+    for reason in skipped:
+        record_property("lint not applied", reason)
+    if failures:
+        pytest.fail(
+            f"{path.name} fails {len(failures)} of the {len(TEMPLATE_LINTS)} template lints.\n\n"
+            + "\n\n".join(failures)
+            + "".join(f"\n\nNot applied here: {reason}" for reason in skipped),
+            pytrace=False,
+        )
+
+
+def test_every_lint_that_fails_is_reported_and_none_hides_another(tmp_path):
+    """The one test says what the separate ones said (#1033): each failing lint by name with
+    its own message and line numbers, the lints after a failure still run, and a lint that
+    skips a template is skipped for that template only."""
+    text = '<p class="ml-2">\n{# spread\n   over two #}\n<h2 class="mb-3 font-medium">Notes</h2>\n'
+    ours = tmp_path / "ours.html"
+    ours.write_text(text, encoding="utf-8")
+    said = lint_failures(ours)
+    assert [line.split(" ")[0] for line in said] == [
+        "no_template_comment_spans_lines",
+        "no_template_names_a_side_of_the_page",
+        "no_template_writes_a_section_heading_by_hand",
+    ]
+    assert "ours.html: {# #} spans lines at [2]" in said[0]
+    assert "ours.html: names a side of the page at line 1 (ml-2)" in said[1]
+    assert "ours.html: a section heading written by hand at line(s) [4]" in said[2]
+    assert f"({Path(__file__).name}, line " in said[0], "and where the lint is written"
+
+    theirs = tmp_path / "allauth" / "theirs.html"
+    theirs.parent.mkdir()
+    theirs.write_text(text, encoding="utf-8")
+    assert [line.split(" ")[0] for line in lint_failures(theirs)] == [
+        "no_template_comment_spans_lines",
+        "no_template_names_a_side_of_the_page",
+    ], "the heading lint skips allauth's templates, and the other lints still run on them"
+
+    with pytest.raises(pytest.fail.Exception) as raised:
+        test_a_template_passes_every_lint(ours, lambda name, value: None)
+    assert f"ours.html fails 3 of the {len(TEMPLATE_LINTS)} template lints." in str(raised.value)
+    assert all(failure in str(raised.value) for failure in said)
+
+    fine = tmp_path / "fine.html"
+    fine.write_text('<p class="ms-2">{# on one line #}</p>\n', encoding="utf-8")
+    assert lint_failures(fine) == []
+    test_a_template_passes_every_lint(fine, lambda name, value: None)
+
+    recorded, skipped = [], []
+    assert len(lint_failures(theirs, skipped)) == 2
+    assert skipped == [
+        "no_template_writes_a_section_heading_by_hand: "
+        "allauth's elements are its own vocabulary, drawn once each"
+    ], "a lint that does not apply says so, with its reason"
+    with pytest.raises(pytest.fail.Exception) as raised:
+        test_a_template_passes_every_lint(theirs, lambda *pair: recorded.append(pair))
+    assert f"Not applied here: {skipped[0]}" in str(raised.value)
+    assert recorded == [("lint not applied", skipped[0])]
+
+
+def test_a_lint_that_breaks_is_reported_with_its_traceback(tmp_path, monkeypatch):
+    """A lint that raises something other than a finding is shown as its own test showed it,
+    and the lints after it still run (#1033)."""
+
+    def broken(path: Path):
+        raise ValueError("the lint itself is wrong")
+
+    monkeypatch.setattr(sys.modules[__name__], "TEMPLATE_LINTS", [broken, *TEMPLATE_LINTS[:1]])
+    page = tmp_path / "page.html"
+    page.write_text("{# spread\n   over two #}\n", encoding="utf-8")
+
+    said = lint_failures(page)
+
+    assert len(said) == 2
+    assert said[0].startswith("broken (") and "ValueError: the lint itself is wrong" in said[0]
+    assert "Traceback (most recent call last)" in said[0]
+    assert said[1].startswith("no_template_comment_spans_lines (")
+
+
+def test_every_lint_written_for_a_template_is_one_the_test_runs():
+    """A lint is run because it says `@template_lint`, not because of its name: one written
+    without it would be collected by nothing and would check nothing (#1033)."""
+    written = {
+        name
+        for name, value in vars(sys.modules[__name__]).items()
+        if inspect.isfunction(value)
+        and value.__module__ == __name__
+        and list(inspect.signature(value).parameters) == ["path"]
+        and not name.startswith("test_")
+    }
+    assert written - {"template_name", "lint_failures"} == {
+        lint.__name__ for lint in TEMPLATE_LINTS
+    }
+    assert len(TEMPLATE_LINTS) == len({lint.__name__ for lint in TEMPLATE_LINTS})
+
+
+# ------------------------------------------------------ a comment over two lines
 
 
 def multiline_hash_comments(text: str) -> list[int]:
@@ -25,10 +181,8 @@ def multiline_hash_comments(text: str) -> list[int]:
     return found
 
 
-@pytest.mark.parametrize(
-    "path", TEMPLATES, ids=lambda p: str(p.relative_to(TEMPLATES[0].parents[3]))
-)
-def test_no_template_comment_spans_lines(path: Path):
+@template_lint
+def no_template_comment_spans_lines(path: Path):
     lines = multiline_hash_comments(path.read_text(encoding="utf-8"))
     assert not lines, f"{path.name}: {{# #}} spans lines at {lines}; use {{% comment %}} instead"
 
@@ -80,10 +234,8 @@ def physical_sides(text: str) -> list[tuple[int, str]]:
     return found
 
 
-@pytest.mark.parametrize(
-    "path", TEMPLATES, ids=lambda p: str(p.relative_to(TEMPLATES[0].parents[3]))
-)
-def test_no_template_names_a_side_of_the_page(path: Path):
+@template_lint
+def no_template_names_a_side_of_the_page(path: Path):
     """The lint that keeps right-to-left working after it has been made to work (#67).
 
     Without it this drifts back one heading row at a time, and nobody notices until an
@@ -140,10 +292,8 @@ RETIRED_BUTTON = re.compile(
 )
 
 
-@pytest.mark.parametrize(
-    "path", TEMPLATES, ids=lambda p: str(p.relative_to(TEMPLATES[0].parents[3]))
-)
-def test_no_template_names_a_retired_button_class(path: Path):
+@template_lint
+def no_template_names_a_retired_button_class(path: Path):
     text = path.read_text(encoding="utf-8")
     found = [text.count("\n", 0, m.start()) + 1 for m in RETIRED_BUTTON.finditer(text)]
     assert not found, (
@@ -168,10 +318,8 @@ def test_the_script_names_no_retired_button_class_either():
 RETIRED_FIELD = re.compile(r"(?<![-\w])field-(?:input|label|help|error)(?![-\w])")
 
 
-@pytest.mark.parametrize(
-    "path", TEMPLATES, ids=lambda p: str(p.relative_to(TEMPLATES[0].parents[3]))
-)
-def test_no_template_names_a_retired_field_class(path: Path):
+@template_lint
+def no_template_names_a_retired_field_class(path: Path):
     text = path.read_text(encoding="utf-8")
     found = [text.count("\n", 0, m.start()) + 1 for m in RETIRED_FIELD.finditer(text)]
     assert not found, (
@@ -199,10 +347,8 @@ HAND_FIGURE = re.compile(r"text-[23]xl font-semibold tabular-nums")
 COMMENT = re.compile(r"\{% comment %\}.*?\{% endcomment %\}", re.DOTALL)
 
 
-@pytest.mark.parametrize(
-    "path", TEMPLATES, ids=lambda p: str(p.relative_to(TEMPLATES[0].parents[3]))
-)
-def test_no_template_writes_a_figure_by_hand(path: Path):
+@template_lint
+def no_template_writes_a_figure_by_hand(path: Path):
     text = COMMENT.sub("", path.read_text(encoding="utf-8"))
     assert not HAND_FIGURE.search(text), (
         f"{path.name}: a figure written by hand. Write "
@@ -219,10 +365,8 @@ HAND_HEADING = re.compile(
 )
 
 
-@pytest.mark.parametrize(
-    "path", TEMPLATES, ids=lambda p: str(p.relative_to(TEMPLATES[0].parents[3]))
-)
-def test_no_template_writes_a_section_heading_by_hand(path: Path):
+@template_lint
+def no_template_writes_a_section_heading_by_hand(path: Path):
     if "allauth" in path.parts:
         pytest.skip("allauth's elements are its own vocabulary, drawn once each")
     text = path.read_text(encoding="utf-8")
@@ -249,10 +393,8 @@ def test_the_heading_detector_knows_the_difference():
 COPIED_HEADER = re.compile(r'<thead class="border-b border-ink-200')
 
 
-@pytest.mark.parametrize(
-    "path", TEMPLATES, ids=lambda p: str(p.relative_to(TEMPLATES[0].parents[3]))
-)
-def test_no_template_copies_the_table_header(path: Path):
+@template_lint
+def no_template_copies_the_table_header(path: Path):
     text = path.read_text(encoding="utf-8")
     assert not COPIED_HEADER.search(text), (
         f'{path.name}: a table header written by hand. Say `<table class="table">` and '
@@ -293,10 +435,8 @@ def retired_pills(text: str) -> list[tuple[int, str]]:
     return found
 
 
-@pytest.mark.parametrize(
-    "path", TEMPLATES, ids=lambda p: str(p.relative_to(TEMPLATES[0].parents[3]))
-)
-def test_no_template_names_a_retired_pill_class(path: Path):
+@template_lint
+def no_template_names_a_retired_pill_class(path: Path):
     found = retired_pills(path.read_text(encoding="utf-8"))
     assert not found, (
         f"{path.name}: a retired pill class at {found}. Write "
@@ -326,10 +466,8 @@ def pills_by_hand(text: str) -> list[int]:
     ]
 
 
-@pytest.mark.parametrize(
-    "path", TEMPLATES, ids=lambda p: str(p.relative_to(TEMPLATES[0].parents[3]))
-)
-def test_no_template_writes_a_pill_by_hand(path: Path):
+@template_lint
+def no_template_writes_a_pill_by_hand(path: Path):
     found = pills_by_hand(path.read_text(encoding="utf-8"))
     assert not found, (
         f"{path.name}: a pill written out at line {found}. Write "
@@ -390,8 +528,6 @@ NATIVE_ON_PURPOSE: dict[tuple[str, str], str] = {
     ),
 }
 
-SOURCE_ROOT = Path(__file__).resolve().parents[1] / "src" / "postulo"
-
 
 def native_selects(text: str) -> list[tuple[int, str]]:
     """Line number and `id` or `name` of every select a template keeps native."""
@@ -405,14 +541,8 @@ def native_selects(text: str) -> list[tuple[int, str]]:
     return found
 
 
-def template_name(path: Path) -> str:
-    return path.relative_to(SOURCE_ROOT).as_posix()
-
-
-@pytest.mark.parametrize(
-    "path", TEMPLATES, ids=lambda p: str(p.relative_to(TEMPLATES[0].parents[3]))
-)
-def test_a_select_is_basecoats_unless_the_list_says_why_not(path: Path):
+@template_lint
+def a_select_is_basecoats_unless_the_list_says_why_not(path: Path):
     """Decided on #301: everywhere, not only where an option has a flag or an icon to show.
 
     So a template that keeps a select native has to say so in the list above, where the
@@ -504,10 +634,8 @@ def test_the_select_detector_knows_the_difference():
 BARE_SCROLL = re.compile(r"(?<![-\w:])overflow-(?:x-)?(?:auto|scroll)(?![-\w])")
 
 
-@pytest.mark.parametrize(
-    "path", TEMPLATES, ids=lambda p: str(p.relative_to(TEMPLATES[0].parents[3]))
-)
-def test_a_table_scrolls_in_the_box_made_for_it(path: Path):
+@template_lint
+def a_table_scrolls_in_the_box_made_for_it(path: Path):
     """`.scroll-x` is `relative overflow-x-auto`, and `relative` is the half that is easy to
     leave out: without it an absolutely positioned `.sr-only` label is confined by the page
     rather than by the box, escapes it, and scrolls the page sideways (#113). The report and
@@ -587,10 +715,8 @@ def lowercased_labels(text: str) -> list[int]:
     ]
 
 
-@pytest.mark.parametrize(
-    "path", TEMPLATES, ids=lambda p: str(p.relative_to(TEMPLATES[0].parents[3]))
-)
-def test_no_template_lowercases_a_translated_label(path: Path):
+@template_lint
+def no_template_lowercases_a_translated_label(path: Path):
     """`|lower` is English typography. Applied to a label a translator wrote, it flattens an
     acronym in French and Portuguese and misspells every noun in German, and no catalogue
     can undo it. A CV's page said "What is on this cv" for a release because of it (#168).
@@ -660,10 +786,8 @@ def spelled_out_dates(text: str, pattern: re.Pattern[str]) -> list[tuple[int, st
     return found
 
 
-@pytest.mark.parametrize(
-    "path", TEMPLATES, ids=lambda p: str(p.relative_to(TEMPLATES[0].parents[3]))
-)
-def test_no_template_writes_a_date_format_out(path: Path):
+@template_lint
+def no_template_writes_a_date_format_out(path: Path):
     """``|date:"j M Y"`` is a British sentence about a date, in every language at once.
 
     It fixes day before month before year and the hour at 14 rather than 2 p.m., which is
@@ -795,10 +919,8 @@ def uncounted_counts(text: str) -> list[int]:
     return found
 
 
-@pytest.mark.parametrize(
-    "path", TEMPLATES, ids=lambda p: str(p.relative_to(TEMPLATES[0].parents[3]))
-)
-def test_no_template_binds_a_count_without_counting_it(path: Path):
+@template_lint
+def no_template_binds_a_count_without_counting_it(path: Path):
     """A sentence with a number in it is a `{% blocktranslate count n=... %}` with a
     `{% plural %}`, so that every language's plural forms apply to it (#391)."""
     lines = uncounted_counts(path.read_text(encoding="utf-8"))
@@ -842,10 +964,8 @@ def expressions_in_translated_text(text: str) -> list[int]:
     return found
 
 
-@pytest.mark.parametrize(
-    "path", TEMPLATES, ids=lambda p: str(p.relative_to(TEMPLATES[0].parents[3]))
-)
-def test_no_translated_text_filters_a_value_in_place(path: Path):
+@template_lint
+def no_translated_text_filters_a_value_in_place(path: Path):
     lines = expressions_in_translated_text(path.read_text(encoding="utf-8"))
     assert not lines, (
         f"{path.name}: a `blocktranslate` filters or looks up a value inside its text at "
@@ -885,10 +1005,8 @@ def test_htmx_is_configured_not_to_run_what_a_response_carries():
     assert '"allowEval":false' in text and '"allowScriptTags":false' in text
 
 
-@pytest.mark.parametrize(
-    "path", TEMPLATES, ids=lambda p: str(p.relative_to(TEMPLATES[0].parents[3]))
-)
-def test_no_template_uses_an_htmx_scripting_surface(path: Path):
+@template_lint
+def no_template_uses_an_htmx_scripting_surface(path: Path):
     text = COMMENT.sub("", path.read_text(encoding="utf-8"))
     found = HTMX_SCRIPTING.search(text)
     assert not found, f"{path.name}: {found.group(0)!r} is script htmx would have to evaluate"
@@ -928,10 +1046,8 @@ JSON_ATTRIBUTE = re.compile(r"""\bhx-(?:vals|headers)\s*=\s*(?:"([^"]*)"|'([^']*
 ONLY_AS_JSON = re.compile(r"\s*\{\{\s*[\w.]+\s*\|\s*as_json\s*\}\}\s*")
 
 
-@pytest.mark.parametrize(
-    "path", TEMPLATES, ids=lambda p: str(p.relative_to(TEMPLATES[0].parents[3]))
-)
-def test_a_json_attribute_is_never_built_by_pasting_a_value_into_it(path: Path):
+@template_lint
+def a_json_attribute_is_never_built_by_pasting_a_value_into_it(path: Path):
     text = COMMENT.sub("", path.read_text(encoding="utf-8"))
     for match in JSON_ATTRIBUTE.finditer(text):
         value = match.group(1) if match.group(1) is not None else match.group(2)
