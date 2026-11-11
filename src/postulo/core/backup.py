@@ -69,6 +69,13 @@ PLUGINS_PREFIX = "plugins"
 #: will have, which nothing lists as a backup.
 PARTIAL_PREFIX = ".postulo-backup-"
 PARTIAL_SUFFIX = ".partial"
+#: The gzip level an archive is written at (#1124). `tarfile` writes at 9 unless told, and on
+#: the database that took about 45% longer than 6 for an archive under 4% smaller; on media,
+#: which does not compress, the level changes nothing. It is gzip's own default, and what
+#: `pg_dump` uses inside its dump. Reading does not depend on the level, so it is no part of
+#: the format: an archive written at 9 is verified and restored as before. This is the one
+#: place an archive is compressed; the offsite copy encrypts the file as it is.
+GZIP_LEVEL = 6
 
 
 class BackupError(Exception):
@@ -577,7 +584,7 @@ def write_backup(
         # counted it as one of the newest and deleted a good one to make room for it.
         partial = path.with_name(f"{PARTIAL_PREFIX}{uuid.uuid4().hex}{PARTIAL_SUFFIX}")
         try:
-            with tarfile.open(partial, "w:gz") as archive:
+            with tarfile.open(partial, "w:gz", compresslevel=GZIP_LEVEL) as archive:
                 info = tarfile.TarInfo(MANIFEST)
                 info.size = len(manifest_bytes)
                 info.mtime = int(timezone.now().timestamp())

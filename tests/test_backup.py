@@ -295,6 +295,41 @@ def test_a_backup_restores_onto_an_empty_instance(tmp_path, settings):
     assert cv.read_bytes() == b"%PDF-1.4 fake"
 
 
+def test_an_archive_is_written_at_gzip_level_six_and_still_verifies_and_restores(
+    tmp_path, settings, monkeypatch
+):
+    """The archive was gzipped at level 9, which is what `tarfile` does unless told: about
+    45% more time on the database than level 6, for an archive under 4% smaller (#1124)."""
+    a_search()
+    cv = a_media_file(settings)
+    opened = []
+    really_open = tarfile.open
+
+    def watching(name=None, mode="r", *args, **kwargs):
+        if mode.startswith("w"):
+            opened.append(kwargs.get("compresslevel"))
+        return really_open(name, mode, *args, **kwargs)
+
+    with monkeypatch.context() as patch:
+        patch.setattr(backup_module.tarfile, "open", watching)
+        archive = write_backup(tmp_path / "instance.tar.gz").path
+
+    # The file says so itself: the ninth byte of a gzip file is 2 for level 9 only.
+    header = archive.read_bytes()[:10]
+    assert header[:2] == b"\x1f\x8b" and header[8] == 0
+    assert opened == [6], "the one archive, opened at level 6"
+    assert backup_module.GZIP_LEVEL == 6
+
+    # What reads an archive does not care what level wrote it.
+    assert verify_backup(archive)["postulo"]["backup_format"] == BACKUP_FORMAT
+    User.objects.all().delete()
+    cv.unlink()
+    report = restore_backup(archive)
+    assert report.counts["users"] == 1 and report.media_files == 1
+    assert User.objects.get().username == "alex"
+    assert cv.read_bytes() == b"%PDF-1.4 fake"
+
+
 def test_a_backup_restores_onto_a_database_that_was_never_migrated(tmp_path):
     """A rebuilt host with `POSTULO_SKIP_MIGRATE=1` has a file with no tables in it (#476)."""
     if database_vendor() != "sqlite":
