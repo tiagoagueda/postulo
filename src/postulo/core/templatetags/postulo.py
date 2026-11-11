@@ -747,6 +747,9 @@ def render_widget(context, rendered):
     """
     from django.template.loader import get_template
 
+    if rendered.left_out:
+        # A plugin's widget that failed, kept in the arrange mode for its controls (#1102).
+        return ""
     return get_template(rendered.spec.template).render(
         {
             **rendered.context,

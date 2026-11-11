@@ -637,6 +637,26 @@ def test_the_surface_holds_what_a_register_adapter_needs():
     assert api.RegisterAdapterPlugin is base.RegisterAdapterPlugin
 
 
+def test_the_surface_holds_what_a_dashboard_widget_needs(tmp_path):
+    """One widget, declared in a plugin's ``widgets`` and checked by the published check
+    (#1102). What it is handed -- the person and a connection -- needs nothing past the
+    surface, so a plugin with a widget imports the surface and nothing else."""
+    from postulo.plugins import api, base, testing
+
+    assert "DashboardWidget" in api.__all__
+    assert api.DashboardWidget is base.DashboardWidget
+    assert callable(testing.assert_declares_usable_widgets)
+    assert callable(testing.draw_widget)
+
+    package = tmp_path / "postulo_glance"
+    package.mkdir()
+    (package / "__init__.py").write_text(
+        "from postulo.plugins.api import Application, DashboardWidget\n",
+        encoding="utf-8",
+    )
+    assert_imports_only_the_surface(package, package="postulo_glance")
+
+
 def test_the_surface_holds_what_a_registry_of_link_services_needs():
     """One entry, what holds the entries, and the read of one by its key (#305).
 

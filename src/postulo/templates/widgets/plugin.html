@@ -1,0 +1,13 @@
+{% comment %} A widget a plugin brought (#1102). Postulo draws the card and the heading; the
+   plugin's template drew each body, which arrives here already held to the allowlist in
+   `core.widgets.sanitise`. One body per connection the person holds to the plugin, each
+   under the connection's own name when there is more than one. {% endcomment %}
+<div class="card" data-plugin-widget="{{ widget.provider }}">
+  <c-section-title>{{ widget.label }}</c-section-title>
+  {% for part in parts %}
+    <div class="text-sm{% if not forloop.first %} mt-4 border-t border-ink-100 pt-4 dark:border-ink-800{% endif %}">
+      {% if several %}<h3 class="mb-2 font-medium"><bdi>{{ part.label }}</bdi></h3>{% endif %}
+      {{ part.html }}
+    </div>
+  {% endfor %}
+</div>

@@ -102,6 +102,8 @@ _cache: dict[str, list] = {}
 _builtin: dict[str, list[type]] = {"source": list(BUILTIN_SOURCES)}
 #: The record as it was when the cache was filled. ``None`` means "never looked".
 _stamp: str | None = None
+#: How many times what `plugins` hands out may have changed. See `generation`.
+_generation = 0
 
 #: What a module above this one remembers about a plugin and must forget when the registry is
 #: rebuilt (#609). A module adds itself here, so that this one never imports upwards.
@@ -165,6 +167,7 @@ def register_builtin(kind: str, plugin_class: type) -> None:
     # that sets them, and nothing else may hand a template to the renderer (#132).
     register_plugin_themes(plugin_class)
     _cache.pop(kind, None)
+    _changed()
 
 
 def builtins() -> dict[str, list[type]]:
@@ -210,6 +213,7 @@ def unregister_builtin(kind: str, plugin_class: type) -> None:
     if plugin_class in registered:
         registered.remove(plugin_class)
     _cache.pop(kind, None)
+    _changed()
 
 
 def _load_third_party(kind: str) -> list:
@@ -301,6 +305,7 @@ def catch_up() -> bool:
         return False
     _stamp = now
     _cache.clear()
+    _changed()
     activate()
     # The files under the directory changed, so what the import machinery remembers about
     # what is installed there is out of date with them.
@@ -349,7 +354,26 @@ def plugins(kind: str, *, refresh: bool = False) -> list:
                 *(plugin_class() for plugin_class in _builtin.get(kind, [])),
             ],
         )
+        _changed()
     return list(_cache[kind])
+
+
+def generation() -> int:
+    """A number that moves whenever the plugins `plugins` hands out may have changed.
+
+    For a module above this one that builds something from every plugin -- the dashboard's
+    widgets (#1102) -- and is asked for it many times a page: comparing this is one look at
+    the record, where asking `plugins` for every kind again is one per kind. It moves when a
+    kind is loaded or loaded again, when a built-in is added or taken away, and when another
+    process changed the record (`catch_up`).
+    """
+    catch_up()
+    return _generation
+
+
+def _changed() -> None:
+    global _generation
+    _generation += 1
 
 
 def _without_a_built_ins_name(candidates: list) -> list:

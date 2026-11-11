@@ -27,11 +27,17 @@ of them is a `### ⚠️ Deprecated` entry first and a `### 🗑️ Removed` ent
 release, never a silent rename. Anything reached through `postulo.plugins.base`,
 `postulo.core` or any other module may move without warning, whatever it looks like today.
 
-**What is deliberately not here yet.** What a dashboard widget is handed (#125) is
-unsettled; a plugin needing it is reaching past this on purpose, and
-`tests/test_plugin_surface.py` records the ones that do with the reason. That list is the
-map of what #129 still has to move. What a *document* template may be is settled: `Theme`
-and `ThemeKind` below, plus a ``templates/`` directory beside the package (#132).
+**What a plugin reaches past this for** is recorded in `tests/test_plugin_surface.py`, each
+with the reason. That list is the map of what #129 still has to move. What a *document*
+template may be is settled: `Theme` and `ThemeKind` below, plus a ``templates/`` directory
+beside the package (#132).
+
+**A dashboard widget is on it (#1102)**: `DashboardWidget` is one, declared in a plugin's
+``widgets``, with a key, a label, a sentence, a width, a template from the same ``templates/``
+directory and a function handed the person and their connection to the plugin -- never a
+queryset -- that returns what the template is given. Postulo draws the card and the heading,
+asks the instance's plugin policy first, holds the markup to an allowlist, and leaves out and
+logs a widget that raises.
 
 **The surface was too small for the plugins that existed (#229).** Every official Python
 plugin imported past it and the wiki taught those imports -- not out of carelessness, but
@@ -241,6 +247,7 @@ from .base import (
     ConnectionUnusable,
     # -------------------------------------------------- what a plugin declares
     Consent,
+    DashboardWidget,  # one thing on the dashboard (#1102)
     DiscoveredOption,
     # ------------------------------------------- what a store is handed, and gives back
     DocumentMetadata,
@@ -306,6 +313,7 @@ __all__ = [
     "ConnectionUnusable",
     "Consent",
     "Contact",
+    "DashboardWidget",
     "DayEntry",
     "Department",
     "DestinationRefused",

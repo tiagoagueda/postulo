@@ -40,7 +40,7 @@ def home(request: HttpRequest):
     profile = (
         arranging.profile_for(request.user) if editing else getattr(request.user, "profile", None)
     )
-    page = widgets.build_page(request, profile)
+    page = widgets.build_page(request, profile, keep_left_out=editing)
     fresh = widgets.new_for(profile)
     context = {
         "page": page,

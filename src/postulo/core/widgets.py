@@ -43,18 +43,34 @@ version that also works when the new widget came from a plugin.
 response rate and the time-to-reply figures all come out of one pass over the event log.
 :class:`Sources` is handed to every widget on a page and works each answer out at most
 once, so adding a fourth insights widget costs nothing.
+
+**A plugin's widgets join Postulo's (#1102).** A plugin declares a `DashboardWidget` on the
+plugin surface, and it is here under ``plugin:key``, beside the ones registered above, for
+as long as the plugin is installed. Each is offered only to somebody the instance's plugin
+policy lets use the plugin, and drawn the way Postulo's are -- once per view, nothing kept
+between views -- with three differences: it is handed the person and their connection
+rather than :class:`Sources`, Postulo draws its card and heading, and what its template
+writes is held to an allowlist (`sanitise`). One that raises is left off and logged.
 """
 
 from __future__ import annotations
 
-from collections.abc import Callable
+import logging
+from collections.abc import Callable, Mapping
 from dataclasses import dataclass, field
 
+import nh3
 from django.utils.functional import cached_property
+from django.utils.safestring import mark_safe
+
+from postulo.plugins.base import WIDGET_WIDTHS
+
+logger = logging.getLogger(__name__)
 
 #: The three widths a widget can ask for, and what each spans on a wide screen. The
-#: template turns these into classes by name so Tailwind can see them in a template.
-WIDTHS = ("quarter", "half", "full")
+#: template turns these into classes by name so Tailwind can see them in a template. A
+#: plugin's widget asks in the same words, so the list is the plugin surface's.
+WIDTHS = WIDGET_WIDTHS
 
 #: How wide a row is, and what each width takes up in it. Twelve, because a quarter, a half
 #: and a whole row all divide into it -- the same twelve the dashboard template draws.
@@ -119,6 +135,13 @@ def register(widget: Widget) -> Widget:
     """
     if widget.key in REGISTRY:
         raise ValueError(f"A widget called {widget.key!r} is already registered.")
+    _check(widget)
+    REGISTRY[widget.key] = widget
+    return widget
+
+
+def _check(widget: Widget) -> None:
+    """The rules every widget's key and name follow, Postulo's and a plugin's alike."""
     prefix, sep, _rest = widget.key.partition(":")
     if widget.provider and (not sep or prefix != widget.provider):
         raise ValueError(
@@ -133,16 +156,143 @@ def register(widget: Widget) -> Widget:
         raise ValueError(
             f"{widget.key!r}: a widget needs a label, or a name when it draws its own heading."
         )
-    REGISTRY[widget.key] = widget
-    return widget
 
 
-def get(key: str) -> Widget | None:
-    return REGISTRY.get(key)
+# ------------------------------------------------------------- the plugins' widgets
 
 
-def all_widgets() -> list[Widget]:
-    return list(REGISTRY.values())
+@dataclass(frozen=True)
+class FromPlugin:
+    """What a widget a plugin brought needs besides the `Widget` itself."""
+
+    plugin: str
+    kind: str
+    #: The plugin's own `DashboardWidget`.
+    declared: object
+
+
+#: The registry's generation the widgets were last read at, and what they came to. See
+#: `_from_plugins`.
+_merged: tuple[int, dict[str, Widget], dict[str, FromPlugin]] | None = None
+
+
+def _installed_plugins() -> list[tuple[str, object]]:
+    """Every plugin loaded now, with its kind, in the registry's order."""
+    from postulo.plugins import registry as plugin_registry
+
+    found: list[tuple[str, object]] = []
+    for kind in plugin_registry.GROUPS:
+        try:
+            found.extend((kind, plugin) for plugin in plugin_registry.plugins(kind))
+        except Exception:  # pragma: no cover - a kind that cannot even be enumerated
+            logger.exception("The %s plugins could not be read for their widgets", kind)
+    return found
+
+
+def _from_plugins() -> tuple[dict[str, Widget], dict[str, FromPlugin]]:
+    """The widgets every installed plugin declares, as `Widget`s keyed ``plugin:key``.
+
+    Read again only when `plugins.registry` may have loaded them again -- an install, a
+    removal, a switch, here or in another process -- which its `generation` says in one look
+    at the record. The page asks this for every widget it lays out and every arrow it
+    offers, so asking the registry for every kind each time is what it must not do. A
+    declaration that cannot be used is logged when it is read and costs that widget alone.
+    """
+    global _merged
+
+    from postulo.plugins import registry as plugin_registry
+    from postulo.plugins.base import label_of, widget_problems, widgets_of
+
+    if _merged is not None and _merged[0] == plugin_registry.generation():
+        return _merged[1], _merged[2]
+    installed = _installed_plugins()
+
+    found: dict[str, Widget] = {}
+    origins: dict[str, FromPlugin] = {}
+    for kind, plugin in installed:
+        name = str(getattr(plugin, "name", "") or "")
+        try:
+            declared = widgets_of(plugin)
+        except Exception:
+            # Somebody else's list, read on somebody's page: one that will not be read costs
+            # its own widgets and nobody else's.
+            logger.exception("Plugin %r's dashboard widgets could not be read", name)
+            continue
+        for one in declared:
+            problems = widget_problems(one) if name else ["the plugin has no name"]
+            if problems:
+                logger.warning(
+                    "Plugin %r offered a dashboard widget that cannot be used: %s",
+                    name,
+                    "; ".join(problems),
+                )
+                continue
+            key = f"{name}:{one.key}"
+            if key in found or key in REGISTRY:
+                logger.warning("Dashboard widget %r was offered twice; the first keeps it", key)
+                continue
+            widget = Widget(
+                key=key,
+                label=one.label,
+                blurb=one.blurb,
+                template="widgets/plugin.html",
+                context=_plugin_context(key),
+                width=one.width,
+                group=label_of(plugin),
+                provider=name,
+            )
+            try:
+                _check(widget)
+            except ValueError as refused:
+                logger.warning("Plugin %r: %s", name, refused)
+                continue
+            found[key] = widget
+            origins[key] = FromPlugin(plugin=name, kind=kind, declared=one)
+    # Read after loading, which may itself have moved it: the next look then matches.
+    _merged = (plugin_registry.generation(), found, origins)
+    return found, origins
+
+
+def _allowed(plugin: str, user) -> bool:
+    """Whether the instance's plugin policy lets this person use this plugin."""
+    from postulo.plugins.policy import decide
+
+    return user is not None and decide(plugin, user).on
+
+
+def registry(user=None) -> dict[str, Widget]:
+    """Every widget there is: Postulo's, then the plugins', keyed and in that order.
+
+    Given a person, only the plugins' widgets the instance's policy lets that person use: one
+    switched off for them is, for them, a plugin that is not installed -- offered nowhere,
+    drawn nowhere, and passed over in their arrangement as an uninstalled one is.
+    """
+    plugin_widgets, origins = _from_plugins()
+    if not plugin_widgets:
+        return dict(REGISTRY)
+    if user is not None:
+        plugin_widgets = {
+            key: widget
+            for key, widget in plugin_widgets.items()
+            if _allowed(origins[key].plugin, user)
+        }
+    return {**REGISTRY, **plugin_widgets}
+
+
+def _for(profile) -> dict[str, Widget]:
+    """`registry` as this profile's person sees it, reading the account only when a plugin
+    has a widget to be filtered."""
+    if not _from_plugins()[0]:
+        return dict(REGISTRY)
+    return registry(getattr(profile, "user", None) if profile is not None else None)
+
+
+def get(key: str, user=None) -> Widget | None:
+    return registry(user).get(key)
+
+
+def all_widgets(user=None) -> list[Widget]:
+    return list(registry(user).values())
 
 
 def default_keys() -> list[str]:
@@ -156,7 +306,7 @@ def default_keys() -> list[str]:
 
 
 def all_keys() -> list[str]:
-    return list(REGISTRY)
+    return list(registry())
 
 
 def is_standard(profile) -> bool:
@@ -186,11 +336,13 @@ def keys_for(profile) -> list[str]:
     """The keys this person's dashboard shows, in their order.
 
     A widget whose key no longer exists -- a plugin uninstalled, a widget dropped in an
-    upgrade -- is passed over rather than breaking the page.
+    upgrade -- is passed over rather than breaking the page. So is a plugin's widget the
+    instance's policy does not let this person use (#1102).
     """
     stored = getattr(profile, "dashboard_widgets", None)
     keys = default_keys() if stored is None else list(stored)
-    return [key for key in keys if key in REGISTRY]
+    known = _for(profile)
+    return [key for key in keys if key in known]
 
 
 def known_to(profile) -> set[str]:
@@ -236,8 +388,9 @@ def rows_of(keys: list[str]) -> list[list[str]]:
     """
     rows: list[list[str]] = []
     used = ROW_UNITS
+    known = registry()
     for key in keys:
-        widget = REGISTRY.get(key)
+        widget = known.get(key)
         width = UNITS.get(widget.width if widget else "half", UNITS["half"])
         if used + width > ROW_UNITS:
             rows.append([])
@@ -324,13 +477,25 @@ def new_for(profile) -> list[Widget]:
     plugin. They wait here rather than arriving unannounced.
     """
     decided = known_to(profile) | set(keys_for(profile))
-    return [widget for key, widget in REGISTRY.items() if key not in decided]
+    return [widget for key, widget in _for(profile).items() if key not in decided]
 
 
-def groups() -> list[tuple[str, list[Widget]]]:
-    """The picker's headings, in first-registration order, each with its widgets."""
+def groups(user=None) -> list[tuple[str, list[Widget]]]:
+    """The picker's headings, in first-registration order, each with its widgets.
+
+    A plugin's widgets come under the plugin's name, after Postulo's own headings.
+    """
+    return _grouped(registry(user))
+
+
+def groups_for(profile) -> list[tuple[str, list[Widget]]]:
+    """`groups`, as this profile's person is offered them."""
+    return _grouped(_for(profile))
+
+
+def _grouped(known: dict[str, Widget]) -> list[tuple[str, list[Widget]]]:
     out: dict[str, list[Widget]] = {}
-    for widget in REGISTRY.values():
+    for widget in known.values():
         out.setdefault(str(widget.group), []).append(widget)
     return list(out.items())
 
@@ -404,13 +569,145 @@ class Rendered:
     #: anything, so a button that cannot act says so before it is pressed (#124). Empty on
     #: the page as read.
     moves: dict = field(default_factory=dict)
+    #: A plugin's widget that could not be drawn (#1102). Kept as a cell with its controls
+    #: and no body while the page is being arranged, so it can still be taken off.
+    left_out: bool = False
 
 
-def build_page(request, profile) -> list[Rendered]:
-    """Every widget this person has chosen, in order, each with its own context."""
+def build_page(request, profile, *, keep_left_out: bool = False) -> list[Rendered]:
+    """Every widget this person has chosen, in order, each with its own context.
+
+    A plugin's widget that could not be drawn is not on the page, or is an empty cell with
+    ``keep_left_out``, which is what the arrange mode asks for.
+    """
     sources = Sources(request)
+    known = _for(profile)
     page = []
     for key in keys_for(profile):
-        widget = REGISTRY[key]
-        page.append(Rendered(spec=widget, context=widget.context(sources)))
+        widget = known[key]
+        context = widget.context(sources)
+        if context is None:
+            if keep_left_out:
+                page.append(Rendered(spec=widget, left_out=True))
+            continue
+        page.append(Rendered(spec=widget, context=context))
     return page
+
+
+# ------------------------------------------------------- drawing a plugin's widget
+#
+# A plugin's template is the plugin's code, and runs because an administrator installed the
+# plugin -- the trust a document theme has (`plugins.themes`). What it *writes* lands on
+# Postulo's own page, beside the person's records and under Postulo's script, so it keeps the
+# rule every other piece of a plugin's markup keeps: a plugin never puts unescaped HTML in
+# front of a person. A form is Postulo's to draw (`FieldSpec`), a remote item is escaped text
+# (`RemoteItem`), an attribute on a card is escaped and named from a short list
+# (`form_attributes`), and a widget's body goes through an allowlist, whatever ``|safe`` or
+# ``{% autoescape off %}`` let through in its template.
+
+#: What a widget's body may hold: words, lists, tables, the lower headings (the card's own
+#: is an ``h2``) and links. No script, style, form, image, frame or ``svg``.
+ALLOWED_TAGS = frozenset(
+    {
+        "a", "abbr", "b", "bdi", "blockquote", "br", "caption", "code", "data", "dd", "div",
+        "dl", "dt", "em", "figcaption", "figure", "h3", "h4", "h5", "h6", "hr", "i", "li",
+        "mark", "ol", "p", "q", "s", "small", "span", "strong", "sub", "sup", "table",
+        "tbody", "td", "tfoot", "th", "thead", "time", "tr", "ul",
+    }
+)  # fmt: skip
+#: And what each may carry. No ``id`` (the page's own would collide), no ``data-`` (Postulo's
+#: script acts on those), no ``style`` and no event handler.
+ALLOWED_ATTRIBUTES = {
+    "*": {"class", "title", "lang", "dir", "role", "aria-label", "aria-hidden"},
+    "a": {"href", "hreflang"},
+    "data": {"value"},
+    "li": {"value"},
+    "ol": {"start", "reversed"},
+    "td": {"colspan", "rowspan"},
+    "th": {"colspan", "rowspan", "scope", "abbr"},
+    "time": {"datetime"},
+}
+ALLOWED_SCHEMES = frozenset({"http", "https", "mailto"})
+
+
+def sanitise(html: str) -> str:
+    """A plugin widget's body, held to the allowlist above.
+
+    A path with no scheme is kept: a widget pointing at one of the person's applications
+    points at a page of this instance.
+    """
+    return nh3.clean(
+        html,
+        tags=set(ALLOWED_TAGS),
+        clean_content_tags={"script", "style"},
+        attributes={tag: set(names) for tag, names in ALLOWED_ATTRIBUTES.items()},
+        url_schemes=set(ALLOWED_SCHEMES),
+        link_rel="noopener noreferrer",
+        strip_comments=True,
+    )
+
+
+@dataclass(frozen=True)
+class Part:
+    """A plugin widget's body for one connection: the connection's name, and the markup."""
+
+    label: str
+    html: str
+
+
+def _connections_for(origin: FromPlugin, user) -> list:
+    """What the widget is drawn for: each of the person's enabled connections to the plugin
+    that the policy lets act, as the Connections page orders them, or ``[None]``."""
+    from postulo.plugins.base import CONNECTED_KINDS
+    from postulo.plugins.models import Connection
+    from postulo.plugins.policy import allows
+
+    if origin.kind not in CONNECTED_KINDS:
+        return [None]
+    held = [
+        connection
+        for connection in Connection.objects.for_user(user)
+        .enabled()
+        .filter(kind=origin.kind, plugin=origin.plugin)
+        .select_related("owner")
+        if allows(connection)
+    ]
+    return held or [None]
+
+
+def draw(declared, user, connection) -> str:
+    """One plugin widget's body for one connection: asked for, rendered and sanitised.
+
+    Raises whatever the plugin raised, and `TypeError` for a context that is not a dict.
+    `build_page` is what leaves a widget out for it; a plugin's own tests reach this through
+    `postulo.plugins.testing.draw_widget` and see the error.
+    """
+    from django.template.loader import get_template
+
+    context = declared.context(user, connection)
+    if not isinstance(context, Mapping):
+        raise TypeError(f"{declared.key!r} returned {type(context).__name__}, not a dict")
+    return sanitise(get_template(declared.template).render(dict(context)))
+
+
+def _plugin_context(key: str) -> Callable[[Sources], dict | None]:
+    """The `Widget.context` of a plugin's widget: its parts, or ``None`` to leave it out."""
+
+    def context(sources: Sources) -> dict | None:
+        origin = _from_plugins()[1].get(key)
+        user = sources.user
+        if origin is None or not _allowed(origin.plugin, user):
+            return None
+        parts = []
+        try:
+            for connection in _connections_for(origin, user):
+                html = mark_safe(draw(origin.declared, user, connection))  # noqa: S308 -- the allowlist
+                parts.append(Part(label=str(connection or ""), html=html))
+        except Exception:
+            # Somebody else's code on somebody's dashboard: it costs its own cell and
+            # nothing else on the page.
+            logger.exception("Dashboard widget %r could not be drawn", key)
+            return None
+        return {"parts": parts, "several": len(parts) > 1}
+
+    return context
