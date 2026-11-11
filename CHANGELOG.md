@@ -12,6 +12,11 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🔧 Changed
 
+- The scheduler checks each uploaded file against its record once a week instead of several times a day; POSTULO_SCRUB_EVERY_DAYS sets the interval, and manage.py verify_media still reads every file. (#1118)
+- The scheduler looks for files no record names once an hour instead of every five minutes, and walks the media directory once to do it. (#1119)
+- The scheduler's gone-quiet check reads each account once and no longer reloads applications it has already announced; accounts with only drafts or ended applications cost it nothing. (#1120)
+- An idle background worker no longer writes two log lines and its heartbeat file every two seconds: the kept log holds weeks instead of about a day and a half, and the heartbeat is written once a minute. (#1117)
+- A slow document store no longer holds up the scheduler: a pass stops starting document copies after 60 seconds and sends the rest on the next pass, so webhooks and syncs are not kept waiting. (#1172)
 - Pages that ask which plugins are switched on read the plugin policy in two queries instead of two per plugin, which takes 19 queries off a company's page. (#1112)
 - A page no longer asks the database whether the instance has any account or whether you are in a group, two queries fewer on every page when signed in. (#1115)
 - The dashboard's "Where things stand" counters are worked out in one database query, not four. (#1114)
@@ -34,6 +39,9 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🐛 Fixed
 
+- A notification that could not be sent, because the mail server, a push service or another notifier was briefly out of reach, is tried again by the scheduler, five minutes later and then at doubling intervals for about ten hours, instead of being lost. (#1163)
+- The scheduler deletes the background queue's records of finished tasks after seven days; they were kept for ever, a failed one with its whole traceback. (#1121)
+- Expired entries of the database cache and of the rate-limit file cache are deleted once an hour; they used to stay until 200,000 had piled up, slowing every cache write. (#1167)
 - Matching a typed country no longer loads every language's country names into each worker process, about 60 MB each; the names are stored with the city lookup when it is built. (#1109)
 - Reading a month name from a CSV date, or matching a typed language name, no longer loads every language into the worker and keeps it; that was about 115 MB and 66 MB per process. (#1086)
 - Leaving a page still asks first when an entry for the timeline, a status change or a dialog could not be saved because the request failed or was refused. (#1156)
