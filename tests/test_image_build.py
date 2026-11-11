@@ -67,10 +67,20 @@ def test_the_reader_finds_what_it_is_looking_for():
 SYNC = re.compile(r"^RUN (?:--mount=\S+ \\\n +)?uv sync .*$", re.M)
 
 
-def sync_lines() -> list[str]:
-    found = SYNC.findall(DOCKERFILE.read_text(encoding="utf-8"))
-    assert found, "expected the environment to be built with `uv sync`"
+def sync_lines(stage: str = "build") -> list[str]:
+    """The syncs of one stage: unless asked otherwise, the one whose environment ships.
+
+    The catalogues stage has a sync as well since #1033, for the machine that builds, and
+    what it installs never leaves it; a rule about what the image carries is not about it.
+    """
+    found = SYNC.findall(stages()[stage])
+    assert found, f"expected the {stage} stage to build its environment with `uv sync`"
     return found
+
+
+def every_sync_line() -> list[str]:
+    """The syncs of every stage, for the rules that hold wherever uv installs."""
+    return [*sync_lines("catalogues"), *sync_lines("build")]
 
 
 def test_the_project_is_installed_once_its_source_is_there():
@@ -83,7 +93,7 @@ def test_the_project_is_installed_once_its_source_is_there():
     the source may only install dependencies; one after it has to install the project.
     """
     build = stages()["build"]
-    source = build.index("COPY src ./src")
+    source = build.index("COPY --from=catalogues /app/src ./src")
     before = [m.group(0) for m in SYNC.finditer(build) if m.start() < source]
     after = [m.group(0) for m in SYNC.finditer(build) if m.start() > source]
 
@@ -102,7 +112,7 @@ def test_the_sync_excludes_every_dependency_group():
     tool, bundling a Node.js runtime, in an image that runs neither. Naming groups to exclude
     goes stale the moment a third is added; excluding all of them does not.
     """
-    for line in sync_lines():
+    for line in every_sync_line():
         assert "--no-default-groups" in line, line
         assert "--no-dev" not in line, "names one group and misses the others"
 
@@ -116,7 +126,7 @@ def test_the_sync_keeps_its_download_cache_out_of_every_layer():
     mostly a local copy (#1140).
     """
     text = DOCKERFILE.read_text(encoding="utf-8")
-    for line in sync_lines():
+    for line in every_sync_line():
         assert "--mount=type=cache,target=/root/.cache/uv" in line, line
         assert "--no-cache" not in line, line
     assert "uv pip install --no-cache" not in text
@@ -131,7 +141,7 @@ def test_the_readme_is_not_part_of_what_decides_the_dependencies():
     before the first sync it was part of that layer's key, and each such commit installed
     every dependency again, for both architectures, in both builders (#1140). Only the
     project's own build reads it, and that is the second sync."""
-    text = DOCKERFILE.read_text(encoding="utf-8")
+    text = stages()["build"]
     first, second = (found.start() for found in SYNC.finditer(text))
 
     assert "COPY pyproject.toml uv.lock ./" in text[:first]
@@ -426,10 +436,12 @@ def test_the_base_image_is_not_pinned_by_digest():
     from_lines = [
         line
         for line in DOCKERFILE.read_text(encoding="utf-8").splitlines()
-        if line.startswith("FROM ")
+        # The stage that is uv's own image is not a base anything is built on: it holds one
+        # binary and no Debian, and naming it by digest is its own decision (#790).
+        if line.startswith("FROM ") and "ghcr.io/astral-sh/uv:" not in line
     ]
 
-    assert from_lines, "no FROM line found"
+    assert len(from_lines) >= 3, "the Node and Python bases were not found"
     for line in from_lines:
         assert "@sha256:" not in line, (
             "pinned by digest: see #155 before deciding this, and keep the upgrade"
@@ -588,10 +600,88 @@ def stages() -> dict[str, str]:
     return found
 
 
+def stage_heads() -> dict[str, str]:
+    """Each stage's `FROM` line, by the stage's name."""
+    return {
+        match["name"]: match[0]
+        for match in re.finditer(
+            r"^FROM .* AS (?P<name>\w+)\s*$", DOCKERFILE.read_text(encoding="utf-8"), re.M
+        )
+    }
+
+
+def instructions(stage: str) -> str:
+    """One stage's instructions without its comments, each folded onto one line."""
+    lines = [
+        line
+        for line in stages()[stage].splitlines()
+        if line.strip() and not line.lstrip().startswith("#")
+    ]
+    return re.sub(r"\s*\\\n\s*", " ", "\n".join(lines) + "\n").lstrip("\n") if lines else ""
+
+
+#: The stages that run on the machine that builds, once for both architectures (#1033).
+NATIVE = ("styles", "native_uv", "catalogues")
+
+
 def test_the_stage_reader_finds_what_it_is_looking_for():
     """A test that reads a file has to be shown failing, or it passes on an empty match."""
-    assert set(stages()) == {"styles", "build", "runtime"}
+    assert list(stages()) == ["styles", "native_uv", "catalogues", "build", "runtime"]
     assert "npm run build:css" in stages()["styles"]
+    assert set(stage_heads()) == set(stages())
+    assert instructions("native_uv") == "", "one binary to copy from, and nothing done to it"
+    assert "#" not in instructions("build") and "\\\n" not in instructions("build")
+
+
+def test_what_does_not_depend_on_the_architecture_is_done_once_natively():
+    """#1033: arm64 is built under QEMU, and compiling the catalogues took 233 s there.
+
+    The stylesheet, the page script and the `.mo` files are the same bytes for both
+    architectures, so their stages run on the machine that builds and both halves copy the
+    result. What ships, the environment and the runtime, stays per architecture: a native
+    stage there would hand arm64 an amd64 interpreter.
+    """
+    heads = stage_heads()
+
+    for name in NATIVE:
+        assert "--platform=$BUILDPLATFORM" in heads[name], heads[name]
+    for name in ("build", "runtime"):
+        assert "--platform" not in heads[name], heads[name]
+    # Named rather than `COPY --from=<image>`: such a copy is given the image of the platform
+    # being built, whatever the stage it sits in says.
+    assert "COPY --from=native_uv /uv /usr/local/bin/uv" in instructions("catalogues")
+    assert "native_uv" not in instructions("build") + instructions("runtime")
+
+
+def test_the_catalogues_are_compiled_once_and_handed_on():
+    """Compiled in the native stage and nowhere else: the build stage takes the result."""
+    for name in ("styles", "build", "runtime"):
+        assert "messages.py" not in instructions(name), name
+    assert "COPY --from=catalogues /app/src ./src" in instructions("build")
+    assert "catalogues" not in instructions("runtime"), "through the build stage, as before"
+
+
+def test_the_catalogues_stage_installs_what_the_build_stage_installs_first():
+    """Line for line, so that on an amd64 runner the two are the same work, which BuildKit
+    can do once; and the tool runs against the environment the image itself has."""
+    first_of_build = sync_lines("build")[0]
+
+    assert sync_lines("catalogues") == [first_of_build]
+    assert "--no-install-project" in first_of_build
+
+
+def test_nothing_built_by_node_reaches_another_stage():
+    """`node_modules` holds Tailwind's and esbuild's binaries for the machine that builds,
+    which since #1033 is not the machine the image is for. Two text files leave the stage."""
+    copied = re.findall(r"^COPY --from=styles (\S+)", DOCKERFILE.read_text(encoding="utf-8"), re.M)
+
+    assert sorted(copied) == [
+        "/build/src/postulo/static/css/app.css",
+        "/build/src/postulo/static/js/app.min.js",
+    ]
+    assert all("node_modules" not in path for path in copied)
+    for name in ("native_uv", "catalogues", "build"):
+        assert "--from=styles" not in instructions(name), name
 
 
 def test_the_shipping_stage_installs_nothing_it_could_have_been_handed():
@@ -610,15 +700,27 @@ def test_the_shipping_stage_installs_nothing_it_could_have_been_handed():
 def test_the_source_catalogues_do_not_ship():
     """20 MB of `.po` that nothing at run time reads: Django reads the compiled `.mo`.
 
-    Deleted in the same layer that compiles them, in the stage that does not ship, so the
+    Deleted in the same layer that compiles them, in a stage that does not ship, so the
     bytes are never in an image at all. By extension rather than by directory, because
     `locale/status.json` sits among them and the language picker reads it to say how far
     along each translation is.
-    """
-    build = stages()["build"]
 
-    assert "find src -name '*.po' -delete" in build
+    That stage is the native one since #1033, and it is the only way the source reaches the
+    stages after it: neither of them copies `src` from the build context, where the `.po`
+    files are.
+    """
+    compiling = [
+        line for line in instructions("catalogues").splitlines() if "messages.py compile" in line
+    ]
+
+    assert len(compiling) == 1
+    assert "find src -name '*.po' -delete" in compiling[0], "in the layer that compiles them"
     assert "*.po" not in stages()["runtime"], "deleting it there would free nothing"
+    for name in ("build", "runtime"):
+        assert not re.search(r"^COPY (?!--from=)\S*src\b", instructions(name), re.M), (
+            f"{name} takes the source from the build context, catalogues and all"
+        )
+    assert "COPY --from=build /app/src ./src" in instructions("runtime")
 
 
 def test_the_image_keeps_uv_on_purpose():

@@ -1,9 +1,17 @@
 # Postulo, as one image.
 #
-# Three stages, and the runtime is the only one that ships. Node builds the stylesheet and
-# the page script;
-# Python builds the environment and compiles the catalogues; the runtime copies in what
-# runs and nothing else.
+# Several stages, and the runtime is the only one that ships. Node builds the stylesheet and
+# the page script; Python compiles the catalogues, then builds the environment; the runtime
+# copies in what runs and nothing else.
+#
+# **What does not depend on the architecture is done once, natively** (#1033). The image is
+# built for amd64 and arm64, and arm64 runs under QEMU on an amd64 runner, many times slower:
+# compiling the catalogues took 233 s there and 20 s natively. The stylesheet, the page script
+# and the compiled `.mo` files are text, or bytes written in one stated order, and the same
+# for both, so those stages say `--platform=$BUILDPLATFORM`: BuildKit runs them once, on the
+# machine that builds, and both architectures copy their result. `$BUILDPLATFORM` is one of
+# the arguments BuildKit defines in the global scope; the legacy builder does not, but it
+# cannot build this file anyway, since it refuses `RUN --mount` (#1140).
 #
 # **The stage boundary is what makes the trimming real** (#157). While the Python side was
 # single-stage, every intermediate was already in a layer and a later `RUN rm` freed
@@ -22,7 +30,9 @@
 # it is an afternoon.
 
 # ----------------------------------------------------------------- stylesheet
-FROM node:22-bookworm-slim AS styles
+# Native: `node_modules` holds Tailwind's and esbuild's binaries for the machine that builds,
+# which is why nothing but the two files they write may leave this stage.
+FROM --platform=$BUILDPLATFORM node:22-bookworm-slim AS styles
 
 WORKDIR /build
 COPY package.json package-lock.json ./
@@ -45,10 +55,53 @@ RUN npm run build:css
 RUN npm run build:js
 
 
+# ---------------------------------------------------------------- catalogues
+# uv for the machine that builds. A `COPY --from=` naming an image is given the image of the
+# platform being built, so a native stage that wants a native binary names a native stage.
+# The same version and digest as the copies below (#233, #790).
+FROM --platform=$BUILDPLATFORM ghcr.io/astral-sh/uv:0.12.17@sha256:10787c682e4184e4f290de1171fd4703dc63de99221f10fe1c99002ce7fa9acc AS native_uv
+
+# Native, and thrown away whole: it exists to hand the build stage the source with its
+# catalogues compiled. The tool is plain Python, but it asks Django how a language code is
+# spelt as a locale, so it needs the dependencies. It installs them as the build stage does,
+# line for line: on an amd64 runner that is the same work as the build stage's amd64 half,
+# which BuildKit can answer once, and at worst a second install from the same cache mount.
+FROM --platform=$BUILDPLATFORM python:3.14-slim-bookworm AS catalogues
+
+COPY --from=native_uv /uv /usr/local/bin/uv
+
+ENV UV_COMPILE_BYTECODE=1 \
+    UV_LINK_MODE=copy \
+    UV_PROJECT_ENVIRONMENT=/app/.venv \
+    PATH="/app/.venv/bin:$PATH"
+
+WORKDIR /app
+
+COPY pyproject.toml uv.lock ./
+
+RUN --mount=type=cache,target=/root/.cache/uv \
+    uv sync --locked --no-default-groups --extra server --extra postgres --no-install-project
+
+COPY src ./src
+COPY scripts/messages.py ./scripts/messages.py
+
+# The translation catalogues are committed as .po text; Django reads the compiled .mo,
+# which this writes in plain Python — no gettext in the image. Every set of them, since a
+# plugin Postulo ships carries its own (#127). A `.mo` is the same on every architecture:
+# `compile_catalogue` packs it little-endian by name, and gettext reads either order.
+#
+# Then the .po files go: 476 files and 20 MB of source that nothing at run time reads, of
+# which the six plugin catalogues are the newest part. `status.json` is not one of them —
+# the language picker reads it to say how far along each translation is — so this deletes
+# by extension rather than by directory.
+RUN python scripts/messages.py compile \
+    && find src -name '*.po' -delete
+
+
 # --------------------------------------------------------------- python build
-# Thrown away whole. Everything here — uv, the lock, the `.po` catalogues, whatever git
-# the extra-packages step needed — exists only to produce two directories: the virtual
-# environment, and the source with its catalogues compiled.
+# Thrown away whole. Everything here — uv, the lock, whatever git the extra-packages step
+# needed — exists only to produce the virtual environment, for the architecture being
+# built, with Postulo installed into it.
 FROM python:3.14-slim-bookworm AS build
 
 # Pinned to the patch, the same one ci.yml and .pre-commit-config.yaml name, so the tool
@@ -104,22 +157,12 @@ RUN --mount=type=cache,target=/root/.cache/uv \
     uv sync --locked --no-default-groups --extra server --extra postgres --no-install-project
 
 COPY README.md ./
-COPY src ./src
-COPY scripts/messages.py ./scripts/messages.py
+# The source from the catalogues stage, compiled and without a `.po`, and never from the
+# build context, where the `.po` files are.
+COPY --from=catalogues /app/src ./src
 
 RUN --mount=type=cache,target=/root/.cache/uv \
     uv sync --locked --no-default-groups --extra server --extra postgres
-
-# The translation catalogues are committed as .po text; Django reads the compiled .mo,
-# which this writes in plain Python — no gettext in the image. Every set of them, since a
-# plugin Postulo ships carries its own (#127).
-#
-# Then the .po files go: 476 files and 20 MB of source that nothing at run time reads, of
-# which the six plugin catalogues are the newest part. `status.json` is not one of them —
-# the language picker reads it to say how far along each translation is — so this deletes
-# by extension rather than by directory.
-RUN python scripts/messages.py compile \
-    && find src -name '*.po' -delete
 
 # Plugins baked into the image. A plugin is an ordinary Python package installed into
 # Postulo's environment; this argument takes any number of them, in whatever form pip
@@ -335,6 +378,11 @@ COPY --from=styles /build/src/postulo/static/js/app.min.js ./src/postulo/static/
 # because the admin is installed and its URL is read at run time. Making it a build
 # argument would hand somebody an image whose admin page is missing its stylesheet the day
 # they decide to enable it, which is a worse thing to own than 6.6 MB.
+#
+# Under emulation for arm64, unlike the catalogues, and not because its output differs: it
+# imports the whole application, so a native copy of it would need a native environment
+# with every plugin `POSTULO_EXTRA_PACKAGES` bakes in installed a second time, and a native
+# source tree in which the stylesheet and the page script already sit (#1033).
 RUN POSTULO_SECRET_KEY="$(python -c 'import secrets; print(secrets.token_urlsafe(64))')" \
     POSTULO_ALLOWED_HOSTS=localhost \
     python manage.py collectstatic --noinput --clear

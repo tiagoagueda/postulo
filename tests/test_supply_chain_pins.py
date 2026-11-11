@@ -71,7 +71,9 @@ def test_all_workflows_pin_the_same_version_and_the_same_checksum():
 def test_the_dockerfile_names_the_uv_image_by_digest_and_the_same_version():
     (version, _digest), *_ = pins().values()
     lines = [line for line in read(DOCKERFILE).splitlines() if "ghcr.io/astral-sh/uv:" in line]
-    assert len(lines) == 2, "the build and the runtime stage both copy uv"
+    # The build and the runtime stage both copy uv, and the native stage the catalogues are
+    # compiled in names it for the machine that builds (#1033).
+    assert len(lines) == 3, "the build, the runtime and the native uv stage"
     for line in lines:
         found = re.search(r"uv:([\w.]+)@sha256:([0-9a-f]{64})\b", line)
         assert found, f"not pinned by digest: {line}"
