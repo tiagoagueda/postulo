@@ -12,6 +12,7 @@ import zipfile
 from pathlib import Path
 
 import pytest
+from django.core.cache import cache
 from django.core.files.base import ContentFile
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.management import call_command
@@ -461,6 +462,29 @@ def test_the_sweep_can_be_switched_off(user, media_root, settings):
     assert old.is_file()
 
 
+@pytest.fixture
+def walks(monkeypatch):
+    """One entry for each time the whole media tree is listed."""
+    made = []
+    listing = filestore.listing
+
+    def counted(prefix=""):
+        made.append(prefix)
+        return listing(prefix)
+
+    monkeypatch.setattr(filestore, "listing", counted)
+    return made
+
+
+def a_stray(media_root, name="stray.pdf", *, hours=100) -> Path:
+    """A file no row names, written long enough ago for the sweep to take it."""
+    path = media_root / "documents" / name
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_bytes(PDF)
+    age(path, hours)
+    return path
+
+
 def test_the_scheduled_pass_runs_the_slice_and_the_sweep(user, media_root, capsys):
     old = media_root / "documents" / "stray.pdf"
     old.parent.mkdir(parents=True)
@@ -472,6 +496,104 @@ def test_the_scheduled_pass_runs_the_slice_and_the_sweep(user, media_root, capsy
 
     assert not old.exists()
     assert UploadedDocument.objects.get().verified_at is not None
+
+
+def test_the_scheduled_pass_walks_the_media_once_an_hour(media_root, walks):
+    """Every pass, five minutes apart, walked the whole media tree and read every file field
+    for files that have to be a day old before they go (#1119)."""
+    first = a_stray(media_root, "first.pdf")
+    call_command("send_due_reminders")
+    assert not first.exists() and len(walks) == 1
+
+    second = a_stray(media_root, "second.pdf")
+    call_command("send_due_reminders")
+
+    assert len(walks) == 1, "the hour is not over, and the tree was walked again"
+    assert second.is_file(), "it goes with the next sweep, an hour later at most"
+
+
+def test_the_sweep_comes_round_again_when_the_hour_is_over(media_root, walks):
+    """What ends the wait is the key running out, in the cache every process shares (#1119)."""
+    a_stray(media_root, "first.pdf")
+    assert scrub.sweep_if_due() == ["documents/first.pdf"]
+    second = a_stray(media_root, "second.pdf")
+    assert scrub.sweep_if_due() == [] and second.is_file()
+
+    cache.delete(scrub.SWEEP_KEY)  # what the cache does by itself, an hour on
+
+    assert scrub.sweep_if_due() == ["documents/second.pdf"]
+    assert len(walks) == 2
+
+
+def test_the_wait_between_sweeps_is_an_hour(media_root, monkeypatch):
+    asked = []
+
+    class Cache:
+        def add(self, key, value, timeout):
+            asked.append((key, timeout))
+            return True
+
+    monkeypatch.setattr(scrub, "cache", Cache())
+    scrub.sweep_if_due()
+    assert asked == [(scrub.SWEEP_KEY, 3600)]
+
+
+def test_a_sweep_asked_for_outright_does_not_wait_for_the_hour(media_root):
+    """Only the scheduler's pass is held to the hour (#1119)."""
+    a_stray(media_root, "first.pdf")
+    assert scrub.sweep_if_due() == ["documents/first.pdf"]
+
+    second = a_stray(media_root, "second.pdf")
+    assert scrub.sweep() == ["documents/second.pdf"]
+    third = a_stray(media_root, "third.pdf")
+    assert scrub.sweep() == ["documents/third.pdf"]
+    assert not second.exists() and not third.exists()
+
+
+def test_a_sweep_that_is_switched_off_does_not_spend_the_hour(media_root, settings):
+    """Switched on again, the next pass sweeps: it does not wait out an hour nothing used."""
+    old = a_stray(media_root)
+    settings.POSTULO_MEDIA_SWEEP = False
+    assert scrub.sweep_if_due() == [] and old.is_file()
+
+    settings.POSTULO_MEDIA_SWEEP = True
+    assert scrub.sweep_if_due() == ["documents/stray.pdf"]
+
+
+def test_a_cache_that_is_down_does_not_stop_the_sweep(media_root, monkeypatch):
+    """Nor the pass that carries it: the sweep runs as it did before there was a wait."""
+
+    class Down:
+        def add(self, *args, **kwargs):
+            raise ConnectionError("the cache is not answering")
+
+    monkeypatch.setattr(scrub, "cache", Down())
+    old = a_stray(media_root)
+
+    assert scrub.sweep_if_due() == ["documents/stray.pdf"]
+    assert not old.exists()
+
+
+def test_the_sweep_counts_what_is_kept_on_the_walk_it_makes_anyway(media_root, walks, caplog):
+    """With more than ten strays it walked the whole tree a second time, only to count the
+    files (#1119). The floor it counts them for (#775) holds as it did."""
+    strays = [a_stray(media_root, f"stray{n}.pdf") for n in range(11)]
+    young = [a_stray(media_root, f"young{n}.pdf", hours=0) for n in range(12)]
+
+    assert len(scrub.sweep()) == 11
+    assert len(walks) == 1
+    assert not any(path.exists() for path in strays) and all(path.is_file() for path in young)
+
+    # Eleven strays of twelve files: most of what is kept, so none goes, and one walk says so.
+    del walks[:]
+    strays = [a_stray(media_root, f"stray{n}.pdf") for n in range(11)]
+    for path in young[1:]:
+        path.unlink()
+
+    assert scrub.sweep() == []
+    assert len(walks) == 1
+    assert all(path.is_file() for path in strays)
+    assert "would remove 11 of 12 files" in caplog.text
 
 
 # ---------------------------------------------------------- the boundary

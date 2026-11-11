@@ -20,6 +20,7 @@ import logging
 from dataclasses import dataclass, field
 
 from django.conf import settings
+from django.core.cache import cache
 from django.db.models import Q
 from django.utils import timezone
 
@@ -137,17 +138,16 @@ def sweep(*, now=None) -> list[str]:
     if not settings.POSTULO_MEDIA_SWEEP:
         return []
     removed: list[str] = []
-    found = list(strays(grace=grace()))
-    if len(found) > SWEEP_SMALL:
-        kept = sum(1 for _ in filestore.listing())
-        if kept and len(found) > kept * SWEEP_MAX_SHARE:
-            logger.error(
-                "The media sweep would remove %d of %d files; it removed none. If the database "
-                "is the right one, run `manage.py prune_media`.",
-                len(found),
-                kept,
-            )
-            return []
+    # The strays and the number of files kept, from the one walk (#1119).
+    found, kept = media.survey(older_than=timezone.now() - grace())
+    if len(found) > SWEEP_SMALL and kept and len(found) > kept * SWEEP_MAX_SHARE:
+        logger.error(
+            "The media sweep would remove %d of %d files; it removed none. If the database "
+            "is the right one, run `manage.py prune_media`.",
+            len(found),
+            kept,
+        )
+        return []
     for stored in found:
         try:
             filestore.delete(stored.name)
@@ -159,3 +159,34 @@ def sweep(*, now=None) -> list[str]:
         # How many, never which: a file's name carries what its owner called it (#797).
         logger.info("Removed %d orphan file(s): no record names them", len(removed))
     return removed
+
+
+#: How long the scheduler's pass leaves between two sweeps, and the key in the cache that says
+#: one was made (#1119).
+SWEEP_EVERY_SECONDS = 3600
+SWEEP_KEY = "documents:media-swept"
+
+
+def sweep_if_due() -> list[str]:
+    """`sweep`, once an hour at most: the one the scheduler's pass calls (#1119).
+
+    The pass comes round every five minutes, and a sweep walks the whole media tree and reads
+    every file field of every table. A file has to be older than the grace period to go, a
+    day unless the operator says otherwise, so each sweep could find only what had come of
+    age in the five minutes since the last. Once an hour removes every orphan an hour later
+    at most.
+
+    The hour is a key in the cache, as it is for `core.slow.tidy_up_if_due`: every process
+    sees the same one, and a scheduler that restarts does not start the hour again. It does
+    not have to be exact, since the pass that calls this already runs one at a time: a key
+    lost early costs one more walk. A cache that is not answering costs a walk on every pass,
+    as before, and never the pass. A sweep that is switched off does not take the key, so
+    switching it on is not followed by an hour of nothing.
+    """
+    if not settings.POSTULO_MEDIA_SWEEP:
+        return []
+    try:
+        due = cache.add(SWEEP_KEY, True, SWEEP_EVERY_SECONDS)
+    except Exception:  # a cache that is down is no reason to end the pass, or to keep orphans
+        due = True
+    return sweep() if due else []

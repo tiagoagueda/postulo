@@ -38,21 +38,35 @@ def referenced_names() -> set[str]:
     return names
 
 
+def survey(*, older_than=None) -> tuple[list, int]:
+    """One walk of the store: the files no row names, and how many files it holds.
+
+    The files are `unreferenced`'s, as a list. The count is of every file the walk met, named
+    or not and of any age: what the sweep measures its strays against, which it used to walk
+    the whole tree a second time to learn (#1119).
+    """
+    from postulo.documents import filestore
+
+    referenced = referenced_names()
+    unnamed = []
+    held = 0
+    for stored in filestore.listing():
+        held += 1
+        if stored.name in referenced:
+            continue
+        if older_than is not None and (stored.modified is None or stored.modified >= older_than):
+            continue
+        unnamed.append(stored)
+    return unnamed, held
+
+
 def unreferenced(*, older_than=None):
     """The stored files no row names, each as `filestore.Stored`, in name order.
 
     ``older_than`` is a moment: a file written since is left out, because a request may be
     about to attach it. A file whose age the store cannot tell is left out too (#663).
     """
-    from postulo.documents import filestore
-
-    referenced = referenced_names()
-    for stored in filestore.listing():
-        if stored.name in referenced:
-            continue
-        if older_than is not None and (stored.modified is None or stored.modified >= older_than):
-            continue
-        yield stored
+    yield from survey(older_than=older_than)[0]
 
 
 def owner_lookup(model) -> str | None:

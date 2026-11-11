@@ -228,7 +228,7 @@ class Command(BaseCommand):
             # checked first, and the files no row names once they are older than the grace
             # period (#663).
             scrubbed = scrub.verify_uploads(limit=SCRUB_SLICE)
-            swept = scrub.sweep()
+            swept = scrub.sweep_if_due()
 
         # Outside the lease on purpose: a backup of a large media directory takes minutes,
         # and what it needs is its own claim on the slot, not this pass's. A failed one
