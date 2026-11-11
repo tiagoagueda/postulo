@@ -13,6 +13,10 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🔧 Changed
 
+- A test run on your own machine keeps the migrated test database and restores it instead of migrating again, so one test file starts in seconds instead of a minute or more; plugin repositories can use the same fixture from postulo.plugins.testing, and CI migrates as before. (#1144)
+- scripts/messages.py extract --check finds the catalogue sets once instead of once per set and no longer walks the translation directories, about three times faster, and extract writes only the catalogues whose text changed and says how many. (#1169)
+- scripts/messages.py compile parses each catalogue once instead of twice and builds each .mo file without copying it for every entry, about halving its time; the files it writes are byte for byte the same. (#1145)
+- CONTRIBUTING.md says how to work on a second issue in a git worktree beside the first, what a new working tree lacks, and the three things that bite. (#1146)
 - A search asks the database one question for each group of results instead of two, so matching rows are read once; the results and the "All N" numbers are the same. (#1116)
 - On SQLite, searching and filtering plain ASCII text is about a third faster; text with accents or in other scripts is matched exactly as before. (#1134)
 - A backup is compressed at gzip level 6 instead of 9, which takes about a third less time on the database for an archive a few per cent larger; older archives restore as before. (#1124)
