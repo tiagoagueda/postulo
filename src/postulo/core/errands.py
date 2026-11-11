@@ -254,7 +254,11 @@ def interrupt(rows) -> int:
     )
 
 
-def forget_old(*, days: int = 7) -> int:
+#: Days an errand, and the queue's record of the task that did it, are kept.
+KEEP_DAYS = 7
+
+
+def forget_old(*, days: int = KEEP_DAYS) -> int:
     """Drop errands nobody is watching any more. Called by the scheduler.
 
     A finished errand is a sentence and a link, both of which are already somewhere better
@@ -264,4 +268,24 @@ def forget_old(*, days: int = 7) -> int:
     """
     cutoff = timezone.now() - timedelta(days=days)
     deleted, _rows = Errand.objects.filter(created_at__lt=cutoff).delete()
+    return deleted
+
+
+def forget_task_results(*, days: int = KEEP_DAYS) -> int:
+    """Drop the queue's rows for tasks that finished long ago. Called by the scheduler (#1121).
+
+    Every task enqueued leaves a row in `django_tasks_db`'s table: its arguments, what it
+    returned and, when it failed, the whole traceback. The library ships a command that
+    prunes them and nothing ran it, so a row outlived the errand that gave it meaning, for
+    the life of the instance. The same week as the errands, in every queue; a failed task's
+    traceback is in the log already.
+
+    *Finished* is the library's own word for it (`finished()`, which its
+    `prune_db_task_results` command also uses), so a status it adds later is its to
+    classify. Work still waiting or running is never touched, however old.
+    """
+    from django_tasks_db.models import DBTaskResult
+
+    cutoff = timezone.now() - timedelta(days=days)
+    deleted, _rows = DBTaskResult.objects.finished().filter(finished_at__lte=cutoff).delete()
     return deleted

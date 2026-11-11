@@ -213,6 +213,8 @@ class Command(BaseCommand):
             # pass that already exists rather than by a second timer.
             errands.fail_interrupted()
             reaped = reap_archives() + errands.forget_old() + inbox.forget_old()
+            # And the queue's own record of the tasks behind those errands (#1121).
+            reaped += errands.forget_task_results()
             # What a webhook was told, a week on (#752).
             webhooks.forget_old()
             # The pages of captures that never became a listing, past the days the

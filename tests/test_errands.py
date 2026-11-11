@@ -444,6 +444,55 @@ def test_finished_errands_are_forgotten_after_a_week(a_kind, user):
     assert Errand.objects.filter(pk=recent.pk).exists()
 
 
+def _task_result(status: str, *, finished_days_ago: int | None):
+    """One row of the queue's own table, as enqueueing leaves it, moved on to ``status``."""
+    from django_tasks_db.models import DBTaskResult
+
+    from postulo.core.tasks import perform_errand
+
+    row = DBTaskResult.objects.get(pk=perform_errand.enqueue(0).id)
+    finished = None
+    if finished_days_ago is not None:
+        finished = timezone.now() - dt.timedelta(days=finished_days_ago)
+    DBTaskResult.objects.filter(pk=row.pk).update(status=status, finished_at=finished)
+    return row
+
+
+def test_a_pass_forgets_the_queue_s_finished_results_after_a_week(user):
+    """Every task a worker ran left its row in the queue's table for good, a failed one with
+    its whole traceback, long after the errand it belonged to had been forgotten: nothing
+    ever pruned them. A pass now deletes the finished ones a week on, and leaves the work
+    still waiting and the results of this week (#1121)."""
+    from django.core.management import call_command
+    from django_tasks_db.models import DBTaskResult
+
+    succeeded = _task_result("SUCCESSFUL", finished_days_ago=8)
+    failed = _task_result("FAILED", finished_days_ago=8)
+    waiting = _task_result("READY", finished_days_ago=None)
+    fresh = _task_result("SUCCESSFUL", finished_days_ago=1)
+
+    call_command("send_due_reminders")
+
+    left = set(DBTaskResult.objects.values_list("pk", flat=True))
+    assert left == {waiting.pk, fresh.pk}
+    assert succeeded.pk not in left and failed.pk not in left
+
+
+def test_forgetting_the_queue_s_results_is_one_statement_and_counts_them(
+    user, django_assert_num_queries
+):
+    """One ``DELETE`` however many rows have piled up, and the number it removed is what the
+    pass adds to its total (#1121)."""
+    for _n in range(5):
+        _task_result("SUCCESSFUL", finished_days_ago=30)
+    _task_result("RUNNING", finished_days_ago=None)
+
+    with django_assert_num_queries(1):
+        assert errands.forget_task_results() == 5
+    with django_assert_num_queries(1):
+        assert errands.forget_task_results() == 0
+
+
 def test_an_errand_the_worker_never_finished_is_failed_with_a_sentence(a_kind, user):
     stuck = errands.send("test_kind", user)
     # Counted from when the work began, since #1122; it was from when it was asked for.
