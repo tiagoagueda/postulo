@@ -621,12 +621,19 @@ def instructions(stage: str) -> str:
 
 
 #: The stages that run on the machine that builds, once for both architectures (#1033).
-NATIVE = ("styles", "native_uv", "catalogues")
+NATIVE = ("styles_source", "styles", "native_uv", "catalogues")
 
 
 def test_the_stage_reader_finds_what_it_is_looking_for():
     """A test that reads a file has to be shown failing, or it passes on an empty match."""
-    assert list(stages()) == ["styles", "native_uv", "catalogues", "build", "runtime"]
+    assert list(stages()) == [
+        "styles_source",
+        "styles",
+        "native_uv",
+        "catalogues",
+        "build",
+        "runtime",
+    ]
     assert "npm run build:css" in stages()["styles"]
     assert set(stage_heads()) == set(stages())
     assert instructions("native_uv") == "", "one binary to copy from, and nothing done to it"
@@ -681,7 +688,48 @@ def test_nothing_built_by_node_reaches_another_stage():
     ]
     assert all("node_modules" not in path for path in copied)
     for name in ("native_uv", "catalogues", "build"):
-        assert "--from=styles" not in instructions(name), name
+        assert "--from=styles " not in instructions(name), name
+
+
+#: The stylesheet's source, which names what Tailwind is told to skip.
+STYLESHEET = ROOT / "assets" / "css" / "app.css"
+
+
+def skipped_catalogues() -> list[str]:
+    """The `@source not` paths of `app.css` that are catalogues, from the repository's root."""
+    found = re.findall(r'^@source not "\.\./\.\./(?P<path>[^"]*locale)";', _css(), re.M)
+    assert found, "app.css no longer tells Tailwind to skip the catalogues"
+    return found
+
+
+def _css() -> str:
+    return STYLESHEET.read_text(encoding="utf-8")
+
+
+def test_a_translation_does_not_build_the_stylesheet_again():
+    """#1142: the styles stage copied all of `src`, catalogues included, so a commit that
+    changed only a `.po` file changed the key of the layer `npm run build:css` runs on, and
+    the stylesheet was built again for nothing. Tailwind is told to skip them; its stage now
+    never sees them.
+
+    Through a stage of its own, whose copy into `styles` BuildKit keys by the files copied:
+    a translation reruns that stage and hands on the same files. The paths it removes are
+    the ones `app.css` skips, so the image's stylesheet is the one a contributor builds.
+    """
+    styles, source = instructions("styles"), instructions("styles_source")
+
+    assert not re.search(r"^COPY (?!--from=)\S*src\b", styles, re.M), "the catalogues and all"
+    assert "COPY --from=styles_source /build/src ./src" in styles
+    assert styles.index("--from=styles_source") < styles.index("npm run build:css")
+    removed = re.search(r"^RUN rm -rf (.*)$", source, re.M)
+    assert removed, "nothing is left out"
+    assert sorted(removed[1].split()) == sorted(skipped_catalogues())
+    assert source.index("COPY src ./src") < source.index("RUN rm -rf")
+
+
+def test_the_catalogue_reader_finds_what_it_is_looking_for():
+    """A test that reads a file has to be shown failing, or it passes on an empty match."""
+    assert skipped_catalogues() == ["src/postulo/locale", "src/postulo/plugins/*/locale"]
 
 
 def test_the_shipping_stage_installs_nothing_it_could_have_been_handed():

@@ -30,6 +30,19 @@
 # it is an afternoon.
 
 # ----------------------------------------------------------------- stylesheet
+# What Tailwind reads: the source without the catalogues, which `assets/css/app.css` tells
+# it to skip (`@source not`) and which still decided the cache key of the layer it runs in,
+# so a commit that changed only a translation built the stylesheet again (#1142). The copy is
+# keyed by the files it brings, not by how this stage got them: a translation reruns the two
+# cheap steps below, hands the next stage the same files, and `npm run build:css` is served
+# from the cache. Not `COPY --exclude`, which the built-in Dockerfile frontend has only since
+# 1.19 (September 2025) and an older one would need a `# syntax=` line pulled at build time.
+FROM --platform=$BUILDPLATFORM node:22-bookworm-slim AS styles_source
+
+WORKDIR /build
+COPY src ./src
+RUN rm -rf src/postulo/locale src/postulo/plugins/*/locale
+
 # Native: `node_modules` holds Tailwind's and esbuild's binaries for the machine that builds,
 # which is why nothing but the two files they write may leave this stage.
 FROM --platform=$BUILDPLATFORM node:22-bookworm-slim AS styles
@@ -41,7 +54,7 @@ RUN npm ci --no-audit --no-fund
 # Tailwind reads the templates to decide which classes to emit, so the source has to be
 # here even though nothing in it is executed.
 COPY assets ./assets
-COPY src ./src
+COPY --from=styles_source /build/src ./src
 # Not minified, and the same command a contributor runs, so the image's copy and the
 # committed one are byte for byte the same file. WhiteNoise compresses what it serves and
 # minifying first saves 819 bytes of the 11 kB it sends -- which is not worth a stylesheet
