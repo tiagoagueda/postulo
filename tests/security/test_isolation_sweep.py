@@ -243,6 +243,20 @@ def appointment(owner):
     return Appointment.objects.create(owner=owner, company=office, starts_at=timezone.now())
 
 
+def subscription(owner):
+    from postulo.applications.models import CalendarSubscription
+
+    return CalendarSubscription.objects.create(owner=owner, name="Theirs")
+
+
+def subscribed_event(owner):
+    from postulo.applications.models import SubscribedEvent
+
+    return SubscribedEvent.objects.create(
+        subscription=subscription(owner), summary="Theirs", starts_at=timezone.now()
+    )
+
+
 def offer(owner):
     from postulo.applications.models import Offer
 
@@ -561,6 +575,11 @@ FACTORIES: dict[str, Callable] = {
     "applications:event_create": pk_of(application),
     "applications:appointment_delete": pk_of(appointment),
     "applications:appointment_update": pk_of(appointment),
+    # a calendar followed, and one of its events (#1098)
+    "applications:subscription_update": pk_of(subscription),
+    "applications:subscription_delete": pk_of(subscription),
+    "applications:subscription_refresh": pk_of(subscription),
+    "applications:subscribed_event": pk_of(subscribed_event),
     "applications:interview_create": pk_of(application),
     "applications:quiet_action": pk_of(application),
     "applications:status": pk_of(application),
@@ -1049,6 +1068,7 @@ def form_table(user, mine=None) -> dict:
             {"user": user, "instance": interview(user)},
         ],
         applications.TagForm: [{"user": user}],
+        applications.SubscriptionForm: [{"user": user}],
         applications.OfferForm: [{"user": user}],
         documents.CVForm: [{"user": user}],
         documents.CVItemForm: [{"user": user}],

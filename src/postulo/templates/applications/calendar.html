@@ -29,6 +29,10 @@
   <a href="{{ event.url }}{% if event.returns %}?next={{ request.get_full_path|urlencode:'' }}{% endif %}"
      class="cal-event min-w-0 flex-1 max-lg:basis-40 {{ event.tone }}{% if event.muted %} line-through{% endif %}"
      data-event="{{ event.kind }}">
+    {% comment %} A subscribed calendar's event is marked as one to the eye as well as in words
+       (#1098): its colour is the subscription's, which may be a kind's, so the mark is what
+       tells them apart. {% endcomment %}
+    {% if event.source %}<span class="shrink-0 pt-0.5" data-subscribed>{% icon "link" class="size-3" %}</span>{% endif %}
     {% if dated %}
       <span class="tabular-nums">{{ event.local_start|date:"DATETIME_FORMAT" }}</span>
     {% elif not event.all_day %}
@@ -155,6 +159,14 @@
          class="btn" data-variant="outline" data-new-appointment>
         {% icon "plus" %}{% translate "New appointment" %}
       </a>
+      {% comment %} The calendars somebody else keeps, followed read-only (#1098): iCalendar, so
+         only while that module is on. {% endcomment %}
+      {% module_on "format-icalendar" as ical_on %}
+      {% if ical_on %}
+        <a href="{% url 'applications:subscription_list' %}" class="btn" data-variant="outline" data-subscriptions>
+          {% icon "link" %}{% translate "Subscriptions" %}
+        </a>
+      {% endif %}
     </div>
   </div>
 

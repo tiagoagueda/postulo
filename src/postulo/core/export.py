@@ -257,7 +257,14 @@ logger = logging.getLogger(__name__)
 #: applied through, a number of its own, ``{"screening": 10}``. An archive without them
 #: restores none, so the usual number applies to all; a key that is not a status or a channel
 #: that can have one, or a number outside 1 to 365, is passed over (#1099).
-FORMAT_VERSION = 81
+#: 82 added ``calendar_subscriptions`` at the top of the file: each calendar the person follows,
+#: its ``name``, ``colour`` and ``interval`` in minutes, when it was last read (``last_ok_at``),
+#: and the ``events`` it held then, each a ``uid``, a ``summary``, a ``location``, a
+#: ``description``, ``starts_at`` and ``ends_at`` or a whole ``day``, and ``cancelled``. **Not
+#: its address**, which may be what opens that calendar to anyone holding it, and is kept as a
+#: connection's secrets are, which no archive carries: a restored subscription keeps its events
+#: and asks for its address again. An archive without them restores none (#1098).
+FORMAT_VERSION = 82
 
 
 def industry_entry(industry) -> str | dict:
@@ -1083,6 +1090,35 @@ def _appointment(appointment) -> dict:
     }
 
 
+#: What a subscribed calendar's archive entry carries of it (#1098): never its address.
+SUBSCRIPTION_FIELDS = ("name", "colour", "interval", "last_ok_at", "created_at")
+SUBSCRIBED_EVENT_FIELDS = (
+    "uid",
+    "summary",
+    "location",
+    "description",
+    "starts_at",
+    "ends_at",
+    "day",
+    "cancelled",
+)
+
+
+def _subscriptions(user) -> list[dict]:
+    """The calendars ``user`` follows, each with the events it held when last read (#1098)."""
+    from postulo.applications.models import CalendarSubscription
+
+    return [
+        {
+            **_fields(subscription, SUBSCRIPTION_FIELDS),
+            "events": [
+                _fields(event, SUBSCRIBED_EVENT_FIELDS) for event in subscription.events.all()
+            ],
+        }
+        for subscription in CalendarSubscription.objects.for_user(user).prefetch_related("events")
+    ]
+
+
 def _contact(contact) -> dict:
     """One person, with everything recorded about how to reach them."""
     return {
@@ -1167,7 +1203,12 @@ def counts(user) -> dict[str, int]:
     everything here is filtered by owner exactly as the document's queries are, and
     `tests/test_export.py` holds the two together.
     """
-    from postulo.applications.models import Application, Appointment, Interview
+    from postulo.applications.models import (
+        Application,
+        Appointment,
+        CalendarSubscription,
+        Interview,
+    )
     from postulo.documents.models import CV, CoverLetter, RenderedDocument, UploadedDocument
     from postulo.jobs.models import Capture, CapturedPage, Company, FieldHint, ListingEvent
 
@@ -1183,6 +1224,7 @@ def counts(user) -> dict[str, int]:
         "applications": Application.objects.for_user(user).count(),
         "interviews": Interview.objects.for_user(user).count(),
         "appointments": Appointment.objects.for_user(user).count(),
+        "calendar_subscriptions": CalendarSubscription.objects.for_user(user).count(),
         "cvs": CV.objects.for_user(user).count(),
         "cover_letters": CoverLetter.objects.for_user(user).count(),
         "uploads": UploadedDocument.objects.for_user(user).count(),
@@ -1281,6 +1323,8 @@ def build_document(user) -> dict:
                 application__isnull=True, appointment__isnull=True
             )
         ],
+        # The calendars followed (#1098), with what each held; not their addresses.
+        "calendar_subscriptions": _subscriptions(user),
         "companies": [],
         "documents": {},
         "captures": [],
@@ -1564,6 +1608,7 @@ def build_document(user) -> dict:
             for application in posting["applications"]
         ),
         "appointments": sum(len(company["appointments"]) for company in document["companies"]),
+        "calendar_subscriptions": len(document["calendar_subscriptions"]),
         "cvs": len(document["documents"]["cvs"]),
         "cover_letters": len(document["documents"]["cover_letters"]),
         "uploads": len(document["documents"]["uploads"]),

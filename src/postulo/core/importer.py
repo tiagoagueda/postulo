@@ -120,6 +120,7 @@ class ImportReport:
     reminders: int = 0
     interviews: int = 0
     appointments: int = 0
+    calendar_subscriptions: int = 0
     resume_items: int = 0
     cvs: int = 0
     cover_letters: int = 0
@@ -1687,6 +1688,9 @@ def _load(user, archive: zipfile.ZipFile, *, force: bool = False, into=None) -> 
         )
         report.reminders += 1
 
+    # The calendars followed, which format 82 is the first to carry (#1098).
+    _restore_subscriptions(user, document.get("calendar_subscriptions"), report)
+
     # The people recorded at no company, which format 20 is the first to carry (#239).
     for contact_entry in document.get("contacts", []):
         restore_contact(contact_entry, None)
@@ -2413,6 +2417,76 @@ def _load(user, archive: zipfile.ZipFile, *, force: bool = False, into=None) -> 
         report.remembered_places += _restore_remembered_place(user, row, report)
 
     return report
+
+
+def _restore_subscriptions(user, entries, report: ImportReport) -> None:
+    """The calendars followed, and what each held when it was last read (#1098).
+
+    Without an address, which no archive carries: each is restored asking for it again, and
+    keeps its events until it is given one and read. A colour or an interval that is not one
+    of the choices is the default; an event with no readable start is left out.
+    """
+    from postulo.applications.models import (
+        CalendarSubscription,
+        SubscribedEvent,
+        SubscriptionColour,
+        SubscriptionInterval,
+    )
+
+    def when(value, read=_dt):
+        try:
+            return read(value) if isinstance(value, str) else None
+        except ValueError:
+            return None
+
+    if not isinstance(entries, list):
+        return
+    for entry in entries:
+        if not isinstance(entry, dict):
+            continue
+        name = str(entry.get("name") or "").strip()[:120]
+        if not name:
+            report.skipped.append("A calendar subscription: it has no name, and was left out")
+            continue
+        colour = entry.get("colour")
+        interval = entry.get("interval")
+        subscription = CalendarSubscription.objects.create(
+            owner=user,
+            name=name,
+            colour=colour if colour in SubscriptionColour.values else SubscriptionColour.GREY,
+            interval=(
+                interval if interval in SubscriptionInterval.values else SubscriptionInterval.HOURLY
+            ),
+            last_ok_at=when(entry.get("last_ok_at")),
+        )
+        rows = []
+        events = entry.get("events")
+        for event in events if isinstance(events, list) else []:
+            if not isinstance(event, dict):
+                continue
+            starts_at = when(event.get("starts_at"))
+            if starts_at is None:
+                continue
+            ends_at = when(event.get("ends_at"))
+            rows.append(
+                SubscribedEvent(
+                    subscription=subscription,
+                    uid=str(event.get("uid") or "")[:255],
+                    summary=str(event.get("summary") or "")[:250],
+                    location=str(event.get("location") or "")[:500],
+                    description=str(event.get("description") or ""),
+                    starts_at=starts_at,
+                    ends_at=ends_at if ends_at is not None and ends_at > starts_at else None,
+                    day=when(event.get("day"), _d),
+                    cancelled=event.get("cancelled") is True,
+                )
+            )
+        SubscribedEvent.objects.bulk_create(rows)
+        report.calendar_subscriptions += 1
+        report.skipped.append(
+            f"The calendar subscription “{name}”: archives do not carry addresses, so enter "
+            "its address again to keep it up to date"
+        )
 
 
 def _restore_listing_history(

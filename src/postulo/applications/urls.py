@@ -2,7 +2,7 @@ from django.urls import path
 
 from postulo.core import modules
 
-from . import views, views_calendar_print, views_ical
+from . import views, views_calendar_print, views_ical, views_subscriptions
 
 app_name = "applications"
 
@@ -75,6 +75,37 @@ urlpatterns = [
         "calendar/import/",
         icalendar(views_ical.CalendarImportView.as_view()),
         name="ical_import",
+    ),
+    # Calendars somebody else keeps, followed read-only (#1098): iCalendar, so the module's.
+    path(
+        "calendar/subscriptions/",
+        icalendar(views_subscriptions.SubscriptionListView.as_view()),
+        name="subscription_list",
+    ),
+    path(
+        "calendar/subscriptions/new/",
+        icalendar(views_subscriptions.SubscriptionCreateView.as_view()),
+        name="subscription_create",
+    ),
+    path(
+        "calendar/subscriptions/<int:pk>/edit/",
+        icalendar(views_subscriptions.SubscriptionUpdateView.as_view()),
+        name="subscription_update",
+    ),
+    path(
+        "calendar/subscriptions/<int:pk>/delete/",
+        icalendar(views_subscriptions.SubscriptionDeleteView.as_view()),
+        name="subscription_delete",
+    ),
+    path(
+        "calendar/subscriptions/<int:pk>/refresh/",
+        icalendar(views_subscriptions.SubscriptionRefreshView.as_view()),
+        name="subscription_refresh",
+    ),
+    path(
+        "calendar/subscribed/<int:pk>/",
+        icalendar(views_subscriptions.SubscribedEventView.as_view()),
+        name="subscribed_event",
     ),
     path(
         "reminders/calendar.ics",

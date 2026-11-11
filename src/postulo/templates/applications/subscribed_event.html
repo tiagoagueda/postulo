@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+{% load i18n postulo %}
+
+{% comment %} One event of a subscribed calendar (#1098): what the calendar it came from says,
+   read-only, and the one thing to do with it here -- add it as an appointment or an interview,
+   which is then the person's own. A whole day has no time to meet at, and an event already
+   added says where it went instead of offering it twice. {% endcomment %}
+{% block title %}{% if event.summary %}{{ event.summary }}{% else %}{% translate "(untitled)" %}{% endif %}{% endblock %}
+{% block breadcrumb %}
+  <c-breadcrumb>
+    <c-crumb href="{% url 'applications:calendar' %}">{% translate "Calendar" %}</c-crumb>
+    <c-crumb href="{% url 'applications:subscription_list' %}">{% translate "Subscriptions" %}</c-crumb>
+    <c-crumb current>{% if event.summary %}{{ event.summary }}{% else %}{% translate "(untitled)" %}{% endif %}</c-crumb>
+  </c-breadcrumb>
+{% endblock %}
+
+{% block content %}
+  <div class="mx-auto max-w-xl">
+    <p class="mb-1 text-sm">
+      <span class="cal-event inline-flex cal-{{ event.subscription.colour }}" data-subscribed-from>{% icon "link" %}{% blocktranslate trimmed with name=event.subscription.name %}From the subscribed calendar {{ name }}{% endblocktranslate %}</span>
+    </p>
+    <c-page-title>
+      <span class="{% if event.cancelled %}line-through{% endif %}">{% if event.summary %}{{ event.summary }}{% else %}{% translate "(untitled)" %}{% endif %}</span>
+    </c-page-title>
+
+    <div class="card mb-6">
+      <dl class="space-y-3 text-sm">
+        {% if event.cancelled %}
+          <div><dt class="font-medium">{% translate "Status" %}</dt><dd>{% translate "The calendar marks this as cancelled." %}</dd></div>
+        {% endif %}
+        <div>
+          <dt class="font-medium">{% translate "When" %}</dt>
+          <dd>
+            {% if event.all_day %}
+              {{ event.day|date:"DATE_FORMAT" }}
+            {% else %}
+              {{ event.starts_at|date:"DATETIME_FORMAT" }}{% if event.ends_at %} – {{ event.ends_at|date:"TIME_FORMAT" }}{% endif %}
+            {% endif %}
+          </dd>
+        </div>
+        {% if event.location %}
+          <div><dt class="font-medium">{% translate "Where" %}</dt><dd class="wrap-anywhere">{{ event.location }}</dd></div>
+        {% endif %}
+        {% if event.description %}
+          <div><dt class="font-medium">{% translate "Description" %}</dt><dd class="wrap-anywhere whitespace-pre-line">{{ event.description }}</dd></div>
+        {% endif %}
+      </dl>
+      <p class="mt-4 text-sm text-ink-600 dark:text-ink-300">
+        {% translate "This is how the calendar it comes from has it, and it changes there. Postulo reads it again on its own." %}
+      </p>
+    </div>
+
+    {% if made %}
+      <div class="alert mb-6" data-variant="info" data-already-added>
+        <p>
+          {% translate "This event is already in your calendar as your own." %}
+          <a href="{{ made.get_absolute_url }}" class="underline">{% translate "Open it" %}</a>
+        </p>
+      </div>
+    {% elif event.all_day %}
+      <p class="mb-6 text-sm">{% translate "It is a whole day, with no time to meet at, so it cannot be added as an appointment or an interview. Add one by hand if you need it." %}</p>
+    {% else %}
+      <form method="post" novalidate data-add-as>
+        {% csrf_token %}
+        <c-section-title>{% translate "Add it as your own" %}</c-section-title>
+        {% if form.non_field_errors %}
+          <div class="alert mb-4" data-variant="error">{{ form.non_field_errors }}</div>
+        {% endif %}
+        <div class="card mb-6">
+          {% for field in form %}
+            <c-field :field="field" />
+          {% endfor %}
+        </div>
+        <div class="flex flex-wrap items-center gap-3">
+          <button type="submit" class="btn">{% translate "Add" %}</button>
+          <a href="{{ back_url }}" class="btn" data-variant="ghost">{% translate "Back" %}</a>
+        </div>
+      </form>
+    {% endif %}
+    {% if made or event.all_day %}
+      <a href="{{ back_url }}" class="btn" data-variant="outline">{% translate "Back" %}</a>
+    {% endif %}
+  </div>
+{% endblock %}

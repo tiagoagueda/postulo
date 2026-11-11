@@ -220,6 +220,9 @@ EXCUSED: dict[str, str] = {
     "applications:quiet_action": "a POST that dismisses the gone-quiet prompt",
     "applications:reminder_complete": "a POST that marks a reminder done",
     "applications:reminder_later": "a POST that moves a reminder; its menu is on two visited pages",
+    "applications:subscription_refresh": (
+        "a POST that reads a subscribed calendar now; its button is on the visited list (#1098)"
+    ),
     "applications:reminder_reopen": "a POST that marks a done reminder not done (#331)",
     "applications:suggestion_action": "a POST from the suggestions page, which is visited",
     "documents:cv_item_move": "a POST that reorders one entry on a CV",

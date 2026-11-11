@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+{% load i18n postulo %}
+
+{% comment %} Calendar → Subscriptions (#1098): one card a calendar followed, saying what a
+   person needs to trust it -- when it was last read, what it holds, what was left out and why,
+   and, while it fails, the reason in words and when it will be tried again. The address is
+   shown as its site only: it may be what opens the calendar to anyone who has it. {% endcomment %}
+{% block title %}{% translate "Subscriptions" %}{% endblock %}
+{% block breadcrumb %}
+  <c-breadcrumb>
+    <c-crumb href="{% url 'applications:calendar' %}">{% translate "Calendar" %}</c-crumb>
+    <c-crumb current>{% translate "Subscriptions" %}</c-crumb>
+  </c-breadcrumb>
+{% endblock %}
+
+{% block content %}
+  <div class="mx-auto max-w-3xl">
+    <div class="mb-6 flex flex-wrap items-center gap-4">
+      <div class="grow basis-48">
+        <c-page-title>
+          {% translate "Subscriptions" %}
+          <c-slot name="subtitle">
+            {% translate "Calendars somebody else keeps, such as an employment office's appointments or a training provider's sessions. Postulo reads them again on their own and draws their events on your calendar, without changing them." %}
+          </c-slot>
+        </c-page-title>
+      </div>
+      <a href="{% url 'applications:subscription_create' %}" class="btn ms-auto" data-new-subscription>
+        {% icon "plus" %}{% translate "New subscription" %}
+      </a>
+    </div>
+
+    {% if cards %}
+      <ul class="space-y-4">
+        {% for card in cards %}
+          {% with subscription=card.subscription %}
+            <li class="card" data-subscription="{{ subscription.pk }}">
+              <div class="flex flex-wrap items-start gap-3">
+                <div class="min-w-0 grow basis-48">
+                  <h2 class="font-medium">
+                    <span class="cal-event inline-flex cal-{{ subscription.colour }}">{% icon "link" %}<bdi>{{ subscription.name }}</bdi></span>
+                  </h2>
+                  <p class="mt-1 text-sm text-ink-600 wrap-anywhere dark:text-ink-300">
+                    {% if subscription.shown_address %}{{ subscription.shown_address }}{% else %}{% translate "No address: enter it again." %}{% endif %}
+                    · {{ subscription.get_interval_display }}
+                  </p>
+                </div>
+                <div class="flex flex-wrap items-center gap-2">
+                  <form method="post" action="{% url 'applications:subscription_refresh' subscription.pk %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn" data-variant="outline" data-size="xs">
+                      {% translate "Read it now" %}<span class="sr-only">: <bdi>{{ subscription.name }}</bdi></span>
+                    </button>
+                  </form>
+                  <a href="{% url 'applications:subscription_update' subscription.pk %}" class="btn" data-variant="ghost" data-size="xs">
+                    {% translate "Edit" %}<span class="sr-only">: <bdi>{{ subscription.name }}</bdi></span>
+                  </a>
+                  <a href="{% url 'applications:subscription_delete' subscription.pk %}" class="btn" data-variant="destructive-ghost" data-size="xs">
+                    {% translate "Delete" %}<span class="sr-only">: <bdi>{{ subscription.name }}</bdi></span>
+                  </a>
+                </div>
+              </div>
+              <div class="mt-3 space-y-1 text-sm">
+                {% if subscription.last_error %}
+                  <div class="alert" data-variant="error" data-subscription-error>
+                    <p>{{ subscription.last_error }}</p>
+                    {% if card.next_attempt %}
+                      <p>{% blocktranslate trimmed with when=card.next_attempt|date:"DATETIME_FORMAT" %}Postulo will try again on {{ when }}, and less often while it keeps failing.{% endblocktranslate %}</p>
+                    {% endif %}
+                  </div>
+                {% endif %}
+                {% if subscription.last_ok_at %}
+                  <p>
+                    {% blocktranslate trimmed count counter=subscription.event_count with when=subscription.last_ok_at|date:"DATETIME_FORMAT" %}
+                      Last read on {{ when }}: {{ counter }} event.
+                    {% plural %}
+                      Last read on {{ when }}: {{ counter }} events.
+                    {% endblocktranslate %}
+                  </p>
+                {% elif not subscription.last_error %}
+                  <p>{% translate "Not read yet. It will be within minutes." %}</p>
+                {% endif %}
+                {% if card.left_out %}
+                  <div data-left-out>
+                    <p>{% translate "Left out of the calendar:" %}</p>
+                    <ul class="list-disc ps-5">
+                      {% for line in card.left_out %}<li>{{ line }}</li>{% endfor %}
+                    </ul>
+                  </div>
+                {% endif %}
+              </div>
+            </li>
+          {% endwith %}
+        {% endfor %}
+      </ul>
+    {% else %}
+      <c-empty icon="calendar">{% translate "No subscriptions yet." %}</c-empty>
+    {% endif %}
+  </div>
+{% endblock %}

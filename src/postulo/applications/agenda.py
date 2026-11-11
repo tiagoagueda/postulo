@@ -16,7 +16,9 @@ view ever wants one, and neither does yet.
 a title, a link, and a kind for its colour and its words. Kinds fill it: an interview, a
 reminder, an application's deadline, a listing's closing date, an offer's answer date and, since
 #888, an appointment at the employment office, typed by hand -- the way the report reads its
-rows through `reports.Evidence`. A reminder that is done is drawn as done rather than
+rows through `reports.Evidence`. Since #1098 the events of the calendars a person subscribes to
+are drawn beside them, in the colour each subscription was given, marked as from it and never
+edited here. A reminder that is done is drawn as done rather than
 dropped, and so is an interview that was cancelled: the calendar is a record of the month as
 well as a plan for it.
 
@@ -55,6 +57,7 @@ from dataclasses import dataclass, field
 from urllib.parse import quote
 
 from django.conf import settings
+from django.db.models import Q
 from django.urls import reverse
 from django.utils import formats, timezone
 from django.utils.translation import gettext_lazy as _
@@ -66,11 +69,13 @@ from . import ical
 from .models import (
     Application,
     Appointment,
+    CalendarSubscription,
     Interview,
     InterviewOutcome,
     Offer,
     Reminder,
     Status,
+    SubscribedEvent,
 )
 from .reports import MAX_YEAR, MIN_YEAR, week_start
 
@@ -93,6 +98,8 @@ DEADLINE = "deadline"
 CLOSING = "closing"
 ANSWER = "answer"
 APPOINTMENT = "appointment"
+#: An event of a calendar somebody else keeps, read by a subscription (#1098).
+SUBSCRIBED = "subscribed"
 
 #: Every kind, in the order the legend draws them, with what it is called and the tone the
 #: stylesheet paints it. A tuple rather than a set because the legend is a row somebody
@@ -104,12 +111,20 @@ KINDS: tuple[tuple[str, object, str], ...] = (
     (CLOSING, _("Closing dates"), "teal"),
     (ANSWER, _("Answers due"), "violet"),
     (APPOINTMENT, _("Appointments"), "sky"),
+    (SUBSCRIBED, _("Subscribed calendars"), "grey"),
 )
 
 #: The state of an interview the other side did not come to, as `Event.state` holds it.
 NO_SHOW = "no_show"
 
 ALL_KINDS = frozenset(kind for kind, _label, _tone in KINDS)
+
+#: The kinds that are the person's own, which a plugin may read (`items_between`) and the
+#: page's file carries: a subscribed calendar's events are its keeper's, read from there.
+OWN_KINDS = ALL_KINDS - {SUBSCRIBED}
+
+#: The module subscriptions belong to (#877): while it is off their events are not drawn.
+ICALENDAR = "format-icalendar"
 
 TONES = {kind: tone for kind, _label, tone in KINDS}
 
@@ -136,6 +151,9 @@ SPOKEN: dict[tuple[str, bool], object] = {
     (ANSWER, True): _("Already answered —"),
     (APPOINTMENT, False): _("Appointment:"),
     (APPOINTMENT, True): _("Appointment attended:"),
+    # Said with the subscription's name where there is one (`Event.said`, #1098).
+    (SUBSCRIBED, False): _("From a subscribed calendar:"),
+    (SUBSCRIBED, True): _("Cancelled, from a subscribed calendar:"),
 }
 
 #: Said instead of `SPOKEN` for an event whose `state` is one of these: an interview nobody came
@@ -187,6 +205,10 @@ class Event:
     interview: Interview | None = field(default=None, compare=False, repr=False)
     #: And an appointment at the employment office, for the same file (#888).
     appointment: Appointment | None = field(default=None, compare=False, repr=False)
+    #: The tone a subscribed calendar's event is drawn in, which its subscription chose, and
+    #: that subscription's name, which says where it came from (#1098).
+    colour: str = ""
+    source: str = ""
 
     @property
     def day(self) -> dt.date:
@@ -208,6 +230,8 @@ class Event:
         for `cal-<kind>` would draw an unpainted box rather than a wrong one, which looks
         like a broken stylesheet.
         """
+        if self.colour:
+            return f"cal-{self.colour}"
         return f"cal-{TONES.get(self.kind, 'grey')}"
 
     @property
@@ -216,9 +240,18 @@ class Event:
 
         Empty where the title already carries it, which is the whole of `SPOKEN`'s comment.
         """
+        if self.kind == SUBSCRIBED:
+            return subscribed_said(self.source, cancelled=self.muted)
         if (self.kind, self.state) in SPOKEN_STATES:
             return str(SPOKEN_STATES[(self.kind, self.state)])
         return str(SPOKEN.get((self.kind, self.muted), ""))
+
+
+def subscribed_said(name: str, *, cancelled: bool = False) -> str:
+    """What a subscribed calendar's event is, in words: where it came from (#1098)."""
+    if cancelled:
+        return str(_("Cancelled, from the subscribed calendar %(name)s:") % {"name": name})
+    return str(_("From the subscribed calendar %(name)s:") % {"name": name})
 
 
 def _bounds(start: dt.date, end: dt.date) -> tuple[dt.datetime, dt.datetime]:
@@ -267,6 +300,8 @@ def events_between(user, start: dt.date, end: dt.date, kinds=None) -> list[Event
         events += _closings(user, start, end)
     if ANSWER in wanted:
         events += _answers(user, start, end)
+    if SUBSCRIBED in wanted:
+        events += subscribed_events(user, start, end)
     events.sort(key=lambda event: (event.starts_at, event.kind, event.title))
     return events
 
@@ -298,6 +333,53 @@ def appointment_events(user, lower: dt.datetime, upper: dt.datetime) -> list[Eve
         .with_display_data()
         .filter(starts_at__gte=lower, starts_at__lt=upper)
     ]
+
+
+def subscribed_event(event: SubscribedEvent) -> Event:
+    """One event of a subscribed calendar as the calendar draws it (#1098): its own summary,
+    and below it the subscription's name and the place. It links to its own page, which shows
+    it read-only and offers to make it an appointment or an interview of the person's own."""
+    subscription = event.subscription
+    detail = " · ".join(part for part in (subscription.name, event.location) if part)
+    return Event(
+        kind=SUBSCRIBED,
+        title=event.summary or str(_("(untitled)")),
+        url=event.get_absolute_url(),
+        starts_at=_at_midnight(event.day) if event.day is not None else event.starts_at,
+        ends_at=event.ends_at,
+        detail=detail,
+        muted=event.cancelled,
+        all_day=event.day is not None,
+        returns=True,
+        colour=subscription.colour,
+        source=subscription.name,
+    )
+
+
+def subscribed_events(user, start: dt.date, end: dt.date) -> list[Event]:
+    """Every subscribed event on a day in ``[start, end)``: a moment by its time in the
+    person's zone, a whole day by its date. None while the iCalendar module is off."""
+    from postulo.core import modules
+
+    if not modules.is_on(user, ICALENDAR):
+        return []
+    lower, upper = _bounds(start, end)
+    rows = (
+        SubscribedEvent.objects.for_user(user)
+        .filter(
+            Q(day__isnull=True, starts_at__gte=lower, starts_at__lt=upper)
+            | Q(day__gte=start, day__lt=end)
+        )
+        .select_related("subscription")
+    )
+    return [subscribed_event(row) for row in rows]
+
+
+def has_subscriptions(user) -> bool:
+    """Whether the legend offers the subscribed calendars: only to somebody who has one."""
+    from postulo.core import modules
+
+    return CalendarSubscription.objects.for_user(user).exists() and modules.is_on(user, ICALENDAR)
 
 
 def _reminders(user):
@@ -690,6 +772,8 @@ class Page:
     search: str = ""
     #: The agenda's last day where the address chose one (#933); ``None`` is the thirty days.
     until: dt.date | None = None
+    #: Whether the person subscribes to a calendar, so the legend offers them (#1098).
+    subscribed: bool = False
 
     @property
     def last(self) -> dt.date:
@@ -764,6 +848,9 @@ class Page:
         """
         rows = []
         for kind, label, tone in KINDS:
+            if kind == SUBSCRIBED and not self.subscribed:
+                # A key to something the person has none of is a row of clutter (#1098).
+                continue
             showing = kind in self.kinds
             wanted = set(self.kinds) - {kind} if showing else set(self.kinds) | {kind}
             rows.append(
@@ -854,6 +941,7 @@ def build(
     ``until`` is an agenda's last day (#933), and means nothing to the other views.
     """
     page = _build(user, view, on, today=today, kinds=kinds, until=until)
+    page.subscribed = has_subscriptions(user)
     profile = getattr(user, "profile", None)
     if profile is not None:
         page.labels = profile.calendar_labels
@@ -1134,8 +1222,10 @@ def download_for(events: list[Event], absolute) -> str:
     Read from the same list the page draws, which is the one place that decides what a
     deadline is, so the file and the page cannot disagree. An interview is a meeting, a
     deadline a whole day and a reminder a task; each is written the way its own file writes
-    it.
+    it. A subscribed calendar's events are not the person's and are not carried (#1098): the
+    calendar they came from is where they are kept.
     """
+    events = [event for event in events if event.kind != SUBSCRIBED]
     interviews = [event.interview for event in events if event.interview is not None]
     reminders = [event.reminder for event in events if event.reminder is not None]
     appointments = [event.appointment for event in events if event.appointment is not None]
@@ -1318,10 +1408,11 @@ def items_between(user, start: dt.date, end: dt.date, *, kinds=None) -> Items:
     """
     from postulo.core import preferences
 
-    wanted = ALL_KINDS if kinds is None else frozenset(str(kind) for kind in kinds)
-    unknown = wanted - ALL_KINDS
+    # A subscribed calendar's events are its keeper's, not a kind a plugin reads (#1098).
+    wanted = OWN_KINDS if kinds is None else frozenset(str(kind) for kind in kinds)
+    unknown = wanted - OWN_KINDS
     if unknown:
-        raise ValueError(f"{sorted(unknown)} are not kinds; each is one of {sorted(ALL_KINDS)}.")
+        raise ValueError(f"{sorted(unknown)} are not kinds; each is one of {sorted(OWN_KINDS)}.")
     if (end - start).days > AGENDA_MAX_DAYS:
         raise ValueError(f"A range of at most {AGENDA_MAX_DAYS} days.")
     withheld = ""

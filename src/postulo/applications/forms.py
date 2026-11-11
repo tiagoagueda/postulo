@@ -33,14 +33,17 @@ from .models import (
     Application,
     ApplicationEvent,
     Appointment,
+    CalendarSubscription,
     Channel,
     EndReason,
     EventKind,
     Interview,
+    InterviewKind,
     Offer,
     Priority,
     Reminder,
     Status,
+    SubscriptionColour,
 )
 
 #: What the person's own fields say, said once (#205). `ApplicationDetailsForm` declares
@@ -926,4 +929,132 @@ class OfferForm(OwnerScopedModelForm):
         cleaned = super().clean()
         if cleaned.get("base_amount") is not None and not cleaned.get("currency"):
             self.add_error("currency", _("Say which currency the amount is in."))
+        return cleaned
+
+
+class SubscriptionForm(OwnerScopedModelForm):
+    """A calendar to follow: its address, a name, a colour and how often it is read (#1098).
+
+    The address is a secret -- a shared calendar's usually carries the token that opens it --
+    so it is never put back in the box: on a subscription that has one, the box is empty and
+    leaving it so keeps the address there is. What is typed is held to the instance's
+    destination policy here, before it is kept, and again on every fetch.
+    """
+
+    address = forms.CharField(
+        label=_("Address"),
+        max_length=2000,
+        required=False,
+        widget=forms.URLInput(attrs={"autocomplete": "off", "spellcheck": "false"}),
+        help_text=_(
+            "The calendar's web address, as the service that keeps it gives it: it starts with "
+            "https:// or webcal:// and usually ends in .ics. It may open the calendar to "
+            "anyone who has it, so Postulo keeps it encrypted and shows only its site."
+        ),
+    )
+
+    class Meta:
+        model = CalendarSubscription
+        fields = ("name", "colour", "interval")
+        help_texts = {
+            "name": _("Yours, for telling it apart: drawn beside each of its events."),
+            "colour": _("What its events are drawn in on the calendar."),
+            "interval": _(
+                "How often Postulo reads it again. One that cannot be read is tried less "
+                "often until it can."
+            ),
+        }
+
+    field_order = ("address", "name", "colour", "interval")
+
+    def __init__(self, *args, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
+        self.fields["colour"].choices = SubscriptionColour.choices
+        if self.instance.pk and self.instance.address_encrypted:
+            self.fields["address"].help_text = _(
+                "Kept as %(site)s. Leave it empty to keep it, or enter a new one."
+            ) % {"site": self.instance.shown_address or "…"}
+        else:
+            self.fields["address"].required = True
+
+    def clean_address(self) -> str:
+        from . import subscriptions
+
+        raw = (self.cleaned_data.get("address") or "").strip()
+        if not raw:
+            return ""
+        try:
+            address = subscriptions.normalise(raw)
+            subscriptions.check(address)
+        except ValueError as refused:
+            raise forms.ValidationError(str(refused)) from None
+        return address
+
+    def save(self, commit: bool = True):
+        address = self.cleaned_data.get("address")
+        if address:
+            self.instance.address = address
+            # A new address is read on the next pass, whatever the old one's turn was.
+            self.instance.fetched_at = None
+            self.instance.last_error = ""
+        return super().save(commit=commit)
+
+
+class SubscribedEventForm(forms.Form):
+    """What one subscribed event becomes, when the person makes it their own (#1098).
+
+    An interview, on an application they pick, or an appointment, with a public employment
+    service they pick; the event itself stays as the calendar has it. Every choice is built
+    against the requesting person, so nobody else's application or service is valid.
+    """
+
+    AS_INTERVIEW = "interview"
+    AS_APPOINTMENT = "appointment"
+
+    action = forms.ChoiceField(
+        label=_("Add it as"),
+        choices=(
+            (AS_APPOINTMENT, _("An appointment")),
+            (AS_INTERVIEW, _("An interview")),
+        ),
+        widget=forms.RadioSelect,
+        initial=AS_APPOINTMENT,
+    )
+    application = forms.ModelChoiceField(
+        label=_("Application"),
+        queryset=Application.objects.none(),
+        required=False,
+        help_text=_("For an interview: the application it is about."),
+    )
+    kind = forms.ChoiceField(
+        label=_("Type of interview"),
+        choices=InterviewKind.choices,
+        initial=InterviewKind.VIDEO,
+        required=False,
+    )
+    company = forms.ModelChoiceField(
+        label=_("Employment service"),
+        queryset=Company.objects.none(),
+        required=False,
+        help_text=_("For an appointment: the public employment service it is with."),
+    )
+
+    def __init__(self, *args, user, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
+        self.fields["application"].queryset = Application.objects.for_user(user).with_display_data()
+        self.fields["company"].queryset = (
+            Company.objects.for_user(user)
+            .filter(kind=CompanyKind.EMPLOYMENT_SERVICE)
+            .order_by("name")
+        )
+
+    def clean(self):
+        cleaned = super().clean()
+        action = cleaned.get("action")
+        if action == self.AS_INTERVIEW and not cleaned.get("application"):
+            self.add_error("application", _("An interview belongs to an application. Choose one."))
+        if action == self.AS_APPOINTMENT and not cleaned.get("company"):
+            self.add_error(
+                "company", _("An appointment is with a public employment service. Choose one.")
+            )
         return cleaned

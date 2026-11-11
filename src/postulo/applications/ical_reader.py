@@ -187,8 +187,13 @@ def check_bounds(data: bytes) -> str:
     return text
 
 
-def read(data: bytes) -> Reading:
-    """Every event and task of an iCalendar file as plain values. Raises `Refused`."""
+def read(data: bytes, *, limit: int = MAX_ENTRIES) -> Reading:
+    """Every event and task of an iCalendar file as plain values. Raises `Refused`.
+
+    ``limit`` is how many events and tasks are read before the file is refused: a review page
+    draws a row for each, and a subscribed calendar (#1098) is read with a larger one, held by
+    `MAX_COMPONENTS` all the same.
+    """
     text = check_bounds(data)
     with warnings.catch_warnings():
         # A TZID written as a globally unique path is *guessed* at by the library, with a
@@ -200,10 +205,10 @@ def read(data: bytes) -> Reading:
             raise Refused(_("That file could not be read as an iCalendar file.")) from None
         reading = Reading()
         components = [c for c in calendar.walk() if c.name in ("VEVENT", "VTODO")]
-        if len(components) > MAX_ENTRIES:
+        if len(components) > limit:
             raise Refused(
                 _("That file holds more than %(limit)s events and tasks, too many to go through.")
-                % {"limit": MAX_ENTRIES}
+                % {"limit": limit}
             )
         for component in components:
             reading.entries.append(_entry(component))

@@ -163,6 +163,20 @@ def furnished(applicant):
         ends_at=timezone.now() + dt.timedelta(days=2, hours=2),
         place="12 rue de la Paix",
     )
+    # A calendar followed, its event on the calendar, its card and its event's page (#1098).
+    from postulo.applications.models import CalendarSubscription, SubscribedEvent
+
+    subscription = CalendarSubscription(owner=applicant, name="Training centre", colour="teal")
+    subscription.address = "https://calendar.example.org/private/token/basic.ics"
+    subscription.last_ok_at = timezone.now()
+    subscription.left_out = {"repeats": 2}
+    subscription.save()
+    subscribed = SubscribedEvent.objects.create(
+        subscription=subscription,
+        summary="Workshop: interviews",
+        location="Room 4",
+        starts_at=timezone.now() + dt.timedelta(days=2, hours=3),
+    )
     experience = Experience.objects.create(
         owner=applicant,
         organisation="Weyland-Yutani",
@@ -445,6 +459,8 @@ def furnished(applicant):
         "interview": interview,
         "office": office,
         "appointment": appointment,
+        "subscription": subscription,
+        "subscribed": subscribed,
         "reminder": reminder,
         "offer": offer,
         "connection": connection,
@@ -573,6 +589,8 @@ def signed_in_paths(a, c, me, entry=None, recovery_link: str = "", things=None) 
     reminder = it.get("reminder", a)
     office = it.get("office", c)
     appointment = it.get("appointment", a)
+    subscription = it.get("subscription", a)
+    subscribed = it.get("subscribed", a)
     offer = it.get("offer", a)
     connection = it.get("connection", a)
     pairing = it.get("pairing", a)
@@ -616,6 +634,12 @@ def signed_in_paths(a, c, me, entry=None, recovery_link: str = "", things=None) 
         "/applications/calendar/?view=week",
         "/applications/calendar/?view=day",
         "/applications/calendar/import/",
+        # The calendars followed, and one of their events (#1098).
+        "/applications/calendar/subscriptions/",
+        "/applications/calendar/subscriptions/new/",
+        f"/applications/calendar/subscriptions/{subscription.pk}/edit/",
+        f"/applications/calendar/subscriptions/{subscription.pk}/delete/",
+        f"/applications/calendar/subscribed/{subscribed.pk}/",
         "/applications/calendar/?view=agenda",
         # What a print of the calendar will hold, and the choices for its document (#342).
         "/applications/calendar/print/?view=week&kinds=reminder",

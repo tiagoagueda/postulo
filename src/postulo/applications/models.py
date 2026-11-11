@@ -1123,6 +1123,162 @@ class Appointment(OwnedModel):
         return (self.ends_at - self.starts_at) if self.ends_at else None
 
 
+class SubscriptionColour(models.TextChoices):
+    """The tones a subscribed calendar may be drawn in (#1098).
+
+    The calendar's own palette (`agenda.TONES`), so every one already holds 4.5:1 against
+    its ground in both themes; the values are the stylesheet's names and the words are the
+    tags'. Grey first, the default: it is the one no kind of the person's own is drawn in.
+    """
+
+    GREY = "grey", _("Grey")
+    BLUE = "sky", _("Blue")
+    TEAL = "teal", _("Teal")
+    AMBER = "amber", _("Amber")
+    ROSE = "rose", _("Rose")
+    VIOLET = "violet", _("Violet")
+
+
+class SubscriptionInterval(models.IntegerChoices):
+    """How often a subscribed calendar is read again, in minutes: the sync connections' words."""
+
+    HOURLY = 60, _("Every hour")
+    FOUR_HOURS = 240, _("Every four hours")
+    DAILY = 1440, _("Once a day")
+
+
+class CalendarSubscriptionQuerySet(models.QuerySet):
+    def for_user(self, user) -> CalendarSubscriptionQuerySet:
+        if user is None or not getattr(user, "is_authenticated", False):
+            return self.none()
+        return self.filter(owner=user)
+
+
+class CalendarSubscription(OwnedModel):
+    """A calendar somebody else keeps, read again on an interval and drawn read-only (#1098).
+
+    An employment office's appointments, a training provider's sessions, a calendar a career
+    coach shares: they keep changing, and importing a file once (#661) does not follow them.
+    The scheduler reads the address again every ``interval`` minutes and replaces what it held
+    (`SubscribedEvent`); nothing read here is ever written anywhere else unless the person turns
+    one entry into an appointment or an interview of their own.
+
+    **The address is a secret.** A shared calendar's address usually carries the token that
+    opens it, so it is kept encrypted as a connection's password is (`plugins.secrets`), shown
+    back only as its site (`shown_address`), never logged, and left out of the export, which
+    carries no connection's secrets either.
+    """
+
+    name = models.CharField(_("name"), max_length=120)
+    address_encrypted = models.TextField(_("address"), blank=True, editable=False)
+    colour = models.CharField(
+        _("colour"), max_length=10, choices=SubscriptionColour, default=SubscriptionColour.GREY
+    )
+    interval = models.PositiveIntegerField(
+        _("read it again"), choices=SubscriptionInterval, default=SubscriptionInterval.HOURLY
+    )
+    #: When it was last read, whether or not that worked: what the interval counts from.
+    fetched_at = models.DateTimeField(_("last read"), null=True, blank=True)
+    last_ok_at = models.DateTimeField(_("last worked"), null=True, blank=True)
+    last_error = models.TextField(_("last error"), blank=True)
+    #: What the last reading that worked left out, and why, in the person's words.
+    left_out = models.JSONField(_("left out"), default=dict, blank=True)
+
+    objects = CalendarSubscriptionQuerySet.as_manager()
+
+    class Meta:
+        verbose_name = _("calendar subscription")
+        verbose_name_plural = _("calendar subscriptions")
+        ordering = ("name", "pk")
+
+    def __str__(self) -> str:
+        return self.name
+
+    def get_absolute_url(self) -> str:
+        return reverse("applications:subscription_list")
+
+    @property
+    def address(self) -> str:
+        """The address in full, for the fetch and nothing else. Empty when it cannot be read."""
+        from postulo.plugins.secrets import TEXT_PREFIX, SecretsUnreadable, decrypt_text
+
+        if not self.address_encrypted.startswith(TEXT_PREFIX):
+            return ""
+        try:
+            return decrypt_text(self.address_encrypted)
+        except SecretsUnreadable:
+            return ""
+
+    @address.setter
+    def address(self, value: str) -> None:
+        from postulo.plugins.secrets import encrypt_text
+
+        self.address_encrypted = encrypt_text(value) if value else ""
+
+    @property
+    def shown_address(self) -> str:
+        """The address as a page shows it: its site, and nothing of the path that opens it."""
+        from urllib.parse import urlsplit
+
+        address = self.address
+        if not address:
+            return ""
+        parts = urlsplit(address)
+        host = parts.hostname or ""
+        return f"{parts.scheme}://{host}/…" if host else "…"
+
+
+class SubscribedEventQuerySet(models.QuerySet):
+    def for_user(self, user) -> SubscribedEventQuerySet:
+        if user is None or not getattr(user, "is_authenticated", False):
+            return self.none()
+        return self.filter(subscription__owner=user)
+
+
+class SubscribedEvent(models.Model):
+    """One event of a subscribed calendar, as it was last read (#1098).
+
+    Replaced whole on every reading that works, so it is never edited: the calendar it came
+    from is where it changes. Exactly one way of saying when is set, as in `ical_reader`: a
+    moment (``starts_at``, and ``ends_at`` where it lasts) or a whole ``day``.
+    """
+
+    subscription = models.ForeignKey(
+        CalendarSubscription,
+        on_delete=models.CASCADE,
+        related_name="events",
+        verbose_name=_("calendar subscription"),
+    )
+    #: The identifier the calendar gave it, as it gave it.
+    uid = models.CharField(_("calendar identifier"), max_length=255, blank=True)
+    summary = models.CharField(_("summary"), max_length=250, blank=True)
+    location = models.CharField(_("where"), max_length=500, blank=True)
+    description = models.TextField(_("description"), blank=True)
+    starts_at = models.DateTimeField(_("starts"), db_index=True)
+    ends_at = models.DateTimeField(_("ends"), null=True, blank=True)
+    #: A whole day, where the calendar gave a date and no time; ``starts_at`` is then its
+    #: midnight in the zone the reading was made in, which is only for sorting.
+    day = models.DateField(_("day"), null=True, blank=True)
+    cancelled = models.BooleanField(_("cancelled"), default=False)
+
+    objects = SubscribedEventQuerySet.as_manager()
+
+    class Meta:
+        verbose_name = _("subscribed event")
+        verbose_name_plural = _("subscribed events")
+        ordering = ("starts_at", "pk")
+
+    def __str__(self) -> str:
+        return self.summary or str(_("(untitled)"))
+
+    def get_absolute_url(self) -> str:
+        return reverse("applications:subscribed_event", args=[self.pk])
+
+    @property
+    def all_day(self) -> bool:
+        return self.day is not None
+
+
 class SuggestionStatus(models.TextChoices):
     PENDING = "pending", _("Waiting for review")
     ACCEPTED = "accepted", _("Accepted")

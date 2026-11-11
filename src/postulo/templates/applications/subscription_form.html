@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% comment %} Following a calendar, and changing how it is followed (#1098). The address box is
+   never filled back in: it may hold what opens the calendar, and its help says which site it
+   is kept as instead. {% endcomment %}
+{% block title %}{% if object %}{{ object.name }}{% else %}{% translate "New subscription" %}{% endif %}{% endblock %}
+{% block breadcrumb %}
+  <c-breadcrumb>
+    <c-crumb href="{% url 'applications:calendar' %}">{% translate "Calendar" %}</c-crumb>
+    <c-crumb href="{% url 'applications:subscription_list' %}">{% translate "Subscriptions" %}</c-crumb>
+    <c-crumb current>{% if object %}{{ object.name }}{% else %}{% translate "New subscription" %}{% endif %}</c-crumb>
+  </c-breadcrumb>
+{% endblock %}
+
+{% block content %}
+  <div class="mx-auto max-w-xl">
+    <c-page-title>
+      {% if object %}<bdi>{{ object.name }}</bdi>{% else %}{% translate "New subscription" %}{% endif %}
+      <c-slot name="subtitle">
+        {% translate "Its events are drawn on your calendar as they are in the calendar it comes from. They cannot be changed here; any of them can be added as an appointment or an interview of your own." %}
+      </c-slot>
+    </c-page-title>
+    <form method="post" novalidate>
+      {% csrf_token %}
+      {% if form.non_field_errors %}
+        <div class="alert mb-4" data-variant="error">{{ form.non_field_errors }}</div>
+      {% endif %}
+      <div class="card mb-6">
+        {% for field in form %}
+          <c-field :field="field" />
+        {% endfor %}
+      </div>
+      <div class="flex flex-wrap items-center gap-3">
+        <button type="submit" class="btn">{% if object %}{% translate "Save" %}{% else %}{% translate "Subscribe" %}{% endif %}</button>
+        <a href="{% url 'applications:subscription_list' %}" class="btn" data-variant="ghost">{% translate "Cancel" %}</a>
+      </div>
+    </form>
+  </div>
+{% endblock %}
