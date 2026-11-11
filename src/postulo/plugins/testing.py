@@ -49,6 +49,11 @@ asked of the plugin again by its key, the address taken from that answer, the re
 the plugin's ``fill_record`` and checked -- without a browser, so a sync plugin's own tests can
 see what its next run makes of each.
 
+**And a dashboard widget, checked and drawn (#1102).** `assert_declares_usable_widgets` holds
+a plugin's ``widgets`` to what the dashboard accepts, and `draw_widget` draws one body as the
+dashboard would -- handed the person and a connection, rendered, and held to the allowlist --
+so a plugin's tests assert on what a person sees.
+
 **And the migrated test database, kept between runs (#1144).** A plugin's suite migrates the
 whole of Postulo before its first test. `cached_django_db_setup` makes the fixture that does
 it once and restores the result afterwards; two lines in the plugin's ``tests/conftest.py``:
@@ -239,6 +244,49 @@ def assert_is_a_backup_destination(plugin, config: dict, *, tmp_path: Path) -> N
     assert all(item.id != reference.id for item in plugin.list(config)), (
         f"{reference.id!r} is still listed after it was deleted"
     )
+
+
+def assert_declares_usable_widgets(plugin) -> None:
+    """Fail unless every dashboard widget the plugin declares can be put on a dashboard (#1102).
+
+    What Postulo checks when it reads the declaration, with the reasons it would only have
+    logged: each is a `DashboardWidget` with a key, a label, a sentence, a template, a
+    function and one of the three widths, no two have one key, and each template is found.
+    A plugin with no widgets passes.
+    """
+    from django.template.loader import get_template
+
+    from .base import widget_problems, widgets_of
+    from .themes import register_plugin_themes
+
+    register_plugin_themes(plugin)
+    declared = widgets_of(plugin)
+    problems = [problem for widget in declared for problem in widget_problems(widget)]
+    assert not problems, "; ".join(problems)
+    keys = [widget.key for widget in declared]
+    assert len(keys) == len(set(keys)), f"two widgets share a key: {keys}"
+    for widget in declared:
+        get_template(widget.template)
+
+
+def draw_widget(plugin, key: str, user, connection=None) -> str:
+    """One of the plugin's dashboard widgets as the dashboard draws its body (#1102).
+
+    Handed what the dashboard hands it -- the person, and one of their connections to the
+    plugin or ``None`` -- and returned as the markup that reaches the page: rendered, then
+    held to the dashboard's allowlist, so a test sees what a person would and not what the
+    template wrote. What the plugin raises is raised here, where the dashboard would leave
+    the widget out and log it.
+    """
+    from postulo.core.widgets import draw
+
+    from .base import widgets_of
+    from .themes import register_plugin_themes
+
+    register_plugin_themes(plugin)
+    found = [widget for widget in widgets_of(plugin) if widget.key == key]
+    assert found, f"{plugin!r} declares no widget {key!r}"
+    return draw(found[0], user, connection)
 
 
 def listing_history(record) -> list[dict]:

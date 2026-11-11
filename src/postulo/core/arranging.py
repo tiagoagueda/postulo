@@ -76,7 +76,7 @@ def context_for(profile, page: list[widgets.Rendered]) -> dict:
         "fresh": fresh,
         "available": [
             (group, [w for w in items if w.key not in keys and w not in fresh])
-            for group, items in widgets.groups()
+            for group, items in widgets.groups_for(profile)
         ],
         "is_standard": widgets.is_standard(profile),
     }
@@ -103,7 +103,7 @@ def apply(request: HttpRequest) -> HttpResponse:
         widgets.seed(profile)
         profile.save(update_fields=["dashboard_widgets", "dashboard_known", "updated_at"])
         return redirect(mode_url())
-    if key not in widgets.REGISTRY:
+    if widgets.get(key, request.user) is None:
         messages.error(request, _("That is not a widget Postulo knows about."))
         return redirect(mode_url())
     # "dismiss" changes nothing about the page and everything about the offer: a new widget

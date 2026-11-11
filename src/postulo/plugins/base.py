@@ -15,6 +15,7 @@ not put a fabricated job title into their records.
 from __future__ import annotations
 
 import datetime as dt
+import re
 from dataclasses import dataclass, field, replace
 from decimal import Decimal
 from typing import Protocol, runtime_checkable
@@ -720,6 +721,102 @@ class FeaturePlugin(Protocol):
     name: str
     #: What kind of plugin this is; always ``"feature"``.
     kind: str
+
+
+# ------------------------------------------------------------ dashboard widgets
+
+#: The widths a dashboard widget may ask for: a quarter, a half or the whole of a row on a
+#: wide screen, and the whole of it on a narrow one. The dashboard's own widgets use the same
+#: three (`core.widgets`).
+WIDGET_WIDTHS = ("quarter", "half", "full")
+
+#: What a widget's own key may be. Postulo puts the plugin's name and a colon in front of it,
+#: so two plugins can both have a ``status`` widget, and that whole key is what a person's
+#: arrangement stores.
+WIDGET_KEY = r"[a-z0-9][a-z0-9_-]{0,40}"
+
+
+@dataclass(frozen=True)
+class DashboardWidget:
+    """One thing a plugin adds to the dashboard (#1102).
+
+    A plugin of any kind declares its widgets in a ``widgets`` attribute: a sequence of
+    these, or a method returning one. Each is offered on the dashboard's arrange page under
+    the plugin's name, and is put on the page only by the person, as any widget a plugin
+    brings is (#123).
+
+    ``context(user, connection)`` is what the widget computes, as a dict for its template. It
+    is handed the person whose dashboard it is and, for a plugin people connect to (a
+    notifier, an outbox, a store, a sync), one of that person's enabled connections to it --
+    never a queryset. It reads through the surface, whose reads are scoped already
+    (`Application.objects.for_user(user)`, `calendar_items`, `connection.last_report`). A
+    person with several connections to the plugin sees the widget's body once for each,
+    under the connection's name; one with none sees it once, handed ``None``, which is the
+    widget's chance to say what connecting would show. A plugin nobody connects to is
+    always handed ``None``.
+
+    It runs on every view of the dashboard, as the dashboard's own widgets do: no answer is
+    kept between two views, so it reads what is already stored and never dials the other
+    service. One that raises, or returns anything but a dict, is left off the page and
+    logged; the rest of the dashboard is drawn.
+
+    ``template`` is a Django template in the ``templates/`` directory beside the plugin's
+    package, named under a directory of the plugin's own (``"acme/widgets/status.html"``). It
+    draws the widget's body: Postulo draws the card around it and ``label`` as its heading.
+    What it writes is escaped as every template's is, and then held to an allowlist -- text,
+    lists, tables, ``h3`` to ``h6``, links to ``http``, ``https``, ``mailto`` or a path on
+    the instance, and the ``class``, ``title``, ``lang``, ``dir``, ``role`` and ``aria-``
+    attributes. A script, a style, a form, an image, an ``id``, a ``data-`` attribute or an
+    event handler is taken out, whatever ``|safe`` let through.
+    """
+
+    #: The plugin's own key for it, matching `WIDGET_KEY`.
+    key: str
+    #: The heading Postulo draws over it, and its name on the arrange page.
+    label: str
+    #: One sentence on the arrange page, saying what it is for.
+    blurb: str
+    #: The template that draws its body.
+    template: str
+    #: ``(user, connection) -> dict``, what the template is given.
+    context: object
+    #: One of `WIDGET_WIDTHS`.
+    width: str = "half"
+
+
+def widgets_of(plugin) -> list[DashboardWidget]:
+    """What this plugin says it adds to the dashboard, or nothing (#1102).
+
+    A sequence or a method, as with a plugin's themes. One that cannot be read costs its
+    own widgets and nobody else's; the reason is the caller's to log.
+    """
+    declared = getattr(plugin, "widgets", None)
+    if callable(declared):
+        declared = declared()
+    if not declared:
+        return []
+    return list(declared)
+
+
+def widget_problems(widget) -> list[str]:
+    """What is wrong with one declared widget, in words for the plugin's author. Empty if
+    nothing is."""
+    if not isinstance(widget, DashboardWidget):
+        return [f"{widget!r} is not a DashboardWidget"]
+    problems = []
+    if not isinstance(widget.key, str) or not re.fullmatch(WIDGET_KEY, widget.key):
+        problems.append(f"key {widget.key!r} does not match {WIDGET_KEY}")
+    if not str(widget.label or "").strip():
+        problems.append(f"{widget.key!r} has no label")
+    if not str(widget.blurb or "").strip():
+        problems.append(f"{widget.key!r} has no blurb")
+    if not isinstance(widget.template, str) or not widget.template.strip():
+        problems.append(f"{widget.key!r} names no template")
+    if not callable(widget.context):
+        problems.append(f"{widget.key!r}: context is not callable")
+    if widget.width not in WIDGET_WIDTHS:
+        problems.append(f"{widget.key!r}: width must be one of {WIDGET_WIDTHS}")
+    return problems
 
 
 # ----------------------------------------------------------- connected plugins

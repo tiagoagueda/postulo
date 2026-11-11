@@ -18,9 +18,10 @@ and hold somebody's credentials, not a new one being granted here.
 Postulo's interface, nor a template of Django, allauth or the admin (a form widget, say), by
 shipping a file at the same path (#971). Between plugins the first one registered wins.
 
-**A plugin that declares no theme gets no template directory.** Not caution for its own
-sake: an unused search path is a file somebody can shadow by accident, and there is no
-reason to add one for a plugin that only parses adverts.
+**A plugin that declares no theme and no dashboard widget gets no template directory.** Not
+caution for its own sake: an unused search path is a file somebody can shadow by accident,
+and there is no reason to add one for a plugin that only parses adverts. A widget's template
+comes through the same door, searched last like a theme's (#1102).
 """
 
 from __future__ import annotations
@@ -118,11 +119,14 @@ def themes_of(plugin) -> list[themes.Theme]:
 def register_plugin_themes(plugin, module_name: str = "") -> int:
     """Take a plugin's themes, and its templates with them. Returns how many were taken.
 
+    A plugin with dashboard widgets and no theme has its templates taken too, for the
+    widgets' (#1102), and none of its themes, since it has none.
+
     ``module_name`` is where to look for the ``templates/`` directory; by default the module
     the plugin is defined in, which is right for a class and for an instance of one.
     """
     declared = themes_of(plugin)
-    if not declared:
+    if not declared and not getattr(plugin, "widgets", None):
         return 0
 
     module_name = module_name or getattr(plugin, "__module__", "") or type(plugin).__module__
@@ -131,9 +135,11 @@ def register_plugin_themes(plugin, module_name: str = "") -> int:
         register_template_dir(directory)
     else:
         logger.warning(
-            "Plugin %r declares themes but has no templates/ directory",
+            "Plugin %r declares themes or widgets but has no templates/ directory",
             getattr(plugin, "name", module_name),
         )
+    if not declared:
+        return 0
 
     # Each theme reads its files from the plugin's own package, whatever it wrote in
     # `package`: a theme that could name another package could inline that one's files
