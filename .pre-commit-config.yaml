@@ -1,7 +1,8 @@
 # Vendored libraries, the compiled stylesheet and the built page script are artefacts:
 # reformatting them only creates churn the next time they are regenerated. A credential kept as a test fixture
-# is sealed over its exact bytes, so not even its last newline is added (#670).
-exclude: ^(src/postulo/static/js/vendor/|src/postulo/static/css/app\.css$|src/postulo/static/js/app\.min\.js$|package-lock\.json$|tests/data/edc/)
+# is sealed over its exact bytes, so not even its last newline is added (#670). A published schema
+# kept to check a writer against is kept as it was published (#1100).
+exclude: ^(src/postulo/static/js/vendor/|src/postulo/static/css/app\.css$|src/postulo/static/js/app\.min\.js$|package-lock\.json$|tests/data/edc/|tests/data/json-resume/)
 
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks

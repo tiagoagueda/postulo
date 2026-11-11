@@ -223,6 +223,8 @@ def test_these_are_the_plugins_that_ship_across_eleven_kinds():
         "format-icalendar",
         "format-vcard",
         "format-geojson",
+        "format-europass",
+        "format-json-resume",
     }
 
 

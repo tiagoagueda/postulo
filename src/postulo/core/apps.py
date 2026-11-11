@@ -13,9 +13,11 @@ class CoreConfig(AppConfig):
         from postulo.plugins.employer_structure import EmployerStructureFeature
         from postulo.plugins.file_formats import (
             DocxFormat,
+            EuropassFormat,
             FileFormatsFeature,
             GeoJsonFormat,
             ICalendarFormat,
+            JsonResumeFormat,
             OdtFormat,
             PdfFormat,
             VCardFormat,
@@ -54,7 +56,7 @@ class CoreConfig(AppConfig):
         transfers.register_the_ones_postulo_has()
 
         # The module the file-format sub-modules belong to: PDF, Word, OpenDocument, iCalendar
-        # and vCard, with Europass beside them (#877).
+        # and vCard, with Europass beside them (#877); and a CV as Europass or JSON Resume (#1100).
         for format_module in (
             FileFormatsFeature,
             PdfFormat,
@@ -63,6 +65,8 @@ class CoreConfig(AppConfig):
             ICalendarFormat,
             VCardFormat,
             GeoJsonFormat,
+            EuropassFormat,
+            JsonResumeFormat,
         ):
             registry.register_builtin("feature", format_module)
         # The module the "multiple …" features are sub-modules of (#875).

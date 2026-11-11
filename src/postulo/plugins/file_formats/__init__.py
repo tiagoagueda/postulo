@@ -37,6 +37,8 @@ ODT = "format-odt"
 ICALENDAR = "format-icalendar"
 VCARD = "format-vcard"
 GEOJSON = "format-geojson"
+EUROPASS = "format-europass"
+JSON_RESUME = "format-json-resume"
 
 
 @declares(
@@ -174,3 +176,45 @@ class VCardFormat:
 )
 class GeoJsonFormat:
     """GeoJSON, on or off, and never without the map (#880)."""
+
+
+@declares(
+    shipped(
+        name=EUROPASS,
+        # "Export", beside the importer's "Europass import" (#911): two switches, and a
+        # person turning one off should know which.
+        label=_("Europass export"),
+        kind="feature",
+        parent=FILE_FORMATS,
+        categories=("files",),
+        icon="id-card",
+        description=_(
+            "A CV downloaded as a Europass file, for a portal or a service that reads the "
+            "European CV format: its entries and the details it prints, in its language. What "
+            "Europass has no place for is said beside the download. Switched off, the download "
+            "is not offered and its address answers as if there were nothing there."
+        ),
+    )
+)
+class EuropassFormat:
+    """Europass as a CV leaves, on or off (#1100). The reading is the importer's own switch."""
+
+
+@declares(
+    shipped(
+        name=JSON_RESUME,
+        label=_("JSON Resume"),
+        kind="feature",
+        parent=FILE_FORMATS,
+        categories=("files",),
+        icon="braces",
+        description=_(
+            "A CV downloaded as a JSON Resume file, the open format many CV tools and themes "
+            "read: its entries and the details it prints. What the format has no place for is "
+            "said beside the download. Switched off, the download is not offered and its "
+            "address answers as if there were nothing there."
+        ),
+    )
+)
+class JsonResumeFormat:
+    """JSON Resume, on or off (#1100)."""

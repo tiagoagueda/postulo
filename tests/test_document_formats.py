@@ -707,8 +707,13 @@ def a_plugins_format():
         formats.forget("shout")
 
 
+#: What Postulo registers itself, in the order a page offers them: the words as text,
+#: OpenDocument and Word, and a CV's structure as Europass and JSON Resume (#1100).
+POSTULOS_OWN = ["txt", "odt", "docx", "europass", "json-resume"]
+
+
 def test_postulo_ships_plain_text_opendocument_and_word():
-    assert [one.key for one in formats.all_formats()] == ["txt", "odt", "docx"]
+    assert [one.key for one in formats.all_formats()] == POSTULOS_OWN
     assert formats.get("docx").extension == "docx"
 
 
@@ -749,13 +754,13 @@ def test_a_format_with_no_key_or_no_extension_is_ignored(key, extension):
     )
 
     assert formats.register(nameless) is False
-    assert [one.key for one in formats.all_formats()] == ["txt", "odt", "docx"]
+    assert [one.key for one in formats.all_formats()] == POSTULOS_OWN
 
 
 def test_registering_postulos_own_twice_changes_nothing():
     formats.register_the_ones_postulo_has()
 
-    assert [one.key for one in formats.all_formats()] == ["txt", "odt", "docx"]
+    assert [one.key for one in formats.all_formats()] == POSTULOS_OWN
 
 
 def test_a_format_that_fails_is_a_sentence_and_the_others_still_work(client, person, cv, caplog):
