@@ -709,9 +709,13 @@ jobs:
         # invitation at the same moment on this engine, so only here can one wait (#544).
         # The leases are here for the race itself: two connections taking one expired lease
         # can only be run against a server, and exactly one of them may win (#1130).
+        # The cache purge is here for its one statement written by hand: it compares a date
+        # in the form this engine keeps it, and a wrong comparison would delete a live
+        # rate-limit counter, which is the one thing the purge must never do (#1167).
         run: >-
           uv run pytest tests/test_smoke.py tests/test_ownership.py tests/test_backup.py
           tests/test_language_storage.py tests/test_invites.py tests/test_leases.py
+          tests/test_cache_purge.py
         timeout-minutes: 15
         env:
           POSTULO_TEST_DATABASE_URL: postgres://postulo:${{ env.PG_PASSWORD }}@${{ env.PG_HOST }}:5432/postulo
