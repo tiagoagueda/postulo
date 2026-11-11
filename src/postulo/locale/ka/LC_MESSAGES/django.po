@@ -5822,6 +5822,7 @@ msgstr "თარიღი აღრიცხული არ არის"
 msgid "date of birth"
 msgstr "დაბადების თარიღი"
 
+#: src/postulo/documents/structured.py
 #: src/postulo/templates/accounts/profile.html
 msgid "Date of birth"
 msgstr "დაბადების თარიღი"
@@ -5833,6 +5834,10 @@ msgstr "დაბადების თარიღი, დაბადები
 #: src/postulo/templates/jobs/company_form.html
 msgid "Dated entries, kept as a history and shared with everybody who can see this company. One older than 90 days is shown as of its date."
 msgstr "თარიღიანი ჩანაწერები, რომლებიც ისტორიად ინახება და გაზიარებულია ყველასთან, ვისაც ეს კომპანია ხედავს. 90 დღეზე ძველი ნაჩვენებია მისი თარიღის მდგომარეობით."
+
+#: src/postulo/documents/structured.py
+msgid "Dates of projects"
+msgstr ""
 
 #: src/postulo/applications/models.py
 msgid "dates offered"
@@ -6783,7 +6788,7 @@ msgstr "ჩანაწერები ვაკანსიების ის�
 msgid "Entries in listing histories that came from them"
 msgstr "ვაკანსიების ისტორიის ჩანაწერები, რომლებიც მათგან მოვიდა"
 
-#: src/postulo/resume/models.py
+#: src/postulo/documents/structured.py src/postulo/resume/models.py
 #: src/postulo/templates/documents/upload_form.html
 msgid "EQF level"
 msgstr "EQF დონე"
@@ -6815,6 +6820,10 @@ msgstr "დავალებები"
 #: src/postulo/resume/models.py
 msgid "ESCO skill"
 msgstr "ESCO უნარი"
+
+#: src/postulo/documents/formats.py
+msgid "Europass"
+msgstr ""
 
 #: src/postulo/core/transfers.py
 msgid "Europass import"
@@ -7557,7 +7566,7 @@ msgstr "დამახსოვრებულის დავიწყებ�
 msgid "Forgotten. Your next capture from %(host)s is read as if for the first time."
 msgstr "დავიწყებულია. თქვენი შემდეგი აღება საიტიდან %(host)s ისე წაიკითხება, თითქოს პირველად."
 
-#: src/postulo/accounts/forms.py
+#: src/postulo/accounts/forms.py src/postulo/documents/structured.py
 msgid "Form of address"
 msgstr "მიმართვის ფორმა"
 
@@ -7757,7 +7766,7 @@ msgstr "უფრო მოგვიანებით"
 msgid "Gaming"
 msgstr "ვიდეოთამაშები"
 
-#: src/postulo/accounts/forms.py
+#: src/postulo/accounts/forms.py src/postulo/documents/structured.py
 msgid "Gender"
 msgstr "სქესი"
 
@@ -7934,6 +7943,10 @@ msgstr "კარგი"
 msgid "Got any reply"
 msgstr "პასუხი მოვიდა"
 
+#: src/postulo/documents/structured.py
+msgid "Grade"
+msgstr ""
+
 #: src/postulo/resume/models.py
 msgid "grade"
 msgstr "შეფასება"
@@ -8108,6 +8121,10 @@ msgstr "მთავარი პუნქტები"
 #: src/postulo/documents/models.py
 msgid "highlights for this CV"
 msgstr "მთავარი პუნქტები ამ CV-სთვის"
+
+#: src/postulo/documents/structured.py
+msgid "Highlights of education"
+msgstr ""
 
 #: src/postulo/jobs/models.py src/postulo/jobs/tables.py
 #: src/postulo/templates/jobs/company_form.html
@@ -8394,9 +8411,9 @@ msgid "identifiers"
 msgstr "იდენტიფიკატორები"
 
 #: src/postulo/accounts/views.py src/postulo/core/help.py
-#: src/postulo/documents/forms.py src/postulo/jobs/merging.py
-#: src/postulo/plugins/kinds.py src/postulo/resume/candidate.py
-#: src/postulo/resume/views_candidate.py
+#: src/postulo/documents/forms.py src/postulo/documents/structured.py
+#: src/postulo/jobs/merging.py src/postulo/plugins/kinds.py
+#: src/postulo/resume/candidate.py src/postulo/resume/views_candidate.py
 #: src/postulo/templates/accounts/profile.html
 #: src/postulo/templates/jobs/company_form.html
 msgid "Identifiers"
@@ -9276,6 +9293,10 @@ msgstr "JPEG სურათი"
 msgid "JSON"
 msgstr "JSON"
 
+#: src/postulo/documents/formats.py
+msgid "JSON Resume"
+msgstr ""
+
 #: src/postulo/templates/partials/table/views.html
 #, fuzzy
 msgid "Keep"
@@ -9767,6 +9788,10 @@ msgstr "თუ ცარიელს დატოვებთ, დღევა�
 #, python-format
 msgid "Left out, because they hold nothing to write: %(columns)s."
 msgstr "გამოტოვებულია, რადგან ჩასაწერი არაფერი აქვთ: %(columns)s."
+
+#: src/postulo/templates/documents/cv_detail.html
+msgid "Left out, because this format has no place for them:"
+msgstr ""
 
 #: src/postulo/jobs/industries.py
 msgid "Legal"
@@ -10406,7 +10431,8 @@ msgid "Message"
 msgstr "შეტყობინება"
 
 #: src/postulo/accounts/views.py src/postulo/core/help.py
-#: src/postulo/resume/candidate.py src/postulo/resume/views_candidate.py
+#: src/postulo/documents/structured.py src/postulo/resume/candidate.py
+#: src/postulo/resume/views_candidate.py
 #: src/postulo/templates/partials/messaging_handles.html
 msgid "Messaging"
 msgstr "მესენჯერები"
@@ -10715,7 +10741,7 @@ msgstr "მოქალაქეობები"
 msgid "Nationalities are written as a list of country codes."
 msgstr "მოქალაქეობები ქვეყნის კოდების სიად იწერება."
 
-#: src/postulo/resume/candidate.py
+#: src/postulo/documents/structured.py src/postulo/resume/candidate.py
 msgid "Nationality"
 msgstr "მოქალაქეობა"
 
@@ -13258,6 +13284,10 @@ msgstr "ტელეფონი"
 msgid "Phone screen"
 msgstr "სატელეფონო გასაუბრება"
 
+#: src/postulo/documents/structured.py
+msgid "Photo"
+msgstr ""
+
 #: src/postulo/jobs/geocoding.py
 msgid "Photon"
 msgstr "Photon"
@@ -13302,6 +13332,10 @@ msgstr "აქ განთავსება"
 #: src/postulo/accounts/models.py
 msgid "place of birth"
 msgstr "დაბადების ადგილი"
+
+#: src/postulo/documents/structured.py
+msgid "Place of birth"
+msgstr ""
 
 #: src/postulo/templates/jobs/address_place.html
 msgid "Place on the map"
@@ -13938,7 +13972,7 @@ msgstr "Prometheus-ის მეტრიკები ხელმისაწ�
 msgid "Prometheus metrics are switched on but <code>/metrics</code> refuses to answer until POSTULO_METRICS_TOKEN is set: they name the exact versions this instance runs, which is not for anybody who can reach it."
 msgstr "Prometheus-ის მეტრიკები ჩართულია, მაგრამ <code>/metrics</code> პასუხზე უარს ამბობს, სანამ POSTULO_METRICS_TOKEN არ დაყენდება: მეტრიკები ასახელებს იმ ზუსტ ვერსიებს, რომლებზეც ეს ინსტალაცია მუშაობს, და ეს ინფორმაცია განკუთვნილი არ არის ყველასთვის, ვისაც მასთან წვდომა აქვს."
 
-#: src/postulo/accounts/forms.py
+#: src/postulo/accounts/forms.py src/postulo/documents/structured.py
 msgid "Pronouns"
 msgstr "ნაცვალსახელები"
 
@@ -16032,6 +16066,10 @@ msgstr "ზოგიერთი კოდის საცავი ინახ
 msgid "Some code repositories are kept for this contact and not shown, because {setting} is switched off."
 msgstr "ზოგიერთი კოდის საცავი ინახება ამ კონტაქტისთვის და არ ჩანს, რადგან {setting} გამორთულია."
 
+#: src/postulo/documents/structured.py
+msgid "Some driving licence details"
+msgstr ""
+
 #: src/postulo/applications/views_ical.py
 msgid "Some of the choices need another look."
 msgstr "ზოგიერთ არჩევანს ხელახლა დათვალიერება სჭირდება."
@@ -16435,6 +16473,10 @@ msgstr "მოდულების შემოთავაზებები"
 #: src/postulo/jobs/models.py src/postulo/resume/models.py
 msgid "summary"
 msgstr "შეჯამება"
+
+#: src/postulo/documents/structured.py
+msgid "Summary"
+msgstr ""
 
 #: src/postulo/core/models.py
 msgid "Sunday"
@@ -18280,6 +18322,10 @@ msgstr "მთავარი ჩანაწერი. CV-ის ვარი�
 #: src/postulo/documents/printing.py
 msgid "The messaging handle chosen for this CV is no longer in your details, so it prints none."
 msgstr "ამ CV-ისთვის არჩეული მესენჯერის სახელი აღარ არის თქვენს მონაცემებში, ამიტომ არცერთი არ იბეჭდება."
+
+#: src/postulo/documents/structured.py
+msgid "The names of skill groups"
+msgstr ""
 
 #: src/postulo/templates/server/backups.html
 msgid "The next backup may not fit."
