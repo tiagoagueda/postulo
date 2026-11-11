@@ -34,6 +34,18 @@ def rows() -> set[str]:
         return {key.split(":", 2)[2] for (key,) in cursor.fetchall()}
 
 
+@pytest.fixture(autouse=True)
+def the_connection_kept(monkeypatch):
+    """The scheduler command closes old connections when a pass ends, which is right for a
+    process that sleeps between passes. A test's connection is "old" at once, and it holds
+    the test's transaction: in-memory SQLite is never closed, so nothing showed there, and
+    on PostgreSQL the next statement of the test found its connection gone."""
+    monkeypatch.setattr(
+        "postulo.notifications.management.commands.send_due_reminders.close_old_connections",
+        lambda: None,
+    )
+
+
 @pytest.fixture
 def file_store(settings, tmp_path):
     """The production arrangement: the database cache, and the allowances in files beside it."""
