@@ -157,6 +157,22 @@ stylesheet and the committed page script have not drifted from their sources. Co
 `npm ci` has installed the Tailwind CLI: `tests/test_stylesheet.py` rebuilds it and compares,
 which is the difference between finding out before the push and after it.
 
+**The migrated test database is kept between runs (#1144).** A run begins by migrating an
+empty in-memory database, about a minute before the first test of a single file. On your
+machine the first run does that and keeps a copy, and every later run restores the copy,
+in about a second. The copy is named by a hash of what `migrate` reads: every installed
+app's migration files, the modules they import, the settings they name and the versions
+installed. So a new or edited migration migrates afresh without being asked, and checkouts
+with the same migrations share one copy. It lives in your own cache directory,
+`%LOCALAPPDATA%\postulo\test-databases` on Windows, `~/Library/Caches/postulo/test-databases`
+on macOS and `~/.cache/postulo/test-databases` elsewhere, which keeps the six used last.
+`POSTULO_TEST_DB_CACHE=0` switches it off, `1` switches it on where it is off by default,
+which is CI (wherever `CI` is set), and any other value is the directory to use.
+`uv run pytest --create-db` migrates afresh once and replaces the copy; deleting the directory
+clears it. The browser suite, a PostgreSQL run and `--no-migrations` migrate as they always
+did. A migration that seeds rows from a file it reads through other code is the one thing
+the name cannot see: name that file in `also`, where `tests/conftest.py` makes the fixture.
+
 The page script is written in `assets/js/app.js`, comments and all, and the browser is served
 `src/postulo/static/js/app.min.js`: the same script without its comments and indentation,
 which were more than half of the script a first visit downloaded. `npm run build:js` writes it with

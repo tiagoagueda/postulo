@@ -48,6 +48,14 @@ on the table underneath it.
 asked of the plugin again by its key, the address taken from that answer, the record made by
 the plugin's ``fill_record`` and checked -- without a browser, so a sync plugin's own tests can
 see what its next run makes of each.
+
+**And the migrated test database, kept between runs (#1144).** A plugin's suite migrates the
+whole of Postulo before its first test. `cached_django_db_setup` makes the fixture that does
+it once and restores the result afterwards; two lines in the plugin's ``tests/conftest.py``:
+
+    from postulo.plugins.testing import cached_django_db_setup
+
+    django_db_setup = cached_django_db_setup()
 """
 
 from __future__ import annotations
@@ -267,6 +275,69 @@ def listing_history(record) -> list[dict]:
             }
         )
     return entries
+
+
+def cached_django_db_setup(*, also: Iterable[Path | str] = ()):
+    """pytest-django's ``django_db_setup``, with the migrated database kept between runs (#1144).
+
+    Returns a session fixture named ``django_db_setup``; assign it in ``tests/conftest.py``::
+
+        from postulo.plugins.testing import cached_django_db_setup
+
+        django_db_setup = cached_django_db_setup()
+
+    The first run migrates as before and keeps a copy of the migrated database; a later run
+    restores the copy into its in-memory SQLite database instead of migrating. pytest-django's
+    own fixture still does everything else -- which databases, serialised contents, teardown --
+    because this one only stands around it. A database on another engine, one kept in a
+    file, and a run with ``--no-migrations`` are migrated as they always were.
+
+    **The copy is named by what the migrations are**: every migration file of every installed
+    app (Postulo's, your plugin's, each library's), the modules they import, the settings
+    they read by name, and the versions of everything installed. Change any of them and the
+    next run migrates afresh. What the name cannot see is a file or a setting a ``RunPython``
+    reaches through other code; if a migration of yours seeds rows from a data file, name it
+    in ``also`` so that a change to the file is a change to the name::
+
+        django_db_setup = cached_django_db_setup(also=[HERE / "data" / "regions.json"])
+
+    **``POSTULO_TEST_DB_CACHE`` decides whether and where.** Unset, the copy is kept on a
+    person's machine (under the user's cache directory, ``postulo/test-databases``) and not
+    on CI, where ``CI`` is set and a job starts from nothing. ``0`` switches it off, ``1``
+    switches it on, and any other value is the directory to keep it in -- which is what a
+    workflow sets, together with a cache step for that directory, to migrate only when its
+    Postulo or its own migrations change. ``--create-db`` migrates afresh and replaces the
+    copy; deleting the directory clears it, and it is never needed for a run to pass.
+    """
+    import pytest
+
+    from . import testdb
+
+    files = tuple(also)
+
+    @pytest.fixture(scope="session", name="django_db_setup")
+    def django_db_setup(request, django_db_use_migrations, django_db_createdb):
+        directory = testdb.cache_directory() if django_db_use_migrations else None
+        with testdb.answering_migrate(directory, also=files, afresh=django_db_createdb):
+            # The fixture this one replaces, by its own name: pytest hands back the next
+            # one down, pytest-django's, and sets it up here, inside the block.
+            request.getfixturevalue("django_db_setup")
+
+    return django_db_setup
+
+
+def migrated_database_header() -> str | None:
+    """A line for ``pytest_report_header``: where the migrated database is kept, if it is.
+
+    Optional, and worth its three lines in a ``conftest.py``: a run that restored its
+    database says so at the top, with the variable that makes it migrate instead::
+
+        def pytest_report_header(config):
+            return migrated_database_header()
+    """
+    from . import testdb
+
+    return testdb.report_header()
 
 
 def _on_the_server(connection):

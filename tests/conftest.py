@@ -8,6 +8,19 @@ from django.contrib.auth import get_user_model
 
 from postulo.config import sqlite
 from postulo.core import site
+from postulo.plugins import testing
+
+#: The migrated test database, kept between runs on a contributor's machine and restored
+#: instead of migrating again; CI migrates as it always did (#1144). The classification is
+#: named because a migration reads it through `jobs.industries`, where the key cannot see it.
+django_db_setup = testing.cached_django_db_setup(
+    also=[Path(sqlite.__file__).parents[1] / "jobs" / "data" / "nace-2.1.json"]
+)
+
+
+def pytest_report_header(config):
+    """Say where the migrated database is kept, when it is (#1144)."""
+    return testing.migrated_database_header()
 
 
 @pytest.fixture(scope="session")
