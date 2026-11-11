@@ -4039,6 +4039,10 @@ msgstr "Egyesületek, társaságok és klubok, amelyeknek tagja vagy tagja volt.
 msgid "at"
 msgstr "időpont"
 
+#: src/postulo/templates/settings/appearance.html
+msgid "At each status"
+msgstr ""
+
 #: src/postulo/templates/cotton/table/filter.html
 msgid "at least"
 msgstr "legalább"
@@ -4471,6 +4475,10 @@ msgstr "Ágazatok szerint, mindegyik alatt az iparágakkal. Több ágazatban vag
 #: src/postulo/applications/models.py
 msgid "By video"
 msgstr "Videohíváson"
+
+#: src/postulo/templates/settings/appearance.html
+msgid "By what it was applied through"
+msgstr ""
 
 #: src/postulo/resume/models.py
 msgid "C1 — advanced"
@@ -5628,6 +5636,11 @@ msgstr "születési ország"
 #: src/postulo/templates/server/design.html
 msgid "Country the number is in"
 msgstr "A szám országa"
+
+#: src/postulo/templates/applications/partials/status_card.html
+#, python-format
+msgid "Counts as quiet from %(day)s if nothing happens before then."
+msgstr ""
 
 #: src/postulo/resume/models.py
 msgid "course"
@@ -7868,6 +7881,11 @@ msgstr "Elcsendesedett"
 #: src/postulo/templates/widgets/sources.html
 msgid "Gone quiet at:"
 msgstr "Elcsendesedett ezeknél a cégeknél:"
+
+#: src/postulo/templates/applications/partials/status_card.html
+#, python-format
+msgid "Gone quiet on %(day)s."
+msgstr ""
 
 #: src/postulo/templates/account/partials/password_meter.html
 msgid "Good"
@@ -11664,6 +11682,10 @@ msgid_plural "Nothing has gone quiet for %(days)s days. Either you are on top of
 msgstr[0] "Nincs olyan jelentkezés, amely %(days)s napja elcsendesedett volna. Vagy mindent kézben tart, vagy ideje még néhányat elküldeni."
 msgstr[1] "Nincs olyan jelentkezés, amely %(days)s napja elcsendesedett volna. Vagy mindent kézben tart, vagy ideje még néhányat elküldeni."
 
+#: src/postulo/templates/widgets/gone_quiet.html
+msgid "Nothing has gone quiet. Either you are on top of it, or it is time to send out a few more."
+msgstr ""
+
 #: src/postulo/templates/documents/cv_text.html
 msgid "Nothing here can be changed: it is built from the entries on the document, in the language it declares."
 msgstr "Itt semmi sem módosítható: a dokumentum bejegyzéseiből épül fel, az általa megadott nyelven."
@@ -12555,6 +12577,10 @@ msgid "Open applications with nothing for %(days)s day and nothing planned. Snoo
 msgid_plural "Open applications with nothing for %(days)s days and nothing planned. Snooze sets a reminder two weeks out; Ghosted records that you stopped waiting."
 msgstr[0] "Nyitott jelentkezések, amelyeknél %(days)s napja semmi sem történt, és semmi sincs tervezve. Az Elhalasztás két hét múlvára állít be emlékeztetőt; a Válasz nélkül feljegyzi, hogy felhagyott a várakozással."
 msgstr[1] "Nyitott jelentkezések, amelyeknél %(days)s napja semmi sem történt, és semmi sincs tervezve. Az Elhalasztás két hét múlvára állít be emlékeztetőt; a Válasz nélkül feljegyzi, hogy felhagyott a várakozással."
+
+#: src/postulo/templates/widgets/gone_quiet.html
+msgid "Open applications with nothing for as long as you allow them, and nothing planned. Snooze sets a reminder two weeks out; Ghosted records that you stopped waiting."
+msgstr ""
 
 #: src/postulo/applications/widgets.py
 msgid "Open applications with nothing heard, and the three things to do about it."
@@ -13952,6 +13978,14 @@ msgstr "Elcsendesedett"
 msgid "quiet after"
 msgstr "elcsendesedett ennyi után"
 
+#: src/postulo/accounts/models.py
+msgid "quiet after, by status"
+msgstr ""
+
+#: src/postulo/accounts/models.py
+msgid "quiet after, by what it was applied through"
+msgstr ""
+
 #: src/postulo/applications/models.py
 msgid "quiet announced on"
 msgstr "elcsendesedés jelzésének időpontja"
@@ -13962,6 +13996,10 @@ msgid "Quiet counts open applications silent for %(days)s day with nothing plann
 msgid_plural "Quiet counts open applications silent for %(days)s days with nothing planned; they are not yet failures, but they are not replies either."
 msgstr[0] "Az Elcsendesedett oszlop azokat a nyitott jelentkezéseket számolja, amelyek %(days)s napja hallgatnak, és nincs hozzájuk semmi tervezve; ezek még nem kudarcok, de válaszok sem."
 msgstr[1] "Az Elcsendesedett oszlop azokat a nyitott jelentkezéseket számolja, amelyek %(days)s napja hallgatnak, és nincs hozzájuk semmi tervezve; ezek még nem kudarcok, de válaszok sem."
+
+#: src/postulo/templates/widgets/sources.html
+msgid "Quiet counts open applications silent for as long as you allow them, with nothing planned; they are not yet failures, but they are not replies either."
+msgstr ""
 
 #: src/postulo/templates/applications/partials/application_card.html
 #, python-format
@@ -15877,6 +15915,10 @@ msgstr "A közösségi profilok, a kódtárak és a webhelyek ugyanígy működn
 msgid "Software"
 msgstr "Szoftver"
 
+#: src/postulo/templates/settings/appearance.html
+msgid "Some applications can be given longer or shorter. Each box is a number of days; left blank, the number above applies. A number for a status comes before one for what it was applied through."
+msgstr ""
+
 #: src/postulo/core/web_links.py
 msgid "Some code repositories are kept and not shown, because {setting} is switched off. They come back untouched if it is switched on."
 msgstr "Néhány kódtár meg van őrizve, de nem jelenik meg, mert a(z) {setting} beállítás ki van kapcsolva. Ha bekapcsolja, változatlanul visszatérnek."
@@ -15938,6 +15980,10 @@ msgstr "Valaki megoszt Önnel egy céget, kapcsolatot vagy hirdetést"
 #: src/postulo/templates/jobs/partials/sharing_panel.html
 msgid "somebody who has since left"
 msgstr "valaki, aki azóta távozott"
+
+#: src/postulo/templates/applications/partials/status_card.html
+msgid "Something is planned for it, so it does not count as quiet."
+msgstr ""
 
 #: src/postulo/notifications/base.py
 msgid "Something shared with you is no longer shared"
@@ -17059,6 +17105,20 @@ msgstr "Ez nem a felhasználónév."
 msgid "That is somebody's own record, details and career. It is read from Your record as a file, under Your career."
 msgstr "Ez valakinek a saját adatai: elérhetőségei és pályafutása. Ilyet Az Ön pályafutása alatt, Az adatai egyetlen fájlban oldalon lehet beolvasni."
 
+#: src/postulo/templates/applications/partials/status_card.html
+#, python-format
+msgid "That is the %(counter)s day you set for %(status)s."
+msgid_plural "That is the %(counter)s days you set for %(status)s."
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/postulo/templates/applications/partials/status_card.html
+#, python-format
+msgid "That is the %(counter)s day you set for applications through %(channel)s."
+msgid_plural "That is the %(counter)s days you set for applications through %(channel)s."
+msgstr[0] ""
+msgstr[1] ""
+
 #: src/postulo/core/kind_files.py
 msgid "That is the export of a whole account. This page reads only the file it offers to download itself, which holds one kind of record."
 msgstr "Ez egy teljes fiók exportja. Ez az oldal csak az általa letöltésre kínált fájlt olvassa be, amely egyféle tételt tartalmaz."
@@ -17070,6 +17130,13 @@ msgstr "Ez egy teljes fiók exportja. Ez az oldal csak azt a fájlt olvassa be, 
 #: src/postulo/core/server_views.py
 msgid "That is the last administrator. Appoint another first."
 msgstr "Ez az utolsó adminisztrátor. Előbb nevezzen ki másikat."
+
+#: src/postulo/templates/applications/partials/status_card.html
+#, python-format
+msgid "That is your usual %(counter)s day."
+msgid_plural "That is your usual %(counter)s days."
+msgstr[0] ""
+msgstr[1] ""
 
 #: src/postulo/plugins/pairing.py
 msgid "That item cannot be made into one of those."

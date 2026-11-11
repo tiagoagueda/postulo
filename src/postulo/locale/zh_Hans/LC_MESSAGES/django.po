@@ -3954,6 +3954,10 @@ msgstr "你目前或曾经所属的协会、学会和俱乐部。"
 msgid "at"
 msgstr "在"
 
+#: src/postulo/templates/settings/appearance.html
+msgid "At each status"
+msgstr ""
+
 #: src/postulo/templates/cotton/table/filter.html
 msgid "at least"
 msgstr "至少"
@@ -4391,6 +4395,10 @@ msgstr "按门类划分，并在每个门类下列出其行业。跨多个门类
 #: src/postulo/applications/models.py
 msgid "By video"
 msgstr "通过视频"
+
+#: src/postulo/templates/settings/appearance.html
+msgid "By what it was applied through"
+msgstr ""
 
 #: src/postulo/resume/models.py
 msgid "C1 — advanced"
@@ -5556,6 +5564,11 @@ msgstr "出生国"
 #: src/postulo/templates/server/design.html
 msgid "Country the number is in"
 msgstr "号码所在的国家"
+
+#: src/postulo/templates/applications/partials/status_card.html
+#, python-format
+msgid "Counts as quiet from %(day)s if nothing happens before then."
+msgstr ""
 
 #: src/postulo/resume/models.py
 msgid "course"
@@ -7817,6 +7830,11 @@ msgstr "失去音讯"
 #: src/postulo/templates/widgets/sources.html
 msgid "Gone quiet at:"
 msgstr "失去音讯的阶段："
+
+#: src/postulo/templates/applications/partials/status_card.html
+#, python-format
+msgid "Gone quiet on %(day)s."
+msgstr ""
 
 #: src/postulo/templates/account/partials/password_meter.html
 msgid "Good"
@@ -11643,6 +11661,10 @@ msgid "Nothing has gone quiet for %(days)s day. Either you are on top of it, or 
 msgid_plural "Nothing has gone quiet for %(days)s days. Either you are on top of it, or it is time to send out a few more."
 msgstr[0] "%(days)s天内没有任何申请失去音讯。要么你都跟进得很好，要么是时候再多投几份了。"
 
+#: src/postulo/templates/widgets/gone_quiet.html
+msgid "Nothing has gone quiet. Either you are on top of it, or it is time to send out a few more."
+msgstr ""
+
 #: src/postulo/templates/documents/cv_text.html
 msgid "Nothing here can be changed: it is built from the entries on the document, in the language it declares."
 msgstr "这里的内容无法更改：它由文档中的条目按文档声明的语言生成。"
@@ -12524,6 +12546,10 @@ msgstr "打开一个带选项的对话框"
 msgid "Open applications with nothing for %(days)s day and nothing planned. Snooze sets a reminder two weeks out; Ghosted records that you stopped waiting."
 msgid_plural "Open applications with nothing for %(days)s days and nothing planned. Snooze sets a reminder two weeks out; Ghosted records that you stopped waiting."
 msgstr[0] "%(days)s天内没有任何动态、也没有任何计划的进行中申请。“暂缓”会设置一个两周后的提醒；“无回音”则记录你已不再等待。"
+
+#: src/postulo/templates/widgets/gone_quiet.html
+msgid "Open applications with nothing for as long as you allow them, and nothing planned. Snooze sets a reminder two weeks out; Ghosted records that you stopped waiting."
+msgstr ""
 
 #: src/postulo/applications/widgets.py
 msgid "Open applications with nothing heard, and the three things to do about it."
@@ -13936,6 +13962,14 @@ msgstr "沉寂"
 msgid "quiet after"
 msgstr "沉寂判定天数"
 
+#: src/postulo/accounts/models.py
+msgid "quiet after, by status"
+msgstr ""
+
+#: src/postulo/accounts/models.py
+msgid "quiet after, by what it was applied through"
+msgstr ""
+
 #: src/postulo/applications/models.py
 #, fuzzy
 msgid "quiet announced on"
@@ -13946,6 +13980,10 @@ msgstr "标记为沉寂的日期"
 msgid "Quiet counts open applications silent for %(days)s day with nothing planned; they are not yet failures, but they are not replies either."
 msgid_plural "Quiet counts open applications silent for %(days)s days with nothing planned; they are not yet failures, but they are not replies either."
 msgstr[0] "“沉寂”统计的是已%(days)s天没有动静、也没有任何计划的进行中申请；它们还不算失败，但也不算回复。"
+
+#: src/postulo/templates/widgets/sources.html
+msgid "Quiet counts open applications silent for as long as you allow them, with nothing planned; they are not yet failures, but they are not replies either."
+msgstr ""
 
 #: src/postulo/templates/applications/partials/application_card.html
 #, python-format
@@ -15879,6 +15917,10 @@ msgstr "社交资料、代码仓库和网站的用法相同，各有自己的卡
 msgid "Software"
 msgstr "软件"
 
+#: src/postulo/templates/settings/appearance.html
+msgid "Some applications can be given longer or shorter. Each box is a number of days; left blank, the number above applies. A number for a status comes before one for what it was applied through."
+msgstr ""
+
 #: src/postulo/core/web_links.py
 msgid "Some code repositories are kept and not shown, because {setting} is switched off. They come back untouched if it is switched on."
 msgstr "部分代码仓库已保留但未显示，因为{setting}已关闭。开启后它们会原样恢复。"
@@ -15940,6 +15982,10 @@ msgstr "有人与你共享了公司、联系人或职位"
 #: src/postulo/templates/jobs/partials/sharing_panel.html
 msgid "somebody who has since left"
 msgstr "已离开的某人"
+
+#: src/postulo/templates/applications/partials/status_card.html
+msgid "Something is planned for it, so it does not count as quiet."
+msgstr ""
 
 #: src/postulo/notifications/base.py
 msgid "Something shared with you is no longer shared"
@@ -17077,6 +17123,18 @@ msgstr "用户名不正确。"
 msgid "That is somebody's own record, details and career. It is read from Your record as a file, under Your career."
 msgstr "这是某人自己的记录、资料和职业经历。请在“你的职业经历”下的“你的记录”中将其作为文件读取。"
 
+#: src/postulo/templates/applications/partials/status_card.html
+#, python-format
+msgid "That is the %(counter)s day you set for %(status)s."
+msgid_plural "That is the %(counter)s days you set for %(status)s."
+msgstr[0] ""
+
+#: src/postulo/templates/applications/partials/status_card.html
+#, python-format
+msgid "That is the %(counter)s day you set for applications through %(channel)s."
+msgid_plural "That is the %(counter)s days you set for applications through %(channel)s."
+msgstr[0] ""
+
 #: src/postulo/core/kind_files.py
 msgid "That is the export of a whole account. This page reads only the file it offers to download itself, which holds one kind of record."
 msgstr "这是整个账户的导出文件。此页面只读取它自己提供下载的文件，其中只包含一类记录。"
@@ -17088,6 +17146,12 @@ msgstr "这是整个账户的导出文件。此页面只读取它自己提供下
 #: src/postulo/core/server_views.py
 msgid "That is the last administrator. Appoint another first."
 msgstr "这是最后一位管理员。请先任命另一位。"
+
+#: src/postulo/templates/applications/partials/status_card.html
+#, python-format
+msgid "That is your usual %(counter)s day."
+msgid_plural "That is your usual %(counter)s days."
+msgstr[0] ""
 
 #: src/postulo/plugins/pairing.py
 #, fuzzy

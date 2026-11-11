@@ -4053,6 +4053,10 @@ msgstr "Foreninger, selskaber og klubber, du er eller har været medlem af."
 msgid "at"
 msgstr "på"
 
+#: src/postulo/templates/settings/appearance.html
+msgid "At each status"
+msgstr ""
+
 #: src/postulo/templates/cotton/table/filter.html
 msgid "at least"
 msgstr "mindst"
@@ -4487,6 +4491,10 @@ msgstr "Efter sektor og brancherne i hver sektor nedenunder. En virksomhed i fle
 #: src/postulo/applications/models.py
 msgid "By video"
 msgstr "Pr. video"
+
+#: src/postulo/templates/settings/appearance.html
+msgid "By what it was applied through"
+msgstr ""
 
 #: src/postulo/resume/models.py
 msgid "C1 — advanced"
@@ -5647,6 +5655,11 @@ msgstr "fødeland"
 #: src/postulo/templates/server/design.html
 msgid "Country the number is in"
 msgstr "Det land, nummeret hører til"
+
+#: src/postulo/templates/applications/partials/status_card.html
+#, python-format
+msgid "Counts as quiet from %(day)s if nothing happens before then."
+msgstr ""
 
 #: src/postulo/resume/models.py
 msgid "course"
@@ -7903,6 +7916,11 @@ msgstr "Gået i stå"
 #, fuzzy
 msgid "Gone quiet at:"
 msgstr "Gået i stå den:"
+
+#: src/postulo/templates/applications/partials/status_card.html
+#, python-format
+msgid "Gone quiet on %(day)s."
+msgstr ""
 
 #: src/postulo/templates/account/partials/password_meter.html
 msgid "Good"
@@ -11711,6 +11729,10 @@ msgid_plural "Nothing has gone quiet for %(days)s days. Either you are on top of
 msgstr[0] "Ingen ansøgning er gået i stå i %(days)s dag. Enten har du styr på det, eller også er det tid til at sende nogle flere ud."
 msgstr[1] "Ingen ansøgning er gået i stå i %(days)s dage. Enten har du styr på det, eller også er det tid til at sende nogle flere ud."
 
+#: src/postulo/templates/widgets/gone_quiet.html
+msgid "Nothing has gone quiet. Either you are on top of it, or it is time to send out a few more."
+msgstr ""
+
 #: src/postulo/templates/documents/cv_text.html
 msgid "Nothing here can be changed: it is built from the entries on the document, in the language it declares."
 msgstr "Intet her kan ændres: det er bygget af posterne på dokumentet, på det sprog, det angiver."
@@ -12606,6 +12628,10 @@ msgid "Open applications with nothing for %(days)s day and nothing planned. Snoo
 msgid_plural "Open applications with nothing for %(days)s days and nothing planned. Snooze sets a reminder two weeks out; Ghosted records that you stopped waiting."
 msgstr[0] "Åbne ansøgninger uden aktivitet i %(days)s dag og intet planlagt. Udsæt sætter en påmindelse to uger frem; Ingen svar registrerer, at du holdt op med at vente."
 msgstr[1] "Åbne ansøgninger uden aktivitet i %(days)s dage og intet planlagt. Udsæt sætter en påmindelse to uger frem; Ingen svar registrerer, at du holdt op med at vente."
+
+#: src/postulo/templates/widgets/gone_quiet.html
+msgid "Open applications with nothing for as long as you allow them, and nothing planned. Snooze sets a reminder two weeks out; Ghosted records that you stopped waiting."
+msgstr ""
 
 #: src/postulo/applications/widgets.py
 msgid "Open applications with nothing heard, and the three things to do about it."
@@ -14009,6 +14035,14 @@ msgstr "Gået i stå"
 msgid "quiet after"
 msgstr "gået i stå efter"
 
+#: src/postulo/accounts/models.py
+msgid "quiet after, by status"
+msgstr ""
+
+#: src/postulo/accounts/models.py
+msgid "quiet after, by what it was applied through"
+msgstr ""
+
 #: src/postulo/applications/models.py
 #, fuzzy
 msgid "quiet announced on"
@@ -14020,6 +14054,10 @@ msgid "Quiet counts open applications silent for %(days)s day with nothing plann
 msgid_plural "Quiet counts open applications silent for %(days)s days with nothing planned; they are not yet failures, but they are not replies either."
 msgstr[0] "»Gået i stå« tæller åbne ansøgninger, der har været tavse i %(days)s dag uden noget planlagt; de er endnu ikke afslag, men de er heller ikke svar."
 msgstr[1] "»Gået i stå« tæller åbne ansøgninger, der har været tavse i %(days)s dage uden noget planlagt; de er endnu ikke afslag, men de er heller ikke svar."
+
+#: src/postulo/templates/widgets/sources.html
+msgid "Quiet counts open applications silent for as long as you allow them, with nothing planned; they are not yet failures, but they are not replies either."
+msgstr ""
 
 #: src/postulo/templates/applications/partials/application_card.html
 #, python-format
@@ -15943,6 +15981,10 @@ msgstr "Sociale profiler, kodearkiver og websteder fungerer på samme måde, hve
 msgid "Software"
 msgstr "Software"
 
+#: src/postulo/templates/settings/appearance.html
+msgid "Some applications can be given longer or shorter. Each box is a number of days; left blank, the number above applies. A number for a status comes before one for what it was applied through."
+msgstr ""
+
 #: src/postulo/core/web_links.py
 msgid "Some code repositories are kept and not shown, because {setting} is switched off. They come back untouched if it is switched on."
 msgstr "Nogle kodelagre gemmes, men vises ikke, fordi {setting} er slået fra. De kommer uændrede tilbage, hvis den slås til."
@@ -16005,6 +16047,10 @@ msgstr "Nogen deler en virksomhed, en kontakt eller et opslag med dig"
 #, fuzzy
 msgid "somebody who has since left"
 msgstr "nogen, der ikke længere er her"
+
+#: src/postulo/templates/applications/partials/status_card.html
+msgid "Something is planned for it, so it does not count as quiet."
+msgstr ""
 
 #: src/postulo/notifications/base.py
 msgid "Something shared with you is no longer shared"
@@ -17139,6 +17185,20 @@ msgstr "Det er ikke brugernavnet."
 msgid "That is somebody's own record, details and career. It is read from Your record as a file, under Your career."
 msgstr "Det er nogens egne oplysninger og karriere. Det læses ind fra Dine oplysninger som fil, under Din karriere."
 
+#: src/postulo/templates/applications/partials/status_card.html
+#, python-format
+msgid "That is the %(counter)s day you set for %(status)s."
+msgid_plural "That is the %(counter)s days you set for %(status)s."
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/postulo/templates/applications/partials/status_card.html
+#, python-format
+msgid "That is the %(counter)s day you set for applications through %(channel)s."
+msgid_plural "That is the %(counter)s days you set for applications through %(channel)s."
+msgstr[0] ""
+msgstr[1] ""
+
 #: src/postulo/core/kind_files.py
 msgid "That is the export of a whole account. This page reads only the file it offers to download itself, which holds one kind of record."
 msgstr "Det er eksporten af en hel konto. Denne side læser kun den fil, den selv tilbyder at downloade, som indeholder én slags post."
@@ -17150,6 +17210,13 @@ msgstr "Det er eksporten af en hel konto. Denne side læser kun den fil, den sel
 #: src/postulo/core/server_views.py
 msgid "That is the last administrator. Appoint another first."
 msgstr "Det er den sidste administrator. Udpeg en anden først."
+
+#: src/postulo/templates/applications/partials/status_card.html
+#, python-format
+msgid "That is your usual %(counter)s day."
+msgid_plural "That is your usual %(counter)s days."
+msgstr[0] ""
+msgstr[1] ""
 
 #: src/postulo/plugins/pairing.py
 msgid "That item cannot be made into one of those."
