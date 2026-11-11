@@ -29,7 +29,12 @@ def read_a_file(page: Page, base: str, path) -> None:
     page.goto(f"{base}/career/file/")
     page.locator("input[type=file]").set_input_files(str(path))
     page.locator("[data-candidate-upload] button[type=submit]").click()
-    expect(page.locator("[data-candidate-review]")).to_be_visible()
+    # The answer to the upload is the first page drawn in the language just chosen, so it
+    # waits for that language's catalogue to be read as well as for the file. On CI's host
+    # with its memory full that once took longer than the five seconds an expectation waits
+    # by default, in German, on a commit whose pull request had passed; the same test passed
+    # alone a minute later. The review has to appear, not to appear quickly.
+    expect(page.locator("[data-candidate-review]")).to_be_visible(timeout=20_000)
 
 
 def test_the_file_goes_out_and_comes_back(live_server, page: Page, furnished, tmp_path):  # noqa: F811
