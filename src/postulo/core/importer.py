@@ -227,6 +227,15 @@ def _profile_value(profile, name: str, value):
 
         kept = themes.remembered_from_archive(value)
         return _REFUSED if kept is None else kept
+    if name in {"quiet_days_by_status", "quiet_days_by_channel"}:
+        # Held to the statuses and channels that can have a number, and to its bounds (#1099).
+        from postulo.applications.models import QUIET_SETTABLE_STATUSES, Channel, quiet_days_from
+
+        allowed = (
+            set(QUIET_SETTABLE_STATUSES) if name == "quiet_days_by_status" else set(Channel.values)
+        )
+        kept = quiet_days_from(value, allowed)
+        return _REFUSED if kept is None else kept
     if name in {"identifier_order", "hidden_identifiers"}:
         from postulo.core import identifier_order
 

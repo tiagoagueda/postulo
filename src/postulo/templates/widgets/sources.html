@@ -39,6 +39,9 @@
   </c-scroll-box>
   <p class="mt-2 text-xs text-ink-500 dark:text-ink-400">
     {% translate "Source is the “found via” field on a posting. Fill it in and this table starts earning its place." %}
+    {% if insights.quiet_varies %}
+      {% translate "Quiet counts open applications silent for as long as you allow them, with nothing planned; they are not yet failures, but they are not replies either." %}
+    {% else %}
     {% blocktranslate trimmed count days=insights.quiet_after_days %}
       Quiet counts open applications silent for {{ days }} day with nothing planned; they
       are not yet failures, but they are not replies either.
@@ -46,6 +49,7 @@
       Quiet counts open applications silent for {{ days }} days with nothing planned; they
       are not yet failures, but they are not replies either.
     {% endblocktranslate %}
+    {% endif %}
   </p>
   {% if insights.quiet_by_company %}
     <p class="mt-2 text-xs text-ink-500 dark:text-ink-400" data-quiet-by-company>

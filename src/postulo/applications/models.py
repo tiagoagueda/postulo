@@ -16,6 +16,7 @@ from the failures.
 from __future__ import annotations
 
 import uuid
+from dataclasses import dataclass, field
 from decimal import Decimal
 
 from django.core.exceptions import ValidationError
@@ -116,14 +117,107 @@ def open_condition() -> Q:
 #: Statuses an application can go quiet in: open, and actually sent.
 QUIET_STATUSES = frozenset(OPEN_STATUSES - {Status.DRAFT})
 
+#: The statuses a person can give a number of days of their own (#1099), in the board's order.
+QUIET_SETTABLE_STATUSES = (
+    Status.APPLIED,
+    Status.SCREENING,
+    Status.INTERVIEWING,
+    Status.ASSESSMENT,
+    Status.OFFER,
+)
 
-def quiet_condition(after_days: int, at=None) -> Q:
+#: The bounds of any number of days before an application counts as quiet: the profile's own
+#: column's, so a number for one status is held to what the usual number is held to.
+QUIET_DAYS_MIN = 1
+QUIET_DAYS_MAX = 365
+
+
+def quiet_days_from(value, allowed) -> dict[str, int] | None:
+    """A mapping of keys to days, kept to the keys ``allowed`` and the bounds; or None.
+
+    The one reading of a stored or imported mapping (#1099): the form writes only what this
+    keeps, the importer believes only what this keeps, and the rule reads only what this
+    keeps, so a key that stopped being a status or a channel is passed over everywhere at
+    once. None for something that is not a mapping at all.
+    """
+    if not isinstance(value, dict):
+        return None
+    return {
+        key: days
+        for key, days in value.items()
+        if key in allowed and type(days) is int and QUIET_DAYS_MIN <= days <= QUIET_DAYS_MAX
+    }
+
+
+@dataclass(frozen=True)
+class QuietRule:
+    """How many days of silence make one person's application *quiet* (#1099).
+
+    One number for everything used to be the whole rule. Now a status can have its own, and
+    what the application was applied through can have its own, and the order is fixed: the
+    status's number, else the channel's, else the usual one. An empty mapping means none of
+    that, and the rule is the single number it always was -- the same SQL, word for word.
+    """
+
+    days: int
+    by_status: dict = field(default_factory=dict)
+    by_channel: dict = field(default_factory=dict)
+
+    @classmethod
+    def of(cls, after) -> QuietRule:
+        """A rule from a rule, or from the bare number every caller used to pass."""
+        return after if isinstance(after, QuietRule) else cls(days=after)
+
+    @property
+    def varies(self) -> bool:
+        """Whether any application is held to a number other than the usual one."""
+        return any(
+            days != self.days for days in (*self.by_status.values(), *self.by_channel.values())
+        )
+
+    def days_for(self, status: str, channel: str) -> tuple[int, str]:
+        """The days for one application, and which setting gave them: status, channel, usual."""
+        if status in self.by_status:
+            return self.by_status[status], "status"
+        if channel and channel in self.by_channel:
+            return self.by_channel[channel], "channel"
+        return self.days, "usual"
+
+    def silence(self, now) -> Q:
+        """Nothing for as long as this rule asks of each row, as one condition.
+
+        A disjunction over the numbers set, each guarded by the ones that win over it, so a
+        status's number shadows a channel's and both shadow the usual one. It stays inside
+        the one statement: no query per status, per channel, per person or per row.
+        """
+
+        def before(days: int) -> Q:
+            return Q(last_activity_at__lt=now - timezone.timedelta(days=days))
+
+        statuses = {key: days for key, days in self.by_status.items() if key in QUIET_STATUSES}
+        channels = dict(self.by_channel)
+        if not statuses and not channels:
+            return before(self.days)
+        either = Q()
+        for status, days in sorted(statuses.items()):
+            either |= Q(status=status) & before(days)
+        not_by_status = ~Q(status__in=sorted(statuses)) if statuses else Q()
+        for channel, days in sorted(channels.items()):
+            either |= not_by_status & Q(channel=channel) & before(days)
+        usual = not_by_status & before(self.days)
+        if channels:
+            usual &= ~Q(channel__in=sorted(channels))
+        return either | usual
+
+
+def quiet_condition(after_days: int | QuietRule, at=None) -> Q:
     """What *gone quiet* means, as one condition (#231).
 
-    Open, actually sent, nothing for ``after_days`` days, and nothing planned -- no reminder
-    ahead, no interview waiting for an outcome. Written once and used twice: `quiet()`
-    filters by it and `with_quiet_flag()` marks rows with it, so a board badge saying *quiet*
-    and a dashboard block listing the quiet ones can never come to disagree.
+    Open, actually sent, nothing for as many days as the rule asks of it, and nothing planned
+    -- no reminder ahead, no interview waiting for an outcome. Written once and used twice:
+    `quiet()` filters by it and `with_quiet_flag()` marks rows with it, so a board badge
+    saying *quiet* and a dashboard block listing the quiet ones can never come to disagree.
+    ``after_days`` is a `QuietRule`, or the one number for every application (#1099).
 
     It reads the annotations `with_activity` makes, so it is only meaningful on a queryset
     that has been through it. Both callers do that themselves.
@@ -131,7 +225,7 @@ def quiet_condition(after_days: int, at=None) -> Q:
     now = at or timezone.now()
     return (
         Q(status__in=list(QUIET_STATUSES))
-        & Q(last_activity_at__lt=now - timezone.timedelta(days=after_days))
+        & QuietRule.of(after_days).silence(now)
         & Q(has_future_reminder=False)
         & Q(has_unsettled_interview=False)
     )
@@ -301,8 +395,8 @@ class ApplicationQuerySet(models.QuerySet):
             queryset = queryset.annotate(has_unsettled_interview=Exists(waiting))
         return queryset
 
-    def quiet(self, after_days: int, at=None) -> ApplicationQuerySet:
-        """Open, sent, nothing for ``after_days`` days, and nothing planned.
+    def quiet(self, after_days: int | QuietRule, at=None) -> ApplicationQuerySet:
+        """Open, sent, nothing for ``after_days`` days (or what the rule asks), nothing planned.
 
         The one predicate behind every mention of *quiet*: the dashboard block, the board
         badge, the table filter, the figures and the notifier all call this.
@@ -310,7 +404,7 @@ class ApplicationQuerySet(models.QuerySet):
         now = at or timezone.now()
         return self.with_activity(at=now).filter(quiet_condition(after_days, at=now))
 
-    def with_quiet_flag(self, after_days: int, at=None) -> ApplicationQuerySet:
+    def with_quiet_flag(self, after_days: int | QuietRule, at=None) -> ApplicationQuerySet:
         """Annotate ``is_quiet`` rather than asking a second query which rows are (#231).
 
         The board drew its badge by running `quiet()` over the whole set and comparing

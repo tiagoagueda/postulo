@@ -212,6 +212,26 @@
             {% blocktranslate count counter=form.quiet_days trimmed %}day{% plural %}days{% endblocktranslate %}
           </p>
         </div>
+        {% comment %} A number of its own for a status, or for what it was applied through (#1099).
+           Each box is a number of days, blank for the one above; a status's number comes
+           before a channel's. Saved by *Save*, not as each changes: they are one choice. {% endcomment %}
+        <p class="mb-3 text-sm text-ink-500 dark:text-ink-400">{% translate "Some applications can be given longer or shorter. Each box is a number of days; left blank, the number above applies. A number for a status comes before one for what it was applied through." %}</p>
+        <fieldset class="mb-4" data-quiet-by-status>
+          <legend class="label mb-2">{% translate "At each status" %}</legend>
+          <div class="grid grid-cols-2 gap-x-3 sm:grid-cols-3">
+            {% for field in form.quiet_status_fields %}
+              <c-field :field="field" />
+            {% endfor %}
+          </div>
+        </fieldset>
+        <fieldset data-quiet-by-channel>
+          <legend class="label mb-2">{% translate "By what it was applied through" %}</legend>
+          <div class="grid grid-cols-2 gap-x-3 sm:grid-cols-3">
+            {% for field in form.quiet_channel_fields %}
+              <c-field :field="field" />
+            {% endfor %}
+          </div>
+        </fieldset>
       </div>
       {% comment %} Beside *Gone quiet* because it is the same kind of choice -- how much
          warning this person wants -- and because somebody who came here to change one will

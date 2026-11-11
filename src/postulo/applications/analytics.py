@@ -165,6 +165,9 @@ class Insights:
     #: Gone quiet: open, sent, silent past the person's threshold, nothing planned.
     quiet_now: int = 0
     quiet_after_days: int = 0
+    #: Whether some applications are held to a number of their own (#1099), when one number
+    #: of days would misdescribe what *quiet* counted.
+    quiet_varies: bool = False
     quiet_by_company: list[tuple[str, int]] = field(default_factory=list)
     #: The stage before applications: how many listings were noticed, and what became of them.
     listings_noted: int = 0
@@ -327,8 +330,9 @@ def _reached_interview(applications, reached: dict[int, set[str]]) -> set[int]:
 #: so figures kept by one release are read by the next -- and when `Insights` gains a field
 #: they would arrive without it. Counted into the fingerprint, so a release that changes
 #: the shape asks for keys no earlier one wrote. 2 added the endings and the two
-#: breakdowns of the sources (#239); 3 made one rule of an interview reached (#449).
-SHAPE = 3
+#: breakdowns of the sources (#239); 3 made one rule of an interview reached (#449); 4 added
+#: whether the quiet days vary by status or channel (#1099).
+SHAPE = 4
 
 #: How long a set of figures may sit in the cache at most. The fingerprint below is what
 #: actually decides whether they are still true; this is only so that a key for a state
@@ -397,6 +401,9 @@ def fingerprint(user) -> str:
         # from it. Somebody changing it from 21 days to 14 changes the figures without
         # touching anything the three aggregates above can see.
         getattr(getattr(user, "profile", None), "quiet_after_days", None),
+        # And the numbers by status and channel (#1099), for the same reason.
+        getattr(getattr(user, "profile", None), "quiet_days_by_status", None),
+        getattr(getattr(user, "profile", None), "quiet_days_by_channel", None),
         reminders["n"],
         reminders["open"],
         reminders["at"],
@@ -532,11 +539,12 @@ def build(user) -> Insights:
     insights.interview_kinds = [(str(labels.get(kind, kind)), count) for kind, count in kinds]
 
     # ------------------------------------------------------------------ quiet
-    from .quiet import quiet_applications, threshold_for
+    from .quiet import quiet_applications, rule_for, threshold_for
 
     quiet_ids = set(quiet_applications(user).values_list("pk", flat=True))
     insights.quiet_now = len(quiet_ids)
     insights.quiet_after_days = threshold_for(user)
+    insights.quiet_varies = rule_for(user).varies
     by_company: dict[str, int] = {}
     for application in applications:
         if application.pk in quiet_ids:

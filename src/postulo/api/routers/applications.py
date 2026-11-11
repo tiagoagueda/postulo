@@ -16,7 +16,7 @@ from postulo.applications.models import (
     EventKind,
 )
 from postulo.applications.models import Status as ApplicationStatus
-from postulo.applications.quiet import threshold_for
+from postulo.applications.quiet import rule_for
 from postulo.applications.services import (
     change_status,
     create_application,
@@ -70,7 +70,7 @@ def list_applications(
         .order_by("-created_at", "-pk")
     )
     if quiet:
-        applications = applications.quiet(threshold_for(request.auth.owner))
+        applications = applications.quiet(rule_for(request.auth.owner))
     if status:
         applications = applications.filter(status=status)
     if company:

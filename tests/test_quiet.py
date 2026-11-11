@@ -563,3 +563,227 @@ def test_one_read_of_the_owners_still_gives_each_their_threshold_and_language(
         ) % {"count": 1}
     assert expected != "1 application has gone quiet", "the catalogue has it in French"
     assert expected in mail.outbox[-1].subject
+
+
+# ------------------------------------------------- numbers by status and by channel
+
+
+def numbers(user, *, usual=21, by_status=None, by_channel=None):
+    """Give ``user`` a usual number and the ones by status and by channel (#1099)."""
+    profile = Profile.objects.get(user=user)
+    profile.quiet_after_days = usual
+    profile.quiet_days_by_status = by_status or {}
+    profile.quiet_days_by_channel = by_channel or {}
+    profile.save()
+    user.refresh_from_db()
+
+
+def through(application, channel):
+    Application.objects.filter(pk=application.pk).update(channel=channel)
+    application.refresh_from_db()
+    return application
+
+
+def test_a_status_number_comes_before_a_channel_number_before_the_usual_one(user, company):
+    """Every application went quiet after one number of days, whatever its stage (#1099)."""
+    through(
+        sent(user, company, days_ago=12, title="Screening, recruiter", status=Status.SCREENING),
+        "recruiter",
+    )
+    through(sent(user, company, days_ago=12, title="Applied, recruiter"), "recruiter")
+    sent(user, company, days_ago=12, title="Applied, no channel")
+    through(
+        sent(user, company, days_ago=25, title="Offer, job board", status=Status.OFFER),
+        "job_board",
+    )
+    numbers(user, usual=14, by_status={"screening": 10, "offer": 30}, by_channel={"recruiter": 7})
+
+    assert sorted(quiet_titles(user)) == ["Applied, recruiter", "Screening, recruiter"], (
+        "screening's 10 and the recruiter's 7 are past; the usual 14 and the offer's 30 are not"
+    )
+    numbers(user, usual=14, by_status={"screening": 20}, by_channel={"recruiter": 7})
+    assert sorted(quiet_titles(user)) == ["Applied, recruiter", "Offer, job board"], (
+        "screening's 20 wins over the recruiter's 7; the offer, with none of its own, has the usual"
+    )
+    numbers(user, usual=14)
+    assert quiet_titles(user) == ["Offer, job board"], "with none set, the usual number alone"
+
+
+def test_the_board_the_table_and_the_api_follow_the_same_rule(client, user, company):
+    early = sent(user, company, days_ago=10, title="Screening", status=Status.SCREENING)
+    sent(user, company, days_ago=10, title="Applied")
+    numbers(user, by_status={"screening": 7})
+    client.force_login(user)
+
+    board = client.get(reverse("applications:list"), {"view": "board"})
+    cards = {
+        a.pk: a.is_quiet for column in board.context["columns"] for a in column["applications"]
+    }
+    assert cards[early.pk] is True and sum(cards.values()) == 1
+    table = client.get(reverse("applications:list"), {"quiet": "1"})
+    assert [a.posting.title for a in table.context["applications"]] == ["Screening"]
+    _record, raw = ApiToken.issue(user, "Agent", scopes=("read",))
+    listed = client.get("/api/v1/applications?quiet=true", HTTP_AUTHORIZATION=f"Bearer {raw}")
+    assert [item["listing"]["title"] for item in listed.json()["items"]] == ["Screening"]
+
+
+def test_the_dashboard_widget_follows_the_rule_and_names_no_one_number(client, user, company):
+    """The widget said "nothing for 21 days" over a list held to other numbers (#1099)."""
+    sent(user, company, days_ago=10, title="Screening", status=Status.SCREENING)
+    numbers(user, by_status={"screening": 7})
+    client.force_login(user)
+    response = client.get(reverse("core:home"))
+    assert [a.posting.title for a in response.context["quiet_applications"]] == ["Screening"]
+    body = response.content.decode()
+    assert "for as long as you allow them" in body
+    assert "with nothing for 21 days" not in body
+
+
+def test_the_pass_with_numbers_of_their_own_still_asks_once_for_each_owner(
+    user, other_user, django_assert_num_queries
+):
+    """The rule is read off the profile that comes with the owner: no query per status (#1099)."""
+    for person in (user, other_user, someone("third")):
+        a_silence(person, days_ago=10, status=Status.SCREENING)
+        numbers(person, by_status={"screening": 7}, by_channel={"recruiter": 3})
+    assert quiet.announce_quiet_applications()[0] == 3, "each by screening's own seven days"
+
+    with django_assert_num_queries(1 + 3):
+        assert quiet.announce_quiet_applications() == (0, 0)
+
+
+def test_the_numbers_are_set_beside_the_usual_one(client, user):
+    """Blank is the usual number, and nothing is stored for it (#1099)."""
+    client.force_login(user)
+    page = client.get(reverse("settings:appearance")).content.decode()
+    assert 'name="quiet_status_screening"' in page and 'name="quiet_channel_recruiter"' in page
+    assert 'name="quiet_status_draft"' not in page
+
+    form = {"theme": "system", "density": "comfortable", "quiet_after_days": "21"}
+    response = client.post(
+        reverse("settings:appearance"),
+        {**form, "quiet_status_screening": "10", "quiet_channel_recruiter": "7"},
+    )
+    assert response.status_code == 302
+    profile = Profile.objects.get(user=user)
+    assert profile.quiet_days_by_status == {"screening": 10}
+    assert profile.quiet_days_by_channel == {"recruiter": 7}
+    page = client.get(reverse("settings:appearance")).content.decode()
+    assert 'name="quiet_status_screening"' in page and 'value="10"' in page
+
+    response = client.post(reverse("settings:appearance"), {**form, "quiet_status_screening": "0"})
+    assert response.status_code == 200, "a number outside 1 to 365 is refused"
+    assert Profile.objects.get(user=user).quiet_days_by_status == {"screening": 10}
+
+    client.post(reverse("settings:appearance"), form)
+    profile = Profile.objects.get(user=user)
+    assert profile.quiet_days_by_status == {"screening": 10}, (
+        "a page drawn before the boxes existed sends none, and leaves them as they were"
+    )
+    client.post(
+        reverse("settings:appearance"),
+        {**form, "quiet_status_screening": "", "quiet_channel_recruiter": ""},
+    )
+    profile = Profile.objects.get(user=user)
+    assert profile.quiet_days_by_status == {} and profile.quiet_days_by_channel == {}
+
+
+def test_saving_the_usual_number_on_its_own_keeps_the_others(client, user):
+    numbers(user, by_status={"screening": 10}, by_channel={"recruiter": 7})
+    profile = Profile.objects.get(user=user)
+    profile.save_as_you_go = True
+    profile.save()
+    client.force_login(user)
+    response = client.post(
+        reverse("settings:save_field", args=["appearance", "quiet_after_days"]),
+        {"quiet_after_days": "14"},
+    )
+    assert response.status_code == 200
+    profile.refresh_from_db()
+    assert profile.quiet_after_days == 14
+    assert profile.quiet_days_by_status == {"screening": 10}
+    assert profile.quiet_days_by_channel == {"recruiter": 7}
+
+
+def test_the_application_page_says_when_it_counts_as_quiet(client, user, company):
+    """Nothing said when an application would go quiet, or by which number (#1099)."""
+    screening = sent(user, company, days_ago=3, title="Screening", status=Status.SCREENING)
+    applied = through(sent(user, company, days_ago=3, title="Applied"), "recruiter")
+    plain = sent(user, company, days_ago=30, title="Plain")
+    numbers(user, by_status={"screening": 10}, by_channel={"recruiter": 5})
+    client.force_login(user)
+
+    body = client.get(screening.get_absolute_url()).content.decode()
+    assert "data-quiet-outlook" in body and "Counts as quiet from" in body
+    assert "That is the 10 days you set for Screening." in body
+    body = client.get(applied.get_absolute_url()).content.decode()
+    assert "That is the 5 days you set for applications through Recruiter." in body
+    body = client.get(plain.get_absolute_url()).content.decode()
+    assert "Gone quiet on" in body and "That is your usual 21 days." in body
+
+    Reminder.objects.create(
+        owner=user,
+        application=plain,
+        summary="Chase",
+        due_at=timezone.now() + dt.timedelta(days=2),
+    )
+    body = client.get(plain.get_absolute_url()).content.decode()
+    assert "Something is planned for it, so it does not count as quiet." in body
+
+    response = client.post(
+        reverse("applications:status", args=[screening.pk]),
+        {"status": "interviewing"},
+        HTTP_HX_REQUEST="true",
+        HTTP_HX_TARGET="status-card",
+    )
+    swapped = response.content.decode()
+    assert "That is your usual 21 days." in swapped, "the swapped card follows the new status"
+    assert "Counts as quiet from" in swapped, "and the status change is the newest activity"
+
+
+def test_the_outlook_agrees_with_the_predicate(user, company):
+    application = through(sent(user, company, days_ago=8, title="Edge"), "recruiter")
+    numbers(user, by_channel={"recruiter": 7})
+    row = Application.objects.with_activity().get(pk=application.pk)
+    seen = quiet.outlook(row, user)
+    assert (seen.days, seen.source, seen.is_quiet) == (7, "channel", True)
+    assert quiet_titles(user) == ["Edge"]
+    numbers(user, by_channel={"recruiter": 9})
+    seen = quiet.outlook(row, user)
+    assert (seen.days, seen.is_quiet) == (9, False) and quiet_titles(user) == []
+    change_status(application, Status.REJECTED)
+    assert quiet.outlook(application, user) is None, "an ending never goes quiet"
+
+
+def test_the_figures_are_worked_out_again_when_a_number_changes(user, company):
+    sent(user, company, days_ago=10, status=Status.SCREENING)
+    before = analytics.fingerprint(user)
+    numbers(user, by_status={"screening": 7})
+    assert analytics.fingerprint(user) != before
+    figures = analytics.build(user)
+    assert figures.quiet_now == 1 and figures.quiet_varies
+
+
+def test_the_numbers_travel_in_the_archive_and_are_checked_on_the_way_back(user, other_user):
+    import zipfile
+
+    from postulo.core import export, importer
+
+    numbers(user, by_status={"screening": 10}, by_channel={"recruiter": 7})
+    document = export.build_document(user)
+    assert document["account"]["profile"]["quiet_days_by_status"] == {"screening": 10}
+    importer.load(other_user, zipfile.ZipFile(export.write_archive(user)))
+    restored = Profile.objects.get(user=other_user)
+    assert restored.quiet_days_by_status == {"screening": 10}
+    assert restored.quiet_days_by_channel == {"recruiter": 7}
+
+    profile = Profile.objects.get(user=user)
+    value = importer._profile_value(
+        profile, "quiet_days_by_status", {"screening": 10, "draft": 3, "offer": 0, "applied": "9"}
+    )
+    assert value == {"screening": 10}, "a draft cannot go quiet; 0 and text are not days"
+    assert importer._profile_value(
+        profile, "quiet_days_by_channel", {"recruiter": 7, "pigeon": 2}
+    ) == {"recruiter": 7}
+    refused = importer._profile_value(profile, "quiet_days_by_channel", ["recruiter"])
+    assert refused is importer._REFUSED

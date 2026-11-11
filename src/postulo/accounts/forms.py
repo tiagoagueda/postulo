@@ -1601,6 +1601,7 @@ class AppearanceForm(forms.ModelForm):
         ):
             if name in self.fields:
                 self.fields[name].required = False
+        self._add_quiet_days_fields()
 
         from postulo.core import navigation
 
@@ -1629,6 +1630,80 @@ class AppearanceForm(forms.ModelForm):
         self.initial.setdefault(
             "identifiers_shown", [key for key in self.ident_order if key not in ident_hidden]
         )
+
+    #: The prefixes of the boxes that give a status, or a way of applying, a number of days of
+    #: its own before an application counts as quiet (#1099), and the profile column each fills.
+    QUIET_DAYS_KINDS = {
+        "quiet_status_": "quiet_days_by_status",
+        "quiet_channel_": "quiet_days_by_channel",
+    }
+
+    def _add_quiet_days_fields(self) -> None:
+        """A box per status and per way of applying, blank where the usual number applies.
+
+        Declared here rather than on the class because the lists are the models': a status
+        or a channel added there gets its box without anybody remembering this form. Left
+        blank, a box means "the number above", so nothing is stored for it.
+        """
+        from postulo.applications.models import (
+            QUIET_DAYS_MAX,
+            QUIET_DAYS_MIN,
+            QUIET_SETTABLE_STATUSES,
+            Channel,
+        )
+
+        stored = {
+            "quiet_status_": self.instance.quiet_days_by_status or {},
+            "quiet_channel_": self.instance.quiet_days_by_channel or {},
+        }
+        offered = {
+            "quiet_status_": [(status.value, status.label) for status in QUIET_SETTABLE_STATUSES],
+            "quiet_channel_": list(Channel.choices),
+        }
+        for prefix, choices in offered.items():
+            for key, label in choices:
+                name = f"{prefix}{key}"
+                self.fields[name] = forms.IntegerField(
+                    label=label,
+                    required=False,
+                    min_value=QUIET_DAYS_MIN,
+                    max_value=QUIET_DAYS_MAX,
+                )
+                days = stored[prefix].get(key)
+                if isinstance(days, int):
+                    self.initial.setdefault(name, days)
+
+    def _quiet_days_fields(self, prefix: str) -> list:
+        return [self[name] for name in self.fields if name.startswith(prefix)]
+
+    @property
+    def quiet_status_fields(self) -> list:
+        """The boxes for the statuses, in the board's order, for the page to lay out."""
+        return self._quiet_days_fields("quiet_status_")
+
+    @property
+    def quiet_channel_fields(self) -> list:
+        """The boxes for what an application was applied through, in the list's order."""
+        return self._quiet_days_fields("quiet_channel_")
+
+    def _save_quiet_days(self, profile: Profile) -> None:
+        """What the boxes say, as the two mappings: only the ones filled in (#1099).
+
+        Only the boxes that were posted: a field saved on its own (#656) has none of them,
+        and a page drawn before they existed sends none, and reading either absence as blanks
+        would forget every number set. A box posted blank is the usual number again.
+        """
+        for prefix, column in self.QUIET_DAYS_KINDS.items():
+            kept = dict(getattr(profile, column) or {})
+            for name in self.fields:
+                if not name.startswith(prefix) or name not in self.data:
+                    continue
+                key = name.removeprefix(prefix)
+                if self.cleaned_data.get(name) is None:
+                    kept.pop(key, None)
+                else:
+                    kept[key] = self.cleaned_data[name]
+            setattr(profile, column, kept)
 
     def _posted(self, name: str) -> list[str]:
         if not self.is_bound or not hasattr(self.data, "getlist"):
@@ -1705,6 +1780,7 @@ class AppearanceForm(forms.ModelForm):
         self.nav_order = navigation.complete(order)
         profile.nav_order = navigation.to_store(order)
         self._save_identifiers(profile)
+        self._save_quiet_days(profile)
         if commit:
             profile.save()
         return profile

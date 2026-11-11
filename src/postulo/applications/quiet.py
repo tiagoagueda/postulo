@@ -8,7 +8,9 @@ has already planned the next step it is not quiet, it is waiting.
 
 The threshold is per person, because the right number depends on the market and the
 person's patience; the default follows recruiters' own advice, which clusters around two
-to three weeks. Everything that shows or counts quiet applications uses the one predicate
+to three weeks. A person may also give a status, or what an application was applied
+through, a number of its own (#1099): a status's number comes first, then the channel's,
+then the usual one. Everything that shows or counts quiet applications uses the one predicate
 here, so the dashboard, the board, the table, the figures and the notifier all agree.
 """
 
@@ -16,6 +18,7 @@ from __future__ import annotations
 
 import datetime as dt
 import logging
+from dataclasses import dataclass
 
 from django.contrib.auth import get_user_model
 from django.db.models import Exists, F, OuterRef, Q
@@ -32,7 +35,14 @@ from postulo.notifications.base import (
 )
 from postulo.notifications.service import notify
 
-from .models import QUIET_STATUSES, Application
+from .models import (
+    QUIET_SETTABLE_STATUSES,
+    QUIET_STATUSES,
+    Application,
+    Channel,
+    QuietRule,
+    quiet_days_from,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -45,10 +55,31 @@ SNOOZE_DAYS = 14
 
 
 def threshold_for(user) -> int:
-    """The person's own threshold, or the default."""
+    """The person's own usual threshold, or the default."""
     profile = getattr(user, "profile", None)
     days = getattr(profile, "quiet_after_days", None)
     return days if isinstance(days, int) and days > 0 else DEFAULT_QUIET_AFTER_DAYS
+
+
+def rule_for(user) -> QuietRule:
+    """The person's whole rule: the usual number, and the ones they set by status and channel.
+
+    Read off the profile the caller already holds, so asking it costs no query where the
+    profile came with the person (#1120's owners do), and one where it did not -- as
+    `threshold_for` always has.
+    """
+    profile = getattr(user, "profile", None)
+    return QuietRule(
+        days=threshold_for(user),
+        by_status=quiet_days_from(
+            getattr(profile, "quiet_days_by_status", None), set(QUIET_SETTABLE_STATUSES)
+        )
+        or {},
+        by_channel=quiet_days_from(
+            getattr(profile, "quiet_days_by_channel", None), set(Channel.values)
+        )
+        or {},
+    )
 
 
 def quiet_applications(user, at=None):
@@ -56,8 +87,58 @@ def quiet_applications(user, at=None):
     return (
         Application.objects.for_user(user)
         .with_display_data()
-        .quiet(threshold_for(user), at=at)
+        .quiet(rule_for(user), at=at)
         .order_by("last_activity_at", "pk")
+    )
+
+
+@dataclass(frozen=True)
+class Outlook:
+    """When one application counts as quiet, for its own page (#1099)."""
+
+    #: The days its silence may last, and which setting gave them: status, channel or usual.
+    days: int
+    source: str
+    #: The day it counts as quiet if nothing happens before then.
+    on: dt.datetime
+    #: Whether it is quiet now, and whether something planned keeps it from being so.
+    is_quiet: bool
+    waiting: bool
+
+
+def outlook(application, user, at=None, *, afresh: bool = False) -> Outlook | None:
+    """When ``application`` counts as quiet under ``user``'s rule, or None where it never can.
+
+    Reads the annotations `with_activity` makes, as the one condition does; an application
+    in a status that cannot go quiet -- a draft, an ending -- has no outlook at all.
+    ``afresh`` reads them again, for a row that has just been written to.
+    """
+    if application.status not in QUIET_STATUSES:
+        return None
+    if afresh or not hasattr(application, "last_activity_at"):
+        # Drawn from a row read without the annotations, as a swapped card is: one query
+        # for the three, on this one application.
+        read = (
+            Application.objects.for_user(user)
+            .filter(pk=application.pk)
+            .with_activity(at=at)
+            .values("last_activity_at", "has_future_reminder", "has_unsettled_interview")
+            .first()
+        )
+        for name, value in (read or {}).items():
+            setattr(application, name, value)
+    last = getattr(application, "last_activity_at", None)
+    if last is None:
+        return None
+    now = at or timezone.now()
+    days, source = rule_for(user).days_for(application.status, application.channel)
+    on = last + dt.timedelta(days=days)
+    waiting = bool(
+        getattr(application, "has_future_reminder", False)
+        or getattr(application, "has_unsettled_interview", False)
+    )
+    return Outlook(
+        days=days, source=source, on=on, is_quiet=on < now and not waiting, waiting=waiting
     )
 
 
@@ -90,7 +171,7 @@ def announce_quiet_applications(at=None) -> tuple[int, int]:
         fresh = list(
             Application.objects.filter(owner=owner)
             .select_related("posting", "posting__company")
-            .quiet(threshold_for(owner), at=now)
+            .quiet(rule_for(owner), at=now)
             .filter(
                 Q(quiet_announced_at__isnull=True) | Q(quiet_announced_at__lt=F("last_activity_at"))
             )

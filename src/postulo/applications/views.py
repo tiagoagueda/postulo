@@ -151,7 +151,7 @@ class ApplicationFilterMixin:
             queryset = queryset.closed()
 
         if params.get("quiet", "").strip():
-            queryset = queryset.quiet(quiet.threshold_for(self.request.user))
+            queryset = queryset.quiet(quiet.rule_for(self.request.user))
 
         # No filter here can repeat a row: search goes through single foreign keys, the tag
         # slug is unique per owner, and the rest are columns or annotations (#552).
@@ -256,7 +256,7 @@ class ApplicationListView(PageOrFragmentMixin, OwnedObjectMixin, ApplicationFilt
             # four hundred settled applications and twelve live ones was reading four
             # hundred and twelve rows to draw twelve.
             return self.filter_queryset(
-                queryset.with_quiet_flag(quiet.threshold_for(self.request.user))
+                queryset.with_quiet_flag(quiet.rule_for(self.request.user))
             ).filter(status__in=list(BOARD_STATUSES))
         return self.table_rows(queryset)
 
@@ -533,6 +533,9 @@ class ApplicationDetailView(OwnedObjectMixin, DetailView):
                 "referred_by__company",
                 "through_agency",
             )
+            # The last activity and what is planned, in the same statement, for the line that
+            # says when this one counts as quiet (#1099).
+            .with_activity()
         )
 
     def get_context_data(self, **kwargs) -> dict:
@@ -558,6 +561,7 @@ class ApplicationDetailView(OwnedObjectMixin, DetailView):
         context["settled_interviews"] = [i for i in interviews if i.is_settled][::-1]
         context["event_form"] = EventForm()
         context["status_form"] = StatusChangeForm(initial={"status": self.object.status})
+        context["quiet_outlook"] = quiet.outlook(self.object, self.request.user)
         return context
 
 
@@ -799,6 +803,12 @@ def detail_fragments(request, application, *, target: str, event_form=None):
         # Asked afresh, for the reason the rest of this is: the card says how the
         # application ended, and the entry that says so was written a moment ago (#239).
         "ending": endings.of(application, afresh=True),
+        # When it counts as quiet moves with its status, and the card is what says it (#1099).
+        "quiet_outlook": (
+            quiet.outlook(application, request.user, afresh=True)
+            if target == "status-card"
+            else None
+        ),
         "event_form": event_form if event_form is not None else EventForm(),
         "reminders": application.reminders.filter(done_at__isnull=True),
     }

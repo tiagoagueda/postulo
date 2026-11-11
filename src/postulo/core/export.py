@@ -252,7 +252,12 @@ logger = logging.getLogger(__name__)
 #: such as ``a4-portrait`` or ``letter-landscape``, and blank for the instance's default. An
 #: archive without it restores the instance's default; a value that is not one of the papers
 #: is refused and the default stays (#344).
-FORMAT_VERSION = 80
+#: 81 added ``quiet_days_by_status`` and ``quiet_days_by_channel`` on the profile: the days
+#: before an application counts as quiet where the person gave a status, or what it was
+#: applied through, a number of its own, ``{"screening": 10}``. An archive without them
+#: restores none, so the usual number applies to all; a key that is not a status or a channel
+#: that can have one, or a number outside 1 to 365, is passed over (#1099).
+FORMAT_VERSION = 81
 
 
 def industry_entry(industry) -> str | dict:
@@ -392,6 +397,10 @@ PROFILE_FIELDS = (
     "identifier_order",
     "hidden_identifiers",
     "quiet_after_days",
+    # The same number by status and by what it was applied through (#1099), read back
+    # through `applications.models.quiet_days_from`.
+    "quiet_days_by_status",
+    "quiet_days_by_channel",
     "use_gravatar",
     "show_career_order",
     # The rest of how the account behaves (#464). Each is a choice somebody made, and two

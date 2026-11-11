@@ -26,6 +26,40 @@
 {% endcomment %}
 <div class="card mb-6" id="status-card">
   <c-section-title>{% translate "Move it along" %}</c-section-title>
+  {% comment %} When this one counts as quiet, by the person's own numbers (#1099). In this
+     card because it moves with the status, and this is the region a status change swaps. {% endcomment %}
+  {% if quiet_outlook %}
+    <p class="mb-4 text-sm text-ink-500 dark:text-ink-400" data-quiet-outlook>
+      {% if quiet_outlook.waiting %}
+        {% translate "Something is planned for it, so it does not count as quiet." %}
+      {% else %}
+        {% if quiet_outlook.is_quiet %}
+          {% blocktranslate trimmed with day=quiet_outlook.on|date:"DATE_FORMAT" %}Gone quiet on {{ day }}.{% endblocktranslate %}
+        {% else %}
+          {% blocktranslate trimmed with day=quiet_outlook.on|date:"DATE_FORMAT" %}Counts as quiet from {{ day }} if nothing happens before then.{% endblocktranslate %}
+        {% endif %}
+        {% if quiet_outlook.source == "status" %}
+          {% blocktranslate trimmed count counter=quiet_outlook.days with status=application.get_status_display %}
+            That is the {{ counter }} day you set for {{ status }}.
+          {% plural %}
+            That is the {{ counter }} days you set for {{ status }}.
+          {% endblocktranslate %}
+        {% elif quiet_outlook.source == "channel" %}
+          {% blocktranslate trimmed count counter=quiet_outlook.days with channel=application.get_channel_display %}
+            That is the {{ counter }} day you set for applications through {{ channel }}.
+          {% plural %}
+            That is the {{ counter }} days you set for applications through {{ channel }}.
+          {% endblocktranslate %}
+        {% else %}
+          {% blocktranslate trimmed count counter=quiet_outlook.days %}
+            That is your usual {{ counter }} day.
+          {% plural %}
+            That is your usual {{ counter }} days.
+          {% endblocktranslate %}
+        {% endif %}
+      {% endif %}
+    </p>
+  {% endif %}
   {% if ending %}
     <dl class="mb-4 grid gap-x-6 gap-y-3 text-sm sm:grid-cols-2" data-ending>
       <div>

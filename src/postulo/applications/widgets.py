@@ -63,6 +63,7 @@ def _gone_quiet(sources: Sources) -> dict:
         "quiet_applications": sources.quiet[:10],
         "quiet_count": sources.quiet.count(),
         "quiet_after_days": sources.quiet_after_days,
+        "quiet_varies": sources.quiet_varies,
     }
 
 

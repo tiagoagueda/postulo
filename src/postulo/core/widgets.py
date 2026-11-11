@@ -386,6 +386,13 @@ class Sources:
 
         return threshold_for(self.user)
 
+    @cached_property
+    def quiet_varies(self) -> bool:
+        """Whether some applications have a number of days of their own (#1099)."""
+        from postulo.applications.quiet import rule_for
+
+        return rule_for(self.user).varies
+
 
 @dataclass
 class Rendered:

@@ -666,6 +666,14 @@ class Profile(models.Model):
         validators=[MinValueValidator(1), MaxValueValidator(365)],
         help_text=_("Days without anything happening, and nothing planned, before Postulo asks."),
     )
+    #: The same number for some statuses, and for some ways of applying, where the person wants
+    #: one other than the usual (#1099): ``{"screening": 10}``, ``{"recruiter": 14}``. A status's
+    #: number comes before a channel's, and either before the one above. Read through
+    #: `applications.models.quiet_days_from`, which keeps known keys and numbers in bounds.
+    quiet_days_by_status = models.JSONField(_("quiet after, by status"), blank=True, default=dict)
+    quiet_days_by_channel = models.JSONField(
+        _("quiet after, by what it was applied through"), blank=True, default=dict
+    )
     #: How much warning to give before a listing the person has not decided about closes.
     closing_notice_days = models.PositiveSmallIntegerField(
         _("notice before a listing closes"),
