@@ -9,6 +9,8 @@ from __future__ import annotations
 
 import os
 import sqlite3
+import threading
+import time
 
 import pytest
 from babel import Locale, localedata
@@ -559,6 +561,299 @@ def test_a_save_reads_the_lookup_and_never_parses_the_table(data_dir, monkeypatc
 
     address = where(company)
     assert (address.latitude, address.longitude) == (38.7167, -9.1333)
+
+
+# ------------------------------------------- the lookup without its table (#1127)
+
+
+@pytest.fixture
+def lookup_alone(data_dir):
+    """The directory as `fetch_geonames` leaves it: the lookup, the country table, and no
+    city table."""
+    places.build_lookup(data_dir / places.CITIES_FILE, data_dir / places.LOOKUP_FILE)
+    (data_dir / places.CITIES_FILE).unlink()
+    return data_dir
+
+
+def refuse_to_build(*args, **kwargs):
+    raise AssertionError("the lookup was built again")
+
+
+def test_the_lookup_alone_is_the_dataset(lookup_alone, monkeypatch):
+    """The city table was the sign that the dataset is there, so it was kept for good
+    beside the lookup built from it (#1127). The lookup is the sign now: with no table
+    beside it the map has its dataset, and a location is placed as it was."""
+    monkeypatch.setattr(places, "build_lookup", refuse_to_build)
+
+    assert places.available() is True
+    assert places.cities() == len(CITY_ROWS)
+    assert places.resolve("Lissabon, Portogallo")["name"] == "Lisboa"
+    assert places.resolve("Springfield, Irlande")["country"] == "IE"
+    assert places.place("", "Berlin", "DE") == ("town", {"lat": 52.5244, "lon": 13.4105})
+
+
+def test_a_table_put_beside_the_lookup_by_hand_is_indexed_and_left_there(lookup_alone):
+    """A newer table an operator puts there is indexed at the next start, as it always
+    was, and it is theirs: only the command that downloads a table removes it (#1127)."""
+    table = lookup_alone / places.CITIES_FILE
+    row = city_row("2735943", "Braga", "Braga", "", "41.5503", "-8.42", "PT", 121394)
+    table.write_text(TABLE + row + "\n", encoding="utf-8")
+    later = (lookup_alone / places.LOOKUP_FILE).stat().st_mtime_ns + 5_000_000_000
+    os.utime(table, ns=(later, later))
+    places._index.cache_clear()
+
+    assert places.resolve("Braga, Portugal")["country"] == "PT"
+
+    assert table.is_file()
+    assert places.cities() == len(CITY_ROWS) + 1
+
+
+#: A lookup as an upgrade finds it: its names read from an older CLDR, which had a name for
+#: Spain that the one in hand has not, and lacked the one it has.
+OLDER_NAMES = (
+    "UPDATE about SET value = '41' WHERE key = 'cldr';"
+    "DELETE FROM countries WHERE key = 'espana';"
+    "INSERT INTO countries VALUES ('hispania', 'ES');"
+)
+#: And as a Postulo from before #1109 built it: the cities, and nothing of the countries.
+BEFORE_THE_COUNTRIES = "DROP TABLE countries; DROP TABLE about;"
+
+
+def alter(lookup, script):
+    connection = sqlite3.connect(lookup)
+    connection.executescript(script)
+    connection.close()
+
+
+def cities_and_names(lookup):
+    """Every row of the two tables a city is matched from, in a fixed order."""
+    connection = sqlite3.connect(lookup)
+    try:
+        return (
+            connection.execute("SELECT * FROM cities ORDER BY id").fetchall(),
+            connection.execute("SELECT * FROM names ORDER BY key, city").fetchall(),
+        )
+    finally:
+        connection.close()
+
+
+def test_a_lookup_alone_reads_its_country_names_again_at_first_use(lookup_alone):
+    """Names read from another CLDR were mended by building the lookup again, which takes
+    the city table that is no longer kept, so every upgrade of Babel would have asked for
+    32 MB to be downloaded again (#1127). The names are tables of their own, read from CLDR
+    and from the country table that is kept: they are written again in place at the first
+    use, and a typed country narrows by the names this Postulo has."""
+    lookup = lookup_alone / places.LOOKUP_FILE
+    alter(lookup, OLDER_NAMES)
+    assert places.lookup_stamp() != places.current_stamp()
+
+    assert places.resolve("Valencia, España")["country"] == "ES"
+
+    assert places.lookup_stamp() == places.current_stamp()
+    assert places._countries("hispania") is None, "a name only the older CLDR had"
+    assert places.cities() == len(CITY_ROWS)
+
+
+def test_a_lookup_alone_reads_the_names_of_a_language_postulo_gained(lookup_alone, monkeypatch):
+    """A language added since the lookup was built is the other thing its names go out of
+    date by, and is mended the same way (#1127)."""
+    monkeypatch.setitem(languages.NATIVE_NAMES, "tlh", "tlhIngan Hol")
+    assert places.lookup_stamp() != places.current_stamp()
+
+    assert places.resolve("Berlin, Deutschland")["country"] == "DE"
+
+    assert places.lookup_stamp() == places.current_stamp()
+
+
+def test_a_lookup_alone_from_before_the_countries_gains_them_at_first_use(lookup_alone):
+    """A lookup from before it carried the countries was built again from its table at its
+    first use (#1109). Alone, it is given the two tables it lacks, and is then all a lookup
+    built today is: nothing else of it changed with the countries (#1127)."""
+    alter(lookup_alone / places.LOOKUP_FILE, BEFORE_THE_COUNTRIES)
+    assert places.lookup_stamp() is None
+
+    assert places.resolve("Springfield, Ireland")["country"] == "IE"
+    assert places.resolve("Valencia, España")["country"] == "ES"
+
+    assert places.lookup_stamp() == places.current_stamp()
+
+
+@pytest.mark.parametrize("script", [OLDER_NAMES, BEFORE_THE_COUNTRIES], ids=["older", "none"])
+def test_writing_the_country_names_again_leaves_the_cities_as_they_were(lookup_alone, script):
+    """Only the countries are written: every city and every name of one is the row it was
+    (#1127)."""
+    lookup = lookup_alone / places.LOOKUP_FILE
+    before = cities_and_names(lookup)
+    assert len(before[0]) == len(CITY_ROWS) and len(before[1]) > len(CITY_ROWS)
+    alter(lookup, script)
+
+    assert places.resolve("Berlin, Deutschland")["country"] == "DE"
+
+    assert places.lookup_stamp() == places.current_stamp()
+    assert cities_and_names(lookup) == before
+
+
+def test_a_country_table_newer_than_a_lookup_alone_is_read_into_it(lookup_alone):
+    """A country table put there by hand after the lookup was made is read at the next
+    start (#1109), and needs no city table to be (#1127)."""
+    lookup = lookup_alone / places.LOOKUP_FILE
+    more = COUNTRIES + country_row("ES", "ESP", "Hispania", "Madrid") + "\n"
+    (lookup_alone / places.COUNTRIES_FILE).write_text(more, encoding="utf-8")
+    earlier = lookup.stat().st_mtime_ns - 5_000_000_000
+    os.utime(lookup, ns=(earlier, earlier))
+
+    assert places.resolve("Valencia, Hispania")["country"] == "ES"
+    assert places.cities() == len(CITY_ROWS)
+
+
+def test_the_country_names_are_written_again_once(lookup_alone, monkeypatch):
+    """Once for the instance, not once a worker or a start: the first use that finds the
+    names out of date writes them, and every first use after it finds them current
+    (#1127)."""
+    alter(lookup_alone / places.LOOKUP_FILE, OLDER_NAMES)
+    real, read = places._country_names, []
+
+    def counting(path):
+        read.append(path)
+        return real(path)
+
+    monkeypatch.setattr(places, "_country_names", counting)
+    for _process in range(3):
+        assert places.resolve("Valencia, España")["country"] == "ES"
+        assert places.resolve("Berlin, Deutschland")["country"] == "DE"
+        places._index.cache_clear()
+
+    assert len(read) == 1
+
+
+def test_two_workers_starting_together_write_the_names_once(lookup_alone, monkeypatch):
+    """Workers start together and each meets the same lookup: one writes the names, the
+    other waits for it and finds them written, and neither fails (#1127)."""
+    lookup = lookup_alone / places.LOOKUP_FILE
+    alter(lookup, OLDER_NAMES)
+    real, read = places._country_names, []
+
+    def slow(path):
+        read.append(path)
+        time.sleep(0.3)
+        return real(path)
+
+    monkeypatch.setattr(places, "_country_names", slow)
+    together = threading.Barrier(2)
+    answers = []
+
+    def worker():
+        together.wait()
+        answers.append(places._refresh_countries(lookup))
+
+    threads = [threading.Thread(target=worker) for _worker in range(2)]
+    for thread in threads:
+        thread.start()
+    for thread in threads:
+        thread.join()
+
+    assert answers == [True, True]
+    assert len(read) == 1
+    assert places.lookup_stamp() == places.current_stamp()
+    assert places.resolve("Valencia, España")["country"] == "ES"
+
+
+def test_names_that_cannot_be_written_again_leave_the_lookup_in_use(
+    lookup_alone, monkeypatch, caplog
+):
+    """A lookup that cannot be written (a volume mounted read-only, or here a file another
+    process holds) is read as it is: its cities and the names it has are matched, and the
+    log says once how to have a new one (#1127)."""
+    lookup = lookup_alone / places.LOOKUP_FILE
+    alter(lookup, "UPDATE about SET value = '41' WHERE key = 'cldr'")
+    monkeypatch.setattr(places, "REFRESH_WAIT", 0.05)
+    monkeypatch.setattr(places, "_warned", False)
+    holder = sqlite3.connect(lookup, isolation_level=None)
+    holder.execute("BEGIN IMMEDIATE")
+    try:
+        with caplog.at_level("WARNING", logger="postulo.jobs.places"):
+            for _process in range(2):
+                assert places.resolve("Valencia, España")["country"] == "ES"
+                assert places.resolve("Lissabon")["name"] == "Lisboa"
+                places._index.cache_clear()
+    finally:
+        holder.execute("ROLLBACK")
+        holder.close()
+
+    assert ["fetch_geonames" in record.getMessage() for record in caplog.records] == [True]
+    assert places.lookup_stamp()["cldr"] == "41"
+
+
+def test_without_the_country_table_a_lookup_alone_keeps_the_names_it_has(
+    lookup_alone, monkeypatch, caplog
+):
+    """The names are read from the country table, so without it there are none to write:
+    the ones the lookup has are kept, not emptied, and both the log and `manage.py check`
+    say to run the download again (#1127)."""
+    from postulo.jobs import checks
+
+    alter(lookup_alone / places.LOOKUP_FILE, "UPDATE about SET value = '41' WHERE key = 'cldr'")
+    (lookup_alone / places.COUNTRIES_FILE).unlink()
+    monkeypatch.setattr(places, "_warned", False)
+
+    with caplog.at_level("WARNING", logger="postulo.jobs.places"):
+        assert places.resolve("Valencia, España")["country"] == "ES"
+
+    assert ["fetch_geonames" in record.getMessage() for record in caplog.records] == [True]
+    assert places.lookup_stamp()["cldr"] == "41"
+    problems = checks.country_names(None)
+    assert [problem.id for problem in problems] == ["postulo.W003"]
+    assert "fetch_geonames" in problems[0].hint
+
+
+@pytest.mark.parametrize("script", [OLDER_NAMES, BEFORE_THE_COUNTRIES], ids=["older", "none"])
+def test_start_up_says_nothing_of_names_the_first_use_writes_again(lookup_alone, script):
+    """`manage.py check` runs at start-up, before anything is matched: it does not report
+    names that the first match puts right by itself (#1127)."""
+    from postulo.jobs import checks
+
+    alter(lookup_alone / places.LOOKUP_FILE, script)
+
+    assert checks.country_names(None) == []
+    assert places.resolve("Valencia, España")["country"] == "ES"
+    assert checks.country_names(None) == []
+
+
+def test_start_up_says_when_a_lookup_alone_has_no_names_and_cannot_be_given_them(lookup_alone):
+    """A lookup from before the countries, with neither the city table to be built again
+    from nor the country table to read the names from, is said at start-up (#1127)."""
+    from postulo.jobs import checks
+
+    alter(lookup_alone / places.LOOKUP_FILE, BEFORE_THE_COUNTRIES)
+    (lookup_alone / places.COUNTRIES_FILE).unlink()
+
+    problems = checks.country_names(None)
+
+    assert [problem.id for problem in problems] == ["postulo.W003"]
+    assert "fetch_geonames" in problems[0].hint
+    assert places.resolve("Springfield, Ireland")["country"] == "US", "matched, not narrowed"
+
+
+def test_a_file_that_is_no_lookup_is_no_dataset_and_no_error(data_dir, monkeypatch, caplog):
+    """With no table to build from, a file under the lookup's name that is not one is an
+    absent dataset, not an error on every save (#1127)."""
+    (data_dir / places.CITIES_FILE).unlink()
+    (data_dir / places.LOOKUP_FILE).write_bytes(b"not a database at all, " * 64)
+    monkeypatch.setattr(places, "_warned", False)
+
+    with caplog.at_level("WARNING", logger="postulo.jobs.places"):
+        assert places.resolve("Berlin") is None
+        assert places.cities() == 0
+
+    assert ["fetch_geonames" in record.getMessage() for record in caplog.records] == [True]
+
+
+def test_a_table_removed_while_it_is_being_looked_at_leaves_the_lookup(lookup_alone, monkeypatch):
+    """`fetch_geonames` in another process removes the table once its lookup is built; a
+    worker that saw the table a moment before reads the lookup, and does not fail (#1127)."""
+    monkeypatch.setattr(places, "_cities_file", lambda: lookup_alone / places.CITIES_FILE)
+
+    assert places.resolve("Berlin, Deutschland")["country"] == "DE"
 
 
 def test_a_table_without_a_lookup_gets_one_built_beside_it(data_dir):

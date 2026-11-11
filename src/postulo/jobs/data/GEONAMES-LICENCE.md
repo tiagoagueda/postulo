@@ -7,6 +7,10 @@ above a thousand" table and the country table, published by
 committed: a table of a few megabytes is reference data, not a repository, and a
 fresh download is how it is replaced.
 
+What is kept of the city table is its index, `data/geonames-cities1000.sqlite`: the same
+places, on the same terms. The downloaded table is removed once the index is built from
+it (#1127).
+
 **The terms they are carried on are the GeoNames database licence:**
 [Creative Commons Attribution 3.0 Unported](https://creativecommons.org/licenses/by/3.0/)
 (https://download.geonames.org/export/dump/). The attribution the licence asks for is
@@ -20,7 +24,7 @@ says so, and `THIRD-PARTY.md` says the same.
 
 ## The postal codes (#702)
 
-`data/geonames-postcodes.txt`, and its index `geonames-postcodes.sqlite`, are GeoNames'
+`data/geonames-postcodes.sqlite`, the index kept of `geonames-postcodes.txt`, is GeoNames'
 postal codes (https://download.geonames.org/export/zip/), downloaded only when an operator
 asks for them: `manage.py fetch_geonames --postcodes`, or `POSTULO_GEONAMES_POSTCODES=1` in
 the image. **Their terms are

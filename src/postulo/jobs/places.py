@@ -52,7 +52,9 @@ CITIES_FILE = "geonames-cities1000.txt"
 COUNTRIES_FILE = "geonames-countryinfo.txt"
 
 #: What the cities table is indexed into at provisioning, so no process parses it (#399),
-#: and the countries' names with it, so none reads them out of CLDR (#1109).
+#: and the countries' names with it, so none reads them out of CLDR (#1109). It is all a
+#: match reads, so ``fetch_geonames`` removes the city table once this is built (#1127):
+#: the lookup alone is the dataset, and a city table beside it is one an operator put there.
 LOOKUP_FILE = "geonames-cities1000.sqlite"
 
 #: GeoNames' postal codes, the step between a town and a street (#702): a centroid per
@@ -66,7 +68,17 @@ POSTCODES_LOOKUP_FILE = "geonames-postcodes.sqlite"
 #: is cut to it: before the space, or the four digits of a Dutch code.
 OUTWARD_ONLY = {"GB": "space", "CA": "space", "NL": "digits"}
 
-#: Once is enough to say the dataset is not there; the absence is not an error to repeat.
+#: What a file must answer to be a lookup a city is matched from.
+_HOLDS_CITIES = "SELECT 1 FROM names JOIN cities ON cities.id = names.city LIMIT 1"
+
+#: How long, in seconds, a process waits for another that is writing the country names
+#: into the lookup (#1127). The writer reads every language's CLDR data while it holds the
+#: lock, a few seconds on a slow disk; readers are not kept waiting by it.
+REFRESH_WAIT = 30.0
+
+#: Once is enough to say the dataset is not there, or that its lookup is read with the
+#: country names it has because they could not be written again; neither is an error to
+#: repeat.
 _warned = False
 
 
@@ -123,9 +135,6 @@ def build_lookup(cities: Path, target: Path, countries: Path | None = None) -> i
             " country TEXT, population INTEGER);"
             "CREATE TABLE names (key TEXT, city INTEGER, PRIMARY KEY (key, city))"
             " WITHOUT ROWID;"
-            "CREATE TABLE countries (key TEXT, code TEXT, PRIMARY KEY (key, code))"
-            " WITHOUT ROWID;"
-            "CREATE TABLE about (key TEXT PRIMARY KEY, value TEXT) WITHOUT ROWID;"
         )
         count = 0
         with cities.open(encoding="utf-8") as handle:
@@ -149,13 +158,35 @@ def build_lookup(cities: Path, target: Path, countries: Path | None = None) -> i
                 connection.executemany(
                     "INSERT INTO names VALUES (?, ?)", [(key, count) for key in keys if key]
                 )
-        connection.executemany("INSERT INTO countries VALUES (?, ?)", _country_names(countries))
-        connection.executemany("INSERT INTO about VALUES (?, ?)", current_stamp().items())
+        _write_countries(connection, countries)
         connection.commit()
     finally:
         connection.close()
     os.replace(temporary, target)
     return count
+
+
+def _write_countries(connection: sqlite3.Connection, countries: Path) -> None:
+    """Write the countries' names into a lookup, with what they were read from (#1109).
+
+    The one way they are written: into a lookup as it is built, and again into one that
+    stands without its city table when they have gone out of date (#1127). The two tables
+    are made where a lookup from before #1109 has none, and what they held is replaced.
+    It is the caller's transaction, so a reader sees the names as they were or as they
+    are, and the cities are not touched.
+    """
+    names = _country_names(countries)
+    connection.execute(
+        "CREATE TABLE IF NOT EXISTS countries (key TEXT, code TEXT, PRIMARY KEY (key, code))"
+        " WITHOUT ROWID"
+    )
+    connection.execute(
+        "CREATE TABLE IF NOT EXISTS about (key TEXT PRIMARY KEY, value TEXT) WITHOUT ROWID"
+    )
+    connection.execute("DELETE FROM countries")
+    connection.execute("DELETE FROM about")
+    connection.executemany("INSERT INTO countries VALUES (?, ?)", names)
+    connection.executemany("INSERT INTO about VALUES (?, ?)", current_stamp().items())
 
 
 def _country_names(path: Path) -> list[tuple[str, str]]:
@@ -259,19 +290,122 @@ def _up_to_date(lookup: Path, cities: Path) -> bool:
     return lookup_stamp(lookup) is not None
 
 
+def _names_current(lookup: Path) -> bool:
+    """Whether the country names in the lookup are the ones that would be written now.
+
+    Read from the CLDR this Postulo carries, in the languages it has, and no earlier than
+    the country table beside the lookup was last written. Asked of a lookup that stands
+    without its city table (#1127), whose names are the one part of it that can go out of
+    date, and the part that is written again without that table.
+    """
+    countries = lookup.with_name(COUNTRIES_FILE)
+    try:
+        if countries.is_file() and lookup.stat().st_mtime_ns < countries.stat().st_mtime_ns:
+            return False
+    except OSError:
+        return False
+    return lookup_stamp(lookup) == current_stamp()
+
+
+def _refresh_countries(lookup: Path) -> bool:
+    """Write the country names into the lookup at ``lookup`` again; whether it has them now.
+
+    In place and in one transaction (#1127): the names and their stamp are replaced, made
+    where a lookup from before #1109 has no tables for them, and the cities stay as they
+    are, so nothing is downloaded for what CLDR and the kept country table already say.
+    The write lock is taken before anything is read: of several processes that start
+    together one writes, and the others wait for it and find the names written.
+
+    ``False`` where they cannot be written, and the lookup is then as it was: there is no
+    country table to read them from, the file is not a lookup, or it cannot be written (a
+    volume mounted read-only, or a lock nobody let go of in `REFRESH_WAIT` seconds).
+    """
+    countries = lookup.with_name(COUNTRIES_FILE)
+    if not countries.is_file():
+        return False
+    try:
+        connection = sqlite3.connect(
+            f"{lookup.as_uri()}?mode=rw", uri=True, timeout=REFRESH_WAIT, isolation_level=None
+        )
+    except sqlite3.Error:
+        return False
+    try:
+        connection.execute("BEGIN IMMEDIATE")
+        if not _names_current(lookup):
+            connection.execute(_HOLDS_CITIES)
+            _write_countries(connection, countries)
+        connection.commit()
+    except (sqlite3.Error, OSError, UnicodeError):
+        return False
+    finally:
+        # Closing is what undoes a transaction that did not reach its commit.
+        connection.close()
+    return True
+
+
+def _readable(lookup: Path) -> bool:
+    """Whether the file at ``lookup`` is a lookup a match can read: it holds the cities."""
+    if not lookup.is_file():
+        return False
+    connection = sqlite3.connect(f"{lookup.as_uri()}?mode=ro", uri=True)
+    try:
+        connection.execute(_HOLDS_CITIES)
+    except sqlite3.Error:
+        return False
+    finally:
+        connection.close()
+    return True
+
+
+def _built(cities: Path, lookup: Path) -> Path:
+    """The lookup built from the table at ``cities``: at ``lookup``, or in a temporary
+    directory where that one is not writable."""
+    try:
+        build_lookup(cities, lookup)
+    except FileNotFoundError:
+        # The table went, which no other directory mends: `_index` reads what is left.
+        raise
+    except OSError:
+        lookup = Path(tempfile.mkdtemp(prefix="postulo-geonames-")) / LOOKUP_FILE
+        build_lookup(cities, lookup)
+    return lookup
+
+
 @lru_cache(maxsize=1)
 def _index() -> Path | None:
     """The lookup database to read, or ``None`` where the dataset is not on this machine.
 
-    Provisioning writes it beside the table (``fetch_geonames``), so this is a path
-    and no request parses anything. An install that has the table from before the
-    lookup existed, whose lookup is older than its tables, or whose lookup is from before
-    it carried the countries (#1109), gets it built here once, beside the table, or in a
-    temporary directory where that one is not writable.
+    Provisioning writes it (``fetch_geonames``) and removes the table it was built from
+    (#1127), so this is a path and no request parses anything. A city table beside it is
+    one an operator put there, or one from before the table was removed: where the lookup
+    is missing, older than its tables, or from before it carried the countries (#1109), it
+    is built here once from that table, which is left where it is.
+
+    With no table the cities are what they are, and only the countries' names can have
+    gone out of date: read from another CLDR or for other languages, older than the
+    country table, or not there at all in a lookup from before #1109. They are written
+    again here once, in place (`_refresh_countries`). Where they cannot be, the lookup is
+    read as it is, and the log says how to have a new one.
     """
+    global _warned
+    lookup = _lookup_path()
     path = _cities_file()
-    if path is None:
-        global _warned
+    if path is not None:
+        try:
+            return lookup if _up_to_date(lookup, path) else _built(path, lookup)
+        except FileNotFoundError:
+            # `fetch_geonames` in another process removed the table between two looks at
+            # it (#1127): the lookup it built first is what is there now.
+            pass
+    # Before the lookup is read: a write that was cut short is undone by the next one.
+    stale = (
+        lookup.is_file()
+        and not _names_current(lookup)
+        and not _refresh_countries(lookup)
+        # Another process may have written them while this one waited in vain.
+        and not _names_current(lookup)
+    )
+    if not _readable(lookup):
         if not _warned:
             _warned = True
             logger.warning(
@@ -280,14 +414,14 @@ def _index() -> Path | None:
                 "in place."
             )
         return None
-    lookup = _lookup_path()
-    if _up_to_date(lookup, path):
-        return lookup
-    try:
-        build_lookup(path, lookup)
-    except OSError:
-        lookup = Path(tempfile.mkdtemp(prefix="postulo-geonames-")) / LOOKUP_FILE
-        build_lookup(path, lookup)
+    if stale and not _warned:
+        _warned = True
+        logger.warning(
+            "The country names in the GeoNames lookup are out of date and could not be "
+            "written into it again: the country table is not beside it, or the lookup "
+            "cannot be written. It is used as it is. Run 'manage.py fetch_geonames' to "
+            "download the tables and build the lookup again."
+        )
     return lookup
 
 
@@ -447,8 +581,33 @@ def place(postcode: str, town: str, country: str) -> tuple[str, dict] | None:
 
 
 def available() -> bool:
-    """Whether the dataset is on this machine at all: the map page says so plainly."""
-    return _cities_file() is not None
+    """Whether the dataset is on this machine at all: the map page says so plainly.
+
+    The lookup is the dataset (#1127); a city table without one is a lookup at its first
+    use.
+    """
+    return _lookup_path().is_file() or _cities_file() is not None
+
+
+def lookup_alone() -> bool:
+    """Whether the lookup is there without the city table it would be built again from."""
+    return _lookup_path().is_file() and _cities_file() is None
+
+
+def renews_its_countries() -> bool:
+    """Whether country names that are out of date are written again at the first use.
+
+    So for a lookup that stands alone, with the country table the names are read from
+    beside it, where it can be written (#1127). `postulo.jobs.checks` asks before anything
+    was matched, and does not report what the first match puts right.
+    """
+    lookup = _lookup_path()
+    return (
+        lookup_alone()
+        and lookup.with_name(COUNTRIES_FILE).is_file()
+        and os.access(lookup, os.W_OK)
+        and os.access(lookup.parent, os.W_OK)
+    )
 
 
 def cities() -> int:

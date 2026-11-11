@@ -1,18 +1,24 @@
 """Download the GeoNames city dataset in place, where the geocoder reads it (#108).
 
-``postulo/jobs/places.py`` reads ``data/geonames-cities1000.txt`` and
-``data/geonames-countryinfo.txt``; this command is how the files get there. It asks
-download.geonames.org for the table of the cities above a thousand inhabitants and the
-table of the countries, and writes them beside the code that reads them. The download
-is one request per table, at provisioning, for data that is a few dozen megabytes — a
-repository is not where reference data is kept, and neither is a request on the path
-of a save.
+``postulo/jobs/places.py`` reads ``data/geonames-cities1000.sqlite``, the lookup built from
+``data/geonames-cities1000.txt`` and ``data/geonames-countryinfo.txt``; this command is
+how it gets there. It asks download.geonames.org for the table of the cities above a
+thousand inhabitants and the table of the countries, writes them beside the code that
+reads them, and builds the lookup. The download is one request per table, at
+provisioning, for data that is a few dozen megabytes — a repository is not where
+reference data is kept, and neither is a request on the path of a save.
 
 Without the files Postulo runs on: a location is simply not placed, and the map page
 says the dataset has not been downloaded. What is written is checked before anything
 is replaced — the loader itself is asked about the cities it needs to be true — and
 the command says what it found. ``data/GEONAMES-LICENCE.md``, committed, says on whose
 terms the table is carried.
+
+What stays is the lookup and the small country table (#1127). The city table, and the
+postal codes' with ``--postcodes``, are removed once the lookup built from each has
+answered the same questions: nothing reads them again, and running this command again
+is how a lookup is built again. A table an operator puts there by hand is indexed at the
+next start and never removed by that; this command writes over it, as it always has.
 """
 
 from __future__ import annotations
@@ -88,18 +94,32 @@ class Command(BaseCommand):
             cities = self._fetch(client, CITIES_URL, "the city table")
             countries = self._fetch(client, COUNTRIES_URL, "the country table")
         self._validate(cities, countries)
-        self._write(places.DATA_DIR / places.CITIES_FILE, cities)
+        table = places.DATA_DIR / places.CITIES_FILE
+        self._write(table, cities)
         self._write(places.DATA_DIR / places.COUNTRIES_FILE, countries)
         # The table is parsed here, once, into the lookup the saves read (#399), and the
         # countries' names are read out of CLDR into it, once, with it (#1109).
-        places.build_lookup(places.DATA_DIR / places.CITIES_FILE, places._lookup_path())
+        built = places.build_lookup(table, places._lookup_path())
         # The loader caches what it has read, and this process may have read the
         # absence; the new file is the state now.
         places._index.cache_clear()
+        # The lookup is all a match reads, and the table beside it was 32 MB kept on every
+        # data volume for nothing (#1127). It goes once the lookup has answered for itself,
+        # and not before: a build that stopped, or a lookup that does not answer, leaves
+        # the table where the next start indexes it.
+        problems = self._lookup_problems(built)
+        if problems:
+            raise CommandError(
+                "the lookup built from the download is not what the loader reads, and the "
+                "city table is left beside it:\n" + "\n".join(problems)
+            )
+        self._remove(table)
+        places._index.cache_clear()
         self.stdout.write(
             self.style.SUCCESS(
-                "Wrote the city table, its lookup and the country table. A location is "
-                "placed from them when it is saved."
+                "Wrote the lookup of the cities and the country table, and removed the "
+                "city table the lookup was built from. A location is placed from them "
+                "when it is saved."
             )
         )
         if options.get("postcodes") or os.environ.get("POSTULO_GEONAMES_POSTCODES") == "1":
@@ -143,15 +163,11 @@ class Command(BaseCommand):
             staged = pathlib.Path(staging) / places.POSTCODES_FILE
             staged.write_text(text, encoding="utf-8")
             lookup = pathlib.Path(staging) / places.POSTCODES_LOOKUP_FILE
-            places.build_postcode_lookup(staged, lookup)
+            checked = places.build_postcode_lookup(staged, lookup)
             original = places.DATA_DIR
             try:
                 places.DATA_DIR = pathlib.Path(staging)
-                missing = [
-                    f"{country} {code}"
-                    for country, code in REQUIRED_POSTCODES
-                    if places.resolve_postcode(code, country) is None
-                ]
+                missing = self._missing_postcodes()
             finally:
                 places.DATA_DIR = original
             if missing:
@@ -159,13 +175,33 @@ class Command(BaseCommand):
                     "the postal code table lacks codes it must hold: " + ", ".join(missing)
                 )
             self._write(target, text)
-            places.build_postcode_lookup(target, places.DATA_DIR / places.POSTCODES_LOOKUP_FILE)
+            built = places.build_postcode_lookup(
+                target, places.DATA_DIR / places.POSTCODES_LOOKUP_FILE
+            )
+        # Nothing reads the table once its lookup is there, so it goes as the cities' does
+        # (#1127), after the lookup in place has answered as the checked one did.
+        missing = self._missing_postcodes()
+        if missing or built != checked:
+            raise CommandError(
+                "the lookup built from the postal codes is not the one that was checked, "
+                "and the table is left beside it"
+                + (": it lacks " + ", ".join(missing) if missing else "")
+            )
+        self._remove(target)
         self.stdout.write(
             self.style.SUCCESS(
-                "Wrote the postal codes and their lookup. An address is placed at its "
-                "postcode from them when it is saved."
+                "Wrote the lookup of the postal codes, and removed the table it was built "
+                "from. An address is placed at its postcode from it when it is saved."
             )
         )
+
+    def _missing_postcodes(self) -> list[str]:
+        """The codes a postcode lookup must hold that the one the loader reads does not."""
+        return [
+            f"{country} {code}"
+            for country, code in REQUIRED_POSTCODES
+            if places.resolve_postcode(code, country) is None
+        ]
 
     def _fetch(self, client, url: str, what: str) -> str:
         # Streamed and bounded (#782): this runs at first start with nobody behind it, against
@@ -239,9 +275,39 @@ class Command(BaseCommand):
                 places._index.cache_clear()
         return problems
 
+    def _lookup_problems(self, built: int) -> list[str]:
+        """The lookup in place, asked what the download was asked before it was written.
+
+        ``built`` is how many cities the build said it indexed. The table the lookup was
+        built from is removed only when this finds nothing (#1127).
+        """
+        problems = []
+        held = places.cities()
+        if held != built:
+            problems.append(f"the lookup holds {held} cities of the {built} that were indexed")
+        if places.lookup_stamp() != places.current_stamp():
+            problems.append("the lookup does not say what its country names were read from")
+        for city in REQUIRED_CITIES:
+            if places.resolve(city) is None:
+                problems.append(f"{city} is not in the lookup")
+        return problems
+
     def _write(self, target, text: str) -> None:
         # The directory is whatever POSTULO_GEOLOCATIONS_DIR names, and may be new.
         target.parent.mkdir(parents=True, exist_ok=True)
         temporary = target.with_name(target.name + ".tmp")
         temporary.write_text(text, encoding="utf-8")
         os.replace(temporary, target)
+
+    def _remove(self, table) -> None:
+        """Take away a table this command wrote, now that its lookup is what is read (#1127).
+
+        A table that will not go (a worker on Windows still reading it) is no failure: the
+        lookup is built, and a table beside it changes nothing but the room it takes.
+        """
+        try:
+            table.unlink(missing_ok=True)
+        except OSError as problem:
+            self.stderr.write(
+                f"{table.name} could not be removed ({problem}); it is left beside its lookup."
+            )

@@ -17,6 +17,7 @@ and this is not it: this asks the two questions that have actually gone wrong.
 
 from __future__ import annotations
 
+import os
 import shutil
 import subprocess
 from pathlib import Path
@@ -29,6 +30,8 @@ REPO = Path(__file__).resolve().parents[1]
 #: list — which is what the bandit rules are asking for, and is true here.
 GIT = shutil.which("git") or "git"
 BASH = shutil.which("bash")
+#: The entrypoint's own shell: `sh` in the image is dash, which reads less than bash does.
+SH = shutil.which("sh")
 
 
 #: Tracked shell scripts. Read from git rather than the filesystem so a stray `.sh` in a
@@ -121,3 +124,61 @@ def test_the_entrypoint_follows_the_geolocations_directory():
 def test_the_entrypoint_lets_the_startup_download_be_switched_off():
     text = (REPO / "docker" / "entrypoint.sh").read_text(encoding="utf-8")
     assert "POSTULO_SKIP_GEONAMES" in text
+
+
+#: What `manage.py` is asked for at start-up, written down instead of run: the entrypoint
+#: is given this in place of `python`.
+RECORDER = '#!/bin/sh\necho "$*" >> "$POSTULO_TEST_RECORD"\n'
+
+
+@pytest.mark.parametrize(
+    "there, skip, downloads",
+    [
+        ((), "", True),
+        (("geonames-cities1000.sqlite", "geonames-countryinfo.txt"), "", False),
+        (("geonames-cities1000.txt", "geonames-countryinfo.txt"), "", False),
+        (("geonames-cities1000.txt", "geonames-cities1000.sqlite"), "", False),
+        ((), "1", False),
+    ],
+    ids=["nothing", "the lookup alone", "a table by hand", "both", "switched off"],
+)
+def test_the_entrypoint_downloads_the_cities_only_where_there_are_none(
+    tmp_path, there, skip, downloads
+):
+    """`fetch_geonames` removes the city table once its lookup is built (#1127), and the
+    entrypoint took the table's absence for "not downloaded yet": every start would have
+    downloaded it again. The lookup is as good a sign as the table, and a table put there
+    by hand with the download switched off is still left to be indexed."""
+    if SH is None:  # pragma: no cover - every machine this runs on has one
+        pytest.skip("no sh on this machine")
+    tools = tmp_path / "tools"
+    tools.mkdir()
+    recorder = tools / "python"
+    recorder.write_text(RECORDER, encoding="utf-8", newline="\n")
+    recorder.chmod(0o755)
+    record = tmp_path / "record.txt"
+    data = tmp_path / "data"
+    data.mkdir()
+    for name in there:
+        (data / name).write_text("", encoding="utf-8")
+
+    result = subprocess.run(  # noqa: S603 - a fixed argument list, the shell resolved above
+        [SH, str(REPO / "docker" / "entrypoint.sh"), "true"],
+        capture_output=True,
+        text=True,
+        cwd=tmp_path,
+        env={
+            **os.environ,
+            "PATH": str(tools) + os.pathsep + os.environ.get("PATH", ""),
+            "POSTULO_TEST_RECORD": record.as_posix(),
+            "POSTULO_GEOLOCATIONS_DIR": data.as_posix(),
+            "POSTULO_SKIP_GEONAMES": skip,
+            "POSTULO_SKIP_MIGRATE": "1",
+            "POSTULO_SKIP_PLUGIN_SYNC": "1",
+        },
+    )
+
+    assert result.returncode == 0, result.stderr
+    asked = record.read_text(encoding="utf-8").splitlines()
+    assert ("manage.py fetch_geonames" in asked) is downloads, asked
+    assert asked[-1] == "manage.py check --deploy --fail-level ERROR"

@@ -28,8 +28,14 @@ fi
 # turns the download off (put geonames-cities1000.txt and geonames-countryinfo.txt in
 # that directory by hand to have the map anyway). POSTULO_GEONAMES_POSTCODES=1 also downloads
 # the postal codes (#702), so an address is placed at its postcode rather than its town.
+#
+# What the download leaves is the lookup built from the city table, geonames-cities1000.sqlite,
+# and not the table (#1127), so either one there means there is nothing to fetch: the
+# lookup of an earlier start, or a table put there by hand, which is indexed at its first use.
 geonames_dir="${POSTULO_GEOLOCATIONS_DIR:-/app/data/geonames}"
-if [ "${POSTULO_SKIP_GEONAMES:-}" != "1" ] && [ ! -f "$geonames_dir/geonames-cities1000.txt" ]; then
+if [ "${POSTULO_SKIP_GEONAMES:-}" != "1" ] \
+    && [ ! -f "$geonames_dir/geonames-cities1000.sqlite" ] \
+    && [ ! -f "$geonames_dir/geonames-cities1000.txt" ]; then
     mkdir -p "$geonames_dir"
     python manage.py fetch_geonames || \
         echo "Postulo: the GeoNames city dataset could not be fetched; locations are not placed on the map until it is"

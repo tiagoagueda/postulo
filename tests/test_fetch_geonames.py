@@ -172,10 +172,164 @@ def answers_for(cities=None, countries=None):
 def test_the_download_is_checked_and_written_where_the_loader_reads_it(run, data_dir):
     client = run(answers_for())
 
-    assert (data_dir / places.CITIES_FILE).is_file()
     assert (data_dir / places.COUNTRIES_FILE).is_file()
     assert (data_dir / places.LOOKUP_FILE).is_file()
     assert client.requests == [fetch_geonames.CITIES_URL, fetch_geonames.COUNTRIES_URL]
+
+
+def test_the_city_table_is_removed_once_its_lookup_is_built(run, data_dir):
+    """The downloaded city table was kept beside the lookup built from it, 32 MB on every
+    data volume that nothing read again (#1127). What a fetch leaves is the lookup and the
+    small country table, and the lookup alone is the dataset: the map says it is there and
+    a location is placed from it."""
+    run(answers_for())
+
+    assert sorted(path.name for path in data_dir.iterdir()) == sorted(
+        [places.LOOKUP_FILE, places.COUNTRIES_FILE]
+    )
+    beside = sum(
+        path.stat().st_size for path in data_dir.iterdir() if path.name != places.LOOKUP_FILE
+    )
+    assert beside < 100_000, "the country table and nothing else"
+    assert places.available() is True
+    assert places.cities() == 10004
+    assert places.resolve("Lisbon, Portogallo")["country"] == "PT"
+
+
+def test_a_second_download_is_built_and_removed_like_the_first(run, data_dir):
+    """Running the command again is how a lookup is brought up to date, and there is no
+    table beside it to build from: the table is downloaded, indexed and removed again
+    (#1127)."""
+    run(answers_for())
+    more = city_table() + table_row("Porto", "PT", 242722) + "\n"
+
+    run(answers_for(cities=more))
+
+    assert not (data_dir / places.CITIES_FILE).exists()
+    assert places.resolve("Porto")["country"] == "PT"
+
+
+def test_a_table_put_there_by_hand_is_replaced_by_the_download(run, data_dir):
+    """The command has always written over the table it finds; what it then removes is the
+    one it downloaded (#1127)."""
+    (data_dir / places.CITIES_FILE).write_text(table_row("Atlantis", "DE", 5000) + "\n", "utf-8")
+
+    run(answers_for())
+
+    assert not (data_dir / places.CITIES_FILE).exists()
+    assert places.resolve("Atlantis") is None
+    assert places.resolve("Berlin")["country"] == "DE"
+
+
+def test_a_build_that_fails_leaves_the_table_and_the_lookup_before_it(run, data_dir, monkeypatch):
+    """The table is removed after its lookup is built and has answered, never before: a
+    build that stops half way leaves the downloaded table, and the lookup of the download
+    before it, so the next start indexes the table itself (#1127)."""
+    run(answers_for())
+    before = (data_dir / places.LOOKUP_FILE).read_bytes()
+    real = places.build_lookup
+
+    def full_disk(cities, target, countries=None):
+        if target == data_dir / places.LOOKUP_FILE:
+            raise OSError("No space left on device")
+        return real(cities, target, countries)
+
+    monkeypatch.setattr(places, "build_lookup", full_disk)
+    more = city_table() + table_row("Porto", "PT", 242722) + "\n"
+    with pytest.raises(OSError, match="No space left"):
+        run(answers_for(cities=more))
+
+    assert (data_dir / places.CITIES_FILE).is_file()
+    assert (data_dir / places.LOOKUP_FILE).read_bytes() == before
+    monkeypatch.setattr(places, "build_lookup", real)
+    places._index.cache_clear()
+    assert places.resolve("Porto")["country"] == "PT", "the table left there is indexed"
+    assert (data_dir / places.CITIES_FILE).is_file()
+
+
+def test_a_lookup_that_does_not_answer_leaves_the_table_beside_it(run, data_dir, monkeypatch):
+    """The lookup is asked what the download was asked before the table is removed: one
+    that lacks a city the table held is said so, and the table stays (#1127)."""
+    real = places.build_lookup
+
+    def short(cities, target, countries=None):
+        if target != data_dir / places.LOOKUP_FILE:
+            return real(cities, target, countries)
+        cut = cities.with_name("cut.txt")
+        rows = cities.read_text(encoding="utf-8").splitlines()
+        cut.write_text("\n".join(rows[2:]) + "\n", encoding="utf-8")
+        try:
+            return real(cut, target, cities.with_name(places.COUNTRIES_FILE))
+        finally:
+            cut.unlink()
+
+    monkeypatch.setattr(places, "build_lookup", short)
+    with pytest.raises(CommandError, match="Lisbon is not in the lookup"):
+        run(answers_for())
+
+    assert (data_dir / places.CITIES_FILE).is_file()
+
+
+def postcode_zip() -> bytes:
+    """The postal codes as GeoNames zips them: the codes the check asks for, and enough
+    others to be the table."""
+    rows = [
+        "DE\t10115\tBerlin\t\t\t\t\t\t\t52.53\t13.38\t6",
+        "PT\t1000-001\tLisboa\t\t\t\t\t\t\t38.72\t-9.15\t6",
+        "FR\t75001\tParis\t\t\t\t\t\t\t48.86\t2.34\t6",
+    ]
+    rows.extend(f"DE\t{number:05d}\tA place\t\t\t\t\t\t\t50.0\t10.0\t6" for number in range(500))
+    buffer = io.BytesIO()
+    with zipfile.ZipFile(buffer, "w", zipfile.ZIP_DEFLATED) as archive:
+        archive.writestr(fetch_geonames.POSTCODES_MEMBER, "\n".join(rows) + "\n")
+    return buffer.getvalue()
+
+
+@pytest.fixture
+def run_with_postcodes(monkeypatch, data_dir):
+    """A run that also asks for the postal codes, against a table of a few hundred."""
+
+    def perform():
+        answers = {**answers_for(), fetch_geonames.POSTCODES_URL: Answer(postcode_zip())}
+        monkeypatch.setattr(fetch_geonames, "MINIMUM_POSTCODES", 500)
+        monkeypatch.setattr(fetch_geonames, "public_only_client", lambda **kw: FakeClient(answers))
+        command = fetch_geonames.Command()
+        command.stdout = io.StringIO()
+        command.stderr = io.StringIO()
+        command.handle(postcodes=True)
+
+    return perform
+
+
+def test_the_postal_code_table_is_removed_once_its_lookup_is_built(run_with_postcodes, data_dir):
+    """The postal codes' table was kept beside its lookup too, and nothing ever read it
+    again (#1127). The lookup is what an address is placed from."""
+    run_with_postcodes()
+
+    assert sorted(path.name for path in data_dir.iterdir()) == sorted(
+        [places.LOOKUP_FILE, places.COUNTRIES_FILE, places.POSTCODES_LOOKUP_FILE]
+    )
+    assert places.postcodes_available() is True
+    assert places.resolve_postcode("1000-001", "PT") == {"lat": 38.72, "lon": -9.15}
+
+
+def test_a_postal_code_lookup_that_fails_to_build_leaves_its_table(
+    run_with_postcodes, data_dir, monkeypatch
+):
+    """As the cities: the table goes after the lookup in place has answered (#1127)."""
+    real = places.build_postcode_lookup
+
+    def full_disk(source, target):
+        if target == data_dir / places.POSTCODES_LOOKUP_FILE:
+            raise OSError("No space left on device")
+        return real(source, target)
+
+    monkeypatch.setattr(places, "build_postcode_lookup", full_disk)
+    with pytest.raises(OSError, match="No space left"):
+        run_with_postcodes()
+
+    assert (data_dir / places.POSTCODES_FILE).is_file()
+    assert not (data_dir / places.CITIES_FILE).exists(), "the cities were done before"
 
 
 def test_the_file_the_command_writes_is_one_the_loader_reads(run, data_dir):

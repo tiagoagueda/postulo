@@ -135,18 +135,38 @@ def country_names(app_configs, **kwargs):
     lookup with the names it was built with. A country typed by one of the names it lacks
     then narrows nothing, which is a wrong dot on a map and not an error anybody sees.
     Nothing is said where there is no lookup, or one that is built again at its first use.
+
+    Nor of a lookup that stands without its city table, as `fetch_geonames` leaves it
+    (#1127), where the first use writes the names into it again: this runs at start-up,
+    before anything is matched, and what the first match puts right is no problem to
+    report. Where that cannot be done (no country table to read them from, or a lookup that
+    cannot be written) it is said, of a lookup from before it held the names too. The
+    command advised downloads the tables it builds from, so it is the answer either way.
     """
     written = places.lookup_stamp()
     now = places.current_stamp()
-    if written is None or written == now:
+    if written == now or places.renews_its_countries():
         return []
-    if written.get("cldr") != now["cldr"]:
-        what = f"CLDR {written.get('cldr') or '?'}, and this Postulo carries CLDR {now['cldr']}"
+    if written is None and not places.lookup_alone():
+        return []
+    if written is None:
+        said = (
+            f"{places.LOOKUP_FILE} holds no country names, and they cannot be written into "
+            "it: the country table is not beside it, or the lookup cannot be written."
+        )
+    elif written.get("cldr") != now["cldr"]:
+        said = (
+            f"The country names in {places.LOOKUP_FILE} were read from CLDR "
+            f"{written.get('cldr') or '?'}, and this Postulo carries CLDR {now['cldr']}."
+        )
     else:
-        what = "another list of languages than this Postulo has"
+        said = (
+            f"The country names in {places.LOOKUP_FILE} were read from another list of "
+            "languages than this Postulo has."
+        )
     return [
         Warning(
-            f"The country names in {places.LOOKUP_FILE} were read from {what}.",
+            said,
             hint="Run 'manage.py fetch_geonames' to build the lookup again.",
             id="postulo.W003",
         )
