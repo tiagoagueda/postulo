@@ -291,7 +291,8 @@ class Command(BaseCommand):
         if syncs_ran:
             self.stdout.write(f"{when} {syncs_ran} syncs ran, {syncs_failed} failed")
         if hooks_sent or hooks_failed:
-            self.stdout.write(f"{when} {hooks_sent} webhooks delivered, {hooks_failed} failed")
+            # Webhook deliveries, and the sends that failed at another notifier (#1163).
+            self.stdout.write(f"{when} {hooks_sent} queued sends delivered, {hooks_failed} failed")
         if streets_pinned or streets_missed:
             self.stdout.write(
                 f"{when} {streets_pinned} addresses pinned at their street, "

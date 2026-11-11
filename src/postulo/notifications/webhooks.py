@@ -10,11 +10,21 @@ caused the event, and a receiver down for an afternoon gets everything when it c
 (#229), so a retried errand or a second scheduler cannot make the same reminder arrive
 twice. A notification that claims no key is delivered every time it is announced, which is
 what claiming no key means.
+
+**Every other notifier's second chance waits here too (#1163).** A notifier that sends at
+once -- mail, a push, Apprise -- was called once, and a send that failed was lost while a
+webhook's was retried for ten hours. Its failed send is now a row in this same queue, already
+one attempt old: the same schedule, the same lease, the same pass, the same week of being
+kept, and the same end when its connection or its account goes. What a row holds is the
+notification as a webhook is sent it, which is all of it, so the retry hands the notifier
+the notification it was handed the first time. Which of the two a row is, is its
+connection's plugin: there is no second table and no second pass to reason about.
 """
 
 from __future__ import annotations
 
 import datetime as dt
+import json
 import logging
 import time
 
@@ -22,8 +32,10 @@ from django.db import models
 from django.utils import timezone
 from django.utils.translation import gettext as _
 
+from postulo.core import languages
+from postulo.core.preferences import as_person
 from postulo.plugins import webhook as plugin
-from postulo.plugins.api import DestinationRefused, Notification
+from postulo.plugins.api import ConnectionUnusable, DestinationRefused, Notification
 from postulo.plugins.policy import allows, refused_connections
 from postulo.plugins.secrets import SecretsUnreadable
 
@@ -68,21 +80,66 @@ def enqueue_for(user, url: str, notification: Notification) -> list[WebhookDeliv
 
 def enqueue(connection, notification: Notification) -> WebhookDelivery | None:
     """A delivery row for this connection, unless its key has one already."""
+    return _row(connection, notification, next_attempt_at=timezone.now())
+
+
+def retry_later(connection, notification: Notification, error: str) -> WebhookDelivery | None:
+    """A row for a send that has just failed at a notifier, unless its key has one (#1163).
+
+    The send that failed was the first attempt, and the row says so: it is where a webhook's
+    row is after its first failure, so the next attempt is `FIRST_RETRY` away and there are
+    as many left as a webhook would have.
+    """
+    now = timezone.now()
+    return _row(
+        connection,
+        notification,
+        status=DeliveryStatus.FAILED,
+        attempts=1,
+        last_attempt_at=now,
+        last_error=error[:500],
+        next_attempt_at=now + FIRST_RETRY,
+    )
+
+
+def _row(connection, notification: Notification, **state) -> WebhookDelivery | None:
     key = notification.key
     limit = WebhookDelivery._meta.get_field("key").max_length
     if len(key) > limit:
         # A later announcer must not be able to overflow the column, which PostgreSQL
         # enforces and SQLite does not (#413). Hashed whole, so it still names one thing.
         key = announcement_key(key[: limit - 50], key)
-    if key and WebhookDelivery.objects.filter(connection=connection, key=key).exists():
+    waiting = WebhookDelivery.objects.filter(owner_id=connection.owner_id, connection=connection)
+    if key and waiting.filter(key=key).exists():
         return None
     return WebhookDelivery.objects.create(
-        owner=connection.owner,
+        owner_id=connection.owner_id,
         connection=connection,
         event=notification.event,
         key=key,
         body=plugin.encode(plugin.payload_for(notification)),
-        next_attempt_at=timezone.now(),
+        **state,
+    )
+
+
+def notification_from(body: str) -> Notification:
+    """The notification a row was queued with, read back from the text it is kept as.
+
+    `payload_for` writes every field a `Notification` has, so this is the one a notifier was
+    handed the first time: the same words in the same language, and the same key, which is
+    what lets a notifier that keeps its own record tell this retry from a second event (#229).
+    """
+    payload = json.loads(body)
+    occurred_at = payload.get("occurred_at")
+    return Notification(
+        event=payload["event"],
+        title=payload["title"],
+        body=payload.get("body") or "",
+        url=payload.get("url") or "",
+        key=payload.get("key") or "",
+        language=payload.get("language") or "",
+        occurred_at=dt.datetime.fromisoformat(occurred_at) if occurred_at else None,
+        data=payload.get("data") or {},
     )
 
 
@@ -135,11 +192,26 @@ def deliver(row) -> bool:
         row.save()
         return False
 
+    def arrived(status: int | None = None) -> bool:
+        row.status = DeliveryStatus.SENT
+        row.last_status = status
+        row.last_error = ""
+        row.next_attempt_at = None
+        row.sent_at = now
+        # The text of a notification (the role, the company, a note, an offer's terms) has done
+        # its job once the receiver has it, and is not kept for the row's whole life (#752).
+        row.body = ""
+        row.save()
+        connection.record_test(True)
+        return True
+
     if connection is not None and not allows(connection):
         # Waits, and spends nothing: reversing the decision resumes it (#362).
         return False
     if connection is None or not connection.enabled:
         return fail(str(_("The connection is gone or switched off.")), final=connection is None)
+    if connection.plugin != plugin.WebhookNotifier.name:
+        return _send_again(row, connection, fail, arrived)
     url = (connection.config.get("url") or "").strip()
     try:
         secret = connection.secrets.get("secret") or ""
@@ -168,17 +240,7 @@ def deliver(row) -> bool:
 
     status = response.status_code
     if 200 <= status < 300:
-        row.status = DeliveryStatus.SENT
-        row.last_status = status
-        row.last_error = ""
-        row.next_attempt_at = None
-        row.sent_at = now
-        # The text of a notification (the role, the company, a note, an offer's terms) has done
-        # its job once the receiver has it, and is not kept for the row's whole life (#752).
-        row.body = ""
-        row.save()
-        connection.record_test(True)
-        return True
+        return arrived(status)
     moved = plugin.redirect_message(response)
     if moved:
         connection.record_test(False, moved)
@@ -191,6 +253,55 @@ def deliver(row) -> bool:
     # A client error will not fix itself by being retried; 408 and 429 are the two that
     # mean *later*, and are treated as the transient failures they are.
     return fail(answered, final=400 <= status < 500 and status not in (408, 429))
+
+
+def _send_again(row, connection, fail, arrived) -> bool:
+    """One more attempt at a send that failed at its notifier (#1163).
+
+    What `notifications.service` does for a first send, for one connection: the notifier is
+    handed the notification it was handed then, in the language its words are in and the
+    recipient's time zone. The outcome is written where the first one was, on the connection,
+    and on the row, which is what decides whether there is another attempt.
+    """
+    notifier = connection.plugin_instance
+    if notifier is None:
+        # Not a verdict: a plugin missing during an upgrade is back before the attempts end.
+        return fail(
+            str(_("The %(plugin)s plugin is not installed.") % {"plugin": connection.plugin})
+        )
+    try:
+        notification = notification_from(row.body)
+    except (ValueError, KeyError, TypeError) as unreadable:
+        # An event this version no longer has, or a row that is not one: no retry reads it.
+        return fail(f"{type(unreadable).__name__}: {unreadable}", final=True)
+    owner = row.owner
+    try:
+        # The recipient's time zone, and the language the words are already in: theirs, as
+        # `notify` stamped it, and theirs again for a row that somehow names none.
+        with as_person(owner), languages.override(notification.language):
+            notifier.send(notification, connection.full_config, owner)
+    except ConnectionUnusable as dead:
+        # The other side has ended the connection since the first send: switched off with
+        # the reason, as a first send does, and this row is not what brings it back (#216).
+        logger.warning(
+            "Notifier %r says connection %s is finished: %s", connection.plugin, connection.pk, dead
+        )
+        connection.retire(str(dead), keep_secrets=dead.keep_secrets)
+        return fail(str(dead), final=True)
+    except SecretsUnreadable as unreadable:
+        # No retry can read them either, as for a webhook's secret (#573).
+        connection.record_test(False, str(unreadable))
+        return fail(str(unreadable), final=True)
+    except Exception as error:
+        logger.info(
+            "Notifier %r failed again for connection %s: %s",
+            connection.plugin,
+            connection.pk,
+            error,
+        )
+        connection.record_test(False, f"{type(error).__name__}: {error}")
+        return fail(f"{type(error).__name__}: {error}")
+    return arrived()
 
 
 #: How long a delivered or given-up row is kept, for the connection's page to say what
@@ -217,6 +328,10 @@ def send_pending(*, limit: int = BATCH, budget: float = BUDGET) -> tuple[int, in
     TOTAL, so a pass spends at most the budget and one delivery more here, however many
     receivers answer slowly; before this, fifty slow receivers could hold every account's
     reminders for the whole of fifty deadlines. A delivery already started is never cut off.
+
+    The sends that failed at another notifier are in the same list, each claimed the same
+    way (#1163). One of those is held to its notifier's own deadline rather than to TOTAL,
+    so the "one delivery more" is then that notifier's longest send.
     """
     started = time.monotonic()
     sent = failed = 0

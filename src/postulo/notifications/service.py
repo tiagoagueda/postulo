@@ -7,6 +7,7 @@ import zoneinfo
 from collections.abc import Callable
 
 from django.conf import settings
+from django.db import transaction
 from django.utils import timezone
 
 from postulo.core import languages
@@ -15,6 +16,7 @@ from postulo.plugins.base import ConnectionUnusable
 from postulo.plugins.models import Connection
 from postulo.plugins.policy import allows
 
+from . import webhooks
 from .base import Notification, wants
 
 logger = logging.getLogger(__name__)
@@ -44,8 +46,9 @@ def notify(user, notification: Notification | Callable[[], Notification]) -> int
 
     A notifier sends one message and either it goes or it does not, and the connection
     remembers which. A failing notifier never fails the caller — a capture is still
-    captured, a reminder still due — it is logged and shown on the connection instead.
-    Returns how many connections took the message.
+    captured, a reminder still due — it is logged and shown on the connection instead,
+    and the scheduler tries that connection again later, as it does a webhook (#1163).
+    Returns how many connections took the message now.
 
     One notifier does not send at all: the webhook queues a row and the scheduler
     delivers it. It says so with ``delivers_later``, and then taking the message leaves
@@ -108,6 +111,7 @@ def _deliver(user, notification: Notification) -> int:
                 "Notifier %r failed for connection %s", connection.plugin, connection.pk
             )
             connection.record_test(False, f"{type(error).__name__}: {error}")
+            _retry_later(connection, plugin, notification, error)
             continue
         # A notifier that only queued has delivered nothing yet. Calling the connection
         # working here wiped whatever the delivery pass had written on it, so a receiver
@@ -116,3 +120,30 @@ def _deliver(user, notification: Notification) -> int:
             connection.record_test(True)
         delivered += 1
     return delivered
+
+
+def _retry_later(connection, plugin, notification: Notification, error: Exception) -> None:
+    """Leave a send that has just failed for the scheduler to try again (#1163).
+
+    It was lost: `send` was called once, and a reminder announced in the minute the mail
+    server or a push service could not be reached never arrived, because whoever announced
+    it had already stamped it as announced. The failed send now waits where a webhook's
+    deliveries wait, and the pass that delivers those tries it again on the same schedule.
+
+    A notifier that only queues is left alone: what delivers for it retries already, and a
+    row here would be a second delivery. And queueing is a courtesy that must not cost the
+    caller what the failure itself did not, so a notification that cannot be kept is logged
+    and lost as it always was.
+    """
+    if getattr(plugin, "delivers_later", False):
+        return
+    try:
+        # A savepoint, so a row the database refuses leaves the caller's transaction usable.
+        with transaction.atomic():
+            webhooks.retry_later(connection, notification, f"{type(error).__name__}: {error}")
+    except Exception:
+        logger.exception(
+            "Could not queue a retry for notifier %r on connection %s",
+            connection.plugin,
+            connection.pk,
+        )

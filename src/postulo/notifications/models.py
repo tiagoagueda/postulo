@@ -55,6 +55,12 @@ class WebhookDelivery(OwnedModel):
     the first attempt signed and a receiver that logs signatures can match them. The key is
     the notification's stable one (#229): a retried announcement finds its row and makes no
     second one.
+
+    Since #1163 it is also where a send that failed at any other notifier waits to be tried
+    again, on the same schedule and under the same rules. Such a row begins one attempt old,
+    and its body, the same text, is read back into the notification the notifier is handed
+    again. The name is the first tenant's: which of the two a row is, is its connection's
+    plugin.
     """
 
     connection = models.ForeignKey(

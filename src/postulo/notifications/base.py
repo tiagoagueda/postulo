@@ -137,6 +137,13 @@ class NotifierPlugin(ConnectedPlugin, Protocol):
     ``config`` is the connection's configuration and secrets together; ``user`` is the
     person the message is for, so a notifier can fall back to their address or name.
 
+    A ``send`` that raises is called again later, by the scheduler, with the same
+    notification and so the same ``key``: five minutes on, then doubling, as often as a
+    webhook delivery is tried (#1163). So raise for a failure that may pass, raise
+    `ConnectionUnusable` for one that will not (the connection is switched off and nothing
+    is retried), and know that a ``send`` which reached some of several destinations before
+    raising will reach those again; ``key`` is how to tell.
+
     Two things a notifier may also say about itself. Both are read by name and neither
     is part of this protocol, so a notifier that says neither is still one:
 
