@@ -48,6 +48,7 @@ import struct
 import sys
 import tokenize
 import tomllib
+from collections.abc import Callable
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from html.parser import HTMLParser
@@ -958,23 +959,27 @@ def compile_catalogue(catalogue: Catalogue, code: str | None = None) -> bytes:
         entries.append((key.encode(), value.encode()))
     entries.sort(key=lambda pair: pair[0])
 
+    # The header, a table of (length, offset) for the ids and one for the strings, then the
+    # ids and the strings. Both tables are one list of numbers packed once: appending each
+    # pair to the bytes copied everything written so far, twice for every entry (#1145).
     count = len(entries)
     header_size = 7 * 4
-    ids_offset = header_size + 2 * count * 8
-    ids_blob = b"".join(k + b"\0" for k, _ in entries)
-    strs_offset = ids_offset + len(ids_blob)
-    out = struct.pack("<7I", 0x950412DE, 0, count, header_size, header_size + count * 8, 0, 0)
-    position = ids_offset
+    table: list[int] = []
+    position = header_size + 2 * count * 8
     for k, _ in entries:
-        out += struct.pack("<2I", len(k), position)
+        table += (len(k), position)
         position += len(k) + 1
-    position = strs_offset
     for _, v in entries:
-        out += struct.pack("<2I", len(v), position)
+        table += (len(v), position)
         position += len(v) + 1
-    out += ids_blob
-    out += b"".join(v + b"\0" for _, v in entries)
-    return out
+    return b"".join(
+        (
+            struct.pack("<7I", 0x950412DE, 0, count, header_size, header_size + count * 8, 0, 0),
+            struct.pack(f"<{len(table)}I", *table),
+            *(k + b"\0" for k, _ in entries),
+            *(v + b"\0" for _, v in entries),
+        )
+    )
 
 
 def cmd_compile() -> int:
@@ -983,20 +988,40 @@ def cmd_compile() -> int:
     A plugin that ships inside the image is compiled here rather than by a build step of
     its own: *Writing a plugin* tells a third party to ship its `.mo` files, and a built-in
     has no separate release to ship them in (#127).
+
+    **A catalogue is parsed once** (#1145). The status report counts a language across
+    every set, and used to read and parse every catalogue again to do it; now it asks for
+    each one here, where it is compiled and handed over. That makes the order a language
+    at a time, so one language's catalogues are held and not all of them: Postulo's
+    2,352, parsed and kept, are 450 MB.
     """
+    sets = catalogue_sets()
+    waiting = dict.fromkeys(
+        path for subject in sets for path in sorted(subject.locale.glob("*/LC_MESSAGES/django.po"))
+    )
     written = 0
-    for subject in catalogue_sets():
-        for path in sorted(subject.locale.glob("*/LC_MESSAGES/django.po")):
-            catalogue = parse(path.read_text(encoding="utf-8"))
-            path.with_suffix(".mo").write_bytes(compile_catalogue(catalogue))
-            written += 1
+
+    def compiled(path: Path) -> Catalogue | None:
+        """Write the .mo of a catalogue still waiting, and hand back what was parsed."""
+        nonlocal written
+        if path not in waiting:
+            return None
+        del waiting[path]
+        catalogue = parse(path.read_text(encoding="utf-8"))
+        path.with_suffix(".mo").write_bytes(compile_catalogue(catalogue))
+        written += 1
+        return catalogue
+
+    report = build_report(sets, compiled) if project().is_postulo else None
+    for path in list(waiting):
+        compiled(path)  # a plugin's, and any directory that is not a language offered
     print(f"{written} catalogues compiled.")
-    if project().is_postulo:
+    if report is not None:
         # Built with the .mo files rather than committed: every translation saved in
         # Weblate changes it, and a committed copy made every one of Weblate's pull
         # requests stale the moment it was opened (#349).
         status = project().locale / "status.json"
-        status.write_text(_status_text(build_report()), encoding="utf-8", newline="\n")
+        status.write_text(_status_text(report), encoding="utf-8", newline="\n")
         print(f"written {status.relative_to(project().root)}")
     return 0
 
@@ -1371,22 +1396,35 @@ def _status_text(report: dict[str, dict[str, int]]) -> str:
     return json.dumps(report, indent=2, ensure_ascii=False) + "\n"
 
 
-def build_report() -> dict[str, dict[str, int]]:
+def _catalogue_at(path: Path) -> Catalogue | None:
+    return parse(path.read_text(encoding="utf-8")) if path.exists() else None
+
+
+def build_report(
+    sets: list[CatalogueSet] | None = None,
+    read: Callable[[Path], Catalogue | None] | None = None,
+) -> dict[str, dict[str, int]]:
     """How far along each language is, counting every set.
 
     Summed rather than reported per set, because the figure is shown to somebody choosing
     a language and "português is complete" has to mean the interface they will see, not
     the part of it that happens to live in core (#127).
+
+    ``read`` gives the catalogue at a path, or None where there is none. Left out, each is
+    read from the disk, which is what ``stats`` wants; ``compile`` passes its own, which
+    hands over what it has just parsed (#1145). It is asked a language at a time, for each
+    set in turn.
     """
     report: dict[str, dict[str, int]] = {}
     # Found once: each call walks the source tree, and inside the loop that was once per
     # language, 68 walks for one answer (#724).
-    subjects = catalogue_sets()
+    subjects = catalogue_sets() if sets is None else sets
+    read = read or _catalogue_at
     for code in translated_languages():
         found = [
-            parse(po_path(code, subject).read_text(encoding="utf-8"))
+            catalogue
             for subject in subjects
-            if po_path(code, subject).exists()
+            if (catalogue := read(po_path(code, subject))) is not None
         ]
         if not found:
             continue

@@ -2,7 +2,9 @@
 
 import gettext
 import io
+import json
 import os
+import struct
 from pathlib import Path
 
 import pytest
@@ -299,6 +301,7 @@ def test_a_plugin_gets_every_slot_postulo_has_and_the_same_four_commands(tool, p
     assert len(list(locale.glob("*/LC_MESSAGES/django.mo"))) == 84
     out = capsys.readouterr().out
     assert "84 catalogues compiled" in out
+    assert not (locale / "status.json").exists(), "the status report is Postulo's alone"
 
 
 def test_the_tool_refuses_a_directory_that_is_not_a_project(tool, tmp_path):
@@ -753,3 +756,127 @@ def test_an_extract_that_changes_nothing_writes_nothing(tool, plugin_repo, capsy
     assert portuguese.exists()
     moved = [path for path in catalogues if path.stat().st_mtime_ns != stamps[path]]
     assert moved == [french], "only the one that differed, and the one that was missing"
+
+
+# --------------------------------------- a compile reads each catalogue once (#1145)
+
+
+def _catalogue(tool, subject, sets, code, forms=None, drafts=()):
+    """One language's catalogue in a temporary project: the slots ``extract`` writes for it,
+    and the translations Weblate would have saved in them."""
+    catalogue = tool.merge(tool.extract_all(subject, sets), None, code)
+    for msgid, form in (forms or {}).items():
+        message = catalogue.messages[(None, msgid)]
+        message.msgstr = [form]
+        message.flags = ["fuzzy"] if msgid in drafts else []
+    path = tool.po_path(code, subject)
+    path.parent.mkdir(parents=True)
+    path.write_text(tool.dump(catalogue, code, subject), encoding="utf-8", newline="\n")
+
+
+@pytest.fixture
+def small_postulo(tmp_path, tool):
+    """A project that calls itself Postulo, which is the one a compile writes the status
+    report for. Two strings of its own and a nested set that repeats one and adds one;
+    French in both sets with something to count, Portuguese in its own set alone, and no
+    other language: a compile costs what its catalogues cost, and three show what 2,352 do."""
+    _write(tmp_path / "pyproject.toml", '[project]\nname = "postulo"\nversion = "0.6.0"\n')
+    package = tmp_path / "src" / "postulo"
+    _write(package / "__init__.py", _says("Hello, world") + 'OTHER = _("Goodbye")\n')
+    inner = package / "plugins" / "inner"
+    _write(inner / "__init__.py", _says("Hello, world") + 'OTHER = _("Inner hello")\n')
+    (inner / "locale").mkdir()
+    tool.use(tmp_path)
+    sets = tool.catalogue_sets()
+    own, nested = sets
+    draft = {"Hello, world": "Bonjour, le monde"}
+    _catalogue(tool, own, sets, "fr-FR", draft, drafts=draft)
+    _catalogue(tool, nested, sets, "fr-FR", {"Hello, world": "Salut", "Inner hello": "Bonjour"})
+    _catalogue(tool, own, sets, "pt-PT")
+    yield tmp_path
+    tool.use(REPO)
+
+
+def test_a_compile_parses_each_catalogue_once(tool, small_postulo, monkeypatch, capsys):
+    """``compile`` parsed every catalogue to write its .mo file, and the status report then
+    read and parsed every one of them again: 2,352 catalogues twice, about ten of a
+    compile's 27 seconds (#1145). The report is handed what the compile parsed."""
+    package = small_postulo / "src" / "postulo"
+    french = package / "locale" / "fr_FR" / "LC_MESSAGES" / "django.po"
+    _write(package / "locale" / "xx" / "LC_MESSAGES" / "django.po", french.read_text("utf-8"))
+    catalogues = sorted(package.rglob("django.po"))
+    assert len(catalogues) == 4, "the fixture's three, and one in a directory that is no language"
+
+    parsed = []
+    parse = tool.parse
+    with monkeypatch.context() as patched:
+        patched.setattr(tool, "parse", lambda text: parsed.append(1) or parse(text))
+        assert tool.cmd_compile() == 0
+
+    assert len(parsed) == 4, "each one once"
+    assert "4 catalogues compiled." in capsys.readouterr().out
+    for path in catalogues:
+        catalogue = tool.parse(path.read_text(encoding="utf-8"))
+        assert path.with_suffix(".mo").read_bytes() == tool.compile_catalogue(catalogue), path
+    report = json.loads((package / "locale" / "status.json").read_text(encoding="utf-8"))
+    assert report == tool.build_report(), "and the report is the one reading them again gives"
+    assert report == {
+        # Postulo's own draft of the string both sets hold, not the nested set's reviewed one.
+        "fr-FR": {"total": 3, "translated": 2, "drafts": 1, "reviewed": 1, "percent": 67},
+        "pt-PT": {"total": 2, "translated": 0, "drafts": 0, "reviewed": 0, "percent": 0},
+    }, "a row for each language that has a catalogue, counted across the sets that have it"
+
+
+def test_the_tables_of_a_compiled_file_are_packed_once(tool, monkeypatch):
+    """Each (length, offset) pair of a .mo file's two tables was packed on its own and added
+    to the bytes written so far, which copied all of them every time: 9,684 times for a
+    full core catalogue (#1145). The tables are packed in one go, and the file is laid out
+    as it was: the header, the two tables, the ids, the strings."""
+
+    def catalogue(size):
+        messages = [
+            tool.Message(msgid=f"String {n}", msgstr=[f"Chaîne {n}"]) for n in range(size)
+        ] + [
+            tool.Message(msgid="May", context="ctx", msgstr=["mai"]),
+            tool.Message(
+                msgid="%(n)s day", plural="%(n)s days", msgstr=["%(n)s jour", "%(n)s jours"]
+            ),
+            tool.Message(msgid="Empty", msgstr=[""]),
+        ]
+        header = {
+            "Content-Type": "text/plain; charset=UTF-8",
+            "Plural-Forms": "nplurals=2; plural=(n > 1);",
+        }
+        return tool.Catalogue(header=header, messages={m.key: m for m in messages})
+
+    packs = []
+    pack = struct.pack
+    with monkeypatch.context() as patched:
+        patched.setattr(struct, "pack", lambda *args: packs.append(args[0]) or pack(*args))
+        tool.compile_catalogue(catalogue(3), "fr-FR")
+        few = len(packs)
+        data = tool.compile_catalogue(catalogue(300), "fr-FR")
+    assert len(packs) == 2 * few, "as many packs for three hundred entries as for three"
+
+    magic, revision, count, ids_table, strings_table, hash_size, hash_offset = struct.unpack_from(
+        "<7I", data
+    )
+    assert (magic, revision, hash_size, hash_offset) == (0x950412DE, 0, 0, 0)
+    assert count == 300 + 2 + 1, "every translated entry, and the header"
+    assert (ids_table, strings_table) == (28, 28 + 8 * count)
+    position = 28 + 16 * count
+    read = []
+    for table in (ids_table, strings_table):
+        for index in range(count):
+            length, offset = struct.unpack_from("<2I", data, table + 8 * index)
+            assert offset == position, "each follows the last, with nothing between"
+            assert data[offset + length] == 0
+            read.append(data[offset : offset + length])
+            position += length + 1
+    assert position == len(data)
+    ids, strings = read[:count], read[count:]
+    assert ids == sorted(ids) and ids[0] == b""
+    assert strings[ids.index(b"ctx\x04May")] == b"mai"
+    assert strings[ids.index(b"%(n)s day\x00%(n)s days")] == b"%(n)s jour\x00%(n)s jours"
+    assert strings[ids.index(b"String 7")] == "Chaîne 7".encode()
+    assert gettext.GNUTranslations(io.BytesIO(data)).gettext("String 299") == "Chaîne 299"
