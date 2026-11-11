@@ -31,7 +31,17 @@ from postulo.core.redirects import safe_next
 from postulo.jobs.views import UserFormKwargsMixin
 from postulo.resume import ordering, translating
 
-from . import comparing, formats, kinds, paper_choice, printing, proofs, rendering, themes
+from . import (
+    comparing,
+    formats,
+    kinds,
+    paper_choice,
+    printing,
+    proofs,
+    rendering,
+    structured,
+    themes,
+)
 from . import paper as papers
 from . import pdf as renderers
 from .forms import (
@@ -108,18 +118,29 @@ def chosen_paper(request: HttpRequest) -> str:
     return str(data.get("paper", ""))[: papers.MAX_KEY_LENGTH]
 
 
-def written_file(request: HttpRequest, document, outline, key: str):
+def written_file(request: HttpRequest, document, outline, key: str, data=None):
     """A document in one of the registry's formats, handed over, or a sentence about why not.
 
     The one place a CV and a letter are written out: the record is already the person's, the
     format is looked up, and a format that fails -- it may be a plugin's -- is a message on
     the document's own page rather than a traceback about it (#236).
+
+    ``data`` is what a format that carries a CV's structure is handed instead of the outline
+    (#1100): a function that builds it, asked only for such a format. Without it, that format
+    is not there for this document, as it is not for a letter.
     """
-    chosen = formats.get_for(request.user, key)
+    chosen = formats.get_for(request.user, key, letter=data is None)
     if chosen is None:
         raise Http404("No such format.")
+    name = outline.name
     try:
-        content = chosen.write(outline)
+        if chosen.takes == formats.DATA:
+            content = chosen.write(data())
+            # Two of these are `.json`; the format's name keeps one download from taking
+            # the other's file name.
+            name = f"{outline.name} ({chosen.label})"
+        else:
+            content = chosen.write(outline)
     except Exception:
         logger.exception(
             "Format %r could not write %s %s", chosen.key, type(document).__name__, document.pk
@@ -132,7 +153,7 @@ def written_file(request: HttpRequest, document, outline, key: str):
     return handed_over(
         content,
         content_type=chosen.content_type,
-        name=f"{outline.name}.{chosen.extension}",
+        name=f"{name}.{chosen.extension}",
     )
 
 
@@ -251,6 +272,15 @@ class CVDetailView(OwnedObjectMixin, DetailView):
         # What it can leave as beside the PDF: the registry's list, so a format a plugin
         # brings is on the page without the page being edited (#236).
         context["formats"] = formats.offered_to(self.request.user)
+        # And, beside a format that carries the CV's structure, what of this CV it has no
+        # place for: said before the download, not found missing after it (#1100). The CV is
+        # read as values once, and only where such a format is offered.
+        structural = [one for one in context["formats"] if one.takes == formats.DATA]
+        data = structured.cv_data(self.object) if structural else None
+        context["format_rows"] = [
+            (one, structured.left_out(one, data) if one.takes == formats.DATA else [])
+            for one in context["formats"]
+        ]
         # What the file will say about itself, before anybody exports it (#480).
         context["properties_form"] = FilePropertiesForm(
             initial=rendering.file_defaults(self.object)
@@ -549,12 +579,14 @@ class CVDownloadView(OwnedObjectMixin, View):
         if chosen is None:
             raise Http404("No such format.")
         # A format may be a plugin's, and its failing is not a reason to show somebody a
-        # traceback about their own CV: `written_file` says it in a sentence.
+        # traceback about their own CV: `written_file` says it in a sentence. One that
+        # carries the CV's structure is handed the CV as values (#1100).
         return written_file(
             request,
             cv,
             rendering.cv_outline(cv, chosen_properties(request), chosen_paper(request)),
             format,
+            data=lambda: structured.cv_data(cv),
         )
 
     #: The page's form posts what it chose (#480).
@@ -606,8 +638,9 @@ class CoverLetterDetailView(OwnedObjectMixin, DetailView):
             .select_related("posting", "posting__company")
             .order_by("-created_at")[:50]
         )
-        # What the file will say about itself, and the formats it can leave as (#480).
-        context["formats"] = formats.offered_to(self.request.user)
+        # What the file will say about itself, and the formats it can leave as (#480): none
+        # that carries a CV's entries, which a letter has none of (#1100).
+        context["formats"] = formats.offered_to(self.request.user, letter=True)
         context["properties_form"] = FilePropertiesForm(
             initial=rendering.file_defaults(self.object)
         )
@@ -739,7 +772,7 @@ class CoverLetterDownloadView(OwnedObjectMixin, View):
 
     def get(self, request: HttpRequest, pk: int, format: str) -> HttpResponse:
         letter = get_object_or_404(self.get_queryset(), pk=pk)
-        if formats.get_for(request.user, format) is None:
+        if formats.get_for(request.user, format, letter=True) is None:
             raise Http404("No such format.")
         outline = rendering.letter_outline(
             letter, chosen_application(request), chosen_properties(request), chosen_paper(request)

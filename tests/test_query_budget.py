@@ -268,6 +268,9 @@ def test_a_cv_costs_the_same_at_seven_entries_and_sixty_three(client, user, lang
         "preview": (reverse("documents:cv_preview", args=[cv.pk]), {}),
         "text": (reverse("documents:cv_text", args=[cv.pk]), {}),
         "docx": (reverse("documents:cv_download", args=[cv.pk, "docx"]), {}),
+        # And the two that carry its structure, which read it as values (#1100).
+        "europass": (reverse("documents:cv_download", args=[cv.pk, "europass"]), {}),
+        "json-resume": (reverse("documents:cv_download", args=[cv.pk, "json-resume"]), {}),
         "api": (f"/api/v1/cvs/{cv.pk}", headers),
     }
 

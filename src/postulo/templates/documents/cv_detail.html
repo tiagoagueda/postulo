@@ -253,14 +253,24 @@
           </p>
           <c-file-properties :form="properties_form" />
         </form>
-        {% if formats %}
+        {% comment %} A format that carries the CV's entries rather than its words -- Europass,
+           JSON Resume -- says under its row what of this CV it has no place for, before the
+           download rather than after it (#1100). Two of them are `.json`, so each button is
+           described by its row's name as well as its extension. {% endcomment %}
+        {% if format_rows %}
           <ul class="mt-3 space-y-2 text-sm">
-            {% for format in formats %}
+            {% for format, left_out in format_rows %}
               <li class="flex flex-wrap items-center gap-2">
-                <span class="min-w-0 grow basis-40">{{ format.label }}</span>
+                <span class="min-w-0 grow basis-40" id="format-{{ format.key }}">{{ format.label }}</span>
                 <button type="submit" class="btn" data-variant="outline" data-size="sm"
                         form="file-properties"
+                        aria-describedby="format-{{ format.key }}{% if left_out %} format-{{ format.key }}-left-out{% endif %}"
                         formaction="{% url 'documents:cv_download' cv.pk format.key %}">{% blocktranslate trimmed with extension=format.extension %}Download .{{ extension }}{% endblocktranslate %}</button>
+                {% if left_out %}
+                  <p class="w-full text-xs text-ink-500 dark:text-ink-400" id="format-{{ format.key }}-left-out" data-left-out-of="{{ format.key }}">
+                    {% translate "Left out, because this format has no place for them:" %} {{ left_out|join:", " }}
+                  </p>
+                {% endif %}
               </li>
             {% endfor %}
           </ul>

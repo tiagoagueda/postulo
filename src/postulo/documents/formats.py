@@ -95,6 +95,10 @@ def write_text(outline: Outline) -> bytes:
 
 # ------------------------------------------------------------------ the registry
 
+#: What a format is handed: the words, or the CV as values (#1100).
+OUTLINE = "outline"
+DATA = "data"
+
 
 @dataclass(frozen=True)
 class Format:
@@ -116,6 +120,14 @@ class Format:
     #: The module whose switch decides whether this is offered (#877): ``format-docx`` for Word.
     #: Empty for plain text and for a plugin's format, which no module governs.
     module: str = ""
+    #: What `write` is handed (#1100). ``OUTLINE``, the document's words, for every format that
+    #: sets a document out; ``DATA``, a CV's entries and details as values
+    #: (`structured.CVData`), for a format that carries a CV's structure -- Europass, JSON
+    #: Resume. A format handed data is offered for a CV and never for a letter.
+    takes: str = OUTLINE
+    #: For a format handed data: what of a CV it has no place for, as the keys
+    #: `structured.LEFT_OUT` words, so that the page can say so beside the download.
+    leaves_out: Callable | None = None
 
 
 #: Every format, in the order a page should offer them.
@@ -156,17 +168,29 @@ def all_formats() -> list[Format]:
     return list(REGISTRY.values())
 
 
-def offered_to(user) -> list[Format]:
-    """What a page offers this person: every format whose module is on for them (#877)."""
+def offered_to(user, *, letter: bool = False) -> list[Format]:
+    """What a page offers this person: every format whose module is on for them (#877).
+
+    ``letter`` for a letter's page, which is not offered a format that carries a CV's
+    structure: a letter has no entries to carry (#1100).
+    """
     from postulo.core import modules
 
-    return [one for one in REGISTRY.values() if not one.module or modules.is_on(user, one.module)]
+    return [
+        one
+        for one in REGISTRY.values()
+        if (not one.module or modules.is_on(user, one.module))
+        and not (letter and one.takes == DATA)
+    ]
 
 
-def get_for(user, key: str) -> Format | None:
-    """The format, unless its module is off for this person -- then it is not there (#877)."""
+def get_for(user, key: str, *, letter: bool = False) -> Format | None:
+    """The format, unless its module is off for this person -- then it is not there (#877).
+
+    Nor for a letter is a format that carries a CV's structure (#1100).
+    """
     found = REGISTRY.get(key)
-    if found is None:
+    if found is None or (letter and found.takes == DATA):
         return None
     from postulo.core import modules
 
@@ -182,7 +206,9 @@ def register_the_ones_postulo_has() -> None:
     `kinds.register_the_ones_postulo_has` gives: a registry filled at import time is empty
     in whichever test imported the module first.
     """
-    from . import docx, odt
+    from postulo.plugins.europass import writer as europass
+
+    from . import docx, jsonresume, odt
 
     described = (
         Format(
@@ -209,6 +235,29 @@ def register_the_ones_postulo_has() -> None:
             write=docx.write,
             has_properties=True,
             module="format-docx",
+        ),
+        # The two that carry a CV's structure rather than its words, for a portal or a tool
+        # that reads the entries (#1100). Europass is written by the plugin that reads it, so
+        # the two halves share one mapping; JSON Resume is Postulo's own.
+        Format(
+            key="europass",
+            label=_("Europass"),
+            extension="json",
+            content_type=europass.CONTENT_TYPE,
+            write=europass.write,
+            module="format-europass",
+            takes=DATA,
+            leaves_out=europass.leaves_out,
+        ),
+        Format(
+            key="json-resume",
+            label=_("JSON Resume"),
+            extension="json",
+            content_type=jsonresume.CONTENT_TYPE,
+            write=jsonresume.write,
+            module="format-json-resume",
+            takes=DATA,
+            leaves_out=jsonresume.leaves_out,
         ),
     )
     for one in described:
