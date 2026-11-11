@@ -42,6 +42,7 @@ import functools
 import gettext
 import io
 import json
+import os
 import re
 import struct
 import sys
@@ -204,10 +205,6 @@ class CatalogueSet:
         return self.root == project().package
 
 
-def _within(path: Path, directory: Path) -> bool:
-    return path == directory or directory in path.parents
-
-
 def catalogue_sets() -> list[CatalogueSet]:
     """Postulo's own catalogues first, then every package carrying its own.
 
@@ -221,20 +218,27 @@ def catalogue_sets() -> list[CatalogueSet]:
     overriding the last -- so the first path wins a msgid two catalogues both define. Core
     winning is the safe direction: a plugin cannot quietly change a word in Postulo's own
     interface by translating the same English string differently.
+
+    **Each call walks the package, so a command makes one and passes the list on** (#1169).
+    The walk leaves `SKIP_DIRS` alone rather than entering them and discarding what it
+    found: the ``locale/`` trees are nineteen directories in twenty of the package, and
+    ``extract --check`` used to walk all of them once for the sets and once more per set.
     """
-    sets = [CatalogueSet(project().name, project().package, project().locale)]
-    for locale in sorted(project().package.rglob("locale")):
-        if locale == project().locale or not locale.is_dir():
-            continue
-        if SKIP_DIRS & set(locale.relative_to(project().package).parts[:-1]):
-            continue
-        root = locale.parent
-        sets.append(CatalogueSet(root.relative_to(project().package).as_posix(), root, locale))
-    return sets
+    package = project().package
+    found = []
+    for where, directories, _files in os.walk(package):
+        if "locale" in directories and Path(where) != package:
+            found.append(Path(where) / "locale")
+        directories[:] = [name for name in directories if name not in SKIP_DIRS]
+    return [core_set()] + [
+        CatalogueSet(locale.parent.relative_to(package).as_posix(), locale.parent, locale)
+        for locale in sorted(found)
+    ]
 
 
 def core_set() -> CatalogueSet:
-    return catalogue_sets()[0]
+    """The project's own set, which is the first of `catalogue_sets` and needs no walk."""
+    return CatalogueSet(project().name, project().package, project().locale)
 
 
 PLACEHOLDER = re.compile(r"%\((\w+)\)[sdifr]|%[sdifr%]|\{(\w*)\}")
@@ -382,28 +386,37 @@ def extract_template(source: str, origin: str) -> list[Message]:
     return extract_python(flattened, origin)
 
 
-def sources(subject: CatalogueSet | None = None) -> list[Path]:
+def sources(
+    subject: CatalogueSet | None = None, sets: list[CatalogueSet] | None = None
+) -> list[Path]:
     """Every file whose strings belong to ``subject``, defaulting to Postulo's own.
 
     A file inside a nested set belongs to that one, not to this: core claims the whole
-    package *except* the packages that carry their own catalogues.
+    package *except* the packages that carry their own catalogues. ``sets`` is every set
+    of the project, for a caller that has already found them; the walk enters neither
+    `SKIP_DIRS` nor another set (#1169).
     """
     subject = subject or core_set()
-    nested = [s.root for s in catalogue_sets() if s.root != subject.root]
+    sets = catalogue_sets() if sets is None else sets
+    nested = {other.root for other in sets if other.root != subject.root}
     files = []
-    for path in sorted(subject.root.rglob("*")):
-        if not path.is_file() or path.suffix not in (".py", ".html", ".txt"):
-            continue
-        if SKIP_DIRS & set(path.relative_to(subject.root).parts[:-1]):
-            continue
-        if any(_within(path, other) for other in nested if _within(other, subject.root)):
-            continue
-        files.append(path)
-    return files
+    for where, directories, names in os.walk(subject.root):
+        here = Path(where)
+        directories[:] = [
+            name for name in directories if name not in SKIP_DIRS and here / name not in nested
+        ]
+        for name in names:
+            path = here / name
+            if path.suffix in (".py", ".html", ".txt") and path.is_file():
+                files.append(path)
+    return sorted(files)
 
 
-def extract_all(subject: CatalogueSet | None = None) -> dict[tuple[str | None, str], Message]:
-    """Every message in one set's source, merged by (context, msgid)."""
+def extract_all(
+    subject: CatalogueSet | None = None, sets: list[CatalogueSet] | None = None
+) -> dict[tuple[str | None, str], Message]:
+    """Every message in one set's source, merged by (context, msgid). ``sets`` is passed on
+    to `sources`."""
     import django
     from django.conf import settings
 
@@ -412,7 +425,7 @@ def extract_all(subject: CatalogueSet | None = None) -> dict[tuple[str | None, s
         django.setup()
 
     merged: dict[tuple[str | None, str], Message] = {}
-    for path in sources(subject):
+    for path in sources(subject, sets):
         origin = path.relative_to(project().root).as_posix()
         text = path.read_text(encoding="utf-8")
         found = (
@@ -876,30 +889,40 @@ def cmd_extract(check: bool) -> int:
     party and a regression for a plugin Postulo ships (#127).
     """
     stale: list[str] = []
-    written: list[str] = []
-    for subject in catalogue_sets():
-        extracted = extract_all(subject)
+    counted: list[str] = []
+    written = unchanged = 0
+    # Found once and passed down: `sources` used to find them again for every set (#1169).
+    sets = catalogue_sets()
+    for subject in sets:
+        extracted = extract_all(subject, sets)
         for code in translated_languages():
             path = po_path(code, subject)
-            existing = parse(path.read_text(encoding="utf-8")) if path.exists() else None
+            current = path.read_text(encoding="utf-8") if path.exists() else None
+            existing = parse(current) if current is not None else None
             catalogue = merge(extracted, existing, code)
             text = dump(catalogue, code, subject)
+            if text == current:
+                # What `--check` calls current is left as it is, modification time and all:
+                # git, an editor and a file watcher each react to a rewritten file, and a
+                # run that changed nothing used to rewrite every one of them (#1169).
+                unchanged += 1
+                continue
             if check:
-                current = path.read_text(encoding="utf-8") if path.exists() else ""
-                if current != text:
-                    stale.append(str(path.relative_to(project().root)))
+                stale.append(str(path.relative_to(project().root)))
                 continue
             path.parent.mkdir(parents=True, exist_ok=True)
             path.write_text(text, encoding="utf-8", newline="\n")
-        written.append(f"{subject.name}: {len(extracted)} messages")
+            written += 1
+        counted.append(f"{subject.name}: {len(extracted)} messages")
     count = len(translated_languages())
     if check:
         if stale:
             print("Catalogues out of date; run scripts/messages.py extract:", *stale, sep="\n  ")
             return 1
-        print(f"{count} catalogues current in each set; " + ", ".join(written))
+        print(f"{count} catalogues current in each set; " + ", ".join(counted))
         return 0
-    print(f"{count} catalogues per set; " + ", ".join(written))
+    print(f"{count} catalogues per set; " + ", ".join(counted))
+    print(f"{written} written, {unchanged} unchanged.")
     return 0
 
 

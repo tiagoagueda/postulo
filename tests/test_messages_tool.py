@@ -2,6 +2,7 @@
 
 import gettext
 import io
+import os
 from pathlib import Path
 
 import pytest
@@ -547,3 +548,208 @@ def test_postulos_record_names_only_sets_and_languages_it_has(tool):
     for name, code in tool.recorded_excluded_drafts():
         assert name in sets, name
         assert code in languages, code
+
+
+# ------------------------------- the walks, and what extract leaves alone (#1169)
+
+
+def _write(path, text):
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(text, encoding="utf-8")
+
+
+def _says(text):
+    return f'from django.utils.translation import gettext_lazy as _\n\nLABEL = _("{text}")\n'
+
+
+@pytest.fixture
+def nested_repo(tmp_path, tool):
+    """A project with a set of its own, one nested in it, and directories no walk enters."""
+    _write(tmp_path / "pyproject.toml", '[project]\nname = "postulo-example"\nversion = "0.3.0"\n')
+    package = tmp_path / "src" / "postulo_example"
+    _write(package / "__init__.py", _says("Hello, world"))
+    _write(package / "templates" / "page.html", '{% load i18n %}{% translate "A page" %}\n')
+    _write(package / "templates" / "page.css", "/* not a source */\n")
+    _write(package / "migrations" / "0001_initial.py", _says("In a migration"))
+    _write(package / "static" / "vendor" / "tool.py", _says("In a static file"))
+    _write(package / "static" / "locale" / "notes.txt", "Under static, so not a set.\n")
+    _write(package / "__pycache__" / "old.py", _says("In a cache"))
+    _write(package / "locale" / "notes.txt", "Beside the catalogues, so not a source.\n")
+    inner = package / "plugins" / "inner"
+    _write(inner / "__init__.py", _says("Inner hello"))
+    _write(inner / "forms.py", _says("Inner form"))
+    _write(inner / "migrations" / "0001_initial.py", _says("In a nested migration"))
+    (inner / "locale").mkdir()
+    yield tmp_path
+    tool.use(REPO)
+
+
+def _within(path, directory):
+    return path == directory or directory in path.parents
+
+
+def _walked_whole(root):
+    """Every directory and every file under ``root``, nothing left out, from one walk."""
+    directories, files = [], []
+    for where, names, others in os.walk(root):
+        directories += [Path(where) / name for name in names]
+        files += [Path(where) / name for name in others]
+    return sorted(directories), sorted(files)
+
+
+def _sets_before_the_walk_was_pruned(tool, directories=None):
+    """`catalogue_sets` as it was until #1169: everything walked, the skipped discarded
+    after. ``directories`` stands in for the walk where one listing serves several calls."""
+    project = tool.project()
+    if directories is None:
+        found = sorted(project.package.rglob("locale"))
+    else:
+        found = [directory for directory in directories if directory.name == "locale"]
+    sets = [tool.CatalogueSet(project.name, project.package, project.locale)]
+    for locale in found:
+        if locale == project.locale or not locale.is_dir():
+            continue
+        if tool.SKIP_DIRS & set(locale.relative_to(project.package).parts[:-1]):
+            continue
+        root = locale.parent
+        sets.append(tool.CatalogueSet(root.relative_to(project.package).as_posix(), root, locale))
+    return sets
+
+
+def _sources_before_the_walk_was_pruned(subject, sets, skip, files=None):
+    """`sources` as it was until #1169, the same way."""
+    nested = [s.root for s in sets if s.root != subject.root]
+    inside = [other for other in nested if _within(other, subject.root)]
+    found = []
+    for path in sorted(subject.root.rglob("*")) if files is None else files:
+        if path.suffix not in (".py", ".html", ".txt") or not path.is_file():
+            continue
+        if skip & set(path.relative_to(subject.root).parts[:-1]):
+            continue
+        if any(_within(path, other) for other in inside):
+            continue
+        found.append(path)
+    return found
+
+
+def test_the_pruned_walks_find_what_the_whole_walks_found(tool, nested_repo):
+    """The walks stopped entering the directories they skip (#1169); what they find is the
+    same: a set per ``locale/`` outside those, and each file in the innermost set around it."""
+    tool.use(nested_repo)
+    package = nested_repo / "src" / "postulo_example"
+    inner = package / "plugins" / "inner"
+
+    sets = tool.catalogue_sets()
+    assert [(s.name, s.root, s.locale) for s in sets] == [
+        ("postulo-example", package, package / "locale"),
+        ("plugins/inner", inner, inner / "locale"),
+    ]
+    assert sets == _sets_before_the_walk_was_pruned(tool)
+
+    own, nested = sets
+    assert tool.sources(own, sets) == [package / "__init__.py", package / "templates" / "page.html"]
+    assert tool.sources(nested, sets) == [inner / "__init__.py", inner / "forms.py"]
+    for subject in sets:
+        before = _sources_before_the_walk_was_pruned(subject, sets, tool.SKIP_DIRS)
+        assert tool.sources(subject, sets) == before
+        assert tool.sources(subject) == before, "and the same for a caller with no list to pass"
+    assert tool.sources() == tool.sources(own, sets), "the project's own set by default"
+
+
+def test_the_pruned_walks_find_in_postulo_what_the_whole_walks_found(tool):
+    """The same on the real tree, where the skipped directories are nineteen in twenty
+    (#1169): the sets and every set's sources, against one walk that leaves nothing out."""
+    tool.use(REPO)
+    directories, files = _walked_whole(tool.project().package)
+    sets = tool.catalogue_sets()
+    assert sets == _sets_before_the_walk_was_pruned(tool, directories)
+    assert len(sets) > 20 and sets[0].is_core
+    named = [(str(path), path) for path in files]
+    claimed = 0
+    for subject in sets:
+        below = [path for name, path in named if name.startswith(f"{subject.root}{os.sep}")]
+        found = tool.sources(subject, sets)
+        assert found == _sources_before_the_walk_was_pruned(subject, sets, tool.SKIP_DIRS, below)
+        claimed += len(found)
+    assert claimed > 500, "and it is the tree that was compared, not two empty lists"
+
+
+def test_an_extract_finds_the_sets_once_and_enters_no_directory_it_skips(
+    tool, nested_repo, monkeypatch
+):
+    """``extract --check`` looked for the catalogue sets once for itself and once more for
+    every set, and each of those walks, like the walk for a set's sources, entered every
+    ``locale/`` tree only to discard what it found there: 29 walks of 4,955 directories,
+    4,704 of them catalogues, a third of the command's time (#1169)."""
+    tool.use(nested_repo)
+    package = nested_repo / "src" / "postulo_example"
+    assert tool.cmd_extract(check=False) == 0, "so that each locale/ holds every language"
+
+    searches = []
+    find = tool.catalogue_sets
+    entered = []
+    scan = os.scandir
+
+    def scandir(path="."):
+        entered.append(Path(os.fspath(path)))
+        return scan(path)
+
+    with monkeypatch.context() as patched:
+        patched.setattr(tool, "catalogue_sets", lambda: searches.append(1) or find())
+        patched.setattr(os, "scandir", scandir)
+        assert tool.cmd_extract(check=True) == 0
+
+    assert len(searches) == 1, "the command finds the sets and passes them down"
+    assert package in entered and package / "plugins" / "inner" in entered, "the walks are seen"
+    skipped = [
+        directory
+        for directory in entered
+        if directory.is_relative_to(package)
+        and tool.SKIP_DIRS & set(directory.relative_to(package).parts)
+    ]
+    assert skipped == [], "and no walk goes into a directory whose files it would discard"
+
+
+def test_an_extract_that_changes_nothing_writes_nothing(tool, plugin_repo, capsys):
+    """``extract`` wrote every catalogue whether or not its text had changed: in Postulo
+    2,352 files and 73 MB, each with a new modification time for git to hash again, an
+    editor to reload and a file watcher to report (#1169). Now it writes the ones that
+    differ, and says how many that was."""
+    tool.use(plugin_repo)
+    locale = plugin_repo / "src" / "postulo_example" / "locale"
+    assert tool.cmd_extract(check=False) == 0
+    assert "84 written, 0 unchanged." in capsys.readouterr().out
+
+    catalogues = sorted(locale.glob("*/LC_MESSAGES/django.po"))
+    long_ago = 1_000_000_000 * 10**9
+
+    def age():
+        for path in catalogues:
+            os.utime(path, ns=(long_ago, long_ago))
+        return {path: path.stat().st_mtime_ns for path in catalogues}
+
+    stamps = age()
+    assert tool.cmd_extract(check=False) == 0
+    assert "0 written, 84 unchanged." in capsys.readouterr().out
+    assert {path: path.stat().st_mtime_ns for path in catalogues} == stamps, "not one touched"
+
+    french = locale / "fr_FR" / "LC_MESSAGES" / "django.po"
+    portuguese = locale / "pt_PT" / "LC_MESSAGES" / "django.po"
+    text = french.read_text(encoding="utf-8")
+    french.write_text(text.replace("Hello, world", "Hello, word"), encoding="utf-8", newline="\n")
+    portuguese.unlink()
+    catalogues.remove(portuguese)
+    stamps = age()
+    assert tool.cmd_extract(check=True) == 1, "--check still names what is out of date"
+    out = capsys.readouterr().out
+    assert str(french.relative_to(plugin_repo)) in out
+    assert str(portuguese.relative_to(plugin_repo)) in out
+    assert out.count("django.po") == 2
+    assert not portuguese.exists(), "and still writes nothing"
+
+    assert tool.cmd_extract(check=False) == 0
+    assert "2 written, 82 unchanged." in capsys.readouterr().out
+    assert french.read_text(encoding="utf-8") == text
+    assert portuguese.exists()
+    moved = [path for path in catalogues if path.stat().st_mtime_ns != stamps[path]]
+    assert moved == [french], "only the one that differed, and the one that was missing"
