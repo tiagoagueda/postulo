@@ -44,7 +44,7 @@ from django.core import signing
 from django.db import transaction
 from django.utils.translation import gettext as _
 
-from .base import Consent
+from .base import ACCESS_TOKEN, EXPIRES_AT, REFRESH_TOKEN, Consent
 
 #: How long a consent round trip may take. Long enough to read a provider's screen and sign in
 #: on the way; short enough that a state value found in a log is worthless.
@@ -54,11 +54,9 @@ STATE_MAX_AGE = 15 * 60
 #: middle of a send is a failure nobody can explain, and a minute costs nothing.
 REFRESH_MARGIN = 60
 
-#: The keys the tokens are kept under in a connection's secrets. Names of places, not
-#: credentials -- the values are the credentials, and they never appear in this file.
-ACCESS_TOKEN = "oauth_access_token"  # noqa: S105
-REFRESH_TOKEN = "oauth_refresh_token"  # noqa: S105
-EXPIRES_AT = "oauth_expires_at"
+#: The keys the tokens are kept under in a connection's secrets: `ACCESS_TOKEN`,
+#: `REFRESH_TOKEN` and `EXPIRES_AT`, defined with the contract (`base`) since the connection's
+#: own row reads them too, to tell a token renewed here from a secret somebody changed (#1165).
 
 
 class ConsentFailed(Exception):
@@ -218,7 +216,7 @@ def finish(request, code: str, state: str):
             "redirect_uri": callback_url(request),
         },
     )
-    _keep(connection, tokens, keep_refresh=True)
+    _keep(connection, tokens, keep_refresh=True, agreed_anew=True)
     return connection
 
 
@@ -338,7 +336,14 @@ def _says_the_grant_is_gone(response) -> bool:
     return error in {"invalid_grant", "unauthorized_client", "access_denied"}
 
 
-def _keep(connection, tokens: dict, *, keep_refresh: bool) -> None:
+def _keep(connection, tokens: dict, *, keep_refresh: bool, agreed_anew: bool = False) -> None:
+    """Store the tokens a provider answered with.
+
+    A renewal is not an edit of the connection, and the row's own save does not read it as
+    one. ``agreed_anew`` is the other case, which that save cannot see: somebody has just
+    been through the provider's screen, perhaps as another account, so what a sync kept
+    between runs was true of the last one and goes (#1165).
+    """
     secrets = dict(connection.secrets)
     secrets[ACCESS_TOKEN] = str(tokens.get("access_token") or "")
     if keep_refresh and tokens.get("refresh_token"):
@@ -349,7 +354,11 @@ def _keep(connection, tokens: dict, *, keep_refresh: bool) -> None:
         lifetime = 0
     secrets[EXPIRES_AT] = time.time() + lifetime if lifetime else 0
     connection.secrets = secrets
+    fields = ["secrets_encrypted", "updated_at"]
+    if agreed_anew:
+        connection.sync_state = {}
+        fields.append("sync_state")
     # Its own short transaction: the callers have just waited on the provider and are not in
     # one (#357).
     with transaction.atomic():
-        connection.save(update_fields=["secrets_encrypted", "updated_at"])
+        connection.save(update_fields=fields)

@@ -31,14 +31,15 @@ from dataclasses import dataclass, field
 from django.utils import timezone
 from django.utils.dateparse import parse_datetime
 
-from .base import DiscoveredOption, FieldSpec
+from .base import DISCOVERED_KEY, DiscoveredOption, FieldSpec
 
 logger = logging.getLogger(__name__)
 
 #: Where the found options live in a connection's configuration. A colon, so that it cannot be
 #: the name of a field a plugin declares, and the core's name in front, so that it reads as
-#: what it is in an exported archive.
-KEY = "postulo:discovered"
+#: what it is in an exported archive. Defined with the contract (`base`), since the
+#: connection's own row leaves it out when it asks whether its settings changed (#1165).
+KEY = DISCOVERED_KEY
 
 #: The most options kept for one field. A server listing more than this is not offering a
 #: choice anybody makes from a table, and an unbounded list is a page that never ends.

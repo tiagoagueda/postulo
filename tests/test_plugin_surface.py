@@ -525,6 +525,55 @@ def test_the_surface_holds_what_a_sync_offers_to_pair_by_hand():
     assert (item.href, item.detail, item.collection_label, item.slot) == ("", "", "", "")
 
 
+def test_the_surface_holds_what_a_sync_keeps_between_runs():
+    """A sync had nowhere to keep its place, so one that could not mark the other side read
+    it all again on every pass (#1165). The read, the bound and the field a run returns are
+    on the surface; the column is not, and `sync` takes no new argument for any of it."""
+    import inspect
+
+    from postulo.plugins import api, base
+
+    for name in ("sync_state", "MAX_SYNC_STATE_BYTES"):
+        assert name in api.__all__, name
+    assert api.sync_state is base.sync_state
+    assert api.MAX_SYNC_STATE_BYTES == base.MAX_SYNC_STATE_BYTES == 8 * 1024
+    assert api.SyncReport().state is None, "a sync that keeps nothing says nothing"
+    assert api.SyncReport(1, 2, 3, 4, ["a note"], "an error").error == "an error"
+    assert list(inspect.signature(api.SyncPlugin.sync).parameters) == [
+        "self",
+        "connection",
+        "config",
+    ], "a plugin pinned to an older Postulo is called as it always was"
+
+    class Unsaved:
+        """Anything a plugin's own tests hand `sync`: it need not be a row."""
+
+    assert api.sync_state(Unsaved()) == {}
+    kept = Unsaved()
+    kept.sync_state = {"folder": "Jobs", "last_uid": 7}
+    read = api.sync_state(kept)
+    read["last_uid"] = 0
+    assert api.sync_state(kept) == {"folder": "Jobs", "last_uid": 7}, "a copy each time"
+
+
+def test_a_sync_written_elsewhere_that_keeps_a_state_passes_the_published_check(tmp_path):
+    """Keeping a place between runs needs nothing past the surface, and nothing of the row
+    it is kept in (#1165)."""
+    package = tmp_path / "postulo_mailbox"
+    package.mkdir()
+    (package / "__init__.py").write_text(
+        "from postulo.plugins.api import MAX_SYNC_STATE_BYTES, SyncReport, sync_state\n"
+        "\n"
+        "\n"
+        "def sync(connection, config):\n"
+        "    last = sync_state(connection).get('last_uid', 0)\n"
+        "    return SyncReport(state={'last_uid': last + 1})\n",
+        encoding="utf-8",
+    )
+
+    assert_imports_only_the_surface(package, package="postulo_mailbox")
+
+
 def test_a_reminder_on_the_surface_is_the_cores_own_class():
     """What a sync of a task list reads and writes (#331): the record, read with
     `Reminder.objects.for_user()`, and the services, never the model's save."""

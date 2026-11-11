@@ -10,20 +10,28 @@ What links a local record to its remote twin is a :class:`~postulo.plugins.model
 row — the remote address, the identifier the remote uses, the version tag it last gave,
 and a hash of what was last pushed — kept beside the record and never on it. A plugin
 reads and writes those through the connection; nothing else in Postulo knows they exist.
+
+What a run needs to remember that is about no one record -- how far into a mailbox it read,
+a server's token for "what changed since" -- it returns as ``SyncReport.state`` and is handed
+back at its next run (`base.sync_state`, #1165). It is written here, with the report, only
+after a run that did not fail, and emptied by `Connection.save` when the connection is set up
+differently.
 """
 
 from __future__ import annotations
 
 import datetime as dt
+import json
 import logging
 import time
 
+from django.db import transaction
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 from postulo.core import leases, preferences
 
-from .base import ConnectionUnusable, FieldSpec, SyncReport
+from .base import MAX_SYNC_STATE_BYTES, ConnectionUnusable, FieldSpec, SyncReport
 from .models import Connection
 from .policy import allows
 from .secrets import SecretsUnreadable
@@ -136,7 +144,7 @@ def sync_connection(connection: Connection) -> SyncReport:
         )
     try:
         with preferences.as_person(connection.owner):
-            return _run_connection(connection)
+            return _run_connection(connection, lease=(key, token))
     finally:
         # Only a lease that is still this run's (#988): one that outlived `LEASE_SECONDS` was
         # taken by the next run, and deleting that would let a third start beside it. One
@@ -144,7 +152,78 @@ def sync_connection(connection: Connection) -> SyncReport:
         leases.release(key, token)
 
 
-def _run_connection(connection: Connection) -> SyncReport:
+class StateRefused(Exception):
+    """A state a sync returned that will not be kept (#1165).
+
+    ``str()`` is for the log and names what was wrong with it; ``sentence`` is what the
+    connection says, with the plugin's name to be filled in.
+    """
+
+    def __init__(self, found: str, sentence) -> None:
+        super().__init__(found)
+        self.sentence = sentence
+
+
+def state_to_keep(state) -> dict:
+    """A run's ``SyncReport.state`` as it will be stored, or a `StateRefused` (#1165).
+
+    A dict, JSON and nothing else, at most `MAX_SYNC_STATE_BYTES` as compact JSON in UTF-8.
+    What is returned has been through JSON once, so the run after this one is handed what
+    every later one will be: lists for tuples, text for the numbers used as keys. A NUL is
+    refused although JSON can write it: PostgreSQL cannot store one, and the state has to
+    mean the same on every database.
+    """
+    not_json = _(
+        "The %(plugin)s plugin tried to keep something between runs that cannot be stored. "
+        "What it kept before stays, and the plugin needs fixing."
+    )
+    if not isinstance(state, dict):
+        raise StateRefused(f"a {type(state).__name__} where a dict belongs", not_json)
+    try:
+        text = json.dumps(state, ensure_ascii=False, allow_nan=False, separators=(",", ":"))
+        size = len(text.encode("utf-8"))
+    except (TypeError, ValueError, RecursionError) as error:
+        raise StateRefused(f"{type(error).__name__}: {error}", not_json) from error
+    if "\\u0000" in text.replace("\\\\", ""):
+        raise StateRefused("a NUL character in a text", not_json)
+    if size > MAX_SYNC_STATE_BYTES:
+        raise StateRefused(
+            f"{size} bytes of JSON where {MAX_SYNC_STATE_BYTES} are allowed",
+            _(
+                "The %(plugin)s plugin tried to keep too much between runs. "
+                "What it kept before stays, and the plugin needs fixing."
+            ),
+        )
+    return json.loads(text)
+
+
+def _may_keep_state(connection: Connection, lease: tuple[str, str] | None) -> bool:
+    """Whether this run is still the one whose state the next run should start from (#1165).
+
+    Asked inside the transaction that records the report. Not if another run took this
+    connection's lease while this one was still going: that run read the same starting
+    state and will keep its own. The lease is renewed rather than looked at, so the answer
+    and the write that follows are one decision: on PostgreSQL a run trying to take the lease
+    over waits for this transaction. And not if the person saved other settings or secrets
+    while the plugin was reading with the old ones: that save emptied the state, and what
+    this run learnt is true of a set-up that is gone.
+    """
+    if lease is not None and not leases.renew(*lease, LEASE_SECONDS):
+        logger.warning(
+            "Sync connection %s ran past its lease and another run took it: its state is not kept",
+            connection.pk,
+        )
+        return False
+    if connection.set_up_differently():
+        logger.info(
+            "Sync connection %s was edited while it ran: the run's state is not kept",
+            connection.pk,
+        )
+        return False
+    return True
+
+
+def _run_connection(connection: Connection, lease: tuple[str, str] | None = None) -> SyncReport:
     now = timezone.now()
     plugin = connection.plugin_instance
     if plugin is not None and not allows(connection):
@@ -174,6 +253,22 @@ def _run_connection(connection: Connection) -> SyncReport:
         except Exception as error:
             logger.exception("Sync %r failed for connection %s", connection.plugin, connection.pk)
             report = SyncReport(error=f"{type(error).__name__}: {error}")
+    # What the run wants its next one handed (#1165), only from a run that did not fail: a
+    # failed one leaves the state of the last good run, so its work is done again. A state
+    # Postulo will not keep makes this a failed run, said on the connection: kept out in
+    # silence, the plugin would read everything again on every pass and nobody would know.
+    state = None
+    if not report.error and getattr(report, "state", None) is not None:
+        try:
+            state = state_to_keep(report.state)
+        except StateRefused as refused:
+            logger.error(
+                "Sync %r returned a state for connection %s that is not kept: %s",
+                connection.plugin,
+                connection.pk,
+                refused,
+            )
+            report.error = str(refused.sentence) % {"plugin": connection.plugin}
     connection.synced_at = now
     if report.error:
         connection.last_error = report.error[:500]
@@ -181,9 +276,18 @@ def _run_connection(connection: Connection) -> SyncReport:
         connection.last_ok_at = now
         connection.last_error = ""
     connection.last_report = report.record()
-    connection.save(
-        update_fields=["synced_at", "last_ok_at", "last_error", "last_report", "updated_at"]
-    )
+    fields = ["synced_at", "last_ok_at", "last_error", "last_report", "updated_at"]
+    if state is None:
+        # Nothing to keep: one statement, as it was before a sync could keep anything.
+        connection.save(update_fields=fields)
+        return report
+    # One transaction for the report and the state, so the state is never stored without
+    # the report of the run that earned it, nor after the question of whether it may be.
+    with transaction.atomic():
+        if _may_keep_state(connection, lease):
+            connection.sync_state = state
+            fields.append("sync_state")
+        connection.save(update_fields=fields)
     return report
 
 

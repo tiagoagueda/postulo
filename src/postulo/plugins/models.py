@@ -8,6 +8,8 @@ answers. One person may hold several connections to the same plugin.
 
 from __future__ import annotations
 
+import json
+
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.db import IntegrityError, models, transaction
@@ -16,7 +18,7 @@ from django.utils.translation import gettext_lazy as _
 from postulo.core.models import OwnedModel
 
 from . import secrets
-from .base import CONNECTED_KINDS
+from .base import CONNECTED_KINDS, DISCOVERED_KEY, RENEWED_SECRETS
 
 
 class CatalogueSerial(models.Model):
@@ -267,6 +269,33 @@ class PluginAccess(models.Model):
         return result
 
 
+#: The columns that say how a connection is set up: a save that changes either, for a sync,
+#: is the edit that empties what the sync kept between runs (#1165).
+_SET_UP_BY = frozenset({"config", "secrets_encrypted"})
+
+#: What a connection's configuration holds that is not about where or as whom it reads: what
+#: *Look on the server* found, and the schedule Postulo adds to every sync (`syncing`'s
+#: ``interval`` field). Running more or less often reads the same place, so it keeps it.
+_NOT_SET_UP = frozenset({DISCOVERED_KEY, "interval"})
+
+
+def _settings(config) -> dict:
+    """A connection's settings as JSON holds them, without what Postulo itself put there."""
+    try:
+        # As the database gives them back, so a tuple a plugin put there is not an edit.
+        config = json.loads(json.dumps(config or {}))
+    except (TypeError, ValueError):
+        return {"unreadable": repr(config)}
+    if not isinstance(config, dict):
+        return {"unreadable": repr(config)}
+    return {key: value for key, value in config.items() if key not in _NOT_SET_UP}
+
+
+def _credentials(held: dict) -> dict:
+    """A connection's secrets without the consent tokens, which Postulo renews by itself."""
+    return {key: value for key, value in held.items() if key not in RENEWED_SECRETS}
+
+
 class ConnectionQuerySet(models.QuerySet):
     def for_user(self, user) -> ConnectionQuerySet:
         if user is None or not getattr(user, "is_authenticated", False):
@@ -301,6 +330,12 @@ class Connection(OwnedModel):
     #: The counters and notes of that run, as numbers (``SyncReport.record``): the sentence is
     #: worded at display time, so it follows the reader's language rather than the run's (#384).
     last_report = models.JSONField(_("last run's report"), default=dict, blank=True)
+    #: For syncs: what the last run that did not fail asked to be handed at the next one
+    #: (``SyncReport.state``, #1165). The plugin's bookkeeping -- how far into a mailbox it
+    #: read, a server's token -- and nothing of the person's: no form offers it, no page, export
+    #: or API answer carries it, and :meth:`save` empties it when the settings or the secrets
+    #: change. Written by `syncing._run_connection` alone, read through `base.sync_state`.
+    sync_state = models.JSONField(_("kept between runs"), default=dict, blank=True, editable=False)
 
     objects = ConnectionQuerySet.as_manager()
 
@@ -319,6 +354,58 @@ class Connection(OwnedModel):
 
     def __str__(self) -> str:
         return self.label or self.plugin
+
+    # ----------------------------------------------- what a sync keeps between runs
+
+    def save(self, *args, **kwargs):
+        """Save, and forget what a sync kept if this save sets it up differently (#1165).
+
+        The one place that rule lives, so the form, *Look on the server*, a connection
+        retired by its plugin, a plugin's own code and whatever saves a connection next all
+        keep it without knowing it: a change to the settings or the secrets empties
+        ``sync_state`` in the same statement that writes them, and nothing else does -- a
+        report, a test, the switch, the label and the scheduler's stamp leave it alone. The
+        one edit this cannot see says so itself: somebody agreeing again at a provider
+        (`consent.finish`), where the tokens change and may now be another account's.
+
+        Only a save that writes ``config`` or the secrets is looked at, and only for a sync
+        that is already stored, so a run recording its report costs no query here.
+        """
+        if self.kind == "sync" and not self._state.adding:
+            fields = kwargs.get("update_fields")
+            if self.set_up_differently(fields):
+                self.sync_state = {}
+                if fields is not None:
+                    kwargs["update_fields"] = {*fields, "sync_state"}
+        super().save(*args, **kwargs)
+
+    def set_up_differently(self, fields=None) -> bool:
+        """Whether the stored row has other settings or secrets than this object (#1165).
+
+        Asked by :meth:`save`, of the columns it is about to write (``fields``, or all of
+        them), and by a sync run before it keeps its state, to learn whether the person
+        saved the connection while it ran. Three things in those columns are not how the
+        connection is set up, and are left out of the comparison: what *Look on the server*
+        last found (`discovery.KEY`), how often it runs (the ``interval``), and the consent
+        tokens Postulo renews by itself, which would otherwise read as an edit every hour. Values
+        are compared, not ciphertexts: the same secrets encrypted again are the same.
+        Secrets that can no longer be read count as changed.
+        """
+        watched = _SET_UP_BY if fields is None else _SET_UP_BY & set(fields)
+        if not watched:
+            return False
+        stored = Connection.objects.filter(pk=self.pk).values("config", "secrets_encrypted").first()
+        if stored is None:
+            return False
+        if "config" in watched and _settings(stored["config"]) != _settings(self.config):
+            return True
+        if "secrets_encrypted" in watched and stored["secrets_encrypted"] != self.secrets_encrypted:
+            try:
+                before = secrets.decrypt(stored["secrets_encrypted"])
+                return _credentials(before) != _credentials(self.secrets)
+            except secrets.SecretsUnreadable:
+                return True
+        return False
 
     # ------------------------------------------------------------------ secrets
 

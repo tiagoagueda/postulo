@@ -14,6 +14,7 @@ not put a fabricated job title into their records.
 
 from __future__ import annotations
 
+import copy
 import datetime as dt
 import re
 from dataclasses import dataclass, field, replace
@@ -974,6 +975,23 @@ def medium_of(transport) -> str:
     return value if value in MEDIUMS else DEFAULT_MEDIUM
 
 
+#: What Postulo itself writes among a connection's settings and secrets, beside what the
+#: person set. They are named here, with the contract, because the connection's own row has
+#: to tell them from an edit (#1165): a sync keeps its place until the connection is set up
+#: differently, and neither a token renewed nor a server looked at again is that.
+#:
+#: The keys the consent tokens are kept under in a connection's secrets (`consent`). Names of
+#: places, not credentials -- the values are the credentials, and they never appear in a file.
+ACCESS_TOKEN = "oauth_access_token"  # noqa: S105
+REFRESH_TOKEN = "oauth_refresh_token"  # noqa: S105
+EXPIRES_AT = "oauth_expires_at"
+RENEWED_SECRETS = frozenset({ACCESS_TOKEN, REFRESH_TOKEN, EXPIRES_AT})
+#: Where what *Look on the server* found lives in a connection's configuration (`discovery`).
+#: A colon, so that it cannot be the name of a field a plugin declares, and the core's name in
+#: front, so that it reads as what it is in an exported archive.
+DISCOVERED_KEY = "postulo:discovered"
+
+
 #: What a plugin needs a person to agree to, when it authenticates by consent rather than
 #: by a field somebody types (#150). It sits here beside `FieldSpec` because it is the same
 #: kind of thing: part of the vocabulary a plugin uses to say what it needs.
@@ -1184,6 +1202,13 @@ class StorePlugin(ConnectedPlugin, Protocol):
 # ------------------------------------------------------------------------- syncs
 
 
+#: The most a sync may keep between two runs of one connection (#1165): 8 kB, measured on
+#: the state as compact JSON in UTF-8. Room for a place in each of a few dozen folders or
+#: collections -- a UIDVALIDITY and a last UID, a sync token -- and for nothing that is a
+#: copy of what is on the other side: it is a bookmark, not a store.
+MAX_SYNC_STATE_BYTES = 8 * 1024
+
+
 @dataclass
 class SyncReport:
     """What one run of a sync did, in numbers and in sentences.
@@ -1191,6 +1216,33 @@ class SyncReport:
     ``notes`` are things a person should know — a record removed on the other side, an
     event on the calendar that is not Postulo's — and ``error`` is why the run stopped,
     if it did. Both are shown on the connection.
+
+    **``state`` is the run's note to the next one on the same connection (#1165)**: how far
+    into a mailbox it read, the token a server gave it for "what changed since". A run reads
+    the last one with `sync_state(connection)` and returns the next one here.
+
+    - ``None``, which is what every sync that keeps nothing returns, leaves what is kept as it
+      is. A dict replaces it, whole. An empty dict forgets it.
+    - **It is kept only when the run did not fail.** A run that raised, that set ``error``,
+      that ended its connection with `ConnectionUnusable`, or that took so long another run
+      started beside it, leaves the state of the last good run: a pass that stopped half-way
+      is done again, never skipped. A plugin that stops early on purpose -- so many messages a
+      pass -- returns without an error, and its state is kept.
+    - **It is dropped when the connection is set up differently**: any change to its settings
+      (how often it runs aside) or its secrets, and somebody agreeing again at a provider. A
+      place in one folder of one account says nothing about another, and Postulo cannot tell
+      which setting moved it. So
+      the run after an edit starts with none, and a state never has to be checked against the
+      settings it was made under.
+    - **It is JSON, and at most `MAX_SYNC_STATE_BYTES`**: a dict of text, numbers, booleans,
+      ``None``, lists and dicts. What comes back is what JSON made of it -- a tuple returns as
+      a list, a number used as a key as text. A state that is larger, or that is not JSON,
+      **fails the run**: its error is on the connection, where the person and the plugin's
+      author both read it, and the last good state stays. Refusing it quietly would have left
+      the plugin reading everything again on every pass with nobody told.
+    - **It is the plugin's bookkeeping, not the person's data**: never shown on a page, never
+      in an export or an API answer, gone with its connection. Keep in it what the other side
+      calls things, and nothing a person would miss.
     """
 
     pushed: int = 0
@@ -1202,6 +1254,8 @@ class SyncReport:
     #: Set by Postulo, never by a plugin: this run did not start because the same
     #: connection was already being synced (#586).
     already_running: bool = False
+    #: What to hand the next run of this connection; ``None`` to leave what is kept (#1165).
+    state: dict | None = None
 
     def record(self) -> dict:
         """The numbers and the notes, as stored on the connection (#384).
@@ -1218,6 +1272,18 @@ class SyncReport:
 
     def summary(self) -> str:
         return describe_sync(self.record())
+
+
+def sync_state(connection) -> dict:
+    """What the last run of ``connection`` that did not fail returned as its ``state`` (#1165).
+
+    Empty before a first run, after a change to the connection's settings or secrets, and
+    for a sync that keeps nothing. A copy: changing it changes nothing, and what a run wants
+    kept it returns on its `SyncReport`. Read it at the start of ``sync``, from the
+    connection ``sync`` is handed.
+    """
+    kept = getattr(connection, "sync_state", None)
+    return copy.deepcopy(kept) if isinstance(kept, dict) else {}
 
 
 def describe_sync(record: dict) -> str:
@@ -1289,6 +1355,11 @@ class SyncPlugin(ConnectedPlugin, Protocol):
     returns a :class:`SyncReport`. It raises when it cannot run at all; a record it
     cannot handle is a note, not an exception. The scheduler calls it on the interval
     the connection carries; *Sync now* calls it at once.
+
+    A sync that would otherwise read the same things again on every pass keeps a small state
+    between runs (#1165): `sync_state(connection)` at the start, ``SyncReport(state=...)`` at
+    the end. ``sync`` takes no new argument for it, so a plugin written before it existed is
+    called exactly as it was.
 
     Two more methods are optional, and give the connection a *Pairing* page (#327):
 

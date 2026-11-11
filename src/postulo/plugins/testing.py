@@ -61,6 +61,12 @@ it once and restores the result afterwards; two lines in the plugin's ``tests/co
     from postulo.plugins.testing import cached_django_db_setup
 
     django_db_setup = cached_django_db_setup()
+
+**And a sync run as Postulo runs it, with what it kept read back (#1165).** `sync_state` and
+`SyncReport.state` are on the surface and the column that holds the state is not. `run_sync`
+runs a connection the way the scheduler and *Sync now* do -- so a state is kept or refused by
+the same rules -- optionally from a state of the test's choosing, and `kept_sync_state` reads
+what the next run will be handed.
 """
 
 from __future__ import annotations
@@ -448,3 +454,36 @@ def create_by_hand(connection, *, collection: str, uid: str, kind: str, into=Non
     if pair:
         pairing.pair(connection, item, record)
     return record
+
+
+def run_sync(connection, *, state: dict | None = None):
+    """Run a sync connection once, as the scheduler and *Sync now* do (#1165).
+
+    Through the same door: the connection's turn is taken, the plugin runs as the owner,
+    the report is recorded, and the state the run returned is kept, or refused, by Postulo's
+    rules, not the test's. Returns the `SyncReport`; ``connection`` is the object the plugin
+    was handed, and holds afterwards what was recorded.
+
+    With ``state``, the run starts from it, as if the last run that did not fail had returned
+    it: the way to put a plugin in front of a place it would otherwise take several runs to
+    reach, or one a server has since made stale.
+    """
+    from .syncing import sync_connection
+
+    if state is not None:
+        connection.sync_state = dict(state)
+        connection.save(update_fields=["sync_state", "updated_at"])
+    return sync_connection(connection)
+
+
+def kept_sync_state(connection) -> dict:
+    """What the connection's next run will be handed, read back from the database (#1165).
+
+    The same value `sync_state` gives a plugin at the start of that run, and a copy: empty
+    where nothing is kept, where the last state was refused before any was, or after the
+    connection's settings changed.
+    """
+    from .base import sync_state
+
+    connection.refresh_from_db(fields=["sync_state"])
+    return sync_state(connection)

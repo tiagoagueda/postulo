@@ -95,6 +95,11 @@ still holds its requests to what was chosen.
 other side a person may pair with one of `RECORD_KINDS`, and its optional ``fill_record`` makes
 or fills a record from one through the services above. Postulo draws the page, asks live, and
 writes the `SyncLink`.
+
+**A sync can keep its place between runs (#1165)**: `sync_state(connection)` is what the last
+run that did not fail returned as `SyncReport.state`, a small dict of JSON, at most
+`MAX_SYNC_STATE_BYTES`. One per connection, written only after a run that did not fail, dropped
+when the connection's settings or secrets change, and shown to nobody.
 """
 
 from __future__ import annotations
@@ -233,6 +238,7 @@ from .base import (
     # ------------------------------------------ what a transport carries, and how
     MAIL,
     MAX_IMPORT_BYTES,
+    MAX_SYNC_STATE_BYTES,  # the most a sync may keep between runs (#1165)
     MEDIUMS,
     RECORD_KINDS,  # what an item may be paired with by hand (#327)
     TEXT,
@@ -279,6 +285,7 @@ from .base import (
     medium_of,
     refuse_unreadable,
     shipped,
+    sync_state,  # what a sync's last good run kept for this one (#1165)
 )
 
 __all__ = [
@@ -288,6 +295,7 @@ __all__ = [
     "EVENTS",
     "MAIL",
     "MAX_IMPORT_BYTES",
+    "MAX_SYNC_STATE_BYTES",
     "MAX_THEME_ASSET_BYTES",
     "MAX_THEME_DOCUMENT_BYTES",
     "MEDIUMS",
@@ -437,6 +445,7 @@ __all__ = [
     "settle_interview",
     "shipped",
     "suggest",
+    "sync_state",
     "until",
     "update_company",
     "update_contact",
