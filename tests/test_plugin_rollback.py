@@ -28,6 +28,8 @@ from django.core.management.base import CommandError
 from postulo.plugins import installing, provenance
 from postulo.plugins.installing import InstallError
 
+from .plugin_install_support import environment_read_once  # noqa: F401 - for every test here
+
 pytestmark = pytest.mark.django_db
 
 

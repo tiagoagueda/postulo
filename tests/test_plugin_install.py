@@ -13,6 +13,7 @@ import base64
 import importlib
 import importlib.metadata
 import json
+import os
 import shutil
 import sys
 import zipfile
@@ -27,6 +28,9 @@ from django.urls import reverse
 
 from postulo.plugins import catalogue, installing, provenance
 from postulo.plugins.installing import InstallError
+
+from . import plugin_install_support
+from .plugin_install_support import environment_read_once  # noqa: F401 - for every test here
 
 pytestmark = pytest.mark.django_db
 
@@ -1513,3 +1517,93 @@ def test_an_encrypted_member_and_a_wheel_of_thousands_of_members_are_refused(tmp
     monkeypatch.setattr(zipfile.ZipFile, "getinfo", encrypted)
     with pytest.raises(InstallError, match="encrypted"):
         installing.read_wheel(wheel)
+
+
+# ------------------------------------------- the environment, read once (#1033)
+
+
+def a_distribution(directory: Path, version: str = "1.0") -> Path:
+    """What an installer leaves for a package: a `.dist-info` and the METADATA in it."""
+    dist_info = directory / "remembered-1.0.dist-info"
+    dist_info.mkdir(exist_ok=True)
+    (dist_info / "METADATA").write_text(
+        f"Metadata-Version: 2.1\nName: remembered\nVersion: {version}\n", encoding="utf-8"
+    )
+    return dist_info
+
+
+@pytest.fixture
+def in_the_environment(tmp_path, monkeypatch):
+    """A directory that counts as one the running environment's packages are installed in."""
+    listed = plugin_install_support._as_listed(str(tmp_path))
+    monkeypatch.setattr(
+        plugin_install_support, "ENVIRONMENT", plugin_install_support.ENVIRONMENT | {listed}
+    )
+    monkeypatch.setattr(plugin_install_support, "_listed", {})
+    return tmp_path
+
+
+def test_an_install_reads_nothing_of_the_environment_a_second_time(
+    tmp_path, plugins_dir, installer, monkeypatch
+):
+    """Where these two files' time went: one install parsed the METADATA of every package
+    Postulo runs on ten times over and asked each for its entry points once for every kind of
+    plugin, and the files it read never change while the suite runs (#1033). They are read
+    once for a worker now; what is in the plugins directory is read every time, as it was.
+    """
+    installing.install_wheel(a_wheel(tmp_path))
+    read: list[Path] = []
+    real = importlib.metadata.PathDistribution.read_text
+
+    def watched(self, filename):
+        if filename in ("METADATA", "entry_points.txt"):
+            read.append(Path(str(self._path)))
+        return real(self, filename)
+
+    monkeypatch.setattr(importlib.metadata.PathDistribution, "read_text", watched)
+
+    installing.install_wheel(a_wheel(tmp_path, version="1.1"))
+
+    assert [path for path in read if path.parent == plugins_dir], "the plugin's own is read"
+    assert [path for path in read if path.parent != plugins_dir] == []
+
+
+def test_a_distribution_that_is_replaced_is_read_again(in_the_environment):
+    """An answer is remembered for the file as it stood: one that grows, or is written
+    again later, or arrives where there was none, is read from the disk (#1033)."""
+    at = importlib.metadata.Distribution.at
+    dist_info = a_distribution(in_the_environment, "1.0")
+    first = at(dist_info).metadata
+    assert first["Version"] == "1.0"
+    assert at(dist_info).metadata is first, "remembered: the file was not parsed again"
+    assert list(at(dist_info).entry_points) == []
+
+    a_distribution(in_the_environment, "1.0.1")
+    assert at(dist_info).version == "1.0.1", "a different size"
+
+    stamp = os.stat(dist_info / "METADATA")
+    a_distribution(in_the_environment, "2.0.0")
+    os.utime(dist_info / "METADATA", ns=(stamp.st_atime_ns, stamp.st_mtime_ns + 2_000_000_000))
+    assert at(dist_info).version == "2.0.0", "the same size, written later"
+
+    (dist_info / "entry_points.txt").write_text(
+        "[postulo.sources]\nremembered = remembered:Source\n", encoding="utf-8"
+    )
+    assert [point.name for point in at(dist_info).entry_points] == ["remembered"]
+
+
+def test_what_is_in_a_plugins_directory_is_never_remembered(tmp_path):
+    """The tests write there, twice in a moment and over the same names, so nothing of it is
+    kept: not even for a file whose size and time are what they were (#1033)."""
+    at = importlib.metadata.Distribution.at
+    dist_info = a_distribution(tmp_path, "1.0")
+    stamp = os.stat(dist_info / "METADATA")
+    first = at(dist_info).metadata
+    assert first["Version"] == "1.0"
+
+    a_distribution(tmp_path, "2.0")
+    os.utime(dist_info / "METADATA", ns=(stamp.st_atime_ns, stamp.st_mtime_ns))
+
+    assert os.stat(dist_info / "METADATA").st_size == stamp.st_size
+    assert at(dist_info).version == "2.0"
+    assert at(dist_info).metadata is not first
