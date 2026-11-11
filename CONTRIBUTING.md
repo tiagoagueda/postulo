@@ -79,6 +79,58 @@ is committed or pushed to `main` directly (#940).
   is a push to `main`, and `main`'s own CI run checks the combination instead; when that
   run is red, mending it comes first, through a pull request like any other.
 
+### Two issues at once
+
+One checkout is enough for one issue at a time. While a pull request waits for CI, which is
+about half an hour for the browser job alone, the next issue can start in a second working
+tree instead of a stash and a branch switch, which would also leave the compiled catalogues
+and the built files belonging to the wrong branch. `git worktree` gives each branch a
+directory of its own on the same repository:
+
+```sh
+git fetch origin
+git worktree add ../postulo-1146 -b 1146-worktrees origin/main
+cd ../postulo-1146
+uv sync                                   # quick: uv links from the cache it already has
+uv run python scripts/messages.py compile
+cp ../postulo/.env .env                   # only to run the app there
+```
+
+What a new working tree does not have, because git does not track it:
+
+- **No `.venv`.** `uv sync` makes one; nothing is downloaded again.
+- **No compiled catalogues.** The `.mo` files are ignored, and the tests that read a
+  translation fail without them, so compile before the first test run.
+- **No `.env`.** The tests never read it; the running app does.
+- **No `node_modules`.** `npm ci` is needed only to rebuild the stylesheet or the page
+  script (*Before you open a pull request*, below). Without it the accessibility walks of
+  the browser suite skip themselves; CI runs them.
+- **No downloaded datasets.** The GeoNames lookup and the ESCO files live under
+  `src/postulo/jobs/data`, ignored, tens of megabytes together. The tests run without them, as
+  CI's do. To have places and occupations in the running app without downloading them again,
+  point the working tree at the first checkout's copy in its `.env`, with absolute paths:
+  `POSTULO_GEOLOCATIONS_DIR=/path/to/postulo/src/postulo/jobs/data` and
+  `POSTULO_ESCO_DIR=` the same.
+
+The pre-commit hooks need no second `pre-commit install`: hooks belong to the repository,
+not to a working tree.
+
+Three things to know before they bite:
+
+- **A branch is checked out in one working tree at a time.** Git refuses the second.
+- **The stash is shared by every working tree.** `git stash pop` in one takes whatever was
+  stashed last in any of them. Commit work in progress to its branch instead.
+- **One heavy suite at a time.** The unit suite on every core beside the browser suite in
+  another working tree starves both, and the browser tests then fail on timeouts that have
+  nothing to do with the change.
+
+When the pull request is merged:
+
+```sh
+git worktree remove ../postulo-1146
+git branch -D 1146-worktrees           # -D: a squash merge leaves the branch unmerged in git's eyes
+```
+
 ## Before you open a pull request
 
 ```sh
