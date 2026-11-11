@@ -737,6 +737,12 @@ POSTULO_MEDIA_SENDFILE = env.bool("POSTULO_MEDIA_SENDFILE", default=False)
 POSTULO_MEDIA_SWEEP = env.bool("POSTULO_MEDIA_SWEEP", default=True)
 POSTULO_MEDIA_SWEEP_GRACE_HOURS = env.int("POSTULO_MEDIA_SWEEP_GRACE_HOURS", default=24)
 
+# The scheduler reads a slice of the uploads against the size and checksum recorded when each
+# arrived, and leaves a file it has read alone for this many days before reading it again
+# (#1118). Damage on disk is rare, and a week still reports it within days; 0 reads the slice
+# again on every pass. `manage.py verify_media` reads every file whenever it is run.
+POSTULO_SCRUB_EVERY_DAYS = env.int("POSTULO_SCRUB_EVERY_DAYS", default=7)
+
 # ------------------------------------------------------------------------ pdf
 
 # auto | weasyprint | chromium. WeasyPrint is the default renderer and ships with

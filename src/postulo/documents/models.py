@@ -858,6 +858,10 @@ class UploadedDocument(RecordsALanguage, OwnedModel):
         verbose_name = _("uploaded document")
         verbose_name_plural = _("uploaded documents")
         ordering = ("-created_at",)
+        # The scheduled scrub asks every five minutes which files were never read or not
+        # lately, the least recently read first (#1118): answered from this, not by reading
+        # every row, each with the text of its file in it.
+        indexes = [models.Index(fields=("verified_at",))]
 
     def __str__(self) -> str:
         return f"{self.title} (v{self.version})"

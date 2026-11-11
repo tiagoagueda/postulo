@@ -20,6 +20,7 @@ import logging
 from dataclasses import dataclass, field
 
 from django.conf import settings
+from django.db.models import Q
 from django.utils import timezone
 
 from postulo.core import media
@@ -44,15 +45,27 @@ class Findings:
         return len(self.missing) + len(self.changed)
 
 
+def reread_after() -> dt.timedelta:
+    """How long the scheduled slice leaves a file it has read before reading it again."""
+    return dt.timedelta(days=max(0, int(settings.POSTULO_SCRUB_EVERY_DAYS)))
+
+
 def verify_uploads(*, limit: int | None = None, now=None) -> Findings:
     """Read uploads, the least recently checked first, and record what each one is.
 
     Writes the verdict, the moment and, for a row from before the size was kept, the size
     -- and nothing else: not the file, not the checksum, which is what the file is held to.
+
+    With a ``limit`` this is the scheduled slice, and it takes only the uploads never read or
+    last read more than ``POSTULO_SCRUB_EVERY_DAYS`` ago (#1118): the pass comes round every
+    five minutes, and without that a hundred uploads were each read and hashed 72 times a
+    day. Without one it is somebody asking, and it reads every file.
     """
     now = now or timezone.now()
     findings = Findings()
     rows = UploadedDocument.objects.exclude(file="").order_by("verified_at", "pk")
+    if limit:
+        rows = rows.filter(Q(verified_at__isnull=True) | Q(verified_at__lt=now - reread_after()))
     for upload in rows[:limit] if limit else rows:
         findings.checked += 1
         found = integrity.damage_of(upload.file.name, size=upload.size, checksum=upload.checksum)

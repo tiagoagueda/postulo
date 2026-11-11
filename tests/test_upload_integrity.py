@@ -342,6 +342,84 @@ def test_the_scrub_reads_the_least_recently_checked_first(user, media_root):
     assert UploadedDocument.objects.get(pk=second.pk).verified_at is not None
 
 
+@pytest.fixture
+def files_read(monkeypatch):
+    """The name of each file the scrub reads and hashes, in the order it does."""
+    read = []
+    measure = integrity.damage_of
+
+    def counted(name, **recorded):
+        read.append(name)
+        return measure(name, **recorded)
+
+    monkeypatch.setattr(integrity, "damage_of", counted)
+    return read
+
+
+def test_the_scheduled_slice_leaves_alone_what_it_read_this_week(
+    user, media_root, files_read, django_assert_num_queries
+):
+    """Every pass read and hashed its slice again, however lately each file had been read:
+    with a hundred uploads, each one 72 times a day (#1118)."""
+    first = an_upload(user, name="a.pdf", title="A")
+    second = an_upload(user, name="b.pdf", title="B")
+    start = timezone.now()
+
+    scrub.verify_uploads(limit=25, now=start)
+    assert files_read == [first.file.name, second.file.name]
+
+    del files_read[:]
+    with django_assert_num_queries(1):  # the question, and no row written
+        found = scrub.verify_uploads(limit=25, now=start + dt.timedelta(minutes=5))
+    assert files_read == [] and found.checked == 0
+    assert UploadedDocument.objects.get(pk=first.pk).verified_at == start
+
+    # A file that arrives is read on the next pass, and only it.
+    third = an_upload(user, name="c.pdf", title="C")
+    scrub.verify_uploads(limit=25, now=start + dt.timedelta(minutes=10))
+    assert files_read == [third.file.name]
+
+    # A week on the first two are due again, and the third not for ten minutes more.
+    del files_read[:]
+    scrub.verify_uploads(limit=25, now=start + dt.timedelta(days=7, minutes=5))
+    assert files_read == [first.file.name, second.file.name]
+
+
+def test_how_long_the_slice_leaves_a_file_is_the_operators_to_say(
+    user, media_root, files_read, settings
+):
+    """`POSTULO_SCRUB_EVERY_DAYS`, and nought is every pass, as it was (#1118)."""
+    upload = an_upload(user)
+    start = timezone.now()
+    scrub.verify_uploads(limit=25, now=start)
+    del files_read[:]
+
+    settings.POSTULO_SCRUB_EVERY_DAYS = 2
+    scrub.verify_uploads(limit=25, now=start + dt.timedelta(days=1))
+    assert files_read == []
+    scrub.verify_uploads(limit=25, now=start + dt.timedelta(days=2, minutes=5))
+    assert files_read == [upload.file.name]
+
+    del files_read[:]
+    settings.POSTULO_SCRUB_EVERY_DAYS = 0
+    scrub.verify_uploads(limit=25, now=start + dt.timedelta(days=2, minutes=10))
+    assert files_read == [upload.file.name]
+
+
+def test_verify_media_reads_every_file_however_lately_it_was_read(
+    user, media_root, files_read, capsys
+):
+    """The command is somebody asking now; only the scheduled slice waits (#1118)."""
+    upload = an_upload(user)
+    scrub.verify_uploads(limit=25)
+    del files_read[:]
+
+    call_command("verify_media")
+
+    assert files_read == [upload.file.name]
+    assert "1 file(s) read" in capsys.readouterr().out
+
+
 # ---------------------------------------------------------------- the sweep
 
 
