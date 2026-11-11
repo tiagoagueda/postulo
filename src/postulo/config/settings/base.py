@@ -843,9 +843,10 @@ TASKS = {
 # process believes, and nothing here can see whether the container is really there.
 POSTULO_BACKGROUND_WORK = env.bool("POSTULO_BACKGROUND_WORK", default=False)
 
-# Where the worker records the end of each pass, read by its own container healthcheck and
-# by Server settings in the web one. A file on the shared volume for the reason the
-# scheduler's is one: it is the only thing both containers can see (#221, #247).
+# Where the worker records that it is going round (the end of a pass, once a minute: #1117),
+# read by its own container healthcheck and by Server settings in the web one. A file on
+# the shared volume for the reason the scheduler's is one: it is the only thing both
+# containers can see (#221, #247).
 POSTULO_WORKER_HEARTBEAT = env.path(
     "POSTULO_WORKER_HEARTBEAT", default=REPO_DIR / "data" / "worker-heartbeat"
 )
@@ -1025,6 +1026,13 @@ LOGGING = {
         # httpcore says as much at DEBUG.
         "httpx": {"level": "WARNING"},
         "httpcore": {"level": "WARNING"},
+        # The worker goes round every two seconds, and the library under it says "Starting
+        # worker" and "No more tasks to run" at INFO each time: 86,400 lines a day from a
+        # worker with nothing to do, about 14.5 MB into a kept log of 20 MB that the web
+        # process shares, whose errors were gone from it in a day and a half. A stop asked
+        # for and a task that failed unexpectedly are warnings and errors, and still written;
+        # `manage.py work` says once, itself, that it has started (#1117).
+        "django_tasks_db": {"level": "WARNING"},
     },
     "root": {
         "handlers": ["console", "file"] if POSTULO_LOG_DIR else ["console"],

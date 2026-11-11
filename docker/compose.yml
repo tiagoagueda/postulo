@@ -104,9 +104,9 @@ services:
     command: ["python", "manage.py", "work"]
     # The image's own healthcheck curls the web port, which this container does not serve,
     # so without this it is permanently unhealthy and the one thing a healthcheck is for --
-    # noticing that it has stopped -- never happens. The worker writes the time of each
-    # finished pass to this file; passes are seconds apart, so five minutes of silence is
-    # a worker that is not going round.
+    # noticing that it has stopped -- never happens. The worker writes the time of a
+    # finished pass to this file once a minute (#1117); passes are seconds apart, so five
+    # minutes of silence is a worker that is not going round.
     healthcheck:
       test: ["CMD-SHELL", "find /app/data/worker-heartbeat -mmin -5 | grep -q ."]
       interval: 60s

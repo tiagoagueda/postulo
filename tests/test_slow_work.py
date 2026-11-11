@@ -305,6 +305,152 @@ def test_a_stop_asked_for_during_a_task_ends_the_worker_after_it(user):
     assert ran == [first.pk], "it stopped after the task it was running"
 
 
+@pytest.fixture
+def signals_put_back():
+    """The worker takes SIGINT and SIGTERM for itself; the next test gets them back."""
+    import signal
+
+    saved = {n: signal.getsignal(n) for n in (signal.SIGINT, signal.SIGTERM)}
+    yield
+    for number, handler in saved.items():
+        signal.signal(number, handler)
+
+
+def idle_passes(monkeypatch, passes: int, *, every: float = 2.0) -> list[int]:
+    """Send the worker round an empty queue `passes` times; the passes that wrote a heartbeat.
+
+    On a clock that only the loop's own wait moves, so three minutes of going round take no
+    time at all and the counts do not depend on how busy the machine is.
+    """
+    import types
+
+    from django.core.management import call_command
+
+    from postulo.core import scheduler
+    from postulo.core.management.commands import work
+
+    class Enough(Exception):
+        pass
+
+    clock = types.SimpleNamespace(now=1000.0, waits=0)
+
+    def wait(seconds: float) -> None:
+        clock.waits += 1
+        clock.now += seconds
+        if clock.waits == passes:
+            raise Enough
+
+    monkeypatch.setattr(
+        work, "time", types.SimpleNamespace(monotonic=lambda: clock.now, sleep=wait)
+    )
+    written: list[int] = []
+    really = scheduler.worker_beat
+    monkeypatch.setattr(
+        scheduler, "worker_beat", lambda when=None: written.append(clock.waits + 1) or really(when)
+    )
+    with pytest.raises(Enough):
+        call_command("work", "--every", str(every))
+    return written
+
+
+def test_an_idle_worker_writes_its_heartbeat_once_a_minute_not_every_pass(
+    monkeypatch, signals_put_back
+):
+    """Every pass wrote the heartbeat file: 43,200 writes a day to say it was still there (#1117).
+
+    Its readers allow five minutes, so once a minute tells them as much. Ninety passes two
+    seconds apart are three minutes: three writes where there were ninety.
+    """
+    from postulo.core import scheduler
+
+    scheduler.worker_heartbeat_path().unlink(missing_ok=True)
+
+    written = idle_passes(monkeypatch, 90)
+
+    assert written == [1, 31, 61], f"{len(written)} heartbeats in 90 passes"
+    assert scheduler.worker_last_pass() is not None, "and what is written is still the file"
+
+
+def test_a_worker_that_has_just_started_is_seen_at_once(monkeypatch, signals_put_back):
+    """The first pass writes whatever the clock says, and so does each run made by cron (#1117)."""
+    from django.core.management import call_command
+
+    from postulo.core import scheduler
+
+    scheduler.worker_heartbeat_path().unlink(missing_ok=True)
+    assert idle_passes(monkeypatch, 1) == [1]
+    assert scheduler.worker_last_pass() is not None
+
+    scheduler.worker_heartbeat_path().unlink()
+    call_command("work", "--once")
+    assert scheduler.worker_last_pass() is not None, "one pass and stop still leaves its mark"
+
+
+def test_what_watches_the_worker_waits_longer_than_it_takes_to_write():
+    """A heartbeat a minute old is a worker going round, to everything that reads it (#1117).
+
+    The page that watches slow work calls the worker silent after five minutes, and so does
+    the container's healthcheck. Both have to stay well clear of the minute between writes.
+    """
+    import re
+    from pathlib import Path
+
+    from postulo.core import scheduler, views_errands
+    from postulo.core.management.commands import work
+
+    between = dt.timedelta(seconds=work.HEARTBEAT_EVERY)
+    assert between == dt.timedelta(minutes=1)
+    assert views_errands.WORKER_SILENT_AFTER >= 2 * between
+
+    scheduler.worker_beat(timezone.now() - between - dt.timedelta(seconds=10))
+    assert not views_errands.worker_silent(), "the oldest an idle worker's heartbeat gets"
+
+    docker = Path(__file__).resolve().parent.parent / "docker"
+    for name in ("compose.yml", "compose.postgres.yml"):
+        (minutes,) = re.findall(
+            r"worker-heartbeat -mmin -(\d+)", (docker / name).read_text(encoding="utf-8")
+        )
+        assert dt.timedelta(minutes=int(minutes)) >= 2 * between, name
+
+
+def test_an_idle_worker_says_it_started_and_then_nothing(monkeypatch, caplog, signals_put_back):
+    """An idle worker logged two lines every pass: 86,400 a day, about 14.5 MB (#1117).
+
+    They were the library's, "Starting worker" and "No more tasks to run", and the kept log
+    is 20 MB shared with the web process, whose errors they pushed out in a day and a half.
+    The library is now heard from WARNING up, and the command says once that it came up.
+    """
+    import logging
+
+    from postulo.core.management.commands import work
+
+    with caplog.at_level(logging.INFO):
+        idle_passes(monkeypatch, 5)
+
+    theirs = [record.getMessage() for record in caplog.records if record.name == "django_tasks_db"]
+    assert theirs == [], f"{len(theirs)} lines from the library in 5 idle passes"
+    ours = [record for record in caplog.records if record.name == work.__name__]
+    assert len(ours) == 1, "one line of Postulo's own, so the container's log shows it came up"
+    assert ours[0].levelno == logging.INFO and "default" in ours[0].getMessage()
+    assert logging.getLogger("django_tasks_db").isEnabledFor(logging.WARNING), (
+        "a stop and a task that failed are still reported"
+    )
+
+
+def test_a_single_pass_for_cron_says_nothing_about_starting(caplog, signals_put_back):
+    """Run from cron every minute, a line each time would be the noise back again (#1117)."""
+    import logging
+
+    from django.core.management import call_command
+
+    from postulo.core.management.commands import work
+
+    with caplog.at_level(logging.INFO):
+        call_command("work", "--once")
+
+    assert [r for r in caplog.records if r.name in (work.__name__, "django_tasks_db")] == []
+
+
 def test_a_report_filed_by_the_worker_covers_the_owners_period_in_their_language(
     user, settings, monkeypatch
 ):

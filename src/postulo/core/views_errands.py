@@ -52,9 +52,9 @@ SILENT_POLL_SECONDS = 30
 def worker_silent() -> bool:
     """Whether the worker has not been round lately, or never has here (#1122).
 
-    Read from the heartbeat the worker writes after each pass, which is the one thing the
-    web container can see of it. A heartbeat from the future is a clock that disagrees, not
-    a worker that has stopped.
+    Read from the heartbeat the worker writes after a pass, once a minute (#1117), which is
+    the one thing the web container can see of it. A heartbeat from the future is a clock
+    that disagrees, not a worker that has stopped.
     """
     seen = scheduler.worker_last_pass()
     if seen is None:
