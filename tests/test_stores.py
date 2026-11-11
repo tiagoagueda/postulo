@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import datetime as dt
 import io
+import types
 import zipfile
 from typing import ClassVar
 
@@ -462,6 +463,96 @@ def test_the_scheduler_command_reports_copies(user):
     out = io.StringIO()
     call_command("send_due_reminders", stdout=out)
     assert "Nothing due." in out.getvalue()
+
+
+def a_slow_shelf(monkeypatch, seconds: float) -> list[str]:
+    """Make every `put` take ``seconds`` on the pass's own clock; the titles it was asked for.
+
+    Only the clock `archiving` reads is replaced, and it moves when the store is called and at
+    no other time: what is counted is how many copies were begun, never how long a test took.
+    """
+    clock = types.SimpleNamespace(now=0.0)
+    monkeypatch.setattr(archiving, "time", types.SimpleNamespace(monotonic=lambda: clock.now))
+    asked: list[str] = []
+    put = ShelfStore.put
+
+    def slow_put(self, document, file, metadata, config, user):
+        asked.append(document.title)
+        clock.now += seconds
+        return put(self, document, file, metadata, config, user)
+
+    monkeypatch.setattr(ShelfStore, "put", slow_put)
+    return asked
+
+
+def test_the_pass_stops_starting_copies_once_its_budget_is_spent(user, monkeypatch):
+    """A slow store held the scheduler for every copy that was due, webhooks and syncs behind it.
+
+    A copy under way is never cut off; the budget decides whether to begin another, and what
+    was not begun is left untouched for the next pass (#1172).
+    """
+    a_store(user)
+    uploads = [an_upload(user, f"Diploma {n}") for n in range(5)]
+    asked = a_slow_shelf(monkeypatch, 25.0)
+
+    assert send_pending() == (3, 0), "begun at 0, 25 and 50 seconds; at 75 the minute is spent"
+    assert asked == ["Diploma 0", "Diploma 1", "Diploma 2"], "in the order they were due"
+    for upload in uploads[3:]:
+        copy = upload.copies.get()
+        assert copy.status == CopyStatus.PENDING and copy.attempts == 0, "not counted as tried"
+        assert copy.claimed_until is None, "and not held: the next pass may take it at once"
+
+    assert send_pending() == (2, 0), "the rest go out on the next pass"
+    assert asked[3:] == ["Diploma 3", "Diploma 4"]
+    assert send_pending() == (0, 0)
+
+
+def test_what_the_budget_left_is_tried_before_what_it_already_tried(user, monkeypatch):
+    """A store that is slow and failing must not have the same copies tried pass after pass.
+
+    The ones a pass did not reach keep the time they were due, and the ones it tried and failed
+    are due later than that, so nothing waits behind a copy that has had its turn (#1172).
+    """
+    a_store(user)
+    for n in range(5):
+        an_upload(user, f"Diploma {n}")
+    asked = a_slow_shelf(monkeypatch, 25.0)
+    ShelfStore.fail_with = "the shelf timed out"
+
+    assert send_pending() == (0, 3), "three were tried, and three is what it says"
+    assert send_pending() == (0, 2), "the two it left, not the three that failed"
+    assert asked == [f"Diploma {n}" for n in range(5)], "each one once"
+
+    # And once the failed ones are due again, they stand behind anything still untried.
+    another = an_upload(user, "Reference")
+    later = timezone.now() + dt.timedelta(hours=1)
+    queue = [copy.document.title for copy in archiving.pending_copies(later)]
+    assert queue[0] == another.title and sorted(queue[1:]) == asked
+
+
+def test_a_budget_of_nothing_is_no_budget(user, monkeypatch):
+    """What a caller that wants every due copy sent asks for, as with the webhooks (#1172)."""
+    a_store(user)
+    for n in range(5):
+        an_upload(user, f"Diploma {n}")
+    a_slow_shelf(monkeypatch, 25.0)
+
+    assert send_pending(budget=0) == (5, 0)
+
+
+def test_the_scheduler_command_counts_only_the_copies_it_began(user, monkeypatch):
+    """The line a pass writes stays true when the budget ends it early (#1172)."""
+    a_store(user)
+    for n in range(5):
+        an_upload(user, f"Diploma {n}")
+    a_slow_shelf(monkeypatch, 25.0)
+
+    out = io.StringIO()
+    call_command("send_due_reminders", stdout=out)
+    assert "3 document copies sent, 0 failed" in out.getvalue()
+    out = io.StringIO()
+    call_command("send_due_reminders", stdout=out)
+    assert "2 document copies sent, 0 failed" in out.getvalue()
 
 
 # --------------------------------------------------------------- the interface

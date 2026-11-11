@@ -14,6 +14,7 @@ from __future__ import annotations
 
 import datetime as dt
 import logging
+import time
 
 from django.db import transaction
 from django.db.models import Q
@@ -39,6 +40,10 @@ MAX_ATTEMPTS = 6
 FIRST_RETRY = dt.timedelta(minutes=5)
 #: How many copies one scheduler pass sends at most, so a backlog cannot starve reminders.
 BATCH = 50
+#: How many seconds one scheduler pass may spend starting copies (#1172). A pass that has used
+#: it leaves the rest of the batch to the next pass rather than holding the webhooks and the
+#: syncs behind a store that answers slowly.
+BUDGET = 60.0
 #: How long a claimed copy is held while it is being sent. Long enough for a slow store to
 #: finish, short enough that a process killed mid-send is not a copy nobody ever sends.
 SENDING_LEASE = dt.timedelta(minutes=15)
@@ -260,10 +265,27 @@ def claim(copy, now=None) -> bool:
     )
 
 
-def send_pending(*, limit: int = BATCH) -> tuple[int, int]:
-    """Send what is due. Returns (sent, failed). Called by the scheduler on every pass."""
+def send_pending(*, limit: int = BATCH, budget: float = BUDGET) -> tuple[int, int]:
+    """Send what is due. Returns (sent, failed). Called by the scheduler on every pass.
+
+    With a ``budget`` in seconds, copies are started until that much time has gone and the rest
+    wait for the next pass, as the webhooks and `run_syncs` do (#1172); a budget of 0 is none.
+    A pass spends at most the budget and one copy more here, however slowly a store answers;
+    before this, fifty documents on a store that takes twenty seconds over each held the
+    webhooks and the syncs of every account for a quarter of an hour. A copy already started
+    is never cut off, and both counts are of the copies this pass started.
+
+    What is left is not claimed and not counted as tried, so it keeps the time it was due and
+    stands first in the next pass: a copy that was tried is sent, declined, or due again only
+    after its wait, which is later than anything still untried. Nothing waits behind a copy
+    that has had its turn.
+    """
+    started = time.monotonic()
     sent = failed = 0
     for copy in list(pending_copies()[:limit]):
+        if budget and time.monotonic() - started >= budget:
+            logger.info("Copy budget of %ss spent; the rest wait for the next pass", budget)
+            break
         if not claim(copy):
             continue
         if send_copy(copy):
