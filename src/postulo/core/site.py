@@ -12,12 +12,11 @@ Everything here is a small function so that the rest of the code asks a question
 from __future__ import annotations
 
 import logging
-import os
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
 
-from . import memo
+from . import configuration, memo
 
 # The forgetting lives with the memo, which the row itself can import when it is saved; it is
 # handed out here too, because this is where everything that reads the row looks (#248).
@@ -109,7 +108,8 @@ def overridden_by(field: str) -> str | None:
     if isinstance(names, str):
         names = (names,)
     for variable in names:
-        if variable in os.environ:
+        # Its `_FILE` too, for a secret (#1186): a password given as a file pins the field.
+        if configuration.is_set(variable):
             return variable
     return None
 

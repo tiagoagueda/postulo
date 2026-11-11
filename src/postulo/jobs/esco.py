@@ -92,6 +92,7 @@ from functools import lru_cache
 from itertools import pairwise
 from pathlib import Path
 
+from postulo.core import configuration
 from postulo.core import languages as tags
 
 logger = logging.getLogger(__name__)
@@ -100,7 +101,7 @@ logger = logging.getLogger(__name__)
 #: code by default, and on the data volume in the image, where `POSTULO_ESCO_DIR` points.
 #: The source layer the code sits in belongs to root there, and a file written into it
 #: would die with the layer an upgrade replaces.
-DATA_DIR = Path(os.environ.get("POSTULO_ESCO_DIR") or Path(__file__).resolve().parent / "data")
+DATA_DIR = Path(configuration.read("POSTULO_ESCO_DIR"))
 
 #: The language a name is read in when ESCO publishes nothing in the reader's.
 FALLBACK = "en"

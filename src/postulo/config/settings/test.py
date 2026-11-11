@@ -1,8 +1,9 @@
 """Test settings: fast, isolated, and independent of the developer's .env."""
 
-import os
 import tempfile
 from pathlib import Path
+
+from postulo.core.configuration import read
 
 from .base import *
 
@@ -19,7 +20,7 @@ DATABASES = {"default": {"ENGINE": "django.db.backends.sqlite3", "NAME": ":memor
 # CI sets this on a job with a real server beside it; a contributor with one can do the
 # same. Deliberately its own variable rather than POSTULO_DATABASE_URL: a developer's .env
 # points at their working database, and a test run must never find it.
-_test_database_url = os.environ.get("POSTULO_TEST_DATABASE_URL")
+_test_database_url = read("POSTULO_TEST_DATABASE_URL")
 if _test_database_url:
     DATABASES = {"default": env.db_url_config(_test_database_url)}
 

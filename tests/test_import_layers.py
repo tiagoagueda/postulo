@@ -64,6 +64,8 @@ LAYERS: list[tuple[str, tuple[str, ...]]] = [
             "postulo.core.destinations",
             "postulo.core.brands",
             "postulo.core.childenv",
+            # Every environment variable, declared once and read by the settings (#1186).
+            "postulo.core.configuration",
             "postulo.core.flags",
             # A translated sentence with markup pieces, escaped (#806): Django and nothing else.
             "postulo.core.htmlstrings",

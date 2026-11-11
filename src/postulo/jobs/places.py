@@ -34,16 +34,14 @@ from pathlib import Path
 
 from babel import Locale, UnknownLocaleError
 
-from postulo.core import language_names, languages
+from postulo.core import configuration, language_names, languages
 
 logger = logging.getLogger(__name__)
 
 #: Where the tables are read from: beside the code by default, and on the data volume
 #: in the image, where `POSTULO_GEOLOCATIONS_DIR` points and the entrypoint writes them.
 #: The source layer the code sits in is not a place the running container writes to.
-DATA_DIR = Path(
-    os.environ.get("POSTULO_GEOLOCATIONS_DIR") or Path(__file__).resolve().parent / "data"
-)
+DATA_DIR = Path(configuration.read("POSTULO_GEOLOCATIONS_DIR"))
 
 #: The table the cities come from, and the table the country names in it are read from.
 #: ``manage.py fetch_geonames`` writes both; ``data/GEONAMES-LICENCE.md`` says on whose

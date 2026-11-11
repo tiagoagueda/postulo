@@ -605,6 +605,38 @@ for it. It binds plugins too. A package from the index gets a comment in `pyproj
 saying why it is there; files copied into the tree get a line in
 [THIRD-PARTY.md](THIRD-PARTY.md).
 
+## Configuration variables
+
+Every environment variable Postulo, its image or its tooling reads is declared once, in
+`src/postulo/core/configuration.py`, with its type, default, syntax and a one-line
+description, and read through `configuration.read` (#1186). A new variable is a new entry
+there; nothing calls `env(...)` or `os.environ` for one. The names follow these rules:
+
+- **`POSTULO_` + the area + the thing**, in upper snake case. The first word after `POSTULO_`
+  is one of the area words the registry lists in `AREAS` (a Server page, a part of the
+  instance, or a plugin); adding a word is a decision made there. A rate is the exception:
+  it is named for what it bounds.
+- **A unit is the last word, and only `_BYTES`, `_SECONDS` and `_RATE` are units.** A size
+  ends in `_BYTES`, a duration in `_SECONDS`, a rate in `_RATE`, and nothing else does; no
+  `_MB`, `_HOURS`, `_DAYS` or bare `_TIMEOUT`. A size or a duration also takes a suffixed
+  value (`25MB`, `90s`, `2h`, `7d`), so the name never needs a second unit.
+- **A boolean reads as a statement that is true when it is on**: `POSTULO_REGISTRATION_OPEN`,
+  `POSTULO_CAPTURE_KEEP_SOURCE`. Never a negation (`SKIP`, `NO`, `DISABLE`). It takes
+  `true/false/1/0/yes/no/on/off`, in any case.
+- **Lists are comma-separated, rates are `<count>/<s|m|h|d>`, a choice takes its documented
+  words only**, and a secret may also be given as `<NAME>_FILE`, so no name ends in `_FILE`.
+- **A rename keeps the old name working for one minor release**: declare it as an `Alias` of
+  the new entry. It is read with a start-up warning naming the new one (`postulo.W007`), and
+  setting both is refused.
+
+After changing the registry, run `uv run python scripts/configuration_docs.py` and commit
+`.env.example` with it; `--wiki` prints the tables of the wiki's *Configuration* page. Start-up
+warns about a `POSTULO_*` name nothing declares (`postulo.W005`) and refuses a value that
+cannot be read (`postulo.E009`), and `manage.py settings` prints what each variable is and
+where it came from. `tests/test_configuration.py` holds every name to the rules above, except
+the names that broke them when the rules were written, listed there with the name each takes
+when it is renamed; that list only shrinks.
+
 ## Formats
 
 What a new export or import picks, in this order, and a format further down the list needs

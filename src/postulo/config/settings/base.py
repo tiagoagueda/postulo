@@ -1,10 +1,11 @@
 """Settings shared by every environment.
 
 Values that differ between a laptop and a server belong in the environment, not in
-this file. See ``.env.example`` for the full set of recognised variables.
+this file. Every variable read here is declared once, with its type, default and syntax, in
+`postulo.core.configuration`, and read through it (#1186); ``.env.example`` is written from
+that declaration.
 """
 
-import os
 from datetime import timedelta
 from pathlib import Path
 from urllib.parse import urlsplit
@@ -14,26 +15,29 @@ from django.utils.csp import CSP
 
 from postulo.accounts.validators import USERNAME_BLACKLIST
 from postulo.config import database_password, sqlite
-from postulo.core import languages, proxy
+from postulo.core import languages
+from postulo.core.configuration import is_set, read
 
 # src/postulo/config/settings/base.py -> src/postulo
 PACKAGE_DIR = Path(__file__).resolve().parents[2]
 # ... -> the repository root
 REPO_DIR = PACKAGE_DIR.parents[1]
 
+# Kept for the settings that import it, and for plugins' settings that start from these;
+# Postulo's own read through `read` (#1186).
 env = environ.Env()
 # The test settings are built from the process environment alone: a developer's `.env`
 # belongs to their own instance, and a suite that read it ran differently from one machine
 # to the next (#414).
-if os.environ.get("DJANGO_SETTINGS_MODULE") != "postulo.config.settings.test":
+if read("DJANGO_SETTINGS_MODULE", default=None) != "postulo.config.settings.test":
     environ.Env.read_env(REPO_DIR / ".env")
 
 # --------------------------------------------------------------------------- core
 
-SECRET_KEY = env("POSTULO_SECRET_KEY", default=None)
-DEBUG = env.bool("POSTULO_DEBUG", default=False)
-ALLOWED_HOSTS = env.list("POSTULO_ALLOWED_HOSTS", default=["localhost", "127.0.0.1"])
-CSRF_TRUSTED_ORIGINS = env.list("POSTULO_CSRF_TRUSTED_ORIGINS", default=[])
+SECRET_KEY = read("POSTULO_SECRET_KEY")
+DEBUG = read("POSTULO_DEBUG")
+ALLOWED_HOSTS = read("POSTULO_ALLOWED_HOSTS")
+CSRF_TRUSTED_ORIGINS = read("POSTULO_CSRF_TRUSTED_ORIGINS")
 
 ROOT_URLCONF = "postulo.config.urls"
 WSGI_APPLICATION = "postulo.config.wsgi.application"
@@ -87,9 +91,7 @@ INSTALLED_APPS = [
 #: so an instance published straight onto a port cannot be told it is behind HTTPS. Only
 #: this host until the operator names the proxy's network; every private network used to be
 #: trusted, and on a LAN or under rootless Docker that was everybody (#232).
-POSTULO_TRUSTED_PROXIES = env.list(
-    "POSTULO_TRUSTED_PROXIES", default=list(proxy.DEFAULT_TRUSTED_PROXIES)
-)
+POSTULO_TRUSTED_PROXIES = read("POSTULO_TRUSTED_PROXIES")
 
 MIDDLEWARE = [
     # First, so nothing downstream sees a forwarding header from somewhere untrusted --
@@ -169,17 +171,19 @@ TEMPLATES = [
 
 # ----------------------------------------------------------------------- database
 
-DATABASES = {
-    "default": env.db_url(
-        "POSTULO_DATABASE_URL",
-        default=f"sqlite:///{REPO_DIR / 'data' / 'postulo.sqlite3'}",
-    ),
-}
+DATABASES = {"default": environ.Env.db_url_config(read("POSTULO_DATABASE_URL"))}
 DATABASES["default"].setdefault("ATOMIC_REQUESTS", True)
 
 # A password with a `/` in it cannot be written into the URL above, so it may be given
 # beside it instead (#582).
-database_password.apply_password(DATABASES["default"], env.ENVIRON)
+database_password.apply_password(
+    DATABASES["default"],
+    {
+        name: value
+        for name in ("POSTULO_DATABASE_PASSWORD", "POSTGRES_PASSWORD")
+        if (value := read(name))
+    },
+)
 
 # Several workers share one SQLite file, and its defaults fail the moment two of them
 # write at once: an immediate transaction, a write-ahead log and a longer wait make them
@@ -210,7 +214,7 @@ CACHE_TABLE = "postulo_cache"
 # An operator with Redis or Memcached points POSTULO_CACHE_URL at it and gets a faster
 # one. Anything django-environ understands works: redis://, rediss://, memcache://.
 CACHES = {
-    "default": env.cache_url("POSTULO_CACHE_URL", default=f"dbcache://{CACHE_TABLE}"),
+    "default": environ.Env.cache_url_config(read("POSTULO_CACHE_URL")),
 }
 # Django's database cache keeps 300 entries and, past that, deletes the *lexicographically
 # smallest* third of the keys, not the oldest (#755). The rate limits and the sign-in lockout
@@ -218,7 +222,7 @@ CACHES = {
 # a guesser's five tries again. Raised far past anything honest traffic reaches, so that an
 # eviction takes a flood nobody could miss. Redis and Memcached have their own policy and are
 # left as they are.
-POSTULO_CACHE_MAX_ENTRIES = env.int("POSTULO_CACHE_MAX_ENTRIES", default=200_000)
+POSTULO_CACHE_MAX_ENTRIES = read("POSTULO_CACHE_MAX_ENTRIES")
 if CACHES["default"]["BACKEND"].endswith("db.DatabaseCache"):
     CACHES["default"].setdefault("OPTIONS", {}).setdefault("MAX_ENTRIES", POSTULO_CACHE_MAX_ENTRIES)
 
@@ -231,7 +235,7 @@ if CACHES["default"]["BACKEND"].endswith("db.DatabaseCache"):
 if CACHES["default"]["BACKEND"].endswith("db.DatabaseCache"):
     CACHES["ratelimit"] = {
         "BACKEND": "django.core.cache.backends.filebased.FileBasedCache",
-        "LOCATION": str(env.path("POSTULO_RATELIMIT_DIR", default=REPO_DIR / "data" / "ratelimit")),
+        "LOCATION": str(environ.Path(read("POSTULO_RATELIMIT_DIR"))),
         "OPTIONS": {"MAX_ENTRIES": POSTULO_CACHE_MAX_ENTRIES},
     }
 else:
@@ -319,11 +323,11 @@ ACCOUNT_ADAPTER = "postulo.accounts.adapter.AccountAdapter"
 ACCOUNT_LOGIN_BY_CODE_ENABLED = True
 # Three minutes is allauth's default and it is right: long enough for mail to arrive, short
 # enough that a code left in an inbox stops being a key.
-ACCOUNT_LOGIN_BY_CODE_TIMEOUT = env.int("POSTULO_EMAIL_CODE_TIMEOUT", default=180)
-ACCOUNT_LOGIN_BY_CODE_MAX_ATTEMPTS = env.int("POSTULO_EMAIL_CODE_ATTEMPTS", default=3)
+ACCOUNT_LOGIN_BY_CODE_TIMEOUT = read("POSTULO_EMAIL_CODE_TIMEOUT")
+ACCOUNT_LOGIN_BY_CODE_MAX_ATTEMPTS = read("POSTULO_EMAIL_CODE_ATTEMPTS")
 # Resends bounded because each one is an email somebody may not have asked for: a person who
 # mistypes an address they do not own can otherwise send a stranger a stream of them.
-ACCOUNT_LOGIN_BY_CODE_MAX_RESEND_COUNT = env.int("POSTULO_EMAIL_CODE_RESENDS", default=3)
+ACCOUNT_LOGIN_BY_CODE_MAX_RESEND_COUNT = read("POSTULO_EMAIL_CODE_RESENDS")
 # Never. Remembering the browser turns a one-off code into a standing credential on a machine
 # that may not be theirs next week, and this is a route for somebody who has lost their
 # password rather than a way to stop typing it.
@@ -359,9 +363,9 @@ MFA_TRUST_COOKIE_AGE = timedelta(days=30)
 # Single sign-on through OpenID Connect, configured from the environment. Unset means no
 # button and nothing changes for anyone. One generic provider covers Authentik, Keycloak,
 # Pocket ID, Zitadel, Kanidm, Google and anything else that speaks OIDC.
-POSTULO_OIDC_NAME = env("POSTULO_OIDC_NAME", default="Single sign-on")
-POSTULO_OIDC_SERVER_URL = env("POSTULO_OIDC_SERVER_URL", default="")
-POSTULO_OIDC_CLIENT_ID = env("POSTULO_OIDC_CLIENT_ID", default="")
+POSTULO_OIDC_NAME = read("POSTULO_OIDC_NAME")
+POSTULO_OIDC_SERVER_URL = read("POSTULO_OIDC_SERVER_URL")
+POSTULO_OIDC_CLIENT_ID = read("POSTULO_OIDC_CLIENT_ID")
 # The provider's origin, for the policy's `form-action` (#737): the sign-in button is a form,
 # and its answer is a redirect to the provider. Nothing when none is configured.
 _OIDC_FORM_ORIGINS = (
@@ -369,10 +373,10 @@ _OIDC_FORM_ORIGINS = (
     if POSTULO_OIDC_SERVER_URL and POSTULO_OIDC_CLIENT_ID
     else []
 )
-POSTULO_OIDC_CLIENT_SECRET = env("POSTULO_OIDC_CLIENT_SECRET", default="")
+POSTULO_OIDC_CLIENT_SECRET = read("POSTULO_OIDC_CLIENT_SECRET")
 # By default single sign-on signs in accounts that exist; the identity provider is not an
 # invitation unless the operator says so.
-POSTULO_OIDC_AUTO_SIGNUP = env.bool("POSTULO_OIDC_AUTO_SIGNUP", default=False)
+POSTULO_OIDC_AUTO_SIGNUP = read("POSTULO_OIDC_AUTO_SIGNUP")
 POSTULO_OIDC_PROVIDER_ID = "oidc"
 
 SOCIALACCOUNT_PROVIDERS = (
@@ -416,9 +420,9 @@ SOCIALACCOUNT_OPENID_CONNECT_URL_PREFIX = "sso"
 # chosen so instances already running did not change, and an instance paired with a weak
 # provider was one login from every local account. An operator who runs a provider they
 # trust turns it on, and `postulo.W002` says so to one who has a provider and has not chosen.
-POSTULO_OIDC_LINK_BY_EMAIL = env.bool("POSTULO_OIDC_LINK_BY_EMAIL", default=False)
+POSTULO_OIDC_LINK_BY_EMAIL = read("POSTULO_OIDC_LINK_BY_EMAIL")
 # Whether the operator said anything at all, for the check that reminds the ones who did not.
-POSTULO_OIDC_LINK_BY_EMAIL_CHOSEN = "POSTULO_OIDC_LINK_BY_EMAIL" in env.ENVIRON
+POSTULO_OIDC_LINK_BY_EMAIL_CHOSEN = is_set("POSTULO_OIDC_LINK_BY_EMAIL")
 SOCIALACCOUNT_EMAIL_AUTHENTICATION = POSTULO_OIDC_LINK_BY_EMAIL
 SOCIALACCOUNT_EMAIL_AUTHENTICATION_AUTO_CONNECT = POSTULO_OIDC_LINK_BY_EMAIL
 SOCIALACCOUNT_EMAIL_REQUIRED = True
@@ -433,32 +437,29 @@ SOCIALACCOUNT_FORMS = {"signup": "postulo.accounts.forms.SocialSignupForm"}
 # counts of records, work waiting, and what has failed. With no token set they are
 # readable by whoever can reach the instance, and the page says exactly that rather than
 # implying they are protected.
-POSTULO_METRICS_ENABLED = env.bool("POSTULO_METRICS_ENABLED", default=False)
+POSTULO_METRICS_ENABLED = read("POSTULO_METRICS_ENABLED")
 # Whether this instance may ask, once a day from the scheduler and never from a page,
 # whether a newer release exists -- one request to the address below and to nothing else.
 # Off by default, because this application does not make requests on a reader's behalf;
 # on, the Overview can say that a release, and so a security release, is out (#272).
-POSTULO_UPDATE_CHECK = env.bool("POSTULO_UPDATE_CHECK", default=False)
-POSTULO_UPDATE_SOURCE = env(
-    "POSTULO_UPDATE_SOURCE",
-    default="https://source.tiagoagueda.com/api/v1/repos/postulo/postulo/releases/latest",
-)
-POSTULO_METRICS_TOKEN = env("POSTULO_METRICS_TOKEN", default="")
+POSTULO_UPDATE_CHECK = read("POSTULO_UPDATE_CHECK")
+POSTULO_UPDATE_SOURCE = read("POSTULO_UPDATE_SOURCE")
+POSTULO_METRICS_TOKEN = read("POSTULO_METRICS_TOKEN")
 
 # The log, served at /logs for a collector to scrape. Off, and a 404 rather than a 403
 # when off, so nothing confirms that an endpoint is there at all. On without a token it
 # refuses to serve: an unauthenticated log endpoint is a data leak with a URL.
-POSTULO_LOGS_ENDPOINT_ENABLED = env.bool("POSTULO_LOGS_ENDPOINT_ENABLED", default=False)
-POSTULO_LOGS_TOKEN = env("POSTULO_LOGS_TOKEN", default="")
+POSTULO_LOGS_ENDPOINT_ENABLED = read("POSTULO_LOGS_ENDPOINT_ENABLED")
+POSTULO_LOGS_TOKEN = read("POSTULO_LOGS_TOKEN")
 
 # Whether arriving through the identity provider counts as the second factor, so
 # somebody with a TOTP app is not asked for a code as well. Off: Postulo cannot see how
 # the provider authenticated anybody, so this is the operator's judgement about their own
 # provider. Also settable from Server settings → Sign-in.
-POSTULO_OIDC_IS_SECOND_FACTOR = env.bool("POSTULO_OIDC_IS_SECOND_FACTOR", default=False)
+POSTULO_OIDC_IS_SECOND_FACTOR = read("POSTULO_OIDC_IS_SECOND_FACTOR")
 
 # An instance is invite-only unless the operator opens registration deliberately.
-POSTULO_REGISTRATION_OPEN = env.bool("POSTULO_REGISTRATION_OPEN", default=False)
+POSTULO_REGISTRATION_OPEN = read("POSTULO_REGISTRATION_OPEN")
 
 # Where Django's admin lives, and whether it exists at all. **Empty by default**, which
 # means it is not mounted: Postulo's own Server settings cover people, sign-in policy,
@@ -478,7 +479,7 @@ POSTULO_REGISTRATION_OPEN = env.bool("POSTULO_REGISTRATION_OPEN", default=False)
 # It has no login of its own (#367). Whoever is not signed in is sent to Postulo's sign-in,
 # so allauth's limits, the second factor and the confirmed address all apply to it, and
 # there is no second set of limits here to keep in step with allauth's.
-POSTULO_ADMIN_URL = env("POSTULO_ADMIN_URL", default="").strip().lstrip("/")
+POSTULO_ADMIN_URL = read("POSTULO_ADMIN_URL").strip().lstrip("/")
 if POSTULO_ADMIN_URL and not POSTULO_ADMIN_URL.endswith("/"):
     POSTULO_ADMIN_URL += "/"
 
@@ -493,92 +494,92 @@ if POSTULO_ADMIN_URL and not POSTULO_ADMIN_URL.endswith("/"):
 # outbound request to an address the caller chose. Thirty an hour is far more than a person
 # recording their own applications will use and far less than a scanner wants; an instance
 # doing bulk work should raise it deliberately rather than discover it has no ceiling.
-POSTULO_CAPTURE_RATE = env("POSTULO_CAPTURE_RATE", default="30/h")
+POSTULO_CAPTURE_RATE = read("POSTULO_CAPTURE_RATE")
 # The other places the server fetches an address somebody typed: *Check* and *Check all* on
 # career links, the logo address on a company, *Find logo* and *Refresh*. One use per
 # outbound URL (#407). Looser than capture, because pressing *Check all* on a few dozen
 # links is ordinary use, but it is a ceiling where there was none.
-POSTULO_FETCH_RATE = env("POSTULO_FETCH_RATE", default="300/h")
+POSTULO_FETCH_RATE = read("POSTULO_FETCH_RATE")
 # *Fetch from Wikidata*, per account (#673): one item per press, to a fixed public host whose
 # policy asks clients to go gently.
-POSTULO_WIKIDATA_RATE = env("POSTULO_WIKIDATA_RATE", default="60/h")
+POSTULO_WIKIDATA_RATE = read("POSTULO_WIKIDATA_RATE")
 # *Look up* beside a publication's DOI and *Suggest from my ORCID record*, together, per account
 # (#688): one request to doi.org or to pub.orcid.org per press, spent before the request and
 # so spent whether the service answers or not.
-POSTULO_LOOKUP_RATE = env("POSTULO_LOOKUP_RATE", default="20/h")
+POSTULO_LOOKUP_RATE = read("POSTULO_LOOKUP_RATE")
 # *Look up* in a company register, per account (#1021): one company per press, to a
 # government's service whose terms ask for a few requests a second at most (France's says 7
 # per address, Czechia's blocks past 500 a minute). Thirty an hour is a morning of tidying
 # companies, and nowhere near what a register would notice.
-POSTULO_REGISTER_LOOKUP_RATE = env("POSTULO_REGISTER_LOOKUP_RATE", default="30/h")
+POSTULO_REGISTER_LOOKUP_RATE = read("POSTULO_REGISTER_LOOKUP_RATE")
 # Per token rather than per account, so revoking one revokes its allowance with it.
-POSTULO_API_RATE = env("POSTULO_API_RATE", default="600/h")
+POSTULO_API_RATE = read("POSTULO_API_RATE")
 # What every token of one account may do together (#799), since tokens are free to make.
-POSTULO_API_ACCOUNT_RATE = env("POSTULO_API_ACCOUNT_RATE", default="3000/h")
+POSTULO_API_ACCOUNT_RATE = read("POSTULO_API_ACCOUNT_RATE")
 # Mail somebody sends as themselves (#149). Per account, and low: this is the one surface
 # where a mistake reaches strangers rather than the person who made it, and a job search is
 # a few messages a day rather than a mailing list.
-POSTULO_OUTBOX_RATE = env("POSTULO_OUTBOX_RATE", default="60/h")
+POSTULO_OUTBOX_RATE = read("POSTULO_OUTBOX_RATE")
 # /logs and /metrics, which a shared token guards rather than an account, so this is keyed
 # on the caller's address. A collector polls on a schedule; this bounds one that does not.
-POSTULO_ENDPOINT_RATE = env("POSTULO_ENDPOINT_RATE", default="120/h")
+POSTULO_ENDPOINT_RATE = read("POSTULO_ENDPOINT_RATE")
 # Asking for a confirmation to be sent again, across every kind of contact detail (#146).
 # One limit rather than one per channel: a resend button is a way to make somebody's phone
 # buzz forty times, and the channel that costs money per send is not the one whose own
 # setting anybody would remember to configure. Five an hour is more than somebody who did
 # not receive the first one needs, and few enough to be useless as a way to bother anybody.
-POSTULO_CONFIRMATION_RATE = env("POSTULO_CONFIRMATION_RATE", default="5/h")
+POSTULO_CONFIRMATION_RATE = read("POSTULO_CONFIRMATION_RATE")
 # How often one account may be told that a telephone number is already recorded here. The
 # disclosure itself is deliberate and documented (#90); what this bounds is asking it five
 # hundred times, which turns one honest sentence into a list of the numbers with accounts
 # here. Charged only when the answer is the informative one, so somebody editing their own
 # numbers never meets it (#142).
-POSTULO_NUMBER_RATE = env("POSTULO_NUMBER_RATE", default="20/h")
+POSTULO_NUMBER_RATE = read("POSTULO_NUMBER_RATE")
 # Text messages, bounded twice because two different mistakes are being bounded (#143). Per
 # account is somebody driving the resend button. Per number is a stranger whose number was
 # mistyped into a form and who has no way to make it stop -- which is the one that matters,
 # because they never asked to be involved and cannot switch anything off. Mail that fails
 # costs nothing; this costs money per message.
-POSTULO_TEXT_RATE = env("POSTULO_TEXT_RATE", default="5/h")
-POSTULO_TEXT_PER_NUMBER_RATE = env("POSTULO_TEXT_PER_NUMBER_RATE", default="3/h")
+POSTULO_TEXT_RATE = read("POSTULO_TEXT_RATE")
+POSTULO_TEXT_PER_NUMBER_RATE = read("POSTULO_TEXT_PER_NUMBER_RATE")
 # Recovery links one administrator may issue in an hour. Each one is a whole account in a
 # URL, so this is deliberately low: an administrator helping people back in one at a time
 # never notices it, and a compromised administrator session cannot mint fifty (#103).
-POSTULO_RECOVERY_RATE = env("POSTULO_RECOVERY_RATE", default="10/h")
+POSTULO_RECOVERY_RATE = read("POSTULO_RECOVERY_RATE")
 # How often one account may be told that a company of its owner's already has a name, when the
 # company is shared with it and not its own (#949). Renaming a shared company asks about the
 # owner's other companies; the answer is kept, as telephone numbers' is (#758), but bounded.
-POSTULO_COMPANY_NAME_RATE = env("POSTULO_COMPANY_NAME_RATE", default="20/h")
+POSTULO_COMPANY_NAME_RATE = read("POSTULO_COMPANY_NAME_RATE")
 # Usernames one account may try to change to in an hour (#745). Each attempt that names a
 # taken username says so, which is how a name is found out; the sign-up form is bounded by
 # allauth's per-address limit and cannot be bounded per account, there being none yet.
-POSTULO_USERNAME_RATE = env("POSTULO_USERNAME_RATE", default="10/h")
+POSTULO_USERNAME_RATE = read("POSTULO_USERNAME_RATE")
 # People one account may look up by username or address on a record's *Sharing* page in an
 # hour (#943). A hit shares the record, a miss says nobody answers: that is an oracle for
 # who holds an account here, so the number of tries is bounded. Choosing one's own group
 # costs nothing.
-POSTULO_SHARE_LOOKUP_RATE = env("POSTULO_SHARE_LOOKUP_RATE", default="20/h")
+POSTULO_SHARE_LOOKUP_RATE = read("POSTULO_SHARE_LOOKUP_RATE")
 # API tokens one account may make in an hour (#764). Each is a way in with no password and no
 # second factor; making a handful an hour is a person, making fifty is not.
-POSTULO_API_TOKEN_RATE = env("POSTULO_API_TOKEN_RATE", default="10/h")
+POSTULO_API_TOKEN_RATE = read("POSTULO_API_TOKEN_RATE")
 # Tests of a connection, and of the instance's mail settings, one account may run in an
 # hour. Each is a real message or a real request at a press of a button, and the button
 # had no bound at all (#232).
-POSTULO_CONNECTION_TEST_RATE = env("POSTULO_CONNECTION_TEST_RATE", default="10/h")
+POSTULO_CONNECTION_TEST_RATE = read("POSTULO_CONNECTION_TEST_RATE")
 # *Sync now* presses of one account in an hour (#786). Each runs a sync inline, which is a run of
 # real requests to somebody's server; the scheduler runs a connection at most every fifteen
 # minutes, so the button is for the odd moment and not for a loop.
-POSTULO_CONNECTION_SYNC_RATE = env("POSTULO_CONNECTION_SYNC_RATE", default="20/h")
+POSTULO_CONNECTION_SYNC_RATE = read("POSTULO_CONNECTION_SYNC_RATE")
 # Questions one account may put to a sync connection's plugin in an hour from its *Pairing* page
 # (#327): a search, *Show unpaired*, or the one item a pairing is about to be made with, each
 # asked again of the server, live. A person pairing an address book by hand asks a few a
 # minute; this bounds a script, not a person.
-POSTULO_CONNECTION_PAIRING_RATE = env("POSTULO_CONNECTION_PAIRING_RATE", default="120/h")
+POSTULO_CONNECTION_PAIRING_RATE = read("POSTULO_CONNECTION_PAIRING_RATE")
 # What the skill box asks for as somebody types, per account (#266): names from the ESCO
 # classification beginning with what has been typed. A request at each pause in typing is a
 # handful a skill, so six hundred an hour is a long afternoon of writing a career down, and
 # a bound on a script asking the server to search a list as fast as it can.
-POSTULO_SUGGESTION_RATE = env("POSTULO_SUGGESTION_RATE", default="600/h")
+POSTULO_SUGGESTION_RATE = read("POSTULO_SUGGESTION_RATE")
 
 # ---------------------------------------------------------- internationalisation
 
@@ -594,7 +595,7 @@ LANGUAGES = languages.LANGUAGES
 # Inside the package, so an installed wheel and a container carry the catalogues too.
 LOCALE_PATHS = [PACKAGE_DIR / "locale"]
 
-TIME_ZONE = env("POSTULO_TIME_ZONE", default="Europe/Paris")
+TIME_ZONE = read("POSTULO_TIME_ZONE")
 USE_I18N = True
 USE_TZ = True
 
@@ -632,13 +633,13 @@ FORMAT_MODULE_PATH = ["postulo.config.formats"]
 # ---------------------------------------------------------------- static & media
 
 STATIC_URL = "static/"
-STATIC_ROOT = env.path("POSTULO_STATIC_ROOT", default=REPO_DIR / "staticfiles")
+STATIC_ROOT = environ.Path(read("POSTULO_STATIC_ROOT"))
 STATICFILES_DIRS = [PACKAGE_DIR / "static"]
 
 # Media holds CVs and cover letters: personal documents, never served directly.
 # Every file is delivered through an ownership-checked view instead.
 MEDIA_URL = "media/"
-MEDIA_ROOT = env.path("POSTULO_MEDIA_ROOT", default=REPO_DIR / "data" / "media")
+MEDIA_ROOT = environ.Path(read("POSTULO_MEDIA_ROOT"))
 # Uploaded documents and the directories made for them are the owner's alone. Django's
 # default is whatever the umask leaves, which on a bare-metal install is world-readable
 # (#789). The image runs as one user in a root-only volume and is unaffected.
@@ -648,71 +649,67 @@ FILE_UPLOAD_DIRECTORY_PERMISSIONS = 0o700
 # Where plugins installed through the interface live. On the data volume, not in the
 # environment: the image is rebuilt on every upgrade and the volume is not, so a plugin
 # put here survives one. The directory is added to the import path at startup.
-POSTULO_PLUGINS_DIR = env.path("POSTULO_PLUGINS_DIR", default=REPO_DIR / "data" / "plugins")
+POSTULO_PLUGINS_DIR = environ.Path(read("POSTULO_PLUGINS_DIR"))
 
 # Catalogues an administrator may install plugins from, as `name|url|public-key` entries
 # separated by commas. Empty by default: an index is a list of code to run, so pointing at
 # one is a decision an operator makes, and every index must be signed with the key given
 # here before anything is fetched from it.
-POSTULO_PLUGIN_CATALOGUES = env("POSTULO_PLUGIN_CATALOGUES", default="")
+POSTULO_PLUGIN_CATALOGUES = read("POSTULO_PLUGIN_CATALOGUES")
 
 # Where the scheduler records the end of each pass. On the data volume because two
 # different containers read it: the scheduler's own healthcheck, which has no port to curl
 # and no database credentials, and the metrics endpoint, which runs in the web one (#221).
-POSTULO_SCHEDULER_HEARTBEAT = env.path(
-    "POSTULO_SCHEDULER_HEARTBEAT", default=REPO_DIR / "data" / "scheduler-heartbeat"
-)
+POSTULO_SCHEDULER_HEARTBEAT = environ.Path(read("POSTULO_SCHEDULER_HEARTBEAT"))
 
 # Where `manage.py backup` writes when given no target. Beside the data it copies, so a
 # single volume holds both; move it elsewhere if that volume is the thing being backed up.
-POSTULO_BACKUP_DIR = env.path("POSTULO_BACKUP_DIR", default=REPO_DIR / "data" / "backups")
+POSTULO_BACKUP_DIR = environ.Path(read("POSTULO_BACKUP_DIR"))
 
 # The largest archive Server settings > Backups accepts for a restore, in megabytes. An
 # upload is checked against this before any of it is kept; a reverse proxy in front has its
 # own, smaller limit that has to be raised to match (#242).
-POSTULO_BACKUP_UPLOAD_MAX_MB = env.int("POSTULO_BACKUP_UPLOAD_MAX_MB", default=512)
+POSTULO_BACKUP_UPLOAD_MAX_MB = read("POSTULO_BACKUP_UPLOAD_MAX_MB")
 # The largest request body any other page accepts, refused on its declared length before it is
 # read (#812). A document is 20 MB at most; the rest is for the form around it.
-POSTULO_UPLOAD_CEILING_MB = env.int("POSTULO_UPLOAD_CEILING_MB", default=25)
+POSTULO_UPLOAD_CEILING_MB = read("POSTULO_UPLOAD_CEILING_MB")
 # Whether outbound requests honour HTTP_PROXY, HTTPS_PROXY and NO_PROXY (#817). Off: behind a
 # proxy the destination check is made on an address the tunnel then verifies a certificate for
 # instead of the name, so the check and the connection can disagree. For an instance whose only
 # way out is a proxy, and whose operator accepts that.
-POSTULO_OUTBOUND_USE_ENV_PROXY = env.bool("POSTULO_OUTBOUND_USE_ENV_PROXY", default=False)
+POSTULO_OUTBOUND_USE_ENV_PROXY = read("POSTULO_OUTBOUND_USE_ENV_PROXY")
 # Who may download a backup through the browser (#810). A backup holds every account's rows and
 # files, so this is the one place an administrator is more than an administrator of accounts:
 # `administrators` (the default) is every administrator, `operator` only the operator's own
 # account (the superuser), and `console` nobody -- the files are taken from the data volume.
-POSTULO_BACKUP_DOWNLOAD = env("POSTULO_BACKUP_DOWNLOAD", default="administrators")
+POSTULO_BACKUP_DOWNLOAD = read("POSTULO_BACKUP_DOWNLOAD")
 
 # Where this instance is reached from outside, for the links in messages sent when no
 # request is around — a reminder falling due at three in the morning. Unset, such links
 # are bare paths. Where a request exists, the link is built from it instead.
-POSTULO_PUBLIC_URL = env("POSTULO_PUBLIC_URL", default="").rstrip("/")
+POSTULO_PUBLIC_URL = read("POSTULO_PUBLIC_URL").rstrip("/")
 
 # Where this instance's code can be had, linked as *Source code* at the foot of every page
 # (#212). The AGPL entitles the people using a *modified* Postulo run as a service to its
 # source, and the footer is where that offer is made -- so it points at wherever the
 # operator's code lives, and at the upstream repository for an instance that changed
 # nothing. Checked at start-up: an address a browser can follow, or the instance refuses.
-POSTULO_SOURCE_URL = env(
-    "POSTULO_SOURCE_URL", default="https://source.tiagoagueda.com/postulo/postulo"
-).strip()
+POSTULO_SOURCE_URL = read("POSTULO_SOURCE_URL").strip()
 
 # The operator's legal notice -- an imprint, a contact page -- which some countries require
 # of a site (Germany's Impressum is the usual example). Linked at the foot of every page
 # when set, and nowhere when not: who runs an instance is a fact nobody but the operator
 # can state, so it is never guessed. Checked at start-up like the one above.
-POSTULO_LEGAL_NOTICE_URL = env("POSTULO_LEGAL_NOTICE_URL", default="").strip()
+POSTULO_LEGAL_NOTICE_URL = read("POSTULO_LEGAL_NOTICE_URL").strip()
 
 # Where the companies' map takes its tiles (#898): `osm` (OpenStreetMap's public tiles, fetched
 # by the viewer's browser), `custom` (the URL template below, https:// or a path on this
 # instance's own origin) or `none` (the world's outline, nothing fetched). Each also changeable
 # under Server settings -> Plugins -> Maps when not set here. `postulo.jobs.tiles` says what
 # each tells whom.
-POSTULO_MAP_TILES = env("POSTULO_MAP_TILES", default="osm").strip().lower()
-POSTULO_MAP_TILE_URL = env("POSTULO_MAP_TILE_URL", default="").strip()
-POSTULO_MAP_TILE_ATTRIBUTION = env("POSTULO_MAP_TILE_ATTRIBUTION", default="").strip()
+POSTULO_MAP_TILES = read("POSTULO_MAP_TILES").strip().lower()
+POSTULO_MAP_TILE_URL = read("POSTULO_MAP_TILE_URL").strip()
+POSTULO_MAP_TILE_ATTRIBUTION = read("POSTULO_MAP_TILE_ATTRIBUTION").strip()
 
 # Whether an address with a street is pinned at that street, looked up with a geocoding service
 # (#913): `off` (the default: the postcode or the town, offline), `nominatim`, `photon` or
@@ -720,28 +717,28 @@ POSTULO_MAP_TILE_ATTRIBUTION = env("POSTULO_MAP_TILE_ATTRIBUTION", default="").s
 # service may be sent the addresses on the map, people's and contacts' included. Each also
 # changeable under Server settings -> Plugins -> Maps when not set here.
 # `postulo.jobs.geocoding` says what is sent where.
-POSTULO_GEOCODER = env("POSTULO_GEOCODER", default="").strip().lower()
-POSTULO_GEOCODER_URL = env("POSTULO_GEOCODER_URL", default="").strip()
+POSTULO_GEOCODER = read("POSTULO_GEOCODER").strip().lower()
+POSTULO_GEOCODER_URL = read("POSTULO_GEOCODER_URL").strip()
 
 # Optional hand-off to the web server once Django has authorised a download. Leave both
 # unset to have Django stream the file itself, which is correct but ties up a worker.
 # nginx: an `internal` location, e.g. "/protected-media/".
-POSTULO_MEDIA_ACCEL_PREFIX = env("POSTULO_MEDIA_ACCEL_PREFIX", default="")
+POSTULO_MEDIA_ACCEL_PREFIX = read("POSTULO_MEDIA_ACCEL_PREFIX")
 # Apache with mod_xsendfile.
-POSTULO_MEDIA_SENDFILE = env.bool("POSTULO_MEDIA_SENDFILE", default=False)
+POSTULO_MEDIA_SENDFILE = read("POSTULO_MEDIA_SENDFILE")
 
 # The scheduler removes a file under the media root that no row names, once it is older than
 # the grace period: a request that failed after its file was written leaves one behind, and
 # Django has no hook for a rollback (#663). The grace is what stops it taking a file a
 # request is about to attach. Set POSTULO_MEDIA_SWEEP=false to leave it to `prune_media`.
-POSTULO_MEDIA_SWEEP = env.bool("POSTULO_MEDIA_SWEEP", default=True)
-POSTULO_MEDIA_SWEEP_GRACE_HOURS = env.int("POSTULO_MEDIA_SWEEP_GRACE_HOURS", default=24)
+POSTULO_MEDIA_SWEEP = read("POSTULO_MEDIA_SWEEP")
+POSTULO_MEDIA_SWEEP_GRACE_HOURS = read("POSTULO_MEDIA_SWEEP_GRACE_HOURS")
 
 # The scheduler reads a slice of the uploads against the size and checksum recorded when each
 # arrived, and leaves a file it has read alone for this many days before reading it again
 # (#1118). Damage on disk is rare, and a week still reports it within days; 0 reads the slice
 # again on every pass. `manage.py verify_media` reads every file whenever it is run.
-POSTULO_SCRUB_EVERY_DAYS = env.int("POSTULO_SCRUB_EVERY_DAYS", default=7)
+POSTULO_SCRUB_EVERY_DAYS = read("POSTULO_SCRUB_EVERY_DAYS")
 
 # ------------------------------------------------------------------------ pdf
 
@@ -750,7 +747,7 @@ POSTULO_SCRUB_EVERY_DAYS = env.int("POSTULO_SCRUB_EVERY_DAYS", default=7)
 # impractical. "auto" takes whichever actually works, preferring WeasyPrint. Export is
 # optional, so an unusable renderer is reported when export is attempted rather than
 # preventing the application from starting.
-POSTULO_PDF_BACKEND = env("POSTULO_PDF_BACKEND", default="auto")
+POSTULO_PDF_BACKEND = read("POSTULO_PDF_BACKEND")
 
 # ---------------------------------------------------------------------- capture
 
@@ -758,7 +755,7 @@ POSTULO_PDF_BACKEND = env("POSTULO_PDF_BACKEND", default="auto")
 # are looking at is not a crawler, but Postulo cannot prove that to the site, so the
 # polite default stands. Turning this off makes the operator responsible for the
 # requests their instance makes.
-POSTULO_CAPTURE_IGNORE_ROBOTS = env.bool("POSTULO_CAPTURE_IGNORE_ROBOTS", default=False)
+POSTULO_CAPTURE_IGNORE_ROBOTS = read("POSTULO_CAPTURE_IGNORE_ROBOTS")
 
 # Whether a capture may keep the page it was read from: the source as it was parsed, and a
 # rendering of the whole page (#256). Two switches because the two leak differently -- a
@@ -768,36 +765,32 @@ POSTULO_CAPTURE_IGNORE_ROBOTS = env.bool("POSTULO_CAPTURE_IGNORE_ROBOTS", defaul
 # a person switches each on for their own captures, under Settings -> Capture, and a no
 # here is final. Also settable from Server settings -> Capture, where a variable set here
 # is shown as pinned.
-POSTULO_CAPTURE_KEEP_SOURCE = env.bool("POSTULO_CAPTURE_KEEP_SOURCE", default=False)
-POSTULO_CAPTURE_KEEP_RENDERING = env.bool("POSTULO_CAPTURE_KEEP_RENDERING", default=False)
+POSTULO_CAPTURE_KEEP_SOURCE = read("POSTULO_CAPTURE_KEEP_SOURCE")
+POSTULO_CAPTURE_KEEP_RENDERING = read("POSTULO_CAPTURE_KEEP_RENDERING")
 # What one kept file may weigh, in bytes, checked before anything is read or stored. The
 # source is bounded by what capture reads anyway -- two megabytes fetched, a request body
 # of two and a half -- so its cap is the first of those; a rendering of a long advert is
 # larger than either, and ten megabytes holds a full-page picture at twice the pixel
 # density. The rendering's cap can be set from Server settings -> Capture as well.
-POSTULO_CAPTURE_SOURCE_MAX_BYTES = env.int("POSTULO_CAPTURE_SOURCE_MAX_BYTES", default=2_000_000)
-POSTULO_CAPTURE_RENDERING_MAX_BYTES = env.int(
-    "POSTULO_CAPTURE_RENDERING_MAX_BYTES", default=10 * 1024 * 1024
-)
+POSTULO_CAPTURE_SOURCE_MAX_BYTES = read("POSTULO_CAPTURE_SOURCE_MAX_BYTES")
+POSTULO_CAPTURE_RENDERING_MAX_BYTES = read("POSTULO_CAPTURE_RENDERING_MAX_BYTES")
 # What one account's kept pages may weigh together. The caps above bound a file; this is
 # what bounds the disk, because a token that can capture can send a rendering with every
 # capture, and the API's own rate would let that be gigabytes an hour. Past it captures are
 # still made and nothing more is kept until something kept has gone.
-POSTULO_CAPTURE_ACCOUNT_MAX_BYTES = env.int(
-    "POSTULO_CAPTURE_ACCOUNT_MAX_BYTES", default=1024 * 1024 * 1024
-)
+POSTULO_CAPTURE_ACCOUNT_MAX_BYTES = read("POSTULO_CAPTURE_ACCOUNT_MAX_BYTES")
 # How many days the page of a capture that never became a listing is kept -- one discarded,
 # or one still waiting for review. The capture itself stays; what goes is the copy of the
 # page. A capture that was saved keeps its page while its listing exists (#664). 0 keeps them all.
-POSTULO_CAPTURE_PAGE_KEEP_DAYS = env.int("POSTULO_CAPTURE_PAGE_KEEP_DAYS", default=30)
+POSTULO_CAPTURE_PAGE_KEEP_DAYS = read("POSTULO_CAPTURE_PAGE_KEEP_DAYS")
 
 # Connections: plugins that talk to another service on a person's behalf. Their secrets
 # are encrypted under a key derived from SECRET_KEY unless a dedicated one is given, so
 # that rotating Django's key does not silently lock every connection.
-POSTULO_FIELD_KEY = env("POSTULO_FIELD_KEY", default="")
+POSTULO_FIELD_KEY = read("POSTULO_FIELD_KEY")
 # The ports a fetch of something public -- a posting, a link, a logo -- may dial (#780). A
 # connection is the operator's own choice and may use any port.
-_fetch_ports = env.list("POSTULO_FETCH_PORTS", default=["80", "443", "8080", "8443"])
+_fetch_ports = read("POSTULO_FETCH_PORTS")
 # `*` lifts the restriction, for a test that serves a page on a port of its own.
 POSTULO_FETCH_PORTS = (
     "*"
@@ -807,7 +800,7 @@ POSTULO_FETCH_PORTS = (
 # Capture refuses private addresses because the URL came from a stranger's page. A
 # connection's destination is what the person typed, and self-hosted services live on
 # private networks, so the operator decides — once — whether plugins may reach them.
-POSTULO_CONNECTIONS_ALLOW_PRIVATE = env.bool("POSTULO_CONNECTIONS_ALLOW_PRIVATE", default=False)
+POSTULO_CONNECTIONS_ALLOW_PRIVATE = read("POSTULO_CONNECTIONS_ALLOW_PRIVATE")
 
 STORAGES = {
     "default": {"BACKEND": "django.core.files.storage.FileSystemStorage"},
@@ -841,21 +834,19 @@ TASKS = {
 #   docker compose -f docker/compose.yml --profile worker up -d
 # or run `manage.py work` yourself. The pair must agree: this setting is what the web
 # process believes, and nothing here can see whether the container is really there.
-POSTULO_BACKGROUND_WORK = env.bool("POSTULO_BACKGROUND_WORK", default=False)
+POSTULO_BACKGROUND_WORK = read("POSTULO_BACKGROUND_WORK")
 
 # Where the worker records that it is going round (the end of a pass, once a minute: #1117),
 # read by its own container healthcheck and by Server settings in the web one. A file on
 # the shared volume for the reason the scheduler's is one: it is the only thing both
 # containers can see (#221, #247).
-POSTULO_WORKER_HEARTBEAT = env.path(
-    "POSTULO_WORKER_HEARTBEAT", default=REPO_DIR / "data" / "worker-heartbeat"
-)
+POSTULO_WORKER_HEARTBEAT = environ.Path(read("POSTULO_WORKER_HEARTBEAT"))
 
 # How long an export archive waits on disk for somebody to download it. One file per
 # export, holding every document in an account, so it is reaped rather than kept: the
 # scheduler deletes what has expired, and the archive is reachable only through an
 # ownership-checked view like every other personal document (#247).
-POSTULO_EXPORT_KEEP_HOURS = env.int("POSTULO_EXPORT_KEEP_HOURS", default=24)
+POSTULO_EXPORT_KEEP_HOURS = read("POSTULO_EXPORT_KEEP_HOURS")
 
 # --------------------------------------------------------------------- security
 
@@ -913,7 +904,7 @@ CSRF_COOKIE_HTTPONLY = True
 
 # Django 6.1 deprecates the EMAIL_* settings in favour of MAILERS; the two may not be
 # mixed, so Postulo uses MAILERS exclusively. Each environment defines its own.
-DEFAULT_FROM_EMAIL = env("POSTULO_DEFAULT_FROM_EMAIL", default="postulo@localhost")
+DEFAULT_FROM_EMAIL = read("POSTULO_DEFAULT_FROM_EMAIL")
 SERVER_EMAIL = DEFAULT_FROM_EMAIL
 
 # Read here rather than straight into MAILERS so that `postulo.core.site` can resolve them
@@ -921,44 +912,39 @@ SERVER_EMAIL = DEFAULT_FROM_EMAIL
 # Server settings page fills the rest. MAILERS is built once at import and email has to be
 # configurable without a restart, so the values reach the backend at send time instead.
 # See postulo.core.mail.
-POSTULO_EMAIL_HOST = env("POSTULO_EMAIL_HOST", default="localhost")
-POSTULO_EMAIL_PORT = env.int("POSTULO_EMAIL_PORT", default=25)
-POSTULO_EMAIL_HOST_USER = env("POSTULO_EMAIL_HOST_USER", default="")
-POSTULO_EMAIL_HOST_PASSWORD = env("POSTULO_EMAIL_HOST_PASSWORD", default="")
-POSTULO_EMAIL_USE_TLS = env.bool("POSTULO_EMAIL_USE_TLS", default=True)
+POSTULO_EMAIL_HOST = read("POSTULO_EMAIL_HOST")
+POSTULO_EMAIL_PORT = read("POSTULO_EMAIL_PORT")
+POSTULO_EMAIL_HOST_USER = read("POSTULO_EMAIL_HOST_USER")
+POSTULO_EMAIL_HOST_PASSWORD = read("POSTULO_EMAIL_HOST_PASSWORD")
+POSTULO_EMAIL_USE_TLS = read("POSTULO_EMAIL_USE_TLS")
 # How the connection is encrypted: "none", "starttls" or "ssl" (#158). Falls back to the
 # older POSTULO_EMAIL_USE_TLS, which every existing .env sets and which cannot express the
 # third state, so an instance that has been setting it goes on meaning what it meant.
-POSTULO_EMAIL_SECURITY = (
-    env.str(
-        "POSTULO_EMAIL_SECURITY",
-        default="starttls" if POSTULO_EMAIL_USE_TLS else "none",
-    )
-    .strip()
-    .lower()
+POSTULO_EMAIL_SECURITY = read(
+    "POSTULO_EMAIL_SECURITY", default="starttls" if POSTULO_EMAIL_USE_TLS else "none"
 )
-POSTULO_EMAIL_TIMEOUT = env.int("POSTULO_EMAIL_TIMEOUT", default=10)
+POSTULO_EMAIL_TIMEOUT = read("POSTULO_EMAIL_TIMEOUT")
 # How the server is told who is connecting: "password" (the default, and what a relay of
 # your own wants) or "xoauth2", which Microsoft 365 requires from the end of December 2026
 # and Google accepts (#151). The OAuth half is only read when this says xoauth2.
-POSTULO_EMAIL_AUTH = env.str("POSTULO_EMAIL_AUTH", default="password").strip().lower()
-POSTULO_EMAIL_OAUTH_PROVIDER = env.str("POSTULO_EMAIL_OAUTH_PROVIDER", default="").strip().lower()
-POSTULO_EMAIL_OAUTH_GRANT = env.str("POSTULO_EMAIL_OAUTH_GRANT", default="").strip().lower()
-POSTULO_EMAIL_OAUTH_TENANT = env("POSTULO_EMAIL_OAUTH_TENANT", default="")
-POSTULO_EMAIL_OAUTH_CLIENT_ID = env("POSTULO_EMAIL_OAUTH_CLIENT_ID", default="")
-POSTULO_EMAIL_OAUTH_CLIENT_SECRET = env("POSTULO_EMAIL_OAUTH_CLIENT_SECRET", default="")
+POSTULO_EMAIL_AUTH = read("POSTULO_EMAIL_AUTH").strip().lower()
+POSTULO_EMAIL_OAUTH_PROVIDER = read("POSTULO_EMAIL_OAUTH_PROVIDER").strip().lower()
+POSTULO_EMAIL_OAUTH_GRANT = read("POSTULO_EMAIL_OAUTH_GRANT").strip().lower()
+POSTULO_EMAIL_OAUTH_TENANT = read("POSTULO_EMAIL_OAUTH_TENANT")
+POSTULO_EMAIL_OAUTH_CLIENT_ID = read("POSTULO_EMAIL_OAUTH_CLIENT_ID")
+POSTULO_EMAIL_OAUTH_CLIENT_SECRET = read("POSTULO_EMAIL_OAUTH_CLIENT_SECRET")
 
 # --------------------------------------------------------------------- logging
 
 # Where records are kept so an administrator can read them without a shell. Empty turns
 # it off entirely and only the console is written to. See postulo.core.logs.
-POSTULO_LOG_DIR = env("POSTULO_LOG_DIR", default=str(REPO_DIR / "data" / "logs"))
-POSTULO_LOG_MAX_BYTES = env.int("POSTULO_LOG_MAX_BYTES", default=5 * 1024 * 1024)
-POSTULO_LOG_BACKUPS = env.int("POSTULO_LOG_BACKUPS", default=3)
+POSTULO_LOG_DIR = read("POSTULO_LOG_DIR")
+POSTULO_LOG_MAX_BYTES = read("POSTULO_LOG_MAX_BYTES")
+POSTULO_LOG_BACKUPS = read("POSTULO_LOG_BACKUPS")
 # What the console gets: "simple", a line a person reads under `docker logs`, or "json",
 # the same one-object-per-line the file keeps, for an instance whose console is collected
 # by something that parses it (#233). The file is always JSON.
-POSTULO_LOG_FORMAT = env("POSTULO_LOG_FORMAT", default="simple").strip().lower()
+POSTULO_LOG_FORMAT = read("POSTULO_LOG_FORMAT").strip().lower()
 
 from postulo.core import logs as _logs  # noqa: E402 - needs POSTULO_LOG_DIR, read just above
 
@@ -1036,6 +1022,6 @@ LOGGING = {
     },
     "root": {
         "handlers": ["console", "file"] if POSTULO_LOG_DIR else ["console"],
-        "level": env("POSTULO_LOG_LEVEL", default="INFO"),
+        "level": read("POSTULO_LOG_LEVEL"),
     },
 }

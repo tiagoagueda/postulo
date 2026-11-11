@@ -23,7 +23,6 @@ import base64
 import datetime as dt
 import hashlib
 import json
-import os
 import sys
 import time
 import tomllib
@@ -104,7 +103,10 @@ def private_key(key_file: str | None):
     if key_file:
         raw = Path(key_file).read_text(encoding="ascii")
     else:
-        raw = os.environ.get("POSTULO_CATALOGUE_KEY", "")
+        from postulo.core.configuration import read
+
+        # Or POSTULO_CATALOGUE_KEY_FILE, naming a file that holds it (#1186).
+        raw = read("POSTULO_CATALOGUE_KEY")
     if not raw.strip():
         raise SystemExit("No key: set POSTULO_CATALOGUE_KEY or pass --key-file.")
     return Ed25519PrivateKey.from_private_bytes(base64.b64decode(raw.strip(), validate=True))

@@ -32,6 +32,7 @@ import zipfile
 import httpx
 from django.core.management.base import BaseCommand, CommandError
 
+from postulo.core import configuration
 from postulo.jobs import places
 from postulo.plugins.http import BodyRefused, get_bytes, public_only_client
 
@@ -122,7 +123,7 @@ class Command(BaseCommand):
                 "when it is saved."
             )
         )
-        if options.get("postcodes") or os.environ.get("POSTULO_GEONAMES_POSTCODES") == "1":
+        if options.get("postcodes") or configuration.read("POSTULO_GEONAMES_POSTCODES"):
             self._postcodes()
 
     def _postcodes(self) -> None:

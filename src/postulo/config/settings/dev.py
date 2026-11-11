@@ -2,13 +2,15 @@
 
 from django.core.management.utils import get_random_secret_key
 
-from .base import *
-from .base import REPO_DIR, env
+from postulo.core.configuration import read
 
-DEBUG = env.bool("POSTULO_DEBUG", default=True)
+from .base import *
+from .base import REPO_DIR
+
+DEBUG = read("POSTULO_DEBUG", default=True)
 
 # Generate a key on first run and keep it, so sessions survive a restart.
-if not env("POSTULO_SECRET_KEY", default=None):
+if not read("POSTULO_SECRET_KEY"):
     _key_file = REPO_DIR / "data" / ".dev-secret-key"
     if not _key_file.exists():
         _key_file.parent.mkdir(parents=True, exist_ok=True)

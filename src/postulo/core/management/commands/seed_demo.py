@@ -17,7 +17,6 @@ from __future__ import annotations
 
 import datetime as dt
 import getpass
-import os
 import random
 import secrets
 import unicodedata
@@ -42,6 +41,7 @@ from postulo.applications.models import (
     Status,
 )
 from postulo.applications.services import change_status, record_event, schedule_interview
+from postulo.core import configuration
 from postulo.core.models import Tag, TagColour, TagIcon
 from postulo.documents.models import (
     CV,
@@ -344,8 +344,8 @@ class Command(BaseCommand):
         given = options.get("password")
         if isinstance(given, str) and given:
             return given
-        if os.environ.get("POSTULO_SEED_PASSWORD"):
-            return os.environ["POSTULO_SEED_PASSWORD"]
+        if from_environment := configuration.read("POSTULO_SEED_PASSWORD"):
+            return from_environment
         if given:
             typed = getpass.getpass("Password for the new account: ")
             if not typed:

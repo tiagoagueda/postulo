@@ -2,14 +2,15 @@
 
 from django.core.exceptions import ImproperlyConfigured
 
+from postulo.core.configuration import read
+
 from .base import *
-from .base import env
 from .keys import refuse_a_weak_key
 
 # Before anything else, because this key does not only sign sessions: it derives the key
 # that encrypts every stored connection credential. A refusal here costs an operator a
 # restart; the warning it replaces cost them nothing and told them nothing (#111).
-_allow_weak = env.bool("POSTULO_ALLOW_WEAK_SECRET_KEY", default=False)
+_allow_weak = read("POSTULO_ALLOW_WEAK_SECRET_KEY")
 refuse_a_weak_key(SECRET_KEY, name="POSTULO_SECRET_KEY", allow_weak=_allow_weak)
 
 # And the same of the field key when there is one, because whenever it is set *it* is the
@@ -22,22 +23,22 @@ DEBUG = False
 # A wildcard host makes the Host header whatever the sender says it is (#747). Links in mail
 # are on POSTULO_PUBLIC_URL when it is set, but the host check is the first defence, and a
 # `*` switches it off. Refused as a weak key is: name the hosts the instance answers to.
-if "*" in ALLOWED_HOSTS and not env.bool("POSTULO_ALLOW_WILDCARD_HOSTS", default=False):
+if "*" in ALLOWED_HOSTS and not read("POSTULO_ALLOW_WILDCARD_HOSTS"):
     raise ImproperlyConfigured(
         "POSTULO_ALLOWED_HOSTS contains '*', which accepts any Host header. List the names "
         "the instance is reached by instead. To start anyway while you plan that, set "
         "POSTULO_ALLOW_WILDCARD_HOSTS=true."
     )
 
-SECURE_HSTS_SECONDS = env.int("POSTULO_HSTS_SECONDS", default=31536000)
-SECURE_HSTS_INCLUDE_SUBDOMAINS = env.bool("POSTULO_HSTS_INCLUDE_SUBDOMAINS", default=True)
-SECURE_HSTS_PRELOAD = env.bool("POSTULO_HSTS_PRELOAD", default=False)
+SECURE_HSTS_SECONDS = read("POSTULO_HSTS_SECONDS")
+SECURE_HSTS_INCLUDE_SUBDOMAINS = read("POSTULO_HSTS_INCLUDE_SUBDOMAINS")
+SECURE_HSTS_PRELOAD = read("POSTULO_HSTS_PRELOAD")
 
 # HSTS preloading is close to irreversible and commits every subdomain to HTTPS,
 # which is not a decision Postulo should make for an operator's domain. Opting out
 # is deliberate, so the check that nags about it is silenced while it stays off.
 SILENCED_SYSTEM_CHECKS = [] if SECURE_HSTS_PRELOAD else ["security.W021"]
-SECURE_SSL_REDIRECT = env.bool("POSTULO_SSL_REDIRECT", default=True)
+SECURE_SSL_REDIRECT = read("POSTULO_SSL_REDIRECT")
 
 # That redirect answers before any view does, which is right for a browser and wrong for
 # the endpoints a machine talks to over plain HTTP *inside* the deployment.
@@ -79,7 +80,7 @@ SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 # VPN such as NetBird or Tailscale, where the wire is already encrypted and the browser
 # sees plain HTTP: the cookie is never sent, and nobody can sign in. Turn this off only
 # in that situation, and turn SSL redirection off with it.
-POSTULO_SECURE_COOKIES = env.bool("POSTULO_SECURE_COOKIES", default=True)
+POSTULO_SECURE_COOKIES = read("POSTULO_SECURE_COOKIES")
 SESSION_COOKIE_SECURE = POSTULO_SECURE_COOKIES
 CSRF_COOKIE_SECURE = POSTULO_SECURE_COOKIES
 

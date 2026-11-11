@@ -20,18 +20,15 @@ from urllib.parse import urlsplit
 from django.conf import settings
 from django.core.checks import Error, Warning, register
 
-from postulo.core import throttle
+from postulo.core import configuration, throttle
 
-#: The words each setting accepts. Read from here by the checks and by nothing else: the
-#: modules that act on these settings keep their own comparisons, and this is the list an
-#: operator is shown.
+#: The words each setting accepts, as the registry declares them (#1186). Read from here by
+#: the checks and by nothing else: the modules that act on these settings keep their own
+#: comparisons, and this is the list an operator is shown.
 CHOICES: dict[str, tuple[str, ...]] = {
-    "POSTULO_EMAIL_SECURITY": ("none", "starttls", "ssl"),
-    "POSTULO_EMAIL_AUTH": ("password", "xoauth2"),
-    "POSTULO_PDF_BACKEND": ("auto", "weasyprint", "chromium"),
-    "POSTULO_LOG_FORMAT": ("simple", "json"),
-    "POSTULO_MAP_TILES": ("osm", "custom", "none"),
-    "POSTULO_BACKUP_DOWNLOAD": ("administrators", "operator", "console"),
+    variable.name: variable.choices
+    for variable in configuration.VARIABLES.values()
+    if variable.checked_by == "postulo.E001"
 }
 
 #: Where a request has to be reachable from: the two schemes a browser will follow.
@@ -298,3 +295,48 @@ def mail_oauth(app_configs=None, **kwargs) -> list[Error]:
                 )
             )
     return problems
+
+
+@register("postulo")
+def environment(app_configs=None, **kwargs) -> list[Error | Warning]:
+    """What the environment says that nothing reads, or that cannot be read as written (#1186).
+
+    Every variable Postulo reads is declared in `postulo.core.configuration`, so a
+    `POSTULO_*` name it does not declare is a typo or a leftover -- and a typo is a setting
+    silently not made. A value that cannot be taken as written is an error where it used to
+    stop the instance or was read as something else (a number that is not one, a boolean
+    that is not one), and a warning where it is only unusual (out of range). The variables
+    another check already refuses are left to it.
+    """
+    found: list[Error | Warning] = []
+    for name, nearest in configuration.unknown():
+        found.append(
+            Warning(
+                f"{name} is set, and nothing in Postulo reads it.",
+                hint=(
+                    f"Did you mean {nearest}?"
+                    if nearest
+                    else "Check the name against Configuration in the wiki."
+                )
+                + " A plugin's own variable is reported here too until plugins declare theirs.",
+                id="postulo.W005",
+            )
+        )
+    for old, new in configuration.deprecated():
+        found.append(
+            Warning(
+                f"{old} is the old name of {new}, and stops being read in the next minor release.",
+                hint=f"Rename it to {new}.",
+                id="postulo.W007",
+            )
+        )
+    for problem in configuration.problems():
+        kind = Error if problem.level == "error" else Warning
+        found.append(
+            kind(
+                problem.message,
+                hint=problem.hint,
+                id="postulo.E009" if problem.level == "error" else "postulo.W006",
+            )
+        )
+    return found

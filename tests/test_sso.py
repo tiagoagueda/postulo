@@ -249,20 +249,11 @@ def test_linking_by_address_is_off_unless_an_operator_turns_it_on(settings):
 
 
 def test_the_shipped_setting_defaults_to_off():
-    import ast
-    import inspect
+    """The default is declared in the registry the settings read through (#1186)."""
+    from postulo.core import configuration
 
-    from postulo.config.settings import base
-
-    source = inspect.getsource(base)
-    tree = ast.parse(source)
-    default = next(
-        node.value.keywords[0].value.value
-        for node in ast.walk(tree)
-        if isinstance(node, ast.Assign)
-        and getattr(node.targets[0], "id", "") == "POSTULO_OIDC_LINK_BY_EMAIL"
-    )
-    assert default is False
+    assert configuration.VARIABLES["POSTULO_OIDC_LINK_BY_EMAIL"].default is False
+    assert configuration.read("POSTULO_OIDC_LINK_BY_EMAIL", environ={}) is False
 
 
 def test_a_provider_with_no_choice_made_is_told_about_the_change(configured):
