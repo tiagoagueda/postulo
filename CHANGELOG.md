@@ -12,6 +12,7 @@ All notable changes to Postulo are recorded here. The format follows
 - Offers can now be recorded, changed and deleted through the API, not only read, with the same checks, timeline entries and answer-by reminders as the page. (#1101)
 - A CV can be downloaded as Europass and as JSON Resume, each switched on under Extend file formats, and the CV's page says what each format leaves out. (#1100)
 - A plugin can add its own widget to the dashboard: offered on the arrange page, shown only to people allowed to use the plugin, and left out without breaking the page if it fails. (#1102)
+- Calendar → Subscriptions: follow a calendar somebody else keeps by its address, with a name, a colour and how often it is read again; its events appear read-only on your calendar, and any of them can be added as an appointment or an interview of your own. (#1098)
 - SQLite instances keep their write-ahead log to 64 MB and refresh the query planner's statistics once a day, and manage.py compact_database (with --dry-run) gives back the space deleted records leave in the file; Server Overview shows how much that is. (#1128)
 - The mark redrawn as vectors beside the raster, in assets/brand: postulo.svg, a pride variant (with its raster, postulo_pride.png), and two looping animations of each (Swell, Light drift) that start and end on the static mark. The raster stays the source of the served icons. (#1218)
 
