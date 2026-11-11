@@ -8,10 +8,16 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### ✨ Added
 
+- SQLite instances keep their write-ahead log to 64 MB and refresh the query planner's statistics once a day, and manage.py compact_database (with --dry-run) gives back the space deleted records leave in the file; Server Overview shows how much that is. (#1128)
 - The mark redrawn as vectors beside the raster, in assets/brand: postulo.svg, a pride variant (with its raster, postulo_pride.png), and two looping animations of each (Swell, Light drift) that start and end on the static mark. The raster stays the source of the served icons. (#1218)
 
 ### 🔧 Changed
 
+- A search asks the database one question for each group of results instead of two, so matching rows are read once; the results and the "All N" numbers are the same. (#1116)
+- On SQLite, searching and filtering plain ASCII text is about a third faster; text with accents or in other scripts is matched exactly as before. (#1134)
+- A backup is compressed at gzip level 6 instead of 9, which takes about a third less time on the database for an archive a few per cent larger; older archives restore as before. (#1124)
+- An export is written once, on the data volume, and each file goes into it a piece at a time, so a large export no longer sits in the worker's memory where /tmp is memory, and is no longer written twice. (#1125)
+- manage.py fetch_geonames removes the downloaded city table, and the postal codes' table, once the lookup built from each has been checked, which frees about 32 MB on the data volume; a table placed by hand is still indexed and left alone, and the lookup brings its own country names up to date after an upgrade. (#1127)
 - The scheduler checks each uploaded file against its record once a week instead of several times a day; POSTULO_SCRUB_EVERY_DAYS sets the interval, and manage.py verify_media still reads every file. (#1118)
 - The scheduler looks for files no record names once an hour instead of every five minutes, and walks the media directory once to do it. (#1119)
 - The scheduler's gone-quiet check reads each account once and no longer reloads applications it has already announced; accounts with only drafts or ended applications cost it nothing. (#1120)
