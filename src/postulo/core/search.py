@@ -19,8 +19,9 @@ matching row of every model was loaded, turned into a `Hit`, sorted, and then fi
 were shown. Searching *engineer* over three hundred applications and four hundred listings
 loaded seven hundred rows -- including four hundred full descriptions -- to draw fifty
 lines, and the application group cost one further query *per matching row* to find the event
-the term was in. Each group now asks two questions: how many, and the first five. The
-ranking that decided which five is an `ORDER BY`, and the excerpt is a subquery on the row.
+the term was in. Each group now asks one question: the first five, with how many there are
+in all counted beside them (#1116; it was two, the count and then the five). The ranking
+that decided which five is an `ORDER BY`, and the excerpt is a subquery on the row.
 """
 
 from __future__ import annotations
@@ -29,7 +30,19 @@ import re
 from collections.abc import Callable
 from dataclasses import dataclass, field
 
-from django.db.models import Case, Exists, IntegerField, OuterRef, Q, Subquery, Value, When
+from django.db.models import (
+    Case,
+    Count,
+    Exists,
+    IntegerField,
+    OuterRef,
+    Q,
+    Subquery,
+    Value,
+    When,
+    Window,
+)
+from django.db.models.query import ModelIterable
 from django.urls import reverse
 from django.utils import formats
 from django.utils.http import urlencode
@@ -62,8 +75,8 @@ class Found:
     """One group's answer: how many there are, and the few that are shown.
 
     Two numbers rather than a list, because they are two different questions and only one of
-    them needs the rows. A group that says *and 48 more* got that 48 from a `COUNT`, not from
-    building forty-eight `Hit`s and throwing them away.
+    them needs the rows. A group that says *and 48 more* got that 48 from a count the
+    database made, not from building forty-eight `Hit`s and throwing them away.
     """
 
     total: int = 0
@@ -146,13 +159,39 @@ def ranked(rows, query: str, title_field: str, *order: str):
     ).order_by("title_hit", *order)
 
 
+def _counted_by_a_window(rows, limit: int) -> bool:
+    """Whether a count over the matching rows, read beside them, is the number `COUNT` gives.
+
+    A window is worked out after the `WHERE` and before `DISTINCT` and `LIMIT`, so it counts
+    the rows a `DISTINCT` then folds together and the ones a slice already cut off; a union
+    takes no annotation at all, and `values()` rows are not objects to read one off. None of
+    the groups below is any of those: each filters with `Exists` where a join would repeat a
+    row. The check is for whoever writes the next one.
+    """
+    query = rows.query
+    return (
+        limit > 0
+        and not (query.distinct or query.is_sliced or query.combinator)
+        and issubclass(rows._iterable_class, ModelIterable)
+    )
+
+
 def take(rows, limit: int, build) -> Found:
     """How many rows match, and ``build`` applied to the first ``limit`` of them.
 
-    Two queries per group, whatever a person has. The `COUNT` is what the *and N more* line
-    needs and the only thing that needs all of them.
+    One query per group, whatever a person has (#1116). The number the *and N more* line
+    needs rides on the rows themselves, as a count over every row that matched, and is read
+    off the first; no first row, nothing matched. It used to be a `COUNT` of its own: the
+    same rows filtered twice, and on SQLite every `LIKE` of both passes is a call into Python
+    (`core.sqlite_like`).
     """
-    return Found(total=rows.count(), hits=[build(row) for row in rows[:limit]])
+    if not _counted_by_a_window(rows, limit):
+        return Found(total=rows.count(), hits=[build(row) for row in rows[:limit]])
+    first = list(rows.annotate(search_total=Window(Count("*")))[:limit])
+    return Found(
+        total=first[0].search_total if first else 0,
+        hits=[build(row) for row in first],
+    )
 
 
 # ----------------------------------------------------------------- per model
@@ -247,8 +286,9 @@ def search_applications(user, query: str, limit: int) -> Found:
     is three correlated subqueries on the row now, so the passage arrives with the row.
 
     `Exists` rather than a join and `.distinct()`. An application with four matching entries
-    was four rows the database then had to de-duplicate, and the `COUNT` above paid for that
-    twice: once to find them, once to fold them back into one.
+    was four rows the database then had to de-duplicate, and the count paid for that twice:
+    once to find them, once to fold them back into one. One row an application is also what
+    lets `take` count them beside the rows (#1116).
     """
     from postulo.applications.models import Application
 
@@ -548,11 +588,11 @@ def _career_anchor(model) -> str:
 
 
 def search_career(user, query: str, limit: int) -> Found:
-    """Six models under one heading, each counted and capped on its own.
+    """Eleven models under one heading, each counted and capped on its own.
 
-    Twelve queries rather than two, and that is the price of the heading: the six have no
+    Eleven queries rather than one, and that is the price of the heading: the models have no
     common table to count across and no field to order against each other by. It is a fixed
-    twelve -- five experiences or five hundred, the page asks the same questions.
+    eleven -- five experiences or five hundred, the page asks the same questions.
     """
     from postulo.resume import models as resume
 

@@ -316,3 +316,107 @@ def test_a_sent_cover_letter_is_named_by_its_own_sentence(user, world):
     rendered.save()
     hit = kinds(searching.search(user, "calibration"))["sent"].hits[0]
     assert hit.subtitle == "in the cover letter you sent to Aperture Science on 12 May 2026"
+
+
+# ------------------------------------------------- one question a group (#1116)
+
+
+def test_a_search_asks_each_group_one_question(user, world, django_assert_num_queries):
+    """Each group counted its matches and then fetched them: two scans where one does (#1116).
+
+    One statement for each of the nine groups with a table of their own and for each of the
+    eleven models of the career, and the two prefetches of the one company that is found.
+    """
+    searching.search(user, "portal")  # the content types are remembered after the first
+
+    with django_assert_num_queries(22):
+        groups = kinds(searching.search(user, "portal"))
+
+    assert groups["listings"].total == 1 and groups["career"].total == 1
+
+
+def test_a_group_counts_its_rows_as_the_count_did_whatever_is_joined(
+    user, other_user, world, monkeypatch
+):
+    """The total read off the first row is the number `COUNT` gave, and the hits the same (#1116).
+
+    Over rows that have several of everything a group joins or looks into: a listing two
+    people have a status on, a company with the word in three industries, two identifiers,
+    two names and two addresses, an application with four timeline entries that hold it.
+    """
+    from postulo.core.models import PostalAddress
+    from postulo.documents.models import ReferenceLetter
+    from postulo.jobs.models import CompanyIdentifier, CompanyName, ListingStatus
+    from postulo.resume.models import Citation, Publication
+
+    company, application = world["company"], world["application"]
+    for index in range(7):
+        posting = JobPosting.objects.create(owner=user, company=company, title=f"Portal {index}")
+        ListingStatus.objects.update_or_create(owner=user, posting=posting)
+        ListingStatus.objects.create(owner=other_user, posting=posting, state="discarded")
+    company.industries.set(Industry.named(user, ["Portals", "Portal repair", "Portal hire"]))
+    for scheme, value in (("wikidata", "Qportal"), ("lei", "PORTAL00000000000000")):
+        CompanyIdentifier.objects.create(owner=user, company=company, scheme=scheme, value=value)
+    for language, town in (("fr", "Portal-sur-Mer"), ("pt", "Portalegre")):
+        CompanyName.objects.create(
+            owner=user, company=company, language=language, name="Portal SA", source="typed"
+        )
+        PostalAddress.objects.create(owner=user, holder=company, municipality=town)
+    for day in range(4):
+        record_event(application, summary=f"Portal call {day}", body="About the portal.")
+    for index in range(6):
+        Company.objects.create(owner=user, name=f"Portal maker {index}")
+    referee = Contact.objects.create(owner=user, name="Portal Referee")
+    upload = UploadedDocument.objects.create(
+        owner=user, title="Letter", kind="reference", file=ContentFile(b"x", name="l.pdf")
+    )
+    ReferenceLetter.objects.create(owner=user, upload=upload, referee=referee)
+    paper = Publication.objects.create(owner=user, title="Portal optics")
+    for source in ("Portal Index", "Scholar"):
+        Citation.objects.create(
+            owner=user, source=source, count=3, as_of=dt.date(2026, 9, 1), publication=paper
+        )
+
+    asked = []
+    take = searching.take
+
+    def both(rows, limit, build):
+        found = take(rows, limit, build)
+        counted = searching.Found(total=rows.count(), hits=[build(row) for row in rows[:limit]])
+        asked.append((rows.model.__name__, found, counted))
+        return found
+
+    monkeypatch.setattr(searching, "take", both)
+    groups = kinds(searching.search(user, "portal", limit=3))
+
+    assert len(asked) == 20, "the nine groups and the eleven models of the career"
+    for name, found, counted in asked:
+        assert found.total == counted.total, name
+        assert found.hits == counted.hits, name
+    totals = {kind: (group.total, len(group.hits)) for kind, group in groups.items()}
+    assert totals["listings"] == (8, 3), "eight listings, not one per status on them"
+    assert totals["companies"] == (7, 3), "seven companies, not one per industry or address"
+    assert totals["applications"] == (1, 1), "one application, not one per timeline entry"
+    assert totals["uploads"] == (2, 2) and totals["contacts"] == (1, 1)
+    assert totals["career"] == (4, 3), "the career adds its models' totals up"
+    assert not searching.search(user, "zebra"), "no first row to read a total off: none found"
+
+
+def test_a_queryset_a_window_would_miscount_is_still_counted_on_its_own(user):
+    """A window counts before `DISTINCT` and before a slice: those keep the `COUNT` (#1116)."""
+    company = Company.objects.create(owner=user, name="Aperture Science")
+    company.industries.set(Industry.named(user, ["Portals", "Portal repair", "Portal hire"]))
+    for name in ("Black Mesa", "Cyberdyne", "Dharma"):
+        Company.objects.create(owner=user, name=name)
+    mine = Company.objects.for_user(user).order_by("name")
+
+    joined = mine.filter(industries__name__icontains="portal")
+    assert joined.count() == 3, "one row per industry: the join the search does not make"
+    found = searching.take(joined.distinct(), 5, lambda row: row.name)
+    assert (found.total, found.hits) == (1, ["Aperture Science"])
+
+    found = searching.take(mine[:3], 2, lambda row: row.name)
+    assert (found.total, found.hits) == (3, ["Aperture Science", "Black Mesa"])
+
+    found = searching.take(mine.values_list("name", flat=True), 2, str.upper)
+    assert (found.total, found.hits) == (4, ["APERTURE SCIENCE", "BLACK MESA"])
