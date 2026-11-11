@@ -6,7 +6,8 @@ import pytest
 from django.core import mail
 from django.core.management import call_command
 from django.urls import reverse
-from django.utils import timezone
+from django.utils import timezone, translation
+from django.utils.translation import ngettext
 
 from postulo.accounts.models import Profile
 from postulo.api.models import ApiToken
@@ -446,3 +447,119 @@ def test_the_quiet_pass_costs_the_same_however_many_applications_one_owner_has(u
     two = cost()
     sent(user, company, days_ago=50, title="Three")
     assert cost() == two
+
+
+# ------------------------------------------------------------- what a pass costs
+
+
+def someone(name: str, **fields):
+    from django.contrib.auth import get_user_model
+
+    return get_user_model().objects.create_user(
+        email=f"{name}@example.org", password="not-a-real-password", **fields
+    )
+
+
+def a_silence(person, *, days_ago: int = 60, title="Test Engineer", status=Status.APPLIED):
+    """One application of ``person``'s, at a company of their own, silent for ``days_ago`` days."""
+    employer = Company.objects.create(owner=person, name="Aperture Science")
+    return sent(person, employer, days_ago=days_ago, title=title, status=status)
+
+
+def applications_loaded(run) -> int:
+    """How many applications ``run`` read from the database into memory."""
+    from django.db.models.signals import post_init
+
+    loaded = []
+
+    def count(sender, instance, **kwargs):
+        loaded.append(instance.pk)
+
+    post_init.connect(count, sender=Application)
+    try:
+        run()
+    finally:
+        post_init.disconnect(count, sender=Application)
+    return len(loaded)
+
+
+def test_a_pass_with_nothing_new_asks_once_for_the_owners_and_once_for_each(
+    user, other_user, django_assert_num_queries
+):
+    """Each account was asked for twice, once only to read its threshold (#1120)."""
+    for person in (user, other_user, someone("third")):
+        a_silence(person)
+    assert quiet.announce_quiet_applications()[0] == 3
+
+    # The owners with their profiles, then the one question each of them is asked.
+    with django_assert_num_queries(1 + 3):
+        assert quiet.announce_quiet_applications() == (0, 0)
+
+
+def test_an_account_with_nothing_that_can_go_quiet_is_not_asked_at_all(
+    user, other_user, django_assert_num_queries
+):
+    """A draft or an application that has ended cost two questions every pass (#1120)."""
+    a_silence(user)
+    a_silence(other_user, status=Status.REJECTED)
+    drafting = someone("drafting")
+    Application.objects.create(
+        owner=drafting,
+        posting=JobPosting.objects.create(
+            owner=drafting,
+            company=Company.objects.create(owner=drafting, name="Black Mesa"),
+            title="Draft",
+        ),
+        status=Status.DRAFT,
+    )
+    a_silence(someone("gone", is_active=False))
+    assert quiet.announce_quiet_applications()[0] == 1
+
+    with django_assert_num_queries(1 + 1):
+        assert quiet.announce_quiet_applications() == (0, 0)
+    assert Application.objects.filter(quiet_announced_at__isnull=False).count() == 1, (
+        "an account that was closed is still left alone"
+    )
+
+
+def test_an_application_already_announced_is_not_read_again(user, company):
+    """Every pass loaded each quiet application to find it had been said (#1120)."""
+    email_connection(user)
+    sent(user, company, days_ago=60, title="Said last month")
+    quiet.announce_quiet_applications(at=timezone.now() - dt.timedelta(days=30))
+    assert applications_loaded(quiet.announce_quiet_applications) == 0, "nothing new, nothing read"
+
+    sent(user, company, days_ago=25, title="New silence")
+    assert applications_loaded(quiet.announce_quiet_applications) == 1, "only the new one"
+    body = mail.outbox[-1].body
+    assert "New silence at Aperture Science" in body and "Said last month" not in body
+
+
+def test_one_read_of_the_owners_still_gives_each_their_threshold_and_language(
+    user, other_user, company
+):
+    """The threshold and the language come from the profile read with the owner (#1120)."""
+    email_connection(user)
+    sent(user, company, days_ago=10, title="Ten days")
+    user.profile.quiet_after_days = 7
+    user.profile.language = "fr-FR"
+    user.profile.save()
+    a_silence(other_user, days_ago=10)
+    without_profile = someone("bare")
+    Profile.objects.filter(user=without_profile).delete()
+    a_silence(without_profile, days_ago=30)
+
+    assert quiet.announce_quiet_applications() == (2, 1), (
+        "seven days for one, the default three weeks for the others, profile or not"
+    )
+    assert set(
+        Application.objects.filter(quiet_announced_at__isnull=False).values_list(
+            "owner__email", flat=True
+        )
+    ) == {user.email, without_profile.email}
+    with translation.override("fr-FR"):
+        expected = ngettext(
+            "%(count)s application has gone quiet", "%(count)s applications have gone quiet", 1
+        ) % {"count": 1}
+    assert expected != "1 application has gone quiet", "the catalogue has it in French"
+    assert expected in mail.outbox[-1].subject

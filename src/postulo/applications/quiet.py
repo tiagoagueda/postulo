@@ -17,6 +17,8 @@ from __future__ import annotations
 import datetime as dt
 import logging
 
+from django.contrib.auth import get_user_model
+from django.db.models import Exists, F, OuterRef, Q
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.translation import ngettext
@@ -27,11 +29,10 @@ from postulo.notifications.base import (
     absolute_url,
     announcement_body,
     announcement_key,
-    owner_of,
 )
 from postulo.notifications.service import notify
 
-from .models import Application
+from .models import QUIET_STATUSES, Application
 
 logger = logging.getLogger(__name__)
 
@@ -69,27 +70,32 @@ def announce_quiet_applications(at=None) -> tuple[int, int]:
     not repeated every pass. Returns (applications stamped, deliveries made).
     """
     now = at or timezone.now()
-    # No ordering, or the default one rides into the DISTINCT and gives a row per application.
+    # Read once, with the profile that holds each person's threshold and language, and only
+    # the people who have an application in a status that can go quiet at all (#1120): an
+    # account of drafts and endings is not asked anything. An EXISTS rather than a join, so
+    # nobody comes back once per application.
     owners = (
-        Application.objects.filter(owner__is_active=True)
-        .values_list("owner", flat=True)
-        .order_by()
-        .distinct()
+        get_user_model()
+        .objects.filter(is_active=True)
+        .filter(Exists(Application.objects.filter(owner=OuterRef("pk"), status__in=QUIET_STATUSES)))
+        .select_related("profile")
+        .order_by("pk")
     )
     stamped = 0
     delivered = 0
-    for owner_id in owners:
-        rows = list(
-            Application.objects.filter(owner_id=owner_id)
-            .select_related("owner", "owner__profile", "posting", "posting__company")
-            .quiet(threshold_for(owner_of(owner_id)), at=now)
+    for owner in owners:
+        # Announced once per silence, and the database is asked only for the ones still to
+        # be said (#1120): an application that went quiet weeks ago was read again on every
+        # pass, with its listing and its company, to find the stamp it already had.
+        fresh = list(
+            Application.objects.filter(owner=owner)
+            .select_related("posting", "posting__company")
+            .quiet(threshold_for(owner), at=now)
+            .filter(
+                Q(quiet_announced_at__isnull=True) | Q(quiet_announced_at__lt=F("last_activity_at"))
+            )
             .order_by("last_activity_at", "pk")
         )
-        fresh = [
-            row
-            for row in rows
-            if row.quiet_announced_at is None or row.quiet_announced_at < row.last_activity_at
-        ]
         if not fresh:
             continue
         # Claimed before the message goes, and only the rows this process actually claimed
@@ -106,13 +112,12 @@ def announce_quiet_applications(at=None) -> tuple[int, int]:
         if not claimed:
             continue
         stamped += len(claimed)
-        owner = claimed[0].owner
         try:
             # Worded when it is sent rather than before, so the count, the days and the
             # "and N more" come out in the language the person reads (#223).
             delivered += notify(owner, lambda claimed=claimed: _announcement(claimed, now))
         except Exception:
-            logger.exception("Could not announce quiet applications for owner %s", owner_id)
+            logger.exception("Could not announce quiet applications for owner %s", owner.pk)
     return stamped, delivered
 
 
