@@ -56,6 +56,37 @@ def test_the_settings_module_applies_them():
     assert 'sqlite.apply_options(DATABASES["default"])' in source
 
 
+@pytest.mark.django_db
+def test_a_file_database_holds_its_write_ahead_log_to_a_limit(tmp_path):
+    """SQLite never shrinks the `-wal` file by itself: after one large write it stayed at
+    its largest for as long as any connection was open, which with three workers, a
+    scheduler and a worker is for good. Every connection to a file now asks for 64 MB, and
+    a freshly opened one says so (#1128)."""
+    from django.db import connections
+    from django.db.backends.sqlite3.base import DatabaseWrapper
+
+    database = sqlite_options.apply_options(
+        {
+            **connections["default"].settings_dict,
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": str(tmp_path / "postulo.sqlite3"),
+            "OPTIONS": {},
+        }
+    )
+    assert "PRAGMA journal_size_limit=67108864;" in database["OPTIONS"]["init_command"]
+    assert "journal_mode=WAL" in database["OPTIONS"]["init_command"]
+
+    opened = DatabaseWrapper(database, "scratch")
+    try:
+        with opened.cursor() as cursor:
+            cursor.execute("PRAGMA journal_size_limit")
+            assert cursor.fetchone() == (67108864,)
+            cursor.execute("PRAGMA journal_mode")
+            assert cursor.fetchone() == ("wal",), "and the options before it still apply"
+    finally:
+        opened.close()
+
+
 # ----------------------------------------------------------------- the behaviour
 
 
@@ -104,6 +135,51 @@ def test_a_deferred_second_writer_is_refused_at_once_which_is_the_bug(database):
     results = race(database, "DEFERRED")
     assert results.count("ok") == 1
     assert any("locked" in result for result in results), results
+
+
+def _log_after_a_burst(path: str, limit: int | None) -> tuple[int, int]:
+    """The size of the `-wal` file after one large write, and after the small ones that follow."""
+    from pathlib import Path
+
+    connection = sqlite3.connect(path, isolation_level=None)
+    # A second connection, as an instance always has: the log is only removed when the last
+    # one closes.
+    other = sqlite3.connect(path)
+    try:
+        if limit is not None:
+            connection.execute(f"PRAGMA journal_size_limit={limit}")
+        connection.execute("BEGIN")
+        connection.execute(
+            "WITH RECURSIVE n(i) AS (SELECT 1 UNION ALL SELECT i + 1 FROM n WHERE i < 600) "
+            "INSERT INTO t (v) SELECT hex(randomblob(5000)) FROM n"
+        )
+        connection.execute("COMMIT")
+        log = Path(f"{path}-wal")
+        burst = log.stat().st_size
+        # The limit is applied when a write starts the log again after a checkpoint.
+        for _ in range(2):
+            connection.execute("PRAGMA wal_checkpoint(PASSIVE)").fetchall()
+            connection.execute("INSERT INTO t (v) VALUES ('small')")
+        return burst, log.stat().st_size
+    finally:
+        other.close()
+        connection.close()
+
+
+def test_without_a_limit_the_log_stays_at_its_largest_and_with_one_it_shrinks_back(database):
+    """What `journal_size_limit` is for, on a file (#1128). One large write leaves a log of
+    its own size, and the small writes after it go on using that file without ever making
+    it smaller; with a limit, the first of them to start the log again cuts it back. One
+    megabyte here where an instance asks for sixty-four, so the test writes six and not
+    four hundred."""
+    megabyte = 1024 * 1024
+    burst, later = _log_after_a_burst(database, None)
+    assert burst > 4 * megabyte
+    assert later == burst, "which is the bug: megabytes kept for a row of five letters"
+
+    burst, later = _log_after_a_burst(database, megabyte)
+    assert burst > 4 * megabyte
+    assert later == megabyte
 
 
 def test_an_immediate_second_writer_waits_its_turn(database):

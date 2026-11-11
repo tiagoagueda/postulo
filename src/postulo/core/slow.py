@@ -304,6 +304,8 @@ def tidy_up_if_due() -> None:
     pages.expire_unconfirmed()
     sessions.clear_expired()
     # The cache's own expired entries, which nothing else removes (#1167).
-    from . import cache_purge
+    from . import cache_purge, sqlite_upkeep
 
     cache_purge.purge_if_due()
+    # And SQLite's statistics for the query planner, which keep a day of their own (#1128).
+    sqlite_upkeep.optimize_if_due()

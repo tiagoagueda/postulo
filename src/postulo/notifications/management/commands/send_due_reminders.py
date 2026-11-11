@@ -216,9 +216,11 @@ class Command(BaseCommand):
             # And the queue's own record of the tasks behind those errands (#1121).
             reaped += errands.forget_task_results()
             # Cache entries past their expiry, which Django keeps until 200,000 pile up (#1167).
-            from postulo.core import cache_purge
+            from postulo.core import cache_purge, sqlite_upkeep
 
             cache_purge.purge_if_due()
+            # SQLite's statistics for the query planner, once a day (#1128).
+            sqlite_upkeep.optimize_if_due()
             # What a webhook was told, a week on (#752).
             webhooks.forget_old()
             # The pages of captures that never became a listing, past the days the

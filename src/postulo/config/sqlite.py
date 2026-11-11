@@ -45,6 +45,20 @@ Three options together make two writers take turns instead:
 * a ``timeout`` of twenty seconds rather than the default five, since a wait is now a
   wait rather than a refusal.
 
+And one that is about the disk rather than about taking turns (#1128):
+
+* ``journal_size_limit`` of 64 MB. SQLite checkpoints the ``-wal`` file every thousand
+  pages but never makes it smaller: after one large write (an archive imported, a backup
+  restored, a first purge) it stayed at its largest until the last connection closed, and
+  with three workers, a scheduler and a worker one is nearly always open. With a limit,
+  the file is cut back to it the next time a write starts the log again. Sixty-four
+  megabytes is far above the four or so the log holds between two checkpoints, so it is
+  not cut and grown again all day, and far below what a restore leaves. It is a setting
+  of the connection, not of the file, so it is asked for here, each time one is opened.
+  The copy a backup takes needs none: its file is written and closed in one go, and a
+  closed database has no log. A restore writes through the instance's own connection,
+  which has the limit.
+
 Applied only to a file: an in-memory database has one connection and nothing to share.
 Applied with ``setdefault``, so an operator who sets an option in ``OPTIONS`` keeps it.
 """
@@ -56,7 +70,9 @@ from pathlib import Path
 #: What every file-backed SQLite connection gets unless the operator says otherwise.
 FILE_OPTIONS: dict = {
     "transaction_mode": "IMMEDIATE",
-    "init_command": "PRAGMA journal_mode=WAL; PRAGMA synchronous=NORMAL;",
+    "init_command": (
+        "PRAGMA journal_mode=WAL; PRAGMA synchronous=NORMAL; PRAGMA journal_size_limit=67108864;"
+    ),
     "timeout": 20,
 }
 

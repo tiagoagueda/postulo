@@ -38,7 +38,7 @@ from postulo.accounts import deletion
 from postulo.accounts.reauth import reauthentication_required
 from postulo.plugins.forms import PluginRepositoryForm
 
-from . import backups, errands, languages, proxy, scheduler, site, updates
+from . import backups, errands, languages, proxy, scheduler, site, sqlite_upkeep, updates
 from .mixins import StaffRequiredMixin
 from .models import SiteSettings
 from .server_forms import (
@@ -225,6 +225,9 @@ class OverviewView(ServerSectionMixin, TemplateView):
                 "django_version": django.get_version(),
                 "database_engine": connection.vendor,
                 "database_name": str(database.get("NAME", "")),
+                # How much of a SQLite file is pages that deleted rows left, which only
+                # `compact_database` gives back; ``None`` on PostgreSQL. Two pragmas (#1128).
+                "database_free": sqlite_upkeep.reclaimable(),
                 "pdf_backend": _pdf_backend_name(),
                 # The same question as the PDF renderer's, one level down: which of
                 # the scripts the offered languages need this machine's fonts draw.
