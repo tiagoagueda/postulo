@@ -148,6 +148,62 @@ def test_a_missing_file_costs_that_file_and_nothing_else(populated):
 
     assert document["documents"]["uploads"][0]["title"] == "Designed CV"
     assert export_module.MANIFEST_NAME in archive.namelist()
+    assert f"media/{upload.file.name}" not in archive.namelist(), "not even an empty member"
+
+
+def test_a_kept_file_goes_into_the_archive_a_piece_at_a_time_and_arrives_whole(user, monkeypatch):
+    """Each kept file was read whole to be put in the zip, so an export held the largest of
+    them, up to 20 MB for an upload, where a buffer is enough (#1125)."""
+    import os
+
+    from django.core.files.storage import FileSystemStorage
+
+    body = os.urandom(2 * export_module.COPY_BUFFER + 12_345)  # does not fit in two pieces
+    upload = UploadedDocument.objects.create(
+        owner=user, title="Portfolio", file=SimpleUploadedFile("portfolio.pdf", body)
+    )
+    reads = []
+    really_open = FileSystemStorage._open
+
+    class Watched:
+        def __init__(self, handle):
+            self.handle = handle
+
+        def read(self, size=-1):
+            piece = self.handle.read(size)
+            reads.append(len(piece))
+            return piece
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *exc):
+            self.handle.close()
+
+    monkeypatch.setattr(
+        FileSystemStorage, "_open", lambda self, name, mode="rb": Watched(really_open(self, name))
+    )
+
+    archive, document = read_archive(user)
+
+    member = f"media/{upload.file.name}"
+    assert document["documents"]["uploads"][0]["file"] == member
+    assert max(reads) <= export_module.COPY_BUFFER, "never more than the buffer at once"
+    assert sum(reads) == len(body) and len(reads) > 2
+    assert archive.read(member) == body, "byte for byte"
+    assert archive.testzip() is None
+
+    # And the member is written as `writestr` wrote it: compressed as the manifest is, with
+    # the same permissions, and dated now rather than the 1980 a streamed member defaults to.
+    kept, manifest = archive.getinfo(member), archive.getinfo(export_module.MANIFEST_NAME)
+    assert kept.file_size == len(body)
+    for field in ("compress_type", "external_attr", "create_system", "flag_bits"):
+        assert getattr(kept, field) == getattr(manifest, field), field
+    assert kept.compress_type == zipfile.ZIP_DEFLATED and kept.external_attr == 0o600 << 16
+    written = dt.datetime(*kept.date_time)
+    assert abs(written - dt.datetime(*manifest.date_time)) < dt.timedelta(minutes=5)
+    assert abs(written - dt.datetime.now()) < dt.timedelta(minutes=5)
+    assert archive.namelist() == [export_module.MANIFEST_NAME, member], "the same members"
 
 
 # ------------------------------------------------------------------ round trip

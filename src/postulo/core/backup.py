@@ -179,20 +179,29 @@ def _add_tree(
             if path.is_dir():
                 archive.add(path, arcname=arcname, recursive=False, filter=_plain_files_only)
                 continue
-            info = archive.gettarinfo(str(path), arcname=arcname)
-            if info.islnk():
-                # A second name for a file already in the archive is written by tarfile as a
-                # hard-link member, which `_plain_files_only` then dropped and a restore
-                # refuses (#809). Each name is a file of its own here, with its own bytes, so
-                # the copy is whole and the restore reads nothing but plain files.
-                info.type = tarfile.REGTYPE
-                info.linkname = ""
-                info.size = path.stat().st_size
-            info = _plain_files_only(info)
-            if info is None:
+            try:
+                info = archive.gettarinfo(str(path), arcname=arcname)
+                if info.islnk():
+                    # A second name for a file already in the archive is written by tarfile
+                    # as a hard-link member, which `_plain_files_only` then dropped and a
+                    # restore refuses (#809). Each name is a file of its own here, with its
+                    # own bytes, so the copy is whole and the restore reads nothing but
+                    # plain files.
+                    info.type = tarfile.REGTYPE
+                    info.linkname = ""
+                    info.size = path.stat().st_size
+                info = _plain_files_only(info)
+                if info is None:
+                    continue
+                handle = path.open("rb")
+            except FileNotFoundError:
+                # Listed a moment ago and gone since. An export is written under a name of
+                # its own beside the archives and renamed when it is whole (#1125), so a
+                # file that leaves the tree while it is walked is an ordinary thing: it is
+                # left out, as one that went a moment earlier would have been.
                 continue
             digest = hashlib.sha256()
-            with path.open("rb") as handle:
+            with handle:
                 archive.addfile(info, _Hashing(handle, digest, info.size))
             digests[arcname] = digest.hexdigest()
 
@@ -497,9 +506,13 @@ def _tree_stats(root: Path) -> tuple[int, int]:
     files = 0
     size = 0
     for entry in root.rglob("*"):
-        if entry.is_file():
-            files += 1
-            size += entry.stat().st_size
+        try:
+            if entry.is_file():
+                length = entry.stat().st_size
+                files += 1
+                size += length
+        except FileNotFoundError:  # gone since it was listed (#1125)
+            continue
     return files, size
 
 

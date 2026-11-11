@@ -4,10 +4,20 @@ An export reads every record and every file an account owns and zips the lot. Do
 the request it was one long POST holding a gunicorn worker; done by a worker it becomes a
 file, and a file is a thing somebody has to look after.
 
-**Written to a temporary file rather than to memory.** `write_archive` took a target long
-before this, and a `BytesIO` in a worker process is the same megabytes held for the same
-time with nobody waiting on them. The temporary file is handed to the `ExportArchive` and
-then removed, so at no point are there two copies for long.
+**Written to a file rather than to memory, and written once** (#1125). `write_archive` took
+a target long before this, and a `BytesIO` in a worker process is the same megabytes held
+for the same time with nobody waiting on them. The file is made where the archives are
+kept, in the person's own folder of them, as a dot-file; when it is whole the store takes
+it by renaming it. It used to be made in the system's temporary directory and copied from
+there, which wrote every export twice, and where that directory is memory (the hardened
+compose file mounts `/tmp` as tmpfs) held the whole archive in the worker's allowance
+meanwhile.
+
+**A worker killed half way leaves the dot-file, and not for good.** No row names it and
+nothing serves it, so the sweep of files nothing names (`documents.scrub.sweep`) removes it
+once it is older than the grace period. A file is as old as its last write and an export
+writes as it goes, so one that is still being written is not that old: the grace is an
+hour at the least, and a day unless the operator says otherwise.
 
 **It expires.** One archive per export, holding the whole of somebody's job search; the
 scheduler deletes what has run out, bytes and row together. `POSTULO_EXPORT_KEEP_HOURS`
@@ -20,7 +30,10 @@ never from the media directory.
 
 from __future__ import annotations
 
+import logging
+import os
 import tempfile
+import uuid
 from datetime import timedelta
 from pathlib import Path
 
@@ -30,6 +43,77 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 from .errands import handler
+
+logger = logging.getLogger(__name__)
+
+#: What an export is called while it is being written (#1125): a dot-file in the person's
+#: folder of archives, which no row names and nothing lists or serves.
+SCRATCH_PREFIX = ".postulo-export-"
+SCRATCH_SUFFIX = ".partial"
+
+
+class _Finished(File):
+    """A file that is whole and on this machine, for a store to take rather than to copy.
+
+    `FileSystemStorage` renames whatever has a `temporary_file_path`, which is how Django
+    keeps an upload it had spooled to disk. Any other store reads it, as it must, and gets a
+    file like any other. Nothing is opened until something reads, and `chunks` closes what
+    it opened, because Windows will not rename a file that is open.
+    """
+
+    def __init__(self, path: Path, name: str) -> None:
+        self._path = path
+        self._handle = None
+        self.name = name
+
+    def temporary_file_path(self) -> str:
+        return str(self._path)
+
+    @property
+    def file(self):
+        if self._handle is None:
+            self._handle = self._path.open("rb")
+        return self._handle
+
+    @property
+    def size(self) -> int:
+        return self._path.stat().st_size
+
+    def chunks(self, chunk_size=None):
+        with self._path.open("rb") as reading:
+            while piece := reading.read(chunk_size or self.DEFAULT_CHUNK_SIZE):
+                yield piece
+
+    def close(self) -> None:
+        if self._handle is not None:
+            self._handle.close()
+            self._handle = None
+
+
+def _scratch(folder: str) -> Path:
+    """An empty file to write an archive into, inside ``folder`` of the store when it can be.
+
+    Made by the store itself, so the file and the folders above it have the modes every kept
+    file has, and on the volume the archive will be kept on, so that keeping it is a rename.
+    A store that is not a directory on this machine has no such place: there the file is in
+    the system's temporary directory, as it always was, and the store copies it.
+    """
+    from django.core.files.base import ContentFile
+    from django.core.files.storage import default_storage
+
+    from postulo.documents import filestore
+
+    name = f"{folder}{SCRATCH_PREFIX}{uuid.uuid4().hex}{SCRATCH_SUFFIX}"
+    if filestore.local_path(name) is not None:
+        made = default_storage.save(name, ContentFile(b""))
+        path = filestore.local_path(made)
+        if path is not None and path.is_file():
+            return path
+        # A store that names a path and keeps no file there, as the one in memory does.
+        filestore.delete(made)
+    handle, temporary = tempfile.mkstemp(prefix="postulo-export-", suffix=".zip")
+    os.close(handle)
+    return Path(temporary)
 
 
 @handler("export", working=_("Packing up your data"))
@@ -44,21 +128,27 @@ def build_an_export(errand) -> dict:
     name = suggested_filename(owner)
     hours = int(getattr(settings, "POSTULO_EXPORT_KEEP_HOURS", 24) or 24)
 
-    handle, temporary = tempfile.mkstemp(prefix="postulo-export-", suffix=".zip")
-    path = Path(temporary)
+    scratch = _scratch(ExportArchive(owner=owner).storage_prefix)
+    whole = _Finished(scratch, name)
     try:
-        with open(handle, "w+b") as writing:
+        with scratch.open("wb") as writing:
             write_archive(owner, writing)
-        with path.open("rb") as reading:
-            archive = ExportArchive(
-                owner=owner,
-                filename=name,
-                size=path.stat().st_size,
-                expires_at=timezone.now() + timedelta(hours=hours),
-            )
-            archive.file.save(name, File(reading), save=True)
+        archive = ExportArchive(
+            owner=owner,
+            filename=name,
+            size=scratch.stat().st_size,
+            expires_at=timezone.now() + timedelta(hours=hours),
+        )
+        archive.file.save(name, whole, save=True)
     finally:
-        path.unlink(missing_ok=True)
+        whole.close()
+        try:
+            # Nothing to remove once the store has taken it; an export that failed has.
+            scratch.unlink(missing_ok=True)
+        except OSError:
+            # Held open by something else, which only Windows minds. No row names it, so
+            # the sweep removes it; the archive, if it was kept, is no worse for it.
+            logger.warning("Could not remove an export's scratch file", exc_info=True)
 
     return {
         "message": str(_("Your data is ready to download.")),

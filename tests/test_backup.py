@@ -236,6 +236,57 @@ def test_writing_an_archive_says_it_is_alive_for_every_file(tmp_path, settings):
     assert len(beats) >= 3 + 2, "each file, and the steps before and after them"
 
 
+def test_a_file_that_leaves_the_media_tree_while_it_is_walked_does_not_stop_the_backup(
+    tmp_path, settings, monkeypatch
+):
+    """An export is written under a name of its own beside the archives and renamed when it
+    is whole, so the walk can list a file that is gone when it comes to read it, and a backup
+    taken at that moment stopped with *No such file* (#1125)."""
+    a_media_file(settings)
+    scratch = a_media_file(settings, "exports/7/.postulo-export-0123.partial", b"PK an export")
+    finished = scratch.parent / "2026" / "11" / "postulo-alex.zip"
+    finished.parent.mkdir(parents=True)
+    describe = tarfile.TarFile.gettarinfo
+
+    def renamed_just_then(self, name=None, arcname=None, fileobj=None):
+        if name and Path(name) == scratch:
+            scratch.rename(finished)
+        return describe(self, name, arcname, fileobj)
+
+    monkeypatch.setattr(tarfile.TarFile, "gettarinfo", renamed_just_then)
+
+    report = write_backup(tmp_path / "instance.tar.gz")
+
+    names = members_of(report.path)
+    assert "media/documents/cv.pdf" in names
+    assert "media/exports/7/.postulo-export-0123.partial" not in names
+    assert "media/exports/7/2026/11/postulo-alex.zip" in names, "under the name it has now"
+    verify_backup(report.path)
+
+
+def test_counting_the_media_tree_survives_a_file_that_goes_while_it_is_counted(
+    tmp_path, monkeypatch
+):
+    """The count made before the archive is written read the size of a file it had just
+    listed, and stopped the backup if an export had been renamed in between (#1125)."""
+    root = tmp_path / "tree"
+    (root / "exports").mkdir(parents=True)
+    (root / "kept.pdf").write_bytes(b"12345")
+    scratch = root / "exports" / ".postulo-export-0123.partial"
+    scratch.write_bytes(b"PK an export")
+    is_file = Path.is_file
+
+    def gone_just_after(self, **kwargs):
+        there = is_file(self, **kwargs)
+        if self == scratch:
+            scratch.unlink(missing_ok=True)
+        return there
+
+    monkeypatch.setattr(Path, "is_file", gone_just_after)
+
+    assert backup_module._tree_stats(root) == (1, 5)
+
+
 def test_media_can_be_left_out(tmp_path, settings):
     a_media_file(settings)
     report = write_backup(tmp_path / "db-only.tar.gz", include_media=False)

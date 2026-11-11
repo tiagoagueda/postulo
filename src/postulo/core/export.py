@@ -16,6 +16,8 @@ from __future__ import annotations
 import datetime as dt
 import json
 import logging
+import shutil
+import time
 import zipfile
 from io import BytesIO
 from typing import Any
@@ -1745,12 +1747,34 @@ def _media_paths(document: dict) -> list[str]:
     return names
 
 
+#: How much of a kept file is held at once on its way into the archive (#1125).
+COPY_BUFFER = 1024 * 1024
+
+
+def _member(archive: zipfile.ZipFile, name: str) -> zipfile.ZipInfo:
+    """The entry `writestr` makes for ``name``, for a member that is written in pieces.
+
+    `ZipFile.open(name, "w")` given only a name dates the member 1 January 1980. Given this
+    it is dated now and compressed as the archive is, like every member `writestr` adds, so
+    a file that is streamed in reads no differently from one that was not.
+    """
+    info = zipfile.ZipInfo(name, date_time=time.localtime()[:6])
+    info.compress_type = archive.compression
+    return info
+
+
 def write_archive(user, target=None) -> BytesIO:
     """Build the complete export as a zip.
 
-    Returns an in-memory buffer when no target is given. An export is one person's job
-    search: measured in megabytes, not gigabytes, so holding it in memory is reasonable
-    and streaming would be more machinery than the size justifies.
+    Written to ``target`` when one is given, which is how the export somebody asks for is
+    made (`core.slow.build_an_export`) and what `manage.py export_data` does. With none it
+    returns an in-memory buffer, which suits a caller that wants a small one whole. An
+    export is not always small: what captures kept of their pages is part of it, and an
+    account may keep a gigabyte of that.
+
+    Each kept file is copied in `COPY_BUFFER` at a time and never read whole (#1125). It
+    used to be, on the reasoning that an export is measured in megabytes; the copy needs no
+    more than a buffer whatever the file weighs, and it is the standard library's own.
 
     The manifest is read inside one transaction and the files outside it. The view no longer
     runs in a transaction of its own (#220), and an archive whose JSON names an application
@@ -1773,8 +1797,12 @@ def write_archive(user, target=None) -> BytesIO:
             archive.writestr(member, content)
         for name in _media_paths(document):
             try:
-                with default_storage.open(name, "rb") as handle:
-                    archive.writestr(f"{MEDIA_PREFIX}{name}", handle.read())
+                # The file first: one that is missing leaves no member behind, as before.
+                with (
+                    default_storage.open(name, "rb") as source,
+                    archive.open(_member(archive, f"{MEDIA_PREFIX}{name}"), "w") as member,
+                ):
+                    shutil.copyfileobj(source, member, COPY_BUFFER)
             except FileNotFoundError:
                 # A record whose file has gone missing should not cost you the export of
                 # everything else; the manifest still says the file was expected.

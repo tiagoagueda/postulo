@@ -9,12 +9,16 @@ and that the export archive is looked after rather than left on disk.
 from __future__ import annotations
 
 import datetime as dt
+import os
+import tempfile
+import zipfile
+from pathlib import Path
 
 import pytest
 from django.urls import reverse
 from django.utils import timezone
 
-from postulo.core import errands
+from postulo.core import errands, export
 from postulo.core.models import Errand, ErrandState, ExportArchive
 from postulo.jobs.models import Capture, CaptureStatus, Company
 
@@ -147,6 +151,179 @@ def test_an_export_becomes_a_file_with_an_owner_and_an_expiry(client, user, sett
     assert archive.filename.endswith(".zip")
     assert dt.timedelta(hours=5) < archive.expires_at - timezone.now() < dt.timedelta(hours=7)
     assert errand.url == reverse("core:export_archive", args=[archive.pk])
+
+
+@pytest.fixture
+def volumes(tmp_path, settings, monkeypatch):
+    """A data volume and a system temporary directory of this test's own, both empty."""
+    media = tmp_path / "media"
+    temporary = tmp_path / "tmp"
+    media.mkdir()
+    temporary.mkdir()
+    settings.MEDIA_ROOT = str(media)
+    monkeypatch.setattr(tempfile, "tempdir", str(temporary))
+    return media, temporary
+
+
+def files_in(directory: Path) -> list[str]:
+    return sorted(
+        path.relative_to(directory).as_posix() for path in directory.rglob("*") if path.is_file()
+    )
+
+
+@pytest.fixture
+def while_writing(monkeypatch):
+    """Run something in the middle of an export: after some of the archive is written."""
+    write_archive = export.write_archive
+    during = []
+
+    def interrupted(owner, target=None):
+        target.write(b"PK half an archive")
+        target.flush()
+        for look in during:
+            look(target)
+        target.seek(0)
+        target.truncate()
+        return write_archive(owner, target)
+
+    monkeypatch.setattr(export, "write_archive", interrupted)
+    return during
+
+
+def test_an_export_is_written_once_on_the_data_volume_and_moved_into_place(
+    user, volumes, while_writing, monkeypatch
+):
+    """An export was built in the system's temporary directory, which the hardened compose
+    file keeps in memory, and then copied into the store: every archive was written twice,
+    and held in the worker's memory allowance while it was (#1125)."""
+    from django.core.files.storage import filesystem
+
+    from postulo.core import slow
+
+    media, temporary = volumes
+    seen = {}
+
+    def look(target):
+        seen["temporary"] = files_in(temporary)
+        seen["media"] = files_in(media)
+        seen["inode"] = os.stat(target.name).st_ino
+
+    while_writing.append(look)
+    moves, copies = [], []
+    move = filesystem.file_move_safe
+    monkeypatch.setattr(
+        filesystem, "file_move_safe", lambda *a, **kw: moves.append(a[:2]) or move(*a, **kw)
+    )
+    monkeypatch.setattr(slow._Finished, "chunks", lambda self, size=None: copies.append(1) or [])
+
+    errand = errands.send("export", user)
+
+    assert errand.state == ErrandState.DONE, errand.message
+    archive = ExportArchive.objects.for_user(user).get()
+    assert seen["temporary"] == [], "nothing is built in the system's temporary directory"
+    (scratch,) = seen["media"]
+    folder, _slash, name = scratch.rpartition("/")
+    assert folder == f"exports/{user.pk}", "beside the archives, in the person's own folder"
+    assert name.startswith(".postulo-export-") and name.endswith(".partial")
+    # Moved, not copied: the store renamed the very file that was written.
+    assert len(moves) == 1 and copies == []
+    assert os.stat(archive.file.path).st_ino == seen["inode"]
+    # And nothing is left but the archive, which is whole.
+    assert files_in(temporary) == []
+    assert files_in(media) == [archive.file.name]
+    assert archive.size == os.path.getsize(archive.file.path)
+    with zipfile.ZipFile(archive.file.path) as written:
+        assert written.testzip() is None and export.MANIFEST_NAME in written.namelist()
+
+
+def test_an_export_that_fails_removes_what_it_had_written(user, volumes, monkeypatch):
+    """The half-written archive is on the data volume now, where a failure must not leave
+    it (#1125)."""
+    media, temporary = volumes
+
+    def fails(owner, target=None):
+        target.write(b"PK half an archive")
+        raise OSError("No space left on device")
+
+    monkeypatch.setattr(export, "write_archive", fails)
+
+    errand = errands.send("export", user)
+
+    assert errand.state == ErrandState.FAILED
+    assert not ExportArchive.objects.exists()
+    assert files_in(media) == [] and files_in(temporary) == []
+
+
+def test_a_scratch_file_is_left_alone_while_it_is_written_and_swept_once_it_is_old(
+    user, volumes, while_writing, settings
+):
+    """A worker killed half way leaves its scratch file on the data volume, where nothing
+    but the sweep of unnamed files would ever remove it (#1125). The sweep takes it once it
+    is past the grace period, and never one an export is still writing."""
+    from postulo.core import slow
+    from postulo.documents import scrub
+
+    media, _temporary = volumes
+    settings.POSTULO_MEDIA_SWEEP_GRACE_HOURS = 1  # the shortest an operator can make it
+    swept = []
+    while_writing.append(lambda target: swept.append((scrub.sweep(), files_in(media))))
+
+    errand = errands.send("export", user)
+
+    assert errand.state == ErrandState.DONE, errand.message
+    ((removed, there),) = swept
+    assert removed == [] and len(there) == 1, "the sweep came round and left it"
+
+    # The same file, as a killed worker leaves it: no export, no row, nobody to remove it.
+    leftover = slow._scratch(f"exports/{user.pk}/")
+    leftover.write_bytes(b"PK half an archive")
+    assert scrub.sweep() == [], "inside the grace period"
+    then = (timezone.now() - dt.timedelta(hours=2)).timestamp()
+    os.utime(leftover, (then, then))
+    assert scrub.sweep() == [f"exports/{user.pk}/{leftover.name}"]
+    assert not leftover.exists()
+    assert files_in(media) == [ExportArchive.objects.get().file.name], "and the archive stays"
+
+
+def test_a_store_that_is_not_a_directory_is_still_handed_the_archive_to_copy(
+    user, volumes, settings
+):
+    """Only a store on this machine can take a file by renaming it; any other reads it, from
+    the temporary directory as before, and nothing is left there afterwards (#1125)."""
+    media, temporary = volumes
+    settings.STORAGES = {
+        **settings.STORAGES,
+        "default": {"BACKEND": "django.core.files.storage.InMemoryStorage"},
+    }
+
+    errand = errands.send("export", user)
+
+    assert errand.state == ErrandState.DONE, errand.message
+    archive = ExportArchive.objects.for_user(user).get()
+    with archive.file.open("rb") as kept, zipfile.ZipFile(kept) as written:
+        assert written.testzip() is None and export.MANIFEST_NAME in written.namelist()
+    assert archive.size == archive.file.size
+    assert files_in(temporary) == [] and files_in(media) == []
+    assert archive.file.storage.listdir(f"exports/{user.pk}")[1] == [], "and no scratch file"
+
+
+def test_a_finished_file_can_be_read_by_a_store_that_reads_and_then_let_go(tmp_path):
+    """What the store is handed is a file like any other to one that copies it (#1125)."""
+    from postulo.core.slow import _Finished
+
+    path = tmp_path / "whole.zip"
+    path.write_bytes(b"PK" + b"x" * 200_000)
+    whole = _Finished(path, "export.zip")
+
+    assert whole.temporary_file_path() == str(path)
+    assert whole.size == 200_002 and whole.name == "export.zip"
+    assert b"".join(whole.chunks(64 * 1024)) == path.read_bytes()
+    path.rename(tmp_path / "moved.zip")  # nothing holds it open after `chunks`
+    (tmp_path / "moved.zip").rename(path)
+    whole.seek(0)
+    assert whole.read(2) == b"PK"
+    whole.close()
+    path.unlink()
 
 
 def test_an_archive_is_served_to_its_owner_and_nobody_else(client, user, other_user):

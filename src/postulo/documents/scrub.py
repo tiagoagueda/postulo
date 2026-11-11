@@ -128,6 +128,9 @@ def sweep(*, now=None) -> list[str]:
 
     The scheduled pass's half of "no orphan survives": a request that fails after its file
     was written rolls the row back and leaves the file, and Django offers no hook for that.
+    A worker killed while it wrote an export leaves one too: the dot-file the archive was
+    being written under, beside the archives (#1125). One still being written is safe, since
+    a file is as old as its last write and the grace period is an hour at the least.
     Logged line by line, and off with ``POSTULO_MEDIA_SWEEP=false``.
 
     **It has a floor** (#775): a pass that finds more than `SWEEP_MAX_SHARE` of the files kept to
