@@ -215,6 +215,10 @@ class Command(BaseCommand):
             reaped = reap_archives() + errands.forget_old() + inbox.forget_old()
             # And the queue's own record of the tasks behind those errands (#1121).
             reaped += errands.forget_task_results()
+            # Cache entries past their expiry, which Django keeps until 200,000 pile up (#1167).
+            from postulo.core import cache_purge
+
+            cache_purge.purge_if_due()
             # What a webhook was told, a week on (#752).
             webhooks.forget_old()
             # The pages of captures that never became a listing, past the days the

@@ -213,3 +213,7 @@ def tidy_up_if_due() -> None:
     reap_archives()
     pages.expire_unconfirmed()
     sessions.clear_expired()
+    # The cache's own expired entries, which nothing else removes (#1167).
+    from . import cache_purge
+
+    cache_purge.purge_if_due()
