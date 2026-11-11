@@ -398,22 +398,6 @@ def test_a_plugin_without_a_url_or_licence_claims_neither(tool, plugin_repo):
     assert tool.cmd_extract(check=True) == 0
 
 
-def test_compile_writes_the_status_report_the_picker_reads(tool, tmp_path, monkeypatch):
-    """The picker and *Defaults* read locale/status.json and nothing else (#495). It is
-    written with the .mo files rather than committed: every translation saved in Weblate
-    changes it, and a committed copy was stale on every one of its pull requests (#349)."""
-    written = {}
-
-    def capture(self, text, **kwargs):
-        written[self.name] = text
-
-    monkeypatch.setattr(tool, "compile_catalogue", lambda catalogue, code=None: b"")
-    monkeypatch.setattr(Path, "write_bytes", lambda self, data: None)
-    monkeypatch.setattr(Path, "write_text", capture)
-    assert tool.cmd_compile() == 0
-    assert written["status.json"] == tool._status_text(tool.build_report())
-
-
 # --------------------------------------------- a translation is text, not markup (#983)
 
 HOSTILE = [
@@ -795,6 +779,25 @@ def small_postulo(tmp_path, tool):
     _catalogue(tool, own, sets, "pt-PT")
     yield tmp_path
     tool.use(REPO)
+
+
+def test_compile_writes_the_status_report_the_picker_reads(tool, small_postulo, capsys):
+    """The picker and *Defaults* read locale/status.json and nothing else (#495). It is
+    written with the .mo files rather than committed: every translation saved in Weblate
+    changes it, and a committed copy was stale on every one of its pull requests (#349).
+
+    Shown on three catalogues. It used to compile Postulo's own tree with the writes
+    patched out, which parsed all 2,352 catalogues more than once to say the same, and was
+    the third slowest test of the suite (#1033)."""
+    status = small_postulo / "src" / "postulo" / "locale" / "status.json"
+    assert not status.exists()
+
+    assert tool.cmd_compile() == 0
+
+    report = tool.build_report()
+    assert set(report) == {"fr-FR", "pt-PT"}, "there is something to report"
+    assert status.read_bytes() == tool._status_text(report).encode(), "what stats would print"
+    assert f"written {status.relative_to(small_postulo)}" in capsys.readouterr().out
 
 
 def test_a_compile_parses_each_catalogue_once(tool, small_postulo, monkeypatch, capsys):
