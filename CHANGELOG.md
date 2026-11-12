@@ -8,6 +8,9 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### ✨ Added
 
+- A listing's page and its application's page show which of the skills the listing names your career record has and which it does not, read from the ESCO classification with no model, and which CV prints the most of them. (#1093)
+- The report page can make last month's report on a chosen day, or some days before a plugin's calendar entry; it is filed under Sent documents with a reminder to read it, and handed to your stores or emailed from your own outbox only if you switch that on. (#1095)
+- Each contact has a page with their details, your own note, and everything that happened with them: the applications they were on or referred you to, interviews, appointments, messages and reference letters, newest first. (#1097)
 - Sync plugins can keep a small note between runs of a connection, so a mail sync no longer has to read the same messages again on every pass. (#1165)
 - Applications can go quiet after a different number of days for each status, or for what they were applied through, set beside the usual number under Settings → Appearance; each application's page says when it will count as quiet. (#1099)
 - Offers can now be recorded, changed and deleted through the API, not only read, with the same checks, timeline entries and answer-by reminders as the page. (#1101)
