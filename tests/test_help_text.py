@@ -67,6 +67,7 @@ EXCUSED = {
     "ExperienceForm.role": "what the job was called",
     "IndustryForm.name": "what the industry is called",
     "InterviewForm.kind": "the choices are the answer, and they are named",
+    "SubscribedEventForm.kind": "the choices are the answer, and they are named (#1098)",
     "JobPostingForm.company": "who the employer is",
     "LanguageSkillForm.code": "which language, from the list",
     "LanguageSkillForm.name": "which language",

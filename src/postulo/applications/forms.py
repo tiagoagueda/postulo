@@ -1019,6 +1019,9 @@ class SubscribedEventForm(forms.Form):
         ),
         widget=forms.RadioSelect,
         initial=AS_APPOINTMENT,
+        help_text=_(
+            "The event stays as the calendar has it. What is added here is yours to change."
+        ),
     )
     application = forms.ModelChoiceField(
         label=_("Application"),
