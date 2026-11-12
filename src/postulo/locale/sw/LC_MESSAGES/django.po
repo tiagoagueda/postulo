@@ -332,6 +332,20 @@ msgid_plural "%(count)s applications have gone quiet"
 msgstr[0] "Ombi %(count)s limenyamaza"
 msgstr[1] "Maombi %(count)s yamenyamaza"
 
+#: src/postulo/applications/subscriptions.py
+#, python-format
+msgid "%(count)s event whose date could not be read."
+msgid_plural "%(count)s events whose date could not be read."
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/postulo/applications/subscriptions.py
+#, python-format
+msgid "%(count)s event with a time but no time zone Postulo knows."
+msgid_plural "%(count)s events with a time but no time zone Postulo knows."
+msgstr[0] ""
+msgstr[1] ""
+
 #: src/postulo/jobs/closing.py
 #, fuzzy, python-format
 msgid "%(count)s listing you are considering closes soon"
@@ -360,12 +374,26 @@ msgid_plural "%(count)s removed"
 msgstr[0] "%(count)s iliondolewa"
 msgstr[1] "%(count)s iliondolewa"
 
+#: src/postulo/applications/subscriptions.py
+#, python-format
+msgid "%(count)s repeating event: Postulo does not read repeating events."
+msgid_plural "%(count)s repeating events: Postulo does not read repeating events."
+msgstr[0] ""
+msgstr[1] ""
+
 #: src/postulo/plugins/base.py
 #, fuzzy, python-format
 msgid "%(count)s skipped"
 msgid_plural "%(count)s skipped"
 msgstr[0] "%(count)s imerukwa"
 msgstr[1] "%(count)s zimerukwa"
+
+#: src/postulo/applications/subscriptions.py
+#, python-format
+msgid "%(count)s task."
+msgid_plural "%(count)s tasks."
+msgstr[0] ""
+msgstr[1] ""
 
 #: src/postulo/templates/server/people.html
 #, fuzzy, python-format
@@ -1665,8 +1693,10 @@ msgstr "(elekezwa kutoka kitabu kipya)"
 msgid "(part)"
 msgstr "(sehemu ya)"
 
-#: src/postulo/applications/ical_import.py
+#: src/postulo/applications/agenda.py src/postulo/applications/ical_import.py
+#: src/postulo/applications/models.py
 #: src/postulo/templates/applications/ical_import.html
+#: src/postulo/templates/applications/subscribed_event.html
 #, fuzzy
 msgid "(untitled)"
 msgstr "(haina wajibu wowote)"
@@ -3147,6 +3177,7 @@ msgid "Activity"
 msgstr ""
 
 #: src/postulo/templates/applications/application_detail.html
+#: src/postulo/templates/applications/subscribed_event.html
 #: src/postulo/templates/jobs/company_detail.html
 #: src/postulo/templates/jobs/company_form.html
 #: src/postulo/templates/resume/overview.html
@@ -3250,10 +3281,14 @@ msgstr "Kuongeza kuingia"
 msgid "Add it anyway"
 msgstr "Ya ya ya ya ya anyway"
 
-#: src/postulo/applications/ical_import.py
+#: src/postulo/applications/forms.py src/postulo/applications/ical_import.py
 #, fuzzy
 msgid "Add it as"
 msgstr "Ongeza kama"
+
+#: src/postulo/templates/applications/subscribed_event.html
+msgid "Add it as your own"
+msgstr ""
 
 #: src/postulo/templates/jobs/partials/bind_capture.html
 #, fuzzy
@@ -3390,6 +3425,14 @@ msgstr "Ongeza kwenye historia ya orodha."
 msgid "Added to the timeline."
 msgstr "Ongeza kwenye orodha ya muda."
 
+#: src/postulo/applications/views_subscriptions.py
+msgid "Added to your appointments. It is yours to change now."
+msgstr ""
+
+#: src/postulo/applications/views_subscriptions.py
+msgid "Added to your interviews. It is yours to change now."
+msgstr ""
+
 #: src/postulo/jobs/listing_views.py
 #, fuzzy
 msgid "Added to your listings."
@@ -3419,14 +3462,15 @@ msgstr "Ongeza faili moja kwa moja. Kile ambacho tayari kimeachwa kama ilivyo na
 msgid "addok (France's Base Adresse Nationale)"
 msgstr ""
 
-#: src/postulo/applications/reports.py src/postulo/jobs/tables.py
-#: src/postulo/templates/partials/web_links.html
+#: src/postulo/applications/forms.py src/postulo/applications/reports.py
+#: src/postulo/jobs/tables.py src/postulo/templates/partials/web_links.html
 #, fuzzy
 msgid "Address"
 msgstr "Hotuba ya"
 
-#: src/postulo/core/models.py src/postulo/jobs/models.py
-#: src/postulo/notifications/models.py src/postulo/resume/models.py
+#: src/postulo/applications/models.py src/postulo/core/models.py
+#: src/postulo/jobs/models.py src/postulo/notifications/models.py
+#: src/postulo/resume/models.py
 #, fuzzy
 msgid "address"
 msgstr "anwani ya anwani"
@@ -3645,7 +3689,7 @@ msgstr "Kumbuka: Postulo haiwezi kufanya kazi bila hiyo."
 msgid "Always this"
 msgstr ""
 
-#: src/postulo/core/models.py
+#: src/postulo/applications/models.py src/postulo/core/models.py
 #, fuzzy
 msgid "Amber"
 msgstr "Amber"
@@ -3730,6 +3774,14 @@ msgstr "Msimamizi aliunda kiungo hiki kwa ajili ya %(name)s. Kinafanya kazi mara
 msgid "An application's status changes"
 msgstr "Mabadiliko ya hali ya maombi"
 
+#: src/postulo/applications/forms.py
+msgid "An appointment"
+msgstr ""
+
+#: src/postulo/applications/forms.py
+msgid "An appointment is with a public employment service. Choose one."
+msgstr ""
+
 #: src/postulo/templates/core/export.html
 #, fuzzy
 msgid "An archive can be imported into an empty account from the command line. It is not offered here because importing creates records rather than merging them, and that is a decision worth making deliberately rather than by clicking."
@@ -3805,12 +3857,12 @@ msgstr "Ni muhimu kuongeza tu. Hakuna kitu tayari katika rekodi yako ya kazi kim
 msgid "An index is a list of code to run here, so it must be signed and you must hold the key. Switching a repository off later stops new installs and updates from it; anything already installed keeps working."
 msgstr "Index ni orodha ya msimbo wa kuendesha hapa, hivyo ni lazima saini na lazima kushikilia ufunguo. Kubadilisha uhifadhi mbali baadaye huacha kufunga mpya na sasisho kutoka kwake; kitu chochote kilichowekwa tayari kinaendelea kufanya kazi."
 
-#: src/postulo/applications/ical_import.py
+#: src/postulo/applications/forms.py src/postulo/applications/ical_import.py
 #, fuzzy
 msgid "An interview"
 msgstr "Mahojiano ya"
 
-#: src/postulo/applications/ical_import.py
+#: src/postulo/applications/forms.py src/postulo/applications/ical_import.py
 #, fuzzy
 msgid "An interview belongs to an application. Choose one."
 msgstr "Mahojiano ni sehemu ya maombi. Chagua moja."
@@ -4060,7 +4112,8 @@ msgstr "Vifaa vya API"
 msgid "Appearance"
 msgstr "Kuonekana kwa"
 
-#: src/postulo/applications/ical_import.py src/postulo/plugins/pairing.py
+#: src/postulo/applications/forms.py src/postulo/applications/ical_import.py
+#: src/postulo/plugins/pairing.py
 #: src/postulo/templates/applications/suggestion_list.html
 #: src/postulo/templates/base.html
 #: src/postulo/templates/documents/letter_detail.html
@@ -4628,6 +4681,7 @@ msgstr "B1 - Kiwango cha kati"
 msgid "B2 — upper intermediate"
 msgstr "B2 - kiwango cha juu"
 
+#: src/postulo/templates/applications/subscribed_event.html
 #: src/postulo/templates/connections/pick.html
 #: src/postulo/templates/jobs/move_owner.html
 #: src/postulo/templates/jobs/share.html
@@ -4851,7 +4905,7 @@ msgstr "Bioteknolojia ya Bioteknolojia"
 msgid "Blank keeps them for as long as the instance exists."
 msgstr "Magufuli aendelea kuwatetea kwa muda mrefu kadri hali itakavyokuwa."
 
-#: src/postulo/core/models.py
+#: src/postulo/applications/models.py src/postulo/core/models.py
 #, fuzzy
 msgid "Blue"
 msgstr "Rangi ya bluu"
@@ -5033,6 +5087,9 @@ msgstr "C2 - Uwezo"
 #: src/postulo/templates/applications/application_detail.html
 #: src/postulo/templates/applications/calendar.html
 #: src/postulo/templates/applications/ical_import.html
+#: src/postulo/templates/applications/subscribed_event.html
+#: src/postulo/templates/applications/subscription_form.html
+#: src/postulo/templates/applications/subscription_list.html
 #: src/postulo/templates/cotton/date_field.html
 #, fuzzy
 msgid "Calendar"
@@ -5048,6 +5105,14 @@ msgstr "Kalenda ya faili"
 msgid "calendar identifier"
 msgstr "tarehe ya utambulisho"
 
+#: src/postulo/applications/models.py
+msgid "calendar subscription"
+msgstr ""
+
+#: src/postulo/applications/models.py
+msgid "calendar subscriptions"
+msgstr ""
+
 #: src/postulo/templates/applications/calendar.html
 #, fuzzy
 msgid "Calendar views"
@@ -5056,6 +5121,10 @@ msgstr "Maoni ya kalenda"
 #: src/postulo/applications/calendar_print.py
 #, python-format
 msgid "Calendar · %(period)s"
+msgstr ""
+
+#: src/postulo/templates/applications/subscription_list.html
+msgid "Calendars somebody else keeps, such as an employment office's appointments or a training provider's sessions. Postulo reads them again on their own and draws their events on your calendar, without changing them."
 msgstr ""
 
 #: src/postulo/applications/models.py src/postulo/jobs/models.py
@@ -5080,6 +5149,7 @@ msgstr ""
 #: src/postulo/templates/applications/interview_form.html
 #: src/postulo/templates/applications/offer_form.html
 #: src/postulo/templates/applications/reminder_form.html
+#: src/postulo/templates/applications/subscription_form.html
 #: src/postulo/templates/applications/tag_form.html
 #: src/postulo/templates/connections/confirm_delete.html
 #: src/postulo/templates/connections/form.html
@@ -5122,10 +5192,23 @@ msgstr "Kufuta"
 msgid "Cancelled"
 msgstr "Kuondolewa"
 
+#: src/postulo/applications/models.py
+msgid "cancelled"
+msgstr ""
+
 #: src/postulo/applications/agenda.py
 #, fuzzy
 msgid "Cancelled interview:"
 msgstr "Mahojiano yaliyofutwa:"
+
+#: src/postulo/applications/agenda.py
+msgid "Cancelled, from a subscribed calendar:"
+msgstr ""
+
+#: src/postulo/applications/agenda.py
+#, python-format
+msgid "Cancelled, from the subscribed calendar %(name)s:"
+msgstr ""
 
 #: src/postulo/core/file_review.py
 #, fuzzy
@@ -5907,15 +5990,15 @@ msgstr "kodi ya kumbukumbu iliyochapishwa"
 msgid "collection"
 msgstr ""
 
+#: src/postulo/applications/models.py src/postulo/core/models.py
+#, fuzzy
+msgid "colour"
+msgstr "rangi ya rangi"
+
 #: src/postulo/core/design.py src/postulo/templates/server/design.html
 #, fuzzy
 msgid "Colour"
 msgstr "Rangi ya rangi"
-
-#: src/postulo/core/models.py
-#, fuzzy
-msgid "colour"
-msgstr "rangi ya rangi"
 
 #: src/postulo/templates/core/import_csv_map.html
 #, fuzzy
@@ -6634,6 +6717,7 @@ msgstr "Tarehe ya kuchagua"
 msgid "Day"
 msgstr "Siku ya Siku"
 
+#: src/postulo/applications/models.py
 #: src/postulo/templates/settings/appearance.html
 #, fuzzy
 msgid "day"
@@ -6843,6 +6927,7 @@ msgstr "Ulinzi wa Ulinzi"
 
 #: src/postulo/templates/applications/application_detail.html
 #: src/postulo/templates/applications/appointment_form.html
+#: src/postulo/templates/applications/subscription_list.html
 #: src/postulo/templates/applications/tag_list.html
 #: src/postulo/templates/cotton/delete_dialog.html
 #: src/postulo/templates/cotton/reminder_actions.html
@@ -6981,12 +7066,14 @@ msgstr "Dept ya"
 
 #: src/postulo/applications/forms.py src/postulo/core/csv_import.py
 #: src/postulo/jobs/models.py src/postulo/jobs/tables.py
+#: src/postulo/templates/applications/subscribed_event.html
 #: src/postulo/templates/jobs/posting_detail.html
 #, fuzzy
 msgid "Description"
 msgstr "Maelezo ya ufafanuzi"
 
-#: src/postulo/jobs/models.py src/postulo/resume/models.py
+#: src/postulo/applications/models.py src/postulo/jobs/models.py
+#: src/postulo/resume/models.py
 #, fuzzy
 msgid "description"
 msgstr "maelezo ya maelezo"
@@ -7494,6 +7581,7 @@ msgstr "Ed25519, base64. Bila hiyo hakuna katalogi: orodha ya anwani zisizotiwa 
 
 #: src/postulo/templates/applications/application_detail.html
 #: src/postulo/templates/applications/interview_list.html
+#: src/postulo/templates/applications/subscription_list.html
 #: src/postulo/templates/applications/tag_list.html
 #: src/postulo/templates/connections/list.html
 #: src/postulo/templates/documents/letter_detail.html
@@ -7650,6 +7738,10 @@ msgstr "Mfanyakazi"
 msgid "Employer structure is switched off, so departments and parents are not changed."
 msgstr "Muundo wa mwajiri umezimwa, kwa hivyo idara na wazazi hazibadilika."
 
+#: src/postulo/applications/forms.py
+msgid "Employment service"
+msgstr ""
+
 #: src/postulo/applications/models.py
 #, fuzzy
 msgid "employment service"
@@ -7733,6 +7825,10 @@ msgstr "Uhandisi wa Uhandisi"
 msgctxt "name of a keyboard key"
 msgid "Enter"
 msgstr "Kuingia kwa kuingia"
+
+#: src/postulo/applications/subscriptions.py
+msgid "Enter the calendar's web address, starting with https:// or webcal://."
+msgstr ""
 
 #: src/postulo/templates/accounts/delete_account.html
 #: src/postulo/templates/core/export.html
@@ -7883,12 +7979,12 @@ msgstr "Kila hati kama ilivyoachwa, ilihifadhiwa wakati ulipotumwa. Hawajawahi k
 msgid "Every file goes without a title, an author, a subject or keywords, whatever is chosen below or typed for one file, and a PDF without the name of the program that drew it. The language stays unless you leave it out below as well."
 msgstr ""
 
-#: src/postulo/plugins/syncing.py
+#: src/postulo/applications/models.py src/postulo/plugins/syncing.py
 #, fuzzy
 msgid "Every four hours"
 msgstr "Kila baada ya saa nne"
 
-#: src/postulo/plugins/syncing.py
+#: src/postulo/applications/models.py src/postulo/plugins/syncing.py
 #, fuzzy
 msgid "Every hour"
 msgstr "Kila saa"
@@ -8577,6 +8673,14 @@ msgstr "Kwa mfano, %(office)s"
 msgid "For a PNG or JPEG. Cuts out where it was taken, when and with what, which a phone's photograph carries, before it is kept and before it is sent anywhere. The picture itself is not touched. Untick it to keep the file exactly as it is."
 msgstr "Kwa ajili ya PNG au JPEG. Kata nje ambapo ni kuchukuliwa, wakati na nini, ambayo picha ya simu hubeba, kabla ni agizo na kabla ya kutumwa popote. Picha yenyewe haionekani. Jaribu kuweka faili kama ilivyo."
 
+#: src/postulo/applications/forms.py
+msgid "For an appointment: the public employment service it is with."
+msgstr ""
+
+#: src/postulo/applications/forms.py
+msgid "For an interview: the application it is about."
+msgstr ""
+
 #: src/postulo/resume/models.py
 #, fuzzy
 msgid "For example, “BSc Computer Science”."
@@ -8797,6 +8901,10 @@ msgstr "Kutoka kwa %(start)s hadi %(end)s"
 msgid "From %(start)s: now choose the last day"
 msgstr "Kuanzia %(start)s: sasa chagua siku ya mwisho"
 
+#: src/postulo/applications/agenda.py
+msgid "From a subscribed calendar:"
+msgstr ""
+
 #: src/postulo/core/models.py
 #, fuzzy
 msgid "from address"
@@ -8837,6 +8945,16 @@ msgstr ""
 
 #: src/postulo/accounts/forms.py
 msgid "From the document is your name and the kind of document: “Alex Morgan — CV”."
+msgstr ""
+
+#: src/postulo/templates/applications/subscribed_event.html
+#, python-format
+msgid "From the subscribed calendar %(name)s"
+msgstr ""
+
+#: src/postulo/applications/agenda.py
+#, python-format
+msgid "From the subscribed calendar %(name)s:"
 msgstr ""
 
 #: src/postulo/core/models.py
@@ -9132,7 +9250,7 @@ msgstr "Gravatar haina picha kwa anwani yako, kwa hivyo kuanza kwako kukaa."
 msgid "Green"
 msgstr "Kijani cha kijani"
 
-#: src/postulo/core/models.py
+#: src/postulo/applications/models.py src/postulo/core/models.py
 #, fuzzy
 msgid "Grey"
 msgstr "Grey"
@@ -9485,6 +9603,10 @@ msgstr "Kiasi gani cha nafasi ya kuondoka"
 #, fuzzy
 msgid "How much you sent, month by month, so a quiet stretch is visible."
 msgstr "Na kwa mwezi unapolifuatia."
+
+#: src/postulo/applications/forms.py
+msgid "How often Postulo reads it again. One that cannot be read is tried less often until it can."
+msgstr ""
 
 #: src/postulo/resume/registry.py
 msgid "How often your work has been cited, as a source counted it on a given day: for all of it, or for one publication. Postulo counts nothing itself."
@@ -10398,6 +10520,10 @@ msgstr "Wizara hii ilikuwa ni kwa ajili ya."
 msgid "It holds nothing that needs moving."
 msgstr "Hakuna kitu ambacho kinahitaji kusonga."
 
+#: src/postulo/templates/applications/subscribed_event.html
+msgid "It is a whole day, with no time to meet at, so it cannot be added as an appointment or an interview. Add one by hand if you need it."
+msgstr ""
+
 #: src/postulo/applications/views.py
 #, fuzzy
 msgid "It is already done."
@@ -10561,6 +10687,10 @@ msgstr ""
 #, fuzzy
 msgid "Its date could not be read."
 msgstr "Tarehe yake haikuweza kusomwa."
+
+#: src/postulo/templates/applications/subscription_form.html
+msgid "Its events are drawn on your calendar as they are in the calendar it comes from. They cannot be changed here; any of them can be added as an appointment or an interview of your own."
+msgstr ""
 
 #: src/postulo/plugins/provenance.py
 #, fuzzy
@@ -10788,6 +10918,11 @@ msgstr "Kept baada ya kutumika au kumalizika, kwa sababu kuchukua akaunti ya mtu
 #, fuzzy
 msgid "Kept apart: they will not be asked about again."
 msgstr "Wala hawatamuuliza Maregesi kundi lake ni lipi."
+
+#: src/postulo/applications/forms.py
+#, python-format
+msgid "Kept as %(site)s. Leave it empty to keep it, or enter a new one."
+msgstr ""
 
 #: src/postulo/templates/partials/postal_addresses.html
 #, fuzzy
@@ -11048,8 +11183,8 @@ msgstr "ukaguzi wa mwisho"
 msgid "last checked"
 msgstr "uchunguzi wa mwisho"
 
-#: src/postulo/documents/models.py src/postulo/notifications/models.py
-#: src/postulo/plugins/models.py
+#: src/postulo/applications/models.py src/postulo/documents/models.py
+#: src/postulo/notifications/models.py src/postulo/plugins/models.py
 #, fuzzy
 msgid "last error"
 msgstr "makosa ya mwisho"
@@ -11067,6 +11202,17 @@ msgstr ""
 #, fuzzy
 msgid "last pushed"
 msgstr "hatua ya mwisho"
+
+#: src/postulo/applications/models.py
+msgid "last read"
+msgstr ""
+
+#: src/postulo/templates/applications/subscription_list.html
+#, python-format
+msgid "Last read on %(when)s: %(counter)s event."
+msgid_plural "Last read on %(when)s: %(counter)s events."
+msgstr[0] ""
+msgstr[1] ""
 
 #: src/postulo/plugins/models.py
 #, fuzzy
@@ -11120,7 +11266,7 @@ msgstr "matumizi ya mwisho"
 msgid "Last used %(when)s"
 msgstr "Matumizi ya mwisho %(when)s"
 
-#: src/postulo/plugins/models.py
+#: src/postulo/applications/models.py src/postulo/plugins/models.py
 #, fuzzy
 msgid "last worked"
 msgstr "kazi ya mwisho"
@@ -11262,6 +11408,14 @@ msgstr "Kikiachwa wazi, CV zako huchapisha “%(place)s”: mji na nchi ya anwan
 #, fuzzy
 msgid "Left empty it is today. Capturing a posting you applied to last week is common."
 msgstr "Acha tu, hii ni leo. Kuchapisha makala uliyotumia wiki iliyopita ni jambo la kawaida."
+
+#: src/postulo/applications/models.py
+msgid "left out"
+msgstr ""
+
+#: src/postulo/templates/applications/subscription_list.html
+msgid "Left out of the calendar:"
+msgstr ""
 
 #: src/postulo/templates/core/table_export.html
 #: src/postulo/templates/documents/themes/base_list.html
@@ -12302,9 +12456,9 @@ msgid "NACE section"
 msgstr "Sehemu ya NACE"
 
 #: src/postulo/accounts/models.py src/postulo/api/models.py
-#: src/postulo/core/models.py src/postulo/documents/models.py
-#: src/postulo/jobs/models.py src/postulo/plugins/models.py
-#: src/postulo/resume/models.py
+#: src/postulo/applications/models.py src/postulo/core/models.py
+#: src/postulo/documents/models.py src/postulo/jobs/models.py
+#: src/postulo/plugins/models.py src/postulo/resume/models.py
 #, fuzzy
 msgid "name"
 msgstr "jina la jina"
@@ -12523,6 +12677,11 @@ msgstr "Kumbuka juu ya %(day)s"
 msgid "New since you last arranged this"
 msgstr "Kwa mara ya mwisho, baada ya kufanya"
 
+#: src/postulo/templates/applications/subscription_form.html
+#: src/postulo/templates/applications/subscription_list.html
+msgid "New subscription"
+msgstr ""
+
 #: src/postulo/templates/applications/tag_list.html
 #, fuzzy
 msgid "New tag"
@@ -12628,6 +12787,10 @@ msgstr "Hakuna cha"
 #, fuzzy
 msgid "No address and no key, so nothing is offered from it."
 msgstr "Hakuna anwani na hakuna ufunguo, kwa hivyo hakuna chochote kinachotolewa kutoka kwake."
+
+#: src/postulo/templates/applications/subscription_list.html
+msgid "No address: enter it again."
+msgstr ""
 
 #: src/postulo/core/offsite.py
 msgid "No age recipient is set, and nothing leaves this machine unencrypted."
@@ -12944,6 +13107,10 @@ msgstr "Hakuna chanzo kilichohifadhiwa kwenye ukurasa huu."
 #, fuzzy
 msgid "No source was kept."
 msgstr "Hakuna chanzo kilichohifadhiwa."
+
+#: src/postulo/templates/applications/subscription_list.html
+msgid "No subscriptions yet."
+msgstr ""
 
 #: src/postulo/api/routers/interviews.py src/postulo/api/routers/offers.py
 #: src/postulo/api/routers/reminders.py
@@ -13360,6 +13527,10 @@ msgstr "Haikuandikwa kwenye CV."
 #, fuzzy
 msgid "Not printed on any CV until they have agreed."
 msgstr "Si kuchapishwa kwenye CV yoyote mpaka walikubaliana."
+
+#: src/postulo/templates/applications/subscription_list.html
+msgid "Not read yet. It will be within minutes."
+msgstr ""
 
 #: src/postulo/applications/analytics.py src/postulo/applications/reports.py
 #: src/postulo/templates/applications/partials/status_card.html
@@ -14283,7 +14454,7 @@ msgstr "Ya ya. Kuingia katika kuuliza msimbo kutoka programu yako ya kuthibitish
 msgid "On. Signing in asks for one of your security keys, or a recovery code."
 msgstr "Ya ya. Ingiza namba yako ya simu au namba ya simu."
 
-#: src/postulo/plugins/syncing.py
+#: src/postulo/applications/models.py src/postulo/plugins/syncing.py
 #, fuzzy
 msgid "Once a day"
 msgstr "Mara moja kwa siku"
@@ -14691,6 +14862,7 @@ msgstr "Ni wazi maombi bila chochote kusikia, na mambo matatu ya kufanya kuhusu 
 msgid "Open as this"
 msgstr "Fungua kama hii"
 
+#: src/postulo/templates/applications/subscribed_event.html
 #: src/postulo/templates/jobs/capture_form.html
 #: src/postulo/templates/jobs/capture_review.html
 #, fuzzy
@@ -15866,6 +16038,11 @@ msgstr "Postulo inasoma katika spelling ya kujiandikisha mwenyewe na kuangalia s
 msgid "Postulo version"
 msgstr "Tafsiri ya Postulo"
 
+#: src/postulo/templates/applications/subscription_list.html
+#, python-format
+msgid "Postulo will try again on %(when)s, and less often while it keeps failing."
+msgstr ""
+
 #: src/postulo/templates/partials/footer_links.html
 #, fuzzy
 msgid "Postulo — your job search, your data."
@@ -16420,6 +16597,10 @@ msgstr "Uendeshaji upya"
 msgid "Read %(name)s as"
 msgstr "Soma %(name)s kama"
 
+#: src/postulo/applications/views_subscriptions.py
+msgid "Read again. The calendar shows what it holds now."
+msgstr ""
+
 #: src/postulo/templates/core/import_csv_map.html
 #, fuzzy
 msgid "Read as"
@@ -16488,6 +16669,10 @@ msgstr "Soma kutoka kwa Europass XML iliyounganishwa na PDF, europass.europa.eu 
 msgid "Read it"
 msgstr "Soma zaidi"
 
+#: src/postulo/applications/models.py
+msgid "read it again"
+msgstr ""
+
 #: src/postulo/templates/documents/letter_detail.html
 #, fuzzy
 msgid "Read it as they will"
@@ -16497,6 +16682,10 @@ msgstr "Soma kama unataka"
 #, fuzzy
 msgid "Read it below"
 msgstr "Soma hapa chini"
+
+#: src/postulo/templates/applications/subscription_list.html
+msgid "Read it now"
+msgstr ""
 
 #: src/postulo/jobs/slow.py
 #, fuzzy
@@ -17277,7 +17466,7 @@ msgstr "wajibu wa"
 msgid "Role / job title"
 msgstr "Jina la Kazi / Jina la Kazi"
 
-#: src/postulo/core/models.py
+#: src/postulo/applications/models.py src/postulo/core/models.py
 #, fuzzy
 msgid "Rose"
 msgstr "Rose ya Rose"
@@ -17393,6 +17582,7 @@ msgstr "Jumamosi ya Jumamosi"
 #: src/postulo/templates/applications/interview_form.html
 #: src/postulo/templates/applications/offer_form.html
 #: src/postulo/templates/applications/reminder_form.html
+#: src/postulo/templates/applications/subscription_form.html
 #: src/postulo/templates/applications/tag_form.html
 #: src/postulo/templates/connections/form.html
 #: src/postulo/templates/documents/cv_form.html
@@ -18951,6 +19141,7 @@ msgstr "hali ya"
 #: src/postulo/templates/applications/partials/bulk_fields.html
 #: src/postulo/templates/applications/partials/status_card.html
 #: src/postulo/templates/applications/report.html
+#: src/postulo/templates/applications/subscribed_event.html
 #: src/postulo/templates/core/import_csv_map.html
 #: src/postulo/templates/documents/themes/base_report.html
 #: src/postulo/templates/jobs/company_form.html
@@ -19099,6 +19290,33 @@ msgstr "masuala ya"
 
 #: src/postulo/accounts/models.py
 msgid "subject of exported files"
+msgstr ""
+
+#: src/postulo/templates/applications/subscription_form.html
+msgid "Subscribe"
+msgstr ""
+
+#: src/postulo/applications/agenda.py
+msgid "Subscribed calendars"
+msgstr ""
+
+#: src/postulo/applications/models.py
+msgid "subscribed event"
+msgstr ""
+
+#: src/postulo/applications/models.py
+msgid "subscribed events"
+msgstr ""
+
+#: src/postulo/applications/views_subscriptions.py
+msgid "Subscribed. Its events appear on the calendar once it has been read, within minutes."
+msgstr ""
+
+#: src/postulo/templates/applications/calendar.html
+#: src/postulo/templates/applications/subscribed_event.html
+#: src/postulo/templates/applications/subscription_form.html
+#: src/postulo/templates/applications/subscription_list.html
+msgid "Subscriptions"
 msgstr ""
 
 #: src/postulo/templates/resume/overview.html
@@ -19374,7 +19592,7 @@ msgstr "Kuwaondoa kutoka"
 msgid "Task"
 msgstr "Majukumu ya"
 
-#: src/postulo/core/models.py
+#: src/postulo/applications/models.py src/postulo/core/models.py
 #, fuzzy
 msgid "Teal"
 msgstr "Teua"
@@ -19518,6 +19736,10 @@ msgstr ""
 #, fuzzy, python-format
 msgid "That address is %(type)s, not an image Postulo keeps."
 msgstr "Anwani hiyo ni %(type)s, si picha Postulo anaendelea."
+
+#: src/postulo/applications/subscriptions.py
+msgid "That address is not one a calendar can be read from."
+msgstr ""
 
 #: src/postulo/plugins/public_addresses.py
 #, fuzzy
@@ -19866,6 +20088,7 @@ msgstr[0] "Hayo ni majaribio mengi. Jaribu tena baada ya sekunde %(seconds)d."
 msgstr[1] "Hayo ni majaribio mengi. Jaribu tena baada ya sekunde %(seconds)d."
 
 #: src/postulo/accounts/avatars.py
+#: src/postulo/applications/views_subscriptions.py
 #, fuzzy
 msgid "That is a lot of tries. Wait a little before asking again."
 msgstr "Hii ni mengi ya majaribio. Tafadhali subiri kidogo kabla ya kuuliza tena."
@@ -20344,6 +20567,10 @@ msgstr "Anwani ilijibu %(code)s."
 msgid "The address answered with nothing."
 msgstr "Barua hiyo ilijibu bila ya chochote."
 
+#: src/postulo/applications/subscriptions.py
+msgid "The address cannot be read here any more. Enter it again."
+msgstr ""
+
 #: src/postulo/jobs/tiles.py
 #, fuzzy
 msgid "The address must hold {z}, {x} and {y}, where each tile's numbers go."
@@ -20474,10 +20701,56 @@ msgstr "Muda na ripoti huanza wiki zake. Kuachwa katika lugha ya kawaida, hufuat
 msgid "The calendar can be downloaded as an iCalendar file, for the period and kinds on the screen, and a file from another calendar can be read in, with a review of what it holds before anything is added."
 msgstr "Kalenda inaweza kupakuliwa kama faili ya iCalendar, kwa kipindi na aina kwenye skrini, na faili kutoka kwa kalenda nyingine inaweza kusomwa, na ukaguzi wa kile kinachoshikilia kabla ya kitu chochote kuongezwa."
 
+#: src/postulo/applications/subscriptions.py
+msgid "The calendar could not be read."
+msgstr ""
+
+#: src/postulo/applications/subscriptions.py
+#, python-format
+msgid "The calendar is larger than %(limit)s MB, so it was not read."
+msgstr ""
+
+#: src/postulo/templates/applications/subscribed_event.html
+msgid "The calendar marks this as cancelled."
+msgstr ""
+
 #: src/postulo/accounts/forms.py
 #, fuzzy
 msgid "The calendar's period buttons"
 msgstr "Orodha ya muda wa kalenda"
+
+#: src/postulo/applications/subscriptions.py
+#, python-format
+msgid "The calendar's server answered with an error (%(status)s)."
+msgstr ""
+
+#: src/postulo/applications/subscriptions.py
+msgid "The calendar's server could not be reached."
+msgstr ""
+
+#: src/postulo/applications/subscriptions.py
+msgid "The calendar's server has nothing at that address any more."
+msgstr ""
+
+#: src/postulo/applications/subscriptions.py
+msgid "The calendar's server refused the address. It may have been changed or withdrawn."
+msgstr ""
+
+#: src/postulo/applications/subscriptions.py
+msgid "The calendar's server sent Postulo round too many redirects."
+msgstr ""
+
+#: src/postulo/applications/subscriptions.py
+msgid "The calendar's server sent something that could not be read."
+msgstr ""
+
+#: src/postulo/applications/subscriptions.py
+msgid "The calendar's server took too long to answer."
+msgstr ""
+
+#: src/postulo/applications/forms.py
+msgid "The calendar's web address, as the service that keeps it gives it: it starts with https:// or webcal:// and usually ends in .ics. It may open the calendar to anyone who has it, so Postulo keeps it encrypted and shows only its site."
+msgstr ""
 
 #: src/postulo/templates/jobs/capture_page_forget.html
 #, fuzzy
@@ -21843,6 +22116,11 @@ msgstr ""
 msgid "The subject has to be one line."
 msgstr "Suala hili linapaswa kuwa mstari mmoja."
 
+#: src/postulo/applications/views_subscriptions.py
+#, python-format
+msgid "the subscribed calendar %(name)s"
+msgstr ""
+
 #: src/postulo/templates/settings/appearance.html
 #, fuzzy
 msgid "The switch at the top right cycles through the same three; this is the explicit version."
@@ -22381,6 +22659,10 @@ msgstr "Kampuni hii iliripotiwa kupunguza wafanyakazi kufikia %(date)s."
 msgid "This entry prints its original text on every CV."
 msgstr "Kuingia hii inachapisha maandishi yake ya awali kwenye kila CV."
 
+#: src/postulo/templates/applications/subscribed_event.html
+msgid "This event is already in your calendar as your own."
+msgstr ""
+
 #: src/postulo/documents/forms.py
 msgid "This export only. Your default is under Settings → Export."
 msgstr ""
@@ -22530,6 +22812,10 @@ msgstr "Hii ni kabla ya tarehe ya kutolewa."
 #, fuzzy
 msgid "This is before the start date."
 msgstr "Hii ni kabla ya tarehe ya kuanza."
+
+#: src/postulo/templates/applications/subscribed_event.html
+msgid "This is how the calendar it comes from has it, and it changes there. Postulo reads it again on its own."
+msgstr ""
 
 #: src/postulo/core/phones.py
 #, fuzzy
@@ -23142,7 +23428,7 @@ msgstr "aina ya hati"
 msgid "type of entry"
 msgstr "aina ya kuingia"
 
-#: src/postulo/applications/ical_import.py
+#: src/postulo/applications/forms.py src/postulo/applications/ical_import.py
 #, fuzzy
 msgid "Type of interview"
 msgstr "Aina ya mahojiano"
@@ -23239,6 +23525,10 @@ msgstr "Angalia kuweka kuingia kwenye lahaja hii lakini uiondoe kwenye ukurasa."
 #, fuzzy
 msgid "Under each language, how many of Postulo's strings a speaker has reviewed, how many are drafts nobody has read yet, and how many are not translated at all."
 msgstr "Chini ya kila lugha, ni vifungu ngapi vya msemaji wa Postulo amekagua, ni ngapi ni rasimu ambazo hakuna mtu amesoma bado, na ni ngapi ambazo hazijatafsiriwa kabisa."
+
+#: src/postulo/templates/help/calendar.html
+msgid "Under Subscriptions, a calendar somebody else keeps -- an employment office's appointments, a training provider's sessions -- can be followed by its address. Postulo reads it again on its own and draws its events in the colour you chose, marked as from it. They cannot be changed here; any of them can be added as an appointment or an interview of your own."
+msgstr ""
 
 #: src/postulo/accounts/forms.py
 msgid "Underline links in navigation"
@@ -23626,7 +23916,7 @@ msgstr "Mtazamo wa kuokoa."
 msgid "Views"
 msgstr "Maoni"
 
-#: src/postulo/core/models.py
+#: src/postulo/applications/models.py src/postulo/core/models.py
 #, fuzzy
 msgid "Violet"
 msgstr "Kuwa Violet"
@@ -24079,6 +24369,10 @@ msgstr "Ilikuwa nini. Ukamataji mwingine wa tangazo hilo unaongezwa kutoka kweny
 msgid "What it will hold"
 msgstr ""
 
+#: src/postulo/applications/forms.py
+msgid "What its events are drawn in on the calendar."
+msgstr ""
+
 #: src/postulo/templates/jobs/merge.html
 #, fuzzy
 msgid "What moves"
@@ -24441,6 +24735,7 @@ msgstr "Chochote kinachostahili kwako, mara moja au mara kwa mara, kwenye <a hre
 msgid "when"
 msgstr "wakati ambapo wakati"
 
+#: src/postulo/templates/applications/subscribed_event.html
 #: src/postulo/templates/documents/rendered_list.html
 #: src/postulo/templates/server/backups.html
 #: src/postulo/templates/server/design.html
@@ -24488,6 +24783,10 @@ msgstr "Unapojiandikisha tukio hili na mtoa huduma, toa anwani hii ili uwarudish
 #, fuzzy
 msgid "where"
 msgstr "ambapo"
+
+#: src/postulo/templates/applications/subscribed_event.html
+msgid "Where"
+msgstr ""
 
 #: src/postulo/templates/help/links.html
 #, fuzzy
@@ -25898,6 +26197,10 @@ msgstr "Wako Wako tayari"
 #, fuzzy
 msgid "Yours to set and never enforced: after it, Postulo warns and does not block."
 msgstr "Ni wajibu wenu kuwaonya na kuwaonya wasifanye hivyo."
+
+#: src/postulo/applications/forms.py
+msgid "Yours, for telling it apart: drawn beside each of its events."
+msgstr ""
 
 #: src/postulo/applications/forms.py
 #, fuzzy

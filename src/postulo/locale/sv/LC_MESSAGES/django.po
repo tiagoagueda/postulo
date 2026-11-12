@@ -332,6 +332,20 @@ msgid_plural "%(count)s applications have gone quiet"
 msgstr[0] "%(count)s ansökan har tystnat"
 msgstr[1] "%(count)s ansökningar har tystnat"
 
+#: src/postulo/applications/subscriptions.py
+#, python-format
+msgid "%(count)s event whose date could not be read."
+msgid_plural "%(count)s events whose date could not be read."
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/postulo/applications/subscriptions.py
+#, python-format
+msgid "%(count)s event with a time but no time zone Postulo knows."
+msgid_plural "%(count)s events with a time but no time zone Postulo knows."
+msgstr[0] ""
+msgstr[1] ""
+
 #: src/postulo/jobs/closing.py
 #, python-format
 msgid "%(count)s listing you are considering closes soon"
@@ -360,12 +374,26 @@ msgid_plural "%(count)s removed"
 msgstr[0] "%(count)s borttagen"
 msgstr[1] "%(count)s borttagna"
 
+#: src/postulo/applications/subscriptions.py
+#, python-format
+msgid "%(count)s repeating event: Postulo does not read repeating events."
+msgid_plural "%(count)s repeating events: Postulo does not read repeating events."
+msgstr[0] ""
+msgstr[1] ""
+
 #: src/postulo/plugins/base.py
 #, python-format
 msgid "%(count)s skipped"
 msgid_plural "%(count)s skipped"
 msgstr[0] "%(count)s hoppades över"
 msgstr[1] "%(count)s hoppades över"
+
+#: src/postulo/applications/subscriptions.py
+#, python-format
+msgid "%(count)s task."
+msgid_plural "%(count)s tasks."
+msgstr[0] ""
+msgstr[1] ""
 
 #: src/postulo/templates/server/people.html
 #, python-format
@@ -1660,8 +1688,10 @@ msgstr "(öppnas i en ny flik)"
 msgid "(part)"
 msgstr "(delvis)"
 
-#: src/postulo/applications/ical_import.py
+#: src/postulo/applications/agenda.py src/postulo/applications/ical_import.py
+#: src/postulo/applications/models.py
 #: src/postulo/templates/applications/ical_import.html
+#: src/postulo/templates/applications/subscribed_event.html
 msgid "(untitled)"
 msgstr "(namnlös)"
 
@@ -2911,6 +2941,7 @@ msgid "Activity"
 msgstr "Verksamhet"
 
 #: src/postulo/templates/applications/application_detail.html
+#: src/postulo/templates/applications/subscribed_event.html
 #: src/postulo/templates/jobs/company_detail.html
 #: src/postulo/templates/jobs/company_form.html
 #: src/postulo/templates/resume/overview.html
@@ -2997,9 +3028,13 @@ msgstr "Lägg till post"
 msgid "Add it anyway"
 msgstr "Lägg till det ändå"
 
-#: src/postulo/applications/ical_import.py
+#: src/postulo/applications/forms.py src/postulo/applications/ical_import.py
 msgid "Add it as"
 msgstr "Lägg till som"
+
+#: src/postulo/templates/applications/subscribed_event.html
+msgid "Add it as your own"
+msgstr ""
 
 #: src/postulo/templates/jobs/partials/bind_capture.html
 msgid "Add it, and next"
@@ -3117,6 +3152,14 @@ msgstr "Lades till i annonsens historik."
 msgid "Added to the timeline."
 msgstr "Tillagt på tidslinjen."
 
+#: src/postulo/applications/views_subscriptions.py
+msgid "Added to your appointments. It is yours to change now."
+msgstr ""
+
+#: src/postulo/applications/views_subscriptions.py
+msgid "Added to your interviews. It is yours to change now."
+msgstr ""
+
 #: src/postulo/jobs/listing_views.py
 msgid "Added to your listings."
 msgstr "Tillagd bland dina annonser."
@@ -3141,13 +3184,14 @@ msgstr "Att lägga till en fil lägger bara till. Det du redan har lämnas exakt
 msgid "addok (France's Base Adresse Nationale)"
 msgstr "addok (Frankrikes Base Adresse Nationale)"
 
-#: src/postulo/applications/reports.py src/postulo/jobs/tables.py
-#: src/postulo/templates/partials/web_links.html
+#: src/postulo/applications/forms.py src/postulo/applications/reports.py
+#: src/postulo/jobs/tables.py src/postulo/templates/partials/web_links.html
 msgid "Address"
 msgstr "Adress"
 
-#: src/postulo/core/models.py src/postulo/jobs/models.py
-#: src/postulo/notifications/models.py src/postulo/resume/models.py
+#: src/postulo/applications/models.py src/postulo/core/models.py
+#: src/postulo/jobs/models.py src/postulo/notifications/models.py
+#: src/postulo/resume/models.py
 msgid "address"
 msgstr "adress"
 
@@ -3340,7 +3384,7 @@ msgstr "Alltid på: Postulo kan inte fungera utan det."
 msgid "Always this"
 msgstr "Alltid detta"
 
-#: src/postulo/core/models.py
+#: src/postulo/applications/models.py src/postulo/core/models.py
 msgid "Amber"
 msgstr "Bärnsten"
 
@@ -3411,6 +3455,14 @@ msgstr "En administratör skapade den här länken åt %(name)s. Den fungerar en
 msgid "An application's status changes"
 msgstr "En ansökans status ändras"
 
+#: src/postulo/applications/forms.py
+msgid "An appointment"
+msgstr ""
+
+#: src/postulo/applications/forms.py
+msgid "An appointment is with a public employment service. Choose one."
+msgstr ""
+
 #: src/postulo/templates/core/export.html
 msgid "An archive can be imported into an empty account from the command line. It is not offered here because importing creates records rather than merging them, and that is a decision worth making deliberately rather than by clicking."
 msgstr "Ett arkiv kan importeras till ett tomt konto från kommandoraden. Det erbjuds inte här eftersom import skapar poster i stället för att slå ihop dem, och det är ett beslut värt att fatta medvetet snarare än med ett klick."
@@ -3473,11 +3525,11 @@ msgstr "En import lägger bara till. Ingenting som redan finns i din meritförte
 msgid "An index is a list of code to run here, so it must be signed and you must hold the key. Switching a repository off later stops new installs and updates from it; anything already installed keeps working."
 msgstr "Ett index är en lista med kod som körs här, så det måste vara signerat och du måste ha nyckeln. Att stänga av ett arkiv senare stoppar nya installationer och uppdateringar från det; det som redan är installerat fortsätter att fungera."
 
-#: src/postulo/applications/ical_import.py
+#: src/postulo/applications/forms.py src/postulo/applications/ical_import.py
 msgid "An interview"
 msgstr "En intervju"
 
-#: src/postulo/applications/ical_import.py
+#: src/postulo/applications/forms.py src/postulo/applications/ical_import.py
 msgid "An interview belongs to an application. Choose one."
 msgstr "En intervju tillhör en ansökan. Välj en."
 
@@ -3691,7 +3743,8 @@ msgstr "API-tokens"
 msgid "Appearance"
 msgstr "Utseende"
 
-#: src/postulo/applications/ical_import.py src/postulo/plugins/pairing.py
+#: src/postulo/applications/forms.py src/postulo/applications/ical_import.py
+#: src/postulo/plugins/pairing.py
 #: src/postulo/templates/applications/suggestion_list.html
 #: src/postulo/templates/base.html
 #: src/postulo/templates/documents/letter_detail.html
@@ -4172,6 +4225,7 @@ msgstr "B1 – medelnivå"
 msgid "B2 — upper intermediate"
 msgstr "B2 – övre medelnivå"
 
+#: src/postulo/templates/applications/subscribed_event.html
 #: src/postulo/templates/connections/pick.html
 #: src/postulo/templates/jobs/move_owner.html
 #: src/postulo/templates/jobs/share.html
@@ -4360,7 +4414,7 @@ msgstr "Bioteknik"
 msgid "Blank keeps them for as long as the instance exists."
 msgstr "Om fältet lämnas tomt behålls de så länge instansen finns."
 
-#: src/postulo/core/models.py
+#: src/postulo/applications/models.py src/postulo/core/models.py
 msgid "Blue"
 msgstr "Blå"
 
@@ -4513,6 +4567,9 @@ msgstr "C2 – mycket avancerad"
 #: src/postulo/templates/applications/application_detail.html
 #: src/postulo/templates/applications/calendar.html
 #: src/postulo/templates/applications/ical_import.html
+#: src/postulo/templates/applications/subscribed_event.html
+#: src/postulo/templates/applications/subscription_form.html
+#: src/postulo/templates/applications/subscription_list.html
 #: src/postulo/templates/cotton/date_field.html
 msgid "Calendar"
 msgstr "Kalender"
@@ -4525,6 +4582,14 @@ msgstr "Kalenderfil"
 msgid "calendar identifier"
 msgstr "kalenderidentifierare"
 
+#: src/postulo/applications/models.py
+msgid "calendar subscription"
+msgstr ""
+
+#: src/postulo/applications/models.py
+msgid "calendar subscriptions"
+msgstr ""
+
 #: src/postulo/templates/applications/calendar.html
 msgid "Calendar views"
 msgstr "Kalendervyer"
@@ -4533,6 +4598,10 @@ msgstr "Kalendervyer"
 #, python-format
 msgid "Calendar · %(period)s"
 msgstr "Kalender · %(period)s"
+
+#: src/postulo/templates/applications/subscription_list.html
+msgid "Calendars somebody else keeps, such as an employment office's appointments or a training provider's sessions. Postulo reads them again on their own and draws their events on your calendar, without changing them."
+msgstr ""
 
 #: src/postulo/applications/models.py src/postulo/jobs/models.py
 msgid "Call"
@@ -4554,6 +4623,7 @@ msgstr "Kan parkopplas med"
 #: src/postulo/templates/applications/interview_form.html
 #: src/postulo/templates/applications/offer_form.html
 #: src/postulo/templates/applications/reminder_form.html
+#: src/postulo/templates/applications/subscription_form.html
 #: src/postulo/templates/applications/tag_form.html
 #: src/postulo/templates/connections/confirm_delete.html
 #: src/postulo/templates/connections/form.html
@@ -4594,9 +4664,22 @@ msgstr "Avbryt"
 msgid "Cancelled"
 msgstr "Inställd"
 
+#: src/postulo/applications/models.py
+msgid "cancelled"
+msgstr ""
+
 #: src/postulo/applications/agenda.py
 msgid "Cancelled interview:"
 msgstr "Inställd intervju:"
+
+#: src/postulo/applications/agenda.py
+msgid "Cancelled, from a subscribed calendar:"
+msgstr ""
+
+#: src/postulo/applications/agenda.py
+#, python-format
+msgid "Cancelled, from the subscribed calendar %(name)s:"
+msgstr ""
 
 #: src/postulo/core/file_review.py
 msgid "Cannot be added"
@@ -5256,13 +5339,13 @@ msgstr "utskrivet kodarkiv"
 msgid "collection"
 msgstr "samling"
 
+#: src/postulo/applications/models.py src/postulo/core/models.py
+msgid "colour"
+msgstr "färg"
+
 #: src/postulo/core/design.py src/postulo/templates/server/design.html
 msgid "Colour"
 msgstr "Färg"
-
-#: src/postulo/core/models.py
-msgid "colour"
-msgstr "färg"
 
 #: src/postulo/templates/core/import_csv_map.html
 msgid "Column in the file"
@@ -5862,6 +5945,7 @@ msgstr "Datum du väljer själv"
 msgid "Day"
 msgstr "Dag"
 
+#: src/postulo/applications/models.py
 #: src/postulo/templates/settings/appearance.html
 msgid "day"
 msgid_plural "days"
@@ -6045,6 +6129,7 @@ msgstr "Försvar"
 
 #: src/postulo/templates/applications/application_detail.html
 #: src/postulo/templates/applications/appointment_form.html
+#: src/postulo/templates/applications/subscription_list.html
 #: src/postulo/templates/applications/tag_list.html
 #: src/postulo/templates/cotton/delete_dialog.html
 #: src/postulo/templates/cotton/reminder_actions.html
@@ -6161,11 +6246,13 @@ msgstr "Djup"
 
 #: src/postulo/applications/forms.py src/postulo/core/csv_import.py
 #: src/postulo/jobs/models.py src/postulo/jobs/tables.py
+#: src/postulo/templates/applications/subscribed_event.html
 #: src/postulo/templates/jobs/posting_detail.html
 msgid "Description"
 msgstr "Beskrivning"
 
-#: src/postulo/jobs/models.py src/postulo/resume/models.py
+#: src/postulo/applications/models.py src/postulo/jobs/models.py
+#: src/postulo/resume/models.py
 msgid "description"
 msgstr "beskrivning"
 
@@ -6591,6 +6678,7 @@ msgstr "Ed25519, base64. Utan den finns ingen katalog: en osignerad lista med ad
 
 #: src/postulo/templates/applications/application_detail.html
 #: src/postulo/templates/applications/interview_list.html
+#: src/postulo/templates/applications/subscription_list.html
 #: src/postulo/templates/applications/tag_list.html
 #: src/postulo/templates/connections/list.html
 #: src/postulo/templates/documents/letter_detail.html
@@ -6720,6 +6808,10 @@ msgstr "Arbetsgivare"
 msgid "Employer structure is switched off, so departments and parents are not changed."
 msgstr "Arbetsgivarstruktur är avstängd, så avdelningar och moderbolag ändras inte."
 
+#: src/postulo/applications/forms.py
+msgid "Employment service"
+msgstr ""
+
 #: src/postulo/applications/models.py
 msgid "employment service"
 msgstr "arbetsförmedling"
@@ -6788,6 +6880,10 @@ msgstr "Teknik"
 msgctxt "name of a keyboard key"
 msgid "Enter"
 msgstr "Enter"
+
+#: src/postulo/applications/subscriptions.py
+msgid "Enter the calendar's web address, starting with https:// or webcal://."
+msgstr ""
 
 #: src/postulo/templates/accounts/delete_account.html
 #: src/postulo/templates/core/export.html
@@ -6916,11 +7012,11 @@ msgstr "Varje dokument precis som det skickades, fryst i det ögonblick det gick
 msgid "Every file goes without a title, an author, a subject or keywords, whatever is chosen below or typed for one file, and a PDF without the name of the program that drew it. The language stays unless you leave it out below as well."
 msgstr "Varje fil blir utan titel, författare, ämne och nyckelord, oavsett vad som väljs nedan eller skrivs in för en enskild fil, och en PDF utan namnet på programmet som ritade den. Språket finns kvar om du inte utelämnar det nedan också."
 
-#: src/postulo/plugins/syncing.py
+#: src/postulo/applications/models.py src/postulo/plugins/syncing.py
 msgid "Every four hours"
 msgstr "Var fjärde timme"
 
-#: src/postulo/plugins/syncing.py
+#: src/postulo/applications/models.py src/postulo/plugins/syncing.py
 msgid "Every hour"
 msgstr "Varje timme"
 
@@ -7504,6 +7600,14 @@ msgstr "För %(office)s"
 msgid "For a PNG or JPEG. Cuts out where it was taken, when and with what, which a phone's photograph carries, before it is kept and before it is sent anywhere. The picture itself is not touched. Untick it to keep the file exactly as it is."
 msgstr "För PNG eller JPEG. Tar bort var, när och med vad bilden togs, uppgifter som ett mobilfoto bär med sig, innan den sparas och innan den skickas någonstans. Själva bilden ändras inte. Avmarkera rutan för att behålla filen exakt som den är."
 
+#: src/postulo/applications/forms.py
+msgid "For an appointment: the public employment service it is with."
+msgstr ""
+
+#: src/postulo/applications/forms.py
+msgid "For an interview: the application it is about."
+msgstr ""
+
 #: src/postulo/resume/models.py
 msgid "For example, “BSc Computer Science”."
 msgstr "Till exempel ”Kandidatexamen i datavetenskap”."
@@ -7700,6 +7804,10 @@ msgstr "Från %(start)s till %(end)s"
 msgid "From %(start)s: now choose the last day"
 msgstr "Från %(start)s: välj nu den sista dagen"
 
+#: src/postulo/applications/agenda.py
+msgid "From a subscribed calendar:"
+msgstr ""
+
 #: src/postulo/core/models.py
 msgid "from address"
 msgstr "avsändaradress"
@@ -7735,6 +7843,16 @@ msgstr "Från dokumentet är namnet som dokumentet skriver ut, och ingenting dä
 #: src/postulo/accounts/forms.py
 msgid "From the document is your name and the kind of document: “Alex Morgan — CV”."
 msgstr "Från dokumentet är ditt namn och typen av dokument: ”Alex Morgan – CV”."
+
+#: src/postulo/templates/applications/subscribed_event.html
+#, python-format
+msgid "From the subscribed calendar %(name)s"
+msgstr ""
+
+#: src/postulo/applications/agenda.py
+#, python-format
+msgid "From the subscribed calendar %(name)s:"
+msgstr ""
 
 #: src/postulo/core/models.py
 msgid "from Wikidata"
@@ -7984,7 +8102,7 @@ msgstr "Gravatar har ingen bild för din adress, så dina initialer stannar kvar
 msgid "Green"
 msgstr "Grön"
 
-#: src/postulo/core/models.py
+#: src/postulo/applications/models.py src/postulo/core/models.py
 msgid "Grey"
 msgstr "Grå"
 
@@ -8275,6 +8393,10 @@ msgstr "Hur mycket utrymme som ska lämnas"
 #: src/postulo/applications/widgets.py
 msgid "How much you sent, month by month, so a quiet stretch is visible."
 msgstr "Hur mycket du skickade, månad för månad, så att en tyst period syns."
+
+#: src/postulo/applications/forms.py
+msgid "How often Postulo reads it again. One that cannot be read is tried less often until it can."
+msgstr ""
 
 #: src/postulo/resume/registry.py
 msgid "How often your work has been cited, as a source counted it on a given day: for all of it, or for one publication. Postulo counts nothing itself."
@@ -9044,6 +9166,10 @@ msgstr "Den innehöll avdelningen som detta gällde."
 msgid "It holds nothing that needs moving."
 msgstr "Den innehåller inget som behöver flyttas."
 
+#: src/postulo/templates/applications/subscribed_event.html
+msgid "It is a whole day, with no time to meet at, so it cannot be added as an appointment or an interview. Add one by hand if you need it."
+msgstr ""
+
 #: src/postulo/applications/views.py
 msgid "It is already done."
 msgstr "Det är redan klart."
@@ -9183,6 +9309,10 @@ msgstr "Dess data omfattas av %(licence)s."
 #: src/postulo/applications/ical_import.py
 msgid "Its date could not be read."
 msgstr "Dess datum kunde inte läsas."
+
+#: src/postulo/templates/applications/subscription_form.html
+msgid "Its events are drawn on your calendar as they are in the calendar it comes from. They cannot be changed here; any of them can be added as an appointment or an interview of your own."
+msgstr ""
 
 #: src/postulo/plugins/provenance.py
 msgid "Its file matches what a repository on this instance signed."
@@ -9374,6 +9504,11 @@ msgstr "Sparas efter att de har använts eller gått ut, eftersom det inte ska g
 #: src/postulo/jobs/share_views.py
 msgid "Kept apart: they will not be asked about again."
 msgstr "Hålls isär: du får inte frågan om dem igen."
+
+#: src/postulo/applications/forms.py
+#, python-format
+msgid "Kept as %(site)s. Leave it empty to keep it, or enter a new one."
+msgstr ""
 
 #: src/postulo/templates/partials/postal_addresses.html
 msgid "Kept as it was"
@@ -9597,8 +9732,8 @@ msgstr "senaste kontroll"
 msgid "last checked"
 msgstr "senast kontrollerad"
 
-#: src/postulo/documents/models.py src/postulo/notifications/models.py
-#: src/postulo/plugins/models.py
+#: src/postulo/applications/models.py src/postulo/documents/models.py
+#: src/postulo/notifications/models.py src/postulo/plugins/models.py
 msgid "last error"
 msgstr "senaste fel"
 
@@ -9613,6 +9748,17 @@ msgstr "Senaste som kom fram"
 #: src/postulo/plugins/models.py
 msgid "last pushed"
 msgstr "senast skickat"
+
+#: src/postulo/applications/models.py
+msgid "last read"
+msgstr ""
+
+#: src/postulo/templates/applications/subscription_list.html
+#, python-format
+msgid "Last read on %(when)s: %(counter)s event."
+msgid_plural "Last read on %(when)s: %(counter)s events."
+msgstr[0] ""
+msgstr[1] ""
 
 #: src/postulo/plugins/models.py
 msgid "last run"
@@ -9659,7 +9805,7 @@ msgstr "senast använd"
 msgid "Last used %(when)s"
 msgstr "Senast använd den %(when)s"
 
-#: src/postulo/plugins/models.py
+#: src/postulo/applications/models.py src/postulo/plugins/models.py
 msgid "last worked"
 msgstr "fungerade senast"
 
@@ -9777,6 +9923,14 @@ msgstr "Om det lämnas tomt skriver dina CV:n ut ”%(place)s”: ort och land f
 #: src/postulo/jobs/capture_views.py
 msgid "Left empty it is today. Capturing a posting you applied to last week is common."
 msgstr "Lämnas det tomt blir det i dag. Att fånga in en annons du sökte förra veckan är vanligt."
+
+#: src/postulo/applications/models.py
+msgid "left out"
+msgstr ""
+
+#: src/postulo/templates/applications/subscription_list.html
+msgid "Left out of the calendar:"
+msgstr ""
 
 #: src/postulo/templates/core/table_export.html
 #: src/postulo/templates/documents/themes/base_list.html
@@ -10651,9 +10805,9 @@ msgid "NACE section"
 msgstr "NACE-avdelning"
 
 #: src/postulo/accounts/models.py src/postulo/api/models.py
-#: src/postulo/core/models.py src/postulo/documents/models.py
-#: src/postulo/jobs/models.py src/postulo/plugins/models.py
-#: src/postulo/resume/models.py
+#: src/postulo/applications/models.py src/postulo/core/models.py
+#: src/postulo/documents/models.py src/postulo/jobs/models.py
+#: src/postulo/plugins/models.py src/postulo/resume/models.py
 msgid "name"
 msgstr "namn"
 
@@ -10836,6 +10990,11 @@ msgstr "Ny påminnelse den %(day)s"
 msgid "New since you last arranged this"
 msgstr "Nytt sedan du senast ordnade det här"
 
+#: src/postulo/templates/applications/subscription_form.html
+#: src/postulo/templates/applications/subscription_list.html
+msgid "New subscription"
+msgstr ""
+
 #: src/postulo/templates/applications/tag_list.html
 msgid "New tag"
 msgstr "Ny tagg"
@@ -10923,6 +11082,10 @@ msgstr "Nej"
 #: src/postulo/templates/server/plugins.html
 msgid "No address and no key, so nothing is offered from it."
 msgstr "Ingen adress och ingen nyckel, så inget erbjuds därifrån."
+
+#: src/postulo/templates/applications/subscription_list.html
+msgid "No address: enter it again."
+msgstr ""
 
 #: src/postulo/core/offsite.py
 msgid "No age recipient is set, and nothing leaves this machine unencrypted."
@@ -11188,6 +11351,10 @@ msgstr "Ingen källa sparades av den sidan."
 #: src/postulo/templates/jobs/capture_page.html
 msgid "No source was kept."
 msgstr "Ingen källa sparades."
+
+#: src/postulo/templates/applications/subscription_list.html
+msgid "No subscriptions yet."
+msgstr ""
 
 #: src/postulo/api/routers/interviews.py src/postulo/api/routers/offers.py
 #: src/postulo/api/routers/reminders.py
@@ -11532,6 +11699,10 @@ msgstr "Skrivs inte ut på ett CV."
 #: src/postulo/templates/resume/overview.html
 msgid "Not printed on any CV until they have agreed."
 msgstr "Skrivs inte ut på något CV förrän de har sagt ja."
+
+#: src/postulo/templates/applications/subscription_list.html
+msgid "Not read yet. It will be within minutes."
+msgstr ""
 
 #: src/postulo/applications/analytics.py src/postulo/applications/reports.py
 #: src/postulo/templates/applications/partials/status_card.html
@@ -12320,7 +12491,7 @@ msgstr "På. Inloggning kräver en kod från din autentiseringsapp, eller en åt
 msgid "On. Signing in asks for one of your security keys, or a recovery code."
 msgstr "På. Inloggning kräver en av dina säkerhetsnycklar, eller en återställningskod."
 
-#: src/postulo/plugins/syncing.py
+#: src/postulo/applications/models.py src/postulo/plugins/syncing.py
 msgid "Once a day"
 msgstr "En gång om dagen"
 
@@ -12681,6 +12852,7 @@ msgstr "Öppna ansökningar utan svar, och de tre sakerna du kan göra åt det."
 msgid "Open as this"
 msgstr "Öppnas som detta"
 
+#: src/postulo/templates/applications/subscribed_event.html
 #: src/postulo/templates/jobs/capture_form.html
 #: src/postulo/templates/jobs/capture_review.html
 msgid "Open it"
@@ -13674,6 +13846,11 @@ msgstr "Postulo anpassar det till registrets egen stavning och kontrollerar form
 msgid "Postulo version"
 msgstr "Postulo-version"
 
+#: src/postulo/templates/applications/subscription_list.html
+#, python-format
+msgid "Postulo will try again on %(when)s, and less often while it keeps failing."
+msgstr ""
+
 #: src/postulo/templates/partials/footer_links.html
 msgid "Postulo — your job search, your data."
 msgstr "Postulo – din jobbsökning, dina data."
@@ -14147,6 +14324,10 @@ msgstr "Återaktivera"
 msgid "Read %(name)s as"
 msgstr "Läs %(name)s som"
 
+#: src/postulo/applications/views_subscriptions.py
+msgid "Read again. The calendar shows what it holds now."
+msgstr ""
+
 #: src/postulo/templates/core/import_csv_map.html
 msgid "Read as"
 msgstr "Läs som"
@@ -14205,6 +14386,10 @@ msgstr "Läst från Europass-XML:en som är bifogad i PDF-filen, formatet som eu
 msgid "Read it"
 msgstr "Läs det"
 
+#: src/postulo/applications/models.py
+msgid "read it again"
+msgstr ""
+
 #: src/postulo/templates/documents/letter_detail.html
 msgid "Read it as they will"
 msgstr "Så här läser de det"
@@ -14212,6 +14397,10 @@ msgstr "Så här läser de det"
 #: src/postulo/templates/documents/letter_detail.html
 msgid "Read it below"
 msgstr "Läs den nedan"
+
+#: src/postulo/templates/applications/subscription_list.html
+msgid "Read it now"
+msgstr ""
 
 #: src/postulo/jobs/slow.py
 msgid "Read it. Check what was found before it becomes a listing."
@@ -14869,7 +15058,7 @@ msgstr "roll"
 msgid "Role / job title"
 msgstr "Roll / jobbtitel"
 
-#: src/postulo/core/models.py
+#: src/postulo/applications/models.py src/postulo/core/models.py
 msgid "Rose"
 msgstr "Rosa"
 
@@ -14967,6 +15156,7 @@ msgstr "Lördag"
 #: src/postulo/templates/applications/interview_form.html
 #: src/postulo/templates/applications/offer_form.html
 #: src/postulo/templates/applications/reminder_form.html
+#: src/postulo/templates/applications/subscription_form.html
 #: src/postulo/templates/applications/tag_form.html
 #: src/postulo/templates/connections/form.html
 #: src/postulo/templates/documents/cv_form.html
@@ -16281,6 +16471,7 @@ msgstr "status"
 #: src/postulo/templates/applications/partials/bulk_fields.html
 #: src/postulo/templates/applications/partials/status_card.html
 #: src/postulo/templates/applications/report.html
+#: src/postulo/templates/applications/subscribed_event.html
 #: src/postulo/templates/core/import_csv_map.html
 #: src/postulo/templates/documents/themes/base_report.html
 #: src/postulo/templates/jobs/company_form.html
@@ -16413,6 +16604,33 @@ msgstr "ämne"
 #: src/postulo/accounts/models.py
 msgid "subject of exported files"
 msgstr "ämne för exporterade filer"
+
+#: src/postulo/templates/applications/subscription_form.html
+msgid "Subscribe"
+msgstr ""
+
+#: src/postulo/applications/agenda.py
+msgid "Subscribed calendars"
+msgstr ""
+
+#: src/postulo/applications/models.py
+msgid "subscribed event"
+msgstr ""
+
+#: src/postulo/applications/models.py
+msgid "subscribed events"
+msgstr ""
+
+#: src/postulo/applications/views_subscriptions.py
+msgid "Subscribed. Its events appear on the calendar once it has been read, within minutes."
+msgstr ""
+
+#: src/postulo/templates/applications/calendar.html
+#: src/postulo/templates/applications/subscribed_event.html
+#: src/postulo/templates/applications/subscription_form.html
+#: src/postulo/templates/applications/subscription_list.html
+msgid "Subscriptions"
+msgstr ""
 
 #: src/postulo/templates/resume/overview.html
 msgid "Suggest from my ORCID record"
@@ -16643,7 +16861,7 @@ msgstr "Exportera dem"
 msgid "Task"
 msgstr "Uppgift"
 
-#: src/postulo/core/models.py
+#: src/postulo/applications/models.py src/postulo/core/models.py
 msgid "Teal"
 msgstr "Blågrön"
 
@@ -16768,6 +16986,10 @@ msgstr "Den adressen kunde inte läggas till."
 #, python-format
 msgid "That address is %(type)s, not an image Postulo keeps."
 msgstr "Den adressen är %(type)s, inte en bild som Postulo behåller."
+
+#: src/postulo/applications/subscriptions.py
+msgid "That address is not one a calendar can be read from."
+msgstr ""
 
 #: src/postulo/plugins/public_addresses.py
 msgid "That address is on a private or local network, and Postulo will not fetch it. Paste the posting text in by hand instead."
@@ -17071,6 +17293,7 @@ msgstr[0] "Det är många tester. Försök igen om %(seconds)d sekund."
 msgstr[1] "Det är många tester. Försök igen om %(seconds)d sekunder."
 
 #: src/postulo/accounts/avatars.py
+#: src/postulo/applications/views_subscriptions.py
 msgid "That is a lot of tries. Wait a little before asking again."
 msgstr "Det är många försök. Vänta lite innan du frågar igen."
 
@@ -17502,6 +17725,10 @@ msgstr "Adressen svarade %(code)s."
 msgid "The address answered with nothing."
 msgstr "Adressen gav ett tomt svar."
 
+#: src/postulo/applications/subscriptions.py
+msgid "The address cannot be read here any more. Enter it again."
+msgstr ""
+
 #: src/postulo/jobs/tiles.py
 msgid "The address must hold {z}, {x} and {y}, where each tile's numbers go."
 msgstr "Adressen måste innehålla {z}, {x} och {y}, där varje kartrutas nummer ska stå."
@@ -17614,9 +17841,55 @@ msgstr "Kalendern och rapporterna börjar sina veckor på den. Lämnas den på s
 msgid "The calendar can be downloaded as an iCalendar file, for the period and kinds on the screen, and a file from another calendar can be read in, with a review of what it holds before anything is added."
 msgstr "Kalendern kan laddas ned som en iCalendar-fil, för perioden och de typer som visas, och en fil från en annan kalender kan läsas in, med en genomgång av vad den innehåller innan något läggs till."
 
+#: src/postulo/applications/subscriptions.py
+msgid "The calendar could not be read."
+msgstr ""
+
+#: src/postulo/applications/subscriptions.py
+#, python-format
+msgid "The calendar is larger than %(limit)s MB, so it was not read."
+msgstr ""
+
+#: src/postulo/templates/applications/subscribed_event.html
+msgid "The calendar marks this as cancelled."
+msgstr ""
+
 #: src/postulo/accounts/forms.py
 msgid "The calendar's period buttons"
 msgstr "Kalenderns periodknappar"
+
+#: src/postulo/applications/subscriptions.py
+#, python-format
+msgid "The calendar's server answered with an error (%(status)s)."
+msgstr ""
+
+#: src/postulo/applications/subscriptions.py
+msgid "The calendar's server could not be reached."
+msgstr ""
+
+#: src/postulo/applications/subscriptions.py
+msgid "The calendar's server has nothing at that address any more."
+msgstr ""
+
+#: src/postulo/applications/subscriptions.py
+msgid "The calendar's server refused the address. It may have been changed or withdrawn."
+msgstr ""
+
+#: src/postulo/applications/subscriptions.py
+msgid "The calendar's server sent Postulo round too many redirects."
+msgstr ""
+
+#: src/postulo/applications/subscriptions.py
+msgid "The calendar's server sent something that could not be read."
+msgstr ""
+
+#: src/postulo/applications/subscriptions.py
+msgid "The calendar's server took too long to answer."
+msgstr ""
+
+#: src/postulo/applications/forms.py
+msgid "The calendar's web address, as the service that keeps it gives it: it starts with https:// or webcal:// and usually ends in .ics. It may open the calendar to anyone who has it, so Postulo keeps it encrypted and shows only its site."
+msgstr ""
 
 #: src/postulo/templates/jobs/capture_page_forget.html
 msgid "The capture stays as it is, and so does any listing it became."
@@ -18783,6 +19056,11 @@ msgstr "Ämnet som varje fil har"
 msgid "The subject has to be one line."
 msgstr "Ämnet måste vara en enda rad."
 
+#: src/postulo/applications/views_subscriptions.py
+#, python-format
+msgid "the subscribed calendar %(name)s"
+msgstr ""
+
 #: src/postulo/templates/settings/appearance.html
 msgid "The switch at the top right cycles through the same three; this is the explicit version."
 msgstr "Omkopplaren uppe till höger växlar mellan samma tre; detta är den uttryckliga versionen."
@@ -19241,6 +19519,10 @@ msgstr "Det här företaget rapporterades varsla personal per %(date)s."
 msgid "This entry prints its original text on every CV."
 msgstr "Den här posten skriver ut sin ursprungliga text på varje CV."
 
+#: src/postulo/templates/applications/subscribed_event.html
+msgid "This event is already in your calendar as your own."
+msgstr ""
+
 #: src/postulo/documents/forms.py
 msgid "This export only. Your default is under Settings → Export."
 msgstr "Bara den här exporten. Din standard finns under Inställningar → Exportera."
@@ -19365,6 +19647,10 @@ msgstr "Detta är före datumet då den utfärdades."
 #: src/postulo/resume/forms.py
 msgid "This is before the start date."
 msgstr "Detta är före startdatumet."
+
+#: src/postulo/templates/applications/subscribed_event.html
+msgid "This is how the calendar it comes from has it, and it changes there. Postulo reads it again on its own."
+msgstr ""
 
 #: src/postulo/core/phones.py
 msgid "This is kept as it was typed, with no country in front of it, so it could not be checked and cannot be dialled from anywhere else."
@@ -19880,7 +20166,7 @@ msgstr "typ av dokument"
 msgid "type of entry"
 msgstr "typ av post"
 
-#: src/postulo/applications/ical_import.py
+#: src/postulo/applications/forms.py src/postulo/applications/ical_import.py
 msgid "Type of interview"
 msgstr "Typ av intervju"
 
@@ -19963,6 +20249,10 @@ msgstr "Avmarkera för att behålla posten i den här varianten men lämna den u
 #: src/postulo/templates/server/defaults.html
 msgid "Under each language, how many of Postulo's strings a speaker has reviewed, how many are drafts nobody has read yet, and how many are not translated at all."
 msgstr "Under varje språk: hur många av Postulos strängar en talare har granskat, hur många som är utkast ingen har läst ännu och hur många som inte är översatta alls."
+
+#: src/postulo/templates/help/calendar.html
+msgid "Under Subscriptions, a calendar somebody else keeps -- an employment office's appointments, a training provider's sessions -- can be followed by its address. Postulo reads it again on its own and draws its events in the colour you chose, marked as from it. They cannot be changed here; any of them can be added as an appointment or an interview of your own."
+msgstr ""
 
 #: src/postulo/accounts/forms.py
 msgid "Underline links in navigation"
@@ -20294,7 +20584,7 @@ msgstr "Vyn sparades."
 msgid "Views"
 msgstr "Vyer"
 
-#: src/postulo/core/models.py
+#: src/postulo/applications/models.py src/postulo/core/models.py
 msgid "Violet"
 msgstr "Violett"
 
@@ -20671,6 +20961,10 @@ msgstr "Vad den var. En annan infångning av samma annons läggs till från gran
 msgid "What it will hold"
 msgstr "Vad den ska innehålla"
 
+#: src/postulo/applications/forms.py
+msgid "What its events are drawn in on the calendar."
+msgstr ""
+
 #: src/postulo/templates/jobs/merge.html
 msgid "What moves"
 msgstr "Det som flyttas"
@@ -20971,6 +21265,7 @@ msgstr "Vad det än är värt för dig, en gång eller då och då, på <a href=
 msgid "when"
 msgstr "när"
 
+#: src/postulo/templates/applications/subscribed_event.html
 #: src/postulo/templates/documents/rendered_list.html
 #: src/postulo/templates/server/backups.html
 #: src/postulo/templates/server/design.html
@@ -21010,6 +21305,10 @@ msgstr "När du registrerar den här instansen hos leverantören, ange den här 
 #: src/postulo/applications/models.py
 msgid "where"
 msgstr "var"
+
+#: src/postulo/templates/applications/subscribed_event.html
+msgid "Where"
+msgstr ""
 
 #: src/postulo/templates/help/links.html
 msgid "Where a card has a <em>Service</em> menu, choose the service the address is on. Its icon is shown beside it, and the address is checked against what an address on that service looks like, so a mistyped one is refused, and the refusal says why. Paste an address without choosing a service, and saving chooses it where the address is on one Postulo knows."
@@ -22188,6 +22487,10 @@ msgstr "Din behålls"
 #: src/postulo/documents/forms.py
 msgid "Yours to set and never enforced: after it, Postulo warns and does not block."
 msgstr "Du bestämmer, och det upprätthålls aldrig: efteråt varnar Postulo men blockerar inte."
+
+#: src/postulo/applications/forms.py
+msgid "Yours, for telling it apart: drawn beside each of its events."
+msgstr ""
 
 #: src/postulo/applications/forms.py
 msgid "Yours, not the employer's. The list can be sorted and narrowed by it."

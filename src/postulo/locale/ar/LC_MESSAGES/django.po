@@ -496,6 +496,28 @@ msgstr[3] "%(count)s طلبات بلا أخبار"
 msgstr[4] "%(count)s طلبًا بلا أخبار"
 msgstr[5] "%(count)s طلب بلا أخبار"
 
+#: src/postulo/applications/subscriptions.py
+#, python-format
+msgid "%(count)s event whose date could not be read."
+msgid_plural "%(count)s events whose date could not be read."
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+msgstr[4] ""
+msgstr[5] ""
+
+#: src/postulo/applications/subscriptions.py
+#, python-format
+msgid "%(count)s event with a time but no time zone Postulo knows."
+msgid_plural "%(count)s events with a time but no time zone Postulo knows."
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+msgstr[4] ""
+msgstr[5] ""
+
 #: src/postulo/jobs/closing.py
 #, python-format
 msgid "%(count)s listing you are considering closes soon"
@@ -540,6 +562,17 @@ msgstr[3] "تمت إزالة %(count)s"
 msgstr[4] "تمت إزالة %(count)s"
 msgstr[5] "تمت إزالة %(count)s"
 
+#: src/postulo/applications/subscriptions.py
+#, python-format
+msgid "%(count)s repeating event: Postulo does not read repeating events."
+msgid_plural "%(count)s repeating events: Postulo does not read repeating events."
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+msgstr[4] ""
+msgstr[5] ""
+
 #: src/postulo/plugins/base.py
 #, python-format
 msgid "%(count)s skipped"
@@ -550,6 +583,17 @@ msgstr[2] "تم تخطي %(count)s"
 msgstr[3] "تم تخطي %(count)s"
 msgstr[4] "تم تخطي %(count)s"
 msgstr[5] "تم تخطي %(count)s"
+
+#: src/postulo/applications/subscriptions.py
+#, python-format
+msgid "%(count)s task."
+msgid_plural "%(count)s tasks."
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+msgstr[4] ""
+msgstr[5] ""
 
 #: src/postulo/templates/server/people.html
 #, python-format
@@ -2052,8 +2096,10 @@ msgstr "(يُفتح في علامة تبويب جديدة)"
 msgid "(part)"
 msgstr "(جزئي)"
 
-#: src/postulo/applications/ical_import.py
+#: src/postulo/applications/agenda.py src/postulo/applications/ical_import.py
+#: src/postulo/applications/models.py
 #: src/postulo/templates/applications/ical_import.html
+#: src/postulo/templates/applications/subscribed_event.html
 msgid "(untitled)"
 msgstr "(بلا عنوان)"
 
@@ -3317,6 +3363,7 @@ msgid "Activity"
 msgstr "النشاط"
 
 #: src/postulo/templates/applications/application_detail.html
+#: src/postulo/templates/applications/subscribed_event.html
 #: src/postulo/templates/jobs/company_detail.html
 #: src/postulo/templates/jobs/company_form.html
 #: src/postulo/templates/resume/overview.html
@@ -3403,9 +3450,13 @@ msgstr "إضافة بند"
 msgid "Add it anyway"
 msgstr "إضافتها على أي حال"
 
-#: src/postulo/applications/ical_import.py
+#: src/postulo/applications/forms.py src/postulo/applications/ical_import.py
 msgid "Add it as"
 msgstr "إضافته بوصفه"
+
+#: src/postulo/templates/applications/subscribed_event.html
+msgid "Add it as your own"
+msgstr ""
 
 #: src/postulo/templates/jobs/partials/bind_capture.html
 msgid "Add it, and next"
@@ -3538,6 +3589,14 @@ msgstr "تمت الإضافة إلى سجل تغييرات الإعلان."
 msgid "Added to the timeline."
 msgstr "تمت الإضافة إلى الخط الزمني."
 
+#: src/postulo/applications/views_subscriptions.py
+msgid "Added to your appointments. It is yours to change now."
+msgstr ""
+
+#: src/postulo/applications/views_subscriptions.py
+msgid "Added to your interviews. It is yours to change now."
+msgstr ""
+
 #: src/postulo/jobs/listing_views.py
 msgid "Added to your listings."
 msgstr "تمت الإضافة إلى إعلاناتك."
@@ -3562,14 +3621,15 @@ msgstr "إضافة ملف لا تفعل سوى الإضافة. يبقى ما ل�
 msgid "addok (France's Base Adresse Nationale)"
 msgstr "addok (Base Adresse Nationale، قاعدة العناوين الوطنية في فرنسا)"
 
-#: src/postulo/applications/reports.py src/postulo/jobs/tables.py
-#: src/postulo/templates/partials/web_links.html
+#: src/postulo/applications/forms.py src/postulo/applications/reports.py
+#: src/postulo/jobs/tables.py src/postulo/templates/partials/web_links.html
 #, fuzzy
 msgid "Address"
 msgstr "عنوان الويب"
 
-#: src/postulo/core/models.py src/postulo/jobs/models.py
-#: src/postulo/notifications/models.py src/postulo/resume/models.py
+#: src/postulo/applications/models.py src/postulo/core/models.py
+#: src/postulo/jobs/models.py src/postulo/notifications/models.py
+#: src/postulo/resume/models.py
 msgid "address"
 msgstr "العنوان"
 
@@ -3769,7 +3829,7 @@ msgstr "مفعّل دائمًا: لا يمكن أن يعمل Postulo بدونه.
 msgid "Always this"
 msgstr "هذه القيمة دائمًا"
 
-#: src/postulo/core/models.py
+#: src/postulo/applications/models.py src/postulo/core/models.py
 msgid "Amber"
 msgstr "كهرماني"
 
@@ -3840,6 +3900,14 @@ msgstr "أنشأ مسؤول هذا الرابط من أجل %(name)s. يعمل �
 msgid "An application's status changes"
 msgstr "تتغيّر حالة طلب توظيف"
 
+#: src/postulo/applications/forms.py
+msgid "An appointment"
+msgstr ""
+
+#: src/postulo/applications/forms.py
+msgid "An appointment is with a public employment service. Choose one."
+msgstr ""
+
 #: src/postulo/templates/core/export.html
 msgid "An archive can be imported into an empty account from the command line. It is not offered here because importing creates records rather than merging them, and that is a decision worth making deliberately rather than by clicking."
 msgstr "يمكن استيراد الأرشيف إلى حساب فارغ من سطر الأوامر. لا يُتاح ذلك هنا لأن الاستيراد ينشئ سجلات جديدة بدل دمجها، وهذا قرار يستحق أن يُتخذ عن تأنٍّ لا بنقرة."
@@ -3901,11 +3969,11 @@ msgstr "الاستيراد لا يفعل سوى الإضافة. لا يُغيَ�
 msgid "An index is a list of code to run here, so it must be signed and you must hold the key. Switching a repository off later stops new installs and updates from it; anything already installed keeps working."
 msgstr "فهرس الحزم قائمة بشيفرة ستُشغَّل هنا، لذا يجب أن يكون موقّعًا وأن تملك المفتاح. تعطيل مستودع لاحقًا يوقف عمليات التثبيت والتحديث الجديدة منه؛ ويستمر كل ما ثُبّت بالفعل في العمل."
 
-#: src/postulo/applications/ical_import.py
+#: src/postulo/applications/forms.py src/postulo/applications/ical_import.py
 msgid "An interview"
 msgstr "مقابلة"
 
-#: src/postulo/applications/ical_import.py
+#: src/postulo/applications/forms.py src/postulo/applications/ical_import.py
 msgid "An interview belongs to an application. Choose one."
 msgstr "تنتمي المقابلة إلى طلب توظيف. اختر واحدًا."
 
@@ -4131,7 +4199,8 @@ msgstr "رموز API المميزة"
 msgid "Appearance"
 msgstr "المظهر"
 
-#: src/postulo/applications/ical_import.py src/postulo/plugins/pairing.py
+#: src/postulo/applications/forms.py src/postulo/applications/ical_import.py
+#: src/postulo/plugins/pairing.py
 #: src/postulo/templates/applications/suggestion_list.html
 #: src/postulo/templates/base.html
 #: src/postulo/templates/documents/letter_detail.html
@@ -4611,6 +4680,7 @@ msgstr "B1 — متوسط"
 msgid "B2 — upper intermediate"
 msgstr "B2 — فوق المتوسط"
 
+#: src/postulo/templates/applications/subscribed_event.html
 #: src/postulo/templates/connections/pick.html
 #: src/postulo/templates/jobs/move_owner.html
 #: src/postulo/templates/jobs/share.html
@@ -4801,7 +4871,7 @@ msgstr "التكنولوجيا الحيوية"
 msgid "Blank keeps them for as long as the instance exists."
 msgstr "إن تُرك فارغًا، يُحتفظ بها ما دام المثيل موجودًا."
 
-#: src/postulo/core/models.py
+#: src/postulo/applications/models.py src/postulo/core/models.py
 msgid "Blue"
 msgstr "أزرق"
 
@@ -4956,6 +5026,9 @@ msgstr "C2 — متمكّن"
 #: src/postulo/templates/applications/application_detail.html
 #: src/postulo/templates/applications/calendar.html
 #: src/postulo/templates/applications/ical_import.html
+#: src/postulo/templates/applications/subscribed_event.html
+#: src/postulo/templates/applications/subscription_form.html
+#: src/postulo/templates/applications/subscription_list.html
 #: src/postulo/templates/cotton/date_field.html
 msgid "Calendar"
 msgstr "التقويم"
@@ -4968,6 +5041,14 @@ msgstr "ملف التقويم"
 msgid "calendar identifier"
 msgstr "معرّف التقويم"
 
+#: src/postulo/applications/models.py
+msgid "calendar subscription"
+msgstr ""
+
+#: src/postulo/applications/models.py
+msgid "calendar subscriptions"
+msgstr ""
+
 #: src/postulo/templates/applications/calendar.html
 msgid "Calendar views"
 msgstr "طرق عرض التقويم"
@@ -4976,6 +5057,10 @@ msgstr "طرق عرض التقويم"
 #, python-format
 msgid "Calendar · %(period)s"
 msgstr "التقويم · %(period)s"
+
+#: src/postulo/templates/applications/subscription_list.html
+msgid "Calendars somebody else keeps, such as an employment office's appointments or a training provider's sessions. Postulo reads them again on their own and draws their events on your calendar, without changing them."
+msgstr ""
 
 #: src/postulo/applications/models.py src/postulo/jobs/models.py
 msgid "Call"
@@ -4998,6 +5083,7 @@ msgstr "يمكن إقرانه بـ"
 #: src/postulo/templates/applications/interview_form.html
 #: src/postulo/templates/applications/offer_form.html
 #: src/postulo/templates/applications/reminder_form.html
+#: src/postulo/templates/applications/subscription_form.html
 #: src/postulo/templates/applications/tag_form.html
 #: src/postulo/templates/connections/confirm_delete.html
 #: src/postulo/templates/connections/form.html
@@ -5038,9 +5124,22 @@ msgstr "إلغاء"
 msgid "Cancelled"
 msgstr "مُلغى"
 
+#: src/postulo/applications/models.py
+msgid "cancelled"
+msgstr ""
+
 #: src/postulo/applications/agenda.py
 msgid "Cancelled interview:"
 msgstr "مقابلة ملغاة:"
+
+#: src/postulo/applications/agenda.py
+msgid "Cancelled, from a subscribed calendar:"
+msgstr ""
+
+#: src/postulo/applications/agenda.py
+#, python-format
+msgid "Cancelled, from the subscribed calendar %(name)s:"
+msgstr ""
 
 #: src/postulo/core/file_review.py
 msgid "Cannot be added"
@@ -5712,12 +5811,12 @@ msgstr "مستودع الشيفرة الظاهر"
 msgid "collection"
 msgstr "المجموعة"
 
-#: src/postulo/core/design.py src/postulo/templates/server/design.html
-msgid "Colour"
+#: src/postulo/applications/models.py src/postulo/core/models.py
+msgid "colour"
 msgstr "اللون"
 
-#: src/postulo/core/models.py
-msgid "colour"
+#: src/postulo/core/design.py src/postulo/templates/server/design.html
+msgid "Colour"
 msgstr "اللون"
 
 #: src/postulo/templates/core/import_csv_map.html
@@ -6318,6 +6417,7 @@ msgstr "تواريخ تختارها"
 msgid "Day"
 msgstr "يوم"
 
+#: src/postulo/applications/models.py
 #: src/postulo/templates/settings/appearance.html
 #, fuzzy
 msgid "day"
@@ -6505,6 +6605,7 @@ msgstr "الدفاع"
 
 #: src/postulo/templates/applications/application_detail.html
 #: src/postulo/templates/applications/appointment_form.html
+#: src/postulo/templates/applications/subscription_list.html
 #: src/postulo/templates/applications/tag_list.html
 #: src/postulo/templates/cotton/delete_dialog.html
 #: src/postulo/templates/cotton/reminder_actions.html
@@ -6621,11 +6722,13 @@ msgstr "العمق"
 
 #: src/postulo/applications/forms.py src/postulo/core/csv_import.py
 #: src/postulo/jobs/models.py src/postulo/jobs/tables.py
+#: src/postulo/templates/applications/subscribed_event.html
 #: src/postulo/templates/jobs/posting_detail.html
 msgid "Description"
 msgstr "الوصف"
 
-#: src/postulo/jobs/models.py src/postulo/resume/models.py
+#: src/postulo/applications/models.py src/postulo/jobs/models.py
+#: src/postulo/resume/models.py
 msgid "description"
 msgstr "الوصف"
 
@@ -7050,6 +7153,7 @@ msgstr "Ed25519، بترميز base64. بدونه لا يوجد فهرس: فلن
 
 #: src/postulo/templates/applications/application_detail.html
 #: src/postulo/templates/applications/interview_list.html
+#: src/postulo/templates/applications/subscription_list.html
 #: src/postulo/templates/applications/tag_list.html
 #: src/postulo/templates/connections/list.html
 #: src/postulo/templates/documents/letter_detail.html
@@ -7179,6 +7283,10 @@ msgstr "صاحب العمل"
 msgid "Employer structure is switched off, so departments and parents are not changed."
 msgstr "هيكل صاحب العمل معطّل، لذا لم تتغير الأقسام والشركات الأم."
 
+#: src/postulo/applications/forms.py
+msgid "Employment service"
+msgstr ""
+
 #: src/postulo/applications/models.py
 msgid "employment service"
 msgstr "خدمة التوظيف"
@@ -7247,6 +7355,10 @@ msgstr "الهندسة"
 msgctxt "name of a keyboard key"
 msgid "Enter"
 msgstr "Enter"
+
+#: src/postulo/applications/subscriptions.py
+msgid "Enter the calendar's web address, starting with https:// or webcal://."
+msgstr ""
 
 #: src/postulo/templates/accounts/delete_account.html
 #: src/postulo/templates/core/export.html
@@ -7373,11 +7485,11 @@ msgstr "كل مستند تمامًا كما أُرسل، مجمّدًا لحظة
 msgid "Every file goes without a title, an author, a subject or keywords, whatever is chosen below or typed for one file, and a PDF without the name of the program that drew it. The language stays unless you leave it out below as well."
 msgstr "يخلو كل ملف من العنوان والمؤلف والموضوع والكلمات المفتاحية، مهما اختير أدناه أو كُتب لملف بعينه، ويخلو ملف PDF من اسم البرنامج الذي أنشأه. وتبقى اللغة ما لم تستبعدها أدناه أيضًا."
 
-#: src/postulo/plugins/syncing.py
+#: src/postulo/applications/models.py src/postulo/plugins/syncing.py
 msgid "Every four hours"
 msgstr "كل أربع ساعات"
 
-#: src/postulo/plugins/syncing.py
+#: src/postulo/applications/models.py src/postulo/plugins/syncing.py
 msgid "Every hour"
 msgstr "كل ساعة"
 
@@ -7962,6 +8074,14 @@ msgstr "إلى %(office)s"
 msgid "For a PNG or JPEG. Cuts out where it was taken, when and with what, which a phone's photograph carries, before it is kept and before it is sent anywhere. The picture itself is not touched. Untick it to keep the file exactly as it is."
 msgstr "لملفات PNG أو JPEG. يزيل ما تحمله صورة الهاتف من معلومات عن مكان التقاطها وزمانه والجهاز الذي التُقطت به، قبل حفظها وقبل إرسالها إلى أي مكان. ولا تُمَسّ الصورة نفسها. ألغِ التحديد للاحتفاظ بالملف كما هو تمامًا."
 
+#: src/postulo/applications/forms.py
+msgid "For an appointment: the public employment service it is with."
+msgstr ""
+
+#: src/postulo/applications/forms.py
+msgid "For an interview: the application it is about."
+msgstr ""
+
 #: src/postulo/resume/models.py
 msgid "For example, “BSc Computer Science”."
 msgstr "مثلًا، «بكالوريوس علوم الحاسوب»."
@@ -8162,6 +8282,10 @@ msgstr "من %(start)s إلى %(end)s"
 msgid "From %(start)s: now choose the last day"
 msgstr "من %(start)s: اختر الآن اليوم الأخير"
 
+#: src/postulo/applications/agenda.py
+msgid "From a subscribed calendar:"
+msgstr ""
+
 #: src/postulo/core/models.py
 msgid "from address"
 msgstr "عنوان المرسل"
@@ -8197,6 +8321,16 @@ msgstr "«من المستند» هو الاسم الذي يُظهره المست
 #: src/postulo/accounts/forms.py
 msgid "From the document is your name and the kind of document: “Alex Morgan — CV”."
 msgstr "«من المستند» هو اسمك ونوع المستند: «Alex Morgan — السيرة الذاتية»."
+
+#: src/postulo/templates/applications/subscribed_event.html
+#, python-format
+msgid "From the subscribed calendar %(name)s"
+msgstr ""
+
+#: src/postulo/applications/agenda.py
+#, python-format
+msgid "From the subscribed calendar %(name)s:"
+msgstr ""
 
 #: src/postulo/core/models.py
 msgid "from Wikidata"
@@ -8445,7 +8579,7 @@ msgstr "لا توجد لدى Gravatar صورة لعنوانك، لذا تبقى 
 msgid "Green"
 msgstr "أخضر"
 
-#: src/postulo/core/models.py
+#: src/postulo/applications/models.py src/postulo/core/models.py
 msgid "Grey"
 msgstr "رمادي"
 
@@ -8737,6 +8871,10 @@ msgstr "مقدار المساحة المتروكة"
 #: src/postulo/applications/widgets.py
 msgid "How much you sent, month by month, so a quiet stretch is visible."
 msgstr "حجم ما أرسلته شهرًا بشهر، لتظهر أي فترة هدوء."
+
+#: src/postulo/applications/forms.py
+msgid "How often Postulo reads it again. One that cannot be read is tried less often until it can."
+msgstr ""
 
 #: src/postulo/resume/registry.py
 msgid "How often your work has been cited, as a source counted it on a given day: for all of it, or for one publication. Postulo counts nothing itself."
@@ -9511,6 +9649,10 @@ msgstr "كانت تضم القسم الذي يخصه هذا."
 msgid "It holds nothing that needs moving."
 msgstr "لا يحتوي على شيء يحتاج إلى نقل."
 
+#: src/postulo/templates/applications/subscribed_event.html
+msgid "It is a whole day, with no time to meet at, so it cannot be added as an appointment or an interview. Add one by hand if you need it."
+msgstr ""
+
 #: src/postulo/applications/views.py
 msgid "It is already done."
 msgstr "تم ذلك بالفعل."
@@ -9657,6 +9799,10 @@ msgstr "بياناته متاحة بموجب %(licence)s."
 #: src/postulo/applications/ical_import.py
 msgid "Its date could not be read."
 msgstr "تعذرت قراءة تاريخه."
+
+#: src/postulo/templates/applications/subscription_form.html
+msgid "Its events are drawn on your calendar as they are in the calendar it comes from. They cannot be changed here; any of them can be added as an appointment or an interview of your own."
+msgstr ""
 
 #: src/postulo/plugins/provenance.py
 msgid "Its file matches what a repository on this instance signed."
@@ -9847,6 +9993,11 @@ msgstr "يُحتفظ بها بعد استخدامها أو انتهاء صلاح
 #: src/postulo/jobs/share_views.py
 msgid "Kept apart: they will not be asked about again."
 msgstr "أُبقيت منفصلة: لن تُسأل عنها مجددًا."
+
+#: src/postulo/applications/forms.py
+#, python-format
+msgid "Kept as %(site)s. Leave it empty to keep it, or enter a new one."
+msgstr ""
 
 #: src/postulo/templates/partials/postal_addresses.html
 msgid "Kept as it was"
@@ -10069,8 +10220,8 @@ msgstr "آخر تحقق"
 msgid "last checked"
 msgstr "آخر تحقق"
 
-#: src/postulo/documents/models.py src/postulo/notifications/models.py
-#: src/postulo/plugins/models.py
+#: src/postulo/applications/models.py src/postulo/documents/models.py
+#: src/postulo/notifications/models.py src/postulo/plugins/models.py
 msgid "last error"
 msgstr "آخر خطأ"
 
@@ -10085,6 +10236,21 @@ msgstr "آخر ما وصل"
 #: src/postulo/plugins/models.py
 msgid "last pushed"
 msgstr "آخر إرسال"
+
+#: src/postulo/applications/models.py
+msgid "last read"
+msgstr ""
+
+#: src/postulo/templates/applications/subscription_list.html
+#, python-format
+msgid "Last read on %(when)s: %(counter)s event."
+msgid_plural "Last read on %(when)s: %(counter)s events."
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+msgstr[4] ""
+msgstr[5] ""
 
 #: src/postulo/plugins/models.py
 msgid "last run"
@@ -10131,7 +10297,7 @@ msgstr "آخر استخدام"
 msgid "Last used %(when)s"
 msgstr "آخر استخدام: %(when)s"
 
-#: src/postulo/plugins/models.py
+#: src/postulo/applications/models.py src/postulo/plugins/models.py
 msgid "last worked"
 msgstr "آخر نجاح"
 
@@ -10249,6 +10415,14 @@ msgstr "إن تُرك فارغًا، تُظهر سيرك الذاتية «%(plac
 #: src/postulo/jobs/capture_views.py
 msgid "Left empty it is today. Capturing a posting you applied to last week is common."
 msgstr "إن تُرك فارغًا فهو تاريخ اليوم. من الشائع التقاط إعلان تقدّمت إليه الأسبوع الماضي."
+
+#: src/postulo/applications/models.py
+msgid "left out"
+msgstr ""
+
+#: src/postulo/templates/applications/subscription_list.html
+msgid "Left out of the calendar:"
+msgstr ""
 
 #: src/postulo/templates/core/table_export.html
 #: src/postulo/templates/documents/themes/base_list.html
@@ -11128,9 +11302,9 @@ msgid "NACE section"
 msgstr "باب NACE"
 
 #: src/postulo/accounts/models.py src/postulo/api/models.py
-#: src/postulo/core/models.py src/postulo/documents/models.py
-#: src/postulo/jobs/models.py src/postulo/plugins/models.py
-#: src/postulo/resume/models.py
+#: src/postulo/applications/models.py src/postulo/core/models.py
+#: src/postulo/documents/models.py src/postulo/jobs/models.py
+#: src/postulo/plugins/models.py src/postulo/resume/models.py
 msgid "name"
 msgstr "الاسم"
 
@@ -11314,6 +11488,11 @@ msgstr "تذكير جديد في %(day)s"
 msgid "New since you last arranged this"
 msgstr "جديد منذ آخر مرة رتّبت فيها هذه اللوحة"
 
+#: src/postulo/templates/applications/subscription_form.html
+#: src/postulo/templates/applications/subscription_list.html
+msgid "New subscription"
+msgstr ""
+
 #: src/postulo/templates/applications/tag_list.html
 msgid "New tag"
 msgstr "وسم جديد"
@@ -11405,6 +11584,10 @@ msgstr "لا"
 #: src/postulo/templates/server/plugins.html
 msgid "No address and no key, so nothing is offered from it."
 msgstr "لا عنوان ولا مفتاح، لذا لا يُعرض منه أي شيء."
+
+#: src/postulo/templates/applications/subscription_list.html
+msgid "No address: enter it again."
+msgstr ""
 
 #: src/postulo/core/offsite.py
 msgid "No age recipient is set, and nothing leaves this machine unencrypted."
@@ -11669,6 +11852,10 @@ msgstr "لم يُحتفظ بمصدر تلك الصفحة."
 #: src/postulo/templates/jobs/capture_page.html
 msgid "No source was kept."
 msgstr "لم يُحتفظ بالمصدر."
+
+#: src/postulo/templates/applications/subscription_list.html
+msgid "No subscriptions yet."
+msgstr ""
 
 #: src/postulo/api/routers/interviews.py src/postulo/api/routers/offers.py
 #: src/postulo/api/routers/reminders.py
@@ -12016,6 +12203,10 @@ msgstr "لا يظهر في السيرة الذاتية."
 #: src/postulo/templates/resume/overview.html
 msgid "Not printed on any CV until they have agreed."
 msgstr "لا يظهر في أي سيرة ذاتية قبل الحصول على موافقة هذا الشخص."
+
+#: src/postulo/templates/applications/subscription_list.html
+msgid "Not read yet. It will be within minutes."
+msgstr ""
 
 #: src/postulo/applications/analytics.py src/postulo/applications/reports.py
 #: src/postulo/templates/applications/partials/status_card.html
@@ -12813,7 +13004,7 @@ msgstr "مفعّلة. يطلب تسجيل الدخول رمزًا من تطبي�
 msgid "On. Signing in asks for one of your security keys, or a recovery code."
 msgstr "مفعّلة. يطلب تسجيل الدخول أحد مفاتيح الأمان الخاصة بك، أو رمز استرداد."
 
-#: src/postulo/plugins/syncing.py
+#: src/postulo/applications/models.py src/postulo/plugins/syncing.py
 msgid "Once a day"
 msgstr "مرة واحدة يوميًا"
 
@@ -13248,6 +13439,7 @@ msgstr "الطلبات المفتوحة التي لم تصل عنها أخبار
 msgid "Open as this"
 msgstr "الفتح بهذا العرض"
 
+#: src/postulo/templates/applications/subscribed_event.html
 #: src/postulo/templates/jobs/capture_form.html
 #: src/postulo/templates/jobs/capture_review.html
 msgid "Open it"
@@ -14245,6 +14437,11 @@ msgstr "يكتبه Postulo بالهيئة التي يعتمدها السجل ن�
 msgid "Postulo version"
 msgstr "إصدار Postulo"
 
+#: src/postulo/templates/applications/subscription_list.html
+#, python-format
+msgid "Postulo will try again on %(when)s, and less often while it keeps failing."
+msgstr ""
+
 #: src/postulo/templates/partials/footer_links.html
 msgid "Postulo — your job search, your data."
 msgstr "Postulo — بحثك عن عمل، وبياناتك ملكك."
@@ -14732,6 +14929,10 @@ msgstr "إعادة التنشيط"
 msgid "Read %(name)s as"
 msgstr "قراءة %(name)s على أنه"
 
+#: src/postulo/applications/views_subscriptions.py
+msgid "Read again. The calendar shows what it holds now."
+msgstr ""
+
 #: src/postulo/templates/core/import_csv_map.html
 msgid "Read as"
 msgstr "قراءة على أنه"
@@ -14790,6 +14991,10 @@ msgstr "تمت القراءة من ملف Europass XML المرفق بملف PDF
 msgid "Read it"
 msgstr "قراءته"
 
+#: src/postulo/applications/models.py
+msgid "read it again"
+msgstr ""
+
 #: src/postulo/templates/documents/letter_detail.html
 msgid "Read it as they will"
 msgstr "قراءته كما سيقرؤه المستلم"
@@ -14797,6 +15002,10 @@ msgstr "قراءته كما سيقرؤه المستلم"
 #: src/postulo/templates/documents/letter_detail.html
 msgid "Read it below"
 msgstr "اقرأه أدناه"
+
+#: src/postulo/templates/applications/subscription_list.html
+msgid "Read it now"
+msgstr ""
 
 #: src/postulo/jobs/slow.py
 msgid "Read it. Check what was found before it becomes a listing."
@@ -15459,7 +15668,7 @@ msgstr "الوظيفة"
 msgid "Role / job title"
 msgstr "الوظيفة / المسمّى الوظيفي"
 
-#: src/postulo/core/models.py
+#: src/postulo/applications/models.py src/postulo/core/models.py
 msgid "Rose"
 msgstr "وردي"
 
@@ -15558,6 +15767,7 @@ msgstr "السبت"
 #: src/postulo/templates/applications/interview_form.html
 #: src/postulo/templates/applications/offer_form.html
 #: src/postulo/templates/applications/reminder_form.html
+#: src/postulo/templates/applications/subscription_form.html
 #: src/postulo/templates/applications/tag_form.html
 #: src/postulo/templates/connections/form.html
 #: src/postulo/templates/documents/cv_form.html
@@ -16876,6 +17086,7 @@ msgstr "الحالة"
 #: src/postulo/templates/applications/partials/bulk_fields.html
 #: src/postulo/templates/applications/partials/status_card.html
 #: src/postulo/templates/applications/report.html
+#: src/postulo/templates/applications/subscribed_event.html
 #: src/postulo/templates/core/import_csv_map.html
 #: src/postulo/templates/documents/themes/base_report.html
 #: src/postulo/templates/jobs/company_form.html
@@ -17008,6 +17219,33 @@ msgstr "الموضوع"
 #: src/postulo/accounts/models.py
 msgid "subject of exported files"
 msgstr "موضوع الملفات المُصدَّرة"
+
+#: src/postulo/templates/applications/subscription_form.html
+msgid "Subscribe"
+msgstr ""
+
+#: src/postulo/applications/agenda.py
+msgid "Subscribed calendars"
+msgstr ""
+
+#: src/postulo/applications/models.py
+msgid "subscribed event"
+msgstr ""
+
+#: src/postulo/applications/models.py
+msgid "subscribed events"
+msgstr ""
+
+#: src/postulo/applications/views_subscriptions.py
+msgid "Subscribed. Its events appear on the calendar once it has been read, within minutes."
+msgstr ""
+
+#: src/postulo/templates/applications/calendar.html
+#: src/postulo/templates/applications/subscribed_event.html
+#: src/postulo/templates/applications/subscription_form.html
+#: src/postulo/templates/applications/subscription_list.html
+msgid "Subscriptions"
+msgstr ""
 
 #: src/postulo/templates/resume/overview.html
 msgid "Suggest from my ORCID record"
@@ -17241,7 +17479,7 @@ msgstr "تصديرها"
 msgid "Task"
 msgstr "مهمة"
 
-#: src/postulo/core/models.py
+#: src/postulo/applications/models.py src/postulo/core/models.py
 msgid "Teal"
 msgstr "أزرق مخضر"
 
@@ -17362,6 +17600,10 @@ msgstr "تعذّرت إضافة ذلك العنوان."
 #, python-format
 msgid "That address is %(type)s, not an image Postulo keeps."
 msgstr "يشير ذلك العنوان إلى %(type)s، وليس إلى صورة يحتفظ بها Postulo."
+
+#: src/postulo/applications/subscriptions.py
+msgid "That address is not one a calendar can be read from."
+msgstr ""
 
 #: src/postulo/plugins/public_addresses.py
 msgid "That address is on a private or local network, and Postulo will not fetch it. Paste the posting text in by hand instead."
@@ -17680,6 +17922,7 @@ msgstr[4] "هذه اختبارات كثيرة. حاول مجددًا بعد %(se
 msgstr[5] "هذه اختبارات كثيرة. حاول مجددًا بعد %(seconds)d ثانية."
 
 #: src/postulo/accounts/avatars.py
+#: src/postulo/applications/views_subscriptions.py
 msgid "That is a lot of tries. Wait a little before asking again."
 msgstr "محاولات كثيرة. انتظر قليلًا قبل أن تطلب مرة أخرى."
 
@@ -18132,6 +18375,10 @@ msgstr "ردّ العنوان بالرمز %(code)s."
 msgid "The address answered with nothing."
 msgstr "لم يُرجع العنوان أي شيء."
 
+#: src/postulo/applications/subscriptions.py
+msgid "The address cannot be read here any more. Enter it again."
+msgstr ""
+
 #: src/postulo/jobs/tiles.py
 msgid "The address must hold {z}, {x} and {y}, where each tile's numbers go."
 msgstr "يجب أن يحتوي العنوان على {z} و {x} و {y}، حيث توضع أرقام كل بلاطة."
@@ -18243,9 +18490,55 @@ msgstr "يبدأ التقويم والتقارير أسابيعهما به. إن
 msgid "The calendar can be downloaded as an iCalendar file, for the period and kinds on the screen, and a file from another calendar can be read in, with a review of what it holds before anything is added."
 msgstr "يمكن تنزيل التقويم كملف iCalendar للفترة والأنواع المعروضة على الشاشة، ويمكن قراءة ملف من تقويم آخر، مع مراجعة ما يحتويه قبل إضافة أي شيء."
 
+#: src/postulo/applications/subscriptions.py
+msgid "The calendar could not be read."
+msgstr ""
+
+#: src/postulo/applications/subscriptions.py
+#, python-format
+msgid "The calendar is larger than %(limit)s MB, so it was not read."
+msgstr ""
+
+#: src/postulo/templates/applications/subscribed_event.html
+msgid "The calendar marks this as cancelled."
+msgstr ""
+
 #: src/postulo/accounts/forms.py
 msgid "The calendar's period buttons"
 msgstr "أزرار الفترة في التقويم"
+
+#: src/postulo/applications/subscriptions.py
+#, python-format
+msgid "The calendar's server answered with an error (%(status)s)."
+msgstr ""
+
+#: src/postulo/applications/subscriptions.py
+msgid "The calendar's server could not be reached."
+msgstr ""
+
+#: src/postulo/applications/subscriptions.py
+msgid "The calendar's server has nothing at that address any more."
+msgstr ""
+
+#: src/postulo/applications/subscriptions.py
+msgid "The calendar's server refused the address. It may have been changed or withdrawn."
+msgstr ""
+
+#: src/postulo/applications/subscriptions.py
+msgid "The calendar's server sent Postulo round too many redirects."
+msgstr ""
+
+#: src/postulo/applications/subscriptions.py
+msgid "The calendar's server sent something that could not be read."
+msgstr ""
+
+#: src/postulo/applications/subscriptions.py
+msgid "The calendar's server took too long to answer."
+msgstr ""
+
+#: src/postulo/applications/forms.py
+msgid "The calendar's web address, as the service that keeps it gives it: it starts with https:// or webcal:// and usually ends in .ics. It may open the calendar to anyone who has it, so Postulo keeps it encrypted and shows only its site."
+msgstr ""
 
 #: src/postulo/templates/jobs/capture_page_forget.html
 msgid "The capture stays as it is, and so does any listing it became."
@@ -19430,6 +19723,11 @@ msgstr "الموضوع الذي يحمله كل ملف"
 msgid "The subject has to be one line."
 msgstr "يجب أن يكون الموضوع في سطر واحد."
 
+#: src/postulo/applications/views_subscriptions.py
+#, python-format
+msgid "the subscribed calendar %(name)s"
+msgstr ""
+
 #: src/postulo/templates/settings/appearance.html
 msgid "The switch at the top right cycles through the same three; this is the explicit version."
 msgstr "يتنقّل المفتاح في أعلى الصفحة بين الخيارات الثلاثة نفسها؛ وهذه هي الصيغة الصريحة."
@@ -19891,6 +20189,10 @@ msgstr "أُبلغ عن قيام هذه الشركة بتسريح موظفين �
 msgid "This entry prints its original text on every CV."
 msgstr "يطبع هذا البند نصه الأصلي في كل سيرة ذاتية."
 
+#: src/postulo/templates/applications/subscribed_event.html
+msgid "This event is already in your calendar as your own."
+msgstr ""
+
 #: src/postulo/documents/forms.py
 msgid "This export only. Your default is under Settings → Export."
 msgstr "لهذا التصدير فقط. الإعداد الافتراضي لديك في الإعدادات ← تصدير."
@@ -20015,6 +20317,10 @@ msgstr "هذا قبل تاريخ إصداره."
 #: src/postulo/resume/forms.py
 msgid "This is before the start date."
 msgstr "هذا قبل تاريخ البدء."
+
+#: src/postulo/templates/applications/subscribed_event.html
+msgid "This is how the calendar it comes from has it, and it changes there. Postulo reads it again on its own."
+msgstr ""
 
 #: src/postulo/core/phones.py
 msgid "This is kept as it was typed, with no country in front of it, so it could not be checked and cannot be dialled from anywhere else."
@@ -20543,7 +20849,7 @@ msgstr "نوع المستند"
 msgid "type of entry"
 msgstr "نوع البند"
 
-#: src/postulo/applications/ical_import.py
+#: src/postulo/applications/forms.py src/postulo/applications/ical_import.py
 msgid "Type of interview"
 msgstr "نوع المقابلة"
 
@@ -20625,6 +20931,10 @@ msgstr "ألغِ التحديد للإبقاء على البند في هذه ا�
 #: src/postulo/templates/server/defaults.html
 msgid "Under each language, how many of Postulo's strings a speaker has reviewed, how many are drafts nobody has read yet, and how many are not translated at all."
 msgstr "تحت كل لغة: عدد نصوص Postulo التي راجعها متحدث بها، وعدد المسودات التي لم يقرأها أحد بعد، وعدد النصوص غير المترجمة إطلاقًا."
+
+#: src/postulo/templates/help/calendar.html
+msgid "Under Subscriptions, a calendar somebody else keeps -- an employment office's appointments, a training provider's sessions -- can be followed by its address. Postulo reads it again on its own and draws its events in the colour you chose, marked as from it. They cannot be changed here; any of them can be added as an appointment or an interview of your own."
+msgstr ""
 
 #: src/postulo/accounts/forms.py
 msgid "Underline links in navigation"
@@ -20957,7 +21267,7 @@ msgstr "تم حفظ العرض."
 msgid "Views"
 msgstr "العروض المحفوظة"
 
-#: src/postulo/core/models.py
+#: src/postulo/applications/models.py src/postulo/core/models.py
 msgid "Violet"
 msgstr "بنفسجي"
 
@@ -21333,6 +21643,10 @@ msgstr "ما كان عليه. يُضاف التقاط آخر للإعلان نف
 msgid "What it will hold"
 msgstr "ما سيحتويه"
 
+#: src/postulo/applications/forms.py
+msgid "What its events are drawn in on the calendar."
+msgstr ""
+
 #: src/postulo/templates/jobs/merge.html
 msgid "What moves"
 msgstr "ما يُنقل"
@@ -21630,6 +21944,7 @@ msgstr "أيًا كانت قيمته لديك، مرة واحدة أو من حي
 msgid "when"
 msgstr "متى"
 
+#: src/postulo/templates/applications/subscribed_event.html
 #: src/postulo/templates/documents/rendered_list.html
 #: src/postulo/templates/server/backups.html
 #: src/postulo/templates/server/design.html
@@ -21668,6 +21983,10 @@ msgstr "عند تسجيل هذا المثيل لدى المزوّد، أعطه �
 #: src/postulo/applications/models.py
 msgid "where"
 msgstr "المكان"
+
+#: src/postulo/templates/applications/subscribed_event.html
+msgid "Where"
+msgstr ""
 
 #: src/postulo/templates/help/links.html
 msgid "Where a card has a <em>Service</em> menu, choose the service the address is on. Its icon is shown beside it, and the address is checked against what an address on that service looks like, so a mistyped one is refused, and the refusal says why. Paste an address without choosing a service, and saving chooses it where the address is on one Postulo knows."
@@ -22860,6 +23179,10 @@ msgstr "يُحتفظ بما لديك"
 #: src/postulo/documents/forms.py
 msgid "Yours to set and never enforced: after it, Postulo warns and does not block."
 msgstr "تحدده أنت ولا يُفرض أبدًا: بعده، يحذّرك Postulo دون أن يمنعك."
+
+#: src/postulo/applications/forms.py
+msgid "Yours, for telling it apart: drawn beside each of its events."
+msgstr ""
 
 #: src/postulo/applications/forms.py
 msgid "Yours, not the employer's. The list can be sorted and narrowed by it."

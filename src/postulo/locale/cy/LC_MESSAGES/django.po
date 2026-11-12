@@ -414,6 +414,24 @@ msgstr[1] "Mae %(count)s gais wedi tawelu"
 msgstr[2] "Mae %(count)s cais wedi tawelu"
 msgstr[3] "Mae %(count)s cais wedi tawelu"
 
+#: src/postulo/applications/subscriptions.py
+#, python-format
+msgid "%(count)s event whose date could not be read."
+msgid_plural "%(count)s events whose date could not be read."
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+
+#: src/postulo/applications/subscriptions.py
+#, python-format
+msgid "%(count)s event with a time but no time zone Postulo knows."
+msgid_plural "%(count)s events with a time but no time zone Postulo knows."
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+
 #: src/postulo/jobs/closing.py
 #, python-format
 msgid "%(count)s listing you are considering closes soon"
@@ -450,6 +468,15 @@ msgstr[1] "%(count)s wedi'u tynnu"
 msgstr[2] "%(count)s wedi'u tynnu"
 msgstr[3] "%(count)s wedi'u tynnu"
 
+#: src/postulo/applications/subscriptions.py
+#, python-format
+msgid "%(count)s repeating event: Postulo does not read repeating events."
+msgid_plural "%(count)s repeating events: Postulo does not read repeating events."
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+
 #: src/postulo/plugins/base.py
 #, python-format
 msgid "%(count)s skipped"
@@ -458,6 +485,15 @@ msgstr[0] "%(count)s wedi'i hepgor"
 msgstr[1] "%(count)s wedi'u hepgor"
 msgstr[2] "%(count)s wedi'u hepgor"
 msgstr[3] "%(count)s wedi'u hepgor"
+
+#: src/postulo/applications/subscriptions.py
+#, python-format
+msgid "%(count)s task."
+msgid_plural "%(count)s tasks."
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
 
 #: src/postulo/templates/server/people.html
 #, python-format
@@ -1856,8 +1892,10 @@ msgstr "(yn agor mewn tab newydd)"
 msgid "(part)"
 msgstr "(rhannol)"
 
-#: src/postulo/applications/ical_import.py
+#: src/postulo/applications/agenda.py src/postulo/applications/ical_import.py
+#: src/postulo/applications/models.py
 #: src/postulo/templates/applications/ical_import.html
+#: src/postulo/templates/applications/subscribed_event.html
 msgid "(untitled)"
 msgstr "(heb deitl)"
 
@@ -3112,6 +3150,7 @@ msgid "Activity"
 msgstr "Gweithgaredd"
 
 #: src/postulo/templates/applications/application_detail.html
+#: src/postulo/templates/applications/subscribed_event.html
 #: src/postulo/templates/jobs/company_detail.html
 #: src/postulo/templates/jobs/company_form.html
 #: src/postulo/templates/resume/overview.html
@@ -3198,9 +3237,13 @@ msgstr "Ychwanegu cofnod"
 msgid "Add it anyway"
 msgstr "Ei ychwanegu beth bynnag"
 
-#: src/postulo/applications/ical_import.py
+#: src/postulo/applications/forms.py src/postulo/applications/ical_import.py
 msgid "Add it as"
 msgstr "Ei ychwanegu fel"
+
+#: src/postulo/templates/applications/subscribed_event.html
+msgid "Add it as your own"
+msgstr ""
 
 #: src/postulo/templates/jobs/partials/bind_capture.html
 msgid "Add it, and next"
@@ -3324,6 +3367,14 @@ msgstr "Ychwanegwyd at hanes yr hysbyseb."
 msgid "Added to the timeline."
 msgstr "Ychwanegwyd at y llinell amser."
 
+#: src/postulo/applications/views_subscriptions.py
+msgid "Added to your appointments. It is yours to change now."
+msgstr ""
+
+#: src/postulo/applications/views_subscriptions.py
+msgid "Added to your interviews. It is yours to change now."
+msgstr ""
+
 #: src/postulo/jobs/listing_views.py
 msgid "Added to your listings."
 msgstr "Ychwanegwyd at eich hysbysebion."
@@ -3348,13 +3399,14 @@ msgstr "Nid yw ychwanegu ffeil byth yn gwneud dim ond ychwanegu. Mae'r hyn sydd 
 msgid "addok (France's Base Adresse Nationale)"
 msgstr "addok (Base Adresse Nationale Ffrainc)"
 
-#: src/postulo/applications/reports.py src/postulo/jobs/tables.py
-#: src/postulo/templates/partials/web_links.html
+#: src/postulo/applications/forms.py src/postulo/applications/reports.py
+#: src/postulo/jobs/tables.py src/postulo/templates/partials/web_links.html
 msgid "Address"
 msgstr "Cyfeiriad"
 
-#: src/postulo/core/models.py src/postulo/jobs/models.py
-#: src/postulo/notifications/models.py src/postulo/resume/models.py
+#: src/postulo/applications/models.py src/postulo/core/models.py
+#: src/postulo/jobs/models.py src/postulo/notifications/models.py
+#: src/postulo/resume/models.py
 msgid "address"
 msgstr "cyfeiriad"
 
@@ -3546,7 +3598,7 @@ msgstr "Ymlaen bob amser: ni all Postulo weithio hebddo."
 msgid "Always this"
 msgstr "Hwn bob tro"
 
-#: src/postulo/core/models.py
+#: src/postulo/applications/models.py src/postulo/core/models.py
 msgid "Amber"
 msgstr "Ambr"
 
@@ -3617,6 +3669,14 @@ msgstr "Fe wnaeth gweinyddwr y ddolen hon ar gyfer %(name)s. Mae'n gweithio unwa
 msgid "An application's status changes"
 msgstr "Mae statws cais yn newid"
 
+#: src/postulo/applications/forms.py
+msgid "An appointment"
+msgstr ""
+
+#: src/postulo/applications/forms.py
+msgid "An appointment is with a public employment service. Choose one."
+msgstr ""
+
 #: src/postulo/templates/core/export.html
 msgid "An archive can be imported into an empty account from the command line. It is not offered here because importing creates records rather than merging them, and that is a decision worth making deliberately rather than by clicking."
 msgstr "Gellir mewnforio archif i gyfrif gwag o'r llinell orchymyn. Nid yw'n cael ei gynnig yma am fod mewnforio yn creu cofnodion yn hytrach na'u cyfuno, a phenderfyniad yw hwnnw sy'n werth ei wneud yn fwriadol yn hytrach na chyda chlic."
@@ -3678,11 +3738,11 @@ msgstr "Dim ond ychwanegu y mae mewnforio. Nid oes dim sydd eisoes yn eich cofno
 msgid "An index is a list of code to run here, so it must be signed and you must hold the key. Switching a repository off later stops new installs and updates from it; anything already installed keeps working."
 msgstr "Rhestr o god i'w redeg yma yw mynegai, felly rhaid iddo fod wedi'i lofnodi a rhaid i chi ddal yr allwedd. Mae diffodd ystorfa'n ddiweddarach yn atal gosod a diweddaru newydd ohoni; mae'r hyn sydd eisoes wedi'i osod yn dal i weithio."
 
-#: src/postulo/applications/ical_import.py
+#: src/postulo/applications/forms.py src/postulo/applications/ical_import.py
 msgid "An interview"
 msgstr "Cyfweliad"
 
-#: src/postulo/applications/ical_import.py
+#: src/postulo/applications/forms.py src/postulo/applications/ical_import.py
 msgid "An interview belongs to an application. Choose one."
 msgstr "Mae cyfweliad yn perthyn i gais. Dewiswch un."
 
@@ -3901,7 +3961,8 @@ msgstr "Tocynnau API"
 msgid "Appearance"
 msgstr "Golwg"
 
-#: src/postulo/applications/ical_import.py src/postulo/plugins/pairing.py
+#: src/postulo/applications/forms.py src/postulo/applications/ical_import.py
+#: src/postulo/plugins/pairing.py
 #: src/postulo/templates/applications/suggestion_list.html
 #: src/postulo/templates/base.html
 #: src/postulo/templates/documents/letter_detail.html
@@ -4383,6 +4444,7 @@ msgstr "B1 — canolradd"
 msgid "B2 — upper intermediate"
 msgstr "B2 — canolradd uwch"
 
+#: src/postulo/templates/applications/subscribed_event.html
 #: src/postulo/templates/connections/pick.html
 #: src/postulo/templates/jobs/move_owner.html
 #: src/postulo/templates/jobs/share.html
@@ -4571,7 +4633,7 @@ msgstr "Biotechnoleg"
 msgid "Blank keeps them for as long as the instance exists."
 msgstr "Mae gadael yn wag yn eu cadw cyhyd ag y bo'r gosodiad yn bodoli."
 
-#: src/postulo/core/models.py
+#: src/postulo/applications/models.py src/postulo/core/models.py
 msgid "Blue"
 msgstr "Glas"
 
@@ -4724,6 +4786,9 @@ msgstr "C2 — hyfedr"
 #: src/postulo/templates/applications/application_detail.html
 #: src/postulo/templates/applications/calendar.html
 #: src/postulo/templates/applications/ical_import.html
+#: src/postulo/templates/applications/subscribed_event.html
+#: src/postulo/templates/applications/subscription_form.html
+#: src/postulo/templates/applications/subscription_list.html
 #: src/postulo/templates/cotton/date_field.html
 msgid "Calendar"
 msgstr "Calendr"
@@ -4736,6 +4801,14 @@ msgstr "Ffeil galendr"
 msgid "calendar identifier"
 msgstr "dynodydd calendr"
 
+#: src/postulo/applications/models.py
+msgid "calendar subscription"
+msgstr ""
+
+#: src/postulo/applications/models.py
+msgid "calendar subscriptions"
+msgstr ""
+
 #: src/postulo/templates/applications/calendar.html
 msgid "Calendar views"
 msgstr "Gweddau'r calendr"
@@ -4744,6 +4817,10 @@ msgstr "Gweddau'r calendr"
 #, python-format
 msgid "Calendar · %(period)s"
 msgstr "Calendr · %(period)s"
+
+#: src/postulo/templates/applications/subscription_list.html
+msgid "Calendars somebody else keeps, such as an employment office's appointments or a training provider's sessions. Postulo reads them again on their own and draws their events on your calendar, without changing them."
+msgstr ""
 
 #: src/postulo/applications/models.py src/postulo/jobs/models.py
 msgid "Call"
@@ -4767,6 +4844,7 @@ msgstr "Gellir ei baru â"
 #: src/postulo/templates/applications/interview_form.html
 #: src/postulo/templates/applications/offer_form.html
 #: src/postulo/templates/applications/reminder_form.html
+#: src/postulo/templates/applications/subscription_form.html
 #: src/postulo/templates/applications/tag_form.html
 #: src/postulo/templates/connections/confirm_delete.html
 #: src/postulo/templates/connections/form.html
@@ -4807,9 +4885,22 @@ msgstr "Canslo"
 msgid "Cancelled"
 msgstr "Wedi'i ganslo"
 
+#: src/postulo/applications/models.py
+msgid "cancelled"
+msgstr ""
+
 #: src/postulo/applications/agenda.py
 msgid "Cancelled interview:"
 msgstr "Cyfweliad wedi'i ganslo:"
+
+#: src/postulo/applications/agenda.py
+msgid "Cancelled, from a subscribed calendar:"
+msgstr ""
+
+#: src/postulo/applications/agenda.py
+#, python-format
+msgid "Cancelled, from the subscribed calendar %(name)s:"
+msgstr ""
 
 #: src/postulo/core/file_review.py
 msgid "Cannot be added"
@@ -5475,13 +5566,13 @@ msgstr "ystorfa cod a argraffwyd"
 msgid "collection"
 msgstr "casgliad"
 
+#: src/postulo/applications/models.py src/postulo/core/models.py
+msgid "colour"
+msgstr "lliw"
+
 #: src/postulo/core/design.py src/postulo/templates/server/design.html
 msgid "Colour"
 msgstr "Lliw"
-
-#: src/postulo/core/models.py
-msgid "colour"
-msgstr "lliw"
 
 #: src/postulo/templates/core/import_csv_map.html
 msgid "Column in the file"
@@ -6078,6 +6169,7 @@ msgstr "Dyddiadau o'ch dewis chi"
 msgid "Day"
 msgstr "Diwrnod"
 
+#: src/postulo/applications/models.py
 #: src/postulo/templates/settings/appearance.html
 msgid "day"
 msgid_plural "days"
@@ -6262,6 +6354,7 @@ msgstr "Amddiffyn"
 
 #: src/postulo/templates/applications/application_detail.html
 #: src/postulo/templates/applications/appointment_form.html
+#: src/postulo/templates/applications/subscription_list.html
 #: src/postulo/templates/applications/tag_list.html
 #: src/postulo/templates/cotton/delete_dialog.html
 #: src/postulo/templates/cotton/reminder_actions.html
@@ -6378,11 +6471,13 @@ msgstr "Dyfnder"
 
 #: src/postulo/applications/forms.py src/postulo/core/csv_import.py
 #: src/postulo/jobs/models.py src/postulo/jobs/tables.py
+#: src/postulo/templates/applications/subscribed_event.html
 #: src/postulo/templates/jobs/posting_detail.html
 msgid "Description"
 msgstr "Disgrifiad"
 
-#: src/postulo/jobs/models.py src/postulo/resume/models.py
+#: src/postulo/applications/models.py src/postulo/jobs/models.py
+#: src/postulo/resume/models.py
 msgid "description"
 msgstr "disgrifiad"
 
@@ -6809,6 +6904,7 @@ msgstr "Ed25519, base64. Hebddo nid oes catalog: nid yw rhestr heb ei llofnodi o
 
 #: src/postulo/templates/applications/application_detail.html
 #: src/postulo/templates/applications/interview_list.html
+#: src/postulo/templates/applications/subscription_list.html
 #: src/postulo/templates/applications/tag_list.html
 #: src/postulo/templates/connections/list.html
 #: src/postulo/templates/documents/letter_detail.html
@@ -6938,6 +7034,10 @@ msgstr "Cyflogwr"
 msgid "Employer structure is switched off, so departments and parents are not changed."
 msgstr "Mae strwythur cyflogwyr wedi'i ddiffodd, felly ni chaiff adrannau a rhieni eu newid."
 
+#: src/postulo/applications/forms.py
+msgid "Employment service"
+msgstr ""
+
 #: src/postulo/applications/models.py
 msgid "employment service"
 msgstr "gwasanaeth cyflogaeth"
@@ -7006,6 +7106,10 @@ msgstr "Peirianneg"
 msgctxt "name of a keyboard key"
 msgid "Enter"
 msgstr "Enter"
+
+#: src/postulo/applications/subscriptions.py
+msgid "Enter the calendar's web address, starting with https:// or webcal://."
+msgstr ""
 
 #: src/postulo/templates/accounts/delete_account.html
 #: src/postulo/templates/core/export.html
@@ -7132,11 +7236,11 @@ msgstr "Pob dogfen yn union fel yr oedd pan gafodd ei hanfon, wedi'i rhewi ar yr
 msgid "Every file goes without a title, an author, a subject or keywords, whatever is chosen below or typed for one file, and a PDF without the name of the program that drew it. The language stays unless you leave it out below as well."
 msgstr "Mae pob ffeil yn mynd heb deitl, awdur, pwnc nac allweddeiriau, beth bynnag a ddewisir isod neu a deipir ar gyfer un ffeil, a PDF heb enw'r rhaglen a'i lluniodd. Mae'r iaith yn aros oni bai eich bod yn ei gadael allan isod hefyd."
 
-#: src/postulo/plugins/syncing.py
+#: src/postulo/applications/models.py src/postulo/plugins/syncing.py
 msgid "Every four hours"
 msgstr "Bob pedair awr"
 
-#: src/postulo/plugins/syncing.py
+#: src/postulo/applications/models.py src/postulo/plugins/syncing.py
 msgid "Every hour"
 msgstr "Bob awr"
 
@@ -7715,6 +7819,14 @@ msgstr "Ar gyfer %(office)s"
 msgid "For a PNG or JPEG. Cuts out where it was taken, when and with what, which a phone's photograph carries, before it is kept and before it is sent anywhere. The picture itself is not touched. Untick it to keep the file exactly as it is."
 msgstr "Ar gyfer PNG neu JPEG. Mae'n torri allan ble y'i tynnwyd, pryd a gyda beth, sydd mewn ffotograff ffôn, cyn iddo gael ei gadw a chyn iddo gael ei anfon i unrhyw le. Nid yw'r llun ei hun yn cael ei gyffwrdd. Dad-diciwch ef i gadw'r ffeil yn union fel y mae."
 
+#: src/postulo/applications/forms.py
+msgid "For an appointment: the public employment service it is with."
+msgstr ""
+
+#: src/postulo/applications/forms.py
+msgid "For an interview: the application it is about."
+msgstr ""
+
 #: src/postulo/resume/models.py
 msgid "For example, “BSc Computer Science”."
 msgstr "Er enghraifft, “BSc Cyfrifiadureg”."
@@ -7913,6 +8025,10 @@ msgstr "O %(start)s i %(end)s"
 msgid "From %(start)s: now choose the last day"
 msgstr "O %(start)s: nawr dewiswch y diwrnod olaf"
 
+#: src/postulo/applications/agenda.py
+msgid "From a subscribed calendar:"
+msgstr ""
+
 #: src/postulo/core/models.py
 msgid "from address"
 msgstr "cyfeiriad yr anfonwr"
@@ -7948,6 +8064,16 @@ msgstr "O'r ddogfen yw'r enw y mae'r ddogfen yn ei argraffu, a dim byd lle nad y
 #: src/postulo/accounts/forms.py
 msgid "From the document is your name and the kind of document: “Alex Morgan — CV”."
 msgstr "O'r ddogfen yw eich enw a'r math o ddogfen: “Alex Morgan — CV”."
+
+#: src/postulo/templates/applications/subscribed_event.html
+#, python-format
+msgid "From the subscribed calendar %(name)s"
+msgstr ""
+
+#: src/postulo/applications/agenda.py
+#, python-format
+msgid "From the subscribed calendar %(name)s:"
+msgstr ""
 
 #: src/postulo/core/models.py
 msgid "from Wikidata"
@@ -8195,7 +8321,7 @@ msgstr "Nid oes gan Gravatar lun ar gyfer eich cyfeiriad, felly mae'ch llythrenn
 msgid "Green"
 msgstr "Gwyrdd"
 
-#: src/postulo/core/models.py
+#: src/postulo/applications/models.py src/postulo/core/models.py
 msgid "Grey"
 msgstr "Llwyd"
 
@@ -8485,6 +8611,10 @@ msgstr "Faint o le i'w adael"
 #: src/postulo/applications/widgets.py
 msgid "How much you sent, month by month, so a quiet stretch is visible."
 msgstr "Faint a anfonoch chi, fis wrth fis, fel bod cyfnod tawel i'w weld."
+
+#: src/postulo/applications/forms.py
+msgid "How often Postulo reads it again. One that cannot be read is tried less often until it can."
+msgstr ""
 
 #: src/postulo/resume/registry.py
 msgid "How often your work has been cited, as a source counted it on a given day: for all of it, or for one publication. Postulo counts nothing itself."
@@ -9254,6 +9384,10 @@ msgstr "Roedd yn dal yr adran yr oedd hyn ar ei chyfer."
 msgid "It holds nothing that needs moving."
 msgstr "Nid oes ganddo ddim sydd angen ei symud."
 
+#: src/postulo/templates/applications/subscribed_event.html
+msgid "It is a whole day, with no time to meet at, so it cannot be added as an appointment or an interview. Add one by hand if you need it."
+msgstr ""
+
 #: src/postulo/applications/views.py
 msgid "It is already done."
 msgstr "Mae wedi'i wneud eisoes."
@@ -9396,6 +9530,10 @@ msgstr "Mae ei data o dan %(licence)s."
 #: src/postulo/applications/ical_import.py
 msgid "Its date could not be read."
 msgstr "Ni ellid darllen ei ddyddiad."
+
+#: src/postulo/templates/applications/subscription_form.html
+msgid "Its events are drawn on your calendar as they are in the calendar it comes from. They cannot be changed here; any of them can be added as an appointment or an interview of your own."
+msgstr ""
 
 #: src/postulo/plugins/provenance.py
 msgid "Its file matches what a repository on this instance signed."
@@ -9585,6 +9723,11 @@ msgstr "Cânt eu cadw ar ôl iddynt gael eu defnyddio neu ddod i ben, oherwydd n
 #: src/postulo/jobs/share_views.py
 msgid "Kept apart: they will not be asked about again."
 msgstr "Wedi'u cadw ar wahân: ni ofynnir amdanynt eto."
+
+#: src/postulo/applications/forms.py
+#, python-format
+msgid "Kept as %(site)s. Leave it empty to keep it, or enter a new one."
+msgstr ""
 
 #: src/postulo/templates/partials/postal_addresses.html
 msgid "Kept as it was"
@@ -9808,8 +9951,8 @@ msgstr "gwiriad diwethaf"
 msgid "last checked"
 msgstr "gwiriwyd ddiwethaf"
 
-#: src/postulo/documents/models.py src/postulo/notifications/models.py
-#: src/postulo/plugins/models.py
+#: src/postulo/applications/models.py src/postulo/documents/models.py
+#: src/postulo/notifications/models.py src/postulo/plugins/models.py
 msgid "last error"
 msgstr "gwall diwethaf"
 
@@ -9824,6 +9967,19 @@ msgstr "Yr olaf a gyrhaeddodd"
 #: src/postulo/plugins/models.py
 msgid "last pushed"
 msgstr "gwthiwyd ddiwethaf"
+
+#: src/postulo/applications/models.py
+msgid "last read"
+msgstr ""
+
+#: src/postulo/templates/applications/subscription_list.html
+#, python-format
+msgid "Last read on %(when)s: %(counter)s event."
+msgid_plural "Last read on %(when)s: %(counter)s events."
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
 
 #: src/postulo/plugins/models.py
 msgid "last run"
@@ -9870,7 +10026,7 @@ msgstr "defnyddiwyd ddiwethaf"
 msgid "Last used %(when)s"
 msgstr "Defnyddiwyd ddiwethaf %(when)s"
 
-#: src/postulo/plugins/models.py
+#: src/postulo/applications/models.py src/postulo/plugins/models.py
 msgid "last worked"
 msgstr "gweithiodd ddiwethaf"
 
@@ -9987,6 +10143,14 @@ msgstr "Os gadewir yn wag, mae eich CVs yn argraffu “%(place)s”: tref a gwla
 #: src/postulo/jobs/capture_views.py
 msgid "Left empty it is today. Capturing a posting you applied to last week is common."
 msgstr "Os caiff ei adael yn wag, heddiw yw hi. Mae cipio hysbyseb y gwnaethoch gais amdani'r wythnos diwethaf yn beth cyffredin."
+
+#: src/postulo/applications/models.py
+msgid "left out"
+msgstr ""
+
+#: src/postulo/templates/applications/subscription_list.html
+msgid "Left out of the calendar:"
+msgstr ""
 
 #: src/postulo/templates/core/table_export.html
 #: src/postulo/templates/documents/themes/base_list.html
@@ -10862,9 +11026,9 @@ msgid "NACE section"
 msgstr "Adran NACE"
 
 #: src/postulo/accounts/models.py src/postulo/api/models.py
-#: src/postulo/core/models.py src/postulo/documents/models.py
-#: src/postulo/jobs/models.py src/postulo/plugins/models.py
-#: src/postulo/resume/models.py
+#: src/postulo/applications/models.py src/postulo/core/models.py
+#: src/postulo/documents/models.py src/postulo/jobs/models.py
+#: src/postulo/plugins/models.py src/postulo/resume/models.py
 msgid "name"
 msgstr "enw"
 
@@ -11046,6 +11210,11 @@ msgstr "Nodyn atgoffa newydd ar %(day)s"
 msgid "New since you last arranged this"
 msgstr "Newydd ers i chi drefnu hyn ddiwethaf"
 
+#: src/postulo/templates/applications/subscription_form.html
+#: src/postulo/templates/applications/subscription_list.html
+msgid "New subscription"
+msgstr ""
+
 #: src/postulo/templates/applications/tag_list.html
 msgid "New tag"
 msgstr "Tag newydd"
@@ -11135,6 +11304,10 @@ msgstr "Na"
 #: src/postulo/templates/server/plugins.html
 msgid "No address and no key, so nothing is offered from it."
 msgstr "Nid oes cyfeiriad nac allwedd, felly ni chynigir dim ohono."
+
+#: src/postulo/templates/applications/subscription_list.html
+msgid "No address: enter it again."
+msgstr ""
 
 #: src/postulo/core/offsite.py
 msgid "No age recipient is set, and nothing leaves this machine unencrypted."
@@ -11399,6 +11572,10 @@ msgstr "Ni chadwyd ffynhonnell y dudalen honno."
 #: src/postulo/templates/jobs/capture_page.html
 msgid "No source was kept."
 msgstr "Ni chadwyd ffynhonnell."
+
+#: src/postulo/templates/applications/subscription_list.html
+msgid "No subscriptions yet."
+msgstr ""
 
 #: src/postulo/api/routers/interviews.py src/postulo/api/routers/offers.py
 #: src/postulo/api/routers/reminders.py
@@ -11744,6 +11921,10 @@ msgstr "Nid yw'n cael ei argraffu ar CV."
 #: src/postulo/templates/resume/overview.html
 msgid "Not printed on any CV until they have agreed."
 msgstr "Nid yw'n cael ei argraffu ar unrhyw CV nes eu bod wedi cytuno."
+
+#: src/postulo/templates/applications/subscription_list.html
+msgid "Not read yet. It will be within minutes."
+msgstr ""
 
 #: src/postulo/applications/analytics.py src/postulo/applications/reports.py
 #: src/postulo/templates/applications/partials/status_card.html
@@ -12532,7 +12713,7 @@ msgstr "Wedi'i droi ymlaen. Wrth fewngofnodi gofynnir am god o'ch ap dilysu, neu
 msgid "On. Signing in asks for one of your security keys, or a recovery code."
 msgstr "Ymlaen. Mae mewngofnodi yn gofyn am un o'ch allweddi diogelwch, neu god adfer."
 
-#: src/postulo/plugins/syncing.py
+#: src/postulo/applications/models.py src/postulo/plugins/syncing.py
 msgid "Once a day"
 msgstr "Unwaith y dydd"
 
@@ -12930,6 +13111,7 @@ msgstr "Ceisiadau agored heb glywed dim, a'r tri pheth y gellir eu gwneud am hyn
 msgid "Open as this"
 msgstr "Agor fel hyn"
 
+#: src/postulo/templates/applications/subscribed_event.html
 #: src/postulo/templates/jobs/capture_form.html
 #: src/postulo/templates/jobs/capture_review.html
 msgid "Open it"
@@ -13922,6 +14104,11 @@ msgstr "Mae Postulo yn ei dacluso i sillafiad y gofrestr ei hun ac yn gwirio'r s
 msgid "Postulo version"
 msgstr "Fersiwn Postulo"
 
+#: src/postulo/templates/applications/subscription_list.html
+#, python-format
+msgid "Postulo will try again on %(when)s, and less often while it keeps failing."
+msgstr ""
+
 #: src/postulo/templates/partials/footer_links.html
 msgid "Postulo — your job search, your data."
 msgstr "Postulo — eich chwilio am swydd, eich data."
@@ -14400,6 +14587,10 @@ msgstr "Ailactifadu"
 msgid "Read %(name)s as"
 msgstr "Darllen %(name)s fel"
 
+#: src/postulo/applications/views_subscriptions.py
+msgid "Read again. The calendar shows what it holds now."
+msgstr ""
+
 #: src/postulo/templates/core/import_csv_map.html
 msgid "Read as"
 msgstr "Darllen fel"
@@ -14457,6 +14648,10 @@ msgstr "Wedi'i darllen o'r XML Europass sydd wedi'i atodi i'r PDF, y fformat y m
 msgid "Read it"
 msgstr "Ei ddarllen"
 
+#: src/postulo/applications/models.py
+msgid "read it again"
+msgstr ""
+
 #: src/postulo/templates/documents/letter_detail.html
 msgid "Read it as they will"
 msgstr "Darllenwch ef fel y byddan nhw'n ei ddarllen"
@@ -14464,6 +14659,10 @@ msgstr "Darllenwch ef fel y byddan nhw'n ei ddarllen"
 #: src/postulo/templates/documents/letter_detail.html
 msgid "Read it below"
 msgstr "Darllenwch ef isod"
+
+#: src/postulo/templates/applications/subscription_list.html
+msgid "Read it now"
+msgstr ""
 
 #: src/postulo/jobs/slow.py
 #, fuzzy
@@ -15124,7 +15323,7 @@ msgstr "rôl"
 msgid "Role / job title"
 msgstr "Rôl / teitl swydd"
 
-#: src/postulo/core/models.py
+#: src/postulo/applications/models.py src/postulo/core/models.py
 msgid "Rose"
 msgstr "Rhosliw"
 
@@ -15223,6 +15422,7 @@ msgstr "Dydd Sadwrn"
 #: src/postulo/templates/applications/interview_form.html
 #: src/postulo/templates/applications/offer_form.html
 #: src/postulo/templates/applications/reminder_form.html
+#: src/postulo/templates/applications/subscription_form.html
 #: src/postulo/templates/applications/tag_form.html
 #: src/postulo/templates/connections/form.html
 #: src/postulo/templates/documents/cv_form.html
@@ -16537,6 +16737,7 @@ msgstr "statws"
 #: src/postulo/templates/applications/partials/bulk_fields.html
 #: src/postulo/templates/applications/partials/status_card.html
 #: src/postulo/templates/applications/report.html
+#: src/postulo/templates/applications/subscribed_event.html
 #: src/postulo/templates/core/import_csv_map.html
 #: src/postulo/templates/documents/themes/base_report.html
 #: src/postulo/templates/jobs/company_form.html
@@ -16670,6 +16871,33 @@ msgstr "pwnc"
 #: src/postulo/accounts/models.py
 msgid "subject of exported files"
 msgstr "pwnc ffeiliau a allforiwyd"
+
+#: src/postulo/templates/applications/subscription_form.html
+msgid "Subscribe"
+msgstr ""
+
+#: src/postulo/applications/agenda.py
+msgid "Subscribed calendars"
+msgstr ""
+
+#: src/postulo/applications/models.py
+msgid "subscribed event"
+msgstr ""
+
+#: src/postulo/applications/models.py
+msgid "subscribed events"
+msgstr ""
+
+#: src/postulo/applications/views_subscriptions.py
+msgid "Subscribed. Its events appear on the calendar once it has been read, within minutes."
+msgstr ""
+
+#: src/postulo/templates/applications/calendar.html
+#: src/postulo/templates/applications/subscribed_event.html
+#: src/postulo/templates/applications/subscription_form.html
+#: src/postulo/templates/applications/subscription_list.html
+msgid "Subscriptions"
+msgstr ""
 
 #: src/postulo/templates/resume/overview.html
 msgid "Suggest from my ORCID record"
@@ -16900,7 +17128,7 @@ msgstr "Eu tynnu allan"
 msgid "Task"
 msgstr "Tasg"
 
-#: src/postulo/core/models.py
+#: src/postulo/applications/models.py src/postulo/core/models.py
 msgid "Teal"
 msgstr "Gwyrddlas"
 
@@ -17024,6 +17252,10 @@ msgstr "Ni ellid ychwanegu'r cyfeiriad hwnnw."
 #, python-format
 msgid "That address is %(type)s, not an image Postulo keeps."
 msgstr "Mae'r cyfeiriad hwnnw'n %(type)s, nid delwedd y mae Postulo yn ei chadw."
+
+#: src/postulo/applications/subscriptions.py
+msgid "That address is not one a calendar can be read from."
+msgstr ""
 
 #: src/postulo/plugins/public_addresses.py
 msgid "That address is on a private or local network, and Postulo will not fetch it. Paste the posting text in by hand instead."
@@ -17334,6 +17566,7 @@ msgstr[2] "Dyna lawer o brofion. Rhowch gynnig arall arni ymhen %(seconds)d eili
 msgstr[3] "Dyna lawer o brofion. Rhowch gynnig arall arni ymhen %(seconds)d eiliad."
 
 #: src/postulo/accounts/avatars.py
+#: src/postulo/applications/views_subscriptions.py
 msgid "That is a lot of tries. Wait a little before asking again."
 msgstr "Dyna lawer o gynigion. Arhoswch ychydig cyn gofyn eto."
 
@@ -17775,6 +18008,10 @@ msgstr "Atebodd y cyfeiriad %(code)s."
 msgid "The address answered with nothing."
 msgstr "Atebodd y cyfeiriad heb ddim."
 
+#: src/postulo/applications/subscriptions.py
+msgid "The address cannot be read here any more. Enter it again."
+msgstr ""
+
 #: src/postulo/jobs/tiles.py
 msgid "The address must hold {z}, {x} and {y}, where each tile's numbers go."
 msgstr "Rhaid i'r cyfeiriad gynnwys {z}, {x} a {y}, lle mae rhifau pob teilsen yn mynd."
@@ -17886,9 +18123,55 @@ msgstr "Mae'r calendr a'r adroddiadau'n dechrau eu hwythnosau arno. Os caiff ei 
 msgid "The calendar can be downloaded as an iCalendar file, for the period and kinds on the screen, and a file from another calendar can be read in, with a review of what it holds before anything is added."
 msgstr "Gellir llwytho'r calendr i lawr fel ffeil iCalendar, ar gyfer y cyfnod a'r mathau ar y sgrin, a gellir darllen ffeil o galendr arall i mewn, gydag adolygiad o'r hyn sydd ynddi cyn i ddim gael ei ychwanegu."
 
+#: src/postulo/applications/subscriptions.py
+msgid "The calendar could not be read."
+msgstr ""
+
+#: src/postulo/applications/subscriptions.py
+#, python-format
+msgid "The calendar is larger than %(limit)s MB, so it was not read."
+msgstr ""
+
+#: src/postulo/templates/applications/subscribed_event.html
+msgid "The calendar marks this as cancelled."
+msgstr ""
+
 #: src/postulo/accounts/forms.py
 msgid "The calendar's period buttons"
 msgstr "Botymau cyfnod y calendr"
+
+#: src/postulo/applications/subscriptions.py
+#, python-format
+msgid "The calendar's server answered with an error (%(status)s)."
+msgstr ""
+
+#: src/postulo/applications/subscriptions.py
+msgid "The calendar's server could not be reached."
+msgstr ""
+
+#: src/postulo/applications/subscriptions.py
+msgid "The calendar's server has nothing at that address any more."
+msgstr ""
+
+#: src/postulo/applications/subscriptions.py
+msgid "The calendar's server refused the address. It may have been changed or withdrawn."
+msgstr ""
+
+#: src/postulo/applications/subscriptions.py
+msgid "The calendar's server sent Postulo round too many redirects."
+msgstr ""
+
+#: src/postulo/applications/subscriptions.py
+msgid "The calendar's server sent something that could not be read."
+msgstr ""
+
+#: src/postulo/applications/subscriptions.py
+msgid "The calendar's server took too long to answer."
+msgstr ""
+
+#: src/postulo/applications/forms.py
+msgid "The calendar's web address, as the service that keeps it gives it: it starts with https:// or webcal:// and usually ends in .ics. It may open the calendar to anyone who has it, so Postulo keeps it encrypted and shows only its site."
+msgstr ""
 
 #: src/postulo/templates/jobs/capture_page_forget.html
 msgid "The capture stays as it is, and so does any listing it became."
@@ -19062,6 +19345,11 @@ msgstr "Y pwnc sydd ym mhob ffeil"
 msgid "The subject has to be one line."
 msgstr "Rhaid i'r pwnc fod yn un llinell."
 
+#: src/postulo/applications/views_subscriptions.py
+#, python-format
+msgid "the subscribed calendar %(name)s"
+msgstr ""
+
 #: src/postulo/templates/settings/appearance.html
 msgid "The switch at the top right cycles through the same three; this is the explicit version."
 msgstr "Mae'r switsh ar y dde uchaf yn newid drwy'r un tri; dyma'r fersiwn benodol."
@@ -19521,6 +19809,10 @@ msgstr "Adroddwyd bod y cwmni hwn yn diswyddo staff fel ar %(date)s."
 msgid "This entry prints its original text on every CV."
 msgstr "Mae'r cofnod hwn yn argraffu ei destun gwreiddiol ar bob CV."
 
+#: src/postulo/templates/applications/subscribed_event.html
+msgid "This event is already in your calendar as your own."
+msgstr ""
+
 #: src/postulo/documents/forms.py
 msgid "This export only. Your default is under Settings → Export."
 msgstr "Yr allforiad hwn yn unig. Mae eich rhagosodiad o dan Gosodiadau → Allforio."
@@ -19645,6 +19937,10 @@ msgstr "Mae hyn cyn y dyddiad y cafodd ei roi."
 #: src/postulo/resume/forms.py
 msgid "This is before the start date."
 msgstr "Mae hyn cyn y dyddiad dechrau."
+
+#: src/postulo/templates/applications/subscribed_event.html
+msgid "This is how the calendar it comes from has it, and it changes there. Postulo reads it again on its own."
+msgstr ""
 
 #: src/postulo/core/phones.py
 msgid "This is kept as it was typed, with no country in front of it, so it could not be checked and cannot be dialled from anywhere else."
@@ -20170,7 +20466,7 @@ msgstr "math o ddogfen"
 msgid "type of entry"
 msgstr "math o gofnod"
 
-#: src/postulo/applications/ical_import.py
+#: src/postulo/applications/forms.py src/postulo/applications/ical_import.py
 msgid "Type of interview"
 msgstr "Math o gyfweliad"
 
@@ -20251,6 +20547,10 @@ msgstr "Dad-diciwch i gadw'r cofnod ar yr amrywiad hwn ond ei adael oddi ar y du
 #: src/postulo/templates/server/defaults.html
 msgid "Under each language, how many of Postulo's strings a speaker has reviewed, how many are drafts nobody has read yet, and how many are not translated at all."
 msgstr "O dan bob iaith, faint o linynnau Postulo y mae siaradwr wedi'u hadolygu, faint sy'n ddrafftiau nad oes neb wedi'u darllen eto, a faint sydd heb eu cyfieithu o gwbl."
+
+#: src/postulo/templates/help/calendar.html
+msgid "Under Subscriptions, a calendar somebody else keeps -- an employment office's appointments, a training provider's sessions -- can be followed by its address. Postulo reads it again on its own and draws its events in the colour you chose, marked as from it. They cannot be changed here; any of them can be added as an appointment or an interview of your own."
+msgstr ""
 
 #: src/postulo/accounts/forms.py
 msgid "Underline links in navigation"
@@ -20583,7 +20883,7 @@ msgstr "Cadwyd y wedd."
 msgid "Views"
 msgstr "Gweddau"
 
-#: src/postulo/core/models.py
+#: src/postulo/applications/models.py src/postulo/core/models.py
 msgid "Violet"
 msgstr "Fioled"
 
@@ -20962,6 +21262,10 @@ msgstr "Beth ydoedd. Mae cipiad arall o'r un hysbyseb yn cael ei ychwanegu o'r s
 msgid "What it will hold"
 msgstr "Beth fydd ynddo"
 
+#: src/postulo/applications/forms.py
+msgid "What its events are drawn in on the calendar."
+msgstr ""
+
 #: src/postulo/templates/jobs/merge.html
 msgid "What moves"
 msgstr "Beth sy'n symud"
@@ -21260,6 +21564,7 @@ msgstr "Beth bynnag yw ei werth i chi, unwaith neu o bryd i'w gilydd, yn <a href
 msgid "when"
 msgstr "pryd"
 
+#: src/postulo/templates/applications/subscribed_event.html
 #: src/postulo/templates/documents/rendered_list.html
 #: src/postulo/templates/server/backups.html
 #: src/postulo/templates/server/design.html
@@ -21298,6 +21603,10 @@ msgstr "Pan fyddwch yn cofrestru'r gosodiad hwn gyda'r darparwr, rhowch y cyfeir
 #: src/postulo/applications/models.py
 msgid "where"
 msgstr "ble"
+
+#: src/postulo/templates/applications/subscribed_event.html
+msgid "Where"
+msgstr ""
 
 #: src/postulo/templates/help/links.html
 msgid "Where a card has a <em>Service</em> menu, choose the service the address is on. Its icon is shown beside it, and the address is checked against what an address on that service looks like, so a mistyped one is refused, and the refusal says why. Paste an address without choosing a service, and saving chooses it where the address is on one Postulo knows."
@@ -22480,6 +22789,10 @@ msgstr "Cedwir eich un chi"
 #: src/postulo/documents/forms.py
 msgid "Yours to set and never enforced: after it, Postulo warns and does not block."
 msgstr "Chi sy'n ei osod ac nid yw byth yn cael ei orfodi: ar ei ôl, mae Postulo yn rhybuddio ac nid yw'n rhwystro."
+
+#: src/postulo/applications/forms.py
+msgid "Yours, for telling it apart: drawn beside each of its events."
+msgstr ""
 
 #: src/postulo/applications/forms.py
 msgid "Yours, not the employer's. The list can be sorted and narrowed by it."

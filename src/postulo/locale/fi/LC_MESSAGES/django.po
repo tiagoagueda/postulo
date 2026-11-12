@@ -332,6 +332,20 @@ msgid_plural "%(count)s applications have gone quiet"
 msgstr[0] "%(count)s hakemus on hiljentynyt"
 msgstr[1] "%(count)s hakemusta on hiljentynyt"
 
+#: src/postulo/applications/subscriptions.py
+#, python-format
+msgid "%(count)s event whose date could not be read."
+msgid_plural "%(count)s events whose date could not be read."
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/postulo/applications/subscriptions.py
+#, python-format
+msgid "%(count)s event with a time but no time zone Postulo knows."
+msgid_plural "%(count)s events with a time but no time zone Postulo knows."
+msgstr[0] ""
+msgstr[1] ""
+
 #: src/postulo/jobs/closing.py
 #, python-format
 msgid "%(count)s listing you are considering closes soon"
@@ -360,12 +374,26 @@ msgid_plural "%(count)s removed"
 msgstr[0] "%(count)s poistettu"
 msgstr[1] "%(count)s poistettu"
 
+#: src/postulo/applications/subscriptions.py
+#, python-format
+msgid "%(count)s repeating event: Postulo does not read repeating events."
+msgid_plural "%(count)s repeating events: Postulo does not read repeating events."
+msgstr[0] ""
+msgstr[1] ""
+
 #: src/postulo/plugins/base.py
 #, python-format
 msgid "%(count)s skipped"
 msgid_plural "%(count)s skipped"
 msgstr[0] "%(count)s ohitettu"
 msgstr[1] "%(count)s ohitettu"
+
+#: src/postulo/applications/subscriptions.py
+#, python-format
+msgid "%(count)s task."
+msgid_plural "%(count)s tasks."
+msgstr[0] ""
+msgstr[1] ""
 
 #: src/postulo/templates/server/people.html
 #, python-format
@@ -1660,8 +1688,10 @@ msgstr "(avautuu uuteen välilehteen)"
 msgid "(part)"
 msgstr "(osittain)"
 
-#: src/postulo/applications/ical_import.py
+#: src/postulo/applications/agenda.py src/postulo/applications/ical_import.py
+#: src/postulo/applications/models.py
 #: src/postulo/templates/applications/ical_import.html
+#: src/postulo/templates/applications/subscribed_event.html
 msgid "(untitled)"
 msgstr "(nimetön)"
 
@@ -2908,6 +2938,7 @@ msgid "Activity"
 msgstr "Toimiala"
 
 #: src/postulo/templates/applications/application_detail.html
+#: src/postulo/templates/applications/subscribed_event.html
 #: src/postulo/templates/jobs/company_detail.html
 #: src/postulo/templates/jobs/company_form.html
 #: src/postulo/templates/resume/overview.html
@@ -2996,10 +3027,14 @@ msgstr "Lisää merkintä"
 msgid "Add it anyway"
 msgstr "Lisää se silti"
 
-#: src/postulo/applications/ical_import.py
+#: src/postulo/applications/forms.py src/postulo/applications/ical_import.py
 #, fuzzy
 msgid "Add it as"
 msgstr "Lisää tyyppinä"
+
+#: src/postulo/templates/applications/subscribed_event.html
+msgid "Add it as your own"
+msgstr ""
 
 #: src/postulo/templates/jobs/partials/bind_capture.html
 msgid "Add it, and next"
@@ -3117,6 +3152,14 @@ msgstr "Lisätty ilmoituksen historiaan."
 msgid "Added to the timeline."
 msgstr "Lisätty aikajanalle."
 
+#: src/postulo/applications/views_subscriptions.py
+msgid "Added to your appointments. It is yours to change now."
+msgstr ""
+
+#: src/postulo/applications/views_subscriptions.py
+msgid "Added to your interviews. It is yours to change now."
+msgstr ""
+
 #: src/postulo/jobs/listing_views.py
 msgid "Added to your listings."
 msgstr "Lisätty ilmoituksiisi."
@@ -3141,13 +3184,14 @@ msgstr "Tiedoston lisääminen vain lisää. Se, mitä sinulla jo on, jätetää
 msgid "addok (France's Base Adresse Nationale)"
 msgstr "addok (Ranskan Base Adresse Nationale)"
 
-#: src/postulo/applications/reports.py src/postulo/jobs/tables.py
-#: src/postulo/templates/partials/web_links.html
+#: src/postulo/applications/forms.py src/postulo/applications/reports.py
+#: src/postulo/jobs/tables.py src/postulo/templates/partials/web_links.html
 msgid "Address"
 msgstr "Osoite"
 
-#: src/postulo/core/models.py src/postulo/jobs/models.py
-#: src/postulo/notifications/models.py src/postulo/resume/models.py
+#: src/postulo/applications/models.py src/postulo/core/models.py
+#: src/postulo/jobs/models.py src/postulo/notifications/models.py
+#: src/postulo/resume/models.py
 msgid "address"
 msgstr "osoite"
 
@@ -3338,7 +3382,7 @@ msgstr "Aina päällä: Postulo ei toimi ilman sitä."
 msgid "Always this"
 msgstr "Aina tämä"
 
-#: src/postulo/core/models.py
+#: src/postulo/applications/models.py src/postulo/core/models.py
 msgid "Amber"
 msgstr "Meripihka"
 
@@ -3409,6 +3453,14 @@ msgstr "Ylläpitäjä teki tämän linkin käyttäjälle %(name)s. Se toimii ker
 msgid "An application's status changes"
 msgstr "Hakemuksen tila muuttuu"
 
+#: src/postulo/applications/forms.py
+msgid "An appointment"
+msgstr ""
+
+#: src/postulo/applications/forms.py
+msgid "An appointment is with a public employment service. Choose one."
+msgstr ""
+
 #: src/postulo/templates/core/export.html
 msgid "An archive can be imported into an empty account from the command line. It is not offered here because importing creates records rather than merging them, and that is a decision worth making deliberately rather than by clicking."
 msgstr "Arkiston voi tuoda tyhjään tiliin komentoriviltä. Sitä ei tarjota tässä, koska tuonti luo tietueita sen sijaan, että yhdistäisi niitä, ja se on päätös, joka kannattaa tehdä harkiten eikä napsauttamalla."
@@ -3470,11 +3522,11 @@ msgstr "Tuonti vain lisää. Mitään uratiedoissasi jo olevaa ei muuteta eikä 
 msgid "An index is a list of code to run here, so it must be signed and you must hold the key. Switching a repository off later stops new installs and updates from it; anything already installed keeps working."
 msgstr "Hakemisto on luettelo koodista, joka suoritetaan täällä, joten sen on oltava allekirjoitettu ja avaimen on oltava sinulla. Kun liitännäislähde myöhemmin kytketään pois päältä, siitä ei enää tehdä uusia asennuksia eikä päivityksiä; jo asennettu toimii edelleen."
 
-#: src/postulo/applications/ical_import.py
+#: src/postulo/applications/forms.py src/postulo/applications/ical_import.py
 msgid "An interview"
 msgstr "Haastattelu"
 
-#: src/postulo/applications/ical_import.py
+#: src/postulo/applications/forms.py src/postulo/applications/ical_import.py
 msgid "An interview belongs to an application. Choose one."
 msgstr "Haastattelu kuuluu hakemukseen. Valitse hakemus."
 
@@ -3686,7 +3738,8 @@ msgstr "API-tunnukset"
 msgid "Appearance"
 msgstr "Ulkoasu"
 
-#: src/postulo/applications/ical_import.py src/postulo/plugins/pairing.py
+#: src/postulo/applications/forms.py src/postulo/applications/ical_import.py
+#: src/postulo/plugins/pairing.py
 #: src/postulo/templates/applications/suggestion_list.html
 #: src/postulo/templates/base.html
 #: src/postulo/templates/documents/letter_detail.html
@@ -4167,6 +4220,7 @@ msgstr "B1 — keskitaso"
 msgid "B2 — upper intermediate"
 msgstr "B2 — ylempi keskitaso"
 
+#: src/postulo/templates/applications/subscribed_event.html
 #: src/postulo/templates/connections/pick.html
 #: src/postulo/templates/jobs/move_owner.html
 #: src/postulo/templates/jobs/share.html
@@ -4355,7 +4409,7 @@ msgstr "Bioteknologia"
 msgid "Blank keeps them for as long as the instance exists."
 msgstr "Jos kenttä on tyhjä, ne säilytetään niin kauan kuin instanssi on olemassa."
 
-#: src/postulo/core/models.py
+#: src/postulo/applications/models.py src/postulo/core/models.py
 msgid "Blue"
 msgstr "Sininen"
 
@@ -4509,6 +4563,9 @@ msgstr "C2 — erittäin taitava"
 #: src/postulo/templates/applications/application_detail.html
 #: src/postulo/templates/applications/calendar.html
 #: src/postulo/templates/applications/ical_import.html
+#: src/postulo/templates/applications/subscribed_event.html
+#: src/postulo/templates/applications/subscription_form.html
+#: src/postulo/templates/applications/subscription_list.html
 #: src/postulo/templates/cotton/date_field.html
 msgid "Calendar"
 msgstr "Kalenteri"
@@ -4521,6 +4578,14 @@ msgstr "Kalenteritiedosto"
 msgid "calendar identifier"
 msgstr "kalenteritunniste"
 
+#: src/postulo/applications/models.py
+msgid "calendar subscription"
+msgstr ""
+
+#: src/postulo/applications/models.py
+msgid "calendar subscriptions"
+msgstr ""
+
 #: src/postulo/templates/applications/calendar.html
 msgid "Calendar views"
 msgstr "Kalenterinäkymät"
@@ -4529,6 +4594,10 @@ msgstr "Kalenterinäkymät"
 #, python-format
 msgid "Calendar · %(period)s"
 msgstr "Kalenteri · %(period)s"
+
+#: src/postulo/templates/applications/subscription_list.html
+msgid "Calendars somebody else keeps, such as an employment office's appointments or a training provider's sessions. Postulo reads them again on their own and draws their events on your calendar, without changing them."
+msgstr ""
 
 #: src/postulo/applications/models.py src/postulo/jobs/models.py
 msgid "Call"
@@ -4550,6 +4619,7 @@ msgstr "Voidaan linkittää"
 #: src/postulo/templates/applications/interview_form.html
 #: src/postulo/templates/applications/offer_form.html
 #: src/postulo/templates/applications/reminder_form.html
+#: src/postulo/templates/applications/subscription_form.html
 #: src/postulo/templates/applications/tag_form.html
 #: src/postulo/templates/connections/confirm_delete.html
 #: src/postulo/templates/connections/form.html
@@ -4590,9 +4660,22 @@ msgstr "Peruuta"
 msgid "Cancelled"
 msgstr "Peruttu"
 
+#: src/postulo/applications/models.py
+msgid "cancelled"
+msgstr ""
+
 #: src/postulo/applications/agenda.py
 msgid "Cancelled interview:"
 msgstr "Peruttu haastattelu:"
+
+#: src/postulo/applications/agenda.py
+msgid "Cancelled, from a subscribed calendar:"
+msgstr ""
+
+#: src/postulo/applications/agenda.py
+#, python-format
+msgid "Cancelled, from the subscribed calendar %(name)s:"
+msgstr ""
 
 #: src/postulo/core/file_review.py
 msgid "Cannot be added"
@@ -5257,13 +5340,13 @@ msgstr "tulostettu koodivarasto"
 msgid "collection"
 msgstr "kokoelma"
 
+#: src/postulo/applications/models.py src/postulo/core/models.py
+msgid "colour"
+msgstr "väri"
+
 #: src/postulo/core/design.py src/postulo/templates/server/design.html
 msgid "Colour"
 msgstr "Väri"
-
-#: src/postulo/core/models.py
-msgid "colour"
-msgstr "väri"
 
 #: src/postulo/templates/core/import_csv_map.html
 msgid "Column in the file"
@@ -5862,6 +5945,7 @@ msgstr "Itse valitsemasi päivämäärät"
 msgid "Day"
 msgstr "Päivä"
 
+#: src/postulo/applications/models.py
 #: src/postulo/templates/settings/appearance.html
 msgid "day"
 msgid_plural "days"
@@ -6043,6 +6127,7 @@ msgstr "Puolustus"
 
 #: src/postulo/templates/applications/application_detail.html
 #: src/postulo/templates/applications/appointment_form.html
+#: src/postulo/templates/applications/subscription_list.html
 #: src/postulo/templates/applications/tag_list.html
 #: src/postulo/templates/cotton/delete_dialog.html
 #: src/postulo/templates/cotton/reminder_actions.html
@@ -6160,11 +6245,13 @@ msgstr "Syvyys"
 
 #: src/postulo/applications/forms.py src/postulo/core/csv_import.py
 #: src/postulo/jobs/models.py src/postulo/jobs/tables.py
+#: src/postulo/templates/applications/subscribed_event.html
 #: src/postulo/templates/jobs/posting_detail.html
 msgid "Description"
 msgstr "Kuvaus"
 
-#: src/postulo/jobs/models.py src/postulo/resume/models.py
+#: src/postulo/applications/models.py src/postulo/jobs/models.py
+#: src/postulo/resume/models.py
 msgid "description"
 msgstr "kuvaus"
 
@@ -6590,6 +6677,7 @@ msgstr "Ed25519, base64. Ilman sitä luetteloa ei ole: Postulo ei tarjoa allekir
 
 #: src/postulo/templates/applications/application_detail.html
 #: src/postulo/templates/applications/interview_list.html
+#: src/postulo/templates/applications/subscription_list.html
 #: src/postulo/templates/applications/tag_list.html
 #: src/postulo/templates/connections/list.html
 #: src/postulo/templates/documents/letter_detail.html
@@ -6721,6 +6809,10 @@ msgstr "Työnantaja"
 msgid "Employer structure is switched off, so departments and parents are not changed."
 msgstr "Työnantajarakenne on pois päältä, joten osastoja ja emoyhtiöitä ei muuteta."
 
+#: src/postulo/applications/forms.py
+msgid "Employment service"
+msgstr ""
+
 #: src/postulo/applications/models.py
 msgid "employment service"
 msgstr "työvoimapalvelu"
@@ -6790,6 +6882,10 @@ msgstr "Tekniikka"
 msgctxt "name of a keyboard key"
 msgid "Enter"
 msgstr "Enter"
+
+#: src/postulo/applications/subscriptions.py
+msgid "Enter the calendar's web address, starting with https:// or webcal://."
+msgstr ""
 
 #: src/postulo/templates/accounts/delete_account.html
 #: src/postulo/templates/core/export.html
@@ -6917,11 +7013,11 @@ msgstr "Jokainen asiakirja täsmälleen sellaisena kuin se lähti, jäädytettyn
 msgid "Every file goes without a title, an author, a subject or keywords, whatever is chosen below or typed for one file, and a PDF without the name of the program that drew it. The language stays unless you leave it out below as well."
 msgstr "Jokainen tiedosto lähtee ilman otsikkoa, tekijää, aihetta tai avainsanoja riippumatta siitä, mitä alla on valittu tai yhdelle tiedostolle kirjoitettu, ja PDF ilman sen piirtäneen ohjelman nimeä. Kieli säilyy, ellet jätä sitäkin pois alla."
 
-#: src/postulo/plugins/syncing.py
+#: src/postulo/applications/models.py src/postulo/plugins/syncing.py
 msgid "Every four hours"
 msgstr "Neljän tunnin välein"
 
-#: src/postulo/plugins/syncing.py
+#: src/postulo/applications/models.py src/postulo/plugins/syncing.py
 msgid "Every hour"
 msgstr "Tunnin välein"
 
@@ -7508,6 +7604,14 @@ msgstr "Toimistolle %(office)s"
 msgid "For a PNG or JPEG. Cuts out where it was taken, when and with what, which a phone's photograph carries, before it is kept and before it is sent anywhere. The picture itself is not touched. Untick it to keep the file exactly as it is."
 msgstr "PNG- ja JPEG-kuville. Poistaa tiedon siitä, missä, milloin ja millä kuva on otettu – puhelimella otetuissa valokuvissa tämä tieto on mukana – ennen kuin kuva tallennetaan ja ennen kuin se lähetetään minnekään. Itse kuvaan ei kosketa. Poista valinta, jos haluat säilyttää tiedoston täsmälleen sellaisenaan."
 
+#: src/postulo/applications/forms.py
+msgid "For an appointment: the public employment service it is with."
+msgstr ""
+
+#: src/postulo/applications/forms.py
+msgid "For an interview: the application it is about."
+msgstr ""
+
 #: src/postulo/resume/models.py
 msgid "For example, “BSc Computer Science”."
 msgstr "Esimerkiksi ”Tietojenkäsittelytieteen kandidaatti”."
@@ -7708,6 +7812,10 @@ msgstr "%(start)s–%(end)s"
 msgid "From %(start)s: now choose the last day"
 msgstr "Alkaen %(start)s: valitse nyt viimeinen päivä"
 
+#: src/postulo/applications/agenda.py
+msgid "From a subscribed calendar:"
+msgstr ""
+
 #: src/postulo/core/models.py
 msgid "from address"
 msgstr "lähettäjän osoite"
@@ -7746,6 +7854,16 @@ msgstr "Asiakirjasta tarkoittaa nimeä, jonka asiakirja tulostaa, tai ei mitää
 #: src/postulo/accounts/forms.py
 msgid "From the document is your name and the kind of document: “Alex Morgan — CV”."
 msgstr "Asiakirjasta tarkoittaa nimeäsi ja asiakirjan lajia: ”Alex Morgan — ansioluettelo”."
+
+#: src/postulo/templates/applications/subscribed_event.html
+#, python-format
+msgid "From the subscribed calendar %(name)s"
+msgstr ""
+
+#: src/postulo/applications/agenda.py
+#, python-format
+msgid "From the subscribed calendar %(name)s:"
+msgstr ""
 
 #: src/postulo/core/models.py
 msgid "from Wikidata"
@@ -7999,7 +8117,7 @@ msgstr "Gravatarilla ei ole kuvaa osoitteellesi, joten nimikirjaimesi pysyvät."
 msgid "Green"
 msgstr "Vihreä"
 
-#: src/postulo/core/models.py
+#: src/postulo/applications/models.py src/postulo/core/models.py
 msgid "Grey"
 msgstr "Harmaa"
 
@@ -8292,6 +8410,10 @@ msgstr "Kuinka paljon tilaa jätetään"
 #: src/postulo/applications/widgets.py
 msgid "How much you sent, month by month, so a quiet stretch is visible."
 msgstr "Kuinka paljon lähetit kuukausittain, jotta hiljainen jakso näkyy."
+
+#: src/postulo/applications/forms.py
+msgid "How often Postulo reads it again. One that cannot be read is tried less often until it can."
+msgstr ""
 
 #: src/postulo/resume/registry.py
 msgid "How often your work has been cited, as a source counted it on a given day: for all of it, or for one publication. Postulo counts nothing itself."
@@ -9059,6 +9181,10 @@ msgstr "Siinä oli osasto, jota tämä koski."
 msgid "It holds nothing that needs moving."
 msgstr "Siinä ei ole mitään siirrettävää."
 
+#: src/postulo/templates/applications/subscribed_event.html
+msgid "It is a whole day, with no time to meet at, so it cannot be added as an appointment or an interview. Add one by hand if you need it."
+msgstr ""
+
 #: src/postulo/applications/views.py
 msgid "It is already done."
 msgstr "Se on jo tehty."
@@ -9198,6 +9324,10 @@ msgstr "Sen tiedot ovat lisenssin %(licence)s alaisia."
 #: src/postulo/applications/ical_import.py
 msgid "Its date could not be read."
 msgstr "Sen päivämäärää ei voitu lukea."
+
+#: src/postulo/templates/applications/subscription_form.html
+msgid "Its events are drawn on your calendar as they are in the calendar it comes from. They cannot be changed here; any of them can be added as an appointment or an interview of your own."
+msgstr ""
 
 #: src/postulo/plugins/provenance.py
 msgid "Its file matches what a repository on this instance signed."
@@ -9389,6 +9519,11 @@ msgstr "Säilytetään käytön tai vanhenemisen jälkeen, koska jonkun tilin ta
 #: src/postulo/jobs/share_views.py
 msgid "Kept apart: they will not be asked about again."
 msgstr "Pidetty erillään: niistä ei kysytä uudelleen."
+
+#: src/postulo/applications/forms.py
+#, python-format
+msgid "Kept as %(site)s. Leave it empty to keep it, or enter a new one."
+msgstr ""
 
 #: src/postulo/templates/partials/postal_addresses.html
 msgid "Kept as it was"
@@ -9613,8 +9748,8 @@ msgstr "viimeisin tarkistus"
 msgid "last checked"
 msgstr "viimeksi tarkistettu"
 
-#: src/postulo/documents/models.py src/postulo/notifications/models.py
-#: src/postulo/plugins/models.py
+#: src/postulo/applications/models.py src/postulo/documents/models.py
+#: src/postulo/notifications/models.py src/postulo/plugins/models.py
 msgid "last error"
 msgstr "viimeisin virhe"
 
@@ -9630,6 +9765,17 @@ msgstr "Viimeisin perille saapunut"
 #, fuzzy
 msgid "last pushed"
 msgstr "viimeksi lähetetty"
+
+#: src/postulo/applications/models.py
+msgid "last read"
+msgstr ""
+
+#: src/postulo/templates/applications/subscription_list.html
+#, python-format
+msgid "Last read on %(when)s: %(counter)s event."
+msgid_plural "Last read on %(when)s: %(counter)s events."
+msgstr[0] ""
+msgstr[1] ""
 
 #: src/postulo/plugins/models.py
 msgid "last run"
@@ -9676,7 +9822,7 @@ msgstr "viimeksi käytetty"
 msgid "Last used %(when)s"
 msgstr "Viimeksi käytetty %(when)s"
 
-#: src/postulo/plugins/models.py
+#: src/postulo/applications/models.py src/postulo/plugins/models.py
 msgid "last worked"
 msgstr "viimeksi toiminut"
 
@@ -9794,6 +9940,14 @@ msgstr "Jos jätät tämän tyhjäksi, ansioluettelosi tulostavat ”%(place)s�
 #: src/postulo/jobs/capture_views.py
 msgid "Left empty it is today. Capturing a posting you applied to last week is common."
 msgstr "Tyhjäksi jätettynä päivä on tämä päivä. On tavallista kaapata työpaikkailmoitus, jota hait viime viikolla."
+
+#: src/postulo/applications/models.py
+msgid "left out"
+msgstr ""
+
+#: src/postulo/templates/applications/subscription_list.html
+msgid "Left out of the calendar:"
+msgstr ""
 
 #: src/postulo/templates/core/table_export.html
 #: src/postulo/templates/documents/themes/base_list.html
@@ -10671,9 +10825,9 @@ msgid "NACE section"
 msgstr "NACE-pääluokka"
 
 #: src/postulo/accounts/models.py src/postulo/api/models.py
-#: src/postulo/core/models.py src/postulo/documents/models.py
-#: src/postulo/jobs/models.py src/postulo/plugins/models.py
-#: src/postulo/resume/models.py
+#: src/postulo/applications/models.py src/postulo/core/models.py
+#: src/postulo/documents/models.py src/postulo/jobs/models.py
+#: src/postulo/plugins/models.py src/postulo/resume/models.py
 msgid "name"
 msgstr "nimi"
 
@@ -10856,6 +11010,11 @@ msgstr "Uusi muistutus päivälle %(day)s"
 msgid "New since you last arranged this"
 msgstr "Uutta sen jälkeen, kun viimeksi järjestit tämän"
 
+#: src/postulo/templates/applications/subscription_form.html
+#: src/postulo/templates/applications/subscription_list.html
+msgid "New subscription"
+msgstr ""
+
 #: src/postulo/templates/applications/tag_list.html
 msgid "New tag"
 msgstr "Uusi tunniste"
@@ -10943,6 +11102,10 @@ msgstr "Ei"
 #: src/postulo/templates/server/plugins.html
 msgid "No address and no key, so nothing is offered from it."
 msgstr "Ei osoitetta eikä avainta, joten siitä ei tarjota mitään."
+
+#: src/postulo/templates/applications/subscription_list.html
+msgid "No address: enter it again."
+msgstr ""
 
 #: src/postulo/core/offsite.py
 msgid "No age recipient is set, and nothing leaves this machine unencrypted."
@@ -11208,6 +11371,10 @@ msgstr "Siitä sivusta ei säilytetty lähdettä."
 #: src/postulo/templates/jobs/capture_page.html
 msgid "No source was kept."
 msgstr "Lähdettä ei säilytetty."
+
+#: src/postulo/templates/applications/subscription_list.html
+msgid "No subscriptions yet."
+msgstr ""
 
 #: src/postulo/api/routers/interviews.py src/postulo/api/routers/offers.py
 #: src/postulo/api/routers/reminders.py
@@ -11553,6 +11720,10 @@ msgstr "Ei tulosteta ansioluetteloon."
 #: src/postulo/templates/resume/overview.html
 msgid "Not printed on any CV until they have agreed."
 msgstr "Ei tulosteta mihinkään ansioluetteloon ennen kuin hän on suostunut."
+
+#: src/postulo/templates/applications/subscription_list.html
+msgid "Not read yet. It will be within minutes."
+msgstr ""
 
 #: src/postulo/applications/analytics.py src/postulo/applications/reports.py
 #: src/postulo/templates/applications/partials/status_card.html
@@ -12340,7 +12511,7 @@ msgstr "Päällä. Kirjautuminen kysyy koodin todennussovelluksestasi tai palaut
 msgid "On. Signing in asks for one of your security keys, or a recovery code."
 msgstr "Päällä. Kirjautuessa kysytään jotakin suojausavaimistasi tai palautuskoodia."
 
-#: src/postulo/plugins/syncing.py
+#: src/postulo/applications/models.py src/postulo/plugins/syncing.py
 msgid "Once a day"
 msgstr "Kerran päivässä"
 
@@ -12699,6 +12870,7 @@ msgstr "Avoimet hakemukset, joista ei ole kuulunut mitään, ja kolme tapaa toim
 msgid "Open as this"
 msgstr "Avaa tällaisena"
 
+#: src/postulo/templates/applications/subscribed_event.html
 #: src/postulo/templates/jobs/capture_form.html
 #: src/postulo/templates/jobs/capture_review.html
 msgid "Open it"
@@ -13696,6 +13868,11 @@ msgstr "Postulo siistii sen rekisterin omaan kirjoitusasuun ja tarkistaa muodon.
 msgid "Postulo version"
 msgstr "Postulon versio"
 
+#: src/postulo/templates/applications/subscription_list.html
+#, python-format
+msgid "Postulo will try again on %(when)s, and less often while it keeps failing."
+msgstr ""
+
 #: src/postulo/templates/partials/footer_links.html
 msgid "Postulo — your job search, your data."
 msgstr "Postulo — sinun työnhakusi, sinun tietosi."
@@ -14165,6 +14342,10 @@ msgstr "Ota uudelleen käyttöön"
 msgid "Read %(name)s as"
 msgstr "Tulkitse %(name)s kenttänä"
 
+#: src/postulo/applications/views_subscriptions.py
+msgid "Read again. The calendar shows what it holds now."
+msgstr ""
+
 #: src/postulo/templates/core/import_csv_map.html
 #, fuzzy
 msgid "Read as"
@@ -14225,6 +14406,10 @@ msgstr "Luettu PDF:ään liitetystä Europass XML -tiedostosta, muodossa, jota e
 msgid "Read it"
 msgstr "Lue se"
 
+#: src/postulo/applications/models.py
+msgid "read it again"
+msgstr ""
+
 #: src/postulo/templates/documents/letter_detail.html
 msgid "Read it as they will"
 msgstr "Lue se niin kuin he lukevat"
@@ -14232,6 +14417,10 @@ msgstr "Lue se niin kuin he lukevat"
 #: src/postulo/templates/documents/letter_detail.html
 msgid "Read it below"
 msgstr "Lue se alta"
+
+#: src/postulo/templates/applications/subscription_list.html
+msgid "Read it now"
+msgstr ""
 
 #: src/postulo/jobs/slow.py
 msgid "Read it. Check what was found before it becomes a listing."
@@ -14891,7 +15080,7 @@ msgstr "tehtävä"
 msgid "Role / job title"
 msgstr "Tehtävä / tehtävänimike"
 
-#: src/postulo/core/models.py
+#: src/postulo/applications/models.py src/postulo/core/models.py
 msgid "Rose"
 msgstr "Ruusunpunainen"
 
@@ -14989,6 +15178,7 @@ msgstr "Lauantai"
 #: src/postulo/templates/applications/interview_form.html
 #: src/postulo/templates/applications/offer_form.html
 #: src/postulo/templates/applications/reminder_form.html
+#: src/postulo/templates/applications/subscription_form.html
 #: src/postulo/templates/applications/tag_form.html
 #: src/postulo/templates/connections/form.html
 #: src/postulo/templates/documents/cv_form.html
@@ -16307,6 +16497,7 @@ msgstr "tila"
 #: src/postulo/templates/applications/partials/bulk_fields.html
 #: src/postulo/templates/applications/partials/status_card.html
 #: src/postulo/templates/applications/report.html
+#: src/postulo/templates/applications/subscribed_event.html
 #: src/postulo/templates/core/import_csv_map.html
 #: src/postulo/templates/documents/themes/base_report.html
 #: src/postulo/templates/jobs/company_form.html
@@ -16439,6 +16630,33 @@ msgstr "aihe"
 #: src/postulo/accounts/models.py
 msgid "subject of exported files"
 msgstr "vietyjen tiedostojen aihe"
+
+#: src/postulo/templates/applications/subscription_form.html
+msgid "Subscribe"
+msgstr ""
+
+#: src/postulo/applications/agenda.py
+msgid "Subscribed calendars"
+msgstr ""
+
+#: src/postulo/applications/models.py
+msgid "subscribed event"
+msgstr ""
+
+#: src/postulo/applications/models.py
+msgid "subscribed events"
+msgstr ""
+
+#: src/postulo/applications/views_subscriptions.py
+msgid "Subscribed. Its events appear on the calendar once it has been read, within minutes."
+msgstr ""
+
+#: src/postulo/templates/applications/calendar.html
+#: src/postulo/templates/applications/subscribed_event.html
+#: src/postulo/templates/applications/subscription_form.html
+#: src/postulo/templates/applications/subscription_list.html
+msgid "Subscriptions"
+msgstr ""
 
 #: src/postulo/templates/resume/overview.html
 msgid "Suggest from my ORCID record"
@@ -16668,7 +16886,7 @@ msgstr "Niiden poistaminen"
 msgid "Task"
 msgstr "Tehtävä"
 
-#: src/postulo/core/models.py
+#: src/postulo/applications/models.py src/postulo/core/models.py
 msgid "Teal"
 msgstr "Sinivihreä"
 
@@ -16791,6 +17009,10 @@ msgstr "Tätä osoitetta ei voitu lisätä."
 #, python-format
 msgid "That address is %(type)s, not an image Postulo keeps."
 msgstr "Osoitteen sisältö on tyyppiä %(type)s, eikä se ole kuva, jonka Postulo voi säilyttää."
+
+#: src/postulo/applications/subscriptions.py
+msgid "That address is not one a calendar can be read from."
+msgstr ""
 
 #: src/postulo/plugins/public_addresses.py
 msgid "That address is on a private or local network, and Postulo will not fetch it. Paste the posting text in by hand instead."
@@ -17093,6 +17315,7 @@ msgstr[0] "Testejä on paljon. Yritä uudelleen %(seconds)d sekunnin kuluttua."
 msgstr[1] "Testejä on paljon. Yritä uudelleen %(seconds)d sekunnin kuluttua."
 
 #: src/postulo/accounts/avatars.py
+#: src/postulo/applications/views_subscriptions.py
 msgid "That is a lot of tries. Wait a little before asking again."
 msgstr "Yrityskertoja on ollut paljon. Odota hetki ennen kuin pyydät uudelleen."
 
@@ -17522,6 +17745,10 @@ msgstr "Osoite vastasi koodilla %(code)s."
 msgid "The address answered with nothing."
 msgstr "Osoite ei palauttanut mitään."
 
+#: src/postulo/applications/subscriptions.py
+msgid "The address cannot be read here any more. Enter it again."
+msgstr ""
+
 #: src/postulo/jobs/tiles.py
 msgid "The address must hold {z}, {x} and {y}, where each tile's numbers go."
 msgstr "Osoitteessa on oltava {z}, {x} ja {y} kohdissa, joihin kunkin karttatiilen numerot tulevat."
@@ -17633,9 +17860,55 @@ msgstr "Kalenteri ja raportit aloittavat viikkonsa tästä päivästä. Kielen o
 msgid "The calendar can be downloaded as an iCalendar file, for the period and kinds on the screen, and a file from another calendar can be read in, with a review of what it holds before anything is added."
 msgstr "Kalenterin voi ladata iCalendar-tiedostona näytöllä olevalta ajanjaksolta ja näytetyistä tyypeistä, ja toisen kalenterin tiedoston voi tuoda, jolloin sen sisältö tarkistetaan ennen kuin mitään lisätään."
 
+#: src/postulo/applications/subscriptions.py
+msgid "The calendar could not be read."
+msgstr ""
+
+#: src/postulo/applications/subscriptions.py
+#, python-format
+msgid "The calendar is larger than %(limit)s MB, so it was not read."
+msgstr ""
+
+#: src/postulo/templates/applications/subscribed_event.html
+msgid "The calendar marks this as cancelled."
+msgstr ""
+
 #: src/postulo/accounts/forms.py
 msgid "The calendar's period buttons"
 msgstr "Kalenterin jaksopainikkeet"
+
+#: src/postulo/applications/subscriptions.py
+#, python-format
+msgid "The calendar's server answered with an error (%(status)s)."
+msgstr ""
+
+#: src/postulo/applications/subscriptions.py
+msgid "The calendar's server could not be reached."
+msgstr ""
+
+#: src/postulo/applications/subscriptions.py
+msgid "The calendar's server has nothing at that address any more."
+msgstr ""
+
+#: src/postulo/applications/subscriptions.py
+msgid "The calendar's server refused the address. It may have been changed or withdrawn."
+msgstr ""
+
+#: src/postulo/applications/subscriptions.py
+msgid "The calendar's server sent Postulo round too many redirects."
+msgstr ""
+
+#: src/postulo/applications/subscriptions.py
+msgid "The calendar's server sent something that could not be read."
+msgstr ""
+
+#: src/postulo/applications/subscriptions.py
+msgid "The calendar's server took too long to answer."
+msgstr ""
+
+#: src/postulo/applications/forms.py
+msgid "The calendar's web address, as the service that keeps it gives it: it starts with https:// or webcal:// and usually ends in .ics. It may open the calendar to anyone who has it, so Postulo keeps it encrypted and shows only its site."
+msgstr ""
 
 #: src/postulo/templates/jobs/capture_page_forget.html
 msgid "The capture stays as it is, and so does any listing it became."
@@ -18799,6 +19072,11 @@ msgstr "Kaikkien tiedostojen aihe"
 msgid "The subject has to be one line."
 msgstr "Aiheen on oltava yhdellä rivillä."
 
+#: src/postulo/applications/views_subscriptions.py
+#, python-format
+msgid "the subscribed calendar %(name)s"
+msgstr ""
+
 #: src/postulo/templates/settings/appearance.html
 msgid "The switch at the top right cycles through the same three; this is the explicit version."
 msgstr "Oikean yläkulman valitsin kiertää samat kolme vaihtoehtoa; tämä on suora versio."
@@ -19257,6 +19535,10 @@ msgstr "Tämän yrityksen raportoitiin %(date)s irtisanovan työntekijöitä."
 msgid "This entry prints its original text on every CV."
 msgstr "Tämä merkintä tulostuu jokaiseen ansioluetteloon alkuperäisellä tekstillään."
 
+#: src/postulo/templates/applications/subscribed_event.html
+msgid "This event is already in your calendar as your own."
+msgstr ""
+
 #: src/postulo/documents/forms.py
 msgid "This export only. Your default is under Settings → Export."
 msgstr "Vain tämä vienti. Oletuksesi on kohdassa Asetukset → Vie."
@@ -19381,6 +19663,10 @@ msgstr "Tämä on ennen sen myöntämispäivää."
 #: src/postulo/resume/forms.py
 msgid "This is before the start date."
 msgstr "Tämä on ennen aloituspäivää."
+
+#: src/postulo/templates/applications/subscribed_event.html
+msgid "This is how the calendar it comes from has it, and it changes there. Postulo reads it again on its own."
+msgstr ""
 
 #: src/postulo/core/phones.py
 msgid "This is kept as it was typed, with no country in front of it, so it could not be checked and cannot be dialled from anywhere else."
@@ -19900,7 +20186,7 @@ msgstr "asiakirjan tyyppi"
 msgid "type of entry"
 msgstr "merkinnän tyyppi"
 
-#: src/postulo/applications/ical_import.py
+#: src/postulo/applications/forms.py src/postulo/applications/ical_import.py
 msgid "Type of interview"
 msgstr "Haastattelun tyyppi"
 
@@ -19983,6 +20269,10 @@ msgstr "Poista valinta, jos haluat säilyttää merkinnän tässä versiossa mut
 #: src/postulo/templates/server/defaults.html
 msgid "Under each language, how many of Postulo's strings a speaker has reviewed, how many are drafts nobody has read yet, and how many are not translated at all."
 msgstr "Kunkin kielen alla: kuinka monta Postulon merkkijonoa kielen puhuja on tarkistanut, kuinka moni on luonnos, jota kukaan ei ole vielä lukenut, ja kuinka montaa ei ole käännetty lainkaan."
+
+#: src/postulo/templates/help/calendar.html
+msgid "Under Subscriptions, a calendar somebody else keeps -- an employment office's appointments, a training provider's sessions -- can be followed by its address. Postulo reads it again on its own and draws its events in the colour you chose, marked as from it. They cannot be changed here; any of them can be added as an appointment or an interview of your own."
+msgstr ""
 
 #: src/postulo/accounts/forms.py
 msgid "Underline links in navigation"
@@ -20315,7 +20605,7 @@ msgstr "Näkymä tallennettu."
 msgid "Views"
 msgstr "Näkymät"
 
-#: src/postulo/core/models.py
+#: src/postulo/applications/models.py src/postulo/core/models.py
 msgid "Violet"
 msgstr "Violetti"
 
@@ -20694,6 +20984,10 @@ msgstr "Mikä se oli. Toinen saman ilmoituksen kaappaus lisätään tarkistusnä
 msgid "What it will hold"
 msgstr "Mitä se sisältää"
 
+#: src/postulo/applications/forms.py
+msgid "What its events are drawn in on the calendar."
+msgstr ""
+
 #: src/postulo/templates/jobs/merge.html
 msgid "What moves"
 msgstr "Mikä siirtyy"
@@ -20991,6 +21285,7 @@ msgstr "Sen verran kuin se on sinulle arvoista, kerran tai silloin tällöin, os
 msgid "when"
 msgstr "milloin"
 
+#: src/postulo/templates/applications/subscribed_event.html
 #: src/postulo/templates/documents/rendered_list.html
 #: src/postulo/templates/server/backups.html
 #: src/postulo/templates/server/design.html
@@ -21030,6 +21325,10 @@ msgstr "Kun rekisteröit tämän instanssin palveluntarjoajalle, anna sille täm
 #: src/postulo/applications/models.py
 msgid "where"
 msgstr "missä"
+
+#: src/postulo/templates/applications/subscribed_event.html
+msgid "Where"
+msgstr ""
 
 #: src/postulo/templates/help/links.html
 msgid "Where a card has a <em>Service</em> menu, choose the service the address is on. Its icon is shown beside it, and the address is checked against what an address on that service looks like, so a mistyped one is refused, and the refusal says why. Paste an address without choosing a service, and saving chooses it where the address is on one Postulo knows."
@@ -22201,6 +22500,10 @@ msgstr "Sinun versiosi säilytetään"
 #: src/postulo/documents/forms.py
 msgid "Yours to set and never enforced: after it, Postulo warns and does not block."
 msgstr "Itse asetettava, eikä sitä koskaan valvota: sen jälkeen Postulo varoittaa mutta ei estä."
+
+#: src/postulo/applications/forms.py
+msgid "Yours, for telling it apart: drawn beside each of its events."
+msgstr ""
 
 #: src/postulo/applications/forms.py
 msgid "Yours, not the employer's. The list can be sorted and narrowed by it."

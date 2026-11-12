@@ -414,6 +414,24 @@ msgstr[1] "%(count)s prijavi sta utihnili"
 msgstr[2] "%(count)s prijave so utihnile"
 msgstr[3] "%(count)s prijav je utihnilo"
 
+#: src/postulo/applications/subscriptions.py
+#, python-format
+msgid "%(count)s event whose date could not be read."
+msgid_plural "%(count)s events whose date could not be read."
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+
+#: src/postulo/applications/subscriptions.py
+#, python-format
+msgid "%(count)s event with a time but no time zone Postulo knows."
+msgid_plural "%(count)s events with a time but no time zone Postulo knows."
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+
 #: src/postulo/jobs/closing.py
 #, python-format
 msgid "%(count)s listing you are considering closes soon"
@@ -450,6 +468,15 @@ msgstr[1] "odstranjeno: %(count)s"
 msgstr[2] "odstranjeno: %(count)s"
 msgstr[3] "odstranjeno: %(count)s"
 
+#: src/postulo/applications/subscriptions.py
+#, python-format
+msgid "%(count)s repeating event: Postulo does not read repeating events."
+msgid_plural "%(count)s repeating events: Postulo does not read repeating events."
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+
 #: src/postulo/plugins/base.py
 #, python-format
 msgid "%(count)s skipped"
@@ -458,6 +485,15 @@ msgstr[0] "preskočeno: %(count)s"
 msgstr[1] "preskočeno: %(count)s"
 msgstr[2] "preskočeno: %(count)s"
 msgstr[3] "preskočeno: %(count)s"
+
+#: src/postulo/applications/subscriptions.py
+#, python-format
+msgid "%(count)s task."
+msgid_plural "%(count)s tasks."
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
 
 #: src/postulo/templates/server/people.html
 #, python-format
@@ -1856,8 +1892,10 @@ msgstr "(odpre se v novem zavihku)"
 msgid "(part)"
 msgstr "(delno)"
 
-#: src/postulo/applications/ical_import.py
+#: src/postulo/applications/agenda.py src/postulo/applications/ical_import.py
+#: src/postulo/applications/models.py
 #: src/postulo/templates/applications/ical_import.html
+#: src/postulo/templates/applications/subscribed_event.html
 msgid "(untitled)"
 msgstr "(brez naslova)"
 
@@ -3112,6 +3150,7 @@ msgid "Activity"
 msgstr "Dejavnost"
 
 #: src/postulo/templates/applications/application_detail.html
+#: src/postulo/templates/applications/subscribed_event.html
 #: src/postulo/templates/jobs/company_detail.html
 #: src/postulo/templates/jobs/company_form.html
 #: src/postulo/templates/resume/overview.html
@@ -3198,9 +3237,13 @@ msgstr "Dodaj vnos"
 msgid "Add it anyway"
 msgstr "Vseeno dodaj"
 
-#: src/postulo/applications/ical_import.py
+#: src/postulo/applications/forms.py src/postulo/applications/ical_import.py
 msgid "Add it as"
 msgstr "Dodaj kot"
+
+#: src/postulo/templates/applications/subscribed_event.html
+msgid "Add it as your own"
+msgstr ""
 
 #: src/postulo/templates/jobs/partials/bind_capture.html
 msgid "Add it, and next"
@@ -3324,6 +3367,14 @@ msgstr "Dodano v zgodovino oglasa."
 msgid "Added to the timeline."
 msgstr "Dodano na časovnico."
 
+#: src/postulo/applications/views_subscriptions.py
+msgid "Added to your appointments. It is yours to change now."
+msgstr ""
+
+#: src/postulo/applications/views_subscriptions.py
+msgid "Added to your interviews. It is yours to change now."
+msgstr ""
+
 #: src/postulo/jobs/listing_views.py
 msgid "Added to your listings."
 msgstr "Dodano med vaše oglase."
@@ -3348,13 +3399,14 @@ msgstr "Dodajanje datoteke samo dodaja. Kar že imate, ostane natanko tako, kot 
 msgid "addok (France's Base Adresse Nationale)"
 msgstr "addok (francoska Base Adresse Nationale)"
 
-#: src/postulo/applications/reports.py src/postulo/jobs/tables.py
-#: src/postulo/templates/partials/web_links.html
+#: src/postulo/applications/forms.py src/postulo/applications/reports.py
+#: src/postulo/jobs/tables.py src/postulo/templates/partials/web_links.html
 msgid "Address"
 msgstr "Naslov"
 
-#: src/postulo/core/models.py src/postulo/jobs/models.py
-#: src/postulo/notifications/models.py src/postulo/resume/models.py
+#: src/postulo/applications/models.py src/postulo/core/models.py
+#: src/postulo/jobs/models.py src/postulo/notifications/models.py
+#: src/postulo/resume/models.py
 msgid "address"
 msgstr "naslov"
 
@@ -3547,7 +3599,7 @@ msgstr "Vedno vklopljeno: Postulo brez njega ne more delovati."
 msgid "Always this"
 msgstr "Vedno to"
 
-#: src/postulo/core/models.py
+#: src/postulo/applications/models.py src/postulo/core/models.py
 msgid "Amber"
 msgstr "Jantarna"
 
@@ -3618,6 +3670,14 @@ msgstr "Skrbnik je to povezavo ustvaril za %(name)s. Deluje enkrat in to je tist
 msgid "An application's status changes"
 msgstr "Stanje prijave se spremeni"
 
+#: src/postulo/applications/forms.py
+msgid "An appointment"
+msgstr ""
+
+#: src/postulo/applications/forms.py
+msgid "An appointment is with a public employment service. Choose one."
+msgstr ""
+
 #: src/postulo/templates/core/export.html
 msgid "An archive can be imported into an empty account from the command line. It is not offered here because importing creates records rather than merging them, and that is a decision worth making deliberately rather than by clicking."
 msgstr "Arhiv je mogoče uvoziti v prazen račun iz ukazne vrstice. Tukaj ni na voljo, ker uvoz ustvarja zapise, namesto da bi jih združeval, in to je odločitev, ki jo je vredno sprejeti premišljeno in ne s klikom."
@@ -3679,11 +3739,11 @@ msgstr "Uvoz samo dodaja. Nič, kar je že v vašem kariernem zapisu, se ne spre
 msgid "An index is a list of code to run here, so it must be signed and you must hold the key. Switching a repository off later stops new installs and updates from it; anything already installed keeps working."
 msgstr "Indeks je seznam kode, ki se izvede tukaj, zato mora biti podpisan in imeti morate ključ. Poznejši izklop repozitorija ustavi nove namestitve in posodobitve iz njega; kar je že nameščeno, deluje naprej."
 
-#: src/postulo/applications/ical_import.py
+#: src/postulo/applications/forms.py src/postulo/applications/ical_import.py
 msgid "An interview"
 msgstr "Razgovor"
 
-#: src/postulo/applications/ical_import.py
+#: src/postulo/applications/forms.py src/postulo/applications/ical_import.py
 msgid "An interview belongs to an application. Choose one."
 msgstr "Razgovor spada k prijavi. Izberite eno."
 
@@ -3903,7 +3963,8 @@ msgstr "Žetoni API"
 msgid "Appearance"
 msgstr "Videz"
 
-#: src/postulo/applications/ical_import.py src/postulo/plugins/pairing.py
+#: src/postulo/applications/forms.py src/postulo/applications/ical_import.py
+#: src/postulo/plugins/pairing.py
 #: src/postulo/templates/applications/suggestion_list.html
 #: src/postulo/templates/base.html
 #: src/postulo/templates/documents/letter_detail.html
@@ -4395,6 +4456,7 @@ msgstr "B1 — srednji"
 msgid "B2 — upper intermediate"
 msgstr "B2 — višji srednji"
 
+#: src/postulo/templates/applications/subscribed_event.html
 #: src/postulo/templates/connections/pick.html
 #: src/postulo/templates/jobs/move_owner.html
 #: src/postulo/templates/jobs/share.html
@@ -4582,7 +4644,7 @@ msgstr "Biotehnologija"
 msgid "Blank keeps them for as long as the instance exists."
 msgstr "Če pustite prazno, se hranijo, dokler instanca obstaja."
 
-#: src/postulo/core/models.py
+#: src/postulo/applications/models.py src/postulo/core/models.py
 msgid "Blue"
 msgstr "Modra"
 
@@ -4738,6 +4800,9 @@ msgstr "C2 — mojstrski"
 #: src/postulo/templates/applications/application_detail.html
 #: src/postulo/templates/applications/calendar.html
 #: src/postulo/templates/applications/ical_import.html
+#: src/postulo/templates/applications/subscribed_event.html
+#: src/postulo/templates/applications/subscription_form.html
+#: src/postulo/templates/applications/subscription_list.html
 #: src/postulo/templates/cotton/date_field.html
 msgid "Calendar"
 msgstr "Koledar"
@@ -4750,6 +4815,14 @@ msgstr "Koledarska datoteka"
 msgid "calendar identifier"
 msgstr "identifikator koledarja"
 
+#: src/postulo/applications/models.py
+msgid "calendar subscription"
+msgstr ""
+
+#: src/postulo/applications/models.py
+msgid "calendar subscriptions"
+msgstr ""
+
 #: src/postulo/templates/applications/calendar.html
 msgid "Calendar views"
 msgstr "Pogledi koledarja"
@@ -4758,6 +4831,10 @@ msgstr "Pogledi koledarja"
 #, python-format
 msgid "Calendar · %(period)s"
 msgstr "Koledar · %(period)s"
+
+#: src/postulo/templates/applications/subscription_list.html
+msgid "Calendars somebody else keeps, such as an employment office's appointments or a training provider's sessions. Postulo reads them again on their own and draws their events on your calendar, without changing them."
+msgstr ""
 
 #: src/postulo/applications/models.py src/postulo/jobs/models.py
 msgid "Call"
@@ -4779,6 +4856,7 @@ msgstr "Lahko se združi z"
 #: src/postulo/templates/applications/interview_form.html
 #: src/postulo/templates/applications/offer_form.html
 #: src/postulo/templates/applications/reminder_form.html
+#: src/postulo/templates/applications/subscription_form.html
 #: src/postulo/templates/applications/tag_form.html
 #: src/postulo/templates/connections/confirm_delete.html
 #: src/postulo/templates/connections/form.html
@@ -4819,9 +4897,22 @@ msgstr "Prekliči"
 msgid "Cancelled"
 msgstr "Odpovedano"
 
+#: src/postulo/applications/models.py
+msgid "cancelled"
+msgstr ""
+
 #: src/postulo/applications/agenda.py
 msgid "Cancelled interview:"
 msgstr "Odpovedan razgovor:"
+
+#: src/postulo/applications/agenda.py
+msgid "Cancelled, from a subscribed calendar:"
+msgstr ""
+
+#: src/postulo/applications/agenda.py
+#, python-format
+msgid "Cancelled, from the subscribed calendar %(name)s:"
+msgstr ""
 
 #: src/postulo/core/file_review.py
 msgid "Cannot be added"
@@ -5487,13 +5578,13 @@ msgstr "natisnjeni repozitorij kode"
 msgid "collection"
 msgstr "zbirka"
 
+#: src/postulo/applications/models.py src/postulo/core/models.py
+msgid "colour"
+msgstr "barva"
+
 #: src/postulo/core/design.py src/postulo/templates/server/design.html
 msgid "Colour"
 msgstr "Barva"
-
-#: src/postulo/core/models.py
-msgid "colour"
-msgstr "barva"
 
 #: src/postulo/templates/core/import_csv_map.html
 msgid "Column in the file"
@@ -6094,6 +6185,7 @@ msgstr "Datumi po vaši izbiri"
 msgid "Day"
 msgstr "Dan"
 
+#: src/postulo/applications/models.py
 #: src/postulo/templates/settings/appearance.html
 msgid "day"
 msgid_plural "days"
@@ -6279,6 +6371,7 @@ msgstr "Obramba"
 
 #: src/postulo/templates/applications/application_detail.html
 #: src/postulo/templates/applications/appointment_form.html
+#: src/postulo/templates/applications/subscription_list.html
 #: src/postulo/templates/applications/tag_list.html
 #: src/postulo/templates/cotton/delete_dialog.html
 #: src/postulo/templates/cotton/reminder_actions.html
@@ -6396,11 +6489,13 @@ msgstr "Globina"
 
 #: src/postulo/applications/forms.py src/postulo/core/csv_import.py
 #: src/postulo/jobs/models.py src/postulo/jobs/tables.py
+#: src/postulo/templates/applications/subscribed_event.html
 #: src/postulo/templates/jobs/posting_detail.html
 msgid "Description"
 msgstr "Opis"
 
-#: src/postulo/jobs/models.py src/postulo/resume/models.py
+#: src/postulo/applications/models.py src/postulo/jobs/models.py
+#: src/postulo/resume/models.py
 msgid "description"
 msgstr "opis"
 
@@ -6828,6 +6923,7 @@ msgstr "Ed25519, base64. Brez njega ni kataloga: nepodpisanega seznama naslovov,
 
 #: src/postulo/templates/applications/application_detail.html
 #: src/postulo/templates/applications/interview_list.html
+#: src/postulo/templates/applications/subscription_list.html
 #: src/postulo/templates/applications/tag_list.html
 #: src/postulo/templates/connections/list.html
 #: src/postulo/templates/documents/letter_detail.html
@@ -6957,6 +7053,10 @@ msgstr "Delodajalec"
 msgid "Employer structure is switched off, so departments and parents are not changed."
 msgstr "Struktura delodajalca je izklopljena, zato se oddelki in matična podjetja ne spremenijo."
 
+#: src/postulo/applications/forms.py
+msgid "Employment service"
+msgstr ""
+
 #: src/postulo/applications/models.py
 msgid "employment service"
 msgstr "zavod za zaposlovanje"
@@ -7024,6 +7124,10 @@ msgstr "Inženirstvo"
 msgctxt "name of a keyboard key"
 msgid "Enter"
 msgstr "Enter"
+
+#: src/postulo/applications/subscriptions.py
+msgid "Enter the calendar's web address, starting with https:// or webcal://."
+msgstr ""
 
 #: src/postulo/templates/accounts/delete_account.html
 #: src/postulo/templates/core/export.html
@@ -7150,11 +7254,11 @@ msgstr "Vsak dokument točno tak, kot je odšel, zamrznjen v trenutku pošiljanj
 msgid "Every file goes without a title, an author, a subject or keywords, whatever is chosen below or typed for one file, and a PDF without the name of the program that drew it. The language stays unless you leave it out below as well."
 msgstr "Nobena datoteka nima naslova, avtorja, zadeve ali ključnih besed, ne glede na to, kaj je izbrano spodaj ali vpisano za posamezno datoteko, PDF pa tudi ne imena programa, ki ga je izrisal. Jezik ostane, razen če ga spodaj tudi izpustite."
 
-#: src/postulo/plugins/syncing.py
+#: src/postulo/applications/models.py src/postulo/plugins/syncing.py
 msgid "Every four hours"
 msgstr "Vsake štiri ure"
 
-#: src/postulo/plugins/syncing.py
+#: src/postulo/applications/models.py src/postulo/plugins/syncing.py
 msgid "Every hour"
 msgstr "Vsako uro"
 
@@ -7739,6 +7843,14 @@ msgstr "Za %(office)s"
 msgid "For a PNG or JPEG. Cuts out where it was taken, when and with what, which a phone's photograph carries, before it is kept and before it is sent anywhere. The picture itself is not touched. Untick it to keep the file exactly as it is."
 msgstr "Za PNG ali JPEG. Preden se slika shrani in preden se kamor koli pošlje, odstrani podatke o tem, kje, kdaj in s čim je bila posneta, ki jih nosi fotografija iz telefona. Same slike se ne dotakne. Odznačite, če želite datoteko obdržati natanko tako, kot je."
 
+#: src/postulo/applications/forms.py
+msgid "For an appointment: the public employment service it is with."
+msgstr ""
+
+#: src/postulo/applications/forms.py
+msgid "For an interview: the application it is about."
+msgstr ""
+
 #: src/postulo/resume/models.py
 msgid "For example, “BSc Computer Science”."
 msgstr "Na primer »Diplomirani inženir računalništva«."
@@ -7938,6 +8050,10 @@ msgstr "Od %(start)s do %(end)s"
 msgid "From %(start)s: now choose the last day"
 msgstr "Od %(start)s: zdaj izberite zadnji dan"
 
+#: src/postulo/applications/agenda.py
+msgid "From a subscribed calendar:"
+msgstr ""
+
 #: src/postulo/core/models.py
 msgid "from address"
 msgstr "naslov pošiljatelja"
@@ -7974,6 +8090,16 @@ msgstr "»Iz dokumenta« je ime, ki ga dokument natisne, in nič, kjer ne natisn
 #: src/postulo/accounts/forms.py
 msgid "From the document is your name and the kind of document: “Alex Morgan — CV”."
 msgstr "»Iz dokumenta« je vaše ime in vrsta dokumenta: »Alex Morgan — življenjepis«."
+
+#: src/postulo/templates/applications/subscribed_event.html
+#, python-format
+msgid "From the subscribed calendar %(name)s"
+msgstr ""
+
+#: src/postulo/applications/agenda.py
+#, python-format
+msgid "From the subscribed calendar %(name)s:"
+msgstr ""
 
 #: src/postulo/core/models.py
 msgid "from Wikidata"
@@ -8225,7 +8351,7 @@ msgstr "Gravatar nima slike za vaš naslov, zato ostanejo vaše začetnice."
 msgid "Green"
 msgstr "Zelena"
 
-#: src/postulo/core/models.py
+#: src/postulo/applications/models.py src/postulo/core/models.py
 msgid "Grey"
 msgstr "Siva"
 
@@ -8519,6 +8645,10 @@ msgstr "Koliko prostora pustiti"
 #: src/postulo/applications/widgets.py
 msgid "How much you sent, month by month, so a quiet stretch is visible."
 msgstr "Koliko ste pošiljali iz meseca v mesec, da se tiho obdobje vidi."
+
+#: src/postulo/applications/forms.py
+msgid "How often Postulo reads it again. One that cannot be read is tried less often until it can."
+msgstr ""
 
 #: src/postulo/resume/registry.py
 msgid "How often your work has been cited, as a source counted it on a given day: for all of it, or for one publication. Postulo counts nothing itself."
@@ -9293,6 +9423,10 @@ msgstr "Vsebovalo je oddelek, za katerega je bilo to."
 msgid "It holds nothing that needs moving."
 msgstr "Ne vsebuje ničesar, kar bi bilo treba premakniti."
 
+#: src/postulo/templates/applications/subscribed_event.html
+msgid "It is a whole day, with no time to meet at, so it cannot be added as an appointment or an interview. Add one by hand if you need it."
+msgstr ""
+
 #: src/postulo/applications/views.py
 msgid "It is already done."
 msgstr "Je že opravljeno."
@@ -9435,6 +9569,10 @@ msgstr "Njegovi podatki so pod licenco %(licence)s."
 #: src/postulo/applications/ical_import.py
 msgid "Its date could not be read."
 msgstr "Datuma ni bilo mogoče prebrati."
+
+#: src/postulo/templates/applications/subscription_form.html
+msgid "Its events are drawn on your calendar as they are in the calendar it comes from. They cannot be changed here; any of them can be added as an appointment or an interview of your own."
+msgstr ""
 
 #: src/postulo/plugins/provenance.py
 msgid "Its file matches what a repository on this instance signed."
@@ -9625,6 +9763,11 @@ msgstr "Ohranijo se po uporabi ali poteku, ker odvzema tujega računa ne sme bit
 #: src/postulo/jobs/share_views.py
 msgid "Kept apart: they will not be asked about again."
 msgstr "Obdržano ločeno: o tem ne boste več vprašani."
+
+#: src/postulo/applications/forms.py
+#, python-format
+msgid "Kept as %(site)s. Leave it empty to keep it, or enter a new one."
+msgstr ""
 
 #: src/postulo/templates/partials/postal_addresses.html
 msgid "Kept as it was"
@@ -9848,8 +9991,8 @@ msgstr "zadnje preverjanje"
 msgid "last checked"
 msgstr "nazadnje preverjeno"
 
-#: src/postulo/documents/models.py src/postulo/notifications/models.py
-#: src/postulo/plugins/models.py
+#: src/postulo/applications/models.py src/postulo/documents/models.py
+#: src/postulo/notifications/models.py src/postulo/plugins/models.py
 msgid "last error"
 msgstr "zadnja napaka"
 
@@ -9866,6 +10009,19 @@ msgstr "Zadnji prispeli arhiv"
 #, fuzzy
 msgid "last pushed"
 msgstr "nazadnje poslano"
+
+#: src/postulo/applications/models.py
+msgid "last read"
+msgstr ""
+
+#: src/postulo/templates/applications/subscription_list.html
+#, python-format
+msgid "Last read on %(when)s: %(counter)s event."
+msgid_plural "Last read on %(when)s: %(counter)s events."
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
 
 #: src/postulo/plugins/models.py
 msgid "last run"
@@ -9912,7 +10068,7 @@ msgstr "nazadnje uporabljeno"
 msgid "Last used %(when)s"
 msgstr "Nazadnje uporabljeno %(when)s"
 
-#: src/postulo/plugins/models.py
+#: src/postulo/applications/models.py src/postulo/plugins/models.py
 msgid "last worked"
 msgstr "nazadnje delovalo"
 
@@ -10030,6 +10186,14 @@ msgstr "Če polje pustite prazno, vaši življenjepisi natisnejo »%(place)s«: 
 #: src/postulo/jobs/capture_views.py
 msgid "Left empty it is today. Capturing a posting you applied to last week is common."
 msgstr "Če pustite prazno, velja današnji datum. Pogosto se zgodi, da zajamete oglas, na katerega ste se prijavili prejšnji teden."
+
+#: src/postulo/applications/models.py
+msgid "left out"
+msgstr ""
+
+#: src/postulo/templates/applications/subscription_list.html
+msgid "Left out of the calendar:"
+msgstr ""
 
 #: src/postulo/templates/core/table_export.html
 #: src/postulo/templates/documents/themes/base_list.html
@@ -10909,9 +11073,9 @@ msgid "NACE section"
 msgstr "Področje NACE"
 
 #: src/postulo/accounts/models.py src/postulo/api/models.py
-#: src/postulo/core/models.py src/postulo/documents/models.py
-#: src/postulo/jobs/models.py src/postulo/plugins/models.py
-#: src/postulo/resume/models.py
+#: src/postulo/applications/models.py src/postulo/core/models.py
+#: src/postulo/documents/models.py src/postulo/jobs/models.py
+#: src/postulo/plugins/models.py src/postulo/resume/models.py
 msgid "name"
 msgstr "ime"
 
@@ -11095,6 +11259,11 @@ msgstr "Nov opomnik za %(day)s"
 msgid "New since you last arranged this"
 msgstr "Novo, odkar ste to nazadnje uredili"
 
+#: src/postulo/templates/applications/subscription_form.html
+#: src/postulo/templates/applications/subscription_list.html
+msgid "New subscription"
+msgstr ""
+
 #: src/postulo/templates/applications/tag_list.html
 msgid "New tag"
 msgstr "Nova oznaka"
@@ -11184,6 +11353,10 @@ msgstr "Ne"
 #: src/postulo/templates/server/plugins.html
 msgid "No address and no key, so nothing is offered from it."
 msgstr "Ni naslova in ni ključa, zato se iz njega nič ne ponuja."
+
+#: src/postulo/templates/applications/subscription_list.html
+msgid "No address: enter it again."
+msgstr ""
 
 #: src/postulo/core/offsite.py
 msgid "No age recipient is set, and nothing leaves this machine unencrypted."
@@ -11449,6 +11622,10 @@ msgstr "Vir te strani ni bil shranjen."
 #: src/postulo/templates/jobs/capture_page.html
 msgid "No source was kept."
 msgstr "Vir ni bil shranjen."
+
+#: src/postulo/templates/applications/subscription_list.html
+msgid "No subscriptions yet."
+msgstr ""
 
 #: src/postulo/api/routers/interviews.py src/postulo/api/routers/offers.py
 #: src/postulo/api/routers/reminders.py
@@ -11802,6 +11979,10 @@ msgstr "Ne natisne se v življenjepisu."
 #: src/postulo/templates/resume/overview.html
 msgid "Not printed on any CV until they have agreed."
 msgstr "Dokler ne privolijo, se ne natisne v nobenem življenjepisu."
+
+#: src/postulo/templates/applications/subscription_list.html
+msgid "Not read yet. It will be within minutes."
+msgstr ""
 
 #: src/postulo/applications/analytics.py src/postulo/applications/reports.py
 #: src/postulo/templates/applications/partials/status_card.html
@@ -12597,7 +12778,7 @@ msgstr "Vklopljeno. Prijava zahteva kodo iz aplikacije za overjanje ali kodo za 
 msgid "On. Signing in asks for one of your security keys, or a recovery code."
 msgstr "Vklopljeno. Prijava zahteva enega od vaših varnostnih ključev ali obnovitveno kodo."
 
-#: src/postulo/plugins/syncing.py
+#: src/postulo/applications/models.py src/postulo/plugins/syncing.py
 msgid "Once a day"
 msgstr "Enkrat na dan"
 
@@ -12998,6 +13179,7 @@ msgstr "Odprte prijave brez odziva in tri stvari, ki jih lahko storite."
 msgid "Open as this"
 msgstr "Odpri kot to"
 
+#: src/postulo/templates/applications/subscribed_event.html
 #: src/postulo/templates/jobs/capture_form.html
 #: src/postulo/templates/jobs/capture_review.html
 msgid "Open it"
@@ -13998,6 +14180,11 @@ msgstr "Postulo ga uredi v zapis, kakršnega uporablja register, in preveri njeg
 msgid "Postulo version"
 msgstr "Različica Postula"
 
+#: src/postulo/templates/applications/subscription_list.html
+#, python-format
+msgid "Postulo will try again on %(when)s, and less often while it keeps failing."
+msgstr ""
+
 #: src/postulo/templates/partials/footer_links.html
 msgid "Postulo — your job search, your data."
 msgstr "Postulo — vaše iskanje zaposlitve, vaši podatki."
@@ -14476,6 +14663,10 @@ msgstr "Znova aktiviraj"
 msgid "Read %(name)s as"
 msgstr "Preberi %(name)s kot"
 
+#: src/postulo/applications/views_subscriptions.py
+msgid "Read again. The calendar shows what it holds now."
+msgstr ""
+
 #: src/postulo/templates/core/import_csv_map.html
 #, fuzzy
 msgid "Read as"
@@ -14536,6 +14727,10 @@ msgstr "Prebrano iz XML Europass, priloženega PDF-ju, v obliki, ki jo europass.
 msgid "Read it"
 msgstr "Preberi ga"
 
+#: src/postulo/applications/models.py
+msgid "read it again"
+msgstr ""
+
 #: src/postulo/templates/documents/letter_detail.html
 msgid "Read it as they will"
 msgstr "Preberite ga tako, kot ga bodo brali oni"
@@ -14543,6 +14738,10 @@ msgstr "Preberite ga tako, kot ga bodo brali oni"
 #: src/postulo/templates/documents/letter_detail.html
 msgid "Read it below"
 msgstr "Preberite spodaj"
+
+#: src/postulo/templates/applications/subscription_list.html
+msgid "Read it now"
+msgstr ""
 
 #: src/postulo/jobs/slow.py
 msgid "Read it. Check what was found before it becomes a listing."
@@ -15203,7 +15402,7 @@ msgstr "delovno mesto"
 msgid "Role / job title"
 msgstr "Delovno mesto / naziv"
 
-#: src/postulo/core/models.py
+#: src/postulo/applications/models.py src/postulo/core/models.py
 msgid "Rose"
 msgstr "Rožnata"
 
@@ -15302,6 +15501,7 @@ msgstr "Sobota"
 #: src/postulo/templates/applications/interview_form.html
 #: src/postulo/templates/applications/offer_form.html
 #: src/postulo/templates/applications/reminder_form.html
+#: src/postulo/templates/applications/subscription_form.html
 #: src/postulo/templates/applications/tag_form.html
 #: src/postulo/templates/connections/form.html
 #: src/postulo/templates/documents/cv_form.html
@@ -16626,6 +16826,7 @@ msgstr "stanje"
 #: src/postulo/templates/applications/partials/bulk_fields.html
 #: src/postulo/templates/applications/partials/status_card.html
 #: src/postulo/templates/applications/report.html
+#: src/postulo/templates/applications/subscribed_event.html
 #: src/postulo/templates/core/import_csv_map.html
 #: src/postulo/templates/documents/themes/base_report.html
 #: src/postulo/templates/jobs/company_form.html
@@ -16757,6 +16958,33 @@ msgstr "zadeva"
 #: src/postulo/accounts/models.py
 msgid "subject of exported files"
 msgstr "zadeva izvoženih datotek"
+
+#: src/postulo/templates/applications/subscription_form.html
+msgid "Subscribe"
+msgstr ""
+
+#: src/postulo/applications/agenda.py
+msgid "Subscribed calendars"
+msgstr ""
+
+#: src/postulo/applications/models.py
+msgid "subscribed event"
+msgstr ""
+
+#: src/postulo/applications/models.py
+msgid "subscribed events"
+msgstr ""
+
+#: src/postulo/applications/views_subscriptions.py
+msgid "Subscribed. Its events appear on the calendar once it has been read, within minutes."
+msgstr ""
+
+#: src/postulo/templates/applications/calendar.html
+#: src/postulo/templates/applications/subscribed_event.html
+#: src/postulo/templates/applications/subscription_form.html
+#: src/postulo/templates/applications/subscription_list.html
+msgid "Subscriptions"
+msgstr ""
 
 #: src/postulo/templates/resume/overview.html
 msgid "Suggest from my ORCID record"
@@ -16988,7 +17216,7 @@ msgstr "Odstranjevanje"
 msgid "Task"
 msgstr "Naloga"
 
-#: src/postulo/core/models.py
+#: src/postulo/applications/models.py src/postulo/core/models.py
 msgid "Teal"
 msgstr "Turkizna"
 
@@ -17113,6 +17341,10 @@ msgstr "Tega naslova ni bilo mogoče dodati."
 #, python-format
 msgid "That address is %(type)s, not an image Postulo keeps."
 msgstr "Ta naslov je %(type)s, ne slika, ki bi jo Postulo hranil."
+
+#: src/postulo/applications/subscriptions.py
+msgid "That address is not one a calendar can be read from."
+msgstr ""
 
 #: src/postulo/plugins/public_addresses.py
 msgid "That address is on a private or local network, and Postulo will not fetch it. Paste the posting text in by hand instead."
@@ -17424,6 +17656,7 @@ msgstr[2] "To je veliko testov. Poskusite znova čez %(seconds)d sekunde."
 msgstr[3] "To je veliko testov. Poskusite znova čez %(seconds)d sekund."
 
 #: src/postulo/accounts/avatars.py
+#: src/postulo/applications/views_subscriptions.py
 msgid "That is a lot of tries. Wait a little before asking again."
 msgstr "Poskusov je preveč. Počakajte malo, preden znova poskusite."
 
@@ -17865,6 +18098,10 @@ msgstr "Naslov je odgovoril s kodo %(code)s."
 msgid "The address answered with nothing."
 msgstr "Naslov ni vrnil ničesar."
 
+#: src/postulo/applications/subscriptions.py
+msgid "The address cannot be read here any more. Enter it again."
+msgstr ""
+
 #: src/postulo/jobs/tiles.py
 msgid "The address must hold {z}, {x} and {y}, where each tile's numbers go."
 msgstr "Naslov mora vsebovati {z}, {x} in {y} na mestih, kamor gredo številke posamezne ploščice."
@@ -17978,9 +18215,55 @@ msgstr "Na ta dan začneta teden koledar in poročila. Če ostane privzeta vredn
 msgid "The calendar can be downloaded as an iCalendar file, for the period and kinds on the screen, and a file from another calendar can be read in, with a review of what it holds before anything is added."
 msgstr "Koledar lahko prenesete kot datoteko iCalendar za obdobje in vrste na zaslonu, datoteko iz drugega koledarja pa lahko uvozite, pri čemer pred dodajanjem pregledate njeno vsebino."
 
+#: src/postulo/applications/subscriptions.py
+msgid "The calendar could not be read."
+msgstr ""
+
+#: src/postulo/applications/subscriptions.py
+#, python-format
+msgid "The calendar is larger than %(limit)s MB, so it was not read."
+msgstr ""
+
+#: src/postulo/templates/applications/subscribed_event.html
+msgid "The calendar marks this as cancelled."
+msgstr ""
+
 #: src/postulo/accounts/forms.py
 msgid "The calendar's period buttons"
 msgstr "Gumbi za obdobje koledarja"
+
+#: src/postulo/applications/subscriptions.py
+#, python-format
+msgid "The calendar's server answered with an error (%(status)s)."
+msgstr ""
+
+#: src/postulo/applications/subscriptions.py
+msgid "The calendar's server could not be reached."
+msgstr ""
+
+#: src/postulo/applications/subscriptions.py
+msgid "The calendar's server has nothing at that address any more."
+msgstr ""
+
+#: src/postulo/applications/subscriptions.py
+msgid "The calendar's server refused the address. It may have been changed or withdrawn."
+msgstr ""
+
+#: src/postulo/applications/subscriptions.py
+msgid "The calendar's server sent Postulo round too many redirects."
+msgstr ""
+
+#: src/postulo/applications/subscriptions.py
+msgid "The calendar's server sent something that could not be read."
+msgstr ""
+
+#: src/postulo/applications/subscriptions.py
+msgid "The calendar's server took too long to answer."
+msgstr ""
+
+#: src/postulo/applications/forms.py
+msgid "The calendar's web address, as the service that keeps it gives it: it starts with https:// or webcal:// and usually ends in .ics. It may open the calendar to anyone who has it, so Postulo keeps it encrypted and shows only its site."
+msgstr ""
 
 #: src/postulo/templates/jobs/capture_page_forget.html
 msgid "The capture stays as it is, and so does any listing it became."
@@ -19162,6 +19445,11 @@ msgstr "Zadeva, ki jo vsebuje vsaka datoteka"
 msgid "The subject has to be one line."
 msgstr "Zadeva mora biti v eni vrstici."
 
+#: src/postulo/applications/views_subscriptions.py
+#, python-format
+msgid "the subscribed calendar %(name)s"
+msgstr ""
+
 #: src/postulo/templates/settings/appearance.html
 msgid "The switch at the top right cycles through the same three; this is the explicit version."
 msgstr "Stikalo zgoraj desno kroži med istimi tremi; to je izrecna različica."
@@ -19622,6 +19910,10 @@ msgstr "O tem podjetju je bilo sporočeno, da od %(date)s odpušča zaposlene."
 msgid "This entry prints its original text on every CV."
 msgstr "Ta vnos natisne svoje izvirno besedilo v vsakem življenjepisu."
 
+#: src/postulo/templates/applications/subscribed_event.html
+msgid "This event is already in your calendar as your own."
+msgstr ""
+
 #: src/postulo/documents/forms.py
 msgid "This export only. Your default is under Settings → Export."
 msgstr "Samo ta izvoz. Vaša privzeta nastavitev je pod Nastavitve → Izvoz."
@@ -19746,6 +20038,10 @@ msgstr "To je pred datumom izdaje."
 #: src/postulo/resume/forms.py
 msgid "This is before the start date."
 msgstr "To je pred začetnim datumom."
+
+#: src/postulo/templates/applications/subscribed_event.html
+msgid "This is how the calendar it comes from has it, and it changes there. Postulo reads it again on its own."
+msgstr ""
 
 #: src/postulo/core/phones.py
 msgid "This is kept as it was typed, with no country in front of it, so it could not be checked and cannot be dialled from anywhere else."
@@ -20274,7 +20570,7 @@ msgstr "vrsta dokumenta"
 msgid "type of entry"
 msgstr "vrsta vnosa"
 
-#: src/postulo/applications/ical_import.py
+#: src/postulo/applications/forms.py src/postulo/applications/ical_import.py
 msgid "Type of interview"
 msgstr "Vrsta razgovora"
 
@@ -20356,6 +20652,10 @@ msgstr "Odznačite, da vnos ohranite v tej različici, a ga ne prikažete na str
 #: src/postulo/templates/server/defaults.html
 msgid "Under each language, how many of Postulo's strings a speaker has reviewed, how many are drafts nobody has read yet, and how many are not translated at all."
 msgstr "Pod vsakim jezikom: koliko nizov Postula je pregledal govorec, koliko je osnutkov, ki jih še nihče ni prebral, in koliko sploh ni prevedenih."
+
+#: src/postulo/templates/help/calendar.html
+msgid "Under Subscriptions, a calendar somebody else keeps -- an employment office's appointments, a training provider's sessions -- can be followed by its address. Postulo reads it again on its own and draws its events in the colour you chose, marked as from it. They cannot be changed here; any of them can be added as an appointment or an interview of your own."
+msgstr ""
 
 #: src/postulo/accounts/forms.py
 msgid "Underline links in navigation"
@@ -20687,7 +20987,7 @@ msgstr "Pogled shranjen."
 msgid "Views"
 msgstr "Pogledi"
 
-#: src/postulo/core/models.py
+#: src/postulo/applications/models.py src/postulo/core/models.py
 msgid "Violet"
 msgstr "Vijolična"
 
@@ -21068,6 +21368,10 @@ msgstr "Kaj je bilo. Drug zajem istega oglasa se doda z zaslona za pregled, zato
 msgid "What it will hold"
 msgstr "Kaj bo vsebovalo"
 
+#: src/postulo/applications/forms.py
+msgid "What its events are drawn in on the calendar."
+msgstr ""
+
 #: src/postulo/templates/jobs/merge.html
 msgid "What moves"
 msgstr "Kaj se premakne"
@@ -21365,6 +21669,7 @@ msgstr "Kolikor vam je vredno, enkrat ali občasno, na <a href=\"%(url)s\" class
 msgid "when"
 msgstr "kdaj"
 
+#: src/postulo/templates/applications/subscribed_event.html
 #: src/postulo/templates/documents/rendered_list.html
 #: src/postulo/templates/server/backups.html
 #: src/postulo/templates/server/design.html
@@ -21404,6 +21709,10 @@ msgstr "Ko to instanco registrirate pri ponudniku, mu navedite ta naslov, kamor 
 #: src/postulo/applications/models.py
 msgid "where"
 msgstr "kje"
+
+#: src/postulo/templates/applications/subscribed_event.html
+msgid "Where"
+msgstr ""
 
 #: src/postulo/templates/help/links.html
 msgid "Where a card has a <em>Service</em> menu, choose the service the address is on. Its icon is shown beside it, and the address is checked against what an address on that service looks like, so a mistyped one is refused, and the refusal says why. Paste an address without choosing a service, and saving chooses it where the address is on one Postulo knows."
@@ -22594,6 +22903,10 @@ msgstr "Vaše je ohranjeno"
 #: src/postulo/documents/forms.py
 msgid "Yours to set and never enforced: after it, Postulo warns and does not block."
 msgstr "To nastavite sami in se nikoli ne uveljavlja: po tem datumu Postulo opozori, vendar ne prepreči."
+
+#: src/postulo/applications/forms.py
+msgid "Yours, for telling it apart: drawn beside each of its events."
+msgstr ""
 
 #: src/postulo/applications/forms.py
 #, fuzzy

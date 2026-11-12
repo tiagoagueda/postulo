@@ -373,6 +373,22 @@ msgstr[0] "%(count)s candidatură nu mai are noutăți"
 msgstr[1] "%(count)s candidaturi nu mai au noutăți"
 msgstr[2] "%(count)s de candidaturi nu mai au noutăți"
 
+#: src/postulo/applications/subscriptions.py
+#, python-format
+msgid "%(count)s event whose date could not be read."
+msgid_plural "%(count)s events whose date could not be read."
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+
+#: src/postulo/applications/subscriptions.py
+#, python-format
+msgid "%(count)s event with a time but no time zone Postulo knows."
+msgid_plural "%(count)s events with a time but no time zone Postulo knows."
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+
 #: src/postulo/jobs/closing.py
 #, python-format
 msgid "%(count)s listing you are considering closes soon"
@@ -405,6 +421,14 @@ msgstr[0] "%(count)s eliminate"
 msgstr[1] "%(count)s eliminate"
 msgstr[2] "%(count)s eliminate"
 
+#: src/postulo/applications/subscriptions.py
+#, python-format
+msgid "%(count)s repeating event: Postulo does not read repeating events."
+msgid_plural "%(count)s repeating events: Postulo does not read repeating events."
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+
 #: src/postulo/plugins/base.py
 #, python-format
 msgid "%(count)s skipped"
@@ -412,6 +436,14 @@ msgid_plural "%(count)s skipped"
 msgstr[0] "%(count)s omise"
 msgstr[1] "%(count)s omise"
 msgstr[2] "%(count)s omise"
+
+#: src/postulo/applications/subscriptions.py
+#, python-format
+msgid "%(count)s task."
+msgid_plural "%(count)s tasks."
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
 
 #: src/postulo/templates/server/people.html
 #, python-format
@@ -1758,8 +1790,10 @@ msgstr "(se deschide într-o filă nouă)"
 msgid "(part)"
 msgstr "(parțial)"
 
-#: src/postulo/applications/ical_import.py
+#: src/postulo/applications/agenda.py src/postulo/applications/ical_import.py
+#: src/postulo/applications/models.py
 #: src/postulo/templates/applications/ical_import.html
+#: src/postulo/templates/applications/subscribed_event.html
 msgid "(untitled)"
 msgstr "(fără titlu)"
 
@@ -3018,6 +3052,7 @@ msgid "Activity"
 msgstr "Activitate"
 
 #: src/postulo/templates/applications/application_detail.html
+#: src/postulo/templates/applications/subscribed_event.html
 #: src/postulo/templates/jobs/company_detail.html
 #: src/postulo/templates/jobs/company_form.html
 #: src/postulo/templates/resume/overview.html
@@ -3104,9 +3139,13 @@ msgstr "Adăugați o intrare"
 msgid "Add it anyway"
 msgstr "Adăugați-l oricum"
 
-#: src/postulo/applications/ical_import.py
+#: src/postulo/applications/forms.py src/postulo/applications/ical_import.py
 msgid "Add it as"
 msgstr "Adăugați-l ca"
+
+#: src/postulo/templates/applications/subscribed_event.html
+msgid "Add it as your own"
+msgstr ""
 
 #: src/postulo/templates/jobs/partials/bind_capture.html
 msgid "Add it, and next"
@@ -3231,6 +3270,14 @@ msgstr "Adăugat la istoricul anunțului."
 msgid "Added to the timeline."
 msgstr "Adăugat în cronologie."
 
+#: src/postulo/applications/views_subscriptions.py
+msgid "Added to your appointments. It is yours to change now."
+msgstr ""
+
+#: src/postulo/applications/views_subscriptions.py
+msgid "Added to your interviews. It is yours to change now."
+msgstr ""
+
 #: src/postulo/jobs/listing_views.py
 msgid "Added to your listings."
 msgstr "Adăugat la anunțurile dumneavoastră."
@@ -3255,13 +3302,14 @@ msgstr "Adăugarea unui fișier doar adaugă. Ce aveți deja rămâne exact așa
 msgid "addok (France's Base Adresse Nationale)"
 msgstr "addok (Base Adresse Nationale a Franței)"
 
-#: src/postulo/applications/reports.py src/postulo/jobs/tables.py
-#: src/postulo/templates/partials/web_links.html
+#: src/postulo/applications/forms.py src/postulo/applications/reports.py
+#: src/postulo/jobs/tables.py src/postulo/templates/partials/web_links.html
 msgid "Address"
 msgstr "Adresă"
 
-#: src/postulo/core/models.py src/postulo/jobs/models.py
-#: src/postulo/notifications/models.py src/postulo/resume/models.py
+#: src/postulo/applications/models.py src/postulo/core/models.py
+#: src/postulo/jobs/models.py src/postulo/notifications/models.py
+#: src/postulo/resume/models.py
 msgid "address"
 msgstr "adresă"
 
@@ -3454,7 +3502,7 @@ msgstr "Mereu activ: Postulo nu poate funcționa fără el."
 msgid "Always this"
 msgstr "Întotdeauna aceasta"
 
-#: src/postulo/core/models.py
+#: src/postulo/applications/models.py src/postulo/core/models.py
 msgid "Amber"
 msgstr "Chihlimbar"
 
@@ -3525,6 +3573,14 @@ msgstr "Un administrator a creat acest link pentru %(name)s. Funcționează o si
 msgid "An application's status changes"
 msgstr "Starea unei candidaturi se schimbă"
 
+#: src/postulo/applications/forms.py
+msgid "An appointment"
+msgstr ""
+
+#: src/postulo/applications/forms.py
+msgid "An appointment is with a public employment service. Choose one."
+msgstr ""
+
 #: src/postulo/templates/core/export.html
 msgid "An archive can be imported into an empty account from the command line. It is not offered here because importing creates records rather than merging them, and that is a decision worth making deliberately rather than by clicking."
 msgstr "O arhivă poate fi importată într-un cont gol din linia de comandă. Nu este oferită aici pentru că importul creează înregistrări în loc să le contopească, iar aceasta este o decizie care merită luată deliberat, nu printr-un clic."
@@ -3586,11 +3642,11 @@ msgstr "Un import doar adaugă. Nimic din ce se află deja în parcursul dumneav
 msgid "An index is a list of code to run here, so it must be signed and you must hold the key. Switching a repository off later stops new installs and updates from it; anything already installed keeps working."
 msgstr "Un index este o listă de cod care se execută aici, deci trebuie semnat și trebuie să dețineți cheia. Dezactivarea ulterioară a unui depozit oprește instalările și actualizările noi din el; ce este deja instalat continuă să funcționeze."
 
-#: src/postulo/applications/ical_import.py
+#: src/postulo/applications/forms.py src/postulo/applications/ical_import.py
 msgid "An interview"
 msgstr "Un interviu"
 
-#: src/postulo/applications/ical_import.py
+#: src/postulo/applications/forms.py src/postulo/applications/ical_import.py
 msgid "An interview belongs to an application. Choose one."
 msgstr "Un interviu aparține unei candidaturi. Alegeți una."
 
@@ -3807,7 +3863,8 @@ msgstr "Tokenuri API"
 msgid "Appearance"
 msgstr "Aspect"
 
-#: src/postulo/applications/ical_import.py src/postulo/plugins/pairing.py
+#: src/postulo/applications/forms.py src/postulo/applications/ical_import.py
+#: src/postulo/plugins/pairing.py
 #: src/postulo/templates/applications/suggestion_list.html
 #: src/postulo/templates/base.html
 #: src/postulo/templates/documents/letter_detail.html
@@ -4295,6 +4352,7 @@ msgstr "B1 — intermediar"
 msgid "B2 — upper intermediate"
 msgstr "B2 — intermediar avansat"
 
+#: src/postulo/templates/applications/subscribed_event.html
 #: src/postulo/templates/connections/pick.html
 #: src/postulo/templates/jobs/move_owner.html
 #: src/postulo/templates/jobs/share.html
@@ -4482,7 +4540,7 @@ msgstr "Biotehnologie"
 msgid "Blank keeps them for as long as the instance exists."
 msgstr "Dacă rămâne necompletat, le păstrează atât timp cât există instanța."
 
-#: src/postulo/core/models.py
+#: src/postulo/applications/models.py src/postulo/core/models.py
 msgid "Blue"
 msgstr "Albastru"
 
@@ -4637,6 +4695,9 @@ msgstr "C2 — experimentat"
 #: src/postulo/templates/applications/application_detail.html
 #: src/postulo/templates/applications/calendar.html
 #: src/postulo/templates/applications/ical_import.html
+#: src/postulo/templates/applications/subscribed_event.html
+#: src/postulo/templates/applications/subscription_form.html
+#: src/postulo/templates/applications/subscription_list.html
 #: src/postulo/templates/cotton/date_field.html
 msgid "Calendar"
 msgstr "Calendar"
@@ -4649,6 +4710,14 @@ msgstr "Fișier de calendar"
 msgid "calendar identifier"
 msgstr "identificator de calendar"
 
+#: src/postulo/applications/models.py
+msgid "calendar subscription"
+msgstr ""
+
+#: src/postulo/applications/models.py
+msgid "calendar subscriptions"
+msgstr ""
+
 #: src/postulo/templates/applications/calendar.html
 msgid "Calendar views"
 msgstr "Vizualizări de calendar"
@@ -4657,6 +4726,10 @@ msgstr "Vizualizări de calendar"
 #, python-format
 msgid "Calendar · %(period)s"
 msgstr "Calendar · %(period)s"
+
+#: src/postulo/templates/applications/subscription_list.html
+msgid "Calendars somebody else keeps, such as an employment office's appointments or a training provider's sessions. Postulo reads them again on their own and draws their events on your calendar, without changing them."
+msgstr ""
 
 #: src/postulo/applications/models.py src/postulo/jobs/models.py
 msgid "Call"
@@ -4678,6 +4751,7 @@ msgstr "Poate fi asociat cu"
 #: src/postulo/templates/applications/interview_form.html
 #: src/postulo/templates/applications/offer_form.html
 #: src/postulo/templates/applications/reminder_form.html
+#: src/postulo/templates/applications/subscription_form.html
 #: src/postulo/templates/applications/tag_form.html
 #: src/postulo/templates/connections/confirm_delete.html
 #: src/postulo/templates/connections/form.html
@@ -4719,9 +4793,22 @@ msgstr "Anulați"
 msgid "Cancelled"
 msgstr "Anulat"
 
+#: src/postulo/applications/models.py
+msgid "cancelled"
+msgstr ""
+
 #: src/postulo/applications/agenda.py
 msgid "Cancelled interview:"
 msgstr "Interviu anulat:"
+
+#: src/postulo/applications/agenda.py
+msgid "Cancelled, from a subscribed calendar:"
+msgstr ""
+
+#: src/postulo/applications/agenda.py
+#, python-format
+msgid "Cancelled, from the subscribed calendar %(name)s:"
+msgstr ""
 
 #: src/postulo/core/file_review.py
 msgid "Cannot be added"
@@ -5387,13 +5474,13 @@ msgstr "depozit de cod tipărit"
 msgid "collection"
 msgstr "colecție"
 
+#: src/postulo/applications/models.py src/postulo/core/models.py
+msgid "colour"
+msgstr "culoare"
+
 #: src/postulo/core/design.py src/postulo/templates/server/design.html
 msgid "Colour"
 msgstr "Culoare"
-
-#: src/postulo/core/models.py
-msgid "colour"
-msgstr "culoare"
 
 #: src/postulo/templates/core/import_csv_map.html
 msgid "Column in the file"
@@ -5992,6 +6079,7 @@ msgstr "Date alese de dumneavoastră"
 msgid "Day"
 msgstr "Zi"
 
+#: src/postulo/applications/models.py
 #: src/postulo/templates/settings/appearance.html
 msgid "day"
 msgid_plural "days"
@@ -6176,6 +6264,7 @@ msgstr "Apărare"
 
 #: src/postulo/templates/applications/application_detail.html
 #: src/postulo/templates/applications/appointment_form.html
+#: src/postulo/templates/applications/subscription_list.html
 #: src/postulo/templates/applications/tag_list.html
 #: src/postulo/templates/cotton/delete_dialog.html
 #: src/postulo/templates/cotton/reminder_actions.html
@@ -6292,11 +6381,13 @@ msgstr "Adâncime"
 
 #: src/postulo/applications/forms.py src/postulo/core/csv_import.py
 #: src/postulo/jobs/models.py src/postulo/jobs/tables.py
+#: src/postulo/templates/applications/subscribed_event.html
 #: src/postulo/templates/jobs/posting_detail.html
 msgid "Description"
 msgstr "Descriere"
 
-#: src/postulo/jobs/models.py src/postulo/resume/models.py
+#: src/postulo/applications/models.py src/postulo/jobs/models.py
+#: src/postulo/resume/models.py
 msgid "description"
 msgstr "descriere"
 
@@ -6724,6 +6815,7 @@ msgstr "Ed25519, base64. Fără ea nu există catalog: o listă nesemnată de ad
 
 #: src/postulo/templates/applications/application_detail.html
 #: src/postulo/templates/applications/interview_list.html
+#: src/postulo/templates/applications/subscription_list.html
 #: src/postulo/templates/applications/tag_list.html
 #: src/postulo/templates/connections/list.html
 #: src/postulo/templates/documents/letter_detail.html
@@ -6853,6 +6945,10 @@ msgstr "Angajator"
 msgid "Employer structure is switched off, so departments and parents are not changed."
 msgstr "Structura angajatorului este dezactivată, așa că departamentele și companiile-mamă nu sunt modificate."
 
+#: src/postulo/applications/forms.py
+msgid "Employment service"
+msgstr ""
+
 #: src/postulo/applications/models.py
 msgid "employment service"
 msgstr "serviciul de ocupare a forței de muncă"
@@ -6921,6 +7017,10 @@ msgstr "Inginerie"
 msgctxt "name of a keyboard key"
 msgid "Enter"
 msgstr "Enter"
+
+#: src/postulo/applications/subscriptions.py
+msgid "Enter the calendar's web address, starting with https:// or webcal://."
+msgstr ""
 
 #: src/postulo/templates/accounts/delete_account.html
 #: src/postulo/templates/core/export.html
@@ -7049,11 +7149,11 @@ msgstr "Fiecare document exact așa cum a plecat, înghețat în momentul trimit
 msgid "Every file goes without a title, an author, a subject or keywords, whatever is chosen below or typed for one file, and a PDF without the name of the program that drew it. The language stays unless you leave it out below as well."
 msgstr "Fiecare fișier pleacă fără titlu, autor, subiect sau cuvinte-cheie, indiferent ce este ales mai jos sau tastat pentru un singur fișier, iar un PDF fără numele programului care l-a generat. Limba rămâne, cu excepția cazului în care o omiteți și pe ea mai jos."
 
-#: src/postulo/plugins/syncing.py
+#: src/postulo/applications/models.py src/postulo/plugins/syncing.py
 msgid "Every four hours"
 msgstr "La fiecare patru ore"
 
-#: src/postulo/plugins/syncing.py
+#: src/postulo/applications/models.py src/postulo/plugins/syncing.py
 msgid "Every hour"
 msgstr "La fiecare oră"
 
@@ -7634,6 +7734,14 @@ msgstr "Pentru %(office)s"
 msgid "For a PNG or JPEG. Cuts out where it was taken, when and with what, which a phone's photograph carries, before it is kept and before it is sent anywhere. The picture itself is not touched. Untick it to keep the file exactly as it is."
 msgstr "Pentru un PNG sau JPEG. Elimină locul, momentul și aparatul cu care a fost făcută, informații pe care le conține fotografia unui telefon, înainte de a fi păstrată și înainte de a fi trimisă oriunde. Imaginea în sine nu este atinsă. Debifați pentru a păstra fișierul exact așa cum este."
 
+#: src/postulo/applications/forms.py
+msgid "For an appointment: the public employment service it is with."
+msgstr ""
+
+#: src/postulo/applications/forms.py
+msgid "For an interview: the application it is about."
+msgstr ""
+
 #: src/postulo/resume/models.py
 msgid "For example, “BSc Computer Science”."
 msgstr "De exemplu, „Licență în informatică”."
@@ -7833,6 +7941,10 @@ msgstr "De la %(start)s la %(end)s"
 msgid "From %(start)s: now choose the last day"
 msgstr "De la %(start)s: alegeți acum ultima zi"
 
+#: src/postulo/applications/agenda.py
+msgid "From a subscribed calendar:"
+msgstr ""
+
 #: src/postulo/core/models.py
 msgid "from address"
 msgstr "adresa expeditorului"
@@ -7868,6 +7980,16 @@ msgstr "„Din document” înseamnă numele pe care îl tipărește documentul 
 #: src/postulo/accounts/forms.py
 msgid "From the document is your name and the kind of document: “Alex Morgan — CV”."
 msgstr "„Din document” înseamnă numele dumneavoastră și tipul documentului: „Alex Morgan — CV”."
+
+#: src/postulo/templates/applications/subscribed_event.html
+#, python-format
+msgid "From the subscribed calendar %(name)s"
+msgstr ""
+
+#: src/postulo/applications/agenda.py
+#, python-format
+msgid "From the subscribed calendar %(name)s:"
+msgstr ""
 
 #: src/postulo/core/models.py
 msgid "from Wikidata"
@@ -8117,7 +8239,7 @@ msgstr "Gravatar nu are nicio imagine pentru adresa dumneavoastră, așa că ră
 msgid "Green"
 msgstr "Verde"
 
-#: src/postulo/core/models.py
+#: src/postulo/applications/models.py src/postulo/core/models.py
 msgid "Grey"
 msgstr "Gri"
 
@@ -8408,6 +8530,10 @@ msgstr "Cât spațiu să lăsați"
 #: src/postulo/applications/widgets.py
 msgid "How much you sent, month by month, so a quiet stretch is visible."
 msgstr "Cât ați trimis, lună de lună, ca o perioadă fără activitate să fie vizibilă."
+
+#: src/postulo/applications/forms.py
+msgid "How often Postulo reads it again. One that cannot be read is tried less often until it can."
+msgstr ""
 
 #: src/postulo/resume/registry.py
 msgid "How often your work has been cited, as a source counted it on a given day: for all of it, or for one publication. Postulo counts nothing itself."
@@ -9178,6 +9304,10 @@ msgstr "Conținea departamentul pentru care era."
 msgid "It holds nothing that needs moving."
 msgstr "Nu conține nimic care să trebuiască mutat."
 
+#: src/postulo/templates/applications/subscribed_event.html
+msgid "It is a whole day, with no time to meet at, so it cannot be added as an appointment or an interview. Add one by hand if you need it."
+msgstr ""
+
 #: src/postulo/applications/views.py
 msgid "It is already done."
 msgstr "Este deja făcut."
@@ -9318,6 +9448,10 @@ msgstr "Datele sale sunt sub licența %(licence)s."
 #: src/postulo/applications/ical_import.py
 msgid "Its date could not be read."
 msgstr "Data nu a putut fi citită."
+
+#: src/postulo/templates/applications/subscription_form.html
+msgid "Its events are drawn on your calendar as they are in the calendar it comes from. They cannot be changed here; any of them can be added as an appointment or an interview of your own."
+msgstr ""
 
 #: src/postulo/plugins/provenance.py
 msgid "Its file matches what a repository on this instance signed."
@@ -9507,6 +9641,11 @@ msgstr "Se păstrează după folosire sau expirare, pentru că luarea contului c
 #: src/postulo/jobs/share_views.py
 msgid "Kept apart: they will not be asked about again."
 msgstr "Păstrate separat: nu veți mai fi întrebat despre ele."
+
+#: src/postulo/applications/forms.py
+#, python-format
+msgid "Kept as %(site)s. Leave it empty to keep it, or enter a new one."
+msgstr ""
 
 #: src/postulo/templates/partials/postal_addresses.html
 msgid "Kept as it was"
@@ -9730,8 +9869,8 @@ msgstr "ultima verificare"
 msgid "last checked"
 msgstr "verificat ultima dată"
 
-#: src/postulo/documents/models.py src/postulo/notifications/models.py
-#: src/postulo/plugins/models.py
+#: src/postulo/applications/models.py src/postulo/documents/models.py
+#: src/postulo/notifications/models.py src/postulo/plugins/models.py
 msgid "last error"
 msgstr "ultima eroare"
 
@@ -9746,6 +9885,18 @@ msgstr "Ultima care a ajuns"
 #: src/postulo/plugins/models.py
 msgid "last pushed"
 msgstr "ultima trimitere"
+
+#: src/postulo/applications/models.py
+msgid "last read"
+msgstr ""
+
+#: src/postulo/templates/applications/subscription_list.html
+#, python-format
+msgid "Last read on %(when)s: %(counter)s event."
+msgid_plural "Last read on %(when)s: %(counter)s events."
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
 
 #: src/postulo/plugins/models.py
 msgid "last run"
@@ -9792,7 +9943,7 @@ msgstr "ultima utilizare"
 msgid "Last used %(when)s"
 msgstr "Folosit ultima dată la %(when)s"
 
-#: src/postulo/plugins/models.py
+#: src/postulo/applications/models.py src/postulo/plugins/models.py
 #, fuzzy
 msgid "last worked"
 msgstr "ultima funcționare"
@@ -9911,6 +10062,14 @@ msgstr "Dacă este lăsat necompletat, CV-urile dumneavoastră tipăresc „%(pl
 #: src/postulo/jobs/capture_views.py
 msgid "Left empty it is today. Capturing a posting you applied to last week is common."
 msgstr "Dacă este lăsat gol, se folosește data de azi. Este obișnuit să capturați un anunț la care ați candidat săptămâna trecută."
+
+#: src/postulo/applications/models.py
+msgid "left out"
+msgstr ""
+
+#: src/postulo/templates/applications/subscription_list.html
+msgid "Left out of the calendar:"
+msgstr ""
 
 #: src/postulo/templates/core/table_export.html
 #: src/postulo/templates/documents/themes/base_list.html
@@ -10789,9 +10948,9 @@ msgid "NACE section"
 msgstr "Secțiunea NACE"
 
 #: src/postulo/accounts/models.py src/postulo/api/models.py
-#: src/postulo/core/models.py src/postulo/documents/models.py
-#: src/postulo/jobs/models.py src/postulo/plugins/models.py
-#: src/postulo/resume/models.py
+#: src/postulo/applications/models.py src/postulo/core/models.py
+#: src/postulo/documents/models.py src/postulo/jobs/models.py
+#: src/postulo/plugins/models.py src/postulo/resume/models.py
 msgid "name"
 msgstr "nume"
 
@@ -10974,6 +11133,11 @@ msgstr "Memento nou pentru %(day)s"
 msgid "New since you last arranged this"
 msgstr "Nou de la ultima dată când ați aranjat asta"
 
+#: src/postulo/templates/applications/subscription_form.html
+#: src/postulo/templates/applications/subscription_list.html
+msgid "New subscription"
+msgstr ""
+
 #: src/postulo/templates/applications/tag_list.html
 msgid "New tag"
 msgstr "Etichetă nouă"
@@ -11063,6 +11227,10 @@ msgstr "Nu"
 #: src/postulo/templates/server/plugins.html
 msgid "No address and no key, so nothing is offered from it."
 msgstr "Nicio adresă și nicio cheie, deci nu se oferă nimic din el."
+
+#: src/postulo/templates/applications/subscription_list.html
+msgid "No address: enter it again."
+msgstr ""
 
 #: src/postulo/core/offsite.py
 msgid "No age recipient is set, and nothing leaves this machine unencrypted."
@@ -11327,6 +11495,10 @@ msgstr "Nu s-a păstrat nicio sursă a acelei pagini."
 #: src/postulo/templates/jobs/capture_page.html
 msgid "No source was kept."
 msgstr "Nu s-a păstrat nicio sursă."
+
+#: src/postulo/templates/applications/subscription_list.html
+msgid "No subscriptions yet."
+msgstr ""
 
 #: src/postulo/api/routers/interviews.py src/postulo/api/routers/offers.py
 #: src/postulo/api/routers/reminders.py
@@ -11681,6 +11853,10 @@ msgstr "Nu este tipărit pe un CV."
 #: src/postulo/templates/resume/overview.html
 msgid "Not printed on any CV until they have agreed."
 msgstr "Nu se tipărește pe niciun CV până când persoana nu își dă acordul."
+
+#: src/postulo/templates/applications/subscription_list.html
+msgid "Not read yet. It will be within minutes."
+msgstr ""
 
 #: src/postulo/applications/analytics.py src/postulo/applications/reports.py
 #: src/postulo/templates/applications/partials/status_card.html
@@ -12468,7 +12644,7 @@ msgstr "Activat. Conectarea cere un cod din aplicația dumneavoastră de autenti
 msgid "On. Signing in asks for one of your security keys, or a recovery code."
 msgstr "Activată. Conectarea cere una dintre cheile dumneavoastră de securitate sau un cod de recuperare."
 
-#: src/postulo/plugins/syncing.py
+#: src/postulo/applications/models.py src/postulo/plugins/syncing.py
 msgid "Once a day"
 msgstr "O dată pe zi"
 
@@ -12846,6 +13022,7 @@ msgstr "Candidaturi deschise fără niciun răspuns și cele trei lucruri de fă
 msgid "Open as this"
 msgstr "Deschideți ca aceasta"
 
+#: src/postulo/templates/applications/subscribed_event.html
 #: src/postulo/templates/jobs/capture_form.html
 #: src/postulo/templates/jobs/capture_review.html
 msgid "Open it"
@@ -13837,6 +14014,11 @@ msgstr "Postulo îl aduce la scrierea proprie a registrului și îi verifică fo
 msgid "Postulo version"
 msgstr "Versiunea Postulo"
 
+#: src/postulo/templates/applications/subscription_list.html
+#, python-format
+msgid "Postulo will try again on %(when)s, and less often while it keeps failing."
+msgstr ""
+
 #: src/postulo/templates/partials/footer_links.html
 msgid "Postulo — your job search, your data."
 msgstr "Postulo — căutarea dumneavoastră de loc de muncă, datele dumneavoastră."
@@ -14314,6 +14496,10 @@ msgstr "Reactivați"
 msgid "Read %(name)s as"
 msgstr "Citiți %(name)s ca"
 
+#: src/postulo/applications/views_subscriptions.py
+msgid "Read again. The calendar shows what it holds now."
+msgstr ""
+
 #: src/postulo/templates/core/import_csv_map.html
 #, fuzzy
 msgid "Read as"
@@ -14372,6 +14558,10 @@ msgstr "Citit din XML-ul Europass atașat la PDF, formatul pe care europass.euro
 msgid "Read it"
 msgstr "Citiți-l"
 
+#: src/postulo/applications/models.py
+msgid "read it again"
+msgstr ""
+
 #: src/postulo/templates/documents/letter_detail.html
 msgid "Read it as they will"
 msgstr "Citiți-o așa cum o vor citi ei"
@@ -14379,6 +14569,10 @@ msgstr "Citiți-o așa cum o vor citi ei"
 #: src/postulo/templates/documents/letter_detail.html
 msgid "Read it below"
 msgstr "Citiți-l mai jos"
+
+#: src/postulo/templates/applications/subscription_list.html
+msgid "Read it now"
+msgstr ""
 
 #: src/postulo/jobs/slow.py
 #, fuzzy
@@ -15036,7 +15230,7 @@ msgstr "post"
 msgid "Role / job title"
 msgstr "Post / titlul postului"
 
-#: src/postulo/core/models.py
+#: src/postulo/applications/models.py src/postulo/core/models.py
 msgid "Rose"
 msgstr "Roz"
 
@@ -15134,6 +15328,7 @@ msgstr "Sâmbătă"
 #: src/postulo/templates/applications/interview_form.html
 #: src/postulo/templates/applications/offer_form.html
 #: src/postulo/templates/applications/reminder_form.html
+#: src/postulo/templates/applications/subscription_form.html
 #: src/postulo/templates/applications/tag_form.html
 #: src/postulo/templates/connections/form.html
 #: src/postulo/templates/documents/cv_form.html
@@ -16447,6 +16642,7 @@ msgstr "stare"
 #: src/postulo/templates/applications/partials/bulk_fields.html
 #: src/postulo/templates/applications/partials/status_card.html
 #: src/postulo/templates/applications/report.html
+#: src/postulo/templates/applications/subscribed_event.html
 #: src/postulo/templates/core/import_csv_map.html
 #: src/postulo/templates/documents/themes/base_report.html
 #: src/postulo/templates/jobs/company_form.html
@@ -16579,6 +16775,33 @@ msgstr "subiect"
 #: src/postulo/accounts/models.py
 msgid "subject of exported files"
 msgstr "subiectul fișierelor exportate"
+
+#: src/postulo/templates/applications/subscription_form.html
+msgid "Subscribe"
+msgstr ""
+
+#: src/postulo/applications/agenda.py
+msgid "Subscribed calendars"
+msgstr ""
+
+#: src/postulo/applications/models.py
+msgid "subscribed event"
+msgstr ""
+
+#: src/postulo/applications/models.py
+msgid "subscribed events"
+msgstr ""
+
+#: src/postulo/applications/views_subscriptions.py
+msgid "Subscribed. Its events appear on the calendar once it has been read, within minutes."
+msgstr ""
+
+#: src/postulo/templates/applications/calendar.html
+#: src/postulo/templates/applications/subscribed_event.html
+#: src/postulo/templates/applications/subscription_form.html
+#: src/postulo/templates/applications/subscription_list.html
+msgid "Subscriptions"
+msgstr ""
 
 #: src/postulo/templates/resume/overview.html
 msgid "Suggest from my ORCID record"
@@ -16808,7 +17031,7 @@ msgstr "Eliminarea lor"
 msgid "Task"
 msgstr "Sarcină"
 
-#: src/postulo/core/models.py
+#: src/postulo/applications/models.py src/postulo/core/models.py
 msgid "Teal"
 msgstr "Turcoaz"
 
@@ -16932,6 +17155,10 @@ msgstr "Acea adresă nu a putut fi adăugată."
 #, python-format
 msgid "That address is %(type)s, not an image Postulo keeps."
 msgstr "Acea adresă este %(type)s, nu o imagine pe care Postulo o păstrează."
+
+#: src/postulo/applications/subscriptions.py
+msgid "That address is not one a calendar can be read from."
+msgstr ""
 
 #: src/postulo/plugins/public_addresses.py
 msgid "That address is on a private or local network, and Postulo will not fetch it. Paste the posting text in by hand instead."
@@ -17238,6 +17465,7 @@ msgstr[1] "Ați făcut multe teste. Încercați din nou peste %(seconds)d secund
 msgstr[2] "Ați făcut multe teste. Încercați din nou peste %(seconds)d de secunde."
 
 #: src/postulo/accounts/avatars.py
+#: src/postulo/applications/views_subscriptions.py
 msgid "That is a lot of tries. Wait a little before asking again."
 msgstr "Ați făcut multe încercări. Așteptați puțin înainte de a cere din nou."
 
@@ -17672,6 +17900,10 @@ msgstr "Adresa a răspuns %(code)s."
 msgid "The address answered with nothing."
 msgstr "Adresa nu a returnat nimic."
 
+#: src/postulo/applications/subscriptions.py
+msgid "The address cannot be read here any more. Enter it again."
+msgstr ""
+
 #: src/postulo/jobs/tiles.py
 msgid "The address must hold {z}, {x} and {y}, where each tile's numbers go."
 msgstr "Adresa trebuie să conțină {z}, {x} și {y}, acolo unde vin numerele fiecărei dale."
@@ -17783,9 +18015,55 @@ msgstr "Calendarul și rapoartele încep săptămânile cu această zi. Lăsată
 msgid "The calendar can be downloaded as an iCalendar file, for the period and kinds on the screen, and a file from another calendar can be read in, with a review of what it holds before anything is added."
 msgstr "Calendarul poate fi descărcat ca fișier iCalendar, pentru perioada și tipurile de pe ecran, iar un fișier dintr-un alt calendar poate fi importat, cu o trecere în revistă a conținutului înainte de a se adăuga ceva."
 
+#: src/postulo/applications/subscriptions.py
+msgid "The calendar could not be read."
+msgstr ""
+
+#: src/postulo/applications/subscriptions.py
+#, python-format
+msgid "The calendar is larger than %(limit)s MB, so it was not read."
+msgstr ""
+
+#: src/postulo/templates/applications/subscribed_event.html
+msgid "The calendar marks this as cancelled."
+msgstr ""
+
 #: src/postulo/accounts/forms.py
 msgid "The calendar's period buttons"
 msgstr "Butoanele de perioadă ale calendarului"
+
+#: src/postulo/applications/subscriptions.py
+#, python-format
+msgid "The calendar's server answered with an error (%(status)s)."
+msgstr ""
+
+#: src/postulo/applications/subscriptions.py
+msgid "The calendar's server could not be reached."
+msgstr ""
+
+#: src/postulo/applications/subscriptions.py
+msgid "The calendar's server has nothing at that address any more."
+msgstr ""
+
+#: src/postulo/applications/subscriptions.py
+msgid "The calendar's server refused the address. It may have been changed or withdrawn."
+msgstr ""
+
+#: src/postulo/applications/subscriptions.py
+msgid "The calendar's server sent Postulo round too many redirects."
+msgstr ""
+
+#: src/postulo/applications/subscriptions.py
+msgid "The calendar's server sent something that could not be read."
+msgstr ""
+
+#: src/postulo/applications/subscriptions.py
+msgid "The calendar's server took too long to answer."
+msgstr ""
+
+#: src/postulo/applications/forms.py
+msgid "The calendar's web address, as the service that keeps it gives it: it starts with https:// or webcal:// and usually ends in .ics. It may open the calendar to anyone who has it, so Postulo keeps it encrypted and shows only its site."
+msgstr ""
 
 #: src/postulo/templates/jobs/capture_page_forget.html
 msgid "The capture stays as it is, and so does any listing it became."
@@ -18955,6 +19233,11 @@ msgstr "Subiectul fiecărui fișier"
 msgid "The subject has to be one line."
 msgstr "Subiectul trebuie să fie pe un singur rând."
 
+#: src/postulo/applications/views_subscriptions.py
+#, python-format
+msgid "the subscribed calendar %(name)s"
+msgstr ""
+
 #: src/postulo/templates/settings/appearance.html
 msgid "The switch at the top right cycles through the same three; this is the explicit version."
 msgstr "Comutatorul din dreapta sus trece prin aceleași trei; aceasta este versiunea explicită."
@@ -19413,6 +19696,10 @@ msgstr "S-a raportat că această companie face disponibilizări la data de %(da
 msgid "This entry prints its original text on every CV."
 msgstr "Această intrare tipărește textul original pe fiecare CV."
 
+#: src/postulo/templates/applications/subscribed_event.html
+msgid "This event is already in your calendar as your own."
+msgstr ""
+
 #: src/postulo/documents/forms.py
 msgid "This export only. Your default is under Settings → Export."
 msgstr "Doar acest export. Valoarea dumneavoastră implicită se află în Setări → Exportați."
@@ -19537,6 +19824,10 @@ msgstr "Această dată este anterioară datei emiterii."
 #: src/postulo/resume/forms.py
 msgid "This is before the start date."
 msgstr "Această dată este anterioară datei de început."
+
+#: src/postulo/templates/applications/subscribed_event.html
+msgid "This is how the calendar it comes from has it, and it changes there. Postulo reads it again on its own."
+msgstr ""
 
 #: src/postulo/core/phones.py
 msgid "This is kept as it was typed, with no country in front of it, so it could not be checked and cannot be dialled from anywhere else."
@@ -20056,7 +20347,7 @@ msgstr "tip de document"
 msgid "type of entry"
 msgstr "tip de intrare"
 
-#: src/postulo/applications/ical_import.py
+#: src/postulo/applications/forms.py src/postulo/applications/ical_import.py
 msgid "Type of interview"
 msgstr "Tipul interviului"
 
@@ -20137,6 +20428,10 @@ msgstr "Debifați pentru a păstra intrarea în această variantă, dar a o lăs
 #: src/postulo/templates/server/defaults.html
 msgid "Under each language, how many of Postulo's strings a speaker has reviewed, how many are drafts nobody has read yet, and how many are not translated at all."
 msgstr "Sub fiecare limbă, câte dintre textele Postulo a revizuit un vorbitor, câte sunt ciorne pe care nimeni nu le-a citit încă și câte nu sunt deloc traduse."
+
+#: src/postulo/templates/help/calendar.html
+msgid "Under Subscriptions, a calendar somebody else keeps -- an employment office's appointments, a training provider's sessions -- can be followed by its address. Postulo reads it again on its own and draws its events in the colour you chose, marked as from it. They cannot be changed here; any of them can be added as an appointment or an interview of your own."
+msgstr ""
 
 #: src/postulo/accounts/forms.py
 msgid "Underline links in navigation"
@@ -20474,7 +20769,7 @@ msgstr "Vizualizare salvată."
 msgid "Views"
 msgstr "Vizualizări"
 
-#: src/postulo/core/models.py
+#: src/postulo/applications/models.py src/postulo/core/models.py
 msgid "Violet"
 msgstr "Violet"
 
@@ -20852,6 +21147,10 @@ msgstr "Ce a fost. O altă captură a aceluiași anunț se adaugă din ecranul d
 msgid "What it will hold"
 msgstr "Ce va conține"
 
+#: src/postulo/applications/forms.py
+msgid "What its events are drawn in on the calendar."
+msgstr ""
+
 #: src/postulo/templates/jobs/merge.html
 msgid "What moves"
 msgstr "Ce se mută"
@@ -21150,6 +21449,7 @@ msgstr "Cât considerați că merită, o dată sau din când în când, la <a hr
 msgid "when"
 msgstr "când"
 
+#: src/postulo/templates/applications/subscribed_event.html
 #: src/postulo/templates/documents/rendered_list.html
 #: src/postulo/templates/server/backups.html
 #: src/postulo/templates/server/design.html
@@ -21188,6 +21488,10 @@ msgstr "Când înregistrați această instanță la furnizor, dați-i această a
 #: src/postulo/applications/models.py
 msgid "where"
 msgstr "unde"
+
+#: src/postulo/templates/applications/subscribed_event.html
+msgid "Where"
+msgstr ""
 
 #: src/postulo/templates/help/links.html
 msgid "Where a card has a <em>Service</em> menu, choose the service the address is on. Its icon is shown beside it, and the address is checked against what an address on that service looks like, so a mistyped one is refused, and the refusal says why. Paste an address without choosing a service, and saving chooses it where the address is on one Postulo knows."
@@ -22376,6 +22680,10 @@ msgstr "Versiunea dumneavoastră este păstrată"
 #: src/postulo/documents/forms.py
 msgid "Yours to set and never enforced: after it, Postulo warns and does not block."
 msgstr "Îl stabiliți dumneavoastră și nu este impus niciodată: după acesta, Postulo avertizează, dar nu blochează."
+
+#: src/postulo/applications/forms.py
+msgid "Yours, for telling it apart: drawn beside each of its events."
+msgstr ""
 
 #: src/postulo/applications/forms.py
 #, fuzzy
