@@ -10,6 +10,7 @@ and the address, which may be what opens the calendar, is a secret.
 from __future__ import annotations
 
 import datetime as dt
+import io
 import ipaddress
 import json
 import logging
@@ -396,6 +397,30 @@ def test_the_archive_carries_them_without_the_address(user, other_user, subscrip
     assert not subscriptions.refresh(restored)
     restored.refresh_from_db()
     assert "Enter it again" in restored.last_error
+
+
+@pytest.mark.parametrize("older", [80, 81])
+def test_an_archive_from_before_them_still_loads(user, other_user, subscription, older):
+    """82 is the format that carries them; 81 added the quiet days (#1099) and 80 neither.
+    An archive of either is read as it was written, and restores no subscription (#1098)."""
+    an_event(subscription)
+    document = export_module.build_document(user)
+    assert document["postulo"]["format"] == export_module.FORMAT_VERSION >= 82
+    del document["calendar_subscriptions"]
+    del document["counts"]["calendar_subscriptions"]
+    if older < 81:
+        for name in ("quiet_days_by_status", "quiet_days_by_channel"):
+            document["account"]["profile"].pop(name, None)
+    document["postulo"]["format"] = older
+    buffer = io.BytesIO()
+    with zipfile.ZipFile(buffer, "w") as archive:
+        archive.writestr(export_module.MANIFEST_NAME, json.dumps(document))
+    buffer.seek(0)
+
+    report = importer.load(other_user, zipfile.ZipFile(buffer))
+
+    assert report.calendar_subscriptions == 0
+    assert not CalendarSubscription.objects.filter(owner=other_user).exists()
 
 
 def test_they_go_with_the_account(user, subscription):
