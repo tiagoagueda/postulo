@@ -399,7 +399,8 @@ def test_a_contacts_address_is_drawn_only_when_asked(client, user, monkeypatch, 
 
     (entry,) = page(client, user).context["places"]
     assert entry["people"] == [
-        ("Caroline", reverse("jobs:contact_update", args=[someone.pk]), "Home")
+        # Their own page (#1097).
+        ("Caroline", reverse("jobs:contact_detail", args=[someone.pk]), "Home")
     ]
     assert "Rua Secreta" not in html, "never a street on the overview"
 

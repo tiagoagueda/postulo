@@ -1,0 +1,140 @@
+{% extends "base.html" %}
+{% load i18n postulo %}
+
+{% block title %}{{ contact.name }}{% endblock %}
+{% block breadcrumb %}
+  <c-breadcrumb>
+    <c-crumb href="{% url 'jobs:company_list' %}">{% translate "Companies" %}</c-crumb>
+    {% if contact.company %}
+      <c-crumb href="{{ contact.company.get_absolute_url }}">{{ contact.company.name }}</c-crumb>
+    {% endif %}
+    <c-crumb current>{{ contact.name }}</c-crumb>
+  </c-breadcrumb>
+{% endblock %}
+
+{% block content %}
+  {% comment %} A contact's own page (#1097): who they are, and everything that happened with
+     them across the reader's applications and listings, newest first. Read-only: the details
+     change on the edit page, and only the reader's own rows are drawn here, whoever else may
+     see the contact (#896). {% endcomment %}
+  {% if sharing %}{% include "jobs/partials/sharing_panel.html" with panel=sharing %}{% endif %}
+  <div class="mb-6 flex flex-wrap items-start gap-4">
+    <div class="min-w-0">
+      <c-page-title><bdi>{{ contact.name }}</bdi></c-page-title>
+      {% if contact.role or contact.department %}
+        <p class="text-sm text-ink-500 dark:text-ink-400">
+          {% if contact.role %}<bdi>{{ contact.role }}</bdi>{% endif %}{% if contact.role and contact.department %} · {% endif %}
+          {% if contact.department %}<bdi>{{ contact.department.name }}</bdi>{% endif %}
+        </p>
+      {% endif %}
+      {% if contact.company %}
+        <p class="text-sm" data-contact-company>
+          <a href="{{ contact.company.get_absolute_url }}" class="text-brand-600 underline dark:text-brand-400"><bdi>{{ contact.company.name }}</bdi></a>
+        </p>
+      {% endif %}
+      <c-pairing-line :record="contact" class="mt-2" />
+    </div>
+    <div class="ms-auto">
+      <div class="button-group" role="group" aria-label="{% translate 'This contact' %}" data-contact-actions>
+        {% if can_write %}
+          <a href="{% url 'jobs:contact_update' contact.pk %}" class="btn" data-variant="outline">{% icon "pencil" %}<span class="btn-label">{% translate "Edit" %}</span></a>
+        {% endif %}
+        {% if gdpr_offered %}
+          <a href="{% url 'jobs:contact_export' contact.pk %}" class="btn" data-variant="outline">{% icon "download" %}<span class="btn-label">{% translate "Export" %}</span></a>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
+    <section class="lg:col-span-2" aria-labelledby="contact-history-title" data-contact-history>
+      <c-section-title id="contact-history-title">{% translate "What happened with them" %}</c-section-title>
+      {% if history %}
+        {% comment %} The line, the dot and the date are a listing's history's, so the two read
+           as one kind of thing. Every title may be a stranger's words -- an email's subject,
+           an advert's title -- and is printed as text and nothing else (#218). {% endcomment %}
+        <ol class="relative border-s border-ink-200 ps-6 dark:border-ink-800">
+          {% for entry in history %}
+            <li class="mb-6 last:mb-0" data-history-entry="{{ entry.kind }}">
+              <span class="absolute -start-1.5 mt-1.5 h-3 w-3 rounded-full bg-ink-300 dark:bg-ink-600"></span>
+              <div class="flex flex-wrap items-baseline gap-2">
+                <a href="{{ entry.url }}" class="font-medium wrap-anywhere hover:underline"><bdi>{{ entry.title }}</bdi></a>
+                <span class="text-xs text-ink-500 dark:text-ink-400">
+                  {% if entry.when is None %}{% translate "Date not recorded" %}{% elif entry.has_time %}{{ entry.when|date:"DATETIME_FORMAT" }}{% else %}{{ entry.when|date:"DATE_FORMAT" }}{% endif %}
+                </span>
+                <span class="badge" data-tone="grey">{{ entry.label }}</span>
+              </div>
+              {% if entry.listing or entry.company %}
+                <p class="mt-1 text-sm text-ink-600 dark:text-ink-300">
+                  {% if entry.listing %}<bdi>{{ entry.listing }}</bdi>{% endif %}{% if entry.listing and entry.company %} — {% endif %}{% if entry.company %}<bdi>{{ entry.company }}</bdi>{% endif %}
+                </p>
+              {% endif %}
+            </li>
+          {% endfor %}
+        </ol>
+      {% else %}
+        <c-empty variant="quiet">{% translate "Nothing recorded with them yet." %}</c-empty>
+      {% endif %}
+
+      {% if can_write %}
+        {% if contact.notes %}
+          <c-section-title class="mt-8">{% translate "Notes" %}</c-section-title>
+          <div class="card whitespace-pre-line text-sm">{{ contact.notes }}</div>
+        {% endif %}
+      {% else %}
+        {% include "jobs/partials/own_note_form.html" with record=contact kind="contact" %}
+      {% endif %}
+    </section>
+
+    <aside aria-labelledby="contact-details-title">
+      <c-section-title id="contact-details-title">{% translate "How to reach them" %}</c-section-title>
+      <div class="card flex flex-col gap-1 text-sm" data-contact-details>
+        {% if contact.email %}
+          <p class="wrap-anywhere"><a href="mailto:{{ contact.email }}" class="underline">{{ contact.email }}</a></p>
+        {% endif %}
+        {% for number in contact.phone_numbers.all %}
+          {% if several_numbers or number.is_primary %}
+            <p>
+              {% phone_link number.number %}
+              {% if number.kind_label %}<span class="text-ink-500 dark:text-ink-400">{{ number.kind_label }}</span>{% endif %}
+            </p>
+          {% endif %}
+        {% endfor %}
+        {% for address in contact.postal_addresses.all %}
+          <p data-contact-address>
+            {% if address.kind %}<span class="text-ink-500 dark:text-ink-400">{% if address.kind == "other" %}{{ address.label }}{% else %}{{ address.get_kind_display }}{% endif %}</span> {% endif %}<bdi>{{ address.one_line }}</bdi>
+          </p>
+        {% endfor %}
+        {% for link in contact.web_links.all %}
+          {% if link.is_primary or link.kind in several_links %}
+            <p class="wrap-anywhere">
+              {% if link.brand %}{% brand link.brand class="inline-block size-4 align-text-bottom" %} {% endif %}<a href="{{ link.url }}" rel="noopener noreferrer external" target="_blank" class="underline">{{ link.display }}</a>
+              <span class="text-ink-500 dark:text-ink-400">{{ link.kind_label }}</span>
+            </p>
+          {% endif %}
+        {% endfor %}
+        {% if messaging_offered %}{% for handle in contact.messaging_handles.all %}
+          <p>
+            <span class="text-ink-500 dark:text-ink-400">{{ handle.service_label }}</span>
+            <bdi>{{ handle.handle }}</bdi>
+          </p>
+        {% endfor %}{% endif %}
+        {% if not contact.email and not contact.phone_numbers.all and not contact.postal_addresses.all and not contact.web_links.all %}
+          <p class="text-ink-500 dark:text-ink-400">{% translate "No way to reach them recorded." %}</p>
+        {% endif %}
+      </div>
+      {% if career_reference %}
+        <p class="mt-4 text-sm" data-career-reference>
+          <a href="{% url 'resume:item_update' 'reference' career_reference.pk %}" class="text-brand-600 underline dark:text-brand-400">{% translate "One of the references in your career record" %}</a>
+        </p>
+      {% endif %}
+      {% module_on "format-vcard" as vcard_on %}
+      {% if vcard_on %}
+        <div class="mt-4">
+          {% url 'jobs:contact_vcard' contact.pk as card_url %}
+          <c-vcard-download :url="card_url" label="{% translate 'Download as a vCard' %}" notes />
+        </div>
+      {% endif %}
+    </aside>
+  </div>
+{% endblock %}

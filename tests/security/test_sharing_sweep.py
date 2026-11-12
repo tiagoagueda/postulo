@@ -46,6 +46,8 @@ READ = {
     "jobs:company_contacts_vcard",
     "jobs:contact_vcard",
     "jobs:contact_export",
+    # A contact's page and their history, the reader's own rows only (#1097).
+    "jobs:contact_detail",
     "jobs:posting_detail",
     "listings:apply",
     "listings:discard",

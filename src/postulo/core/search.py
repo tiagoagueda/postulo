@@ -379,9 +379,8 @@ def search_contacts(user, query: str, limit: int) -> Found:
                 for part in (contact.role, contact.company.name if contact.company else "")
                 if part
             ),
-            url=contact.company.get_absolute_url()
-            if contact.company
-            else reverse("jobs:company_list"),
+            # Their own page, with everything that happened with them (#1097).
+            url=contact.get_absolute_url(),
             excerpt=excerpt(_first_match(query, contact.notes, contact.email), query),
             in_title=query.lower() in contact.name.lower(),
         )

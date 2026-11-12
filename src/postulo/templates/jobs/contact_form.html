@@ -73,7 +73,7 @@
        comparison only knows names and addresses (#239). {% endcomment %}
     <div class="flex max-w-2xl flex-wrap items-center gap-3">
       {% if not read_only %}<button type="submit" class="btn">{% translate "Save" %}</button>{% endif %}
-      <a href="{% url 'jobs:company_list' %}" class="btn" data-variant="ghost">{% translate "Cancel" %}</a>
+      <a href="{% if object.pk %}{{ object.get_absolute_url }}{% else %}{% url 'jobs:company_list' %}{% endif %}" class="btn" data-variant="ghost">{% translate "Cancel" %}</a>
       {% if merge_url %}
         <a href="{{ merge_url }}" class="btn ms-auto" data-variant="ghost">{% translate "Merge with another contact" %}</a>
       {% endif %}

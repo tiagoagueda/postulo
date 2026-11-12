@@ -1368,7 +1368,7 @@ class Contact(OwnNote, PrincipalOwnedModel):
         return self.name
 
     def get_absolute_url(self) -> str:
-        return reverse("jobs:contact_update", args=[self.pk])
+        return reverse("jobs:contact_detail", args=[self.pk])
 
     def clean(self) -> None:
         """A department belongs to a company, so a contact cannot borrow another's."""

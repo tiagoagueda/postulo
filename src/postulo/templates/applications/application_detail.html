@@ -121,7 +121,7 @@
           {% if application.contact %}
             <div>
               <dt class="text-xs text-ink-500 dark:text-ink-400">{% translate "Main contact" %}</dt>
-              <dd>{{ application.contact.name }}{% if application.contact.role %} — {{ application.contact.role }}{% endif %}</dd>
+              <dd><a href="{{ application.contact.get_absolute_url }}" class="hover:underline"><bdi>{{ application.contact.name }}</bdi></a>{% if application.contact.role %} — {{ application.contact.role }}{% endif %}</dd>
             </div>
           {% endif %}
           {% comment %} Who put the person forward, and the agency it went through (#239).
@@ -131,7 +131,7 @@
             <div data-referred-by>
               <dt class="text-xs text-ink-500 dark:text-ink-400">{% translate "Referred by" %}</dt>
               <dd>
-                <bdi>{{ application.referred_by.name }}</bdi>
+                <a href="{{ application.referred_by.get_absolute_url }}" class="hover:underline"><bdi>{{ application.referred_by.name }}</bdi></a>
                 {% if application.referred_by.company %}
                   <span class="text-xs text-ink-500 dark:text-ink-400">
                     <bdi>{{ application.referred_by.company.name }}</bdi>

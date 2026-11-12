@@ -4,6 +4,7 @@ from postulo.core import modules
 
 from . import (
     capture_views,
+    contact_views,
     page_views,
     register_views,
     share_views,
@@ -95,6 +96,8 @@ urlpatterns = [
     path("industries/<int:pk>/edit/", views.IndustryUpdateView.as_view(), name="industry_update"),
     path("industries/<int:pk>/delete/", views.IndustryDeleteView.as_view(), name="industry_delete"),
     path("contacts/new/", views.ContactCreateView.as_view(), name="contact_create"),
+    # A contact's own page, and everything that happened with them (#1097).
+    path("contacts/<int:pk>/", contact_views.ContactDetailView.as_view(), name="contact_detail"),
     path("contacts/<int:pk>/edit/", views.ContactUpdateView.as_view(), name="contact_update"),
     path(
         "contacts/<int:holder_pk>/remove/<slug:kind>/<int:pk>/",

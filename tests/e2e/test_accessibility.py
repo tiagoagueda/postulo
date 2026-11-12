@@ -142,7 +142,11 @@ def furnished(applicant):
         description_format="markdown",
     )
     posting = JobPosting.objects.create(owner=applicant, company=company, title="Test Engineer")
-    application = Application.objects.create(owner=applicant, posting=posting, status=Status.DRAFT)
+    # Cave is its main contact, so the application names him and his own page has an
+    # application, an interview and a message on it (#1097).
+    application = Application.objects.create(
+        owner=applicant, posting=posting, status=Status.DRAFT, contact=cave
+    )
     change_status(application, Status.APPLIED, occurred_at=timezone.now() - dt.timedelta(days=30))
     reminder = Reminder.objects.create(
         owner=applicant, application=application, summary="Chase", due_at=timezone.now()
@@ -303,6 +307,7 @@ def furnished(applicant):
         url="https://jobs.example.org/42"
     )
     interview = application.interviews.first()
+    interview.contacts.add(cave)
     # An offer with every field, so the comparison page and the card have something to
     # draw in both themes (#237).
     from postulo.applications.services import record_offer
@@ -810,6 +815,8 @@ def signed_in_paths(a, c, me, entry=None, recovery_link: str = "", things=None) 
         f"/jobs/companies/{c.pk}/merge/?with={duplicate.pk}",
         f"/jobs/contacts/{contact.pk}/merge/",
         f"/jobs/contacts/{contact.pk}/merge/?with={twin.pk}",
+        # The contact's own page, with their history on it (#1097).
+        f"/jobs/contacts/{contact.pk}/",
         f"/jobs/contacts/{contact.pk}/edit/",
         f"/jobs/contacts/{contact.pk}/delete/",
         f"/jobs/industries/{industry.pk}/edit/",

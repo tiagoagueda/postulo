@@ -333,7 +333,7 @@ def pinned_addresses(person) -> list[dict]:
                 continue
             name, url, is_company = (
                 contact.name,
-                reverse("jobs:contact_update", args=[contact.pk]),
+                reverse("jobs:contact_detail", args=[contact.pk]),
                 False,
             )
             state = picture = ""
