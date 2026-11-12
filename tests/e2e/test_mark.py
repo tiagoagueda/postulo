@@ -50,6 +50,26 @@ def test_the_header_draws_the_vector_at_28_pixels_beside_the_name(
     assert page.locator(MARK).get_attribute("alt") == ""
 
 
+def test_the_mark_takes_the_room_the_png_did_and_no_more(page: Page, live_server, applicant):
+    """The wordmark is the mark, the row's gap and the name, as it was with a bare `<img>`.
+    The `<picture>` was `display: contents`, which handed its `<source>`s to the link's flex
+    row as empty items: each took a gap of its own, so the mark sat 8 pixels in, the link
+    grew by as much, and under the text-spacing override the masthead went to two lines
+    with no script to fit it (#1238)."""
+    sign_in(page, live_server.url, "/")
+    shown(page)
+
+    link = page.locator("header [data-wordmark]").bounding_box()
+    mark = page.locator(MARK).bounding_box()
+    name = page.evaluate(
+        "() => { const r = document.createRange();"
+        " const a = document.querySelector('header [data-wordmark]');"
+        " r.selectNodeContents(a.lastChild); return r.getBoundingClientRect().width; }"
+    )
+    assert round(mark["x"]) == round(link["x"]), "the mark starts the link"
+    assert round(link["width"]) == round(28 + 8 + name), (link["width"], name)
+
+
 def test_the_moving_mark_is_still_for_a_system_that_asks_for_less_motion(
     page: Page, live_server, applicant
 ):

@@ -133,12 +133,14 @@
                repeating "Postulo logo, Postulo" helps nobody. The vector, with the PNG as
                the fallback; the moving one only for somebody who asked for it and whose
                system does not ask for less motion, and the still vector the moment it does
-               (#1238). `contents`, so the image is the row's item and lines up as it did. {% endcomment %}
-            <picture class="contents">
+               (#1238). The picture is the row's item, a 28-pixel block as the PNG was: not
+               `contents`, which made each `<source>` an empty item of the row with a gap of
+               its own, and pushed the masthead onto two lines under text spacing. {% endcomment %}
+            <picture class="block size-7 shrink-0">
               {% if brand_mark.moving %}<source srcset="{% static brand_mark.moving %}" type="image/svg+xml" media="(prefers-reduced-motion: no-preference)">{% endif %}
               <source srcset="{% static brand_mark.svg %}" type="image/svg+xml">
               <img src="{% static brand_mark.png %}" alt="" width="28" height="28"
-                   class="h-7 w-auto shrink-0" data-mark>
+                   class="block size-7" data-mark>
             </picture>
             {{ instance_name }}
           </a>
