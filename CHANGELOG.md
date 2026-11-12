@@ -19,6 +19,7 @@ All notable changes to Postulo are recorded here. The format follows
 - Calendar → Subscriptions: follow a calendar somebody else keeps by its address, with a name, a colour and how often it is read again; its events appear read-only on your calendar, and any of them can be added as an appointment or an interview of your own. (#1098)
 - SQLite instances keep their write-ahead log to 64 MB and refresh the query planner's statistics once a day, and manage.py compact_database (with --dry-run) gives back the space deleted records leave in the file; Server Overview shows how much that is. (#1128)
 - The mark redrawn as vectors beside the raster, in assets/brand: postulo.svg, a pride variant (with its raster, postulo_pride.png), and two looping animations of each (Swell, Light drift) that start and end on the static mark. The raster stays the source of the served icons. (#1218)
+- Every environment variable is declared once: sizes and durations accept `25MB` or `2h`, booleans yes/no/on/off, a secret `<NAME>_FILE`; plugins declare their own; start-up names unknown variables and values it cannot read; `manage.py settings` shows each value and its source; `.env.example` is generated. (#1186)
 
 ### 🔧 Changed
 
@@ -55,6 +56,8 @@ All notable changes to Postulo are recorded here. The format follows
 - The weekly scheduled run is the dependency audit and the ESCO check alone, in a workflow of its own, not the whole of CI. (#1136)
 - CI jobs that leave the browser tests' packages out no longer download them anyway on their first command. (#1135)
 - CI's security job audits the two lock files without installing the project or the asset build's packages. (#1166)
+- CI's unit tests restore the test database migrated by an earlier run instead of migrating it in every process; the PostgreSQL and browser jobs still migrate from nothing on every push. (#1033)
+- The logo is served as a vector, sharp at any zoom, with every icon rendered from it; a moving logo can be switched on under Appearance (never moving when the system asks for less motion), and in June the logo wears the pride colours. (#1238)
 
 ### 🐛 Fixed
 
