@@ -35,12 +35,14 @@
        same thing. A page fills `title` with its own name; the home page empties the whole
        tail and is the instance's name alone. {% endcomment %}
     <title>{{ instance_name }}{% block title_tail %} &gt; {% block title %}{% endblock %}{% endblock %}</title>
-    {% comment %} Three sizes rather than one: a browser picks the nearest and scaling a
-       32-pixel mark up to a 180-pixel home screen looks exactly as bad as it sounds. The
-       .ico is for anything that still asks for /favicon.ico without being told to.
-    {% endcomment %}
-    <link rel="icon" type="image/png" sizes="32x32" href="{% static 'brand/favicon-32.png' %}">
-    <link rel="icon" type="image/png" sizes="16x16" href="{% static 'brand/favicon-16.png' %}">
+    {% comment %} The vector first, sharp at any size, in every browser that takes an SVG
+       icon (#1238); the PNGs behind it for one that does not, in three sizes rather than one,
+       because a browser picks the nearest and scaling a 32-pixel mark up to a 180-pixel home
+       screen looks exactly as bad as it sounds. The .ico is for anything that still asks for
+       /favicon.ico without being told to. `brand_mark` is the pride mark in June. {% endcomment %}
+    <link rel="icon" type="image/svg+xml" sizes="any" href="{% static brand_mark.svg %}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{% static brand_mark.favicon_32 %}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{% static brand_mark.favicon_16 %}">
     <link rel="apple-touch-icon" sizes="180x180" href="{% static 'brand/apple-touch-icon.png' %}">
     {% comment %} With credentials, so the manifest is in the account's language rather than the browser's guess at it (#895). {% endcomment %}
     <link rel="manifest" href="{% url 'core:manifest' %}" crossorigin="use-credentials">
@@ -128,9 +130,16 @@
              class="flex items-center gap-2 text-lg font-semibold tracking-tight {% if dashboard_hidden %}{% nav_active 'core:home' %} !text-lg !font-semibold{% else %}text-ink-900 dark:text-ink-50{% endif %}"
              {% if dashboard_hidden %}aria-label="{% blocktranslate with name=instance_name trimmed %}{{ name }} — dashboard{% endblocktranslate %}"{% endif %}>
             {% comment %} Decorative: the name is right beside it, and a screen reader
-               repeating "Postulo logo, Postulo" helps nobody. {% endcomment %}
-            <img src="{% static 'brand/logo-64.png' %}" alt="" width="28" height="28"
-                 class="h-7 w-auto shrink-0">
+               repeating "Postulo logo, Postulo" helps nobody. The vector, with the PNG as
+               the fallback; the moving one only for somebody who asked for it and whose
+               system does not ask for less motion, and the still vector the moment it does
+               (#1238). `contents`, so the image is the row's item and lines up as it did. {% endcomment %}
+            <picture class="contents">
+              {% if brand_mark.moving %}<source srcset="{% static brand_mark.moving %}" type="image/svg+xml" media="(prefers-reduced-motion: no-preference)">{% endif %}
+              <source srcset="{% static brand_mark.svg %}" type="image/svg+xml">
+              <img src="{% static brand_mark.png %}" alt="" width="28" height="28"
+                   class="h-7 w-auto shrink-0" data-mark>
+            </picture>
             {{ instance_name }}
           </a>
 

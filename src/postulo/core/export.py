@@ -270,7 +270,9 @@ logger = logging.getLogger(__name__)
 #: ``report_made_for``, the first day of the last month one was made for, so a restore does not
 #: make that month again. Each is held to its column; an archive without them restores the
 #: report as never made without being asked (#1095).
-FORMAT_VERSION = 83
+#: 84 added ``animated_mark`` on the profile: whether the mark in the header moves. An archive
+#: without it restores the mark still, the default (#1238).
+FORMAT_VERSION = 84
 
 
 def industry_entry(industry) -> str | dict:
@@ -430,6 +432,7 @@ PROFILE_FIELDS = (
     "calendar_labels",
     "weekday_names",
     "first_weekday",
+    "animated_mark",
     "plugins_off",
     "keep_page_source",
     "keep_page_rendering",

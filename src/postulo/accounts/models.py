@@ -554,6 +554,10 @@ class Profile(models.Model):
         blank=True,
         validators=[MaxValueValidator(6)],
     )
+    #: Whether the mark in the header moves: the light on its sheets turning and returning
+    #: (#1238). Off unless somebody switches it on, and still whenever the system asks for
+    #: less motion, whatever this says.
+    animated_mark = models.BooleanField(_("moving mark"), default=False)
     #: Plugins this person has switched off for themselves. Stored as what was turned
     #: *off*, like `hidden_nav_items` and for the same reason: a plugin installed in a
     #: later release should be available without anybody having to opt into it.

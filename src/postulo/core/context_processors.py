@@ -67,6 +67,8 @@ def ui(request: HttpRequest) -> dict:
     show_breadcrumb = False
     breadcrumb_on_hover = False
     button_labels = "both"
+    # Still unless somebody has asked for it to move (#1238), and a stranger has not.
+    moving_mark = False
     user = getattr(request, "user", None)
     signed_in = user is not None and user.is_authenticated
     if signed_in:
@@ -80,10 +82,11 @@ def ui(request: HttpRequest) -> dict:
             show_breadcrumb = profile.show_breadcrumb
             breadcrumb_on_hover = profile.show_breadcrumb and profile.breadcrumb_on_hover
             button_labels = profile.button_labels
+            moving_mark = profile.animated_mark
         # "system" means stamp nothing and let the operating system preference apply.
         if choice in {"light", "dark"}:
             theme = choice
-    from . import site
+    from . import mark, site
 
     name = site.instance_name()
     return {
@@ -117,6 +120,9 @@ def ui(request: HttpRequest) -> dict:
         # Likewise: the stylesheet hides the icon or the label, and `app.js` gives an icon-only
         # button its tooltip (#852).
         "ui_button_labels": button_labels,
+        # The files the tab and the header draw the mark from: the pride mark in June, in this
+        # person's time zone, and the moving one for somebody who asked for it (#1238).
+        "brand_mark": mark.files(moving=moving_mark),
         "nav_items": navigation.visible_items(profile),
         "dashboard_hidden": navigation.dashboard_hidden(profile),
         # Sign-up is also open on an instance with no account at all, which is asked of the

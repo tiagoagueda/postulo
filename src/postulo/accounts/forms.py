@@ -1502,6 +1502,7 @@ class AppearanceForm(forms.ModelForm):
         "button_labels",
         "calendar_labels",
         "weekday_names",
+        "animated_mark",
         "quiet_after_days",
         "closing_notice_days",
     )
@@ -1521,6 +1522,20 @@ class AppearanceForm(forms.ModelForm):
         ),
     )
 
+    #: The mark beside the instance's name (#1238), radio buttons for the same two reasons.
+    animated_mark = forms.TypedChoiceField(
+        label=_("The mark beside the name"),
+        choices=(("False", _("Still")), ("True", _("Moving"))),
+        coerce=lambda value: value == "True",
+        empty_value=None,
+        required=False,
+        widget=forms.RadioSelect,
+        help_text=_(
+            "Moving, the light on its coloured sheets turns slowly and comes back. It stays "
+            "still whenever your device asks for less motion."
+        ),
+    )
+
     class Meta:
         model = Profile
         fields = (
@@ -1530,6 +1545,7 @@ class AppearanceForm(forms.ModelForm):
             "button_labels",
             "calendar_labels",
             "weekday_names",
+            "animated_mark",
             "quiet_after_days",
             "closing_notice_days",
         )
@@ -1576,6 +1592,11 @@ class AppearanceForm(forms.ModelForm):
         """Left out, as by a page drawn before the setting existed, it stays as it was (#859)."""
         value = self.cleaned_data.get("calendar_labels")
         return self.instance.calendar_labels if value is None else value
+
+    def clean_animated_mark(self):
+        """Left out, as by a page drawn before the setting existed, it stays as it was (#1238)."""
+        value = self.cleaned_data.get("animated_mark")
+        return self.instance.animated_mark if value is None else value
 
     def clean_weekday_names(self):
         return self.cleaned_data.get("weekday_names") or self.instance.weekday_names or "short"

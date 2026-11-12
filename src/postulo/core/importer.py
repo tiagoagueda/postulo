@@ -157,6 +157,7 @@ _CHECKED_PROFILE_FIELDS = frozenset(
         "calendar_labels",
         "weekday_names",
         "first_weekday",
+        "animated_mark",
         "keep_page_source",
         "keep_page_rendering",
         "closing_notice_days",

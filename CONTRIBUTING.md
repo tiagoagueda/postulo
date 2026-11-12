@@ -230,33 +230,45 @@ installing or remembering; the run stops at once, saying so, if the font does no
 
 ## The mark
 
-Postulo's mark is a layered paper-cut **P**. It lives once, at `assets/brand/postulo.png`,
-and everything served is derived from it:
+Postulo's mark is a layered paper-cut **P**. It lives as vectors in `assets/brand/`, and
+everything served is derived from them (#1238):
 
 ```sh
-uv run python scripts/brand.py          # write the derived images
+uv run python scripts/brand.py          # write the served copies and the images
 uv run python scripts/brand.py --check  # CI runs this
 ```
 
-That produces the favicons, the Apple touch icon, the two manifest icons and the header
-logo into `src/postulo/static/brand/`, all committed — the same arrangement as the compiled
-stylesheet and the icon set, so an instance runs without needing the tooling that made them.
-Change the source, run the script, commit both; CI fails if they disagree.
+That writes into `src/postulo/static/brand/`, all committed — the same arrangement as the
+compiled stylesheet and the icon set, so an instance runs without needing the tooling that
+made them:
+
+- **the served vectors**, `logo.svg` and its pride and moving companions: each source
+  minified, framed on the mark, holding nothing but drawing (no script, no external
+  reference, no `foreignObject`). The header and the tab show the vector first.
+- **the PNGs**, every one rendered from `logo.svg` (or `logo-pride.svg`) by Chromium, the
+  browser the browser tests already use (`uv run playwright install chromium`): the tab's
+  favicons for a browser that takes no SVG icon, the Apple and manifest icons, which those
+  platforms want as PNG, and the header's fallback.
+
+Change a source, run the script, commit both; CI fails if they disagree. `--check` compares
+the digests `brand.json` records and needs nothing but Python, because two machines never
+rasterise to the same bytes.
 
 The mark is **decorative everywhere it appears**. It always sits beside the instance's name,
 so it carries an empty `alt` and a screen reader is not made to say "Postulo logo, Postulo".
 
-The file in this repository is 1024 pixels square, which is twice the largest thing derived
-from it. The full-resolution artwork lives wherever it is being designed; a source tree is
-not an asset library.
+In **June** the tab and the header show the pride mark instead, in the person's own time
+zone (the instance's for a visitor), with no setting. The icons a phone installs stay the
+usual mark, since one installed in June would stay there all year.
 
 It is a work in progress and will change. Nothing should hard-code its colours: the
 stylesheet's `brand` palette is the source of truth for those.
 
-Beside the raster, `assets/brand/` holds the mark redrawn as vectors (#1218):
+The sources in `assets/brand/` (#1218):
 
 - **`postulo.svg`:** seven paper sheets, front to back. Each is a Bézier path with its own
-  gradient (`grad-<sheet>`) and shadow filter (`shadow-<sheet>`), sampled from the raster.
+  gradient (`grad-<sheet>`) and shadow filter (`shadow-<sheet>`), sampled from the raster
+  the mark was first drawn as.
 - **`postulo_pride.svg`:** the same sheets in the six pride colours, red to purple.
   `postulo_pride.png` is the raster it was coloured from, 896 pixels on white, kept as made.
 - **`postulo_swell.svg`, `postulo_pride_swell.svg`:** an 8-second loop in which a slow
@@ -266,10 +278,13 @@ Beside the raster, `assets/brand/` holds the mark redrawn as vectors (#1218):
 
 The animation is plain SVG, so a browser plays it even when the file is an `<img>`. It
 cannot follow a reduced-motion setting by itself, so wherever an animated file is used,
-serve the static one to people who ask for less motion. The raster is still what
-`scripts/brand.py` reads; the vectors are not derived from it at build time and do not
-change the served icons. `tests/test_brand.py` holds them to pure vectors under the
-repository's 500 KB limit.
+serve the static one to people who ask for less motion. The header does: somebody can
+switch the moving mark on under Settings → Appearance (off by default), and `base.html`
+offers the drift file only in a `<source media="(prefers-reduced-motion: no-preference)">`
+ahead of the still one. Drift rather than swell because it is a twentieth of the size, and
+at 28 pixels a bending edge is under a pixel while turning light still reads.
+`tests/test_brand.py` holds the sources to pure vectors under the repository's 500 KB
+limit, and the served copies to drawing alone.
 
 ## Icons
 
