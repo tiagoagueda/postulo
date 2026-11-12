@@ -308,21 +308,26 @@ def environment(app_configs=None, **kwargs) -> list[Error | Warning]:
     that is not one), and a warning where it is only unusual (out of range). The variables
     another check already refuses are left to it.
     """
+    from postulo.plugins.registry import environment_variables
+
+    # Postulo's own, and what each loaded plugin declares it reads.
+    variables = {**environment_variables(), **configuration.VARIABLES}
     found: list[Error | Warning] = []
-    for name, nearest in configuration.unknown():
+    for name, nearest in configuration.unknown(variables=variables):
         found.append(
             Warning(
-                f"{name} is set, and nothing in Postulo reads it.",
+                f"{name} is set, and neither Postulo nor a loaded plugin reads it.",
                 hint=(
                     f"Did you mean {nearest}?"
                     if nearest
                     else "Check the name against Configuration in the wiki."
                 )
-                + " A plugin's own variable is reported here too until plugins declare theirs.",
+                + " A plugin's variable is known once the plugin declares it, and while the "
+                "plugin is switched on.",
                 id="postulo.W005",
             )
         )
-    for old, new in configuration.deprecated():
+    for old, new in configuration.deprecated(variables=variables):
         found.append(
             Warning(
                 f"{old} is the old name of {new}, and stops being read in the next minor release.",
@@ -330,7 +335,7 @@ def environment(app_configs=None, **kwargs) -> list[Error | Warning]:
                 id="postulo.W007",
             )
         )
-    for problem in configuration.problems():
+    for problem in configuration.problems(variables=variables):
         kind = Error if problem.level == "error" else Warning
         found.append(
             kind(

@@ -55,8 +55,7 @@ NOT_VARIABLES = {
 
 #: Declared names read where no pattern below can see it, and by what.
 READ_ELSEWHERE = {
-    # Arrives with the branch that adds the cached test database (#1144), which reads it in
-    # `postulo.plugins.testdb` through a constant; the merge meets it here.
+    # The cached test database (#1144) reads it through a constant, `testdb.VARIABLE`.
     "POSTULO_TEST_DB_CACHE": "postulo.plugins.testdb",
     # gunicorn reads it; the image sets it.
     "GUNICORN_CMD_ARGS": "gunicorn",
@@ -195,48 +194,7 @@ BREAKERS = {
 #: The list may only shrink. Lower this as names are renamed; never raise it.
 MOST_BREAKERS = 21
 
-_SHAPE = re.compile(r"^POSTULO_[A-Z][A-Z0-9]*(?:_[A-Z0-9]+)+$")
-_UNIT_WORDS = {
-    "B",
-    "KB",
-    "MB",
-    "GB",
-    "BYTE",
-    "MS",
-    "MINUTES",
-    "MINS",
-    "HOURS",
-    "DAYS",
-    "WEEKS",
-    "SECS",
-}
-_NEGATIONS = {"SKIP", "NO", "NOT", "DISABLE", "DISABLED"}
-_UNITS = {Kind.SIZE: "BYTES", Kind.DURATION: "SECONDS", Kind.RATE: "RATE"}
-
-
-def rule_breaks(variable: Variable) -> list[str]:
-    """What is wrong with a name, by the rules in CONTRIBUTING.md; nothing for a good one."""
-    name = variable.name
-    if not name.startswith("POSTULO_"):
-        return []  # another program's name: gunicorn's, Django's, PostgreSQL's
-    if not _SHAPE.match(name):
-        return ["not POSTULO_ + an area + a thing, in upper snake case"]
-    words = name.removeprefix("POSTULO_").split("_")
-    found = []
-    if variable.kind is not Kind.RATE and words[0] not in configuration.AREA_WORDS:
-        found.append(f"{words[0]} is not an area word")
-    if _UNIT_WORDS & set(words):
-        found.append("a unit other than _BYTES, _SECONDS or _RATE")
-    wanted = _UNITS.get(variable.kind)
-    if wanted and words[-1] != wanted:
-        found.append(f"a {variable.kind} ends in _{wanted}")
-    if words[-1] in set(_UNITS.values()) - ({wanted} if wanted else set()):
-        found.append(f"_{words[-1]} on a {variable.kind}")
-    if variable.kind is Kind.DURATION and words[-1] == "TIMEOUT":
-        found.append("a duration without its unit")
-    if variable.kind is Kind.BOOLEAN and _NEGATIONS & set(words):
-        found.append("a boolean that is a negation")
-    return found
+rule_breaks = configuration.naming_problems
 
 
 def test_every_name_follows_the_rules_but_the_listed_ones():
@@ -693,10 +651,23 @@ def test_env_example_carries_every_variable_an_instance_reads():
             assert re.search(rf"^(# )?{variable.name}=", text, re.M), variable.name
         else:
             assert not re.search(rf"^(# )?{variable.name}=", text, re.M), variable.name
-    # Only what production needs is set; everything else is shown commented out.
-    assert re.findall(r"^[A-Z][A-Z0-9_]+=", text, re.M) == [
+
+
+def test_a_copy_of_env_example_sets_what_the_hand_written_one_set():
+    """`cp .env.example .env` behaved one way before the file was written from the registry,
+    and behaves the same now: the six lines the hand-written file set are set, with the same
+    values, and the secret key a real deployment must set is there to fill in. Everything else
+    is shown commented out."""
+    text = (REPO / ".env.example").read_text(encoding="utf-8")
+
+    assert re.findall(r"^[A-Z][A-Z0-9_]+=.*$", text, re.M) == [
         "POSTULO_SECRET_KEY=",
-        "POSTULO_ALLOWED_HOSTS=",
+        "POSTULO_DEBUG=true",
+        "POSTULO_ALLOWED_HOSTS=localhost,127.0.0.1",
+        "POSTULO_REGISTRATION_OPEN=false",
+        "POSTULO_DEFAULT_FROM_EMAIL=postulo@example.org",
+        "POSTULO_LOG_LEVEL=INFO",
+        "POSTULO_TIME_ZONE=Europe/Paris",
     ]
 
 
@@ -756,3 +727,149 @@ def test_the_settings_command_shows_the_development_variables_when_asked():
     call_command("settings", "--json", "--all", stdout=out)
 
     assert "POSTULO_TEST_DATABASE_URL" in {entry["name"] for entry in json.loads(out.getvalue())}
+
+
+def test_the_test_database_variable_is_the_one_the_suite_reads():
+    from postulo.plugins import testdb
+
+    assert testdb.VARIABLE in configuration.VARIABLES
+    assert configuration.VARIABLES[testdb.VARIABLE].scope is Scope.DEVELOPMENT
+
+
+# ---------------------------------------------------------- a plugin's own variables
+
+
+def _gauge(*declared):
+    """A plugin that reads two variables of its own and declares them, or what it is given."""
+    from postulo.plugins.api import EnvironmentVariable
+
+    plugin = type("Gauge", (), {"name": "gauge", "label": "Gauge"})()
+    plugin.environment = declared or (
+        EnvironmentVariable(
+            "POSTULO_PLUGIN_GAUGE_LIMIT_BYTES",
+            "size",
+            "How much the gauge may read.",
+            default=1024,
+            unit="bytes",
+        ),
+        EnvironmentVariable(
+            "POSTULO_PLUGIN_GAUGE_TOKEN", "secret", "The gauge's token.", default=""
+        ),
+    )
+    return plugin
+
+
+@pytest.fixture
+def gauge_installed(monkeypatch):
+    """The gauge, as the registry hands it over among the loaded plugins."""
+    from postulo.plugins import registry
+
+    plugin = _gauge()
+    real = registry.plugins
+
+    def plugins(kind, *, refresh=False):
+        found = real(kind, refresh=refresh)
+        return [*found, plugin] if kind == "notifier" else found
+
+    monkeypatch.setattr(registry, "plugins", plugins)
+    return plugin
+
+
+def test_a_plugin_reads_its_variable_as_postulo_reads_its_own(tmp_path):
+    from postulo.plugins.api import read_environment
+
+    limit, token = _gauge().environment
+    secret = tmp_path / "token"
+    secret.write_text("t0ken\n", encoding="utf-8")
+    environ = {
+        "POSTULO_PLUGIN_GAUGE_LIMIT_BYTES": "2KB",
+        "POSTULO_PLUGIN_GAUGE_TOKEN_FILE": str(secret),
+    }
+
+    assert read_environment(limit, environ=environ) == 2048
+    assert read_environment(token, environ=environ) == "t0ken"
+    assert read_environment(limit, environ={}) == 1024
+
+
+def test_a_declared_plugin_variable_is_known_and_an_undeclared_one_is_not(
+    monkeypatch, gauge_installed
+):
+    found = _ids(
+        monkeypatch,
+        POSTULO_PLUGIN_GAUGE_LIMIT_BYTES="4096",
+        POSTULO_PLUGIN_GAUGE_COLOUR="red",
+    )
+
+    assert [m.msg.split(" ")[0] for m in found["postulo.W005"]] == ["POSTULO_PLUGIN_GAUGE_COLOUR"]
+
+
+def test_a_plugin_variable_that_cannot_be_read_stops_the_start_naming_the_plugin(
+    monkeypatch, gauge_installed
+):
+    found = _ids(monkeypatch, POSTULO_PLUGIN_GAUGE_LIMIT_BYTES="lots")
+
+    [error] = found["postulo.E009"]
+    assert "POSTULO_PLUGIN_GAUGE_LIMIT_BYTES is 'lots'" in error.msg
+    assert "Gauge" in error.msg
+    assert "25MB" in error.hint and "1024" in error.hint
+
+
+def test_a_plugin_that_declares_nothing_still_works_and_its_variables_are_unknown(monkeypatch):
+    from postulo.plugins import registry
+
+    quiet = type("Quiet", (), {"name": "quiet"})()
+    real = registry.plugins
+    monkeypatch.setattr(
+        registry,
+        "plugins",
+        lambda kind, *, refresh=False: [*real(kind), quiet] if kind == "notifier" else real(kind),
+    )
+
+    assert registry.environment_variables() == {}
+    found = _ids(monkeypatch, POSTULO_PLUGIN_QUIET_DIR="/x")
+    assert [m.msg.split(" ")[0] for m in found["postulo.W005"]] == ["POSTULO_PLUGIN_QUIET_DIR"]
+
+
+def test_the_settings_command_lists_a_plugins_variables_under_its_name(
+    monkeypatch, gauge_installed
+):
+    monkeypatch.setenv("POSTULO_PLUGIN_GAUGE_LIMIT_BYTES", "8KB")
+    monkeypatch.setenv("POSTULO_PLUGIN_GAUGE_TOKEN", "never-printed-gauge-token")
+
+    text = StringIO()
+    call_command("settings", stdout=text)
+    out = text.getvalue()
+
+    section = out[out.index("Plugin: Gauge") :]
+    assert "POSTULO_PLUGIN_GAUGE_LIMIT_BYTES" in section and "8192" in section
+    assert "never-printed" not in out
+    assert re.search(r"POSTULO_PLUGIN_GAUGE_TOKEN\s+environment\s+set", section)
+
+
+@pytest.mark.parametrize(
+    ("declared", "complaint"),
+    [
+        (("POSTULO_GAUGE_LIMIT_BYTES", "size", "x", 1, "bytes"), "does not begin with"),
+        (("POSTULO_PLUGIN_GAUGE_LIMIT_MB", "size", "x", 1, "megabytes"), "counted in bytes"),
+        (("POSTULO_PLUGIN_GAUGE_WAIT", "duration", "x", 1, "seconds"), "ends in _SECONDS"),
+        (("POSTULO_PLUGIN_GAUGE_SKIP_CHECK", "boolean", "x", False, ""), "negation"),
+        (("POSTULO_PLUGIN_GAUGE_MODE", "colour", "x", "", ""), "kind must be one of"),
+        (("POSTULO_PLUGIN_GAUGE_WAIT_SECONDS", "duration", "", 1, "seconds"), "description"),
+    ],
+)
+def test_the_published_check_refuses_a_variable_postulo_cannot_read(declared, complaint):
+    from postulo.plugins import testing
+    from postulo.plugins.api import EnvironmentVariable
+
+    name, kind, description, default, unit = declared
+    plugin = _gauge(EnvironmentVariable(name, kind, description, default=default, unit=unit))
+
+    with pytest.raises(AssertionError, match=complaint):
+        testing.assert_declares_usable_environment(plugin)
+
+
+def test_the_published_check_passes_a_good_declaration_and_none():
+    from postulo.plugins import testing
+
+    testing.assert_declares_usable_environment(_gauge())
+    testing.assert_declares_usable_environment(type("Quiet", (), {"name": "quiet"})())

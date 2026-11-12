@@ -448,6 +448,44 @@ def load_everything() -> None:
             logger.exception("The %s plugins could not be loaded at start-up", kind)
 
 
+def environment_variables() -> dict:
+    """Every environment variable a loaded plugin declares, as Postulo's own are declared.
+
+    Keyed by name, each a `postulo.core.configuration.Variable` carrying the plugin's name in
+    words, for the start-up check and `manage.py settings` (#1186). A declaration that cannot
+    be read costs that plugin's and nobody else's; one that breaks a rule is still counted,
+    since the plugin reads it whatever its name, and the rule is logged for its author.
+    """
+    from .base import ENVIRONMENT_KINDS, environment_of, environment_problems, label_of
+
+    found: dict = {}
+    for kind in GROUPS:
+        try:
+            loaded = plugins(kind)
+        except Exception:  # pragma: no cover - a kind that cannot even be enumerated
+            logger.exception("The %s plugins could not be read for their variables", kind)
+            continue
+        for plugin in loaded:
+            name = str(getattr(plugin, "name", "") or "")
+            try:
+                declared = environment_of(plugin)
+            except Exception:
+                logger.exception("Plugin %r's environment variables could not be read", name)
+                continue
+            for variable in declared:
+                problems = environment_problems(variable, name)
+                if problems:
+                    logger.warning(
+                        "Plugin %r declares an environment variable wrongly: %s",
+                        name,
+                        "; ".join(problems),
+                    )
+                if getattr(variable, "kind", None) not in ENVIRONMENT_KINDS:
+                    continue
+                found.setdefault(variable.name, variable.declared(label_of(plugin)))
+    return found
+
+
 def find_plugin(kind: str, name: str):
     """The plugin of ``kind`` called ``name``, or ``None`` if it is not installed."""
     for plugin in plugins(kind):

@@ -114,7 +114,8 @@ def render_env_example(variables=None) -> str:
                 out.extend(_comment(f"The image sets {variable.image}."))
             out.extend(_comment(kind_line(variable)))
             line = f"{variable.name}={env_value(variable)}"
-            out.append(line if variable.required else f"# {line}")
+            active = variable.required or variable.set_in_example
+            out.append(line if active else f"# {line}")
     return "\n".join(out) + "\n"
 
 

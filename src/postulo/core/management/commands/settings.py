@@ -3,7 +3,8 @@
 Every variable is declared in `postulo.core.configuration`; this prints, for each one an
 instance or its image reads, the value it has and whether that came from the environment,
 from a `_FILE`, from an old name or from the default. A secret is shown as set or unset and
-never printed, and a password inside an address is hidden. `--json` gives the same as one
+never printed, and a password inside an address is hidden. A loaded plugin's declared
+variables follow, under the plugin's name. `--json` gives the same as one
 document, for a script; `--all` adds what only the test suite and the maintainers' scripts
 read.
 """
@@ -42,6 +43,8 @@ def _settings_module() -> str:
 
 def _effective(variable: Variable):
     """What the running settings hold for it, where they hold it under a name; else the reading."""
+    if variable.plugin:
+        return configuration.read(variable.name, variables={variable.name: variable})
     module = _settings_module().rsplit(".", 1)[-1]
     reads_it = variable.module == "base" or variable.module == module
     name = variable.setting or variable.name
@@ -59,9 +62,10 @@ def describe(variable: Variable) -> dict:
         "scope": str(variable.scope),
         "restart": variable.restart,
         "default": configuration.display_default(variable),
+        "plugin": variable.plugin,
     }
     try:
-        found = configuration.source(variable.name)
+        found = configuration.source(variable.name, variables={variable.name: variable})
         value = _effective(variable)
     except ImproperlyConfigured as exc:
         entry.update(source="error", via="", value=None, shown=str(exc))
@@ -95,21 +99,33 @@ class Command(BaseCommand):
         )
 
     def handle(self, *args, **options):
+        from postulo.plugins.registry import environment_variables
+
         variables = [
             variable
             for variable in configuration.VARIABLES.values()
             if options["all"] or variable.documented
         ]
+        # And what each loaded plugin declares it reads, under the plugin's name (#1186).
+        variables += sorted(environment_variables().values(), key=lambda v: (v.plugin, v.name))
         entries = [describe(variable) for variable in variables]
         if options["json"]:
             self.stdout.write(json.dumps(entries, indent=2, ensure_ascii=False))
             return
         width = max(len(entry["name"]) for entry in entries)
-        for area in configuration.AREAS:
-            rows = [entry for entry in entries if entry["area"] == area.key]
+        groups = [
+            (area.title, [e for e in entries if e["area"] == area.key and not e["plugin"]])
+            for area in configuration.AREAS
+        ]
+        plugins = sorted({entry["plugin"] for entry in entries if entry["plugin"]})
+        groups += [
+            (f"Plugin: {plugin}", [e for e in entries if e["plugin"] == plugin])
+            for plugin in plugins
+        ]
+        for title, rows in groups:
             if not rows:
                 continue
-            self.stdout.write(f"\n{area.title}")
+            self.stdout.write(f"\n{title}")
             for entry in rows:
                 source = entry["source"]
                 if source in ("file", "alias"):

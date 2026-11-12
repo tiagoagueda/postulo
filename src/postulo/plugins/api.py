@@ -39,6 +39,14 @@ queryset -- that returns what the template is given. Postulo draws the card and 
 asks the instance's plugin policy first, holds the markup to an allowlist, and leaves out and
 logs a widget that raises.
 
+**An environment variable a plugin reads is declared on it (#1186)**: `EnvironmentVariable`
+is one, listed in a plugin's ``environment``, with a name beginning ``POSTULO_PLUGIN_`` and
+the plugin's name, a kind, a default and one line saying what it does, and `read_environment`
+reads it as Postulo reads its own -- ``25MB``, ``2h``, ``yes``, a secret as ``<NAME>_FILE``.
+The start-up check then knows the name, refuses a value that cannot be read, and
+`manage.py settings` lists it under the plugin; a variable read without being declared is
+reported at start-up as one nothing reads.
+
 **The surface was too small for the plugins that existed (#229).** Every official Python
 plugin imported past it and the wiki taught those imports -- not out of carelessness, but
 because a notifier is handed a `Notification` that was not here, and a sync plugin cannot
@@ -257,6 +265,7 @@ from .base import (
     DiscoveredOption,
     # ------------------------------------------- what a store is handed, and gives back
     DocumentMetadata,
+    EnvironmentVariable,  # one variable the plugin reads (#1186)
     ExternalRef,
     FeaturePlugin,
     FieldSpec,
@@ -283,6 +292,7 @@ from .base import (
     label_of,
     manifest_of,
     medium_of,
+    read_environment,
     refuse_unreadable,
     shipped,
     sync_state,  # what a sync's last good run kept for this one (#1165)
@@ -328,6 +338,7 @@ __all__ = [
     "DiscoveredOption",
     "DocumentFormat",
     "DocumentMetadata",
+    "EnvironmentVariable",
     "EventKind",
     "ExternalRef",
     "FeaturePlugin",
@@ -426,6 +437,7 @@ __all__ = [
     "public_only_client",
     "read_body",
     "read_calendar",
+    "read_environment",
     "record_event",
     "record_listing_event",
     "refuse_unreadable",

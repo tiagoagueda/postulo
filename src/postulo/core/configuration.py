@@ -136,8 +136,12 @@ class Variable:
     module: str = "base"
     #: A value to show in `.env.example` instead of the default.
     example: str = ""
-    #: Whether `.env.example` sets it rather than showing it commented out.
+    #: Whether a real deployment must set it; `.env.example` sets it rather than showing it
+    #: commented out.
     required: bool = False
+    #: Whether `.env.example` sets it, to `example` or the default, although an instance need
+    #: not: what the hand-written file set, so a copy of it behaves as a copy always did.
+    set_in_example: bool = False
     #: What a deployer should know beyond the one line.
     notes: str = ""
     #: The default, said in words, where it is not one value.
@@ -155,6 +159,8 @@ class Variable:
     aliases: tuple[Alias, ...] = ()
     #: Whether `.env.example` carries it (a variable read before the file is, does not).
     in_env_file: bool = True
+    #: The plugin that declared it, by its name in words; empty for Postulo's own.
+    plugin: str = ""
 
     @property
     def documented(self) -> bool:
@@ -310,6 +316,8 @@ _VARIABLES: tuple[Variable, ...] = (
         default=False,
         default_text="false (true in the development settings; the production settings ignore it)",
         setting="DEBUG",
+        example="true",
+        set_in_example=True,
     ),
     Variable(
         "POSTULO_ALLOWED_HOSTS",
@@ -549,6 +557,7 @@ _VARIABLES: tuple[Variable, ...] = (
         "Whether anybody may sign up; off, the instance is invite-only.",
         default=False,
         field="registration_open",
+        set_in_example=True,
     ),
     Variable(
         "POSTULO_EMAIL_CODE_TIMEOUT",
@@ -663,6 +672,7 @@ _VARIABLES: tuple[Variable, ...] = (
         example="postulo@example.org",
         field="email_from",
         setting="DEFAULT_FROM_EMAIL",
+        set_in_example=True,
     ),
     Variable(
         "POSTULO_EMAIL_HOST",
@@ -844,6 +854,7 @@ _VARIABLES: tuple[Variable, ...] = (
         "logs",
         "The least serious record written: DEBUG, INFO, WARNING, ERROR or CRITICAL.",
         default="INFO",
+        set_in_example=True,
     ),
     Variable(
         "POSTULO_LOGS_ENDPOINT_ENABLED",
@@ -912,6 +923,7 @@ _VARIABLES: tuple[Variable, ...] = (
         default="Europe/Paris",
         field="default_time_zone",
         setting="TIME_ZONE",
+        set_in_example=True,
     ),
     # ----------------------------------------------------------------------------- storage
     Variable(
@@ -1502,7 +1514,9 @@ _VARIABLES: tuple[Variable, ...] = (
         "POSTULO_TEST_DB_CACHE",
         Kind.TEXT,
         "development",
-        "Whether and where the test suite keeps a migrated database between runs.",
+        "Whether and where the test suite keeps its migrated database between runs: 0 (or "
+        "false, no, off) never, 1 (or true, yes, on) in the default place, a path there; "
+        "unset, everywhere but on CI.",
         default="",
         scope=Scope.DEVELOPMENT,
         interpolate=False,
@@ -1686,7 +1700,7 @@ def syntax(variable: Variable) -> str:
     kind = variable.kind
     if kind is Kind.BOOLEAN:
         if variable.accepts:
-            return "1 to switch it on; nothing else is understood"
+            return "1 to switch it on or 0 to leave it off, and nothing else"
         return "true or false (also yes/no, on/off, 1/0)"
     if kind is Kind.INTEGER:
         return "a whole number" + _range_text(variable)
@@ -1726,11 +1740,20 @@ def _range_text(variable: Variable) -> str:
 
 
 def _problem(variable: Variable, found: Found, level: str, why: str) -> Problem:
+    """A refusal an operator can act on from the log alone: the variable, what it holds (never
+    a secret's value), why that cannot be read, and what to write instead."""
+    shown = "set" if variable.kind is Kind.SECRET else repr(found.raw)
+    where = f" (the old name of {variable.name})" if found.source == "alias" else ""
+    if found.source == "file":
+        where = f" (read from the file {found.via} names)"
+    stops = " Postulo does not start until it is corrected or unset." if level == "error" else ""
+    owner = f" It is read by the plugin {variable.plugin}." if variable.plugin else ""
     return Problem(
         variable.name,
         level,
-        f"{found.via} is {found.raw!r}: {why}.",
-        f"{found.via} takes {syntax(variable)}.",
+        f"{found.via}{where} is {shown}, which {why}.{stops}{owner}",
+        f"Set {found.via} to {syntax(variable)}; or unset it to take the default, "
+        f"{display_default(variable)}.",
     )
 
 
@@ -1755,12 +1778,12 @@ def _parse(variable: Variable, found: Found) -> _Parsed:
                 return _Parsed(choice)
         return _Parsed(
             word.lower(),
-            _problem(variable, found, "error", "it is not one of the words it takes"),
+            _problem(variable, found, "error", "is not one of the words it takes"),
         )
     if kind is Kind.RATE:
         if _RATE.match(raw):
             return _Parsed(raw)
-        return _Parsed(raw, _problem(variable, found, "error", "it is not a rate"))
+        return _Parsed(raw, _problem(variable, found, "error", "is not a rate"))
     return _Parsed(raw)
 
 
@@ -1771,7 +1794,12 @@ def _parse_boolean(variable: Variable, found: Found) -> _Parsed:
             return _Parsed(raw == "1")
         return _Parsed(
             False,
-            _problem(variable, found, "error", "only 1 switches it on, so this is read as off"),
+            _problem(
+                variable,
+                found,
+                "error",
+                "the container's start-up script does not understand: only 1 switches it on",
+            ),
         )
     # django-environ's reading, kept: a whole number is its truth, and anything else is true
     # only if it is one of its words.
@@ -1790,13 +1818,11 @@ def _parse_boolean(variable: Variable, found: Found) -> _Parsed:
                         variable,
                         found,
                         "warning",
-                        "empty is read as false; unset it to take the default, true",
+                        "is empty and reads as false, not as the default",
                     ),
                 )
             return _Parsed(value)
-        return _Parsed(
-            value, _problem(variable, found, "error", "it is not a boolean, so it is read as false")
-        )
+        return _Parsed(value, _problem(variable, found, "error", "is not a boolean"))
     return _Parsed(value)
 
 
@@ -1813,22 +1839,28 @@ def _parse_number(variable: Variable, found: Found) -> _Parsed:
         )
     if number is None and kind is not Kind.INTEGER:
         number = _suffixed(kind, raw, _unit_size(kind, variable.unit))
+    if number is None and kind is not Kind.INTEGER and _is_suffixed(kind, raw):
+        return _Parsed(
+            variable.default,
+            _problem(variable, found, "error", f"is not a whole number of {variable.unit}"),
+            fallback=True,
+        )
     if number is None:
         what = {
-            Kind.INTEGER: "it is not a whole number",
-            Kind.SIZE: f"it is not a whole number of {variable.unit} or a size",
-            Kind.DURATION: f"it is not a whole number of {variable.unit} or a duration",
+            Kind.INTEGER: "is not a whole number",
+            Kind.SIZE: f"is neither a whole number of {variable.unit} nor a size",
+            Kind.DURATION: f"is neither a whole number of {variable.unit} nor a duration",
         }[kind]
         return _Parsed(
             variable.default,
-            _problem(variable, found, "error", what + ", so the default is used"),
+            _problem(variable, found, "error", what),
             fallback=True,
         )
     low, high = variable.minimum, variable.maximum
     if low is not None and number < low:
-        return _Parsed(number, _problem(variable, found, "warning", f"it is less than {low}"))
+        return _Parsed(number, _problem(variable, found, "warning", f"is less than {low}"))
     if high is not None and number > high:
-        return _Parsed(number, _problem(variable, found, "warning", f"it is more than {high}"))
+        return _Parsed(number, _problem(variable, found, "warning", f"is more than {high}"))
     return _Parsed(number)
 
 
@@ -1839,6 +1871,13 @@ def _unit_size(kind: Kind, unit: str) -> int:
 
 def _convert(amount: Decimal, source: int, target: int) -> int | None:
     return _whole(amount * source / target)
+
+
+def _is_suffixed(kind: Kind, raw: str) -> bool:
+    """Whether a value is written as a size or a duration, whatever it comes to."""
+    pattern, units = (_SIZE, SIZE_UNITS) if kind is Kind.SIZE else (_DURATION, DURATION_UNITS)
+    match = pattern.match(raw)
+    return bool(match) and match[2].lower() in units
 
 
 def _suffixed(kind: Kind, raw: str, target: int) -> int | None:
@@ -2008,3 +2047,42 @@ def display(variable: Variable, value: object) -> str:
 
 def in_area(area: str, variables: Mapping[str, Variable] | None = None) -> list[Variable]:
     return [v for v in (VARIABLES if variables is None else variables).values() if v.area == area]
+
+
+# ------------------------------------------------------------------------------------ naming
+
+_SHAPE = re.compile(r"^POSTULO_[A-Z][A-Z0-9]*(?:_[A-Z0-9]+)+$")
+#: Units a name may not carry: only `_BYTES`, `_SECONDS` and `_RATE` are units.
+_UNIT_WORDS = frozenset(
+    {"B", "KB", "MB", "GB", "BYTE", "MS", "MINUTES", "MINS", "HOURS", "DAYS", "WEEKS", "SECS"}
+)
+_NEGATIONS = frozenset({"SKIP", "NO", "NOT", "DISABLE", "DISABLED"})
+_UNITS = {Kind.SIZE: "BYTES", Kind.DURATION: "SECONDS", Kind.RATE: "RATE"}
+
+
+def naming_problems(variable: Variable) -> list[str]:
+    """What is wrong with a name, by the rules in CONTRIBUTING.md; nothing for a good one.
+
+    Another program's name (gunicorn's, Django's, PostgreSQL's) is not Postulo's to rule.
+    """
+    name = variable.name
+    if not name.startswith("POSTULO_"):
+        return []
+    if not _SHAPE.match(name):
+        return ["not POSTULO_ + an area + a thing, in upper snake case"]
+    words = name.removeprefix("POSTULO_").split("_")
+    found = []
+    if variable.kind is not Kind.RATE and words[0] not in AREA_WORDS:
+        found.append(f"{words[0]} is not an area word")
+    if _UNIT_WORDS & set(words):
+        found.append("a unit other than _BYTES, _SECONDS or _RATE")
+    wanted = _UNITS.get(variable.kind)
+    if wanted and words[-1] != wanted:
+        found.append(f"a {variable.kind} ends in _{wanted}")
+    if words[-1] in set(_UNITS.values()) - ({wanted} if wanted else set()):
+        found.append(f"_{words[-1]} on a {variable.kind}")
+    if variable.kind is Kind.DURATION and words[-1] == "TIMEOUT":
+        found.append("a duration without its unit")
+    if variable.kind is Kind.BOOLEAN and _NEGATIONS & set(words):
+        found.append("a boolean that is a negation")
+    return found

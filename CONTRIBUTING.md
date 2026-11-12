@@ -633,7 +633,10 @@ After changing the registry, run `uv run python scripts/configuration_docs.py` a
 `.env.example` with it; `--wiki` prints the tables of the wiki's *Configuration* page. Start-up
 warns about a `POSTULO_*` name nothing declares (`postulo.W005`) and refuses a value that
 cannot be read (`postulo.E009`), and `manage.py settings` prints what each variable is and
-where it came from. `tests/test_configuration.py` holds every name to the rules above, except
+where it came from. A plugin declares the variables it reads the same way, as
+`EnvironmentVariable`s on the plugin surface named `POSTULO_PLUGIN_<NAME>_...`; one it reads
+without declaring is reported at start-up like any other unknown name.
+`tests/test_configuration.py` holds every name to the rules above, except
 the names that broke them when the rules were written, listed there with the name each takes
 when it is renamed; that list only shrinks.
 

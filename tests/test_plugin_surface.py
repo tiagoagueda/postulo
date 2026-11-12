@@ -706,6 +706,26 @@ def test_the_surface_holds_what_a_dashboard_widget_needs(tmp_path):
     assert_imports_only_the_surface(package, package="postulo_glance")
 
 
+def test_the_surface_holds_what_declaring_an_environment_variable_needs(tmp_path):
+    """One variable, declared in a plugin's ``environment``, read as Postulo reads its own and
+    checked by the published check (#1186), with nothing imported past the surface."""
+    from postulo.plugins import api, base, testing
+
+    for name in ("EnvironmentVariable", "read_environment"):
+        assert name in api.__all__, name
+    assert api.EnvironmentVariable is base.EnvironmentVariable
+    assert api.read_environment is base.read_environment
+    assert callable(testing.assert_declares_usable_environment)
+
+    package = tmp_path / "postulo_gauge"
+    package.mkdir()
+    (package / "__init__.py").write_text(
+        "from postulo.plugins.api import EnvironmentVariable, read_environment\n",
+        encoding="utf-8",
+    )
+    assert_imports_only_the_surface(package, package="postulo_gauge")
+
+
 def test_the_surface_holds_what_a_registry_of_link_services_needs():
     """One entry, what holds the entries, and the read of one by its key (#305).
 

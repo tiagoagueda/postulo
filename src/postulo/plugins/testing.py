@@ -54,6 +54,11 @@ a plugin's ``widgets`` to what the dashboard accepts, and `draw_widget` draws on
 dashboard would -- handed the person and a connection, rendered, and held to the allowlist --
 so a plugin's tests assert on what a person sees.
 
+**And the environment variables a plugin reads, checked (#1186).**
+`assert_declares_usable_environment` holds a plugin's ``environment`` to what Postulo accepts:
+each an `EnvironmentVariable` of a known kind, named ``POSTULO_PLUGIN_<NAME>_...`` by the rules
+Postulo's own names follow, none of them one of Postulo's, and its default readable as its kind.
+
 **And the migrated test database, kept between runs (#1144).** A plugin's suite migrates the
 whole of Postulo before its first test. `cached_django_db_setup` makes the fixture that does
 it once and restores the result afterwards; two lines in the plugin's ``tests/conftest.py``:
@@ -273,6 +278,29 @@ def assert_declares_usable_widgets(plugin) -> None:
     assert len(keys) == len(set(keys)), f"two widgets share a key: {keys}"
     for widget in declared:
         get_template(widget.template)
+
+
+def assert_declares_usable_environment(plugin) -> None:
+    """Fail unless every environment variable the plugin declares is one Postulo can read (#1186).
+
+    What the start-up check would only log: each is an `EnvironmentVariable` of one of the
+    kinds, its name begins ``POSTULO_PLUGIN_`` and the plugin's name and follows the naming
+    rules, it is not one of Postulo's own, no two share a name, and reading it with nothing
+    set gives its default. A plugin that declares nothing passes.
+    """
+    from .base import environment_of, environment_problems, read_environment
+
+    name = str(getattr(plugin, "name", "") or "")
+    assert name, "the plugin has no name"
+    declared = environment_of(plugin)
+    problems = [found for variable in declared for found in environment_problems(variable, name)]
+    assert not problems, "; ".join(problems)
+    names = [variable.name for variable in declared]
+    assert len(names) == len(set(names)), f"two variables share a name: {names}"
+    for variable in declared:
+        assert read_environment(variable, environ={}) == variable.default, (
+            f"{variable.name}: reading it unset does not give its default"
+        )
 
 
 def draw_widget(plugin, key: str, user, connection=None) -> str:

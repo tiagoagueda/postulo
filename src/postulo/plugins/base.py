@@ -820,6 +820,142 @@ def widget_problems(widget) -> list[str]:
     return problems
 
 
+# ------------------------------------------------------- environment variables
+
+#: The kinds a variable may be, as Postulo's own are declared (`postulo.core.configuration`).
+ENVIRONMENT_KINDS = (
+    "boolean",
+    "integer",
+    "size",
+    "duration",
+    "rate",
+    "URL",
+    "list",
+    "choice",
+    "secret",
+    "text",
+    "path",
+)
+
+
+@dataclass(frozen=True)
+class EnvironmentVariable:
+    """One environment variable a plugin reads (#1186).
+
+    A plugin of any kind declares the variables it reads in an ``environment`` attribute: a
+    sequence of these, or a method returning one. Postulo's own are declared the same way, in
+    one registry, and a declared variable is treated as theirs are: the start-up check knows
+    its name and does not report it as unknown (`postulo.W005`), refuses a value that cannot
+    be read as its kind with the syntax it expected (`postulo.E009`), and `manage.py settings`
+    lists it under the plugin's name with its value and where it came from. A variable a
+    plugin reads without declaring it is reported at every start as a name nothing reads,
+    which is the point of declaring it.
+
+    The name is ``POSTULO_PLUGIN_`` + the plugin's name in capitals (hyphens as underscores)
+    + the thing, and follows the rules Postulo's own names do: a size ends in ``_BYTES``, a
+    duration in ``_SECONDS``, a rate in ``_RATE``, and a boolean says what is on. Read it with
+    `read_environment`, which takes every syntax Postulo's variables take -- ``25MB``,
+    ``2h``, ``yes``, a secret given as ``<NAME>_FILE`` -- and falls back to ``default``.
+
+    A plugin that is switched off is not loaded, so its variables are reported as unknown
+    until it is switched on again.
+    """
+
+    name: str
+    #: One of `ENVIRONMENT_KINDS`.
+    kind: str
+    #: One plain line: what it does.
+    description: str
+    default: object = None
+    #: For a size, ``bytes``; for a duration, ``seconds``: the unit a bare number is in.
+    unit: str = ""
+    #: For a choice, the words it takes.
+    choices: tuple[str, ...] = ()
+    #: For a choice, whether it may also be left empty.
+    blank: bool = False
+    minimum: int | None = None
+    maximum: int | None = None
+
+    def declared(self, plugin_label: str = ""):
+        """This variable as the registry declares Postulo's own."""
+        from postulo.core import configuration
+
+        return configuration.Variable(
+            self.name,
+            configuration.Kind(self.kind),
+            "plugins",
+            self.description,
+            default=self.default,
+            unit=self.unit,
+            choices=tuple(self.choices),
+            blank=self.blank,
+            minimum=self.minimum,
+            maximum=self.maximum,
+            interpolate=False,
+            plugin=plugin_label,
+        )
+
+
+def environment_of(plugin) -> list[EnvironmentVariable]:
+    """The environment variables this plugin says it reads, or none (#1186).
+
+    A sequence or a method, as with a plugin's widgets. One that cannot be read costs its
+    own declaration and nobody else's; the reason is the caller's to log.
+    """
+    declared = getattr(plugin, "environment", None)
+    if callable(declared):
+        declared = declared()
+    if not declared:
+        return []
+    return list(declared)
+
+
+def environment_prefix(plugin_name: str) -> str:
+    """What every variable of the plugin called ``plugin_name`` begins with."""
+    return "POSTULO_PLUGIN_" + re.sub(r"[^A-Z0-9]+", "_", plugin_name.upper()).strip("_") + "_"
+
+
+def environment_problems(variable, plugin_name: str = "") -> list[str]:
+    """What is wrong with one declared variable, in words for the plugin's author. Empty if
+    nothing is."""
+    from postulo.core import configuration
+
+    if not isinstance(variable, EnvironmentVariable):
+        return [f"{variable!r} is not an EnvironmentVariable"]
+    name = variable.name
+    if variable.kind not in ENVIRONMENT_KINDS:
+        return [f"{name}: kind must be one of {ENVIRONMENT_KINDS}"]
+    problems = []
+    if plugin_name and not str(name).startswith(environment_prefix(plugin_name)):
+        problems.append(f"{name} does not begin with {environment_prefix(plugin_name)}")
+    if not str(variable.description or "").strip() or "\n" in variable.description:
+        problems.append(f"{name} has no one-line description")
+    if variable.kind == "size" and variable.unit != "bytes":
+        problems.append(f"{name}: a size is counted in bytes (unit='bytes')")
+    if variable.kind == "duration" and variable.unit != "seconds":
+        problems.append(f"{name}: a duration is counted in seconds (unit='seconds')")
+    if variable.kind == "choice" and not variable.choices:
+        problems.append(f"{name}: a choice names its words")
+    if name in configuration.VARIABLES:
+        problems.append(f"{name} is one of Postulo's own variables")
+    problems.extend(
+        f"{name}: {problem}" for problem in configuration.naming_problems(variable.declared())
+    )
+    return problems
+
+
+def read_environment(variable: EnvironmentVariable, environ=None):
+    """The value of a variable the plugin declared, read as Postulo reads its own (#1186).
+
+    Its default when unset, or when the value cannot be read; the start-up check names a value
+    that cannot be read, so the plugin need not.
+    """
+    from postulo.core import configuration
+
+    declared = variable.declared()
+    return configuration.read(variable.name, environ=environ, variables={variable.name: declared})
+
+
 # ----------------------------------------------------------- connected plugins
 
 #: The kinds of plugin that talk to another service on a person's behalf, and the
