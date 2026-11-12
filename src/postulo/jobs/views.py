@@ -53,6 +53,7 @@ from . import (
     identifier_removals,
     identifiers,
     industries,
+    listing_skills,
     logos,
     mapping,
     merging,
@@ -2216,6 +2217,8 @@ def listing_page_context(request, posting, *, event_form=None) -> dict:
         # page reads through its posting, once there is an application.
         "listing_events": history_of(posting, request.user),
         "event_form": event_form or ListingEventForm(user=request.user),
+        # Which of the skills it names the reader has, from ESCO, with no model (#1093).
+        "skills": listing_skills.panel(posting, request.user),
     }
 
 

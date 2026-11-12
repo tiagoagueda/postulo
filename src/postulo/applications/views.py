@@ -40,6 +40,7 @@ from postulo.core.params import as_pk
 from postulo.core.redirects import safe_next
 from postulo.core.search import application_match, clean_query
 from postulo.documents import themes
+from postulo.jobs import listing_skills
 from postulo.jobs.history import history_of
 from postulo.jobs.models import Company
 from postulo.jobs.views import UserFormKwargsMixin
@@ -552,6 +553,8 @@ class ApplicationDetailView(OwnedObjectMixin, DetailView):
         # What arrived about the listing, read through the posting rather than copied when
         # the application was made (#270): the first part of one history, stored once.
         context["listing_events"] = history_of(self.object.posting, self.object.owner)
+        # Which of the skills the listing names the person has, from ESCO (#1093).
+        context["skills"] = listing_skills.panel(self.object.posting, self.request.user)
         context["reminders"] = self.object.reminders.filter(done_at__isnull=True)
         # What deleting it would take with it, for the dialog on this page (#854).
         context["deletion"] = deletions.facts_for(ApplicationDeleteView, self.request, self.object)

@@ -79,12 +79,15 @@ skill matches nothing and the skill box offers nothing, which is the ordinary st
 from __future__ import annotations
 
 import bisect
+import hashlib
 import json
 import logging
 import os
+import re
 import unicodedata
 import zipfile
 from array import array
+from collections import OrderedDict
 from functools import lru_cache
 from itertools import pairwise
 from pathlib import Path
@@ -728,6 +731,136 @@ def skill_suggestions(typed: str, *languages: str, limit: int = SUGGESTED_SKILLS
     return offered
 
 
+#: What a word is in a listing's text, as `skills_named` reads it: a letter or a digit, then
+#: whatever a skill's name keeps inside a word -- ``C++``, ``C#``, ``ASP.NET``, ``CI/CD``,
+#: ``l'information`` -- less what only ends a sentence.
+_WORD = re.compile(r"\w[\w+#.'/-]*")
+_WORD_ENDS = ".'/-"
+
+#: How many texts `skills_named` remembers what it found in, per process, the oldest going
+#: first. The answer is a few identifiers, and the key is a digest of the text with the
+#: revision it was read in, so a description edited is a new key rather than a stale answer,
+#: and one worker never needs to hear what another found.
+SKILLS_NAMED_HELD = 256
+_named: OrderedDict[tuple, tuple[str, ...]] = OrderedDict()
+
+
+def _words(text: str) -> list[str]:
+    """A text as the folded words a skill's name is compared with."""
+    words = (word.rstrip(_WORD_ENDS) for word in _WORD.findall(_fold(text)))
+    return [word for word in words if word]
+
+
+def _beginning(language: str, prefix: str) -> list[int]:
+    """The positions of the names in ``language`` that, folded, begin with ``prefix``."""
+    names, order, index = _named_from(language, prefix)
+    found = []
+    while index < len(order) and _fold(names[order[index]]).startswith(prefix):
+        found.append(order[index])
+        index += 1
+    return found
+
+
+def _continues(language: str, prefix: str) -> bool:
+    """Whether some name in ``language``, folded, begins with ``prefix``."""
+    names, order, index = _named_from(language, prefix)
+    return index < len(order) and _fold(names[order[index]]).startswith(prefix)
+
+
+def _named_as(phrase: str, language: str) -> int | None:
+    """The skill a run of words in a text names, in ``language``, where exactly one does.
+
+    Its preferred name, as `skill_for` matches a typed one; or that name less the words in
+    brackets ESCO adds to tell one sense from another -- *Python (computer programming)* is
+    named in a listing as *Python* -- where no skill has the bare name and one has it with
+    them. Two skills either way is a name that says neither.
+    """
+    names, order, index = _named_from(language, phrase)
+    exact: set[int] = set()
+    while index < len(order) and _fold(names[order[index]]) == phrase:
+        exact.add(order[index])
+        index += 1
+    if exact:
+        return exact.pop() if len(exact) == 1 else None
+    qualified = {
+        position
+        for position in _beginning(language, phrase + " (")
+        if _fold(names[position]).endswith(")")
+    }
+    return qualified.pop() if len(qualified) == 1 else None
+
+
+def _named_in(words: list[str], language: str) -> list[int]:
+    """The skills a text names in one language, in the order it first names them.
+
+    Read left to right, taking at each word the longest run of words that is a skill's
+    name: *project management* is one skill, not *project management* and *management*. A
+    run grows only while some name begins with it, so most words cost one look.
+    """
+    found: list[int] = []
+    index = 0
+    while index < len(words):
+        phrase, end, best = words[index], index, None
+        while True:
+            position = _named_as(phrase, language)
+            if position is not None:
+                best = (end, position)
+            end += 1
+            if end >= len(words) or not _continues(language, phrase + " "):
+                break
+            phrase = f"{phrase} {words[end]}"
+        if best is None:
+            index += 1
+            continue
+        end, position = best
+        if position not in found:
+            found.append(position)
+        index = end + 1
+    return found
+
+
+def skills_named(text: str, *languages: str) -> tuple[str, ...]:
+    """The URIs of the ESCO skills a text names, in the order it first names them (#1093).
+
+    For a listing: which of the classification's skills its words ask for, with no model
+    and nothing fetched. A skill is named where a run of the text's words is its preferred
+    name, folded as `skill_for` folds a typed one. The text is read in each of
+    ``languages`` the classification publishes, and in English, and the language that finds
+    the most is the one the answer comes from: a listing is written in one language, and
+    the names of another found in it are mostly words that happen to be spelt alike.
+
+    Remembered per text, so a page drawn again reads it once. Nothing where the skills have
+    not been downloaded.
+    """
+    if not skills_available() or not str(text or "").strip():
+        return ()
+    readings: list[str] = []
+    for code in (*languages, FALLBACK):
+        language = _skill_language(code)
+        if language and language not in readings:
+            readings.append(language)
+    digest = hashlib.sha256(str(text).encode("utf-8")).hexdigest()
+    key = (skills_about()["revision"], digest, tuple(readings))
+    held = _named.get(key)
+    if held is not None:
+        return held
+    words = _words(text)
+    best: list[int] = []
+    for language in readings:
+        found = _named_in(words, language)
+        if len(found) > len(best):
+            best = found
+    identifiers = _skill_identifiers()
+    answer = tuple(SKILL_NAMESPACE + identifiers[position] for position in best)
+    _named[key] = answer
+    while len(_named) > SKILLS_NAMED_HELD:
+        try:
+            _named.popitem(last=False)
+        except KeyError:  # Another thread emptied it first.
+            break
+    return answer
+
+
 def forget() -> None:
     """Drop everything this process has read of the classification.
 
@@ -748,4 +881,5 @@ def forget() -> None:
         _skill_order,
     ):
         cached.cache_clear()
+    _named.clear()
     _warned = _warned_legacy = _warned_skills = False

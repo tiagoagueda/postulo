@@ -1,0 +1,53 @@
+{% load i18n %}
+<c-vars panel />
+{% comment %} Which of the skills a listing names the person has, and which they do not (#1093):
+   `<c-listing-skills :panel="skills" />`, with `jobs.listing_skills.panel`.
+
+   Drawn on two pages -- the listing's own, and its application's -- which is why it is a
+   component. The names are the ESCO classification's, in the reader's language, in the order
+   the listing first names them. Where the classification's skills have not been downloaded
+   there is nothing to compare, and the card says how an administrator downloads them rather
+   than saying the listing names none.
+{% endcomment %}
+<div class="card mb-6" data-listing-skills>
+  <c-section-title>
+    {% translate "Skills" %}
+    <c-slot name="subtitle">{% translate "The skills of the ESCO classification this listing names, and which of them your career record has." %}</c-slot>
+  </c-section-title>
+  {% if not panel.available %}
+    <p class="text-sm text-ink-500 dark:text-ink-400" data-skills-unavailable>
+      {% translate "The ESCO skills have not been downloaded on this instance, so this listing cannot be compared with your skills: an administrator runs manage.py fetch_esco to download them." %}
+    </p>
+  {% elif not panel.named %}
+    <p class="text-sm text-ink-500 dark:text-ink-400" data-skills-none>
+      {% translate "This listing names none of the classification's skills by name." %}
+    </p>
+  {% else %}
+    {% if panel.held %}
+      <h3 class="text-xs text-ink-500 dark:text-ink-400">{% translate "You have" %}</h3>
+      <ul class="mt-1 mb-3 flex flex-wrap gap-1" data-skills-held>
+        {% for name in panel.held %}
+          <li class="badge" data-tone="green"><bdi>{{ name }}</bdi></li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+    {% if panel.missing %}
+      <h3 class="text-xs text-ink-500 dark:text-ink-400">{% translate "Not on your career record" %}</h3>
+      <ul class="mt-1 flex flex-wrap gap-1" data-skills-missing>
+        {% for name in panel.missing %}
+          <li class="badge" data-tone="grey"><bdi>{{ name }}</bdi></li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+    {% if panel.best_cv %}
+      <p class="mt-3 text-sm" data-skills-best-cv>
+        {% blocktranslate trimmed count counter=panel.best_cv_count %}
+          The CV that prints the most of the ones you have, {{ counter }}:
+        {% plural %}
+          The CV that prints the most of the ones you have, {{ counter }}:
+        {% endblocktranslate %}
+        <a class="underline" href="{% url 'documents:cv_detail' panel.best_cv.pk %}"><bdi>{{ panel.best_cv.name }}</bdi></a>
+      </p>
+    {% endif %}
+  {% endif %}
+</div>
