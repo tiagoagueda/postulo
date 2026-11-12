@@ -175,6 +175,14 @@ _CHECKED_PROFILE_FIELDS = frozenset(
         "gender",
         # The paper (#344): one of the papers there are, or blank for the instance's.
         "paper",
+        # Last month's report without being asked (#1095): a schedule that is not one of the
+        # three, a day outside the month, an address that is not one, is refused.
+        "report_schedule",
+        "report_day",
+        "report_entry_source",
+        "report_days_before",
+        "report_send",
+        "report_send_to",
     }
 )
 #: The checked fields a refusal of which the report says: they are the person's own facts,
@@ -249,6 +257,14 @@ def _profile_value(profile, name: str, value):
 
         installed = {plugin.name for kind in GOVERNED_KINDS for plugin in plugins(kind)}
         return sorted({item for item in value if isinstance(item, str) and item in installed})
+    if name == "report_made_for":
+        # The first day of a month, as the archive writes a date (#1095); anything else is
+        # refused, and the next report due is made.
+        try:
+            day = parse_date(value) if isinstance(value, str) else None
+        except ValueError:
+            day = None
+        return day if day is not None and day.day == 1 else _REFUSED
     if name in _CHECKED_PROFILE_FIELDS:
         wanted = (
             bool

@@ -1222,6 +1222,7 @@ def snapshot_report(
     backend=None,
     theme: str = "",
     language: str = "",
+    kept_back: bool = False,
 ):
     """Freeze a report as a PDF, filed under Sent documents like a CV is (#162).
 
@@ -1234,6 +1235,9 @@ def snapshot_report(
 
     ``theme`` and ``language`` are what it was drawn in (#340), written down with it as a
     CV's are; a caller that passes no language means the one in force.
+
+    ``kept_back`` files it without giving the stores a copy: a report the scheduler made
+    that nobody has read yet (#1095). *Send now* on the document hands it on afterwards.
     """
     from .models import DocumentKind
 
@@ -1257,6 +1261,8 @@ def snapshot_report(
         source_text=html,
         checksum=RenderedDocument.checksum_for(content),
     )
+    # Read by the signal that queues the copies as the row is saved, and by nothing after.
+    document.kept_back = kept_back
     _file_and_save(document, filename, content)
     return document
 

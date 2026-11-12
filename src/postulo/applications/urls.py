@@ -18,6 +18,7 @@ urlpatterns = [
     path("report/", views.ReportView.as_view(), name="report"),
     path("report/report.csv", views.ReportCSVView.as_view(), name="report_csv"),
     path("report/report.pdf", views.ReportPDFView.as_view(), name="report_pdf"),
+    path("report/schedule/", views.ReportScheduleView.as_view(), name="report_schedule"),
     path("new/", views.ApplicationCreateView.as_view(), name="create"),
     path("<int:pk>/", views.ApplicationDetailView.as_view(), name="detail"),
     path("<int:pk>/edit/", views.ApplicationUpdateView.as_view(), name="update"),

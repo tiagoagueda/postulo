@@ -65,6 +65,10 @@ EXCUSED: dict[str, str] = {
     ),
     "applications:report_csv": "the report's evidence list arriving as a spreadsheet",
     "applications:report_pdf": "the report arriving as a rendered PDF",
+    "applications:report_schedule": (
+        "a POST that saves and goes back to the report page, which the suite visits with its "
+        "form; a refusal is that page again (#1095)"
+    ),
     "applications:interview_ics": "a calendar file for one interview",
     "applications:interview_calendar": "a calendar feed of every interview",
     "applications:calendar_download": (

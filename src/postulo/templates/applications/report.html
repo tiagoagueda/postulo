@@ -297,4 +297,27 @@
   <p class="mt-6 text-xs text-ink-500 dark:text-ink-400">
     {% translate "Postulo sets no target. How many applications a period should hold is a benefit regime's rule or your own, never this software's." %}
   </p>
+
+  {% comment %} Last month's report without being asked (#1095): made on a day of the
+     month, or some days before a plugin's calendar entry, and filed under Sent documents
+     with a reminder to read it. Handing it on is a second switch, off until turned on.
+     The period the page shows travels with the form, so saving comes back to it. {% endcomment %}
+  <section class="card mt-6" aria-labelledby="schedule-heading">
+    <c-section-title id="schedule-heading">
+      {% translate "Each month, without asking" %}
+      <c-slot name="subtitle">{% translate "A report made for you is kept under Sent documents and waits for you to read it. Send now on the document hands it on." %}</c-slot>
+    </c-section-title>
+    <form method="post" action="{% url 'applications:report_schedule' %}?{{ request.GET.urlencode }}">
+      {% csrf_token %}
+      <div class="grid gap-4 sm:grid-cols-2">
+        <c-field :field="schedule_form.report_schedule" />
+        <c-field :field="schedule_form.report_day" />
+        <c-field :field="schedule_form.report_entry_source" />
+        <c-field :field="schedule_form.report_days_before" />
+        <c-field :field="schedule_form.report_send" />
+        <c-field :field="schedule_form.report_send_to" />
+      </div>
+      <button type="submit" class="btn mt-4">{% translate "Save" %}</button>
+    </form>
+  </section>
 {% endblock %}

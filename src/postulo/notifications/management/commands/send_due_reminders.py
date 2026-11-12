@@ -176,7 +176,7 @@ class Command(BaseCommand):
     def one_pass(self, every: int, *, budget: int) -> None:
         """Everything the clock has made due, once."""
         from postulo.accounts import claims, sessions
-        from postulo.applications import subscriptions
+        from postulo.applications import scheduled_reports, subscriptions
         from postulo.applications.quiet import announce_quiet_applications
         from postulo.core import errands, site
         from postulo.core.slow import reap_archives
@@ -208,6 +208,8 @@ class Command(BaseCommand):
             syncs_ran, syncs_failed = run_syncs(budget=budget)
             # The calendars people subscribe to, each read once per its interval (#1098).
             subscriptions.refresh_due()
+            # Last month's report, on the day each person chose, at most once an hour (#1095).
+            scheduled_reports.make_if_due()
             # Streets looked up for the map's pins (#913): a few a pass, one a second, so the
             # addresses saved before the setting was switched on are found slowly too.
             streets_pinned, streets_missed = geocoding.run()

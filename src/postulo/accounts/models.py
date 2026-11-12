@@ -294,6 +294,14 @@ class PersonIdentifier(KeepsItsScheme, models.Model):
         )
 
 
+class ReportSchedule(models.TextChoices):
+    """When last month's report is made without being asked (#1095)."""
+
+    NEVER = "", _("Never")
+    DAY = "day", _("On a day of each month")
+    ENTRY = "entry", _("Some days before a calendar entry")
+
+
 class Profile(models.Model):
     """Personal details and preferences.
 
@@ -680,6 +688,66 @@ class Profile(models.Model):
         default=3,
         validators=[MinValueValidator(1), MaxValueValidator(90)],
         help_text=_("Days of warning before a listing you have not decided about closes."),
+    )
+    #: Last month's report, made without being asked and filed under Sent documents with a
+    #: reminder to read it (#1095): on a day of each month, or some days before an entry a
+    #: plugin places on the calendar, such as a monthly declaration. Blank is never, as it
+    #: always was. Read by `applications.scheduled_reports`.
+    report_schedule = models.CharField(
+        _("make last month's report"),
+        max_length=20,
+        blank=True,
+        default=ReportSchedule.NEVER,
+        choices=ReportSchedule.choices,
+        help_text=_(
+            "Postulo makes the report for the month before, files it under Sent documents and "
+            "reminds you to read it."
+        ),
+    )
+    report_day = models.PositiveSmallIntegerField(
+        _("on day"),
+        default=1,
+        validators=[MinValueValidator(1), MaxValueValidator(31)],
+        help_text=_("The day of the month. In a shorter month, its last day."),
+    )
+    #: The plugin whose entries say when, by name, as a reminder's `source` holds it.
+    report_entry_source = models.CharField(
+        _("before an entry placed by"),
+        max_length=60,
+        blank=True,
+        default="",
+        help_text=_(
+            "The plugin whose calendar entries set the date, such as a monthly declaration."
+        ),
+    )
+    report_days_before = models.PositiveSmallIntegerField(
+        _("days before the entry"),
+        default=3,
+        validators=[MinValueValidator(0), MaxValueValidator(28)],
+        help_text=_("How many days ahead of the entry the report is made. 0 is the same day."),
+    )
+    #: The second switch, off by default: a report is evidence, and a person reads it before
+    #: it goes anywhere unless they say otherwise (#1095).
+    report_send = models.BooleanField(
+        _("hand it on without waiting for me"),
+        default=False,
+        help_text=_(
+            "Off, the report waits for you to read it. On, it also goes to your document "
+            "stores that take reports, and to the address below."
+        ),
+    )
+    report_send_to = models.EmailField(
+        _("also email it to"),
+        blank=True,
+        default="",
+        help_text=_(
+            "Sent from your own outbox when the report is handed on. Leave it empty for nobody."
+        ),
+    )
+    #: The first day of the last month a report was made for, so each month is made once:
+    #: the scheduler claims a month by comparing this with what it read (#1095).
+    report_made_for = models.DateField(
+        _("last report made for"), null=True, blank=True, editable=False
     )
 
     created_at = models.DateTimeField(_("created at"), auto_now_add=True)

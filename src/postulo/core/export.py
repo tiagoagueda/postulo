@@ -264,7 +264,13 @@ logger = logging.getLogger(__name__)
 #: its address**, which may be what opens that calendar to anyone holding it, and is kept as a
 #: connection's secrets are, which no archive carries: a restored subscription keeps its events
 #: and asks for its address again. An archive without them restores none (#1098).
-FORMAT_VERSION = 82
+#: 83 added on the profile when last month's report is made without being asked:
+#: ``report_schedule`` (blank, ``day`` or ``entry``), ``report_day``, ``report_entry_source`` (a
+#: plugin's name), ``report_days_before``, ``report_send``, ``report_send_to`` (an address), and
+#: ``report_made_for``, the first day of the last month one was made for, so a restore does not
+#: make that month again. Each is held to its column; an archive without them restores the
+#: report as never made without being asked (#1095).
+FORMAT_VERSION = 83
 
 
 def industry_entry(industry) -> str | dict:
@@ -429,6 +435,15 @@ PROFILE_FIELDS = (
     "keep_page_rendering",
     "closing_notice_days",
     "save_as_you_go",
+    # Last month's report without being asked (#1095), each read back against its column, and
+    # the month last made, so a restore does not make it a second time.
+    "report_schedule",
+    "report_day",
+    "report_entry_source",
+    "report_days_before",
+    "report_send",
+    "report_send_to",
+    "report_made_for",
     # What every exported file says about itself (#878): a privacy choice, like what a
     # capture keeps, so a restore that reset it would put a name back into files.
     *EXPORT_METADATA_FIELDS,

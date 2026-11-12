@@ -9,6 +9,7 @@ from django.forms.models import ModelChoiceIterator
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
+from postulo.accounts.models import Profile, ReportSchedule
 from postulo.core import slugs
 from postulo.core.csv_import import OFFERED_CURRENCIES
 from postulo.core.date_widgets import DateInput, DateTimeInput
@@ -1059,5 +1060,75 @@ class SubscribedEventForm(forms.Form):
         if action == self.AS_APPOINTMENT and not cleaned.get("company"):
             self.add_error(
                 "company", _("An appointment is with a public employment service. Choose one.")
+            )
+        return cleaned
+
+
+class ReportScheduleForm(forms.ModelForm):
+    """When last month's report is made without being asked, and whether it is handed on (#1095).
+
+    The plugins offered are the ones that have placed entries on this person's calendar, by
+    their names in words; the one already chosen stays offered after its last entry has gone,
+    so saving the form for another reason does not take it away.
+    """
+
+    class Meta:
+        model = Profile
+        fields = (
+            "report_schedule",
+            "report_day",
+            "report_entry_source",
+            "report_days_before",
+            "report_send",
+            "report_send_to",
+        )
+
+    def __init__(self, *args, user, **kwargs) -> None:
+        from postulo.plugins.base import label_of
+        from postulo.plugins.registry import find_any
+
+        from .scheduled_reports import entry_sources
+
+        super().__init__(*args, **kwargs)
+        self.user = user
+        names = entry_sources(user)
+        stored = self.instance.report_entry_source
+        if stored and stored not in names:
+            names.append(stored)
+
+        def words(name: str) -> str:
+            plugin = find_any(name)
+            return label_of(plugin) if plugin is not None else name
+
+        field = self.fields["report_entry_source"]
+        self.fields["report_entry_source"] = forms.ChoiceField(
+            label=field.label,
+            help_text=field.help_text,
+            required=False,
+            choices=[("", _("None chosen"))] + [(name, words(name)) for name in names],
+        )
+
+    def clean(self):
+        from postulo.core import correspondence
+
+        cleaned = super().clean()
+        if cleaned.get("report_schedule") == ReportSchedule.ENTRY and not cleaned.get(
+            "report_entry_source"
+        ):
+            self.add_error(
+                "report_entry_source",
+                _("Choose whose calendar entries set the date.")
+                if len(self.fields["report_entry_source"].choices) > 1
+                else _(
+                    "No plugin has put an entry on your calendar yet, so there is none to choose."
+                ),
+            )
+        if cleaned.get("report_send_to") and not correspondence.can_send_as_themselves(self.user):
+            self.add_error(
+                "report_send_to",
+                _(
+                    "You have no outbox set up, so there is nothing to email it from. Add one "
+                    "under Settings → Connections."
+                ),
             )
         return cleaned

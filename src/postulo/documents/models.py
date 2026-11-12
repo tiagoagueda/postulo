@@ -1169,7 +1169,14 @@ class RenderedDocument(RecordsALanguage, OwnedModel):
         handed to an employment office, at a deliberate press, and #162 decided that a store
         is given it; asking it for an application would switch that off by accident, and
         leave every store connection with a *Report* switch that does nothing.
+
+        **Except one the scheduler made that nobody has read** (#1095): it is filed with
+        ``kept_back`` set for the moment it is saved, so no copy is queued as it is created.
+        The attribute is not a column, so the same row read again -- by *Send now*, once the
+        person has read it -- goes to the stores as any report does.
         """
+        if getattr(self, "kept_back", False):
+            return False
         return self.went_with_an_application or self.kind == DocumentKind.REPORT
 
     def file_is_as_rendered(self) -> bool:

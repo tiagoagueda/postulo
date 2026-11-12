@@ -1499,41 +1499,68 @@ class ReportView(LoginRequiredMixin, View):
     template_name = "applications/report.html"
 
     def get(self, request: HttpRequest) -> HttpResponse:
+        return render(request, self.template_name, report_context(request))
+
+
+def report_context(request: HttpRequest, *, schedule_form=None) -> dict:
+    """What the report page is drawn with, for its own GET and for a schedule that was refused."""
+    from .forms import ReportScheduleForm
+
+    period = reports.period_from(request.GET)
+    report = reports.build(request.user, period)
+    earlier = period.shifted(-1)
+    later = period.shifted(1)
+    return {
+        "report": report,
+        "period": period,
+        "earlier": urlencode(reports.as_query(earlier)) if earlier else "",
+        # Never a period that has not happened. A report about next month is a blank
+        # page pretending to be a document.
+        "later": (
+            urlencode(reports.as_query(later))
+            if later and later.start <= timezone.localdate()
+            else ""
+        ),
+        "week_choices": reports.WEEK_CHOICES,
+        # What the document is drawn in, offered beside the button that files it
+        # (#340): the theme this person last chose, and the language a CV with none
+        # of its own would be in.
+        "theme_choices": themes.choices_for(themes.Kind.REPORT),
+        "chosen_theme": reports.theme_for(request.user),
+        "language_choices": reports.offered_languages(),
+        "chosen_language": reports.language_for(request.user),
+        # And the paper (#344): the ones the theme prints on, starting from this
+        # person's default, and why the others are not there where some are not.
+        **_paper_choices(request.user, reports.theme_for(request.user)),
+        "kind": period.kind,
+        "on_month": period.start.strftime("%Y-%m"),
+        "on_quarter": f"{period.start.year}-Q{(period.start.month - 1) // 3 + 1}",
+        "weeks": period.days // 7,
+        # Last month's report without being asked (#1095), at the foot of the page.
+        "schedule_form": schedule_form
+        or ReportScheduleForm(instance=request.user.profile, user=request.user),
+    }
+
+
+class ReportScheduleView(LoginRequiredMixin, View):
+    """Save when last month's report is made without being asked (#1095).
+
+    Back to the report page the form was on, with the period it was showing; a refusal is
+    that page again, with the form as it was filled in and what is wrong beside each field.
+    """
+
+    def post(self, request: HttpRequest) -> HttpResponse:
+        from .forms import ReportScheduleForm
+
+        form = ReportScheduleForm(request.POST, instance=request.user.profile, user=request.user)
+        if not form.is_valid():
+            return render(
+                request, ReportView.template_name, report_context(request, schedule_form=form)
+            )
+        form.save()
+        messages.success(request, _("Saved. The report is made as you chose."))
         period = reports.period_from(request.GET)
-        report = reports.build(request.user, period)
-        earlier = period.shifted(-1)
-        later = period.shifted(1)
-        return render(
-            request,
-            self.template_name,
-            {
-                "report": report,
-                "period": period,
-                "earlier": urlencode(reports.as_query(earlier)) if earlier else "",
-                # Never a period that has not happened. A report about next month is a blank
-                # page pretending to be a document.
-                "later": (
-                    urlencode(reports.as_query(later))
-                    if later and later.start <= timezone.localdate()
-                    else ""
-                ),
-                "week_choices": reports.WEEK_CHOICES,
-                # What the document is drawn in, offered beside the button that files it
-                # (#340): the theme this person last chose, and the language a CV with none
-                # of its own would be in.
-                "theme_choices": themes.choices_for(themes.Kind.REPORT),
-                "chosen_theme": reports.theme_for(request.user),
-                "language_choices": reports.offered_languages(),
-                "chosen_language": reports.language_for(request.user),
-                # And the paper (#344): the ones the theme prints on, starting from this
-                # person's default, and why the others are not there where some are not.
-                **_paper_choices(request.user, reports.theme_for(request.user)),
-                "kind": period.kind,
-                "on_month": period.start.strftime("%Y-%m"),
-                "on_quarter": f"{period.start.year}-Q{(period.start.month - 1) // 3 + 1}",
-                "weeks": period.days // 7,
-            },
-        )
+        return redirect(f"{reverse('applications:report')}?{urlencode(reports.as_query(period))}")
 
 
 def _paper_choices(user, theme: str) -> dict:
