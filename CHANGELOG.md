@@ -8,6 +8,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### ✨ Added
 
+- Sync plugins can keep a small note between runs of a connection, so a mail sync no longer has to read the same messages again on every pass. (#1165)
 - Applications can go quiet after a different number of days for each status, or for what they were applied through, set beside the usual number under Settings → Appearance; each application's page says when it will count as quiet. (#1099)
 - Offers can now be recorded, changed and deleted through the API, not only read, with the same checks, timeline entries and answer-by reminders as the page. (#1101)
 - A CV can be downloaded as Europass and as JSON Resume, each switched on under Extend file formats, and the CV's page says what each format leaves out. (#1100)
