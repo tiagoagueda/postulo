@@ -30,10 +30,12 @@ from django.views.generic import (
 
 from postulo.core import deletions, tables
 from postulo.core.mixins import (
+    READ,
     ConfirmDeleteMixin,
     OwnedObjectMixin,
     OwnerFormMixin,
     PageOrFragmentMixin,
+    shared_scope,
 )
 from postulo.core.models import Tag
 from postulo.core.params import as_pk
@@ -42,7 +44,7 @@ from postulo.core.search import application_match, clean_query
 from postulo.documents import themes
 from postulo.jobs import listing_skills
 from postulo.jobs.history import history_of
-from postulo.jobs.models import Company
+from postulo.jobs.models import Company, Contact
 from postulo.jobs.views import UserFormKwargsMixin
 
 from . import agenda, endings, ical, quiet, reports, suggestions
@@ -556,6 +558,19 @@ class ApplicationDetailView(OwnedObjectMixin, DetailView):
         # Which of the skills the listing names the person has, from ESCO (#1093).
         context["skills"] = listing_skills.panel(self.object.posting, self.request.user)
         context["reminders"] = self.object.reminders.filter(done_at__isnull=True)
+        # Which of the people it names the reader may open (#1097): a contact's name is a
+        # link to their page only where that page would answer, by the rule the page itself
+        # uses; a contact no longer shared with them stays a name. One query for both.
+        named = [pk for pk in (self.object.contact_id, self.object.referred_by_id) if pk]
+        context["openable_contacts"] = (
+            set(
+                shared_scope(Contact.objects, self.request.user, READ)
+                .filter(pk__in=named)
+                .values_list("pk", flat=True)
+            )
+            if named
+            else set()
+        )
         # What deleting it would take with it, for the dialog on this page (#854).
         context["deletion"] = deletions.facts_for(ApplicationDeleteView, self.request, self.object)
         context["offers"] = list(self.object.offers.all())

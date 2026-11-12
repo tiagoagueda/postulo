@@ -160,3 +160,20 @@ def test_the_company_the_application_and_search_link_to_the_page(client, user):
 
     hits = search_contacts(user, "Cave", 5)
     assert [hit.url for hit in hits.hits] == [url]
+
+
+def test_a_contact_the_reader_cannot_open_is_named_and_not_linked(client, user, other_user):
+    """An application may name somebody whose contact is no longer shared with its owner:
+    the name is still shown, and is not a link to a page that would answer 404 (#1097)."""
+    hidden = a_contact(other_user, name="Gordon Freeman")
+    contact = a_contact(user)
+    posting = JobPosting.objects.create(owner=user, company=contact.company, title="Engineer")
+    application = Application.objects.create(owner=user, posting=posting, referred_by=contact)
+    Application.objects.filter(pk=application.pk).update(contact=hidden)
+    client.force_login(user)
+
+    body = client.get(application.get_absolute_url()).content.decode()
+
+    assert "Gordon Freeman" in body
+    assert page(hidden) not in body
+    assert f'href="{page(contact)}"' in body
