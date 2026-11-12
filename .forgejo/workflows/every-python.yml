@@ -77,6 +77,9 @@ jobs:
       # this it brings the environment back to the default groups before every command,
       # which reinstalled the browser group this job leaves out: 45 MB on every run (#1135).
       UV_NO_SYNC: "1"
+      # Where the suite keeps its migrated database, kept between runs by the step of that
+      # name; `ci.yml` says why (#1033).
+      POSTULO_TEST_DB_CACHE: "~/.cache/postulo/test-databases"
     strategy:
       fail-fast: false
       matrix:
@@ -184,6 +187,19 @@ jobs:
         # it had taken half a minute, and ten were not enough the first time the cache was
         # empty (#1110). The limit is there to end a hang, not to time the service.
         timeout-minutes: 30
+
+      - name: Keep the migrated test database between runs
+        # Restored instead of migrating some 290 migrations in every worker (#1033, #1144);
+        # each file is named by what `migrate` reads, so a stale copy costs a migration and
+        # no wrong result. `ci.yml` says why, and what still migrates from nothing.
+        id: test-databases
+        uses: actions/cache@v4
+        continue-on-error: true
+        with:
+          path: "~/.cache/postulo/test-databases"
+          key: test-databases-${{ runner.os }}-${{ matrix.python-version }}-${{ env.UV_VERSION }}-${{ hashFiles('src/postulo/**/migrations/*.py', 'src/postulo/**/models.py', 'src/postulo/config/settings/*.py', 'src/postulo/jobs/data/nace-2.1.json', 'src/postulo/plugins/testdb.py', 'src/postulo/__init__.py', 'uv.lock') }}
+          restore-keys: ${{ github.event_name != 'pull_request' && format('test-databases-{0}-{1}-{2}-', runner.os, matrix.python-version, env.UV_VERSION) || '' }}
+        timeout-minutes: 10
 
       - name: Test
         # Two processes, not `-n auto` (#233): the jobs of this workflow share one host,

@@ -156,6 +156,86 @@ def test_the_unit_jobs_keep_the_files_fetch_esco_writes_and_not_an_earlier_layou
         assert revision in kept["with"]["key"], name
 
 
+# --------------------------------------------- a cache a pull request cannot seed (#827)
+
+
+def test_no_cache_falls_back_to_an_older_one_on_a_pull_request():
+    """Only a push to a branch the project controls may restore an older cache by its prefix:
+    on a pull request the key is exact, so a run of somebody else's code cannot read or seed
+    what `main` restores. A cache step with plain restore keys would undo that for its files."""
+    loose = []
+    for name, key, job in jobs():
+        for step in job["steps"]:
+            if "actions/cache@" not in str(step.get("uses", "")):
+                continue
+            fallback = step.get("with", {}).get("restore-keys")
+            if fallback is None:
+                continue
+            withheld = fallback.startswith(
+                "${{ github.event_name != 'pull_request' && "
+            ) and fallback.endswith(" || '' }}")
+            if not withheld:
+                loose.append(f"{name}: {key}: {step.get('name')}")
+
+    assert loose == []
+
+
+# ------------------------------- the unit job restores its migrated database (#1033, #1144)
+
+
+def kept_test_databases(job) -> dict:
+    (step,) = [step for step in job["steps"] if step.get("id") == "test-databases"]
+    return step
+
+
+def test_the_unit_jobs_keep_the_migrated_test_database_between_runs():
+    """Every process of the unit job migrated an empty database, some 290 migrations and
+    35 s each, before its first test. The job keeps the database `testdb` stores, under a key
+    that rolls when the migrations or the installed versions do, and points the suite at it:
+    a cache step with no variable, or a variable with no cache step, keeps nothing."""
+    from postulo.plugins import testdb
+
+    for name in ("ci.yml", "every-python.yml"):
+        job = workflows()[name]["jobs"]["test"]
+        directory = job["env"].get(testdb.VARIABLE, "")
+        kept = kept_test_databases(job)
+
+        assert directory.lower() not in testdb._OFF | testdb._ON | {""}, f"{name}: a directory"
+        assert "actions/cache@" in kept["uses"], name
+        assert kept["continue-on-error"] is True, name
+        assert "timeout-minutes" in kept, name
+        assert kept["with"]["path"] == directory, f"{name}: the directory the suite writes"
+        for part in (
+            "migrations/*.py",
+            "uv.lock",
+            "nace-2.1.json",
+            "matrix.python-version",
+            "env.UV_VERSION",
+        ):
+            assert part in kept["with"]["key"], f"{name}: the key rolls with {part}"
+        assert "'pull_request'" in kept["with"]["restore-keys"], name
+
+        steps = job["steps"]
+        first_test = next(
+            index for index, step in enumerate(steps) if "pytest" in str(step.get("run", ""))
+        )
+        assert steps.index(kept) < first_test, f"{name}: restored before the suite runs"
+
+
+def test_a_job_on_every_push_still_migrates_from_nothing():
+    """The decision behind the cache (#1033): the migrations must still be run from an empty
+    database on every push. The PostgreSQL job and the browser job do, since `testdb` keeps
+    only an in-memory SQLite database; neither may start keeping one."""
+    from postulo.plugins import testdb
+
+    ci = workflows()["ci.yml"]
+    for key in ("postgres", "browser"):
+        job = ci["jobs"][key]
+        assert testdb.VARIABLE not in str(job), key
+        assert not any(step.get("id") == "test-databases" for step in job["steps"]), key
+    assert testdb.VARIABLE not in str(ci.get("env", {}))
+
+
 # ------------------------------------ no step waits for ever on the network (#1138)
 
 #: What a step's text holds when it reaches the network to set a job up.

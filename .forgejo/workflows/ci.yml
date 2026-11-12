@@ -7,8 +7,9 @@
 #
 # Three actions are used, all of them from Forgejo's own copy of the standard set, and
 # nothing else from any action marketplace: `actions/checkout`, which every job needs;
-# `actions/cache`, which keeps uv's downloads and the browser between runs and is
-# `continue-on-error`, so a cache that is down costs time and fails nothing; and
+# `actions/cache`, which keeps uv's downloads, the browser, the compiled translations, ESCO
+# and the unit suite's migrated test database between runs and is `continue-on-error`, so
+# a cache that is down costs time and fails nothing; and
 # `actions/upload-artifact`, kept on v3 because v4 depends on GitHub's own artifact
 # backend, which Forgejo does not have, and also `continue-on-error`. Forgejo resolves
 # bare action names against its own instance rather than GitHub, so an action published
@@ -264,6 +265,10 @@ jobs:
       # this it brings the environment back to the default groups before every command,
       # which reinstalled the browser group this job leaves out: 45 MB on every run (#1135).
       UV_NO_SYNC: "1"
+      # Where the suite keeps its migrated database, which the step "Keep the migrated test
+      # database between runs" restores (#1033). On the job rather than on a step, so that
+      # both test steps and the `heavy` one read it; `testdb` expands the `~`.
+      POSTULO_TEST_DB_CACHE: "~/.cache/postulo/test-databases"
     strategy:
       fail-fast: false
       matrix:
@@ -374,6 +379,35 @@ jobs:
         # it had taken half a minute, and ten were not enough the first time the cache was
         # empty (#1110). The limit is there to end a hang, not to time the service.
         timeout-minutes: 30
+
+      - name: Keep the migrated test database between runs
+        # Every process of the suite began by migrating an empty in-memory database: about
+        # 290 migrations, some 35 s, in each worker of this job and again in every other job
+        # that runs tests, five times a push (#1033). #1144 taught the suite to keep the
+        # migrated database in a directory and restore it instead; off on CI unless a
+        # workflow names the directory, which this job does (`POSTULO_TEST_DB_CACHE` above),
+        # and this step keeps that directory between runs. The maintainer chose it on 12
+        # November 2026, on the condition that something still migrates from nothing on every
+        # push: the PostgreSQL job and the browser job do, since only an in-memory SQLite
+        # database is ever kept, and `tests/test_workflow_rules.py` holds both to it.
+        #
+        # What is restored is never trusted for being restored: each file is named by
+        # everything `migrate` reads (`postulo.plugins.testdb.fingerprint`), and a file under
+        # another name is ignored, so a stale copy costs one migration and no wrong result.
+        # The key rolls with what changes that name most often -- the migrations, the models
+        # and settings they read, the classification one of them seeds from, the lock, uv,
+        # which picks the Python, and the Python -- so that an exact hit holds a file the run
+        # can use; a change the key misses migrates until the next migration rolls it. The
+        # two workers take turns on the first run: one migrates and stores, the other waits
+        # and restores. Restore keys withheld from pull requests, as for uv's downloads (#827).
+        id: test-databases
+        uses: actions/cache@v4
+        continue-on-error: true
+        with:
+          path: "~/.cache/postulo/test-databases"
+          key: test-databases-${{ runner.os }}-${{ matrix.python-version }}-${{ env.UV_VERSION }}-${{ hashFiles('src/postulo/**/migrations/*.py', 'src/postulo/**/models.py', 'src/postulo/config/settings/*.py', 'src/postulo/jobs/data/nace-2.1.json', 'src/postulo/plugins/testdb.py', 'src/postulo/__init__.py', 'uv.lock') }}
+          restore-keys: ${{ github.event_name != 'pull_request' && format('test-databases-{0}-{1}-{2}-', runner.os, matrix.python-version, env.UV_VERSION) || '' }}
+        timeout-minutes: 10
 
       - name: Test
         # Two processes, not `-n auto` (#233): the jobs of this workflow share one host,
