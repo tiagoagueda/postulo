@@ -463,7 +463,7 @@ def test_the_icon_is_drawn_only_when_there_are_names(client, user):
     assert 'popovertarget="company-names"' in page
     assert 'aria-labelledby="company-names-tip"' in page
     assert 'id="company-names" popover' in page
-    assert '<bdi lang="pt" class="min-w-0 flex-1">Universidade de Aveiro</bdi>' in page
+    assert '<bdi lang="pt" class="min-w-0 break-words">Universidade de Aveiro</bdi>' in page
     assert "Fetch from Wikidata" not in page and 'name="remove"' not in page
 
 

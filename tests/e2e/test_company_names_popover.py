@@ -72,3 +72,24 @@ def test_no_icon_without_names(page: Page, live_server, applicant):
     sign_in(page, live_server.url, detail(bare))
 
     expect(page.get_by_role("button", name="Names in other languages")).to_have_count(0)
+
+
+def test_the_popover_is_as_wide_as_its_content_and_wraps_long_names(
+    page: Page, live_server, applicant, company
+):
+    """The popover was a fixed 20 rem however short its names were (#1243)."""
+    sign_in(page, live_server.url, detail(company))
+    page.get_by_role("button", name="Names in other languages").click()
+    popover = page.locator("#company-names")
+    expect(popover).to_be_visible()
+    width = popover.bounding_box()["width"]
+    assert width < 20 * 16, width
+
+    long_name = "Universidade " + "Muito " * 40 + "Longa"
+    CompanyName.objects.create(owner=applicant, company=company, language="es", name=long_name)
+    page.reload()
+    page.set_viewport_size({"width": 320, "height": 700})
+    page.get_by_role("button", name="Names in other languages").click()
+    box = popover.bounding_box()
+    assert box["x"] >= 0 and box["x"] + box["width"] <= 320
+    assert popover.evaluate("e => e.scrollWidth <= e.clientWidth + 1")

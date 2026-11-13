@@ -25,12 +25,12 @@
           <button type="button" class="btn" data-variant="ghost" data-size="icon" popovertarget="company-names"
                   aria-haspopup="dialog" aria-labelledby="company-names-tip" data-company-names-button>{% icon "languages" %}</button>
           <span id="company-names-tip" data-tooltip>{% translate "Names in other languages" %}</span>
-          <div id="company-names" popover data-popover data-align="start" class="w-80" data-company-names>
-            <ul class="divide-y divide-ink-100 p-2 text-sm dark:divide-ink-800">
+          <div id="company-names" popover data-popover data-align="start" class="w-max min-w-0 max-w-[calc(100vw-1rem)] sm:max-w-md" data-company-names>
+            <ul class="grid grid-cols-[auto_minmax(0,1fr)] divide-y divide-ink-100 p-2 text-sm dark:divide-ink-800">
               {% for language, row in company_names %}
-                <li class="flex flex-wrap items-baseline gap-x-3 px-2 py-1.5">
-                  <span class="w-28 text-ink-500 dark:text-ink-400">{{ language }}</span>
-                  <bdi lang="{{ row.language }}" class="min-w-0 flex-1">{{ row.name }}</bdi>
+                <li class="col-span-2 grid grid-cols-subgrid items-baseline gap-x-3 px-2 py-1.5">
+                  <span class="text-ink-500 dark:text-ink-400">{{ language }}</span>
+                  <bdi lang="{{ row.language }}" class="min-w-0 break-words">{{ row.name }}</bdi>
                 </li>
               {% endfor %}
             </ul>
