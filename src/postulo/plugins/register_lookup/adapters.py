@@ -87,6 +87,8 @@ from django.utils.translation import gettext_lazy as _
 
 from postulo.plugins.api import RegisterAdapter, RegisterAddress, RegisterRecord
 
+from . import casing
+
 ACTIVE, ADMINISTRATION, DISSOLVED = "active", "administration", "dissolved"
 
 
@@ -146,17 +148,23 @@ def _france(document, number: str):
     if found.get("statut_diffusion") == "O" and not seat.get("code_pays_etranger"):
         address = RegisterAddress(
             street=_joined(
-                seat.get("numero_voie"), seat.get("type_voie"), seat.get("libelle_voie")
+                seat.get("numero_voie"),
+                casing.street_type(seat.get("type_voie")),
+                casing.place(seat.get("libelle_voie"), french=True, first=False),
             ),
             postcode=seat.get("code_postal") or "",
-            municipality=seat.get("libelle_commune") or "",
+            municipality=casing.place(seat.get("libelle_commune"), french=True),
             country="FR",
         )
     ceased = found.get("etat_administratif") == "C"
     code = found.get("activite_principale_naf25") or found.get("activite_principale") or ""
     return RegisterRecord(
         number=siren,
-        name=found.get("nom_raison_sociale") or found.get("nom_complet") or "",
+        name=casing.name(
+            found.get("nom_raison_sociale") or found.get("nom_complet") or "",
+            keep=[found.get("sigle") or ""],
+            french=True,
+        ),
         address=address,
         state=DISSOLVED if ceased else ACTIVE if found.get("etat_administratif") == "A" else "",
         state_words="Cessée" if ceased else "Active" if found.get("etat_administratif") else "",
@@ -199,7 +207,7 @@ def _norway(document, number: str):
         address = RegisterAddress(
             street=", ".join(str(line) for line in _list(office.get("adresse")) if line),
             postcode=office.get("postnummer") or "",
-            municipality=office.get("poststed") or "",
+            municipality=casing.place(office.get("poststed")),
             country=office.get("landkode") or "",
         )
     if document.get("slettedato"):
@@ -221,7 +229,7 @@ def _norway(document, number: str):
     code = activity.get("kode") or ""
     return RegisterRecord(
         number=digits,
-        name=document.get("navn") or "",
+        name=casing.name(document.get("navn")),
         address=address,
         state=state,
         state_words=words,
@@ -307,7 +315,7 @@ def _finland(document, number: str):
                 office.get("apartmentNumber"),
             ),
             postcode=office.get("postCode") or "",
-            municipality=town.get("city") or "",
+            municipality=casing.place(town.get("city")),
             country=office.get("country") or "FI",
         )
     situations = [
@@ -440,7 +448,7 @@ def _poland(document, number: str):
         address = RegisterAddress(
             street=_joined(seat.get("ulica"), house),
             postcode=seat.get("kodPocztowy") or "",
-            municipality=seat.get("miejscowosc") or "",
+            municipality=casing.place(seat.get("miejscowosc")),
             country="PL" if (seat.get("kraj") or "POLSKA") == "POLSKA" else "",
         )
     business = _dict(_dict(data.get("dzial3")).get("przedmiotDzialalnosci"))
@@ -452,7 +460,7 @@ def _poland(document, number: str):
     )
     return RegisterRecord(
         number=digits,
-        name=_dict(first.get("danePodmiotu")).get("nazwa") or "",
+        name=casing.name(_dict(first.get("danePodmiotu")).get("nazwa")),
         address=address,
         activity=code,
         activity_words=main.get("opis") or "",

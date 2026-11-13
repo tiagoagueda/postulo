@@ -278,12 +278,34 @@ def test_france_reads_name_head_office_state_and_nace_2_1_division(registers):
 
     record = register_lookup.lookup(adapters.FRANCE, "FR 552081317")
 
-    assert record.name == "ELECTRICITE DE FRANCE"
-    assert record.address.street == "22 AVENUE DE WAGRAM"
-    assert (record.address.postcode, record.address.municipality) == ("75008", "PARIS")
+    assert record.name == "Electricite de France"
+    assert record.address.street == "22 Avenue de Wagram"
+    assert (record.address.postcode, record.address.municipality) == ("75008", "Paris")
     assert record.state == register_lookup.ACTIVE
     assert record.activity == "35.11Y", "NAF 2025 first: its division is NACE 2.1's"
     assert record.division == "35"
+
+
+def test_france_writes_a_name_and_address_in_capitals_the_way_a_person_would(registers):
+    """A register's `15 AV DES CHAMPS ELYSEES` is saved as `15 Avenue des ...` (#1244)."""
+    answers, _seen = registers
+    capitals = json.loads(json.dumps(FRANCE))
+    result = capitals["results"][0]
+    result["nom_raison_sociale"] = "DUPONT SERVICES (DPS)"
+    result["sigle"] = None
+    result["siege"].update(
+        numero_voie="15",
+        type_voie="AV",
+        libelle_voie="DES CHAMPS ELYSEES",
+        libelle_commune="ST DENIS",
+    )
+    answer(answers, RECORDED["fr"][1], capitals)
+
+    record = register_lookup.lookup(adapters.FRANCE, "FR 552081317")
+
+    assert record.name == "Dupont Services (DPS)"
+    assert record.address.street == "15 Avenue des Champs Elysees"
+    assert record.address.municipality == "Saint Denis"
 
 
 def test_france_withholds_the_address_of_a_company_that_asked_for_it(registers):
@@ -326,7 +348,7 @@ def test_norway_reads_its_activity_and_a_bankruptcy(registers):
 
     record = register_lookup.lookup(adapters.NORWAY, "NO 923609016")
 
-    assert record.name == "EQUINOR ASA"
+    assert record.name == "Equinor ASA"
     assert record.address.street == "Forusbeen 50" and record.address.country == "NO"
     assert (record.activity, record.division) == ("06.100", "06")
     assert record.activity_words == "Utvinning av råolje"
@@ -350,7 +372,7 @@ def test_finland_reads_the_current_name_the_street_address_and_english_activity(
 
     assert record.name == "Nokia Oyj", "a name with an end date is an old one"
     assert record.address.street == "Karakaari 7"
-    assert (record.address.postcode, record.address.municipality) == ("02610", "ESPOO")
+    assert (record.address.postcode, record.address.municipality) == ("02610", "Espoo")
     assert record.state == register_lookup.ACTIVE
     assert (record.activity, record.activity_words) == ("70100", "Activities of head offices")
     assert record.division == "70"
@@ -390,7 +412,7 @@ def test_poland_asks_the_associations_register_when_the_business_one_has_no_entr
     record = register_lookup.lookup(adapters.POLAND, "PL 0000019193")
 
     assert [request.url.params["rejestr"] for request in seen] == ["P", "S"]
-    assert record.name == "POLSKIE KOLEJE PAŃSTWOWE SPÓŁKA AKCYJNA"
+    assert record.name == "Polskie Koleje Państwowe Spółka Akcyjna"
     assert (record.activity, record.division) == ("70.10.Z", "70")
 
 
@@ -452,7 +474,7 @@ def test_a_registers_text_is_cleaned(registers):
     answers, _seen = registers
     answer(answers, RECORDED["no"][1], dict(NORWAY, navn="EQUINOR‮ ASA\u0007"))
 
-    assert register_lookup.lookup(adapters.NORWAY, "NO 923609016").name == "EQUINOR ASA"
+    assert register_lookup.lookup(adapters.NORWAY, "NO 923609016").name == "Equinor ASA"
 
 
 def test_an_adapter_cannot_send_the_request_outside_its_hosts(registers):
@@ -616,7 +638,7 @@ def test_looking_up_shows_what_came_back_and_keeps_nothing(client, user, switche
     assert client.post(url, {"scheme": "register"}).status_code == 302
     html = client.get(url).content.decode()
 
-    assert "ELECTRICITE DE FRANCE" in html
+    assert "Electricite de France" in html
     assert "Licence Ouverte 2.0" in html, "attributed as the licence asks"
     assert 'name="take" value="name"' in html and "checked" not in html
     company.refresh_from_db()
@@ -639,9 +661,9 @@ def test_the_review_keeps_only_what_is_ticked(client, user, switched_on, registe
     assert company.legal_state == LegalState.DISSOLVED, "the state was not ticked"
     (address,) = company.postal_addresses.all()
     assert (address.street, address.postcode, address.municipality) == (
-        "22 AVENUE DE WAGRAM",
+        "22 Avenue de Wagram",
         "75008",
-        "PARIS",
+        "Paris",
     )
     assert [industry.code for industry in company.industries.all()] == ["35"]
     assert company.identifiers.count() == 1
@@ -662,7 +684,7 @@ def test_keeping_the_name_and_state_writes_the_register_as_the_source(
     client.post(url, {"keep": "1", "take": ["name", "state"]})
 
     company.refresh_from_db()
-    assert company.name == "ELECTRICITE DE FRANCE"
+    assert company.name == "Electricite de France"
     assert company.legal_state == LegalState.DISSOLVED
     assert company.legal_state_since.isoformat() == "2024-03-31"
     assert company.legal_state_source.endswith("/entreprise/552081317")
