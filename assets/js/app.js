@@ -9440,4 +9440,69 @@
 
   onContentReady(readyPickers);
 
+  /* ------------------------------------------- the CV photo, shown before it is kept (#1246)
+   *
+   * Choosing a file on *Your details* shows it in the card, as a `data:` address because the
+   * page's policy allows images from itself and `data:` only, so a wrong photo is noticed
+   * before it replaces the kept one. Clearing the choice brings the kept photo back, or
+   * hides the picture where there was none. Ticking *Remove the CV photo* says so beside it
+   * (the dimming is the stylesheet's, which works without this).
+   */
+  function readyCvPhoto() {
+    var card = document.querySelector("[data-cv-photo]");
+    if (!card || card.hasAttribute("data-cv-photo-ready")) {
+      return;
+    }
+    card.setAttribute("data-cv-photo-ready", "");
+    var input = card.querySelector('input[type="file"]');
+    var figure = card.querySelector("[data-cv-photo-figure]");
+    var image = card.querySelector("[data-cv-photo-image]");
+    var chosen = card.querySelector("[data-cv-photo-chosen]");
+    var going = card.querySelector("[data-cv-photo-going]");
+    var facts = card.querySelector("[data-cv-photo-facts]");
+    var remove = card.querySelector('input[name="remove_cv_photo"]');
+    if (!input || !figure || !image) {
+      return;
+    }
+    function show() {
+      var file = input.files && input.files[0];
+      if (!file || file.type.indexOf("image/") !== 0 || typeof FileReader === "undefined") {
+        var kept = image.getAttribute("data-kept-src");
+        if (kept) {
+          image.setAttribute("src", kept);
+        } else {
+          image.removeAttribute("src");
+        }
+        figure.hidden = !kept;
+        chosen.hidden = true;
+        if (facts) {
+          facts.hidden = false;
+        }
+        return;
+      }
+      var reader = new FileReader();
+      reader.onload = function () {
+        image.setAttribute("src", String(reader.result));
+        image.removeAttribute("width");
+        image.removeAttribute("height");
+        figure.hidden = false;
+        chosen.hidden = false;
+        if (facts) {
+          facts.hidden = true;
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+    input.addEventListener("change", show);
+    if (remove && going) {
+      var sync = function () {
+        going.hidden = !remove.checked;
+      };
+      remove.addEventListener("change", sync);
+      sync();
+    }
+  }
+
+  onContentReady(readyCvPhoto);
+
 })();

@@ -40,6 +40,7 @@ urlpatterns = [
     ),
     path("theme/", views.ThemeView.as_view(), name="theme"),
     path("avatar/<int:pk>/", views.AvatarView.as_view(), name="avatar"),
+    path("cv-photo/", views.CvPhotoView.as_view(), name="cv_photo"),
     path("avatar/refresh/", views.GravatarRefreshView.as_view(), name="avatar_refresh"),
     path("delete/", views.DeleteAccountView.as_view(), name="delete"),
     # The groups one is in, and leaving one (#896).

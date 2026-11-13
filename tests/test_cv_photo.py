@@ -287,3 +287,54 @@ def test_the_candidate_file_leaves_the_photo_out(user):
     from postulo.core.export import build_candidate_document
 
     assert "cv_photo" not in json.dumps(build_candidate_document(user))
+
+
+# ------------------------------------------------------- shown on Your details (#1246)
+
+
+def test_your_details_shows_the_kept_photo_with_its_size_in_words(client, user):
+    """The card said only "A CV photo is kept"; it shows the photo, uncropped, and says how
+    big it is (#1246)."""
+    keep_photo(user, size=(300, 400))
+    client.force_login(user)
+
+    html = client.get(reverse("accounts:profile")).content.decode()
+
+    assert "data-cv-photo-image" in html
+    assert reverse("accounts:cv_photo") + "?v=" in html
+    assert 'width="300" height="400"' in html
+    assert "300 by 400 pixels" in html
+    assert 'alt="Your CV photo"' in html
+
+
+def test_your_details_says_so_when_there_is_no_photo(client, user):
+    client.force_login(user)
+
+    html = client.get(reverse("accounts:profile")).content.decode()
+
+    assert "No CV photo is kept." in html
+    assert reverse("accounts:cv_photo") not in html
+
+
+def test_the_photo_is_served_to_its_owner_only_and_kept_by_the_browser(client, user, other_user):
+    keep_photo(user, size=(300, 400))
+    client.force_login(user)
+    version = Profile.objects.get(user=user).picture_version
+
+    response = client.get(reverse("accounts:cv_photo"), {"v": version})
+
+    assert response.status_code == 200
+    assert response["Content-Type"] == "image/png"
+    assert response["Cache-Control"] == "private, max-age=31536000, immutable"
+    assert response["X-Content-Type-Options"] == "nosniff"
+    assert response["Content-Disposition"].startswith("inline")
+    with Image.open(io.BytesIO(response.content)) as image:
+        assert image.size == (300, 400)
+
+    client.force_login(other_user)
+    assert client.get(reverse("accounts:cv_photo")).status_code == 404
+
+
+def test_the_photo_route_wants_a_sign_in(client, user):
+    keep_photo(user)
+    assert client.get(reverse("accounts:cv_photo")).status_code == 302

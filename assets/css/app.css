@@ -3290,3 +3290,9 @@ html {
     display: none;
   }
 }
+
+/* The CV photo on *Your details* (#1246): while *Remove the CV photo* is ticked the photo is
+   dimmed, which is how the card says it will go on save. Pure CSS, so it holds without script. */
+[data-cv-photo]:has(input[name="remove_cv_photo"]:checked) [data-cv-photo-image] {
+  opacity: 0.35;
+}

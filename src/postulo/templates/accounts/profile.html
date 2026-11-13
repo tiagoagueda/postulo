@@ -122,6 +122,22 @@
         <p class="mb-3 text-sm" data-cv-photo-state>
           {% if profile.has_cv_photo %}{% translate "A CV photo is kept." %}{% else %}{% translate "No CV photo is kept." %}{% endif %}
         </p>
+        {% comment %} The photo as a CV prints it, uncropped, from an address of its own and not
+           inside the page (#1246). The picture is drawn here whether or not one is kept: a file
+           chosen below is shown in it before the form is saved (`app.js`, as a `data:` address,
+           which the page's policy allows), and without script the kept photo is what shows. {% endcomment %}
+        <figure class="mb-3 flex flex-wrap items-start gap-4" data-cv-photo-figure{% if not cv_photo %} hidden{% endif %}>
+          <img {% if cv_photo %}src="{% url 'accounts:cv_photo' %}?v={{ profile.picture_version }}" width="{{ cv_photo.width }}" height="{{ cv_photo.height }}" data-kept-src="{% url 'accounts:cv_photo' %}?v={{ profile.picture_version }}"{% endif %}
+               alt="{% translate 'Your CV photo' %}"
+               class="h-auto max-h-64 w-auto max-w-full rounded-md border border-ink-200 object-contain dark:border-ink-800" data-cv-photo-image>
+          <figcaption class="text-sm text-ink-500 dark:text-ink-400">
+            {% if cv_photo %}
+              <span data-cv-photo-facts>{% blocktranslate trimmed with width=cv_photo.width height=cv_photo.height size=cv_photo.bytes|filesizeformat %}{{ width }} by {{ height }} pixels, {{ size }}{% endblocktranslate %}</span>
+            {% endif %}
+            <span class="block" data-cv-photo-chosen hidden>{% translate "This is the file you chose. It is kept when you save." %}</span>
+            <span class="block" data-cv-photo-going hidden>{% translate "This photo will be removed when you save." %}</span>
+          </figcaption>
+        </figure>
         <c-field :field="form.cv_photo" />
         {% if form.remove_cv_photo %}
           <label class="flex items-center gap-2 text-sm">

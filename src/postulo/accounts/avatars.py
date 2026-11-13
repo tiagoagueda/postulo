@@ -32,6 +32,7 @@ from __future__ import annotations
 
 import base64
 import hashlib
+import io
 import logging
 from decimal import ROUND_DOWN, Decimal
 
@@ -42,6 +43,7 @@ from django.utils import timezone
 from django.utils.formats import number_format
 from django.utils.text import get_text_list
 from django.utils.translation import gettext as _
+from PIL import Image
 
 from postulo.core import pictures
 from postulo.core.throttle import Rate
@@ -306,3 +308,23 @@ def cv_photo_data_uri(profile) -> str:
     if row is None:
         return ""
     return f"data:{row.media_type};base64,{base64.b64encode(bytes(row.data)).decode('ascii')}"
+
+
+def cv_photo_facts(profile) -> dict | None:
+    """What the profile page says about the CV photo kept: its size in pixels and in bytes.
+
+    None where there is none. Read from the stored bytes, headers only for the pixels, so the
+    page needs no column for them (#1246).
+    """
+    if profile is None or not profile.has_cv_photo:
+        return None
+    row = ProfilePicture.objects.filter(profile=profile, kind=ProfilePicture.CV).first()
+    if row is None:
+        return None
+    data = bytes(row.data)
+    try:
+        with Image.open(io.BytesIO(data)) as image:
+            width, height = image.size
+    except (OSError, ValueError):
+        width = height = 0
+    return {"width": width, "height": height, "bytes": len(data)}

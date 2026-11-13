@@ -96,6 +96,7 @@ class ProfileView(
         context["refused"] = self._refused(context)
         context["tips"] = not context["refused"]
         context["unsaved_fields"] = self._unsaved_fields(context)
+        context["cv_photo"] = avatars.cv_photo_facts(context.get("profile"))
         return context
 
     @staticmethod
@@ -389,6 +390,30 @@ class AvatarView(LoginRequiredMixin, View):
         if picture is None:
             raise Http404
         response = serve_stored_picture(picture, download_name="picture.png")
+        response["Cache-Control"] = picture_cache_control(request, profile.picture_version)
+        return response
+
+
+@method_decorator(transaction.non_atomic_requests, name="dispatch")
+class CvPhotoView(LoginRequiredMixin, View):
+    """Show a person their own CV photo on *Your details*, as it prints: uncropped (#1246).
+
+    Only the owner's, and no pk to ask for another's: anybody else, and anyone with none
+    kept, is answered 404. The photo never goes in the page itself, which would add its
+    bytes to every load. Like the avatar it is kept by the browser for a year at an address
+    that carries the profile's stamp, and is `private`, `nosniff` and inline.
+    """
+
+    def get(self, request: HttpRequest) -> HttpResponse:
+        profile = Profile.objects.filter(user=request.user, has_cv_photo=True).first()
+        picture = (
+            ProfilePicture.objects.filter(profile=profile, kind=ProfilePicture.CV).first()
+            if profile
+            else None
+        )
+        if picture is None:
+            raise Http404
+        response = serve_stored_picture(picture, download_name="cv-photo.png")
         response["Cache-Control"] = picture_cache_control(request, profile.picture_version)
         return response
 
