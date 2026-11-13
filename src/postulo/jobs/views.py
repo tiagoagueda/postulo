@@ -397,7 +397,13 @@ def _company_names(company) -> list:
     """A company's names in other languages, each with its language in the reader's words (#673)."""
     from postulo.core import languages
 
-    return [(languages.native_name(row.language, row.language), row) for row in company.names.all()]
+    from .models import CompanyName
+
+    return [
+        (languages.native_name(row.language, row.language), row)
+        for row in company.names.all()
+        if row.kind == CompanyName.Kind.NAME
+    ]
 
 
 class CompanyWikidataView(LoginRequiredMixin, View):
@@ -514,12 +520,13 @@ class CompanyWikidataView(LoginRequiredMixin, View):
         now = timezone.now()
         names = {tag: name for tag, name in (held.get("names") or {}).items() if tag and name}
         with transaction.atomic():
-            company.names.filter(source=CompanyName.Source.WIKIDATA).exclude(
-                language__in=list(names)
-            ).delete()
+            company.names.filter(
+                source=CompanyName.Source.WIKIDATA, kind=CompanyName.Kind.NAME
+            ).exclude(language__in=list(names)).delete()
             for tag, name in names.items():
                 CompanyName.objects.update_or_create(
                     company=company,
+                    kind=CompanyName.Kind.NAME,
                     language=tag,
                     defaults={
                         "name": name[:200],
@@ -637,13 +644,18 @@ class CompanyNamesView(LoginRequiredMixin, View):
         back = safe_next(request, reverse("jobs:company_detail", args=[company.pk]))
         if request.POST.get("remove"):
             company.names.filter(pk=as_pk(request.POST.get("remove"))).delete()
+            company.keep_list_name()
             return redirect(back)
+        if "acronym" in request.POST:
+            return self._acronym(request, company, back)
+        if "shown" in request.POST:
+            return self._shown(request, company, back)
         tag = languages.tag(request.POST.get("language", ""))
         name = " ".join((request.POST.get("name") or "").split())[:200]
         if not name or not languages.well_formed(tag) or tag not in languages.NATIVE_NAMES:
             messages.error(request, _("Choose a language and type the name."))
             return redirect(back)
-        held = company.names.filter(language=tag).first()
+        held = company.names.filter(kind=CompanyName.Kind.NAME, language=tag).first()
         if held is not None and held.source == CompanyName.Source.WIKIDATA:
             messages.error(
                 request,
@@ -655,9 +667,40 @@ class CompanyNamesView(LoginRequiredMixin, View):
             return redirect(back)
         CompanyName.objects.update_or_create(
             company=company,
+            kind=CompanyName.Kind.NAME,
             language=tag,
             defaults={"name": name, "source": CompanyName.Source.TYPED, "fetched_at": None},
         )
+        return redirect(back)
+
+    def _acronym(self, request, company, back):
+        """Add an acronym or short name (#1245): typed, no language, one of each spelling."""
+        from .models import CompanyName
+
+        name = " ".join((request.POST.get("acronym") or "").split())[:200]
+        if not name:
+            messages.error(request, _("Type the acronym or short name."))
+            return redirect(back)
+        if name.casefold() == company.name.casefold() or any(
+            row.name.casefold() == name.casefold() for row in company.acronyms()
+        ):
+            messages.error(request, _("The company already has that name."))
+            return redirect(back)
+        company.names.create(
+            kind=CompanyName.Kind.ACRONYM,
+            name=name,
+            source=CompanyName.Source.TYPED,
+        )
+        return redirect(back)
+
+    def _shown(self, request, company, back):
+        """Choose which name the lists show (#1245): the full name, or one of its acronyms."""
+        wanted = (request.POST.get("shown") or "").strip()
+        if wanted and wanted not in {row.name for row in company.acronyms()}:
+            messages.error(request, _("Choose one of the company's names."))
+            return redirect(back)
+        company.list_name = wanted
+        company.save(update_fields=["list_name", "updated_at"])
         return redirect(back)
 
 
@@ -1131,6 +1174,15 @@ class CompanyDetailView(SharedObjectMixin, DetailView):
         context["several_numbers"] = phone_numbers.several_allowed(person)
         # Its names in other languages, read in a popover beside its name (#917).
         context["company_names"] = _company_names(self.object)
+        context["company_acronyms"] = self.object.acronyms()
+        # What the lists do not show (#1245): the full name beside a chosen acronym, then the
+        # acronyms that are not the chosen one.
+        shown = self.object.display_name
+        context["other_names"] = [
+            name
+            for name in [self.object.name, *(row.name for row in context["company_acronyms"])]
+            if name != shown
+        ]
         # The company's own numbers and addresses (#329), on the same terms as a contact's.
         context["company_numbers"] = phone_numbers.numbers_for(self.object, person)
         context["company_addresses"] = list(self.object.postal_addresses.all())
@@ -1457,6 +1509,7 @@ class CompanyUpdateView(
         context["signal_kinds"] = HiringSignalKind.choices
         # The names in other languages, edited here and read from the company's page (#917).
         context["company_names"] = _company_names(self.object)
+        context["company_acronyms"] = self.object.acronyms() if self.object else []
         context["wikidata_offered"] = wikidata_offered(self.request.user)
         context["name_languages"] = sorted(
             languages.NATIVE_NAMES.items(), key=lambda pair: pair[1].casefold()

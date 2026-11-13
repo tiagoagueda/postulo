@@ -274,7 +274,7 @@ def search_listings(user, query: str, limit: int) -> Found:
             kind="listings",
             id=posting.pk,
             title=posting.title,
-            subtitle=posting.company.name,
+            subtitle=posting.company.display_name,
             url=posting.get_absolute_url(),
             excerpt=excerpt(_first_match(query, posting.description_text, posting.location), query),
             in_title=query.lower() in posting.title.lower(),
@@ -322,7 +322,9 @@ def search_applications(user, query: str, limit: int) -> Found:
             kind="applications",
             id=application.pk,
             title=title,
-            subtitle=f"{application.posting.company.name} · {application.get_status_display()}",
+            subtitle=(
+                f"{application.posting.company.display_name} · {application.get_status_display()}"
+            ),
             url=application.get_absolute_url(),
             excerpt=excerpt(passage, query) if passage else "",
             in_title=query.lower() in title.lower()
@@ -349,13 +351,14 @@ def search_companies(user, query: str, limit: int) -> Found:
         return Hit(
             kind="companies",
             id=company.pk,
-            title=company.name,
+            title=company.display_name,
             subtitle=" · ".join(
                 part for part in (company.location, company.industry_names) if part
             ),
             url=company.get_absolute_url(),
             excerpt=excerpt(_first_match(query, company.notes), query) if company.notes else "",
-            in_title=query.lower() in company.name.lower(),
+            in_title=query.lower() in company.name.lower()
+            or query.lower() in company.display_name.lower(),
         )
 
     return take(rows, limit, build)

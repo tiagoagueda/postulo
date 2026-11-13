@@ -949,14 +949,35 @@ def _restore_company_names(company, owner, rows) -> None:
     from postulo.jobs.models import CompanyName
 
     if not isinstance(rows, list):
+        company.keep_list_name()
         return
-    held = set(company.names.values_list("language", flat=True))
+    held = set(company.names.filter(kind="name").values_list("language", flat=True))
+    acronyms = {
+        row.casefold()
+        for row in company.names.filter(kind="acronym").values_list("name", flat=True)
+    }
     for row in rows:
         if not isinstance(row, dict):
             continue
         tag = languages.tag(row.get("language", ""))
         name = wikidata.clean(row.get("name"))
         source = row.get("source")
+        # An acronym (#1245; format 85) has no language, and an older archive has none.
+        if row.get("kind") == CompanyName.Kind.ACRONYM:
+            if (
+                name
+                and name.casefold() not in acronyms
+                and name.casefold() != company.name.casefold()
+            ):
+                CompanyName.objects.create(
+                    owner=owner,
+                    company=company,
+                    kind=CompanyName.Kind.ACRONYM,
+                    name=name,
+                    source=CompanyName.Source.TYPED,
+                )
+                acronyms.add(name.casefold())
+            continue
         if not name or tag in held or source not in CompanyName.Source.values:
             continue
         if not languages.well_formed(tag) or not languages.match(tag, list(languages.NATIVE_NAMES)):
@@ -972,6 +993,7 @@ def _restore_company_names(company, owner, rows) -> None:
             else None,
         )
         held.add(tag)
+    company.keep_list_name()
 
 
 def _closes_a_loop(acquirer, child_pk: int) -> bool:
@@ -1776,6 +1798,10 @@ def _load(user, archive: zipfile.ZipFile, *, force: bool = False, into=None) -> 
         company_entry["from_career"] = company_entry.get("from_career") is True
         # The legal state: one this Postulo knows, or active; a day or none; an address
         # `drop_unsafe_addresses` has already emptied if it was not a web one (#941).
+        # The acronym the lists show (#1245): text, kept only if the restore below makes it.
+        from postulo.jobs import wikidata
+
+        company_entry["list_name"] = wikidata.clean(company_entry.get("list_name")) or ""
         if company_entry.get("legal_state") not in LegalState.values:
             company_entry["legal_state"] = LegalState.ACTIVE
         since = company_entry.get("legal_state_since")

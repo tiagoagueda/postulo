@@ -7,7 +7,7 @@
     <td class="px-4 py-3">
       <label class="tap-target justify-center">
         <input type="checkbox" class="input" name="chosen" value="{{ company.pk }}" form="{{ bulk_form_id }}"
-               data-bulk-row aria-label="{% blocktranslate trimmed with what=company.name %}Select {{ what }}{% endblocktranslate %}">
+               data-bulk-row aria-label="{% blocktranslate trimmed with what=company.display_name %}Select {{ what }}{% endblocktranslate %}">
       </label>
     </td>
   {% endif %}
@@ -21,7 +21,7 @@
              the form, which is exactly what the name was before (#135, #252). {% endcomment %}
           {% url 'jobs:company_cell' company.pk 'name' as cell_url %}
           {% url 'jobs:company_update' company.pk as form_url %}
-          {% include "partials/table/cell.html" with object=company value=company.name editing=False message="" cell_url=cell_url form_url=form_url record_url=company.get_absolute_url %}
+          {% include "partials/table/cell.html" with object=company value=company.display_name editing=False message="" cell_url=cell_url form_url=form_url record_url=company.get_absolute_url %}
           {% if company.is_employment_service %}
             <span class="badge" data-tone="grey"><span>{{ company.get_kind_display }}</span></span>
           {% endif %}

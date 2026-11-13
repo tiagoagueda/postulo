@@ -711,6 +711,10 @@ class Company(OwnNote, PrincipalOwnedModel):
     )
     logo_source_url = models.CharField(_("logo address"), max_length=500, blank=True)
     logo_fetched_at = models.DateTimeField(_("logo fetched"), null=True, blank=True)
+    #: Which of its acronyms the lists show instead of `name` (#1245); blank is the full name.
+    #: The text rather than a link to the row, so reading it costs nothing; `display_name`
+    #: is how it is read, and `keep_list_name` how it is kept true.
+    list_name = models.CharField(_("name shown in lists"), max_length=200, blank=True)
 
     #: Who changed what on it (#896); goes with it.
     changes = GenericRelation("jobs.RecordChange")
@@ -822,11 +826,34 @@ class Company(OwnNote, PrincipalOwnedModel):
         probe.is_primary = primary is None
         probe.save()
 
+    @property
+    def display_name(self) -> str:
+        """The name the lists, the board and the command bar show (#1245).
+
+        The one place that decides it: `name` -- the full name, which identifies the company --
+        unless the person chose one of its acronyms. A column of its own holds the choice, so
+        a list of a hundred companies asks the database for nothing more.
+        """
+        return self.list_name or self.name
+
+    def acronyms(self) -> list[CompanyName]:
+        """Its acronyms and short names, in the order they were added (#1245)."""
+        return [row for row in self.names.all() if row.kind == CompanyName.Kind.ACRONYM]
+
+    def keep_list_name(self) -> None:
+        """Drop the choice of an acronym that is gone or was renamed (#1245): the lists then
+        show the full name again, rather than a name nobody holds."""
+        if self.list_name and self.list_name not in {row.name for row in self.acronyms()}:
+            self.list_name = ""
+            self.save(update_fields=["list_name", "updated_at"])
+
     def name_in(self, language: str) -> str:
         """Its name in ``language``: that one, then its base language's, then `name` (#673)."""
         from postulo.core import languages
 
-        stored = {row.language: row.name for row in self.names.all()}
+        stored = {
+            row.language: row.name for row in self.names.all() if row.kind == CompanyName.Kind.NAME
+        }
         if stored and language:
             best = languages.match(language, list(stored))
             if best:
@@ -1052,8 +1079,11 @@ class CompanyName(OwnedAsItsCompany, PrincipalOwnedModel):
 
     ``Company.name`` stays the one name that identifies the company -- uniqueness, the
     duplicate notice, a merge's matching and a CSV's all read it -- and these sit beside it,
-    for the documents written in a language the company has a name in. A name from Wikidata
-    is replaced only by fetching again, or removed; a typed one is allowed only for a
+    for the documents written in a language the company has a name in. A row of kind
+    ``acronym`` (#1245) has no language: it is a short form of the name (CNRS, EDF), found by
+    the search and offered by the duplicate notice, and the person may choose it for the
+    lists. A name from Wikidata is replaced only by fetching again, or removed; a typed one
+    is allowed only for a
     language Wikidata gave none for, so where a name came from always means something.
     """
 
@@ -1061,10 +1091,16 @@ class CompanyName(OwnedAsItsCompany, PrincipalOwnedModel):
         WIKIDATA = "wikidata", _("Wikidata")
         TYPED = "typed", _("Typed")
 
+    class Kind(models.TextChoices):
+        NAME = "name", _("Name in a language")
+        ACRONYM = "acronym", _("Acronym or short name")
+
     company = models.ForeignKey(
         "Company", on_delete=models.CASCADE, related_name="names", verbose_name=_("company")
     )
-    language = LanguageField(_("language"))
+    #: A name in a language, or an acronym (#1245): one has a language, the other has none.
+    kind = models.CharField(_("kind"), max_length=8, choices=Kind.choices, default=Kind.NAME)
+    language = LanguageField(_("language"), blank=True)
     name = models.CharField(_("name"), max_length=200)
     source = models.CharField(_("source"), max_length=10, choices=Source.choices)
     fetched_at = models.DateTimeField(_("fetched"), null=True, blank=True)
@@ -1078,7 +1114,14 @@ class CompanyName(OwnedAsItsCompany, PrincipalOwnedModel):
         constraints = [
             PrincipalOwnedModel.one_owner("company_name_one_owner"),
             models.UniqueConstraint(
-                fields=("company", "language"), name="one_company_name_per_language"
+                fields=("company", "language"),
+                condition=models.Q(kind="name"),
+                name="one_company_name_per_language",
+            ),
+            models.UniqueConstraint(
+                fields=("company", "name"),
+                condition=models.Q(kind="acronym"),
+                name="one_company_acronym_each",
             ),
         ]
 

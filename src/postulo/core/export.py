@@ -281,7 +281,11 @@ logger = logging.getLogger(__name__)
 #: each application ``answers``, copies as they were given, each with the local id of the saved
 #: answer it began as (``saved_answer_id``) or none. An archive without them restores none; one
 #: with a question missing or too long is restored without that answer, and says so.
-FORMAT_VERSION = 86
+#: 87 added the acronyms and short names of a company (#1245): each of its ``names`` has a
+#: ``kind``, ``name`` (in a ``language``, as before) or ``acronym`` (no language), and the
+#: company a ``list_name``, the acronym the lists show, blank for its full name. An archive
+#: without them restores every name as one in a language and the lists showing the name.
+FORMAT_VERSION = 87
 
 
 def industry_entry(industry) -> str | dict:
@@ -507,6 +511,8 @@ COMPANY_FIELDS = (
     "careers_url",
     "email",
     "notes",
+    # Which acronym the lists show, blank for its name (#1245).
+    "list_name",
     # What it is (#941): the legal state, the day it became true and where it was learnt.
     # The company it was acquired by is written by name below.
     "legal_state",
@@ -1496,6 +1502,7 @@ def build_document(user) -> dict:
                 # Its names in other languages (#673).
                 "names": [
                     {
+                        "kind": row.kind,
                         "language": row.language,
                         "name": row.name,
                         "source": row.source,

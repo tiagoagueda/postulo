@@ -7,6 +7,7 @@
 # jobs/status.py stamps a company the caller has already scoped, as its signals change (#941).
 # jobs/merging.py moves everybody's rows once _same_owner has checked that everybody who saw
 # the other record sees the kept one (#896).
+# jobs/duplicates.py reads the acronyms of the companies of `pool`, which the caller scoped (#1245).
 # jobs/geocoding.py walks every account's addresses in the scheduler, as its one caller (#913).
 # The reminders router reads through owned_or_404, which scopes to the token's owner (#331).
 # The offers router finds the application an offer is recorded on through owned(), which
@@ -117,6 +118,7 @@ documents/signals.py::forget_the_entry_a_file_proved::UploadedDocument
 documents/signals.py::forget_the_source_of_a_render::RenderedDocument
 jobs/detach.py::_copy_parts::Company
 jobs/duplicates.py::for_company::CompanyIdentifier
+jobs/duplicates.py::for_company::CompanyName
 jobs/forms.py::_save_department::Department
 jobs/geocoding.py::due::PostalAddress
 jobs/geojson.py::export::PostalAddress

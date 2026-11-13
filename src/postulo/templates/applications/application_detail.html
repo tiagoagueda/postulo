@@ -19,7 +19,7 @@
       {% endcomment %}
       <p class="text-sm text-ink-500 dark:text-ink-400">
         <a href="{{ application.posting.company.get_absolute_url }}" class="hover:underline">
-          <bdi>{{ application.posting.company.name }}</bdi>
+          <bdi>{{ application.posting.company.display_name }}</bdi>
         </a>
         {% if group and group.pk != application.posting.company_id %}
           <a href="{{ group.get_absolute_url }}" class="hover:underline">
@@ -112,7 +112,7 @@
                 <bdi>{{ application.department.name }}</bdi>
                 {% if application.department.company_id != application.posting.company_id %}
                   <span class="text-xs text-ink-500 dark:text-ink-400">
-                    <bdi>{{ application.department.company.name }}</bdi>
+                    <bdi>{{ application.department.company.display_name }}</bdi>
                   </span>
                 {% endif %}
               </dd>
@@ -134,7 +134,7 @@
                 {% if application.referred_by_id in openable_contacts %}<a href="{{ application.referred_by.get_absolute_url }}" class="hover:underline"><bdi>{{ application.referred_by.name }}</bdi></a>{% else %}<bdi>{{ application.referred_by.name }}</bdi>{% endif %}
                 {% if application.referred_by.company %}
                   <span class="text-xs text-ink-500 dark:text-ink-400">
-                    <bdi>{{ application.referred_by.company.name }}</bdi>
+                    <bdi>{{ application.referred_by.company.display_name }}</bdi>
                   </span>
                 {% endif %}
               </dd>

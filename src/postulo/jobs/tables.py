@@ -483,7 +483,7 @@ class ListingsTable(Table):
             case "title":
                 return row.title
             case "company":
-                return row.company.name if row.company_id else ""
+                return row.company.display_name if row.company_id else ""
             case "location":
                 return row.location
             case "closes":

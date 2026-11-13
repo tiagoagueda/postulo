@@ -1,11 +1,11 @@
 {% extends "base.html" %}
 {% load i18n postulo %}
 
-{% block title %}{{ company.name }}{% endblock %}
+{% block title %}{{ company.display_name }}{% endblock %}
 {% block breadcrumb %}
   <c-breadcrumb>
     <c-crumb href="{% url 'jobs:company_list' %}">{% translate "Companies" %}</c-crumb>
-    <c-crumb current>{{ company.name }}</c-crumb>
+    <c-crumb current>{{ company.display_name }}</c-crumb>
   </c-breadcrumb>
 {% endblock %}
 
@@ -16,7 +16,7 @@
     {% company_logo company "size-14 text-lg" %}
     <div>
       <div class="flex items-center gap-2">
-        <c-page-title>{{ company.name }}</c-page-title>
+        <c-page-title>{{ company.display_name }}</c-page-title>
         {% comment %} Its names in other languages (#673), read from here and changed under Edit
            (#917): a button after the name that opens a popover, drawn only when there are some.
            A `popovertarget` button, so it opens with no script; the browser closes it on Escape
@@ -37,6 +37,13 @@
           </div>
         {% endif %}
       </div>
+      {% comment %} The names the lists do not show (#1245): the full name beside a chosen
+         acronym, and every acronym, so the page says what the company is called. {% endcomment %}
+      {% if other_names %}
+        <p class="text-sm text-ink-500 dark:text-ink-400" data-company-other-names>
+          {% for other in other_names %}{% if not forloop.first %} · {% endif %}<bdi>{{ other }}</bdi>{% endfor %}
+        </p>
+      {% endif %}
       {% include "jobs/partials/company_status.html" %}
       {% comment %} Its pairings on the person's sync connections, and its departments' (#327). {% endcomment %}
       <c-pairing-line :record="company" class="mt-2" />
