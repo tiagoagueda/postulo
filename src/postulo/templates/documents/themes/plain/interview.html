@@ -1,0 +1,32 @@
+{% extends "documents/themes/base_interview.html" %}
+{% comment %} An interview in the plain theme (#1091): the type and rules of the plain list and
+   calendar (#341, #342). {% endcomment %}
+
+{% block page_styles %}
+    @page {
+      margin: 14mm;
+      @bottom-center {
+        content: counter(page) " / " counter(pages);
+        font: 7.5pt "DejaVu Sans", sans-serif;
+        color: #666;
+      }
+    }
+    body {
+      font: 9.5pt/1.45 "DejaVu Sans", sans-serif;
+      color: #111;
+      margin: 0;
+      /* An address or a long name breaks rather than running off the page (#235). */
+      overflow-wrap: anywhere;
+    }
+    h1 { font-size: 15pt; margin: 0 0 2mm; }
+    h2 { font-size: 10.5pt; margin: 0 0 1.5mm; padding-bottom: 1mm; border-bottom: 0.5pt solid #ccc; }
+    .meta { color: #444; font-size: 8pt; margin: 0 0 5mm; }
+    section { margin-bottom: 5mm; }
+    section p { margin: 0 0 1mm; }
+    .big { font-size: 11pt; font-weight: bold; }
+    .item { margin-bottom: 2mm; page-break-inside: avoid; }
+    .text { white-space: pre-line; color: #222; }
+    .start { text-align: start; }
+    .nothing { color: #777; }
+    .note { font-size: 7.5pt; color: #555; margin-top: 3mm; }
+{% endblock %}

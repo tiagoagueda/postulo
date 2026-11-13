@@ -52,7 +52,7 @@
                {% endcomment %}
             <div class="min-w-0 grow basis-48">
               <p class="text-sm">
-                <span class="font-medium">{{ interview.get_kind_display }}</span>
+                <a href="{% url 'applications:interview_detail' interview.pk %}" class="font-medium hover:underline" data-interview-page>{{ interview.get_kind_display }}</a>
                 ·
                 <a href="{{ interview.application.get_absolute_url }}" class="hover:underline">
                   {{ interview.application.posting.title }}

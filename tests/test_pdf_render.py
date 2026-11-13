@@ -205,6 +205,37 @@ def a_full_month(user, theme, chosen) -> str:
     return html
 
 
+def an_interview_with_long_lines(user, theme, chosen) -> str:
+    """An interview whose notes, place and listing carry a line with nowhere to wrap (#1091)."""
+    import datetime as dt
+
+    from django.test import RequestFactory
+    from django.utils import timezone
+
+    from postulo.applications import interview_brief
+    from postulo.applications.models import Application
+    from postulo.applications.services import schedule_interview
+    from postulo.jobs.models import Company, JobPosting
+
+    company = Company.objects.create(owner=user, name=f"Aperture {LONG_ADDRESS}")
+    posting = JobPosting.objects.create(
+        owner=user, company=company, title="Tester", description=f"See {LONG_ADDRESS}"
+    )
+    application = Application.objects.create(owner=user, posting=posting)
+    interview = schedule_interview(
+        application,
+        kind="video",
+        starts_at=timezone.now() + dt.timedelta(days=2),
+        location=LONG_ADDRESS,
+        notes=f"Read {LONG_ADDRESS}",
+        remind=False,
+    )
+    request = RequestFactory().get("/")
+    request.user = user
+    html, _theme, _language = interview_brief.draw(request, interview, theme=theme, paper=chosen)
+    return html
+
+
 @pytest.mark.parametrize("theme,kind,chosen", ON_PAPER)
 def test_every_kind_draws_on_every_paper_at_its_size(user, experience, theme, kind, chosen):
     """The page is the paper chosen, turned the way chosen, and nothing runs off it (#344)."""
@@ -225,6 +256,8 @@ def test_every_kind_draws_on_every_paper_at_its_size(user, experience, theme, ki
         html = a_wide_list(user, theme, chosen)
     elif kind == themes.Kind.CALENDAR:
         html = a_full_month(user, theme, chosen)
+    elif kind == themes.Kind.INTERVIEW:
+        html = an_interview_with_long_lines(user, theme, chosen)
     else:
         cv = selection(user, experience, kind=kind, theme=theme)
         html = rendering.render_cv_html(cv, paper=chosen)

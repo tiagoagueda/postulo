@@ -806,6 +806,8 @@ def signed_in_paths(a, c, me, entry=None, recovery_link: str = "", things=None) 
         f"/documents/messages/{message.pk}/edit/",
         f"/documents/messages/{message.pk}/delete/",
         f"/documents/applications/{a.pk}/message/?purpose=follow_up",
+        # Everything to prepare from, gathered, and the choices for printing it (#1091).
+        f"/applications/interviews/{interview.pk}/",
         f"/applications/interviews/{interview.pk}/edit/",
         f"/applications/tags/{tag.pk}/edit/",
         f"/applications/tags/{tag.pk}/delete/",

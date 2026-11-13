@@ -591,6 +591,8 @@ FACTORIES: dict[str, Callable] = {
     "applications:status": pk_of(application),
     "applications:update": pk_of(application),
     "applications:interview_ics": pk_of(interview),
+    "applications:interview_detail": pk_of(interview),
+    "applications:interview_pdf": pk_of(interview),
     "applications:interview_outcome": pk_of(interview),
     "applications:interview_update": pk_of(interview),
     "applications:offer_create": pk_of(application),

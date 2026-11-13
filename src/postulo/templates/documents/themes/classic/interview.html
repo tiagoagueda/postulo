@@ -1,0 +1,37 @@
+{% extends "documents/themes/base_interview.html" %}
+{% comment %} An interview in the classic theme (#1091): the serif and the small capitals of the
+   classic report, list and calendar (#340-#342). {% endcomment %}
+
+{% block page_styles %}
+    @page {
+      margin: 16mm;
+      @bottom-center {
+        content: counter(page) " / " counter(pages);
+        font: 7.5pt "Palatino Linotype", Palatino, Georgia, "Times New Roman", "Noto Serif", "DejaVu Serif", serif;
+        color: #4a4f5a;
+      }
+    }
+    body {
+      font: 10pt/1.5 "Palatino Linotype", Palatino, Georgia, "Times New Roman", "Noto Serif", "Noto Serif Ethiopic", "Noto Naskh Arabic", "DejaVu Serif", serif;
+      color: #16181d;
+      margin: 0;
+      /* An address or a long name breaks rather than running off the page (#235). */
+      overflow-wrap: anywhere;
+    }
+    /* Urdu is set in Nastaliq and Arabic stays in Naskh, as in the classic letter (#1054). */
+    body:lang(ur) {
+      font-family: "Noto Nastaliq Urdu", "Palatino Linotype", Palatino, Georgia, "Times New Roman", "Noto Serif", "Noto Naskh Arabic", serif;
+      line-height: 2;
+    }
+    h1 { font-size: 16pt; font-weight: 600; font-variant: small-caps; letter-spacing: 0.02em; margin: 0 0 2mm; }
+    h2 { font-size: 10.5pt; font-weight: 600; font-variant: small-caps; margin: 0 0 1.5mm; padding-bottom: 1mm; border-bottom: 0.5pt solid #c7cad1; }
+    .meta { color: #4a4f5a; font-size: 8pt; margin: 0 0 5mm; padding-bottom: 2.5mm; border-bottom: 0.5pt solid #c7cad1; }
+    section { margin-bottom: 5mm; }
+    section p { margin: 0 0 1mm; }
+    .big { font-size: 11.5pt; font-weight: 600; }
+    .item { margin-bottom: 2mm; page-break-inside: avoid; }
+    .text { white-space: pre-line; }
+    .start { text-align: start; }
+    .nothing { color: #8a8f99; font-style: italic; }
+    .note { font-size: 7.5pt; color: #4a4f5a; margin-top: 3mm; }
+{% endblock %}
