@@ -82,8 +82,8 @@
               <ul class="divide-y divide-ink-100 dark:divide-ink-800">
                 {% for item in section.items %}
                   {% comment %} The entry claims twelve rem before its four buttons may sit beside
-                     it. In Greek, "Edit" and "Delete" are long enough that the entry was left
-                     fourteen pixels, with its title written over the arrows (#165). {% endcomment %}
+                     it. They are icons since #1247, so the long "Edit" and "Delete" of Greek
+                     that once left the entry fourteen pixels (#165) no longer take the room. {% endcomment %}
                   <li class="flex flex-wrap items-start gap-3 px-4 py-3">
                     <div class="min-w-0 grow basis-48">
                       <p class="font-medium">{{ item }}</p>
@@ -205,20 +205,25 @@
                          it was. {% endcomment %}
                       <form method="post" action="{% url 'resume:item_move' section.spec.slug item.pk 'up' %}">
                         {% csrf_token %}
-                        <button type="submit" class="btn" data-variant="ghost" data-size="xs"
-                                aria-label="{% translate 'Move up' %}"{% if forloop.first %} disabled{% endif %}>↑</button>
+                        <button type="submit" class="btn" data-variant="ghost" data-size="icon-xs"
+                                aria-label="{% translate 'Move up' %}"{% if forloop.first %} disabled{% endif %}>{% icon "chevron-up" class="size-4" %}</button>
                       </form>
                       <form method="post" action="{% url 'resume:item_move' section.spec.slug item.pk 'down' %}">
                         {% csrf_token %}
-                        <button type="submit" class="btn" data-variant="ghost" data-size="xs"
-                                aria-label="{% translate 'Move down' %}"{% if forloop.last %} disabled{% endif %}>↓</button>
+                        <button type="submit" class="btn" data-variant="ghost" data-size="icon-xs"
+                                aria-label="{% translate 'Move down' %}"{% if forloop.last %} disabled{% endif %}>{% icon "chevron-down" class="size-4" %}</button>
                       </form>
+                      {% comment %} Icons, as everywhere else (#1247). Each names its entry, so
+                         the page does not say "Edit" eleven times, and the tooltip carries the
+                         same words. Delete still opens the confirmation page. {% endcomment %}
                       <a href="{% url 'resume:item_update' section.spec.slug item.pk %}"
-                         class="btn" data-variant="ghost" data-size="xs">{% translate "Edit" %}</a>
+                         class="btn" data-variant="ghost" data-size="icon-xs"
+                         aria-labelledby="edit-{{ section.spec.slug }}-{{ item.pk }}-tip">{% icon "pencil" class="size-4" %}</a>
+                      <span id="edit-{{ section.spec.slug }}-{{ item.pk }}-tip" data-tooltip>{% blocktranslate trimmed with what=item %}Edit {{ what }}{% endblocktranslate %}</span>
                       <a href="{% url 'resume:item_delete' section.spec.slug item.pk %}"
-                         class="btn" data-variant="destructive-ghost" data-size="xs">
-                        {% translate "Delete" %}
-                      </a>
+                         class="btn" data-variant="destructive-ghost" data-size="icon-xs"
+                         aria-labelledby="delete-{{ section.spec.slug }}-{{ item.pk }}-tip">{% icon "trash-2" class="size-4" %}</a>
+                      <span id="delete-{{ section.spec.slug }}-{{ item.pk }}-tip" data-tooltip>{% blocktranslate trimmed with what=item %}Delete {{ what }}{% endblocktranslate %}</span>
                     </div>
                   </li>
 

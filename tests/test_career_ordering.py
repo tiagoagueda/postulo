@@ -314,3 +314,22 @@ def test_the_preference_is_set_under_accessibility_and_travels_with_the_export(c
         'name="show_career_order"'
         not in client.get(reverse("settings:appearance")).content.decode()
     )
+
+
+def test_each_row_has_icon_buttons_that_name_their_entry(client, user):
+    """Edit and Delete were the words "Edit" and "Delete" on every row; they are a pencil and a
+    bin that say which entry they act on, and still go to the same routes (#1247)."""
+    one = job(user, "Software engineer", dt.date(2020, 1, 1))
+    client.force_login(user)
+
+    html = client.get(reverse("resume:overview")).content.decode()
+    section = html.split('id="section-experience"')[1].split("</section>")[0]
+
+    update = reverse("resume:item_update", args=["experience", one.pk])
+    delete = reverse("resume:item_delete", args=["experience", one.pk])
+    assert f'href="{update}"' in section
+    assert f'href="{delete}"' in section
+    assert "Edit Software engineer — Aperture" in section
+    assert "Delete Software engineer — Aperture" in section
+    assert ">Edit<" not in section and ">Delete<" not in section
+    assert "↑" not in section and "↓" not in section

@@ -145,3 +145,27 @@ def test_a_search_hit_lands_on_its_section_below_the_masthead(live_server, page:
     header = page.locator("header").first.bounding_box()
     assert box and 0 <= box["y"] < 700, "the section was not brought onto the screen"
     assert box["y"] >= header["height"] - 1, "the section is hidden behind the masthead"
+
+
+def test_the_row_buttons_are_icons_with_a_target_and_the_page_does_not_scroll_sideways(
+    live_server,
+    page: Page,
+    furnished,  # noqa: F811
+):
+    """Edit and Delete are a pencil and a bin that name their entry; four 24 px buttons fit
+    beside it at 320 px without the page scrolling sideways (#1247)."""
+    page.set_viewport_size({"width": 320, "height": 700})
+    sign_in(page, live_server.url)
+    page.goto(f"{live_server.url}/career/")
+
+    edit = page.get_by_role("link", name="Edit", exact=False).first
+    expect(edit).to_be_visible()
+    assert edit.inner_text().strip() == ""
+    for button in (
+        edit,
+        page.get_by_role("link", name="Delete", exact=False).first,
+        page.get_by_role("button", name="Move down").first,
+    ):
+        box = button.bounding_box()
+        assert box and box["width"] >= 24 and box["height"] >= 24
+    assert page.evaluate("document.documentElement.scrollWidth <= window.innerWidth")
