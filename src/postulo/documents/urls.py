@@ -1,6 +1,6 @@
 from django.urls import path
 
-from . import views
+from . import views, views_messages
 
 app_name = "documents"
 
@@ -38,6 +38,31 @@ urlpatterns = [
         "letters/<int:pk>/as/<slug:format>/",
         views.CoverLetterDownloadView.as_view(),
         name="letter_download",
+    ),
+    # Messages sent from your own address, written from a template (#1094).
+    path("messages/", views_messages.MessageTemplateListView.as_view(), name="message_list"),
+    path(
+        "messages/new/", views_messages.MessageTemplateCreateView.as_view(), name="message_create"
+    ),
+    path(
+        "messages/starters/",
+        views_messages.MessageStartersView.as_view(),
+        name="message_starters",
+    ),
+    path(
+        "messages/<int:pk>/edit/",
+        views_messages.MessageTemplateUpdateView.as_view(),
+        name="message_update",
+    ),
+    path(
+        "messages/<int:pk>/delete/",
+        views_messages.MessageTemplateDeleteView.as_view(),
+        name="message_delete",
+    ),
+    path(
+        "applications/<int:pk>/message/",
+        views_messages.MessageWriteView.as_view(),
+        name="message_write",
     ),
     path("files/", views.UploadListView.as_view(), name="upload_list"),
     path("files/new/", views.UploadCreateView.as_view(), name="upload_create"),

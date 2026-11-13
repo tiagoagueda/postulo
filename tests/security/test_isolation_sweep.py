@@ -355,6 +355,12 @@ def letter(owner):
     return CoverLetter.objects.create(owner=owner, name="Their letter", body="Dear them")
 
 
+def message_template(owner):
+    from postulo.documents.models import MessageTemplate
+
+    return MessageTemplate.objects.create(owner=owner, name="Their message", body="Hello them")
+
+
 def upload(owner):
     from postulo.documents.models import UploadedDocument
 
@@ -640,6 +646,10 @@ FACTORIES: dict[str, Callable] = {
     "documents:letter_download": pk_of(letter, format="txt"),
     "documents:letter_preview": pk_of(letter),
     "documents:letter_update": pk_of(letter),
+    # messages written from a template (#1094); the page that writes one is of an application
+    "documents:message_update": pk_of(message_template),
+    "documents:message_delete": pk_of(message_template),
+    "documents:message_write": pk_of(application),
     "documents:rendered_archive": pk_of(rendered),
     "documents:rendered_compare": pk_of(rendered),
     "documents:rendered_download": pk_of(rendered),
@@ -1075,6 +1085,7 @@ def form_table(user, mine=None) -> dict:
         documents.CVForm: [{"user": user}],
         documents.CVItemForm: [{"user": user}],
         documents.CoverLetterForm: [{"user": user}],
+        documents.MessageTemplateForm: [{"user": user}],
         documents.UploadedDocumentForm: [{"user": user}],
         jobs.CompanyForm: [{"user": user}, {"user": user, "instance": mine.posting.company}],
         jobs.ContactForm: [{"user": user}],

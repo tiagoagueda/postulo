@@ -272,7 +272,11 @@ logger = logging.getLogger(__name__)
 #: report as never made without being asked (#1095).
 #: 84 added ``animated_mark`` on the profile: whether the mark in the header moves. An archive
 #: without it restores the mark still, the default (#1238).
-FORMAT_VERSION = 84
+#: 85 added ``message_templates`` in ``documents``: each a ``name``, a ``purpose`` (``follow_up``,
+#: ``thank_you``, ``withdrawal``, ``availability`` or ``other``), a ``subject``, a ``body`` and a
+#: ``language``. An archive without them restores none; a purpose that is not one of those is
+#: ``other`` (#1094).
+FORMAT_VERSION = 85
 
 
 def industry_entry(industry) -> str | dict:
@@ -675,6 +679,8 @@ CV_FIELDS = (
     "show_contact_details",
 )
 LETTER_FIELDS = ("id", "name", "kind", "subject", "body", "theme", "is_template", "language")
+#: What a message template's archive entry carries (#1094).
+MESSAGE_FIELDS = ("id", "name", "purpose", "subject", "body", "language")
 UPLOAD_FIELDS = (
     "id",
     "title",
@@ -1227,7 +1233,13 @@ def counts(user) -> dict[str, int]:
         CalendarSubscription,
         Interview,
     )
-    from postulo.documents.models import CV, CoverLetter, RenderedDocument, UploadedDocument
+    from postulo.documents.models import (
+        CV,
+        CoverLetter,
+        MessageTemplate,
+        RenderedDocument,
+        UploadedDocument,
+    )
     from postulo.jobs.models import Capture, CapturedPage, Company, FieldHint, ListingEvent
 
     return {
@@ -1245,6 +1257,7 @@ def counts(user) -> dict[str, int]:
         "calendar_subscriptions": CalendarSubscription.objects.for_user(user).count(),
         "cvs": CV.objects.for_user(user).count(),
         "cover_letters": CoverLetter.objects.for_user(user).count(),
+        "message_templates": MessageTemplate.objects.for_user(user).count(),
         "uploads": UploadedDocument.objects.for_user(user).count(),
         "sent_documents": RenderedDocument.objects.for_user(user).count(),
         "captures": Capture.objects.for_user(user).count(),
@@ -1271,7 +1284,13 @@ def build_document(user) -> dict:
     from postulo.applications.models import Application, Appointment, Reminder
     from postulo.core.models import Tag
     from postulo.documents import printing
-    from postulo.documents.models import CV, CoverLetter, RenderedDocument, UploadedDocument
+    from postulo.documents.models import (
+        CV,
+        CoverLetter,
+        MessageTemplate,
+        RenderedDocument,
+        UploadedDocument,
+    )
     from postulo.jobs.models import (
         Capture,
         Company,
@@ -1552,6 +1571,9 @@ def build_document(user) -> dict:
         }
         for cv in CV.objects.for_user(user).prefetch_related("items")
     ]
+    document["documents"]["message_templates"] = [
+        _fields(template, MESSAGE_FIELDS) for template in MessageTemplate.objects.for_user(user)
+    ]
     document["documents"]["cover_letters"] = [
         _fields(letter, LETTER_FIELDS) for letter in CoverLetter.objects.for_user(user)
     ]
@@ -1629,6 +1651,7 @@ def build_document(user) -> dict:
         "calendar_subscriptions": len(document["calendar_subscriptions"]),
         "cvs": len(document["documents"]["cvs"]),
         "cover_letters": len(document["documents"]["cover_letters"]),
+        "message_templates": len(document["documents"]["message_templates"]),
         "uploads": len(document["documents"]["uploads"]),
         "sent_documents": len(document["documents"]["sent"]),
         "captures": len(document["captures"]),

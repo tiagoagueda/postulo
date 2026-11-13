@@ -32,6 +32,8 @@ from .models import (
     CVItem,
     CVKind,
     LetterKind,
+    MessagePurpose,
+    MessageTemplate,
     Prints,
     ReferenceDelivery,
     ReferenceLetter,
@@ -534,6 +536,82 @@ class CoverLetterForm(ThemeChoiceMixin, LanguageChoiceMixin, OwnerScopedModelFor
         self.initial.setdefault("kind", kind)
         self.initial.setdefault("body", str(LETTER_STARTERS.get(kind, "")))
         self.initial.setdefault("theme", LETTER_THEMES.get(kind, themes.DEFAULT))
+
+
+class MessageTemplateForm(LanguageChoiceMixin, OwnerScopedModelForm):
+    """A message written many times: what it is for, its subject and its words (#1094)."""
+
+    class Meta:
+        model = MessageTemplate
+        fields = ("name", "purpose", "subject", "body", "language")
+        widgets = {"body": forms.Textarea(attrs={"rows": 12})}
+        help_texts = {
+            "name": _("What you will look for it under. It is never sent."),
+            "purpose": _("Where it is offered: a follow-up when an application has gone quiet."),
+            "subject": _("The subject line. It takes the same placeholders as the body."),
+        }
+
+    def clean_subject(self) -> str:
+        """One line: a subject with a line break is refused as a bad header on the way out."""
+        subject = self.cleaned_data.get("subject", "")
+        if "\n" in subject or "\r" in subject:
+            raise forms.ValidationError(_("The subject has to be one line."))
+        return subject
+
+
+class MessageWriteForm(forms.Form):
+    """A message about one application, written from a template and edited before it goes.
+
+    Plain fields rather than a model form: nothing here is saved as it is typed. What is kept
+    is a line on the timeline, and only once the message is sent or said to be sent.
+    """
+
+    recipient = forms.EmailField(
+        label=_("To"),
+        required=False,
+        help_text=_(
+            "One address: the person you met, or your contact for this application, or the "
+            "company's own. It is needed to send, and noted on the timeline when it is given."
+        ),
+    )
+    subject = forms.CharField(
+        label=_("Subject"), max_length=200, help_text=_("One line. Change it as you like.")
+    )
+    body = forms.CharField(
+        label=_("Message"),
+        widget=forms.Textarea(attrs={"rows": 12}),
+        help_text=_("Filled in from the template. Read it through before it goes."),
+    )
+    #: What the message was written for, carried through the page so that the timeline says
+    #: *Followed up* for a follow-up, as the quiet action's own button does.
+    purpose = forms.ChoiceField(
+        choices=MessagePurpose.choices, required=False, widget=forms.HiddenInput
+    )
+
+    def clean_subject(self) -> str:
+        """One line (#769): see `SendDocumentsForm.clean_subject`."""
+        subject = self.cleaned_data.get("subject", "")
+        if "\n" in subject or "\r" in subject:
+            raise forms.ValidationError(_("The subject has to be one line."))
+        return subject.strip()
+
+
+class MessageChoiceForm(forms.Form):
+    """Which of the person's own message templates to write from (#1094)."""
+
+    template = forms.ModelChoiceField(
+        label=_("Write it from"),
+        queryset=MessageTemplate.objects.none(),
+        required=False,
+        help_text=_("Your message templates. Choosing one replaces what is below."),
+    )
+
+    def __init__(self, *args, user=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["template"].queryset = MessageTemplate.objects.for_user(user)
+        self.fields["template"].label_from_instance = lambda template: (
+            f"{template.get_purpose_display()}: {template.name}"
+        )
 
 
 def _refuse_an_old_credential(uploaded) -> None:

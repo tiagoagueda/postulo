@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% translate "Messages" %}{% endblock %}
+
+{% block content %}
+  <c-documents-nav current="messages" />
+  <div class="mb-6 flex flex-wrap items-center gap-4">
+    <div>
+      <h2 class="font-medium">{% translate "Messages" %}</h2>
+      <p class="text-sm text-ink-500 dark:text-ink-400">
+        {% translate "The follow-up, the thank-you and the withdrawal you would otherwise write again each time. Write one from an application." %}
+      </p>
+    </div>
+    <div class="ms-auto flex flex-wrap items-center gap-2">
+      <form method="post" action="{% url 'documents:message_starters' %}">
+        {% csrf_token %}
+        <button type="submit" class="btn" data-variant="outline">{% translate "Add the starter messages" %}</button>
+      </form>
+      <a href="{% url 'documents:message_create' %}" class="btn">{% translate "New message" %}</a>
+    </div>
+  </div>
+
+  {% if message_templates %}
+    <div class="card p-0">
+      <ul class="divide-y divide-ink-100 dark:divide-ink-800">
+        {% for template in message_templates %}
+          <li class="flex items-center gap-3 px-4 py-3">
+            <div class="min-w-0 flex-1">
+              <a href="{{ template.get_absolute_url }}" class="font-medium hover:underline">
+                {{ template.name }}
+              </a>
+              <p class="flex items-center gap-1.5 text-sm text-ink-500 dark:text-ink-400">
+                <c-document-language :document="template" />
+                <span class="truncate">{{ template.get_purpose_display }}{% if template.subject %} · <bdi>{{ template.subject }}</bdi>{% endif %}</span>
+              </p>
+            </div>
+          </li>
+        {% endfor %}
+      </ul>
+    </div>
+  {% else %}
+    <c-empty icon="circle-dashed">
+      {% translate "No messages yet. Add the starter messages to begin from a follow-up, a thank-you, a withdrawal and a reply with your availability, or write your own." %}
+    </c-empty>
+  {% endif %}
+{% endblock %}

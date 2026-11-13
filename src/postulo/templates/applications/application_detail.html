@@ -171,10 +171,16 @@
       <div class="card mb-6">
         <div class="mb-3 flex items-center justify-between">
           <h2 class="font-medium">{% translate "Documents" %}</h2>
-          <a href="{% url 'documents:send' application.pk %}"
-             class="text-sm text-brand-600 underline dark:text-brand-400">
-            {% translate "Record what you sent" %}
-          </a>
+          <span class="flex flex-wrap gap-x-4 gap-y-1 text-sm">
+            <a href="{% url 'documents:message_write' application.pk %}"
+               class="text-brand-600 underline dark:text-brand-400">
+              {% translate "Write a message" %}
+            </a>
+            <a href="{% url 'documents:send' application.pk %}"
+               class="text-brand-600 underline dark:text-brand-400">
+              {% translate "Record what you sent" %}
+            </a>
+          </span>
         </div>
         {% with sent=application.rendered_documents.all %}
           {% if sent %}
@@ -304,6 +310,9 @@
                       {% translate "Calendar" %}
                     </a>
                     {% endif %}
+                    <a href="{% url 'documents:message_write' application.pk %}?interview={{ interview.pk }}&amp;purpose=thank_you" class="btn" data-variant="ghost" data-size="xs">
+                      {% translate "Write a thank-you" %}
+                    </a>
                     <a href="{% url 'applications:interview_update' interview.pk %}" class="btn" data-variant="ghost" data-size="xs">
                       {% translate "Edit" %}
                     </a>

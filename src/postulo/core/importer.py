@@ -42,6 +42,7 @@ from .export import (
     LINKED_TO_A_COMPANY,
     MANIFEST_NAME,
     MEDIA_PREFIX,
+    MESSAGE_FIELDS,
     OFFER_FIELDS,
     POSTING_FIELDS,
     PROFILE_FIELDS,
@@ -124,6 +125,7 @@ class ImportReport:
     resume_items: int = 0
     cvs: int = 0
     cover_letters: int = 0
+    message_templates: int = 0
     uploads: int = 0
     sent_documents: int = 0
     captured_pages: int = 0
@@ -678,7 +680,7 @@ def _languages_as_written(document: dict, report: ImportReport) -> None:
         section = row.get("section") if isinstance(row, dict) else ""
         written(row, "language", f"The language of a translation of {str(section)[:40]}")
     documents = document.get("documents") or {}
-    for kind in ("cvs", "cover_letters", "uploads", "sent"):
+    for kind in ("cvs", "cover_letters", "message_templates", "uploads", "sent"):
         for entry in documents.get(kind) or []:
             name = (
                 (entry.get("name") or entry.get("title") or "") if isinstance(entry, dict) else ""
@@ -1298,7 +1300,7 @@ def _load(user, archive: zipfile.ZipFile, *, force: bool = False, into=None) -> 
         Reminder,
     )
     from postulo.core import identifiers as scheme_registry
-    from postulo.core import pictures
+    from postulo.core import languages, pictures
     from postulo.core.models import Tag, TagIcon, nearest_tone
     from postulo.documents import printing, themes
     from postulo.documents.models import (
@@ -1306,6 +1308,8 @@ def _load(user, archive: zipfile.ZipFile, *, force: bool = False, into=None) -> 
         CoverLetter,
         CVItem,
         CVKind,
+        MessagePurpose,
+        MessageTemplate,
         RenderedDocument,
         UploadedDocument,
     )
@@ -2292,6 +2296,34 @@ def _load(user, archive: zipfile.ZipFile, *, force: bool = False, into=None) -> 
             owner=user, **_carried(letter_entry, LETTER_FIELDS, report, "A cover letter")
         )
         report.cover_letters += 1
+
+    # The messages written from a template, which format 85 is the first to carry (#1094). Each
+    # field is held to its column: a subject is one line, a purpose is one of the five.
+    for message_entry in documents.get("message_templates") or []:
+        if not isinstance(message_entry, dict):
+            continue
+        message_entry.pop("id", None)
+        carried = _carried(message_entry, MESSAGE_FIELDS, report, "A message template")
+        name = str(carried.get("name") or "").strip()[:120]
+        body = carried.get("body")
+        if not name or not isinstance(body, str):
+            report.skipped.append("A message template with no name or no words was left out")
+            continue
+        purpose = carried.get("purpose")
+        language = carried.get("language")
+        MessageTemplate.objects.create(
+            owner=user,
+            name=name,
+            purpose=purpose if purpose in MessagePurpose.values else MessagePurpose.OTHER,
+            subject=" ".join(str(carried.get("subject") or "").split())[:200],
+            body=body,
+            language=(
+                languages.tag(language)
+                if isinstance(language, str) and languages.well_formed(language)
+                else ""
+            ),
+        )
+        report.message_templates += 1
 
     uploads: dict[int, UploadedDocument] = {}
     pending_supersedes: list[tuple[UploadedDocument, int]] = []

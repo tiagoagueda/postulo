@@ -197,7 +197,13 @@ def furnished(applicant):
     from django.contrib.contenttypes.models import ContentType
 
     from postulo.applications.models import Tag
-    from postulo.documents.models import CV, CoverLetter, CVItem, UploadedDocument
+    from postulo.documents.models import (
+        CV,
+        CoverLetter,
+        CVItem,
+        MessageTemplate,
+        UploadedDocument,
+    )
     from postulo.jobs.models import Capture
     from postulo.plugins.models import Connection
 
@@ -214,6 +220,14 @@ def furnished(applicant):
         owner=applicant,
         name="To Aperture",
         body="Dear Aperture, I would like to help.",
+    )
+    # A message written many times, and the page that writes one (#1094).
+    message = MessageTemplate.objects.create(
+        owner=applicant,
+        name="Nudge",
+        purpose="follow_up",
+        subject="About {{ role }}",
+        body="Dear {{ contact }}, any news from {{ company }}?",
     )
     upload = UploadedDocument.objects.create(
         owner=applicant,
@@ -456,6 +470,7 @@ def furnished(applicant):
         "cv": cv,
         "cv_item": cv.items.first(),
         "letter": letter,
+        "message": message,
         "upload": upload,
         # The later of the two versions: the one with something to be compared with.
         "render": render,
@@ -582,6 +597,7 @@ def signed_in_paths(a, c, me, entry=None, recovery_link: str = "", things=None) 
     cv = it.get("cv", a)
     cv_item = it.get("cv_item", a)
     letter = it.get("letter", a)
+    message = it.get("message", a)
     upload = it.get("upload", a)
     render = it.get("render", a)
     tag = it.get("tag", a)
@@ -784,6 +800,12 @@ def signed_in_paths(a, c, me, entry=None, recovery_link: str = "", things=None) 
         f"/documents/files/{upload.pk}/edit/",
         f"/documents/files/{upload.pk}/delete/",
         f"/documents/applications/{a.pk}/send/",
+        # Messages written from a template, and the page that writes one (#1094).
+        "/documents/messages/",
+        "/documents/messages/new/",
+        f"/documents/messages/{message.pk}/edit/",
+        f"/documents/messages/{message.pk}/delete/",
+        f"/documents/applications/{a.pk}/message/?purpose=follow_up",
         f"/applications/interviews/{interview.pk}/edit/",
         f"/applications/tags/{tag.pk}/edit/",
         f"/applications/tags/{tag.pk}/delete/",

@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% translate "Write a message" %}{% endblock %}
+
+{% block content %}
+  <div class="mx-auto max-w-2xl">
+    <h1 class="mb-1 text-title font-semibold tracking-tight">{% translate "Write a message" %}</h1>
+    <p class="mb-6 text-sm text-ink-500 dark:text-ink-400">
+      <bdi>{{ application.posting.title }}</bdi> — <bdi>{{ application.posting.company.name }}</bdi>
+    </p>
+
+    {% if has_templates %}
+      {% comment %} A plain form that asks for this page again with another template, so it
+         works with scripts off. {% endcomment %}
+      <form method="get" class="mb-6">
+        {% if interview %}<input type="hidden" name="interview" value="{{ interview.pk }}">{% endif %}
+        <div class="card mb-3">
+          <c-field :field="choose.template" />
+        </div>
+        <button type="submit" class="btn" data-variant="outline">{% translate "Use this template" %}</button>
+      </form>
+    {% else %}
+      <c-empty variant="quiet">
+        {% translate "You have no message templates yet. Write the message below, or add some first." %}
+        <a href="{% url 'documents:message_list' %}" class="text-brand-600 underline dark:text-brand-400">{% translate "Messages" %}</a>
+      </c-empty>
+    {% endif %}
+
+    {% if copied %}
+      {% comment %} What *Copy* leaves: the words, in a box that can be selected from end to
+         end, and a *Copy* button that app.js adds where the clipboard is there to be written
+         to. Nothing is recorded by copying; *Record as sent* below says it went. {% endcomment %}
+      <div class="card mb-6">
+        <div class="field wrap-anywhere">
+          <label for="message-copy">{% translate "The message, to copy" %}</label>
+          <textarea id="message-copy" readonly rows="10"
+                    data-copy-source data-copy-label="{% translate 'Copy' %}"
+                    data-copied-label="{% translate 'Copied' %}">{{ copied }}</textarea>
+        </div>
+      </div>
+    {% endif %}
+
+    <form method="post" novalidate>
+      {% csrf_token %}
+      {% if interview %}<input type="hidden" name="interview" value="{{ interview.pk }}">{% endif %}
+      {{ form.purpose }}
+      {% if form.non_field_errors %}
+        <div class="alert mb-4" data-variant="error">{{ form.non_field_errors }}</div>
+      {% endif %}
+      <div class="card mb-6">
+        <c-field :field="form.recipient" />
+        <c-field :field="form.subject" />
+        <c-field :field="form.body" />
+      </div>
+      <div class="flex flex-wrap items-center gap-3">
+        {% if can_send %}
+          <button type="submit" name="action" value="send" class="btn">{% translate "Send from my address" %}</button>
+        {% endif %}
+        <button type="submit" name="action" value="copy" class="btn" data-variant="outline">{% translate "Copy" %}</button>
+        <button type="submit" name="action" value="record" class="btn" data-variant="outline">{% translate "Record as sent" %}</button>
+        <a href="{{ application.get_absolute_url }}" class="btn" data-variant="ghost">{% translate "Cancel" %}</a>
+      </div>
+      <p class="mt-3 text-sm text-ink-500 dark:text-ink-400">
+        {% if can_send %}
+          {% translate "Sending mails it from your own address and notes it on the timeline. If you send it yourself, copy it and record it as sent." %}
+        {% else %}
+          {% translate "You have no outbox set up, so Postulo sends nothing. Copy the message into your own mail program, then record it as sent to keep it on the timeline." %}
+        {% endif %}
+      </p>
+    </form>
+  </div>
+{% endblock %}

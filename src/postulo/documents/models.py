@@ -659,6 +659,62 @@ class CoverLetter(DeclaresALanguage, OwnedModel):
         return DocumentKind.COVER_LETTER
 
 
+class MessagePurpose(models.TextChoices):
+    """What a message is for, which is how the right one is found (#1094): the quiet action
+    asks for a follow-up and an interview's page for a thank-you."""
+
+    FOLLOW_UP = "follow_up", _("Follow-up")
+    THANK_YOU = "thank_you", _("Thank-you")
+    WITHDRAWAL = "withdrawal", _("Withdrawal")
+    AVAILABILITY = "availability", _("Availability")
+    OTHER = "other", _("Other")
+
+
+class MessageTemplate(DeclaresALanguage, OwnedModel):
+    """A short message written many times: a follow-up, a thank-you, a withdrawal (#1094).
+
+    Not a letter, which is a document that is printed and filed as sent: a message is text
+    that is mailed from the person's own address, or copied into their own mail program, and
+    what is kept of it is a line on the timeline. It takes the letter's placeholders, filled
+    when it is written against an application.
+    """
+
+    #: The same small, fixed set a letter has, for the same reason.
+    PLACEHOLDERS = CoverLetter.PLACEHOLDERS
+
+    name = models.CharField(_("name"), max_length=120)
+    purpose = models.CharField(
+        _("purpose"),
+        max_length=20,
+        choices=MessagePurpose,
+        default=MessagePurpose.OTHER,
+        db_index=True,
+    )
+    subject = models.CharField(_("subject"), max_length=200, blank=True)
+    body = models.TextField(
+        _("body"),
+        help_text=_("Placeholders such as {{ company }} are filled in when you write it."),
+    )
+    language = LanguageField(
+        _("language"),
+        blank=True,
+        help_text=_(
+            "Which language this message is written in. Leave blank to follow your profile."
+        ),
+    )
+
+    class Meta:
+        verbose_name = _("message template")
+        verbose_name_plural = _("message templates")
+        ordering = ("purpose", "name", "pk")
+
+    def __str__(self) -> str:
+        return self.name
+
+    def get_absolute_url(self) -> str:
+        return reverse("documents:message_update", args=[self.pk])
+
+
 class UploadedDocument(RecordsALanguage, OwnedModel):
     """A file you already had: a designed CV, a scanned certificate, a portfolio.
 

@@ -224,6 +224,9 @@ EXCUSED: dict[str, str] = {
     "applications:quiet_action": "a POST that dismisses the gone-quiet prompt",
     "applications:reminder_complete": "a POST that marks a reminder done",
     "applications:reminder_later": "a POST that moves a reminder; its menu is on two visited pages",
+    "documents:message_starters": (
+        "a POST that adds the starter messages; its button is on the visited list (#1094)"
+    ),
     "applications:subscription_refresh": (
         "a POST that reads a subscribed calendar now; its button is on the visited list (#1098)"
     ),
