@@ -879,8 +879,8 @@ the next major. During 0.x that is loose on purpose -- 0.x is where breaking cha
 in the minor -- so a plugin a core release actually breaks raises its own floor (`>=0.6`)
 and says so in its changelog. That is the mechanism, not the installer. The two browser
 extensions carry the same number in `package.json`; nothing installs them from a
-catalogue, so nothing enforces it there. `postulo-templates` is not a package and carries
-no version at all, deliberately: a template pack is copied, not installed.
+catalogue, so nothing enforces it there. `postulo-templates` is a plugin like the others:
+it is released beside the core and follows its version.
 
 
 ### Publishing an official plugin

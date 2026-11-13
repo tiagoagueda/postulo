@@ -8,6 +8,8 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### ✨ Added
 
+- Message templates: follow-ups, thank-yous and withdrawals written from templates and sent from your own address (#1094)
+- My details shows the CV photo, with its size, and previews a new one before it is saved (#1246)
 - A listing's page and its application's page show which of the skills the listing names your career record has and which it does not, read from the ESCO classification with no model, and which CV prints the most of them. (#1093)
 - The report page can make last month's report on a chosen day, or some days before a plugin's calendar entry; it is filed under Sent documents with a reminder to read it, and handed to your stores or emailed from your own outbox only if you switch that on. (#1095)
 - Each contact has a page with their details, your own note, and everything that happened with them: the applications they were on or referred you to, interviews, appointments, messages and reference letters, newest first. (#1097)
@@ -23,6 +25,8 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🔧 Changed
 
+- Sectors and industries are shown by one- or two-word labels, with the full name as the tooltip, and a search finds them by either (#1248)
+- My career shows Edit and Delete as pencil and bin icons that name their entry (#1247)
 - A test run on your own machine keeps the migrated test database and restores it instead of migrating again, so one test file starts in seconds instead of a minute or more; plugin repositories can use the same fixture from postulo.plugins.testing, and CI migrates as before. (#1144)
 - scripts/messages.py extract --check finds the catalogue sets once instead of once per set and no longer walks the translation directories, about three times faster, and extract writes only the catalogues whose text changed and says how many. (#1169)
 - scripts/messages.py compile parses each catalogue once instead of twice and builds each .mo file without copying it for every entry, about halving its time; the files it writes are byte for byte the same. (#1145)
@@ -61,6 +65,8 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🐛 Fixed
 
+- Names and addresses found in the Annuaire des Entreprises (and capital-letter names from the Norwegian and Polish registers) are written in normal case, with street types spelled out (#1244)
+- The names-in-other-languages popover on a company page is as wide as its content (#1243)
 - A notification that could not be sent, because the mail server, a push service or another notifier was briefly out of reach, is tried again by the scheduler, five minutes later and then at doubling intervals for about ten hours, instead of being lost. (#1163)
 - The scheduler deletes the background queue's records of finished tasks after seven days; they were kept for ever, a failed one with its whole traceback. (#1121)
 - Expired entries of the database cache and of the rate-limit file cache are deleted once an hour; they used to stay until 200,000 had piled up, slowing every cache write. (#1167)
