@@ -81,6 +81,10 @@ EXCUSED: dict[str, str] = {
         "the calendar's view on screen as a PDF arriving as a download, filed nowhere; the "
         "print page that offers it, `applications:calendar_print`, is walked (#342)"
     ),
+    "applications:interview_pdf": (
+        "an interview's page as a PDF arriving as a download, filed nowhere; the page that "
+        "offers it, `applications:interview_detail`, is walked (#1091)"
+    ),
     "accounts:avatar": "an image, served through a permission check",
     "jobs:company_logo": "a company's logo image, served from this instance",
     "connections:logo": (

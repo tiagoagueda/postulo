@@ -1,0 +1,109 @@
+{% load i18n %}<!DOCTYPE html>
+{% comment %} One interview as a document to prepare from (#1091), set by a theme.
+
+   **Plain values, and no model**, as for a report, a list and the calendar (#340-#342):
+   `interview_brief.as_context` hands over the title, who printed it and when, the kind, the
+   start and the end, the place, the outcome, the person's preparation notes, ``contacts``,
+   ``company``, ``listing``, ``sent`` (the documents as they were sent), ``timeline`` and
+   ``earlier``. A theme from a plugin reads the same names this one does.
+
+   **Nothing that is a control is here.** No buttons, no links to click: an address that is
+   worth having is printed as text, since paper cannot be clicked.
+
+   **Every side is logical**, for the reason `base_report.html` gives, and the paper is
+   Postulo's to write (#344).
+{% endcomment %}
+<html lang="{{ document_language }}" dir="{{ document_direction|default:'ltr' }}">
+<head>
+  <meta charset="utf-8">
+  <title>{{ document_title }}</title>
+  <style{% if csp_nonce %} nonce="{{ csp_nonce }}"{% endif %}>{% block page_styles %}{% endblock %}</style>
+</head>
+<body>
+  <h1><bdi>{{ title }}</bdi></h1>
+  <div class="meta">
+    <div><strong><bdi>{{ person }}</bdi></strong></div>
+    <div>{% blocktranslate with produced=produced_at|date:"DATETIME_FORMAT" %}Produced on {{ produced }}{% endblocktranslate %}</div>
+  </div>
+
+  <section class="when">
+    <h2>{% translate "When and where" %}</h2>
+    <p class="big">{{ starts_at|date:"l" }} {{ starts_at|date:"DATE_FORMAT" }}, {{ starts_at|date:"TIME_FORMAT" }}–{{ ends_at|date:"TIME_FORMAT" }}</p>
+    <p>{{ kind }} · {{ outcome }}</p>
+    {% if location %}<p><bdi>{{ location }}</bdi></p>{% endif %}
+  </section>
+
+  <section>
+    <h2>{% translate "Your preparation notes" %}</h2>
+    {% if notes %}<p class="text"><bdi>{{ notes }}</bdi></p>{% else %}<p class="nothing">{% translate "Nothing written yet." %}</p>{% endif %}
+  </section>
+
+  <section>
+    <h2>{% translate "Who you are meeting" %}</h2>
+    {% for person in contacts %}
+      <div class="item">
+        <p><strong><bdi>{{ person.name }}</bdi></strong>{% if person.role %} · <bdi>{{ person.role }}</bdi>{% endif %}</p>
+        {% if person.email %}<p>{{ person.email }}</p>{% endif %}
+        {% for number in person.phones %}<p dir="ltr" class="start">{{ number }}</p>{% endfor %}
+        {% if person.note %}<p class="text"><bdi>{{ person.note }}</bdi></p>{% endif %}
+      </div>
+    {% empty %}
+      <p class="nothing">{% translate "Nobody is named for this interview." %}</p>
+    {% endfor %}
+  </section>
+
+  <section>
+    <h2>{% translate "The company in brief" %}</h2>
+    <p><strong><bdi>{{ company.name }}</bdi></strong> · {{ company.kind }}</p>
+    {% if company.parent %}<p>{% translate "Part of" %}: <bdi>{{ company.parent }}</bdi></p>{% endif %}
+    {% if company.industries %}<p>{% translate "Industries" %}: <bdi>{{ company.industries|join:", " }}</bdi></p>{% endif %}
+    {% if company.website %}<p>{{ company.website }}</p>{% endif %}
+    {% if company.state %}<p>{% translate "State" %}: {{ company.state }}{% if company.state_since %} · {{ company.state_since|date:"DATE_FORMAT" }}{% endif %}</p>{% endif %}
+    {% if company.hiring %}<p>{% translate "Hiring" %}: {{ company.hiring }} · {% blocktranslate trimmed with day=company.hiring_as_of|date:"DATE_FORMAT" %}as of {{ day }}{% endblocktranslate %}</p>{% endif %}
+    {% if company.warning %}<p>{{ company.warning }}</p>{% endif %}
+    {% if company.note %}<p class="text"><bdi>{{ company.note }}</bdi></p>{% endif %}
+  </section>
+
+  <section>
+    <h2>{% translate "The listing" %}</h2>
+    <p><strong><bdi>{{ listing.title }}</bdi></strong>{% if listing.location %} · <bdi>{{ listing.location }}</bdi>{% endif %}</p>
+    {% if listing.url %}<p>{{ listing.url }}</p>{% endif %}
+    {% if listing.text %}<p class="text"><bdi>{{ listing.text }}</bdi></p>{% else %}<p class="nothing">{% translate "No text recorded for this listing." %}</p>{% endif %}
+  </section>
+
+  <section>
+    <h2>{% translate "What you sent" %}</h2>
+    {% for document in sent %}
+      <p><bdi>{{ document.title }}</bdi> · {{ document.kind }} · {{ document.sent_on|date:"DATE_FORMAT" }}</p>
+    {% empty %}
+      <p class="nothing">{% translate "Nothing recorded as sent for this application." %}</p>
+    {% endfor %}
+  </section>
+
+  <section>
+    <h2>{% translate "The story so far" %}</h2>
+    {% for entry in timeline %}
+      <div class="item">
+        <p>{{ entry.at|date:"DATE_FORMAT" }} · {{ entry.kind }}{% if entry.summary %} · <bdi>{{ entry.summary }}</bdi>{% endif %}</p>
+        {% if entry.body %}<p class="text"><bdi>{{ entry.body }}</bdi></p>{% endif %}
+      </div>
+    {% empty %}
+      <p class="nothing">{% translate "Nothing on the timeline yet." %}</p>
+    {% endfor %}
+  </section>
+
+  {% if earlier %}
+    <section>
+      <h2>{% translate "Earlier interviews for this application" %}</h2>
+      {% for other in earlier %}
+        <div class="item">
+          <p>{{ other.starts_at|date:"DATE_FORMAT" }} · {{ other.kind }} · {{ other.outcome }}</p>
+          {% if other.note %}<p class="text"><bdi>{{ other.note }}</bdi></p>{% endif %}
+        </div>
+      {% endfor %}
+    </section>
+  {% endif %}
+
+  <p class="note">{% translate "Produced by Postulo from this person's own records." %}</p>
+</body>
+</html>

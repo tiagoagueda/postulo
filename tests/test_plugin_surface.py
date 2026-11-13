@@ -574,6 +574,13 @@ def test_a_sync_written_elsewhere_that_keeps_a_state_passes_the_published_check(
     assert_imports_only_the_surface(package, package="postulo_mailbox")
 
 
+def test_a_theme_can_set_an_interview():
+    """A plugin theme for an interview's printed page sets `ThemeKind.INTERVIEW` (#1091)."""
+    from postulo.plugins import api
+
+    assert api.ThemeKind.INTERVIEW == "interview"
+
+
 def test_a_reminder_on_the_surface_is_the_cores_own_class():
     """What a sync of a task list reads and writes (#331): the record, read with
     `Reminder.objects.for_user()`, and the services, never the model's save."""

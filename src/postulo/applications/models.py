@@ -947,7 +947,7 @@ class Interview(OwnedModel):
         return f"{self.get_kind_display()} — {self.application}"
 
     def get_absolute_url(self) -> str:
-        return f"{self.application.get_absolute_url()}#interview-{self.pk}"
+        return reverse("applications:interview_detail", args=[self.pk])
 
     @property
     def is_scheduled(self) -> bool:

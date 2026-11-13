@@ -1,0 +1,231 @@
+{% extends "base.html" %}
+{% load i18n postulo %}
+
+{% block title %}{{ brief.title }}{% endblock %}
+
+{% block content %}
+  {% comment %} One interview, with everything a person opens four or five pages to remember
+     before it (#1091): when and where, who is there, the listing, the company, what was sent,
+     the timeline and the earlier interviews. Built from `interview_brief.as_context`, the
+     same plain values the printed document is drawn from. {% endcomment %}
+  <div class="max-w-3xl">
+    <p class="text-sm text-ink-500 dark:text-ink-400">
+      <a href="{{ application.get_absolute_url }}" class="hover:underline">
+        <bdi>{{ brief.listing.title }}</bdi> · <bdi>{{ brief.company.name }}</bdi>
+      </a>
+    </p>
+    <c-page-title>
+      {{ brief.kind }}
+      <c-slot name="subtitle">
+        <span class="tabular-nums" data-interview-when>
+          {{ brief.starts_at|date:"l" }} {{ brief.starts_at|date:"DATETIME_FORMAT" }}–{{ brief.ends_at|date:"TIME_FORMAT" }}
+        </span>
+        · {{ brief.outcome }}
+      </c-slot>
+    </c-page-title>
+
+    <div class="mb-6 flex flex-wrap items-center gap-2">
+      <a href="{% url 'applications:interview_update' interview.pk %}" class="btn" data-variant="outline">
+        {% translate "Edit" %}<span class="sr-only">: <bdi>{{ brief.title }}</bdi></span>
+      </a>
+      {% module_on "format-icalendar" as ical_on %}
+      {% if ical_on %}
+        <a href="{% url 'applications:interview_ics' interview.pk %}" class="btn" data-variant="outline">
+          {% icon "calendar" %} {% translate "Calendar file" %}
+        </a>
+      {% endif %}
+      <a href="{% url 'applications:interview_list' %}" class="btn" data-variant="ghost">{% translate "All interviews" %}</a>
+    </div>
+
+    <section class="card mb-6" aria-labelledby="iv-where" data-interview-where>
+      <c-section-title id="iv-where">{% translate "Where" %}</c-section-title>
+      {% if brief.location %}
+        <p class="text-sm wrap-anywhere">
+          {% if brief.location_is_link %}
+            <a href="{{ brief.location }}" rel="noopener noreferrer external" target="_blank"
+               class="text-brand-600 underline dark:text-brand-400">{% translate "Join the call" %}</a>
+          {% else %}
+            <bdi>{{ brief.location }}</bdi>
+          {% endif %}
+        </p>
+      {% else %}
+        <p class="text-sm text-ink-500 dark:text-ink-400">{% translate "No place recorded." %}</p>
+      {% endif %}
+    </section>
+
+    <section class="card mb-6" aria-labelledby="iv-notes" data-interview-notes>
+      <c-section-title id="iv-notes">{% translate "Your preparation notes" %}</c-section-title>
+      {% if brief.notes %}
+        <p class="whitespace-pre-line text-sm"><bdi>{{ brief.notes }}</bdi></p>
+      {% else %}
+        <p class="text-sm text-ink-500 dark:text-ink-400">
+          {% translate "Nothing written yet. Add notes when you edit the interview." %}
+        </p>
+      {% endif %}
+    </section>
+
+    <section class="card mb-6" aria-labelledby="iv-people" data-interview-people>
+      <c-section-title id="iv-people">{% translate "Who you are meeting" %}</c-section-title>
+      {% if brief.contacts %}
+        <ul class="space-y-4">
+          {% for person in brief.contacts %}
+            <li class="text-sm">
+              <p class="font-medium">
+                {% if person.url %}<a href="{{ person.url }}" class="hover:underline"><bdi>{{ person.name }}</bdi></a>{% else %}<bdi>{{ person.name }}</bdi>{% endif %}
+                {% if person.role %}<span class="font-normal text-ink-500 dark:text-ink-400">· <bdi>{{ person.role }}</bdi></span>{% endif %}
+              </p>
+              {% if person.email %}<p class="wrap-anywhere"><a href="mailto:{{ person.email }}" class="underline">{{ person.email }}</a></p>{% endif %}
+              {% for number in person.phones %}<p dir="ltr" class="text-start">{{ number }}</p>{% endfor %}
+              {% if person.note %}
+                <p class="mt-1 whitespace-pre-line text-ink-600 dark:text-ink-300"><bdi>{{ person.note }}</bdi></p>
+              {% endif %}
+            </li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <p class="text-sm text-ink-500 dark:text-ink-400">{% translate "Nobody is named for this interview." %}</p>
+      {% endif %}
+    </section>
+
+    <section class="card mb-6" aria-labelledby="iv-company" data-interview-company>
+      <c-section-title id="iv-company">{% translate "The company in brief" %}</c-section-title>
+      <p class="text-sm font-medium">
+        <a href="{{ brief.company.url }}" class="hover:underline"><bdi>{{ brief.company.name }}</bdi></a>
+        <span class="font-normal text-ink-500 dark:text-ink-400">· {{ brief.company.kind }}</span>
+      </p>
+      <dl class="mt-2 grid gap-x-4 gap-y-1 text-sm sm:grid-cols-[max-content_1fr]">
+        {% if brief.company.parent %}
+          <dt class="font-medium">{% translate "Part of" %}</dt>
+          <dd><bdi>{{ brief.company.parent }}</bdi></dd>
+        {% endif %}
+        {% if brief.company.industries %}
+          <dt class="font-medium">{% translate "Industries" %}</dt>
+          <dd><bdi>{{ brief.company.industries|join:", " }}</bdi></dd>
+        {% endif %}
+        {% if brief.company.website %}
+          <dt class="font-medium">{% translate "Website" %}</dt>
+          <dd class="wrap-anywhere"><a href="{{ brief.company.website }}" rel="noopener noreferrer external" target="_blank" class="underline">{{ brief.company.website }}</a></dd>
+        {% endif %}
+        {% if brief.company.state %}
+          <dt class="font-medium">{% translate "State" %}</dt>
+          <dd>{{ brief.company.state }}{% if brief.company.state_since %} · {{ brief.company.state_since|date:"DATE_FORMAT" }}{% endif %}</dd>
+        {% endif %}
+        {% if brief.company.hiring %}
+          <dt class="font-medium">{% translate "Hiring" %}</dt>
+          <dd>{{ brief.company.hiring }} · {% blocktranslate trimmed with day=brief.company.hiring_as_of|date:"DATE_FORMAT" %}as of {{ day }}{% endblocktranslate %}</dd>
+        {% endif %}
+      </dl>
+      {% if brief.company.warning %}
+        <p class="mt-2 text-sm text-amber-700 dark:text-amber-400">{{ brief.company.warning }}</p>
+      {% endif %}
+      {% if brief.company.note %}
+        <p class="mt-2 whitespace-pre-line text-sm text-ink-600 dark:text-ink-300"><bdi>{{ brief.company.note }}</bdi></p>
+      {% endif %}
+    </section>
+
+    <section class="card mb-6" aria-labelledby="iv-listing" data-interview-listing>
+      <c-section-title id="iv-listing">{% translate "The listing" %}</c-section-title>
+      <p class="text-sm font-medium">
+        <a href="{{ brief.listing.page }}" class="hover:underline"><bdi>{{ brief.listing.title }}</bdi></a>
+        {% if brief.listing.location %}<span class="font-normal text-ink-500 dark:text-ink-400">· <bdi>{{ brief.listing.location }}</bdi></span>{% endif %}
+      </p>
+      {% if brief.listing.text %}
+        <p class="mt-2 whitespace-pre-line text-sm"><bdi>{{ brief.listing.text }}</bdi></p>
+      {% else %}
+        <p class="mt-2 text-sm text-ink-500 dark:text-ink-400">{% translate "No text recorded for this listing." %}</p>
+      {% endif %}
+    </section>
+
+    <section class="card mb-6" aria-labelledby="iv-sent" data-interview-sent>
+      <c-section-title id="iv-sent">{% translate "What you sent" %}</c-section-title>
+      {% if brief.sent %}
+        <ul class="space-y-2">
+          {% for document in brief.sent %}
+            <li class="flex items-start gap-2 text-sm">
+              <div class="min-w-0 flex-1">
+                <p class="wrap-anywhere"><bdi>{{ document.title }}</bdi></p>
+                <p class="text-xs text-ink-500 dark:text-ink-400">{{ document.kind }} · {{ document.sent_on|date:"DATE_FORMAT" }}</p>
+              </div>
+              <a href="{{ document.download }}" class="btn" data-variant="ghost" data-size="xs">
+                {% translate "Get" %}<span class="sr-only">: <bdi>{{ document.title }}</bdi></span>
+              </a>
+            </li>
+          {% endfor %}
+        </ul>
+        <p class="mt-2 text-xs text-ink-500 dark:text-ink-400">
+          {% translate "These are the files as they were sent, not your documents as they are now." %}
+        </p>
+      {% else %}
+        <p class="text-sm text-ink-500 dark:text-ink-400">{% translate "Nothing recorded as sent for this application." %}</p>
+      {% endif %}
+    </section>
+
+    <section class="card mb-6" aria-labelledby="iv-timeline" data-interview-timeline>
+      <c-section-title id="iv-timeline">{% translate "The story so far" %}</c-section-title>
+      {% if brief.timeline %}
+        <ol class="space-y-2">
+          {% for entry in brief.timeline %}
+            <li class="text-sm">
+              <p><span class="tabular-nums text-ink-500 dark:text-ink-400">{{ entry.at|date:"DATE_FORMAT" }}</span> · {{ entry.kind }}{% if entry.summary %} · <bdi>{{ entry.summary }}</bdi>{% endif %}</p>
+              {% if entry.body %}<p class="whitespace-pre-line text-xs text-ink-600 dark:text-ink-300"><bdi>{{ entry.body }}</bdi></p>{% endif %}
+            </li>
+          {% endfor %}
+        </ol>
+      {% else %}
+        <p class="text-sm text-ink-500 dark:text-ink-400">{% translate "Nothing on the timeline yet." %}</p>
+      {% endif %}
+    </section>
+
+    {% if brief.earlier %}
+      <section class="card mb-6" aria-labelledby="iv-earlier" data-interview-earlier>
+        <c-section-title id="iv-earlier">{% translate "Earlier interviews for this application" %}</c-section-title>
+        <ul class="space-y-2">
+          {% for other in brief.earlier %}
+            <li class="text-sm">
+              <p>{{ other.starts_at|date:"DATE_FORMAT" }} · {{ other.kind }} · {{ other.outcome }}</p>
+              {% if other.note %}<p class="whitespace-pre-line text-xs text-ink-600 dark:text-ink-300"><bdi>{{ other.note }}</bdi></p>{% endif %}
+            </li>
+          {% endfor %}
+        </ul>
+      </section>
+    {% endif %}
+
+    <section class="card" aria-labelledby="iv-print">
+      <c-section-title id="iv-print">{% translate "As a document" %}</c-section-title>
+      <p class="mb-3 text-sm text-ink-500 dark:text-ink-400">
+        {% translate "All of the above as a PDF to read on the way there. Downloaded, and not kept in Postulo." %}
+      </p>
+      {% comment %} A post, so the theme is remembered for the next one as the report's, a
+         list's and the calendar's are (#340-#342). {% endcomment %}
+      <form method="post" action="{% url 'applications:interview_pdf' interview.pk %}" class="flex flex-wrap items-end gap-3">
+        {% csrf_token %}
+        <div class="field w-auto">
+          <label for="print-theme">{% translate "Theme" %}</label>
+          <select name="theme" id="print-theme">
+            {% for value, label in theme_choices %}
+              <option value="{{ value }}" {% if value == chosen_theme %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="field w-auto">
+          <label for="print-language">{% translate "Language of the document" %}</label>
+          <select name="language" id="print-language">
+            {% for code, name in language_choices %}
+              <option value="{{ code }}" lang="{{ code }}" {% if code == chosen_language %}selected{% endif %}>{{ name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="field w-auto">
+          <label for="print-paper">{% translate "Paper" %}</label>
+          <select name="paper" id="print-paper"{% if paper_restriction %} aria-describedby="print-paper-why"{% endif %}>
+            {% for value, label in paper_choices %}
+              <option value="{{ value }}" {% if value == chosen_paper %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+          </select>
+          {% if paper_restriction %}<p id="print-paper-why" class="text-xs text-ink-500 dark:text-ink-400">{{ paper_restriction }}</p>{% endif %}
+        </div>
+        <button type="submit" class="btn" data-print-pdf>{% translate "Download PDF" %}</button>
+      </form>
+    </section>
+  </div>
+{% endblock %}

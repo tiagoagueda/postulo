@@ -2,7 +2,7 @@ from django.urls import path
 
 from postulo.core import modules
 
-from . import views, views_calendar_print, views_ical, views_subscriptions
+from . import views, views_calendar_print, views_ical, views_interview, views_subscriptions
 
 app_name = "applications"
 
@@ -119,6 +119,18 @@ urlpatterns = [
         name="interview_calendar",
     ),
     path("<int:pk>/interviews/new/", views.InterviewCreateView.as_view(), name="interview_create"),
+    # One interview gathered into a page to prepare from, and the same page as a PDF that
+    # is downloaded and never filed (#1091).
+    path(
+        "interviews/<int:pk>/",
+        views_interview.InterviewDetailView.as_view(),
+        name="interview_detail",
+    ),
+    path(
+        "interviews/<int:pk>/print/",
+        views_interview.InterviewPDFView.as_view(),
+        name="interview_pdf",
+    ),
     path("interviews/<int:pk>/edit/", views.InterviewUpdateView.as_view(), name="interview_update"),
     path(
         "interviews/<int:pk>/outcome/",
