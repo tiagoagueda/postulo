@@ -18,7 +18,7 @@
      the same button. The title is padded clear of the corner so it never runs under it. {% endcomment %}
   <div class="absolute end-2 top-2" data-card-status-menu>
     <c-dropdown-menu trigger_describedby="board-move-help"
-                     label="{% blocktranslate trimmed with title=application.posting.title company=application.posting.company.name %}Status of {{ title }} at {{ company }}{% endblocktranslate %}">
+                     label="{% blocktranslate trimmed with title=application.posting.title company=application.posting.company.display_name %}Status of {{ title }} at {{ company }}{% endblocktranslate %}">
       <c-slot name="trigger">{% icon "pencil" %}</c-slot>
       <form method="post" action="{% url 'applications:status' application.pk %}" role="none">
         {% csrf_token %}
@@ -38,7 +38,7 @@
   </a>
   <p class="truncate text-sm text-ink-500 dark:text-ink-400">
     {% company_logo application.posting.company "size-4 text-[0.5rem]" %}
-    {{ application.posting.company.name }}
+    {{ application.posting.company.display_name }}
   </p>
 
   {% if application.tags.all %}

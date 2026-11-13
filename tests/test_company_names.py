@@ -328,7 +328,7 @@ def test_the_api_lists_the_names_beside_the_name(client, user):
 
     assert body["name"] == "Aveiro Uni"
     assert body["names"] == [
-        {"language": "pt", "name": "Universidade de Aveiro", "source": "typed"}
+        {"kind": "name", "language": "pt", "name": "Universidade de Aveiro", "source": "typed"}
     ]
 
 

@@ -177,6 +177,9 @@ class CompanyOut(Schema):
     #: Its name in other languages (#673): ``language`` a BCP 47 tag, ``source`` ``wikidata``
     #: or ``typed``. Read-only here; ``name`` stays the one name that identifies it.
     names: list[dict] = Field(default_factory=list)
+    #: The name its lists show (#1245): ``name`` unless the person chose one of its acronyms,
+    #: which are the ``names`` of kind ``acronym``, the chosen one marked ``shown``.
+    display_name: str = ""
     phone_numbers: list[PhoneNumberOut] = Field(default_factory=list)
     postal_addresses: list[PostalAddressOut] = Field(default_factory=list)
     #: Its social profiles (#906), each on a service or on none, as a contact's are.
@@ -1786,12 +1789,19 @@ def company_out(company, *, detail: bool = False) -> dict:
     data = {
         "id": company.pk,
         "name": company.name,
+        "display_name": company.display_name,
         "kind": company.kind,
         "website": company.website,
         "careers_url": company.careers_url,
         "email": company.email,
         "names": [
-            {"language": row.language, "name": row.name, "source": row.source}
+            {
+                "kind": row.kind,
+                "language": row.language,
+                "name": row.name,
+                "source": row.source,
+                **({"shown": row.name == company.list_name} if row.kind == "acronym" else {}),
+            }
             for row in company.names.all()
         ],
         "phone_numbers": [_number_out(row) for row in company.phone_numbers.all()],

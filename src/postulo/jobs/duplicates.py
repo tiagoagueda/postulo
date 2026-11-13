@@ -36,7 +36,7 @@ from urllib.parse import urlsplit
 from django.utils.translation import gettext as _
 
 from . import identifiers
-from .models import Company, CompanyIdentifier, Contact
+from .models import Company, CompanyIdentifier, CompanyName, Contact
 
 #: The legal forms a company's name is written with, as people write them. **The one
 #: list**: every comparison of two names goes through `bare_name`, and `bare_name` reads
@@ -248,10 +248,10 @@ def _contacts_of(contact, person):
 def for_company(company, person=None) -> list[Candidate]:
     """This person's other companies that look like ``company``, each with why.
 
-    Three reads at most: the names and websites of the person's other companies, the
-    identifiers of theirs that match one of this company's, and the rows of the ones that
-    matched. The comparing is done here, because a name with its legal form set aside is
-    not something a database can be asked for.
+    Four reads at most: the names and websites of the person's other companies, their
+    acronyms (#1245), the identifiers of theirs that match one of this company's, and the
+    rows of the ones that matched. The comparing is done here, because a name with its legal
+    form set aside is not something a database can be asked for.
     """
     if company.pk is None:
         return []
@@ -260,7 +260,7 @@ def for_company(company, person=None) -> list[Candidate]:
     reasons: dict[int, list[str]] = {}
 
     pool = _companies_of(company, person)
-    others = pool.exclude(pk=company.pk).values_list("pk", "name", "website")
+    others = list(pool.exclude(pk=company.pk).values_list("pk", "name", "website"))
     for pk, other_name, other_website in others:
         if name and bare_name(other_name) == name:
             reasons.setdefault(pk, []).append(_("The same name, once the legal form is set aside"))
@@ -268,6 +268,20 @@ def for_company(company, person=None) -> list[Candidate]:
             reasons.setdefault(pk, []).append(
                 _("The same website: %(domain)s") % {"domain": domain}
             )
+
+    # An acronym is a name too (#1245): CNRS and its full name are one company, so a name
+    # that is another's acronym, or an acronym that is another's name, is the same company.
+    my_acronyms = {bare_name(row.name) for row in company.acronyms()} - {""}
+    their_acronyms = defaultdict(set)
+    for pk, acronym in CompanyName.objects.filter(
+        company__in=pool.exclude(pk=company.pk).values("pk"), kind=CompanyName.Kind.ACRONYM
+    ).values_list("company_id", "name"):
+        their_acronyms[pk].add(bare_name(acronym))
+    for pk, other_name, _website in others:
+        if (name and name in their_acronyms[pk]) or my_acronyms & (
+            their_acronyms[pk] | {bare_name(other_name)}
+        ):
+            reasons.setdefault(pk, []).append(_("The same acronym or short name"))
 
     mine = {
         _identifier_key(row.scheme, row.value, row.label): row for row in company.identifiers.all()

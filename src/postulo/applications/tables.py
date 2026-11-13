@@ -169,7 +169,7 @@ class ApplicationsTable(Table):
             case "role":
                 return posting.title
             case "company":
-                return posting.company.name
+                return posting.company.display_name
             case "location":
                 return posting.location
             case "status":

@@ -261,6 +261,52 @@
     </section>
   {% endif %}
   {% if object %}
+    {% comment %} Its acronyms and short names (#1245), and which name the lists show. Forms
+       of their own, after the main one, as the names above: each saves nothing else and
+       returns here. The full name is the one typed above; the lists show it unless one of
+       these is chosen, and whichever is not shown is still found by the search. {% endcomment %}
+    <section class="card mt-6 max-w-2xl text-sm" id="section-acronyms" data-company-acronyms>
+      <c-section-title>{% translate "Acronyms and short names" %}</c-section-title>
+      {% if company_acronyms %}
+        <ul class="mb-3 divide-y divide-ink-100 dark:divide-ink-800">
+          {% for row in company_acronyms %}
+            <li class="flex flex-wrap items-center gap-x-3 py-1.5">
+              <bdi class="min-w-0 flex-1">{{ row.name }}</bdi>
+              <form method="post" action="{% url 'jobs:company_names' object.pk %}">
+                {% csrf_token %}
+                <input type="hidden" name="next" value="{% url 'jobs:company_update' object.pk %}">
+                <button type="submit" name="remove" value="{{ row.pk }}" class="btn" data-variant="ghost" data-size="sm">{% translate "Remove" %}<span class="sr-only">: <bdi>{{ row.name }}</bdi></span></button>
+              </form>
+            </li>
+          {% endfor %}
+        </ul>
+        <form method="post" action="{% url 'jobs:company_names' object.pk %}" class="mb-3 flex flex-wrap items-end gap-3">
+          {% csrf_token %}
+          <input type="hidden" name="next" value="{% url 'jobs:company_update' object.pk %}">
+          <div class="field min-w-0 flex-1">
+            <label for="name-shown">{% translate "Lists show" %}</label>
+            <select class="select" id="name-shown" name="shown">
+              <option value=""{% if not object.list_name %} selected{% endif %}>{{ object.name }}</option>
+              {% for row in company_acronyms %}<option value="{{ row.name }}"{% if object.list_name == row.name %} selected{% endif %}>{{ row.name }}</option>{% endfor %}
+            </select>
+          </div>
+          <button type="submit" class="btn" data-variant="outline">{% translate "Save" %}</button>
+        </form>
+      {% else %}
+        <p class="mb-3 text-ink-500 dark:text-ink-400">{% translate "None yet. Add one, such as CNRS for a long name, to choose which the lists show." %}</p>
+      {% endif %}
+      <form method="post" action="{% url 'jobs:company_names' object.pk %}" class="flex flex-wrap items-end gap-3">
+        {% csrf_token %}
+        <input type="hidden" name="next" value="{% url 'jobs:company_update' object.pk %}">
+        <div class="field min-w-0 flex-1">
+          <label for="name-acronym">{% translate "Acronym or short name" %}</label>
+          <input class="input" id="name-acronym" name="acronym" maxlength="200" required>
+        </div>
+        <button type="submit" class="btn" data-variant="outline">{% translate "Add" %}</button>
+      </form>
+    </section>
+  {% endif %}
+  {% if object %}
     {% comment %} Its hiring (#941): dated entries, each with who noted it. Forms of their own,
        outside the one above, since changing an entry should not save the rest of the page. {% endcomment %}
     <section class="card mt-6 max-w-2xl" id="section-hiring" data-hiring-signals>

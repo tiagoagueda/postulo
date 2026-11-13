@@ -595,7 +595,17 @@ def merge_companies(kept, other) -> Plan:
         kept.acquired_by = None
 
     # Its names in other languages (#673): the kept company's own wins a language it has.
-    other.names.exclude(language__in=kept.names.values("language")).update(company=kept)
+    other.names.filter(kind=CompanyName.Kind.NAME).exclude(
+        language__in=kept.names.filter(kind=CompanyName.Kind.NAME).values("language")
+    ).update(company=kept)
+    # And its acronyms (#1245), the ones the kept company does not hold already, in either
+    # spelling of the case; the others go with it in the delete below.
+    held = {row.name.casefold() for row in kept.acronyms()} | {kept.name.casefold()}
+    for row in other.acronyms():
+        if row.name.casefold() not in held:
+            row.company = kept
+            row.save()
+            held.add(row.name.casefold())
     # What it answers on and where it is (#329), as a contact's are moved; one the kept
     # company already lists is not listed twice.
     for rows in (list(other.phone_numbers.all()), list(other.postal_addresses.all())):
