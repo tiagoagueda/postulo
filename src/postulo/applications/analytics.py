@@ -607,7 +607,7 @@ def build(user) -> Insights:
             count(by_sector.setdefault("\x00", SourceRow(name=name)), application)
             continue
         for section in {industry.section for industry in held}:
-            label = industries.section_name(section) if section else str(_("No sector"))
+            label = industries.short_section_name(section) if section else str(_("No sector"))
             count(by_sector.setdefault(section, SourceRow(name=label, code=section)), application)
         for industry in held:
             count(by_industry.setdefault(industry.name, SourceRow(name=industry.name)), application)

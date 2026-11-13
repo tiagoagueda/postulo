@@ -1818,13 +1818,12 @@ class IndustryListView(OwnedObjectMixin, ListView):
         found = super().get_queryset().annotate(company_count=Count("companies", distinct=True))
         wanted = self.request.GET.get("q", "").strip()
         if wanted:
-            named = [
-                letter
-                for letter, name in industries.sections()
-                if wanted.casefold() in name.casefold()
-            ]
+            named, codes = industries.matching(wanted)
             found = found.filter(
-                Q(name__icontains=wanted) | Q(code__startswith=wanted) | Q(section__in=named)
+                Q(name__icontains=wanted)
+                | Q(code__startswith=wanted)
+                | Q(code__in=codes)
+                | Q(section__in=named)
             )
         return found
 
@@ -1845,7 +1844,8 @@ def industries_by_sector(rows) -> list[dict]:
     return [
         {
             "section": letter,
-            "name": industries.section_name(letter) if letter else _("No sector"),
+            "name": industries.short_section_name(letter) if letter else _("No sector"),
+            "full_name": industries.section_name(letter) if letter else "",
             "industries": grouped[letter],
         }
         for letter in [*order, ""]

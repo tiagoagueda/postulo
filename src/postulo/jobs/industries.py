@@ -208,6 +208,130 @@ def section_of(code: str) -> str:
     return entry["section"] if entry else ""
 
 
+#: The short label of each section and each division (#1248): one word where there is one,
+#: two at the most and never more than 20 characters in English, for a table cell, a badge or
+#: a phone-width card, where the full name takes the space of a sentence. Eurostat's names
+#: are reference data in 24 languages; these are Postulo's own words, so they are gettext
+#: strings and go through Weblate in every selected language, and where a language has none
+#: the English one stands. The full name stays as the tooltip and on the page where the
+#: person picks one. A test holds every label to the length rule and every list free of two
+#: equal labels, so a clash is settled here with the two-word form, not at the screen.
+SECTION_SHORT: dict[str, str] = {
+    "A": _("Agriculture"),
+    "B": _("Mining"),
+    "C": _("Manufacturing"),
+    "D": _("Energy"),
+    "E": _("Environment"),
+    "F": _("Construction"),
+    "G": _("Trade"),
+    "H": _("Transport"),
+    "I": _("Hospitality"),
+    "J": _("Media"),
+    "K": _("Technology"),
+    "L": _("Finance"),
+    "M": _("Real estate"),
+    "N": _("Professional"),
+    "O": _("Business support"),
+    "P": _("Public sector"),
+    "Q": _("Education"),
+    "R": _("Health"),
+    "S": _("Arts"),
+    "T": _("Other services"),
+    "U": _("Households"),
+    "V": _("International"),
+}
+
+DIVISION_SHORT: dict[str, str] = {
+    "01": _("Farming"),
+    "02": _("Forestry"),
+    "03": _("Fishing"),
+    "05": _("Coal mining"),
+    "06": _("Petroleum"),
+    "07": _("Metal mining"),
+    "08": _("Quarrying"),
+    "09": _("Mining support"),
+    "10": _("Food products"),
+    "11": _("Beverages"),
+    "12": _("Tobacco"),
+    "13": _("Textiles"),
+    "14": _("Clothing"),
+    "15": _("Leather"),
+    "16": _("Wood products"),
+    "17": _("Paper"),
+    "18": _("Printing"),
+    "19": _("Refining"),
+    "20": _("Chemicals"),
+    "21": _("Pharmaceuticals"),
+    "22": _("Plastics"),
+    "23": _("Mineral products"),
+    "24": _("Metals"),
+    "25": _("Metal products"),
+    "26": _("Electronics"),
+    "27": _("Electrical equipment"),
+    "28": _("Machinery"),
+    "29": _("Automotive"),
+    "30": _("Transport equipment"),
+    "31": _("Furniture"),
+    "32": _("Other manufacturing"),
+    "33": _("Machinery repair"),
+    "35": _("Energy"),
+    "36": _("Water supply"),
+    "37": _("Sewerage"),
+    "38": _("Waste"),
+    "39": _("Remediation"),
+    "41": _("Buildings"),
+    "42": _("Civil engineering"),
+    "43": _("Building trades"),
+    "46": _("Wholesale"),
+    "47": _("Retail"),
+    "49": _("Land transport"),
+    "50": _("Shipping"),
+    "51": _("Aviation"),
+    "52": _("Warehousing"),
+    "53": _("Postal services"),
+    "55": _("Accommodation"),
+    "56": _("Catering"),
+    "58": _("Publishing"),
+    "59": _("Audiovisual"),
+    "60": _("Broadcasting"),
+    "61": _("Telecoms"),
+    "62": _("Software"),
+    "63": _("Data services"),
+    "64": _("Banking"),
+    "65": _("Insurance"),
+    "66": _("Financial support"),
+    "68": _("Real estate"),
+    "69": _("Legal services"),
+    "70": _("Consulting"),
+    "71": _("Engineering"),
+    "72": _("Research"),
+    "73": _("Advertising"),
+    "74": _("Other professional"),
+    "75": _("Veterinary"),
+    "77": _("Leasing"),
+    "78": _("Staffing"),
+    "79": _("Travel"),
+    "80": _("Security"),
+    "81": _("Facility services"),
+    "82": _("Business support"),
+    "84": _("Public sector"),
+    "85": _("Education"),
+    "86": _("Healthcare"),
+    "87": _("Residential care"),
+    "88": _("Social work"),
+    "90": _("Arts"),
+    "91": _("Culture"),
+    "92": _("Gambling"),
+    "93": _("Leisure"),
+    "94": _("Associations"),
+    "95": _("Repair services"),
+    "96": _("Personal services"),
+    "97": _("Domestic staff"),
+    "98": _("Home production"),
+    "99": _("International bodies"),
+}
+
+
 #: The words of the German section names that stay lower case in a sentence: German
 #: capitalises every noun, so lower-casing the whole name would be wrong, and the 22 names
 #: are fixed, so the small words are listed (#897).
@@ -255,6 +379,57 @@ def section_name(letter: str, language: str = "") -> str:
     if names.get(reading):
         return _sentence_case(names[reading], reading)
     return _sentence_case(names.get(FALLBACK, ""), FALLBACK)
+
+
+def short_section_name(letter: str) -> str:
+    """A section's short label, or its full name where it has none, or empty (#1248)."""
+    label = SECTION_SHORT.get(letter or "")
+    return str(label) if label else section_name(letter)
+
+
+def short_division_name(code: str, language: str = "") -> str:
+    """A division's short label, or its full name where it has none, or empty (#1248)."""
+    label = DIVISION_SHORT.get(code or "")
+    return str(label) if label else name_for(code, language)
+
+
+def matching(query: str) -> tuple[list[str], list[str]]:
+    """``(section letters, division codes)`` a typed word names, by short label or full name.
+
+    In the reader's language and in English, so that *software* and *programming* find the
+    same companies, and a person's own words stay matched by `Industry.name` as before
+    (#1248).
+    """
+    wanted = (query or "").strip().casefold()
+    if not wanted:
+        return [], []
+    letters = [
+        letter
+        for letter in classification()["sections"]
+        if any(
+            wanted in text.casefold()
+            for text in (
+                short_section_name(letter),
+                section_name(letter),
+                section_name(letter, FALLBACK),
+                _english(SECTION_SHORT[letter]),
+            )
+        )
+    ]
+    codes = [
+        code
+        for code in classification()["divisions"]
+        if any(
+            wanted in text.casefold()
+            for text in (
+                short_division_name(code),
+                name_for(code),
+                name_for(code, FALLBACK),
+                _english(DIVISION_SHORT[code]),
+            )
+        )
+    ]
+    return letters, codes
 
 
 def is_section(letter: str) -> bool:

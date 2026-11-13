@@ -570,7 +570,7 @@ def sector_tallies(by_sector, by_industry, unrecorded) -> list[Tally]:
 
     lines = []
     for section, count in ordered({k: v for k, v in by_sector.items() if k != UNRECORDED}):
-        name = industries.section_name(section) if section else str(_("No sector"))
+        name = industries.short_section_name(section) if section else str(_("No sector"))
         children = [Tally(n, c) for n, c in ordered(by_industry.get(section, {}))]
         lines.append(Tally(name, count, code=section, children=children))
     if UNRECORDED in by_sector:

@@ -8,5 +8,7 @@
    a word somebody made up draws plain. The name is always there: the icon is `aria-hidden`
    and the tone says nothing a screen reader needs, so neither is the only cue.
 {% endcomment %}
-{% comment %} The title names the sector above it as well, where it has one (#897). {% endcomment %}
-{% with look=industry.look sector=industry.sector_name %}<span class="badge" data-tone="{{ look.1 }}"{% if sector or industry.code %} title="{% if sector %}{{ sector }}{% endif %}{% if sector and industry.code %} · {% endif %}{% if industry.code %}NACE {{ industry.code }}{% endif %}"{% endif %}>{% icon look.0 class="size-3" %}<bdi>{{ industry.name }}</bdi></span>{% endwith %}
+{% comment %} The label is the short one where the name is a seeded NACE one (#1248). The title gives
+   the full name, the sector above it (#897) and the division; the accessible description
+   carries the full name, so the classification is never hidden. {% endcomment %}
+{% with look=industry.look short=industry.short_name title=industry.badge_title %}<span class="badge" data-tone="{{ look.1 }}"{% if short != industry.name %} aria-description="{{ industry.name }}"{% endif %}{% if title %} title="{{ title }}"{% endif %}>{% icon look.0 class="size-3" %}<bdi>{{ short }}</bdi></span>{% endwith %}

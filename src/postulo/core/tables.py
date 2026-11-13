@@ -29,6 +29,7 @@ from __future__ import annotations
 
 import datetime as dt
 import re
+from collections.abc import Callable
 from dataclasses import dataclass, field
 from decimal import Decimal, InvalidOperation
 from functools import cached_property
@@ -81,6 +82,10 @@ class Column:
     datetime: bool = False
     #: Lookups the filter applies. Text matches any of them; choice and date use the first.
     lookups: tuple[str, ...] = ()
+    #: For a ``text`` filter that must match more than the column's own fields (a short label
+    #: that is not stored, say): a function from what was typed to a ``Q``, used instead of
+    #: ``lookups`` (#1248).
+    matcher: Callable[[str], Q] | None = None
     #: The choices a ``choice`` filter offers, as (value, label) pairs.
     choices: tuple = ()
     #: The query parameter, when it should differ from the key.
@@ -744,6 +749,8 @@ class Table:
                     condition = Q()
                     for lookup in column.lookups:
                         condition |= Q(**{f"{lookup}__icontains": value})
+                    if column.matcher is not None:
+                        condition |= column.matcher(value)
                     queryset = queryset.filter(condition)
             elif column.filter == "choice":
                 value = self.given(column.name)

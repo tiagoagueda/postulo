@@ -41,7 +41,7 @@
       {% for sector in sectors %}
       <section class="mb-4" aria-labelledby="sector-{{ sector.section|default:'none' }}" data-sector="{{ sector.section }}">
         <h2 class="mb-2 text-sm font-medium text-ink-600 dark:text-ink-300" id="sector-{{ sector.section|default:'none' }}">
-          {% if sector.section %}<span class="tabular-nums text-ink-400" title="{% translate 'NACE section' %}"><span class="sr-only">{% translate 'NACE section' %} </span>{{ sector.section }}</span> {% endif %}{{ sector.name }}
+          {% if sector.section %}<span class="tabular-nums text-ink-400" title="{% translate 'NACE section' %}"><span class="sr-only">{% translate 'NACE section' %} </span>{{ sector.section }}</span> {% endif %}<span{% if sector.full_name and sector.full_name != sector.name %} title="{{ sector.full_name }}"{% endif %}>{{ sector.name }}</span>
         </h2>
       <div class="card p-0">
         <ul class="divide-y divide-ink-100 dark:divide-ink-800">
@@ -49,7 +49,7 @@
             <li class="flex flex-wrap items-center gap-3 px-4 py-3">
               <a href="{% url 'jobs:company_list' %}?industry={{ industry.name|urlencode }}"
                  class="min-w-0 flex-1 hover:underline">
-                <bdi>{{ industry.name }}</bdi>
+                <bdi{% if industry.short_name != industry.name %} title="{{ industry.name }}"{% endif %}>{{ industry.short_name }}</bdi>
                 {% if industry.code %}
                   {% comment %} What the standard bought beyond coverage: a code an
                      employment office recognises, beside the person's own word for it. {% endcomment %}

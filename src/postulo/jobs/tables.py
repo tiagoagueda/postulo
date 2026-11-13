@@ -1,5 +1,6 @@
 """The tables this app draws: companies, and the listings waiting to be decided."""
 
+from django.db.models import Q
 from django.utils.translation import gettext_lazy as _
 from django.utils.translation import ngettext_lazy
 
@@ -34,7 +35,16 @@ class SectorChoices:
     imported in (#897)."""
 
     def __iter__(self):
-        return iter(industries.sections())
+        return iter(
+            (letter, industries.short_section_name(letter)) for letter, _ in industries.sections()
+        )
+
+
+def industry_match(query: str) -> Q:
+    """Companies whose industries are named by ``query`` in a short label or a full name,
+    beyond a person's own words, which ``industries__name`` already matches (#1248)."""
+    letters, codes = industries.matching(query)
+    return Q(industries__code__in=codes) | Q(industries__section__in=letters)
 
 
 @register
@@ -123,6 +133,9 @@ class CompaniesTable(Table):
             _("Industries"),
             filter="text",
             lookups=("industries__name",),
+            # And by the short label and the full name of a division, so "software" and
+            # "programming" find the same companies (#1248).
+            matcher=industry_match,
             default=True,
         ),
         # The counts narrow by a least and a most: "companies I have applied to more than

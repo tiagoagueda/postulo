@@ -59,8 +59,8 @@
         {% with held=company.sector_looks %}
           {% if held %}
             <span class="flex flex-wrap items-center gap-1">
-              {% for letter, name, icon_name, tone in held %}
-                <span class="badge" data-tone="{{ tone }}" title="{% translate 'NACE section' %} {{ letter }}">{% icon icon_name class="size-3" %}{{ name }}</span>
+              {% for letter, name, icon_name, tone, full in held %}
+                <span class="badge" data-tone="{{ tone }}" title="{{ full }} · {% translate 'NACE section' %} {{ letter }}"{% if name != full %} aria-description="{{ full }}"{% endif %}>{% icon icon_name class="size-3" %}{{ name }}</span>
               {% endfor %}
             </span>
           {% else %}—{% endif %}

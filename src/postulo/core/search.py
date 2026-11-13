@@ -230,9 +230,14 @@ def company_match(query: str) -> Q:
     from django.contrib.contenttypes.models import ContentType
 
     from postulo.core.models import PostalAddress
+    from postulo.jobs import industries
     from postulo.jobs.models import Company, CompanyIdentifier, CompanyName, Industry
 
-    industry = Industry.objects.filter(companies=OuterRef("pk"), name__icontains=query)
+    letters, codes = industries.matching(query)
+    # By a person's own word, and by a seeded name's short label or full name (#1248).
+    industry = Industry.objects.filter(companies=OuterRef("pk")).filter(
+        Q(name__icontains=query) | Q(code__in=codes) | Q(section__in=letters)
+    )
     identifier = CompanyIdentifier.objects.filter(company=OuterRef("pk"), value__icontains=query)
     # And by any of its names in other languages (#673).
     named = CompanyName.objects.filter(company=OuterRef("pk"), name__icontains=query)

@@ -262,6 +262,29 @@ class Industry(OwnedModel):
         return industries.section_name(self.section)
 
     @property
+    def short_name(self) -> str:
+        """The one- or two-word label to draw: its division's where the name is a seeded
+        NACE name (it has a code), and the person's own word as typed otherwise, a seeded
+        name they renamed included, since renaming it takes the code away (#1248)."""
+        return (industries.short_division_name(self.code) if self.code else "") or self.name
+
+    @property
+    def badge_title(self) -> str:
+        """What the badge says on hover: the full name where the label is a short one, the
+        sector above it, and the NACE division (#1248, #897)."""
+        parts = [
+            self.name if self.short_name != self.name else "",
+            self.sector_name,
+            f"NACE {self.code}" if self.code else "",
+        ]
+        return " · ".join(part for part in parts if part)
+
+    @property
+    def sector_short_name(self) -> str:
+        """Its sector's short label, or empty where it has none (#1248)."""
+        return industries.short_section_name(self.section)
+
+    @property
     def sector_by_hand(self) -> bool:
         """Whether its sector was chosen rather than read off the name: the only case an
         archive carries it, since a division's or a short name's is derivable (#897)."""
@@ -977,10 +1000,16 @@ class Company(OwnNote, PrincipalOwnedModel):
         return [industries.section_name(letter) for letter in self.sectors]
 
     @property
-    def sector_looks(self) -> list[tuple[str, str, str, str]]:
-        """``(letter, name, icon, tone)`` for each of its sectors, as a badge draws one."""
+    def sector_looks(self) -> list[tuple[str, str, str, str, str]]:
+        """``(letter, short label, icon, tone, full name)`` for each of its sectors, as a
+        badge draws one: the short label in the cell, the full name as its tooltip (#1248)."""
         return [
-            (letter, industries.section_name(letter), *industries.LOOKS[letter])
+            (
+                letter,
+                industries.short_section_name(letter),
+                *industries.LOOKS[letter],
+                industries.section_name(letter),
+            )
             for letter in self.sectors
             if letter in industries.LOOKS
         ]
