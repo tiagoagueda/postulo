@@ -54,7 +54,7 @@ def lookups_for(company, person) -> list[dict]:
         if row.scheme not in register_lookup.SCHEMES:
             continue
         adapter = register_lookup.adapter_for(row.scheme, row.value)
-        if adapter is not None:
+        if adapter is not None and register_lookup.available(adapter):
             found.append({"scheme": row.scheme, "value": row.value, "label": str(adapter.label)})
     return found
 
@@ -209,7 +209,7 @@ class CompanyRegisterView(LoginRequiredMixin, View):
             None,
         )
         adapter = register_lookup.adapter_for(scheme, row.value) if row is not None else None
-        if adapter is None:
+        if adapter is None or not register_lookup.available(adapter):
             messages.error(request, _("No register this instance asks answers for that number."))
             return redirect(self._back(request, company))
         try:

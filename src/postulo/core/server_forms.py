@@ -171,6 +171,70 @@ class CaptureForm(PinnedPolicyForm):
             self.initial[field] = effective[field]()
 
 
+class RegisterKeysForm(PinnedPolicyForm):
+    """One key per company register that answers only to one (#1065).
+
+    A key is never drawn back: the field is empty, and says whether one is saved. Typing one
+    replaces it; ticking *Remove* deletes it; leaving both alone keeps it.
+    """
+
+    class Meta:
+        model = SiteSettings
+        fields = ()
+
+    def __init__(self, *args, **kwargs):
+        from postulo.jobs import register_lookup
+
+        super().__init__(*args, **kwargs)
+        try:
+            self.held = dict(self.instance.register_keys)
+        except Exception:
+            self.held = {}
+        self.keyed = [a for a in register_lookup.adapters().values() if a.needs_key]
+        for adapter in self.keyed:
+            self.fields[f"key__{adapter.key}"] = forms.CharField(
+                label=adapter.key_label or adapter.label,
+                required=False,
+                max_length=200,
+                strip=True,
+                widget=forms.PasswordInput(render_value=False, attrs={"autocomplete": "off"}),
+                help_text=_("Saved. Type a new one to replace it.")
+                if self.held.get(adapter.key)
+                else _("None saved: no look-up is offered for this register."),
+            )
+            self.fields[f"remove__{adapter.key}"] = forms.BooleanField(
+                label=_("Remove the saved key"),
+                required=False,
+                help_text=_("Delete the key; no look-up is offered for this register after."),
+            )
+
+    def entries(self):
+        """Each keyed register with its key field, its remove box and whether a key is saved."""
+        return [
+            {
+                "adapter": adapter,
+                "key": self[f"key__{adapter.key}"],
+                "remove": self[f"remove__{adapter.key}"],
+                "saved": bool(self.held.get(adapter.key)),
+            }
+            for adapter in self.keyed
+        ]
+
+    def save(self, commit=True):
+        row = super().save(commit=False)
+        keys = dict(self.held)
+        for adapter in self.keyed:
+            typed = self.cleaned_data.get(f"key__{adapter.key}") or ""
+            if self.cleaned_data.get(f"remove__{adapter.key}"):
+                keys.pop(adapter.key, None)
+            elif typed:
+                keys[adapter.key] = typed
+        row.register_keys = keys
+        if commit:
+            row.save()
+        return row
+
+
 class MapsForm(PinnedPolicyForm):
     """Where the companies' map takes its tiles (#898), and whether streets are looked up (#913).
 

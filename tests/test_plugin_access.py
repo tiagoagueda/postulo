@@ -217,6 +217,7 @@ def test_groups_are_made_filled_renamed_and_deleted(client, admin_user, user):
 
 SETTINGS_PAGES = [
     ("maps", "server:maps"),
+    ("register-lookup", "server:register_lookup"),
     ("gdpr", "server:data_protection"),
     ("email", "server:email"),
     ("identifiers", "server:identifier_schemes"),

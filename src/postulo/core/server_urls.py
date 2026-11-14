@@ -78,5 +78,6 @@ urlpatterns = [
     path("design/", views.DesignView.as_view(), name="design"),
     path("capture/", views.CaptureView.as_view(), name="capture"),
     path("maps/", views.MapsView.as_view(), name="maps"),
+    path("register-lookup/", views.RegisterLookupView.as_view(), name="register_lookup"),
     path("defaults/", views.DefaultsView.as_view(), name="defaults"),
 ]

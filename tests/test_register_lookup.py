@@ -560,6 +560,7 @@ def test_every_shipped_adapter_asks_over_https_on_its_own_hosts():
         "FI": "0112038-9",
         "CZ": "00177041",
         "PL": "0000019193",
+        "GB": "00445790",
         "": LEI,
     }
     for adapter in adapters.ADAPTERS:

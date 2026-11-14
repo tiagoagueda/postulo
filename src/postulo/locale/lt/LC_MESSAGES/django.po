@@ -1359,6 +1359,11 @@ msgstr "Registras %(register)s paprašė siųsti mažiau užklausų. Bandykite d
 msgid "%(register)s could not be reached."
 msgstr "Nepavyko pasiekti registro %(register)s."
 
+#: src/postulo/jobs/register_lookup.py
+#, python-format
+msgid "%(register)s did not accept the key saved for it."
+msgstr ""
+
 #: src/postulo/templates/jobs/company_register.html
 #, python-format
 msgid "%(register)s has an entry for this number."
@@ -1368,6 +1373,11 @@ msgstr "Registre %(register)s yra šio numerio įrašas."
 #, python-format
 msgid "%(register)s has removed this entry."
 msgstr "Registras %(register)s pašalino šį įrašą."
+
+#: src/postulo/jobs/register_lookup.py
+#, python-format
+msgid "%(register)s needs a key, and this instance has none saved for it."
+msgstr ""
 
 #: src/postulo/jobs/register_lookup.py
 #, python-format
@@ -2311,6 +2321,10 @@ msgstr "JPEG vaizdas"
 #: src/postulo/resume/publications.py
 msgid "A key holds letters, digits and the characters - _ : . + / and nothing else."
 msgstr "Rakte gali būti tik raidės, skaitmenys ir simboliai - _ : . + /."
+
+#: src/postulo/templates/server/register_lookup.html
+msgid "A key is stored encrypted on this instance and is never shown again: type a new one to replace it, or tick Remove. It is sent to its own register with each look-up and to nobody else. A register with no key saved is not offered, and no Look up button is drawn for its country."
+msgstr ""
 
 #: src/postulo/templates/server/design.html
 msgid "A key to press: <kbd class=\"kbd\">/</kbd> opens the search from anywhere."
@@ -6451,6 +6465,10 @@ msgstr "Ištrinti paskyrą"
 #: src/postulo/templates/server/backup_delete.html
 msgid "Delete the backup"
 msgstr "Ištrinti atsarginę kopiją"
+
+#: src/postulo/core/server_forms.py
+msgid "Delete the key; no look-up is offered for this register after."
+msgstr ""
 
 #: src/postulo/jobs/views.py
 msgid "Delete the letters they wrote as well"
@@ -11725,6 +11743,10 @@ msgstr "Nė vienam įdiegtam papildiniui ryšio nereikia."
 msgid "No installed plugin needs a connection. Notifiers, document stores and synchronisation plugins appear here once the operator installs one."
 msgstr "Nė vienam įdiegtam papildiniui ryšio nereikia. Pranešikliai, dokumentų saugyklos ir sinchronizavimo papildiniai atsiras čia, kai operatorius juos įdiegs."
 
+#: src/postulo/templates/server/register_lookup.html
+msgid "No installed register needs a key."
+msgstr ""
+
 #: src/postulo/templates/widgets/upcoming_interviews.html
 msgid "No interviews in the diary."
 msgstr "Darbotvarkėje pokalbių nėra."
@@ -12060,6 +12082,10 @@ msgstr "Neatitinka nė vienas jūsų įrašas."
 #: src/postulo/templates/applications/partials/reminders.html
 msgid "None outstanding."
 msgstr "Neatliktų nėra."
+
+#: src/postulo/core/server_forms.py
+msgid "None saved: no look-up is offered for this register."
+msgstr ""
 
 #: src/postulo/templates/server/overview.html
 msgid "none usable"
@@ -15343,6 +15369,15 @@ msgstr "Atmesta: %(fields)s. Kas negerai su kiekvienu, žr. %(member)s."
 msgid "region"
 msgstr "regionas"
 
+#: src/postulo/core/models.py
+msgid "register keys"
+msgstr ""
+
+#: src/postulo/core/server_views.py
+#: src/postulo/templates/server/register_lookup.html
+msgid "Register lookup"
+msgstr ""
+
 #: src/postulo/templates/jobs/company_register.html
 msgid "Register number"
 msgstr "Registro numeris"
@@ -15499,6 +15534,10 @@ msgstr "Pašalinti logotipą"
 #: src/postulo/documents/forms.py
 msgid "Remove the photo's metadata (location, time, camera)"
 msgstr "Pašalinti nuotraukos metaduomenis (vietą, laiką, fotoaparatą)"
+
+#: src/postulo/core/server_forms.py
+msgid "Remove the saved key"
+msgstr ""
 
 #: src/postulo/accounts/forms.py
 msgid "Remove the uploaded picture"
@@ -15835,6 +15874,7 @@ msgstr "Šeštadienis"
 #: src/postulo/templates/server/person_username.html
 #: src/postulo/templates/server/plugin_access.html
 #: src/postulo/templates/server/plugins.html
+#: src/postulo/templates/server/register_lookup.html
 #: src/postulo/templates/server/signin.html
 #: src/postulo/templates/settings/accessibility.html
 #: src/postulo/templates/settings/appearance.html
@@ -15907,6 +15947,10 @@ msgstr "Išsaugota."
 
 #: src/postulo/applications/views.py
 msgid "Saved. The report is made as you chose."
+msgstr ""
+
+#: src/postulo/core/server_forms.py
+msgid "Saved. Type a new one to replace it."
 msgstr ""
 
 #: src/postulo/templates/settings/accessibility.html
@@ -19144,6 +19188,10 @@ msgstr "„%(name)s“ raktas buvo pakeistas. Tas raktas yra vienintelis dalykas
 msgid "The key the connection secrets are under is not in the archive. Restore with the same <code>.env</code> the archive was written under, or those secrets cannot be read."
 msgstr "Rakto, kuriuo užšifruotos ryšių paslaptys, archyve nėra. Atkurkite su tuo pačiu <code>.env</code> failu, su kuriuo archyvas buvo įrašytas, antraip tų paslapčių nebus galima perskaityti."
 
+#: src/postulo/templates/server/register_lookup.html
+msgid "The keys of the company registers that answer only to one."
+msgstr ""
+
 #: src/postulo/accounts/forms.py
 msgid "The keywords every file carries"
 msgstr "Raktažodžiai, įrašomi į kiekvieną failą"
@@ -22264,6 +22312,10 @@ msgstr "Šio įrašo vieta jo skiltyje nustatoma rodyklėmis skiltyje <a href=\"
 #: src/postulo/templates/help/telephone_numbers.html
 msgid "Where this instance can send a code to a telephone, a number you have confirmed can also be the one that gets you back into your account. That choice is separate from the primary, so changing what a recruiter dials never changes how you prove it is you. The bin will not remove that number while it is your way in. Changing its digits makes it another number, which has to be confirmed again and is no longer your way in."
 msgstr "Jei šis egzempliorius gali siųsti kodą į telefoną, patvirtintas numeris taip pat gali būti tas, kuriuo atgaunate prieigą prie paskyros. Šis pasirinkimas nepriklauso nuo pagrindinio numerio, todėl pakeitus numerį, kuriuo skambina atrankos specialistas, niekada nepasikeičia tai, kaip įrodote savo tapatybę. Šiukšlinė nepašalins šio numerio, kol jis yra jūsų būdas patekti į paskyrą. Pakeitus jo skaitmenis, jis tampa kitu numeriu, kurį reikia patvirtinti iš naujo ir kuris nebėra jūsų būdas patekti į paskyrą."
+
+#: src/postulo/templates/server/register_lookup.html
+msgid "Where to get a key"
+msgstr ""
 
 #: src/postulo/jobs/models.py
 msgid "Where you came across it: a job board, a referral, the company site."

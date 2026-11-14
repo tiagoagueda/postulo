@@ -1275,6 +1275,11 @@ msgstr "%(register)s bad om færre forespørgsler. Prøv igen senere."
 msgid "%(register)s could not be reached."
 msgstr "%(register)s kunne ikke nås."
 
+#: src/postulo/jobs/register_lookup.py
+#, python-format
+msgid "%(register)s did not accept the key saved for it."
+msgstr ""
+
 #: src/postulo/templates/jobs/company_register.html
 #, python-format
 msgid "%(register)s has an entry for this number."
@@ -1284,6 +1289,11 @@ msgstr "%(register)s har en post for dette nummer."
 #, python-format
 msgid "%(register)s has removed this entry."
 msgstr "%(register)s har fjernet denne post."
+
+#: src/postulo/jobs/register_lookup.py
+#, python-format
+msgid "%(register)s needs a key, and this instance has none saved for it."
+msgstr ""
 
 #: src/postulo/jobs/register_lookup.py
 #, python-format
@@ -2210,6 +2220,10 @@ msgstr "et JPEG-billede"
 #: src/postulo/resume/publications.py
 msgid "A key holds letters, digits and the characters - _ : . + / and nothing else."
 msgstr "En nøgle indeholder bogstaver, cifre og tegnene - _ : . + / og intet andet."
+
+#: src/postulo/templates/server/register_lookup.html
+msgid "A key is stored encrypted on this instance and is never shown again: type a new one to replace it, or tick Remove. It is sent to its own register with each look-up and to nobody else. A register with no key saved is not offered, and no Look up button is drawn for its country."
+msgstr ""
 
 #: src/postulo/templates/server/design.html
 msgid "A key to press: <kbd class=\"kbd\">/</kbd> opens the search from anywhere."
@@ -6356,6 +6370,10 @@ msgstr "Slet kontoen"
 #: src/postulo/templates/server/backup_delete.html
 msgid "Delete the backup"
 msgstr "Slet sikkerhedskopien"
+
+#: src/postulo/core/server_forms.py
+msgid "Delete the key; no look-up is offered for this register after."
+msgstr ""
 
 #: src/postulo/jobs/views.py
 msgid "Delete the letters they wrote as well"
@@ -11650,6 +11668,10 @@ msgstr "Intet installeret plugin har brug for en forbindelse."
 msgid "No installed plugin needs a connection. Notifiers, document stores and synchronisation plugins appear here once the operator installs one."
 msgstr "Intet installeret plugin har brug for en forbindelse. Notifikationstjenester, dokumentlagre og synkroniseringsplugins vises her, når den driftsansvarlige installerer et."
 
+#: src/postulo/templates/server/register_lookup.html
+msgid "No installed register needs a key."
+msgstr ""
+
 #: src/postulo/templates/widgets/upcoming_interviews.html
 msgid "No interviews in the diary."
 msgstr "Ingen samtaler i kalenderen."
@@ -11984,6 +12006,10 @@ msgstr "Ingen af dine poster matcher."
 #: src/postulo/templates/applications/partials/reminders.html
 msgid "None outstanding."
 msgstr "Intet udestående."
+
+#: src/postulo/core/server_forms.py
+msgid "None saved: no look-up is offered for this register."
+msgstr ""
 
 #: src/postulo/templates/server/overview.html
 msgid "none usable"
@@ -15249,6 +15275,15 @@ msgstr "Afvist: %(fields)s. Se %(member)s for, hvad der er galt med hver."
 msgid "region"
 msgstr "region"
 
+#: src/postulo/core/models.py
+msgid "register keys"
+msgstr ""
+
+#: src/postulo/core/server_views.py
+#: src/postulo/templates/server/register_lookup.html
+msgid "Register lookup"
+msgstr ""
+
 #: src/postulo/templates/jobs/company_register.html
 msgid "Register number"
 msgstr "Registreringsnummer"
@@ -15405,6 +15440,10 @@ msgstr "Fjern logoet"
 #: src/postulo/documents/forms.py
 msgid "Remove the photo's metadata (location, time, camera)"
 msgstr "Fjern fotoets metadata (sted, tidspunkt, kamera)"
+
+#: src/postulo/core/server_forms.py
+msgid "Remove the saved key"
+msgstr ""
 
 #: src/postulo/accounts/forms.py
 msgid "Remove the uploaded picture"
@@ -15744,6 +15783,7 @@ msgstr "Lørdag"
 #: src/postulo/templates/server/person_username.html
 #: src/postulo/templates/server/plugin_access.html
 #: src/postulo/templates/server/plugins.html
+#: src/postulo/templates/server/register_lookup.html
 #: src/postulo/templates/server/signin.html
 #: src/postulo/templates/settings/accessibility.html
 #: src/postulo/templates/settings/appearance.html
@@ -15816,6 +15856,10 @@ msgstr "Gemt."
 
 #: src/postulo/applications/views.py
 msgid "Saved. The report is made as you chose."
+msgstr ""
+
+#: src/postulo/core/server_forms.py
+msgid "Saved. Type a new one to replace it."
 msgstr ""
 
 #: src/postulo/templates/settings/accessibility.html
@@ -19060,6 +19104,10 @@ msgstr "Nøglen til »%(name)s« blev udskiftet. Den nøgle er det eneste, der s
 msgid "The key the connection secrets are under is not in the archive. Restore with the same <code>.env</code> the archive was written under, or those secrets cannot be read."
 msgstr "Nøglen, som forbindelseshemmelighederne er krypteret med, er ikke i arkivet. Gendan med den samme <code>.env</code>, som arkivet blev skrevet med, ellers kan de hemmeligheder ikke læses."
 
+#: src/postulo/templates/server/register_lookup.html
+msgid "The keys of the company registers that answer only to one."
+msgstr ""
+
 #: src/postulo/accounts/forms.py
 msgid "The keywords every file carries"
 msgstr "Nøgleordene, som alle filer har"
@@ -22187,6 +22235,10 @@ msgstr "Hvor denne post ligger i sit afsnit, angives med pilene på <a href=\"%(
 #: src/postulo/templates/help/telephone_numbers.html
 msgid "Where this instance can send a code to a telephone, a number you have confirmed can also be the one that gets you back into your account. That choice is separate from the primary, so changing what a recruiter dials never changes how you prove it is you. The bin will not remove that number while it is your way in. Changing its digits makes it another number, which has to be confirmed again and is no longer your way in."
 msgstr "Hvor denne instans kan sende en kode til en telefon, kan et nummer, du har bekræftet, også være det, der giver dig adgang til din konto igen. Det valg er adskilt fra det primære, så hvis du ændrer, hvad en rekrutterer ringer til, ændrer det aldrig, hvordan du beviser, at det er dig. Skraldespanden fjerner ikke det nummer, mens det er din vej ind. Ændrer du dets cifre, bliver det et andet nummer, som skal bekræftes igen og ikke længere er din vej ind."
+
+#: src/postulo/templates/server/register_lookup.html
+msgid "Where to get a key"
+msgstr ""
 
 #: src/postulo/jobs/models.py
 msgid "Where you came across it: a job board, a referral, the company site."

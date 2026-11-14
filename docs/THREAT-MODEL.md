@@ -227,6 +227,12 @@ personal instance is close to saying who, so the rules are these:
   against Postulo's own tables, and the review page keeps only what the person ticks. A
   French company whose details are not public (`statut_diffusion` other than `O`) has no
   address offered; Norway's *removed for legal reasons* is said and nothing is held.
+- **A register's key is a stored secret (#1065).** A register that answers only to a key
+  (Companies House) has its key saved under *Register lookup → Settings*, encrypted under
+  `POSTULO_FIELD_KEY` as a mail password is (rule 6), in a column the backup counts among the
+  site's secrets, and never drawn back: replace or remove only. It is added to the request by
+  Postulo, to the adapter's own host, and an adapter's `addresses` and `read` never see it. A
+  register with no key is not offered.
 - **The record of processing names each register** while the plugin is on for anybody, with
   its hosts, what it is sent and its licence.
 

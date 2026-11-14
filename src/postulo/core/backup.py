@@ -269,6 +269,7 @@ SITE_SECRET_COLUMNS = (
     "transport_secrets_encrypted",
     "text_secrets_encrypted",
     "backup_destination_secrets_encrypted",
+    "register_keys_encrypted",
 )
 
 

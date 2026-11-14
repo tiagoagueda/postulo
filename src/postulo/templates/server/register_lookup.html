@@ -1,0 +1,32 @@
+{% extends "server/base.html" %}
+{% load i18n postulo %}
+
+{% block measure %}max-w-2xl{% endblock %}
+
+{% block content %}
+  <c-page-title>
+    {% translate "Register lookup" %}
+    <c-slot name="subtitle">
+    {% translate "The keys of the company registers that answer only to one." %}
+    </c-slot>
+  </c-page-title>
+
+  <div class="card mb-4 text-sm">
+    <p>{% translate "A key is stored encrypted on this instance and is never shown again: type a new one to replace it, or tick Remove. It is sent to its own register with each look-up and to nobody else. A register with no key saved is not offered, and no Look up button is drawn for its country." %}</p>
+  </div>
+
+  <form method="post" novalidate>
+    {% csrf_token %}
+    {% for entry in form.entries %}
+      <div class="card mb-4" data-register-key="{{ entry.adapter.key }}" data-key-saved="{{ entry.saved|yesno:'yes,no' }}">
+        <h2 class="text-base font-semibold">{{ entry.adapter.label }}</h2>
+        {% if entry.adapter.key_url %}<p class="text-xs text-ink-500 dark:text-ink-400"><a href="{{ entry.adapter.key_url }}" rel="noopener noreferrer external" target="_blank">{% translate "Where to get a key" %}</a></p>{% endif %}
+        <c-field :field="entry.key" />
+        {% if entry.saved %}<c-field :field="entry.remove" />{% endif %}
+      </div>
+    {% empty %}
+      <p class="text-sm">{% translate "No installed register needs a key." %}</p>
+    {% endfor %}
+    {% if form.keyed %}<button type="submit" class="btn">{% translate "Save" %}</button>{% endif %}
+  </form>
+{% endblock %}

@@ -1527,6 +1527,11 @@ msgstr "D’iarr %(register)s níos lú iarratas. Bain triail eile as ar ball."
 msgid "%(register)s could not be reached."
 msgstr "Níorbh fhéidir %(register)s a shroicheadh."
 
+#: src/postulo/jobs/register_lookup.py
+#, python-format
+msgid "%(register)s did not accept the key saved for it."
+msgstr ""
+
 #: src/postulo/templates/jobs/company_register.html
 #, python-format
 msgid "%(register)s has an entry for this number."
@@ -1536,6 +1541,11 @@ msgstr "Tá iontráil ag %(register)s don uimhir seo."
 #, python-format
 msgid "%(register)s has removed this entry."
 msgstr "Bhain %(register)s an iontráil seo."
+
+#: src/postulo/jobs/register_lookup.py
+#, python-format
+msgid "%(register)s needs a key, and this instance has none saved for it."
+msgstr ""
 
 #: src/postulo/jobs/register_lookup.py
 #, python-format
@@ -2527,6 +2537,10 @@ msgstr "pictiúr JPEG"
 #: src/postulo/resume/publications.py
 msgid "A key holds letters, digits and the characters - _ : . + / and nothing else."
 msgstr "Ní bhíonn in eochair ach litreacha, digití agus na carachtair - _ : . + /."
+
+#: src/postulo/templates/server/register_lookup.html
+msgid "A key is stored encrypted on this instance and is never shown again: type a new one to replace it, or tick Remove. It is sent to its own register with each look-up and to nobody else. A register with no key saved is not offered, and no Look up button is drawn for its country."
+msgstr ""
 
 #: src/postulo/templates/server/design.html
 msgid "A key to press: <kbd class=\"kbd\">/</kbd> opens the search from anywhere."
@@ -6741,6 +6755,10 @@ msgstr "Scrios an cuntas"
 #: src/postulo/templates/server/backup_delete.html
 msgid "Delete the backup"
 msgstr "Scrios an cúltaca"
+
+#: src/postulo/core/server_forms.py
+msgid "Delete the key; no look-up is offered for this register after."
+msgstr ""
 
 #: src/postulo/jobs/views.py
 msgid "Delete the letters they wrote as well"
@@ -12094,6 +12112,10 @@ msgstr "Ní theastaíonn nasc ó aon bhreiseán suiteáilte."
 msgid "No installed plugin needs a connection. Notifiers, document stores and synchronisation plugins appear here once the operator installs one."
 msgstr "Ní theastaíonn nasc ó aon bhreiseán suiteáilte. Taispeántar fógróirí, stórtha doiciméad agus breiseáin sioncrónaithe anseo nuair a shuiteálann an t-oibreoir ceann."
 
+#: src/postulo/templates/server/register_lookup.html
+msgid "No installed register needs a key."
+msgstr ""
+
 #: src/postulo/templates/widgets/upcoming_interviews.html
 msgid "No interviews in the diary."
 msgstr "Níl aon agallaimh sa dialann."
@@ -12433,6 +12455,10 @@ msgstr "Ní mheaitseálann aon cheann de do thaifid."
 #: src/postulo/templates/applications/partials/reminders.html
 msgid "None outstanding."
 msgstr "Níl aon cheann ar feitheamh."
+
+#: src/postulo/core/server_forms.py
+msgid "None saved: no look-up is offered for this register."
+msgstr ""
 
 #: src/postulo/templates/server/overview.html
 msgid "none usable"
@@ -15811,6 +15837,15 @@ msgstr "Diúltaíodh: %(fields)s. Féach %(member)s chun an locht ar gach ceann 
 msgid "region"
 msgstr "réigiún"
 
+#: src/postulo/core/models.py
+msgid "register keys"
+msgstr ""
+
+#: src/postulo/core/server_views.py
+#: src/postulo/templates/server/register_lookup.html
+msgid "Register lookup"
+msgstr ""
+
 #: src/postulo/templates/jobs/company_register.html
 msgid "Register number"
 msgstr "Uimhir chláraithe"
@@ -15969,6 +16004,10 @@ msgstr "Bain an lógó"
 #: src/postulo/documents/forms.py
 msgid "Remove the photo's metadata (location, time, camera)"
 msgstr "Bain meiteashonraí an ghrianghraif (suíomh, am, ceamara)"
+
+#: src/postulo/core/server_forms.py
+msgid "Remove the saved key"
+msgstr ""
 
 #: src/postulo/accounts/forms.py
 msgid "Remove the uploaded picture"
@@ -16312,6 +16351,7 @@ msgstr "Dé Sathairn"
 #: src/postulo/templates/server/person_username.html
 #: src/postulo/templates/server/plugin_access.html
 #: src/postulo/templates/server/plugins.html
+#: src/postulo/templates/server/register_lookup.html
 #: src/postulo/templates/server/signin.html
 #: src/postulo/templates/settings/accessibility.html
 #: src/postulo/templates/settings/appearance.html
@@ -16384,6 +16424,10 @@ msgstr "Sábháilte."
 
 #: src/postulo/applications/views.py
 msgid "Saved. The report is made as you chose."
+msgstr ""
+
+#: src/postulo/core/server_forms.py
+msgid "Saved. Type a new one to replace it."
 msgstr ""
 
 #: src/postulo/templates/settings/accessibility.html
@@ -19688,6 +19732,10 @@ msgstr "Cuireadh eochair nua in ionad na heochrach do “%(name)s”. Is í an e
 msgid "The key the connection secrets are under is not in the archive. Restore with the same <code>.env</code> the archive was written under, or those secrets cannot be read."
 msgstr "Níl an eochair faoina bhfuil rúin an naisc sa chartlann. Athbhunaigh leis an <code>.env</code> céanna faoinar scríobhadh an chartlann, nó ní féidir na rúin sin a léamh."
 
+#: src/postulo/templates/server/register_lookup.html
+msgid "The keys of the company registers that answer only to one."
+msgstr ""
+
 #: src/postulo/accounts/forms.py
 msgid "The keywords every file carries"
 msgstr "Na heochairfhocail atá i ngach comhad"
@@ -22856,6 +22904,10 @@ msgstr "Socraítear áit na hiontrála seo ina rannán leis na saigheada ar <a h
 #: src/postulo/templates/help/telephone_numbers.html
 msgid "Where this instance can send a code to a telephone, a number you have confirmed can also be the one that gets you back into your account. That choice is separate from the primary, so changing what a recruiter dials never changes how you prove it is you. The bin will not remove that number while it is your way in. Changing its digits makes it another number, which has to be confirmed again and is no longer your way in."
 msgstr "Más féidir leis an tsuiteáil seo cód a sheoladh chuig guthán, is féidir le huimhir a dheimhnigh tú a bheith ar an uimhir a ligeann ar ais isteach i do chuntas thú. Tá an rogha sin ar leith ón bpríomhuimhir, mar sin ní athraíonn an uimhir a dhiailíonn earcaitheoir an chaoi a gcruthaíonn tú gur tú atá ann. Ní bhainfidh an bosca bruscair an uimhir sin fad is í do bhealach isteach í. Má athraíonn tú a digití, is uimhir eile í, ar gá í a dheimhniú arís agus nach í do bhealach isteach a thuilleadh í."
+
+#: src/postulo/templates/server/register_lookup.html
+msgid "Where to get a key"
+msgstr ""
 
 #: src/postulo/jobs/models.py
 msgid "Where you came across it: a job board, a referral, the company site."

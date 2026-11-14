@@ -1275,6 +1275,11 @@ msgstr "%(register)s huet ëm manner Ufroe gebieden. Probéiert méi spéit nach
 msgid "%(register)s could not be reached."
 msgstr "%(register)s konnt net erreecht ginn."
 
+#: src/postulo/jobs/register_lookup.py
+#, python-format
+msgid "%(register)s did not accept the key saved for it."
+msgstr ""
+
 #: src/postulo/templates/jobs/company_register.html
 #, python-format
 msgid "%(register)s has an entry for this number."
@@ -1284,6 +1289,11 @@ msgstr "%(register)s huet en Andrag fir dës Nummer."
 #, python-format
 msgid "%(register)s has removed this entry."
 msgstr "%(register)s huet dësen Andrag ewechgeholl."
+
+#: src/postulo/jobs/register_lookup.py
+#, python-format
+msgid "%(register)s needs a key, and this instance has none saved for it."
+msgstr ""
 
 #: src/postulo/jobs/register_lookup.py
 #, python-format
@@ -2210,6 +2220,10 @@ msgstr "e JPEG-Bild"
 #: src/postulo/resume/publications.py
 msgid "A key holds letters, digits and the characters - _ : . + / and nothing else."
 msgstr "E Schlëssel enthält Buschtawen, Zifferen an d'Zeechen - _ : . + / a soss näischt."
+
+#: src/postulo/templates/server/register_lookup.html
+msgid "A key is stored encrypted on this instance and is never shown again: type a new one to replace it, or tick Remove. It is sent to its own register with each look-up and to nobody else. A register with no key saved is not offered, and no Look up button is drawn for its country."
+msgstr ""
 
 #: src/postulo/templates/server/design.html
 msgid "A key to press: <kbd class=\"kbd\">/</kbd> opens the search from anywhere."
@@ -6369,6 +6383,10 @@ msgstr "De Kont läschen"
 #: src/postulo/templates/server/backup_delete.html
 msgid "Delete the backup"
 msgstr "De Backup läschen"
+
+#: src/postulo/core/server_forms.py
+msgid "Delete the key; no look-up is offered for this register after."
+msgstr ""
 
 #: src/postulo/jobs/views.py
 msgid "Delete the letters they wrote as well"
@@ -11680,6 +11698,10 @@ msgstr "Kee installéierte Plugin brauch eng Verbindung."
 msgid "No installed plugin needs a connection. Notifiers, document stores and synchronisation plugins appear here once the operator installs one."
 msgstr "Kee installéierte Plugin brauch eng Verbindung. Benoriichtegungsdéngschter, Dokumentespäicher a Synchronisatiounsplugins erschénge hei, soubal den Operateur ee installéiert."
 
+#: src/postulo/templates/server/register_lookup.html
+msgid "No installed register needs a key."
+msgstr ""
+
 #: src/postulo/templates/widgets/upcoming_interviews.html
 msgid "No interviews in the diary."
 msgstr "Keng Entretienen am Agenda."
@@ -12015,6 +12037,10 @@ msgstr "Keen vun Ären Andréi passt."
 #: src/postulo/templates/applications/partials/reminders.html
 msgid "None outstanding."
 msgstr "Näischt méi ausstoend."
+
+#: src/postulo/core/server_forms.py
+msgid "None saved: no look-up is offered for this register."
+msgstr ""
 
 #: src/postulo/templates/server/overview.html
 #, fuzzy
@@ -15292,6 +15318,15 @@ msgstr "Ofgeleent: %(fields)s. Kuckt %(member)s, fir ze gesinn, wat bei all eenz
 msgid "region"
 msgstr "Regioun"
 
+#: src/postulo/core/models.py
+msgid "register keys"
+msgstr ""
+
+#: src/postulo/core/server_views.py
+#: src/postulo/templates/server/register_lookup.html
+msgid "Register lookup"
+msgstr ""
+
 #: src/postulo/templates/jobs/company_register.html
 msgid "Register number"
 msgstr "Registernummer"
@@ -15449,6 +15484,10 @@ msgstr "De Logo ewechhuelen"
 #: src/postulo/documents/forms.py
 msgid "Remove the photo's metadata (location, time, camera)"
 msgstr "D'Metadate vun der Foto ewechhuelen (Plaz, Zäit, Kamera)"
+
+#: src/postulo/core/server_forms.py
+msgid "Remove the saved key"
+msgstr ""
 
 #: src/postulo/accounts/forms.py
 msgid "Remove the uploaded picture"
@@ -15787,6 +15826,7 @@ msgstr "Samschdeg"
 #: src/postulo/templates/server/person_username.html
 #: src/postulo/templates/server/plugin_access.html
 #: src/postulo/templates/server/plugins.html
+#: src/postulo/templates/server/register_lookup.html
 #: src/postulo/templates/server/signin.html
 #: src/postulo/templates/settings/accessibility.html
 #: src/postulo/templates/settings/appearance.html
@@ -15860,6 +15900,10 @@ msgstr "Gespäichert."
 
 #: src/postulo/applications/views.py
 msgid "Saved. The report is made as you chose."
+msgstr ""
+
+#: src/postulo/core/server_forms.py
+msgid "Saved. Type a new one to replace it."
 msgstr ""
 
 #: src/postulo/templates/settings/accessibility.html
@@ -19104,6 +19148,10 @@ msgstr "De Schlëssel fir „%(name)s“ gouf ersat. Dee Schlëssel ass dat eenz
 msgid "The key the connection secrets are under is not in the archive. Restore with the same <code>.env</code> the archive was written under, or those secrets cannot be read."
 msgstr "De Schlëssel, ënner deem d'Verbindungsgeheimnisser leien, ass net am Archiv. Restauréiert mat deemselwechte <code>.env</code>, ënner deem d'Archiv geschriwwe gouf, soss kënnen dës Geheimnisser net gelies ginn."
 
+#: src/postulo/templates/server/register_lookup.html
+msgid "The keys of the company registers that answer only to one."
+msgstr ""
+
 #: src/postulo/accounts/forms.py
 msgid "The keywords every file carries"
 msgstr "D'Schlësselwierder, déi all Fichier huet"
@@ -22236,6 +22284,10 @@ msgstr "Wou dësen Andrag a senger Rubrik steet, gëtt mat de Feiler op <a href=
 #: src/postulo/templates/help/telephone_numbers.html
 msgid "Where this instance can send a code to a telephone, a number you have confirmed can also be the one that gets you back into your account. That choice is separate from the primary, so changing what a recruiter dials never changes how you prove it is you. The bin will not remove that number while it is your way in. Changing its digits makes it another number, which has to be confirmed again and is no longer your way in."
 msgstr "Wou dës Instanz e Code op en Telefon schécke kann, kann eng Nummer, déi Dir bestätegt hutt, och déi sinn, mat där Dir erëm an Äre Kont kommt. Dës Wiel ass onofhängeg vun der Haaptnummer, sou datt eng Ännerung vun deem, wat e Recruteur wielt, ni ännert, wéi Dir beweist, datt Dir et sidd. D'Poubelle hëlt dës Nummer net ewech, soulaang se Ären Zougang ass. Wann Dir hir Zifferen ännert, gëtt et eng aner Nummer, déi nach eng Kéier bestätegt muss ginn an net méi Ären Zougang ass."
+
+#: src/postulo/templates/server/register_lookup.html
+msgid "Where to get a key"
+msgstr ""
 
 #: src/postulo/jobs/models.py
 msgid "Where you came across it: a job board, a referral, the company site."

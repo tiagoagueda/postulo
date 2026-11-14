@@ -43,9 +43,12 @@ REGISTER_ADAPTERS = "register-adapters"
         kind="feature",
         icon="landmark",
         requires=("identifiers",),
+        settings="server:register_lookup",
         description=_(
             "Look a company up in its country's register when you press for it, from its "
-            "register number (France, Norway, Finland, Czechia, Poland) or its LEI (GLEIF), "
+            "register number (France, Norway, Finland, Czechia, Poland, and the United Kingdom "
+            "once a key is saved) "
+            "or its LEI (GLEIF), "
             "and choose which of the official name, address, state and activity to keep. "
             "One request per press, carrying the number and nothing else, to the register's "
             "own service, which so learns which company somebody here is looking at. Off "
@@ -66,7 +69,9 @@ class RegisterLookupFeature:
         description=_(
             "Which registers Register lookup can ask, one per country, and how each one's "
             "answer is read: the Annuaire des Entreprises (France), Enhetsregisteret (Norway), "
-            "YTJ (Finland), ARES (Czechia), KRS (Poland) and GLEIF. Nothing here asks "
+            "YTJ (Finland), ARES (Czechia), KRS (Poland), Companies House (United Kingdom, "
+            "with a key) and GLEIF. "
+            "Nothing here asks "
             "anything by itself."
         ),
     )

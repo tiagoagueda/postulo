@@ -8,6 +8,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### ✨ Added
 
+- Register lookup keeps an encrypted key per register that needs one, and asks Companies House (United Kingdom) once it has one (#1065)
 - Message templates: follow-ups, thank-yous and withdrawals written from templates and sent from your own address (#1094)
 - My details shows the CV photo, with its size, and previews a new one before it is saved (#1246)
 - A listing's page and its application's page show which of the skills the listing names your career record has and which it does not, read from the ESCO classification with no model, and which CV prints the most of them. (#1093)

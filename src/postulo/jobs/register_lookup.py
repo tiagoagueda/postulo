@@ -36,6 +36,7 @@ characters name the body that issued it and not a country (#935).
 
 from __future__ import annotations
 
+import base64
 import json
 import logging
 import re
@@ -168,6 +169,17 @@ class Adapter:
     page: Callable[[str], str] | None = None
     #: Extra request headers the register's documentation asks for (an ``Accept`` version).
     headers: tuple[tuple[str, str], ...] = field(default_factory=tuple)
+    #: A register that answers only to a key (#1065). ``needs_key`` says so, and exactly one of
+    #: ``key_header`` (the header the key goes in) and ``key_basic`` (HTTP Basic, the key as the
+    #: user name and no password) says where. Postulo keeps the key, adds it to the request
+    #: and hands it to nothing else: ``addresses`` and ``read`` never see it. An adapter that
+    #: needs a key and has none is not offered. ``key_label`` names the key for the settings
+    #: page, and ``key_url`` is where an operator gets one.
+    needs_key: bool = False
+    key_header: str = ""
+    key_basic: bool = False
+    key_label: Any = ""
+    key_url: str = ""
 
 
 # ------------------------------------------------------------------ the registry
@@ -190,6 +202,12 @@ def _usable(adapter) -> bool:
         and callable(adapter.addresses)
         and callable(adapter.read)
         and (adapter.page is None or callable(adapter.page))
+        and (
+            bool(adapter.key_basic) != bool(adapter.key_header)
+            and bool(re.fullmatch(r"[A-Za-z][A-Za-z0-9-]{0,39}", adapter.key_header or "a"))
+            if adapter.needs_key
+            else not (adapter.key_basic or adapter.key_header)
+        )
     )
 
 
@@ -268,6 +286,29 @@ def adapter_for(scheme: str, value: str) -> Adapter | None:
     return None
 
 
+def key_of(adapter: Adapter) -> str:
+    """The key the administrator saved for ``adapter``, or empty: none needed, none saved, or
+    one that cannot be read under this instance's field key."""
+    if not adapter.needs_key:
+        return ""
+    from postulo.core.models import SiteSettings
+    from postulo.plugins.secrets import SecretsUnreadable
+
+    row = SiteSettings.objects.first()
+    if row is None:
+        return ""
+    try:
+        value = row.register_keys.get(adapter.key, "")
+    except SecretsUnreadable:
+        return ""
+    return value if isinstance(value, str) else ""
+
+
+def available(adapter: Adapter) -> bool:
+    """Whether ``adapter`` can be asked at all: it needs no key, or it has one."""
+    return not adapter.needs_key or bool(key_of(adapter))
+
+
 def number_of(scheme: str, value: str) -> str:
     """What is sent: a register number without its country, or the LEI as it is."""
     value = (value or "").strip()
@@ -291,6 +332,12 @@ def lookup(adapter: Adapter, value: str) -> Record:
     number = number_of(adapter.scheme, value)
     if not number:
         raise LookupRefused(_("There is no number to look up."))
+    key = key_of(adapter)
+    if adapter.needs_key and not key:
+        raise LookupRefused(
+            _("%(register)s needs a key, and this instance has none saved for it.")
+            % {"register": str(adapter.label)}
+        )
     try:
         addresses = [str(address) for address in adapter.addresses(number)]
     except Exception as error:
@@ -306,7 +353,7 @@ def lookup(adapter: Adapter, value: str) -> Record:
             )
             raise LookupRefused(_("The register's address is not one it declared."))
     for address in addresses:
-        document = _get(adapter, address)
+        document = _get(adapter, address, key)
         if document is None:
             continue
         try:
@@ -322,12 +369,16 @@ def lookup(adapter: Adapter, value: str) -> Record:
     raise LookupRefused(_("The register has no entry with that number."))
 
 
-def _get(adapter: Adapter, url: str):
+def _get(adapter: Adapter, url: str, key: str = ""):
     """The JSON at ``url``, or ``None`` where the register says it has no such entry."""
     label = str(adapter.label)
     deadline = http.deadline_in(SECONDS)
     headers = {"User-Agent": user_agent(), "Accept": "application/json"}
     headers.update(dict(adapter.headers))
+    if key and adapter.key_header:
+        headers[adapter.key_header] = key
+    elif key and adapter.key_basic:
+        headers["Authorization"] = "Basic " + base64.b64encode(f"{key}:".encode()).decode("ascii")
     try:
         with (
             http.public_only_client(
@@ -342,6 +393,10 @@ def _get(adapter: Adapter, url: str):
                 )
             if answer.status_code == 404:
                 return None
+            if answer.status_code in (401, 403) and adapter.needs_key:
+                raise LookupRefused(
+                    _("%(register)s did not accept the key saved for it.") % {"register": label}
+                )
             if answer.status_code == 410:
                 raise LookupRefused(_("%(register)s has removed this entry.") % {"register": label})
             if answer.status_code == 429:

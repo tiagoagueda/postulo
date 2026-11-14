@@ -49,6 +49,7 @@ from .server_forms import (
     IdentifierSchemesForm,
     MapsForm,
     OfferedLanguagesForm,
+    RegisterKeysForm,
     SignInForm,
     TestEmailForm,
 )
@@ -733,6 +734,20 @@ class MapsView(PluginSettingsMixin, PolicyView):
         context["geocoder_problem"] = site.current().geocoder_problem
         context["editable"] = len(context["pinned"]) < len(self.pinned_fields)
         return context
+
+
+class RegisterLookupView(PluginSettingsMixin, PolicyView):
+    """The keys of the registers that answer only to one (#1065), kept encrypted and never shown.
+
+    Reached from Register lookup's *Settings* under Plugins; who may change it follows that
+    plugin's access rules (#886).
+    """
+
+    settings_page = "server:register_lookup"
+
+    form_class = RegisterKeysForm
+    template_name = "server/register_lookup.html"
+    section_title = _("Register lookup")
 
 
 class DefaultsView(PolicyView):

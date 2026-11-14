@@ -1481,6 +1481,9 @@ class SiteSettings(models.Model):
     text_transport = models.CharField(_("text transport"), max_length=60, blank=True)
     text_config = models.JSONField(_("text configuration"), default=dict, blank=True)
     text_secrets_encrypted = models.TextField(_("text secrets"), blank=True, editable=False)
+    #: The keys for the company registers that answer only to one (#1065), by adapter key, in
+    #: one encrypted store. Never a plain column, never shown again once saved.
+    register_keys_encrypted = models.TextField(_("register keys"), blank=True, editable=False)
 
     #: What the mail transport last actually did. Recorded rather than probed, because the
     #: question "can this instance still send mail?" is asked while rendering a page and an
@@ -1725,6 +1728,19 @@ class SiteSettings(models.Model):
         from postulo.plugins import secrets
 
         self.text_secrets_encrypted = secrets.encrypt(values or {})
+
+    @property
+    def register_keys(self) -> dict:
+        """The registers' keys, decrypted: ``{adapter key: key}``."""
+        from postulo.plugins import secrets
+
+        return secrets.decrypt(self.register_keys_encrypted)
+
+    @register_keys.setter
+    def register_keys(self, values: dict) -> None:
+        from postulo.plugins import secrets
+
+        self.register_keys_encrypted = secrets.encrypt(values or {})
 
     @property
     def backup_destination_secrets(self) -> dict:

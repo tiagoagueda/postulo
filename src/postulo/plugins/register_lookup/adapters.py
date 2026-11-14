@@ -71,6 +71,24 @@ documentation is linked from https://www.gleif.org/en/lei-data/gleif-api): ``dat
 what is made of them. ``INACTIVE`` is shown and not offered as a state: it covers a merger as
 well as a dissolution.
 
+**United Kingdom: Companies House public data API, with a key.**
+``GET https://api.company-information.service.gov.uk/company/<number>``, HTTP Basic with the
+key as the user name and no password (https://developer-specs.company-information.service.gov.uk/guides/authorisation,
+read 2026-11-14), 404 for no such company. The ``companyProfile`` resource
+(https://developer-specs.company-information.service.gov.uk/companies-house-public-data-api/resources/companyprofile,
+read 2026-11-14) gives ``company_name``, ``company_number``, ``company_status`` (active,
+dissolved, liquidation, receivership, administration, voluntary-arrangement, converted-closed,
+insolvency-proceedings, registered, removed, closed, open), ``date_of_cessation``,
+``registered_office_address`` (``premises``, ``address_line_1``, ``address_line_2``,
+``locality``, ``region``, ``postal_code``) and ``sic_codes``. **Not confirmed against the
+documentation, to confirm before release:** the 600 requests per 5 minutes the issue states, and
+the licence (the pages read say only "Crown copyright"; Open Government Licence v3.0 is
+assumed). The recorded answer in the tests is built from the resource's field list, not fetched
+with a key.
+
+**Estonia, the Netherlands, Denmark and Sweden are not here.** Each needs a key or an agreement
+that nobody has yet got, so no answer could be recorded; they are left to #1065.
+
 **Estonia is not here.** Every query service of the e-Business Register asks for an agreement
 with the RIK and a user name and password, or a key, even where it is free
 (https://avaandmed.ariregister.rik.ee/en/open-data-api/introduction-api-services); the one
@@ -488,6 +506,91 @@ POLAND = RegisterAdapter(
 )
 
 
+# ----------------------------------------------------------------- United Kingdom
+
+#: Companies House's ``company_status``, in `LegalState`'s words. A status not listed here is
+#: shown as the register wrote it and offered as no state.
+_UK_STATES = {
+    "active": ACTIVE,
+    "open": ACTIVE,
+    "registered": ACTIVE,
+    "dissolved": DISSOLVED,
+    "closed": DISSOLVED,
+    "converted-closed": DISSOLVED,
+    "removed": DISSOLVED,
+    "liquidation": ADMINISTRATION,
+    "receivership": ADMINISTRATION,
+    "administration": ADMINISTRATION,
+    "voluntary-arrangement": ADMINISTRATION,
+    "insolvency-proceedings": ADMINISTRATION,
+}
+
+
+def _uk_number(number: str) -> str:
+    code = re.sub(r"[ .\-/]", "", number or "").upper()
+    if not re.fullmatch(r"[A-Z0-9]{1,8}", code):
+        return ""
+    return code.zfill(8) if code.isdigit() else code
+
+
+def _united_kingdom(document, number: str):
+    document = _dict(document)
+    if not document.get("company_name"):
+        return None
+    office = _dict(document.get("registered_office_address"))
+    address = RegisterAddress(
+        street=_joined(
+            office.get("premises"), office.get("address_line_1"), office.get("address_line_2")
+        ),
+        postcode=office.get("postal_code") or "",
+        municipality=office.get("locality") or "",
+        region=office.get("region") or "",
+        country="GB",
+    )
+    status = document.get("company_status") or ""
+    state = _UK_STATES.get(status, "")
+    codes = [code for code in _list(document.get("sic_codes")) if isinstance(code, str)]
+    # SIC 2007's two first digits are NACE Rev. 2's division, and the register lists no main one.
+    code = codes[0] if len(codes) == 1 else ""
+    return RegisterRecord(
+        number=document.get("company_number") or _uk_number(number),
+        name=document["company_name"],
+        address=address,
+        state=state,
+        state_words=status.replace("-", " ").capitalize(),
+        state_since=_day(document.get("date_of_cessation")) if state == DISSOLVED else None,
+        activity=code,
+        division=code[:2],
+    )
+
+
+UNITED_KINGDOM = RegisterAdapter(
+    key="gb-companies-house",
+    label="Companies House",
+    scheme="register",
+    country="GB",
+    hosts=("api.company-information.service.gov.uk",),
+    addresses=lambda number: (
+        [f"https://api.company-information.service.gov.uk/company/{_uk_number(number)}"]
+        if _uk_number(number)
+        else []
+    ),
+    read=_united_kingdom,
+    source=_("Companies House"),
+    licence="Open Government Licence v3.0",
+    licence_url="https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/",
+    page=lambda number: (
+        f"https://find-and-update.company-information.service.gov.uk/company/{_uk_number(number)}"
+        if _uk_number(number)
+        else ""
+    ),
+    needs_key=True,
+    key_basic=True,
+    key_label=_("Companies House API key"),
+    key_url="https://developer.company-information.service.gov.uk/get-started",
+)
+
+
 # ----------------------------------------------------------------------------- GLEIF
 
 _LEI = re.compile(r"[0-9A-Z]{18}[0-9]{2}")
@@ -540,4 +643,4 @@ GLEIF = RegisterAdapter(
 )
 
 #: Every adapter Postulo ships, in the order the record of processing lists them.
-ADAPTERS = (FRANCE, NORWAY, FINLAND, CZECHIA, POLAND, GLEIF)
+ADAPTERS = (FRANCE, NORWAY, FINLAND, CZECHIA, POLAND, UNITED_KINGDOM, GLEIF)

@@ -1275,6 +1275,11 @@ msgstr "%(register)s কম অনুরোধ পাঠাতে বলেছ�
 msgid "%(register)s could not be reached."
 msgstr "%(register)s-এ পৌঁছানো যায়নি।"
 
+#: src/postulo/jobs/register_lookup.py
+#, python-format
+msgid "%(register)s did not accept the key saved for it."
+msgstr ""
+
 #: src/postulo/templates/jobs/company_register.html
 #, python-format
 msgid "%(register)s has an entry for this number."
@@ -1284,6 +1289,11 @@ msgstr "%(register)s-এ এই নম্বরের একটি ভুক্�
 #, python-format
 msgid "%(register)s has removed this entry."
 msgstr "%(register)s এই ভুক্তিটি সরিয়ে দিয়েছে।"
+
+#: src/postulo/jobs/register_lookup.py
+#, python-format
+msgid "%(register)s needs a key, and this instance has none saved for it."
+msgstr ""
 
 #: src/postulo/jobs/register_lookup.py
 #, python-format
@@ -2208,6 +2218,10 @@ msgstr "একটি JPEG ছবি"
 #, fuzzy
 msgid "A key holds letters, digits and the characters - _ : . + / and nothing else."
 msgstr "একটি কী-তে কেবল অক্ষর, অঙ্ক এবং - _ : . + / চিহ্নগুলো থাকতে পারে, আর কিছু নয়।"
+
+#: src/postulo/templates/server/register_lookup.html
+msgid "A key is stored encrypted on this instance and is never shown again: type a new one to replace it, or tick Remove. It is sent to its own register with each look-up and to nobody else. A register with no key saved is not offered, and no Look up button is drawn for its country."
+msgstr ""
 
 #: src/postulo/templates/server/design.html
 msgid "A key to press: <kbd class=\"kbd\">/</kbd> opens the search from anywhere."
@@ -6347,6 +6361,10 @@ msgstr "অ্যাকাউন্টটি মুছুন"
 #: src/postulo/templates/server/backup_delete.html
 msgid "Delete the backup"
 msgstr "ব্যাকআপটি মুছুন"
+
+#: src/postulo/core/server_forms.py
+msgid "Delete the key; no look-up is offered for this register after."
+msgstr ""
 
 #: src/postulo/jobs/views.py
 msgid "Delete the letters they wrote as well"
@@ -11630,6 +11648,10 @@ msgstr "ইনস্টল করা কোনো প্লাগইনের �
 msgid "No installed plugin needs a connection. Notifiers, document stores and synchronisation plugins appear here once the operator installs one."
 msgstr "ইনস্টল করা কোনো প্লাগইনের সংযোগ দরকার নেই। অপারেটর কোনো নোটিফায়ার, নথি সংগ্রহস্থল বা সিঙ্ক প্লাগইন ইনস্টল করলে সেটি এখানে দেখা যায়।"
 
+#: src/postulo/templates/server/register_lookup.html
+msgid "No installed register needs a key."
+msgstr ""
+
 #: src/postulo/templates/widgets/upcoming_interviews.html
 msgid "No interviews in the diary."
 msgstr "দিনপঞ্জিতে কোনো সাক্ষাৎকার নেই।"
@@ -11964,6 +11986,10 @@ msgstr "আপনার কোনো রেকর্ড মেলেনি।"
 #: src/postulo/templates/applications/partials/reminders.html
 msgid "None outstanding."
 msgstr "কোনোটিই বাকি নেই।"
+
+#: src/postulo/core/server_forms.py
+msgid "None saved: no look-up is offered for this register."
+msgstr ""
 
 #: src/postulo/templates/server/overview.html
 msgid "none usable"
@@ -15220,6 +15246,15 @@ msgstr "প্রত্যাখ্যান করা হয়েছে: %(fie
 msgid "region"
 msgstr "অঞ্চল"
 
+#: src/postulo/core/models.py
+msgid "register keys"
+msgstr ""
+
+#: src/postulo/core/server_views.py
+#: src/postulo/templates/server/register_lookup.html
+msgid "Register lookup"
+msgstr ""
+
 #: src/postulo/templates/jobs/company_register.html
 msgid "Register number"
 msgstr "নিবন্ধন নম্বর"
@@ -15376,6 +15411,10 @@ msgstr "লোগোটি সরান"
 #: src/postulo/documents/forms.py
 msgid "Remove the photo's metadata (location, time, camera)"
 msgstr "ছবির মেটাডেটা সরান (অবস্থান, সময়, ক্যামেরা)"
+
+#: src/postulo/core/server_forms.py
+msgid "Remove the saved key"
+msgstr ""
 
 #: src/postulo/accounts/forms.py
 msgid "Remove the uploaded picture"
@@ -15714,6 +15753,7 @@ msgstr "শনিবার"
 #: src/postulo/templates/server/person_username.html
 #: src/postulo/templates/server/plugin_access.html
 #: src/postulo/templates/server/plugins.html
+#: src/postulo/templates/server/register_lookup.html
 #: src/postulo/templates/server/signin.html
 #: src/postulo/templates/settings/accessibility.html
 #: src/postulo/templates/settings/appearance.html
@@ -15786,6 +15826,10 @@ msgstr "সংরক্ষিত হয়েছে।"
 
 #: src/postulo/applications/views.py
 msgid "Saved. The report is made as you chose."
+msgstr ""
+
+#: src/postulo/core/server_forms.py
+msgid "Saved. Type a new one to replace it."
 msgstr ""
 
 #: src/postulo/templates/settings/accessibility.html
@@ -19013,6 +19057,10 @@ msgstr "“%(name)s”-এর কী প্রতিস্থাপন করা
 msgid "The key the connection secrets are under is not in the archive. Restore with the same <code>.env</code> the archive was written under, or those secrets cannot be read."
 msgstr "সংযোগের সিক্রেটগুলো যে এনক্রিপশন কী দিয়ে সুরক্ষিত, সেটি আর্কাইভে নেই। আর্কাইভটি যে <code>.env</code> দিয়ে লেখা হয়েছিল সেটি দিয়েই পুনরুদ্ধার করুন, নইলে ওই সিক্রেটগুলো পড়া যাবে না।"
 
+#: src/postulo/templates/server/register_lookup.html
+msgid "The keys of the company registers that answer only to one."
+msgstr ""
+
 #: src/postulo/accounts/forms.py
 msgid "The keywords every file carries"
 msgstr "প্রতিটি ফাইলে থাকা কীওয়ার্ড"
@@ -22129,6 +22177,10 @@ msgstr "এই এন্ট্রিটি তার অংশে কোথা�
 #: src/postulo/templates/help/telephone_numbers.html
 msgid "Where this instance can send a code to a telephone, a number you have confirmed can also be the one that gets you back into your account. That choice is separate from the primary, so changing what a recruiter dials never changes how you prove it is you. The bin will not remove that number while it is your way in. Changing its digits makes it another number, which has to be confirmed again and is no longer your way in."
 msgstr "যেখানে এই ইনস্ট্যান্স কোনো ফোনে কোড পাঠাতে পারে, সেখানে আপনার নিশ্চিত করা একটি নম্বর সেই নম্বরও হতে পারে যা দিয়ে আপনি আবার আপনার অ্যাকাউন্টে ঢুকতে পারেন। এই পছন্দটি প্রধানটি থেকে আলাদা, তাই কোনো রিক্রুটার যে নম্বরে ফোন করেন তা বদলালে আপনি কীভাবে প্রমাণ করেন যে এটি আপনিই, তা কখনও বদলায় না। যতক্ষণ নম্বরটি আপনার ঢোকার উপায়, ততক্ষণ ময়লার ঝুড়ির বোতামটি সেটি সরাবে না। এর অঙ্কগুলো বদলালে এটি অন্য একটি নম্বর হয়ে যায়, যা আবার নিশ্চিত করতে হয় এবং যা আর আপনার ঢোকার উপায় থাকে না।"
+
+#: src/postulo/templates/server/register_lookup.html
+msgid "Where to get a key"
+msgstr ""
 
 #: src/postulo/jobs/models.py
 msgid "Where you came across it: a job board, a referral, the company site."

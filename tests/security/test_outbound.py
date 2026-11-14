@@ -1953,5 +1953,6 @@ def test_every_register_postulo_ships_is_asked_on_its_own_public_name_over_https
         "avoindata.prh.fi",
         "ares.gov.cz",
         "api-krs.ms.gov.pl",
+        "api.company-information.service.gov.uk",
         "api.gleif.org",
     }
