@@ -23,7 +23,7 @@ from django.utils.translation import gettext_lazy as _
 from postulo.documents.paper import CHOICES as PAPER_CHOICES
 from postulo.documents.paper import MAX_KEY_LENGTH as MAX_PAPER_KEY
 
-from . import phones, slugs
+from . import phones, pins, slugs
 from .language_field import LanguageField
 
 # MailSecurity is not a model -- it is how TLS gets onto an SMTP session (#149) -- and
@@ -1649,7 +1649,11 @@ class SiteSettings(models.Model):
 
     def save(self, *args, **kwargs) -> None:
         self.pk = 1
-        super().save(*args, **kwargs)
+        over = pins.restore(self)
+        try:
+            super().save(*args, **kwargs)
+        finally:
+            pins.reapply(self, over)
         # The row is memoised for the request that is reading it (#231); saving it is the
         # one thing that makes that memo wrong, so it is the one place that clears it. The
         # memo lives in `core.memo`, below this module, rather than in `site`, which reads
@@ -1659,8 +1663,28 @@ class SiteSettings(models.Model):
         forget_current()
 
     @classmethod
+    def from_db(cls, db, field_names, values, **kwargs):
+        """A row read from the database, with the environment laid over it (#1186).
+
+        Everything that reads the policy row sees what the instance was started with where a
+        variable is set, whichever way it got the row. `save` gives the stored values back
+        before it writes, so the environment is never copied into the database.
+        """
+        row = super().from_db(db, field_names, values, **kwargs)
+        pins.apply(row)
+        return row
+
+    def refresh_from_db(self, *args, **kwargs) -> None:
+        """Read the row again; what the environment covers is still laid over it."""
+        super().refresh_from_db(*args, **kwargs)
+        columns = tuple(pins.stored(self))
+        if columns:
+            pins.keep(self, type(self)._base_manager.filter(pk=self.pk).values(*columns).get())
+
+    @classmethod
     def get(cls) -> "SiteSettings":
         row, _created = cls.objects.get_or_create(pk=1)
+        pins.apply(row)
         return row
 
     #: Failures in a row before mail stops counting as a way back into an account. Three

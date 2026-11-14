@@ -602,7 +602,7 @@ class SignInView(PolicyView):
     form_class = SignInForm
     template_name = "server/signin.html"
     section_title = _("Sign-in")
-    pinned_fields = ("registration_open", "sso_is_second_factor")
+    pinned_fields = ("registration_open", "sso_is_second_factor", "email_sign_in")
 
     def get_context_data(self, **kwargs):
         from postulo.accounts import sso
@@ -727,6 +727,7 @@ class MapsView(PluginSettingsMixin, PolicyView):
         "map_tile_attribution",
         "geocoder",
         "geocoder_url",
+        "geocoder_consent",
     )
 
     def get_context_data(self, **kwargs):

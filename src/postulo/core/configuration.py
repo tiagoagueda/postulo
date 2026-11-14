@@ -37,6 +37,7 @@ from __future__ import annotations
 
 import difflib
 import enum
+import json
 import os
 import re
 from collections.abc import Mapping
@@ -163,6 +164,8 @@ class Variable:
     in_env_file: bool = True
     #: The plugin that declared it, by its name in words; empty for Postulo's own.
     plugin: str = ""
+    #: The value is a JSON object, read as a dict.
+    json: bool = False
 
     @property
     def documented(self) -> bool:
@@ -208,7 +211,16 @@ AREAS: tuple[Area, ...] = (
             "address out."
         ),
     ),
-    Area("defaults", "Defaults", ("TIME",)),
+    Area(
+        "defaults",
+        "Defaults",
+        ("TIME", "INSTANCE", "LANGUAGE", "LANGUAGES", "PAPER"),
+        notes=(
+            "What the instance calls itself and what a new account starts with: Server settings "
+            "-> Defaults. Set here, a value is pinned: the page shows it read-only and says "
+            "which variable it came from."
+        ),
+    ),
     Area(
         "storage",
         "Storage",
@@ -242,6 +254,23 @@ AREAS: tuple[Area, ...] = (
         notes=(
             "The tiles and the geocoder can also be set from Server settings -> Maps when not "
             "set here."
+        ),
+    ),
+    Area(
+        "data-protection",
+        "Data protection",
+        ("RETENTION", "PRIVACY", "IDENTIFIER"),
+        notes="Server settings -> Data protection and Server settings -> Plugins. Pinned as above.",
+    ),
+    Area(
+        "transports",
+        "Mail and text-message transports",
+        ("TEXT", "REGISTER"),
+        notes=(
+            "Which transport sends, and what it is configured with, are chosen from the plugins "
+            "that provide them; the configuration is a JSON object whose keys are the plugin's "
+            "own field names, secrets included, and `<NAME>_FILE` may name a file holding it. "
+            "Set here, the page shows the choice read-only and the plugin's fields not at all."
         ),
     ),
     Area("plugins", "Plugins", ("PLUGINS", "PLUGIN")),
@@ -1614,6 +1643,295 @@ _VARIABLES: tuple[Variable, ...] = (
         interpolate=False,
         empty_is_unset=True,
     ),
+    # ---------------------------------------------- what a Server page holds (#1186, stage 3)
+    Variable(
+        "POSTULO_INSTANCE_NAME",
+        Kind.TEXT,
+        "defaults",
+        "What the instance calls itself: the header, the sign-in page.",
+        default="Postulo",
+        field="instance_name",
+        empty_is_unset=True,
+    ),
+    Variable(
+        "POSTULO_INSTANCE_TAGLINE",
+        Kind.TEXT,
+        "defaults",
+        "The line under the name on the home page, and the web app's description.",
+        default="",
+        field="tagline",
+    ),
+    Variable(
+        "POSTULO_INSTANCE_MOTTO",
+        Kind.TEXT,
+        "defaults",
+        "The line in the footer of every page, after the name.",
+        default="",
+        field="motto",
+        default_text="empty, which shows “your job search, your data”",
+    ),
+    Variable(
+        "POSTULO_LANGUAGE_DEFAULT",
+        Kind.TEXT,
+        "defaults",
+        "The language a new account starts with, as a BCP 47 tag such as fr-FR or pt-PT.",
+        default="",
+        field="default_language",
+        empty_is_unset=True,
+        default_text="empty: the built-in language",
+    ),
+    Variable(
+        "POSTULO_LANGUAGES_OFFERED",
+        Kind.LIST,
+        "defaults",
+        (
+            "The languages the instance offers, as BCP 47 tags. Empty offers every one it speaks,"
+            " including those added later."
+        ),
+        default=(),
+        field="offered_languages",
+        empty_is_unset=True,
+        default_text="every language",
+    ),
+    Variable(
+        "POSTULO_PAPER_DEFAULT",
+        Kind.CHOICE,
+        "defaults",
+        "What a CV, a letter or a report is printed on unless its owner chooses another.",
+        default="",
+        choices=("a4-portrait", "a4-landscape", "letter-portrait", "letter-landscape"),
+        blank=True,
+        field="default_paper",
+        default_text="empty: A4, portrait",
+        empty_is_unset=True,
+    ),
+    Variable(
+        "POSTULO_EMAIL_CODE_SIGN_IN",
+        Kind.BOOLEAN,
+        "sign-in",
+        (
+            "Whether somebody may sign in with a code sent to their primary address. Offered only"
+            " while mail gets through."
+        ),
+        default=False,
+        field="email_sign_in",
+        empty_is_unset=True,
+    ),
+    Variable(
+        "POSTULO_GEOCODER_CONSENT",
+        Kind.BOOLEAN,
+        "maps",
+        (
+            "Your word that the geocoder chosen on the Maps page may be sent the addresses on the"
+            " map, people's and contacts' included."
+        ),
+        default=False,
+        field="geocoder_consent",
+        notes=(
+            "Set POSTULO_GEOCODER_SERVICE instead and the choice is already your word; this is "
+            "for a service chosen on the page."
+        ),
+        empty_is_unset=True,
+    ),
+    Variable(
+        "POSTULO_RETENTION_SECONDS",
+        Kind.DURATION,
+        "data-protection",
+        (
+            "How long records about other people are kept. Not set keeps them for as long as the "
+            "instance exists."
+        ),
+        default=None,
+        unit="seconds",
+        minimum=86_400,
+        field="retention_days",
+        default_text="unset: no limit",
+        notes=(
+            "The page counts days: a part of a day counts as a day. Nothing is deleted for this "
+            "reason until the dry run has been seen."
+        ),
+        empty_is_unset=True,
+    ),
+    Variable(
+        "POSTULO_PRIVACY_NOTICE",
+        Kind.TEXT,
+        "data-protection",
+        (
+            "The instance's privacy text, shown wherever the site keeps something about another "
+            "person."
+        ),
+        default="",
+        field="privacy_notice",
+        interpolate=False,
+    ),
+    Variable(
+        "POSTULO_IDENTIFIER_SCHEMES",
+        Kind.TEXT,
+        "data-protection",
+        (
+            "Identifier schemes of the instance's own, as the JSON text typed under Server "
+            "settings -> Plugins."
+        ),
+        default="",
+        field="identifier_schemes",
+        interpolate=False,
+    ),
+    Variable(
+        "POSTULO_BACKUP_SCHEDULE",
+        Kind.CHOICE,
+        "storage",
+        "Whether the scheduler writes a backup by itself, and how often.",
+        default="off",
+        choices=("off", "daily", "weekly"),
+        field="backup_schedule",
+        empty_is_unset=True,
+    ),
+    Variable(
+        "POSTULO_BACKUP_HOUR",
+        Kind.INTEGER,
+        "storage",
+        "The hour of the day a scheduled backup is taken, in the instance's time zone.",
+        default=3,
+        minimum=0,
+        maximum=23,
+        field="backup_hour",
+        empty_is_unset=True,
+    ),
+    Variable(
+        "POSTULO_BACKUP_WEEKDAY",
+        Kind.INTEGER,
+        "storage",
+        "The day a weekly backup is taken: 0 is Monday, 6 is Sunday.",
+        default=0,
+        minimum=0,
+        maximum=6,
+        field="backup_weekday",
+        empty_is_unset=True,
+    ),
+    Variable(
+        "POSTULO_BACKUP_KEEP",
+        Kind.INTEGER,
+        "storage",
+        "How many of the newest scheduled backups are kept here.",
+        default=7,
+        minimum=1,
+        maximum=365,
+        field="backup_keep",
+        notes=(
+            "Older ones are deleted only after a new one has been written and checked. Archives "
+            "you uploaded are never deleted by this."
+        ),
+        empty_is_unset=True,
+    ),
+    Variable(
+        "POSTULO_BACKUP_RECIPIENT",
+        Kind.TEXT,
+        "storage",
+        (
+            "The public key (age1...) every archive is encrypted to before it leaves for a "
+            "destination."
+        ),
+        default="",
+        field="backup_recipient",
+        empty_is_unset=True,
+    ),
+    Variable(
+        "POSTULO_BACKUP_REMOTE_KEEP",
+        Kind.INTEGER,
+        "storage",
+        (
+            "How many archives to keep at the destination. 0 never deletes there; unset keeps as "
+            "many as are kept here."
+        ),
+        default=None,
+        minimum=0,
+        maximum=365,
+        field="backup_remote_keep",
+        default_text="unset: as many as here",
+        empty_is_unset=True,
+    ),
+    Variable(
+        "POSTULO_BACKUP_DESTINATION",
+        Kind.TEXT,
+        "storage",
+        "The backup-destination plugin that receives each archive, by name.",
+        default="",
+        field="backup_destination",
+        empty_is_unset=True,
+    ),
+    Variable(
+        "POSTULO_BACKUP_DESTINATION_CONFIG",
+        Kind.SECRET,
+        "storage",
+        "The destination's settings and secrets, as a JSON object of the plugin's own field names.",
+        default={},
+        json=True,
+        field="backup_destination_config",
+        default_text="unset",
+        empty_is_unset=True,
+    ),
+    Variable(
+        "POSTULO_EMAIL_TRANSPORT",
+        Kind.TEXT,
+        "email",
+        (
+            "The mail transport that sends, by plugin name. Empty is SMTP, configured by the "
+            "variables above."
+        ),
+        default="",
+        field="email_transport",
+        default_text="smtp",
+        empty_is_unset=True,
+    ),
+    Variable(
+        "POSTULO_EMAIL_TRANSPORT_CONFIG",
+        Kind.SECRET,
+        "email",
+        (
+            "The chosen transport's settings and secrets, as a JSON object of the plugin's own "
+            "field names."
+        ),
+        default={},
+        json=True,
+        field="transport_config",
+        default_text="unset",
+        empty_is_unset=True,
+    ),
+    Variable(
+        "POSTULO_TEXT_TRANSPORT",
+        Kind.TEXT,
+        "transports",
+        "The text-message transport that sends, by plugin name. Empty sends no text messages.",
+        default="",
+        field="text_transport",
+        default_text="none",
+        empty_is_unset=True,
+    ),
+    Variable(
+        "POSTULO_TEXT_TRANSPORT_CONFIG",
+        Kind.SECRET,
+        "transports",
+        (
+            "The chosen transport's settings and secrets, as a JSON object of the plugin's own "
+            "field names."
+        ),
+        default={},
+        json=True,
+        field="text_config",
+        default_text="unset",
+        empty_is_unset=True,
+    ),
+    Variable(
+        "POSTULO_REGISTER_KEYS",
+        Kind.SECRET,
+        "transports",
+        "The keys the business-register look-ups use, as a JSON object of register name to key.",
+        default={},
+        json=True,
+        field="register_keys",
+        default_text="unset",
+        empty_is_unset=True,
+    ),
 )
 
 #: Every variable, by name, in the order they are documented.
@@ -1781,7 +2099,8 @@ def syntax(variable: Variable) -> str:
         words = ", ".join(variable.choices)
         return f"one of: {words}" + (", or empty" if variable.blank else "")
     if kind is Kind.SECRET:
-        return f"text, or {variable.name}{FILE_SUFFIX} naming a file that holds it"
+        what = "a JSON object" if variable.json else "text"
+        return f"{what}, or {variable.name}{FILE_SUFFIX} naming a file that holds it"
     if kind is Kind.PATH:
         return "a path"
     return "text"
@@ -1841,6 +2160,18 @@ def _parse(variable: Variable, found: Found) -> _Parsed:
         if _RATE.match(raw):
             return _Parsed(raw)
         return _Parsed(raw, _problem(variable, found, "error", "is not a rate"))
+    if variable.json:
+        try:
+            value = json.loads(raw)
+        except ValueError:
+            value = None
+        if isinstance(value, dict):
+            return _Parsed(value)
+        return _Parsed(
+            variable.default,
+            _problem(variable, found, "error", "is not a JSON object"),
+            fallback=True,
+        )
     return _Parsed(raw)
 
 
@@ -1988,6 +2319,8 @@ def is_set(
     names = [variable.name, *(alias.name for alias in variable.aliases)]
     if variable.kind is Kind.SECRET:
         names.append(variable.name + FILE_SUFFIX)
+    if variable.empty_is_unset:
+        return any(environ.get(candidate) for candidate in names)
     return any(candidate in environ for candidate in names)
 
 

@@ -54,9 +54,20 @@ class PinnedPolicyForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.pin_fields()
+
+    def pin_fields(self) -> None:
+        """Work out which of the fields the environment holds, and mark each for the page.
+
+        Called again by a form that adds fields after this one has run. `<c-field>` draws a
+        marked field read-only with the variable named beside it (#1186), so a page that
+        draws its fields with it needs nothing more.
+        """
         self.pinned = {
             field: variable for field in self.fields if (variable := site.overridden_by(field))
         }
+        for field, variable in self.pinned.items():
+            self.fields[field].pinned_by = variable
 
     def clean(self):
         cleaned = super().clean()
@@ -186,6 +197,9 @@ class RegisterKeysForm(PinnedPolicyForm):
         from postulo.jobs import register_lookup
 
         super().__init__(*args, **kwargs)
+        #: The variable holding every key, when the environment does: nothing here is then
+        #: editable, and the keys it gives show as saved (#1186).
+        self.keys_pinned = site.overridden_by("register_keys")
         try:
             self.held = dict(self.instance.register_keys)
         except Exception:
@@ -207,6 +221,9 @@ class RegisterKeysForm(PinnedPolicyForm):
                 required=False,
                 help_text=_("Delete the key; no look-up is offered for this register after."),
             )
+        if self.keys_pinned:
+            for name in [name for name in self.fields if name.startswith(("key__", "remove__"))]:
+                self.fields[name].disabled = True
 
     def entries(self):
         """Each keyed register with its key field, its remove box and whether a key is saved."""
@@ -222,6 +239,8 @@ class RegisterKeysForm(PinnedPolicyForm):
 
     def save(self, commit=True):
         row = super().save(commit=False)
+        if self.keys_pinned:
+            return row
         keys = dict(self.held)
         for adapter in self.keyed:
             typed = self.cleaned_data.get(f"key__{adapter.key}") or ""
@@ -319,6 +338,7 @@ class MapsForm(PinnedPolicyForm):
             "map_tile_attribution": in_force.attribution,
         }
         effective["geocoder"], effective["geocoder_url"] = geocoding.chosen()
+        effective["geocoder_consent"] = self.instance.geocoder_consent
         for field in self.pinned:
             self.initial[field] = effective[field]
 
@@ -346,7 +366,11 @@ class MapsForm(PinnedPolicyForm):
                 url = url or geocoding.DEFAULT_URLS.get(service, "")
                 if problem := geocoding.url_problem(url):
                     self.add_error("geocoder_url", problem)
-            if "geocoder" not in self.pinned and not cleaned.get("geocoder_consent"):
+            if (
+                "geocoder" not in self.pinned
+                and "geocoder_consent" not in self.pinned
+                and not cleaned.get("geocoder_consent")
+            ):
                 self.add_error(
                     "geocoder_consent",
                     _("Street look-ups send addresses to the service: tick this to say so."),
@@ -360,7 +384,7 @@ class MapsForm(PinnedPolicyForm):
         return super().save(commit=commit)
 
 
-class OfferedLanguagesForm(forms.ModelForm):
+class OfferedLanguagesForm(PinnedPolicyForm):
     """Which languages this instance offers at all.
 
     Stored as an empty list when everything is ticked, and that is the point rather than an
@@ -510,9 +534,10 @@ class DefaultsForm(PinnedPolicyForm):
             choices=[("", _("Not set here — A4, portrait")), *paper.CHOICES],
             required=False,
         )
+        self.pin_fields()
 
 
-class GdprForm(forms.ModelForm):
+class GdprForm(PinnedPolicyForm):
     """The instance's data-protection policy: how long, and in whose words (#297)."""
 
     class Meta:
@@ -528,7 +553,7 @@ class GdprForm(forms.ModelForm):
         self.fields["privacy_notice"].required = False
 
 
-class IdentifierSchemesForm(forms.ModelForm):
+class IdentifierSchemesForm(PinnedPolicyForm):
     """The identifier schemes this instance defines for itself, as JSON in one box (#311).
 
     The text is checked when it is saved, by the registry plugin that will read it
@@ -771,6 +796,8 @@ class EmailForm(PinnedPolicyForm):
             for field in site.EMAIL_FIELDS
             if (variable := site.overridden_by(field))
         }
+        if "email_transport" in self.fields and (variable := site.overridden_by("email_transport")):
+            self.fields["email_transport"].pinned_by = variable
         resolved = site.email_settings()
         for field, key in site.EMAIL_FIELDS.items():
             # The effective value, so a pinned field shows what is actually in force rather
@@ -910,6 +937,15 @@ class EmailForm(PinnedPolicyForm):
         self.fields.pop("email_password", None)
         self.fields.pop("forget_email_password", None)
 
+        if variable := site.overridden_by("transport_config"):
+            # The variable holds the whole configuration, secrets included, so none of it is
+            # drawn: one line says so, and the plugin's fields are not offered (#1186).
+            self.fields["transport_settings"] = forms.CharField(
+                label=_("Transport settings"), required=False, initial=_("set"), disabled=True
+            )
+            self.fields["transport_settings"].pinned_by = variable
+            return
+
         row = self.instance
         stored = dict(row.transport_config or {})
         held = set(row.transport_secrets)
@@ -926,6 +962,8 @@ class EmailForm(PinnedPolicyForm):
 
         chosen = transports.selected()
         if chosen is None or chosen.name == transports.DEFAULT_TRANSPORT:
+            return {}, {}
+        if site.overridden_by("transport_config"):
             return {}, {}
         plain, secret = {}, {}
         for spec in chosen.config_fields():
@@ -971,7 +1009,7 @@ class EmailForm(PinnedPolicyForm):
         return row
 
 
-class BackupScheduleForm(forms.ModelForm):
+class BackupScheduleForm(PinnedPolicyForm):
     """When the instance backs itself up, and how many to keep (#242)."""
 
     class Meta:
@@ -979,7 +1017,7 @@ class BackupScheduleForm(forms.ModelForm):
         fields = ("backup_schedule", "backup_hour", "backup_weekday", "backup_keep")
 
 
-class BackupDestinationForm(forms.ModelForm):
+class BackupDestinationForm(PinnedPolicyForm):
     """Where the backups go besides this disk, and the key they are encrypted to (#325).
 
     Drawn the way the mail transport's settings are (`EmailForm._add_transport_fields`): a
@@ -1025,6 +1063,15 @@ class BackupDestinationForm(forms.ModelForm):
         #: Whether the destination is being changed, so the stored settings do not apply.
         self.switching = self.plugin is not None and self.plugin.name != stored
         self.specs = list(self.plugin.config_fields()) if self.plugin is not None else []
+        self.pin_fields()
+        if variable := site.overridden_by("backup_destination_config"):
+            # The variable holds the whole configuration, secrets included: none of it is
+            # drawn, one line says so (#1186).
+            self.specs = []
+            self.fields["destination_settings"] = forms.CharField(
+                label=_("Destination settings"), required=False, initial=_("set"), disabled=True
+            )
+            self.fields["destination_settings"].pinned_by = variable
         held = set() if self.switching else set(self.instance.backup_destination_secrets)
         config = {} if self.switching else dict(self.instance.backup_destination_config or {})
         from postulo.plugins.forms import form_field_for
@@ -1036,7 +1083,10 @@ class BackupDestinationForm(forms.ModelForm):
                 self.initial.setdefault(key, config.get(spec.name, spec.default))
 
     def plugin_fields(self):
-        return [self[f"{self.PREFIX}{spec.name}"] for spec in self.specs]
+        drawn = [self[f"{self.PREFIX}{spec.name}"] for spec in self.specs]
+        if "destination_settings" in self.fields:
+            drawn.append(self["destination_settings"])
+        return drawn
 
     def _answers(self) -> tuple[dict, dict]:
         """The plugin's settings as they will be stored: what was typed over what is kept."""
@@ -1073,6 +1123,9 @@ class BackupDestinationForm(forms.ModelForm):
 
     def clean(self):
         cleaned = super().clean()
+        # What the environment holds counts as given, for the checks below.
+        for field in self.pinned:
+            cleaned[field] = getattr(self.instance, field, "")
         chosen = cleaned.get("backup_destination") or ""
         if chosen and "backup_recipient" not in self.errors and not cleaned.get("backup_recipient"):
             self.add_error(

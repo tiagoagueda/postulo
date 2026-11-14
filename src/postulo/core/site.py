@@ -16,7 +16,7 @@ import logging
 from django.conf import settings
 from django.contrib.auth import get_user_model
 
-from . import configuration, memo
+from . import configuration, memo, pins
 
 # The forgetting lives with the memo, which the row itself can import when it is saved; it is
 # handed out here too, because this is where everything that reads the row looks (#248).
@@ -57,6 +57,9 @@ ENV_OVERRIDES = {
     # Street look-ups for the map's pins (#913); `postulo.jobs.geocoding` reads them.
     "geocoder": "POSTULO_GEOCODER_SERVICE",
     "geocoder_url": "POSTULO_GEOCODER_URL",
+    # The rest of what the Server pages hold: laid over the row itself, so that whatever reads
+    # the row answers with the environment (`postulo.core.pins`).
+    **pins.FIELDS,
 }
 
 #: Email field on the policy row → the key the SMTP backend wants. One mapping, so the
@@ -127,6 +130,7 @@ def current() -> SiteSettings:
     row = getattr(memo.site, "row", None)
     if row is None:
         row = SiteSettings.objects.filter(pk=1).first() or SiteSettings()
+        pins.apply(row)
         memo.site.row = row
     return row
 

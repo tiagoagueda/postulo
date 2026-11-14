@@ -39,11 +39,17 @@
    320-pixel screen leaves, in every language, which is what ran the upload form off a phone
    (#167). The path is gone (#191); a long name still cannot break.
 
+   A field the environment sets (`PinnedPolicyForm` marks it with `pinned_by`, the variable's
+   name, #1186) is drawn by `pinned_field` instead: its value read-only, and the variable
+   named beside it, whichever page the field is on.
+
    `tip` makes the help a tooltip (#302): `<c-field :field="form.headline" tip />`, for a
    sentence that says what the field is for. `<c-field-feedback>` says what that means. A
    tick box takes no `tip`: its sentence says what ticking does, and stays beside it.
 {% endcomment %}
-{% if field.use_fieldset %}
+{% if field.field.pinned_by %}
+  {% pinned_field field field.field.pinned_by %}
+{% elif field.use_fieldset %}
   <div class="field mb-4 wrap-anywhere"{% if field.errors %} data-invalid="true"{% endif %}>
     <fieldset{% if field.aria_describedby %} aria-describedby="{{ field.aria_describedby }}"{% endif %}>
       <legend>

@@ -33,7 +33,7 @@ from django.core.checks import WARNING
 from django.core.exceptions import ImproperlyConfigured
 from django.core.management import call_command
 
-from postulo.core import checks, configuration, site
+from postulo.core import checks, configuration, pins, site
 from postulo.core.configuration import Alias, Kind, Scope, Variable, read
 
 REPO = Path(__file__).resolve().parents[1]
@@ -60,6 +60,9 @@ READ_ELSEWHERE = {
     # gunicorn reads it; the image sets it.
     "GUNICORN_CMD_ARGS": "gunicorn",
 }
+
+# What a Server page holds is read by name, from a table, when the policy row is read (#1186).
+READ_ELSEWHERE.update(dict.fromkeys(pins.FIELDS.values(), "postulo.core.pins"))
 
 #: Where variables are read or set: the code, the image, the maintainers' scripts and CI.
 SCANNED = ("src/postulo", "docker", "scripts", ".forgejo/workflows")
@@ -266,6 +269,10 @@ NOT_PINNED = {
     "POSTULO_ESCO_DIR": "postulo.jobs.esco.DATA_DIR",
     "POSTULO_GEONAMES_POSTCODES": "manage.py fetch_geonames",
 }
+
+
+# What a Server page holds is no Django setting: the variable is read when the policy row is.
+NOT_PINNED.update(dict.fromkeys(pins.FIELDS.values(), "SiteSettings, by postulo.core.pins"))
 
 
 def _defaults(module: str, **extra: str) -> dict:
