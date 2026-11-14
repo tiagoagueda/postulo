@@ -585,6 +585,26 @@ LETTER_THEMES = {
 }
 
 
+class CompanyNameStyle(models.TextChoices):
+    """Which of a company's names a template prints where it says ``{{ company }}`` (#1245)."""
+
+    FULL = "full", _("Its full name")
+    ACRONYM = "acronym", _("Its acronym, where it has one")
+
+
+def company_name_field():
+    return models.CharField(
+        _("company name"),
+        max_length=8,
+        choices=CompanyNameStyle,
+        default=CompanyNameStyle.FULL,
+        help_text=_(
+            "Which of the company's names {{ company }} is filled in with: its full name, or "
+            "its acronym where it has one. A company with none is named in full."
+        ),
+    )
+
+
 class CoverLetter(DeclaresALanguage, OwnedModel):
     """A letter, or a template for many letters.
 
@@ -629,6 +649,8 @@ class CoverLetter(DeclaresALanguage, OwnedModel):
             "Which language this letter is written in. Leave blank to follow your profile."
         ),
     )
+
+    company_name = company_name_field()
 
     class Meta:
         verbose_name = _("letter")
@@ -702,6 +724,8 @@ class MessageTemplate(DeclaresALanguage, OwnedModel):
             "Which language this message is written in. Leave blank to follow your profile."
         ),
     )
+
+    company_name = company_name_field()
 
     class Meta:
         verbose_name = _("message template")

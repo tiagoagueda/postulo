@@ -889,7 +889,9 @@ def letter_values(letter: CoverLetter, application=None) -> dict[str, str]:
     }
     if application is not None:
         # Its name in the letter's language where it has one (#673), else the one typed.
-        values["company"] = application.posting.company.name_in(document_language(letter))
+        values["company"] = application.posting.company.name_for_document(
+            document_language(letter), letter.company_name
+        )
         values["role"] = application.posting.title
         values["location"] = application.posting.location
         values["contact"] = application.contact.name if application.contact_id else ""
@@ -978,7 +980,10 @@ def letter_outline(
             blocks.append(file_formats.paragraph(BETWEEN.join(details)))
         if application is not None:
             blocks.append(
-                file_formats.paragraph(application.posting.company.name_in(language), apart=True)
+                file_formats.paragraph(
+                    application.posting.company.name_for_document(language, letter.company_name),
+                    apart=True,
+                )
             )
         blocks.append(file_formats.paragraph(values["date"], apart=True))
         subject = fill_placeholders(letter.subject, values).strip()

@@ -288,7 +288,10 @@ logger = logging.getLogger(__name__)
 #: 88 added ``show_country`` on the profile: whether a place is shown with its country, ``auto``
 #: (the town alone while every place is in one country), ``always`` or ``never``. An archive
 #: without it restores ``auto``; a value that is none of the three is refused (#1249).
-FORMAT_VERSION = 88
+#: 89 added ``company_name`` to each cover letter and message template: ``full`` or ``acronym``,
+#: which of a company's names its ``{{ company }}`` is filled in with (#1245). An archive
+#: without it restores ``full``; a value that is neither is ``full``.
+FORMAT_VERSION = 89
 
 
 def industry_entry(industry) -> str | dict:
@@ -702,9 +705,19 @@ CV_FIELDS = (
     "language",
     "show_contact_details",
 )
-LETTER_FIELDS = ("id", "name", "kind", "subject", "body", "theme", "is_template", "language")
+LETTER_FIELDS = (
+    "id",
+    "name",
+    "kind",
+    "subject",
+    "body",
+    "theme",
+    "is_template",
+    "language",
+    "company_name",
+)
 #: What a message template's archive entry carries (#1094).
-MESSAGE_FIELDS = ("id", "name", "purpose", "subject", "body", "language")
+MESSAGE_FIELDS = ("id", "name", "purpose", "subject", "body", "language", "company_name")
 UPLOAD_FIELDS = (
     "id",
     "title",

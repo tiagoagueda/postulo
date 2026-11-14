@@ -878,6 +878,19 @@ class Company(OwnNote, PrincipalOwnedModel):
                 return stored[best]
         return self.name
 
+    def name_for_document(self, language: str, style: str = "") -> str:
+        """The name a letter or a message prints (#1245): its name in ``language`` unless the
+        template asked for the ``acronym``, and then the one the lists show if that is an
+        acronym, else its first acronym, else the same name as before. A company with no
+        acronym is named as it always was."""
+        if style == "acronym":
+            if self.list_name:
+                return self.list_name
+            held = self.acronyms()
+            if held:
+                return held[0].name
+        return self.name_in(language)
+
     def wikidata_id(self) -> str:
         """The Wikidata item it carries, or nothing (#42)."""
         row = next(

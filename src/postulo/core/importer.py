@@ -379,6 +379,12 @@ def _carried(entry: dict, names, report: ImportReport, what: str, *extra: str) -
     return kept
 
 
+def _company_name_style(value) -> str:
+    """Which company name a template prints, from an archive (#1245): ``acronym``, or the full
+    name for an archive that predates it and for any other value."""
+    return "acronym" if value == "acronym" else "full"
+
+
 def _eqf_level(value, report: ImportReport, entry: dict) -> int | None:
     """An education entry's level, kept when it is a whole number from 1 to 8 (#684).
 
@@ -2329,9 +2335,9 @@ def _load(user, archive: zipfile.ZipFile, *, force: bool = False, into=None) -> 
     letters: dict[int, CoverLetter] = {}
     for letter_entry in documents.get("cover_letters", []):
         old_id = letter_entry.pop("id", None)
-        letters[old_id] = CoverLetter.objects.create(
-            owner=user, **_carried(letter_entry, LETTER_FIELDS, report, "A cover letter")
-        )
+        carried_letter = _carried(letter_entry, LETTER_FIELDS, report, "A cover letter")
+        carried_letter["company_name"] = _company_name_style(carried_letter.get("company_name"))
+        letters[old_id] = CoverLetter.objects.create(owner=user, **carried_letter)
         report.cover_letters += 1
 
     # The messages written from a template, which format 85 is the first to carry (#1094). Each
@@ -2354,6 +2360,7 @@ def _load(user, archive: zipfile.ZipFile, *, force: bool = False, into=None) -> 
             purpose=purpose if purpose in MessagePurpose.values else MessagePurpose.OTHER,
             subject=" ".join(str(carried.get("subject") or "").split())[:200],
             body=body,
+            company_name=_company_name_style(carried.get("company_name")),
             language=(
                 languages.tag(language)
                 if isinstance(language, str) and languages.well_formed(language)
