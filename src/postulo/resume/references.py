@@ -1,4 +1,4 @@
-"""Publications as reference-manager files: BibTeX, BibLaTeX, RIS and CSL JSON (#879).
+"""Publications as reference-manager files: BibTeX, BibLaTeX, RIS, CSL JSON and MODS (#879).
 
 Zotero, Mendeley, JabRef, EndNote and a LaTeX bibliography all exchange references in a
 handful of text formats, and a publication is already shaped like a BibTeX entry (#687, with
@@ -8,8 +8,11 @@ shape of a publication and writes publications out as them.
 **Libraries, not parsers.** BibTeX and BibLaTeX go through `bibtexparser` 2 (MIT) and the
 LaTeX in a value through `pylatexenc` (MIT); RIS goes through `rispy` (MIT); CSL JSON is JSON,
 read with the standard library, and its values by `lookups.from_csl`, which already holds a
-record from a registry to the same rules. What this module adds is the mapping to and from a
-publication's fields, and the limits.
+record from a registry to the same rules. MODS is XML, which no maintained Python library
+maps to and from references (the one tool that does, bibutils, is a C program): it is read
+with `defusedxml` (already a dependency, no entities, no DOCTYPE) and written with the
+standard library's `ElementTree`, through the mapping below. What this module adds is the
+mapping to and from a publication's fields, and the limits.
 
 **A file is hostile until read.** At most `MAX_BYTES`, at most `MAX_ENTRIES` entries, no
 value longer than the column it lands in (a value is cut before it is decoded, so a
@@ -35,7 +38,10 @@ import re
 import unicodedata
 from dataclasses import dataclass, field
 from urllib.parse import urlsplit
+from xml.etree import ElementTree
 
+from defusedxml import DefusedXmlException
+from defusedxml.ElementTree import fromstring as parse_xml
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext as _
 
@@ -53,6 +59,7 @@ BIBTEX = "bibtex"
 BIBLATEX = "biblatex"
 RIS = "ris"
 CSL_JSON = "csl-json"
+MODS = "mods"
 
 
 class ReferencesRefused(Exception):
@@ -81,6 +88,9 @@ FORMATS: dict[str, Format] = {
     ),
     CSL_JSON: Format(
         CSL_JSON, "CSL JSON", "json", "application/vnd.citationstyles.csl+json", "Zotero, Pandoc"
+    ),
+    MODS: Format(
+        MODS, "MODS", "xml", "application/mods+xml", "Library catalogues, Zotero, bibutils"
     ),
 }
 
@@ -672,6 +682,322 @@ def read_csl_json(raw: bytes) -> Reading:
     return reading
 
 
+# ------------------------------------------------------------------------------- MODS
+
+#: The genre a MODS record names (bibutils' own vocabulary, which Zotero and the Library of
+#: Congress tools also read) onto `publications.TYPES`, and the genre written for each.
+_MODS_GENRES = {
+    "journal article": "article",
+    "article": "article",
+    "periodical": "article",
+    "newspaper": "article",
+    "conference publication": "proceedings",
+    "conference paper": "inproceedings",
+    "book": "book",
+    "book chapter": "incollection",
+    "book section": "inbook",
+    "thesis": "phdthesis",
+    "technical report": "techreport",
+    "report": "techreport",
+    "handbook": "manual",
+    "instruction": "manual",
+    "pamphlet": "booklet",
+    "unpublished": "unpublished",
+    "web page": "online",
+    "web site": "online",
+    "dataset": "dataset",
+    "software": "software",
+    "miscellaneous": "misc",
+}
+_MODS_OUT = {
+    "article": "journal article",
+    "inproceedings": "conference paper",
+    "proceedings": "conference publication",
+    "book": "book",
+    "inbook": "book section",
+    "incollection": "book chapter",
+    "phdthesis": "thesis",
+    "mastersthesis": "thesis",
+    "techreport": "technical report",
+    "manual": "handbook",
+    "booklet": "pamphlet",
+    "unpublished": "unpublished",
+    "online": "web page",
+    "dataset": "dataset",
+    "software": "software",
+    "misc": "miscellaneous",
+}
+_MODS_NS = "http://www.loc.gov/mods/v3"
+_MODS_LEFT_OUT = {
+    "abstract": "abstract",
+    "subject": "keywords",
+    "tableOfContents": "table of contents",
+    "classification": "classification",
+}
+
+
+def _bare(root):
+    """The tree with its namespaces taken off the tags, so MODS 3.x of any minor version reads."""
+    for element in root.iter():
+        if isinstance(element.tag, str):
+            element.tag = element.tag.rsplit("}", 1)[-1]
+    return root
+
+
+def _t(element, path: str, limit: int) -> str:
+    """The text of the first element at ``path`` under ``element``, as plain text."""
+    found = element.find(path)
+    return text("".join(found.itertext()), limit) if found is not None else ""
+
+
+def _mods_name(name) -> tuple[str, str]:
+    """One ``name`` as ``(role, "Family, Given")``; the role is ``author`` or ``editor``."""
+    role = ""
+    for term in name.iterfind("role/roleTerm"):
+        role = text("".join(term.itertext()), 40).lower()
+        if role:
+            break
+    family = " ".join(
+        text("".join(p.itertext()), 200)
+        for p in name.iterfind("namePart")
+        if p.get("type") == "family"
+    ).strip()
+    given = " ".join(
+        text("".join(p.itertext()), 200)
+        for p in name.iterfind("namePart")
+        if p.get("type") == "given"
+    ).strip()
+    if family or given:
+        person = f"{family}, {given}" if family and given else family or given
+    else:
+        person = " ".join(
+            text("".join(p.itertext()), 200)
+            for p in name.iterfind("namePart")
+            if p.get("type") in (None, "")
+        ).strip()
+    return ("editor" if role in ("editor", "edt") else "author"), person
+
+
+def _from_mods_record(record) -> tuple[dict[str, str], set[str]]:
+    genres = [text("".join(g.itertext()), 80).lower() for g in record.iterfind("genre")]
+    kind = next((_MODS_GENRES[g] for g in genres if g in _MODS_GENRES), "")
+    host = next((r for r in record.iterfind("relatedItem") if r.get("type") == "host"), None)
+    if not kind:
+        kind = "article" if host is not None else "misc"
+    if kind == "phdthesis" and any("master" in g for g in genres):
+        kind = "mastersthesis"
+    values: dict[str, str] = {"entry_type": kind}
+    title = record.find("titleInfo")
+    if title is not None:
+        values["title"] = " ".join(
+            part
+            for part in (_t(title, "nonSort", 100), _t(title, "title", _limit("title")))
+            if part
+        )
+        if sub := _t(title, "subTitle", _limit("title")):
+            values["title"] = f"{values['title']}: {sub}"
+        values["title"] = text(values["title"], _limit("title"))
+    people: dict[str, list[str]] = {"author": [], "editor": []}
+    for name in record.iterfind("name"):
+        role, person = _mods_name(name)
+        if person:
+            people[role].append(person)
+    values["authors"] = _name_list(people["author"], _limit("authors"))
+    values["editors"] = _name_list(people["editor"], _limit("editors"))
+    origin = record.find("originInfo")
+    holder = ""
+    if origin is not None:
+        holder = _t(origin, "publisher", _limit("publisher"))
+        values["location"] = _t(origin, "place/placeTerm", _limit("location"))
+        values["edition"] = _t(origin, "edition", _limit("edition"))
+        stamp = _t(origin, "dateIssued", 40) or _t(origin, "copyrightDate", 40)
+        values["date"] = _date_text(stamp)
+    if kind in ("phdthesis", "mastersthesis", "techreport"):
+        values["institution"] = holder
+    else:
+        values["publisher"] = holder
+    parts = list(record.iter("part"))
+    if host is not None:
+        values["container_title"] = _t(host, "titleInfo/title", _limit("container_title"))
+    for related in record.iterfind("relatedItem"):
+        if related.get("type") == "series":
+            values["series"] = _t(related, "titleInfo/title", _limit("series"))
+    for part in parts:
+        for detail in part.iterfind("detail"):
+            number = _t(detail, "number", 40)
+            match detail.get("type"):
+                case "volume":
+                    values["volume"] = number
+                case "issue" | "number":
+                    values["number"] = number
+                case "chapter":
+                    values["chapter"] = number
+        for extent in part.iterfind("extent"):
+            if extent.get("unit") not in (None, "page", "pages"):
+                continue
+            start, end = _t(extent, "start", 20), _t(extent, "end", 20)
+            if start or end:
+                values["pages"] = _pages(f"{start}-{end}" if start and end else start or end)
+            elif listed := _t(extent, "list", 40):
+                values["pages"] = _pages(listed)
+    for ident in record.iterfind("identifier"):
+        kind_of = (ident.get("type") or "").lower()
+        raw = text("".join(ident.itertext()), 500)
+        if kind_of == "doi":
+            values.setdefault("doi", lookups.doi_from(raw))
+        elif kind_of in ("citekey", "citation key"):
+            values.setdefault("cite_key", text(raw, publications.CITE_KEY_MAX_LENGTH))
+        elif kind_of == "uri" and (link := _web_address(raw)):
+            values.setdefault("url", link)
+    for url in record.iterfind("location/url"):
+        if link := _web_address("".join(url.itertext())):
+            values.setdefault("url", link)
+            break
+    if not values.get("cite_key") and record.get("ID"):
+        values["cite_key"] = text(record.get("ID"), publications.CITE_KEY_MAX_LENGTH)
+    language = record.find("language/languageTerm")
+    if language is not None:
+        values["language"] = _language("".join(language.itertext()))
+    note = _t(record, "note", _limit("note"))
+    values["note"] = note
+    left_out = {label for tag, label in _MODS_LEFT_OUT.items() if record.find(tag) is not None}
+    if record.find("identifier[@type='isbn']") is not None or (
+        record.find("identifier[@type='issn']") is not None
+    ):
+        left_out.add("ISBN/ISSN")
+    return values, left_out
+
+
+def read_mods(raw: bytes) -> Reading:
+    try:
+        root = _bare(parse_xml(raw))
+    except (ElementTree.ParseError, DefusedXmlException, RecursionError, ValueError) as error:
+        raise ReferencesRefused(_("That file is not MODS.")) from error
+    if root.tag == "modsCollection":
+        records = list(root.iterfind("mods"))
+    elif root.tag == "mods":
+        records = [root]
+    else:
+        raise ReferencesRefused(_("That file is not MODS."))
+    reading = Reading(format=MODS)
+    left_out: set[str] = set()
+    for index, record in enumerate(records):
+        if index >= MAX_ENTRIES:
+            reading.beyond += 1
+            continue
+        try:
+            values, ignored = _from_mods_record(record)
+        except Exception:
+            reading.skipped += 1
+            continue
+        left_out |= ignored
+        if not values.get("title"):
+            reading.skipped += 1
+            continue
+        reading.entries.append({name: value for name, value in values.items() if value})
+    reading.left_out = sorted(left_out)
+    return reading
+
+
+_XML_UNSAFE = re.compile("[\x00-\x08\x0b\x0c\x0e-\x1f" + chr(0xFFFE) + chr(0xFFFF) + "]")
+
+_XML_UNSAFE = re.compile(r"[\x00-\x08\x0b\x0c\x0e-\x1f￾￿]")
+
+
+def _sub(parent, tag: str, value: str = "", **attrs):
+    element = ElementTree.SubElement(parent, tag, {k: v for k, v in attrs.items() if v})
+    if value:
+        # A character XML cannot hold would make the whole file unreadable.
+        element.text = _XML_UNSAFE.sub("", value)
+    return element
+
+
+def mods_record(parent, item) -> None:
+    record = _sub(parent, "mods", version="3.8")
+    _sub(_sub(record, "titleInfo"), "title", item.title)
+    for role, value in (("author", item.authors), ("editor", item.editors)):
+        for line in publications.names(value):
+            if line == lookups.OTHERS:
+                continue
+            name = _sub(record, "name", type="personal")
+            if "," in line:
+                family, given = (part.strip() for part in line.split(",", 1))
+                _sub(name, "namePart", family, type="family")
+                _sub(name, "namePart", given, type="given")
+            else:
+                _sub(name, "namePart", line)
+            roles = _sub(name, "role")
+            _sub(roles, "roleTerm", role, type="text", authority="marcrelator")
+    _sub(record, "typeOfResource", "text")
+    _sub(record, "genre", _MODS_OUT.get(item.entry_type, "miscellaneous"), authority="bibutilsgt")
+    if item.entry_type == "phdthesis":
+        _sub(record, "genre", "Ph.D. thesis", authority="bibutilsgt")
+    elif item.entry_type == "mastersthesis":
+        _sub(record, "genre", "Masters thesis", authority="bibutilsgt")
+    holder = item.publisher or item.institution
+    if holder or item.location or item.date or item.edition:
+        origin = _sub(record, "originInfo")
+        if item.location:
+            _sub(_sub(origin, "place"), "placeTerm", item.location, type="text")
+        if holder:
+            _sub(origin, "publisher", holder)
+        if item.date:
+            _sub(origin, "dateIssued", item.date, encoding="iso8601")
+        if item.edition:
+            _sub(origin, "edition", item.edition)
+    if item.language:
+        _sub(
+            _sub(record, "language"),
+            "languageTerm",
+            item.language,
+            type="code",
+            authority="rfc5646",
+        )
+    host = (
+        _sub(record, "relatedItem", type="host")
+        if item.container_title or item.volume or item.number or item.pages or item.chapter
+        else None
+    )
+    if host is not None and item.container_title:
+        _sub(_sub(host, "titleInfo"), "title", item.container_title)
+    if host is not None:
+        part = _sub(host, "part")
+        for kind, value in (
+            ("volume", item.volume),
+            ("issue", item.number),
+            ("chapter", item.chapter),
+        ):
+            if value:
+                _sub(_sub(part, "detail", type=kind), "number", value)
+        if item.pages:
+            extent = _sub(part, "extent", unit="page")
+            span = re.fullmatch(r"\s*(.+?)\s*[–—-]+\s*(.+?)\s*", item.pages)
+            if span:
+                _sub(extent, "start", span.group(1))
+                _sub(extent, "end", span.group(2))
+            else:
+                _sub(extent, "list", item.pages)
+    if item.series:
+        _sub(_sub(_sub(record, "relatedItem", type="series"), "titleInfo"), "title", item.series)
+    if item.note:
+        _sub(record, "note", item.note)
+    if item.doi:
+        _sub(record, "identifier", item.doi, type="doi")
+    if item.cite_key:
+        _sub(record, "identifier", item.cite_key, type="citekey")
+    if item.url:
+        _sub(_sub(record, "location"), "url", item.url)
+
+
+def write_mods(items) -> str:
+    collection = ElementTree.Element("modsCollection", {"xmlns": _MODS_NS})
+    for item in items:
+        mods_record(collection, item)
+    ElementTree.indent(collection)
+    body = ElementTree.tostring(collection, encoding="unicode")
+    return '<?xml version="1.0" encoding="UTF-8"?>\n' + body + "\n"
+
+
 # ------------------------------------------------------------------------- detection
 
 
@@ -681,6 +1007,8 @@ def detect(raw: bytes, name: str = "") -> str:
     head = raw[:4096].decode("utf-8-sig", errors="replace").lstrip()
     if head.startswith(("{", "[")):
         return CSL_JSON
+    if head.startswith("<") and re.search(r"<(?:\w+:)?mods(?:Collection)?[\s>]", head):
+        return MODS
     if re.match(r"TY\s{1,2}-", head) or suffix == "ris":
         return RIS
     if head.startswith("@") or suffix in ("bib", "bibtex", "biblatex") or "\n@" in head:
@@ -698,9 +1026,12 @@ def read(raw: bytes, name: str = "") -> Reading:
     fmt = detect(raw, name)
     if not fmt:
         raise ReferencesRefused(
-            _("That file is not one of BibTeX, BibLaTeX, RIS or CSL JSON, so it was not read.")
+            _(
+                "That file is not one of BibTeX, BibLaTeX, RIS, CSL JSON or MODS, "
+                "so it was not read."
+            )
         )
-    reader = {BIBTEX: read_bibtex, RIS: read_ris, CSL_JSON: read_csl_json}[fmt]
+    reader = {BIBTEX: read_bibtex, RIS: read_ris, CSL_JSON: read_csl_json, MODS: read_mods}[fmt]
     return reader(raw)
 
 
@@ -979,4 +1310,6 @@ def write(fmt: str, items) -> str:
         return write_ris(items)
     if fmt == CSL_JSON:
         return write_csl_json(items)
+    if fmt == MODS:
+        return write_mods(items)
     raise KeyError(fmt)

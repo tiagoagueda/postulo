@@ -234,7 +234,7 @@ class JsonResumeFormat:
         icon="book-text",
         description=_(
             "The publications of Your career as a bibliography file, out, and a bibliography "
-            "file read in: BibTeX, BibLaTeX, RIS and CSL JSON, which Zotero, Mendeley, "
+            "file read in: BibTeX, BibLaTeX, RIS, CSL JSON and MODS, which Zotero, Mendeley, "
             "JabRef, EndNote and LaTeX read and write. What a file holds is listed before "
             "anything is added. Switched off, neither is offered and their addresses answer "
             "as if there were nothing there."
