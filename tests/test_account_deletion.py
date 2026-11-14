@@ -16,7 +16,13 @@ from django.utils import timezone
 from postulo.accounts import avatars, deletion
 from postulo.accounts.models import Invite, Profile, ProfilePicture
 from postulo.api.models import ApiToken
-from postulo.applications.models import Application, Reminder, Status
+from postulo.applications.models import (
+    Application,
+    ApplicationAnswer,
+    Reminder,
+    SavedAnswer,
+    Status,
+)
 from postulo.applications.services import change_status
 from postulo.core.models import ExportArchive, OwnedModel
 from postulo.documents.models import CV, RenderedDocument, UploadedDocument
@@ -66,6 +72,10 @@ def fill(user) -> dict[str, Path]:
     change_status(application, Status.APPLIED)
     Reminder.objects.create(
         owner=user, application=application, summary="x", due_at="2030-01-01T09:00Z"
+    )
+    SavedAnswer.objects.create(owner=user, question="Why us?", answer="Because.")
+    ApplicationAnswer.objects.create(
+        owner=user, application=application, question="Why us?", answer="Because."
     )
     cv = CV.objects.create(owner=user, name="CV")
     counted = Publication.objects.create(owner=user, title="A paper", authors="Morgan, Alex")

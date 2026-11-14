@@ -2,7 +2,7 @@ from django.urls import path
 
 from postulo.core import modules
 
-from . import views, views_candidate, views_references
+from . import views, views_answers, views_candidate, views_references
 
 #: Bibliography files are a module (#879): while it is off the address answers as if there
 #: were nothing there.
@@ -42,6 +42,19 @@ urlpatterns = [
         "publications/references/",
         bibliography(views_references.ReferencesView.as_view()),
         name="references",
+    ),
+    # The answers kept for application forms (#1092), before the sections' own addresses.
+    path("answers/", views_answers.SavedAnswerListView.as_view(), name="answer_list"),
+    path("answers/new/", views_answers.SavedAnswerCreateView.as_view(), name="answer_create"),
+    path(
+        "answers/<int:pk>/edit/",
+        views_answers.SavedAnswerUpdateView.as_view(),
+        name="answer_update",
+    ),
+    path(
+        "answers/<int:pk>/delete/",
+        views_answers.SavedAnswerDeleteView.as_view(),
+        name="answer_delete",
     ),
     path("<slug:section>/new/", views.ResumeItemCreateView.as_view(), name="item_create"),
     path("<slug:section>/<int:pk>/edit/", views.ResumeItemUpdateView.as_view(), name="item_update"),

@@ -574,6 +574,7 @@ class ApplicationDetailView(OwnedObjectMixin, DetailView):
         # What deleting it would take with it, for the dialog on this page (#854).
         context["deletion"] = deletions.facts_for(ApplicationDeleteView, self.request, self.object)
         context["offers"] = list(self.object.offers.all())
+        context["answers"] = list(self.object.answers.all())
         interviews = list(self.object.interviews.prefetch_related("contacts"))
         context["scheduled_interviews"] = [i for i in interviews if i.is_scheduled]
         context["settled_interviews"] = [i for i in interviews if i.is_settled][::-1]

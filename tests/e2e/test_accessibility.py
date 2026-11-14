@@ -337,6 +337,24 @@ def furnished(applicant):
         holidays=25,
         answer_by=timezone.localdate() + dt.timedelta(days=7),
     )
+    # A saved answer, and a copy of it on the application, so the pages of the answers have
+    # something to draw in both themes (#1092).
+    from postulo.applications.models import ApplicationAnswer, SavedAnswer
+
+    saved_answer = SavedAnswer.objects.create(
+        owner=applicant,
+        question="Why {{ company }}?",
+        answer="Because of the work. And the people.",
+        language="en-GB",
+    )
+    saved_answer.tags.add(tag)
+    answer_given = ApplicationAnswer.objects.create(
+        owner=applicant,
+        application=application,
+        question="Why us?",
+        answer="Because of the work.",
+        saved_answer=saved_answer,
+    )
     # A connection row, so its own pages exist. Nothing is configured behind it and nothing
     # here contacts anything: the pages being checked are a form and a confirmation.
     connection = Connection.objects.create(
@@ -483,6 +501,8 @@ def furnished(applicant):
         "subscribed": subscribed,
         "reminder": reminder,
         "offer": offer,
+        "saved_answer": saved_answer,
+        "answer_given": answer_given,
         "connection": connection,
         "suggestion": suggestion,
         # The company's primary address, for the page that places it by hand (#702).
@@ -613,6 +633,8 @@ def signed_in_paths(a, c, me, entry=None, recovery_link: str = "", things=None) 
     subscription = it.get("subscription", a)
     subscribed = it.get("subscribed", a)
     offer = it.get("offer", a)
+    saved_answer = it.get("saved_answer", a)
+    answer_given = it.get("answer_given", a)
     connection = it.get("connection", a)
     pairing = it.get("pairing", a)
     errand = it.get("errand", a)
@@ -820,6 +842,14 @@ def signed_in_paths(a, c, me, entry=None, recovery_link: str = "", things=None) 
         f"/applications/{a.pk}/offers/new/",
         f"/applications/offers/{offer.pk}/edit/",
         f"/applications/offers/{offer.pk}/delete/",
+        # The answers kept for application forms, and what an application was told (#1092).
+        "/career/answers/",
+        "/career/answers/new/",
+        f"/career/answers/{saved_answer.pk}/edit/",
+        f"/career/answers/{saved_answer.pk}/delete/",
+        f"/applications/{a.pk}/answers/new/",
+        f"/applications/answers/{answer_given.pk}/edit/",
+        f"/applications/answers/{answer_given.pk}/delete/",
         f"/jobs/captures/{capture.pk}/review/",
         # What the capture kept of its page, and the question asked before it is thrown
         # away: fetched and never submitted, like every other confirmation here (#256).

@@ -968,6 +968,51 @@ class OfferPatch(Schema):
     notes: str | None = Field(default=None, max_length=BODY_MAX_CHARS)
 
 
+# --------------------------------------------------------------------- answers
+
+
+class SavedAnswerOut(Schema):
+    id: int
+    question: str
+    answer: str
+    language: str = Field("", description="A BCP 47 tag, or empty where it does not matter")
+    tags: list[str] = Field(description="The slugs of its tags")
+    updated_at: dt.datetime
+
+
+class AnswerGivenOut(Schema):
+    id: int
+    application_id: int
+    question: str
+    answer: str = Field(description="As it was given, whatever the saved answer says now")
+    language: str = ""
+    saved_answer_id: int | None = Field(None, description="The saved answer it began as, if any")
+    updated_at: dt.datetime
+
+
+def saved_answer_out(saved) -> dict:
+    return {
+        "id": saved.pk,
+        "question": saved.question,
+        "answer": saved.answer,
+        "language": saved.language,
+        "tags": [tag.slug for tag in saved.tags.all()],
+        "updated_at": saved.updated_at,
+    }
+
+
+def answer_given_out(given) -> dict:
+    return {
+        "id": given.pk,
+        "application_id": given.application_id,
+        "question": given.question,
+        "answer": given.answer,
+        "language": given.language,
+        "saved_answer_id": given.saved_answer_id,
+        "updated_at": given.updated_at,
+    }
+
+
 class ApplicationDetailOut(ApplicationOut):
     events: list[EventOut]
     reminders: list[ReminderOut]

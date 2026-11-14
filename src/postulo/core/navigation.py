@@ -148,6 +148,11 @@ CAREER_NAMES: tuple[str, ...] = (
     "resume:publication_lookup_new",
     "resume:publication_lookup",
     "resume:publication_orcid",
+    # The answers kept for application forms (#1092).
+    "resume:answer_list",
+    "resume:answer_create",
+    "resume:answer_update",
+    "resume:answer_delete",
     "resume:item_create",
     "resume:item_update",
     "resume:item_delete",

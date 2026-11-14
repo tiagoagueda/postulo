@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% if form.instance.pk %}{% translate "Edit answer" %}{% else %}{% translate "Keep an answer" %}{% endif %}{% endblock %}
+
+{% block content %}
+  {% comment %} What one application was told in answer to one question (#1092). A copy: it may
+     begin as a saved answer, with the application's details filled into its placeholders, and
+     from then on it is this application's own. Editing it leaves the saved one as it is. {% endcomment %}
+  <div class="mx-auto max-w-lg">
+    <p class="text-sm text-ink-500 dark:text-ink-400">
+      <a href="{{ application.get_absolute_url }}" class="hover:underline">
+        <bdi>{{ application.posting.title }}</bdi> · <bdi>{{ application.posting.company.name }}</bdi>
+      </a>
+    </p>
+    <c-page-title>
+      {% if form.instance.pk %}{% translate "Edit answer" %}{% else %}{% translate "Keep an answer" %}{% endif %}
+      <c-slot name="subtitle">
+        {% if form.instance.pk %}
+          {% translate "Changing it here leaves the saved answer it began as untouched." %}
+        {% else %}
+          {% translate "What you told them. It is kept as it is, even if you later change the saved answer." %}
+        {% endif %}
+      </c-slot>
+    </c-page-title>
+
+    {% if not form.instance.pk and saved_answers %}
+      <div class="card mb-6">
+        <h2 class="mb-2 text-sm font-medium">{% translate "Start from an answer you have saved" %}</h2>
+        <ul class="flex flex-wrap gap-2">
+          {% for option in saved_answers %}
+            <li>
+              <a href="?from={{ option.pk }}" class="btn" data-variant="outline" data-size="xs"
+                 {% if saved and saved.pk == option.pk %}aria-current="true"{% endif %}>
+                <bdi>{{ option.question }}</bdi>
+              </a>
+            </li>
+          {% endfor %}
+        </ul>
+      </div>
+    {% endif %}
+
+    <form method="post" novalidate>
+      {% csrf_token %}
+      {% if saved %}<input type="hidden" name="saved_answer" value="{{ saved.pk }}">{% endif %}
+      <div class="card mb-6">
+        <c-field :field="form.question" />
+        <c-field :field="form.answer" />
+        <c-field :field="form.language" />
+      </div>
+      <div class="flex items-center gap-3">
+        <button type="submit" class="btn">{% translate "Save" %}</button>
+        <a href="{{ application.get_absolute_url }}#answers" class="btn" data-variant="ghost">{% translate "Cancel" %}</a>
+      </div>
+    </form>
+  </div>
+{% endblock %}

@@ -276,7 +276,12 @@ logger = logging.getLogger(__name__)
 #: ``thank_you``, ``withdrawal``, ``availability`` or ``other``), a ``subject``, a ``body`` and a
 #: ``language``. An archive without them restores none; a purpose that is not one of those is
 #: ``other`` (#1094).
-FORMAT_VERSION = 85
+#: 86 added the answers kept for application forms (#1092): ``saved_answers`` at the top of the
+#: file, each a ``question``, an ``answer``, a ``language`` and its ``tags`` by slug, and under
+#: each application ``answers``, copies as they were given, each with the local id of the saved
+#: answer it began as (``saved_answer_id``) or none. An archive without them restores none; one
+#: with a question missing or too long is restored without that answer, and says so.
+FORMAT_VERSION = 86
 
 
 def industry_entry(industry) -> str | dict:
@@ -647,6 +652,15 @@ INTERVIEW_FIELDS = (
     "notes",
     "outcome",
     "reminder_id",
+    "created_at",
+)
+SAVED_ANSWER_FIELDS = ("id", "question", "answer", "language", "created_at")
+APPLICATION_ANSWER_FIELDS = (
+    "id",
+    "question",
+    "answer",
+    "language",
+    "saved_answer_id",
     "created_at",
 )
 OFFER_FIELDS = (
@@ -1143,6 +1157,16 @@ def _subscriptions(user) -> list[dict]:
     ]
 
 
+def _saved_answers(user) -> list[dict]:
+    """The answers kept for application forms, each with its tags by slug (#1092)."""
+    from postulo.applications.models import SavedAnswer
+
+    return [
+        {**_fields(saved, SAVED_ANSWER_FIELDS), "tags": [tag.slug for tag in saved.tags.all()]}
+        for saved in SavedAnswer.objects.for_user(user).prefetch_related("tags")
+    ]
+
+
 def _contact(contact) -> dict:
     """One person, with everything recorded about how to reach them."""
     return {
@@ -1232,6 +1256,7 @@ def counts(user) -> dict[str, int]:
         Appointment,
         CalendarSubscription,
         Interview,
+        SavedAnswer,
     )
     from postulo.documents.models import (
         CV,
@@ -1255,6 +1280,7 @@ def counts(user) -> dict[str, int]:
         "interviews": Interview.objects.for_user(user).count(),
         "appointments": Appointment.objects.for_user(user).count(),
         "calendar_subscriptions": CalendarSubscription.objects.for_user(user).count(),
+        "saved_answers": SavedAnswer.objects.for_user(user).count(),
         "cvs": CV.objects.for_user(user).count(),
         "cover_letters": CoverLetter.objects.for_user(user).count(),
         "message_templates": MessageTemplate.objects.for_user(user).count(),
@@ -1362,6 +1388,9 @@ def build_document(user) -> dict:
         ],
         # The calendars followed (#1098), with what each held; not their addresses.
         "calendar_subscriptions": _subscriptions(user),
+        # The answers kept for application forms (#1092); each application's own copies are
+        # written under it.
+        "saved_answers": _saved_answers(user),
         "companies": [],
         "documents": {},
         "captures": [],
@@ -1400,6 +1429,7 @@ def build_document(user) -> dict:
             Prefetch("postings__applications", queryset=Application.objects.filter(owner=user)),
             "postings__applications__tags",
             "postings__applications__offers",
+            "postings__applications__answers",
             "postings__applications__events",
             "postings__applications__reminders",
             "postings__applications__interviews__contacts",
@@ -1541,6 +1571,10 @@ def build_document(user) -> dict:
                                     _fields(offer, OFFER_FIELDS)
                                     for offer in application.offers.all()
                                 ],
+                                "answers": [
+                                    _fields(answer, APPLICATION_ANSWER_FIELDS)
+                                    for answer in application.answers.all()
+                                ],
                             }
                             for application in posting.applications.all()
                         ],
@@ -1649,6 +1683,7 @@ def build_document(user) -> dict:
         ),
         "appointments": sum(len(company["appointments"]) for company in document["companies"]),
         "calendar_subscriptions": len(document["calendar_subscriptions"]),
+        "saved_answers": len(document["saved_answers"]),
         "cvs": len(document["documents"]["cvs"]),
         "cover_letters": len(document["documents"]["cover_letters"]),
         "message_templates": len(document["documents"]["message_templates"]),

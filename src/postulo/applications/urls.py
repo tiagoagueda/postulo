@@ -2,7 +2,14 @@ from django.urls import path
 
 from postulo.core import modules
 
-from . import views, views_calendar_print, views_ical, views_interview, views_subscriptions
+from . import (
+    views,
+    views_answers,
+    views_calendar_print,
+    views_ical,
+    views_interview,
+    views_subscriptions,
+)
 
 app_name = "applications"
 
@@ -23,6 +30,21 @@ urlpatterns = [
     path("<int:pk>/", views.ApplicationDetailView.as_view(), name="detail"),
     path("<int:pk>/edit/", views.ApplicationUpdateView.as_view(), name="update"),
     path("<int:pk>/delete/", views.ApplicationDeleteView.as_view(), name="delete"),
+    path(
+        "<int:pk>/answers/new/",
+        views_answers.AnswerGivenCreateView.as_view(),
+        name="answer_given_create",
+    ),
+    path(
+        "answers/<int:pk>/edit/",
+        views_answers.AnswerGivenUpdateView.as_view(),
+        name="answer_given_update",
+    ),
+    path(
+        "answers/<int:pk>/delete/",
+        views_answers.AnswerGivenDeleteView.as_view(),
+        name="answer_given_delete",
+    ),
     path("<int:pk>/status/", views.ApplicationStatusView.as_view(), name="status"),
     path("<int:pk>/events/new/", views.EventCreateView.as_view(), name="event_create"),
     path("<int:pk>/quiet/", views.ApplicationQuietActionView.as_view(), name="quiet_action"),
