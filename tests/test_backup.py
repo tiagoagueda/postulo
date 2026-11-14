@@ -382,7 +382,7 @@ def test_an_archive_is_written_at_gzip_level_six_and_still_verifies_and_restores
 
 
 def test_a_backup_restores_onto_a_database_that_was_never_migrated(tmp_path):
-    """A rebuilt host with `POSTULO_SKIP_MIGRATE=1` has a file with no tables in it (#476)."""
+    """A rebuilt host with `POSTULO_CONTAINER_MIGRATE=0` has a file with no tables in it (#476)."""
     if database_vendor() != "sqlite":
         pytest.skip("a file of its own is something SQLite has")
     from django.db import connections

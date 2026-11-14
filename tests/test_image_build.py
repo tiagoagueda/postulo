@@ -166,7 +166,7 @@ def test_the_image_carries_the_driver_for_the_engine_it_is_offered():
 def test_the_plugin_constraints_name_the_same_extras_as_the_environment():
     """A constraint file only constrains what it mentions.
 
-    `uv export` writes the constraints that `POSTULO_EXTRA_PACKAGES` is installed against,
+    `uv export` writes the constraints that `POSTULO_IMAGE_EXTRA_PACKAGES` is installed against,
     so an extra missing from it is a package a plugin may silently move to another version
     -- which is the one thing a constraint file is there to stop.
     """
@@ -231,7 +231,7 @@ def test_the_postgresql_compose_file_runs_the_scheduler_too():
     assert "send_due_reminders" in scheduler["command"]
     assert scheduler["profiles"] == ["scheduler"], "started by asking for it, as with SQLite"
     assert "db" in scheduler["depends_on"], "it cannot run before the database accepts it"
-    assert scheduler["environment"]["POSTULO_SKIP_MIGRATE"] == "1", (
+    assert scheduler["environment"]["POSTULO_CONTAINER_MIGRATE"] == "0", (
         "two containers migrating the same database at once is a race, not a safety net"
     )
 
@@ -251,7 +251,7 @@ def test_the_two_compose_files_run_the_same_postulo_services():
     for compose in (sqlite, postgres):
         worker = compose["services"]["worker"]
         assert worker["command"][-1] == "work"
-        assert worker["environment"]["POSTULO_SKIP_MIGRATE"] == "1"
+        assert worker["environment"]["POSTULO_CONTAINER_MIGRATE"] == "0"
 
 
 def test_the_postgresql_compose_file_interpolates_no_password():
@@ -393,7 +393,7 @@ def test_every_apt_layer_takes_debians_updates():
     only thing that reaches a package like that is `upgrade`.
 
     Asserted for every apt layer, not only the first: an image built with
-    `POSTULO_EXTRA_PACKAGES` refreshes the index a second time, and an image with plugins
+    `POSTULO_IMAGE_EXTRA_PACKAGES` refreshes the index a second time, and an image with plugins
     must not be quietly less patched than one without them.
     """
     for layer in apt_commands():
@@ -495,15 +495,15 @@ def test_the_layer_that_upgrades_can_be_told_to_run_again():
         line for line in stages()["runtime"].splitlines() if not line.lstrip().startswith("#")
     )
 
-    assert "ARG POSTULO_APT_REFRESH" in runtime, "nothing can make the apt layer run again"
-    declared = runtime.index("ARG POSTULO_APT_REFRESH")
+    assert "ARG POSTULO_IMAGE_APT_REFRESH" in runtime, "nothing can make the apt layer run again"
+    declared = runtime.index("ARG POSTULO_IMAGE_APT_REFRESH")
     layer = runtime.index("apt-get update")
     assert declared < layer, "declared under the layer, the value is not in its cache key"
     assert "COPY" not in runtime[declared:layer], (
         "the layer it is for is the first thing after it: anything between them is rebuilt "
         "for no reason, and says the argument is for something else"
     )
-    assert "${POSTULO_APT_REFRESH:-" in runtime[declared:], (
+    assert "${POSTULO_IMAGE_APT_REFRESH:-" in runtime[declared:], (
         "the build log has to say when Debian was asked, and that nobody said when"
     )
 
@@ -519,7 +519,9 @@ def test_every_build_the_project_makes_asks_debian_again(path: Path):
 
     assert builds, f"{path.name} builds nothing: the file has changed, or the reader is wrong"
     for build in builds:
-        assert "--build-arg POSTULO_APT_REFRESH=" in build, f"may be served from cache: {build}"
+        assert "--build-arg POSTULO_IMAGE_APT_REFRESH=" in build, (
+            f"may be served from cache: {build}"
+        )
         assert "--pull" in build, f"keeps whatever base image the builder has: {build}"
 
 
@@ -543,7 +545,7 @@ def test_the_image_scanned_and_the_image_published_are_built_at_one_moment(path:
     assert steps.index(moment) < steps.index(building[0]), "worked out before it is used"
     for step in building:
         assert step.get("env", {}).get("ASKED") == "${{ steps.moment.outputs.asked }}", step
-        assert 'POSTULO_APT_REFRESH="$ASKED"' in step["run"], step["run"]
+        assert 'POSTULO_IMAGE_APT_REFRESH="$ASKED"' in step["run"], step["run"]
 
 
 def test_a_pushed_dev_image_asks_debian_once_a_day_and_a_release_every_time():
@@ -573,7 +575,7 @@ def test_a_pushed_dev_image_asks_debian_once_a_day_and_a_release_every_time():
 def test_a_script_that_builds_passes_the_moment_it_runs_at(path: Path):
     """A person scanning by hand wants the image a build would make now."""
     for build in builds_in(path.read_text(encoding="utf-8")):
-        assert 'POSTULO_APT_REFRESH="$(date -u' in build, build
+        assert 'POSTULO_IMAGE_APT_REFRESH="$(date -u' in build, build
 
 
 # ------------------------------------------------ what the finished image contains
@@ -1102,7 +1104,7 @@ def test_the_image_check_does_not_wait_on_geonames():
 
     assert len(runs) == 2
     for run in runs:
-        assert "-e POSTULO_SKIP_GEONAMES=1" in run, run
+        assert "-e POSTULO_CONTAINER_GEONAMES_FETCH=0" in run, run
 
 
 def test_start_only_builds_nothing_and_publishes_no_port():

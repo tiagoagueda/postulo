@@ -77,6 +77,7 @@ _READ_PATTERNS = (
     r'"{name}"\s+in\s+os\.environ',
     r"\$\{{?{name}\b",
     r"^ARG\s+{name}\b",
+    r"\bis_off\s+{name}\b",
     r'\("{name}",\s*"POSTGRES_PASSWORD"\)',
 )
 
@@ -142,7 +143,10 @@ def test_the_words_a_choice_takes_are_the_ones_the_code_acts_on():
     variables = configuration.VARIABLES
     assert set(variables["POSTULO_EMAIL_OAUTH_PROVIDER"].choices) == set(mail_auth.PROVIDERS)
     assert set(variables["POSTULO_EMAIL_OAUTH_GRANT"].choices) == set(MailGrant.values)
-    assert set(variables["POSTULO_GEOCODER"].choices) == {geocoding.OFF, *geocoding.SERVICES}
+    assert set(variables["POSTULO_GEOCODER_SERVICE"].choices) == {
+        geocoding.OFF,
+        *geocoding.SERVICES,
+    }
     assert checks.CHOICES["POSTULO_PDF_BACKEND"] == ("auto", "weasyprint", "chromium")
     assert len(checks.CHOICES) == 6
 
@@ -158,41 +162,13 @@ def test_every_variable_is_in_an_area_and_documented_in_one_place():
 
 # ---------------------------------------------------------------- the naming rules
 
-#: Every name that broke the rules in CONTRIBUTING.md when they were written, with the name it
-#: takes when it is renamed (stage 2 of #1186; the old one stays as an alias for a minor).
-#: Entries leave this list as they are renamed, and none is ever added: a new name follows
-#: the rules.
-BREAKERS = {
-    # One word: there is no area.
-    "POSTULO_DEBUG": "POSTULO_DEBUG_ENABLED",
-    # A first word that is not an area.
-    "POSTULO_ALLOW_WEAK_SECRET_KEY": "POSTULO_SECRET_KEY_WEAK_ALLOWED",
-    "POSTULO_ALLOW_WILDCARD_HOSTS": "POSTULO_ALLOWED_HOSTS_WILDCARD_ALLOWED",
-    "POSTULO_DEFAULT_FROM_EMAIL": "POSTULO_EMAIL_FROM",
-    "POSTULO_SCRUB_EVERY_DAYS": "POSTULO_MEDIA_SCRUB_EVERY_SECONDS",
-    "POSTULO_APT_REFRESH": "POSTULO_IMAGE_APT_REFRESH",
-    "POSTULO_EXTRA_PACKAGES": "POSTULO_IMAGE_EXTRA_PACKAGES",
-    "POSTULO_EXTRA_APT_PACKAGES": "POSTULO_IMAGE_EXTRA_APT_PACKAGES",
-    "POSTULO_WRITE_GOLDEN": "POSTULO_TEST_WRITE_GOLDEN",
-    # A unit other than bytes or seconds, or none on a duration.
-    "POSTULO_BACKUP_UPLOAD_MAX_MB": "POSTULO_BACKUP_UPLOAD_MAX_BYTES",
-    "POSTULO_UPLOAD_CEILING_MB": "POSTULO_UPLOAD_CEILING_BYTES",
-    "POSTULO_EMAIL_TIMEOUT": "POSTULO_EMAIL_TIMEOUT_SECONDS",
-    "POSTULO_EMAIL_CODE_TIMEOUT": "POSTULO_EMAIL_CODE_TIMEOUT_SECONDS",
-    "POSTULO_EXPORT_KEEP_HOURS": "POSTULO_EXPORT_KEEP_SECONDS",
-    "POSTULO_MEDIA_SWEEP_GRACE_HOURS": "POSTULO_MEDIA_SWEEP_GRACE_SECONDS",
-    "POSTULO_CAPTURE_PAGE_KEEP_DAYS": "POSTULO_CAPTURE_PAGE_KEEP_SECONDS",
-    # A boolean that is a negation; the new one is true when the step runs.
-    "POSTULO_SKIP_MIGRATE": "POSTULO_CONTAINER_MIGRATE",
-    "POSTULO_SKIP_PLUGIN_SYNC": "POSTULO_CONTAINER_PLUGIN_SYNC",
-    "POSTULO_SKIP_GEONAMES": "POSTULO_CONTAINER_GEONAMES_FETCH",
-    # One word.
-    "POSTULO_GEOCODER": "POSTULO_GEOCODER_SERVICE",
-    "POSTULO_WIKI": "POSTULO_WIKI_DIR",
-}
+#: Names that break the rules in CONTRIBUTING.md, with the name each takes when renamed. The 21
+#: that did were renamed in stage 2 of #1186, each old one kept as an alias for a minor (see
+#: `RENAMED`). Nothing is added: a new name follows the rules.
+BREAKERS: dict[str, str] = {}
 
 #: The list may only shrink. Lower this as names are renamed; never raise it.
-MOST_BREAKERS = 21
+MOST_BREAKERS = 0
 
 rule_breaks = configuration.naming_problems
 
@@ -284,8 +260,8 @@ NOT_PINNED = {
     "POSTULO_RATELIMIT_DIR": "CACHES['ratelimit']",
     "POSTULO_LOG_LEVEL": "LOGGING",
     "POSTULO_FETCH_PORTS": "POSTULO_FETCH_PORTS, as numbers",
-    "POSTULO_ALLOW_WEAK_SECRET_KEY": "a refusal at start-up",
-    "POSTULO_ALLOW_WILDCARD_HOSTS": "a refusal at start-up",
+    "POSTULO_SECRET_KEY_WEAK_ALLOWED": "a refusal at start-up",
+    "POSTULO_ALLOWED_HOSTS_WILDCARD_ALLOWED": "a refusal at start-up",
     "POSTULO_GEOLOCATIONS_DIR": "postulo.jobs.places.DATA_DIR",
     "POSTULO_ESCO_DIR": "postulo.jobs.esco.DATA_DIR",
     "POSTULO_GEONAMES_POSTCODES": "manage.py fetch_geonames",
@@ -374,21 +350,21 @@ def test_an_empty_boolean_that_defaults_to_true_is_a_warning():
     ("name", "raw", "value"),
     [
         # A bare number is in the unit the name gives, as before.
-        ("POSTULO_UPLOAD_CEILING_MB", "25", 25),
-        ("POSTULO_UPLOAD_CEILING_MB", "25MB", 25),
-        ("POSTULO_UPLOAD_CEILING_MB", "1GB", 1024),
-        ("POSTULO_UPLOAD_CEILING_MB", "1.5 gb", 1536),
+        ("POSTULO_UPLOAD_CEILING_BYTES", "26214400", 25 * 1024**2),
+        ("POSTULO_UPLOAD_CEILING_BYTES", "25MB", 25 * 1024**2),
+        ("POSTULO_UPLOAD_CEILING_BYTES", "1GB", 1024**3),
+        ("POSTULO_UPLOAD_CEILING_BYTES", "1.5 gb", 1536 * 1024**2),
         ("POSTULO_LOG_MAX_BYTES", "2MB", 2 * 1024 * 1024),
         ("POSTULO_LOG_MAX_BYTES", "512KiB", 512 * 1024),
         ("POSTULO_LOG_MAX_BYTES", "100B", 100),
         ("POSTULO_HSTS_SECONDS", "90s", 90),
         ("POSTULO_HSTS_SECONDS", "2h", 7200),
         ("POSTULO_HSTS_SECONDS", "15m", 900),
-        ("POSTULO_EXPORT_KEEP_HOURS", "2h", 2),
-        ("POSTULO_EXPORT_KEEP_HOURS", "2d", 48),
-        ("POSTULO_EXPORT_KEEP_HOURS", "48", 48),
-        ("POSTULO_SCRUB_EVERY_DAYS", "7d", 7),
-        ("POSTULO_SCRUB_EVERY_DAYS", "1w", 7),
+        ("POSTULO_EXPORT_KEEP_SECONDS", "2h", 7200),
+        ("POSTULO_EXPORT_KEEP_SECONDS", "2d", 172_800),
+        ("POSTULO_EXPORT_KEEP_SECONDS", "48", 48),
+        ("POSTULO_MEDIA_SCRUB_EVERY_SECONDS", "7d", 604_800),
+        ("POSTULO_MEDIA_SCRUB_EVERY_SECONDS", "1w", 604_800),
         ("POSTULO_CACHE_MAX_ENTRIES", " 5000 ", 5000),
     ],
 )
@@ -400,9 +376,9 @@ def test_sizes_and_durations_take_a_suffix(name, raw, value):
 @pytest.mark.parametrize(
     ("name", "raw"),
     [
-        ("POSTULO_UPLOAD_CEILING_MB", "100KB"),  # not a whole number of megabytes
-        ("POSTULO_EXPORT_KEEP_HOURS", "90m"),
-        ("POSTULO_EXPORT_KEEP_HOURS", "1.5h"),
+        ("POSTULO_UPLOAD_CEILING_BYTES", "1.5B"),  # not a whole number of bytes
+        ("POSTULO_EXPORT_KEEP_SECONDS", "1.5s"),
+        ("POSTULO_EXPORT_KEEP_SECONDS", "1.5m"),
         ("POSTULO_EMAIL_PORT", "abc"),
         ("POSTULO_EMAIL_PORT", ""),
         ("POSTULO_LOG_MAX_BYTES", "5 megabytes"),
@@ -435,10 +411,12 @@ def test_a_list_is_split_on_commas_without_the_spaces():
 
 def test_a_choice_takes_its_words_in_any_case_and_nothing_else():
     assert read("POSTULO_PDF_BACKEND", environ={"POSTULO_PDF_BACKEND": " Chromium "}) == "chromium"
-    assert read("POSTULO_GEOCODER", environ={"POSTULO_GEOCODER": ""}) == ""
+    assert read("POSTULO_GEOCODER_SERVICE", environ={"POSTULO_GEOCODER_SERVICE": ""}) == ""
 
-    geocoder = configuration.VARIABLES["POSTULO_GEOCODER"]
-    [problem] = configuration.problems({"POSTULO_GEOCODER": "nominatum"}, {geocoder.name: geocoder})
+    geocoder = configuration.VARIABLES["POSTULO_GEOCODER_SERVICE"]
+    [problem] = configuration.problems(
+        {"POSTULO_GEOCODER_SERVICE": "nominatum"}, {geocoder.name: geocoder}
+    )
     assert problem.level == "error" and "nominatim" in problem.hint
 
 
@@ -574,6 +552,57 @@ def test_start_up_names_the_new_name_of_an_old_one(monkeypatch):
     assert "POSTULO_SCRATCH_LIMIT_BYTES" in warning.hint
 
 
+#: The 21 names renamed to the rules in stage 2 of #1186: the old name, the name it has now and
+#: a value under the old name with what it comes to now. Build arguments and the variables of
+#: the tests and scripts (`POSTULO_APT_REFRESH`, `POSTULO_EXTRA_PACKAGES`,
+#: `POSTULO_EXTRA_APT_PACKAGES`, `POSTULO_WRITE_GOLDEN`, `POSTULO_WIKI`) were renamed with no
+#: alias: no instance's environment holds them. The old ones leave in 0.7.
+RENAMED = {
+    "POSTULO_DEBUG": ("POSTULO_DEBUG_ENABLED", "true", True),
+    "POSTULO_ALLOW_WEAK_SECRET_KEY": ("POSTULO_SECRET_KEY_WEAK_ALLOWED", "1", True),
+    "POSTULO_ALLOW_WILDCARD_HOSTS": ("POSTULO_ALLOWED_HOSTS_WILDCARD_ALLOWED", "yes", True),
+    "POSTULO_DEFAULT_FROM_EMAIL": ("POSTULO_EMAIL_FROM", "a@example.org", "a@example.org"),
+    "POSTULO_SCRUB_EVERY_DAYS": ("POSTULO_MEDIA_SCRUB_EVERY_SECONDS", "3", 3 * 86_400),
+    "POSTULO_BACKUP_UPLOAD_MAX_MB": ("POSTULO_BACKUP_UPLOAD_MAX_BYTES", "7", 7 * 1024**2),
+    "POSTULO_UPLOAD_CEILING_MB": ("POSTULO_UPLOAD_CEILING_BYTES", "30", 30 * 1024**2),
+    "POSTULO_EMAIL_TIMEOUT": ("POSTULO_EMAIL_TIMEOUT_SECONDS", "20", 20),
+    "POSTULO_EMAIL_CODE_TIMEOUT": ("POSTULO_EMAIL_CODE_TIMEOUT_SECONDS", "60", 60),
+    "POSTULO_EXPORT_KEEP_HOURS": ("POSTULO_EXPORT_KEEP_SECONDS", "2", 7200),
+    "POSTULO_MEDIA_SWEEP_GRACE_HOURS": ("POSTULO_MEDIA_SWEEP_GRACE_SECONDS", "3", 10_800),
+    "POSTULO_CAPTURE_PAGE_KEEP_DAYS": ("POSTULO_CAPTURE_PAGE_KEEP_SECONDS", "2", 172_800),
+    "POSTULO_SKIP_MIGRATE": ("POSTULO_CONTAINER_MIGRATE", "1", False),
+    "POSTULO_SKIP_PLUGIN_SYNC": ("POSTULO_CONTAINER_PLUGIN_SYNC", "1", False),
+    "POSTULO_SKIP_GEONAMES": ("POSTULO_CONTAINER_GEONAMES_FETCH", "1", False),
+    "POSTULO_GEOCODER": ("POSTULO_GEOCODER_SERVICE", "photon", "photon"),
+}
+
+
+@pytest.mark.parametrize("old", sorted(RENAMED))
+def test_every_renamed_variable_still_works_under_its_old_name(old):
+    new, raw, value = RENAMED[old]
+    variable = configuration.VARIABLES[new]
+    environ = {old: raw}
+
+    assert read(new, environ=environ) == value
+    assert configuration.deprecated(environ) == [(old, new)]
+    assert configuration.unknown(environ) == []
+    assert configuration.problems(environ) == []
+    assert [alias.name for alias in variable.aliases] == [old]
+    with pytest.raises(ImproperlyConfigured, match=old):
+        read(new, environ={old: raw, new: raw})
+
+
+def test_a_negation_read_under_its_old_name_is_turned_round():
+    for old, (new, _raw, _value) in RENAMED.items():
+        if old.startswith("POSTULO_SKIP_"):
+            assert read(new, environ={old: "0"}) is True
+            assert read(new, environ={}) is True
+
+
+def test_a_name_the_rules_refuse_is_no_longer_declared():
+    assert not set(RENAMED) & set(configuration.VARIABLES)
+
+
 # ----------------------------------------------------------------------- the start-up check
 
 
@@ -603,20 +632,20 @@ def test_the_test_and_ci_names_are_known(monkeypatch):
         POSTULO_TEST_DATABASE_URL="sqlite:///x",
         POSTULO_TEST_DB_CACHE="0",
         POSTULO_SEED_PASSWORD="ci-only",
-        POSTULO_SKIP_MIGRATE="1",
-        POSTULO_SKIP_PLUGIN_SYNC="1",
+        POSTULO_CONTAINER_MIGRATE="0",
+        POSTULO_CONTAINER_PLUGIN_SYNC="0",
     )
 
     assert found == {}
 
 
 def test_a_value_that_cannot_be_read_is_an_error_with_the_syntax(monkeypatch):
-    found = _ids(monkeypatch, POSTULO_EMAIL_PORT="smtp", POSTULO_SKIP_MIGRATE="true")
+    found = _ids(monkeypatch, POSTULO_EMAIL_PORT="smtp", POSTULO_CONTAINER_MIGRATE="true")
 
     errors = {message.msg.split(" ")[0]: message for message in found["postulo.E009"]}
-    assert set(errors) == {"POSTULO_EMAIL_PORT", "POSTULO_SKIP_MIGRATE"}
+    assert set(errors) == {"POSTULO_EMAIL_PORT", "POSTULO_CONTAINER_MIGRATE"}
     assert "whole number" in errors["POSTULO_EMAIL_PORT"].hint
-    assert "1 to switch it on" in errors["POSTULO_SKIP_MIGRATE"].hint
+    assert "1 to run the step" in errors["POSTULO_CONTAINER_MIGRATE"].hint
 
 
 def test_a_value_out_of_range_is_a_warning(monkeypatch):
@@ -662,10 +691,10 @@ def test_a_copy_of_env_example_sets_what_the_hand_written_one_set():
 
     assert re.findall(r"^[A-Z][A-Z0-9_]+=.*$", text, re.M) == [
         "POSTULO_SECRET_KEY=",
-        "POSTULO_DEBUG=true",
+        "POSTULO_DEBUG_ENABLED=true",
         "POSTULO_ALLOWED_HOSTS=localhost,127.0.0.1",
         "POSTULO_REGISTRATION_OPEN=false",
-        "POSTULO_DEFAULT_FROM_EMAIL=postulo@example.org",
+        "POSTULO_EMAIL_FROM=postulo@example.org",
         "POSTULO_LOG_LEVEL=INFO",
         "POSTULO_TIME_ZONE=Europe/Paris",
     ]

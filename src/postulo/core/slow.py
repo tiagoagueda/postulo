@@ -20,7 +20,7 @@ writes as it goes, so one that is still being written is not that old: the grace
 hour at the least, and a day unless the operator says otherwise.
 
 **It expires.** One archive per export, holding the whole of somebody's job search; the
-scheduler deletes what has run out, bytes and row together. `POSTULO_EXPORT_KEEP_HOURS`
+scheduler deletes what has run out, bytes and row together. `POSTULO_EXPORT_KEEP_SECONDS`
 says how long, and a day is the default because an export is something a person asks for
 and then downloads.
 
@@ -126,7 +126,7 @@ def build_an_export(errand) -> dict:
 
     owner = errand.owner
     name = suggested_filename(owner)
-    hours = int(getattr(settings, "POSTULO_EXPORT_KEEP_HOURS", 24) or 24)
+    seconds = int(getattr(settings, "POSTULO_EXPORT_KEEP_SECONDS", 86_400) or 86_400)
 
     scratch = _scratch(ExportArchive(owner=owner).storage_prefix)
     whole = _Finished(scratch, name)
@@ -137,7 +137,7 @@ def build_an_export(errand) -> dict:
             owner=owner,
             filename=name,
             size=scratch.stat().st_size,
-            expires_at=timezone.now() + timedelta(hours=hours),
+            expires_at=timezone.now() + timedelta(seconds=seconds),
         )
         archive.file.save(name, whole, save=True)
     finally:

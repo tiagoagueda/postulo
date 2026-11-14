@@ -10,7 +10,7 @@ from .keys import refuse_a_weak_key
 # Before anything else, because this key does not only sign sessions: it derives the key
 # that encrypts every stored connection credential. A refusal here costs an operator a
 # restart; the warning it replaces cost them nothing and told them nothing (#111).
-_allow_weak = read("POSTULO_ALLOW_WEAK_SECRET_KEY")
+_allow_weak = read("POSTULO_SECRET_KEY_WEAK_ALLOWED")
 refuse_a_weak_key(SECRET_KEY, name="POSTULO_SECRET_KEY", allow_weak=_allow_weak)
 
 # And the same of the field key when there is one, because whenever it is set *it* is the
@@ -23,11 +23,11 @@ DEBUG = False
 # A wildcard host makes the Host header whatever the sender says it is (#747). Links in mail
 # are on POSTULO_PUBLIC_URL when it is set, but the host check is the first defence, and a
 # `*` switches it off. Refused as a weak key is: name the hosts the instance answers to.
-if "*" in ALLOWED_HOSTS and not read("POSTULO_ALLOW_WILDCARD_HOSTS"):
+if "*" in ALLOWED_HOSTS and not read("POSTULO_ALLOWED_HOSTS_WILDCARD_ALLOWED"):
     raise ImproperlyConfigured(
         "POSTULO_ALLOWED_HOSTS contains '*', which accepts any Host header. List the names "
         "the instance is reached by instead. To start anyway while you plan that, set "
-        "POSTULO_ALLOW_WILDCARD_HOSTS=true."
+        "POSTULO_ALLOWED_HOSTS_WILDCARD_ALLOWED=true."
     )
 
 SECURE_HSTS_SECONDS = read("POSTULO_HSTS_SECONDS")

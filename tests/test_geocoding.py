@@ -99,7 +99,7 @@ def test_the_page_setting_needs_the_operators_word(user, service):
 
 
 def test_set_in_the_environment_the_choice_is_the_operators_word(user, service, settings):
-    settings.POSTULO_GEOCODER = "nominatim"
+    settings.POSTULO_GEOCODER_SERVICE = "nominatim"
     with mock.patch.object(site, "overridden_by", lambda field: field == "geocoder"):
         in_force = geocoding.current()
 
@@ -294,7 +294,7 @@ def test_a_service_address_must_be_a_web_address():
     [("google", "", "postulo.E043"), ("photon", "ftp://photon.example.org", "postulo.E044")],
 )
 def test_a_wrong_setting_in_the_environment_is_named_by_the_check(settings, service, url, named):
-    settings.POSTULO_GEOCODER, settings.POSTULO_GEOCODER_URL = service, url
+    settings.POSTULO_GEOCODER_SERVICE, settings.POSTULO_GEOCODER_URL = service, url
 
     with pytest.raises(SystemCheckError, match=named):
         call_command("check", tags=["postulo"])

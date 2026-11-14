@@ -195,13 +195,13 @@ RUN --mount=type=cache,target=/root/.cache/uv \
 # the same pins (#542).
 RUN uv export --locked --no-dev --extra server --extra postgres --extra preview --no-hashes \
         --no-emit-project --output-file /app/constraints.txt
-ARG POSTULO_EXTRA_PACKAGES=""
+ARG POSTULO_IMAGE_EXTRA_PACKAGES=""
 RUN --mount=type=cache,target=/root/.cache/uv \
-    if [ -n "$POSTULO_EXTRA_PACKAGES" ]; then \
+    if [ -n "$POSTULO_IMAGE_EXTRA_PACKAGES" ]; then \
         apt-get update \
         && apt-get upgrade -y \
         && apt-get install -y --no-install-recommends git \
-        && uv pip install --constraint /app/constraints.txt $POSTULO_EXTRA_PACKAGES \
+        && uv pip install --constraint /app/constraints.txt $POSTULO_IMAGE_EXTRA_PACKAGES \
         && rm -rf /var/lib/apt/lists/*; \
     fi
 
@@ -306,11 +306,11 @@ ENV PYTHONUNBUFFERED=1 \
 # exactly when the source line above it had changed.
 # The door for packages the default image does not carry (#74). It takes any number of
 # apt packages, in whatever form apt accepts, and installs them into this stage only.
-# The build stage's POSTULO_EXTRA_PACKAGES is the pip door, and the two are separate
+# The build stage's POSTULO_IMAGE_EXTRA_PACKAGES is the pip door, and the two are separate
 # questions: a Python package a plugin needs is not a font a document needs. A script the
 # default fonts do not draw is the usual reason to reach for it:
-#     docker build --build-arg POSTULO_EXTRA_APT_PACKAGES=fonts-noto-extra ...
-ARG POSTULO_EXTRA_APT_PACKAGES=""
+#     docker build --build-arg POSTULO_IMAGE_EXTRA_APT_PACKAGES=fonts-noto-extra ...
+ARG POSTULO_IMAGE_EXTRA_APT_PACKAGES=""
 
 # PostgreSQL's apt signing key (fingerprint B97B 0AFC AA1A 47F0 44F2 44A0 7FCC 7D46 ACCC 4CF8),
 # committed rather than fetched: whatever an address answered at build time would become the
@@ -333,13 +333,13 @@ COPY docker/apt.postgresql.org.asc /tmp/apt.postgresql.org.asc
 # `scripts/check-image.sh` do when they build. A dev image built by a push passes the day and
 # not the second, so the first of a day asks and the rest of that day reuse the layer (#1139);
 # a release always asks. By hand:
-#     docker build --pull --build-arg POSTULO_APT_REFRESH="$(date -u +%Y-%m-%dT%H:%M:%SZ)" ...
+#     docker build --pull --build-arg POSTULO_IMAGE_APT_REFRESH="$(date -u +%Y-%m-%dT%H:%M:%SZ)" ...
 #
 # Built without it the layer may be one the cache remembers, which is what `docker compose
 # build` does on a machine that has built before, and the line it prints says that instead
 # of claiming a date.
-ARG POSTULO_APT_REFRESH=""
-RUN echo "Debian's packages as of: ${POSTULO_APT_REFRESH:-whenever this layer was last built}" \
+ARG POSTULO_IMAGE_APT_REFRESH=""
+RUN echo "Debian's packages as of: ${POSTULO_IMAGE_APT_REFRESH:-whenever this layer was last built}" \
     && apt-get update \
     && apt-get upgrade -y \
     && apt-get install -y --no-install-recommends \
@@ -347,8 +347,8 @@ RUN echo "Debian's packages as of: ${POSTULO_APT_REFRESH:-whenever this layer wa
         libthai0 \
         fonts-dejavu-core fonts-noto-core fonts-noto-cjk \
         ca-certificates curl \
-    && if [ -n "$POSTULO_EXTRA_APT_PACKAGES" ]; then \
-           apt-get install -y --no-install-recommends $POSTULO_EXTRA_APT_PACKAGES; \
+    && if [ -n "$POSTULO_IMAGE_EXTRA_APT_PACKAGES" ]; then \
+           apt-get install -y --no-install-recommends $POSTULO_IMAGE_EXTRA_APT_PACKAGES; \
        fi \
     && install -d /usr/share/postgresql-common/pgdg \
     && install -m 644 /tmp/apt.postgresql.org.asc /usr/share/postgresql-common/pgdg/apt.postgresql.org.asc \
@@ -394,7 +394,7 @@ COPY --from=styles /build/src/postulo/static/js/app.min.js ./src/postulo/static/
 #
 # Under emulation for arm64, unlike the catalogues, and not because its output differs: it
 # imports the whole application, so a native copy of it would need a native environment
-# with every plugin `POSTULO_EXTRA_PACKAGES` bakes in installed a second time, and a native
+# with every plugin `POSTULO_IMAGE_EXTRA_PACKAGES` bakes in installed a second time, and a native
 # source tree in which the stylesheet and the page script already sit (#1033).
 RUN POSTULO_SECRET_KEY="$(python -c 'import secrets; print(secrets.token_urlsafe(64))')" \
     POSTULO_ALLOWED_HOSTS=localhost \

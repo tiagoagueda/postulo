@@ -92,7 +92,7 @@ if [ -z "$IMAGE" ]; then
     # The image a build would make now, not the one this machine's cache remembers: the
     # moment is part of the cache key of the layer that takes Debian's updates, and
     # without it a scan on a machine that has built before reads old packages (#300).
-    $DOCKER build --pull --build-arg POSTULO_APT_REFRESH="$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+    $DOCKER build --pull --build-arg POSTULO_IMAGE_APT_REFRESH="$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
         -f "$ROOT/docker/Dockerfile" -t "$IMAGE" "$ROOT"
 fi
 

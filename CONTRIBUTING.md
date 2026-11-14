@@ -641,8 +641,10 @@ there; nothing calls `env(...)` or `os.environ` for one. The names follow these 
 - **Lists are comma-separated, rates are `<count>/<s|m|h|d>`, a choice takes its documented
   words only**, and a secret may also be given as `<NAME>_FILE`, so no name ends in `_FILE`.
 - **A rename keeps the old name working for one minor release**: declare it as an `Alias` of
-  the new entry. It is read with a start-up warning naming the new one (`postulo.W007`), and
-  setting both is refused.
+  the new entry (`Alias(name, unit=...)` for a bare number counted in another unit, and
+  `inverted=True` where the old name said the opposite). It is read with a start-up warning
+  naming the new one (`postulo.W007`), and setting both is refused. A variable that is only a
+  build argument or the tests' has no environment to keep working: rename it outright.
 
 After changing the registry, run `uv run python scripts/configuration_docs.py` and commit
 `.env.example` with it; `--wiki` prints the tables of the wiki's *Configuration* page. Start-up
@@ -651,9 +653,9 @@ cannot be read (`postulo.E009`), and `manage.py settings` prints what each varia
 where it came from. A plugin declares the variables it reads the same way, as
 `EnvironmentVariable`s on the plugin surface named `POSTULO_PLUGIN_<NAME>_...`; one it reads
 without declaring is reported at start-up like any other unknown name.
-`tests/test_configuration.py` holds every name to the rules above, except
-the names that broke them when the rules were written, listed there with the name each takes
-when it is renamed; that list only shrinks.
+`tests/test_configuration.py` holds every name to the rules above, with no exception: the 21
+names that broke them when they were written were renamed in 0.6 (the old ones, listed in the
+test's `RENAMED`, are read until 0.7).
 
 ## Formats
 

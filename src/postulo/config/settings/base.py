@@ -35,7 +35,7 @@ if read("DJANGO_SETTINGS_MODULE", default=None) != "postulo.config.settings.test
 # --------------------------------------------------------------------------- core
 
 SECRET_KEY = read("POSTULO_SECRET_KEY")
-DEBUG = read("POSTULO_DEBUG")
+DEBUG = read("POSTULO_DEBUG_ENABLED")
 ALLOWED_HOSTS = read("POSTULO_ALLOWED_HOSTS")
 CSRF_TRUSTED_ORIGINS = read("POSTULO_CSRF_TRUSTED_ORIGINS")
 
@@ -323,7 +323,7 @@ ACCOUNT_ADAPTER = "postulo.accounts.adapter.AccountAdapter"
 ACCOUNT_LOGIN_BY_CODE_ENABLED = True
 # Three minutes is allauth's default and it is right: long enough for mail to arrive, short
 # enough that a code left in an inbox stops being a key.
-ACCOUNT_LOGIN_BY_CODE_TIMEOUT = read("POSTULO_EMAIL_CODE_TIMEOUT")
+ACCOUNT_LOGIN_BY_CODE_TIMEOUT = read("POSTULO_EMAIL_CODE_TIMEOUT_SECONDS")
 ACCOUNT_LOGIN_BY_CODE_MAX_ATTEMPTS = read("POSTULO_EMAIL_CODE_ATTEMPTS")
 # Resends bounded because each one is an email somebody may not have asked for: a person who
 # mistypes an address they do not own can otherwise send a stranger a stream of them.
@@ -669,10 +669,10 @@ POSTULO_BACKUP_DIR = environ.Path(read("POSTULO_BACKUP_DIR"))
 # The largest archive Server settings > Backups accepts for a restore, in megabytes. An
 # upload is checked against this before any of it is kept; a reverse proxy in front has its
 # own, smaller limit that has to be raised to match (#242).
-POSTULO_BACKUP_UPLOAD_MAX_MB = read("POSTULO_BACKUP_UPLOAD_MAX_MB")
+POSTULO_BACKUP_UPLOAD_MAX_BYTES = read("POSTULO_BACKUP_UPLOAD_MAX_BYTES")
 # The largest request body any other page accepts, refused on its declared length before it is
 # read (#812). A document is 20 MB at most; the rest is for the form around it.
-POSTULO_UPLOAD_CEILING_MB = read("POSTULO_UPLOAD_CEILING_MB")
+POSTULO_UPLOAD_CEILING_BYTES = read("POSTULO_UPLOAD_CEILING_BYTES")
 # Whether outbound requests honour HTTP_PROXY, HTTPS_PROXY and NO_PROXY (#817). Off: behind a
 # proxy the destination check is made on an address the tunnel then verifies a certificate for
 # instead of the name, so the check and the connection can disagree. For an instance whose only
@@ -717,7 +717,7 @@ POSTULO_MAP_TILE_ATTRIBUTION = read("POSTULO_MAP_TILE_ATTRIBUTION").strip()
 # service may be sent the addresses on the map, people's and contacts' included. Each also
 # changeable under Server settings -> Plugins -> Maps when not set here.
 # `postulo.jobs.geocoding` says what is sent where.
-POSTULO_GEOCODER = read("POSTULO_GEOCODER").strip().lower()
+POSTULO_GEOCODER_SERVICE = read("POSTULO_GEOCODER_SERVICE").strip().lower()
 POSTULO_GEOCODER_URL = read("POSTULO_GEOCODER_URL").strip()
 
 # Optional hand-off to the web server once Django has authorised a download. Leave both
@@ -732,13 +732,13 @@ POSTULO_MEDIA_SENDFILE = read("POSTULO_MEDIA_SENDFILE")
 # Django has no hook for a rollback (#663). The grace is what stops it taking a file a
 # request is about to attach. Set POSTULO_MEDIA_SWEEP=false to leave it to `prune_media`.
 POSTULO_MEDIA_SWEEP = read("POSTULO_MEDIA_SWEEP")
-POSTULO_MEDIA_SWEEP_GRACE_HOURS = read("POSTULO_MEDIA_SWEEP_GRACE_HOURS")
+POSTULO_MEDIA_SWEEP_GRACE_SECONDS = read("POSTULO_MEDIA_SWEEP_GRACE_SECONDS")
 
 # The scheduler reads a slice of the uploads against the size and checksum recorded when each
 # arrived, and leaves a file it has read alone for this many days before reading it again
 # (#1118). Damage on disk is rare, and a week still reports it within days; 0 reads the slice
 # again on every pass. `manage.py verify_media` reads every file whenever it is run.
-POSTULO_SCRUB_EVERY_DAYS = read("POSTULO_SCRUB_EVERY_DAYS")
+POSTULO_MEDIA_SCRUB_EVERY_SECONDS = read("POSTULO_MEDIA_SCRUB_EVERY_SECONDS")
 
 # ------------------------------------------------------------------------ pdf
 
@@ -782,7 +782,7 @@ POSTULO_CAPTURE_ACCOUNT_MAX_BYTES = read("POSTULO_CAPTURE_ACCOUNT_MAX_BYTES")
 # How many days the page of a capture that never became a listing is kept -- one discarded,
 # or one still waiting for review. The capture itself stays; what goes is the copy of the
 # page. A capture that was saved keeps its page while its listing exists (#664). 0 keeps them all.
-POSTULO_CAPTURE_PAGE_KEEP_DAYS = read("POSTULO_CAPTURE_PAGE_KEEP_DAYS")
+POSTULO_CAPTURE_PAGE_KEEP_SECONDS = read("POSTULO_CAPTURE_PAGE_KEEP_SECONDS")
 
 # Connections: plugins that talk to another service on a person's behalf. Their secrets
 # are encrypted under a key derived from SECRET_KEY unless a dedicated one is given, so
@@ -846,7 +846,7 @@ POSTULO_WORKER_HEARTBEAT = environ.Path(read("POSTULO_WORKER_HEARTBEAT"))
 # export, holding every document in an account, so it is reaped rather than kept: the
 # scheduler deletes what has expired, and the archive is reachable only through an
 # ownership-checked view like every other personal document (#247).
-POSTULO_EXPORT_KEEP_HOURS = read("POSTULO_EXPORT_KEEP_HOURS")
+POSTULO_EXPORT_KEEP_SECONDS = read("POSTULO_EXPORT_KEEP_SECONDS")
 
 # --------------------------------------------------------------------- security
 
@@ -904,7 +904,7 @@ CSRF_COOKIE_HTTPONLY = True
 
 # Django 6.1 deprecates the EMAIL_* settings in favour of MAILERS; the two may not be
 # mixed, so Postulo uses MAILERS exclusively. Each environment defines its own.
-DEFAULT_FROM_EMAIL = read("POSTULO_DEFAULT_FROM_EMAIL")
+DEFAULT_FROM_EMAIL = read("POSTULO_EMAIL_FROM")
 SERVER_EMAIL = DEFAULT_FROM_EMAIL
 
 # Read here rather than straight into MAILERS so that `postulo.core.site` can resolve them
@@ -923,7 +923,7 @@ POSTULO_EMAIL_USE_TLS = read("POSTULO_EMAIL_USE_TLS")
 POSTULO_EMAIL_SECURITY = read(
     "POSTULO_EMAIL_SECURITY", default="starttls" if POSTULO_EMAIL_USE_TLS else "none"
 )
-POSTULO_EMAIL_TIMEOUT = read("POSTULO_EMAIL_TIMEOUT")
+POSTULO_EMAIL_TIMEOUT_SECONDS = read("POSTULO_EMAIL_TIMEOUT_SECONDS")
 # How the server is told who is connecting: "password" (the default, and what a relay of
 # your own wants) or "xoauth2", which Microsoft 365 requires from the end of December 2026
 # and Google accepts (#151). The OAuth half is only read when this says xoauth2.

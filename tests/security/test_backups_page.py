@@ -229,7 +229,7 @@ def upload(client, content: bytes, name="mine.tar.gz"):
 
 
 def test_an_upload_over_the_limit_is_refused_and_nothing_is_kept(client, admin, settings):
-    settings.POSTULO_BACKUP_UPLOAD_MAX_MB = 0
+    settings.POSTULO_BACKUP_UPLOAD_MAX_BYTES = 0
     client.force_login(admin)
 
     response = upload(client, b"x" * 10)

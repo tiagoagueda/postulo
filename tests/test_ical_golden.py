@@ -105,7 +105,7 @@ def components(text: str) -> list[tuple]:
     return found
 
 
-@pytest.mark.skipif(not os.environ.get("POSTULO_WRITE_GOLDEN"), reason="writes the goldens")
+@pytest.mark.skipif(not os.environ.get("POSTULO_TEST_WRITE_GOLDEN"), reason="writes the goldens")
 def test_write_the_goldens(interview):
     GOLDEN.mkdir(parents=True, exist_ok=True)
     for name, text in what_it_wrote(interview).items():

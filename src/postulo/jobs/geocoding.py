@@ -7,8 +7,8 @@ a point placed by hand or from Wikidata wins and is never overwritten, *take off
 back to the words, and an address with no street keeps the offline placement.
 
 **Off unless the operator switches it on**, under *Server settings → Plugins → Maps* or with
-``POSTULO_GEOCODER``. Three kinds of service, each at a base address so an operator can point
-it at their own:
+``POSTULO_GEOCODER_SERVICE``. Three kinds of service, each at a base address so an operator can
+point it at their own:
 
 - **Nominatim** (OpenStreetMap), pre-filled with the foundation's public instance. Its policy
   allows one request a second for the whole application, asks for an identifying agent and
@@ -157,7 +157,7 @@ def _value(field: str, setting: str) -> str:
 
 def chosen() -> tuple[str, str]:
     """The service and address configured, whether or not look-ups may run: for the page."""
-    service = _value("geocoder", "POSTULO_GEOCODER").lower() or OFF
+    service = _value("geocoder", "POSTULO_GEOCODER_SERVICE").lower() or OFF
     if service not in SERVICES:
         return OFF, ""
     url = _value("geocoder_url", "POSTULO_GEOCODER_URL") or DEFAULT_URLS.get(service, "")

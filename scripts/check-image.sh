@@ -57,15 +57,15 @@ fi
 echo "Building $TAG"
 # With the moment, so the layer that takes Debian's updates runs and this checks the image
 # a build would make now (#300).
-$DOCKER build --pull --build-arg POSTULO_APT_REFRESH="$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+$DOCKER build --pull --build-arg POSTULO_IMAGE_APT_REFRESH="$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
     -f "$ROOT/docker/Dockerfile" -t "$TAG" "$ROOT"
 
-# POSTULO_SKIP_GEONAMES in both runs: a fresh container otherwise downloads and imports the
+# POSTULO_CONTAINER_GEONAMES_FETCH in both runs: a fresh container otherwise downloads and imports the
 # city table before it answers, which put download.geonames.org inside this check and its
 # slowness inside the first minute; a slow mirror failed the image (#1143).
 echo "Starting it"
 $DOCKER run -d --name "$NAME" -p 8000:8000 \
-    -e POSTULO_SKIP_GEONAMES=1 \
+    -e POSTULO_CONTAINER_GEONAMES_FETCH=0 \
     -e POSTULO_SECRET_KEY="$(a_secret_key)" \
     -e POSTULO_ALLOWED_HOSTS=localhost,127.0.0.1 \
     -e POSTULO_SSL_REDIRECT=false \
@@ -101,7 +101,7 @@ fi  # not --start-only
 # allows the very host the check uses.
 echo "Starting it as a deployment would, answering only to its own name"
 $DOCKER run -d --name "$DEPLOYED" \
-    -e POSTULO_SKIP_GEONAMES=1 \
+    -e POSTULO_CONTAINER_GEONAMES_FETCH=0 \
     -e POSTULO_SECRET_KEY="$(a_secret_key)" \
     -e POSTULO_ALLOWED_HOSTS=postulo.example.org \
     "$TAG" >/dev/null

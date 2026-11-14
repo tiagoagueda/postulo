@@ -48,7 +48,7 @@ class Findings:
 
 def reread_after() -> dt.timedelta:
     """How long the scheduled slice leaves a file it has read before reading it again."""
-    return dt.timedelta(days=max(0, int(settings.POSTULO_SCRUB_EVERY_DAYS)))
+    return dt.timedelta(seconds=max(0, int(settings.POSTULO_MEDIA_SCRUB_EVERY_SECONDS)))
 
 
 def verify_uploads(*, limit: int | None = None, now=None) -> Findings:
@@ -58,7 +58,8 @@ def verify_uploads(*, limit: int | None = None, now=None) -> Findings:
     -- and nothing else: not the file, not the checksum, which is what the file is held to.
 
     With a ``limit`` this is the scheduled slice, and it takes only the uploads never read or
-    last read more than ``POSTULO_SCRUB_EVERY_DAYS`` ago (#1118): the pass comes round every
+    last read more than ``POSTULO_MEDIA_SCRUB_EVERY_SECONDS`` ago (#1118): the pass comes
+    round every
     five minutes, and without that a hundred uploads were each read and hashed 72 times a
     day. Without one it is somebody asking, and it reads every file.
     """
@@ -111,7 +112,7 @@ def verify(*, limit: int | None = None) -> Findings:
 
 
 def grace() -> dt.timedelta:
-    return dt.timedelta(hours=max(1, int(settings.POSTULO_MEDIA_SWEEP_GRACE_HOURS)))
+    return dt.timedelta(seconds=max(3600, int(settings.POSTULO_MEDIA_SWEEP_GRACE_SECONDS)))
 
 
 #: The most of the files an unattended pass may remove, and the number below which the share is

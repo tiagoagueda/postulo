@@ -123,7 +123,7 @@ def test_the_entrypoint_follows_the_geolocations_directory():
 
 def test_the_entrypoint_lets_the_startup_download_be_switched_off():
     text = (REPO / "docker" / "entrypoint.sh").read_text(encoding="utf-8")
-    assert "POSTULO_SKIP_GEONAMES" in text
+    assert "POSTULO_CONTAINER_GEONAMES_FETCH" in text
 
 
 #: What `manage.py` is asked for at start-up, written down instead of run: the entrypoint
@@ -138,7 +138,7 @@ RECORDER = '#!/bin/sh\necho "$*" >> "$POSTULO_TEST_RECORD"\n'
         (("geonames-cities1000.sqlite", "geonames-countryinfo.txt"), "", False),
         (("geonames-cities1000.txt", "geonames-countryinfo.txt"), "", False),
         (("geonames-cities1000.txt", "geonames-cities1000.sqlite"), "", False),
-        ((), "1", False),
+        ((), "0", False),
     ],
     ids=["nothing", "the lookup alone", "a table by hand", "both", "switched off"],
 )
@@ -172,9 +172,9 @@ def test_the_entrypoint_downloads_the_cities_only_where_there_are_none(
             "PATH": str(tools) + os.pathsep + os.environ.get("PATH", ""),
             "POSTULO_TEST_RECORD": record.as_posix(),
             "POSTULO_GEOLOCATIONS_DIR": data.as_posix(),
-            "POSTULO_SKIP_GEONAMES": skip,
-            "POSTULO_SKIP_MIGRATE": "1",
-            "POSTULO_SKIP_PLUGIN_SYNC": "1",
+            "POSTULO_CONTAINER_GEONAMES_FETCH": skip,
+            "POSTULO_CONTAINER_MIGRATE": "0",
+            "POSTULO_CONTAINER_PLUGIN_SYNC": "0",
         },
     )
 

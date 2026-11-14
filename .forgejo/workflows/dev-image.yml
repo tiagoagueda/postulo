@@ -118,7 +118,7 @@ jobs:
             -u "$REGISTRY_USER" --password-stdin
 
       # One moment for the run, handed to both builds below (#300). The Dockerfile takes it
-      # as POSTULO_APT_REFRESH, which is part of the cache key of the layer that takes
+      # as POSTULO_IMAGE_APT_REFRESH, which is part of the cache key of the layer that takes
       # Debian's updates: a value the builder has not seen, and the layer runs. Without it
       # that layer was served from cache by both builders, and the image kept the packages
       # of the day the layer was first built.
@@ -151,7 +151,7 @@ jobs:
         env:
           ASKED: ${{ steps.moment.outputs.asked }}
         run: |
-          docker build --pull --build-arg POSTULO_APT_REFRESH="$ASKED" \
+          docker build --pull --build-arg POSTULO_IMAGE_APT_REFRESH="$ASKED" \
             -f docker/Dockerfile -t postulo:dev-scan .
 
       # The same script a person runs and the same one `image.yml` calls, rather than a
@@ -183,7 +183,7 @@ jobs:
           docker buildx create --use --name postulo-dev >/dev/null 2>&1 || docker buildx use postulo-dev
           tags=""
           for tag in $(echo "$TAGS" | tr ',' ' '); do tags="$tags -t $tag"; done
-          docker buildx build --pull --build-arg POSTULO_APT_REFRESH="$ASKED" \
+          docker buildx build --pull --build-arg POSTULO_IMAGE_APT_REFRESH="$ASKED" \
             --platform linux/amd64,linux/arm64 -f docker/Dockerfile $tags --push .
 
       # A failure here fails the run, deliberately: the image is already published, but a

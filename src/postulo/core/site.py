@@ -42,8 +42,8 @@ ENV_OVERRIDES = {
     # Two variables for one field: the new one, and the boolean it replaces, which every
     # existing `.env` sets and which is still honoured (#158). The first one present wins.
     "email_security": ("POSTULO_EMAIL_SECURITY", "POSTULO_EMAIL_USE_TLS"),
-    "email_timeout": "POSTULO_EMAIL_TIMEOUT",
-    "email_from": "POSTULO_DEFAULT_FROM_EMAIL",
+    "email_timeout": "POSTULO_EMAIL_TIMEOUT_SECONDS",
+    "email_from": "POSTULO_EMAIL_FROM",
     "email_auth": "POSTULO_EMAIL_AUTH",
     "email_oauth_provider": "POSTULO_EMAIL_OAUTH_PROVIDER",
     "email_oauth_grant": "POSTULO_EMAIL_OAUTH_GRANT",
@@ -55,7 +55,7 @@ ENV_OVERRIDES = {
     "map_tile_url": "POSTULO_MAP_TILE_URL",
     "map_tile_attribution": "POSTULO_MAP_TILE_ATTRIBUTION",
     # Street look-ups for the map's pins (#913); `postulo.jobs.geocoding` reads them.
-    "geocoder": "POSTULO_GEOCODER",
+    "geocoder": "POSTULO_GEOCODER_SERVICE",
     "geocoder_url": "POSTULO_GEOCODER_URL",
 }
 
@@ -94,6 +94,9 @@ def env_variables() -> tuple[str, ...]:
     flat: list[str] = []
     for names in ENV_OVERRIDES.values():
         flat.extend((names,) if isinstance(names, str) else names)
+    # An old name pins a field as the new one does, for as long as it is read (#1186).
+    for name in tuple(flat):
+        flat.extend(alias.name for alias in configuration.VARIABLES[name].aliases)
     return tuple(flat)
 
 
@@ -192,9 +195,14 @@ def capture_account_max_bytes() -> int:
     return int(settings.POSTULO_CAPTURE_ACCOUNT_MAX_BYTES)
 
 
+def capture_page_keep_seconds() -> int:
+    """Seconds the page of a capture that never became a listing is kept; 0 for always (#256)."""
+    return max(0, int(settings.POSTULO_CAPTURE_PAGE_KEEP_SECONDS))
+
+
 def capture_page_keep_days() -> int:
-    """Days the page of a capture that never became a listing is kept; 0 for always (#256)."""
-    return max(0, int(settings.POSTULO_CAPTURE_PAGE_KEEP_DAYS))
+    """The same, for the pages that say it in days: a part of a day counts as a day."""
+    return -(-capture_page_keep_seconds() // 86_400)
 
 
 def sso_is_second_factor() -> bool:
@@ -335,7 +343,7 @@ def email_settings() -> dict:
         "username": settings.POSTULO_EMAIL_HOST_USER,
         "password": settings.POSTULO_EMAIL_HOST_PASSWORD,
         "security": settings.POSTULO_EMAIL_SECURITY,
-        "timeout": settings.POSTULO_EMAIL_TIMEOUT,
+        "timeout": settings.POSTULO_EMAIL_TIMEOUT_SECONDS,
         "from_address": settings.DEFAULT_FROM_EMAIL,
         "auth": settings.POSTULO_EMAIL_AUTH,
         "oauth_provider": settings.POSTULO_EMAIL_OAUTH_PROVIDER,

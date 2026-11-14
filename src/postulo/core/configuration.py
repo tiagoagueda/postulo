@@ -97,6 +97,8 @@ class Alias:
 
     name: str
     unit: str = ""
+    #: The old name said the opposite (`SKIP_X=1` for `X=0`): a boolean read under it is flipped.
+    inverted: bool = False
 
 
 @dataclass(frozen=True)
@@ -309,7 +311,7 @@ _VARIABLES: tuple[Variable, ...] = (
         setting="SECRET_KEY",
     ),
     Variable(
-        "POSTULO_DEBUG",
+        "POSTULO_DEBUG_ENABLED",
         Kind.BOOLEAN,
         "server",
         "Django's debug mode: detailed error pages. Never on a public instance.",
@@ -318,6 +320,7 @@ _VARIABLES: tuple[Variable, ...] = (
         setting="DEBUG",
         example="true",
         set_in_example=True,
+        aliases=(Alias("POSTULO_DEBUG"),),
     ),
     Variable(
         "POSTULO_ALLOWED_HOSTS",
@@ -334,12 +337,13 @@ _VARIABLES: tuple[Variable, ...] = (
         setting="ALLOWED_HOSTS",
     ),
     Variable(
-        "POSTULO_ALLOW_WILDCARD_HOSTS",
+        "POSTULO_ALLOWED_HOSTS_WILDCARD_ALLOWED",
         Kind.BOOLEAN,
         "https",
         "Start in production even though POSTULO_ALLOWED_HOSTS contains '*'.",
         default=False,
         module="prod",
+        aliases=(Alias("POSTULO_ALLOW_WILDCARD_HOSTS"),),
     ),
     Variable(
         "POSTULO_CSRF_TRUSTED_ORIGINS",
@@ -491,12 +495,13 @@ _VARIABLES: tuple[Variable, ...] = (
     ),
     # ------------------------------------------------------------------------------- https
     Variable(
-        "POSTULO_ALLOW_WEAK_SECRET_KEY",
+        "POSTULO_SECRET_KEY_WEAK_ALLOWED",
         Kind.BOOLEAN,
         "https",
         "Start in production with a secret key that is too weak, while you plan replacing it.",
         default=False,
         module="prod",
+        aliases=(Alias("POSTULO_ALLOW_WEAK_SECRET_KEY"),),
     ),
     Variable(
         "POSTULO_SSL_REDIRECT",
@@ -560,7 +565,7 @@ _VARIABLES: tuple[Variable, ...] = (
         set_in_example=True,
     ),
     Variable(
-        "POSTULO_EMAIL_CODE_TIMEOUT",
+        "POSTULO_EMAIL_CODE_TIMEOUT_SECONDS",
         Kind.DURATION,
         "sign-in",
         "How long a sign-in code sent by email stays valid.",
@@ -573,6 +578,7 @@ _VARIABLES: tuple[Variable, ...] = (
             "settings -> Sign-in. Three minutes is long enough for mail to arrive and short "
             "enough that a code left in an inbox stops being a key."
         ),
+        aliases=(Alias("POSTULO_EMAIL_CODE_TIMEOUT"),),
     ),
     Variable(
         "POSTULO_EMAIL_CODE_ATTEMPTS",
@@ -664,7 +670,7 @@ _VARIABLES: tuple[Variable, ...] = (
     ),
     # ------------------------------------------------------------------------------- email
     Variable(
-        "POSTULO_DEFAULT_FROM_EMAIL",
+        "POSTULO_EMAIL_FROM",
         Kind.TEXT,
         "email",
         "The address Postulo's own messages are sent from.",
@@ -673,6 +679,7 @@ _VARIABLES: tuple[Variable, ...] = (
         field="email_from",
         setting="DEFAULT_FROM_EMAIL",
         set_in_example=True,
+        aliases=(Alias("POSTULO_DEFAULT_FROM_EMAIL"),),
     ),
     Variable(
         "POSTULO_EMAIL_HOST",
@@ -739,7 +746,7 @@ _VARIABLES: tuple[Variable, ...] = (
         ),
     ),
     Variable(
-        "POSTULO_EMAIL_TIMEOUT",
+        "POSTULO_EMAIL_TIMEOUT_SECONDS",
         Kind.DURATION,
         "email",
         "How long to wait for the mail server.",
@@ -747,6 +754,7 @@ _VARIABLES: tuple[Variable, ...] = (
         unit="seconds",
         minimum=1,
         field="email_timeout",
+        aliases=(Alias("POSTULO_EMAIL_TIMEOUT"),),
     ),
     Variable(
         "POSTULO_EMAIL_AUTH",
@@ -968,27 +976,31 @@ _VARIABLES: tuple[Variable, ...] = (
         notes="Off, that is left to `manage.py prune_media`.",
     ),
     Variable(
-        "POSTULO_MEDIA_SWEEP_GRACE_HOURS",
+        "POSTULO_MEDIA_SWEEP_GRACE_SECONDS",
         Kind.DURATION,
         "storage",
         "How old such a file must be before it is removed.",
-        default=24,
-        unit="hours",
-        minimum=0,
+        default=86_400,
+        unit="seconds",
+        default_text="24h",
+        minimum=3600,
+        aliases=(Alias("POSTULO_MEDIA_SWEEP_GRACE_HOURS", unit="hours"),),
     ),
     Variable(
-        "POSTULO_SCRUB_EVERY_DAYS",
+        "POSTULO_MEDIA_SCRUB_EVERY_SECONDS",
         Kind.DURATION,
         "storage",
         "How long the scheduler leaves an uploaded file it has checked before reading it again.",
-        default=7,
-        unit="days",
+        default=604_800,
+        unit="seconds",
+        default_text="7d",
         minimum=0,
         notes=(
             "Each file is read against the size and checksum recorded when it arrived, a few on "
             "every pass. 0 reads them again on every pass. `manage.py verify_media` reads all "
             "of them at once."
         ),
+        aliases=(Alias("POSTULO_SCRUB_EVERY_DAYS", unit="days"),),
     ),
     Variable(
         "POSTULO_BACKUP_DIR",
@@ -1000,27 +1012,31 @@ _VARIABLES: tuple[Variable, ...] = (
         notes="Move it elsewhere if the data volume is the thing being backed up.",
     ),
     Variable(
-        "POSTULO_BACKUP_UPLOAD_MAX_MB",
+        "POSTULO_BACKUP_UPLOAD_MAX_BYTES",
         Kind.SIZE,
         "storage",
         "The largest archive Server settings -> Backups accepts for a restore.",
-        default=512,
-        unit="megabytes",
+        default=512 * 1024**2,
+        unit="bytes",
+        default_text="512MB",
         minimum=1,
         notes="A reverse proxy in front has its own limit, which has to be raised to match.",
+        aliases=(Alias("POSTULO_BACKUP_UPLOAD_MAX_MB", unit="megabytes"),),
     ),
     Variable(
-        "POSTULO_UPLOAD_CEILING_MB",
+        "POSTULO_UPLOAD_CEILING_BYTES",
         Kind.SIZE,
         "storage",
         "The largest request body any page but the backup and plugin uploads accepts.",
-        default=25,
-        unit="megabytes",
+        default=25 * 1024**2,
+        unit="bytes",
+        default_text="25MB",
         minimum=1,
         notes=(
             "A longer one is refused with 413 before it is read. Also set client_max_body_size "
             "at the proxy."
         ),
+        aliases=(Alias("POSTULO_UPLOAD_CEILING_MB", unit="megabytes"),),
     ),
     Variable(
         "POSTULO_BACKUP_DOWNLOAD",
@@ -1091,13 +1107,15 @@ _VARIABLES: tuple[Variable, ...] = (
         default=DATA_DIR / "scheduler-heartbeat",
     ),
     Variable(
-        "POSTULO_EXPORT_KEEP_HOURS",
+        "POSTULO_EXPORT_KEEP_SECONDS",
         Kind.DURATION,
         "background",
         "How long a built export archive waits to be downloaded before it is deleted.",
-        default=24,
-        unit="hours",
+        default=86_400,
+        unit="seconds",
+        default_text="24h",
         minimum=0,
+        aliases=(Alias("POSTULO_EXPORT_KEEP_HOURS", unit="hours"),),
     ),
     # ----------------------------------------------------------------------------- capture
     Variable(
@@ -1159,13 +1177,15 @@ _VARIABLES: tuple[Variable, ...] = (
         checked_by="postulo.E004",
     ),
     Variable(
-        "POSTULO_CAPTURE_PAGE_KEEP_DAYS",
+        "POSTULO_CAPTURE_PAGE_KEEP_SECONDS",
         Kind.DURATION,
         "capture",
         "How long the page of a capture that never became a listing is kept; 0 keeps them all.",
-        default=30,
-        unit="days",
+        default=2_592_000,
+        unit="seconds",
+        default_text="30d",
         checked_by="postulo.E005",
+        aliases=(Alias("POSTULO_CAPTURE_PAGE_KEEP_DAYS", unit="days"),),
     ),
     # ---------------------------------------------------------------------------- outbound
     Variable(
@@ -1237,7 +1257,7 @@ _VARIABLES: tuple[Variable, ...] = (
         field="map_tile_attribution",
     ),
     Variable(
-        "POSTULO_GEOCODER",
+        "POSTULO_GEOCODER_SERVICE",
         Kind.CHOICE,
         "maps",
         "Whether an address with a street is pinned at that street, and by which service.",
@@ -1250,6 +1270,7 @@ _VARIABLES: tuple[Variable, ...] = (
             "Set here, the choice is your word that the service may be sent the addresses on "
             "the map, people's and contacts' included."
         ),
+        aliases=(Alias("POSTULO_GEOCODER"),),
     ),
     Variable(
         "POSTULO_GEOCODER_URL",
@@ -1282,11 +1303,11 @@ _VARIABLES: tuple[Variable, ...] = (
         interpolate=False,
     ),
     Variable(
-        "POSTULO_SKIP_GEONAMES",
+        "POSTULO_CONTAINER_GEONAMES_FETCH",
         Kind.BOOLEAN,
         "container",
-        "1 stops the container fetching the GeoNames city tables on its first start.",
-        default=False,
+        "0 stops the container fetching the GeoNames city tables on its first start.",
+        default=True,
         scope=Scope.CONTAINER,
         accepts=("0", "1"),
         notes=(
@@ -1294,6 +1315,7 @@ _VARIABLES: tuple[Variable, ...] = (
             "with nobody asking for it. Skipped, put geonames-cities1000.txt and "
             "geonames-countryinfo.txt in POSTULO_GEOLOCATIONS_DIR by hand to have the map anyway."
         ),
+        aliases=(Alias("POSTULO_SKIP_GEONAMES", inverted=True),),
     ),
     Variable(
         "POSTULO_ESCO_DIR",
@@ -1414,26 +1436,28 @@ _VARIABLES: tuple[Variable, ...] = (
     ),
     # --------------------------------------------------------------------------- container
     Variable(
-        "POSTULO_SKIP_MIGRATE",
+        "POSTULO_CONTAINER_MIGRATE",
         Kind.BOOLEAN,
         "container",
-        "1 stops the container applying migrations as it starts.",
-        default=False,
+        "0 stops the container applying migrations as it starts.",
+        default=True,
         scope=Scope.CONTAINER,
         accepts=("0", "1"),
         notes=(
             "The compose files set it on the scheduler and the worker, which start after the "
             "web container."
         ),
+        aliases=(Alias("POSTULO_SKIP_MIGRATE", inverted=True),),
     ),
     Variable(
-        "POSTULO_SKIP_PLUGIN_SYNC",
+        "POSTULO_CONTAINER_PLUGIN_SYNC",
         Kind.BOOLEAN,
         "container",
-        "1 stops the container installing again the plugins the data volume lists.",
-        default=False,
+        "0 stops the container installing again the plugins the data volume lists.",
+        default=True,
         scope=Scope.CONTAINER,
         accepts=("0", "1"),
+        aliases=(Alias("POSTULO_SKIP_PLUGIN_SYNC", inverted=True),),
     ),
     Variable(
         "DJANGO_SETTINGS_MODULE",
@@ -1475,7 +1499,7 @@ _VARIABLES: tuple[Variable, ...] = (
     ),
     # ------------------------------------------------------------------------------- image
     Variable(
-        "POSTULO_EXTRA_PACKAGES",
+        "POSTULO_IMAGE_EXTRA_PACKAGES",
         Kind.TEXT,
         "image",
         "Python packages to install into the image, such as plugins.",
@@ -1483,7 +1507,7 @@ _VARIABLES: tuple[Variable, ...] = (
         scope=Scope.BUILD,
     ),
     Variable(
-        "POSTULO_EXTRA_APT_PACKAGES",
+        "POSTULO_IMAGE_EXTRA_APT_PACKAGES",
         Kind.TEXT,
         "image",
         "Debian packages to install into the image, such as fonts.",
@@ -1491,7 +1515,7 @@ _VARIABLES: tuple[Variable, ...] = (
         scope=Scope.BUILD,
     ),
     Variable(
-        "POSTULO_APT_REFRESH",
+        "POSTULO_IMAGE_APT_REFRESH",
         Kind.TEXT,
         "image",
         "A time stamp that makes the build take Debian's packages afresh.",
@@ -1522,7 +1546,7 @@ _VARIABLES: tuple[Variable, ...] = (
         interpolate=False,
     ),
     Variable(
-        "POSTULO_WRITE_GOLDEN",
+        "POSTULO_TEST_WRITE_GOLDEN",
         Kind.BOOLEAN,
         "development",
         "Lets the calendar tests write their expected files again.",
@@ -1541,7 +1565,7 @@ _VARIABLES: tuple[Variable, ...] = (
         empty_is_unset=True,
     ),
     Variable(
-        "POSTULO_WIKI",
+        "POSTULO_WIKI_DIR",
         Kind.PATH,
         "development",
         "The wiki checkout `scripts/screenshots.py` writes its pictures into.",
@@ -1688,6 +1712,8 @@ def locate(variable: Variable, environ: Mapping[str, str] | None = None) -> Foun
     raw = _interpolated(name, environ) if variable.interpolate else environ[name]
     if raw is None:
         return Found("default", "", None)
+    if source == "alias" and alias.inverted:
+        raw = {"0": "1", "1": "0"}.get(raw.strip(), raw)
     return Found(source, name, raw, unit)
 
 
@@ -1700,7 +1726,7 @@ def syntax(variable: Variable) -> str:
     kind = variable.kind
     if kind is Kind.BOOLEAN:
         if variable.accepts:
-            return "1 to switch it on or 0 to leave it off, and nothing else"
+            return "1 to run the step or 0 to skip it, and nothing else"
         return "true or false (also yes/no, on/off, 1/0)"
     if kind is Kind.INTEGER:
         return "a whole number" + _range_text(variable)
@@ -1798,7 +1824,7 @@ def _parse_boolean(variable: Variable, found: Found) -> _Parsed:
                 variable,
                 found,
                 "error",
-                "the container's start-up script does not understand: only 1 switches it on",
+                "the container's start-up script does not understand it: it takes 1 or 0 only",
             ),
         )
     # django-environ's reading, kept: a whole number is its truth, and anything else is true

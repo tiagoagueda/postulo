@@ -940,7 +940,7 @@ def aged(capture: Capture, days: int) -> Capture:
 def test_the_page_of_a_capture_never_confirmed_expires(
     kept, settings, django_capture_on_commit_callbacks
 ):
-    settings.POSTULO_CAPTURE_PAGE_KEEP_DAYS = 30
+    settings.POSTULO_CAPTURE_PAGE_KEEP_SECONDS = 30 * 86_400
     source = path_of(kept.page.source)
     aged(kept, 31)
 
@@ -953,7 +953,7 @@ def test_the_page_of_a_capture_never_confirmed_expires(
 
 
 def test_a_discarded_capture_loses_its_page_the_same_way(kept, settings):
-    settings.POSTULO_CAPTURE_PAGE_KEEP_DAYS = 30
+    settings.POSTULO_CAPTURE_PAGE_KEEP_SECONDS = 30 * 86_400
     Capture.objects.filter(pk=kept.pk).update(status=CaptureStatus.DISCARDED)
     aged(kept, 31)
 
@@ -961,7 +961,7 @@ def test_a_discarded_capture_loses_its_page_the_same_way(kept, settings):
 
 
 def test_a_capture_somebody_saved_keeps_its_page(kept, settings):
-    settings.POSTULO_CAPTURE_PAGE_KEEP_DAYS = 30
+    settings.POSTULO_CAPTURE_PAGE_KEEP_SECONDS = 30 * 86_400
     Capture.objects.filter(pk=kept.pk).update(status=CaptureStatus.ACCEPTED)
     aged(kept, 400)
 
@@ -970,21 +970,21 @@ def test_a_capture_somebody_saved_keeps_its_page(kept, settings):
 
 
 def test_a_page_inside_its_days_is_left_alone(kept, settings):
-    settings.POSTULO_CAPTURE_PAGE_KEEP_DAYS = 30
+    settings.POSTULO_CAPTURE_PAGE_KEEP_SECONDS = 30 * 86_400
     aged(kept, 29)
 
     assert pages.expire_unconfirmed() == 0
 
 
 def test_nought_days_keeps_them_all(kept, settings):
-    settings.POSTULO_CAPTURE_PAGE_KEEP_DAYS = 0
+    settings.POSTULO_CAPTURE_PAGE_KEEP_SECONDS = 0
     aged(kept, 4000)
 
     assert pages.expire_unconfirmed() == 0
 
 
 def test_the_scheduler_does_the_expiring(kept, settings, capsys):
-    settings.POSTULO_CAPTURE_PAGE_KEEP_DAYS = 30
+    settings.POSTULO_CAPTURE_PAGE_KEEP_SECONDS = 30 * 86_400
     aged(kept, 31)
 
     call_command("send_due_reminders")

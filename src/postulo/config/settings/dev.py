@@ -7,7 +7,7 @@ from postulo.core.configuration import read
 from .base import *
 from .base import REPO_DIR
 
-DEBUG = read("POSTULO_DEBUG", default=True)
+DEBUG = read("POSTULO_DEBUG_ENABLED", default=True)
 
 # Generate a key on first run and keep it, so sessions survive a restart.
 if not read("POSTULO_SECRET_KEY"):

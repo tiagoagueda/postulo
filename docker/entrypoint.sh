@@ -7,7 +7,21 @@
 # worse failure than a few seconds of start-up.
 set -eu
 
-if [ "${POSTULO_SKIP_MIGRATE:-}" != "1" ]; then
+# Whether a step is switched off: its variable is 0. The names before 0.6 said it the other way
+# round (POSTULO_SKIP_MIGRATE=1); they still work for this minor, with a warning, and an
+# answer under the new name wins over one under the old (#1186).
+is_off() {
+    new_name=$1
+    old_name=$2
+    eval "new=\${$new_name:-}"
+    eval "old=\${$old_name:-}"
+    if [ -n "$old" ]; then
+        echo "Postulo: $old_name is the old name of $new_name, which is 0 where it was 1; the old name stops working in 0.7" >&2
+    fi
+    [ "$new" = "0" ] || { [ -z "$new" ] && [ "$old" = "1" ]; }
+}
+
+if ! is_off POSTULO_CONTAINER_MIGRATE POSTULO_SKIP_MIGRATE; then
     echo "Postulo: applying migrations"
     python manage.py migrate --noinput
 fi
@@ -15,7 +29,7 @@ fi
 # Plugins live on the data volume, and the environment in this image is brand new after
 # an upgrade. Anything the volume's record lists but the environment lacks is installed
 # again here, before the first request.
-if [ "${POSTULO_SKIP_PLUGIN_SYNC:-}" != "1" ]; then
+if ! is_off POSTULO_CONTAINER_PLUGIN_SYNC POSTULO_SKIP_PLUGIN_SYNC; then
     python manage.py plugins sync || echo "Postulo: some plugins could not be restored"
 fi
 
@@ -24,7 +38,7 @@ fi
 # This is the one request Postulo makes with nobody asking for it, to
 # download.geonames.org, through the same guarded client as every other. A start-up
 # without a network is a map without dots until one returns, and the map page says the
-# dataset is not there; the rest of Postulo does not care. POSTULO_SKIP_GEONAMES=1
+# dataset is not there; the rest of Postulo does not care. POSTULO_CONTAINER_GEONAMES_FETCH=0
 # turns the download off (put geonames-cities1000.txt and geonames-countryinfo.txt in
 # that directory by hand to have the map anyway). POSTULO_GEONAMES_POSTCODES=1 also downloads
 # the postal codes (#702), so an address is placed at its postcode rather than its town.
@@ -33,7 +47,7 @@ fi
 # and not the table (#1127), so either one there means there is nothing to fetch: the
 # lookup of an earlier start, or a table put there by hand, which is indexed at its first use.
 geonames_dir="${POSTULO_GEOLOCATIONS_DIR:-/app/data/geonames}"
-if [ "${POSTULO_SKIP_GEONAMES:-}" != "1" ] \
+if ! is_off POSTULO_CONTAINER_GEONAMES_FETCH POSTULO_SKIP_GEONAMES \
     && [ ! -f "$geonames_dir/geonames-cities1000.sqlite" ] \
     && [ ! -f "$geonames_dir/geonames-cities1000.txt" ]; then
     mkdir -p "$geonames_dir"

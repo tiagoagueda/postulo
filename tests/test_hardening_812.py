@@ -21,13 +21,13 @@ def post_declaring(client, path, megabytes, **extra):
 
 
 def test_a_body_past_the_ceiling_is_413_and_never_read(client, settings):
-    settings.POSTULO_UPLOAD_CEILING_MB = 25
+    settings.POSTULO_UPLOAD_CEILING_BYTES = 25 * MB
     response = post_declaring(client, reverse("documents:upload_create"), 200)
     assert response.status_code == 413
 
 
 def test_a_body_inside_it_goes_on_to_the_view(client, settings):
-    settings.POSTULO_UPLOAD_CEILING_MB = 25
+    settings.POSTULO_UPLOAD_CEILING_BYTES = 25 * MB
     response = post_declaring(client, reverse("documents:upload_create"), 10)
     assert response.status_code != 413
 
@@ -41,8 +41,8 @@ def test_the_backup_upload_has_the_backup_limit(settings):
 
     from postulo.core.middleware import UploadCeilingMiddleware
 
-    settings.POSTULO_UPLOAD_CEILING_MB = 25
-    settings.POSTULO_BACKUP_UPLOAD_MAX_MB = 512
+    settings.POSTULO_UPLOAD_CEILING_BYTES = 25 * MB
+    settings.POSTULO_BACKUP_UPLOAD_MAX_BYTES = 512 * MB
     ceiling = UploadCeilingMiddleware._ceiling
     factory = RequestFactory()
     backup = ceiling(factory.post(reverse("server:backup_upload")))
