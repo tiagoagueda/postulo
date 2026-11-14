@@ -46,7 +46,12 @@ def test_the_file_goes_out_and_comes_back(live_server, page: Page, furnished, tm
     sign_in(page, base)
 
     page.goto(f"{base}/career/")
-    page.get_by_role("link", name="Export", exact=True).click()
+    # One way to export is a link; several (the bibliography formats are on too) are a button
+    # that opens a list, where the record is one of the entries.
+    export = page.locator("[data-transfer=export]")
+    export.click()
+    if export.evaluate("e => e.tagName") == "BUTTON":
+        page.get_by_role("link", name="Your record (JSON)").click()
     expect(page.get_by_role("heading", level=1)).to_have_text("Your record as a file")
     expect(page.get_by_text("Your picture is left out.")).to_be_visible()
 
