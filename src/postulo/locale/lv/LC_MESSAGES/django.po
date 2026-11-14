@@ -301,6 +301,22 @@ msgstr[0] "%(count)d spraudņa rinda"
 msgstr[1] "%(count)d spraudņa rindas"
 msgstr[2] "%(count)d spraudņa rindu"
 
+#: src/postulo/plugins/updates.py
+#, python-format
+msgid "%(count)d plugin update is available"
+msgid_plural "%(count)d plugin updates are available"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+
+#: src/postulo/plugins/updates.py
+#, python-format
+msgid "%(count)d plugin update: %(names)s"
+msgid_plural "%(count)d plugin updates: %(names)s"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+
 #: src/postulo/core/gdpr.py
 #, python-format
 msgid "%(count)d postal address"
@@ -974,6 +990,11 @@ msgctxt "names the language used when nothing was chosen"
 msgid "%(name)s %(tag)s — Default"
 msgstr "%(name)s %(tag)s — noklusējums"
 
+#: src/postulo/plugins/dependencies.py
+#, python-format
+msgid "%(name)s %(version)s cannot be installed: %(who)s needs %(need)s."
+msgstr ""
+
 #: src/postulo/plugins/catalogue.py
 #, python-format
 msgid "%(name)s %(version)s is for Postulo %(wanted)s, and this is Postulo %(have)s."
@@ -993,6 +1014,16 @@ msgstr "%(name)s %(version)s ir instalēts, un katra šīs instances daļa to ja
 #, python-format
 msgid "%(name)s %(version)s is installed, but this instance is still running the version it replaced until it is restarted: every process keeps the code it has already loaded."
 msgstr "%(name)s %(version)s ir instalēts, bet šī instance līdz restartēšanai joprojām darbojas ar versiju, ko tas aizstāj: katrs process patur jau ielādēto kodu."
+
+#: src/postulo/plugins/updates.py
+#, python-format
+msgid "%(name)s %(version)s may break something; update it on its own."
+msgstr ""
+
+#: src/postulo/plugins/updates.py
+#, python-format
+msgid "%(name)s %(version)s needs Postulo %(wanted)s."
+msgstr ""
 
 #: src/postulo/plugins/catalogue.py
 #, python-format
@@ -1044,6 +1075,11 @@ msgstr "%(name)s neatbilst kontrolsummai, ar kuru tas tika publicēts."
 msgid "%(name)s does not verify: %(problem)s"
 msgstr "%(name)s neiztur pārbaudi: %(problem)s"
 
+#: src/postulo/core/server_views.py
+#, python-format
+msgid "%(name)s follows the latest release again."
+msgstr ""
+
 #: src/postulo/resume/views.py
 #, python-format
 msgid "%(name)s has none of its industries from the NACE list yet."
@@ -1081,6 +1117,21 @@ msgid_plural "%(name)s is gone: the account, its records and %(count)s files on 
 msgstr[0] "%(name)s ir dzēsts: konts, tā ieraksti un %(count)s fails diskā."
 msgstr[1] "%(name)s ir dzēsts: konts, tā ieraksti un %(count)s faili diskā."
 msgstr[2] "%(name)s ir dzēsts: konts, tā ieraksti un %(count)s failu diskā."
+
+#: src/postulo/core/server_views.py
+#, python-format
+msgid "%(name)s is held at %(version)s. Nothing updates it by itself; a newer release is still shown."
+msgstr ""
+
+#: src/postulo/core/server_views.py
+#, python-format
+msgid "%(name)s is held at %(version)s. Press the button again to move it anyway; it then stays at the version you choose."
+msgstr ""
+
+#: src/postulo/plugins/updates.py
+#, python-format
+msgid "%(name)s is held."
+msgstr ""
 
 #: src/postulo/core/views_backups.py
 #, python-format
@@ -1136,6 +1187,11 @@ msgstr "%(name)s tagad ir %(place)s. vietā identifikatoru sarakstā."
 #, python-format
 msgid "%(name)s is now number %(place)s in the navigation."
 msgstr "%(name)s tagad navigācijā ir %(place)s. vietā."
+
+#: src/postulo/core/server_views.py
+#, python-format
+msgid "%(name)s is pinned to %(version)s. Nothing updates it by itself."
+msgstr ""
 
 #: src/postulo/core/views_backups.py
 #, python-format
@@ -1206,6 +1262,21 @@ msgstr "%(name)s joprojām pieder ieraksti. Vispirms nododiet tos kādam vai izd
 #, python-format
 msgid "%(name)s was not added: %(why)s"
 msgstr "%(name)s netika pievienots: %(why)s"
+
+#: src/postulo/plugins/updates.py
+#, python-format
+msgid "%(name)s was not updated, and nothing changed: %(why)s"
+msgstr ""
+
+#: src/postulo/plugins/updates.py
+#, python-format
+msgid "%(name)s was not updated, and nothing was changed: %(why)s"
+msgstr ""
+
+#: src/postulo/core/server_views.py
+#, python-format
+msgid "%(name)s was updated from %(before)s to %(after)s."
+msgstr ""
 
 #: src/postulo/plugins/installing.py
 #, python-format
@@ -1804,6 +1875,11 @@ msgstr "%(zone)s — noklusējums"
 #: src/postulo/core/models.py
 msgid "(empty address)"
 msgstr "(tukša adrese)"
+
+#: src/postulo/templates/server/plugins.html
+#, python-format
+msgid "(installed: %(version)s)"
+msgstr ""
 
 #: src/postulo/core/kind_files.py
 msgid "(no name)"
@@ -2823,6 +2899,11 @@ msgstr "Otrs signāls blakus vārdam, nekad tā vietā."
 #: src/postulo/templates/server/design.html
 msgid "A section heading"
 msgstr "Sadaļas virsraksts"
+
+#: src/postulo/templates/server/plugins.html
+#, python-format
+msgid "A security release, %(version)s, is available. A hold does not apply it, and does not hide it."
+msgstr ""
 
 #: src/postulo/templates/core/home.html
 msgid "A self-hosted job application manager, written from the applicant's side of the table. Your applications, your CVs, your cover letters, on your server."
@@ -5195,6 +5276,14 @@ msgstr "Pārvadā transports %(label)s, versija %(version)s."
 msgid "cars and light vans"
 msgstr "vieglie automobiļi un vieglie furgoni"
 
+#: src/postulo/plugins/models.py
+msgid "catalogue answer"
+msgstr ""
+
+#: src/postulo/plugins/models.py
+msgid "catalogue answers"
+msgstr ""
+
 #: src/postulo/templates/server/plugins.html
 msgid "Catalogues"
 msgstr "Katalogi"
@@ -5323,6 +5412,14 @@ msgstr "Pārbaudīt"
 #: src/postulo/templates/core/partials/errand_state.html
 msgid "Check again"
 msgstr "Pārbaudīt vēlreiz"
+
+#: src/postulo/templates/server/plugins.html
+msgid "Check every day"
+msgstr ""
+
+#: src/postulo/plugins/models.py
+msgid "check for plugin updates every day"
+msgstr ""
 
 #: src/postulo/templates/server/plugins.html
 msgid "Check for updates"
@@ -7577,6 +7674,10 @@ msgstr "Katrs grupas dalībnieks pēc tam var to redzēt, mainīt, kopīgot un d
 msgid "Every piece the interface is built from, in the theme you are reading it in. Switch the theme under Settings → Appearance to see the other one."
 msgstr "Katrs elements, no kura veidota saskarne, tajā tēmā, kurā to lasāt. Pārslēdziet tēmu sadaļā Iestatījumi → Izskats, lai redzētu otru."
 
+#: src/postulo/templates/server/plugins.html
+msgid "Every plugin installed from a catalogue is up to date, as far as the last check could tell."
+msgstr ""
+
 #: src/postulo/templates/server/record_of_processing.html
 msgid "Every plugin installed on this instance, in the words it gives about itself. What Postulo keeps before any plugin arrives — profiles, careers, companies, contacts, documents — is the instance itself, and it is on every one of these pages."
 msgstr "Katrs šajā instancē instalētais spraudnis — tā paša vārdiem par sevi. Tas, ko Postulo glabā vēl pirms jebkāda spraudņa — profili, karjeras dati, uzņēmumi, kontakti, dokumenti —, ir pati instance, un tas ir katrā no šīm lapām."
@@ -8146,6 +8247,10 @@ msgstr "Atzīmēts ar karodziņu"
 #: src/postulo/core/design.py
 msgid "Floating"
 msgstr "Peldošs"
+
+#: src/postulo/templates/server/plugins.html
+msgid "Follow the latest"
+msgstr ""
 
 #: src/postulo/documents/models.py
 #, fuzzy
@@ -8845,8 +8950,22 @@ msgstr ""
 
 #: src/postulo/applications/models.py
 #: src/postulo/templates/applications/partials/interview_outcome.html
+#: src/postulo/templates/server/plugins.html
 msgid "Held"
 msgstr "Notikusi"
+
+#: src/postulo/templates/server/plugins.html
+#, python-format
+msgid "Held at %(version)s"
+msgstr ""
+
+#: src/postulo/plugins/models.py
+msgid "Held at the installed version"
+msgstr ""
+
+#: src/postulo/templates/server/plugins.html
+msgid "Held plugins are left alone. If any one fails, nothing is changed."
+msgstr ""
 
 #: src/postulo/core/design.py src/postulo/templates/partials/footer_links.html
 #: src/postulo/templates/server/design.html
@@ -8936,6 +9055,10 @@ msgstr "darbā pieņemšanas signāli"
 #: src/postulo/templates/jobs/posting_detail.html
 msgid "History"
 msgstr "Vēsture"
+
+#: src/postulo/templates/server/plugins.html
+msgid "Hold here"
+msgstr ""
 
 #: src/postulo/core/models.py src/postulo/templates/server/design.html
 #, fuzzy
@@ -9508,6 +9631,10 @@ msgstr "iekļaut kontaktinformāciju"
 msgid "Include my notes"
 msgstr "Iekļaut manas piezīmes"
 
+#: src/postulo/templates/server/plugins.html
+msgid "Include releases that may break something"
+msgstr ""
+
 #: src/postulo/documents/models.py
 #: src/postulo/templates/server/backup_restore.html
 msgid "included"
@@ -9578,6 +9705,10 @@ msgstr "Instalēt to"
 #: src/postulo/documents/pdf.py
 msgid "Install it with: uv sync --extra chromium, then: uv run playwright install chromium"
 msgstr "Instalējiet ar: uv sync --extra chromium, pēc tam: uv run playwright install chromium"
+
+#: src/postulo/templates/server/plugins.html
+msgid "Install this one"
+msgstr ""
 
 #: src/postulo/templates/server/plugins.html
 msgid "Installed on this instance"
@@ -10436,6 +10567,11 @@ msgstr "pēdējā pārbaude"
 msgid "last checked"
 msgstr "pēdējoreiz pārbaudīts"
 
+#: src/postulo/templates/server/plugins.html
+#, python-format
+msgid "Last checked %(when)s ago."
+msgstr ""
+
 #: src/postulo/applications/models.py src/postulo/documents/models.py
 #: src/postulo/notifications/models.py src/postulo/plugins/models.py
 msgid "last error"
@@ -11182,6 +11318,10 @@ msgstr "Atbilstoši operētājsistēmai"
 msgid "Matching"
 msgstr "Atbilst"
 
+#: src/postulo/templates/server/plugins.html
+msgid "May break something"
+msgstr ""
+
 #: src/postulo/plugins/models.py
 msgid "may change its settings"
 msgstr "var mainīt tā iestatījumus"
@@ -11431,6 +11571,10 @@ msgstr "Trūkstošs ieraksts"
 #: src/postulo/core/models.py src/postulo/templates/server/design.html
 msgid "Mobile"
 msgstr "Mobilais"
+
+#: src/postulo/plugins/models.py
+msgid "mode"
+msgstr ""
 
 #: src/postulo/plugins/provenance.py
 msgid "Module"
@@ -11745,6 +11889,11 @@ msgid "Near me"
 msgstr "Netālu no manis"
 
 #: src/postulo/templates/server/plugins.html
+#, python-format
+msgid "Needs Postulo %(wanted)s."
+msgstr ""
+
+#: src/postulo/templates/server/plugins.html
 msgid "Needs, installed first:"
 msgstr "Vispirms jāinstalē:"
 
@@ -11976,13 +12125,13 @@ msgstr "Neviena kartīte netika atzīmēta, tāpēc nekas netika pievienots."
 msgid "No catalogue called “%(name)s” is configured."
 msgstr "Nav konfigurēts neviens katalogs ar nosaukumu “%(name)s”."
 
-#: src/postulo/plugins/catalogue.py
+#: src/postulo/plugins/catalogue.py src/postulo/plugins/updates.py
 msgid "No catalogue is configured on this instance."
 msgstr "Šajā instancē nav konfigurēts neviens katalogs."
 
 #: src/postulo/templates/server/plugins.html
-msgid "No catalogue is configured, so plugins are installed from a package you upload. A catalogue is a signed list of plugins that can be installed by name."
-msgstr "Nav konfigurēts neviens katalogs, tāpēc spraudņi tiek instalēti no pakotnes, kuru augšupielādējat. Katalogs ir parakstīts spraudņu saraksts, kurus var instalēt pēc nosaukuma."
+msgid "No catalogue is configured, so nothing can be installed yet: plugins come only from a signed catalogue, a signed list of plugins that can be installed by name."
+msgstr ""
 
 #: src/postulo/plugins/catalogue.py
 #, python-format
@@ -12529,6 +12678,10 @@ msgstr "Vēl nav pārbaudīts"
 msgid "not checked yet"
 msgstr "vēl nav pārbaudīts"
 
+#: src/postulo/templates/server/plugins.html
+msgid "Not checked yet."
+msgstr ""
+
 #: src/postulo/templates/server/signin.html
 msgid "Not configured. Set POSTULO_OIDC_SERVER_URL, POSTULO_OIDC_CLIENT_ID and POSTULO_OIDC_CLIENT_SECRET in the environment to offer a sign-in button for an OpenID Connect provider."
 msgstr "Nav konfigurēts. Iestatiet vidē POSTULO_OIDC_SERVER_URL, POSTULO_OIDC_CLIENT_ID un POSTULO_OIDC_CLIENT_SECRET, lai piedāvātu pogu pierakstīšanās ar OpenID Connect pakalpojumu sniedzēja palīdzību."
@@ -12901,6 +13054,10 @@ msgstr "Neko no šajā instancē instalētā jūs nevarat ieslēgt vai izslēgt.
 msgid "Nothing is being kept."
 msgstr "Nekas netiek glabāts."
 
+#: src/postulo/plugins/installing.py
+msgid "Nothing is installed except from a signed catalogue, and this package is not listed in one. An operator developing a plugin can switch POSTULO_PLUGIN_ALLOW_UNLISTED on."
+msgstr ""
+
 #: src/postulo/templates/server/plugins.html
 #, python-format
 msgid "Nothing is installed here yet. Plugins live in %(directory)s, on the data volume, so they survive an upgrade."
@@ -13068,6 +13225,10 @@ msgstr "Nav ko likt rindā: katrs izvēlēto veidu dokuments jau ir %(label)s sa
 #: src/postulo/templates/applications/partials/report_tally.html
 msgid "Nothing to show for this period."
 msgstr "Šajā periodā nav ko rādīt."
+
+#: src/postulo/templates/server/plugins.html
+msgid "Nothing updates it by itself."
+msgstr ""
 
 #: src/postulo/templates/documents/upload_list.html
 msgid "Nothing uploaded yet."
@@ -13353,6 +13514,7 @@ msgid "Offers side by side"
 msgstr "Piedāvājumi blakus"
 
 #: src/postulo/plugins/models.py src/postulo/plugins/provenance.py
+#: src/postulo/templates/server/plugins.html
 msgid "Official"
 msgstr "Oficiāls"
 
@@ -14494,10 +14656,27 @@ msgstr "attēls"
 msgid "Picture"
 msgstr "Attēls"
 
+#: src/postulo/templates/server/plugins.html
+msgid "Pin to this version"
+msgstr ""
+
+#: src/postulo/templates/server/plugins.html
+msgid "Pinned by POSTULO_PLUGIN_PINS in the environment; it cannot be changed here."
+msgstr ""
+
 #: src/postulo/plugins/installing.py
 #, fuzzy, python-format
 msgid "Pinned by: %(plugins)s."
 msgstr "Piesprausts: %(plugins)s."
+
+#: src/postulo/templates/server/plugins.html
+#, python-format
+msgid "Pinned to %(version)s"
+msgstr ""
+
+#: src/postulo/plugins/models.py
+msgid "Pinned to a version"
+msgstr ""
 
 #: src/postulo/core/models.py
 msgid "Place"
@@ -14627,6 +14806,14 @@ msgstr "spraudņa piekļuves noteikums"
 msgid "plugin access rules"
 msgstr "spraudņa piekļuves noteikumi"
 
+#: src/postulo/plugins/models.py
+msgid "plugin hold"
+msgstr ""
+
+#: src/postulo/plugins/models.py
+msgid "plugin holds"
+msgstr ""
+
 #: src/postulo/templates/connections/list.html
 msgid "plugin not installed"
 msgstr "spraudnis nav instalēts"
@@ -14647,6 +14834,10 @@ msgstr "spraudņu repozitoriji"
 msgid "plugin repository"
 msgstr "spraudņu repozitorijs"
 
+#: src/postulo/plugins/models.py
+msgid "plugin update settings"
+msgstr ""
+
 #: src/postulo/accounts/settings_views.py src/postulo/core/server_sections.py
 #: src/postulo/core/server_views.py src/postulo/core/settings_sections.py
 #: src/postulo/core/views_access.py src/postulo/plugins/apps.py
@@ -14655,6 +14846,10 @@ msgstr "spraudņu repozitorijs"
 #: src/postulo/templates/settings/plugins.html
 msgid "Plugins"
 msgstr "Spraudņi"
+
+#: src/postulo/core/server_views.py
+msgid "Plugins are installed from a signed catalogue only. Installing from a file is switched off on this instance."
+msgstr ""
 
 #: src/postulo/core/server_views.py
 #: src/postulo/templates/server/person_plugins.html
@@ -14817,6 +15012,10 @@ msgstr "Sludinājumi visā grupā %(name)s"
 msgid "Postings read from a page, waiting for you to confirm them."
 msgstr "No lapas nolasīti sludinājumi, kas gaida jūsu apstiprinājumu."
 
+#: src/postulo/core/server_views.py
+msgid "Postulo checks the plugin catalogues for updates every day."
+msgstr ""
+
 #: src/postulo/templates/base.html
 msgid "Postulo could not be reached. Nothing on this page has changed."
 msgstr "Postulo nebija sasniedzams. Nekas šajā lapā nav mainījies."
@@ -14836,6 +15035,10 @@ msgstr "Postulo nezina šo laika joslu."
 #: src/postulo/documents/paper_choice.py
 msgid "Postulo does not print on that paper. Choose another."
 msgstr "Postulo nedrukā uz šāda papīra. Izvēlieties citu."
+
+#: src/postulo/templates/server/plugins.html
+msgid "Postulo fetches each catalogue's signed list once a day to see whether a plugin has a newer release. Nothing is downloaded or installed until an administrator presses Update."
+msgstr ""
 
 #: src/postulo/jobs/forms.py
 msgid "Postulo fetches it once and keeps a copy; the address is never shown to a browser. PNG, JPEG, GIF or WebP."
@@ -14877,6 +15080,10 @@ msgstr ""
 #: src/postulo/templates/help/links.html
 msgid "Postulo never opens a link on its own: not to check that it answers, not for an icon, not for a picture. The address is kept as you typed it, with https:// put in front where you left it out."
 msgstr "Postulo nekad pats neatver saiti: ne lai pārbaudītu, vai tā atbild, ne ikonas dēļ, ne attēla dēļ. Adrese tiek glabāta, kā ierakstījāt, ar https:// priekšā, ja to izlaidāt."
+
+#: src/postulo/core/server_views.py
+msgid "Postulo no longer checks the plugin catalogues by itself."
+msgstr ""
 
 #: src/postulo/core/errands.py
 msgid "Postulo no longer does that."
@@ -14920,6 +15127,24 @@ msgstr "Postulo paša vārdi. Portāla apzīmējums var precīzi neatbilst nevie
 msgid "POSTULO_LOG_DIR is empty, so records go to the console and nowhere else. Set it to a directory on the data volume to read them here; see Configuration in the wiki."
 msgstr "POSTULO_LOG_DIR ir tukšs, tāpēc ieraksti nonāk tikai konsolē. Lai tos lasītu šeit, iestatiet to uz direktoriju datu sējumā; skatiet sadaļu “Konfigurācija” vikī."
 
+#: src/postulo/plugins/holds.py
+#, python-format
+msgid "POSTULO_PLUGIN_PINS pins %(name)s to %(wanted)s, so %(version)s is not installed from here. Change the pin where it is set."
+msgstr ""
+
+#: src/postulo/plugins/holds.py
+#, python-format
+msgid "POSTULO_PLUGIN_PINS pins “%(name)s”, so it cannot be changed here. Change it where the environment is set."
+msgstr ""
+
+#: src/postulo/plugins/updates.py
+msgid "POSTULO_PLUGIN_UPDATE_CHECK is set in the environment, so the switch cannot be changed here."
+msgstr ""
+
+#: src/postulo/templates/server/plugins.html
+msgid "POSTULO_PLUGIN_UPDATE_CHECK is set in the environment, so this cannot be changed here."
+msgstr ""
+
 #: src/postulo/templates/partials/footer_links.html
 msgid "Powered by Postulo"
 msgstr "Darbina Postulo"
@@ -14955,8 +15180,8 @@ msgid "Presentations, conferences and seminars"
 msgstr "Prezentācijas, konferences un semināri"
 
 #: src/postulo/templates/server/plugins.html
-msgid "Press Check for updates to fetch what the catalogues offer. Postulo does not fetch them on its own."
-msgstr "Nospiediet “Meklēt atjauninājumus”, lai iegūtu to, ko piedāvā katalogi. Postulo tos pats neielādē."
+msgid "Press Check for updates to fetch what the catalogues offer."
+msgstr ""
 
 #: src/postulo/templates/jobs/capture_form.html
 msgid "Press “Read the page” again to capture it anyway."
@@ -15902,6 +16127,10 @@ msgstr "Atteikumi"
 msgid "relationship"
 msgstr "attiecības"
 
+#: src/postulo/templates/server/plugins.html
+msgid "Release notes"
+msgstr ""
+
 #: src/postulo/jobs/industries.py
 msgid "Remediation"
 msgstr ""
@@ -16170,6 +16399,10 @@ msgstr "Pārskatīt"
 msgid "Review the capture"
 msgstr "Pārskatīt tvērumu"
 
+#: src/postulo/templates/server/overview.html
+msgid "Review them on the Plugins page"
+msgstr ""
+
 #: src/postulo/applications/models.py
 msgid "reviewed on"
 msgstr "pārskatīts"
@@ -16263,6 +16496,11 @@ msgstr "Palaist"
 #: src/postulo/templates/server/data_protection.html
 msgid "Run the dry run"
 msgstr "Palaist izmēģinājumu"
+
+#: src/postulo/templates/server/plugins.html
+#, python-format
+msgid "running %(running)s; restart to finish"
+msgstr ""
 
 #: src/postulo/templates/server/backups.html
 msgid "Runs in the background; you can leave this page while it works."
@@ -16616,6 +16854,7 @@ msgid "Sectors and industries"
 msgstr "Sektori un nozares"
 
 #: src/postulo/jobs/industries.py src/postulo/templates/server/email.html
+#: src/postulo/templates/server/plugins.html
 msgid "Security"
 msgstr "Drošība"
 
@@ -16844,7 +17083,7 @@ msgstr "Pakalpojums"
 msgid "service"
 msgstr "pakalpojums"
 
-#: src/postulo/templates/server/email.html
+#: src/postulo/plugins/models.py src/postulo/templates/server/email.html
 msgid "set"
 msgstr "iestatīts"
 
@@ -16859,6 +17098,15 @@ msgstr "Iestatiet <code>POSTULO_UPDATE_CHECK=true</code>, lai plānotājs pajaut
 #: src/postulo/applications/models.py
 msgid "Set automatically the first time the status becomes “Applied”."
 msgstr "Iestatās automātiski, kad statuss pirmo reizi kļūst “Iesniegts”."
+
+#: src/postulo/plugins/models.py
+msgid "set by"
+msgstr ""
+
+#: src/postulo/templates/server/plugins.html
+#, python-format
+msgid "Set by %(who)s on %(when)s."
+msgstr ""
 
 #: src/postulo/templates/partials/field_pinned.html
 #, python-format
@@ -18596,6 +18844,10 @@ msgstr "Tas ir īsais numurs valstī %(country)s, ko var sastādīt tikai no š�
 msgid "That is larger than %(limit)s, which is the most this instance keeps."
 msgstr "Tas ir lielāks par %(limit)s, kas ir maksimums, ko šī instance glabā."
 
+#: src/postulo/plugins/updates.py
+msgid "That is more than one request has time for. Nothing was changed; update fewer at a time."
+msgstr ""
+
 #: src/postulo/jobs/pages.py
 #, python-format
 msgid "That is not a %(kind)s, whatever it was sent as."
@@ -19202,11 +19454,6 @@ msgid "The cards in the file"
 msgstr "Kartītes failā"
 
 #: src/postulo/plugins/catalogue.py
-#, python-format
-msgid "The catalogue expired on %(date)s; an old copy may have been served."
-msgstr "Kataloga derīguma termiņš beidzās %(date)s; iespējams, tika saņemta veca kopija."
-
-#: src/postulo/plugins/catalogue.py
 msgid "The catalogue is not readable JSON."
 msgstr "Katalogs nav lasāms JSON."
 
@@ -19214,6 +19461,11 @@ msgstr "Katalogs nav lasāms JSON."
 #, python-format
 msgid "The catalogue is older than one already seen (%(old)d, after %(new)d)."
 msgstr "Katalogs ir vecāks par jau redzētu (%(old)d pēc %(new)d)."
+
+#: src/postulo/plugins/catalogue.py
+#, python-format
+msgid "The catalogue “%(name)s” expired on %(date)s, so it cannot be used: its publisher has to sign a new list, or an old copy is being served. Plugins already installed go on working; nothing can be installed or updated from it until then."
+msgstr ""
 
 #: src/postulo/plugins/catalogue.py
 msgid "The catalogue's expiry is not a date."
@@ -19358,6 +19610,10 @@ msgid_plural "The CV that prints the most of the ones you have, %(counter)s:"
 msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
+
+#: src/postulo/templates/server/plugins.html
+msgid "The daily check is off."
+msgstr ""
 
 #: src/postulo/templates/settings/appearance.html
 msgid "The dashboard lists open applications nothing has happened to for a while, with nothing planned. Recruiters' own advice clusters around two to three weeks."
@@ -20280,6 +20536,10 @@ msgstr "Tas pats divreiz"
 msgid "The same website: %(domain)s"
 msgstr "Tā pati tīmekļa vietne: %(domain)s"
 
+#: src/postulo/plugins/updates.py
+msgid "the scheduler"
+msgstr ""
+
 #: src/postulo/templates/server/overview.html
 msgid "The scheduler asks once a day; run manage.py check_for_updates to ask now."
 msgstr "Plānotājs jautā reizi dienā; palaidiet manage.py check_for_updates, lai pajautātu tagad."
@@ -20568,6 +20828,10 @@ msgstr "Teksts bez izkārtojuma šīs vēstules valodā. Neviens no tiem netiek 
 msgid "The work was interrupted before it finished. Please try again."
 msgstr "Darbs tika pārtraukts, pirms tas beidzās. Lūdzu, mēģiniet vēlreiz."
 
+#: src/postulo/plugins/updates.py
+msgid "the worker"
+msgstr ""
+
 #: src/postulo/jobs/merging.py
 msgid "Their entry among your references"
 msgstr "Viņa ieraksts starp jūsu atsauksmju sniedzējiem"
@@ -20690,6 +20954,10 @@ msgstr "Nekas negaida importēšanu."
 msgid "There was nothing to keep."
 msgstr "Nebija ko saglabāt."
 
+#: src/postulo/core/server_views.py
+msgid "There was nothing to update."
+msgstr ""
+
 #: src/postulo/templates/applications/interview_detail.html
 msgid "These are the files as they were sent, not your documents as they are now."
 msgstr ""
@@ -20756,6 +21024,10 @@ msgstr "Viņi bija galvenā kontaktpersona."
 msgctxt "pronouns"
 msgid "they/them"
 msgstr "viņi/viņus"
+
+#: src/postulo/templates/server/plugins.html
+msgid "Third party"
+msgstr ""
 
 #: src/postulo/jobs/pages.py
 msgid "This account does not keep a rendering of a page."
@@ -20976,6 +21248,10 @@ msgstr "Šis identifikators jau ir sarakstā."
 #: src/postulo/templates/server/defaults.html
 msgid "This instance"
 msgstr "Šī instance"
+
+#: src/postulo/templates/server/plugins.html
+msgid "This instance allows installing a package no catalogue lists, for developing a plugin. Nothing vouches for it: it is not signed by anyone."
+msgstr ""
 
 #: src/postulo/templates/settings/account.html
 #, python-format
@@ -21781,6 +22057,18 @@ msgstr "līdz %(high)s"
 msgid "Up to %(mb)s MB. It is opened and checked before anything is kept."
 msgstr "Līdz %(mb)s MB. Pirms kaut kas tiek saglabāts, tas tiek atvērts un pārbaudīts."
 
+#: src/postulo/templates/server/plugins.html
+msgid "Update"
+msgstr ""
+
+#: src/postulo/templates/server/plugins.html
+msgid "Update all"
+msgstr ""
+
+#: src/postulo/templates/server/plugins.html
+msgid "Update anyway"
+msgstr ""
+
 #: src/postulo/templates/core/import_csv_map.html
 msgid "Update the preview"
 msgstr "Atjaunināt priekšskatījumu"
@@ -21792,6 +22080,23 @@ msgstr "atjaunināts"
 #: src/postulo/core/models.py
 msgid "updated by"
 msgstr "atjaunināja"
+
+#: src/postulo/core/server_views.py
+msgid "Updated. Restart Postulo to finish: this server cannot reload itself, and every process keeps the code it had already loaded."
+msgstr ""
+
+#: src/postulo/core/server_views.py
+msgid "Updated. The web processes are reloading to use the new code."
+msgstr ""
+
+#: src/postulo/core/server_views.py
+#, python-format
+msgid "Updated. The web processes are reloading to use the new code. Restart %(others)s to finish: each keeps the code it had already loaded."
+msgstr ""
+
+#: src/postulo/templates/server/plugins.html
+msgid "Updates"
+msgstr ""
 
 #: src/postulo/accounts/forms.py
 msgid "Upload a CV photo"
@@ -21991,7 +22296,7 @@ msgstr "apstiprināts"
 msgid "Verified"
 msgstr "Apstiprināts"
 
-#: src/postulo/documents/models.py
+#: src/postulo/documents/models.py src/postulo/plugins/models.py
 #: src/postulo/templates/documents/upload_detail.html
 #: src/postulo/templates/documents/upload_list.html
 msgid "version"
@@ -22005,6 +22310,10 @@ msgstr "Versija"
 #: src/postulo/plugins/models.py
 msgid "version tag"
 msgstr "versijas birka"
+
+#: src/postulo/templates/server/plugins.html
+msgid "Version to pin"
+msgstr ""
 
 #: src/postulo/templates/documents/cv_detail.html
 #: src/postulo/templates/documents/letter_detail.html
@@ -23138,9 +23447,17 @@ msgstr "Kam pieder"
 msgid "Whose they become"
 msgstr "Kam tie piederēs"
 
+#: src/postulo/plugins/models.py
+msgid "why"
+msgstr ""
+
 #: src/postulo/templates/jobs/posting_detail.html
 msgid "Why"
 msgstr "Kāpēc"
+
+#: src/postulo/templates/server/plugins.html
+msgid "Why (optional)"
+msgstr ""
 
 #: src/postulo/jobs/tables.py
 msgid "Why discarded"
@@ -24249,6 +24566,16 @@ msgstr "“%(name)s” nav ieraksta daļa, ko Postulo tulko."
 #, python-format
 msgid "“%(name)s” is not a part of the career that Postulo translates."
 msgstr "“%(name)s” nav karjeras daļa, ko Postulo tulko."
+
+#: src/postulo/plugins/holds.py
+#, python-format
+msgid "“%(name)s” is not held."
+msgstr ""
+
+#: src/postulo/plugins/holds.py
+#, python-format
+msgid "“%(name)s” is not installed here, so there is no version to hold."
+msgstr ""
 
 #: src/postulo/core/server_views.py
 #, python-format

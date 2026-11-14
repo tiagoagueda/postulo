@@ -269,6 +269,20 @@ msgid_plural "%(count)d plugin rows"
 msgstr[0] "%(count)d γραμμή δεδομένων πρόσθετου"
 msgstr[1] "%(count)d γραμμές δεδομένων πρόσθετων"
 
+#: src/postulo/plugins/updates.py
+#, python-format
+msgid "%(count)d plugin update is available"
+msgid_plural "%(count)d plugin updates are available"
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/postulo/plugins/updates.py
+#, python-format
+msgid "%(count)d plugin update: %(names)s"
+msgid_plural "%(count)d plugin updates: %(names)s"
+msgstr[0] ""
+msgstr[1] ""
+
 #: src/postulo/core/gdpr.py
 #, python-format
 msgid "%(count)d postal address"
@@ -890,6 +904,11 @@ msgctxt "names the language used when nothing was chosen"
 msgid "%(name)s %(tag)s — Default"
 msgstr "%(name)s %(tag)s — Προεπιλογή"
 
+#: src/postulo/plugins/dependencies.py
+#, python-format
+msgid "%(name)s %(version)s cannot be installed: %(who)s needs %(need)s."
+msgstr ""
+
 #: src/postulo/plugins/catalogue.py
 #, python-format
 msgid "%(name)s %(version)s is for Postulo %(wanted)s, and this is Postulo %(have)s."
@@ -909,6 +928,16 @@ msgstr "Το %(name)s %(version)s είναι εγκατεστημένο και �
 #, python-format
 msgid "%(name)s %(version)s is installed, but this instance is still running the version it replaced until it is restarted: every process keeps the code it has already loaded."
 msgstr "Το %(name)s %(version)s έχει εγκατασταθεί, αλλά αυτή η εγκατάσταση εξακολουθεί να εκτελεί την έκδοση που αντικαταστάθηκε μέχρι να γίνει επανεκκίνηση: κάθε διεργασία διατηρεί τον κώδικα που έχει ήδη φορτώσει."
+
+#: src/postulo/plugins/updates.py
+#, python-format
+msgid "%(name)s %(version)s may break something; update it on its own."
+msgstr ""
+
+#: src/postulo/plugins/updates.py
+#, python-format
+msgid "%(name)s %(version)s needs Postulo %(wanted)s."
+msgstr ""
 
 #: src/postulo/plugins/catalogue.py
 #, python-format
@@ -960,6 +989,11 @@ msgstr "Το %(name)s δεν ταιριάζει με το άθροισμα ελ�
 msgid "%(name)s does not verify: %(problem)s"
 msgstr "Αποτυχία επαλήθευσης για %(name)s: %(problem)s"
 
+#: src/postulo/core/server_views.py
+#, python-format
+msgid "%(name)s follows the latest release again."
+msgstr ""
+
 #: src/postulo/resume/views.py
 #, python-format
 msgid "%(name)s has none of its industries from the NACE list yet."
@@ -996,6 +1030,21 @@ msgid "%(name)s is gone: the account, its records and %(count)s file on disk."
 msgid_plural "%(name)s is gone: the account, its records and %(count)s files on disk."
 msgstr[0] "%(name)s: διαγράφηκαν ο λογαριασμός, οι εγγραφές του και %(count)s αρχείο στον δίσκο."
 msgstr[1] "%(name)s: διαγράφηκαν ο λογαριασμός, οι εγγραφές του και %(count)s αρχεία στον δίσκο."
+
+#: src/postulo/core/server_views.py
+#, python-format
+msgid "%(name)s is held at %(version)s. Nothing updates it by itself; a newer release is still shown."
+msgstr ""
+
+#: src/postulo/core/server_views.py
+#, python-format
+msgid "%(name)s is held at %(version)s. Press the button again to move it anyway; it then stays at the version you choose."
+msgstr ""
+
+#: src/postulo/plugins/updates.py
+#, python-format
+msgid "%(name)s is held."
+msgstr ""
 
 #: src/postulo/core/views_backups.py
 #, python-format
@@ -1051,6 +1100,11 @@ msgstr "%(name)s: βρίσκεται πλέον στη θέση %(place)s στα
 #, python-format
 msgid "%(name)s is now number %(place)s in the navigation."
 msgstr "%(name)s: τώρα στη θέση %(place)s της πλοήγησης."
+
+#: src/postulo/core/server_views.py
+#, python-format
+msgid "%(name)s is pinned to %(version)s. Nothing updates it by itself."
+msgstr ""
 
 #: src/postulo/core/views_backups.py
 #, python-format
@@ -1121,6 +1175,21 @@ msgstr "Ο χρήστης %(name)s εξακολουθεί να κατέχει ε
 #, python-format
 msgid "%(name)s was not added: %(why)s"
 msgstr "%(name)s δεν προστέθηκε: %(why)s"
+
+#: src/postulo/plugins/updates.py
+#, python-format
+msgid "%(name)s was not updated, and nothing changed: %(why)s"
+msgstr ""
+
+#: src/postulo/plugins/updates.py
+#, python-format
+msgid "%(name)s was not updated, and nothing was changed: %(why)s"
+msgstr ""
+
+#: src/postulo/core/server_views.py
+#, python-format
+msgid "%(name)s was updated from %(before)s to %(after)s."
+msgstr ""
 
 #: src/postulo/plugins/installing.py
 #, python-format
@@ -1700,6 +1769,11 @@ msgstr "%(zone)s — Προεπιλογή"
 #: src/postulo/core/models.py
 msgid "(empty address)"
 msgstr "(κενή διεύθυνση)"
+
+#: src/postulo/templates/server/plugins.html
+#, python-format
+msgid "(installed: %(version)s)"
+msgstr ""
 
 #: src/postulo/core/kind_files.py
 msgid "(no name)"
@@ -2718,6 +2792,11 @@ msgstr "Ένα δεύτερο σήμα δίπλα στη λέξη, ποτέ αν
 #: src/postulo/templates/server/design.html
 msgid "A section heading"
 msgstr "Μια επικεφαλίδα ενότητας"
+
+#: src/postulo/templates/server/plugins.html
+#, python-format
+msgid "A security release, %(version)s, is available. A hold does not apply it, and does not hide it."
+msgstr ""
 
 #: src/postulo/templates/core/home.html
 msgid "A self-hosted job application manager, written from the applicant's side of the table. Your applications, your CVs, your cover letters, on your server."
@@ -5108,6 +5187,14 @@ msgstr "Αποστέλλεται μέσω της μεταφοράς %(label)s, �
 msgid "cars and light vans"
 msgstr "αυτοκίνητα και ελαφρά φορτηγά"
 
+#: src/postulo/plugins/models.py
+msgid "catalogue answer"
+msgstr ""
+
+#: src/postulo/plugins/models.py
+msgid "catalogue answers"
+msgstr ""
+
 #: src/postulo/templates/server/plugins.html
 msgid "Catalogues"
 msgstr "Κατάλογοι"
@@ -5237,6 +5324,14 @@ msgstr "Έλεγχος"
 #: src/postulo/templates/core/partials/errand_state.html
 msgid "Check again"
 msgstr "Νέος έλεγχος"
+
+#: src/postulo/templates/server/plugins.html
+msgid "Check every day"
+msgstr ""
+
+#: src/postulo/plugins/models.py
+msgid "check for plugin updates every day"
+msgstr ""
 
 #: src/postulo/templates/server/plugins.html
 msgid "Check for updates"
@@ -7503,6 +7598,10 @@ msgstr "Κάθε μέλος της ομάδας μπορεί τότε να το 
 msgid "Every piece the interface is built from, in the theme you are reading it in. Switch the theme under Settings → Appearance to see the other one."
 msgstr "Κάθε κομμάτι από το οποίο είναι φτιαγμένη η διεπαφή, στο θέμα στο οποίο τη διαβάζετε. Αλλάξτε το θέμα στις Ρυθμίσεις → Εμφάνιση για να δείτε το άλλο."
 
+#: src/postulo/templates/server/plugins.html
+msgid "Every plugin installed from a catalogue is up to date, as far as the last check could tell."
+msgstr ""
+
 #: src/postulo/templates/server/record_of_processing.html
 msgid "Every plugin installed on this instance, in the words it gives about itself. What Postulo keeps before any plugin arrives — profiles, careers, companies, contacts, documents — is the instance itself, and it is on every one of these pages."
 msgstr "Κάθε πρόσθετο αυτής της εγκατάστασης, με τα λόγια που χρησιμοποιεί για τον εαυτό του. Ό,τι κρατά το Postulo πριν φτάσει οποιοδήποτε πρόσθετο — προφίλ, σταδιοδρομίες, εταιρείες, επαφές, έγγραφα — είναι η ίδια η εγκατάσταση, και βρίσκεται σε καθεμία από αυτές τις σελίδες."
@@ -8076,6 +8175,10 @@ msgstr "Επισημασμένο"
 #: src/postulo/core/design.py
 msgid "Floating"
 msgstr "Αιωρούμενο"
+
+#: src/postulo/templates/server/plugins.html
+msgid "Follow the latest"
+msgstr ""
 
 #: src/postulo/documents/models.py
 #, fuzzy
@@ -8774,8 +8877,22 @@ msgstr ""
 
 #: src/postulo/applications/models.py
 #: src/postulo/templates/applications/partials/interview_outcome.html
+#: src/postulo/templates/server/plugins.html
 msgid "Held"
 msgstr "Πραγματοποιήθηκε"
+
+#: src/postulo/templates/server/plugins.html
+#, python-format
+msgid "Held at %(version)s"
+msgstr ""
+
+#: src/postulo/plugins/models.py
+msgid "Held at the installed version"
+msgstr ""
+
+#: src/postulo/templates/server/plugins.html
+msgid "Held plugins are left alone. If any one fails, nothing is changed."
+msgstr ""
 
 #: src/postulo/core/design.py src/postulo/templates/partials/footer_links.html
 #: src/postulo/templates/server/design.html
@@ -8865,6 +8982,10 @@ msgstr "ενδείξεις προσλήψεων"
 #: src/postulo/templates/jobs/posting_detail.html
 msgid "History"
 msgstr "Ιστορικό"
+
+#: src/postulo/templates/server/plugins.html
+msgid "Hold here"
+msgstr ""
 
 #: src/postulo/core/models.py src/postulo/templates/server/design.html
 #, fuzzy
@@ -9435,6 +9556,10 @@ msgstr "συμπερίληψη στοιχείων επικοινωνίας"
 msgid "Include my notes"
 msgstr "Συμπερίληψη των σημειώσεών μου"
 
+#: src/postulo/templates/server/plugins.html
+msgid "Include releases that may break something"
+msgstr ""
+
 #: src/postulo/documents/models.py
 #: src/postulo/templates/server/backup_restore.html
 msgid "included"
@@ -9505,6 +9630,10 @@ msgstr "Εγκαταστήστε το"
 #: src/postulo/documents/pdf.py
 msgid "Install it with: uv sync --extra chromium, then: uv run playwright install chromium"
 msgstr "Εγκαταστήστε το με: uv sync --extra chromium, έπειτα: uv run playwright install chromium"
+
+#: src/postulo/templates/server/plugins.html
+msgid "Install this one"
+msgstr ""
 
 #: src/postulo/templates/server/plugins.html
 msgid "Installed on this instance"
@@ -10364,6 +10493,11 @@ msgstr "τελευταίος έλεγχος"
 msgid "last checked"
 msgstr "τελευταίος έλεγχος στις"
 
+#: src/postulo/templates/server/plugins.html
+#, python-format
+msgid "Last checked %(when)s ago."
+msgstr ""
+
 #: src/postulo/applications/models.py src/postulo/documents/models.py
 #: src/postulo/notifications/models.py src/postulo/plugins/models.py
 msgid "last error"
@@ -11112,6 +11246,10 @@ msgstr "Σύμφωνα με το λειτουργικό σύστημα"
 msgid "Matching"
 msgstr "Που ταιριάζουν"
 
+#: src/postulo/templates/server/plugins.html
+msgid "May break something"
+msgstr ""
+
 #: src/postulo/plugins/models.py
 msgid "may change its settings"
 msgstr "μπορεί να αλλάζει τις ρυθμίσεις του"
@@ -11359,6 +11497,10 @@ msgstr "Λείπει καταχώριση"
 #: src/postulo/core/models.py src/postulo/templates/server/design.html
 msgid "Mobile"
 msgstr "Κινητό"
+
+#: src/postulo/plugins/models.py
+msgid "mode"
+msgstr ""
 
 #: src/postulo/plugins/provenance.py
 #, fuzzy
@@ -11672,6 +11814,11 @@ msgid "Near me"
 msgstr "Κοντά μου"
 
 #: src/postulo/templates/server/plugins.html
+#, python-format
+msgid "Needs Postulo %(wanted)s."
+msgstr ""
+
+#: src/postulo/templates/server/plugins.html
 msgid "Needs, installed first:"
 msgstr "Απαιτεί να έχουν εγκατασταθεί πρώτα:"
 
@@ -11903,13 +12050,13 @@ msgstr "Δεν επιλέχθηκε καμία κάρτα, οπότε δεν π�
 msgid "No catalogue called “%(name)s” is configured."
 msgstr "Δεν έχει ρυθμιστεί κατάλογος με όνομα «%(name)s»."
 
-#: src/postulo/plugins/catalogue.py
+#: src/postulo/plugins/catalogue.py src/postulo/plugins/updates.py
 msgid "No catalogue is configured on this instance."
 msgstr "Δεν έχει ρυθμιστεί κατάλογος σε αυτή την εγκατάσταση."
 
 #: src/postulo/templates/server/plugins.html
-msgid "No catalogue is configured, so plugins are installed from a package you upload. A catalogue is a signed list of plugins that can be installed by name."
-msgstr "Δεν έχει ρυθμιστεί κατάλογος, οπότε τα πρόσθετα εγκαθίστανται από ένα πακέτο που ανεβάζετε. Ο κατάλογος είναι μια υπογεγραμμένη λίστα πρόσθετων που εγκαθίστανται με το όνομά τους."
+msgid "No catalogue is configured, so nothing can be installed yet: plugins come only from a signed catalogue, a signed list of plugins that can be installed by name."
+msgstr ""
 
 #: src/postulo/plugins/catalogue.py
 #, python-format
@@ -12460,6 +12607,10 @@ msgstr "Δεν έχει ελεγχθεί ακόμα"
 msgid "not checked yet"
 msgstr "δεν έχει ελεγχθεί ακόμη"
 
+#: src/postulo/templates/server/plugins.html
+msgid "Not checked yet."
+msgstr ""
+
 #: src/postulo/templates/server/signin.html
 msgid "Not configured. Set POSTULO_OIDC_SERVER_URL, POSTULO_OIDC_CLIENT_ID and POSTULO_OIDC_CLIENT_SECRET in the environment to offer a sign-in button for an OpenID Connect provider."
 msgstr "Δεν έχει ρυθμιστεί. Ορίστε τα POSTULO_OIDC_SERVER_URL, POSTULO_OIDC_CLIENT_ID και POSTULO_OIDC_CLIENT_SECRET στο περιβάλλον για να προσφέρετε κουμπί σύνδεσης με πάροχο OpenID Connect."
@@ -12830,6 +12981,10 @@ msgstr "Δεν υπάρχει τίποτα εγκατεστημένο σε αυ�
 msgid "Nothing is being kept."
 msgstr "Δεν φυλάσσεται τίποτα."
 
+#: src/postulo/plugins/installing.py
+msgid "Nothing is installed except from a signed catalogue, and this package is not listed in one. An operator developing a plugin can switch POSTULO_PLUGIN_ALLOW_UNLISTED on."
+msgstr ""
+
 #: src/postulo/templates/server/plugins.html
 #, python-format
 msgid "Nothing is installed here yet. Plugins live in %(directory)s, on the data volume, so they survive an upgrade."
@@ -12996,6 +13151,10 @@ msgstr "Τίποτα για προσθήκη στην ουρά: κάθε έγγ�
 #: src/postulo/templates/applications/partials/report_tally.html
 msgid "Nothing to show for this period."
 msgstr "Δεν υπάρχει τίποτα για εμφάνιση σε αυτή την περίοδο."
+
+#: src/postulo/templates/server/plugins.html
+msgid "Nothing updates it by itself."
+msgstr ""
 
 #: src/postulo/templates/documents/upload_list.html
 msgid "Nothing uploaded yet."
@@ -13279,6 +13438,7 @@ msgid "Offers side by side"
 msgstr "Προσφορές δίπλα δίπλα"
 
 #: src/postulo/plugins/models.py src/postulo/plugins/provenance.py
+#: src/postulo/templates/server/plugins.html
 msgid "Official"
 msgstr "Επίσημο"
 
@@ -14404,10 +14564,27 @@ msgstr "εικόνα"
 msgid "Picture"
 msgstr "Εικόνα"
 
+#: src/postulo/templates/server/plugins.html
+msgid "Pin to this version"
+msgstr ""
+
+#: src/postulo/templates/server/plugins.html
+msgid "Pinned by POSTULO_PLUGIN_PINS in the environment; it cannot be changed here."
+msgstr ""
+
 #: src/postulo/plugins/installing.py
 #, fuzzy, python-format
 msgid "Pinned by: %(plugins)s."
 msgstr "Καρφιτσωμένο από: %(plugins)s."
+
+#: src/postulo/templates/server/plugins.html
+#, python-format
+msgid "Pinned to %(version)s"
+msgstr ""
+
+#: src/postulo/plugins/models.py
+msgid "Pinned to a version"
+msgstr ""
 
 #: src/postulo/core/models.py
 #, fuzzy
@@ -14540,6 +14717,14 @@ msgstr "κανόνας πρόσβασης πρόσθετων"
 msgid "plugin access rules"
 msgstr "κανόνες πρόσβασης πρόσθετων"
 
+#: src/postulo/plugins/models.py
+msgid "plugin hold"
+msgstr ""
+
+#: src/postulo/plugins/models.py
+msgid "plugin holds"
+msgstr ""
+
 #: src/postulo/templates/connections/list.html
 msgid "plugin not installed"
 msgstr "το πρόσθετο δεν είναι εγκατεστημένο"
@@ -14560,6 +14745,10 @@ msgstr "αποθετήρια πρόσθετων"
 msgid "plugin repository"
 msgstr "αποθετήριο πρόσθετων"
 
+#: src/postulo/plugins/models.py
+msgid "plugin update settings"
+msgstr ""
+
 #: src/postulo/accounts/settings_views.py src/postulo/core/server_sections.py
 #: src/postulo/core/server_views.py src/postulo/core/settings_sections.py
 #: src/postulo/core/views_access.py src/postulo/plugins/apps.py
@@ -14568,6 +14757,10 @@ msgstr "αποθετήριο πρόσθετων"
 #: src/postulo/templates/settings/plugins.html
 msgid "Plugins"
 msgstr "Πρόσθετα"
+
+#: src/postulo/core/server_views.py
+msgid "Plugins are installed from a signed catalogue only. Installing from a file is switched off on this instance."
+msgstr ""
 
 #: src/postulo/core/server_views.py
 #: src/postulo/templates/server/person_plugins.html
@@ -14729,6 +14922,10 @@ msgstr "Αγγελίες σε όλο τον όμιλο %(name)s"
 msgid "Postings read from a page, waiting for you to confirm them."
 msgstr "Αγγελίες που διαβάστηκαν από μια σελίδα και περιμένουν την επιβεβαίωσή σας."
 
+#: src/postulo/core/server_views.py
+msgid "Postulo checks the plugin catalogues for updates every day."
+msgstr ""
+
 #: src/postulo/templates/base.html
 msgid "Postulo could not be reached. Nothing on this page has changed."
 msgstr "Δεν ήταν δυνατή η επικοινωνία με το Postulo. Τίποτα σε αυτή τη σελίδα δεν άλλαξε."
@@ -14748,6 +14945,10 @@ msgstr "Το Postulo δεν γνωρίζει αυτή τη ζώνη ώρας."
 #: src/postulo/documents/paper_choice.py
 msgid "Postulo does not print on that paper. Choose another."
 msgstr "Το Postulo δεν τυπώνει σε αυτό το χαρτί. Επιλέξτε άλλο."
+
+#: src/postulo/templates/server/plugins.html
+msgid "Postulo fetches each catalogue's signed list once a day to see whether a plugin has a newer release. Nothing is downloaded or installed until an administrator presses Update."
+msgstr ""
 
 #: src/postulo/jobs/forms.py
 msgid "Postulo fetches it once and keeps a copy; the address is never shown to a browser. PNG, JPEG, GIF or WebP."
@@ -14789,6 +14990,10 @@ msgstr ""
 #: src/postulo/templates/help/links.html
 msgid "Postulo never opens a link on its own: not to check that it answers, not for an icon, not for a picture. The address is kept as you typed it, with https:// put in front where you left it out."
 msgstr "Το Postulo δεν ανοίγει ποτέ σύνδεσμο από μόνο του: ούτε για να ελέγξει ότι απαντά, ούτε για ένα εικονίδιο, ούτε για μια εικόνα. Η διεύθυνση κρατιέται όπως την πληκτρολογήσατε, με το https:// μπροστά όπου το παραλείψατε."
+
+#: src/postulo/core/server_views.py
+msgid "Postulo no longer checks the plugin catalogues by itself."
+msgstr ""
 
 #: src/postulo/core/errands.py
 msgid "Postulo no longer does that."
@@ -14832,6 +15037,24 @@ msgstr "Λέξεις του ίδιου του Postulo. Η ετικέτα ενό�
 msgid "POSTULO_LOG_DIR is empty, so records go to the console and nowhere else. Set it to a directory on the data volume to read them here; see Configuration in the wiki."
 msgstr "Το POSTULO_LOG_DIR είναι κενό, οπότε οι εγγραφές πηγαίνουν μόνο στην κονσόλα. Ορίστε το σε έναν κατάλογο στον τόμο δεδομένων για να τις διαβάζετε εδώ· δείτε τη Διαμόρφωση στο wiki."
 
+#: src/postulo/plugins/holds.py
+#, python-format
+msgid "POSTULO_PLUGIN_PINS pins %(name)s to %(wanted)s, so %(version)s is not installed from here. Change the pin where it is set."
+msgstr ""
+
+#: src/postulo/plugins/holds.py
+#, python-format
+msgid "POSTULO_PLUGIN_PINS pins “%(name)s”, so it cannot be changed here. Change it where the environment is set."
+msgstr ""
+
+#: src/postulo/plugins/updates.py
+msgid "POSTULO_PLUGIN_UPDATE_CHECK is set in the environment, so the switch cannot be changed here."
+msgstr ""
+
+#: src/postulo/templates/server/plugins.html
+msgid "POSTULO_PLUGIN_UPDATE_CHECK is set in the environment, so this cannot be changed here."
+msgstr ""
+
 #: src/postulo/templates/partials/footer_links.html
 msgid "Powered by Postulo"
 msgstr "Με την τεχνολογία του Postulo"
@@ -14867,8 +15090,8 @@ msgid "Presentations, conferences and seminars"
 msgstr "Παρουσιάσεις, συνέδρια και σεμινάρια"
 
 #: src/postulo/templates/server/plugins.html
-msgid "Press Check for updates to fetch what the catalogues offer. Postulo does not fetch them on its own."
-msgstr "Πατήστε «Έλεγχος για ενημερώσεις» για να ανακτήσετε ό,τι προσφέρουν οι κατάλογοι. Το Postulo δεν τα ανακτά από μόνο του."
+msgid "Press Check for updates to fetch what the catalogues offer."
+msgstr ""
 
 #: src/postulo/templates/jobs/capture_form.html
 msgid "Press “Read the page” again to capture it anyway."
@@ -15813,6 +16036,10 @@ msgstr "Απορρίψεις"
 msgid "relationship"
 msgstr "σχέση"
 
+#: src/postulo/templates/server/plugins.html
+msgid "Release notes"
+msgstr ""
+
 #: src/postulo/jobs/industries.py
 msgid "Remediation"
 msgstr ""
@@ -16084,6 +16311,10 @@ msgstr "Έλεγχος"
 msgid "Review the capture"
 msgstr "Έλεγχος της καταγραφής"
 
+#: src/postulo/templates/server/overview.html
+msgid "Review them on the Plugins page"
+msgstr ""
+
 #: src/postulo/applications/models.py
 msgid "reviewed on"
 msgstr "ελέγχθηκε στις"
@@ -16177,6 +16408,11 @@ msgstr "Εκτέλεση"
 #: src/postulo/templates/server/data_protection.html
 msgid "Run the dry run"
 msgstr "Δοκιμαστική εκτέλεση"
+
+#: src/postulo/templates/server/plugins.html
+#, python-format
+msgid "running %(running)s; restart to finish"
+msgstr ""
 
 #: src/postulo/templates/server/backups.html
 msgid "Runs in the background; you can leave this page while it works."
@@ -16532,6 +16768,7 @@ msgid "Sectors and industries"
 msgstr "Τομείς και κλάδοι"
 
 #: src/postulo/jobs/industries.py src/postulo/templates/server/email.html
+#: src/postulo/templates/server/plugins.html
 msgid "Security"
 msgstr "Ασφάλεια"
 
@@ -16761,7 +16998,7 @@ msgstr "Υπηρεσία"
 msgid "service"
 msgstr "υπηρεσία"
 
-#: src/postulo/templates/server/email.html
+#: src/postulo/plugins/models.py src/postulo/templates/server/email.html
 #, fuzzy
 msgid "set"
 msgstr "ορισμένο"
@@ -16777,6 +17014,15 @@ msgstr "Ορίστε <code>POSTULO_UPDATE_CHECK=true</code> για να αφήσ
 #: src/postulo/applications/models.py
 msgid "Set automatically the first time the status becomes “Applied”."
 msgstr "Ορίζεται αυτόματα την πρώτη φορά που η κατάσταση γίνεται «Υποβλήθηκε»."
+
+#: src/postulo/plugins/models.py
+msgid "set by"
+msgstr ""
+
+#: src/postulo/templates/server/plugins.html
+#, python-format
+msgid "Set by %(who)s on %(when)s."
+msgstr ""
 
 #: src/postulo/templates/partials/field_pinned.html
 #, python-format
@@ -18527,6 +18773,10 @@ msgstr "Αυτός είναι σύντομος αριθμός στη χώρα %(
 msgid "That is larger than %(limit)s, which is the most this instance keeps."
 msgstr "Αυτό είναι μεγαλύτερο από %(limit)s, που είναι το μέγιστο που διατηρεί αυτή η εγκατάσταση."
 
+#: src/postulo/plugins/updates.py
+msgid "That is more than one request has time for. Nothing was changed; update fewer at a time."
+msgstr ""
+
 #: src/postulo/jobs/pages.py
 #, python-format
 msgid "That is not a %(kind)s, whatever it was sent as."
@@ -19128,11 +19378,6 @@ msgid "The cards in the file"
 msgstr "Οι κάρτες στο αρχείο"
 
 #: src/postulo/plugins/catalogue.py
-#, python-format
-msgid "The catalogue expired on %(date)s; an old copy may have been served."
-msgstr "Ο κατάλογος έληξε στις %(date)s· ενδέχεται να παραδόθηκε παλιό αντίγραφο."
-
-#: src/postulo/plugins/catalogue.py
 msgid "The catalogue is not readable JSON."
 msgstr "Ο κατάλογος δεν είναι αναγνώσιμο JSON."
 
@@ -19140,6 +19385,11 @@ msgstr "Ο κατάλογος δεν είναι αναγνώσιμο JSON."
 #, fuzzy, python-format
 msgid "The catalogue is older than one already seen (%(old)d, after %(new)d)."
 msgstr "Ο κατάλογος είναι παλαιότερος από έναν που έχει ήδη εμφανιστεί (%(old)d, μετά το %(new)d)."
+
+#: src/postulo/plugins/catalogue.py
+#, python-format
+msgid "The catalogue “%(name)s” expired on %(date)s, so it cannot be used: its publisher has to sign a new list, or an old copy is being served. Plugins already installed go on working; nothing can be installed or updated from it until then."
+msgstr ""
 
 #: src/postulo/plugins/catalogue.py
 msgid "The catalogue's expiry is not a date."
@@ -19283,6 +19533,10 @@ msgid "The CV that prints the most of the ones you have, %(counter)s:"
 msgid_plural "The CV that prints the most of the ones you have, %(counter)s:"
 msgstr[0] ""
 msgstr[1] ""
+
+#: src/postulo/templates/server/plugins.html
+msgid "The daily check is off."
+msgstr ""
 
 #: src/postulo/templates/settings/appearance.html
 msgid "The dashboard lists open applications nothing has happened to for a while, with nothing planned. Recruiters' own advice clusters around two to three weeks."
@@ -20205,6 +20459,10 @@ msgstr "Το ίδιο πράγμα δύο φορές"
 msgid "The same website: %(domain)s"
 msgstr "Ο ίδιος ιστότοπος: %(domain)s"
 
+#: src/postulo/plugins/updates.py
+msgid "the scheduler"
+msgstr ""
+
 #: src/postulo/templates/server/overview.html
 msgid "The scheduler asks once a day; run manage.py check_for_updates to ask now."
 msgstr "Ο χρονοπρογραμματιστής ρωτά μία φορά την ημέρα· εκτελέστε manage.py check_for_updates για να ρωτήσει τώρα."
@@ -20494,6 +20752,10 @@ msgstr "Το κείμενο χωρίς τη διάταξη, στη γλώσσα 
 msgid "The work was interrupted before it finished. Please try again."
 msgstr "Η εργασία διακόπηκε πριν τελειώσει. Δοκιμάστε ξανά."
 
+#: src/postulo/plugins/updates.py
+msgid "the worker"
+msgstr ""
+
 #: src/postulo/jobs/merging.py
 msgid "Their entry among your references"
 msgstr "Η καταχώρισή τους στις συστάσεις σας"
@@ -20616,6 +20878,10 @@ msgstr "Δεν υπάρχει τίποτα σε αναμονή για εισαγ
 msgid "There was nothing to keep."
 msgstr "Δεν υπήρχε τίποτα για να κρατηθεί."
 
+#: src/postulo/core/server_views.py
+msgid "There was nothing to update."
+msgstr ""
+
 #: src/postulo/templates/applications/interview_detail.html
 msgid "These are the files as they were sent, not your documents as they are now."
 msgstr ""
@@ -20681,6 +20947,10 @@ msgstr "Ήταν η κύρια επαφή."
 msgctxt "pronouns"
 msgid "they/them"
 msgstr "αυτοί/τους"
+
+#: src/postulo/templates/server/plugins.html
+msgid "Third party"
+msgstr ""
 
 #: src/postulo/jobs/pages.py
 msgid "This account does not keep a rendering of a page."
@@ -20901,6 +21171,10 @@ msgstr "Αυτό το αναγνωριστικό είναι ήδη στη λίσ
 #: src/postulo/templates/server/defaults.html
 msgid "This instance"
 msgstr "Αυτή η εγκατάσταση"
+
+#: src/postulo/templates/server/plugins.html
+msgid "This instance allows installing a package no catalogue lists, for developing a plugin. Nothing vouches for it: it is not signed by anyone."
+msgstr ""
 
 #: src/postulo/templates/settings/account.html
 #, python-format
@@ -21715,6 +21989,18 @@ msgstr "έως %(high)s"
 msgid "Up to %(mb)s MB. It is opened and checked before anything is kept."
 msgstr "Έως %(mb)s MB. Ανοίγεται και ελέγχεται πριν αποθηκευτεί οτιδήποτε."
 
+#: src/postulo/templates/server/plugins.html
+msgid "Update"
+msgstr ""
+
+#: src/postulo/templates/server/plugins.html
+msgid "Update all"
+msgstr ""
+
+#: src/postulo/templates/server/plugins.html
+msgid "Update anyway"
+msgstr ""
+
 #: src/postulo/templates/core/import_csv_map.html
 msgid "Update the preview"
 msgstr "Ενημέρωση της προεπισκόπησης"
@@ -21726,6 +22012,23 @@ msgstr "ενημερώθηκε στις"
 #: src/postulo/core/models.py
 msgid "updated by"
 msgstr "ενημερώθηκε από"
+
+#: src/postulo/core/server_views.py
+msgid "Updated. Restart Postulo to finish: this server cannot reload itself, and every process keeps the code it had already loaded."
+msgstr ""
+
+#: src/postulo/core/server_views.py
+msgid "Updated. The web processes are reloading to use the new code."
+msgstr ""
+
+#: src/postulo/core/server_views.py
+#, python-format
+msgid "Updated. The web processes are reloading to use the new code. Restart %(others)s to finish: each keeps the code it had already loaded."
+msgstr ""
+
+#: src/postulo/templates/server/plugins.html
+msgid "Updates"
+msgstr ""
 
 #: src/postulo/accounts/forms.py
 msgid "Upload a CV photo"
@@ -21926,7 +22229,7 @@ msgstr "επαληθευμένο"
 msgid "Verified"
 msgstr "Επαληθευμένη"
 
-#: src/postulo/documents/models.py
+#: src/postulo/documents/models.py src/postulo/plugins/models.py
 #: src/postulo/templates/documents/upload_detail.html
 #: src/postulo/templates/documents/upload_list.html
 msgid "version"
@@ -21940,6 +22243,10 @@ msgstr "Έκδοση"
 #: src/postulo/plugins/models.py
 msgid "version tag"
 msgstr "ετικέτα έκδοσης"
+
+#: src/postulo/templates/server/plugins.html
+msgid "Version to pin"
+msgstr ""
 
 #: src/postulo/templates/documents/cv_detail.html
 #: src/postulo/templates/documents/letter_detail.html
@@ -23070,9 +23377,17 @@ msgstr "Ποιανού"
 msgid "Whose they become"
 msgstr "Σε ποιον περνούν"
 
+#: src/postulo/plugins/models.py
+msgid "why"
+msgstr ""
+
 #: src/postulo/templates/jobs/posting_detail.html
 msgid "Why"
 msgstr "Γιατί"
+
+#: src/postulo/templates/server/plugins.html
+msgid "Why (optional)"
+msgstr ""
 
 #: src/postulo/jobs/tables.py
 msgid "Why discarded"
@@ -24178,6 +24493,16 @@ msgstr "Το «%(name)s» δεν είναι μέρος μιας καταχώρι
 #, python-format
 msgid "“%(name)s” is not a part of the career that Postulo translates."
 msgstr "Το «%(name)s» δεν είναι μέρος της σταδιοδρομίας που μεταφράζει το Postulo."
+
+#: src/postulo/plugins/holds.py
+#, python-format
+msgid "“%(name)s” is not held."
+msgstr ""
+
+#: src/postulo/plugins/holds.py
+#, python-format
+msgid "“%(name)s” is not installed here, so there is no version to hold."
+msgstr ""
 
 #: src/postulo/core/server_views.py
 #, python-format

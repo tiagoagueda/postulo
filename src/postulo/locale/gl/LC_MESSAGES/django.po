@@ -269,6 +269,20 @@ msgid_plural "%(count)d plugin rows"
 msgstr[0] "%(count)d fila de complemento"
 msgstr[1] "%(count)d filas de complementos"
 
+#: src/postulo/plugins/updates.py
+#, python-format
+msgid "%(count)d plugin update is available"
+msgid_plural "%(count)d plugin updates are available"
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/postulo/plugins/updates.py
+#, python-format
+msgid "%(count)d plugin update: %(names)s"
+msgid_plural "%(count)d plugin updates: %(names)s"
+msgstr[0] ""
+msgstr[1] ""
+
 #: src/postulo/core/gdpr.py
 #, python-format
 msgid "%(count)d postal address"
@@ -890,6 +904,11 @@ msgctxt "names the language used when nothing was chosen"
 msgid "%(name)s %(tag)s — Default"
 msgstr "%(name)s %(tag)s — Predeterminado"
 
+#: src/postulo/plugins/dependencies.py
+#, python-format
+msgid "%(name)s %(version)s cannot be installed: %(who)s needs %(need)s."
+msgstr ""
+
 #: src/postulo/plugins/catalogue.py
 #, python-format
 msgid "%(name)s %(version)s is for Postulo %(wanted)s, and this is Postulo %(have)s."
@@ -909,6 +928,16 @@ msgstr "%(name)s %(version)s está instalado, e todas as partes desta instancia 
 #, python-format
 msgid "%(name)s %(version)s is installed, but this instance is still running the version it replaced until it is restarted: every process keeps the code it has already loaded."
 msgstr "%(name)s %(version)s está instalado, pero esta instancia segue a executar a versión que substituíu ata que se reinicie: cada proceso conserva o código que xa cargou."
+
+#: src/postulo/plugins/updates.py
+#, python-format
+msgid "%(name)s %(version)s may break something; update it on its own."
+msgstr ""
+
+#: src/postulo/plugins/updates.py
+#, python-format
+msgid "%(name)s %(version)s needs Postulo %(wanted)s."
+msgstr ""
 
 #: src/postulo/plugins/catalogue.py
 #, python-format
@@ -960,6 +989,11 @@ msgstr "%(name)s non coincide coa suma de comprobación coa que se publicou."
 msgid "%(name)s does not verify: %(problem)s"
 msgstr "%(name)s non supera a verificación: %(problem)s"
 
+#: src/postulo/core/server_views.py
+#, python-format
+msgid "%(name)s follows the latest release again."
+msgstr ""
+
 #: src/postulo/resume/views.py
 #, python-format
 msgid "%(name)s has none of its industries from the NACE list yet."
@@ -996,6 +1030,21 @@ msgid "%(name)s is gone: the account, its records and %(count)s file on disk."
 msgid_plural "%(name)s is gone: the account, its records and %(count)s files on disk."
 msgstr[0] "%(name)s xa non existe: a conta, os seus rexistros e %(count)s ficheiro no disco."
 msgstr[1] "%(name)s xa non existe: a conta, os seus rexistros e %(count)s ficheiros no disco."
+
+#: src/postulo/core/server_views.py
+#, python-format
+msgid "%(name)s is held at %(version)s. Nothing updates it by itself; a newer release is still shown."
+msgstr ""
+
+#: src/postulo/core/server_views.py
+#, python-format
+msgid "%(name)s is held at %(version)s. Press the button again to move it anyway; it then stays at the version you choose."
+msgstr ""
+
+#: src/postulo/plugins/updates.py
+#, python-format
+msgid "%(name)s is held."
+msgstr ""
 
 #: src/postulo/core/views_backups.py
 #, python-format
@@ -1051,6 +1100,11 @@ msgstr "%(name)s é agora o número %(place)s nos identificadores."
 #, python-format
 msgid "%(name)s is now number %(place)s in the navigation."
 msgstr "%(name)s é agora o número %(place)s na navegación."
+
+#: src/postulo/core/server_views.py
+#, python-format
+msgid "%(name)s is pinned to %(version)s. Nothing updates it by itself."
+msgstr ""
 
 #: src/postulo/core/views_backups.py
 #, python-format
@@ -1121,6 +1175,21 @@ msgstr "%(name)s aínda é propietario de rexistros. Dáos a alguén, ou elimín
 #, python-format
 msgid "%(name)s was not added: %(why)s"
 msgstr "Non se engadiu %(name)s: %(why)s"
+
+#: src/postulo/plugins/updates.py
+#, python-format
+msgid "%(name)s was not updated, and nothing changed: %(why)s"
+msgstr ""
+
+#: src/postulo/plugins/updates.py
+#, python-format
+msgid "%(name)s was not updated, and nothing was changed: %(why)s"
+msgstr ""
+
+#: src/postulo/core/server_views.py
+#, python-format
+msgid "%(name)s was updated from %(before)s to %(after)s."
+msgstr ""
 
 #: src/postulo/plugins/installing.py
 #, python-format
@@ -1700,6 +1769,11 @@ msgstr "%(zone)s — Predeterminado"
 #: src/postulo/core/models.py
 msgid "(empty address)"
 msgstr "(enderezo baleiro)"
+
+#: src/postulo/templates/server/plugins.html
+#, python-format
+msgid "(installed: %(version)s)"
+msgstr ""
 
 #: src/postulo/core/kind_files.py
 msgid "(no name)"
@@ -2707,6 +2781,11 @@ msgstr "Un segundo sinal ao lado da palabra, nunca no canto dela."
 #: src/postulo/templates/server/design.html
 msgid "A section heading"
 msgstr "Un título de sección"
+
+#: src/postulo/templates/server/plugins.html
+#, python-format
+msgid "A security release, %(version)s, is available. A hold does not apply it, and does not hide it."
+msgstr ""
 
 #: src/postulo/templates/core/home.html
 msgid "A self-hosted job application manager, written from the applicant's side of the table. Your applications, your CVs, your cover letters, on your server."
@@ -5051,6 +5130,14 @@ msgstr "Enviado mediante o transporte %(label)s, versión %(version)s."
 msgid "cars and light vans"
 msgstr "turismos e furgonetas lixeiras"
 
+#: src/postulo/plugins/models.py
+msgid "catalogue answer"
+msgstr ""
+
+#: src/postulo/plugins/models.py
+msgid "catalogue answers"
+msgstr ""
+
 #: src/postulo/templates/server/plugins.html
 msgid "Catalogues"
 msgstr "Catálogos"
@@ -5179,6 +5266,14 @@ msgstr "Comprobar"
 #: src/postulo/templates/core/partials/errand_state.html
 msgid "Check again"
 msgstr "Comprobar de novo"
+
+#: src/postulo/templates/server/plugins.html
+msgid "Check every day"
+msgstr ""
+
+#: src/postulo/plugins/models.py
+msgid "check for plugin updates every day"
+msgstr ""
 
 #: src/postulo/templates/server/plugins.html
 msgid "Check for updates"
@@ -7420,6 +7515,10 @@ msgstr "Entón, todos os membros do grupo poderán velo, cambialo, compartilo e 
 msgid "Every piece the interface is built from, in the theme you are reading it in. Switch the theme under Settings → Appearance to see the other one."
 msgstr "Cada peza coa que está construída a interface, no tema no que a estás a ler. Cambia o tema en Configuración → Aparencia para ver o outro."
 
+#: src/postulo/templates/server/plugins.html
+msgid "Every plugin installed from a catalogue is up to date, as far as the last check could tell."
+msgstr ""
+
 #: src/postulo/templates/server/record_of_processing.html
 msgid "Every plugin installed on this instance, in the words it gives about itself. What Postulo keeps before any plugin arrives — profiles, careers, companies, contacts, documents — is the instance itself, and it is on every one of these pages."
 msgstr "Cada complemento instalado nesta instancia, coas palabras que el mesmo dá sobre si. O que o Postulo garda antes de que chegue ningún complemento — perfís, traxectorias, empresas, contactos, documentos — é a propia instancia, e está en cada unha destas páxinas."
@@ -7987,6 +8086,10 @@ msgstr "Sinalado"
 #: src/postulo/core/design.py
 msgid "Floating"
 msgstr "Flotante"
+
+#: src/postulo/templates/server/plugins.html
+msgid "Follow the latest"
+msgstr ""
 
 #: src/postulo/documents/models.py
 msgid "Follow your details"
@@ -8671,8 +8774,22 @@ msgstr ""
 
 #: src/postulo/applications/models.py
 #: src/postulo/templates/applications/partials/interview_outcome.html
+#: src/postulo/templates/server/plugins.html
 msgid "Held"
 msgstr "Realizada"
+
+#: src/postulo/templates/server/plugins.html
+#, python-format
+msgid "Held at %(version)s"
+msgstr ""
+
+#: src/postulo/plugins/models.py
+msgid "Held at the installed version"
+msgstr ""
+
+#: src/postulo/templates/server/plugins.html
+msgid "Held plugins are left alone. If any one fails, nothing is changed."
+msgstr ""
 
 #: src/postulo/core/design.py src/postulo/templates/partials/footer_links.html
 #: src/postulo/templates/server/design.html
@@ -8762,6 +8879,10 @@ msgstr "sinais de contratación"
 #: src/postulo/templates/jobs/posting_detail.html
 msgid "History"
 msgstr "Historial"
+
+#: src/postulo/templates/server/plugins.html
+msgid "Hold here"
+msgstr ""
 
 #: src/postulo/core/models.py src/postulo/templates/server/design.html
 msgid "Home"
@@ -9329,6 +9450,10 @@ msgstr "incluír os datos de contacto"
 msgid "Include my notes"
 msgstr "Incluír as miñas notas"
 
+#: src/postulo/templates/server/plugins.html
+msgid "Include releases that may break something"
+msgstr ""
+
 #: src/postulo/documents/models.py
 #: src/postulo/templates/server/backup_restore.html
 msgid "included"
@@ -9399,6 +9524,10 @@ msgstr "Instalalo"
 #: src/postulo/documents/pdf.py
 msgid "Install it with: uv sync --extra chromium, then: uv run playwright install chromium"
 msgstr "Instálao con: uv sync --extra chromium, e despois: uv run playwright install chromium"
+
+#: src/postulo/templates/server/plugins.html
+msgid "Install this one"
+msgstr ""
 
 #: src/postulo/templates/server/plugins.html
 msgid "Installed on this instance"
@@ -10250,6 +10379,11 @@ msgstr "última comprobación"
 msgid "last checked"
 msgstr "comprobado por última vez"
 
+#: src/postulo/templates/server/plugins.html
+#, python-format
+msgid "Last checked %(when)s ago."
+msgstr ""
+
 #: src/postulo/applications/models.py src/postulo/documents/models.py
 #: src/postulo/notifications/models.py src/postulo/plugins/models.py
 msgid "last error"
@@ -10989,6 +11123,10 @@ msgstr "Seguir o sistema operativo"
 msgid "Matching"
 msgstr "Que coincide con"
 
+#: src/postulo/templates/server/plugins.html
+msgid "May break something"
+msgstr ""
+
 #: src/postulo/plugins/models.py
 msgid "may change its settings"
 msgstr "pode cambiar a súa configuración"
@@ -11234,6 +11372,10 @@ msgstr "Falta a entrada"
 #: src/postulo/core/models.py src/postulo/templates/server/design.html
 msgid "Mobile"
 msgstr "Móbil"
+
+#: src/postulo/plugins/models.py
+msgid "mode"
+msgstr ""
 
 #: src/postulo/plugins/provenance.py
 msgid "Module"
@@ -11543,6 +11685,11 @@ msgid "Near me"
 msgstr "Preto de min"
 
 #: src/postulo/templates/server/plugins.html
+#, python-format
+msgid "Needs Postulo %(wanted)s."
+msgstr ""
+
+#: src/postulo/templates/server/plugins.html
 msgid "Needs, installed first:"
 msgstr "Precisa, instalados antes:"
 
@@ -11773,13 +11920,13 @@ msgstr "Non se marcou ningunha tarxeta, polo que non se engadiu nada."
 msgid "No catalogue called “%(name)s” is configured."
 msgstr "Non hai ningún catálogo configurado chamado «%(name)s»."
 
-#: src/postulo/plugins/catalogue.py
+#: src/postulo/plugins/catalogue.py src/postulo/plugins/updates.py
 msgid "No catalogue is configured on this instance."
 msgstr "Non hai ningún catálogo configurado nesta instancia."
 
 #: src/postulo/templates/server/plugins.html
-msgid "No catalogue is configured, so plugins are installed from a package you upload. A catalogue is a signed list of plugins that can be installed by name."
-msgstr "Non hai ningún catálogo configurado, así que os complementos instálanse desde un paquete que cargues. Un catálogo é unha lista asinada de complementos que se poden instalar polo nome."
+msgid "No catalogue is configured, so nothing can be installed yet: plugins come only from a signed catalogue, a signed list of plugins that can be installed by name."
+msgstr ""
 
 #: src/postulo/plugins/catalogue.py
 #, python-format
@@ -12320,6 +12467,10 @@ msgstr "Aínda sen comprobar"
 msgid "not checked yet"
 msgstr "aínda sen comprobar"
 
+#: src/postulo/templates/server/plugins.html
+msgid "Not checked yet."
+msgstr ""
+
 #: src/postulo/templates/server/signin.html
 msgid "Not configured. Set POSTULO_OIDC_SERVER_URL, POSTULO_OIDC_CLIENT_ID and POSTULO_OIDC_CLIENT_SECRET in the environment to offer a sign-in button for an OpenID Connect provider."
 msgstr "Sen configurar. Define POSTULO_OIDC_SERVER_URL, POSTULO_OIDC_CLIENT_ID e POSTULO_OIDC_CLIENT_SECRET no contorno para ofrecer un botón de inicio de sesión cun provedor OpenID Connect."
@@ -12687,6 +12838,10 @@ msgstr "Nada do que hai instalado nesta instancia depende de ti para activalo ou
 msgid "Nothing is being kept."
 msgstr "Non se conserva nada."
 
+#: src/postulo/plugins/installing.py
+msgid "Nothing is installed except from a signed catalogue, and this package is not listed in one. An operator developing a plugin can switch POSTULO_PLUGIN_ALLOW_UNLISTED on."
+msgstr ""
+
 #: src/postulo/templates/server/plugins.html
 #, python-format
 msgid "Nothing is installed here yet. Plugins live in %(directory)s, on the data volume, so they survive an upgrade."
@@ -12852,6 +13007,10 @@ msgstr "Non hai nada que poñer na cola: todos os documentos dos tipos escollido
 #: src/postulo/templates/applications/partials/report_tally.html
 msgid "Nothing to show for this period."
 msgstr "Nada que mostrar neste período."
+
+#: src/postulo/templates/server/plugins.html
+msgid "Nothing updates it by itself."
+msgstr ""
 
 #: src/postulo/templates/documents/upload_list.html
 msgid "Nothing uploaded yet."
@@ -13135,6 +13294,7 @@ msgid "Offers side by side"
 msgstr "Propostas lado a lado"
 
 #: src/postulo/plugins/models.py src/postulo/plugins/provenance.py
+#: src/postulo/templates/server/plugins.html
 msgid "Official"
 msgstr "Oficial"
 
@@ -14251,10 +14411,27 @@ msgstr "imaxe"
 msgid "Picture"
 msgstr "Imaxe"
 
+#: src/postulo/templates/server/plugins.html
+msgid "Pin to this version"
+msgstr ""
+
+#: src/postulo/templates/server/plugins.html
+msgid "Pinned by POSTULO_PLUGIN_PINS in the environment; it cannot be changed here."
+msgstr ""
+
 #: src/postulo/plugins/installing.py
 #, python-format
 msgid "Pinned by: %(plugins)s."
 msgstr "Fixado por: %(plugins)s."
+
+#: src/postulo/templates/server/plugins.html
+#, python-format
+msgid "Pinned to %(version)s"
+msgstr ""
+
+#: src/postulo/plugins/models.py
+msgid "Pinned to a version"
+msgstr ""
 
 #: src/postulo/core/models.py
 msgid "Place"
@@ -14381,6 +14558,14 @@ msgstr "regra de acceso a complementos"
 msgid "plugin access rules"
 msgstr "regras de acceso a complementos"
 
+#: src/postulo/plugins/models.py
+msgid "plugin hold"
+msgstr ""
+
+#: src/postulo/plugins/models.py
+msgid "plugin holds"
+msgstr ""
+
 #: src/postulo/templates/connections/list.html
 msgid "plugin not installed"
 msgstr "complemento non instalado"
@@ -14401,6 +14586,10 @@ msgstr "repositorios de complementos"
 msgid "plugin repository"
 msgstr "repositorio de complementos"
 
+#: src/postulo/plugins/models.py
+msgid "plugin update settings"
+msgstr ""
+
 #: src/postulo/accounts/settings_views.py src/postulo/core/server_sections.py
 #: src/postulo/core/server_views.py src/postulo/core/settings_sections.py
 #: src/postulo/core/views_access.py src/postulo/plugins/apps.py
@@ -14409,6 +14598,10 @@ msgstr "repositorio de complementos"
 #: src/postulo/templates/settings/plugins.html
 msgid "Plugins"
 msgstr "Complementos"
+
+#: src/postulo/core/server_views.py
+msgid "Plugins are installed from a signed catalogue only. Installing from a file is switched off on this instance."
+msgstr ""
 
 #: src/postulo/core/server_views.py
 #: src/postulo/templates/server/person_plugins.html
@@ -14570,6 +14763,10 @@ msgstr "Ofertas en todo o grupo %(name)s"
 msgid "Postings read from a page, waiting for you to confirm them."
 msgstr "Ofertas lidas dunha páxina, agardando a que as confirmes."
 
+#: src/postulo/core/server_views.py
+msgid "Postulo checks the plugin catalogues for updates every day."
+msgstr ""
+
 #: src/postulo/templates/base.html
 msgid "Postulo could not be reached. Nothing on this page has changed."
 msgstr "Non se puido chegar ao Postulo. Nada desta páxina cambiou."
@@ -14589,6 +14786,10 @@ msgstr "O Postulo non coñece ese fuso horario."
 #: src/postulo/documents/paper_choice.py
 msgid "Postulo does not print on that paper. Choose another."
 msgstr "O Postulo non imprime nese papel. Escolle outro."
+
+#: src/postulo/templates/server/plugins.html
+msgid "Postulo fetches each catalogue's signed list once a day to see whether a plugin has a newer release. Nothing is downloaded or installed until an administrator presses Update."
+msgstr ""
 
 #: src/postulo/jobs/forms.py
 msgid "Postulo fetches it once and keeps a copy; the address is never shown to a browser. PNG, JPEG, GIF or WebP."
@@ -14631,6 +14832,10 @@ msgstr ""
 msgid "Postulo never opens a link on its own: not to check that it answers, not for an icon, not for a picture. The address is kept as you typed it, with https:// put in front where you left it out."
 msgstr "O Postulo nunca abre unha ligazón pola súa conta: nin para comprobar que responde, nin para obter unha icona, nin para unha imaxe. O enderezo consérvase tal como o escribiches, con https:// diante se o omitiches."
 
+#: src/postulo/core/server_views.py
+msgid "Postulo no longer checks the plugin catalogues by itself."
+msgstr ""
+
 #: src/postulo/core/errands.py
 msgid "Postulo no longer does that."
 msgstr "O Postulo xa non fai iso."
@@ -14672,6 +14877,24 @@ msgstr "As palabras do propio Postulo. A etiqueta dun portal de emprego pode non
 msgid "POSTULO_LOG_DIR is empty, so records go to the console and nowhere else. Set it to a directory on the data volume to read them here; see Configuration in the wiki."
 msgstr "POSTULO_LOG_DIR está baleiro, así que os rexistros van á consola e a ningún outro sitio. Defíneo cun directorio do volume de datos para lelos aquí; consulta Configuración no wiki."
 
+#: src/postulo/plugins/holds.py
+#, python-format
+msgid "POSTULO_PLUGIN_PINS pins %(name)s to %(wanted)s, so %(version)s is not installed from here. Change the pin where it is set."
+msgstr ""
+
+#: src/postulo/plugins/holds.py
+#, python-format
+msgid "POSTULO_PLUGIN_PINS pins “%(name)s”, so it cannot be changed here. Change it where the environment is set."
+msgstr ""
+
+#: src/postulo/plugins/updates.py
+msgid "POSTULO_PLUGIN_UPDATE_CHECK is set in the environment, so the switch cannot be changed here."
+msgstr ""
+
+#: src/postulo/templates/server/plugins.html
+msgid "POSTULO_PLUGIN_UPDATE_CHECK is set in the environment, so this cannot be changed here."
+msgstr ""
+
 #: src/postulo/templates/partials/footer_links.html
 msgid "Powered by Postulo"
 msgstr "Funciona co Postulo"
@@ -14707,8 +14930,8 @@ msgid "Presentations, conferences and seminars"
 msgstr "Presentacións, conferencias e seminarios"
 
 #: src/postulo/templates/server/plugins.html
-msgid "Press Check for updates to fetch what the catalogues offer. Postulo does not fetch them on its own."
-msgstr "Preme «Comprobar se hai actualizacións» para obter o que ofrecen os catálogos. O Postulo non os obtén pola súa conta."
+msgid "Press Check for updates to fetch what the catalogues offer."
+msgstr ""
 
 #: src/postulo/templates/jobs/capture_form.html
 msgid "Press “Read the page” again to capture it anyway."
@@ -15644,6 +15867,10 @@ msgstr "Rexeitamentos"
 msgid "relationship"
 msgstr "relación"
 
+#: src/postulo/templates/server/plugins.html
+msgid "Release notes"
+msgstr ""
+
 #: src/postulo/jobs/industries.py
 msgid "Remediation"
 msgstr ""
@@ -15910,6 +16137,10 @@ msgstr "Revisar"
 msgid "Review the capture"
 msgstr "Revisar a captura"
 
+#: src/postulo/templates/server/overview.html
+msgid "Review them on the Plugins page"
+msgstr ""
+
 #: src/postulo/applications/models.py
 msgid "reviewed on"
 msgstr "revisada o"
@@ -16003,6 +16234,11 @@ msgstr "Executar"
 #: src/postulo/templates/server/data_protection.html
 msgid "Run the dry run"
 msgstr "Executar a simulación"
+
+#: src/postulo/templates/server/plugins.html
+#, python-format
+msgid "running %(running)s; restart to finish"
+msgstr ""
 
 #: src/postulo/templates/server/backups.html
 msgid "Runs in the background; you can leave this page while it works."
@@ -16354,6 +16590,7 @@ msgid "Sectors and industries"
 msgstr "Sectores e industrias"
 
 #: src/postulo/jobs/industries.py src/postulo/templates/server/email.html
+#: src/postulo/templates/server/plugins.html
 msgid "Security"
 msgstr "Seguranza"
 
@@ -16581,7 +16818,7 @@ msgstr "Servizo"
 msgid "service"
 msgstr "servizo"
 
-#: src/postulo/templates/server/email.html
+#: src/postulo/plugins/models.py src/postulo/templates/server/email.html
 msgid "set"
 msgstr "definido"
 
@@ -16596,6 +16833,15 @@ msgstr "Define <code>POSTULO_UPDATE_CHECK=true</code> para que o planificador pr
 #: src/postulo/applications/models.py
 msgid "Set automatically the first time the status becomes “Applied”."
 msgstr "Establécese automaticamente a primeira vez que o estado pasa a «Enviada»."
+
+#: src/postulo/plugins/models.py
+msgid "set by"
+msgstr ""
+
+#: src/postulo/templates/server/plugins.html
+#, python-format
+msgid "Set by %(who)s on %(when)s."
+msgstr ""
 
 #: src/postulo/templates/partials/field_pinned.html
 #, python-format
@@ -18319,6 +18565,10 @@ msgstr "Ese é un número curto de %(country)s, que só se pode marcar desde den
 msgid "That is larger than %(limit)s, which is the most this instance keeps."
 msgstr "Iso supera %(limit)s, que é o máximo que conserva esta instancia."
 
+#: src/postulo/plugins/updates.py
+msgid "That is more than one request has time for. Nothing was changed; update fewer at a time."
+msgstr ""
+
 #: src/postulo/jobs/pages.py
 #, python-format
 msgid "That is not a %(kind)s, whatever it was sent as."
@@ -18917,11 +19167,6 @@ msgid "The cards in the file"
 msgstr "As tarxetas do ficheiro"
 
 #: src/postulo/plugins/catalogue.py
-#, python-format
-msgid "The catalogue expired on %(date)s; an old copy may have been served."
-msgstr "O catálogo caducou o %(date)s; pode que se servise unha copia antiga."
-
-#: src/postulo/plugins/catalogue.py
 msgid "The catalogue is not readable JSON."
 msgstr "O catálogo non é JSON lexible."
 
@@ -18929,6 +19174,11 @@ msgstr "O catálogo non é JSON lexible."
 #, python-format
 msgid "The catalogue is older than one already seen (%(old)d, after %(new)d)."
 msgstr "O catálogo é máis antigo ca un xa visto (%(old)d, despois de %(new)d)."
+
+#: src/postulo/plugins/catalogue.py
+#, python-format
+msgid "The catalogue “%(name)s” expired on %(date)s, so it cannot be used: its publisher has to sign a new list, or an old copy is being served. Plugins already installed go on working; nothing can be installed or updated from it until then."
+msgstr ""
 
 #: src/postulo/plugins/catalogue.py
 msgid "The catalogue's expiry is not a date."
@@ -19072,6 +19322,10 @@ msgid "The CV that prints the most of the ones you have, %(counter)s:"
 msgid_plural "The CV that prints the most of the ones you have, %(counter)s:"
 msgstr[0] ""
 msgstr[1] ""
+
+#: src/postulo/templates/server/plugins.html
+msgid "The daily check is off."
+msgstr ""
 
 #: src/postulo/templates/settings/appearance.html
 msgid "The dashboard lists open applications nothing has happened to for a while, with nothing planned. Recruiters' own advice clusters around two to three weeks."
@@ -19987,6 +20241,10 @@ msgstr "A mesma cousa dúas veces"
 msgid "The same website: %(domain)s"
 msgstr "O mesmo sitio web: %(domain)s"
 
+#: src/postulo/plugins/updates.py
+msgid "the scheduler"
+msgstr ""
+
 #: src/postulo/templates/server/overview.html
 msgid "The scheduler asks once a day; run manage.py check_for_updates to ask now."
 msgstr "O planificador pregunta unha vez ao día; executa manage.py check_for_updates para preguntar agora."
@@ -20275,6 +20533,10 @@ msgstr "As palabras sen a maquetación, no idioma desta carta. Ningunha delas se
 msgid "The work was interrupted before it finished. Please try again."
 msgstr "O traballo interrompeuse antes de rematar. Téntao de novo."
 
+#: src/postulo/plugins/updates.py
+msgid "the worker"
+msgstr ""
+
 #: src/postulo/jobs/merging.py
 msgid "Their entry among your references"
 msgstr "A súa entrada entre as túas referencias"
@@ -20396,6 +20658,10 @@ msgstr "Non hai nada á espera de importarse."
 msgid "There was nothing to keep."
 msgstr "Non había nada que conservar."
 
+#: src/postulo/core/server_views.py
+msgid "There was nothing to update."
+msgstr ""
+
 #: src/postulo/templates/applications/interview_detail.html
 msgid "These are the files as they were sent, not your documents as they are now."
 msgstr ""
@@ -20461,6 +20727,10 @@ msgstr "Era o contacto principal."
 msgctxt "pronouns"
 msgid "they/them"
 msgstr "elle"
+
+#: src/postulo/templates/server/plugins.html
+msgid "Third party"
+msgstr ""
 
 #: src/postulo/jobs/pages.py
 msgid "This account does not keep a rendering of a page."
@@ -20682,6 +20952,10 @@ msgstr "Este identificador xa está na lista."
 #: src/postulo/templates/server/defaults.html
 msgid "This instance"
 msgstr "Esta instancia"
+
+#: src/postulo/templates/server/plugins.html
+msgid "This instance allows installing a package no catalogue lists, for developing a plugin. Nothing vouches for it: it is not signed by anyone."
+msgstr ""
 
 #: src/postulo/templates/settings/account.html
 #, python-format
@@ -21482,6 +21756,18 @@ msgstr "ata %(high)s"
 msgid "Up to %(mb)s MB. It is opened and checked before anything is kept."
 msgstr "Ata %(mb)s MB. Ábrese e compróbase antes de conservar nada."
 
+#: src/postulo/templates/server/plugins.html
+msgid "Update"
+msgstr ""
+
+#: src/postulo/templates/server/plugins.html
+msgid "Update all"
+msgstr ""
+
+#: src/postulo/templates/server/plugins.html
+msgid "Update anyway"
+msgstr ""
+
 #: src/postulo/templates/core/import_csv_map.html
 msgid "Update the preview"
 msgstr "Actualizar a vista previa"
@@ -21493,6 +21779,23 @@ msgstr "data de actualización"
 #: src/postulo/core/models.py
 msgid "updated by"
 msgstr "actualizada por"
+
+#: src/postulo/core/server_views.py
+msgid "Updated. Restart Postulo to finish: this server cannot reload itself, and every process keeps the code it had already loaded."
+msgstr ""
+
+#: src/postulo/core/server_views.py
+msgid "Updated. The web processes are reloading to use the new code."
+msgstr ""
+
+#: src/postulo/core/server_views.py
+#, python-format
+msgid "Updated. The web processes are reloading to use the new code. Restart %(others)s to finish: each keeps the code it had already loaded."
+msgstr ""
+
+#: src/postulo/templates/server/plugins.html
+msgid "Updates"
+msgstr ""
 
 #: src/postulo/accounts/forms.py
 msgid "Upload a CV photo"
@@ -21689,7 +21992,7 @@ msgstr "verificado"
 msgid "Verified"
 msgstr "Verificado"
 
-#: src/postulo/documents/models.py
+#: src/postulo/documents/models.py src/postulo/plugins/models.py
 #: src/postulo/templates/documents/upload_detail.html
 #: src/postulo/templates/documents/upload_list.html
 msgid "version"
@@ -21703,6 +22006,10 @@ msgstr "Versión"
 #: src/postulo/plugins/models.py
 msgid "version tag"
 msgstr "etiqueta de versión"
+
+#: src/postulo/templates/server/plugins.html
+msgid "Version to pin"
+msgstr ""
 
 #: src/postulo/templates/documents/cv_detail.html
 #: src/postulo/templates/documents/letter_detail.html
@@ -22830,9 +23137,17 @@ msgstr "De quen"
 msgid "Whose they become"
 msgstr "De quen pasan a ser"
 
+#: src/postulo/plugins/models.py
+msgid "why"
+msgstr ""
+
 #: src/postulo/templates/jobs/posting_detail.html
 msgid "Why"
 msgstr "Motivo"
+
+#: src/postulo/templates/server/plugins.html
+msgid "Why (optional)"
+msgstr ""
 
 #: src/postulo/jobs/tables.py
 msgid "Why discarded"
@@ -23930,6 +24245,16 @@ msgstr "«%(name)s» non é unha parte dunha entrada que traduza o Postulo."
 #, python-format
 msgid "“%(name)s” is not a part of the career that Postulo translates."
 msgstr "«%(name)s» non é unha parte da traxectoria que traduza o Postulo."
+
+#: src/postulo/plugins/holds.py
+#, python-format
+msgid "“%(name)s” is not held."
+msgstr ""
+
+#: src/postulo/plugins/holds.py
+#, python-format
+msgid "“%(name)s” is not installed here, so there is no version to hold."
+msgstr ""
 
 #: src/postulo/core/server_views.py
 #, python-format

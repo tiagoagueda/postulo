@@ -9,6 +9,9 @@ All notable changes to Postulo are recorded here. The format follows
 ### ✨ Added
 
 - Register lookup links Finland's and Czechia's own register page, reads Czechia's main activity and a liquidation or bankruptcy in Poland (#1065)
+- Plugins are installed only through a signed manifest: each listing names where it came from, an index that has expired says so, and a third-party index is added as a manifest, never a single plugin by address (#1263)
+- An administrator can hold a plugin where it is, or pin it to a version, so it is not updated to the latest by itself (#1264)
+- Administrators are told when a plugin has an update, and can update one plugin or all of them (#1187)
 - Register lookup keeps an encrypted key per register that needs one, and asks Companies House (United Kingdom) once it has one (#1065)
 - PDFs open in a viewer of Postulo's own, and the lists show a thumbnail of each (#942)
 - Publications can be read and written as BibTeX, BibLaTeX, RIS and CSL JSON; looking them up online is an administrator's switch, off by default (#879)
