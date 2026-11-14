@@ -140,7 +140,7 @@ def _no_inherited_environment(monkeypatch):
 
     `site.overridden_by` asks `os.environ` whether a variable is set, and settings are read
     from a `.env` file into `os.environ` at import. So a machine with a `.env` was running a
-    different suite from one without: `POSTULO_DEFAULT_FROM_EMAIL=postulo@localhost` in a
+    different suite from one without: `POSTULO_EMAIL_FROM=postulo@localhost` in a
     local file pinned the email from-address, and the test that saves one from the interface
     passed in CI and failed on the machine that wrote it.
 

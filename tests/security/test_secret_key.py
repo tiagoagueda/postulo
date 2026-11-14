@@ -53,17 +53,17 @@ CASES: dict[str, dict[str, str]] = {
     "weak-field-key": {"POSTULO_SECRET_KEY": GOOD, "POSTULO_FIELD_KEY": "changeme"},
     "good-field-key": {"POSTULO_SECRET_KEY": GOOD, "POSTULO_FIELD_KEY": GOOD[::-1]},
     "no-field-key": {"POSTULO_SECRET_KEY": GOOD, "POSTULO_FIELD_KEY": ""},
-    "allowed-short": {"POSTULO_SECRET_KEY": SHORT, "POSTULO_ALLOW_WEAK_SECRET_KEY": "true"},
+    "allowed-short": {"POSTULO_SECRET_KEY": SHORT, "POSTULO_SECRET_KEY_WEAK_ALLOWED": "true"},
     "allowed-placeholder": {
         "POSTULO_SECRET_KEY": "changeme",
-        "POSTULO_ALLOW_WEAK_SECRET_KEY": "true",
+        "POSTULO_SECRET_KEY_WEAK_ALLOWED": "true",
     },
-    "allowed-empty": {"POSTULO_SECRET_KEY": "", "POSTULO_ALLOW_WEAK_SECRET_KEY": "true"},
+    "allowed-empty": {"POSTULO_SECRET_KEY": "", "POSTULO_SECRET_KEY_WEAK_ALLOWED": "true"},
     "wildcard-host": {"POSTULO_SECRET_KEY": GOOD, "POSTULO_ALLOWED_HOSTS": "postulo.example.org,*"},
     "wildcard-host-allowed": {
         "POSTULO_SECRET_KEY": GOOD,
         "POSTULO_ALLOWED_HOSTS": "*",
-        "POSTULO_ALLOW_WILDCARD_HOSTS": "true",
+        "POSTULO_ALLOWED_HOSTS_WILDCARD_ALLOWED": "true",
     },
 }
 
@@ -256,7 +256,7 @@ def test_a_wildcard_in_the_allowed_hosts_is_refused_and_says_how_to_go_on_anyway
 
     assert not refused.started
     assert "accepts any Host header" in refused.error
-    assert "POSTULO_ALLOW_WILDCARD_HOSTS" in refused.error
+    assert "POSTULO_ALLOWED_HOSTS_WILDCARD_ALLOWED" in refused.error
 
 
 def test_it_can_be_allowed_on_purpose(outcomes):

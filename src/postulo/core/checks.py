@@ -44,9 +44,9 @@ BYTE_CAPS = (
     "POSTULO_CAPTURE_ACCOUNT_MAX_BYTES",
 )
 
-#: Settings that count days, where nought means *for ever* and less than nought means
+#: Settings that count seconds, where nought means *for ever* and less than nought means
 #: nothing at all.
-DAY_COUNTS = ("POSTULO_CAPTURE_PAGE_KEEP_DAYS",)
+SECOND_COUNTS = ("POSTULO_CAPTURE_PAGE_KEEP_SECONDS",)
 
 
 def rate_settings() -> list[str]:
@@ -122,12 +122,12 @@ def sizes(app_configs=None, **kwargs) -> list[Error]:
                     id="postulo.E004",
                 )
             )
-    for name in DAY_COUNTS:
+    for name in SECOND_COUNTS:
         value = getattr(settings, name, 0)
         if not _whole_number(value) or value < 0:
             problems.append(
                 Error(
-                    f"{name} is {value!r}; it must be a whole number of days, and 0 means "
+                    f"{name} is {value!r}; it must be a whole number of seconds, and 0 means "
                     "they are kept for as long as the capture is.",
                     id="postulo.E005",
                 )

@@ -20,7 +20,7 @@ so, or it sends an operator to fix one problem by causing a worse one. `POSTULO_
 is the way out: set it to the **old** key first, and the credentials stay readable while the
 signing key changes underneath them.
 
-`POSTULO_ALLOW_WEAK_SECRET_KEY` exists for the operator this catches at an inconvenient
+`POSTULO_SECRET_KEY_WEAK_ALLOWED` exists for the operator this catches at an inconvenient
 moment: an instance that has been running happily on a short key, refusing to start after an
 upgrade, at the hour when nobody wants to plan a key rotation. It buys time. It does not
 apply to a placeholder — somebody who typed `changeme` has not chosen anything, and there is
@@ -120,6 +120,6 @@ def refuse_a_weak_key(key: str, *, name: str, allow_weak: bool = False) -> None:
         raise ImproperlyConfigured(
             f"{name} is too weak: {weakness}. Generate one with: {GENERATE}\n"
             f"{ROTATION_WARNING}\n"
-            "To start anyway while you plan that, set POSTULO_ALLOW_WEAK_SECRET_KEY=true. "
+            "To start anyway while you plan that, set POSTULO_SECRET_KEY_WEAK_ALLOWED=true. "
             "It is a way to buy an afternoon, not an answer."
         )

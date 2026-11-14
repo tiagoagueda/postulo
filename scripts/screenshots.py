@@ -321,7 +321,7 @@ def isolate_environment(workdir: Path) -> None:
             "DJANGO_SETTINGS_MODULE": "postulo.config.settings.dev",
             "DJANGO_ALLOW_ASYNC_UNSAFE": "true",
             "POSTULO_SECRET_KEY": "screenshots-not-a-secret",
-            "POSTULO_DEBUG": "true",
+            "POSTULO_DEBUG_ENABLED": "true",
             "POSTULO_DATABASE_URL": f"sqlite:///{(workdir / 'demo.sqlite3').as_posix()}",
             "POSTULO_MEDIA_ROOT": str(workdir / "media"),
             "POSTULO_PLUGINS_DIR": str(workdir / "plugins"),
@@ -596,7 +596,7 @@ def markdown(shot: Shot, language: str) -> str:
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     parser.add_argument(
-        "--wiki", type=Path, default=Path(os.environ.get("POSTULO_WIKI", DEFAULT_WIKI))
+        "--wiki", type=Path, default=Path(os.environ.get("POSTULO_WIKI_DIR", DEFAULT_WIKI))
     )
     parser.add_argument("--language", default="en", help="interface language code (default en)")
     parser.add_argument("--only", nargs="*", default=[], metavar="NAME", help="take only these")

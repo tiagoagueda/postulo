@@ -141,7 +141,7 @@ def test_a_company_deleted_while_the_fetch_waited_is_said_plainly(user, settings
 
 
 def test_an_export_becomes_a_file_with_an_owner_and_an_expiry(client, user, settings):
-    settings.POSTULO_EXPORT_KEEP_HOURS = 6
+    settings.POSTULO_EXPORT_KEEP_SECONDS = 6 * 3600
     client.force_login(user)
 
     errand = finished(client.post(reverse("core:export_download")), client)
@@ -264,7 +264,7 @@ def test_a_scratch_file_is_left_alone_while_it_is_written_and_swept_once_it_is_o
     from postulo.documents import scrub
 
     media, _temporary = volumes
-    settings.POSTULO_MEDIA_SWEEP_GRACE_HOURS = 1  # the shortest an operator can make it
+    settings.POSTULO_MEDIA_SWEEP_GRACE_SECONDS = 3600  # an hour: the shortest the old name allowed
     swept = []
     while_writing.append(lambda target: swept.append((scrub.sweep(), files_in(media))))
 

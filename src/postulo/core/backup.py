@@ -836,7 +836,7 @@ def restore_backup(
             "underneath whatever is reading it. Stop the web service, the scheduler and the "
             "worker first — in the container, `docker compose --profile scheduler --profile "
             "worker stop`, then "
-            "`docker compose run --rm -e POSTULO_SKIP_MIGRATE=1 postulo python manage.py "
+            "`docker compose run --rm -e POSTULO_CONTAINER_MIGRATE=0 postulo python manage.py "
             "restore ...` — or pass --force if you are certain nothing else is connected."
         )
     if _has_accounts() and not force:

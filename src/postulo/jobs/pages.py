@@ -814,16 +814,16 @@ def expire_unconfirmed() -> int:
     """Remove the pages of captures that never became a listing. Called by the scheduler.
 
     A capture discarded, or one still waiting for review, keeps its page for
-    `POSTULO_CAPTURE_PAGE_KEEP_DAYS` from the day it was captured; a capture somebody saved
+    `POSTULO_CAPTURE_PAGE_KEEP_SECONDS` from the day it was captured; a capture somebody saved
     keeps its page while the listing it became exists (#664). The capture itself is never
     touched here: what goes is the copy of the page, which is the part that weighs something.
 
     Returns how many pages went.
     """
-    days = site.capture_page_keep_days()
-    if not days:
+    seconds = site.capture_page_keep_seconds()
+    if not seconds:
         return 0
-    cutoff = timezone.now() - dt.timedelta(days=days)
+    cutoff = timezone.now() - dt.timedelta(seconds=seconds)
     stale = (
         CapturedPage.objects.filter(capture__created_at__lt=cutoff)
         .exclude(capture__status=CaptureStatus.ACCEPTED)

@@ -32,7 +32,7 @@ were the only thing that mattered.
   third-party origins.
 - Nothing is fetched from the network on a page view. What is fetched without a person
   asking is named in the wiki's *Hardening* page: the GeoNames city tables at first
-  start (`POSTULO_SKIP_GEONAMES=1` turns it off), plugin packages on `plugins sync`
+  start (`POSTULO_CONTAINER_GEONAMES_FETCH=0` turns it off), plugin packages on `plugins sync`
   after an upgrade, deliveries to the connections a person set up, and the update check
   when `POSTULO_UPDATE_CHECK` is on. Never from private addresses unless the operator
   allowed it.

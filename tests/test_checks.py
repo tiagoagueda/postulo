@@ -170,10 +170,10 @@ def test_every_cap_on_a_kept_page_is_checked():
     named = {
         name
         for name in dir(configured)
-        if name.startswith("POSTULO_CAPTURE_") and name.endswith(("_MAX_BYTES", "_KEEP_DAYS"))
+        if name.startswith("POSTULO_CAPTURE_") and name.endswith(("_MAX_BYTES", "_KEEP_SECONDS"))
     }
 
-    assert named == set(checks.BYTE_CAPS) | set(checks.DAY_COUNTS)
+    assert named == set(checks.BYTE_CAPS) | set(checks.SECOND_COUNTS)
     assert len(named) == 4
 
 
@@ -198,18 +198,18 @@ def test_a_cap_that_is_a_number_of_bytes_passes(settings, name, value):
 
 
 @pytest.mark.parametrize("value", [-1, "a month", None, 1.5])
-def test_a_count_of_days_that_is_not_one_is_an_error(settings, value):
-    settings.POSTULO_CAPTURE_PAGE_KEEP_DAYS = value
+def test_a_count_of_seconds_that_is_not_one_is_an_error(settings, value):
+    settings.POSTULO_CAPTURE_PAGE_KEEP_SECONDS = value
 
     problems = checks.sizes()
 
     assert ids(problems) == {"postulo.E005"}
-    assert "POSTULO_CAPTURE_PAGE_KEEP_DAYS" in problems[0].msg
+    assert "POSTULO_CAPTURE_PAGE_KEEP_SECONDS" in problems[0].msg
 
 
 @pytest.mark.parametrize("value", [0, 1, 30, 3650])
-def test_nought_days_means_for_ever_and_passes(settings, value):
-    settings.POSTULO_CAPTURE_PAGE_KEEP_DAYS = value
+def test_nought_seconds_means_for_ever_and_passes(settings, value):
+    settings.POSTULO_CAPTURE_PAGE_KEEP_SECONDS = value
     assert checks.sizes() == []
 
 

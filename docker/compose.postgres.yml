@@ -59,11 +59,11 @@ services:
       - ../.env
     environment:
       POSTULO_DATABASE_URL: postgres://postulo@db:5432/postulo
-      POSTULO_SKIP_MIGRATE: "1"
+      POSTULO_CONTAINER_MIGRATE: "0"
       # The web container restores the installed plugins on startup. Both doing it at the
       # same moment means two processes writing one record, so the scheduler leaves it to
       # the container that waited for it (#221).
-      POSTULO_SKIP_PLUGIN_SYNC: "1"
+      POSTULO_CONTAINER_PLUGIN_SYNC: "0"
     volumes:
       # Media, because a notice may render a document; the records are in the database.
       - postulo-data:/app/data
@@ -103,8 +103,8 @@ services:
       - ../.env
     environment:
       POSTULO_DATABASE_URL: postgres://postulo@db:5432/postulo
-      POSTULO_SKIP_MIGRATE: "1"
-      POSTULO_SKIP_PLUGIN_SYNC: "1"
+      POSTULO_CONTAINER_MIGRATE: "0"
+      POSTULO_CONTAINER_PLUGIN_SYNC: "0"
     volumes:
       - postulo-data:/app/data
     command: ["python", "manage.py", "work"]

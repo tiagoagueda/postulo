@@ -98,18 +98,19 @@ def map_tile_url(app_configs, **kwargs):
 
 @register("postulo")
 def geocoder(app_configs, **kwargs):
-    """`POSTULO_GEOCODER` names no service, or `POSTULO_GEOCODER_URL` is no base address (#913).
+    """`POSTULO_GEOCODER_SERVICE` names no service, or `POSTULO_GEOCODER_URL` is no address (#913).
 
     Either way no street is looked up; this says why before anybody wonders.
     """
-    service = getattr(settings, "POSTULO_GEOCODER", "")
+    service = getattr(settings, "POSTULO_GEOCODER_SERVICE", "")
     if not service:
         return []
     allowed = (geocoding.OFF, *geocoding.SERVICES)
     if service not in allowed:
         return [
             Error(
-                f"POSTULO_GEOCODER is {service!r}; it must be one of: {', '.join(allowed)}.",
+                f"POSTULO_GEOCODER_SERVICE is {service!r}; it must be one of: "
+                f"{', '.join(allowed)}.",
                 hint="Set it in the environment, or unset it to leave the choice to the page.",
                 id="postulo.E043",
             )

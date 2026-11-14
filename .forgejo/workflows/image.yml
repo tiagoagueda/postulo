@@ -98,7 +98,7 @@ jobs:
             -u "$REGISTRY_USER" --password-stdin
 
       # One moment for the run, handed to both builds below (#300). The Dockerfile takes it
-      # as POSTULO_APT_REFRESH, which is part of the cache key of the layer that takes
+      # as POSTULO_IMAGE_APT_REFRESH, which is part of the cache key of the layer that takes
       # Debian's updates, so that layer runs in this build whatever the runner's cache
       # remembers. A release above all: it is the image people keep.
       - name: Note the moment Debian is asked
@@ -112,7 +112,7 @@ jobs:
         env:
           ASKED: ${{ steps.moment.outputs.asked }}
         run: |
-          docker build --pull --build-arg POSTULO_APT_REFRESH="$ASKED" \
+          docker build --pull --build-arg POSTULO_IMAGE_APT_REFRESH="$ASKED" \
             -f docker/Dockerfile -t postulo:scan .
 
       # The same script a person runs, rather than a second description of the same
@@ -165,7 +165,7 @@ jobs:
           docker buildx create --use --name postulo-release >/dev/null 2>&1 || docker buildx use postulo-release
           tags=""
           for tag in $(echo "$TAGS" | tr ',' ' '); do tags="$tags -t $tag"; done
-          docker buildx build --pull --build-arg POSTULO_APT_REFRESH="$ASKED" \
+          docker buildx build --pull --build-arg POSTULO_IMAGE_APT_REFRESH="$ASKED" \
             --platform linux/amd64,linux/arm64 -f docker/Dockerfile $tags --push .
 
       # The registry, asked the way `docker pull` asks it: each of the three tags must be

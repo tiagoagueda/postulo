@@ -389,20 +389,20 @@ def test_the_scheduled_slice_leaves_alone_what_it_read_this_week(
 def test_how_long_the_slice_leaves_a_file_is_the_operators_to_say(
     user, media_root, files_read, settings
 ):
-    """`POSTULO_SCRUB_EVERY_DAYS`, and nought is every pass, as it was (#1118)."""
+    """`POSTULO_MEDIA_SCRUB_EVERY_SECONDS`, and nought is every pass, as it was (#1118)."""
     upload = an_upload(user)
     start = timezone.now()
     scrub.verify_uploads(limit=25, now=start)
     del files_read[:]
 
-    settings.POSTULO_SCRUB_EVERY_DAYS = 2
+    settings.POSTULO_MEDIA_SCRUB_EVERY_SECONDS = 2 * 86_400
     scrub.verify_uploads(limit=25, now=start + dt.timedelta(days=1))
     assert files_read == []
     scrub.verify_uploads(limit=25, now=start + dt.timedelta(days=2, minutes=5))
     assert files_read == [upload.file.name]
 
     del files_read[:]
-    settings.POSTULO_SCRUB_EVERY_DAYS = 0
+    settings.POSTULO_MEDIA_SCRUB_EVERY_SECONDS = 0
     scrub.verify_uploads(limit=25, now=start + dt.timedelta(days=2, minutes=10))
     assert files_read == [upload.file.name]
 

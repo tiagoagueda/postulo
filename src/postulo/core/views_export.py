@@ -100,7 +100,8 @@ def export_archive(request: HttpRequest, pk: int) -> HttpResponse:
 def _keep_hours() -> int:
     from django.conf import settings
 
-    return int(getattr(settings, "POSTULO_EXPORT_KEEP_HOURS", 24) or 24)
+    seconds = int(getattr(settings, "POSTULO_EXPORT_KEEP_SECONDS", 86_400) or 86_400)
+    return max(1, -(-seconds // 3600))
 
 
 def _on_disk(archive: ExportArchive) -> bool:

@@ -117,7 +117,7 @@ def test_the_dockerfile_reader_ignores_comments():
 
 def test_cjk_is_in_the_default_image_since_chinese_is_offered():
     """#74 left CJK out of the image, for a language almost none of the installations would
-    use, and left a door (POSTULO_EXTRA_APT_PACKAGES). #728 offers Chinese in 0.5.0, and a
+    use, and left a door (POSTULO_IMAGE_EXTRA_APT_PACKAGES). #728 offers Chinese in 0.5.0, and a
     language that is offered without a font that draws it is a CV of empty boxes, so the
     package is in the image and the test above holds the two together."""
     assert "fonts-noto-cjk" in installed_font_packages()
@@ -126,9 +126,9 @@ def test_cjk_is_in_the_default_image_since_chinese_is_offered():
 def test_the_image_has_a_door_for_the_fonts_it_does_not_carry():
     """The opt-in is an argument the runtime stage consumes, not a comment (#74)."""
     text = DOCKERFILE.read_text(encoding="utf-8")
-    assert 'ARG POSTULO_EXTRA_APT_PACKAGES=""' in text
+    assert 'ARG POSTULO_IMAGE_EXTRA_APT_PACKAGES=""' in text
     body = "\n".join(line for line in text.splitlines() if not line.lstrip().startswith("#"))
-    assert "POSTULO_EXTRA_APT_PACKAGES" in body, "declared, but nothing installs it"
+    assert "POSTULO_IMAGE_EXTRA_APT_PACKAGES" in body, "declared, but nothing installs it"
     assert "apt-get install" in body
 
 

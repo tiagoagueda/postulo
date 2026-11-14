@@ -349,7 +349,7 @@ class UploadCeilingMiddleware:
     notes): this is the floor for a deployment that has none.
 
     The ceiling is the instance's backup limit on the backup upload, a plugin wheel's on the
-    plugin page, and `POSTULO_UPLOAD_CEILING_MB` everywhere else.
+    plugin page, and `POSTULO_UPLOAD_CEILING_BYTES` everywhere else.
     """
 
     def __init__(self, get_response):
@@ -371,14 +371,14 @@ class UploadCeilingMiddleware:
 
     @staticmethod
     def _ceiling(request) -> int:
-        megabytes = settings.POSTULO_UPLOAD_CEILING_MB
+        ceiling = settings.POSTULO_UPLOAD_CEILING_BYTES
         path = request.path_info
         if path.rstrip("/").endswith("/server/backups/upload"):
-            megabytes = settings.POSTULO_BACKUP_UPLOAD_MAX_MB
+            ceiling = settings.POSTULO_BACKUP_UPLOAD_MAX_BYTES
         elif path.rstrip("/").endswith("/server/plugins/action"):
-            megabytes = max(megabytes, 64)
+            ceiling = max(ceiling, 64 * 1024 * 1024)
         # A little over, for the form's other fields and the multipart framing.
-        return (megabytes + 1) * 1024 * 1024
+        return ceiling + 1024 * 1024
 
 
 class DownloadsAreNotCachedMiddleware:

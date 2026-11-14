@@ -161,7 +161,7 @@ class BackupsView(BackupsMixin, UpdateView):
                 "next_slot": backups.next_slot(row),
                 "scheduled": row.backup_schedule != backups.OFF,
                 "missed": backups.is_missed(row),
-                "upload_max_mb": settings.POSTULO_BACKUP_UPLOAD_MAX_MB,
+                "upload_max_mb": settings.POSTULO_BACKUP_UPLOAD_MAX_BYTES // (1024 * 1024),
                 "may_download": may_download(self.request.user),
                 "background_work": errands.worker_expected(),
             }
@@ -271,12 +271,12 @@ class BackupUploadView(BackupsMixin, View):
         if sent is None:
             messages.error(request, _("Choose an archive to upload."))
             return redirect("server:backups")
-        limit = settings.POSTULO_BACKUP_UPLOAD_MAX_MB * 1024 * 1024
+        limit = settings.POSTULO_BACKUP_UPLOAD_MAX_BYTES
         if sent.size > limit:
             messages.error(
                 request,
                 _("That file is larger than the %(mb)s MB this instance accepts.")
-                % {"mb": settings.POSTULO_BACKUP_UPLOAD_MAX_MB},
+                % {"mb": settings.POSTULO_BACKUP_UPLOAD_MAX_BYTES // (1024 * 1024)},
             )
             return redirect("server:backups")
 

@@ -13,7 +13,7 @@
 # ownership-checked view.
 # Limit the size of a request body at the proxy too (client_max_body_size in nginx, 25m, and
 # more only for the backup upload): Postulo refuses a longer declared body with 413, but a proxy
-# that buffers a body to disk has read it before Postulo is asked (POSTULO_UPLOAD_CEILING_MB).
+# that buffers a body to disk has read it before Postulo is asked (POSTULO_UPLOAD_CEILING_BYTES).
 
 # Named explicitly. Compose otherwise takes the project name from the directory the
 # file sits in, which here is "docker" — so the container becomes docker-postulo-1
@@ -53,11 +53,11 @@ services:
       - ../.env
     environment:
       POSTULO_DATABASE_URL: sqlite:////app/data/postulo.sqlite3
-      POSTULO_SKIP_MIGRATE: "1"
+      POSTULO_CONTAINER_MIGRATE: "0"
       # The web container restores the installed plugins on startup. Both doing it at the
       # same moment means two processes writing one record, so the scheduler leaves it to
       # the container that waited for it (#221).
-      POSTULO_SKIP_PLUGIN_SYNC: "1"
+      POSTULO_CONTAINER_PLUGIN_SYNC: "0"
     volumes:
       - postulo-data:/app/data
     command: ["python", "manage.py", "send_due_reminders", "--loop", "--every", "300"]
@@ -94,11 +94,11 @@ services:
       - ../.env
     environment:
       POSTULO_DATABASE_URL: sqlite:////app/data/postulo.sqlite3
-      POSTULO_SKIP_MIGRATE: "1"
+      POSTULO_CONTAINER_MIGRATE: "0"
       # The web container restores the installed plugins on startup. Both doing it at the
       # same moment means two processes writing one record, so this leaves it to the
       # container that waited for it (#221).
-      POSTULO_SKIP_PLUGIN_SYNC: "1"
+      POSTULO_CONTAINER_PLUGIN_SYNC: "0"
     volumes:
       - postulo-data:/app/data
     command: ["python", "manage.py", "work"]

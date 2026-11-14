@@ -126,7 +126,7 @@ look-ups are the two ways the neighbourhood of somebody's search can leave the i
 follows are promises:
 
 - **Street look-ups are the operator's decision, and say what they send.** *Server settings →
-  Plugins → Maps*, or `POSTULO_GEOCODER`, chooses a service: Nominatim (OpenStreetMap's public
+  Plugins → Maps*, or `POSTULO_GEOCODER_SERVICE`, chooses a service: Nominatim (OpenStreetMap's public
   instance pre-filled), Photon or addok, each at an address the operator can point at their
   own. The scheduler sends it one address a second: the street, postcode, town, region and
   country of a company's address, and of a person's own or a contact's address where that is
