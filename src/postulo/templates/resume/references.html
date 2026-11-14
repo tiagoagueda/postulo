@@ -104,14 +104,14 @@
         <form method="post" enctype="multipart/form-data" class="flex flex-wrap items-end gap-3">
           {% csrf_token %}
           <div class="field">
-            <label for="references-file">{% translate "A .bib, .ris or .json file" %}</label>
-            <input class="input" type="file" id="references-file" name="file" accept=".bib,.bibtex,.ris,.json,application/x-bibtex,application/x-research-info-systems,application/json">
+            <label for="references-file">{% translate "A .bib, .ris, .json or .xml file" %}</label>
+            <input class="input" type="file" id="references-file" name="file" accept=".bib,.bibtex,.ris,.json,.xml,application/mods+xml,application/x-bibtex,application/x-research-info-systems,application/json">
           </div>
           <button type="submit" class="btn" data-variant="outline">{% translate "Read it" %}</button>
         </form>
         <p class="mt-2 text-xs text-ink-500 dark:text-ink-400">
           {% blocktranslate trimmed with limit=max_mb most=most_entries %}
-            BibTeX, BibLaTeX, RIS and CSL JSON are read, up to {{ limit }} MB and {{ most }} entries. The file is read here and not kept; nothing is added until you tick it.
+            BibTeX, BibLaTeX, RIS, CSL JSON and MODS are read, up to {{ limit }} MB and {{ most }} entries. The file is read here and not kept; nothing is added until you tick it.
           {% endblocktranslate %}
         </p>
       {% endif %}

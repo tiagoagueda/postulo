@@ -1,4 +1,4 @@
-"""Publications as BibTeX, BibLaTeX, RIS and CSL JSON files, out and in (#879)."""
+"""Publications as BibTeX, BibLaTeX, RIS, CSL JSON, MODS and EndNote files, out and in (#879)."""
 
 from __future__ import annotations
 
@@ -257,7 +257,14 @@ def test_biblatex_out_keeps_the_type_and_the_whole_date(user):
 
 
 @pytest.mark.parametrize(
-    "fmt", [references.BIBTEX, references.BIBLATEX, references.RIS, references.CSL_JSON]
+    "fmt",
+    [
+        references.BIBTEX,
+        references.BIBLATEX,
+        references.RIS,
+        references.CSL_JSON,
+        references.MODS,
+    ],
 )
 def test_what_is_written_reads_back_the_same(user, fmt):
     item = make(
@@ -294,13 +301,98 @@ def test_what_is_written_reads_back_the_same(user, fmt):
     }
     if fmt == references.BIBTEX:
         expected["date"] = "2020-09"
-    if fmt in (references.RIS, references.CSL_JSON):
+    if fmt in (references.RIS, references.CSL_JSON, references.MODS):
         # Braces are the title's own here; only BibTeX's use of them is decoded.
         expected["title"] = "Array programming: a {survey} & more"
     for name, value in expected.items():
         assert back.get(name) == value, (fmt, name)
     if fmt != references.RIS:
         assert back["editors"] == "Ed, Ita"
+
+
+MODS_FILE = """<?xml version="1.0" encoding="UTF-8"?>
+<modsCollection xmlns="http://www.loc.gov/mods/v3" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <mods version="3.7" ID="harris2020">
+    <titleInfo>
+      <nonSort>The</nonSort><title>NumPy array</title><subTitle>a survey</subTitle>
+    </titleInfo>
+    <name type="personal">
+      <namePart type="family">Harris</namePart><namePart type="given">Charles R.</namePart>
+      <role><roleTerm type="text" authority="marcrelator">author</roleTerm></role>
+    </name>
+    <name type="personal"><namePart>Hans Muller</namePart></name>
+    <name type="corporate"><namePart>NumPy Team</namePart>
+      <role><roleTerm type="code" authority="marcrelator">aut</roleTerm></role></name>
+    <name type="personal">
+      <namePart type="family">Ed</namePart><namePart type="given">Ita</namePart>
+      <role><roleTerm type="text">editor</roleTerm></role>
+    </name>
+    <typeOfResource>text</typeOfResource>
+    <genre authority="marcgenre">journal article</genre>
+    <originInfo><dateIssued encoding="w3cdtf">2020-09-16</dateIssued><publisher>Springer</publisher>
+      <place><placeTerm type="text">London</placeTerm></place></originInfo>
+    <abstract>Long text with no place here.</abstract>
+    <subject><topic>arrays</topic></subject>
+    <relatedItem type="host">
+      <titleInfo><title>Nature</title></titleInfo>
+      <part><detail type="volume"><number>585</number></detail>
+        <detail type="issue"><number>7825</number></detail>
+        <extent unit="page"><start>357</start><end>362</end></extent></part>
+    </relatedItem>
+    <identifier type="doi">https://doi.org/10.1038/s41586-020-2649-2</identifier>
+    <identifier type="issn">0028-0836</identifier>
+    <location><url>https://example.org/paper</url></location>
+    <location><url>javascript:alert(1)</url></location>
+  </mods>
+  <mods version="3.7"><genre>thesis</genre><genre>Masters thesis</genre>
+    <titleInfo><title>Theory</title></titleInfo>
+    <originInfo><publisher>Utah</publisher></originInfo></mods>
+  <mods version="3.7"><genre>book</genre></mods>
+</modsCollection>
+"""
+
+MODS_WITH_ENTITY = (
+    '<?xml version="1.0"?><!DOCTYPE m [<!ENTITY x "boom">]>'
+    '<mods xmlns="http://www.loc.gov/mods/v3"><titleInfo><title>&x;</title></titleInfo></mods>'
+)
+MODS_CUT_OFF = '<modsCollection xmlns="http://www.loc.gov/mods/v3"><mods><titleInfo>'
+
+
+def test_mods_is_read_into_a_publications_fields():
+    reading = references.read(MODS_FILE.encode(), "refs.xml")
+
+    first, second = reading.entries
+    assert reading.format == references.MODS
+    assert first["entry_type"] == "article"
+    assert first["title"] == "The NumPy array: a survey"
+    assert first["authors"] == "Harris, Charles R.\nHans Muller\nNumPy Team"
+    assert first["editors"] == "Ed, Ita"
+    assert (first["container_title"], first["volume"], first["number"]) == ("Nature", "585", "7825")
+    assert first["pages"] == "357–362" and first["date"] == "2020-09-16"
+    assert (first["publisher"], first["location"]) == ("Springer", "London")
+    assert first["doi"] == "10.1038/s41586-020-2649-2"
+    assert first["url"] == "https://example.org/paper", "a link that is not http is dropped"
+    assert first["cite_key"] == "harris2020"
+    assert second["entry_type"] == "mastersthesis" and second["institution"] == "Utah"
+    assert reading.skipped == 1, "a record with no title is counted"
+    assert reading.left_out == ["ISBN/ISSN", "abstract", "keywords"]
+
+
+@pytest.mark.parametrize("body", [MODS_WITH_ENTITY, MODS_CUT_OFF])
+def test_mods_with_entities_or_broken_markup_is_refused_not_expanded(body):
+    with pytest.raises(references.ReferencesRefused):
+        references.read_mods(body.encode())
+
+
+def test_mods_out_is_well_formed_xml_whatever_the_title_holds(user):
+    title = "A <b>&</b> " + chr(11) + " title"
+    item = make(user, title=title, authors="Smith, Jo\nand others", entry_type="phdthesis")
+    out = references.write(references.MODS, [item])
+
+    assert out.startswith('<?xml version="1.0" encoding="UTF-8"?>')
+    (back,) = references.read(out.encode(), "x.xml").entries
+    assert back["title"] == "A <b>&</b> title"
+    assert back["entry_type"] == "phdthesis" and back["authors"] == "Smith, Jo"
 
 
 # ------------------------------------------------------------------- the page
