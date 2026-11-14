@@ -38,9 +38,11 @@ from dataclasses import dataclass, field
 from datetime import timedelta
 
 import httpx
-from django.utils import timezone, translation
+from django.utils import timezone
 from django.utils.translation import gettext as _
 from django.utils.translation import ngettext
+
+from postulo.core import languages
 
 from . import catalogue as catalogues
 from . import dependencies, holds, http, installing
@@ -459,7 +461,7 @@ def announce(offers: list[Offer]) -> int:
     administrators = list(get_user_model().objects.filter(is_staff=True, is_active=True))
     for administrator in administrators:
         try:
-            with translation.override(language_for(administrator)):
+            with languages.override(language_for(administrator)):
                 inbox.leave(administrator, _notification(new, reverse("server:plugins")))
         except Exception:
             logger.exception("Could not tell %s about plugin updates", administrator.pk)
