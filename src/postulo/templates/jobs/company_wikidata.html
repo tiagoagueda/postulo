@@ -40,6 +40,19 @@
         <p class="text-sm text-ink-500 dark:text-ink-400">{% translate "The item gives no single place." %}</p>
       {% endif %}
     </div>
+    {% comment %} Its short names (#1245): offered as acronyms, each unticked, so none is kept
+       that the person did not choose. {% endcomment %}
+    {% if acronyms %}
+      <fieldset class="card mb-4" data-wikidata-acronyms>
+        <legend class="legend-title">{% translate "Short names" %}</legend>
+        <p class="mb-2 text-sm text-ink-500 dark:text-ink-400">{% translate "Tick the ones to add as acronyms or short names. Only what you tick is added." %}</p>
+        <div class="space-y-2 text-sm">
+          {% for text in acronyms %}
+            <label class="flex items-center gap-2"><input type="checkbox" class="input" name="acronym" value="{{ text }}" form="wikidata-keep"> <bdi class="min-w-0 break-words">{{ text }}</bdi></label>
+          {% endfor %}
+        </div>
+      </fieldset>
+    {% endif %}
     {% comment %} Whether it ended, and who replaced it (#941): offered, never applied. The
        choice starts on leaving the company as it is, because its legal state is shown to
        everybody who can see it. {% endcomment %}

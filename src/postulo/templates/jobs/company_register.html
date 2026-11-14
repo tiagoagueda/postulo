@@ -21,6 +21,7 @@
       </p>
       <dl class="space-y-1 text-sm">
         {% if record.name %}<div class="flex flex-wrap gap-x-3"><dt class="w-40 text-ink-500 dark:text-ink-400">{% translate "Official name" %}</dt><dd><bdi>{{ record.name }}</bdi></dd></div>{% endif %}
+        {% if record.acronyms %}<div class="flex flex-wrap gap-x-3"><dt class="w-40 text-ink-500 dark:text-ink-400">{% translate "Short name" %}</dt><dd><bdi>{{ record.acronyms|join:", " }}</bdi></dd></div>{% endif %}
         {% if record.address %}<div class="flex flex-wrap gap-x-3"><dt class="w-40 text-ink-500 dark:text-ink-400">{% translate "Registered office" %}</dt><dd><bdi>{{ record.address.street }}{% if record.address.postcode or record.address.municipality %}, {{ record.address.postcode }} {{ record.address.municipality }}{% endif %}</bdi>{% if record.address.country %} ({{ record.address.country }}){% endif %}</dd></div>{% endif %}
         {% if record.state_words or record.state %}<div class="flex flex-wrap gap-x-3"><dt class="w-40 text-ink-500 dark:text-ink-400">{% translate "State" %}</dt><dd><bdi>{{ record.state_words|default:record.state }}</bdi>{% if record.state_since %} · {{ record.state_since|date:"DATE_FORMAT" }}{% endif %}</dd></div>{% endif %}
         {% if record.activity %}<div class="flex flex-wrap gap-x-3"><dt class="w-40 text-ink-500 dark:text-ink-400">{% translate "Activity" %}</dt><dd><span class="tabular-nums">{{ record.activity }}</span>{% if record.activity_words %} · <bdi>{{ record.activity_words }}</bdi>{% endif %}</dd></div>{% endif %}
@@ -44,10 +45,13 @@
       {% csrf_token %}
       <fieldset class="card mb-4" data-register-offers>
         <legend class="legend-title">{% translate "What to keep" %}</legend>
-        {% if offers.name or offers.address or offers.state or offers.industry or offers.register %}
+        {% if offers.name or offers.acronym or offers.address or offers.state or offers.industry or offers.register %}
           <div class="space-y-2 text-sm">
             {% if offers.name %}
               <label class="flex items-start gap-2"><input type="checkbox" class="input mt-0.5" name="take" value="name"> <span>{% blocktranslate trimmed with name=offers.name.value current=company.name %}Use <bdi>{{ name }}</bdi> as its name, in place of <bdi>{{ current }}</bdi>{% endblocktranslate %}</span></label>
+            {% endif %}
+            {% if offers.acronym %}
+              <label class="flex items-start gap-2"><input type="checkbox" class="input mt-0.5" name="take" value="acronym"> <span>{% blocktranslate trimmed with names=offers.acronym.values|join:", " %}Add <bdi>{{ names }}</bdi> as its acronym or short name{% endblocktranslate %}</span></label>
             {% endif %}
             {% if offers.address %}
               <label class="flex items-start gap-2"><input type="checkbox" class="input mt-0.5" name="take" value="address"> <span>{% blocktranslate trimmed with address=offers.address.value %}Add <bdi>{{ address }}</bdi> to its addresses, as its registered office{% endblocktranslate %}</span></label>

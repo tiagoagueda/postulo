@@ -564,3 +564,56 @@ def test_a_reader_is_shown_the_names_and_no_form_to_change_them(client, user, ot
     assert client.get(reverse("jobs:company_update", args=[company.pk])).status_code == 404
     names = reverse("jobs:company_names", args=[company.pk])
     assert client.post(names, {"language": "pt", "name": "X"}).status_code == 404
+
+
+def test_the_short_names_of_an_item_are_read_without_repeats():
+    def statement(text, language="en", rank="normal"):
+        return {
+            "rank": rank,
+            "mainsnak": {"datavalue": {"value": {"text": text, "language": language}}},
+        }
+
+    claims = {
+        "P1813": [
+            statement("CNRS"),
+            statement("cnrs", "fr"),
+            statement("Old", rank="deprecated"),
+            statement("C.N.R.S.\u0007", "fr"),
+        ]
+    }
+
+    assert wikidata.acronyms_from(claims) == ["CNRS", "C.N.R.S."]
+    assert wikidata.acronyms_from({}) == []
+
+
+def test_the_short_names_are_offered_and_added_only_where_ticked(client, user, wikidata_answers):
+    answers, _seen = wikidata_answers
+    body = json.loads(json.dumps(AVEIRO))
+    body["entities"]["Q29671"]["claims"] = {
+        "P1813": [
+            {
+                "rank": "normal",
+                "mainsnak": {"datavalue": {"value": {"text": "UA", "language": "pt"}}},
+            },
+            {
+                "rank": "normal",
+                "mainsnak": {"datavalue": {"value": {"text": "UAveiro", "language": "pt"}}},
+            },
+        ]
+    }
+    an_item(answers, body=body)
+    company = aperture(user)
+    url = reverse("jobs:company_wikidata", args=[company.pk])
+    client.force_login(user)
+    client.post(url)
+
+    page = client.get(url).content.decode()
+    assert 'value="UA"' in page and 'value="UAveiro"' in page
+
+    client.post(url, {"keep": "1", "acronym": ["UA", "Hacked"]})
+
+    assert [(row.kind, row.name, row.source) for row in company.names.filter(kind="acronym")] == [
+        ("acronym", "UA", "wikidata")
+    ], "only an offered and ticked short name is added"
+    client.post(url)
+    assert 'value="UA"' not in client.get(url).content.decode(), "already held"

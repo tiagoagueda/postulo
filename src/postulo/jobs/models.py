@@ -846,6 +846,18 @@ class Company(OwnNote, PrincipalOwnedModel):
         """Its acronyms and short names, in the order they were added (#1245)."""
         return [row for row in self.names.all() if row.kind == CompanyName.Kind.ACRONYM]
 
+    def add_acronym(self, name: str, source: str) -> bool:
+        """Add ``name`` as an acronym or short name unless the company already holds it
+        (#1245); whether it was added. The one place that applies the "one of each
+        spelling" rule, for a typed name and for one a lookup offered."""
+        name = " ".join((name or "").split())[:200]
+        if not name or name.casefold() == self.name.casefold():
+            return False
+        if any(row.name.casefold() == name.casefold() for row in self.acronyms()):
+            return False
+        self.names.create(kind=CompanyName.Kind.ACRONYM, name=name, source=source)
+        return True
+
     def keep_list_name(self) -> None:
         """Drop the choice of an acronym that is gone or was renamed (#1245): the lists then
         show the full name again, rather than a name nobody holds."""
