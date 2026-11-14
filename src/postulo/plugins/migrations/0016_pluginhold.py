@@ -8,7 +8,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('plugins', '0014_connection_sync_state'),
+        ('plugins', '0015_bibliography_lookups_start_off'),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 

@@ -6,7 +6,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('plugins', '0015_pluginhold'),
+        ('plugins', '0016_pluginhold'),
     ]
 
     operations = [
