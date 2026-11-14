@@ -36,6 +36,7 @@ SUB_MODULES = {
     # A CV downloaded in the two formats that carry its structure (#1100).
     "format-europass": ("Europass export", "id-card"),
     "format-json-resume": ("JSON Resume", "braces"),
+    "format-bibliography": ("Bibliography", "book-text"),
 }
 
 

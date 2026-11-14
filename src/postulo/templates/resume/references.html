@@ -1,0 +1,142 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% translate "Bibliography" %}{% endblock %}
+
+{% block content %}
+  <div class="max-w-3xl">
+    <c-page-title>
+      {% translate "Bibliography" %}
+      <c-slot name="subtitle">{% translate "Your publications as a file that Zotero, Mendeley, JabRef, EndNote and LaTeX read, and a file of theirs read in." %}</c-slot>
+    </c-page-title>
+
+    <div class="card mb-4">
+      <c-section-title>{% translate "Export" %}</c-section-title>
+      <p class="mb-3 text-sm text-ink-600 dark:text-ink-300">
+        {% if one %}
+          {% translate "Only this publication, as a reference:" %} <bdi>{{ one.title }}</bdi>.
+          <a href="{{ request.path }}" class="underline">{% translate "Export all of them instead" %}</a>
+        {% else %}
+          {% blocktranslate trimmed count total=count %}
+            Your {{ total }} publication, in the format your reference manager reads.
+          {% plural %}
+            Your {{ total }} publications, in the format your reference manager reads.
+          {% endblocktranslate %}
+        {% endif %}
+      </p>
+      <ul class="flex flex-wrap gap-3" data-reference-formats>
+        {% for format in formats %}
+          <li>
+            <a href="?download={{ format.key }}{% if one %}&amp;publication={{ one.pk }}{% endif %}" class="btn" data-variant="outline" data-download="{{ format.key }}">
+              {% blocktranslate trimmed with name=format.label %}Download as {{ name }}{% endblocktranslate %}
+            </a>
+          </li>
+        {% endfor %}
+      </ul>
+      <p class="mt-3 text-xs text-ink-500 dark:text-ink-400">
+        {% translate "BibTeX has no place for datasets, software or web pages, so they are written as Other; BibLaTeX keeps them. Only what a publication holds is in the file." %}
+      </p>
+    </div>
+
+    <div class="card mb-4">
+      <c-section-title>{% translate "Import" %}</c-section-title>
+      {% if entries %}
+        {% comment %} What the file held, before anything is added (#879). A file is somebody's
+           work and may say anything, so each value is shown as the plain text it was cleaned to,
+           in its own direction. None is ticked; only what is ticked is added. {% endcomment %}
+        <p class="mb-3 text-sm text-ink-600 dark:text-ink-300">
+          {% if notes.format %}{% blocktranslate trimmed with name=notes.format %}Read as {{ name }}.{% endblocktranslate %}{% endif %}
+          {% translate "Tick the publications to add. Nothing is changed or overwritten: an entry you already have is marked, and ticking it adds another." %}
+        </p>
+        {% if notes.skipped %}
+          <p class="mb-3 text-sm text-ink-600 dark:text-ink-300" data-references-skipped>
+            {% blocktranslate trimmed count total=notes.skipped %}
+              {{ total }} entry could not be read, or had no title, and is not listed.
+            {% plural %}
+              {{ total }} entries could not be read, or had no title, and are not listed.
+            {% endblocktranslate %}
+          </p>
+        {% endif %}
+        {% if notes.beyond %}
+          <p class="mb-3 text-sm text-ink-600 dark:text-ink-300" data-references-beyond>
+            {% blocktranslate trimmed with most=most_entries %}
+              Only the first {{ most }} entries are read; the rest of the file was left out.
+            {% endblocktranslate %}
+          </p>
+        {% endif %}
+        {% if notes.left_out %}
+          <p class="mb-3 text-sm text-ink-600 dark:text-ink-300" data-references-left-out>
+            {% blocktranslate trimmed with names=notes.left_out|join:", " %}
+              Not read, because a publication has nowhere to keep them: {{ names }}.
+            {% endblocktranslate %}
+          </p>
+        {% endif %}
+        <form method="post">
+          {% csrf_token %}
+          <input type="hidden" name="action" value="confirm">
+          <fieldset class="mb-4 p-0">
+            <legend class="sr-only">{% translate "Publications in the file" %}</legend>
+            <ul class="divide-y divide-ink-100 dark:divide-ink-800" data-references-entries>
+              {% for entry in entries %}
+                <li class="py-3">
+                  <label class="flex items-start gap-3">
+                    <input type="checkbox" class="input mt-1" name="entry" value="{{ entry.index }}">
+                    <span class="min-w-0">
+                      <span class="block font-medium"><bdi>{{ entry.title }}</bdi></span>
+                      <span class="block text-sm text-ink-500 dark:text-ink-400">
+                        {{ entry.type_label }}{% if entry.container_title %} · <bdi>{{ entry.container_title }}</bdi>{% endif %}{% if entry.year %} · {{ entry.year }}{% endif %}{% if entry.doi %} · <bdi dir="ltr">{{ entry.doi }}</bdi>{% endif %}
+                      </span>
+                      {% if entry.held %}
+                        <span class="block text-xs text-ink-500 dark:text-ink-400" data-references-held>{% translate "You already have this one." %}</span>
+                      {% endif %}
+                    </span>
+                  </label>
+                </li>
+              {% endfor %}
+            </ul>
+          </fieldset>
+          <div class="flex flex-wrap items-center gap-3">
+            <button type="submit" class="btn">{% translate "Add the ticked publications" %}</button>
+            <button type="submit" name="action" value="forget" class="btn" data-variant="ghost">{% translate "Forget this file" %}</button>
+          </div>
+        </form>
+      {% else %}
+        <form method="post" enctype="multipart/form-data" class="flex flex-wrap items-end gap-3">
+          {% csrf_token %}
+          <div class="field">
+            <label for="references-file">{% translate "A .bib, .ris or .json file" %}</label>
+            <input class="input" type="file" id="references-file" name="file" accept=".bib,.bibtex,.ris,.json,application/x-bibtex,application/x-research-info-systems,application/json">
+          </div>
+          <button type="submit" class="btn" data-variant="outline">{% translate "Read it" %}</button>
+        </form>
+        <p class="mt-2 text-xs text-ink-500 dark:text-ink-400">
+          {% blocktranslate trimmed with limit=max_mb most=most_entries %}
+            BibTeX, BibLaTeX, RIS and CSL JSON are read, up to {{ limit }} MB and {{ most }} entries. The file is read here and not kept; nothing is added until you tick it.
+          {% endblocktranslate %}
+        </p>
+      {% endif %}
+    </div>
+
+    {% if lookups_on %}
+      <div class="card mb-4" data-references-dois>
+        <c-section-title>{% translate "Add by DOI" %}</c-section-title>
+        <form method="post" class="space-y-3">
+          {% csrf_token %}
+          <input type="hidden" name="action" value="dois">
+          <div class="field">
+            <label for="references-dois">{% translate "DOIs, one per line" %}</label>
+            <textarea class="input" id="references-dois" name="dois" rows="4" dir="ltr" spellcheck="false" autocomplete="off"></textarea>
+          </div>
+          <button type="submit" class="btn" data-variant="outline">{% translate "Look them up" %}</button>
+        </form>
+        <p class="mt-2 text-xs text-ink-500 dark:text-ink-400">
+          {% blocktranslate trimmed with most=most_dois %}
+            One request to doi.org for each DOI, at most {{ most }}, when you press the button: doi.org passes it to Crossref or DataCite. Only the DOI is sent. What comes back is listed above to tick, and nothing is kept until you add it.
+          {% endblocktranslate %}
+        </p>
+      </div>
+    {% endif %}
+
+    <a href="{% url back %}#section-publication" class="btn" data-variant="ghost">{% translate "Back to Your career" %}</a>
+  </div>
+{% endblock %}

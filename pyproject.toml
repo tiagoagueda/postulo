@@ -87,6 +87,15 @@ dependencies = [
     # `core/offsite.py` imports it, and only for X25519 recipients: 1.2.0 to 1.2.2 could be
     # made to run a program by a plugin recipient's name (GHSA-47h8-jmp3-9f28).
     "pyrage>=1.4,<2",
+    # A publication as a reference-manager file (#879). `resume/references.py` is the only
+    # importer of both. bibtexparser 2 (MIT, pure Python, one small dependency, pylatexenc,
+    # MIT) reads and writes BibTeX and BibLaTeX and turns LaTeX accents into letters; it
+    # expands nothing and runs nothing from the file. rispy (MIT, no dependency, pure
+    # Python) reads and writes RIS. pybtex was passed over for a Python-2-era design and a
+    # dependency on PyYAML nothing here wants; citeproc-py renders citations, which is not
+    # what a file of references is.
+    "bibtexparser>=2.1,<3",
+    "rispy>=0.10,<0.11",
 ]
 
 [project.optional-dependencies]
