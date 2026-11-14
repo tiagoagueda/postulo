@@ -32,6 +32,8 @@ from __future__ import annotations
 import datetime as dt
 import functools
 import re
+import sys
+import unicodedata
 from decimal import Decimal, InvalidOperation
 
 from django.conf import settings
@@ -64,6 +66,12 @@ UP_TO_WORDS = pgettext_lazy(
     "40,000', separated by |.",
     "up to|maximum|max",
 )
+UP_TO_AFTER_WORDS = pgettext_lazy(
+    "Words that follow a pay figure to make it the most on offer rather than the least, as in "
+    "'40,000 or less' or, in a language whose words go after the number, 'up to 40,000'; "
+    "separated by |. Leave the words that go before the figure to the other list.",
+    "or less|at most|maximum|max",
+)
 RANGE_WORDS = pgettext_lazy(
     "Words that join the two figures of a pay range, as in '30,000 to 40,000', separated by |.",
     "to|and",
@@ -92,6 +100,7 @@ LISTS = {
     "closing": CLOSING_WORDS,
     "salary": SALARY_WORDS,
     "up_to": UP_TO_WORDS,
+    "up_to_after": UP_TO_AFTER_WORDS,
     "range": RANGE_WORDS,
     **PERIOD_WORDS,
 }
@@ -227,13 +236,36 @@ def words(name: str, tag: str = "") -> tuple[str, ...]:
     return tuple(found.values())
 
 
+def _marks() -> str:
+    """Every combining mark, as the inside of a character class: the word class leaves them
+    out, so a vowel sign in Hindi or Bengali, a tone mark in Thai or a vowel mark in Arabic would
+    otherwise end a word."""
+    ranges: list[list[int]] = []
+    for code in range(sys.maxunicode + 1):
+        if unicodedata.category(chr(code)).startswith("M"):
+            if ranges and ranges[-1][1] == code - 1:
+                ranges[-1][1] = code
+            else:
+                ranges.append([code, code])
+    return "".join(
+        re.escape(chr(a)) if a == b else f"{re.escape(chr(a))}-{re.escape(chr(b))}"
+        for a, b in ranges
+    )
+
+
+_MARKS = _marks()
+#: Not straight after, or straight before, a letter or a mark: a longer word.
+_NOT_AFTER_WORD = rf"(?<![^\W\d_])(?<![{_MARKS}])"
+_NOT_BEFORE_WORD = rf"(?![^\W\d_])(?![{_MARKS}])"
+
+
 def _word(word: str) -> str:
     """One spelling, matched whole: "/yr" straight after a figure, "per annum" across any
     spacing, "p.a." with its dots."""
     body = re.escape(_straight(word).lstrip("/").strip()).replace(r"\ ", r"\s+")
     if word.startswith("/"):
-        return rf"\s{{0,2}}/\s{{0,2}}{body}(?![^\W\d_])"
-    return rf"(?<![^\W\d_]){body}(?![^\W\d_])"
+        return rf"\s{{0,2}}/\s{{0,2}}{body}{_NOT_BEFORE_WORD}"
+    return rf"{_NOT_AFTER_WORD}{body}{_NOT_BEFORE_WORD}"
 
 
 @functools.lru_cache(maxsize=256)
@@ -546,6 +578,11 @@ def _pay(
     return low, high, currencies.pop() if currencies else ""
 
 
+def _most_after(following: str, tag: str) -> bool:
+    """Whether the words straight after a figure make it the most on offer: "40,000 तक"."""
+    return _pattern_for(words("up_to_after", tag)).match(following.lstrip(" ")[:60]) is not None
+
+
 def _period(following: str, label: str, tag: str) -> str:
     """The period the page states for a figure: the nearest after it on its line, else the
     one its label names ("Annual salary"). "" where it states none, or two."""
@@ -575,7 +612,10 @@ def pay_in(text: str, tag: str = "") -> tuple[Decimal | None, Decimal | None, st
         return None
     low, high, currency = read
     before = text[: match.start()]
-    if high is None and _pattern_for(words("up_to", tag)).search(before):
+    after = text[match.end() :]
+    if high is None and (
+        _pattern_for(words("up_to", tag)).search(before) or _most_after(after, tag)
+    ):
         low, high = None, low
     return low, high, currency, _period(text[match.end() :], _labelling(before), tag)
 
@@ -605,7 +645,7 @@ def salary(text: str, tag: str = "") -> tuple[Decimal | None, Decimal | None, st
         if read is None:
             continue
         low, high, currency = read
-        if high is None and up_to.search(filler):
+        if high is None and (up_to.search(filler) or _most_after(following[match.end() :], tag)):
             low, high = None, low
         period = _period(following[match.end() :], f"{label} {filler}", tag)
         found.add((low, high, currency, period))

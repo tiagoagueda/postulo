@@ -314,3 +314,49 @@ def test_the_fallback_reads_deeply_nested_blocks_in_linear_time():
     text = main_text(html)
     assert time.monotonic() - started < 5
     assert "link number" not in text
+
+
+# ---- words that go after the figure, and whole words in scripts with combining marks (#1106)
+
+
+@pytest.fixture
+def after_words(monkeypatch):
+    """A catalogue that has the new list: the words come from Weblate, so a test brings its own."""
+    monkeypatch.setitem(patterns.LISTS, "up_to_after", "तक|পর্যন্ত|تک|kadar")
+    patterns._list_in.cache_clear()
+    yield
+    patterns._list_in.cache_clear()
+
+
+@pytest.mark.parametrize(
+    "written",
+    [
+        "Salary: ₹40,000 तक",
+        "Salary: ₹40,000 পর্যন্ত",
+        "Salary: ₹40,000 تک",
+        "Salary: 40,000 TRY kadar",
+    ],
+)
+def test_a_word_after_the_figure_makes_it_the_most_on_offer(after_words, written):
+    low, high, _currency, _period = patterns.salary(written, "en")
+    assert (low, high) == (None, Decimal(40000))
+
+
+def test_a_word_after_the_figure_changes_nothing_when_it_is_not_there(after_words):
+    assert patterns.salary("Salary: ₹40,000 per year", "en")[:2] == (Decimal(40000), None)
+    assert patterns.pay_in("₹40,000 तक", "en")[:2] == (None, Decimal(40000))
+
+
+@pytest.mark.parametrize(
+    ("word", "inside", "alone"),
+    [
+        ("से", "कैसे", "30,000 से 40,000"),
+        ("से", "पैसे भेजे", "वह से"),
+        ("ক", "কিছু", "ক টাকা"),
+        ("ب", "بِسْم", "ب م"),
+    ],
+)
+def test_a_spelling_is_not_found_inside_a_word_with_combining_marks(word, inside, alone):
+    pattern = patterns._pattern_for((word,))
+    assert pattern.search(inside) is None
+    assert pattern.search(alone) is not None
