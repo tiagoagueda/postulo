@@ -70,6 +70,9 @@ class Item:
     dissolved_on: date | None = None
     #: The items that replaced it (P1366), as identifiers.
     replaced_by: list[str] = field(default_factory=list)
+    #: Its short names (P1813), offered as acronyms and kept only where the person ticks them
+    #: (#1245).
+    acronyms: list[str] = field(default_factory=list)
 
 
 def user_agent() -> str:
@@ -199,6 +202,25 @@ def replaced_by_from(claims: dict) -> list[str]:
     return found[:3]
 
 
+#: How many short names are offered: an item can list a dozen spellings in as many languages.
+MAX_ACRONYMS = 5
+
+
+def acronyms_from(claims: dict) -> list[str]:
+    """The item's short names (P1813), as plain text without repeats, at most `MAX_ACRONYMS`.
+
+    The statements that are not deprecated, each a text in some language; the same spelling
+    in several languages is one (#1245). Offered to the person, never applied.
+    """
+    found: list[str] = []
+    for row in _live(claims.get("P1813") if isinstance(claims, dict) else None):
+        value = (((row.get("mainsnak") or {}).get("datavalue") or {}).get("value")) or {}
+        text = clean(value.get("text") if isinstance(value, dict) else None)
+        if text and text.casefold() not in {have.casefold() for have in found}:
+            found.append(text)
+    return found[:MAX_ACRONYMS]
+
+
 def fetch(qid: str) -> Item:
     """Ask Wikidata for one item. Raises `WikidataRefused` with the reason."""
     qid = (qid or "").strip().upper()
@@ -221,6 +243,7 @@ def fetch(qid: str) -> Item:
         dissolved=dissolved,
         dissolved_on=dissolved_on,
         replaced_by=replaced_by_from(claims),
+        acronyms=acronyms_from(claims),
     )
 
 

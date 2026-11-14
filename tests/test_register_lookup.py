@@ -883,3 +883,44 @@ def test_the_record_page_names_each_register(admin_client, switched_on):
 
     assert 'data-outside-service="no-enhetsregisteret"' in html
     assert "data.brreg.no" in html
+
+
+def test_a_sigle_is_offered_as_an_acronym_and_added_only_where_ticked(
+    client, user, switched_on, registers
+):
+    """France's `sigle` is a candidate acronym, never applied unseen (#1245)."""
+    answers, _seen = registers
+    with_sigle = json.loads(json.dumps(FRANCE))
+    with_sigle["results"][0]["sigle"] = "EDF"
+    answer(answers, RECORDED["fr"][1], with_sigle)
+    company = acme(user, name="Electricite de France SA")
+    client.force_login(user)
+    url = reverse("jobs:company_register", args=[company.pk])
+    client.post(url, {"scheme": "register"})
+
+    assert 'value="acronym"' in client.get(url).content.decode()
+    client.post(url, {"keep": "1", "take": ["name"]})
+    assert not company.names.exists(), "the acronym was not ticked"
+
+    client.post(url, {"scheme": "register"})
+    client.post(url, {"keep": "1", "take": ["acronym"]})
+
+    (row,) = company.names.all()
+    assert (row.kind, row.name) == ("acronym", "EDF")
+    company.refresh_from_db()
+    assert company.display_name == company.name, "adding it does not change what lists show"
+    client.post(url, {"scheme": "register"})
+    assert 'value="acronym"' not in client.get(url).content.decode(), "already held"
+
+
+def test_a_sigle_the_company_already_holds_is_not_offered(client, user, switched_on, registers):
+    answers, _seen = registers
+    with_sigle = json.loads(json.dumps(FRANCE))
+    with_sigle["results"][0]["sigle"] = "EDF"
+    answer(answers, RECORDED["fr"][1], with_sigle)
+    company = acme(user)  # named EDF already
+    client.force_login(user)
+    url = reverse("jobs:company_register", args=[company.pk])
+    client.post(url, {"scheme": "register"})
+
+    assert 'value="acronym"' not in client.get(url).content.decode()

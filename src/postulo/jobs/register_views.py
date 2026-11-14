@@ -34,7 +34,7 @@ from . import identifiers, industries, register_lookup, trail
 from .models import Company, Industry, LegalState
 
 #: What the review page can offer, in the order it draws them.
-TAKES = ("name", "address", "state", "industry", "register")
+TAKES = ("name", "acronym", "address", "state", "industry", "register")
 
 
 def offered(person) -> bool:
@@ -90,6 +90,10 @@ def offers(company, record, scheme: str) -> dict:
     found["notes"] = []
     if record.name and not _same(record.name, company.name):
         found["name"] = {"value": record.name}
+    held_names = {company.name.casefold(), *(row.name.casefold() for row in company.acronyms())}
+    short = [name for name in record.acronyms if name.casefold() not in held_names]
+    if short:
+        found["acronym"] = {"values": short}
     if record.address is not None:
         row = _address_row(company, record.address)
         listed = {address.comparable for address in company.postal_addresses.all()}
@@ -270,6 +274,16 @@ class CompanyRegisterView(LoginRequiredMixin, View):
                 refused.append(str(refusal))
         fields: list[str] = []
         with transaction.atomic():
+            if "acronym" in ticked:
+                from .models import CompanyName
+
+                # Each short name the register gave, never one the page did not offer.
+                added = [
+                    company.add_acronym(name, CompanyName.Source.TYPED)
+                    for name in found["acronym"]["values"]
+                ]
+                if any(added):
+                    fields.append("names")
             if "address" in ticked:
                 row = found["address"]["row"]
                 row.is_primary = not company.postal_addresses.exists()

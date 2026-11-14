@@ -209,6 +209,7 @@ def _france(document, number: str):
         state_since=_day(found.get("date_fermeture")) if ceased else None,
         activity=code,
         division=code[:2] if isinstance(code, str) else "",
+        acronyms=(found.get("sigle") or "",),
     )
 
 

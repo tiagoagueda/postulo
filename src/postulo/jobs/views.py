@@ -464,6 +464,8 @@ class CompanyWikidataView(LoginRequiredMixin, View):
                 "names": names,
                 # Whether it ended, and who replaced it: offered, never applied unseen (#941).
                 "ending": self._ending(request, company, held),
+                # Its short names, offered as acronyms and unticked to begin with (#1245).
+                "acronyms": self._acronyms(company, held),
                 # Where the point would go, and whether a hand-placed one is in its way (#701).
                 "address": address,
                 "by_hand": address is not None and address.placed_by == address.Placed.MANUAL,
@@ -483,6 +485,7 @@ class CompanyWikidataView(LoginRequiredMixin, View):
             if held:
                 self._keep(company, held)
                 self._keep_ending(request, company, held)
+                self._keep_acronyms(request, company, held)
                 messages.success(request, _("Kept what Wikidata said."))
             return redirect(back or self._back(request, company))
         qid = company.wikidata_id()
@@ -507,6 +510,7 @@ class CompanyWikidataView(LoginRequiredMixin, View):
             "dissolved": item.dissolved,
             "dissolved_on": item.dissolved_on.isoformat() if item.dissolved_on else None,
             "replaced_by": item.replaced_by,
+            "acronyms": item.acronyms,
             "at": timezone.now().isoformat(),
         }
         return redirect("jobs:company_wikidata", pk=company.pk)
@@ -532,6 +536,25 @@ class CompanyWikidataView(LoginRequiredMixin, View):
                     },
                 )
             self.keep_point(company, held)
+
+    @staticmethod
+    def _acronyms(company, held) -> list[str]:
+        """The short names the held answer offers that the company does not already hold:
+        worked out again on Keep, so only what the page offered can be ticked (#1245)."""
+        have = {company.name.casefold(), *(row.name.casefold() for row in company.acronyms())}
+        return [
+            text
+            for text in (held.get("acronyms") or [])
+            if isinstance(text, str) and text and text.casefold() not in have
+        ]
+
+    def _keep_acronyms(self, request, company, held) -> None:
+        from .models import CompanyName
+
+        ticked = set(request.POST.getlist("acronym"))
+        for text in self._acronyms(company, held):
+            if text in ticked:
+                company.add_acronym(text, CompanyName.Source.WIKIDATA)
 
     # ------------------------------------------------- whether it ended, and who replaced it
     #
@@ -678,16 +701,8 @@ class CompanyNamesView(LoginRequiredMixin, View):
         if not name:
             messages.error(request, _("Type the acronym or short name."))
             return redirect(back)
-        if name.casefold() == company.name.casefold() or any(
-            row.name.casefold() == name.casefold() for row in company.acronyms()
-        ):
+        if not company.add_acronym(name, CompanyName.Source.TYPED):
             messages.error(request, _("The company already has that name."))
-            return redirect(back)
-        company.names.create(
-            kind=CompanyName.Kind.ACRONYM,
-            name=name,
-            source=CompanyName.Source.TYPED,
-        )
         return redirect(back)
 
     def _shown(self, request, company, back):

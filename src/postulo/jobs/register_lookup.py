@@ -140,6 +140,9 @@ class Record:
     registered_as: str = ""
     registered_at: str = ""
     jurisdiction: str = ""
+    #: The register's short forms of the name (France's ``sigle``), offered as acronyms and
+    #: kept only where the person ticks them (#1245).
+    acronyms: tuple[str, ...] = ()
 
 
 @dataclass(frozen=True)
@@ -465,6 +468,16 @@ def _division(code) -> str:
     return code if _DIVISION.fullmatch(code) and industries.name_for(code, "en") else ""
 
 
+def _acronyms(values) -> tuple[str, ...]:
+    """The short names as plain text without repeats, at most three (#1245)."""
+    found: list[str] = []
+    for value in values if isinstance(values, (list, tuple)) else ():
+        name = text(value, MAX_NAME)
+        if name and name.casefold() not in {have.casefold() for have in found}:
+            found.append(name)
+    return tuple(found[:3])
+
+
 def cleaned(record: Record) -> Record:
     """The record as Postulo will hold it: every string tidied, every code checked."""
     address = record.address if isinstance(record.address, Address) else None
@@ -493,6 +506,7 @@ def cleaned(record: Record) -> Record:
         registered_as=text(record.registered_as, MAX_NUMBER),
         registered_at=text(record.registered_at, MAX_CODE),
         jurisdiction=text(record.jurisdiction, 6).upper(),
+        acronyms=_acronyms(record.acronyms),
     )
 
 
@@ -528,6 +542,7 @@ def from_held(data: dict) -> Record:
             registered_as=data.get("registered_as") or "",
             registered_at=data.get("registered_at") or "",
             jurisdiction=data.get("jurisdiction") or "",
+            acronyms=tuple(data.get("acronyms") or ()),
         )
     )
 
