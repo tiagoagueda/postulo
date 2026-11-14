@@ -385,6 +385,16 @@ msgstr[2] "%(count)d fhógra poist"
 msgstr[3] "%(count)d bhfógra poist"
 msgstr[4] "%(count)d fógra poist"
 
+#: src/postulo/resume/views_references.py
+#, python-format
+msgid "%(count)d publication found. Nothing is added until you tick it."
+msgid_plural "%(count)d publications found. Nothing is added until you tick them."
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+msgstr[4] ""
+
 #: src/postulo/core/gdpr.py
 #, fuzzy, python-format
 msgid "%(count)d reference letter kept, without its referee."
@@ -781,6 +791,11 @@ msgstr[4] "%(days)s lá ó %(day)s"
 msgid "%(department)s is at %(company)s, which is not part of the same employer as this posting."
 msgstr "Tá %(department)s ag %(company)s, nach cuid den fhostóir céanna lena mbaineann an fógra poist seo í."
 
+#: src/postulo/resume/views_references.py
+#, python-format
+msgid "%(doi)s: %(reason)s"
+msgstr ""
+
 #: src/postulo/templates/widgets/endings.html
 #, fuzzy, python-format
 msgid "%(explained)s of %(counter)s ending has a reason recorded. One can be added afterwards, from the application's own page."
@@ -1025,6 +1040,11 @@ msgstr "%(kind)s ar %(when)s curtha ar ceal"
 #, python-format
 msgid "%(kind)s scheduled for %(when)s"
 msgstr "%(kind)s sceidealta do %(when)s"
+
+#: src/postulo/applications/interview_brief.py
+#, python-format
+msgid "%(kind)s · %(role)s at %(company)s"
+msgstr ""
 
 #: src/postulo/applications/ical.py
 #, python-format
@@ -1803,6 +1823,16 @@ msgstr[2] "%(total)s iontráil"
 msgstr[3] "%(total)s n-iontráil"
 msgstr[4] "%(total)s iontráil"
 
+#: src/postulo/templates/resume/references.html
+#, python-format
+msgid "%(total)s entry could not be read, or had no title, and is not listed."
+msgid_plural "%(total)s entries could not be read, or had no title, and are not listed."
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+msgstr[4] ""
+
 #: src/postulo/templates/applications/calendar_print.html
 #, fuzzy, python-format
 msgid "%(total)s entry."
@@ -2022,6 +2052,10 @@ msgstr "<code dir=\"ltr\">iso7064-mod11-2</code>, a chríochnaíonn ORCID leis, 
 msgid "<code dir=\"ltr\">true</code> to put what was typed into capitals, or into small letters, before it is checked."
 msgstr "<code dir=\"ltr\">true</code> chun an méid a clóscríobhadh a chur i gceannlitreacha, nó i litreacha beaga, sula seiceáiltear é."
 
+#: src/postulo/templates/help/career.html
+msgid "<em>Answers</em> keeps what application forms keep asking, such as why this company, your notice period or your salary expectation. On an application, <em>What I answered</em> keeps its own copy of what you told that employer, so changing a saved answer later never changes what was sent. Answers are never printed on a CV and never shared."
+msgstr ""
+
 #: src/postulo/templates/help/documents.html
 #, fuzzy
 msgid "<em>CVs and portfolios</em> are variants of your career record: each one chooses which entries to show, in which order, and how they are set. Correct an entry in <em>Your career</em> and every variant changes with it. <em>Letters</em> are the cover and motivation letters, with their own text."
@@ -2130,6 +2164,10 @@ msgstr ""
 #, python-format
 msgid "A %(kind)s entry names the file: send %(field)s."
 msgstr "Ainmníonn iontráil %(kind)s an comhad: seol %(field)s."
+
+#: src/postulo/templates/resume/references.html
+msgid "A .bib, .ris or .json file"
+msgstr ""
 
 #: src/postulo/templates/jobs/company_places.html
 msgid "A .geojson file"
@@ -3255,6 +3293,14 @@ msgstr "Ceannaithe nó cumaiscthe"
 msgid "acquired_by must be a company you can see."
 msgstr "Caithfidh acquired_by a bheith ina cuideachta is féidir leat a fheiceáil."
 
+#: src/postulo/jobs/models.py src/postulo/templates/jobs/company_form.html
+msgid "Acronym or short name"
+msgstr ""
+
+#: src/postulo/templates/jobs/company_form.html
+msgid "Acronyms and short names"
+msgstr ""
+
 #: src/postulo/templates/jobs/company_detail.html
 #, python-format
 msgid "Across the %(name)s group"
@@ -3358,6 +3404,10 @@ msgstr "Cuir clib leis"
 msgid "Add all of this"
 msgstr "Cuir seo ar fad leis"
 
+#: src/postulo/templates/applications/application_detail.html
+msgid "Add an answer"
+msgstr ""
+
 #: src/postulo/templates/jobs/company_form.html
 msgid "Add an entry"
 msgstr "Cuir iontráil leis"
@@ -3365,6 +3415,10 @@ msgstr "Cuir iontráil leis"
 #: src/postulo/templates/resume/item_form.html
 msgid "Add an industry"
 msgstr "Cuir tionscal leis"
+
+#: src/postulo/templates/resume/references.html
+msgid "Add by DOI"
+msgstr ""
 
 #: src/postulo/templates/documents/cv_detail.html
 msgid "Add entries"
@@ -3415,6 +3469,10 @@ msgstr "Cuir an uimhir chláraithe <bdi>%(number)s</bdi> leis"
 
 #: src/postulo/templates/documents/message_list.html
 msgid "Add the starter messages"
+msgstr ""
+
+#: src/postulo/templates/resume/references.html
+msgid "Add the ticked publications"
 msgstr ""
 
 #: src/postulo/templates/resume/publication_orcid.html
@@ -3479,6 +3537,16 @@ msgstr[1] "Cuireadh %(count)d fhoilseachán leis ó do thaifead ORCID, gan údai
 msgstr[2] "Cuireadh %(count)d fhoilseachán leis ó do thaifead ORCID, gan údair: níl aon údar ar liosta ORCID. Oscail gach ceann acu agus brúigh Cuardaigh in aice lena DOI chun an chuid eile a fháil."
 msgstr[3] "Cuireadh %(count)d bhfoilseachán leis ó do thaifead ORCID, gan údair: níl aon údar ar liosta ORCID. Oscail gach ceann acu agus brúigh Cuardaigh in aice lena DOI chun an chuid eile a fháil."
 msgstr[4] "Cuireadh %(count)d foilseachán leis ó do thaifead ORCID, gan údair: níl aon údar ar liosta ORCID. Oscail gach ceann acu agus brúigh Cuardaigh in aice lena DOI chun an chuid eile a fháil."
+
+#: src/postulo/resume/views_references.py
+#, python-format
+msgid "Added %(count)d publication to Your career. Nothing was overwritten."
+msgid_plural "Added %(count)d publications to Your career. Nothing was overwritten."
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+msgstr[4] ""
 
 #: src/postulo/documents/views.py
 #, python-format
@@ -3689,6 +3757,11 @@ msgstr "An lá ar fad"
 msgid "All documents"
 msgstr "Gach doiciméad"
 
+#: src/postulo/templates/documents/upload_detail.html
+msgid "All files"
+msgstr ""
+
+#: src/postulo/templates/applications/interview_detail.html
 #: src/postulo/templates/widgets/upcoming_interviews.html
 msgid "All interviews"
 msgstr "Gach agallamh"
@@ -3696,6 +3769,10 @@ msgstr "Gach agallamh"
 #: src/postulo/templates/widgets/listings.html
 msgid "All listings"
 msgstr "Gach fógra poist"
+
+#: src/postulo/templates/applications/interview_detail.html
+msgid "All of the above as a PDF to read on the way there. Downloaded, and not kept in Postulo."
+msgstr ""
 
 #: src/postulo/templates/server/defaults.html
 msgid "All of them are offered, and a language added in a later release will be too."
@@ -3756,6 +3833,10 @@ msgstr "Tarlaíonn sé uaidh féin freisin nuair a athraíonn do phríomhsheolad
 #, python-format
 msgid "Also in %(names)s"
 msgstr "I %(names)s freisin"
+
+#: src/postulo/accounts/models.py
+msgid "Always"
+msgstr ""
 
 #: src/postulo/plugins/policy.py
 msgid "Always on: Postulo cannot work without it."
@@ -4012,7 +4093,7 @@ msgstr "Tá iarratas eile ag úsáid an Idempotency-Key seo; bain triail eile as
 msgid "Another row is on the same service. Both stay as they are; remove one, or move it to Other, when you like."
 msgstr "Tá ró eile ar an tseirbhís chéanna. Fanann an dá cheann mar atá; bain ceann acu, nó bog go hEile é, nuair is mian leat."
 
-#: src/postulo/api/models.py
+#: src/postulo/api/models.py src/postulo/applications/models.py
 msgid "answer"
 msgstr "freagra"
 
@@ -4039,6 +4120,18 @@ msgstr "freagra faoi %(day)s"
 msgid "Answer by: %(company)s"
 msgstr "Freagra faoi: %(company)s"
 
+#: src/postulo/applications/models.py
+msgid "answer given"
+msgstr ""
+
+#: src/postulo/applications/views_answers.py
+msgid "Answer kept."
+msgstr ""
+
+#: src/postulo/applications/views_answers.py
+msgid "Answer updated."
+msgstr ""
+
 #: src/postulo/resume/models.py
 #, fuzzy
 msgid "Answered"
@@ -4049,9 +4142,18 @@ msgstr "Freagartha"
 msgid "Answered %(code)s."
 msgstr "Freagra: %(code)s."
 
+#: src/postulo/templates/resume/answer_list.html
+#: src/postulo/templates/resume/overview.html
+msgid "Answers"
+msgstr ""
+
 #: src/postulo/applications/agenda.py
 msgid "Answers due"
 msgstr "Freagraí dlite"
+
+#: src/postulo/applications/models.py
+msgid "answers given"
+msgstr ""
 
 #: src/postulo/accounts/forms.py
 msgid "Antarctica"
@@ -4059,6 +4161,7 @@ msgstr "An Antartaice"
 
 #: src/postulo/templates/applications/partials/board_filters.html
 #: src/postulo/templates/cotton/table/filter.html
+#: src/postulo/templates/resume/answer_list.html
 msgid "Any"
 msgstr "Aon cheann"
 
@@ -4218,6 +4321,10 @@ msgstr "Iarratais a seoladh, cé mhéad a fuair freagra, cá fhad a thógann fre
 #, fuzzy
 msgid "Applications that reached one"
 msgstr "Iarratais a shroich ceann"
+
+#: src/postulo/templates/resume/answer_form.html
+msgid "Applications that used it keep their own copy, so changing it here changes none of them."
+msgstr ""
 
 #: src/postulo/jobs/merging.py
 msgid "Applications that went through it as an agency"
@@ -4392,6 +4499,7 @@ msgid "As a CV should print it. It is linked to the company of that name among y
 msgstr "Mar ba cheart do CV é a phriontáil. Nasctar é leis an gcuideachta den ainm sin i measc do chuideachtaí, agus cuirtear le do chuideachtaí é mura bhfuil ceann ann."
 
 #: src/postulo/templates/applications/calendar_print.html
+#: src/postulo/templates/applications/interview_detail.html
 #: src/postulo/templates/core/table_export.html
 msgid "As a document"
 msgstr "Mar dhoiciméad"
@@ -4412,6 +4520,10 @@ msgstr "Mar a aimsíodh é ar %(when)s."
 #: src/postulo/resume/forms.py
 msgid "As it was published."
 msgstr "Mar a foilsíodh é."
+
+#: src/postulo/templates/documents/rendered_detail.html
+msgid "As it was sent"
+msgstr ""
 
 #: src/postulo/applications/forms.py
 msgid "As it was written: a percentage, a number of options, the vesting."
@@ -4436,9 +4548,23 @@ msgstr "Amhail"
 msgid "as of %(date)s"
 msgstr "amhail %(date)s"
 
+#: src/postulo/templates/applications/interview_detail.html
+#: src/postulo/templates/documents/themes/base_interview.html
+#, python-format
+msgid "as of %(day)s"
+msgstr ""
+
 #: src/postulo/templates/documents/cv_text.html
 msgid "As plain text"
 msgstr "Mar ghnáth-théacs"
+
+#: src/postulo/applications/forms.py
+msgid "As the employer's form put it."
+msgstr ""
+
+#: src/postulo/applications/forms.py
+msgid "As the form puts it, or near enough to find it again."
+msgstr ""
 
 #: src/postulo/resume/forms.py
 msgid "As the institution words it. Kept in your record; a CV does not print it yet."
@@ -4476,6 +4602,10 @@ msgstr "Mar atá an scéal, ní phriontáiltear aon cheann."
 #: src/postulo/documents/forms.py
 msgid "As things stand: {value}."
 msgstr "Mar atá an scéal: {value}."
+
+#: src/postulo/applications/forms.py
+msgid "As you sent it. Editing it here leaves the saved answer as it is."
+msgstr ""
 
 #: src/postulo/accounts/forms.py src/postulo/templates/server/design.html
 msgid "Asia"
@@ -4591,6 +4721,14 @@ msgstr "údar na gcomhad easpórtáilte"
 #: src/postulo/resume/models.py
 msgid "authors"
 msgstr "údair"
+
+#: src/postulo/accounts/models.py
+msgid "Automatically"
+msgstr ""
+
+#: src/postulo/accounts/forms.py
+msgid "Automatically shows a place as the city alone while all your companies are in one country, and as the city and country as soon as there are two. Documents, exports and the API keep the country whatever you choose here."
+msgstr ""
 
 #: src/postulo/jobs/industries.py
 msgid "Automotive"
@@ -4741,7 +4879,7 @@ msgstr "Ar ais go dtí na gnáthcholúin."
 msgid "Back to the usual order"
 msgstr "Ar ais chuig an ngnáthord"
 
-#: src/postulo/core/help.py
+#: src/postulo/core/help.py src/postulo/templates/resume/references.html
 msgid "Back to Your career"
 msgstr "Ar ais chuig Do ghairm"
 
@@ -4832,6 +4970,23 @@ msgstr "In aice leis an institiúid, do gach cáilíocht a bhfuil ceann luaite a
 
 #: src/postulo/jobs/industries.py
 msgid "Beverages"
+msgstr ""
+
+#: src/postulo/templates/resume/references.html
+msgid "Bibliography"
+msgstr ""
+
+#: src/postulo/core/transfers.py
+msgid "Bibliography (BibTeX, RIS, CSL JSON)"
+msgstr ""
+
+#: src/postulo/templates/resume/references.html
+msgid "BibTeX has no place for datasets, software or web pages, so they are written as Other; BibLaTeX keeps them. Only what a publication holds is in the file."
+msgstr ""
+
+#: src/postulo/templates/resume/references.html
+#, python-format
+msgid "BibTeX, BibLaTeX, RIS and CSL JSON are read, up to %(limit)s MB and %(most)s entries. The file is read here and not kept; nothing is added until you tick it."
 msgstr ""
 
 #: src/postulo/jobs/industries.py
@@ -5021,6 +5176,7 @@ msgstr "C2 — oilte"
 msgid "Calendar"
 msgstr "Féilire"
 
+#: src/postulo/templates/applications/interview_detail.html
 #: src/postulo/templates/applications/interview_list.html
 msgid "Calendar file"
 msgstr "Comhad féilire"
@@ -5066,6 +5222,7 @@ msgstr "Is féidir é a phéireáil le"
 
 #: src/postulo/templates/accounts/invite_form.html
 #: src/postulo/templates/accounts/profile.html
+#: src/postulo/templates/applications/answer_form.html
 #: src/postulo/templates/applications/application_form.html
 #: src/postulo/templates/applications/application_intake.html
 #: src/postulo/templates/applications/appointment_form.html
@@ -5100,6 +5257,7 @@ msgstr "Is féidir é a phéireáil le"
 #: src/postulo/templates/jobs/share.html
 #: src/postulo/templates/partials/confirm_delete.html
 #: src/postulo/templates/partials/table/cell.html
+#: src/postulo/templates/resume/answer_form.html
 #: src/postulo/templates/resume/item_form.html
 #: src/postulo/templates/resume/publication_orcid.html
 #: src/postulo/templates/server/backup_delete.html
@@ -5381,6 +5539,10 @@ msgstr "Seoltar athruithe a dhéantar anseo ar an gcéad rith eile; léitear an 
 msgid "changes to records"
 msgstr "athruithe ar thaifid"
 
+#: src/postulo/templates/applications/answer_form.html
+msgid "Changing it here leaves the saved answer it began as untouched."
+msgstr ""
+
 #: src/postulo/resume/models.py
 msgid "chapter"
 msgstr "caibidil"
@@ -5493,7 +5655,7 @@ msgstr "Roghnaigh comhad Europass ar dtús."
 
 #: src/postulo/applications/views_ical.py src/postulo/core/views_kind_files.py
 #: src/postulo/jobs/vcard_views.py src/postulo/jobs/views.py
-#: src/postulo/resume/views_candidate.py
+#: src/postulo/resume/views_candidate.py src/postulo/resume/views_references.py
 msgid "Choose a file first."
 msgstr "Roghnaigh comhad ar dtús."
 
@@ -5570,6 +5732,10 @@ msgstr "Roghnaigh dátaí ó fhéilire"
 #: src/postulo/core/personal.py
 msgid "Choose one of the answers in the list."
 msgstr "Roghnaigh ceann de na freagraí sa liosta."
+
+#: src/postulo/jobs/views.py
+msgid "Choose one of the company's names."
+msgstr ""
 
 #: src/postulo/templates/base.html
 msgid "Choose one of the options."
@@ -6698,6 +6864,7 @@ msgstr "Cosaint"
 #: src/postulo/templates/jobs/industry_list.html
 #: src/postulo/templates/jobs/posting_detail.html
 #: src/postulo/templates/partials/confirm_delete.html
+#: src/postulo/templates/resume/answer_list.html
 #: src/postulo/templates/server/backups.html
 #: src/postulo/templates/server/groups.html
 msgid "Delete"
@@ -7000,9 +7167,17 @@ msgstr "Teipeann ar an bhfíorú"
 msgid "DOI"
 msgstr "DOI"
 
+#: src/postulo/resume/views_references.py
+msgid "DOI lookup"
+msgstr ""
+
 #: src/postulo/resume/lookups.py
 msgid "doi.org's answer was not a record Postulo can read."
 msgstr "Ní taifead is féidir le Postulo a léamh a bhí i bhfreagra doi.org."
+
+#: src/postulo/templates/resume/references.html
+msgid "DOIs, one per line"
+msgstr ""
 
 #: src/postulo/jobs/industries.py
 msgid "Domestic staff"
@@ -7028,6 +7203,7 @@ msgstr "déanta ar"
 msgid "Done reminder:"
 msgstr "Meabhrúchán déanta:"
 
+#: src/postulo/templates/cotton/document_viewer.html
 #: src/postulo/templates/cotton/sent_versions.html
 #: src/postulo/templates/documents/application_documents.html
 #: src/postulo/templates/documents/rendered_compare.html
@@ -7044,6 +7220,11 @@ msgstr "Íoslódáil"
 #, python-format
 msgid "Download .%(extension)s"
 msgstr "Íoslódáil .%(extension)s"
+
+#: src/postulo/templates/resume/references.html
+#, python-format
+msgid "Download as %(name)s"
+msgstr ""
 
 #: src/postulo/templates/jobs/contact_detail.html
 #: src/postulo/templates/jobs/contact_form.html
@@ -7077,6 +7258,7 @@ msgid "Download it as text"
 msgstr "Íoslódáil mar théacs é"
 
 #: src/postulo/templates/applications/calendar_print.html
+#: src/postulo/templates/applications/interview_detail.html
 #: src/postulo/templates/core/table_export.html
 msgid "Download PDF"
 msgstr "Íoslódáil PDF"
@@ -7241,21 +7423,29 @@ msgstr "Comhaireann gach céim iarratais a shroich í riamh, cibé rud a tharla 
 msgid "Each with an icon"
 msgstr "Gach ceann le deilbhín"
 
+#: src/postulo/templates/applications/interview_detail.html
+#: src/postulo/templates/documents/themes/base_interview.html
+msgid "Earlier interviews for this application"
+msgstr ""
+
 #: src/postulo/plugins/models.py
 msgid "Ed25519, base64. Without it there is no catalogue: an unsigned list of addresses to run code from is not something Postulo will offer."
 msgstr "Ed25519, base64. Gan í níl catalóg ann: ní thairgfidh Postulo liosta neamhshínithe seoltaí as a rithfear cód."
 
 #: src/postulo/templates/applications/application_detail.html
+#: src/postulo/templates/applications/interview_detail.html
 #: src/postulo/templates/applications/interview_list.html
 #: src/postulo/templates/applications/subscription_list.html
 #: src/postulo/templates/applications/tag_list.html
 #: src/postulo/templates/connections/list.html
 #: src/postulo/templates/documents/letter_detail.html
+#: src/postulo/templates/documents/upload_detail.html
 #: src/postulo/templates/documents/upload_list.html
 #: src/postulo/templates/jobs/company_detail.html
 #: src/postulo/templates/jobs/company_form.html
 #: src/postulo/templates/jobs/contact_detail.html
 #: src/postulo/templates/jobs/posting_detail.html
+#: src/postulo/templates/resume/answer_list.html
 #: src/postulo/templates/resume/preview.html
 #: src/postulo/templates/resume/translations.html
 msgid "Edit"
@@ -7264,6 +7454,11 @@ msgstr "Cuir in eagar"
 #: src/postulo/templates/resume/overview.html
 #, python-format
 msgid "Edit %(what)s"
+msgstr ""
+
+#: src/postulo/templates/applications/answer_form.html
+#: src/postulo/templates/resume/answer_form.html
+msgid "Edit answer"
 msgstr ""
 
 #: src/postulo/templates/applications/application_form.html
@@ -7817,6 +8012,7 @@ msgstr "Is minic gur gá a rá cén nasc, cén chuideachta nó cén doiciméad l
 #: src/postulo/templates/jobs/company_places.html
 #: src/postulo/templates/jobs/contact_detail.html
 #: src/postulo/templates/partials/table/export.html
+#: src/postulo/templates/resume/references.html
 #: src/postulo/templates/settings/export.html
 msgid "Export"
 msgstr "Easpórtáil"
@@ -7825,6 +8021,10 @@ msgstr "Easpórtáil"
 #, python-format
 msgid "Export %(list)s"
 msgstr "Easpórtáil %(list)s"
+
+#: src/postulo/templates/resume/references.html
+msgid "Export all of them instead"
+msgstr ""
 
 #: src/postulo/core/models.py
 msgid "export archive"
@@ -7837,6 +8037,10 @@ msgstr "cartlanna easpórtála"
 #: src/postulo/templates/cotton/transfer_group.html
 msgid "Export as"
 msgstr "Easpórtáil mar"
+
+#: src/postulo/templates/resume/overview.html
+msgid "Export as a reference"
+msgstr ""
 
 #: src/postulo/templates/core/export.html
 #: src/postulo/templates/core/kind_file.html
@@ -7864,6 +8068,7 @@ msgstr "Easpórtáil PDF"
 
 #: src/postulo/templates/cotton/sent_versions.html
 #: src/postulo/templates/documents/rendered_compare.html
+#: src/postulo/templates/documents/rendered_detail.html
 #: src/postulo/templates/documents/rendered_list.html
 msgid "Exported on its own"
 msgstr "Easpórtáilte ina aonar"
@@ -8104,6 +8309,10 @@ msgstr "Airgeadas"
 msgid "Financial support"
 msgstr ""
 
+#: src/postulo/templates/resume/answer_list.html
+msgid "Find"
+msgstr ""
+
 #: src/postulo/templates/settings/locale.html
 msgid "Find a language"
 msgstr "Aimsigh teanga"
@@ -8171,6 +8380,14 @@ msgstr "Ar dtús, tabhair gach rud leat"
 
 #: src/postulo/jobs/industries.py
 msgid "Fishing"
+msgstr ""
+
+#: src/postulo/templates/cotton/document_viewer.html
+msgid "Fit page"
+msgstr ""
+
+#: src/postulo/templates/cotton/document_viewer.html
+msgid "Fit width"
 msgstr ""
 
 #: src/postulo/core/models.py
@@ -8325,6 +8542,7 @@ msgid "Forget the token"
 msgstr "Déan dearmad ar an gcomhartha"
 
 #: src/postulo/templates/jobs/company_places.html
+#: src/postulo/templates/resume/references.html
 msgid "Forget this file"
 msgstr "Déan dearmad ar an gcomhad seo"
 
@@ -8578,6 +8796,7 @@ msgid "Gender: %(gender)s"
 msgstr "Inscne: %(gender)s"
 
 #: src/postulo/templates/applications/application_detail.html
+#: src/postulo/templates/applications/interview_detail.html
 msgid "Get"
 msgstr "Faigh"
 
@@ -8934,6 +9153,8 @@ msgid "Highlights of education"
 msgstr ""
 
 #: src/postulo/jobs/models.py src/postulo/jobs/tables.py
+#: src/postulo/templates/applications/interview_detail.html
+#: src/postulo/templates/documents/themes/base_interview.html
 #: src/postulo/templates/jobs/company_form.html
 #: src/postulo/templates/jobs/partials/company_signals.html
 msgid "Hiring"
@@ -9319,6 +9540,7 @@ msgstr "Déan neamhaird den cholún seo"
 #: src/postulo/templates/core/import_csv_map.html
 #: src/postulo/templates/cotton/transfer_group.html
 #: src/postulo/templates/jobs/company_places.html
+#: src/postulo/templates/resume/references.html
 msgid "Import"
 msgstr "Iompórtáil"
 
@@ -9563,7 +9785,10 @@ msgid "Indian Ocean"
 msgstr "An tAigéan Indiach"
 
 #: src/postulo/jobs/forms.py src/postulo/jobs/merging.py
-#: src/postulo/jobs/tables.py src/postulo/templates/jobs/company_list.html
+#: src/postulo/jobs/tables.py
+#: src/postulo/templates/applications/interview_detail.html
+#: src/postulo/templates/documents/themes/base_interview.html
+#: src/postulo/templates/jobs/company_list.html
 #: src/postulo/templates/jobs/industry_list.html
 msgid "Industries"
 msgstr "Tionscail"
@@ -9658,8 +9883,8 @@ msgstr ""
 msgid "Internship"
 msgstr "Intéirneacht"
 
-#: src/postulo/applications/models.py src/postulo/jobs/contact_views.py
-#: src/postulo/plugins/pairing.py
+#: src/postulo/applications/models.py src/postulo/documents/themes.py
+#: src/postulo/jobs/contact_views.py src/postulo/plugins/pairing.py
 msgid "Interview"
 msgstr "Agallamh"
 
@@ -10134,6 +10359,7 @@ msgid "Jobs"
 msgstr "Poist"
 
 #: src/postulo/templates/applications/application_detail.html
+#: src/postulo/templates/applications/interview_detail.html
 #: src/postulo/templates/applications/interview_list.html
 msgid "Join the call"
 msgstr "Téigh isteach sa ghlao"
@@ -10165,6 +10391,10 @@ msgstr "coinnigh rindreáil de leathanach gafa"
 #: src/postulo/accounts/forms.py
 msgid "Keep a rendering of the pages I capture"
 msgstr "Coinnigh rindreáil de na leathanaigh a ghabhaim"
+
+#: src/postulo/templates/applications/answer_form.html
+msgid "Keep an answer"
+msgstr ""
 
 #: src/postulo/templates/jobs/conflicts.html
 msgid "Keep both"
@@ -10329,6 +10559,10 @@ msgstr "eochairfhocail"
 msgid "keywords of exported files"
 msgstr "eochairfhocail na gcomhad easpórtáilte"
 
+#: src/postulo/jobs/models.py
+msgid "kind"
+msgstr ""
+
 #: src/postulo/documents/models.py src/postulo/plugins/models.py
 msgid "label"
 msgstr "lipéad"
@@ -10355,8 +10589,9 @@ msgstr "tírdhreach"
 msgid "Language"
 msgstr "Teanga"
 
-#: src/postulo/accounts/models.py src/postulo/documents/models.py
-#: src/postulo/jobs/models.py src/postulo/resume/models.py
+#: src/postulo/accounts/models.py src/postulo/applications/models.py
+#: src/postulo/documents/models.py src/postulo/jobs/models.py
+#: src/postulo/resume/models.py
 msgid "language"
 msgstr "teanga"
 
@@ -10382,6 +10617,7 @@ msgid "language of exported files"
 msgstr "teanga na gcomhad easpórtáilte"
 
 #: src/postulo/templates/applications/calendar_print.html
+#: src/postulo/templates/applications/interview_detail.html
 #: src/postulo/templates/core/table_export.html
 msgid "Language of the document"
 msgstr "Teanga an doiciméid"
@@ -10934,6 +11170,14 @@ msgstr "Fógraí poist le cinneadh orthu"
 msgid "Listings, applications and their timelines, companies and people, reminders, the text of what you sent, letters, CVs, files and your career record — everything, including what is closed or discarded, because you are looking for something you remember."
 msgstr "Fógraí poist, iarratais agus a n-amlínte, cuideachtaí agus daoine, meabhrúcháin, téacs a bhfuil seolta agat, litreacha, CVanna, comhaid agus do thaifead gairme — gach rud, lena n-áirítear a bhfuil dúnta nó caite i leataobh, mar tá tú ag lorg ruda a bhfuil cuimhne agat air."
 
+#: src/postulo/templates/jobs/company_form.html
+msgid "Lists show"
+msgstr ""
+
+#: src/postulo/templates/cotton/document_viewer.html
+msgid "Loading the document…"
+msgstr ""
+
 #: src/postulo/accounts/models.py src/postulo/jobs/models.py
 #: src/postulo/resume/models.py
 msgid "location"
@@ -10986,6 +11230,10 @@ msgstr "Domhanfhad"
 #: src/postulo/templates/connections/form.html
 msgid "Look on the server"
 msgstr "Cuardaigh ar an bhfreastalaí"
+
+#: src/postulo/templates/resume/references.html
+msgid "Look them up"
+msgstr ""
 
 #: src/postulo/templates/resume/item_form.html
 msgid "Look up"
@@ -11674,9 +11922,17 @@ msgstr "ainm"
 msgid "Name"
 msgstr "Ainm"
 
+#: src/postulo/jobs/models.py
+msgid "Name in a language"
+msgstr ""
+
 #: src/postulo/resume/forms.py
 msgid "Name of the language"
 msgstr "Ainm na teanga"
+
+#: src/postulo/jobs/models.py
+msgid "name shown in lists"
+msgstr ""
 
 #: src/postulo/jobs/models.py
 #, fuzzy
@@ -11795,6 +12051,11 @@ msgstr "Nua"
 #: src/postulo/templates/server/defaults.html
 msgid "New accounts"
 msgstr "Cuntais nua"
+
+#: src/postulo/templates/resume/answer_form.html
+#: src/postulo/templates/resume/answer_list.html
+msgid "New answer"
+msgstr ""
 
 #: src/postulo/templates/applications/appointment_form.html
 #: src/postulo/templates/applications/calendar.html
@@ -11919,6 +12180,10 @@ msgstr "An chéad agallamh eile"
 msgid "Next month"
 msgstr "An mhí seo chugainn"
 
+#: src/postulo/templates/cotton/document_viewer.html
+msgid "Next page"
+msgstr ""
+
 #: src/postulo/applications/tables.py
 msgid "Next reminder"
 msgstr "An chéad mheabhrúchán eile"
@@ -11956,6 +12221,14 @@ msgstr "Níl aon fhaighteoir age socraithe, agus ní fhágann aon rud an ríomha
 #: src/postulo/applications/forms.py
 msgid "No agency"
 msgstr "Gan gníomhaireacht"
+
+#: src/postulo/templates/resume/answer_list.html
+msgid "No answer matches."
+msgstr ""
+
+#: src/postulo/templates/resume/answer_list.html
+msgid "No answers yet."
+msgstr ""
 
 #: src/postulo/templates/documents/letter_detail.html
 msgid "No application"
@@ -12152,6 +12425,10 @@ msgstr "Níl aon inneall PDF inúsáidte, mar sin ní féidir doiciméid a easp�
 msgid "No people recorded at this company yet. Add them from <a href=\"%(company_url)s\" class=\"underline\">the company page</a> to name who you are meeting."
 msgstr "Níl aon duine taifeadta ag an gcuideachta seo fós. Cuir leis iad ó <a href=\"%(company_url)s\" class=\"underline\">leathanach na cuideachta</a> chun a ainmniú cé leis a bhfuil tú ag bualadh."
 
+#: src/postulo/templates/applications/interview_detail.html
+msgid "No place recorded."
+msgstr ""
+
 #: src/postulo/templates/jobs/company_map.html
 msgid "No places yet. When a company has an address, its town is listed here and drawn on the map."
 msgstr "Níl aon áiteanna fós. Nuair a bhíonn seoladh ag cuideachta, liostaítear a baile anseo agus tarraingítear ar an léarscáil é."
@@ -12246,6 +12523,11 @@ msgstr "Níl aon chlibeanna fós."
 msgid "No telephone number"
 msgstr "Gan uimhir ghutháin"
 
+#: src/postulo/templates/applications/interview_detail.html
+#: src/postulo/templates/documents/themes/base_interview.html
+msgid "No text recorded for this listing."
+msgstr ""
+
 #: src/postulo/documents/themes.py
 #, python-format
 msgid "No theme called “%(theme)s” is installed."
@@ -12312,6 +12594,11 @@ msgstr "Níor shínigh aon duine isteach leis an soláthraí ríomhphoist fós. 
 #: src/postulo/templates/server/email.html
 msgid "Nobody has signed in yet, so nothing can be sent. Save the settings above, then sign in on the provider's page as the mailbox this instance sends from."
 msgstr "Níor shínigh aon duine isteach fós, mar sin ní féidir aon rud a sheoladh. Sábháil na socruithe thuas, ansin sínigh isteach ar leathanach an tsoláthraí mar an bosca poist óna seolann an tsuiteáil seo."
+
+#: src/postulo/templates/applications/interview_detail.html
+#: src/postulo/templates/documents/themes/base_interview.html
+msgid "Nobody is named for this interview."
+msgstr ""
 
 #: src/postulo/templates/server/data_protection.html
 msgid "Nobody is named here: whose contacts they are is the account's own business. Each person erases from their own contact's page."
@@ -12441,6 +12728,10 @@ msgstr "níl aon cheann fós"
 #: src/postulo/templates/server/person_recovery.html
 msgid "None yet."
 msgstr "Ceann ar bith fós."
+
+#: src/postulo/templates/jobs/company_form.html
+msgid "None yet. Add one, such as CNRS for a long name, to choose which the lists show."
+msgstr ""
 
 #: src/postulo/templates/jobs/company_form.html
 msgid "None yet. Documents print the name above in every language."
@@ -12589,6 +12880,11 @@ msgstr "Ní phriontáiltear ar aon CV é go dtí go n-aontóidh siad."
 
 #: src/postulo/templates/applications/subscription_list.html
 msgid "Not read yet. It will be within minutes."
+msgstr ""
+
+#: src/postulo/templates/resume/references.html
+#, python-format
+msgid "Not read, because a publication has nowhere to keep them: %(names)s."
 msgstr ""
 
 #: src/postulo/applications/analytics.py src/postulo/applications/reports.py
@@ -12908,6 +13204,10 @@ msgstr "Ní shábháiltear aon rud go dtí go mbeidh sé athbhreithnithe agat."
 msgid "Nothing is sent to the server as a password until a new one is entered."
 msgstr "Ní sheoltar aon phasfhocal chuig an bhfreastalaí go dtí go gcuirtear ceann nua isteach."
 
+#: src/postulo/templates/applications/application_detail.html
+msgid "Nothing kept yet. Keep what you typed into the employer's form, so you can see what they were told."
+msgstr ""
+
 #: src/postulo/templates/applications/application_list.html
 #: src/postulo/templates/jobs/company_list.html
 #: src/postulo/templates/jobs/listing_list.html
@@ -12958,6 +13258,11 @@ msgstr "Níl aon rud sa tsuiteáil níos sine ná an polasaí. Níl aon rud le d
 msgid "Nothing on the other service is touched. You can connect it again later."
 msgstr "Ní bhaintear le haon rud ar an tseirbhís eile. Is féidir leat é a nascadh arís níos déanaí."
 
+#: src/postulo/templates/applications/interview_detail.html
+#: src/postulo/templates/documents/themes/base_interview.html
+msgid "Nothing on the timeline yet."
+msgstr ""
+
 #: src/postulo/templates/applications/calendar.html
 #: src/postulo/templates/documents/themes/base_calendar.html
 msgid "Nothing on this day."
@@ -12970,6 +13275,11 @@ msgstr "Ní aistrítear aon rud ar an iontráil seo. Is iad focail an chomhlacht
 #: src/postulo/templates/applications/partials/timeline.html
 msgid "Nothing recorded against this one yet."
 msgstr "Níl aon rud taifeadta i gcoinne an chinn seo fós."
+
+#: src/postulo/templates/applications/interview_detail.html
+#: src/postulo/templates/documents/themes/base_interview.html
+msgid "Nothing recorded as sent for this application."
+msgstr ""
 
 #: src/postulo/templates/documents/application_documents.html
 msgid "Nothing recorded for this application yet."
@@ -13138,9 +13448,17 @@ msgstr "Níor seoladh aon rud sa tréimhse seo."
 msgid "Nothing was sent in this period. That is what the report says, and it is a fact like any other."
 msgstr "Níor seoladh aon rud sa tréimhse seo. Sin a deir an tuairisc, agus is fíric é cosúil le haon fhíric eile."
 
-#: src/postulo/resume/views.py
+#: src/postulo/resume/views.py src/postulo/resume/views_references.py
 msgid "Nothing was ticked, so nothing was added."
 msgstr "Ní raibh tic le haon rud, mar sin níor cuireadh aon rud leis."
+
+#: src/postulo/templates/documents/themes/base_interview.html
+msgid "Nothing written yet."
+msgstr ""
+
+#: src/postulo/templates/applications/interview_detail.html
+msgid "Nothing written yet. Add notes when you edit the interview."
+msgstr ""
 
 #: src/postulo/documents/forms.py
 msgid "Nothing yet"
@@ -13186,6 +13504,11 @@ msgstr "curtha in iúl ar"
 #: src/postulo/resume/models.py
 msgid "number"
 msgstr "uimhir"
+
+#: src/postulo/templates/cotton/document_viewer.html
+#, python-format
+msgid "of %(count)s"
+msgstr ""
 
 #: src/postulo/jobs/widgets.py
 msgid "Of the listings you noticed, how many you applied to and how many you let go."
@@ -13621,6 +13944,11 @@ msgstr[2] "Cuireadh %(total)s thaifead leis. Níor athraíodh ná níor baineadh
 msgstr[3] "Cuireadh %(total)s dtaifead leis. Níor athraíodh ná níor baineadh aon rud a bhí agat cheana."
 msgstr[4] "Cuireadh %(total)s taifead leis. Níor athraíodh ná níor baineadh aon rud a bhí agat cheana."
 
+#: src/postulo/templates/resume/references.html
+#, python-format
+msgid "One request to doi.org for each DOI, at most %(most)s, when you press the button: doi.org passes it to Crossref or DataCite. Only the DOI is sent. What comes back is listed above to tick, and nothing is kept until you add it."
+msgstr ""
+
 #: src/postulo/templates/jobs/company_detail.html
 msgid "One request to that register, carrying the number alone; nothing is kept until you say so."
 msgstr "Iarratas amháin chuig an gclárlann sin, ina bhfuil an uimhir amháin; ní choinnítear aon rud go dtí go ndeir tú amhlaidh."
@@ -13773,6 +14101,11 @@ msgstr "Ní féidir ach leis an riarthóir a thosaigh é é a chríochnú."
 msgid "Only the applications that name a referrer or an agency are in these two; the company on a posting stays the employer."
 msgstr "Ní bhíonn sna dhá cheann seo ach na hiarratais a ainmníonn tarchuirtheoir nó gníomhaireacht; fanann an chuideachta ar fhógra poist mar fhostóir."
 
+#: src/postulo/templates/resume/references.html
+#, python-format
+msgid "Only the first %(most)s entries are read; the rest of the file was left out."
+msgstr ""
+
 #: src/postulo/documents/forms.py
 msgid "Only the ones ticked below"
 msgstr "Na cinn a ticeáladh thíos amháin"
@@ -13800,6 +14133,10 @@ msgstr "Ní choinnítear anseo ach an eochair phoiblí, an faighteoir. Coinnigh 
 #: src/postulo/resume/forms.py
 msgid "Only the year prints on a CV, so the day makes no difference."
 msgstr "Ní phriontáiltear ach an bhliain ar CV, mar sin is cuma faoin lá."
+
+#: src/postulo/templates/resume/references.html
+msgid "Only this publication, as a reference:"
+msgstr ""
 
 #: src/postulo/templates/jobs/company_register.html
 msgid "Only what you tick is kept; nothing else on the company changes."
@@ -13830,6 +14167,10 @@ msgstr "Iarratais oscailte gan scéala, agus na trí rud is féidir a dhéanamh 
 #: src/postulo/templates/partials/table/views.html
 msgid "Open as this"
 msgstr "Oscail mar seo"
+
+#: src/postulo/templates/cotton/document_viewer.html
+msgid "Open in a new tab"
+msgstr ""
 
 #: src/postulo/templates/applications/subscribed_event.html
 #: src/postulo/templates/jobs/capture_form.html
@@ -14104,7 +14445,7 @@ msgstr "Pacáiste"
 msgid "Packing up your data"
 msgstr "Do shonraí á bpacáil"
 
-#: src/postulo/core/design.py
+#: src/postulo/core/design.py src/postulo/templates/cotton/document_viewer.html
 msgid "Page"
 msgstr "Leathanach"
 
@@ -14113,6 +14454,11 @@ msgstr "Leathanach"
 #, python-format
 msgid "Page %(current)s of %(total)s"
 msgstr "Leathanach %(current)s de %(total)s"
+
+#: src/postulo/templates/cotton/document_viewer.html
+#, python-format
+msgid "Page %(page)s of %(count)s"
+msgstr ""
 
 #: src/postulo/jobs/capture_views.py
 msgid "Page source"
@@ -14211,6 +14557,7 @@ msgstr "páipéar"
 
 #: src/postulo/documents/forms.py src/postulo/jobs/industries.py
 #: src/postulo/templates/applications/calendar_print.html
+#: src/postulo/templates/applications/interview_detail.html
 #: src/postulo/templates/applications/report.html
 #: src/postulo/templates/core/table_export.html
 #: src/postulo/templates/settings/export.html
@@ -14242,6 +14589,8 @@ msgid "part of"
 msgstr "cuid de"
 
 #: src/postulo/jobs/tables.py
+#: src/postulo/templates/applications/interview_detail.html
+#: src/postulo/templates/documents/themes/base_interview.html
 msgid "Part of"
 msgstr "Cuid de"
 
@@ -14530,6 +14879,10 @@ msgstr "Líontar áitchoinneálaithe ar nós {{ company }} nuair a sheoltar iad.
 
 #: src/postulo/documents/models.py
 msgid "Placeholders such as {{ company }} are filled in when you write it."
+msgstr ""
+
+#: src/postulo/applications/models.py
+msgid "Placeholders such as {{ company }} are filled in with the application when you use the answer on one."
 msgstr ""
 
 #: src/postulo/plugins/categories.py
@@ -14934,6 +15287,8 @@ msgstr "Brúigh Seiceáil le haghaidh nuashonruithe chun a bhfuil á thairiscint
 msgid "Press “Read the page” again to capture it anyway."
 msgstr "Brúigh “Léigh an leathanach” arís chun é a ghabháil mar sin féin."
 
+#: src/postulo/templates/documents/rendered_list.html
+#: src/postulo/templates/documents/upload_list.html
 #: src/postulo/templates/resume/overview.html
 msgid "Preview"
 msgstr "Réamhamharc"
@@ -14972,6 +15327,10 @@ msgstr "An lá roimhe sin"
 #: src/postulo/templates/cotton/date_picker.html
 msgid "Previous month"
 msgstr "An mhí roimhe sin"
+
+#: src/postulo/templates/cotton/document_viewer.html
+msgid "Previous page"
+msgstr ""
 
 #: src/postulo/applications/agenda.py
 msgid "Previous week"
@@ -15096,6 +15455,7 @@ msgid "Proceedings"
 msgstr "Imeachtaí comhdhála"
 
 #: src/postulo/templates/documents/themes/base_calendar.html
+#: src/postulo/templates/documents/themes/base_interview.html
 #: src/postulo/templates/documents/themes/base_list.html
 #, fuzzy
 msgid "Produced by Postulo from this person's own records."
@@ -15106,6 +15466,7 @@ msgid "Produced by Postulo from this person's own records. Postulo sets no targe
 msgstr "Táirgthe ag Postulo ó thaifid an duine seo féin. Ní shocraíonn Postulo aon sprioc: is riail de chuid córais sochair nó riail an duine féin í cé mhéad iarratas ba cheart a bheith i dtréimhse."
 
 #: src/postulo/templates/documents/themes/base_calendar.html
+#: src/postulo/templates/documents/themes/base_interview.html
 #: src/postulo/templates/documents/themes/base_list.html
 #: src/postulo/templates/documents/themes/base_report.html
 #, python-format
@@ -15227,6 +15588,10 @@ msgstr "Foilseacháin"
 msgid "publications"
 msgstr "foilseacháin"
 
+#: src/postulo/templates/resume/references.html
+msgid "Publications in the file"
+msgstr ""
+
 #: src/postulo/resume/models.py
 msgid "published in"
 msgstr "foilsithe i"
@@ -15292,6 +15657,10 @@ msgstr "Cáilíochtaí"
 
 #: src/postulo/jobs/industries.py
 msgid "Quarrying"
+msgstr ""
+
+#: src/postulo/applications/models.py
+msgid "question"
 msgstr ""
 
 #: src/postulo/templates/connections/list.html
@@ -15395,6 +15764,11 @@ msgstr ""
 msgid "Read as"
 msgstr "Léigh mar"
 
+#: src/postulo/templates/resume/references.html
+#, python-format
+msgid "Read as %(name)s."
+msgstr ""
+
 #: src/postulo/resume/views.py
 msgid "Read as Europass JSON, the older format as the Europass web service wrote it until 2020."
 msgstr "Léite mar JSON Europass, an fhormáid níos sine mar a scríobh seirbhís ghréasáin Europass go dtí 2020 í."
@@ -15444,6 +15818,7 @@ msgstr "Léite ón XML Europass atá ceangailte leis an PDF, an fhormáid atá s
 
 #: src/postulo/templates/jobs/company_places.html
 #: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/references.html
 #: src/postulo/templates/server/plugins.html
 msgid "Read it"
 msgstr "Léigh é"
@@ -15702,6 +16077,10 @@ msgstr "Earcaitheoir"
 #: src/postulo/templates/server/capture.html
 msgid "Redirects followed"
 msgstr "Atreoruithe a leanadh"
+
+#: src/postulo/templates/cotton/document_viewer.html
+msgid "Redraw"
+msgstr ""
 
 #: src/postulo/documents/forms.py
 #, fuzzy
@@ -16272,6 +16651,7 @@ msgid "Saturday"
 msgstr "Dé Sathairn"
 
 #: src/postulo/templates/accounts/profile.html
+#: src/postulo/templates/applications/answer_form.html
 #: src/postulo/templates/applications/application_form.html
 #: src/postulo/templates/applications/application_intake.html
 #: src/postulo/templates/applications/appointment_form.html
@@ -16292,6 +16672,7 @@ msgstr "Dé Sathairn"
 #: src/postulo/templates/jobs/industry_form.html
 #: src/postulo/templates/jobs/posting_form.html
 #: src/postulo/templates/partials/table/cell.html
+#: src/postulo/templates/resume/answer_form.html
 #: src/postulo/templates/resume/item_form.html
 #: src/postulo/templates/resume/translations.html
 #: src/postulo/templates/server/backup_destination.html
@@ -16356,6 +16737,14 @@ msgstr "Sábháil chun aitheantóir eile a chur leis."
 #: src/postulo/templates/jobs/capture_review.html
 msgid "Save to listings"
 msgstr "Sábháil sna fógraí poist"
+
+#: src/postulo/applications/models.py
+msgid "saved answer"
+msgstr ""
+
+#: src/postulo/applications/models.py
+msgid "saved answers"
+msgstr ""
 
 #: src/postulo/accounts/settings_views.py
 #, python-format
@@ -16484,6 +16873,7 @@ msgstr "Níor sheiceáil Postulo an séala"
 #: src/postulo/templates/core/search.html
 #: src/postulo/templates/cotton/site_search.html
 #: src/postulo/templates/jobs/industry_list.html
+#: src/postulo/templates/resume/answer_list.html
 msgid "Search"
 msgstr "Cuardaigh"
 
@@ -16699,6 +17089,7 @@ msgstr "doiciméid seolta"
 #: src/postulo/templates/core/export.html
 #: src/postulo/templates/cotton/documents_nav.html
 #: src/postulo/templates/documents/rendered_compare.html
+#: src/postulo/templates/documents/rendered_detail.html
 #: src/postulo/templates/documents/rendered_list.html
 msgid "Sent documents"
 msgstr "Doiciméid seolta"
@@ -17078,6 +17469,14 @@ msgstr "taispeáin an chonair nascleanúna faoin bpointeoir"
 #, fuzzy
 msgid "Show the breadcrumb only while I point at it"
 msgstr "Ná taispeáin an chonair nascleanúna ach nuair a dhírím air"
+
+#: src/postulo/accounts/forms.py
+msgid "Show the country"
+msgstr ""
+
+#: src/postulo/accounts/models.py
+msgid "show the country"
+msgstr ""
 
 #: src/postulo/accounts/forms.py
 msgid "Show the keys beside the controls that have one"
@@ -17599,6 +17998,10 @@ msgstr "Dáta tosaigh"
 msgid "Start from a type"
 msgstr "Tosaigh ó chineál"
 
+#: src/postulo/templates/applications/answer_form.html
+msgid "Start from an answer you have saved"
+msgstr ""
+
 #: src/postulo/templates/documents/letter_form.html
 msgid "Start from:"
 msgstr "Tosaigh ó:"
@@ -17634,7 +18037,10 @@ msgstr "STARTTLS, tar éis nasctha"
 msgid "state"
 msgstr "staid"
 
-#: src/postulo/jobs/tables.py src/postulo/templates/connections/pairing.html
+#: src/postulo/jobs/tables.py
+#: src/postulo/templates/applications/interview_detail.html
+#: src/postulo/templates/connections/pairing.html
+#: src/postulo/templates/documents/themes/base_interview.html
 #: src/postulo/templates/jobs/company_register.html
 #: src/postulo/templates/server/person_recovery.html
 #, fuzzy
@@ -17962,6 +18368,7 @@ msgstr "Amharc tábla"
 #: src/postulo/templates/applications/partials/board_filters.html
 #: src/postulo/templates/applications/partials/bulk_fields.html
 #: src/postulo/templates/applications/tag_form.html
+#: src/postulo/templates/resume/answer_list.html
 msgid "Tag"
 msgstr "Clib"
 
@@ -18378,7 +18785,7 @@ msgstr "Tá an comhad seo folamh."
 #: src/postulo/core/vcard.py src/postulo/core/views_kind_files.py
 #: src/postulo/jobs/geojson.py src/postulo/jobs/vcard_views.py
 #: src/postulo/plugins/base.py src/postulo/resume/candidate.py
-#: src/postulo/resume/views_candidate.py
+#: src/postulo/resume/references.py src/postulo/resume/views_candidate.py
 #, python-format
 msgid "That file is larger than %(limit)s MB, so it was not read."
 msgstr "Tá an comhad seo níos mó ná %(limit)s MB, mar sin níor léadh é."
@@ -18402,9 +18809,25 @@ msgstr "Tá an comhad sin níos mó ná an %(mb)s MB a ghlacann an tsuiteáil se
 msgid "That file is not a GeoJSON collection of features."
 msgstr "Ní bailiúchán gnéithe GeoJSON é an comhad sin."
 
+#: src/postulo/resume/references.py
+msgid "That file is not BibTeX."
+msgstr ""
+
+#: src/postulo/resume/references.py
+msgid "That file is not CSL JSON."
+msgstr ""
+
 #: src/postulo/jobs/geojson.py
 msgid "That file is not GeoJSON."
 msgstr "Ní GeoJSON é an comhad sin."
+
+#: src/postulo/resume/references.py
+msgid "That file is not one of BibTeX, BibLaTeX, RIS or CSL JSON, so it was not read."
+msgstr ""
+
+#: src/postulo/resume/references.py
+msgid "That file is not RIS."
+msgstr ""
 
 #: src/postulo/resume/views.py
 #, python-format
@@ -18432,6 +18855,10 @@ msgstr "Léadh an comhad sin, agus ní raibh aon chárta ann le hiompórtáil."
 #: src/postulo/jobs/views.py
 msgid "That file was read, and there was no point in it."
 msgstr "Léadh an comhad sin, agus ní raibh aon phointe ann."
+
+#: src/postulo/resume/views_references.py
+msgid "That file was read, and there was no publication in it to add."
+msgstr ""
 
 #: src/postulo/core/views_kind_files.py src/postulo/resume/views.py
 #: src/postulo/resume/views_candidate.py
@@ -19226,6 +19653,10 @@ msgstr "Na cuideachtaí, na teagmhálaithe agus na fógraí poist a chuireann s�
 msgid "The company %(name)s is not in your account, and is added with it."
 msgstr "Níl an chuideachta %(name)s i do chuntas, agus cuirtear isteach í in éineacht leis."
 
+#: src/postulo/jobs/views.py
+msgid "The company already has that name."
+msgstr ""
+
 #: src/postulo/templates/jobs/company_places.html
 msgid "The company has no address to place."
 msgstr "Níl aon seoladh ag an gcuideachta le cur ar an léarscáil."
@@ -19233,6 +19664,11 @@ msgstr "Níl aon seoladh ag an gcuideachta le cur ar an léarscáil."
 #: src/postulo/templates/jobs/company_wikidata.html
 msgid "The company has no address to put it on: add one, and fetch again."
 msgstr "Níl aon seoladh ag an gcuideachta lena chur air: cuir ceann leis, agus faigh arís."
+
+#: src/postulo/templates/applications/interview_detail.html
+#: src/postulo/templates/documents/themes/base_interview.html
+msgid "The company in brief"
+msgstr ""
 
 #: src/postulo/templates/applications/application_intake.html
 msgid "The company is matched by name and created if it is new. Only the company and the job title are required; everything else can be filled in later."
@@ -19438,6 +19874,7 @@ msgstr "An figiúr mar a scríobh siad é, roimh cháin."
 
 #: src/postulo/templates/applications/ical_import.html
 #: src/postulo/templates/core/kind_file.html
+#: src/postulo/templates/documents/upload_detail.html
 #: src/postulo/templates/jobs/contact_vcards.html
 #: src/postulo/templates/resume/candidate_file.html
 #: src/postulo/templates/resume/europass_import.html
@@ -19798,7 +20235,9 @@ msgstr "Léimeann an liosta ar chlé chuig roinn agus taispeánann sé cé mhéa
 msgid "The list opens over the dialog. Escape closes the list and leaves the dialog open."
 msgstr "Osclaítear an liosta os cionn na dialóige. Dúnann Escape an liosta agus fágann sé an dialóg oscailte."
 
+#: src/postulo/templates/applications/interview_detail.html
 #: src/postulo/templates/applications/partials/timeline.html
+#: src/postulo/templates/documents/themes/base_interview.html
 msgid "The listing"
 msgstr "An fógra poist"
 
@@ -20182,6 +20621,10 @@ msgstr "An ról"
 msgid "The route it went through. The report counts by this, including how many went through the public employment service's own board."
 msgstr "An bealach a ndeachaigh sé tríd. Áiríonn an tuarascáil de réir seo, lena n-áirítear cé mhéad a chuaigh trí shuíomh fógraí poist na seirbhíse fostaíochta poiblí féin."
 
+#: src/postulo/jobs/duplicates.py
+msgid "The same acronym or short name"
+msgstr ""
+
 #: src/postulo/jobs/conflicts.py
 msgid "The same advert"
 msgstr "An fógra poist céanna"
@@ -20371,6 +20814,11 @@ msgstr ""
 msgid "The stored mail credentials cannot be read on this instance."
 msgstr "Ní féidir na dintiúir ríomhphoist stóráilte a léamh ar an tsuiteáil seo."
 
+#: src/postulo/templates/applications/interview_detail.html
+#: src/postulo/templates/documents/themes/base_interview.html
+msgid "The story so far"
+msgstr ""
+
 #: src/postulo/accounts/forms.py
 msgid "The subject every file carries"
 msgstr "An t-ábhar atá i ngach comhad"
@@ -20543,6 +20991,7 @@ msgid "theme"
 msgstr "téama"
 
 #: src/postulo/templates/applications/calendar_print.html
+#: src/postulo/templates/applications/interview_detail.html
 #: src/postulo/templates/applications/report.html
 #: src/postulo/templates/core/table_export.html
 msgid "Theme"
@@ -20641,6 +21090,10 @@ msgstr "Níl aon rud ag fanacht lena iompórtáil."
 #: src/postulo/jobs/pages.py
 msgid "There was nothing to keep."
 msgstr "Ní raibh aon rud le coinneáil."
+
+#: src/postulo/templates/applications/interview_detail.html
+msgid "These are the files as they were sent, not your documents as they are now."
+msgstr ""
 
 #: src/postulo/templates/widgets/insight_counters.html
 #, python-format
@@ -20870,14 +21323,28 @@ msgstr "An easpórtáil seo amháin. Tá do réamhshocrú faoi Shocruithe → Ea
 msgid "This field is required."
 msgstr "Tá an réimse seo riachtanach."
 
+#: src/postulo/templates/cotton/document_viewer.html
+msgid "This file could not be shown here. You can still download it."
+msgstr ""
+
+#: src/postulo/templates/cotton/document_viewer.html
+msgid "This file has no text a screen reader can read."
+msgstr ""
+
 #: src/postulo/applications/ical_reader.py
 msgid "This file is an invitation. Its events are read as any others; no reply is sent."
 msgstr "Is cuireadh é an comhad seo. Léitear a choinní mar aon choinní eile; ní sheoltar aon fhreagra."
 
+#: src/postulo/templates/cotton/document_viewer.html
+msgid "This file is locked with a password, so it cannot be shown here. You can still download it."
+msgstr ""
+
+#: src/postulo/templates/documents/upload_detail.html
 #: src/postulo/templates/documents/upload_list.html
 msgid "This file is missing. Upload it again as a new version that supersedes this one."
 msgstr "Tá an comhad seo ar iarraidh. Uaslódáil arís é mar leagan nua a thagann in ionad an chinn seo."
 
+#: src/postulo/templates/documents/upload_detail.html
 #: src/postulo/templates/documents/upload_list.html
 msgid "This file no longer matches what was uploaded. Upload it again as a new version that supersedes this one."
 msgstr "Ní mheaitseálann an comhad seo a thuilleadh an méid a uaslódáladh. Uaslódáil arís é mar leagan nua a thagann in ionad an chinn seo."
@@ -21057,6 +21524,10 @@ msgstr "Tá sé seo mícheart sa téacs mar a choinnítear é. Go dtí go gceart
 msgid "This is your own account. A link you make for yourself is not a way back in — you had to sign in to make it. If you are the only administrator here, a passkey or a second administrator is what covers you."
 msgstr "Seo do chuntas féin. Ní bealach ar ais isteach é nasc a dhéanann tú duit féin — bhí ort síniú isteach chun é a dhéanamh. Más tusa an t-aon riarthóir anseo, is eochair rochtana nó dara riarthóir a chosnaíonn thú."
 
+#: src/postulo/templates/cotton/document_viewer.html
+msgid "This kind of file cannot be shown here. Download it to open it."
+msgstr ""
+
 #: src/postulo/templates/cotton/listing_skills.html
 msgid "This listing names none of the classification's skills by name."
 msgstr ""
@@ -21234,6 +21705,10 @@ msgstr "Ticeáil rónna chun gníomhú ar roinnt acu ag an am céanna."
 #: src/postulo/applications/forms.py
 msgid "Tick the box to add the listing anyway."
 msgstr "Cuir tic leis an mbosca chun an fógra poist a chur leis ar aon nós."
+
+#: src/postulo/templates/resume/references.html
+msgid "Tick the publications to add. Nothing is changed or overwritten: an entry you already have is marked, and ticking it adds another."
+msgstr ""
 
 #: src/postulo/templates/resume/publication_orcid.html
 #, python-format
@@ -21528,9 +22003,23 @@ msgctxt "type of event"
 msgid "type"
 msgstr "cineál"
 
+#: src/postulo/resume/views_references.py
+msgid "Type at least one DOI first."
+msgstr ""
+
 #: src/postulo/templates/core/search.html
 msgid "Type at least two characters."
 msgstr "Clóscríobh dhá charachtar ar a laghad."
+
+#: src/postulo/resume/views_references.py
+#, python-format
+msgid "Type at most %(count)d DOI at a time; nothing was asked."
+msgid_plural "Type at most %(count)d DOIs at a time; nothing was asked."
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+msgstr[4] ""
 
 #: src/postulo/accounts/forms.py
 msgid "Type it here, or choose one from the list."
@@ -21567,6 +22056,10 @@ msgstr "cineál foinse"
 #: src/postulo/jobs/models.py
 msgid "type of thing it points at"
 msgstr "cineál an ruda a dhíríonn sé air"
+
+#: src/postulo/jobs/views.py
+msgid "Type the acronym or short name."
+msgstr ""
 
 #: src/postulo/resume/lookups.py src/postulo/resume/views.py
 msgid "Type the DOI first."
@@ -21917,6 +22410,7 @@ msgid "Verified"
 msgstr "Fíoraithe"
 
 #: src/postulo/documents/models.py
+#: src/postulo/templates/documents/upload_detail.html
 #: src/postulo/templates/documents/upload_list.html
 msgid "version"
 msgstr "leagan"
@@ -22087,6 +22581,7 @@ msgstr "Íomhá WebP"
 
 #: src/postulo/core/models.py src/postulo/core/web_links.py
 #: src/postulo/documents/printing.py src/postulo/jobs/tables.py
+#: src/postulo/templates/applications/interview_detail.html
 #: src/postulo/templates/jobs/company_detail.html
 msgid "Website"
 msgstr "Suíomh gréasáin"
@@ -22201,6 +22696,10 @@ msgstr "Cén chuma atá ar luach, óna chéad charachtar go dtí an ceann deirea
 msgid "What almost everything in Postulo sits in."
 msgstr "An rud ina bhfuil beagnach gach rud i Postulo."
 
+#: src/postulo/templates/resume/answer_list.html
+msgid "What application forms keep asking, written once. An application keeps its own copy of the answer it uses."
+msgstr ""
+
 #: src/postulo/templates/jobs/posting_detail.html
 msgid "What arrived about this listing, and what you noted. Once you apply, it heads the application's timeline."
 msgstr "An méid a tháinig faoin bhfógra poist seo, agus na nótaí a bhreac tú. Nuair a dhéanann tú iarratas, bíonn sé ar bharr amlíne an iarratais."
@@ -22271,6 +22770,10 @@ msgstr ""
 #: src/postulo/templates/cotton/review_sections.html
 msgid "What happens"
 msgstr "Cad a tharlaíonn"
+
+#: src/postulo/templates/applications/application_detail.html
+msgid "What I answered"
+msgstr ""
 
 #: src/postulo/templates/connections/form.html
 msgid "What is being asked for"
@@ -22625,9 +23128,18 @@ msgstr "cad a chuir tú i láthair"
 msgid "What you presented, if you presented something."
 msgstr "Cad a chuir tú i láthair, má chuir tú rud éigin i láthair."
 
+#: src/postulo/templates/applications/interview_detail.html
+#: src/postulo/templates/documents/themes/base_interview.html
+msgid "What you sent"
+msgstr ""
+
 #: src/postulo/accounts/forms.py
 msgid "What you sign in with. Lowercase letters, digits, dots, underscores, hyphens."
 msgstr "An rud a shíníonn tú isteach leis. Litreacha beaga, digití, poncanna, fostríoca, fleiscíní."
+
+#: src/postulo/templates/applications/answer_form.html
+msgid "What you told them. It is kept as it is, even if you later change the saved answer."
+msgstr ""
 
 #: src/postulo/templates/resume/translations.html
 msgid "What you type here is what a CV in that language prints instead."
@@ -22693,6 +23205,10 @@ msgstr "Cathain"
 msgid "When accepting should also move the application."
 msgstr "Nuair ba cheart don ghlacadh an t-iarratas a bhogadh freisin."
 
+#: src/postulo/templates/documents/themes/base_interview.html
+msgid "When and where"
+msgstr ""
+
 #: src/postulo/jobs/models.py
 msgid "When it entered your listings."
 msgstr "Cathain a tháinig sé isteach i do chuid fógraí poist."
@@ -22721,6 +23237,7 @@ msgstr "Nuair a chláraíonn tú an tsuiteáil seo leis an soláthraí, tabhair 
 msgid "where"
 msgstr "cá háit"
 
+#: src/postulo/templates/applications/interview_detail.html
 #: src/postulo/templates/applications/subscribed_event.html
 msgid "Where"
 msgstr ""
@@ -22911,6 +23428,10 @@ msgstr "Cén colún atá i gceist?"
 msgid "Which device or tool this is for."
 msgstr "Cén gléas nó cén uirlis atá i gceist."
 
+#: src/postulo/applications/models.py
+msgid "Which language the answer is written in. Leave blank if it does not matter."
+msgstr ""
+
 #: src/postulo/documents/models.py
 msgid "Which language this file is in. Postulo cannot read it, so nothing is assumed; a store files it by this."
 msgstr "Cén teanga ina bhfuil an comhad seo. Ní féidir le Postulo é a léamh, mar sin ní ghlactar le rud ar bith; comhdaíonn stór de réir seo é."
@@ -23009,6 +23530,11 @@ msgstr "Cé a scríobh é, cathain, agus an bhfuil sé fós feiliúnach le seola
 #: src/postulo/applications/models.py
 msgid "who you are meeting"
 msgstr "cé leis a bhfuil tú ag bualadh"
+
+#: src/postulo/templates/applications/interview_detail.html
+#: src/postulo/templates/documents/themes/base_interview.html
+msgid "Who you are meeting"
+msgstr ""
 
 #: src/postulo/applications/forms.py
 msgid "Who you are meeting. The people you have recorded at this company are offered, and anybody already on this interview who has since moved on."
@@ -23484,6 +24010,7 @@ msgid "You already have that industry."
 msgstr "Tá an tionscal sin agat cheana."
 
 #: src/postulo/templates/resume/publication_orcid.html
+#: src/postulo/templates/resume/references.html
 msgid "You already have this one."
 msgstr "Tá an ceann seo agat cheana féin."
 
@@ -23649,6 +24176,11 @@ msgstr "Bhain tú gach rud de. Cuir rud éigin ar ais nuair is mian leat."
 msgid "You leave your groups; what they own stays theirs."
 msgstr "Fágann tú do ghrúpaí; fanann a bhfuil ar úinéireacht acu leo."
 
+#: src/postulo/applications/forms.py
+#, python-format
+msgid "You may name the company and the rest when you use it on an application: %(names)s."
+msgstr ""
+
 #: src/postulo/documents/models.py
 msgid "You send it"
 msgstr "Seolann tú féin é"
@@ -23660,6 +24192,16 @@ msgstr "Iarrfar an ceann reatha ort ar dtús."
 #: src/postulo/templates/account/recovery_set_password.html
 msgid "You will still sign in afterwards, and still give your second factor if you have one. This link changes the password and nothing else."
 msgstr "Beidh ort síniú isteach ina dhiaidh sin fós, agus do dhara fachtóir a thabhairt má tá ceann agat. Athraíonn an nasc seo an pasfhocal agus faic eile."
+
+#: src/postulo/templates/resume/references.html
+#, python-format
+msgid "Your %(total)s publication, in the format your reference manager reads."
+msgid_plural "Your %(total)s publications, in the format your reference manager reads."
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+msgstr[4] ""
 
 #: src/postulo/accounts/views.py
 msgid "Your account and everything in it have been deleted."
@@ -23901,6 +24443,10 @@ msgid "Your own site, if you have one."
 msgstr "Do shuíomh féin, má tá ceann agat."
 
 #: src/postulo/applications/forms.py
+msgid "Your own words for grouping answers: pay, availability, motivation."
+msgstr ""
+
+#: src/postulo/applications/forms.py
 msgid "Your own words for grouping applications. New ones go in the box below."
 msgstr "Do chuid focal féin chun iarratais a ghrúpáil. Téann cinn nua sa bhosca thíos."
 
@@ -23921,6 +24467,11 @@ msgstr "Fágtar do phictiúr ar lár. Ní féidir le comhad JSON ceann a iompar,
 msgid "Your picture is shown at the top of every page, where it is the button that opens your menu, and to the administrators of this instance in their list of people. No CV and no letter prints it. Until you give Postulo a picture, it shows your initials."
 msgstr "Taispeántar do phictiúr ag barr gach leathanaigh, áit ar cnaipe é a osclaíonn do roghchlár, agus do riarthóirí na suiteála seo ina liosta daoine. Ní phriontálann aon CV ná aon litir é. Go dtí go dtugann tú pictiúr do Postulo, taispeánann sé do thúslitreacha."
 
+#: src/postulo/templates/applications/interview_detail.html
+#: src/postulo/templates/documents/themes/base_interview.html
+msgid "Your preparation notes"
+msgstr ""
+
 #: src/postulo/documents/printing.py
 msgid "Your primary code repository"
 msgstr "Do phríomhstór cóid"
@@ -23936,6 +24487,10 @@ msgstr "Do phríomhphróifíl shóisialta"
 #: src/postulo/documents/printing.py
 msgid "Your primary website"
 msgstr "Do phríomhshuíomh gréasáin"
+
+#: src/postulo/templates/resume/references.html
+msgid "Your publications as a file that Zotero, Mendeley, JabRef, EndNote and LaTeX read, and a file of theirs read in."
+msgstr ""
 
 #: src/postulo/core/transfers.py
 msgid "Your record (JSON)"
@@ -24031,11 +24586,17 @@ msgstr "Leatsa iad. Ní théann siad áit ar bith leis an gcomhad."
 msgid "Yours: only you can share it, give it to a group or delete it."
 msgstr "Leatsa: is tusa amháin is féidir é a roinnt, a thabhairt do ghrúpa nó a scriosadh."
 
+#: src/postulo/templates/cotton/document_viewer.html
+msgid "Zoom"
+msgstr ""
+
+#: src/postulo/templates/cotton/document_viewer.html
 #: src/postulo/templates/jobs/address_place.html
 #: src/postulo/templates/jobs/company_map.html
 msgid "Zoom in"
 msgstr "Zúmáil isteach"
 
+#: src/postulo/templates/cotton/document_viewer.html
 #: src/postulo/templates/jobs/address_place.html
 #: src/postulo/templates/jobs/company_map.html
 msgid "Zoom out"

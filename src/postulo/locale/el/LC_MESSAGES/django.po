@@ -283,6 +283,13 @@ msgid_plural "%(count)d postings"
 msgstr[0] "%(count)d αγγελία"
 msgstr[1] "%(count)d αγγελίες"
 
+#: src/postulo/resume/views_references.py
+#, python-format
+msgid "%(count)d publication found. Nothing is added until you tick it."
+msgid_plural "%(count)d publications found. Nothing is added until you tick them."
+msgstr[0] ""
+msgstr[1] ""
+
 #: src/postulo/core/gdpr.py
 #, python-format
 msgid "%(count)d reference letter kept, without its referee."
@@ -562,6 +569,11 @@ msgstr[1] "%(days)s ημέρες από τις %(day)s"
 msgid "%(department)s is at %(company)s, which is not part of the same employer as this posting."
 msgstr "Το τμήμα %(department)s ανήκει στην εταιρεία %(company)s, η οποία δεν ανήκει στον ίδιο εργοδότη με αυτή την αγγελία."
 
+#: src/postulo/resume/views_references.py
+#, python-format
+msgid "%(doi)s: %(reason)s"
+msgstr ""
+
 #: src/postulo/templates/widgets/endings.html
 #, fuzzy, python-format
 msgid "%(explained)s of %(counter)s ending has a reason recorded. One can be added afterwards, from the application's own page."
@@ -794,6 +806,11 @@ msgstr "%(kind)s στις %(when)s: ακυρώθηκε"
 #, fuzzy, python-format
 msgid "%(kind)s scheduled for %(when)s"
 msgstr "%(kind)s: προγραμματίστηκε για %(when)s"
+
+#: src/postulo/applications/interview_brief.py
+#, python-format
+msgid "%(kind)s · %(role)s at %(company)s"
+msgstr ""
 
 #: src/postulo/applications/ical.py
 #, python-format
@@ -1527,6 +1544,13 @@ msgid_plural "%(total)s entries"
 msgstr[0] "%(total)s καταχώριση"
 msgstr[1] "%(total)s καταχωρίσεις"
 
+#: src/postulo/templates/resume/references.html
+#, python-format
+msgid "%(total)s entry could not be read, or had no title, and is not listed."
+msgid_plural "%(total)s entries could not be read, or had no title, and are not listed."
+msgstr[0] ""
+msgstr[1] ""
+
 #: src/postulo/templates/applications/calendar_print.html
 #, python-format
 msgid "%(total)s entry."
@@ -1717,6 +1741,10 @@ msgstr "<code dir=\"ltr\">iso7064-mod11-2</code>, με το οποίο τελε�
 msgid "<code dir=\"ltr\">true</code> to put what was typed into capitals, or into small letters, before it is checked."
 msgstr "<code dir=\"ltr\">true</code> για να μετατραπεί ό,τι πληκτρολογήθηκε σε κεφαλαία ή σε πεζά γράμματα πριν ελεγχθεί."
 
+#: src/postulo/templates/help/career.html
+msgid "<em>Answers</em> keeps what application forms keep asking, such as why this company, your notice period or your salary expectation. On an application, <em>What I answered</em> keeps its own copy of what you told that employer, so changing a saved answer later never changes what was sent. Answers are never printed on a CV and never shared."
+msgstr ""
+
 #: src/postulo/templates/help/documents.html
 #, fuzzy
 msgid "<em>CVs and portfolios</em> are variants of your career record: each one chooses which entries to show, in which order, and how they are set. Correct an entry in <em>Your career</em> and every variant changes with it. <em>Letters</em> are the cover and motivation letters, with their own text."
@@ -1819,6 +1847,10 @@ msgstr ""
 #, python-format
 msgid "A %(kind)s entry names the file: send %(field)s."
 msgstr "Μια καταχώριση τύπου %(kind)s ονομάζει το αρχείο: στείλτε %(field)s."
+
+#: src/postulo/templates/resume/references.html
+msgid "A .bib, .ris or .json file"
+msgstr ""
 
 #: src/postulo/templates/jobs/company_places.html
 msgid "A .geojson file"
@@ -2931,6 +2963,14 @@ msgstr "Εξαγοράστηκε ή συγχωνεύτηκε"
 msgid "acquired_by must be a company you can see."
 msgstr "Το acquired_by πρέπει να είναι εταιρεία στην οποία έχετε πρόσβαση."
 
+#: src/postulo/jobs/models.py src/postulo/templates/jobs/company_form.html
+msgid "Acronym or short name"
+msgstr ""
+
+#: src/postulo/templates/jobs/company_form.html
+msgid "Acronyms and short names"
+msgstr ""
+
 #: src/postulo/templates/jobs/company_detail.html
 #, python-format
 msgid "Across the %(name)s group"
@@ -3034,6 +3074,10 @@ msgstr "Προσθήκη ετικέτας"
 msgid "Add all of this"
 msgstr "Προσθήκη όλων"
 
+#: src/postulo/templates/applications/application_detail.html
+msgid "Add an answer"
+msgstr ""
+
 #: src/postulo/templates/jobs/company_form.html
 msgid "Add an entry"
 msgstr "Προσθήκη καταχώρισης"
@@ -3041,6 +3085,10 @@ msgstr "Προσθήκη καταχώρισης"
 #: src/postulo/templates/resume/item_form.html
 msgid "Add an industry"
 msgstr "Προσθήκη κλάδου"
+
+#: src/postulo/templates/resume/references.html
+msgid "Add by DOI"
+msgstr ""
 
 #: src/postulo/templates/documents/cv_detail.html
 msgid "Add entries"
@@ -3094,6 +3142,10 @@ msgstr "Προσθήκη του αριθμού μητρώου <bdi>%(number)s</b
 
 #: src/postulo/templates/documents/message_list.html
 msgid "Add the starter messages"
+msgstr ""
+
+#: src/postulo/templates/resume/references.html
+msgid "Add the ticked publications"
 msgstr ""
 
 #: src/postulo/templates/resume/publication_orcid.html
@@ -3156,6 +3208,13 @@ msgid "Added %(count)d publication from your ORCID record, with no authors: ORCI
 msgid_plural "Added %(count)d publications from your ORCID record, with no authors: ORCID's list has none. Open each and press Look up beside its DOI for the rest."
 msgstr[0] "Προστέθηκε %(count)d δημοσίευση από την εγγραφή σας στο ORCID, χωρίς συγγραφείς: η λίστα του ORCID δεν περιέχει. Ανοίξτε την και πατήστε «Αναζήτηση» δίπλα στο DOI της για τα υπόλοιπα."
 msgstr[1] "Προστέθηκαν %(count)d δημοσιεύσεις από την εγγραφή σας στο ORCID, χωρίς συγγραφείς: η λίστα του ORCID δεν περιέχει. Ανοίξτε την καθεμία και πατήστε «Αναζήτηση» δίπλα στο DOI της για τα υπόλοιπα."
+
+#: src/postulo/resume/views_references.py
+#, python-format
+msgid "Added %(count)d publication to Your career. Nothing was overwritten."
+msgid_plural "Added %(count)d publications to Your career. Nothing was overwritten."
+msgstr[0] ""
+msgstr[1] ""
 
 #: src/postulo/documents/views.py
 #, python-format
@@ -3356,6 +3415,11 @@ msgstr "Ολοήμερο"
 msgid "All documents"
 msgstr "Όλα τα έγγραφα"
 
+#: src/postulo/templates/documents/upload_detail.html
+msgid "All files"
+msgstr ""
+
+#: src/postulo/templates/applications/interview_detail.html
 #: src/postulo/templates/widgets/upcoming_interviews.html
 msgid "All interviews"
 msgstr "Όλες οι συνεντεύξεις"
@@ -3363,6 +3427,10 @@ msgstr "Όλες οι συνεντεύξεις"
 #: src/postulo/templates/widgets/listings.html
 msgid "All listings"
 msgstr "Όλες οι αγγελίες"
+
+#: src/postulo/templates/applications/interview_detail.html
+msgid "All of the above as a PDF to read on the way there. Downloaded, and not kept in Postulo."
+msgstr ""
 
 #: src/postulo/templates/server/defaults.html
 msgid "All of them are offered, and a language added in a later release will be too."
@@ -3423,6 +3491,10 @@ msgstr "Γίνεται και αυτόματα όταν αλλάζει η κύρ
 #, fuzzy, python-format
 msgid "Also in %(names)s"
 msgstr "Επίσης στα %(names)s"
+
+#: src/postulo/accounts/models.py
+msgid "Always"
+msgstr ""
 
 #: src/postulo/plugins/policy.py
 #, fuzzy
@@ -3670,7 +3742,7 @@ msgstr "Ένα άλλο αίτημα χρησιμοποιεί αυτό το Idem
 msgid "Another row is on the same service. Both stay as they are; remove one, or move it to Other, when you like."
 msgstr "Μια άλλη γραμμή είναι στην ίδια υπηρεσία. Και οι δύο μένουν ως έχουν· αφαιρέστε τη μία ή μεταφέρετέ τη στο «Άλλο», όποτε θέλετε."
 
-#: src/postulo/api/models.py
+#: src/postulo/api/models.py src/postulo/applications/models.py
 msgid "answer"
 msgstr "απάντηση"
 
@@ -3697,6 +3769,18 @@ msgstr "απάντηση έως %(day)s"
 msgid "Answer by: %(company)s"
 msgstr "Απάντηση έως: %(company)s"
 
+#: src/postulo/applications/models.py
+msgid "answer given"
+msgstr ""
+
+#: src/postulo/applications/views_answers.py
+msgid "Answer kept."
+msgstr ""
+
+#: src/postulo/applications/views_answers.py
+msgid "Answer updated."
+msgstr ""
+
 #: src/postulo/resume/models.py
 #, fuzzy
 msgid "Answered"
@@ -3707,9 +3791,18 @@ msgstr "Απάντησε"
 msgid "Answered %(code)s."
 msgstr "Απάντησε %(code)s."
 
+#: src/postulo/templates/resume/answer_list.html
+#: src/postulo/templates/resume/overview.html
+msgid "Answers"
+msgstr ""
+
 #: src/postulo/applications/agenda.py
 msgid "Answers due"
 msgstr "Απαντήσεις που εκκρεμούν"
+
+#: src/postulo/applications/models.py
+msgid "answers given"
+msgstr ""
 
 #: src/postulo/accounts/forms.py
 msgid "Antarctica"
@@ -3717,6 +3810,7 @@ msgstr "Ανταρκτική"
 
 #: src/postulo/templates/applications/partials/board_filters.html
 #: src/postulo/templates/cotton/table/filter.html
+#: src/postulo/templates/resume/answer_list.html
 #, fuzzy
 msgid "Any"
 msgstr "Οποιοδήποτε"
@@ -3882,6 +3976,10 @@ msgstr "Αιτήσεις που στάλθηκαν, πόσες πήραν απά
 #, fuzzy
 msgid "Applications that reached one"
 msgstr "Αιτήσεις που έφτασαν ως εκεί"
+
+#: src/postulo/templates/resume/answer_form.html
+msgid "Applications that used it keep their own copy, so changing it here changes none of them."
+msgstr ""
 
 #: src/postulo/jobs/merging.py
 #, fuzzy
@@ -4056,6 +4154,7 @@ msgid "As a CV should print it. It is linked to the company of that name among y
 msgstr "Όπως πρέπει να το τυπώνει ένα βιογραφικό. Συνδέεται με την ομώνυμη εταιρεία από τις δικές σας και προστίθεται στις εταιρείες σας αν δεν υπάρχει."
 
 #: src/postulo/templates/applications/calendar_print.html
+#: src/postulo/templates/applications/interview_detail.html
 #: src/postulo/templates/core/table_export.html
 msgid "As a document"
 msgstr "Ως έγγραφο"
@@ -4076,6 +4175,10 @@ msgstr "Όπως βρέθηκε στις %(when)s."
 #: src/postulo/resume/forms.py
 msgid "As it was published."
 msgstr "Όπως δημοσιεύτηκε."
+
+#: src/postulo/templates/documents/rendered_detail.html
+msgid "As it was sent"
+msgstr ""
 
 #: src/postulo/applications/forms.py
 msgid "As it was written: a percentage, a number of options, the vesting."
@@ -4102,9 +4205,23 @@ msgstr "Ημερομηνία"
 msgid "as of %(date)s"
 msgstr "στις %(date)s"
 
+#: src/postulo/templates/applications/interview_detail.html
+#: src/postulo/templates/documents/themes/base_interview.html
+#, python-format
+msgid "as of %(day)s"
+msgstr ""
+
 #: src/postulo/templates/documents/cv_text.html
 msgid "As plain text"
 msgstr "Ως απλό κείμενο"
+
+#: src/postulo/applications/forms.py
+msgid "As the employer's form put it."
+msgstr ""
+
+#: src/postulo/applications/forms.py
+msgid "As the form puts it, or near enough to find it again."
+msgstr ""
 
 #: src/postulo/resume/forms.py
 msgid "As the institution words it. Kept in your record; a CV does not print it yet."
@@ -4142,6 +4259,10 @@ msgstr "Όπως έχουν τα πράγματα, δεν εκτυπώνεται
 #: src/postulo/documents/forms.py
 msgid "As things stand: {value}."
 msgstr "Όπως έχουν τα πράγματα: {value}."
+
+#: src/postulo/applications/forms.py
+msgid "As you sent it. Editing it here leaves the saved answer as it is."
+msgstr ""
 
 #: src/postulo/accounts/forms.py src/postulo/templates/server/design.html
 msgid "Asia"
@@ -4258,6 +4379,14 @@ msgstr "συγγραφέας εξαγόμενων αρχείων"
 #: src/postulo/resume/models.py
 msgid "authors"
 msgstr "συγγραφείς"
+
+#: src/postulo/accounts/models.py
+msgid "Automatically"
+msgstr ""
+
+#: src/postulo/accounts/forms.py
+msgid "Automatically shows a place as the city alone while all your companies are in one country, and as the city and country as soon as there are two. Documents, exports and the API keep the country whatever you choose here."
+msgstr ""
 
 #: src/postulo/jobs/industries.py
 msgid "Automotive"
@@ -4409,7 +4538,7 @@ msgstr "Πίσω στις συνηθισμένες στήλες."
 msgid "Back to the usual order"
 msgstr "Πίσω στη συνηθισμένη σειρά"
 
-#: src/postulo/core/help.py
+#: src/postulo/core/help.py src/postulo/templates/resume/references.html
 #, fuzzy
 msgid "Back to Your career"
 msgstr "Επιστροφή στη σταδιοδρομία σας"
@@ -4500,6 +4629,23 @@ msgstr "Δίπλα στο ίδρυμα, για κάθε τίτλο σπουδώ�
 
 #: src/postulo/jobs/industries.py
 msgid "Beverages"
+msgstr ""
+
+#: src/postulo/templates/resume/references.html
+msgid "Bibliography"
+msgstr ""
+
+#: src/postulo/core/transfers.py
+msgid "Bibliography (BibTeX, RIS, CSL JSON)"
+msgstr ""
+
+#: src/postulo/templates/resume/references.html
+msgid "BibTeX has no place for datasets, software or web pages, so they are written as Other; BibLaTeX keeps them. Only what a publication holds is in the file."
+msgstr ""
+
+#: src/postulo/templates/resume/references.html
+#, python-format
+msgid "BibTeX, BibLaTeX, RIS and CSL JSON are read, up to %(limit)s MB and %(most)s entries. The file is read here and not kept; nothing is added until you tick it."
 msgstr ""
 
 #: src/postulo/jobs/industries.py
@@ -4690,6 +4836,7 @@ msgstr "C2 — άριστη γνώση"
 msgid "Calendar"
 msgstr "Ημερολόγιο"
 
+#: src/postulo/templates/applications/interview_detail.html
 #: src/postulo/templates/applications/interview_list.html
 msgid "Calendar file"
 msgstr "Αρχείο ημερολογίου"
@@ -4733,6 +4880,7 @@ msgstr "Μπορεί να αντιστοιχιστεί με"
 
 #: src/postulo/templates/accounts/invite_form.html
 #: src/postulo/templates/accounts/profile.html
+#: src/postulo/templates/applications/answer_form.html
 #: src/postulo/templates/applications/application_form.html
 #: src/postulo/templates/applications/application_intake.html
 #: src/postulo/templates/applications/appointment_form.html
@@ -4767,6 +4915,7 @@ msgstr "Μπορεί να αντιστοιχιστεί με"
 #: src/postulo/templates/jobs/share.html
 #: src/postulo/templates/partials/confirm_delete.html
 #: src/postulo/templates/partials/table/cell.html
+#: src/postulo/templates/resume/answer_form.html
 #: src/postulo/templates/resume/item_form.html
 #: src/postulo/templates/resume/publication_orcid.html
 #: src/postulo/templates/server/backup_delete.html
@@ -5049,6 +5198,10 @@ msgstr "Οι αλλαγές που γίνονται εδώ στέλνονται 
 msgid "changes to records"
 msgstr "αλλαγές σε εγγραφές"
 
+#: src/postulo/templates/applications/answer_form.html
+msgid "Changing it here leaves the saved answer it began as untouched."
+msgstr ""
+
 #: src/postulo/resume/models.py
 msgid "chapter"
 msgstr "κεφάλαιο"
@@ -5160,7 +5313,7 @@ msgstr "Επιλέξτε πρώτα ένα αρχείο Europass."
 
 #: src/postulo/applications/views_ical.py src/postulo/core/views_kind_files.py
 #: src/postulo/jobs/vcard_views.py src/postulo/jobs/views.py
-#: src/postulo/resume/views_candidate.py
+#: src/postulo/resume/views_candidate.py src/postulo/resume/views_references.py
 msgid "Choose a file first."
 msgstr "Επιλέξτε πρώτα ένα αρχείο."
 
@@ -5236,6 +5389,10 @@ msgstr "Επιλέξτε ημερομηνίες από ένα ημερολόγι
 #: src/postulo/core/personal.py
 msgid "Choose one of the answers in the list."
 msgstr "Επιλέξτε μία από τις απαντήσεις στη λίστα."
+
+#: src/postulo/jobs/views.py
+msgid "Choose one of the company's names."
+msgstr ""
 
 #: src/postulo/templates/base.html
 msgid "Choose one of the options."
@@ -6366,6 +6523,7 @@ msgstr "Άμυνα"
 #: src/postulo/templates/jobs/industry_list.html
 #: src/postulo/templates/jobs/posting_detail.html
 #: src/postulo/templates/partials/confirm_delete.html
+#: src/postulo/templates/resume/answer_list.html
 #: src/postulo/templates/server/backups.html
 #: src/postulo/templates/server/groups.html
 msgid "Delete"
@@ -6667,9 +6825,17 @@ msgstr "Δεν επαληθεύεται"
 msgid "DOI"
 msgstr "DOI"
 
+#: src/postulo/resume/views_references.py
+msgid "DOI lookup"
+msgstr ""
+
 #: src/postulo/resume/lookups.py
 msgid "doi.org's answer was not a record Postulo can read."
 msgstr "Η απάντηση του doi.org δεν ήταν εγγραφή που μπορεί να διαβάσει το Postulo."
+
+#: src/postulo/templates/resume/references.html
+msgid "DOIs, one per line"
+msgstr ""
 
 #: src/postulo/jobs/industries.py
 msgid "Domestic staff"
@@ -6694,6 +6860,7 @@ msgstr "ολοκληρώθηκε στις"
 msgid "Done reminder:"
 msgstr "Ολοκληρωμένη υπενθύμιση:"
 
+#: src/postulo/templates/cotton/document_viewer.html
 #: src/postulo/templates/cotton/sent_versions.html
 #: src/postulo/templates/documents/application_documents.html
 #: src/postulo/templates/documents/rendered_compare.html
@@ -6710,6 +6877,11 @@ msgstr "Λήψη"
 #, python-format
 msgid "Download .%(extension)s"
 msgstr "Λήψη .%(extension)s"
+
+#: src/postulo/templates/resume/references.html
+#, python-format
+msgid "Download as %(name)s"
+msgstr ""
 
 #: src/postulo/templates/jobs/contact_detail.html
 #: src/postulo/templates/jobs/contact_form.html
@@ -6743,6 +6915,7 @@ msgid "Download it as text"
 msgstr "Λήψη ως κείμενο"
 
 #: src/postulo/templates/applications/calendar_print.html
+#: src/postulo/templates/applications/interview_detail.html
 #: src/postulo/templates/core/table_export.html
 msgid "Download PDF"
 msgstr "Λήψη PDF"
@@ -6906,21 +7079,29 @@ msgstr "Κάθε στάδιο μετρά τις αιτήσεις που έφτα
 msgid "Each with an icon"
 msgstr "Το καθένα με εικονίδιο"
 
+#: src/postulo/templates/applications/interview_detail.html
+#: src/postulo/templates/documents/themes/base_interview.html
+msgid "Earlier interviews for this application"
+msgstr ""
+
 #: src/postulo/plugins/models.py
 msgid "Ed25519, base64. Without it there is no catalogue: an unsigned list of addresses to run code from is not something Postulo will offer."
 msgstr "Ed25519, base64. Χωρίς αυτό δεν υπάρχει κατάλογος: μια ανυπόγραφη λίστα διευθύνσεων από τις οποίες θα εκτελούνταν κώδικας δεν είναι κάτι που θα προσφέρει το Postulo."
 
 #: src/postulo/templates/applications/application_detail.html
+#: src/postulo/templates/applications/interview_detail.html
 #: src/postulo/templates/applications/interview_list.html
 #: src/postulo/templates/applications/subscription_list.html
 #: src/postulo/templates/applications/tag_list.html
 #: src/postulo/templates/connections/list.html
 #: src/postulo/templates/documents/letter_detail.html
+#: src/postulo/templates/documents/upload_detail.html
 #: src/postulo/templates/documents/upload_list.html
 #: src/postulo/templates/jobs/company_detail.html
 #: src/postulo/templates/jobs/company_form.html
 #: src/postulo/templates/jobs/contact_detail.html
 #: src/postulo/templates/jobs/posting_detail.html
+#: src/postulo/templates/resume/answer_list.html
 #: src/postulo/templates/resume/preview.html
 #: src/postulo/templates/resume/translations.html
 msgid "Edit"
@@ -6929,6 +7110,11 @@ msgstr "Επεξεργασία"
 #: src/postulo/templates/resume/overview.html
 #, python-format
 msgid "Edit %(what)s"
+msgstr ""
+
+#: src/postulo/templates/applications/answer_form.html
+#: src/postulo/templates/resume/answer_form.html
+msgid "Edit answer"
 msgstr ""
 
 #: src/postulo/templates/applications/application_form.html
@@ -7476,6 +7662,7 @@ msgstr "Το να εξηγήσει κανείς τι πήγε στραβά συ�
 #: src/postulo/templates/jobs/company_places.html
 #: src/postulo/templates/jobs/contact_detail.html
 #: src/postulo/templates/partials/table/export.html
+#: src/postulo/templates/resume/references.html
 #: src/postulo/templates/settings/export.html
 msgid "Export"
 msgstr "Εξαγωγή"
@@ -7484,6 +7671,10 @@ msgstr "Εξαγωγή"
 #, python-format
 msgid "Export %(list)s"
 msgstr "Εξαγωγή: %(list)s"
+
+#: src/postulo/templates/resume/references.html
+msgid "Export all of them instead"
+msgstr ""
 
 #: src/postulo/core/models.py
 msgid "export archive"
@@ -7496,6 +7687,10 @@ msgstr "αρχεία εξαγωγής"
 #: src/postulo/templates/cotton/transfer_group.html
 msgid "Export as"
 msgstr "Εξαγωγή ως"
+
+#: src/postulo/templates/resume/overview.html
+msgid "Export as a reference"
+msgstr ""
 
 #: src/postulo/templates/core/export.html
 #: src/postulo/templates/core/kind_file.html
@@ -7524,6 +7719,7 @@ msgstr "Εξαγωγή PDF"
 
 #: src/postulo/templates/cotton/sent_versions.html
 #: src/postulo/templates/documents/rendered_compare.html
+#: src/postulo/templates/documents/rendered_detail.html
 #: src/postulo/templates/documents/rendered_list.html
 #, fuzzy
 msgid "Exported on its own"
@@ -7767,6 +7963,10 @@ msgstr "Χρηματοοικονομικά"
 msgid "Financial support"
 msgstr ""
 
+#: src/postulo/templates/resume/answer_list.html
+msgid "Find"
+msgstr ""
+
 #: src/postulo/templates/settings/locale.html
 msgid "Find a language"
 msgstr "Εύρεση γλώσσας"
@@ -7835,6 +8035,14 @@ msgstr "Πρώτα, πάρτε τα πάντα μαζί σας"
 
 #: src/postulo/jobs/industries.py
 msgid "Fishing"
+msgstr ""
+
+#: src/postulo/templates/cotton/document_viewer.html
+msgid "Fit page"
+msgstr ""
+
+#: src/postulo/templates/cotton/document_viewer.html
+msgid "Fit width"
 msgstr ""
 
 #: src/postulo/core/models.py
@@ -7988,6 +8196,7 @@ msgid "Forget the token"
 msgstr "Διαγραφή του διακριτικού"
 
 #: src/postulo/templates/jobs/company_places.html
+#: src/postulo/templates/resume/references.html
 #, fuzzy
 msgid "Forget this file"
 msgstr "Απόρριψη αυτού του αρχείου"
@@ -8238,6 +8447,7 @@ msgid "Gender: %(gender)s"
 msgstr "Φύλο: %(gender)s"
 
 #: src/postulo/templates/applications/application_detail.html
+#: src/postulo/templates/applications/interview_detail.html
 #, fuzzy
 msgid "Get"
 msgstr "Λήψη"
@@ -8593,6 +8803,8 @@ msgid "Highlights of education"
 msgstr ""
 
 #: src/postulo/jobs/models.py src/postulo/jobs/tables.py
+#: src/postulo/templates/applications/interview_detail.html
+#: src/postulo/templates/documents/themes/base_interview.html
 #: src/postulo/templates/jobs/company_form.html
 #: src/postulo/templates/jobs/partials/company_signals.html
 msgid "Hiring"
@@ -8978,6 +9190,7 @@ msgstr "Αγνόηση αυτής της στήλης"
 #: src/postulo/templates/core/import_csv_map.html
 #: src/postulo/templates/cotton/transfer_group.html
 #: src/postulo/templates/jobs/company_places.html
+#: src/postulo/templates/resume/references.html
 msgid "Import"
 msgstr "Εισαγωγή"
 
@@ -9216,7 +9429,10 @@ msgid "Indian Ocean"
 msgstr "Ινδικός Ωκεανός"
 
 #: src/postulo/jobs/forms.py src/postulo/jobs/merging.py
-#: src/postulo/jobs/tables.py src/postulo/templates/jobs/company_list.html
+#: src/postulo/jobs/tables.py
+#: src/postulo/templates/applications/interview_detail.html
+#: src/postulo/templates/documents/themes/base_interview.html
+#: src/postulo/templates/jobs/company_list.html
 #: src/postulo/templates/jobs/industry_list.html
 msgid "Industries"
 msgstr "Κλάδοι"
@@ -9311,8 +9527,8 @@ msgstr ""
 msgid "Internship"
 msgstr "Πρακτική άσκηση"
 
-#: src/postulo/applications/models.py src/postulo/jobs/contact_views.py
-#: src/postulo/plugins/pairing.py
+#: src/postulo/applications/models.py src/postulo/documents/themes.py
+#: src/postulo/jobs/contact_views.py src/postulo/plugins/pairing.py
 msgid "Interview"
 msgstr "Συνέντευξη"
 
@@ -9784,6 +10000,7 @@ msgid "Jobs"
 msgstr "Θέσεις εργασίας"
 
 #: src/postulo/templates/applications/application_detail.html
+#: src/postulo/templates/applications/interview_detail.html
 #: src/postulo/templates/applications/interview_list.html
 msgid "Join the call"
 msgstr "Συμμετοχή στην κλήση"
@@ -9815,6 +10032,10 @@ msgstr "διατήρηση απόδοσης μιας καταγεγραμμέν�
 #: src/postulo/accounts/forms.py
 msgid "Keep a rendering of the pages I capture"
 msgstr "Διατήρηση απόδοσης των σελίδων που καταγράφω"
+
+#: src/postulo/templates/applications/answer_form.html
+msgid "Keep an answer"
+msgstr ""
 
 #: src/postulo/templates/jobs/conflicts.html
 msgid "Keep both"
@@ -9980,6 +10201,10 @@ msgstr "λέξεις-κλειδιά"
 msgid "keywords of exported files"
 msgstr "λέξεις-κλειδιά εξαγόμενων αρχείων"
 
+#: src/postulo/jobs/models.py
+msgid "kind"
+msgstr ""
+
 #: src/postulo/documents/models.py src/postulo/plugins/models.py
 msgid "label"
 msgstr "ετικέτα"
@@ -10006,8 +10231,9 @@ msgstr "οριζόντια"
 msgid "Language"
 msgstr "Γλώσσα"
 
-#: src/postulo/accounts/models.py src/postulo/documents/models.py
-#: src/postulo/jobs/models.py src/postulo/resume/models.py
+#: src/postulo/accounts/models.py src/postulo/applications/models.py
+#: src/postulo/documents/models.py src/postulo/jobs/models.py
+#: src/postulo/resume/models.py
 msgid "language"
 msgstr "γλώσσα"
 
@@ -10033,6 +10259,7 @@ msgid "language of exported files"
 msgstr "γλώσσα εξαγόμενων αρχείων"
 
 #: src/postulo/templates/applications/calendar_print.html
+#: src/postulo/templates/applications/interview_detail.html
 #: src/postulo/templates/core/table_export.html
 msgid "Language of the document"
 msgstr "Γλώσσα του εγγράφου"
@@ -10577,6 +10804,14 @@ msgstr "Αγγελίες προς απόφαση"
 msgid "Listings, applications and their timelines, companies and people, reminders, the text of what you sent, letters, CVs, files and your career record — everything, including what is closed or discarded, because you are looking for something you remember."
 msgstr "Αγγελίες, αιτήσεις και τα χρονολόγιά τους, εταιρείες και άτομα, υπενθυμίσεις, το κείμενο όσων στείλατε, επιστολές, βιογραφικά, αρχεία και το ιστορικό σταδιοδρομίας σας — όλα, μαζί με ό,τι έχει κλείσει ή απορριφθεί, επειδή ψάχνετε κάτι που θυμάστε."
 
+#: src/postulo/templates/jobs/company_form.html
+msgid "Lists show"
+msgstr ""
+
+#: src/postulo/templates/cotton/document_viewer.html
+msgid "Loading the document…"
+msgstr ""
+
 #: src/postulo/accounts/models.py src/postulo/jobs/models.py
 #: src/postulo/resume/models.py
 msgid "location"
@@ -10630,6 +10865,10 @@ msgstr "Γεωγραφικό μήκος"
 #: src/postulo/templates/connections/form.html
 msgid "Look on the server"
 msgstr "Αναζήτηση στον διακομιστή"
+
+#: src/postulo/templates/resume/references.html
+msgid "Look them up"
+msgstr ""
 
 #: src/postulo/templates/resume/item_form.html
 msgid "Look up"
@@ -11314,9 +11553,17 @@ msgstr "όνομα"
 msgid "Name"
 msgstr "Όνομα"
 
+#: src/postulo/jobs/models.py
+msgid "Name in a language"
+msgstr ""
+
 #: src/postulo/resume/forms.py
 msgid "Name of the language"
 msgstr "Όνομα της γλώσσας"
+
+#: src/postulo/jobs/models.py
+msgid "name shown in lists"
+msgstr ""
 
 #: src/postulo/jobs/models.py
 msgid "Name the acquirer only for a company that was acquired."
@@ -11432,6 +11679,11 @@ msgstr "Νέα"
 #: src/postulo/templates/server/defaults.html
 msgid "New accounts"
 msgstr "Νέοι λογαριασμοί"
+
+#: src/postulo/templates/resume/answer_form.html
+#: src/postulo/templates/resume/answer_list.html
+msgid "New answer"
+msgstr ""
 
 #: src/postulo/templates/applications/appointment_form.html
 #: src/postulo/templates/applications/calendar.html
@@ -11553,6 +11805,10 @@ msgstr "Επόμενη συνέντευξη"
 msgid "Next month"
 msgstr "Επόμενος μήνας"
 
+#: src/postulo/templates/cotton/document_viewer.html
+msgid "Next page"
+msgstr ""
+
 #: src/postulo/applications/tables.py
 msgid "Next reminder"
 msgstr "Επόμενη υπενθύμιση"
@@ -11589,6 +11845,14 @@ msgstr "Δεν έχει οριστεί παραλήπτης age, και τίπο
 #: src/postulo/applications/forms.py
 msgid "No agency"
 msgstr "Χωρίς πρακτορείο"
+
+#: src/postulo/templates/resume/answer_list.html
+msgid "No answer matches."
+msgstr ""
+
+#: src/postulo/templates/resume/answer_list.html
+msgid "No answers yet."
+msgstr ""
 
 #: src/postulo/templates/documents/letter_detail.html
 msgid "No application"
@@ -11786,6 +12050,10 @@ msgstr "Καμία μηχανή PDF δεν είναι χρησιμοποιήσι
 msgid "No people recorded at this company yet. Add them from <a href=\"%(company_url)s\" class=\"underline\">the company page</a> to name who you are meeting."
 msgstr "Δεν έχουν καταγραφεί ακόμη άτομα σε αυτή την εταιρεία. Προσθέστε τα από <a href=\"%(company_url)s\" class=\"underline\">τη σελίδα της εταιρείας</a> για να ορίσετε ποιον θα συναντήσετε."
 
+#: src/postulo/templates/applications/interview_detail.html
+msgid "No place recorded."
+msgstr ""
+
 #: src/postulo/templates/jobs/company_map.html
 msgid "No places yet. When a company has an address, its town is listed here and drawn on the map."
 msgstr "Δεν υπάρχουν τοποθεσίες ακόμα. Όταν μια εταιρεία έχει διεύθυνση, η πόλη της εμφανίζεται εδώ και σημειώνεται στον χάρτη."
@@ -11880,6 +12148,11 @@ msgstr "Δεν υπάρχουν ετικέτες ακόμη."
 msgid "No telephone number"
 msgstr "Κανένας αριθμός τηλεφώνου"
 
+#: src/postulo/templates/applications/interview_detail.html
+#: src/postulo/templates/documents/themes/base_interview.html
+msgid "No text recorded for this listing."
+msgstr ""
+
 #: src/postulo/documents/themes.py
 #, python-format
 msgid "No theme called “%(theme)s” is installed."
@@ -11945,6 +12218,11 @@ msgstr "Κανείς δεν έχει συνδεθεί ακόμη στον πάρ
 #: src/postulo/templates/server/email.html
 msgid "Nobody has signed in yet, so nothing can be sent. Save the settings above, then sign in on the provider's page as the mailbox this instance sends from."
 msgstr "Κανείς δεν έχει συνδεθεί ακόμη, οπότε δεν μπορεί να σταλεί τίποτα. Αποθηκεύστε τις ρυθμίσεις παραπάνω και μετά συνδεθείτε στη σελίδα του παρόχου με τον λογαριασμό του γραμματοκιβωτίου από το οποίο στέλνει αλληλογραφία αυτή η εγκατάσταση."
+
+#: src/postulo/templates/applications/interview_detail.html
+#: src/postulo/templates/documents/themes/base_interview.html
+msgid "Nobody is named for this interview."
+msgstr ""
 
 #: src/postulo/templates/server/data_protection.html
 msgid "Nobody is named here: whose contacts they are is the account's own business. Each person erases from their own contact's page."
@@ -12077,6 +12355,10 @@ msgstr "κανένα ακόμη"
 #, fuzzy
 msgid "None yet."
 msgstr "Κανένας ακόμη."
+
+#: src/postulo/templates/jobs/company_form.html
+msgid "None yet. Add one, such as CNRS for a long name, to choose which the lists show."
+msgstr ""
 
 #: src/postulo/templates/jobs/company_form.html
 msgid "None yet. Documents print the name above in every language."
@@ -12226,6 +12508,11 @@ msgstr "Δεν τυπώνεται σε κανένα βιογραφικό μέχ�
 
 #: src/postulo/templates/applications/subscription_list.html
 msgid "Not read yet. It will be within minutes."
+msgstr ""
+
+#: src/postulo/templates/resume/references.html
+#, python-format
+msgid "Not read, because a publication has nowhere to keep them: %(names)s."
 msgstr ""
 
 #: src/postulo/applications/analytics.py src/postulo/applications/reports.py
@@ -12537,6 +12824,10 @@ msgstr "Τίποτα δεν αποθηκεύεται μέχρι να το ελέ
 msgid "Nothing is sent to the server as a password until a new one is entered."
 msgstr "Δεν στέλνεται κωδικός στον διακομιστή μέχρι να εισαχθεί νέος."
 
+#: src/postulo/templates/applications/application_detail.html
+msgid "Nothing kept yet. Keep what you typed into the employer's form, so you can see what they were told."
+msgstr ""
+
 #: src/postulo/templates/applications/application_list.html
 #: src/postulo/templates/jobs/company_list.html
 #: src/postulo/templates/jobs/listing_list.html
@@ -12587,6 +12878,11 @@ msgstr "Τίποτα στην εγκατάσταση δεν είναι παλα�
 msgid "Nothing on the other service is touched. You can connect it again later."
 msgstr "Δεν αλλάζει τίποτα στην άλλη υπηρεσία. Μπορείτε να τη συνδέσετε ξανά αργότερα."
 
+#: src/postulo/templates/applications/interview_detail.html
+#: src/postulo/templates/documents/themes/base_interview.html
+msgid "Nothing on the timeline yet."
+msgstr ""
+
 #: src/postulo/templates/applications/calendar.html
 #: src/postulo/templates/documents/themes/base_calendar.html
 msgid "Nothing on this day."
@@ -12600,6 +12896,11 @@ msgstr "Τίποτα σε αυτή την καταχώριση δεν μεταφ
 #, fuzzy
 msgid "Nothing recorded against this one yet."
 msgstr "Τίποτα δεν έχει καταγραφεί γι' αυτή ακόμη."
+
+#: src/postulo/templates/applications/interview_detail.html
+#: src/postulo/templates/documents/themes/base_interview.html
+msgid "Nothing recorded as sent for this application."
+msgstr ""
 
 #: src/postulo/templates/documents/application_documents.html
 msgid "Nothing recorded for this application yet."
@@ -12768,9 +13069,17 @@ msgstr "Δεν στάλθηκε τίποτα σε αυτή την περίοδο
 msgid "Nothing was sent in this period. That is what the report says, and it is a fact like any other."
 msgstr "Δεν στάλθηκε τίποτα σε αυτή την περίοδο. Αυτό λέει η αναφορά, και είναι ένα γεγονός όπως κάθε άλλο."
 
-#: src/postulo/resume/views.py
+#: src/postulo/resume/views.py src/postulo/resume/views_references.py
 msgid "Nothing was ticked, so nothing was added."
 msgstr "Δεν επιλέχθηκε τίποτα, οπότε δεν προστέθηκε τίποτα."
+
+#: src/postulo/templates/documents/themes/base_interview.html
+msgid "Nothing written yet."
+msgstr ""
+
+#: src/postulo/templates/applications/interview_detail.html
+msgid "Nothing written yet. Add notes when you edit the interview."
+msgstr ""
 
 #: src/postulo/documents/forms.py
 msgid "Nothing yet"
@@ -12816,6 +13125,11 @@ msgstr "ειδοποιήθηκε στις"
 #: src/postulo/resume/models.py
 msgid "number"
 msgstr "αριθμός"
+
+#: src/postulo/templates/cotton/document_viewer.html
+#, python-format
+msgid "of %(count)s"
+msgstr ""
 
 #: src/postulo/jobs/widgets.py
 msgid "Of the listings you noticed, how many you applied to and how many you let go."
@@ -13213,6 +13527,11 @@ msgid_plural "%(total)s records were added. Nothing you already had was changed 
 msgstr[0] "Προστέθηκε μία εγγραφή. Τίποτα από όσα είχατε ήδη δεν άλλαξε ούτε αφαιρέθηκε."
 msgstr[1] "Προστέθηκαν %(total)s εγγραφές. Τίποτα από όσα είχατε ήδη δεν άλλαξε ούτε αφαιρέθηκε."
 
+#: src/postulo/templates/resume/references.html
+#, python-format
+msgid "One request to doi.org for each DOI, at most %(most)s, when you press the button: doi.org passes it to Crossref or DataCite. Only the DOI is sent. What comes back is listed above to tick, and nothing is kept until you add it."
+msgstr ""
+
 #: src/postulo/templates/jobs/company_detail.html
 msgid "One request to that register, carrying the number alone; nothing is kept until you say so."
 msgstr "Ένα αίτημα σε αυτό το μητρώο, που περιέχει μόνο τον αριθμό· τίποτα δεν διατηρείται μέχρι να το επιβεβαιώσετε."
@@ -13349,6 +13668,11 @@ msgstr "Μόνο ο διαχειριστής που το ξεκίνησε μπο
 msgid "Only the applications that name a referrer or an agency are in these two; the company on a posting stays the employer."
 msgstr "Μόνο οι αιτήσεις που αναφέρουν άτομο που παρέπεμψε ή πρακτορείο βρίσκονται σε αυτά τα δύο· η εταιρεία σε μια αγγελία παραμένει ο εργοδότης."
 
+#: src/postulo/templates/resume/references.html
+#, python-format
+msgid "Only the first %(most)s entries are read; the rest of the file was left out."
+msgstr ""
+
 #: src/postulo/documents/forms.py
 msgid "Only the ones ticked below"
 msgstr "Μόνο τα επιλεγμένα παρακάτω"
@@ -13378,6 +13702,10 @@ msgstr "Εδώ φυλάσσεται μόνο το δημόσιο κλειδί, �
 msgid "Only the year prints on a CV, so the day makes no difference."
 msgstr "Σε ένα βιογραφικό τυπώνεται μόνο το έτος, οπότε η ημέρα δεν έχει σημασία."
 
+#: src/postulo/templates/resume/references.html
+msgid "Only this publication, as a reference:"
+msgstr ""
+
 #: src/postulo/templates/jobs/company_register.html
 msgid "Only what you tick is kept; nothing else on the company changes."
 msgstr "Διατηρείται μόνο ό,τι επιλέξετε· τίποτα άλλο στην εταιρεία δεν αλλάζει."
@@ -13405,6 +13733,10 @@ msgstr "Ανοιχτές αιτήσεις χωρίς νέα, και τα τρί�
 #, fuzzy
 msgid "Open as this"
 msgstr "Άνοιγμα ως αυτό"
+
+#: src/postulo/templates/cotton/document_viewer.html
+msgid "Open in a new tab"
+msgstr ""
 
 #: src/postulo/templates/applications/subscribed_event.html
 #: src/postulo/templates/jobs/capture_form.html
@@ -13678,7 +14010,7 @@ msgstr "Πακέτο"
 msgid "Packing up your data"
 msgstr "Συγκεντρώνονται τα δεδομένα σας"
 
-#: src/postulo/core/design.py
+#: src/postulo/core/design.py src/postulo/templates/cotton/document_viewer.html
 msgid "Page"
 msgstr "Σελίδα"
 
@@ -13687,6 +14019,11 @@ msgstr "Σελίδα"
 #, python-format
 msgid "Page %(current)s of %(total)s"
 msgstr "Σελίδα %(current)s από %(total)s"
+
+#: src/postulo/templates/cotton/document_viewer.html
+#, python-format
+msgid "Page %(page)s of %(count)s"
+msgstr ""
 
 #: src/postulo/jobs/capture_views.py
 msgid "Page source"
@@ -13784,6 +14121,7 @@ msgstr "χαρτί"
 
 #: src/postulo/documents/forms.py src/postulo/jobs/industries.py
 #: src/postulo/templates/applications/calendar_print.html
+#: src/postulo/templates/applications/interview_detail.html
 #: src/postulo/templates/applications/report.html
 #: src/postulo/templates/core/table_export.html
 #: src/postulo/templates/settings/export.html
@@ -13816,6 +14154,8 @@ msgid "part of"
 msgstr "μέρος της"
 
 #: src/postulo/jobs/tables.py
+#: src/postulo/templates/applications/interview_detail.html
+#: src/postulo/templates/documents/themes/base_interview.html
 #, fuzzy
 msgid "Part of"
 msgstr "Μέρος της"
@@ -14102,6 +14442,10 @@ msgstr "Οι θέσεις αντικατάστασης όπως {{ company }} σ
 
 #: src/postulo/documents/models.py
 msgid "Placeholders such as {{ company }} are filled in when you write it."
+msgstr ""
+
+#: src/postulo/applications/models.py
+msgid "Placeholders such as {{ company }} are filled in with the application when you use the answer on one."
 msgstr ""
 
 #: src/postulo/plugins/categories.py
@@ -14502,6 +14846,8 @@ msgstr "Πατήστε «Έλεγχος για ενημερώσεις» για �
 msgid "Press “Read the page” again to capture it anyway."
 msgstr "Πατήστε ξανά «Ανάγνωση της σελίδας» για να την καταγράψετε παρ' όλα αυτά."
 
+#: src/postulo/templates/documents/rendered_list.html
+#: src/postulo/templates/documents/upload_list.html
 #: src/postulo/templates/resume/overview.html
 msgid "Preview"
 msgstr "Προεπισκόπηση"
@@ -14537,6 +14883,10 @@ msgstr "Προηγούμενη ημέρα"
 #: src/postulo/templates/cotton/date_picker.html
 msgid "Previous month"
 msgstr "Προηγούμενος μήνας"
+
+#: src/postulo/templates/cotton/document_viewer.html
+msgid "Previous page"
+msgstr ""
 
 #: src/postulo/applications/agenda.py
 msgid "Previous week"
@@ -14659,6 +15009,7 @@ msgid "Proceedings"
 msgstr "Πρακτικά συνεδρίου"
 
 #: src/postulo/templates/documents/themes/base_calendar.html
+#: src/postulo/templates/documents/themes/base_interview.html
 #: src/postulo/templates/documents/themes/base_list.html
 msgid "Produced by Postulo from this person's own records."
 msgstr "Παράχθηκε από το Postulo από τις δικές του εγγραφές αυτού του ατόμου."
@@ -14668,6 +15019,7 @@ msgid "Produced by Postulo from this person's own records. Postulo sets no targe
 msgstr "Δημιουργήθηκε από το Postulo με βάση τα δεδομένα αυτού του ίδιου του ατόμου. Το Postulo δεν θέτει κανέναν στόχο: πόσες αιτήσεις πρέπει να περιλαμβάνει μια περίοδος είναι κανόνας ενός συστήματος επιδομάτων ή του ίδιου του ατόμου."
 
 #: src/postulo/templates/documents/themes/base_calendar.html
+#: src/postulo/templates/documents/themes/base_interview.html
 #: src/postulo/templates/documents/themes/base_list.html
 #: src/postulo/templates/documents/themes/base_report.html
 #, python-format
@@ -14788,6 +15140,10 @@ msgstr "Δημοσιεύσεις"
 msgid "publications"
 msgstr "δημοσιεύσεις"
 
+#: src/postulo/templates/resume/references.html
+msgid "Publications in the file"
+msgstr ""
+
 #: src/postulo/resume/models.py
 msgid "published in"
 msgstr "δημοσιεύτηκε σε"
@@ -14854,6 +15210,10 @@ msgstr "Τίτλοι σπουδών"
 
 #: src/postulo/jobs/industries.py
 msgid "Quarrying"
+msgstr ""
+
+#: src/postulo/applications/models.py
+msgid "question"
 msgstr ""
 
 #: src/postulo/templates/connections/list.html
@@ -14948,6 +15308,11 @@ msgstr ""
 msgid "Read as"
 msgstr "Ανάγνωση ως"
 
+#: src/postulo/templates/resume/references.html
+#, python-format
+msgid "Read as %(name)s."
+msgstr ""
+
 #: src/postulo/resume/views.py
 msgid "Read as Europass JSON, the older format as the Europass web service wrote it until 2020."
 msgstr "Διαβάστηκε ως Europass JSON, η παλαιότερη μορφή όπως την έγραφε η διαδικτυακή υπηρεσία Europass μέχρι το 2020."
@@ -14998,6 +15363,7 @@ msgstr "Διαβάστηκε από το Europass XML που είναι συνη
 
 #: src/postulo/templates/jobs/company_places.html
 #: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/references.html
 #: src/postulo/templates/server/plugins.html
 msgid "Read it"
 msgstr "Ανάγνωση"
@@ -15251,6 +15617,10 @@ msgstr "Υπεύθυνος προσλήψεων"
 #: src/postulo/templates/server/capture.html
 msgid "Redirects followed"
 msgstr "Ανακατευθύνσεις που ακολουθήθηκαν"
+
+#: src/postulo/templates/cotton/document_viewer.html
+msgid "Redraw"
+msgstr ""
 
 #: src/postulo/documents/forms.py
 msgid "Referee"
@@ -15811,6 +16181,7 @@ msgid "Saturday"
 msgstr "Σάββατο"
 
 #: src/postulo/templates/accounts/profile.html
+#: src/postulo/templates/applications/answer_form.html
 #: src/postulo/templates/applications/application_form.html
 #: src/postulo/templates/applications/application_intake.html
 #: src/postulo/templates/applications/appointment_form.html
@@ -15831,6 +16202,7 @@ msgstr "Σάββατο"
 #: src/postulo/templates/jobs/industry_form.html
 #: src/postulo/templates/jobs/posting_form.html
 #: src/postulo/templates/partials/table/cell.html
+#: src/postulo/templates/resume/answer_form.html
 #: src/postulo/templates/resume/item_form.html
 #: src/postulo/templates/resume/translations.html
 #: src/postulo/templates/server/backup_destination.html
@@ -15896,6 +16268,14 @@ msgstr "Αποθηκεύστε για να προσθέσετε άλλο ανα�
 #: src/postulo/templates/jobs/capture_review.html
 msgid "Save to listings"
 msgstr "Αποθήκευση στις αγγελίες"
+
+#: src/postulo/applications/models.py
+msgid "saved answer"
+msgstr ""
+
+#: src/postulo/applications/models.py
+msgid "saved answers"
+msgstr ""
 
 #: src/postulo/accounts/settings_views.py
 #, python-format
@@ -16026,6 +16406,7 @@ msgstr "Η σφραγίδα δεν ελέγχθηκε από το Postulo"
 #: src/postulo/templates/core/search.html
 #: src/postulo/templates/cotton/site_search.html
 #: src/postulo/templates/jobs/industry_list.html
+#: src/postulo/templates/resume/answer_list.html
 msgid "Search"
 msgstr "Αναζήτηση"
 
@@ -16244,6 +16625,7 @@ msgstr "απεσταλμένα έγγραφα"
 #: src/postulo/templates/core/export.html
 #: src/postulo/templates/cotton/documents_nav.html
 #: src/postulo/templates/documents/rendered_compare.html
+#: src/postulo/templates/documents/rendered_detail.html
 #: src/postulo/templates/documents/rendered_list.html
 msgid "Sent documents"
 msgstr "Απεσταλμένα έγγραφα"
@@ -16621,6 +17003,14 @@ msgstr "εμφάνιση της διαδρομής πλοήγησης κατά �
 #: src/postulo/accounts/forms.py
 msgid "Show the breadcrumb only while I point at it"
 msgstr "Εμφάνιση της διαδρομής πλοήγησης μόνο όταν ο δείκτης βρίσκεται πάνω της"
+
+#: src/postulo/accounts/forms.py
+msgid "Show the country"
+msgstr ""
+
+#: src/postulo/accounts/models.py
+msgid "show the country"
+msgstr ""
 
 #: src/postulo/accounts/forms.py
 msgid "Show the keys beside the controls that have one"
@@ -17140,6 +17530,10 @@ msgstr "Ημερομηνία έναρξης"
 msgid "Start from a type"
 msgstr "Έναρξη από έναν τύπο"
 
+#: src/postulo/templates/applications/answer_form.html
+msgid "Start from an answer you have saved"
+msgstr ""
+
 #: src/postulo/templates/documents/letter_form.html
 msgid "Start from:"
 msgstr "Ξεκινήστε από:"
@@ -17175,7 +17569,10 @@ msgstr "STARTTLS, μετά τη σύνδεση"
 msgid "state"
 msgstr "κατάσταση"
 
-#: src/postulo/jobs/tables.py src/postulo/templates/connections/pairing.html
+#: src/postulo/jobs/tables.py
+#: src/postulo/templates/applications/interview_detail.html
+#: src/postulo/templates/connections/pairing.html
+#: src/postulo/templates/documents/themes/base_interview.html
 #: src/postulo/templates/jobs/company_register.html
 #: src/postulo/templates/server/person_recovery.html
 msgid "State"
@@ -17505,6 +17902,7 @@ msgstr "Προβολή πίνακα"
 #: src/postulo/templates/applications/partials/board_filters.html
 #: src/postulo/templates/applications/partials/bulk_fields.html
 #: src/postulo/templates/applications/tag_form.html
+#: src/postulo/templates/resume/answer_list.html
 msgid "Tag"
 msgstr "Ετικέτα"
 
@@ -17920,7 +18318,7 @@ msgstr "Το αρχείο είναι κενό."
 #: src/postulo/core/vcard.py src/postulo/core/views_kind_files.py
 #: src/postulo/jobs/geojson.py src/postulo/jobs/vcard_views.py
 #: src/postulo/plugins/base.py src/postulo/resume/candidate.py
-#: src/postulo/resume/views_candidate.py
+#: src/postulo/resume/references.py src/postulo/resume/views_candidate.py
 #, python-format
 msgid "That file is larger than %(limit)s MB, so it was not read."
 msgstr "Το αρχείο ξεπερνά τα %(limit)s MB, οπότε δεν διαβάστηκε."
@@ -17944,9 +18342,25 @@ msgstr "Αυτό το αρχείο είναι μεγαλύτερο από τα %
 msgid "That file is not a GeoJSON collection of features."
 msgstr "Αυτό το αρχείο δεν είναι συλλογή χαρακτηριστικών (FeatureCollection) GeoJSON."
 
+#: src/postulo/resume/references.py
+msgid "That file is not BibTeX."
+msgstr ""
+
+#: src/postulo/resume/references.py
+msgid "That file is not CSL JSON."
+msgstr ""
+
 #: src/postulo/jobs/geojson.py
 msgid "That file is not GeoJSON."
 msgstr "Αυτό το αρχείο δεν είναι GeoJSON."
+
+#: src/postulo/resume/references.py
+msgid "That file is not one of BibTeX, BibLaTeX, RIS or CSL JSON, so it was not read."
+msgstr ""
+
+#: src/postulo/resume/references.py
+msgid "That file is not RIS."
+msgstr ""
 
 #: src/postulo/resume/views.py
 #, python-format
@@ -17971,6 +18385,10 @@ msgstr "Το αρχείο διαβάστηκε και δεν υπήρχε κάρ
 #: src/postulo/jobs/views.py
 msgid "That file was read, and there was no point in it."
 msgstr "Το αρχείο διαβάστηκε, αλλά δεν περιείχε κανένα σημείο."
+
+#: src/postulo/resume/views_references.py
+msgid "That file was read, and there was no publication in it to add."
+msgstr ""
 
 #: src/postulo/core/views_kind_files.py src/postulo/resume/views.py
 #: src/postulo/resume/views_candidate.py
@@ -18731,6 +19149,10 @@ msgstr "Οι εταιρείες, οι επαφές και οι αγγελίες 
 msgid "The company %(name)s is not in your account, and is added with it."
 msgstr "Η εταιρεία %(name)s δεν υπάρχει στον λογαριασμό σας και προστίθεται μαζί."
 
+#: src/postulo/jobs/views.py
+msgid "The company already has that name."
+msgstr ""
+
 #: src/postulo/templates/jobs/company_places.html
 msgid "The company has no address to place."
 msgstr "Η εταιρεία δεν έχει διεύθυνση για τοποθέτηση."
@@ -18738,6 +19160,11 @@ msgstr "Η εταιρεία δεν έχει διεύθυνση για τοποθ
 #: src/postulo/templates/jobs/company_wikidata.html
 msgid "The company has no address to put it on: add one, and fetch again."
 msgstr "Η εταιρεία δεν έχει διεύθυνση στην οποία να τοποθετηθεί: προσθέστε μία και κάντε ξανά ανάκτηση."
+
+#: src/postulo/templates/applications/interview_detail.html
+#: src/postulo/templates/documents/themes/base_interview.html
+msgid "The company in brief"
+msgstr ""
 
 #: src/postulo/templates/applications/application_intake.html
 msgid "The company is matched by name and created if it is new. Only the company and the job title are required; everything else can be filled in later."
@@ -18938,6 +19365,7 @@ msgstr "Το ποσό όπως το έγραψαν, πριν από τους φ�
 
 #: src/postulo/templates/applications/ical_import.html
 #: src/postulo/templates/core/kind_file.html
+#: src/postulo/templates/documents/upload_detail.html
 #: src/postulo/templates/jobs/contact_vcards.html
 #: src/postulo/templates/resume/candidate_file.html
 #: src/postulo/templates/resume/europass_import.html
@@ -19291,7 +19719,9 @@ msgstr "Η λίστα στα αριστερά μεταβαίνει σε μια �
 msgid "The list opens over the dialog. Escape closes the list and leaves the dialog open."
 msgstr "Η λίστα ανοίγει πάνω από το παράθυρο διαλόγου. Το Escape κλείνει τη λίστα και αφήνει ανοιχτό το παράθυρο διαλόγου."
 
+#: src/postulo/templates/applications/interview_detail.html
 #: src/postulo/templates/applications/partials/timeline.html
+#: src/postulo/templates/documents/themes/base_interview.html
 msgid "The listing"
 msgstr "Η αγγελία"
 
@@ -19665,6 +20095,10 @@ msgstr "Ο ρόλος"
 msgid "The route it went through. The report counts by this, including how many went through the public employment service's own board."
 msgstr "Η οδός μέσω της οποίας έγινε. Η αναφορά μετρά με βάση αυτό, συμπεριλαμβανομένου του πόσες έγιναν μέσω του ιστότοπου αγγελιών της ίδιας της δημόσιας υπηρεσίας απασχόλησης."
 
+#: src/postulo/jobs/duplicates.py
+msgid "The same acronym or short name"
+msgstr ""
+
 #: src/postulo/jobs/conflicts.py
 msgid "The same advert"
 msgstr "Η ίδια αγγελία"
@@ -19854,6 +20288,11 @@ msgstr ""
 msgid "The stored mail credentials cannot be read on this instance."
 msgstr "Τα αποθηκευμένα διαπιστευτήρια αλληλογραφίας δεν μπορούν να διαβαστούν σε αυτή την εγκατάσταση."
 
+#: src/postulo/templates/applications/interview_detail.html
+#: src/postulo/templates/documents/themes/base_interview.html
+msgid "The story so far"
+msgstr ""
+
 #: src/postulo/accounts/forms.py
 msgid "The subject every file carries"
 msgstr "Το θέμα που περιέχει κάθε αρχείο"
@@ -20022,6 +20461,7 @@ msgid "theme"
 msgstr "θέμα"
 
 #: src/postulo/templates/applications/calendar_print.html
+#: src/postulo/templates/applications/interview_detail.html
 #: src/postulo/templates/applications/report.html
 #: src/postulo/templates/core/table_export.html
 msgid "Theme"
@@ -20120,6 +20560,10 @@ msgstr "Δεν υπάρχει τίποτα σε αναμονή για εισαγ
 #: src/postulo/jobs/pages.py
 msgid "There was nothing to keep."
 msgstr "Δεν υπήρχε τίποτα για να κρατηθεί."
+
+#: src/postulo/templates/applications/interview_detail.html
+msgid "These are the files as they were sent, not your documents as they are now."
+msgstr ""
 
 #: src/postulo/templates/widgets/insight_counters.html
 #, python-format
@@ -20344,14 +20788,28 @@ msgstr "Μόνο για αυτή την εξαγωγή. Η προεπιλογή 
 msgid "This field is required."
 msgstr "Αυτό το πεδίο είναι υποχρεωτικό."
 
+#: src/postulo/templates/cotton/document_viewer.html
+msgid "This file could not be shown here. You can still download it."
+msgstr ""
+
+#: src/postulo/templates/cotton/document_viewer.html
+msgid "This file has no text a screen reader can read."
+msgstr ""
+
 #: src/postulo/applications/ical_reader.py
 msgid "This file is an invitation. Its events are read as any others; no reply is sent."
 msgstr "Αυτό το αρχείο είναι πρόσκληση. Τα συμβάντα του διαβάζονται όπως όλα τα άλλα· δεν αποστέλλεται απάντηση."
 
+#: src/postulo/templates/cotton/document_viewer.html
+msgid "This file is locked with a password, so it cannot be shown here. You can still download it."
+msgstr ""
+
+#: src/postulo/templates/documents/upload_detail.html
 #: src/postulo/templates/documents/upload_list.html
 msgid "This file is missing. Upload it again as a new version that supersedes this one."
 msgstr "Αυτό το αρχείο λείπει. Ανεβάστε το ξανά ως νέα έκδοση που αντικαθιστά αυτήν."
 
+#: src/postulo/templates/documents/upload_detail.html
 #: src/postulo/templates/documents/upload_list.html
 msgid "This file no longer matches what was uploaded. Upload it again as a new version that supersedes this one."
 msgstr "Αυτό το αρχείο δεν ταιριάζει πλέον με αυτό που ανέβηκε. Ανεβάστε το ξανά ως νέα έκδοση που αντικαθιστά αυτήν."
@@ -20530,6 +20988,10 @@ msgstr "Αυτό είναι λάθος στο κείμενο όπως κρατι
 msgid "This is your own account. A link you make for yourself is not a way back in — you had to sign in to make it. If you are the only administrator here, a passkey or a second administrator is what covers you."
 msgstr "Αυτός είναι ο δικός σας λογαριασμός. Ένας σύνδεσμος που φτιάχνετε για τον εαυτό σας δεν είναι τρόπος ανάκτησης της πρόσβασης — χρειάστηκε να συνδεθείτε για να τον φτιάξετε. Αν είστε ο μόνος διαχειριστής εδώ, σας καλύπτει ένα κλειδί πρόσβασης ή ένας δεύτερος διαχειριστής."
 
+#: src/postulo/templates/cotton/document_viewer.html
+msgid "This kind of file cannot be shown here. Download it to open it."
+msgstr ""
+
 #: src/postulo/templates/cotton/listing_skills.html
 msgid "This listing names none of the classification's skills by name."
 msgstr ""
@@ -20702,6 +21164,10 @@ msgstr "Επιλέξτε γραμμές για να εκτελέσετε ενέ�
 #: src/postulo/applications/forms.py
 msgid "Tick the box to add the listing anyway."
 msgstr "Επιλέξτε το πλαίσιο για να προσθέσετε την αγγελία παρ' όλα αυτά."
+
+#: src/postulo/templates/resume/references.html
+msgid "Tick the publications to add. Nothing is changed or overwritten: an entry you already have is marked, and ticking it adds another."
+msgstr ""
 
 #: src/postulo/templates/resume/publication_orcid.html
 #, python-format
@@ -20997,9 +21463,20 @@ msgctxt "type of event"
 msgid "type"
 msgstr "τύπος"
 
+#: src/postulo/resume/views_references.py
+msgid "Type at least one DOI first."
+msgstr ""
+
 #: src/postulo/templates/core/search.html
 msgid "Type at least two characters."
 msgstr "Πληκτρολογήστε τουλάχιστον δύο χαρακτήρες."
+
+#: src/postulo/resume/views_references.py
+#, python-format
+msgid "Type at most %(count)d DOI at a time; nothing was asked."
+msgid_plural "Type at most %(count)d DOIs at a time; nothing was asked."
+msgstr[0] ""
+msgstr[1] ""
 
 #: src/postulo/accounts/forms.py
 msgid "Type it here, or choose one from the list."
@@ -21037,6 +21514,10 @@ msgstr "είδος πηγής"
 #: src/postulo/jobs/models.py
 msgid "type of thing it points at"
 msgstr "είδος του πράγματος στο οποίο δείχνει"
+
+#: src/postulo/jobs/views.py
+msgid "Type the acronym or short name."
+msgstr ""
 
 #: src/postulo/resume/lookups.py src/postulo/resume/views.py
 msgid "Type the DOI first."
@@ -21391,6 +21872,7 @@ msgid "Verified"
 msgstr "Επαληθευμένη"
 
 #: src/postulo/documents/models.py
+#: src/postulo/templates/documents/upload_detail.html
 #: src/postulo/templates/documents/upload_list.html
 msgid "version"
 msgstr "έκδοση"
@@ -21561,6 +22043,7 @@ msgstr "Εικόνα WebP"
 
 #: src/postulo/core/models.py src/postulo/core/web_links.py
 #: src/postulo/documents/printing.py src/postulo/jobs/tables.py
+#: src/postulo/templates/applications/interview_detail.html
 #: src/postulo/templates/jobs/company_detail.html
 msgid "Website"
 msgstr "Ιστότοπος"
@@ -21674,6 +22157,10 @@ msgstr "Πώς μοιάζει μια τιμή, από τον πρώτο ως τ�
 msgid "What almost everything in Postulo sits in."
 msgstr "Αυτό μέσα στο οποίο βρίσκονται σχεδόν τα πάντα στο Postulo."
 
+#: src/postulo/templates/resume/answer_list.html
+msgid "What application forms keep asking, written once. An application keeps its own copy of the answer it uses."
+msgstr ""
+
 #: src/postulo/templates/jobs/posting_detail.html
 msgid "What arrived about this listing, and what you noted. Once you apply, it heads the application's timeline."
 msgstr "Τι έφτασε για αυτή την αγγελία και τι σημειώσατε. Μόλις κάνετε αίτηση, βρίσκεται στην αρχή του χρονολογίου της αίτησης."
@@ -21746,6 +22233,10 @@ msgstr ""
 #: src/postulo/templates/cotton/review_sections.html
 msgid "What happens"
 msgstr "Τι συμβαίνει"
+
+#: src/postulo/templates/applications/application_detail.html
+msgid "What I answered"
+msgstr ""
 
 #: src/postulo/templates/connections/form.html
 msgid "What is being asked for"
@@ -22094,9 +22585,18 @@ msgstr "τι παρουσιάσατε"
 msgid "What you presented, if you presented something."
 msgstr "Τι παρουσιάσατε, αν παρουσιάσατε κάτι."
 
+#: src/postulo/templates/applications/interview_detail.html
+#: src/postulo/templates/documents/themes/base_interview.html
+msgid "What you sent"
+msgstr ""
+
 #: src/postulo/accounts/forms.py
 msgid "What you sign in with. Lowercase letters, digits, dots, underscores, hyphens."
 msgstr "Με τι συνδέεστε. Πεζά γράμματα, ψηφία, τελείες, κάτω παύλες, παύλες."
+
+#: src/postulo/templates/applications/answer_form.html
+msgid "What you told them. It is kept as it is, even if you later change the saved answer."
+msgstr ""
 
 #: src/postulo/templates/resume/translations.html
 msgid "What you type here is what a CV in that language prints instead."
@@ -22162,6 +22662,10 @@ msgstr "Πότε"
 msgid "When accepting should also move the application."
 msgstr "Όταν η αποδοχή πρέπει και να μετακινήσει την αίτηση."
 
+#: src/postulo/templates/documents/themes/base_interview.html
+msgid "When and where"
+msgstr ""
+
 #: src/postulo/jobs/models.py
 msgid "When it entered your listings."
 msgstr "Πότε μπήκε στις αγγελίες σας."
@@ -22190,6 +22694,7 @@ msgstr "Όταν εγγράφετε αυτή την εγκατάσταση στ�
 msgid "where"
 msgstr "πού"
 
+#: src/postulo/templates/applications/interview_detail.html
 #: src/postulo/templates/applications/subscribed_event.html
 msgid "Where"
 msgstr ""
@@ -22380,6 +22885,10 @@ msgstr "Ποια στήλη είναι τι;"
 msgid "Which device or tool this is for."
 msgstr "Για ποια συσκευή ή εργαλείο είναι."
 
+#: src/postulo/applications/models.py
+msgid "Which language the answer is written in. Leave blank if it does not matter."
+msgstr ""
+
 #: src/postulo/documents/models.py
 msgid "Which language this file is in. Postulo cannot read it, so nothing is assumed; a store files it by this."
 msgstr "Σε ποια γλώσσα είναι αυτό το αρχείο. Το Postulo δεν μπορεί να το διαβάσει, οπότε δεν γίνεται καμία υπόθεση· μια αποθήκη εγγράφων το αρχειοθετεί με βάση αυτό."
@@ -22476,6 +22985,11 @@ msgstr "Ποιος την έγραψε, πότε και αν ισχύει ακό
 #: src/postulo/applications/models.py
 msgid "who you are meeting"
 msgstr "ποιον συναντάτε"
+
+#: src/postulo/templates/applications/interview_detail.html
+#: src/postulo/templates/documents/themes/base_interview.html
+msgid "Who you are meeting"
+msgstr ""
 
 #: src/postulo/applications/forms.py
 msgid "Who you are meeting. The people you have recorded at this company are offered, and anybody already on this interview who has since moved on."
@@ -22945,6 +23459,7 @@ msgid "You already have that industry."
 msgstr "Έχετε ήδη αυτόν τον κλάδο."
 
 #: src/postulo/templates/resume/publication_orcid.html
+#: src/postulo/templates/resume/references.html
 msgid "You already have this one."
 msgstr "Αυτή την έχετε ήδη."
 
@@ -23099,6 +23614,11 @@ msgstr "Τα αφαιρέσατε όλα. Επαναφέρετε κάτι όπο
 msgid "You leave your groups; what they own stays theirs."
 msgstr "Αποχωρείτε από τις ομάδες σας· ό,τι κατέχουν παραμένει δικό τους."
 
+#: src/postulo/applications/forms.py
+#, python-format
+msgid "You may name the company and the rest when you use it on an application: %(names)s."
+msgstr ""
+
 #: src/postulo/documents/models.py
 msgid "You send it"
 msgstr "Τη στέλνετε εσείς"
@@ -23110,6 +23630,13 @@ msgstr "Θα σας ζητηθεί πρώτα ο τρέχων."
 #: src/postulo/templates/account/recovery_set_password.html
 msgid "You will still sign in afterwards, and still give your second factor if you have one. This link changes the password and nothing else."
 msgstr "Θα συνδεθείτε κανονικά μετά και θα δώσετε τον δεύτερο παράγοντά σας, αν έχετε. Αυτός ο σύνδεσμος αλλάζει τον κωδικό πρόσβασης και τίποτε άλλο."
+
+#: src/postulo/templates/resume/references.html
+#, python-format
+msgid "Your %(total)s publication, in the format your reference manager reads."
+msgid_plural "Your %(total)s publications, in the format your reference manager reads."
+msgstr[0] ""
+msgstr[1] ""
 
 #: src/postulo/accounts/views.py
 msgid "Your account and everything in it have been deleted."
@@ -23349,6 +23876,10 @@ msgid "Your own site, if you have one."
 msgstr "Ο δικός σας ιστότοπος, αν έχετε."
 
 #: src/postulo/applications/forms.py
+msgid "Your own words for grouping answers: pay, availability, motivation."
+msgstr ""
+
+#: src/postulo/applications/forms.py
 msgid "Your own words for grouping applications. New ones go in the box below."
 msgstr "Δικές σας λέξεις για την ομαδοποίηση των αιτήσεων. Οι νέες μπαίνουν στο παρακάτω πεδίο."
 
@@ -23369,6 +23900,11 @@ msgstr "Η εικόνα σας παραλείπεται. Ένα αρχείο JSO
 msgid "Your picture is shown at the top of every page, where it is the button that opens your menu, and to the administrators of this instance in their list of people. No CV and no letter prints it. Until you give Postulo a picture, it shows your initials."
 msgstr "Η εικόνα σας εμφανίζεται στο πάνω μέρος κάθε σελίδας, όπου είναι το κουμπί που ανοίγει το μενού σας, και στους διαχειριστές αυτής της εγκατάστασης στη λίστα ατόμων τους. Κανένα βιογραφικό και καμία επιστολή δεν την τυπώνει. Μέχρι να δώσετε στο Postulo μια εικόνα, εμφανίζει τα αρχικά σας."
 
+#: src/postulo/templates/applications/interview_detail.html
+#: src/postulo/templates/documents/themes/base_interview.html
+msgid "Your preparation notes"
+msgstr ""
+
 #: src/postulo/documents/printing.py
 msgid "Your primary code repository"
 msgstr "Το κύριο αποθετήριο κώδικά σας"
@@ -23384,6 +23920,10 @@ msgstr "Το κύριο προφίλ σας σε κοινωνικό δίκτυο
 #: src/postulo/documents/printing.py
 msgid "Your primary website"
 msgstr "Ο κύριος ιστότοπός σας"
+
+#: src/postulo/templates/resume/references.html
+msgid "Your publications as a file that Zotero, Mendeley, JabRef, EndNote and LaTeX read, and a file of theirs read in."
+msgstr ""
 
 #: src/postulo/core/transfers.py
 #, fuzzy
@@ -23478,11 +24018,17 @@ msgstr "Δικά σας. Δεν πηγαίνουν πουθενά με το αρ
 msgid "Yours: only you can share it, give it to a group or delete it."
 msgstr "Δικό σας: μόνο εσείς μπορείτε να το μοιραστείτε, να το δώσετε σε μια ομάδα ή να το διαγράψετε."
 
+#: src/postulo/templates/cotton/document_viewer.html
+msgid "Zoom"
+msgstr ""
+
+#: src/postulo/templates/cotton/document_viewer.html
 #: src/postulo/templates/jobs/address_place.html
 #: src/postulo/templates/jobs/company_map.html
 msgid "Zoom in"
 msgstr "Μεγέθυνση"
 
+#: src/postulo/templates/cotton/document_viewer.html
 #: src/postulo/templates/jobs/address_place.html
 #: src/postulo/templates/jobs/company_map.html
 msgid "Zoom out"

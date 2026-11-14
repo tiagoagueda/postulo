@@ -317,6 +317,14 @@ msgstr[0] "%(count)d оглас"
 msgstr[1] "%(count)d огласа"
 msgstr[2] "%(count)d огласа"
 
+#: src/postulo/resume/views_references.py
+#, python-format
+msgid "%(count)d publication found. Nothing is added until you tick it."
+msgid_plural "%(count)d publications found. Nothing is added until you tick them."
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+
 #: src/postulo/core/gdpr.py
 #, python-format
 msgid "%(count)d reference letter kept, without its referee."
@@ -635,6 +643,11 @@ msgstr[2] "%(days)s дана од %(day)s"
 msgid "%(department)s is at %(company)s, which is not part of the same employer as this posting."
 msgstr "%(department)s је у компанији %(company)s, која није део истог послодавца као овај оглас."
 
+#: src/postulo/resume/views_references.py
+#, python-format
+msgid "%(doi)s: %(reason)s"
+msgstr ""
+
 #: src/postulo/templates/widgets/endings.html
 #, python-format
 msgid "%(explained)s of %(counter)s ending has a reason recorded. One can be added afterwards, from the application's own page."
@@ -871,6 +884,11 @@ msgstr "%(kind)s, %(when)s: отказано"
 #, python-format
 msgid "%(kind)s scheduled for %(when)s"
 msgstr "%(kind)s: заказано за %(when)s"
+
+#: src/postulo/applications/interview_brief.py
+#, python-format
+msgid "%(kind)s · %(role)s at %(company)s"
+msgstr ""
 
 #: src/postulo/applications/ical.py
 #, python-format
@@ -1619,6 +1637,14 @@ msgstr[0] "%(total)s унос"
 msgstr[1] "%(total)s уноса"
 msgstr[2] "%(total)s уноса"
 
+#: src/postulo/templates/resume/references.html
+#, python-format
+msgid "%(total)s entry could not be read, or had no title, and is not listed."
+msgid_plural "%(total)s entries could not be read, or had no title, and are not listed."
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+
 #: src/postulo/templates/applications/calendar_print.html
 #, python-format
 msgid "%(total)s entry."
@@ -1819,6 +1845,10 @@ msgstr "<code dir=\"ltr\">iso7064-mod11-2</code>, којим се завршав
 msgid "<code dir=\"ltr\">true</code> to put what was typed into capitals, or into small letters, before it is checked."
 msgstr "<code dir=\"ltr\">true</code> да се унети текст пре провере претвори у велика или у мала слова."
 
+#: src/postulo/templates/help/career.html
+msgid "<em>Answers</em> keeps what application forms keep asking, such as why this company, your notice period or your salary expectation. On an application, <em>What I answered</em> keeps its own copy of what you told that employer, so changing a saved answer later never changes what was sent. Answers are never printed on a CV and never shared."
+msgstr ""
+
 #: src/postulo/templates/help/documents.html
 msgid "<em>CVs and portfolios</em> are variants of your career record: each one chooses which entries to show, in which order, and how they are set. Correct an entry in <em>Your career</em> and every variant changes with it. <em>Letters</em> are the cover and motivation letters, with their own text."
 msgstr "<em>CV-јеви и портфолији</em> су варијанте ваших података о каријери: свака бира које ставке приказује, којим редоследом и како су обликоване. Исправите ставку у <em>Ваша каријера</em> и свака варијанта се мења с њом. <em>Писма</em> су пропратна и мотивациона писма, са сопственим текстом."
@@ -1919,6 +1949,10 @@ msgstr ""
 #, python-format
 msgid "A %(kind)s entry names the file: send %(field)s."
 msgstr "Ставка врсте %(kind)s наводи датотеку: пошаљите %(field)s."
+
+#: src/postulo/templates/resume/references.html
+msgid "A .bib, .ris or .json file"
+msgstr ""
 
 #: src/postulo/templates/jobs/company_places.html
 msgid "A .geojson file"
@@ -3025,6 +3059,14 @@ msgstr "Преузета или припојена"
 msgid "acquired_by must be a company you can see."
 msgstr "acquired_by мора бити компанија коју можете да видите."
 
+#: src/postulo/jobs/models.py src/postulo/templates/jobs/company_form.html
+msgid "Acronym or short name"
+msgstr ""
+
+#: src/postulo/templates/jobs/company_form.html
+msgid "Acronyms and short names"
+msgstr ""
+
 #: src/postulo/templates/jobs/company_detail.html
 #, python-format
 msgid "Across the %(name)s group"
@@ -3128,6 +3170,10 @@ msgstr "Додај ознаку"
 msgid "Add all of this"
 msgstr "Додај све ово"
 
+#: src/postulo/templates/applications/application_detail.html
+msgid "Add an answer"
+msgstr ""
+
 #: src/postulo/templates/jobs/company_form.html
 msgid "Add an entry"
 msgstr "Додај унос"
@@ -3135,6 +3181,10 @@ msgstr "Додај унос"
 #: src/postulo/templates/resume/item_form.html
 msgid "Add an industry"
 msgstr "Додај делатност"
+
+#: src/postulo/templates/resume/references.html
+msgid "Add by DOI"
+msgstr ""
 
 #: src/postulo/templates/documents/cv_detail.html
 msgid "Add entries"
@@ -3185,6 +3235,10 @@ msgstr "Додај матични број <bdi>%(number)s</bdi>"
 
 #: src/postulo/templates/documents/message_list.html
 msgid "Add the starter messages"
+msgstr ""
+
+#: src/postulo/templates/resume/references.html
+msgid "Add the ticked publications"
 msgstr ""
 
 #: src/postulo/templates/resume/publication_orcid.html
@@ -3247,6 +3301,14 @@ msgid_plural "Added %(count)d publications from your ORCID record, with no autho
 msgstr[0] "Додата је %(count)d публикација из вашег ORCID записа, без аутора: ORCID-ов списак их не садржи. Отворите сваку и притисните „Потражи“ поред њеног DOI-ја за остало."
 msgstr[1] "Додате су %(count)d публикације из вашег ORCID записа, без аутора: ORCID-ов списак их не садржи. Отворите сваку и притисните „Потражи“ поред њеног DOI-ја за остало."
 msgstr[2] "Додато је %(count)d публикација из вашег ORCID записа, без аутора: ORCID-ов списак их не садржи. Отворите сваку и притисните „Потражи“ поред њеног DOI-ја за остало."
+
+#: src/postulo/resume/views_references.py
+#, python-format
+msgid "Added %(count)d publication to Your career. Nothing was overwritten."
+msgid_plural "Added %(count)d publications to Your career. Nothing was overwritten."
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
 
 #: src/postulo/documents/views.py
 #, python-format
@@ -3449,6 +3511,11 @@ msgstr "Цео дан"
 msgid "All documents"
 msgstr "Сви документи"
 
+#: src/postulo/templates/documents/upload_detail.html
+msgid "All files"
+msgstr ""
+
+#: src/postulo/templates/applications/interview_detail.html
 #: src/postulo/templates/widgets/upcoming_interviews.html
 msgid "All interviews"
 msgstr "Сви интервјуи"
@@ -3456,6 +3523,10 @@ msgstr "Сви интервјуи"
 #: src/postulo/templates/widgets/listings.html
 msgid "All listings"
 msgstr "Сви огласи"
+
+#: src/postulo/templates/applications/interview_detail.html
+msgid "All of the above as a PDF to read on the way there. Downloaded, and not kept in Postulo."
+msgstr ""
 
 #: src/postulo/templates/server/defaults.html
 msgid "All of them are offered, and a language added in a later release will be too."
@@ -3515,6 +3586,10 @@ msgstr "Дешава се и само од себе када се промени
 #, python-format
 msgid "Also in %(names)s"
 msgstr "Такође у: %(names)s"
+
+#: src/postulo/accounts/models.py
+msgid "Always"
+msgstr ""
 
 #: src/postulo/plugins/policy.py
 msgid "Always on: Postulo cannot work without it."
@@ -3763,7 +3838,7 @@ msgstr "Овај Idempotency-Key користи други захтев; пок�
 msgid "Another row is on the same service. Both stay as they are; remove one, or move it to Other, when you like."
 msgstr "Други ред користи исту услугу. Оба остају каква јесу; уклоните један или га преместите у Друго када желите."
 
-#: src/postulo/api/models.py
+#: src/postulo/api/models.py src/postulo/applications/models.py
 msgid "answer"
 msgstr "одговор"
 
@@ -3790,6 +3865,18 @@ msgstr "одговор до %(day)s"
 msgid "Answer by: %(company)s"
 msgstr "Рок за одговор: %(company)s"
 
+#: src/postulo/applications/models.py
+msgid "answer given"
+msgstr ""
+
+#: src/postulo/applications/views_answers.py
+msgid "Answer kept."
+msgstr ""
+
+#: src/postulo/applications/views_answers.py
+msgid "Answer updated."
+msgstr ""
+
 #: src/postulo/resume/models.py
 msgid "Answered"
 msgstr "Одговорено"
@@ -3799,9 +3886,18 @@ msgstr "Одговорено"
 msgid "Answered %(code)s."
 msgstr "Одговор: %(code)s."
 
+#: src/postulo/templates/resume/answer_list.html
+#: src/postulo/templates/resume/overview.html
+msgid "Answers"
+msgstr ""
+
 #: src/postulo/applications/agenda.py
 msgid "Answers due"
 msgstr "Рокови за одговор"
+
+#: src/postulo/applications/models.py
+msgid "answers given"
+msgstr ""
 
 #: src/postulo/accounts/forms.py
 msgid "Antarctica"
@@ -3809,6 +3905,7 @@ msgstr "Антарктида"
 
 #: src/postulo/templates/applications/partials/board_filters.html
 #: src/postulo/templates/cotton/table/filter.html
+#: src/postulo/templates/resume/answer_list.html
 msgid "Any"
 msgstr "Било који"
 
@@ -3968,6 +4065,10 @@ msgstr "Послате пријаве, колико их је добило би�
 #: src/postulo/templates/widgets/interviews_summary.html
 msgid "Applications that reached one"
 msgstr "Пријаве које су достигле ову фазу"
+
+#: src/postulo/templates/resume/answer_form.html
+msgid "Applications that used it keep their own copy, so changing it here changes none of them."
+msgstr ""
 
 #: src/postulo/jobs/merging.py
 msgid "Applications that went through it as an agency"
@@ -4138,6 +4239,7 @@ msgid "As a CV should print it. It is linked to the company of that name among y
 msgstr "Онако како треба да стоји на CV-у. Повезује се са истоименом компанијом међу вашима, а ако таква не постоји, додаје се у ваше компаније."
 
 #: src/postulo/templates/applications/calendar_print.html
+#: src/postulo/templates/applications/interview_detail.html
 #: src/postulo/templates/core/table_export.html
 msgid "As a document"
 msgstr "Као документ"
@@ -4158,6 +4260,10 @@ msgstr "Како је пронађено %(when)s."
 #: src/postulo/resume/forms.py
 msgid "As it was published."
 msgstr "Онако како је објављено."
+
+#: src/postulo/templates/documents/rendered_detail.html
+msgid "As it was sent"
+msgstr ""
 
 #: src/postulo/applications/forms.py
 msgid "As it was written: a percentage, a number of options, the vesting."
@@ -4182,9 +4288,23 @@ msgstr "На дан"
 msgid "as of %(date)s"
 msgstr "на дан %(date)s"
 
+#: src/postulo/templates/applications/interview_detail.html
+#: src/postulo/templates/documents/themes/base_interview.html
+#, python-format
+msgid "as of %(day)s"
+msgstr ""
+
 #: src/postulo/templates/documents/cv_text.html
 msgid "As plain text"
 msgstr "Као обичан текст"
+
+#: src/postulo/applications/forms.py
+msgid "As the employer's form put it."
+msgstr ""
+
+#: src/postulo/applications/forms.py
+msgid "As the form puts it, or near enough to find it again."
+msgstr ""
 
 #: src/postulo/resume/forms.py
 msgid "As the institution words it. Kept in your record; a CV does not print it yet."
@@ -4221,6 +4341,10 @@ msgstr "Тренутно се ниједан не приказује."
 #: src/postulo/documents/forms.py
 msgid "As things stand: {value}."
 msgstr "Тренутно: {value}."
+
+#: src/postulo/applications/forms.py
+msgid "As you sent it. Editing it here leaves the saved answer as it is."
+msgstr ""
 
 #: src/postulo/accounts/forms.py src/postulo/templates/server/design.html
 msgid "Asia"
@@ -4334,6 +4458,14 @@ msgstr "аутор извезених датотека"
 #: src/postulo/resume/models.py
 msgid "authors"
 msgstr "аутори"
+
+#: src/postulo/accounts/models.py
+msgid "Automatically"
+msgstr ""
+
+#: src/postulo/accounts/forms.py
+msgid "Automatically shows a place as the city alone while all your companies are in one country, and as the city and country as soon as there are two. Documents, exports and the API keep the country whatever you choose here."
+msgstr ""
 
 #: src/postulo/jobs/industries.py
 msgid "Automotive"
@@ -4484,7 +4616,7 @@ msgstr "Назад на уобичајене колоне."
 msgid "Back to the usual order"
 msgstr "Назад на уобичајени редослед"
 
-#: src/postulo/core/help.py
+#: src/postulo/core/help.py src/postulo/templates/resume/references.html
 msgid "Back to Your career"
 msgstr "Назад на Вашу каријеру"
 
@@ -4574,6 +4706,23 @@ msgstr "Поред установе, за сваку квалификацију 
 
 #: src/postulo/jobs/industries.py
 msgid "Beverages"
+msgstr ""
+
+#: src/postulo/templates/resume/references.html
+msgid "Bibliography"
+msgstr ""
+
+#: src/postulo/core/transfers.py
+msgid "Bibliography (BibTeX, RIS, CSL JSON)"
+msgstr ""
+
+#: src/postulo/templates/resume/references.html
+msgid "BibTeX has no place for datasets, software or web pages, so they are written as Other; BibLaTeX keeps them. Only what a publication holds is in the file."
+msgstr ""
+
+#: src/postulo/templates/resume/references.html
+#, python-format
+msgid "BibTeX, BibLaTeX, RIS and CSL JSON are read, up to %(limit)s MB and %(most)s entries. The file is read here and not kept; nothing is added until you tick it."
 msgstr ""
 
 #: src/postulo/jobs/industries.py
@@ -4761,6 +4910,7 @@ msgstr "C2 — врсни"
 msgid "Calendar"
 msgstr "Календар"
 
+#: src/postulo/templates/applications/interview_detail.html
 #: src/postulo/templates/applications/interview_list.html
 msgid "Calendar file"
 msgstr "Датотека календара"
@@ -4804,6 +4954,7 @@ msgstr "Може да се упари са"
 
 #: src/postulo/templates/accounts/invite_form.html
 #: src/postulo/templates/accounts/profile.html
+#: src/postulo/templates/applications/answer_form.html
 #: src/postulo/templates/applications/application_form.html
 #: src/postulo/templates/applications/application_intake.html
 #: src/postulo/templates/applications/appointment_form.html
@@ -4838,6 +4989,7 @@ msgstr "Може да се упари са"
 #: src/postulo/templates/jobs/share.html
 #: src/postulo/templates/partials/confirm_delete.html
 #: src/postulo/templates/partials/table/cell.html
+#: src/postulo/templates/resume/answer_form.html
 #: src/postulo/templates/resume/item_form.html
 #: src/postulo/templates/resume/publication_orcid.html
 #: src/postulo/templates/server/backup_delete.html
@@ -5118,6 +5270,10 @@ msgstr "Промене направљене овде шаљу се у следе
 msgid "changes to records"
 msgstr "измене записа"
 
+#: src/postulo/templates/applications/answer_form.html
+msgid "Changing it here leaves the saved answer it began as untouched."
+msgstr ""
+
 #: src/postulo/resume/models.py
 msgid "chapter"
 msgstr "поглавље"
@@ -5231,7 +5387,7 @@ msgstr "Прво изаберите Europass датотеку."
 
 #: src/postulo/applications/views_ical.py src/postulo/core/views_kind_files.py
 #: src/postulo/jobs/vcard_views.py src/postulo/jobs/views.py
-#: src/postulo/resume/views_candidate.py
+#: src/postulo/resume/views_candidate.py src/postulo/resume/views_references.py
 msgid "Choose a file first."
 msgstr "Прво изаберите датотеку."
 
@@ -5307,6 +5463,10 @@ msgstr "Изаберите датуме из календара"
 #: src/postulo/core/personal.py
 msgid "Choose one of the answers in the list."
 msgstr "Изаберите један од одговора са списка."
+
+#: src/postulo/jobs/views.py
+msgid "Choose one of the company's names."
+msgstr ""
 
 #: src/postulo/templates/base.html
 msgid "Choose one of the options."
@@ -6431,6 +6591,7 @@ msgstr "Одбрана"
 #: src/postulo/templates/jobs/industry_list.html
 #: src/postulo/templates/jobs/posting_detail.html
 #: src/postulo/templates/partials/confirm_delete.html
+#: src/postulo/templates/resume/answer_list.html
 #: src/postulo/templates/server/backups.html
 #: src/postulo/templates/server/groups.html
 msgid "Delete"
@@ -6732,9 +6893,17 @@ msgstr "Не пролази проверу"
 msgid "DOI"
 msgstr "DOI"
 
+#: src/postulo/resume/views_references.py
+msgid "DOI lookup"
+msgstr ""
+
 #: src/postulo/resume/lookups.py
 msgid "doi.org's answer was not a record Postulo can read."
 msgstr "Одговор doi.org није био запис који Postulo може да прочита."
+
+#: src/postulo/templates/resume/references.html
+msgid "DOIs, one per line"
+msgstr ""
 
 #: src/postulo/jobs/industries.py
 msgid "Domestic staff"
@@ -6760,6 +6929,7 @@ msgstr "завршено"
 msgid "Done reminder:"
 msgstr "Обављен подсетник:"
 
+#: src/postulo/templates/cotton/document_viewer.html
 #: src/postulo/templates/cotton/sent_versions.html
 #: src/postulo/templates/documents/application_documents.html
 #: src/postulo/templates/documents/rendered_compare.html
@@ -6776,6 +6946,11 @@ msgstr "Преузми"
 #, python-format
 msgid "Download .%(extension)s"
 msgstr "Преузми .%(extension)s"
+
+#: src/postulo/templates/resume/references.html
+#, python-format
+msgid "Download as %(name)s"
+msgstr ""
 
 #: src/postulo/templates/jobs/contact_detail.html
 #: src/postulo/templates/jobs/contact_form.html
@@ -6809,6 +6984,7 @@ msgid "Download it as text"
 msgstr "Преузми као текст"
 
 #: src/postulo/templates/applications/calendar_print.html
+#: src/postulo/templates/applications/interview_detail.html
 #: src/postulo/templates/core/table_export.html
 msgid "Download PDF"
 msgstr "Преузми PDF"
@@ -6973,21 +7149,29 @@ msgstr "Свака фаза броји пријаве које су је ика�
 msgid "Each with an icon"
 msgstr "Свака са иконом"
 
+#: src/postulo/templates/applications/interview_detail.html
+#: src/postulo/templates/documents/themes/base_interview.html
+msgid "Earlier interviews for this application"
+msgstr ""
+
 #: src/postulo/plugins/models.py
 msgid "Ed25519, base64. Without it there is no catalogue: an unsigned list of addresses to run code from is not something Postulo will offer."
 msgstr "Ed25519, base64. Без њега нема каталога: непотписан списак адреса са којих се извршава код није нешто што ће Postulo понудити."
 
 #: src/postulo/templates/applications/application_detail.html
+#: src/postulo/templates/applications/interview_detail.html
 #: src/postulo/templates/applications/interview_list.html
 #: src/postulo/templates/applications/subscription_list.html
 #: src/postulo/templates/applications/tag_list.html
 #: src/postulo/templates/connections/list.html
 #: src/postulo/templates/documents/letter_detail.html
+#: src/postulo/templates/documents/upload_detail.html
 #: src/postulo/templates/documents/upload_list.html
 #: src/postulo/templates/jobs/company_detail.html
 #: src/postulo/templates/jobs/company_form.html
 #: src/postulo/templates/jobs/contact_detail.html
 #: src/postulo/templates/jobs/posting_detail.html
+#: src/postulo/templates/resume/answer_list.html
 #: src/postulo/templates/resume/preview.html
 #: src/postulo/templates/resume/translations.html
 msgid "Edit"
@@ -6996,6 +7180,11 @@ msgstr "Уреди"
 #: src/postulo/templates/resume/overview.html
 #, python-format
 msgid "Edit %(what)s"
+msgstr ""
+
+#: src/postulo/templates/applications/answer_form.html
+#: src/postulo/templates/resume/answer_form.html
+msgid "Edit answer"
 msgstr ""
 
 #: src/postulo/templates/applications/application_form.html
@@ -7540,6 +7729,7 @@ msgstr "Објашњење шта је пошло по злу често зна�
 #: src/postulo/templates/jobs/company_places.html
 #: src/postulo/templates/jobs/contact_detail.html
 #: src/postulo/templates/partials/table/export.html
+#: src/postulo/templates/resume/references.html
 #: src/postulo/templates/settings/export.html
 msgid "Export"
 msgstr "Извези"
@@ -7548,6 +7738,10 @@ msgstr "Извези"
 #, python-format
 msgid "Export %(list)s"
 msgstr "Извоз: %(list)s"
+
+#: src/postulo/templates/resume/references.html
+msgid "Export all of them instead"
+msgstr ""
 
 #: src/postulo/core/models.py
 msgid "export archive"
@@ -7560,6 +7754,10 @@ msgstr "архиве за извоз"
 #: src/postulo/templates/cotton/transfer_group.html
 msgid "Export as"
 msgstr "Извези као"
+
+#: src/postulo/templates/resume/overview.html
+msgid "Export as a reference"
+msgstr ""
 
 #: src/postulo/templates/core/export.html
 #: src/postulo/templates/core/kind_file.html
@@ -7587,6 +7785,7 @@ msgstr "Извези PDF"
 
 #: src/postulo/templates/cotton/sent_versions.html
 #: src/postulo/templates/documents/rendered_compare.html
+#: src/postulo/templates/documents/rendered_detail.html
 #: src/postulo/templates/documents/rendered_list.html
 msgid "Exported on its own"
 msgstr "Извезено засебно"
@@ -7828,6 +8027,10 @@ msgstr "Финансије"
 msgid "Financial support"
 msgstr ""
 
+#: src/postulo/templates/resume/answer_list.html
+msgid "Find"
+msgstr ""
+
 #: src/postulo/templates/settings/locale.html
 msgid "Find a language"
 msgstr "Пронађи језик"
@@ -7896,6 +8099,14 @@ msgstr "Прво понесите све са собом"
 
 #: src/postulo/jobs/industries.py
 msgid "Fishing"
+msgstr ""
+
+#: src/postulo/templates/cotton/document_viewer.html
+msgid "Fit page"
+msgstr ""
+
+#: src/postulo/templates/cotton/document_viewer.html
+msgid "Fit width"
 msgstr ""
 
 #: src/postulo/core/models.py
@@ -8046,6 +8257,7 @@ msgid "Forget the token"
 msgstr "Заборави токен"
 
 #: src/postulo/templates/jobs/company_places.html
+#: src/postulo/templates/resume/references.html
 msgid "Forget this file"
 msgstr "Заборави ову датотеку"
 
@@ -8296,6 +8508,7 @@ msgid "Gender: %(gender)s"
 msgstr "Род: %(gender)s"
 
 #: src/postulo/templates/applications/application_detail.html
+#: src/postulo/templates/applications/interview_detail.html
 msgid "Get"
 msgstr "Преузми"
 
@@ -8649,6 +8862,8 @@ msgid "Highlights of education"
 msgstr ""
 
 #: src/postulo/jobs/models.py src/postulo/jobs/tables.py
+#: src/postulo/templates/applications/interview_detail.html
+#: src/postulo/templates/documents/themes/base_interview.html
 #: src/postulo/templates/jobs/company_form.html
 #: src/postulo/templates/jobs/partials/company_signals.html
 msgid "Hiring"
@@ -9034,6 +9249,7 @@ msgstr "Занемари ову колону"
 #: src/postulo/templates/core/import_csv_map.html
 #: src/postulo/templates/cotton/transfer_group.html
 #: src/postulo/templates/jobs/company_places.html
+#: src/postulo/templates/resume/references.html
 msgid "Import"
 msgstr "Увоз"
 
@@ -9276,7 +9492,10 @@ msgid "Indian Ocean"
 msgstr "Индијски океан"
 
 #: src/postulo/jobs/forms.py src/postulo/jobs/merging.py
-#: src/postulo/jobs/tables.py src/postulo/templates/jobs/company_list.html
+#: src/postulo/jobs/tables.py
+#: src/postulo/templates/applications/interview_detail.html
+#: src/postulo/templates/documents/themes/base_interview.html
+#: src/postulo/templates/jobs/company_list.html
 #: src/postulo/templates/jobs/industry_list.html
 msgid "Industries"
 msgstr "Делатности"
@@ -9370,8 +9589,8 @@ msgstr ""
 msgid "Internship"
 msgstr "Пракса"
 
-#: src/postulo/applications/models.py src/postulo/jobs/contact_views.py
-#: src/postulo/plugins/pairing.py
+#: src/postulo/applications/models.py src/postulo/documents/themes.py
+#: src/postulo/jobs/contact_views.py src/postulo/plugins/pairing.py
 msgid "Interview"
 msgstr "Интервју"
 
@@ -9845,6 +10064,7 @@ msgid "Jobs"
 msgstr "Послови"
 
 #: src/postulo/templates/applications/application_detail.html
+#: src/postulo/templates/applications/interview_detail.html
 #: src/postulo/templates/applications/interview_list.html
 msgid "Join the call"
 msgstr "Придружи се позиву"
@@ -9876,6 +10096,10 @@ msgstr "чувај генерисани приказ ухваћене стран
 #: src/postulo/accounts/forms.py
 msgid "Keep a rendering of the pages I capture"
 msgstr "Чувај генерисани приказ страница које ухватим"
+
+#: src/postulo/templates/applications/answer_form.html
+msgid "Keep an answer"
+msgstr ""
 
 #: src/postulo/templates/jobs/conflicts.html
 msgid "Keep both"
@@ -10040,6 +10264,10 @@ msgstr "кључне речи"
 msgid "keywords of exported files"
 msgstr "кључне речи извезених датотека"
 
+#: src/postulo/jobs/models.py
+msgid "kind"
+msgstr ""
+
 #: src/postulo/documents/models.py src/postulo/plugins/models.py
 #, fuzzy
 msgid "label"
@@ -10067,8 +10295,9 @@ msgstr "положено"
 msgid "Language"
 msgstr "Језик"
 
-#: src/postulo/accounts/models.py src/postulo/documents/models.py
-#: src/postulo/jobs/models.py src/postulo/resume/models.py
+#: src/postulo/accounts/models.py src/postulo/applications/models.py
+#: src/postulo/documents/models.py src/postulo/jobs/models.py
+#: src/postulo/resume/models.py
 msgid "language"
 msgstr "језик"
 
@@ -10094,6 +10323,7 @@ msgid "language of exported files"
 msgstr "језик извезених датотека"
 
 #: src/postulo/templates/applications/calendar_print.html
+#: src/postulo/templates/applications/interview_detail.html
 #: src/postulo/templates/core/table_export.html
 msgid "Language of the document"
 msgstr "Језик документа"
@@ -10640,6 +10870,14 @@ msgstr "Огласи о којима треба одлучити"
 msgid "Listings, applications and their timelines, companies and people, reminders, the text of what you sent, letters, CVs, files and your career record — everything, including what is closed or discarded, because you are looking for something you remember."
 msgstr "Огласи, пријаве и њихове временске линије, компаније и људи, подсетници, текст онога што сте послали, писма, CV-ови, датотеке и ваш запис о каријери — све, укључујући затворено и одбачено, јер тражите нешто чега се сећате."
 
+#: src/postulo/templates/jobs/company_form.html
+msgid "Lists show"
+msgstr ""
+
+#: src/postulo/templates/cotton/document_viewer.html
+msgid "Loading the document…"
+msgstr ""
+
 #: src/postulo/accounts/models.py src/postulo/jobs/models.py
 #: src/postulo/resume/models.py
 msgid "location"
@@ -10692,6 +10930,10 @@ msgstr "Географска дужина"
 #: src/postulo/templates/connections/form.html
 msgid "Look on the server"
 msgstr "Претражи сервер"
+
+#: src/postulo/templates/resume/references.html
+msgid "Look them up"
+msgstr ""
 
 #: src/postulo/templates/resume/item_form.html
 msgid "Look up"
@@ -11372,9 +11614,17 @@ msgstr "име"
 msgid "Name"
 msgstr "Име"
 
+#: src/postulo/jobs/models.py
+msgid "Name in a language"
+msgstr ""
+
 #: src/postulo/resume/forms.py
 msgid "Name of the language"
 msgstr "Назив језика"
+
+#: src/postulo/jobs/models.py
+msgid "name shown in lists"
+msgstr ""
 
 #: src/postulo/jobs/models.py
 msgid "Name the acquirer only for a company that was acquired."
@@ -11489,6 +11739,11 @@ msgstr "Ново"
 #: src/postulo/templates/server/defaults.html
 msgid "New accounts"
 msgstr "Нови налози"
+
+#: src/postulo/templates/resume/answer_form.html
+#: src/postulo/templates/resume/answer_list.html
+msgid "New answer"
+msgstr ""
 
 #: src/postulo/templates/applications/appointment_form.html
 #: src/postulo/templates/applications/calendar.html
@@ -11611,6 +11866,10 @@ msgstr "Следећи интервју"
 msgid "Next month"
 msgstr "Следећи месец"
 
+#: src/postulo/templates/cotton/document_viewer.html
+msgid "Next page"
+msgstr ""
+
 #: src/postulo/applications/tables.py
 msgid "Next reminder"
 msgstr "Следећи подсетник"
@@ -11647,6 +11906,14 @@ msgstr "Није подешен age прималац, а ништа не нап�
 #: src/postulo/applications/forms.py
 msgid "No agency"
 msgstr "Без агенције"
+
+#: src/postulo/templates/resume/answer_list.html
+msgid "No answer matches."
+msgstr ""
+
+#: src/postulo/templates/resume/answer_list.html
+msgid "No answers yet."
+msgstr ""
 
 #: src/postulo/templates/documents/letter_detail.html
 msgid "No application"
@@ -11844,6 +12111,10 @@ msgstr "Ниједан PDF позадински систем није употр
 msgid "No people recorded at this company yet. Add them from <a href=\"%(company_url)s\" class=\"underline\">the company page</a> to name who you are meeting."
 msgstr "Још нема забележених људи у овој компанији. Додајте их са <a href=\"%(company_url)s\" class=\"underline\">странице компаније</a> да бисте навели с ким се састајете."
 
+#: src/postulo/templates/applications/interview_detail.html
+msgid "No place recorded."
+msgstr ""
+
 #: src/postulo/templates/jobs/company_map.html
 msgid "No places yet. When a company has an address, its town is listed here and drawn on the map."
 msgstr "Још нема места. Када компанија има адресу, њено место се наводи овде и приказује на мапи."
@@ -11938,6 +12209,11 @@ msgstr "Још нема ознака."
 msgid "No telephone number"
 msgstr "Без броја телефона"
 
+#: src/postulo/templates/applications/interview_detail.html
+#: src/postulo/templates/documents/themes/base_interview.html
+msgid "No text recorded for this listing."
+msgstr ""
+
 #: src/postulo/documents/themes.py
 #, python-format
 msgid "No theme called “%(theme)s” is installed."
@@ -12004,6 +12280,11 @@ msgstr "Код пружаоца услуге е-поште се још нико 
 #: src/postulo/templates/server/email.html
 msgid "Nobody has signed in yet, so nothing can be sent. Save the settings above, then sign in on the provider's page as the mailbox this instance sends from."
 msgstr "Још се нико није пријавио, па се ништа не може послати. Сачувајте подешавања изнад, а затим се на страници пружаоца услуге пријавите налогом поштанског сандучета са ког ова инстанца шаље поруке."
+
+#: src/postulo/templates/applications/interview_detail.html
+#: src/postulo/templates/documents/themes/base_interview.html
+msgid "Nobody is named for this interview."
+msgstr ""
 
 #: src/postulo/templates/server/data_protection.html
 #, fuzzy
@@ -12131,6 +12412,10 @@ msgstr "још нема"
 #: src/postulo/templates/server/person_recovery.html
 msgid "None yet."
 msgstr "Још нема."
+
+#: src/postulo/templates/jobs/company_form.html
+msgid "None yet. Add one, such as CNRS for a long name, to choose which the lists show."
+msgstr ""
 
 #: src/postulo/templates/jobs/company_form.html
 msgid "None yet. Documents print the name above in every language."
@@ -12277,6 +12562,11 @@ msgstr "Не приказује се ни на једном CV-у док не п
 
 #: src/postulo/templates/applications/subscription_list.html
 msgid "Not read yet. It will be within minutes."
+msgstr ""
+
+#: src/postulo/templates/resume/references.html
+#, python-format
+msgid "Not read, because a publication has nowhere to keep them: %(names)s."
 msgstr ""
 
 #: src/postulo/applications/analytics.py src/postulo/applications/reports.py
@@ -12590,6 +12880,10 @@ msgstr "Ништа се не чува док то не прегледате."
 msgid "Nothing is sent to the server as a password until a new one is entered."
 msgstr "Серверу се не шаље никаква лозинка док се не унесе нова."
 
+#: src/postulo/templates/applications/application_detail.html
+msgid "Nothing kept yet. Keep what you typed into the employer's form, so you can see what they were told."
+msgstr ""
+
 #: src/postulo/templates/applications/application_list.html
 #: src/postulo/templates/jobs/company_list.html
 #: src/postulo/templates/jobs/listing_list.html
@@ -12640,6 +12934,11 @@ msgstr "Ништа на инстанци није старије од рока �
 msgid "Nothing on the other service is touched. You can connect it again later."
 msgstr "Ништа на другој услузи се не дира. Касније можете поново да је повежете."
 
+#: src/postulo/templates/applications/interview_detail.html
+#: src/postulo/templates/documents/themes/base_interview.html
+msgid "Nothing on the timeline yet."
+msgstr ""
+
 #: src/postulo/templates/applications/calendar.html
 #: src/postulo/templates/documents/themes/base_calendar.html
 msgid "Nothing on this day."
@@ -12652,6 +12951,11 @@ msgstr "На овом уносу се ништа не преводи. Назив
 #: src/postulo/templates/applications/partials/timeline.html
 msgid "Nothing recorded against this one yet."
 msgstr "За ово још ништа није забележено."
+
+#: src/postulo/templates/applications/interview_detail.html
+#: src/postulo/templates/documents/themes/base_interview.html
+msgid "Nothing recorded as sent for this application."
+msgstr ""
 
 #: src/postulo/templates/documents/application_documents.html
 msgid "Nothing recorded for this application yet."
@@ -12820,9 +13124,17 @@ msgstr "У овом периоду није послато ништа."
 msgid "Nothing was sent in this period. That is what the report says, and it is a fact like any other."
 msgstr "У овом периоду није послато ништа. То каже извештај и то је чињеница као и свака друга."
 
-#: src/postulo/resume/views.py
+#: src/postulo/resume/views.py src/postulo/resume/views_references.py
 msgid "Nothing was ticked, so nothing was added."
 msgstr "Ништа није означено, па ништа није додато."
+
+#: src/postulo/templates/documents/themes/base_interview.html
+msgid "Nothing written yet."
+msgstr ""
+
+#: src/postulo/templates/applications/interview_detail.html
+msgid "Nothing written yet. Add notes when you edit the interview."
+msgstr ""
 
 #: src/postulo/documents/forms.py
 msgid "Nothing yet"
@@ -12868,6 +13180,11 @@ msgstr "обавештено"
 #: src/postulo/resume/models.py
 msgid "number"
 msgstr "број"
+
+#: src/postulo/templates/cotton/document_viewer.html
+#, python-format
+msgid "of %(count)s"
+msgstr ""
 
 #: src/postulo/jobs/widgets.py
 msgid "Of the listings you noticed, how many you applied to and how many you let go."
@@ -13279,6 +13596,11 @@ msgstr[0] "Додат је %(total)s запис. Ништа што сте већ
 msgstr[1] "Додата су %(total)s записа. Ништа што сте већ имали није промењено ни уклоњено."
 msgstr[2] "Додато је %(total)s записа. Ништа што сте већ имали није промењено ни уклоњено."
 
+#: src/postulo/templates/resume/references.html
+#, python-format
+msgid "One request to doi.org for each DOI, at most %(most)s, when you press the button: doi.org passes it to Crossref or DataCite. Only the DOI is sent. What comes back is listed above to tick, and nothing is kept until you add it."
+msgstr ""
+
 #: src/postulo/templates/jobs/company_detail.html
 msgid "One request to that register, carrying the number alone; nothing is kept until you say so."
 msgstr "Један захтев том регистру, само са бројем; ништа се не чува док то не кажете."
@@ -13420,6 +13742,11 @@ msgstr "Завршити ово може само администратор к�
 msgid "Only the applications that name a referrer or an agency are in these two; the company on a posting stays the employer."
 msgstr "У ова два су само пријаве које наводе препоручиоца или агенцију; компанија на огласу остаје послодавац."
 
+#: src/postulo/templates/resume/references.html
+#, python-format
+msgid "Only the first %(most)s entries are read; the rest of the file was left out."
+msgstr ""
+
 #: src/postulo/documents/forms.py
 msgid "Only the ones ticked below"
 msgstr "Само они означени испод"
@@ -13448,6 +13775,10 @@ msgstr "Овде се чува само јавни кључ, прималац. �
 msgid "Only the year prints on a CV, so the day makes no difference."
 msgstr "На CV-у се приказује само година, па дан није битан."
 
+#: src/postulo/templates/resume/references.html
+msgid "Only this publication, as a reference:"
+msgstr ""
+
 #: src/postulo/templates/jobs/company_register.html
 msgid "Only what you tick is kept; nothing else on the company changes."
 msgstr "Чува се само оно што означите; ништа друго на компанији се не мења."
@@ -13475,6 +13806,10 @@ msgstr "Отворене пријаве без икаквог одговора �
 #: src/postulo/templates/partials/table/views.html
 msgid "Open as this"
 msgstr "Отварај овако"
+
+#: src/postulo/templates/cotton/document_viewer.html
+msgid "Open in a new tab"
+msgstr ""
 
 #: src/postulo/templates/applications/subscribed_event.html
 #: src/postulo/templates/jobs/capture_form.html
@@ -13749,7 +14084,7 @@ msgstr "Пакет"
 msgid "Packing up your data"
 msgstr "Пакују се ваши подаци"
 
-#: src/postulo/core/design.py
+#: src/postulo/core/design.py src/postulo/templates/cotton/document_viewer.html
 msgid "Page"
 msgstr "Страница"
 
@@ -13758,6 +14093,11 @@ msgstr "Страница"
 #, python-format
 msgid "Page %(current)s of %(total)s"
 msgstr "Страница %(current)s од %(total)s"
+
+#: src/postulo/templates/cotton/document_viewer.html
+#, python-format
+msgid "Page %(page)s of %(count)s"
+msgstr ""
 
 #: src/postulo/jobs/capture_views.py
 msgid "Page source"
@@ -13855,6 +14195,7 @@ msgstr "папир"
 
 #: src/postulo/documents/forms.py src/postulo/jobs/industries.py
 #: src/postulo/templates/applications/calendar_print.html
+#: src/postulo/templates/applications/interview_detail.html
 #: src/postulo/templates/applications/report.html
 #: src/postulo/templates/core/table_export.html
 #: src/postulo/templates/settings/export.html
@@ -13886,6 +14227,8 @@ msgid "part of"
 msgstr "део"
 
 #: src/postulo/jobs/tables.py
+#: src/postulo/templates/applications/interview_detail.html
+#: src/postulo/templates/documents/themes/base_interview.html
 msgid "Part of"
 msgstr "Део"
 
@@ -14170,6 +14513,10 @@ msgstr "Резервисана места попут {{ company }} попуња�
 
 #: src/postulo/documents/models.py
 msgid "Placeholders such as {{ company }} are filled in when you write it."
+msgstr ""
+
+#: src/postulo/applications/models.py
+msgid "Placeholders such as {{ company }} are filled in with the application when you use the answer on one."
 msgstr ""
 
 #: src/postulo/plugins/categories.py
@@ -14567,6 +14914,8 @@ msgstr "Притисните „Провери ажурирања“ да бис
 msgid "Press “Read the page” again to capture it anyway."
 msgstr "Притисните поново „Прочитај страницу“ да бисте је свеједно ухватили."
 
+#: src/postulo/templates/documents/rendered_list.html
+#: src/postulo/templates/documents/upload_list.html
 #: src/postulo/templates/resume/overview.html
 msgid "Preview"
 msgstr "Претпреглед"
@@ -14603,6 +14952,10 @@ msgstr "Претходни дан"
 #: src/postulo/templates/cotton/date_picker.html
 msgid "Previous month"
 msgstr "Претходни месец"
+
+#: src/postulo/templates/cotton/document_viewer.html
+msgid "Previous page"
+msgstr ""
 
 #: src/postulo/applications/agenda.py
 msgid "Previous week"
@@ -14726,6 +15079,7 @@ msgid "Proceedings"
 msgstr "Зборник радова"
 
 #: src/postulo/templates/documents/themes/base_calendar.html
+#: src/postulo/templates/documents/themes/base_interview.html
 #: src/postulo/templates/documents/themes/base_list.html
 msgid "Produced by Postulo from this person's own records."
 msgstr "Генерисала апликација Postulo из сопствених записа ове особе."
@@ -14735,6 +15089,7 @@ msgid "Produced by Postulo from this person's own records. Postulo sets no targe
 msgstr "Израдила апликација Postulo из сопствених записа ове особе. Postulo не поставља никакав циљ: колико пријава треба да буде у једном периоду одређује правило система накнада или сама особа."
 
 #: src/postulo/templates/documents/themes/base_calendar.html
+#: src/postulo/templates/documents/themes/base_interview.html
 #: src/postulo/templates/documents/themes/base_list.html
 #: src/postulo/templates/documents/themes/base_report.html
 #, python-format
@@ -14855,6 +15210,10 @@ msgstr "Публикације"
 msgid "publications"
 msgstr "публикације"
 
+#: src/postulo/templates/resume/references.html
+msgid "Publications in the file"
+msgstr ""
+
 #: src/postulo/resume/models.py
 msgid "published in"
 msgstr "објављено у"
@@ -14921,6 +15280,10 @@ msgstr "Квалификације"
 
 #: src/postulo/jobs/industries.py
 msgid "Quarrying"
+msgstr ""
+
+#: src/postulo/applications/models.py
+msgid "question"
 msgstr ""
 
 #: src/postulo/templates/connections/list.html
@@ -15018,6 +15381,11 @@ msgstr ""
 msgid "Read as"
 msgstr "Читај као"
 
+#: src/postulo/templates/resume/references.html
+#, python-format
+msgid "Read as %(name)s."
+msgstr ""
+
 #: src/postulo/resume/views.py
 msgid "Read as Europass JSON, the older format as the Europass web service wrote it until 2020."
 msgstr "Прочитано као Europass JSON, старији формат који је веб-услуга Europass записивала до 2020."
@@ -15067,6 +15435,7 @@ msgstr "Прочитано из Europass XML-а приложеног уз PDF, �
 
 #: src/postulo/templates/jobs/company_places.html
 #: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/references.html
 #: src/postulo/templates/server/plugins.html
 msgid "Read it"
 msgstr "Прочитај"
@@ -15321,6 +15690,10 @@ msgstr "Регрутер"
 #: src/postulo/templates/server/capture.html
 msgid "Redirects followed"
 msgstr "Праћених преусмерења"
+
+#: src/postulo/templates/cotton/document_viewer.html
+msgid "Redraw"
+msgstr ""
 
 #: src/postulo/documents/forms.py
 msgid "Referee"
@@ -15877,6 +16250,7 @@ msgid "Saturday"
 msgstr "Субота"
 
 #: src/postulo/templates/accounts/profile.html
+#: src/postulo/templates/applications/answer_form.html
 #: src/postulo/templates/applications/application_form.html
 #: src/postulo/templates/applications/application_intake.html
 #: src/postulo/templates/applications/appointment_form.html
@@ -15897,6 +16271,7 @@ msgstr "Субота"
 #: src/postulo/templates/jobs/industry_form.html
 #: src/postulo/templates/jobs/posting_form.html
 #: src/postulo/templates/partials/table/cell.html
+#: src/postulo/templates/resume/answer_form.html
 #: src/postulo/templates/resume/item_form.html
 #: src/postulo/templates/resume/translations.html
 #: src/postulo/templates/server/backup_destination.html
@@ -15962,6 +16337,14 @@ msgstr "Сачувајте да бисте додали још један иде
 #: src/postulo/templates/jobs/capture_review.html
 msgid "Save to listings"
 msgstr "Сачувај у огласе"
+
+#: src/postulo/applications/models.py
+msgid "saved answer"
+msgstr ""
+
+#: src/postulo/applications/models.py
+msgid "saved answers"
+msgstr ""
 
 #: src/postulo/accounts/settings_views.py
 #, python-format
@@ -16089,6 +16472,7 @@ msgstr "Postulo није проверио печат"
 #: src/postulo/templates/core/search.html
 #: src/postulo/templates/cotton/site_search.html
 #: src/postulo/templates/jobs/industry_list.html
+#: src/postulo/templates/resume/answer_list.html
 msgid "Search"
 msgstr "Претражи"
 
@@ -16304,6 +16688,7 @@ msgstr "послати документи"
 #: src/postulo/templates/core/export.html
 #: src/postulo/templates/cotton/documents_nav.html
 #: src/postulo/templates/documents/rendered_compare.html
+#: src/postulo/templates/documents/rendered_detail.html
 #: src/postulo/templates/documents/rendered_list.html
 msgid "Sent documents"
 msgstr "Послати документи"
@@ -16674,6 +17059,14 @@ msgstr "прикажи путању навигације при лебдењу"
 #: src/postulo/accounts/forms.py
 msgid "Show the breadcrumb only while I point at it"
 msgstr "Прикажи путању навигације само док показујем на њу"
+
+#: src/postulo/accounts/forms.py
+msgid "Show the country"
+msgstr ""
+
+#: src/postulo/accounts/models.py
+msgid "show the country"
+msgstr ""
 
 #: src/postulo/accounts/forms.py
 msgid "Show the keys beside the controls that have one"
@@ -17186,6 +17579,10 @@ msgstr "Датум почетка"
 msgid "Start from a type"
 msgstr "Почни од врсте"
 
+#: src/postulo/templates/applications/answer_form.html
+msgid "Start from an answer you have saved"
+msgstr ""
+
 #: src/postulo/templates/documents/letter_form.html
 msgid "Start from:"
 msgstr "Почни од:"
@@ -17220,7 +17617,10 @@ msgstr "STARTTLS, након повезивања"
 msgid "state"
 msgstr "стање"
 
-#: src/postulo/jobs/tables.py src/postulo/templates/connections/pairing.html
+#: src/postulo/jobs/tables.py
+#: src/postulo/templates/applications/interview_detail.html
+#: src/postulo/templates/connections/pairing.html
+#: src/postulo/templates/documents/themes/base_interview.html
 #: src/postulo/templates/jobs/company_register.html
 #: src/postulo/templates/server/person_recovery.html
 msgid "State"
@@ -17550,6 +17950,7 @@ msgstr "Табеларни приказ"
 #: src/postulo/templates/applications/partials/board_filters.html
 #: src/postulo/templates/applications/partials/bulk_fields.html
 #: src/postulo/templates/applications/tag_form.html
+#: src/postulo/templates/resume/answer_list.html
 msgid "Tag"
 msgstr "Ознака"
 
@@ -17963,7 +18364,7 @@ msgstr "Та датотека је празна."
 #: src/postulo/core/vcard.py src/postulo/core/views_kind_files.py
 #: src/postulo/jobs/geojson.py src/postulo/jobs/vcard_views.py
 #: src/postulo/plugins/base.py src/postulo/resume/candidate.py
-#: src/postulo/resume/views_candidate.py
+#: src/postulo/resume/references.py src/postulo/resume/views_candidate.py
 #, python-format
 msgid "That file is larger than %(limit)s MB, so it was not read."
 msgstr "Та датотека је већа од %(limit)s MB, па није прочитана."
@@ -17987,9 +18388,25 @@ msgstr "Та датотека је већа од %(mb)s MB које ова ин�
 msgid "That file is not a GeoJSON collection of features."
 msgstr "Та датотека није GeoJSON колекција објеката."
 
+#: src/postulo/resume/references.py
+msgid "That file is not BibTeX."
+msgstr ""
+
+#: src/postulo/resume/references.py
+msgid "That file is not CSL JSON."
+msgstr ""
+
 #: src/postulo/jobs/geojson.py
 msgid "That file is not GeoJSON."
 msgstr "Та датотека није GeoJSON."
+
+#: src/postulo/resume/references.py
+msgid "That file is not one of BibTeX, BibLaTeX, RIS or CSL JSON, so it was not read."
+msgstr ""
+
+#: src/postulo/resume/references.py
+msgid "That file is not RIS."
+msgstr ""
 
 #: src/postulo/resume/views.py
 #, python-format
@@ -18015,6 +18432,10 @@ msgstr "Та датотека је прочитана, али у њој није
 #: src/postulo/jobs/views.py
 msgid "That file was read, and there was no point in it."
 msgstr "Та датотека је прочитана, али у њој није било тачке."
+
+#: src/postulo/resume/views_references.py
+msgid "That file was read, and there was no publication in it to add."
+msgstr ""
 
 #: src/postulo/core/views_kind_files.py src/postulo/resume/views.py
 #: src/postulo/resume/views_candidate.py
@@ -18784,6 +19205,10 @@ msgstr "Компаније, контакти и огласи које додај
 msgid "The company %(name)s is not in your account, and is added with it."
 msgstr "Компанија %(name)s није у вашем налогу и додаје се заједно са њим."
 
+#: src/postulo/jobs/views.py
+msgid "The company already has that name."
+msgstr ""
+
 #: src/postulo/templates/jobs/company_places.html
 msgid "The company has no address to place."
 msgstr "Компанија нема адресу према којој би се поставила на мапу."
@@ -18791,6 +19216,11 @@ msgstr "Компанија нема адресу према којој би се
 #: src/postulo/templates/jobs/company_wikidata.html
 msgid "The company has no address to put it on: add one, and fetch again."
 msgstr "Компанија нема адресу на коју би се то ставило: додајте адресу и преузмите поново."
+
+#: src/postulo/templates/applications/interview_detail.html
+#: src/postulo/templates/documents/themes/base_interview.html
+msgid "The company in brief"
+msgstr ""
 
 #: src/postulo/templates/applications/application_intake.html
 msgid "The company is matched by name and created if it is new. Only the company and the job title are required; everything else can be filled in later."
@@ -18993,6 +19423,7 @@ msgstr "Износ онако како су га написали, пре пор
 
 #: src/postulo/templates/applications/ical_import.html
 #: src/postulo/templates/core/kind_file.html
+#: src/postulo/templates/documents/upload_detail.html
 #: src/postulo/templates/jobs/contact_vcards.html
 #: src/postulo/templates/resume/candidate_file.html
 #: src/postulo/templates/resume/europass_import.html
@@ -19348,7 +19779,9 @@ msgstr "Листа са леве стране води до одељка и по
 msgid "The list opens over the dialog. Escape closes the list and leaves the dialog open."
 msgstr "Листа се отвара преко дијалога. Escape затвара листу, а дијалог оставља отвореним."
 
+#: src/postulo/templates/applications/interview_detail.html
 #: src/postulo/templates/applications/partials/timeline.html
+#: src/postulo/templates/documents/themes/base_interview.html
 msgid "The listing"
 msgstr "Оглас"
 
@@ -19723,6 +20156,10 @@ msgstr "Радно место"
 msgid "The route it went through. The report counts by this, including how many went through the public employment service's own board."
 msgstr "Пут којим је ишла. Извештај броји према овоме, укључујући колико их је ишло преко огласника саме јавне службе за запошљавање."
 
+#: src/postulo/jobs/duplicates.py
+msgid "The same acronym or short name"
+msgstr ""
+
 #: src/postulo/jobs/conflicts.py
 msgid "The same advert"
 msgstr "Исти оглас"
@@ -19912,6 +20349,11 @@ msgstr ""
 msgid "The stored mail credentials cannot be read on this instance."
 msgstr "Сачувани приступни подаци за пошту не могу да се прочитају на овој инстанци."
 
+#: src/postulo/templates/applications/interview_detail.html
+#: src/postulo/templates/documents/themes/base_interview.html
+msgid "The story so far"
+msgstr ""
+
 #: src/postulo/accounts/forms.py
 msgid "The subject every file carries"
 msgstr "Тема коју свака датотека садржи"
@@ -20080,6 +20522,7 @@ msgid "theme"
 msgstr "тема"
 
 #: src/postulo/templates/applications/calendar_print.html
+#: src/postulo/templates/applications/interview_detail.html
 #: src/postulo/templates/applications/report.html
 #: src/postulo/templates/core/table_export.html
 msgid "Theme"
@@ -20178,6 +20621,10 @@ msgstr "Ништа не чека на увоз."
 #: src/postulo/jobs/pages.py
 msgid "There was nothing to keep."
 msgstr "Није било ничега за чување."
+
+#: src/postulo/templates/applications/interview_detail.html
+msgid "These are the files as they were sent, not your documents as they are now."
+msgstr ""
 
 #: src/postulo/templates/widgets/insight_counters.html
 #, python-format
@@ -20403,14 +20850,28 @@ msgstr "Само за овај извоз. Ваша подразумевана �
 msgid "This field is required."
 msgstr "Ово поље је обавезно."
 
+#: src/postulo/templates/cotton/document_viewer.html
+msgid "This file could not be shown here. You can still download it."
+msgstr ""
+
+#: src/postulo/templates/cotton/document_viewer.html
+msgid "This file has no text a screen reader can read."
+msgstr ""
+
 #: src/postulo/applications/ical_reader.py
 msgid "This file is an invitation. Its events are read as any others; no reply is sent."
 msgstr "Ова датотека је позивница. Њени догађаји се читају као и сви други; никакав одговор се не шаље."
 
+#: src/postulo/templates/cotton/document_viewer.html
+msgid "This file is locked with a password, so it cannot be shown here. You can still download it."
+msgstr ""
+
+#: src/postulo/templates/documents/upload_detail.html
 #: src/postulo/templates/documents/upload_list.html
 msgid "This file is missing. Upload it again as a new version that supersedes this one."
 msgstr "Ова датотека недостаје. Поново је отпремите као нову верзију која замењује ову."
 
+#: src/postulo/templates/documents/upload_detail.html
 #: src/postulo/templates/documents/upload_list.html
 msgid "This file no longer matches what was uploaded. Upload it again as a new version that supersedes this one."
 msgstr "Ова датотека се више не подудара са оним што је отпремљено. Поново је отпремите као нову верзију која замењује ову."
@@ -20589,6 +21050,10 @@ msgstr "Ово је погрешно у тексту онако како је с
 msgid "This is your own account. A link you make for yourself is not a way back in — you had to sign in to make it. If you are the only administrator here, a passkey or a second administrator is what covers you."
 msgstr "Ово је ваш сопствени налог. Линк који направите за себе није начин да поново приступите налогу — морали сте да се пријавите да бисте га направили. Ако сте овде једини администратор, штити вас приступни кључ или други администратор."
 
+#: src/postulo/templates/cotton/document_viewer.html
+msgid "This kind of file cannot be shown here. Download it to open it."
+msgstr ""
+
 #: src/postulo/templates/cotton/listing_skills.html
 msgid "This listing names none of the classification's skills by name."
 msgstr ""
@@ -20763,6 +21228,10 @@ msgstr "Означите редове да бисте деловали на ви
 #: src/postulo/applications/forms.py
 msgid "Tick the box to add the listing anyway."
 msgstr "Означите поље да бисте ипак додали оглас."
+
+#: src/postulo/templates/resume/references.html
+msgid "Tick the publications to add. Nothing is changed or overwritten: an entry you already have is marked, and ticking it adds another."
+msgstr ""
 
 #: src/postulo/templates/resume/publication_orcid.html
 #, python-format
@@ -21054,9 +21523,21 @@ msgctxt "type of event"
 msgid "type"
 msgstr "врста"
 
+#: src/postulo/resume/views_references.py
+msgid "Type at least one DOI first."
+msgstr ""
+
 #: src/postulo/templates/core/search.html
 msgid "Type at least two characters."
 msgstr "Упишите бар два знака."
+
+#: src/postulo/resume/views_references.py
+#, python-format
+msgid "Type at most %(count)d DOI at a time; nothing was asked."
+msgid_plural "Type at most %(count)d DOIs at a time; nothing was asked."
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
 
 #: src/postulo/accounts/forms.py
 msgid "Type it here, or choose one from the list."
@@ -21093,6 +21574,10 @@ msgstr "врста извора"
 #: src/postulo/jobs/models.py
 msgid "type of thing it points at"
 msgstr "врста ствари на коју указује"
+
+#: src/postulo/jobs/views.py
+msgid "Type the acronym or short name."
+msgstr ""
 
 #: src/postulo/resume/lookups.py src/postulo/resume/views.py
 msgid "Type the DOI first."
@@ -21443,6 +21928,7 @@ msgid "Verified"
 msgstr "Потврђено"
 
 #: src/postulo/documents/models.py
+#: src/postulo/templates/documents/upload_detail.html
 #: src/postulo/templates/documents/upload_list.html
 msgid "version"
 msgstr "верзија"
@@ -21614,6 +22100,7 @@ msgstr "WebP слика"
 
 #: src/postulo/core/models.py src/postulo/core/web_links.py
 #: src/postulo/documents/printing.py src/postulo/jobs/tables.py
+#: src/postulo/templates/applications/interview_detail.html
 #: src/postulo/templates/jobs/company_detail.html
 msgid "Website"
 msgstr "Веб-сајт"
@@ -21726,6 +22213,10 @@ msgstr "Како вредност изгледа, од првог до посл�
 msgid "What almost everything in Postulo sits in."
 msgstr "Оно у чему се налази скоро све у апликацији Postulo."
 
+#: src/postulo/templates/resume/answer_list.html
+msgid "What application forms keep asking, written once. An application keeps its own copy of the answer it uses."
+msgstr ""
+
 #: src/postulo/templates/jobs/posting_detail.html
 msgid "What arrived about this listing, and what you noted. Once you apply, it heads the application's timeline."
 msgstr "Шта је стигло о овом огласу и шта сте забележили. Када се пријавите, то стоји на почетку временске линије пријаве."
@@ -21796,6 +22287,10 @@ msgstr ""
 #: src/postulo/templates/cotton/review_sections.html
 msgid "What happens"
 msgstr "Шта се дешава"
+
+#: src/postulo/templates/applications/application_detail.html
+msgid "What I answered"
+msgstr ""
 
 #: src/postulo/templates/connections/form.html
 msgid "What is being asked for"
@@ -22146,9 +22641,18 @@ msgstr "шта сте представили"
 msgid "What you presented, if you presented something."
 msgstr "Шта сте представили, ако сте нешто представили."
 
+#: src/postulo/templates/applications/interview_detail.html
+#: src/postulo/templates/documents/themes/base_interview.html
+msgid "What you sent"
+msgstr ""
+
 #: src/postulo/accounts/forms.py
 msgid "What you sign in with. Lowercase letters, digits, dots, underscores, hyphens."
 msgstr "Оно чиме се пријављујете. Мала слова, цифре, тачке, доње црте, цртице."
+
+#: src/postulo/templates/applications/answer_form.html
+msgid "What you told them. It is kept as it is, even if you later change the saved answer."
+msgstr ""
 
 #: src/postulo/templates/resume/translations.html
 msgid "What you type here is what a CV in that language prints instead."
@@ -22214,6 +22718,10 @@ msgstr "Када"
 msgid "When accepting should also move the application."
 msgstr "Када прихватање треба и да помери пријаву."
 
+#: src/postulo/templates/documents/themes/base_interview.html
+msgid "When and where"
+msgstr ""
+
 #: src/postulo/jobs/models.py
 msgid "When it entered your listings."
 msgstr "Када је ушао у ваше огласе."
@@ -22242,6 +22750,7 @@ msgstr "Када региструјете ову инстанцу код пру�
 msgid "where"
 msgstr "где"
 
+#: src/postulo/templates/applications/interview_detail.html
 #: src/postulo/templates/applications/subscribed_event.html
 msgid "Where"
 msgstr ""
@@ -22435,6 +22944,10 @@ msgstr "Која колона је која?"
 msgid "Which device or tool this is for."
 msgstr "За који уређај или алат је ово."
 
+#: src/postulo/applications/models.py
+msgid "Which language the answer is written in. Leave blank if it does not matter."
+msgstr ""
+
 #: src/postulo/documents/models.py
 msgid "Which language this file is in. Postulo cannot read it, so nothing is assumed; a store files it by this."
 msgstr "На ком је језику ова датотека. Postulo не може да је прочита, па се ништа не претпоставља; складиште је по томе разврстава."
@@ -22531,6 +23044,11 @@ msgstr "Ко га је написао, када и да ли још може д�
 #: src/postulo/applications/models.py
 msgid "who you are meeting"
 msgstr "с ким се састајете"
+
+#: src/postulo/templates/applications/interview_detail.html
+#: src/postulo/templates/documents/themes/base_interview.html
+msgid "Who you are meeting"
+msgstr ""
 
 #: src/postulo/applications/forms.py
 msgid "Who you are meeting. The people you have recorded at this company are offered, and anybody already on this interview who has since moved on."
@@ -23001,6 +23519,7 @@ msgid "You already have that industry."
 msgstr "Већ имате ту делатност."
 
 #: src/postulo/templates/resume/publication_orcid.html
+#: src/postulo/templates/resume/references.html
 msgid "You already have this one."
 msgstr "Ово већ имате."
 
@@ -23158,6 +23677,11 @@ msgstr "Скинули сте све с њега. Вратите нешто ка
 msgid "You leave your groups; what they own stays theirs."
 msgstr "Напуштате своје групе; оно што оне поседују остаје њихово."
 
+#: src/postulo/applications/forms.py
+#, python-format
+msgid "You may name the company and the rest when you use it on an application: %(names)s."
+msgstr ""
+
 #: src/postulo/documents/models.py
 msgid "You send it"
 msgstr "Ви га шаљете"
@@ -23169,6 +23693,14 @@ msgstr "Прво ће вас питати за тренутну."
 #: src/postulo/templates/account/recovery_set_password.html
 msgid "You will still sign in afterwards, and still give your second factor if you have one. This link changes the password and nothing else."
 msgstr "Након тога ћете се ипак пријавити и унети свој други фактор ако га имате. Овај линк мења лозинку и ништа друго."
+
+#: src/postulo/templates/resume/references.html
+#, python-format
+msgid "Your %(total)s publication, in the format your reference manager reads."
+msgid_plural "Your %(total)s publications, in the format your reference manager reads."
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
 
 #: src/postulo/accounts/views.py
 msgid "Your account and everything in it have been deleted."
@@ -23408,6 +23940,10 @@ msgid "Your own site, if you have one."
 msgstr "Ваш сопствени веб-сајт, ако га имате."
 
 #: src/postulo/applications/forms.py
+msgid "Your own words for grouping answers: pay, availability, motivation."
+msgstr ""
+
+#: src/postulo/applications/forms.py
 msgid "Your own words for grouping applications. New ones go in the box below."
 msgstr "Ваше сопствене речи за груписање пријава. Нове се уписују у поље испод."
 
@@ -23428,6 +23964,11 @@ msgstr "Ваша слика је изостављена. JSON датотека �
 msgid "Your picture is shown at the top of every page, where it is the button that opens your menu, and to the administrators of this instance in their list of people. No CV and no letter prints it. Until you give Postulo a picture, it shows your initials."
 msgstr "Ваша слика се приказује на врху сваке странице, где је дугме које отвара ваш мени, као и администраторима ове инстанце на њиховој листи особа. Ниједан CV ни писмо је не приказује. Док апликацији Postulo не дате слику, приказују се ваши иницијали."
 
+#: src/postulo/templates/applications/interview_detail.html
+#: src/postulo/templates/documents/themes/base_interview.html
+msgid "Your preparation notes"
+msgstr ""
+
 #: src/postulo/documents/printing.py
 msgid "Your primary code repository"
 msgstr "Ваш примарни репозиторијум кода"
@@ -23443,6 +23984,10 @@ msgstr "Ваш примарни профил на друштвеној мреж�
 #: src/postulo/documents/printing.py
 msgid "Your primary website"
 msgstr "Ваш примарни веб-сајт"
+
+#: src/postulo/templates/resume/references.html
+msgid "Your publications as a file that Zotero, Mendeley, JabRef, EndNote and LaTeX read, and a file of theirs read in."
+msgstr ""
 
 #: src/postulo/core/transfers.py
 msgid "Your record (JSON)"
@@ -23540,11 +24085,17 @@ msgstr "Ваше су. Не иду нигде уз датотеку."
 msgid "Yours: only you can share it, give it to a group or delete it."
 msgstr "Ваше: само ви можете да га поделите, дате групи или обришете."
 
+#: src/postulo/templates/cotton/document_viewer.html
+msgid "Zoom"
+msgstr ""
+
+#: src/postulo/templates/cotton/document_viewer.html
 #: src/postulo/templates/jobs/address_place.html
 #: src/postulo/templates/jobs/company_map.html
 msgid "Zoom in"
 msgstr "Увећај"
 
+#: src/postulo/templates/cotton/document_viewer.html
 #: src/postulo/templates/jobs/address_place.html
 #: src/postulo/templates/jobs/company_map.html
 msgid "Zoom out"

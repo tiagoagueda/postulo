@@ -8,6 +8,11 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### ✨ Added
 
+- PDFs open in a viewer of Postulo's own, and the lists show a thumbnail of each (#942)
+- Publications can be read and written as BibTeX, BibLaTeX, RIS and CSL JSON; looking them up online is an administrator's switch, off by default (#879)
+- A company can hold acronyms and short names, and you choose which name the lists show (#1245)
+- Answers given to application forms are kept, reusable, with a copy of what each application sent (#1092)
+- Each interview has a page that gathers what to prepare from, and a PDF of it (#1091)
 - Message templates: follow-ups, thank-yous and withdrawals written from templates and sent from your own address (#1094)
 - My details shows the CV photo, with its size, and previews a new one before it is saved (#1246)
 - A listing's page and its application's page show which of the skills the listing names your career record has and which it does not, read from the ESCO classification with no model, and which CV prints the most of them. (#1093)
@@ -25,6 +30,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🔧 Changed
 
+- A place is shown as the city alone while every place you deal with is in one country; a setting overrides it (#1249)
 - Sectors and industries are shown by one- or two-word labels, with the full name as the tooltip, and a search finds them by either (#1248)
 - My career shows Edit and Delete as pencil and bin icons that name their entry (#1247)
 - A test run on your own machine keeps the migrated test database and restores it instead of migrating again, so one test file starts in seconds instead of a minute or more; plugin repositories can use the same fixture from postulo.plugins.testing, and CI migrates as before. (#1144)

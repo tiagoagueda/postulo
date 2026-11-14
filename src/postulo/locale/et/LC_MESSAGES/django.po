@@ -283,6 +283,13 @@ msgid_plural "%(count)d postings"
 msgstr[0] "%(count)d kuulutus"
 msgstr[1] "%(count)d kuulutust"
 
+#: src/postulo/resume/views_references.py
+#, python-format
+msgid "%(count)d publication found. Nothing is added until you tick it."
+msgid_plural "%(count)d publications found. Nothing is added until you tick them."
+msgstr[0] ""
+msgstr[1] ""
+
 #: src/postulo/core/gdpr.py
 #, python-format
 msgid "%(count)d reference letter kept, without its referee."
@@ -562,6 +569,11 @@ msgstr[1] "%(days)s päeva alates kuupäevast %(day)s"
 msgid "%(department)s is at %(company)s, which is not part of the same employer as this posting."
 msgstr "%(department)s on ettevõttes %(company)s, mis ei kuulu samale tööandjale kui see kuulutus."
 
+#: src/postulo/resume/views_references.py
+#, python-format
+msgid "%(doi)s: %(reason)s"
+msgstr ""
+
 #: src/postulo/templates/widgets/endings.html
 #, python-format
 msgid "%(explained)s of %(counter)s ending has a reason recorded. One can be added afterwards, from the application's own page."
@@ -794,6 +806,11 @@ msgstr "%(kind)s %(when)s tühistati"
 #, python-format
 msgid "%(kind)s scheduled for %(when)s"
 msgstr "%(kind)s on määratud: %(when)s"
+
+#: src/postulo/applications/interview_brief.py
+#, python-format
+msgid "%(kind)s · %(role)s at %(company)s"
+msgstr ""
 
 #: src/postulo/applications/ical.py
 #, python-format
@@ -1527,6 +1544,13 @@ msgid_plural "%(total)s entries"
 msgstr[0] "%(total)s kirje"
 msgstr[1] "%(total)s kirjet"
 
+#: src/postulo/templates/resume/references.html
+#, python-format
+msgid "%(total)s entry could not be read, or had no title, and is not listed."
+msgid_plural "%(total)s entries could not be read, or had no title, and are not listed."
+msgstr[0] ""
+msgstr[1] ""
+
 #: src/postulo/templates/applications/calendar_print.html
 #, python-format
 msgid "%(total)s entry."
@@ -1717,6 +1741,10 @@ msgstr "<code dir=\"ltr\">iso7064-mod11-2</code>, millega lõpeb ORCID, või <co
 msgid "<code dir=\"ltr\">true</code> to put what was typed into capitals, or into small letters, before it is checked."
 msgstr "<code dir=\"ltr\">true</code>, et sisestatu enne kontrollimist suurtähtedeks või väiketähtedeks muuta."
 
+#: src/postulo/templates/help/career.html
+msgid "<em>Answers</em> keeps what application forms keep asking, such as why this company, your notice period or your salary expectation. On an application, <em>What I answered</em> keeps its own copy of what you told that employer, so changing a saved answer later never changes what was sent. Answers are never printed on a CV and never shared."
+msgstr ""
+
 #: src/postulo/templates/help/documents.html
 msgid "<em>CVs and portfolios</em> are variants of your career record: each one chooses which entries to show, in which order, and how they are set. Correct an entry in <em>Your career</em> and every variant changes with it. <em>Letters</em> are the cover and motivation letters, with their own text."
 msgstr "<em>CV-d ja portfooliod</em> on teie karjääriloo variandid: igaüks valib, milliseid kirjeid näidata, mis järjekorras ja kuidas need on vormistatud. Parandage kirjet jaotises <em>Teie karjäär</em> ja iga variant muutub koos sellega. <em>Kirjad</em> on motivatsioonikirjad, igaüks oma tekstiga."
@@ -1814,6 +1842,10 @@ msgstr ""
 #, python-format
 msgid "A %(kind)s entry names the file: send %(field)s."
 msgstr "Liigi %(kind)s kanne nimetab faili: saatke %(field)s."
+
+#: src/postulo/templates/resume/references.html
+msgid "A .bib, .ris or .json file"
+msgstr ""
 
 #: src/postulo/templates/jobs/company_places.html
 msgid "A .geojson file"
@@ -2920,6 +2952,14 @@ msgstr "Omandatud või ühinenud"
 msgid "acquired_by must be a company you can see."
 msgstr "acquired_by peab olema ettevõte, mida te näete."
 
+#: src/postulo/jobs/models.py src/postulo/templates/jobs/company_form.html
+msgid "Acronym or short name"
+msgstr ""
+
+#: src/postulo/templates/jobs/company_form.html
+msgid "Acronyms and short names"
+msgstr ""
+
 #: src/postulo/templates/jobs/company_detail.html
 #, python-format
 msgid "Across the %(name)s group"
@@ -3023,6 +3063,10 @@ msgstr "Lisa silt"
 msgid "Add all of this"
 msgstr "Lisa see kõik"
 
+#: src/postulo/templates/applications/application_detail.html
+msgid "Add an answer"
+msgstr ""
+
 #: src/postulo/templates/jobs/company_form.html
 msgid "Add an entry"
 msgstr "Lisa kirje"
@@ -3030,6 +3074,10 @@ msgstr "Lisa kirje"
 #: src/postulo/templates/resume/item_form.html
 msgid "Add an industry"
 msgstr "Lisa valdkond"
+
+#: src/postulo/templates/resume/references.html
+msgid "Add by DOI"
+msgstr ""
 
 #: src/postulo/templates/documents/cv_detail.html
 msgid "Add entries"
@@ -3081,6 +3129,10 @@ msgstr "Lisa registrinumber <bdi>%(number)s</bdi>"
 
 #: src/postulo/templates/documents/message_list.html
 msgid "Add the starter messages"
+msgstr ""
+
+#: src/postulo/templates/resume/references.html
+msgid "Add the ticked publications"
 msgstr ""
 
 #: src/postulo/templates/resume/publication_orcid.html
@@ -3142,6 +3194,13 @@ msgid "Added %(count)d publication from your ORCID record, with no authors: ORCI
 msgid_plural "Added %(count)d publications from your ORCID record, with no authors: ORCID's list has none. Open each and press Look up beside its DOI for the rest."
 msgstr[0] "Lisati %(count)d publikatsioon teie ORCID-kirjest ilma autoriteta: ORCIDi loendis neid pole. Avage see ja vajutage ülejäänu saamiseks selle DOI kõrval nuppu Otsi."
 msgstr[1] "Lisati %(count)d publikatsiooni teie ORCID-kirjest ilma autoriteta: ORCIDi loendis neid pole. Avage igaüks neist ja vajutage ülejäänu saamiseks selle DOI kõrval nuppu Otsi."
+
+#: src/postulo/resume/views_references.py
+#, python-format
+msgid "Added %(count)d publication to Your career. Nothing was overwritten."
+msgid_plural "Added %(count)d publications to Your career. Nothing was overwritten."
+msgstr[0] ""
+msgstr[1] ""
 
 #: src/postulo/documents/views.py
 #, python-format
@@ -3339,6 +3398,11 @@ msgstr "Terve päev"
 msgid "All documents"
 msgstr "Kõik dokumendid"
 
+#: src/postulo/templates/documents/upload_detail.html
+msgid "All files"
+msgstr ""
+
+#: src/postulo/templates/applications/interview_detail.html
 #: src/postulo/templates/widgets/upcoming_interviews.html
 msgid "All interviews"
 msgstr "Kõik intervjuud"
@@ -3346,6 +3410,10 @@ msgstr "Kõik intervjuud"
 #: src/postulo/templates/widgets/listings.html
 msgid "All listings"
 msgstr "Kõik kuulutused"
+
+#: src/postulo/templates/applications/interview_detail.html
+msgid "All of the above as a PDF to read on the way there. Downloaded, and not kept in Postulo."
+msgstr ""
 
 #: src/postulo/templates/server/defaults.html
 msgid "All of them are offered, and a language added in a later release will be too."
@@ -3405,6 +3473,10 @@ msgstr "Toimub ka iseenesest, kui teie põhiaadress muutub."
 #, fuzzy, python-format
 msgid "Also in %(names)s"
 msgstr "Saadaval ka: %(names)s"
+
+#: src/postulo/accounts/models.py
+msgid "Always"
+msgstr ""
 
 #: src/postulo/plugins/policy.py
 msgid "Always on: Postulo cannot work without it."
@@ -3649,7 +3721,7 @@ msgstr "Teine päring kasutab seda Idempotency-Key väärtust; proovige hetke p�
 msgid "Another row is on the same service. Both stay as they are; remove one, or move it to Other, when you like."
 msgstr "Teine rida on samas teenuses. Mõlemad jäävad nii, nagu on; eemaldage üks või viige see valikusse Muu, kui soovite."
 
-#: src/postulo/api/models.py
+#: src/postulo/api/models.py src/postulo/applications/models.py
 msgid "answer"
 msgstr "vastus"
 
@@ -3676,6 +3748,18 @@ msgstr "vastata hiljemalt %(day)s"
 msgid "Answer by: %(company)s"
 msgstr "Vastamise tähtaeg: %(company)s"
 
+#: src/postulo/applications/models.py
+msgid "answer given"
+msgstr ""
+
+#: src/postulo/applications/views_answers.py
+msgid "Answer kept."
+msgstr ""
+
+#: src/postulo/applications/views_answers.py
+msgid "Answer updated."
+msgstr ""
+
 #: src/postulo/resume/models.py
 msgid "Answered"
 msgstr "Vastatud"
@@ -3685,9 +3769,18 @@ msgstr "Vastatud"
 msgid "Answered %(code)s."
 msgstr "Vastus: %(code)s."
 
+#: src/postulo/templates/resume/answer_list.html
+#: src/postulo/templates/resume/overview.html
+msgid "Answers"
+msgstr ""
+
 #: src/postulo/applications/agenda.py
 msgid "Answers due"
 msgstr "Vastamise tähtajad"
+
+#: src/postulo/applications/models.py
+msgid "answers given"
+msgstr ""
 
 #: src/postulo/accounts/forms.py
 msgid "Antarctica"
@@ -3695,6 +3788,7 @@ msgstr "Antarktika"
 
 #: src/postulo/templates/applications/partials/board_filters.html
 #: src/postulo/templates/cotton/table/filter.html
+#: src/postulo/templates/resume/answer_list.html
 msgid "Any"
 msgstr "Mis tahes"
 
@@ -3853,6 +3947,10 @@ msgstr "Saadetud kandideerimised, mitu said vastuse, kui kaua vastus võtab, pak
 #: src/postulo/templates/widgets/interviews_summary.html
 msgid "Applications that reached one"
 msgstr "Kandideerimised, mis selleni jõudsid"
+
+#: src/postulo/templates/resume/answer_form.html
+msgid "Applications that used it keep their own copy, so changing it here changes none of them."
+msgstr ""
 
 #: src/postulo/jobs/merging.py
 msgid "Applications that went through it as an agency"
@@ -4023,6 +4121,7 @@ msgid "As a CV should print it. It is linked to the company of that name among y
 msgstr "Nii, nagu CV peaks selle trükkima. See seotakse teie samanimelise ettevõttega ja lisatakse teie ettevõtete hulka, kui sellist pole."
 
 #: src/postulo/templates/applications/calendar_print.html
+#: src/postulo/templates/applications/interview_detail.html
 #: src/postulo/templates/core/table_export.html
 msgid "As a document"
 msgstr "Dokumendina"
@@ -4043,6 +4142,10 @@ msgstr "Nii, nagu leitud %(when)s."
 #: src/postulo/resume/forms.py
 msgid "As it was published."
 msgstr "Nii, nagu see avaldati."
+
+#: src/postulo/templates/documents/rendered_detail.html
+msgid "As it was sent"
+msgstr ""
 
 #: src/postulo/applications/forms.py
 msgid "As it was written: a percentage, a number of options, the vesting."
@@ -4067,9 +4170,23 @@ msgstr "Alates"
 msgid "as of %(date)s"
 msgstr "%(date)s seisuga"
 
+#: src/postulo/templates/applications/interview_detail.html
+#: src/postulo/templates/documents/themes/base_interview.html
+#, python-format
+msgid "as of %(day)s"
+msgstr ""
+
 #: src/postulo/templates/documents/cv_text.html
 msgid "As plain text"
 msgstr "Lihttekstina"
+
+#: src/postulo/applications/forms.py
+msgid "As the employer's form put it."
+msgstr ""
+
+#: src/postulo/applications/forms.py
+msgid "As the form puts it, or near enough to find it again."
+msgstr ""
 
 #: src/postulo/resume/forms.py
 msgid "As the institution words it. Kept in your record; a CV does not print it yet."
@@ -4106,6 +4223,10 @@ msgstr "Praegu ei trükita ühtegi."
 #: src/postulo/documents/forms.py
 msgid "As things stand: {value}."
 msgstr "Praegu: {value}."
+
+#: src/postulo/applications/forms.py
+msgid "As you sent it. Editing it here leaves the saved answer as it is."
+msgstr ""
 
 #: src/postulo/accounts/forms.py src/postulo/templates/server/design.html
 msgid "Asia"
@@ -4219,6 +4340,14 @@ msgstr "eksporditud failide autor"
 #: src/postulo/resume/models.py
 msgid "authors"
 msgstr "autorid"
+
+#: src/postulo/accounts/models.py
+msgid "Automatically"
+msgstr ""
+
+#: src/postulo/accounts/forms.py
+msgid "Automatically shows a place as the city alone while all your companies are in one country, and as the city and country as soon as there are two. Documents, exports and the API keep the country whatever you choose here."
+msgstr ""
 
 #: src/postulo/jobs/industries.py
 msgid "Automotive"
@@ -4371,7 +4500,7 @@ msgstr "Tagasi tavaliste veergude juurde."
 msgid "Back to the usual order"
 msgstr "Tagasi tavapärase järjekorra juurde"
 
-#: src/postulo/core/help.py
+#: src/postulo/core/help.py src/postulo/templates/resume/references.html
 msgid "Back to Your career"
 msgstr "Tagasi karjääri juurde"
 
@@ -4461,6 +4590,23 @@ msgstr "Asutuse kõrval iga kvalifikatsiooni juures, mille puhul olete selle mä
 
 #: src/postulo/jobs/industries.py
 msgid "Beverages"
+msgstr ""
+
+#: src/postulo/templates/resume/references.html
+msgid "Bibliography"
+msgstr ""
+
+#: src/postulo/core/transfers.py
+msgid "Bibliography (BibTeX, RIS, CSL JSON)"
+msgstr ""
+
+#: src/postulo/templates/resume/references.html
+msgid "BibTeX has no place for datasets, software or web pages, so they are written as Other; BibLaTeX keeps them. Only what a publication holds is in the file."
+msgstr ""
+
+#: src/postulo/templates/resume/references.html
+#, python-format
+msgid "BibTeX, BibLaTeX, RIS and CSL JSON are read, up to %(limit)s MB and %(most)s entries. The file is read here and not kept; nothing is added until you tick it."
 msgstr ""
 
 #: src/postulo/jobs/industries.py
@@ -4648,6 +4794,7 @@ msgstr "C2 — vilunud"
 msgid "Calendar"
 msgstr "Kalender"
 
+#: src/postulo/templates/applications/interview_detail.html
 #: src/postulo/templates/applications/interview_list.html
 msgid "Calendar file"
 msgstr "Kalendrifail"
@@ -4691,6 +4838,7 @@ msgstr "Saab siduda"
 
 #: src/postulo/templates/accounts/invite_form.html
 #: src/postulo/templates/accounts/profile.html
+#: src/postulo/templates/applications/answer_form.html
 #: src/postulo/templates/applications/application_form.html
 #: src/postulo/templates/applications/application_intake.html
 #: src/postulo/templates/applications/appointment_form.html
@@ -4725,6 +4873,7 @@ msgstr "Saab siduda"
 #: src/postulo/templates/jobs/share.html
 #: src/postulo/templates/partials/confirm_delete.html
 #: src/postulo/templates/partials/table/cell.html
+#: src/postulo/templates/resume/answer_form.html
 #: src/postulo/templates/resume/item_form.html
 #: src/postulo/templates/resume/publication_orcid.html
 #: src/postulo/templates/server/backup_delete.html
@@ -5003,6 +5152,10 @@ msgstr "Siin tehtud muudatused saadetakse järgmisel käivitusel; siis loetakse 
 msgid "changes to records"
 msgstr "kirjete muudatused"
 
+#: src/postulo/templates/applications/answer_form.html
+msgid "Changing it here leaves the saved answer it began as untouched."
+msgstr ""
+
 #: src/postulo/resume/models.py
 msgid "chapter"
 msgstr "peatükk"
@@ -5114,7 +5267,7 @@ msgstr "Valige kõigepealt Europassi fail."
 
 #: src/postulo/applications/views_ical.py src/postulo/core/views_kind_files.py
 #: src/postulo/jobs/vcard_views.py src/postulo/jobs/views.py
-#: src/postulo/resume/views_candidate.py
+#: src/postulo/resume/views_candidate.py src/postulo/resume/views_references.py
 msgid "Choose a file first."
 msgstr "Valige esmalt fail."
 
@@ -5190,6 +5343,10 @@ msgstr "Vali kuupäevad kalendrist"
 #: src/postulo/core/personal.py
 msgid "Choose one of the answers in the list."
 msgstr "Valige loendist üks vastustest."
+
+#: src/postulo/jobs/views.py
+msgid "Choose one of the company's names."
+msgstr ""
 
 #: src/postulo/templates/base.html
 msgid "Choose one of the options."
@@ -6312,6 +6469,7 @@ msgstr "Kaitsetööstus"
 #: src/postulo/templates/jobs/industry_list.html
 #: src/postulo/templates/jobs/posting_detail.html
 #: src/postulo/templates/partials/confirm_delete.html
+#: src/postulo/templates/resume/answer_list.html
 #: src/postulo/templates/server/backups.html
 #: src/postulo/templates/server/groups.html
 msgid "Delete"
@@ -6612,9 +6770,17 @@ msgstr "Ei kontrolli"
 msgid "DOI"
 msgstr "DOI"
 
+#: src/postulo/resume/views_references.py
+msgid "DOI lookup"
+msgstr ""
+
 #: src/postulo/resume/lookups.py
 msgid "doi.org's answer was not a record Postulo can read."
 msgstr "doi.org vastus ei olnud kirje, mida Postulo suudab lugeda."
+
+#: src/postulo/templates/resume/references.html
+msgid "DOIs, one per line"
+msgstr ""
 
 #: src/postulo/jobs/industries.py
 msgid "Domestic staff"
@@ -6641,6 +6807,7 @@ msgstr "tegemise kuupäev"
 msgid "Done reminder:"
 msgstr "Tehtud meeldetuletus:"
 
+#: src/postulo/templates/cotton/document_viewer.html
 #: src/postulo/templates/cotton/sent_versions.html
 #: src/postulo/templates/documents/application_documents.html
 #: src/postulo/templates/documents/rendered_compare.html
@@ -6657,6 +6824,11 @@ msgstr "Laadi alla"
 #, python-format
 msgid "Download .%(extension)s"
 msgstr "Laadi alla .%(extension)s"
+
+#: src/postulo/templates/resume/references.html
+#, python-format
+msgid "Download as %(name)s"
+msgstr ""
 
 #: src/postulo/templates/jobs/contact_detail.html
 #: src/postulo/templates/jobs/contact_form.html
@@ -6690,6 +6862,7 @@ msgid "Download it as text"
 msgstr "Laadi see alla tekstina"
 
 #: src/postulo/templates/applications/calendar_print.html
+#: src/postulo/templates/applications/interview_detail.html
 #: src/postulo/templates/core/table_export.html
 msgid "Download PDF"
 msgstr "Laadi PDF alla"
@@ -6854,21 +7027,29 @@ msgstr "Iga etapp loeb kandideerimisi, mis selleni kunagi jõudsid, olenemata se
 msgid "Each with an icon"
 msgstr "Igaüks ikooniga"
 
+#: src/postulo/templates/applications/interview_detail.html
+#: src/postulo/templates/documents/themes/base_interview.html
+msgid "Earlier interviews for this application"
+msgstr ""
+
 #: src/postulo/plugins/models.py
 msgid "Ed25519, base64. Without it there is no catalogue: an unsigned list of addresses to run code from is not something Postulo will offer."
 msgstr "Ed25519, base64. Ilma selleta pole kataloogi: allkirjastamata aadresside loendit, kust koodi käivitada, Postulo ei paku."
 
 #: src/postulo/templates/applications/application_detail.html
+#: src/postulo/templates/applications/interview_detail.html
 #: src/postulo/templates/applications/interview_list.html
 #: src/postulo/templates/applications/subscription_list.html
 #: src/postulo/templates/applications/tag_list.html
 #: src/postulo/templates/connections/list.html
 #: src/postulo/templates/documents/letter_detail.html
+#: src/postulo/templates/documents/upload_detail.html
 #: src/postulo/templates/documents/upload_list.html
 #: src/postulo/templates/jobs/company_detail.html
 #: src/postulo/templates/jobs/company_form.html
 #: src/postulo/templates/jobs/contact_detail.html
 #: src/postulo/templates/jobs/posting_detail.html
+#: src/postulo/templates/resume/answer_list.html
 #: src/postulo/templates/resume/preview.html
 #: src/postulo/templates/resume/translations.html
 msgid "Edit"
@@ -6877,6 +7058,11 @@ msgstr "Muuda"
 #: src/postulo/templates/resume/overview.html
 #, python-format
 msgid "Edit %(what)s"
+msgstr ""
+
+#: src/postulo/templates/applications/answer_form.html
+#: src/postulo/templates/resume/answer_form.html
+msgid "Edit answer"
 msgstr ""
 
 #: src/postulo/templates/applications/application_form.html
@@ -7422,6 +7608,7 @@ msgstr "Selgitada, mis läks valesti, tähendab sageli öelda, millise ühenduse
 #: src/postulo/templates/jobs/company_places.html
 #: src/postulo/templates/jobs/contact_detail.html
 #: src/postulo/templates/partials/table/export.html
+#: src/postulo/templates/resume/references.html
 #: src/postulo/templates/settings/export.html
 msgid "Export"
 msgstr "Eksport"
@@ -7430,6 +7617,10 @@ msgstr "Eksport"
 #, python-format
 msgid "Export %(list)s"
 msgstr "Ekspordi %(list)s"
+
+#: src/postulo/templates/resume/references.html
+msgid "Export all of them instead"
+msgstr ""
 
 #: src/postulo/core/models.py
 msgid "export archive"
@@ -7442,6 +7633,10 @@ msgstr "ekspordiarhiivid"
 #: src/postulo/templates/cotton/transfer_group.html
 msgid "Export as"
 msgstr "Ekspordi vormingus"
+
+#: src/postulo/templates/resume/overview.html
+msgid "Export as a reference"
+msgstr ""
 
 #: src/postulo/templates/core/export.html
 #: src/postulo/templates/core/kind_file.html
@@ -7469,6 +7664,7 @@ msgstr "Ekspordi PDF"
 
 #: src/postulo/templates/cotton/sent_versions.html
 #: src/postulo/templates/documents/rendered_compare.html
+#: src/postulo/templates/documents/rendered_detail.html
 #: src/postulo/templates/documents/rendered_list.html
 msgid "Exported on its own"
 msgstr "Eksporditud eraldi"
@@ -7710,6 +7906,10 @@ msgstr "Rahandus"
 msgid "Financial support"
 msgstr ""
 
+#: src/postulo/templates/resume/answer_list.html
+msgid "Find"
+msgstr ""
+
 #: src/postulo/templates/settings/locale.html
 msgid "Find a language"
 msgstr "Leia keel"
@@ -7778,6 +7978,14 @@ msgstr "Kõigepealt võtke kõik kaasa"
 
 #: src/postulo/jobs/industries.py
 msgid "Fishing"
+msgstr ""
+
+#: src/postulo/templates/cotton/document_viewer.html
+msgid "Fit page"
+msgstr ""
+
+#: src/postulo/templates/cotton/document_viewer.html
+msgid "Fit width"
 msgstr ""
 
 #: src/postulo/core/models.py
@@ -7933,6 +8141,7 @@ msgid "Forget the token"
 msgstr "Unusta tõend"
 
 #: src/postulo/templates/jobs/company_places.html
+#: src/postulo/templates/resume/references.html
 msgid "Forget this file"
 msgstr "Unusta see fail"
 
@@ -8181,6 +8390,7 @@ msgid "Gender: %(gender)s"
 msgstr "Sugu: %(gender)s"
 
 #: src/postulo/templates/applications/application_detail.html
+#: src/postulo/templates/applications/interview_detail.html
 #, fuzzy
 msgid "Get"
 msgstr "Too"
@@ -8532,6 +8742,8 @@ msgid "Highlights of education"
 msgstr ""
 
 #: src/postulo/jobs/models.py src/postulo/jobs/tables.py
+#: src/postulo/templates/applications/interview_detail.html
+#: src/postulo/templates/documents/themes/base_interview.html
 #: src/postulo/templates/jobs/company_form.html
 #: src/postulo/templates/jobs/partials/company_signals.html
 msgid "Hiring"
@@ -8914,6 +9126,7 @@ msgstr "Eira seda veergu"
 #: src/postulo/templates/core/import_csv_map.html
 #: src/postulo/templates/cotton/transfer_group.html
 #: src/postulo/templates/jobs/company_places.html
+#: src/postulo/templates/resume/references.html
 msgid "Import"
 msgstr "Impordi"
 
@@ -9153,7 +9366,10 @@ msgid "Indian Ocean"
 msgstr "India ookean"
 
 #: src/postulo/jobs/forms.py src/postulo/jobs/merging.py
-#: src/postulo/jobs/tables.py src/postulo/templates/jobs/company_list.html
+#: src/postulo/jobs/tables.py
+#: src/postulo/templates/applications/interview_detail.html
+#: src/postulo/templates/documents/themes/base_interview.html
+#: src/postulo/templates/jobs/company_list.html
 #: src/postulo/templates/jobs/industry_list.html
 msgid "Industries"
 msgstr "Valdkonnad"
@@ -9247,8 +9463,8 @@ msgstr ""
 msgid "Internship"
 msgstr "Praktika"
 
-#: src/postulo/applications/models.py src/postulo/jobs/contact_views.py
-#: src/postulo/plugins/pairing.py
+#: src/postulo/applications/models.py src/postulo/documents/themes.py
+#: src/postulo/jobs/contact_views.py src/postulo/plugins/pairing.py
 msgid "Interview"
 msgstr "Intervjuu"
 
@@ -9722,6 +9938,7 @@ msgid "Jobs"
 msgstr "Tööd"
 
 #: src/postulo/templates/applications/application_detail.html
+#: src/postulo/templates/applications/interview_detail.html
 #: src/postulo/templates/applications/interview_list.html
 msgid "Join the call"
 msgstr "Liitu kõnega"
@@ -9753,6 +9970,10 @@ msgstr "säilita jäädvustatud lehe renderdus"
 #: src/postulo/accounts/forms.py
 msgid "Keep a rendering of the pages I capture"
 msgstr "Säilita minu jäädvustatud lehtede renderdus"
+
+#: src/postulo/templates/applications/answer_form.html
+msgid "Keep an answer"
+msgstr ""
 
 #: src/postulo/templates/jobs/conflicts.html
 msgid "Keep both"
@@ -9915,6 +10136,10 @@ msgstr "märksõnad"
 msgid "keywords of exported files"
 msgstr "eksporditud failide märksõnad"
 
+#: src/postulo/jobs/models.py
+msgid "kind"
+msgstr ""
+
 #: src/postulo/documents/models.py src/postulo/plugins/models.py
 msgid "label"
 msgstr "silt"
@@ -9941,8 +10166,9 @@ msgstr "rõhtpaigutus"
 msgid "Language"
 msgstr "Keel"
 
-#: src/postulo/accounts/models.py src/postulo/documents/models.py
-#: src/postulo/jobs/models.py src/postulo/resume/models.py
+#: src/postulo/accounts/models.py src/postulo/applications/models.py
+#: src/postulo/documents/models.py src/postulo/jobs/models.py
+#: src/postulo/resume/models.py
 msgid "language"
 msgstr "keel"
 
@@ -9968,6 +10194,7 @@ msgid "language of exported files"
 msgstr "eksporditud failide keel"
 
 #: src/postulo/templates/applications/calendar_print.html
+#: src/postulo/templates/applications/interview_detail.html
 #: src/postulo/templates/core/table_export.html
 msgid "Language of the document"
 msgstr "Dokumendi keel"
@@ -10512,6 +10739,14 @@ msgstr "Otsustamist ootavad kuulutused"
 msgid "Listings, applications and their timelines, companies and people, reminders, the text of what you sent, letters, CVs, files and your career record — everything, including what is closed or discarded, because you are looking for something you remember."
 msgstr "Kuulutused, kandideerimised ja nende ajajooned, ettevõtted ja inimesed, meeldetuletused, saadetu tekst, kirjad, CV-d, failid ja teie karjäärilugu – kõik, kaasa arvatud suletud või hüljatud, sest otsite midagi, mida mäletate."
 
+#: src/postulo/templates/jobs/company_form.html
+msgid "Lists show"
+msgstr ""
+
+#: src/postulo/templates/cotton/document_viewer.html
+msgid "Loading the document…"
+msgstr ""
+
 #: src/postulo/accounts/models.py src/postulo/jobs/models.py
 #: src/postulo/resume/models.py
 msgid "location"
@@ -10565,6 +10800,10 @@ msgstr "Pikkuskraad"
 #: src/postulo/templates/connections/form.html
 msgid "Look on the server"
 msgstr "Otsi serverist"
+
+#: src/postulo/templates/resume/references.html
+msgid "Look them up"
+msgstr ""
 
 #: src/postulo/templates/resume/item_form.html
 msgid "Look up"
@@ -11246,9 +11485,17 @@ msgstr "nimi"
 msgid "Name"
 msgstr "Nimi"
 
+#: src/postulo/jobs/models.py
+msgid "Name in a language"
+msgstr ""
+
 #: src/postulo/resume/forms.py
 msgid "Name of the language"
 msgstr "Keele nimetus"
+
+#: src/postulo/jobs/models.py
+msgid "name shown in lists"
+msgstr ""
 
 #: src/postulo/jobs/models.py
 msgid "Name the acquirer only for a company that was acquired."
@@ -11363,6 +11610,11 @@ msgstr "Uus"
 #: src/postulo/templates/server/defaults.html
 msgid "New accounts"
 msgstr "Uued kontod"
+
+#: src/postulo/templates/resume/answer_form.html
+#: src/postulo/templates/resume/answer_list.html
+msgid "New answer"
+msgstr ""
 
 #: src/postulo/templates/applications/appointment_form.html
 #: src/postulo/templates/applications/calendar.html
@@ -11484,6 +11736,10 @@ msgstr "Järgmine intervjuu"
 msgid "Next month"
 msgstr "Järgmine kuu"
 
+#: src/postulo/templates/cotton/document_viewer.html
+msgid "Next page"
+msgstr ""
+
 #: src/postulo/applications/tables.py
 msgid "Next reminder"
 msgstr "Järgmine meeldetuletus"
@@ -11520,6 +11776,14 @@ msgstr "Miski ei lahku sellest arvutist krüptimata ja age-saajat pole määratu
 #: src/postulo/applications/forms.py
 msgid "No agency"
 msgstr "Vahendajat pole"
+
+#: src/postulo/templates/resume/answer_list.html
+msgid "No answer matches."
+msgstr ""
+
+#: src/postulo/templates/resume/answer_list.html
+msgid "No answers yet."
+msgstr ""
 
 #: src/postulo/templates/documents/letter_detail.html
 msgid "No application"
@@ -11719,6 +11983,10 @@ msgstr "Ükski PDF-mootor pole kasutatav, seega ei saa dokumente eksportida. %(w
 msgid "No people recorded at this company yet. Add them from <a href=\"%(company_url)s\" class=\"underline\">the company page</a> to name who you are meeting."
 msgstr "Selles ettevõttes pole veel kedagi salvestatud. Lisage nad <a href=\"%(company_url)s\" class=\"underline\">ettevõtte lehelt</a>, et nimetada, kellega kohtute."
 
+#: src/postulo/templates/applications/interview_detail.html
+msgid "No place recorded."
+msgstr ""
+
 #: src/postulo/templates/jobs/company_map.html
 msgid "No places yet. When a company has an address, its town is listed here and drawn on the map."
 msgstr "Kohti veel pole. Kui ettevõttel on aadress, on selle linn siin loetletud ja kaardile märgitud."
@@ -11813,6 +12081,11 @@ msgstr "Silte veel pole."
 msgid "No telephone number"
 msgstr "Telefoninumbrit pole"
 
+#: src/postulo/templates/applications/interview_detail.html
+#: src/postulo/templates/documents/themes/base_interview.html
+msgid "No text recorded for this listing."
+msgstr ""
+
 #: src/postulo/documents/themes.py
 #, python-format
 msgid "No theme called “%(theme)s” is installed."
@@ -11877,6 +12150,11 @@ msgstr "Keegi pole veel e-posti teenusepakkuja juures sisse loginud. Ühendage s
 #: src/postulo/templates/server/email.html
 msgid "Nobody has signed in yet, so nothing can be sent. Save the settings above, then sign in on the provider's page as the mailbox this instance sends from."
 msgstr "Keegi pole veel sisse loginud, seega ei saa midagi saata. Salvestage ülal olevad seaded ja logige seejärel pakkuja lehel sisse selle postkastiga, millelt see Postulo kirju saadab."
+
+#: src/postulo/templates/applications/interview_detail.html
+#: src/postulo/templates/documents/themes/base_interview.html
+msgid "Nobody is named for this interview."
+msgstr ""
 
 #: src/postulo/templates/server/data_protection.html
 msgid "Nobody is named here: whose contacts they are is the account's own business. Each person erases from their own contact's page."
@@ -12004,6 +12282,10 @@ msgstr "veel mitte ühtegi"
 #: src/postulo/templates/server/person_recovery.html
 msgid "None yet."
 msgstr "Veel ühtegi."
+
+#: src/postulo/templates/jobs/company_form.html
+msgid "None yet. Add one, such as CNRS for a long name, to choose which the lists show."
+msgstr ""
 
 #: src/postulo/templates/jobs/company_form.html
 msgid "None yet. Documents print the name above in every language."
@@ -12151,6 +12433,11 @@ msgstr "Ei trükita ühelegi CV-le enne, kui nad on nõustunud."
 
 #: src/postulo/templates/applications/subscription_list.html
 msgid "Not read yet. It will be within minutes."
+msgstr ""
+
+#: src/postulo/templates/resume/references.html
+#, python-format
+msgid "Not read, because a publication has nowhere to keep them: %(names)s."
 msgstr ""
 
 #: src/postulo/applications/analytics.py src/postulo/applications/reports.py
@@ -12464,6 +12751,10 @@ msgstr "Midagi ei salvestata enne, kui olete selle üle vaadanud."
 msgid "Nothing is sent to the server as a password until a new one is entered."
 msgstr "Serverile ei saadeta parooli enne, kui sisestatakse uus."
 
+#: src/postulo/templates/applications/application_detail.html
+msgid "Nothing kept yet. Keep what you typed into the employer's form, so you can see what they were told."
+msgstr ""
+
 #: src/postulo/templates/applications/application_list.html
 #: src/postulo/templates/jobs/company_list.html
 #: src/postulo/templates/jobs/listing_list.html
@@ -12514,6 +12805,11 @@ msgstr "Selles Postulos pole midagi reeglist vanemat. Midagi pole teha."
 msgid "Nothing on the other service is touched. You can connect it again later."
 msgstr "Teises teenuses ei puututa midagi. Saate selle hiljem uuesti ühendada."
 
+#: src/postulo/templates/applications/interview_detail.html
+#: src/postulo/templates/documents/themes/base_interview.html
+msgid "Nothing on the timeline yet."
+msgstr ""
+
 #: src/postulo/templates/applications/calendar.html
 #: src/postulo/templates/documents/themes/base_calendar.html
 msgid "Nothing on this day."
@@ -12526,6 +12822,11 @@ msgstr "Selles kirjes ei tõlgita midagi. Sertifikaadi nimi ja selle väljastanu
 #: src/postulo/templates/applications/partials/timeline.html
 msgid "Nothing recorded against this one yet."
 msgstr "Selle kohta pole veel midagi salvestatud."
+
+#: src/postulo/templates/applications/interview_detail.html
+#: src/postulo/templates/documents/themes/base_interview.html
+msgid "Nothing recorded as sent for this application."
+msgstr ""
 
 #: src/postulo/templates/documents/application_documents.html
 msgid "Nothing recorded for this application yet."
@@ -12694,9 +12995,17 @@ msgstr "Sel perioodil ei saadetud midagi."
 msgid "Nothing was sent in this period. That is what the report says, and it is a fact like any other."
 msgstr "Sel perioodil ei saadetud midagi. Seda aruanne ütlebki ja see on fakt nagu iga teine."
 
-#: src/postulo/resume/views.py
+#: src/postulo/resume/views.py src/postulo/resume/views_references.py
 msgid "Nothing was ticked, so nothing was added."
 msgstr "Midagi ei märgitud, seega midagi ei lisatud."
+
+#: src/postulo/templates/documents/themes/base_interview.html
+msgid "Nothing written yet."
+msgstr ""
+
+#: src/postulo/templates/applications/interview_detail.html
+msgid "Nothing written yet. Add notes when you edit the interview."
+msgstr ""
 
 #: src/postulo/documents/forms.py
 msgid "Nothing yet"
@@ -12742,6 +13051,11 @@ msgstr "teavitamise kuupäev"
 #: src/postulo/resume/models.py
 msgid "number"
 msgstr "number"
+
+#: src/postulo/templates/cotton/document_viewer.html
+#, python-format
+msgid "of %(count)s"
+msgstr ""
 
 #: src/postulo/jobs/widgets.py
 msgid "Of the listings you noticed, how many you applied to and how many you let go."
@@ -13137,6 +13451,11 @@ msgid_plural "%(total)s records were added. Nothing you already had was changed 
 msgstr[0] "Lisati üks kirje. Midagi, mis teil juba oli, ei muudetud ega eemaldatud."
 msgstr[1] "Lisati %(total)s kirjet. Midagi, mis teil juba oli, ei muudetud ega eemaldatud."
 
+#: src/postulo/templates/resume/references.html
+#, python-format
+msgid "One request to doi.org for each DOI, at most %(most)s, when you press the button: doi.org passes it to Crossref or DataCite. Only the DOI is sent. What comes back is listed above to tick, and nothing is kept until you add it."
+msgstr ""
+
 #: src/postulo/templates/jobs/company_detail.html
 msgid "One request to that register, carrying the number alone; nothing is kept until you say so."
 msgstr "Üks päring sellesse registrisse, milles on ainult number; midagi ei salvestata enne, kui te seda ütlete."
@@ -13273,6 +13592,11 @@ msgstr "Selle saab lõpetada ainult administraator, kes selle alustas."
 msgid "Only the applications that name a referrer or an agency are in these two; the company on a posting stays the employer."
 msgstr "Neis kahes on ainult kandideerimised, kus on märgitud soovitaja või vahendaja; kuulutuse ettevõte jääb tööandjaks."
 
+#: src/postulo/templates/resume/references.html
+#, python-format
+msgid "Only the first %(most)s entries are read; the rest of the file was left out."
+msgstr ""
+
 #: src/postulo/documents/forms.py
 msgid "Only the ones ticked below"
 msgstr "Ainult allpool märgitud"
@@ -13302,6 +13626,10 @@ msgstr "Siin hoitakse ainult avalikku võtit ehk saajat. Hoidke arhiive avavat i
 msgid "Only the year prints on a CV, so the day makes no difference."
 msgstr "CV-le trükitakse ainult aasta, nii et päeval pole tähtsust."
 
+#: src/postulo/templates/resume/references.html
+msgid "Only this publication, as a reference:"
+msgstr ""
+
 #: src/postulo/templates/jobs/company_register.html
 msgid "Only what you tick is kept; nothing else on the company changes."
 msgstr "Alles jäetakse ainult see, mille märgite; ettevõtte juures ei muutu midagi muud."
@@ -13329,6 +13657,10 @@ msgstr "Avatud kandideerimised, millest pole kuulda, ja kolm asja, mida sellega 
 #, fuzzy
 msgid "Open as this"
 msgstr "Ava nii"
+
+#: src/postulo/templates/cotton/document_viewer.html
+msgid "Open in a new tab"
+msgstr ""
 
 #: src/postulo/templates/applications/subscribed_event.html
 #: src/postulo/templates/jobs/capture_form.html
@@ -13600,7 +13932,7 @@ msgstr "Pakett"
 msgid "Packing up your data"
 msgstr "Teie andmete pakkimine"
 
-#: src/postulo/core/design.py
+#: src/postulo/core/design.py src/postulo/templates/cotton/document_viewer.html
 msgid "Page"
 msgstr "Leht"
 
@@ -13609,6 +13941,11 @@ msgstr "Leht"
 #, python-format
 msgid "Page %(current)s of %(total)s"
 msgstr "Leht %(current)s / %(total)s"
+
+#: src/postulo/templates/cotton/document_viewer.html
+#, python-format
+msgid "Page %(page)s of %(count)s"
+msgstr ""
 
 #: src/postulo/jobs/capture_views.py
 msgid "Page source"
@@ -13707,6 +14044,7 @@ msgstr "paber"
 
 #: src/postulo/documents/forms.py src/postulo/jobs/industries.py
 #: src/postulo/templates/applications/calendar_print.html
+#: src/postulo/templates/applications/interview_detail.html
 #: src/postulo/templates/applications/report.html
 #: src/postulo/templates/core/table_export.html
 #: src/postulo/templates/settings/export.html
@@ -13738,6 +14076,8 @@ msgid "part of"
 msgstr "kuulub"
 
 #: src/postulo/jobs/tables.py
+#: src/postulo/templates/applications/interview_detail.html
+#: src/postulo/templates/documents/themes/base_interview.html
 msgid "Part of"
 msgstr "Kuulub"
 
@@ -14022,6 +14362,10 @@ msgstr "Kohatäited nagu {{ company }} täidetakse saatmisel."
 
 #: src/postulo/documents/models.py
 msgid "Placeholders such as {{ company }} are filled in when you write it."
+msgstr ""
+
+#: src/postulo/applications/models.py
+msgid "Placeholders such as {{ company }} are filled in with the application when you use the answer on one."
 msgstr ""
 
 #: src/postulo/plugins/categories.py
@@ -14419,6 +14763,8 @@ msgstr "Vajutage „Kontrolli uuendusi“, et tuua see, mida kataloogid pakuvad.
 msgid "Press “Read the page” again to capture it anyway."
 msgstr "Vajutage uuesti „Loe leht“, et see siiski jäädvustada."
 
+#: src/postulo/templates/documents/rendered_list.html
+#: src/postulo/templates/documents/upload_list.html
 #: src/postulo/templates/resume/overview.html
 msgid "Preview"
 msgstr "Eelvaade"
@@ -14454,6 +14800,10 @@ msgstr "Eelmine päev"
 #: src/postulo/templates/cotton/date_picker.html
 msgid "Previous month"
 msgstr "Eelmine kuu"
+
+#: src/postulo/templates/cotton/document_viewer.html
+msgid "Previous page"
+msgstr ""
 
 #: src/postulo/applications/agenda.py
 msgid "Previous week"
@@ -14577,6 +14927,7 @@ msgid "Proceedings"
 msgstr "Konverentsikogumik"
 
 #: src/postulo/templates/documents/themes/base_calendar.html
+#: src/postulo/templates/documents/themes/base_interview.html
 #: src/postulo/templates/documents/themes/base_list.html
 msgid "Produced by Postulo from this person's own records."
 msgstr "Koostanud Postulo selle isiku enda andmete põhjal."
@@ -14586,6 +14937,7 @@ msgid "Produced by Postulo from this person's own records. Postulo sets no targe
 msgstr "Koostanud Postulo selle inimese enda kirjete põhjal. Postulo ei sea ühtegi eesmärki: mitu kandideerimist peaks periood sisaldama, on hüvitiskorra või inimese enda reegel."
 
 #: src/postulo/templates/documents/themes/base_calendar.html
+#: src/postulo/templates/documents/themes/base_interview.html
 #: src/postulo/templates/documents/themes/base_list.html
 #: src/postulo/templates/documents/themes/base_report.html
 #, python-format
@@ -14706,6 +15058,10 @@ msgstr "Publikatsioonid"
 msgid "publications"
 msgstr "publikatsioonid"
 
+#: src/postulo/templates/resume/references.html
+msgid "Publications in the file"
+msgstr ""
+
 #: src/postulo/resume/models.py
 msgid "published in"
 msgstr "avaldatud väljaandes"
@@ -14772,6 +15128,10 @@ msgstr "Kvalifikatsioonid"
 
 #: src/postulo/jobs/industries.py
 msgid "Quarrying"
+msgstr ""
+
+#: src/postulo/applications/models.py
+msgid "question"
 msgstr ""
 
 #: src/postulo/templates/connections/list.html
@@ -14864,6 +15224,11 @@ msgstr ""
 msgid "Read as"
 msgstr "Loe kui"
 
+#: src/postulo/templates/resume/references.html
+#, python-format
+msgid "Read as %(name)s."
+msgstr ""
+
 #: src/postulo/resume/views.py
 msgid "Read as Europass JSON, the older format as the Europass web service wrote it until 2020."
 msgstr "Loetud Europassi JSON-ina – vanemas vormingus, mida Europassi veebiteenus kirjutas kuni 2020. aastani."
@@ -14916,6 +15281,7 @@ msgstr "Loetud PDF-ile lisatud Europassi XML-ist, vormingus, mida europass.europ
 
 #: src/postulo/templates/jobs/company_places.html
 #: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/references.html
 #: src/postulo/templates/server/plugins.html
 #, fuzzy
 msgid "Read it"
@@ -15171,6 +15537,10 @@ msgstr "Värbaja"
 #: src/postulo/templates/server/capture.html
 msgid "Redirects followed"
 msgstr "Järgitud ümbersuunamised"
+
+#: src/postulo/templates/cotton/document_viewer.html
+msgid "Redraw"
+msgstr ""
 
 #: src/postulo/documents/forms.py
 msgid "Referee"
@@ -15728,6 +16098,7 @@ msgid "Saturday"
 msgstr "Laupäev"
 
 #: src/postulo/templates/accounts/profile.html
+#: src/postulo/templates/applications/answer_form.html
 #: src/postulo/templates/applications/application_form.html
 #: src/postulo/templates/applications/application_intake.html
 #: src/postulo/templates/applications/appointment_form.html
@@ -15748,6 +16119,7 @@ msgstr "Laupäev"
 #: src/postulo/templates/jobs/industry_form.html
 #: src/postulo/templates/jobs/posting_form.html
 #: src/postulo/templates/partials/table/cell.html
+#: src/postulo/templates/resume/answer_form.html
 #: src/postulo/templates/resume/item_form.html
 #: src/postulo/templates/resume/translations.html
 #: src/postulo/templates/server/backup_destination.html
@@ -15812,6 +16184,14 @@ msgstr "Salvestage, et lisada veel üks identifikaator."
 #: src/postulo/templates/jobs/capture_review.html
 msgid "Save to listings"
 msgstr "Salvesta kuulutuste hulka"
+
+#: src/postulo/applications/models.py
+msgid "saved answer"
+msgstr ""
+
+#: src/postulo/applications/models.py
+msgid "saved answers"
+msgstr ""
 
 #: src/postulo/accounts/settings_views.py
 #, python-format
@@ -15940,6 +16320,7 @@ msgstr "Postulo ei ole templit kontrollinud"
 #: src/postulo/templates/core/search.html
 #: src/postulo/templates/cotton/site_search.html
 #: src/postulo/templates/jobs/industry_list.html
+#: src/postulo/templates/resume/answer_list.html
 msgid "Search"
 msgstr "Otsi"
 
@@ -16155,6 +16536,7 @@ msgstr "saadetud dokumendid"
 #: src/postulo/templates/core/export.html
 #: src/postulo/templates/cotton/documents_nav.html
 #: src/postulo/templates/documents/rendered_compare.html
+#: src/postulo/templates/documents/rendered_detail.html
 #: src/postulo/templates/documents/rendered_list.html
 msgid "Sent documents"
 msgstr "Saadetud dokumendid"
@@ -16528,6 +16910,14 @@ msgstr "näita navigeerimisrada kursori all"
 #: src/postulo/accounts/forms.py
 msgid "Show the breadcrumb only while I point at it"
 msgstr "Näita navigeerimisrada ainult siis, kui osutan sellele"
+
+#: src/postulo/accounts/forms.py
+msgid "Show the country"
+msgstr ""
+
+#: src/postulo/accounts/models.py
+msgid "show the country"
+msgstr ""
 
 #: src/postulo/accounts/forms.py
 msgid "Show the keys beside the controls that have one"
@@ -17041,6 +17431,10 @@ msgstr "Alguskuupäev"
 msgid "Start from a type"
 msgstr "Alusta liigi valimisest"
 
+#: src/postulo/templates/applications/answer_form.html
+msgid "Start from an answer you have saved"
+msgstr ""
+
 #: src/postulo/templates/documents/letter_form.html
 msgid "Start from:"
 msgstr "Alusta:"
@@ -17075,7 +17469,10 @@ msgstr "STARTTLS, pärast ühendumist"
 msgid "state"
 msgstr "olek"
 
-#: src/postulo/jobs/tables.py src/postulo/templates/connections/pairing.html
+#: src/postulo/jobs/tables.py
+#: src/postulo/templates/applications/interview_detail.html
+#: src/postulo/templates/connections/pairing.html
+#: src/postulo/templates/documents/themes/base_interview.html
 #: src/postulo/templates/jobs/company_register.html
 #: src/postulo/templates/server/person_recovery.html
 msgid "State"
@@ -17399,6 +17796,7 @@ msgstr "Tabelivaade"
 #: src/postulo/templates/applications/partials/board_filters.html
 #: src/postulo/templates/applications/partials/bulk_fields.html
 #: src/postulo/templates/applications/tag_form.html
+#: src/postulo/templates/resume/answer_list.html
 msgid "Tag"
 msgstr "Silt"
 
@@ -17810,7 +18208,7 @@ msgstr "Fail on tühi."
 #: src/postulo/core/vcard.py src/postulo/core/views_kind_files.py
 #: src/postulo/jobs/geojson.py src/postulo/jobs/vcard_views.py
 #: src/postulo/plugins/base.py src/postulo/resume/candidate.py
-#: src/postulo/resume/views_candidate.py
+#: src/postulo/resume/references.py src/postulo/resume/views_candidate.py
 #, python-format
 msgid "That file is larger than %(limit)s MB, so it was not read."
 msgstr "Fail on suurem kui %(limit)s MB, seega seda ei loetud."
@@ -17834,9 +18232,25 @@ msgstr "See fail on suurem kui %(mb)s MB, mida see Postulo vastu võtab."
 msgid "That file is not a GeoJSON collection of features."
 msgstr "See fail ei ole GeoJSON-i objektide kogum."
 
+#: src/postulo/resume/references.py
+msgid "That file is not BibTeX."
+msgstr ""
+
+#: src/postulo/resume/references.py
+msgid "That file is not CSL JSON."
+msgstr ""
+
 #: src/postulo/jobs/geojson.py
 msgid "That file is not GeoJSON."
 msgstr "See fail ei ole GeoJSON."
+
+#: src/postulo/resume/references.py
+msgid "That file is not one of BibTeX, BibLaTeX, RIS or CSL JSON, so it was not read."
+msgstr ""
+
+#: src/postulo/resume/references.py
+msgid "That file is not RIS."
+msgstr ""
 
 #: src/postulo/resume/views.py
 #, python-format
@@ -17861,6 +18275,10 @@ msgstr "Fail loeti, kuid selles polnud ühtegi imporditavat kaarti."
 #: src/postulo/jobs/views.py
 msgid "That file was read, and there was no point in it."
 msgstr "Fail loeti, kuid selles polnud ühtegi punkti."
+
+#: src/postulo/resume/views_references.py
+msgid "That file was read, and there was no publication in it to add."
+msgstr ""
 
 #: src/postulo/core/views_kind_files.py src/postulo/resume/views.py
 #: src/postulo/resume/views_candidate.py
@@ -18619,6 +19037,10 @@ msgstr "Ettevõtted, kontaktid ja kuulutused, mille see lisab. Kandideerimised j
 msgid "The company %(name)s is not in your account, and is added with it."
 msgstr "Ettevõtet %(name)s teie kontol pole ja see lisatakse koos sellega."
 
+#: src/postulo/jobs/views.py
+msgid "The company already has that name."
+msgstr ""
+
 #: src/postulo/templates/jobs/company_places.html
 msgid "The company has no address to place."
 msgstr "Ettevõttel pole aadressi, mida paigutada."
@@ -18626,6 +19048,11 @@ msgstr "Ettevõttel pole aadressi, mida paigutada."
 #: src/postulo/templates/jobs/company_wikidata.html
 msgid "The company has no address to put it on: add one, and fetch again."
 msgstr "Ettevõttel pole aadressi, millele see panna: lisage aadress ja tooge uuesti."
+
+#: src/postulo/templates/applications/interview_detail.html
+#: src/postulo/templates/documents/themes/base_interview.html
+msgid "The company in brief"
+msgstr ""
 
 #: src/postulo/templates/applications/application_intake.html
 msgid "The company is matched by name and created if it is new. Only the company and the job title are required; everything else can be filled in later."
@@ -18826,6 +19253,7 @@ msgstr "Arv nii, nagu nad selle kirjutasid, enne makse."
 
 #: src/postulo/templates/applications/ical_import.html
 #: src/postulo/templates/core/kind_file.html
+#: src/postulo/templates/documents/upload_detail.html
 #: src/postulo/templates/jobs/contact_vcards.html
 #: src/postulo/templates/resume/candidate_file.html
 #: src/postulo/templates/resume/europass_import.html
@@ -19176,7 +19604,9 @@ msgstr "Vasakul olev loend viib jaotiseni ja näitab, mitu kirjet selles on. Iga
 msgid "The list opens over the dialog. Escape closes the list and leaves the dialog open."
 msgstr "Loend avaneb dialoogi kohal. Escape sulgeb loendi ja jätab dialoogi avatuks."
 
+#: src/postulo/templates/applications/interview_detail.html
 #: src/postulo/templates/applications/partials/timeline.html
+#: src/postulo/templates/documents/themes/base_interview.html
 msgid "The listing"
 msgstr "Kuulutus"
 
@@ -19546,6 +19976,10 @@ msgstr "Roll"
 msgid "The route it went through. The report counts by this, including how many went through the public employment service's own board."
 msgstr "Kanal, mille kaudu see läks. Aruanne loendab selle järgi, sealhulgas seda, mitu läks läbi avaliku tööturuasutuse enda tööportaali."
 
+#: src/postulo/jobs/duplicates.py
+msgid "The same acronym or short name"
+msgstr ""
+
 #: src/postulo/jobs/conflicts.py
 msgid "The same advert"
 msgstr "Sama kuulutus"
@@ -19734,6 +20168,11 @@ msgstr ""
 msgid "The stored mail credentials cannot be read on this instance."
 msgstr "Salvestatud meili sisselogimisandmeid ei saa selles Postulos lugeda."
 
+#: src/postulo/templates/applications/interview_detail.html
+#: src/postulo/templates/documents/themes/base_interview.html
+msgid "The story so far"
+msgstr ""
+
 #: src/postulo/accounts/forms.py
 msgid "The subject every file carries"
 msgstr "Iga faili teema"
@@ -19901,6 +20340,7 @@ msgid "theme"
 msgstr "teema"
 
 #: src/postulo/templates/applications/calendar_print.html
+#: src/postulo/templates/applications/interview_detail.html
 #: src/postulo/templates/applications/report.html
 #: src/postulo/templates/core/table_export.html
 msgid "Theme"
@@ -19999,6 +20439,10 @@ msgstr "Importimist ei oota miski."
 #: src/postulo/jobs/pages.py
 msgid "There was nothing to keep."
 msgstr "Polnud midagi säilitada."
+
+#: src/postulo/templates/applications/interview_detail.html
+msgid "These are the files as they were sent, not your documents as they are now."
+msgstr ""
 
 #: src/postulo/templates/widgets/insight_counters.html
 #, python-format
@@ -20224,14 +20668,28 @@ msgstr "Ainult see eksport. Teie vaikeväärtus on jaotises Seaded → Eksport."
 msgid "This field is required."
 msgstr "See väli on kohustuslik."
 
+#: src/postulo/templates/cotton/document_viewer.html
+msgid "This file could not be shown here. You can still download it."
+msgstr ""
+
+#: src/postulo/templates/cotton/document_viewer.html
+msgid "This file has no text a screen reader can read."
+msgstr ""
+
 #: src/postulo/applications/ical_reader.py
 msgid "This file is an invitation. Its events are read as any others; no reply is sent."
 msgstr "See fail on kutse. Selle sündmusi loetakse nagu kõiki teisi; vastust ei saadeta."
 
+#: src/postulo/templates/cotton/document_viewer.html
+msgid "This file is locked with a password, so it cannot be shown here. You can still download it."
+msgstr ""
+
+#: src/postulo/templates/documents/upload_detail.html
 #: src/postulo/templates/documents/upload_list.html
 msgid "This file is missing. Upload it again as a new version that supersedes this one."
 msgstr "See fail on puudu. Laadige see uuesti üles uue versioonina, mis asendab selle."
 
+#: src/postulo/templates/documents/upload_detail.html
 #: src/postulo/templates/documents/upload_list.html
 msgid "This file no longer matches what was uploaded. Upload it again as a new version that supersedes this one."
 msgstr "See fail ei vasta enam sellele, mis üles laaditi. Laadige see uuesti üles uue versioonina, mis asendab selle."
@@ -20410,6 +20868,10 @@ msgstr "Säilitatud tekstis on viga. Kuni see on parandamata ja salvestamata, ei
 msgid "This is your own account. A link you make for yourself is not a way back in — you had to sign in to make it. If you are the only administrator here, a passkey or a second administrator is what covers you."
 msgstr "See on teie enda konto. Endale tehtud link ei aita teil tagasi pääseda – selle tegemiseks pidite olema sisse logitud. Kui olete siin ainus administraator, kaitseb teid pääsuvõti või teine administraator."
 
+#: src/postulo/templates/cotton/document_viewer.html
+msgid "This kind of file cannot be shown here. Download it to open it."
+msgstr ""
+
 #: src/postulo/templates/cotton/listing_skills.html
 msgid "This listing names none of the classification's skills by name."
 msgstr ""
@@ -20582,6 +21044,10 @@ msgstr "Märkige ridu, et tegutseda mitmega korraga."
 #: src/postulo/applications/forms.py
 msgid "Tick the box to add the listing anyway."
 msgstr "Kuulutuse ikkagi lisamiseks märkige ruut."
+
+#: src/postulo/templates/resume/references.html
+msgid "Tick the publications to add. Nothing is changed or overwritten: an entry you already have is marked, and ticking it adds another."
+msgstr ""
 
 #: src/postulo/templates/resume/publication_orcid.html
 #, python-format
@@ -20867,9 +21333,20 @@ msgctxt "type of event"
 msgid "type"
 msgstr "liik"
 
+#: src/postulo/resume/views_references.py
+msgid "Type at least one DOI first."
+msgstr ""
+
 #: src/postulo/templates/core/search.html
 msgid "Type at least two characters."
 msgstr "Sisestage vähemalt kaks märki."
+
+#: src/postulo/resume/views_references.py
+#, python-format
+msgid "Type at most %(count)d DOI at a time; nothing was asked."
+msgid_plural "Type at most %(count)d DOIs at a time; nothing was asked."
+msgstr[0] ""
+msgstr[1] ""
 
 #: src/postulo/accounts/forms.py
 msgid "Type it here, or choose one from the list."
@@ -20906,6 +21383,10 @@ msgstr "allika liik"
 #: src/postulo/jobs/models.py
 msgid "type of thing it points at"
 msgstr "selle asja liik, millele see viitab"
+
+#: src/postulo/jobs/views.py
+msgid "Type the acronym or short name."
+msgstr ""
 
 #: src/postulo/resume/lookups.py src/postulo/resume/views.py
 msgid "Type the DOI first."
@@ -21253,6 +21734,7 @@ msgid "Verified"
 msgstr "Kinnitatud"
 
 #: src/postulo/documents/models.py
+#: src/postulo/templates/documents/upload_detail.html
 #: src/postulo/templates/documents/upload_list.html
 msgid "version"
 msgstr "versioon"
@@ -21422,6 +21904,7 @@ msgstr "WebP-pilt"
 
 #: src/postulo/core/models.py src/postulo/core/web_links.py
 #: src/postulo/documents/printing.py src/postulo/jobs/tables.py
+#: src/postulo/templates/applications/interview_detail.html
 #: src/postulo/templates/jobs/company_detail.html
 msgid "Website"
 msgstr "Veebisait"
@@ -21534,6 +22017,10 @@ msgstr "Kuidas väärtus välja näeb, esimesest märgist viimaseni. Märk tähi
 msgid "What almost everything in Postulo sits in."
 msgstr "See, milles asub peaaegu kõik Postulos."
 
+#: src/postulo/templates/resume/answer_list.html
+msgid "What application forms keep asking, written once. An application keeps its own copy of the answer it uses."
+msgstr ""
+
 #: src/postulo/templates/jobs/posting_detail.html
 msgid "What arrived about this listing, and what you noted. Once you apply, it heads the application's timeline."
 msgstr "Mis selle kuulutuse kohta saabus ja mida te märkisite. Kui kandideerite, on see kandideerimise ajajoone alguses."
@@ -21604,6 +22091,10 @@ msgstr ""
 #: src/postulo/templates/cotton/review_sections.html
 msgid "What happens"
 msgstr "Mis juhtub"
+
+#: src/postulo/templates/applications/application_detail.html
+msgid "What I answered"
+msgstr ""
 
 #: src/postulo/templates/connections/form.html
 msgid "What is being asked for"
@@ -21954,9 +22445,18 @@ msgstr "mida esitlesite"
 msgid "What you presented, if you presented something."
 msgstr "Mida esitlesite, kui midagi esitlesite."
 
+#: src/postulo/templates/applications/interview_detail.html
+#: src/postulo/templates/documents/themes/base_interview.html
+msgid "What you sent"
+msgstr ""
+
 #: src/postulo/accounts/forms.py
 msgid "What you sign in with. Lowercase letters, digits, dots, underscores, hyphens."
 msgstr "Millega te sisse logite. Väiketähed, numbrid, punktid, alakriipsud, sidekriipsud."
+
+#: src/postulo/templates/applications/answer_form.html
+msgid "What you told them. It is kept as it is, even if you later change the saved answer."
+msgstr ""
 
 #: src/postulo/templates/resume/translations.html
 msgid "What you type here is what a CV in that language prints instead."
@@ -22022,6 +22522,10 @@ msgstr "Millal"
 msgid "When accepting should also move the application."
 msgstr "Kui vastuvõtmine peaks kandideerimist ka edasi liigutama."
 
+#: src/postulo/templates/documents/themes/base_interview.html
+msgid "When and where"
+msgstr ""
+
 #: src/postulo/jobs/models.py
 msgid "When it entered your listings."
 msgstr "Millal see teie kuulutuste hulka jõudis."
@@ -22050,6 +22554,7 @@ msgstr "Kui registreerite selle Postulo pakkuja juures, andke talle see aadress,
 msgid "where"
 msgstr "kus"
 
+#: src/postulo/templates/applications/interview_detail.html
 #: src/postulo/templates/applications/subscribed_event.html
 msgid "Where"
 msgstr ""
@@ -22240,6 +22745,10 @@ msgstr "Mis veerg on mis?"
 msgid "Which device or tool this is for."
 msgstr "Mis seadme või tööriista jaoks see on."
 
+#: src/postulo/applications/models.py
+msgid "Which language the answer is written in. Leave blank if it does not matter."
+msgstr ""
+
 #: src/postulo/documents/models.py
 msgid "Which language this file is in. Postulo cannot read it, so nothing is assumed; a store files it by this."
 msgstr "Mis keeles see fail on. Postulo ei oska seda lugeda, seega midagi ei eeldata; dokumendihoidla talletab selle selle järgi."
@@ -22336,6 +22845,11 @@ msgstr "Kes selle kirjutas, millal ja kas seda tasub veel saata. Kasutatakse ain
 #: src/postulo/applications/models.py
 msgid "who you are meeting"
 msgstr "kellega kohtute"
+
+#: src/postulo/templates/applications/interview_detail.html
+#: src/postulo/templates/documents/themes/base_interview.html
+msgid "Who you are meeting"
+msgstr ""
 
 #: src/postulo/applications/forms.py
 msgid "Who you are meeting. The people you have recorded at this company are offered, and anybody already on this interview who has since moved on."
@@ -22803,6 +23317,7 @@ msgid "You already have that industry."
 msgstr "See valdkond on teil juba olemas."
 
 #: src/postulo/templates/resume/publication_orcid.html
+#: src/postulo/templates/resume/references.html
 msgid "You already have this one."
 msgstr "See on teil juba olemas."
 
@@ -22957,6 +23472,11 @@ msgstr "Võtsite siit kõik ära. Pange midagi tagasi, millal soovite."
 msgid "You leave your groups; what they own stays theirs."
 msgstr "Te lahkute oma rühmadest; see, mis neile kuulub, jääb neile."
 
+#: src/postulo/applications/forms.py
+#, python-format
+msgid "You may name the company and the rest when you use it on an application: %(names)s."
+msgstr ""
+
 #: src/postulo/documents/models.py
 msgid "You send it"
 msgstr "Saadate ise"
@@ -22968,6 +23488,13 @@ msgstr "Teilt küsitakse kõigepealt praegust."
 #: src/postulo/templates/account/recovery_set_password.html
 msgid "You will still sign in afterwards, and still give your second factor if you have one. This link changes the password and nothing else."
 msgstr "Logite pärast ikkagi sisse ja annate oma teise teguri, kui see teil on. See link muudab parooli ja ei midagi muud."
+
+#: src/postulo/templates/resume/references.html
+#, python-format
+msgid "Your %(total)s publication, in the format your reference manager reads."
+msgid_plural "Your %(total)s publications, in the format your reference manager reads."
+msgstr[0] ""
+msgstr[1] ""
 
 #: src/postulo/accounts/views.py
 msgid "Your account and everything in it have been deleted."
@@ -23206,6 +23733,10 @@ msgid "Your own site, if you have one."
 msgstr "Teie enda sait, kui teil see on."
 
 #: src/postulo/applications/forms.py
+msgid "Your own words for grouping answers: pay, availability, motivation."
+msgstr ""
+
+#: src/postulo/applications/forms.py
 msgid "Your own words for grouping applications. New ones go in the box below."
 msgstr "Teie enda sõnad kandideerimiste rühmitamiseks. Uued lähevad allolevasse kasti."
 
@@ -23226,6 +23757,11 @@ msgstr "Teie pilt jäetakse välja. JSON-fail ei saa seda sisaldada ja väljajä
 msgid "Your picture is shown at the top of every page, where it is the button that opens your menu, and to the administrators of this instance in their list of people. No CV and no letter prints it. Until you give Postulo a picture, it shows your initials."
 msgstr "Teie pilti näidatakse iga lehe ülaosas, kus see on teie menüüd avav nupp, ja selle Postulo administraatoritele nende inimeste loendis. Ükski CV ega kiri seda ei trüki. Kuni te pole Postulole pilti andnud, näidatakse teie initsiaale."
 
+#: src/postulo/templates/applications/interview_detail.html
+#: src/postulo/templates/documents/themes/base_interview.html
+msgid "Your preparation notes"
+msgstr ""
+
 #: src/postulo/documents/printing.py
 msgid "Your primary code repository"
 msgstr "Teie põhikoodihoidla"
@@ -23241,6 +23777,10 @@ msgstr "Teie sotsiaalmeedia põhiprofiil"
 #: src/postulo/documents/printing.py
 msgid "Your primary website"
 msgstr "Teie põhiveebisait"
+
+#: src/postulo/templates/resume/references.html
+msgid "Your publications as a file that Zotero, Mendeley, JabRef, EndNote and LaTeX read, and a file of theirs read in."
+msgstr ""
 
 #: src/postulo/core/transfers.py
 msgid "Your record (JSON)"
@@ -23333,11 +23873,17 @@ msgstr "Teie omad. Failiga koos need kuhugi ei lähe."
 msgid "Yours: only you can share it, give it to a group or delete it."
 msgstr "Teie oma: ainult teie saate seda jagada, rühmale anda või kustutada."
 
+#: src/postulo/templates/cotton/document_viewer.html
+msgid "Zoom"
+msgstr ""
+
+#: src/postulo/templates/cotton/document_viewer.html
 #: src/postulo/templates/jobs/address_place.html
 #: src/postulo/templates/jobs/company_map.html
 msgid "Zoom in"
 msgstr "Suurenda"
 
+#: src/postulo/templates/cotton/document_viewer.html
 #: src/postulo/templates/jobs/address_place.html
 #: src/postulo/templates/jobs/company_map.html
 msgid "Zoom out"
