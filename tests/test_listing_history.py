@@ -833,9 +833,37 @@ def test_a_mail_client_chooses_from_a_brief_list(client, user, company, listing)
         "state",
         "noted_at",
         "updated_at",
+        "filed",
     }, "a title to recognise, and nothing of the search"
     assert client.get("/api/v1/listings/choices?q=black", **token).json()["count"] == 2
     assert client.get("/api/v1/listings/choices?state=weird", **token).status_code == 422
+
+
+def test_a_mail_client_sees_where_a_message_is_already_filed(client, user, company, listing):
+    other = JobPosting.objects.create(owner=user, company=company, title="Lab Assistant")
+    record_listing_event(listing, kind="email_received", external_id="<talk@blackmesa.example>")
+    token = bearer(user, "listings:bind")
+
+    asked = client.get("/api/v1/listings/choices?external_id=<talk@blackmesa.example>", **token)
+    plain = client.get("/api/v1/listings/choices", **token)
+
+    filed = {row["id"]: row["filed"] for row in asked.json()["items"]}
+    assert filed == {listing.pk: True, other.pk: False}
+    assert not any(row["filed"] for row in plain.json()["items"])
+
+
+def test_filed_is_only_ever_about_the_callers_own_entries(client, user, other_user, company):
+    mine = JobPosting.objects.create(owner=user, company=company, title="Mine")
+    theirs_company = Company.objects.create(owner=other_user, name="Elsewhere")
+    theirs = JobPosting.objects.create(owner=other_user, company=theirs_company, title="Theirs")
+    record_listing_event(theirs, kind="email_received", external_id="<same@example>")
+
+    rows = client.get(
+        "/api/v1/listings/choices?external_id=<same@example>", **bearer(user, "listings:bind")
+    ).json()["items"]
+
+    assert [(row["id"], row["filed"]) for row in rows] == [(mine.pk, False)]
+    assert theirs.pk not in [row["id"] for row in rows]
 
 
 def test_the_file_a_document_entry_names_is_the_callers_own(client, user, listing, forwarded):

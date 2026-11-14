@@ -6,7 +6,7 @@ the brief list of listings such a client needs to choose one. That scope reaches
 calls and nothing else.
 """
 
-from django.db.models import Q
+from django.db.models import Exists, OuterRef, Q
 from django.utils.translation import gettext as _
 from ninja import Query, Router, Status
 from ninja.errors import HttpError
@@ -16,13 +16,14 @@ from postulo.applications.models import Channel
 from postulo.applications.models import Status as ApplicationStatus
 from postulo.applications.services import apply_to_listing, create_listing, get_or_create_company
 from postulo.documents.models import UploadedDocument
-from postulo.jobs.history import record_listing_event
+from postulo.jobs.history import EXTERNAL_ID_MAX_CHARS, one_line, record_listing_event
 from postulo.jobs.models import (
     LISTING_FILTERS,
     SYSTEM_LISTING_EVENT_KINDS,
     Contact,
     DiscardReason,
     JobPosting,
+    ListingEvent,
     ListingEventKind,
 )
 
@@ -118,6 +119,11 @@ def list_listing_choices(
         "all",
         description="all (default), undecided, new, shortlisted, discarded, applied or closed",
     ),
+    external_id: str = Query(
+        "",
+        max_length=EXTERNAL_ID_MAX_CHARS,
+        description="A message id: each listing says in `filed` whether it holds an entry with it",
+    ),
     updated_since: Moment | None = Query(None, description=UPDATED_SINCE),
     after_id: RowId | None = Query(None, description=AFTER_ID),
 ):
@@ -125,7 +131,11 @@ def list_listing_choices(
 
     For a client filing something into a listing's history, which has to offer a choice of
     listing and must not read the search to do it: a title, a company, a place and a state.
-    Newest noted first, and ``q`` narrows to the ones whose title or company says it.
+    Newest noted first, and ``q`` narrows to the ones whose title or company says it. Given
+    an ``external_id`` -- a mail's ``Message-ID`` -- each says in ``filed`` whether an entry
+    with that identifier is already in the caller's own history of it, so a client can show
+    where a message is filed before sending it again. It tells the caller only about
+    entries the caller's account holds, which a replay of the same id already told.
     """
     listings = (
         owned(request, JobPosting.objects).select_related("company").with_status(request.auth.owner)
@@ -145,6 +155,15 @@ def list_listing_choices(
     words = q.strip()
     if words:
         listings = listings.filter(Q(title__icontains=words) | Q(company__name__icontains=words))
+    wanted = one_line(external_id)[:EXTERNAL_ID_MAX_CHARS]
+    if wanted:
+        listings = listings.annotate(
+            filed=Exists(
+                ListingEvent.objects.filter(
+                    posting=OuterRef("pk"), owner=request.auth.owner, external_id=wanted
+                )
+            )
+        )
     return changed_since(listings.order_by("-noted_at", "-pk"), updated_since, after_id)
 
 
