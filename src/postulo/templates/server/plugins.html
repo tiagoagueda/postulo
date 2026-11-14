@@ -259,6 +259,11 @@
                 {% if not plugin.present %}
                   <span class="ms-2 badge" data-tone="amber">{% translate "not loaded" %}</span>
                 {% endif %}
+                {% if plugin.hold %}
+                  <span class="ms-2 badge" data-tone="blue" data-hold="{{ plugin.hold.mode }}">
+                    {% if plugin.hold.mode == "pin" %}{% blocktranslate trimmed with version=plugin.hold.version %}Pinned to {{ version }}{% endblocktranslate %}{% else %}{% blocktranslate trimmed with version=plugin.hold.version %}Held at {{ version }}{% endblocktranslate %}{% endif %}
+                  </span>
+                {% endif %}
                 {% comment %} Said here and not only in a log: a core upgrade is what makes
                    a plugin stop fitting, and the page is where an administrator looks for
                    why something stopped working (#186). {% endcomment %}
@@ -288,6 +293,17 @@
                  the moment this page had shown it once. An administrator could see who
                  wrote a plugin exactly on the day they installed it and never again.
               {% endcomment %}
+              {% if plugin.hold %}
+                <p class="text-xs text-ink-500 dark:text-ink-400" data-hold-detail="{{ plugin.name }}">
+                  {% if plugin.hold.source == "environment" %}
+                    {% translate "Pinned by POSTULO_PLUGIN_PINS in the environment; it cannot be changed here." %}
+                  {% else %}
+                    {% if plugin.hold.set_by %}{% blocktranslate trimmed with who=plugin.hold.set_by when=plugin.hold.set_at|date:"DATE_FORMAT" %}Set by {{ who }} on {{ when }}.{% endblocktranslate %}{% endif %}
+                    {% if plugin.hold.note %}<bdi>{{ plugin.hold.note }}</bdi>{% endif %}
+                  {% endif %}
+                  {% translate "Nothing updates it by itself." %}
+                </p>
+              {% endif %}
               {% if plugin.summary %}<p class="text-sm">{{ plugin.summary }}</p>{% endif %}
               {% if plugin.author or plugin.licence or plugin.source_url %}
                 <p class="text-xs text-ink-500 dark:text-ink-400">
@@ -339,6 +355,21 @@
                     {% if plugin.disabled %}{% translate "Switch on" %}{% else %}{% translate "Switch off" %}{% endif %}
                   </button>
                 </form>
+                {% if not plugin.hold or plugin.hold.source != "environment" %}
+                  <form method="post" action="{% url 'server:plugin_action' %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="name" value="{{ plugin.name }}">
+                    {% if plugin.hold %}
+                      <input type="hidden" name="action" value="lift">
+                      <button type="submit" class="btn" data-variant="outline" data-size="xs">{% translate "Follow the latest" %}</button>
+                    {% else %}
+                      <input type="hidden" name="action" value="hold">
+                      <label class="sr-only" for="hold-note-{{ plugin.name }}">{% translate "Why (optional)" %}</label>
+                      <input type="text" name="note" id="hold-note-{{ plugin.name }}" maxlength="300" class="input w-40" placeholder="{% translate 'Why (optional)' %}">
+                      <button type="submit" class="btn" data-variant="outline" data-size="xs">{% translate "Hold here" %}</button>
+                    {% endif %}
+                  </form>
+                {% endif %}
                 <form method="post" action="{% url 'server:plugin_action' %}">
                   {% csrf_token %}
                   <input type="hidden" name="name" value="{{ plugin.name }}">
@@ -454,6 +485,7 @@
               <div class="min-w-0 flex-1">
                 <p class="font-medium">
                   {{ listing.name }} {{ listing.version }}
+                  {% if listing.hold %}<span class="ms-1 badge" data-tone="blue" data-hold="{{ listing.hold.mode }}">{% if listing.hold.mode == "pin" %}{% blocktranslate trimmed with version=listing.hold.version %}Pinned to {{ version }}{% endblocktranslate %}{% else %}{% blocktranslate trimmed with version=listing.hold.version %}Held at {{ version }}{% endblocktranslate %}{% endif %}</span>{% endif %}
                   {% for category in listing.category_labels %}<span class="ms-1 badge" data-tone="grey" data-category="{{ category.slug }}">{{ category.label }}</span>{% endfor %}
                 </p>
                 <p class="text-xs text-ink-500 dark:text-ink-400">
@@ -461,6 +493,14 @@
                   {% if listing.licence %} · {{ listing.licence }}{% endif %}
                   {% if listing.maintainer %} · <bdi>{{ listing.maintainer }}</bdi>{% endif %}
                   · <code>{{ listing.catalogue }}</code>
+                  {% if listing.security_held %}
+                    <span class="block text-amber-800 dark:text-amber-200" data-security-held="{{ listing.name }}">
+                      {% blocktranslate trimmed with version=listing.security_held.version %}
+                        A security release, {{ version }}, is available. A hold does not apply it, and does not hide it.
+                      {% endblocktranslate %}
+                      {% if listing.security_held.advisory %}<bdi>{{ listing.security_held.advisory }}</bdi>{% endif %}
+                    </span>
+                  {% endif %}
                   · <span class="badge" data-tone="grey" data-origin="{{ listing.origin }}">{% if listing.origin == "official" %}{% translate "Official" %}{% else %}{% translate "Third party" %}{% endif %}</span>
                 </p>
               </div>
@@ -495,10 +535,24 @@
                   <input type="hidden" name="catalogue" value="{{ listing.catalogue }}">
                   <input type="hidden" name="version" value="{{ listing.version }}">
                   <input type="hidden" name="action" value="install">
+                  {% if listing.hold %}<input type="hidden" name="confirm_held" value="1">{% endif %}
                   <button type="submit" class="btn" data-variant="outline" data-size="sm">
-                    {% if listing.installed %}{% translate "Reinstall" %}{% else %}{% translate "Install" %}{% endif %}
+                    {% if listing.installed %}{% if listing.hold %}{% translate "Update anyway" %}{% else %}{% translate "Reinstall" %}{% endif %}{% else %}{% translate "Install" %}{% endif %}
                   </button>
                 </form>
+                {% if listing.installed and not listing.hold.environment %}
+                  <form method="post" action="{% url 'server:plugin_action' %}" class="flex flex-wrap items-center gap-1" data-pin="{{ listing.name }}">
+                    {% csrf_token %}
+                    <input type="hidden" name="name" value="{{ listing.name }}">
+                    <input type="hidden" name="catalogue" value="{{ listing.catalogue }}">
+                    <input type="hidden" name="action" value="pin">
+                    <label class="sr-only" for="pin-version-{{ listing.name }}">{% translate "Version to pin" %}</label>
+                    <select name="version" id="pin-version-{{ listing.name }}" class="input w-auto">
+                      {% for release in listing.releases %}{% if release.compatible %}<option value="{{ release.version }}">{{ release.version }}</option>{% endif %}{% endfor %}
+                    </select>
+                    <button type="submit" class="btn" data-variant="outline" data-size="sm">{% translate "Pin to this version" %}</button>
+                  </form>
+                {% endif %}
               {% else %}
                 {% comment %} No button: installing would refuse with this same sentence,
                    and a control that can only refuse is worse than the sentence. {% endcomment %}

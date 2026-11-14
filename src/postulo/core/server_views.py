@@ -1215,7 +1215,13 @@ class PluginsView(ServerSectionMixin, TemplateView):
         ]
         context["entry_point_group"] = ENTRY_POINT_GROUP
         context["allow_unlisted"] = installing.allows_unlisted()
-        context["installed"] = provenance.status()
+        from postulo.plugins import holds
+
+        found_holds = holds.all_holds()
+        context["installed"] = [
+            {**row, "hold": found_holds.get(holds.canonicalise(row["name"]))}
+            for row in provenance.status()
+        ]
         context["plugins_dir"] = str(installing.plugins_dir())
         context["catalogues_configured"] = sorted(catalogue.configured())
         context["repositories"] = _repositories()
@@ -1859,6 +1865,43 @@ _UNLISTED_REFUSED = _(
 )
 
 
+def _hold_facts(listing, current, all_holds) -> dict:
+    """What a listing says about a hold on its plugin, for the page's row (#1264).
+
+    Nothing for a plugin that follows the latest. For a held or pinned one: the hold, and a
+    security release past the installed version when there is one, which the hold does not
+    apply but must not hide.
+    """
+    from postulo.plugins import holds
+
+    held = all_holds.get(holds.canonicalise(listing.name))
+    if held is None or current is None:
+        return {}
+    facts = {
+        "hold": {
+            "mode": held.mode,
+            "version": held.version,
+            "note": held.note,
+            "set_by": held.set_by,
+            "environment": held.from_environment,
+        },
+    }
+    if (secure := holds.security_release(listing, current.version)) is not None:
+        facts["security_held"] = {"version": secure.version, "advisory": secure.advisory}
+    return facts
+
+
+def _held_sentence(held) -> str:
+    """What the page says before moving a held plugin by hand (#1264)."""
+    return str(
+        _(
+            "%(name)s is held at %(version)s. Press the button again to move it anyway; "
+            "it then stays at the version you choose."
+        )
+        % {"name": held.plugin, "version": held.version}
+    )
+
+
 def _upgrade_notice(entry) -> str:
     return str(
         _(
@@ -1894,6 +1937,9 @@ class PluginActionView(StaffRequiredMixin, View):
         "disable": "_disable",
         "enable": "_enable",
         "remove": "_remove",
+        "hold": "_hold",
+        "lift": "_lift",
+        "pin": "_pin",
     }
 
     def post(self, request: HttpRequest) -> HttpResponse:
@@ -2017,9 +2063,10 @@ class PluginActionView(StaffRequiredMixin, View):
         catalogues, problems = catalogue.fetch_all()
         for problem in problems:
             messages.error(request, problem)
-        from postulo.plugins import dependencies, provenance
+        from postulo.plugins import dependencies, holds, provenance
 
         official = provenance.official_repositories()
+        all_holds = holds.all_holds()
         listings = []
         for one in catalogues:
             offered_here = {
@@ -2031,6 +2078,7 @@ class PluginActionView(StaffRequiredMixin, View):
                 release = listing.latest
                 if release is None:
                     continue
+                current = installing.installed(listing.name)
                 # What this release needs that is not here, and for each whether this very
                 # catalogue lists it, so the page can offer it. Offered, never installed on
                 # the administrator's behalf (#884).
@@ -2064,6 +2112,14 @@ class PluginActionView(StaffRequiredMixin, View):
                         "compatible": installing.compatible(release.requires_postulo),
                         "categories": list(listing.categories),
                         "needs": needs,
+                        "releases": [
+                            {
+                                "version": each.version,
+                                "compatible": installing.compatible(each.requires_postulo),
+                            }
+                            for each in listing.releases
+                        ],
+                        **_hold_facts(listing, current, all_holds),
                     }
                 )
         request.session["plugin_listings"] = listings
@@ -2072,11 +2128,23 @@ class PluginActionView(StaffRequiredMixin, View):
         return redirect("server:plugins")
 
     def _install(self, request: HttpRequest) -> HttpResponse:
-        from postulo.plugins import catalogue
+        from postulo.plugins import catalogue, holds
         from postulo.plugins.installing import InstallError, installed
 
         name = request.POST.get("name", "")
         replaces = installed(name) is not None
+        # A held or pinned plugin is moved by hand only when the person has been told it is held
+        # and said so again; the environment's pin is refused inside the install (#1264).
+        held = holds.get(name)
+        version = request.POST.get("version", "")
+        if (
+            held is not None
+            and not held.from_environment
+            and version != held.version
+            and request.POST.get("confirm_held") != "1"
+        ):
+            messages.error(request, _held_sentence(held))
+            return redirect("server:plugins")
         try:
             # The catalogue and the version the pressed row showed, not whatever lists the
             # name first (#601).
@@ -2089,6 +2157,7 @@ class PluginActionView(StaffRequiredMixin, View):
         except (catalogue.CatalogueError, InstallError) as error:
             messages.error(request, str(error))
             return redirect("server:plugins")
+        holds.follow_manual_install(entry.name, entry.version, by=request.user)
         if replaces:
             messages.success(request, _upgrade_notice(entry))
             return redirect("server:plugins")
@@ -2096,6 +2165,69 @@ class PluginActionView(StaffRequiredMixin, View):
             request,
             _("%(name)s %(version)s is installed from the catalogue.")
             % {"name": entry.name, "version": entry.version},
+        )
+        return redirect("server:plugins")
+
+    # ------------------------------------------------------- holding, pinning
+
+    def _hold(self, request: HttpRequest) -> HttpResponse:
+        from postulo.plugins import holds
+
+        try:
+            held = holds.hold(
+                request.POST.get("name", ""),
+                by=request.user,
+                note=(request.POST.get("note") or "").strip(),
+            )
+        except holds.HoldError as error:
+            messages.error(request, str(error))
+            return redirect("server:plugins")
+        messages.success(
+            request,
+            _(
+                "%(name)s is held at %(version)s. Nothing updates it by itself; a newer "
+                "release is still shown."
+            )
+            % {"name": held.plugin, "version": held.version},
+        )
+        return redirect("server:plugins")
+
+    def _lift(self, request: HttpRequest) -> HttpResponse:
+        from postulo.plugins import holds
+
+        name = request.POST.get("name", "")
+        try:
+            holds.lift(name, by=request.user)
+        except holds.HoldError as error:
+            messages.error(request, str(error))
+            return redirect("server:plugins")
+        messages.success(request, _("%(name)s follows the latest release again.") % {"name": name})
+        return redirect("server:plugins")
+
+    def _pin(self, request: HttpRequest) -> HttpResponse:
+        from postulo.plugins import catalogue
+        from postulo.plugins.installing import InstallError, installed
+
+        name = request.POST.get("name", "")
+        replaces = installed(name) is not None
+        try:
+            held = catalogue.pin(
+                name,
+                request.POST.get("version", ""),
+                by=request.user,
+                note=(request.POST.get("note") or "").strip(),
+                catalogue=request.POST.get("catalogue", ""),
+            )
+        except (catalogue.CatalogueError, InstallError) as error:
+            messages.error(request, str(error))
+            return redirect("server:plugins")
+        entry = installed(name)
+        if replaces and entry is not None:
+            messages.success(request, _upgrade_notice(entry))
+        messages.success(
+            request,
+            _("%(name)s is pinned to %(version)s. Nothing updates it by itself.")
+            % {"name": held.plugin, "version": held.version},
         )
         return redirect("server:plugins")
 

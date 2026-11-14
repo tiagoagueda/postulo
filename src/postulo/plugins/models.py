@@ -106,6 +106,48 @@ class PluginRepository(models.Model):
         return bool(self.enabled and self.url and self.public_key)
 
 
+class PluginHold(models.Model):
+    """An administrator's decision that a plugin stays where it is (#1264).
+
+    Two forms of the same thing. *Hold* keeps the version installed now; *pin* names a
+    version and has been installed through the usual checks. Either way nothing upgrades the
+    plugin by itself -- not the daily check's update, not "update all" -- and an administrator
+    can still move it by hand, after being told it is held. A row is kept per plugin, on the
+    instance, so a restart or an upgrade of Postulo changes nothing; no row means "follow the
+    latest". ``POSTULO_PLUGIN_PINS`` can pin a plugin from the environment, which is not stored
+    here and wins over a row.
+
+    ``plugin`` is the canonical distribution name, as the record names it. Who set it is the
+    account, kept while it exists; the instance log (`postulo.plugins.audit`) keeps the name.
+    """
+
+    class Mode(models.TextChoices):
+        HOLD = "hold", _("Held at the installed version")
+        PIN = "pin", _("Pinned to a version")
+
+    plugin = models.CharField(_("plugin"), max_length=100, unique=True)
+    mode = models.CharField(_("mode"), max_length=4, choices=Mode)
+    version = models.CharField(_("version"), max_length=60)
+    note = models.CharField(_("why"), max_length=300, blank=True)
+    set_by = models.ForeignKey(
+        "accounts.User",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="+",
+        verbose_name=_("set by"),
+    )
+    set_at = models.DateTimeField(_("set"), auto_now=True)
+
+    class Meta:
+        verbose_name = _("plugin hold")
+        verbose_name_plural = _("plugin holds")
+        ordering = ("plugin",)
+
+    def __str__(self) -> str:
+        return f"{self.plugin} {self.mode} {self.version}"
+
+
 class PluginPolicy(models.Model):
     """What an administrator has decided about a plugin — for everybody, or for one person.
 

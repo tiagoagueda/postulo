@@ -144,6 +144,7 @@ def test_every_action_the_page_posts_is_a_catalogue_or_a_local_one(strict, clien
 
     assert set(PluginActionView.ACTIONS) == {
         "upload", "cancel", "confirm", "refresh", "install", "disable", "enable", "remove",
+        "hold", "lift", "pin",
     }  # fmt: skip
     client.force_login(admin)
     for field in ("url", "source", "wheel", "pip", "index"):

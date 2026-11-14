@@ -1324,6 +1324,16 @@ _VARIABLES: tuple[Variable, ...] = (
         notes="Empty: an index is a list of code to run, so pointing at one is a decision.",
     ),
     Variable(
+        "POSTULO_PLUGIN_PINS",
+        Kind.TEXT,
+        "plugins",
+        "Plugins pinned to a version, as name==version entries separated by commas. A pinned "
+        "plugin is never updated by itself, and the Plugins page cannot change the pin.",
+        default="",
+        notes="Empty: nothing is pinned from the environment. A pin set here wins over one set "
+        "on the Plugins page (#1264).",
+    ),
+    Variable(
         "POSTULO_PLUGIN_ALLOW_UNLISTED",
         Kind.BOOLEAN,
         "plugins",

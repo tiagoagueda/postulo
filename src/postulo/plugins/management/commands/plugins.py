@@ -13,7 +13,7 @@ from pathlib import Path
 
 from django.core.management.base import BaseCommand, CommandError
 
-from postulo.plugins import catalogue, installing, provenance
+from postulo.plugins import catalogue, holds, installing, provenance
 
 #: What an upgrade or a rollback leaves true: modules already imported are not imported again
 #: (#599).
@@ -56,6 +56,20 @@ class Command(BaseCommand):
         )
         sub.add_parser("sync", help="Reinstall what the record lists and the environment lacks.")
         sub.add_parser("catalogue", help="What the configured catalogues offer.")
+        held = sub.add_parser("hold", help="Keep a plugin at the version installed now.")
+        held.add_argument("name")
+        held.add_argument("--note", default="", help="Why, for whoever reads the page next.")
+        lifted = sub.add_parser("lift", help="Let a held or pinned plugin follow the latest.")
+        lifted.add_argument("name")
+        pinned = sub.add_parser("pin", help="Install a version and keep the plugin on it.")
+        pinned.add_argument("name")
+        pinned.add_argument("version")
+        pinned.add_argument("--catalogue", default="")
+        pinned.add_argument("--note", default="")
+        holds = sub.add_parser("holds", help="What is held or pinned, and whether it fits.")
+        holds.add_argument(
+            "--postulo", default="", help="Check against this Postulo version, before moving to it."
+        )
 
     def handle(self, *args, **options) -> None:
         action = options["action"]
@@ -197,6 +211,50 @@ class Command(BaseCommand):
             self.stderr.write(f"{name} is recorded but could not be reinstalled; install it again.")
         if not restored and not lost:
             self.stdout.write("Everything the record lists is present.")
+
+    # ---------------------------------------------------------- hold, pin, lift
+
+    def _hold(self, options) -> None:
+        try:
+            held = holds.hold(options["name"], by="command line", note=options["note"])
+        except holds.HoldError as error:
+            raise CommandError(str(error)) from error
+        self.stdout.write(f"{held.plugin} is held at {held.version}.")
+
+    def _lift(self, options) -> None:
+        try:
+            holds.lift(options["name"], by="command line")
+        except holds.HoldError as error:
+            raise CommandError(str(error)) from error
+        self.stdout.write(f"{options['name']} follows the latest release again.")
+
+    def _pin(self, options) -> None:
+        try:
+            held = catalogue.pin(
+                options["name"],
+                options["version"],
+                by="command line",
+                note=options["note"],
+                catalogue=options["catalogue"],
+            )
+        except (catalogue.CatalogueError, installing.InstallError) as error:
+            raise CommandError(str(error)) from error
+        self.stdout.write(f"{held.plugin} is pinned to {held.version}.")
+        self.stdout.write(RESTART_NEEDED)
+
+    def _holds(self, options) -> None:
+        found = holds.all_holds()
+        for name, held in sorted(found.items()):
+            where = "environment" if held.from_environment else (held.set_by or "page")
+            self.stdout.write(f"{name}  {held.mode} {held.version}  [{where}] {held.note}".rstrip())
+        if not found:
+            self.stdout.write("Nothing is held or pinned.")
+        if options["postulo"]:
+            for name, version, wanted in holds.incompatible_with(options["postulo"]):
+                self.stdout.write(
+                    f"{name} {version} is for Postulo {wanted or '(not declared)'}, "
+                    f"which does not include {options['postulo']}."
+                )
 
     # ------------------------------------------------------------- catalogue
 

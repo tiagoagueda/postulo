@@ -80,6 +80,10 @@ def build(wheels: Path, expires_days: int = DEFAULT_EXPIRES_DAYS) -> dict:
                     "requires_postulo": release.get("requires_postulo", ""),
                     "provides": list(release.get("provides", [])),
                     **({"requires": list(release["requires"])} if release.get("requires") else {}),
+                    # A release signed as a security fix, and where it says what was fixed:
+                    # a held plugin is not moved by it, but the page says it is there (#1264).
+                    **({"security": True} if release.get("security") else {}),
+                    **({"advisory": release["advisory"]} if release.get("advisory") else {}),
                 }
             )
         plugins.append(

@@ -183,6 +183,45 @@ def refuse_removing(distribution: str) -> str:
     )
 
 
+def refuse_version(distribution: str, version: str) -> str:
+    """A sentence naming what needs another version of this package, or nothing (#1264).
+
+    Moving a plugin up or down is refused when something installed says, in its own
+    requirements, that it does not accept the version it would land on. The sentence names
+    the plugin and the range, so the administrator knows what stands in the way.
+    """
+    from .record import read_record
+    from .registry import GROUPS, plugins
+
+    names = {_canonical(distribution), *(_canonical(name) for name in provided_by(distribution))}
+    inside = provided_by(distribution)
+    blocking: dict[str, str] = {}
+    for entry in read_record():
+        if _canonical(entry.name) == _canonical(distribution):
+            continue
+        for need in parse(entry.requires):
+            if _canonical(need.name) in names and not _fits(need.specifier, version):
+                blocking[entry.name] = str(need)
+    for kind in GROUPS:
+        for plugin in plugins(kind):
+            if plugin.name in inside:
+                continue
+            for need in needs_of(plugin):
+                if _canonical(need.name) in names and not _fits(need.specifier, version):
+                    blocking.setdefault(plugin.name, str(need))
+    if not blocking:
+        return ""
+    return str(
+        _("%(name)s %(version)s cannot be installed: %(who)s needs %(need)s.")
+        % {
+            "name": distribution,
+            "version": version,
+            "who": ", ".join(sorted(blocking)),
+            "need": "; ".join(sorted(set(blocking.values()))),
+        }
+    )
+
+
 def refuse_installing(name: str, entries) -> str:
     """A sentence naming what a release needs that is not here, or nothing."""
     missing = unmet(entries)

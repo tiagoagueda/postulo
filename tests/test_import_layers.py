@@ -203,6 +203,7 @@ LAYERS: list[tuple[str, tuple[str, ...]]] = [
             "postulo.plugins.data",
             # What a plugin needs of the others (#884), asked by the policy and the installer.
             "postulo.plugins.dependencies",
+            "postulo.plugins.holds",
             "postulo.plugins.installing",
             "postulo.plugins.logos",
             "postulo.plugins.policy",

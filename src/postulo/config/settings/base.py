@@ -657,6 +657,9 @@ POSTULO_PLUGINS_DIR = environ.Path(read("POSTULO_PLUGINS_DIR"))
 # here before anything is fetched from it.
 POSTULO_PLUGIN_CATALOGUES = read("POSTULO_PLUGIN_CATALOGUES")
 
+# Plugins pinned to a version from the environment: `name==version`, comma-separated (#1264).
+POSTULO_PLUGIN_PINS = read("POSTULO_PLUGIN_PINS")
+
 # Whether a plugin may be installed from a file nobody signed for (#1263). Off: the only way in
 # is a signed manifest (a catalogue's index, checked for its signature, the release's
 # compatibility and the wheel's SHA-256). For somebody writing a plugin, on their own instance.

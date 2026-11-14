@@ -70,6 +70,10 @@ class Release:
     provides: tuple[str, ...] = ()
     #: The plugins and modules this release needs, written as requirements (#884).
     requires: tuple[str, ...] = ()
+    #: Whether the publisher signed this release as a security fix, and where it says what was
+    #: fixed (#1264). A held or pinned plugin is not moved by it, and the page says it is there.
+    security: bool = False
+    advisory: str = ""
 
 
 @dataclass(frozen=True)
@@ -222,6 +226,8 @@ def parse(payload: bytes, *, catalogue: str = "") -> list[Listing]:
                     requires_postulo=str(release.get("requires_postulo", "")),
                     provides=tuple(str(item) for item in release.get("provides", [])),
                     requires=tuple(str(item) for item in release.get("requires", [])),
+                    security=release.get("security") is True,
+                    advisory=str(release.get("advisory", "")),
                 )
             )
         listings.append(
@@ -589,6 +595,8 @@ def install(plugin: str, *, by: str = "", catalogue: str = "", version: str = ""
     listing, release = find(catalogues, plugin, version, catalogue=catalogue)
     refuse_unless_it_fits(listing, release)
     refuse_unless_it_has_what_it_needs(listing, release)
+    refuse_unless_dependants_accept(listing, release)
+    refuse_unless_not_pinned_elsewhere(listing, release)
     with tempfile.TemporaryDirectory(prefix="postulo-plugin-") as scratch:
         wheel = download(release, Path(scratch))
         return install_wheel(
@@ -602,6 +610,24 @@ def install(plugin: str, *, by: str = "", catalogue: str = "", version: str = ""
         )
 
 
+def pin(plugin: str, version: str, *, by=None, note: str = "", catalogue: str = ""):
+    """Install ``version`` through every check an install makes, then keep the plugin on it (#1264).
+
+    A pin is an install with a decision attached, so it takes no road of its own: the signature,
+    the compatibility, the checksum, the dependants, the snapshot and the rollback are
+    `install`'s. Nothing is recorded unless the install worked.
+    """
+    from . import holds
+
+    username = "" if by is None else (by if isinstance(by, str) else by.get_username())
+    try:
+        holds.refuse_if_environment_pins(plugin)
+    except holds.HoldError as error:
+        raise CatalogueError(str(error)) from error
+    entry = install(plugin, by=username, catalogue=catalogue, version=version)
+    return holds.record_pin(entry.name, entry.version, by=by, note=note)
+
+
 def refuse_unless_it_has_what_it_needs(listing: Listing, release: Release) -> None:
     """The fourth check: the plugins and modules a release names must already be here (#884).
 
@@ -612,6 +638,22 @@ def refuse_unless_it_has_what_it_needs(listing: Listing, release: Release) -> No
     from .dependencies import refuse_installing
 
     if sentence := refuse_installing(listing.name, release.requires):
+        raise CatalogueError(sentence)
+
+
+def refuse_unless_dependants_accept(listing: Listing, release: Release) -> None:
+    """A plugin another one needs cannot move to a version that one does not accept (#1264)."""
+    from .dependencies import refuse_version
+
+    if sentence := refuse_version(listing.name, release.version):
+        raise CatalogueError(sentence)
+
+
+def refuse_unless_not_pinned_elsewhere(listing: Listing, release: Release) -> None:
+    """The environment's pin wins: nothing but that version is installed from the page (#1264)."""
+    from .holds import refuse_other_than_environment_pin
+
+    if sentence := refuse_other_than_environment_pin(listing.name, release.version):
         raise CatalogueError(sentence)
 
 
