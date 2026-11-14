@@ -72,7 +72,7 @@
         </p>
       {% endif %}
       {% if company.location %}
-        <p class="text-sm text-ink-500 dark:text-ink-400">{{ company.location }}</p>
+        <p class="text-sm text-ink-500 dark:text-ink-400">{{ company|place:user }}</p>
       {% endif %}
       {% if company.industries.all %}
         <div class="mt-2 flex flex-wrap gap-1" data-industries>
@@ -180,7 +180,7 @@
       {% endfor %}
       {% for address in company_addresses %}
         <p class="text-ink-600 dark:text-ink-300">
-          {% if address.kind %}<span class="text-xs text-ink-500 dark:text-ink-400">{% if address.kind == "other" %}{{ address.label }}{% else %}{{ address.get_kind_display }}{% endif %}</span> {% endif %}<bdi>{{ address.one_line }}</bdi>
+          {% if address.kind %}<span class="text-xs text-ink-500 dark:text-ink-400">{% if address.kind == "other" %}{{ address.label }}{% else %}{{ address.get_kind_display }}{% endif %}</span> {% endif %}<bdi>{{ address|address_line:user }}</bdi>
         </p>
       {% endfor %}
     </div>
@@ -265,7 +265,7 @@
                   {% if showing_group and posting.company_id != company.pk %}
                     <bdi>{{ posting.company.name }}</bdi> ·
                   {% endif %}
-                  {{ posting.location|default:"—" }}
+                  {{ posting.location|typed_place:user|default:"—" }}
                   {% for application in posting.applications.all %}
                     ·
                     <a href="{{ application.get_absolute_url }}" class="hover:underline">
@@ -410,7 +410,7 @@
                 <a href="{% url 'jobs:company_detail' child.pk %}"
                    class="min-w-0 flex-1 font-medium underline">{{ child.name }}</a>
                 {% if child.location %}
-                  <span class="text-xs text-ink-500 dark:text-ink-400">{{ child.location }}</span>
+                  <span class="text-xs text-ink-500 dark:text-ink-400">{{ child|place:user }}</span>
                 {% endif %}
               </li>
             {% endfor %}
@@ -501,7 +501,7 @@
                        shown, to whoever may see the contact. {% endcomment %}
                     {% for address in contact.postal_addresses.all %}
                       <p class="text-xs text-ink-500 dark:text-ink-400" data-contact-address>
-                        {% if address.kind %}<span class="text-ink-400 dark:text-ink-500">{% if address.kind == "other" %}{{ address.label }}{% else %}{{ address.get_kind_display }}{% endif %}</span> {% endif %}<bdi>{{ address.one_line }}</bdi>
+                        {% if address.kind %}<span class="text-ink-400 dark:text-ink-500">{% if address.kind == "other" %}{{ address.label }}{% else %}{{ address.get_kind_display }}{% endif %}</span> {% endif %}<bdi>{{ address|address_line:user }}</bdi>
                       </p>
                     {% endfor %}
                     {% for link in contact.web_links.all %}

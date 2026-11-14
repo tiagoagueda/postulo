@@ -348,12 +348,14 @@ def search_companies(user, query: str, limit: int) -> Found:
     )
 
     def build(company) -> Hit:
+        from postulo.core.place_display import company_place
+
         return Hit(
             kind="companies",
             id=company.pk,
             title=company.display_name,
             subtitle=" · ".join(
-                part for part in (company.location, company.industry_names) if part
+                part for part in (company_place(company, user), company.industry_names) if part
             ),
             url=company.get_absolute_url(),
             excerpt=excerpt(_first_match(query, company.notes), query) if company.notes else "",

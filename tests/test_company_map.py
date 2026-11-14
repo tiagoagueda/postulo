@@ -353,7 +353,7 @@ def test_an_address_changed_while_off_is_drawn_where_its_words_say(
 
     (entry,) = page(client, user).context["places"]
 
-    assert entry["label"] == "Berlin, Germany"
+    assert entry["label"] == "Berlin", "the one country is not written on the pin (#1249)"
     assert entry["lon"] == pytest.approx(13.41053)
     address.refresh_from_db()
     assert address.longitude == pytest.approx(-9.1498), "a page view writes nothing"

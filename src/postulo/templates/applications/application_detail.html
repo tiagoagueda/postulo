@@ -69,7 +69,7 @@
           {% if application.posting.location %}
             <div>
               <dt class="text-xs text-ink-500 dark:text-ink-400">{% translate "Location" %}</dt>
-              <dd>{{ application.posting.location }}</dd>
+              <dd>{{ application.posting.location|typed_place:user }}</dd>
             </div>
           {% endif %}
           {% if application.posting.remote_type %}

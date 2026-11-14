@@ -11,7 +11,7 @@
   <div class="max-w-2xl">
     <c-page-title>
       {% translate "Place on the map" %}
-      <c-slot name="subtitle"><bdi>{{ address.one_line }}</bdi></c-slot>
+      <c-slot name="subtitle"><bdi>{{ address|address_line:user }}</bdi></c-slot>
     </c-page-title>
     <p class="mb-4 text-sm text-ink-600 dark:text-ink-300">
       {% translate "Drop the pin where the address is, or type the two numbers. The point is kept on this instance and nothing is looked up anywhere; changing the address afterwards does not move it." %}

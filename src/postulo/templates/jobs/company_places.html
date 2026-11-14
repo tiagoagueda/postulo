@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% load i18n %}
+{% load i18n postulo %}
 
 {% block title %}{% translate "Places as GeoJSON" %}{% endblock %}
 
@@ -35,7 +35,7 @@
                     <input type="checkbox" class="input" name="chosen" value="{{ entry.point.index }}">
                     <span><bdi>{{ entry.company.name }}</bdi></span>
                   </label>
-                  <span class="text-xs text-ink-500 dark:text-ink-400"><bdi>{{ entry.address.one_line }}</bdi> → {{ entry.point.lat|floatformat:5 }}, {{ entry.point.lon|floatformat:5 }}</span>
+                  <span class="text-xs text-ink-500 dark:text-ink-400"><bdi>{{ entry.address|address_line:user }}</bdi> → {{ entry.point.lat|floatformat:5 }}, {{ entry.point.lon|floatformat:5 }}</span>
                 {% else %}
                   <span><bdi>{{ entry.point.name|default:entry.point.wikidata }}</bdi></span>
                   <span class="text-xs text-ink-500 dark:text-ink-400" data-geojson-left>

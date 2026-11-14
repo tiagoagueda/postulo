@@ -25,7 +25,7 @@ from django.views.generic import (
 )
 
 from postulo.accounts import removals
-from postulo.core import deletions, identifier_order, slugs, tables, throttle
+from postulo.core import deletions, identifier_order, place_display, slugs, tables, throttle
 from postulo.core.cells import EditableCellView
 from postulo.core.files import picture_cache_control, serve_stored_picture
 from postulo.core.mixins import (
@@ -296,7 +296,6 @@ def pinned_addresses(person) -> list[dict]:
     from django.contrib.contenttypes.models import ContentType
 
     from postulo.accounts.models import Profile
-    from postulo.core import phones
     from postulo.core.models import PostalAddress
     from postulo.core.templatetags.postulo import avatar_url, logo_url
 
@@ -344,9 +343,7 @@ def pinned_addresses(person) -> list[dict]:
         if row.placed_by not in placing.KEPT and row.place_key() != row.placed_from:
             placed = places_data_place(row)
             lat, lon = (placed["lat"], placed["lon"]) if placed else (None, None)
-        place = ", ".join(
-            part for part in (row.municipality.strip(), phones.country_name(row.country)) if part
-        ) or str(_("No town given"))
+        place = place_display.address_place(row, person) or str(_("No town given"))
         what = row.label if row.kind == PostalAddress.Kind.OTHER else row.get_kind_display()
         found.append(
             {

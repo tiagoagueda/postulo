@@ -827,3 +827,32 @@ def has_thumbnail(filename: str) -> bool:
     from postulo.documents import previews
 
     return previews.has_thumbnail(filename)
+
+
+# ---------------------------------------------------------------- places (#1249)
+# A place for a person to read goes through `core.place_display`, which leaves the country
+# off while every place they deal with is in one. Each takes the signed-in user, `user`.
+
+
+@register.filter
+def place(company, user) -> str:
+    """A company's town, with its country where the person's places are not all in one."""
+    from postulo.core import place_display
+
+    return place_display.company_place(company, user)
+
+
+@register.filter
+def address_line(address, user) -> str:
+    """A postal address in one line, with its country where it is shown."""
+    from postulo.core import place_display
+
+    return place_display.address_line(address, user)
+
+
+@register.filter
+def typed_place(text, user) -> str:
+    """A place somebody typed, without its country where that is not shown."""
+    from postulo.core import place_display
+
+    return place_display.typed_place(text, user)

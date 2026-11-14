@@ -558,6 +558,19 @@ class Profile(models.Model):
     #: (#1238). Off unless somebody switches it on, and still whenever the system asks for
     #: less motion, whatever this says.
     animated_mark = models.BooleanField(_("moving mark"), default=False)
+    #: Whether a place is shown with its country (#1249): ``auto`` shows the town alone while
+    #: every place the person deals with is in one country, ``always`` and ``never`` are their
+    #: own word. Display only: what is stored, exported and printed on a document keeps it.
+    show_country = models.CharField(
+        _("show the country"),
+        max_length=6,
+        choices=(
+            ("auto", _("Automatically")),
+            ("always", _("Always")),
+            ("never", _("Never")),
+        ),
+        default="auto",
+    )
     #: Plugins this person has switched off for themselves. Stored as what was turned
     #: *off*, like `hidden_nav_items` and for the same reason: a plugin installed in a
     #: later release should be available without anybody having to opt into it.
