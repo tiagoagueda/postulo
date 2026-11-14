@@ -316,8 +316,8 @@
           <ul class="space-y-3">
             {% for interview in scheduled_interviews %}
               <li id="interview-{{ interview.pk }}">
-                <div class="flex items-start gap-3">
-                  <div class="min-w-0 flex-1">
+                <div class="flex flex-wrap items-start gap-3">
+                  <div class="min-w-[10rem] flex-1">
                     <p class="text-sm font-medium"><a href="{% url 'applications:interview_detail' interview.pk %}" class="hover:underline" data-interview-page>{{ interview.get_kind_display }}</a></p>
                     <p class="text-xs {% if interview.awaits_outcome %}text-amber-700 dark:text-amber-400{% else %}text-ink-500 dark:text-ink-400{% endif %} tabular-nums">
                       {{ interview.starts_at|date:"D" }} {{ interview.starts_at|date:"DATETIME_FORMAT" }}–{{ interview.ends_at|date:"TIME_FORMAT" }}
@@ -339,7 +339,7 @@
                       <p class="mt-1 whitespace-pre-line text-xs text-ink-600 dark:text-ink-300">{{ interview.notes }}</p>
                     {% endif %}
                   </div>
-                  <div class="flex shrink-0 flex-col items-end gap-1">
+                  <div class="ms-auto flex shrink-0 flex-col items-end gap-1">
                     {% module_on "format-icalendar" as ical_on %}
                     {% if ical_on %}
                     <a href="{% url 'applications:interview_ics' interview.pk %}" class="btn" data-variant="ghost" data-size="xs">
