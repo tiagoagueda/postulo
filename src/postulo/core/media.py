@@ -48,6 +48,9 @@ def survey(*, older_than=None) -> tuple[list, int]:
     from postulo.documents import filestore
 
     referenced = referenced_names()
+    # The small pictures made from those files (#942) have no row of their own: each is named by
+    # the file it shows, so it is named here and is never swept as a stray.
+    referenced |= filestore.thumbnail_names(referenced)
     unnamed = []
     held = 0
     for stored in filestore.listing():

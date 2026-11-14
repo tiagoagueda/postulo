@@ -20,6 +20,7 @@ from django.db import transaction
 from django.db.models.signals import post_delete, post_save, pre_delete
 from django.dispatch import receiver
 
+from . import previews
 from .models import CV, CoverLetter, RenderedDocument, UploadedDocument
 
 logger = logging.getLogger(__name__)
@@ -80,6 +81,7 @@ def remove_the_file_from_disk(sender, instance, **kwargs) -> None:
             instance.file.storage.delete(name)
         except OSError:  # pragma: no cover - a file already gone is the outcome we wanted
             logger.warning("Could not remove %s from storage", name, exc_info=True)
+        previews.remove(name)
 
     transaction.on_commit(remove)
 

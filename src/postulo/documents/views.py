@@ -24,7 +24,14 @@ from django.views.decorators.csp import csp_override
 from django.views.generic import CreateView, DeleteView, DetailView, ListView, UpdateView
 
 from postulo.applications.models import Application
-from postulo.core.files import FILE_POLICY, serve_private_file
+from postulo.core.files import (
+    FILE_POLICY,
+    PLAIN_TEXT,
+    lies_under,
+    serve_private_file,
+    serve_private_preview,
+    serve_thumbnail,
+)
 from postulo.core.mixins import ConfirmDeleteMixin, OwnedObjectMixin, OwnerFormMixin
 from postulo.core.params import as_pk
 from postulo.core.redirects import safe_next
@@ -36,6 +43,7 @@ from . import (
     formats,
     kinds,
     paper_choice,
+    previews,
     printing,
     proofs,
     rendering,
@@ -76,7 +84,9 @@ logger = logging.getLogger(__name__)
 VERSIONS_SHOWN = 10
 
 
-def handed_over(content: bytes, *, content_type: str, name: str) -> HttpResponse:
+def handed_over(
+    content: bytes, *, content_type: str, name: str, inline: bool = False, status: int = 200
+) -> HttpResponse:
     """A file made for this request: handed to whoever asked, and kept nowhere (#236).
 
     What `serve_private_file` says of a file on disk, said of one that never reaches it,
@@ -88,9 +98,13 @@ def handed_over(content: bytes, *, content_type: str, name: str) -> HttpResponse
     The name is written by Django, which escapes what a quoted name cannot hold and spells
     a name with an accent or a dash in it the way RFC 6266 asks -- and the title of a
     document always has the dash.
+
+    ``inline`` is for the document viewer (#942), which reads the bytes with a request of its
+    own and draws them; a browser that is sent here by a link still gets a download. Only the
+    caller that has made the PDF itself says so, so the type is never one a name suggests.
     """
-    response = HttpResponse(content, content_type=content_type)
-    response["Content-Disposition"] = content_disposition_header(True, name)
+    response = HttpResponse(content, content_type=content_type, status=status)
+    response["Content-Disposition"] = content_disposition_header(not inline, name)
     response["Cache-Control"] = "private, max-age=0, no-store"
     response["X-Content-Type-Options"] = "nosniff"
     response["Content-Security-Policy"] = FILE_POLICY
@@ -202,15 +216,28 @@ class DraftMixin(PDFErrorMixin):
     def draft(self, request: HttpRequest, document, html) -> HttpResponse:
         """``html`` is called rather than passed, so that a theme which cannot set this
         document is refused in the same sentence as a renderer that is not there."""
+        # The viewer asks for the draft to draw it (#942): the same PDF, answered inline, and a
+        # refusal answered as a sentence with a status rather than a message queued for the
+        # next page and a redirect that the viewer would follow into an HTML page.
+        inline = request.GET.get("inline") == "1"
         try:
             content = renderers.draft_pdf(html())
         except (PDFBackendUnavailable, themes.CannotRender) as refusal:
+            if inline:
+                return handed_over(
+                    str(refusal).encode(),
+                    content_type=PLAIN_TEXT,
+                    name="draft.txt",
+                    inline=True,
+                    status=503,
+                )
             messages.error(request, str(refusal))
             return redirect(document.get_absolute_url())
         return handed_over(
             content,
             content_type="application/pdf",
             name=f"{rendering.draft_name(document)}.pdf",
+            inline=inline,
         )
 
 
@@ -939,6 +966,114 @@ class UploadDownloadView(OwnedObjectMixin, View):
             as_attachment=True,
             within=document.storage_prefix,
         )
+
+
+class PreviewViewsMixin:
+    """The three addresses a viewable record has beside its download (#942).
+
+    The page that holds the viewer (`DetailView`'s), the file as the viewer reads it, and a
+    thumbnail. Each is the record's own queryset narrowed to the requester, so another
+    account's file is a 404 at every one of them, and each hands the file over through
+    `core.files` with the folder it must lie under.
+    """
+
+    def get_queryset(self):
+        return self.model.objects.for_user(self.request.user)
+
+
+class UploadPreviewView(PreviewViewsMixin, OwnedObjectMixin, View):
+    """An uploaded file **inline**, for the viewer: only a PDF, a PNG, a JPEG or plain text.
+
+    Any other kind is a 404 here and a download at `UploadDownloadView`; what may be shown is
+    `previews.BY_EXTENSION`, worked out from the stored name and never from the title.
+    """
+
+    model = UploadedDocument
+
+    def get(self, request: HttpRequest, pk: int) -> HttpResponse:
+        document = get_object_or_404(self.get_queryset(), pk=pk)
+        return serve_private_preview(
+            request,
+            document.file,
+            preview_type=previews.preview_of(document.download_name).content_type,
+            download_name=document.download_name,
+            within=document.storage_prefix,
+        )
+
+
+class UploadThumbView(PreviewViewsMixin, OwnedObjectMixin, View):
+    """The small picture of an uploaded file's first page; a 404 where it has none."""
+
+    model = UploadedDocument
+
+    def get(self, request: HttpRequest, pk: int) -> HttpResponse:
+        document = get_object_or_404(self.get_queryset(), pk=pk)
+        return thumbnail_response(document)
+
+
+def thumbnail_response(document) -> HttpResponse:
+    """The thumbnail of a record's file, made now if need be, or a 404 (#942)."""
+    if not document.file or not lies_under(document.file.name, document.storage_prefix):
+        raise Http404("No thumbnail.")
+    data = previews.thumbnail_bytes(document.file, document.download_name)
+    if not data:
+        raise Http404("No thumbnail.")
+    return serve_thumbnail(data)
+
+
+class RenderedPreviewView(PreviewViewsMixin, OwnedObjectMixin, View):
+    """A sent document **inline**, for the viewer (it is always a PDF Postulo drew)."""
+
+    model = RenderedDocument
+
+    def get(self, request: HttpRequest, pk: int) -> HttpResponse:
+        document = get_object_or_404(self.get_queryset(), pk=pk)
+        return serve_private_preview(
+            request,
+            document.file,
+            preview_type=previews.preview_of(document.download_name).content_type,
+            download_name=document.download_name,
+            within=document.storage_prefix,
+        )
+
+
+class RenderedThumbView(PreviewViewsMixin, OwnedObjectMixin, View):
+    """The small picture of a sent document's first page."""
+
+    model = RenderedDocument
+
+    def get(self, request: HttpRequest, pk: int) -> HttpResponse:
+        document = get_object_or_404(self.get_queryset(), pk=pk)
+        return thumbnail_response(document)
+
+
+class UploadDetailView(OwnedObjectMixin, DetailView):
+    """An uploaded file on a page of its own, beside what is known about it (#942)."""
+
+    model = UploadedDocument
+    template_name = "documents/upload_detail.html"
+    context_object_name = "document"
+
+    def get_context_data(self, **kwargs) -> dict:
+        context = super().get_context_data(**kwargs)
+        context["preview"] = previews.preview_of(self.object.download_name)
+        return context
+
+
+class RenderedDetailView(OwnedObjectMixin, DetailView):
+    """A sent document on a page of its own: the PDF as it left, drawn (#942)."""
+
+    model = RenderedDocument
+    template_name = "documents/rendered_detail.html"
+    context_object_name = "document"
+
+    def get_queryset(self):
+        return super().get_queryset().select_related("application__posting")
+
+    def get_context_data(self, **kwargs) -> dict:
+        context = super().get_context_data(**kwargs)
+        context["preview"] = previews.preview_of(self.object.download_name)
+        return context
 
 
 class RenderedDownloadView(OwnedObjectMixin, View):

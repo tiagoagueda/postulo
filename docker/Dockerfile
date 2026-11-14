@@ -93,7 +93,7 @@ WORKDIR /app
 COPY pyproject.toml uv.lock ./
 
 RUN --mount=type=cache,target=/root/.cache/uv \
-    uv sync --locked --no-default-groups --extra server --extra postgres --no-install-project
+    uv sync --locked --no-default-groups --extra server --extra postgres --extra preview --no-install-project
 
 COPY src ./src
 COPY scripts/messages.py ./scripts/messages.py
@@ -167,7 +167,7 @@ COPY pyproject.toml uv.lock ./
 # small price for the second engine the project documents actually working; the alternative
 # — a separate tag for it — is two images to build, scan and publish.
 RUN --mount=type=cache,target=/root/.cache/uv \
-    uv sync --locked --no-default-groups --extra server --extra postgres --no-install-project
+    uv sync --locked --no-default-groups --extra server --extra postgres --extra preview --no-install-project
 
 COPY README.md ./
 # The source from the catalogues stage, compiled and without a `.po`, and never from the
@@ -175,7 +175,7 @@ COPY README.md ./
 COPY --from=catalogues /app/src ./src
 
 RUN --mount=type=cache,target=/root/.cache/uv \
-    uv sync --locked --no-default-groups --extra server --extra postgres
+    uv sync --locked --no-default-groups --extra server --extra postgres --extra preview
 
 # Plugins baked into the image. A plugin is an ordinary Python package installed into
 # Postulo's environment; this argument takes any number of them, in whatever form pip
@@ -193,7 +193,7 @@ RUN --mount=type=cache,target=/root/.cache/uv \
 # The file is written whether or not anything is baked in, and the runtime stage keeps it as
 # /app/constraints.txt, so an image built on top of this one can install a plugin against
 # the same pins (#542).
-RUN uv export --locked --no-dev --extra server --extra postgres --no-hashes \
+RUN uv export --locked --no-dev --extra server --extra postgres --extra preview --no-hashes \
         --no-emit-project --output-file /app/constraints.txt
 ARG POSTULO_EXTRA_PACKAGES=""
 RUN --mount=type=cache,target=/root/.cache/uv \

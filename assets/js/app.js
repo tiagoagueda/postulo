@@ -9504,5 +9504,461 @@
   }
 
   onContentReady(readyCvPhoto);
+  /* ------------------------------------------------------------ the document viewer (#942)
+   *
+   * One viewer for every document and file: `<c-document-viewer>` draws the markup and the
+   * controls, hidden, and this is what makes them work. A PDF is drawn by pdf.js, vendored
+   * under /static/js/vendor/pdfjs/ and loaded from this page's own origin by `import()` the
+   * first time a viewer is on the page -- a page without one never fetches a byte of it, and
+   * the content security policy needs no CDN, no inline script and no `'wasm-unsafe-eval'`
+   * (`useWasm: false`). The worker is a module worker from the same origin (`worker-src
+   * 'self'`), and the page's styles are set through the CSSOM, which `style-src` allows.
+   *
+   * The PDF is *fetched here* and handed to pdf.js as bytes. That keeps one request under the
+   * policy's `connect-src 'self'` with the person's cookie, and it is what lets a refusal --
+   * a draft whose renderer is not installed answers 503 with a sentence -- be shown as that
+   * sentence rather than as "invalid PDF". One page is drawn at a time, with its text layer
+   * over it, so the words can be selected, copied and read by a screen reader.
+   *
+   * No PDF script runs (no scripting manager is built, `enableXfa` is off), and links inside
+   * a PDF are not drawn as links: no annotation layer is added.
+   *
+   * The keys belong to the viewer while it has focus and to nothing else: PageUp, PageDown,
+   * Home, End, the arrows while the page fits the box, plus and minus.
+   */
+  var pdfLibrary = null;
+  var ZOOM_STEPS = [0.5, 0.75, 1, 1.25, 1.5, 2];
+  var MAX_VIEWER_BYTES = 80 * 1024 * 1024;
+
+  function loadPdfLibrary(viewer) {
+    if (!pdfLibrary) {
+      pdfLibrary = import(viewer.getAttribute("data-lib")).then(function (library) {
+        library.GlobalWorkerOptions.workerSrc = viewer.getAttribute("data-worker");
+        return library;
+      });
+    }
+    return pdfLibrary;
+  }
+
+  function folderOf(url) {
+    return url ? url.slice(0, url.lastIndexOf("/") + 1) : "";
+  }
+
+  function readyViewers() {
+    Array.prototype.forEach.call(
+      document.querySelectorAll("[data-document-viewer]:not([data-viewer-ready])"),
+      startViewer
+    );
+  }
+
+  function startViewer(viewer) {
+    viewer.setAttribute("data-viewer-ready", "");
+    var part = function (name) {
+      return viewer.querySelector("[data-viewer-" + name + "]");
+    };
+    var bar = part("bar"),
+      stage = part("stage"),
+      message = part("message"),
+      status = part("status"),
+      fallback = part("fallback"),
+      pageBox = part("page"),
+      countWords = part("count"),
+      prev = part("prev"),
+      next = part("next"),
+      zoomBox = part("zoom"),
+      redraw = part("redraw");
+    var kind = viewer.getAttribute("data-kind");
+    var word = function (name) {
+      return viewer.getAttribute("data-" + name + "-words") || "";
+    };
+    var state = {
+      pdf: null,
+      library: null,
+      page: 1,
+      count: 0,
+      zoom: "width",
+      turn: 0,
+      natural: 0,
+      src: viewer.getAttribute("data-src"),
+    };
+
+    function controls() {
+      return bar.querySelectorAll("button, select, input");
+    }
+    function say(words) {
+      status.textContent = words;
+    }
+    function tell(words) {
+      message.textContent = words;
+      message.hidden = !words;
+    }
+    function failed(words) {
+      stage.hidden = true;
+      fallback.hidden = false;
+      tell(words || word("error"));
+      // The bar stays only for *Redraw*, which is how a refusal that was only for now (a
+      // renderer that was not ready) is tried again; the rest has nothing to act on.
+      bar.hidden = !redraw;
+      Array.prototype.forEach.call(controls(), function (control) {
+        control.disabled = control !== redraw && control.tagName !== "A";
+      });
+    }
+    function begin() {
+      fallback.hidden = true;
+      bar.hidden = false;
+      stage.hidden = false;
+      tell("");
+      say(word("loading"));
+    }
+
+    function fetchFile() {
+      return fetch(state.src, { credentials: "same-origin" }).then(function (response) {
+        if (!response.ok) {
+          return response.text().then(function (words) {
+            var plain = (response.headers.get("Content-Type") || "").indexOf("text/plain") === 0;
+            throw { words: plain ? words : "" };
+          });
+        }
+        return response;
+      });
+    }
+
+    /* -------------------------------------------------------------- pictures and text */
+    function showPicture() {
+      stage.textContent = "";
+      var picture = document.createElement("img");
+      picture.className = "document-viewer-picture";
+      picture.alt = viewer.getAttribute("aria-label") || "";
+      picture.addEventListener("error", function () {
+        failed();
+      });
+      picture.addEventListener("load", function () {
+        say("");
+      });
+      picture.src = state.src;
+      stage.appendChild(picture);
+    }
+
+    function showText() {
+      fetchFile()
+        .then(function (response) {
+          return response.arrayBuffer();
+        })
+        .then(function (bytes) {
+          var shown = document.createElement("pre");
+          shown.className = "document-viewer-text";
+          shown.textContent = new TextDecoder("utf-8").decode(bytes);
+          stage.textContent = "";
+          stage.appendChild(shown);
+          say("");
+        })
+        .catch(function (refusal) {
+          failed(refusal && refusal.words);
+        });
+    }
+
+    /* ------------------------------------------------------------------------- the PDF */
+    function scaleFor(page) {
+      var natural = page.getViewport({ scale: 1 });
+      var styles = window.getComputedStyle(stage);
+      var across =
+        stage.clientWidth - parseFloat(styles.paddingLeft) - parseFloat(styles.paddingRight);
+      var down =
+        Math.min(stage.clientHeight, window.innerHeight * 0.9) -
+        parseFloat(styles.paddingTop) -
+        parseFloat(styles.paddingBottom);
+      if (state.zoom === "page") {
+        return Math.max(0.1, Math.min(across / natural.width, down / natural.height));
+      }
+      if (state.zoom === "width") {
+        return Math.max(0.1, across / natural.width);
+      }
+      return state.zoom;
+    }
+
+    function drawPage() {
+      if (!state.pdf) {
+        return;
+      }
+      var turn = ++state.turn;
+      state.pdf
+        .getPage(state.page)
+        .then(function (page) {
+          if (turn !== state.turn) {
+            return null;
+          }
+          var library = state.library;
+          var scale = scaleFor(page);
+          var viewport = page.getViewport({ scale: scale });
+          var ratio = Math.min(window.devicePixelRatio || 1, 2);
+          var sheet = document.createElement("div");
+          sheet.className = "document-viewer-sheet";
+          sheet.style.width = Math.floor(viewport.width) + "px";
+          sheet.style.height = Math.floor(viewport.height) + "px";
+          var canvas = document.createElement("canvas");
+          canvas.width = Math.floor(viewport.width * ratio);
+          canvas.height = Math.floor(viewport.height * ratio);
+          canvas.setAttribute("aria-hidden", "true");
+          var words = document.createElement("div");
+          words.className = "textLayer";
+          words.style.setProperty("--total-scale-factor", String(scale));
+          sheet.appendChild(canvas);
+          sheet.appendChild(words);
+          library.setLayerDimensions(words, viewport);
+          var drawing = page.render({
+            canvasContext: canvas.getContext("2d"),
+            viewport: viewport,
+            transform: ratio === 1 ? null : [ratio, 0, 0, ratio, 0, 0],
+          });
+          var text = new library.TextLayer({
+            textContentSource: page.streamTextContent(),
+            container: words,
+            viewport: viewport,
+          });
+          return Promise.all([drawing.promise, text.render()]).then(function () {
+            if (turn !== state.turn) {
+              return;
+            }
+            sheet.setAttribute("data-scale", String(scale));
+            stage.textContent = "";
+            stage.appendChild(sheet);
+            tell(words.textContent.trim() ? "" : word("no-text"));
+          });
+        })
+        .catch(function (error) {
+          if (turn === state.turn && !(error && error.name === "RenderingCancelledException")) {
+            failed();
+          }
+        });
+    }
+
+    function show(number) {
+      number = Math.max(1, Math.min(state.count, number));
+      var changed = number !== state.page;
+      state.page = number;
+      pageBox.value = String(number);
+      prev.disabled = number <= 1;
+      next.disabled = number >= state.count;
+      if (changed) {
+        say(word("page").replace("__PAGE__", String(number)).replace("__COUNT__", String(state.count)));
+        stage.scrollTop = 0;
+      }
+      drawPage();
+    }
+
+    function currentScale() {
+      if (typeof state.zoom === "number") {
+        return state.zoom;
+      }
+      var sheet = stage.querySelector("[data-scale]");
+      return sheet ? parseFloat(sheet.getAttribute("data-scale")) || 1 : 1;
+    }
+
+    function zoomBy(step) {
+      var current = currentScale();
+      var chosen;
+      if (step > 0) {
+        chosen =
+          ZOOM_STEPS.filter(function (value) {
+            return value > current + 0.001;
+          })[0] || ZOOM_STEPS[ZOOM_STEPS.length - 1];
+      } else {
+        chosen =
+          ZOOM_STEPS.filter(function (value) {
+            return value < current - 0.001;
+          }).pop() || ZOOM_STEPS[0];
+      }
+      setZoom(String(chosen));
+    }
+
+    function setZoom(value) {
+      state.zoom = value === "width" || value === "page" ? value : parseFloat(value);
+      var wanted = String(state.zoom);
+      var known = Array.prototype.some.call(zoomBox.options, function (option) {
+        return option.value === wanted;
+      });
+      if (!known) {
+        var extra = zoomBox.querySelector("option[data-viewer-extra]");
+        if (!extra) {
+          extra = document.createElement("option");
+          extra.setAttribute("data-viewer-extra", "");
+          zoomBox.appendChild(extra);
+        }
+        extra.value = wanted;
+        extra.textContent = Math.round(state.zoom * 100) + "%";
+      }
+      zoomBox.value = wanted;
+      drawPage();
+    }
+
+    function openPdf() {
+      begin();
+      Promise.all([
+        loadPdfLibrary(viewer),
+        fetchFile().then(function (response) {
+          return response.arrayBuffer();
+        }),
+      ])
+        .then(function (loaded) {
+          var library = loaded[0];
+          var bytes = loaded[1];
+          if (bytes.byteLength > MAX_VIEWER_BYTES) {
+            throw { words: "" };
+          }
+          state.library = library;
+          return library.getDocument({
+            data: new Uint8Array(bytes),
+            useWasm: false,
+            enableXfa: false,
+            isOffscreenCanvasSupported: true,
+            cMapUrl: folderOf(viewer.getAttribute("data-cmaps")),
+            cMapPacked: true,
+            standardFontDataUrl: folderOf(viewer.getAttribute("data-fonts")),
+            wasmUrl: folderOf(viewer.getAttribute("data-wasm")),
+          }).promise;
+        })
+        .then(function (pdf) {
+          if (state.pdf) {
+            state.pdf.destroy();
+          }
+          state.pdf = pdf;
+          state.count = pdf.numPages;
+          state.page = 0;
+          pageBox.max = String(pdf.numPages);
+          countWords.textContent = word("count").replace("__COUNT__", String(pdf.numPages));
+          Array.prototype.forEach.call(controls(), function (control) {
+            control.disabled = false;
+          });
+          show(1);
+          say(word("page").replace("__PAGE__", "1").replace("__COUNT__", String(state.count)));
+        })
+        .catch(function (error) {
+          failed(error && error.name === "PasswordException" ? word("password") : error && error.words);
+        });
+    }
+
+    /* ------------------------------------------------------------------- the controls */
+    if (kind === "pdf") {
+      prev.addEventListener("click", function () {
+        show(state.page - 1);
+      });
+      next.addEventListener("click", function () {
+        show(state.page + 1);
+      });
+      pageBox.addEventListener("change", function () {
+        var wanted = parseInt(pageBox.value, 10);
+        show(isNaN(wanted) ? state.page : wanted);
+      });
+      zoomBox.addEventListener("change", function () {
+        setZoom(zoomBox.value);
+      });
+      part("zoom-in").addEventListener("click", function () {
+        zoomBy(1);
+      });
+      part("zoom-out").addEventListener("click", function () {
+        zoomBy(-1);
+      });
+      var resizing = null;
+      window.addEventListener("resize", function () {
+        if (state.pdf && (state.zoom === "width" || state.zoom === "page")) {
+          window.clearTimeout(resizing);
+          resizing = window.setTimeout(drawPage, 150);
+        }
+      });
+      viewer.addEventListener("keydown", function (event) {
+        var target = event.target;
+        if (event.ctrlKey || event.metaKey || event.altKey || !state.pdf) {
+          return;
+        }
+        if (target.matches("input, select, textarea")) {
+          return;
+        }
+        var fits = stage.scrollWidth <= stage.clientWidth + 1;
+        var rtl = window.getComputedStyle(viewer).direction === "rtl";
+        var handled = true;
+        switch (event.key) {
+          case "PageDown":
+            show(state.page + 1);
+            break;
+          case "PageUp":
+            show(state.page - 1);
+            break;
+          case "ArrowRight":
+          case "ArrowLeft":
+            if (!fits || target !== stage) {
+              handled = false;
+            } else {
+              show(state.page + ((event.key === "ArrowRight") !== rtl ? 1 : -1));
+            }
+            break;
+          case "Home":
+            show(1);
+            break;
+          case "End":
+            show(state.count);
+            break;
+          case "+":
+          case "=":
+            zoomBy(1);
+            break;
+          case "-":
+            zoomBy(-1);
+            break;
+          default:
+            handled = false;
+        }
+        if (handled) {
+          event.preventDefault();
+        }
+      });
+    }
+    if (redraw) {
+      redraw.addEventListener("click", function () {
+        var form = document.getElementById(viewer.getAttribute("data-redraw-form"));
+        var address = new URL(viewer.getAttribute("data-src"), window.location.href);
+        if (form) {
+          new FormData(form).forEach(function (value, name) {
+            if (typeof value === "string" && name !== "csrfmiddlewaretoken") {
+              address.searchParams.set(name, value);
+            }
+          });
+        }
+        state.src = address.pathname + address.search;
+        if (kind === "pdf") {
+          openPdf();
+        }
+      });
+    }
+
+    if (kind === "pdf") {
+      openPdf();
+    } else if (kind === "image") {
+      begin();
+      showPicture();
+    } else if (kind === "text") {
+      begin();
+      showText();
+    }
+  }
+
+  onContentReady(readyViewers);
+
+  /* A thumbnail that could not be made answers 404; hide it and the kind's icon, drawn under
+   * it, shows through (#942). `error` does not bubble, so it is caught on the way down. */
+  document.addEventListener(
+    "error",
+    function (event) {
+      var picture = event.target;
+      if (
+        picture &&
+        picture.tagName === "IMG" &&
+        picture.closest &&
+        picture.closest("[data-document-thumb]")
+      ) {
+        picture.hidden = true;
+      }
+    },
+    true
+  );
 
 })();

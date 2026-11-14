@@ -867,6 +867,119 @@
     aspect-ratio: 210 / 297;
   }
 
+  /* The document viewer (#942): a bar of controls over a stage that holds one page, a picture
+     or the text. The page is a white sheet in dark mode as well -- a document is white paper,
+     and only what surrounds it follows the theme -- and it is scrolled inside the stage rather
+     than squeezed into it. Sizes of the sheet are set by the script through the CSSOM, which the
+     policy allows; nothing here is an inline style. */
+  .document-viewer-bar {
+    @apply mb-3 flex flex-wrap items-center gap-x-4 gap-y-2;
+  }
+  .document-viewer-bar[hidden],
+  .document-viewer-stage[hidden],
+  .document-viewer-message[hidden],
+  .document-viewer-fallback[hidden] {
+    display: none;
+  }
+  .document-viewer-group {
+    @apply flex items-center gap-1;
+  }
+  .document-viewer-links {
+    @apply ms-auto flex-wrap;
+  }
+  .document-viewer-page {
+    @apply flex items-center gap-1.5 text-sm text-ink-500 dark:text-ink-400;
+  }
+  .document-viewer-page .input {
+    @apply w-16 text-center;
+  }
+  .document-viewer-bar .select {
+    @apply w-auto;
+  }
+  .document-viewer-stage {
+    @apply overflow-auto rounded-lg border border-ink-200 bg-ink-100 p-3 dark:border-ink-700 dark:bg-ink-800;
+    max-block-size: 85vh;
+    min-block-size: 16rem;
+    /* A bare focus ring on the box that takes the keys, as every scroller in the page has. */
+  }
+  .document-viewer-sheet {
+    @apply relative mx-auto bg-white shadow-sm;
+  }
+  .document-viewer-sheet canvas {
+    @apply block size-full;
+  }
+  .document-viewer-picture {
+    @apply mx-auto block h-auto max-w-full bg-white;
+  }
+  .document-viewer-text {
+    @apply whitespace-pre-wrap break-words bg-white p-4 text-sm text-ink-900;
+    font-family: var(--font-mono, ui-monospace, monospace);
+  }
+  .document-viewer-message {
+    @apply mb-3 text-ink-500 dark:text-ink-400;
+  }
+
+  /* pdf.js's text layer, the part of its own viewer stylesheet (`web/pdf_viewer.css`) that puts
+     the words over the page as transparent text: selectable, copyable, found by the browser's
+     Find and read by a screen reader. The library places and sizes each span itself, through
+     the CSSOM, from the variables below; the rest of that stylesheet is for its own toolbar and
+     annotation layers, neither of which is used. */
+  .document-viewer-sheet {
+    --scale-round-x: 1px;
+    --scale-round-y: 1px;
+  }
+  .textLayer {
+    color-scheme: only light;
+    position: absolute;
+    inset: 0;
+    overflow: clip;
+    opacity: 1;
+    line-height: 1;
+    text-align: initial;
+    transform-origin: 0 0;
+    forced-color-adjust: none;
+    --min-font-size: 1;
+    --text-scale-factor: calc(var(--total-scale-factor) * var(--min-font-size));
+    --min-font-size-inv: calc(1 / var(--min-font-size));
+  }
+  .textLayer :is(span, br) {
+    position: absolute;
+    color: transparent;
+    white-space: pre;
+    cursor: text;
+    transform-origin: 0% 0%;
+    user-select: text;
+  }
+  .textLayer > :not(.markedContent),
+  .textLayer .markedContent span:not(.markedContent) {
+    z-index: 1;
+    --font-height: 0;
+    font-size: calc(var(--text-scale-factor) * var(--font-height));
+    --scale-x: 1;
+    --rotate: 0deg;
+    transform: rotate(var(--rotate)) scaleX(var(--scale-x)) scale(var(--min-font-size-inv));
+  }
+  .textLayer .markedContent {
+    display: contents;
+  }
+  .textLayer ::selection {
+    background: color-mix(in srgb, Highlight 40%, transparent);
+  }
+
+  /* The picture of a file's first page in a list, or its icon where there is none (#942). The
+     icon is drawn under the picture, so a picture that never arrives leaves the icon. */
+  .document-thumb {
+    @apply relative flex shrink-0 items-center justify-center overflow-hidden rounded-md border border-ink-200 bg-ink-50 text-ink-400 dark:border-ink-700 dark:bg-ink-800;
+    inline-size: 3rem;
+    block-size: 4rem;
+  }
+  .document-thumb img {
+    @apply absolute inset-0 size-full bg-white object-cover object-top;
+  }
+  .document-thumb img[hidden] {
+    display: none;
+  }
+
   /* The grab area at the end edge of a column header (#136). Wider than it looks: the
      visible line is one pixel and the target is eight, with the full header height behind
      it, which is what makes it catchable by a finger as well as a mouse. It is pinned to
@@ -3286,7 +3399,8 @@ html {
   .page-alert,
   /* Printing the editing page must not print the framed document (#293): the document
      has an export of its own, and a frame on paper is a box with the first page in it. */
-  .document-frame {
+  .document-frame,
+  .document-viewer {
     display: none;
   }
 }

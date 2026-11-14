@@ -60,6 +60,17 @@ EXCUSED: dict[str, str] = {
     ),
     "documents:upload_download": "an uploaded file arriving as a download",
     "documents:rendered_download": "a rendered document arriving as a download",
+    "documents:upload_preview": (
+        "an uploaded file answered inline for the document viewer to read: bytes, with "
+        "nothing to check for accessibility. The page that draws it, `documents:upload_detail`, "
+        "is walked (#942)"
+    ),
+    "documents:rendered_preview": (
+        "a sent document answered inline for the viewer to read; the page that draws it, "
+        "`documents:rendered_detail`, is walked (#942)"
+    ),
+    "documents:upload_thumb": "the small picture of an uploaded file's first page: an image (#942)",
+    "documents:rendered_thumb": "the small picture of a sent document's first page (#942)",
     "applications:insights": (
         "a redirect to the dashboard, which the suite visits; the figures it used to "
         "render are widgets there and are checked with the rest"

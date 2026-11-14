@@ -790,6 +790,9 @@ def signed_in_paths(a, c, me, entry=None, recovery_link: str = "", things=None) 
         # beside them are downloads, and a download has no page to look at.
         f"/documents/cvs/{cv.pk}/text/",
         f"/documents/sent/{render.pk}/compare/",
+        # The sent PDF and an uploaded file, each in the document viewer (#942).
+        f"/documents/sent/{render.pk}/",
+        f"/documents/files/{upload.pk}/",
         f"/documents/cvs/{cv.pk}/delete/",
         f"/documents/cv-entries/{cv_item.pk}/edit/",
         f"/documents/cv-entries/{cv_item.pk}/delete/",

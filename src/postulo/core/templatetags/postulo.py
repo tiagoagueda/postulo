@@ -819,3 +819,11 @@ def as_json(value) -> str:
     step out of the attribute it is in.
     """
     return json.dumps(value, ensure_ascii=False, separators=(",", ":"))
+
+
+@register.filter
+def has_thumbnail(filename: str) -> bool:
+    """Whether a file with this name can have a thumbnail (a PDF, a PNG or a JPEG)."""
+    from postulo.documents import previews
+
+    return previews.has_thumbnail(filename)
