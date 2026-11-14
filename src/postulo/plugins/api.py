@@ -111,6 +111,10 @@ other side a person may pair with one of `RECORD_KINDS`, and its optional ``fill
 or fills a record from one through the services above. Postulo draws the page, asks live, and
 writes the `SyncLink`.
 
+**A file Postulo cannot show can be converted for the viewer (#942)**: `PreviewConverter` is a
+plugin's offer to turn the extensions it names into a PDF, `register_preview_converter` makes
+it. The PDF is a derivative; the file stays what is downloaded, and the core ships no converter.
+
 **A sync can keep its place between runs (#1165)**: `sync_state(connection)` is what the last
 run that did not fail returned as `SyncReport.state`, a small dict of JSON, at most
 `MAX_SYNC_STATE_BYTES`. One per connection, written only after a run that did not fail, dropped
@@ -207,6 +211,8 @@ if TYPE_CHECKING:  # pragma: no cover - the names `__getattr__` resolves at run 
     from postulo.documents.formats import Format as DocumentFormat
     from postulo.documents.formats import register as register_document_format
     from postulo.documents.outline import Outline
+    from postulo.documents.previews import Converter as PreviewConverter
+    from postulo.documents.previews import register_converter as register_preview_converter
     from postulo.documents.rendering import PersonCard, person_card
     from postulo.documents.theme_assets import MAX_ASSET_BYTES as MAX_THEME_ASSET_BYTES
     from postulo.documents.theme_assets import MAX_DOCUMENT_BYTES as MAX_THEME_DOCUMENT_BYTES
@@ -376,6 +382,7 @@ __all__ = [
     "PhoneNumberKind",
     "PhoneRow",
     "PostalAddressKind",
+    "PreviewConverter",
     "Record",
     "Refused",
     "RegisterAdapter",
@@ -453,6 +460,7 @@ __all__ = [
     "record_listing_event",
     "refuse_unreadable",
     "register_document_format",
+    "register_preview_converter",
     "register_transfer",
     "reminder_lines",
     "reopen_reminder",
@@ -739,6 +747,14 @@ _ELSEWHERE: dict[str, tuple[str, str]] = {
     "MAX_THEME_DOCUMENT_BYTES": ("postulo.documents.theme_assets", "MAX_DOCUMENT_BYTES"),
     "ThemeAssetRefused": ("postulo.documents.theme_assets", "Refused"),
     "load_theme_asset": ("postulo.documents.theme_assets", "load"),
+    # --------------------------------------- previewing a file Postulo cannot show (#942)
+    # A plugin may offer to turn Word, OpenDocument or RTF files into a PDF the viewer can
+    # draw: `PreviewConverter` is the offer (a key, the extensions it takes, a function from
+    # the file's bytes and extension to a PDF's bytes) and `register_preview_converter` makes
+    # it. The converted copy is a derivative kept beside the thumbnails and never replaces
+    # the file, which stays what is downloaded. The core ships none: no converter, no preview.
+    "PreviewConverter": ("postulo.documents.previews", "Converter"),
+    "register_preview_converter": ("postulo.documents.previews", "register_converter"),
 }
 
 

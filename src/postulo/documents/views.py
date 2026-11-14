@@ -28,6 +28,7 @@ from postulo.core.files import (
     FILE_POLICY,
     PLAIN_TEXT,
     lies_under,
+    serve_derived_pdf,
     serve_private_file,
     serve_private_preview,
     serve_thumbnail,
@@ -992,10 +993,20 @@ class UploadPreviewView(PreviewViewsMixin, OwnedObjectMixin, View):
 
     def get(self, request: HttpRequest, pk: int) -> HttpResponse:
         document = get_object_or_404(self.get_queryset(), pk=pk)
+        found = previews.preview_of(document.download_name)
+        if found.converted:
+            # A file a converter plugin turns into a PDF (D3): the *copy* is what is answered,
+            # after the same ownership and folder checks as the file itself.
+            if not document.file or not lies_under(document.file.name, document.storage_prefix):
+                raise Http404("No preview.")
+            data = previews.converted_bytes(document.file, document.download_name)
+            if not data:
+                raise Http404("No preview.")
+            return serve_derived_pdf(data)
         return serve_private_preview(
             request,
             document.file,
-            preview_type=previews.preview_of(document.download_name).content_type,
+            preview_type=found.content_type,
             download_name=document.download_name,
             within=document.storage_prefix,
         )

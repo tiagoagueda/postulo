@@ -239,6 +239,22 @@ def serve_thumbnail(data: bytes) -> HttpResponse:
     return response
 
 
+def serve_derived_pdf(data: bytes) -> HttpResponse:
+    """Answer the PDF a converter plugin made from a kept file (#942, D3), inline, for the viewer.
+
+    The bytes are a plugin's, so they are held to what is checked before they are kept (they
+    begin ``%PDF-``) and answered as nothing but a PDF: a fixed type, ``nosniff``, ``no-store``
+    and the file policy, exactly as the file they come from would be. Performs **no**
+    permission checking.
+    """
+    response = HttpResponse(data, content_type="application/pdf")
+    response["Content-Disposition"] = "inline"
+    response["Cache-Control"] = "private, max-age=0, no-store"
+    response["X-Content-Type-Options"] = "nosniff"
+    response["Content-Security-Policy"] = FILE_POLICY
+    return response
+
+
 def serve_stored_picture(row, *, download_name: str) -> HttpResponse:
     """Answer a picture kept in the database (#662): its bytes, its type, and the policy.
 
