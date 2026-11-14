@@ -29,6 +29,7 @@ EXCUSED: dict[str, str] = {
     "accounts:group_leave": "POST only: leaves one of one's groups and goes back to the list.",
     "jobs:own_note": "POST only: keeps the reader's own note and goes back to the record's page.",
     "jobs:share_revoke": "POST only: takes one grant back and goes back to the sharing page.",
+    "accounts:cv_photo": "the owner's CV photo as an image (#1246), shown on the profile page",
     "core:healthz": "a JSON status document for monitoring to poll",
     "core:csp_report": "an endpoint a browser posts violation reports to; it draws nothing (#822)",
     "core:manifest": "the JSON manifest a browser reads when installing the app",

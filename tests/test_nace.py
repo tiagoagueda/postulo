@@ -98,13 +98,17 @@ def test_a_language_eurostat_does_not_publish_gets_the_english_name():
 
 
 def test_nothing_in_the_classification_is_a_string_this_project_translates():
-    """It is reference data, in the same sense a language's own name is."""
+    """It is reference data, in the same sense a language's own name is.
+
+    The short one- or two-word labels (#1248) are Postulo's own wording, and are strings
+    this project translates; the classification's names are not.
+    """
     from pathlib import Path
 
     source = Path("src/postulo/jobs/industries.py").read_text(encoding="utf-8")
     code = source.split('"""', 2)[2]
 
-    assert "Mining" not in code and "Crop and animal" not in code
+    assert "Mining of metal ores" not in code and "Crop and animal" not in code
 
 
 # ------------------------------------------------------- a seed, and never a closed list
