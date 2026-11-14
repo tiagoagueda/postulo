@@ -962,7 +962,7 @@ def _restore_company_names(company, owner, rows) -> None:
         tag = languages.tag(row.get("language", ""))
         name = wikidata.clean(row.get("name"))
         source = row.get("source")
-        # An acronym (#1245; format 85) has no language, and an older archive has none.
+        # An acronym (#1245; format 87) has no language, and an older archive has none.
         if row.get("kind") == CompanyName.Kind.ACRONYM:
             if (
                 name
