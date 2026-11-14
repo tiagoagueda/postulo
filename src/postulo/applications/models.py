@@ -42,6 +42,7 @@ from django.utils.translation import gettext_lazy as _
 from django.utils.translation import pgettext
 
 from postulo.core.htmlstrings import sentence
+from postulo.core.language_field import LanguageField
 from postulo.core.models import OwnedModel, Tag
 from postulo.jobs.models import Contact, JobPosting, SalaryPeriod, currency_code
 
@@ -1510,3 +1511,90 @@ class Offer(OwnedModel):
         if amount is None:
             return None
         return amount * YEARLY_UNITS.get(self.period, 1)
+
+
+class SavedAnswer(OwnedModel):
+    """An answer to a question application forms keep asking, written once (#1092).
+
+    Why this company, what salary, how soon could you start, do you have the right to work
+    here: the same few questions in every form, typed into a browser and lost once it is
+    sent. The question and the answer are the person's own words, in a language of their own
+    (an employer in Lisbon asks in Portuguese), with tags of the kind an application has.
+
+    **Nothing here is printed or shared.** A salary answer is as private as the salary: a CV
+    never reads these rows, and a shared record (#896) is a company, a contact or a listing,
+    never an answer.
+
+    What an application was *told* is not this row but a copy of it, `ApplicationAnswer`:
+    what was sent must not change when the reusable answer does.
+    """
+
+    QUESTION_MAX = 300
+
+    question = models.CharField(_("question"), max_length=QUESTION_MAX)
+    answer = models.TextField(
+        _("answer"),
+        help_text=_(
+            "Placeholders such as {{ company }} are filled in with the application when you "
+            "use the answer on one."
+        ),
+    )
+    language = LanguageField(
+        _("language"),
+        blank=True,
+        help_text=_("Which language the answer is written in. Leave blank if it does not matter."),
+    )
+    tags = models.ManyToManyField(
+        Tag, blank=True, related_name="saved_answers", verbose_name=_("tags")
+    )
+
+    class Meta:
+        verbose_name = _("saved answer")
+        verbose_name_plural = _("saved answers")
+        ordering = ("question", "pk")
+
+    def __str__(self) -> str:
+        return self.question
+
+
+class ApplicationAnswer(OwnedModel):
+    """One answer an application was given to a question, as it was given (#1092).
+
+    A copy, not a reference: what was sent to an employer must not change when the saved
+    answer it began as is edited or deleted, which is also why a document is snapshotted.
+    `saved_answer` says only where it began, and is emptied when that answer goes. The copy
+    is edited freely on its own page without touching the saved one.
+    """
+
+    application = models.ForeignKey(
+        Application,
+        on_delete=models.CASCADE,
+        related_name="answers",
+        verbose_name=_("application"),
+    )
+    question = models.CharField(_("question"), max_length=300)
+    answer = models.TextField(_("answer"), blank=True)
+    language = LanguageField(
+        _("language"),
+        blank=True,
+        help_text=_("Which language the answer is written in. Leave blank if it does not matter."),
+    )
+    saved_answer = models.ForeignKey(
+        SavedAnswer,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="given",
+        verbose_name=_("saved answer"),
+    )
+
+    class Meta:
+        verbose_name = _("answer given")
+        verbose_name_plural = _("answers given")
+        ordering = ("created_at", "pk")
+
+    def __str__(self) -> str:
+        return self.question
+
+    def get_absolute_url(self) -> str:
+        return f"{self.application.get_absolute_url()}#answers"

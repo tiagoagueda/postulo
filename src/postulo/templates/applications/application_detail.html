@@ -268,6 +268,42 @@
         </div>
       {% endif %}
 
+      {% comment %} What this application was told in answer to the employer's own questions
+         (#1092): copies, as given, so that editing a saved answer later changes nothing
+         that was sent. Added from a saved one or written here. {% endcomment %}
+      <div class="card mb-6" id="answers">
+        <div class="mb-3 flex flex-wrap items-center justify-between gap-2">
+          <h2 class="font-medium">{% translate "What I answered" %}</h2>
+          <a href="{% url 'applications:answer_given_create' application.pk %}" class="text-brand-600 underline dark:text-brand-400">
+            {% translate "Add an answer" %}
+          </a>
+        </div>
+        {% if answers %}
+          <ul class="space-y-4">
+            {% for given in answers %}
+              <li id="answer-{{ given.pk }}" class="flex flex-wrap items-start gap-3">
+                <div class="min-w-0 grow basis-48 text-sm">
+                  <p class="font-medium"><bdi>{{ given.question }}</bdi></p>
+                  <p class="mt-1 whitespace-pre-line break-words text-ink-700 dark:text-ink-300" {% if given.language %}lang="{{ given.language }}"{% endif %}>{{ given.answer }}</p>
+                </div>
+                <div class="flex items-center gap-1">
+                  <a href="{% url 'applications:answer_given_update' given.pk %}" class="btn" data-variant="ghost" data-size="xs">
+                    {% translate "Edit" %}<span class="sr-only">: <bdi>{{ given.question }}</bdi></span>
+                  </a>
+                  <a href="{% url 'applications:answer_given_delete' given.pk %}" class="btn" data-variant="destructive-ghost" data-size="xs">
+                    {% translate "Delete" %}<span class="sr-only">: <bdi>{{ given.question }}</bdi></span>
+                  </a>
+                </div>
+              </li>
+            {% endfor %}
+          </ul>
+        {% else %}
+          <p class="text-sm text-ink-500 dark:text-ink-400">
+            {% translate "Nothing kept yet. Keep what you typed into the employer's form, so you can see what they were told." %}
+          </p>
+        {% endif %}
+      </div>
+
       <div class="card mb-6" id="interviews">
         <div class="mb-3 flex items-center justify-between">
           <h2 class="font-medium">{% translate "Interviews" %}</h2>

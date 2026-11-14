@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% translate "Answers" %}{% endblock %}
+
+{% block content %}
+  {% comment %} The answers application forms keep asking for, written once (#1092). Beside
+     the career they are written from; an application keeps a copy of whichever it uses. {% endcomment %}
+  <div class="mx-auto max-w-3xl">
+    <div class="mb-6 flex flex-wrap items-center gap-4">
+      <div class="grow basis-48">
+        <c-page-title>{% translate "Answers" %}</c-page-title>
+        <p class="text-sm text-ink-500 dark:text-ink-400">
+          {% translate "What application forms keep asking, written once. An application keeps its own copy of the answer it uses." %}
+        </p>
+      </div>
+      <a href="{% url 'resume:answer_create' %}" class="btn ms-auto">{% translate "New answer" %}</a>
+    </div>
+
+    <form method="get" role="search" class="mb-4 flex flex-wrap items-end gap-3">
+      <div class="field grow basis-48">
+        <label for="answer-search">{% translate "Search" %}</label>
+        <input type="search" id="answer-search" name="q" value="{{ query }}">
+      </div>
+      {% if tags %}
+        <div class="field">
+          <label for="answer-tag">{% translate "Tag" %}</label>
+          <select id="answer-tag" name="tag">
+            <option value="">{% translate "Any" %}</option>
+            {% for option in tags %}
+              <option value="{{ option.slug }}"{% if option.slug == tag %} selected{% endif %}>{{ option.name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+      {% endif %}
+      <button type="submit" class="btn" data-variant="outline">{% translate "Find" %}</button>
+    </form>
+
+    {% if answers %}
+      <div class="card p-0">
+        <ul class="divide-y divide-ink-100 dark:divide-ink-800">
+          {% for saved in answers %}
+            <li class="flex flex-wrap items-start gap-3 px-4 py-3">
+              <div class="min-w-0 grow basis-48 text-sm">
+                <p class="font-medium"><bdi>{{ saved.question }}</bdi></p>
+                <p class="mt-1 line-clamp-3 whitespace-pre-line break-words text-ink-700 dark:text-ink-300"{% if saved.language %} lang="{{ saved.language }}"{% endif %}>{{ saved.answer }}</p>
+                {% if saved.tags.all %}
+                  <p class="mt-2 flex flex-wrap gap-1">
+                    {% for tag_row in saved.tags.all %}<c-tag :tag="tag_row" />{% endfor %}
+                  </p>
+                {% endif %}
+              </div>
+              <div class="flex items-center gap-1">
+                <a href="{% url 'resume:answer_update' saved.pk %}" class="btn" data-variant="ghost" data-size="xs">
+                  {% translate "Edit" %}<span class="sr-only">: <bdi>{{ saved.question }}</bdi></span>
+                </a>
+                <a href="{% url 'resume:answer_delete' saved.pk %}" class="btn" data-variant="destructive-ghost" data-size="xs">
+                  {% translate "Delete" %}<span class="sr-only">: <bdi>{{ saved.question }}</bdi></span>
+                </a>
+              </div>
+            </li>
+          {% endfor %}
+        </ul>
+      </div>
+    {% elif query or tag %}
+      <c-empty icon="search">{% translate "No answer matches." %}</c-empty>
+    {% else %}
+      <c-empty icon="circle-dashed">{% translate "No answers yet." %}</c-empty>
+    {% endif %}
+  </div>
+{% endblock %}

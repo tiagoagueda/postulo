@@ -263,6 +263,20 @@ def offer(owner):
     return Offer.objects.create(owner=owner, application=application(owner), currency="EUR")
 
 
+def saved_answer(owner):
+    from postulo.applications.models import SavedAnswer
+
+    return SavedAnswer.objects.create(owner=owner, question="Theirs", answer="Theirs")
+
+
+def answer_given(owner):
+    from postulo.applications.models import ApplicationAnswer
+
+    return ApplicationAnswer.objects.create(
+        owner=owner, application=application(owner), question="Theirs", answer="Theirs"
+    )
+
+
 def suggestion(owner):
     from postulo.applications.models import Suggestion
 
@@ -596,6 +610,12 @@ FACTORIES: dict[str, Callable] = {
     "applications:interview_outcome": pk_of(interview),
     "applications:interview_update": pk_of(interview),
     "applications:offer_create": pk_of(application),
+    # What an application was told, and the answers kept for reuse (#1092)
+    "applications:answer_given_create": pk_of(application),
+    "applications:answer_given_update": pk_of(answer_given),
+    "applications:answer_given_delete": pk_of(answer_given),
+    "resume:answer_update": pk_of(saved_answer),
+    "resume:answer_delete": pk_of(saved_answer),
     "applications:offer_update": pk_of(offer),
     "applications:offer_delete": pk_of(offer),
     "applications:reminder_complete": pk_of(reminder),
@@ -756,6 +776,8 @@ API: dict[str, tuple[str, Callable, dict]] = {
     "postulo-api:record_outcome": ("post", pk_of(interview), {"outcome": "done"}),
     "postulo-api:interview_calendar": ("get", pk_of(interview), {}),
     "postulo-api:get_offer": ("get", pk_of(offer), {}),
+    "postulo-api:get_saved_answer": ("get", pk_of(saved_answer), {}),
+    "postulo-api:get_answer_given": ("get", pk_of(answer_given), {}),
     # Changing and deleting somebody else's offer (#1101).
     "postulo-api:change_offer": ("patch", pk_of(offer), {"notes": "x"}),
     "postulo-api:delete_offer": ("delete", pk_of(offer), {}),
@@ -1084,6 +1106,8 @@ def form_table(user, mine=None) -> dict:
         applications.TagForm: [{"user": user}],
         applications.SubscriptionForm: [{"user": user}],
         applications.OfferForm: [{"user": user}],
+        applications.SavedAnswerForm: [{"user": user}],
+        applications.ApplicationAnswerForm: [{"user": user}],
         documents.CVForm: [{"user": user}],
         documents.CVItemForm: [{"user": user}],
         documents.CoverLetterForm: [{"user": user}],

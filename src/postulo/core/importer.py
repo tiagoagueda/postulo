@@ -122,6 +122,8 @@ class ImportReport:
     interviews: int = 0
     appointments: int = 0
     calendar_subscriptions: int = 0
+    saved_answers: int = 0
+    answers: int = 0
     resume_items: int = 0
     cvs: int = 0
     cover_letters: int = 0
@@ -1712,6 +1714,11 @@ def _load(user, archive: zipfile.ZipFile, *, force: bool = False, into=None) -> 
     # The calendars followed, which format 82 is the first to carry (#1098).
     _restore_subscriptions(user, document.get("calendar_subscriptions"), report)
 
+    # The answers kept for application forms, which format 85 is the first to carry (#1092).
+    saved_answers = _restore_saved_answers(
+        user, document.get("saved_answers"), tags_by_slug, report
+    )
+
     # The people recorded at no company, which format 20 is the first to carry (#239).
     for contact_entry in document.get("contacts", []):
         restore_contact(contact_entry, None)
@@ -1985,6 +1992,7 @@ def _load(user, archive: zipfile.ZipFile, *, force: bool = False, into=None) -> 
                 reminder_entries = application_entry.pop("reminders", [])
                 interview_entries = application_entry.pop("interviews", [])
                 offer_entries = application_entry.pop("offers", [])
+                answer_entries = application_entry.pop("answers", [])
                 tag_slugs = application_entry.pop("tags", [])
                 sent_link_ids = application_entry.pop("sent_link_ids", [])
                 sent_upload_ids = application_entry.pop("sent_upload_ids", None) or []
@@ -2113,6 +2121,8 @@ def _load(user, archive: zipfile.ZipFile, *, force: bool = False, into=None) -> 
                         answer_by=_d(offer_entry.pop("answer_by", None)),
                         **_carried(offer_entry, OFFER_FIELDS, report, "An offer"),
                     )
+
+                _restore_answers(user, application, answer_entries, saved_answers, report)
 
     # The ownership tree, once every company in the file has been made or matched. A name
     # that matches nothing is left alone rather than guessed at, and a company is never made
@@ -2466,6 +2476,87 @@ def _load(user, archive: zipfile.ZipFile, *, force: bool = False, into=None) -> 
         report.remembered_places += _restore_remembered_place(user, row, report)
 
     return report
+
+
+def _restore_saved_answers(user, entries, tags_by_slug: dict, report: ImportReport) -> dict:
+    """The answers kept for application forms, by the id each had in the file (#1092).
+
+    A question that is missing, or longer than its column, leaves that answer out and says so;
+    a language that is not a tag is none; a tag the file does not hold is not made up.
+    """
+    from postulo.applications.models import SavedAnswer
+
+    from . import languages
+
+    made: dict = {}
+    if not isinstance(entries, list):
+        return made
+    limit = SavedAnswer._meta.get_field("question").max_length
+    for entry in entries:
+        if not isinstance(entry, dict):
+            continue
+        question = str(entry.get("question") or "").strip()
+        if not question or len(question) > limit:
+            report.skipped.append(
+                f"A saved answer to {question[:40]!r}: its question is missing or longer than "
+                f"{limit} characters, and it was left out"
+            )
+            continue
+        language = entry.get("language")
+        saved = SavedAnswer.objects.create(
+            owner=user,
+            question=question,
+            answer=str(entry.get("answer") or ""),
+            language=languages.tag(language)
+            if isinstance(language, str) and languages.well_formed(language)
+            else "",
+        )
+        slugs_named = entry.get("tags")
+        saved.tags.add(
+            *{
+                tags_by_slug[slug]
+                for slug in (slugs_named if isinstance(slugs_named, list) else [])
+                if isinstance(slug, str) and slug in tags_by_slug
+            }
+        )
+        made[entry.get("id")] = saved
+        report.saved_answers += 1
+    return made
+
+
+def _restore_answers(user, application, entries, saved_answers: dict, report: ImportReport):
+    """What one application was told, as it was given (#1092), tied to the saved answer it
+    began as where the file still holds that one."""
+    from postulo.applications.models import ApplicationAnswer
+
+    from . import languages
+
+    if not isinstance(entries, list):
+        return
+    limit = ApplicationAnswer._meta.get_field("question").max_length
+    for entry in entries:
+        if not isinstance(entry, dict):
+            continue
+        question = str(entry.get("question") or "").strip()
+        if not question or len(question) > limit:
+            report.skipped.append(
+                f"An answer given to {question[:40]!r}: its question is missing or longer than "
+                f"{limit} characters, and it was left out"
+            )
+            continue
+        language = entry.get("language")
+        began = entry.get("saved_answer_id")
+        ApplicationAnswer.objects.create(
+            owner=user,
+            application=application,
+            question=question,
+            answer=str(entry.get("answer") or ""),
+            language=languages.tag(language)
+            if isinstance(language, str) and languages.well_formed(language)
+            else "",
+            saved_answer=saved_answers.get(began) if isinstance(began, int | str) else None,
+        )
+        report.answers += 1
 
 
 def _restore_subscriptions(user, entries, report: ImportReport) -> None:

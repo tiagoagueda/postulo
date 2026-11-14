@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% if form.instance.pk %}{% translate "Edit answer" %}{% else %}{% translate "New answer" %}{% endif %}{% endblock %}
+
+{% block content %}
+  <div class="mx-auto max-w-lg">
+    <c-page-title>
+      {% if form.instance.pk %}{% translate "Edit answer" %}{% else %}{% translate "New answer" %}{% endif %}
+      <c-slot name="subtitle">
+        {% translate "Applications that used it keep their own copy, so changing it here changes none of them." %}
+      </c-slot>
+    </c-page-title>
+    <form method="post" novalidate>
+      {% csrf_token %}
+      <div class="card mb-6">
+        <c-field :field="form.question" />
+        <c-field :field="form.answer" />
+        <c-field :field="form.language" />
+        {% include "partials/tags_field.html" with form=form %}
+      </div>
+      <div class="flex items-center gap-3">
+        <button type="submit" class="btn">{% translate "Save" %}</button>
+        <a href="{% url 'resume:answer_list' %}" class="btn" data-variant="ghost">{% translate "Cancel" %}</a>
+      </div>
+    </form>
+  </div>
+{% endblock %}

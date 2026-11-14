@@ -32,6 +32,7 @@ from postulo.jobs.models import (
 from .models import (
     SYSTEM_EVENT_KINDS,
     Application,
+    ApplicationAnswer,
     ApplicationEvent,
     Appointment,
     CalendarSubscription,
@@ -43,6 +44,7 @@ from .models import (
     Offer,
     Priority,
     Reminder,
+    SavedAnswer,
     Status,
     SubscriptionColour,
 )
@@ -1132,3 +1134,85 @@ class ReportScheduleForm(forms.ModelForm):
                 ),
             )
         return cleaned
+
+
+def _placeholder_help() -> str:
+    """The names a placeholder may take, in one sentence, from the letter's own list."""
+    from .answers import PLACEHOLDERS
+
+    return ", ".join(f"{{{{ {name} }}}}" for name in PLACEHOLDERS)
+
+
+class _AnswerLanguage:
+    """The language of an answer is a menu of the languages Postulo knows, and may be left
+    blank: an answer in the language of nobody in particular is an answer all the same."""
+
+    def __init__(self, *args, **kwargs):
+        from postulo.documents.forms import language_widget
+
+        super().__init__(*args, **kwargs)
+        field = self.fields["language"]
+        field.widget = language_widget(self["language"].value())
+        field.required = False
+
+
+class SavedAnswerForm(_AnswerLanguage, OwnerScopedModelForm):
+    """A reusable answer: its question, its words, its language and its tags (#1092)."""
+
+    new_tags = forms.CharField(
+        label=_("New tags"),
+        required=False,
+        help_text=_("Separate them with commas. A tag you have already keeps its colour."),
+    )
+
+    class Meta:
+        model = SavedAnswer
+        fields = ("question", "answer", "language", "tags")
+        widgets = {"answer": forms.Textarea(attrs={"rows": 8})}
+        help_texts = {
+            "question": _("As the form puts it, or near enough to find it again."),
+            "tags": _("Your own words for grouping answers: pay, availability, motivation."),
+        }
+
+    def scope_querysets(self) -> None:
+        self.fields["tags"].queryset = Tag.objects.for_user(self.user)
+        self.fields["answer"].help_text = _(
+            "You may name the company and the rest when you use it on an application: %(names)s."
+        ) % {"names": _placeholder_help()}
+
+    def save(self, commit: bool = True):
+        """Save, then add any tag that was typed rather than ticked (as an application does)."""
+        answer = super().save(commit=commit)
+        if commit:
+            self._add_typed_tags(answer)
+        else:
+            saved_m2m = self.save_m2m
+
+            def save_m2m():
+                saved_m2m()
+                self._add_typed_tags(answer)
+
+            self.save_m2m = save_m2m
+        return answer
+
+    def _add_typed_tags(self, answer) -> None:
+        typed = Tag.named(self.user, Tag.split(self.cleaned_data.get("new_tags", "")))
+        if typed:
+            answer.tags.add(*typed)
+
+
+class ApplicationAnswerForm(_AnswerLanguage, OwnerScopedModelForm):
+    """What one application was told in answer to one question, edited freely (#1092).
+
+    A copy of a saved answer, or written here from nothing. Changing it does not touch the
+    saved answer it began as, and changing that does not touch this.
+    """
+
+    class Meta:
+        model = ApplicationAnswer
+        fields = ("question", "answer", "language")
+        widgets = {"answer": forms.Textarea(attrs={"rows": 8})}
+        help_texts = {
+            "question": _("As the employer's form put it."),
+            "answer": _("As you sent it. Editing it here leaves the saved answer as it is."),
+        }
