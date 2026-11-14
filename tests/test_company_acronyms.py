@@ -200,3 +200,86 @@ def test_the_edit_page_offers_the_choice(client, user, shown):
 
     assert "data-company-acronyms" in page and 'name="shown"' in page
     assert 'value="CNRS" selected' in page if shown else 'value="" selected' in page
+
+
+# ------------------------------------------------------- the name a template prints (#1245)
+
+
+@pytest.fixture
+def application(user):
+    from postulo.applications.models import Application, Status
+
+    company = Company.objects.create(owner=user, name=FULL)
+    posting = JobPosting.objects.create(owner=user, company=company, title="Chercheur")
+    return Application.objects.create(owner=user, posting=posting, status=Status.APPLIED)
+
+
+def letter(user, **fields):
+    from postulo.documents.models import CoverLetter
+
+    return CoverLetter.objects.create(
+        owner=user, name="L", body="To {{ company }}", language="en", **fields
+    )
+
+
+def test_a_template_prints_the_full_name_unless_it_asks_for_the_acronym(user, application):
+    from postulo.documents import rendering
+
+    company = application.posting.company
+    acronym(user, company)
+
+    assert rendering.letter_values(letter(user), application)["company"] == FULL
+    asked = letter(user, company_name="acronym")
+    assert rendering.letter_values(asked, application)["company"] == "CNRS"
+
+
+def test_the_acronym_the_lists_show_is_the_one_a_template_prints(user, application):
+    from postulo.documents import rendering
+
+    company = application.posting.company
+    acronym(user, company, "C.N.R.S.")
+    acronym(user, company)
+    company.list_name = "CNRS"
+    company.save()
+
+    asked = letter(user, company_name="acronym")
+
+    assert rendering.letter_values(asked, application)["company"] == "CNRS"
+
+
+def test_a_company_without_an_acronym_is_named_in_full_whatever_the_template_asks(
+    user, application
+):
+    from postulo.documents import rendering
+
+    asked = letter(user, company_name="acronym")
+
+    assert rendering.letter_values(asked, application)["company"] == FULL
+
+
+def test_the_choice_is_on_the_letter_and_the_message_forms(client, user):
+    client.force_login(user)
+
+    for name in ("documents:letter_create", "documents:message_create"):
+        page = client.get(reverse(name)).content.decode()
+        assert 'name="company_name"' in page, name
+
+
+def test_the_archive_carries_each_templates_choice(user, other_user):
+    from postulo.documents.models import CoverLetter, MessageTemplate
+
+    letter(user, company_name="acronym")
+    MessageTemplate.objects.create(owner=user, name="M", body="x", company_name="acronym")
+
+    data = export.write_archive(user)
+    with zipfile.ZipFile(io.BytesIO(data.getvalue())) as archive:
+        importer.load(other_user, archive)
+
+    assert CoverLetter.objects.get(owner=other_user).company_name == "acronym"
+    assert MessageTemplate.objects.get(owner=other_user).company_name == "acronym"
+    assert export.FORMAT_VERSION >= 89
+
+
+@pytest.mark.parametrize("value", [None, "", "full", "shout", 3])
+def test_an_archive_without_a_choice_or_with_a_wrong_one_restores_the_full_name(value):
+    assert importer._company_name_style(value) == "full"

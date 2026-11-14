@@ -507,7 +507,21 @@ class AddCVItemsForm(forms.Form):
         return chosen
 
 
-class CoverLetterForm(ThemeChoiceMixin, LanguageChoiceMixin, OwnerScopedModelForm):
+class CompanyNameChoiceMixin:
+    """The company name a template prints is optional on the form: left out, it is the full
+    name, which is what a template always printed (#1245)."""
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["company_name"].required = False
+
+    def clean_company_name(self) -> str:
+        return self.cleaned_data.get("company_name") or "full"
+
+
+class CoverLetterForm(
+    CompanyNameChoiceMixin, ThemeChoiceMixin, LanguageChoiceMixin, OwnerScopedModelForm
+):
     """A letter of any of the four kinds.
 
     A new letter starts from the kind's own text rather than an empty box: what a
@@ -519,7 +533,16 @@ class CoverLetterForm(ThemeChoiceMixin, LanguageChoiceMixin, OwnerScopedModelFor
 
     class Meta:
         model = CoverLetter
-        fields = ("name", "kind", "subject", "body", "theme", "is_template", "language")
+        fields = (
+            "name",
+            "kind",
+            "subject",
+            "body",
+            "theme",
+            "is_template",
+            "language",
+            "company_name",
+        )
         widgets = {"body": forms.Textarea(attrs={"rows": 18})}
         help_texts = {
             "name": _("What you will look for it under. It is never printed on the letter."),
@@ -538,12 +561,12 @@ class CoverLetterForm(ThemeChoiceMixin, LanguageChoiceMixin, OwnerScopedModelFor
         self.initial.setdefault("theme", LETTER_THEMES.get(kind, themes.DEFAULT))
 
 
-class MessageTemplateForm(LanguageChoiceMixin, OwnerScopedModelForm):
+class MessageTemplateForm(CompanyNameChoiceMixin, LanguageChoiceMixin, OwnerScopedModelForm):
     """A message written many times: what it is for, its subject and its words (#1094)."""
 
     class Meta:
         model = MessageTemplate
-        fields = ("name", "purpose", "subject", "body", "language")
+        fields = ("name", "purpose", "subject", "body", "language", "company_name")
         widgets = {"body": forms.Textarea(attrs={"rows": 12})}
         help_texts = {
             "name": _("What you will look for it under. It is never sent."),
