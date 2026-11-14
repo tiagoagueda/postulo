@@ -8233,7 +8233,10 @@
       }
     }
   }
-  .tab-nav > a {
+  .tab-nav[hidden] {
+    display: none;
+  }
+  .tab-nav > a, .tab-nav > button {
     display: inline-flex;
     min-height: calc(var(--spacing) * 7);
     align-items: center;
@@ -8280,7 +8283,7 @@
       }
     }
   }
-  .tab-nav > a[aria-current="page"] {
+  .tab-nav > a[aria-current="page"], .tab-nav > button[aria-selected="true"] {
     border-color: var(--color-ink-200);
     background-color: var(--color-white);
     color: var(--color-ink-900);
@@ -8329,7 +8332,7 @@
     }
   }
   @media (forced-colors: active) {
-    .tab-nav > a[aria-current="page"] {
+    .tab-nav > a[aria-current="page"], .tab-nav > button[aria-selected="true"] {
       border-color: CanvasText;
       text-decoration: underline;
     }

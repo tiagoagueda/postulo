@@ -13,6 +13,7 @@ from __future__ import annotations
 import pytest
 from playwright.sync_api import Page, expect
 
+from tests.e2e.preview import show_quick_view
 from tests.e2e.signing_in import sign_in
 
 pytestmark = pytest.mark.e2e
@@ -50,6 +51,7 @@ def cv(applicant):
 def test_the_preview_is_on_the_page_and_follows_an_edit(page: Page, live_server, cv):
     sign_in(page, live_server.url)
     page.goto(f"{live_server.url}/documents/cvs/{cv.pk}/")
+    show_quick_view(page)
 
     frame = page.frame_locator("iframe[data-document-preview]")
     body = frame.locator("body")
@@ -58,7 +60,9 @@ def test_the_preview_is_on_the_page_and_follows_an_edit(page: Page, live_server,
     before = body.inner_text()
     assert before.index("Aperture Science") < before.index("Black Mesa")
 
-    page.get_by_role("button", name="Move down").first.click()
+    with page.expect_navigation():
+        page.get_by_role("button", name="Move down").first.click()
+    show_quick_view(page)
 
     after = page.frame_locator("iframe[data-document-preview]").locator("body")
     expect(after).to_contain_text("Aperture Science")
@@ -86,6 +90,7 @@ def test_the_cv_photo_is_drawn_in_the_preview_under_the_real_policy(
 
     sign_in(page, live_server.url)
     page.goto(f"{live_server.url}/documents/cvs/{cv.pk}/")
+    show_quick_view(page)
     photo = page.frame_locator("iframe[data-document-preview]").locator("img.photo")
     expect(photo).to_have_count(1)
     expect(photo).to_have_attribute("alt", "")
@@ -97,6 +102,7 @@ def test_the_frame_is_named_and_is_not_a_keyboard_trap(page: Page, live_server, 
     stop in the tab order, but a stop somebody can leave again."""
     sign_in(page, live_server.url)
     page.goto(f"{live_server.url}/documents/cvs/{cv.pk}/")
+    show_quick_view(page)
 
     frame = page.locator("iframe[data-document-preview]")
     expect(frame).to_have_attribute("title", "Preview of Main")
@@ -126,6 +132,7 @@ def test_a_letters_chooser_redraws_the_frame_for_that_application(page: Page, li
     )
     sign_in(page, live_server.url)
     page.goto(f"{live_server.url}/documents/letters/{letter.pk}/")
+    show_quick_view(page)
 
     frame = page.frame_locator("iframe[data-document-preview]")
     expect(frame.locator("body")).to_contain_text("Dear")

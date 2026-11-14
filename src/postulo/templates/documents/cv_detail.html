@@ -207,9 +207,22 @@
         <p class="mb-3 text-xs text-ink-500 dark:text-ink-400">
           {% translate "What is saved, redrawn after every change. Scroll inside it to read on." %}
         </p>
-        <iframe src="{% url 'documents:cv_preview' cv.pk %}"
-                title="{% blocktranslate trimmed with name=cv.name %}Preview of {{ name }}{% endblocktranslate %}"
-                class="document-frame" loading="lazy" data-document-preview></iframe>
+        {% comment %} Two ways to read it (#942): the PDF -- what is sent, with its page breaks
+           and its paper -- drawn by the viewer from the draft's address, and the quick view
+           below it, the HTML that follows the page at once. *Redraw* sends what is chosen in
+           the form beside it (the paper). {% endcomment %}
+        <c-preview-tabs id="cv-preview" label="{% translate 'Ways to read this CV' %}">
+          <c-slot name="pdf">
+            <c-document-viewer kind="pdf" src="{% url 'documents:cv_draft' cv.pk %}?inline=1"
+                               download="{% url 'documents:cv_draft' cv.pk %}" redraw="file-properties"
+                               title="{% blocktranslate trimmed with name=cv.name %}PDF of {{ name }}{% endblocktranslate %}" />
+          </c-slot>
+          <c-slot name="quick">
+            <iframe src="{% url 'documents:cv_preview' cv.pk %}"
+                    title="{% blocktranslate trimmed with name=cv.name %}Preview of {{ name }}{% endblocktranslate %}"
+                    class="document-frame" loading="lazy" data-document-preview></iframe>
+          </c-slot>
+        </c-preview-tabs>
         {% comment %} What the frame cannot show is where the pages break, and the only way
            to see that used to be *Export PDF* -- which files a version under the heading
            beside this one and queued it for every store, once a try. A draft is the same

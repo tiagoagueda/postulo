@@ -9941,6 +9941,73 @@
     }
   }
 
+  /* The PDF and the quick view of a CV or a letter are two tabs (#942). Without this script
+   * both panels are shown and the strip is `hidden`; with it the strip is a tablist of real
+   * buttons, one panel is shown, and Left/Right/Home/End move between the tabs with only the
+   * chosen one in the Tab order. */
+  function readyPreviewTabs() {
+    Array.prototype.forEach.call(
+      document.querySelectorAll("[data-preview-tabs]:not([data-tabs-ready])"),
+      function (root) {
+        root.setAttribute("data-tabs-ready", "");
+        var list = root.querySelector("[data-preview-tablist]");
+        var tabs = Array.prototype.slice.call(root.querySelectorAll("[data-preview-tab]"));
+        if (!list || !tabs.length) {
+          return;
+        }
+        list.hidden = false;
+        list.setAttribute("role", "tablist");
+        var choose = function (chosen, focus) {
+          tabs.forEach(function (tab) {
+            var on = tab === chosen;
+            tab.setAttribute("aria-selected", on ? "true" : "false");
+            tab.tabIndex = on ? 0 : -1;
+            var panel = root.querySelector(
+              '[data-preview-panel="' + tab.getAttribute("data-preview-tab") + '"]'
+            );
+            if (panel) {
+              panel.hidden = !on;
+            }
+          });
+          if (focus) {
+            chosen.focus();
+          }
+        };
+        tabs.forEach(function (tab) {
+          tab.setAttribute("role", "tab");
+          var panel = root.querySelector(
+            '[data-preview-panel="' + tab.getAttribute("data-preview-tab") + '"]'
+          );
+          if (panel) {
+            panel.setAttribute("role", "tabpanel");
+          }
+          tab.addEventListener("click", function () {
+            choose(tab, false);
+          });
+          tab.addEventListener("keydown", function (event) {
+            var at = tabs.indexOf(tab),
+              to = null;
+            if (event.key === "ArrowRight" || event.key === "ArrowDown") {
+              to = tabs[(at + 1) % tabs.length];
+            } else if (event.key === "ArrowLeft" || event.key === "ArrowUp") {
+              to = tabs[(at + tabs.length - 1) % tabs.length];
+            } else if (event.key === "Home") {
+              to = tabs[0];
+            } else if (event.key === "End") {
+              to = tabs[tabs.length - 1];
+            }
+            if (to) {
+              event.preventDefault();
+              choose(to, true);
+            }
+          });
+        });
+        choose(tabs[0], false);
+      }
+    );
+  }
+
+  onContentReady(readyPreviewTabs);
   onContentReady(readyViewers);
 
   /* A thumbnail that could not be made answers 404; hide it and the kind's icon, drawn under

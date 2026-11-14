@@ -38,9 +38,20 @@
         <p class="mb-3 text-xs text-ink-500 dark:text-ink-400">
           {% translate "What is saved, redrawn after every change. Scroll inside it to read on." %}
         </p>
-        <iframe src="{% url 'documents:letter_preview' letter.pk %}" name="letter-preview"
-                title="{% blocktranslate trimmed with name=letter.name %}Preview of {{ name }}{% endblocktranslate %}"
-                class="document-frame" loading="lazy" data-document-preview></iframe>
+        {% comment %} The PDF is what is sent (#942); *Redraw* adds the application and the paper
+           chosen in the form beside the page. The quick view is the frame the chooser targets. {% endcomment %}
+        <c-preview-tabs id="letter-preview" label="{% translate 'Ways to read this letter' %}">
+          <c-slot name="pdf">
+            <c-document-viewer kind="pdf" src="{% url 'documents:letter_draft' letter.pk %}?inline=1"
+                               download="{% url 'documents:letter_draft' letter.pk %}" redraw="letter-chooser"
+                               title="{% blocktranslate trimmed with name=letter.name %}PDF of {{ name }}{% endblocktranslate %}" />
+          </c-slot>
+          <c-slot name="quick">
+            <iframe src="{% url 'documents:letter_preview' letter.pk %}" name="letter-preview"
+                    title="{% blocktranslate trimmed with name=letter.name %}Preview of {{ name }}{% endblocktranslate %}"
+                    class="document-frame" loading="lazy" data-document-preview></iframe>
+          </c-slot>
+        </c-preview-tabs>
       </section>
 
       {% comment %} The view had been handing this page its versions since the link became
@@ -68,7 +79,7 @@
              read. A form with a `target` naming a frame is plain HTML and needs no script;
              the frame's own address is the letter with no application, which is what it
              starts as. {% endcomment %}
-          <form method="get" action="{% url 'documents:letter_preview' letter.pk %}"
+          <form method="get" action="{% url 'documents:letter_preview' letter.pk %}" id="letter-chooser"
                 target="letter-preview" class="space-y-3">
             <label class="sr-only" for="preview-application">{% translate "Application" %}</label>
             <select name="application" id="preview-application" class="w-full">
@@ -99,7 +110,7 @@
           </p>
           {% comment %} A form rather than the link it was, so that the paper goes with it
              (#344). A GET still: it changes nothing. {% endcomment %}
-          <form method="get" action="{% url 'documents:letter_draft' letter.pk %}" class="mt-3 space-y-3">
+          <form method="get" action="{% url 'documents:letter_draft' letter.pk %}" id="letter-chooser" class="mt-3 space-y-3">
             <c-field :field="paper_form.paper" />
             <button type="submit" class="btn w-full" data-variant="outline">{% translate "Download draft PDF" %}</button>
           </form>
