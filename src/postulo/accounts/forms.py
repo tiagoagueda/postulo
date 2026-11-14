@@ -1503,6 +1503,7 @@ class AppearanceForm(forms.ModelForm):
         "calendar_labels",
         "weekday_names",
         "animated_mark",
+        "show_country",
         "quiet_after_days",
         "closing_notice_days",
     )
@@ -1536,6 +1537,14 @@ class AppearanceForm(forms.ModelForm):
         ),
     )
 
+    #: Not required: a page drawn before the setting existed leaves it out (#1249).
+    show_country = forms.ChoiceField(
+        label=_("Show the country"),
+        choices=Profile._meta.get_field("show_country").choices,
+        required=False,
+        widget=forms.RadioSelect,
+    )
+
     class Meta:
         model = Profile
         fields = (
@@ -1546,6 +1555,7 @@ class AppearanceForm(forms.ModelForm):
             "calendar_labels",
             "weekday_names",
             "animated_mark",
+            "show_country",
             "quiet_after_days",
             "closing_notice_days",
         )
@@ -1565,6 +1575,11 @@ class AppearanceForm(forms.ModelForm):
             "weekday_names": _("Weekday names on the calendar"),
         }
         help_texts = {
+            "show_country": _(
+                "Automatically shows a place as the city alone while all your companies are "
+                "in one country, and as the city and country as soon as there are two. "
+                "Documents, exports and the API keep the country whatever you choose here."
+            ),
             # Under Appearance rather than Accessibility, by the rule #281 set: file a
             # choice by what somebody is looking for, not by what motivated it. A person
             # who wants more rows on a screen looks here (#292).
@@ -1597,6 +1612,10 @@ class AppearanceForm(forms.ModelForm):
         """Left out, as by a page drawn before the setting existed, it stays as it was (#1238)."""
         value = self.cleaned_data.get("animated_mark")
         return self.instance.animated_mark if value is None else value
+
+    def clean_show_country(self):
+        """Left out, as by a page drawn before the setting existed, it stays as it was (#1249)."""
+        return self.cleaned_data.get("show_country") or self.instance.show_country or "auto"
 
     def clean_weekday_names(self):
         return self.cleaned_data.get("weekday_names") or self.instance.weekday_names or "short"

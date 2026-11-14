@@ -52,6 +52,22 @@
         </fieldset>
       </div>
       <div class="card mb-6">
+        {% comment %} Whether a place is shown with its country (#1249). {% endcomment %}
+        <fieldset{% if form.show_country.aria_describedby %} aria-describedby="{{ form.show_country.aria_describedby }}"{% endif %}>
+          <legend class="label mb-1">{{ form.show_country.label }}</legend>
+          <p class="mb-3 text-sm text-ink-500 dark:text-ink-400" id="{{ form.show_country.auto_id }}_helptext">{{ form.show_country.help_text }}</p>
+          <div class="space-y-2">
+            {% for choice in form.show_country|widgets_classed:"input" %}
+              <label class="flex items-center gap-3 text-sm text-ink-800 dark:text-ink-200">
+                {{ choice.tag }}
+                <span>{{ choice.choice_label }}</span>
+              </label>
+            {% endfor %}
+          </div>
+          <div class="field"><c-field-feedback :field="form.show_country" errors-only /></div>
+        </fieldset>
+      </div>
+      <div class="card mb-6">
         {% comment %} How much room the interface leaves (#292). Beside the theme because it
            is the same kind of choice -- what the interface looks like to you -- and because
            somebody who wants more rows on a screen comes looking here. {% endcomment %}

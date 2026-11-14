@@ -285,7 +285,10 @@ logger = logging.getLogger(__name__)
 #: ``kind``, ``name`` (in a ``language``, as before) or ``acronym`` (no language), and the
 #: company a ``list_name``, the acronym the lists show, blank for its full name. An archive
 #: without them restores every name as one in a language and the lists showing the name.
-FORMAT_VERSION = 87
+#: 88 added ``show_country`` on the profile: whether a place is shown with its country, ``auto``
+#: (the town alone while every place is in one country), ``always`` or ``never``. An archive
+#: without it restores ``auto``; a value that is none of the three is refused (#1249).
+FORMAT_VERSION = 88
 
 
 def industry_entry(industry) -> str | dict:
@@ -446,6 +449,7 @@ PROFILE_FIELDS = (
     "weekday_names",
     "first_weekday",
     "animated_mark",
+    "show_country",
     "plugins_off",
     "keep_page_source",
     "keep_page_rendering",

@@ -789,14 +789,20 @@ class Company(OwnNote, PrincipalOwnedModel):
         pending = self.__dict__.get("_pending_location")
         if pending is not None:
             return pending
+        town, country = self.location_parts()
+        parts = [town, phones.country_name(country)]
+        return ", ".join(part for part in parts if part)
+
+    def location_parts(self) -> tuple[str, str]:
+        """Its primary address's town and country code, for a page that shows them its own
+        way (#1249); `location` is the same two as the line the data carries."""
         if not self.pk:
-            return ""
+            return "", ""
         rows = list(self.postal_addresses.all())
         address = next((row for row in rows if row.is_primary), rows[0] if rows else None)
         if address is None:
-            return ""
-        parts = [address.municipality.strip(), phones.country_name(address.country)]
-        return ", ".join(part for part in parts if part)
+            return "", ""
+        return address.municipality.strip(), address.country
 
     @location.setter
     def location(self, value) -> None:

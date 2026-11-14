@@ -25,7 +25,7 @@
               data-listing-state="{{ posting.derived_state }}">
           {{ posting.derived_state_label }}{% if posting.discard_reason %}: {{ posting.get_discard_reason_display }}{% endif %}
         </span>
-        {{ posting.location|default:"" }}
+        {{ posting.location|typed_place:user|default:"" }}
         {% if posting.remote_type %} · {{ posting.get_remote_type_display }}{% endif %}
         {% if posting.employment_type %} · {{ posting.get_employment_type_display }}{% endif %}
       </p>

@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% load i18n %}
+{% load i18n postulo %}
 
 {% block title %}{% translate "From Wikidata" %}{% endblock %}
 
@@ -33,7 +33,7 @@
           {% elif by_hand %}
             {% translate "Its primary address was placed by hand, and stays where you put it." %}
           {% else %}
-            {% blocktranslate trimmed with address=address.one_line %}Kept, it places <bdi>{{ address }}</bdi> here on the map, and changing the address's words will not move it.{% endblocktranslate %}
+            {% blocktranslate trimmed with address=address|address_line:user %}Kept, it places <bdi>{{ address }}</bdi> here on the map, and changing the address's words will not move it.{% endblocktranslate %}
           {% endif %}
         </p>
       {% else %}

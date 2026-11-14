@@ -33,7 +33,7 @@
         </a>
       </td>
     {% elif column.key == 'location' %}
-      <td class="px-4 py-3 text-ink-500 dark:text-ink-400">{{ application.posting.location|default:"—" }}</td>
+      <td class="px-4 py-3 text-ink-500 dark:text-ink-400">{{ application.posting.location|typed_place:user|default:"—" }}</td>
     {% elif column.key == 'status' %}
       <td class="px-4 py-3">
         {% include "partials/status_badge.html" with status=application.status label=application.get_status_display %}

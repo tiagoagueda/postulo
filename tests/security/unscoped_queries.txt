@@ -16,6 +16,8 @@
 # its handlers only narrow them further (#1092).
 # core/errands.py's fail_if_interrupted ends the one errand its caller, the errand page, has
 # already fetched through for_user; the statement names that row and the state it was in (#1154).
+# core/place_display.py reads the countries of addresses on companies that are visible_to() the
+# person, and of their own profile, to decide whether a place shows its country (#1249).
 # core/slow.py's fail_interrupted_backups is the scheduler's sweep of backup errands whose
 # process died, every administrator's, as fail_interrupted is for every kind (#1131).
 api/routers/answers.py::_given::ApplicationAnswer
@@ -95,6 +97,7 @@ core/metrics.py::collect::Suggestion
 core/phone_numbers.py::mine::PhoneNumber
 core/phone_numbers.py::refusal::PhoneNumber
 core/phone_numbers.py::set_primary::PhoneNumber
+core/place_display.py::countries_in_play::PostalAddress
 core/postal.py::for_holder::PostalAddress
 core/postal.py::save_existing_objects::PostalAddress
 core/search.py::company_match::CompanyIdentifier

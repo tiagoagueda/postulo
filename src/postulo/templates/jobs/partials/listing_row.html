@@ -36,7 +36,7 @@
         <a href="{{ listing.company.get_absolute_url }}" class="hover:underline"><bdi>{{ listing.company.display_name }}</bdi></a>
       </td>
     {% elif column.key == 'location' %}
-      <td class="px-4 py-3 text-ink-500 dark:text-ink-400">{{ listing.location|default:"—" }}</td>
+      <td class="px-4 py-3 text-ink-500 dark:text-ink-400">{{ listing.location|typed_place:user|default:"—" }}</td>
     {% elif column.key == 'closes' %}
       <td class="px-4 py-3 text-ink-500 tabular-nums dark:text-ink-400">
         {{ listing.closes_at|date:"DATE_FORMAT"|default:"—" }}

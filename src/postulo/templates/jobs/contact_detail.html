@@ -102,7 +102,7 @@
         {% endfor %}
         {% for address in contact.postal_addresses.all %}
           <p data-contact-address>
-            {% if address.kind %}<span class="text-ink-500 dark:text-ink-400">{% if address.kind == "other" %}{{ address.label }}{% else %}{{ address.get_kind_display }}{% endif %}</span> {% endif %}<bdi>{{ address.one_line }}</bdi>
+            {% if address.kind %}<span class="text-ink-500 dark:text-ink-400">{% if address.kind == "other" %}{{ address.label }}{% else %}{{ address.get_kind_display }}{% endif %}</span> {% endif %}<bdi>{{ address|address_line:user }}</bdi>
           </p>
         {% endfor %}
         {% for link in contact.web_links.all %}
