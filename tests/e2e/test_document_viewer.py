@@ -165,3 +165,88 @@ def test_the_list_shows_the_first_page_of_a_pdf(page: Page, live_server, pdf_fil
         "() => { const i = document.querySelector('[data-document-thumb] img');"
         " return i && i.complete && i.naturalWidth > 0; }"
     )
+
+
+# ---------------------------------------------------------------- a CV and a letter
+
+
+@pytest.fixture
+def drawn_draft(monkeypatch):
+    """The draft is any two-page PDF: what is under test is the page and the viewer, not
+    WeasyPrint (held by the document tests)."""
+    from postulo.documents import pdf
+
+    monkeypatch.setattr(pdf, "draft_pdf", lambda html, **kwargs: two_pages())
+
+
+@pytest.fixture
+def cv(applicant):
+    from postulo.documents.models import CV
+
+    return CV.objects.create(owner=applicant, name="Main")
+
+
+def test_a_cvs_pdf_is_the_tab_that_opens_and_the_quick_view_is_the_other(
+    page: Page, live_server, cv, drawn_draft
+):
+    sign_in(page, live_server.url, f"/documents/cvs/{cv.pk}/")
+    pdf_tab = page.get_by_role("tab", name="PDF")
+    quick_tab = page.get_by_role("tab", name="Quick view")
+    expect(pdf_tab).to_have_attribute("aria-selected", "true")
+    viewer = page.locator("[data-document-viewer]")
+    expect(viewer.locator("[data-viewer-count]")).to_have_text("of 2", timeout=30000)
+    expect(viewer.locator(".textLayer")).to_contain_text("Words of page 1")
+    expect(page.locator("iframe[data-document-preview]")).to_be_hidden()
+    expect(page.get_by_role("tabpanel", name="PDF")).to_be_visible()
+
+    # Arrow keys move between the tabs, and only the chosen one is a stop of the Tab key.
+    pdf_tab.focus()
+    page.keyboard.press("ArrowRight")
+    expect(quick_tab).to_have_attribute("aria-selected", "true")
+    expect(quick_tab).to_be_focused()
+    expect(pdf_tab).to_have_attribute("tabindex", "-1")
+    expect(page.locator("iframe[data-document-preview]")).to_be_visible()
+    expect(viewer).to_be_hidden()
+    page.keyboard.press("Home")
+    expect(pdf_tab).to_have_attribute("aria-selected", "true")
+    expect(viewer).to_be_visible()
+
+
+def test_a_cvs_page_with_the_pdf_tab_passes_axe(page: Page, live_server, cv, drawn_draft):
+    sign_in(page, live_server.url, f"/documents/cvs/{cv.pk}/")
+    expect(page.locator("[data-viewer-count]")).to_have_text("of 2", timeout=30000)
+    found = violations_on(page, AXE.read_text(encoding="utf-8"))
+    assert not found, describe(page.url, found)
+
+
+def test_a_letters_redraw_asks_for_the_application_chosen_beside_it(
+    page: Page, live_server, cv, drawn_draft
+):
+    from postulo.applications.models import Application, Status
+    from postulo.documents.models import CoverLetter
+    from postulo.jobs.models import Company, JobPosting
+
+    owner = cv.owner
+    company = Company.objects.create(owner=owner, name="Aperture Science")
+    posting = JobPosting.objects.create(owner=owner, company=company, title="Test engineer")
+    application = Application.objects.create(owner=owner, posting=posting, status=Status.APPLIED)
+    letter = CoverLetter.objects.create(owner=owner, name="To Aperture", body="Dear {{ company }}")
+    sign_in(page, live_server.url, f"/documents/letters/{letter.pk}/")
+    viewer = page.locator("[data-document-viewer]")
+    expect(viewer.locator("[data-viewer-count]")).to_have_text("of 2", timeout=30000)
+
+    page.locator("#preview-application").select_option(str(application.pk))
+    with page.expect_request(lambda r: f"application={application.pk}" in r.url):
+        viewer.get_by_role("button", name="Redraw").click()
+    expect(viewer.locator("[data-viewer-count]")).to_have_text("of 2", timeout=30000)
+
+
+def test_a_cvs_page_does_not_scroll_sideways_at_320_pixels(
+    page: Page, live_server, cv, drawn_draft
+):
+    from tests.e2e.test_reflow import NARROW, SCROLLS_SIDEWAYS
+
+    page.set_viewport_size({"width": NARROW, "height": 800})
+    sign_in(page, live_server.url, f"/documents/cvs/{cv.pk}/")
+    expect(page.locator("[data-viewer-count]")).to_have_text("of 2", timeout=30000)
+    assert page.evaluate(SCROLLS_SIDEWAYS)["reached"] == 0

@@ -1,0 +1,21 @@
+{% load i18n %}
+<c-vars id label />
+{% comment %} Two ways to read a CV or a letter, one at a time (#942): its **PDF** -- what is sent,
+   page breaks and paper included -- and a **Quick view**, the HTML that follows the page in
+   milliseconds.
+
+   `<c-preview-tabs id="cv" label="…"><c-slot name="pdf">…</c-slot><c-slot name="quick">…</c-slot></c-preview-tabs>`
+
+   **Without a script both are shown, one over the other**, and the strip of tabs stays
+   `hidden`: a tab that does nothing would be a lie. The script (`[data-preview-tabs]` in
+   `assets/js/app.js`) shows the strip, makes it an ARIA tablist (the tabs are real buttons, the
+   panels are real regions) and hides the panel that is not chosen. Left and Right move between the
+   tabs, Home and End go to the first and last, and only the chosen tab is in the Tab order. {% endcomment %}
+<div data-preview-tabs>
+  <div class="tab-nav mb-3" data-preview-tablist aria-label="{{ label }}" hidden>
+    <button type="button" id="{{ id }}-tab-pdf" aria-controls="{{ id }}-panel-pdf" data-preview-tab="pdf">{% translate "PDF" %}</button>
+    <button type="button" id="{{ id }}-tab-quick" aria-controls="{{ id }}-panel-quick" data-preview-tab="quick">{% translate "Quick view" %}</button>
+  </div>
+  <div id="{{ id }}-panel-pdf" data-preview-panel="pdf" aria-labelledby="{{ id }}-tab-pdf" class="min-w-0">{{ pdf }}</div>
+  <div id="{{ id }}-panel-quick" data-preview-panel="quick" aria-labelledby="{{ id }}-tab-quick" class="mt-4 min-w-0">{{ quick }}</div>
+</div>

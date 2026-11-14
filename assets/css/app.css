@@ -2099,13 +2099,20 @@
     @apply inline-flex max-w-full flex-wrap items-center gap-1 rounded-lg bg-ink-100 p-1 dark:bg-ink-800;
   }
 
-  .tab-nav > a {
+  /* The strip of a preview's tabs is `hidden` until the script that makes it work has run. */
+  .tab-nav[hidden] {
+    display: none;
+  }
+
+  .tab-nav > a,
+  .tab-nav > button {
     @apply inline-flex min-h-7 items-center gap-2 rounded-md border border-transparent px-3 py-1
       text-sm font-medium whitespace-nowrap text-ink-600 hover:text-ink-900 dark:text-ink-300
       dark:hover:text-ink-100;
   }
 
-  .tab-nav > a[aria-current="page"] {
+  .tab-nav > a[aria-current="page"],
+  .tab-nav > button[aria-selected="true"] {
     @apply border-ink-200 bg-white text-ink-900 shadow-sm dark:border-ink-700 dark:bg-ink-950
       dark:text-ink-50;
   }
@@ -2115,7 +2122,8 @@
   }
 
   @media (forced-colors: active) {
-    .tab-nav > a[aria-current="page"] {
+    .tab-nav > a[aria-current="page"],
+    .tab-nav > button[aria-selected="true"] {
       border-color: CanvasText;
       text-decoration: underline;
     }

@@ -21,6 +21,7 @@ from __future__ import annotations
 import pytest
 from playwright.sync_api import Page, expect
 
+from .preview import show_quick_view
 from .selects import drawn
 from .test_accessibility import axe_source, describe, sign_in, violations_on  # noqa: F401
 from .test_reflow import LANGUAGES, NARROW, SCROLLS_SIDEWAYS, SPILLS
@@ -97,6 +98,7 @@ def cv(applicant):
 def choose_and_save(page: Page, base: str, cv) -> None:
     """The whole choice, by the controls a person has: no address typed, no value set."""
     page.goto(f"{base}/documents/cvs/{cv.pk}/")
+    show_quick_view(page)
     preview = page.frame_locator("iframe[data-document-preview]").locator("body")
     expect(preview).to_contain_text(MOBILE_PRINTED)
     expect(preview).to_contain_text(LINKEDIN)
@@ -138,6 +140,7 @@ def choose_and_save(page: Page, base: str, cv) -> None:
 
     # Saving lands on the CV's own page, and the frame there is the document as chosen.
     expect(page).to_have_url(f"{base}/documents/cvs/{cv.pk}/")
+    show_quick_view(page)
     preview = page.frame_locator("iframe[data-document-preview]").locator("body")
     expect(preview).to_contain_text(DESK_PRINTED)
     expect(preview).to_contain_text(MASTODON)
@@ -309,6 +312,7 @@ def name_line_as_drawn(page: Page, base: str, cv, *, language, first, last, form
 
     sign_in(page, base)
     page.goto(f"{base}/documents/cvs/{cv.pk}/")
+    show_quick_view(page)
     frame = page.frame_locator("iframe[data-document-preview]")
     expect(frame.locator("html")).to_have_attribute("dir", "rtl" if language == "ar" else "ltr")
     heading = frame.locator("header.contact h1")

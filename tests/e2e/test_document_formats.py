@@ -17,6 +17,7 @@ import pytest
 from playwright.sync_api import Browser, Page, expect
 
 from postulo.documents.pdf import PDFBackendUnavailable, get_pdf_backend
+from tests.e2e.preview import show_quick_view
 from tests.e2e.signing_in import sign_in
 
 pytestmark = pytest.mark.e2e
@@ -102,6 +103,7 @@ def test_a_letters_draft_leaves_the_frame_and_the_page_alone(page: Page, live_se
 
     sign_in(page, live_server.url)
     page.goto(f"{live_server.url}/documents/letters/{letter.pk}/")
+    show_quick_view(page)
     frame = page.frame_locator("iframe[data-document-preview]")
     expect(frame.locator("body")).to_contain_text("Dear")
 
