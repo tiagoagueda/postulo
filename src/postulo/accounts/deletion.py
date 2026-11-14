@@ -60,7 +60,7 @@ def is_last_administrator(user) -> bool:
 
 
 #: The folders under the media root that are kept per person, one folder each.
-MEDIA_FOLDERS = ("documents", "avatars", "captures", "exports", "logos")
+MEDIA_FOLDERS = ("documents", "avatars", "captures", "exports", "logos", "thumbnails")
 
 
 def files_of(user) -> list[str]:
@@ -137,7 +137,9 @@ def delete_account(user) -> DeletionReport:
     report.directories_removed = sum(filestore.would_prune(d, set(present)) for d in directories)
 
     def remove_files() -> None:
-        for name in names:
+        # The small pictures made from those files are kept in a folder of their own and are
+        # no row's file, so they are not in the report above (#942).
+        for name in [*names, *sorted(filestore.thumbnail_names(names))]:
             try:
                 if filestore.exists(name):
                     filestore.delete(name)

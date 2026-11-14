@@ -42,6 +42,10 @@ THIRD_PARTY = {
     "src/postulo/static/js/vendor": "htmx.LICENSE.txt",
     "src/postulo/static/js/vendor/leaflet": "LICENSE.txt",
     "src/postulo/static/js/vendor/leaflet.markercluster": "LICENSE.txt",
+    "src/postulo/static/js/vendor/pdfjs": "LICENSE.txt",
+    "src/postulo/static/js/vendor/pdfjs/cmaps": "LICENSE",
+    "src/postulo/static/js/vendor/pdfjs/standard_fonts": "LICENSE_FOXIT",
+    "src/postulo/static/js/vendor/pdfjs/wasm": "LICENSE_OPENJPEG",
     "src/postulo/static/css": "basecoat.LICENSE.txt",
     "src/postulo/static/maps": "LICENCE.txt",
     "src/postulo/jobs/data": "LICENCE.md",
@@ -92,6 +96,7 @@ def test_the_register_names_every_work_and_the_copyright_holder():
         "zxcvbn",
         "Leaflet",
         "Leaflet.markercluster",
+        "pdf.js",
         "OpenStreetMap",
     ):
         assert work in REGISTER, f"{work} is shipped and not registered"
@@ -130,6 +135,8 @@ def test_the_notices_are_the_real_ones():
     assert "Volodymyr Agafonkin" in leaflet and "BSD" in leaflet
     clusters = (vendor / "leaflet.markercluster/LICENSE.txt").read_text(encoding="utf-8")
     assert "David Leaver" in clusters and "MIT" in clusters
+    pdfjs = (vendor / "pdfjs/LICENSE.txt").read_text(encoding="utf-8")
+    assert "Apache License" in pdfjs and "Version 2.0" in pdfjs
     htmx = (REPO / "src/postulo/static/js/vendor/htmx.LICENSE.txt").read_text(encoding="utf-8")
     assert "Zero-Clause BSD" in htmx or "0BSD" in htmx or "Permission to use" in htmx
 
@@ -146,17 +153,22 @@ def test_every_vendored_script_has_a_pinned_provenance():
     assert package["license"] == "AGPL-3.0-or-later"
     pinned = package["devDependencies"]
     sync = (REPO / "scripts/sync-vendor.mjs").read_text(encoding="utf-8")
-    for name in ("htmx.org", "@zxcvbn-ts/core", "leaflet", "leaflet.markercluster"):
+    for name in ("htmx.org", "@zxcvbn-ts/core", "leaflet", "leaflet.markercluster", "pdfjs-dist"):
         assert name in pinned, f"{name} is vendored and not a dependency"
         assert f'["{name}/' in sync, f"{name} is not in the sync script's list"
     assert re.fullmatch(r"\d+\.\d+\.\d+", pinned["htmx.org"]), "exact, not a range"
     bundle = (REPO / "src/postulo/static/js/vendor/htmx.min.js").read_text(encoding="utf-8")
     assert f'version:"{pinned["htmx.org"]}"' in bundle, "the served bundle is the pinned version"
     # Leaflet and its clusters draw the map (#898): exact pins, and the served file is the pin.
-    for name in ("leaflet", "leaflet.markercluster"):
+    for name in ("leaflet", "leaflet.markercluster", "pdfjs-dist"):
         assert re.fullmatch(r"\d+\.\d+\.\d+", pinned[name]), f"{name}: exact, not a range"
     leaflet = (REPO / "src/postulo/static/js/vendor/leaflet/leaflet.js").read_text(encoding="utf-8")
     assert f't.version="{pinned["leaflet"]}"' in leaflet, "the served Leaflet is the pinned one"
+    # pdf.js draws a PDF (#942): the library and its worker are the pinned release, and the
+    # worker is served beside it, since the policy allows a worker from this origin only.
+    for served in ("pdf.min.mjs", "pdf.worker.min.mjs"):
+        text = (REPO / "src/postulo/static/js/vendor/pdfjs" / served).read_text(encoding="utf-8")
+        assert pinned["pdfjs-dist"] in text, f"the served {served} is the pinned pdf.js"
 
 
 @pytest.mark.parametrize(

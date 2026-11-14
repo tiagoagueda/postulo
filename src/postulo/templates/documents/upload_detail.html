@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{{ document.title }}{% endblock %}
+
+{% block content %}
+  <div class="mb-6 flex flex-wrap items-start gap-4">
+    <div class="min-w-0">
+      <c-page-title>{{ document.title }}</c-page-title>
+      <p class="flex flex-wrap items-center gap-1.5 text-sm text-ink-500 dark:text-ink-400">
+        {% if document.language %}<c-document-language :document="document" />{% endif %}
+        {{ document.get_kind_display }} · {% translate "version" %} {{ document.version }}
+        · {{ document.created_at|date:"DATE_FORMAT" }}
+      </p>
+    </div>
+    <div class="ms-auto flex flex-wrap items-center gap-2">
+      <a href="{% url 'documents:upload_update' document.pk %}" class="btn" data-variant="outline">{% translate "Edit" %}</a>
+      <a href="{% url 'documents:upload_list' %}" class="btn" data-variant="ghost">{% translate "All files" %}</a>
+    </div>
+  </div>
+
+  {% if document.damage == "missing" %}
+    <p class="mb-4 text-sm text-red-600 dark:text-red-400" data-damage="missing">{% translate "This file is missing. Upload it again as a new version that supersedes this one." %}</p>
+  {% elif document.damage %}
+    <p class="mb-4 text-sm text-red-600 dark:text-red-400" data-damage="changed">{% translate "This file no longer matches what was uploaded. Upload it again as a new version that supersedes this one." %}</p>
+  {% endif %}
+
+  <section class="card" aria-labelledby="file-preview-heading">
+    <c-section-title id="file-preview-heading">{% translate "The file" %}</c-section-title>
+    {% url 'documents:upload_download' document.pk as download_url %}
+    {% url 'documents:upload_preview' document.pk as preview_url %}
+    <c-document-viewer :kind="preview.kind" :src="preview_url" :title="document.title" :download="download_url" />
+  </section>
+{% endblock %}

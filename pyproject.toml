@@ -105,6 +105,9 @@ postgres = ["psycopg[binary]>=3.2"]
 chromium = ["playwright>=1.62"]
 # What the container runs. Not a development dependency: runserver is Django's own.
 server = ["gunicorn>=23.0"]
+# Draws the first page of a PDF as the small picture a list shows (#942). PDFium, in a wheel
+# with no system library. Optional: without it a list shows a kind icon instead.
+preview = ["pypdfium2>=5"]
 
 [project.urls]
 Homepage = "https://source.tiagoagueda.com/postulo/postulo"

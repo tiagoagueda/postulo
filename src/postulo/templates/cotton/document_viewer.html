@@ -1,0 +1,102 @@
+{% load i18n postulo static %}
+<c-vars src="" kind title download open="" redraw="" />
+{% comment %} One viewer for every document and file (#942):
+   `<c-document-viewer kind="pdf" src="{% url 'documents:upload_preview' d.pk %}" title="…"
+   download="{% url 'documents:upload_download' d.pk %}" />`, with whatever should stand in for it
+   without a script as the slot.
+
+   `kind` is `pdf`, `image`, `text`, or `none` for a file that has no preview, which is only a
+   sentence and the way to download it (`documents.previews` says which a file is). `src` is the
+   address the viewer *reads*, answered inline by a view that has checked whose file it is; `open`
+   is the address a link to the file on its own opens in a new tab, `src` unless the page says
+   otherwise. `redraw` is the id of a form whose choices are added to `src` when the person presses
+   *Redraw* -- the CV's page, whose preview is drawn from what is chosen beside it.
+
+   **Without a script it is a link.** Everything the script adds is `hidden` until it runs, and
+   what is left is the slot, *Open* and *Download*: a viewer with nothing to draw it with has
+   not lost the file.
+
+   **The PDF is drawn by pdf.js**, vendored under `static/js/vendor/pdfjs/` and loaded by the
+   page script (`assets/js/app.js`) from this page's own origin, so the content security policy
+   stays as strict as it is everywhere: no inline script, no other origin. The three addresses
+   below are of files inside the folders pdf.js reads fonts, character maps and decoders from;
+   the script keeps the folder. Only the page the viewer is on loads any of it.
+
+   **Accessible by its parts**: the whole is a labelled region; the controls are buttons and one
+   number box, each named; the page is announced politely as it changes; the stage takes the
+   keyboard (PageUp, PageDown, Home, End, the arrow keys while the page fits, plus and minus),
+   and only while it has focus. The words of the PDF are a real text layer, so a screen reader
+   reads them and the person can select and copy them; a PDF with no words says so.
+{% endcomment %}
+{% if kind == "none" %}
+  <div class="document-viewer" data-kind="none" role="region" aria-label="{{ title }}">
+    <p class="text-sm text-ink-500 dark:text-ink-400">{% translate "This kind of file cannot be shown here. Download it to open it." %}</p>
+    <p class="mt-3"><a href="{{ download }}" class="btn" data-variant="outline">{% icon "download" %}{% translate "Download" %}</a></p>
+  </div>
+{% else %}
+  <div class="document-viewer" data-document-viewer data-kind="{{ kind }}" data-src="{{ src }}"
+       {% if redraw %}data-redraw-form="{{ redraw }}"{% endif %}
+       {% if kind == "pdf" %}
+       data-lib="{% static 'js/vendor/pdfjs/pdf.min.mjs' %}"
+       data-worker="{% static 'js/vendor/pdfjs/pdf.worker.min.mjs' %}"
+       data-cmaps="{% static 'js/vendor/pdfjs/cmaps/LICENSE' %}"
+       data-fonts="{% static 'js/vendor/pdfjs/standard_fonts/LICENSE_FOXIT' %}"
+       data-wasm="{% static 'js/vendor/pdfjs/wasm/LICENSE_OPENJPEG' %}"
+       {% endif %}
+       data-page-words="{% blocktranslate with page='__PAGE__' count='__COUNT__' %}Page {{ page }} of {{ count }}{% endblocktranslate %}"
+       data-count-words="{% blocktranslate with count='__COUNT__' %}of {{ count }}{% endblocktranslate %}"
+       data-loading-words="{% translate 'Loading the document…' %}"
+       data-error-words="{% translate 'This file could not be shown here. You can still download it.' %}"
+       data-password-words="{% translate 'This file is locked with a password, so it cannot be shown here. You can still download it.' %}"
+       data-no-text-words="{% translate 'This file has no text a screen reader can read.' %}"
+       role="region" aria-label="{{ title }}">
+    <div class="document-viewer-bar" data-viewer-bar hidden>
+      {% if kind == "pdf" %}
+        <div class="document-viewer-group" data-viewer-pager>
+          <button type="button" class="btn" data-variant="ghost" data-size="icon-sm" data-viewer-prev
+                  title="{% translate 'Previous page' %}">{% icon "chevron-left" %}<span class="sr-only">{% translate "Previous page" %}</span></button>
+          <label class="document-viewer-page">
+            <span class="sr-only">{% translate "Page" %}</span>
+            <input type="number" min="1" value="1" inputmode="numeric" class="input" data-viewer-page>
+            <span data-viewer-count aria-hidden="true"></span>
+          </label>
+          <button type="button" class="btn" data-variant="ghost" data-size="icon-sm" data-viewer-next
+                  title="{% translate 'Next page' %}">{% icon "chevron-right" %}<span class="sr-only">{% translate "Next page" %}</span></button>
+        </div>
+        <div class="document-viewer-group">
+          <button type="button" class="btn" data-variant="ghost" data-size="icon-sm" data-viewer-zoom-out
+                  title="{% translate 'Zoom out' %}">{% icon "zoom-out" %}<span class="sr-only">{% translate "Zoom out" %}</span></button>
+          <select class="select" data-native data-viewer-zoom aria-label="{% translate 'Zoom' %}">
+            <option value="width">{% translate "Fit width" %}</option>
+            <option value="page">{% translate "Fit page" %}</option>
+            <option value="0.5">50%</option>
+            <option value="0.75">75%</option>
+            <option value="1">100%</option>
+            <option value="1.25">125%</option>
+            <option value="1.5">150%</option>
+            <option value="2">200%</option>
+          </select>
+          <button type="button" class="btn" data-variant="ghost" data-size="icon-sm" data-viewer-zoom-in
+                  title="{% translate 'Zoom in' %}">{% icon "zoom-in" %}<span class="sr-only">{% translate "Zoom in" %}</span></button>
+        </div>
+      {% endif %}
+      <div class="document-viewer-group document-viewer-links">
+        {% if redraw %}
+          <button type="button" class="btn" data-variant="ghost" data-size="sm" data-viewer-redraw>{% icon "rotate-cw" %}{% translate "Redraw" %}</button>
+        {% endif %}
+        <a href="{{ open|default:src }}" class="btn" data-variant="ghost" data-size="sm" target="_blank" rel="noopener noreferrer">{% icon "external-link" %}{% translate "Open in a new tab" %}</a>
+        <a href="{{ download }}" class="btn" data-variant="ghost" data-size="sm">{% icon "download" %}{% translate "Download" %}</a>
+      </div>
+    </div>
+    <p class="sr-only" role="status" data-viewer-status></p>
+    <div class="document-viewer-stage" tabindex="0" role="group" aria-label="{{ title }}" data-viewer-stage hidden></div>
+    <p class="document-viewer-message text-sm" data-viewer-message hidden></p>
+    <div class="document-viewer-fallback" data-viewer-fallback>
+      {{ slot }}
+      <p class="mt-3 flex flex-wrap gap-2">
+        <a href="{{ open|default:src }}" class="btn" data-variant="outline" target="_blank" rel="noopener noreferrer">{% icon "external-link" %}{% translate "Open in a new tab" %}</a>
+        <a href="{{ download }}" class="btn" data-variant="outline">{% icon "download" %}{% translate "Download" %}</a>
+      </p>
+    </div>
+  </div>
+{% endif %}

@@ -20,6 +20,7 @@ Nothing here is published on `postulo.plugins.api`: it waits for a plugin that n
 
 from __future__ import annotations
 
+import hashlib
 import posixpath
 from collections.abc import Iterator
 from dataclasses import dataclass
@@ -169,3 +170,27 @@ def would_prune(prefix: str, going: set[str]) -> int:
             emptied.add(node)
             count += 1
     return count
+
+
+#: The folder, under the media root, that thumbnails are kept in, one subfolder a person (#942).
+THUMBNAIL_FOLDER = "thumbnails"
+
+
+def thumbnail_name(name: str) -> str:
+    """Where the thumbnail of the stored file ``name`` lives, worked out and never stored.
+
+    A thumbnail is a derived file with no row (see `documents.previews`), so the sweep for
+    files nobody names, the deletion of a file and the deletion of an account all need the
+    name without a model. Under the folder of the same person, which is the second component
+    of an upload's own name (``documents/<owner>/...``); a name that has none gets none.
+    """
+    parts = name.replace("\\", "/").split("/")
+    if len(parts) < 3 or parts[0] != "documents" or not parts[1].isdigit() or ".." in parts:
+        return ""
+    digest = hashlib.sha256(name.encode("utf-8")).hexdigest()[:40]
+    return f"{THUMBNAIL_FOLDER}/{parts[1]}/{digest}.webp"
+
+
+def thumbnail_names(names) -> set[str]:
+    """The thumbnails that may exist for these stored files, for whoever has to count them."""
+    return {one for one in (thumbnail_name(name) for name in names) if one}

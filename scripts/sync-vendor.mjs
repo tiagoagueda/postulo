@@ -4,7 +4,7 @@
 // security policy allows scripts from Postulo's own origin only, so nothing is ever loaded
 // from a CDN.
 
-import { copyFileSync, existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { copyFileSync, existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 
 const DESTINATION = "src/postulo/static/js/vendor";
@@ -24,6 +24,9 @@ const NOTICES = [
   // Leaflet (BSD-2-Clause) and its clustering plugin (MIT) draw the companies' map (#898).
   ["leaflet/LICENSE", "src/postulo/static/js/vendor/leaflet/LICENSE.txt"],
   ["leaflet.markercluster/MIT-LICENCE.txt", "src/postulo/static/js/vendor/leaflet.markercluster/LICENSE.txt"],
+  // pdf.js (Apache-2.0) draws a PDF in the document viewer (#942). Its fonts, character maps
+  // and decoders carry notices of their own, copied beside them by DIRECTORIES below.
+  ["pdfjs-dist/LICENSE", "src/postulo/static/js/vendor/pdfjs/LICENSE.txt"],
 ];
 
 // [source in node_modules, name under DESTINATION]
@@ -53,6 +56,23 @@ const FILES = [
   ["leaflet.markercluster/dist/leaflet.markercluster.js", "leaflet.markercluster/leaflet.markercluster.js"],
   ["leaflet.markercluster/dist/MarkerCluster.css", "leaflet.markercluster/MarkerCluster.css"],
   ["leaflet.markercluster/dist/MarkerCluster.Default.css", "leaflet.markercluster/MarkerCluster.Default.css"],
+  // pdf.js draws a PDF in the document viewer (#942): the library and its worker, both loaded
+  // as modules from Postulo's own origin by a page that shows a document, and by no other.
+  // Not `pdf_viewer.mjs`: the viewer's controls are Postulo's own, drawn by the page script,
+  // and what the library is asked for is the document, a canvas and a text layer.
+  ["pdfjs-dist/build/pdf.min.mjs", "pdfjs/pdf.min.mjs"],
+  ["pdfjs-dist/build/pdf.worker.min.mjs", "pdfjs/pdf.worker.min.mjs"],
+];
+
+// Whole folders of pdf.js's data, copied byte for byte: [source folder, destination folder,
+// which names to leave out]. The character maps and the standard fonts are what a PDF that
+// carries none of its own needs. The WebAssembly files are left out: the viewer runs with
+// `useWasm: false`, so the policy needs no `'wasm-unsafe-eval'`, and only the JavaScript
+// stand-ins for the decoders are copied, with the notice of each.
+const DIRECTORIES = [
+  ["pdfjs-dist/cmaps", "pdfjs/cmaps", () => false],
+  ["pdfjs-dist/standard_fonts", "pdfjs/standard_fonts", () => false],
+  ["pdfjs-dist/wasm", "pdfjs/wasm", (name) => name.endsWith(".wasm") || name.startsWith("quickjs") || name.includes("QCMS")],
 ];
 
 // Images a vendored stylesheet points at, copied byte for byte. The manifest storage refuses a
@@ -93,6 +113,20 @@ for (const [source, name] of BINARIES) {
   mkdirSync(dirname(to), { recursive: true });
   copyFileSync(from, to);
   console.log(`${name} <- ${source}`);
+}
+for (const [source, name, leaveOut] of DIRECTORIES) {
+  const from = join("node_modules", source);
+  if (!existsSync(from)) {
+    console.error(`${from} is missing; run "npm ci" first.`);
+    failed = true;
+    continue;
+  }
+  const to = join(DESTINATION, name);
+  mkdirSync(to, { recursive: true });
+  for (const file of readdirSync(from).sort()) {
+    if (!leaveOut(file)) copyFileSync(join(from, file), join(to, file));
+  }
+  console.log(`${name}/ <- ${source}/`);
 }
 for (const [source, to] of NOTICES) {
   const from = join("node_modules", source);

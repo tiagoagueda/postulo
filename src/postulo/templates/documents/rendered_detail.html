@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{{ document.title }}{% endblock %}
+
+{% block content %}
+  <div class="mb-6 flex flex-wrap items-start gap-4">
+    <div class="min-w-0">
+      <c-page-title>{{ document.title }}</c-page-title>
+      <p class="text-sm text-ink-500 dark:text-ink-400">
+        {{ document.rendered_at|date:"DATETIME_FORMAT" }}
+        {% if document.application %}
+          · <a href="{{ document.application.get_absolute_url }}" class="underline"><bdi>{{ document.application.posting.title }}</bdi></a>
+        {% elif document.sent_to %}
+          · <bdi>{{ document.sent_to }}</bdi>
+        {% else %}
+          · {% translate "Exported on its own" %}
+        {% endif %}
+      </p>
+    </div>
+    <div class="ms-auto flex flex-wrap items-center gap-2">
+      <a href="{% url 'documents:rendered_list' %}" class="btn" data-variant="ghost">{% translate "Sent documents" %}</a>
+    </div>
+  </div>
+
+  <section class="card" aria-labelledby="sent-preview-heading">
+    <c-section-title id="sent-preview-heading">{% translate "As it was sent" %}</c-section-title>
+    {% url 'documents:rendered_download' document.pk as download_url %}
+    {% url 'documents:rendered_preview' document.pk as preview_url %}
+    <c-document-viewer :kind="preview.kind" :src="preview_url" :title="document.title" :download="download_url" />
+  </section>
+{% endblock %}

@@ -107,6 +107,11 @@ def _lies_under(name: str, folder: str) -> bool:
     return posixpath.normpath(name).startswith(folder.rstrip("/") + "/")
 
 
+def lies_under(name: str, folder: str) -> bool:
+    """`_lies_under`, for a caller that has to check a name before it reads the file (#942)."""
+    return _lies_under(name, folder)
+
+
 def _type_by_extension(filename: str) -> str:
     """The media type for a file name, from its extension and nothing else (#771).
 
@@ -182,6 +187,54 @@ def serve_private_file(
     response["X-Content-Type-Options"] = "nosniff"
     # See `FILE_POLICY`. Set here rather than at each call site, so a view added later
     # carries it without anybody having to remember (#264).
+    response["Content-Security-Policy"] = FILE_POLICY
+    return response
+
+
+#: What may be answered **inline** to the document viewer (#942), and nothing else: the types
+#: of the viewer's own kinds. Worked out from the stored name's extension by the caller's
+#: `previews.preview_of`, never from a title or from anything a person typed (#771); an HTML,
+#: SVG, script or Word file is never on this list and is always an attachment.
+PREVIEW_TYPES = frozenset(
+    {"application/pdf", "image/png", "image/jpeg", "image/webp", "text/plain; charset=utf-8"}
+)
+
+
+def serve_private_preview(
+    request: HttpRequest, file_field, *, preview_type: str, download_name: str, within: str
+) -> HttpResponse:
+    """Answer a kept file **inline**, for the viewer to draw, when its kind may be drawn.
+
+    `serve_private_file` for the kinds a page may show: ``preview_type`` is the type the
+    caller worked out from the extension (`documents.previews`), and one outside
+    `PREVIEW_TYPES` is a 404, so there is no way to ask a preview for a file that is a
+    download. The type on the response is that one, not a guess from the name; text carries
+    its charset; ``nosniff``, ``no-store`` and the file policy are `serve_private_file`'s own.
+    ``within`` is required, as it is for a download. Performs **no** permission checking.
+    """
+    if preview_type not in PREVIEW_TYPES:
+        raise Http404("No preview for this file.")
+    response = serve_private_file(
+        request, file_field, download_name=download_name, as_attachment=False, within=within
+    )
+    # An inline answer is never handed to a proxy that would not add the policy: the type
+    # stays the one the extension gave, and text is always declared as UTF-8 text.
+    if preview_type.startswith("text/plain"):
+        response["Content-Type"] = preview_type
+    return response
+
+
+def serve_thumbnail(data: bytes) -> HttpResponse:
+    """Answer a thumbnail Postulo made (#942): WebP bytes, inline, and under the file policy.
+
+    The bytes are ones this process wrote through Pillow, so the type is fixed rather than
+    read from anywhere. ``no-store`` as for the file it shows: a thumbnail of somebody's
+    certificate is as private as the certificate. Performs **no** permission checking.
+    """
+    response = HttpResponse(data, content_type="image/webp")
+    response["Content-Disposition"] = "inline"
+    response["Cache-Control"] = "private, max-age=0, no-store"
+    response["X-Content-Type-Options"] = "nosniff"
     response["Content-Security-Policy"] = FILE_POLICY
     return response
 

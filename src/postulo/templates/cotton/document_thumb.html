@@ -1,0 +1,16 @@
+{% load postulo %}
+<c-vars src="" />
+{% comment %} The small picture of a file's first page, or the icon of its kind (#942):
+   `<c-document-thumb src="{% url 'documents:upload_thumb' d.pk %}" />`, with no `src` for a file
+   that has no picture (a Word file, a text file), which is only the icon.
+
+   The icon is always drawn and the picture is laid over it. A picture that cannot be made --
+   a file that is not a PDF in fact, or the library that draws one not installed -- answers 404,
+   the page script hides it (`data-document-thumb`), and the icon shows through, with no broken
+   image in between. It carries no text of its own (`alt=""`): the title beside it names the file.
+   `loading="lazy"` and a fixed size keep a long list from moving as the pictures arrive.
+{% endcomment %}
+<span class="document-thumb" data-document-thumb aria-hidden="true">
+  {% icon "file-text" class="size-5" %}
+  {% if src %}<img src="{{ src }}" alt="" width="48" height="64" loading="lazy" decoding="async">{% endif %}
+</span>
