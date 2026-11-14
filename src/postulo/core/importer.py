@@ -1714,7 +1714,7 @@ def _load(user, archive: zipfile.ZipFile, *, force: bool = False, into=None) -> 
     # The calendars followed, which format 82 is the first to carry (#1098).
     _restore_subscriptions(user, document.get("calendar_subscriptions"), report)
 
-    # The answers kept for application forms, which format 85 is the first to carry (#1092).
+    # The answers kept for application forms, which format 86 is the first to carry (#1092).
     saved_answers = _restore_saved_answers(
         user, document.get("saved_answers"), tags_by_slug, report
     )
