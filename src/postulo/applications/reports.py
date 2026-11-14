@@ -36,7 +36,7 @@ from django.utils import formats, timezone
 from django.utils.translation import gettext_lazy as _
 
 from postulo.core import weeks
-from postulo.jobs.models import Company, CompanyKind
+from postulo.jobs.models import Company, CompanyKind, Contact
 
 from . import endings
 from .analytics import RESPONSE_STATUSES, interviews_held
@@ -532,7 +532,9 @@ def build(user, period: Period, *, today: dt.date | None = None) -> Report:
     )
     if office is not None:
         report.office = office.name
-        adviser = office.contacts.order_by("pk").first()
+        # Only a contact the reader may see: one added at a shared company stays its
+        # author's (#1276).
+        adviser = Contact.objects.visible_to(user).filter(company=office).order_by("pk").first()
         report.adviser = adviser.name if adviser else ""
 
     by_sector: dict[str, int] = {}
