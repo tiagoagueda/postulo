@@ -240,3 +240,56 @@ def test_the_ci_header_names_every_action_the_workflow_uses():
     assert used, "the reader found no action"
     missing = [name for name in used if name not in header]
     assert not missing, f"ci.yml's header does not name: {missing}"
+
+
+# ------------------------------------------------------------- Deploying with Docker Compose
+
+
+def test_the_deployment_page_compose_file_is_held_to_the_one_in_the_repository():
+    """#704: the page's stand-alone Compose file cannot drift from `docker/compose.yml`.
+
+    It may differ in exactly what makes it stand alone (no build override, an `env_file`
+    beside it), and in nothing else that matters: the same services, the same image tag, the
+    minor of the version in the tree, and every `POSTULO_*` name in it one Postulo reads.
+    """
+    import tomllib
+
+    import yaml
+
+    from postulo.core.configuration import VARIABLES
+
+    text = page("Deploying-with-Docker-Compose")
+    blocks = re.findall(r"```yaml\n(.*?)```", text, re.DOTALL)
+    compose = next(yaml.safe_load(b) for b in blocks if b.startswith("name: postulo"))
+    repo = yaml.safe_load((ROOT / "docker" / "compose.yml").read_text(encoding="utf-8"))
+
+    assert set(compose["services"]) == set(repo["services"])
+    version = tomllib.loads((ROOT / "pyproject.toml").read_text(encoding="utf-8"))["project"][
+        "version"
+    ]
+    minor = ".".join(version.split(".")[:2])
+    known = set(VARIABLES) | set(
+        re.findall(
+            r"POSTULO_[A-Z0-9_]+",
+            (ROOT / "docker" / "entrypoint.sh").read_text(encoding="utf-8"),
+        )
+    )
+    for name, service in compose["services"].items():
+        mine = repo["services"][name]
+        assert service["image"] == mine["image"], f"{name}: {service['image']}"
+        assert service["image"].rsplit(":", 1)[1] == minor
+        assert service["env_file"] == [".env"]
+        for key in ("command", "healthcheck", "depends_on", "profiles", "volumes", "ports"):
+            assert service.get(key) == mine.get(key), f"{name}: {key} differs from compose.yml"
+        for variable in service.get("environment", {}):
+            assert variable in known, f"{name}: {variable} is not a setting Postulo reads"
+        assert service.get("environment") == mine.get("environment")
+    assert compose["volumes"] == repo["volumes"]
+    # The names in the .env example are held to the registry too.
+    for variable in re.findall(r"^#? ?(POSTULO_[A-Z0-9_]+)=", text, re.MULTILINE):
+        assert variable in known, f"{variable} is not a setting Postulo reads"
+
+
+def test_no_wiki_page_says_there_is_no_background_worker():
+    for path in sorted(WIKI.glob("*.md")):
+        assert "no background worker" not in path.read_text(encoding="utf-8").lower(), path.name
