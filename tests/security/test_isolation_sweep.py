@@ -675,9 +675,16 @@ FACTORIES: dict[str, Callable] = {
     "documents:rendered_archive": pk_of(rendered),
     "documents:rendered_compare": pk_of(rendered),
     "documents:rendered_download": pk_of(rendered),
+    # the viewer's own pages: the file drawn, and its thumbnail (#942)
+    "documents:rendered_detail": pk_of(rendered),
+    "documents:rendered_preview": pk_of(rendered),
+    "documents:rendered_thumb": pk_of(rendered),
     "documents:upload_archive": pk_of(upload),
     "documents:upload_delete": pk_of(upload),
     "documents:upload_download": pk_of(upload),
+    "documents:upload_detail": pk_of(upload),
+    "documents:upload_preview": pk_of(upload),
+    "documents:upload_thumb": pk_of(upload),
     "documents:upload_update": pk_of(upload),
     # jobs
     "jobs:capture_delete": pk_of(capture),
@@ -1529,6 +1536,15 @@ def test_a_citation_count_cannot_name_somebody_elses_publication(client, user, o
 #: here is a place where "404 for somebody else's" proves nothing by itself, so each names
 #: the test that does prove it.
 OWN_RECORD_NOT_REACHED_HERE: dict[str, str] = {
+    "documents:upload_thumb": (
+        "the sweep's file is not a real PDF, so it has no first page to draw and the owner's "
+        "own request is a 404 too; tests/test_previews.py draws one for a real PDF and asks "
+        "for somebody else's"
+    ),
+    "documents:rendered_thumb": (
+        "the sweep's file is not a real PDF, so it has no first page to draw and the owner's "
+        "own request is a 404 too; tests/test_previews.py asks for somebody else's"
+    ),
     "jobs:capture_bind": (
         "the listing it names is in the body, which this request does not carry; "
         "test_a_capture_cannot_be_bound_across_accounts below asks for both"

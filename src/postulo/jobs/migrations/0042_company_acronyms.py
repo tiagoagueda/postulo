@@ -26,7 +26,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='companyname',
             name='kind',
-            field=models.CharField(choices=[('name', 'Name in a language'), ('acronym', 'Acronym or short name')], default='name', max_length=8, verbose_name='kind'),
+            field=models.CharField(choices=[('name', 'Name in a language'), ('acronym', 'Acronym or short name')], default='name', max_length=8, verbose_name='type'),
         ),
         migrations.AlterField(
             model_name='companyname',

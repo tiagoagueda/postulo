@@ -1543,6 +1543,12 @@ class AppearanceForm(forms.ModelForm):
         choices=Profile._meta.get_field("show_country").choices,
         required=False,
         widget=forms.RadioSelect,
+        # Here and not in Meta.help_texts, which a declared field ignores.
+        help_text=_(
+            "Automatically shows a place as the city alone while all your companies are "
+            "in one country, and as the city and country as soon as there are two. "
+            "Documents, exports and the API keep the country whatever you choose here."
+        ),
     )
 
     class Meta:
@@ -1575,11 +1581,6 @@ class AppearanceForm(forms.ModelForm):
             "weekday_names": _("Weekday names on the calendar"),
         }
         help_texts = {
-            "show_country": _(
-                "Automatically shows a place as the city alone while all your companies are "
-                "in one country, and as the city and country as soon as there are two. "
-                "Documents, exports and the API keep the country whatever you choose here."
-            ),
             # Under Appearance rather than Accessibility, by the rule #281 set: file a
             # choice by what somebody is looking for, not by what motivated it. A person
             # who wants more rows on a screen looks here (#292).

@@ -43,6 +43,7 @@ def countries_in_play(user) -> frozenset[str]:
     if user is None or not getattr(user, "is_authenticated", False):
         return frozenset()
     from django.contrib.contenttypes.models import ContentType
+    from django.db.models import Count
 
     from .models import PostalAddress
 
@@ -53,8 +54,12 @@ def countries_in_play(user) -> frozenset[str]:
             content_type=ContentType.objects.get_for_model(Company), object_id__in=visible
         )
         .exclude(country="")
+        # Grouped rather than DISTINCT, and unordered: the model's own order would make every
+        # row its own (#552).
+        .order_by()
+        .values("country")
+        .annotate(places=Count("pk"))
         .values_list("country", flat=True)
-        .distinct()
     )
     profile = getattr(user, "profile", None)
     if profile is not None and getattr(profile, "pk", None):

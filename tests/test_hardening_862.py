@@ -60,14 +60,15 @@ def test_career_draws_the_group_with_a_popover_for_two_ways_in(client, user):
     box = group(html, "career")
     assert 'data-transfer="import"' in box and 'data-transfer="export"' in box
     assert 'popovertarget="import-career"' in box, "Europass and the record: two, so it asks"
-    assert reverse("resume:candidate_file") in box, "one way out goes straight there"
+    assert 'popovertarget="export-career"' in box, "the record and the bibliography (#879): two"
+    assert reverse("resume:candidate_file") in html
     assert 'id="import-career"' in html and reverse("resume:europass_import") in html
 
 
-def test_a_plugins_format_joins_the_list_and_turns_a_link_into_a_choice(client, user):
+def test_a_plugins_format_joins_the_list_of_ways_out(client, user):
     client.force_login(user)
     before = client.get(reverse("resume:overview")).content.decode()
-    assert 'popovertarget="export-career"' not in before
+    assert "/json-resume/" not in before
 
     api.register_transfer(
         api.Transfer(
@@ -76,7 +77,7 @@ def test_a_plugins_format_joins_the_list_and_turns_a_link_into_a_choice(client, 
     )
     after = client.get(reverse("resume:overview")).content.decode()
 
-    assert 'popovertarget="export-career"' in after and "/json-resume/" in after
+    assert "/json-resume/" in after
     assert "JSON Resume" in after
 
 

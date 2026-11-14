@@ -212,6 +212,7 @@ def test_these_are_the_plugins_that_ship_across_eleven_kinds():
         "maps",
         "wikidata",
         "publication-lookups",
+        "bibliography-lookups",
         "register-lookup",
         "register-adapters",
         "multiple-fields",
@@ -225,6 +226,7 @@ def test_these_are_the_plugins_that_ship_across_eleven_kinds():
         "format-geojson",
         "format-europass",
         "format-json-resume",
+        "format-bibliography",
     }
 
 

@@ -526,6 +526,13 @@ NATIVE_ON_PURPOSE: dict[tuple[str, str], str] = {
     ("templates/cotton/date_picker.html", ""): (
         "the calendar's month and year: unnamed, so never posted, and a year is typed into"
     ),
+    # The viewer's zoom (#942): the page script sets its value from the zoom buttons and the
+    # fit modes, and adds an option for a zoom the list does not hold; it is unnamed, so never
+    # posted. A drawn list is built from the select when it is opened and would show the old
+    # choice until then.
+    ("templates/cotton/document_viewer.html", ""): (
+        "the viewer's zoom: the script sets its value and adds an option, and it is never posted"
+    ),
 }
 
 
