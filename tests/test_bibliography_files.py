@@ -264,6 +264,7 @@ def test_biblatex_out_keeps_the_type_and_the_whole_date(user):
         references.RIS,
         references.CSL_JSON,
         references.MODS,
+        references.ENDNOTE,
     ],
 )
 def test_what_is_written_reads_back_the_same(user, fmt):
@@ -301,7 +302,7 @@ def test_what_is_written_reads_back_the_same(user, fmt):
     }
     if fmt == references.BIBTEX:
         expected["date"] = "2020-09"
-    if fmt in (references.RIS, references.CSL_JSON, references.MODS):
+    if fmt in (references.RIS, references.CSL_JSON, references.MODS, references.ENDNOTE):
         # Braces are the title's own here; only BibTeX's use of them is decoded.
         expected["title"] = "Array programming: a {survey} & more"
     for name, value in expected.items():
@@ -393,6 +394,103 @@ def test_mods_out_is_well_formed_xml_whatever_the_title_holds(user):
     (back,) = references.read(out.encode(), "x.xml").entries
     assert back["title"] == "A <b>&</b> title"
     assert back["entry_type"] == "phdthesis" and back["authors"] == "Smith, Jo"
+
+
+ENDNOTE_FILE = """<?xml version="1.0" encoding="UTF-8" ?>
+<xml><records>
+<record>
+  <database name="My EndNote Library.enl" path="C:\\Users\\a\\My EndNote Library.enl">Lib</database>
+  <source-app name="EndNote" version="21.0">EndNote</source-app>
+  <rec-number>1</rec-number>
+  <ref-type name="Journal Article">17</ref-type>
+  <contributors>
+    <authors>
+      <author><style face="normal" font="default" size="100%">Harris, Charles R.</style></author>
+      <author>Millman, K. Jarrod</author>
+    </authors>
+    <secondary-authors><author>Ed, Ita</author></secondary-authors>
+  </contributors>
+  <titles>
+    <title><style face="normal" font="default">Array programming with NumPy</style></title>
+    <secondary-title>Nature</secondary-title>
+  </titles>
+  <periodical><full-title>Nature</full-title></periodical>
+  <pages>357-362</pages>
+  <volume>585</volume>
+  <number>7825</number>
+  <dates><year>2020</year><pub-dates><date>Sep 16</date></pub-dates></dates>
+  <isbn>0028-0836</isbn>
+  <label>harris2020</label>
+  <urls><related-urls><url>javascript:alert(1)</url>
+    <url>https://example.org/paper</url></related-urls></urls>
+  <electronic-resource-num>10.1038/s41586-020-2649-2</electronic-resource-num>
+  <abstract>Long text.</abstract>
+  <keywords><keyword>arrays</keyword></keywords>
+</record>
+<record>
+  <ref-type name="Thesis">32</ref-type>
+  <work-type>Master's thesis</work-type>
+  <titles><title>Theory</title></titles>
+  <publisher>Utah</publisher>
+  <dates><year>2019</year></dates>
+</record>
+<record><ref-type name="Book">6</ref-type></record>
+<record><ref-type>47</ref-type><titles><title>Notebooks in class</title></titles></record>
+</records></xml>
+"""
+
+
+def test_endnote_xml_is_read_into_a_publications_fields():
+    reading = references.read(ENDNOTE_FILE.encode(), "export.xml")
+
+    first, second, third = reading.entries
+    assert reading.format == references.ENDNOTE
+    assert first["entry_type"] == "article"
+    assert first["title"] == "Array programming with NumPy", "the style wrappers are text"
+    assert first["authors"] == "Harris, Charles R.\nMillman, K. Jarrod"
+    assert first["editors"] == "Ed, Ita"
+    assert (first["container_title"], first["volume"], first["number"]) == ("Nature", "585", "7825")
+    assert first["pages"] == "357–362" and first["date"] == "2020-09-16"
+    assert first["doi"] == "10.1038/s41586-020-2649-2"
+    assert first["url"] == "https://example.org/paper", "a link that is not http is dropped"
+    assert first["cite_key"] == "harris2020"
+    assert second["entry_type"] == "mastersthesis" and second["institution"] == "Utah"
+    assert second["date"] == "2019"
+    assert third["entry_type"] == "inproceedings", "a type with no name is read by its code"
+    assert reading.skipped == 1, "a record with no title is counted"
+    assert reading.left_out == ["ISBN/ISSN", "abstract", "keywords"]
+
+
+@pytest.mark.parametrize(
+    "body",
+    [
+        '<?xml version="1.0"?><!DOCTYPE x [<!ENTITY e "boom">]>'
+        "<xml><records><record>&e;</record></records></xml>",
+        "<xml><records><record><titles><title>x",
+        "<html><body>not it</body></html>",
+    ],
+)
+def test_endnote_with_entities_or_broken_markup_is_refused_not_expanded(body):
+    with pytest.raises(references.ReferencesRefused):
+        references.read_endnote(body.encode())
+
+
+def test_endnote_out_has_the_types_name_and_code_and_reads_back(user):
+    item = make(
+        user,
+        entry_type="mastersthesis",
+        title="Theory & practice",
+        authors="Kay, Alan",
+        institution="Utah",
+        date="2019-06-01",
+    )
+    out = references.write(references.ENDNOTE, [item])
+
+    assert '<ref-type name="Thesis">32</ref-type>' in out
+    assert "<year>2019</year>" in out and "Theory &amp; practice" in out
+    (back,) = references.read(out.encode(), "x.xml").entries
+    assert back["entry_type"] == "mastersthesis" and back["institution"] == "Utah"
+    assert back["date"] == "2019-06-01" and back["title"] == "Theory & practice"
 
 
 # ------------------------------------------------------------------- the page

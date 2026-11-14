@@ -1,4 +1,6 @@
-"""Publications as reference-manager files: BibTeX, BibLaTeX, RIS, CSL JSON and MODS (#879).
+"""Publications as reference-manager files, BibTeX to EndNote XML (#879).
+
+BibTeX, BibLaTeX, RIS, CSL JSON, MODS and EndNote XML.
 
 Zotero, Mendeley, JabRef, EndNote and a LaTeX bibliography all exchange references in a
 handful of text formats, and a publication is already shaped like a BibTeX entry (#687, with
@@ -60,6 +62,7 @@ BIBLATEX = "biblatex"
 RIS = "ris"
 CSL_JSON = "csl-json"
 MODS = "mods"
+ENDNOTE = "endnote"
 
 
 class ReferencesRefused(Exception):
@@ -92,6 +95,7 @@ FORMATS: dict[str, Format] = {
     MODS: Format(
         MODS, "MODS", "xml", "application/mods+xml", "Library catalogues, Zotero, bibutils"
     ),
+    ENDNOTE: Format(ENDNOTE, "EndNote XML", "xml", "application/xml", "EndNote, Zotero"),
 }
 
 
@@ -998,6 +1002,233 @@ def write_mods(items) -> str:
     return '<?xml version="1.0" encoding="UTF-8"?>\n' + body + "\n"
 
 
+# ------------------------------------------------------------------------- EndNote XML
+
+#: EndNote's reference type, by the name its ``ref-type`` carries (the number is its code and
+#: is only used when the name is missing), onto `publications.TYPES`.
+_ENDNOTE_NAMES = {
+    "journal article": "article",
+    "magazine article": "article",
+    "newspaper article": "article",
+    "electronic article": "article",
+    "book": "book",
+    "edited book": "book",
+    "electronic book": "book",
+    "book section": "incollection",
+    "electronic book section": "incollection",
+    "conference paper": "inproceedings",
+    "conference proceedings": "proceedings",
+    "thesis": "phdthesis",
+    "report": "techreport",
+    "computer program": "software",
+    "dataset": "dataset",
+    "web page": "online",
+    "blog": "online",
+    "manuscript": "unpublished",
+    "unpublished work": "unpublished",
+    "generic": "misc",
+}
+_ENDNOTE_CODES = {
+    17: "article",
+    6: "book",
+    5: "incollection",
+    47: "inproceedings",
+    10: "proceedings",
+    32: "phdthesis",
+    27: "techreport",
+    9: "software",
+    59: "dataset",
+    12: "online",
+    36: "unpublished",
+    13: "misc",
+}
+#: What each is called, and numbered, going out. EndNote has no more precise home for the rest.
+_ENDNOTE_OUT = {
+    "article": ("Journal Article", 17),
+    "inproceedings": ("Conference Paper", 47),
+    "proceedings": ("Conference Proceedings", 10),
+    "book": ("Book", 6),
+    "inbook": ("Book Section", 5),
+    "incollection": ("Book Section", 5),
+    "phdthesis": ("Thesis", 32),
+    "mastersthesis": ("Thesis", 32),
+    "techreport": ("Report", 27),
+    "manual": ("Report", 27),
+    "booklet": ("Generic", 13),
+    "unpublished": ("Unpublished Work", 34),
+    "online": ("Web Page", 12),
+    "dataset": ("Dataset", 59),
+    "software": ("Computer Program", 9),
+    "misc": ("Generic", 13),
+}
+_ENDNOTE_LEFT_OUT = {
+    "abstract": "abstract",
+    "keywords": "keywords",
+    "isbn": "ISBN/ISSN",
+    "research-notes": "research notes",
+    "accession-num": "accession number",
+}
+
+
+def _endnote_names(record, path: str) -> list[str]:
+    return [
+        name for name in (text("".join(a.itertext()), 200) for a in record.iterfind(path)) if name
+    ]
+
+
+def _endnote_date(record) -> str:
+    """The year and the publication date of a ``dates`` element, as an ISO date."""
+    year = _t(record, "dates/year", 4)
+    stamp = _t(record, "dates/pub-dates/date", 40)
+    if re.match(r"[0-9]{4}", stamp):
+        return _date_text(stamp)
+    month = ""
+    day = ""
+    for word in re.split(r"[\s,./-]+", stamp):
+        if not month and (found := _month(word)) and not word.isdigit():
+            month = found
+        elif not day and word.isdigit() and 1 <= int(word) <= 31:
+            day = f"{int(word):02d}"
+    if not year:
+        return ""
+    return _iso_date(year, month, day if month else "") or _iso_date(year)
+
+
+def _from_endnote_record(record) -> tuple[dict[str, str], set[str]]:
+    ref = record.find("ref-type")
+    kind = ""
+    if ref is not None:
+        kind = _ENDNOTE_NAMES.get((ref.get("name") or "").strip().lower(), "")
+        if not kind:
+            try:
+                kind = _ENDNOTE_CODES.get(int("".join(ref.itertext()).strip()), "")
+            except ValueError:
+                kind = ""
+    kind = kind or "misc"
+    if kind == "phdthesis" and "master" in _t(record, "work-type", 80).lower():
+        kind = "mastersthesis"
+    values: dict[str, str] = {"entry_type": kind}
+    values["title"] = _t(record, "titles/title", _limit("title"))
+    values["authors"] = _name_list(
+        _endnote_names(record, "contributors/authors/author"), _limit("authors")
+    )
+    values["editors"] = _name_list(
+        _endnote_names(record, "contributors/secondary-authors/author"), _limit("editors")
+    )
+    values["container_title"] = _t(
+        record, "periodical/full-title", _limit("container_title")
+    ) or _t(record, "titles/secondary-title", _limit("container_title"))
+    values["series"] = _t(record, "titles/tertiary-title", _limit("series"))
+    holder = _t(record, "publisher", _limit("publisher"))
+    if kind in ("phdthesis", "mastersthesis", "techreport"):
+        values["institution"] = holder
+    else:
+        values["publisher"] = holder
+    values["location"] = _t(record, "pub-location", _limit("location"))
+    values["volume"] = _t(record, "volume", _limit("volume"))
+    values["number"] = _t(record, "number", _limit("number"))
+    values["edition"] = _t(record, "edition", _limit("edition"))
+    values["chapter"] = _t(record, "section", _limit("chapter"))
+    values["pages"] = _pages(_t(record, "pages", _limit("pages")))
+    values["date"] = _endnote_date(record)
+    values["doi"] = lookups.doi_from(_t(record, "electronic-resource-num", 500))
+    for url in record.iterfind("urls/related-urls/url"):
+        if link := _web_address("".join(url.itertext())):
+            values["url"] = link
+            break
+    values["language"] = _language(_t(record, "language", 40))
+    values["note"] = _t(record, "notes", _limit("note"))
+    values["cite_key"] = _t(record, "label", publications.CITE_KEY_MAX_LENGTH)
+    left_out = {label for tag, label in _ENDNOTE_LEFT_OUT.items() if record.find(tag) is not None}
+    return values, left_out
+
+
+def read_endnote(raw: bytes) -> Reading:
+    try:
+        root = _bare(parse_xml(raw))
+    except (ElementTree.ParseError, DefusedXmlException, RecursionError, ValueError) as error:
+        raise ReferencesRefused(_("That file is not EndNote XML.")) from error
+    records = list(root.iter("record")) if root.tag in ("xml", "records") else []
+    if not records and root.tag == "record":
+        records = [root]
+    if not records and root.tag not in ("xml", "records", "record"):
+        raise ReferencesRefused(_("That file is not EndNote XML."))
+    reading = Reading(format=ENDNOTE)
+    left_out: set[str] = set()
+    for index, record in enumerate(records):
+        if index >= MAX_ENTRIES:
+            reading.beyond += 1
+            continue
+        try:
+            values, ignored = _from_endnote_record(record)
+        except Exception:
+            reading.skipped += 1
+            continue
+        left_out |= ignored
+        if not values.get("title"):
+            reading.skipped += 1
+            continue
+        reading.entries.append({name: value for name, value in values.items() if value})
+    reading.left_out = sorted(left_out)
+    return reading
+
+
+def endnote_record(parent, item) -> None:
+    record = _sub(parent, "record")
+    name, code = _ENDNOTE_OUT.get(item.entry_type, ("Generic", 13))
+    _sub(record, "ref-type", str(code), name=name)
+    people = _sub(record, "contributors")
+    for tag, value in (("authors", item.authors), ("secondary-authors", item.editors)):
+        lines = [line for line in publications.names(value) if line != lookups.OTHERS]
+        if lines:
+            group = _sub(people, tag)
+            for line in lines:
+                _sub(group, "author", line)
+    titles = _sub(record, "titles")
+    _sub(titles, "title", item.title)
+    if item.container_title and item.entry_type != "article":
+        _sub(titles, "secondary-title", item.container_title)
+    if item.series:
+        _sub(titles, "tertiary-title", item.series)
+    if item.container_title and item.entry_type == "article":
+        _sub(_sub(record, "periodical"), "full-title", item.container_title)
+    if item.entry_type == "mastersthesis":
+        _sub(record, "work-type", "Master's thesis")
+    elif item.entry_type == "phdthesis":
+        _sub(record, "work-type", "PhD thesis")
+    _sub(record, "pages", item.pages)
+    _sub(record, "volume", item.volume)
+    _sub(record, "number", item.number)
+    _sub(record, "edition", item.edition)
+    _sub(record, "section", item.chapter)
+    if item.date:
+        dates = _sub(record, "dates")
+        _sub(dates, "year", item.date[:4])
+        if len(item.date) > 4:
+            _sub(_sub(dates, "pub-dates"), "date", item.date)
+    _sub(record, "publisher", item.publisher or item.institution)
+    _sub(record, "pub-location", item.location)
+    _sub(record, "label", item.cite_key)
+    if item.url:
+        _sub(_sub(_sub(record, "urls"), "related-urls"), "url", item.url)
+    _sub(record, "electronic-resource-num", item.doi)
+    _sub(record, "language", item.language)
+    _sub(record, "notes", item.note)
+
+
+def write_endnote(items) -> str:
+    root = ElementTree.Element("xml")
+    records = ElementTree.SubElement(root, "records")
+    for item in items:
+        endnote_record(records, item)
+    ElementTree.indent(root)
+    return (
+        '<?xml version="1.0" encoding="UTF-8"?>\n'
+        + ElementTree.tostring(root, encoding="unicode")
+        + "\n"
+    )
+
+
 # ------------------------------------------------------------------------- detection
 
 
@@ -1007,6 +1238,8 @@ def detect(raw: bytes, name: str = "") -> str:
     head = raw[:4096].decode("utf-8-sig", errors="replace").lstrip()
     if head.startswith(("{", "[")):
         return CSL_JSON
+    if head.startswith("<") and re.search(r"<records[\s>]|<record[\s>]", head) and ("<xml" in head):
+        return ENDNOTE
     if head.startswith("<") and re.search(r"<(?:\w+:)?mods(?:Collection)?[\s>]", head):
         return MODS
     if re.match(r"TY\s{1,2}-", head) or suffix == "ris":
@@ -1027,11 +1260,17 @@ def read(raw: bytes, name: str = "") -> Reading:
     if not fmt:
         raise ReferencesRefused(
             _(
-                "That file is not one of BibTeX, BibLaTeX, RIS, CSL JSON or MODS, "
+                "That file is not one of BibTeX, BibLaTeX, RIS, CSL JSON, MODS or EndNote XML, "
                 "so it was not read."
             )
         )
-    reader = {BIBTEX: read_bibtex, RIS: read_ris, CSL_JSON: read_csl_json, MODS: read_mods}[fmt]
+    reader = {
+        BIBTEX: read_bibtex,
+        RIS: read_ris,
+        CSL_JSON: read_csl_json,
+        MODS: read_mods,
+        ENDNOTE: read_endnote,
+    }[fmt]
     return reader(raw)
 
 
@@ -1312,4 +1551,6 @@ def write(fmt: str, items) -> str:
         return write_csl_json(items)
     if fmt == MODS:
         return write_mods(items)
+    if fmt == ENDNOTE:
+        return write_endnote(items)
     raise KeyError(fmt)
