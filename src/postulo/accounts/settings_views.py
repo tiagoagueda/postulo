@@ -17,7 +17,7 @@ from django.template.loader import render_to_string
 from django.urls import reverse, reverse_lazy
 from django.utils import timezone
 from django.utils.formats import time_format
-from django.utils.translation import gettext
+from django.utils.translation import gettext, pgettext_lazy
 from django.utils.translation import gettext_lazy as _
 from django.views import View
 from django.views.generic import RedirectView, TemplateView, UpdateView
@@ -271,7 +271,7 @@ class ExportView(ProfileSectionView):
 
     form_class = ExportMetadataForm
     template_name = "settings/export.html"
-    section_title = _("Export")
+    section_title = pgettext_lazy("the name of a section or a place, a noun", "Export")
 
 
 class ForgetRememberedPlacesView(LoginRequiredMixin, View):

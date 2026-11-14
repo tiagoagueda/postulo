@@ -66,6 +66,7 @@ All notable changes to Postulo are recorded here. The format follows
 ### 🐛 Fixed
 
 - Reading a job page: a word that follows the pay figure ("40,000 तक", "40.000 kadar") now makes it the most on offer, and a keyword is no longer found inside a longer word in Hindi, Bengali, Thai or Arabic (#1106)
+- "Export" and "Schedule" are each two strings now, one for the heading or place and one for the button, so a language can use a noun in the Settings menu and a verb on the button (#1107)
 - Names and addresses found in the Annuaire des Entreprises (and capital-letter names from the Norwegian and Polish registers) are written in normal case, with street types spelled out (#1244)
 - The names-in-other-languages popover on a company page is as wide as its content (#1243)
 - A notification that could not be sent, because the mail server, a push service or another notifier was briefly out of reach, is tried again by the scheduler, five minutes later and then at doubling intervals for about ten hours, instead of being lost. (#1163)

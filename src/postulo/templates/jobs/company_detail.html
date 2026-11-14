@@ -87,7 +87,7 @@
       <div class="button-group" role="group" aria-label="{% translate 'This company' %}" data-company-actions>
         <a href="{% url 'jobs:company_update' company.pk %}" class="btn" data-variant="outline">{% icon "pencil" %}<span class="btn-label">{% translate "Edit" %}</span></a>
         {% if sharing.manages %}<a href="{% url 'jobs:company_merge' company.pk %}" class="btn" data-variant="outline">{% icon "git-merge" %}<span class="btn-label">{% translate "Merge" %}</span></a>{% endif %}
-        <button type="button" class="btn" data-variant="outline" popovertarget="export-company" aria-haspopup="dialog">{% icon "download" %}<span class="btn-label">{% translate "Export" %}</span></button>
+        <button type="button" class="btn" data-variant="outline" popovertarget="export-company" aria-haspopup="dialog">{% icon "download" %}<span class="btn-label">{% translate "Export" context "a button or link that exports, a verb" %}</span></button>
         {% if sharing.manages %}<button type="button" class="btn" data-variant="destructive-ghost"
                 popovertarget="delete-company">{% icon "trash-2" %}<span class="btn-label">{% translate "Delete" %}</span></button>{% endif %}
       </div>
@@ -528,7 +528,7 @@
                      class="btn" data-variant="ghost" data-size="xs">{% translate "Edit" %}<span class="sr-only">: <bdi>{{ contact.name }}</bdi></span></a>
                   {% if gdpr_offered %}
                     <a href="{% url 'jobs:contact_export' contact.pk %}"
-                       class="btn" data-variant="ghost" data-size="xs">{% translate "Export" %}<span class="sr-only">: <bdi>{{ contact.name }}</bdi></span></a>
+                       class="btn" data-variant="ghost" data-size="xs">{% translate "Export" context "a button or link that exports, a verb" %}<span class="sr-only">: <bdi>{{ contact.name }}</bdi></span></a>
                   {% endif %}
                 </div>
               </li>

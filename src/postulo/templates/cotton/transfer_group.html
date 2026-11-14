@@ -15,9 +15,9 @@
       <button type="button" class="btn" data-variant="outline" data-transfer="import" popovertarget="import-{{ subject }}" aria-haspopup="true">{% icon "file-up" %}<span class="btn-label">{% translate "Import" %}</span></button>
     {% endif %}
     {% if group.exports|length == 1 %}
-      <a href="{{ group.exports.0.1 }}" class="btn" data-variant="outline" data-transfer="export"{% if subject == "calendar" %} download data-calendar-download{% endif %}>{% icon "file-down" %}<span class="btn-label">{% translate "Export" %}</span></a>
+      <a href="{{ group.exports.0.1 }}" class="btn" data-variant="outline" data-transfer="export"{% if subject == "calendar" %} download data-calendar-download{% endif %}>{% icon "file-down" %}<span class="btn-label">{% translate "Export" context "a button or link that exports, a verb" %}</span></a>
     {% elif group.exports %}
-      <button type="button" class="btn" data-variant="outline" data-transfer="export" popovertarget="export-{{ subject }}" aria-haspopup="true">{% icon "file-down" %}<span class="btn-label">{% translate "Export" %}</span></button>
+      <button type="button" class="btn" data-variant="outline" data-transfer="export" popovertarget="export-{{ subject }}" aria-haspopup="true">{% icon "file-down" %}<span class="btn-label">{% translate "Export" context "a button or link that exports, a verb" %}</span></button>
     {% endif %}
   </div>
   {% if group.imports|length > 1 %}

@@ -6,5 +6,5 @@
    is, and without a script every filter reloads the page. {% endcomment %}
 <form method="get" action="{% url 'core:table_export' table.name %}" data-table-export>
   <input type="hidden" name="from" value="{{ request.get_full_path }}" data-next-here>
-  <button type="submit" class="btn" data-variant="outline">{% icon "download" %} {% translate "Export" %}</button>
+  <button type="submit" class="btn" data-variant="outline">{% icon "download" %} {% translate "Export" context "a button or link that exports, a verb" %}</button>
 </form>

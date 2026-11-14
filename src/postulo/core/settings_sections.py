@@ -12,6 +12,7 @@ from dataclasses import dataclass, field
 
 from django.http import HttpRequest
 from django.utils.translation import gettext_lazy as _
+from django.utils.translation import pgettext_lazy
 
 
 @dataclass(frozen=True)
@@ -93,7 +94,7 @@ BUILTIN: tuple[SettingsSection, ...] = (
     # Capture, because it is the same kind of choice -- what a file carries about this person.
     SettingsSection(
         slug="export",
-        label=_("Export"),
+        label=pgettext_lazy("the name of a section or a place, a noun", "Export"),
         url_name="settings:export",
         icon="file-down",
         order=33,
