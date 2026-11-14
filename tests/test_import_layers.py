@@ -66,6 +66,8 @@ LAYERS: list[tuple[str, tuple[str, ...]]] = [
             "postulo.core.childenv",
             # Every environment variable, declared once and read by the settings (#1186).
             "postulo.core.configuration",
+            # What the environment holds of the Server pages' fields (#1186): the registry.
+            "postulo.core.pins",
             "postulo.core.flags",
             # A translated sentence with markup pieces, escaped (#806): Django and nothing else.
             "postulo.core.htmlstrings",

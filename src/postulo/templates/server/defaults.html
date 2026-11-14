@@ -29,6 +29,9 @@
          draws the flag in its button and beside every language in its list (#301), and
          this one is put away. The space is reserved whether or not a flag is showing, so
          choosing a language moves nothing. {% endcomment %}
+      {% if form.default_language.field.pinned_by %}
+        {% pinned_field form.default_language form.default_language.field.pinned_by %}
+      {% else %}
       <div class="field mb-4 wrap-anywhere"{% if form.default_language.errors %} data-invalid="true"{% endif %}>
         <label for="{{ form.default_language.id_for_label }}">{{ form.default_language.label }}</label>
         <div class="input-group">
@@ -37,6 +40,7 @@
         </div>
         <c-field-feedback :field="form.default_language" />
       </div>
+      {% endif %}
       {% if pinned.default_time_zone %}
         <div class="alert mb-4 text-sm" data-variant="info" data-pinned="default_time_zone">
           {% blocktranslate with variable=pinned.default_time_zone zone=effective_time_zone trimmed %}
@@ -89,6 +93,14 @@
         are drafts nobody has read yet, and how many are not translated at all.
       {% endblocktranslate %}
     </p>
+    {% if languages_form.pinned.offered_languages %}
+      <div class="alert mb-4 text-sm" data-variant="info" data-pinned="offered_languages">
+        {% blocktranslate with variable=languages_form.pinned.offered_languages trimmed %}
+          The languages offered are set by the environment: <code>{{ variable }}</code>.
+          Remove it from the environment to change them here.
+        {% endblocktranslate %}
+      </div>
+    {% else %}
     <c-field-feedback :field="languages_form.offered_languages" />
     {% comment %} The same row the locale picker draws: checkbox, flag, the name in its own
        language, in that order and with the flag outside the `lang` span (#208). The flag's
@@ -110,5 +122,6 @@
     <button type="submit" name="offered_languages_submit" value="1" class="btn mt-4">
       {% translate "Save" %}
     </button>
+    {% endif %}
   </form>
 {% endblock %}
