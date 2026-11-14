@@ -1324,6 +1324,17 @@ _VARIABLES: tuple[Variable, ...] = (
         notes="Empty: an index is a list of code to run, so pointing at one is a decision.",
     ),
     Variable(
+        "POSTULO_PLUGIN_UPDATE_CHECK",
+        Kind.CHOICE,
+        "plugins",
+        "Whether Postulo checks the plugin catalogues once a day for updates: daily, or off.",
+        default="daily",
+        choices=("daily", "off"),
+        notes="The check fetches only each catalogue's signed index; nothing is downloaded or "
+        "installed without an administrator's click. Set here, it wins over the switch on the "
+        "Plugins page (#1187).",
+    ),
+    Variable(
         "POSTULO_PLUGIN_PINS",
         Kind.TEXT,
         "plugins",

@@ -657,6 +657,10 @@ POSTULO_PLUGINS_DIR = environ.Path(read("POSTULO_PLUGINS_DIR"))
 # here before anything is fetched from it.
 POSTULO_PLUGIN_CATALOGUES = read("POSTULO_PLUGIN_CATALOGUES")
 
+# Whether the daily plugin update check runs; the administrator's switch on the Plugins page
+# decides when this is not set (#1187).
+POSTULO_PLUGIN_UPDATE_CHECK = read("POSTULO_PLUGIN_UPDATE_CHECK")
+
 # Plugins pinned to a version from the environment: `name==version`, comma-separated (#1264).
 POSTULO_PLUGIN_PINS = read("POSTULO_PLUGIN_PINS")
 

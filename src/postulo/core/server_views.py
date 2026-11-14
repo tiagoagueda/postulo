@@ -219,6 +219,10 @@ class OverviewView(ServerSectionMixin, TemplateView):
 
         media_files, media_bytes = _media_figures()
         database = settings.DATABASES["default"]
+        from postulo.plugins import updates as plugin_updates
+
+        plugin_updates.check_when_a_page_is_opened()
+        context["plugin_updates"] = plugin_updates.summary()
         context.update(
             {
                 "version": __version__,
@@ -1215,11 +1219,20 @@ class PluginsView(ServerSectionMixin, TemplateView):
         ]
         context["entry_point_group"] = ENTRY_POINT_GROUP
         context["allow_unlisted"] = installing.allows_unlisted()
+        from postulo.plugins import updates
+
+        updates.check_when_a_page_is_opened()
+        context["plugin_updates"] = updates.summary()
+        context["plugin_update_items"] = updates.pending()
         from postulo.plugins import holds
 
         found_holds = holds.all_holds()
         context["installed"] = [
-            {**row, "hold": found_holds.get(holds.canonicalise(row["name"]))}
+            {
+                **row,
+                "hold": found_holds.get(holds.canonicalise(row["name"])),
+                **_loaded_against_installed(row),
+            }
             for row in provenance.status()
         ]
         context["plugins_dir"] = str(installing.plugins_dir())
@@ -1891,6 +1904,42 @@ def _hold_facts(listing, current, all_holds) -> dict:
     return facts
 
 
+def _loaded_against_installed(row: dict) -> dict:
+    """The version this process runs against the one on the volume, until they agree (#1187)."""
+    from postulo.plugins import updates
+
+    if row.get("provenance") == "internal":
+        return {}
+    loaded = updates.loaded_version(row["name"])
+    return {"loaded_version": loaded, "restart_pending": bool(loaded and loaded != row["version"])}
+
+
+def _deploy_sentence(request) -> str:
+    """What happens to the running code after an update, said plainly (#1187).
+
+    Under gunicorn the web workers are asked to reload, which finishes the requests in flight;
+    the scheduler and the worker are other processes and keep what they loaded. Anywhere else
+    a restart is what finishes it, and the reason is given.
+    """
+    from postulo.plugins import updates
+
+    others = updates.other_processes()
+    if updates.reload_web(request.META.get("SERVER_SOFTWARE", "")):
+        sentence = _("Updated. The web processes are reloading to use the new code.")
+        if others:
+            sentence = _(
+                "Updated. The web processes are reloading to use the new code. Restart %(others)s "
+                "to finish: each keeps the code it had already loaded."
+            ) % {"others": ", ".join(others)}
+        return str(sentence)
+    return str(
+        _(
+            "Updated. Restart Postulo to finish: this server cannot reload itself, and every "
+            "process keeps the code it had already loaded."
+        )
+    )
+
+
 def _held_sentence(held) -> str:
     """What the page says before moving a held plugin by hand (#1264)."""
     return str(
@@ -1940,6 +1989,9 @@ class PluginActionView(StaffRequiredMixin, View):
         "hold": "_hold",
         "lift": "_lift",
         "pin": "_pin",
+        "update": "_update",
+        "update_all": "_update_all",
+        "update_check": "_update_check",
     }
 
     def post(self, request: HttpRequest) -> HttpResponse:
@@ -2063,7 +2115,7 @@ class PluginActionView(StaffRequiredMixin, View):
         catalogues, problems = catalogue.fetch_all()
         for problem in problems:
             messages.error(request, problem)
-        from postulo.plugins import dependencies, holds, provenance
+        from postulo.plugins import dependencies, holds, provenance, updates
 
         official = provenance.official_repositories()
         all_holds = holds.all_holds()
@@ -2107,7 +2159,15 @@ class PluginActionView(StaffRequiredMixin, View):
                         # One list, three origins (#1263): a catalogue is official because of
                         # its key, never its name; the third origin is built in, and is not here.
                         "origin": "official" if one.name in official else "third-party",
-                        "installed": installing.installed(listing.name) is not None,
+                        "installed": current is not None,
+                        # Compared by PEP 440 order, so the button says what it will do (#1187).
+                        "installed_version": current.version if current else "",
+                        "update": bool(
+                            current
+                            and holds.newer(release.version, current.version)
+                            and installing.compatible(release.requires_postulo)
+                        ),
+                        "older": bool(current and holds.newer(current.version, release.version)),
                         "requires_postulo": release.requires_postulo,
                         "compatible": installing.compatible(release.requires_postulo),
                         "categories": list(listing.categories),
@@ -2123,6 +2183,8 @@ class PluginActionView(StaffRequiredMixin, View):
                     }
                 )
         request.session["plugin_listings"] = listings
+        # What the press found is kept, so the page and the notices read it afterwards (#1187).
+        updates.record(catalogues, problems)
         if catalogues and not listings:
             messages.info(request, _("The catalogues answered, and list nothing yet."))
         return redirect("server:plugins")
@@ -2166,6 +2228,66 @@ class PluginActionView(StaffRequiredMixin, View):
             _("%(name)s %(version)s is installed from the catalogue.")
             % {"name": entry.name, "version": entry.version},
         )
+        return redirect("server:plugins")
+
+    # -------------------------------------------------------------- updating
+
+    def _update(self, request: HttpRequest) -> HttpResponse:
+        from postulo.plugins import holds
+
+        name = request.POST.get("name", "")
+        held = holds.get(name)
+        if held is not None and request.POST.get("confirm_held") != "1":
+            messages.error(request, _held_sentence(held))
+            return redirect("server:plugins")
+        return self._run_updates(request, [name], include_held=True)
+
+    def _update_all(self, request: HttpRequest) -> HttpResponse:
+        return self._run_updates(
+            request, None, include_breaking=request.POST.get("include_breaking") == "1"
+        )
+
+    def _update_check(self, request: HttpRequest) -> HttpResponse:
+        from postulo.plugins import updates
+
+        try:
+            updates.switch(request.POST.get("checking") == "on", by=request.user)
+        except updates.UpdateError as error:
+            messages.error(request, str(error))
+            return redirect("server:plugins")
+        messages.success(
+            request,
+            _("Postulo checks the plugin catalogues for updates every day.")
+            if updates.enabled()
+            else _("Postulo no longer checks the plugin catalogues by itself."),
+        )
+        return redirect("server:plugins")
+
+    def _run_updates(self, request, names, *, include_breaking=False, include_held=False):
+        from postulo.plugins import updates
+
+        try:
+            result = updates.apply(
+                names,
+                by=request.user,
+                include_breaking=include_breaking,
+                include_held=include_held,
+            )
+        except updates.UpdateError as error:
+            messages.error(request, str(error))
+            return redirect("server:plugins")
+        for line in result.skipped:
+            messages.info(request, line)
+        if not result.updated:
+            messages.info(request, _("There was nothing to update."))
+            return redirect("server:plugins")
+        for name, before, after in result.updated:
+            messages.success(
+                request,
+                _("%(name)s was updated from %(before)s to %(after)s.")
+                % {"name": name, "before": before, "after": after},
+            )
+        messages.success(request, _deploy_sentence(request))
         return redirect("server:plugins")
 
     # ------------------------------------------------------- holding, pinning

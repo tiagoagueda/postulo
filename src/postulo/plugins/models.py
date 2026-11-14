@@ -148,6 +148,57 @@ class PluginHold(models.Model):
         return f"{self.plugin} {self.mode} {self.version}"
 
 
+class CatalogueAnswer(models.Model):
+    """What a catalogue last said, kept so that no page has to ask again (#1187).
+
+    One row per catalogue name, overwritten by each check (the daily one, or an administrator's
+    *Check for updates*). ``offers`` are the updates that answer held for what was installed
+    then, as plain dictionaries; the page and the notices read them back and compare them with
+    what is installed *now*, so an update applied since is not announced again. Only a verified
+    index is ever stored: a refusal (a bad signature, an expired index) is kept as ``error``
+    and leaves the offers it replaces empty, rather than showing what an untrusted answer said.
+    """
+
+    name = models.CharField(max_length=100, unique=True)
+    checked_at = models.DateTimeField()
+    ok = models.BooleanField(default=True)
+    error = models.TextField(blank=True)
+    offers = models.JSONField(default=list, blank=True)
+
+    class Meta:
+        verbose_name = _("catalogue answer")
+        verbose_name_plural = _("catalogue answers")
+        ordering = ("name",)
+
+    def __str__(self) -> str:
+        return f"{self.name}: {self.checked_at:%Y-%m-%d}"
+
+
+class PluginUpdateSettings(models.Model):
+    """Whether the daily update check runs, and what has been announced: one row (#1187).
+
+    ``checking`` is the administrator's switch, on by default; ``POSTULO_PLUGIN_UPDATE_CHECK``
+    wins over it when the environment sets one, and the page shows it as fixed. ``announced``
+    holds ``name==version`` for each update an administrator has been told about, so that an
+    update is announced once however many days it stays available.
+    """
+
+    checking = models.BooleanField(_("check for plugin updates every day"), default=True)
+    announced = models.JSONField(default=list, blank=True)
+
+    class Meta:
+        verbose_name = _("plugin update settings")
+        verbose_name_plural = _("plugin update settings")
+
+    def __str__(self) -> str:
+        return "plugin update settings"
+
+    @classmethod
+    def current(cls) -> PluginUpdateSettings:
+        row, _made = cls.objects.get_or_create(pk=1)
+        return row
+
+
 class PluginPolicy(models.Model):
     """What an administrator has decided about a plugin — for everybody, or for one person.
 

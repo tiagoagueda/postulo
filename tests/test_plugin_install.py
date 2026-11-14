@@ -826,9 +826,17 @@ def test_the_install_form_posts_the_catalogue_and_installs_from_it(
 
 
 def test_the_plugins_pages_make_no_request_to_a_catalogue(
-    client, admin, served, settings, plugins_dir, installer, monkeypatch
+    client, admin, served, settings, plugins_dir, installer, monkeypatch, tmp_path
 ):
-    """Rendering a page asked every repository for its index and its signature (#602)."""
+    """Rendering a page asked every repository for its index and its signature (#602).
+
+    Where a scheduler is running it makes the daily check, so a page asks nothing (#1187);
+    `test_plugin_updates` holds the instance with no scheduler.
+    """
+    from postulo.core import scheduler
+
+    settings.POSTULO_SCHEDULER_HEARTBEAT = tmp_path / "beat"
+    scheduler.beat()
     configure(settings, served["public"])
     installing.install_wheel(served["wheel_path"], by="ana")
     asked = []

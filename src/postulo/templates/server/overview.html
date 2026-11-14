@@ -9,6 +9,15 @@
     </c-slot>
   </c-page-title>
 
+  {% if plugin_updates.count %}
+    <div class="alert mb-6" data-variant="info" role="status" data-plugin-updates>
+      <div>
+        <p class="font-medium">{{ plugin_updates.sentence }}</p>
+        <p class="text-sm"><a href="{% url 'server:plugins' %}" class="text-brand-600 underline dark:text-brand-400">{% translate "Review them on the Plugins page" %}</a></p>
+      </div>
+    </div>
+  {% endif %}
+
   {% comment %} `[&>*]:min-w-0` on the cards, and `min-w-0` on the two values below that
      truncate. `truncate` sets `white-space: nowrap`, which makes a value's smallest
      possible width its whole width -- a database path, say -- and a flex item will not go

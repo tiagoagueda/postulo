@@ -168,7 +168,7 @@ def lift(name: str, *, by=None) -> None:
     if row is None:
         raise HoldError(str(_("“%(name)s” is not held.")) % {"name": name})
     row.delete()
-    _log("lifted", name, _who(by), version=row.version)
+    _log("lifted", name, who(by), version=row.version)
 
 
 def record_pin(name: str, version: str, *, by=None, note: str = "") -> Hold:
@@ -193,10 +193,10 @@ def follow_manual_install(name: str, version: str, *, by=None) -> None:
         return
     before, row.version = row.version, version
     row.save(update_fields=["version", "set_at"])
-    _log("moved by hand", name, _who(by), was=before, now=version)
+    _log("moved by hand", name, who(by), was=before, now=version)
 
 
-def _who(by) -> str:
+def who(by) -> str:
     if by is None:
         return ""
     return by if isinstance(by, str) else by.get_username()
@@ -210,13 +210,13 @@ def _save(mode: str, name: str, version: str, by, note: str, verb: str) -> Hold:
         plugin=canonicalise(name),
         defaults={"mode": mode, "version": version, "note": note[:300], "set_by": user},
     )
-    _log(verb, name, _who(by), version=version, why=note)
+    _log(verb, name, who(by), version=version, why=note)
     return Hold(
         plugin=row.plugin,
         mode=row.mode,
         version=row.version,
         note=row.note,
-        set_by=_who(by),
+        set_by=who(by),
         set_at=row.set_at,
     )
 

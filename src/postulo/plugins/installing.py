@@ -939,8 +939,12 @@ def install_wheel(
     disabled: bool = False,
     installed_at: str = "",
     requires: list[str] | None = None,
+    snapshot: bool = True,
 ) -> Installed:
     """Check a wheel, install it into the plugins directory, and record it.
+
+    ``snapshot=False`` is for a caller that has taken the snapshot itself, once, for a run of
+    several installs: a failure here then puts the directory back to before the whole run.
 
     ``disabled`` and ``installed_at`` are for a restore rather than for an install: `sync`
     puts a plugin back after an upgrade and has to put back the state it was in, not a
@@ -960,7 +964,8 @@ def install_wheel(
     # Kept before anything is written, because what this is protecting against is an
     # upgrade: `--target --upgrade` writes over the working version, and until #246 there
     # was nothing to go back to once it had.
-    take_snapshot()
+    if snapshot:
+        take_snapshot()
     try:
         constraint_file = target / ".constraints.txt"
         constraint_file.write_text(
@@ -970,7 +975,8 @@ def install_wheel(
             run_install(target, wheel, constraint_file)
         except InstallError as error:
             restore_snapshot()
-            give_back_snapshot()
+            if snapshot:
+                give_back_snapshot()
             raise InstallError(explain_conflict(str(error), exclude=info.name)) from error
         finally:
             constraint_file.unlink(missing_ok=True)
@@ -982,7 +988,8 @@ def install_wheel(
         _forget_metadata_cache()
         if broken := verify_imports(info.entry_points):
             restore_snapshot()
-            give_back_snapshot()
+            if snapshot:
+                give_back_snapshot()
             activate()
             _forget_metadata_cache()
             raise InstallError(
@@ -1026,11 +1033,13 @@ def install_wheel(
         # (#604). Without this the new plugin stayed on the volume with no line in the
         # record, loaded by every worker and impossible to switch off.
         restore_snapshot()
-        give_back_snapshot()
+        if snapshot:
+            give_back_snapshot()
         activate()
         _forget_metadata_cache()
         raise
-    keep_snapshot()
+    if snapshot:
+        keep_snapshot()
     activate()
     _forget_metadata_cache()
     return entry

@@ -34,6 +34,83 @@
     </div>
   </div>
 
+  {# ------------------------------------------------------------ updates #}
+  <c-section-title>
+    {% translate "Updates" %}
+    <c-slot name="subtitle">{% blocktranslate trimmed %}
+      Postulo fetches each catalogue's signed list once a day to see whether a plugin has a newer
+      release. Nothing is downloaded or installed until an administrator presses Update.
+    {% endblocktranslate %}</c-slot>
+  </c-section-title>
+  <div class="card mb-8 p-0" data-plugin-update-list>
+    <div class="flex flex-wrap items-center gap-3 border-b border-ink-100 px-4 py-3 dark:border-ink-800">
+      <p class="min-w-0 flex-1 text-sm text-ink-500 dark:text-ink-400" data-update-checked>
+        {% if plugin_updates.checked_at %}
+          {% blocktranslate trimmed with when=plugin_updates.checked_at|timesince %}Last checked {{ when }} ago.{% endblocktranslate %}
+        {% elif plugin_updates.enabled %}
+          {% translate "Not checked yet." %}
+        {% else %}
+          {% translate "The daily check is off." %}
+        {% endif %}
+        {% for name, why in plugin_updates.problems.items %}<span class="block text-amber-800 dark:text-amber-200" data-update-problem="{{ name }}"><code>{{ name }}</code>: {{ why }}</span>{% endfor %}
+      </p>
+      <form method="post" action="{% url 'server:plugin_action' %}" class="flex items-center gap-2" data-update-switch>
+        {% csrf_token %}
+        <input type="hidden" name="action" value="update_check">
+        <label class="flex items-center gap-2 text-sm">
+          <input type="checkbox" role="switch" class="input" name="checking" {% if plugin_updates.enabled %}checked{% endif %} {% if plugin_updates.pinned %}disabled{% endif %}>
+          {% translate "Check every day" %}
+        </label>
+        {% if not plugin_updates.pinned %}<button type="submit" class="btn" data-variant="outline" data-size="sm">{% translate "Save" %}</button>{% endif %}
+      </form>
+    </div>
+    {% if plugin_updates.pinned %}
+      <p class="border-b border-ink-100 px-4 py-2 text-xs text-ink-500 dark:border-ink-800 dark:text-ink-400">{% translate "POSTULO_PLUGIN_UPDATE_CHECK is set in the environment, so this cannot be changed here." %}</p>
+    {% endif %}
+    {% if plugin_update_items %}
+      <ul>
+        {% for item in plugin_update_items %}
+          <li class="flex flex-wrap items-start gap-3 px-4 py-3" data-update="{{ item.plugin }}">
+            <div class="min-w-0 grow basis-48">
+              <p class="font-medium">
+                {{ item.plugin }} <span class="text-ink-500 dark:text-ink-400">{{ item.installed }} → {{ item.available }}</span>
+                {% if item.security %}<span class="ms-2 badge" data-tone="red">{% translate "Security" %}</span>{% endif %}
+                {% if item.breaking %}<span class="ms-2 badge" data-tone="amber" data-breaking>{% translate "May break something" %}</span>{% endif %}
+                {% if item.held %}<span class="ms-2 badge" data-tone="blue">{% translate "Held" %}</span>{% endif %}
+              </p>
+              <p class="text-xs text-ink-500 dark:text-ink-400">
+                <code>{{ item.catalogue }}</code>
+                {% if item.link %} · <a href="{{ item.link }}" rel="noopener noreferrer external" target="_blank" class="text-brand-600 underline dark:text-brand-400">{% translate "Release notes" %}</a>{% endif %}
+                {% if item.advisory %} · <bdi>{{ item.advisory }}</bdi>{% endif %}
+              </p>
+              {% if not item.actionable %}
+                <p class="text-xs text-amber-800 dark:text-amber-200" data-needs-postulo>{% blocktranslate trimmed with wanted=item.requires_postulo %}Needs Postulo {{ wanted }}.{% endblocktranslate %}</p>
+              {% endif %}
+            </div>
+            {% if item.actionable %}
+              <form method="post" action="{% url 'server:plugin_action' %}">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="update">
+                <input type="hidden" name="name" value="{{ item.plugin }}">
+                {% if item.held %}<input type="hidden" name="confirm_held" value="1">{% endif %}
+                <button type="submit" class="btn" data-variant="outline" data-size="sm">{% if item.held %}{% translate "Update anyway" %}{% else %}{% translate "Update" %}{% endif %}</button>
+              </form>
+            {% endif %}
+          </li>
+        {% endfor %}
+      </ul>
+      <form method="post" action="{% url 'server:plugin_action' %}" class="flex flex-wrap items-center gap-3 border-t border-ink-100 px-4 py-3 dark:border-ink-800" data-update-all>
+        {% csrf_token %}
+        <input type="hidden" name="action" value="update_all">
+        <button type="submit" class="btn">{% translate "Update all" %}</button>
+        <label class="flex items-center gap-2 text-sm"><input type="checkbox" name="include_breaking" value="1" class="input">{% translate "Include releases that may break something" %}</label>
+        <p class="w-full text-xs text-ink-500 dark:text-ink-400">{% translate "Held plugins are left alone. If any one fails, nothing is changed." %}</p>
+      </form>
+    {% else %}
+      <p class="px-4 py-3 text-sm text-ink-500 dark:text-ink-400">{% translate "Every plugin installed from a catalogue is up to date, as far as the last check could tell." %}</p>
+    {% endif %}
+  </div>
+
   {# ------------------------------------------------------------ installed #}
   {# --------------------------------------------------------- what is on #}
 
@@ -258,6 +335,11 @@
                 {% endif %}
                 {% if not plugin.present %}
                   <span class="ms-2 badge" data-tone="amber">{% translate "not loaded" %}</span>
+                {% endif %}
+                {% if plugin.restart_pending %}
+                  <span class="ms-2 badge" data-tone="amber" data-restart-pending>
+                    {% blocktranslate trimmed with running=plugin.loaded_version %}running {{ running }}; restart to finish{% endblocktranslate %}
+                  </span>
                 {% endif %}
                 {% if plugin.hold %}
                   <span class="ms-2 badge" data-tone="blue" data-hold="{{ plugin.hold.mode }}">
@@ -485,6 +567,7 @@
               <div class="min-w-0 flex-1">
                 <p class="font-medium">
                   {{ listing.name }} {{ listing.version }}
+                  {% if listing.installed and listing.installed_version != listing.version %}<span class="text-ink-500 dark:text-ink-400" data-installed-version>{% blocktranslate trimmed with version=listing.installed_version %}(installed: {{ version }}){% endblocktranslate %}</span>{% endif %}
                   {% if listing.hold %}<span class="ms-1 badge" data-tone="blue" data-hold="{{ listing.hold.mode }}">{% if listing.hold.mode == "pin" %}{% blocktranslate trimmed with version=listing.hold.version %}Pinned to {{ version }}{% endblocktranslate %}{% else %}{% blocktranslate trimmed with version=listing.hold.version %}Held at {{ version }}{% endblocktranslate %}{% endif %}</span>{% endif %}
                   {% for category in listing.category_labels %}<span class="ms-1 badge" data-tone="grey" data-category="{{ category.slug }}">{{ category.label }}</span>{% endfor %}
                 </p>
@@ -537,7 +620,7 @@
                   <input type="hidden" name="action" value="install">
                   {% if listing.hold %}<input type="hidden" name="confirm_held" value="1">{% endif %}
                   <button type="submit" class="btn" data-variant="outline" data-size="sm">
-                    {% if listing.installed %}{% if listing.hold %}{% translate "Update anyway" %}{% else %}{% translate "Reinstall" %}{% endif %}{% else %}{% translate "Install" %}{% endif %}
+                    {% if listing.installed %}{% if listing.update %}{% if listing.hold %}{% translate "Update anyway" %}{% else %}{% translate "Update" %}{% endif %}{% elif listing.older %}{% translate "Install this one" %}{% else %}{% translate "Reinstall" %}{% endif %}{% else %}{% translate "Install" %}{% endif %}
                   </button>
                 </form>
                 {% if listing.installed and not listing.hold.environment %}
@@ -567,7 +650,7 @@
         </ul>
       {% else %}
         <p class="px-4 py-3 text-sm text-ink-500 dark:text-ink-400">
-          {% translate "Press Check for updates to fetch what the catalogues offer. Postulo does not fetch them on its own." %}
+          {% translate "Press Check for updates to fetch what the catalogues offer." %}
         </p>
       {% endif %}
     </div>

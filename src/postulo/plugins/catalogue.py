@@ -567,8 +567,6 @@ def install(plugin: str, *, by: str = "", catalogue: str = "", version: str = ""
     that catalogue no longer lists that release. Without ``catalogue`` a name that more than
     one catalogue lists is refused rather than settled by whichever comes first (#601).
     """
-    from .installing import install_wheel
-
     if catalogue:
         try:
             catalogues, problems = [fetch(catalogue)], []
@@ -593,21 +591,55 @@ def install(plugin: str, *, by: str = "", catalogue: str = "", version: str = ""
                 % {"name": plugin, "catalogues": ", ".join(listing_it)}
             )
     listing, release = find(catalogues, plugin, version, catalogue=catalogue)
+    return install_release(listing, release, by=by)
+
+
+def refuse_unless_installable(listing: Listing, release: Release) -> None:
+    """Every check that needs no download, in the order an install makes them."""
     refuse_unless_it_fits(listing, release)
     refuse_unless_it_has_what_it_needs(listing, release)
     refuse_unless_dependants_accept(listing, release)
     refuse_unless_not_pinned_elsewhere(listing, release)
-    with tempfile.TemporaryDirectory(prefix="postulo-plugin-") as scratch:
-        wheel = download(release, Path(scratch))
+
+
+def install_release(
+    listing: Listing,
+    release: Release,
+    *,
+    by: str = "",
+    wheel: Path | None = None,
+    snapshot: bool = True,
+):
+    """Install one release of a verified listing: the part of an install after the index.
+
+    ``wheel`` is one `download` already fetched and checked, which is how an update of several
+    plugins fetches every wheel before it changes anything; without it the wheel is fetched
+    here. ``snapshot=False`` is for a run that took the one snapshot itself and wants a failure
+    to put everything back (`updates.apply`). A plugin the administrator switched off stays
+    switched off, and an update is not the moment to change that.
+    """
+    from .installing import install_wheel, installed
+
+    refuse_unless_installable(listing, release)
+    before = installed(listing.name)
+
+    def put(path: Path):
         return install_wheel(
-            wheel,
+            path,
             origin=f"catalogue:{listing.catalogue}",
             source=release.url,
             by=by,
             expected_sha256=release.sha256,
             requires_postulo=release.requires_postulo,
             requires=list(release.requires),
+            disabled=bool(before and before.disabled),
+            snapshot=snapshot,
         )
+
+    if wheel is not None:
+        return put(wheel)
+    with tempfile.TemporaryDirectory(prefix="postulo-plugin-") as scratch:
+        return put(download(release, Path(scratch)))
 
 
 def pin(plugin: str, version: str, *, by=None, note: str = "", catalogue: str = ""):

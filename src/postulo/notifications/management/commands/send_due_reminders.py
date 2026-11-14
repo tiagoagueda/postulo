@@ -157,6 +157,7 @@ class Command(BaseCommand):
 
                 if updates.due():
                     updates.check()
+                self.plugin_update_check()
             except Exception:
                 # A pass that ends badly is one pass. Before this, a dropped PostgreSQL
                 # connection or a SQLite lock timeout ended the *process*, and the container
@@ -172,6 +173,26 @@ class Command(BaseCommand):
             if not options["loop"]:
                 return
             time.sleep(every)
+
+    def plugin_update_check(self) -> None:
+        """Once a day: each plugin catalogue's signed index is fetched, and what it says kept.
+
+        On the worker where there is one (#1187), so the pass never waits on somebody else's
+        server. An administrator's switch, or POSTULO_PLUGIN_UPDATE_CHECK, turns it off, and it
+        never installs anything.
+        """
+        try:
+            from postulo.core import errands
+            from postulo.plugins import updates as plugin_updates
+
+            queue = None
+            if errands.worker_expected():
+                from postulo.plugins.tasks import plugin_update_check
+
+                queue = plugin_update_check.enqueue
+            plugin_updates.start_if_due(queue=queue)
+        except Exception:
+            logger.exception("Could not check the plugin catalogues for updates")
 
     def one_pass(self, every: int, *, budget: int) -> None:
         """Everything the clock has made due, once."""
