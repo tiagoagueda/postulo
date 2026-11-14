@@ -148,6 +148,8 @@ CAREER_NAMES: tuple[str, ...] = (
     "resume:publication_lookup_new",
     "resume:publication_lookup",
     "resume:publication_orcid",
+    # The publications as a bibliography file, and one read in (#879).
+    "resume:references",
     # The answers kept for application forms (#1092).
     "resume:answer_list",
     "resume:answer_create",

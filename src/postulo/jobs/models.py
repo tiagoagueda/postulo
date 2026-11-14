@@ -1105,7 +1105,7 @@ class CompanyName(OwnedAsItsCompany, PrincipalOwnedModel):
         "Company", on_delete=models.CASCADE, related_name="names", verbose_name=_("company")
     )
     #: A name in a language, or an acronym (#1245): one has a language, the other has none.
-    kind = models.CharField(_("kind"), max_length=8, choices=Kind.choices, default=Kind.NAME)
+    kind = models.CharField(_("type"), max_length=8, choices=Kind.choices, default=Kind.NAME)
     language = LanguageField(_("language"), blank=True)
     name = models.CharField(_("name"), max_length=200)
     source = models.CharField(_("source"), max_length=10, choices=Source.choices)

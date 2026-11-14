@@ -84,7 +84,7 @@
         {% if redraw %}
           <button type="button" class="btn" data-variant="ghost" data-size="sm" data-viewer-redraw>{% icon "rotate-cw" %}{% translate "Redraw" %}</button>
         {% endif %}
-        <a href="{{ open|default:src }}" class="btn" data-variant="ghost" data-size="sm" target="_blank" rel="noopener noreferrer">{% icon "external-link" %}{% translate "Open in a new tab" %}</a>
+        <a href="{{ open|default:src }}" class="btn" data-variant="ghost" data-size="sm" target="_blank" rel="noopener noreferrer">{% icon "external-link" %}{% translate "Open in a new tab" %}<span class="sr-only"> {% translate "(opens in a new tab)" %}</span></a>
         <a href="{{ download }}" class="btn" data-variant="ghost" data-size="sm">{% icon "download" %}{% translate "Download" %}</a>
       </div>
     </div>
@@ -94,7 +94,7 @@
     <div class="document-viewer-fallback" data-viewer-fallback>
       {{ slot }}
       <p class="mt-3 flex flex-wrap gap-2">
-        <a href="{{ open|default:src }}" class="btn" data-variant="outline" target="_blank" rel="noopener noreferrer">{% icon "external-link" %}{% translate "Open in a new tab" %}</a>
+        <a href="{{ open|default:src }}" class="btn" data-variant="outline" target="_blank" rel="noopener noreferrer">{% icon "external-link" %}{% translate "Open in a new tab" %}<span class="sr-only"> {% translate "(opens in a new tab)" %}</span></a>
         <a href="{{ download }}" class="btn" data-variant="outline">{% icon "download" %}{% translate "Download" %}</a>
       </p>
     </div>

@@ -791,6 +791,8 @@ def signed_in_paths(a, c, me, entry=None, recovery_link: str = "", things=None) 
         # One person's own record as a file: what is in it, the link to it, and the box
         # that reads one back (#181). The half that comes after a file has a test below.
         "/career/file/",
+        # The publications as a bibliography file, and one read in (#879).
+        "/career/publications/references/",
         "/server/logs/",
         "/server/backups/",
         # Where the archives go besides this disk, and the key they are encrypted to (#325).
