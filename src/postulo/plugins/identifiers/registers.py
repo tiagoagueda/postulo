@@ -215,10 +215,24 @@ def _belgium(number: str) -> str:
     )
 
 
+def _finland(number: str) -> str:
+    digits = _digits(number, 8)
+    # PRH's YTJ Tietopalvelu: /yritys/<Y-tunnus>, with the hyphen (its own search links so).
+    return f"https://tietopalvelu.ytj.fi/yritys/{digits[:7]}-{digits[7]}" if digits else ""
+
+
+def _czechia(number: str) -> str:
+    digits = _digits(number, 8)
+    # ARES's subject page from the basic register: /ekonomicke-subjekty/ros/<ICO>.
+    return f"https://ares.gov.cz/ekonomicke-subjekty/ros/{digits}" if digits else ""
+
+
 LINKS: dict[str, Callable[[str], str]] = {
     "FR": _france,
     "NO": _norway,
     "EE": _estonia,
+    "FI": _finland,
+    "CZ": _czechia,
     "GB": _united_kingdom,
     "NL": _netherlands,
     "DK": _denmark,

@@ -115,6 +115,9 @@ def test_a_country_without_a_rule_keeps_passing_on_its_prefix_and_a_wrong_prefix
             "GB SC123456",
             "https://find-and-update.company-information.service.gov.uk/company/SC123456",
         ),
+        ("FI 0112038-9", "https://tietopalvelu.ytj.fi/yritys/0112038-9"),
+        ("FI 01120389", "https://tietopalvelu.ytj.fi/yritys/0112038-9"),
+        ("CZ 00177041", "https://ares.gov.cz/ekonomicke-subjekty/ros/00177041"),
         ("NL 33011433", "https://www.kvk.nl/zoeken/?source=all&q=33011433"),
         ("DK 10150817", "https://datacvr.virk.dk/enhed/virksomhed/10150817"),
         (
@@ -128,7 +131,7 @@ def test_a_register_number_links_to_its_own_register(value, url):
     assert company.url_for("register", value) == url
 
 
-@pytest.mark.parametrize("value", ["PT 501234567", "DE HRB 12345", "CZ 27082440", "EL 123456789"])
+@pytest.mark.parametrize("value", ["PT 501234567", "DE HRB 12345", "PL 0000028860", "EL 123456789"])
 def test_a_country_without_a_page_of_its_own_leads_to_the_eu_search(value):
     assert company.url_for("register", value) == registers.BRIS
 

@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import ipaddress
 import json
+from datetime import date
 
 import httpx
 import pytest
@@ -170,6 +171,43 @@ POLAND = {
     }
 }
 
+#: Škoda Auto's answer from the RES source (``/ekonomicke-subjekty-res/00177041``), read on
+#: 2026-11-14 and cut down to what is read: only this source marks the predominant activity.
+CZECHIA_RES = {
+    "icoId": "00177041",
+    "zaznamy": [
+        {
+            "ico": "00177041",
+            "obchodniJmeno": "Škoda Auto a.s.",
+            "sidlo": CZECHIA["sidlo"],
+            "pravniForma": "121",
+            "datumVzniku": "1990-11-13",
+            "czNace": ["70200", "471", "29100", "24"],
+            "czNace2008": ["29100", "45200", "471"],
+            "primarniZaznam": True,
+            "czNacePrevazujici": "29100",
+            "czNacePrevazujici2008": "29100",
+        }
+    ],
+}
+
+#: TVP S.A. w likwidacji (KRS 0000100679), division 6 of its current extract read on 2026-11-14,
+#: the liquidator left out (a person). Its name says it; division 6 is where the register does.
+POLAND_LIQUIDATION = {
+    "otwarcieLikwidacji": "27.12.2023, UCHWAŁA WZA NR 1, NOTARIUSZ, REP. A NR 1248/2023",
+    "sposobReprezentacjiPodmiotuPrzezLikwidatorow": "SAMODZIELNA REPREZENTACJA",
+}
+#: KP S.A. w likwidacji w upadłości (KRS 0000190672), the bankruptcy entry as read on 2026-11-14,
+#: the receiver (a company, not a person) and the court's file number left out.
+POLAND_BANKRUPTCY = {
+    "informacjaOOgloszeniuUpadlosci": {
+        "organWydajacy": "SĄD REJONOWY GDAŃSK - PÓŁNOC W GDAŃSKU WYDZIAŁ VI GOSPODARCZY",
+        "data": "16.04.2025",
+    },
+    "opisZakonczeniaProcesuUpadlosci": {},
+    "informacjaOUchyleniuUpadlosci": {},
+}
+
 LEI = "529900W18LQJJN6SJ336"
 GLEIF = {
     "data": {
@@ -205,7 +243,11 @@ RECORDED = {
     ),
     "no": ("NO 923609016", "/enhetsregisteret/api/enheter/923609016", NORWAY),
     "fi": ("FI 0112038-9", "/opendata-ytj-api/v3/companies?businessId=0112038-9", FINLAND),
-    "cz": ("CZ 00177041", "/ekonomicke-subjekty-v-be/rest/ekonomicke-subjekty/00177041", CZECHIA),
+    "cz": (
+        "CZ 00177041",
+        "/ekonomicke-subjekty-v-be/rest/ekonomicke-subjekty-res/00177041",
+        CZECHIA_RES,
+    ),
     "pl": ("PL 0000019193", "/api/krs/OdpisAktualny/0000019193?rejestr=P&format=json", POLAND),
 }
 
@@ -391,7 +433,7 @@ def test_finland_liquidation_is_an_administration(registers):
     assert (record.state, record.state_words) == (register_lookup.ADMINISTRATION, "Liquidation")
 
 
-def test_czechia_reads_the_seat_and_offers_no_activity_it_cannot_rank(registers):
+def test_czechia_reads_the_seat_and_the_predominant_activity_the_res_source_marks(registers):
     answers, _seen = registers
     answer(answers, *RECORDED["cz"][1:])
 
@@ -400,8 +442,22 @@ def test_czechia_reads_the_seat_and_offers_no_activity_it_cannot_rank(registers)
     assert record.name == "Škoda Auto a.s."
     assert record.address.street == "tř. Václava Klementa 869"
     assert record.address.postcode == "293 01"
-    assert record.division == "", "several CZ-NACE codes and none marked as the main one"
+    assert (record.activity, record.division) == ("29100", "29")
     assert record.state == "", "being in ARES does not say it trades"
+
+
+def test_czechia_falls_back_to_the_general_answer_and_offers_no_activity_there(registers):
+    answers, seen = registers
+    answer(answers, "/ekonomicke-subjekty-v-be/rest/ekonomicke-subjekty/00177041", CZECHIA)
+
+    record = register_lookup.lookup(adapters.CZECHIA, "CZ 00177041")
+
+    assert [request.url.path.rsplit("/", 2)[1] for request in seen] == [
+        "ekonomicke-subjekty-res",
+        "ekonomicke-subjekty",
+    ]
+    assert record.name == "Škoda Auto a.s."
+    assert record.division == "", "several CZ-NACE codes and none marked as the main one"
 
 
 def test_poland_asks_the_associations_register_when_the_business_one_has_no_entry(registers):
@@ -414,6 +470,65 @@ def test_poland_asks_the_associations_register_when_the_business_one_has_no_entr
     assert [request.url.params["rejestr"] for request in seen] == ["P", "S"]
     assert record.name == "Polskie Koleje Państwowe Spółka Akcyjna"
     assert (record.activity, record.division) == ("70.10.Z", "70")
+
+
+def _polish(**division_6):
+    extract = json.loads(json.dumps(POLAND))
+    extract["odpis"]["dane"]["dzial6"] = division_6
+    return extract
+
+
+@pytest.mark.parametrize(
+    ("division_6", "words", "since"),
+    [
+        ({"likwidacja": [POLAND_LIQUIDATION]}, "W likwidacji", date(2023, 12, 27)),
+        ({"postepowanieUpadlosciowe": [POLAND_BANKRUPTCY]}, "W upadłości", date(2025, 4, 16)),
+        (
+            {
+                "likwidacja": [POLAND_LIQUIDATION],
+                "postepowanieUpadlosciowe": [POLAND_BANKRUPTCY],
+            },
+            "W upadłości",
+            date(2025, 4, 16),
+        ),
+    ],
+)
+def test_poland_reads_a_liquidation_and_a_bankruptcy_from_division_6(
+    registers, division_6, words, since
+):
+    answers, _seen = registers
+    answer(answers, RECORDED["pl"][1], _polish(**division_6))
+
+    record = register_lookup.lookup(adapters.POLAND, "PL 0000019193")
+
+    assert (record.state, record.state_words) == (register_lookup.ADMINISTRATION, words)
+    assert record.state_since == since
+
+
+def test_poland_a_bankruptcy_that_is_over_is_not_a_state(registers):
+    answers, _seen = registers
+    over = {**POLAND_BANKRUPTCY, "opisZakonczeniaProcesuUpadlosci": {"data": "01.02.2026"}}
+    answer(answers, RECORDED["pl"][1], _polish(postepowanieUpadlosciowe=[over]))
+
+    record = register_lookup.lookup(adapters.POLAND, "PL 0000019193")
+
+    assert record.state == ""
+
+
+def test_poland_an_extract_without_division_6_entries_has_no_state(registers):
+    answers, _seen = registers
+    answer(answers, RECORDED["pl"][1], _polish())
+
+    assert register_lookup.lookup(adapters.POLAND, "PL 0000019193").state == ""
+
+
+def test_finland_and_czechia_link_to_the_registers_own_page():
+    assert adapters.FINLAND.page("0112038-9") == "https://tietopalvelu.ytj.fi/yritys/0112038-9"
+    assert adapters.FINLAND.page("01120389") == "https://tietopalvelu.ytj.fi/yritys/0112038-9"
+    assert (
+        adapters.CZECHIA.page("00177041") == "https://ares.gov.cz/ekonomicke-subjekty/ros/00177041"
+    )
+    assert adapters.FINLAND.page("1/../x") == adapters.CZECHIA.page("1?x") == ""
 
 
 def test_gleif_reads_the_local_register_number(registers):

@@ -8,6 +8,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### ✨ Added
 
+- Register lookup links Finland's and Czechia's own register page, reads Czechia's main activity and a liquidation or bankruptcy in Poland (#1065)
 - Register lookup keeps an encrypted key per register that needs one, and asks Companies House (United Kingdom) once it has one (#1065)
 - PDFs open in a viewer of Postulo's own, and the lists show a thumbnail of each (#942)
 - Publications can be read and written as BibTeX, BibLaTeX, RIS and CSL JSON; looking them up online is an administrator's switch, off by default (#879)

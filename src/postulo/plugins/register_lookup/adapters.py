@@ -42,13 +42,25 @@ by language, 3 being English), ``addresses[]`` (``type`` 1 the street address, 2
 ``/v3/description?code=SELTILA,SANE,KONK``), ``tradeRegisterStatus`` (code list ``REK_KDI``:
 1 registered, 2 removed from the register, 4 ceased) and ``endDate``. CC BY 4.0, the source to
 be named, and no PRH logo or look-alike layout (https://avoindata.prh.fi/en/info/swagger-ui).
+The company's page is ``https://tietopalvelu.ytj.fi/yritys/<Y-tunnus>``, with the hyphen: the
+Tietopalvelu is a single-page app whose route table (``/yritys/:id``) and whose own search
+results link to ``/yritys/<businessId>``, read in its script on 2026-11-14 (a request for the
+page answers 200 whatever the number, so the address cannot be confirmed by its status).
 
 **Czechia: ARES (Ministry of Finance).**
 ``GET https://ares.gov.cz/ekonomicke-subjekty-v-be/rest/ekonomicke-subjekty/<IČO>``, from the
 OpenAPI document at https://ares.gov.cz/ekonomicke-subjekty-v-be/rest/v3/api-docs ("ARES: REST
 API - veřejné", 1.4): ``ico``, ``obchodniJmeno``, ``sidlo`` (``nazevUlice``, ``cisloDomovni``,
 ``cisloOrientacni``, ``psc``, ``nazevObce``, ``kodStatu``), ``datumZaniku`` and lists of
-CZ-NACE codes with none marked as the main one, so no activity is offered. The Ministry's
+CZ-NACE codes with none marked as the main one. The RES source does mark it: ``GET
+https://ares.gov.cz/ekonomicke-subjekty-v-be/rest/ekonomicke-subjekty-res/<IČO>`` answers
+``{icoId, zaznamy: [...]}``, and a record there has ``czNacePrevazujici`` ("Převažující
+CZ-NACE_2025") and ``czNacePrevazujici2008``, as the same OpenAPI document describes them, read
+and confirmed against Škoda Auto's answer on 2026-11-14 (``29100`` in both, the other codes
+only in ``czNace``). That source is asked first, and the general one where it has no entry; the
+two-digit division is NACE's. The subject's page is
+``https://ares.gov.cz/ekonomicke-subjekty/ros/<IČO>``, the address ARES's own result list and
+register overview link to (read in its script on 2026-11-14). The Ministry's
 open-data page (https://data.mf.gov.cz/api/ares.html) says anyone may use it who respects the
 operating conditions, may block more than 500 queries a minute, and names no licence; the
 data are informative, and the source is named.
@@ -60,8 +72,16 @@ Portal at https://prs.ms.gov.pl/krs/openApi (200, 404 for no such entity, 5xx). 
 ``odpis.naglowekA.numerKRS``, ``dane.dzial1.danePodmiotu.nazwa``,
 ``dane.dzial1.siedzibaIAdres.adres`` and the main activity in
 ``dane.dzial3.przedmiotDzialalnosci.przedmiotPrzewazajacejDzialalnosci`` (PKD, whose division
-is NACE's). Nothing in what was confirmed says plainly whether a company is in liquidation, so
-no state is offered. The portal names no licence; the source is named.
+is NACE's). Division 6 of the open extract says what the register knows of an ending, confirmed
+on 2026-11-14 against TVP S.A. w likwidacji (KRS 0000100679) and KP S.A. w likwidacji w upadłości
+(KRS 0000190672): ``dane.dzial6.likwidacja[]`` (``otwarcieLikwidacji``, a text that carries
+the date, ``dd.mm.yyyy``) and ``dane.dzial6.postepowanieUpadlosciowe[]``
+(``informacjaOOgloszeniuUpadlosci.data``, and ``opisZakonczeniaProcesuUpadlosci``, empty while
+the bankruptcy runs); an active company (Orlen, 0000028860) has neither. Both are an
+administration here. Poland's own register page for a number is not linked: the search
+(https://wyszukiwarka-krs.ms.gov.pl/) sits behind a bot wall that answered 403, and no
+address for one entity is documented, so none is guessed. The portal names no licence; the
+source is named.
 
 **GLEIF, for an LEI.** ``GET https://api.gleif.org/api/v1/lei-records/<LEI>`` (JSON:API; the
 documentation is linked from https://www.gleif.org/en/lei-data/gleif-api): ``data.attributes
@@ -393,6 +413,9 @@ FINLAND = RegisterAdapter(
     source=_("Finnish Patent and Registration Office (PRH), Business Information System (YTJ)"),
     licence="CC BY 4.0",
     licence_url="https://creativecommons.org/licenses/by/4.0/",
+    page=lambda number: (
+        f"https://tietopalvelu.ytj.fi/yritys/{_business_id(number)}" if _business_id(number) else ""
+    ),
 )
 
 
@@ -402,6 +425,12 @@ FINLAND = RegisterAdapter(
 def _czechia(document, number: str):
     document = _dict(document)
     digits = _digits(number, 8)
+    if "zaznamy" in document:
+        # The RES source: one record per source entry of the number, one of them the primary.
+        rows = [_dict(row) for row in _list(document.get("zaznamy"))]
+        document = next((row for row in rows if row.get("primarniZaznam")), None) or (
+            rows[0] if rows else {}
+        )
     if not digits or document.get("ico") != digits:
         return None
     seat = _dict(document.get("sidlo"))
@@ -418,6 +447,10 @@ def _czechia(document, number: str):
             country=seat.get("kodStatu") or "",
         )
     ended = _day(document.get("datumZaniku"))
+    # Only the RES source marks the main activity (CZ-NACE 2025, else 2008); the general answer
+    # lists codes with none ranked, and is read for the rest.
+    code = document.get("czNacePrevazujici") or document.get("czNacePrevazujici2008") or ""
+    code = code if isinstance(code, str) and code.isascii() and code.isdigit() else ""
     return RegisterRecord(
         number=digits,
         name=document.get("obchodniJmeno") or "",
@@ -425,6 +458,8 @@ def _czechia(document, number: str):
         state=DISSOLVED if ended else "",
         state_words="Zaniklý" if ended else "",
         state_since=ended,
+        activity=code,
+        division=code[:2],
     )
 
 
@@ -436,18 +471,50 @@ CZECHIA = RegisterAdapter(
     hosts=("ares.gov.cz",),
     addresses=lambda number: (
         [
-            "https://ares.gov.cz/ekonomicke-subjekty-v-be/rest/ekonomicke-subjekty/"
-            f"{_digits(number, 8)}"
+            f"https://ares.gov.cz/ekonomicke-subjekty-v-be/rest/{source}/{_digits(number, 8)}"
+            for source in ("ekonomicke-subjekty-res", "ekonomicke-subjekty")
         ]
         if _digits(number, 8)
         else []
     ),
     read=_czechia,
     source=_("ARES, Ministry of Finance of the Czech Republic"),
+    page=lambda number: (
+        f"https://ares.gov.cz/ekonomicke-subjekty/ros/{_digits(number, 8)}"
+        if _digits(number, 8)
+        else ""
+    ),
 )
 
 
 # ---------------------------------------------------------------------------- Poland
+
+
+_POLISH_DATE = re.compile(r"\b(\d{2})\.(\d{2})\.(\d{4})\b")
+
+
+def _polish_day(*texts) -> date | None:
+    """The first ``dd.mm.yyyy`` in a text of the register's, which is where it writes a date."""
+    for text in texts:
+        found = _POLISH_DATE.search(text) if isinstance(text, str) else None
+        if found:
+            try:
+                return date(int(found[3]), int(found[2]), int(found[1]))
+            except ValueError:
+                continue
+    return None
+
+
+def _polish_state(ending: dict):
+    """Division 6 of the extract: a bankruptcy still running, else a liquidation, else nothing."""
+    for row in map(_dict, _list(ending.get("postepowanieUpadlosciowe"))):
+        if not _dict(row.get("opisZakonczeniaProcesuUpadlosci")):
+            announced = _dict(row.get("informacjaOOgloszeniuUpadlosci"))
+            if announced:
+                return ADMINISTRATION, "W upadłości", _polish_day(announced.get("data"))
+    for row in map(_dict, _list(ending.get("likwidacja"))):
+        return ADMINISTRATION, "W likwidacji", _polish_day(row.get("otwarcieLikwidacji"))
+    return "", "", None
 
 
 def _poland(document, number: str):
@@ -476,10 +543,14 @@ def _poland(document, number: str):
     code = ".".join(
         str(part) for part in (division, main.get("kodKlasa"), main.get("kodPodklasa")) if part
     )
+    state, words, since = _polish_state(_dict(data.get("dzial6")))
     return RegisterRecord(
         number=digits,
         name=casing.name(_dict(first.get("danePodmiotu")).get("nazwa")),
         address=address,
+        state=state,
+        state_words=words,
+        state_since=since,
         activity=code,
         activity_words=main.get("opis") or "",
         division=division,
