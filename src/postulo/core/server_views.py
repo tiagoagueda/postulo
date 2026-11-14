@@ -1367,11 +1367,13 @@ def _repositories() -> list[dict]:
 def _governed_plugins() -> list:
     """Every plugin a person may hold an opinion about, in one list across the kinds."""
     from postulo.plugins import policy
-    from postulo.plugins.registry import plugins
+    from postulo.plugins.registry import plugins, sub_plugins
 
     found = []
     for kind in policy.GOVERNED_KINDS:
         found.extend(plugins(kind))
+    # What a plugin offers in many parts, each switched by itself (postulo-apprise#20).
+    found.extend(sub_plugins())
     return sorted(found, key=lambda item: (getattr(item, "kind", "source"), item.name))
 
 
@@ -1412,7 +1414,7 @@ def _policy_rows(person=None, user=None) -> list[dict]:
     for plugin in _governed_plugins():
         own = stored.get(plugin.name)
         row = own or instance.get(plugin.name)
-        state = row.state if row else PluginPolicy.State.AVAILABLE
+        state = row.state if row else policy.default_state(plugin.name)
         # The whole manifest, not three fields off it: this is the page an administrator
         # is on when the question is "whose code is running here", and #97 exists because
         # the answer used to be visible on the day of installation and never again.
@@ -1460,7 +1462,7 @@ def _policy_rows(person=None, user=None) -> list[dict]:
         # A plugin whose requirement is missing or off is held the way a child is: off, with
         # its controls taken away and the names beside it (#884).
         decision = policy.decide(row["name"], person)
-        if decision.decided_by == "requires":
+        if decision.decided_by in ("requires", "unavailable"):
             row["held_by_parent"] = True
             row["held_because"] = decision.explain()
     for plugin in _ungoverned_plugins():
@@ -1677,7 +1679,7 @@ def _save_policies(request: HttpRequest, person=None) -> int:
                 person=person,
                 state=PluginPolicy.State.FORCED_OFF,
             ).delete()
-        if wanted == instance.get(plugin.name, PluginPolicy.State.AVAILABLE):
+        if wanted == instance.get(plugin.name, policy.default_state(plugin.name)):
             # What they would get anyway: no row of their own.
             if existing:
                 existing.delete()

@@ -40,6 +40,7 @@ from .base import (
     LINK_SERVICE_GROUP,
     MESSAGING_SERVICE_GROUP,
     REGISTER_ADAPTER_GROUP,
+    SUB_PLUGIN_KINDS,
     TRANSPORT_GROUP,
     BackupDestinationPlugin,
     ConnectedPlugin,
@@ -51,7 +52,10 @@ from .base import (
     MessagingServicePlugin,
     RegisterAdapterPlugin,
     SourcePlugin,
+    SubPlugin,
+    SubPluginEntry,
     TransportPlugin,
+    sub_plugins_of,
 )
 from .builtin import BUILTIN_SOURCES
 from .builtin.htmlutil import one_parse
@@ -484,6 +488,70 @@ def environment_variables() -> dict:
                     continue
                 found.setdefault(variable.name, variable.declared(label_of(plugin)))
     return found
+
+
+#: The sub-plugins as last built, and the generation they were built at.
+_sub_cache: tuple[int, list[SubPluginEntry]] | None = None
+
+#: The longest name a policy row can hold (`PluginPolicy.plugin`).
+_NAME_WIDTH = 60
+
+
+def sub_plugins(parent: str = "") -> list[SubPluginEntry]:
+    """Every sub-plugin the loaded plugins declare, or only those of ``parent``.
+
+    A plugin's ``sub_plugins`` is read when its kind is loaded and kept until the registry
+    is rebuilt, so a set that takes work to compute is computed once and not on every page. A
+    plugin that is switched off is not loaded and offers none. One whose declaration cannot be
+    read, or breaks a rule, loses that sub-plugin and nothing else; the reason is logged. A
+    name another plugin or sub-plugin already holds is left to whoever had it first.
+    """
+    global _sub_cache
+
+    loaded = [(kind, plugin) for kind in SUB_PLUGIN_KINDS for plugin in plugins(kind)]
+    if _sub_cache is None or _sub_cache[0] != _generation:
+        held = {plugin.name for kind in GROUPS for plugin in plugins(kind)}
+        found: list[SubPluginEntry] = []
+        for kind, plugin in loaded:
+            try:
+                declared = sub_plugins_of(plugin)
+            except Exception:
+                logger.exception("Plugin %r's sub-plugins could not be read", plugin.name)
+                continue
+            for sub in declared:
+                if not isinstance(sub, SubPlugin):
+                    logger.error(
+                        "Plugin %r declares %r, which is not a SubPlugin", plugin.name, sub
+                    )
+                    continue
+                if wrong := sub.problems():
+                    logger.error(
+                        "Plugin %r declares a sub-plugin wrongly: %s", plugin.name, "; ".join(wrong)
+                    )
+                    continue
+                entry = SubPluginEntry(parent=plugin.name, kind=kind, sub=sub)
+                if len(entry.name) > _NAME_WIDTH or entry.name in held:
+                    logger.error(
+                        "Sub-plugin %r of %r was ignored: its name is taken or too long",
+                        sub.id,
+                        plugin.name,
+                    )
+                    continue
+                held.add(entry.name)
+                found.append(entry)
+        _sub_cache = (_generation, found)
+    entries = _sub_cache[1]
+    return [entry for entry in entries if not parent or entry.parent == parent]
+
+
+def find_sub_plugin(name: str) -> SubPluginEntry | None:
+    """The sub-plugin called ``name`` (``parent:id``), or ``None``."""
+    from .base import SUB_PLUGIN_SEPARATOR
+
+    if SUB_PLUGIN_SEPARATOR not in name:
+        return None
+    parent = name.partition(SUB_PLUGIN_SEPARATOR)[0]
+    return next((entry for entry in sub_plugins(parent) if entry.name == name), None)
 
 
 def find_plugin(kind: str, name: str):

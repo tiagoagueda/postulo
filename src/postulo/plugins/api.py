@@ -56,6 +56,13 @@ the records a sync works on, the calls that write to a timeline, the details tha
 a contact, and the calendar text. It is a wider surface, deliberately, because the
 alternative was a narrow one that was routinely ignored.
 
+**A plugin may offer many things, each switched by itself (postulo-apprise#20)**: `SubPlugin`
+is one, declared in a plugin's ``sub_plugins`` -- a sequence or a method called when the plugin
+loads, so the set can be computed -- with an id, a label, a sentence, whether it starts on and,
+where it cannot work here, why. The administrator's plugins page lists each under its plugin
+and switches it as it does any sub-module; the plugin asks `enabled_sub_plugins` and
+`sub_plugin_enabled` and does what a switch means.
+
 **A listing has a history now (#270)**, and one call writes to it: `record_listing_event`,
 for a plugin that sees a mail or a message about a job before anybody has applied. It is
 handed the listing, or an application whose listing it is, and takes the owner from that
@@ -226,6 +233,7 @@ if TYPE_CHECKING:  # pragma: no cover - the names `__getattr__` resolves at run 
         update_contact,
     )
     from postulo.notifications.base import EVENTS, Notification, NotifierPlugin
+    from postulo.plugins.policy import enabled_sub_plugins, sub_plugin_enabled
     from postulo.resume.importing import Record
 
     from .consent import ACCESS_TOKEN, access_token
@@ -281,6 +289,7 @@ from .base import (
     RemoteItem,  # an item a sync offers to pair by hand (#327)
     SourcePlugin,
     StorePlugin,
+    SubPlugin,  # one of many things a plugin offers, each switched by itself
     SyncPlugin,
     SyncReport,
     # ----------------------------------------------------- what it hands back
@@ -378,6 +387,7 @@ __all__ = [
     "SavedRows",
     "SourcePlugin",
     "StorePlugin",
+    "SubPlugin",
     "Suggestion",
     "SyncLink",
     "SyncPlugin",
@@ -412,6 +422,7 @@ __all__ = [
     "deadline_in",
     "declares",
     "description_of",
+    "enabled_sub_plugins",
     "event_lines",
     "get_or_create_company",
     "get_or_create_department",
@@ -456,6 +467,7 @@ __all__ = [
     "schedule_interview",
     "settle_interview",
     "shipped",
+    "sub_plugin_enabled",
     "suggest",
     "sync_state",
     "until",
@@ -474,6 +486,11 @@ _GUIDE = "https://source.tiagoagueda.com/postulo/postulo/wiki/Writing-a-plugin"
 #: paragraphs restating twenty-three one-line imports; what is worth saying about these is
 #: said once per group, above the group.
 _ELSEWHERE: dict[str, tuple[str, str]] = {
+    # ---------------------------------------------- what a plugin offers in many parts
+    # Asked at the moment of use, as the policy is for a whole plugin: what an administrator
+    # switched off stops being offered and the plugin's own rows stay where they were.
+    "enabled_sub_plugins": ("postulo.plugins.policy", "enabled_sub_plugins"),
+    "sub_plugin_enabled": ("postulo.plugins.policy", "sub_plugin_enabled"),
     # ------------------------------------------------------------- the notifier contract
     # What `send()` is handed, and which events a person may switch on per connection.
     # Until now every notifier there is -- Postulo's own included -- reached past the

@@ -820,6 +820,110 @@ def widget_problems(widget) -> list[str]:
     return problems
 
 
+# ------------------------------------------------------------------ sub-plugins
+
+#: What a sub-plugin's id may be: lower case, digits, hyphen and underscore. It goes into the
+#: policy's name for the sub-plugin (``parent:id``), a column sixty characters wide.
+SUB_PLUGIN_ID = r"[a-z0-9][a-z0-9_-]{0,29}"
+#: The kinds of plugin that may offer sub-plugins: the ones an administrator governs, which
+#: `policy.GOVERNED_KINDS` names too (a test holds the two together). Here, below both.
+SUB_PLUGIN_KINDS = ("source", "notifier", "store", "sync", "importer", "feature", "outbox")
+#: Where the parent's name and the sub-plugin's id are joined in the name policy rows hold.
+SUB_PLUGIN_SEPARATOR = ":"
+
+
+@dataclass(frozen=True)
+class SubPlugin:
+    """One of the many things a single plugin offers, each switched on or off by itself.
+
+    A plugin declares them in a ``sub_plugins`` attribute: a sequence of these, or a method
+    returning one, called when the registry loads the plugin -- so the set may be computed, as
+    when a library knows a hundred services and which of them work on this machine. Each is
+    listed on the administrator's plugins page under its plugin, switched there like any
+    sub-module (#873), and asked about through ``api.sub_plugin_enabled``; Postulo stores the
+    switch, the plugin decides what a switch does.
+
+    ``id`` is the plugin's own, unique among its sub-plugins and matching `SUB_PLUGIN_ID`.
+    ``default_on`` is what an instance gets before an administrator decides: a plugin that
+    offers a hundred services need not switch a hundred on. ``unavailable`` is a sentence saying
+    why this one cannot work here (a library missing, say); it is drawn off, with the reason,
+    and no switch moves it. ``icon`` is the name of a Lucide icon drawn where a logo would go.
+    ``label`` and ``description`` are what the page shows and are the plugin's to translate.
+    """
+
+    id: str
+    label: str
+    description: str = ""
+    default_on: bool = True
+    unavailable: str = ""
+    icon: str = ""
+
+    def problems(self) -> list[str]:
+        """What is wrong with this declaration, in words for the plugin's author."""
+        found = []
+        if not isinstance(self.id, str) or not re.fullmatch(SUB_PLUGIN_ID, self.id):
+            found.append(f"id {self.id!r} does not match {SUB_PLUGIN_ID}")
+        if not str(self.label or "").strip():
+            found.append(f"{self.id!r} has no label")
+        return found
+
+
+@dataclass(frozen=True)
+class SubPluginEntry:
+    """A declared `SubPlugin` as the registry holds it: named, and tied to its plugin.
+
+    Never written by a plugin. It answers the questions the policy and the plugins page ask
+    of a plugin -- ``name``, ``kind``, ``label``, ``manifest`` -- so that it is governed like
+    any other: its ``kind`` is its plugin's, and its manifest's ``parent`` is the plugin.
+    """
+
+    parent: str
+    kind: str
+    sub: SubPlugin
+
+    @property
+    def name(self) -> str:
+        return sub_plugin_name(self.parent, self.sub.id)
+
+    @property
+    def label(self) -> str:
+        return str(self.sub.label)
+
+    @property
+    def description(self) -> str:
+        return str(self.sub.description)
+
+    @property
+    def manifest(self) -> Manifest:
+        return Manifest(
+            name=self.name,
+            label=self.label,
+            kind=self.kind,
+            description=self.description,
+            parent=self.parent,
+            icon=self.sub.icon,
+        )
+
+
+def sub_plugin_name(parent: str, sub_id: str) -> str:
+    """The name policy rows hold for a sub-plugin: its plugin's, a colon, its own id."""
+    return f"{parent}{SUB_PLUGIN_SEPARATOR}{sub_id}"
+
+
+def sub_plugins_of(plugin) -> list[SubPlugin]:
+    """What this plugin says it offers, or nothing (the same reading as ``widgets_of``).
+
+    A sequence or a method. One that cannot be read costs its own sub-plugins and nobody
+    else's; the reason is the caller's to log.
+    """
+    declared = getattr(plugin, "sub_plugins", None)
+    if callable(declared):
+        declared = declared()
+    if not declared:
+        return []
+    return list(declared)
+
+
 # ------------------------------------------------------- environment variables
 
 #: The kinds a variable may be, as Postulo's own are declared (`postulo.core.configuration`).

@@ -259,9 +259,10 @@ def _profile_value(profile, name: str, value):
         if not isinstance(value, list):
             return _REFUSED
         from postulo.plugins.policy import GOVERNED_KINDS
-        from postulo.plugins.registry import plugins
+        from postulo.plugins.registry import plugins, sub_plugins
 
         installed = {plugin.name for kind in GOVERNED_KINDS for plugin in plugins(kind)}
+        installed |= {entry.name for entry in sub_plugins()}
         return sorted({item for item in value if isinstance(item, str) and item in installed})
     if name == "report_made_for":
         # The first day of a month, as the archive writes a date (#1095); anything else is
