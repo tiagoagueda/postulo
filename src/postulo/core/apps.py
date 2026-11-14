@@ -12,6 +12,8 @@ class CoreConfig(AppConfig):
         from postulo.plugins import registry
         from postulo.plugins.employer_structure import EmployerStructureFeature
         from postulo.plugins.file_formats import (
+            BibliographyFormat,
+            BibliographyLookupsFeature,
             DocxFormat,
             EuropassFormat,
             FileFormatsFeature,
@@ -67,6 +69,8 @@ class CoreConfig(AppConfig):
             GeoJsonFormat,
             EuropassFormat,
             JsonResumeFormat,
+            BibliographyFormat,
+            BibliographyLookupsFeature,
         ):
             registry.register_builtin("feature", format_module)
         # The module the "multiple …" features are sub-modules of (#875).

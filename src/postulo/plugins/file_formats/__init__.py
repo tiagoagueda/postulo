@@ -18,8 +18,9 @@ that would still be a CV. Its switch is drawn on and disabled, and it stays on w
 module above it says.
 
 Europass is the importer that has shipped since #129; it names this module as its parent
-and is not declared again here. GeoJSON (#880) is one too, and needs the map; References
-(#879) will join when it exists.
+and is not declared again here. GeoJSON (#880) is one too, and needs the map; so is
+Bibliography (#879), the publications of *Your career* as BibTeX, BibLaTeX, RIS and CSL JSON.
+MODS and EndNote XML are not offered yet; the issue said they would come on demand.
 """
 
 from __future__ import annotations
@@ -39,6 +40,9 @@ VCARD = "format-vcard"
 GEOJSON = "format-geojson"
 EUROPASS = "format-europass"
 JSON_RESUME = "format-json-resume"
+BIBLIOGRAPHY = "format-bibliography"
+#: The online half of it (#879): off until an administrator says, as Register lookup is.
+BIBLIOGRAPHY_LOOKUPS = "bibliography-lookups"
 
 
 @declares(
@@ -218,3 +222,48 @@ class EuropassFormat:
 )
 class JsonResumeFormat:
     """JSON Resume, on or off (#1100)."""
+
+
+@declares(
+    shipped(
+        name=BIBLIOGRAPHY,
+        label=_("Bibliography"),
+        kind="feature",
+        parent=FILE_FORMATS,
+        categories=("files",),
+        icon="book-text",
+        description=_(
+            "The publications of Your career as a bibliography file, out, and a bibliography "
+            "file read in: BibTeX, BibLaTeX, RIS and CSL JSON, which Zotero, Mendeley, "
+            "JabRef, EndNote and LaTeX read and write. What a file holds is listed before "
+            "anything is added. Switched off, neither is offered and their addresses answer "
+            "as if there were nothing there."
+        ),
+    )
+)
+class BibliographyFormat:
+    """References as files, on or off (#879). Nothing here asks anyone anything."""
+
+
+@declares(
+    shipped(
+        name=BIBLIOGRAPHY_LOOKUPS,
+        label=_("Bibliography lookups"),
+        kind="feature",
+        categories=("files",),
+        icon="search",
+        # Not a sub-module of the format (a module has one level of children): it follows it,
+        # and follows Publication lookups, by what it needs (#884).
+        requires=(BIBLIOGRAPHY, "publication-lookups"),
+        description=_(
+            "Add publications to the bibliography import by typing their DOIs: one request to "
+            "doi.org for each, when you press for it, which passes the DOI to Crossref or "
+            "DataCite. Nothing else about you is sent. Off until an administrator switches it "
+            "on, because every DOI typed tells doi.org, and so whoever runs this, what "
+            "somebody here is reading; it also needs Publication lookups. Switched off, "
+            "nothing is asked and a file is still read."
+        ),
+    )
+)
+class BibliographyLookupsFeature:
+    """DOIs read on a press and never otherwise (#879)."""

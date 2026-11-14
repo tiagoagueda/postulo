@@ -1,6 +1,12 @@
 from django.urls import path
 
-from . import views, views_candidate
+from postulo.core import modules
+
+from . import views, views_candidate, views_references
+
+#: Bibliography files are a module (#879): while it is off the address answers as if there
+#: were nothing there.
+bibliography = modules.required("format-bibliography")
 
 app_name = "resume"
 
@@ -32,6 +38,11 @@ urlpatterns = [
         name="publication_lookup",
     ),
     path("publications/orcid/", views.PublicationOrcidView.as_view(), name="publication_orcid"),
+    path(
+        "publications/references/",
+        bibliography(views_references.ReferencesView.as_view()),
+        name="references",
+    ),
     path("<slug:section>/new/", views.ResumeItemCreateView.as_view(), name="item_create"),
     path("<slug:section>/<int:pk>/edit/", views.ResumeItemUpdateView.as_view(), name="item_update"),
     path(
