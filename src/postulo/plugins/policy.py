@@ -151,6 +151,8 @@ class Decision:
             "parent": _("Off, because the module it belongs to is off."),
             "required": _("Always on: Postulo cannot work without it."),
             "access": _("Set by your administrator."),
+            "sub-default": _("Off until an administrator switches it on."),
+            "unavailable": " ".join(self.because),
         }[self.decided_by]
 
 
@@ -216,7 +218,11 @@ def shipped_inside(plugin_name: str) -> bool:
     from an entry point. Asked by name because that is what a policy row holds.
     """
     from .installing import is_internal
+    from .registry import find_sub_plugin
 
+    # A sub-plugin is its plugin's: it ships inside Postulo exactly when its plugin does.
+    if (sub := find_sub_plugin(plugin_name)) is not None:
+        plugin_name = sub.parent
     return is_internal(plugin_name)
 
 
@@ -236,12 +242,31 @@ def is_ungoverned(plugin_name: str) -> bool:
     )
 
 
+def _find(plugin_name: str):
+    """The plugin called ``plugin_name``, or the sub-plugin of a plugin that is called that."""
+    from .registry import find_any, find_sub_plugin
+
+    found = find_any(plugin_name)
+    return found if found is not None else find_sub_plugin(plugin_name)
+
+
+def default_state(plugin_name: str):
+    """What a plugin is when nobody has decided: available, but for a sub-plugin that its
+    plugin declared ``default_on=False`` (and for one that cannot work here), which is off."""
+    from .models import PluginPolicy
+    from .registry import find_sub_plugin
+
+    sub = find_sub_plugin(plugin_name)
+    if sub is not None and (not sub.sub.default_on or sub.sub.unavailable):
+        return PluginPolicy.State.FORCED_OFF
+    return PluginPolicy.State.AVAILABLE
+
+
 def is_required(plugin_name: str) -> bool:
     """Whether Postulo cannot work without this one, so no row or parent can turn it off (#877)."""
     from . import base
-    from .registry import find_any
 
-    plugin = find_any(plugin_name)
+    plugin = _find(plugin_name)
     return bool(plugin is not None and base.manifest_of(plugin).required)
 
 
@@ -253,9 +278,8 @@ def parent_of(plugin_name: str) -> str:
     removed should mean.
     """
     from . import base
-    from .registry import find_any
 
-    plugin = find_any(plugin_name)
+    plugin = _find(plugin_name)
     return base.manifest_of(plugin).parent if plugin is not None else ""
 
 
@@ -270,7 +294,7 @@ def _unmet_needs(plugin_name: str, person) -> list[str]:
     from . import dependencies
     from .registry import find_any
 
-    plugin = find_any(plugin_name)
+    plugin = _find(plugin_name)
     if plugin is None:
         return []
     needs = dependencies.needs_of(plugin)
@@ -297,13 +321,16 @@ def _unmet_needs(plugin_name: str, person) -> list[str]:
 def children_of(plugin_name: str) -> list[str]:
     """The names of the sub-modules of a module, in the order the registry lists them."""
     from . import base
-    from .registry import plugins
+    from .registry import plugins, sub_plugins
 
     return [
-        item.name
-        for kind in GOVERNED_KINDS
-        for item in plugins(kind)
-        if base.manifest_of(item).parent == plugin_name
+        *(
+            item.name
+            for kind in GOVERNED_KINDS
+            for item in plugins(kind)
+            if base.manifest_of(item).parent == plugin_name
+        ),
+        *(entry.name for entry in sub_plugins(plugin_name)),
     ]
 
 
@@ -401,8 +428,12 @@ def _decide(plugin_name: str, person) -> Decision:
     policies, access = _rows_for(person)
     rows = policies.get(plugin_name, {})
     row = rows.get(getattr(person, "pk", None)) or rows.get(None)
-    state = row.state if row else PluginPolicy.State.AVAILABLE
+    state = row.state if row else default_state(plugin_name)
 
+    if sub := _sub_unavailable(plugin_name):
+        return Decision(
+            on=False, offered=True, theirs=False, decided_by="unavailable", because=(sub,)
+        )
     if state == PluginPolicy.State.UNAVAILABLE:
         return Decision(
             on=False, offered=False, theirs=False, decided_by="administrator", who=row.decided_by
@@ -430,6 +461,9 @@ def _decide(plugin_name: str, person) -> Decision:
             on=True, offered=True, theirs=False, decided_by="administrator", who=row.decided_by
         )
     if state == PluginPolicy.State.FORCED_OFF:
+        if row is None:
+            # Nobody decided: a sub-plugin its plugin declared off until somebody switches it on.
+            return Decision(on=False, offered=True, theirs=False, decided_by="sub-default")
         return Decision(
             on=False, offered=True, theirs=False, decided_by="administrator", who=row.decided_by
         )
@@ -557,6 +591,28 @@ def _governed_names() -> list[str]:
     return [
         item.name for kind in GOVERNED_KINDS for item in plugins(kind) if not is_required(item.name)
     ]
+
+
+def _sub_unavailable(plugin_name: str) -> str:
+    """Why a sub-plugin cannot work on this instance, or nothing. A decision cannot change it."""
+    from .registry import find_sub_plugin
+
+    sub = find_sub_plugin(plugin_name)
+    return str(sub.sub.unavailable) if sub is not None else ""
+
+
+def sub_plugin_enabled(plugin_name: str, sub_id: str, person) -> bool:
+    """Whether the sub-plugin ``sub_id`` of the plugin ``plugin_name`` is on for ``person``."""
+    from .base import sub_plugin_name
+
+    return decide(sub_plugin_name(plugin_name, sub_id), person).on
+
+
+def enabled_sub_plugins(plugin_name: str, person) -> list:
+    """The `SubPlugin`s of ``plugin_name`` that are on for ``person``, in declared order."""
+    from .registry import sub_plugins
+
+    return [entry.sub for entry in sub_plugins(plugin_name) if decide(entry.name, person).on]
 
 
 def models_person_filter(person):
