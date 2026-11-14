@@ -779,6 +779,14 @@ image named by digest, so a new version is a new hash in both places:
    `ghcr.io/astral-sh/uv:<version>`, e.g. `docker buildx imagetools inspect ghcr.io/astral-sh/uv:<version>`.
 4. Push, and read the CI run: a wrong hash fails the install step before anything is built.
 
+**The plugins' uv pin lives in one file of its own repository (#1170).** The seven Python plugins run
+their CI through the shared action `Postulo/plugin-ci`, referenced by full address and tagged (`@v1`),
+and its `plugin-ci/action.yml` holds the plugins' `UV_VERSION` and `UV_INSTALLER_SHA256`, with the same
+sha256 check as above. A uv bump is therefore the four edits here plus one in that repository (the
+version and the hash in `action.yml`, then a new tag, or a moved `v1` if the change is only the pin);
+the plugins pick it up on their next run without a pull request each. Nothing in this repository checks
+that file: do it in the same sitting, and read one plugin's CI run afterwards. Their `release.yml` uses the same action, so the pin is not in it.
+
 The actions (`actions/checkout`, `upload-artifact`) stay pinned by tag: Forgejo resolves them against its own
 instance, and a hash from GitHub names a commit it may not have (`.forgejo/zizmor.yml`). `docs/THREAT-MODEL.md` says who the attackers are and which rules follow; a pull
 request that touches a boundary answers to it.
