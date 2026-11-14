@@ -639,6 +639,14 @@ class ListingChoiceOut(Schema):
     state: str
     noted_at: dt.datetime
     updated_at: dt.datetime
+    filed: bool = Field(
+        default=False,
+        description=(
+            "True when the caller asked with `external_id` and an entry with that identifier "
+            "is already in this listing's history: a mail client marks where a message is "
+            "already filed. Always false when `external_id` was not sent."
+        ),
+    )
 
 
 class ListingEventIn(Schema):
@@ -1693,6 +1701,7 @@ def listing_choice_out(request, posting) -> dict:
         "state": posting.derived_state,
         "noted_at": posting.noted_at,
         "updated_at": posting.updated_at,
+        "filed": bool(getattr(posting, "filed", False)),
     }
 
 
