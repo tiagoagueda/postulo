@@ -1323,6 +1323,16 @@ _VARIABLES: tuple[Variable, ...] = (
         default="",
         notes="Empty: an index is a list of code to run, so pointing at one is a decision.",
     ),
+    Variable(
+        "POSTULO_PLUGIN_ALLOW_UNLISTED",
+        Kind.BOOLEAN,
+        "plugins",
+        "Let a plugin be installed from a file the administrator supplies, which no signed "
+        "catalogue lists. For developing a plugin only.",
+        default=False,
+        notes="Off: nothing is installed except from a signed manifest (#1263). With it on, "
+        "the Plugins page offers an upload and `manage.py plugins install` takes a .whl path.",
+    ),
     # ------------------------------------------------------------------------- rate limits
     _rate(
         "POSTULO_CAPTURE_RATE",

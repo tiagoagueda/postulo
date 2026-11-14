@@ -892,6 +892,41 @@ def verify_imports(names: list[str]) -> list[str]:
     return said or [str(_("it could not be imported"))]
 
 
+def allows_unlisted() -> bool:
+    """Whether a wheel nobody signed for may be installed: ``POSTULO_PLUGIN_ALLOW_UNLISTED``.
+
+    Off unless an operator turned it on, for writing a plugin on their own instance (#1263).
+    """
+    from django.conf import settings
+
+    return bool(getattr(settings, "POSTULO_PLUGIN_ALLOW_UNLISTED", False))
+
+
+def refuse_unlisted(origin: str, expected_sha256: str) -> None:
+    """Nothing is installed except through a signed manifest (#1263).
+
+    A wheel is *listed* when it arrives from a catalogue (``catalogue:<name>``) with the
+    SHA-256 that catalogue's verified index carried: `catalogue.install` is the one place
+    that makes that pair, after the signature, the release and the compatibility have been
+    checked, and `sync` puts back what it recorded. Anything else -- an upload, a path on the
+    command line, a bare address -- is refused here, below every route, so a new route cannot
+    forget to ask.
+    """
+    if origin.startswith("catalogue:") and expected_sha256:
+        return
+    if allows_unlisted():
+        return
+    raise InstallError(
+        str(
+            _(
+                "Nothing is installed except from a signed catalogue, and this package is not "
+                "listed in one. An operator developing a plugin can switch "
+                "POSTULO_PLUGIN_ALLOW_UNLISTED on."
+            )
+        )
+    )
+
+
 @_under_record_lock
 def install_wheel(
     wheel: Path,
@@ -911,6 +946,7 @@ def install_wheel(
     puts a plugin back after an upgrade and has to put back the state it was in, not a
     fresh one. An install leaves both alone, which is enabled and now.
     """
+    refuse_unlisted(origin, expected_sha256)
     info = read_wheel(wheel)
     if expected_sha256 and info.sha256 != expected_sha256:
         raise InstallError(

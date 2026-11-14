@@ -32,7 +32,9 @@ class Command(BaseCommand):
     def add_arguments(self, parser) -> None:
         sub = parser.add_subparsers(dest="action", required=True)
         sub.add_parser("list", help="What is installed, and whether it loads.")
-        install = sub.add_parser("install", help="Install a wheel, or a name from a catalogue.")
+        install = sub.add_parser(
+            "install", help="Install a name from a catalogue (a .whl path only in development)."
+        )
         install.add_argument("what", help="A path to a .whl file, or a plugin's name.")
         install.add_argument(
             "--by", default="command line", help="Who to record as having done it."
@@ -90,6 +92,12 @@ class Command(BaseCommand):
         replaces = False
         try:
             if path.suffix == ".whl":
+                if not installing.allows_unlisted():
+                    raise CommandError(
+                        "Installing from a file is switched off: a plugin comes only from a "
+                        "signed catalogue. Name it instead, or set POSTULO_PLUGIN_ALLOW_UNLISTED "
+                        "to develop one."
+                    )
                 if not path.is_file():
                     raise CommandError(f"No such file: {path}")
                 replaces = installing.installed(installing.read_wheel(path).name) is not None

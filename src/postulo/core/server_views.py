@@ -1214,6 +1214,7 @@ class PluginsView(ServerSectionMixin, TemplateView):
             for source in available_sources()
         ]
         context["entry_point_group"] = ENTRY_POINT_GROUP
+        context["allow_unlisted"] = installing.allows_unlisted()
         context["installed"] = provenance.status()
         context["plugins_dir"] = str(installing.plugins_dir())
         context["catalogues_configured"] = sorted(catalogue.configured())
@@ -1852,6 +1853,12 @@ class PluginRepositoryView(StaffRequiredMixin, View):
         return redirect("server:plugins")
 
 
+_UNLISTED_REFUSED = _(
+    "Plugins are installed from a signed catalogue only. Installing from a file is switched "
+    "off on this instance."
+)
+
+
 def _upgrade_notice(entry) -> str:
     return str(
         _(
@@ -1900,8 +1907,12 @@ class PluginActionView(StaffRequiredMixin, View):
     # ------------------------------------------------------------- upload
 
     def _upload(self, request: HttpRequest) -> HttpResponse:
-        from postulo.plugins.installing import InstallError, check, read_wheel
+        from postulo.plugins.installing import InstallError, allows_unlisted, check, read_wheel
 
+        # No route installs outside a signed manifest unless an operator said so (#1263).
+        if not allows_unlisted():
+            messages.error(request, _UNLISTED_REFUSED)
+            return redirect("server:plugins")
         upload = request.FILES.get("package")
         if upload is None:
             messages.error(request, _("Choose a package first."))
@@ -1947,8 +1958,17 @@ class PluginActionView(StaffRequiredMixin, View):
         return redirect("server:plugins")
 
     def _confirm(self, request: HttpRequest) -> HttpResponse:
-        from postulo.plugins.installing import InstallError, install_wheel, installed
+        from postulo.plugins.installing import (
+            InstallError,
+            allows_unlisted,
+            install_wheel,
+            installed,
+        )
 
+        if not allows_unlisted():
+            request.session.pop("plugin_pending", None)
+            messages.error(request, _UNLISTED_REFUSED)
+            return redirect("server:plugins")
         pending = request.session.get("plugin_pending") or {}
         token = request.POST.get("token", "")
         if not pending or token != pending.get("token"):
@@ -1997,8 +2017,9 @@ class PluginActionView(StaffRequiredMixin, View):
         catalogues, problems = catalogue.fetch_all()
         for problem in problems:
             messages.error(request, problem)
-        from postulo.plugins import dependencies
+        from postulo.plugins import dependencies, provenance
 
+        official = provenance.official_repositories()
         listings = []
         for one in catalogues:
             offered_here = {
@@ -2035,6 +2056,9 @@ class PluginActionView(StaffRequiredMixin, View):
                         "licence": listing.licence,
                         "maintainer": listing.maintainer,
                         "catalogue": one.name,
+                        # One list, three origins (#1263): a catalogue is official because of
+                        # its key, never its name; the third origin is built in, and is not here.
+                        "origin": "official" if one.name in official else "third-party",
                         "installed": installing.installed(listing.name) is not None,
                         "requires_postulo": release.requires_postulo,
                         "compatible": installing.compatible(release.requires_postulo),

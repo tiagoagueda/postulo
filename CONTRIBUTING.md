@@ -903,6 +903,13 @@ by hand: `plugins.toml` says what is listed, and `scripts/official_catalogue.py`
    `tests/test_official_catalogue.py` runs it too. Commit `plugins.toml`, the index and the
    signature together.
 
+6. The index expires (`DEFAULT_EXPIRES_DAYS`, 60 days after it was built), and an expired index
+   is refused by every instance, which then says so on the Plugins page. So the release recipe
+   re-signs it: at each release, and whenever `python scripts/official_catalogue.py expiry`
+   (run by `tests/test_official_catalogue.py` in CI) fails because fewer than 30 days are
+   left, run steps 3 to 5 again, even with no new plugin release, and publish the pair. The
+   key is held by one person, so CI warning early is the whole mechanism.
+
 A leaked key means a new key: add it to `provenance.OFFICIAL_KEYS`, write a migration that gives
 the official row the new one, and sign again. An instance that has not upgraded keeps trusting what
 the old key signed, and no more.

@@ -657,6 +657,11 @@ POSTULO_PLUGINS_DIR = environ.Path(read("POSTULO_PLUGINS_DIR"))
 # here before anything is fetched from it.
 POSTULO_PLUGIN_CATALOGUES = read("POSTULO_PLUGIN_CATALOGUES")
 
+# Whether a plugin may be installed from a file nobody signed for (#1263). Off: the only way in
+# is a signed manifest (a catalogue's index, checked for its signature, the release's
+# compatibility and the wheel's SHA-256). For somebody writing a plugin, on their own instance.
+POSTULO_PLUGIN_ALLOW_UNLISTED = read("POSTULO_PLUGIN_ALLOW_UNLISTED")
+
 # Where the scheduler records the end of each pass. On the data volume because two
 # different containers read it: the scheduler's own healthcheck, which has no port to curl
 # and no database credentials, and the metrics endpoint, which runs in the web one (#221).

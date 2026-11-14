@@ -57,6 +57,10 @@ class CatalogueError(Exception):
     """The catalogue could not be read or could not be trusted."""
 
 
+class CatalogueExpired(CatalogueError):
+    """The index's signed expiry has passed (#1263): it cannot be used, and nothing is listed."""
+
+
 @dataclass(frozen=True)
 class Release:
     version: str
@@ -272,9 +276,16 @@ def refuse_stale(name: str, key: str, serial: int | None, expires: dt.datetime |
     remembered per repository and key (a new key is a repository not yet seen).
     """
     if expires is not None and expires < timezone.now():
-        raise CatalogueError(
-            str(_("The catalogue expired on %(date)s; an old copy may have been served."))
-            % {"date": expires.date().isoformat()}
+        raise CatalogueExpired(
+            str(
+                _(
+                    "The catalogue “%(name)s” expired on %(date)s, so it cannot be used: its "
+                    "publisher has to sign a new list, or an old copy is being served. Plugins "
+                    "already installed go on working; nothing can be installed or updated from "
+                    "it until then."
+                )
+            )
+            % {"name": name, "date": expires.date().isoformat()}
         )
     if serial is None:
         return

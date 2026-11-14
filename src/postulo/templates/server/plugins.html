@@ -370,7 +370,11 @@
   {% endif %}
 
   {# --------------------------------------------------------------- upload #}
+  {% if allow_unlisted %}
   <c-section-title>{% translate "Install a package" %}</c-section-title>
+  <div class="alert mb-4" data-variant="warning" role="note" data-unlisted-warning>
+    <div><p class="text-sm">{% translate "This instance allows installing a package no catalogue lists, for developing a plugin. Nothing vouches for it: it is not signed by anyone." %}</p></div>
+  </div>
   {% if pending %}
     <div class="card mb-8">
       <p class="mb-3 text-sm text-ink-500 dark:text-ink-400">
@@ -419,6 +423,7 @@
       <button type="submit" class="btn">{% translate "Read it" %}</button>
     </form>
   {% endif %}
+  {% endif %}
 
   {# ------------------------------------------------------------ catalogue #}
   <c-section-title>{% translate "Catalogues" %}</c-section-title>
@@ -456,6 +461,7 @@
                   {% if listing.licence %} · {{ listing.licence }}{% endif %}
                   {% if listing.maintainer %} · <bdi>{{ listing.maintainer }}</bdi>{% endif %}
                   · <code>{{ listing.catalogue }}</code>
+                  · <span class="badge" data-tone="grey" data-origin="{{ listing.origin }}">{% if listing.origin == "official" %}{% translate "Official" %}{% else %}{% translate "Third party" %}{% endif %}</span>
                 </p>
               </div>
               {% if listing.needs %}
@@ -515,8 +521,8 @@
     <div class="card mb-8 text-sm text-ink-500 dark:text-ink-400">
       <p class="mb-2">
         {% blocktranslate trimmed %}
-          No catalogue is configured, so plugins are installed from a package you upload.
-          A catalogue is a signed list of plugins that can be installed by name.
+          No catalogue is configured, so nothing can be installed yet: plugins come only from
+          a signed catalogue, a signed list of plugins that can be installed by name.
         {% endblocktranslate %}
       </p>
       <p>

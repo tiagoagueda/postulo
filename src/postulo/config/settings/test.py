@@ -90,3 +90,7 @@ POSTULO_FETCH_PORTS = "*"
 # again, and answer the browser's requests for them without leaving the machine
 # (`tests/e2e/test_map.py`).
 POSTULO_MAP_TILES = "none"
+
+# The install tests build wheels of their own and install them directly. The rule that nothing
+# is installed outside a signed manifest is switched back on by the tests that hold it (#1263).
+POSTULO_PLUGIN_ALLOW_UNLISTED = True

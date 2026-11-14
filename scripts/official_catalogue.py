@@ -7,6 +7,7 @@ exactly its bytes, which is what ``postulo.plugins.catalogue`` reads and checks.
     python scripts/official_catalogue.py build  --wheels DIR   # plugins.toml + wheels → index.json
     python scripts/official_catalogue.py sign                  # index.json → index.json.sig
     python scripts/official_catalogue.py verify [--wheels DIR] # what an instance would check
+    python scripts/official_catalogue.py expiry [--within 30]  # fail near expiry
 
 ``sign`` reads the private key (base64, the 32 raw bytes) from ``POSTULO_CATALOGUE_KEY``
 or, with ``--key-file``, from a file; never from an argument, where it would be in the
@@ -58,6 +59,8 @@ def render(document: dict) -> bytes:
 #: copy served long after the release it listed was withdrawn refuses itself; it also means the
 #: index has to be signed again within this time, whether or not anything changed.
 DEFAULT_EXPIRES_DAYS = 60
+#: CI fails when the committed index has this few days left (#1263).
+EXPIRY_WARNING_DAYS = 30
 
 
 def build(wheels: Path, expires_days: int = DEFAULT_EXPIRES_DAYS) -> dict:
@@ -145,6 +148,32 @@ def check(wheels: Path | None) -> list[str]:
     return problems
 
 
+def days_left(now: dt.datetime | None = None) -> int | None:
+    """Whole days until the committed index expires (negative once past), or ``None``.
+
+    The index is signed with an expiry (#972), after which every instance refuses it. Nothing
+    renews it on its own: the key is held by a person, so CI says so while there is time (#1263).
+    """
+    expires = json.loads(INDEX.read_bytes()).get("expires")
+    if expires is None:
+        return None
+    moment = dt.datetime.fromisoformat(str(expires).replace("Z", "+00:00"))
+    return (moment - (now or dt.datetime.now(dt.UTC))).days
+
+
+def expiring(within: int, now: dt.datetime | None = None) -> str:
+    """A sentence when the index expires within ``within`` days, or is past it; else empty."""
+    left = days_left(now)
+    if left is None or left > within:
+        return ""
+    if left < 0:
+        return "index.json has expired, so no instance can use it: build and sign it again."
+    return (
+        f"index.json expires in {left} days (the limit is {within}): build it again with "
+        "`build`, sign it with `sign`, and publish both before then."
+    )
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     sub = parser.add_subparsers(dest="command", required=True)
@@ -161,6 +190,8 @@ def main(argv: list[str] | None = None) -> int:
     signed.add_argument("--key-file")
     verified = sub.add_parser("verify", help="check the pair as an instance would")
     verified.add_argument("--wheels", type=Path)
+    expiry = sub.add_parser("expiry", help="fail when the index expires soon")
+    expiry.add_argument("--within", type=int, default=EXPIRY_WARNING_DAYS)
     args = parser.parse_args(argv)
 
     if args.command == "build":
@@ -177,6 +208,13 @@ def main(argv: list[str] | None = None) -> int:
             raise SystemExit("That is not the key instances trust (provenance.OFFICIAL_KEY).")
         SIGNATURE.write_bytes(base64.b64encode(key.sign(INDEX.read_bytes())) + b"\n")
         print(f"Wrote {SIGNATURE.relative_to(ROOT)}.")
+        return 0
+    if args.command == "expiry":
+        problem = expiring(args.within)
+        if problem:
+            print(f"error: {problem}", file=sys.stderr)
+            return 1
+        print(f"The index has more than {args.within} days left.")
         return 0
     problems = check(args.wheels)
     for problem in problems:
