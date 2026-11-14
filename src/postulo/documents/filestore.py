@@ -191,6 +191,23 @@ def thumbnail_name(name: str) -> str:
     return f"{THUMBNAIL_FOLDER}/{parts[1]}/{digest}.webp"
 
 
+def converted_name(name: str) -> str:
+    """Where the PDF a converter plugin made from the stored file ``name`` lives (#942, D3).
+
+    Worked out as a thumbnail's name is, and kept in the same folder with the same digest and
+    a ``.pdf`` ending: it is a derived file with no row, so everything that counts, sweeps or
+    deletes thumbnails counts, sweeps and deletes it. It is a *derivative*, never the file.
+    """
+    one = thumbnail_name(name)
+    return one[: -len(".webp")] + ".pdf" if one else ""
+
+
 def thumbnail_names(names) -> set[str]:
-    """The thumbnails that may exist for these stored files, for whoever has to count them."""
-    return {one for one in (thumbnail_name(name) for name in names) if one}
+    """The derived files that may exist for these stored files (a thumbnail, a converted PDF),
+    for whoever has to count them."""
+    found: set[str] = set()
+    for name in names:
+        one = thumbnail_name(name)
+        if one:
+            found.update((one, converted_name(name)))
+    return found

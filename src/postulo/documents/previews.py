@@ -33,6 +33,7 @@ import logging
 import posixpath
 import subprocess
 import sys
+from collections.abc import Callable
 from dataclasses import dataclass
 
 from django.core.files.base import ContentFile
@@ -40,7 +41,7 @@ from django.core.files.storage import default_storage
 
 from postulo.core import pictures
 
-from .filestore import thumbnail_name
+from .filestore import converted_name, thumbnail_name
 
 logger = logging.getLogger(__name__)
 
@@ -64,6 +65,8 @@ class Preview:
     kind: str
     #: The type the preview is answered as, or ``""`` where there is none.
     content_type: str
+    #: Whether it is a PDF a converter plugin makes from the file, rather than the file itself.
+    converted: bool = False
 
 
 #: Extension to preview. The whole list of what is ever answered *inline*: a type not here is
@@ -81,10 +84,80 @@ NONE = Preview("none", "")
 THUMBNAILED = frozenset({"pdf", "image"})
 
 
-def preview_of(filename: str) -> Preview:
-    """What a file called ``filename`` is previewed as, from its last extension alone."""
+@dataclass(frozen=True)
+class Converter:
+    """A plugin's offer to turn files Postulo cannot show into a PDF it can (#942, D3).
+
+    ``extensions`` are the ones it takes, with their dot (``(".docx", ".odt")``), none of them an
+    extension that is already previewed. ``convert`` is handed the file's bytes and its
+    extension and returns the PDF's bytes, or ``None`` (or raises) when it cannot; it runs on
+    the first view of a file and may be slow, so a converter that dials a service holds itself
+    to a deadline. Postulo checks the answer is a PDF before keeping it.
+    """
+
+    key: str
+    extensions: tuple[str, ...]
+    convert: Callable[[bytes, str], bytes | None]
+
+
+#: Converters a plugin registered, by key. Empty in a core with none: then a Word file is a
+#: download and nothing more.
+CONVERTERS: dict[str, Converter] = {}
+
+#: The most a converter is handed and the most it may hand back.
+MAX_CONVERT_BYTES = 40 * 1024 * 1024
+
+
+def register_converter(offered: Converter) -> bool:
+    """Offer a converter. Returns whether it was taken.
+
+    Refused, and logged, when it has no key or no extension, when the key is taken (the first
+    keeps it, as a document format's does), or when it names an extension Postulo already
+    previews: a plugin cannot take over how a PDF or a picture is shown.
+    """
+    extensions = tuple(one.lower() for one in offered.extensions if one.startswith("."))
+    if not offered.key or not extensions or len(extensions) != len(offered.extensions):
+        logger.warning("A preview converter with no key or a bad extension was ignored")
+        return False
+    if offered.key in CONVERTERS:
+        logger.warning(
+            "Preview converter %r was offered twice; the first one keeps it", offered.key
+        )
+        return False
+    if any(one in BY_EXTENSION for one in extensions):
+        logger.warning("Preview converter %r names a kind Postulo previews itself", offered.key)
+        return False
+    CONVERTERS[offered.key] = Converter(offered.key, extensions, offered.convert)
+    return True
+
+
+def forget_converter(key: str = "") -> None:
+    """Drop a plugin's converter, or every one. For tests and for uninstalling."""
+    if key:
+        CONVERTERS.pop(key, None)
+    else:
+        CONVERTERS.clear()
+
+
+def converter_for(filename: str) -> Converter | None:
+    """The converter that takes this file's extension, if a plugin brought one."""
     extension = posixpath.splitext(filename or "")[1].lower()
-    return BY_EXTENSION.get(extension, NONE)
+    return next((one for one in CONVERTERS.values() if extension in one.extensions), None)
+
+
+def preview_of(filename: str) -> Preview:
+    """What a file called ``filename`` is previewed as, from its last extension alone.
+
+    A kind Postulo does not show is a PDF when a converter plugin takes its extension: the
+    viewer then reads the converted copy (`converted_bytes`), and the download stays the file.
+    """
+    extension = posixpath.splitext(filename or "")[1].lower()
+    found = BY_EXTENSION.get(extension)
+    if found:
+        return found
+    if converter_for(filename):
+        return Preview("pdf", "application/pdf", converted=True)
+    return NONE
 
 
 @functools.cache
@@ -130,8 +203,10 @@ def _from_picture(data: bytes) -> bytes | None:
 
 def has_thumbnail(filename: str) -> bool:
     """Whether a thumbnail may be asked for a file of this name (a PDF needs the library)."""
-    kind = preview_of(filename).kind
-    return kind == "image" or (kind == "pdf" and can_rasterise())
+    found = preview_of(filename)
+    return found.kind == "image" or (
+        found.kind == "pdf" and not found.converted and can_rasterise()
+    )
 
 
 def make(data: bytes, filename: str) -> bytes | None:
@@ -154,7 +229,8 @@ def thumbnail_bytes(file_field, filename: str) -> bytes | None:
     tried once and not on every request; the bytes are then nothing, as they are for a kind
     that has none. Performs no permission checking: the caller has established who is asking.
     """
-    if preview_of(filename).kind not in THUMBNAILED:
+    found = preview_of(filename)
+    if found.kind not in THUMBNAILED or found.converted:
         return None
     name = thumbnail_name(file_field.name)
     if not name:
@@ -174,11 +250,47 @@ def thumbnail_bytes(file_field, filename: str) -> bytes | None:
     return made
 
 
+def converted_bytes(file_field, filename: str) -> bytes | None:
+    """The PDF a converter made from a kept file, made now if it has none; ``None`` if it cannot.
+
+    Kept beside the thumbnails as a derivative of the file and never in its place. Nothing is
+    kept for a failure -- a converter whose service is down is tried again at the next view --
+    and nothing that is not a PDF is ever kept or answered. Performs no permission checking:
+    the caller has established who is asking.
+    """
+    found = preview_of(filename)
+    converter = converter_for(filename)
+    name = converted_name(file_field.name)
+    if not found.converted or converter is None or not name:
+        return None
+    if default_storage.exists(name):
+        with default_storage.open(name, "rb") as kept:
+            return kept.read() or None
+    try:
+        with file_field.storage.open(file_field.name, "rb") as source:
+            data = source.read(MAX_CONVERT_BYTES + 1)
+    except OSError:
+        return None
+    if len(data) > MAX_CONVERT_BYTES:
+        return None
+    try:
+        made = converter.convert(data, posixpath.splitext(filename)[1].lower())
+    except Exception:  # a plugin's failure is a sentence in the viewer, never an error page
+        logger.warning("Converter %r failed", converter.key, exc_info=True)
+        return None
+    if not made or not made.startswith(b"%PDF-") or len(made) > MAX_CONVERT_BYTES:
+        return None
+    saved = default_storage.save(name, ContentFile(made))
+    if saved != name:  # another request wrote it first; keep one
+        default_storage.delete(saved)
+    return made
+
+
 def remove(file_name: str) -> None:
-    """Delete the thumbnail of a file that is going."""
-    name = thumbnail_name(file_name)
-    if name and default_storage.exists(name):
-        try:
-            default_storage.delete(name)
-        except OSError:  # pragma: no cover - a thumbnail already gone is what was wanted
-            logger.warning("Could not remove %s from storage", name, exc_info=True)
+    """Delete the thumbnail and the converted PDF of a file that is going."""
+    for name in (thumbnail_name(file_name), converted_name(file_name)):
+        if name and default_storage.exists(name):
+            try:
+                default_storage.delete(name)
+            except OSError:  # pragma: no cover - a file already gone is what was wanted
+                logger.warning("Could not remove %s from storage", name, exc_info=True)
