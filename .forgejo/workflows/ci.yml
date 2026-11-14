@@ -155,7 +155,7 @@ jobs:
         timeout-minutes: 10
 
       - name: Install dependencies
-        run: uv sync --locked --python 3.14 --group e2e
+        run: uv sync --locked --python 3.14 --group e2e --extra preview
         timeout-minutes: 5
 
       - name: Install Chromium for Playwright
@@ -327,7 +327,7 @@ jobs:
         # unit test needs pytest-playwright, whose plugin would otherwise load in every
         # worker. The browser itself is never downloaded here. `UV_NO_SYNC` above is what
         # makes this true: for months a plain `uv run` put the whole group back (#1135).
-        run: uv sync --locked --python ${{ matrix.python-version }} --no-group e2e --extra chromium
+        run: uv sync --locked --python ${{ matrix.python-version }} --no-group e2e --extra chromium --extra preview
         timeout-minutes: 5
 
       - name: Keep the compiled translations between runs
