@@ -182,8 +182,15 @@ def test_deeply_nested_braces_and_json_are_refused_or_cut_and_never_crash(depth)
         references.read(nested.encode(), "nested.bib")
     except references.ReferencesRefused:
         pass
-    with pytest.raises(references.ReferencesRefused):
-        references.read(("[" * depth + "]" * depth).encode(), "nested.json")
+    # Whether Python's JSON reader refuses 50,000 nested lists depends on its patch version
+    # (3.14.7 parses them, later ones may not): either is fine, so long as nothing crashes and
+    # nothing is kept.
+    try:
+        reading = references.read(("[" * depth + "]" * depth).encode(), "nested.json")
+    except references.ReferencesRefused:
+        pass
+    else:
+        assert not reading.entries
     assert time.monotonic() - started < 20
 
 
