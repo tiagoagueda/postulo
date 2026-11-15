@@ -6669,6 +6669,10 @@ msgstr "设计（Behance、Dribbble……）"
 msgid "Destination"
 msgstr "目标"
 
+#: src/postulo/core/server_forms.py
+msgid "Destination settings"
+msgstr ""
+
 #: src/postulo/core/design.py
 msgid "Destructive"
 msgstr "破坏性"
@@ -13240,6 +13244,10 @@ msgstr "除非你要求，否则关闭：住址是别人能找到你的地方。
 msgid "Off unless you turn it on: a reference letter is written by somebody else, and is their words and their name."
 msgstr "默认关闭，除非你开启：推荐信由他人撰写，是他们的言辞，署的是他们的名字。"
 
+#: src/postulo/plugins/policy.py
+msgid "Off until an administrator switches it on."
+msgstr ""
+
 #: src/postulo/core/server_views.py
 msgid "Off while the module above it is off."
 msgstr "上方的模块关闭时，此项也关闭。"
@@ -14300,13 +14308,19 @@ msgstr "粘贴文本。招聘信息会从网上消失，而你的副本不会。
 msgid "Pay"
 msgstr "薪酬"
 
-#: src/postulo/jobs/models.py
+#: src/postulo/jobs/models.py src/postulo/templates/cotton/preview_tabs.html
 msgid "PDF"
 msgstr "PDF"
 
 #: src/postulo/documents/slow.py
 msgid "PDF created."
 msgstr "已创建 PDF。"
+
+#: src/postulo/templates/documents/cv_detail.html
+#: src/postulo/templates/documents/letter_detail.html
+#, python-format
+msgid "PDF of %(name)s"
+msgstr ""
 
 #: src/postulo/templates/server/overview.html
 msgid "PDF renderer"
@@ -15363,6 +15377,10 @@ msgstr "已排队的任务"
 #: src/postulo/templates/server/overview.html
 msgid "queued, but no worker has been here"
 msgstr "已排队，但还没有工作进程处理过"
+
+#: src/postulo/templates/cotton/preview_tabs.html
+msgid "Quick view"
+msgstr ""
 
 #: src/postulo/templates/widgets/_source_table.html
 #: src/postulo/templates/widgets/industries.html
@@ -16882,7 +16900,8 @@ msgstr "服务"
 msgid "service"
 msgstr "服务"
 
-#: src/postulo/plugins/models.py src/postulo/templates/server/email.html
+#: src/postulo/core/server_forms.py src/postulo/plugins/models.py
+#: src/postulo/templates/server/email.html
 #, fuzzy
 msgid "set"
 msgstr "已设置"
@@ -16901,6 +16920,11 @@ msgstr "在状态首次变为“已申请”时自动设置。"
 
 #: src/postulo/plugins/models.py
 msgid "set by"
+msgstr ""
+
+#: src/postulo/core/server_views.py
+#, python-format
+msgid "Set by %(variable)s in the environment; change it there."
 msgstr ""
 
 #: src/postulo/templates/server/plugins.html
@@ -19528,6 +19552,11 @@ msgstr "它所属的条目不在文件中。"
 msgid "The entry of your career this is the proof of. Used for a certificate, a diploma or a diploma supplement; a diploma and its supplement point at the same entry."
 msgstr "此文件所证明的职业经历条目。用于证书、文凭或文凭补充说明；文凭及其补充说明指向同一条目。"
 
+#: src/postulo/core/views_access.py
+#, python-format
+msgid "The environment decides this: change %(variable)s there."
+msgstr ""
+
 #: src/postulo/core/server_views.py src/postulo/plugins/forms.py
 #, python-format
 msgid "The environment sets “%(name)s”, so it cannot be changed here."
@@ -19798,6 +19827,11 @@ msgid "The key the connection secrets are under is not in the archive. Restore w
 msgstr "归档中不包含连接机密信息所用的密钥。请使用写入归档时的同一个<code>.env</code>进行恢复，否则无法读取这些机密信息。"
 
 #: src/postulo/templates/server/register_lookup.html
+#, python-format
+msgid "The keys are set by the environment: <code>%(variable)s</code>. Change them there."
+msgstr ""
+
+#: src/postulo/templates/server/register_lookup.html
 msgid "The keys of the company registers that answer only to one."
 msgstr "只接受一个密钥的公司登记机构的密钥。"
 
@@ -19829,6 +19863,11 @@ msgstr "你使用 Postulo 的界面语言"
 #: src/postulo/accounts/forms.py
 msgid "The language's usual"
 msgstr "语言默认"
+
+#: src/postulo/templates/server/defaults.html
+#, python-format
+msgid "The languages offered are set by the environment: <code>%(variable)s</code>. Remove it from the environment to change them here."
+msgstr ""
 
 #: src/postulo/templates/server/backups.html
 #: src/postulo/templates/server/overview.html
@@ -21613,6 +21652,10 @@ msgstr "运输设备"
 msgid "transport secrets"
 msgstr "传输机密信息"
 
+#: src/postulo/core/server_forms.py
+msgid "Transport settings"
+msgstr ""
+
 #: src/postulo/jobs/industries.py
 msgid "Travel"
 msgstr "旅游"
@@ -22246,6 +22289,14 @@ msgstr "供水"
 #: src/postulo/core/models.py
 msgid "way back into the account"
 msgstr "重新登录账户的方式"
+
+#: src/postulo/templates/documents/cv_detail.html
+msgid "Ways to read this CV"
+msgstr ""
+
+#: src/postulo/templates/documents/letter_detail.html
+msgid "Ways to read this letter"
+msgstr ""
 
 #: src/postulo/templates/account/partials/password_meter.html
 msgid "Weak"

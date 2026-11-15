@@ -6720,6 +6720,10 @@ msgstr "डिज़ाइन (Behance, Dribbble…)"
 msgid "Destination"
 msgstr "गंतव्य"
 
+#: src/postulo/core/server_forms.py
+msgid "Destination settings"
+msgstr ""
+
 #: src/postulo/core/design.py
 msgid "Destructive"
 msgstr "खतरनाक"
@@ -13241,6 +13245,10 @@ msgstr "जब तक आप न कहें, बंद रहता है: �
 msgid "Off unless you turn it on: a reference letter is written by somebody else, and is their words and their name."
 msgstr "जब तक आप इसे चालू न करें, बंद रहता है: रेफ़रेंस लेटर कोई और लिखता है, और उसमें उसके शब्द और उसका नाम होता है।"
 
+#: src/postulo/plugins/policy.py
+msgid "Off until an administrator switches it on."
+msgstr ""
+
 #: src/postulo/core/server_views.py
 msgid "Off while the module above it is off."
 msgstr "ऊपर वाले मॉड्यूल के बंद रहने तक बंद है।"
@@ -14317,13 +14325,19 @@ msgstr "टेक्स्ट पेस्ट करें। विज्ञा
 msgid "Pay"
 msgstr "वेतन"
 
-#: src/postulo/jobs/models.py
+#: src/postulo/jobs/models.py src/postulo/templates/cotton/preview_tabs.html
 msgid "PDF"
 msgstr "PDF"
 
 #: src/postulo/documents/slow.py
 msgid "PDF created."
 msgstr "PDF बनाया गया।"
+
+#: src/postulo/templates/documents/cv_detail.html
+#: src/postulo/templates/documents/letter_detail.html
+#, python-format
+msgid "PDF of %(name)s"
+msgstr ""
 
 #: src/postulo/templates/server/overview.html
 msgid "PDF renderer"
@@ -15375,6 +15389,10 @@ msgstr "कतार में लगे टास्क"
 #: src/postulo/templates/server/overview.html
 msgid "queued, but no worker has been here"
 msgstr "कतार में है, लेकिन कोई वर्कर यहां नहीं आया"
+
+#: src/postulo/templates/cotton/preview_tabs.html
+msgid "Quick view"
+msgstr ""
 
 #: src/postulo/templates/widgets/_source_table.html
 #: src/postulo/templates/widgets/industries.html
@@ -16891,7 +16909,8 @@ msgstr "सेवा"
 msgid "service"
 msgstr "सेवा"
 
-#: src/postulo/plugins/models.py src/postulo/templates/server/email.html
+#: src/postulo/core/server_forms.py src/postulo/plugins/models.py
+#: src/postulo/templates/server/email.html
 msgid "set"
 msgstr "सेट है"
 
@@ -16910,6 +16929,11 @@ msgstr "जब स्थिति पहली बार “आवेदन क�
 
 #: src/postulo/plugins/models.py
 msgid "set by"
+msgstr ""
+
+#: src/postulo/core/server_views.py
+#, python-format
+msgid "Set by %(variable)s in the environment; change it there."
 msgstr ""
 
 #: src/postulo/templates/server/plugins.html
@@ -19534,6 +19558,11 @@ msgstr "जिस प्रविष्टि का यह हिस्सा �
 msgid "The entry of your career this is the proof of. Used for a certificate, a diploma or a diploma supplement; a diploma and its supplement point at the same entry."
 msgstr "आपके करियर की वह प्रविष्टि जिसका यह सबूत है। सर्टिफ़िकेट, डिप्लोमा या डिप्लोमा सप्लीमेंट के लिए इस्तेमाल होता है; डिप्लोमा और उसका सप्लीमेंट एक ही प्रविष्टि की ओर इशारा करते हैं।"
 
+#: src/postulo/core/views_access.py
+#, python-format
+msgid "The environment decides this: change %(variable)s there."
+msgstr ""
+
 #: src/postulo/core/server_views.py src/postulo/plugins/forms.py
 #, python-format
 msgid "The environment sets “%(name)s”, so it cannot be changed here."
@@ -19806,6 +19835,11 @@ msgid "The key the connection secrets are under is not in the archive. Restore w
 msgstr "जिस कुंजी से कनेक्शन के सीक्रेट एन्क्रिप्ट हैं, वह आर्काइव में नहीं है। उसी <code>.env</code> के साथ रीस्टोर करें जिसके साथ आर्काइव लिखा गया था, वरना वे सीक्रेट पढ़े नहीं जा सकेंगे।"
 
 #: src/postulo/templates/server/register_lookup.html
+#, python-format
+msgid "The keys are set by the environment: <code>%(variable)s</code>. Change them there."
+msgstr ""
+
+#: src/postulo/templates/server/register_lookup.html
 msgid "The keys of the company registers that answer only to one."
 msgstr "उन कंपनी रजिस्टरों की कुंजियां जो केवल कुंजी वाले को जवाब देते हैं।"
 
@@ -19837,6 +19871,11 @@ msgstr "वह भाषा जिसमें आप Postulo पढ़ते �
 #: src/postulo/accounts/forms.py
 msgid "The language's usual"
 msgstr "भाषा के हिसाब से सामान्य"
+
+#: src/postulo/templates/server/defaults.html
+#, python-format
+msgid "The languages offered are set by the environment: <code>%(variable)s</code>. Remove it from the environment to change them here."
+msgstr ""
 
 #: src/postulo/templates/server/backups.html
 #: src/postulo/templates/server/overview.html
@@ -21618,6 +21657,10 @@ msgstr "ट्रांसपोर्ट उपकरण"
 msgid "transport secrets"
 msgstr "ट्रांसपोर्ट के सीक्रेट"
 
+#: src/postulo/core/server_forms.py
+msgid "Transport settings"
+msgstr ""
+
 #: src/postulo/jobs/industries.py
 msgid "Travel"
 msgstr "यात्रा"
@@ -22252,6 +22295,14 @@ msgstr "जल आपूर्ति"
 #: src/postulo/core/models.py
 msgid "way back into the account"
 msgstr "खाते में वापस आने का तरीका"
+
+#: src/postulo/templates/documents/cv_detail.html
+msgid "Ways to read this CV"
+msgstr ""
+
+#: src/postulo/templates/documents/letter_detail.html
+msgid "Ways to read this letter"
+msgstr ""
 
 #: src/postulo/templates/account/partials/password_meter.html
 msgid "Weak"

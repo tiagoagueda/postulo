@@ -6741,6 +6741,10 @@ msgstr "Design (Behance, Dribbble…)"
 msgid "Destination"
 msgstr "Destination"
 
+#: src/postulo/core/server_forms.py
+msgid "Destination settings"
+msgstr ""
+
 #: src/postulo/core/design.py
 msgid "Destructive"
 msgstr "Destructif"
@@ -13243,6 +13247,10 @@ msgstr "Désactivé sauf si vous le demandez : une adresse personnelle est un e
 msgid "Off unless you turn it on: a reference letter is written by somebody else, and is their words and their name."
 msgstr "Désactivé sauf si vous l'activez : une lettre de recommandation est écrite par quelqu'un d'autre ; ce sont ses mots et son nom."
 
+#: src/postulo/plugins/policy.py
+msgid "Off until an administrator switches it on."
+msgstr ""
+
 #: src/postulo/core/server_views.py
 msgid "Off while the module above it is off."
 msgstr "Désactivé tant que le module au-dessus l'est."
@@ -14312,13 +14320,19 @@ msgstr "Collez le texte. Les annonces disparaissent du web ; votre copie, non.
 msgid "Pay"
 msgstr "Salaire"
 
-#: src/postulo/jobs/models.py
+#: src/postulo/jobs/models.py src/postulo/templates/cotton/preview_tabs.html
 msgid "PDF"
 msgstr "PDF"
 
 #: src/postulo/documents/slow.py
 msgid "PDF created."
 msgstr "PDF créé."
+
+#: src/postulo/templates/documents/cv_detail.html
+#: src/postulo/templates/documents/letter_detail.html
+#, python-format
+msgid "PDF of %(name)s"
+msgstr ""
 
 #: src/postulo/templates/server/overview.html
 msgid "PDF renderer"
@@ -15368,6 +15382,10 @@ msgstr "Tâches en file d'attente"
 #: src/postulo/templates/server/overview.html
 msgid "queued, but no worker has been here"
 msgstr "en file d'attente, mais aucun processus de travail n'est passé"
+
+#: src/postulo/templates/cotton/preview_tabs.html
+msgid "Quick view"
+msgstr ""
 
 #: src/postulo/templates/widgets/_source_table.html
 #: src/postulo/templates/widgets/industries.html
@@ -16871,7 +16889,8 @@ msgstr "Service"
 msgid "service"
 msgstr "service"
 
-#: src/postulo/plugins/models.py src/postulo/templates/server/email.html
+#: src/postulo/core/server_forms.py src/postulo/plugins/models.py
+#: src/postulo/templates/server/email.html
 msgid "set"
 msgstr "défini"
 
@@ -16889,6 +16908,11 @@ msgstr "Défini automatiquement la première fois que le statut passe à « Env
 
 #: src/postulo/plugins/models.py
 msgid "set by"
+msgstr ""
+
+#: src/postulo/core/server_views.py
+#, python-format
+msgid "Set by %(variable)s in the environment; change it there."
 msgstr ""
 
 #: src/postulo/templates/server/plugins.html
@@ -19497,6 +19521,11 @@ msgstr "L'entrée à laquelle elle appartient n'est pas dans le fichier."
 msgid "The entry of your career this is the proof of. Used for a certificate, a diploma or a diploma supplement; a diploma and its supplement point at the same entry."
 msgstr "L'entrée de votre parcours que ce fichier justifie. Utilisée pour un certificat, un diplôme ou un supplément au diplôme ; un diplôme et son supplément pointent vers la même entrée."
 
+#: src/postulo/core/views_access.py
+#, python-format
+msgid "The environment decides this: change %(variable)s there."
+msgstr ""
+
 #: src/postulo/core/server_views.py src/postulo/plugins/forms.py
 #, python-format
 msgid "The environment sets “%(name)s”, so it cannot be changed here."
@@ -19769,6 +19798,11 @@ msgid "The key the connection secrets are under is not in the archive. Restore w
 msgstr "La clé qui protège les secrets de connexion ne figure pas dans l'archive. Restaurez avec le même <code>.env</code> que celui utilisé à l'écriture de l'archive, sinon ces secrets seront illisibles."
 
 #: src/postulo/templates/server/register_lookup.html
+#, python-format
+msgid "The keys are set by the environment: <code>%(variable)s</code>. Change them there."
+msgstr ""
+
+#: src/postulo/templates/server/register_lookup.html
 msgid "The keys of the company registers that answer only to one."
 msgstr "Les clés des registres d'entreprises qui ne répondent qu'avec une clé."
 
@@ -19800,6 +19834,11 @@ msgstr "La langue dans laquelle vous lisez Postulo"
 #: src/postulo/accounts/forms.py
 msgid "The language's usual"
 msgstr "Selon la langue"
+
+#: src/postulo/templates/server/defaults.html
+#, python-format
+msgid "The languages offered are set by the environment: <code>%(variable)s</code>. Remove it from the environment to change them here."
+msgstr ""
 
 #: src/postulo/templates/server/backups.html
 #: src/postulo/templates/server/overview.html
@@ -21574,6 +21613,10 @@ msgstr "Matériel de transport"
 msgid "transport secrets"
 msgstr "secrets du transport"
 
+#: src/postulo/core/server_forms.py
+msgid "Transport settings"
+msgstr ""
+
 #: src/postulo/jobs/industries.py
 #, fuzzy
 msgid "Travel"
@@ -22205,6 +22248,14 @@ msgstr "Distribution d'eau"
 #: src/postulo/core/models.py
 msgid "way back into the account"
 msgstr "moyen de récupérer l'accès au compte"
+
+#: src/postulo/templates/documents/cv_detail.html
+msgid "Ways to read this CV"
+msgstr ""
+
+#: src/postulo/templates/documents/letter_detail.html
+msgid "Ways to read this letter"
+msgstr ""
 
 #: src/postulo/templates/account/partials/password_meter.html
 msgid "Weak"

@@ -6870,6 +6870,10 @@ msgstr "Dizainas (Behance, Dribbble…)"
 msgid "Destination"
 msgstr "Paskirties vieta"
 
+#: src/postulo/core/server_forms.py
+msgid "Destination settings"
+msgstr ""
+
 #: src/postulo/core/design.py
 msgid "Destructive"
 msgstr "Naikinamasis"
@@ -13395,6 +13399,10 @@ msgstr "Išjungta, nebent paprašysite: namų adresas – vieta, kur žmogų gal
 msgid "Off unless you turn it on: a reference letter is written by somebody else, and is their words and their name."
 msgstr "Išjungta, nebent įjungsite: rekomendacinį laišką rašo kitas asmuo, tai jo žodžiai ir jo vardas."
 
+#: src/postulo/plugins/policy.py
+msgid "Off until an administrator switches it on."
+msgstr ""
+
 #: src/postulo/core/server_views.py
 msgid "Off while the module above it is off."
 msgstr "Išjungta, kol išjungtas aukščiau esantis modulis."
@@ -14485,13 +14493,19 @@ msgstr "Įklijuokite tekstą. Skelbimai iš interneto dingsta, o jūsų kopija �
 msgid "Pay"
 msgstr "Atlyginimas"
 
-#: src/postulo/jobs/models.py
+#: src/postulo/jobs/models.py src/postulo/templates/cotton/preview_tabs.html
 msgid "PDF"
 msgstr "PDF"
 
 #: src/postulo/documents/slow.py
 msgid "PDF created."
 msgstr "PDF sukurtas."
+
+#: src/postulo/templates/documents/cv_detail.html
+#: src/postulo/templates/documents/letter_detail.html
+#, python-format
+msgid "PDF of %(name)s"
+msgstr ""
 
 #: src/postulo/templates/server/overview.html
 msgid "PDF renderer"
@@ -15543,6 +15557,10 @@ msgstr "Eilėje laukiančios užduotys"
 #: src/postulo/templates/server/overview.html
 msgid "queued, but no worker has been here"
 msgstr "eilėje, bet foninis procesas čia nebuvo"
+
+#: src/postulo/templates/cotton/preview_tabs.html
+msgid "Quick view"
+msgstr ""
 
 #: src/postulo/templates/widgets/_source_table.html
 #: src/postulo/templates/widgets/industries.html
@@ -17053,7 +17071,8 @@ msgstr "Paslauga"
 msgid "service"
 msgstr "paslauga"
 
-#: src/postulo/plugins/models.py src/postulo/templates/server/email.html
+#: src/postulo/core/server_forms.py src/postulo/plugins/models.py
+#: src/postulo/templates/server/email.html
 msgid "set"
 msgstr "nustatyta"
 
@@ -17071,6 +17090,11 @@ msgstr "Nustatoma automatiškai, kai būsena pirmą kartą tampa „Pateikta“.
 
 #: src/postulo/plugins/models.py
 msgid "set by"
+msgstr ""
+
+#: src/postulo/core/server_views.py
+#, python-format
+msgid "Set by %(variable)s in the environment; change it there."
 msgstr ""
 
 #: src/postulo/templates/server/plugins.html
@@ -19688,6 +19712,11 @@ msgstr "Įrašo, kuriam tai priklauso, faile nėra."
 msgid "The entry of your career this is the proof of. Used for a certificate, a diploma or a diploma supplement; a diploma and its supplement point at the same entry."
 msgstr "Jūsų karjeros įrašas, kurį tai įrodo. Naudojama pažymėjimui, diplomui ar diplomo priedėliui; diplomas ir jo priedėlis nurodo tą patį įrašą."
 
+#: src/postulo/core/views_access.py
+#, python-format
+msgid "The environment decides this: change %(variable)s there."
+msgstr ""
+
 #: src/postulo/core/server_views.py src/postulo/plugins/forms.py
 #, python-format
 msgid "The environment sets “%(name)s”, so it cannot be changed here."
@@ -19962,6 +19991,11 @@ msgid "The key the connection secrets are under is not in the archive. Restore w
 msgstr "Rakto, kuriuo užšifruotos ryšių paslaptys, archyve nėra. Atkurkite su tuo pačiu <code>.env</code> failu, su kuriuo archyvas buvo įrašytas, antraip tų paslapčių nebus galima perskaityti."
 
 #: src/postulo/templates/server/register_lookup.html
+#, python-format
+msgid "The keys are set by the environment: <code>%(variable)s</code>. Change them there."
+msgstr ""
+
+#: src/postulo/templates/server/register_lookup.html
 msgid "The keys of the company registers that answer only to one."
 msgstr "Įmonių registrų raktai, kurie atsako tik turint raktą."
 
@@ -19993,6 +20027,11 @@ msgstr "Kalba, kuria skaitote Postulo"
 #: src/postulo/accounts/forms.py
 msgid "The language's usual"
 msgstr "Kalbai įprasta"
+
+#: src/postulo/templates/server/defaults.html
+#, python-format
+msgid "The languages offered are set by the environment: <code>%(variable)s</code>. Remove it from the environment to change them here."
+msgstr ""
 
 #: src/postulo/templates/server/backups.html
 #: src/postulo/templates/server/overview.html
@@ -21776,6 +21815,10 @@ msgstr "Transporto priemonės"
 msgid "transport secrets"
 msgstr "perdavimo paslaptys"
 
+#: src/postulo/core/server_forms.py
+msgid "Transport settings"
+msgstr ""
+
 #: src/postulo/jobs/industries.py
 msgid "Travel"
 msgstr "Kelionės"
@@ -22406,6 +22449,14 @@ msgstr "Vandens tiekimas"
 #: src/postulo/core/models.py
 msgid "way back into the account"
 msgstr "būdas atgauti prieigą prie paskyros"
+
+#: src/postulo/templates/documents/cv_detail.html
+msgid "Ways to read this CV"
+msgstr ""
+
+#: src/postulo/templates/documents/letter_detail.html
+msgid "Ways to read this letter"
+msgstr ""
 
 #: src/postulo/templates/account/partials/password_meter.html
 msgid "Weak"

@@ -6794,6 +6794,10 @@ msgstr "Hönnun (Behance, Dribbble …)"
 msgid "Destination"
 msgstr "Áfangastaður"
 
+#: src/postulo/core/server_forms.py
+msgid "Destination settings"
+msgstr ""
+
 #: src/postulo/core/design.py
 #, fuzzy
 msgid "Destructive"
@@ -13362,6 +13366,10 @@ msgstr "Slökkt nema þú biðjir um það: heimilisfang segir hvar hægt er að
 msgid "Off unless you turn it on: a reference letter is written by somebody else, and is their words and their name."
 msgstr "Sjálfgefið er slökkt á þessu: meðmælabréf er skrifað af einhverjum öðrum og ber orð þess og nafn."
 
+#: src/postulo/plugins/policy.py
+msgid "Off until an administrator switches it on."
+msgstr ""
+
 #: src/postulo/core/server_views.py
 msgid "Off while the module above it is off."
 msgstr "Slökkt á meðan slökkt er á kerfiseiningunni fyrir ofan."
@@ -14438,13 +14446,19 @@ msgstr "Límdu inn textann. Auglýsingar hverfa af vefnum; þitt afrit gerir þa
 msgid "Pay"
 msgstr "Laun"
 
-#: src/postulo/jobs/models.py
+#: src/postulo/jobs/models.py src/postulo/templates/cotton/preview_tabs.html
 msgid "PDF"
 msgstr "PDF"
 
 #: src/postulo/documents/slow.py
 msgid "PDF created."
 msgstr "PDF-skrá búin til."
+
+#: src/postulo/templates/documents/cv_detail.html
+#: src/postulo/templates/documents/letter_detail.html
+#, python-format
+msgid "PDF of %(name)s"
+msgstr ""
 
 #: src/postulo/templates/server/overview.html
 #, fuzzy
@@ -15505,6 +15519,10 @@ msgstr "Verk í biðröð"
 #: src/postulo/templates/server/overview.html
 msgid "queued, but no worker has been here"
 msgstr "í biðröð, en ekkert vinnsluferli hefur litið við"
+
+#: src/postulo/templates/cotton/preview_tabs.html
+msgid "Quick view"
+msgstr ""
 
 #: src/postulo/templates/widgets/_source_table.html
 #: src/postulo/templates/widgets/industries.html
@@ -17025,7 +17043,8 @@ msgstr "Þjónusta"
 msgid "service"
 msgstr "þjónusta"
 
-#: src/postulo/plugins/models.py src/postulo/templates/server/email.html
+#: src/postulo/core/server_forms.py src/postulo/plugins/models.py
+#: src/postulo/templates/server/email.html
 msgid "set"
 msgstr "stillt"
 
@@ -17043,6 +17062,11 @@ msgstr "Stillt sjálfkrafa í fyrsta sinn sem staðan verður „Sótt um“."
 
 #: src/postulo/plugins/models.py
 msgid "set by"
+msgstr ""
+
+#: src/postulo/core/server_views.py
+#, python-format
+msgid "Set by %(variable)s in the environment; change it there."
 msgstr ""
 
 #: src/postulo/templates/server/plugins.html
@@ -19678,6 +19702,11 @@ msgstr "Færslan sem þetta tilheyrir er ekki í skránni."
 msgid "The entry of your career this is the proof of. Used for a certificate, a diploma or a diploma supplement; a diploma and its supplement point at the same entry."
 msgstr "Færslan í starfsferli þínum sem þetta er staðfesting á. Notað fyrir vottorð, prófskírteini eða viðauka með prófskírteini; prófskírteini og viðauki þess vísa á sömu færslu."
 
+#: src/postulo/core/views_access.py
+#, python-format
+msgid "The environment decides this: change %(variable)s there."
+msgstr ""
+
 #: src/postulo/core/server_views.py src/postulo/plugins/forms.py
 #, python-format
 msgid "The environment sets “%(name)s”, so it cannot be changed here."
@@ -19951,6 +19980,11 @@ msgid "The key the connection secrets are under is not in the archive. Restore w
 msgstr "Lykillinn sem leynilyklar tenginganna eru dulritaðir með er ekki í safnskránni. Endurheimtu með sömu <code>.env</code> og safnskráin var skrifuð með, annars er ekki hægt að lesa þá leynilykla."
 
 #: src/postulo/templates/server/register_lookup.html
+#, python-format
+msgid "The keys are set by the environment: <code>%(variable)s</code>. Change them there."
+msgstr ""
+
+#: src/postulo/templates/server/register_lookup.html
 #, fuzzy
 msgid "The keys of the company registers that answer only to one."
 msgstr "Lyklar fyrirtækjaskránna sem svara aðeins með lykli."
@@ -19983,6 +20017,11 @@ msgstr "Tungumálið sem þú lest Postulo á"
 #: src/postulo/accounts/forms.py
 msgid "The language's usual"
 msgstr "Venja tungumálsins"
+
+#: src/postulo/templates/server/defaults.html
+#, python-format
+msgid "The languages offered are set by the environment: <code>%(variable)s</code>. Remove it from the environment to change them here."
+msgstr ""
 
 #: src/postulo/templates/server/backups.html
 #: src/postulo/templates/server/overview.html
@@ -21774,6 +21813,10 @@ msgstr "Flutningatæki"
 msgid "transport secrets"
 msgstr "leyniupplýsingar flutningsleiðar"
 
+#: src/postulo/core/server_forms.py
+msgid "Transport settings"
+msgstr ""
+
 #: src/postulo/jobs/industries.py
 msgid "Travel"
 msgstr "Ferðalög"
@@ -22410,6 +22453,14 @@ msgstr "Vatnsveita"
 #: src/postulo/core/models.py
 msgid "way back into the account"
 msgstr "leið aftur inn á reikninginn"
+
+#: src/postulo/templates/documents/cv_detail.html
+msgid "Ways to read this CV"
+msgstr ""
+
+#: src/postulo/templates/documents/letter_detail.html
+msgid "Ways to read this letter"
+msgstr ""
 
 #: src/postulo/templates/account/partials/password_meter.html
 msgid "Weak"
