@@ -9,7 +9,7 @@ All notable changes to Postulo are recorded here. The format follows
 ### ✨ Added
 
 - Each plugin's availability can be set from the environment, `POSTULO_PLUGIN_<NAME>`, and every setting an administrator makes in the Server pages has a variable of its own (#1186)
-- A plugin can offer several things, each switched on or off by itself (sub-plugins), and offer to convert a Word, OpenDocument or RTF file to a PDF so the viewer can show it (#942, postulo-apprise#20)
+- A plugin can offer several things, each switched on or off by itself (sub-plugins), and offer to convert a Word, OpenDocument or RTF file to a PDF so the viewer can show it (#942)
 - Reports no longer name an adviser the reader cannot see (#1276)
 - Register lookup links Finland's and Czechia's own register page, reads Czechia's main activity and a liquidation or bankruptcy in Poland (#1065)
 - Plugins are installed only through a signed manifest: each listing names where it came from, an index that has expired says so, and a third-party index is added as a manifest, never a single plugin by address (#1263)
