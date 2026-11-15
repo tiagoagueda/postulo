@@ -354,6 +354,9 @@ def _rows_for(person) -> tuple[dict, dict]:
             "decided_by"
         ):
             policies.setdefault(row.plugin, {})[row.person_id] = row
+        # What the environment decides for the instance is laid over what was stored (#1186).
+        for name, pinned in pinned_rows().items():
+            policies.setdefault(name, {})[None] = pinned
         access: dict = {}
         if pk:
             for rule in PluginAccess.objects.filter(
@@ -444,6 +447,116 @@ def _decide(plugin_name: str, person) -> Decision:
         theirs=True,
         decided_by="person" if chosen_off else "default",
     )
+
+
+# ------------------------------------------------------- what the environment decides (#1186)
+
+
+def variable_name(plugin_name: str) -> str:
+    """The variable that sets the instance's decision about a plugin: `POSTULO_PLUGIN_<NAME>`."""
+    from .base import environment_prefix
+
+    return environment_prefix(plugin_name).removesuffix("_")
+
+
+def variable_for(plugin_name: str, label: str = ""):
+    """The registry entry of that variable, for the start-up check and `manage.py settings`."""
+    from postulo.core import configuration
+
+    states = tuple(state.value for state in _states())
+    return configuration.Variable(
+        variable_name(plugin_name),
+        configuration.Kind.CHOICE,
+        "plugins",
+        "The instance's decision about this plugin: available, unavailable, on or off.",
+        default="available",
+        choices=states,
+        empty_is_unset=True,
+        notes=(
+            "Available: each person chooses. Unavailable: not offered at all. On and off: "
+            "held for everybody. Set, the Plugins page shows it read-only; a person's own "
+            "exception, if an administrator made one, still applies."
+        ),
+        plugin=label or plugin_name,
+    )
+
+
+def environment_variables() -> dict:
+    """Every variable a loaded plugin brings, by name: what it declares it reads, and the
+    instance's decision about it. For the start-up check and `manage.py settings`."""
+    from .base import label_of
+    from .registry import environment_variables as declared
+    from .registry import plugins
+
+    found = dict(declared())
+    for kind in GOVERNED_KINDS:
+        for plugin in plugins(kind):
+            name = str(getattr(plugin, "name", "") or "")
+            if name and not is_required(name):
+                decision = variable_for(name, label_of(plugin))
+                found.setdefault(decision.name, decision)
+    return found
+
+
+def _states():
+    from .models import PluginPolicy
+
+    return list(PluginPolicy.State)
+
+
+def pinned_state(plugin_name: str) -> str | None:
+    """What the environment says about the plugin, as a stored state, or nothing.
+
+    A word that is not one of the four is nothing here: the start-up check names it.
+    """
+    from postulo.core import configuration
+
+    variable = variable_for(plugin_name)
+    if not configuration.is_set(variable.name, variables={variable.name: variable}):
+        return None
+    value = configuration.read(variable.name, variables={variable.name: variable})
+    return value if value in variable.choices else None
+
+
+def pinned_row(plugin_name: str):
+    """The instance's decision as the environment makes it: a row that is never saved."""
+    from .models import PluginPolicy
+
+    state = pinned_state(plugin_name)
+    if state is None:
+        return None
+    return PluginPolicy(plugin=plugin_name, person=None, state=state, decided_by=None)
+
+
+def pinned_rows() -> dict:
+    """The decisions the environment makes, by plugin name. Nothing, without a look at the
+    plugins, where no variable of the family is set at all."""
+    import os
+
+    if not any(name.startswith("POSTULO_PLUGIN_") for name in os.environ):
+        return {}
+    found = {}
+    for name in _governed_names():
+        if (pinned := pinned_row(name)) is not None:
+            found[name] = pinned
+    return found
+
+
+def instance_rows() -> dict:
+    """The instance's decision for each plugin, by name: what is stored, the environment over it."""
+    from .models import PluginPolicy
+
+    rows = {row.plugin: row for row in PluginPolicy.objects.filter(person=None)}
+    rows.update(pinned_rows())
+    return rows
+
+
+def _governed_names() -> list[str]:
+    from .registry import plugins
+
+    return [
+        item.name for kind in GOVERNED_KINDS for item in plugins(kind) if not is_required(item.name)
+    ]
 
 
 def models_person_filter(person):

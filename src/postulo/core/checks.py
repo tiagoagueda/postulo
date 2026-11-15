@@ -308,7 +308,7 @@ def environment(app_configs=None, **kwargs) -> list[Error | Warning]:
     that is not one), and a warning where it is only unusual (out of range). The variables
     another check already refuses are left to it.
     """
-    from postulo.plugins.registry import environment_variables
+    from postulo.plugins.policy import environment_variables
 
     # Postulo's own, and what each loaded plugin declares it reads.
     variables = {**environment_variables(), **configuration.VARIABLES}

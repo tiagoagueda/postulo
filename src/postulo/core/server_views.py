@@ -1406,13 +1406,14 @@ def _policy_rows(person=None, user=None) -> list[dict]:
     stored = {row.plugin: row for row in PluginPolicy.objects.filter(person=person)}
     # What applies to a person who has no row of their own is the instance's, so that is what
     # their page draws (#490); a row of their own is an exception to it.
-    instance = (
-        {row.plugin: row for row in PluginPolicy.objects.filter(person=None)} if person else {}
-    )
+    instance = policy.instance_rows() if person else {}
+    pinned = policy.pinned_rows()
     rows = []
     for plugin in _governed_plugins():
         own = stored.get(plugin.name)
         row = own or instance.get(plugin.name)
+        if person is None and plugin.name in pinned:
+            row = pinned[plugin.name]
         state = row.state if row else PluginPolicy.State.AVAILABLE
         # The whole manifest, not three fields off it: this is the page an administrator
         # is on when the question is "whose code is running here", and #97 exists because
@@ -1447,9 +1448,20 @@ def _policy_rows(person=None, user=None) -> list[dict]:
                     {"slug": slug, "label": categories.label_for(slug)}
                     for slug in manifest.categories
                 ],
-                # What Postulo cannot work without is drawn on and held, with the reason (#877).
-                "held": manifest.required,
-                "why": policy.decide(plugin.name, person).explain() if manifest.required else "",
+                # What Postulo cannot work without is drawn on and held, with the reason (#877);
+                # so is what the environment decides for the instance (#1186).
+                "held": manifest.required or (person is None and plugin.name in pinned),
+                "why": (
+                    policy.decide(plugin.name, person).explain()
+                    if manifest.required
+                    else _("Set by %(variable)s in the environment; change it there.")
+                    % {"variable": policy.variable_name(plugin.name)}
+                    if person is None and plugin.name in pinned
+                    else ""
+                ),
+                "pinned_by": policy.variable_name(plugin.name)
+                if person is None and plugin.name in pinned
+                else "",
                 "decided_by": row.decided_by if row else None,
                 "decided_at": row.decided_at if row else None,
             }
@@ -1637,11 +1649,8 @@ def _save_policies(request: HttpRequest, person=None) -> int:
     # What a person with no row of their own gets: the instance's decision. A person's row is
     # kept only where it differs from that, so "available" is stored for them when the
     # instance has decided otherwise, and dropped when it is what they would get anyway (#490).
-    instance = (
-        {row.plugin: row.state for row in PluginPolicy.objects.filter(person=None)}
-        if person
-        else {}
-    )
+    instance = {name: row.state for name, row in policy.instance_rows().items()} if person else {}
+    pinned = policy.pinned_rows()
     changed = 0
     if person is None:
         changed += _save_packages(request)
@@ -1652,6 +1661,9 @@ def _save_policies(request: HttpRequest, person=None) -> int:
         if request.POST.get(f"row:{plugin.name}") != "1":
             continue
         if policy.is_required(plugin.name):
+            continue
+        if person is None and plugin.name in pinned:
+            # The environment holds the instance's decision: nothing posted changes it (#1186).
             continue
         existing = PluginPolicy.objects.filter(plugin=plugin.name, person=person).first()
         on = f"on:{plugin.name}" in request.POST
