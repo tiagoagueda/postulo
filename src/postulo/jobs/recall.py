@@ -131,3 +131,17 @@ def sources(user) -> list[str]:
     from .models import JobPosting
 
     return _by_use(JobPosting.objects.for_user(user), "source")
+
+
+def titles(user) -> list[str]:
+    """The job titles of this person's postings, commonest first (#1251)."""
+    from .models import JobPosting
+
+    return _by_use(JobPosting.objects.for_user(user), "title")
+
+
+def contact_roles(user) -> list[str]:
+    """The roles this person has recorded for their contacts, commonest first (#1251)."""
+    from .models import Contact
+
+    return _by_use(Contact.objects.for_user(user), "role")

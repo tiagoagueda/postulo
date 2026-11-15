@@ -3418,3 +3418,60 @@ html {
 [data-cv-photo]:has(input[name="remove_cv_photo"]:checked) [data-cv-photo-image] {
   opacity: 0.35;
 }
+
+/* ------------------------------------------------------------------ suggestions */
+
+/*
+ * A text box that suggests (#1251): `app.js` wraps an `<input data-suggest>` in `.suggest`
+ * and puts a `role="listbox"` under it. The list is laid out against the box, not in the top
+ * layer: it is a few short lines, it must scroll with the box, and a popover would be
+ * dismissed by the very focus the person is typing with. The paint is the select's list --
+ * the popover's ground, border and shadow, the same option rows -- so a suggestion and a
+ * choice look like one family.
+ *
+ * Logical edges throughout, so the list sits under the box in right-to-left; an option's
+ * words wrap rather than being cut; the box's own width is the list's width, so nothing is
+ * wider than the screen at 320 pixels.
+ */
+@layer components {
+  .suggest {
+    @apply relative min-w-0;
+  }
+
+  .suggest > [role="listbox"] {
+    @apply absolute inset-x-0 top-full z-30 mt-1 max-h-64 min-w-0 overflow-y-auto overscroll-contain
+      rounded-xl border border-border bg-popover p-1 text-sm text-popover-foreground
+      shadow-floating;
+  }
+
+  .suggest > [role="listbox"][hidden] {
+    display: none;
+  }
+
+  .suggest [role="option"] {
+    @apply cursor-pointer rounded-md px-2 py-1.5 text-start whitespace-normal text-ink-700
+      wrap-anywhere dark:text-ink-200;
+  }
+
+  .suggest [role="option"][aria-selected="true"] {
+    @apply bg-accent text-accent-foreground;
+  }
+
+  @media (pointer: coarse) {
+    .suggest [role="option"] {
+      @apply py-2.5;
+    }
+  }
+}
+
+@media (forced-colors: active) {
+  .suggest > [role="listbox"] {
+    border: 1px solid CanvasText;
+  }
+
+  .suggest [role="option"][aria-selected="true"] {
+    forced-color-adjust: none;
+    background-color: Highlight;
+    color: HighlightText;
+  }
+}

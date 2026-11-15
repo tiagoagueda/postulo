@@ -11,6 +11,7 @@ from django.utils.translation import gettext_lazy as _
 from postulo.core import language_names, languages, phones, postal
 from postulo.core.date_widgets import DateInput
 from postulo.core.language_field import LanguageChoiceField
+from postulo.core.suggest import SuggestInput
 from postulo.jobs.forms import OwnerScopedModelForm
 
 from . import driving, publications, translatable
@@ -102,7 +103,7 @@ class ExperienceForm(ResumeItemForm):
             "order",
         )
         widgets = {
-            "organisation": forms.TextInput(attrs={"list": "company-suggestions"}),
+            "organisation": SuggestInput("employer", {"list": "company-suggestions"}),
             "start_date": DATE_WIDGET,
             "end_date": DATE_WIDGET,
             "summary": forms.Textarea(attrs={"rows": 3}),

@@ -16,6 +16,7 @@ from postulo.core import phone_field, phone_numbers, phones, slugs, web_links
 from postulo.core.date_widgets import DateInput, DateTimeInput
 from postulo.core.formsets import RowsAlreadyGone
 from postulo.core.identifiers import IdentifierRow, OneOfEachKind, SchemeSelect, offering
+from postulo.core.suggest import SuggestInput
 
 from . import company_names, employment_services, esco, identifiers, industries, logos, structure
 from .models import (
@@ -841,6 +842,7 @@ class ContactForm(OwnNoteForm):
     class Meta:
         model = Contact
         fields = ("name", "role", "company", "email")
+        widgets = {"role": SuggestInput("contact-role")}
         help_texts = {
             "role": _("Their job title, as they give it themselves."),
             "company": _("Where they work. Only companies you have recorded are offered."),
@@ -972,7 +974,7 @@ class JobPostingForm(OwnerScopedModelForm):
     title = forms.CharField(
         label=_("Job title"),
         max_length=250,
-        widget=forms.TextInput(attrs={"list": "title-suggestions", "autocomplete": "off"}),
+        widget=SuggestInput("job-title", {"list": "title-suggestions"}),
         help_text=POSTING_HELP["title"],
     )
 
@@ -996,6 +998,8 @@ class JobPostingForm(OwnerScopedModelForm):
             "description_format",
         )
         widgets = {
+            "location": SuggestInput("location"),
+            "source": SuggestInput("source"),
             "posted_at": DateInput(),
             "closes_at": DateInput(),
             "description": forms.Textarea(attrs={"rows": 10}),

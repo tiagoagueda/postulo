@@ -14,6 +14,7 @@ from postulo.core import slugs
 from postulo.core.csv_import import OFFERED_CURRENCIES
 from postulo.core.date_widgets import DateInput, DateTimeInput
 from postulo.core.models import Tag, TagColour, TagIcon
+from postulo.core.suggest import SuggestInput
 from postulo.jobs import esco, recall, status
 from postulo.jobs.forms import POSTING_HELP, OwnerScopedModelForm, who_and_where
 from postulo.jobs.models import (
@@ -102,7 +103,7 @@ class PostingIntakeForm(UserAwareForm):
     company_name = forms.CharField(
         label=_("Company"),
         max_length=200,
-        widget=forms.TextInput(attrs={"list": "company-suggestions", "autocomplete": "off"}),
+        widget=SuggestInput("company", {"list": "company-suggestions"}),
     )
     title = forms.CharField(
         label=_("Job title"),
@@ -110,7 +111,7 @@ class PostingIntakeForm(UserAwareForm):
         # The list it names is the ESCO unit groups from `datalists`, offered even without
         # a user because it belongs to no one; the code the words match follows the posting
         # it becomes and is not offered here (#266).
-        widget=forms.TextInput(attrs={"list": "title-suggestions", "autocomplete": "off"}),
+        widget=SuggestInput("job-title", {"list": "title-suggestions"}),
         help_text=POSTING_HELP["title"],
     )
     #: Asked only when the company named is recorded as dissolved (#941): adding work at a
@@ -131,7 +132,7 @@ class PostingIntakeForm(UserAwareForm):
         label=_("Location"),
         max_length=200,
         required=False,
-        widget=forms.TextInput(attrs={"list": "location-suggestions", "autocomplete": "off"}),
+        widget=SuggestInput("location", {"list": "location-suggestions"}),
         help_text=POSTING_HELP["location"],
     )
     remote_type = forms.ChoiceField(
@@ -150,7 +151,7 @@ class PostingIntakeForm(UserAwareForm):
         label=_("Found via"),
         max_length=120,
         required=False,
-        widget=forms.TextInput(attrs={"list": "source-suggestions", "autocomplete": "off"}),
+        widget=SuggestInput("source", {"list": "source-suggestions"}),
         # The same sentence the model carries, so the two forms that ask for this read
         # alike. `JobPostingForm` takes it from the model without being told.
         help_text=JobPosting._meta.get_field("source").help_text,

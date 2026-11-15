@@ -12,6 +12,7 @@ from . import (
     views_logs,
     views_metrics,
     views_search,
+    views_suggest,
     views_tables,
 )
 
@@ -29,6 +30,8 @@ urlpatterns = [
     path("logs", views_logs.collect, name="logs_endpoint"),
     path("metrics", views_metrics.scrape, name="metrics"),
     path("search/", views_search.search_page, name="search"),
+    # What a suggestion box offers as it is typed in (#1251).
+    path("suggest/<str:kind>/", views_suggest.suggestions, name="suggest"),
     # A card's help as a page of its own: where its question mark leads with scripts off,
     # and what a script opens in a drawer instead (#302).
     path("help/<slug:slug>/", views_help.topic_page, name="help_topic"),

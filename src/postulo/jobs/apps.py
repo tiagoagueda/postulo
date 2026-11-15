@@ -26,6 +26,7 @@ class JobsConfig(AppConfig):
             checks,  # noqa: F401
             signals,  # noqa: F401
             slow,  # noqa: F401
+            suggesters,  # noqa: F401
             tables,  # noqa: F401
             widgets,  # noqa: F401
         )
