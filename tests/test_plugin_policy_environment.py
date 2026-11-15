@@ -81,7 +81,10 @@ def test_the_variable_is_known_so_it_is_no_typo_and_is_listed(monkeypatch):
 
     assert VARIABLE in environment_variables()
     assert not [m for m in checks.environment() if m.id == "postulo.W005" and VARIABLE in m.msg]
-    assert configuration.unknown(variables=environment_variables()) == []
+    # Only this variable is the question: CI sets others of its own (POSTULO_TEST_DB_CACHE).
+    assert VARIABLE not in [
+        name for name, _ in configuration.unknown(variables=environment_variables())
+    ]
 
 
 def test_the_plugins_page_holds_the_plugin_and_names_the_variable(client, admin, monkeypatch):
