@@ -80,6 +80,11 @@ register is asked about one number, `RegisterRecord` and `RegisterAddress` what 
 and `RegisterAdapterPlugin` the registry that holds them. An adapter builds an address and reads
 JSON; Postulo makes the request.
 
+**A field can suggest from a vocabulary (#1252)**: `SuggestionSource` is one vocabulary -- the
+fields it suggests for, its languages, whether it is offline, its licence, its hosts if it dials
+out -- and `SuggestionSourcePlugin` the registry that holds them. A source reached over the
+network is asked on a press and never on a page load.
+
 **A backup can leave the machine (#325)**: `BackupDestinationPlugin` is what keeps the
 instance's archives somewhere else, `BackupArchive` what it is handed (already encrypted to the
 operator's age recipient), `BackupManifest` what the archive says about itself in plain values,
@@ -196,6 +201,7 @@ if TYPE_CHECKING:  # pragma: no cover - the names `__getattr__` resolves at run 
     from postulo.core.phone_numbers import taken_by_asking as phone_number_is_taken
     from postulo.core.phones import COUNTRY_CODES
     from postulo.core.redirects import safe_next
+    from postulo.core.suggestion_sources import Source as SuggestionSource
     from postulo.core.transfers import Transfer
     from postulo.core.transfers import register as register_transfer
     from postulo.core.vcard import Address as VCardAddress
@@ -296,6 +302,7 @@ from .base import (
     SourcePlugin,
     StorePlugin,
     SubPlugin,  # one of many things a plugin offers, each switched by itself
+    SuggestionSourcePlugin,
     SyncPlugin,
     SyncReport,
     # ----------------------------------------------------- what it hands back
@@ -396,6 +403,8 @@ __all__ = [
     "StorePlugin",
     "SubPlugin",
     "Suggestion",
+    "SuggestionSource",
+    "SuggestionSourcePlugin",
     "SyncLink",
     "SyncPlugin",
     "SyncReport",
@@ -604,6 +613,12 @@ _ELSEWHERE: dict[str, tuple[str, str]] = {
     "RegisterAdapter": ("postulo.jobs.register_lookup", "Adapter"),
     "RegisterAddress": ("postulo.jobs.register_lookup", "Address"),
     "RegisterRecord": ("postulo.jobs.register_lookup", "Record"),
+    # ----------------------------------------------- where a field's suggestions come from (#1252)
+    # A `suggestion-source` plugin adds a vocabulary a field may suggest from: one
+    # `SuggestionSource` -- a key, a name, the fields it suggests for, the languages it reads
+    # in, whether it is offline, its licence and, for one that dials out, its hosts -- whose
+    # `offer` answers with `(text, group)` pairs. Only offline sources are asked by a page.
+    "SuggestionSource": ("postulo.core.suggestion_sources", "Source"),
     # ----------------------------------------- companies, departments and the person (#328)
     # What a sync of contacts needs and could not reach: the companies and departments a
     # card is filed under, the vocabularies it maps onto, and the person's own card. All of

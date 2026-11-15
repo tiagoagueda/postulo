@@ -50,6 +50,14 @@ HOME = "postulo.plugins."
 #: What each shipped plugin still reaches past the surface for, and why. Every line is
 #: either a name that should become part of the surface, or work left to do.
 REACHING_PAST: dict[str, dict[str, str]] = {
+    "nace": {
+        "postulo.jobs.industries": (
+            "the NACE classification and Postulo's short industry names it suggests from. The "
+            "module stays in `jobs`, where models, a migration, the reports and the importer "
+            "read it directly, until later slices of #1252 move those readers behind the "
+            "registry and the data into this package"
+        ),
+    },
     "email": {
         "postulo.core.site": "the instance's name and from-address, for the message it sends",
         # `Notification` used to be reached past the surface as well — by this plugin and by

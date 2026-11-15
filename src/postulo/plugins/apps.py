@@ -18,6 +18,7 @@ class PluginsConfig(AppConfig):
         from .installing import activate
         from .link_services import LinkServices
         from .messaging_services import MessagingServices
+        from .nace import Nace
         from .register_lookup import RegisterAdapters
         from .registry import (
             load_everything,
@@ -38,6 +39,9 @@ class PluginsConfig(AppConfig):
         # And the company registers Register lookup may ask (#1021): a registry, which the
         # feature beside it switches.
         register_builtin("register-adapter", RegisterAdapters)
+        # And the vocabularies a field suggests from (#1252): NACE for industries, offline
+        # and on by default.
+        register_builtin("suggestion-source", Nace)
         register_builtin_locales()
         register_builtin_themes()
         # And now import what is installed, so a plugin that will not load says so in the

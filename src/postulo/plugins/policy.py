@@ -70,7 +70,16 @@ from postulo.core import memo
 from postulo.core.memo import forget_decisions
 
 #: Kinds a person may hold an opinion about. A transport is deliberately not one of them.
-GOVERNED_KINDS = ("source", "notifier", "store", "sync", "importer", "feature", "outbox")
+GOVERNED_KINDS = (
+    "source",
+    "notifier",
+    "store",
+    "sync",
+    "importer",
+    "feature",
+    "outbox",
+    "suggestion-source",
+)
 
 #: The rest. Named rather than implied, because the guard below has to look a plugin up by
 #: name and "every kind that is not governed" is the honest way to write that.
