@@ -42,6 +42,7 @@ All notable changes to Postulo are recorded here. The format follows
 ### 🔧 Changed
 
 - Twenty-one environment variables that broke the naming rules are renamed (POSTULO_DEBUG is POSTULO_DEBUG_ENABLED, POSTULO_GEOCODER is POSTULO_GEOCODER_SERVICE, and so on); the old name still works, with a start-up warning that names the new one, until 0.7 (#1186)
+- The threat model now says what an extension's and a mail client's token really holds and who keeps it so: the server enforces scopes only; the extension refuses a wider token on Save, the mail client warns (#1271)
 - A place is shown as the city alone while every place you deal with is in one country; a setting overrides it (#1249)
 - Sectors and industries are shown by one- or two-word labels, with the full name as the tooltip, and a search finds them by either (#1248)
 - My career shows Edit and Delete as pencil and bin icons that name their entry (#1247)
