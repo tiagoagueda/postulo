@@ -1952,7 +1952,7 @@ msgid "A %(kind)s entry names the file: send %(field)s."
 msgstr "Kiingizo cha %(kind)s kinataja faili: tuma %(field)s."
 
 #: src/postulo/templates/resume/references.html
-msgid "A .bib, .ris or .json file"
+msgid "A .bib, .ris, .json or .xml file"
 msgstr ""
 
 #: src/postulo/templates/jobs/company_places.html
@@ -3351,6 +3351,11 @@ msgstr "Ongeza %(name)s"
 #: src/postulo/templates/jobs/company_register.html
 #, python-format
 msgid "Add <bdi>%(address)s</bdi> to its addresses, as its registered office"
+msgstr ""
+
+#: src/postulo/templates/jobs/company_register.html
+#, python-format
+msgid "Add <bdi>%(names)s</bdi> as its acronym or short name"
 msgstr ""
 
 #: src/postulo/templates/jobs/company_list.html
@@ -5198,7 +5203,7 @@ msgstr ""
 
 #: src/postulo/templates/resume/references.html
 #, python-format
-msgid "BibTeX, BibLaTeX, RIS and CSL JSON are read, up to %(limit)s MB and %(most)s entries. The file is read here and not kept; nothing is added until you tick it."
+msgid "BibTeX, BibLaTeX, RIS, CSL JSON, MODS and EndNote XML are read, up to %(limit)s MB and %(most)s entries. The file is read here and not kept; nothing is added until you tick it."
 msgstr ""
 
 #: src/postulo/jobs/industries.py
@@ -6531,7 +6536,7 @@ msgstr "kampuni ya logo"
 msgid "company logos"
 msgstr "nembo ya kampuni"
 
-#: src/postulo/jobs/models.py
+#: src/postulo/documents/models.py src/postulo/jobs/models.py
 #, fuzzy
 msgid "company name"
 msgstr "jina la kampuni"
@@ -11359,6 +11364,10 @@ msgstr ""
 msgid "Items found"
 msgstr ""
 
+#: src/postulo/documents/models.py
+msgid "Its acronym, where it has one"
+msgstr ""
+
 #: src/postulo/jobs/register_views.py
 msgid "Its address is already listed."
 msgstr ""
@@ -11386,6 +11395,10 @@ msgstr "Faili yake inafanana na kumbukumbu ya kesi hii iliyosainiwa."
 #, fuzzy
 msgid "Its file matches what the official repository signed."
 msgstr "Faili yake inafanana na kumbukumbu rasmi iliyosainiwa."
+
+#: src/postulo/documents/models.py
+msgid "Its full name"
+msgstr ""
 
 #: src/postulo/jobs/models.py
 #, fuzzy
@@ -19645,6 +19658,14 @@ msgstr "yeye / yeye"
 msgid "Shipping"
 msgstr ""
 
+#: src/postulo/templates/jobs/company_register.html
+msgid "Short name"
+msgstr ""
+
+#: src/postulo/templates/jobs/company_wikidata.html
+msgid "Short names"
+msgstr ""
+
 #: src/postulo/core/widgets_builtin.py
 #, fuzzy
 msgid "Shortcuts"
@@ -21315,13 +21336,21 @@ msgstr ""
 msgid "That file is not CSL JSON."
 msgstr ""
 
+#: src/postulo/resume/references.py
+msgid "That file is not EndNote XML."
+msgstr ""
+
 #: src/postulo/jobs/geojson.py
 #, fuzzy
 msgid "That file is not GeoJSON."
 msgstr "Hii sio ya GeoJSON."
 
 #: src/postulo/resume/references.py
-msgid "That file is not one of BibTeX, BibLaTeX, RIS or CSL JSON, so it was not read."
+msgid "That file is not MODS."
+msgstr ""
+
+#: src/postulo/resume/references.py
+msgid "That file is not one of BibTeX, BibLaTeX, RIS, CSL JSON, MODS or EndNote XML, so it was not read."
 msgstr ""
 
 #: src/postulo/resume/references.py
@@ -24586,6 +24615,10 @@ msgstr "Fanya kazi kwa bidii ili ufanye kazi mara moja."
 msgid "Tick the box to add the listing anyway."
 msgstr "Bonyeza kitufe ili kuongeza orodha yoyote."
 
+#: src/postulo/templates/jobs/company_wikidata.html
+msgid "Tick the ones to add as acronyms or short names. Only what you tick is added."
+msgstr ""
+
 #: src/postulo/templates/resume/references.html
 msgid "Tick the publications to add. Nothing is changed or overwritten: an entry you already have is marked, and ticking it adds another."
 msgstr ""
@@ -26667,6 +26700,10 @@ msgstr "Ni lugha gani iliyoandikwa katika lugha hii? Acha tupu kufuata wasifu wa
 #, fuzzy
 msgid "Which language your experience, education and projects are typed in. A CV in another language shows what you have translated, and says what it could not."
 msgstr "Lugha ambayo uzoefu wako, elimu na miradi ni typed katika. CV katika lugha nyingine inaonyesha kile ulichokitafsiri, na kusema kile ambacho hakikuweza."
+
+#: src/postulo/documents/models.py
+msgid "Which of the company's names {{ company }} is filled in with: its full name, or its acronym where it has one. A company with none is named in full."
+msgstr ""
 
 #: src/postulo/applications/forms.py
 #, fuzzy

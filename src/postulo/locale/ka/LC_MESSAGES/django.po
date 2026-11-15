@@ -1930,7 +1930,7 @@ msgid "A %(kind)s entry names the file: send %(field)s."
 msgstr "%(kind)s ჩანაწერი ფაილს ასახელებს: გამოგზავნეთ %(field)s."
 
 #: src/postulo/templates/resume/references.html
-msgid "A .bib, .ris or .json file"
+msgid "A .bib, .ris, .json or .xml file"
 msgstr ""
 
 #: src/postulo/templates/jobs/company_places.html
@@ -3108,6 +3108,11 @@ msgstr "დამატება: %(name)s"
 #, python-format
 msgid "Add <bdi>%(address)s</bdi> to its addresses, as its registered office"
 msgstr "მისამართებში დამატება იურიდიულ მისამართად: <bdi>%(address)s</bdi>"
+
+#: src/postulo/templates/jobs/company_register.html
+#, python-format
+msgid "Add <bdi>%(names)s</bdi> as its acronym or short name"
+msgstr ""
 
 #: src/postulo/templates/jobs/company_list.html
 msgid "Add a company"
@@ -4701,7 +4706,7 @@ msgstr ""
 
 #: src/postulo/templates/resume/references.html
 #, python-format
-msgid "BibTeX, BibLaTeX, RIS and CSL JSON are read, up to %(limit)s MB and %(most)s entries. The file is read here and not kept; nothing is added until you tick it."
+msgid "BibTeX, BibLaTeX, RIS, CSL JSON, MODS and EndNote XML are read, up to %(limit)s MB and %(most)s entries. The file is read here and not kept; nothing is added until you tick it."
 msgstr ""
 
 #: src/postulo/jobs/industries.py
@@ -5849,7 +5854,7 @@ msgstr "კომპანიის ლოგო"
 msgid "company logos"
 msgstr "კომპანიების ლოგოები"
 
-#: src/postulo/jobs/models.py
+#: src/postulo/documents/models.py src/postulo/jobs/models.py
 msgid "company name"
 msgstr "კომპანიის სახელი"
 
@@ -9982,6 +9987,10 @@ msgstr "ელემენტი"
 msgid "Items found"
 msgstr "ნაპოვნი ელემენტები"
 
+#: src/postulo/documents/models.py
+msgid "Its acronym, where it has one"
+msgstr ""
+
 #: src/postulo/jobs/register_views.py
 msgid "Its address is already listed."
 msgstr "მისი მისამართი უკვე მითითებულია."
@@ -10006,6 +10015,10 @@ msgstr "მისი ფაილი ემთხვევა იმას, რ�
 #: src/postulo/plugins/provenance.py
 msgid "Its file matches what the official repository signed."
 msgstr "მისი ფაილი ემთხვევა იმას, რასაც ოფიციალურმა რეპოზიტორმა ხელი მოაწერა."
+
+#: src/postulo/documents/models.py
+msgid "Its full name"
+msgstr ""
 
 #: src/postulo/jobs/models.py
 msgid "Its general mailbox, such as jobs@ or info@. A person's address goes on a contact."
@@ -17129,6 +17142,14 @@ msgstr "ის (მდედრობითი)"
 msgid "Shipping"
 msgstr ""
 
+#: src/postulo/templates/jobs/company_register.html
+msgid "Short name"
+msgstr ""
+
+#: src/postulo/templates/jobs/company_wikidata.html
+msgid "Short names"
+msgstr ""
+
 #: src/postulo/core/widgets_builtin.py
 msgid "Shortcuts"
 msgstr "მალსახმობები"
@@ -18564,12 +18585,20 @@ msgstr ""
 msgid "That file is not CSL JSON."
 msgstr ""
 
+#: src/postulo/resume/references.py
+msgid "That file is not EndNote XML."
+msgstr ""
+
 #: src/postulo/jobs/geojson.py
 msgid "That file is not GeoJSON."
 msgstr "ეს ფაილი GeoJSON არ არის."
 
 #: src/postulo/resume/references.py
-msgid "That file is not one of BibTeX, BibLaTeX, RIS or CSL JSON, so it was not read."
+msgid "That file is not MODS."
+msgstr ""
+
+#: src/postulo/resume/references.py
+msgid "That file is not one of BibTeX, BibLaTeX, RIS, CSL JSON, MODS or EndNote XML, so it was not read."
 msgstr ""
 
 #: src/postulo/resume/references.py
@@ -21407,6 +21436,10 @@ msgstr "მონიშნეთ სტრიქონები, რომ რ�
 msgid "Tick the box to add the listing anyway."
 msgstr "მონიშნეთ ველი, რომ ვაკანსია მაინც დაამატოთ."
 
+#: src/postulo/templates/jobs/company_wikidata.html
+msgid "Tick the ones to add as acronyms or short names. Only what you tick is added."
+msgstr ""
+
 #: src/postulo/templates/resume/references.html
 msgid "Tick the publications to add. Nothing is changed or overwritten: an entry you already have is marked, and ticking it adds another."
 msgstr ""
@@ -23176,6 +23209,10 @@ msgstr "რა ენაზეა ეს ვარიანტი დაწე�
 #: src/postulo/accounts/forms.py
 msgid "Which language your experience, education and projects are typed in. A CV in another language shows what you have translated, and says what it could not."
 msgstr "რომელ ენაზეა ჩაწერილი თქვენი გამოცდილება, განათლება და პროექტები. სხვა ენაზე შედგენილი CV აჩვენებს იმას, რაც თარგმნეთ, და მიუთითებს, რისი ჩვენება ვერ მოახერხა."
+
+#: src/postulo/documents/models.py
+msgid "Which of the company's names {{ company }} is filled in with: its full name, or its acronym where it has one. A company with none is named in full."
+msgstr ""
 
 #: src/postulo/applications/forms.py
 msgid "Which one it is about. Leave it empty for a reminder about none."

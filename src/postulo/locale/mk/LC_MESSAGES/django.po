@@ -1928,7 +1928,7 @@ msgid "A %(kind)s entry names the file: send %(field)s."
 msgstr "Ставката од вид %(kind)s ја именува датотеката: испратете %(field)s."
 
 #: src/postulo/templates/resume/references.html
-msgid "A .bib, .ris or .json file"
+msgid "A .bib, .ris, .json or .xml file"
 msgstr ""
 
 #: src/postulo/templates/jobs/company_places.html
@@ -3107,6 +3107,11 @@ msgstr "Додај %(name)s"
 #, python-format
 msgid "Add <bdi>%(address)s</bdi> to its addresses, as its registered office"
 msgstr "Додај ја <bdi>%(address)s</bdi> во адресите на компанијата, како седиште"
+
+#: src/postulo/templates/jobs/company_register.html
+#, python-format
+msgid "Add <bdi>%(names)s</bdi> as its acronym or short name"
+msgstr ""
 
 #: src/postulo/templates/jobs/company_list.html
 msgid "Add a company"
@@ -4705,7 +4710,7 @@ msgstr ""
 
 #: src/postulo/templates/resume/references.html
 #, python-format
-msgid "BibTeX, BibLaTeX, RIS and CSL JSON are read, up to %(limit)s MB and %(most)s entries. The file is read here and not kept; nothing is added until you tick it."
+msgid "BibTeX, BibLaTeX, RIS, CSL JSON, MODS and EndNote XML are read, up to %(limit)s MB and %(most)s entries. The file is read here and not kept; nothing is added until you tick it."
 msgstr ""
 
 #: src/postulo/jobs/industries.py
@@ -5855,7 +5860,7 @@ msgstr "лого на компанија"
 msgid "company logos"
 msgstr "логоа на компании"
 
-#: src/postulo/jobs/models.py
+#: src/postulo/documents/models.py src/postulo/jobs/models.py
 msgid "company name"
 msgstr "име на компанијата"
 
@@ -9976,6 +9981,10 @@ msgstr "Ставка"
 msgid "Items found"
 msgstr "Пронајдени ставки"
 
+#: src/postulo/documents/models.py
+msgid "Its acronym, where it has one"
+msgstr ""
+
 #: src/postulo/jobs/register_views.py
 msgid "Its address is already listed."
 msgstr "Адресата веќе е наведена."
@@ -10000,6 +10009,10 @@ msgstr "Неговата датотека одговара на она што г
 #: src/postulo/plugins/provenance.py
 msgid "Its file matches what the official repository signed."
 msgstr "Неговата датотека одговара на она што го потпишало официјалното складиште."
+
+#: src/postulo/documents/models.py
+msgid "Its full name"
+msgstr ""
 
 #: src/postulo/jobs/models.py
 msgid "Its general mailbox, such as jobs@ or info@. A person's address goes on a contact."
@@ -17100,6 +17113,14 @@ msgstr "таа/неа"
 msgid "Shipping"
 msgstr ""
 
+#: src/postulo/templates/jobs/company_register.html
+msgid "Short name"
+msgstr ""
+
+#: src/postulo/templates/jobs/company_wikidata.html
+msgid "Short names"
+msgstr ""
+
 #: src/postulo/core/widgets_builtin.py
 msgid "Shortcuts"
 msgstr "Кратенки"
@@ -18528,12 +18549,20 @@ msgstr ""
 msgid "That file is not CSL JSON."
 msgstr ""
 
+#: src/postulo/resume/references.py
+msgid "That file is not EndNote XML."
+msgstr ""
+
 #: src/postulo/jobs/geojson.py
 msgid "That file is not GeoJSON."
 msgstr "Таа датотека не е GeoJSON."
 
 #: src/postulo/resume/references.py
-msgid "That file is not one of BibTeX, BibLaTeX, RIS or CSL JSON, so it was not read."
+msgid "That file is not MODS."
+msgstr ""
+
+#: src/postulo/resume/references.py
+msgid "That file is not one of BibTeX, BibLaTeX, RIS, CSL JSON, MODS or EndNote XML, so it was not read."
 msgstr ""
 
 #: src/postulo/resume/references.py
@@ -21367,6 +21396,10 @@ msgstr "Означете редови за да дејствувате на по
 msgid "Tick the box to add the listing anyway."
 msgstr "Штиклирајте го полето за сепак да го додадете огласот."
 
+#: src/postulo/templates/jobs/company_wikidata.html
+msgid "Tick the ones to add as acronyms or short names. Only what you tick is added."
+msgstr ""
+
 #: src/postulo/templates/resume/references.html
 msgid "Tick the publications to add. Nothing is changed or overwritten: an entry you already have is marked, and ticking it adds another."
 msgstr ""
@@ -23128,6 +23161,10 @@ msgstr "На кој јазик е напишана оваа варијанта. 
 #: src/postulo/accounts/forms.py
 msgid "Which language your experience, education and projects are typed in. A CV in another language shows what you have translated, and says what it could not."
 msgstr "На кој јазик се запишани вашето искуство, образование и проекти. CV на друг јазик го покажува она што сте го превеле и кажува што не можело да се преведе."
+
+#: src/postulo/documents/models.py
+msgid "Which of the company's names {{ company }} is filled in with: its full name, or its acronym where it has one. A company with none is named in full."
+msgstr ""
 
 #: src/postulo/applications/forms.py
 msgid "Which one it is about. Leave it empty for a reminder about none."

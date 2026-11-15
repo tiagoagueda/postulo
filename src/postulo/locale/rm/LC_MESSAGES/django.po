@@ -1929,7 +1929,7 @@ msgid "A %(kind)s entry names the file: send %(field)s."
 msgstr "In'inscripziun da tip %(kind)s numna la datoteca: trametti %(field)s."
 
 #: src/postulo/templates/resume/references.html
-msgid "A .bib, .ris or .json file"
+msgid "A .bib, .ris, .json or .xml file"
 msgstr ""
 
 #: src/postulo/templates/jobs/company_places.html
@@ -3120,6 +3120,11 @@ msgstr "Agiuntar %(name)s"
 #, python-format
 msgid "Add <bdi>%(address)s</bdi> to its addresses, as its registered office"
 msgstr "Agiuntar <bdi>%(address)s</bdi> a sias adressas, sco sedia"
+
+#: src/postulo/templates/jobs/company_register.html
+#, python-format
+msgid "Add <bdi>%(names)s</bdi> as its acronym or short name"
+msgstr ""
 
 #: src/postulo/templates/jobs/company_list.html
 msgid "Add a company"
@@ -4711,7 +4716,7 @@ msgstr ""
 
 #: src/postulo/templates/resume/references.html
 #, python-format
-msgid "BibTeX, BibLaTeX, RIS and CSL JSON are read, up to %(limit)s MB and %(most)s entries. The file is read here and not kept; nothing is added until you tick it."
+msgid "BibTeX, BibLaTeX, RIS, CSL JSON, MODS and EndNote XML are read, up to %(limit)s MB and %(most)s entries. The file is read here and not kept; nothing is added until you tick it."
 msgstr ""
 
 #: src/postulo/jobs/industries.py
@@ -5856,7 +5861,7 @@ msgstr "logo da l'interpresa"
 msgid "company logos"
 msgstr "logos d'interpresas"
 
-#: src/postulo/jobs/models.py
+#: src/postulo/documents/models.py src/postulo/jobs/models.py
 msgid "company name"
 msgstr "num da l'interpresa"
 
@@ -10005,6 +10010,10 @@ msgstr "Element"
 msgid "Items found"
 msgstr "Elements chattads"
 
+#: src/postulo/documents/models.py
+msgid "Its acronym, where it has one"
+msgstr ""
+
 #: src/postulo/jobs/register_views.py
 msgid "Its address is already listed."
 msgstr "Sia adressa è gia enumerada."
@@ -10029,6 +10038,10 @@ msgstr "Sia datoteca correspunda a quai ch'in deposit sin questa instanza ha sig
 #: src/postulo/plugins/provenance.py
 msgid "Its file matches what the official repository signed."
 msgstr "Sia datoteca correspunda a quai ch'il deposit uffizial ha signà."
+
+#: src/postulo/documents/models.py
+msgid "Its full name"
+msgstr ""
 
 #: src/postulo/jobs/models.py
 msgid "Its general mailbox, such as jobs@ or info@. A person's address goes on a contact."
@@ -17177,6 +17190,14 @@ msgstr "ella/la"
 msgid "Shipping"
 msgstr ""
 
+#: src/postulo/templates/jobs/company_register.html
+msgid "Short name"
+msgstr ""
+
+#: src/postulo/templates/jobs/company_wikidata.html
+msgid "Short names"
+msgstr ""
+
 #: src/postulo/core/widgets_builtin.py
 msgid "Shortcuts"
 msgstr "Scursanidas"
@@ -18619,12 +18640,20 @@ msgstr ""
 msgid "That file is not CSL JSON."
 msgstr ""
 
+#: src/postulo/resume/references.py
+msgid "That file is not EndNote XML."
+msgstr ""
+
 #: src/postulo/jobs/geojson.py
 msgid "That file is not GeoJSON."
 msgstr "Questa datoteca n'è betg GeoJSON."
 
 #: src/postulo/resume/references.py
-msgid "That file is not one of BibTeX, BibLaTeX, RIS or CSL JSON, so it was not read."
+msgid "That file is not MODS."
+msgstr ""
+
+#: src/postulo/resume/references.py
+msgid "That file is not one of BibTeX, BibLaTeX, RIS, CSL JSON, MODS or EndNote XML, so it was not read."
 msgstr ""
 
 #: src/postulo/resume/references.py
@@ -21479,6 +21508,10 @@ msgstr "Marcai lingias per agir sin pliras a la giada."
 msgid "Tick the box to add the listing anyway."
 msgstr "Marcai la chascha per agiuntar tuttina l'inserat."
 
+#: src/postulo/templates/jobs/company_wikidata.html
+msgid "Tick the ones to add as acronyms or short names. Only what you tick is added."
+msgstr ""
+
 #: src/postulo/templates/resume/references.html
 msgid "Tick the publications to add. Nothing is changed or overwritten: an entry you already have is marked, and ticking it adds another."
 msgstr ""
@@ -23259,6 +23292,10 @@ msgstr "En tge lingua che questa varianta è scritta. Laschai vid per suandar Vo
 #: src/postulo/accounts/forms.py
 msgid "Which language your experience, education and projects are typed in. A CV in another language shows what you have translated, and says what it could not."
 msgstr "En tge lingua che Vossa experientscha, furmaziun e Voss projects èn endatads. In CV en in'autra lingua mussa quai che Vus avais translatà e di tge ch'el n'ha betg pudì."
+
+#: src/postulo/documents/models.py
+msgid "Which of the company's names {{ company }} is filled in with: its full name, or its acronym where it has one. A company with none is named in full."
+msgstr ""
 
 #: src/postulo/applications/forms.py
 msgid "Which one it is about. Leave it empty for a reminder about none."
