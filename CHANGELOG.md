@@ -8,6 +8,9 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### ✨ Added
 
+- Text fields that suggest (company, job title, location, source, a contact's role, a CV's employer) are one accessible combobox, and stay plain text boxes without script (#1251)
+- Plugins can offer a vocabulary a field suggests from (a suggestion source), each source says what it covers, whether it works offline and where it calls out; NACE is the first, bundled and on by default (#1252)
+- A mail client asking which listings a message is filed under is told where it is already filed, with no more access than before (#271)
 - Each plugin's availability can be set from the environment, `POSTULO_PLUGIN_<NAME>`, and every setting an administrator makes in the Server pages has a variable of its own (#1186)
 - A plugin can offer several things, each switched on or off by itself (sub-plugins), and offer to convert a Word, OpenDocument or RTF file to a PDF so the viewer can show it (#942)
 - Reports no longer name an adviser the reader cannot see (#1276)
