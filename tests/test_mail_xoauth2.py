@@ -53,7 +53,11 @@ class Provider:
     """Stands in for a token endpoint. Records what it was asked, answers what it is told."""
 
     def __init__(self, answer=None, refuse=None):
-        self.answer = answer if answer is not None else {"access_token": "tok", "expires_in": 3600}
+        self.answer = (
+            answer
+            if answer is not None
+            else {"access_token": "plain-token-value", "expires_in": 3600}
+        )
         self.refuse = refuse
         self.calls = []
 
@@ -269,7 +273,7 @@ def test_the_application_grant_asks_microsoft_for_the_default_scope(monkeypatch)
 
     token = mail_auth.instance_token()
 
-    assert token == "tok"
+    assert token == "plain-token-value"
     call = provider.calls[0]
     assert call["grant_type"] == "client_credentials"
     assert call["scope"] == "https://outlook.office365.com/.default"
@@ -297,7 +301,7 @@ def test_a_token_about_to_expire_is_renewed_first(monkeypatch):
         secrets={"client_secret": "shh", "access_token": "old", "expires_at": time.time() + 30}
     )
 
-    assert mail_auth.instance_token() == "tok", "thirty seconds is inside the margin"
+    assert mail_auth.instance_token() == "plain-token-value", "thirty seconds is inside the margin"
 
 
 def test_the_token_is_kept_encrypted_rather_than_in_a_column_or_a_cache(monkeypatch):
@@ -307,8 +311,8 @@ def test_the_token_is_kept_encrypted_rather_than_in_a_column_or_a_cache(monkeypa
     mail_auth.instance_token()
 
     row = SiteSettings.get()
-    assert "tok" not in row.email_oauth_secrets_encrypted
-    assert row.email_oauth_secrets["access_token"] == "tok"
+    assert "plain-token-value" not in row.email_oauth_secrets_encrypted
+    assert row.email_oauth_secrets["access_token"] == "plain-token-value"
     assert row.email_oauth_secrets["client_secret"] == "shh", "and nothing else was lost"
 
 
