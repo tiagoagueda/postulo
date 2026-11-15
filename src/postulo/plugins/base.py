@@ -857,7 +857,16 @@ def widget_problems(widget) -> list[str]:
 SUB_PLUGIN_ID = r"[a-z0-9][a-z0-9_-]{0,29}"
 #: The kinds of plugin that may offer sub-plugins: the ones an administrator governs, which
 #: `policy.GOVERNED_KINDS` names too (a test holds the two together). Here, below both.
-SUB_PLUGIN_KINDS = ("source", "notifier", "store", "sync", "importer", "feature", "outbox")
+SUB_PLUGIN_KINDS = (
+    "source",
+    "notifier",
+    "store",
+    "sync",
+    "importer",
+    "feature",
+    "outbox",
+    "suggestion-source",
+)
 #: Where the parent's name and the sub-plugin's id are joined in the name policy rows hold.
 SUB_PLUGIN_SEPARATOR = ":"
 

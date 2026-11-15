@@ -195,7 +195,8 @@ def test_every_part_of_the_translation_bar_clears_three_to_one_in_both_themes():
 
 def test_the_translation_bar_is_painted_in_system_colours_when_forced():
     """Three parts that still differ from one another under a high-contrast theme."""
-    forced = CSS[CSS.rindex("@media (forced-colors: active)") :]
+    bar = CSS.index(".translation-bar {\n    forced-color-adjust: none;")
+    forced = CSS[CSS.rindex("@media (forced-colors: active)", 0, bar) :]
     assert ".translation-bar {\n    forced-color-adjust: none;" in forced
     painted = {
         part: re.search(

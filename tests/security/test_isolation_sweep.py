@@ -107,6 +107,10 @@ EXCUSED: dict[str, str] = {
     "connections:logo": (
         "a plugin name, and no record; who may see which logo is tests/test_plugin_logos.py"
     ),
+    "core:suggest": (
+        "a field kind in the address, and no record: the answer is the caller's own data and "
+        "reference titles, as an HTML fragment; tests/test_suggest.py"
+    ),
     "core:help_topic": (
         "a help topic's name in the address, and no record: the same words for everybody "
         "signed in; tests/test_help_topics.py tries an unknown one and a hostile way back"
