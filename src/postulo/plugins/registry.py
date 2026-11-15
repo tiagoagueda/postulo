@@ -40,6 +40,7 @@ from .base import (
     LINK_SERVICE_GROUP,
     MESSAGING_SERVICE_GROUP,
     REGISTER_ADAPTER_GROUP,
+    SUGGESTION_SOURCE_GROUP,
     TRANSPORT_GROUP,
     BackupDestinationPlugin,
     ConnectedPlugin,
@@ -51,6 +52,7 @@ from .base import (
     MessagingServicePlugin,
     RegisterAdapterPlugin,
     SourcePlugin,
+    SuggestionSourcePlugin,
     TransportPlugin,
 )
 from .builtin import BUILTIN_SOURCES
@@ -94,6 +96,7 @@ GROUPS = {
     "link-service": LINK_SERVICE_GROUP,
     "messaging-service": MESSAGING_SERVICE_GROUP,
     "register-adapter": REGISTER_ADAPTER_GROUP,
+    "suggestion-source": SUGGESTION_SOURCE_GROUP,
     "backup-destination": BACKUP_DESTINATION_GROUP,
     **CONNECTED_KINDS,
 }
@@ -126,6 +129,7 @@ def _protocol_for(kind: str):
         "link-service": LinkServicePlugin,
         "messaging-service": MessagingServicePlugin,
         "register-adapter": RegisterAdapterPlugin,
+        "suggestion-source": SuggestionSourcePlugin,
         "backup-destination": BackupDestinationPlugin,
     }.get(kind, ConnectedPlugin)
 

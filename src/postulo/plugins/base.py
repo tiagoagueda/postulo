@@ -692,6 +692,36 @@ class RegisterAdapterPlugin(Protocol):
     adapters: tuple
 
 
+# ---------------------------------------------------------------- suggestion sources
+
+#: Where a package that knows a vocabulary a field can suggest from registers itself (#1252).
+#: Open, as the link-service group is: a source says which fields it suggests for, in which
+#: languages, whether it is offline, its licence and, if it dials out, the hosts it may; a
+#: package installed beside Postulo may add one, and cannot take a key another already holds.
+SUGGESTION_SOURCE_GROUP = "postulo.suggestion_sources"
+
+
+@runtime_checkable
+class SuggestionSourcePlugin(Protocol):
+    """A registry of the vocabularies a field may suggest from (#1252).
+
+    The shape of a link-service plugin: it holds no rows and is not asked to do anything
+    but say which sources it contributes, each a `SuggestionSource` from the plugin
+    surface. Reference data it ships (a classification, a table of places) lives in its own
+    package; what a person has already typed stays in their data when it is removed.
+
+    **A source that reaches the network says so**: it names its hosts, is never asked on a
+    page load, and is held to the guarded client like any lookup.
+    """
+
+    #: The identifier the registry keys on.
+    name: str
+    #: What kind of plugin this is; always ``"suggestion-source"``.
+    kind: str
+    #: The sources it contributes, each a `SuggestionSource` from the plugin surface.
+    sources: tuple
+
+
 # --------------------------------------------------------------------- features
 
 #: Where something that *changes what Postulo keeps* registers itself.

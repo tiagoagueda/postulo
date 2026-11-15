@@ -12,7 +12,7 @@ from django.db.models import Q
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
-from postulo.core import phone_field, phone_numbers, phones, slugs, web_links
+from postulo.core import phone_field, phone_numbers, phones, slugs, suggestion_sources, web_links
 from postulo.core.date_widgets import DateInput, DateTimeInput
 from postulo.core.formsets import RowsAlreadyGone
 from postulo.core.identifiers import IdentifierRow, OneOfEachKind, SchemeSelect, offering
@@ -469,9 +469,11 @@ class CompanyForm(OwnNoteForm):
         listings have titles ESCO knows is offered, first, the divisions ESCO's companion
         correspondence employs those occupations in (#897): offered, never required.
         """
-        return industries.offered(
+        return suggestion_sources.offered(
+            "industry",
             exclude=self.fields["industries"].queryset.values_list("name", flat=True),
             first=self.divisions_from_postings(),
+            user=self.user,
         )
 
     def divisions_from_postings(self) -> list[str]:
