@@ -273,7 +273,20 @@ AREAS: tuple[Area, ...] = (
             "Set here, the page shows the choice read-only and the plugin's fields not at all."
         ),
     ),
-    Area("plugins", "Plugins", ("PLUGINS", "PLUGIN")),
+    Area(
+        "plugins",
+        "Plugins",
+        ("PLUGINS", "PLUGIN"),
+        notes=(
+            "The instance's decision about a plugin is `POSTULO_PLUGIN_<NAME>`: available (each "
+            "person chooses), unavailable (not offered), on or off (held for everybody). <NAME> "
+            "is the plugin's name in upper case, any other character becoming `_`: paperless is "
+            "`POSTULO_PLUGIN_PAPERLESS`, schema.org `POSTULO_PLUGIN_SCHEMA_ORG`. Set, the "
+            "Plugins page shows the plugin held and names the variable. A plugin's own "
+            "variables are `POSTULO_PLUGIN_<NAME>_<SETTING>`, declared by the plugin; "
+            "`manage.py settings` lists both for every plugin that is loaded."
+        ),
+    ),
     Area(
         "limits",
         "Rate limits",

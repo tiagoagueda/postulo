@@ -189,7 +189,7 @@ class PluginAccessView(StaffRequiredMixin, View):
 
     def _context(self, plugin) -> dict:
         manifest = base.manifest_of(plugin)
-        instance = PluginPolicy.objects.filter(plugin=plugin.name, person=None).first()
+        instance = policy.instance_rows().get(plugin.name)
         return {
             "section_title": _("Plugins"),
             "plugin": plugin,
@@ -222,6 +222,13 @@ class PluginAccessView(StaffRequiredMixin, View):
     def _everyone(self, request: HttpRequest, name: str) -> None:
         """*Everyone may switch it* is the instance row's available against forced on."""
         free = "everyone_switches" in request.POST
+        if policy.pinned_state(name):
+            messages.error(
+                request,
+                _("The environment decides this: change %(variable)s there.")
+                % {"variable": policy.variable_name(name)},
+            )
+            return
         row = PluginPolicy.objects.filter(plugin=name, person=None).first()
         if row is not None and row.state not in (
             PluginPolicy.State.AVAILABLE,

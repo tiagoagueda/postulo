@@ -99,7 +99,7 @@ class Command(BaseCommand):
         )
 
     def handle(self, *args, **options):
-        from postulo.plugins.registry import environment_variables
+        from postulo.plugins.policy import environment_variables
 
         variables = [
             variable
