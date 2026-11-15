@@ -1,0 +1,6 @@
+{% load i18n %}{% comment %} The options of a suggestion box (#1251): list items for its `role="listbox"`, and
+   one hidden item saying how many there are, which the script moves into the box's live
+   region so a screen reader is told the count as the list changes. Every value is somebody's
+   own text and is escaped on the way out. {% endcomment %}
+<li hidden data-status>{% if not values %}{% translate "No suggestions." %}{% else %}{% blocktranslate count counter=values|length %}{{ counter }} suggestion available. Use the up and down arrows, then Enter, to choose.{% plural %}{{ counter }} suggestions available. Use the up and down arrows, then Enter, to choose.{% endblocktranslate %}{% endif %}</li>
+{% for value in values %}<li role="option" data-value="{{ value }}">{{ value }}</li>{% endfor %}

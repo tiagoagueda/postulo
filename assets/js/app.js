@@ -9961,4 +9961,241 @@
     true
   );
 
+  /* ------------------------------------------------------------ suggesting (#1251)
+   *
+   * A text box marked `data-suggest="<address>"` suggests as it is typed in: a combobox in
+   * the ARIA pattern (a listbox, `aria-activedescendant`, `aria-expanded`, the count said in
+   * a live region). The server writes the box and nothing else; this builds the list. With
+   * scripts off the box is a plain text box -- or the browser's own `<datalist>` where the
+   * field names one, which is taken off the box here when the list below replaces it, so one
+   * box never shows two.
+   *
+   * What is typed goes to the address the box names, on the same origin, after a pause of
+   * 250 ms, one question in flight at a time (the older one is cancelled), never on page
+   * load, and what was answered for a word is kept for the life of the page. A refusal or
+   * an error closes the list and leaves the box as it was: a suggestion never blocks.
+   * Keys: Down and Up move through the options (Down on an empty box asks for the
+   * commonest), Enter takes the one the keys are on and otherwise submits the form as
+   * ever, Escape closes the list, Tab leaves the box without taking anything.
+   */
+  var SUGGEST_PAUSE = 250;
+  var suggestSerial = 0;
+
+  function readySuggest(input) {
+    var serial = ++suggestSerial;
+    var address = input.getAttribute("data-suggest");
+    var listId = "suggest-" + serial;
+    var wrapper = document.createElement("div");
+    wrapper.className = "suggest";
+    input.parentNode.insertBefore(wrapper, input);
+    wrapper.appendChild(input);
+
+    var list = document.createElement("ul");
+    list.id = listId;
+    list.setAttribute("role", "listbox");
+    list.hidden = true;
+    var label = input.labels && input.labels[0];
+    if (label) {
+      list.setAttribute("aria-label", label.textContent.replace(/\s*\*\s*$/, "").trim());
+    }
+    var status = document.createElement("div");
+    status.className = "sr-only";
+    status.setAttribute("role", "status");
+    status.setAttribute("aria-live", "polite");
+    wrapper.appendChild(list);
+    wrapper.appendChild(status);
+
+    input.removeAttribute("list");
+    input.setAttribute("role", "combobox");
+    input.setAttribute("aria-autocomplete", "list");
+    input.setAttribute("aria-expanded", "false");
+    input.setAttribute("aria-controls", listId);
+    input.setAttribute("data-suggest-ready", "");
+
+    var kept = {};
+    var timer = 0;
+    var request = null;
+    var skip = false;
+
+    function options() {
+      return Array.prototype.slice.call(list.querySelectorAll('[role="option"]'));
+    }
+
+    function active() {
+      return list.querySelector('[aria-selected="true"]');
+    }
+
+    function show(on) {
+      list.hidden = !on;
+      input.setAttribute("aria-expanded", on ? "true" : "false");
+      if (!on) {
+        input.removeAttribute("aria-activedescendant");
+        var chosen = active();
+        if (chosen) {
+          chosen.setAttribute("aria-selected", "false");
+        }
+      }
+    }
+
+    function move(to) {
+      var all = options();
+      if (!all.length) {
+        return;
+      }
+      var now = active();
+      if (now) {
+        now.setAttribute("aria-selected", "false");
+      }
+      var next = all[((to % all.length) + all.length) % all.length];
+      next.setAttribute("aria-selected", "true");
+      input.setAttribute("aria-activedescendant", next.id);
+      next.scrollIntoView({ block: "nearest" });
+    }
+
+    function draw(html) {
+      var holder = document.createElement("template");
+      holder.innerHTML = html;
+      var words = holder.content.querySelector("[data-status]");
+      status.textContent = words ? words.textContent.trim() : "";
+      if (words) {
+        words.remove();
+      }
+      list.replaceChildren(holder.content);
+      options().forEach(function (option, at) {
+        option.id = listId + "-" + at;
+        option.setAttribute("aria-selected", "false");
+      });
+      // Offered only while the box still has the focus: an answer that lands after the
+      // person has moved on opens nothing under somebody else's field.
+      show(options().length > 0 && document.activeElement === input);
+    }
+
+    function ask(typed) {
+      if (request) {
+        request.abort();
+        request = null;
+      }
+      if (Object.prototype.hasOwnProperty.call(kept, typed)) {
+        draw(kept[typed]);
+        return;
+      }
+      var mine = new AbortController();
+      request = mine;
+      fetch(address + "?q=" + encodeURIComponent(typed), {
+        credentials: "same-origin",
+        headers: { Accept: "text/html" },
+        signal: mine.signal
+      })
+        .then(function (answer) {
+          if (!answer.ok) {
+            throw new Error("refused");
+          }
+          return answer.text();
+        })
+        .then(function (html) {
+          if (request !== mine) {
+            return;
+          }
+          request = null;
+          kept[typed] = html;
+          // What was typed since is the question now; this answer is about the old one.
+          if (input.value.slice(0, 100) === typed || (!typed && !input.value)) {
+            draw(html);
+          }
+        })
+        .catch(function () {
+          if (request === mine) {
+            request = null;
+            show(false);
+          }
+        });
+    }
+
+    function take(option) {
+      skip = true;
+      input.value = option.getAttribute("data-value");
+      input.dispatchEvent(new Event("input", { bubbles: true }));
+      input.dispatchEvent(new Event("change", { bubbles: true }));
+      skip = false;
+      show(false);
+      status.textContent = "";
+    }
+
+    input.addEventListener("input", function () {
+      if (skip) {
+        return;
+      }
+      window.clearTimeout(timer);
+      var typed = input.value.slice(0, 100);
+      if (!typed.trim()) {
+        if (request) {
+          request.abort();
+          request = null;
+        }
+        show(false);
+        return;
+      }
+      timer = window.setTimeout(function () {
+        ask(typed);
+      }, SUGGEST_PAUSE);
+    });
+
+    input.addEventListener("keydown", function (event) {
+      if (event.ctrlKey || event.metaKey || event.altKey) {
+        return;
+      }
+      var open = !list.hidden;
+      var now = active();
+      var all = options();
+      if (event.key === "ArrowDown") {
+        event.preventDefault();
+        if (open) {
+          move(now ? all.indexOf(now) + 1 : 0);
+        } else {
+          ask(input.value.slice(0, 100));
+        }
+      } else if (event.key === "ArrowUp" && open) {
+        event.preventDefault();
+        move(now ? all.indexOf(now) - 1 : all.length - 1);
+      } else if (event.key === "Enter" && open && now) {
+        event.preventDefault();
+        take(now);
+      } else if (event.key === "Escape" && open) {
+        event.preventDefault();
+        event.stopPropagation();
+        show(false);
+      } else if (event.key === "Tab") {
+        show(false);
+      }
+    });
+
+    input.addEventListener("blur", function () {
+      window.clearTimeout(timer);
+      show(false);
+    });
+
+    // The pointer takes the option without the box losing the focus first, which would
+    // close the list before the click lands.
+    list.addEventListener("mousedown", function (event) {
+      event.preventDefault();
+    });
+    list.addEventListener("click", function (event) {
+      var option = event.target.closest && event.target.closest('[role="option"]');
+      if (option) {
+        take(option);
+        input.focus();
+      }
+    });
+  }
+
+  function readySuggestions() {
+    Array.prototype.forEach.call(
+      document.querySelectorAll("input[data-suggest]:not([data-suggest-ready])"),
+      readySuggest
+    );
+  }
+
+  onContentReady(readySuggestions);
+
+
 })();

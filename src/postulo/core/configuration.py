@@ -1409,8 +1409,8 @@ _VARIABLES: tuple[Variable, ...] = (
     ),
     _rate(
         "POSTULO_SUGGESTION_RATE",
-        "600/h",
-        "Suggestions the skill box asks for as somebody types, per account.",
+        "1800/h",
+        "Suggestions the boxes of a form ask for as somebody types, per account.",
     ),
     # --------------------------------------------------------------------------- container
     Variable(
