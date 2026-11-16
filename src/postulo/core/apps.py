@@ -46,7 +46,6 @@ class CoreConfig(AppConfig):
             safe_choices,
             signals,
             slow,
-            suggesters,
             transfers,
             widgets_builtin,
         )

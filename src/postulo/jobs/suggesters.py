@@ -32,9 +32,13 @@ def city(user, typed: str):
     )
 
 
-suggest.register("company", lambda user, typed: recall.companies(user))
-suggest.register("employer", lambda user, typed: recall.companies(user, including_career=True))
-suggest.register("job-title", job_title)
+suggest.register("company", lambda user, typed: recall.companies(user), fills=recall.company_facts)
+suggest.register(
+    "employer",
+    lambda user, typed: recall.companies(user, including_career=True),
+    fills=recall.company_facts,
+)
+suggest.register("job-title", job_title, fills=recall.title_facts)
 suggest.register("location", lambda user, typed: recall.locations(user))
 suggest.register("city", city)
 suggest.register("source", lambda user, typed: recall.sources(user))
@@ -55,3 +59,16 @@ suggest.register(
     ),
 )
 suggest.register("contact-name", lambda user, typed: recall.contact_names(user))
+
+
+def municipality(user, typed: str):
+    """The towns of the addresses this person recorded, then the cities of every enabled
+    places source (#1252), so the address row has both and choosing a recorded one fills its
+    postcode and country (#1251)."""
+    return chain(
+        recall.municipalities(user),
+        (text for text, _group in suggestion_sources.offered("city", user=user, typed=typed)),
+    )
+
+
+suggest.register("municipality", municipality, fills=recall.municipality_facts)

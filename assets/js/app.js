@@ -10083,16 +10083,9 @@
     var timer = 0;
     var request = null;
     var skip = false;
-    // A box of several words (tags) says what separates them: it is the last one, the one
-    // being typed, that is asked about and replaced.
-    var separator = input.getAttribute("data-suggest-separator") || "";
 
     function typedNow() {
-      var value = input.value;
-      if (separator) {
-        value = value.slice(value.lastIndexOf(separator) + 1).replace(/^\s+/, "");
-      }
-      return value.slice(0, 100);
+      return input.value.slice(0, 100);
     }
 
     function options() {
@@ -10189,21 +10182,134 @@
         });
     }
 
+    // What choosing a value fills in beside the box (#1251): fields that are empty and no
+    // others, said in a note under the box, and undone with one press. Asked once, when an
+    // option is taken, never as somebody types.
+    var fillMap = null;
+    try {
+      fillMap = JSON.parse(input.getAttribute("data-suggest-fills") || "null");
+    } catch (broken) {
+      fillMap = null;
+    }
+    var fillAddress = input.getAttribute("data-suggest-fill-address") || "";
+    var note = null;
+
+    function fieldBeside(name) {
+      if (!input.form) {
+        return null;
+      }
+      var prefix = input.name.slice(0, input.name.lastIndexOf("-") + 1);
+      return input.form.querySelector('[name="' + prefix + name + '"]');
+    }
+
+    function say(words, undoLabel, undo) {
+      if (!note) {
+        note = document.createElement("div");
+        note.className = "suggest-filled";
+        note.setAttribute("role", "status");
+        note.setAttribute("aria-live", "polite");
+        wrapper.insertAdjacentElement("afterend", note);
+      }
+      note.textContent = words;
+      if (undo) {
+        var button = document.createElement("button");
+        button.type = "button";
+        button.textContent = undoLabel;
+        button.addEventListener("click", undo);
+        note.appendChild(document.createTextNode(" "));
+        note.appendChild(button);
+      }
+    }
+
+    function forgetFill() {
+      if (note) {
+        note.textContent = "";
+      }
+    }
+
+    function changed(field) {
+      field.dispatchEvent(new Event("input", { bubbles: true }));
+      field.dispatchEvent(new Event("change", { bubbles: true }));
+    }
+
+    function applyFills(found) {
+      var done = [];
+      Object.keys(fillMap).forEach(function (key) {
+        var target = fieldBeside(fillMap[key]);
+        var text = found[key];
+        if (!target || !text || target.value) {
+          return; // what is already there is the person's, and stays
+        }
+        if (target.tagName === "SELECT") {
+          var known = Array.prototype.some.call(target.options, function (option) {
+            return option.value === text;
+          });
+          if (!known) {
+            return;
+          }
+        }
+        target.value = text;
+        changed(target);
+        var label = target.labels && target.labels[0];
+        done.push({
+          field: target,
+          text: text,
+          label: label ? label.textContent.replace(/\s*\*\s*$/, "").trim() : fillMap[key]
+        });
+      });
+      if (!done.length) {
+        return;
+      }
+      say(
+        (input.getAttribute("data-fill-said") || "") +
+          " " +
+          done
+            .map(function (item) {
+              return item.label;
+            })
+            .join(", "),
+        input.getAttribute("data-fill-undo") || "Undo",
+        function () {
+          done.forEach(function (item) {
+            // Only what this fill wrote: a field the person has changed since is theirs.
+            if (item.field.value === item.text) {
+              item.field.value = "";
+              changed(item.field);
+            }
+          });
+          say(input.getAttribute("data-fill-undone") || "", "", null);
+          input.focus();
+        }
+      );
+    }
+
+    function fillFor(value) {
+      if (!fillMap || !fillAddress || !value) {
+        return;
+      }
+      fetch(fillAddress + "?value=" + encodeURIComponent(value), {
+        credentials: "same-origin",
+        headers: { Accept: "application/json" }
+      })
+        .then(function (answer) {
+          return answer.ok ? answer.json() : { fills: {} };
+        })
+        .then(function (body) {
+          applyFills(body.fills || {});
+        })
+        .catch(function () {});
+    }
+
     function take(option) {
       skip = true;
       var chosen = option.getAttribute("data-value");
-      if (separator) {
-        var cut = input.value.lastIndexOf(separator) + 1;
-        var head = input.value.slice(0, cut);
-        input.value = head + (head ? " " : "") + chosen + separator + " ";
-      } else {
-        input.value = chosen;
-      }
+      input.value = chosen;
       input.dispatchEvent(new Event("input", { bubbles: true }));
       input.dispatchEvent(new Event("change", { bubbles: true }));
       skip = false;
       show(false);
       status.textContent = "";
+      fillFor(chosen);
     }
 
     input.addEventListener("input", function () {
@@ -10211,6 +10317,7 @@
         return;
       }
       window.clearTimeout(timer);
+      forgetFill();
       var typed = typedNow();
       if (!typed.trim()) {
         if (request) {

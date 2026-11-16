@@ -364,9 +364,14 @@ class PostalAddressForm(forms.ModelForm):
         self.fields["street"].widget = forms.Textarea(
             attrs={"rows": 2, "autocomplete": "street-address"}
         )
-        # The town suggests as it is typed (#1252): what this person kept, then the cities of
-        # whichever places source is on. With none on it is a plain box, which is all it was.
-        self.fields["municipality"].widget = SuggestInput("city")
+        # The town suggests the towns of the person's own addresses, then the cities of whichever
+        # places source is on (#1252); choosing a recorded one fills the postcode and the country
+        # that went with it where they are still empty (#1251).
+        self.fields["municipality"].widget = SuggestInput(
+            "municipality",
+            dict(self.fields["municipality"].widget.attrs),
+            fills={"postcode": "postcode", "country": "country"},
+        )
         for name, token in (
             ("postcode", "postal-code"),
             ("municipality", "address-level2"),

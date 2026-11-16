@@ -111,6 +111,10 @@ EXCUSED: dict[str, str] = {
         "a field kind in the address, and no record: the answer is the caller's own data and "
         "reference titles, as an HTML fragment; tests/test_suggest.py"
     ),
+    "core:suggest_fill": (
+        "a field kind in the address, and no record: what the caller's own records say about a "
+        "chosen value, as JSON; tests/test_suggest_more.py tries another person's"
+    ),
     "core:help_topic": (
         "a help topic's name in the address, and no record: the same words for everybody "
         "signed in; tests/test_help_topics.py tries an unknown one and a hostile way back"

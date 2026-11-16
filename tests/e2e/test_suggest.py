@@ -336,3 +336,50 @@ def test_axe_is_clean_with_a_list_open_and_a_key_on_an_option(
 
     found = violations_on(page, axe_source)
     assert not found, describe(f"{NEW_APPLICATION} ({scheme}, {language})", found)
+
+
+# ------------------------------------------------------------- more fields, and what a choice fills
+
+
+def test_a_career_field_suggests_too(live_server, page: Page, recorded):
+    from postulo.resume.models import Education
+
+    Education.objects.create(
+        owner=recorded, institution="Seaside College", qualification="Master of Arts"
+    )
+    sign_in(page, live_server.url, "/career/education/new/")
+
+    field = type_into(page, "qualification", "mas")
+    expect(options(page).first).to_have_text("Master of Arts")
+    field.press("ArrowDown")
+    field.press("Enter")
+    expect(field).to_have_value("Master of Arts")
+
+
+def test_choosing_a_company_fills_the_empty_location_says_so_and_can_undo(
+    live_server, page: Page, recorded
+):
+    sign_in(page, live_server.url, NEW_APPLICATION)
+
+    type_into(page, "company_name", "black")
+    options(page).first.click()
+
+    expect(box(page, "location")).to_have_value("Lyon")
+    note = page.locator(".suggest-filled")
+    expect(note).to_contain_text("Also filled in: Location")
+    note.get_by_role("button", name="Undo").click()
+    expect(box(page, "location")).to_have_value("")
+    expect(note).to_contain_text("Undone.")
+
+
+def test_a_fill_never_overwrites_what_is_typed(live_server, page: Page, recorded):
+    sign_in(page, live_server.url, NEW_APPLICATION)
+    box(page, "location").fill("Paris")
+
+    type_into(page, "company_name", "black")
+    options(page).first.click()
+
+    expect(box(page, "company_name")).to_have_value("Black Mesa")
+    expect(box(page, "location")).to_have_value("Paris")
+    page.wait_for_timeout(500)  # long enough for the answer, were there to be one that was used
+    expect(page.locator(".suggest-filled")).to_have_count(0)
