@@ -6,6 +6,8 @@ All notable changes to Postulo are recorded here. The format follows
 
 ## [Unreleased]
 
+## [0.5.5] — 2026-11-16
+
 ### ✨ Added
 
 - A `Translators:` comment in a template or before a gettext call reaches the catalogues, so Weblate shows a translator where a string is printed (#1293)
@@ -46,6 +48,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🔧 Changed
 
+- The image scan lets a finding through until the date `docker/scan-waivers.txt` gives it, and fails on it again after; CVE-2026-119170 in CPython 3.14.10 is waived until 2026-12-15, while the official Python image still lacks 3.14.11 (#1295)
 - Twenty-one environment variables that broke the naming rules are renamed (POSTULO_DEBUG is POSTULO_DEBUG_ENABLED, POSTULO_GEOCODER is POSTULO_GEOCODER_SERVICE, and so on); the old name still works, with a start-up warning that names the new one, until 0.7 (#1186)
 - The threat model now says what an extension's and a mail client's token really holds and who keeps it so: the server enforces scopes only; the extension refuses a wider token on Save, the mail client warns (#1271)
 - A place is shown as the city alone while every place you deal with is in one country; a setting overrides it (#1249)
