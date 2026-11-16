@@ -220,7 +220,7 @@
           <c-slot name="quick">
             <iframe src="{% url 'documents:cv_preview' cv.pk %}"
                     title="{% blocktranslate trimmed with name=cv.name %}Preview of {{ name }}{% endblocktranslate %}"
-                    class="document-frame" loading="lazy" data-document-preview></iframe>
+                    class="document-frame" loading="lazy" sandbox="allow-same-origin" data-document-preview></iframe>
           </c-slot>
         </c-preview-tabs>
         {% comment %} What the frame cannot show is where the pages break, and the only way

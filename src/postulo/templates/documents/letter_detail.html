@@ -49,7 +49,7 @@
           <c-slot name="quick">
             <iframe src="{% url 'documents:letter_preview' letter.pk %}" name="letter-preview"
                     title="{% blocktranslate trimmed with name=letter.name %}Preview of {{ name }}{% endblocktranslate %}"
-                    class="document-frame" loading="lazy" data-document-preview></iframe>
+                    class="document-frame" loading="lazy" sandbox="allow-same-origin" data-document-preview></iframe>
           </c-slot>
         </c-preview-tabs>
       </section>

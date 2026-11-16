@@ -250,3 +250,99 @@ def test_a_cvs_page_does_not_scroll_sideways_at_320_pixels(
     sign_in(page, live_server.url, f"/documents/cvs/{cv.pk}/")
     expect(page.locator("[data-viewer-count]")).to_have_text("of 2", timeout=30000)
     assert page.evaluate(SCROLLS_SIDEWAYS)["reached"] == 0
+
+
+def test_a_link_in_a_pdf_is_a_link_only_where_it_is_safe(page: Page, live_server, applicant):
+    """http, https and mailto become links that open in a new tab and let nothing back (#942)."""
+    from postulo.documents.models import UploadedDocument
+
+    pdf = make_pdf(
+        1,
+        links=(
+            ("https://example.org/portfolio", (72, 690, 300, 730)),
+            ("mailto:alex@example.org", (72, 600, 300, 640)),
+            ("javascript:alert(1)", (72, 500, 300, 540)),
+            ("file:///etc/passwd", (72, 400, 300, 440)),
+        ),
+    )
+    document = UploadedDocument.objects.create(owner=applicant, title="Links")
+    document.file.save("links.pdf", io.BytesIO(pdf), save=True)
+    sign_in(page, live_server.url, f"/documents/files/{document.pk}/")
+    links = page.locator(".document-viewer-link")
+    expect(links).to_have_count(2, timeout=30000)
+    assert [link.get_attribute("href") for link in links.all()] == [
+        "https://example.org/portfolio",
+        "mailto:alex@example.org",
+    ]
+    for link in links.all():
+        assert link.get_attribute("target") == "_blank"
+        assert link.get_attribute("rel") == "noopener noreferrer"
+        assert link.get_attribute("aria-label")
+
+
+def test_on_a_phone_the_viewer_can_take_the_whole_window(page: Page, live_server, pdf_file):
+    page.set_viewport_size({"width": 375, "height": 700})
+    viewer = open_viewer(page, live_server, pdf_file)
+    button = viewer.locator("[data-viewer-full-button]")
+    expect(button).to_be_visible()
+
+    button.click()
+    expect(viewer).to_have_attribute("data-full", "")
+    expect(viewer).to_have_attribute("role", "dialog")
+    box = viewer.bounding_box()
+    assert box["width"] == 375 and box["height"] == 700
+    expect(viewer.locator("[data-viewer-stage]")).to_be_focused()
+    expect(button).to_have_attribute("aria-pressed", "true")
+    expect(button).to_contain_text("Close full screen")
+
+    page.keyboard.press("Escape")
+    expect(viewer).not_to_have_attribute("data-full", "")
+    expect(viewer).to_have_attribute("role", "region")
+    expect(button).to_be_focused()
+
+    page.set_viewport_size({"width": 1100, "height": 800})
+    expect(button).to_be_hidden()
+
+
+def test_the_viewers_hold_at_320_pixels_in_every_language(page: Page, live_server, applicant):
+    """A file's page, a sent document's and the Compare page, each drawing a real PDF (#942)."""
+    import datetime as dt
+
+    from django.utils import timezone
+
+    from postulo.accounts.models import Profile
+    from postulo.documents.models import CV, RenderedDocument, UploadedDocument
+    from tests.e2e.test_reflow import LANGUAGES, NARROW, SCROLLS_SIDEWAYS, SPILLS
+
+    upload = UploadedDocument.objects.create(owner=applicant, title="Two pages")
+    upload.file.save("two.pdf", io.BytesIO(two_pages()), save=True)
+    cv = CV.objects.first()
+    sent = []
+    for days in (3, 1):
+        row = RenderedDocument.objects.create(
+            owner=applicant,
+            title="Alex Morgan — CV",
+            kind="cv",
+            source=cv,
+            plain_text=f"Alex Morgan\n{days}",
+            checksum=f"{days:064d}",
+            rendered_at=timezone.now() - dt.timedelta(days=days),
+        )
+        row.file.save("cv.pdf", io.BytesIO(two_pages()), save=True)
+        sent.append(row)
+    sign_in(page, live_server.url)
+    page.set_viewport_size({"width": NARROW, "height": 800})
+    addresses = [
+        f"/documents/files/{upload.pk}/",
+        f"/documents/sent/{sent[1].pk}/",
+        f"/documents/sent/{sent[1].pk}/compare/",
+    ]
+    for language in LANGUAGES:
+        Profile.objects.filter(user=applicant).update(language=language)
+        for address in addresses:
+            page.goto(f"{live_server.url}{address}")
+            counts = page.locator("[data-viewer-count]")
+            for index in range(counts.count()):
+                expect(counts.nth(index)).not_to_be_empty(timeout=30000)
+            assert not page.evaluate(SCROLLS_SIDEWAYS)["reached"], (language, address)
+            assert not page.evaluate(SPILLS), (language, address, page.evaluate(SPILLS))

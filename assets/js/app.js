@@ -9520,8 +9520,11 @@
    * sentence rather than as "invalid PDF". One page is drawn at a time, with its text layer
    * over it, so the words can be selected, copied and read by a screen reader.
    *
-   * No PDF script runs (no scripting manager is built, `enableXfa` is off), and links inside
-   * a PDF are not drawn as links: no annotation layer is added.
+   * No PDF script runs (no scripting manager is built, `enableXfa` is off). A link inside a
+   * PDF is drawn as a link only when it goes to an `http:`, `https:` or `mailto:` address, and
+   * opens in a new tab with `rel="noopener noreferrer"`; every other kind (a `javascript:`
+   * address, a file, a form, a jump the PDF scripts) is left as the words it covers. pdf.js's
+   * annotation layer is not used: the boxes are made here from the link annotations alone.
    *
    * The keys belong to the viewer while it has focus and to nothing else: PageUp, PageDown,
    * Home, End, the arrows while the page fits the box, plus and minus.
@@ -9538,6 +9541,18 @@
       });
     }
     return pdfLibrary;
+  }
+
+  var LINK_PROTOCOLS = ["http:", "https:", "mailto:"];
+
+  /* The address a PDF link goes to, or "" when it is not one a person may be sent to. */
+  function safeLink(address) {
+    try {
+      var url = new URL(address);
+      return LINK_PROTOCOLS.indexOf(url.protocol) === -1 ? "" : url.href;
+    } catch (error) {
+      return "";
+    }
   }
 
   function folderOf(url) {
@@ -9566,7 +9581,8 @@
       prev = part("prev"),
       next = part("next"),
       zoomBox = part("zoom"),
-      redraw = part("redraw");
+      redraw = part("redraw"),
+      fullButton = part("full-button");
     var kind = viewer.getAttribute("data-kind");
     var word = function (name) {
       return viewer.getAttribute("data-" + name + "-words") || "";
@@ -9715,10 +9731,15 @@
             container: words,
             viewport: viewport,
           });
-          return Promise.all([drawing.promise, text.render()]).then(function () {
+          return Promise.all([
+            drawing.promise,
+            text.render(),
+            page.getAnnotations({ intent: "display" }),
+          ]).then(function (done) {
             if (turn !== state.turn) {
               return;
             }
+            addLinks(sheet, viewport, done[2]);
             sheet.setAttribute("data-scale", String(scale));
             stage.textContent = "";
             stage.appendChild(sheet);
@@ -9730,6 +9751,30 @@
             failed();
           }
         });
+    }
+
+    /* A box over each link of the page that goes somewhere safe (see `safeLink`). */
+    function addLinks(sheet, viewport, annotations) {
+      annotations.forEach(function (note) {
+        var href = note.subtype === "Link" && note.url ? safeLink(note.url) : "";
+        if (!href || !note.rect) {
+          return;
+        }
+        var from = viewport.convertToViewportPoint(note.rect[0], note.rect[1]);
+        var to = viewport.convertToViewportPoint(note.rect[2], note.rect[3]);
+        var box = [from[0], from[1], to[0], to[1]];
+        var link = document.createElement("a");
+        link.className = "document-viewer-link";
+        link.href = href;
+        link.target = "_blank";
+        link.rel = "noopener noreferrer";
+        link.setAttribute("aria-label", href);
+        link.style.left = Math.min(box[0], box[2]) + "px";
+        link.style.top = Math.min(box[1], box[3]) + "px";
+        link.style.width = Math.abs(box[2] - box[0]) + "px";
+        link.style.height = Math.abs(box[3] - box[1]) + "px";
+        sheet.appendChild(link);
+      });
     }
 
     function show(number) {
@@ -9909,6 +9954,69 @@
         }
         if (handled) {
           event.preventDefault();
+        }
+      });
+    }
+    /* Full screen below `md` (#942): the viewer as a dialog over the page. Escape closes it, Tab
+     * stays inside it, and focus goes to the stage on opening and back to the button on closing.
+     * The button is shown only here, so with no script the page has none. */
+    if (fullButton) {
+      fullButton.hidden = false;
+      var label = fullButton.querySelector("[data-viewer-full-label]");
+      var setFull = function (on) {
+        if (on) {
+          viewer.setAttribute("data-full", "");
+          viewer.setAttribute("role", "dialog");
+          viewer.setAttribute("aria-modal", "true");
+          document.body.setAttribute("data-viewer-full", "");
+        } else {
+          viewer.removeAttribute("data-full");
+          viewer.setAttribute("role", "region");
+          viewer.removeAttribute("aria-modal");
+          document.body.removeAttribute("data-viewer-full");
+        }
+        fullButton.setAttribute("aria-pressed", on ? "true" : "false");
+        label.textContent = fullButton.getAttribute(on ? "data-close-words" : "data-open-words");
+        if (state.pdf) {
+          drawPage();
+        }
+        (on ? stage : fullButton).focus();
+      };
+      fullButton.addEventListener("click", function () {
+        setFull(!viewer.hasAttribute("data-full"));
+      });
+      viewer.addEventListener("keydown", function (event) {
+        if (!viewer.hasAttribute("data-full")) {
+          return;
+        }
+        if (event.key === "Escape") {
+          event.preventDefault();
+          setFull(false);
+        } else if (event.key === "Tab") {
+          var inside = Array.prototype.filter.call(
+            viewer.querySelectorAll("a[href], button, input, select, [tabindex='0']"),
+            function (item) {
+              return !item.disabled && !item.hidden && item.offsetParent !== null;
+            }
+          );
+          if (!inside.length) {
+            return;
+          }
+          var first = inside[0],
+            last = inside[inside.length - 1];
+          if (event.shiftKey && document.activeElement === first) {
+            event.preventDefault();
+            last.focus();
+          } else if (!event.shiftKey && document.activeElement === last) {
+            event.preventDefault();
+            first.focus();
+          }
+        }
+      });
+      window.matchMedia("(min-width: 768px)").addEventListener("change", function (query) {
+        // A wide window has no full screen of its own: the button is gone, so the mode goes too.
+        if (query.matches && viewer.hasAttribute("data-full")) {
+          setFull(false);
         }
       });
     }
