@@ -724,6 +724,46 @@ def test_the_wiki_tables_have_every_documented_variable_once():
         assert (f"### {area.title}" in markdown) is bool(documented)
 
 
+def _wiki_page():
+    """The wiki's Configuration page from the wiki checkout, or None where there is none."""
+    wiki = Path(os.environ.get("POSTULO_WIKI_DIR") or REPO.parent / "postulo.wiki")
+    page = wiki / "Configuration.md"
+    return page if page.is_file() else None
+
+
+def test_the_wiki_page_carries_the_tables_the_registry_writes():
+    """The Configuration page's reference section is the registry's output, byte for byte, so a
+    variable added, renamed or reworded there shows up on the page or this fails (#1186)."""
+    page = _wiki_page()
+    if page is None:
+        pytest.skip("the wiki is not checked out beside this repository")
+    text = page.read_text(encoding="utf-8")
+
+    assert _script().with_wiki_section(text) == text, (
+        "run: uv run python scripts/configuration_docs.py --wiki-page " + str(page)
+    )
+
+
+def test_the_wiki_page_names_no_variable_the_registry_does_not_know():
+    page = _wiki_page()
+    if page is None:
+        pytest.skip("the wiki is not checked out beside this repository")
+    known = configuration.known_names()
+    # `POSTULO_PLUGIN_<NAME>` is a family, one per plugin; the page gives two as examples.
+    names = _NAME.findall(page.read_text(encoding="utf-8"))
+    stray = {n for n in names if n not in known and not n.startswith("POSTULO_PLUGIN_")}
+
+    assert not stray - NOT_VARIABLES, stray
+
+
+def test_the_wiki_section_is_replaced_not_added_twice():
+    script = _script()
+    once = script.with_wiki_section("# Configuration\n\nText.\n")
+
+    assert script.with_wiki_section(once) == once
+    assert once.count(script.WIKI_BEGIN) == 1
+
+
 # ------------------------------------------------------------------- manage.py settings
 
 
