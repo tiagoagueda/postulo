@@ -126,6 +126,13 @@ def locations(user) -> list[str]:
     return _by_use(JobPosting.objects.for_user(user), "location")
 
 
+def cities(user) -> list[str]:
+    """The towns of the addresses this person has kept, commonest first (#1252)."""
+    from postulo.core.models import PostalAddress
+
+    return _by_use(PostalAddress.objects.for_user(user), "municipality")
+
+
 def sources(user) -> list[str]:
     """Where postings were found. A short list for most people, and typed every time."""
     from .models import JobPosting

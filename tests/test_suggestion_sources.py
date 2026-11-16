@@ -24,7 +24,7 @@ def _fresh_registry():
     registry._cache.pop("suggestion-source", None)
 
 
-def _offer_cities(field, exclude=(), language="", first=()):
+def _offer_cities(field, exclude=(), language="", first=(), typed=""):
     return [("Lisbon", "PT"), ("Porto", "PT")] if field == "city" else []
 
 

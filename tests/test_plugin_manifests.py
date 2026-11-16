@@ -217,6 +217,7 @@ def test_these_are_the_plugins_that_ship_across_twelve_kinds():
         "register-adapters",
         "nace",
         "esco",
+        "geonames",
         "multiple-fields",
         "builtin-notifications",
         "file-formats",

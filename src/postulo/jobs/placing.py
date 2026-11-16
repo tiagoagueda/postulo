@@ -38,6 +38,10 @@ def place(address) -> None:
     owner = getattr(address, "owner", None)
     if owner is None or not mapping.map_offered(owner):
         return
+    # With the GeoNames plugin off nothing is placed from its table and nothing stored is
+    # touched, as with the map off (#1252).
+    if not places.enabled(owner):
+        return
     address.placed_from = key
     address.placed_at = timezone.now()
     found = places.place(address.postcode, address.municipality, address.country)

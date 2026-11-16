@@ -15,6 +15,7 @@ class PluginsConfig(AppConfig):
         is found exactly as one installed with pip would be.
         """
         from .esco import Esco
+        from .geonames import Geonames
         from .identifiers import Identifiers
         from .installing import activate
         from .link_services import LinkServices
@@ -46,6 +47,8 @@ class PluginsConfig(AppConfig):
         # ESCO for job titles and skills, the same way: offline, and on by default.
         register_builtin("suggestion-source", Esco)
         _tell_the_vocabulary_who_decides()
+        # And GeoNames' places for a city, offline and on by default (#1252).
+        register_builtin("suggestion-source", Geonames)
         register_builtin_locales()
         register_builtin_themes()
         # And now import what is installed, so a plugin that will not load says so in the

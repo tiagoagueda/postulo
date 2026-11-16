@@ -621,6 +621,56 @@ def cities() -> int:
         connection.close()
 
 
+#: The plugin that offers this table (`postulo.plugins.geonames`), by the name its policy rows
+#: key on. A string and not an import: core asks the registry and never imports a plugin.
+PLUGIN = "geonames"
+
+
+def enabled(person=None) -> bool:
+    """Whether the GeoNames plugin is on for ``person`` (an instance's answer with ``None``).
+
+    Off, nothing is placed by this table and no city is suggested, and what is stored stays
+    exactly as it is (#1252). An instance where the plugin is not installed at all answers
+    as one where it is on: the table is then read as before, and a reader that wants it gone
+    removes the files.
+    """
+    from postulo.core import modules
+
+    return modules.is_on(person, PLUGIN)
+
+
+def suggest_cities(typed: str, limit: int = 10) -> list[str]:
+    """City names that begin with ``typed``, the most populous first, each once.
+
+    For the city box of an address (#1252). A name is the city's own, as the table spells
+    it, found by any name it answers to, so "Lisboa" finds the city the table
+    spells "Lisbon". Nothing before two letters, and nothing where the dataset
+    is not on this machine.
+    """
+    key = fold(typed or "")
+    if len(key) < 2:
+        return []
+    lookup = _index()
+    if lookup is None:
+        return []
+    connection = sqlite3.connect(f"{lookup.as_uri()}?mode=ro", uri=True)
+    try:
+        found = connection.execute(
+            "SELECT c.name, MAX(c.population) AS size FROM names n JOIN cities c ON c.id = n.city"
+            " WHERE n.key >= ? AND n.key < ? GROUP BY c.name ORDER BY size DESC LIMIT ?",
+            (key, key + chr(0x10FFFF), max(limit, 1) * 4),
+        ).fetchall()
+    finally:
+        connection.close()
+    seen: set[str] = set()
+    names: list[str] = []
+    for name, _size in found:
+        if name.casefold() not in seen:
+            seen.add(name.casefold())
+            names.append(name)
+    return names[:limit]
+
+
 def resolve(text: str) -> dict | None:
     """A company's free-text location to a place, or ``None`` where the text is not one.
 

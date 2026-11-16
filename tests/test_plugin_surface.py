@@ -50,6 +50,14 @@ HOME = "postulo.plugins."
 #: What each shipped plugin still reaches past the surface for, and why. Every line is
 #: either a name that should become part of the surface, or work left to do.
 REACHING_PAST: dict[str, dict[str, str]] = {
+    "geonames": {
+        "postulo.jobs.places": (
+            "the table of GeoNames' cities it suggests from. The module stays in `jobs`, where "
+            "the address model's placing, the map page and the system checks read it, as "
+            "NACE's classification does, until later slices of #1252 move those readers "
+            "behind the registry"
+        ),
+    },
     "nace": {
         "postulo.jobs.industries": (
             "the NACE classification and Postulo's short industry names it suggests from. The "
