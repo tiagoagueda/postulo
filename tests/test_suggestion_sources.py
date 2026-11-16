@@ -24,7 +24,7 @@ def _fresh_registry():
     registry._cache.pop("suggestion-source", None)
 
 
-def _offer_cities(field, exclude=(), language="", first=()):
+def _offer_cities(field, exclude=(), language="", first=(), typed=""):
     return [("Lisbon", "PT"), ("Porto", "PT")] if field == "city" else []
 
 
@@ -49,7 +49,7 @@ def test_the_surface_holds_what_a_suggestion_source_needs():
 
 
 def test_nace_is_a_shipped_suggestion_source_that_is_offline_and_licensed():
-    (plugin,) = registry.plugins("suggestion-source")
+    (plugin,) = [p for p in registry.plugins("suggestion-source") if p.name == "nace"]
     (source,) = plugin.sources
 
     assert plugin.name == "nace" and plugin.kind == "suggestion-source"

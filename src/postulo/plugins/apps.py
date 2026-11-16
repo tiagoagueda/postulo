@@ -14,6 +14,7 @@ class PluginsConfig(AppConfig):
         Before anything reads entry points, so a plugin installed through the interface
         is found exactly as one installed with pip would be.
         """
+        from .geonames import Geonames
         from .identifiers import Identifiers
         from .installing import activate
         from .link_services import LinkServices
@@ -42,6 +43,8 @@ class PluginsConfig(AppConfig):
         # And the vocabularies a field suggests from (#1252): NACE for industries, offline
         # and on by default.
         register_builtin("suggestion-source", Nace)
+        # And GeoNames' places for a city, offline and on by default (#1252).
+        register_builtin("suggestion-source", Geonames)
         register_builtin_locales()
         register_builtin_themes()
         # And now import what is installed, so a plugin that will not load says so in the

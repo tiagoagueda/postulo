@@ -9,7 +9,7 @@ from __future__ import annotations
 
 from itertools import chain
 
-from postulo.core import suggest
+from postulo.core import suggest, suggestion_sources
 
 from . import esco, recall
 
@@ -18,9 +18,22 @@ def job_title(user, typed: str):
     return chain(recall.titles(user), esco.suggestions())
 
 
+def city(user, typed: str):
+    """The towns this person kept, then the cities of every enabled places source (#1252).
+
+    A source is asked what was typed, since it searches a table; with none enabled the box
+    suggests only what the person typed before, and is otherwise a plain box.
+    """
+    return chain(
+        recall.cities(user),
+        (text for text, _group in suggestion_sources.offered("city", user=user, typed=typed)),
+    )
+
+
 suggest.register("company", lambda user, typed: recall.companies(user))
 suggest.register("employer", lambda user, typed: recall.companies(user, including_career=True))
 suggest.register("job-title", job_title)
 suggest.register("location", lambda user, typed: recall.locations(user))
+suggest.register("city", city)
 suggest.register("source", lambda user, typed: recall.sources(user))
 suggest.register("contact-role", lambda user, typed: recall.contact_roles(user))

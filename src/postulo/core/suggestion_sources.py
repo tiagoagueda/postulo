@@ -25,6 +25,7 @@ their own word, which is what almost everybody does anyway.
 
 from __future__ import annotations
 
+import inspect
 import logging
 from collections.abc import Callable
 from dataclasses import dataclass
@@ -41,7 +42,8 @@ MAX_KEY_LENGTH = 40
 class Source:
     """One vocabulary that can suggest values for some fields.
 
-    ``offer(field, exclude=(), language="", first=())`` returns ``(text, group)`` pairs, in
+    ``offer(field, exclude=(), language="", first=())`` -- and ``typed=""``, what has been
+    typed so far, passed only to an ``offer`` that names it -- returns ``(text, group)`` pairs, in
     the order they should be shown: ``exclude`` are the values the person already has,
     ``first`` is a hint (a list of codes, source-specific) of what to put at the head, and
     ``group`` a short label the field may narrow by (an industry's sector), or ``""``.
@@ -119,13 +121,26 @@ def sources(field: str = "", user=None) -> list[Source]:
     return [s for s in found.values() if not field or field in s.fields]
 
 
+def _takes_typed(offer) -> bool:
+    """Whether ``offer`` can be told what has been typed: a source that searches (a table
+    of places) needs it, and one that lists everything (a classification) need not."""
+    try:
+        parameters = inspect.signature(offer).parameters
+    except (TypeError, ValueError):
+        return False
+    return "typed" in parameters or any(
+        parameter.kind is inspect.Parameter.VAR_KEYWORD for parameter in parameters.values()
+    )
+
+
 def offered(
-    field: str, exclude=(), language: str = "", first=(), user=None
+    field: str, exclude=(), language: str = "", first=(), user=None, typed: str = ""
 ) -> list[tuple[str, str]]:
     """What a field's input offers: ``(text, group)`` from every enabled offline source.
 
     Merged in source order, one entry per text however many sources have it (the first
-    keeps it). A source that raises is logged and left out, so a broken plugin makes a
+    keeps it). ``typed`` is what the person has typed, for a source that searches. A source
+    that raises is logged and left out, so a broken plugin makes a
     plainer field and never a broken page.
     """
     merged: list[tuple[str, str]] = []
@@ -134,7 +149,8 @@ def offered(
         if not source.offline:
             continue
         try:
-            answer = source.offer(field, exclude=exclude, language=language, first=first)
+            extra = {"typed": typed} if typed and _takes_typed(source.offer) else {}
+            answer = source.offer(field, exclude=exclude, language=language, first=first, **extra)
         except Exception:
             logger.exception("Suggestion source %r failed for %r", source.key, field)
             continue

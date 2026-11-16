@@ -373,6 +373,8 @@ def pinned_addresses(person) -> list[dict]:
 def places_data_place(row) -> dict | None:
     from . import places
 
+    if not places.enabled(getattr(row, "owner", None)):
+        return None
     answer = places.place(row.postcode, row.municipality, row.country)
     return answer[1] if answer else None
 
