@@ -124,7 +124,7 @@ LAYERS: list[tuple[str, tuple[str, ...]]] = [
             # Postulo's, called by the upload that holds the file.
             "postulo.documents.readers",
             "postulo.documents.themes",
-            "postulo.jobs.esco",
+            "postulo.plugins.esco.classification",
             "postulo.jobs.industries",
             "postulo.jobs.places",
             "postulo.jobs.roles",
@@ -183,6 +183,9 @@ LAYERS: list[tuple[str, tuple[str, ...]]] = [
             # row, and `plugins.syncing` among the governance takes one.
             "postulo.core.leases",
             "postulo.core.identifiers",
+            # What the rest of Postulo asks of the occupation and skill vocabulary (#1252): it
+            # asks the registry, and the plugins app hands it the policy, so models read it.
+            "postulo.core.occupations",
             "postulo.plugins.identifiers*",
             # What a web link's service is, which the model reads to name a row (#305). The
             # table Postulo ships is a feature like any other: nothing below imports it.

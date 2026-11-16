@@ -16,8 +16,8 @@ import zipfile
 import pytest
 from django.core.management.base import CommandError
 
-from postulo.jobs import esco
-from postulo.jobs.management.commands import fetch_esco
+from postulo.plugins.esco import classification as esco
+from postulo.plugins.management.commands import fetch_esco
 
 #: The two queries the harvest makes, keyed in the table of pages the way the command
 #: asks them: by the ISCO concept scheme, and by the class the API names for occupations.
@@ -568,7 +568,7 @@ def test_a_refused_run_keeps_the_previous_revision(data_dir, harvest):
     ],
 )
 def test_the_system_check_reports_two_revisions(tmp_path, monkeypatch, names, check_id):
-    from postulo.jobs import checks
+    from postulo.plugins.esco import checks
 
     monkeypatch.setattr(esco, "DATA_DIR", tmp_path)
     assert checks.esco_one_revision(None) == []

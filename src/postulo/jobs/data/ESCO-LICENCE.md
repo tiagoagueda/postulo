@@ -52,7 +52,7 @@ itself rather than one this project hands on.
 > under the EUPL 1.2.
 
 **Changes made, as required.** Only shape, never wording. The first file holds the unit
-groups and the occupations — see `postulo/jobs/esco.py` for why the unit group is the
+groups and the occupations — see `postulo/plugins/esco/classification.py` for why the unit group is the
 level a title keeps — and, beside each occupation, the NACE divisions of the
 correspondence, cut from the group or class ESCO links it to. The second holds each skill's identifier and its preferred names and
 nothing else: no alternative names, no descriptions, no relations between skills, and none

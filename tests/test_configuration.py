@@ -266,7 +266,7 @@ NOT_PINNED = {
     "POSTULO_SECRET_KEY_WEAK_ALLOWED": "a refusal at start-up",
     "POSTULO_ALLOWED_HOSTS_WILDCARD_ALLOWED": "a refusal at start-up",
     "POSTULO_GEOLOCATIONS_DIR": "postulo.jobs.places.DATA_DIR",
-    "POSTULO_ESCO_DIR": "postulo.jobs.esco.DATA_DIR",
+    "POSTULO_ESCO_DIR": "postulo.plugins.esco.classification.DATA_DIR",
     "POSTULO_GEONAMES_POSTCODES": "manage.py fetch_geonames",
 }
 

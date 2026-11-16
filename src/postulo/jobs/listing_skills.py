@@ -4,11 +4,11 @@ Somebody reading a listing asks which of its requirements they meet. Postulo hol
 halves of the answer: the ESCO skills a person's career record names (`resume.Skill`
 keeps the classification's identifier beside each name, #266) and the classification
 itself. This lays them side by side, with no model and nothing fetched: the skills a
-listing names are the runs of its words that are a skill's name (`esco.skills_named`), and
+listing names are the runs of its words that are a skill's name (`occupations.skills_named`), and
 the person has one where a skill of theirs is that same skill.
 
 Worked out when the page is drawn, from the listing's title and text, which are short; the
-reading of the text is remembered per text by `esco.skills_named`, and what the person has
+reading of the text is remembered per text by `occupations.skills_named`, and what the person has
 is one query. Where the skills have not been downloaded there is nothing to compare, and
 the panel says how an administrator downloads them rather than saying the listing names
 none.
@@ -20,11 +20,9 @@ from dataclasses import dataclass, field
 
 from django.db.models import Count, F
 
-from postulo.core import languages
+from postulo.core import languages, occupations
 from postulo.resume import translatable
 from postulo.resume.models import Skill
-
-from . import esco
 
 
 @dataclass
@@ -53,10 +51,12 @@ def _text_of(posting) -> str:
 
 def panel(posting, user) -> SkillsPanel:
     """The skills ``posting`` names, split into those ``user`` has and those they do not."""
-    if not esco.skills_available():
+    if not occupations.skills_available(user):
         return SkillsPanel(available=False)
     reader = languages.current()
-    named = esco.skills_named(_text_of(posting), translatable.record_language_of(user), reader)
+    named = occupations.skills_named(
+        _text_of(posting), translatable.record_language_of(user), reader, user=user
+    )
     if not named:
         return SkillsPanel(available=True)
     theirs = set(
@@ -64,7 +64,7 @@ def panel(posting, user) -> SkillsPanel:
     )
     found = SkillsPanel(available=True)
     for uri in named:
-        name = esco.skill_name(uri, reader, strict=False)
+        name = occupations.skill_name(uri, reader, strict=False, user=user)
         if name:
             (found.held if uri in theirs else found.missing).append(name)
     if theirs:

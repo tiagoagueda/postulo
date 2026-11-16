@@ -18,8 +18,9 @@ from django.utils import translation
 
 from postulo.applications.services import apply_to_listing, create_listing
 from postulo.documents.models import CV, CVItem
-from postulo.jobs import esco, listing_skills
+from postulo.jobs import listing_skills
 from postulo.jobs.models import Company
+from postulo.plugins.esco import classification as esco
 from postulo.resume.models import Skill, SkillGroup
 
 from .conftest import write_esco_skills
@@ -263,4 +264,6 @@ def test_the_listing_page_with_the_panel_costs_what_it_did_and_two_queries(
 
 
 #: The listing page, its panel holding three skills the person has and the CV printing them.
-PAGE_QUERIES = 27
+#: Two of them are the plugin policy -- the rows and the access rules, read once a request --
+#: which the page now asks because ESCO is a plugin that can be switched off (#1252).
+PAGE_QUERIES = 29

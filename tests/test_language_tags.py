@@ -362,7 +362,7 @@ def classified(tmp_path, monkeypatch):
     Written here rather than read from the download, which a checkout does not have: the
     question is how a reader's language is matched to the file's, not what the file says.
     """
-    from postulo.jobs import esco
+    from postulo.plugins.esco import classification as esco
 
     from .conftest import write_esco_occupations
 
@@ -385,7 +385,7 @@ def classified(tmp_path, monkeypatch):
 def test_a_norwegian_reader_is_given_the_norwegian_names(classified):
     """ESCO publishes its Norwegian under `no`; Postulo's catalogue is `nb`. The two were
     compared as strings, and a Norwegian reader was given the English names."""
-    from postulo.jobs import esco
+    from postulo.plugins.esco import classification as esco
 
     assert esco.name_for("2511", "nb") == classified["no"]
     assert esco.name_for("2511", "nb-NO") == classified["no"]
@@ -397,7 +397,7 @@ def test_a_norwegian_reader_is_given_the_norwegian_names(classified):
 
 
 def test_a_skill_is_read_in_norwegian_too(monkeypatch):
-    from postulo.jobs import esco
+    from postulo.plugins.esco import classification as esco
 
     monkeypatch.setattr(esco, "skills_about", lambda: {"languages": ["en", "no", "pt"]})
 

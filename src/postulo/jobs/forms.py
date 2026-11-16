@@ -12,13 +12,21 @@ from django.db.models import Q
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
-from postulo.core import phone_field, phone_numbers, phones, slugs, suggestion_sources, web_links
+from postulo.core import (
+    occupations,
+    phone_field,
+    phone_numbers,
+    phones,
+    slugs,
+    suggestion_sources,
+    web_links,
+)
 from postulo.core.date_widgets import DateInput, DateTimeInput
 from postulo.core.formsets import RowsAlreadyGone
 from postulo.core.identifiers import IdentifierRow, OneOfEachKind, SchemeSelect, offering
 from postulo.core.suggest import SuggestInput
 
-from . import company_names, employment_services, esco, identifiers, industries, logos, structure
+from . import company_names, employment_services, identifiers, industries, logos, structure
 from .models import (
     Company,
     CompanyHiringSignal,
@@ -485,7 +493,7 @@ class CompanyForm(OwnNoteForm):
             return []
         counted: dict[str, int] = {}
         for group in company.postings.exclude(isco_code="").values_list("isco_code", flat=True):
-            for division in esco.divisions_for(group):
+            for division in occupations.divisions_for(group):
                 counted[division] = counted.get(division, 0) + 1
         return sorted(counted, key=lambda code: (-counted[code], code))
 
@@ -1035,7 +1043,14 @@ class JobPostingForm(OwnerScopedModelForm):
         the listing's company is known and has sectors, the unit groups ESCO's companion
         correspondence places in them come first, and nothing is left out (#897).
         """
-        return {"title-suggestions": esco.suggestions(sections=self.company_sectors())}
+        return {
+            "title-suggestions": [
+                text
+                for text, _group in suggestion_sources.offered(
+                    "job_title", first=self.company_sectors(), user=self.user
+                )
+            ]
+        }
 
     def company_sectors(self) -> list[str]:
         """The sectors of the company this listing is for, where that is already known."""

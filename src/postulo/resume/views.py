@@ -23,11 +23,10 @@ from django.utils.translation import ngettext
 from django.views import View
 from django.views.generic import CreateView, DeleteView, TemplateView, UpdateView
 
-from postulo.core import languages, throttle
+from postulo.core import languages, occupations, throttle
 from postulo.core.mixins import ConfirmDeleteMixin, OwnedObjectMixin, OwnerFormMixin
 from postulo.core.redirects import safe_next
 from postulo.documents import proofs
-from postulo.jobs import esco
 from postulo.jobs.views import UserFormKwargsMixin
 from postulo.plugins import base
 
@@ -183,10 +182,11 @@ class SkillSuggestionsView(LoginRequiredMixin, View):
             return refusal
         limit = Skill._meta.get_field("name").max_length
         typed = (request.GET.get("name") or "")[:limit]
-        names = esco.skill_suggestions(
+        names = occupations.skill_suggestions(
             typed,
             languages.current(),
             translating.record_language_of(request.user),
+            user=request.user,
         )
         response = render(request, self.template_name, {"names": names})
         # What one person typed, answered for them: no cache between them and it.

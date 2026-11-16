@@ -19,8 +19,9 @@ from django.utils import translation
 
 from postulo.applications.forms import ApplicationIntakeForm, PostingIntakeForm
 from postulo.applications.models import Application, Priority, Status
-from postulo.jobs import esco, recall
+from postulo.jobs import recall
 from postulo.jobs.models import Company, JobPosting
+from postulo.plugins.esco import classification as esco
 
 pytestmark = pytest.mark.django_db
 

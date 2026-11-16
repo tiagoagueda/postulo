@@ -24,10 +24,11 @@ from postulo.applications.models import Application, Status
 from postulo.applications.services import change_status
 from postulo.core import export as export_module
 from postulo.core import importer
-from postulo.jobs import esco, industries
+from postulo.jobs import industries
 from postulo.jobs.forms import CompanyForm, IndustryForm, JobPostingForm
-from postulo.jobs.management.commands import fetch_esco
 from postulo.jobs.models import Company, Industry, JobPosting
+from postulo.plugins.esco import classification as esco
+from postulo.plugins.management.commands import fetch_esco
 
 pytestmark = pytest.mark.django_db
 

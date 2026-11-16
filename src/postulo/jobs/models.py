@@ -36,7 +36,7 @@ from django.utils import timezone
 from django.utils.formats import number_format
 from django.utils.translation import gettext_lazy as _
 
-from postulo.core import slugs
+from postulo.core import occupations, slugs
 from postulo.core.addresses import same_url
 from postulo.core.identifiers import COMPANY, MAX_VALUE_LENGTH, KeepsItsScheme, scheme_field
 from postulo.core.language_field import LanguageField
@@ -44,7 +44,7 @@ from postulo.core.models import OwnedModel, PrincipalOwnedModel, PrincipalQueryS
 from postulo.core.sharing import SharedQuerySet
 from postulo.core.stored_pictures import StoredPicture
 
-from . import esco, identifiers, industries, roles
+from . import identifiers, industries, roles
 
 
 def split_location(text: str) -> tuple[str, str]:
@@ -1869,7 +1869,7 @@ class JobPosting(StartsAsTheOwners, PrincipalOwnedModel):
             # The code follows the title, in the language being read (#266): derived
             # whenever the title may be written, and carried along then, whatever else the
             # save meant to write.
-            self.isco_code = esco.code_for(self.title)
+            self.isco_code = occupations.code_for(self.title, otherwise=self.isco_code)
             if update is not None and "isco_code" not in update:
                 kwargs["update_fields"] = [*update, "isco_code"]
         return super().save(*args, **kwargs)
@@ -1888,7 +1888,7 @@ class JobPosting(StartsAsTheOwners, PrincipalOwnedModel):
     @property
     def isco_name(self) -> str:
         """What the classification calls the code this posting carries, in the language read."""
-        return esco.name_for(self.isco_code)
+        return occupations.name_for(self.isco_code)
 
     @property
     def has_applications(self) -> bool:
