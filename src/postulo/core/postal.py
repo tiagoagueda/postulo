@@ -33,6 +33,7 @@ from django.utils.translation import gettext_lazy as _
 from .formsets import RowsAlreadyGone, give_owner, owner_of
 from .models import PostalAddress
 from .option_icons import IconSelect
+from .suggest import SuggestInput
 
 #: The icon beside each kind of address in the row's choice (#301).
 KIND_ICONS = {
@@ -362,6 +363,13 @@ class PostalAddressForm(forms.ModelForm):
         # browser that knows them can fill them.
         self.fields["street"].widget = forms.Textarea(
             attrs={"rows": 2, "autocomplete": "street-address"}
+        )
+        # The town suggests the towns of the person's own addresses, and choosing one fills the
+        # postcode and the country that went with it where they are still empty (#1251).
+        self.fields["municipality"].widget = SuggestInput(
+            "municipality",
+            dict(self.fields["municipality"].widget.attrs),
+            fills={"postcode": "postcode", "country": "country"},
         )
         for name, token in (
             ("postcode", "postal-code"),

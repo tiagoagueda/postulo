@@ -103,7 +103,9 @@ class PostingIntakeForm(UserAwareForm):
     company_name = forms.CharField(
         label=_("Company"),
         max_length=200,
-        widget=SuggestInput("company", {"list": "company-suggestions"}),
+        widget=SuggestInput(
+            "company", {"list": "company-suggestions"}, fills={"location": "location"}
+        ),
     )
     title = forms.CharField(
         label=_("Job title"),
@@ -111,7 +113,9 @@ class PostingIntakeForm(UserAwareForm):
         # The list it names is the ESCO unit groups from `datalists`, offered even without
         # a user because it belongs to no one; the code the words match follows the posting
         # it becomes and is not offered here (#266).
-        widget=SuggestInput("job-title", {"list": "title-suggestions"}),
+        widget=SuggestInput(
+            "job-title", {"list": "title-suggestions"}, fills={"employment_type": "employment_type"}
+        ),
         help_text=POSTING_HELP["title"],
     )
     #: Asked only when the company named is recorded as dissolved (#941): adding work at a
@@ -344,7 +348,6 @@ class ApplicationDetailsForm(UserAwareForm):
         label=_("New tags"),
         required=False,
         help_text=_("Separate them with commas. A tag you have already keeps its colour."),
-        widget=SuggestInput("tag", separator=","),
     )
 
     def __init__(self, *args, **kwargs):
@@ -421,7 +424,6 @@ class ApplicationForm(OwnerScopedModelForm):
         label=_("New tags"),
         required=False,
         help_text=_("Separate them with commas. A tag you have already keeps its colour."),
-        widget=SuggestInput("tag", separator=","),
     )
     #: The status this form was drawn with, sent back so that the view can tell a status
     #: somebody chose from one that is only the page being old (#545).
@@ -1166,7 +1168,6 @@ class SavedAnswerForm(_AnswerLanguage, OwnerScopedModelForm):
         label=_("New tags"),
         required=False,
         help_text=_("Separate them with commas. A tag you have already keeps its colour."),
-        widget=SuggestInput("tag", separator=","),
     )
 
     class Meta:

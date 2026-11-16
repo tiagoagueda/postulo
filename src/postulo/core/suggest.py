@@ -26,6 +26,7 @@ kept. At most `AT_MOST` are returned: a list to choose from, not a directory.
 
 from __future__ import annotations
 
+import json
 import re
 import unicodedata
 from collections.abc import Callable, Iterable
@@ -33,6 +34,7 @@ from dataclasses import dataclass
 
 from django import forms
 from django.urls import reverse_lazy
+from django.utils.translation import gettext_lazy as _
 
 #: The most a suggestion box shows (#1251).
 AT_MOST = 10
@@ -54,16 +56,35 @@ class Suggester:
     #: are narrowed to what was typed by `suggest`, so a source need not do it; one that can
     #: do it better (a database that can search) may, and gets the same matching again.
     source: Callable[[object, str], Iterable[str]]
+    #: ``fills(user, chosen) -> {key: text}``: what is known, from this person's own records,
+    #: about a value that has been chosen, keyed by what it is (``location``, ``postcode``).
+    #: Asked once, when an option is taken -- never as somebody types. None: nothing follows.
+    fills: Callable[[object, str], dict[str, str]] | None = None
+    #: ``enabled(user) -> bool`` for a kind whose answers come from a lookup the person has to
+    #: switch on (a register, Wikidata: #879). None: the person's own entries, always on.
+    #: A kind that is not enabled for somebody answers nothing and is never called.
+    enabled: Callable[[object], bool] | None = None
 
 
 _registry: dict[str, Suggester] = {}
 
 
-def register(kind: str, source: Callable[[object, str], Iterable[str]]) -> None:
-    """Add a kind, or replace the one of that name."""
+def register(
+    kind: str,
+    source: Callable[[object, str], Iterable[str]],
+    *,
+    fills: Callable[[object, str], dict[str, str]] | None = None,
+    enabled: Callable[[object], bool] | None = None,
+) -> None:
+    """Add a kind, or replace the one of that name.
+
+    ``fills`` says what follows from choosing a value (see `Suggester`); ``enabled`` is for a
+    kind that is a lookup and must be switched on by the person, as the issue lays down: it
+    is not asked, and answers nothing, until it is.
+    """
     if not KIND.match(kind):
         raise ValueError(f"A suggestion kind is lower case words and hyphens, not {kind!r}.")
-    _registry[kind] = Suggester(kind, source)
+    _registry[kind] = Suggester(kind, source, fills, enabled)
 
 
 def kinds() -> list[str]:
@@ -108,10 +129,40 @@ def suggest(kind: str, user, typed: str = "") -> list[str]:
     """What ``kind`` suggests to ``user`` for ``typed``; nothing for a kind not registered
     and nothing for somebody who is not signed in."""
     suggester = _registry.get(kind)
-    if suggester is None or not getattr(user, "is_authenticated", False):
+    if suggester is None or not usable(suggester, user):
         return []
     typed = (typed or "")[:TYPED_AT_MOST]
     return matching(suggester.source(user, typed), typed)
+
+
+def usable(suggester: Suggester, user) -> bool:
+    """Whether ``user`` may be answered by ``suggester``: signed in, and, for a lookup, with
+    it switched on. A switch that cannot be read is off."""
+    if not getattr(user, "is_authenticated", False):
+        return False
+    if suggester.enabled is None:
+        return True
+    try:
+        return bool(suggester.enabled(user))
+    except Exception:
+        return False
+
+
+def fills(kind: str, user, chosen: str) -> dict[str, str]:
+    """What choosing ``chosen`` in a box of ``kind`` fills in beside it, for ``user``.
+
+    Only text the person's own records hold, only non-empty, and nothing for a kind with no
+    ``fills`` or one that is not usable by them. A failing ``fills`` is an empty answer: a
+    fill is a convenience, never a reason for the form to break.
+    """
+    suggester = _registry.get(kind)
+    if suggester is None or suggester.fills is None or not usable(suggester, user):
+        return {}
+    try:
+        found = suggester.fills(user, (chosen or "")[:TYPED_AT_MOST])
+    except Exception:
+        return {}
+    return {str(key): str(text) for key, text in found.items() if str(text).strip()}
 
 
 class SuggestInput(forms.TextInput):
@@ -122,11 +173,31 @@ class SuggestInput(forms.TextInput):
     attribute off when it draws its own list, so one box never shows two.
     """
 
-    def __init__(self, kind: str, attrs: dict | None = None, *, separator: str = ""):
+    def __init__(
+        self,
+        kind: str,
+        attrs: dict | None = None,
+        *,
+        fills: dict[str, str] | None = None,
+    ):
+        """``fills`` maps what the kind can fill (a key of its ``fills``) to the name of the
+        field beside this one that takes it; the script fills such a field only while it is
+        empty, says so, and offers to undo it."""
         own = {
             "data-suggest": reverse_lazy("core:suggest", args=[kind]),
             "autocomplete": "off",
-            **({"data-suggest-separator": separator} if separator else {}),
+            **(
+                {
+                    "data-suggest-fills": json.dumps(fills),
+                    "data-suggest-fill-address": reverse_lazy("core:suggest_fill", args=[kind]),
+                    # Said by the script, so they are the page's own words and language.
+                    "data-fill-said": _("Also filled in:"),
+                    "data-fill-undo": _("Undo"),
+                    "data-fill-undone": _("Undone."),
+                }
+                if fills
+                else {}
+            ),
             **(attrs or {}),
         }
         super().__init__(own)

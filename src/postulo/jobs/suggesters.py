@@ -18,9 +18,13 @@ def job_title(user, typed: str):
     return chain(recall.titles(user), esco.suggestions())
 
 
-suggest.register("company", lambda user, typed: recall.companies(user))
-suggest.register("employer", lambda user, typed: recall.companies(user, including_career=True))
-suggest.register("job-title", job_title)
+suggest.register("company", lambda user, typed: recall.companies(user), fills=recall.company_facts)
+suggest.register(
+    "employer",
+    lambda user, typed: recall.companies(user, including_career=True),
+    fills=recall.company_facts,
+)
+suggest.register("job-title", job_title, fills=recall.title_facts)
 suggest.register("location", lambda user, typed: recall.locations(user))
 suggest.register("source", lambda user, typed: recall.sources(user))
 suggest.register("contact-role", lambda user, typed: recall.contact_roles(user))
@@ -40,3 +44,6 @@ suggest.register(
     ),
 )
 suggest.register("contact-name", lambda user, typed: recall.contact_names(user))
+suggest.register(
+    "municipality", lambda user, typed: recall.municipalities(user), fills=recall.municipality_facts
+)

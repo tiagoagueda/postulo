@@ -32,6 +32,7 @@ urlpatterns = [
     path("search/", views_search.search_page, name="search"),
     # What a suggestion box offers as it is typed in (#1251).
     path("suggest/<str:kind>/", views_suggest.suggestions, name="suggest"),
+    path("suggest/<str:kind>/fill/", views_suggest.fills, name="suggest_fill"),
     # A card's help as a page of its own: where its question mark leads with scripts off,
     # and what a script opens in a drawer instead (#302).
     path("help/<slug:slug>/", views_help.topic_page, name="help_topic"),

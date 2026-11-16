@@ -9575,6 +9575,39 @@ html {
     background-color: var(--color-accent);
     color: var(--color-accent-foreground);
   }
+  .suggest-filled {
+    min-width: 0px;
+    font-size: var(--text-sm);
+    line-height: var(--tw-leading, var(--text-sm--line-height));
+    overflow-wrap: anywhere;
+    color: var(--color-ink-600);
+    &:where([data-theme="dark"], [data-theme="dark"] *) {
+      color: var(--color-ink-300);
+    }
+    @media (prefers-color-scheme: dark) {
+      &:where(:root:not([data-theme="light"]), :root:not([data-theme="light"]) *) {
+        color: var(--color-ink-300);
+      }
+    }
+  }
+  .suggest-filled:empty {
+    display: none;
+  }
+  .suggest-filled button {
+    cursor: pointer;
+    border-radius: var(--radius-sm);
+    color: var(--color-brand-700);
+    text-decoration-line: underline;
+    text-underline-offset: 2px;
+    &:where([data-theme="dark"], [data-theme="dark"] *) {
+      color: var(--color-brand-300);
+    }
+    @media (prefers-color-scheme: dark) {
+      &:where(:root:not([data-theme="light"]), :root:not([data-theme="light"]) *) {
+        color: var(--color-brand-300);
+      }
+    }
+  }
   @media (pointer: coarse) {
     .suggest [role="option"] {
       padding-block: calc(var(--spacing) * 2.5);

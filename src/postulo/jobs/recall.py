@@ -157,3 +157,74 @@ def contact_names(user) -> list[str]:
         .order_by("-updated_at", "name")
         .values_list("name", flat=True)[:AT_MOST]
     )
+
+
+# ----------------------------------------------------------------------- what a choice fills
+#
+# Each answers "what do I already know, from this person's own records, about this value?",
+# for `core.suggest.fills` (#1251). They read the person's rows only, and the caller puts the
+# answer into fields that are empty and nowhere else.
+
+
+def company_facts(user, name: str) -> dict[str, str]:
+    """A company the person has recorded: the location its latest posting gave, and its
+    careers page. The company is found by name among their own, ignoring case."""
+    from .models import Company, JobPosting
+
+    company = Company.objects.for_user(user).filter(name__iexact=name.strip()).first()
+    if company is None:
+        return {}
+    place = (
+        JobPosting.objects.for_user(user)
+        .filter(company=company)
+        .exclude(location="")
+        .order_by("-created_at")
+        .values_list("location", flat=True)
+        .first()
+    )
+    return {"location": place or "", "careers_url": company.careers_url or ""}
+
+
+def title_facts(user, title: str) -> dict[str, str]:
+    """The employment type the person's postings of this title most often had."""
+    from .models import JobPosting
+
+    row = (
+        JobPosting.objects.for_user(user)
+        .filter(title__iexact=title.strip())
+        .exclude(employment_type="")
+        .values("employment_type")
+        .annotate(uses=Count("pk"))
+        .order_by("-uses", "employment_type")
+        .first()
+    )
+    return {"employment_type": row["employment_type"]} if row else {}
+
+
+def municipalities(user) -> list[str]:
+    """The towns and cities of the addresses this person has recorded, most recent first."""
+    from postulo.core.models import PostalAddress
+
+    seen: dict[str, None] = {}
+    for town in (
+        PostalAddress.objects.for_user(user)
+        .exclude(municipality="")
+        .order_by("-updated_at")
+        .values_list("municipality", flat=True)[: AT_MOST * 2]
+    ):
+        seen.setdefault(town, None)
+    return list(seen)[:AT_MOST]
+
+
+def municipality_facts(user, town: str) -> dict[str, str]:
+    """The postcode and country of the latest address the person recorded in this town."""
+    from postulo.core.models import PostalAddress
+
+    row = (
+        PostalAddress.objects.for_user(user)
+        .filter(municipality__iexact=town.strip())
+        .order_by("-updated_at")
+        .values("postcode", "country")
+        .first()
+    )
+    return {"postcode": row["postcode"], "country": row["country"]} if row else {}

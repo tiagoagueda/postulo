@@ -3457,6 +3457,19 @@ html {
     @apply bg-accent text-accent-foreground;
   }
 
+  /* What choosing a suggestion filled in beside the box, and the press that undoes it (#1251). */
+  .suggest-filled {
+    @apply min-w-0 text-sm text-ink-600 wrap-anywhere dark:text-ink-300;
+  }
+
+  .suggest-filled:empty {
+    display: none;
+  }
+
+  .suggest-filled button {
+    @apply cursor-pointer rounded-sm text-brand-700 underline underline-offset-2 dark:text-brand-300;
+  }
+
   @media (pointer: coarse) {
     .suggest [role="option"] {
       @apply py-2.5;
