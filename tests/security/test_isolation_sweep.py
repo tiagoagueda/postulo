@@ -815,6 +815,11 @@ API: dict[str, tuple[str, Callable, dict]] = {
         pk_of(rendered, source="rendered"),
         {},
     ),
+    # The preview and the thumbnail of each (#942): the same ownership, a second pair of routes.
+    "postulo-api:document_preview": ("get", pk_of(upload, source="upload"), {}),
+    "postulo-api:document_preview#rendered": ("get", pk_of(rendered, source="rendered"), {}),
+    "postulo-api:document_thumb": ("get", pk_of(upload, source="upload"), {}),
+    "postulo-api:document_thumb#rendered": ("get", pk_of(rendered, source="rendered"), {}),
     # Sending a rendering for somebody else's capture (#256). The lookup comes before
     # anything about the upload is looked at, so what the body is does not matter here.
     "postulo-api:attach_rendering": ("put", pk_of(kept_page), {}),

@@ -303,3 +303,58 @@ def test_a_draft_can_be_asked_for_inline_and_a_refusal_is_a_sentence(client, use
     assert refused.status_code == 503
     assert refused["Content-Type"].startswith("text/plain")
     assert b"No PDF renderer" in refused.content
+
+
+def test_the_api_has_a_preview_and_a_thumbnail_beside_the_download(client, user, other_user):
+    """`/preview` and `/thumb` answer what the web addresses do, for the same owner only (#942)."""
+    from tests.test_api import issue
+
+    document = upload(user, "cv.pdf", a_pdf())
+    word = upload(user, "cv.docx", b"PK", title="Word")
+    bearer = issue(user, "read", "documents:read")
+    base = f"/api/v1/documents/upload/{document.pk}"
+
+    shown = fetched(client, f"{base}/preview", **bearer)
+    assert shown.status_code == 200
+    assert shown["Content-Type"] == "application/pdf"
+    assert shown["Content-Disposition"].startswith("inline")
+    assert shown["X-Content-Type-Options"] == "nosniff"
+    assert "no-store" in shown["Cache-Control"]
+
+    small = fetched(client, f"{base}/thumb", **bearer)
+    assert small.status_code == 200 and small["Content-Type"] == "image/webp"
+
+    # A Word file is a download: nothing inline, and no picture.
+    assert (
+        fetched(client, f"/api/v1/documents/upload/{word.pk}/preview", **bearer).status_code == 404
+    )
+    assert fetched(client, f"/api/v1/documents/upload/{word.pk}/thumb", **bearer).status_code == 404
+
+    # The listing says where each is.
+    listed = client.get("/api/v1/documents", **bearer).json()["items"]
+    row = next(item for item in listed if item["id"] == document.pk)
+    assert row["preview_url"].endswith(f"{base}/preview")
+    assert row["thumb_url"].endswith(f"{base}/thumb")
+
+    # Somebody else's file, a token without the scope, and a kind that is not one: all refused.
+    theirs = issue(other_user, "read", "documents:read")
+    assert fetched(client, f"{base}/preview", **theirs).status_code == 404
+    assert fetched(client, f"{base}/thumb", **theirs).status_code == 404
+    narrow = issue(user, "read")
+    assert fetched(client, f"{base}/preview", **narrow).status_code == 403
+    assert (
+        fetched(client, f"/api/v1/documents/nothing/{document.pk}/preview", **bearer).status_code
+        == 404
+    )
+
+
+def test_a_sent_document_has_an_api_preview_for_its_owner_only(client, user, other_user):
+    from tests.test_api import issue
+
+    sent = RenderedDocument.objects.create(owner=user, title="CV", source_type=None, source_id=None)
+    sent.file.save("cv.pdf", io.BytesIO(a_pdf()), save=True)
+    address = f"/api/v1/documents/rendered/{sent.pk}/preview"
+    assert fetched(client, address, **issue(user, "read", "documents:read")).status_code == 200
+    assert (
+        fetched(client, address, **issue(other_user, "read", "documents:read")).status_code == 404
+    )
