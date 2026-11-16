@@ -8,6 +8,8 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### ✨ Added
 
+- ESCO occupations and skills and GeoNames cities are bundled plugins of the suggestion-source kind, on by default and offline; switched off, the job-title and town boxes are plain (#1252)
+- More boxes suggest from what the person has already entered (education, experience, certifications, memberships, contact names), choosing a company, a job title or a recorded town fills what is known beside it where it is still empty, says so and can be undone; a lookup that goes to a third party answers nothing until the person switches it on (#1251)
 - Text fields that suggest (company, job title, location, source, a contact's role, a CV's employer) are one accessible combobox, and stay plain text boxes without script (#1251)
 - Plugins can offer a vocabulary a field suggests from (a suggestion source), each source says what it covers, whether it works offline and where it calls out; NACE is the first, bundled and on by default (#1252)
 - A mail client asking which listings a message is filed under is told where it is already filed, with no more access than before (#271)
