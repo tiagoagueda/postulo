@@ -31,8 +31,10 @@
                so the comparison is linked from here, where there is an earlier version of
                the same CV or letter to compare with (#236). {% endcomment %}
             <li class="flex flex-wrap items-center gap-x-3 gap-y-1 px-4 py-3">
+              {% url 'documents:rendered_thumb' document.pk as thumb_url %}
+              <c-document-thumb :src="thumb_url" />
               <div class="min-w-0 grow basis-40">
-                <p class="font-medium">{{ document.title }}</p>
+                <p class="font-medium"><a href="{% url 'documents:rendered_detail' document.pk %}" class="break-words hover:underline">{{ document.title }}</a></p>
                 <p class="text-xs text-ink-500 dark:text-ink-400">
                   {{ document.rendered_at|date:"DATETIME_FORMAT" }} · {{ document.checksum|slice:":12" }}
                 </p>
@@ -40,6 +42,8 @@
                 {% include "documents/partials/copies.html" with document=document send_url=send_url %}
               </div>
               <div class="flex flex-wrap items-center gap-1">
+                <a href="{% url 'documents:rendered_detail' document.pk %}"
+                   class="btn" data-variant="ghost" data-size="xs">{% translate "Preview" %}<span class="sr-only">: <bdi>{{ document.title }}</bdi></span></a>
                 {% if document.has_earlier %}
                   <a href="{% url 'documents:rendered_compare' document.pk %}"
                      class="btn" data-variant="ghost" data-size="xs">{% translate "Compare with previous" %}<span class="sr-only">: <bdi>{{ document.title }}</bdi></span></a>

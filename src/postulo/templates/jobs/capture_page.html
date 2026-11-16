@@ -103,14 +103,24 @@
               {% endif %}
             </p>
           </div>
+          {% if not page.rendering_is_a_picture %}
+            {% comment %} A PDF a client sent is a stranger's document (#942). It is drawn by
+               the viewer, which *reads* it, and is never answered inline, so the address
+               opened on its own is a download and the browser's own PDF viewer is never given
+               it. *Open in a new tab* opens this page, where the viewer is. {% endcomment %}
+            {% url 'jobs:capture_page_rendering' capture.pk as rendering_url %}
+            {% url 'jobs:capture_page' capture.pk as this_page %}
+            {% blocktranslate trimmed with title=capture asvar viewer_title %}The rendering of the page that “{{ title }}” was read from{% endblocktranslate %}
+            <div class="mb-3">
+              <c-document-viewer kind="pdf" :src="rendering_url" :open="this_page" :title="viewer_title" :download="rendering_url" />
+            </div>
+          {% endif %}
           <div class="flex flex-wrap items-center gap-3">
-            <a href="{% url 'jobs:capture_page_rendering' capture.pk %}" class="btn" data-variant="outline">
-              {% if page.rendering_is_a_picture %}
+            {% if page.rendering_is_a_picture %}
+              <a href="{% url 'jobs:capture_page_rendering' capture.pk %}" class="btn" data-variant="outline">
                 {% translate "Open the picture on its own" %}
-              {% else %}
-                {% translate "Download the PDF" %}
-              {% endif %}
-            </a>
+              </a>
+            {% endif %}
             <a href="{% url 'jobs:capture_page_forget' capture.pk %}?what=rendering"
                class="btn" data-variant="destructive-ghost">{% translate "Delete the rendering" %}</a>
           </div>

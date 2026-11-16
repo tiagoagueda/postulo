@@ -187,8 +187,10 @@
             <ul class="space-y-2">
               {% for document in sent %}
                 <li class="flex items-start gap-2">
+                  {% url 'documents:rendered_thumb' document.pk as thumb_url %}
+                  <c-document-thumb :src="thumb_url" />
                   <div class="min-w-0 flex-1">
-                    <p class="truncate text-sm">{{ document.title }}</p>
+                    <p class="truncate text-sm"><a href="{% url 'documents:rendered_detail' document.pk %}" class="hover:underline">{{ document.title }}</a></p>
                     <p class="text-xs text-ink-500 dark:text-ink-400">
                       {{ document.rendered_at|date:"DATE_FORMAT" }}
                     </p>
