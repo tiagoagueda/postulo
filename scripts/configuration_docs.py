@@ -3,6 +3,9 @@
     uv run python scripts/configuration_docs.py           # rewrite .env.example
     uv run python scripts/configuration_docs.py --check   # fail if it is out of date
     uv run python scripts/configuration_docs.py --wiki    # print the wiki's tables
+    uv run python scripts/configuration_docs.py --wiki-page ../postulo.wiki/Configuration.md
+                                                          # rewrite the generated section there
+    uv run python scripts/configuration_docs.py --check-wiki-page ../postulo.wiki/Configuration.md
 
 Every variable is declared once, in ``src/postulo/core/configuration.py``, with its type,
 default, syntax and a line saying what it does. ``.env.example`` is written from that, grouped
@@ -156,7 +159,44 @@ def render_wiki(variables=None) -> str:
     return "\n".join(out) + "\n"
 
 
+WIKI_BEGIN = "<!-- BEGIN GENERATED: scripts/configuration_docs.py --wiki-page -->"
+WIKI_END = "<!-- END GENERATED -->"
+WIKI_INTRO = (
+    "## Every variable\n\n"
+    "The tables below are written from the registry, one per area, and list every variable "
+    "Postulo reads. The sections above explain the ones that need explaining; where they "
+    "disagree with a table, the table is right."
+)
+
+
+def wiki_section(variables=None) -> str:
+    """The block of the wiki page that the registry writes, markers included."""
+    return f"{WIKI_BEGIN}\n{WIKI_INTRO}\n\n{render_wiki(variables)}{WIKI_END}\n"
+
+
+def with_wiki_section(page: str, variables=None) -> str:
+    """The page with its generated block replaced, or added at the end when it has none."""
+    section = wiki_section(variables)
+    if WIKI_BEGIN in page and WIKI_END in page:
+        head, _, rest = page.partition(WIKI_BEGIN)
+        _, _, tail = rest.partition(WIKI_END)
+        return head + section.rstrip("\n") + tail
+    return page.rstrip("\n") + "\n\n" + section
+
+
 def main(argv: list[str]) -> int:
+    for flag in ("--wiki-page", "--check-wiki-page"):
+        if flag in argv:
+            path = Path(argv[argv.index(flag) + 1])
+            current = path.read_text(encoding="utf-8")
+            wanted = with_wiki_section(current)
+            if flag == "--check-wiki-page":
+                if current != wanted:
+                    print(f"{path} is out of date: run scripts/configuration_docs.py --wiki-page")
+                    return 1
+                return 0
+            path.write_text(wanted, encoding="utf-8", newline="\n")
+            return 0
     if "--wiki" in argv:
         sys.stdout.write(render_wiki())
         return 0
