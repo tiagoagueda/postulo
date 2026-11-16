@@ -104,6 +104,8 @@ class ExperienceForm(ResumeItemForm):
         )
         widgets = {
             "organisation": SuggestInput("employer", {"list": "company-suggestions"}),
+            "role": SuggestInput("job-title"),
+            "location": SuggestInput("location"),
             "start_date": DATE_WIDGET,
             "end_date": DATE_WIDGET,
             "summary": forms.Textarea(attrs={"rows": 3}),
@@ -161,7 +163,10 @@ class EducationForm(ResumeItemForm):
             "order",
         )
         widgets = {
-            "institution": forms.TextInput(attrs={"list": "school-suggestions"}),
+            "institution": SuggestInput("school", {"list": "school-suggestions"}),
+            "qualification": SuggestInput("qualification"),
+            "field_of_study": SuggestInput("field-of-study"),
+            "location": SuggestInput("location"),
             "start_date": DATE_WIDGET,
             "end_date": DATE_WIDGET,
             "highlights": forms.Textarea(attrs={"rows": 4}),
@@ -297,7 +302,7 @@ class CertificationForm(ResumeItemForm):
         model = Certification
         fields = ("name", "issuer", "issued_on", "expires_on", "credential_url", "order")
         widgets = {
-            "issuer": forms.TextInput(attrs={"list": "issuer-suggestions"}),
+            "issuer": SuggestInput("awarding-body", {"list": "issuer-suggestions"}),
             "issued_on": DATE_WIDGET,
             "expires_on": DATE_WIDGET,
         }
@@ -357,7 +362,7 @@ class CourseForm(ResumeItemForm):
         model = Course
         fields = ("title", "provider", "start_date", "end_date", "hours", "summary", "url", "order")
         widgets = {
-            "provider": forms.TextInput(attrs={"list": "provider-suggestions"}),
+            "provider": SuggestInput("place-of-learning", {"list": "provider-suggestions"}),
             "start_date": DATE_WIDGET,
             "end_date": DATE_WIDGET,
             "hours": forms.NumberInput(attrs={"min": Course.HOURS_MIN, "max": Course.HOURS_MAX}),
@@ -629,7 +634,7 @@ class HonourForm(ResumeItemForm):
         model = Honour
         fields = ("title", "awarded_by", "awarded_on", "summary", "url", "order")
         widgets = {
-            "awarded_by": forms.TextInput(attrs={"list": "awarding-body-suggestions"}),
+            "awarded_by": SuggestInput("awarding-body", {"list": "awarding-body-suggestions"}),
             "awarded_on": DATE_WIDGET,
             "summary": forms.Textarea(attrs={"rows": 3}),
         }
@@ -687,7 +692,9 @@ class MembershipForm(ResumeItemForm):
         model = Membership
         fields = ("organisation", "role", "start_date", "end_date", "summary", "url", "order")
         widgets = {
-            "organisation": forms.TextInput(attrs={"list": "membership-suggestions"}),
+            "organisation": SuggestInput(
+                "membership-organisation", {"list": "membership-suggestions"}
+            ),
             "start_date": DATE_WIDGET,
             "end_date": DATE_WIDGET,
             "summary": forms.Textarea(attrs={"rows": 3}),

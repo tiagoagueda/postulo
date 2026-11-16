@@ -13,3 +13,5 @@ class ResumeConfig(AppConfig):
         from postulo.plugins.europass import EuropassImporter
 
         registry.register_builtin("importer", EuropassImporter)
+
+        from . import suggesters  # noqa: F401  (registers what the career forms suggest, #1251)

@@ -348,6 +348,7 @@ class ApplicationDetailsForm(UserAwareForm):
         label=_("New tags"),
         required=False,
         help_text=_("Separate them with commas. A tag you have already keeps its colour."),
+        widget=SuggestInput("tag", separator=","),
     )
 
     def __init__(self, *args, **kwargs):
@@ -424,6 +425,7 @@ class ApplicationForm(OwnerScopedModelForm):
         label=_("New tags"),
         required=False,
         help_text=_("Separate them with commas. A tag you have already keeps its colour."),
+        widget=SuggestInput("tag", separator=","),
     )
     #: The status this form was drawn with, sent back so that the view can tell a status
     #: somebody chose from one that is only the page being old (#545).
@@ -1168,6 +1170,7 @@ class SavedAnswerForm(_AnswerLanguage, OwnerScopedModelForm):
         label=_("New tags"),
         required=False,
         help_text=_("Separate them with commas. A tag you have already keeps its colour."),
+        widget=SuggestInput("tag", separator=","),
     )
 
     class Meta:
