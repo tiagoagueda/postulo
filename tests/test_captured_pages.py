@@ -814,7 +814,12 @@ def test_a_picture_is_drawn_by_the_page_and_a_pdf_is_handed_over(client, keeping
     download = client.get(reverse("jobs:capture_page_rendering", args=[capture.pk]))
 
     assert "<img" not in html[html.index("data-captured-page") :]
-    assert "Download the PDF" in html
+    # Drawn by the viewer (#942), which reads the address; the address on its own is still a
+    # download, and "Open in a new tab" goes to this page, never to the file.
+    assert 'data-kind="pdf"' in html and "data-document-viewer" in html
+    rendering = reverse("jobs:capture_page_rendering", args=[capture.pk])
+    assert f'data-src="{rendering}"' in html
+    assert f'href="{reverse("jobs:capture_page", args=[capture.pk])}" class="btn"' in html
     assert download["Content-Type"] == "application/pdf"
     assert download["Content-Disposition"].startswith("attachment;")
     download.close()

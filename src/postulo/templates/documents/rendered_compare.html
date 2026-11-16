@@ -4,7 +4,7 @@
 {% block title %}{% blocktranslate trimmed with title=document.title %}What changed in {{ title }}{% endblocktranslate %}{% endblock %}
 
 {% block content %}
-  <div class="mx-auto max-w-3xl">
+  <div class="mx-auto max-w-5xl">
     <c-page-title>
       {% translate "What changed" %}
       <c-slot name="subtitle">
@@ -59,6 +59,34 @@
         </section>
       {% endif %}
     </div>
+
+    {% if earlier %}
+      {% comment %} The words are compared below; a change of layout is not in the words, so the
+         two PDFs are drawn side by side, each in the same viewer a sent document has (#942).
+         They stack below `lg`, and each column may shrink (`min-w-0`) so neither pushes the
+         page sideways at 320px. {% endcomment %}
+      <section class="mb-6" aria-labelledby="layout-heading">
+        <c-section-title id="layout-heading">{% translate "The two, as they were sent" %}</c-section-title>
+        <div class="grid gap-4 lg:grid-cols-2">
+          <div class="min-w-0">
+            {% url 'documents:rendered_preview' document.pk as this_preview %}
+            {% url 'documents:rendered_download' document.pk as this_download %}
+            {% blocktranslate trimmed with when=document.rendered_at|date:"DATETIME_FORMAT" asvar this_title %}
+              This version, from {{ when }}
+            {% endblocktranslate %}
+            <c-document-viewer kind="pdf" :src="this_preview" :title="this_title" :download="this_download" />
+          </div>
+          <div class="min-w-0">
+            {% url 'documents:rendered_preview' earlier.pk as earlier_preview %}
+            {% url 'documents:rendered_download' earlier.pk as earlier_download %}
+            {% blocktranslate trimmed with when=earlier.rendered_at|date:"DATETIME_FORMAT" asvar earlier_title %}
+              The version before it, from {{ when }}
+            {% endblocktranslate %}
+            <c-document-viewer kind="pdf" :src="earlier_preview" :title="earlier_title" :download="earlier_download" />
+          </div>
+        </div>
+      </section>
+    {% endif %}
 
     {% if not earlier %}
       <c-empty variant="quiet">

@@ -25,6 +25,8 @@
   <ul class="divide-y divide-ink-100 dark:divide-ink-800">
     {% for render in renders %}
       <li class="flex flex-wrap items-center gap-x-3 gap-y-1 px-4 py-3">
+        {% url 'documents:rendered_thumb' render.pk as thumb_url %}
+        <c-document-thumb :src="thumb_url" />
         <div class="min-w-0 grow basis-40">
           <p class="text-sm">{{ render.rendered_at|date:"DATETIME_FORMAT" }}</p>
           <p class="text-xs text-ink-500 dark:text-ink-400">
@@ -38,6 +40,8 @@
           </p>
         </div>
         <div class="flex flex-wrap items-center gap-1">
+          <a href="{% url 'documents:rendered_detail' render.pk %}"
+             class="btn" data-variant="ghost" data-size="xs">{% translate "Preview" %}<span class="sr-only">: {{ render.rendered_at|date:"DATETIME_FORMAT" }}</span></a>
           {% if render.has_earlier %}
             <a href="{% url 'documents:rendered_compare' render.pk %}"
                class="btn" data-variant="ghost" data-size="xs">{% translate "Compare with previous" %}<span class="sr-only">: {{ render.rendered_at|date:"DATETIME_FORMAT" }}</span></a>

@@ -413,6 +413,23 @@ def test_two_letters_are_compared_too(client, user, application):
     assert "1 line added" in page and "1 line removed" in page
 
 
+def test_the_two_pdfs_are_drawn_side_by_side_and_only_where_there_are_two(
+    client, user, two_versions, cv
+):
+    """The layout is not in the words, so each version has a viewer of its own (#942)."""
+    earlier, later = two_versions
+    client.force_login(user)
+
+    page = compare_page(client, later)
+
+    assert page.count("data-document-viewer") == 2
+    for version in (earlier, later):
+        assert f'data-src="{reverse("documents:rendered_preview", args=[version.pk])}"' in page
+        assert reverse("documents:rendered_download", args=[version.pk]) in page
+    # The first version has none before it: nothing to put beside it.
+    assert "data-document-viewer" not in compare_page(client, earlier)
+
+
 def test_somebody_elses_version_is_not_found(client, other_user, two_versions):
     _earlier, later = two_versions
     client.force_login(other_user)

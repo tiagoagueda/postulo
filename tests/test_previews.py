@@ -358,3 +358,30 @@ def test_a_sent_document_has_an_api_preview_for_its_owner_only(client, user, oth
     assert (
         fetched(client, address, **issue(other_user, "read", "documents:read")).status_code == 404
     )
+
+
+def test_every_place_a_sent_document_is_listed_shows_its_thumbnail_and_a_way_to_the_viewer(
+    client, user
+):
+    """The Sent documents list, an application's documents and its page (#942)."""
+    from postulo.applications.models import Application
+    from postulo.jobs.models import Company, JobPosting
+
+    company = Company.objects.create(owner=user, name="Acme")
+    posting = JobPosting.objects.create(owner=user, company=company, title="Engineer")
+    application = Application.objects.create(owner=user, posting=posting)
+    sent = RenderedDocument.objects.create(
+        owner=user, title="CV", source_type=None, source_id=None, application=application
+    )
+    sent.file.save("cv.pdf", io.BytesIO(a_pdf()), save=True)
+    client.force_login(user)
+    thumb = reverse("documents:rendered_thumb", args=[sent.pk])
+    detail = reverse("documents:rendered_detail", args=[sent.pk])
+    for address in (
+        reverse("documents:rendered_list"),
+        reverse("documents:application_documents", args=[application.pk]),
+        application.get_absolute_url(),
+    ):
+        html = client.get(address).content.decode()
+        assert thumb in html, address
+        assert detail in html, address

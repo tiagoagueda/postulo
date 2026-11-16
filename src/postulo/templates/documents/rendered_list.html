@@ -34,6 +34,10 @@
           {% for document in documents %}
             <tr>
               <td>
+                <span class="flex items-start gap-3">
+                  {% url 'documents:rendered_thumb' document.pk as thumb_url %}
+                  <c-document-thumb :src="thumb_url" />
+                  <span class="min-w-0">
                 {{ document.title }}
                 <span class="ms-1 inline-flex items-center gap-1.5 text-xs text-ink-500 dark:text-ink-400">
                   {% comment %} What this PDF declared when it was frozen, not what its source
@@ -47,6 +51,8 @@
                 {% endif %}
                 {% url 'documents:rendered_archive' document.pk as send_url %}
                 {% include "documents/partials/copies.html" with document=document send_url=send_url %}
+                  </span>
+                </span>
               </td>
               <td>
                 {% comment %} Three answers, where there were two. An application that was
