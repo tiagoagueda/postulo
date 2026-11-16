@@ -10054,8 +10054,19 @@
     var listId = "suggest-" + serial;
     var wrapper = document.createElement("div");
     wrapper.className = "suggest";
+    // Moving a box into its wrapper takes focus off it. A box that already had it -- an
+    // inline cell editor focuses its field as it opens -- keeps it, and its selection.
+    var focused = document.activeElement === input;
+    var from = focused ? input.selectionStart : null;
+    var to = focused ? input.selectionEnd : null;
     input.parentNode.insertBefore(wrapper, input);
     wrapper.appendChild(input);
+    if (focused) {
+      input.focus();
+      if (from !== null && to !== null) {
+        input.setSelectionRange(from, to);
+      }
+    }
 
     var list = document.createElement("ul");
     list.id = listId;
