@@ -1339,6 +1339,15 @@ class DocumentOut(Schema):
     created_at: dt.datetime
     updated_at: dt.datetime
     download_url: str
+    preview_url: str = Field(
+        default="",
+        description="The file shown inline, for a viewer: a PDF, a PNG, a JPEG or plain text. "
+        "A file of any other kind answers 404 there; download it instead",
+    )
+    thumb_url: str = Field(
+        default="",
+        description="The first page, or the picture, as a small WebP image; 404 if none",
+    )
 
 
 class SearchHitOut(Schema):
@@ -1966,6 +1975,12 @@ def document_out(request, document, *, source: str) -> dict:
         "updated_at": document.updated_at,
         "download_url": request.build_absolute_uri(
             reverse(name, kwargs={"source": source, "pk": document.pk})
+        ),
+        "preview_url": request.build_absolute_uri(
+            reverse("postulo-api:document_preview", kwargs={"source": source, "pk": document.pk})
+        ),
+        "thumb_url": request.build_absolute_uri(
+            reverse("postulo-api:document_thumb", kwargs={"source": source, "pk": document.pk})
         ),
     }
 

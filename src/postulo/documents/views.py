@@ -993,23 +993,43 @@ class UploadPreviewView(PreviewViewsMixin, OwnedObjectMixin, View):
 
     def get(self, request: HttpRequest, pk: int) -> HttpResponse:
         document = get_object_or_404(self.get_queryset(), pk=pk)
-        found = previews.preview_of(document.download_name)
-        if found.converted:
-            # A file a converter plugin turns into a PDF (D3): the *copy* is what is answered,
-            # after the same ownership and folder checks as the file itself.
-            if not document.file or not lies_under(document.file.name, document.storage_prefix):
-                raise Http404("No preview.")
-            data = previews.converted_bytes(document.file, document.download_name)
-            if not data:
-                raise Http404("No preview.")
-            return serve_derived_pdf(data)
-        return serve_private_preview(
-            request,
-            document.file,
-            preview_type=found.content_type,
-            download_name=document.download_name,
-            within=document.storage_prefix,
-        )
+        return upload_preview_response(request, document)
+
+
+def upload_preview_response(request: HttpRequest, document) -> HttpResponse:
+    """An uploaded file inline for the viewer, or a PDF a converter made from it (#942).
+
+    One function for the web address and the API's, so the two cannot differ in what they
+    answer inline. Performs no permission checking: the caller has established whose file it is.
+    """
+    found = previews.preview_of(document.download_name)
+    if found.converted:
+        # A file a converter plugin turns into a PDF (D3): the *copy* is what is answered,
+        # after the same ownership and folder checks as the file itself.
+        if not document.file or not lies_under(document.file.name, document.storage_prefix):
+            raise Http404("No preview.")
+        data = previews.converted_bytes(document.file, document.download_name)
+        if not data:
+            raise Http404("No preview.")
+        return serve_derived_pdf(data)
+    return serve_private_preview(
+        request,
+        document.file,
+        preview_type=found.content_type,
+        download_name=document.download_name,
+        within=document.storage_prefix,
+    )
+
+
+def rendered_preview_response(request: HttpRequest, document) -> HttpResponse:
+    """A sent document inline (it is always a PDF Postulo drew); shared with the API (#942)."""
+    return serve_private_preview(
+        request,
+        document.file,
+        preview_type=previews.preview_of(document.download_name).content_type,
+        download_name=document.download_name,
+        within=document.storage_prefix,
+    )
 
 
 class UploadThumbView(PreviewViewsMixin, OwnedObjectMixin, View):
@@ -1039,13 +1059,7 @@ class RenderedPreviewView(PreviewViewsMixin, OwnedObjectMixin, View):
 
     def get(self, request: HttpRequest, pk: int) -> HttpResponse:
         document = get_object_or_404(self.get_queryset(), pk=pk)
-        return serve_private_preview(
-            request,
-            document.file,
-            preview_type=previews.preview_of(document.download_name).content_type,
-            download_name=document.download_name,
-            within=document.storage_prefix,
-        )
+        return rendered_preview_response(request, document)
 
 
 class RenderedThumbView(PreviewViewsMixin, OwnedObjectMixin, View):

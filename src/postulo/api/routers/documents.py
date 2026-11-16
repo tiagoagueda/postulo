@@ -16,6 +16,11 @@ from postulo.documents.models import (
     UploadedDocument,
     with_entries,
 )
+from postulo.documents.views import (
+    rendered_preview_response,
+    thumbnail_response,
+    upload_preview_response,
+)
 
 from ..auth import scope
 from ..paging import AFTER_ID, UPDATED_SINCE, Moment, Page, RowId, changed_since
@@ -326,6 +331,15 @@ def list_documents(
     return _DocumentPages(request, streams, updated_since)
 
 
+def _owned_document(request, source: str, pk: int):
+    """The caller's own upload or sent document, or a 404 for anything else."""
+    if source == "upload":
+        return owned_or_404(request, UploadedDocument.objects, pk)
+    if source == "rendered":
+        return owned_or_404(request, RenderedDocument.objects, pk)
+    raise HttpError(404, _("No such type of document."))
+
+
 @router.get(
     "/documents/{source}/{int:pk}/download",
     auth=scope("documents:read"),
@@ -333,22 +347,43 @@ def list_documents(
     summary="Download a file",
 )
 def download_document(request, source: str, pk: int):
+    document = _owned_document(request, source, pk)
+    return serve_private_file(
+        request,
+        document.file,
+        download_name=document.download_name,
+        as_attachment=True,
+        within=document.storage_prefix,
+    )
+
+
+@router.get(
+    "/documents/{source}/{int:pk}/preview",
+    auth=scope("documents:read"),
+    url_name="document_preview",
+    summary="Show a file inline",
+    description=(
+        "The file as a viewer draws it: inline, and only a PDF, a PNG, a JPEG or plain text "
+        "(a Word, OpenDocument or RTF file only where a converter plugin makes a PDF of it). "
+        "Any other kind is a 404: download it instead."
+    ),
+)
+def preview_document(request, source: str, pk: int):
+    document = _owned_document(request, source, pk)
     if source == "upload":
-        document = owned_or_404(request, UploadedDocument.objects, pk)
-        return serve_private_file(
-            request,
-            document.file,
-            download_name=document.download_name,
-            as_attachment=True,
-            within=document.storage_prefix,
-        )
-    if source == "rendered":
-        document = owned_or_404(request, RenderedDocument.objects, pk)
-        return serve_private_file(
-            request,
-            document.file,
-            download_name=document.download_name,
-            as_attachment=True,
-            within=document.storage_prefix,
-        )
-    raise HttpError(404, _("No such type of document."))
+        return upload_preview_response(request, document)
+    return rendered_preview_response(request, document)
+
+
+@router.get(
+    "/documents/{source}/{int:pk}/thumb",
+    auth=scope("documents:read"),
+    url_name="document_thumb",
+    summary="The small picture of a file",
+    description=(
+        "The first page of a PDF, or a picture, as a WebP image of at most 400 by 560 pixels. "
+        "A 404 for a file that has none."
+    ),
+)
+def thumb_document(request, source: str, pk: int):
+    return thumbnail_response(_owned_document(request, source, pk))
