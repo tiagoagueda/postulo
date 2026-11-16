@@ -18,6 +18,21 @@ anybody else's: it is given the user, never a queryset over the instance. Refere
 not a suggester of this kind: this contract has nothing to send anywhere, and what is typed
 into a suggestion box is never passed on.
 
+**What a choice fills (#1251).** A kind may also say what follows from choosing one of its
+values: ``register(kind, source, fills=...)``. ``fills(user, chosen)`` answers with
+``{key: text}`` from that person's own records, and the box maps a key to the field beside it
+(`SuggestInput(fills=...)`). The page asks once, when an option is taken (`core:suggest_fill`),
+fills only fields that are empty, says what it filled and offers Undo. Nothing typed is ever
+overwritten, and an answer that cannot be given is no answer.
+
+**Privacy.** Records are read through the account (`for_user`), so what is offered is what
+the person owns or already sees through a group they belong to, and never another account's.
+Nothing typed here is sent to a third party. A kind that *is* a lookup at a third party (a
+register, Wikidata: #879) must say so with ``register(..., enabled=...)``: it is not called,
+and answers nothing, until the person has switched it on; and like every kind it is asked only
+after a pause in typing, never on page load, and within the per-account rate of
+`POSTULO_SUGGESTION_RATE`.
+
 **Matching** is by the box's own words, ignoring case and accents: the entries that begin
 with what was typed come first, then the ones with a word that begins with it, then the ones
 that contain it. Inside each group the order the suggester gave -- most used first -- is
