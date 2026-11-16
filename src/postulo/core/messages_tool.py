@@ -336,6 +336,12 @@ def _strings_in(tokens: list[tokenize.TokenInfo], start: int) -> tuple[list[str 
     return args, i
 
 
+#: A comment that tells a translator where a string is printed: ``# Translators: …``, which is
+#: what ``templatize`` makes of a template's ``{# Translators: … #}``. What follows the colon
+#: is kept, and Weblate shows it beside the string as a `#.` line.
+TRANSLATOR_COMMENT = re.compile(r"#\s*Translators:?\s*(.*)$", re.IGNORECASE)
+
+
 def extract_python(source: str, origin: str) -> list[Message]:
     """Messages in Python source (or in what ``templatize`` made of a template)."""
     found: list[Message] = []
@@ -344,10 +350,27 @@ def extract_python(source: str, origin: str) -> list[Message]:
     except (tokenize.TokenError, SyntaxError) as exc:  # pragma: no cover - broken source
         print(f"{origin}: cannot tokenise: {exc}", file=sys.stderr)
         return found
+    #: A ``# Translators:`` comment waiting for the call it describes, and the line it ended
+    #: on. ``templatize`` writes a template's ``{# Translators: … #}`` as one of these just
+    #: before the call it precedes, so one more than a line away belongs to nothing.
+    waiting: list[str] = []
+    waiting_line = 0
     i = 0
     while i < len(tokens) - 1:
         tok = tokens[i]
         nxt = tokens[i + 1]
+        if tok.type == tokenize.COMMENT:
+            note = TRANSLATOR_COMMENT.match(tok.string)
+            if note:
+                if waiting and tok.start[0] - waiting_line > 1:
+                    waiting = []
+                waiting.append(note.group(1).strip())
+                waiting_line = tok.start[0]
+            elif waiting and tok.start[0] == waiting_line + 1 and tok.line.strip() == tok.string:
+                # A comment on the line after a translator comment, on a line of its own,
+                # goes on with it: a note is often longer than one line.
+                waiting[-1] = f"{waiting[-1]} {tok.string.lstrip('#').strip()}".strip()
+                waiting_line = tok.start[0]
         if (
             tok.type == tokenize.NAME
             and tok.string in CALLS
@@ -363,11 +386,14 @@ def extract_python(source: str, origin: str) -> list[Message]:
                 # call does, which rewrote the reference beside a translation Weblate was
                 # changing and made the two conflict on every rebase (#349).
                 message = Message(msgid=msgid, references=[origin])
+                if waiting and tok.start[0] - waiting_line <= 1:
+                    message.comments = [line for line in waiting if line]
                 if plural_index is not None and len(args) > plural_index and args[plural_index]:
                     message.plural = args[plural_index]
                 if context_index is not None and len(args) > context_index:
                     message.context = args[context_index]
                 found.append(message)
+            waiting = []
             continue
         i += 1
     return found
@@ -438,6 +464,7 @@ def extract_all(
                 merged[message.key] = message
             else:
                 existing.references.extend(message.references)
+                existing.comments.extend(c for c in message.comments if c not in existing.comments)
                 if message.plural and not existing.plural:
                     existing.plural = message.plural
     for message in merged.values():

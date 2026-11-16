@@ -8,6 +8,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### ✨ Added
 
+- A `Translators:` comment in a template or before a gettext call reaches the catalogues, so Weblate shows a translator where a string is printed (#1293)
 - PDFs open in the viewer wherever a sent or captured document appears, the Compare page draws the two side by side, a PDF's safe links are drawn, a phone can take the viewer full screen, and the API gives a preview and a thumbnail address beside each download (#942)
 - The wiki's Configuration reference is generated from the one registry of variables, and a test holds the page to it (#1186)
 - ESCO occupations and skills and GeoNames cities are bundled plugins of the suggestion-source kind, on by default and offline; switched off, the job-title and town boxes are plain (#1252)

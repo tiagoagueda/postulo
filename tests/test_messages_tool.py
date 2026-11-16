@@ -883,3 +883,56 @@ def test_the_tables_of_a_compiled_file_are_packed_once(tool, monkeypatch):
     assert strings[ids.index(b"%(n)s day\x00%(n)s days")] == b"%(n)s jour\x00%(n)s jours"
     assert strings[ids.index(b"String 7")] == "Chaîne 7".encode()
     assert gettext.GNUTranslations(io.BytesIO(data)).gettext("String 299") == "Chaîne 299"
+
+
+def test_a_translators_comment_in_a_template_reaches_the_catalogue(tool):
+    """A translator cannot see the page: the comment before a string is what says where it is
+    printed (#1293)."""
+    import django
+    from django.conf import settings
+
+    if not settings.configured:  # pragma: no cover - configured by pytest-django
+        settings.configure()
+        django.setup()
+    source = (
+        "{% load i18n %}\n"
+        "{# Translators: The heading of the table of every application sent. #}\n"
+        '<h2>{% translate "Every application" %}</h2>\n'
+        '<p>{% translate "No comment here" %}</p>\n'
+        "{# Translators: Printed under the table. #}\n"
+        "{# Translators: Names the person the report is for. #}\n"
+        '<p>{% translate "Name" %}</p>\n'
+    )
+    found = {m.key: m for m in tool.extract_template(source, "t.html")}
+
+    assert found[(None, "Every application")].comments == [
+        "The heading of the table of every application sent."
+    ]
+    assert found[(None, "No comment here")].comments == []
+    assert found[(None, "Name")].comments == [
+        "Printed under the table.",
+        "Names the person the report is for.",
+    ]
+
+
+def test_a_translators_comment_in_python_reaches_the_catalogue(tool):
+    found = {
+        m.key: m
+        for m in tool.extract_python(
+            "# Translators: Said when nothing matches.\n_('Nothing here')\n_('Other')\n", "x.py"
+        )
+    }
+
+    assert found[(None, "Nothing here")].comments == ["Said when nothing matches."]
+    assert found[(None, "Other")].comments == []
+
+
+def test_a_translators_note_may_run_over_several_lines(tool):
+    found = {
+        m.key: m
+        for m in tool.extract_python(
+            "# Translators: The first line,\n# and the second.\nx = _('Sector')\n", "x.py"
+        )
+    }
+
+    assert found[(None, "Sector")].comments == ["The first line, and the second."]
