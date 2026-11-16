@@ -8,9 +8,18 @@ standard font, and a correct cross-reference table.
 from __future__ import annotations
 
 
-def make_pdf(pages: int = 2, text: str = "Words of page {n}") -> bytes:
-    """A PDF of ``pages`` A4 pages, each saying ``text`` with ``{n}`` as its number."""
+def make_pdf(
+    pages: int = 2,
+    text: str = "Words of page {n}",
+    links: tuple[tuple[str, tuple[int, int, int, int]], ...] = (),
+) -> bytes:
+    """A PDF of ``pages`` A4 pages, each saying ``text`` with ``{n}`` as its number.
+
+    ``links`` are ``(address, (left, bottom, right, top))`` link annotations on the first page.
+    """
     objects: list[bytes] = []
+    first_link = 4 + 2 * pages
+    notes = " ".join(f"{first_link + n} 0 R" for n in range(len(links)))
     # 1 catalogue, 2 page tree, 3 font, then a page and its content for each page.
     kids = " ".join(f"{4 + 2 * n} 0 R" for n in range(pages))
     objects.append(b"<< /Type /Catalog /Pages 2 0 R >>")
@@ -18,11 +27,17 @@ def make_pdf(pages: int = 2, text: str = "Words of page {n}") -> bytes:
     objects.append(b"<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>")
     for n in range(pages):
         content = f"BT /F1 24 Tf 72 700 Td ({text.format(n=n + 1)}) Tj ET".encode()
+        annots = b" /Annots [%s]" % notes.encode() if n == 0 and links else b""
         objects.append(
             b"<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] "
-            b"/Resources << /Font << /F1 3 0 R >> >> /Contents %d 0 R >>" % (5 + 2 * n)
+            b"/Resources << /Font << /F1 3 0 R >> >> /Contents %d 0 R%s >>" % (5 + 2 * n, annots)
         )
         objects.append(b"<< /Length %d >>\nstream\n%s\nendstream" % (len(content), content))
+    for address, (left, bottom, right, top) in links:
+        objects.append(
+            b"<< /Type /Annot /Subtype /Link /Rect [%d %d %d %d] /Border [0 0 0] "
+            b"/A << /S /URI /URI (%s) >> >>" % (left, bottom, right, top, address.encode())
+        )
     out = bytearray(b"%PDF-1.4\n")
     offsets = []
     for number, body in enumerate(objects, start=1):

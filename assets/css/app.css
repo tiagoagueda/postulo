@@ -918,6 +918,28 @@
   .document-viewer-message {
     @apply mb-3 text-ink-500 dark:text-ink-400;
   }
+  /* A link inside a PDF (#942): a transparent box over the words it covers, placed by the script
+     through the CSSOM. It is above the text layer, so it is the thing a click and Tab reach; a
+     keyboard ring shows where it is, since the page itself shows no box. */
+  .document-viewer-link {
+    @apply absolute z-10 rounded-sm outline-offset-0 focus-visible:outline-2 focus-visible:outline-brand-600;
+  }
+  .document-viewer-link:hover {
+    background: color-mix(in srgb, Highlight 18%, transparent);
+  }
+  /* Full screen on a phone (#942): the viewer takes the whole window as a dialog, with its bar on
+     top and the stage filling what is left. The button that does it is shown below `md` only. */
+  .document-viewer[data-full] {
+    @apply fixed inset-0 z-50 flex flex-col gap-0 overflow-hidden bg-white p-3 dark:bg-ink-900;
+  }
+  .document-viewer[data-full] .document-viewer-stage {
+    @apply min-h-0 flex-1;
+    max-block-size: none;
+    min-block-size: 0;
+  }
+  body[data-viewer-full] {
+    overflow: hidden;
+  }
 
   /* pdf.js's text layer, the part of its own viewer stylesheet (`web/pdf_viewer.css`) that puts
      the words over the page as transparent text: selectable, copyable, found by the browser's

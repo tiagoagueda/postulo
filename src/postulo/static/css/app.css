@@ -7007,6 +7007,50 @@
       }
     }
   }
+  .document-viewer-link {
+    position: absolute;
+    z-index: 10;
+    border-radius: var(--radius-sm);
+    outline-offset: 0px;
+    &:focus-visible {
+      outline-style: var(--tw-outline-style);
+      outline-width: 2px;
+    }
+    &:focus-visible {
+      outline-color: var(--color-brand-600);
+    }
+  }
+  .document-viewer-link:hover {
+    background: color-mix(in srgb, Highlight 18%, transparent);
+  }
+  .document-viewer[data-full] {
+    position: fixed;
+    inset: 0px;
+    z-index: 50;
+    display: flex;
+    flex-direction: column;
+    gap: 0px;
+    overflow: hidden;
+    background-color: var(--color-white);
+    padding: calc(var(--spacing) * 3);
+    &:where([data-theme="dark"], [data-theme="dark"] *) {
+      background-color: var(--color-ink-900);
+    }
+    @media (prefers-color-scheme: dark) {
+      &:where(:root:not([data-theme="light"]), :root:not([data-theme="light"]) *) {
+        background-color: var(--color-ink-900);
+      }
+    }
+  }
+  .document-viewer[data-full] .document-viewer-stage {
+    min-height: 0px;
+    flex: 1;
+    max-block-size: none;
+    min-block-size: 0;
+  }
+  body[data-viewer-full] {
+    overflow: hidden;
+  }
   .document-viewer-sheet {
     --scale-round-x: 1px;
     --scale-round-y: 1px;

@@ -81,6 +81,11 @@
         </div>
       {% endif %}
       <div class="document-viewer-group document-viewer-links">
+        {% comment %} Below `md` the viewer may take the whole window; the script shows the button
+           (it is `hidden` without one) and `md:hidden` takes it away again on a wide screen. {% endcomment %}
+        <button type="button" class="btn md:hidden" data-variant="ghost" data-size="sm" data-viewer-full-button hidden
+                data-open-words="{% translate 'Full screen' %}" data-close-words="{% translate 'Close full screen' %}"
+                aria-pressed="false">{% icon "maximize" %}<span data-viewer-full-label>{% translate "Full screen" %}</span></button>
         {% if redraw %}
           <button type="button" class="btn" data-variant="ghost" data-size="sm" data-viewer-redraw>{% icon "rotate-cw" %}{% translate "Redraw" %}</button>
         {% endif %}
