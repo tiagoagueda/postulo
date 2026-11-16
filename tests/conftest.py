@@ -380,7 +380,7 @@ ESCO_SKILLS = {
 
 def write_esco_skills(directory, skills=None, revision: str = "9.9.9"):
     """Write a skills file into ``directory`` the way `fetch_esco` writes one."""
-    from postulo.jobs.management.commands import fetch_esco
+    from postulo.plugins.management.commands import fetch_esco
 
     skills = ESCO_SKILLS if skills is None else skills
     identifiers = sorted(skills)
@@ -408,8 +408,8 @@ def write_esco_occupations(directory, document, revision: str = "9.9.9"):
     ``document`` is the classification whole, each entry with its ``names`` by language, as
     the harvest assembles it; what it leaves out is filled in as the absent document has it.
     """
-    from postulo.jobs import esco
-    from postulo.jobs.management.commands import fetch_esco
+    from postulo.plugins.esco import classification as esco
+    from postulo.plugins.management.commands import fetch_esco
 
     whole = {**esco.ABSENT, "revision": f"ESCO v{revision}", **document}
     target = directory / f"esco-occupations-{revision}.zip"
@@ -425,7 +425,7 @@ def esco_skills(tmp_path, monkeypatch):
     the state they are in wherever they have not been downloaded. What the process held of
     the classification is dropped either side.
     """
-    from postulo.jobs import esco
+    from postulo.plugins.esco import classification as esco
 
     directory = tmp_path / "esco"
     directory.mkdir()
@@ -439,7 +439,7 @@ def esco_skills(tmp_path, monkeypatch):
 @pytest.fixture
 def no_esco(tmp_path, monkeypatch):
     """No ESCO files at all, as on an instance where nobody ran `fetch_esco`."""
-    from postulo.jobs import esco
+    from postulo.plugins.esco import classification as esco
 
     directory = tmp_path / "no-esco"
     directory.mkdir()

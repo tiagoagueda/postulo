@@ -1,6 +1,6 @@
 """Download the ESCO classification in place, where the loader reads it (#266).
 
-``postulo/jobs/esco.py`` reads ``data/esco-occupations-<revision>.zip`` and
+``postulo.plugins.esco.classification.py`` reads ``data/esco-occupations-<revision>.zip`` and
 ``data/esco-skills-<revision>.zip``; this command is how the two files get there. It asks
 the ESCO web-service API, the machine-facing access the ESCO services document at
 https://esco.ec.europa.eu/en/use-esco/use-esco-services-api/esco-web-service-api, for
@@ -53,8 +53,9 @@ from pathlib import Path
 import httpx
 from django.core.management.base import BaseCommand, CommandError
 
-from postulo.jobs import esco, industries
-from postulo.jobs.esco import DATA_DIR, FALLBACK
+from postulo.jobs import industries
+from postulo.plugins.esco import classification as esco
+from postulo.plugins.esco.classification import DATA_DIR, FALLBACK
 from postulo.plugins.http import public_only_client
 
 #: The ESCO web-service API. If a run fails to fetch, this block is the first thing to
@@ -136,7 +137,7 @@ ATTEMPTS = 3
 
 
 class Command(BaseCommand):
-    help = "Download the ESCO classification in place, where postulo.jobs.esco reads it."
+    help = "Download the ESCO classification in place, where the ESCO plugin reads it."
 
     def add_arguments(self, parser):
         parser.add_argument(

@@ -9,7 +9,7 @@ from __future__ import annotations
 
 import pytest
 
-from postulo.jobs import esco
+from postulo.plugins.esco import classification as esco
 
 from .conftest import write_esco_occupations
 

@@ -19,8 +19,9 @@ import logging
 import pytest
 from django.utils import translation
 
-from postulo.jobs import checks, esco
-from postulo.jobs.management.commands import fetch_esco
+from postulo.plugins.esco import checks
+from postulo.plugins.esco import classification as esco
+from postulo.plugins.management.commands import fetch_esco
 
 from .conftest import write_esco_occupations
 
@@ -308,7 +309,7 @@ def test_an_earlier_releases_file_is_not_kept_whole_either(directory, members, c
     built and once for each language read, and the log says once which file it is."""
     write_earlier(directory)
 
-    with caplog.at_level(logging.WARNING, logger="postulo.jobs.esco"):
+    with caplog.at_level(logging.WARNING, logger="postulo.plugins.esco.classification"):
         for _again in range(2):
             assert esco.code_for("serveuse", "fr") == "5131"
             assert esco.name_for("2512", "fr") == "Concepteurs de logiciels"

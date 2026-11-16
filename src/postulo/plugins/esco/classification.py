@@ -156,7 +156,7 @@ def data_file() -> Path | None:
 
     One revision at a time: ``manage.py fetch_esco`` writes
     ``esco-occupations-<revision>.zip`` and deletes the one it replaces, so two files, which
-    only a hand-filled directory has, are a state to be reported (`postulo.jobs.checks` does
+    only a hand-filled directory has, are a state to be reported (`postulo.plugins.esco.checks` does
     it at start-up), not a choice to be made.
 
     The ``esco-<revision>.json`` of a release before #1110 is what is read where there is no
@@ -472,7 +472,7 @@ def suggestions(exclude=(), language: str = "", sections=()) -> list[str]:
     there to be matched, not chosen. Where a company's ``sections`` are known, the groups
     whose occupations ESCO places in them come first (#897); nothing is left out.
     """
-    from . import industries
+    from postulo.jobs import industries
 
     taken = {str(name).casefold() for name in exclude}
     offered = [(code, name) for code, name in unit_groups(language) if name.casefold() not in taken]

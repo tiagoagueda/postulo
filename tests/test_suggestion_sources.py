@@ -49,7 +49,7 @@ def test_the_surface_holds_what_a_suggestion_source_needs():
 
 
 def test_nace_is_a_shipped_suggestion_source_that_is_offline_and_licensed():
-    (plugin,) = registry.plugins("suggestion-source")
+    plugin = registry.find_plugin("suggestion-source", "nace")
     (source,) = plugin.sources
 
     assert plugin.name == "nace" and plugin.kind == "suggestion-source"
@@ -68,7 +68,7 @@ def test_the_registry_offers_what_the_industry_module_offered(db):
 
 
 def test_a_field_no_source_knows_is_a_plain_input(db):
-    assert suggestion_sources.offered("job_title") == []
+    assert suggestion_sources.offered("school") == []
 
 
 def test_a_plugin_adds_a_source_and_its_suggestions_merge_after_the_shipped_ones(db, monkeypatch):

@@ -23,7 +23,7 @@ from django.utils import translation
 from postulo.core import export, importer
 from postulo.documents.models import CV, CVItem
 from postulo.documents.rendering import cv_text
-from postulo.jobs import esco
+from postulo.plugins.esco import classification as esco
 from postulo.resume import candidate, importing, translating
 from postulo.resume.models import Skill, SkillGroup, Translation
 
@@ -89,7 +89,7 @@ def test_the_file_says_which_revision_and_languages_it_holds(esco_skills):
 
 def test_a_file_fetch_esco_did_not_write_is_refused_rather_than_misread(esco_skills):
     """A language with a name too few would put every name after it on the wrong skill."""
-    from postulo.jobs.management.commands import fetch_esco
+    from postulo.plugins.management.commands import fetch_esco
 
     esco.skills_file().unlink()
     about = {**esco.ABSENT_SKILLS, "revision": "ESCO v9.9.9", "languages": ["en", "xx"]}

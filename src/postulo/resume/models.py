@@ -21,11 +21,10 @@ from django.utils import formats
 from django.utils.translation import gettext, ngettext, pgettext_lazy
 from django.utils.translation import gettext_lazy as _
 
-from postulo.core import languages
+from postulo.core import languages, occupations
 from postulo.core.language_field import LanguageField
 from postulo.core.models import OwnedModel
 from postulo.core.personal import validate_country_code
-from postulo.jobs import esco
 
 from . import driving, publications, translatable
 
@@ -237,7 +236,9 @@ class Skill(ResumeItem):
         offered names in.
         """
         record = [translatable.record_language_of(self.owner)] if self.owner_id else []
-        self.esco_uri = esco.skill_for(self.name, *record, languages.current())
+        self.esco_uri = occupations.skill_for(
+            self.name, *record, languages.current(), otherwise=self.esco_uri
+        )
         return self.esco_uri
 
     @property
@@ -247,7 +248,7 @@ class Skill(ResumeItem):
         The English name where the classification publishes none in that language: this is
         for the person editing their record, who is being told what the name was taken for.
         """
-        return esco.skill_name(self.esco_uri, strict=False) if self.esco_uri else ""
+        return occupations.skill_name(self.esco_uri, strict=False) if self.esco_uri else ""
 
 
 class Project(ResumeItem):

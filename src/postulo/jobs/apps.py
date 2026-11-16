@@ -14,7 +14,6 @@ class JobsConfig(AppConfig):
         # Registers the pieces of slow work this app sends off (#247).
         # Connects the receiver that removes a kept page's files with its row (#256), and
         # the ones that unlink a listing's history from a capture or a file that goes (#270).
-        # Registers the system check that names two ESCO revisions in the data directory (#535).
         # And tells a postal address how it is put on the map as it is saved (#702).
         from postulo.core import models as core_models
 

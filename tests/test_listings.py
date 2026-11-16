@@ -13,7 +13,6 @@ from postulo.applications.models import Application, Status
 from postulo.core import export as export_module
 from postulo.core.export import build_document, write_archive
 from postulo.core.importer import load
-from postulo.jobs import esco
 from postulo.jobs.models import (
     TAB_ORDER,
     Capture,
@@ -22,6 +21,7 @@ from postulo.jobs.models import (
     JobPosting,
     ListingState,
 )
+from postulo.plugins.esco import classification as esco
 
 pytestmark = pytest.mark.django_db
 

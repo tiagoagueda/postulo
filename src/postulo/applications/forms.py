@@ -10,12 +10,12 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 from postulo.accounts.models import Profile, ReportSchedule
-from postulo.core import slugs
+from postulo.core import slugs, suggestion_sources
 from postulo.core.csv_import import OFFERED_CURRENCIES
 from postulo.core.date_widgets import DateInput, DateTimeInput
 from postulo.core.models import Tag, TagColour, TagIcon
 from postulo.core.suggest import SuggestInput
-from postulo.jobs import esco, recall, status
+from postulo.jobs import recall, status
 from postulo.jobs.forms import POSTING_HELP, OwnerScopedModelForm, who_and_where
 from postulo.jobs.models import (
     Company,
@@ -198,9 +198,13 @@ class PostingIntakeForm(UserAwareForm):
         form with no user attached offers nothing of theirs rather than everything, which
         is the safe way round: every route here passes one, and a route that forgets should
         suggest nothing rather than leak. The title's list is the ESCO classification,
-        which belongs to no one, so it is offered to everyone.
+        which belongs to no one, so it is offered to everyone (while its plugin is on).
         """
-        lists = {"title-suggestions": esco.suggestions()}
+        lists = {
+            "title-suggestions": [
+                text for text, _group in suggestion_sources.offered("job_title", user=self.user)
+            ]
+        }
         if self.user is None:
             return lists
         return {

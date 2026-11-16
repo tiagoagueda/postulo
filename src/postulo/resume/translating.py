@@ -39,8 +39,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-from postulo.core import language_names, languages
-from postulo.jobs import esco
+from postulo.core import language_names, languages, occupations
 
 # The rules live in `translatable`, below the models and the forms that declare and offer
 # them (#248). Handed out here as well, under the names every caller has always used.
@@ -258,7 +257,7 @@ def classified_names(skills, language: str, owner=None) -> dict[int, str]:
         return {}
     named: dict[int, str] = {}
     for skill in skills:
-        name = esco.skill_name(skill.esco_uri, wanted, strict=True)
+        name = occupations.skill_name(skill.esco_uri, wanted, strict=True)
         if name:
             named[skill.pk] = as_they_write_it(skill.name, name)
     return named

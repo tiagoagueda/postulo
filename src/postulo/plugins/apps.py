@@ -14,6 +14,7 @@ class PluginsConfig(AppConfig):
         Before anything reads entry points, so a plugin installed through the interface
         is found exactly as one installed with pip would be.
         """
+        from .esco import Esco
         from .identifiers import Identifiers
         from .installing import activate
         from .link_services import LinkServices
@@ -42,11 +43,23 @@ class PluginsConfig(AppConfig):
         # And the vocabularies a field suggests from (#1252): NACE for industries, offline
         # and on by default.
         register_builtin("suggestion-source", Nace)
+        # ESCO for job titles and skills, the same way: offline, and on by default.
+        register_builtin("suggestion-source", Esco)
+        _tell_the_vocabulary_who_decides()
         register_builtin_locales()
         register_builtin_themes()
         # And now import what is installed, so a plugin that will not load says so in the
         # start-up log rather than inside somebody's request (#228).
         load_everything()
+
+
+def _tell_the_vocabulary_who_decides() -> None:
+    """Hand the occupation vocabulary the plugin policy and register the plugin's checks (#1252)."""
+    from postulo.core import modules, occupations
+
+    from .esco import checks  # noqa: F401
+
+    occupations.is_on = modules.is_on
 
 
 def _forget_decisions(**_kwargs) -> None:

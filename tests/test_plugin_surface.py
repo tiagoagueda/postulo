@@ -58,6 +58,21 @@ REACHING_PAST: dict[str, dict[str, str]] = {
             "registry and the data into this package"
         ),
     },
+    "esco": {
+        "postulo.jobs.industries": (
+            "which NACE sections a set of divisions belongs to, for the unit groups a company's "
+            "sector puts first (#897): the same classification module the NACE plugin reads, "
+            "which stays in `jobs` until the later slices of #1252 move its readers"
+        ),
+        "postulo.core.configuration": (
+            "`POSTULO_ESCO_DIR`: where the downloaded classification is read from, which is an "
+            "instance setting, declared once with the others (#1186)"
+        ),
+        "postulo.core.languages": (
+            "the BCP 47 tags a name is read in and folded to (`no` for ESCO's Norwegian): one "
+            "table of language codes for the whole of Postulo, not a second one here"
+        ),
+    },
     "email": {
         "postulo.core.site": "the instance's name and from-address, for the message it sends",
         # `Notification` used to be reached past the surface as well — by this plugin and by

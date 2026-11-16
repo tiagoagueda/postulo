@@ -140,7 +140,7 @@ def test_the_unit_jobs_keep_the_files_fetch_esco_writes_and_not_an_earlier_layou
     """The occupations became a zip (#1110). A unit job that still kept `esco-<revision>.json`
     would find its copy and skip the download, and every run would test the loader on the file
     of an earlier release; kept under the key that file was kept under, the same."""
-    from postulo.jobs import esco
+    from postulo.plugins.esco import classification as esco
 
     revision = "${{ env.ESCO_REVISION }}"
     written = sorted(

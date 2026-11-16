@@ -14,7 +14,7 @@ from __future__ import annotations
 import pytest
 from django.utils import translation
 
-from postulo.jobs import esco
+from postulo.plugins.esco import classification as esco
 
 pytestmark = pytest.mark.skipif(
     esco.data_file() is None,
@@ -94,7 +94,7 @@ def test_nothing_in_the_classification_is_a_string_this_project_translates():
     """It is reference data, in the same sense a language's own name is."""
     from pathlib import Path
 
-    source = Path("src/postulo/jobs/esco.py").read_text(encoding="utf-8")
+    source = Path("src/postulo/plugins/esco/classification.py").read_text(encoding="utf-8")
     code = source.split('"""', 2)[2]
 
     assert "Chief executives" not in code and "Armed forces" not in code
