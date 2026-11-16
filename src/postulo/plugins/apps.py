@@ -59,10 +59,12 @@ class PluginsConfig(AppConfig):
 def _tell_the_vocabulary_who_decides() -> None:
     """Hand the occupation vocabulary the plugin policy and register the plugin's checks (#1252)."""
     from postulo.core import modules, occupations
+    from postulo.jobs import places
 
     from .esco import checks  # noqa: F401
 
     occupations.is_on = modules.is_on
+    places.is_on = modules.is_on
 
 
 def _forget_decisions(**_kwargs) -> None:

@@ -158,7 +158,7 @@ def test_the_town_box_of_an_address_is_a_suggestion_box():
     form = PostalAddressForm()
 
     assert isinstance(form.fields["municipality"].widget, suggest.SuggestInput)
-    assert form.fields["municipality"].widget.attrs["data-suggest"].endswith("/city/")
+    assert form.fields["municipality"].widget.attrs["data-suggest"].endswith("/municipality/")
 
 
 def test_the_address_form_works_with_the_plugin_off(user, table):

@@ -625,6 +625,11 @@ def cities() -> int:
 #: key on. A string and not an import: core asks the registry and never imports a plugin.
 PLUGIN = "geonames"
 
+#: ``is_on(person, name) -> bool``: whether the plugin ``name`` is on for ``person`` (``None``
+#: for the instance). The plugins app replaces it with the plugin policy, which sits above
+#: this layer; until then everything is on.
+is_on = lambda person, name: True  # noqa: E731
+
 
 def enabled(person=None) -> bool:
     """Whether the GeoNames plugin is on for ``person`` (an instance's answer with ``None``).
@@ -634,9 +639,7 @@ def enabled(person=None) -> bool:
     as one where it is on: the table is then read as before, and a reader that wants it gone
     removes the files.
     """
-    from postulo.core import modules
-
-    return modules.is_on(person, PLUGIN)
+    return is_on(person, PLUGIN)
 
 
 def suggest_cities(typed: str, limit: int = 10) -> list[str]:

@@ -31,6 +31,10 @@ EXCUSED: dict[str, str] = {
     "jobs:share_revoke": "POST only: takes one grant back and goes back to the sharing page.",
     "accounts:cv_photo": "the owner's CV photo as an image (#1246), shown on the profile page",
     "core:healthz": "a JSON status document for monitoring to poll",
+    "core:suggest_fill": (
+        "the JSON a field asks for once, when a suggestion is taken, to fill what is known beside "
+        "it (#1251); the browser walks that take a suggestion are what visit it"
+    ),
     "core:suggest": (
         "an HTML fragment a field asks for while one types, drawn in the browser by the "
         "combobox (#1251); the combobox is what the accessibility walks visit"
