@@ -258,3 +258,42 @@ def test_a_fill_that_fails_is_an_empty_answer(user):
         assert suggest.fills("test-fill", user, "x") == {}
     finally:
         suggest._registry.pop("test-fill", None)
+
+
+def test_what_a_group_the_person_belongs_to_owns_is_offered_and_no_other_groups(
+    client, user, other_user
+):
+    from django.contrib.auth.models import Group
+
+    mine = Group.objects.create(name="Household")
+    mine.user_set.add(user, other_user)
+    theirs = Group.objects.create(name="Elsewhere")
+    theirs.user_set.add(other_user)
+    for group, name in [(mine, "Shared Household Ltd"), (theirs, "Hidden Elsewhere Ltd")]:
+        company = Company(name=name)
+        company.set_principal(group)
+        company.save()
+    client.force_login(user)
+
+    body = ask(client, "employer", "").content.decode()
+
+    assert "Shared Household Ltd" in body
+    assert "Hidden Elsewhere Ltd" not in body
+
+
+def test_an_enabled_lookup_is_still_within_the_account_rate(client, user):
+    from postulo.core import suggest
+
+    calls = []
+    suggest.register(
+        "test-lookup", lambda who, typed: calls.append(typed) or [], enabled=lambda who: True
+    )
+    try:
+        client.force_login(user)
+        with override_settings(POSTULO_SUGGESTION_RATE="2/m"):
+            cache.clear()
+            codes = [ask(client, "test-lookup", "x").status_code for _ in range(4)]
+        assert codes[:2] == [200, 200] and 429 in codes
+        assert len(calls) == 2  # a refused question never reached the lookup
+    finally:
+        suggest._registry.pop("test-lookup", None)
