@@ -8,6 +8,8 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### ✨ Added
 
+- PDFs open in the viewer wherever a sent or captured document appears, the Compare page draws the two side by side, a PDF's safe links are drawn, a phone can take the viewer full screen, and the API gives a preview and a thumbnail address beside each download (#942)
+- The wiki's Configuration reference is generated from the one registry of variables, and a test holds the page to it (#1186)
 - ESCO occupations and skills and GeoNames cities are bundled plugins of the suggestion-source kind, on by default and offline; switched off, the job-title and town boxes are plain (#1252)
 - More boxes suggest from what the person already entered; choosing a company, a job title or a recorded town fills what is known beside it where it is empty, says so and can be undone; a third-party lookup answers nothing until it is switched on (#1251)
 - Text fields that suggest (company, job title, location, source, a contact's role, a CV's employer) are one accessible combobox, and stay plain text boxes without script (#1251)
