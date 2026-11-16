@@ -65,6 +65,10 @@ GRYPE="${GRYPE_IMAGE:-anchore/grype:v0.100.0}"
 SEVERITY="${SCAN_SEVERITY:-HIGH,CRITICAL}"
 GRYPE_SEVERITY="${GRYPE_SEVERITY:-high}"
 
+#: Findings that may pass until a date, and what reads them (`docker/scan-waivers.txt`).
+WAIVERS="${SCAN_WAIVERS:-$ROOT/docker/scan-waivers.txt}"
+PYTHON="${PYTHON:-python3}"
+
 #: What Trivy exits with when it finds something. Not 1: Trivy exits 1 for its own
 #: failures too, and the whole point is telling the two apart.
 FOUND=3
@@ -152,6 +156,23 @@ case "$status" in
     *) incomplete "trivy exited $status" ;;
 esac
 
+# A finding the waivers name (until their date) does not fail the gate: the same query
+# again, as JSON, read against the waiver file. Exit 1 there is a finding nobody waived.
+waived() {
+    local tool="$1" report="$2"; shift 2
+    local verdict=0
+    $PYTHON "$ROOT/scripts/scan_waivers.py" "$tool" "$report" --waivers "$WAIVERS" "$@" || verdict=$?
+    case "$verdict" in
+        0) return 0 ;;
+        1) return 1 ;;
+        *) incomplete "the $tool findings could not be read against the waivers" ;;
+    esac
+}
+if [ "$failed" -ne 0 ]; then
+    trivy image --scanners vuln --ignore-unfixed --severity "$SEVERITY" --format json         "$IMAGE" > "$OUT/trivy-fixable.json" || incomplete "trivy could not write the JSON report"
+    waived trivy "$OUT/trivy-fixable.json" && failed=0
+fi
+
 # Grype exits 1 for findings and 1 for its own failures, and has no flag to change that.
 # The difference is whether it produced a report: a table on stdout is findings; nothing on
 # stdout with a non-zero exit is a scanner that did not run.
@@ -160,11 +181,13 @@ grype "$IMAGE" --only-fixed --fail-on "$GRYPE_SEVERITY" -o table > "$OUT/grype-f
     || status=$?
 cat "$OUT/grype-fixable.txt"
 if [ "$status" -ne 0 ]; then
-    if [ -s "$OUT/grype-fixable.txt" ]; then
-        failed=1
-    else
+    if [ ! -s "$OUT/grype-fixable.txt" ]; then
         incomplete "grype exited $status with no report"
     fi
+    status=0
+    grype "$IMAGE" --only-fixed -o json > "$OUT/grype-fixable.json" || status=$?
+    [ "$status" -eq 0 ] && [ -s "$OUT/grype-fixable.json" ]         || incomplete "grype could not write the JSON report"
+    waived grype "$OUT/grype-fixable.json" --severity "$GRYPE_SEVERITY" || failed=1
 fi
 
 echo

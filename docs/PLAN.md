@@ -319,7 +319,10 @@ CV choices of which details print, and a listing's history; 0.5.0 (2026-11-01) s
 with people and groups, the map with street geocoding, sync pairings and the plugin
 surface for reminders and interviews, themed reports, printing and table export on A4 or
 US Letter, company registers and publication look-ups, European Digital Credentials, and
-the release's 56 selected languages (#347). The languages that were to be Africa's
+the release's 56 selected languages (#347); 0.5.5 (2026-11-16) Postulo's own PDF viewer,
+suggestion sources with ESCO and GeoNames as bundled plugins, plugins installed only through
+a signed manifest with holds and update notices, message templates, interview pages and kept
+form answers, and every environment variable declared once. The languages that were to be Africa's
 milestone are now ordered by speakers (#269) across the releases after it.
 
 **What was "deliberately after v1" and is now built.** The browser extension (two of them,

@@ -1,0 +1,8 @@
+# Findings the image scan may let through, each until a date (`scripts/scan_waivers.py`).
+#
+#   ID  YYYY-MM-DD  why nobody here can take the fix yet
+#
+# A waiver is read only until its date; after it the finding fails the gate again by itself.
+# Keep each one short-lived and remove it once the base image carries the fix.
+
+CVE-2026-119170  2026-12-15  CPython 3.14.11 fixes it; the official python:3.14-slim-bookworm image still ships 3.14.10
