@@ -302,7 +302,10 @@ class CompanyForm(OwnNoteForm):
             "legal_state_source",
             "acquired_by",
         )
-        widgets = {"legal_state_since": DateInput()}
+        widgets = {
+            "name": SuggestInput("employer"),
+            "legal_state_since": DateInput(),
+        }
         help_texts = {
             "legal_state": _("What the company is. Shown to everybody who can see it."),
             "kind": _(
@@ -844,7 +847,7 @@ class ContactForm(OwnNoteForm):
     class Meta:
         model = Contact
         fields = ("name", "role", "company", "email")
-        widgets = {"role": SuggestInput("contact-role")}
+        widgets = {"name": SuggestInput("contact-name"), "role": SuggestInput("contact-role")}
         help_texts = {
             "role": _("Their job title, as they give it themselves."),
             "company": _("Where they work. Only companies you have recorded are offered."),

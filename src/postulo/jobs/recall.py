@@ -145,3 +145,15 @@ def contact_roles(user) -> list[str]:
     from .models import Contact
 
     return _by_use(Contact.objects.for_user(user), "role")
+
+
+def contact_names(user) -> list[str]:
+    """The names of the people this person has recorded, most recent first (#1251)."""
+    from .models import Contact
+
+    return list(
+        Contact.objects.for_user(user)
+        .exclude(name="")
+        .order_by("-updated_at", "name")
+        .values_list("name", flat=True)[:AT_MOST]
+    )

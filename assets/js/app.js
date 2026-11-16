@@ -10083,6 +10083,17 @@
     var timer = 0;
     var request = null;
     var skip = false;
+    // A box of several words (tags) says what separates them: it is the last one, the one
+    // being typed, that is asked about and replaced.
+    var separator = input.getAttribute("data-suggest-separator") || "";
+
+    function typedNow() {
+      var value = input.value;
+      if (separator) {
+        value = value.slice(value.lastIndexOf(separator) + 1).replace(/^\s+/, "");
+      }
+      return value.slice(0, 100);
+    }
 
     function options() {
       return Array.prototype.slice.call(list.querySelectorAll('[role="option"]'));
@@ -10166,7 +10177,7 @@
           request = null;
           kept[typed] = html;
           // What was typed since is the question now; this answer is about the old one.
-          if (input.value.slice(0, 100) === typed || (!typed && !input.value)) {
+          if (typedNow() === typed || (!typed && !input.value)) {
             draw(html);
           }
         })
@@ -10180,7 +10191,14 @@
 
     function take(option) {
       skip = true;
-      input.value = option.getAttribute("data-value");
+      var chosen = option.getAttribute("data-value");
+      if (separator) {
+        var cut = input.value.lastIndexOf(separator) + 1;
+        var head = input.value.slice(0, cut);
+        input.value = head + (head ? " " : "") + chosen + separator + " ";
+      } else {
+        input.value = chosen;
+      }
       input.dispatchEvent(new Event("input", { bubbles: true }));
       input.dispatchEvent(new Event("change", { bubbles: true }));
       skip = false;
@@ -10193,7 +10211,7 @@
         return;
       }
       window.clearTimeout(timer);
-      var typed = input.value.slice(0, 100);
+      var typed = typedNow();
       if (!typed.trim()) {
         if (request) {
           request.abort();
@@ -10219,7 +10237,7 @@
         if (open) {
           move(now ? all.indexOf(now) + 1 : 0);
         } else {
-          ask(input.value.slice(0, 100));
+          ask(typedNow());
         }
       } else if (event.key === "ArrowUp" && open) {
         event.preventDefault();

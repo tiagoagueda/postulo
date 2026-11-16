@@ -122,10 +122,11 @@ class SuggestInput(forms.TextInput):
     attribute off when it draws its own list, so one box never shows two.
     """
 
-    def __init__(self, kind: str, attrs: dict | None = None):
+    def __init__(self, kind: str, attrs: dict | None = None, *, separator: str = ""):
         own = {
             "data-suggest": reverse_lazy("core:suggest", args=[kind]),
             "autocomplete": "off",
+            **({"data-suggest-separator": separator} if separator else {}),
             **(attrs or {}),
         }
         super().__init__(own)
