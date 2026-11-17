@@ -1508,3 +1508,63 @@ def test_every_documents_page_is_headed_documents_with_its_list_below(client, us
     assert [text for level, text in headings if level == "1"] == ["Documents"]
     assert ("2", heading) in headings, f"{heading} is a subheading, not the page's name"
     assert headings.index(("1", "Documents")) < headings.index(("2", heading))
+
+
+# ----------------------------------- the browser's spelling check, in the letter's language
+
+
+def _box(html: str, name: str) -> str:
+    """The opening tag of a form's box, by the field's name."""
+    return re.search(rf'<(?:input|textarea)[^>]*name="{name}"[^>]*>', html).group(0)
+
+
+def test_a_letters_boxes_say_which_language_its_words_are_in(client, user):
+    """Somebody reading Postulo in one language and writing in another had every word
+    underlined: the browser checks spelling in the language the box declares (#1258)."""
+    user.profile.language = "pt-PT"
+    user.profile.save()
+    letter = CoverLetter.objects.create(owner=user, name="In English", body="Dear", language="en")
+    client.force_login(user)
+
+    html = client.get(reverse("documents:letter_update", args=[letter.pk])).content.decode()
+
+    for name in ("subject", "body"):
+        assert 'lang="en"' in _box(html, name), name
+        assert 'dir="ltr"' in _box(html, name) and 'spellcheck="true"' in _box(html, name)
+    assert "lang=" not in _box(html, "name"), "what it is filed under is not the letter's words"
+
+
+def test_a_right_to_left_letter_is_typed_right_to_left_in_any_interface(client, user):
+    letter = CoverLetter.objects.create(owner=user, name="Arabic", body="x", language="ar")
+    client.force_login(user)
+
+    html = client.get(reverse("documents:letter_update", args=[letter.pk])).content.decode()
+
+    assert 'lang="ar"' in _box(html, "body") and 'dir="rtl"' in _box(html, "body")
+    assert 'dir="rtl"' in _box(html, "subject")
+
+
+def test_a_new_letter_and_one_with_no_language_follow_the_profile(client, user):
+    user.profile.language = "fr-FR"
+    user.profile.save()
+    blank = CoverLetter.objects.create(owner=user, name="Blank", body="x")
+    client.force_login(user)
+
+    new = client.get(reverse("documents:letter_create")).content.decode()
+    old = client.get(reverse("documents:letter_update", args=[blank.pk])).content.decode()
+
+    assert 'lang="fr-FR"' in _box(new, "body")
+    assert 'lang="fr-FR"' in _box(old, "body")
+
+
+def test_a_message_templates_boxes_say_their_language_too(client, user):
+    from postulo.documents.forms import MessageTemplateForm
+    from postulo.documents.models import MessageTemplate
+
+    message = MessageTemplate(owner=user, name="Merci", body="x", language="fr-CA")
+
+    form = MessageTemplateForm(instance=message, user=user)
+
+    for name in ("subject", "body"):
+        attrs = form.fields[name].widget.attrs
+        assert (attrs["lang"], attrs["dir"], attrs["spellcheck"]) == ("fr-CA", "ltr", "true")

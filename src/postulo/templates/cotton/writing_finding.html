@@ -1,0 +1,42 @@
+{% load i18n %}
+<c-vars line listing apply="" back="" />
+{% comment %} One line of `<c-writing-findings>` (#1258), which says what every part is for.
+
+   `line` is a `documents.checking.Line`. How serious it is, is said in a word. The sentence
+   is the checker's and is escaped, as is everything quoted from the letter; the highlight is
+   this template's own `<mark>` between the three strings of the excerpt. With `apply`, each
+   replacement the line offers is a POST form of its own, its button named by what it does.
+{% endcomment %}
+<li data-finding data-check="{{ line.finding.check }}" data-severity="{{ line.finding.severity }}">
+  <p>
+    {% if line.finding.severity == "problem" %}
+      <span class="badge" data-tone="amber">{% translate "Goes out wrong" %}</span>
+    {% else %}
+      <span class="badge" data-tone="grey">{% translate "Suggestion" %}</span>
+    {% endif %}
+    <span data-finding-message>{{ line.finding.message }}</span>
+  </p>
+  {% if line.finding.passage %}
+    <p class="mt-1 text-xs">
+      <bdi lang="{{ listing.language }}" dir="{{ listing.direction }}" class="whitespace-pre-wrap wrap-anywhere" data-finding-excerpt>{{ line.before }}{% if line.marked %}<mark>{{ line.marked }}</mark>{% endif %}{{ line.after }}</bdi>
+      {% if line.passage_label %}<span class="ms-2">{{ line.passage_label }}</span>{% endif %}
+    </p>
+  {% endif %}
+  {% if apply and line.actions %}
+    <div class="mt-2 flex flex-wrap gap-2">
+      {% for action in line.actions %}
+        <form method="post" action="{{ apply }}" data-writing-apply>
+          {% csrf_token %}
+          <input type="hidden" name="passage" value="{{ line.finding.passage }}">
+          <input type="hidden" name="start" value="{{ line.finding.start }}">
+          <input type="hidden" name="end" value="{{ line.finding.end }}">
+          <input type="hidden" name="digest" value="{{ line.digest }}">
+          <input type="hidden" name="replacement" value="{{ action.encoded }}">
+          <input type="hidden" name="next" value="{{ back }}">
+          <button type="submit" class="btn h-auto whitespace-normal text-start" data-variant="outline" data-size="sm">{{ action.label }}</button>
+        </form>
+      {% endfor %}
+    </div>
+  {% endif %}
+  <p class="mt-1 text-xs" data-finding-source>{{ line.reported.label }}</p>
+</li>

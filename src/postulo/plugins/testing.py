@@ -72,6 +72,14 @@ it once and restores the result afterwards; two lines in the plugin's ``tests/co
 runs a connection the way the scheduler and *Sync now* do -- so a state is kept or refused by
 the same rules -- optionally from a state of the test's choosing, and `kept_sync_state` reads
 what the next run will be handed.
+
+**And a writing checker held to its contract (#1258).** `assert_is_a_writing_checker` holds a
+plugin's ``checkers`` to what Postulo accepts, then runs each offline one over a small set of
+awkward documents -- nothing at all, a placeholder at each end, Windows line endings, a
+character outside the basic plane, right-to-left, a script with no spaces, the longest
+passage a checker is handed -- and fails on an exception and on any finding Postulo would
+drop. `writing_findings` runs the plugin's checkers over a text of the test's own and gives
+back what the list would show, as plain values.
 """
 
 from __future__ import annotations
@@ -515,3 +523,151 @@ def kept_sync_state(connection) -> dict:
 
     connection.refresh_from_db(fields=["sync_state"])
     return sync_state(connection)
+
+
+#: Texts a writing checker meets sooner or later, each of which has broken one (#1258).
+_AWKWARD_TEXTS = (
+    "",
+    "Hello",
+    "{{ company }} is where I would like to work, {{ name }}",
+    "Dear {{ compnay }},\r\n\r\nI am writing about the the role.\r\n\r\n{{ name }}\r\n",
+    "A r\u00e9sum\u00e9 with a \U0001f600 in it,  and [a note] left in. {{ role }}",
+    "\u0627\u0644\u0633\u064a\u062f\u0629 {{ contact }}\u060c \u0623\u0643\u062a\u0628 "
+    "\u0625\u0644\u064a\u0643\u0645 \u0628\u062e\u0635\u0648\u0635 {{ role }}\u061f",
+    "\u5c0a\u656c\u7684{{ company }}\uff1a\u6211\u60f3\u7533\u8bf7"
+    "\u8fd9\u4e2a\u804c\u4f4d\u3002\u8c22\u8c22\u3002",
+)
+
+
+def _awkward_documents(kind: str, language: str):
+    """The built-in documents `assert_is_a_writing_checker` reads a checker over."""
+    from postulo.core.writing_checks import MAX_PASSAGE
+    from postulo.documents.checking import text_document
+
+    facts = {"company": "Aperture Science", "role": "Test engineer", "name": "A. Person"}
+    longest = ("word " * (MAX_PASSAGE // 5 + 1))[:MAX_PASSAGE]
+    for text in (*_AWKWARD_TEXTS, longest):
+        yield text_document(text, subject="About {{ role }}", kind=kind, language=language)
+        yield text_document(text, kind=kind, language=language, facts=facts)
+
+
+def assert_is_a_writing_checker(plugin) -> None:
+    """Hold a writing-checker plugin to its contract (#1258).
+
+    Fails unless the plugin answers to the protocol and calls itself a ``writing-checker``;
+    every checker it declares is one Postulo would ask (a key, a label, documents it reads,
+    a function, and for one that is not offline its hosts and what it sends); no two share a
+    key; and a checker that names a sub-plugin names one the plugin declares.
+
+    Then each offline checker is run over a set of awkward documents, in each kind of
+    document it reads and in each language it names (British English where it names none):
+    it must not raise, and every finding among the first hundred, which is as many as
+    Postulo takes, must be one Postulo would draw -- a span inside its passage, whole
+    placeholders or none, a one-line sentence, replacements that differ from what they
+    replace. Offsets
+    are code points over the text as stored, which the Windows line endings and the
+    character outside the basic plane are there to catch.
+
+    A checker that is not offline is not run: it would ask its service. Its own tests run
+    it against a stand-in, through `writing_findings`.
+    """
+    from itertools import islice
+
+    from postulo.core import writing_checks
+
+    from .base import WritingCheckerPlugin, sub_plugins_of
+
+    assert isinstance(plugin, WritingCheckerPlugin), (
+        f"{plugin!r} does not provide name, kind and checkers"
+    )
+    assert plugin.kind == "writing-checker", f"its kind is {plugin.kind!r}"
+    declared = list(plugin.checkers or ())
+    assert declared, "it declares no checker"
+    problems = [
+        f"{getattr(checker, 'key', checker)!r}: {problem}"
+        for checker in declared
+        for problem in writing_checks.checker_problems(checker)
+    ]
+    assert not problems, "; ".join(problems)
+    keys = [checker.key for checker in declared]
+    assert len(keys) == len(set(keys)), f"two checkers share a key: {keys}"
+    switches = {sub.id for sub in sub_plugins_of(plugin)}
+    for checker in declared:
+        assert not checker.sub_plugin or checker.sub_plugin in switches, (
+            f"{checker.key!r} names the sub-plugin {checker.sub_plugin!r}, which the plugin "
+            "does not declare"
+        )
+
+    for checker in declared:
+        if not checker.offline:
+            continue
+        for kind in checker.documents:
+            for language in checker.languages or ("en-GB",):
+                for document in _awkward_documents(kind, language):
+                    handed = writing_checks.readable(document)
+                    answer = islice(iter(checker.check(handed)), writing_checks.MAX_FINDINGS)
+                    for finding in answer:
+                        rule = writing_checks.problem_with(finding, handed)
+                        assert not rule, (
+                            f"{checker.key!r} gave a finding Postulo would drop: it breaks "
+                            f"the rule {rule!r} ({finding!r})"
+                        )
+
+
+def writing_findings(
+    plugin,
+    text: str,
+    *,
+    subject: str = "",
+    kind: str = "letter",
+    variant: str = "cover",
+    language: str = "en-GB",
+    facts: Mapping[str, str] | None = None,
+) -> list[dict]:
+    """What a plugin's checkers say about a text, as the list would show it (#1258).
+
+    The text is a letter's body (``subject`` its subject line) as a person stored it, read
+    for an application when ``facts`` are given -- ``company``, ``role``, ``location``,
+    ``contact``, ``name``, and ``company_names``, one a line -- and for none without. Every
+    checker the plugin declares that reads this kind of document and this language is asked,
+    whatever is switched on: an offline one is handed the document, and one that is not is
+    handed it without the facts, as Postulo would on a press.
+
+    Each entry is plain values: ``checker``, ``check``, ``message``, ``severity``,
+    ``passage``, ``start``, ``end``, ``text`` (the words the span covers) and
+    ``replacements``. A finding Postulo would drop is not in it, and what a checker raises
+    is raised here, where a page would leave the checker out.
+    """
+    from postulo.core import writing_checks
+    from postulo.documents.checking import text_document
+
+    document = writing_checks.readable(
+        text_document(
+            text, subject=subject, kind=kind, variant=variant, language=language, facts=facts
+        )
+    )
+    shown = []
+    for checker in plugin.checkers:
+        if writing_checks.checker_problems(checker) or kind not in checker.documents:
+            continue
+        if not writing_checks.reads(checker, language):
+            continue
+        handed = document if checker.offline else writing_checks.without_facts(document)
+        for finding in list(checker.check(handed))[: writing_checks.MAX_FINDINGS]:
+            if writing_checks.problem_with(finding, handed):
+                continue
+            passage = handed.passage(finding.passage) if finding.passage else None
+            shown.append(
+                {
+                    "checker": checker.key,
+                    "check": finding.check,
+                    "message": finding.message,
+                    "severity": finding.severity,
+                    "passage": finding.passage,
+                    "start": finding.start,
+                    "end": finding.end,
+                    "text": passage.text[finding.start : finding.end] if passage else "",
+                    "replacements": tuple(finding.replacements),
+                }
+            )
+    return shown

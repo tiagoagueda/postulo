@@ -21,6 +21,7 @@ class PluginsConfig(AppConfig):
         from .link_services import LinkServices
         from .messaging_services import MessagingServices
         from .nace import Nace
+        from .placeholder_checks import PlaceholderChecks
         from .register_lookup import RegisterAdapters
         from .registry import (
             load_everything,
@@ -49,6 +50,9 @@ class PluginsConfig(AppConfig):
         _tell_the_vocabulary_who_decides()
         # And GeoNames' places for a city, offline and on by default (#1252).
         register_builtin("suggestion-source", Geonames)
+        # And what reads a letter's own words and says what it noticed (#1258): the placeholder
+        # checks first, which are always on.
+        register_builtin("writing-checker", PlaceholderChecks)
         register_builtin_locales()
         register_builtin_themes()
         # And now import what is installed, so a plugin that will not load says so in the

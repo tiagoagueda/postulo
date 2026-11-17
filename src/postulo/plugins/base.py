@@ -722,6 +722,39 @@ class SuggestionSourcePlugin(Protocol):
     sources: tuple
 
 
+# ------------------------------------------------------------------ writing checkers
+
+#: Where a package that reads a document's own words and says what it noticed registers
+#: itself (#1258). Open, as the suggestion-source group is: a checker says which documents it
+#: reads, in which languages, whether it is offline and, if it dials out, the hosts it may ask
+#: and what it sends; a package installed beside Postulo may add one, and cannot take a key
+#: another already holds.
+WRITING_CHECKER_GROUP = "postulo.writing_checkers"
+
+
+@runtime_checkable
+class WritingCheckerPlugin(Protocol):
+    """What reads a letter's own words and says what it noticed, and changes nothing (#1258).
+
+    The shape of a suggestion-source plugin: it holds no rows and is asked to do nothing but
+    say which checkers it contributes, each a `WritingChecker` from the plugin surface. A
+    checker is handed plain data (a `WritingDocument`: the person's text as stored, with the
+    placeholders marked) and answers with plain data (`WritingFinding`s: a span, a sentence
+    and, where it has one, a proposed replacement). Postulo draws the one list, checks every
+    finding before it does, and applies a replacement only when the person presses for it.
+
+    **A checker that reaches the network says so**: it names its hosts and what it sends, is
+    never asked by a page, and is handed the text without the facts that would fill it in.
+    """
+
+    #: The identifier the registry keys on.
+    name: str
+    #: What kind of plugin this is; always ``"writing-checker"``.
+    kind: str
+    #: The checkers it contributes, each a `WritingChecker` from the plugin surface.
+    checkers: tuple
+
+
 # --------------------------------------------------------------------- features
 
 #: Where something that *changes what Postulo keeps* registers itself.
@@ -866,6 +899,7 @@ SUB_PLUGIN_KINDS = (
     "feature",
     "outbox",
     "suggestion-source",
+    "writing-checker",
 )
 #: Where the parent's name and the sub-plugin's id are joined in the name policy rows hold.
 SUB_PLUGIN_SEPARATOR = ":"

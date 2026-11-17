@@ -6,6 +6,16 @@ All notable changes to Postulo are recorded here. The format follows
 
 ## [Unreleased]
 
+### ✨ Added
+
+- A letter's page lists what will go out wrong before it goes, for the application chosen: a placeholder with nothing to fill it, or a misspelt one, read out with its count; plugins of a new kind, writing-checker, add to the same list (#1258)
+- A suggested replacement in that list is put into the letter one press at a time, refused if the letter changed since, and can be undone (#1258)
+
+### 🔧 Changed
+
+- *Read it below* draws the letter's page again for the application chosen, so the preview, the PDF and the list agree; a misspelt placeholder now also asks before a letter is frozen (#1258)
+- A letter's and a message's subject and body tell the browser their language, so its spelling check reads them in the letter's language rather than the interface's (#1258)
+
 ## [0.5.5] — 2026-11-16
 
 ### ✨ Added

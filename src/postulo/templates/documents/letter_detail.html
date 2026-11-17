@@ -29,25 +29,31 @@
     <div class="lg:col-span-2">
       <div class="card whitespace-pre-line text-sm">{{ letter.body }}</div>
 
-      {% comment %} The letter as it will read, under the text that makes it (#293). The
-         frame's `name` is what the chooser beside it targets, so picking an application
-         re-fetches the frame with that application's placeholders filled in -- plain HTML,
-         no script. See the CV page for why a frame, why `src`, and why it is titled. {% endcomment %}
+      {% comment %} What the writing checkers found, between the words and the way they will
+         be read (#1258): where a person lands after *Save*, and after a replacement. For
+         the application chosen beside it, like the frame and the PDF below. {% endcomment %}
+      <c-writing-findings :listing="findings" apply="{% url 'documents:letter_apply' letter.pk %}"
+                          back="{{ request.get_full_path }}" :undo="can_undo" />
+
+      {% comment %} The letter as it will read, under the text that makes it (#293). Picking
+         an application beside it draws this page again for that application (#1258), so the
+         frame, the PDF and the list above all follow the one choice -- plain HTML, no
+         script. See the CV page for why a frame, why `src`, and why it is titled. {% endcomment %}
       <section class="mt-6" aria-labelledby="letter-preview-heading">
         <c-section-title id="letter-preview-heading">{% translate "As they will read it" %}</c-section-title>
         <p class="mb-3 text-xs text-ink-500 dark:text-ink-400">
           {% translate "What is saved, redrawn after every change. Scroll inside it to read on." %}
         </p>
         {% comment %} The PDF is what is sent (#942); *Redraw* adds the application and the paper
-           chosen in the form beside the page. The quick view is the frame the chooser targets. {% endcomment %}
+           chosen in the form beside the page. Both start as the application the page was asked for. {% endcomment %}
         <c-preview-tabs id="letter-preview" label="{% translate 'Ways to read this letter' %}">
           <c-slot name="pdf">
-            <c-document-viewer kind="pdf" src="{% url 'documents:letter_draft' letter.pk %}?inline=1"
+            <c-document-viewer kind="pdf" :src="draft_src"
                                download="{% url 'documents:letter_draft' letter.pk %}" redraw="letter-chooser"
                                title="{% blocktranslate trimmed with name=letter.name %}PDF of {{ name }}{% endblocktranslate %}" />
           </c-slot>
           <c-slot name="quick">
-            <iframe src="{% url 'documents:letter_preview' letter.pk %}" name="letter-preview"
+            <iframe src="{% url 'documents:letter_preview' letter.pk %}{% if chosen %}?application={{ chosen.pk }}{% endif %}" name="letter-preview"
                     title="{% blocktranslate trimmed with name=letter.name %}Preview of {{ name }}{% endblocktranslate %}"
                     class="document-frame" loading="lazy" sandbox="allow-same-origin" data-document-preview></iframe>
           </c-slot>
@@ -74,18 +80,19 @@
           <p class="mb-3 text-xs text-ink-500 dark:text-ink-400">
             {% translate "Pick an application and the placeholders are filled in from it." %}
           </p>
-          {% comment %} The chooser targets the frame below rather than a new tab (#293):
-             pick an application, and the letter beside the chooser is the one they would
-             read. A form with a `target` naming a frame is plain HTML and needs no script;
-             the frame's own address is the letter with no application, which is what it
-             starts as. {% endcomment %}
-          <form method="get" action="{% url 'documents:letter_preview' letter.pk %}" id="letter-chooser"
-                target="letter-preview" class="space-y-3">
+          {% comment %} The chooser asks for this page again, for the application picked
+             (#1258). It used to re-target the frame alone (#293), and a list of what is
+             wrong beside a frame that disagreed with it would have been two truths; now the
+             frame, the PDF and the list are one choice. A GET form is plain HTML and needs
+             no script, and the address lands on the list, just above the letter as they
+             will read it. {% endcomment %}
+          <form method="get" action="{% url 'documents:letter_detail' letter.pk %}#writing-findings" id="letter-chooser"
+                class="space-y-3">
             <label class="sr-only" for="preview-application">{% translate "Application" %}</label>
             <select name="application" id="preview-application" class="w-full">
               <option value="">{% translate "No application" %}</option>
               {% for entry in applications %}
-                <option value="{{ entry.pk }}">
+                <option value="{{ entry.pk }}"{% if chosen.pk == entry.pk %} selected{% endif %}>
                   {{ entry.posting.title }} — {{ entry.posting.company.name }}
                 </option>
               {% endfor %}
@@ -97,9 +104,8 @@
             <button type="submit" class="btn w-full" data-variant="outline">{% translate "Read it below" %}</button>
             {% comment %} The same choice, as the PDF it would be (#236). A second button on
                the one form rather than a second chooser: `formaction` sends what is chosen
-               to the draft's address and `formtarget` takes the answer out of the frame, so
-               the browser is handed a file and the page stays where it is. Plain HTML, as
-               the button above it is. {% endcomment %}
+               to the draft's address, so the browser is handed a file and the page stays
+               where it is. Plain HTML, as the button above it is. {% endcomment %}
             <button type="submit" class="btn w-full" data-variant="outline"
                     formaction="{% url 'documents:letter_draft' letter.pk %}"
                     formtarget="_self">{% translate "Download draft PDF" %}</button>
@@ -137,7 +143,7 @@
               <select name="application" id="file-application" class="w-full">
                 <option value="">{% translate "No application" %}</option>
                 {% for entry in applications %}
-                  <option value="{{ entry.pk }}">
+                  <option value="{{ entry.pk }}"{% if chosen.pk == entry.pk %} selected{% endif %}>
                     {{ entry.posting.title }} — {{ entry.posting.company.name }}
                   </option>
                 {% endfor %}

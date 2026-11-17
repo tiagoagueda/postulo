@@ -20,27 +20,22 @@
     {% if letter_preview %}
       {% comment %} Freezing used to show nobody the text being frozen, so a placeholder with
          nothing behind it -- a posting with no location, a name never filled in -- became a
-         gap in a PDF an employer already had. Where there is one, this is the letter as it
-         will go, with the gaps marked. Where there is not, nothing extra happens: a step
-         everybody has to press through is read once and clicked past for ever (#235).
+         gap in a PDF an employer already had. Where something will go out wrong, this is
+         what, and the letter as it will go, with the gaps marked. Where nothing will,
+         nothing extra happens: a step everybody has to press through is read once and
+         clicked past for ever (#235). What is wrong is the one list the letter's own page
+         draws (#1258), not a sentence of this page's own.
       {% endcomment %}
-      <div class="alert mb-6" data-variant="warning">
-        <p class="mb-2">
-          {% blocktranslate trimmed with names=gaps|join:", " count counter=gaps|length %}
-            Nothing fills in {{ names }}, so it goes out blank.
-          {% plural %}
-            Nothing fills in {{ names }}, so they go out blank.
-          {% endblocktranslate %}
-        </p>
-        <p class="mb-3 text-sm">
+      <c-writing-findings :listing="findings" gate="{{ letter.get_absolute_url }}" :application="application.pk">
+        <p class="mt-3 text-sm">
           {% translate "This is the letter as it will be frozen. Edit it first, or freeze it anyway." %}
         </p>
         {% comment %} No scrolling box: a cover letter is a page, the page scrolls already,
            and a bare scroll utility is what #113 and #165 were both about. {% endcomment %}
-        <div class="rounded bg-white/60 p-3 text-sm dark:bg-black/20">
+        <div class="mt-2 rounded bg-white/60 p-3 text-sm dark:bg-black/20">
           <p class="whitespace-pre-line">{{ letter_preview }}</p>
         </div>
-      </div>
+      </c-writing-findings>
     {% endif %}
 
     <form method="post" novalidate>

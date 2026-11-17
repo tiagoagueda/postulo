@@ -1,0 +1,88 @@
+{% load i18n %}
+<c-vars listing apply="" back="" application="" gate="" undo="" />
+{% comment %} What the writing checkers found in one letter: the one list (#1258).
+
+   `<c-writing-findings :listing="findings" apply="{% url 'documents:letter_apply' letter.pk %}"
+   back="{{ request.get_full_path }}" :undo="can_undo" />` on the letter's own page, and
+   `<c-writing-findings :listing="findings" gate="{{ letter.get_absolute_url }}">…</c-writing-findings>`
+   on the page that freezes a letter, with whatever that page says under the list as the slot.
+   `listing` is a `documents.checking.Listing`; nothing at all is drawn where it is `None`,
+   which is what it is while no checker is on.
+
+   **One list.** The placeholder checks and whatever a plugin's checker found are the same
+   lines in the same list, problems first. A checker supplies plain values and never markup:
+   every word of it is escaped here, and the highlight is a `<mark>` this template writes
+   between three strings.
+
+   **It works with scripts off.** The list is in the page, the suggestions fold in a
+   `<details>`, and each replacement is a small POST form of its own, answered by a redirect
+   back to `#writing-findings`. The section takes focus (`tabindex="-1"`), so that is where
+   reading goes on from.
+
+   **To a screen reader.** The section is named by its heading. The count is one sentence in
+   a `role="status"` line. How serious a line is, is a word and never only a colour. The
+   quoted words carry the letter's `lang` and `dir` inside a `<bdi>`, since a French letter
+   is often read in an English interface. A `<mark>` is not announced, so each sentence
+   quotes what it means, and each button is named by what it replaces with what.
+
+   **With `gate`** (before freezing) the suggestions start folded and nothing can be replaced
+   from here: a link leads to the letter's own page, which is where a replacement is made.
+
+   An alert is a row, and this one holds a heading, a sentence and a list, so it says
+   `flex-col` and draws its heading bare, as `<c-duplicates>` does and for its reason.
+{% endcomment %}
+{% if listing %}
+  <section id="writing-findings" tabindex="-1" aria-labelledby="writing-findings-heading"
+           data-writing-findings data-problems="{{ listing.problems|length }}" data-hints="{{ listing.hints|length }}"
+           {% if gate %}class="alert mb-6 flex-col items-stretch" data-variant="warning"{% else %}class="card mt-6"{% endif %}>
+    {% if gate %}
+      <h2 id="writing-findings-heading" class="font-medium">{% translate "Before it goes" %}</h2>
+    {% else %}
+      <c-section-title id="writing-findings-heading">{% translate "Before it goes" %}</c-section-title>
+    {% endif %}
+    <p role="status" class="text-sm" data-writing-status>{{ listing.status }}</p>
+    {% if listing.unasked %}
+      <p class="mt-1 text-sm">{% translate "No application is chosen, so what an application fills in was not checked." %}</p>
+    {% endif %}
+    {% if listing.unread %}
+      <p class="mt-1 text-sm">{% translate "Part of this letter is too long to be checked, so this list may be missing things." %}</p>
+    {% endif %}
+    {% if undo and apply %}
+      <form method="post" action="{{ apply }}" class="mt-3" data-writing-undo>
+        {% csrf_token %}
+        <input type="hidden" name="undo" value="1">
+        <input type="hidden" name="next" value="{{ back }}">
+        <button type="submit" class="btn" data-variant="outline" data-size="sm">{% translate "Undo the last replacement" %}</button>
+      </form>
+    {% endif %}
+    {% if listing.problems %}
+      <ul class="mt-3 space-y-3 text-sm" data-writing-problems>
+        {% for line in listing.problems %}
+          <c-writing-finding :line="line" :listing="listing" :apply="apply" :back="back" />
+        {% endfor %}
+      </ul>
+    {% endif %}
+    {% if listing.hints %}
+      <details class="mt-3 text-sm" {% if not gate %}open{% endif %} data-writing-hints>
+        <summary class="cursor-pointer font-medium">
+          {% blocktranslate trimmed count counter=listing.hints|length %}
+            {{ counter }} suggestion
+          {% plural %}
+            {{ counter }} suggestions
+          {% endblocktranslate %}
+        </summary>
+        <ul class="mt-3 space-y-3">
+          {% for line in listing.hints %}
+            <c-writing-finding :line="line" :listing="listing" :apply="apply" :back="back" />
+          {% endfor %}
+        </ul>
+      </details>
+    {% endif %}
+    {% if gate and listing.total %}
+      <p class="mt-3 text-sm">
+        <a href="{{ gate }}{% if application %}?application={{ application }}{% endif %}#writing-findings" class="underline">{% translate "Open the letter to change it" %}</a>
+      </p>
+    {% endif %}
+    {{ slot }}
+  </section>
+{% endif %}

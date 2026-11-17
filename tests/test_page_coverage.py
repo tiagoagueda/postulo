@@ -257,6 +257,10 @@ EXCUSED: dict[str, str] = {
     "applications:reminder_reopen": "a POST that marks a done reminder not done (#331)",
     "applications:suggestion_action": "a POST from the suggestions page, which is visited",
     "documents:cv_item_move": "a POST that reorders one entry on a CV",
+    "documents:letter_apply": (
+        "a POST that puts one suggested replacement into a letter, or takes the last one out; "
+        "its buttons are on the letter's page, which is visited (#1258)"
+    ),
     "documents:rendered_archive": "a POST that files a sent document away",
     "documents:upload_archive": "a POST that files an uploaded document away",
     "jobs:capture_delete": "a confirmation and a POST that deletes a capture nobody saved (#664)",

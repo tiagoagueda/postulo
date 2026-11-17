@@ -85,6 +85,13 @@ fields it suggests for, its languages, whether it is offline, its licence, its h
 out -- and `SuggestionSourcePlugin` the registry that holds them. A source reached over the
 network is asked on a press and never on a page load.
 
+**A letter's words can be read and remarked on (#1258)**: a `WritingChecker` is handed a
+`WritingDocument` -- the person's own text as stored, in `WritingPassage`s, each
+`WritingPlaceholder` marked and not filled in -- and answers with `WritingFinding`s: a span, a
+sentence and, where it has one, a replacement. `WritingCheckerPlugin` holds the checkers.
+Postulo draws the one list and puts a replacement in only when the person presses for it; a
+checker reached over the network is never asked by a page.
+
 **A backup can leave the machine (#325)**: `BackupDestinationPlugin` is what keeps the
 instance's archives somewhere else, `BackupArchive` what it is handed (already encrypted to the
 operator's age recipient), `BackupManifest` what the archive says about itself in plain values,
@@ -214,6 +221,11 @@ if TYPE_CHECKING:  # pragma: no cover - the names `__getattr__` resolves at run 
     from postulo.core.web_links import Kind as LinkKind
     from postulo.core.web_links import primary_for as primary_web_link
     from postulo.core.web_links import save_only_link as save_web_link
+    from postulo.core.writing_checks import Checker as WritingChecker
+    from postulo.core.writing_checks import Document as WritingDocument
+    from postulo.core.writing_checks import Finding as WritingFinding
+    from postulo.core.writing_checks import Passage as WritingPassage
+    from postulo.core.writing_checks import Placeholder as WritingPlaceholder
     from postulo.documents.formats import Format as DocumentFormat
     from postulo.documents.formats import register as register_document_format
     from postulo.documents.outline import Outline
@@ -309,6 +321,7 @@ from .base import (
     TestResult,
     TextMessage,
     TransportPlugin,
+    WritingCheckerPlugin,
     declares,
     description_of,
     label_of,
@@ -421,6 +434,12 @@ __all__ = [
     "VCardPhone",
     "VCardRefused",
     "WriteRefused",
+    "WritingChecker",
+    "WritingCheckerPlugin",
+    "WritingDocument",
+    "WritingFinding",
+    "WritingPassage",
+    "WritingPlaceholder",
     "access_token",
     "add_appointment",
     "add_reminder",
@@ -619,6 +638,19 @@ _ELSEWHERE: dict[str, tuple[str, str]] = {
     # in, whether it is offline, its licence and, for one that dials out, its hosts -- whose
     # `offer` answers with `(text, group)` pairs. Only offline sources are asked by a page.
     "SuggestionSource": ("postulo.core.suggestion_sources", "Source"),
+    # ------------------------------------------- what reads a letter's own words (#1258)
+    # A `writing-checker` plugin adds checkers to the one list a letter's page draws. A
+    # `WritingChecker` -- a key, a name, the documents and languages it reads, whether it is
+    # offline and, for one that dials out, its hosts and what it sends -- is handed a
+    # `WritingDocument`: the text as the person stored it, in `WritingPassage`s, with each
+    # `WritingPlaceholder` marked where it was typed and what would fill it beside it. It
+    # answers with `WritingFinding`s, plain values Postulo checks before it draws them. A
+    # checker changes nothing; only offline ones are asked by a page.
+    "WritingChecker": ("postulo.core.writing_checks", "Checker"),
+    "WritingDocument": ("postulo.core.writing_checks", "Document"),
+    "WritingFinding": ("postulo.core.writing_checks", "Finding"),
+    "WritingPassage": ("postulo.core.writing_checks", "Passage"),
+    "WritingPlaceholder": ("postulo.core.writing_checks", "Placeholder"),
     # ----------------------------------------- companies, departments and the person (#328)
     # What a sync of contacts needs and could not reach: the companies and departments a
     # card is filed under, the vocabularies it maps onto, and the person's own card. All of

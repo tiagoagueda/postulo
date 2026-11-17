@@ -1753,6 +1753,9 @@
     -webkit-user-select: all;
     user-select: all;
   }
+  .\[start\:end\] {
+    start: end;
+  }
   .min-inline-0 {
     min-inline-size: 0px;
   }
@@ -9670,6 +9673,48 @@ html {
     forced-color-adjust: none;
     background-color: Highlight;
     color: HighlightText;
+  }
+}
+@layer components {
+  [data-writing-findings] mark {
+    border-radius: var(--radius-sm);
+    background-color: var(--color-amber-100);
+    padding-inline: calc(var(--spacing) * 0.5);
+    color: var(--color-amber-950);
+    text-decoration-line: underline;
+    text-decoration-color: var(--color-amber-700);
+    text-decoration-thickness: 2px;
+    text-underline-offset: 2px;
+    &:where([data-theme="dark"], [data-theme="dark"] *) {
+      background-color: var(--color-amber-900);
+    }
+    @media (prefers-color-scheme: dark) {
+      &:where(:root:not([data-theme="light"]), :root:not([data-theme="light"]) *) {
+        background-color: var(--color-amber-900);
+      }
+    }
+    &:where([data-theme="dark"], [data-theme="dark"] *) {
+      color: var(--color-amber-50);
+    }
+    @media (prefers-color-scheme: dark) {
+      &:where(:root:not([data-theme="light"]), :root:not([data-theme="light"]) *) {
+        color: var(--color-amber-50);
+      }
+    }
+    &:where([data-theme="dark"], [data-theme="dark"] *) {
+      text-decoration-color: var(--color-amber-300);
+    }
+    @media (prefers-color-scheme: dark) {
+      &:where(:root:not([data-theme="light"]), :root:not([data-theme="light"]) *) {
+        text-decoration-color: var(--color-amber-300);
+      }
+    }
+  }
+}
+@media (forced-colors: active) {
+  [data-writing-findings] mark {
+    background-color: Mark;
+    color: MarkText;
   }
 }
 @property --tw-translate-x {

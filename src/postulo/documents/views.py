@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 import logging
 from pathlib import Path
 
@@ -12,7 +13,7 @@ from django.db import models, transaction
 from django.http import Http404, HttpRequest, HttpResponse
 from django.middleware.csp import get_nonce
 from django.shortcuts import get_object_or_404, redirect, render
-from django.urls import reverse_lazy
+from django.urls import reverse, reverse_lazy
 from django.utils.csp import CSP
 from django.utils.decorators import method_decorator
 from django.utils.http import content_disposition_header
@@ -40,6 +41,7 @@ from postulo.jobs.views import UserFormKwargsMixin
 from postulo.resume import ordering, translating
 
 from . import (
+    checking,
     comparing,
     formats,
     kinds,
@@ -675,7 +677,113 @@ class CoverLetterDetailView(OwnedObjectMixin, DetailView):
         context["paper_form"] = PaperForm(
             theme=self.object.theme, kind=themes.Kind.LETTER, owner=self.object.owner
         )
+        # One choice of application for the whole page (#1258): the frame, the PDF and the
+        # list of what the writing checkers found are all drawn for it. While the chooser
+        # re-targeted only the frame, a list beside it would have been a second truth.
+        chosen = chosen_application(self.request)
+        context["chosen"] = chosen
+        draft = reverse("documents:letter_draft", args=[self.object.pk])
+        context["draft_src"] = f"{draft}?inline=1" + (
+            f"&application={chosen.pk}" if chosen is not None else ""
+        )
+        context["findings"] = checking.letter_findings(self.object, chosen, self.request.user)
+        # *Undo*, while the letter is still as the last replacement left it.
+        held = self.request.session.get(UNDO_KEY)
+        context["can_undo"] = bool(held) and checking.can_restore(self.object, held)
         return context
+
+
+#: Where the session keeps what the last replacement took out, for *Undo* (#1258). One
+#: record: a second replacement, on this letter or another, takes its place.
+UNDO_KEY = "writing_undo"
+
+#: The longest whole number a replacement's span is read as. A letter is not that long.
+_DIGITS = 9
+
+
+def _whole(value) -> int:
+    """A span's end as posted: a whole number, or ``-1`` for anything else, which no text has."""
+    text = str(value or "")
+    return int(text) if text.isascii() and text.isdigit() and len(text) <= _DIGITS else -1
+
+
+class CoverLetterApplyView(OwnedObjectMixin, View):
+    """Put one suggested replacement into a letter, or take the last one out again (#1258).
+
+    **One press, one replacement, by the person who read it.** The form carries where the
+    words are, what goes there instead and a fingerprint of the text the list was drawn
+    from; where the letter has changed since, nothing is replaced and the page says so. The
+    checker is not asked again: what goes in is what the button said. There is no *apply
+    all*.
+
+    The letter is the requester's own, narrowed before anything else is read, so somebody
+    else's is a 404; it is held for the write. *Undo* puts back what the session kept of the
+    last replacement and takes nothing from the request but the press.
+    """
+
+    http_method_names = ["post"]
+
+    def get_queryset(self):
+        return CoverLetter.objects.for_user(self.request.user)
+
+    def post(self, request: HttpRequest, pk: int) -> HttpResponse:
+        with transaction.atomic():
+            letter = get_object_or_404(self.get_queryset().select_for_update(), pk=pk)
+            back = safe_next(request, letter.get_absolute_url()).partition("#")[0]
+            if request.POST.get("undo"):
+                self.undo(request, letter)
+            else:
+                self.replace(request, letter)
+        return redirect(f"{back}#writing-findings")
+
+    def replace(self, request: HttpRequest, letter: CoverLetter) -> None:
+        try:
+            replacement = json.loads(request.POST.get("replacement", ""))
+        except ValueError:
+            replacement = None
+        try:
+            applied = checking.apply(
+                letter,
+                passage=request.POST.get("passage", ""),
+                start=_whole(request.POST.get("start")),
+                end=_whole(request.POST.get("end")),
+                replacement=replacement,
+                seen=request.POST.get("digest", ""),
+            )
+        except checking.Stale:
+            messages.warning(
+                request,
+                _(
+                    "The letter has changed since that list was drawn, so nothing was "
+                    "replaced. The list below is the one for the letter as it is now."
+                ),
+            )
+        except checking.Refused:
+            messages.error(request, _("That cannot be put into the letter, so nothing changed."))
+        else:
+            request.session[UNDO_KEY] = applied.as_record(letter)
+            messages.success(
+                request,
+                checking.replaced_sentence(
+                    applied.old,
+                    applied.new,
+                    rendering.document_language(letter),
+                    rendering.document_direction(letter),
+                    done=True,
+                ),
+                extra_tags="safe",
+            )
+
+    def undo(self, request: HttpRequest, letter: CoverLetter) -> None:
+        held = request.session.pop(UNDO_KEY, None)
+        try:
+            checking.restore(letter, held)
+        except (checking.Stale, checking.Refused):
+            messages.warning(
+                request, _("The letter has changed since, so there is nothing to put back.")
+            )
+        else:
+            messages.success(request, _("Put back as it was."))
 
 
 class CoverLetterCreateView(OwnedObjectMixin, UserFormKwargsMixin, OwnerFormMixin, CreateView):
@@ -1295,16 +1403,22 @@ class SendDocumentsView(OwnedObjectMixin, PDFErrorMixin, View):
         # in front of the person first, with the gaps marked, and the button says so. Where
         # there is not, nothing changes: an extra step everybody has to press through would
         # be read once and clicked past for ever after (#235).
+        #
+        # What is wrong is asked of the one list the letter's own page draws (#1258): the
+        # placeholder checks are a writing checker now, and a misspelt placeholder, which
+        # goes out as typed, puts the step here too. Only a problem said by a checker
+        # Postulo ships does: an installed plugin adds lines and never a step.
         letter = form.cleaned_data["cover_letter"]
-        gaps = rendering.unfilled_placeholders(letter, application) if letter else []
-        if gaps and not request.POST.get("confirmed"):
+        findings = checking.letter_findings(letter, application, request.user) if letter else None
+        if checking.blocking(findings) and not request.POST.get("confirmed"):
             return render(
                 request,
                 self.template_name,
                 {
                     "application": application,
                     "form": form,
-                    "gaps": gaps,
+                    "findings": findings,
+                    "letter": letter,
                     "letter_preview": rendering.letter_text(letter, application, mark_empty=True),
                 },
             )

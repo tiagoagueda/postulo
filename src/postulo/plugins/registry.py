@@ -43,6 +43,7 @@ from .base import (
     SUB_PLUGIN_KINDS,
     SUGGESTION_SOURCE_GROUP,
     TRANSPORT_GROUP,
+    WRITING_CHECKER_GROUP,
     BackupDestinationPlugin,
     ConnectedPlugin,
     FeaturePlugin,
@@ -57,6 +58,7 @@ from .base import (
     SubPluginEntry,
     SuggestionSourcePlugin,
     TransportPlugin,
+    WritingCheckerPlugin,
     sub_plugins_of,
 )
 from .builtin import BUILTIN_SOURCES
@@ -88,6 +90,9 @@ ENTRY_POINT_GROUP = "postulo.sources"
 #: A **register-adapter** plugin is open the same way: the company registers *Register lookup*
 #: may ask, one per country, which a package for another country may add to (#1021).
 #:
+#: A **writing-checker** plugin is open the same way (#1258): what reads a letter's own words
+#: and says what it noticed, which a package installed beside Postulo may add to.
+#:
 #: A **backup-destination** plugin is a transport's kind of thing for archives: instance
 #: plumbing that keeps the backups somewhere besides this disk, chosen by an administrator
 #: and owned by nobody, so that nobody's account leaving stops the copies (#325).
@@ -101,6 +106,7 @@ GROUPS = {
     "messaging-service": MESSAGING_SERVICE_GROUP,
     "register-adapter": REGISTER_ADAPTER_GROUP,
     "suggestion-source": SUGGESTION_SOURCE_GROUP,
+    "writing-checker": WRITING_CHECKER_GROUP,
     "backup-destination": BACKUP_DESTINATION_GROUP,
     **CONNECTED_KINDS,
 }
@@ -134,6 +140,7 @@ def _protocol_for(kind: str):
         "messaging-service": MessagingServicePlugin,
         "register-adapter": RegisterAdapterPlugin,
         "suggestion-source": SuggestionSourcePlugin,
+        "writing-checker": WritingCheckerPlugin,
         "backup-destination": BackupDestinationPlugin,
     }.get(kind, ConnectedPlugin)
 
