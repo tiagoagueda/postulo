@@ -6,6 +6,10 @@ All notable changes to Postulo are recorded here. The format follows
 
 ## [Unreleased]
 
+### ✨ Added
+
+- A theme from a plugin can say the languages and countries it suits, and the theme menu lists those first, under their own heading, for a document in that language or country; nothing is hidden or chosen for you, and a plugin can carry the new Documents category (#1255)
+
 ### 🐛 Fixed
 
 - A plugin can no longer take the place of one of Postulo's own document formats, such as Word, by registering it before Postulo has as the server starts; Postulo's own formats are now always listed before a plugin's (#1255)

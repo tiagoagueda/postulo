@@ -49,7 +49,7 @@ from __future__ import annotations
 
 import logging
 from collections.abc import Mapping, Sequence
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 
 from django.core.exceptions import ValidationError
 from django.db import models
@@ -133,9 +133,21 @@ class Theme:
     #: -- for the theme, or for one kind of a mapping -- is A4 portrait only, which is what
     #: every theme written before there was a choice was drawn on. `paper.declared` reads it.
     papers: Sequence[str] | Mapping[str, Sequence[str]] = ()
+    #: The languages the theme is made for, as BCP 47 tags (#1255): ``("de",)`` for a letter
+    #: laid out the German way, which covers ``de-AT`` and ``de-CH`` too. Empty, the default,
+    #: is any language. Only ever a suggestion: the picker lists a theme that suits a document
+    #: first, and never hides one that does not (`suits`).
+    languages: Sequence[str] = ()
+    #: The countries the theme is made for, as ISO 3166-1 alpha-2 codes (``("DE", "AT")``).
+    #: Empty, the default, is anywhere. A suggestion in the same way.
+    countries: Sequence[str] = ()
 
     def sets(self, kind: str) -> bool:
         return kind in self.templates
+
+    def declares_where(self) -> bool:
+        """Whether the theme says which languages or countries it suits."""
+        return bool(self.languages or self.countries)
 
 
 def _shipped(name: str, label) -> Theme:
@@ -191,8 +203,46 @@ def register(theme: Theme) -> bool:
     if not theme.name or len(theme.name) > MAX_NAME_LENGTH:
         logger.warning("Theme name %r does not fit the column and was ignored", theme.name)
         return False
-    _from_plugins[theme.name] = theme
+    _from_plugins[theme.name] = _where_said_cleanly(theme)
     return True
+
+
+def _as_codes(value) -> list[str]:
+    """A declaration as a list of strings: one code written alone is one code, not letters."""
+    if isinstance(value, str):
+        return [value]
+    try:
+        return [one for one in value if isinstance(one, str)]
+    except TypeError:
+        return []
+
+
+def _where_said_cleanly(theme: Theme) -> Theme:
+    """The theme with its languages and countries in canonical form (#1255).
+
+    A tag that is not shaped like one, or a code that is no country, is dropped with a
+    warning rather than refusing the theme: what it suits is a suggestion, and a theme that
+    sets a document is still worth offering. Only the theme's name is logged, never the
+    theme, whose label may be a translation that cannot be read yet.
+    """
+    from postulo.core import languages
+    from postulo.core.phones import COUNTRY_CODES
+
+    tags, codes = [], []
+    for one in _as_codes(theme.languages):
+        if languages.well_formed(one):
+            tags.append(languages.tag(one))
+        else:
+            logger.warning("Theme %r declares %r, which is no language tag", theme.name, one)
+    for one in _as_codes(theme.countries):
+        code = one.strip().upper()
+        if code in COUNTRY_CODES:
+            codes.append(code)
+        else:
+            logger.warning("Theme %r declares %r, which is no country code", theme.name, one)
+    return replace(
+        theme, languages=tuple(dict.fromkeys(tags)), countries=tuple(dict.fromkeys(codes))
+    )
 
 
 def forget(name: str = "") -> None:
@@ -225,7 +275,41 @@ def for_kind(kind: str) -> list[Theme]:
     return [theme for theme in all_themes() if theme.sets(kind)]
 
 
-def choices_for(kind: str) -> list[tuple[str, str]]:
+def _choice(theme: Theme) -> tuple[str, str]:
+    return (
+        theme.name,
+        str(
+            _("%(theme)s, from %(provider)s") % {"theme": theme.label, "provider": theme.provider}
+            if theme.provider
+            else theme.label
+        ),
+    )
+
+
+def suits(theme: Theme, language: str = "", country: str = "") -> bool:
+    """Whether ``theme`` says it was made for a document in ``language``, in ``country`` (#1255).
+
+    A theme that declares languages suits a document in one of them, a region or a variant
+    of one included (`languages.matches`: ``de`` suits ``de-AT``); one that declares
+    countries suits a document whose country is one of them; one that declares both needs
+    both. A theme that declares nothing suits nowhere in particular, which is not the same
+    as being unsuitable: it is simply not suggested.
+    """
+    from postulo.core import languages as tags
+
+    if not theme.declares_where():
+        return False
+    if theme.languages and not (language and tags.matches(language, theme.languages)):
+        return False
+    return not theme.countries or (country or "").upper() in theme.countries
+
+
+#: The two groups of the picker when some theme suits the document (#1255).
+SUGGESTED = _("Suggested for this document")
+OTHERS = _("Other themes")
+
+
+def choices_for(kind: str, *, language: str = "", country: str = "") -> list:
     """The same list, as form choices, each saying where it came from.
 
     A theme from a plugin is named with its provider — "Vellum, from Vellum Press" — and
@@ -233,19 +317,32 @@ def choices_for(kind: str) -> list[tuple[str, str]]:
     the only place a person meets a theme, and a theme is markup that runs when a document
     is exported: whose markup it is belongs beside the name rather than in a page somebody
     would have to go looking for.
+
+    **Given the document's language and country, the themes that suit it come first**
+    (#1255), under *Suggested for this document*, and every other one after them under
+    *Other themes*: a suggestion is never imposed, so nothing is left out and nothing is
+    chosen for the person. Where no theme suits -- and always where no installed theme says
+    what it suits -- the list is flat and in the order it always had, with no groups.
     """
-    return [
-        (
-            theme.name,
-            str(
-                _("%(theme)s, from %(provider)s")
-                % {"theme": theme.label, "provider": theme.provider}
-                if theme.provider
-                else theme.label
-            ),
-        )
-        for theme in for_kind(kind)
-    ]
+    offered = for_kind(kind)
+    suggested = [_choice(one) for one in offered if suits(one, language, country)]
+    if not suggested:
+        return [_choice(one) for one in offered]
+    others = [_choice(one) for one in offered if not suits(one, language, country)]
+    grouped = [(str(SUGGESTED), suggested)]
+    if others:
+        grouped.append((str(OTHERS), others))
+    return grouped
+
+
+def option_groups(choices: list) -> list[tuple[str, list[tuple[str, str]]]]:
+    """``choices_for``'s answer as groups, for a template that draws the `<select>` itself.
+
+    One group with no name where the list is flat, so the template draws no `<optgroup>`.
+    """
+    if choices and isinstance(choices[0][1], list | tuple):
+        return [(label, list(options)) for label, options in choices]
+    return [("", list(choices))]
 
 
 def label_for(name: str) -> str:

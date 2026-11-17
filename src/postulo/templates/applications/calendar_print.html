@@ -55,9 +55,7 @@
         <div class="field w-auto">
           <label for="print-theme">{% translate "Theme" %}</label>
           <select name="theme" id="print-theme">
-            {% for value, label in theme_choices %}
-              <option value="{{ value }}" {% if value == chosen_theme %}selected{% endif %}>{{ label }}</option>
-            {% endfor %}
+            <c-theme-options :groups="theme_groups" :chosen="chosen_theme" />
           </select>
         </div>
         <div class="field w-auto">

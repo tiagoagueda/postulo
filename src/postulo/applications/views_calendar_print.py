@@ -43,7 +43,7 @@ class CalendarPrintView(LoginRequiredMixin, View):
 
     def get(self, request: HttpRequest) -> HttpResponse:
         from postulo.documents import paper as papers
-        from postulo.documents import themes
+        from postulo.documents import theme_choice, themes
 
         asked = agenda.asked_for(request.GET)
         context = calendar_print.as_context(request.user, asked)
@@ -57,7 +57,13 @@ class CalendarPrintView(LoginRequiredMixin, View):
                 "print": context,
                 "query": query,
                 "back": f"{page}?{query}" if query else page,
-                "theme_choices": themes.choices_for(themes.Kind.CALENDAR),
+                "theme_groups": themes.option_groups(
+                    theme_choice.offered_for(
+                        themes.Kind.CALENDAR,
+                        request.user,
+                        calendar_print.language_for(request.user),
+                    )
+                ),
                 "chosen_theme": theme,
                 "language_choices": calendar_print.offered_languages(),
                 "chosen_language": calendar_print.language_for(request.user),

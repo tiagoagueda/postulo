@@ -1,0 +1,7 @@
+<c-vars groups chosen="" />
+{% comment %} The options of a theme picker a page draws itself (#1255): `<select name="theme" …><c-theme-options
+   :groups="theme_groups" :chosen="chosen_theme" /></select>`, with `theme_groups` from
+   `themes.option_groups`. A group with no name is drawn without an `<optgroup>`, which is the
+   whole list wherever no installed theme says what it suits. {% endcomment %}
+{% for group, options in groups %}{% if group %}<optgroup label="{{ group }}">{% endif %}{% for value, label in options %}
+  <option value="{{ value }}"{% if value == chosen %} selected{% endif %}>{{ label }}</option>{% endfor %}{% if group %}</optgroup>{% endif %}{% endfor %}
