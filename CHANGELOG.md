@@ -6,6 +6,10 @@ All notable changes to Postulo are recorded here. The format follows
 
 ## [Unreleased]
 
+### 🐛 Fixed
+
+- A plugin can no longer take the place of one of Postulo's own document formats, such as Word, by registering it before Postulo has as the server starts; Postulo's own formats are now always listed before a plugin's (#1255)
+
 ## [0.5.5] — 2026-11-16
 
 ### ✨ Added
