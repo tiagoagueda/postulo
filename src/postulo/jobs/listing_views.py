@@ -138,6 +138,10 @@ class ListingListView(PageOrFragmentMixin, OwnedObjectMixin, ListView):
         # Counted on its own: the heading must not say twenty over a backlog of forty (#380).
         context["pending_count"] = waiting.count()
         context["discard_reasons"] = DiscardReason.choices
+        # *Search a job service*, while Listing search and one service are on for them (#1253).
+        from . import listing_search
+
+        context["can_search_services"] = bool(listing_search.offered_to(self.request.user))
         context["table"] = self.table
         context["page_sizes"] = tables.PAGE_SIZES
         return context

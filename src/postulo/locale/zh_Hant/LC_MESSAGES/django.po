@@ -1379,25 +1379,40 @@ msgstr "%(scheme)s：這不是常見的格式。"
 msgid "%(sent)s, %(failed)s; each document says which."
 msgstr "%(sent)s，%(failed)s；每份文件會說明是哪一種。"
 
-#: src/postulo/resume/lookups.py
+#: src/postulo/jobs/listing_search.py src/postulo/resume/lookups.py
 #, python-format
 msgid "%(service)s answered %(status)s."
 msgstr "%(service)s 回應了 %(status)s。"
 
-#: src/postulo/resume/lookups.py
+#: src/postulo/jobs/listing_search.py src/postulo/resume/lookups.py
 #, python-format
 msgid "%(service)s asked for fewer requests. Try again later."
 msgstr "%(service)s 要求減少請求次數。請稍後再試。"
 
-#: src/postulo/resume/lookups.py
+#: src/postulo/jobs/listing_search.py src/postulo/resume/lookups.py
 #, python-format
 msgid "%(service)s could not be reached."
 msgstr "無法連線到 %(service)s。"
+
+#: src/postulo/jobs/listing_search.py
+#, python-format
+msgid "%(service)s did not accept that search."
+msgstr ""
+
+#: src/postulo/templates/jobs/listing_search.html
+#, python-format
+msgid "%(service)s does not search by %(criteria)s, so that was not sent."
+msgstr ""
 
 #: src/postulo/resume/lookups.py
 #, python-format
 msgid "%(service)s has no record in a form Postulo reads."
 msgstr "%(service)s 沒有 Postulo 能讀取的格式的紀錄。"
+
+#: src/postulo/jobs/listing_search.py
+#, python-format
+msgid "%(service)s has nothing at the address it was asked at."
+msgstr ""
 
 #: src/postulo/core/web_links.py src/postulo/jobs/surface.py
 #, python-format
@@ -1409,6 +1424,11 @@ msgstr "%(service)s 已被另一列使用。"
 msgid "%(service)s knows no such identifier."
 msgstr "%(service)s 找不到此識別碼。"
 
+#: src/postulo/jobs/listing_search.py
+#, python-format
+msgid "%(service)s no longer has that advert."
+msgstr ""
+
 #: src/postulo/resume/lookups.py
 #, python-format
 msgid "%(service)s redirected too many times."
@@ -1419,7 +1439,7 @@ msgstr "%(service)s 重新導向的次數過多。"
 msgid "%(service)s refused the look-ups (%(status)s). They are stopped."
 msgstr "%(service)s 拒絕了查詢（%(status)s），查詢已停止。"
 
-#: src/postulo/resume/lookups.py
+#: src/postulo/jobs/listing_search.py src/postulo/resume/lookups.py
 #, python-format
 msgid "%(service)s sent the request somewhere else."
 msgstr "%(service)s 將請求轉到了別處。"
@@ -1429,10 +1449,20 @@ msgstr "%(service)s 將請求轉到了別處。"
 msgid "%(service)s sent the request to an address Postulo does not dial."
 msgstr "%(service)s 將請求轉到了 Postulo 不會連線的網址。"
 
-#: src/postulo/resume/lookups.py
+#: src/postulo/jobs/listing_search.py src/postulo/resume/lookups.py
 #, python-format
 msgid "%(service)s took too long to answer."
 msgstr "%(service)s 回應逾時。"
+
+#: src/postulo/jobs/listing_search.py
+#, python-format
+msgid "%(service)s's answer could not be read."
+msgstr ""
+
+#: src/postulo/jobs/listing_search.py
+#, python-format
+msgid "%(service)s's answer was larger than a page of adverts should be."
+msgstr ""
 
 #: src/postulo/resume/views.py
 #, python-format
@@ -1443,6 +1473,11 @@ msgstr "%(service)s（透過 doi.org）沒有為空白的欄位提供任何內�
 #, python-format
 msgid "%(share)s%%"
 msgstr "%(share)s%%"
+
+#: src/postulo/templates/jobs/listing_search.html
+#, python-format
+msgid "%(source)s: asked at %(hosts)s. It is sent the words, the place and the filters you search for, or an advert's number when you press Review, and nothing about you."
+msgstr ""
 
 #: src/postulo/applications/agenda.py
 #, python-format
@@ -2216,6 +2251,10 @@ msgstr "標題、標題下方的一句話，接著是卡片的主要內容。"
 msgid "a job title"
 msgstr "職稱"
 
+#: src/postulo/jobs/search_views.py
+msgid "A job title, a skill or an employer, as you would type it on the service."
+msgstr ""
+
 #: src/postulo/documents/integrity.py
 msgid "a JPEG picture"
 msgstr "JPEG 圖片"
@@ -2325,6 +2364,10 @@ msgstr "職缺是您注意到、但尚未做任何決定的徵才啟事。<em>�
 #: src/postulo/templates/core/import_csv.html
 msgid "A listing keeps its deadline, which the closing-soon notice then watches, and its tags are written into its description."
 msgstr "職缺會保留其截止日期，即將截止的通知會據此提醒；其標籤則會寫入職缺說明中。"
+
+#: src/postulo/templates/jobs/listing_search.html
+msgid "A listing like it"
+msgstr ""
 
 #: src/postulo/templates/jobs/capture_review.html
 msgid "A listing with this title at this company exists; a board that mints a fresh address per visit may be showing you the same advert."
@@ -2782,6 +2825,10 @@ msgstr "權杖讓 Postulo 以外的工具代表您執行動作——例如瀏覽
 #: src/postulo/templates/help/postal_addresses.html
 msgid "A town and a country alone are kept as a place. Nothing checks that an address exists, and a country Postulo has no rules for is free-form."
 msgstr "只有城市與國家時，會保留為一個地點。系統不會檢查地址是否存在；對於 Postulo 沒有規則的國家，地址格式不受限制。"
+
+#: src/postulo/jobs/search_views.py
+msgid "A town or a region."
+msgstr ""
 
 #: src/postulo/resume/candidate.py
 msgid "A translation"
@@ -3304,6 +3351,10 @@ msgstr "廣告"
 #: src/postulo/jobs/industries.py
 msgid "Advertising and marketing"
 msgstr "廣告與行銷"
+
+#: src/postulo/templates/jobs/listing_search.html
+msgid "Adverts found"
+msgstr ""
 
 #: src/postulo/applications/models.py
 msgid "adviser"
@@ -4244,9 +4295,17 @@ msgstr "亞洲"
 msgid "Asked"
 msgstr "已詢問"
 
+#: src/postulo/jobs/search_views.py
+msgid "Asked for the advert. Check it before it becomes a listing."
+msgstr ""
+
 #: src/postulo/templates/server/record_of_processing.html
 msgid "Asked only when somebody presses for it, one company at a time. Each is sent what is listed and nothing about the person asking."
 msgstr "只有在有人要求時才會查詢，每次一家公司。每個登記機構只會收到列出的內容，不會收到任何關於查詢者的資訊。"
+
+#: src/postulo/templates/server/record_of_processing.html
+msgid "Asked only when somebody presses Search or Review. Each is sent what is listed and nothing about the person asking; nothing it answers is kept unless the person saves an advert."
+msgstr ""
 
 #: src/postulo/templates/connections/pairing.html
 #, python-format
@@ -4273,6 +4332,10 @@ msgstr "您目前或曾經所屬的協會、學會與社團。"
 #, fuzzy
 msgid "at"
 msgstr "於"
+
+#: src/postulo/jobs/search_views.py
+msgid "At any time"
+msgstr ""
 
 #: src/postulo/templates/settings/appearance.html
 msgid "At each status"
@@ -4521,6 +4584,7 @@ msgstr "返回「您的個人資料」"
 
 #: src/postulo/templates/jobs/capture_decided.html
 #: src/postulo/templates/jobs/capture_page.html
+#: src/postulo/templates/jobs/listing_search.html
 msgid "Back to your listings"
 msgstr "返回您的職缺"
 
@@ -9423,6 +9487,12 @@ msgstr "在檔案中出現兩次"
 msgid "In the instance's time zone."
 msgstr "以站台的時區為準。"
 
+#: src/postulo/jobs/search_views.py
+#, python-format
+msgid "In the last day"
+msgid_plural "In the last %(count)d days"
+msgstr[0] ""
+
 #: src/postulo/core/search.py
 #, python-format
 msgid "in the motivation letter rendered on %(when)s"
@@ -9460,6 +9530,10 @@ msgstr "在您於 %(when)s 寄給 %(company)s 的報告中"
 #: src/postulo/templates/documents/rendered_compare.html
 msgid "In this version, and not in the one before"
 msgstr "只在此版本中，不在前一版中"
+
+#: src/postulo/templates/jobs/listing_search.html
+msgid "In your listings"
+msgstr ""
 
 #: src/postulo/applications/forms.py
 msgid "In your time zone."
@@ -10051,6 +10125,10 @@ msgstr "其街道"
 msgid "Its street will be looked up with %(service)s shortly."
 msgstr "稍後將透過 %(service)s 查詢其街道。"
 
+#: src/postulo/templates/jobs/listing_search.html
+msgid "Its terms of use"
+msgstr ""
+
 #: src/postulo/core/models.py
 msgid "its town"
 msgstr "其城鎮"
@@ -10075,6 +10153,18 @@ msgstr "求職報告"
 #, python-format
 msgid "Job search report · %(period)s"
 msgstr "求職報告 · %(period)s"
+
+#: src/postulo/jobs/search_views.py
+msgid "Job service"
+msgstr ""
+
+#: src/postulo/plugins/kinds.py
+msgid "Job services"
+msgstr ""
+
+#: src/postulo/templates/server/record_of_processing.html
+msgid "Job services it may search"
+msgstr ""
 
 #: src/postulo/applications/forms.py src/postulo/jobs/forms.py
 #: src/postulo/jobs/models.py
@@ -10760,6 +10850,10 @@ msgstr "第 8 級"
 #, fuzzy
 msgid "Licence"
 msgstr "授權"
+
+#: src/postulo/templates/jobs/listing_search.html
+msgid "Licence of its adverts:"
+msgstr ""
 
 #: src/postulo/accounts/models.py src/postulo/core/context_processors.py
 msgid "Light"
@@ -11913,6 +12007,7 @@ msgid "Next month"
 msgstr "下個月"
 
 #: src/postulo/templates/cotton/document_viewer.html
+#: src/postulo/templates/jobs/listing_search.html
 msgid "Next page"
 msgstr "下一頁"
 
@@ -12948,6 +13043,10 @@ msgstr "在您輸入新密碼之前，不會將任何密碼傳送到伺服器。
 msgid "Nothing kept yet. Keep what you typed into the employer's form, so you can see what they were told."
 msgstr "尚未保留任何內容。保留您在雇主表單中輸入的內容，以便查看他們被告知了什麼。"
 
+#: src/postulo/templates/jobs/listing_search.html
+msgid "Nothing matches that search."
+msgstr ""
+
 #: src/postulo/templates/applications/application_list.html
 #: src/postulo/templates/jobs/company_list.html
 #: src/postulo/templates/jobs/listing_list.html
@@ -13498,6 +13597,12 @@ msgstr "每行一項成就。"
 msgid "One address: the person you met, or your contact for this application, or the company's own. It is needed to send, and noted on the timeline when it is given."
 msgstr "一個地址：您見過的人，或您在這筆應徵中的聯絡人，或公司本身的地址。寄送時需要填寫，填寫後會記入時間軸。"
 
+#: src/postulo/templates/jobs/listing_search.html
+#, python-format
+msgid "One advert found"
+msgid_plural "%(counter)s adverts found"
+msgstr[0] ""
+
 #: src/postulo/templates/applications/report.html
 #, python-format
 msgid "One application sent in this period."
@@ -13935,6 +14040,10 @@ msgstr "或新增聯絡人"
 #, fuzzy
 msgid "Or say only this"
 msgstr "或只寫這段"
+
+#: src/postulo/templates/jobs/capture_form.html
+msgid "Or search a job service for adverts"
+msgstr ""
 
 #: src/postulo/templates/jobs/move_owner.html
 msgid "Or to a person"
@@ -14517,7 +14626,7 @@ msgstr "固定為 %(version)s"
 msgid "Pinned to a version"
 msgstr "固定到某個版本"
 
-#: src/postulo/core/models.py
+#: src/postulo/core/models.py src/postulo/jobs/search_views.py
 msgid "Place"
 msgstr "地點"
 
@@ -15330,6 +15439,15 @@ msgstr "著作"
 msgid "Publications in the file"
 msgstr "檔案中的著作"
 
+#: src/postulo/jobs/search_views.py
+msgid "Published"
+msgstr ""
+
+#: src/postulo/templates/jobs/listing_search.html
+#, python-format
+msgid "Published %(when)s"
+msgstr ""
+
 #: src/postulo/resume/models.py
 msgid "published in"
 msgstr "刊登於"
@@ -16036,6 +16154,14 @@ msgstr "遠端"
 msgid "remote address"
 msgstr "遠端位址"
 
+#: src/postulo/jobs/search_views.py
+msgid "Remote work only"
+msgstr ""
+
+#: src/postulo/jobs/search_views.py
+msgid "remote work only"
+msgstr ""
+
 #: src/postulo/templates/accounts/profile.html
 #: src/postulo/templates/connections/confirm_delete.html
 #: src/postulo/templates/connections/list.html
@@ -16242,6 +16368,7 @@ msgstr "反向代理伺服器"
 
 #: src/postulo/templates/jobs/capture_list.html
 #: src/postulo/templates/jobs/listing_list.html
+#: src/postulo/templates/jobs/listing_search.html
 msgid "Review"
 msgstr "審閱"
 
@@ -16551,6 +16678,14 @@ msgstr "請說明這是什麼識別碼。"
 msgid "Say what this number is."
 msgstr "請說明這是什麼號碼。"
 
+#: src/postulo/jobs/listing_search.py
+msgid "Say what to search for."
+msgstr ""
+
+#: src/postulo/jobs/search_views.py
+msgid "Say what to search for: some words, or a place."
+msgstr ""
+
 #: src/postulo/applications/forms.py
 msgid "Say which currency the amount is in."
 msgstr "請說明金額使用的幣別。"
@@ -16631,9 +16766,15 @@ msgstr "Postulo 未檢查印章"
 #: src/postulo/templates/core/search.html
 #: src/postulo/templates/cotton/site_search.html
 #: src/postulo/templates/jobs/industry_list.html
+#: src/postulo/templates/jobs/listing_search.html
 #: src/postulo/templates/resume/answer_list.html
 msgid "Search"
 msgstr "搜尋"
+
+#: src/postulo/templates/jobs/listing_list.html
+#: src/postulo/templates/jobs/listing_search.html
+msgid "Search a job service"
+msgstr ""
 
 #: src/postulo/applications/tables.py
 msgid "Search applications"
@@ -16663,6 +16804,10 @@ msgstr "搜尋信函"
 #: src/postulo/jobs/tables.py
 msgid "Search listings"
 msgstr "搜尋職缺"
+
+#: src/postulo/templates/jobs/listing_search.html
+msgid "Search the adverts a job service publishes, and review the one you want before it becomes a listing. Nothing is asked until you press Search."
+msgstr ""
 
 #: src/postulo/applications/views.py
 msgid "Search the calendar"
@@ -17035,6 +17180,10 @@ msgstr "已結束"
 #: src/postulo/templates/server/design.html
 msgid "Seven colours, each tuned to 3:1 against the card in both themes."
 msgstr "七種色彩，每一種在兩種主題下與卡片的對比度都調整為 3:1。"
+
+#: src/postulo/jobs/search_views.py
+msgid "Several countries"
+msgstr ""
 
 #: src/postulo/jobs/industries.py
 msgid "Sewerage"
@@ -18407,6 +18556,10 @@ msgstr "該網址重新導向太多次。"
 msgid "That address returned %(kind)s rather than a web page."
 msgstr "該網址傳回的是 %(kind)s，而不是網頁。"
 
+#: src/postulo/jobs/listing_search.py
+msgid "That advert cannot be asked of this service."
+msgstr ""
+
 #: src/postulo/documents/slow.py
 msgid "That application is no longer here."
 msgstr "該應徵已不存在。"
@@ -18835,6 +18988,10 @@ msgstr "那不是 Wikidata 項目的識別碼。"
 msgid "That is not an address Postulo can use."
 msgstr "Postulo 無法使用此地址。"
 
+#: src/postulo/jobs/listing_search.py
+msgid "That is not an advert this service could have named."
+msgstr ""
+
 #: src/postulo/core/offsite.py
 msgid "That is not an age recipient. It starts age1 and is 62 characters long."
 msgstr "這不是 age 接收者。它以 age1 開頭，長度為 62 個字元。"
@@ -18938,6 +19095,10 @@ msgstr "此項目已與 %(record)s 配對。請先取消配對。"
 #: src/postulo/plugins/pairing.py
 msgid "That item is no longer on the other side."
 msgstr "此項目已不在另一端。"
+
+#: src/postulo/jobs/search_views.py
+msgid "That job service is not offered here."
+msgstr ""
 
 #: src/postulo/templates/account/recovery_unusable.html
 msgid "That link cannot be used"
@@ -19061,6 +19222,14 @@ msgstr "該回覆並非來自 Postulo 發出的請求。"
 #: src/postulo/core/views_access.py
 msgid "That rule existed, and is changed."
 msgstr "該規則已存在，現已變更。"
+
+#: src/postulo/jobs/listing_search.py
+msgid "That search cannot be asked of this service."
+msgstr ""
+
+#: src/postulo/jobs/listing_search.py
+msgid "That search is longer than a service can be asked."
+msgstr ""
 
 #: src/postulo/applications/views.py
 msgid "That suggestion has already been answered."
@@ -20224,6 +20393,10 @@ msgstr "您聯絡資訊中的照片，置於您的姓名旁。PDF 與預覽中�
 msgid "The picture that stands for you on these pages: one you upload, your Gravatar, or your initials."
 msgstr "在這些頁面上代表您的圖片：您上傳的圖片、您的 Gravatar，或您的姓名縮寫。"
 
+#: src/postulo/jobs/search_views.py
+msgid "the place"
+msgstr ""
+
 #: src/postulo/accounts/models.py
 msgid "The plugin whose calendar entries set the date, such as a monthly declaration."
 msgstr "由哪個外掛程式的行事曆項目來決定日期，例如每月申報。"
@@ -20361,6 +20534,10 @@ msgstr "要求的格式不符合此呼叫所接受的格式。"
 msgid "The rest of the file is still worth importing. What is listed here is not, and you can add it by hand afterwards."
 msgstr "檔案的其餘部分仍值得匯入。這裡列出的部分無法匯入，您之後可以手動新增。"
 
+#: src/postulo/templates/jobs/listing_search.html
+msgid "The results are shown and not kept. An advert is kept only once you review it and save it."
+msgstr ""
+
 #: src/postulo/templates/applications/application_intake.html
 #: src/postulo/templates/jobs/capture_review.html
 #: src/postulo/templates/jobs/listing_form.html
@@ -20463,6 +20640,14 @@ msgstr "伺服器拒絕了這些認證資訊：%(detail)s"
 #: src/postulo/core/server_forms.py
 msgid "The server that accepts the mail — its name, not an address."
 msgstr "接收郵件的伺服器——請填寫其名稱，而非位址。"
+
+#: src/postulo/jobs/listing_search.py
+msgid "The service's address is not one it declared."
+msgstr ""
+
+#: src/postulo/jobs/listing_search.py
+msgid "The service's answer could not be read."
+msgstr ""
 
 #: src/postulo/core/server_forms.py
 msgid "The service's base address. Left empty with Nominatim, OpenStreetMap's public instance is used: https://nominatim.openstreetmap.org. For your own: for example https://photon.example.org"
@@ -20719,6 +20904,10 @@ msgstr "無法讀取此 wheel 的中繼資料；它可能已損毀。"
 msgid "The wheel's metadata is far larger than any plugin's."
 msgstr "此 wheel 的中繼資料遠大於任何外掛程式的中繼資料。"
 
+#: src/postulo/jobs/search_views.py
+msgid "the words"
+msgstr ""
+
 #: src/postulo/templates/documents/rendered_compare.html
 msgid "The words are the same in both. If the two PDFs look different, what changed is how they are set: the theme, or the layout."
 msgstr "兩份的文字相同。如果兩份 PDF 看起來不同，改變的是排版方式：主題或版面配置。"
@@ -20726,6 +20915,10 @@ msgstr "兩份的文字相同。如果兩份 PDF 看起來不同，改變的是�
 #: src/postulo/templates/documents/letter_detail.html
 msgid "The words without the layout, in this letter's language. None of these is filed as a version you sent."
 msgstr "不含版面配置的文字，以此信函的語言呈現。這些都不會歸檔為您寄出的版本。"
+
+#: src/postulo/jobs/listing_search.py
+msgid "the words, the place and the filters searched for"
+msgstr ""
 
 #: src/postulo/core/errands.py
 msgid "The work was interrupted before it finished. Please try again."
@@ -22309,6 +22502,7 @@ msgid "Waiting after this one: %(count)s."
 msgstr "此項之後還有 %(count)s 個等候中。"
 
 #: src/postulo/applications/models.py src/postulo/jobs/models.py
+#: src/postulo/templates/jobs/listing_search.html
 msgid "Waiting for review"
 msgstr "等候審閱"
 
@@ -23034,6 +23228,10 @@ msgstr "它加入您的職缺的時間。"
 msgid "When it happened, which is not always when you write it down."
 msgstr "事情發生的時間，不一定是您記下的時間。"
 
+#: src/postulo/jobs/search_views.py
+msgid "when it was published"
+msgstr ""
+
 #: src/postulo/jobs/forms.py
 msgid "When the employer put it up, if the posting says. Empty means unknown."
 msgstr "雇主刊登的日期（若徵才啟事有載明）。空白表示未知。"
@@ -23594,6 +23792,10 @@ msgstr "木製品"
 #: src/postulo/documents/formats.py
 msgid "Word document"
 msgstr "Word 文件"
+
+#: src/postulo/jobs/search_views.py
+msgid "Words"
+msgstr ""
 
 #: src/postulo/accounts/forms.py
 msgid "Words and chevrons"

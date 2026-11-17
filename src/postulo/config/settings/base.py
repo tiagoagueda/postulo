@@ -512,6 +512,10 @@ POSTULO_LOOKUP_RATE = read("POSTULO_LOOKUP_RATE")
 # per address, Czechia's blocks past 500 a minute). Thirty an hour is a morning of tidying
 # companies, and nowhere near what a register would notice.
 POSTULO_REGISTER_LOOKUP_RATE = read("POSTULO_REGISTER_LOOKUP_RATE")
+# *Search* and *Review* on a job service, per account (#1253): one request each to a public
+# employment service, which asks for fair use and answers too many with a refusal. Sixty an
+# hour is an evening's searching, a page at a time.
+POSTULO_LISTING_SEARCH_RATE = read("POSTULO_LISTING_SEARCH_RATE")
 # Per token rather than per account, so revoking one revokes its allowance with it.
 POSTULO_API_RATE = read("POSTULO_API_RATE")
 # What every token of one account may do together (#799), since tokens are free to make.

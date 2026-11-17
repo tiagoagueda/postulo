@@ -239,6 +239,37 @@ personal instance is close to saying who, so the rules are these:
 `tests/test_register_lookup.py` and the register tests in `tests/security/test_outbound.py`
 hold these.
 
+**A listing search tells a job service what somebody is looking for (#1253).** With the
+*Listing search* plugin on, a person can search a job service from *Listings* and press
+*Review* on an advert it found, and the server asks that service. What leaves the instance is
+the words, the place and the filters searched for, or the service's own number for one advert,
+with Postulo's user agent: no account, no cookie, nothing about the person. The service still
+learns from the instance's address that somebody there searched for that, so the rules are
+those of a register lookup:
+
+- **Off until an administrator switches it on**, by `plugins` migration 0018, and **a switch
+  per service** under it; the page answers 404 and the listings page draws no button until
+  both are on for the person.
+- **A press, one request, bounded.** Never on a page load, a schedule or an import. Each press
+  of *Search*, of *Next page* and of *Review* spends the account's `POSTULO_LISTING_SEARCH_RATE`
+  (60 an hour by default) before the request; a 429 is said and never retried.
+- **Only the hosts a search declares, and only Postulo writes the query.** A search names an
+  `https` address on one of its hosts, with no query of its own, and hands over its parameters
+  as a mapping of names to plain values; Postulo encodes them, so nothing typed can reach the
+  path, the host or another parameter. The request goes through the public-only client, with a
+  deadline, two megabytes at most and no redirects. A package's search
+  (`postulo.listing_searches`) cannot take a key Postulo's own holds.
+- **What comes back is a stranger's text, and none of it is stored.** Every hit is validated
+  as a capture is, its strings cleaned of control and direction characters and cut to their
+  columns. The results are drawn and forgotten; *Review* asks the service again by the
+  advert's number, held to a bounded shape, and the capture is made from that answer for the
+  person who pressed, never from what the form sent.
+- **The record of processing names each service** somebody can reach, with its hosts, what it
+  is sent and its licence.
+
+`tests/test_listing_search.py` and the listing-search tests in `tests/security/test_outbound.py`
+hold these.
+
 ## What is out of scope
 
 - The operator's own machine. Root on the host reads everything; that is true of any

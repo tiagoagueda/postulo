@@ -31,7 +31,7 @@ from postulo.core.htmlstrings import sentence
 from postulo.core.mixins import ConfirmDeleteMixin, OwnedObjectMixin
 from postulo.plugins.policy import plugins_for
 
-from . import remembered
+from . import listing_search, remembered
 from .known import known
 from .models import Capture, CaptureStatus
 
@@ -95,6 +95,8 @@ class CaptureCreateView(OwnedObjectMixin, View):
                 "sources": plugins_for(request.user, "source"),
                 "known": known_,
                 "ignore_robots": site.capture_ignore_robots(),
+                # The other way in, where it is offered: searching a job service (#1253).
+                "can_search_services": bool(listing_search.offered_to(request.user)),
             },
         )
 

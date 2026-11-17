@@ -6,6 +6,10 @@ All notable changes to Postulo are recorded here. The format follows
 
 ## [Unreleased]
 
+### ✨ Added
+
+- Plugins can describe a job service searched by criteria (the listing-search kind); Postulo makes the request on a press, shows the results without keeping them and sends a chosen advert to review; off until an administrator switches it on, with a switch per service (#1253)
+
 ## [0.5.5] — 2026-11-16
 
 ### ✨ Added

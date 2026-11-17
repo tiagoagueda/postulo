@@ -1468,25 +1468,40 @@ msgstr "%(scheme)s : ce n'est pas la forme habituelle."
 msgid "%(sent)s, %(failed)s; each document says which."
 msgstr "%(sent)s, %(failed)s; chaque document indique ce qu'il en est."
 
-#: src/postulo/resume/lookups.py
+#: src/postulo/jobs/listing_search.py src/postulo/resume/lookups.py
 #, python-format
 msgid "%(service)s answered %(status)s."
 msgstr "%(service)s a répondu %(status)s."
 
-#: src/postulo/resume/lookups.py
+#: src/postulo/jobs/listing_search.py src/postulo/resume/lookups.py
 #, python-format
 msgid "%(service)s asked for fewer requests. Try again later."
 msgstr "%(service)s a demandé moins de requêtes. Réessayez plus tard."
 
-#: src/postulo/resume/lookups.py
+#: src/postulo/jobs/listing_search.py src/postulo/resume/lookups.py
 #, python-format
 msgid "%(service)s could not be reached."
 msgstr "Impossible de joindre %(service)s."
+
+#: src/postulo/jobs/listing_search.py
+#, python-format
+msgid "%(service)s did not accept that search."
+msgstr ""
+
+#: src/postulo/templates/jobs/listing_search.html
+#, python-format
+msgid "%(service)s does not search by %(criteria)s, so that was not sent."
+msgstr ""
 
 #: src/postulo/resume/lookups.py
 #, python-format
 msgid "%(service)s has no record in a form Postulo reads."
 msgstr "%(service)s n'a aucune notice dans un format que Postulo sait lire."
+
+#: src/postulo/jobs/listing_search.py
+#, python-format
+msgid "%(service)s has nothing at the address it was asked at."
+msgstr ""
 
 #: src/postulo/core/web_links.py src/postulo/jobs/surface.py
 #, python-format
@@ -1498,6 +1513,11 @@ msgstr "%(service)s est déjà utilisé par une autre ligne."
 msgid "%(service)s knows no such identifier."
 msgstr "%(service)s ne connaît pas cet identifiant."
 
+#: src/postulo/jobs/listing_search.py
+#, python-format
+msgid "%(service)s no longer has that advert."
+msgstr ""
+
 #: src/postulo/resume/lookups.py
 #, python-format
 msgid "%(service)s redirected too many times."
@@ -1508,7 +1528,7 @@ msgstr "%(service)s a effectué trop de redirections."
 msgid "%(service)s refused the look-ups (%(status)s). They are stopped."
 msgstr "%(service)s a refusé les requêtes de géocodage (%(status)s). Elles sont arrêtées."
 
-#: src/postulo/resume/lookups.py
+#: src/postulo/jobs/listing_search.py src/postulo/resume/lookups.py
 #, python-format
 msgid "%(service)s sent the request somewhere else."
 msgstr "%(service)s a redirigé la requête ailleurs."
@@ -1518,10 +1538,20 @@ msgstr "%(service)s a redirigé la requête ailleurs."
 msgid "%(service)s sent the request to an address Postulo does not dial."
 msgstr "%(service)s a redirigé la requête vers une adresse que Postulo ne contacte pas."
 
-#: src/postulo/resume/lookups.py
+#: src/postulo/jobs/listing_search.py src/postulo/resume/lookups.py
 #, python-format
 msgid "%(service)s took too long to answer."
 msgstr "%(service)s a mis trop de temps à répondre."
+
+#: src/postulo/jobs/listing_search.py
+#, python-format
+msgid "%(service)s's answer could not be read."
+msgstr ""
+
+#: src/postulo/jobs/listing_search.py
+#, python-format
+msgid "%(service)s's answer was larger than a page of adverts should be."
+msgstr ""
 
 #: src/postulo/resume/views.py
 #, python-format
@@ -1532,6 +1562,11 @@ msgstr "%(service)s, via doi.org, n'avait rien pour les champs restés vides."
 #, python-format
 msgid "%(share)s%%"
 msgstr "%(share)s %%"
+
+#: src/postulo/templates/jobs/listing_search.html
+#, python-format
+msgid "%(source)s: asked at %(hosts)s. It is sent the words, the place and the filters you search for, or an advert's number when you press Review, and nothing about you."
+msgstr ""
 
 #: src/postulo/applications/agenda.py
 #, python-format
@@ -2320,6 +2355,10 @@ msgstr "Un titre, la phrase en dessous, puis ce à quoi sert la carte."
 msgid "a job title"
 msgstr "un intitulé de poste"
 
+#: src/postulo/jobs/search_views.py
+msgid "A job title, a skill or an employer, as you would type it on the service."
+msgstr ""
+
 #: src/postulo/documents/integrity.py
 msgid "a JPEG picture"
 msgstr "une image JPEG"
@@ -2428,6 +2467,10 @@ msgstr "Une annonce est un poste publié que vous avez repéré, avant d'avoir r
 #: src/postulo/templates/core/import_csv.html
 msgid "A listing keeps its deadline, which the closing-soon notice then watches, and its tags are written into its description."
 msgstr "Une annonce conserve sa date limite, que surveille ensuite l'alerte de clôture proche, et ses étiquettes sont ajoutées à sa description."
+
+#: src/postulo/templates/jobs/listing_search.html
+msgid "A listing like it"
+msgstr ""
 
 #: src/postulo/templates/jobs/capture_review.html
 msgid "A listing with this title at this company exists; a board that mints a fresh address per visit may be showing you the same advert."
@@ -2883,6 +2926,10 @@ msgstr "Un jeton permet à un outil extérieur à Postulo d'agir pour vous — u
 #: src/postulo/templates/help/postal_addresses.html
 msgid "A town and a country alone are kept as a place. Nothing checks that an address exists, and a country Postulo has no rules for is free-form."
 msgstr "Une ville et un pays seuls sont conservés comme un lieu. Rien ne vérifie qu'une adresse existe, et l'adresse d'un pays pour lequel Postulo n'a pas de règles s'écrit librement."
+
+#: src/postulo/jobs/search_views.py
+msgid "A town or a region."
+msgstr ""
 
 #: src/postulo/resume/candidate.py
 msgid "A translation"
@@ -3404,6 +3451,10 @@ msgstr "Publicité"
 #: src/postulo/jobs/industries.py
 msgid "Advertising and marketing"
 msgstr "Publicité et marketing"
+
+#: src/postulo/templates/jobs/listing_search.html
+msgid "Adverts found"
+msgstr ""
 
 #: src/postulo/applications/models.py
 msgid "adviser"
@@ -4334,9 +4385,17 @@ msgstr "Asie"
 msgid "Asked"
 msgstr "Demandée"
 
+#: src/postulo/jobs/search_views.py
+msgid "Asked for the advert. Check it before it becomes a listing."
+msgstr ""
+
 #: src/postulo/templates/server/record_of_processing.html
 msgid "Asked only when somebody presses for it, one company at a time. Each is sent what is listed and nothing about the person asking."
 msgstr "Interrogés uniquement lorsque quelqu'un le demande, une entreprise à la fois. Chacun reçoit ce qui est indiqué, et rien sur la personne qui demande."
+
+#: src/postulo/templates/server/record_of_processing.html
+msgid "Asked only when somebody presses Search or Review. Each is sent what is listed and nothing about the person asking; nothing it answers is kept unless the person saves an advert."
+msgstr ""
 
 #: src/postulo/templates/connections/pairing.html
 #, python-format
@@ -4362,6 +4421,10 @@ msgstr "Associations, sociétés et clubs dont vous faites ou avez fait partie."
 #: src/postulo/core/models.py
 msgid "at"
 msgstr "à"
+
+#: src/postulo/jobs/search_views.py
+msgid "At any time"
+msgstr ""
 
 #: src/postulo/templates/settings/appearance.html
 msgid "At each status"
@@ -4609,6 +4672,7 @@ msgstr "Retour à Vos coordonnées"
 
 #: src/postulo/templates/jobs/capture_decided.html
 #: src/postulo/templates/jobs/capture_page.html
+#: src/postulo/templates/jobs/listing_search.html
 msgid "Back to your listings"
 msgstr "Retour à vos annonces"
 
@@ -9460,6 +9524,13 @@ msgstr "Deux fois dans le fichier"
 msgid "In the instance's time zone."
 msgstr "Dans le fuseau horaire de l'instance."
 
+#: src/postulo/jobs/search_views.py
+#, python-format
+msgid "In the last day"
+msgid_plural "In the last %(count)d days"
+msgstr[0] ""
+msgstr[1] ""
+
 #: src/postulo/core/search.py
 #, python-format
 msgid "in the motivation letter rendered on %(when)s"
@@ -9497,6 +9568,10 @@ msgstr "dans le bilan que vous avez envoyé à %(company)s le %(when)s"
 #: src/postulo/templates/documents/rendered_compare.html
 msgid "In this version, and not in the one before"
 msgstr "Dans cette version, et pas dans la précédente"
+
+#: src/postulo/templates/jobs/listing_search.html
+msgid "In your listings"
+msgstr ""
 
 #: src/postulo/applications/forms.py
 msgid "In your time zone."
@@ -10084,6 +10159,10 @@ msgstr "sa rue"
 msgid "Its street will be looked up with %(service)s shortly."
 msgstr "Sa rue sera bientôt recherchée auprès de %(service)s."
 
+#: src/postulo/templates/jobs/listing_search.html
+msgid "Its terms of use"
+msgstr ""
+
 #: src/postulo/core/models.py
 msgid "its town"
 msgstr "sa ville"
@@ -10108,6 +10187,18 @@ msgstr "Rapport de recherche d’emploi"
 #, python-format
 msgid "Job search report · %(period)s"
 msgstr "Bilan de recherche d'emploi · %(period)s"
+
+#: src/postulo/jobs/search_views.py
+msgid "Job service"
+msgstr ""
+
+#: src/postulo/plugins/kinds.py
+msgid "Job services"
+msgstr ""
+
+#: src/postulo/templates/server/record_of_processing.html
+msgid "Job services it may search"
+msgstr ""
 
 #: src/postulo/applications/forms.py src/postulo/jobs/forms.py
 #: src/postulo/jobs/models.py
@@ -10787,6 +10878,10 @@ msgstr "Niveau 8"
 #: src/postulo/templates/server/plugins.html
 msgid "Licence"
 msgstr "Licence"
+
+#: src/postulo/templates/jobs/listing_search.html
+msgid "Licence of its adverts:"
+msgstr ""
 
 #: src/postulo/accounts/models.py src/postulo/core/context_processors.py
 msgid "Light"
@@ -11920,6 +12015,7 @@ msgid "Next month"
 msgstr "Mois suivant"
 
 #: src/postulo/templates/cotton/document_viewer.html
+#: src/postulo/templates/jobs/listing_search.html
 msgid "Next page"
 msgstr "Page suivante"
 
@@ -12949,6 +13045,10 @@ msgstr "Aucun mot de passe n'est envoyé au serveur tant qu'un nouveau n'est pas
 msgid "Nothing kept yet. Keep what you typed into the employer's form, so you can see what they were told."
 msgstr "Rien de conservé pour l'instant. Conservez ce que vous avez saisi dans le formulaire de l'employeur, pour voir ce qu'on lui a dit."
 
+#: src/postulo/templates/jobs/listing_search.html
+msgid "Nothing matches that search."
+msgstr ""
+
 #: src/postulo/templates/applications/application_list.html
 #: src/postulo/templates/jobs/company_list.html
 #: src/postulo/templates/jobs/listing_list.html
@@ -13495,6 +13595,13 @@ msgstr "Une réalisation par ligne."
 msgid "One address: the person you met, or your contact for this application, or the company's own. It is needed to send, and noted on the timeline when it is given."
 msgstr "Une seule adresse : celle de la personne rencontrée, de votre contact pour cette candidature, ou celle de l'entreprise. Elle est nécessaire pour envoyer, et notée sur la chronologie lorsqu'elle est indiquée."
 
+#: src/postulo/templates/jobs/listing_search.html
+#, python-format
+msgid "One advert found"
+msgid_plural "%(counter)s adverts found"
+msgstr[0] ""
+msgstr[1] ""
+
 #: src/postulo/templates/applications/report.html
 #, python-format
 msgid "One application sent in this period."
@@ -13943,6 +14050,10 @@ msgstr "Ou un nouveau contact"
 #: src/postulo/accounts/forms.py
 msgid "Or say only this"
 msgstr "Ou indiquez seulement ceci"
+
+#: src/postulo/templates/jobs/capture_form.html
+msgid "Or search a job service for adverts"
+msgstr ""
 
 #: src/postulo/templates/jobs/move_owner.html
 msgid "Or to a person"
@@ -14527,7 +14638,7 @@ msgstr "Fixé à la version %(version)s"
 msgid "Pinned to a version"
 msgstr "Fixé à une version"
 
-#: src/postulo/core/models.py
+#: src/postulo/core/models.py src/postulo/jobs/search_views.py
 msgid "Place"
 msgstr "Lieu"
 
@@ -15333,6 +15444,15 @@ msgstr "publications"
 msgid "Publications in the file"
 msgstr "Publications dans le fichier"
 
+#: src/postulo/jobs/search_views.py
+msgid "Published"
+msgstr ""
+
+#: src/postulo/templates/jobs/listing_search.html
+#, python-format
+msgid "Published %(when)s"
+msgstr ""
+
 #: src/postulo/resume/models.py
 msgid "published in"
 msgstr "publié dans"
@@ -16032,6 +16152,14 @@ msgstr "Télétravail"
 msgid "remote address"
 msgstr "adresse distante"
 
+#: src/postulo/jobs/search_views.py
+msgid "Remote work only"
+msgstr ""
+
+#: src/postulo/jobs/search_views.py
+msgid "remote work only"
+msgstr ""
+
 #: src/postulo/templates/accounts/profile.html
 #: src/postulo/templates/connections/confirm_delete.html
 #: src/postulo/templates/connections/list.html
@@ -16236,6 +16364,7 @@ msgstr "Proxy inverse"
 
 #: src/postulo/templates/jobs/capture_list.html
 #: src/postulo/templates/jobs/listing_list.html
+#: src/postulo/templates/jobs/listing_search.html
 msgid "Review"
 msgstr "Examiner"
 
@@ -16544,6 +16673,14 @@ msgstr "Dites ce qu'est cet identifiant."
 msgid "Say what this number is."
 msgstr "Indiquez de quel numéro il s'agit."
 
+#: src/postulo/jobs/listing_search.py
+msgid "Say what to search for."
+msgstr ""
+
+#: src/postulo/jobs/search_views.py
+msgid "Say what to search for: some words, or a place."
+msgstr ""
+
 #: src/postulo/applications/forms.py
 msgid "Say which currency the amount is in."
 msgstr "Indiquez la devise du montant."
@@ -16622,9 +16759,15 @@ msgstr "Cachet non vérifié par Postulo"
 #: src/postulo/templates/core/search.html
 #: src/postulo/templates/cotton/site_search.html
 #: src/postulo/templates/jobs/industry_list.html
+#: src/postulo/templates/jobs/listing_search.html
 #: src/postulo/templates/resume/answer_list.html
 msgid "Search"
 msgstr "Rechercher"
+
+#: src/postulo/templates/jobs/listing_list.html
+#: src/postulo/templates/jobs/listing_search.html
+msgid "Search a job service"
+msgstr ""
 
 #: src/postulo/applications/tables.py
 msgid "Search applications"
@@ -16654,6 +16797,10 @@ msgstr "Rechercher des lettres"
 #: src/postulo/jobs/tables.py
 msgid "Search listings"
 msgstr "Rechercher des annonces"
+
+#: src/postulo/templates/jobs/listing_search.html
+msgid "Search the adverts a job service publishes, and review the one you want before it becomes a listing. Nothing is asked until you press Search."
+msgstr ""
 
 #: src/postulo/applications/views.py
 msgid "Search the calendar"
@@ -17023,6 +17170,10 @@ msgstr "Terminée"
 #: src/postulo/templates/server/design.html
 msgid "Seven colours, each tuned to 3:1 against the card in both themes."
 msgstr "Sept couleurs, chacune réglée pour un contraste de 3:1 avec la carte dans les deux thèmes."
+
+#: src/postulo/jobs/search_views.py
+msgid "Several countries"
+msgstr ""
 
 #: src/postulo/jobs/industries.py
 msgid "Sewerage"
@@ -18374,6 +18525,10 @@ msgstr "Cette adresse a redirigé trop de fois."
 msgid "That address returned %(kind)s rather than a web page."
 msgstr "Cette adresse a renvoyé %(kind)s plutôt qu'une page web."
 
+#: src/postulo/jobs/listing_search.py
+msgid "That advert cannot be asked of this service."
+msgstr ""
+
 #: src/postulo/documents/slow.py
 msgid "That application is no longer here."
 msgstr "Cette candidature n'existe plus."
@@ -18805,6 +18960,10 @@ msgstr "Ce n'est pas l'identifiant d'un élément Wikidata."
 msgid "That is not an address Postulo can use."
 msgstr "Ce n'est pas une adresse que Postulo peut utiliser."
 
+#: src/postulo/jobs/listing_search.py
+msgid "That is not an advert this service could have named."
+msgstr ""
+
 #: src/postulo/core/offsite.py
 msgid "That is not an age recipient. It starts age1 and is 62 characters long."
 msgstr "Ce n'est pas un destinataire age. Il commence par age1 et compte 62 caractères."
@@ -18908,6 +19067,10 @@ msgstr "Cet élément est déjà associé à %(record)s. Dissociez-le d'abord."
 #: src/postulo/plugins/pairing.py
 msgid "That item is no longer on the other side."
 msgstr "Cet élément n'est plus de l'autre côté."
+
+#: src/postulo/jobs/search_views.py
+msgid "That job service is not offered here."
+msgstr ""
 
 #: src/postulo/templates/account/recovery_unusable.html
 msgid "That link cannot be used"
@@ -19031,6 +19194,14 @@ msgstr "Cette réponse ne provient pas d'une requête faite par Postulo."
 #: src/postulo/core/views_access.py
 msgid "That rule existed, and is changed."
 msgstr "Cette règle existait déjà; elle a été modifiée."
+
+#: src/postulo/jobs/listing_search.py
+msgid "That search cannot be asked of this service."
+msgstr ""
+
+#: src/postulo/jobs/listing_search.py
+msgid "That search is longer than a service can be asked."
+msgstr ""
 
 #: src/postulo/applications/views.py
 msgid "That suggestion has already been answered."
@@ -20194,6 +20365,10 @@ msgstr "La photo de vos coordonnées, à côté de votre nom. Elle figure dans l
 msgid "The picture that stands for you on these pages: one you upload, your Gravatar, or your initials."
 msgstr "La photo qui vous représente sur ces pages : celle que vous téléversez, votre Gravatar ou vos initiales."
 
+#: src/postulo/jobs/search_views.py
+msgid "the place"
+msgstr ""
+
 #: src/postulo/accounts/models.py
 msgid "The plugin whose calendar entries set the date, such as a monthly declaration."
 msgstr "Le plugin dont les entrées de calendrier fixent la date, comme une déclaration mensuelle."
@@ -20330,6 +20505,10 @@ msgstr "La requête n'avait pas la forme que cet appel accepte."
 msgid "The rest of the file is still worth importing. What is listed here is not, and you can add it by hand afterwards."
 msgstr "Le reste du fichier vaut quand même la peine d'être importé. Ce qui est listé ici ne l'est pas, et vous pourrez l'ajouter à la main ensuite."
 
+#: src/postulo/templates/jobs/listing_search.html
+msgid "The results are shown and not kept. An advert is kept only once you review it and save it."
+msgstr ""
+
 #: src/postulo/templates/applications/application_intake.html
 #: src/postulo/templates/jobs/capture_review.html
 #: src/postulo/templates/jobs/listing_form.html
@@ -20431,6 +20610,14 @@ msgstr "Le serveur a refusé ces identifiants : %(detail)s"
 #: src/postulo/core/server_forms.py
 msgid "The server that accepts the mail — its name, not an address."
 msgstr "Le serveur qui accepte le courrier — son nom, pas une adresse."
+
+#: src/postulo/jobs/listing_search.py
+msgid "The service's address is not one it declared."
+msgstr ""
+
+#: src/postulo/jobs/listing_search.py
+msgid "The service's answer could not be read."
+msgstr ""
 
 #: src/postulo/core/server_forms.py
 msgid "The service's base address. Left empty with Nominatim, OpenStreetMap's public instance is used: https://nominatim.openstreetmap.org. For your own: for example https://photon.example.org"
@@ -20684,6 +20871,10 @@ msgstr "Les métadonnées du wheel sont illisibles; il est peut-être endommagé
 msgid "The wheel's metadata is far larger than any plugin's."
 msgstr "Les métadonnées du wheel sont beaucoup plus volumineuses que celles de n'importe quel plugin."
 
+#: src/postulo/jobs/search_views.py
+msgid "the words"
+msgstr ""
+
 #: src/postulo/templates/documents/rendered_compare.html
 msgid "The words are the same in both. If the two PDFs look different, what changed is how they are set: the theme, or the layout."
 msgstr "Le texte est le même dans les deux. Si les deux PDF ont l'air différents, ce qui a changé est leur composition : le thème ou la mise en page."
@@ -20691,6 +20882,10 @@ msgstr "Le texte est le même dans les deux. Si les deux PDF ont l'air différen
 #: src/postulo/templates/documents/letter_detail.html
 msgid "The words without the layout, in this letter's language. None of these is filed as a version you sent."
 msgstr "Le texte sans la mise en page, dans la langue de cette lettre. Aucun de ces formats n'est classé comme une version que vous avez envoyée."
+
+#: src/postulo/jobs/listing_search.py
+msgid "the words, the place and the filters searched for"
+msgstr ""
 
 #: src/postulo/core/errands.py
 msgid "The work was interrupted before it finished. Please try again."
@@ -22268,6 +22463,7 @@ msgid "Waiting after this one: %(count)s."
 msgstr "En attente après celle-ci : %(count)s."
 
 #: src/postulo/applications/models.py src/postulo/jobs/models.py
+#: src/postulo/templates/jobs/listing_search.html
 msgid "Waiting for review"
 msgstr "En attente d'examen"
 
@@ -22985,6 +23181,10 @@ msgstr "Quand elle est entrée dans vos annonces."
 msgid "When it happened, which is not always when you write it down."
 msgstr "Quand cela s'est passé, ce qui n'est pas toujours le moment où vous le notez."
 
+#: src/postulo/jobs/search_views.py
+msgid "when it was published"
+msgstr ""
+
 #: src/postulo/jobs/forms.py
 msgid "When the employer put it up, if the posting says. Empty means unknown."
 msgstr "Quand l'employeur l'a publiée, si l'annonce le précise. Vide signifie inconnue."
@@ -23543,6 +23743,10 @@ msgstr "Produits du bois"
 #: src/postulo/documents/formats.py
 msgid "Word document"
 msgstr "Document Word"
+
+#: src/postulo/jobs/search_views.py
+msgid "Words"
+msgstr ""
 
 #: src/postulo/accounts/forms.py
 msgid "Words and chevrons"

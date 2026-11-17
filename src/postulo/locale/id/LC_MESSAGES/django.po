@@ -1379,25 +1379,40 @@ msgstr "%(scheme)s: bentuknya tidak seperti biasanya."
 msgid "%(sent)s, %(failed)s; each document says which."
 msgstr "%(sent)s, %(failed)s; setiap dokumen menyebutkan yang mana."
 
-#: src/postulo/resume/lookups.py
+#: src/postulo/jobs/listing_search.py src/postulo/resume/lookups.py
 #, python-format
 msgid "%(service)s answered %(status)s."
 msgstr "%(service)s menjawab %(status)s."
 
-#: src/postulo/resume/lookups.py
+#: src/postulo/jobs/listing_search.py src/postulo/resume/lookups.py
 #, python-format
 msgid "%(service)s asked for fewer requests. Try again later."
 msgstr "%(service)s meminta agar permintaan dikurangi. Coba lagi nanti."
 
-#: src/postulo/resume/lookups.py
+#: src/postulo/jobs/listing_search.py src/postulo/resume/lookups.py
 #, python-format
 msgid "%(service)s could not be reached."
 msgstr "%(service)s tidak dapat dihubungi."
+
+#: src/postulo/jobs/listing_search.py
+#, python-format
+msgid "%(service)s did not accept that search."
+msgstr ""
+
+#: src/postulo/templates/jobs/listing_search.html
+#, python-format
+msgid "%(service)s does not search by %(criteria)s, so that was not sent."
+msgstr ""
 
 #: src/postulo/resume/lookups.py
 #, python-format
 msgid "%(service)s has no record in a form Postulo reads."
 msgstr "%(service)s tidak memiliki catatan dalam bentuk yang dapat dibaca Postulo."
+
+#: src/postulo/jobs/listing_search.py
+#, python-format
+msgid "%(service)s has nothing at the address it was asked at."
+msgstr ""
 
 #: src/postulo/core/web_links.py src/postulo/jobs/surface.py
 #, fuzzy, python-format
@@ -1409,6 +1424,11 @@ msgstr "%(service)s sudah digunakan oleh baris lain."
 msgid "%(service)s knows no such identifier."
 msgstr "%(service)s tidak mengenal pengenal tersebut."
 
+#: src/postulo/jobs/listing_search.py
+#, python-format
+msgid "%(service)s no longer has that advert."
+msgstr ""
+
 #: src/postulo/resume/lookups.py
 #, python-format
 msgid "%(service)s redirected too many times."
@@ -1419,7 +1439,7 @@ msgstr "%(service)s terlalu sering mengalihkan."
 msgid "%(service)s refused the look-ups (%(status)s). They are stopped."
 msgstr "%(service)s menolak pencarian (%(status)s). Pencarian dihentikan."
 
-#: src/postulo/resume/lookups.py
+#: src/postulo/jobs/listing_search.py src/postulo/resume/lookups.py
 #, python-format
 msgid "%(service)s sent the request somewhere else."
 msgstr "%(service)s mengirim permintaan ke tempat lain."
@@ -1429,10 +1449,20 @@ msgstr "%(service)s mengirim permintaan ke tempat lain."
 msgid "%(service)s sent the request to an address Postulo does not dial."
 msgstr "%(service)s mengirim permintaan ke alamat yang tidak dihubungi Postulo."
 
-#: src/postulo/resume/lookups.py
+#: src/postulo/jobs/listing_search.py src/postulo/resume/lookups.py
 #, python-format
 msgid "%(service)s took too long to answer."
 msgstr "%(service)s terlalu lama menjawab."
+
+#: src/postulo/jobs/listing_search.py
+#, python-format
+msgid "%(service)s's answer could not be read."
+msgstr ""
+
+#: src/postulo/jobs/listing_search.py
+#, python-format
+msgid "%(service)s's answer was larger than a page of adverts should be."
+msgstr ""
 
 #: src/postulo/resume/views.py
 #, python-format
@@ -1443,6 +1473,11 @@ msgstr "%(service)s, melalui doi.org, tidak memiliki apa pun untuk kotak yang ko
 #, python-format
 msgid "%(share)s%%"
 msgstr "%(share)s%%"
+
+#: src/postulo/templates/jobs/listing_search.html
+#, python-format
+msgid "%(source)s: asked at %(hosts)s. It is sent the words, the place and the filters you search for, or an advert's number when you press Review, and nothing about you."
+msgstr ""
 
 #: src/postulo/applications/agenda.py
 #, fuzzy, python-format
@@ -2220,6 +2255,10 @@ msgstr "Judul, kalimat di bawahnya, lalu apa pun fungsi kartu tersebut."
 msgid "a job title"
 msgstr "jabatan"
 
+#: src/postulo/jobs/search_views.py
+msgid "A job title, a skill or an employer, as you would type it on the service."
+msgstr ""
+
 #: src/postulo/documents/integrity.py
 msgid "a JPEG picture"
 msgstr "gambar JPEG"
@@ -2328,6 +2367,10 @@ msgstr "Lowongan adalah iklan lowongan yang Anda perhatikan, sebelum Anda memutu
 #: src/postulo/templates/core/import_csv.html
 msgid "A listing keeps its deadline, which the closing-soon notice then watches, and its tags are written into its description."
 msgstr "Lowongan mempertahankan tenggatnya, yang kemudian dipantau oleh pemberitahuan segera ditutup, dan tag-nya ditulis ke dalam deskripsinya."
+
+#: src/postulo/templates/jobs/listing_search.html
+msgid "A listing like it"
+msgstr ""
 
 #: src/postulo/templates/jobs/capture_review.html
 msgid "A listing with this title at this company exists; a board that mints a fresh address per visit may be showing you the same advert."
@@ -2786,6 +2829,10 @@ msgstr "Token memungkinkan alat di luar Postulo bertindak atas nama Anda — eks
 #: src/postulo/templates/help/postal_addresses.html
 msgid "A town and a country alone are kept as a place. Nothing checks that an address exists, and a country Postulo has no rules for is free-form."
 msgstr "Kota dan negara saja disimpan sebagai tempat. Tidak ada yang memeriksa apakah suatu alamat benar-benar ada, dan alamat di negara yang tidak memiliki aturan di Postulo berbentuk bebas."
+
+#: src/postulo/jobs/search_views.py
+msgid "A town or a region."
+msgstr ""
 
 #: src/postulo/resume/candidate.py
 msgid "A translation"
@@ -3309,6 +3356,10 @@ msgstr "Periklanan"
 #: src/postulo/jobs/industries.py
 msgid "Advertising and marketing"
 msgstr "Periklanan dan pemasaran"
+
+#: src/postulo/templates/jobs/listing_search.html
+msgid "Adverts found"
+msgstr ""
 
 #: src/postulo/applications/models.py
 msgid "adviser"
@@ -4242,9 +4293,17 @@ msgstr "Asia"
 msgid "Asked"
 msgstr "Sudah ditanya"
 
+#: src/postulo/jobs/search_views.py
+msgid "Asked for the advert. Check it before it becomes a listing."
+msgstr ""
+
 #: src/postulo/templates/server/record_of_processing.html
 msgid "Asked only when somebody presses for it, one company at a time. Each is sent what is listed and nothing about the person asking."
 msgstr "Hanya ditanyakan saat seseorang memintanya, satu perusahaan setiap kali. Masing-masing dikirimi apa yang tercantum dan tidak ada apa pun tentang orang yang bertanya."
+
+#: src/postulo/templates/server/record_of_processing.html
+msgid "Asked only when somebody presses Search or Review. Each is sent what is listed and nothing about the person asking; nothing it answers is kept unless the person saves an advert."
+msgstr ""
 
 #: src/postulo/templates/connections/pairing.html
 #, python-format
@@ -4270,6 +4329,10 @@ msgstr "Asosiasi, perkumpulan, dan klub yang Anda ikuti sekarang atau dulu."
 #: src/postulo/core/models.py
 msgid "at"
 msgstr "pukul"
+
+#: src/postulo/jobs/search_views.py
+msgid "At any time"
+msgstr ""
 
 #: src/postulo/templates/settings/appearance.html
 msgid "At each status"
@@ -4516,6 +4579,7 @@ msgstr "Kembali ke Data Anda"
 
 #: src/postulo/templates/jobs/capture_decided.html
 #: src/postulo/templates/jobs/capture_page.html
+#: src/postulo/templates/jobs/listing_search.html
 msgid "Back to your listings"
 msgstr "Kembali ke lowongan Anda"
 
@@ -9367,6 +9431,12 @@ msgstr "Ada dua kali di berkas"
 msgid "In the instance's time zone."
 msgstr "Dalam zona waktu instans."
 
+#: src/postulo/jobs/search_views.py
+#, python-format
+msgid "In the last day"
+msgid_plural "In the last %(count)d days"
+msgstr[0] ""
+
 #: src/postulo/core/search.py
 #, python-format
 msgid "in the motivation letter rendered on %(when)s"
@@ -9404,6 +9474,10 @@ msgstr "dalam laporan yang Anda kirim ke %(company)s pada %(when)s"
 #: src/postulo/templates/documents/rendered_compare.html
 msgid "In this version, and not in the one before"
 msgstr "Ada di versi ini, dan tidak ada di versi sebelumnya"
+
+#: src/postulo/templates/jobs/listing_search.html
+msgid "In your listings"
+msgstr ""
 
 #: src/postulo/applications/forms.py
 msgid "In your time zone."
@@ -9994,6 +10068,10 @@ msgstr "jalannya"
 msgid "Its street will be looked up with %(service)s shortly."
 msgstr "Jalannya akan segera dicari dengan %(service)s."
 
+#: src/postulo/templates/jobs/listing_search.html
+msgid "Its terms of use"
+msgstr ""
+
 #: src/postulo/core/models.py
 msgid "its town"
 msgstr "kotanya"
@@ -10018,6 +10096,18 @@ msgstr "Laporan pencarian kerja"
 #, python-format
 msgid "Job search report · %(period)s"
 msgstr "Laporan pencarian kerja · %(period)s"
+
+#: src/postulo/jobs/search_views.py
+msgid "Job service"
+msgstr ""
+
+#: src/postulo/plugins/kinds.py
+msgid "Job services"
+msgstr ""
+
+#: src/postulo/templates/server/record_of_processing.html
+msgid "Job services it may search"
+msgstr ""
 
 #: src/postulo/applications/forms.py src/postulo/jobs/forms.py
 #: src/postulo/jobs/models.py
@@ -10698,6 +10788,10 @@ msgstr "Tingkat 8"
 #: src/postulo/templates/server/plugins.html
 msgid "Licence"
 msgstr "Lisensi"
+
+#: src/postulo/templates/jobs/listing_search.html
+msgid "Licence of its adverts:"
+msgstr ""
 
 #: src/postulo/accounts/models.py src/postulo/core/context_processors.py
 msgid "Light"
@@ -11838,6 +11932,7 @@ msgid "Next month"
 msgstr "Bulan berikutnya"
 
 #: src/postulo/templates/cotton/document_viewer.html
+#: src/postulo/templates/jobs/listing_search.html
 msgid "Next page"
 msgstr "Halaman berikutnya"
 
@@ -12873,6 +12968,10 @@ msgstr "Tidak ada yang dikirim ke server sebagai kata sandi sampai kata sandi ba
 msgid "Nothing kept yet. Keep what you typed into the employer's form, so you can see what they were told."
 msgstr "Belum ada yang disimpan. Simpan apa yang Anda ketik di formulir pemberi kerja, agar Anda dapat melihat apa yang disampaikan kepada mereka."
 
+#: src/postulo/templates/jobs/listing_search.html
+msgid "Nothing matches that search."
+msgstr ""
+
 #: src/postulo/templates/applications/application_list.html
 #: src/postulo/templates/jobs/company_list.html
 #: src/postulo/templates/jobs/listing_list.html
@@ -13418,6 +13517,12 @@ msgstr "Satu prestasi per baris."
 msgid "One address: the person you met, or your contact for this application, or the company's own. It is needed to send, and noted on the timeline when it is given."
 msgstr "Satu alamat: orang yang Anda temui, atau kontak Anda untuk lamaran ini, atau alamat perusahaan itu sendiri. Alamat ini diperlukan untuk mengirim, dan dicatat di linimasa saat diberikan."
 
+#: src/postulo/templates/jobs/listing_search.html
+#, python-format
+msgid "One advert found"
+msgid_plural "%(counter)s adverts found"
+msgstr[0] ""
+
 #: src/postulo/templates/applications/report.html
 #, python-format
 msgid "One application sent in this period."
@@ -13847,6 +13952,10 @@ msgstr "Atau kontak baru"
 #: src/postulo/accounts/forms.py
 msgid "Or say only this"
 msgstr "Atau sebutkan ini saja"
+
+#: src/postulo/templates/jobs/capture_form.html
+msgid "Or search a job service for adverts"
+msgstr ""
 
 #: src/postulo/templates/jobs/move_owner.html
 msgid "Or to a person"
@@ -14428,7 +14537,7 @@ msgstr "Dikunci pada %(version)s"
 msgid "Pinned to a version"
 msgstr "Dikunci pada suatu versi"
 
-#: src/postulo/core/models.py
+#: src/postulo/core/models.py src/postulo/jobs/search_views.py
 msgid "Place"
 msgstr "Tempat"
 
@@ -15233,6 +15342,15 @@ msgstr "publikasi"
 msgid "Publications in the file"
 msgstr "Publikasi di dalam berkas"
 
+#: src/postulo/jobs/search_views.py
+msgid "Published"
+msgstr ""
+
+#: src/postulo/templates/jobs/listing_search.html
+#, python-format
+msgid "Published %(when)s"
+msgstr ""
+
 #: src/postulo/resume/models.py
 msgid "published in"
 msgstr "diterbitkan dalam"
@@ -15927,6 +16045,14 @@ msgstr "Jarak jauh"
 msgid "remote address"
 msgstr "alamat jarak jauh"
 
+#: src/postulo/jobs/search_views.py
+msgid "Remote work only"
+msgstr ""
+
+#: src/postulo/jobs/search_views.py
+msgid "remote work only"
+msgstr ""
+
 #: src/postulo/templates/accounts/profile.html
 #: src/postulo/templates/connections/confirm_delete.html
 #: src/postulo/templates/connections/list.html
@@ -16132,6 +16258,7 @@ msgstr "Reverse proxy"
 
 #: src/postulo/templates/jobs/capture_list.html
 #: src/postulo/templates/jobs/listing_list.html
+#: src/postulo/templates/jobs/listing_search.html
 msgid "Review"
 msgstr "Tinjau"
 
@@ -16441,6 +16568,14 @@ msgstr "Sebutkan pengenal apa ini."
 msgid "Say what this number is."
 msgstr "Sebutkan nomor apa ini."
 
+#: src/postulo/jobs/listing_search.py
+msgid "Say what to search for."
+msgstr ""
+
+#: src/postulo/jobs/search_views.py
+msgid "Say what to search for: some words, or a place."
+msgstr ""
+
 #: src/postulo/applications/forms.py
 msgid "Say which currency the amount is in."
 msgstr "Sebutkan mata uang jumlah tersebut."
@@ -16520,9 +16655,15 @@ msgstr "Segel tidak diperiksa oleh Postulo"
 #: src/postulo/templates/core/search.html
 #: src/postulo/templates/cotton/site_search.html
 #: src/postulo/templates/jobs/industry_list.html
+#: src/postulo/templates/jobs/listing_search.html
 #: src/postulo/templates/resume/answer_list.html
 msgid "Search"
 msgstr "Cari"
+
+#: src/postulo/templates/jobs/listing_list.html
+#: src/postulo/templates/jobs/listing_search.html
+msgid "Search a job service"
+msgstr ""
 
 #: src/postulo/applications/tables.py
 msgid "Search applications"
@@ -16552,6 +16693,10 @@ msgstr "Cari surat"
 #: src/postulo/jobs/tables.py
 msgid "Search listings"
 msgstr "Cari lowongan"
+
+#: src/postulo/templates/jobs/listing_search.html
+msgid "Search the adverts a job service publishes, and review the one you want before it becomes a listing. Nothing is asked until you press Search."
+msgstr ""
 
 #: src/postulo/applications/views.py
 msgid "Search the calendar"
@@ -16921,6 +17066,10 @@ msgstr "Berakhir"
 #: src/postulo/templates/server/design.html
 msgid "Seven colours, each tuned to 3:1 against the card in both themes."
 msgstr "Tujuh warna, masing-masing disetel ke kontras 3:1 terhadap kartu di kedua tema."
+
+#: src/postulo/jobs/search_views.py
+msgid "Several countries"
+msgstr ""
 
 #: src/postulo/jobs/industries.py
 msgid "Sewerage"
@@ -18281,6 +18430,10 @@ msgstr "Alamat itu dialihkan terlalu banyak kali."
 msgid "That address returned %(kind)s rather than a web page."
 msgstr "Alamat itu mengembalikan %(kind)s, bukan halaman web."
 
+#: src/postulo/jobs/listing_search.py
+msgid "That advert cannot be asked of this service."
+msgstr ""
+
 #: src/postulo/documents/slow.py
 msgid "That application is no longer here."
 msgstr "Lamaran itu sudah tidak ada di sini."
@@ -18712,6 +18865,10 @@ msgstr "Itu bukan pengenal item Wikidata."
 msgid "That is not an address Postulo can use."
 msgstr "Itu bukan alamat yang dapat digunakan Postulo."
 
+#: src/postulo/jobs/listing_search.py
+msgid "That is not an advert this service could have named."
+msgstr ""
+
 #: src/postulo/core/offsite.py
 msgid "That is not an age recipient. It starts age1 and is 62 characters long."
 msgstr "Itu bukan penerima age. Penerima age diawali age1 dan panjangnya 62 karakter."
@@ -18814,6 +18971,10 @@ msgstr "Item itu sudah disandingkan dengan %(record)s. Batalkan penyandingannya 
 #: src/postulo/plugins/pairing.py
 msgid "That item is no longer on the other side."
 msgstr "Item itu sudah tidak ada di sisi lain."
+
+#: src/postulo/jobs/search_views.py
+msgid "That job service is not offered here."
+msgstr ""
 
 #: src/postulo/templates/account/recovery_unusable.html
 msgid "That link cannot be used"
@@ -18938,6 +19099,14 @@ msgstr "Balasan itu tidak berasal dari permintaan yang dibuat Postulo."
 #: src/postulo/core/views_access.py
 msgid "That rule existed, and is changed."
 msgstr "Aturan itu sudah ada, dan telah diubah."
+
+#: src/postulo/jobs/listing_search.py
+msgid "That search cannot be asked of this service."
+msgstr ""
+
+#: src/postulo/jobs/listing_search.py
+msgid "That search is longer than a service can be asked."
+msgstr ""
 
 #: src/postulo/applications/views.py
 msgid "That suggestion has already been answered."
@@ -20098,6 +20267,10 @@ msgstr "Foto dari data Anda, di samping nama Anda. Foto ada di PDF dan pratinjau
 msgid "The picture that stands for you on these pages: one you upload, your Gravatar, or your initials."
 msgstr "Gambar yang mewakili Anda pada halaman ini: yang Anda unggah, Gravatar Anda, atau inisial Anda."
 
+#: src/postulo/jobs/search_views.py
+msgid "the place"
+msgstr ""
+
 #: src/postulo/accounts/models.py
 msgid "The plugin whose calendar entries set the date, such as a monthly declaration."
 msgstr "Plugin yang entri kalendernya menentukan tanggal, seperti deklarasi bulanan."
@@ -20234,6 +20407,10 @@ msgstr "Bentuk permintaan tidak sesuai dengan yang diterima panggilan ini."
 msgid "The rest of the file is still worth importing. What is listed here is not, and you can add it by hand afterwards."
 msgstr "Bagian lain dari berkas tetap layak diimpor. Yang tercantum di sini tidak, dan Anda dapat menambahkannya secara manual setelahnya."
 
+#: src/postulo/templates/jobs/listing_search.html
+msgid "The results are shown and not kept. An advert is kept only once you review it and save it."
+msgstr ""
+
 #: src/postulo/templates/applications/application_intake.html
 #: src/postulo/templates/jobs/capture_review.html
 #: src/postulo/templates/jobs/listing_form.html
@@ -20335,6 +20512,14 @@ msgstr "Server menolak kredensial tersebut: %(detail)s"
 #: src/postulo/core/server_forms.py
 msgid "The server that accepts the mail — its name, not an address."
 msgstr "Server yang menerima email — namanya, bukan alamatnya."
+
+#: src/postulo/jobs/listing_search.py
+msgid "The service's address is not one it declared."
+msgstr ""
+
+#: src/postulo/jobs/listing_search.py
+msgid "The service's answer could not be read."
+msgstr ""
 
 #: src/postulo/core/server_forms.py
 msgid "The service's base address. Left empty with Nominatim, OpenStreetMap's public instance is used: https://nominatim.openstreetmap.org. For your own: for example https://photon.example.org"
@@ -20589,6 +20774,10 @@ msgstr "Metadata wheel tidak dapat dibaca; mungkin rusak."
 msgid "The wheel's metadata is far larger than any plugin's."
 msgstr "Metadata wheel jauh lebih besar daripada milik plugin mana pun."
 
+#: src/postulo/jobs/search_views.py
+msgid "the words"
+msgstr ""
+
 #: src/postulo/templates/documents/rendered_compare.html
 msgid "The words are the same in both. If the two PDFs look different, what changed is how they are set: the theme, or the layout."
 msgstr "Kata-katanya sama di keduanya. Jika kedua PDF terlihat berbeda, yang berubah adalah cara penyusunannya: tema, atau tata letak."
@@ -20596,6 +20785,10 @@ msgstr "Kata-katanya sama di keduanya. Jika kedua PDF terlihat berbeda, yang ber
 #: src/postulo/templates/documents/letter_detail.html
 msgid "The words without the layout, in this letter's language. None of these is filed as a version you sent."
 msgstr "Kata-kata tanpa tata letak, dalam bahasa surat ini. Tidak satu pun dari ini diarsipkan sebagai versi yang Anda kirim."
+
+#: src/postulo/jobs/listing_search.py
+msgid "the words, the place and the filters searched for"
+msgstr ""
 
 #: src/postulo/core/errands.py
 msgid "The work was interrupted before it finished. Please try again."
@@ -22173,6 +22366,7 @@ msgid "Waiting after this one: %(count)s."
 msgstr "Menunggu setelah ini: %(count)s."
 
 #: src/postulo/applications/models.py src/postulo/jobs/models.py
+#: src/postulo/templates/jobs/listing_search.html
 msgid "Waiting for review"
 msgstr "Menunggu tinjauan"
 
@@ -22896,6 +23090,10 @@ msgstr "Saat lowongan ini masuk ke daftar lowongan Anda."
 msgid "When it happened, which is not always when you write it down."
 msgstr "Kapan hal itu terjadi, yang tidak selalu sama dengan saat Anda mencatatnya."
 
+#: src/postulo/jobs/search_views.py
+msgid "when it was published"
+msgstr ""
+
 #: src/postulo/jobs/forms.py
 msgid "When the employer put it up, if the posting says. Empty means unknown."
 msgstr "Kapan pemberi kerja memasangnya, jika lowongan menyebutkannya. Kosong berarti tidak diketahui."
@@ -23455,6 +23653,10 @@ msgstr "Produk kayu"
 #: src/postulo/documents/formats.py
 msgid "Word document"
 msgstr "Dokumen Word"
+
+#: src/postulo/jobs/search_views.py
+msgid "Words"
+msgstr ""
 
 #: src/postulo/accounts/forms.py
 msgid "Words and chevrons"

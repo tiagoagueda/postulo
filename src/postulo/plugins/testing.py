@@ -59,6 +59,13 @@ so a plugin's tests assert on what a person sees.
 each an `EnvironmentVariable` of a known kind, named ``POSTULO_PLUGIN_<NAME>_...`` by the rules
 Postulo's own names follow, none of them one of Postulo's, and its default readable as its kind.
 
+**And a job service's search held to its contract (#1253).** `assert_is_a_listing_search`
+takes one `ListingSearch` and an answer recorded from its service for a search and for one
+advert, and fails unless Postulo could use it: a key, hosts and criteria of the right shape,
+every address it describes -- for ordinary searches and for words written to break out of a
+parameter -- on its own hosts over https and the same whatever was typed, the recorded answers
+read into hits a capture can be made from, and a source and a licence stated.
+
 **And the migrated test database, kept between runs (#1144).** A plugin's suite migrates the
 whole of Postulo before its first test. `cached_django_db_setup` makes the fixture that does
 it once and restores the result afterwards; two lines in the plugin's ``tests/conftest.py``:
@@ -255,6 +262,98 @@ def assert_is_a_backup_destination(plugin, config: dict, *, tmp_path: Path) -> N
     assert all(item.id != reference.id for item in plugin.list(config)), (
         f"{reference.id!r} is still listed after it was deleted"
     )
+
+
+#: What a person might type, and what somebody might type to make a search ask elsewhere: each
+#: has to reach a parameter's value and nothing else.
+_HOSTILE_WORDS = (
+    "nurse",
+    "sjuksköterska Göteborg",
+    "a&q=b&offset=9999",
+    "../../admin?x=1#top",
+    "https://elsewhere.example/",
+    "x\r\nHost: elsewhere.example",
+    "\u202ereversed\u0000",
+    "%2F%2E%2E%2F",
+    "y" * 500,
+)
+
+
+def assert_is_a_listing_search(search, *, results, advert) -> list:
+    """Hold one job service's `ListingSearch` to what Postulo needs of it (#1253).
+
+    ``results`` is the JSON a search answered with, recorded from the service (cut down, with
+    nobody's name, address or number left in it), and ``advert`` is ``(key, document)``: one
+    advert's number and the JSON the service answered for it. Nothing is asked of the network:
+    the search describes requests, and reads what it is handed.
+
+    Fails unless the search is one the registry would keep; unless every address it describes,
+    for a spread of criteria and for words written to break out of a parameter, is ``https``
+    on one of its hosts and carries no query of its own, and is the same address whatever was
+    typed; unless the recorded search reads into at least one hit, each a number a service's
+    own could be and a posting with a title and a page, as Postulo would show it; unless the
+    recorded advert reads into one posting; and unless a source and a licence are stated.
+    Returns the hits, cleaned as the search page shows them, for the caller's own assertions.
+    """
+    from urllib.parse import urlsplit
+
+    from postulo.jobs import listing_search as core
+
+    assert isinstance(search, core.ListingSearch), f"{search!r} is not a ListingSearch"
+    assert core._usable(search), (
+        f"{search.key!r} would be left out: check its key (lower case, digits, hyphens, at most "
+        "thirty), its countries (two capitals each), its languages (BCP 47 tags), its hosts "
+        f"(names), and that it supports some of {core.FILTERS} and nothing else"
+    )
+    assert str(search.source).strip(), "a search names its source: it is a listing's found via"
+    assert search.licence.strip(), "a search states the licence its service's adverts are under"
+
+    paths = set()
+    for words in _HOSTILE_WORDS:
+        for criteria in (
+            core.Criteria(words=words),
+            core.Criteria(words=words, place=words, remote=True, since_days=7, page=3),
+        ):
+            honoured = core.honoured(search, criteria)
+            if honoured.is_empty():
+                continue
+            try:
+                address = core._address(search, search.request(honoured))
+            except core.SearchRefused as refused:
+                raise AssertionError(
+                    f"for {honoured!r} the search described an address Postulo refuses: {refused}"
+                ) from refused
+            parts = urlsplit(address)
+            assert parts.scheme == "https" and parts.hostname in search.hosts, address
+            paths.add((parts.hostname, parts.path))
+    assert len(paths) == 1, f"what was typed changed the address asked: {sorted(paths)}"
+
+    criteria = core.honoured(search, core.Criteria(words="nurse"))
+    found = search.read(results, criteria)
+    assert isinstance(found, core.Results), f"read returned {found!r}, not SearchResults"
+    hits = []
+    for hit in found.hits:
+        assert isinstance(hit, core.Hit), f"{hit!r} is not a SearchHit"
+        assert core._is_advert(hit.key), f"{hit.key!r} is not a number a service's own can be"
+        posting = core.cleaned(search, hit.posting)
+        assert posting.title and posting.url, f"{hit.key!r} has no title or no page"
+        hits.append(core.Hit(key=hit.key, posting=posting))
+    assert hits, "the recorded search was read into no hits"
+
+    key, document = advert
+    try:
+        address = core._address(search, search.one(key))
+    except core.SearchRefused as refused:
+        raise AssertionError(f"for {key!r} the search described an address Postulo refuses") from (
+            refused
+        )
+    parts = urlsplit(address)
+    assert parts.scheme == "https" and parts.hostname in search.hosts, address
+    one = search.read_one(document, key)
+    assert one is not None, f"the recorded advert {key!r} was read as no such advert"
+    posting = core.cleaned(search, one)
+    assert posting.title and posting.url, f"the advert {key!r} has no title or no page"
+    return hits
 
 
 def assert_declares_usable_widgets(plugin) -> None:

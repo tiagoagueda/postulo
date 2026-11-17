@@ -171,7 +171,8 @@ def test_these_are_the_plugins_that_ship_across_twelve_kinds():
     `register-adapters` is a third vocabulary, and a kind of its own too: the company
     registers *Register lookup* may ask, one per country, which a package for another country
     may add to; `register-lookup` is the feature that decides whether any is asked, and it is
-    the one feature that starts off (#1021).
+    one of the features that start off (#1021). `listing-search` is another (#1253): it decides
+    whether a job service is searched at all, with a switch per service under it.
 
     `multiple-fields` is a module with no behaviour of its own: the parent of the six features
     that let a field hold more than one value (#875), whose switch is theirs, and
@@ -215,6 +216,7 @@ def test_these_are_the_plugins_that_ship_across_twelve_kinds():
         "bibliography-lookups",
         "register-lookup",
         "register-adapters",
+        "listing-search",
         "nace",
         "esco",
         "geonames",

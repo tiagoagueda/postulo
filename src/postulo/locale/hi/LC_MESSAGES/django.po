@@ -1468,25 +1468,40 @@ msgstr "%(scheme)s: यह सामान्य रूप नहीं है�
 msgid "%(sent)s, %(failed)s; each document says which."
 msgstr "%(sent)s, %(failed)s; हर डॉक्यूमेंट पर लिखा है कि उसका क्या हुआ।"
 
-#: src/postulo/resume/lookups.py
+#: src/postulo/jobs/listing_search.py src/postulo/resume/lookups.py
 #, python-format
 msgid "%(service)s answered %(status)s."
 msgstr "%(service)s ने %(status)s जवाब दिया।"
 
-#: src/postulo/resume/lookups.py
+#: src/postulo/jobs/listing_search.py src/postulo/resume/lookups.py
 #, python-format
 msgid "%(service)s asked for fewer requests. Try again later."
 msgstr "%(service)s ने कम अनुरोध भेजने को कहा। बाद में फिर से कोशिश करें।"
 
-#: src/postulo/resume/lookups.py
+#: src/postulo/jobs/listing_search.py src/postulo/resume/lookups.py
 #, python-format
 msgid "%(service)s could not be reached."
 msgstr "%(service)s तक पहुंचा नहीं जा सका।"
+
+#: src/postulo/jobs/listing_search.py
+#, python-format
+msgid "%(service)s did not accept that search."
+msgstr ""
+
+#: src/postulo/templates/jobs/listing_search.html
+#, python-format
+msgid "%(service)s does not search by %(criteria)s, so that was not sent."
+msgstr ""
 
 #: src/postulo/resume/lookups.py
 #, python-format
 msgid "%(service)s has no record in a form Postulo reads."
 msgstr "%(service)s के पास ऐसे रूप में कोई रिकॉर्ड नहीं है जिसे Postulo पढ़ सके।"
+
+#: src/postulo/jobs/listing_search.py
+#, python-format
+msgid "%(service)s has nothing at the address it was asked at."
+msgstr ""
 
 #: src/postulo/core/web_links.py src/postulo/jobs/surface.py
 #, python-format
@@ -1498,6 +1513,11 @@ msgstr "%(service)s पहले से किसी दूसरी पंक�
 msgid "%(service)s knows no such identifier."
 msgstr "%(service)s ऐसे किसी पहचानकर्ता को नहीं जानता।"
 
+#: src/postulo/jobs/listing_search.py
+#, python-format
+msgid "%(service)s no longer has that advert."
+msgstr ""
+
 #: src/postulo/resume/lookups.py
 #, python-format
 msgid "%(service)s redirected too many times."
@@ -1508,7 +1528,7 @@ msgstr "%(service)s ने बहुत बार रीडायरेक्ट
 msgid "%(service)s refused the look-ups (%(status)s). They are stopped."
 msgstr "%(service)s ने खोज के अनुरोध अस्वीकार कर दिए (%(status)s)। उन्हें रोक दिया गया है।"
 
-#: src/postulo/resume/lookups.py
+#: src/postulo/jobs/listing_search.py src/postulo/resume/lookups.py
 #, python-format
 msgid "%(service)s sent the request somewhere else."
 msgstr "%(service)s ने अनुरोध कहीं और भेज दिया।"
@@ -1518,10 +1538,20 @@ msgstr "%(service)s ने अनुरोध कहीं और भेज द�
 msgid "%(service)s sent the request to an address Postulo does not dial."
 msgstr "%(service)s ने अनुरोध ऐसे पते पर भेजा जिससे Postulo कनेक्ट नहीं करता।"
 
-#: src/postulo/resume/lookups.py
+#: src/postulo/jobs/listing_search.py src/postulo/resume/lookups.py
 #, python-format
 msgid "%(service)s took too long to answer."
 msgstr "%(service)s ने जवाब देने में बहुत ज़्यादा समय लिया।"
+
+#: src/postulo/jobs/listing_search.py
+#, python-format
+msgid "%(service)s's answer could not be read."
+msgstr ""
+
+#: src/postulo/jobs/listing_search.py
+#, python-format
+msgid "%(service)s's answer was larger than a page of adverts should be."
+msgstr ""
 
 #: src/postulo/resume/views.py
 #, python-format
@@ -1532,6 +1562,11 @@ msgstr "doi.org के ज़रिए %(service)s के पास खाली
 #, python-format
 msgid "%(share)s%%"
 msgstr "%(share)s%%"
+
+#: src/postulo/templates/jobs/listing_search.html
+#, python-format
+msgid "%(source)s: asked at %(hosts)s. It is sent the words, the place and the filters you search for, or an advert's number when you press Review, and nothing about you."
+msgstr ""
 
 #: src/postulo/applications/agenda.py
 #, python-format
@@ -2320,6 +2355,10 @@ msgstr "एक हेडिंग, उसके नीचे का वाक्
 msgid "a job title"
 msgstr "पद का नाम"
 
+#: src/postulo/jobs/search_views.py
+msgid "A job title, a skill or an employer, as you would type it on the service."
+msgstr ""
+
 #: src/postulo/documents/integrity.py
 msgid "a JPEG picture"
 msgstr "JPEG तस्वीर"
@@ -2428,6 +2467,10 @@ msgstr "यहां विज्ञापन का मतलब नौकर�
 #: src/postulo/templates/core/import_csv.html
 msgid "A listing keeps its deadline, which the closing-soon notice then watches, and its tags are written into its description."
 msgstr "विज्ञापन की समय-सीमा बनी रहती है, जिस पर फिर जल्द बंद होने की सूचना नज़र रखती है, और उसके टैग उसके विवरण में लिख दिए जाते हैं।"
+
+#: src/postulo/templates/jobs/listing_search.html
+msgid "A listing like it"
+msgstr ""
 
 #: src/postulo/templates/jobs/capture_review.html
 msgid "A listing with this title at this company exists; a board that mints a fresh address per visit may be showing you the same advert."
@@ -2884,6 +2927,10 @@ msgstr "टोकन Postulo से बाहर के किसी टूल �
 #: src/postulo/templates/help/postal_addresses.html
 msgid "A town and a country alone are kept as a place. Nothing checks that an address exists, and a country Postulo has no rules for is free-form."
 msgstr "सिर्फ़ शहर और देश को एक जगह के रूप में रखा जाता है। कोई यह नहीं जांचता कि पता असल में मौजूद है, और जिस देश के लिए Postulo के पास नियम नहीं हैं, उसका पता किसी भी रूप में लिखा जा सकता है।"
+
+#: src/postulo/jobs/search_views.py
+msgid "A town or a region."
+msgstr ""
 
 #: src/postulo/resume/candidate.py
 msgid "A translation"
@@ -3408,6 +3455,10 @@ msgstr "विज्ञापन"
 #: src/postulo/jobs/industries.py
 msgid "Advertising and marketing"
 msgstr "एडवरटाइज़िंग और मार्केटिंग"
+
+#: src/postulo/templates/jobs/listing_search.html
+msgid "Adverts found"
+msgstr ""
 
 #: src/postulo/applications/models.py
 msgid "adviser"
@@ -4348,9 +4399,17 @@ msgstr "एशिया"
 msgid "Asked"
 msgstr "पूछा गया"
 
+#: src/postulo/jobs/search_views.py
+msgid "Asked for the advert. Check it before it becomes a listing."
+msgstr ""
+
 #: src/postulo/templates/server/record_of_processing.html
 msgid "Asked only when somebody presses for it, one company at a time. Each is sent what is listed and nothing about the person asking."
 msgstr "केवल तभी पूछा जाता है जब कोई इसके लिए बटन दबाए, एक बार में एक कंपनी। हर एक को वही भेजा जाता है जो सूची में दिया गया है, और पूछने वाले व्यक्ति के बारे में कुछ नहीं।"
+
+#: src/postulo/templates/server/record_of_processing.html
+msgid "Asked only when somebody presses Search or Review. Each is sent what is listed and nothing about the person asking; nothing it answers is kept unless the person saves an advert."
+msgstr ""
 
 #: src/postulo/templates/connections/pairing.html
 #, python-format
@@ -4377,6 +4436,10 @@ msgstr "संघ, सोसाइटी और क्लब जिनके आ
 #, fuzzy
 msgid "at"
 msgstr "समय"
+
+#: src/postulo/jobs/search_views.py
+msgid "At any time"
+msgstr ""
 
 #: src/postulo/templates/settings/appearance.html
 msgid "At each status"
@@ -4623,6 +4686,7 @@ msgstr "“आपका विवरण” पर वापस जाएं"
 
 #: src/postulo/templates/jobs/capture_decided.html
 #: src/postulo/templates/jobs/capture_page.html
+#: src/postulo/templates/jobs/listing_search.html
 msgid "Back to your listings"
 msgstr "अपने विज्ञापनों पर वापस जाएं"
 
@@ -9477,6 +9541,13 @@ msgstr "फ़ाइल में दो बार"
 msgid "In the instance's time zone."
 msgstr "इंस्टेंस के टाइम ज़ोन में।"
 
+#: src/postulo/jobs/search_views.py
+#, python-format
+msgid "In the last day"
+msgid_plural "In the last %(count)d days"
+msgstr[0] ""
+msgstr[1] ""
+
 #: src/postulo/core/search.py
 #, python-format
 msgid "in the motivation letter rendered on %(when)s"
@@ -9514,6 +9585,10 @@ msgstr "%(when)s को %(company)s को भेजी गई रिपोर�
 #: src/postulo/templates/documents/rendered_compare.html
 msgid "In this version, and not in the one before"
 msgstr "इस वर्शन में, पर पिछले वाले में नहीं"
+
+#: src/postulo/templates/jobs/listing_search.html
+msgid "In your listings"
+msgstr ""
 
 #: src/postulo/applications/forms.py
 msgid "In your time zone."
@@ -10104,6 +10179,10 @@ msgstr "इसकी सड़क से"
 msgid "Its street will be looked up with %(service)s shortly."
 msgstr "इसकी सड़क जल्द ही %(service)s से खोजी जाएगी।"
 
+#: src/postulo/templates/jobs/listing_search.html
+msgid "Its terms of use"
+msgstr ""
+
 #: src/postulo/core/models.py
 #, fuzzy
 msgid "its town"
@@ -10129,6 +10208,18 @@ msgstr "नौकरी खोज रिपोर्ट"
 #, python-format
 msgid "Job search report · %(period)s"
 msgstr "नौकरी की तलाश की रिपोर्ट · %(period)s"
+
+#: src/postulo/jobs/search_views.py
+msgid "Job service"
+msgstr ""
+
+#: src/postulo/plugins/kinds.py
+msgid "Job services"
+msgstr ""
+
+#: src/postulo/templates/server/record_of_processing.html
+msgid "Job services it may search"
+msgstr ""
 
 #: src/postulo/applications/forms.py src/postulo/jobs/forms.py
 #: src/postulo/jobs/models.py
@@ -10808,6 +10899,10 @@ msgstr "स्तर 8"
 #: src/postulo/templates/server/plugins.html
 msgid "Licence"
 msgstr "लाइसेंस"
+
+#: src/postulo/templates/jobs/listing_search.html
+msgid "Licence of its adverts:"
+msgstr ""
 
 #: src/postulo/accounts/models.py src/postulo/core/context_processors.py
 msgid "Light"
@@ -11950,6 +12045,7 @@ msgid "Next month"
 msgstr "अगला महीना"
 
 #: src/postulo/templates/cotton/document_viewer.html
+#: src/postulo/templates/jobs/listing_search.html
 msgid "Next page"
 msgstr "अगला पेज"
 
@@ -12983,6 +13079,10 @@ msgstr "जब तक नया पासवर्ड न डाला जाए
 msgid "Nothing kept yet. Keep what you typed into the employer's form, so you can see what they were told."
 msgstr "अभी कुछ रखा नहीं गया है। नियोक्ता के फ़ॉर्म में आपने जो टाइप किया उसे रखें, ताकि आप देख सकें कि उन्हें क्या बताया गया था।"
 
+#: src/postulo/templates/jobs/listing_search.html
+msgid "Nothing matches that search."
+msgstr ""
+
 #: src/postulo/templates/applications/application_list.html
 #: src/postulo/templates/jobs/company_list.html
 #: src/postulo/templates/jobs/listing_list.html
@@ -13529,6 +13629,13 @@ msgstr "हर पंक्ति में एक उपलब्धि।"
 msgid "One address: the person you met, or your contact for this application, or the company's own. It is needed to send, and noted on the timeline when it is given."
 msgstr "एक पता: जिस व्यक्ति से आप मिले, या इस आवेदन के लिए आपका संपर्क, या कंपनी का अपना। भेजने के लिए यह ज़रूरी है, और देने पर टाइमलाइन पर दर्ज होता है।"
 
+#: src/postulo/templates/jobs/listing_search.html
+#, python-format
+msgid "One advert found"
+msgid_plural "%(counter)s adverts found"
+msgstr[0] ""
+msgstr[1] ""
+
 #: src/postulo/templates/applications/report.html
 #, python-format
 msgid "One application sent in this period."
@@ -13983,6 +14090,10 @@ msgstr "या कोई नया संपर्क"
 #: src/postulo/accounts/forms.py
 msgid "Or say only this"
 msgstr "या सिर्फ़ यह बताएं"
+
+#: src/postulo/templates/jobs/capture_form.html
+msgid "Or search a job service for adverts"
+msgstr ""
 
 #: src/postulo/templates/jobs/move_owner.html
 msgid "Or to a person"
@@ -14568,7 +14679,7 @@ msgstr "%(version)s पर पिन किया गया"
 msgid "Pinned to a version"
 msgstr "किसी वर्शन पर पिन किया गया"
 
-#: src/postulo/core/models.py
+#: src/postulo/core/models.py src/postulo/jobs/search_views.py
 msgid "Place"
 msgstr "जगह"
 
@@ -15375,6 +15486,15 @@ msgstr "प्रकाशन"
 msgid "Publications in the file"
 msgstr "फ़ाइल में प्रकाशन"
 
+#: src/postulo/jobs/search_views.py
+msgid "Published"
+msgstr ""
+
+#: src/postulo/templates/jobs/listing_search.html
+#, python-format
+msgid "Published %(when)s"
+msgstr ""
+
 #: src/postulo/resume/models.py
 msgid "published in"
 msgstr "कहां प्रकाशित हुआ"
@@ -16079,6 +16199,14 @@ msgstr "रिमोट"
 msgid "remote address"
 msgstr "रिमोट पता"
 
+#: src/postulo/jobs/search_views.py
+msgid "Remote work only"
+msgstr ""
+
+#: src/postulo/jobs/search_views.py
+msgid "remote work only"
+msgstr ""
+
 #: src/postulo/templates/accounts/profile.html
 #: src/postulo/templates/connections/confirm_delete.html
 #: src/postulo/templates/connections/list.html
@@ -16285,6 +16413,7 @@ msgstr "रिवर्स प्रॉक्सी"
 
 #: src/postulo/templates/jobs/capture_list.html
 #: src/postulo/templates/jobs/listing_list.html
+#: src/postulo/templates/jobs/listing_search.html
 #, fuzzy
 msgid "Review"
 msgstr "जांचें"
@@ -16595,6 +16724,14 @@ msgstr "बताएं कि यह पहचानकर्ता क्य�
 msgid "Say what this number is."
 msgstr "बताएं कि यह किस तरह का नंबर है।"
 
+#: src/postulo/jobs/listing_search.py
+msgid "Say what to search for."
+msgstr ""
+
+#: src/postulo/jobs/search_views.py
+msgid "Say what to search for: some words, or a place."
+msgstr ""
+
 #: src/postulo/applications/forms.py
 msgid "Say which currency the amount is in."
 msgstr "बताएं कि रकम किस मुद्रा में है।"
@@ -16674,9 +16811,15 @@ msgstr "Postulo ने सील की जांच नहीं की"
 #: src/postulo/templates/core/search.html
 #: src/postulo/templates/cotton/site_search.html
 #: src/postulo/templates/jobs/industry_list.html
+#: src/postulo/templates/jobs/listing_search.html
 #: src/postulo/templates/resume/answer_list.html
 msgid "Search"
 msgstr "खोजें"
+
+#: src/postulo/templates/jobs/listing_list.html
+#: src/postulo/templates/jobs/listing_search.html
+msgid "Search a job service"
+msgstr ""
 
 #: src/postulo/applications/tables.py
 msgid "Search applications"
@@ -16706,6 +16849,10 @@ msgstr "लेटर खोजें"
 #: src/postulo/jobs/tables.py
 msgid "Search listings"
 msgstr "विज्ञापन खोजें"
+
+#: src/postulo/templates/jobs/listing_search.html
+msgid "Search the adverts a job service publishes, and review the one you want before it becomes a listing. Nothing is asked until you press Search."
+msgstr ""
 
 #: src/postulo/applications/views.py
 msgid "Search the calendar"
@@ -17078,6 +17225,10 @@ msgstr "निपट चुके"
 #: src/postulo/templates/server/design.html
 msgid "Seven colours, each tuned to 3:1 against the card in both themes."
 msgstr "सात रंग, हर एक को दोनों थीम में कार्ड के मुकाबले 3:1 पर सेट किया गया है।"
+
+#: src/postulo/jobs/search_views.py
+msgid "Several countries"
+msgstr ""
 
 #: src/postulo/jobs/industries.py
 msgid "Sewerage"
@@ -18442,6 +18593,10 @@ msgstr "उस पते ने बहुत बार रीडायरेक�
 msgid "That address returned %(kind)s rather than a web page."
 msgstr "उस पते ने वेब पेज के बजाय %(kind)s लौटाया।"
 
+#: src/postulo/jobs/listing_search.py
+msgid "That advert cannot be asked of this service."
+msgstr ""
+
 #: src/postulo/documents/slow.py
 msgid "That application is no longer here."
 msgstr "वह आवेदन अब मौजूद नहीं है।"
@@ -18873,6 +19028,10 @@ msgstr "यह किसी Wikidata आइटम का पहचानकर�
 msgid "That is not an address Postulo can use."
 msgstr "यह ऐसा पता नहीं है जिसका Postulo इस्तेमाल कर सके।"
 
+#: src/postulo/jobs/listing_search.py
+msgid "That is not an advert this service could have named."
+msgstr ""
+
 #: src/postulo/core/offsite.py
 msgid "That is not an age recipient. It starts age1 and is 62 characters long."
 msgstr "यह age प्राप्तकर्ता नहीं है। यह age1 से शुरू होता है और 62 अक्षर लंबा होता है।"
@@ -18979,6 +19138,10 @@ msgstr "वह आइटम पहले से %(record)s से पेयर �
 #: src/postulo/plugins/pairing.py
 msgid "That item is no longer on the other side."
 msgstr "वह आइटम अब दूसरी तरफ़ नहीं है।"
+
+#: src/postulo/jobs/search_views.py
+msgid "That job service is not offered here."
+msgstr ""
 
 #: src/postulo/templates/account/recovery_unusable.html
 msgid "That link cannot be used"
@@ -19102,6 +19265,14 @@ msgstr "यह जवाब Postulo के किसी अनुरोध स�
 #: src/postulo/core/views_access.py
 msgid "That rule existed, and is changed."
 msgstr "यह नियम पहले से था, और उसे बदल दिया गया है।"
+
+#: src/postulo/jobs/listing_search.py
+msgid "That search cannot be asked of this service."
+msgstr ""
+
+#: src/postulo/jobs/listing_search.py
+msgid "That search is longer than a service can be asked."
+msgstr ""
 
 #: src/postulo/applications/views.py
 msgid "That suggestion has already been answered."
@@ -20269,6 +20440,10 @@ msgstr "आपके विवरण की फ़ोटो, आपके ना
 msgid "The picture that stands for you on these pages: one you upload, your Gravatar, or your initials."
 msgstr "वह तस्वीर जो इन पेजों पर आपकी पहचान है: आपकी अपलोड की हुई, आपका Gravatar, या आपके नाम के पहले अक्षर।"
 
+#: src/postulo/jobs/search_views.py
+msgid "the place"
+msgstr ""
+
 #: src/postulo/accounts/models.py
 msgid "The plugin whose calendar entries set the date, such as a monthly declaration."
 msgstr "वह प्लगिन जिसकी कैलेंडर प्रविष्टियां तारीख तय करती हैं, जैसे मासिक घोषणा।"
@@ -20405,6 +20580,10 @@ msgstr "अनुरोध उस रूप में नहीं था जो
 msgid "The rest of the file is still worth importing. What is listed here is not, and you can add it by hand afterwards."
 msgstr "फ़ाइल का बाकी हिस्सा फिर भी इंपोर्ट करने लायक है। यहां जो सूची में है, वह नहीं, और उसे आप बाद में हाथ से जोड़ सकते हैं।"
 
+#: src/postulo/templates/jobs/listing_search.html
+msgid "The results are shown and not kept. An advert is kept only once you review it and save it."
+msgstr ""
+
 #: src/postulo/templates/applications/application_intake.html
 #: src/postulo/templates/jobs/capture_review.html
 #: src/postulo/templates/jobs/listing_form.html
@@ -20508,6 +20687,14 @@ msgstr "सर्वर ने ये क्रेडेंशियल अस�
 #: src/postulo/core/server_forms.py
 msgid "The server that accepts the mail — its name, not an address."
 msgstr "मेल स्वीकार करने वाला सर्वर — उसका नाम, न कि पता।"
+
+#: src/postulo/jobs/listing_search.py
+msgid "The service's address is not one it declared."
+msgstr ""
+
+#: src/postulo/jobs/listing_search.py
+msgid "The service's answer could not be read."
+msgstr ""
 
 #: src/postulo/core/server_forms.py
 msgid "The service's base address. Left empty with Nominatim, OpenStreetMap's public instance is used: https://nominatim.openstreetmap.org. For your own: for example https://photon.example.org"
@@ -20762,6 +20949,10 @@ msgstr "व्हील का मेटाडेटा पढ़ा नही�
 msgid "The wheel's metadata is far larger than any plugin's."
 msgstr "व्हील का मेटाडेटा किसी भी प्लगिन के मेटाडेटा से बहुत बड़ा है।"
 
+#: src/postulo/jobs/search_views.py
+msgid "the words"
+msgstr ""
+
 #: src/postulo/templates/documents/rendered_compare.html
 msgid "The words are the same in both. If the two PDFs look different, what changed is how they are set: the theme, or the layout."
 msgstr "दोनों में शब्द एक जैसे हैं। अगर दोनों PDF अलग दिखते हैं, तो बदलाव इसमें है कि उन्हें कैसे सजाया गया है: थीम में, या लेआउट में।"
@@ -20769,6 +20960,10 @@ msgstr "दोनों में शब्द एक जैसे हैं। 
 #: src/postulo/templates/documents/letter_detail.html
 msgid "The words without the layout, in this letter's language. None of these is filed as a version you sent."
 msgstr "लेआउट के बिना शब्द, इस लेटर की भाषा में। इनमें से कोई भी आपके भेजे गए वर्शन के रूप में नहीं रखा जाता।"
+
+#: src/postulo/jobs/listing_search.py
+msgid "the words, the place and the filters searched for"
+msgstr ""
 
 #: src/postulo/core/errands.py
 msgid "The work was interrupted before it finished. Please try again."
@@ -22357,6 +22552,7 @@ msgid "Waiting after this one: %(count)s."
 msgstr "इसके बाद इंतज़ार में: %(count)s।"
 
 #: src/postulo/applications/models.py src/postulo/jobs/models.py
+#: src/postulo/templates/jobs/listing_search.html
 msgid "Waiting for review"
 msgstr "जांच का इंतज़ार"
 
@@ -23081,6 +23277,10 @@ msgstr "यह आपके विज्ञापनों में कब आ�
 msgid "When it happened, which is not always when you write it down."
 msgstr "यह कब हुआ, जो हमेशा वही समय नहीं होता जब आप इसे लिखते हैं।"
 
+#: src/postulo/jobs/search_views.py
+msgid "when it was published"
+msgstr ""
+
 #: src/postulo/jobs/forms.py
 msgid "When the employer put it up, if the posting says. Empty means unknown."
 msgstr "नियोक्ता ने इसे कब डाला, अगर विज्ञापन में बताया गया हो। खाली का मतलब है पता नहीं।"
@@ -23639,6 +23839,10 @@ msgstr "लकड़ी के उत्पाद"
 #: src/postulo/documents/formats.py
 msgid "Word document"
 msgstr "Word डॉक्यूमेंट"
+
+#: src/postulo/jobs/search_views.py
+msgid "Words"
+msgstr ""
 
 #: src/postulo/accounts/forms.py
 msgid "Words and chevrons"
