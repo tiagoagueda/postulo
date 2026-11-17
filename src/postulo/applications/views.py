@@ -42,7 +42,7 @@ from postulo.core.params import as_pk
 from postulo.core.redirects import safe_next
 from postulo.core.search import application_match, clean_query
 from postulo.documents import themes
-from postulo.jobs import listing_skills
+from postulo.jobs import listing_earnings, listing_skills
 from postulo.jobs.history import history_of
 from postulo.jobs.models import Company, Contact
 from postulo.jobs.views import UserFormKwargsMixin
@@ -574,6 +574,14 @@ class ApplicationDetailView(OwnedObjectMixin, DetailView):
         # What deleting it would take with it, for the dialog on this page (#854).
         context["deletion"] = deletions.facts_for(ApplicationDeleteView, self.request, self.object)
         context["offers"] = list(self.object.offers.all())
+        # What a statistics office published for the listing's group of occupations and
+        # country (#1257), in the period and currency of the latest offer where it states
+        # pay, else the listing's. Nothing where no earnings source is enabled.
+        context["earnings"] = listing_earnings.panel(
+            self.object.posting,
+            self.request.user,
+            stated=listing_earnings.stated_offer(context["offers"]),
+        )
         context["answers"] = list(self.object.answers.all())
         interviews = list(self.object.interviews.prefetch_related("contacts"))
         context["scheduled_interviews"] = [i for i in interviews if i.is_scheduled]

@@ -722,6 +722,42 @@ class SuggestionSourcePlugin(Protocol):
     sources: tuple
 
 
+# ------------------------------------------------------------------ earnings sources
+
+#: Where a package that knows published earnings statistics registers itself (#1257). Open,
+#: as the suggestion-source group is: a source says which countries it answers for, whether it
+#: is offline, its licence and its citation and, if it dials out, the hosts it may; a package
+#: for one country's statistics office may add one, and cannot take a key another holds.
+EARNINGS_SOURCE_GROUP = "postulo.earnings_sources"
+
+
+@runtime_checkable
+class EarningsSourcePlugin(Protocol):
+    """A registry of the published earnings statistics a listing may be read beside (#1257).
+
+    The shape of a suggestion-source plugin: it holds no rows and is not asked to do
+    anything but say which sources it contributes, each an `EarningsSource` from the plugin
+    surface. A source answers one question -- what did employees of this occupation's group
+    earn in this country -- with `EarningsFigure`s, plain values that each say what they
+    are, and Postulo draws them: the plugin hands over no markup.
+
+    **A figure is a statistic and is drawn as one.** Postulo names the measure, gross or
+    net, the period, the year, the group and the source beside every amount, converts
+    nothing, compares it with nobody's salary and recommends none; a plugin cannot make it
+    do otherwise, because all it hands over is the values.
+
+    **A source that reaches the network says so**: it names its hosts and is never asked on
+    a page load. Nothing asks one on a press yet, so only offline sources are shown.
+    """
+
+    #: The identifier the registry keys on.
+    name: str
+    #: What kind of plugin this is; always ``"earnings-source"``.
+    kind: str
+    #: The sources it contributes, each an `EarningsSource` from the plugin surface.
+    sources: tuple
+
+
 # --------------------------------------------------------------------- features
 
 #: Where something that *changes what Postulo keeps* registers itself.
@@ -866,6 +902,7 @@ SUB_PLUGIN_KINDS = (
     "feature",
     "outbox",
     "suggestion-source",
+    "earnings-source",
 )
 #: Where the parent's name and the sub-plugin's id are joined in the name policy rows hold.
 SUB_PLUGIN_SEPARATOR = ":"

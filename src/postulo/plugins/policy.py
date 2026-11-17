@@ -79,6 +79,7 @@ GOVERNED_KINDS = (
     "feature",
     "outbox",
     "suggestion-source",
+    "earnings-source",
 )
 
 #: The rest. Named rather than implied, because the guard below has to look a plugin up by

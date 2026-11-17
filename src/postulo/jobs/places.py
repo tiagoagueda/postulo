@@ -707,3 +707,21 @@ def resolve(text: str) -> dict | None:
         "name": pick["name"],
         "country": pick["country"],
     }
+
+
+def country_named(text: str) -> str:
+    """The code of the country a typed location names where it names no town, or ``""`` (#1257).
+
+    "Portugal" is a place, and so is "Remote, Germany": the whole text, or what follows its
+    last comma, read as the name of a country in any language Postulo speaks, by the names
+    the lookup already holds. A name two countries share, or none has, is no country, and so
+    is anything where the country table is not on this machine.
+    """
+    parts = [part.strip() for part in (text or "").replace(";", ",").split(",") if part.strip()]
+    if not parts:
+        return ""
+    for candidate in dict.fromkeys((", ".join(parts), parts[-1])):
+        codes = _countries(fold(candidate))
+        if codes is not None and len(codes) == 1:
+            return next(iter(codes))
+    return ""

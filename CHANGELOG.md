@@ -6,6 +6,10 @@ All notable changes to Postulo are recorded here. The format follows
 
 ## [Unreleased]
 
+### ✨ Added
+
+- Plugins can supply published earnings statistics for a listing's occupation and country (an earnings source); the listing and application pages draw each figure with its measure, period, year and source, never as a recommendation, and nothing until a source is enabled (#1257)
+
 ## [0.5.5] — 2026-11-16
 
 ### ✨ Added

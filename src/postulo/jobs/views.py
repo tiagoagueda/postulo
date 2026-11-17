@@ -53,6 +53,7 @@ from . import (
     identifier_removals,
     identifiers,
     industries,
+    listing_earnings,
     listing_skills,
     logos,
     mapping,
@@ -2286,6 +2287,10 @@ def listing_page_context(request, posting, *, event_form=None) -> dict:
         "event_form": event_form or ListingEventForm(user=request.user),
         # Which of the skills it names the reader has, from ESCO, with no model (#1093).
         "skills": listing_skills.panel(posting, request.user),
+        # What a statistics office published for its group of occupations and country, in
+        # the period and currency of the salary it states (#1257). The reader's sources, on
+        # a shared listing too, and nothing where none is enabled.
+        "earnings": listing_earnings.panel(posting, request.user),
     }
 
 
