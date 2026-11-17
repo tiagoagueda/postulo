@@ -431,6 +431,29 @@ def test_a_redirect_is_followed_among_its_hosts_and_refused_outside_them(web):
     assert web["seen"] == ["https://rogue.test/a"], "the other host was never asked"
 
 
+def test_a_page_from_a_sources_own_hosts_is_held_to_them_before_a_redirect_is_followed(web):
+    """A source with hosts of its own that reads HTML is asked as a JSON one is, so a
+    redirect off its hosts is refused before the other host is dialled, not after."""
+    web["answers"]["https://rogue.test/a"] = httpx.Response(
+        200, content=b"<html><title>Rogue</title></html>"
+    )
+    seen_by_read = []
+    source = rogue(reads="page", read=lambda answers, subject: seen_by_read.extend(answers) or [])
+
+    enrichment.ask_source(source, enrichment.Subject(name="Black Mesa"))
+
+    assert [answer.text for answer in seen_by_read] == ["<html><title>Rogue</title></html>"]
+    assert web["read"] == [], "the capture reader, which follows redirects anywhere, is not used"
+
+    web["answers"]["https://rogue.test/a"] = httpx.Response(
+        302, headers={"Location": "https://elsewhere.test/b"}
+    )
+    web["seen"].clear()
+    with pytest.raises(enrichment.Refused, match="somewhere else"):
+        enrichment.ask_source(source, enrichment.Subject(name="Black Mesa"))
+    assert web["seen"] == ["https://rogue.test/a"], "the other host was never asked"
+
+
 def test_a_source_that_reads_the_companys_site_is_held_to_the_websites_host(web):
     def site(addresses):
         return api.EnrichmentSource(
@@ -916,6 +939,28 @@ def test_every_kind_of_value_is_kept_where_it_belongs(client, user, details, web
     assert company.has_logo and company.logo_source == "url"
     assert company.logo_source_url == "https://data.details.test/files/lambda.svg"
     assert company.name == "Black Mesa", "a name is said, never kept"
+
+
+def test_keeping_a_logo_spends_the_fetch_allowance_and_is_refused_once_it_is_spent(
+    client, user, details, web, monkeypatch, settings
+):
+    from postulo.core import throttle
+    from postulo.jobs import logos
+
+    settings.POSTULO_FETCH_RATE = "1/h"
+    throttle.fetch(user)
+    company = acme(user)
+    says(web, value("logo", "https://data.details.test/files/lambda.svg", "P154"))
+    fetched = []
+    monkeypatch.setattr(logos, "download", lambda url: fetched.append(url) or b"<svg/>")
+    client.force_login(user)
+    response, errand = review_of(client, company, "test-data")
+
+    keep(client, company, errand, tick_for(response, "logo"))
+
+    company.refresh_from_db()
+    assert fetched == [], "the address was not fetched"
+    assert not company.has_logo
 
 
 def test_a_hand_written_post_cannot_keep_what_the_page_did_not_offer(client, user, details, web):

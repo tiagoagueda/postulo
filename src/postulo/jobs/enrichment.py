@@ -558,21 +558,30 @@ def _fetch(source: Source, address: str, allowed: set[str]) -> Answer:
 
 
 def _page(source: Source, address: str, allowed: set[str]) -> Answer:
-    """One page, read as a capture's is: public addresses only, every redirect revalidated,
-    ``robots.txt`` honoured, two megabytes and thirty seconds at most (`fetching`)."""
+    """One page. From the company's own site, read as a capture's is: public addresses only,
+    every redirect revalidated, ``robots.txt`` honoured, two megabytes at most (`fetching`).
+    From a source's own hosts, asked as a JSON document is, so that every redirect is held
+    to those hosts before it is followed and never after."""
     from postulo.plugins import fetching
     from postulo.plugins.base import CaptureError
 
+    if not source.own_site:
+        url, status, media_type, body = get(
+            source, address, allowed, accept="text/html,application/xhtml+xml"
+        )
+        return Answer(
+            url=url,
+            status=status,
+            media_type=register_lookup.text(media_type.split(";")[0], 100).lower(),
+            text=body.decode("utf-8", "replace") if status == 200 else "",
+        )
     try:
         page = fetching.fetch_page(address)
     except CaptureError as error:
         raise Refused(str(error)) from error
-    if source.own_site:
-        # A site that sends its visitors to another name of its own (the bare domain to
-        # ``www.``) has said where it lives: a second request may go there too.
-        allowed.add(host_of(page.url))
-    else:
-        _hold(source, page.url, allowed, moved=True)
+    # A site that sends its visitors to another name of its own (the bare domain to
+    # ``www.``) has said where it lives: a second request may go there too.
+    allowed.add(host_of(page.url))
     return Answer(url=page.url, status=200, media_type="text/html", text=page.html)
 
 
@@ -593,13 +602,15 @@ def _json(source: Source, address: str, allowed: set[str]) -> Answer:
     )
 
 
-def get(source: Source, address: str, allowed: set[str]) -> tuple[str, int, str, bytes]:
+def get(
+    source: Source, address: str, allowed: set[str], *, accept: str = "application/json"
+) -> tuple[str, int, str, bytes]:
     """One request for ``source``: the address that answered, its status, its media type and,
     for a 200, its body. Every hop is held to ``allowed``; raises `Refused` with the reason."""
     named = _named(source)
     deadline = http.deadline_in(SECONDS)
     headers = {**dict(source.headers), "User-Agent": user_agent()}
-    headers.setdefault("Accept", "application/json")
+    headers.setdefault("Accept", accept)
     current = address
     body = b""
     try:

@@ -30,7 +30,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.db import IntegrityError, transaction
 from django.utils.dateparse import parse_date
 from django.utils.translation import gettext as _
-from django.utils.translation import gettext_lazy
+from django.utils.translation import gettext_lazy, ngettext
 
 from postulo.core import card_rows, link_services, phone_numbers, phones, web_links
 from postulo.core.models import PostalAddress
@@ -183,7 +183,9 @@ def headcount(value) -> str:
     """A head count as words: one number, a range, or "and more"."""
     low, high = value
     if high is None:
-        return _("%(count)s or more") % {"count": low}
+        return ngettext("%(count)s person or more", "%(count)s people or more", low) % {
+            "count": low
+        }
     if low == high:
         return str(low)
     return _("%(low)s to %(high)s") % {"low": low, "high": high}
@@ -538,6 +540,9 @@ def _take_logo(company, actor, choice: Choice) -> list[str]:
     # found on the company's website, or fetched from an address.
     found_on_its_site = any(origin.own_site for origin in choice.origins)
     try:
+        # A fetch of an address somebody else wrote, as one typed into the logo dialog is,
+        # so it spends one use of the person's fetch allowance (#407).
+        logos.spend_fetch(actor)
         logos.store(
             company,
             logos.process(logos.download(choice.value)),

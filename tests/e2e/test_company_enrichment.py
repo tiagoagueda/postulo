@@ -65,7 +65,8 @@ def test_the_dialog_and_the_review_fit_and_pass_axe(
 
     page.locator("[data-find-details]").click()
     dialog = page.locator("#details-dialog")
-    expect(dialog).to_be_visible()
+    # The `<dialog>` lends its box to what is inside it, as the logo dialog's does.
+    expect(page.locator("#details-dialog > *")).to_be_visible()
     expect(dialog).to_contain_text("data.details.test")
     if AXE.is_file():
         found = violations_on(page, AXE.read_text(encoding="utf-8"))

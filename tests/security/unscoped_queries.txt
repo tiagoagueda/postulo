@@ -20,6 +20,8 @@
 # person, and of their own profile, to decide whether a place shows its country (#1249).
 # core/slow.py's fail_interrupted_backups is the scheduler's sweep of backup errands whose
 # process died, every administrator's, as fail_interrupted is for every kind (#1131).
+# jobs/enrichment_views.py's forget empties the held answer of the one errand its caller fetched
+# through for_user, by that row's primary key (#1256).
 api/routers/answers.py::_given::ApplicationAnswer
 api/routers/answers.py::_saved::SavedAnswer
 api/routers/applications.py::_detail::Application
@@ -122,6 +124,7 @@ documents/signals.py::forget_the_source_of_a_render::RenderedDocument
 jobs/detach.py::_copy_parts::Company
 jobs/duplicates.py::for_company::CompanyIdentifier
 jobs/duplicates.py::for_company::CompanyName
+jobs/enrichment_views.py::forget::Errand
 jobs/forms.py::_save_department::Department
 jobs/geocoding.py::due::PostalAddress
 jobs/geojson.py::export::PostalAddress
