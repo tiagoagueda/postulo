@@ -2030,3 +2030,16 @@ def test_a_listing_search_that_redirects_onto_the_network_is_not_followed(monkey
         listing_search.advert(search, "1001")
 
     assert len(seen) == 1, "the hop onto the network was never opened"
+
+
+def test_every_job_service_postulo_ships_is_asked_on_its_own_public_name_over_https():
+    """The destinations are a fixed list, and the list is the searches' own declarations."""
+    from postulo.jobs import listing_search
+    from postulo.plugins.listing_search.sweden import SEARCHES
+
+    hosts = {host for search in SEARCHES for host in search.hosts}
+    assert hosts == {"jobsearch.api.jobtechdev.se"}
+    for search in SEARCHES:
+        for criteria in (listing_search.Criteria(words="x"), listing_search.Criteria(page=100)):
+            address = httpx.URL(search.request(criteria)[0])
+            assert address.scheme == "https" and address.host in search.hosts

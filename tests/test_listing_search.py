@@ -111,8 +111,13 @@ FOUND = {
 def service(monkeypatch):
     """The fake service installed, answering through the real guard over a mock transport.
 
-    Answers are keyed on the path asked for; anything else is a 404.
+    Answers are keyed on the path asked for; anything else is a 404. Postulo's own registry is
+    taken out meanwhile, so the fake is the only service there is; the one Postulo ships has
+    tests of its own.
     """
+    from postulo.plugins.listing_search import ListingSearches
+
+    registry.unregister_builtin("listing-search", ListingSearches)
     registry.register_builtin("listing-search", ExampleSearches)
     seen: list[httpx.Request] = []
     answers: dict[str, httpx.Response] = {}
@@ -132,6 +137,7 @@ def service(monkeypatch):
     answers["/adverts/1001"] = httpx.Response(200, content=json.dumps(ADVERT).encode())
     yield answers, seen
     registry.unregister_builtin("listing-search", ExampleSearches)
+    registry.register_builtin("listing-search", ListingSearches)
 
 
 @pytest.fixture

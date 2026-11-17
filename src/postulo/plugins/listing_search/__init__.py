@@ -12,6 +12,11 @@ looking for, and that is the operator's decision to make, not Postulo's. **Each 
 switch of its own under it**, one sub-plugin per `ListingSearch` installed, on once the feature
 is, so an administrator can offer one country's service and not another's.
 
+**The registry**, ``listing-searches``, holds the services Postulo ships a search for, and a
+package for another service adds to it through ``postulo.listing_searches``. A registry is not
+switched on its own; the feature and each service's switch are. The first is Arbetsförmedlingen's
+JobTech JobSearch, Sweden (`sweden`): keyless, its adverts under CC0.
+
 **Off is exactly what Postulo did before.** No button, no request; every listing and capture
 already made stays where it is, with the service's name in its *found via*.
 """
@@ -23,8 +28,12 @@ from django.utils.translation import gettext_lazy as _
 
 from postulo.plugins.api import SubPlugin, declares, listing_searches, shipped
 
+from .sweden import SEARCHES
+
 #: The identifier the policy rows key on, fixed as a source's name is.
 LISTING_SEARCH = "listing-search"
+#: The registry's. Not a policy key -- nothing decides about it.
+LISTING_SEARCHES = "listing-searches"
 
 
 def _described(search) -> object:
@@ -79,3 +88,24 @@ class ListingSearchFeature:
             )
             for search in listing_searches().values()
         )
+
+
+@declares(
+    shipped(
+        name=LISTING_SEARCHES,
+        label=_("Job services"),
+        kind="listing-search",
+        description=_(
+            "Which job services Listing search can search, and how each one's answer is read: "
+            "Platsbanken, Arbetsförmedlingen's adverts (Sweden), asked at "
+            "jobsearch.api.jobtechdev.se with no key, its adverts under CC0. Nothing here "
+            "asks anything by itself."
+        ),
+    )
+)
+class ListingSearches:
+    """A registry. Postulo asks it how a service is searched; it never asks anything of anyone."""
+
+    #: Every search this plugin contributes. `postulo.jobs.listing_search.searches` merges
+    #: these with whatever other listing-search plugins are installed.
+    searches = SEARCHES
