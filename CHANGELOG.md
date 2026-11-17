@@ -6,6 +6,10 @@ All notable changes to Postulo are recorded here. The format follows
 
 ## [Unreleased]
 
+### ✨ Added
+
+- A report theme is told how each application was made, where the job is, and the period's interviews one by one, so a plugin can lay the report out as the table an employment office is used to; never the names of the people met (#1262)
+
 ## [0.5.5] — 2026-11-16
 
 ### ✨ Added
