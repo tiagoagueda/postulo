@@ -8,6 +8,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### ✨ Added
 
+- Email notifications can arrive once a day instead of as they happen: one mail at an hour you choose in your own time zone, 08:00 unless you say otherwise (#1259)
 - A notifier plugin can keep a message until a time it chooses (`hold_until`) and take every kept message of a connection at once (`send_many`); kept messages wait and are retried as failed sends do (#1259)
 
 ### 🐛 Fixed
