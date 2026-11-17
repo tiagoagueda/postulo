@@ -2173,8 +2173,8 @@ msgid "<em>Headline</em> is a short professional title, such as “Backend engin
 msgstr "Is teideal gearr gairmiúil é <em>Teideal gairmiúil</em>, mar shampla “Innealtóir cúlchórais”. Má tá teideal gairmiúil dá chuid féin ag CV, priontálann sé an ceann sin ina ionad."
 
 #: src/postulo/templates/help/career.html
-msgid "<em>Import</em> reads a Europass CV; <em>Export</em> writes your details and your career as one file you can keep or move to another Postulo; <em>Preview</em> shows the whole record as a document, and <em>Your CVs</em> opens the variants made from it."
-msgstr "Léann <em>Iompórtáil</em> CV Europass; scríobhann <em>Easpórtáil</em> do shonraí agus do ghairm mar chomhad amháin is féidir leat a choinneáil nó a bhogadh chuig Postulo eile; taispeánann <em>Réamhamharc</em> an taifead iomlán mar dhoiciméad, agus osclaíonn <em>Do CVanna</em> na leaganacha a rinneadh as."
+msgid "<em>Import</em> reads a CV you have as a file; <em>Export</em> writes your details and your career as one file you can keep or move to another Postulo; <em>Preview</em> shows the whole record as a document, and <em>Your CVs</em> opens the variants made from it."
+msgstr ""
 
 #: src/postulo/templates/help/identifiers.html
 #, fuzzy
@@ -2612,7 +2612,7 @@ msgstr "Comhad ó do dhoiciméid"
 msgid "A file goes under Files first; an entry points at it rather than keeping a copy."
 msgstr "Téann comhad faoi Chomhaid ar dtús; díríonn iontráil air seachas cóip a choinneáil."
 
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 msgid "A file that Postulo itself wrote is read on a page of its own."
 msgstr "Léitear comhad a scríobh Postulo féin ar leathanach dá chuid féin."
 
@@ -3522,7 +3522,7 @@ msgstr "Cuir scil leis"
 msgid "Add a tag"
 msgstr "Cuir clib leis"
 
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 msgid "Add all of this"
 msgstr "Cuir seo ar fad leis"
 
@@ -4110,7 +4110,7 @@ msgstr "Cnaipe deilbhíne"
 msgid "An identifier"
 msgstr "Aitheantóir"
 
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 msgid "An import only ever adds. Nothing already in your career record is changed or removed, and anything that turns out to be a duplicate is yours to delete."
 msgstr "Ní dhéanann iompórtáil ach cur leis. Ní athraítear ná ní bhaintear aon rud atá i do thaifead gairme cheana, agus is leatsa aon rud a bhíonn dúbailte a scriosadh."
 
@@ -5614,7 +5614,8 @@ msgstr "Deimhniú"
 
 #: src/postulo/documents/rendering.py src/postulo/jobs/merging.py
 #: src/postulo/resume/candidate.py src/postulo/resume/registry.py
-#: src/postulo/resume/views_candidate.py
+#: src/postulo/resume/views.py src/postulo/resume/views_candidate.py
+#: src/postulo/templates/resume/import.html
 #: src/postulo/templates/resume/preview.html
 msgid "Certifications"
 msgstr "Deimhnithe"
@@ -5803,13 +5804,10 @@ msgstr "Roghnaigh tír ón liosta."
 msgid "Choose a destination and save it first."
 msgstr "Roghnaigh ceann scríbe agus sábháil é ar dtús."
 
-#: src/postulo/resume/views.py
-msgid "Choose a Europass file first."
-msgstr "Roghnaigh comhad Europass ar dtús."
-
 #: src/postulo/applications/views_ical.py src/postulo/core/views_kind_files.py
 #: src/postulo/jobs/vcard_views.py src/postulo/jobs/views.py
-#: src/postulo/resume/views_candidate.py src/postulo/resume/views_references.py
+#: src/postulo/resume/views.py src/postulo/resume/views_candidate.py
+#: src/postulo/resume/views_references.py
 msgid "Choose a file first."
 msgstr "Roghnaigh comhad ar dtús."
 
@@ -5919,9 +5917,9 @@ msgstr "Roghnaigh an dáta breithe ó fhéilire"
 msgid "Choose the destination"
 msgstr "Roghnaigh an ceann scríbe"
 
-#: src/postulo/templates/resume/europass_import.html
-msgid "Choose the PDF you downloaded from europass.europa.eu, as it is: the CV is attached inside it, and that is what Postulo reads. Older Europass files read too: the XML and PDF of the editor before 2020, and the JSON of its web service. Postulo works out which it is, shows you what is in it, and writes nothing until you say so."
-msgstr "Roghnaigh an PDF a íoslódáil tú ó europass.europa.eu, mar atá sé: tá an CV ceangailte istigh ann, agus sin a léann Postulo. Léitear sean-chomhaid Europass freisin: XML agus PDF an eagarthóra roimh 2020, agus JSON a seirbhíse gréasáin. Oibríonn Postulo amach cé acu atá ann, taispeánann sé duit cad atá ann, agus ní scríobhann sé rud ar bith go dtí go ndeir tú."
+#: src/postulo/templates/resume/import.html
+msgid "Choose the file as you downloaded it. Postulo works out which format it is, shows you what is in it, and writes nothing until you say so."
+msgstr ""
 
 #: src/postulo/accounts/forms.py src/postulo/jobs/forms.py
 msgid "Choose the type of identifier."
@@ -6574,7 +6572,8 @@ msgstr "Cúrsa"
 
 #: src/postulo/documents/rendering.py src/postulo/jobs/merging.py
 #: src/postulo/resume/candidate.py src/postulo/resume/registry.py
-#: src/postulo/resume/views_candidate.py
+#: src/postulo/resume/views.py src/postulo/resume/views_candidate.py
+#: src/postulo/templates/resume/import.html
 #: src/postulo/templates/resume/preview.html
 msgid "Courses"
 msgstr "Cúrsaí"
@@ -7581,7 +7580,7 @@ msgstr "Ríomhthráchtáil"
 msgid "Each invitation may be used once, and expires on its own. Its link is shown once, when it is made."
 msgstr "Ní féidir gach cuireadh a úsáid ach uair amháin, agus téann sé as feidhm leis féin. Taispeántar a nasc uair amháin, nuair a chruthaítear é."
 
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 #, fuzzy
 msgid "Each is added as one of your contacts and as a reference you have not asked yet, so none is printed on a CV until you say they agreed."
 msgstr "Cuirtear gach duine leis mar dhuine de do theagmhálaithe agus mar theistiméir nár iarr tú air fós, mar sin ní phriontáiltear aon duine acu ar CV go dtí go ndeir tú gur aontaigh siad."
@@ -7696,7 +7695,7 @@ msgstr "eagarthóirí"
 #: src/postulo/documents/rendering.py src/postulo/jobs/industries.py
 #: src/postulo/resume/candidate.py src/postulo/resume/registry.py
 #: src/postulo/resume/views_candidate.py
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 #: src/postulo/templates/resume/preview.html
 msgid "Education"
 msgstr "Oideachas"
@@ -7916,11 +7915,7 @@ msgstr "Scil ESCO"
 msgid "Europass"
 msgstr "Europass"
 
-#: src/postulo/core/transfers.py
-msgid "Europass import"
-msgstr "Iompórtáil Europass"
-
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 msgid "Europass records five levels per language and Postulo keeps one, so the lowest is taken. Where the file states none, none is written: a level is a claim about yourself that somebody will test, so it is yours to make afterwards."
 msgstr "Taifeadann Europass cúig leibhéal in aghaidh na teanga agus ní choinníonn Postulo ach ceann amháin, mar sin tógtar an ceann is ísle. Nuair nach luann an comhad ceann ar bith, ní scríobhtar ceann ar bith: éileamh fút féin is ea leibhéal a gcuirfidh duine éigin ar a thriail é, mar sin is fút féin é a dhéanamh ina dhiaidh sin."
 
@@ -8167,7 +8162,7 @@ msgstr "Fág amach cinn díscaoilte"
 
 #: src/postulo/documents/rendering.py src/postulo/resume/candidate.py
 #: src/postulo/resume/registry.py src/postulo/resume/views_candidate.py
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 #: src/postulo/templates/resume/preview.html
 msgid "Experience"
 msgstr "Taithí"
@@ -8825,7 +8820,7 @@ msgstr "Aimsithe trí"
 msgid "found via"
 msgstr "aimsithe trí"
 
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 #, python-format
 msgid "Found: %(names)s. Only the ones you have left blank will be filled in."
 msgstr "Aimsíodh: %(names)s. Ní líonfar ach na réimsí a d'fhág tú folamh."
@@ -9454,7 +9449,8 @@ msgstr "Onóir nó dámhachtain"
 
 #: src/postulo/documents/rendering.py src/postulo/jobs/merging.py
 #: src/postulo/resume/candidate.py src/postulo/resume/registry.py
-#: src/postulo/resume/views_candidate.py
+#: src/postulo/resume/views.py src/postulo/resume/views_candidate.py
+#: src/postulo/templates/resume/import.html
 #: src/postulo/templates/resume/preview.html
 msgid "Honours and awards"
 msgstr "Onóracha agus dámhachtainí"
@@ -9525,6 +9521,10 @@ msgstr "Conas a shroicheann sé an fostóir"
 #: src/postulo/documents/models.py
 msgid "how it reaches the employer"
 msgstr "conas a shroicheann sé an fostóir"
+
+#: src/postulo/templates/resume/import.html
+msgid "How it was read"
+msgstr ""
 
 #: src/postulo/applications/widgets.py
 msgid "How long they take"
@@ -9766,9 +9766,9 @@ msgstr "Más litir thagartha í seo"
 msgid "If you are reading this, the email settings of your Postulo instance work. Nothing else to do."
 msgstr "Má tá tú ag léamh seo, oibríonn socruithe ríomhphoist do Postulo. Níl aon rud eile le déanamh."
 
-#: src/postulo/templates/resume/europass_import.html
-msgid "If you have applied to an EU institution or through a national employment service, you already have this file. Rather than type it all again, hand it over."
-msgstr "Má rinne tú iarratas chuig institiúid de chuid an AE nó trí sheirbhís fostaíochta náisiúnta, tá an comhad seo agat cheana. In ionad é go léir a chlóscríobh arís, tabhair do Postulo é."
+#: src/postulo/templates/resume/import.html
+msgid "If your career is already written down in a file, hand it over rather than type it all again."
+msgstr ""
 
 #: src/postulo/core/models.py
 msgid "ignore robots.txt when capturing"
@@ -9790,9 +9790,9 @@ msgid "Import"
 msgstr "Iompórtáil"
 
 #: src/postulo/resume/views.py src/postulo/templates/resume/candidate_file.html
-#: src/postulo/templates/resume/europass_import.html
-msgid "Import a Europass CV"
-msgstr "Iompórtáil CV Europass"
+#: src/postulo/templates/resume/import.html
+msgid "Import a CV"
+msgstr ""
 
 #: src/postulo/templates/applications/ical_import.html
 msgid "Import an iCalendar file"
@@ -10898,7 +10898,7 @@ msgstr "teanga do thaifead gairme"
 #: src/postulo/documents/rendering.py src/postulo/resume/candidate.py
 #: src/postulo/resume/registry.py src/postulo/resume/views.py
 #: src/postulo/resume/views_candidate.py
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 #: src/postulo/templates/resume/preview.html
 msgid "Languages"
 msgstr "Teangacha"
@@ -11821,7 +11821,7 @@ msgstr "Eagraíochtaí ballraíochta"
 #: src/postulo/documents/rendering.py src/postulo/jobs/merging.py
 #: src/postulo/resume/candidate.py src/postulo/resume/registry.py
 #: src/postulo/resume/views.py src/postulo/resume/views_candidate.py
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 #: src/postulo/templates/resume/preview.html
 msgid "Memberships"
 msgstr "Ballraíochtaí"
@@ -13636,6 +13636,14 @@ msgstr "Níor seoladh aon rud fós."
 msgid "Nothing standing at Offer. Record one from an application's page when it arrives."
 msgstr "Níl aon rud ag Tairiscint. Taifead ceann ó leathanach iarratais nuair a thagann sé."
 
+#: src/postulo/resume/views.py
+msgid "Nothing that reads a CV from a file is switched on here, so that file was not read."
+msgstr ""
+
+#: src/postulo/templates/resume/import.html
+msgid "Nothing that reads a CV from a file is switched on here, so there is no file to choose."
+msgstr ""
+
 #: src/postulo/core/design.py src/postulo/templates/server/design.html
 msgid "Nothing there"
 msgstr "Níl aon rud ann"
@@ -15080,7 +15088,7 @@ msgstr "duine"
 
 #: src/postulo/accounts/views.py src/postulo/core/help.py
 #: src/postulo/templates/accounts/profile.html
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 msgid "Personal details"
 msgstr "Sonraí pearsanta"
 
@@ -15684,7 +15692,7 @@ msgstr "faoi láthair"
 #: src/postulo/documents/rendering.py src/postulo/resume/candidate.py
 #: src/postulo/resume/registry.py src/postulo/resume/views.py
 #: src/postulo/resume/views_candidate.py
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 #: src/postulo/templates/resume/preview.html
 msgid "Presentations, conferences and seminars"
 msgstr "Cur i láthair, comhdhálacha agus seimineáir"
@@ -15927,7 +15935,7 @@ msgstr "Tionscadal"
 
 #: src/postulo/documents/rendering.py src/postulo/resume/candidate.py
 #: src/postulo/resume/registry.py src/postulo/resume/views_candidate.py
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 #: src/postulo/templates/resume/preview.html
 msgid "Projects"
 msgstr "Tionscadail"
@@ -15993,7 +16001,9 @@ msgid "Publication"
 msgstr "Foilseachán"
 
 #: src/postulo/documents/rendering.py src/postulo/resume/candidate.py
-#: src/postulo/resume/registry.py src/postulo/resume/views_candidate.py
+#: src/postulo/resume/registry.py src/postulo/resume/views.py
+#: src/postulo/resume/views_candidate.py
+#: src/postulo/templates/resume/import.html
 #: src/postulo/templates/resume/preview.html
 msgid "Publications"
 msgstr "Foilseacháin"
@@ -16190,18 +16200,6 @@ msgstr "Léigh mar"
 msgid "Read as %(name)s."
 msgstr "Léite mar %(name)s."
 
-#: src/postulo/resume/views.py
-msgid "Read as Europass JSON, the older format as the Europass web service wrote it until 2020."
-msgstr "Léite mar JSON Europass, an fhormáid níos sine mar a scríobh seirbhís ghréasáin Europass go dtí 2020 í."
-
-#: src/postulo/resume/views.py
-msgid "Read as Europass XML in the older format, the one the Europass editor wrote until 2020."
-msgstr "Léite mar XML Europass san fhormáid níos sine, an ceann a scríobh eagarthóir Europass go dtí 2020."
-
-#: src/postulo/resume/views.py
-msgid "Read as Europass XML, the format europass.europa.eu has written since 2020."
-msgstr "Léite mar XML Europass, an fhormáid atá scríofa ag europass.europa.eu ó 2020."
-
 #: src/postulo/jobs/models.py
 msgid "read by"
 msgstr "léite ag"
@@ -16229,16 +16227,8 @@ msgstr "Léite ó"
 msgid "Read from <bdi>%(address)s</bdi>."
 msgstr "Léite ó <bdi>%(address)s</bdi>."
 
-#: src/postulo/resume/views.py
-msgid "Read from the Europass XML attached to the PDF, in the older format the Europass editor wrote until 2020."
-msgstr "Léite ón XML Europass atá ceangailte leis an PDF, san fhormáid níos sine a scríobh eagarthóir Europass go dtí 2020."
-
-#: src/postulo/resume/views.py
-msgid "Read from the Europass XML attached to the PDF, the format europass.europa.eu has written since 2020."
-msgstr "Léite ón XML Europass atá ceangailte leis an PDF, an fhormáid atá scríofa ag europass.europa.eu ó 2020."
-
 #: src/postulo/templates/jobs/company_places.html
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 #: src/postulo/templates/resume/references.html
 #: src/postulo/templates/server/plugins.html
 msgid "Read it"
@@ -16553,8 +16543,7 @@ msgid "Reference letters they wrote"
 msgstr "Litreacha tagartha a scríobh siad"
 
 #: src/postulo/documents/rendering.py src/postulo/resume/registry.py
-#: src/postulo/resume/views.py
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/resume/views.py src/postulo/templates/resume/import.html
 #, fuzzy
 msgid "References"
 msgstr "Teistiméirí"
@@ -18192,7 +18181,7 @@ msgstr "grúpaí scileanna"
 #: src/postulo/resume/registry.py src/postulo/resume/views.py
 #: src/postulo/resume/views_candidate.py
 #: src/postulo/templates/cotton/listing_skills.html
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 #: src/postulo/templates/resume/preview.html
 msgid "Skills"
 msgstr "Scileanna"
@@ -18476,7 +18465,7 @@ msgstr "Soláthar foirne"
 #: src/postulo/templates/core/kind_file.html
 #: src/postulo/templates/jobs/contact_vcards.html
 #: src/postulo/templates/resume/candidate_file.html
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 msgid "Start again"
 msgstr "Tosaigh arís"
 
@@ -20400,7 +20389,7 @@ msgstr "An figiúr mar a scríobh siad é, roimh cháin."
 #: src/postulo/templates/documents/upload_detail.html
 #: src/postulo/templates/jobs/contact_vcards.html
 #: src/postulo/templates/resume/candidate_file.html
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 msgid "The file"
 msgstr "An comhad"
 
@@ -21149,7 +21138,7 @@ msgstr "Tá an t-iarratas níos mó ná %(limit)s, an t-uasmhéid a léann an gl
 msgid "The request was not in the shape this call takes."
 msgstr "Ní raibh an t-iarratas sa chruth a ghlacann an glao seo."
 
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 msgid "The rest of the file is still worth importing. What is listed here is not, and you can add it by hand afterwards."
 msgstr "Is fiú an chuid eile den chomhad a iompórtáil fós. Níl an méid atá liostaithe anseo, agus is féidir leat é a chur leis de láimh ina dhiaidh sin."
 
@@ -23368,6 +23357,10 @@ msgstr "Cad a tháinig ar ais sa tréimhse seo"
 msgid "what came of it"
 msgstr "cad a tháinig as"
 
+#: src/postulo/templates/resume/import.html
+msgid "What can be read here"
+msgstr ""
+
 #: src/postulo/core/server_forms.py
 msgid "What carries the mail off this machine."
 msgstr "An rud a iompraíonn an ríomhphost ón ríomhaire seo."
@@ -23389,7 +23382,7 @@ msgstr "Cad a athraigh i %(title)s"
 msgid "What changes how Postulo behaves for you. Everything here works from the keyboard, with a screen reader and with scripts off; these are the choices on top of that."
 msgstr "An méid a athraíonn an chaoi a n-iompraíonn Postulo duit. Oibríonn gach rud anseo ón méarchlár, le léitheoir scáileáin agus le scripteanna múchta; seo iad na roghanna breise air sin."
 
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 msgid "What could not be read"
 msgstr "An méid nárbh fhéidir a léamh"
 
@@ -23450,7 +23443,7 @@ msgstr "Cad atá sa dialann, an ceann is luaithe ar dtús. Sceidealaigh ceann ó
 #: src/postulo/templates/applications/ical_import.html
 #: src/postulo/templates/core/kind_file.html
 #: src/postulo/templates/resume/candidate_file.html
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 msgid "What is in the file"
 msgstr "A bhfuil sa chomhad"
 
@@ -23960,6 +23953,10 @@ msgstr "An áit ar féidir le duine é a sheiceáil. Priontálann CV é mar nasc
 #: src/postulo/templates/server/maps.html
 msgid "Where the companies' map takes the tiles it is drawn on, and whether addresses are pinned at their street."
 msgstr "An áit a bhfaigheann léarscáil na gcuideachtaí na tíleanna a dtarraingítear í orthu, agus an gcuirtear seoltaí ag a sráid."
+
+#: src/postulo/templates/resume/import.html
+msgid "Where the file states no level, none is written: a level is a claim about yourself that somebody will test, so it is yours to make afterwards."
+msgstr ""
 
 #: src/postulo/jobs/models.py
 msgid "where the logo came from"
@@ -24568,7 +24565,7 @@ msgstr "Scríofa ag <bdi>%(name)s</bdi>"
 msgid "Written by Postulo %(version)s on %(when)s."
 msgstr "Scríofa ag Postulo %(version)s ar %(when)s."
 
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 #, python-format
 msgid "Written in %(tongue)s, which will be recorded as the language of your career record if you have not already set one."
 msgstr "Scríofa i %(tongue)s, a thaifeadfar mar theanga do thaifid gairme mura bhfuil ceann socraithe agat cheana."
@@ -25174,7 +25171,7 @@ msgstr "Do thaifead (JSON)"
 
 #: src/postulo/templates/core/export.html
 #: src/postulo/templates/resume/candidate_file.html
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 msgid "Your record as a file"
 msgstr "Do thaifead mar chomhad"
 
@@ -25304,9 +25301,13 @@ msgstr "Téann {value} i ndiaidh an óstaigh: sa chosán, i ndiaidh comhartha ce
 msgid "· in the <a href=\"%(group_url)s\" class=\"underline\">%(name)s</a> group"
 msgstr "· i ngrúpa <a href=\"%(group_url)s\" class=\"underline\">%(name)s</a>"
 
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 msgid "· no level in the file, so none will be claimed"
 msgstr "· níl leibhéal sa chomhad, mar sin ní éileofar ceann ar bith"
+
+#: src/postulo/templates/resume/import.html
+msgid "· not a level Postulo keeps, so none will be claimed"
+msgstr ""
 
 #: src/postulo/templates/applications/application_detail.html
 #, python-format

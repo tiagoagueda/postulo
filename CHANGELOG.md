@@ -6,6 +6,18 @@ All notable changes to Postulo are recorded here. The format follows
 
 ## [Unreleased]
 
+### ✨ Added
+
+- An importer plugin can hand over certifications, honours, courses and publications, a project's dates, role and link, and notes on how a file was read; `assert_is_an_importer` in `postulo.plugins.testing` holds an importer to the contract (#1260)
+
+### 🔧 Changed
+
+- The page behind *Your career → Import* is *Import a CV* and names no format: it lists what each importer that is switched on reads, and each bundled importer has its own entry in the menu. A Europass file is read as before (#1260)
+
+### ⚠️ Deprecated
+
+- The URL name `resume:europass_import` still leads to the import page for one release; a plugin's tests should post to `resume:import` (#1260)
+
 ## [0.5.5] — 2026-11-16
 
 ### ✨ Added

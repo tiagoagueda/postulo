@@ -1849,8 +1849,8 @@ msgid "<em>Headline</em> is a short professional title, such as “Backend engin
 msgstr "<em>Başlıq</em> qısa peşəkar addır, məsələn, «Backend mühəndisi». Öz başlığı olan CV onun əvəzinə həmin başlığı göstərir."
 
 #: src/postulo/templates/help/career.html
-msgid "<em>Import</em> reads a Europass CV; <em>Export</em> writes your details and your career as one file you can keep or move to another Postulo; <em>Preview</em> shows the whole record as a document, and <em>Your CVs</em> opens the variants made from it."
-msgstr "<em>İdxal</em> Europass CV-ni oxuyur; <em>İxrac</em> məlumatlarınızı və karyeranızı saxlaya və ya başqa Postulo-ya köçürə biləcəyiniz bir fayla yazır; <em>Önizləmə</em> bütün məlumatları sənəd kimi göstərir, <em>CV-ləriniz</em> isə ondan yaradılan variantları açır."
+msgid "<em>Import</em> reads a CV you have as a file; <em>Export</em> writes your details and your career as one file you can keep or move to another Postulo; <em>Preview</em> shows the whole record as a document, and <em>Your CVs</em> opens the variants made from it."
+msgstr ""
 
 #: src/postulo/templates/help/identifiers.html
 msgid "<em>Kind</em> is the register the identifier belongs to, and <em>What goes where</em> shows what each one looks like. <em>Other</em> takes anything else, with a name you give it."
@@ -2275,7 +2275,7 @@ msgstr "Sənədlərinizdən fayl"
 msgid "A file goes under Files first; an entry points at it rather than keeping a copy."
 msgstr "Fayl əvvəlcə «Fayllar» bölməsinə yüklənir; yazı onun surətini saxlamır, ona istinad edir."
 
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 msgid "A file that Postulo itself wrote is read on a page of its own."
 msgstr "Postulo-nun özünün yazdığı fayl ayrıca səhifədə oxunur."
 
@@ -3167,7 +3167,7 @@ msgstr "Bacarıq əlavə et"
 msgid "Add a tag"
 msgstr "Teq əlavə et"
 
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 msgid "Add all of this"
 msgstr "Bunların hamısını əlavə et"
 
@@ -3733,7 +3733,7 @@ msgstr "İkon düyməsi"
 msgid "An identifier"
 msgstr "İdentifikator"
 
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 msgid "An import only ever adds. Nothing already in your career record is changed or removed, and anything that turns out to be a duplicate is yours to delete."
 msgstr "İdxal yalnız əlavə edir. Karyera məlumatlarınızda artıq olan heç nə dəyişdirilmir və ya silinmir, dublikat çıxan hər şeyi isə özünüz silə bilərsiniz."
 
@@ -5218,7 +5218,8 @@ msgstr "Sertifikat"
 
 #: src/postulo/documents/rendering.py src/postulo/jobs/merging.py
 #: src/postulo/resume/candidate.py src/postulo/resume/registry.py
-#: src/postulo/resume/views_candidate.py
+#: src/postulo/resume/views.py src/postulo/resume/views_candidate.py
+#: src/postulo/templates/resume/import.html
 #: src/postulo/templates/resume/preview.html
 msgid "Certifications"
 msgstr "Sertifikatlar"
@@ -5404,13 +5405,10 @@ msgstr "Siyahıdan ölkə seçin."
 msgid "Choose a destination and save it first."
 msgstr "Əvvəlcə təyinat yeri seçin və yadda saxlayın."
 
-#: src/postulo/resume/views.py
-msgid "Choose a Europass file first."
-msgstr "Əvvəlcə Europass faylını seçin."
-
 #: src/postulo/applications/views_ical.py src/postulo/core/views_kind_files.py
 #: src/postulo/jobs/vcard_views.py src/postulo/jobs/views.py
-#: src/postulo/resume/views_candidate.py src/postulo/resume/views_references.py
+#: src/postulo/resume/views.py src/postulo/resume/views_candidate.py
+#: src/postulo/resume/views_references.py
 msgid "Choose a file first."
 msgstr "Əvvəlcə fayl seçin."
 
@@ -5519,9 +5517,9 @@ msgstr "Doğum tarixini təqvimdən seçin"
 msgid "Choose the destination"
 msgstr "Təyinat yerini seç"
 
-#: src/postulo/templates/resume/europass_import.html
-msgid "Choose the PDF you downloaded from europass.europa.eu, as it is: the CV is attached inside it, and that is what Postulo reads. Older Europass files read too: the XML and PDF of the editor before 2020, and the JSON of its web service. Postulo works out which it is, shows you what is in it, and writes nothing until you say so."
-msgstr "europass.europa.eu saytından endirdiyiniz PDF faylını olduğu kimi seçin: CV onun içinə qoşulub və Postulo məhz onu oxuyur. Köhnə Europass faylları da oxunur: 2020-ci ildən əvvəlki redaktorun XML və PDF faylları, eləcə də onun veb xidmətinin JSON faylı. Postulo onun hansı olduğunu müəyyən edir, tərkibini sizə göstərir və siz deyənədək heç nə yazmır."
+#: src/postulo/templates/resume/import.html
+msgid "Choose the file as you downloaded it. Postulo works out which format it is, shows you what is in it, and writes nothing until you say so."
+msgstr ""
 
 #: src/postulo/accounts/forms.py src/postulo/jobs/forms.py
 msgid "Choose the type of identifier."
@@ -6170,7 +6168,8 @@ msgstr "Kurs"
 
 #: src/postulo/documents/rendering.py src/postulo/jobs/merging.py
 #: src/postulo/resume/candidate.py src/postulo/resume/registry.py
-#: src/postulo/resume/views_candidate.py
+#: src/postulo/resume/views.py src/postulo/resume/views_candidate.py
+#: src/postulo/templates/resume/import.html
 #: src/postulo/templates/resume/preview.html
 msgid "Courses"
 msgstr "Kurslar"
@@ -7166,7 +7165,7 @@ msgstr "Elektron ticarət"
 msgid "Each invitation may be used once, and expires on its own. Its link is shown once, when it is made."
 msgstr "Hər dəvətdən bir dəfə istifadə etmək olar və onun vaxtı özü bitir. Onun keçidi yalnız bir dəfə, yaradılanda göstərilir."
 
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 msgid "Each is added as one of your contacts and as a reference you have not asked yet, so none is printed on a CV until you say they agreed."
 msgstr "Hər biri kontaktlarınızdan biri kimi və hələ soruşmadığınız tövsiyəçi kimi əlavə edilir, ona görə siz onların razılaşdığını deyənədək heç biri CV-də göstərilmir."
 
@@ -7279,7 +7278,7 @@ msgstr "redaktorlar"
 #: src/postulo/documents/rendering.py src/postulo/jobs/industries.py
 #: src/postulo/resume/candidate.py src/postulo/resume/registry.py
 #: src/postulo/resume/views_candidate.py
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 #: src/postulo/templates/resume/preview.html
 msgid "Education"
 msgstr "Təhsil"
@@ -7497,11 +7496,7 @@ msgstr "ESCO bacarığı"
 msgid "Europass"
 msgstr "Europass"
 
-#: src/postulo/core/transfers.py
-msgid "Europass import"
-msgstr "Europass idxalı"
-
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 msgid "Europass records five levels per language and Postulo keeps one, so the lowest is taken. Where the file states none, none is written: a level is a claim about yourself that somebody will test, so it is yours to make afterwards."
 msgstr "Europass hər dil üçün beş səviyyə qeyd edir, Postulo isə birini saxlayır, ona görə ən aşağısı götürülür. Faylda heç biri göstərilməyibsə, heç biri yazılmır: səviyyə kiminsə yoxlayacağı özünüz haqqında iddiadır, ona görə onu sonradan özünüz göstərməlisiniz."
 
@@ -7741,7 +7736,7 @@ msgstr "Ləğv edilənləri istisna et"
 
 #: src/postulo/documents/rendering.py src/postulo/resume/candidate.py
 #: src/postulo/resume/registry.py src/postulo/resume/views_candidate.py
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 #: src/postulo/templates/resume/preview.html
 msgid "Experience"
 msgstr "Təcrübə"
@@ -8391,7 +8386,7 @@ msgstr "Tapıldığı mənbə"
 msgid "found via"
 msgstr "harada tapılıb"
 
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 #, python-format
 msgid "Found: %(names)s. Only the ones you have left blank will be filled in."
 msgstr "Tapıldı: %(names)s. Yalnız boş buraxdıqlarınız doldurulacaq."
@@ -9018,7 +9013,8 @@ msgstr "Fəxri ad və ya mükafat"
 
 #: src/postulo/documents/rendering.py src/postulo/jobs/merging.py
 #: src/postulo/resume/candidate.py src/postulo/resume/registry.py
-#: src/postulo/resume/views_candidate.py
+#: src/postulo/resume/views.py src/postulo/resume/views_candidate.py
+#: src/postulo/templates/resume/import.html
 #: src/postulo/templates/resume/preview.html
 msgid "Honours and awards"
 msgstr "Fəxri adlar və mükafatlar"
@@ -9089,6 +9085,10 @@ msgstr "İşəgötürənə necə çatdırıldığı"
 #: src/postulo/documents/models.py
 msgid "how it reaches the employer"
 msgstr "işəgötürənə necə çatdırıldığı"
+
+#: src/postulo/templates/resume/import.html
+msgid "How it was read"
+msgstr ""
 
 #: src/postulo/applications/widgets.py
 msgid "How long they take"
@@ -9328,9 +9328,9 @@ msgstr "Bu tövsiyə məktubudursa"
 msgid "If you are reading this, the email settings of your Postulo instance work. Nothing else to do."
 msgstr "Bunu oxuyursunuzsa, Postulo instansiyanızın e-poçt ayarları işləyir. Başqa heç nə etmək lazım deyil."
 
-#: src/postulo/templates/resume/europass_import.html
-msgid "If you have applied to an EU institution or through a national employment service, you already have this file. Rather than type it all again, hand it over."
-msgstr "AB qurumuna və ya dövlət məşğulluq xidməti vasitəsilə müraciət etmisinizsə, bu fayl artıq sizdə var. Hər şeyi yenidən yazmaq əvəzinə onu təqdim edin."
+#: src/postulo/templates/resume/import.html
+msgid "If your career is already written down in a file, hand it over rather than type it all again."
+msgstr ""
 
 #: src/postulo/core/models.py
 msgid "ignore robots.txt when capturing"
@@ -9352,9 +9352,9 @@ msgid "Import"
 msgstr "İdxal et"
 
 #: src/postulo/resume/views.py src/postulo/templates/resume/candidate_file.html
-#: src/postulo/templates/resume/europass_import.html
-msgid "Import a Europass CV"
-msgstr "Europass CV-ni idxal et"
+#: src/postulo/templates/resume/import.html
+msgid "Import a CV"
+msgstr ""
 
 #: src/postulo/templates/applications/ical_import.html
 msgid "Import an iCalendar file"
@@ -10447,7 +10447,7 @@ msgstr "karyera məlumatlarınızın dili"
 #: src/postulo/documents/rendering.py src/postulo/resume/candidate.py
 #: src/postulo/resume/registry.py src/postulo/resume/views.py
 #: src/postulo/resume/views_candidate.py
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 #: src/postulo/templates/resume/preview.html
 msgid "Languages"
 msgstr "Dillər"
@@ -11357,7 +11357,7 @@ msgstr "Üzvlük əsaslı təşkilatlar"
 #: src/postulo/documents/rendering.py src/postulo/jobs/merging.py
 #: src/postulo/resume/candidate.py src/postulo/resume/registry.py
 #: src/postulo/resume/views.py src/postulo/resume/views_candidate.py
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 #: src/postulo/templates/resume/preview.html
 msgid "Memberships"
 msgstr "Üzvlüklər"
@@ -13143,6 +13143,14 @@ msgstr "Hələ heç nə göndərilməyib."
 msgid "Nothing standing at Offer. Record one from an application's page when it arrives."
 msgstr "Statusu «Təklif» olan heç nə yoxdur. Təklif gələndə onu müraciətin səhifəsindən qeydə alın."
 
+#: src/postulo/resume/views.py
+msgid "Nothing that reads a CV from a file is switched on here, so that file was not read."
+msgstr ""
+
+#: src/postulo/templates/resume/import.html
+msgid "Nothing that reads a CV from a file is switched on here, so there is no file to choose."
+msgstr ""
+
 #: src/postulo/core/design.py src/postulo/templates/server/design.html
 msgid "Nothing there"
 msgstr "Heç nə yoxdur"
@@ -14522,7 +14530,7 @@ msgstr "şəxs"
 
 #: src/postulo/accounts/views.py src/postulo/core/help.py
 #: src/postulo/templates/accounts/profile.html
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 msgid "Personal details"
 msgstr "Şəxsi məlumatlar"
 
@@ -15108,7 +15116,7 @@ msgstr "indiyədək"
 #: src/postulo/documents/rendering.py src/postulo/resume/candidate.py
 #: src/postulo/resume/registry.py src/postulo/resume/views.py
 #: src/postulo/resume/views_candidate.py
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 #: src/postulo/templates/resume/preview.html
 msgid "Presentations, conferences and seminars"
 msgstr "Təqdimatlar, konfranslar və seminarlar"
@@ -15342,7 +15350,7 @@ msgstr "Layihə"
 
 #: src/postulo/documents/rendering.py src/postulo/resume/candidate.py
 #: src/postulo/resume/registry.py src/postulo/resume/views_candidate.py
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 #: src/postulo/templates/resume/preview.html
 msgid "Projects"
 msgstr "Layihələr"
@@ -15409,7 +15417,9 @@ msgid "Publication"
 msgstr "Nəşr"
 
 #: src/postulo/documents/rendering.py src/postulo/resume/candidate.py
-#: src/postulo/resume/registry.py src/postulo/resume/views_candidate.py
+#: src/postulo/resume/registry.py src/postulo/resume/views.py
+#: src/postulo/resume/views_candidate.py
+#: src/postulo/templates/resume/import.html
 #: src/postulo/templates/resume/preview.html
 msgid "Publications"
 msgstr "Nəşrlər"
@@ -15597,18 +15607,6 @@ msgstr "Necə oxunsun"
 msgid "Read as %(name)s."
 msgstr "%(name)s kimi oxundu."
 
-#: src/postulo/resume/views.py
-msgid "Read as Europass JSON, the older format as the Europass web service wrote it until 2020."
-msgstr "Europass JSON kimi oxundu — Europass veb xidmətinin 2020-ci ilədək yazdığı köhnə format."
-
-#: src/postulo/resume/views.py
-msgid "Read as Europass XML in the older format, the one the Europass editor wrote until 2020."
-msgstr "Köhnə formatda Europass XML kimi oxundu — Europass redaktorunun 2020-ci ilədək yazdığı format."
-
-#: src/postulo/resume/views.py
-msgid "Read as Europass XML, the format europass.europa.eu has written since 2020."
-msgstr "Europass XML kimi oxundu — europass.europa.eu saytının 2020-ci ildən bəri yazdığı format."
-
 #: src/postulo/jobs/models.py
 msgid "read by"
 msgstr "oxuyan"
@@ -15638,16 +15636,8 @@ msgstr "Oxunduğu ünvan"
 msgid "Read from <bdi>%(address)s</bdi>."
 msgstr "<bdi>%(address)s</bdi> ünvanından oxunub."
 
-#: src/postulo/resume/views.py
-msgid "Read from the Europass XML attached to the PDF, in the older format the Europass editor wrote until 2020."
-msgstr "PDF-ə qoşulmuş Europass XML-dən oxundu — Europass redaktorunun 2020-ci ilədək yazdığı köhnə formatda."
-
-#: src/postulo/resume/views.py
-msgid "Read from the Europass XML attached to the PDF, the format europass.europa.eu has written since 2020."
-msgstr "PDF-ə qoşulmuş Europass XML-dən oxundu — europass.europa.eu saytının 2020-ci ildən bəri yazdığı formatda."
-
 #: src/postulo/templates/jobs/company_places.html
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 #: src/postulo/templates/resume/references.html
 #: src/postulo/templates/server/plugins.html
 msgid "Read it"
@@ -15954,8 +15944,7 @@ msgid "Reference letters they wrote"
 msgstr "Yazdıqları tövsiyə məktubları"
 
 #: src/postulo/documents/rendering.py src/postulo/resume/registry.py
-#: src/postulo/resume/views.py
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/resume/views.py src/postulo/templates/resume/import.html
 msgid "References"
 msgstr "Tövsiyələr"
 
@@ -17567,7 +17556,7 @@ msgstr "bacarıq qrupları"
 #: src/postulo/resume/registry.py src/postulo/resume/views.py
 #: src/postulo/resume/views_candidate.py
 #: src/postulo/templates/cotton/listing_skills.html
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 #: src/postulo/templates/resume/preview.html
 msgid "Skills"
 msgstr "Bacarıqlar"
@@ -17852,7 +17841,7 @@ msgstr "Kadr təminatı"
 #: src/postulo/templates/core/kind_file.html
 #: src/postulo/templates/jobs/contact_vcards.html
 #: src/postulo/templates/resume/candidate_file.html
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 msgid "Start again"
 msgstr "Yenidən başla"
 
@@ -19728,7 +19717,7 @@ msgstr "Onların yazdığı kimi məbləğ, vergidən əvvəl."
 #: src/postulo/templates/documents/upload_detail.html
 #: src/postulo/templates/jobs/contact_vcards.html
 #: src/postulo/templates/resume/candidate_file.html
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 msgid "The file"
 msgstr "Fayl"
 
@@ -20454,7 +20443,7 @@ msgstr "Sorğunun həcmi bu çağırışın oxuya biləcəyi həddi (%(limit)s) 
 msgid "The request was not in the shape this call takes."
 msgstr "Sorğu bu çağırışın qəbul etdiyi formada deyildi."
 
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 msgid "The rest of the file is still worth importing. What is listed here is not, and you can add it by hand afterwards."
 msgstr "Faylın qalan hissəsini idxal etməyə yenə də dəyər. Burada sadalananlar idxal edilmir, onları sonradan əllə əlavə edə bilərsiniz."
 
@@ -22642,6 +22631,10 @@ msgstr "Bu dövrdə nə cavab gəldi"
 msgid "what came of it"
 msgstr "nəticəsi"
 
+#: src/postulo/templates/resume/import.html
+msgid "What can be read here"
+msgstr ""
+
 #: src/postulo/core/server_forms.py
 msgid "What carries the mail off this machine."
 msgstr "Poçtun bu kompüterdən necə göndərildiyi."
@@ -22663,7 +22656,7 @@ msgstr "Nə dəyişib: %(title)s"
 msgid "What changes how Postulo behaves for you. Everything here works from the keyboard, with a screen reader and with scripts off; these are the choices on top of that."
 msgstr "Postulo-nun sizin üçün davranışını dəyişən ayarlar. Buradakı hər şey klaviatura ilə, ekran oxuyucusu ilə və skriptlər deaktiv olduqda işləyir; bunlar həmin imkanlara əlavə seçimlərdir."
 
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 msgid "What could not be read"
 msgstr "Oxuna bilməyənlər"
 
@@ -22725,7 +22718,7 @@ msgstr "Təqvimdə olanlar, ən yaxını birinci. Müsahibəni müraciətin səh
 #: src/postulo/templates/applications/ical_import.html
 #: src/postulo/templates/core/kind_file.html
 #: src/postulo/templates/resume/candidate_file.html
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 msgid "What is in the file"
 msgstr "Faylda nə var"
 
@@ -23228,6 +23221,10 @@ msgstr "Kiminsə onu yoxlaya biləcəyi yer. CV bunu keçid kimi göstərir."
 #: src/postulo/templates/server/maps.html
 msgid "Where the companies' map takes the tiles it is drawn on, and whether addresses are pinned at their street."
 msgstr "Şirkətlər xəritəsinin üzərində çəkildiyi plitələri haradan götürdüyü və ünvanların öz küçələrində işarələnib-işarələnmədiyi."
+
+#: src/postulo/templates/resume/import.html
+msgid "Where the file states no level, none is written: a level is a claim about yourself that somebody will test, so it is yours to make afterwards."
+msgstr ""
 
 #: src/postulo/jobs/models.py
 msgid "where the logo came from"
@@ -23827,7 +23824,7 @@ msgstr "Müəllif: <bdi>%(name)s</bdi>"
 msgid "Written by Postulo %(version)s on %(when)s."
 msgstr "Postulo %(version)s tərəfindən %(when)s tarixində yazılıb."
 
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 #, python-format
 msgid "Written in %(tongue)s, which will be recorded as the language of your career record if you have not already set one."
 msgstr "Yazıldığı dil: %(tongue)s. Hələ təyin etməmisinizsə, o, karyera məlumatlarınızın dili kimi qeydə alınacaq."
@@ -24415,7 +24412,7 @@ msgstr "Məlumatlarınız (JSON)"
 
 #: src/postulo/templates/core/export.html
 #: src/postulo/templates/resume/candidate_file.html
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 msgid "Your record as a file"
 msgstr "Məlumatlarınız fayl kimi"
 
@@ -24542,9 +24539,13 @@ msgstr "{value} host adından sonra gəlir: yolda, sual işarəsindən sonra və
 msgid "· in the <a href=\"%(group_url)s\" class=\"underline\">%(name)s</a> group"
 msgstr "· <a href=\"%(group_url)s\" class=\"underline\">%(name)s</a> qrupunda"
 
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 msgid "· no level in the file, so none will be claimed"
 msgstr "· faylda səviyyə yoxdur, ona görə heç bir səviyyə iddia edilməyəcək"
+
+#: src/postulo/templates/resume/import.html
+msgid "· not a level Postulo keeps, so none will be claimed"
+msgstr ""
 
 #: src/postulo/templates/applications/application_detail.html
 #, python-format

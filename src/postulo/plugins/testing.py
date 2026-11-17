@@ -59,6 +59,12 @@ so a plugin's tests assert on what a person sees.
 each an `EnvironmentVariable` of a known kind, named ``POSTULO_PLUGIN_<NAME>_...`` by the rules
 Postulo's own names follow, none of them one of Postulo's, and its default readable as its kind.
 
+**And an importer held to its contract (#1260).** `assert_is_an_importer` hands an importer
+files of the plugin's own -- ones it reads, ones it must leave alone -- and holds it to what
+the import page relies on: `can_handle` answers and never raises, `read` returns the `Record`
+on the surface with the keys the writer reads and dates that are dates, a file it will not
+read is an `ImportRefused` and nothing else, and nothing is written to a database.
+
 **And the migrated test database, kept between runs (#1144).** A plugin's suite migrates the
 whole of Postulo before its first test. `cached_django_db_setup` makes the fixture that does
 it once and restores the result afterwards; two lines in the plugin's ``tests/conftest.py``:
@@ -77,6 +83,7 @@ what the next run will be handed.
 from __future__ import annotations
 
 import ast
+import re
 from collections.abc import Iterable, Mapping
 from pathlib import Path
 
@@ -255,6 +262,234 @@ def assert_is_a_backup_destination(plugin, config: dict, *, tmp_path: Path) -> N
     assert all(item.id != reference.id for item in plugin.list(config)), (
         f"{reference.id!r} is still listed after it was deleted"
     )
+
+
+#: What an importer's ``accepts`` may hold: a file extension, or a media type.
+_ACCEPTED = re.compile(r"\.[A-Za-z0-9]{1,12}|[a-z]+/[A-Za-z0-9][A-Za-z0-9.+-]*")
+
+#: The keys of a record's ``person``, and of the ``address`` inside it.
+_PERSON_KEYS = frozenset(
+    {
+        "first_name",
+        "last_name",
+        "headline",
+        "location",
+        "website",
+        "phone",
+        "email",
+        "orcid",
+        "address",
+    }
+)
+_ADDRESS_KEYS = frozenset({"street", "postcode", "municipality", "region", "country"})
+
+#: The values of a row that are not text: everything else that is not a date is.
+_NOT_TEXT = {
+    "skills": (list,),
+    "levels": (dict,),
+    "eqf_level": (int, type(None)),
+    "hours": (int, type(None)),
+}
+
+#: What changes a database, as the first word of a statement.
+_WRITES = frozenset(
+    {"INSERT", "UPDATE", "DELETE", "REPLACE", "CREATE", "DROP", "ALTER", "TRUNCATE"}
+)
+
+#: Bytes no importer reads: what `can_handle` and `read` must survive without a traceback.
+_GARBAGE = (
+    bytes(range(256)) * 4,
+    b"\x00" * 64,
+    b"{",
+    b"[",
+    b"<",
+    b'{"',
+    b"PK\x03\x04",
+    b"%PDF-1.7",
+    b"\xff\xfe\x00\x00",
+    b"a,b,c\n1,2,3\n",
+)
+
+
+def _record_problems(record) -> list[str]:
+    """What is wrong with a record an importer returned, in words; nothing where it is sound."""
+    import datetime as dt
+    import json
+
+    from postulo.resume.importing import ROWS, Record
+
+    if not isinstance(record, Record):
+        return [f"read returned {type(record).__name__}, not the Record on the plugin surface"]
+    found: list[str] = []
+    for name in ("source", "source_label", "locale"):
+        if not isinstance(getattr(record, name), str):
+            found.append(f"{name} is {type(getattr(record, name)).__name__}, not text")
+    for name in ("skipped", "notes"):
+        said = getattr(record, name)
+        if not isinstance(said, list) or not all(isinstance(each, str) for each in said):
+            found.append(f"{name} is not a list of sentences")
+    person = record.person
+    if not isinstance(person, dict):
+        found.append("person is not a dictionary")
+    else:
+        unknown = sorted(set(person) - _PERSON_KEYS)
+        if unknown:
+            found.append(f"person has keys nothing reads: {unknown}")
+        address = person.get("address", {})
+        if not isinstance(address, dict):
+            found.append("person's address is not a dictionary")
+        else:
+            unknown = sorted(set(address) - _ADDRESS_KEYS)
+            if unknown:
+                found.append(f"the address has keys nothing reads: {unknown}")
+        for key, value in [
+            *person.items(),
+            *(address.items() if isinstance(address, dict) else ()),
+        ]:
+            if key != "address" and not isinstance(value, str):
+                found.append(f"person's {key} is {type(value).__name__}, not text")
+    for name, rows in ROWS.items():
+        entries = getattr(record, name)
+        if not isinstance(entries, list):
+            found.append(f"{name} is not a list")
+            continue
+        for place, row in enumerate(entries):
+            where = f"{name}[{place}]"
+            if not isinstance(row, dict):
+                found.append(f"{where} is not a dictionary")
+                continue
+            missing = [key for key in rows.required if key not in row]
+            if missing:
+                found.append(f"{where} has no {missing}")
+            unknown = sorted(set(row) - set(rows.known))
+            if unknown:
+                found.append(f"{where} has keys nothing reads: {unknown}")
+            for key, value in row.items():
+                if key in rows.dates:
+                    a_day = isinstance(value, dt.date) and not isinstance(value, dt.datetime)
+                    if value is not None and not a_day:
+                        found.append(f"{where}: {key} is {value!r}, not a datetime.date or None")
+                elif key in rows.known and not isinstance(value, _NOT_TEXT.get(key, (str,))):
+                    found.append(f"{where}: {key} is {type(value).__name__}")
+                elif key in ("skills", "levels"):
+                    try:
+                        json.dumps(value)
+                    except (TypeError, ValueError):
+                        found.append(f"{where}: {key} holds something a session cannot keep")
+            if name == "skill_groups" and isinstance(row.get("skills"), list):
+                if not all(isinstance(skill, str) for skill in row["skills"]):
+                    found.append(f"{where}: skills is not a list of names")
+    return found
+
+
+def assert_is_an_importer(plugin, *, samples: Iterable[bytes], not_samples: Iterable[bytes] = ()):
+    """Hold an importer to its contract, with files of your own (#1260).
+
+    For an importer's own test suite. ``samples`` are files it reads, as bytes;
+    ``not_samples`` are files it must leave to somebody else (another importer's format,
+    a word processor's file). It fails unless:
+
+    - the plugin answers to the protocol, calls itself an ``"importer"`` and has a name, a
+      label and a description; and its ``accepts``, if it declares one, is a tuple of file
+      extensions (``".json"``) and media types (``"application/json"``);
+    - ``can_handle`` says yes to each sample and no to each non-sample, and answers with a
+      plain ``True`` or ``False``, raising nothing, for an empty file, for bytes that are
+      no format at all and for each sample cut short;
+    - ``read`` turns each sample into the `Record` on the surface, whose rows hold the keys
+      the wiki's table lists and no others, whose dates are ``datetime.date`` or ``None``,
+      and whose other values are text (``skills`` a list of names, ``levels`` a
+      dictionary, ``hours`` and ``eqf_level`` a whole number or ``None``);
+    - ``read`` given bytes that are no format, or a sample cut short, either returns a
+      record or raises `ImportRefused`, and nothing else;
+    - nothing is written to a database along the way: an importer turns bytes into a
+      record and stops.
+
+    What Postulo refuses before any importer is asked (`refuse_unreadable`) is not handed
+    to ``read`` here either. The check needs no database of its own: an importer that asks
+    one for anything fails where a test has not been given one.
+    """
+    from contextlib import ExitStack
+
+    from django.db import connections
+
+    from .base import ImporterPlugin, ImportRefused, refuse_unreadable
+
+    assert isinstance(plugin, ImporterPlugin), (
+        f"{plugin!r} does not provide name, version, kind, label, description, can_handle and read"
+    )
+    assert plugin.kind == "importer", f"its kind is {plugin.kind!r}"
+    for name in ("name", "label", "description"):
+        assert str(getattr(plugin, name) or ""), f"it has no {name}"
+    accepts = getattr(plugin, "accepts", None)
+    if accepts is not None:
+        assert isinstance(accepts, tuple) and accepts, "accepts is a tuple that is not empty"
+        odd = [
+            each for each in accepts if not isinstance(each, str) or not _ACCEPTED.fullmatch(each)
+        ]
+        assert not odd, f"accepts holds neither an extension nor a media type: {odd}"
+
+    good = [bytes(sample) for sample in samples]
+    others = [bytes(sample) for sample in not_samples]
+    assert good, "give at least one file the importer reads"
+    cut = sorted(
+        {sample[:length] for sample in good for length in (1, len(sample) // 4, len(sample) // 2)}
+        | {sample[:-1] for sample in good}
+    )
+
+    statements: list[str] = []
+
+    def watch(execute, sql, params, many, context):
+        statements.append(str(sql))
+        return execute(sql, params, many, context)
+
+    def asked(data: bytes) -> bool:
+        try:
+            answer = plugin.can_handle(data, "")
+        except Exception as error:
+            raise AssertionError(
+                f"can_handle raised {type(error).__name__} on {data[:24]!r}: it answers what "
+                "a file is, and a file it does not know is a no"
+            ) from error
+        assert answer is True or answer is False, f"can_handle returned {answer!r}, not a bool"
+        return answer
+
+    def unreadable(data: bytes) -> bool:
+        try:
+            refuse_unreadable(data)
+        except ImportRefused:
+            return True
+        return False
+
+    with ExitStack() as stack:
+        for connection in connections.all():
+            stack.enter_context(connection.execute_wrapper(watch))
+
+        for data in (b"", *_GARBAGE, *cut):
+            asked(data)
+        for data in others:
+            assert not asked(data), f"can_handle claims a file that is not its own: {data[:40]!r}"
+        for data in good:
+            assert asked(data), f"can_handle does not recognise the sample {data[:40]!r}"
+            record = plugin.read(data)
+            problems = _record_problems(record)
+            assert not problems, "; ".join(problems[:20])
+        for data in (*_GARBAGE, *cut):
+            if unreadable(data):
+                continue
+            try:
+                record = plugin.read(data)
+            except ImportRefused:
+                continue
+            except Exception as error:
+                raise AssertionError(
+                    f"read raised {type(error).__name__} on {data[:24]!r}: a file it will "
+                    "not read is an ImportRefused, with a sentence for the person"
+                ) from error
+            problems = _record_problems(record)
+            assert not problems, "; ".join(problems[:20])
+
+    written = [sql for sql in statements if sql.lstrip().split(None, 1)[0].upper() in _WRITES]
+    assert not written, f"the importer wrote to the database: {written[:3]}"
 
 
 def assert_declares_usable_widgets(plugin) -> None:

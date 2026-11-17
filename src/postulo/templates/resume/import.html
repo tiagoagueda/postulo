@@ -1,38 +1,59 @@
 {% extends "base.html" %}
 {% load i18n %}
 
-{% block title %}{% translate "Import a Europass CV" %}{% endblock %}
+{% block title %}{% translate "Import a CV" %}{% endblock %}
 
 {% block content %}
   <div class="mx-auto max-w-3xl">
     <c-page-title>
-      {% translate "Import a Europass CV" %}
+      {% translate "Import a CV" %}
       <c-slot name="subtitle">
       {% blocktranslate trimmed %}
-        If you have applied to an EU institution or through a national employment service,
-        you already have this file. Rather than type it all again, hand it over.
+        If your career is already written down in a file, hand it over rather than type it
+        all again.
       {% endblocktranslate %}
       </c-slot>
     </c-page-title>
 
     {% if not found %}
-      <form method="post" enctype="multipart/form-data" class="card mb-6">
-        {% csrf_token %}
-        <p class="mb-3 text-sm text-ink-500 dark:text-ink-400">
-          {% blocktranslate trimmed %}
-            Choose the PDF you downloaded from europass.europa.eu, as it is: the CV is
-            attached inside it, and that is what Postulo reads. Older Europass files read too:
-            the XML and PDF of the editor before 2020, and the JSON of its web service. Postulo
-            works out which it is, shows you what is in it, and writes nothing until you say
-            so.
-          {% endblocktranslate %}
-        </p>
-        <label class="mb-3 block text-sm font-medium" for="file">{% translate "The file" %}</label>
-        <input type="file" name="file" id="file" required
-               accept=".pdf,.xml,.json,application/pdf,text/xml,application/xml,application/json"
-               class="mb-4 block w-full">
-        <button type="submit" class="btn">{% translate "Read it" %}</button>
-      </form>
+      {% if importers %}
+        <form method="post" enctype="multipart/form-data" class="card mb-6">
+          {% csrf_token %}
+          <p class="mb-3 text-sm text-ink-500 dark:text-ink-400">
+            {% blocktranslate trimmed %}
+              Choose the file as you downloaded it. Postulo works out which format it is,
+              shows you what is in it, and writes nothing until you say so.
+            {% endblocktranslate %}
+          </p>
+          {% comment %} What this instance reads, in each importer's own words: the page names
+             no format, so the next one is a plugin and not a change here (#1260). {% endcomment %}
+          <h2 class="mb-1 text-sm font-medium">{% translate "What can be read here" %}</h2>
+          <dl class="mb-4 space-y-2 text-sm" data-importers>
+            {% for importer in importers %}
+              <div>
+                <dt class="font-medium">{{ importer.label }}</dt>
+                <dd class="text-ink-500 dark:text-ink-400">{{ importer.description }}</dd>
+              </div>
+            {% endfor %}
+          </dl>
+          <label class="mb-3 block text-sm font-medium" for="file">{% translate "The file" %}</label>
+          <input type="file" name="file" id="file" required
+                 {% if accept %}accept="{{ accept }}"{% endif %}
+                 class="mb-4 block w-full">
+          <button type="submit" class="btn">{% translate "Read it" %}</button>
+        </form>
+      {% else %}
+        <div class="alert mb-6 text-sm" data-variant="info" role="note" data-no-importer>
+          <div>
+            <p>
+              {% blocktranslate trimmed %}
+                Nothing that reads a CV from a file is switched on here, so there is no file
+                to choose.
+              {% endblocktranslate %}
+            </p>
+          </div>
+        </div>
+      {% endif %}
 
       <div class="alert text-sm" data-variant="info" role="note">
         <div>
@@ -54,7 +75,7 @@
         <a href="{% url 'resume:candidate_file' %}" class="btn" data-variant="ghost">{% translate "Your record as a file" %}</a>
       </div>
     {% else %}
-      <div class="card mb-6" data-europass-found>
+      <div class="card mb-6" data-import-found>
         <c-section-title>{% translate "What is in the file" %}</c-section-title>
         {% if found.source %}
           <p class="mb-3 text-sm text-ink-500 dark:text-ink-400">{{ found.source }}</p>
@@ -77,6 +98,15 @@
           {% endfor %}
         </dl>
 
+        {% if found.notes %}
+          {% comment %} What was read and put somewhere a person might not look for it: said
+             before anything is written, and apart from what could not be read (#1260). {% endcomment %}
+          <h3 class="mt-4 mb-1 text-sm font-medium">{% translate "How it was read" %}</h3>
+          <ul class="space-y-1 text-sm text-ink-600 dark:text-ink-300" data-import-notes>
+            {% for note in found.notes %}<li>{{ note }}</li>{% endfor %}
+          </ul>
+        {% endif %}
+
         {% if found.experience %}
           <h3 class="mt-4 mb-1 text-sm font-medium">{% translate "Experience" %}</h3>
           <ul class="space-y-1 text-sm text-ink-600 dark:text-ink-300">
@@ -97,14 +127,22 @@
 
         {% if found.languages %}
           <h3 class="mt-4 mb-1 text-sm font-medium">{% translate "Languages" %}</h3>
-          {% comment %} Europass keeps five levels per language and Postulo keeps one, so all
-             five are shown: the one that will be saved is the lowest, and somebody who
-             disagrees can change it afterwards knowing what was thrown away. {% endcomment %}
+          {% comment %} A file may keep several levels per language (Europass keeps five) and
+             Postulo keeps one, so all of them are shown: the one that will be saved is the
+             lowest, and somebody who disagrees can change it afterwards knowing what was
+             thrown away. {% endcomment %}
           <ul class="space-y-1 text-sm text-ink-600 dark:text-ink-300">
             {% for row in found.languages %}
               <li>
                 {{ row.name }}
-                {% if row.unset %}
+                {% if row.unset and row.stated %}
+                  {% comment %} The file's own words for the level, which are none of Postulo's:
+                     shown, and never turned into a level by a table (#1260). {% endcomment %}
+                  <span class="text-ink-500 dark:text-ink-400">· <bdi>{{ row.stated }}</bdi></span>
+                  <span class="text-amber-700 dark:text-amber-400">
+                    {% translate "· not a level Postulo keeps, so none will be claimed" %}
+                  </span>
+                {% elif row.unset %}
                   <span class="text-amber-700 dark:text-amber-400">
                     {% translate "· no level in the file, so none will be claimed" %}
                   </span>
@@ -119,13 +157,22 @@
               </li>
             {% endfor %}
           </ul>
-          <p class="mt-1 text-xs text-ink-500 dark:text-ink-400">
-            {% blocktranslate trimmed %}
-              Europass records five levels per language and Postulo keeps one, so the lowest
-              is taken. Where the file states none, none is written: a level is a claim about
-              yourself that somebody will test, so it is yours to make afterwards.
-            {% endblocktranslate %}
-          </p>
+          {% if found.several_levels %}
+            <p class="mt-1 text-xs text-ink-500 dark:text-ink-400">
+              {% blocktranslate trimmed %}
+                Europass records five levels per language and Postulo keeps one, so the lowest
+                is taken. Where the file states none, none is written: a level is a claim about
+                yourself that somebody will test, so it is yours to make afterwards.
+              {% endblocktranslate %}
+            </p>
+          {% elif found.no_level %}
+            <p class="mt-1 text-xs text-ink-500 dark:text-ink-400">
+              {% blocktranslate trimmed %}
+                Where the file states no level, none is written: a level is a claim about
+                yourself that somebody will test, so it is yours to make afterwards.
+              {% endblocktranslate %}
+            </p>
+          {% endif %}
         {% endif %}
 
         {% if found.skill_groups %}
@@ -141,6 +188,40 @@
           <h3 class="mt-4 mb-1 text-sm font-medium">{% translate "Projects" %}</h3>
           <ul class="space-y-1 text-sm text-ink-600 dark:text-ink-300">
             {% for row in found.projects %}<li>{{ row.name }}</li>{% endfor %}
+          </ul>
+        {% endif %}
+
+        {% if found.certifications %}
+          <h3 class="mt-4 mb-1 text-sm font-medium">{% translate "Certifications" %}</h3>
+          <ul class="space-y-1 text-sm text-ink-600 dark:text-ink-300">
+            {% for row in found.certifications %}
+              <li><bdi>{{ row.name }}</bdi>{% if row.issuer %} · <bdi>{{ row.issuer }}</bdi>{% endif %}</li>
+            {% endfor %}
+          </ul>
+        {% endif %}
+
+        {% if found.honours %}
+          <h3 class="mt-4 mb-1 text-sm font-medium">{% translate "Honours and awards" %}</h3>
+          <ul class="space-y-1 text-sm text-ink-600 dark:text-ink-300">
+            {% for row in found.honours %}
+              <li><bdi>{{ row.title }}</bdi>{% if row.awarded_by %} · <bdi>{{ row.awarded_by }}</bdi>{% endif %}</li>
+            {% endfor %}
+          </ul>
+        {% endif %}
+
+        {% if found.courses %}
+          <h3 class="mt-4 mb-1 text-sm font-medium">{% translate "Courses" %}</h3>
+          <ul class="space-y-1 text-sm text-ink-600 dark:text-ink-300">
+            {% for row in found.courses %}
+              <li><bdi>{{ row.title }}</bdi>{% if row.provider %} · <bdi>{{ row.provider }}</bdi>{% endif %}</li>
+            {% endfor %}
+          </ul>
+        {% endif %}
+
+        {% if found.publications %}
+          <h3 class="mt-4 mb-1 text-sm font-medium">{% translate "Publications" %}</h3>
+          <ul class="space-y-1 text-sm text-ink-600 dark:text-ink-300">
+            {% for row in found.publications %}<li><bdi>{{ row.title }}</bdi></li>{% endfor %}
           </ul>
         {% endif %}
 

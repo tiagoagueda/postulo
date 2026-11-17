@@ -1849,9 +1849,8 @@ msgid "<em>Headline</em> is a short professional title, such as “Backend engin
 msgstr "<em>Заглавие</em> е кратко професионално наименование, например „Backend инженер“. Автобиография, която има собствено заглавие, отпечатва него."
 
 #: src/postulo/templates/help/career.html
-#, fuzzy
-msgid "<em>Import</em> reads a Europass CV; <em>Export</em> writes your details and your career as one file you can keep or move to another Postulo; <em>Preview</em> shows the whole record as a document, and <em>Your CVs</em> opens the variants made from it."
-msgstr "<em>Импортиране</em> чете автобиография Europass; <em>Експортиране</em> записва данните и кариерата ви като един файл, който можете да пазите или да преместите в друг Postulo; <em>Преглед</em> показва целия запис като документ, а <em>Вашите автобиографии</em> отваря вариантите, създадени от него."
+msgid "<em>Import</em> reads a CV you have as a file; <em>Export</em> writes your details and your career as one file you can keep or move to another Postulo; <em>Preview</em> shows the whole record as a document, and <em>Your CVs</em> opens the variants made from it."
+msgstr ""
 
 #: src/postulo/templates/help/identifiers.html
 msgid "<em>Kind</em> is the register the identifier belongs to, and <em>What goes where</em> shows what each one looks like. <em>Other</em> takes anything else, with a name you give it."
@@ -2277,7 +2276,7 @@ msgstr "Файл от вашите документи"
 msgid "A file goes under Files first; an entry points at it rather than keeping a copy."
 msgstr "Файлът първо отива в „Файлове“; записът сочи към него, вместо да пази копие."
 
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 msgid "A file that Postulo itself wrote is read on a page of its own."
 msgstr "Файл, създаден от самия Postulo, се чете на отделна страница."
 
@@ -3169,7 +3168,7 @@ msgstr "Добавяне на умение"
 msgid "Add a tag"
 msgstr "Добавяне на етикет"
 
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 msgid "Add all of this"
 msgstr "Добавяне на всичко това"
 
@@ -3737,7 +3736,7 @@ msgstr "Бутон с икона"
 msgid "An identifier"
 msgstr "Идентификатор"
 
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 msgid "An import only ever adds. Nothing already in your career record is changed or removed, and anything that turns out to be a duplicate is yours to delete."
 msgstr "Импортирането само добавя. Нищо от вече вписаното в професионалния ви път не се променя и не се премахва, а каквото се окаже повторение, вие си го изтривате."
 
@@ -5222,7 +5221,8 @@ msgstr "Сертификация"
 
 #: src/postulo/documents/rendering.py src/postulo/jobs/merging.py
 #: src/postulo/resume/candidate.py src/postulo/resume/registry.py
-#: src/postulo/resume/views_candidate.py
+#: src/postulo/resume/views.py src/postulo/resume/views_candidate.py
+#: src/postulo/templates/resume/import.html
 #: src/postulo/templates/resume/preview.html
 msgid "Certifications"
 msgstr "Сертификации"
@@ -5407,13 +5407,10 @@ msgstr "Изберете страна от списъка."
 msgid "Choose a destination and save it first."
 msgstr "Първо изберете местоназначение и го запазете."
 
-#: src/postulo/resume/views.py
-msgid "Choose a Europass file first."
-msgstr "Първо изберете файл на Europass."
-
 #: src/postulo/applications/views_ical.py src/postulo/core/views_kind_files.py
 #: src/postulo/jobs/vcard_views.py src/postulo/jobs/views.py
-#: src/postulo/resume/views_candidate.py src/postulo/resume/views_references.py
+#: src/postulo/resume/views.py src/postulo/resume/views_candidate.py
+#: src/postulo/resume/views_references.py
 msgid "Choose a file first."
 msgstr "Първо изберете файл."
 
@@ -5522,9 +5519,9 @@ msgstr "Изберете датата на раждане от календар"
 msgid "Choose the destination"
 msgstr "Избор на местоназначение"
 
-#: src/postulo/templates/resume/europass_import.html
-msgid "Choose the PDF you downloaded from europass.europa.eu, as it is: the CV is attached inside it, and that is what Postulo reads. Older Europass files read too: the XML and PDF of the editor before 2020, and the JSON of its web service. Postulo works out which it is, shows you what is in it, and writes nothing until you say so."
-msgstr "Изберете PDF файла, изтеглен от europass.europa.eu, такъв, какъвто е: автобиографията е прикачена вътре в него и именно нея чете Postulo. Четат се и по-стари файлове на Europass: XML и PDF от редактора отпреди 2020 г. и JSON от уеб услугата му. Postulo определя кой от тях е, показва ви какво има в него и не записва нищо, докато не потвърдите."
+#: src/postulo/templates/resume/import.html
+msgid "Choose the file as you downloaded it. Postulo works out which format it is, shows you what is in it, and writes nothing until you say so."
+msgstr ""
 
 #: src/postulo/accounts/forms.py src/postulo/jobs/forms.py
 msgid "Choose the type of identifier."
@@ -6175,7 +6172,8 @@ msgstr "Курс"
 
 #: src/postulo/documents/rendering.py src/postulo/jobs/merging.py
 #: src/postulo/resume/candidate.py src/postulo/resume/registry.py
-#: src/postulo/resume/views_candidate.py
+#: src/postulo/resume/views.py src/postulo/resume/views_candidate.py
+#: src/postulo/templates/resume/import.html
 #: src/postulo/templates/resume/preview.html
 msgid "Courses"
 msgstr "Курсове"
@@ -7173,7 +7171,7 @@ msgstr "Електронна търговия"
 msgid "Each invitation may be used once, and expires on its own. Its link is shown once, when it is made."
 msgstr "Всяка покана може да се използва веднъж и изтича сама. Връзката ѝ се показва веднъж, когато бъде създадена."
 
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 msgid "Each is added as one of your contacts and as a reference you have not asked yet, so none is printed on a CV until you say they agreed."
 msgstr "Всеки се добавя като ваш контакт и като препоръка, която още не сте поискали, така че никой не се отпечатва в автобиография, докато не отбележите, че е дал съгласие."
 
@@ -7288,7 +7286,7 @@ msgstr "редактори"
 #: src/postulo/documents/rendering.py src/postulo/jobs/industries.py
 #: src/postulo/resume/candidate.py src/postulo/resume/registry.py
 #: src/postulo/resume/views_candidate.py
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 #: src/postulo/templates/resume/preview.html
 msgid "Education"
 msgstr "Образование"
@@ -7503,11 +7501,7 @@ msgstr "Умение от ESCO"
 msgid "Europass"
 msgstr "Europass"
 
-#: src/postulo/core/transfers.py
-msgid "Europass import"
-msgstr "Импортиране от Europass"
-
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 msgid "Europass records five levels per language and Postulo keeps one, so the lowest is taken. Where the file states none, none is written: a level is a claim about yourself that somebody will test, so it is yours to make afterwards."
 msgstr "Europass записва по пет нива за всеки език, а Postulo пази едно, затова се взема най-ниското. Където файлът не посочва ниво, не се записва нищо: нивото е твърдение за самите вас, което някой ще провери, така че е ваше право да го заявите после."
 
@@ -7748,7 +7742,7 @@ msgstr "Без прекратените"
 
 #: src/postulo/documents/rendering.py src/postulo/resume/candidate.py
 #: src/postulo/resume/registry.py src/postulo/resume/views_candidate.py
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 #: src/postulo/templates/resume/preview.html
 msgid "Experience"
 msgstr "Опит"
@@ -8400,7 +8394,7 @@ msgstr "Намерено чрез"
 msgid "found via"
 msgstr "намерено чрез"
 
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 #, python-format
 msgid "Found: %(names)s. Only the ones you have left blank will be filled in."
 msgstr "Намерено: %(names)s. Ще бъдат попълнени само полетата, които сте оставили празни."
@@ -9020,7 +9014,8 @@ msgstr "Отличие или награда"
 
 #: src/postulo/documents/rendering.py src/postulo/jobs/merging.py
 #: src/postulo/resume/candidate.py src/postulo/resume/registry.py
-#: src/postulo/resume/views_candidate.py
+#: src/postulo/resume/views.py src/postulo/resume/views_candidate.py
+#: src/postulo/templates/resume/import.html
 #: src/postulo/templates/resume/preview.html
 msgid "Honours and awards"
 msgstr "Отличия и награди"
@@ -9089,6 +9084,10 @@ msgstr "Как стига до работодателя"
 #: src/postulo/documents/models.py
 msgid "how it reaches the employer"
 msgstr "как стига до работодателя"
+
+#: src/postulo/templates/resume/import.html
+msgid "How it was read"
+msgstr ""
 
 #: src/postulo/applications/widgets.py
 msgid "How long they take"
@@ -9328,9 +9327,9 @@ msgstr "Ако това е препоръчително писмо"
 msgid "If you are reading this, the email settings of your Postulo instance work. Nothing else to do."
 msgstr "Ако четете това, настройките за имейл на вашата инстанция на Postulo работят. Не е нужно да правите нищо друго."
 
-#: src/postulo/templates/resume/europass_import.html
-msgid "If you have applied to an EU institution or through a national employment service, you already have this file. Rather than type it all again, hand it over."
-msgstr "Ако сте кандидатствали в институция на ЕС или чрез национална служба по заетостта, вече имате този файл. Вместо да въвеждате всичко отново, просто го качете."
+#: src/postulo/templates/resume/import.html
+msgid "If your career is already written down in a file, hand it over rather than type it all again."
+msgstr ""
 
 #: src/postulo/core/models.py
 msgid "ignore robots.txt when capturing"
@@ -9352,9 +9351,9 @@ msgid "Import"
 msgstr "Импортиране"
 
 #: src/postulo/resume/views.py src/postulo/templates/resume/candidate_file.html
-#: src/postulo/templates/resume/europass_import.html
-msgid "Import a Europass CV"
-msgstr "Импортиране на автобиография Europass"
+#: src/postulo/templates/resume/import.html
+msgid "Import a CV"
+msgstr ""
 
 #: src/postulo/templates/applications/ical_import.html
 msgid "Import an iCalendar file"
@@ -10449,7 +10448,7 @@ msgstr "език на кариерната ви история"
 #: src/postulo/documents/rendering.py src/postulo/resume/candidate.py
 #: src/postulo/resume/registry.py src/postulo/resume/views.py
 #: src/postulo/resume/views_candidate.py
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 #: src/postulo/templates/resume/preview.html
 msgid "Languages"
 msgstr "Езици"
@@ -11353,7 +11352,7 @@ msgstr "Членски организации"
 #: src/postulo/documents/rendering.py src/postulo/jobs/merging.py
 #: src/postulo/resume/candidate.py src/postulo/resume/registry.py
 #: src/postulo/resume/views.py src/postulo/resume/views_candidate.py
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 #: src/postulo/templates/resume/preview.html
 msgid "Memberships"
 msgstr "Членства"
@@ -13148,6 +13147,14 @@ msgstr "Още нищо не е изпратено."
 msgid "Nothing standing at Offer. Record one from an application's page when it arrives."
 msgstr "Нищо не е на етап „Предложение“. Запишете предложение от страницата на кандидатурата, когато пристигне."
 
+#: src/postulo/resume/views.py
+msgid "Nothing that reads a CV from a file is switched on here, so that file was not read."
+msgstr ""
+
+#: src/postulo/templates/resume/import.html
+msgid "Nothing that reads a CV from a file is switched on here, so there is no file to choose."
+msgstr ""
+
 #: src/postulo/core/design.py src/postulo/templates/server/design.html
 msgid "Nothing there"
 msgstr "Няма нищо"
@@ -14527,7 +14534,7 @@ msgstr "човек"
 
 #: src/postulo/accounts/views.py src/postulo/core/help.py
 #: src/postulo/templates/accounts/profile.html
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 msgid "Personal details"
 msgstr "Лични данни"
 
@@ -15111,7 +15118,7 @@ msgstr "до момента"
 #: src/postulo/documents/rendering.py src/postulo/resume/candidate.py
 #: src/postulo/resume/registry.py src/postulo/resume/views.py
 #: src/postulo/resume/views_candidate.py
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 #: src/postulo/templates/resume/preview.html
 msgid "Presentations, conferences and seminars"
 msgstr "Презентации, конференции и семинари"
@@ -15346,7 +15353,7 @@ msgstr "Проект"
 
 #: src/postulo/documents/rendering.py src/postulo/resume/candidate.py
 #: src/postulo/resume/registry.py src/postulo/resume/views_candidate.py
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 #: src/postulo/templates/resume/preview.html
 msgid "Projects"
 msgstr "Проекти"
@@ -15412,7 +15419,9 @@ msgid "Publication"
 msgstr "Публикация"
 
 #: src/postulo/documents/rendering.py src/postulo/resume/candidate.py
-#: src/postulo/resume/registry.py src/postulo/resume/views_candidate.py
+#: src/postulo/resume/registry.py src/postulo/resume/views.py
+#: src/postulo/resume/views_candidate.py
+#: src/postulo/templates/resume/import.html
 #: src/postulo/templates/resume/preview.html
 msgid "Publications"
 msgstr "Публикации"
@@ -15597,18 +15606,6 @@ msgstr "Четене като"
 msgid "Read as %(name)s."
 msgstr "Прочетено като %(name)s."
 
-#: src/postulo/resume/views.py
-msgid "Read as Europass JSON, the older format as the Europass web service wrote it until 2020."
-msgstr "Прочетено като Europass JSON, по-стария формат, както го е писала уеб услугата на Europass до 2020 г."
-
-#: src/postulo/resume/views.py
-msgid "Read as Europass XML in the older format, the one the Europass editor wrote until 2020."
-msgstr "Прочетено като Europass XML в по-стария формат, този, който редакторът на Europass е писал до 2020 г."
-
-#: src/postulo/resume/views.py
-msgid "Read as Europass XML, the format europass.europa.eu has written since 2020."
-msgstr "Прочетено като Europass XML, форматът, който europass.europa.eu пише от 2020 г."
-
 #: src/postulo/jobs/models.py
 msgid "read by"
 msgstr "прочетена от"
@@ -15636,16 +15633,8 @@ msgstr "Прочетено от"
 msgid "Read from <bdi>%(address)s</bdi>."
 msgstr "Прочетено от <bdi>%(address)s</bdi>."
 
-#: src/postulo/resume/views.py
-msgid "Read from the Europass XML attached to the PDF, in the older format the Europass editor wrote until 2020."
-msgstr "Прочетено от Europass XML, прикачен към PDF, в по-стария формат, който редакторът на Europass е писал до 2020 г."
-
-#: src/postulo/resume/views.py
-msgid "Read from the Europass XML attached to the PDF, the format europass.europa.eu has written since 2020."
-msgstr "Прочетено от Europass XML, прикачен към PDF, форматът, който europass.europa.eu пише от 2020 г."
-
 #: src/postulo/templates/jobs/company_places.html
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 #: src/postulo/templates/resume/references.html
 #: src/postulo/templates/server/plugins.html
 msgid "Read it"
@@ -15952,8 +15941,7 @@ msgid "Reference letters they wrote"
 msgstr "Препоръчителни писма, които са написали"
 
 #: src/postulo/documents/rendering.py src/postulo/resume/registry.py
-#: src/postulo/resume/views.py
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/resume/views.py src/postulo/templates/resume/import.html
 msgid "References"
 msgstr "Препоръки"
 
@@ -17569,7 +17557,7 @@ msgstr "групи умения"
 #: src/postulo/resume/registry.py src/postulo/resume/views.py
 #: src/postulo/resume/views_candidate.py
 #: src/postulo/templates/cotton/listing_skills.html
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 #: src/postulo/templates/resume/preview.html
 msgid "Skills"
 msgstr "Умения"
@@ -17848,7 +17836,7 @@ msgstr "Подбор и наемане на персонал"
 #: src/postulo/templates/core/kind_file.html
 #: src/postulo/templates/jobs/contact_vcards.html
 #: src/postulo/templates/resume/candidate_file.html
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 msgid "Start again"
 msgstr "Започване отначало"
 
@@ -19718,7 +19706,7 @@ msgstr "Сумата, както са я написали, преди данъц
 #: src/postulo/templates/documents/upload_detail.html
 #: src/postulo/templates/jobs/contact_vcards.html
 #: src/postulo/templates/resume/candidate_file.html
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 msgid "The file"
 msgstr "Файлът"
 
@@ -20448,7 +20436,7 @@ msgstr "Заявката е по-голяма от %(limit)s — максиму�
 msgid "The request was not in the shape this call takes."
 msgstr "Заявката не беше във вида, който това извикване приема."
 
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 msgid "The rest of the file is still worth importing. What is listed here is not, and you can add it by hand afterwards."
 msgstr "Останалата част от файла пак си струва да се импортира. Изброеното тук — не, и можете да го добавите ръчно след това."
 
@@ -22625,6 +22613,10 @@ msgstr "Какво се върна през този период"
 msgid "what came of it"
 msgstr "какво е станало с нея"
 
+#: src/postulo/templates/resume/import.html
+msgid "What can be read here"
+msgstr ""
+
 #: src/postulo/core/server_forms.py
 msgid "What carries the mail off this machine."
 msgstr "Чрез какво пощата излиза от тази машина."
@@ -22646,7 +22638,7 @@ msgstr "Какво се промени в %(title)s"
 msgid "What changes how Postulo behaves for you. Everything here works from the keyboard, with a screen reader and with scripts off; these are the choices on top of that."
 msgstr "Неща, които променят как Postulo работи за вас. Всичко тук работи с клавиатура, с екранен четец и с изключени скриптове; това са допълнителните възможности отгоре."
 
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 msgid "What could not be read"
 msgstr "Какво не можа да бъде прочетено"
 
@@ -22707,7 +22699,7 @@ msgstr "Какво има в календара, най-близкото пър�
 #: src/postulo/templates/applications/ical_import.html
 #: src/postulo/templates/core/kind_file.html
 #: src/postulo/templates/resume/candidate_file.html
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 msgid "What is in the file"
 msgstr "Какво има във файла"
 
@@ -23208,6 +23200,10 @@ msgstr "Къде някой може да го провери. Автобиог�
 #: src/postulo/templates/server/maps.html
 msgid "Where the companies' map takes the tiles it is drawn on, and whether addresses are pinned at their street."
 msgstr "Откъде картата на компаниите взема плочките, върху които се изчертава, и дали адресите се поставят с карфица на улицата си."
+
+#: src/postulo/templates/resume/import.html
+msgid "Where the file states no level, none is written: a level is a claim about yourself that somebody will test, so it is yours to make afterwards."
+msgstr ""
 
 #: src/postulo/jobs/models.py
 msgid "where the logo came from"
@@ -23809,7 +23805,7 @@ msgstr "Написано от <bdi>%(name)s</bdi>"
 msgid "Written by Postulo %(version)s on %(when)s."
 msgstr "Написано от Postulo %(version)s на %(when)s."
 
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 #, python-format
 msgid "Written in %(tongue)s, which will be recorded as the language of your career record if you have not already set one."
 msgstr "Написано на %(tongue)s — той ще бъде записан като език на кариерната ви история, ако още не сте задали такъв."
@@ -24398,7 +24394,7 @@ msgstr "Вашият запис (JSON)"
 
 #: src/postulo/templates/core/export.html
 #: src/postulo/templates/resume/candidate_file.html
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 msgid "Your record as a file"
 msgstr "Вашите данни като файл"
 
@@ -24528,9 +24524,13 @@ msgstr "{value} отива след хоста: в пътя, след въпро
 msgid "· in the <a href=\"%(group_url)s\" class=\"underline\">%(name)s</a> group"
 msgstr "· в групата <a href=\"%(group_url)s\" class=\"underline\">%(name)s</a>"
 
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 msgid "· no level in the file, so none will be claimed"
 msgstr "· няма ниво във файла, така че няма да се твърди такова"
+
+#: src/postulo/templates/resume/import.html
+msgid "· not a level Postulo keeps, so none will be claimed"
+msgstr ""
 
 #: src/postulo/templates/applications/application_detail.html
 #, python-format
