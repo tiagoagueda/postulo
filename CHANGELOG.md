@@ -10,6 +10,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 - A letter's page lists what will go out wrong before it goes, for the application chosen: a placeholder with nothing to fill it, or a misspelt one, read out with its count; plugins of a new kind, writing-checker, add to the same list (#1258)
 - A suggested replacement in that list is put into the letter one press at a time, refused if the letter changed since, and can be undone (#1258)
+- Writing basics, a bundled checker that reads letters on the instance and sends nothing: hints for a letter naming neither company nor role, starter notes left in, length, repeated words and spaces, very long sentences; off until an administrator switches it on (#1258)
 
 ### 🔧 Changed
 

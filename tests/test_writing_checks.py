@@ -23,9 +23,12 @@ SECRET = "Dear Dr Kleiner, my salary was 61234"
 
 
 @pytest.fixture(autouse=True)
-def _fresh_registry():
-    """A test that adds a plugin must not leave the registry's cache holding it."""
-    writing.forget()
+def _fresh_registry(monkeypatch):
+    """A test that adds a plugin must not leave the registry's cache holding it; and the
+    mechanism is tested beside the one checker that is always on, whatever else ships."""
+    from postulo.plugins.placeholder_checks import PlaceholderChecks
+
+    writing.only(monkeypatch, PlaceholderChecks)
     yield
     writing.forget()
 

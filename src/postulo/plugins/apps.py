@@ -29,6 +29,7 @@ class PluginsConfig(AppConfig):
             register_builtin_locales,
             register_builtin_themes,
         )
+        from .writing_basics import WritingBasics
 
         activate()
         _forget_decisions_when_their_rows_change()
@@ -53,6 +54,9 @@ class PluginsConfig(AppConfig):
         # And what reads a letter's own words and says what it noticed (#1258): the placeholder
         # checks first, which are always on.
         register_builtin("writing-checker", PlaceholderChecks)
+        # And Writing basics, the local reference checker: bundled, and off for the instance
+        # until an administrator switches it on (plugins migration 0018).
+        register_builtin("writing-checker", WritingBasics)
         register_builtin_locales()
         register_builtin_themes()
         # And now import what is installed, so a plugin that will not load says so in the
