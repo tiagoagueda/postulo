@@ -7718,7 +7718,12 @@
     status.setAttribute("data-web-push-status", "");
 
     if (!window.isSecureContext || !("Notification" in window)) {
-      status.textContent = card.dataset.webPushUnsupported || "";
+      // Only Safari on an iPhone or an iPad defines `navigator.standalone`, and it is false in
+      // a tab: notifications are there, but only for the app added to the Home Screen, so
+      // the sentence about HTTPS would send the person looking for the wrong thing (#1259).
+      var notInstalled = window.isSecureContext && navigator.standalone === false;
+      status.textContent =
+        (notInstalled ? card.dataset.webPushInstallFirst : card.dataset.webPushUnsupported) || "";
       (heading || card.firstChild).after(status);
       return;
     }

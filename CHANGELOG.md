@@ -6,6 +6,14 @@ All notable changes to Postulo are recorded here. The format follows
 
 ## [Unreleased]
 
+### 🐛 Fixed
+
+- Browser notifications: two reminders due together no longer replace one another, a long message in a non-Latin script is no longer refused by the push service, and an iPhone or iPad is told to add Postulo to the Home Screen first (#1259)
+
+### 🔒 Security
+
+- A notification sent to a person carries at most 500 characters of text, so a long note on a status change, an offer's terms or a plugin's note no longer travels in full through a push or chat service; a webhook still gets the whole text (#1259)
+
 ## [0.5.5] — 2026-11-16
 
 ### ✨ Added

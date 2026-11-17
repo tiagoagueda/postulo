@@ -92,8 +92,11 @@ def _deliver(user, notification: Notification) -> int:
         # The plugin first, because what an unset switch means is the plugin's to say (#240).
         if not wants(connection.config, notification.event, plugin):
             continue
+        # A notifier that reaches a person is handed a body of a few short lines; a machine's
+        # webhook is the person's own receiver and keeps the whole text (#1259).
+        message = notification if getattr(plugin, "delivers_later", False) else notification.brief()
         try:
-            plugin.send(notification, connection.full_config, user)
+            plugin.send(message, connection.full_config, user)
         except ConnectionUnusable as dead:
             # Not a failure to retry: the other side has ended this connection, and trying
             # again would fail the same way every time anything happened (#216). Switch it
@@ -111,7 +114,7 @@ def _deliver(user, notification: Notification) -> int:
                 "Notifier %r failed for connection %s", connection.plugin, connection.pk
             )
             connection.record_test(False, f"{type(error).__name__}: {error}")
-            _retry_later(connection, plugin, notification, error)
+            _retry_later(connection, plugin, message, error)
             continue
         # A notifier that only queued has delivered nothing yet. Calling the connection
         # working here wiped whatever the delivery pass had written on it, so a receiver
