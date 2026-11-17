@@ -6,6 +6,10 @@ All notable changes to Postulo are recorded here. The format follows
 
 ## [Unreleased]
 
+### ✨ Added
+
+- A notifier plugin can keep a message until a time it chooses (`hold_until`) and take every kept message of a connection at once (`send_many`); kept messages wait and are retried as failed sends do (#1259)
+
 ### 🐛 Fixed
 
 - Browser notifications: two reminders due together no longer replace one another, a long message in a non-Latin script is no longer refused by the push service, and an iPhone or iPad is told to add Postulo to the Home Screen first (#1259)

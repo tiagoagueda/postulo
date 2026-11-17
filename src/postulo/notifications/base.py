@@ -171,14 +171,24 @@ class NotifierPlugin(ConnectedPlugin, Protocol):
     is retried), and know that a ``send`` which reached some of several destinations before
     raising will reach those again; ``key`` is how to tell.
 
-    Two things a notifier may also say about itself. Both are read by name and neither
-    is part of this protocol, so a notifier that says neither is still one:
+    A few things a notifier may also say about itself. Each is read by name and none is
+    part of this protocol, so a notifier that says none of them is still one:
 
     - ``event_defaults``, which events are on for a connection that has not said (see
       `default_for`);
     - ``delivers_later = True``, when ``send`` only queues the message for something
       else to deliver. A ``send`` that returns is then not recorded as a delivery, and
-      whatever does deliver writes the outcome with ``connection.record_test`` (#574).
+      whatever does deliver writes the outcome with ``connection.record_test`` (#574);
+    - ``hold_until(notification, config, user) -> datetime | None``, asked before ``send``
+      (#1259). A time still to come means "keep it until then": Postulo keeps the message
+      and the scheduler hands it over at the first pass after that time, in the words and
+      the language it was built in. ``None``, or a time already past, sends it now. It is
+      asked in the recipient's time zone, so ``timezone.localtime()`` is theirs;
+    - ``send_many(notifications, config, user) -> None``, handed every message of one
+      connection that falls due in the same pass (kept ones, and failed sends due again),
+      oldest first, so they can travel as one (a digest). Without it each goes through
+      ``send``. It succeeds or fails for all of them together, and a failure is tried
+      again as a failed ``send`` is.
     """
 
     def send(self, notification: Notification, config: dict, user) -> None: ...

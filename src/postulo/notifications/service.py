@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import datetime as dt
 import logging
 import zoneinfo
 from collections.abc import Callable
@@ -95,6 +96,13 @@ def _deliver(user, notification: Notification) -> int:
         # A notifier that reaches a person is handed a body of a few short lines; a machine's
         # webhook is the person's own receiver and keeps the whole text (#1259).
         message = notification if getattr(plugin, "delivers_later", False) else notification.brief()
+        # A notifier may keep a message until a time of its choosing: a digest (#1259). Kept
+        # is taken, as a webhook's queued row is, and the connection is left as it was until
+        # the pass that sends it knows how that went (#574).
+        until = _held_until(connection, plugin, message, user)
+        if until is not None and _hold(connection, message, until):
+            delivered += 1
+            continue
         try:
             plugin.send(message, connection.full_config, user)
         except ConnectionUnusable as dead:
@@ -123,6 +131,51 @@ def _deliver(user, notification: Notification) -> int:
             connection.record_test(True)
         delivered += 1
     return delivered
+
+
+def _held_until(connection, plugin, notification: Notification, user):
+    """When ``plugin`` wants this message kept until, or ``None`` to send it now (#1259).
+
+    Asked inside `notify`'s overrides, so the plugin reads the recipient's own time zone. A
+    plugin that answers with nonsense, or raises, has the message sent now: being early is
+    better than never sending it. A naive time is read in the recipient's zone.
+    """
+    hold_until = getattr(plugin, "hold_until", None)
+    if hold_until is None or getattr(plugin, "delivers_later", False):
+        return None
+    try:
+        until = hold_until(notification, connection.full_config, user)
+    except Exception:
+        logger.exception(
+            "Notifier %r could not say when to send on connection %s; sending now",
+            connection.plugin,
+            connection.pk,
+        )
+        return None
+    if not isinstance(until, dt.datetime):
+        return None
+    if timezone.is_naive(until):
+        until = timezone.make_aware(until)
+    return until if until > timezone.now() else None
+
+
+def _hold(connection, notification: Notification, until) -> bool:
+    """Keep ``notification`` for ``connection`` until ``until``; whether it is kept.
+
+    A message the queue already holds under the same key is kept already, which counts. One
+    the database refuses is logged and sent at once instead: early, but not lost.
+    """
+    try:
+        with transaction.atomic():
+            webhooks.hold(connection, notification, until)
+    except Exception:
+        logger.exception(
+            "Could not keep a message for notifier %r on connection %s",
+            connection.plugin,
+            connection.pk,
+        )
+        return False
+    return True
 
 
 def _retry_later(connection, plugin, notification: Notification, error: Exception) -> None:

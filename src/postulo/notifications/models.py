@@ -59,8 +59,9 @@ class WebhookDelivery(OwnedModel):
     Since #1163 it is also where a send that failed at any other notifier waits to be tried
     again, on the same schedule and under the same rules. Such a row begins one attempt old,
     and its body, the same text, is read back into the notification the notifier is handed
-    again. The name is the first tenant's: which of the two a row is, is its connection's
-    plugin.
+    again. Since #1259 it also keeps a message a notifier asked to send later (a digest): a
+    row not yet tried, due at that time. The name is the first tenant's: which a row is, is
+    its connection's plugin and its attempts.
     """
 
     connection = models.ForeignKey(
