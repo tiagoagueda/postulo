@@ -1441,6 +1441,15 @@ _VARIABLES: tuple[Variable, ...] = (
         "30/h",
         "Look-ups in a company register, per account.",
     ),
+    _rate(
+        "POSTULO_ENRICHMENT_RATE",
+        "30/h",
+        "Sources asked by Find details on a company, per account.",
+        notes=(
+            "Counted once per source per press, for a source that answers on hosts of its own. "
+            "One that reads the company's own website counts against POSTULO_FETCH_RATE."
+        ),
+    ),
     _rate("POSTULO_API_RATE", "600/h", "Calls one API token may make."),
     _rate(
         "POSTULO_API_ACCOUNT_RATE",

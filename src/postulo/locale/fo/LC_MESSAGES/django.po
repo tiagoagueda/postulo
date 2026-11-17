@@ -15,6 +15,16 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
 "X-Generator: postulo scripts/messages.py\n"
 
+#: src/postulo/jobs/enrichment_offers.py
+#, python-format
+msgid "%(address)s was not added."
+msgstr ""
+
+#: src/postulo/jobs/enrichment_offers.py
+#, python-format
+msgid "%(address)s was not added: %(reason)s"
+msgstr ""
+
 #: src/postulo/core/personal.py
 #, python-format
 msgid "%(code)s is not a country in the list."
@@ -373,6 +383,11 @@ msgid "%(count)s listing you are considering closes soon"
 msgid_plural "%(count)s listings you are considering close soon"
 msgstr[0] "Umsóknarfreistin fyri %(count)s starvslýsing, sum tú umhugsar, gongur skjótt út"
 msgstr[1] "Umsóknarfreistin fyri %(count)s starvslýsingar, sum tú umhugsar, gongur skjótt út"
+
+#: src/postulo/jobs/enrichment_offers.py
+#, python-format
+msgid "%(count)s or more"
+msgstr ""
 
 #: src/postulo/plugins/base.py
 #, fuzzy, python-format
@@ -788,6 +803,11 @@ msgstr "%(host)s er á einum privatum ella staðbundnum neti. Postulo knýtir be
 msgid "%(i)s interviews and %(e)s entries in listings' histories would be kept without the name."
 msgstr "%(i)s samrøður og %(e)s postar í søguni hjá starvslýsingum høvdu verið varðveitt uttan navnið."
 
+#: src/postulo/jobs/enrichment_offers.py
+#, python-format
+msgid "%(industry)s (NACE %(division)s)"
+msgstr ""
+
 #: src/postulo/templates/server/logs.html
 #, python-format
 msgid "%(kilobytes)s on disk"
@@ -872,7 +892,7 @@ msgstr "%(least)s til %(most)s"
 msgid "%(list)s · %(date)s"
 msgstr "%(list)s · %(date)s"
 
-#: src/postulo/jobs/models.py
+#: src/postulo/jobs/enrichment_offers.py src/postulo/jobs/models.py
 #, python-format
 msgid "%(low)s to %(high)s"
 msgstr "%(low)s til %(high)s"
@@ -1268,6 +1288,16 @@ msgstr "%(name)s: nummarið %(value)s varð ikki tikið við. %(why)s"
 msgid "%(names)s can see “%(other)s” and not “%(kept)s”. Share “%(kept)s” with them first, or nothing is merged."
 msgstr "%(names)s kunnu síggja „%(other)s“ og ikki „%(kept)s“. Deil „%(kept)s“ við tey fyrst, annars verður einki sameint."
 
+#: src/postulo/jobs/enrichment_offers.py
+#, python-format
+msgid "%(number)s was not added."
+msgstr ""
+
+#: src/postulo/jobs/enrichment_offers.py
+#, python-format
+msgid "%(number)s was not added: %(reason)s"
+msgstr ""
+
 #: src/postulo/resume/views.py
 #, fuzzy, python-format
 msgid "%(ok)s, %(broken)s; the ones that did not say why."
@@ -1533,10 +1563,77 @@ msgstr "%(service)s hevði, gjøgnum doi.org, einki til teigarnar, sum eru tómi
 msgid "%(share)s%%"
 msgstr "%(share)s%%"
 
+#: src/postulo/jobs/enrichment.py
+#, python-format
+msgid "%(source)s asked for an address it did not declare."
+msgstr ""
+
+#: src/postulo/jobs/enrichment.py
+#, python-format
+msgid "%(source)s asked for fewer requests. Try again later."
+msgstr ""
+
+#: src/postulo/jobs/enrichment.py
+#, python-format
+msgid "%(source)s asked for more requests than one press allows."
+msgstr ""
+
+#: src/postulo/jobs/enrichment.py
+#, python-format
+msgid "%(source)s cannot be asked about this company."
+msgstr ""
+
+#: src/postulo/jobs/enrichment.py
+#, python-format
+msgid "%(source)s could not be reached."
+msgstr ""
+
+#: src/postulo/templates/jobs/company_enrichment.html
+#, python-format
+msgid "%(source)s could not be read."
+msgstr ""
+
+#: src/postulo/jobs/enrichment.py
+#, python-format
+msgid "%(source)s redirected too many times."
+msgstr ""
+
+#: src/postulo/jobs/enrichment.py
+#, python-format
+msgid "%(source)s sent its answer with the content encoding “%(coding)s”, which Postulo does not unpack."
+msgstr ""
+
+#: src/postulo/jobs/enrichment.py
+#, python-format
+msgid "%(source)s sent the request somewhere else."
+msgstr ""
+
+#: src/postulo/jobs/enrichment.py
+#, python-format
+msgid "%(source)s took longer than %(seconds)s second to answer."
+msgid_plural "%(source)s took longer than %(seconds)s seconds to answer."
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/postulo/jobs/enrichment.py
+#, python-format
+msgid "%(source)s's answer could not be read."
+msgstr ""
+
+#: src/postulo/jobs/enrichment.py
+#, python-format
+msgid "%(source)s's answer was larger than one company's should be."
+msgstr ""
+
 #: src/postulo/applications/agenda.py
 #, python-format
 msgid "%(start)s to %(end)s"
 msgstr "%(start)s til %(end)s"
+
+#: src/postulo/jobs/enrichment_offers.py
+#, python-format
+msgid "%(state)s since %(date)s"
+msgstr ""
 
 #: src/postulo/templates/applications/partials/board.html
 #, python-format
@@ -2509,6 +2606,10 @@ msgstr "Eitt modul: tað fylgir við Postulo og kann ikki takast burtur."
 msgid "A month"
 msgstr "Ein mánaður"
 
+#: src/postulo/jobs/enrichment_views.py
+msgid "a name"
+msgstr ""
+
 #: src/postulo/core/messaging_services.py
 #, python-format
 msgid "A name is at most %(max)s characters."
@@ -2728,6 +2829,10 @@ msgstr "Ein skráseting, sum síðan er strikað"
 #: src/postulo/documents/forms.py
 msgid "A referee who is not a contact yet. Their name is enough; it is added to your contacts without a company, and is used instead of the choice above."
 msgstr "Ein viðmælari, sum enn ikki er sambandspersónur. Navnið er nóg mikið; tað verður lagt afturat sambandspersónum tínum uttan fyritøku og verður brúkt í staðin fyri valið omanfyri."
+
+#: src/postulo/jobs/enrichment_views.py
+msgid "a register number"
+msgstr ""
 
 #: src/postulo/applications/ical_import.py
 msgid "A reminder"
@@ -2961,6 +3066,10 @@ msgstr "Navnið á eini vísing tørvar í minsta lagi ein bókstav ella eitt ta
 msgid "A way back rather than a way on, which is why it is an outline."
 msgstr "Ein vegur aftur heldur enn ein vegur víðari, og tí hevur hann bert eina rammu."
 
+#: src/postulo/jobs/enrichment_views.py
+msgid "a website"
+msgstr ""
+
 #: src/postulo/templates/applications/report.html
 #: src/postulo/templates/documents/themes/base_report.html
 #, fuzzy
@@ -2971,6 +3080,10 @@ msgstr "Um vikuna, í miðal"
 #, fuzzy
 msgid "A widget added in a later release, or brought by a plugin, waits above until you say yes to it. Nothing arrives on your dashboard without being asked."
 msgstr "Ein eind, sum er løgd afturat í eini seinni útgávu ella kemur við einum ískoyti, bíðar omanfyri, til tú sigur ja til hana. Einki kemur á yvirlitið hjá tær, uttan at tú hevur biðið um tað."
+
+#: src/postulo/jobs/enrichment_views.py
+msgid "a Wikidata identifier"
+msgstr ""
 
 #: src/postulo/documents/integrity.py
 msgid "a Word document"
@@ -3102,7 +3215,8 @@ msgstr "Keypt ella samanlagt"
 msgid "acquired_by must be a company you can see."
 msgstr "acquired_by má vera ein fyritøka, tú kanst síggja."
 
-#: src/postulo/jobs/models.py src/postulo/templates/jobs/company_form.html
+#: src/postulo/jobs/enrichment_offers.py src/postulo/jobs/models.py
+#: src/postulo/templates/jobs/company_form.html
 msgid "Acronym or short name"
 msgstr "Skammstavan ella stutt navn"
 
@@ -3430,7 +3544,8 @@ msgid "addok (France's Base Adresse Nationale)"
 msgstr "addok (Base Adresse Nationale í Fraklandi)"
 
 #: src/postulo/applications/forms.py src/postulo/applications/reports.py
-#: src/postulo/jobs/tables.py src/postulo/templates/partials/web_links.html
+#: src/postulo/jobs/enrichment_offers.py src/postulo/jobs/tables.py
+#: src/postulo/templates/partials/web_links.html
 msgid "Address"
 msgstr "Bústaður"
 
@@ -3648,6 +3763,10 @@ msgstr "Hendir eisini av sær sjálvum, tá ið høvuðsteldupostbústaðurin hj
 msgid "Also in %(names)s"
 msgstr "Eisini á %(names)s"
 
+#: src/postulo/templates/jobs/company_enrichment.html
+msgid "Also said"
+msgstr ""
+
 #: src/postulo/accounts/models.py
 msgid "Always"
 msgstr "Altíð"
@@ -3713,6 +3832,10 @@ msgstr "Ein bústaður, sum varð skrásettur, áðrenn bústaðir vórðu kanna
 #: src/postulo/resume/candidate.py
 msgid "An address that could not be read"
 msgstr "Ein bústaður, sum ikki bar til at lesa"
+
+#: src/postulo/jobs/enrichment_views.py
+msgid "an address with a country"
+msgstr ""
 
 #: src/postulo/applications/models.py
 msgid "An address, a telephone number or the link to the call."
@@ -3817,6 +3940,10 @@ msgstr "Ein samrøða hoyrir til eina umsókn. Vel eina."
 msgid "An interview is scheduled or moved"
 msgstr "Ein samrøða verður avtalað ella flutt"
 
+#: src/postulo/jobs/enrichment_views.py
+msgid "an LEI"
+msgstr ""
+
 #: src/postulo/notifications/base.py
 msgid "An offer is recorded"
 msgstr "Eitt tilboð verður skrásett"
@@ -3888,6 +4015,11 @@ msgstr "Eitt annað trygdaravrit var longu í gongd."
 #, fuzzy
 msgid "Another invitation"
 msgstr "Ger aðra innbjóðing"
+
+#: src/postulo/jobs/enrichment_offers.py
+#, python-format
+msgid "Another of your companies already has %(identifier)s."
+msgstr ""
 
 #: src/postulo/jobs/register_views.py
 #, fuzzy, python-format
@@ -4367,6 +4499,11 @@ msgstr "Pr."
 msgid "as of %(date)s"
 msgstr "pr. %(date)s"
 
+#: src/postulo/templates/jobs/partials/enrichment_origins.html
+#, python-format
+msgid "As of %(date)s."
+msgstr ""
+
 #: src/postulo/templates/applications/interview_detail.html
 #: src/postulo/templates/documents/themes/base_interview.html
 #, python-format
@@ -4446,6 +4583,15 @@ msgstr "Spurt bert, tá ið onkur biður um tað, ein fyritøka í senn. Hvør f
 #, python-format
 msgid "Asks %(plugin)s now. Nothing it answers is kept here."
 msgstr "Spyr %(plugin)s nú. Einki av tí, sum tað svarar, verður varðveitt her."
+
+#: src/postulo/templates/cotton/enrichment_ask.html
+#, python-format
+msgid "Asks <bdi>%(hosts)s</bdi>. Sent: %(what)s."
+msgstr ""
+
+#: src/postulo/templates/jobs/company_detail.html
+msgid "Asks the places you choose, once each; nothing is kept until you say so."
+msgstr ""
 
 #: src/postulo/applications/analytics.py src/postulo/applications/models.py
 msgid "Assessment"
@@ -4673,6 +4819,10 @@ msgstr "Aftur til kalendaran"
 #: src/postulo/templates/applications/calendar_print.html
 msgid "Back to the calendar, to change any of this"
 msgstr "Aftur til kalendaran fyri at broyta nakað av hesum"
+
+#: src/postulo/templates/jobs/company_enrichment.html
+msgid "Back to the company"
+msgstr ""
 
 #: src/postulo/core/help.py
 msgid "Back to the dashboard"
@@ -5088,6 +5238,7 @@ msgstr "Kann knýtast saman við"
 #: src/postulo/templates/documents/upload_form.html
 #: src/postulo/templates/jobs/address_place.html
 #: src/postulo/templates/jobs/capture_page_forget.html
+#: src/postulo/templates/jobs/company_enrichment.html
 #: src/postulo/templates/jobs/company_form.html
 #: src/postulo/templates/jobs/company_register.html
 #: src/postulo/templates/jobs/company_wikidata.html
@@ -5142,6 +5293,11 @@ msgstr "Kann ikki leggjast afturat"
 #: src/postulo/templates/applications/ical_import.html
 msgid "Cannot be added."
 msgstr "Kann ikki leggjast afturat."
+
+#: src/postulo/templates/cotton/enrichment_ask.html
+#, python-format
+msgid "Cannot be asked: this company would need %(what)s."
+msgstr ""
 
 #: src/postulo/templates/server/overview.html
 msgid "cannot be checked on this machine"
@@ -5262,13 +5418,14 @@ msgstr "Forsýning av starvsleiðini"
 msgid "Career sections"
 msgstr "Partar í starvsleiðini"
 
+#: src/postulo/jobs/enrichment_offers.py src/postulo/jobs/tables.py
+#: src/postulo/templates/jobs/company_detail.html
+msgid "Careers page"
+msgstr "Starvssíða fyritøkunnar"
+
 #: src/postulo/jobs/models.py
 msgid "careers page"
 msgstr "starvssíða fyritøkunnar"
-
-#: src/postulo/jobs/tables.py src/postulo/templates/jobs/company_detail.html
-msgid "Careers page"
-msgstr "Starvssíða fyritøkunnar"
 
 #: src/postulo/templates/server/email.html
 #, python-format
@@ -5434,6 +5591,10 @@ msgstr "Kanna eftir dagføringum"
 msgid "Check it answers"
 msgstr "Kanna, at tað svarar"
 
+#: src/postulo/templates/jobs/partials/enrichment_origins.html
+msgid "Check it there"
+msgstr ""
+
 #: src/postulo/templates/jobs/capture_review.html
 #, fuzzy
 msgid "Check the reading against it"
@@ -5590,6 +5751,10 @@ msgstr "Vel eina aðra fílu"
 msgid "Choose at least one document to record."
 msgstr "Vel í minsta lagi eitt skjal at skráseta."
 
+#: src/postulo/jobs/enrichment_views.py
+msgid "Choose at least one place to ask."
+msgstr ""
+
 #: src/postulo/templates/cotton/date_field.html
 msgid "Choose dates from a calendar"
 msgstr "Vel dagfestingar úr einum kalendara"
@@ -5655,6 +5820,10 @@ msgstr "Vel, hvat skal gerast við boðið."
 #: src/postulo/jobs/status_views.py
 msgid "Choose what was reported and the date."
 msgstr "Vel, hvat varð sagt frá, og dagfestingina."
+
+#: src/postulo/templates/cotton/enrichment_ask.html
+msgid "Choose where to ask about this company. Each place is asked once, now, and learns only what is listed. Nothing is kept until you tick it."
+msgstr ""
 
 #: src/postulo/applications/views.py
 msgid "Choose which application this is about first."
@@ -5991,6 +6160,10 @@ msgstr "Fyritøka løgd afturat."
 #: src/postulo/jobs/views.py
 msgid "Company deleted, along with its postings."
 msgstr "Fyritøkan strikað saman við starvslýsingum hennara."
+
+#: src/postulo/plugins/kinds.py
+msgid "Company details"
+msgstr ""
 
 #: src/postulo/jobs/models.py
 msgid "company identifier"
@@ -6963,6 +7136,10 @@ msgstr "nærri upplýsingar"
 msgid "details"
 msgstr "upplýsingar"
 
+#: src/postulo/templates/jobs/company_enrichment.html
+msgid "Details found"
+msgstr ""
+
 #: src/postulo/core/design.py src/postulo/templates/server/design.html
 #, fuzzy
 msgid "Dialogs"
@@ -7483,6 +7660,7 @@ msgid "email address"
 msgstr "teldupostbústaður"
 
 #: src/postulo/core/channels.py src/postulo/documents/printing.py
+#: src/postulo/jobs/enrichment_offers.py
 msgid "Email address"
 msgstr "Teldupostbústaður"
 
@@ -8289,6 +8467,10 @@ msgstr "Finn"
 msgid "Find a language"
 msgstr "Finn eitt mál"
 
+#: src/postulo/templates/cotton/enrichment_ask.html
+msgid "Find details"
+msgstr ""
+
 #: src/postulo/templates/jobs/company_form.html
 msgid "Find logo"
 msgstr "Finn búmerki"
@@ -8551,6 +8733,13 @@ msgstr[1] "Fann %(count)d møguleikar á ambætaranum. Vel, hvat skal brúkast, 
 
 #: src/postulo/jobs/slow.py
 #, python-format
+msgid "Found %(count)s detail. Nothing is kept until you tick it."
+msgid_plural "Found %(count)s details. Nothing is kept until you tick it."
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/postulo/jobs/slow.py
+#, python-format
 msgid "Found a logo at %(url)s."
 msgstr "Fann eitt búmerki á %(url)s."
 
@@ -8582,6 +8771,10 @@ msgstr "funnið gjøgnum"
 #, python-format
 msgid "Found: %(names)s. Only the ones you have left blank will be filled in."
 msgstr "Funnið: %(names)s. Bert tey, tú hevur latið vera tóm, verða fylt út."
+
+#: src/postulo/jobs/enrichment_offers.py
+msgid "Founded"
+msgstr ""
 
 #: src/postulo/jobs/models.py
 msgid "Freelance"
@@ -8635,6 +8828,11 @@ msgstr "Frá %(name)s."
 #, python-format
 msgid "From %(register)s"
 msgstr "Úr %(register)s"
+
+#: src/postulo/templates/jobs/partials/enrichment_origins.html
+#, python-format
+msgid "From %(source)s: <bdi>%(where)s</bdi>."
+msgstr ""
 
 #: src/postulo/core/tables.py
 #, python-format
@@ -9053,6 +9251,10 @@ msgctxt "pronouns"
 msgid "he/him"
 msgstr "hann"
 
+#: src/postulo/jobs/enrichment_offers.py
+msgid "Head office"
+msgstr ""
+
 #: src/postulo/accounts/models.py src/postulo/documents/models.py
 #: src/postulo/resume/views.py
 msgid "headline"
@@ -9451,6 +9653,7 @@ msgstr "idempotentar umbønir"
 msgid "identifier"
 msgstr "eyðmerki"
 
+#: src/postulo/jobs/enrichment_offers.py
 #: src/postulo/templates/cotton/identifier_row.html
 msgid "Identifier"
 msgstr "Eyðmerki"
@@ -9807,13 +10010,14 @@ msgstr "Vinnugreinir"
 msgid "industries"
 msgstr "vinnugreinir"
 
-#: src/postulo/jobs/models.py
-msgid "industry"
-msgstr "vinnugrein"
-
+#: src/postulo/jobs/enrichment_offers.py
 #: src/postulo/templates/jobs/industry_form.html
 msgid "Industry"
 msgstr "Vinnugrein"
+
+#: src/postulo/jobs/models.py
+msgid "industry"
+msgstr "vinnugrein"
 
 #: src/postulo/jobs/views.py
 msgid "Industry renamed."
@@ -10028,6 +10232,10 @@ msgstr "útgivið av"
 #: src/postulo/resume/models.py
 msgid "issued on"
 msgstr "útflýggjað tann"
+
+#: src/postulo/jobs/enrichment_offers.py
+msgid "It already has a logo."
+msgstr ""
 
 #: src/postulo/templates/settings/account.html
 msgid "It also gets you back in: ask for a sign-in code and it arrives there. Making a different address primary moves that with it. You are still asked for your authenticator app if you have one."
@@ -10465,6 +10673,7 @@ msgstr "Varðveit hesi"
 msgid "Keep this view as"
 msgstr "Varðveit hesa vísingina sum"
 
+#: src/postulo/templates/jobs/company_enrichment.html
 #: src/postulo/templates/jobs/company_register.html
 msgid "Keep what is ticked"
 msgstr "Varðveit tað, sum er krossað við"
@@ -10484,6 +10693,13 @@ msgstr "At varðveita síðuna"
 #: src/postulo/templates/jobs/merge.html
 msgid "Kept"
 msgstr "Varðveitt"
+
+#: src/postulo/jobs/enrichment_views.py
+#, python-format
+msgid "Kept %(count)s detail."
+msgid_plural "Kept %(count)s details."
+msgstr[0] ""
+msgstr[1] ""
 
 #: src/postulo/templates/server/person_recovery.html
 msgid "Kept after they are used or expire, because taking somebody's account back is not something to be able to do without a trace."
@@ -10872,6 +11088,7 @@ msgstr "Lat vera tómt fyri at varðveita tað, sum longu er goymt."
 msgid "Leave empty if this is your current role."
 msgstr "Lat vera tómt, um hetta er núverandi starv títt."
 
+#: src/postulo/templates/jobs/company_enrichment.html
 #: src/postulo/templates/jobs/company_wikidata.html
 msgid "Leave it as it is"
 msgstr "Lat tað vera, sum tað er"
@@ -10987,6 +11204,10 @@ msgstr "Løgfrøðilig kunning"
 #, fuzzy
 msgid "Legal services"
 msgstr "Løgfrøðiligar tænastur"
+
+#: src/postulo/jobs/enrichment_offers.py
+msgid "Legal state"
+msgstr ""
 
 #: src/postulo/jobs/models.py
 msgid "legal state"
@@ -11237,6 +11458,10 @@ msgstr "staðseting"
 msgid "Location"
 msgstr "Staðseting"
 
+#: src/postulo/jobs/enrichment_offers.py
+msgid "Logo"
+msgstr ""
+
 #: src/postulo/jobs/models.py
 msgid "logo"
 msgstr "búmerki"
@@ -11299,6 +11524,10 @@ msgstr "vevbústaður hjá uppslagstænastuni"
 #: src/postulo/jobs/slow.py
 msgid "Looking for a logo"
 msgstr "Leitar eftir búmerki"
+
+#: src/postulo/jobs/slow.py
+msgid "Looking for details"
+msgstr ""
 
 #: src/postulo/templates/applications/application_list.html
 #: src/postulo/templates/jobs/company_list.html
@@ -11979,8 +12208,8 @@ msgstr "NACE-partur"
 msgid "name"
 msgstr "navn"
 
-#: src/postulo/api/forms.py src/postulo/jobs/tables.py
-#: src/postulo/templates/cotton/identifier_row.html
+#: src/postulo/api/forms.py src/postulo/jobs/enrichment_offers.py
+#: src/postulo/jobs/tables.py src/postulo/templates/cotton/identifier_row.html
 #: src/postulo/templates/partials/messaging_handles.html
 #: src/postulo/templates/partials/phone_numbers.html
 #: src/postulo/templates/partials/postal_addresses.html
@@ -12464,6 +12693,14 @@ msgstr "Eingi brøv av hesum slagi enn."
 msgid "No letters yet. A cover letter is for one posting; a motivation letter tells your story; a speculative letter goes where nothing is advertised; a follow-up note comes after an interview."
 msgstr "Eingi brøv enn. Eitt umsóknarbræv er til eina starvslýsing; eitt áhugabræv sigur tína søgu; eitt óumbiðið umsóknarbræv fer hagar, sum einki er lýst; eitt eftirfylgingarnotat kemur eftir eina samrøðu."
 
+#: src/postulo/templates/jobs/company_enrichment.html
+msgid "No licence is stated."
+msgstr ""
+
+#: src/postulo/templates/jobs/company_enrichment.html
+msgid "No licence is stated; the name and the mark are the company's."
+msgstr ""
+
 #: src/postulo/templates/connections/partials/option_table.html
 msgid "No longer on the server"
 msgstr "Ikki longur á ambætaranum"
@@ -12785,6 +13022,10 @@ msgstr "Einki av tí verður útleitt úr nøkrum øðrum: kyn títt verður ikk
 msgid "None of this company's industries is Education, so it is not listed as a school or university."
 msgstr "Eingin av vinnugreinunum hjá hesi fyritøkuni er Útbúgving, so hon er ikki á listanum sum skúli ella lærdur háskúli."
 
+#: src/postulo/jobs/slow.py
+msgid "None of those can be asked about this company any more."
+msgstr ""
+
 #: src/postulo/templates/jobs/company_places.html
 msgid "None of your companies has this name or identifier."
 msgstr "Eingin av fyritøkum tínum hevur hetta navnið ella eyðmerkið."
@@ -12856,6 +13097,10 @@ msgstr "Samsvarar ikki"
 #: src/postulo/templates/partials/phone_widget.html
 msgid "Not a possible number"
 msgstr "Ikki eitt møguligt nummar"
+
+#: src/postulo/jobs/enrichment_offers.py
+msgid "Not a profile on a service Postulo knows."
+msgstr ""
 
 #: src/postulo/documents/models.py
 msgid "Not accepted"
@@ -13434,6 +13679,10 @@ msgstr "Einki sent enn."
 msgid "Nothing standing at Offer. Record one from an application's page when it arrives."
 msgstr "Einki stendur á Tilboð. Skráset eitt frá síðuni hjá umsóknini, tá ið tað kemur."
 
+#: src/postulo/templates/jobs/company_enrichment.html
+msgid "Nothing that was found can be added to what the company already has."
+msgstr ""
+
 #: src/postulo/core/design.py src/postulo/templates/server/design.html
 msgid "Nothing there"
 msgstr "Einki har"
@@ -13518,7 +13767,7 @@ msgstr "Einki varð varðveitt av teirri síðuni."
 msgid "Nothing was kept of this page"
 msgstr "Einki varð varðveitt av hesi síðuni"
 
-#: src/postulo/jobs/register_views.py
+#: src/postulo/jobs/enrichment_views.py src/postulo/jobs/register_views.py
 msgid "Nothing was kept."
 msgstr "Einki varð varðveitt."
 
@@ -14232,6 +14481,7 @@ msgstr "Bert árið verður víst á eini lívsrás, so dagurin hevur ongan týd
 msgid "Only this publication, as a reference:"
 msgstr "Bert hetta ritverkið, sum tilvísing:"
 
+#: src/postulo/templates/jobs/company_enrichment.html
 #: src/postulo/templates/jobs/company_register.html
 msgid "Only what you tick is kept; nothing else on the company changes."
 msgstr "Bert tað, sum tú krossar við, verður varðveitt; einki annað á fyritøkuni broytist."
@@ -14820,6 +15070,10 @@ msgstr "Eftirløn, trygging, viðbøtur, útgerð: alt, sum varð nevnt."
 msgid "People"
 msgstr "Fólk"
 
+#: src/postulo/jobs/enrichment_offers.py
+msgid "People employed"
+msgstr ""
+
 #: src/postulo/jobs/models.py
 msgid "Per day"
 msgstr "Um dagin"
@@ -15357,6 +15611,10 @@ msgstr "Postulo hevur gloymt tað. Veitarin hevur enn heimildina, til tú tekur 
 #: src/postulo/core/server_views.py
 msgid "Postulo has forgotten the grant. The provider still has it until you withdraw it there as well."
 msgstr "Postulo hevur gloymt heimildina. Veitarin hevur hana framvegis, til tú eisini tekur hana aftur har."
+
+#: src/postulo/templates/jobs/company_enrichment.html
+msgid "Postulo has nowhere to keep these yet. They are shown for you to read, and are not kept."
+msgstr ""
 
 #: src/postulo/core/tagline.py
 msgid "Postulo is a self-hosted job application manager: your applications, CVs and cover letters on your own server, with no paid features."
@@ -16722,6 +16980,7 @@ msgstr "Goymslutíð"
 msgid "retired on"
 msgstr "endað tann"
 
+#: src/postulo/templates/jobs/company_enrichment.html
 #: src/postulo/templates/jobs/company_register.html
 #, python-format
 msgid "Retrieved %(when)s."
@@ -16858,6 +17117,10 @@ msgstr "koyrir %(running)s; endurbyrja fyri at gera liðugt"
 #: src/postulo/templates/server/backups.html
 msgid "Runs in the background; you can leave this page while it works."
 msgstr "Koyrir í bakgrundini; tú kanst fara frá hesi síðuni, meðan tað arbeiðir."
+
+#: src/postulo/templates/jobs/company_enrichment.html
+msgid "Said, and not offered"
+msgstr ""
 
 #: src/postulo/templates/core/import_csv_map.html
 #, fuzzy
@@ -17559,6 +17822,14 @@ msgstr "Avgjørt"
 msgid "Seven colours, each tuned to 3:1 against the card in both themes."
 msgstr "Sjey litir, hvør stillaður til 3:1 móti kortinum í báðum temunum."
 
+#: src/postulo/jobs/enrichment_offers.py
+msgid "Several social profiles are switched off."
+msgstr ""
+
+#: src/postulo/jobs/enrichment_offers.py
+msgid "Several telephone numbers are switched off."
+msgstr ""
+
 #: src/postulo/jobs/industries.py
 #, fuzzy
 msgid "Sewerage"
@@ -18075,7 +18346,7 @@ msgid "Snoozed for two weeks."
 msgstr "Útsett í tvær vikur."
 
 #: src/postulo/core/models.py src/postulo/core/web_links.py
-#: src/postulo/documents/printing.py
+#: src/postulo/documents/printing.py src/postulo/jobs/enrichment_offers.py
 #, fuzzy
 msgid "Social profile"
 msgstr "Sosialur vangi"
@@ -18271,6 +18542,7 @@ msgstr "Keldan er teigurin „funnin gjøgnum“ á eini starvslýsing. Fyll han
 msgid "source version"
 msgstr "útgáva av keldini"
 
+#: src/postulo/templates/jobs/company_enrichment.html
 #: src/postulo/templates/jobs/company_register.html
 #, python-format
 msgid "Source: %(source)s."
@@ -18830,6 +19102,7 @@ msgid "telephone"
 msgstr "telefon"
 
 #: src/postulo/core/channels.py src/postulo/documents/printing.py
+#: src/postulo/jobs/enrichment_offers.py
 #: src/postulo/templates/partials/phone_widget.html
 #: src/postulo/templates/server/design.html
 msgid "Telephone number"
@@ -18947,7 +19220,7 @@ msgstr "Takk, {{ role }}"
 msgid "Thank-you"
 msgstr "Takk"
 
-#: src/postulo/jobs/register_views.py
+#: src/postulo/jobs/enrichment_offers.py
 msgid "That address could not be added."
 msgstr "Tann bústaðurin kundi ikki leggjast afturat."
 
@@ -19995,6 +20268,11 @@ msgstr "Fyritøkurnar, sambandspersónarnir og starvslýsingarnar, tað leggur a
 msgid "The company %(name)s is not in your account, and is added with it."
 msgstr "Fyritøkan %(name)s er ikki í kontu tíni og verður løgd afturat saman við hesum."
 
+#: src/postulo/templates/jobs/company_enrichment.html
+#, python-format
+msgid "The company already has <bdi>%(current)s</bdi>."
+msgstr ""
+
 #: src/postulo/jobs/views.py
 msgid "The company already has that name."
 msgstr "Fyritøkan hevur longu hetta navnið."
@@ -20628,6 +20906,11 @@ msgstr "Búmerkið varð broytt."
 #, python-format
 msgid "The logo was not changed: %(problem)s"
 msgstr "Búmerkið varð ikki broytt: %(problem)s"
+
+#: src/postulo/jobs/enrichment_offers.py
+#, python-format
+msgid "The logo was not kept: %(problem)s"
+msgstr ""
 
 #: src/postulo/templates/applications/report.html
 msgid "The longest gap is measured inside this period, so a silence that began before it is not carried in. A period still running is only counted up to today."
@@ -23050,7 +23333,8 @@ msgid "WebP image"
 msgstr "WebP-mynd"
 
 #: src/postulo/core/models.py src/postulo/core/web_links.py
-#: src/postulo/documents/printing.py src/postulo/jobs/tables.py
+#: src/postulo/documents/printing.py src/postulo/jobs/enrichment_offers.py
+#: src/postulo/jobs/tables.py
 #: src/postulo/templates/applications/interview_detail.html
 #: src/postulo/templates/jobs/company_detail.html
 msgid "Website"
@@ -23532,6 +23816,7 @@ msgstr "Hvat skal gerast við tað, í einum setningi."
 msgid "What to do. It is what the reminder says when it falls due."
 msgstr "Hvat skal gerast. Tað er tað, sum áminningin sigur, tá ið hon fellur til."
 
+#: src/postulo/templates/jobs/company_enrichment.html
 #: src/postulo/templates/jobs/company_register.html
 msgid "What to keep"
 msgstr "Hvat skal varðveitast"
@@ -23591,6 +23876,10 @@ msgstr "Hvat tú gjørdi har. „Ikki ásett“ vísir einki."
 #: src/postulo/jobs/widgets.py
 msgid "What you have noticed and not yet acted on, and what closes this week."
 msgstr "Tað, sum tú hevur lagt til merkis og enn ikki gjørt nakað við, og tað, sum hevur umsóknarfreist hesa vikuna."
+
+#: src/postulo/templates/jobs/company_enrichment.html
+msgid "What you have recorded is never replaced from here. Change it on the company's own page if a source is right."
+msgstr ""
 
 #: src/postulo/resume/models.py
 msgid "what you presented"
@@ -23838,6 +24127,10 @@ msgstr "Hvar hesin posturin stendur í sínum parti, verður sett við pílunum 
 #: src/postulo/templates/help/telephone_numbers.html
 msgid "Where this instance can send a code to a telephone, a number you have confirmed can also be the one that gets you back into your account. That choice is separate from the primary, so changing what a recruiter dials never changes how you prove it is you. The bin will not remove that number while it is your way in. Changing its digits makes it another number, which has to be confirmed again and is no longer your way in."
 msgstr "Har henda uppsetingin kann senda eina kotu til ein telefon, kann eitt nummar, tú hevur váttað, eisini vera tað, sum fær teg inn aftur á kontu tína. Tað valið er óheft av høvuðsnummarinum, so tá ið tú broytir, hvat ein setanarráðgevi ringir til, broytist ongantíð, hvussu tú prógvar, at tað ert tú. Ruskspannin tekur ikki tað nummarið burtur, meðan tað er tín leið inn. Broytir tú tølini í tí, verður tað eitt annað nummar, sum má váttast aftur og ikki longur er tín leið inn."
+
+#: src/postulo/templates/cotton/enrichment_ask.html
+msgid "Where to ask"
+msgstr ""
 
 #: src/postulo/templates/server/register_lookup.html
 msgid "Where to get a key"

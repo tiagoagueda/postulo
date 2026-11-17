@@ -5,6 +5,7 @@ from postulo.core import modules
 from . import (
     capture_views,
     contact_views,
+    enrichment_views,
     page_views,
     register_views,
     share_views,
@@ -46,6 +47,12 @@ urlpatterns = [
         "companies/<int:pk>/register/",
         register_views.CompanyRegisterView.as_view(),
         name="company_register",
+    ),
+    # Find details: the press, what the sources said, and keeping what was ticked (#1256).
+    path(
+        "companies/<int:pk>/details/",
+        enrichment_views.CompanyEnrichmentView.as_view(),
+        name="company_enrichment",
     ),
     # Its dated hiring signals (#941): add one, change one, take one off.
     path(

@@ -15,6 +15,16 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=n > 1;\n"
 "X-Generator: postulo scripts/messages.py\n"
 
+#: src/postulo/jobs/enrichment_offers.py
+#, python-format
+msgid "%(address)s was not added."
+msgstr ""
+
+#: src/postulo/jobs/enrichment_offers.py
+#, python-format
+msgid "%(address)s was not added: %(reason)s"
+msgstr ""
+
 #: src/postulo/core/personal.py
 #, python-format
 msgid "%(code)s is not a country in the list."
@@ -373,6 +383,11 @@ msgid "%(count)s listing you are considering closes soon"
 msgid_plural "%(count)s listings you are considering close soon"
 msgstr[0] "%(count)s հայտարարություն, որը դիտարկում եք, շուտով փակվում է"
 msgstr[1] "%(count)s հայտարարություն, որոնք դիտարկում եք, շուտով փակվում են"
+
+#: src/postulo/jobs/enrichment_offers.py
+#, python-format
+msgid "%(count)s or more"
+msgstr ""
 
 #: src/postulo/plugins/base.py
 #, python-format
@@ -788,6 +803,11 @@ msgstr "%(host)s հանգույցը գտնվում է մասնավոր կամ տ
 msgid "%(i)s interviews and %(e)s entries in listings' histories would be kept without the name."
 msgstr "%(i)s հարցազրույց և հայտարարությունների պատմությունների %(e)s գրառում կպահվեն առանց անվան։"
 
+#: src/postulo/jobs/enrichment_offers.py
+#, python-format
+msgid "%(industry)s (NACE %(division)s)"
+msgstr ""
+
 #: src/postulo/templates/server/logs.html
 #, python-format
 msgid "%(kilobytes)s on disk"
@@ -872,7 +892,7 @@ msgstr "%(least)s – %(most)s"
 msgid "%(list)s · %(date)s"
 msgstr "%(list)s · %(date)s"
 
-#: src/postulo/jobs/models.py
+#: src/postulo/jobs/enrichment_offers.py src/postulo/jobs/models.py
 #, python-format
 msgid "%(low)s to %(high)s"
 msgstr "%(low)s – %(high)s"
@@ -1268,6 +1288,16 @@ msgstr "%(name)s՝ %(value)s համարը բաց թողնվեց։ %(why)s"
 msgid "%(names)s can see “%(other)s” and not “%(kept)s”. Share “%(kept)s” with them first, or nothing is merged."
 msgstr "%(names)s-ը կարող են տեսնել «%(other)s»-ը, բայց ոչ «%(kept)s»-ը։ Նախ կիսվեք «%(kept)s»-ով նրանց հետ, այլապես ոչինչ չի միավորվի։"
 
+#: src/postulo/jobs/enrichment_offers.py
+#, python-format
+msgid "%(number)s was not added."
+msgstr ""
+
+#: src/postulo/jobs/enrichment_offers.py
+#, python-format
+msgid "%(number)s was not added: %(reason)s"
+msgstr ""
+
 #: src/postulo/resume/views.py
 #, python-format
 msgid "%(ok)s, %(broken)s; the ones that did not say why."
@@ -1533,10 +1563,77 @@ msgstr "%(service)s ծառայությունը doi.org-ի միջոցով ոչի�
 msgid "%(share)s%%"
 msgstr "%(share)s%%"
 
+#: src/postulo/jobs/enrichment.py
+#, python-format
+msgid "%(source)s asked for an address it did not declare."
+msgstr ""
+
+#: src/postulo/jobs/enrichment.py
+#, python-format
+msgid "%(source)s asked for fewer requests. Try again later."
+msgstr ""
+
+#: src/postulo/jobs/enrichment.py
+#, python-format
+msgid "%(source)s asked for more requests than one press allows."
+msgstr ""
+
+#: src/postulo/jobs/enrichment.py
+#, python-format
+msgid "%(source)s cannot be asked about this company."
+msgstr ""
+
+#: src/postulo/jobs/enrichment.py
+#, python-format
+msgid "%(source)s could not be reached."
+msgstr ""
+
+#: src/postulo/templates/jobs/company_enrichment.html
+#, python-format
+msgid "%(source)s could not be read."
+msgstr ""
+
+#: src/postulo/jobs/enrichment.py
+#, python-format
+msgid "%(source)s redirected too many times."
+msgstr ""
+
+#: src/postulo/jobs/enrichment.py
+#, python-format
+msgid "%(source)s sent its answer with the content encoding “%(coding)s”, which Postulo does not unpack."
+msgstr ""
+
+#: src/postulo/jobs/enrichment.py
+#, python-format
+msgid "%(source)s sent the request somewhere else."
+msgstr ""
+
+#: src/postulo/jobs/enrichment.py
+#, python-format
+msgid "%(source)s took longer than %(seconds)s second to answer."
+msgid_plural "%(source)s took longer than %(seconds)s seconds to answer."
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/postulo/jobs/enrichment.py
+#, python-format
+msgid "%(source)s's answer could not be read."
+msgstr ""
+
+#: src/postulo/jobs/enrichment.py
+#, python-format
+msgid "%(source)s's answer was larger than one company's should be."
+msgstr ""
+
 #: src/postulo/applications/agenda.py
 #, python-format
 msgid "%(start)s to %(end)s"
 msgstr "%(start)s – %(end)s"
+
+#: src/postulo/jobs/enrichment_offers.py
+#, python-format
+msgid "%(state)s since %(date)s"
+msgstr ""
 
 #: src/postulo/templates/applications/partials/board.html
 #, python-format
@@ -2488,6 +2585,10 @@ msgstr "Մոդուլ․ այն ներառված է Postulo-ում և հնարա�
 msgid "A month"
 msgstr "Մեկ ամիս"
 
+#: src/postulo/jobs/enrichment_views.py
+msgid "a name"
+msgstr ""
+
 #: src/postulo/core/messaging_services.py
 #, python-format
 msgid "A name is at most %(max)s characters."
@@ -2704,6 +2805,10 @@ msgstr "Հետագայում ջնջված գրառում"
 msgid "A referee who is not a contact yet. Their name is enough; it is added to your contacts without a company, and is used instead of the choice above."
 msgstr "Հանձնարարական տվող, որը դեռ ձեր կոնտակտը չէ։ Բավական է նրա անունը․ նա կավելացվի ձեր կոնտակտներին առանց ընկերության և կօգտագործվի վերևի ընտրության փոխարեն։"
 
+#: src/postulo/jobs/enrichment_views.py
+msgid "a register number"
+msgstr ""
+
 #: src/postulo/applications/ical_import.py
 msgid "A reminder"
 msgstr "Հիշեցում"
@@ -2919,6 +3024,10 @@ msgstr "Տեսքի անվան մեջ պետք է լինի առնվազն մեկ 
 msgid "A way back rather than a way on, which is why it is an outline."
 msgstr "Վերադարձի, այլ ոչ թե առաջ շարժվելու ճանապարհ․ ահա թե ինչու է այն ուրվագծային։"
 
+#: src/postulo/jobs/enrichment_views.py
+msgid "a website"
+msgstr ""
+
 #: src/postulo/templates/applications/report.html
 #: src/postulo/templates/documents/themes/base_report.html
 msgid "A week, on average"
@@ -2927,6 +3036,10 @@ msgstr "Շաբաթական՝ միջինում"
 #: src/postulo/templates/core/partials/widget_offers.html
 msgid "A widget added in a later release, or brought by a plugin, waits above until you say yes to it. Nothing arrives on your dashboard without being asked."
 msgstr "Հետագա թողարկումում ավելացված կամ հավելման բերած վիջեթը սպասում է վերևում, մինչև համաձայնեք։ Ձեր ընդհանուր տեսքում ոչինչ չի հայտնվում առանց ձեր համաձայնության։"
+
+#: src/postulo/jobs/enrichment_views.py
+msgid "a Wikidata identifier"
+msgstr ""
 
 #: src/postulo/documents/integrity.py
 msgid "a Word document"
@@ -3055,7 +3168,8 @@ msgstr "Ձեռք բերված կամ միաձուլված"
 msgid "acquired_by must be a company you can see."
 msgstr "acquired_by-ը պետք է լինի ձեզ տեսանելի ընկերություն։"
 
-#: src/postulo/jobs/models.py src/postulo/templates/jobs/company_form.html
+#: src/postulo/jobs/enrichment_offers.py src/postulo/jobs/models.py
+#: src/postulo/templates/jobs/company_form.html
 msgid "Acronym or short name"
 msgstr "Հապավում կամ կարճ անվանում"
 
@@ -3373,7 +3487,8 @@ msgid "addok (France's Base Adresse Nationale)"
 msgstr "addok (Ֆրանսիայի Base Adresse Nationale)"
 
 #: src/postulo/applications/forms.py src/postulo/applications/reports.py
-#: src/postulo/jobs/tables.py src/postulo/templates/partials/web_links.html
+#: src/postulo/jobs/enrichment_offers.py src/postulo/jobs/tables.py
+#: src/postulo/templates/partials/web_links.html
 msgid "Address"
 msgstr "Հասցե"
 
@@ -3585,6 +3700,10 @@ msgstr "Տեղի է ունենում նաև ինքնաբերաբար, երբ ձ�
 msgid "Also in %(names)s"
 msgstr "Նաև %(names)s լեզվով"
 
+#: src/postulo/templates/jobs/company_enrichment.html
+msgid "Also said"
+msgstr ""
+
 #: src/postulo/accounts/models.py
 msgid "Always"
 msgstr "Միշտ"
@@ -3650,6 +3769,10 @@ msgstr "Հասցեն, որը գրանցվել է նախքան հասցեների
 #: src/postulo/resume/candidate.py
 msgid "An address that could not be read"
 msgstr "Հասցե, որը հնարավոր չեղավ կարդալ"
+
+#: src/postulo/jobs/enrichment_views.py
+msgid "an address with a country"
+msgstr ""
 
 #: src/postulo/applications/models.py
 msgid "An address, a telephone number or the link to the call."
@@ -3749,6 +3872,10 @@ msgstr "Հարցազրույցը միշտ կապված է դիմումի հետ�
 msgid "An interview is scheduled or moved"
 msgstr "Հարցազրույց է նշանակվում կամ տեղափոխվում"
 
+#: src/postulo/jobs/enrichment_views.py
+msgid "an LEI"
+msgstr ""
+
 #: src/postulo/notifications/base.py
 msgid "An offer is recorded"
 msgstr "Առաջարկ է գրանցվում"
@@ -3818,6 +3945,11 @@ msgstr "Մեկ այլ պահուստավորում արդեն ընթացքում
 #: src/postulo/templates/accounts/invite_created.html
 msgid "Another invitation"
 msgstr "Եվս մեկ հրավեր"
+
+#: src/postulo/jobs/enrichment_offers.py
+#, python-format
+msgid "Another of your companies already has %(identifier)s."
+msgstr ""
 
 #: src/postulo/jobs/register_views.py
 #, python-format
@@ -4288,6 +4420,11 @@ msgstr "Դրությամբ"
 msgid "as of %(date)s"
 msgstr "%(date)s դրությամբ"
 
+#: src/postulo/templates/jobs/partials/enrichment_origins.html
+#, python-format
+msgid "As of %(date)s."
+msgstr ""
+
 #: src/postulo/templates/applications/interview_detail.html
 #: src/postulo/templates/documents/themes/base_interview.html
 #, python-format
@@ -4363,6 +4500,15 @@ msgstr "Հարցվում է միայն այն ժամանակ, երբ ինչ-որ
 #, python-format
 msgid "Asks %(plugin)s now. Nothing it answers is kept here."
 msgstr "Հիմա հարցնում է %(plugin)s-ին։ Նրա պատասխանից այստեղ ոչինչ չի պահվում։"
+
+#: src/postulo/templates/cotton/enrichment_ask.html
+#, python-format
+msgid "Asks <bdi>%(hosts)s</bdi>. Sent: %(what)s."
+msgstr ""
+
+#: src/postulo/templates/jobs/company_detail.html
+msgid "Asks the places you choose, once each; nothing is kept until you say so."
+msgstr ""
 
 #: src/postulo/applications/analytics.py src/postulo/applications/models.py
 msgid "Assessment"
@@ -4583,6 +4729,10 @@ msgstr "Վերադառնալ օրացույց"
 #: src/postulo/templates/applications/calendar_print.html
 msgid "Back to the calendar, to change any of this"
 msgstr "Վերադառնալ օրացույցին՝ այս ամենը փոխելու համար"
+
+#: src/postulo/templates/jobs/company_enrichment.html
+msgid "Back to the company"
+msgstr ""
 
 #: src/postulo/core/help.py
 msgid "Back to the dashboard"
@@ -4981,6 +5131,7 @@ msgstr "Կարող է զուգակցվել"
 #: src/postulo/templates/documents/upload_form.html
 #: src/postulo/templates/jobs/address_place.html
 #: src/postulo/templates/jobs/capture_page_forget.html
+#: src/postulo/templates/jobs/company_enrichment.html
 #: src/postulo/templates/jobs/company_form.html
 #: src/postulo/templates/jobs/company_register.html
 #: src/postulo/templates/jobs/company_wikidata.html
@@ -5034,6 +5185,11 @@ msgstr "Հնարավոր չէ ավելացնել"
 #: src/postulo/templates/applications/ical_import.html
 msgid "Cannot be added."
 msgstr "Հնարավոր չէ ավելացնել։"
+
+#: src/postulo/templates/cotton/enrichment_ask.html
+#, python-format
+msgid "Cannot be asked: this company would need %(what)s."
+msgstr ""
 
 #: src/postulo/templates/server/overview.html
 msgid "cannot be checked on this machine"
@@ -5153,13 +5309,14 @@ msgstr "Կարիերայի նախադիտում"
 msgid "Career sections"
 msgstr "Կարիերայի բաժիններ"
 
+#: src/postulo/jobs/enrichment_offers.py src/postulo/jobs/tables.py
+#: src/postulo/templates/jobs/company_detail.html
+msgid "Careers page"
+msgstr "Աշխատատեղերի էջ"
+
 #: src/postulo/jobs/models.py
 msgid "careers page"
 msgstr "աշխատատեղերի էջ"
-
-#: src/postulo/jobs/tables.py src/postulo/templates/jobs/company_detail.html
-msgid "Careers page"
-msgstr "Աշխատատեղերի էջ"
 
 #: src/postulo/templates/server/email.html
 #, python-format
@@ -5324,6 +5481,10 @@ msgstr "Ստուգել թարմացումները"
 msgid "Check it answers"
 msgstr "Ստուգել, արդյոք պատասխանում է"
 
+#: src/postulo/templates/jobs/partials/enrichment_origins.html
+msgid "Check it there"
+msgstr ""
+
 #: src/postulo/templates/jobs/capture_review.html
 msgid "Check the reading against it"
 msgstr "Համեմատել կարդացածը դրա հետ"
@@ -5476,6 +5637,10 @@ msgstr "Ընտրել այլ ֆայլ"
 msgid "Choose at least one document to record."
 msgstr "Ընտրեք առնվազն մեկ փաստաթուղթ գրանցելու համար։"
 
+#: src/postulo/jobs/enrichment_views.py
+msgid "Choose at least one place to ask."
+msgstr ""
+
 #: src/postulo/templates/cotton/date_field.html
 msgid "Choose dates from a calendar"
 msgstr "Ընտրել ամսաթվերը օրացույցից"
@@ -5539,6 +5704,10 @@ msgstr "Ընտրեք, թե ինչ անել հաղորդագրության հետ
 #: src/postulo/jobs/status_views.py
 msgid "Choose what was reported and the date."
 msgstr "Ընտրեք, թե ինչ է հաղորդվել, և ամսաթիվը։"
+
+#: src/postulo/templates/cotton/enrichment_ask.html
+msgid "Choose where to ask about this company. Each place is asked once, now, and learns only what is listed. Nothing is kept until you tick it."
+msgstr ""
 
 #: src/postulo/applications/views.py
 msgid "Choose which application this is about first."
@@ -5865,6 +6034,10 @@ msgstr "Ընկերությունն ավելացվեց։"
 #: src/postulo/jobs/views.py
 msgid "Company deleted, along with its postings."
 msgstr "Ընկերությունը ջնջվեց՝ իր հայտարարությունների հետ միասին։"
+
+#: src/postulo/plugins/kinds.py
+msgid "Company details"
+msgstr ""
 
 #: src/postulo/jobs/models.py
 msgid "company identifier"
@@ -6812,6 +6985,10 @@ msgstr "մանրամասն"
 msgid "details"
 msgstr "մանրամասներ"
 
+#: src/postulo/templates/jobs/company_enrichment.html
+msgid "Details found"
+msgstr ""
+
 #: src/postulo/core/design.py src/postulo/templates/server/design.html
 msgid "Dialogs"
 msgstr "Երկխոսության պատուհաններ"
@@ -7315,6 +7492,7 @@ msgid "email address"
 msgstr "էլ. փոստի հասցե"
 
 #: src/postulo/core/channels.py src/postulo/documents/printing.py
+#: src/postulo/jobs/enrichment_offers.py
 msgid "Email address"
 msgstr "Էլ. փոստի հասցե"
 
@@ -8101,6 +8279,10 @@ msgstr "Գտնել"
 msgid "Find a language"
 msgstr "Գտնել լեզու"
 
+#: src/postulo/templates/cotton/enrichment_ask.html
+msgid "Find details"
+msgstr ""
+
 #: src/postulo/templates/jobs/company_form.html
 msgid "Find logo"
 msgstr "Գտնել լոգոտիպը"
@@ -8361,6 +8543,13 @@ msgstr[1] "Սերվերում գտնվեց %(count)d տարբերակ։ Ընտր
 
 #: src/postulo/jobs/slow.py
 #, python-format
+msgid "Found %(count)s detail. Nothing is kept until you tick it."
+msgid_plural "Found %(count)s details. Nothing is kept until you tick it."
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/postulo/jobs/slow.py
+#, python-format
 msgid "Found a logo at %(url)s."
 msgstr "Լոգոտիպ գտնվեց %(url)s հասցեում։"
 
@@ -8392,6 +8581,10 @@ msgstr "գտնելու աղբյուր"
 #, python-format
 msgid "Found: %(names)s. Only the ones you have left blank will be filled in."
 msgstr "Գտնվեց՝ %(names)s։ Կլրացվեն միայն այն դաշտերը, որ դատարկ եք թողել։"
+
+#: src/postulo/jobs/enrichment_offers.py
+msgid "Founded"
+msgstr ""
 
 #: src/postulo/jobs/models.py
 msgid "Freelance"
@@ -8446,6 +8639,11 @@ msgstr "%(name)s-ից։"
 #, python-format
 msgid "From %(register)s"
 msgstr "%(register)s ռեեստրից"
+
+#: src/postulo/templates/jobs/partials/enrichment_origins.html
+#, python-format
+msgid "From %(source)s: <bdi>%(where)s</bdi>."
+msgstr ""
 
 #: src/postulo/core/tables.py
 #, python-format
@@ -8860,6 +9058,10 @@ msgctxt "pronouns"
 msgid "he/him"
 msgstr "նա (արական)"
 
+#: src/postulo/jobs/enrichment_offers.py
+msgid "Head office"
+msgstr ""
+
 #: src/postulo/accounts/models.py src/postulo/documents/models.py
 #: src/postulo/resume/views.py
 msgid "headline"
@@ -9242,6 +9444,7 @@ msgstr "իդեմպոտենտ հարցումներ"
 msgid "identifier"
 msgstr "նույնացուցիչ"
 
+#: src/postulo/jobs/enrichment_offers.py
 #: src/postulo/templates/cotton/identifier_row.html
 msgid "Identifier"
 msgstr "Նույնացուցիչ"
@@ -9595,13 +9798,14 @@ msgstr "Ոլորտներ"
 msgid "industries"
 msgstr "ոլորտներ"
 
-#: src/postulo/jobs/models.py
-msgid "industry"
-msgstr "ոլորտ"
-
+#: src/postulo/jobs/enrichment_offers.py
 #: src/postulo/templates/jobs/industry_form.html
 msgid "Industry"
 msgstr "Ոլորտ"
+
+#: src/postulo/jobs/models.py
+msgid "industry"
+msgstr "ոլորտ"
 
 #: src/postulo/jobs/views.py
 msgid "Industry renamed."
@@ -9812,6 +10016,10 @@ msgstr "տրամադրող"
 #: src/postulo/resume/models.py
 msgid "issued on"
 msgstr "տրման ամսաթիվ"
+
+#: src/postulo/jobs/enrichment_offers.py
+msgid "It already has a logo."
+msgstr ""
 
 #: src/postulo/templates/settings/account.html
 msgid "It also gets you back in: ask for a sign-in code and it arrives there. Making a different address primary moves that with it. You are still asked for your authenticator app if you have one."
@@ -10235,6 +10443,7 @@ msgstr "Պահել սրանք"
 msgid "Keep this view as"
 msgstr "Պահել այս տեսքը որպես"
 
+#: src/postulo/templates/jobs/company_enrichment.html
 #: src/postulo/templates/jobs/company_register.html
 msgid "Keep what is ticked"
 msgstr "Պահել նշվածը"
@@ -10255,6 +10464,13 @@ msgstr "Էջի պահումը"
 #: src/postulo/templates/jobs/merge.html
 msgid "Kept"
 msgstr "Պահվում է"
+
+#: src/postulo/jobs/enrichment_views.py
+#, python-format
+msgid "Kept %(count)s detail."
+msgid_plural "Kept %(count)s details."
+msgstr[0] ""
+msgstr[1] ""
 
 #: src/postulo/templates/server/person_recovery.html
 msgid "Kept after they are used or expire, because taking somebody's account back is not something to be able to do without a trace."
@@ -10632,6 +10848,7 @@ msgstr "Թողեք դատարկ՝ արդեն պահվածը պահպանելու
 msgid "Leave empty if this is your current role."
 msgstr "Թողեք դատարկ, եթե սա ձեր ներկայիս պաշտոնն է։"
 
+#: src/postulo/templates/jobs/company_enrichment.html
 #: src/postulo/templates/jobs/company_wikidata.html
 msgid "Leave it as it is"
 msgstr "Թողնել այնպես, ինչպես կա"
@@ -10740,6 +10957,10 @@ msgstr "Իրավական ծանուցում"
 #: src/postulo/jobs/industries.py
 msgid "Legal services"
 msgstr "Իրավաբանական ծառայություններ"
+
+#: src/postulo/jobs/enrichment_offers.py
+msgid "Legal state"
+msgstr ""
 
 #: src/postulo/jobs/models.py
 msgid "legal state"
@@ -10987,6 +11208,10 @@ msgstr "գտնվելու վայր"
 msgid "Location"
 msgstr "Գտնվելու վայր"
 
+#: src/postulo/jobs/enrichment_offers.py
+msgid "Logo"
+msgstr ""
+
 #: src/postulo/jobs/models.py
 msgid "logo"
 msgstr "լոգոտիպ"
@@ -11048,6 +11273,10 @@ msgstr "որոնման ծառայության հասցե"
 #: src/postulo/jobs/slow.py
 msgid "Looking for a logo"
 msgstr "Լոգոտիպ է փնտրվում"
+
+#: src/postulo/jobs/slow.py
+msgid "Looking for details"
+msgstr ""
 
 #: src/postulo/templates/applications/application_list.html
 #: src/postulo/templates/jobs/company_list.html
@@ -11705,8 +11934,8 @@ msgstr "NACE ճյուղ"
 msgid "name"
 msgstr "անուն"
 
-#: src/postulo/api/forms.py src/postulo/jobs/tables.py
-#: src/postulo/templates/cotton/identifier_row.html
+#: src/postulo/api/forms.py src/postulo/jobs/enrichment_offers.py
+#: src/postulo/jobs/tables.py src/postulo/templates/cotton/identifier_row.html
 #: src/postulo/templates/partials/messaging_handles.html
 #: src/postulo/templates/partials/phone_numbers.html
 #: src/postulo/templates/partials/postal_addresses.html
@@ -12183,6 +12412,14 @@ msgstr "Դեռ այս տեսակի նամակներ չկան։"
 msgid "No letters yet. A cover letter is for one posting; a motivation letter tells your story; a speculative letter goes where nothing is advertised; a follow-up note comes after an interview."
 msgstr "Դեռ նամակներ չկան։ Ուղեկցող նամակը մեկ հայտարարության համար է․ մոտիվացիոն նամակը պատմում է ձեր պատմությունը․ նախաձեռնողական նամակն ուղարկվում է այնտեղ, որտեղ թափուր տեղ չի հայտարարվել․ հետագա կապի նշումը գրվում է հարցազրույցից հետո։"
 
+#: src/postulo/templates/jobs/company_enrichment.html
+msgid "No licence is stated."
+msgstr ""
+
+#: src/postulo/templates/jobs/company_enrichment.html
+msgid "No licence is stated; the name and the mark are the company's."
+msgstr ""
+
 #: src/postulo/templates/connections/partials/option_table.html
 msgid "No longer on the server"
 msgstr "Այլևս սերվերում չէ"
@@ -12496,6 +12733,10 @@ msgstr "Դրանցից ոչինչ չի բխեցվում որևէ այլ բանի
 msgid "None of this company's industries is Education, so it is not listed as a school or university."
 msgstr "Այս ընկերության ոլորտներից ոչ մեկը «Կրթություն» չէ, ուստի այն նշված չէ որպես դպրոց կամ համալսարան։"
 
+#: src/postulo/jobs/slow.py
+msgid "None of those can be asked about this company any more."
+msgstr ""
+
 #: src/postulo/templates/jobs/company_places.html
 msgid "None of your companies has this name or identifier."
 msgstr "Ձեր ընկերություններից ոչ մեկն այս անվանումը կամ նույնացուցիչը չունի։"
@@ -12565,6 +12806,10 @@ msgstr "Չի համապատասխանում"
 #: src/postulo/templates/partials/phone_widget.html
 msgid "Not a possible number"
 msgstr "Հնարավոր համար չէ"
+
+#: src/postulo/jobs/enrichment_offers.py
+msgid "Not a profile on a service Postulo knows."
+msgstr ""
 
 #: src/postulo/documents/models.py
 msgid "Not accepted"
@@ -13122,6 +13367,10 @@ msgstr "Դեռ ոչինչ ուղարկված չէ։"
 msgid "Nothing standing at Offer. Record one from an application's page when it arrives."
 msgstr "«Առաջարկ» կարգավիճակում ոչինչ չկա։ Երբ առաջարկը գա, գրանցեք այն դիմումի էջից։"
 
+#: src/postulo/templates/jobs/company_enrichment.html
+msgid "Nothing that was found can be added to what the company already has."
+msgstr ""
+
 #: src/postulo/core/design.py src/postulo/templates/server/design.html
 msgid "Nothing there"
 msgstr "Այստեղ ոչինչ չկա"
@@ -13205,7 +13454,7 @@ msgstr "Այդ էջից ոչինչ չի պահվել։"
 msgid "Nothing was kept of this page"
 msgstr "Այս էջից ոչինչ չի պահվել"
 
-#: src/postulo/jobs/register_views.py
+#: src/postulo/jobs/enrichment_views.py src/postulo/jobs/register_views.py
 msgid "Nothing was kept."
 msgstr "Ոչինչ չպահվեց։"
 
@@ -13891,6 +14140,7 @@ msgstr "CV-ում տպվում է միայն տարին, ուստի օրը նշ�
 msgid "Only this publication, as a reference:"
 msgstr "Միայն այս հրապարակումը՝ որպես հղում՝"
 
+#: src/postulo/templates/jobs/company_enrichment.html
 #: src/postulo/templates/jobs/company_register.html
 msgid "Only what you tick is kept; nothing else on the company changes."
 msgstr "Պահվում է միայն այն, ինչ նշում եք․ ընկերության մեջ ուրիշ ոչինչ չի փոխվում։"
@@ -14452,6 +14702,10 @@ msgstr "Կենսաթոշակ, ապահովագրություն, նպաստներ
 msgid "People"
 msgstr "Մարդիկ"
 
+#: src/postulo/jobs/enrichment_offers.py
+msgid "People employed"
+msgstr ""
+
 #: src/postulo/jobs/models.py
 msgid "Per day"
 msgstr "Օրական"
@@ -14974,6 +15228,10 @@ msgstr "Postulo-ն մոռացել է այն։ Մատակարարը դեռ պահ
 #: src/postulo/core/server_views.py
 msgid "Postulo has forgotten the grant. The provider still has it until you withdraw it there as well."
 msgstr "Postulo-ն մոռացավ թույլտվությունը։ Մատակարարը դեռ պահում է այն, մինչև այն այնտեղ ևս հետ չկանչեք։"
+
+#: src/postulo/templates/jobs/company_enrichment.html
+msgid "Postulo has nowhere to keep these yet. They are shown for you to read, and are not kept."
+msgstr ""
 
 #: src/postulo/core/tagline.py
 msgid "Postulo is a self-hosted job application manager: your applications, CVs and cover letters on your own server, with no paid features."
@@ -16290,6 +16548,7 @@ msgstr "Պահպանման ժամկետ"
 msgid "retired on"
 msgstr "դադարեցման ամսաթիվ"
 
+#: src/postulo/templates/jobs/company_enrichment.html
 #: src/postulo/templates/jobs/company_register.html
 #, python-format
 msgid "Retrieved %(when)s."
@@ -16419,6 +16678,10 @@ msgstr "աշխատում է %(running)s․ ավարտելու համար վեր�
 #: src/postulo/templates/server/backups.html
 msgid "Runs in the background; you can leave this page while it works."
 msgstr "Աշխատում է ֆոնում․ կարող եք լքել այս էջը, մինչ այն աշխատում է։"
+
+#: src/postulo/templates/jobs/company_enrichment.html
+msgid "Said, and not offered"
+msgstr ""
 
 #: src/postulo/templates/core/import_csv_map.html
 msgid "Salaries are in"
@@ -17095,6 +17358,14 @@ msgstr "Ավարտված"
 msgid "Seven colours, each tuned to 3:1 against the card in both themes."
 msgstr "Յոթ գույն, որոնցից յուրաքանչյուրը երկու թեմաներում էլ կարգավորված է քարտի նկատմամբ 3:1 հակադրությամբ։"
 
+#: src/postulo/jobs/enrichment_offers.py
+msgid "Several social profiles are switched off."
+msgstr ""
+
+#: src/postulo/jobs/enrichment_offers.py
+msgid "Several telephone numbers are switched off."
+msgstr ""
+
 #: src/postulo/jobs/industries.py
 msgid "Sewerage"
 msgstr "Կոյուղի"
@@ -17589,7 +17860,7 @@ msgid "Snoozed for two weeks."
 msgstr "Հետաձգվեց երկու շաբաթով։"
 
 #: src/postulo/core/models.py src/postulo/core/web_links.py
-#: src/postulo/documents/printing.py
+#: src/postulo/documents/printing.py src/postulo/jobs/enrichment_offers.py
 msgid "Social profile"
 msgstr "Սոցիալական պրոֆիլ"
 
@@ -17776,6 +18047,7 @@ msgstr "Աղբյուրը հայտարարության «Որտեղից է գտն
 msgid "source version"
 msgstr "աղբյուրի տարբերակ"
 
+#: src/postulo/templates/jobs/company_enrichment.html
 #: src/postulo/templates/jobs/company_register.html
 #, python-format
 msgid "Source: %(source)s."
@@ -18312,6 +18584,7 @@ msgid "telephone"
 msgstr "հեռախոս"
 
 #: src/postulo/core/channels.py src/postulo/documents/printing.py
+#: src/postulo/jobs/enrichment_offers.py
 #: src/postulo/templates/partials/phone_widget.html
 #: src/postulo/templates/server/design.html
 msgid "Telephone number"
@@ -18427,7 +18700,7 @@ msgstr "Շնորհակալություն՝ {{ role }}"
 msgid "Thank-you"
 msgstr "Շնորհակալություն"
 
-#: src/postulo/jobs/register_views.py
+#: src/postulo/jobs/enrichment_offers.py
 msgid "That address could not be added."
 msgstr "Այդ հասցեն հնարավոր չեղավ ավելացնել։"
 
@@ -19459,6 +19732,11 @@ msgstr "Ընկերությունները, կոնտակտները և հայտար
 msgid "The company %(name)s is not in your account, and is added with it."
 msgstr "%(name)s ընկերությունը ձեր հաշվում չկա և ավելացվում է դրա հետ միասին։"
 
+#: src/postulo/templates/jobs/company_enrichment.html
+#, python-format
+msgid "The company already has <bdi>%(current)s</bdi>."
+msgstr ""
+
 #: src/postulo/jobs/views.py
 msgid "The company already has that name."
 msgstr "Ընկերությունն արդեն ունի այդ անվանումը։"
@@ -20080,6 +20358,11 @@ msgstr "Լոգոտիպը փոխվեց։"
 #, python-format
 msgid "The logo was not changed: %(problem)s"
 msgstr "Լոգոն չփոխվեց՝ %(problem)s"
+
+#: src/postulo/jobs/enrichment_offers.py
+#, python-format
+msgid "The logo was not kept: %(problem)s"
+msgstr ""
 
 #: src/postulo/templates/applications/report.html
 msgid "The longest gap is measured inside this period, so a silence that began before it is not carried in. A period still running is only counted up to today."
@@ -22462,7 +22745,8 @@ msgid "WebP image"
 msgstr "WebP պատկեր"
 
 #: src/postulo/core/models.py src/postulo/core/web_links.py
-#: src/postulo/documents/printing.py src/postulo/jobs/tables.py
+#: src/postulo/documents/printing.py src/postulo/jobs/enrichment_offers.py
+#: src/postulo/jobs/tables.py
 #: src/postulo/templates/applications/interview_detail.html
 #: src/postulo/templates/jobs/company_detail.html
 msgid "Website"
@@ -22937,6 +23221,7 @@ msgstr "Ինչ անել դրա հետ՝ մեկ նախադասությամբ։"
 msgid "What to do. It is what the reminder says when it falls due."
 msgstr "Ինչ անել։ Հենց սա է ասում հիշեցումը, երբ դրա ժամկետը լրանում է։"
 
+#: src/postulo/templates/jobs/company_enrichment.html
 #: src/postulo/templates/jobs/company_register.html
 msgid "What to keep"
 msgstr "Ինչը պահել"
@@ -22996,6 +23281,10 @@ msgstr "Ինչ եք արել այնտեղ։ «Նշված չէ» տարբերակ
 #: src/postulo/jobs/widgets.py
 msgid "What you have noticed and not yet acted on, and what closes this week."
 msgstr "Այն, ինչ նկատել եք, բայց դեռ չեք գործել, և այն, ինչ փակվում է այս շաբաթ։"
+
+#: src/postulo/templates/jobs/company_enrichment.html
+msgid "What you have recorded is never replaced from here. Change it on the company's own page if a source is right."
+msgstr ""
 
 #: src/postulo/resume/models.py
 msgid "what you presented"
@@ -23240,6 +23529,10 @@ msgstr "Այս գրառման տեղն իր բաժնում սահմանվում 
 #: src/postulo/templates/help/telephone_numbers.html
 msgid "Where this instance can send a code to a telephone, a number you have confirmed can also be the one that gets you back into your account. That choice is separate from the primary, so changing what a recruiter dials never changes how you prove it is you. The bin will not remove that number while it is your way in. Changing its digits makes it another number, which has to be confirmed again and is no longer your way in."
 msgstr "Եթե այս տեղակայումը կարող է կոդ ուղարկել հեռախոսին, ձեր հաստատած համարը կարող է նաև լինել այն, որով վերադառնում եք ձեր հաշիվ։ Այդ ընտրությունն առանձին է հիմնականից, ուստի հավաքագրողի զանգահարած համարը փոխելը երբեք չի փոխում, թե ինչպես եք ապացուցում, որ դուք եք։ Աղբամանը չի հեռացնի այդ համարը, քանի դեռ այն ձեր մուտքի միջոցն է։ Դրա թվանշանները փոխելը այն դարձնում է այլ համար, որը պետք է կրկին հաստատվի և այլևս ձեր մուտքի միջոցը չէ։"
+
+#: src/postulo/templates/cotton/enrichment_ask.html
+msgid "Where to ask"
+msgstr ""
 
 #: src/postulo/templates/server/register_lookup.html
 msgid "Where to get a key"

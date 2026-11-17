@@ -65,6 +65,10 @@
           </form>
         {% endif %}
       </c-dialog>
+      {% comment %} Find details (#1256), as on the company's page, coming back here. {% endcomment %}
+      {% if enrichment_sources %}
+        <c-enrichment-ask :company="object" :sources="enrichment_sources" :next="request.path" />
+      {% endif %}
     {% endif %}
   </div>
   <form method="post" novalidate>

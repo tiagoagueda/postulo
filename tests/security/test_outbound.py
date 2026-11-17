@@ -37,7 +37,7 @@ import httpx
 import pytest
 
 from postulo.core import destinations
-from postulo.jobs import logos
+from postulo.jobs import enrichment, logos
 from postulo.plugins import fetching, http, public_addresses
 from postulo.plugins.base import CaptureError
 from postulo.resume import lookups
@@ -618,10 +618,37 @@ def serving(monkeypatch, answer) -> list[httpx.Request]:
     return seen
 
 
-#: The two fetches a stranger's server answers, each with its own limit and its own refusal.
+def enrichment_request(url: str):
+    """One request *Find details* makes for a source (#1256), held to the address's own host,
+    and its body as it arrived: reading it as JSON is the step after.
+
+    A source that reads the company's own site is held to its host as this is, and one with
+    hosts of its own to those and ``https``; the request underneath is the same one."""
+    source = enrichment.Source(
+        key="outbound",
+        label="Outbound",
+        starts_from=("website",),
+        offers=("website",),
+        own_site=True,
+        addresses=lambda subject: [url],
+        read=lambda answers, subject: [],
+        sends="nothing",
+        source="Outbound",
+    )
+    _url, _status, _kind, body = enrichment.get(source, url, {enrichment.host_of(url)})
+    return body
+
+
+#: The fetches a stranger's server answers, each with its own limit and its own refusal.
 FETCHES = {
     "a page": (fetching.fetch_page, fetching.MAX_BYTES, "text/html", fetching.FetchFailed),
     "a logo": (logos.download, logos.MAX_BYTES, "image/png", logos.UnusableLogo),
+    "a company's details": (
+        enrichment_request,
+        enrichment.MAX_BYTES,
+        "application/json",
+        enrichment.Refused,
+    ),
 }
 
 
@@ -1156,6 +1183,7 @@ def test_a_server_trickling_what_nothing_counts_still_runs_out_of_time(
     them: the data had all arrived, and the fetch waited and then succeeded."""
     monkeypatch.setattr(fetching, "DOWNLOAD_SECONDS", BRIEFLY)
     monkeypatch.setattr(logos, "DOWNLOAD_SECONDS", BRIEFLY)
+    monkeypatch.setattr(enrichment, "SECONDS", BRIEFLY)
     stalling_server.stall = stall
     fetch, _limit, _kind, refusal = FETCHES[what]
     path = "/logo.png" if what == "a logo" else "/jobs/1"
@@ -1272,6 +1300,7 @@ def test_a_proxy_from_the_environment_is_held_to_the_deadline_as_well(monkeypatc
 REFUSALS = {
     "a page": (fetching.fetch_page, CaptureError),
     "a logo": (logos.download, logos.UnusableLogo),
+    "a company's details": (enrichment_request, enrichment.Refused),
 }
 
 
@@ -1340,6 +1369,26 @@ def test_a_logo_from_a_name_that_changes_its_answer_is_refused_with_the_reason(
 
     with pytest.raises(logos.UnusableLogo, match=SAYS[then]):
         logos.download("https://blackmesa.test/moved.png")
+
+
+@pytest.mark.parametrize("then", SAYS)
+@pytest.mark.parametrize("after", [0, 1])
+def test_a_companys_details_from_a_name_that_changes_its_answer_are_refused_with_the_reason(
+    monkeypatch, after, then
+):
+    """*Find details* (#1256): every hop of a source's request is looked up again by the
+    client's hook, so a name that answers privately on the second lookup is refused there."""
+
+    def answer(request: httpx.Request) -> httpx.Response:
+        if request.url.path == "/moved":
+            return httpx.Response(302, headers={"Location": "/here"})
+        return httpx.Response(200, headers={"Content-Type": "application/json"}, content=b"{}")
+
+    serving(monkeypatch, answer)
+    a_name_that_changes_its_answer(monkeypatch, after=after, then=then)
+
+    with pytest.raises(enrichment.Refused, match=SAYS[then]):
+        enrichment_request("https://blackmesa.test/moved")
 
 
 @pytest.mark.django_db

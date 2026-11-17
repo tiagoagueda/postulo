@@ -37,6 +37,12 @@ sends one small archive through a destination, lists it and deletes it, which is
 Postulo's retention relies on: a destination whose ``list`` does not return what it was sent
 would never have an old archive removed.
 
+**And a source of company details held to its contract (#1256).**
+`assert_is_a_company_enrichment_source` checks a `company-enrichment` plugin against answers
+you recorded: its sources are usable, every address it asks for is one it declared, what it
+reads out of the answers is what it said it offers, each value saying where it was read, and
+none of it reaches the network. It returns the values as Postulo would hold them.
+
 **And what a call wrote, read back (#270).** `record_listing_event` is on the surface and the
 rows it writes are not: the model is Postulo's to change. A plugin that binds things to a
 listing still has to see, in its own tests, what its call wrote -- `listing_history` is
@@ -78,6 +84,7 @@ from __future__ import annotations
 
 import ast
 from collections.abc import Iterable, Mapping
+from contextlib import contextmanager
 from pathlib import Path
 
 #: The one module a plugin may import from, and the reason there is exactly one.
@@ -255,6 +262,102 @@ def assert_is_a_backup_destination(plugin, config: dict, *, tmp_path: Path) -> N
     assert all(item.id != reference.id for item in plugin.list(config)), (
         f"{reference.id!r} is still listed after it was deleted"
     )
+
+
+@contextmanager
+def _network_refused():
+    """Nothing connects and no name resolves while this is open: a source describes its
+    requests and reads the answers, and Postulo is the one that dials."""
+    import socket
+
+    def refuse(*_args, **_kwargs):
+        raise AssertionError(
+            "a company-enrichment source reached for the network: Postulo makes every "
+            "request, and hands the source the answers"
+        )
+
+    resolve, connect = socket.getaddrinfo, socket.socket.connect
+    socket.getaddrinfo, socket.socket.connect = refuse, refuse
+    try:
+        yield
+    finally:
+        socket.getaddrinfo, socket.socket.connect = resolve, connect
+
+
+def assert_is_a_company_enrichment_source(plugin, *, subject, answers, key: str = "") -> list:
+    """Hold a company-enrichment plugin to its contract, against answers you recorded (#1256).
+
+    For a source's own test suite: ``subject`` is an `EnrichmentSubject` for a company of
+    your choosing and ``answers`` the `EnrichmentAnswer`s your service gave for it, recorded
+    once and kept with the tests. ``key`` names the source where the plugin has several.
+
+    Fails unless the plugin answers to the protocol and its kind; every source can be used
+    (its key, what it starts from and offers, exactly one of ``hosts`` and ``own_site``);
+    every address ``addresses(subject)`` and ``follow(answers, subject)`` return is one
+    Postulo would ask -- ``https`` on a declared host, or on the host of the subject's
+    website for a source that reads the company's own site, and four at most in all; and
+    ``read(answers, subject)`` returns only `OfferedValue`s for fields the source offers,
+    each with an origin. All of it runs with the network refused: a source that dials
+    fails here.
+
+    Returns the offered values cleaned as Postulo would hold them, for your own assertions
+    -- a value the cleaning drops (an address that is not ``http``, a country nobody knows)
+    is not in it.
+    """
+    from postulo.jobs import enrichment
+
+    from .base import CompanyEnrichmentPlugin
+
+    assert isinstance(plugin, CompanyEnrichmentPlugin), (
+        f"{plugin!r} does not provide name, kind and sources"
+    )
+    assert plugin.kind == "company-enrichment", f"its kind is {plugin.kind!r}"
+    sources = list(plugin.sources)
+    assert sources, "the plugin contributes no source"
+    for source in sources:
+        wrong = enrichment.problems(source)
+        assert not wrong, f"{getattr(source, 'key', source)!r}: " + "; ".join(wrong)
+    keys = [source.key for source in sources]
+    assert len(keys) == len(set(keys)), f"two sources share a key: {keys}"
+    if key:
+        assert key in keys, f"the plugin has no source {key!r}"
+        source = sources[keys.index(key)]
+    else:
+        assert len(sources) == 1, f"say which source with key=: {keys}"
+        source = sources[0]
+
+    allowed = set(source.hosts) or {enrichment.host_of(subject.website)}
+    schemes = ("https",) if source.hosts else ("http", "https")
+
+    def held(addresses) -> list[str]:
+        found = [str(address) for address in addresses or ()]
+        for address in found:
+            assert address.split(":", 1)[0] in schemes and enrichment.host_of(address) in allowed, (
+                f"{source.key!r} asks for {address}, which is not {' or '.join(schemes)} on "
+                f"{sorted(allowed)}"
+            )
+        return found
+
+    answers = tuple(answers)
+    with _network_refused():
+        asked = held(source.addresses(subject))
+        assert asked, f"{source.key!r} names no address for this subject"
+        if source.follow is not None:
+            asked += held(source.follow(answers, subject))
+        assert len(asked) <= enrichment.MAX_REQUESTS, (
+            f"{source.key!r} asks for {len(asked)} addresses; one press allows "
+            f"{enrichment.MAX_REQUESTS}"
+        )
+        offered = list(source.read(answers, subject) or ())
+    for value in offered:
+        assert isinstance(value, enrichment.Offered), f"read returned {value!r}"
+        assert value.field in source.offers, (
+            f"{source.key!r} returned a value for {value.field!r}, which it does not offer"
+        )
+        assert str(value.origin or "").strip(), (
+            f"the {value.field!r} value {value.value!r} does not say where it was read"
+        )
+    return enrichment.cleaned_all(offered, source)
 
 
 def assert_declares_usable_widgets(plugin) -> None:

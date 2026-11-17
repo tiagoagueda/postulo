@@ -661,13 +661,13 @@ def outside_services() -> list[dict]:
 
     Drawn like the rest: from the company-register adapters installed, and only while
     *Register lookup* is on for the instance or for somebody on it, because a register this
-    instance will never ask is not a recipient of anything.
+    instance will never ask is not a recipient of anything. Then the sources *Find details*
+    may ask about a company (#1256), each only while its own plugin is on for somebody.
     """
-    from postulo.jobs import register_lookup
+    from postulo.jobs import enrichment, register_lookup
 
-    if not register_lookup.offered_anywhere():
-        return []
-    return register_lookup.services()
+    found = register_lookup.services() if register_lookup.offered_anywhere() else []
+    return found + enrichment.services()
 
 
 # ---------------------------------------------------------------------- the notice

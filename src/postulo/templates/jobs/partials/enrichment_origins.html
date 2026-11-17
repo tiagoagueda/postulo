@@ -1,0 +1,13 @@
+{% load i18n %}
+{% comment %} Who said a value on the *Find details* review, and where each read it (#1256):
+   one line per source, with the address to check it at, the date the source gives for it,
+   and the value's own licence and credit where it has them. A fragment of that one page. {% endcomment %}
+{% for origin in origins %}
+  <span class="block text-xs text-ink-500 dark:text-ink-400" data-enrichment-origin>
+    {% blocktranslate trimmed with source=origin.source where=origin.origin %}From {{ source }}: <bdi>{{ where }}</bdi>.{% endblocktranslate %}
+    {% if origin.as_of %}{% blocktranslate trimmed with date=origin.as_of %}As of {{ date }}.{% endblocktranslate %}{% endif %}
+    {% if origin.url %}<a href="{{ origin.url }}" rel="noopener noreferrer external" target="_blank" class="text-brand-600 underline dark:text-brand-400">{% translate "Check it there" %}</a>{% endif %}
+    {% if origin.licence %}{% if origin.licence_url %}<a href="{{ origin.licence_url }}" rel="noopener noreferrer external license" target="_blank" class="underline">{{ origin.licence }}</a>{% else %}{{ origin.licence }}{% endif %}{% endif %}
+    {% if origin.credit %}<bdi>{{ origin.credit }}</bdi>{% endif %}
+  </span>
+{% endfor %}

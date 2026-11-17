@@ -33,6 +33,7 @@ from importlib.metadata import entry_points
 
 from .base import (
     BACKUP_DESTINATION_GROUP,
+    COMPANY_ENRICHMENT_GROUP,
     CONNECTED_KINDS,
     FEATURE_GROUP,
     IDENTIFIER_GROUP,
@@ -44,6 +45,7 @@ from .base import (
     SUGGESTION_SOURCE_GROUP,
     TRANSPORT_GROUP,
     BackupDestinationPlugin,
+    CompanyEnrichmentPlugin,
     ConnectedPlugin,
     FeaturePlugin,
     IdentifierPlugin,
@@ -87,6 +89,8 @@ ENTRY_POINT_GROUP = "postulo.sources"
 #: services a web link can be on, which a package installed beside Postulo may add to (#305).
 #: A **register-adapter** plugin is open the same way: the company registers *Register lookup*
 #: may ask, one per country, which a package for another country may add to (#1021).
+#: A **company-enrichment** plugin is open too: the places a company's details may be read
+#: from on a press, which a package may add to and which is switched like any plugin (#1256).
 #:
 #: A **backup-destination** plugin is a transport's kind of thing for archives: instance
 #: plumbing that keeps the backups somewhere besides this disk, chosen by an administrator
@@ -101,6 +105,7 @@ GROUPS = {
     "messaging-service": MESSAGING_SERVICE_GROUP,
     "register-adapter": REGISTER_ADAPTER_GROUP,
     "suggestion-source": SUGGESTION_SOURCE_GROUP,
+    "company-enrichment": COMPANY_ENRICHMENT_GROUP,
     "backup-destination": BACKUP_DESTINATION_GROUP,
     **CONNECTED_KINDS,
 }
@@ -134,6 +139,7 @@ def _protocol_for(kind: str):
         "messaging-service": MessagingServicePlugin,
         "register-adapter": RegisterAdapterPlugin,
         "suggestion-source": SuggestionSourcePlugin,
+        "company-enrichment": CompanyEnrichmentPlugin,
         "backup-destination": BackupDestinationPlugin,
     }.get(kind, ConnectedPlugin)
 

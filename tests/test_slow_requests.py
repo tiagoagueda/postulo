@@ -48,6 +48,9 @@ def test_requests_are_atomic_in_production():
 SLOW = [
     ("jobs:capture_create", ()),
     ("jobs:company_logo_action", (1, "refresh")),
+    # Find details asks its sources where it stands when there is no worker, and keeping a
+    # logo fetches it (#1256).
+    ("jobs:company_enrichment", (1,)),
     ("documents:cv_export", (1,)),
     # A draft draws in the request, as the report's does, and writes nothing at all (#236).
     ("documents:cv_draft", (1,)),

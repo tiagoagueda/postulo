@@ -15,6 +15,16 @@ msgstr ""
 "Plural-Forms: nplurals=4; plural=(n==1) ? 0 : (n==2) ? 1 : (n != 8 && n != 11) ? 2 : 3;\n"
 "X-Generator: postulo scripts/messages.py\n"
 
+#: src/postulo/jobs/enrichment_offers.py
+#, python-format
+msgid "%(address)s was not added."
+msgstr ""
+
+#: src/postulo/jobs/enrichment_offers.py
+#, python-format
+msgid "%(address)s was not added: %(reason)s"
+msgstr ""
+
 #: src/postulo/core/personal.py
 #, python-format
 msgid "%(code)s is not a country in the list."
@@ -467,6 +477,11 @@ msgstr[0] "Mae %(count)s hysbyseb rydych yn ei hystyried yn cau cyn bo hir"
 msgstr[1] "Mae %(count)s hysbyseb rydych yn eu hystyried yn cau cyn bo hir"
 msgstr[2] "Mae %(count)s hysbyseb rydych yn eu hystyried yn cau cyn bo hir"
 msgstr[3] "Mae %(count)s hysbyseb rydych yn eu hystyried yn cau cyn bo hir"
+
+#: src/postulo/jobs/enrichment_offers.py
+#, python-format
+msgid "%(count)s or more"
+msgstr ""
 
 #: src/postulo/plugins/base.py
 #, python-format
@@ -950,6 +965,11 @@ msgstr "Mae %(host)s ar rwydwaith preifat neu leol. Nid yw Postulo yn cysylltu a
 msgid "%(i)s interviews and %(e)s entries in listings' histories would be kept without the name."
 msgstr "Byddai %(i)s cyfweliad a %(e)s cofnod yn hanes hysbysebion yn cael eu cadw heb yr enw."
 
+#: src/postulo/jobs/enrichment_offers.py
+#, python-format
+msgid "%(industry)s (NACE %(division)s)"
+msgstr ""
+
 #: src/postulo/templates/server/logs.html
 #, python-format
 msgid "%(kilobytes)s on disk"
@@ -1038,7 +1058,7 @@ msgstr "%(least)s i %(most)s"
 msgid "%(list)s · %(date)s"
 msgstr "%(list)s · %(date)s"
 
-#: src/postulo/jobs/models.py
+#: src/postulo/jobs/enrichment_offers.py src/postulo/jobs/models.py
 #, python-format
 msgid "%(low)s to %(high)s"
 msgstr "%(low)s i %(high)s"
@@ -1444,6 +1464,16 @@ msgstr "%(name)s: gadawyd y rhif %(value)s allan. %(why)s"
 msgid "%(names)s can see “%(other)s” and not “%(kept)s”. Share “%(kept)s” with them first, or nothing is merged."
 msgstr "Gall %(names)s weld “%(other)s” ac nid “%(kept)s”. Rhannwch “%(kept)s” â nhw yn gyntaf, neu ni chaiff dim ei gyfuno."
 
+#: src/postulo/jobs/enrichment_offers.py
+#, python-format
+msgid "%(number)s was not added."
+msgstr ""
+
+#: src/postulo/jobs/enrichment_offers.py
+#, python-format
+msgid "%(number)s was not added: %(reason)s"
+msgstr ""
+
 #: src/postulo/resume/views.py
 #, fuzzy, python-format
 msgid "%(ok)s, %(broken)s; the ones that did not say why."
@@ -1711,10 +1741,79 @@ msgstr "Nid oedd gan %(service)s, trwy doi.org, ddim ar gyfer y blychau sy'n wag
 msgid "%(share)s%%"
 msgstr "%(share)s%%"
 
+#: src/postulo/jobs/enrichment.py
+#, python-format
+msgid "%(source)s asked for an address it did not declare."
+msgstr ""
+
+#: src/postulo/jobs/enrichment.py
+#, python-format
+msgid "%(source)s asked for fewer requests. Try again later."
+msgstr ""
+
+#: src/postulo/jobs/enrichment.py
+#, python-format
+msgid "%(source)s asked for more requests than one press allows."
+msgstr ""
+
+#: src/postulo/jobs/enrichment.py
+#, python-format
+msgid "%(source)s cannot be asked about this company."
+msgstr ""
+
+#: src/postulo/jobs/enrichment.py
+#, python-format
+msgid "%(source)s could not be reached."
+msgstr ""
+
+#: src/postulo/templates/jobs/company_enrichment.html
+#, python-format
+msgid "%(source)s could not be read."
+msgstr ""
+
+#: src/postulo/jobs/enrichment.py
+#, python-format
+msgid "%(source)s redirected too many times."
+msgstr ""
+
+#: src/postulo/jobs/enrichment.py
+#, python-format
+msgid "%(source)s sent its answer with the content encoding “%(coding)s”, which Postulo does not unpack."
+msgstr ""
+
+#: src/postulo/jobs/enrichment.py
+#, python-format
+msgid "%(source)s sent the request somewhere else."
+msgstr ""
+
+#: src/postulo/jobs/enrichment.py
+#, python-format
+msgid "%(source)s took longer than %(seconds)s second to answer."
+msgid_plural "%(source)s took longer than %(seconds)s seconds to answer."
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+
+#: src/postulo/jobs/enrichment.py
+#, python-format
+msgid "%(source)s's answer could not be read."
+msgstr ""
+
+#: src/postulo/jobs/enrichment.py
+#, python-format
+msgid "%(source)s's answer was larger than one company's should be."
+msgstr ""
+
 #: src/postulo/applications/agenda.py
 #, python-format
 msgid "%(start)s to %(end)s"
 msgstr "%(start)s i %(end)s"
+
+#: src/postulo/jobs/enrichment_offers.py
+#, python-format
+msgid "%(state)s since %(date)s"
+msgstr ""
 
 #: src/postulo/templates/applications/partials/board.html
 #, python-format
@@ -2709,6 +2808,10 @@ msgstr "Modiwl: mae'n rhan o Postulo ac ni ellir ei dynnu."
 msgid "A month"
 msgstr "Mis"
 
+#: src/postulo/jobs/enrichment_views.py
+msgid "a name"
+msgstr ""
+
 #: src/postulo/core/messaging_services.py
 #, python-format
 msgid "A name is at most %(max)s characters."
@@ -2929,6 +3032,10 @@ msgstr "Cofnod sydd wedi'i ddileu ers hynny"
 msgid "A referee who is not a contact yet. Their name is enough; it is added to your contacts without a company, and is used instead of the choice above."
 msgstr "Canolwr nad yw'n gyswllt eto. Mae ei enw'n ddigon; caiff ei ychwanegu at eich pobl gyswllt heb gwmni, a'i ddefnyddio yn lle'r dewis uchod."
 
+#: src/postulo/jobs/enrichment_views.py
+msgid "a register number"
+msgstr ""
+
 #: src/postulo/applications/ical_import.py
 msgid "A reminder"
 msgstr "Nodyn atgoffa"
@@ -3148,6 +3255,10 @@ msgstr "Mae angen o leiaf un llythyren neu ddigid yn enw gwedd."
 msgid "A way back rather than a way on, which is why it is an outline."
 msgstr "Ffordd yn ôl yn hytrach na ffordd ymlaen, a dyna pam mai amlinell ydyw."
 
+#: src/postulo/jobs/enrichment_views.py
+msgid "a website"
+msgstr ""
+
 #: src/postulo/templates/applications/report.html
 #: src/postulo/templates/documents/themes/base_report.html
 msgid "A week, on average"
@@ -3156,6 +3267,10 @@ msgstr "Yr wythnos, ar gyfartaledd"
 #: src/postulo/templates/core/partials/widget_offers.html
 msgid "A widget added in a later release, or brought by a plugin, waits above until you say yes to it. Nothing arrives on your dashboard without being asked."
 msgstr "Mae teclyn a ychwanegwyd mewn fersiwn ddiweddarach, neu a ddaeth gydag ategyn, yn aros uchod nes i chi ddweud ie. Nid oes dim yn cyrraedd eich dangosfwrdd heb ofyn."
+
+#: src/postulo/jobs/enrichment_views.py
+msgid "a Wikidata identifier"
+msgstr ""
 
 #: src/postulo/documents/integrity.py
 msgid "a Word document"
@@ -3281,7 +3396,8 @@ msgstr "Wedi'i gaffael neu ei uno"
 msgid "acquired_by must be a company you can see."
 msgstr "Rhaid i acquired_by fod yn gwmni y gallwch ei weld."
 
-#: src/postulo/jobs/models.py src/postulo/templates/jobs/company_form.html
+#: src/postulo/jobs/enrichment_offers.py src/postulo/jobs/models.py
+#: src/postulo/templates/jobs/company_form.html
 msgid "Acronym or short name"
 msgstr "Byrfodd neu enw byr"
 
@@ -3607,7 +3723,8 @@ msgid "addok (France's Base Adresse Nationale)"
 msgstr "addok (Base Adresse Nationale Ffrainc)"
 
 #: src/postulo/applications/forms.py src/postulo/applications/reports.py
-#: src/postulo/jobs/tables.py src/postulo/templates/partials/web_links.html
+#: src/postulo/jobs/enrichment_offers.py src/postulo/jobs/tables.py
+#: src/postulo/templates/partials/web_links.html
 msgid "Address"
 msgstr "Cyfeiriad"
 
@@ -3823,6 +3940,10 @@ msgstr "Mae'n digwydd ohono'i hun hefyd pan fydd eich prif gyfeiriad yn newid."
 msgid "Also in %(names)s"
 msgstr "Hefyd yn %(names)s"
 
+#: src/postulo/templates/jobs/company_enrichment.html
+msgid "Also said"
+msgstr ""
+
 #: src/postulo/accounts/models.py
 msgid "Always"
 msgstr "Bob tro"
@@ -3888,6 +4009,10 @@ msgstr "Mae cyfeiriad a gofnodwyd cyn i gyfeiriadau gael eu gwirio, neu a ddaeth
 #: src/postulo/resume/candidate.py
 msgid "An address that could not be read"
 msgstr "Cyfeiriad nad oedd modd ei ddarllen"
+
+#: src/postulo/jobs/enrichment_views.py
+msgid "an address with a country"
+msgstr ""
 
 #: src/postulo/applications/models.py
 msgid "An address, a telephone number or the link to the call."
@@ -3987,6 +4112,10 @@ msgstr "Mae cyfweliad yn perthyn i gais. Dewiswch un."
 msgid "An interview is scheduled or moved"
 msgstr "Mae cyfweliad yn cael ei drefnu neu ei symud"
 
+#: src/postulo/jobs/enrichment_views.py
+msgid "an LEI"
+msgstr ""
+
 #: src/postulo/notifications/base.py
 msgid "An offer is recorded"
 msgstr "Mae cynnig yn cael ei gofnodi"
@@ -4062,6 +4191,11 @@ msgstr "Roedd copi wrth gefn arall eisoes yn rhedeg."
 #: src/postulo/templates/accounts/invite_created.html
 msgid "Another invitation"
 msgstr "Gwahoddiad arall"
+
+#: src/postulo/jobs/enrichment_offers.py
+#, python-format
+msgid "Another of your companies already has %(identifier)s."
+msgstr ""
 
 #: src/postulo/jobs/register_views.py
 #, python-format
@@ -4528,6 +4662,11 @@ msgstr "Fel ar"
 msgid "as of %(date)s"
 msgstr "fel ar %(date)s"
 
+#: src/postulo/templates/jobs/partials/enrichment_origins.html
+#, python-format
+msgid "As of %(date)s."
+msgstr ""
+
 #: src/postulo/templates/applications/interview_detail.html
 #: src/postulo/templates/documents/themes/base_interview.html
 #, fuzzy, python-format
@@ -4602,6 +4741,15 @@ msgstr "Gofynnir dim ond pan fydd rhywun yn pwyso amdano, un cwmni ar y tro. Anf
 #, fuzzy, python-format
 msgid "Asks %(plugin)s now. Nothing it answers is kept here."
 msgstr "Yn gofyn i %(plugin)s nawr. Nid oes dim o'i ateb yn cael ei gadw yma."
+
+#: src/postulo/templates/cotton/enrichment_ask.html
+#, python-format
+msgid "Asks <bdi>%(hosts)s</bdi>. Sent: %(what)s."
+msgstr ""
+
+#: src/postulo/templates/jobs/company_detail.html
+msgid "Asks the places you choose, once each; nothing is kept until you say so."
+msgstr ""
 
 #: src/postulo/applications/analytics.py src/postulo/applications/models.py
 msgid "Assessment"
@@ -4822,6 +4970,10 @@ msgstr "Yn ôl i'r calendr"
 #: src/postulo/templates/applications/calendar_print.html
 msgid "Back to the calendar, to change any of this"
 msgstr "Yn ôl i'r calendr, i newid unrhyw ran o hyn"
+
+#: src/postulo/templates/jobs/company_enrichment.html
+msgid "Back to the company"
+msgstr ""
 
 #: src/postulo/core/help.py
 msgid "Back to the dashboard"
@@ -5220,6 +5372,7 @@ msgstr "Gellir ei baru â"
 #: src/postulo/templates/documents/upload_form.html
 #: src/postulo/templates/jobs/address_place.html
 #: src/postulo/templates/jobs/capture_page_forget.html
+#: src/postulo/templates/jobs/company_enrichment.html
 #: src/postulo/templates/jobs/company_form.html
 #: src/postulo/templates/jobs/company_register.html
 #: src/postulo/templates/jobs/company_wikidata.html
@@ -5273,6 +5426,11 @@ msgstr "Ni ellir ei ychwanegu"
 #: src/postulo/templates/applications/ical_import.html
 msgid "Cannot be added."
 msgstr "Ni ellir ei ychwanegu."
+
+#: src/postulo/templates/cotton/enrichment_ask.html
+#, python-format
+msgid "Cannot be asked: this company would need %(what)s."
+msgstr ""
 
 #: src/postulo/templates/server/overview.html
 msgid "cannot be checked on this machine"
@@ -5393,13 +5551,14 @@ msgstr "Rhagolwg o'r yrfa"
 msgid "Career sections"
 msgstr "Adrannau gyrfa"
 
+#: src/postulo/jobs/enrichment_offers.py src/postulo/jobs/tables.py
+#: src/postulo/templates/jobs/company_detail.html
+msgid "Careers page"
+msgstr "Tudalen swyddi"
+
 #: src/postulo/jobs/models.py
 msgid "careers page"
 msgstr "tudalen swyddi"
-
-#: src/postulo/jobs/tables.py src/postulo/templates/jobs/company_detail.html
-msgid "Careers page"
-msgstr "Tudalen swyddi"
 
 #: src/postulo/templates/server/email.html
 #, python-format
@@ -5566,6 +5725,10 @@ msgstr "Chwilio am ddiweddariadau"
 msgid "Check it answers"
 msgstr "Gwirio ei fod yn ateb"
 
+#: src/postulo/templates/jobs/partials/enrichment_origins.html
+msgid "Check it there"
+msgstr ""
+
 #: src/postulo/templates/jobs/capture_review.html
 msgid "Check the reading against it"
 msgstr "Gwirio'r darlleniad yn ei erbyn"
@@ -5717,6 +5880,10 @@ msgstr "Dewis ffeil arall"
 msgid "Choose at least one document to record."
 msgstr "Dewiswch o leiaf un ddogfen i'w chofnodi."
 
+#: src/postulo/jobs/enrichment_views.py
+msgid "Choose at least one place to ask."
+msgstr ""
+
 #: src/postulo/templates/cotton/date_field.html
 msgid "Choose dates from a calendar"
 msgstr "Dewiswch ddyddiadau o galendr"
@@ -5780,6 +5947,10 @@ msgstr "Dewiswch beth i'w wneud â'r neges."
 #: src/postulo/jobs/status_views.py
 msgid "Choose what was reported and the date."
 msgstr "Dewiswch yr hyn a adroddwyd a'r dyddiad."
+
+#: src/postulo/templates/cotton/enrichment_ask.html
+msgid "Choose where to ask about this company. Each place is asked once, now, and learns only what is listed. Nothing is kept until you tick it."
+msgstr ""
 
 #: src/postulo/applications/views.py
 msgid "Choose which application this is about first."
@@ -6107,6 +6278,10 @@ msgstr "Ychwanegwyd y cwmni."
 #: src/postulo/jobs/views.py
 msgid "Company deleted, along with its postings."
 msgstr "Dilëwyd y cwmni, ynghyd â'i hysbysebion."
+
+#: src/postulo/plugins/kinds.py
+msgid "Company details"
+msgstr ""
 
 #: src/postulo/jobs/models.py
 msgid "company identifier"
@@ -7050,6 +7225,10 @@ msgstr "manylyn"
 msgid "details"
 msgstr "manylion"
 
+#: src/postulo/templates/jobs/company_enrichment.html
+msgid "Details found"
+msgstr ""
+
 #: src/postulo/core/design.py src/postulo/templates/server/design.html
 msgid "Dialogs"
 msgstr "Deialogau"
@@ -7559,6 +7738,7 @@ msgid "email address"
 msgstr "cyfeiriad e-bost"
 
 #: src/postulo/core/channels.py src/postulo/documents/printing.py
+#: src/postulo/jobs/enrichment_offers.py
 msgid "Email address"
 msgstr "Cyfeiriad e-bost"
 
@@ -8344,6 +8524,10 @@ msgstr "Canfod"
 msgid "Find a language"
 msgstr "Dod o hyd i iaith"
 
+#: src/postulo/templates/cotton/enrichment_ask.html
+msgid "Find details"
+msgstr ""
+
 #: src/postulo/templates/jobs/company_form.html
 msgid "Find logo"
 msgstr "Chwilio am logo"
@@ -8606,6 +8790,15 @@ msgstr[3] "Daethpwyd o hyd i %(count)d dewis ar y gweinydd. Dewiswch beth i'w dd
 
 #: src/postulo/jobs/slow.py
 #, python-format
+msgid "Found %(count)s detail. Nothing is kept until you tick it."
+msgid_plural "Found %(count)s details. Nothing is kept until you tick it."
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+
+#: src/postulo/jobs/slow.py
+#, python-format
 msgid "Found a logo at %(url)s."
 msgstr "Canfuwyd logo yn %(url)s."
 
@@ -8637,6 +8830,10 @@ msgstr "canfuwyd drwy"
 #, python-format
 msgid "Found: %(names)s. Only the ones you have left blank will be filled in."
 msgstr "Canfuwyd: %(names)s. Dim ond y rhai a adawyd gennych yn wag a gaiff eu llenwi."
+
+#: src/postulo/jobs/enrichment_offers.py
+msgid "Founded"
+msgstr ""
 
 #: src/postulo/jobs/models.py
 msgid "Freelance"
@@ -8690,6 +8887,11 @@ msgstr "Gan %(name)s."
 #, python-format
 msgid "From %(register)s"
 msgstr "O %(register)s"
+
+#: src/postulo/templates/jobs/partials/enrichment_origins.html
+#, python-format
+msgid "From %(source)s: <bdi>%(where)s</bdi>."
+msgstr ""
 
 #: src/postulo/core/tables.py
 #, python-format
@@ -9104,6 +9306,10 @@ msgctxt "pronouns"
 msgid "he/him"
 msgstr "ef/fe"
 
+#: src/postulo/jobs/enrichment_offers.py
+msgid "Head office"
+msgstr ""
+
 #: src/postulo/accounts/models.py src/postulo/documents/models.py
 #: src/postulo/resume/views.py
 msgid "headline"
@@ -9485,6 +9691,7 @@ msgstr "ceisiadau idempotent"
 msgid "identifier"
 msgstr "dynodydd"
 
+#: src/postulo/jobs/enrichment_offers.py
 #: src/postulo/templates/cotton/identifier_row.html
 msgid "Identifier"
 msgstr "Dynodydd"
@@ -9842,13 +10049,14 @@ msgstr "Diwydiannau"
 msgid "industries"
 msgstr "diwydiannau"
 
-#: src/postulo/jobs/models.py
-msgid "industry"
-msgstr "diwydiant"
-
+#: src/postulo/jobs/enrichment_offers.py
 #: src/postulo/templates/jobs/industry_form.html
 msgid "Industry"
 msgstr "Diwydiant"
+
+#: src/postulo/jobs/models.py
+msgid "industry"
+msgstr "diwydiant"
 
 #: src/postulo/jobs/views.py
 msgid "Industry renamed."
@@ -10059,6 +10267,10 @@ msgstr "cyhoeddwyd gan"
 #: src/postulo/resume/models.py
 msgid "issued on"
 msgstr "cyhoeddwyd ar"
+
+#: src/postulo/jobs/enrichment_offers.py
+msgid "It already has a logo."
+msgstr ""
 
 #: src/postulo/templates/settings/account.html
 msgid "It also gets you back in: ask for a sign-in code and it arrives there. Making a different address primary moves that with it. You are still asked for your authenticator app if you have one."
@@ -10488,6 +10700,7 @@ msgstr "Cadw'r rhain"
 msgid "Keep this view as"
 msgstr "Cadw'r wedd hon fel"
 
+#: src/postulo/templates/jobs/company_enrichment.html
 #: src/postulo/templates/jobs/company_register.html
 msgid "Keep what is ticked"
 msgstr "Cadw'r hyn a diciwyd"
@@ -10507,6 +10720,15 @@ msgstr "Cadw'r dudalen"
 #: src/postulo/templates/jobs/merge.html
 msgid "Kept"
 msgstr "Wedi'i gadw"
+
+#: src/postulo/jobs/enrichment_views.py
+#, python-format
+msgid "Kept %(count)s detail."
+msgid_plural "Kept %(count)s details."
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
 
 #: src/postulo/templates/server/person_recovery.html
 msgid "Kept after they are used or expire, because taking somebody's account back is not something to be able to do without a trace."
@@ -10887,6 +11109,7 @@ msgstr "Gadewch yn wag i gadw'r un sydd eisoes wedi'i storio."
 msgid "Leave empty if this is your current role."
 msgstr "Gadewch yn wag os mai hon yw eich swydd bresennol."
 
+#: src/postulo/templates/jobs/company_enrichment.html
 #: src/postulo/templates/jobs/company_wikidata.html
 msgid "Leave it as it is"
 msgstr "Ei adael fel y mae"
@@ -10994,6 +11217,10 @@ msgstr "Hysbysiad cyfreithiol"
 #: src/postulo/jobs/industries.py
 msgid "Legal services"
 msgstr "Gwasanaethau cyfreithiol"
+
+#: src/postulo/jobs/enrichment_offers.py
+msgid "Legal state"
+msgstr ""
 
 #: src/postulo/jobs/models.py
 msgid "legal state"
@@ -11239,6 +11466,10 @@ msgstr "lleoliad"
 msgid "Location"
 msgstr "Lleoliad"
 
+#: src/postulo/jobs/enrichment_offers.py
+msgid "Logo"
+msgstr ""
+
 #: src/postulo/jobs/models.py
 msgid "logo"
 msgstr "logo"
@@ -11300,6 +11531,10 @@ msgstr "cyfeiriad y gwasanaeth chwilio"
 #: src/postulo/jobs/slow.py
 msgid "Looking for a logo"
 msgstr "Yn chwilio am logo"
+
+#: src/postulo/jobs/slow.py
+msgid "Looking for details"
+msgstr ""
 
 #: src/postulo/templates/applications/application_list.html
 #: src/postulo/templates/jobs/company_list.html
@@ -11959,8 +12194,8 @@ msgstr "Adran NACE"
 msgid "name"
 msgstr "enw"
 
-#: src/postulo/api/forms.py src/postulo/jobs/tables.py
-#: src/postulo/templates/cotton/identifier_row.html
+#: src/postulo/api/forms.py src/postulo/jobs/enrichment_offers.py
+#: src/postulo/jobs/tables.py src/postulo/templates/cotton/identifier_row.html
 #: src/postulo/templates/partials/messaging_handles.html
 #: src/postulo/templates/partials/phone_numbers.html
 #: src/postulo/templates/partials/postal_addresses.html
@@ -12440,6 +12675,14 @@ msgstr "Dim llythyrau o'r math hwn eto."
 msgid "No letters yet. A cover letter is for one posting; a motivation letter tells your story; a speculative letter goes where nothing is advertised; a follow-up note comes after an interview."
 msgstr "Dim llythyrau eto. Mae llythyr eglurhaol ar gyfer un hysbyseb; mae llythyr cymhelliant yn adrodd eich stori; mae llythyr digymell yn mynd lle nad oes dim wedi'i hysbysebu; daw nodyn dilyniant ar ôl cyfweliad."
 
+#: src/postulo/templates/jobs/company_enrichment.html
+msgid "No licence is stated."
+msgstr ""
+
+#: src/postulo/templates/jobs/company_enrichment.html
+msgid "No licence is stated; the name and the mark are the company's."
+msgstr ""
+
 #: src/postulo/templates/connections/partials/option_table.html
 msgid "No longer on the server"
 msgstr "Nid yw ar y gweinydd mwyach"
@@ -12754,6 +12997,10 @@ msgstr "Nid oes dim ohono'n cael ei gyfrifo o ddim byd arall: nid yw eich rhywed
 msgid "None of this company's industries is Education, so it is not listed as a school or university."
 msgstr "Nid yw'r un o ddiwydiannau'r cwmni hwn yn Addysg, felly nid yw wedi'i restru fel ysgol neu brifysgol."
 
+#: src/postulo/jobs/slow.py
+msgid "None of those can be asked about this company any more."
+msgstr ""
+
 #: src/postulo/templates/jobs/company_places.html
 msgid "None of your companies has this name or identifier."
 msgstr "Nid oes gan yr un o'ch cwmnïau yr enw na'r dynodydd hwn."
@@ -12823,6 +13070,10 @@ msgstr "Nid yw'n cyfateb"
 #: src/postulo/templates/partials/phone_widget.html
 msgid "Not a possible number"
 msgstr "Nid yw'n rhif posibl"
+
+#: src/postulo/jobs/enrichment_offers.py
+msgid "Not a profile on a service Postulo knows."
+msgstr ""
 
 #: src/postulo/documents/models.py
 msgid "Not accepted"
@@ -13384,6 +13635,10 @@ msgstr "Dim byd wedi'i anfon eto."
 msgid "Nothing standing at Offer. Record one from an application's page when it arrives."
 msgstr "Nid oes dim ar y cam Cynnig. Cofnodwch un o dudalen cais pan fydd yn cyrraedd."
 
+#: src/postulo/templates/jobs/company_enrichment.html
+msgid "Nothing that was found can be added to what the company already has."
+msgstr ""
+
 #: src/postulo/core/design.py src/postulo/templates/server/design.html
 msgid "Nothing there"
 msgstr "Dim byd yno"
@@ -13468,7 +13723,7 @@ msgstr "Ni chadwyd dim o'r dudalen honno."
 msgid "Nothing was kept of this page"
 msgstr "Ni chadwyd dim o'r dudalen hon"
 
-#: src/postulo/jobs/register_views.py
+#: src/postulo/jobs/enrichment_views.py src/postulo/jobs/register_views.py
 msgid "Nothing was kept."
 msgstr "Ni chadwyd dim."
 
@@ -14190,6 +14445,7 @@ msgstr "Dim ond y flwyddyn sy'n cael ei hargraffu ar CV, felly nid yw'r diwrnod 
 msgid "Only this publication, as a reference:"
 msgstr "Y cyhoeddiad hwn yn unig, fel cyfeirnod:"
 
+#: src/postulo/templates/jobs/company_enrichment.html
 #: src/postulo/templates/jobs/company_register.html
 msgid "Only what you tick is kept; nothing else on the company changes."
 msgstr "Dim ond yr hyn rydych yn ei dicio sy'n cael ei gadw; nid oes dim arall ar y cwmni'n newid."
@@ -14754,6 +15010,10 @@ msgstr "Pensiwn, yswiriant, lwfansau, offer: beth bynnag a enwyd."
 msgid "People"
 msgstr "Pobl"
 
+#: src/postulo/jobs/enrichment_offers.py
+msgid "People employed"
+msgstr ""
+
 #: src/postulo/jobs/models.py
 msgid "Per day"
 msgstr "Y dydd"
@@ -15279,6 +15539,10 @@ msgstr "Mae Postulo wedi ei anghofio. Mae'r darparwr yn dal i fod â'r caniatâd
 #: src/postulo/core/server_views.py
 msgid "Postulo has forgotten the grant. The provider still has it until you withdraw it there as well."
 msgstr "Mae Postulo wedi anghofio'r caniatâd. Mae'r darparwr yn ei gadw nes i chi ei dynnu'n ôl yno hefyd."
+
+#: src/postulo/templates/jobs/company_enrichment.html
+msgid "Postulo has nowhere to keep these yet. They are shown for you to read, and are not kept."
+msgstr ""
 
 #: src/postulo/core/tagline.py
 msgid "Postulo is a self-hosted job application manager: your applications, CVs and cover letters on your own server, with no paid features."
@@ -16613,6 +16877,7 @@ msgstr "Cyfnod cadw"
 msgid "retired on"
 msgstr "wedi'i dynnu'n ôl ar"
 
+#: src/postulo/templates/jobs/company_enrichment.html
 #: src/postulo/templates/jobs/company_register.html
 #, python-format
 msgid "Retrieved %(when)s."
@@ -16743,6 +17008,10 @@ msgstr "yn rhedeg %(running)s; ailgychwynnwch i orffen"
 #: src/postulo/templates/server/backups.html
 msgid "Runs in the background; you can leave this page while it works."
 msgstr "Mae'n rhedeg yn y cefndir; gallwch adael y dudalen hon tra mae'n gweithio."
+
+#: src/postulo/templates/jobs/company_enrichment.html
+msgid "Said, and not offered"
+msgstr ""
 
 #: src/postulo/templates/core/import_csv_map.html
 #, fuzzy
@@ -17420,6 +17689,14 @@ msgstr "Wedi'i setlo"
 msgid "Seven colours, each tuned to 3:1 against the card in both themes."
 msgstr "Saith lliw, pob un wedi'i diwnio i 3:1 yn erbyn y cerdyn yn y ddwy thema."
 
+#: src/postulo/jobs/enrichment_offers.py
+msgid "Several social profiles are switched off."
+msgstr ""
+
+#: src/postulo/jobs/enrichment_offers.py
+msgid "Several telephone numbers are switched off."
+msgstr ""
+
 #: src/postulo/jobs/industries.py
 msgid "Sewerage"
 msgstr "Carthffosiaeth"
@@ -17914,7 +18191,7 @@ msgid "Snoozed for two weeks."
 msgstr "Gohiriwyd am bythefnos."
 
 #: src/postulo/core/models.py src/postulo/core/web_links.py
-#: src/postulo/documents/printing.py
+#: src/postulo/documents/printing.py src/postulo/jobs/enrichment_offers.py
 msgid "Social profile"
 msgstr "Proffil cymdeithasol"
 
@@ -18101,6 +18378,7 @@ msgstr "Y ffynhonnell yw'r maes “canfuwyd drwy” ar hysbyseb. Llenwch ef a by
 msgid "source version"
 msgstr "fersiwn y ffynhonnell"
 
+#: src/postulo/templates/jobs/company_enrichment.html
 #: src/postulo/templates/jobs/company_register.html
 #, python-format
 msgid "Source: %(source)s."
@@ -18639,6 +18917,7 @@ msgid "telephone"
 msgstr "ffôn"
 
 #: src/postulo/core/channels.py src/postulo/documents/printing.py
+#: src/postulo/jobs/enrichment_offers.py
 #: src/postulo/templates/partials/phone_widget.html
 #: src/postulo/templates/server/design.html
 msgid "Telephone number"
@@ -18754,7 +19033,7 @@ msgstr "Diolch, {{ role }}"
 msgid "Thank-you"
 msgstr "Diolch"
 
-#: src/postulo/jobs/register_views.py
+#: src/postulo/jobs/enrichment_offers.py
 msgid "That address could not be added."
 msgstr "Ni ellid ychwanegu'r cyfeiriad hwnnw."
 
@@ -19808,6 +20087,11 @@ msgstr "Y cwmnïau, y bobl gyswllt a'r hysbysebion y mae'n eu hychwanegu. Mae ce
 msgid "The company %(name)s is not in your account, and is added with it."
 msgstr "Nid yw'r cwmni %(name)s yn eich cyfrif, ac mae'n cael ei ychwanegu gydag ef."
 
+#: src/postulo/templates/jobs/company_enrichment.html
+#, python-format
+msgid "The company already has <bdi>%(current)s</bdi>."
+msgstr ""
+
 #: src/postulo/jobs/views.py
 msgid "The company already has that name."
 msgstr "Mae gan y cwmni'r enw hwnnw eisoes."
@@ -20437,6 +20721,11 @@ msgstr "Newidiwyd y logo."
 #, python-format
 msgid "The logo was not changed: %(problem)s"
 msgstr "Ni newidiwyd y logo: %(problem)s"
+
+#: src/postulo/jobs/enrichment_offers.py
+#, python-format
+msgid "The logo was not kept: %(problem)s"
+msgstr ""
 
 #: src/postulo/templates/applications/report.html
 msgid "The longest gap is measured inside this period, so a silence that began before it is not carried in. A period still running is only counted up to today."
@@ -22837,7 +23126,8 @@ msgid "WebP image"
 msgstr "Delwedd WebP"
 
 #: src/postulo/core/models.py src/postulo/core/web_links.py
-#: src/postulo/documents/printing.py src/postulo/jobs/tables.py
+#: src/postulo/documents/printing.py src/postulo/jobs/enrichment_offers.py
+#: src/postulo/jobs/tables.py
 #: src/postulo/templates/applications/interview_detail.html
 #: src/postulo/templates/jobs/company_detail.html
 msgid "Website"
@@ -23312,6 +23602,7 @@ msgstr "Beth i'w wneud amdano, mewn brawddeg."
 msgid "What to do. It is what the reminder says when it falls due."
 msgstr "Beth i'w wneud. Dyma beth mae'r nodyn atgoffa yn ei ddweud pan ddaw'n ddyledus."
 
+#: src/postulo/templates/jobs/company_enrichment.html
 #: src/postulo/templates/jobs/company_register.html
 msgid "What to keep"
 msgstr "Beth i'w gadw"
@@ -23371,6 +23662,10 @@ msgstr "Beth wnaethoch chi yno. Nid yw “Heb ei nodi” yn argraffu dim."
 #: src/postulo/jobs/widgets.py
 msgid "What you have noticed and not yet acted on, and what closes this week."
 msgstr "Yr hyn rydych wedi sylwi arno ac nad ydych wedi gweithredu arno eto, a beth sy'n cau'r wythnos hon."
+
+#: src/postulo/templates/jobs/company_enrichment.html
+msgid "What you have recorded is never replaced from here. Change it on the company's own page if a source is right."
+msgstr ""
 
 #: src/postulo/resume/models.py
 msgid "what you presented"
@@ -23615,6 +23910,10 @@ msgstr "Mae lle'r cofnod hwn yn ei adran yn cael ei osod gyda'r saethau ar <a hr
 #: src/postulo/templates/help/telephone_numbers.html
 msgid "Where this instance can send a code to a telephone, a number you have confirmed can also be the one that gets you back into your account. That choice is separate from the primary, so changing what a recruiter dials never changes how you prove it is you. The bin will not remove that number while it is your way in. Changing its digits makes it another number, which has to be confirmed again and is no longer your way in."
 msgstr "Lle gall y gosodiad hwn anfon cod i ffôn, gall rhif rydych wedi'i gadarnhau hefyd fod yr un sy'n mynd â chi'n ôl i mewn i'ch cyfrif. Mae'r dewis hwnnw ar wahân i'r prif un, felly nid yw newid yr hyn y mae recriwtiwr yn ei ddeialu byth yn newid sut rydych yn profi mai chi ydyw. Ni fydd y bin yn tynnu'r rhif hwnnw tra mai dyna'ch ffordd i mewn. Mae newid ei ddigidau yn ei wneud yn rhif arall, y mae'n rhaid ei gadarnhau eto ac nad yw bellach yn ffordd i mewn i chi."
+
+#: src/postulo/templates/cotton/enrichment_ask.html
+msgid "Where to ask"
+msgstr ""
 
 #: src/postulo/templates/server/register_lookup.html
 msgid "Where to get a key"

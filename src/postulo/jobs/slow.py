@@ -1,4 +1,5 @@
-"""The slow work this app asks for: fetching somebody else's page, and finding a logo (#247).
+"""The slow work this app asks for: fetching somebody else's page, finding a logo (#247) and
+asking where a company's details can be read (#1256).
 
 Both dial an address the server does not control, and both were doing it inside the request
 that asked. `fetching` allows ten seconds for a page and five more for `robots.txt`; *Find
@@ -16,6 +17,7 @@ from __future__ import annotations
 
 from django.db import DatabaseError
 from django.utils.translation import gettext_lazy as _
+from django.utils.translation import ngettext
 
 from postulo.core.errands import Refused, handler
 
@@ -162,3 +164,48 @@ def find_a_logo(errand) -> dict:
         raise Refused(_("That company is no longer here.")) from error
 
     return {"message": str(message), "url": company.get_absolute_url()}
+
+
+@handler("enrichment", working=_("Looking for details"))
+def find_details(errand) -> dict:
+    """*Find details*: ask each source the person ticked, and hold what came back (#1256).
+
+    The company is looked up as the person who pressed may reach it -- their own, their
+    group's, or one shared with them to write (#896) -- so a grant that was taken back
+    while the errand waited finds nothing, as a deleted company does. Nothing is written to
+    the company here: what the sources said waits in this errand's row, which is the
+    person's, until they tick what to keep on the review or cancel it.
+    """
+    from django.urls import reverse
+    from django.utils import timezone
+
+    from postulo.core.mixins import WRITE, shared_scope
+
+    from . import enrichment
+    from .models import Company
+
+    company = (
+        shared_scope(Company.objects, errand.owner, WRITE)
+        .filter(pk=errand.payload.get("company_id"))
+        .first()
+    )
+    if company is None:
+        raise Refused(_("That company is no longer here."))
+    keys = [str(key) for key in errand.payload.get("sources") or ()]
+    results = enrichment.ask(company, keys, person=errand.owner)
+    if not results:
+        raise Refused(_("None of those can be asked about this company any more."))
+    if all(result.error for result in results):
+        # Nothing to review: each reason is said, and nothing is held.
+        raise Refused(" ".join(dict.fromkeys(result.error for result in results)))
+    count = sum(len(result.values) for result in results)
+    said = ngettext(
+        "Found %(count)s detail. Nothing is kept until you tick it.",
+        "Found %(count)s details. Nothing is kept until you tick it.",
+        count,
+    ) % {"count": count}
+    return {
+        "message": str(said),
+        "url": f"{reverse('jobs:company_enrichment', args=[company.pk])}?errand={errand.pk}",
+        enrichment.HELD: enrichment.held(results, at=timezone.now().isoformat()),
+    }
