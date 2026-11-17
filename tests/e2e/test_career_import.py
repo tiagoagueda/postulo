@@ -62,3 +62,29 @@ def test_a_cv_is_read_and_added_with_scripts_off(browser, live_server, applicant
         context.close()
 
     assert Experience.objects.filter(owner=applicant).count() == 2
+
+
+@pytest.mark.parametrize("scheme", ["light", "dark"])
+def test_the_review_of_a_linkedin_archive_has_no_violations(
+    live_server,
+    page: Page,
+    axe_source,  # noqa: F811
+    applicant,
+    scheme,
+    tmp_path,
+):
+    """The review with what only the LinkedIn archive brings: a level in the file's own words,
+    *How it was read*, and the long list of files that were not opened."""
+    from tests.test_linkedin_archive import build
+
+    archive = tmp_path / "Basic_LinkedInDataExport.zip"
+    archive.write_bytes(build())
+    page.emulate_media(color_scheme=scheme)
+    sign_in(page, live_server.url, "/career/import/")
+    page.locator("input[type=file]").set_input_files(str(archive))
+    page.get_by_role("button", name="Read it").click()
+
+    expect(page.get_by_role("heading", name="How it was read")).to_be_visible()
+    expect(page.get_by_text("Full professional proficiency")).to_be_visible()
+    found = violations_on(page, axe_source)
+    assert not found, describe(f"/career/import/ LinkedIn review ({scheme})", found)

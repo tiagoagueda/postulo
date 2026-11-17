@@ -885,10 +885,12 @@ class CareerImportView(LoginRequiredMixin, TemplateView):
             messages.error(request, _("Choose a file first."))
             return redirect("resume:import")
         if upload.size > base.MAX_IMPORT_BYTES:
+            said = _("That file is over %(limit)s MB. A CV is not that big.") % {
+                "limit": base.MAX_IMPORT_BYTES // (1024 * 1024)
+            }
             messages.error(
                 request,
-                _("That file is over %(limit)s MB. A CV is not that big.")
-                % {"limit": base.MAX_IMPORT_BYTES // (1024 * 1024)},
+                " ".join([str(said), *too_large_hints(request.user, upload.name or "")]),
             )
             return redirect("resume:import")
 
@@ -982,6 +984,29 @@ def importers_for(user) -> list:
     from postulo.plugins.policy import plugins_for
 
     return plugins_for(user, "importer")
+
+
+def too_large_hints(user, filename: str) -> list[str]:
+    """What the importers on for this person say about a file too large to read (#1260).
+
+    ``too_large(filename)`` is optional: an importer that knows how to get a smaller file of
+    its format -- LinkedIn's archive, asked for fewer categories -- says so with the refusal.
+    The refusal comes before any importer is asked, so only the name is handed over. One
+    that raises is logged and left out, as anywhere else on this page.
+    """
+    hints = []
+    for plugin in importers_for(user):
+        hint = getattr(plugin, "too_large", None)
+        if not callable(hint):
+            continue
+        try:
+            said = hint(filename)
+        except Exception:
+            logger.exception("Importer %r could not say what to do about a large file", plugin.name)
+            continue
+        if isinstance(said, str) and said.strip():
+            hints.append(said.strip())
+    return hints
 
 
 #: What an importer may put in ``accepts``: a file extension, or a media type.

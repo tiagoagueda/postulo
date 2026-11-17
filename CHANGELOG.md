@@ -8,11 +8,14 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### ✨ Added
 
+- *Your career → Import* reads a JSON Resume file, any version from 1.0.0 to 1.7.1; what has no place in a career record is named on the review (#1260)
+- *Your career → Import* reads the career in the copy of your data LinkedIn sends you, the ZIP as it came; messages, connections and the rest are named and never opened (#1260)
 - An importer plugin can hand over certifications, honours, courses and publications, a project's dates, role and link, and notes on how a file was read; `assert_is_an_importer` in `postulo.plugins.testing` holds an importer to the contract (#1260)
 
 ### 🔧 Changed
 
 - The page behind *Your career → Import* is *Import a CV* and names no format: it lists what each importer that is switched on reads, and each bundled importer has its own entry in the menu. A Europass file is read as before (#1260)
+- The *JSON Resume* switch under *Extend file formats* is called *JSON Resume export*, beside *JSON Resume import* (#1260)
 
 ### ⚠️ Deprecated
 
