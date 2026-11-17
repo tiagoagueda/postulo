@@ -133,19 +133,27 @@ def draw_a_page(errand) -> dict:
 @handler("logo", working=_("Looking for a logo"))
 def find_a_logo(errand) -> dict:
     """*Find logo* and *Refresh*: read the company's site, try the images on it."""
+    from postulo.core.mixins import WRITE, shared_scope
+
     from . import logos
     from .models import Company
 
-    company = Company.objects.filter(pk=errand.payload.get("company_id")).first()
-    if company is None or company.owner_id != errand.owner_id:
-        # Deleted while it waited, which is a thing that can now happen. Nothing to put a
-        # logo on and nobody wronged: said plainly rather than raised.
+    # As the person who pressed may reach it: their own, their group's or one shared with
+    # them to write (#896), as the button's own view found it (#1256).
+    company = (
+        shared_scope(Company.objects, errand.owner, WRITE)
+        .filter(pk=errand.payload.get("company_id"))
+        .first()
+    )
+    if company is None:
+        # Deleted while it waited, or the grant taken back, which are things that can now
+        # happen. Nothing to put a logo on and nobody wronged: said plainly rather than raised.
         raise Refused(_("That company is no longer here."))
 
     action = errand.payload.get("action", "")
     try:
         if action == "website":
-            found = logos.find_on_website(company)
+            found = logos.find_on_website(company, by=errand.owner)
             message = _("Found a logo at %(url)s.") % {"url": found}
         elif action == "refresh":
             if not company.logo_source_url:

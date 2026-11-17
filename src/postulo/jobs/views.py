@@ -1357,6 +1357,13 @@ class LogoFormMixin:
 
         context = super().get_context_data(**kwargs)
         context["logo_form"] = CompanyLogoForm()
+        # *Find logo* reads the company's site through a source that offers a logo (#1256);
+        # with none on for the reader there is nothing to press. Asking which is on asks
+        # nobody anything.
+        company = getattr(self, "object", None)
+        context["logo_sources"] = bool(
+            company is not None and company.pk and logos.site_sources(company, self.request.user)
+        )
         return context
 
     def form_valid(self, form):

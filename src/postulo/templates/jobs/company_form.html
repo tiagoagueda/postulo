@@ -33,7 +33,8 @@
       <c-dialog id="logo-dialog" tone="plain" data-refresh="company-head">
         <c-slot name="title">{% translate "Change the logo" %}</c-slot>
         <c-slot name="description">{% translate "Find one from the website, give an address, upload a file, or take it away. Nothing else on this page is saved." %}</c-slot>
-        {% if object.website and not object.has_logo or object.has_logo and object.logo_source_url %}
+        {% comment %} *Find logo* only while a source that reads the site for a logo is on (#1256). {% endcomment %}
+        {% if object.website and not object.has_logo and logo_sources or object.has_logo and object.logo_source_url %}
           {% comment %} What the press leaves behind, and where the answer comes: htmx posts this
              same form and puts the errand's state in its place (a plain post redirects, as it
              does with no script). The region is polite and announces the change (#674). {% endcomment %}

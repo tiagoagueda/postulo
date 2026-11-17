@@ -95,6 +95,14 @@ class Details:
     sources = (DATA, SITE)
 
 
+@pytest.fixture(autouse=True)
+def _the_sources_postulo_ships_are_off(db):
+    """Postulo's own source, the company's website (#1256), switched off for the instance,
+    so these tests see only the sources they install."""
+    PluginPolicy.objects.create(plugin="company-site", state=PluginPolicy.State.FORCED_OFF)
+    forget_decisions()
+
+
 @contextmanager
 def installed(plugin_class=Details):
     """``plugin_class`` registered as one of Postulo's own, and taken out again."""
@@ -318,7 +326,7 @@ def test_a_source_that_cannot_be_used_is_left_out_and_a_key_is_claimed_once(deta
     with installed(Elsewhere):
         found = enrichment.registered()
 
-    assert [key for _plugin, key in ((plugin, s.key) for plugin, s in found)] == [
+    assert [s.key for _plugin, s in found if s.key != "company-site"] == [
         "test-data",
         "test-site",
         "elsewhere",
@@ -650,7 +658,7 @@ def test_what_an_errand_holds_is_capped_and_comes_back_cleaned(details):
 # ------------------------------------------------- nothing is asked without a press
 
 
-def test_with_no_source_installed_nothing_is_drawn_and_the_address_is_not_there(client, user, web):
+def test_with_no_source_on_nothing_is_drawn_and_the_address_is_not_there(client, user, web):
     company = acme(user, website="https://blackmesa.test")
     client.force_login(user)
 
@@ -939,6 +947,21 @@ def test_every_kind_of_value_is_kept_where_it_belongs(client, user, details, web
     assert company.has_logo and company.logo_source == "url"
     assert company.logo_source_url == "https://data.details.test/files/lambda.svg"
     assert company.name == "Black Mesa", "a name is said, never kept"
+
+
+def test_find_logo_asks_only_the_sources_that_read_the_companys_own_site(details, user, web):
+    """*Find logo* says it reads the website, spends the fetch allowance and records what it
+    keeps as found there: a source with hosts of its own is asked through *Find details*."""
+    from postulo.jobs import logos
+
+    company = acme(user, website="https://blackmesa.test")
+    assert logos.site_sources(company, user) == ["test-site"]
+    site_says(web)
+
+    with pytest.raises(logos.UnusableLogo):
+        logos.find_on_website(company, by=user)
+    assert web["read"] == ["https://blackmesa.test"]
+    assert web["seen"] == [], "the source with hosts of its own was not asked"
 
 
 def test_keeping_a_logo_spends_the_fetch_allowance_and_is_refused_once_it_is_spent(

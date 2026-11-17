@@ -14,6 +14,7 @@ class PluginsConfig(AppConfig):
         Before anything reads entry points, so a plugin installed through the interface
         is found exactly as one installed with pip would be.
         """
+        from .company_site import CompanySite
         from .esco import Esco
         from .geonames import Geonames
         from .identifiers import Identifiers
@@ -49,6 +50,9 @@ class PluginsConfig(AppConfig):
         _tell_the_vocabulary_who_decides()
         # And GeoNames' places for a city, offline and on by default (#1252).
         register_builtin("suggestion-source", Geonames)
+        # And the company's own website, read for its details and its logo on a press (#1256):
+        # the source Find logo asks, on by default because Find logo always read the site.
+        register_builtin("company-enrichment", CompanySite)
         register_builtin_locales()
         register_builtin_themes()
         # And now import what is installed, so a plugin that will not load says so in the

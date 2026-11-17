@@ -56,7 +56,7 @@ def a_logo() -> ContentFile:
 
 @pytest.fixture
 def finds_a_logo(monkeypatch):
-    def find(company):
+    def find(company, by=None):
         logos.store(company, a_logo(), source="website", url="https://blackmesa.test/logo.png")
         return "https://blackmesa.test/logo.png"
 
@@ -65,7 +65,7 @@ def finds_a_logo(monkeypatch):
 
 @pytest.fixture
 def finds_nothing(monkeypatch):
-    def find(company):
+    def find(company, by=None):
         raise logos.UnusableLogo(
             "Nothing on blackmesa.test could be used as a logo: The address answered 403."
         )

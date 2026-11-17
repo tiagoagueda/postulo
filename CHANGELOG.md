@@ -9,6 +9,7 @@ All notable changes to Postulo are recorded here. The format follows
 ### ✨ Added
 
 - A `company-enrichment` plugin kind: a source says where a company's details can be read and Postulo asks it on a press of *Find details*; each value is shown with where it was read and its licence, and kept only when ticked. For plugin authors; nothing changes until a source is installed (#1256)
+- *Find details* on a company's page reads the company's own website, on a press, for what it declares about itself and offers each value with where it was read; *Find logo* is now part of the same switchable plugin, and works for a person the company is shared with to change too (#1256)
 
 ## [0.5.5] — 2026-11-16
 

@@ -111,7 +111,7 @@ def test_finding_a_logo_is_sent_off_and_removing_one_is_not(client, user, monkey
     """Removing is a database write; the other two read a website and up to six images."""
     company = Company.objects.create(owner=user, name="Aperture", website="https://example.org")
     monkeypatch.setattr(
-        "postulo.jobs.logos.find_on_website", lambda c: "https://example.org/logo.png"
+        "postulo.jobs.logos.find_on_website", lambda c, by=None: "https://example.org/logo.png"
     )
     client.force_login(user)
 
