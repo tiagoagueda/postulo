@@ -234,6 +234,27 @@ def test_the_chooser_draws_the_whole_page_for_the_application_picked(
     assert " selected>" not in plain.split('id="preview-application"')[1].split("</select>")[0]
 
 
+def test_the_chooser_keeps_the_paper_picked_and_the_pdf_is_drawn_on_it(client, user, letter):
+    """The chooser carries the paper as well; the page that comes back keeps it, and leaves
+    out one the letter's theme does not print on."""
+    from postulo.documents.forms import PaperForm
+    from postulo.documents.themes import Kind
+
+    client.force_login(user)
+    address = letter.get_absolute_url()
+    offered = PaperForm(theme=letter.theme, kind=Kind.LETTER, owner=user).fields["paper"]
+    paper = [key for key, _label in offered.choices][-1]
+
+    kept = client.get(address, {"paper": paper}).content.decode()
+    refused = client.get(address, {"paper": "no-such-paper"}).content.decode()
+
+    draft = reverse("documents:letter_draft", args=[letter.pk])
+    assert f'data-src="{draft}?inline=1&amp;paper={paper}"' in kept
+    assert f'<option value="{paper}" selected>' in kept
+    assert f'data-src="{draft}?inline=1"' in refused
+    assert 'paper=no-such-paper"' not in refused.split("letter-chooser")[1]
+
+
 def test_somebody_elses_application_draws_the_list_for_none(client, user, other_user, letter):
     company = Company.objects.create(owner=other_user, name="Aperture Science")
     posting = JobPosting.objects.create(owner=other_user, company=company, title="Tester")

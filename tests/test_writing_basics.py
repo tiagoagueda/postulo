@@ -162,6 +162,13 @@ def test_several_spaces_between_words_are_offered_as_one():
     assert entry["replacements"] == (" ",) and "“Dear”" in entry["message"]
 
 
+def test_spaces_inside_a_placeholder_are_the_placeholders_own():
+    said = found("Dear {{  company }},  hello", facts=FACTS)
+
+    (entry,) = [e for e in said if e["check"] == "doubled-space"]
+    assert entry["text"] == "  " and "“{{ company }},”" in entry["message"]
+
+
 def test_a_right_to_left_letter_is_read_the_same_way():
     said = found("أنا أنا مهندس", language="ar")
 

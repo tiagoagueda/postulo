@@ -180,11 +180,16 @@ def repetition(document):
                     end=match.end(3),
                     replacements=(first,),
                 )
-        for match in SPACES.finditer(passage.text):
+        # Inside a placeholder's braces the spaces are the placeholder's own, and a span
+        # there would take half of it: the tokens are read as one unbroken run of the same
+        # length, so every offset still points into the text as stored.
+        masked = PLACEHOLDER.sub(lambda token: "￼" * len(token.group(0)), passage.text)
+        for match in SPACES.finditer(masked):
+            word = passage.text[match.start(1) : match.end(1)]
             yield WritingFinding(
                 check="doubled-space",
                 message=gettext("There are several spaces in a row after “%(word)s”.")
-                % {"word": _quote(match.group(1))},
+                % {"word": _quote(word)},
                 passage=passage.key,
                 start=match.start(2),
                 end=match.end(2),

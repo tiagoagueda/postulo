@@ -530,6 +530,7 @@ _AWKWARD_TEXTS = (
     "",
     "Hello",
     "{{ company }} is where I would like to work, {{ name }}",
+    "Dear {{   company   }},  the spaces inside the braces are the placeholder's own.",
     "Dear {{ compnay }},\r\n\r\nI am writing about the the role.\r\n\r\n{{ name }}\r\n",
     "A r\u00e9sum\u00e9 with a \U0001f600 in it,  and [a note] left in. {{ role }}",
     "\u0627\u0644\u0633\u064a\u062f\u0629 {{ contact }}\u060c \u0623\u0643\u062a\u0628 "

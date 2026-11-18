@@ -16,7 +16,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse, reverse_lazy
 from django.utils.csp import CSP
 from django.utils.decorators import method_decorator
-from django.utils.http import content_disposition_header
+from django.utils.http import content_disposition_header, urlencode
 from django.utils.translation import gettext_lazy as _
 from django.utils.translation import ngettext
 from django.views import View
@@ -674,18 +674,26 @@ class CoverLetterDetailView(OwnedObjectMixin, DetailView):
         context["properties_form"] = FilePropertiesForm(
             initial=rendering.file_defaults(self.object)
         )
-        context["paper_form"] = PaperForm(
+        paper_form = PaperForm(
             theme=self.object.theme, kind=themes.Kind.LETTER, owner=self.object.owner
         )
         # One choice of application for the whole page (#1258): the frame, the PDF and the
         # list of what the writing checkers found are all drawn for it. While the chooser
-        # re-targeted only the frame, a list beside it would have been a second truth.
+        # re-targeted only the frame, a list beside it would have been a second truth. The
+        # chooser carries the paper too, so the page keeps that choice where the theme
+        # prints on it, and the PDF is drawn on it.
         chosen = chosen_application(self.request)
         context["chosen"] = chosen
+        query = {"inline": "1"}
+        if chosen is not None:
+            query["application"] = chosen.pk
+        paper = chosen_paper(self.request)
+        if paper and paper in dict(paper_form.fields["paper"].choices):
+            paper_form.initial["paper"] = paper
+            query["paper"] = paper
+        context["paper_form"] = paper_form
         draft = reverse("documents:letter_draft", args=[self.object.pk])
-        context["draft_src"] = f"{draft}?inline=1" + (
-            f"&application={chosen.pk}" if chosen is not None else ""
-        )
+        context["draft_src"] = f"{draft}?{urlencode(query)}"
         context["findings"] = checking.letter_findings(self.object, chosen, self.request.user)
         # *Undo*, while the letter is still as the last replacement left it.
         held = self.request.session.get(UNDO_KEY)

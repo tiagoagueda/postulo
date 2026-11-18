@@ -10,6 +10,8 @@ swallow the keyboard on its way through the page.
 
 from __future__ import annotations
 
+import re
+
 import pytest
 from playwright.sync_api import Page, expect
 
@@ -143,12 +145,18 @@ def test_a_letters_chooser_redraws_the_frame_for_that_application(page: Page, li
     page.locator("#preview-application").select_option(index=1)
     page.get_by_role("button", name="Read it below").click()
 
+    # The page itself came back for the application, landing on the list above the frame. The
+    # chooser carries the paper as well, and the page keeps it.
+    expect(page).to_have_url(
+        re.compile(
+            rf"/documents/letters/{letter.pk}/\?application={application.pk}"
+            r"(&paper=[\w-]+)?#writing-findings$"
+        )
+    )
+    expect(page.locator("#preview-application")).to_have_value(str(application.pk))
+    # A new page opens on the PDF again. The frame is lazy, and in a hidden tab it is never
+    # loaded, so a wait on what it says would never end: the quick view is opened first.
+    show_quick_view(page)
     expect(page.frame_locator("iframe[data-document-preview]").locator("body")).to_contain_text(
         "Aperture Science"
     )
-    # The page itself came back for the application, landing on the list above the frame.
-    expect(page).to_have_url(
-        f"{live_server.url}/documents/letters/{letter.pk}/?application={application.pk}"
-        "#writing-findings"
-    )
-    expect(page.locator("#preview-application")).to_have_value(str(application.pk))
