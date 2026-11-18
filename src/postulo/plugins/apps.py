@@ -14,6 +14,7 @@ class PluginsConfig(AppConfig):
         Before anything reads entry points, so a plugin installed through the interface
         is found exactly as one installed with pip would be.
         """
+        from .earnings import Earnings
         from .esco import Esco
         from .geonames import Geonames
         from .identifiers import Identifiers
@@ -49,6 +50,11 @@ class PluginsConfig(AppConfig):
         _tell_the_vocabulary_who_decides()
         # And GeoNames' places for a city, offline and on by default (#1252).
         register_builtin("suggestion-source", Geonames)
+        # And Eurostat's earnings statistics beside a listing (#1257): offline, and off until
+        # an administrator switches it on (migration 0018), with its file's system check.
+        register_builtin("earnings-source", Earnings)
+        from .earnings import checks as earnings_checks  # noqa: F401
+
         register_builtin_locales()
         register_builtin_themes()
         # And now import what is installed, so a plugin that will not load says so in the

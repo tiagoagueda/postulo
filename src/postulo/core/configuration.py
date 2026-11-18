@@ -250,7 +250,7 @@ AREAS: tuple[Area, ...] = (
     Area(
         "maps",
         "Maps and places",
-        ("MAP", "GEOCODER", "GEONAMES", "GEOLOCATIONS", "ESCO"),
+        ("MAP", "GEOCODER", "GEONAMES", "GEOLOCATIONS", "ESCO", "EARNINGS"),
         notes=(
             "The tiles and the geocoder can also be set from Server settings -> Maps when not "
             "set here."
@@ -1366,6 +1366,17 @@ _VARIABLES: tuple[Variable, ...] = (
         "Where the ESCO classification of occupations and skills is read from.",
         default=PACKAGE_DIR / "jobs" / "data",
         image="/app/data/esco",
+        interpolate=False,
+        empty_is_unset=True,
+    ),
+    Variable(
+        "POSTULO_EARNINGS_DIR",
+        Kind.PATH,
+        "maps",
+        "Where manage.py fetch_earnings writes Eurostat's earnings statistics, and where a "
+        "refreshed file is read from; the copy that ships with Postulo is read otherwise.",
+        default=PACKAGE_DIR / "plugins" / "earnings" / "data",
+        image="/app/data/earnings",
         interpolate=False,
         empty_is_unset=True,
     ),

@@ -42,8 +42,9 @@ CARD = "data-earnings-reference"
 
 
 @pytest.fixture(autouse=True)
-def _fresh_registry():
-    """A test that adds a plugin must not leave the registry's cache holding it."""
+def _fresh_registry(monkeypatch):
+    """Only the sources a test installs, and a cache that does not keep them afterwards."""
+    monkeypatch.setitem(registry._builtin, earnings.KIND, [])
     registry._cache.pop(earnings.KIND, None)
     yield
     registry._cache.pop(earnings.KIND, None)

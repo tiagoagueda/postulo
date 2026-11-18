@@ -9,6 +9,7 @@ All notable changes to Postulo are recorded here. The format follows
 ### ✨ Added
 
 - Plugins can supply published earnings statistics for a listing's occupation and country (an earnings source); the listing and application pages draw each figure with its measure, period, year and source, never as a recommendation, and nothing until a source is enabled (#1257)
+- A listing and an application can show Eurostat's earnings statistics for the occupation group and country, with the national minimum wage, each with its source and year and never as a recommendation; off until an administrator enables Earnings statistics (#1257)
 
 ## [0.5.5] — 2026-11-16
 
