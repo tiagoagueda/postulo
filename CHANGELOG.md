@@ -8,6 +8,11 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🔧 Changed
 
+- Single sign-on now sends a PKCE challenge (S256) with every handshake, so an authorisation code caught on the way opens nothing. **If your provider then refuses the sign-in, set `POSTULO_OIDC_PKCE=false`.** (#1261)
+
+### 🔒 Security
+
+- Start-up warns (`postulo.W008`) when the single sign-on issuer is a plain `http://` address that is not this machine, since nothing then proves the provider's answers came from the provider. (#1261)
 - The wiki compares calendar providers (CalDAV, Apple, Google, Microsoft, Proton, ICS addresses): what works today, what each needs and what it risks (#1254)
 
 ## [0.5.5] — 2026-11-16
