@@ -114,6 +114,7 @@ self.addEventListener("push", function (event) {
       body: data.body || "",
       icon: data.icon || undefined,
       tag: data.tag || undefined,
+      lang: data.lang || undefined,
       data: { url: data.url || "/" },
     })
   );

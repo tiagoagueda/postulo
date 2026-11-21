@@ -1886,8 +1886,8 @@ msgid "<em>Headline</em> is a short professional title, such as “Backend engin
 msgstr "<em>سرخی</em> ایک مختصر پیشہ ورانہ عنوان ہے، جیسے “بیک اینڈ انجینئر”۔ جس CV کی اپنی سرخی ہو وہ اس کی بجائے اپنی سرخی پرنٹ کرتا ہے۔"
 
 #: src/postulo/templates/help/career.html
-msgid "<em>Import</em> reads a Europass CV; <em>Export</em> writes your details and your career as one file you can keep or move to another Postulo; <em>Preview</em> shows the whole record as a document, and <em>Your CVs</em> opens the variants made from it."
-msgstr "<em>درآمد</em> Europass CV پڑھتا ہے؛ <em>برآمد</em> آپ کی تفصیلات اور آپ کا کیریئر ایک فائل کے طور پر لکھتا ہے جسے آپ رکھ سکتے ہیں یا کسی دوسرے Postulo میں منتقل کر سکتے ہیں؛ <em>پیش منظر</em> پورا ریکارڈ ایک دستاویز کے طور پر دکھاتا ہے، اور <em>آپ کی CVs</em> اس سے بنی شکلیں کھولتا ہے۔"
+msgid "<em>Import</em> reads a CV you have as a file; <em>Export</em> writes your details and your career as one file you can keep or move to another Postulo; <em>Preview</em> shows the whole record as a document, and <em>Your CVs</em> opens the variants made from it."
+msgstr ""
 
 #: src/postulo/templates/help/identifiers.html
 #, fuzzy
@@ -2315,7 +2315,7 @@ msgstr "آپ کی دستاویزات میں سے ایک فائل"
 msgid "A file goes under Files first; an entry points at it rather than keeping a copy."
 msgstr "فائل پہلے “فائلیں” میں جاتی ہے؛ اندراج کاپی رکھنے کے بجائے اس کی طرف اشارہ کرتا ہے۔"
 
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 msgid "A file that Postulo itself wrote is read on a page of its own."
 msgstr "جو فائل خود Postulo نے لکھی ہو وہ اپنے الگ صفحے پر پڑھی جاتی ہے۔"
 
@@ -3216,7 +3216,7 @@ msgstr "مہارت شامل کریں"
 msgid "Add a tag"
 msgstr "ٹیگ شامل کریں"
 
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 msgid "Add all of this"
 msgstr "یہ سب شامل کریں"
 
@@ -3789,7 +3789,7 @@ msgstr "آئیکن بٹن"
 msgid "An identifier"
 msgstr "شناخت کنندہ"
 
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 msgid "An import only ever adds. Nothing already in your career record is changed or removed, and anything that turns out to be a duplicate is yours to delete."
 msgstr "درآمد ہمیشہ صرف اضافہ کرتی ہے۔ آپ کے کیریئر ریکارڈ میں پہلے سے موجود کوئی چیز تبدیل یا حذف نہیں ہوتی، اور جو کچھ دہرا نکلے اسے حذف کرنا آپ کے ذمے ہے۔"
 
@@ -5284,7 +5284,8 @@ msgstr "سرٹیفیکیشن"
 
 #: src/postulo/documents/rendering.py src/postulo/jobs/merging.py
 #: src/postulo/resume/candidate.py src/postulo/resume/registry.py
-#: src/postulo/resume/views_candidate.py
+#: src/postulo/resume/views.py src/postulo/resume/views_candidate.py
+#: src/postulo/templates/resume/import.html
 #: src/postulo/templates/resume/preview.html
 msgid "Certifications"
 msgstr "سرٹیفیکیشنز"
@@ -5472,13 +5473,10 @@ msgstr "فہرست سے ملک منتخب کریں۔"
 msgid "Choose a destination and save it first."
 msgstr "پہلے کوئی منزل منتخب کریں اور اسے محفوظ کریں۔"
 
-#: src/postulo/resume/views.py
-msgid "Choose a Europass file first."
-msgstr "پہلے Europass فائل منتخب کریں۔"
-
 #: src/postulo/applications/views_ical.py src/postulo/core/views_kind_files.py
 #: src/postulo/jobs/vcard_views.py src/postulo/jobs/views.py
-#: src/postulo/resume/views_candidate.py src/postulo/resume/views_references.py
+#: src/postulo/resume/views.py src/postulo/resume/views_candidate.py
+#: src/postulo/resume/views_references.py
 msgid "Choose a file first."
 msgstr "پہلے فائل منتخب کریں۔"
 
@@ -5588,9 +5586,9 @@ msgstr "کیلنڈر سے تاریخ پیدائش منتخب کریں"
 msgid "Choose the destination"
 msgstr "منزل منتخب کریں"
 
-#: src/postulo/templates/resume/europass_import.html
-msgid "Choose the PDF you downloaded from europass.europa.eu, as it is: the CV is attached inside it, and that is what Postulo reads. Older Europass files read too: the XML and PDF of the editor before 2020, and the JSON of its web service. Postulo works out which it is, shows you what is in it, and writes nothing until you say so."
-msgstr "وہ PDF منتخب کریں جو آپ نے europass.europa.eu سے ڈاؤن لوڈ کیا تھا، جیسا ہے ویسا: CV اس کے اندر منسلک ہے، اور Postulo وہی پڑھتا ہے۔ پرانی Europass فائلیں بھی پڑھی جاتی ہیں: 2020 سے پہلے کے ایڈیٹر کی XML اور PDF، اور اس کی ویب سروس کا JSON۔ Postulo پہچان لیتا ہے کہ یہ کون سی ہے، آپ کو دکھاتا ہے کہ اس میں کیا ہے، اور جب تک آپ نہ کہیں کچھ نہیں لکھتا۔"
+#: src/postulo/templates/resume/import.html
+msgid "Choose the file as you downloaded it. Postulo works out which format it is, shows you what is in it, and writes nothing until you say so."
+msgstr ""
 
 #: src/postulo/accounts/forms.py src/postulo/jobs/forms.py
 msgid "Choose the type of identifier."
@@ -6241,7 +6239,8 @@ msgstr "کورس"
 
 #: src/postulo/documents/rendering.py src/postulo/jobs/merging.py
 #: src/postulo/resume/candidate.py src/postulo/resume/registry.py
-#: src/postulo/resume/views_candidate.py
+#: src/postulo/resume/views.py src/postulo/resume/views_candidate.py
+#: src/postulo/templates/resume/import.html
 #: src/postulo/templates/resume/preview.html
 msgid "Courses"
 msgstr "کورسز"
@@ -6996,7 +6995,7 @@ msgid "document themes"
 msgstr "دستاویز کی تھیمز"
 
 #: src/postulo/core/help.py src/postulo/core/navigation.py
-#: src/postulo/documents/apps.py
+#: src/postulo/documents/apps.py src/postulo/plugins/categories.py
 #: src/postulo/templates/applications/application_detail.html
 #: src/postulo/templates/base.html
 #: src/postulo/templates/cotton/documents_nav.html
@@ -7236,7 +7235,7 @@ msgstr "ای کامرس"
 msgid "Each invitation may be used once, and expires on its own. Its link is shown once, when it is made."
 msgstr "ہر دعوت ایک بار استعمال ہو سکتی ہے، اور خود بخود ختم ہو جاتی ہے۔ اس کا لنک صرف ایک بار، بنتے وقت، دکھایا جاتا ہے۔"
 
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 msgid "Each is added as one of your contacts and as a reference you have not asked yet, so none is printed on a CV until you say they agreed."
 msgstr "ہر ایک کو آپ کے روابط میں سے ایک کے طور پر اور ایسے حوالے کے طور پر شامل کیا جاتا ہے جس سے آپ نے ابھی پوچھا نہیں، اس لیے کوئی بھی CV پر اس وقت تک پرنٹ نہیں ہوتا جب تک آپ نہ بتائیں کہ وہ رضامند ہو گئے ہیں۔"
 
@@ -7349,7 +7348,7 @@ msgstr "مدیران"
 #: src/postulo/documents/rendering.py src/postulo/jobs/industries.py
 #: src/postulo/resume/candidate.py src/postulo/resume/registry.py
 #: src/postulo/resume/views_candidate.py
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 #: src/postulo/templates/resume/preview.html
 msgid "Education"
 msgstr "تعلیم"
@@ -7569,11 +7568,7 @@ msgstr "ESCO مہارت"
 msgid "Europass"
 msgstr "Europass"
 
-#: src/postulo/core/transfers.py
-msgid "Europass import"
-msgstr "Europass درآمد"
-
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 msgid "Europass records five levels per language and Postulo keeps one, so the lowest is taken. Where the file states none, none is written: a level is a claim about yourself that somebody will test, so it is yours to make afterwards."
 msgstr "Europass ہر زبان کے لیے پانچ سطحیں درج کرتا ہے اور Postulo ایک رکھتا ہے، اس لیے سب سے کم سطح لی جاتی ہے۔ جہاں فائل کوئی سطح نہیں بتاتی، وہاں کچھ نہیں لکھا جاتا: سطح آپ کا اپنے بارے میں ایک دعویٰ ہے جسے کوئی پرکھے گا، اس لیے یہ دعویٰ بعد میں آپ ہی کو کرنا ہے۔"
 
@@ -7817,7 +7812,7 @@ msgstr "تحلیل شدہ کو خارج کریں"
 
 #: src/postulo/documents/rendering.py src/postulo/resume/candidate.py
 #: src/postulo/resume/registry.py src/postulo/resume/views_candidate.py
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 #: src/postulo/templates/resume/preview.html
 msgid "Experience"
 msgstr "تجربہ"
@@ -8471,7 +8466,7 @@ msgstr "دریافت کا ذریعہ"
 msgid "found via"
 msgstr "دریافت کا ذریعہ"
 
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 #, python-format
 msgid "Found: %(names)s. Only the ones you have left blank will be filled in."
 msgstr "ملے: %(names)s۔ صرف وہی بھرے جائیں گے جو آپ نے خالی چھوڑے ہیں۔"
@@ -9095,7 +9090,8 @@ msgstr "اعزاز یا انعام"
 
 #: src/postulo/documents/rendering.py src/postulo/jobs/merging.py
 #: src/postulo/resume/candidate.py src/postulo/resume/registry.py
-#: src/postulo/resume/views_candidate.py
+#: src/postulo/resume/views.py src/postulo/resume/views_candidate.py
+#: src/postulo/templates/resume/import.html
 #: src/postulo/templates/resume/preview.html
 msgid "Honours and awards"
 msgstr "اعزازات اور انعامات"
@@ -9165,6 +9161,10 @@ msgstr "یہ آجر تک کیسے پہنچتی ہے"
 #: src/postulo/documents/models.py
 msgid "how it reaches the employer"
 msgstr "یہ آجر تک کیسے پہنچتی ہے"
+
+#: src/postulo/templates/resume/import.html
+msgid "How it was read"
+msgstr ""
 
 #: src/postulo/applications/widgets.py
 msgid "How long they take"
@@ -9407,9 +9407,9 @@ msgstr "اگر یہ حوالہ نامہ ہے تو"
 msgid "If you are reading this, the email settings of your Postulo instance work. Nothing else to do."
 msgstr "اگر آپ یہ پڑھ رہے ہیں تو آپ کے Postulo انسٹینس کی ای میل ترتیبات کام کر رہی ہیں۔ مزید کچھ کرنے کی ضرورت نہیں۔"
 
-#: src/postulo/templates/resume/europass_import.html
-msgid "If you have applied to an EU institution or through a national employment service, you already have this file. Rather than type it all again, hand it over."
-msgstr "اگر آپ نے یورپی یونین کے کسی ادارے میں یا کسی قومی روزگار سروس کے ذریعے درخواست دی ہے تو یہ فائل پہلے سے آپ کے پاس ہے۔ سب کچھ دوبارہ ٹائپ کرنے کے بجائے اسے دے دیں۔"
+#: src/postulo/templates/resume/import.html
+msgid "If your career is already written down in a file, hand it over rather than type it all again."
+msgstr ""
 
 #: src/postulo/core/models.py
 msgid "ignore robots.txt when capturing"
@@ -9431,9 +9431,9 @@ msgid "Import"
 msgstr "درآمد"
 
 #: src/postulo/resume/views.py src/postulo/templates/resume/candidate_file.html
-#: src/postulo/templates/resume/europass_import.html
-msgid "Import a Europass CV"
-msgstr "Europass CV درآمد کریں"
+#: src/postulo/templates/resume/import.html
+msgid "Import a CV"
+msgstr ""
 
 #: src/postulo/templates/applications/ical_import.html
 msgid "Import an iCalendar file"
@@ -10548,7 +10548,7 @@ msgstr "آپ کے کیریئر ریکارڈ کی زبان"
 #: src/postulo/documents/rendering.py src/postulo/resume/candidate.py
 #: src/postulo/resume/registry.py src/postulo/resume/views.py
 #: src/postulo/resume/views_candidate.py
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 #: src/postulo/templates/resume/preview.html
 msgid "Languages"
 msgstr "زبانیں"
@@ -11469,7 +11469,7 @@ msgstr "رکنیتی تنظیمیں"
 #: src/postulo/documents/rendering.py src/postulo/jobs/merging.py
 #: src/postulo/resume/candidate.py src/postulo/resume/registry.py
 #: src/postulo/resume/views.py src/postulo/resume/views_candidate.py
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 #: src/postulo/templates/resume/preview.html
 msgid "Memberships"
 msgstr "رکنیتیں"
@@ -13264,6 +13264,14 @@ msgstr "ابھی تک کچھ نہیں بھیجا گیا۔"
 msgid "Nothing standing at Offer. Record one from an application's page when it arrives."
 msgstr "کوئی درخواست “پیشکش” کے مرحلے پر نہیں۔ جب پیشکش آئے تو کسی درخواست کے صفحے سے اسے درج کریں۔"
 
+#: src/postulo/resume/views.py
+msgid "Nothing that reads a CV from a file is switched on here, so that file was not read."
+msgstr ""
+
+#: src/postulo/templates/resume/import.html
+msgid "Nothing that reads a CV from a file is switched on here, so there is no file to choose."
+msgstr ""
+
 #: src/postulo/core/design.py src/postulo/templates/server/design.html
 msgid "Nothing there"
 msgstr "وہاں کچھ نہیں"
@@ -14269,6 +14277,10 @@ msgstr "دیگر ضمائر"
 msgid "Other services"
 msgstr "دیگر خدمات"
 
+#: src/postulo/documents/themes.py
+msgid "Other themes"
+msgstr ""
+
 #: src/postulo/accounts/forms.py
 msgid "Other time zones"
 msgstr "دیگر ٹائم زونز"
@@ -14671,7 +14683,7 @@ msgstr "شخص"
 
 #: src/postulo/accounts/views.py src/postulo/core/help.py
 #: src/postulo/templates/accounts/profile.html
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 msgid "Personal details"
 msgstr "ذاتی تفصیلات"
 
@@ -15255,7 +15267,7 @@ msgstr "تاحال"
 #: src/postulo/documents/rendering.py src/postulo/resume/candidate.py
 #: src/postulo/resume/registry.py src/postulo/resume/views.py
 #: src/postulo/resume/views_candidate.py
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 #: src/postulo/templates/resume/preview.html
 msgid "Presentations, conferences and seminars"
 msgstr "پریزنٹیشنز، کانفرنسیں اور سیمینار"
@@ -15488,7 +15500,7 @@ msgstr "پروجیکٹ"
 
 #: src/postulo/documents/rendering.py src/postulo/resume/candidate.py
 #: src/postulo/resume/registry.py src/postulo/resume/views_candidate.py
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 #: src/postulo/templates/resume/preview.html
 msgid "Projects"
 msgstr "پروجیکٹس"
@@ -15554,7 +15566,9 @@ msgid "Publication"
 msgstr "اشاعت"
 
 #: src/postulo/documents/rendering.py src/postulo/resume/candidate.py
-#: src/postulo/resume/registry.py src/postulo/resume/views_candidate.py
+#: src/postulo/resume/registry.py src/postulo/resume/views.py
+#: src/postulo/resume/views_candidate.py
+#: src/postulo/templates/resume/import.html
 #: src/postulo/templates/resume/preview.html
 msgid "Publications"
 msgstr "اشاعتیں"
@@ -15747,18 +15761,6 @@ msgstr "بطور پڑھیں"
 msgid "Read as %(name)s."
 msgstr "%(name)s کے طور پر پڑھا گیا۔"
 
-#: src/postulo/resume/views.py
-msgid "Read as Europass JSON, the older format as the Europass web service wrote it until 2020."
-msgstr "Europass JSON کے طور پر پڑھیں، وہ پرانا فارمیٹ جو Europass ویب سروس 2020 تک لکھتی تھی۔"
-
-#: src/postulo/resume/views.py
-msgid "Read as Europass XML in the older format, the one the Europass editor wrote until 2020."
-msgstr "پرانے فارمیٹ میں Europass XML کے طور پر پڑھیں، وہ جو Europass ایڈیٹر 2020 تک لکھتا تھا۔"
-
-#: src/postulo/resume/views.py
-msgid "Read as Europass XML, the format europass.europa.eu has written since 2020."
-msgstr "Europass XML کے طور پر پڑھیں، وہ فارمیٹ جو europass.europa.eu سنہ 2020 سے لکھ رہا ہے۔"
-
 #: src/postulo/jobs/models.py
 msgid "read by"
 msgstr "پڑھنے والا"
@@ -15788,16 +15790,8 @@ msgstr "اس سے پڑھا گیا"
 msgid "Read from <bdi>%(address)s</bdi>."
 msgstr "<bdi>%(address)s</bdi> سے پڑھا گیا۔"
 
-#: src/postulo/resume/views.py
-msgid "Read from the Europass XML attached to the PDF, in the older format the Europass editor wrote until 2020."
-msgstr "PDF کے ساتھ منسلک Europass XML سے پڑھا گیا، اس پرانے فارمیٹ میں جو Europass ایڈیٹر 2020 تک لکھتا تھا۔"
-
-#: src/postulo/resume/views.py
-msgid "Read from the Europass XML attached to the PDF, the format europass.europa.eu has written since 2020."
-msgstr "PDF کے ساتھ منسلک Europass XML سے پڑھا گیا، اس فارمیٹ میں جو europass.europa.eu سنہ 2020 سے لکھ رہا ہے۔"
-
 #: src/postulo/templates/jobs/company_places.html
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 #: src/postulo/templates/resume/references.html
 #: src/postulo/templates/server/plugins.html
 msgid "Read it"
@@ -16106,8 +16100,7 @@ msgid "Reference letters they wrote"
 msgstr "ان کے لکھے ہوئے حوالہ نامے"
 
 #: src/postulo/documents/rendering.py src/postulo/resume/registry.py
-#: src/postulo/resume/views.py
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/resume/views.py src/postulo/templates/resume/import.html
 msgid "References"
 msgstr "حوالہ جات"
 
@@ -17752,7 +17745,7 @@ msgstr "مہارتوں کے گروپ"
 #: src/postulo/resume/registry.py src/postulo/resume/views.py
 #: src/postulo/resume/views_candidate.py
 #: src/postulo/templates/cotton/listing_skills.html
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 #: src/postulo/templates/resume/preview.html
 msgid "Skills"
 msgstr "مہارتیں"
@@ -18031,7 +18024,7 @@ msgstr "عملے کی فراہمی"
 #: src/postulo/templates/core/kind_file.html
 #: src/postulo/templates/jobs/contact_vcards.html
 #: src/postulo/templates/resume/candidate_file.html
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 msgid "Start again"
 msgstr "دوبارہ شروع کریں"
 
@@ -18283,6 +18276,10 @@ msgstr "میرے ORCID ریکارڈ سے تجویز کریں"
 #: src/postulo/applications/models.py
 msgid "suggested by"
 msgstr "تجویز کنندہ"
+
+#: src/postulo/documents/themes.py
+msgid "Suggested for this document"
+msgstr ""
 
 #: src/postulo/applications/models.py
 msgid "suggested status"
@@ -19933,7 +19930,7 @@ msgstr "رقم جیسی انہوں نے لکھی، ٹیکس سے پہلے۔"
 #: src/postulo/templates/documents/upload_detail.html
 #: src/postulo/templates/jobs/contact_vcards.html
 #: src/postulo/templates/resume/candidate_file.html
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 msgid "The file"
 msgstr "فائل"
 
@@ -20667,7 +20664,7 @@ msgstr "درخواست %(limit)s سے بڑی ہے، جو یہ کال زیادہ 
 msgid "The request was not in the shape this call takes."
 msgstr "درخواست اس شکل میں نہیں تھی جو یہ کال لیتی ہے۔"
 
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 msgid "The rest of the file is still worth importing. What is listed here is not, and you can add it by hand afterwards."
 msgstr "فائل کا باقی حصہ اب بھی درآمد کرنے کے قابل ہے۔ یہاں درج چیزیں نہیں، اور آپ انہیں بعد میں ہاتھ سے شامل کر سکتے ہیں۔"
 
@@ -22886,6 +22883,10 @@ msgstr "اس مدت میں کیا واپس آیا"
 msgid "what came of it"
 msgstr "اس کا کیا نتیجہ نکلا"
 
+#: src/postulo/templates/resume/import.html
+msgid "What can be read here"
+msgstr ""
+
 #: src/postulo/core/server_forms.py
 msgid "What carries the mail off this machine."
 msgstr "وہ چیز جو میل کو اس مشین سے باہر لے جاتی ہے۔"
@@ -22907,7 +22908,7 @@ msgstr "%(title)s میں کیا بدلا"
 msgid "What changes how Postulo behaves for you. Everything here works from the keyboard, with a screen reader and with scripts off; these are the choices on top of that."
 msgstr "وہ چیزیں جو بدلتی ہیں کہ Postulo آپ کے لیے کیسا برتاؤ کرے۔ یہاں ہر چیز کی بورڈ سے، اسکرین ریڈر کے ساتھ اور اسکرپٹس بند ہونے پر بھی کام کرتی ہے؛ یہ اس کے علاوہ کے انتخاب ہیں۔"
 
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 msgid "What could not be read"
 msgstr "جو پڑھا نہیں جا سکا"
 
@@ -22969,7 +22970,7 @@ msgstr "ڈائری میں کیا ہے، قریب ترین پہلے۔ کسی در
 #: src/postulo/templates/applications/ical_import.html
 #: src/postulo/templates/core/kind_file.html
 #: src/postulo/templates/resume/candidate_file.html
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 msgid "What is in the file"
 msgstr "فائل میں کیا ہے"
 
@@ -23476,6 +23477,10 @@ msgstr "جہاں کوئی اس کی جانچ کر سکتا ہے۔ CV اسے لن
 #: src/postulo/templates/server/maps.html
 msgid "Where the companies' map takes the tiles it is drawn on, and whether addresses are pinned at their street."
 msgstr "کمپنیوں کا نقشہ جن ٹائلوں پر بنتا ہے وہ کہاں سے لی جاتی ہیں، اور آیا پتوں کا پن ان کی گلی پر لگایا جاتا ہے۔"
+
+#: src/postulo/templates/resume/import.html
+msgid "Where the file states no level, none is written: a level is a claim about yourself that somebody will test, so it is yours to make afterwards."
+msgstr ""
 
 #: src/postulo/jobs/models.py
 msgid "where the logo came from"
@@ -24079,7 +24084,7 @@ msgstr "<bdi>%(name)s</bdi> نے لکھا"
 msgid "Written by Postulo %(version)s on %(when)s."
 msgstr "Postulo %(version)s نے %(when)s کو لکھا۔"
 
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 #, python-format
 msgid "Written in %(tongue)s, which will be recorded as the language of your career record if you have not already set one."
 msgstr "%(tongue)s میں لکھا گیا، جو آپ کے کیریئر ریکارڈ کی زبان کے طور پر درج کی جائے گی اگر آپ نے پہلے سے کوئی مقرر نہیں کی۔"
@@ -24673,7 +24678,7 @@ msgstr "آپ کا ریکارڈ (JSON)"
 
 #: src/postulo/templates/core/export.html
 #: src/postulo/templates/resume/candidate_file.html
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 msgid "Your record as a file"
 msgstr "آپ کا ریکارڈ بطور فائل"
 
@@ -24802,9 +24807,13 @@ msgstr "{value} ہوسٹ کے بعد آتا ہے: پاتھ میں، سوالیہ
 msgid "· in the <a href=\"%(group_url)s\" class=\"underline\">%(name)s</a> group"
 msgstr "· <a href=\"%(group_url)s\" class=\"underline\">%(name)s</a> گروپ میں"
 
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 msgid "· no level in the file, so none will be claimed"
 msgstr "· فائل میں کوئی سطح نہیں، اس لیے کسی سطح کا دعویٰ نہیں کیا جائے گا"
+
+#: src/postulo/templates/resume/import.html
+msgid "· not a level Postulo keeps, so none will be claimed"
+msgstr ""
 
 #: src/postulo/templates/applications/application_detail.html
 #, python-format

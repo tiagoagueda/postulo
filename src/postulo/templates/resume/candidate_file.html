@@ -88,8 +88,7 @@
       <div class="flex flex-wrap items-center gap-3">
         <a href="{% url 'resume:overview' %}" class="btn" data-variant="outline">{% translate "Your career" %}</a>
         <a href="{% url 'accounts:profile' %}" class="btn" data-variant="outline">{% translate "Your details" %}</a>
-        {% module_on "europass" as europass_on %}
-        {% if europass_on %}<a href="{% url 'resume:europass_import' %}" class="btn" data-variant="ghost">{% translate "Import a Europass CV" %}</a>{% endif %}
+        {% if importers_on %}<a href="{% url 'resume:import' %}" class="btn" data-variant="ghost">{% translate "Import a CV" %}</a>{% endif %}
       </div>
     {% else %}
       <section class="card mb-6" aria-labelledby="in-the-file" data-candidate-review>

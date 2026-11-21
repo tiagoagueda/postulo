@@ -54,6 +54,17 @@ _CANDIDATE = re.compile(rb"<(?:[A-Za-z_][\w.-]*:)?Candidate[\s>/]")
 class EuropassImporter:
     """Reads every Europass format: the PDF and its Candidate XML, and SkillsPassport."""
 
+    #: What the import page's file box offers to choose from (#1260).
+    accepts = (
+        ".pdf",
+        ".xml",
+        ".json",
+        "application/pdf",
+        "text/xml",
+        "application/xml",
+        "application/json",
+    )
+
     def can_handle(self, data: bytes, filename: str = "") -> bool:
         """Whether this looks like one of the Europass formats.
 

@@ -378,6 +378,12 @@ POSTULO_OIDC_CLIENT_SECRET = read("POSTULO_OIDC_CLIENT_SECRET")
 # invitation unless the operator says so.
 POSTULO_OIDC_AUTO_SIGNUP = read("POSTULO_OIDC_AUTO_SIGNUP")
 POSTULO_OIDC_PROVIDER_ID = "oidc"
+# PKCE (RFC 7636, S256) on the handshake (#1261). allauth leaves it off unless asked, for the
+# provider or per app; it is asked here, per app. The client secret proves to the provider that
+# the code is being spent by Postulo, and PKCE adds that it is spent by the sign-in that asked
+# for it, so a code caught on the way, in a log or a Referer, opens nothing. On unless the
+# operator turns it off, for a provider that refuses a `code_challenge`.
+POSTULO_OIDC_PKCE = read("POSTULO_OIDC_PKCE")
 
 SOCIALACCOUNT_PROVIDERS = (
     {
@@ -388,7 +394,10 @@ SOCIALACCOUNT_PROVIDERS = (
                     "name": POSTULO_OIDC_NAME,
                     "client_id": POSTULO_OIDC_CLIENT_ID,
                     "secret": POSTULO_OIDC_CLIENT_SECRET,
-                    "settings": {"server_url": POSTULO_OIDC_SERVER_URL},
+                    "settings": {
+                        "server_url": POSTULO_OIDC_SERVER_URL,
+                        "oauth_pkce_enabled": POSTULO_OIDC_PKCE,
+                    },
                 }
             ]
         }

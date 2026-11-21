@@ -133,19 +133,28 @@ class Format:
 #: Every format, in the order a page should offer them.
 REGISTRY: dict[str, Format] = {}
 
+#: The keys of Postulo's own formats, which nobody else may register (#1255). Said here and
+#: not read from the registry, because a plugin is imported -- and may register -- before the
+#: documents app is ready and has registered Postulo's.
+OWN_KEYS = frozenset({"txt", "odt", "docx", "europass", "json-resume"})
+
 
 def register(offered: Format) -> bool:
     """Offer a format. Returns whether it was taken.
 
     A key already in use is refused rather than overridden, as a kind's is and a theme's
     is: a plugin able to replace `docx` could change what every Word file Postulo hands
-    over contains, without anybody having chosen that.
+    over contains, without anybody having chosen that. Postulo's own keys are refused even
+    before Postulo has registered them, which is the moment a plugin is imported (#1255).
     """
     if not offered.key or not offered.extension:
         logger.warning("A document format with no key or no extension was ignored")
         return False
     if offered.key in REGISTRY:
         logger.warning("Document format %r was offered twice; the first one keeps it", offered.key)
+        return False
+    if offered.key in OWN_KEYS:
+        logger.warning("Document format %r is one of Postulo's own and was refused", offered.key)
         return False
     REGISTRY[offered.key] = offered
     return True
@@ -204,7 +213,8 @@ def register_the_ones_postulo_has() -> None:
 
     Called from `DocumentsConfig.ready`, and idempotent, for the reason
     `kinds.register_the_ones_postulo_has` gives: a registry filled at import time is empty
-    in whichever test imported the module first.
+    in whichever test imported the module first. That is after every installed plugin was
+    imported, so Postulo's are put first, before whatever the plugins brought (#1255).
     """
     from postulo.plugins.europass import writer as europass
 
@@ -260,6 +270,9 @@ def register_the_ones_postulo_has() -> None:
             leaves_out=jsonresume.leaves_out,
         ),
     )
+    brought = [one for one in REGISTRY.values() if one.key not in OWN_KEYS]
+    REGISTRY.clear()
     for one in described:
-        if one.key not in REGISTRY:
-            register(one)
+        REGISTRY[one.key] = one
+    for one in brought:
+        REGISTRY[one.key] = one

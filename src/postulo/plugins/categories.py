@@ -25,6 +25,8 @@ LABELS: dict[str, str] = {
     "companies": _("Companies"),
     "accounts": _("Accounts"),
     "capture": _("Capture"),
+    #: Themes a CV, a letter or a report is drawn in, and formats it can leave as (#1255).
+    "documents": _("Documents"),
 }
 
 

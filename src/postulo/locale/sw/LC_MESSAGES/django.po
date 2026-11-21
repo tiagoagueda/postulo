@@ -1898,9 +1898,8 @@ msgid "<em>Headline</em> is a short professional title, such as “Backend engin
 msgstr "<em> Headline</em> ni jina fupi la kitaalamu, kama vile “mhandisi wa nyuma.” CV ambayo ina kichwa cha magazeti yake mwenyewe ambayo badala yake."
 
 #: src/postulo/templates/help/career.html
-#, fuzzy
-msgid "<em>Import</em> reads a Europass CV; <em>Export</em> writes your details and your career as one file you can keep or move to another Postulo; <em>Preview</em> shows the whole record as a document, and <em>Your CVs</em> opens the variants made from it."
-msgstr "<em>Ingiza</em> husoma CV ya Europass; <em>Hamisha</em> huandika maelezo yako na taaluma yako kama faili moja unaloweza kuhifadhi au kuhamishia Postulo nyingine; <em>Onyesho la awali</em> huonyesha rekodi nzima kama hati, na <em>CV zako</em> hufungua matoleo yaliyotengenezwa kutoka kwayo."
+msgid "<em>Import</em> reads a CV you have as a file; <em>Export</em> writes your details and your career as one file you can keep or move to another Postulo; <em>Preview</em> shows the whole record as a document, and <em>Your CVs</em> opens the variants made from it."
+msgstr ""
 
 #: src/postulo/templates/help/identifiers.html
 #, fuzzy
@@ -2395,7 +2394,7 @@ msgstr "Barua kutoka kwa nyaraka zako"
 msgid "A file goes under Files first; an entry points at it rather than keeping a copy."
 msgstr "Faili inakwenda chini ya Files kwanza; pointi za kuingia ndani badala ya kuweka nakala."
 
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 #, fuzzy
 msgid "A file that Postulo itself wrote is read on a page of its own."
 msgstr "Faili ambayo Postulo yenyewe aliandika inasoma kwenye ukurasa wake mwenyewe."
@@ -3464,7 +3463,7 @@ msgstr "Ongeza ujuzi"
 msgid "Add a tag"
 msgstr "Ongeza kwenye tag"
 
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 #, fuzzy
 msgid "Add all of this"
 msgstr "Ongeza hii yote"
@@ -4117,7 +4116,7 @@ msgstr "Icon ya kifungo"
 msgid "An identifier"
 msgstr "Utambulisho wa"
 
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 #, fuzzy
 msgid "An import only ever adds. Nothing already in your career record is changed or removed, and anything that turns out to be a duplicate is yours to delete."
 msgstr "Ni muhimu kuongeza tu. Hakuna kitu tayari katika rekodi yako ya kazi kimebadilika au kuondolewa, na chochote kinachogeuka kuwa duplicate ni yako kufuta."
@@ -5835,7 +5834,8 @@ msgstr "Vyeti vya Vyeti"
 
 #: src/postulo/documents/rendering.py src/postulo/jobs/merging.py
 #: src/postulo/resume/candidate.py src/postulo/resume/registry.py
-#: src/postulo/resume/views_candidate.py
+#: src/postulo/resume/views.py src/postulo/resume/views_candidate.py
+#: src/postulo/templates/resume/import.html
 #: src/postulo/templates/resume/preview.html
 #, fuzzy
 msgid "Certifications"
@@ -6051,14 +6051,10 @@ msgstr "Chagua nchi kutoka kwenye orodha."
 msgid "Choose a destination and save it first."
 msgstr ""
 
-#: src/postulo/resume/views.py
-#, fuzzy
-msgid "Choose a Europass file first."
-msgstr "Chagua faili ya kwanza ya Ulaya."
-
 #: src/postulo/applications/views_ical.py src/postulo/core/views_kind_files.py
 #: src/postulo/jobs/vcard_views.py src/postulo/jobs/views.py
-#: src/postulo/resume/views_candidate.py src/postulo/resume/views_references.py
+#: src/postulo/resume/views.py src/postulo/resume/views_candidate.py
+#: src/postulo/resume/views_references.py
 #, fuzzy
 msgid "Choose a file first."
 msgstr "Chagua faili ya kwanza."
@@ -6187,10 +6183,9 @@ msgstr "Chagua tarehe ya kuzaliwa kutoka kalenda"
 msgid "Choose the destination"
 msgstr ""
 
-#: src/postulo/templates/resume/europass_import.html
-#, fuzzy
-msgid "Choose the PDF you downloaded from europass.europa.eu, as it is: the CV is attached inside it, and that is what Postulo reads. Older Europass files read too: the XML and PDF of the editor before 2020, and the JSON of its web service. Postulo works out which it is, shows you what is in it, and writes nothing until you say so."
-msgstr "Chagua PDF iliyopakuliwa kutoka europass.europa.eu, kama ilivyo: CV imefungwa ndani yake, na hiyo ndio Postulo inasoma. Faili za zamani za Europas zinasoma pia: XML na PDF ya mhariri kabla ya 2020, na JSON ya huduma yake ya wavuti. Postulo kazi nje ambayo ni, inaonyesha nini ndani yake, na kuandika chochote mpaka kusema hivyo."
+#: src/postulo/templates/resume/import.html
+msgid "Choose the file as you downloaded it. Postulo works out which format it is, shows you what is in it, and writes nothing until you say so."
+msgstr ""
 
 #: src/postulo/accounts/forms.py src/postulo/jobs/forms.py
 #, fuzzy
@@ -6955,7 +6950,8 @@ msgstr "Mafunzo ya"
 
 #: src/postulo/documents/rendering.py src/postulo/jobs/merging.py
 #: src/postulo/resume/candidate.py src/postulo/resume/registry.py
-#: src/postulo/resume/views_candidate.py
+#: src/postulo/resume/views.py src/postulo/resume/views_candidate.py
+#: src/postulo/templates/resume/import.html
 #: src/postulo/templates/resume/preview.html
 #, fuzzy
 msgid "Courses"
@@ -7801,7 +7797,7 @@ msgid "document themes"
 msgstr ""
 
 #: src/postulo/core/help.py src/postulo/core/navigation.py
-#: src/postulo/documents/apps.py
+#: src/postulo/documents/apps.py src/postulo/plugins/categories.py
 #: src/postulo/templates/applications/application_detail.html
 #: src/postulo/templates/base.html
 #: src/postulo/templates/cotton/documents_nav.html
@@ -8084,7 +8080,7 @@ msgstr "Biashara ya E-commerce"
 msgid "Each invitation may be used once, and expires on its own. Its link is shown once, when it is made."
 msgstr "Kila mwaliko unaweza kutumika mara moja, na unamalizika peke yake. Kiungo chake kinaonyeshwa mara moja, wakati kinafanywa."
 
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 #, fuzzy
 msgid "Each is added as one of your contacts and as a reference you have not asked yet, so none is printed on a CV until you say they agreed."
 msgstr "Kila moja inaongezwa kama moja ya anwani zako na kama kumbukumbu ambayo haujauliza bado, kwa hivyo hakuna mtu anayechapishwa kwenye CV hadi utakaposema walikubaliana."
@@ -8215,7 +8211,7 @@ msgstr "wahariri wa wahariri"
 #: src/postulo/documents/rendering.py src/postulo/jobs/industries.py
 #: src/postulo/resume/candidate.py src/postulo/resume/registry.py
 #: src/postulo/resume/views_candidate.py
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 #: src/postulo/templates/resume/preview.html
 #, fuzzy
 msgid "Education"
@@ -8472,11 +8468,7 @@ msgstr "Ujuzi wa ESCO"
 msgid "Europass"
 msgstr ""
 
-#: src/postulo/core/transfers.py
-msgid "Europass import"
-msgstr ""
-
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 #, fuzzy
 msgid "Europass records five levels per language and Postulo keeps one, so the lowest is taken. Where the file states none, none is written: a level is a claim about yourself that somebody will test, so it is yours to make afterwards."
 msgstr "Europas inarekodi viwango vitano kwa kila lugha na Postulo inashikilia moja, kwa hivyo chini inachukuliwa. Ambapo faili inasema hakuna, hakuna imeandikwa: ngazi ni madai kuhusu wewe kwamba mtu atajaribu, hivyo ni yako kufanya baadaye."
@@ -8763,7 +8755,7 @@ msgstr "Kuondolewa kwa kuondolewa"
 
 #: src/postulo/documents/rendering.py src/postulo/resume/candidate.py
 #: src/postulo/resume/registry.py src/postulo/resume/views_candidate.py
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 #: src/postulo/templates/resume/preview.html
 #, fuzzy
 msgid "Experience"
@@ -9506,7 +9498,7 @@ msgstr "Imetolewa kupitia"
 msgid "found via"
 msgstr "kwa njia ya"
 
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 #, fuzzy, python-format
 msgid "Found: %(names)s. Only the ones you have left blank will be filled in."
 msgstr "Vimepatikana: %(names)s. Ni vile tu ulivyoviacha wazi vitakavyojazwa."
@@ -10222,7 +10214,8 @@ msgstr "Heshima au tuzo"
 
 #: src/postulo/documents/rendering.py src/postulo/jobs/merging.py
 #: src/postulo/resume/candidate.py src/postulo/resume/registry.py
-#: src/postulo/resume/views_candidate.py
+#: src/postulo/resume/views.py src/postulo/resume/views_candidate.py
+#: src/postulo/templates/resume/import.html
 #: src/postulo/templates/resume/preview.html
 #, fuzzy
 msgid "Honours and awards"
@@ -10306,6 +10299,10 @@ msgstr "Jinsi ya kufikia mwajiri"
 #, fuzzy
 msgid "how it reaches the employer"
 msgstr "jinsi ya kufikia mwajiri"
+
+#: src/postulo/templates/resume/import.html
+msgid "How it was read"
+msgstr ""
 
 #: src/postulo/applications/widgets.py
 #, fuzzy
@@ -10597,10 +10594,9 @@ msgstr "Ikiwa hii ni barua ya kumbukumbu"
 msgid "If you are reading this, the email settings of your Postulo instance work. Nothing else to do."
 msgstr "Ikiwa unasoma hii, mipangilio ya barua pepe ya kazi yako ya Postulo. Hakuna kingine cha kufanya."
 
-#: src/postulo/templates/resume/europass_import.html
-#, fuzzy
-msgid "If you have applied to an EU institution or through a national employment service, you already have this file. Rather than type it all again, hand it over."
-msgstr "Ikiwa umeomba kwa taasisi ya EU au kupitia huduma ya kitaifa ya ajira, tayari una faili hii. Badala ya kurudia kila kitu, rudia tena."
+#: src/postulo/templates/resume/import.html
+msgid "If your career is already written down in a file, hand it over rather than type it all again."
+msgstr ""
 
 #: src/postulo/core/models.py
 #, fuzzy
@@ -10626,10 +10622,9 @@ msgid "Import"
 msgstr "Uwekezaji wa"
 
 #: src/postulo/resume/views.py src/postulo/templates/resume/candidate_file.html
-#: src/postulo/templates/resume/europass_import.html
-#, fuzzy
-msgid "Import a Europass CV"
-msgstr "Uwasilishaji wa Europass CV"
+#: src/postulo/templates/resume/import.html
+msgid "Import a CV"
+msgstr ""
 
 #: src/postulo/templates/applications/ical_import.html
 #, fuzzy
@@ -11920,7 +11915,7 @@ msgstr "lugha ya rekodi yako ya kazi"
 #: src/postulo/documents/rendering.py src/postulo/resume/candidate.py
 #: src/postulo/resume/registry.py src/postulo/resume/views.py
 #: src/postulo/resume/views_candidate.py
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 #: src/postulo/templates/resume/preview.html
 #, fuzzy
 msgid "Languages"
@@ -12991,7 +12986,7 @@ msgstr "Mashirika ya"
 #: src/postulo/documents/rendering.py src/postulo/jobs/merging.py
 #: src/postulo/resume/candidate.py src/postulo/resume/registry.py
 #: src/postulo/resume/views.py src/postulo/resume/views_candidate.py
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 #: src/postulo/templates/resume/preview.html
 #, fuzzy
 msgid "Memberships"
@@ -15073,6 +15068,14 @@ msgstr "Hakuna chochote kilichotumwa hadi sasa."
 msgid "Nothing standing at Offer. Record one from an application's page when it arrives."
 msgstr "Hakuna chochote cha kutoa. Rekodi moja kutoka ukurasa wa maombi wakati wa kuwasili."
 
+#: src/postulo/resume/views.py
+msgid "Nothing that reads a CV from a file is switched on here, so that file was not read."
+msgstr ""
+
+#: src/postulo/templates/resume/import.html
+msgid "Nothing that reads a CV from a file is switched on here, so there is no file to choose."
+msgstr ""
+
 #: src/postulo/core/design.py src/postulo/templates/server/design.html
 #, fuzzy
 msgid "Nothing there"
@@ -16220,6 +16223,10 @@ msgstr "Pronouns nyingine"
 msgid "Other services"
 msgstr ""
 
+#: src/postulo/documents/themes.py
+msgid "Other themes"
+msgstr ""
+
 #: src/postulo/accounts/forms.py
 #, fuzzy
 msgid "Other time zones"
@@ -16672,7 +16679,7 @@ msgstr "mtu binafsi"
 
 #: src/postulo/accounts/views.py src/postulo/core/help.py
 #: src/postulo/templates/accounts/profile.html
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 #, fuzzy
 msgid "Personal details"
 msgstr "Maelezo ya kibinafsi"
@@ -17350,7 +17357,7 @@ msgstr "kwa sasa"
 #: src/postulo/documents/rendering.py src/postulo/resume/candidate.py
 #: src/postulo/resume/registry.py src/postulo/resume/views.py
 #: src/postulo/resume/views_candidate.py
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 #: src/postulo/templates/resume/preview.html
 #, fuzzy
 msgid "Presentations, conferences and seminars"
@@ -17624,7 +17631,7 @@ msgstr "Mradi wa Mradi"
 
 #: src/postulo/documents/rendering.py src/postulo/resume/candidate.py
 #: src/postulo/resume/registry.py src/postulo/resume/views_candidate.py
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 #: src/postulo/templates/resume/preview.html
 #, fuzzy
 msgid "Projects"
@@ -17706,7 +17713,9 @@ msgid "Publication"
 msgstr "Publication ya"
 
 #: src/postulo/documents/rendering.py src/postulo/resume/candidate.py
-#: src/postulo/resume/registry.py src/postulo/resume/views_candidate.py
+#: src/postulo/resume/registry.py src/postulo/resume/views.py
+#: src/postulo/resume/views_candidate.py
+#: src/postulo/templates/resume/import.html
 #: src/postulo/templates/resume/preview.html
 #, fuzzy
 msgid "Publications"
@@ -17920,21 +17929,6 @@ msgstr "Kusoma kama"
 msgid "Read as %(name)s."
 msgstr ""
 
-#: src/postulo/resume/views.py
-#, fuzzy
-msgid "Read as Europass JSON, the older format as the Europass web service wrote it until 2020."
-msgstr "Soma kama Europass JSON, muundo wa zamani kama huduma ya wavuti ya Europass iliandika hadi 2020."
-
-#: src/postulo/resume/views.py
-#, fuzzy
-msgid "Read as Europass XML in the older format, the one the Europass editor wrote until 2020."
-msgstr "Soma kama Europas XML katika muundo wa zamani, ambayo mhariri wa Europas aliandika hadi 2020."
-
-#: src/postulo/resume/views.py
-#, fuzzy
-msgid "Read as Europass XML, the format europass.europa.eu has written since 2020."
-msgstr "Soma kama Europass XML, muundo wa europass.europa.eu umeandikwa tangu 2020."
-
 #: src/postulo/jobs/models.py
 #, fuzzy
 msgid "read by"
@@ -17966,18 +17960,8 @@ msgstr "Kusoma kutoka kwa"
 msgid "Read from <bdi>%(address)s</bdi>."
 msgstr ""
 
-#: src/postulo/resume/views.py
-#, fuzzy
-msgid "Read from the Europass XML attached to the PDF, in the older format the Europass editor wrote until 2020."
-msgstr "Soma kutoka kwa Europass XML iliyounganishwa na PDF, katika muundo wa zamani mhariri wa Europass aliandika hadi 2020."
-
-#: src/postulo/resume/views.py
-#, fuzzy
-msgid "Read from the Europass XML attached to the PDF, the format europass.europa.eu has written since 2020."
-msgstr "Soma kutoka kwa Europass XML iliyounganishwa na PDF, europass.europa.eu imeandikwa tangu 2020."
-
 #: src/postulo/templates/jobs/company_places.html
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 #: src/postulo/templates/resume/references.html
 #: src/postulo/templates/server/plugins.html
 #, fuzzy
@@ -18337,8 +18321,7 @@ msgid "Reference letters they wrote"
 msgstr "Barua ambazo waliandika"
 
 #: src/postulo/documents/rendering.py src/postulo/resume/registry.py
-#: src/postulo/resume/views.py
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/resume/views.py src/postulo/templates/resume/import.html
 #, fuzzy
 msgid "References"
 msgstr "Marejeo ya"
@@ -20247,7 +20230,7 @@ msgstr "vikundi vya ujuzi"
 #: src/postulo/resume/registry.py src/postulo/resume/views.py
 #: src/postulo/resume/views_candidate.py
 #: src/postulo/templates/cotton/listing_skills.html
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 #: src/postulo/templates/resume/preview.html
 #, fuzzy
 msgid "Skills"
@@ -20574,7 +20557,7 @@ msgstr ""
 #: src/postulo/templates/core/kind_file.html
 #: src/postulo/templates/jobs/contact_vcards.html
 #: src/postulo/templates/resume/candidate_file.html
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 #, fuzzy
 msgid "Start again"
 msgstr "Kuanza tena"
@@ -20852,6 +20835,10 @@ msgstr ""
 #, fuzzy
 msgid "suggested by"
 msgstr "kwa mujibu wa"
+
+#: src/postulo/documents/themes.py
+msgid "Suggested for this document"
+msgstr ""
 
 #: src/postulo/applications/models.py
 #, fuzzy
@@ -22725,7 +22712,7 @@ msgstr "Kama walivyowahi kuandika kabla ya kustaafu."
 #: src/postulo/templates/documents/upload_detail.html
 #: src/postulo/templates/jobs/contact_vcards.html
 #: src/postulo/templates/resume/candidate_file.html
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 #, fuzzy
 msgid "The file"
 msgstr "Faili ya"
@@ -23568,7 +23555,7 @@ msgstr "Ombi ni kubwa kuliko %(limit)s, ambacho ndicho kiwango cha juu kabisa am
 msgid "The request was not in the shape this call takes."
 msgstr "Ombi hilo halikuwa katika hali ambayo wito huo ulichukuliwa."
 
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 #, fuzzy
 msgid "The rest of the file is still worth importing. What is listed here is not, and you can add it by hand afterwards."
 msgstr "Sehemu nyingine ya faili bado ni thamani ya kuagiza. Kile kilichoorodheshwa hapa sio, na unaweza kuongeza kwa mkono baadaye."
@@ -26114,6 +26101,10 @@ msgstr "Nini kimefanyika katika kipindi hiki"
 msgid "what came of it"
 msgstr "nini kilichokuja kutoka kwake"
 
+#: src/postulo/templates/resume/import.html
+msgid "What can be read here"
+msgstr ""
+
 #: src/postulo/core/server_forms.py
 #, fuzzy
 msgid "What carries the mail off this machine."
@@ -26139,7 +26130,7 @@ msgstr "Kilichobadilika katika %(title)s"
 msgid "What changes how Postulo behaves for you. Everything here works from the keyboard, with a screen reader and with scripts off; these are the choices on top of that."
 msgstr "Jinsi ya kubadilisha password yako. Kila kitu hapa kazi kutoka keyboard, na msomaji screen na scripts mbali; hizi ni uchaguzi juu ya kwamba."
 
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 #, fuzzy
 msgid "What could not be read"
 msgstr "Nini haiwezi kusomwa"
@@ -26212,7 +26203,7 @@ msgstr "Nini ni katika diary, mapema zaidi. Chagua moja kutoka ukurasa wa maombi
 #: src/postulo/templates/applications/ical_import.html
 #: src/postulo/templates/core/kind_file.html
 #: src/postulo/templates/resume/candidate_file.html
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 #, fuzzy
 msgid "What is in the file"
 msgstr "Nini kwenye faili"
@@ -26817,6 +26808,10 @@ msgstr "Ambapo mtu anaweza kuona. CV inaonyesha kama kiungo."
 
 #: src/postulo/templates/server/maps.html
 msgid "Where the companies' map takes the tiles it is drawn on, and whether addresses are pinned at their street."
+msgstr ""
+
+#: src/postulo/templates/resume/import.html
+msgid "Where the file states no level, none is written: a level is a claim about yourself that somebody will test, so it is yours to make afterwards."
 msgstr ""
 
 #: src/postulo/jobs/models.py
@@ -27527,7 +27522,7 @@ msgstr "Imeandikwa na <bdi>%(name)s</bdi>"
 msgid "Written by Postulo %(version)s on %(when)s."
 msgstr "Imeandikwa na Postulo %(version)s juu ya %(when)s."
 
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 #, fuzzy, python-format
 msgid "Written in %(tongue)s, which will be recorded as the language of your career record if you have not already set one."
 msgstr "Imeandikwa kwa %(tongue)s, ambayo itarekodiwa kama lugha ya rekodi yako ya taaluma ikiwa bado hujaiweka."
@@ -28222,7 +28217,7 @@ msgstr "Taarifa yako (JSON)"
 
 #: src/postulo/templates/core/export.html
 #: src/postulo/templates/resume/candidate_file.html
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 #, fuzzy
 msgid "Your record as a file"
 msgstr "Rekodi yako kama faili"
@@ -28371,10 +28366,14 @@ msgstr "{value} huja baada ya seva: kwenye njia, baada ya alama ya kuuliza au ba
 msgid "· in the <a href=\"%(group_url)s\" class=\"underline\">%(name)s</a> group"
 msgstr "· katika kikundi cha <a href=\"%(group_url)s\" class=\"underline\">%(name)s</a>"
 
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 #, fuzzy
 msgid "· no level in the file, so none will be claimed"
 msgstr "• hakuna kiwango katika faili, hivyo hakuna mtu atakayedai"
+
+#: src/postulo/templates/resume/import.html
+msgid "· not a level Postulo keeps, so none will be claimed"
+msgstr ""
 
 #: src/postulo/templates/applications/application_detail.html
 #, fuzzy, python-format

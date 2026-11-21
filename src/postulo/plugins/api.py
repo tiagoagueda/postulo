@@ -876,6 +876,9 @@ def __getattr__(name: str):
         # kinds it can set by having a template for each. The templates live in a
         # `templates/` directory beside the package and go on Django's search path when the
         # plugin is registered -- which is the only way markup reaches the renderer (#132).
+        # A theme may say the languages (BCP 47) and countries (ISO 3166-1) it is made for,
+        # in `languages` and `countries`; the picker then lists it first for such a document
+        # and hides nothing (#1255).
         from postulo.documents import themes
 
         return themes.Kind if name == "ThemeKind" else themes.Theme

@@ -78,9 +78,7 @@
         <div class="field w-auto">
           <label for="export-theme">{% translate "Theme" %}</label>
           <select name="theme" id="export-theme">
-            {% for value, label in theme_choices %}
-              <option value="{{ value }}" {% if value == chosen_theme %}selected{% endif %}>{{ label }}</option>
-            {% endfor %}
+            <c-theme-options :groups="theme_groups" :chosen="chosen_theme" />
           </select>
         </div>
         <div class="field w-auto">

@@ -1778,8 +1778,8 @@ msgid "<em>Headline</em> is a short professional title, such as “Backend engin
 msgstr "<em>头衔</em>是简短的职业称号，例如“后端工程师”。如果某份简历有自己的头衔，则打印该简历的头衔。"
 
 #: src/postulo/templates/help/career.html
-msgid "<em>Import</em> reads a Europass CV; <em>Export</em> writes your details and your career as one file you can keep or move to another Postulo; <em>Preview</em> shows the whole record as a document, and <em>Your CVs</em> opens the variants made from it."
-msgstr "<em>导入</em>读取 Europass 简历；<em>导出</em>将你的资料和职业经历写入一个文件，你可以保存它或将其移至另一个 Postulo；<em>预览</em>将整个记录显示为文档，<em>你的简历</em>则打开基于它制作的各个版本。"
+msgid "<em>Import</em> reads a CV you have as a file; <em>Export</em> writes your details and your career as one file you can keep or move to another Postulo; <em>Preview</em> shows the whole record as a document, and <em>Your CVs</em> opens the variants made from it."
+msgstr ""
 
 #: src/postulo/templates/help/identifiers.html
 #, fuzzy
@@ -2202,7 +2202,7 @@ msgstr "你的文档中的文件"
 msgid "A file goes under Files first; an entry points at it rather than keeping a copy."
 msgstr "文件需先放在“文件”下；条目只指向它，而不保留副本。"
 
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 msgid "A file that Postulo itself wrote is read on a page of its own."
 msgstr "Postulo 自己写出的文件会在单独的页面上读取。"
 
@@ -3107,7 +3107,7 @@ msgstr "添加技能"
 msgid "Add a tag"
 msgstr "添加标签"
 
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 msgid "Add all of this"
 msgstr "全部添加"
 
@@ -3674,7 +3674,7 @@ msgstr "图标按钮"
 msgid "An identifier"
 msgstr "标识符"
 
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 msgid "An import only ever adds. Nothing already in your career record is changed or removed, and anything that turns out to be a duplicate is yours to delete."
 msgstr "导入只会新增内容。你职业记录中已有的内容都不会被更改或删除，结果重复的内容需要你自行删除。"
 
@@ -5172,7 +5172,8 @@ msgstr "认证"
 
 #: src/postulo/documents/rendering.py src/postulo/jobs/merging.py
 #: src/postulo/resume/candidate.py src/postulo/resume/registry.py
-#: src/postulo/resume/views_candidate.py
+#: src/postulo/resume/views.py src/postulo/resume/views_candidate.py
+#: src/postulo/templates/resume/import.html
 #: src/postulo/templates/resume/preview.html
 msgid "Certifications"
 msgstr "认证"
@@ -5360,13 +5361,10 @@ msgstr "请从列表中选择一个国家。"
 msgid "Choose a destination and save it first."
 msgstr "请先选择一个目标并保存。"
 
-#: src/postulo/resume/views.py
-msgid "Choose a Europass file first."
-msgstr "请先选择 Europass 文件。"
-
 #: src/postulo/applications/views_ical.py src/postulo/core/views_kind_files.py
 #: src/postulo/jobs/vcard_views.py src/postulo/jobs/views.py
-#: src/postulo/resume/views_candidate.py src/postulo/resume/views_references.py
+#: src/postulo/resume/views.py src/postulo/resume/views_candidate.py
+#: src/postulo/resume/views_references.py
 msgid "Choose a file first."
 msgstr "请先选择文件。"
 
@@ -5475,9 +5473,9 @@ msgstr "从日历中选择出生日期"
 msgid "Choose the destination"
 msgstr "选择目标"
 
-#: src/postulo/templates/resume/europass_import.html
-msgid "Choose the PDF you downloaded from europass.europa.eu, as it is: the CV is attached inside it, and that is what Postulo reads. Older Europass files read too: the XML and PDF of the editor before 2020, and the JSON of its web service. Postulo works out which it is, shows you what is in it, and writes nothing until you say so."
-msgstr "选择你从 europass.europa.eu 下载的 PDF，保持原样即可：简历附在其中，Postulo 读取的就是它。旧版 Europass 文件也能读取：2020 年之前编辑器生成的 XML 和 PDF，以及其网络服务生成的 JSON。Postulo 会判断文件类型，向你显示其中的内容，在你确认之前不会写入任何内容。"
+#: src/postulo/templates/resume/import.html
+msgid "Choose the file as you downloaded it. Postulo works out which format it is, shows you what is in it, and writes nothing until you say so."
+msgstr ""
 
 #: src/postulo/accounts/forms.py src/postulo/jobs/forms.py
 msgid "Choose the type of identifier."
@@ -6128,7 +6126,8 @@ msgstr "课程"
 
 #: src/postulo/documents/rendering.py src/postulo/jobs/merging.py
 #: src/postulo/resume/candidate.py src/postulo/resume/registry.py
-#: src/postulo/resume/views_candidate.py
+#: src/postulo/resume/views.py src/postulo/resume/views_candidate.py
+#: src/postulo/templates/resume/import.html
 #: src/postulo/templates/resume/preview.html
 msgid "Courses"
 msgstr "课程"
@@ -6884,7 +6883,7 @@ msgid "document themes"
 msgstr "文档主题"
 
 #: src/postulo/core/help.py src/postulo/core/navigation.py
-#: src/postulo/documents/apps.py
+#: src/postulo/documents/apps.py src/postulo/plugins/categories.py
 #: src/postulo/templates/applications/application_detail.html
 #: src/postulo/templates/base.html
 #: src/postulo/templates/cotton/documents_nav.html
@@ -7126,7 +7125,7 @@ msgstr "电子商务"
 msgid "Each invitation may be used once, and expires on its own. Its link is shown once, when it is made."
 msgstr "每份邀请只能使用一次，并会自动过期。其链接只在创建时显示一次。"
 
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 msgid "Each is added as one of your contacts and as a reference you have not asked yet, so none is printed on a CV until you say they agreed."
 msgstr "每个人都会添加为你的联系人，以及一位你尚未征询的推荐人，因此在你确认他们同意之前，简历上不会打印任何人。"
 
@@ -7240,7 +7239,7 @@ msgstr "编者"
 #: src/postulo/documents/rendering.py src/postulo/jobs/industries.py
 #: src/postulo/resume/candidate.py src/postulo/resume/registry.py
 #: src/postulo/resume/views_candidate.py
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 #: src/postulo/templates/resume/preview.html
 msgid "Education"
 msgstr "教育"
@@ -7457,11 +7456,7 @@ msgstr "ESCO 技能"
 msgid "Europass"
 msgstr "Europass"
 
-#: src/postulo/core/transfers.py
-msgid "Europass import"
-msgstr "Europass 导入"
-
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 msgid "Europass records five levels per language and Postulo keeps one, so the lowest is taken. Where the file states none, none is written: a level is a claim about yourself that somebody will test, so it is yours to make afterwards."
 msgstr "Europass 为每种语言记录五项等级，而 Postulo 只保存一项，因此取其中最低的。文件中没有给出等级时，就不写入：等级是关于你自己的一项声明，会有人去检验，所以应由你之后自己填写。"
 
@@ -7705,7 +7700,7 @@ msgstr "排除已解散的"
 
 #: src/postulo/documents/rendering.py src/postulo/resume/candidate.py
 #: src/postulo/resume/registry.py src/postulo/resume/views_candidate.py
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 #: src/postulo/templates/resume/preview.html
 msgid "Experience"
 msgstr "经历"
@@ -8359,7 +8354,7 @@ msgstr "发现渠道"
 msgid "found via"
 msgstr "发现渠道"
 
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 #, python-format
 msgid "Found: %(names)s. Only the ones you have left blank will be filled in."
 msgstr "找到：%(names)s。只会填写你留空的字段。"
@@ -8982,7 +8977,8 @@ msgstr "荣誉或奖励"
 
 #: src/postulo/documents/rendering.py src/postulo/jobs/merging.py
 #: src/postulo/resume/candidate.py src/postulo/resume/registry.py
-#: src/postulo/resume/views_candidate.py
+#: src/postulo/resume/views.py src/postulo/resume/views_candidate.py
+#: src/postulo/templates/resume/import.html
 #: src/postulo/templates/resume/preview.html
 msgid "Honours and awards"
 msgstr "荣誉和奖项"
@@ -9054,6 +9050,10 @@ msgstr "送达雇主的方式"
 #: src/postulo/documents/models.py
 msgid "how it reaches the employer"
 msgstr "送达雇主的方式"
+
+#: src/postulo/templates/resume/import.html
+msgid "How it was read"
+msgstr ""
 
 #: src/postulo/applications/widgets.py
 msgid "How long they take"
@@ -9295,9 +9295,9 @@ msgstr "如果这是推荐信"
 msgid "If you are reading this, the email settings of your Postulo instance work. Nothing else to do."
 msgstr "如果你看到这封邮件，说明你的 Postulo 实例的电子邮件设置正常。无需其他操作。"
 
-#: src/postulo/templates/resume/europass_import.html
-msgid "If you have applied to an EU institution or through a national employment service, you already have this file. Rather than type it all again, hand it over."
-msgstr "如果你曾向欧盟机构或通过国家就业服务机构提交过申请，你已经有这个文件了。与其全部重新输入，不如直接导入。"
+#: src/postulo/templates/resume/import.html
+msgid "If your career is already written down in a file, hand it over rather than type it all again."
+msgstr ""
 
 #: src/postulo/core/models.py
 msgid "ignore robots.txt when capturing"
@@ -9319,9 +9319,9 @@ msgid "Import"
 msgstr "导入"
 
 #: src/postulo/resume/views.py src/postulo/templates/resume/candidate_file.html
-#: src/postulo/templates/resume/europass_import.html
-msgid "Import a Europass CV"
-msgstr "导入 Europass 简历"
+#: src/postulo/templates/resume/import.html
+msgid "Import a CV"
+msgstr ""
 
 #: src/postulo/templates/applications/ical_import.html
 msgid "Import an iCalendar file"
@@ -10440,7 +10440,7 @@ msgstr "你的职业记录的语言"
 #: src/postulo/documents/rendering.py src/postulo/resume/candidate.py
 #: src/postulo/resume/registry.py src/postulo/resume/views.py
 #: src/postulo/resume/views_candidate.py
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 #: src/postulo/templates/resume/preview.html
 msgid "Languages"
 msgstr "语言"
@@ -11359,7 +11359,7 @@ msgstr "会员制组织"
 #: src/postulo/documents/rendering.py src/postulo/jobs/merging.py
 #: src/postulo/resume/candidate.py src/postulo/resume/registry.py
 #: src/postulo/resume/views.py src/postulo/resume/views_candidate.py
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 #: src/postulo/templates/resume/preview.html
 msgid "Memberships"
 msgstr "会员资格"
@@ -13153,6 +13153,14 @@ msgstr "还没有发送任何内容。"
 msgid "Nothing standing at Offer. Record one from an application's page when it arrives."
 msgstr "没有处于“录用通知”阶段的申请。收到录用通知时，请在对应申请的页面上记录。"
 
+#: src/postulo/resume/views.py
+msgid "Nothing that reads a CV from a file is switched on here, so that file was not read."
+msgstr ""
+
+#: src/postulo/templates/resume/import.html
+msgid "Nothing that reads a CV from a file is switched on here, so there is no file to choose."
+msgstr ""
+
 #: src/postulo/core/design.py src/postulo/templates/server/design.html
 msgid "Nothing there"
 msgstr "那里没有内容"
@@ -14136,6 +14144,10 @@ msgstr "其他代词"
 msgid "Other services"
 msgstr "其他服务"
 
+#: src/postulo/documents/themes.py
+msgid "Other themes"
+msgstr ""
+
 #: src/postulo/accounts/forms.py
 msgid "Other time zones"
 msgstr "其他时区"
@@ -14530,7 +14542,7 @@ msgstr "人员"
 
 #: src/postulo/accounts/views.py src/postulo/core/help.py
 #: src/postulo/templates/accounts/profile.html
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 msgid "Personal details"
 msgstr "个人资料"
 
@@ -15115,7 +15127,7 @@ msgstr "至今"
 #: src/postulo/documents/rendering.py src/postulo/resume/candidate.py
 #: src/postulo/resume/registry.py src/postulo/resume/views.py
 #: src/postulo/resume/views_candidate.py
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 #: src/postulo/templates/resume/preview.html
 msgid "Presentations, conferences and seminars"
 msgstr "演讲、会议和研讨会"
@@ -15349,7 +15361,7 @@ msgstr "项目"
 
 #: src/postulo/documents/rendering.py src/postulo/resume/candidate.py
 #: src/postulo/resume/registry.py src/postulo/resume/views_candidate.py
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 #: src/postulo/templates/resume/preview.html
 msgid "Projects"
 msgstr "项目"
@@ -15415,7 +15427,9 @@ msgid "Publication"
 msgstr "出版物"
 
 #: src/postulo/documents/rendering.py src/postulo/resume/candidate.py
-#: src/postulo/resume/registry.py src/postulo/resume/views_candidate.py
+#: src/postulo/resume/registry.py src/postulo/resume/views.py
+#: src/postulo/resume/views_candidate.py
+#: src/postulo/templates/resume/import.html
 #: src/postulo/templates/resume/preview.html
 msgid "Publications"
 msgstr "出版物"
@@ -15607,18 +15621,6 @@ msgstr "读取为"
 msgid "Read as %(name)s."
 msgstr "已按 %(name)s 读取。"
 
-#: src/postulo/resume/views.py
-msgid "Read as Europass JSON, the older format as the Europass web service wrote it until 2020."
-msgstr "按 Europass JSON 读取，即 Europass 网络服务在 2020 年之前使用的旧格式。"
-
-#: src/postulo/resume/views.py
-msgid "Read as Europass XML in the older format, the one the Europass editor wrote until 2020."
-msgstr "按旧格式的 Europass XML 读取，即 Europass 编辑器在 2020 年之前使用的格式。"
-
-#: src/postulo/resume/views.py
-msgid "Read as Europass XML, the format europass.europa.eu has written since 2020."
-msgstr "按 Europass XML 读取，即 europass.europa.eu 自 2020 年起使用的格式。"
-
 #: src/postulo/jobs/models.py
 msgid "read by"
 msgstr "读取方"
@@ -15647,16 +15649,8 @@ msgstr "读取自"
 msgid "Read from <bdi>%(address)s</bdi>."
 msgstr "已从<bdi>%(address)s</bdi>读取。"
 
-#: src/postulo/resume/views.py
-msgid "Read from the Europass XML attached to the PDF, in the older format the Europass editor wrote until 2020."
-msgstr "读取自 PDF 附带的 Europass XML，采用 Europass 编辑器在 2020 年之前使用的旧格式。"
-
-#: src/postulo/resume/views.py
-msgid "Read from the Europass XML attached to the PDF, the format europass.europa.eu has written since 2020."
-msgstr "读取自 PDF 附带的 Europass XML，即 europass.europa.eu 自 2020 年起使用的格式。"
-
 #: src/postulo/templates/jobs/company_places.html
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 #: src/postulo/templates/resume/references.html
 #: src/postulo/templates/server/plugins.html
 msgid "Read it"
@@ -15964,8 +15958,7 @@ msgid "Reference letters they wrote"
 msgstr "他们撰写的推荐信"
 
 #: src/postulo/documents/rendering.py src/postulo/resume/registry.py
-#: src/postulo/resume/views.py
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/resume/views.py src/postulo/templates/resume/import.html
 #, fuzzy
 msgid "References"
 msgstr "推荐人"
@@ -17616,7 +17609,7 @@ msgstr "技能组"
 #: src/postulo/resume/registry.py src/postulo/resume/views.py
 #: src/postulo/resume/views_candidate.py
 #: src/postulo/templates/cotton/listing_skills.html
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 #: src/postulo/templates/resume/preview.html
 msgid "Skills"
 msgstr "技能"
@@ -17900,7 +17893,7 @@ msgstr "人力派遣"
 #: src/postulo/templates/core/kind_file.html
 #: src/postulo/templates/jobs/contact_vcards.html
 #: src/postulo/templates/resume/candidate_file.html
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 msgid "Start again"
 msgstr "重新开始"
 
@@ -18153,6 +18146,10 @@ msgstr "根据我的 ORCID 记录推荐"
 #, fuzzy
 msgid "suggested by"
 msgstr "建议来源"
+
+#: src/postulo/documents/themes.py
+msgid "Suggested for this document"
+msgstr ""
 
 #: src/postulo/applications/models.py
 msgid "suggested status"
@@ -19793,7 +19790,7 @@ msgstr "对方写的金额，税前。"
 #: src/postulo/templates/documents/upload_detail.html
 #: src/postulo/templates/jobs/contact_vcards.html
 #: src/postulo/templates/resume/candidate_file.html
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 msgid "The file"
 msgstr "文件"
 
@@ -20523,7 +20520,7 @@ msgstr "请求大于%(limit)s，这是此调用读取的上限。"
 msgid "The request was not in the shape this call takes."
 msgstr "请求格式不符合此调用的要求。"
 
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 msgid "The rest of the file is still worth importing. What is listed here is not, and you can add it by hand afterwards."
 msgstr "文件的其余部分仍值得导入。这里列出的内容不会导入，你可以之后手动添加。"
 
@@ -22724,6 +22721,10 @@ msgstr "此期间收到的回复"
 msgid "what came of it"
 msgstr "结果如何"
 
+#: src/postulo/templates/resume/import.html
+msgid "What can be read here"
+msgstr ""
+
 #: src/postulo/core/server_forms.py
 msgid "What carries the mail off this machine."
 msgstr "负责将邮件从这台机器发送出去的方式。"
@@ -22745,7 +22746,7 @@ msgstr "%(title)s中的变更"
 msgid "What changes how Postulo behaves for you. Everything here works from the keyboard, with a screen reader and with scripts off; these are the choices on top of that."
 msgstr "改变 Postulo 对你的行为方式的设置。这里的一切都可以用键盘、屏幕阅读器以及在关闭脚本的情况下使用；这些是在此基础上的额外选择。"
 
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 msgid "What could not be read"
 msgstr "无法读取的内容"
 
@@ -22806,7 +22807,7 @@ msgstr "日程中的安排，最近的排在最前。请在申请页面上安排
 #: src/postulo/templates/applications/ical_import.html
 #: src/postulo/templates/core/kind_file.html
 #: src/postulo/templates/resume/candidate_file.html
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 msgid "What is in the file"
 msgstr "文件中的内容"
 
@@ -23314,6 +23315,10 @@ msgstr "他人可以核实它的地方。简历会将其打印为链接。"
 #: src/postulo/templates/server/maps.html
 msgid "Where the companies' map takes the tiles it is drawn on, and whether addresses are pinned at their street."
 msgstr "公司地图从哪里获取用于绘制的瓦片，以及地址是否以图钉标在其街道上。"
+
+#: src/postulo/templates/resume/import.html
+msgid "Where the file states no level, none is written: a level is a claim about yourself that somebody will test, so it is yours to make afterwards."
+msgstr ""
 
 #: src/postulo/jobs/models.py
 msgid "where the logo came from"
@@ -23918,7 +23923,7 @@ msgstr "由<bdi>%(name)s</bdi>撰写"
 msgid "Written by Postulo %(version)s on %(when)s."
 msgstr "由 Postulo %(version)s于%(when)s写入。"
 
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 #, python-format
 msgid "Written in %(tongue)s, which will be recorded as the language of your career record if you have not already set one."
 msgstr "使用%(tongue)s撰写；如果你尚未设置职业记录的语言，它将被记录为该语言。"
@@ -24504,7 +24509,7 @@ msgstr "你的记录（JSON）"
 
 #: src/postulo/templates/core/export.html
 #: src/postulo/templates/resume/candidate_file.html
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 #, fuzzy
 msgid "Your record as a file"
 msgstr "以文件形式获取你的记录"
@@ -24632,9 +24637,13 @@ msgstr "{value}位于主机之后：在路径中、问号之后或井号之后�
 msgid "· in the <a href=\"%(group_url)s\" class=\"underline\">%(name)s</a> group"
 msgstr "· 在<a href=\"%(group_url)s\" class=\"underline\">%(name)s</a>组中"
 
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 msgid "· no level in the file, so none will be claimed"
 msgstr "· 文件中没有级别，因此不会声明任何级别"
+
+#: src/postulo/templates/resume/import.html
+msgid "· not a level Postulo keeps, so none will be claimed"
+msgstr ""
 
 #: src/postulo/templates/applications/application_detail.html
 #, python-format
