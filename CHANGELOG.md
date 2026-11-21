@@ -6,6 +6,10 @@ All notable changes to Postulo are recorded here. The format follows
 
 ## [Unreleased]
 
+### 🔧 Changed
+
+- The wiki compares calendar providers (CalDAV, Apple, Google, Microsoft, Proton, ICS addresses): what works today, what each needs and what it risks (#1254)
+
 ## [0.5.5] — 2026-11-16
 
 ### ✨ Added
