@@ -336,6 +336,9 @@ def test_the_plugins_that_hold_no_data_need_only_the_surface():
     assert reaching("postulo.plugins.messaging_services") == {SURFACE}
     assert reaching("postulo.plugins.messaging_contacts") == {SURFACE}
     assert reaching("postulo.plugins.register_lookup") == {SURFACE}
+    # And a source of company details: a page in, offered values out, read with the surface's
+    # own readers of structured data (#1256).
+    assert reaching("postulo.plugins.company_site") == {SURFACE}
 
 
 def test_no_plugin_postulo_ships_reaches_for_a_model():

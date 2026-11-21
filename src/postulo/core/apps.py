@@ -25,6 +25,7 @@ class CoreConfig(AppConfig):
             VCardFormat,
         )
         from postulo.plugins.gdpr import GdprFeature
+        from postulo.plugins.listing_search import ListingSearchFeature
         from postulo.plugins.maps import MapsFeature
         from postulo.plugins.messaging_contacts import MessagingContactsFeature
         from postulo.plugins.multiple_fields import MultipleFieldsFeature
@@ -81,6 +82,9 @@ class CoreConfig(AppConfig):
         registry.register_builtin("feature", PublicationLookupsFeature)
         # A company's register entry, read on a press, off until an administrator says (#1021).
         registry.register_builtin("feature", RegisterLookupFeature)
+        # A job service searched on a press, a switch per service, off until an
+        # administrator says (#1253).
+        registry.register_builtin("feature", ListingSearchFeature)
         registry.register_builtin("feature", PhoneNumbersFeature)
         # How somebody is reached on Signal, Matrix, Telegram, XMPP (#682).
         registry.register_builtin("feature", MessagingContactsFeature)

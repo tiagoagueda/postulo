@@ -37,7 +37,7 @@ import httpx
 import pytest
 
 from postulo.core import destinations
-from postulo.jobs import logos
+from postulo.jobs import enrichment, logos
 from postulo.plugins import fetching, http, public_addresses
 from postulo.plugins.base import CaptureError
 from postulo.resume import lookups
@@ -618,10 +618,37 @@ def serving(monkeypatch, answer) -> list[httpx.Request]:
     return seen
 
 
-#: The two fetches a stranger's server answers, each with its own limit and its own refusal.
+def enrichment_request(url: str):
+    """One request *Find details* makes for a source (#1256), held to the address's own host,
+    and its body as it arrived: reading it as JSON is the step after.
+
+    A source that reads the company's own site is held to its host as this is, and one with
+    hosts of its own to those and ``https``; the request underneath is the same one."""
+    source = enrichment.Source(
+        key="outbound",
+        label="Outbound",
+        starts_from=("website",),
+        offers=("website",),
+        own_site=True,
+        addresses=lambda subject: [url],
+        read=lambda answers, subject: [],
+        sends="nothing",
+        source="Outbound",
+    )
+    _url, _status, _kind, body = enrichment.get(source, url, {enrichment.host_of(url)})
+    return body
+
+
+#: The fetches a stranger's server answers, each with its own limit and its own refusal.
 FETCHES = {
     "a page": (fetching.fetch_page, fetching.MAX_BYTES, "text/html", fetching.FetchFailed),
     "a logo": (logos.download, logos.MAX_BYTES, "image/png", logos.UnusableLogo),
+    "a company's details": (
+        enrichment_request,
+        enrichment.MAX_BYTES,
+        "application/json",
+        enrichment.Refused,
+    ),
 }
 
 
@@ -1156,6 +1183,7 @@ def test_a_server_trickling_what_nothing_counts_still_runs_out_of_time(
     them: the data had all arrived, and the fetch waited and then succeeded."""
     monkeypatch.setattr(fetching, "DOWNLOAD_SECONDS", BRIEFLY)
     monkeypatch.setattr(logos, "DOWNLOAD_SECONDS", BRIEFLY)
+    monkeypatch.setattr(enrichment, "SECONDS", BRIEFLY)
     stalling_server.stall = stall
     fetch, _limit, _kind, refusal = FETCHES[what]
     path = "/logo.png" if what == "a logo" else "/jobs/1"
@@ -1272,6 +1300,7 @@ def test_a_proxy_from_the_environment_is_held_to_the_deadline_as_well(monkeypatc
 REFUSALS = {
     "a page": (fetching.fetch_page, CaptureError),
     "a logo": (logos.download, logos.UnusableLogo),
+    "a company's details": (enrichment_request, enrichment.Refused),
 }
 
 
@@ -1340,6 +1369,26 @@ def test_a_logo_from_a_name_that_changes_its_answer_is_refused_with_the_reason(
 
     with pytest.raises(logos.UnusableLogo, match=SAYS[then]):
         logos.download("https://blackmesa.test/moved.png")
+
+
+@pytest.mark.parametrize("then", SAYS)
+@pytest.mark.parametrize("after", [0, 1])
+def test_a_companys_details_from_a_name_that_changes_its_answer_are_refused_with_the_reason(
+    monkeypatch, after, then
+):
+    """*Find details* (#1256): every hop of a source's request is looked up again by the
+    client's hook, so a name that answers privately on the second lookup is refused there."""
+
+    def answer(request: httpx.Request) -> httpx.Response:
+        if request.url.path == "/moved":
+            return httpx.Response(302, headers={"Location": "/here"})
+        return httpx.Response(200, headers={"Content-Type": "application/json"}, content=b"{}")
+
+    serving(monkeypatch, answer)
+    a_name_that_changes_its_answer(monkeypatch, after=after, then=then)
+
+    with pytest.raises(enrichment.Refused, match=SAYS[then]):
+        enrichment_request("https://blackmesa.test/moved")
 
 
 @pytest.mark.django_db
@@ -1956,3 +2005,90 @@ def test_every_register_postulo_ships_is_asked_on_its_own_public_name_over_https
         "api.company-information.service.gov.uk",
         "api.gleif.org",
     }
+
+
+# ------------------------------------------------- a job service's search (#1253)
+#
+# *Listing search* asks the hosts each listing search declares, through the public-only client
+# as a register lookup does: a service whose name answers with a private address is refused
+# whatever the operator allowed for connections, the socket goes to the address that was
+# checked, nothing is followed, and what was typed reaches a parameter's value alone.
+
+
+def _listing_search():
+    from postulo.jobs import listing_search
+
+    return listing_search, listing_search.ListingSearch(
+        key="xx-jobs",
+        label="Example Jobs",
+        countries=(),
+        languages=(),
+        hosts=("jobs.example",),
+        supports=frozenset({"words"}),
+        request=lambda criteria: ("https://jobs.example/search", {"q": criteria.words}),
+        read=lambda document, criteria: listing_search.Results(),
+        one=lambda key: (f"https://jobs.example/adverts/{key}", {}),
+        read_one=lambda document, key: None,
+        source="Example Jobs",
+        licence="CC0 1.0",
+    )
+
+
+def test_a_listing_search_dials_the_address_it_approved(monkeypatch):
+    listing_search, search = _listing_search()
+    resolving(monkeypatch, {"jobs.example": PUBLIC})
+    transport, seen = recorder(200, b"{}", "application/json")
+    _register_client(monkeypatch, transport)
+
+    listing_search.search(search, listing_search.Criteria(words="nurse&host=evil.example"))
+
+    assert str(seen[0].url.host) == "93.184.216.34", "the socket went to the approved address"
+    assert seen[0].headers["Host"] == "jobs.example"
+    assert seen[0].url.params["q"] == "nurse&host=evil.example"
+    assert seen[0].url.path == "/search"
+
+
+@pytest.mark.parametrize("allowed", [False, True])
+def test_a_listing_search_on_a_private_address_is_refused_whatever_connections_allow(
+    monkeypatch, settings, allowed
+):
+    listing_search, search = _listing_search()
+    settings.POSTULO_CONNECTIONS_ALLOW_PRIVATE = allowed
+    resolving(monkeypatch, {})
+    transport, seen = recorder()
+    _register_client(monkeypatch, transport)
+
+    with pytest.raises(listing_search.SearchRefused):
+        listing_search.search(search, listing_search.Criteria(words="nurse"))
+
+    assert seen == [], "nothing was sent"
+
+
+def test_a_listing_search_that_redirects_onto_the_network_is_not_followed(monkeypatch):
+    listing_search, search = _listing_search()
+    resolving(monkeypatch, {"jobs.example": PUBLIC})
+    seen: list[httpx.Request] = []
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        seen.append(snapshot(request))
+        return httpx.Response(302, headers={"Location": "http://192.168.1.50/"})
+
+    _register_client(monkeypatch, httpx.MockTransport(handler))
+
+    with pytest.raises(listing_search.SearchRefused, match="somewhere else"):
+        listing_search.advert(search, "1001")
+
+    assert len(seen) == 1, "the hop onto the network was never opened"
+
+
+def test_every_job_service_postulo_ships_is_asked_on_its_own_public_name_over_https():
+    """The destinations are a fixed list, and the list is the searches' own declarations."""
+    from postulo.jobs import listing_search
+    from postulo.plugins.listing_search.sweden import SEARCHES
+
+    hosts = {host for search in SEARCHES for host in search.hosts}
+    assert hosts == {"jobsearch.api.jobtechdev.se"}
+    for search in SEARCHES:
+        for criteria in (listing_search.Criteria(words="x"), listing_search.Criteria(page=100)):
+            address = httpx.URL(search.request(criteria)[0])
+            assert address.scheme == "https" and address.host in search.hosts

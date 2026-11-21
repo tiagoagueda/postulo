@@ -15,6 +15,16 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
 "X-Generator: postulo scripts/messages.py\n"
 
+#: src/postulo/jobs/enrichment_offers.py
+#, python-format
+msgid "%(address)s was not added."
+msgstr ""
+
+#: src/postulo/jobs/enrichment_offers.py
+#, python-format
+msgid "%(address)s was not added: %(reason)s"
+msgstr ""
+
 #: src/postulo/jobs/listing_earnings.py
 #, python-format
 msgid "%(amount)s %(currency)s per hour, gross (%(year)s)"
@@ -403,6 +413,13 @@ msgid "%(count)s listing you are considering closes soon"
 msgid_plural "%(count)s listings you are considering close soon"
 msgstr[0] "Tangazo la kazi %(count)s unalolifikiria linafungwa hivi karibuni"
 msgstr[1] "Matangazo ya kazi %(count)s unayoyafikiria yanafungwa hivi karibuni"
+
+#: src/postulo/jobs/enrichment_offers.py
+#, python-format
+msgid "%(count)s person or more"
+msgid_plural "%(count)s people or more"
+msgstr[0] ""
+msgstr[1] ""
 
 #: src/postulo/plugins/base.py
 #, fuzzy, python-format
@@ -818,6 +835,11 @@ msgstr "%(host)s iko kwenye mtandao wa kibinafsi au wa ndani. Postulo huunganish
 msgid "%(i)s interviews and %(e)s entries in listings' histories would be kept without the name."
 msgstr "%(i)s mahojiano na %(e)s viingilio katika historia ya orodha zitahifadhiwa bila jina."
 
+#: src/postulo/jobs/enrichment_offers.py
+#, python-format
+msgid "%(industry)s (NACE %(division)s)"
+msgstr ""
+
 #: src/postulo/templates/server/logs.html
 #, fuzzy, python-format
 msgid "%(kilobytes)s on disk"
@@ -902,7 +924,7 @@ msgstr ""
 msgid "%(list)s · %(date)s"
 msgstr ""
 
-#: src/postulo/jobs/models.py
+#: src/postulo/jobs/enrichment_offers.py src/postulo/jobs/models.py
 #, fuzzy, python-format
 msgid "%(low)s to %(high)s"
 msgstr "%(low)s hadi %(high)s"
@@ -1298,6 +1320,16 @@ msgstr "%(name)s: namba %(value)s iliachwa. %(why)s"
 msgid "%(names)s can see “%(other)s” and not “%(kept)s”. Share “%(kept)s” with them first, or nothing is merged."
 msgstr "%(names)s wanaweza kuona “%(other)s” lakini si “%(kept)s”. Shiriki “%(kept)s” nao kwanza, la sivyo hakuna kitakachounganishwa."
 
+#: src/postulo/jobs/enrichment_offers.py
+#, python-format
+msgid "%(number)s was not added."
+msgstr ""
+
+#: src/postulo/jobs/enrichment_offers.py
+#, python-format
+msgid "%(number)s was not added: %(reason)s"
+msgstr ""
+
 #: src/postulo/resume/views.py
 #, fuzzy, python-format
 msgid "%(ok)s, %(broken)s; the ones that did not say why."
@@ -1498,24 +1530,39 @@ msgstr "%(scheme)s: hiyo si muundo wa kawaida."
 msgid "%(sent)s, %(failed)s; each document says which."
 msgstr "%(sent)s, %(failed)s; kila hati inaeleza ipi."
 
-#: src/postulo/resume/lookups.py
+#: src/postulo/jobs/listing_search.py src/postulo/resume/lookups.py
 #, python-format
 msgid "%(service)s answered %(status)s."
 msgstr ""
 
-#: src/postulo/resume/lookups.py
+#: src/postulo/jobs/listing_search.py src/postulo/resume/lookups.py
 #, python-format
 msgid "%(service)s asked for fewer requests. Try again later."
 msgstr ""
 
-#: src/postulo/resume/lookups.py
+#: src/postulo/jobs/listing_search.py src/postulo/resume/lookups.py
 #, python-format
 msgid "%(service)s could not be reached."
+msgstr ""
+
+#: src/postulo/jobs/listing_search.py
+#, python-format
+msgid "%(service)s did not accept that search."
+msgstr ""
+
+#: src/postulo/templates/jobs/listing_search.html
+#, python-format
+msgid "%(service)s does not search by %(criteria)s, so that was not sent."
 msgstr ""
 
 #: src/postulo/resume/lookups.py
 #, python-format
 msgid "%(service)s has no record in a form Postulo reads."
+msgstr ""
+
+#: src/postulo/jobs/listing_search.py
+#, python-format
+msgid "%(service)s has nothing at the address it was asked at."
 msgstr ""
 
 #: src/postulo/core/web_links.py src/postulo/jobs/surface.py
@@ -1528,6 +1575,11 @@ msgstr "%(service)s tayari inatumiwa na safu mlalo nyingine."
 msgid "%(service)s knows no such identifier."
 msgstr ""
 
+#: src/postulo/jobs/listing_search.py
+#, python-format
+msgid "%(service)s no longer has that advert."
+msgstr ""
+
 #: src/postulo/resume/lookups.py
 #, python-format
 msgid "%(service)s redirected too many times."
@@ -1538,7 +1590,7 @@ msgstr ""
 msgid "%(service)s refused the look-ups (%(status)s). They are stopped."
 msgstr ""
 
-#: src/postulo/resume/lookups.py
+#: src/postulo/jobs/listing_search.py src/postulo/resume/lookups.py
 #, python-format
 msgid "%(service)s sent the request somewhere else."
 msgstr ""
@@ -1548,9 +1600,19 @@ msgstr ""
 msgid "%(service)s sent the request to an address Postulo does not dial."
 msgstr ""
 
-#: src/postulo/resume/lookups.py
+#: src/postulo/jobs/listing_search.py src/postulo/resume/lookups.py
 #, python-format
 msgid "%(service)s took too long to answer."
+msgstr ""
+
+#: src/postulo/jobs/listing_search.py
+#, python-format
+msgid "%(service)s's answer could not be read."
+msgstr ""
+
+#: src/postulo/jobs/listing_search.py
+#, python-format
+msgid "%(service)s's answer was larger than a page of adverts should be."
 msgstr ""
 
 #: src/postulo/resume/views.py
@@ -1563,10 +1625,82 @@ msgstr ""
 msgid "%(share)s%%"
 msgstr "%(share)s%%[HARIRI | HARIRI CHANZO]"
 
+#: src/postulo/jobs/enrichment.py
+#, python-format
+msgid "%(source)s asked for an address it did not declare."
+msgstr ""
+
+#: src/postulo/jobs/enrichment.py
+#, python-format
+msgid "%(source)s asked for fewer requests. Try again later."
+msgstr ""
+
+#: src/postulo/jobs/enrichment.py
+#, python-format
+msgid "%(source)s asked for more requests than one press allows."
+msgstr ""
+
+#: src/postulo/jobs/enrichment.py
+#, python-format
+msgid "%(source)s cannot be asked about this company."
+msgstr ""
+
+#: src/postulo/jobs/enrichment.py
+#, python-format
+msgid "%(source)s could not be reached."
+msgstr ""
+
+#: src/postulo/templates/jobs/company_enrichment.html
+#, python-format
+msgid "%(source)s could not be read."
+msgstr ""
+
+#: src/postulo/jobs/enrichment.py
+#, python-format
+msgid "%(source)s redirected too many times."
+msgstr ""
+
+#: src/postulo/jobs/enrichment.py
+#, python-format
+msgid "%(source)s sent its answer with the content encoding “%(coding)s”, which Postulo does not unpack."
+msgstr ""
+
+#: src/postulo/jobs/enrichment.py
+#, python-format
+msgid "%(source)s sent the request somewhere else."
+msgstr ""
+
+#: src/postulo/jobs/enrichment.py
+#, python-format
+msgid "%(source)s took longer than %(seconds)s second to answer."
+msgid_plural "%(source)s took longer than %(seconds)s seconds to answer."
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/postulo/jobs/enrichment.py
+#, python-format
+msgid "%(source)s's answer could not be read."
+msgstr ""
+
+#: src/postulo/jobs/enrichment.py
+#, python-format
+msgid "%(source)s's answer was larger than one company's should be."
+msgstr ""
+
+#: src/postulo/templates/jobs/listing_search.html
+#, python-format
+msgid "%(source)s: asked at %(hosts)s. It is sent the words, the place and the filters you search for, or an advert's number when you press Review, and nothing about you."
+msgstr ""
+
 #: src/postulo/applications/agenda.py
 #, fuzzy, python-format
 msgid "%(start)s to %(end)s"
 msgstr "%(start)s kwa %(end)s"
+
+#: src/postulo/jobs/enrichment_offers.py
+#, python-format
+msgid "%(state)s since %(date)s"
+msgstr ""
 
 #: src/postulo/templates/applications/partials/board.html
 #, fuzzy, python-format
@@ -1893,9 +2027,8 @@ msgid "<em>Headline</em> is a short professional title, such as “Backend engin
 msgstr "<em> Headline</em> ni jina fupi la kitaalamu, kama vile “mhandisi wa nyuma.” CV ambayo ina kichwa cha magazeti yake mwenyewe ambayo badala yake."
 
 #: src/postulo/templates/help/career.html
-#, fuzzy
-msgid "<em>Import</em> reads a Europass CV; <em>Export</em> writes your details and your career as one file you can keep or move to another Postulo; <em>Preview</em> shows the whole record as a document, and <em>Your CVs</em> opens the variants made from it."
-msgstr "<em>Ingiza</em> husoma CV ya Europass; <em>Hamisha</em> huandika maelezo yako na taaluma yako kama faili moja unaloweza kuhifadhi au kuhamishia Postulo nyingine; <em>Onyesho la awali</em> huonyesha rekodi nzima kama hati, na <em>CV zako</em> hufungua matoleo yaliyotengenezwa kutoka kwayo."
+msgid "<em>Import</em> reads a CV you have as a file; <em>Export</em> writes your details and your career as one file you can keep or move to another Postulo; <em>Preview</em> shows the whole record as a document, and <em>Your CVs</em> opens the variants made from it."
+msgstr ""
 
 #: src/postulo/templates/help/identifiers.html
 #, fuzzy
@@ -2390,7 +2523,7 @@ msgstr "Barua kutoka kwa nyaraka zako"
 msgid "A file goes under Files first; an entry points at it rather than keeping a copy."
 msgstr "Faili inakwenda chini ya Files kwanza; pointi za kuingia ndani badala ya kuweka nakala."
 
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 #, fuzzy
 msgid "A file that Postulo itself wrote is read on a page of its own."
 msgstr "Faili ambayo Postulo yenyewe aliandika inasoma kwenye ukurasa wake mwenyewe."
@@ -2449,6 +2582,10 @@ msgstr "Ni juu ya kichwa, hukumu chini yake, na kisha chochote kadi ni kwa ajili
 #, fuzzy
 msgid "a job title"
 msgstr "jina la kazi"
+
+#: src/postulo/jobs/search_views.py
+msgid "A job title, a skill or an employer, as you would type it on the service."
+msgstr ""
 
 #: src/postulo/documents/integrity.py
 #, fuzzy
@@ -2583,6 +2720,10 @@ msgstr "Tangazo la kazi ni nafasi uliyoiona, kabla hujaamua chochote kuihusu. <e
 msgid "A listing keeps its deadline, which the closing-soon notice then watches, and its tags are written into its description."
 msgstr "Orodha inaweka tarehe yake ya mwisho, ambayo taarifa ya kufunga-soon kisha angalia, na vitambulisho vyake vimeandikwa katika maelezo yake."
 
+#: src/postulo/templates/jobs/listing_search.html
+msgid "A listing like it"
+msgstr ""
+
 #: src/postulo/templates/jobs/capture_review.html
 #, fuzzy
 msgid "A listing with this title at this company exists; a board that mints a fresh address per visit may be showing you the same advert."
@@ -2646,6 +2787,10 @@ msgstr "Moduli: Inasafiri ndani ya Postulo na haiwezi kuondolewa."
 #, fuzzy
 msgid "A month"
 msgstr "Mwezi mmoja"
+
+#: src/postulo/jobs/enrichment_views.py
+msgid "a name"
+msgstr ""
 
 #: src/postulo/core/messaging_services.py
 #, fuzzy, python-format
@@ -2904,6 +3049,10 @@ msgstr ""
 msgid "A referee who is not a contact yet. Their name is enough; it is added to your contacts without a company, and is used instead of the choice above."
 msgstr "Mwamuzi ambaye bado hajawasiliana. Jina lao ni la kutosha; linaongezwa kwa anwani zako bila kampuni, na hutumiwa badala ya chaguo hapo juu."
 
+#: src/postulo/jobs/enrichment_views.py
+msgid "a register number"
+msgstr ""
+
 #: src/postulo/applications/ical_import.py
 #, fuzzy
 msgid "A reminder"
@@ -3129,6 +3278,10 @@ msgstr "Ishara inaruhusu chombo nje ya Postulo kitendo kwa ajili yenu - ugani br
 msgid "A town and a country alone are kept as a place. Nothing checks that an address exists, and a country Postulo has no rules for is free-form."
 msgstr "Mji mmoja na nchi moja ni kama eneo moja. Hakuna hundi kwamba anwani ipo, na Postulo nchi haina sheria ya ni bure fomu."
 
+#: src/postulo/jobs/search_views.py
+msgid "A town or a region."
+msgstr ""
+
 #: src/postulo/resume/candidate.py
 #, fuzzy
 msgid "A translation"
@@ -3164,6 +3317,10 @@ msgstr "Jina la picha inahitaji angalau barua moja au tarakimu."
 msgid "A way back rather than a way on, which is why it is an outline."
 msgstr "Njia ya kurudi nyuma badala ya njia, ndiyo sababu ni muhtasari."
 
+#: src/postulo/jobs/enrichment_views.py
+msgid "a website"
+msgstr ""
+
 #: src/postulo/templates/applications/report.html
 #: src/postulo/templates/documents/themes/base_report.html
 #, fuzzy
@@ -3174,6 +3331,10 @@ msgstr "Kwa wastani, kwa wastani"
 #, fuzzy
 msgid "A widget added in a later release, or brought by a plugin, waits above until you say yes to it. Nothing arrives on your dashboard without being asked."
 msgstr "Kwa mfano, ikiwa unapanda mbegu au la, basi unapaswa kupanda mbegu. Hakuna kitu kinachoingia kwenye dashibodi yako bila kuulizwa."
+
+#: src/postulo/jobs/enrichment_views.py
+msgid "a Wikidata identifier"
+msgstr ""
 
 #: src/postulo/documents/integrity.py
 #, fuzzy
@@ -3321,7 +3482,8 @@ msgstr "Kununua au kuunganisha"
 msgid "acquired_by must be a company you can see."
 msgstr "lazima uwe na kampuni ambayo unaweza kuona."
 
-#: src/postulo/jobs/models.py src/postulo/templates/jobs/company_form.html
+#: src/postulo/jobs/enrichment_offers.py src/postulo/jobs/models.py
+#: src/postulo/templates/jobs/company_form.html
 msgid "Acronym or short name"
 msgstr ""
 
@@ -3447,7 +3609,7 @@ msgstr "Ongeza ujuzi"
 msgid "Add a tag"
 msgstr "Ongeza kwenye tag"
 
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 #, fuzzy
 msgid "Add all of this"
 msgstr "Ongeza hii yote"
@@ -3683,7 +3845,8 @@ msgid "addok (France's Base Adresse Nationale)"
 msgstr ""
 
 #: src/postulo/applications/forms.py src/postulo/applications/reports.py
-#: src/postulo/jobs/tables.py src/postulo/templates/partials/web_links.html
+#: src/postulo/jobs/enrichment_offers.py src/postulo/jobs/tables.py
+#: src/postulo/templates/partials/web_links.html
 #, fuzzy
 msgid "Address"
 msgstr "Hotuba ya"
@@ -3733,6 +3896,10 @@ msgstr ""
 #, fuzzy
 msgid "Advertising and marketing"
 msgstr "Matangazo na Masoko"
+
+#: src/postulo/templates/jobs/listing_search.html
+msgid "Adverts found"
+msgstr ""
 
 #: src/postulo/applications/models.py
 #, fuzzy
@@ -3925,6 +4092,10 @@ msgstr "Pia hutokea wakati anwani yako ya msingi inabadilika."
 msgid "Also in %(names)s"
 msgstr "Kwa mfano, katika %(names)s"
 
+#: src/postulo/templates/jobs/company_enrichment.html
+msgid "Also said"
+msgstr ""
+
 #: src/postulo/accounts/models.py
 msgid "Always"
 msgstr ""
@@ -4002,6 +4173,10 @@ msgstr "Anwani iliyorekodiwa kabla ya anwani kuchunguzwa, au kuletwa na faili, k
 #, fuzzy
 msgid "An address that could not be read"
 msgstr "Barua ambayo haikuweza kusomwa"
+
+#: src/postulo/jobs/enrichment_views.py
+msgid "an address with a country"
+msgstr ""
 
 #: src/postulo/applications/models.py
 #, fuzzy
@@ -4096,7 +4271,7 @@ msgstr "Icon ya kifungo"
 msgid "An identifier"
 msgstr "Utambulisho wa"
 
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 #, fuzzy
 msgid "An import only ever adds. Nothing already in your career record is changed or removed, and anything that turns out to be a duplicate is yours to delete."
 msgstr "Ni muhimu kuongeza tu. Hakuna kitu tayari katika rekodi yako ya kazi kimebadilika au kuondolewa, na chochote kinachogeuka kuwa duplicate ni yako kufuta."
@@ -4120,6 +4295,10 @@ msgstr "Mahojiano ni sehemu ya maombi. Chagua moja."
 #, fuzzy
 msgid "An interview is scheduled or moved"
 msgstr "Mahojiano yamepangwa au kuhamishwa"
+
+#: src/postulo/jobs/enrichment_views.py
+msgid "an LEI"
+msgstr ""
 
 #: src/postulo/notifications/base.py
 #, fuzzy
@@ -4201,6 +4380,11 @@ msgstr "Chombo kingine kilikuwa tayari."
 #, fuzzy
 msgid "Another invitation"
 msgstr "Wito mwingine"
+
+#: src/postulo/jobs/enrichment_offers.py
+#, python-format
+msgid "Another of your companies already has %(identifier)s."
+msgstr ""
 
 #: src/postulo/jobs/register_views.py
 #, python-format
@@ -4743,6 +4927,11 @@ msgstr "Kwa kuwa"
 msgid "as of %(date)s"
 msgstr "kwa mfano %(date)s"
 
+#: src/postulo/templates/jobs/partials/enrichment_origins.html
+#, python-format
+msgid "As of %(date)s."
+msgstr ""
+
 #: src/postulo/templates/applications/interview_detail.html
 #: src/postulo/templates/documents/themes/base_interview.html
 #, python-format
@@ -4819,13 +5008,30 @@ msgstr "Asia ya Asia"
 msgid "Asked"
 msgstr "Alipoulizwa"
 
+#: src/postulo/jobs/search_views.py
+msgid "Asked for the advert. Check it before it becomes a listing."
+msgstr ""
+
 #: src/postulo/templates/server/record_of_processing.html
 msgid "Asked only when somebody presses for it, one company at a time. Each is sent what is listed and nothing about the person asking."
+msgstr ""
+
+#: src/postulo/templates/server/record_of_processing.html
+msgid "Asked only when somebody presses Search or Review. Each is sent what is listed and nothing about the person asking; nothing it answers is kept unless the person saves an advert."
 msgstr ""
 
 #: src/postulo/templates/connections/pairing.html
 #, python-format
 msgid "Asks %(plugin)s now. Nothing it answers is kept here."
+msgstr ""
+
+#: src/postulo/templates/cotton/enrichment_ask.html
+#, python-format
+msgid "Asks <bdi>%(hosts)s</bdi>. Sent: %(what)s."
+msgstr ""
+
+#: src/postulo/templates/jobs/company_detail.html
+msgid "Asks the places you choose, once each; nothing is kept until you say so."
 msgstr ""
 
 #: src/postulo/applications/analytics.py src/postulo/applications/models.py
@@ -4851,6 +5057,10 @@ msgstr "Mashirika, jamii na klabu ambazo wewe ni mali ya au ya."
 #, fuzzy
 msgid "at"
 msgstr "wakati wa"
+
+#: src/postulo/jobs/search_views.py
+msgid "At any time"
+msgstr ""
 
 #: src/postulo/templates/settings/appearance.html
 msgid "At each status"
@@ -5082,6 +5292,10 @@ msgstr "Kurudi kwenye kalenda"
 msgid "Back to the calendar, to change any of this"
 msgstr ""
 
+#: src/postulo/templates/jobs/company_enrichment.html
+msgid "Back to the company"
+msgstr ""
+
 #: src/postulo/core/help.py
 #, fuzzy
 msgid "Back to the dashboard"
@@ -5139,6 +5353,7 @@ msgstr "Rejea maelezo yako"
 
 #: src/postulo/templates/jobs/capture_decided.html
 #: src/postulo/templates/jobs/capture_page.html
+#: src/postulo/templates/jobs/listing_search.html
 #, fuzzy
 msgid "Back to your listings"
 msgstr "Kurudi kwenye orodha yako"
@@ -5534,6 +5749,7 @@ msgstr ""
 #: src/postulo/templates/documents/upload_form.html
 #: src/postulo/templates/jobs/address_place.html
 #: src/postulo/templates/jobs/capture_page_forget.html
+#: src/postulo/templates/jobs/company_enrichment.html
 #: src/postulo/templates/jobs/company_form.html
 #: src/postulo/templates/jobs/company_register.html
 #: src/postulo/templates/jobs/company_wikidata.html
@@ -5592,6 +5808,11 @@ msgstr "Haiwezi kuongezwa"
 #, fuzzy
 msgid "Cannot be added."
 msgstr "Haiwezi kuongezwa."
+
+#: src/postulo/templates/cotton/enrichment_ask.html
+#, python-format
+msgid "Cannot be asked: this company would need %(what)s."
+msgstr ""
 
 #: src/postulo/templates/server/overview.html
 #, fuzzy
@@ -5732,15 +5953,16 @@ msgstr "Uhakiki wa preview"
 msgid "Career sections"
 msgstr "Sehemu za kazi"
 
+#: src/postulo/jobs/enrichment_offers.py src/postulo/jobs/tables.py
+#: src/postulo/templates/jobs/company_detail.html
+#, fuzzy
+msgid "Careers page"
+msgstr "Ukurasa wa kazi"
+
 #: src/postulo/jobs/models.py
 #, fuzzy
 msgid "careers page"
 msgstr "ukurasa wa kazi"
-
-#: src/postulo/jobs/tables.py src/postulo/templates/jobs/company_detail.html
-#, fuzzy
-msgid "Careers page"
-msgstr "Ukurasa wa kazi"
 
 #: src/postulo/templates/server/email.html
 #, fuzzy, python-format
@@ -5801,7 +6023,8 @@ msgstr "Vyeti vya Vyeti"
 
 #: src/postulo/documents/rendering.py src/postulo/jobs/merging.py
 #: src/postulo/resume/candidate.py src/postulo/resume/registry.py
-#: src/postulo/resume/views_candidate.py
+#: src/postulo/resume/views.py src/postulo/resume/views_candidate.py
+#: src/postulo/templates/resume/import.html
 #: src/postulo/templates/resume/preview.html
 #, fuzzy
 msgid "Certifications"
@@ -5930,6 +6153,10 @@ msgstr "Angalia kwa ajili ya updates"
 msgid "Check it answers"
 msgstr "Angalia Majibu"
 
+#: src/postulo/templates/jobs/partials/enrichment_origins.html
+msgid "Check it there"
+msgstr ""
+
 #: src/postulo/templates/jobs/capture_review.html
 #, fuzzy
 msgid "Check the reading against it"
@@ -6017,14 +6244,10 @@ msgstr "Chagua nchi kutoka kwenye orodha."
 msgid "Choose a destination and save it first."
 msgstr ""
 
-#: src/postulo/resume/views.py
-#, fuzzy
-msgid "Choose a Europass file first."
-msgstr "Chagua faili ya kwanza ya Ulaya."
-
 #: src/postulo/applications/views_ical.py src/postulo/core/views_kind_files.py
 #: src/postulo/jobs/vcard_views.py src/postulo/jobs/views.py
-#: src/postulo/resume/views_candidate.py src/postulo/resume/views_references.py
+#: src/postulo/resume/views.py src/postulo/resume/views_candidate.py
+#: src/postulo/resume/views_references.py
 #, fuzzy
 msgid "Choose a file first."
 msgstr "Chagua faili ya kwanza."
@@ -6106,6 +6329,10 @@ msgstr "Chagua faili nyingine"
 msgid "Choose at least one document to record."
 msgstr "Chagua angalau hati moja ya kujiandikisha."
 
+#: src/postulo/jobs/enrichment_views.py
+msgid "Choose at least one place to ask."
+msgstr ""
+
 #: src/postulo/templates/cotton/date_field.html
 #, fuzzy
 msgid "Choose dates from a calendar"
@@ -6153,10 +6380,9 @@ msgstr "Chagua tarehe ya kuzaliwa kutoka kalenda"
 msgid "Choose the destination"
 msgstr ""
 
-#: src/postulo/templates/resume/europass_import.html
-#, fuzzy
-msgid "Choose the PDF you downloaded from europass.europa.eu, as it is: the CV is attached inside it, and that is what Postulo reads. Older Europass files read too: the XML and PDF of the editor before 2020, and the JSON of its web service. Postulo works out which it is, shows you what is in it, and writes nothing until you say so."
-msgstr "Chagua PDF iliyopakuliwa kutoka europass.europa.eu, kama ilivyo: CV imefungwa ndani yake, na hiyo ndio Postulo inasoma. Faili za zamani za Europas zinasoma pia: XML na PDF ya mhariri kabla ya 2020, na JSON ya huduma yake ya wavuti. Postulo kazi nje ambayo ni, inaonyesha nini ndani yake, na kuandika chochote mpaka kusema hivyo."
+#: src/postulo/templates/resume/import.html
+msgid "Choose the file as you downloaded it. Postulo works out which format it is, shows you what is in it, and writes nothing until you say so."
+msgstr ""
 
 #: src/postulo/accounts/forms.py src/postulo/jobs/forms.py
 #, fuzzy
@@ -6180,6 +6406,10 @@ msgstr ""
 #, fuzzy
 msgid "Choose what was reported and the date."
 msgstr "Chagua kile kilichoelezwa na tarehe."
+
+#: src/postulo/templates/cotton/enrichment_ask.html
+msgid "Choose where to ask about this company. Each place is asked once, now, and learns only what is listed. Nothing is kept until you tick it."
+msgstr ""
 
 #: src/postulo/applications/views.py
 #, fuzzy
@@ -6561,6 +6791,10 @@ msgstr "Kampuni hiyo imeongeza."
 msgid "Company deleted, along with its postings."
 msgstr "Kampuni ilifutwa, pamoja na matangazo yake."
 
+#: src/postulo/plugins/kinds.py
+msgid "Company details"
+msgstr ""
+
 #: src/postulo/jobs/models.py
 #, fuzzy
 msgid "company identifier"
@@ -6922,7 +7156,8 @@ msgstr "Mafunzo ya"
 
 #: src/postulo/documents/rendering.py src/postulo/jobs/merging.py
 #: src/postulo/resume/candidate.py src/postulo/resume/registry.py
-#: src/postulo/resume/views_candidate.py
+#: src/postulo/resume/views.py src/postulo/resume/views_candidate.py
+#: src/postulo/templates/resume/import.html
 #: src/postulo/templates/resume/preview.html
 #, fuzzy
 msgid "Courses"
@@ -7629,6 +7864,10 @@ msgstr "maelezo ya kina"
 msgid "details"
 msgstr "maelezo zaidi"
 
+#: src/postulo/templates/jobs/company_enrichment.html
+msgid "Details found"
+msgstr ""
+
 #: src/postulo/core/design.py src/postulo/templates/server/design.html
 #, fuzzy
 msgid "Dialogs"
@@ -7768,7 +8007,7 @@ msgid "document themes"
 msgstr ""
 
 #: src/postulo/core/help.py src/postulo/core/navigation.py
-#: src/postulo/documents/apps.py
+#: src/postulo/documents/apps.py src/postulo/plugins/categories.py
 #: src/postulo/templates/applications/application_detail.html
 #: src/postulo/templates/base.html
 #: src/postulo/templates/cotton/documents_nav.html
@@ -8051,7 +8290,7 @@ msgstr "Biashara ya E-commerce"
 msgid "Each invitation may be used once, and expires on its own. Its link is shown once, when it is made."
 msgstr "Kila mwaliko unaweza kutumika mara moja, na unamalizika peke yake. Kiungo chake kinaonyeshwa mara moja, wakati kinafanywa."
 
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 #, fuzzy
 msgid "Each is added as one of your contacts and as a reference you have not asked yet, so none is printed on a CV until you say they agreed."
 msgstr "Kila moja inaongezwa kama moja ya anwani zako na kama kumbukumbu ambayo haujauliza bado, kwa hivyo hakuna mtu anayechapishwa kwenye CV hadi utakaposema walikubaliana."
@@ -8187,7 +8426,7 @@ msgstr "wahariri wa wahariri"
 #: src/postulo/documents/rendering.py src/postulo/jobs/industries.py
 #: src/postulo/resume/candidate.py src/postulo/resume/registry.py
 #: src/postulo/resume/views_candidate.py
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 #: src/postulo/templates/resume/preview.html
 #, fuzzy
 msgid "Education"
@@ -8230,6 +8469,7 @@ msgid "email address"
 msgstr "anwani ya barua pepe"
 
 #: src/postulo/core/channels.py src/postulo/documents/printing.py
+#: src/postulo/jobs/enrichment_offers.py
 #, fuzzy
 msgid "Email address"
 msgstr "Anwani ya barua pepe"
@@ -8444,11 +8684,7 @@ msgstr "Ujuzi wa ESCO"
 msgid "Europass"
 msgstr ""
 
-#: src/postulo/core/transfers.py
-msgid "Europass import"
-msgstr ""
-
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 #, fuzzy
 msgid "Europass records five levels per language and Postulo keeps one, so the lowest is taken. Where the file states none, none is written: a level is a claim about yourself that somebody will test, so it is yours to make afterwards."
 msgstr "Europas inarekodi viwango vitano kwa kila lugha na Postulo inashikilia moja, kwa hivyo chini inachukuliwa. Ambapo faili inasema hakuna, hakuna imeandikwa: ngazi ni madai kuhusu wewe kwamba mtu atajaribu, hivyo ni yako kufanya baadaye."
@@ -8735,7 +8971,7 @@ msgstr "Kuondolewa kwa kuondolewa"
 
 #: src/postulo/documents/rendering.py src/postulo/resume/candidate.py
 #: src/postulo/resume/registry.py src/postulo/resume/views_candidate.py
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 #: src/postulo/templates/resume/preview.html
 #, fuzzy
 msgid "Experience"
@@ -9150,6 +9386,10 @@ msgstr ""
 msgid "Find a language"
 msgstr "Kupata lugha"
 
+#: src/postulo/templates/cotton/enrichment_ask.html
+msgid "Find details"
+msgstr ""
+
 #: src/postulo/templates/jobs/company_form.html
 #, fuzzy
 msgid "Find logo"
@@ -9447,6 +9687,13 @@ msgstr[0] ""
 msgstr[1] ""
 
 #: src/postulo/jobs/slow.py
+#, python-format
+msgid "Found %(count)s detail. Nothing is kept until you tick it."
+msgid_plural "Found %(count)s details. Nothing is kept until you tick it."
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/postulo/jobs/slow.py
 #, fuzzy, python-format
 msgid "Found a logo at %(url)s."
 msgstr "Nembo imepatikana kwenye %(url)s."
@@ -9478,10 +9725,14 @@ msgstr "Imetolewa kupitia"
 msgid "found via"
 msgstr "kwa njia ya"
 
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 #, fuzzy, python-format
 msgid "Found: %(names)s. Only the ones you have left blank will be filled in."
 msgstr "Vimepatikana: %(names)s. Ni vile tu ulivyoviacha wazi vitakavyojazwa."
+
+#: src/postulo/jobs/enrichment_offers.py
+msgid "Founded"
+msgstr ""
 
 #: src/postulo/jobs/models.py
 #, fuzzy
@@ -9541,6 +9792,11 @@ msgstr "Kutoka %(name)s."
 #: src/postulo/templates/jobs/company_register.html
 #, python-format
 msgid "From %(register)s"
+msgstr ""
+
+#: src/postulo/templates/jobs/partials/enrichment_origins.html
+#, python-format
+msgid "From %(source)s: <bdi>%(where)s</bdi>."
 msgstr ""
 
 #: src/postulo/core/tables.py
@@ -10023,6 +10279,10 @@ msgctxt "pronouns"
 msgid "he/him"
 msgstr "ya"
 
+#: src/postulo/jobs/enrichment_offers.py
+msgid "Head office"
+msgstr ""
+
 #: src/postulo/accounts/models.py src/postulo/documents/models.py
 #: src/postulo/resume/views.py
 #, fuzzy
@@ -10194,7 +10454,8 @@ msgstr "Heshima au tuzo"
 
 #: src/postulo/documents/rendering.py src/postulo/jobs/merging.py
 #: src/postulo/resume/candidate.py src/postulo/resume/registry.py
-#: src/postulo/resume/views_candidate.py
+#: src/postulo/resume/views.py src/postulo/resume/views_candidate.py
+#: src/postulo/templates/resume/import.html
 #: src/postulo/templates/resume/preview.html
 #, fuzzy
 msgid "Honours and awards"
@@ -10278,6 +10539,10 @@ msgstr "Jinsi ya kufikia mwajiri"
 #, fuzzy
 msgid "how it reaches the employer"
 msgstr "jinsi ya kufikia mwajiri"
+
+#: src/postulo/templates/resume/import.html
+msgid "How it was read"
+msgstr ""
 
 #: src/postulo/applications/widgets.py
 #, fuzzy
@@ -10473,6 +10738,7 @@ msgstr "maombi yasiyo ya lazima"
 msgid "identifier"
 msgstr "utambulisho wa utambulisho"
 
+#: src/postulo/jobs/enrichment_offers.py
 #: src/postulo/templates/cotton/identifier_row.html
 #, fuzzy
 msgid "Identifier"
@@ -10569,10 +10835,9 @@ msgstr "Ikiwa hii ni barua ya kumbukumbu"
 msgid "If you are reading this, the email settings of your Postulo instance work. Nothing else to do."
 msgstr "Ikiwa unasoma hii, mipangilio ya barua pepe ya kazi yako ya Postulo. Hakuna kingine cha kufanya."
 
-#: src/postulo/templates/resume/europass_import.html
-#, fuzzy
-msgid "If you have applied to an EU institution or through a national employment service, you already have this file. Rather than type it all again, hand it over."
-msgstr "Ikiwa umeomba kwa taasisi ya EU au kupitia huduma ya kitaifa ya ajira, tayari una faili hii. Badala ya kurudia kila kitu, rudia tena."
+#: src/postulo/templates/resume/import.html
+msgid "If your career is already written down in a file, hand it over rather than type it all again."
+msgstr ""
 
 #: src/postulo/core/models.py
 #, fuzzy
@@ -10598,10 +10863,9 @@ msgid "Import"
 msgstr "Uwekezaji wa"
 
 #: src/postulo/resume/views.py src/postulo/templates/resume/candidate_file.html
-#: src/postulo/templates/resume/europass_import.html
-#, fuzzy
-msgid "Import a Europass CV"
-msgstr "Uwasilishaji wa Europass CV"
+#: src/postulo/templates/resume/import.html
+msgid "Import a CV"
+msgstr ""
 
 #: src/postulo/templates/applications/ical_import.html
 #, fuzzy
@@ -10779,6 +11043,13 @@ msgstr "Katika kesi hiyo mara mbili"
 msgid "In the instance's time zone."
 msgstr "Katika eneo la tukio."
 
+#: src/postulo/jobs/search_views.py
+#, python-format
+msgid "In the last day"
+msgid_plural "In the last %(count)d days"
+msgstr[0] ""
+msgstr[1] ""
+
 #: src/postulo/core/search.py
 #, fuzzy, python-format
 msgid "in the motivation letter rendered on %(when)s"
@@ -10818,6 +11089,10 @@ msgstr "katika ripoti uliyotuma kwa %(company)s tarehe %(when)s"
 #, fuzzy
 msgid "In this version, and not in the one before"
 msgstr "Katika kesi hii, na si katika kesi ya awali"
+
+#: src/postulo/templates/jobs/listing_search.html
+msgid "In your listings"
+msgstr ""
 
 #: src/postulo/applications/forms.py
 #, fuzzy
@@ -10885,15 +11160,16 @@ msgstr "Viwanda"
 msgid "industries"
 msgstr "viwanda"
 
-#: src/postulo/jobs/models.py
-#, fuzzy
-msgid "industry"
-msgstr "sekta ya viwanda"
-
+#: src/postulo/jobs/enrichment_offers.py
 #: src/postulo/templates/jobs/industry_form.html
 #, fuzzy
 msgid "Industry"
 msgstr "Viwanda"
+
+#: src/postulo/jobs/models.py
+#, fuzzy
+msgid "industry"
+msgstr "sekta ya viwanda"
 
 #: src/postulo/jobs/views.py
 #, fuzzy
@@ -11145,6 +11421,10 @@ msgstr "imetolewa na"
 #, fuzzy
 msgid "issued on"
 msgstr "imetolewa kwa"
+
+#: src/postulo/jobs/enrichment_offers.py
+msgid "It already has a logo."
+msgstr ""
 
 #: src/postulo/templates/settings/account.html
 #, fuzzy
@@ -11512,6 +11792,10 @@ msgstr ""
 msgid "Its street will be looked up with %(service)s shortly."
 msgstr ""
 
+#: src/postulo/templates/jobs/listing_search.html
+msgid "Its terms of use"
+msgstr ""
+
 #: src/postulo/core/models.py
 #, fuzzy
 msgid "its town"
@@ -11541,6 +11825,18 @@ msgstr "Ripoti ya utafutaji wa kazi"
 #, fuzzy, python-format
 msgid "Job search report · %(period)s"
 msgstr "Ripoti ya utafutaji kazi · %(period)s"
+
+#: src/postulo/jobs/search_views.py
+msgid "Job service"
+msgstr ""
+
+#: src/postulo/plugins/kinds.py
+msgid "Job services"
+msgstr ""
+
+#: src/postulo/templates/server/record_of_processing.html
+msgid "Job services it may search"
+msgstr ""
 
 #: src/postulo/applications/forms.py src/postulo/jobs/forms.py
 #: src/postulo/jobs/models.py
@@ -11642,6 +11938,7 @@ msgstr "Hifadhi hizi"
 msgid "Keep this view as"
 msgstr "Weka mtazamo huu kama"
 
+#: src/postulo/templates/jobs/company_enrichment.html
 #: src/postulo/templates/jobs/company_register.html
 msgid "Keep what is ticked"
 msgstr ""
@@ -11665,6 +11962,13 @@ msgstr "Kuweka ukurasa"
 #, fuzzy
 msgid "Kept"
 msgstr "Kept ya"
+
+#: src/postulo/jobs/enrichment_views.py
+#, python-format
+msgid "Kept %(count)s detail."
+msgid_plural "Kept %(count)s details."
+msgstr[0] ""
+msgstr[1] ""
 
 #: src/postulo/templates/server/person_recovery.html
 #, fuzzy
@@ -11865,7 +12169,7 @@ msgstr "lugha ya rekodi yako ya kazi"
 #: src/postulo/documents/rendering.py src/postulo/resume/candidate.py
 #: src/postulo/resume/registry.py src/postulo/resume/views.py
 #: src/postulo/resume/views_candidate.py
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 #: src/postulo/templates/resume/preview.html
 #, fuzzy
 msgid "Languages"
@@ -12099,6 +12403,7 @@ msgstr "Acha tupu ili kuweka moja tayari kuhifadhiwa."
 msgid "Leave empty if this is your current role."
 msgstr "Acha tupu ikiwa hii ni jukumu lako la sasa."
 
+#: src/postulo/templates/jobs/company_enrichment.html
 #: src/postulo/templates/jobs/company_wikidata.html
 #, fuzzy
 msgid "Leave it as it is"
@@ -12225,6 +12530,10 @@ msgstr "Taarifa ya kisheria"
 msgid "Legal services"
 msgstr ""
 
+#: src/postulo/jobs/enrichment_offers.py
+msgid "Legal state"
+msgstr ""
+
 #: src/postulo/jobs/models.py
 #, fuzzy
 msgid "legal state"
@@ -12338,6 +12647,10 @@ msgstr "Kiwango cha 8"
 #, fuzzy
 msgid "Licence"
 msgstr "Wajibu wa"
+
+#: src/postulo/templates/jobs/listing_search.html
+msgid "Licence of its adverts:"
+msgstr ""
 
 #: src/postulo/accounts/models.py src/postulo/core/context_processors.py
 #, fuzzy
@@ -12520,6 +12833,10 @@ msgstr "mahali ya eneo"
 msgid "Location"
 msgstr "Mahali ya eneo"
 
+#: src/postulo/jobs/enrichment_offers.py
+msgid "Logo"
+msgstr ""
+
 #: src/postulo/jobs/models.py
 #, fuzzy
 msgid "logo"
@@ -12591,6 +12908,10 @@ msgstr ""
 #, fuzzy
 msgid "Looking for a logo"
 msgstr "Kutafuta alama"
+
+#: src/postulo/jobs/slow.py
+msgid "Looking for details"
+msgstr ""
 
 #: src/postulo/templates/applications/application_list.html
 #: src/postulo/templates/jobs/company_list.html
@@ -12941,7 +13262,7 @@ msgstr "Mashirika ya"
 #: src/postulo/documents/rendering.py src/postulo/jobs/merging.py
 #: src/postulo/resume/candidate.py src/postulo/resume/registry.py
 #: src/postulo/resume/views.py src/postulo/resume/views_candidate.py
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 #: src/postulo/templates/resume/preview.html
 #, fuzzy
 msgid "Memberships"
@@ -13364,8 +13685,8 @@ msgstr "Sehemu ya NACE"
 msgid "name"
 msgstr "jina la jina"
 
-#: src/postulo/api/forms.py src/postulo/jobs/tables.py
-#: src/postulo/templates/cotton/identifier_row.html
+#: src/postulo/api/forms.py src/postulo/jobs/enrichment_offers.py
+#: src/postulo/jobs/tables.py src/postulo/templates/cotton/identifier_row.html
 #: src/postulo/templates/partials/messaging_handles.html
 #: src/postulo/templates/partials/phone_numbers.html
 #: src/postulo/templates/partials/postal_addresses.html
@@ -13681,6 +14002,7 @@ msgid "Next month"
 msgstr "Mwezi ujao"
 
 #: src/postulo/templates/cotton/document_viewer.html
+#: src/postulo/templates/jobs/listing_search.html
 msgid "Next page"
 msgstr ""
 
@@ -13927,6 +14249,14 @@ msgstr "Hakuna barua ya aina hiyo hadi sasa."
 #, fuzzy
 msgid "No letters yet. A cover letter is for one posting; a motivation letter tells your story; a speculative letter goes where nothing is advertised; a follow-up note comes after an interview."
 msgstr "Hakuna barua nyingine. Barua ya kifuniko ni kwa ajili ya kuchapisha moja; barua ya motisha inaelezea hadithi yako; barua ya maelezo inakwenda ambapo hakuna kitu kinachotangazwa; barua ya kufuatilia inakuja baada ya mahojiano."
+
+#: src/postulo/templates/jobs/company_enrichment.html
+msgid "No licence is stated."
+msgstr ""
+
+#: src/postulo/templates/jobs/company_enrichment.html
+msgid "No licence is stated; the name and the mark are the company's."
+msgstr ""
 
 #: src/postulo/templates/connections/partials/option_table.html
 msgid "No longer on the server"
@@ -14298,6 +14628,10 @@ msgstr "Hakuna hata mmoja wao anayefanya kazi kutoka kwa kitu kingine chochote: 
 msgid "None of this company's industries is Education, so it is not listed as a school or university."
 msgstr "Hakuna viwanda kampuni hii ni Elimu, hivyo ni si waliotajwa kama shule au chuo kikuu."
 
+#: src/postulo/jobs/slow.py
+msgid "None of those can be asked about this company any more."
+msgstr ""
+
 #: src/postulo/templates/jobs/company_places.html
 #, fuzzy
 msgid "None of your companies has this name or identifier."
@@ -14378,6 +14712,10 @@ msgstr "Sio mchezo wa"
 #, fuzzy
 msgid "Not a possible number"
 msgstr "Hakuna uwezekano wa idadi"
+
+#: src/postulo/jobs/enrichment_offers.py
+msgid "Not a profile on a service Postulo knows."
+msgstr ""
 
 #: src/postulo/documents/models.py
 #, fuzzy
@@ -14883,8 +15221,16 @@ msgstr "Hakuna kitu cha kuokoa mpaka wewe ni upya."
 msgid "Nothing is sent to the server as a password until a new one is entered."
 msgstr "Hakuna kitu kinachotumwa kwenye seva kama nenosiri mpaka kuingia mpya."
 
+#: src/postulo/jobs/logos.py
+msgid "Nothing is switched on that finds a logo on a website."
+msgstr ""
+
 #: src/postulo/templates/applications/application_detail.html
 msgid "Nothing kept yet. Keep what you typed into the employer's form, so you can see what they were told."
+msgstr ""
+
+#: src/postulo/templates/jobs/listing_search.html
+msgid "Nothing matches that search."
 msgstr ""
 
 #: src/postulo/templates/applications/application_list.html
@@ -15022,6 +15368,18 @@ msgstr "Hakuna chochote kilichotumwa hadi sasa."
 msgid "Nothing standing at Offer. Record one from an application's page when it arrives."
 msgstr "Hakuna chochote cha kutoa. Rekodi moja kutoka ukurasa wa maombi wakati wa kuwasili."
 
+#: src/postulo/resume/views.py
+msgid "Nothing that reads a CV from a file is switched on here, so that file was not read."
+msgstr ""
+
+#: src/postulo/templates/resume/import.html
+msgid "Nothing that reads a CV from a file is switched on here, so there is no file to choose."
+msgstr ""
+
+#: src/postulo/templates/jobs/company_enrichment.html
+msgid "Nothing that was found can be added to what the company already has."
+msgstr ""
+
 #: src/postulo/core/design.py src/postulo/templates/server/design.html
 #, fuzzy
 msgid "Nothing there"
@@ -15122,7 +15480,7 @@ msgstr "Hakuna kitu kilichohifadhiwa kwenye ukurasa huu."
 msgid "Nothing was kept of this page"
 msgstr "Hakuna kitu kilichohifadhiwa kwenye ukurasa huu"
 
-#: src/postulo/jobs/register_views.py
+#: src/postulo/jobs/enrichment_views.py src/postulo/jobs/register_views.py
 msgid "Nothing was kept."
 msgstr ""
 
@@ -15527,6 +15885,13 @@ msgstr "Mafanikio kwa kila mstari."
 msgid "One address: the person you met, or your contact for this application, or the company's own. It is needed to send, and noted on the timeline when it is given."
 msgstr ""
 
+#: src/postulo/templates/jobs/listing_search.html
+#, python-format
+msgid "One advert found"
+msgid_plural "%(counter)s adverts found"
+msgstr[0] ""
+msgstr[1] ""
+
 #: src/postulo/templates/applications/report.html
 #, fuzzy, python-format
 msgid "One application sent in this period."
@@ -15924,6 +16289,7 @@ msgstr "Ni mwaka tu wa kuchapisha kwenye CV, kwa hivyo siku haifanyi tofauti."
 msgid "Only this publication, as a reference:"
 msgstr ""
 
+#: src/postulo/templates/jobs/company_enrichment.html
 #: src/postulo/templates/jobs/company_register.html
 msgid "Only what you tick is kept; nothing else on the company changes."
 msgstr ""
@@ -16055,6 +16421,10 @@ msgstr "Au mawasiliano mapya"
 msgid "Or say only this"
 msgstr "Au tuseme tu kwamba hii"
 
+#: src/postulo/templates/jobs/capture_form.html
+msgid "Or search a job service for adverts"
+msgstr ""
+
 #: src/postulo/templates/jobs/move_owner.html
 #, fuzzy
 msgid "Or to a person"
@@ -16172,6 +16542,10 @@ msgstr "Pronouns nyingine"
 
 #: src/postulo/jobs/industries.py
 msgid "Other services"
+msgstr ""
+
+#: src/postulo/documents/themes.py
+msgid "Other themes"
 msgstr ""
 
 #: src/postulo/accounts/forms.py
@@ -16570,6 +16944,10 @@ msgstr "Pensheni, bima, marupurupu, vifaa: chochote kilichoitwa."
 msgid "People"
 msgstr "Watu wa watu"
 
+#: src/postulo/jobs/enrichment_offers.py
+msgid "People employed"
+msgstr ""
+
 #: src/postulo/jobs/models.py
 #, fuzzy
 msgid "Per day"
@@ -16626,7 +17004,7 @@ msgstr "mtu binafsi"
 
 #: src/postulo/accounts/views.py src/postulo/core/help.py
 #: src/postulo/templates/accounts/profile.html
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 #, fuzzy
 msgid "Personal details"
 msgstr "Maelezo ya kibinafsi"
@@ -16725,7 +17103,7 @@ msgstr ""
 msgid "Pinned to a version"
 msgstr ""
 
-#: src/postulo/core/models.py
+#: src/postulo/core/models.py src/postulo/jobs/search_views.py
 #, fuzzy
 msgid "Place"
 msgstr "Mahali pa nafasi"
@@ -17180,6 +17558,10 @@ msgstr "Watanzania wamesahau hayo. Mtoa huduma bado ana ruzuku mpaka wewe kuondo
 msgid "Postulo has forgotten the grant. The provider still has it until you withdraw it there as well."
 msgstr "Lowassa amesahau ahadi zake. Hata hivyo, mwajiri wako bado ana haki hiyo mpaka atakapoondoka."
 
+#: src/postulo/templates/jobs/company_enrichment.html
+msgid "Postulo has nowhere to keep these yet. They are shown for you to read, and are not kept."
+msgstr ""
+
 #: src/postulo/core/tagline.py
 #, fuzzy
 msgid "Postulo is a self-hosted job application manager: your applications, CVs and cover letters on your own server, with no paid features."
@@ -17304,7 +17686,7 @@ msgstr "kwa sasa"
 #: src/postulo/documents/rendering.py src/postulo/resume/candidate.py
 #: src/postulo/resume/registry.py src/postulo/resume/views.py
 #: src/postulo/resume/views_candidate.py
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 #: src/postulo/templates/resume/preview.html
 #, fuzzy
 msgid "Presentations, conferences and seminars"
@@ -17578,7 +17960,7 @@ msgstr "Mradi wa Mradi"
 
 #: src/postulo/documents/rendering.py src/postulo/resume/candidate.py
 #: src/postulo/resume/registry.py src/postulo/resume/views_candidate.py
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 #: src/postulo/templates/resume/preview.html
 #, fuzzy
 msgid "Projects"
@@ -17660,7 +18042,9 @@ msgid "Publication"
 msgstr "Publication ya"
 
 #: src/postulo/documents/rendering.py src/postulo/resume/candidate.py
-#: src/postulo/resume/registry.py src/postulo/resume/views_candidate.py
+#: src/postulo/resume/registry.py src/postulo/resume/views.py
+#: src/postulo/resume/views_candidate.py
+#: src/postulo/templates/resume/import.html
 #: src/postulo/templates/resume/preview.html
 #, fuzzy
 msgid "Publications"
@@ -17673,6 +18057,15 @@ msgstr "machapisho ya machapisho"
 
 #: src/postulo/templates/resume/references.html
 msgid "Publications in the file"
+msgstr ""
+
+#: src/postulo/jobs/search_views.py
+msgid "Published"
+msgstr ""
+
+#: src/postulo/templates/jobs/listing_search.html
+#, python-format
+msgid "Published %(when)s"
 msgstr ""
 
 #: src/postulo/resume/models.py
@@ -17865,21 +18258,6 @@ msgstr "Kusoma kama"
 msgid "Read as %(name)s."
 msgstr ""
 
-#: src/postulo/resume/views.py
-#, fuzzy
-msgid "Read as Europass JSON, the older format as the Europass web service wrote it until 2020."
-msgstr "Soma kama Europass JSON, muundo wa zamani kama huduma ya wavuti ya Europass iliandika hadi 2020."
-
-#: src/postulo/resume/views.py
-#, fuzzy
-msgid "Read as Europass XML in the older format, the one the Europass editor wrote until 2020."
-msgstr "Soma kama Europas XML katika muundo wa zamani, ambayo mhariri wa Europas aliandika hadi 2020."
-
-#: src/postulo/resume/views.py
-#, fuzzy
-msgid "Read as Europass XML, the format europass.europa.eu has written since 2020."
-msgstr "Soma kama Europass XML, muundo wa europass.europa.eu umeandikwa tangu 2020."
-
 #: src/postulo/jobs/models.py
 #, fuzzy
 msgid "read by"
@@ -17911,18 +18289,8 @@ msgstr "Kusoma kutoka kwa"
 msgid "Read from <bdi>%(address)s</bdi>."
 msgstr ""
 
-#: src/postulo/resume/views.py
-#, fuzzy
-msgid "Read from the Europass XML attached to the PDF, in the older format the Europass editor wrote until 2020."
-msgstr "Soma kutoka kwa Europass XML iliyounganishwa na PDF, katika muundo wa zamani mhariri wa Europass aliandika hadi 2020."
-
-#: src/postulo/resume/views.py
-#, fuzzy
-msgid "Read from the Europass XML attached to the PDF, the format europass.europa.eu has written since 2020."
-msgstr "Soma kutoka kwa Europass XML iliyounganishwa na PDF, europass.europa.eu imeandikwa tangu 2020."
-
 #: src/postulo/templates/jobs/company_places.html
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 #: src/postulo/templates/resume/references.html
 #: src/postulo/templates/server/plugins.html
 #, fuzzy
@@ -18282,8 +18650,7 @@ msgid "Reference letters they wrote"
 msgstr "Barua ambazo waliandika"
 
 #: src/postulo/documents/rendering.py src/postulo/resume/registry.py
-#: src/postulo/resume/views.py
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/resume/views.py src/postulo/templates/resume/import.html
 #, fuzzy
 msgid "References"
 msgstr "Marejeo ya"
@@ -18487,6 +18854,14 @@ msgstr "Remote"
 #, fuzzy
 msgid "remote address"
 msgstr "anwani ya mbali"
+
+#: src/postulo/jobs/search_views.py
+msgid "Remote work only"
+msgstr ""
+
+#: src/postulo/jobs/search_views.py
+msgid "remote work only"
+msgstr ""
 
 #: src/postulo/templates/accounts/profile.html
 #: src/postulo/templates/connections/confirm_delete.html
@@ -18705,6 +19080,7 @@ msgstr "Kwa mara nyingine"
 msgid "retired on"
 msgstr "kuondolewa kwa"
 
+#: src/postulo/templates/jobs/company_enrichment.html
 #: src/postulo/templates/jobs/company_register.html
 #, python-format
 msgid "Retrieved %(when)s."
@@ -18722,6 +19098,7 @@ msgstr "Mapitio ya Pro"
 
 #: src/postulo/templates/jobs/capture_list.html
 #: src/postulo/templates/jobs/listing_list.html
+#: src/postulo/templates/jobs/listing_search.html
 #, fuzzy
 msgid "Review"
 msgstr "Ukaguzi wa"
@@ -18857,6 +19234,10 @@ msgstr ""
 #, fuzzy
 msgid "Runs in the background; you can leave this page while it works."
 msgstr "Unaweza kuondoka ukurasa huu wakati inafanya kazi."
+
+#: src/postulo/templates/jobs/company_enrichment.html
+msgid "Said, and not offered"
+msgstr ""
 
 #: src/postulo/templates/core/import_csv_map.html
 #, fuzzy
@@ -19078,6 +19459,14 @@ msgstr "Sema nini kitambulisho hiki ni."
 msgid "Say what this number is."
 msgstr "Waambie idadi hii ni nini."
 
+#: src/postulo/jobs/listing_search.py
+msgid "Say what to search for."
+msgstr ""
+
+#: src/postulo/jobs/search_views.py
+msgid "Say what to search for: some words, or a place."
+msgstr ""
+
 #: src/postulo/applications/forms.py
 #, fuzzy
 msgid "Say which currency the amount is in."
@@ -19169,10 +19558,16 @@ msgstr ""
 #: src/postulo/templates/core/search.html
 #: src/postulo/templates/cotton/site_search.html
 #: src/postulo/templates/jobs/industry_list.html
+#: src/postulo/templates/jobs/listing_search.html
 #: src/postulo/templates/resume/answer_list.html
 #, fuzzy
 msgid "Search"
 msgstr "Utafutaji wa Kutafuta"
+
+#: src/postulo/templates/jobs/listing_list.html
+#: src/postulo/templates/jobs/listing_search.html
+msgid "Search a job service"
+msgstr ""
 
 #: src/postulo/applications/tables.py
 #, fuzzy
@@ -19209,6 +19604,10 @@ msgstr "Barua za Kutafuta"
 #, fuzzy
 msgid "Search listings"
 msgstr "Orodha ya kutafuta"
+
+#: src/postulo/templates/jobs/listing_search.html
+msgid "Search the adverts a job service publishes, and review the one you want before it becomes a listing. Nothing is asked until you press Search."
+msgstr ""
 
 #: src/postulo/applications/views.py
 #, fuzzy
@@ -19640,6 +20039,18 @@ msgstr "Kuwa tayari"
 #, fuzzy
 msgid "Seven colours, each tuned to 3:1 against the card in both themes."
 msgstr "Rangi saba, kila moja ilishika hadi 3: 1 dhidi ya kadi katika mandhari zote mbili."
+
+#: src/postulo/jobs/search_views.py
+msgid "Several countries"
+msgstr ""
+
+#: src/postulo/jobs/enrichment_offers.py
+msgid "Several social profiles are switched off."
+msgstr ""
+
+#: src/postulo/jobs/enrichment_offers.py
+msgid "Several telephone numbers are switched off."
+msgstr ""
 
 #: src/postulo/jobs/industries.py
 msgid "Sewerage"
@@ -20161,7 +20572,7 @@ msgstr "vikundi vya ujuzi"
 #: src/postulo/resume/registry.py src/postulo/resume/views.py
 #: src/postulo/resume/views_candidate.py
 #: src/postulo/templates/cotton/listing_skills.html
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 #: src/postulo/templates/resume/preview.html
 #, fuzzy
 msgid "Skills"
@@ -20227,7 +20638,7 @@ msgid "Snoozed for two weeks."
 msgstr "Imehifadhiwa kwa wiki mbili."
 
 #: src/postulo/core/models.py src/postulo/core/web_links.py
-#: src/postulo/documents/printing.py
+#: src/postulo/documents/printing.py src/postulo/jobs/enrichment_offers.py
 #, fuzzy
 msgid "Social profile"
 msgstr "Wasifu wa kijamii"
@@ -20446,6 +20857,7 @@ msgstr "Chanzo ni uwanja wa \"kupatikana kupitia\" kwenye chapisho. Bonyeza hapa
 msgid "source version"
 msgstr "tafsiri ya chanzo"
 
+#: src/postulo/templates/jobs/company_enrichment.html
 #: src/postulo/templates/jobs/company_register.html
 #, python-format
 msgid "Source: %(source)s."
@@ -20490,7 +20902,7 @@ msgstr ""
 #: src/postulo/templates/core/kind_file.html
 #: src/postulo/templates/jobs/contact_vcards.html
 #: src/postulo/templates/resume/candidate_file.html
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 #, fuzzy
 msgid "Start again"
 msgstr "Kuanza tena"
@@ -20768,6 +21180,10 @@ msgstr ""
 #, fuzzy
 msgid "suggested by"
 msgstr "kwa mujibu wa"
+
+#: src/postulo/documents/themes.py
+msgid "Suggested for this document"
+msgstr ""
 
 #: src/postulo/applications/models.py
 #, fuzzy
@@ -21064,6 +21480,7 @@ msgid "telephone"
 msgstr "simu ya simu"
 
 #: src/postulo/core/channels.py src/postulo/documents/printing.py
+#: src/postulo/jobs/enrichment_offers.py
 #: src/postulo/templates/partials/phone_widget.html
 #: src/postulo/templates/server/design.html
 #, fuzzy
@@ -21195,7 +21612,7 @@ msgstr ""
 msgid "Thank-you"
 msgstr ""
 
-#: src/postulo/jobs/register_views.py
+#: src/postulo/jobs/enrichment_offers.py
 msgid "That address could not be added."
 msgstr ""
 
@@ -21227,6 +21644,10 @@ msgstr "Hotuba hii imerudiwa mara nyingi sana."
 #, fuzzy, python-format
 msgid "That address returned %(kind)s rather than a web page."
 msgstr "Anwani hiyo ilirudi %(kind)s badala ya ukurasa wa wavuti."
+
+#: src/postulo/jobs/listing_search.py
+msgid "That advert cannot be asked of this service."
+msgstr ""
 
 #: src/postulo/documents/slow.py
 #, fuzzy
@@ -21720,6 +22141,10 @@ msgstr "Hii sio kitambulisho cha kipengee cha Wikidata."
 msgid "That is not an address Postulo can use."
 msgstr "Hii sio barua pepe ambayo inaweza kutumika."
 
+#: src/postulo/jobs/listing_search.py
+msgid "That is not an advert this service could have named."
+msgstr ""
+
 #: src/postulo/core/offsite.py
 msgid "That is not an age recipient. It starts age1 and is 62 characters long."
 msgstr ""
@@ -21834,6 +22259,10 @@ msgstr ""
 
 #: src/postulo/plugins/pairing.py
 msgid "That item is no longer on the other side."
+msgstr ""
+
+#: src/postulo/jobs/search_views.py
+msgid "That job service is not offered here."
 msgstr ""
 
 #: src/postulo/templates/account/recovery_unusable.html
@@ -21975,6 +22404,14 @@ msgstr "Majibu hayo hayakutokana na ombi la Postulo."
 #, fuzzy
 msgid "That rule existed, and is changed."
 msgstr "Sheria hii ipo na imebadilishwa."
+
+#: src/postulo/jobs/listing_search.py
+msgid "That search cannot be asked of this service."
+msgstr ""
+
+#: src/postulo/jobs/listing_search.py
+msgid "That search is longer than a service can be asked."
+msgstr ""
 
 #: src/postulo/applications/views.py
 #, fuzzy
@@ -22356,6 +22793,11 @@ msgstr "Kampuni, mawasiliano na orodha zinaongeza. Maombi na maelezo ni yako dai
 msgid "The company %(name)s is not in your account, and is added with it."
 msgstr "Kampuni %(name)s haipo kwenye akaunti yako, na inaongezwa pamoja nayo."
 
+#: src/postulo/templates/jobs/company_enrichment.html
+#, python-format
+msgid "The company already has <bdi>%(current)s</bdi>."
+msgstr ""
+
 #: src/postulo/jobs/views.py
 msgid "The company already has that name."
 msgstr ""
@@ -22621,7 +23063,7 @@ msgstr "Kama walivyowahi kuandika kabla ya kustaafu."
 #: src/postulo/templates/documents/upload_detail.html
 #: src/postulo/templates/jobs/contact_vcards.html
 #: src/postulo/templates/resume/candidate_file.html
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 #, fuzzy
 msgid "The file"
 msgstr "Faili ya"
@@ -23072,6 +23514,11 @@ msgstr "Jina la Brand limebadilika."
 msgid "The logo was not changed: %(problem)s"
 msgstr "Nembo haikubadilishwa: %(problem)s"
 
+#: src/postulo/jobs/enrichment_offers.py
+#, python-format
+msgid "The logo was not kept: %(problem)s"
+msgstr ""
+
 #: src/postulo/templates/applications/report.html
 #, fuzzy
 msgid "The longest gap is measured inside this period, so a silence that began before it is not carried in. A period still running is only counted up to today."
@@ -23309,6 +23756,10 @@ msgstr "Picha kutoka kwa maelezo yako, mbali na jina lako. Ni katika PDF na prev
 msgid "The picture that stands for you on these pages: one you upload, your Gravatar, or your initials."
 msgstr "Picha ambayo inasimama kwako kwenye kurasa hizi: moja unayopakia, Gravatar yako, au mwanzo wako."
 
+#: src/postulo/jobs/search_views.py
+msgid "the place"
+msgstr ""
+
 #: src/postulo/accounts/models.py
 msgid "The plugin whose calendar entries set the date, such as a monthly declaration."
 msgstr ""
@@ -23460,10 +23911,14 @@ msgstr "Ombi ni kubwa kuliko %(limit)s, ambacho ndicho kiwango cha juu kabisa am
 msgid "The request was not in the shape this call takes."
 msgstr "Ombi hilo halikuwa katika hali ambayo wito huo ulichukuliwa."
 
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 #, fuzzy
 msgid "The rest of the file is still worth importing. What is listed here is not, and you can add it by hand afterwards."
 msgstr "Sehemu nyingine ya faili bado ni thamani ya kuagiza. Kile kilichoorodheshwa hapa sio, na unaweza kuongeza kwa mkono baadaye."
+
+#: src/postulo/templates/jobs/listing_search.html
+msgid "The results are shown and not kept. An advert is kept only once you review it and save it."
+msgstr ""
 
 #: src/postulo/templates/applications/application_intake.html
 #: src/postulo/templates/jobs/capture_review.html
@@ -23584,6 +24039,14 @@ msgstr "Mtumiaji huyu anakataa uthibitisho huu: %(detail)s"
 #, fuzzy
 msgid "The server that accepts the mail — its name, not an address."
 msgstr "Seva inayokubali barua - jina lake, sio anwani."
+
+#: src/postulo/jobs/listing_search.py
+msgid "The service's address is not one it declared."
+msgstr ""
+
+#: src/postulo/jobs/listing_search.py
+msgid "The service's answer could not be read."
+msgstr ""
 
 #: src/postulo/core/server_forms.py
 msgid "The service's base address. Left empty with Nominatim, OpenStreetMap's public instance is used: https://nominatim.openstreetmap.org. For your own: for example https://photon.example.org"
@@ -23877,6 +24340,10 @@ msgstr "Metadata ya gurudumu haiwezi kusomwa; inaweza kuharibiwa."
 msgid "The wheel's metadata is far larger than any plugin's."
 msgstr "Metadata ya gurudumu ni kubwa zaidi kuliko Plugin yoyote."
 
+#: src/postulo/jobs/search_views.py
+msgid "the words"
+msgstr ""
+
 #: src/postulo/templates/documents/rendered_compare.html
 #, fuzzy
 msgid "The words are the same in both. If the two PDFs look different, what changed is how they are set: the theme, or the layout."
@@ -23886,6 +24353,10 @@ msgstr "Maneno ni sawa katika yote mawili. Ikiwa PDF mbili zinaonekana tofauti, 
 #, fuzzy
 msgid "The words without the layout, in this letter's language. None of these is filed as a version you sent."
 msgstr "Maneno yasiyo na mpangilio, katika lugha ya barua hii. Hakuna hata moja kati ya haya yaliyoorodheshwa kama barua pepe yako."
+
+#: src/postulo/jobs/listing_search.py
+msgid "the words, the place and the filters searched for"
+msgstr ""
 
 #: src/postulo/core/errands.py
 #, fuzzy
@@ -25724,6 +26195,7 @@ msgid "Waiting after this one: %(count)s."
 msgstr "Baada ya hayo, chemsha chini ya joto mpaka nyanya ziwe wazi."
 
 #: src/postulo/applications/models.py src/postulo/jobs/models.py
+#: src/postulo/templates/jobs/listing_search.html
 #, fuzzy
 msgid "Waiting for review"
 msgstr "Kuangalia kwa ajili ya ukaguzi"
@@ -25830,7 +26302,8 @@ msgid "WebP image"
 msgstr "Picha ya Mtandao"
 
 #: src/postulo/core/models.py src/postulo/core/web_links.py
-#: src/postulo/documents/printing.py src/postulo/jobs/tables.py
+#: src/postulo/documents/printing.py src/postulo/jobs/enrichment_offers.py
+#: src/postulo/jobs/tables.py
 #: src/postulo/templates/applications/interview_detail.html
 #: src/postulo/templates/jobs/company_detail.html
 #, fuzzy
@@ -25993,6 +26466,10 @@ msgstr "Nini kimefanyika katika kipindi hiki"
 msgid "what came of it"
 msgstr "nini kilichokuja kutoka kwake"
 
+#: src/postulo/templates/resume/import.html
+msgid "What can be read here"
+msgstr ""
+
 #: src/postulo/core/server_forms.py
 #, fuzzy
 msgid "What carries the mail off this machine."
@@ -26018,7 +26495,7 @@ msgstr "Kilichobadilika katika %(title)s"
 msgid "What changes how Postulo behaves for you. Everything here works from the keyboard, with a screen reader and with scripts off; these are the choices on top of that."
 msgstr "Jinsi ya kubadilisha password yako. Kila kitu hapa kazi kutoka keyboard, na msomaji screen na scripts mbali; hizi ni uchaguzi juu ya kwamba."
 
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 #, fuzzy
 msgid "What could not be read"
 msgstr "Nini haiwezi kusomwa"
@@ -26091,7 +26568,7 @@ msgstr "Nini ni katika diary, mapema zaidi. Chagua moja kutoka ukurasa wa maombi
 #: src/postulo/templates/applications/ical_import.html
 #: src/postulo/templates/core/kind_file.html
 #: src/postulo/templates/resume/candidate_file.html
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 #, fuzzy
 msgid "What is in the file"
 msgstr "Nini kwenye faili"
@@ -26404,6 +26881,7 @@ msgstr "Nini cha kufanya katika sentensi."
 msgid "What to do. It is what the reminder says when it falls due."
 msgstr "Nini cha kufanya. Ni wakati wa kukumbuka."
 
+#: src/postulo/templates/jobs/company_enrichment.html
 #: src/postulo/templates/jobs/company_register.html
 msgid "What to keep"
 msgstr ""
@@ -26477,6 +26955,10 @@ msgstr "Nini cha kufanya huko. \"Haikuandikwa\" haina maana."
 #, fuzzy
 msgid "What you have noticed and not yet acted on, and what closes this week."
 msgstr "Kile ambacho umekiona na ambacho bado hakijafanyika, na kile ambacho kimefungwa wiki hii."
+
+#: src/postulo/templates/jobs/company_enrichment.html
+msgid "What you have recorded is never replaced from here. Change it on the company's own page if a source is right."
+msgstr ""
 
 #: src/postulo/resume/models.py
 #, fuzzy
@@ -26589,6 +27071,10 @@ msgstr "Baada ya kuingia kwenye akaunti yako."
 msgid "When it happened, which is not always when you write it down."
 msgstr "Hii hutokea, ambayo si mara zote wakati wa kuandika."
 
+#: src/postulo/jobs/search_views.py
+msgid "when it was published"
+msgstr ""
+
 #: src/postulo/jobs/forms.py
 #, fuzzy
 msgid "When the employer put it up, if the posting says. Empty means unknown."
@@ -26694,6 +27180,10 @@ msgstr "Ambapo mtu anaweza kuona. CV inaonyesha kama kiungo."
 msgid "Where the companies' map takes the tiles it is drawn on, and whether addresses are pinned at their street."
 msgstr ""
 
+#: src/postulo/templates/resume/import.html
+msgid "Where the file states no level, none is written: a level is a claim about yourself that somebody will test, so it is yours to make afterwards."
+msgstr ""
+
 #: src/postulo/jobs/models.py
 #, fuzzy
 msgid "where the logo came from"
@@ -26764,6 +27254,10 @@ msgstr "Mahali kiingizo hiki kinapokaa katika sehemu yake huwekwa kwa mishale kw
 #, fuzzy
 msgid "Where this instance can send a code to a telephone, a number you have confirmed can also be the one that gets you back into your account. That choice is separate from the primary, so changing what a recruiter dials never changes how you prove it is you. The bin will not remove that number while it is your way in. Changing its digits makes it another number, which has to be confirmed again and is no longer your way in."
 msgstr "Ambapo tukio hili linaweza kutuma msimbo kwenye simu, idadi ambayo umethibitisha inaweza pia kuwa ile inayokurudisha kwenye akaunti yako. Chaguo hilo ni tofauti na msingi, kwa hivyo kubadilisha kile ambacho mgombea hupigia kamwe mabadiliko jinsi unavyothibitisha ni wewe. Kwa njia hii, hakuna haja ya kuondoa idadi hiyo wakati unapoingia. Kubadilisha namba yake hufanya idadi nyingine, ambayo inapaswa kuthibitishwa tena na sio njia yako tena."
+
+#: src/postulo/templates/cotton/enrichment_ask.html
+msgid "Where to ask"
+msgstr ""
 
 #: src/postulo/templates/server/register_lookup.html
 msgid "Where to get a key"
@@ -27253,6 +27747,10 @@ msgstr ""
 msgid "Word document"
 msgstr "Neno la siri"
 
+#: src/postulo/jobs/search_views.py
+msgid "Words"
+msgstr ""
+
 #: src/postulo/accounts/forms.py
 #, fuzzy
 msgid "Words and chevrons"
@@ -27398,7 +27896,7 @@ msgstr "Imeandikwa na <bdi>%(name)s</bdi>"
 msgid "Written by Postulo %(version)s on %(when)s."
 msgstr "Imeandikwa na Postulo %(version)s juu ya %(when)s."
 
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 #, fuzzy, python-format
 msgid "Written in %(tongue)s, which will be recorded as the language of your career record if you have not already set one."
 msgstr "Imeandikwa kwa %(tongue)s, ambayo itarekodiwa kama lugha ya rekodi yako ya taaluma ikiwa bado hujaiweka."
@@ -28093,7 +28591,7 @@ msgstr "Taarifa yako (JSON)"
 
 #: src/postulo/templates/core/export.html
 #: src/postulo/templates/resume/candidate_file.html
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 #, fuzzy
 msgid "Your record as a file"
 msgstr "Rekodi yako kama faili"
@@ -28242,10 +28740,14 @@ msgstr "{value} huja baada ya seva: kwenye njia, baada ya alama ya kuuliza au ba
 msgid "· in the <a href=\"%(group_url)s\" class=\"underline\">%(name)s</a> group"
 msgstr "· katika kikundi cha <a href=\"%(group_url)s\" class=\"underline\">%(name)s</a>"
 
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 #, fuzzy
 msgid "· no level in the file, so none will be claimed"
 msgstr "• hakuna kiwango katika faili, hivyo hakuna mtu atakayedai"
+
+#: src/postulo/templates/resume/import.html
+msgid "· not a level Postulo keeps, so none will be claimed"
+msgstr ""
 
 #: src/postulo/templates/applications/application_detail.html
 #, fuzzy, python-format

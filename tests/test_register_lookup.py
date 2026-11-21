@@ -867,13 +867,19 @@ def test_a_read_grant_cannot_look_up(client, user, other_user, switched_on):
 
 
 def test_the_record_of_processing_lists_the_registers_only_while_it_is_on(db):
-    assert gdpr.record_of_processing()["services"] == []
+    registers = {adapter.key for adapter in adapters.ADAPTERS}
+
+    def listed():
+        # The company's own website is listed beside them while it is on (#1256).
+        return {row["key"]: row for row in gdpr.record_of_processing()["services"]}
+
+    assert not registers & set(listed())
 
     PluginPolicy.objects.filter(plugin=REGISTER_LOOKUP, person=None).delete()
     forget_decisions()
 
-    services = {row["key"]: row for row in gdpr.record_of_processing()["services"]}
-    assert set(services) == {adapter.key for adapter in adapters.ADAPTERS}
+    services = listed()
+    assert set(services) - {"company-site"} == registers
     assert services["gleif"]["hosts"] == ["api.gleif.org"]
     assert services["fi-ytj"]["licence"] == "CC BY 4.0"
 

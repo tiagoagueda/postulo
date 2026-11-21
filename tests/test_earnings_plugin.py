@@ -88,7 +88,7 @@ def test_it_is_a_shipped_offline_licensed_earnings_source():
 
 
 def test_it_starts_off_for_the_instance(user, client):
-    """D1: a statistic beside a salary is the administrator's choice (migration 0018)."""
+    """D1: a statistic beside a salary is the administrator's choice (migration 0019)."""
     row = PluginPolicy.objects.get(plugin="earnings", person__isnull=True)
 
     assert row.state == "off"

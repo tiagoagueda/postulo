@@ -257,6 +257,7 @@ def test_a_report_theme_is_handed_plain_values_only(user):
         owner=user, name="France Travail", kind=CompanyKind.EMPLOYMENT_SERVICE
     )
     Contact.objects.create(owner=user, company=office, name="Camille Durand")
+    held(application, on=dt.date(2026, 3, 9))
 
     context = reports.as_context(reports.build(user, march(), today=dt.date(2026, 3, 31)))
 
@@ -275,6 +276,7 @@ def test_a_report_theme_is_handed_plain_values_only(user):
         "cadence",
         "happened",
         "evidence",
+        "interviews",
         "sources",
         "industries",
     } <= set(context)
@@ -289,7 +291,119 @@ def test_a_report_theme_is_handed_plain_values_only(user):
         "url",
         "status",
         "last_activity_on",
+        "channel",
+        "channel_key",
+        "location",
     }, "who referred somebody is not a theme's to print (#239)"
+    assert set(context["interviews"][0]) == {"on", "company", "role", "kind"}, (
+        "an interview is the employer and the job, never the people met"
+    )
+
+
+# ------------------------------------------- what an office's table needs (#1262)
+
+
+def held(application, *, on: dt.date, kind="", contact=None):
+    """An interview settled as held on that day, at ten."""
+    from django.utils import timezone
+
+    from postulo.applications.models import Interview, InterviewKind, InterviewOutcome
+    from postulo.jobs.models import Contact
+
+    starts = timezone.make_aware(dt.datetime.combine(on, dt.time(10, 0)))
+    interview = Interview.objects.create(
+        owner=application.owner,
+        application=application,
+        kind=kind or InterviewKind.ONSITE,
+        starts_at=starts,
+        ends_at=starts + dt.timedelta(hours=1),
+        outcome=InterviewOutcome.DONE,
+    )
+    if contact:
+        interview.contacts.add(
+            Contact.objects.create(
+                owner=application.owner, company=application.posting.company, name=contact
+            )
+        )
+    return interview
+
+
+def test_each_row_says_how_it_was_made_and_where_the_job_is(user):
+    from postulo.applications.models import Application, Channel
+
+    application = sent(user, on=dt.date(2026, 3, 4))
+    Application.objects.filter(pk=application.pk).update(channel=Channel.EMPLOYMENT_SERVICE)
+    application.posting.location = "  Lyon  "
+    application.posting.save(update_fields=["location"])
+    sent(user, on=dt.date(2026, 3, 5), company="Black Mesa")
+
+    rows = reports.as_context(reports.build(user, march(), today=dt.date(2026, 3, 31)))["evidence"]
+
+    assert rows[0]["channel"] == "Public employment service"
+    assert rows[0]["channel_key"] == "employment_service", (
+        "a value a theme can map, in any language"
+    )
+    assert rows[0]["location"] == "Lyon"
+    assert (rows[1]["channel"], rows[1]["channel_key"], rows[1]["location"]) == ("", "", ""), (
+        "what the person did not say is empty, not guessed"
+    )
+
+
+def test_the_periods_interviews_are_listed_as_many_as_are_counted(user):
+    """The diary and the timeline together, the overlap removed: the list and the figure
+    are the same interviews (#224)."""
+    from django.utils import timezone
+
+    from postulo.applications.models import EventKind, InterviewKind
+    from postulo.applications.services import record_event
+
+    first = sent(user, on=dt.date(2026, 3, 2), company="Initech", role="Analyst")
+    second = sent(user, on=dt.date(2026, 3, 3), company="Black Mesa", role="Physicist")
+    held(second, on=dt.date(2026, 3, 20), kind=InterviewKind.PHONE)
+    held(first, on=dt.date(2026, 2, 27))  # before the period
+    record_event(
+        first,
+        kind=EventKind.INTERVIEW,
+        summary="Met the team",
+        occurred_at=timezone.make_aware(dt.datetime(2026, 3, 10, 15, 0)),
+    )
+
+    report = reports.build(user, march(), today=dt.date(2026, 3, 31))
+    context = reports.as_context(report)
+
+    assert context["interviews"] == [
+        {"on": dt.date(2026, 3, 10), "company": "Initech", "role": "Analyst", "kind": ""},
+        {
+            "on": dt.date(2026, 3, 20),
+            "company": "Black Mesa",
+            "role": "Physicist",
+            "kind": "Phone screen",
+        },
+    ]
+    assert len(context["interviews"]) == context["happened"]["interviews"]
+
+
+def test_an_interviews_people_are_not_a_themes_to_print(user):
+    application = sent(user, on=dt.date(2026, 3, 2), company="Initech")
+    held(application, on=dt.date(2026, 3, 9), contact="Bill Lumbergh")
+
+    context = reports.as_context(reports.build(user, march(), today=dt.date(2026, 3, 31)))
+
+    assert "Bill Lumbergh" not in repr(context)
+
+
+def test_only_the_readers_own_interviews_are_listed(user, other_user):
+    """Two people applying to the same firm: each report lists its own author's interviews."""
+    mine = sent(user, on=dt.date(2026, 3, 2), company="Initech", role="Analyst")
+    theirs = sent(other_user, on=dt.date(2026, 3, 2), company="Initech", role="Manager")
+    held(mine, on=dt.date(2026, 3, 9))
+    held(theirs, on=dt.date(2026, 3, 10))
+
+    listed = reports.as_context(reports.build(user, march(), today=dt.date(2026, 3, 31)))[
+        "interviews"
+    ]
+
+    assert [row["role"] for row in listed] == ["Analyst"]
 
 
 def test_a_theme_from_outside_reads_the_industries_and_the_rest(user, ledger):

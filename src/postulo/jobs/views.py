@@ -1121,6 +1121,13 @@ class CompanyDetailView(SharedObjectMixin, DetailView):
         context["register_lookups"] = (
             register_views.lookups_for(self.object, person) if context["can_write"] else []
         )
+        # *Find details* (#1256): the sources that are on for the reader, for the dialog that
+        # says what a press would send. Listing them asks nothing of anybody.
+        from . import enrichment_views
+
+        context["enrichment_sources"] = (
+            enrichment_views.ask_rows(self.object, person) if context["can_write"] else []
+        )
         # The data-subject export beside each contact, while the feature offers it (#297).
         from postulo.core import gdpr
 
@@ -1351,6 +1358,13 @@ class LogoFormMixin:
 
         context = super().get_context_data(**kwargs)
         context["logo_form"] = CompanyLogoForm()
+        # *Find logo* reads the company's site through a source that offers a logo (#1256);
+        # with none on for the reader there is nothing to press. Asking which is on asks
+        # nobody anything.
+        company = getattr(self, "object", None)
+        context["logo_sources"] = bool(
+            company is not None and company.pk and logos.site_sources(company, self.request.user)
+        )
         return context
 
     def form_valid(self, form):
@@ -1526,6 +1540,10 @@ class CompanyUpdateView(
         context["company_names"] = _company_names(self.object)
         context["company_acronyms"] = self.object.acronyms() if self.object else []
         context["wikidata_offered"] = wikidata_offered(self.request.user)
+        # *Find details* (#1256), as on the company's page.
+        from . import enrichment_views
+
+        context["enrichment_sources"] = enrichment_views.ask_rows(self.object, self.request.user)
         context["name_languages"] = sorted(
             languages.NATIVE_NAMES.items(), key=lambda pair: pair[1].casefold()
         )

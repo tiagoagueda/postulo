@@ -22,6 +22,7 @@ from postulo.core import pictures
 from postulo.core.models import Errand
 from postulo.jobs import logos
 from postulo.jobs.models import Company, CompanyLogo
+from postulo.plugins import fetching
 
 pytestmark = pytest.mark.django_db
 
@@ -77,7 +78,7 @@ def web(monkeypatch):
     # `find_on_website` uses to read the company's own page — opens one too.
     monkeypatch.setattr(logos.http, "client", client)
     monkeypatch.setattr(logos.http, "public_only_client", client)
-    monkeypatch.setattr(logos.fetching, "validate_public_url", lambda url: url)
+    monkeypatch.setattr(fetching, "validate_public_url", lambda url: url)
     return state
 
 
@@ -249,119 +250,8 @@ def a_page(**parts) -> bytes:
     return f"<html><head>{head}</head><body>Black Mesa</body></html>".encode()
 
 
-def test_the_site_is_asked_what_its_own_icon_is(web, company, monkeypatch):
-    monkeypatch.setattr(
-        logos.fetching,
-        "fetch_page",
-        lambda url: logos.fetching.FetchedPage(
-            url="https://blackmesa.test/",
-            html=a_page(
-                small='<link rel="icon" sizes="16x16" href="/small.png">',
-                apple='<link rel="apple-touch-icon" sizes="180x180" href="/touch.png">',
-            ).decode(),
-        ),
-    )
-    web["responses"]["https://blackmesa.test/touch.png"] = (200, an_image(), "image/png")
-    web["responses"]["https://blackmesa.test/small.png"] = (200, an_image(), "image/png")
-
-    found = logos.find_on_website(company)
-    assert found == "https://blackmesa.test/touch.png", "the largest declared icon first"
-    company.refresh_from_db()
-    assert company.has_logo and company.logo_source == "website"
-
-
-def test_the_organisations_own_logo_and_the_favicon_are_tried_too(web, company, monkeypatch):
-    monkeypatch.setattr(
-        logos.fetching,
-        "fetch_page",
-        lambda url: logos.fetching.FetchedPage(
-            url="https://blackmesa.test/",
-            html=a_page(
-                ld=(
-                    '<script type="application/ld+json">'
-                    '{"@context":"https://schema.org","@type":"Organization",'
-                    '"logo":{"url":"https://blackmesa.test/brand.png"}}'
-                    "</script>"
-                )
-            ).decode(),
-        ),
-    )
-    web["responses"]["https://blackmesa.test/brand.png"] = (200, an_image(), "image/png")
-    assert logos.find_on_website(company) == "https://blackmesa.test/brand.png"
-
-    # With nothing declared, the conventional address is the last thing tried.
-    monkeypatch.setattr(
-        logos.fetching,
-        "fetch_page",
-        lambda url: logos.fetching.FetchedPage(url="https://blackmesa.test/", html=a_page()),
-    )
-    web["responses"]["https://blackmesa.test/favicon.ico"] = (200, an_image(), "image/png")
-    assert logos.find_on_website(company).endswith("/favicon.ico")
-
-
-def test_a_site_with_nothing_usable_says_so(web, company, monkeypatch):
-    monkeypatch.setattr(
-        logos.fetching,
-        "fetch_page",
-        lambda url: logos.fetching.FetchedPage(url="https://blackmesa.test/", html=a_page()),
-    )
-    with pytest.raises(logos.UnusableLogo, match=r"Nothing on blackmesa\.test"):
-        logos.find_on_website(company)
-
-
-def test_a_deeply_nested_json_ld_block_is_skipped_not_a_crash(web, company, monkeypatch):
-    """A page's JSON-LD nested thousands deep must end in the sentence, not a traceback (#959)."""
-    deep = "[" * 200_000 + "]" * 200_000
-    monkeypatch.setattr(
-        logos.fetching,
-        "fetch_page",
-        lambda url: logos.fetching.FetchedPage(
-            url="https://blackmesa.test/",
-            html=a_page(ld=f'<script type="application/ld+json">{deep}</script>').decode(),
-        ),
-    )
-    with pytest.raises(logos.UnusableLogo, match=r"Nothing on blackmesa\.test"):
-        logos.find_on_website(company)
-    # A document nested as deep as the parser allows is walked without recursing.
-    shallow = "[" * 900 + '{"@type":"Organization","logo":"https://x.test/l.png"}' + "]" * 900
-    assert logos._organisation_logos([shallow]) == ["https://x.test/l.png"]
-
-
-def test_a_site_that_blocks_the_icon_says_why(web, company, monkeypatch):
-    monkeypatch.setattr(
-        logos.fetching,
-        "fetch_page",
-        lambda url: logos.fetching.FetchedPage(
-            url="https://blackmesa.test/",
-            html=a_page(icon='<link rel="icon" href="/only.png">').decode(),
-        ),
-    )
-    web["responses"]["https://blackmesa.test/only.png"] = (403, b"", "text/plain")
-    with pytest.raises(logos.UnusableLogo, match=r"Nothing on blackmesa\.test.*403"):
-        logos.find_on_website(company)
-
-
-def test_the_favicon_is_tried_however_many_icons_a_page_declares(web, company, monkeypatch):
-    icons = "".join(
-        f'<link rel="apple-touch-icon" sizes="{n}x{n}" href="/touch{n}.png">'
-        for n in (57, 60, 72, 76, 114, 120, 144)
-    )
-    monkeypatch.setattr(
-        logos.fetching,
-        "fetch_page",
-        lambda url: logos.fetching.FetchedPage(
-            url="https://blackmesa.test/", html=a_page(icons=icons).decode()
-        ),
-    )
-    with pytest.raises(logos.UnusableLogo):
-        logos.find_on_website(company)
-    assert "https://blackmesa.test/favicon.ico" in web["calls"]
-
-
-def test_a_company_with_no_website_has_nowhere_to_look(user):
-    company = Company.objects.create(owner=user, name="Aperture")
-    with pytest.raises(logos.UnusableLogo, match="no website"):
-        logos.find_on_website(company)
+# The tests of reading a site for its icon moved with the code, to tests/test_company_site.py
+# (#1256): what they hold is the `company-site` plugin's now.
 
 
 # --------------------------------------------------------------- the interface
@@ -516,9 +406,9 @@ def test_find_logo_and_refresh_are_only_ever_pressed_by_a_person(
 ):
     client.force_login(user)
     monkeypatch.setattr(
-        logos.fetching,
+        fetching,
         "fetch_page",
-        lambda url: logos.fetching.FetchedPage(
+        lambda url: fetching.FetchedPage(
             url="https://blackmesa.test/",
             html=a_page(icon='<link rel="icon" href="/icon.png">').decode(),
         ),
@@ -558,9 +448,9 @@ def test_logo_actions_are_private_to_the_owner(client, other_user, company):
 
 def _a_site_with_an_icon(web, monkeypatch):
     monkeypatch.setattr(
-        logos.fetching,
+        fetching,
         "fetch_page",
-        lambda url: logos.fetching.FetchedPage(
+        lambda url: fetching.FetchedPage(
             url="https://blackmesa.test/",
             html=a_page(icon='<link rel="icon" href="/icon.png">').decode(),
         ),
@@ -583,6 +473,31 @@ def test_an_htmx_press_is_answered_with_the_errand_state_for_the_dialog(
     assert 'id="errand-state"' in html and "Found a logo" in html
     assert "data-dialog-done" in html and "Take me to it" not in html
     assert "<html" not in html
+
+
+def test_a_write_grantees_find_logo_finds_the_shared_companys_logo(
+    client, user, other_user, company, web, monkeypatch
+):
+    """The errand finds the company as the person who pressed may reach it (#896, #1256):
+    it was answered "That company is no longer here." for anybody but its owner."""
+    from postulo.jobs import slow
+    from postulo.jobs.models import Share
+
+    _a_site_with_an_icon(web, monkeypatch)
+    share = Share.objects.create(company=company, grantee_user=other_user, scope=Share.Scope.WRITE)
+    client.force_login(other_user)
+
+    client.post(reverse("jobs:company_logo_action", args=[company.pk, "website"]))
+
+    errand = Errand.objects.get(kind="logo")
+    assert errand.owner == other_user and "Found a logo" in errand.outcome["message"]
+    company.refresh_from_db()
+    assert company.has_logo
+
+    # A grant taken back while the errand waited finds nothing, as a deleted company does.
+    share.delete()
+    with pytest.raises(slow.Refused, match="no longer here"):
+        slow.find_a_logo(errand)
     company.refresh_from_db()
     assert company.logo_source == "website"
 
@@ -597,9 +512,9 @@ def test_a_plain_press_still_lands_on_the_errand_page(client, user, company, web
 
 def test_a_failure_in_the_dialog_gives_its_reason(client, user, company, web, monkeypatch):
     monkeypatch.setattr(
-        logos.fetching,
+        fetching,
         "fetch_page",
-        lambda url: logos.fetching.FetchedPage(url="https://blackmesa.test/", html=a_page()),
+        lambda url: fetching.FetchedPage(url="https://blackmesa.test/", html=a_page()),
     )
     web["responses"]["https://blackmesa.test/favicon.ico"] = (403, b"", "text/plain")
     client.force_login(user)
@@ -636,6 +551,36 @@ def test_the_edit_page_opens_the_logo_dialog_with_a_button(client, user, company
     assert 'popovertarget="logo-dialog"' in html
     assert 'id="logo-dialog"' in html and 'id="company-head"' in html
     assert "blackmesa.test" in html
+    assert f"/companies/{company.pk}/logo/website/" in html
+
+
+def test_with_the_company_site_switched_off_find_logo_goes_and_the_rest_stays(
+    client, user, company, web
+):
+    """Reading the site is the `company-site` plugin's (#1256): switched off, *Find logo* is
+    not drawn and a hand-written press reads nothing; the address, the upload and the dialog
+    stay, and so does *Refresh* for a logo that has an address."""
+    from postulo.core.memo import forget_decisions
+    from postulo.plugins.models import PluginPolicy
+
+    PluginPolicy.objects.create(plugin="company-site", state=PluginPolicy.State.FORCED_OFF)
+    forget_decisions()
+    client.force_login(user)
+
+    html = client.get(reverse("jobs:company_update", args=[company.pk])).content.decode()
+    assert 'id="logo-dialog"' in html and 'name="logo_url"' in html and 'name="logo_upload"' in html
+    assert f"/companies/{company.pk}/logo/website/" not in html
+
+    pressed = client.post(reverse("jobs:company_logo_action", args=[company.pk, "website"]))
+    errand = Errand.objects.get(pk=pressed.url.rstrip("/").split("/")[-1])
+    assert errand.state == "failed" and "switched on" in errand.error
+    assert web["calls"] == [], "nothing read the site"
+
+    _stored(company)
+    company.logo_source_url = "https://cdn.example/logo.png"
+    company.save()
+    html = client.get(reverse("jobs:company_update", args=[company.pk])).content.decode()
+    assert "Refresh logo" in html
 
 
 def test_two_people_recording_the_same_company_keep_their_own(user, other_user, web):
@@ -720,25 +665,6 @@ def test_an_upload_that_is_not_a_picture_says_so_at_the_form(user):
 
     assert not form.is_valid()
     assert "could not be read as an image" in str(form.errors["logo_upload"])
-
-
-def test_an_icons_sizes_are_read_in_time_that_follows_their_length():
-    """`sizes` is the page's to write. Read without a look-behind, a run of digits with no
-    `x` after it was tried again from every digit in it: 40,000 of them took fifteen seconds
-    and a page may be two megabytes, so *Find logo* on a hostile site held a worker for
-    hours (#321)."""
-    import time
-
-    assert logos._largest("16x16 32X32 180x180") == 180
-    assert logos._largest("any") == 0
-    assert logos._largest("") == 0
-    assert logos._largest(None) == 0
-
-    started = time.perf_counter()
-    assert logos._largest("1" * 400_000) == 0
-    assert logos._largest("1" * 400_000 + "x16") == 0, "no size is 400,000 digits long"
-    assert logos._largest("7" * 200_000 + " 48x48") == 48
-    assert time.perf_counter() - started < 2.0
 
 
 # ------------------------------------------------ a logo is a row, written with its flag (#662)
@@ -846,10 +772,12 @@ def test_finding_a_logo_for_a_company_deleted_meanwhile_is_refused(company, monk
         Company.objects.filter(pk=company.pk).delete()
         raise DatabaseError("Save with update_fields did not affect any rows.")
 
-    monkeypatch.setattr(logos, "find_on_website", lambda c: gone(c, ""))
+    monkeypatch.setattr(logos, "find_on_website", lambda c, by=None: gone(c, ""))
 
     errand = SimpleNamespace(
-        payload={"company_id": company.pk, "action": "website"}, owner_id=company.owner_id
+        payload={"company_id": company.pk, "action": "website"},
+        owner_id=company.owner_id,
+        owner=company.owner,
     )
     with pytest.raises(Refused):
         slow.find_a_logo(errand)

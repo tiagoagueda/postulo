@@ -41,7 +41,7 @@ from postulo.core.models import Tag
 from postulo.core.params import as_pk
 from postulo.core.redirects import safe_next
 from postulo.core.search import application_match, clean_query
-from postulo.documents import themes
+from postulo.documents import theme_choice, themes
 from postulo.jobs import listing_earnings, listing_skills
 from postulo.jobs.history import history_of
 from postulo.jobs.models import Company, Contact
@@ -1549,7 +1549,11 @@ def report_context(request: HttpRequest, *, schedule_form=None) -> dict:
         # What the document is drawn in, offered beside the button that files it
         # (#340): the theme this person last chose, and the language a CV with none
         # of its own would be in.
-        "theme_choices": themes.choices_for(themes.Kind.REPORT),
+        "theme_groups": themes.option_groups(
+            theme_choice.offered_for(
+                themes.Kind.REPORT, request.user, reports.language_for(request.user)
+            )
+        ),
         "chosen_theme": reports.theme_for(request.user),
         "language_choices": reports.offered_languages(),
         "chosen_language": reports.language_for(request.user),

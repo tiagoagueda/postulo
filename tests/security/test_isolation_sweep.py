@@ -41,6 +41,46 @@ def _register_lookup_on(db):
     forget_decisions()
 
 
+class SweptDetails:
+    """A source of company details (#1256), so that *Find details* is an address at all: with
+    none installed it is a 404 to everybody, which proves nothing about anybody's record.
+    Nothing in a sweep presses it, so it is never asked."""
+
+    name = "swept-details"
+    kind = "company-enrichment"
+    label = "Swept details"
+
+    @property
+    def sources(self):
+        from postulo.plugins.api import EnrichmentSource
+
+        return (
+            EnrichmentSource(
+                key="swept",
+                label="Swept",
+                starts_from=("name",),
+                offers=("website",),
+                hosts=("details.example",),
+                addresses=lambda subject: ["https://details.example/"],
+                read=lambda answers, subject: [],
+                sends="the company's name",
+                source="Swept",
+            ),
+        )
+
+
+@pytest.fixture(autouse=True)
+def _a_source_of_company_details():
+    from postulo.core.memo import forget_decisions
+    from postulo.plugins import registry
+
+    registry.register_builtin("company-enrichment", SweptDetails)
+    forget_decisions()
+    yield
+    registry.unregister_builtin("company-enrichment", SweptDetails)
+    forget_decisions()
+
+
 #: Patterns that name no owned record, and why. Keep this honest.
 EXCUSED: dict[str, str] = {
     "accounts:invite_accept": (
@@ -722,6 +762,8 @@ FACTORIES: dict[str, Callable] = {
     "jobs:company_names": pk_of(company),
     # what its register said, and keeping what was ticked (#1021)
     "jobs:company_register": pk_of(company),
+    # what Find details brought back, and keeping what was ticked (#1256)
+    "jobs:company_enrichment": pk_of(company),
     # its dated hiring signals (#941)
     "jobs:company_signal_add": pk_of(company),
     "jobs:company_signal_edit": pk_of(company_signal),

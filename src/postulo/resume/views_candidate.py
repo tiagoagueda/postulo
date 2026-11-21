@@ -78,7 +78,7 @@ def _held(request: HttpRequest) -> dict | None:
 class CandidateFileView(LoginRequiredMixin, TemplateView):
     """Offer the file, read one, show what adding it would do, and add it when told to.
 
-    Two steps on one address, the same shape as the Europass import and the spreadsheet
+    Two steps on one address, the same shape as the import of a CV and the spreadsheet
     one: a file is read and held in the session, the page says what was found and what
     would happen to each part of it, and nothing reaches the record until somebody has
     seen that and pressed the button. **Nothing is saved on a guess.**
@@ -97,6 +97,11 @@ class CandidateFileView(LoginRequiredMixin, TemplateView):
         if not held:
             context["counts"] = _counted(self.request.user)
             context["filename"] = export.candidate_filename(self.request.user)
+            # Whether anything here reads a CV from another program's file: the link to
+            # that page is offered only where one is switched on for the person (#1260).
+            from postulo.plugins.policy import plugins_for
+
+            context["importers_on"] = bool(plugins_for(self.request.user, "importer"))
         return context
 
     def post(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:

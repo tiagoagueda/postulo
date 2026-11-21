@@ -70,6 +70,14 @@ def announcement_key(prefix: str, *parts) -> str:
     return f"{prefix}:{digest}"
 
 
+#: The most characters of body a notifier that reaches a person is handed (#1259). A machine's
+#: webhook (``delivers_later``) is the person's own receiver and keeps the whole text.
+BODY_LIMIT = 500
+
+#: What a cut body ends with.
+BODY_ELLIPSIS = "…"
+
+
 @dataclass(frozen=True)
 class Notification:
     """One message, independent of how it travels.
@@ -124,10 +132,29 @@ class Notification:
     def but(self, **changes) -> Notification:
         """This message with ``changes`` applied, since it is frozen.
 
-        `notify` stamps the language on the way past, which is the only reason this exists;
-        a sender builds the whole thing at once.
+        `notify` stamps the language on the way past, and cuts the body for a notifier that
+        reaches a person; a sender builds the whole thing at once.
         """
         return replace(self, **changes)
+
+    def brief(self) -> Notification:
+        """This message with its body cut to `BODY_LIMIT` characters, at a word (#1259).
+
+        What a person is sent is a line on a lock screen, a push through a vendor's service,
+        a topic on a public ntfy server: a title, a few short lines and a link back. Three
+        bodies are a person's own free text with no bound of their own (the note on a status
+        change, an offer's terms, a plugin's note on a reminder), so the core cuts every body
+        before a notifier that reaches a person sees it, and the rest stays behind the link.
+        """
+        if len(self.body) <= BODY_LIMIT:
+            return self
+        cut = self.body[: BODY_LIMIT - len(BODY_ELLIPSIS)]
+        # At the last space, unless that would throw most of it away: a script written
+        # without spaces (Chinese, Japanese, Thai) is cut where the limit falls.
+        space = max(cut.rfind(" "), cut.rfind("\n"))
+        if space >= BODY_LIMIT // 2:
+            cut = cut[:space]
+        return self.but(body=cut.rstrip() + BODY_ELLIPSIS)
 
 
 @runtime_checkable
@@ -144,14 +171,24 @@ class NotifierPlugin(ConnectedPlugin, Protocol):
     is retried), and know that a ``send`` which reached some of several destinations before
     raising will reach those again; ``key`` is how to tell.
 
-    Two things a notifier may also say about itself. Both are read by name and neither
-    is part of this protocol, so a notifier that says neither is still one:
+    A few things a notifier may also say about itself. Each is read by name and none is
+    part of this protocol, so a notifier that says none of them is still one:
 
     - ``event_defaults``, which events are on for a connection that has not said (see
       `default_for`);
     - ``delivers_later = True``, when ``send`` only queues the message for something
       else to deliver. A ``send`` that returns is then not recorded as a delivery, and
-      whatever does deliver writes the outcome with ``connection.record_test`` (#574).
+      whatever does deliver writes the outcome with ``connection.record_test`` (#574);
+    - ``hold_until(notification, config, user) -> datetime | None``, asked before ``send``
+      (#1259). A time still to come means "keep it until then": Postulo keeps the message
+      and the scheduler hands it over at the first pass after that time, in the words and
+      the language it was built in. ``None``, or a time already past, sends it now. It is
+      asked in the recipient's time zone, so ``timezone.localtime()`` is theirs;
+    - ``send_many(notifications, config, user) -> None``, handed every message of one
+      connection that falls due in the same pass (kept ones, and failed sends due again),
+      oldest first, so they can travel as one (a digest). Without it each goes through
+      ``send``. It succeeds or fails for all of them together, and a failure is tried
+      again as a failed ``send`` is.
     """
 
     def send(self, notification: Notification, config: dict, user) -> None: ...

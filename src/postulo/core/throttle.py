@@ -216,6 +216,28 @@ def register_lookup(user) -> None:
     consume("register-lookup", user, rate_for("POSTULO_REGISTER_LOOKUP_RATE"))
 
 
+def enrichment(user) -> None:
+    """One source asked by *Find details* on a company, against the account's own allowance
+    (#1256).
+
+    Spent once per source per press, before the request, for a source that answers on hosts
+    of its own, however many addresses it is asked at. A source that reads the company's own
+    website spends `fetch` instead: it is a fetch of an address a person recorded, as
+    *Find logo* is.
+    """
+    consume("enrichment", user, rate_for("POSTULO_ENRICHMENT_RATE"))
+
+
+def listing_search(user) -> None:
+    """One press of *Search* or *Review* on a job service, against the account's own
+    allowance (#1253).
+
+    Each is one request to somebody else's service, so each is counted, before it is made,
+    whether the service answers or not; turning a page is another press.
+    """
+    consume("listing-search", user, rate_for("POSTULO_LISTING_SEARCH_RATE"))
+
+
 def api(token) -> None:
     """Per token rather than per account, so revoking one revokes its allowance with it."""
     consume("api", token, rate_for("POSTULO_API_RATE"))

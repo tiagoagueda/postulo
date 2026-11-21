@@ -15,6 +15,16 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
 "X-Generator: postulo scripts/messages.py\n"
 
+#: src/postulo/jobs/enrichment_offers.py
+#, python-format
+msgid "%(address)s was not added."
+msgstr ""
+
+#: src/postulo/jobs/enrichment_offers.py
+#, python-format
+msgid "%(address)s was not added: %(reason)s"
+msgstr ""
+
 #: src/postulo/jobs/listing_earnings.py
 #, python-format
 msgid "%(amount)s %(currency)s per hour, gross (%(year)s)"
@@ -403,6 +413,13 @@ msgid "%(count)s listing you are considering closes soon"
 msgid_plural "%(count)s listings you are considering close soon"
 msgstr[0] "%(count)s اشتہار جس پر آپ غور کر رہے ہیں جلد بند ہو رہا ہے"
 msgstr[1] "%(count)s اشتہارات جن پر آپ غور کر رہے ہیں جلد بند ہو رہے ہیں"
+
+#: src/postulo/jobs/enrichment_offers.py
+#, python-format
+msgid "%(count)s person or more"
+msgid_plural "%(count)s people or more"
+msgstr[0] ""
+msgstr[1] ""
 
 #: src/postulo/plugins/base.py
 #, python-format
@@ -818,6 +835,11 @@ msgstr "%(host)s کسی نجی یا مقامی نیٹ ورک پر ہے۔ Postulo
 msgid "%(i)s interviews and %(e)s entries in listings' histories would be kept without the name."
 msgstr "%(i)s انٹرویوز اور اشتہارات کے تاریخچوں میں %(e)s اندراجات نام کے بغیر رکھے جائیں گے۔"
 
+#: src/postulo/jobs/enrichment_offers.py
+#, python-format
+msgid "%(industry)s (NACE %(division)s)"
+msgstr ""
+
 #: src/postulo/templates/server/logs.html
 #, python-format
 msgid "%(kilobytes)s on disk"
@@ -902,7 +924,7 @@ msgstr "%(least)s سے %(most)s تک"
 msgid "%(list)s · %(date)s"
 msgstr "%(list)s · %(date)s"
 
-#: src/postulo/jobs/models.py
+#: src/postulo/jobs/enrichment_offers.py src/postulo/jobs/models.py
 #, python-format
 msgid "%(low)s to %(high)s"
 msgstr "%(low)s سے %(high)s"
@@ -1298,6 +1320,16 @@ msgstr "%(name)s: نمبر %(value)s چھوڑ دیا گیا۔ %(why)s"
 msgid "%(names)s can see “%(other)s” and not “%(kept)s”. Share “%(kept)s” with them first, or nothing is merged."
 msgstr "%(names)s “%(other)s” دیکھ سکتے ہیں مگر “%(kept)s” نہیں۔ پہلے “%(kept)s” ان کے ساتھ شیئر کریں، ورنہ کچھ ضم نہیں ہوگا۔"
 
+#: src/postulo/jobs/enrichment_offers.py
+#, python-format
+msgid "%(number)s was not added."
+msgstr ""
+
+#: src/postulo/jobs/enrichment_offers.py
+#, python-format
+msgid "%(number)s was not added: %(reason)s"
+msgstr ""
+
 #: src/postulo/resume/views.py
 #, python-format
 msgid "%(ok)s, %(broken)s; the ones that did not say why."
@@ -1498,25 +1530,40 @@ msgstr "%(scheme)s: یہ معمول کی شکل نہیں۔"
 msgid "%(sent)s, %(failed)s; each document says which."
 msgstr "%(sent)s، %(failed)s؛ ہر دستاویز بتاتی ہے کہ کون سا۔"
 
-#: src/postulo/resume/lookups.py
+#: src/postulo/jobs/listing_search.py src/postulo/resume/lookups.py
 #, python-format
 msgid "%(service)s answered %(status)s."
 msgstr "%(service)s نے %(status)s جواب دیا۔"
 
-#: src/postulo/resume/lookups.py
+#: src/postulo/jobs/listing_search.py src/postulo/resume/lookups.py
 #, python-format
 msgid "%(service)s asked for fewer requests. Try again later."
 msgstr "%(service)s نے کم درخواستیں بھیجنے کو کہا۔ بعد میں دوبارہ کوشش کریں۔"
 
-#: src/postulo/resume/lookups.py
+#: src/postulo/jobs/listing_search.py src/postulo/resume/lookups.py
 #, python-format
 msgid "%(service)s could not be reached."
 msgstr "%(service)s تک رسائی نہیں ہو سکی۔"
+
+#: src/postulo/jobs/listing_search.py
+#, python-format
+msgid "%(service)s did not accept that search."
+msgstr ""
+
+#: src/postulo/templates/jobs/listing_search.html
+#, python-format
+msgid "%(service)s does not search by %(criteria)s, so that was not sent."
+msgstr ""
 
 #: src/postulo/resume/lookups.py
 #, python-format
 msgid "%(service)s has no record in a form Postulo reads."
 msgstr "%(service)s کے پاس کوئی ریکارڈ ایسی شکل میں نہیں جسے Postulo پڑھ سکے۔"
+
+#: src/postulo/jobs/listing_search.py
+#, python-format
+msgid "%(service)s has nothing at the address it was asked at."
+msgstr ""
 
 #: src/postulo/core/web_links.py src/postulo/jobs/surface.py
 #, python-format
@@ -1528,6 +1575,11 @@ msgstr "%(service)s پہلے ہی کسی اور قطار میں استعمال �
 msgid "%(service)s knows no such identifier."
 msgstr "%(service)s ایسے کسی شناخت کنندہ کو نہیں جانتا۔"
 
+#: src/postulo/jobs/listing_search.py
+#, python-format
+msgid "%(service)s no longer has that advert."
+msgstr ""
+
 #: src/postulo/resume/lookups.py
 #, python-format
 msgid "%(service)s redirected too many times."
@@ -1538,7 +1590,7 @@ msgstr "%(service)s نے بہت زیادہ بار ری ڈائریکٹ کیا۔"
 msgid "%(service)s refused the look-ups (%(status)s). They are stopped."
 msgstr "%(service)s نے تلاش کی درخواستیں مسترد کر دیں (%(status)s)۔ انہیں روک دیا گیا ہے۔"
 
-#: src/postulo/resume/lookups.py
+#: src/postulo/jobs/listing_search.py src/postulo/resume/lookups.py
 #, python-format
 msgid "%(service)s sent the request somewhere else."
 msgstr "%(service)s نے درخواست کہیں اور بھیج دی۔"
@@ -1548,10 +1600,20 @@ msgstr "%(service)s نے درخواست کہیں اور بھیج دی۔"
 msgid "%(service)s sent the request to an address Postulo does not dial."
 msgstr "%(service)s نے درخواست ایسے پتے پر بھیجی جس سے Postulo رابطہ نہیں کرتا۔"
 
-#: src/postulo/resume/lookups.py
+#: src/postulo/jobs/listing_search.py src/postulo/resume/lookups.py
 #, python-format
 msgid "%(service)s took too long to answer."
 msgstr "%(service)s نے جواب دینے میں بہت زیادہ وقت لیا۔"
+
+#: src/postulo/jobs/listing_search.py
+#, python-format
+msgid "%(service)s's answer could not be read."
+msgstr ""
+
+#: src/postulo/jobs/listing_search.py
+#, python-format
+msgid "%(service)s's answer was larger than a page of adverts should be."
+msgstr ""
 
 #: src/postulo/resume/views.py
 #, python-format
@@ -1563,10 +1625,82 @@ msgstr "doi.org کے ذریعے %(service)s کے پاس خالی خانوں کے
 msgid "%(share)s%%"
 msgstr "%(share)s%%"
 
+#: src/postulo/jobs/enrichment.py
+#, python-format
+msgid "%(source)s asked for an address it did not declare."
+msgstr ""
+
+#: src/postulo/jobs/enrichment.py
+#, python-format
+msgid "%(source)s asked for fewer requests. Try again later."
+msgstr ""
+
+#: src/postulo/jobs/enrichment.py
+#, python-format
+msgid "%(source)s asked for more requests than one press allows."
+msgstr ""
+
+#: src/postulo/jobs/enrichment.py
+#, python-format
+msgid "%(source)s cannot be asked about this company."
+msgstr ""
+
+#: src/postulo/jobs/enrichment.py
+#, python-format
+msgid "%(source)s could not be reached."
+msgstr ""
+
+#: src/postulo/templates/jobs/company_enrichment.html
+#, python-format
+msgid "%(source)s could not be read."
+msgstr ""
+
+#: src/postulo/jobs/enrichment.py
+#, python-format
+msgid "%(source)s redirected too many times."
+msgstr ""
+
+#: src/postulo/jobs/enrichment.py
+#, python-format
+msgid "%(source)s sent its answer with the content encoding “%(coding)s”, which Postulo does not unpack."
+msgstr ""
+
+#: src/postulo/jobs/enrichment.py
+#, python-format
+msgid "%(source)s sent the request somewhere else."
+msgstr ""
+
+#: src/postulo/jobs/enrichment.py
+#, python-format
+msgid "%(source)s took longer than %(seconds)s second to answer."
+msgid_plural "%(source)s took longer than %(seconds)s seconds to answer."
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/postulo/jobs/enrichment.py
+#, python-format
+msgid "%(source)s's answer could not be read."
+msgstr ""
+
+#: src/postulo/jobs/enrichment.py
+#, python-format
+msgid "%(source)s's answer was larger than one company's should be."
+msgstr ""
+
+#: src/postulo/templates/jobs/listing_search.html
+#, python-format
+msgid "%(source)s: asked at %(hosts)s. It is sent the words, the place and the filters you search for, or an advert's number when you press Review, and nothing about you."
+msgstr ""
+
 #: src/postulo/applications/agenda.py
 #, python-format
 msgid "%(start)s to %(end)s"
 msgstr "%(start)s سے %(end)s تک"
+
+#: src/postulo/jobs/enrichment_offers.py
+#, python-format
+msgid "%(state)s since %(date)s"
+msgstr ""
 
 #: src/postulo/templates/applications/partials/board.html
 #, python-format
@@ -1881,8 +2015,8 @@ msgid "<em>Headline</em> is a short professional title, such as “Backend engin
 msgstr "<em>سرخی</em> ایک مختصر پیشہ ورانہ عنوان ہے، جیسے “بیک اینڈ انجینئر”۔ جس CV کی اپنی سرخی ہو وہ اس کی بجائے اپنی سرخی پرنٹ کرتا ہے۔"
 
 #: src/postulo/templates/help/career.html
-msgid "<em>Import</em> reads a Europass CV; <em>Export</em> writes your details and your career as one file you can keep or move to another Postulo; <em>Preview</em> shows the whole record as a document, and <em>Your CVs</em> opens the variants made from it."
-msgstr "<em>درآمد</em> Europass CV پڑھتا ہے؛ <em>برآمد</em> آپ کی تفصیلات اور آپ کا کیریئر ایک فائل کے طور پر لکھتا ہے جسے آپ رکھ سکتے ہیں یا کسی دوسرے Postulo میں منتقل کر سکتے ہیں؛ <em>پیش منظر</em> پورا ریکارڈ ایک دستاویز کے طور پر دکھاتا ہے، اور <em>آپ کی CVs</em> اس سے بنی شکلیں کھولتا ہے۔"
+msgid "<em>Import</em> reads a CV you have as a file; <em>Export</em> writes your details and your career as one file you can keep or move to another Postulo; <em>Preview</em> shows the whole record as a document, and <em>Your CVs</em> opens the variants made from it."
+msgstr ""
 
 #: src/postulo/templates/help/identifiers.html
 #, fuzzy
@@ -2310,7 +2444,7 @@ msgstr "آپ کی دستاویزات میں سے ایک فائل"
 msgid "A file goes under Files first; an entry points at it rather than keeping a copy."
 msgstr "فائل پہلے “فائلیں” میں جاتی ہے؛ اندراج کاپی رکھنے کے بجائے اس کی طرف اشارہ کرتا ہے۔"
 
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 msgid "A file that Postulo itself wrote is read on a page of its own."
 msgstr "جو فائل خود Postulo نے لکھی ہو وہ اپنے الگ صفحے پر پڑھی جاتی ہے۔"
 
@@ -2359,6 +2493,10 @@ msgstr "ایک سرخی، اس کے نیچے والا جملہ، اور پھر �
 #: src/postulo/jobs/vcards.py
 msgid "a job title"
 msgstr "ملازمت کا عنوان"
+
+#: src/postulo/jobs/search_views.py
+msgid "A job title, a skill or an employer, as you would type it on the service."
+msgstr ""
 
 #: src/postulo/documents/integrity.py
 msgid "a JPEG picture"
@@ -2469,6 +2607,10 @@ msgstr "اشتہار سے مراد وہ ملازمت کا اشتہار ہے جو
 msgid "A listing keeps its deadline, which the closing-soon notice then watches, and its tags are written into its description."
 msgstr "اشتہار اپنی آخری تاریخ برقرار رکھتا ہے، جس پر پھر “جلد بند ہو رہا ہے” کی اطلاع نظر رکھتی ہے، اور اس کے ٹیگ اس کی تفصیل میں لکھ دیے جاتے ہیں۔"
 
+#: src/postulo/templates/jobs/listing_search.html
+msgid "A listing like it"
+msgstr ""
+
 #: src/postulo/templates/jobs/capture_review.html
 msgid "A listing with this title at this company exists; a board that mints a fresh address per visit may be showing you the same advert."
 msgstr "اس کمپنی میں اس عنوان کا ایک اشتہار موجود ہے؛ جو جاب بورڈ ہر وزٹ پر نیا پتہ بناتا ہے، ممکن ہے وہ آپ کو وہی اشتہار دکھا رہا ہو۔"
@@ -2520,6 +2662,10 @@ msgstr "ایک ماڈیول: یہ Postulo کے اندر ہی آتا ہے اور 
 #: src/postulo/templates/applications/report.html
 msgid "A month"
 msgstr "ایک مہینہ"
+
+#: src/postulo/jobs/enrichment_views.py
+msgid "a name"
+msgstr ""
 
 #: src/postulo/core/messaging_services.py
 #, python-format
@@ -2737,6 +2883,10 @@ msgstr "ایک ریکارڈ جو بعد میں حذف ہو گیا"
 msgid "A referee who is not a contact yet. Their name is enough; it is added to your contacts without a company, and is used instead of the choice above."
 msgstr "ایسا حوالہ دہندہ جو ابھی رابطہ نہیں۔ ان کا نام کافی ہے؛ یہ کمپنی کے بغیر آپ کے روابط میں شامل کر دیا جاتا ہے، اور اوپر والے انتخاب کی بجائے استعمال ہوتا ہے۔"
 
+#: src/postulo/jobs/enrichment_views.py
+msgid "a register number"
+msgstr ""
+
 #: src/postulo/applications/ical_import.py
 msgid "A reminder"
 msgstr "یاد دہانی"
@@ -2926,6 +3076,10 @@ msgstr "ٹوکن Postulo سے باہر کسی ٹول کو آپ کی طرف سے 
 msgid "A town and a country alone are kept as a place. Nothing checks that an address exists, and a country Postulo has no rules for is free-form."
 msgstr "صرف شہر اور ملک کو ایک جگہ کے طور پر رکھا جاتا ہے۔ کچھ بھی یہ نہیں جانچتا کہ پتہ موجود ہے، اور جس ملک کے لیے Postulo کے پاس کوئی قواعد نہیں وہاں پتہ آزادانہ شکل میں لکھا جاتا ہے۔"
 
+#: src/postulo/jobs/search_views.py
+msgid "A town or a region."
+msgstr ""
+
 #: src/postulo/resume/candidate.py
 msgid "A translation"
 msgstr "ترجمہ"
@@ -2954,6 +3108,10 @@ msgstr "ویو کے نام میں کم از کم ایک حرف یا ہندسہ �
 msgid "A way back rather than a way on, which is why it is an outline."
 msgstr "آگے جانے کا نہیں بلکہ واپس جانے کا راستہ، اسی لیے یہ آؤٹ لائن ہے۔"
 
+#: src/postulo/jobs/enrichment_views.py
+msgid "a website"
+msgstr ""
+
 #: src/postulo/templates/applications/report.html
 #: src/postulo/templates/documents/themes/base_report.html
 msgid "A week, on average"
@@ -2962,6 +3120,10 @@ msgstr "فی ہفتہ اوسطاً"
 #: src/postulo/templates/core/partials/widget_offers.html
 msgid "A widget added in a later release, or brought by a plugin, waits above until you say yes to it. Nothing arrives on your dashboard without being asked."
 msgstr "بعد کی ریلیز میں شامل کیا گیا یا کسی پلگ ان کا لایا ہوا ویجیٹ اوپر انتظار کرتا ہے جب تک آپ اسے ہاں نہ کہیں۔ آپ کے ڈیش بورڈ پر پوچھے بغیر کچھ نہیں آتا۔"
+
+#: src/postulo/jobs/enrichment_views.py
+msgid "a Wikidata identifier"
+msgstr ""
 
 #: src/postulo/documents/integrity.py
 msgid "a Word document"
@@ -3087,7 +3249,8 @@ msgstr "حاصل یا ضم شدہ"
 msgid "acquired_by must be a company you can see."
 msgstr "acquired_by ایسی کمپنی ہونی چاہیے جسے آپ دیکھ سکیں۔"
 
-#: src/postulo/jobs/models.py src/postulo/templates/jobs/company_form.html
+#: src/postulo/jobs/enrichment_offers.py src/postulo/jobs/models.py
+#: src/postulo/templates/jobs/company_form.html
 msgid "Acronym or short name"
 msgstr "مخفف یا مختصر نام"
 
@@ -3199,7 +3362,7 @@ msgstr "مہارت شامل کریں"
 msgid "Add a tag"
 msgstr "ٹیگ شامل کریں"
 
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 msgid "Add all of this"
 msgstr "یہ سب شامل کریں"
 
@@ -3407,7 +3570,8 @@ msgid "addok (France's Base Adresse Nationale)"
 msgstr "addok (فرانس کا Base Adresse Nationale)"
 
 #: src/postulo/applications/forms.py src/postulo/applications/reports.py
-#: src/postulo/jobs/tables.py src/postulo/templates/partials/web_links.html
+#: src/postulo/jobs/enrichment_offers.py src/postulo/jobs/tables.py
+#: src/postulo/templates/partials/web_links.html
 msgid "Address"
 msgstr "پتہ"
 
@@ -3452,6 +3616,10 @@ msgstr "اشتہار بازی"
 #: src/postulo/jobs/industries.py
 msgid "Advertising and marketing"
 msgstr "تشہیر اور مارکیٹنگ"
+
+#: src/postulo/templates/jobs/listing_search.html
+msgid "Adverts found"
+msgstr ""
 
 #: src/postulo/applications/models.py
 msgid "adviser"
@@ -3624,6 +3792,10 @@ msgstr "جب آپ کا بنیادی پتہ تبدیل ہو تو یہ خود بخ
 msgid "Also in %(names)s"
 msgstr "%(names)s میں بھی"
 
+#: src/postulo/templates/jobs/company_enrichment.html
+msgid "Also said"
+msgstr ""
+
 #: src/postulo/accounts/models.py
 msgid "Always"
 msgstr "ہمیشہ"
@@ -3689,6 +3861,10 @@ msgstr "پتوں کی جانچ شروع ہونے سے پہلے درج کیا گ�
 #: src/postulo/resume/candidate.py
 msgid "An address that could not be read"
 msgstr "ایسا پتہ جو پڑھا نہ جا سکا"
+
+#: src/postulo/jobs/enrichment_views.py
+msgid "an address with a country"
+msgstr ""
 
 #: src/postulo/applications/models.py
 msgid "An address, a telephone number or the link to the call."
@@ -3768,7 +3944,7 @@ msgstr "آئیکن بٹن"
 msgid "An identifier"
 msgstr "شناخت کنندہ"
 
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 msgid "An import only ever adds. Nothing already in your career record is changed or removed, and anything that turns out to be a duplicate is yours to delete."
 msgstr "درآمد ہمیشہ صرف اضافہ کرتی ہے۔ آپ کے کیریئر ریکارڈ میں پہلے سے موجود کوئی چیز تبدیل یا حذف نہیں ہوتی، اور جو کچھ دہرا نکلے اسے حذف کرنا آپ کے ذمے ہے۔"
 
@@ -3787,6 +3963,10 @@ msgstr "انٹرویو کسی درخواست سے تعلق رکھتا ہے۔ ا�
 #: src/postulo/notifications/base.py
 msgid "An interview is scheduled or moved"
 msgstr "کوئی انٹرویو طے ہو یا منتقل ہو"
+
+#: src/postulo/jobs/enrichment_views.py
+msgid "an LEI"
+msgstr ""
 
 #: src/postulo/notifications/base.py
 msgid "An offer is recorded"
@@ -3857,6 +4037,11 @@ msgstr "ایک اور بیک اپ پہلے سے چل رہا تھا۔"
 #: src/postulo/templates/accounts/invite_created.html
 msgid "Another invitation"
 msgstr "ایک اور دعوت"
+
+#: src/postulo/jobs/enrichment_offers.py
+#, python-format
+msgid "Another of your companies already has %(identifier)s."
+msgstr ""
 
 #: src/postulo/jobs/register_views.py
 #, python-format
@@ -4325,6 +4510,11 @@ msgstr "بتاریخ"
 msgid "as of %(date)s"
 msgstr "%(date)s کے مطابق"
 
+#: src/postulo/templates/jobs/partials/enrichment_origins.html
+#, python-format
+msgid "As of %(date)s."
+msgstr ""
+
 #: src/postulo/templates/applications/interview_detail.html
 #: src/postulo/templates/documents/themes/base_interview.html
 #, python-format
@@ -4393,14 +4583,31 @@ msgstr "ایشیا"
 msgid "Asked"
 msgstr "پوچھا گیا"
 
+#: src/postulo/jobs/search_views.py
+msgid "Asked for the advert. Check it before it becomes a listing."
+msgstr ""
+
 #: src/postulo/templates/server/record_of_processing.html
 msgid "Asked only when somebody presses for it, one company at a time. Each is sent what is listed and nothing about the person asking."
 msgstr "صرف تب پوچھا جاتا ہے جب کوئی اس کے لیے بٹن دبائے، ایک وقت میں ایک کمپنی۔ ہر ایک کو وہی بھیجا جاتا ہے جو درج ہے، اور پوچھنے والے شخص کے بارے میں کچھ نہیں۔"
+
+#: src/postulo/templates/server/record_of_processing.html
+msgid "Asked only when somebody presses Search or Review. Each is sent what is listed and nothing about the person asking; nothing it answers is kept unless the person saves an advert."
+msgstr ""
 
 #: src/postulo/templates/connections/pairing.html
 #, python-format
 msgid "Asks %(plugin)s now. Nothing it answers is kept here."
 msgstr "ابھی %(plugin)s سے پوچھتا ہے۔ اس کا کوئی جواب یہاں نہیں رکھا جاتا۔"
+
+#: src/postulo/templates/cotton/enrichment_ask.html
+#, python-format
+msgid "Asks <bdi>%(hosts)s</bdi>. Sent: %(what)s."
+msgstr ""
+
+#: src/postulo/templates/jobs/company_detail.html
+msgid "Asks the places you choose, once each; nothing is kept until you say so."
+msgstr ""
 
 #: src/postulo/applications/analytics.py src/postulo/applications/models.py
 msgid "Assessment"
@@ -4422,6 +4629,10 @@ msgstr "انجمنیں، سوسائٹیاں اور کلب جن کے آپ رکن 
 #, fuzzy
 msgid "at"
 msgstr "پر"
+
+#: src/postulo/jobs/search_views.py
+msgid "At any time"
+msgstr ""
 
 #: src/postulo/templates/settings/appearance.html
 msgid "At each status"
@@ -4621,6 +4832,10 @@ msgstr "کیلنڈر پر واپس"
 msgid "Back to the calendar, to change any of this"
 msgstr "اس میں سے کچھ بھی بدلنے کے لیے کیلنڈر پر واپس جائیں"
 
+#: src/postulo/templates/jobs/company_enrichment.html
+msgid "Back to the company"
+msgstr ""
+
 #: src/postulo/core/help.py
 msgid "Back to the dashboard"
 msgstr "ڈیش بورڈ پر واپس"
@@ -4668,6 +4883,7 @@ msgstr "“آپ کی تفصیلات” پر واپس جائیں"
 
 #: src/postulo/templates/jobs/capture_decided.html
 #: src/postulo/templates/jobs/capture_page.html
+#: src/postulo/templates/jobs/listing_search.html
 msgid "Back to your listings"
 msgstr "اپنے اشتہارات پر واپس جائیں"
 
@@ -5020,6 +5236,7 @@ msgstr "اس کے ساتھ جوڑا بن سکتا ہے"
 #: src/postulo/templates/documents/upload_form.html
 #: src/postulo/templates/jobs/address_place.html
 #: src/postulo/templates/jobs/capture_page_forget.html
+#: src/postulo/templates/jobs/company_enrichment.html
 #: src/postulo/templates/jobs/company_form.html
 #: src/postulo/templates/jobs/company_register.html
 #: src/postulo/templates/jobs/company_wikidata.html
@@ -5073,6 +5290,11 @@ msgstr "شامل نہیں کیا جا سکتا"
 #: src/postulo/templates/applications/ical_import.html
 msgid "Cannot be added."
 msgstr "شامل نہیں کیا جا سکتا۔"
+
+#: src/postulo/templates/cotton/enrichment_ask.html
+#, python-format
+msgid "Cannot be asked: this company would need %(what)s."
+msgstr ""
 
 #: src/postulo/templates/server/overview.html
 msgid "cannot be checked on this machine"
@@ -5191,12 +5413,13 @@ msgstr "کیریئر کا پیش منظر"
 msgid "Career sections"
 msgstr "کیریئر کے حصے"
 
-#: src/postulo/jobs/models.py
-msgid "careers page"
+#: src/postulo/jobs/enrichment_offers.py src/postulo/jobs/tables.py
+#: src/postulo/templates/jobs/company_detail.html
+msgid "Careers page"
 msgstr "کیریئر کا صفحہ"
 
-#: src/postulo/jobs/tables.py src/postulo/templates/jobs/company_detail.html
-msgid "Careers page"
+#: src/postulo/jobs/models.py
+msgid "careers page"
 msgstr "کیریئر کا صفحہ"
 
 #: src/postulo/templates/server/email.html
@@ -5250,7 +5473,8 @@ msgstr "سرٹیفیکیشن"
 
 #: src/postulo/documents/rendering.py src/postulo/jobs/merging.py
 #: src/postulo/resume/candidate.py src/postulo/resume/registry.py
-#: src/postulo/resume/views_candidate.py
+#: src/postulo/resume/views.py src/postulo/resume/views_candidate.py
+#: src/postulo/templates/resume/import.html
 #: src/postulo/templates/resume/preview.html
 msgid "Certifications"
 msgstr "سرٹیفیکیشنز"
@@ -5361,6 +5585,10 @@ msgstr "اپ ڈیٹس کے لیے چیک کریں"
 msgid "Check it answers"
 msgstr "چیک کریں کہ یہ جواب دیتا ہے"
 
+#: src/postulo/templates/jobs/partials/enrichment_origins.html
+msgid "Check it there"
+msgstr ""
+
 #: src/postulo/templates/jobs/capture_review.html
 msgid "Check the reading against it"
 msgstr "اس سے پڑھائی کی جانچ کریں"
@@ -5438,13 +5666,10 @@ msgstr "فہرست سے ملک منتخب کریں۔"
 msgid "Choose a destination and save it first."
 msgstr "پہلے کوئی منزل منتخب کریں اور اسے محفوظ کریں۔"
 
-#: src/postulo/resume/views.py
-msgid "Choose a Europass file first."
-msgstr "پہلے Europass فائل منتخب کریں۔"
-
 #: src/postulo/applications/views_ical.py src/postulo/core/views_kind_files.py
 #: src/postulo/jobs/vcard_views.py src/postulo/jobs/views.py
-#: src/postulo/resume/views_candidate.py src/postulo/resume/views_references.py
+#: src/postulo/resume/views.py src/postulo/resume/views_candidate.py
+#: src/postulo/resume/views_references.py
 msgid "Choose a file first."
 msgstr "پہلے فائل منتخب کریں۔"
 
@@ -5514,6 +5739,10 @@ msgstr "دوسری فائل منتخب کریں"
 msgid "Choose at least one document to record."
 msgstr "ریکارڈ کرنے کے لیے کم از کم ایک دستاویز منتخب کریں۔"
 
+#: src/postulo/jobs/enrichment_views.py
+msgid "Choose at least one place to ask."
+msgstr ""
+
 #: src/postulo/templates/cotton/date_field.html
 msgid "Choose dates from a calendar"
 msgstr "کیلنڈر سے تاریخیں منتخب کریں"
@@ -5554,9 +5783,9 @@ msgstr "کیلنڈر سے تاریخ پیدائش منتخب کریں"
 msgid "Choose the destination"
 msgstr "منزل منتخب کریں"
 
-#: src/postulo/templates/resume/europass_import.html
-msgid "Choose the PDF you downloaded from europass.europa.eu, as it is: the CV is attached inside it, and that is what Postulo reads. Older Europass files read too: the XML and PDF of the editor before 2020, and the JSON of its web service. Postulo works out which it is, shows you what is in it, and writes nothing until you say so."
-msgstr "وہ PDF منتخب کریں جو آپ نے europass.europa.eu سے ڈاؤن لوڈ کیا تھا، جیسا ہے ویسا: CV اس کے اندر منسلک ہے، اور Postulo وہی پڑھتا ہے۔ پرانی Europass فائلیں بھی پڑھی جاتی ہیں: 2020 سے پہلے کے ایڈیٹر کی XML اور PDF، اور اس کی ویب سروس کا JSON۔ Postulo پہچان لیتا ہے کہ یہ کون سی ہے، آپ کو دکھاتا ہے کہ اس میں کیا ہے، اور جب تک آپ نہ کہیں کچھ نہیں لکھتا۔"
+#: src/postulo/templates/resume/import.html
+msgid "Choose the file as you downloaded it. Postulo works out which format it is, shows you what is in it, and writes nothing until you say so."
+msgstr ""
 
 #: src/postulo/accounts/forms.py src/postulo/jobs/forms.py
 msgid "Choose the type of identifier."
@@ -5577,6 +5806,10 @@ msgstr "منتخب کریں کہ پیغام کا کیا کرنا ہے۔"
 #: src/postulo/jobs/status_views.py
 msgid "Choose what was reported and the date."
 msgstr "کیا اطلاع ملی، وہ اور اس کی تاریخ منتخب کریں۔"
+
+#: src/postulo/templates/cotton/enrichment_ask.html
+msgid "Choose where to ask about this company. Each place is asked once, now, and learns only what is listed. Nothing is kept until you tick it."
+msgstr ""
 
 #: src/postulo/applications/views.py
 msgid "Choose which application this is about first."
@@ -5905,6 +6138,10 @@ msgstr "کمپنی شامل کر دی گئی۔"
 msgid "Company deleted, along with its postings."
 msgstr "کمپنی اپنے اشتہارات سمیت حذف کر دی گئی۔"
 
+#: src/postulo/plugins/kinds.py
+msgid "Company details"
+msgstr ""
+
 #: src/postulo/jobs/models.py
 msgid "company identifier"
 msgstr "کمپنی کا شناخت کنندہ"
@@ -6208,7 +6445,8 @@ msgstr "کورس"
 
 #: src/postulo/documents/rendering.py src/postulo/jobs/merging.py
 #: src/postulo/resume/candidate.py src/postulo/resume/registry.py
-#: src/postulo/resume/views_candidate.py
+#: src/postulo/resume/views.py src/postulo/resume/views_candidate.py
+#: src/postulo/templates/resume/import.html
 #: src/postulo/templates/resume/preview.html
 msgid "Courses"
 msgstr "کورسز"
@@ -6849,6 +7087,10 @@ msgstr "تفصیل"
 msgid "details"
 msgstr "تفصیلات"
 
+#: src/postulo/templates/jobs/company_enrichment.html
+msgid "Details found"
+msgstr ""
+
 #: src/postulo/core/design.py src/postulo/templates/server/design.html
 msgid "Dialogs"
 msgstr "ڈائیلاگز"
@@ -6963,7 +7205,7 @@ msgid "document themes"
 msgstr "دستاویز کی تھیمز"
 
 #: src/postulo/core/help.py src/postulo/core/navigation.py
-#: src/postulo/documents/apps.py
+#: src/postulo/documents/apps.py src/postulo/plugins/categories.py
 #: src/postulo/templates/applications/application_detail.html
 #: src/postulo/templates/base.html
 #: src/postulo/templates/cotton/documents_nav.html
@@ -7203,7 +7445,7 @@ msgstr "ای کامرس"
 msgid "Each invitation may be used once, and expires on its own. Its link is shown once, when it is made."
 msgstr "ہر دعوت ایک بار استعمال ہو سکتی ہے، اور خود بخود ختم ہو جاتی ہے۔ اس کا لنک صرف ایک بار، بنتے وقت، دکھایا جاتا ہے۔"
 
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 msgid "Each is added as one of your contacts and as a reference you have not asked yet, so none is printed on a CV until you say they agreed."
 msgstr "ہر ایک کو آپ کے روابط میں سے ایک کے طور پر اور ایسے حوالے کے طور پر شامل کیا جاتا ہے جس سے آپ نے ابھی پوچھا نہیں، اس لیے کوئی بھی CV پر اس وقت تک پرنٹ نہیں ہوتا جب تک آپ نہ بتائیں کہ وہ رضامند ہو گئے ہیں۔"
 
@@ -7321,7 +7563,7 @@ msgstr "مدیران"
 #: src/postulo/documents/rendering.py src/postulo/jobs/industries.py
 #: src/postulo/resume/candidate.py src/postulo/resume/registry.py
 #: src/postulo/resume/views_candidate.py
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 #: src/postulo/templates/resume/preview.html
 msgid "Education"
 msgstr "تعلیم"
@@ -7358,6 +7600,7 @@ msgid "email address"
 msgstr "ای میل پتہ"
 
 #: src/postulo/core/channels.py src/postulo/documents/printing.py
+#: src/postulo/jobs/enrichment_offers.py
 msgid "Email address"
 msgstr "ای میل پتہ"
 
@@ -7541,11 +7784,7 @@ msgstr "ESCO مہارت"
 msgid "Europass"
 msgstr "Europass"
 
-#: src/postulo/core/transfers.py
-msgid "Europass import"
-msgstr "Europass درآمد"
-
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 msgid "Europass records five levels per language and Postulo keeps one, so the lowest is taken. Where the file states none, none is written: a level is a claim about yourself that somebody will test, so it is yours to make afterwards."
 msgstr "Europass ہر زبان کے لیے پانچ سطحیں درج کرتا ہے اور Postulo ایک رکھتا ہے، اس لیے سب سے کم سطح لی جاتی ہے۔ جہاں فائل کوئی سطح نہیں بتاتی، وہاں کچھ نہیں لکھا جاتا: سطح آپ کا اپنے بارے میں ایک دعویٰ ہے جسے کوئی پرکھے گا، اس لیے یہ دعویٰ بعد میں آپ ہی کو کرنا ہے۔"
 
@@ -7789,7 +8028,7 @@ msgstr "تحلیل شدہ کو خارج کریں"
 
 #: src/postulo/documents/rendering.py src/postulo/resume/candidate.py
 #: src/postulo/resume/registry.py src/postulo/resume/views_candidate.py
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 #: src/postulo/templates/resume/preview.html
 msgid "Experience"
 msgstr "تجربہ"
@@ -8152,6 +8391,10 @@ msgstr "تلاش کریں"
 msgid "Find a language"
 msgstr "زبان تلاش کریں"
 
+#: src/postulo/templates/cotton/enrichment_ask.html
+msgid "Find details"
+msgstr ""
+
 #: src/postulo/templates/jobs/company_form.html
 msgid "Find logo"
 msgstr "لوگو تلاش کریں"
@@ -8416,6 +8659,13 @@ msgstr[1] "سرور پر %(count)d اختیارات ملے۔ منتخب کریں
 
 #: src/postulo/jobs/slow.py
 #, python-format
+msgid "Found %(count)s detail. Nothing is kept until you tick it."
+msgid_plural "Found %(count)s details. Nothing is kept until you tick it."
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/postulo/jobs/slow.py
+#, python-format
 msgid "Found a logo at %(url)s."
 msgstr "%(url)s پر ایک لوگو ملا۔"
 
@@ -8443,10 +8693,14 @@ msgstr "دریافت کا ذریعہ"
 msgid "found via"
 msgstr "دریافت کا ذریعہ"
 
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 #, python-format
 msgid "Found: %(names)s. Only the ones you have left blank will be filled in."
 msgstr "ملے: %(names)s۔ صرف وہی بھرے جائیں گے جو آپ نے خالی چھوڑے ہیں۔"
+
+#: src/postulo/jobs/enrichment_offers.py
+msgid "Founded"
+msgstr ""
 
 #: src/postulo/jobs/models.py
 msgid "Freelance"
@@ -8500,6 +8754,11 @@ msgstr "%(name)s سے۔"
 #, python-format
 msgid "From %(register)s"
 msgstr "%(register)s سے"
+
+#: src/postulo/templates/jobs/partials/enrichment_origins.html
+#, python-format
+msgid "From %(source)s: <bdi>%(where)s</bdi>."
+msgstr ""
 
 #: src/postulo/core/tables.py
 #, python-format
@@ -8918,6 +9177,10 @@ msgctxt "pronouns"
 msgid "he/him"
 msgstr "وہ (مذکر)"
 
+#: src/postulo/jobs/enrichment_offers.py
+msgid "Head office"
+msgstr ""
+
 #: src/postulo/accounts/models.py src/postulo/documents/models.py
 #: src/postulo/resume/views.py
 msgid "headline"
@@ -9067,7 +9330,8 @@ msgstr "اعزاز یا انعام"
 
 #: src/postulo/documents/rendering.py src/postulo/jobs/merging.py
 #: src/postulo/resume/candidate.py src/postulo/resume/registry.py
-#: src/postulo/resume/views_candidate.py
+#: src/postulo/resume/views.py src/postulo/resume/views_candidate.py
+#: src/postulo/templates/resume/import.html
 #: src/postulo/templates/resume/preview.html
 msgid "Honours and awards"
 msgstr "اعزازات اور انعامات"
@@ -9137,6 +9401,10 @@ msgstr "یہ آجر تک کیسے پہنچتی ہے"
 #: src/postulo/documents/models.py
 msgid "how it reaches the employer"
 msgstr "یہ آجر تک کیسے پہنچتی ہے"
+
+#: src/postulo/templates/resume/import.html
+msgid "How it was read"
+msgstr ""
 
 #: src/postulo/applications/widgets.py
 msgid "How long they take"
@@ -9301,6 +9569,7 @@ msgstr "idempotent درخواستیں"
 msgid "identifier"
 msgstr "شناخت کنندہ"
 
+#: src/postulo/jobs/enrichment_offers.py
 #: src/postulo/templates/cotton/identifier_row.html
 msgid "Identifier"
 msgstr "شناخت کنندہ"
@@ -9379,9 +9648,9 @@ msgstr "اگر یہ حوالہ نامہ ہے تو"
 msgid "If you are reading this, the email settings of your Postulo instance work. Nothing else to do."
 msgstr "اگر آپ یہ پڑھ رہے ہیں تو آپ کے Postulo انسٹینس کی ای میل ترتیبات کام کر رہی ہیں۔ مزید کچھ کرنے کی ضرورت نہیں۔"
 
-#: src/postulo/templates/resume/europass_import.html
-msgid "If you have applied to an EU institution or through a national employment service, you already have this file. Rather than type it all again, hand it over."
-msgstr "اگر آپ نے یورپی یونین کے کسی ادارے میں یا کسی قومی روزگار سروس کے ذریعے درخواست دی ہے تو یہ فائل پہلے سے آپ کے پاس ہے۔ سب کچھ دوبارہ ٹائپ کرنے کے بجائے اسے دے دیں۔"
+#: src/postulo/templates/resume/import.html
+msgid "If your career is already written down in a file, hand it over rather than type it all again."
+msgstr ""
 
 #: src/postulo/core/models.py
 msgid "ignore robots.txt when capturing"
@@ -9403,9 +9672,9 @@ msgid "Import"
 msgstr "درآمد"
 
 #: src/postulo/resume/views.py src/postulo/templates/resume/candidate_file.html
-#: src/postulo/templates/resume/europass_import.html
-msgid "Import a Europass CV"
-msgstr "Europass CV درآمد کریں"
+#: src/postulo/templates/resume/import.html
+msgid "Import a CV"
+msgstr ""
 
 #: src/postulo/templates/applications/ical_import.html
 msgid "Import an iCalendar file"
@@ -9561,6 +9830,13 @@ msgstr "فائل میں دو مرتبہ"
 msgid "In the instance's time zone."
 msgstr "انسٹینس کے ٹائم زون میں۔"
 
+#: src/postulo/jobs/search_views.py
+#, python-format
+msgid "In the last day"
+msgid_plural "In the last %(count)d days"
+msgstr[0] ""
+msgstr[1] ""
+
 #: src/postulo/core/search.py
 #, python-format
 msgid "in the motivation letter rendered on %(when)s"
@@ -9598,6 +9874,10 @@ msgstr "اس رپورٹ میں جو آپ نے %(when)s کو %(company)s کو ب�
 #: src/postulo/templates/documents/rendered_compare.html
 msgid "In this version, and not in the one before"
 msgstr "اس ورژن میں، پچھلے ورژن میں نہیں"
+
+#: src/postulo/templates/jobs/listing_search.html
+msgid "In your listings"
+msgstr ""
 
 #: src/postulo/applications/forms.py
 msgid "In your time zone."
@@ -9655,12 +9935,13 @@ msgstr "صنعتیں"
 msgid "industries"
 msgstr "صنعتیں"
 
-#: src/postulo/jobs/models.py
-msgid "industry"
-msgstr "صنعت"
-
+#: src/postulo/jobs/enrichment_offers.py
 #: src/postulo/templates/jobs/industry_form.html
 msgid "Industry"
+msgstr "صنعت"
+
+#: src/postulo/jobs/models.py
+msgid "industry"
 msgstr "صنعت"
 
 #: src/postulo/jobs/views.py
@@ -9873,6 +10154,10 @@ msgstr "جاری کنندہ"
 #: src/postulo/resume/models.py
 msgid "issued on"
 msgstr "جاری ہونے کی تاریخ"
+
+#: src/postulo/jobs/enrichment_offers.py
+msgid "It already has a logo."
+msgstr ""
 
 #: src/postulo/templates/settings/account.html
 msgid "It also gets you back in: ask for a sign-in code and it arrives there. Making a different address primary moves that with it. You are still asked for your authenticator app if you have one."
@@ -10189,6 +10474,10 @@ msgstr "اس کی گلی سے"
 msgid "Its street will be looked up with %(service)s shortly."
 msgstr "اس کی گلی جلد ہی %(service)s سے تلاش کی جائے گی۔"
 
+#: src/postulo/templates/jobs/listing_search.html
+msgid "Its terms of use"
+msgstr ""
+
 #: src/postulo/core/models.py
 msgid "its town"
 msgstr "اس کا شہر"
@@ -10213,6 +10502,18 @@ msgstr "ملازمت کی تلاش کی رپورٹ"
 #, python-format
 msgid "Job search report · %(period)s"
 msgstr "ملازمت کی تلاش کی رپورٹ · %(period)s"
+
+#: src/postulo/jobs/search_views.py
+msgid "Job service"
+msgstr ""
+
+#: src/postulo/plugins/kinds.py
+msgid "Job services"
+msgstr ""
+
+#: src/postulo/templates/server/record_of_processing.html
+msgid "Job services it may search"
+msgstr ""
 
 #: src/postulo/applications/forms.py src/postulo/jobs/forms.py
 #: src/postulo/jobs/models.py
@@ -10298,6 +10599,7 @@ msgstr "یہ رکھیں"
 msgid "Keep this view as"
 msgstr "یہ منظر اس نام سے رکھیں"
 
+#: src/postulo/templates/jobs/company_enrichment.html
 #: src/postulo/templates/jobs/company_register.html
 msgid "Keep what is ticked"
 msgstr "نشان زدہ کو رکھیں"
@@ -10317,6 +10619,13 @@ msgstr "صفحہ رکھنا"
 #: src/postulo/templates/jobs/merge.html
 msgid "Kept"
 msgstr "رکھا گیا"
+
+#: src/postulo/jobs/enrichment_views.py
+#, python-format
+msgid "Kept %(count)s detail."
+msgid_plural "Kept %(count)s details."
+msgstr[0] ""
+msgstr[1] ""
 
 #: src/postulo/templates/server/person_recovery.html
 msgid "Kept after they are used or expire, because taking somebody's account back is not something to be able to do without a trace."
@@ -10493,7 +10802,7 @@ msgstr "آپ کے کیریئر ریکارڈ کی زبان"
 #: src/postulo/documents/rendering.py src/postulo/resume/candidate.py
 #: src/postulo/resume/registry.py src/postulo/resume/views.py
 #: src/postulo/resume/views_candidate.py
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 #: src/postulo/templates/resume/preview.html
 msgid "Languages"
 msgstr "زبانیں"
@@ -10693,6 +11002,7 @@ msgstr "پہلے سے محفوظ والا رکھنے کے لیے خالی چھو
 msgid "Leave empty if this is your current role."
 msgstr "اگر یہ آپ کا موجودہ عہدہ ہے تو خالی چھوڑیں۔"
 
+#: src/postulo/templates/jobs/company_enrichment.html
 #: src/postulo/templates/jobs/company_wikidata.html
 msgid "Leave it as it is"
 msgstr "اسے جیسا ہے ویسا ہی رہنے دیں"
@@ -10803,6 +11113,10 @@ msgstr "قانونی نوٹس"
 msgid "Legal services"
 msgstr "قانونی خدمات"
 
+#: src/postulo/jobs/enrichment_offers.py
+msgid "Legal state"
+msgstr ""
+
 #: src/postulo/jobs/models.py
 msgid "legal state"
 msgstr "قانونی حیثیت"
@@ -10897,6 +11211,10 @@ msgstr "سطح 8"
 #, fuzzy
 msgid "Licence"
 msgstr "لائسنس"
+
+#: src/postulo/templates/jobs/listing_search.html
+msgid "Licence of its adverts:"
+msgstr ""
 
 #: src/postulo/accounts/models.py src/postulo/core/context_processors.py
 #, fuzzy
@@ -11059,6 +11377,10 @@ msgstr "مقام"
 msgid "Location"
 msgstr "مقام"
 
+#: src/postulo/jobs/enrichment_offers.py
+msgid "Logo"
+msgstr ""
+
 #: src/postulo/jobs/models.py
 msgid "logo"
 msgstr "لوگو"
@@ -11120,6 +11442,10 @@ msgstr "تلاش کی سروس کا پتہ"
 #: src/postulo/jobs/slow.py
 msgid "Looking for a logo"
 msgstr "لوگو تلاش کیا جا رہا ہے"
+
+#: src/postulo/jobs/slow.py
+msgid "Looking for details"
+msgstr ""
 
 #: src/postulo/templates/applications/application_list.html
 #: src/postulo/templates/jobs/company_list.html
@@ -11419,7 +11745,7 @@ msgstr "رکنیتی تنظیمیں"
 #: src/postulo/documents/rendering.py src/postulo/jobs/merging.py
 #: src/postulo/resume/candidate.py src/postulo/resume/registry.py
 #: src/postulo/resume/views.py src/postulo/resume/views_candidate.py
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 #: src/postulo/templates/resume/preview.html
 msgid "Memberships"
 msgstr "رکنیتیں"
@@ -11790,8 +12116,8 @@ msgstr "NACE سیکشن"
 msgid "name"
 msgstr "نام"
 
-#: src/postulo/api/forms.py src/postulo/jobs/tables.py
-#: src/postulo/templates/cotton/identifier_row.html
+#: src/postulo/api/forms.py src/postulo/jobs/enrichment_offers.py
+#: src/postulo/jobs/tables.py src/postulo/templates/cotton/identifier_row.html
 #: src/postulo/templates/partials/messaging_handles.html
 #: src/postulo/templates/partials/phone_numbers.html
 #: src/postulo/templates/partials/postal_addresses.html
@@ -12063,6 +12389,7 @@ msgid "Next month"
 msgstr "اگلا مہینہ"
 
 #: src/postulo/templates/cotton/document_viewer.html
+#: src/postulo/templates/jobs/listing_search.html
 msgid "Next page"
 msgstr "اگلا صفحہ"
 
@@ -12270,6 +12597,14 @@ msgstr "ابھی تک اس قسم کا کوئی خط نہیں۔."
 #: src/postulo/templates/documents/letter_list.html
 msgid "No letters yet. A cover letter is for one posting; a motivation letter tells your story; a speculative letter goes where nothing is advertised; a follow-up note comes after an interview."
 msgstr "ابھی کوئی خط نہیں۔ کور لیٹر ایک اشتہار کے لیے ہوتا ہے؛ موٹیویشن لیٹر آپ کی کہانی بتاتا ہے؛ غیر طلب شدہ خط وہاں جاتا ہے جہاں کوئی اشتہار نہیں؛ فالو اپ نوٹ انٹرویو کے بعد آتا ہے۔"
+
+#: src/postulo/templates/jobs/company_enrichment.html
+msgid "No licence is stated."
+msgstr ""
+
+#: src/postulo/templates/jobs/company_enrichment.html
+msgid "No licence is stated; the name and the mark are the company's."
+msgstr ""
 
 #: src/postulo/templates/connections/partials/option_table.html
 msgid "No longer on the server"
@@ -12585,6 +12920,10 @@ msgstr "اس میں سے کچھ بھی کسی اور چیز سے اخذ نہیں
 msgid "None of this company's industries is Education, so it is not listed as a school or university."
 msgstr "اس کمپنی کی کوئی صنعت “تعلیم” نہیں، اس لیے اسے اسکول یا یونیورسٹی کے طور پر درج نہیں کیا جاتا۔"
 
+#: src/postulo/jobs/slow.py
+msgid "None of those can be asked about this company any more."
+msgstr ""
+
 #: src/postulo/templates/jobs/company_places.html
 msgid "None of your companies has this name or identifier."
 msgstr "آپ کی کسی کمپنی کا یہ نام یا شناخت کنندہ نہیں۔"
@@ -12654,6 +12993,10 @@ msgstr "میل نہیں کھاتا"
 #: src/postulo/templates/partials/phone_widget.html
 msgid "Not a possible number"
 msgstr "ممکنہ نمبر نہیں"
+
+#: src/postulo/jobs/enrichment_offers.py
+msgid "Not a profile on a service Postulo knows."
+msgstr ""
 
 #: src/postulo/documents/models.py
 msgid "Not accepted"
@@ -13093,9 +13436,17 @@ msgstr "جب تک آپ اس کا جائزہ نہ لے لیں، کچھ بھی م�
 msgid "Nothing is sent to the server as a password until a new one is entered."
 msgstr "جب تک نیا پاس ورڈ درج نہ کیا جائے، سرور کو پاس ورڈ کے طور پر کچھ نہیں بھیجا جاتا۔"
 
+#: src/postulo/jobs/logos.py
+msgid "Nothing is switched on that finds a logo on a website."
+msgstr ""
+
 #: src/postulo/templates/applications/application_detail.html
 msgid "Nothing kept yet. Keep what you typed into the employer's form, so you can see what they were told."
 msgstr "ابھی کچھ رکھا نہیں گیا۔ آجر کے فارم میں آپ نے جو ٹائپ کیا اسے رکھیں، تاکہ آپ دیکھ سکیں کہ انہیں کیا بتایا گیا تھا۔"
+
+#: src/postulo/templates/jobs/listing_search.html
+msgid "Nothing matches that search."
+msgstr ""
 
 #: src/postulo/templates/applications/application_list.html
 #: src/postulo/templates/jobs/company_list.html
@@ -13213,6 +13564,18 @@ msgstr "ابھی تک کچھ نہیں بھیجا گیا۔"
 msgid "Nothing standing at Offer. Record one from an application's page when it arrives."
 msgstr "کوئی درخواست “پیشکش” کے مرحلے پر نہیں۔ جب پیشکش آئے تو کسی درخواست کے صفحے سے اسے درج کریں۔"
 
+#: src/postulo/resume/views.py
+msgid "Nothing that reads a CV from a file is switched on here, so that file was not read."
+msgstr ""
+
+#: src/postulo/templates/resume/import.html
+msgid "Nothing that reads a CV from a file is switched on here, so there is no file to choose."
+msgstr ""
+
+#: src/postulo/templates/jobs/company_enrichment.html
+msgid "Nothing that was found can be added to what the company already has."
+msgstr ""
+
 #: src/postulo/core/design.py src/postulo/templates/server/design.html
 msgid "Nothing there"
 msgstr "وہاں کچھ نہیں"
@@ -13296,7 +13659,7 @@ msgstr "اس صفحے کا کچھ بھی محفوظ نہیں رکھا گیا۔"
 msgid "Nothing was kept of this page"
 msgstr "اس صفحے کا کچھ بھی محفوظ نہیں رکھا گیا"
 
-#: src/postulo/jobs/register_views.py
+#: src/postulo/jobs/enrichment_views.py src/postulo/jobs/register_views.py
 msgid "Nothing was kept."
 msgstr "کچھ بھی نہیں رکھا گیا۔"
 
@@ -13646,6 +14009,13 @@ msgstr "ہر لائن میں ایک کامیابی۔"
 #: src/postulo/documents/forms.py
 msgid "One address: the person you met, or your contact for this application, or the company's own. It is needed to send, and noted on the timeline when it is given."
 msgstr "ایک پتہ: جس شخص سے آپ ملے، یا اس درخواست کے لیے آپ کا رابطہ، یا کمپنی کا اپنا۔ بھیجنے کے لیے یہ ضروری ہے، اور دیے جانے پر ٹائم لائن پر درج ہو جاتا ہے۔"
+
+#: src/postulo/templates/jobs/listing_search.html
+#, python-format
+msgid "One advert found"
+msgid_plural "%(counter)s adverts found"
+msgstr[0] ""
+msgstr[1] ""
 
 #: src/postulo/templates/applications/report.html
 #, python-format
@@ -14005,6 +14375,7 @@ msgstr "CV پر صرف سال چھپتا ہے، اس لیے دن سے کوئی �
 msgid "Only this publication, as a reference:"
 msgstr "صرف یہ اشاعت، حوالے کے طور پر:"
 
+#: src/postulo/templates/jobs/company_enrichment.html
 #: src/postulo/templates/jobs/company_register.html
 msgid "Only what you tick is kept; nothing else on the company changes."
 msgstr "صرف وہی رکھا جاتا ہے جس پر آپ نشان لگاتے ہیں؛ کمپنی میں اور کچھ نہیں بدلتا۔"
@@ -14119,6 +14490,10 @@ msgstr "یا نیا رابطہ"
 msgid "Or say only this"
 msgstr "یا صرف یہ کہیں"
 
+#: src/postulo/templates/jobs/capture_form.html
+msgid "Or search a job service for adverts"
+msgstr ""
+
 #: src/postulo/templates/jobs/move_owner.html
 msgid "Or to a person"
 msgstr "یا کسی شخص کو"
@@ -14222,6 +14597,10 @@ msgstr "دیگر ضمائر"
 #: src/postulo/jobs/industries.py
 msgid "Other services"
 msgstr "دیگر خدمات"
+
+#: src/postulo/documents/themes.py
+msgid "Other themes"
+msgstr ""
 
 #: src/postulo/accounts/forms.py
 msgid "Other time zones"
@@ -14578,6 +14957,10 @@ msgstr "پنشن، انشورنس، الاؤنسز، سامان: جو کچھ ب�
 msgid "People"
 msgstr "لوگ"
 
+#: src/postulo/jobs/enrichment_offers.py
+msgid "People employed"
+msgstr ""
+
 #: src/postulo/jobs/models.py
 msgid "Per day"
 msgstr "یومیہ"
@@ -14625,7 +15008,7 @@ msgstr "شخص"
 
 #: src/postulo/accounts/views.py src/postulo/core/help.py
 #: src/postulo/templates/accounts/profile.html
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 msgid "Personal details"
 msgstr "ذاتی تفصیلات"
 
@@ -14712,7 +15095,7 @@ msgstr "%(version)s پر پن کیا گیا"
 msgid "Pinned to a version"
 msgstr "کسی ورژن پر پن کیا گیا"
 
-#: src/postulo/core/models.py
+#: src/postulo/core/models.py src/postulo/jobs/search_views.py
 msgid "Place"
 msgstr "جگہ"
 
@@ -15100,6 +15483,10 @@ msgstr "Postulo اسے بھول چکا ہے۔ فراہم کنندہ کے پاس 
 msgid "Postulo has forgotten the grant. The provider still has it until you withdraw it there as well."
 msgstr "Postulo اجازت بھول چکا ہے۔ فراہم کنندہ کے پاس یہ تب تک رہتی ہے جب تک آپ اسے وہاں بھی واپس نہ لے لیں۔"
 
+#: src/postulo/templates/jobs/company_enrichment.html
+msgid "Postulo has nowhere to keep these yet. They are shown for you to read, and are not kept."
+msgstr ""
+
 #: src/postulo/core/tagline.py
 msgid "Postulo is a self-hosted job application manager: your applications, CVs and cover letters on your own server, with no paid features."
 msgstr "Postulo ایک سیلف ہوسٹڈ ملازمت کی درخواستوں کا منیجر ہے: آپ کی درخواستیں، CV اور کور لیٹر آپ کے اپنے سرور پر، بغیر کسی ادائیگی والی خصوصیت کے۔"
@@ -15209,7 +15596,7 @@ msgstr "تاحال"
 #: src/postulo/documents/rendering.py src/postulo/resume/candidate.py
 #: src/postulo/resume/registry.py src/postulo/resume/views.py
 #: src/postulo/resume/views_candidate.py
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 #: src/postulo/templates/resume/preview.html
 msgid "Presentations, conferences and seminars"
 msgstr "پریزنٹیشنز، کانفرنسیں اور سیمینار"
@@ -15442,7 +15829,7 @@ msgstr "پروجیکٹ"
 
 #: src/postulo/documents/rendering.py src/postulo/resume/candidate.py
 #: src/postulo/resume/registry.py src/postulo/resume/views_candidate.py
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 #: src/postulo/templates/resume/preview.html
 msgid "Projects"
 msgstr "پروجیکٹس"
@@ -15508,7 +15895,9 @@ msgid "Publication"
 msgstr "اشاعت"
 
 #: src/postulo/documents/rendering.py src/postulo/resume/candidate.py
-#: src/postulo/resume/registry.py src/postulo/resume/views_candidate.py
+#: src/postulo/resume/registry.py src/postulo/resume/views.py
+#: src/postulo/resume/views_candidate.py
+#: src/postulo/templates/resume/import.html
 #: src/postulo/templates/resume/preview.html
 msgid "Publications"
 msgstr "اشاعتیں"
@@ -15520,6 +15909,15 @@ msgstr "اشاعتیں"
 #: src/postulo/templates/resume/references.html
 msgid "Publications in the file"
 msgstr "فائل میں اشاعتیں"
+
+#: src/postulo/jobs/search_views.py
+msgid "Published"
+msgstr ""
+
+#: src/postulo/templates/jobs/listing_search.html
+#, python-format
+msgid "Published %(when)s"
+msgstr ""
 
 #: src/postulo/resume/models.py
 msgid "published in"
@@ -15692,18 +16090,6 @@ msgstr "بطور پڑھیں"
 msgid "Read as %(name)s."
 msgstr "%(name)s کے طور پر پڑھا گیا۔"
 
-#: src/postulo/resume/views.py
-msgid "Read as Europass JSON, the older format as the Europass web service wrote it until 2020."
-msgstr "Europass JSON کے طور پر پڑھیں، وہ پرانا فارمیٹ جو Europass ویب سروس 2020 تک لکھتی تھی۔"
-
-#: src/postulo/resume/views.py
-msgid "Read as Europass XML in the older format, the one the Europass editor wrote until 2020."
-msgstr "پرانے فارمیٹ میں Europass XML کے طور پر پڑھیں، وہ جو Europass ایڈیٹر 2020 تک لکھتا تھا۔"
-
-#: src/postulo/resume/views.py
-msgid "Read as Europass XML, the format europass.europa.eu has written since 2020."
-msgstr "Europass XML کے طور پر پڑھیں، وہ فارمیٹ جو europass.europa.eu سنہ 2020 سے لکھ رہا ہے۔"
-
 #: src/postulo/jobs/models.py
 msgid "read by"
 msgstr "پڑھنے والا"
@@ -15733,16 +16119,8 @@ msgstr "اس سے پڑھا گیا"
 msgid "Read from <bdi>%(address)s</bdi>."
 msgstr "<bdi>%(address)s</bdi> سے پڑھا گیا۔"
 
-#: src/postulo/resume/views.py
-msgid "Read from the Europass XML attached to the PDF, in the older format the Europass editor wrote until 2020."
-msgstr "PDF کے ساتھ منسلک Europass XML سے پڑھا گیا، اس پرانے فارمیٹ میں جو Europass ایڈیٹر 2020 تک لکھتا تھا۔"
-
-#: src/postulo/resume/views.py
-msgid "Read from the Europass XML attached to the PDF, the format europass.europa.eu has written since 2020."
-msgstr "PDF کے ساتھ منسلک Europass XML سے پڑھا گیا، اس فارمیٹ میں جو europass.europa.eu سنہ 2020 سے لکھ رہا ہے۔"
-
 #: src/postulo/templates/jobs/company_places.html
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 #: src/postulo/templates/resume/references.html
 #: src/postulo/templates/server/plugins.html
 msgid "Read it"
@@ -16051,8 +16429,7 @@ msgid "Reference letters they wrote"
 msgstr "ان کے لکھے ہوئے حوالہ نامے"
 
 #: src/postulo/documents/rendering.py src/postulo/resume/registry.py
-#: src/postulo/resume/views.py
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/resume/views.py src/postulo/templates/resume/import.html
 msgid "References"
 msgstr "حوالہ جات"
 
@@ -16226,6 +16603,14 @@ msgstr "ریموٹ"
 #: src/postulo/plugins/models.py
 msgid "remote address"
 msgstr "ریموٹ پتہ"
+
+#: src/postulo/jobs/search_views.py
+msgid "Remote work only"
+msgstr ""
+
+#: src/postulo/jobs/search_views.py
+msgid "remote work only"
+msgstr ""
 
 #: src/postulo/templates/accounts/profile.html
 #: src/postulo/templates/connections/confirm_delete.html
@@ -16416,6 +16801,7 @@ msgstr "ڈیٹا رکھنے کی مدت"
 msgid "retired on"
 msgstr "ریٹائر ہونے کی تاریخ"
 
+#: src/postulo/templates/jobs/company_enrichment.html
 #: src/postulo/templates/jobs/company_register.html
 #, python-format
 msgid "Retrieved %(when)s."
@@ -16431,6 +16817,7 @@ msgstr "ریورس پراکسی"
 
 #: src/postulo/templates/jobs/capture_list.html
 #: src/postulo/templates/jobs/listing_list.html
+#: src/postulo/templates/jobs/listing_search.html
 msgid "Review"
 msgstr "جائزہ"
 
@@ -16546,6 +16933,10 @@ msgstr "%(running)s چل رہا ہے؛ مکمل کرنے کے لیے ری اسٹ
 #: src/postulo/templates/server/backups.html
 msgid "Runs in the background; you can leave this page while it works."
 msgstr "پس منظر میں چلتا ہے؛ کام کے دوران آپ یہ صفحہ چھوڑ سکتے ہیں۔"
+
+#: src/postulo/templates/jobs/company_enrichment.html
+msgid "Said, and not offered"
+msgstr ""
 
 #: src/postulo/templates/core/import_csv_map.html
 #, fuzzy
@@ -16741,6 +17132,14 @@ msgstr "بتائیں کہ یہ کون سا شناخت کنندہ ہے۔"
 msgid "Say what this number is."
 msgstr "بتائیں کہ یہ کون سا نمبر ہے۔"
 
+#: src/postulo/jobs/listing_search.py
+msgid "Say what to search for."
+msgstr ""
+
+#: src/postulo/jobs/search_views.py
+msgid "Say what to search for: some words, or a place."
+msgstr ""
+
 #: src/postulo/applications/forms.py
 msgid "Say which currency the amount is in."
 msgstr "بتائیں کہ رقم کس کرنسی میں ہے۔"
@@ -16820,9 +17219,15 @@ msgstr "Postulo نے مہر کی جانچ نہیں کی"
 #: src/postulo/templates/core/search.html
 #: src/postulo/templates/cotton/site_search.html
 #: src/postulo/templates/jobs/industry_list.html
+#: src/postulo/templates/jobs/listing_search.html
 #: src/postulo/templates/resume/answer_list.html
 msgid "Search"
 msgstr "تلاش"
+
+#: src/postulo/templates/jobs/listing_list.html
+#: src/postulo/templates/jobs/listing_search.html
+msgid "Search a job service"
+msgstr ""
 
 #: src/postulo/applications/tables.py
 msgid "Search applications"
@@ -16852,6 +17257,10 @@ msgstr "خطوط تلاش کریں"
 #: src/postulo/jobs/tables.py
 msgid "Search listings"
 msgstr "اشتہارات تلاش کریں"
+
+#: src/postulo/templates/jobs/listing_search.html
+msgid "Search the adverts a job service publishes, and review the one you want before it becomes a listing. Nothing is asked until you press Search."
+msgstr ""
 
 #: src/postulo/applications/views.py
 msgid "Search the calendar"
@@ -17225,6 +17634,18 @@ msgstr "نمٹائی گئی"
 #: src/postulo/templates/server/design.html
 msgid "Seven colours, each tuned to 3:1 against the card in both themes."
 msgstr "سات رنگ، ہر ایک دونوں تھیمز میں کارڈ کے مقابلے میں 3:1 کنٹراسٹ پر ترتیب دیا گیا۔"
+
+#: src/postulo/jobs/search_views.py
+msgid "Several countries"
+msgstr ""
+
+#: src/postulo/jobs/enrichment_offers.py
+msgid "Several social profiles are switched off."
+msgstr ""
+
+#: src/postulo/jobs/enrichment_offers.py
+msgid "Several telephone numbers are switched off."
+msgstr ""
 
 #: src/postulo/jobs/industries.py
 msgid "Sewerage"
@@ -17666,7 +18087,7 @@ msgstr "مہارتوں کے گروپ"
 #: src/postulo/resume/registry.py src/postulo/resume/views.py
 #: src/postulo/resume/views_candidate.py
 #: src/postulo/templates/cotton/listing_skills.html
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 #: src/postulo/templates/resume/preview.html
 msgid "Skills"
 msgstr "مہارتیں"
@@ -17720,7 +18141,7 @@ msgid "Snoozed for two weeks."
 msgstr "دو ہفتوں کے لیے ملتوی کر دیا گیا۔"
 
 #: src/postulo/core/models.py src/postulo/core/web_links.py
-#: src/postulo/documents/printing.py
+#: src/postulo/documents/printing.py src/postulo/jobs/enrichment_offers.py
 msgid "Social profile"
 msgstr "سوشل پروفائل"
 
@@ -17907,6 +18328,7 @@ msgstr "ماخذ اشتہار کا “کہاں سے ملا” فیلڈ ہے۔ ا
 msgid "source version"
 msgstr "ماخذ ورژن"
 
+#: src/postulo/templates/jobs/company_enrichment.html
 #: src/postulo/templates/jobs/company_register.html
 #, python-format
 msgid "Source: %(source)s."
@@ -17947,7 +18369,7 @@ msgstr "عملے کی فراہمی"
 #: src/postulo/templates/core/kind_file.html
 #: src/postulo/templates/jobs/contact_vcards.html
 #: src/postulo/templates/resume/candidate_file.html
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 msgid "Start again"
 msgstr "دوبارہ شروع کریں"
 
@@ -18200,6 +18622,10 @@ msgstr "میرے ORCID ریکارڈ سے تجویز کریں"
 msgid "suggested by"
 msgstr "تجویز کنندہ"
 
+#: src/postulo/documents/themes.py
+msgid "Suggested for this document"
+msgstr ""
+
 #: src/postulo/applications/models.py
 msgid "suggested status"
 msgstr "تجویز کردہ حیثیت"
@@ -18447,6 +18873,7 @@ msgid "telephone"
 msgstr "ٹیلی فون"
 
 #: src/postulo/core/channels.py src/postulo/documents/printing.py
+#: src/postulo/jobs/enrichment_offers.py
 #: src/postulo/templates/partials/phone_widget.html
 #: src/postulo/templates/server/design.html
 msgid "Telephone number"
@@ -18564,7 +18991,7 @@ msgstr "شکریہ، {{ role }}"
 msgid "Thank-you"
 msgstr "شکریہ"
 
-#: src/postulo/jobs/register_views.py
+#: src/postulo/jobs/enrichment_offers.py
 msgid "That address could not be added."
 msgstr "وہ پتہ شامل نہیں کیا جا سکا۔"
 
@@ -18593,6 +19020,10 @@ msgstr "اس پتے نے بہت زیادہ بار ری ڈائریکٹ کیا۔"
 #, python-format
 msgid "That address returned %(kind)s rather than a web page."
 msgstr "اس پتے نے ویب صفحے کی بجائے %(kind)s لوٹایا۔"
+
+#: src/postulo/jobs/listing_search.py
+msgid "That advert cannot be asked of this service."
+msgstr ""
 
 #: src/postulo/documents/slow.py
 msgid "That application is no longer here."
@@ -19026,6 +19457,10 @@ msgstr "یہ کسی Wikidata آئٹم کا شناخت کنندہ نہیں۔"
 msgid "That is not an address Postulo can use."
 msgstr "یہ ایسا پتا نہیں جسے Postulo استعمال کر سکے۔"
 
+#: src/postulo/jobs/listing_search.py
+msgid "That is not an advert this service could have named."
+msgstr ""
+
 #: src/postulo/core/offsite.py
 msgid "That is not an age recipient. It starts age1 and is 62 characters long."
 msgstr "یہ age وصول کنندہ نہیں ہے۔ یہ age1 سے شروع ہوتا ہے اور 62 حروف لمبا ہوتا ہے۔"
@@ -19132,6 +19567,10 @@ msgstr "اس آئٹم کا پہلے ہی %(record)s کے ساتھ جوڑا بن�
 #: src/postulo/plugins/pairing.py
 msgid "That item is no longer on the other side."
 msgstr "وہ آئٹم اب دوسری جانب نہیں ہے۔"
+
+#: src/postulo/jobs/search_views.py
+msgid "That job service is not offered here."
+msgstr ""
 
 #: src/postulo/templates/account/recovery_unusable.html
 msgid "That link cannot be used"
@@ -19255,6 +19694,14 @@ msgstr "یہ جواب کسی ایسی درخواست کا نہیں جو Postulo 
 #: src/postulo/core/views_access.py
 msgid "That rule existed, and is changed."
 msgstr "یہ اصول پہلے سے موجود تھا، اور اسے تبدیل کر دیا گیا ہے۔"
+
+#: src/postulo/jobs/listing_search.py
+msgid "That search cannot be asked of this service."
+msgstr ""
+
+#: src/postulo/jobs/listing_search.py
+msgid "That search is longer than a service can be asked."
+msgstr ""
 
 #: src/postulo/applications/views.py
 msgid "That suggestion has already been answered."
@@ -19600,6 +20047,11 @@ msgstr "وہ کمپنیاں، رابطے اور اشتہارات جو یہ شا�
 msgid "The company %(name)s is not in your account, and is added with it."
 msgstr "کمپنی %(name)s آپ کے اکاؤنٹ میں نہیں ہے، اور اس کے ساتھ شامل کر دی جاتی ہے۔"
 
+#: src/postulo/templates/jobs/company_enrichment.html
+#, python-format
+msgid "The company already has <bdi>%(current)s</bdi>."
+msgstr ""
+
 #: src/postulo/jobs/views.py
 msgid "The company already has that name."
 msgstr "کمپنی کا یہ نام پہلے سے موجود ہے۔"
@@ -19829,7 +20281,7 @@ msgstr "رقم جیسی انہوں نے لکھی، ٹیکس سے پہلے۔"
 #: src/postulo/templates/documents/upload_detail.html
 #: src/postulo/templates/jobs/contact_vcards.html
 #: src/postulo/templates/resume/candidate_file.html
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 msgid "The file"
 msgstr "فائل"
 
@@ -20224,6 +20676,11 @@ msgstr "لوگو تبدیل کر دیا گیا۔"
 msgid "The logo was not changed: %(problem)s"
 msgstr "لوگو تبدیل نہیں کیا گیا: %(problem)s"
 
+#: src/postulo/jobs/enrichment_offers.py
+#, python-format
+msgid "The logo was not kept: %(problem)s"
+msgstr ""
+
 #: src/postulo/templates/applications/report.html
 msgid "The longest gap is measured inside this period, so a silence that began before it is not carried in. A period still running is only counted up to today."
 msgstr "سب سے طویل وقفہ اسی مدت کے اندر ناپا جاتا ہے، اس لیے جو خاموشی اس سے پہلے شروع ہوئی وہ اس میں شامل نہیں کی جاتی۔ جاری مدت صرف آج تک گنی جاتی ہے۔"
@@ -20427,6 +20884,10 @@ msgstr "آپ کی تفصیلات والی تصویر، آپ کے نام کے س�
 msgid "The picture that stands for you on these pages: one you upload, your Gravatar, or your initials."
 msgstr "وہ تصویر جو ان صفحات پر آپ کی نمائندگی کرتی ہے: آپ کی اپ لوڈ کردہ تصویر، آپ کا Gravatar، یا آپ کے نام کے ابتدائی حروف۔"
 
+#: src/postulo/jobs/search_views.py
+msgid "the place"
+msgstr ""
+
 #: src/postulo/accounts/models.py
 msgid "The plugin whose calendar entries set the date, such as a monthly declaration."
 msgstr "وہ پلگ ان جس کے کیلنڈر اندراجات تاریخ طے کرتے ہیں، جیسے ماہانہ اعلامیہ۔"
@@ -20559,9 +21020,13 @@ msgstr "درخواست %(limit)s سے بڑی ہے، جو یہ کال زیادہ 
 msgid "The request was not in the shape this call takes."
 msgstr "درخواست اس شکل میں نہیں تھی جو یہ کال لیتی ہے۔"
 
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 msgid "The rest of the file is still worth importing. What is listed here is not, and you can add it by hand afterwards."
 msgstr "فائل کا باقی حصہ اب بھی درآمد کرنے کے قابل ہے۔ یہاں درج چیزیں نہیں، اور آپ انہیں بعد میں ہاتھ سے شامل کر سکتے ہیں۔"
+
+#: src/postulo/templates/jobs/listing_search.html
+msgid "The results are shown and not kept. An advert is kept only once you review it and save it."
+msgstr ""
 
 #: src/postulo/templates/applications/application_intake.html
 #: src/postulo/templates/jobs/capture_review.html
@@ -20666,6 +21131,14 @@ msgstr "سرور نے یہ اسناد مسترد کر دیں: %(detail)s"
 #: src/postulo/core/server_forms.py
 msgid "The server that accepts the mail — its name, not an address."
 msgstr "وہ سرور جو میل وصول کرتا ہے — اس کا نام، پتا نہیں۔"
+
+#: src/postulo/jobs/listing_search.py
+msgid "The service's address is not one it declared."
+msgstr ""
+
+#: src/postulo/jobs/listing_search.py
+msgid "The service's answer could not be read."
+msgstr ""
 
 #: src/postulo/core/server_forms.py
 msgid "The service's base address. Left empty with Nominatim, OpenStreetMap's public instance is used: https://nominatim.openstreetmap.org. For your own: for example https://photon.example.org"
@@ -20922,6 +21395,10 @@ msgstr "wheel کا میٹا ڈیٹا پڑھا نہیں جا سکتا؛ ہو سک
 msgid "The wheel's metadata is far larger than any plugin's."
 msgstr "wheel کا میٹا ڈیٹا کسی بھی پلگ ان کے میٹا ڈیٹا سے کہیں بڑا ہے۔"
 
+#: src/postulo/jobs/search_views.py
+msgid "the words"
+msgstr ""
+
 #: src/postulo/templates/documents/rendered_compare.html
 msgid "The words are the same in both. If the two PDFs look different, what changed is how they are set: the theme, or the layout."
 msgstr "الفاظ دونوں میں ایک جیسے ہیں۔ اگر دونوں PDF مختلف نظر آتی ہیں تو فرق ان کی ترتیب کا ہے: تھیم، یا لے آؤٹ۔"
@@ -20929,6 +21406,10 @@ msgstr "الفاظ دونوں میں ایک جیسے ہیں۔ اگر دونوں 
 #: src/postulo/templates/documents/letter_detail.html
 msgid "The words without the layout, in this letter's language. None of these is filed as a version you sent."
 msgstr "لے آؤٹ کے بغیر الفاظ، اس خط کی زبان میں۔ ان میں سے کوئی بھی آپ کے بھیجے گئے ورژن کے طور پر محفوظ نہیں کیا جاتا۔"
+
+#: src/postulo/jobs/listing_search.py
+msgid "the words, the place and the filters searched for"
+msgstr ""
 
 #: src/postulo/core/errands.py
 msgid "The work was interrupted before it finished. Please try again."
@@ -22529,6 +23010,7 @@ msgid "Waiting after this one: %(count)s."
 msgstr "اس کے بعد منتظر: %(count)s۔"
 
 #: src/postulo/applications/models.py src/postulo/jobs/models.py
+#: src/postulo/templates/jobs/listing_search.html
 msgid "Waiting for review"
 msgstr "جائزے کے انتظار میں"
 
@@ -22622,7 +23104,8 @@ msgid "WebP image"
 msgstr "WebP تصویر"
 
 #: src/postulo/core/models.py src/postulo/core/web_links.py
-#: src/postulo/documents/printing.py src/postulo/jobs/tables.py
+#: src/postulo/documents/printing.py src/postulo/jobs/enrichment_offers.py
+#: src/postulo/jobs/tables.py
 #: src/postulo/templates/applications/interview_detail.html
 #: src/postulo/templates/jobs/company_detail.html
 msgid "Website"
@@ -22765,6 +23248,10 @@ msgstr "اس مدت میں کیا واپس آیا"
 msgid "what came of it"
 msgstr "اس کا کیا نتیجہ نکلا"
 
+#: src/postulo/templates/resume/import.html
+msgid "What can be read here"
+msgstr ""
+
 #: src/postulo/core/server_forms.py
 msgid "What carries the mail off this machine."
 msgstr "وہ چیز جو میل کو اس مشین سے باہر لے جاتی ہے۔"
@@ -22786,7 +23273,7 @@ msgstr "%(title)s میں کیا بدلا"
 msgid "What changes how Postulo behaves for you. Everything here works from the keyboard, with a screen reader and with scripts off; these are the choices on top of that."
 msgstr "وہ چیزیں جو بدلتی ہیں کہ Postulo آپ کے لیے کیسا برتاؤ کرے۔ یہاں ہر چیز کی بورڈ سے، اسکرین ریڈر کے ساتھ اور اسکرپٹس بند ہونے پر بھی کام کرتی ہے؛ یہ اس کے علاوہ کے انتخاب ہیں۔"
 
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 msgid "What could not be read"
 msgstr "جو پڑھا نہیں جا سکا"
 
@@ -22848,7 +23335,7 @@ msgstr "ڈائری میں کیا ہے، قریب ترین پہلے۔ کسی در
 #: src/postulo/templates/applications/ical_import.html
 #: src/postulo/templates/core/kind_file.html
 #: src/postulo/templates/resume/candidate_file.html
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 msgid "What is in the file"
 msgstr "فائل میں کیا ہے"
 
@@ -23105,6 +23592,7 @@ msgstr "اس کے بارے میں کیا کریں، ایک جملے میں۔"
 msgid "What to do. It is what the reminder says when it falls due."
 msgstr "کیا کرنا ہے۔ یاد دہانی کا وقت آنے پر یہی کہتی ہے۔"
 
+#: src/postulo/templates/jobs/company_enrichment.html
 #: src/postulo/templates/jobs/company_register.html
 msgid "What to keep"
 msgstr "کیا رکھنا ہے"
@@ -23165,6 +23653,10 @@ msgstr "آپ نے وہاں کیا کیا۔ “بیان نہیں کیا گیا”
 #: src/postulo/jobs/widgets.py
 msgid "What you have noticed and not yet acted on, and what closes this week."
 msgstr "جو آپ نے دیکھا مگر ابھی اس پر کچھ نہیں کیا، اور جو اس ہفتے بند ہو رہا ہے۔"
+
+#: src/postulo/templates/jobs/company_enrichment.html
+msgid "What you have recorded is never replaced from here. Change it on the company's own page if a source is right."
+msgstr ""
 
 #: src/postulo/resume/models.py
 msgid "what you presented"
@@ -23263,6 +23755,10 @@ msgstr "جب یہ آپ کے اشتہارات میں شامل ہوا۔"
 msgid "When it happened, which is not always when you write it down."
 msgstr "جب یہ ہوا، جو ہمیشہ وہ وقت نہیں ہوتا جب آپ اسے لکھتے ہیں۔"
 
+#: src/postulo/jobs/search_views.py
+msgid "when it was published"
+msgstr ""
+
 #: src/postulo/jobs/forms.py
 msgid "When the employer put it up, if the posting says. Empty means unknown."
 msgstr "آجر نے اسے کب شائع کیا، اگر اشتہار میں بتایا گیا ہو۔ خالی کا مطلب نامعلوم ہے۔"
@@ -23352,6 +23848,10 @@ msgstr "جہاں کوئی اس کی جانچ کر سکتا ہے۔ CV اسے لن
 msgid "Where the companies' map takes the tiles it is drawn on, and whether addresses are pinned at their street."
 msgstr "کمپنیوں کا نقشہ جن ٹائلوں پر بنتا ہے وہ کہاں سے لی جاتی ہیں، اور آیا پتوں کا پن ان کی گلی پر لگایا جاتا ہے۔"
 
+#: src/postulo/templates/resume/import.html
+msgid "Where the file states no level, none is written: a level is a claim about yourself that somebody will test, so it is yours to make afterwards."
+msgstr ""
+
 #: src/postulo/jobs/models.py
 msgid "where the logo came from"
 msgstr "لوگو کہاں سے آیا"
@@ -23409,6 +23909,10 @@ msgstr "اپنے سیکشن میں اس اندراج کی جگہ <a href=\"%(ove
 #: src/postulo/templates/help/telephone_numbers.html
 msgid "Where this instance can send a code to a telephone, a number you have confirmed can also be the one that gets you back into your account. That choice is separate from the primary, so changing what a recruiter dials never changes how you prove it is you. The bin will not remove that number while it is your way in. Changing its digits makes it another number, which has to be confirmed again and is no longer your way in."
 msgstr "جہاں یہ انسٹینس ٹیلی فون پر کوڈ بھیج سکتا ہو، وہاں آپ کا تصدیق شدہ نمبر آپ کو اکاؤنٹ میں دوبارہ رسائی دلانے والا نمبر بھی ہو سکتا ہے۔ یہ انتخاب بنیادی نمبر سے الگ ہے، اس لیے ریکروٹر جو نمبر ملاتا ہے اسے بدلنے سے یہ کبھی نہیں بدلتا کہ آپ اپنی شناخت کیسے ثابت کرتے ہیں۔ جب تک وہ نمبر آپ کا رسائی کا ذریعہ ہے، کوڑے دان کا نشان اسے نہیں ہٹائے گا۔ اس کے ہندسے بدلنے سے وہ ایک اور نمبر بن جاتا ہے، جس کی دوبارہ تصدیق ضروری ہے اور جو اب آپ کا رسائی کا ذریعہ نہیں رہتا۔"
+
+#: src/postulo/templates/cotton/enrichment_ask.html
+msgid "Where to ask"
+msgstr ""
 
 #: src/postulo/templates/server/register_lookup.html
 msgid "Where to get a key"
@@ -23821,6 +24325,10 @@ msgstr "لکڑی کی مصنوعات"
 msgid "Word document"
 msgstr "Word دستاویز"
 
+#: src/postulo/jobs/search_views.py
+msgid "Words"
+msgstr ""
+
 #: src/postulo/accounts/forms.py
 msgid "Words and chevrons"
 msgstr "الفاظ اور شیورون"
@@ -23950,7 +24458,7 @@ msgstr "<bdi>%(name)s</bdi> نے لکھا"
 msgid "Written by Postulo %(version)s on %(when)s."
 msgstr "Postulo %(version)s نے %(when)s کو لکھا۔"
 
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 #, python-format
 msgid "Written in %(tongue)s, which will be recorded as the language of your career record if you have not already set one."
 msgstr "%(tongue)s میں لکھا گیا، جو آپ کے کیریئر ریکارڈ کی زبان کے طور پر درج کی جائے گی اگر آپ نے پہلے سے کوئی مقرر نہیں کی۔"
@@ -24544,7 +25052,7 @@ msgstr "آپ کا ریکارڈ (JSON)"
 
 #: src/postulo/templates/core/export.html
 #: src/postulo/templates/resume/candidate_file.html
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 msgid "Your record as a file"
 msgstr "آپ کا ریکارڈ بطور فائل"
 
@@ -24673,9 +25181,13 @@ msgstr "{value} ہوسٹ کے بعد آتا ہے: پاتھ میں، سوالیہ
 msgid "· in the <a href=\"%(group_url)s\" class=\"underline\">%(name)s</a> group"
 msgstr "· <a href=\"%(group_url)s\" class=\"underline\">%(name)s</a> گروپ میں"
 
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 msgid "· no level in the file, so none will be claimed"
 msgstr "· فائل میں کوئی سطح نہیں، اس لیے کسی سطح کا دعویٰ نہیں کیا جائے گا"
+
+#: src/postulo/templates/resume/import.html
+msgid "· not a level Postulo keeps, so none will be claimed"
+msgstr ""
 
 #: src/postulo/templates/applications/application_detail.html
 #, python-format

@@ -30,10 +30,7 @@ A company with no logo shows an initials tile, exactly as a person with no pictu
 
 from __future__ import annotations
 
-import json
 import logging
-import re
-from html.parser import HTMLParser
 from urllib.parse import urljoin, urlsplit
 
 import httpx
@@ -44,7 +41,7 @@ from django.utils.translation import gettext as _
 from django.utils.translation import ngettext
 
 from postulo.core import pictures, throttle
-from postulo.plugins import fetching, http
+from postulo.plugins import http
 
 from .models import CompanyLogo
 
@@ -295,141 +292,57 @@ def from_upload(company, data: bytes) -> None:
 # ------------------------------------------------- finding one on their site
 
 
-class _LogoLinks(HTMLParser):
-    """The addresses a page offers for its own icon, best first.
+def site_sources(company, person=None) -> list[str]:
+    """The sources on for ``person`` that read ``company``'s own website for a logo.
 
-    Only what the site declares about itself: an apple-touch-icon, a declared icon, an
-    Open Graph image, or the logo in a schema.org Organization block. Nothing is guessed
-    from the markup's shape.
+    Only those: *Find logo* spends the fetch allowance, says it reads the website and records
+    what it keeps as found there, so a source with hosts of its own (an open data set) is
+    asked through *Find details* and its own allowance, never through this button. Asking
+    which they are asks nobody anything.
     """
+    from . import enrichment
 
-    def __init__(self) -> None:
-        super().__init__()
-        self.apple: list[tuple[int, str]] = []
-        self.icons: list[tuple[int, str]] = []
-        self.og: list[str] = []
-        self.json_ld: list[str] = []
-        self._in_ld = False
-
-    def handle_starttag(self, tag: str, attrs) -> None:
-        values = {name.lower(): (value or "") for name, value in attrs}
-        if tag == "link":
-            rel = values.get("rel", "").lower()
-            href = values.get("href", "")
-            if not href:
-                return
-            size = _largest(values.get("sizes", ""))
-            if "apple-touch-icon" in rel:
-                self.apple.append((size, href))
-            elif "icon" in rel.split():
-                self.icons.append((size, href))
-        elif tag == "meta":
-            name = (values.get("property") or values.get("name") or "").lower()
-            if name in ("og:image", "og:logo", "twitter:image") and values.get("content"):
-                self.og.append(values["content"])
-        elif tag == "script" and values.get("type", "").lower() == "application/ld+json":
-            self._in_ld = True
-
-    def handle_endtag(self, tag: str) -> None:
-        if tag == "script":
-            self._in_ld = False
-
-    def handle_data(self, data: str) -> None:
-        if self._in_ld and data.strip():
-            self.json_ld.append(data)
-
-    def candidates(self) -> list[str]:
-        found = [href for _size, href in sorted(self.apple, reverse=True)]
-        found += [href for _size, href in sorted(self.icons, reverse=True)]
-        found += _organisation_logos(self.json_ld)
-        found += self.og
-        seen: list[str] = []
-        for href in found:
-            if href and href not in seen:
-                seen.append(href)
-        return seen
-
-
-def _largest(sizes: str) -> int:
-    # A number is read from where its digits begin. Without the look-behind, a run of
-    # digits with no `x` after it is tried again from every digit in it: 40,000 of them in
-    # a page's `sizes` took fifteen seconds, and a page may be two megabytes (#321).
-    numbers = [
-        int(match) for match in re.findall(r"(?<!\d)(\d{1,5})x\d+", sizes or "", re.IGNORECASE)
+    return [
+        source.key
+        for source in enrichment.usable_for(company, person, fields=("logo",))
+        if source.own_site
     ]
-    return max(numbers, default=0)
 
 
-def _organisation_logos(blocks: list[str]) -> list[str]:
-    """The ``logo`` of any schema.org Organization the page declares."""
-    found: list[str] = []
-    for block in blocks:
-        try:
-            payload = json.loads(block)
-        except (ValueError, RecursionError):  # RecursionError: nested thousands deep (#959)
-            continue
-        for node in _walk(payload):
-            if not isinstance(node, dict):
-                continue
-            types = node.get("@type", "")
-            types = types if isinstance(types, list) else [types]
-            if not any("organization" in str(one).lower() for one in types):
-                continue
-            logo = node.get("logo")
-            if isinstance(logo, dict):
-                logo = logo.get("url")
-            if isinstance(logo, str) and logo:
-                found.append(logo)
-    return found
-
-
-def _walk(node):
-    """Every node of a parsed document, without recursing: depth is the page's to choose (#959)."""
-    pending = [node]
-    while pending:
-        current = pending.pop()
-        yield current
-        if isinstance(current, dict):
-            pending.extend(current.values())
-        elif isinstance(current, list):
-            pending.extend(current)
-
-
-def find_on_website(company) -> str:
+def find_on_website(company, *, by=None) -> str:
     """Look on the company's own site for its icon, and keep the first that works.
 
     The site is the one public repository every company maintains, and the address is one
-    the person typed. One page is fetched, under the same rules and the same courtesy
-    towards ``robots.txt`` as capture, and then at most a few images.
+    the person typed. Reading it is a source's (#1256): the `company-enrichment` sources
+    that offer a logo -- Postulo's own, the `company-site` plugin, reads the page as capture
+    does, ``robots.txt`` honoured -- name the images the site declares, best first, and the
+    images are fetched, decoded and kept here, as one from an address is. ``by`` is the
+    person who pressed, whose switches decide which sources are asked.
     """
+    from . import enrichment
+
     website = (company.website or "").strip()
     if not website:
         raise UnusableLogo(str(_("This company has no website recorded.")))
-    try:
-        page = fetching.fetch_page(website)
-    except Exception as error:
+    results = enrichment.ask(company, site_sources(company, by), person=by, fields=("logo",))
+    if not results:
+        raise UnusableLogo(str(_("Nothing is switched on that finds a logo on a website.")))
+    errors = [result.error for result in results if result.error]
+    candidates = [value for result in results for value in result.values]
+    if not candidates and errors:
         raise UnusableLogo(
-            str(_("Could not read %(site)s: %(error)s")) % {"site": website, "error": error}
-        ) from error
-
-    parser = _LogoLinks()
-    try:
-        parser.feed(page.html)
-    except Exception:  # pragma: no cover - a broken page is not an error worth showing
-        logger.exception("Could not read the markup of company %s's website", company.pk)
-    base = page.url or website
-    # Five declared images at most, so that the conventional favicon is always the sixth try.
-    candidates = [urljoin(base, href) for href in parser.candidates()][:5]
-    candidates.append(urljoin(base, "/favicon.ico"))
+            str(_("Could not read %(site)s: %(error)s")) % {"site": website, "error": errors[0]}
+        )
 
     problems = []
-    for candidate in candidates:
+    for candidate in dict.fromkeys(value.value for value in candidates):
         try:
             store(company, process(download(candidate)), source="website", url=candidate)
         except UnusableLogo as error:
             problems.append(str(error))
             continue
         return candidate
+    base = next((value.url for value in candidates if value.url), website)
     host = urlsplit(base).hostname or website
     # The company by number, not its host (#797): the log is staff's and a host is what a
     # person is looking at.

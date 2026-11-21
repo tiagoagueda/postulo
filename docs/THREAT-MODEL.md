@@ -239,6 +239,65 @@ personal instance is close to saying who, so the rules are these:
 `tests/test_register_lookup.py` and the register tests in `tests/security/test_outbound.py`
 hold these.
 
+**Find details tells a source which company somebody is looking at (#1256).** A
+`company-enrichment` plugin contributes sources a person may tick when they press *Find details*
+on a company they may change. A source describes its requests and reads the answers; Postulo
+makes every request, under the same rules as a register lookup:
+
+- **Each plugin is its own switch**, under *Server settings → Plugins*, and a source of one
+  that is off is neither shown nor asked. Never on a page load, a save, an import, a merge or
+  a schedule; opening the dialog asks nothing.
+- **Only what the source starts from is sent**: the company's website, name, country or one
+  identifier, as its `starts_from` names. Postulo's user agent, no cookie, no referrer.
+- **Only where it declared.** A source names `https` hosts, and every address and every
+  redirect is held to them; or it reads the company's own website, and every address is on
+  the host of the website the person recorded, read as a capture's page is (`robots.txt`
+  honoured, every hop revalidated). Four requests a press, two megabytes and fifteen seconds
+  each, through the public-only client (rule 5). A press spends `POSTULO_ENRICHMENT_RATE` per
+  source with hosts, `POSTULO_FETCH_RATE` per source that reads the site, before any request.
+- **What comes back waits in the errand's row, which is the person's**, until they tick what
+  to keep or cancel; either way it is taken out of the row, and so is it when the review is
+  opened after the company is gone or the grant to write it is taken back. The errand finds
+  the company as the person who pressed may reach it. The offers are worked out again from
+  that answer at *Keep*, so a hand-written POST keeps only what the page could have offered.
+- **A stranger's text, cleaned**: addresses held to `http(s)` on a host name, codes and
+  identifiers to Postulo's own tables, a value without an origin dropped. An offered logo is
+  not drawn (the page draws nothing from another server); if kept it is fetched by
+  `logos.download` like any logo address.
+
+`tests/test_company_enrichment.py` and the *company's details* rows of
+`tests/security/test_outbound.py` hold these.
+**A listing search tells a job service what somebody is looking for (#1253).** With the
+*Listing search* plugin on, a person can search a job service from *Listings* and press
+*Review* on an advert it found, and the server asks that service. What leaves the instance is
+the words, the place and the filters searched for, or the service's own number for one advert,
+with Postulo's user agent: no account, no cookie, nothing about the person. The service still
+learns from the instance's address that somebody there searched for that, so the rules are
+those of a register lookup:
+
+- **Off until an administrator switches it on**, by `plugins` migration 0018, and **a switch
+  per service** under it; the page answers 404 and the listings page draws no button until
+  both are on for the person.
+- **A press, one request, bounded.** Never on a page load, a schedule or an import. Each press
+  of *Search*, of *Next page* and of *Review* spends the account's `POSTULO_LISTING_SEARCH_RATE`
+  (60 an hour by default) before the request; a 429 is said and never retried.
+- **Only the hosts a search declares, and only Postulo writes the query.** A search names an
+  `https` address on one of its hosts, with no query of its own, and hands over its parameters
+  as a mapping of names to plain values; Postulo encodes them, so nothing typed can reach the
+  path, the host or another parameter. The request goes through the public-only client, with a
+  deadline, two megabytes at most and no redirects. A package's search
+  (`postulo.listing_searches`) cannot take a key Postulo's own holds.
+- **What comes back is a stranger's text, and none of it is stored.** Every hit is validated
+  as a capture is, its strings cleaned of control and direction characters and cut to their
+  columns. The results are drawn and forgotten; *Review* asks the service again by the
+  advert's number, held to a bounded shape, and the capture is made from that answer for the
+  person who pressed, never from what the form sent.
+- **The record of processing names each service** somebody can reach, with its hosts, what it
+  is sent and its licence.
+
+`tests/test_listing_search.py` and the listing-search tests in `tests/security/test_outbound.py`
+hold these.
+
 ## What is out of scope
 
 - The operator's own machine. Root on the host reads everything; that is true of any

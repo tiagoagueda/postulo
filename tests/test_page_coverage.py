@@ -230,10 +230,21 @@ EXCUSED: dict[str, str] = {
         "fetch it sends you to the company's page, so the walk never finds it drawn (#673)"
     ),
     "jobs:company_names": "a form's answer that adds or removes one name and goes back (#673)",
+    "listings:search": (
+        "a job service's search, offered only while Listing search is on, which starts off and "
+        "which the walk leaves off; tests/e2e/test_listing_search.py turns it on and runs axe "
+        "over the form and its results in both themes (#1253)"
+    ),
     "jobs:company_register": (
         "what a press of Look up brought back from a company register, held in the session; "
         "without a lookup it sends you to the company's page, and the walk makes no request "
         "to a register, so it never finds it drawn (#1021)"
+    ),
+    "jobs:company_enrichment": (
+        "what a press of Find details brought back, held in the errand's row; without a press "
+        "it sends you to the company's page, and the walk asks no source, so it never finds it "
+        "drawn (#1256). tests/test_company_enrichment.py draws it and "
+        "tests/e2e/test_company_enrichment.py runs axe over it"
     ),
     "jobs:company_signal_add": "a POST from the company form that adds a hiring entry (#941)",
     "jobs:company_signal_edit": "a POST from the company form that changes a hiring entry (#941)",
@@ -296,6 +307,10 @@ EXCUSED: dict[str, str] = {
     "listings:shortlist": "a POST from the listings table",
     "listings:discard": "a POST from the listings table",
     "listings:restore": "a POST that brings a discarded listing back",
+    "resume:europass_import": (
+        "the name `resume:import` had while Europass was the only importer, kept for one "
+        "release; the same address, which is walked under its own name (#1260)"
+    ),
     "resume:item_move": "a POST that reorders one entry in the career record",
     "resume:skill_suggestions": (
         "the `<option>` elements the skill box asks for as somebody types, as a fragment "

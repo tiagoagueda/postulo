@@ -37,6 +37,12 @@ sends one small archive through a destination, lists it and deletes it, which is
 Postulo's retention relies on: a destination whose ``list`` does not return what it was sent
 would never have an old archive removed.
 
+**And a source of company details held to its contract (#1256).**
+`assert_is_a_company_enrichment_source` checks a `company-enrichment` plugin against answers
+you recorded: its sources are usable, every address it asks for is one it declared, what it
+reads out of the answers is what it said it offers, each value saying where it was read, and
+none of it reaches the network. It returns the values as Postulo would hold them.
+
 **And what a call wrote, read back (#270).** `record_listing_event` is on the surface and the
 rows it writes are not: the model is Postulo's to change. A plugin that binds things to a
 listing still has to see, in its own tests, what its call wrote -- `listing_history` is
@@ -58,6 +64,18 @@ so a plugin's tests assert on what a person sees.
 `assert_declares_usable_environment` holds a plugin's ``environment`` to what Postulo accepts:
 each an `EnvironmentVariable` of a known kind, named ``POSTULO_PLUGIN_<NAME>_...`` by the rules
 Postulo's own names follow, none of them one of Postulo's, and its default readable as its kind.
+
+**And a job service's search held to its contract (#1253).** `assert_is_a_listing_search`
+takes one `ListingSearch` and an answer recorded from its service for a search and for one
+advert, and fails unless Postulo could use it: a key, hosts and criteria of the right shape,
+every address it describes -- for ordinary searches and for words written to break out of a
+parameter -- on its own hosts over https and the same whatever was typed, the recorded answers
+read into hits a capture can be made from, and a source and a licence stated.
+**And an importer held to its contract (#1260).** `assert_is_an_importer` hands an importer
+files of the plugin's own -- ones it reads, ones it must leave alone -- and holds it to what
+the import page relies on: `can_handle` answers and never raises, `read` returns the `Record`
+on the surface with the keys the writer reads and dates that are dates, a file it will not
+read is an `ImportRefused` and nothing else, and nothing is written to a database.
 
 **And the migrated test database, kept between runs (#1144).** A plugin's suite migrates the
 whole of Postulo before its first test. `cached_django_db_setup` makes the fixture that does
@@ -83,7 +101,9 @@ occupation, period and currency it is asked with.
 from __future__ import annotations
 
 import ast
+import re
 from collections.abc import Iterable, Mapping
+from contextlib import contextmanager
 from pathlib import Path
 
 #: The one module a plugin may import from, and the reason there is exactly one.
@@ -261,6 +281,422 @@ def assert_is_a_backup_destination(plugin, config: dict, *, tmp_path: Path) -> N
     assert all(item.id != reference.id for item in plugin.list(config)), (
         f"{reference.id!r} is still listed after it was deleted"
     )
+
+
+@contextmanager
+def _network_refused():
+    """Nothing connects and no name resolves while this is open: a source describes its
+    requests and reads the answers, and Postulo is the one that dials."""
+    import socket
+
+    def refuse(*_args, **_kwargs):
+        raise AssertionError(
+            "a company-enrichment source reached for the network: Postulo makes every "
+            "request, and hands the source the answers"
+        )
+
+    resolve, connect = socket.getaddrinfo, socket.socket.connect
+    socket.getaddrinfo, socket.socket.connect = refuse, refuse
+    try:
+        yield
+    finally:
+        socket.getaddrinfo, socket.socket.connect = resolve, connect
+
+
+def assert_is_a_company_enrichment_source(plugin, *, subject, answers, key: str = "") -> list:
+    """Hold a company-enrichment plugin to its contract, against answers you recorded (#1256).
+
+    For a source's own test suite: ``subject`` is an `EnrichmentSubject` for a company of
+    your choosing and ``answers`` the `EnrichmentAnswer`s your service gave for it, recorded
+    once and kept with the tests. ``key`` names the source where the plugin has several.
+
+    Fails unless the plugin answers to the protocol and its kind; every source can be used
+    (its key, what it starts from and offers, exactly one of ``hosts`` and ``own_site``);
+    every address ``addresses(subject)`` and ``follow(answers, subject)`` return is one
+    Postulo would ask -- ``https`` on a declared host, or on the host of the subject's
+    website for a source that reads the company's own site, and four at most in all; and
+    ``read(answers, subject)`` returns only `OfferedValue`s for fields the source offers,
+    each with an origin. All of it runs with the network refused: a source that dials
+    fails here.
+
+    Returns the offered values cleaned as Postulo would hold them, for your own assertions
+    -- a value the cleaning drops (an address that is not ``http``, a country nobody knows)
+    is not in it.
+    """
+    from postulo.jobs import enrichment
+
+    from .base import CompanyEnrichmentPlugin
+
+    assert isinstance(plugin, CompanyEnrichmentPlugin), (
+        f"{plugin!r} does not provide name, kind and sources"
+    )
+    assert plugin.kind == "company-enrichment", f"its kind is {plugin.kind!r}"
+    sources = list(plugin.sources)
+    assert sources, "the plugin contributes no source"
+    for source in sources:
+        wrong = enrichment.problems(source)
+        assert not wrong, f"{getattr(source, 'key', source)!r}: " + "; ".join(wrong)
+    keys = [source.key for source in sources]
+    assert len(keys) == len(set(keys)), f"two sources share a key: {keys}"
+    if key:
+        assert key in keys, f"the plugin has no source {key!r}"
+        source = sources[keys.index(key)]
+    else:
+        assert len(sources) == 1, f"say which source with key=: {keys}"
+        source = sources[0]
+
+    allowed = set(source.hosts) or {enrichment.host_of(subject.website)}
+    schemes = ("https",) if source.hosts else ("http", "https")
+
+    def held(addresses) -> list[str]:
+        found = [str(address) for address in addresses or ()]
+        for address in found:
+            assert address.split(":", 1)[0] in schemes and enrichment.host_of(address) in allowed, (
+                f"{source.key!r} asks for {address}, which is not {' or '.join(schemes)} on "
+                f"{sorted(allowed)}"
+            )
+        return found
+
+    answers = tuple(answers)
+    with _network_refused():
+        asked = held(source.addresses(subject))
+        assert asked, f"{source.key!r} names no address for this subject"
+        if source.follow is not None:
+            asked += held(source.follow(answers, subject))
+        assert len(asked) <= enrichment.MAX_REQUESTS, (
+            f"{source.key!r} asks for {len(asked)} addresses; one press allows "
+            f"{enrichment.MAX_REQUESTS}"
+        )
+        offered = list(source.read(answers, subject) or ())
+    for value in offered:
+        assert isinstance(value, enrichment.Offered), f"read returned {value!r}"
+        assert value.field in source.offers, (
+            f"{source.key!r} returned a value for {value.field!r}, which it does not offer"
+        )
+        assert str(value.origin or "").strip(), (
+            f"the {value.field!r} value {value.value!r} does not say where it was read"
+        )
+    return enrichment.cleaned_all(offered, source)
+
+
+#: What a person might type, and what somebody might type to make a search ask elsewhere: each
+#: has to reach a parameter's value and nothing else.
+_HOSTILE_WORDS = (
+    "nurse",
+    "sjuksköterska Göteborg",
+    "a&q=b&offset=9999",
+    "../../admin?x=1#top",
+    "https://elsewhere.example/",
+    "x\r\nHost: elsewhere.example",
+    "\u202ereversed\u0000",
+    "%2F%2E%2E%2F",
+    "y" * 500,
+)
+
+
+def assert_is_a_listing_search(search, *, results, advert) -> list:
+    """Hold one job service's `ListingSearch` to what Postulo needs of it (#1253).
+
+    ``results`` is the JSON a search answered with, recorded from the service (cut down, with
+    nobody's name, address or number left in it), and ``advert`` is ``(key, document)``: one
+    advert's number and the JSON the service answered for it. Nothing is asked of the network:
+    the search describes requests, and reads what it is handed.
+
+    Fails unless the search is one the registry would keep; unless every address it describes,
+    for a spread of criteria and for words written to break out of a parameter, is ``https``
+    on one of its hosts and carries no query of its own, and is the same address whatever was
+    typed; unless the recorded search reads into at least one hit, each a number a service's
+    own could be and a posting with a title and a page, as Postulo would show it; unless the
+    recorded advert reads into one posting; and unless a source and a licence are stated.
+    Returns the hits, cleaned as the search page shows them, for the caller's own assertions.
+    """
+    from urllib.parse import urlsplit
+
+    from postulo.jobs import listing_search as core
+
+    assert isinstance(search, core.ListingSearch), f"{search!r} is not a ListingSearch"
+    assert core._usable(search), (
+        f"{search.key!r} would be left out: check its key (lower case, digits, hyphens, at most "
+        "thirty), its countries (two capitals each), its languages (BCP 47 tags), its hosts "
+        f"(names), and that it supports some of {core.FILTERS} and nothing else"
+    )
+    assert str(search.source).strip(), "a search names its source: it is a listing's found via"
+    assert search.licence.strip(), "a search states the licence its service's adverts are under"
+
+    paths = set()
+    for words in _HOSTILE_WORDS:
+        for criteria in (
+            core.Criteria(words=words),
+            core.Criteria(words=words, place=words, remote=True, since_days=7, page=3),
+        ):
+            honoured = core.honoured(search, criteria)
+            if honoured.is_empty():
+                continue
+            try:
+                address = core._address(search, search.request(honoured))
+            except core.SearchRefused as refused:
+                raise AssertionError(
+                    f"for {honoured!r} the search described an address Postulo refuses: {refused}"
+                ) from refused
+            parts = urlsplit(address)
+            assert parts.scheme == "https" and parts.hostname in search.hosts, address
+            paths.add((parts.hostname, parts.path))
+    assert len(paths) == 1, f"what was typed changed the address asked: {sorted(paths)}"
+
+    criteria = core.honoured(search, core.Criteria(words="nurse"))
+    found = search.read(results, criteria)
+    assert isinstance(found, core.Results), f"read returned {found!r}, not SearchResults"
+    hits = []
+    for hit in found.hits:
+        assert isinstance(hit, core.Hit), f"{hit!r} is not a SearchHit"
+        assert core._is_advert(hit.key), f"{hit.key!r} is not a number a service's own can be"
+        posting = core.cleaned(search, hit.posting)
+        assert posting.title and posting.url, f"{hit.key!r} has no title or no page"
+        hits.append(core.Hit(key=hit.key, posting=posting))
+    assert hits, "the recorded search was read into no hits"
+
+    key, document = advert
+    try:
+        address = core._address(search, search.one(key))
+    except core.SearchRefused as refused:
+        raise AssertionError(f"for {key!r} the search described an address Postulo refuses") from (
+            refused
+        )
+    parts = urlsplit(address)
+    assert parts.scheme == "https" and parts.hostname in search.hosts, address
+    one = search.read_one(document, key)
+    assert one is not None, f"the recorded advert {key!r} was read as no such advert"
+    posting = core.cleaned(search, one)
+    assert posting.title and posting.url, f"the advert {key!r} has no title or no page"
+    return hits
+
+
+#: What an importer's ``accepts`` may hold: a file extension, or a media type.
+_ACCEPTED = re.compile(r"\.[A-Za-z0-9]{1,12}|[a-z]+/[A-Za-z0-9][A-Za-z0-9.+-]*")
+
+#: The keys of a record's ``person``, and of the ``address`` inside it.
+_PERSON_KEYS = frozenset(
+    {
+        "first_name",
+        "last_name",
+        "headline",
+        "location",
+        "website",
+        "phone",
+        "email",
+        "orcid",
+        "address",
+    }
+)
+_ADDRESS_KEYS = frozenset({"street", "postcode", "municipality", "region", "country"})
+
+#: The values of a row that are not text: everything else that is not a date is.
+_NOT_TEXT = {
+    "skills": (list,),
+    "levels": (dict,),
+    "eqf_level": (int, type(None)),
+    "hours": (int, type(None)),
+}
+
+#: What changes a database, as the first word of a statement.
+_WRITES = frozenset(
+    {"INSERT", "UPDATE", "DELETE", "REPLACE", "CREATE", "DROP", "ALTER", "TRUNCATE"}
+)
+
+#: Bytes no importer reads: what `can_handle` and `read` must survive without a traceback.
+_GARBAGE = (
+    bytes(range(256)) * 4,
+    b"\x00" * 64,
+    b"{",
+    b"[",
+    b"<",
+    b'{"',
+    b"PK\x03\x04",
+    b"%PDF-1.7",
+    b"\xff\xfe\x00\x00",
+    b"a,b,c\n1,2,3\n",
+)
+
+
+def _record_problems(record) -> list[str]:
+    """What is wrong with a record an importer returned, in words; nothing where it is sound."""
+    import datetime as dt
+    import json
+
+    from postulo.resume.importing import ROWS, Record
+
+    if not isinstance(record, Record):
+        return [f"read returned {type(record).__name__}, not the Record on the plugin surface"]
+    found: list[str] = []
+    for name in ("source", "source_label", "locale"):
+        if not isinstance(getattr(record, name), str):
+            found.append(f"{name} is {type(getattr(record, name)).__name__}, not text")
+    for name in ("skipped", "notes"):
+        said = getattr(record, name)
+        if not isinstance(said, list) or not all(isinstance(each, str) for each in said):
+            found.append(f"{name} is not a list of sentences")
+    person = record.person
+    if not isinstance(person, dict):
+        found.append("person is not a dictionary")
+    else:
+        unknown = sorted(set(person) - _PERSON_KEYS)
+        if unknown:
+            found.append(f"person has keys nothing reads: {unknown}")
+        address = person.get("address", {})
+        if not isinstance(address, dict):
+            found.append("person's address is not a dictionary")
+        else:
+            unknown = sorted(set(address) - _ADDRESS_KEYS)
+            if unknown:
+                found.append(f"the address has keys nothing reads: {unknown}")
+        for key, value in [
+            *person.items(),
+            *(address.items() if isinstance(address, dict) else ()),
+        ]:
+            if key != "address" and not isinstance(value, str):
+                found.append(f"person's {key} is {type(value).__name__}, not text")
+    for name, rows in ROWS.items():
+        entries = getattr(record, name)
+        if not isinstance(entries, list):
+            found.append(f"{name} is not a list")
+            continue
+        for place, row in enumerate(entries):
+            where = f"{name}[{place}]"
+            if not isinstance(row, dict):
+                found.append(f"{where} is not a dictionary")
+                continue
+            missing = [key for key in rows.required if key not in row]
+            if missing:
+                found.append(f"{where} has no {missing}")
+            unknown = sorted(set(row) - set(rows.known))
+            if unknown:
+                found.append(f"{where} has keys nothing reads: {unknown}")
+            for key, value in row.items():
+                if key in rows.dates:
+                    a_day = isinstance(value, dt.date) and not isinstance(value, dt.datetime)
+                    if value is not None and not a_day:
+                        found.append(f"{where}: {key} is {value!r}, not a datetime.date or None")
+                elif key in rows.known and not isinstance(value, _NOT_TEXT.get(key, (str,))):
+                    found.append(f"{where}: {key} is {type(value).__name__}")
+                elif key in ("skills", "levels"):
+                    try:
+                        json.dumps(value)
+                    except (TypeError, ValueError):
+                        found.append(f"{where}: {key} holds something a session cannot keep")
+            if name == "skill_groups" and isinstance(row.get("skills"), list):
+                if not all(isinstance(skill, str) for skill in row["skills"]):
+                    found.append(f"{where}: skills is not a list of names")
+    return found
+
+
+def assert_is_an_importer(plugin, *, samples: Iterable[bytes], not_samples: Iterable[bytes] = ()):
+    """Hold an importer to its contract, with files of your own (#1260).
+
+    For an importer's own test suite. ``samples`` are files it reads, as bytes;
+    ``not_samples`` are files it must leave to somebody else (another importer's format,
+    a word processor's file). It fails unless:
+
+    - the plugin answers to the protocol, calls itself an ``"importer"`` and has a name, a
+      label and a description; and its ``accepts``, if it declares one, is a tuple of file
+      extensions (``".json"``) and media types (``"application/json"``);
+    - ``can_handle`` says yes to each sample and no to each non-sample, and answers with a
+      plain ``True`` or ``False``, raising nothing, for an empty file, for bytes that are
+      no format at all and for each sample cut short;
+    - ``read`` turns each sample into the `Record` on the surface, whose rows hold the keys
+      the wiki's table lists and no others, whose dates are ``datetime.date`` or ``None``,
+      and whose other values are text (``skills`` a list of names, ``levels`` a
+      dictionary, ``hours`` and ``eqf_level`` a whole number or ``None``);
+    - ``read`` given bytes that are no format, or a sample cut short, either returns a
+      record or raises `ImportRefused`, and nothing else;
+    - nothing is written to a database along the way: an importer turns bytes into a
+      record and stops.
+
+    What Postulo refuses before any importer is asked (`refuse_unreadable`) is not handed
+    to ``read`` here either. The check needs no database of its own: an importer that asks
+    one for anything fails where a test has not been given one.
+    """
+    from contextlib import ExitStack
+
+    from django.db import connections
+
+    from .base import ImporterPlugin, ImportRefused, refuse_unreadable
+
+    assert isinstance(plugin, ImporterPlugin), (
+        f"{plugin!r} does not provide name, version, kind, label, description, can_handle and read"
+    )
+    assert plugin.kind == "importer", f"its kind is {plugin.kind!r}"
+    for name in ("name", "label", "description"):
+        assert str(getattr(plugin, name) or ""), f"it has no {name}"
+    accepts = getattr(plugin, "accepts", None)
+    if accepts is not None:
+        assert isinstance(accepts, tuple) and accepts, "accepts is a tuple that is not empty"
+        odd = [
+            each for each in accepts if not isinstance(each, str) or not _ACCEPTED.fullmatch(each)
+        ]
+        assert not odd, f"accepts holds neither an extension nor a media type: {odd}"
+
+    good = [bytes(sample) for sample in samples]
+    others = [bytes(sample) for sample in not_samples]
+    assert good, "give at least one file the importer reads"
+    cut = sorted(
+        {sample[:length] for sample in good for length in (1, len(sample) // 4, len(sample) // 2)}
+        | {sample[:-1] for sample in good}
+    )
+
+    statements: list[str] = []
+
+    def watch(execute, sql, params, many, context):
+        statements.append(str(sql))
+        return execute(sql, params, many, context)
+
+    def asked(data: bytes) -> bool:
+        try:
+            answer = plugin.can_handle(data, "")
+        except Exception as error:
+            raise AssertionError(
+                f"can_handle raised {type(error).__name__} on {data[:24]!r}: it answers what "
+                "a file is, and a file it does not know is a no"
+            ) from error
+        assert answer is True or answer is False, f"can_handle returned {answer!r}, not a bool"
+        return answer
+
+    def unreadable(data: bytes) -> bool:
+        try:
+            refuse_unreadable(data)
+        except ImportRefused:
+            return True
+        return False
+
+    with ExitStack() as stack:
+        for connection in connections.all():
+            stack.enter_context(connection.execute_wrapper(watch))
+
+        for data in (b"", *_GARBAGE, *cut):
+            asked(data)
+        for data in others:
+            assert not asked(data), f"can_handle claims a file that is not its own: {data[:40]!r}"
+        for data in good:
+            assert asked(data), f"can_handle does not recognise the sample {data[:40]!r}"
+            record = plugin.read(data)
+            problems = _record_problems(record)
+            assert not problems, "; ".join(problems[:20])
+        for data in (*_GARBAGE, *cut):
+            if unreadable(data):
+                continue
+            try:
+                record = plugin.read(data)
+            except ImportRefused:
+                continue
+            except Exception as error:
+                raise AssertionError(
+                    f"read raised {type(error).__name__} on {data[:24]!r}: a file it will "
+                    "not read is an ImportRefused, with a sentence for the person"
+                ) from error
+            problems = _record_problems(record)
+            assert not problems, "; ".join(problems[:20])
+
+    written = [sql for sql in statements if sql.lstrip().split(None, 1)[0].upper() in _WRITES]
+    assert not written, f"the importer wrote to the database: {written[:3]}"
 
 
 def assert_declares_usable_widgets(plugin) -> None:

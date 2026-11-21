@@ -26,7 +26,7 @@ from django.core.exceptions import ValidationError
 from django.template.loader import get_template
 from django.urls import reverse
 
-from postulo.documents import themes
+from postulo.documents import theme_choice, themes
 from postulo.documents.models import CV, CoverLetter, LetterKind
 
 pytestmark = pytest.mark.django_db
@@ -122,6 +122,168 @@ def test_the_picker_says_whose_markup_a_theme_is(user):
 
     assert labels["vellum"] == "Vellum, from Vellum Press"
     assert labels["plain"] == "Plain", "Postulo's own have nothing to be distinguished from"
+
+
+# --------------------------------------- what a theme suits, and the picker suggesting it
+
+
+def a_theme_for(name: str, *, languages=(), countries=(), kinds=(themes.Kind.LETTER,)):
+    return themes.Theme(
+        name=name,
+        label=name.title(),
+        templates={kind: f"documents/themes/plain/{kind}.html" for kind in kinds},
+        languages=languages,
+        countries=countries,
+    )
+
+
+def values_in(choices) -> list[str]:
+    return [value for _group, options in themes.option_groups(choices) for value, _ in options]
+
+
+def test_a_theme_says_nothing_about_where_it_suits_unless_it_is_told():
+    """Both fields are optional, so every pack written before them keeps working (#1255)."""
+    theme = a_theme("lettery", themes.Kind.LETTER)
+
+    assert theme.languages == () and theme.countries == ()
+    assert not themes.suits(theme, "de-DE", "DE")
+
+
+def test_with_nothing_declared_the_picker_is_what_it_always_was():
+    """No groups where nothing says what it suits: no more on the page than is needed."""
+    themes.register(a_theme("lettery", themes.Kind.LETTER))
+
+    choices = themes.choices_for(themes.Kind.LETTER, language="de-DE", country="DE")
+
+    assert choices == themes.choices_for(themes.Kind.LETTER)
+    assert [value for value, _label in choices] == ["plain", "classic", "lettery"]
+
+
+def test_a_theme_for_the_documents_language_is_suggested_first_and_nothing_is_hidden():
+    themes.register(a_theme_for("din", languages=("de",)))
+    themes.register(a_theme("lettery", themes.Kind.LETTER))
+
+    choices = themes.choices_for(themes.Kind.LETTER, language="de-AT")
+
+    assert [group for group, _options in choices] == [
+        "Suggested for this document",
+        "Other themes",
+    ]
+    assert [value for value, _label in choices[0][1]] == ["din"]
+    assert values_in(choices) == ["din", "plain", "classic", "lettery"], "none is hidden"
+
+
+def test_a_theme_for_another_language_is_not_suggested():
+    themes.register(a_theme_for("din", languages=("de",)))
+
+    choices = themes.choices_for(themes.Kind.LETTER, language="fr-FR", country="FR")
+
+    assert [value for value, _label in choices] == ["plain", "classic", "din"], "flat, as before"
+
+
+def test_a_theme_that_names_countries_suits_only_a_document_for_one_of_them():
+    us = a_theme_for("resume", countries=("US", "CA"), kinds=(themes.Kind.CV,))
+    both = a_theme_for("din", languages=("de",), countries=("DE", "AT"))
+
+    assert themes.suits(us, "en-US", "US") and themes.suits(us, "", "CA")
+    assert not themes.suits(us, "en-GB", "GB") and not themes.suits(us, "en-US", "")
+    assert themes.suits(both, "de", "AT")
+    assert not themes.suits(both, "de-CH", "CH"), "the language suits, the country does not"
+    assert not themes.suits(both, "fr", "DE"), "the country suits, the language does not"
+
+
+def test_what_a_theme_declares_is_kept_in_canonical_form_and_the_rest_dropped(caplog):
+    themes.register(
+        a_theme_for("din", languages=("DE_at", "not a tag!", 7), countries=("at", "XX", "de"))
+    )
+    themes.register(a_theme_for("solo", languages="fr", countries="fr"))
+
+    din = themes.find("din")
+    assert din.languages == ("de-AT",)
+    assert din.countries == ("AT", "DE")
+    assert "no language tag" in caplog.text and "no country code" in caplog.text
+    assert "din" in caplog.text
+    solo = themes.find("solo")
+    assert (solo.languages, solo.countries) == (("fr",), ("FR",)), "one code is not letters"
+
+
+def test_the_documents_country_is_the_region_of_its_language_first(user):
+    from postulo.core.models import PostalAddress
+
+    PostalAddress.objects.create(
+        owner=user, holder=user.profile, municipality="Lisbon", country="PT", is_primary=True
+    )
+
+    assert theme_choice.document_country(user, "fr-CA") == "CA"
+    assert theme_choice.document_country(user, "fr") == "PT", "else the person's primary address"
+    assert theme_choice.document_country(user, "es-419") == "PT", "a region that is no country"
+
+
+def test_a_person_with_no_address_and_a_tag_with_no_region_has_no_country(user):
+    assert theme_choice.document_country(user, "de") == ""
+    assert theme_choice.document_country(None, "") == ""
+
+
+def test_the_letter_form_suggests_from_the_letters_language_and_the_persons_country(user):
+    from postulo.core.models import PostalAddress
+    from postulo.documents.forms import CoverLetterForm
+
+    PostalAddress.objects.create(
+        owner=user, holder=user.profile, municipality="Vienna", country="AT", is_primary=True
+    )
+    themes.register(a_theme_for("din", languages=("de",), countries=("DE", "AT")))
+    letter = CoverLetter.objects.create(owner=user, name="Bewerbung", language="de")
+
+    field = CoverLetterForm(user=user, instance=letter).fields["theme"]
+
+    assert field.choices[0][0] == "Suggested for this document"
+    assert [value for value, _label in field.choices[0][1]] == ["din"]
+    assert field.valid_value("plain") and field.valid_value("din"), "a group is still a choice"
+    page = CoverLetterForm(user=user, instance=letter)["theme"].as_widget()
+    assert '<optgroup label="Suggested for this document">' in page
+    assert '<optgroup label="Other themes">' in page
+
+
+def test_a_letter_in_another_language_is_offered_the_flat_list(user):
+    from postulo.documents.forms import CoverLetterForm
+
+    themes.register(a_theme_for("din", languages=("de",)))
+    letter = CoverLetter.objects.create(owner=user, name="Motivation", language="fr")
+
+    choices = CoverLetterForm(user=user, instance=letter).fields["theme"].choices
+
+    assert [value for value, _label in choices] == ["plain", "classic", "din"]
+
+
+def test_a_suggestion_is_never_chosen_for_the_person(user, client):
+    """The letter keeps the theme it had; the suggestion is only the order of the menu."""
+    themes.register(a_theme_for("din", languages=("de",)))
+    letter = CoverLetter.objects.create(owner=user, name="Bewerbung", language="de")
+    client.force_login(user)
+
+    page = client.get(reverse("documents:letter_update", args=[letter.pk])).content.decode()
+
+    assert '<optgroup label="Suggested for this document">' in page
+    assert '<option value="plain" selected>' in page
+    assert '<option value="din" selected>' not in page
+
+
+def test_the_report_page_groups_its_picker_only_when_a_theme_suits(user, client):
+    from postulo.applications import reports
+
+    client.force_login(user)
+    themes.register(a_theme_for("other", languages=("tlh",), kinds=(themes.Kind.REPORT,)))
+    plain = client.get(reverse("applications:report")).content.decode()
+    assert "<optgroup" not in plain.split('id="report-theme"', 1)[1].split("</select>", 1)[0]
+
+    language = reports.language_for(user)
+    themes.register(a_theme_for("ours", languages=(language,), kinds=(themes.Kind.REPORT,)))
+    page = client.get(reverse("applications:report")).content.decode()
+    picker = page.split('id="report-theme"', 1)[1].split("</select>", 1)[0]
+
+    assert '<optgroup label="Suggested for this document">' in picker
+    assert picker.index('value="ours"') < picker.index('value="plain"')
+    assert 'value="other"' in picker, "a theme that does not suit is still offered"
 
 
 def test_choosing_a_theme_that_does_not_set_this_kind_is_refused_by_the_form(user, client):

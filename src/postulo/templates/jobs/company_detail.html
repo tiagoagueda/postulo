@@ -164,6 +164,17 @@
     </div>
   {% endif %}
 
+  {% comment %} Find details (#1256): one button, while a source of company details is on for
+     the reader, this company has what one starts from, and the reader may keep what comes
+     back. The dialog it opens says where a press would ask and what it would send; drawing
+     it asks nothing. {% endcomment %}
+  {% if enrichment_sources %}
+    <div class="mb-6 flex flex-wrap items-center gap-2 text-sm{% if identifier_rows or identifiers_hidden %} -mt-4{% endif %}" data-enrichment>
+      <c-enrichment-ask :company="company" :sources="enrichment_sources" />
+      <span class="text-xs text-ink-500 dark:text-ink-400">{% translate "Asks the places you choose, once each; nothing is kept until you say so." %}</span>
+    </div>
+  {% endif %}
+
   {% comment %} What it answers on and where it is (#329): its mailbox, its numbers -- the
      primary alone while several are off, as a contact's -- and its addresses, each on a line
      of its own, before its links. {% endcomment %}

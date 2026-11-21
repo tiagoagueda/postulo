@@ -234,7 +234,94 @@ def test_a_push_reaches_the_service_encrypted_for_that_browser(user, push_servic
     payload = json.loads(AESGCM(key).decrypt(nonce, body[86:], None)[:-1])
     assert payload["title"] == "Chase Aperture"
     assert payload["url"] == "/applications/1/"
+    assert payload["lang"], "the words' language, for a screen reader to read them in"
+    assert payload["tag"] == "reminder_due", "no key, so the event is all there is to tag by"
     assert not BrowserNotice.objects.exists(), "pushed, so nothing waits for a tab as well"
+
+
+def decrypted(request: httpx.Request) -> dict:
+    """The payload of one push, opened with the browser's own key."""
+    from cryptography.hazmat.primitives.ciphers.aead import AESGCM
+    from cryptography.hazmat.primitives.kdf.hkdf import HKDF
+
+    receiver, _ = a_browser()
+    body = request.content
+    salt, sender_public = body[:16], body[21:86]
+    sender = ec.EllipticCurvePublicKey.from_encoded_point(ec.SECP256R1(), sender_public)
+    shared = receiver.exchange(ec.ECDH(), sender)
+    info = b"WebPush: info\x00" + webpush.unb64url(RFC_RECEIVER_PUBLIC) + sender_public
+    ikm = HKDF(hashes.SHA256(), 32, salt=webpush.unb64url(RFC_AUTH), info=info).derive(shared)
+    key = HKDF(hashes.SHA256(), 16, salt=salt, info=b"Content-Encoding: aes128gcm\x00").derive(ikm)
+    nonce = HKDF(hashes.SHA256(), 12, salt=salt, info=b"Content-Encoding: nonce\x00").derive(ikm)
+    return json.loads(AESGCM(key).decrypt(nonce, body[86:], None)[:-1])
+
+
+def test_two_reminders_due_together_are_two_notifications_on_the_screen(user, push_service):
+    """The tag is the message's key, not its event (#1259).
+
+    With the event as the tag, a second reminder due in the same minute silently replaced the
+    first on the screen; the same reminder pushed again still replaces itself.
+    """
+    received, _answer = push_service
+    _, subscription = a_browser()
+    browser_connection(user, subscription=subscription)
+
+    for key in ("reminder:1:2026-11-17T09:00", "reminder:2:2026-11-17T09:00"):
+        notify(user, Notification(event="reminder_due", title="Due", key=key))
+
+    tags = [decrypted(request)["tag"] for request in received]
+    assert tags == ["reminder:1:2026-11-17T09:00", "reminder:2:2026-11-17T09:00"]
+
+
+@pytest.mark.parametrize("character", ["职", "न", "🎉", "\n"])
+def test_a_long_message_in_any_script_fits_what_a_push_service_takes(user, push_service, character):
+    """Bounded in bytes, not characters (#1259).
+
+    300 characters of title and 1000 of body in Chinese, Hindi or emoji are well over the
+    4096 bytes a push service takes; it answered 413, and every retry got the same answer.
+    """
+    received, _answer = push_service
+    _, subscription = a_browser()
+    browser_connection(user, subscription=subscription)
+
+    delivered = notify(
+        user,
+        Notification(
+            event="reminder_due",
+            title=character * 300,
+            body=character * 1000,
+            url="/applications/1/",
+            key="reminder:" + "9" * 190,
+        ),
+    )
+
+    assert delivered == 1
+    (request,) = received
+    assert len(request.content) <= 4096
+    payload = decrypted(request)
+    assert payload["url"] == "/applications/1/", "the link is never what is cut"
+    assert payload["title"], "the title survives; the body goes first"
+    assert payload["body"] == "" or payload["body"].endswith("…")
+
+
+def test_a_short_message_is_pushed_whole():
+    from postulo.plugins.browser import _payload
+
+    fitted = _payload("Chase Aperture", "Role at company", "/x/", "t", "pt-PT")
+    assert fitted["title"] == "Chase Aperture" and fitted["body"] == "Role at company"
+    assert fitted["lang"] == "pt-PT"
+
+
+@pytest.mark.parametrize("character", ["职", "🎉", "\n", '"'])
+def test_the_payload_is_cut_body_first_then_title_on_a_whole_character(character):
+    """What the test button and any caller of `_payload` get, not only a cut body (#1259)."""
+    from postulo.plugins.browser import PAYLOAD_BYTES, _payload, _weight
+
+    fitted = _payload(character * 300, character * 1000, "/x/", "t" * 200)
+
+    assert _weight(fitted) <= PAYLOAD_BYTES
+    assert fitted["url"] == "/x/" and fitted["tag"] == "t" * 200, "only the words are cut"
+    assert "�" not in fitted["title"] + fitted["body"], "never half a character"
 
 
 def test_a_withdrawn_subscription_retires_the_connection_and_keeps_the_notice(user, push_service):
@@ -381,6 +468,8 @@ def test_the_browser_notifier_ships_in_the_box_and_is_offered(client, user):
     assert f'data-web-push-key="{webpush.application_server_key()}"' in page
     assert 'data-web-push-worker="/sw.js"' in page
     assert "data-web-push-allow=" in page
+    # What an iPhone or an iPad in a Safari tab is told instead of the HTTPS sentence (#1259).
+    assert "data-web-push-install-first=" in page
     assert 'name="plugin_subscription"' in page
 
 

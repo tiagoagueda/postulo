@@ -33,18 +33,21 @@ from importlib.metadata import entry_points
 
 from .base import (
     BACKUP_DESTINATION_GROUP,
+    COMPANY_ENRICHMENT_GROUP,
     CONNECTED_KINDS,
     EARNINGS_SOURCE_GROUP,
     FEATURE_GROUP,
     IDENTIFIER_GROUP,
     IMPORTER_GROUP,
     LINK_SERVICE_GROUP,
+    LISTING_SEARCH_GROUP,
     MESSAGING_SERVICE_GROUP,
     REGISTER_ADAPTER_GROUP,
     SUB_PLUGIN_KINDS,
     SUGGESTION_SOURCE_GROUP,
     TRANSPORT_GROUP,
     BackupDestinationPlugin,
+    CompanyEnrichmentPlugin,
     ConnectedPlugin,
     EarningsSourcePlugin,
     FeaturePlugin,
@@ -52,6 +55,7 @@ from .base import (
     ImporterPlugin,
     JobPostingData,
     LinkServicePlugin,
+    ListingSearchPlugin,
     MessagingServicePlugin,
     RegisterAdapterPlugin,
     SourcePlugin,
@@ -91,6 +95,10 @@ ENTRY_POINT_GROUP = "postulo.sources"
 #: may ask, one per country, which a package for another country may add to (#1021).
 #: An **earnings-source** plugin is open too: the published earnings statistics a listing may
 #: be read beside, which a package for one country's statistics office may add to (#1257).
+#: A **company-enrichment** plugin is open too: the places a company's details may be read
+#: from on a press, which a package may add to and which is switched like any plugin (#1256).
+#: A **listing-search** plugin is open the same way: the job services *Search a job service*
+#: may ask, which a package for another service may add to (#1253).
 #:
 #: A **backup-destination** plugin is a transport's kind of thing for archives: instance
 #: plumbing that keeps the backups somewhere besides this disk, chosen by an administrator
@@ -104,8 +112,10 @@ GROUPS = {
     "link-service": LINK_SERVICE_GROUP,
     "messaging-service": MESSAGING_SERVICE_GROUP,
     "register-adapter": REGISTER_ADAPTER_GROUP,
+    "listing-search": LISTING_SEARCH_GROUP,
     "suggestion-source": SUGGESTION_SOURCE_GROUP,
     "earnings-source": EARNINGS_SOURCE_GROUP,
+    "company-enrichment": COMPANY_ENRICHMENT_GROUP,
     "backup-destination": BACKUP_DESTINATION_GROUP,
     **CONNECTED_KINDS,
 }
@@ -138,8 +148,10 @@ def _protocol_for(kind: str):
         "link-service": LinkServicePlugin,
         "messaging-service": MessagingServicePlugin,
         "register-adapter": RegisterAdapterPlugin,
+        "listing-search": ListingSearchPlugin,
         "suggestion-source": SuggestionSourcePlugin,
         "earnings-source": EarningsSourcePlugin,
+        "company-enrichment": CompanyEnrichmentPlugin,
         "backup-destination": BackupDestinationPlugin,
     }.get(kind, ConnectedPlugin)
 

@@ -15,6 +15,16 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: postulo scripts/messages.py\n"
 
+#: src/postulo/jobs/enrichment_offers.py
+#, python-format
+msgid "%(address)s was not added."
+msgstr ""
+
+#: src/postulo/jobs/enrichment_offers.py
+#, python-format
+msgid "%(address)s was not added: %(reason)s"
+msgstr ""
+
 #: src/postulo/jobs/listing_earnings.py
 #, python-format
 msgid "%(amount)s %(currency)s per hour, gross (%(year)s)"
@@ -356,6 +366,12 @@ msgstr[0] "%(count)s个事件有时间，但时区不是 Postulo 所知的时区
 msgid "%(count)s listing you are considering closes soon"
 msgid_plural "%(count)s listings you are considering close soon"
 msgstr[0] "你正在考虑的%(count)s个职位即将截止"
+
+#: src/postulo/jobs/enrichment_offers.py
+#, python-format
+msgid "%(count)s person or more"
+msgid_plural "%(count)s people or more"
+msgstr[0] ""
 
 #: src/postulo/plugins/base.py
 #, python-format
@@ -737,6 +753,11 @@ msgstr "%(host)s位于私有网络或本地网络中。只有当运维人员设�
 msgid "%(i)s interviews and %(e)s entries in listings' histories would be kept without the name."
 msgstr "%(i)s场面试和职位历史记录中的%(e)s个条目将保留，但不再带有该名字。"
 
+#: src/postulo/jobs/enrichment_offers.py
+#, python-format
+msgid "%(industry)s (NACE %(division)s)"
+msgstr ""
+
 #: src/postulo/templates/server/logs.html
 #, python-format
 msgid "%(kilobytes)s on disk"
@@ -819,7 +840,7 @@ msgstr "%(least)s至%(most)s"
 msgid "%(list)s · %(date)s"
 msgstr "%(list)s · %(date)s"
 
-#: src/postulo/jobs/models.py
+#: src/postulo/jobs/enrichment_offers.py src/postulo/jobs/models.py
 #, python-format
 msgid "%(low)s to %(high)s"
 msgstr "%(low)s至%(high)s"
@@ -1210,6 +1231,16 @@ msgstr "%(name)s：已略过号码%(value)s。%(why)s"
 msgid "%(names)s can see “%(other)s” and not “%(kept)s”. Share “%(kept)s” with them first, or nothing is merged."
 msgstr "%(names)s能看到“%(other)s”，但看不到“%(kept)s”。请先与他们共享“%(kept)s”，否则不会进行合并。"
 
+#: src/postulo/jobs/enrichment_offers.py
+#, python-format
+msgid "%(number)s was not added."
+msgstr ""
+
+#: src/postulo/jobs/enrichment_offers.py
+#, python-format
+msgid "%(number)s was not added: %(reason)s"
+msgstr ""
+
 #: src/postulo/resume/views.py
 #, python-format
 msgid "%(ok)s, %(broken)s; the ones that did not say why."
@@ -1409,25 +1440,40 @@ msgstr "%(scheme)s：格式不常见。"
 msgid "%(sent)s, %(failed)s; each document says which."
 msgstr "%(sent)s，%(failed)s；每份文档都注明了结果。"
 
-#: src/postulo/resume/lookups.py
+#: src/postulo/jobs/listing_search.py src/postulo/resume/lookups.py
 #, python-format
 msgid "%(service)s answered %(status)s."
 msgstr "%(service)s返回了%(status)s。"
 
-#: src/postulo/resume/lookups.py
+#: src/postulo/jobs/listing_search.py src/postulo/resume/lookups.py
 #, python-format
 msgid "%(service)s asked for fewer requests. Try again later."
 msgstr "%(service)s要求减少请求。请稍后重试。"
 
-#: src/postulo/resume/lookups.py
+#: src/postulo/jobs/listing_search.py src/postulo/resume/lookups.py
 #, python-format
 msgid "%(service)s could not be reached."
 msgstr "无法连接到%(service)s。"
+
+#: src/postulo/jobs/listing_search.py
+#, python-format
+msgid "%(service)s did not accept that search."
+msgstr ""
+
+#: src/postulo/templates/jobs/listing_search.html
+#, python-format
+msgid "%(service)s does not search by %(criteria)s, so that was not sent."
+msgstr ""
 
 #: src/postulo/resume/lookups.py
 #, python-format
 msgid "%(service)s has no record in a form Postulo reads."
 msgstr "%(service)s没有 Postulo 能读取的格式的记录。"
+
+#: src/postulo/jobs/listing_search.py
+#, python-format
+msgid "%(service)s has nothing at the address it was asked at."
+msgstr ""
 
 #: src/postulo/core/web_links.py src/postulo/jobs/surface.py
 #, python-format
@@ -1439,6 +1485,11 @@ msgstr "%(service)s已被另一行使用。"
 msgid "%(service)s knows no such identifier."
 msgstr "%(service)s不认识此标识符。"
 
+#: src/postulo/jobs/listing_search.py
+#, python-format
+msgid "%(service)s no longer has that advert."
+msgstr ""
+
 #: src/postulo/resume/lookups.py
 #, python-format
 msgid "%(service)s redirected too many times."
@@ -1449,7 +1500,7 @@ msgstr "%(service)s重定向次数过多。"
 msgid "%(service)s refused the look-ups (%(status)s). They are stopped."
 msgstr "%(service)s拒绝了查询（%(status)s），查询已停止。"
 
-#: src/postulo/resume/lookups.py
+#: src/postulo/jobs/listing_search.py src/postulo/resume/lookups.py
 #, python-format
 msgid "%(service)s sent the request somewhere else."
 msgstr "%(service)s将请求转到了别处。"
@@ -1459,10 +1510,20 @@ msgstr "%(service)s将请求转到了别处。"
 msgid "%(service)s sent the request to an address Postulo does not dial."
 msgstr "%(service)s将请求转到了 Postulo 不会连接的地址。"
 
-#: src/postulo/resume/lookups.py
+#: src/postulo/jobs/listing_search.py src/postulo/resume/lookups.py
 #, python-format
 msgid "%(service)s took too long to answer."
 msgstr "%(service)s响应超时。"
+
+#: src/postulo/jobs/listing_search.py
+#, python-format
+msgid "%(service)s's answer could not be read."
+msgstr ""
+
+#: src/postulo/jobs/listing_search.py
+#, python-format
+msgid "%(service)s's answer was larger than a page of adverts should be."
+msgstr ""
 
 #: src/postulo/resume/views.py
 #, python-format
@@ -1474,10 +1535,81 @@ msgstr "%(service)s（通过 doi.org）没有为空白的输入框提供任何�
 msgid "%(share)s%%"
 msgstr "%(share)s%%"
 
+#: src/postulo/jobs/enrichment.py
+#, python-format
+msgid "%(source)s asked for an address it did not declare."
+msgstr ""
+
+#: src/postulo/jobs/enrichment.py
+#, python-format
+msgid "%(source)s asked for fewer requests. Try again later."
+msgstr ""
+
+#: src/postulo/jobs/enrichment.py
+#, python-format
+msgid "%(source)s asked for more requests than one press allows."
+msgstr ""
+
+#: src/postulo/jobs/enrichment.py
+#, python-format
+msgid "%(source)s cannot be asked about this company."
+msgstr ""
+
+#: src/postulo/jobs/enrichment.py
+#, python-format
+msgid "%(source)s could not be reached."
+msgstr ""
+
+#: src/postulo/templates/jobs/company_enrichment.html
+#, python-format
+msgid "%(source)s could not be read."
+msgstr ""
+
+#: src/postulo/jobs/enrichment.py
+#, python-format
+msgid "%(source)s redirected too many times."
+msgstr ""
+
+#: src/postulo/jobs/enrichment.py
+#, python-format
+msgid "%(source)s sent its answer with the content encoding “%(coding)s”, which Postulo does not unpack."
+msgstr ""
+
+#: src/postulo/jobs/enrichment.py
+#, python-format
+msgid "%(source)s sent the request somewhere else."
+msgstr ""
+
+#: src/postulo/jobs/enrichment.py
+#, python-format
+msgid "%(source)s took longer than %(seconds)s second to answer."
+msgid_plural "%(source)s took longer than %(seconds)s seconds to answer."
+msgstr[0] ""
+
+#: src/postulo/jobs/enrichment.py
+#, python-format
+msgid "%(source)s's answer could not be read."
+msgstr ""
+
+#: src/postulo/jobs/enrichment.py
+#, python-format
+msgid "%(source)s's answer was larger than one company's should be."
+msgstr ""
+
+#: src/postulo/templates/jobs/listing_search.html
+#, python-format
+msgid "%(source)s: asked at %(hosts)s. It is sent the words, the place and the filters you search for, or an advert's number when you press Review, and nothing about you."
+msgstr ""
+
 #: src/postulo/applications/agenda.py
 #, python-format
 msgid "%(start)s to %(end)s"
 msgstr "%(start)s至%(end)s"
+
+#: src/postulo/jobs/enrichment_offers.py
+#, python-format
+msgid "%(state)s since %(date)s"
+msgstr ""
 
 #: src/postulo/templates/applications/partials/board.html
 #, python-format
@@ -1773,8 +1905,8 @@ msgid "<em>Headline</em> is a short professional title, such as “Backend engin
 msgstr "<em>头衔</em>是简短的职业称号，例如“后端工程师”。如果某份简历有自己的头衔，则打印该简历的头衔。"
 
 #: src/postulo/templates/help/career.html
-msgid "<em>Import</em> reads a Europass CV; <em>Export</em> writes your details and your career as one file you can keep or move to another Postulo; <em>Preview</em> shows the whole record as a document, and <em>Your CVs</em> opens the variants made from it."
-msgstr "<em>导入</em>读取 Europass 简历；<em>导出</em>将你的资料和职业经历写入一个文件，你可以保存它或将其移至另一个 Postulo；<em>预览</em>将整个记录显示为文档，<em>你的简历</em>则打开基于它制作的各个版本。"
+msgid "<em>Import</em> reads a CV you have as a file; <em>Export</em> writes your details and your career as one file you can keep or move to another Postulo; <em>Preview</em> shows the whole record as a document, and <em>Your CVs</em> opens the variants made from it."
+msgstr ""
 
 #: src/postulo/templates/help/identifiers.html
 #, fuzzy
@@ -2197,7 +2329,7 @@ msgstr "你的文档中的文件"
 msgid "A file goes under Files first; an entry points at it rather than keeping a copy."
 msgstr "文件需先放在“文件”下；条目只指向它，而不保留副本。"
 
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 msgid "A file that Postulo itself wrote is read on a page of its own."
 msgstr "Postulo 自己写出的文件会在单独的页面上读取。"
 
@@ -2246,6 +2378,10 @@ msgstr "标题、标题下的说明句，然后是卡片要承载的内容。"
 #: src/postulo/jobs/vcards.py
 msgid "a job title"
 msgstr "职位名称"
+
+#: src/postulo/jobs/search_views.py
+msgid "A job title, a skill or an employer, as you would type it on the service."
+msgstr ""
 
 #: src/postulo/documents/integrity.py
 msgid "a JPEG picture"
@@ -2356,6 +2492,10 @@ msgstr "职位是你留意到的招聘信息，此时你还没有对它做出任
 msgid "A listing keeps its deadline, which the closing-soon notice then watches, and its tags are written into its description."
 msgstr "职位会保留截止日期（之后由“即将截止”通知跟踪），其标签会写入描述中。"
 
+#: src/postulo/templates/jobs/listing_search.html
+msgid "A listing like it"
+msgstr ""
+
 #: src/postulo/templates/jobs/capture_review.html
 msgid "A listing with this title at this company exists; a board that mints a fresh address per visit may be showing you the same advert."
 msgstr "此公司已有同名职位；每次访问都生成新地址的招聘网站可能正在向你显示同一则广告。"
@@ -2409,6 +2549,10 @@ msgstr "模块：它内置于 Postulo 中，无法移除。"
 #, fuzzy
 msgid "A month"
 msgstr "月份"
+
+#: src/postulo/jobs/enrichment_views.py
+msgid "a name"
+msgstr ""
 
 #: src/postulo/core/messaging_services.py
 #, python-format
@@ -2626,6 +2770,10 @@ msgstr "已删除的记录"
 msgid "A referee who is not a contact yet. Their name is enough; it is added to your contacts without a company, and is used instead of the choice above."
 msgstr "尚未成为联系人的推荐人。填写姓名即可；此人会作为不属于任何公司的联系人添加到你的联系人中，并替代上方的选择。"
 
+#: src/postulo/jobs/enrichment_views.py
+msgid "a register number"
+msgstr ""
+
 #: src/postulo/applications/ical_import.py
 msgid "A reminder"
 msgstr "一个提醒"
@@ -2815,6 +2963,10 @@ msgstr "令牌让 Postulo 之外的工具代表你操作——例如浏览器扩
 msgid "A town and a country alone are kept as a place. Nothing checks that an address exists, and a country Postulo has no rules for is free-form."
 msgstr "仅有城镇和国家的地址会作为地点保存。不会检查地址是否真实存在；Postulo 没有规则的国家可自由填写。"
 
+#: src/postulo/jobs/search_views.py
+msgid "A town or a region."
+msgstr ""
+
 #: src/postulo/resume/candidate.py
 #, fuzzy
 msgid "A translation"
@@ -2844,6 +2996,10 @@ msgstr "视图名称至少需要一个字母或数字。"
 msgid "A way back rather than a way on, which is why it is an outline."
 msgstr "用于返回而不是前进，所以它是轮廓样式。"
 
+#: src/postulo/jobs/enrichment_views.py
+msgid "a website"
+msgstr ""
+
 #: src/postulo/templates/applications/report.html
 #: src/postulo/templates/documents/themes/base_report.html
 msgid "A week, on average"
@@ -2852,6 +3008,10 @@ msgstr "每周平均"
 #: src/postulo/templates/core/partials/widget_offers.html
 msgid "A widget added in a later release, or brought by a plugin, waits above until you say yes to it. Nothing arrives on your dashboard without being asked."
 msgstr "在后续版本中新增或由插件带来的小部件会在上方等待，直到你同意添加。未经你同意，任何内容都不会出现在你的仪表板上。"
+
+#: src/postulo/jobs/enrichment_views.py
+msgid "a Wikidata identifier"
+msgstr ""
 
 #: src/postulo/documents/integrity.py
 msgid "a Word document"
@@ -2977,7 +3137,8 @@ msgstr "已被收购或合并"
 msgid "acquired_by must be a company you can see."
 msgstr "acquired_by 必须是你能看到的公司。"
 
-#: src/postulo/jobs/models.py src/postulo/templates/jobs/company_form.html
+#: src/postulo/jobs/enrichment_offers.py src/postulo/jobs/models.py
+#: src/postulo/templates/jobs/company_form.html
 msgid "Acronym or short name"
 msgstr "缩写或简称"
 
@@ -3090,7 +3251,7 @@ msgstr "添加技能"
 msgid "Add a tag"
 msgstr "添加标签"
 
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 msgid "Add all of this"
 msgstr "全部添加"
 
@@ -3292,7 +3453,8 @@ msgid "addok (France's Base Adresse Nationale)"
 msgstr "addok（法国国家地址库 Base Adresse Nationale）"
 
 #: src/postulo/applications/forms.py src/postulo/applications/reports.py
-#: src/postulo/jobs/tables.py src/postulo/templates/partials/web_links.html
+#: src/postulo/jobs/enrichment_offers.py src/postulo/jobs/tables.py
+#: src/postulo/templates/partials/web_links.html
 msgid "Address"
 msgstr "地址"
 
@@ -3337,6 +3499,10 @@ msgstr "广告"
 #: src/postulo/jobs/industries.py
 msgid "Advertising and marketing"
 msgstr "广告和营销"
+
+#: src/postulo/templates/jobs/listing_search.html
+msgid "Adverts found"
+msgstr ""
 
 #: src/postulo/applications/models.py
 msgid "adviser"
@@ -3509,6 +3675,10 @@ msgstr "你的主地址更改时也会自动执行。"
 msgid "Also in %(names)s"
 msgstr "也在%(names)s中"
 
+#: src/postulo/templates/jobs/company_enrichment.html
+msgid "Also said"
+msgstr ""
+
 #: src/postulo/accounts/models.py
 msgid "Always"
 msgstr "始终"
@@ -3574,6 +3744,10 @@ msgstr "在开始检查地址之前记录的地址，或通过文件导入的地
 #: src/postulo/resume/candidate.py
 msgid "An address that could not be read"
 msgstr "无法读取的地址"
+
+#: src/postulo/jobs/enrichment_views.py
+msgid "an address with a country"
+msgstr ""
 
 #: src/postulo/applications/models.py
 msgid "An address, a telephone number or the link to the call."
@@ -3653,7 +3827,7 @@ msgstr "图标按钮"
 msgid "An identifier"
 msgstr "标识符"
 
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 msgid "An import only ever adds. Nothing already in your career record is changed or removed, and anything that turns out to be a duplicate is yours to delete."
 msgstr "导入只会新增内容。你职业记录中已有的内容都不会被更改或删除，结果重复的内容需要你自行删除。"
 
@@ -3672,6 +3846,10 @@ msgstr "面试属于某个申请。请选择一个。"
 #: src/postulo/notifications/base.py
 msgid "An interview is scheduled or moved"
 msgstr "面试已安排或改期"
+
+#: src/postulo/jobs/enrichment_views.py
+msgid "an LEI"
+msgstr ""
 
 #: src/postulo/notifications/base.py
 msgid "An offer is recorded"
@@ -3740,6 +3918,11 @@ msgstr "另一个备份已在运行。"
 #, fuzzy
 msgid "Another invitation"
 msgstr "另一份邀请"
+
+#: src/postulo/jobs/enrichment_offers.py
+#, python-format
+msgid "Another of your companies already has %(identifier)s."
+msgstr ""
 
 #: src/postulo/jobs/register_views.py
 #, python-format
@@ -4210,6 +4393,11 @@ msgstr "截至"
 msgid "as of %(date)s"
 msgstr "截至%(date)s"
 
+#: src/postulo/templates/jobs/partials/enrichment_origins.html
+#, python-format
+msgid "As of %(date)s."
+msgstr ""
+
 #: src/postulo/templates/applications/interview_detail.html
 #: src/postulo/templates/documents/themes/base_interview.html
 #, python-format
@@ -4277,14 +4465,31 @@ msgstr "亚洲"
 msgid "Asked"
 msgstr "已询问"
 
+#: src/postulo/jobs/search_views.py
+msgid "Asked for the advert. Check it before it becomes a listing."
+msgstr ""
+
 #: src/postulo/templates/server/record_of_processing.html
 msgid "Asked only when somebody presses for it, one company at a time. Each is sent what is listed and nothing about the person asking."
 msgstr "仅在有人请求时查询，每次一家公司。每个登记机构只会收到列出的内容，不会收到关于查询者的任何信息。"
+
+#: src/postulo/templates/server/record_of_processing.html
+msgid "Asked only when somebody presses Search or Review. Each is sent what is listed and nothing about the person asking; nothing it answers is kept unless the person saves an advert."
+msgstr ""
 
 #: src/postulo/templates/connections/pairing.html
 #, python-format
 msgid "Asks %(plugin)s now. Nothing it answers is kept here."
 msgstr "立即询问%(plugin)s。它的答复不会保存在这里。"
+
+#: src/postulo/templates/cotton/enrichment_ask.html
+#, python-format
+msgid "Asks <bdi>%(hosts)s</bdi>. Sent: %(what)s."
+msgstr ""
+
+#: src/postulo/templates/jobs/company_detail.html
+msgid "Asks the places you choose, once each; nothing is kept until you say so."
+msgstr ""
 
 #: src/postulo/applications/analytics.py src/postulo/applications/models.py
 msgid "Assessment"
@@ -4306,6 +4511,10 @@ msgstr "你目前或曾经所属的协会、学会和俱乐部。"
 #, fuzzy
 msgid "at"
 msgstr "在"
+
+#: src/postulo/jobs/search_views.py
+msgid "At any time"
+msgstr ""
 
 #: src/postulo/templates/settings/appearance.html
 msgid "At each status"
@@ -4507,6 +4716,10 @@ msgstr "返回日历"
 msgid "Back to the calendar, to change any of this"
 msgstr "返回日历以更改这些设置"
 
+#: src/postulo/templates/jobs/company_enrichment.html
+msgid "Back to the company"
+msgstr ""
+
 #: src/postulo/core/help.py
 msgid "Back to the dashboard"
 msgstr "返回仪表板"
@@ -4554,6 +4767,7 @@ msgstr "返回你的资料"
 
 #: src/postulo/templates/jobs/capture_decided.html
 #: src/postulo/templates/jobs/capture_page.html
+#: src/postulo/templates/jobs/listing_search.html
 msgid "Back to your listings"
 msgstr "返回你的职位"
 
@@ -4906,6 +5120,7 @@ msgstr "可配对"
 #: src/postulo/templates/documents/upload_form.html
 #: src/postulo/templates/jobs/address_place.html
 #: src/postulo/templates/jobs/capture_page_forget.html
+#: src/postulo/templates/jobs/company_enrichment.html
 #: src/postulo/templates/jobs/company_form.html
 #: src/postulo/templates/jobs/company_register.html
 #: src/postulo/templates/jobs/company_wikidata.html
@@ -4959,6 +5174,11 @@ msgstr "无法添加"
 #: src/postulo/templates/applications/ical_import.html
 msgid "Cannot be added."
 msgstr "无法添加。"
+
+#: src/postulo/templates/cotton/enrichment_ask.html
+#, python-format
+msgid "Cannot be asked: this company would need %(what)s."
+msgstr ""
 
 #: src/postulo/templates/server/overview.html
 msgid "cannot be checked on this machine"
@@ -5077,12 +5297,13 @@ msgstr "职业经历预览"
 msgid "Career sections"
 msgstr "职业经历分区"
 
-#: src/postulo/jobs/models.py
-msgid "careers page"
+#: src/postulo/jobs/enrichment_offers.py src/postulo/jobs/tables.py
+#: src/postulo/templates/jobs/company_detail.html
+msgid "Careers page"
 msgstr "招聘页面"
 
-#: src/postulo/jobs/tables.py src/postulo/templates/jobs/company_detail.html
-msgid "Careers page"
+#: src/postulo/jobs/models.py
+msgid "careers page"
 msgstr "招聘页面"
 
 #: src/postulo/templates/server/email.html
@@ -5138,7 +5359,8 @@ msgstr "认证"
 
 #: src/postulo/documents/rendering.py src/postulo/jobs/merging.py
 #: src/postulo/resume/candidate.py src/postulo/resume/registry.py
-#: src/postulo/resume/views_candidate.py
+#: src/postulo/resume/views.py src/postulo/resume/views_candidate.py
+#: src/postulo/templates/resume/import.html
 #: src/postulo/templates/resume/preview.html
 msgid "Certifications"
 msgstr "认证"
@@ -5249,6 +5471,10 @@ msgstr "检查更新"
 msgid "Check it answers"
 msgstr "检查是否可访问"
 
+#: src/postulo/templates/jobs/partials/enrichment_origins.html
+msgid "Check it there"
+msgstr ""
+
 #: src/postulo/templates/jobs/capture_review.html
 msgid "Check the reading against it"
 msgstr "用它核对读取结果"
@@ -5326,13 +5552,10 @@ msgstr "请从列表中选择一个国家。"
 msgid "Choose a destination and save it first."
 msgstr "请先选择一个目标并保存。"
 
-#: src/postulo/resume/views.py
-msgid "Choose a Europass file first."
-msgstr "请先选择 Europass 文件。"
-
 #: src/postulo/applications/views_ical.py src/postulo/core/views_kind_files.py
 #: src/postulo/jobs/vcard_views.py src/postulo/jobs/views.py
-#: src/postulo/resume/views_candidate.py src/postulo/resume/views_references.py
+#: src/postulo/resume/views.py src/postulo/resume/views_candidate.py
+#: src/postulo/resume/views_references.py
 msgid "Choose a file first."
 msgstr "请先选择文件。"
 
@@ -5401,6 +5624,10 @@ msgstr "选择另一个文件"
 msgid "Choose at least one document to record."
 msgstr "请至少选择一个要记录的文档。"
 
+#: src/postulo/jobs/enrichment_views.py
+msgid "Choose at least one place to ask."
+msgstr ""
+
 #: src/postulo/templates/cotton/date_field.html
 msgid "Choose dates from a calendar"
 msgstr "从日历中选择日期"
@@ -5441,9 +5668,9 @@ msgstr "从日历中选择出生日期"
 msgid "Choose the destination"
 msgstr "选择目标"
 
-#: src/postulo/templates/resume/europass_import.html
-msgid "Choose the PDF you downloaded from europass.europa.eu, as it is: the CV is attached inside it, and that is what Postulo reads. Older Europass files read too: the XML and PDF of the editor before 2020, and the JSON of its web service. Postulo works out which it is, shows you what is in it, and writes nothing until you say so."
-msgstr "选择你从 europass.europa.eu 下载的 PDF，保持原样即可：简历附在其中，Postulo 读取的就是它。旧版 Europass 文件也能读取：2020 年之前编辑器生成的 XML 和 PDF，以及其网络服务生成的 JSON。Postulo 会判断文件类型，向你显示其中的内容，在你确认之前不会写入任何内容。"
+#: src/postulo/templates/resume/import.html
+msgid "Choose the file as you downloaded it. Postulo works out which format it is, shows you what is in it, and writes nothing until you say so."
+msgstr ""
 
 #: src/postulo/accounts/forms.py src/postulo/jobs/forms.py
 msgid "Choose the type of identifier."
@@ -5464,6 +5691,10 @@ msgstr "选择对这条消息的处理方式。"
 #: src/postulo/jobs/status_views.py
 msgid "Choose what was reported and the date."
 msgstr "请选择报告的内容和日期。"
+
+#: src/postulo/templates/cotton/enrichment_ask.html
+msgid "Choose where to ask about this company. Each place is asked once, now, and learns only what is listed. Nothing is kept until you tick it."
+msgstr ""
 
 #: src/postulo/applications/views.py
 msgid "Choose which application this is about first."
@@ -5794,6 +6025,10 @@ msgstr "公司已添加。"
 msgid "Company deleted, along with its postings."
 msgstr "公司已删除，其招聘信息也一并删除。"
 
+#: src/postulo/plugins/kinds.py
+msgid "Company details"
+msgstr ""
+
 #: src/postulo/jobs/models.py
 msgid "company identifier"
 msgstr "公司标识符"
@@ -6095,7 +6330,8 @@ msgstr "课程"
 
 #: src/postulo/documents/rendering.py src/postulo/jobs/merging.py
 #: src/postulo/resume/candidate.py src/postulo/resume/registry.py
-#: src/postulo/resume/views_candidate.py
+#: src/postulo/resume/views.py src/postulo/resume/views_candidate.py
+#: src/postulo/templates/resume/import.html
 #: src/postulo/templates/resume/preview.html
 msgid "Courses"
 msgstr "课程"
@@ -6736,6 +6972,10 @@ msgstr "详情"
 msgid "details"
 msgstr "详情"
 
+#: src/postulo/templates/jobs/company_enrichment.html
+msgid "Details found"
+msgstr ""
+
 #: src/postulo/core/design.py src/postulo/templates/server/design.html
 msgid "Dialogs"
 msgstr "对话框"
@@ -6851,7 +7091,7 @@ msgid "document themes"
 msgstr "文档主题"
 
 #: src/postulo/core/help.py src/postulo/core/navigation.py
-#: src/postulo/documents/apps.py
+#: src/postulo/documents/apps.py src/postulo/plugins/categories.py
 #: src/postulo/templates/applications/application_detail.html
 #: src/postulo/templates/base.html
 #: src/postulo/templates/cotton/documents_nav.html
@@ -7093,7 +7333,7 @@ msgstr "电子商务"
 msgid "Each invitation may be used once, and expires on its own. Its link is shown once, when it is made."
 msgstr "每份邀请只能使用一次，并会自动过期。其链接只在创建时显示一次。"
 
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 msgid "Each is added as one of your contacts and as a reference you have not asked yet, so none is printed on a CV until you say they agreed."
 msgstr "每个人都会添加为你的联系人，以及一位你尚未征询的推荐人，因此在你确认他们同意之前，简历上不会打印任何人。"
 
@@ -7212,7 +7452,7 @@ msgstr "编者"
 #: src/postulo/documents/rendering.py src/postulo/jobs/industries.py
 #: src/postulo/resume/candidate.py src/postulo/resume/registry.py
 #: src/postulo/resume/views_candidate.py
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 #: src/postulo/templates/resume/preview.html
 msgid "Education"
 msgstr "教育"
@@ -7249,6 +7489,7 @@ msgid "email address"
 msgstr "电子邮件地址"
 
 #: src/postulo/core/channels.py src/postulo/documents/printing.py
+#: src/postulo/jobs/enrichment_offers.py
 msgid "Email address"
 msgstr "电子邮件地址"
 
@@ -7429,11 +7670,7 @@ msgstr "ESCO 技能"
 msgid "Europass"
 msgstr "Europass"
 
-#: src/postulo/core/transfers.py
-msgid "Europass import"
-msgstr "Europass 导入"
-
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 msgid "Europass records five levels per language and Postulo keeps one, so the lowest is taken. Where the file states none, none is written: a level is a claim about yourself that somebody will test, so it is yours to make afterwards."
 msgstr "Europass 为每种语言记录五项等级，而 Postulo 只保存一项，因此取其中最低的。文件中没有给出等级时，就不写入：等级是关于你自己的一项声明，会有人去检验，所以应由你之后自己填写。"
 
@@ -7677,7 +7914,7 @@ msgstr "排除已解散的"
 
 #: src/postulo/documents/rendering.py src/postulo/resume/candidate.py
 #: src/postulo/resume/registry.py src/postulo/resume/views_candidate.py
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 #: src/postulo/templates/resume/preview.html
 msgid "Experience"
 msgstr "经历"
@@ -8043,6 +8280,10 @@ msgstr "查找"
 msgid "Find a language"
 msgstr "查找语言"
 
+#: src/postulo/templates/cotton/enrichment_ask.html
+msgid "Find details"
+msgstr ""
+
 #: src/postulo/templates/jobs/company_form.html
 msgid "Find logo"
 msgstr "查找标志"
@@ -8304,6 +8545,12 @@ msgstr[0] "在服务器上找到%(count)d个选项。选择要使用的选项，
 
 #: src/postulo/jobs/slow.py
 #, python-format
+msgid "Found %(count)s detail. Nothing is kept until you tick it."
+msgid_plural "Found %(count)s details. Nothing is kept until you tick it."
+msgstr[0] ""
+
+#: src/postulo/jobs/slow.py
+#, python-format
 msgid "Found a logo at %(url)s."
 msgstr "在%(url)s找到了标志。"
 
@@ -8331,10 +8578,14 @@ msgstr "发现渠道"
 msgid "found via"
 msgstr "发现渠道"
 
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 #, python-format
 msgid "Found: %(names)s. Only the ones you have left blank will be filled in."
 msgstr "找到：%(names)s。只会填写你留空的字段。"
+
+#: src/postulo/jobs/enrichment_offers.py
+msgid "Founded"
+msgstr ""
 
 #: src/postulo/jobs/models.py
 msgid "Freelance"
@@ -8389,6 +8640,11 @@ msgstr "来自%(name)s。"
 #, python-format
 msgid "From %(register)s"
 msgstr "来自%(register)s"
+
+#: src/postulo/templates/jobs/partials/enrichment_origins.html
+#, python-format
+msgid "From %(source)s: <bdi>%(where)s</bdi>."
+msgstr ""
 
 #: src/postulo/core/tables.py
 #, python-format
@@ -8804,6 +9060,10 @@ msgctxt "pronouns"
 msgid "he/him"
 msgstr "他"
 
+#: src/postulo/jobs/enrichment_offers.py
+msgid "Head office"
+msgstr ""
+
 #: src/postulo/accounts/models.py src/postulo/documents/models.py
 #: src/postulo/resume/views.py
 msgid "headline"
@@ -8954,7 +9214,8 @@ msgstr "荣誉或奖励"
 
 #: src/postulo/documents/rendering.py src/postulo/jobs/merging.py
 #: src/postulo/resume/candidate.py src/postulo/resume/registry.py
-#: src/postulo/resume/views_candidate.py
+#: src/postulo/resume/views.py src/postulo/resume/views_candidate.py
+#: src/postulo/templates/resume/import.html
 #: src/postulo/templates/resume/preview.html
 msgid "Honours and awards"
 msgstr "荣誉和奖项"
@@ -9026,6 +9287,10 @@ msgstr "送达雇主的方式"
 #: src/postulo/documents/models.py
 msgid "how it reaches the employer"
 msgstr "送达雇主的方式"
+
+#: src/postulo/templates/resume/import.html
+msgid "How it was read"
+msgstr ""
 
 #: src/postulo/applications/widgets.py
 msgid "How long they take"
@@ -9189,6 +9454,7 @@ msgstr "幂等请求"
 msgid "identifier"
 msgstr "标识符"
 
+#: src/postulo/jobs/enrichment_offers.py
 #: src/postulo/templates/cotton/identifier_row.html
 msgid "Identifier"
 msgstr "标识符"
@@ -9267,9 +9533,9 @@ msgstr "如果这是推荐信"
 msgid "If you are reading this, the email settings of your Postulo instance work. Nothing else to do."
 msgstr "如果你看到这封邮件，说明你的 Postulo 实例的电子邮件设置正常。无需其他操作。"
 
-#: src/postulo/templates/resume/europass_import.html
-msgid "If you have applied to an EU institution or through a national employment service, you already have this file. Rather than type it all again, hand it over."
-msgstr "如果你曾向欧盟机构或通过国家就业服务机构提交过申请，你已经有这个文件了。与其全部重新输入，不如直接导入。"
+#: src/postulo/templates/resume/import.html
+msgid "If your career is already written down in a file, hand it over rather than type it all again."
+msgstr ""
 
 #: src/postulo/core/models.py
 msgid "ignore robots.txt when capturing"
@@ -9291,9 +9557,9 @@ msgid "Import"
 msgstr "导入"
 
 #: src/postulo/resume/views.py src/postulo/templates/resume/candidate_file.html
-#: src/postulo/templates/resume/europass_import.html
-msgid "Import a Europass CV"
-msgstr "导入 Europass 简历"
+#: src/postulo/templates/resume/import.html
+msgid "Import a CV"
+msgstr ""
 
 #: src/postulo/templates/applications/ical_import.html
 msgid "Import an iCalendar file"
@@ -9450,6 +9716,12 @@ msgstr "在文件中出现两次"
 msgid "In the instance's time zone."
 msgstr "按实例的时区。"
 
+#: src/postulo/jobs/search_views.py
+#, python-format
+msgid "In the last day"
+msgid_plural "In the last %(count)d days"
+msgstr[0] ""
+
 #: src/postulo/core/search.py
 #, python-format
 msgid "in the motivation letter rendered on %(when)s"
@@ -9487,6 +9759,10 @@ msgstr "在你于%(when)s发送给%(company)s的报告中"
 #: src/postulo/templates/documents/rendered_compare.html
 msgid "In this version, and not in the one before"
 msgstr "在此版本中，但不在上一个版本中"
+
+#: src/postulo/templates/jobs/listing_search.html
+msgid "In your listings"
+msgstr ""
 
 #: src/postulo/applications/forms.py
 msgid "In your time zone."
@@ -9544,12 +9820,13 @@ msgstr "行业"
 msgid "industries"
 msgstr "行业"
 
-#: src/postulo/jobs/models.py
-msgid "industry"
-msgstr "行业"
-
+#: src/postulo/jobs/enrichment_offers.py
 #: src/postulo/templates/jobs/industry_form.html
 msgid "Industry"
+msgstr "行业"
+
+#: src/postulo/jobs/models.py
+msgid "industry"
 msgstr "行业"
 
 #: src/postulo/jobs/views.py
@@ -9761,6 +10038,10 @@ msgstr "签发机构"
 #: src/postulo/resume/models.py
 msgid "issued on"
 msgstr "签发日期"
+
+#: src/postulo/jobs/enrichment_offers.py
+msgid "It already has a logo."
+msgstr ""
 
 #: src/postulo/templates/settings/account.html
 msgid "It also gets you back in: ask for a sign-in code and it arrives there. Making a different address primary moves that with it. You are still asked for your authenticator app if you have one."
@@ -10078,6 +10359,10 @@ msgstr "其街道"
 msgid "Its street will be looked up with %(service)s shortly."
 msgstr "稍后将通过%(service)s查询其街道。"
 
+#: src/postulo/templates/jobs/listing_search.html
+msgid "Its terms of use"
+msgstr ""
+
 #: src/postulo/core/models.py
 #, fuzzy
 msgid "its town"
@@ -10103,6 +10388,18 @@ msgstr "求职报告"
 #, python-format
 msgid "Job search report · %(period)s"
 msgstr "求职报告 · %(period)s"
+
+#: src/postulo/jobs/search_views.py
+msgid "Job service"
+msgstr ""
+
+#: src/postulo/plugins/kinds.py
+msgid "Job services"
+msgstr ""
+
+#: src/postulo/templates/server/record_of_processing.html
+msgid "Job services it may search"
+msgstr ""
 
 #: src/postulo/applications/forms.py src/postulo/jobs/forms.py
 #: src/postulo/jobs/models.py
@@ -10189,6 +10486,7 @@ msgstr "保留这些"
 msgid "Keep this view as"
 msgstr "将此视图保存为"
 
+#: src/postulo/templates/jobs/company_enrichment.html
 #: src/postulo/templates/jobs/company_register.html
 msgid "Keep what is ticked"
 msgstr "保留勾选的内容"
@@ -10208,6 +10506,12 @@ msgstr "保存页面"
 #: src/postulo/templates/jobs/merge.html
 msgid "Kept"
 msgstr "已保留"
+
+#: src/postulo/jobs/enrichment_views.py
+#, python-format
+msgid "Kept %(count)s detail."
+msgid_plural "Kept %(count)s details."
+msgstr[0] ""
 
 #: src/postulo/templates/server/person_recovery.html
 msgid "Kept after they are used or expire, because taking somebody's account back is not something to be able to do without a trace."
@@ -10386,7 +10690,7 @@ msgstr "你的职业记录的语言"
 #: src/postulo/documents/rendering.py src/postulo/resume/candidate.py
 #: src/postulo/resume/registry.py src/postulo/resume/views.py
 #: src/postulo/resume/views_candidate.py
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 #: src/postulo/templates/resume/preview.html
 msgid "Languages"
 msgstr "语言"
@@ -10585,6 +10889,7 @@ msgstr "留空则保留已存储的值。"
 msgid "Leave empty if this is your current role."
 msgstr "如果这是你当前的职位，请留空。"
 
+#: src/postulo/templates/jobs/company_enrichment.html
 #: src/postulo/templates/jobs/company_wikidata.html
 msgid "Leave it as it is"
 msgstr "保持原样"
@@ -10696,6 +11001,10 @@ msgstr "法律声明"
 msgid "Legal services"
 msgstr "法律服务"
 
+#: src/postulo/jobs/enrichment_offers.py
+msgid "Legal state"
+msgstr ""
+
 #: src/postulo/jobs/models.py
 msgid "legal state"
 msgstr "法律状态"
@@ -10791,6 +11100,10 @@ msgstr "8 级"
 #, fuzzy
 msgid "Licence"
 msgstr "许可证"
+
+#: src/postulo/templates/jobs/listing_search.html
+msgid "Licence of its adverts:"
+msgstr ""
 
 #: src/postulo/accounts/models.py src/postulo/core/context_processors.py
 msgid "Light"
@@ -10949,6 +11262,10 @@ msgstr "地点"
 msgid "Location"
 msgstr "地点"
 
+#: src/postulo/jobs/enrichment_offers.py
+msgid "Logo"
+msgstr ""
+
 #: src/postulo/jobs/models.py
 msgid "logo"
 msgstr "标志"
@@ -11012,6 +11329,10 @@ msgstr "查询服务地址"
 #: src/postulo/jobs/slow.py
 msgid "Looking for a logo"
 msgstr "正在查找标志"
+
+#: src/postulo/jobs/slow.py
+msgid "Looking for details"
+msgstr ""
 
 #: src/postulo/templates/applications/application_list.html
 #: src/postulo/templates/jobs/company_list.html
@@ -11310,7 +11631,7 @@ msgstr "会员制组织"
 #: src/postulo/documents/rendering.py src/postulo/jobs/merging.py
 #: src/postulo/resume/candidate.py src/postulo/resume/registry.py
 #: src/postulo/resume/views.py src/postulo/resume/views_candidate.py
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 #: src/postulo/templates/resume/preview.html
 msgid "Memberships"
 msgstr "会员资格"
@@ -11684,8 +12005,8 @@ msgstr "NACE 门类"
 msgid "name"
 msgstr "名称"
 
-#: src/postulo/api/forms.py src/postulo/jobs/tables.py
-#: src/postulo/templates/cotton/identifier_row.html
+#: src/postulo/api/forms.py src/postulo/jobs/enrichment_offers.py
+#: src/postulo/jobs/tables.py src/postulo/templates/cotton/identifier_row.html
 #: src/postulo/templates/partials/messaging_handles.html
 #: src/postulo/templates/partials/phone_numbers.html
 #: src/postulo/templates/partials/postal_addresses.html
@@ -11954,6 +12275,7 @@ msgid "Next month"
 msgstr "下个月"
 
 #: src/postulo/templates/cotton/document_viewer.html
+#: src/postulo/templates/jobs/listing_search.html
 msgid "Next page"
 msgstr "下一页"
 
@@ -12162,6 +12484,14 @@ msgstr "还没有此类信函。"
 #: src/postulo/templates/documents/letter_list.html
 msgid "No letters yet. A cover letter is for one posting; a motivation letter tells your story; a speculative letter goes where nothing is advertised; a follow-up note comes after an interview."
 msgstr "还没有信函。求职信针对一条招聘信息；动机信讲述你的经历；自荐信投给没有发布招聘的地方；跟进信在面试后发送。"
+
+#: src/postulo/templates/jobs/company_enrichment.html
+msgid "No licence is stated."
+msgstr ""
+
+#: src/postulo/templates/jobs/company_enrichment.html
+msgid "No licence is stated; the name and the mark are the company's."
+msgstr ""
 
 #: src/postulo/templates/connections/partials/option_table.html
 msgid "No longer on the server"
@@ -12477,6 +12807,10 @@ msgstr "这些都不会从其他信息推断：不会根据你的名字猜测性
 msgid "None of this company's industries is Education, so it is not listed as a school or university."
 msgstr "此公司的行业中没有“教育”，因此不会列为学校或大学。"
 
+#: src/postulo/jobs/slow.py
+msgid "None of those can be asked about this company any more."
+msgstr ""
+
 #: src/postulo/templates/jobs/company_places.html
 msgid "None of your companies has this name or identifier."
 msgstr "你的公司中没有使用此名称或标识符的。"
@@ -12547,6 +12881,10 @@ msgstr "不匹配"
 #: src/postulo/templates/partials/phone_widget.html
 msgid "Not a possible number"
 msgstr "不可能存在的号码"
+
+#: src/postulo/jobs/enrichment_offers.py
+msgid "Not a profile on a service Postulo knows."
+msgstr ""
 
 #: src/postulo/documents/models.py
 msgid "Not accepted"
@@ -12984,9 +13322,17 @@ msgstr "在你审核之前，不会保存任何内容。"
 msgid "Nothing is sent to the server as a password until a new one is entered."
 msgstr "在输入新密码之前，不会向服务器发送任何密码。"
 
+#: src/postulo/jobs/logos.py
+msgid "Nothing is switched on that finds a logo on a website."
+msgstr ""
+
 #: src/postulo/templates/applications/application_detail.html
 msgid "Nothing kept yet. Keep what you typed into the employer's form, so you can see what they were told."
 msgstr "还没有保留任何内容。保留你在雇主表单中输入的内容，以便查看他们被告知了什么。"
+
+#: src/postulo/templates/jobs/listing_search.html
+msgid "Nothing matches that search."
+msgstr ""
 
 #: src/postulo/templates/applications/application_list.html
 #: src/postulo/templates/jobs/company_list.html
@@ -13103,6 +13449,18 @@ msgstr "还没有发送任何内容。"
 msgid "Nothing standing at Offer. Record one from an application's page when it arrives."
 msgstr "没有处于“录用通知”阶段的申请。收到录用通知时，请在对应申请的页面上记录。"
 
+#: src/postulo/resume/views.py
+msgid "Nothing that reads a CV from a file is switched on here, so that file was not read."
+msgstr ""
+
+#: src/postulo/templates/resume/import.html
+msgid "Nothing that reads a CV from a file is switched on here, so there is no file to choose."
+msgstr ""
+
+#: src/postulo/templates/jobs/company_enrichment.html
+msgid "Nothing that was found can be added to what the company already has."
+msgstr ""
+
 #: src/postulo/core/design.py src/postulo/templates/server/design.html
 msgid "Nothing there"
 msgstr "那里没有内容"
@@ -13186,7 +13544,7 @@ msgstr "该页面没有保留任何内容。"
 msgid "Nothing was kept of this page"
 msgstr "此页面没有保留任何内容"
 
-#: src/postulo/jobs/register_views.py
+#: src/postulo/jobs/enrichment_views.py src/postulo/jobs/register_views.py
 msgid "Nothing was kept."
 msgstr "未保留任何内容。"
 
@@ -13536,6 +13894,12 @@ msgstr "每行一项成就。"
 msgid "One address: the person you met, or your contact for this application, or the company's own. It is needed to send, and noted on the timeline when it is given."
 msgstr "一个地址：你见过的人，或你在这份申请中的联系人，或公司本身的地址。发送时需要填写，填写后会记入时间线。"
 
+#: src/postulo/templates/jobs/listing_search.html
+#, python-format
+msgid "One advert found"
+msgid_plural "%(counter)s adverts found"
+msgstr[0] ""
+
 #: src/postulo/templates/applications/report.html
 #, python-format
 msgid "One application sent in this period."
@@ -13876,6 +14240,7 @@ msgstr "简历上只打印年份，所以具体是哪一天没有影响。"
 msgid "Only this publication, as a reference:"
 msgstr "仅此出版物，作为参考文献："
 
+#: src/postulo/templates/jobs/company_enrichment.html
 #: src/postulo/templates/jobs/company_register.html
 msgid "Only what you tick is kept; nothing else on the company changes."
 msgstr "只保留你勾选的内容；公司的其他信息都不会改变。"
@@ -13989,6 +14354,10 @@ msgstr "或新建联系人"
 msgid "Or say only this"
 msgstr "或仅注明这一点"
 
+#: src/postulo/templates/jobs/capture_form.html
+msgid "Or search a job service for adverts"
+msgstr ""
+
 #: src/postulo/templates/jobs/move_owner.html
 #, fuzzy
 msgid "Or to a person"
@@ -14091,6 +14460,10 @@ msgstr "其他代词"
 #: src/postulo/jobs/industries.py
 msgid "Other services"
 msgstr "其他服务"
+
+#: src/postulo/documents/themes.py
+msgid "Other themes"
+msgstr ""
 
 #: src/postulo/accounts/forms.py
 msgid "Other time zones"
@@ -14439,6 +14812,10 @@ msgstr "养老金、保险、补贴、设备：凡是提到的都算。"
 msgid "People"
 msgstr "人员"
 
+#: src/postulo/jobs/enrichment_offers.py
+msgid "People employed"
+msgstr ""
+
 #: src/postulo/jobs/models.py
 msgid "Per day"
 msgstr "每天"
@@ -14486,7 +14863,7 @@ msgstr "人员"
 
 #: src/postulo/accounts/views.py src/postulo/core/help.py
 #: src/postulo/templates/accounts/profile.html
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 msgid "Personal details"
 msgstr "个人资料"
 
@@ -14573,7 +14950,7 @@ msgstr "固定为 %(version)s"
 msgid "Pinned to a version"
 msgstr "固定到某个版本"
 
-#: src/postulo/core/models.py
+#: src/postulo/core/models.py src/postulo/jobs/search_views.py
 msgid "Place"
 msgstr "地点"
 
@@ -14961,6 +15338,10 @@ msgstr "Postulo 已忘记它。在你也到服务提供商那里撤销之前，�
 msgid "Postulo has forgotten the grant. The provider still has it until you withdraw it there as well."
 msgstr "Postulo 已忘记该授权。在你也到服务提供商那里撤销之前，对方仍保有它。"
 
+#: src/postulo/templates/jobs/company_enrichment.html
+msgid "Postulo has nowhere to keep these yet. They are shown for you to read, and are not kept."
+msgstr ""
+
 #: src/postulo/core/tagline.py
 msgid "Postulo is a self-hosted job application manager: your applications, CVs and cover letters on your own server, with no paid features."
 msgstr "Postulo 是一款自托管的求职申请管理工具：你的申请、简历和求职信都保存在你自己的服务器上，没有任何付费功能。"
@@ -15071,7 +15452,7 @@ msgstr "至今"
 #: src/postulo/documents/rendering.py src/postulo/resume/candidate.py
 #: src/postulo/resume/registry.py src/postulo/resume/views.py
 #: src/postulo/resume/views_candidate.py
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 #: src/postulo/templates/resume/preview.html
 msgid "Presentations, conferences and seminars"
 msgstr "演讲、会议和研讨会"
@@ -15305,7 +15686,7 @@ msgstr "项目"
 
 #: src/postulo/documents/rendering.py src/postulo/resume/candidate.py
 #: src/postulo/resume/registry.py src/postulo/resume/views_candidate.py
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 #: src/postulo/templates/resume/preview.html
 msgid "Projects"
 msgstr "项目"
@@ -15371,7 +15752,9 @@ msgid "Publication"
 msgstr "出版物"
 
 #: src/postulo/documents/rendering.py src/postulo/resume/candidate.py
-#: src/postulo/resume/registry.py src/postulo/resume/views_candidate.py
+#: src/postulo/resume/registry.py src/postulo/resume/views.py
+#: src/postulo/resume/views_candidate.py
+#: src/postulo/templates/resume/import.html
 #: src/postulo/templates/resume/preview.html
 msgid "Publications"
 msgstr "出版物"
@@ -15383,6 +15766,15 @@ msgstr "出版物"
 #: src/postulo/templates/resume/references.html
 msgid "Publications in the file"
 msgstr "文件中的出版物"
+
+#: src/postulo/jobs/search_views.py
+msgid "Published"
+msgstr ""
+
+#: src/postulo/templates/jobs/listing_search.html
+#, python-format
+msgid "Published %(when)s"
+msgstr ""
 
 #: src/postulo/resume/models.py
 msgid "published in"
@@ -15554,18 +15946,6 @@ msgstr "读取为"
 msgid "Read as %(name)s."
 msgstr "已按 %(name)s 读取。"
 
-#: src/postulo/resume/views.py
-msgid "Read as Europass JSON, the older format as the Europass web service wrote it until 2020."
-msgstr "按 Europass JSON 读取，即 Europass 网络服务在 2020 年之前使用的旧格式。"
-
-#: src/postulo/resume/views.py
-msgid "Read as Europass XML in the older format, the one the Europass editor wrote until 2020."
-msgstr "按旧格式的 Europass XML 读取，即 Europass 编辑器在 2020 年之前使用的格式。"
-
-#: src/postulo/resume/views.py
-msgid "Read as Europass XML, the format europass.europa.eu has written since 2020."
-msgstr "按 Europass XML 读取，即 europass.europa.eu 自 2020 年起使用的格式。"
-
 #: src/postulo/jobs/models.py
 msgid "read by"
 msgstr "读取方"
@@ -15594,16 +15974,8 @@ msgstr "读取自"
 msgid "Read from <bdi>%(address)s</bdi>."
 msgstr "已从<bdi>%(address)s</bdi>读取。"
 
-#: src/postulo/resume/views.py
-msgid "Read from the Europass XML attached to the PDF, in the older format the Europass editor wrote until 2020."
-msgstr "读取自 PDF 附带的 Europass XML，采用 Europass 编辑器在 2020 年之前使用的旧格式。"
-
-#: src/postulo/resume/views.py
-msgid "Read from the Europass XML attached to the PDF, the format europass.europa.eu has written since 2020."
-msgstr "读取自 PDF 附带的 Europass XML，即 europass.europa.eu 自 2020 年起使用的格式。"
-
 #: src/postulo/templates/jobs/company_places.html
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 #: src/postulo/templates/resume/references.html
 #: src/postulo/templates/server/plugins.html
 msgid "Read it"
@@ -15911,8 +16283,7 @@ msgid "Reference letters they wrote"
 msgstr "他们撰写的推荐信"
 
 #: src/postulo/documents/rendering.py src/postulo/resume/registry.py
-#: src/postulo/resume/views.py
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/resume/views.py src/postulo/templates/resume/import.html
 #, fuzzy
 msgid "References"
 msgstr "推荐人"
@@ -16089,6 +16460,14 @@ msgstr "远程"
 #: src/postulo/plugins/models.py
 msgid "remote address"
 msgstr "远程地址"
+
+#: src/postulo/jobs/search_views.py
+msgid "Remote work only"
+msgstr ""
+
+#: src/postulo/jobs/search_views.py
+msgid "remote work only"
+msgstr ""
 
 #: src/postulo/templates/accounts/profile.html
 #: src/postulo/templates/connections/confirm_delete.html
@@ -16281,6 +16660,7 @@ msgstr "保留期限"
 msgid "retired on"
 msgstr "停用于"
 
+#: src/postulo/templates/jobs/company_enrichment.html
 #: src/postulo/templates/jobs/company_register.html
 #, python-format
 msgid "Retrieved %(when)s."
@@ -16296,6 +16676,7 @@ msgstr "反向代理"
 
 #: src/postulo/templates/jobs/capture_list.html
 #: src/postulo/templates/jobs/listing_list.html
+#: src/postulo/templates/jobs/listing_search.html
 msgid "Review"
 msgstr "审核"
 
@@ -16411,6 +16792,10 @@ msgstr "正在运行 %(running)s；重启以完成"
 #: src/postulo/templates/server/backups.html
 msgid "Runs in the background; you can leave this page while it works."
 msgstr "在后台运行；运行期间你可以离开此页面。"
+
+#: src/postulo/templates/jobs/company_enrichment.html
+msgid "Said, and not offered"
+msgstr ""
 
 #: src/postulo/templates/core/import_csv_map.html
 #, fuzzy
@@ -16606,6 +16991,14 @@ msgstr "请说明这是什么标识符。"
 msgid "Say what this number is."
 msgstr "请说明这是什么号码。"
 
+#: src/postulo/jobs/listing_search.py
+msgid "Say what to search for."
+msgstr ""
+
+#: src/postulo/jobs/search_views.py
+msgid "Say what to search for: some words, or a place."
+msgstr ""
+
 #: src/postulo/applications/forms.py
 msgid "Say which currency the amount is in."
 msgstr "请说明金额使用的货币。"
@@ -16686,9 +17079,15 @@ msgstr "Postulo 未检查印章"
 #: src/postulo/templates/core/search.html
 #: src/postulo/templates/cotton/site_search.html
 #: src/postulo/templates/jobs/industry_list.html
+#: src/postulo/templates/jobs/listing_search.html
 #: src/postulo/templates/resume/answer_list.html
 msgid "Search"
 msgstr "搜索"
+
+#: src/postulo/templates/jobs/listing_list.html
+#: src/postulo/templates/jobs/listing_search.html
+msgid "Search a job service"
+msgstr ""
 
 #: src/postulo/applications/tables.py
 msgid "Search applications"
@@ -16718,6 +17117,10 @@ msgstr "搜索信函"
 #: src/postulo/jobs/tables.py
 msgid "Search listings"
 msgstr "搜索职位"
+
+#: src/postulo/templates/jobs/listing_search.html
+msgid "Search the adverts a job service publishes, and review the one you want before it becomes a listing. Nothing is asked until you press Search."
+msgstr ""
 
 #: src/postulo/applications/views.py
 msgid "Search the calendar"
@@ -17090,6 +17493,18 @@ msgstr "已结束"
 #: src/postulo/templates/server/design.html
 msgid "Seven colours, each tuned to 3:1 against the card in both themes."
 msgstr "七种颜色，每种在两种主题下与卡片背景的对比度都调整为 3:1。"
+
+#: src/postulo/jobs/search_views.py
+msgid "Several countries"
+msgstr ""
+
+#: src/postulo/jobs/enrichment_offers.py
+msgid "Several social profiles are switched off."
+msgstr ""
+
+#: src/postulo/jobs/enrichment_offers.py
+msgid "Several telephone numbers are switched off."
+msgstr ""
 
 #: src/postulo/jobs/industries.py
 msgid "Sewerage"
@@ -17532,7 +17947,7 @@ msgstr "技能组"
 #: src/postulo/resume/registry.py src/postulo/resume/views.py
 #: src/postulo/resume/views_candidate.py
 #: src/postulo/templates/cotton/listing_skills.html
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 #: src/postulo/templates/resume/preview.html
 msgid "Skills"
 msgstr "技能"
@@ -17588,7 +18003,7 @@ msgid "Snoozed for two weeks."
 msgstr "已暂缓两周。"
 
 #: src/postulo/core/models.py src/postulo/core/web_links.py
-#: src/postulo/documents/printing.py
+#: src/postulo/documents/printing.py src/postulo/jobs/enrichment_offers.py
 msgid "Social profile"
 msgstr "社交资料"
 
@@ -17778,6 +18193,7 @@ msgstr "来源是指招聘信息上的“发现渠道”字段。填写之后，
 msgid "source version"
 msgstr "源版本"
 
+#: src/postulo/templates/jobs/company_enrichment.html
 #: src/postulo/templates/jobs/company_register.html
 #, python-format
 msgid "Source: %(source)s."
@@ -17818,7 +18234,7 @@ msgstr "人力派遣"
 #: src/postulo/templates/core/kind_file.html
 #: src/postulo/templates/jobs/contact_vcards.html
 #: src/postulo/templates/resume/candidate_file.html
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 msgid "Start again"
 msgstr "重新开始"
 
@@ -18072,6 +18488,10 @@ msgstr "根据我的 ORCID 记录推荐"
 msgid "suggested by"
 msgstr "建议来源"
 
+#: src/postulo/documents/themes.py
+msgid "Suggested for this document"
+msgstr ""
+
 #: src/postulo/applications/models.py
 msgid "suggested status"
 msgstr "建议的状态"
@@ -18320,6 +18740,7 @@ msgid "telephone"
 msgstr "电话"
 
 #: src/postulo/core/channels.py src/postulo/documents/printing.py
+#: src/postulo/jobs/enrichment_offers.py
 #: src/postulo/templates/partials/phone_widget.html
 #: src/postulo/templates/server/design.html
 msgid "Telephone number"
@@ -18437,7 +18858,7 @@ msgstr "感谢，{{ role }}"
 msgid "Thank-you"
 msgstr "感谢"
 
-#: src/postulo/jobs/register_views.py
+#: src/postulo/jobs/enrichment_offers.py
 msgid "That address could not be added."
 msgstr "无法添加该地址。"
 
@@ -18466,6 +18887,10 @@ msgstr "该地址重定向次数过多。"
 #, python-format
 msgid "That address returned %(kind)s rather than a web page."
 msgstr "该地址返回了%(kind)s,而不是网页."
+
+#: src/postulo/jobs/listing_search.py
+msgid "That advert cannot be asked of this service."
+msgstr ""
 
 #: src/postulo/documents/slow.py
 msgid "That application is no longer here."
@@ -18896,6 +19321,10 @@ msgstr "这不是 Wikidata 条目的标识符。"
 msgid "That is not an address Postulo can use."
 msgstr "Postulo 无法使用该地址。"
 
+#: src/postulo/jobs/listing_search.py
+msgid "That is not an advert this service could have named."
+msgstr ""
+
 #: src/postulo/core/offsite.py
 msgid "That is not an age recipient. It starts age1 and is 62 characters long."
 msgstr "这不是 age 接收方。它以 age1 开头，长度为 62 个字符。"
@@ -18999,6 +19428,10 @@ msgstr "该项目已与%(record)s配对。请先取消配对。"
 #: src/postulo/plugins/pairing.py
 msgid "That item is no longer on the other side."
 msgstr "该项目已不在另一端。"
+
+#: src/postulo/jobs/search_views.py
+msgid "That job service is not offered here."
+msgstr ""
 
 #: src/postulo/templates/account/recovery_unusable.html
 msgid "That link cannot be used"
@@ -19121,6 +19554,14 @@ msgstr "该回复并非来自 Postulo 发出的请求。"
 #: src/postulo/core/views_access.py
 msgid "That rule existed, and is changed."
 msgstr "该规则已存在，现已更改。"
+
+#: src/postulo/jobs/listing_search.py
+msgid "That search cannot be asked of this service."
+msgstr ""
+
+#: src/postulo/jobs/listing_search.py
+msgid "That search is longer than a service can be asked."
+msgstr ""
 
 #: src/postulo/applications/views.py
 msgid "That suggestion has already been answered."
@@ -19464,6 +19905,11 @@ msgstr "它添加的公司、联系人和职位。申请和备注始终属于你
 msgid "The company %(name)s is not in your account, and is added with it."
 msgstr "公司%(name)s不在你的账户中，会一并添加。"
 
+#: src/postulo/templates/jobs/company_enrichment.html
+#, python-format
+msgid "The company already has <bdi>%(current)s</bdi>."
+msgstr ""
+
 #: src/postulo/jobs/views.py
 msgid "The company already has that name."
 msgstr "该公司已有这个名称。"
@@ -19691,7 +20137,7 @@ msgstr "对方写的金额，税前。"
 #: src/postulo/templates/documents/upload_detail.html
 #: src/postulo/templates/jobs/contact_vcards.html
 #: src/postulo/templates/resume/candidate_file.html
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 msgid "The file"
 msgstr "文件"
 
@@ -20081,6 +20527,11 @@ msgstr "标志已更改。"
 msgid "The logo was not changed: %(problem)s"
 msgstr "徽标未更改：%(problem)s"
 
+#: src/postulo/jobs/enrichment_offers.py
+#, python-format
+msgid "The logo was not kept: %(problem)s"
+msgstr ""
+
 #: src/postulo/templates/applications/report.html
 msgid "The longest gap is measured inside this period, so a silence that began before it is not carried in. A period still running is only counted up to today."
 msgstr "最长间隔只在此期间内计算，因此在此期间之前就开始的空白期不会计入。仍在进行中的期间只计算到今天。"
@@ -20284,6 +20735,10 @@ msgstr "你资料中的照片，显示在你姓名旁边。它会出现在 PDF �
 msgid "The picture that stands for you on these pages: one you upload, your Gravatar, or your initials."
 msgstr "在这些页面上代表你的图片：你上传的图片、你的 Gravatar 或你的姓名首字母。"
 
+#: src/postulo/jobs/search_views.py
+msgid "the place"
+msgstr ""
+
 #: src/postulo/accounts/models.py
 msgid "The plugin whose calendar entries set the date, such as a monthly declaration."
 msgstr "由哪个插件的日历条目来确定日期，例如每月申报。"
@@ -20417,9 +20872,13 @@ msgstr "请求大于%(limit)s，这是此调用读取的上限。"
 msgid "The request was not in the shape this call takes."
 msgstr "请求格式不符合此调用的要求。"
 
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 msgid "The rest of the file is still worth importing. What is listed here is not, and you can add it by hand afterwards."
 msgstr "文件的其余部分仍值得导入。这里列出的内容不会导入，你可以之后手动添加。"
+
+#: src/postulo/templates/jobs/listing_search.html
+msgid "The results are shown and not kept. An advert is kept only once you review it and save it."
+msgstr ""
 
 #: src/postulo/templates/applications/application_intake.html
 #: src/postulo/templates/jobs/capture_review.html
@@ -20525,6 +20984,14 @@ msgstr "服务器拒绝了这些凭据：%(detail)s"
 #, fuzzy
 msgid "The server that accepts the mail — its name, not an address."
 msgstr "接收邮件的服务器——填写它的名称，而不是地址。"
+
+#: src/postulo/jobs/listing_search.py
+msgid "The service's address is not one it declared."
+msgstr ""
+
+#: src/postulo/jobs/listing_search.py
+msgid "The service's answer could not be read."
+msgstr ""
 
 #: src/postulo/core/server_forms.py
 msgid "The service's base address. Left empty with Nominatim, OpenStreetMap's public instance is used: https://nominatim.openstreetmap.org. For your own: for example https://photon.example.org"
@@ -20780,6 +21247,10 @@ msgstr "无法读取该 wheel 的元数据；它可能已损坏。"
 msgid "The wheel's metadata is far larger than any plugin's."
 msgstr "该 wheel 的元数据远大于任何插件的元数据。"
 
+#: src/postulo/jobs/search_views.py
+msgid "the words"
+msgstr ""
+
 #: src/postulo/templates/documents/rendered_compare.html
 msgid "The words are the same in both. If the two PDFs look different, what changed is how they are set: the theme, or the layout."
 msgstr "两者的文字相同。如果两个 PDF 看起来不同，那么改变的是排版方式：主题或版式。"
@@ -20787,6 +21258,10 @@ msgstr "两者的文字相同。如果两个 PDF 看起来不同，那么改变�
 #: src/postulo/templates/documents/letter_detail.html
 msgid "The words without the layout, in this letter's language. None of these is filed as a version you sent."
 msgstr "不含排版的文字，使用此求职信的语言。这些都不会被归档为你发送过的版本。"
+
+#: src/postulo/jobs/listing_search.py
+msgid "the words, the place and the filters searched for"
+msgstr ""
 
 #: src/postulo/core/errands.py
 msgid "The work was interrupted before it finished. Please try again."
@@ -22374,6 +22849,7 @@ msgid "Waiting after this one: %(count)s."
 msgstr "此后还在等待的：%(count)s个。"
 
 #: src/postulo/applications/models.py src/postulo/jobs/models.py
+#: src/postulo/templates/jobs/listing_search.html
 msgid "Waiting for review"
 msgstr "待审核"
 
@@ -22465,7 +22941,8 @@ msgid "WebP image"
 msgstr "WebP 图像"
 
 #: src/postulo/core/models.py src/postulo/core/web_links.py
-#: src/postulo/documents/printing.py src/postulo/jobs/tables.py
+#: src/postulo/documents/printing.py src/postulo/jobs/enrichment_offers.py
+#: src/postulo/jobs/tables.py
 #: src/postulo/templates/applications/interview_detail.html
 #: src/postulo/templates/jobs/company_detail.html
 msgid "Website"
@@ -22605,6 +23082,10 @@ msgstr "此期间收到的回复"
 msgid "what came of it"
 msgstr "结果如何"
 
+#: src/postulo/templates/resume/import.html
+msgid "What can be read here"
+msgstr ""
+
 #: src/postulo/core/server_forms.py
 msgid "What carries the mail off this machine."
 msgstr "负责将邮件从这台机器发送出去的方式。"
@@ -22626,7 +23107,7 @@ msgstr "%(title)s中的变更"
 msgid "What changes how Postulo behaves for you. Everything here works from the keyboard, with a screen reader and with scripts off; these are the choices on top of that."
 msgstr "改变 Postulo 对你的行为方式的设置。这里的一切都可以用键盘、屏幕阅读器以及在关闭脚本的情况下使用；这些是在此基础上的额外选择。"
 
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 msgid "What could not be read"
 msgstr "无法读取的内容"
 
@@ -22687,7 +23168,7 @@ msgstr "日程中的安排，最近的排在最前。请在申请页面上安排
 #: src/postulo/templates/applications/ical_import.html
 #: src/postulo/templates/core/kind_file.html
 #: src/postulo/templates/resume/candidate_file.html
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 msgid "What is in the file"
 msgstr "文件中的内容"
 
@@ -22946,6 +23427,7 @@ msgstr "用一句话说明处理方法。"
 msgid "What to do. It is what the reminder says when it falls due."
 msgstr "要做的事。提醒到期时会显示这段内容。"
 
+#: src/postulo/templates/jobs/company_enrichment.html
 #: src/postulo/templates/jobs/company_register.html
 msgid "What to keep"
 msgstr "要保留的内容"
@@ -23005,6 +23487,10 @@ msgstr "你在那里做了什么。“未说明”不会打印任何内容。"
 #: src/postulo/jobs/widgets.py
 msgid "What you have noticed and not yet acted on, and what closes this week."
 msgstr "你已关注但尚未采取行动的职位，以及本周截止的职位。"
+
+#: src/postulo/templates/jobs/company_enrichment.html
+msgid "What you have recorded is never replaced from here. Change it on the company's own page if a source is right."
+msgstr ""
 
 #: src/postulo/resume/models.py
 msgid "what you presented"
@@ -23103,6 +23589,10 @@ msgstr "它进入你的职位列表的时间。"
 msgid "When it happened, which is not always when you write it down."
 msgstr "事情发生的时间，不一定是你记录它的时间。"
 
+#: src/postulo/jobs/search_views.py
+msgid "when it was published"
+msgstr ""
+
 #: src/postulo/jobs/forms.py
 msgid "When the employer put it up, if the posting says. Empty means unknown."
 msgstr "雇主发布它的时间（如果招聘信息中注明）。留空表示未知。"
@@ -23192,6 +23682,10 @@ msgstr "他人可以核实它的地方。简历会将其打印为链接。"
 msgid "Where the companies' map takes the tiles it is drawn on, and whether addresses are pinned at their street."
 msgstr "公司地图从哪里获取用于绘制的瓦片，以及地址是否以图钉标在其街道上。"
 
+#: src/postulo/templates/resume/import.html
+msgid "Where the file states no level, none is written: a level is a claim about yourself that somebody will test, so it is yours to make afterwards."
+msgstr ""
+
 #: src/postulo/jobs/models.py
 msgid "where the logo came from"
 msgstr "徽标的来源"
@@ -23249,6 +23743,10 @@ msgstr "此条目在其所在部分中的位置，可通过<a href=\"%(overview_
 #: src/postulo/templates/help/telephone_numbers.html
 msgid "Where this instance can send a code to a telephone, a number you have confirmed can also be the one that gets you back into your account. That choice is separate from the primary, so changing what a recruiter dials never changes how you prove it is you. The bin will not remove that number while it is your way in. Changing its digits makes it another number, which has to be confirmed again and is no longer your way in."
 msgstr "如果此实例可以向电话发送验证码，你已确认的号码也可以用来让你重新登录账户。这项选择与首选号码相互独立，因此更改招聘人员拨打的号码绝不会改变你验证身份的方式。当该号码是你的登录方式时，垃圾桶图标不会删除它。更改其数字会使它成为另一个号码，需要重新确认，并且不再是你的登录方式。"
+
+#: src/postulo/templates/cotton/enrichment_ask.html
+msgid "Where to ask"
+msgstr ""
 
 #: src/postulo/templates/server/register_lookup.html
 msgid "Where to get a key"
@@ -23663,6 +24161,10 @@ msgstr "木制品"
 msgid "Word document"
 msgstr "Word 文档"
 
+#: src/postulo/jobs/search_views.py
+msgid "Words"
+msgstr ""
+
 #: src/postulo/accounts/forms.py
 msgid "Words and chevrons"
 msgstr "文字和箭头符号"
@@ -23791,7 +24293,7 @@ msgstr "由<bdi>%(name)s</bdi>撰写"
 msgid "Written by Postulo %(version)s on %(when)s."
 msgstr "由 Postulo %(version)s于%(when)s写入。"
 
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 #, python-format
 msgid "Written in %(tongue)s, which will be recorded as the language of your career record if you have not already set one."
 msgstr "使用%(tongue)s撰写；如果你尚未设置职业记录的语言，它将被记录为该语言。"
@@ -24377,7 +24879,7 @@ msgstr "你的记录（JSON）"
 
 #: src/postulo/templates/core/export.html
 #: src/postulo/templates/resume/candidate_file.html
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 #, fuzzy
 msgid "Your record as a file"
 msgstr "以文件形式获取你的记录"
@@ -24505,9 +25007,13 @@ msgstr "{value}位于主机之后：在路径中、问号之后或井号之后�
 msgid "· in the <a href=\"%(group_url)s\" class=\"underline\">%(name)s</a> group"
 msgstr "· 在<a href=\"%(group_url)s\" class=\"underline\">%(name)s</a>组中"
 
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 msgid "· no level in the file, so none will be claimed"
 msgstr "· 文件中没有级别，因此不会声明任何级别"
+
+#: src/postulo/templates/resume/import.html
+msgid "· not a level Postulo keeps, so none will be claimed"
+msgstr ""
 
 #: src/postulo/templates/applications/application_detail.html
 #, python-format

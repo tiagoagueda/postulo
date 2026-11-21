@@ -15,6 +15,16 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 "X-Generator: postulo scripts/messages.py\n"
 
+#: src/postulo/jobs/enrichment_offers.py
+#, python-format
+msgid "%(address)s was not added."
+msgstr ""
+
+#: src/postulo/jobs/enrichment_offers.py
+#, python-format
+msgid "%(address)s was not added: %(reason)s"
+msgstr ""
+
 #: src/postulo/jobs/listing_earnings.py
 #, python-format
 msgid "%(amount)s %(currency)s per hour, gross (%(year)s)"
@@ -403,6 +413,13 @@ msgid "%(count)s listing you are considering closes soon"
 msgid_plural "%(count)s listings you are considering close soon"
 msgstr[0] "Düşündüğünüz %(count)s ilan yakında kapanıyor"
 msgstr[1] "Düşündüğünüz %(count)s ilan yakında kapanıyor"
+
+#: src/postulo/jobs/enrichment_offers.py
+#, python-format
+msgid "%(count)s person or more"
+msgid_plural "%(count)s people or more"
+msgstr[0] ""
+msgstr[1] ""
 
 #: src/postulo/plugins/base.py
 #, python-format
@@ -818,6 +835,11 @@ msgstr "%(host)s özel ya da yerel bir ağda. Postulo böyle bir ağa yalnızca 
 msgid "%(i)s interviews and %(e)s entries in listings' histories would be kept without the name."
 msgstr "%(i)s görüşme ve ilan geçmişlerindeki %(e)s girdi ad olmadan korunacak."
 
+#: src/postulo/jobs/enrichment_offers.py
+#, python-format
+msgid "%(industry)s (NACE %(division)s)"
+msgstr ""
+
 #: src/postulo/templates/server/logs.html
 #, python-format
 msgid "%(kilobytes)s on disk"
@@ -902,7 +924,7 @@ msgstr "%(least)s – %(most)s"
 msgid "%(list)s · %(date)s"
 msgstr "%(list)s · %(date)s"
 
-#: src/postulo/jobs/models.py
+#: src/postulo/jobs/enrichment_offers.py src/postulo/jobs/models.py
 #, python-format
 msgid "%(low)s to %(high)s"
 msgstr "%(low)s – %(high)s"
@@ -1298,6 +1320,16 @@ msgstr "%(name)s: %(value)s numarası dışarıda bırakıldı. %(why)s"
 msgid "%(names)s can see “%(other)s” and not “%(kept)s”. Share “%(kept)s” with them first, or nothing is merged."
 msgstr "%(names)s “%(other)s” öğesini görebiliyor, ancak “%(kept)s” öğesini göremiyor. Önce “%(kept)s” öğesini onlarla paylaşın; aksi halde hiçbir şey birleştirilmez."
 
+#: src/postulo/jobs/enrichment_offers.py
+#, python-format
+msgid "%(number)s was not added."
+msgstr ""
+
+#: src/postulo/jobs/enrichment_offers.py
+#, python-format
+msgid "%(number)s was not added: %(reason)s"
+msgstr ""
+
 #: src/postulo/resume/views.py
 #, fuzzy, python-format
 msgid "%(ok)s, %(broken)s; the ones that did not say why."
@@ -1498,25 +1530,40 @@ msgstr "%(scheme)s: bu olağan biçim değil."
 msgid "%(sent)s, %(failed)s; each document says which."
 msgstr "%(sent)s, %(failed)s; hangisi olduğunu her belge söyler."
 
-#: src/postulo/resume/lookups.py
+#: src/postulo/jobs/listing_search.py src/postulo/resume/lookups.py
 #, python-format
 msgid "%(service)s answered %(status)s."
 msgstr "%(service)s hizmeti şu yanıtı verdi: %(status)s."
 
-#: src/postulo/resume/lookups.py
+#: src/postulo/jobs/listing_search.py src/postulo/resume/lookups.py
 #, python-format
 msgid "%(service)s asked for fewer requests. Try again later."
 msgstr "%(service)s hizmeti daha az istek gönderilmesini istedi. Daha sonra yeniden deneyin."
 
-#: src/postulo/resume/lookups.py
+#: src/postulo/jobs/listing_search.py src/postulo/resume/lookups.py
 #, python-format
 msgid "%(service)s could not be reached."
 msgstr "%(service)s hizmetine ulaşılamadı."
+
+#: src/postulo/jobs/listing_search.py
+#, python-format
+msgid "%(service)s did not accept that search."
+msgstr ""
+
+#: src/postulo/templates/jobs/listing_search.html
+#, python-format
+msgid "%(service)s does not search by %(criteria)s, so that was not sent."
+msgstr ""
 
 #: src/postulo/resume/lookups.py
 #, python-format
 msgid "%(service)s has no record in a form Postulo reads."
 msgstr "%(service)s hizmetinde Postulo'nun okuyabildiği biçimde bir kayıt yok."
+
+#: src/postulo/jobs/listing_search.py
+#, python-format
+msgid "%(service)s has nothing at the address it was asked at."
+msgstr ""
 
 #: src/postulo/core/web_links.py src/postulo/jobs/surface.py
 #, python-format
@@ -1528,6 +1575,11 @@ msgstr "%(service)s zaten başka bir satır tarafından kullanılıyor."
 msgid "%(service)s knows no such identifier."
 msgstr "%(service)s hizmeti böyle bir tanımlayıcı tanımıyor."
 
+#: src/postulo/jobs/listing_search.py
+#, python-format
+msgid "%(service)s no longer has that advert."
+msgstr ""
+
 #: src/postulo/resume/lookups.py
 #, python-format
 msgid "%(service)s redirected too many times."
@@ -1538,7 +1590,7 @@ msgstr "%(service)s hizmeti çok fazla yönlendirme yaptı."
 msgid "%(service)s refused the look-ups (%(status)s). They are stopped."
 msgstr "%(service)s hizmeti sorguları reddetti (%(status)s). Sorgular durduruldu."
 
-#: src/postulo/resume/lookups.py
+#: src/postulo/jobs/listing_search.py src/postulo/resume/lookups.py
 #, python-format
 msgid "%(service)s sent the request somewhere else."
 msgstr "%(service)s hizmeti isteği başka bir yere gönderdi."
@@ -1548,10 +1600,20 @@ msgstr "%(service)s hizmeti isteği başka bir yere gönderdi."
 msgid "%(service)s sent the request to an address Postulo does not dial."
 msgstr "%(service)s hizmeti isteği Postulo'nun bağlanmadığı bir adrese gönderdi."
 
-#: src/postulo/resume/lookups.py
+#: src/postulo/jobs/listing_search.py src/postulo/resume/lookups.py
 #, python-format
 msgid "%(service)s took too long to answer."
 msgstr "%(service)s hizmeti yanıt vermekte çok gecikti."
+
+#: src/postulo/jobs/listing_search.py
+#, python-format
+msgid "%(service)s's answer could not be read."
+msgstr ""
+
+#: src/postulo/jobs/listing_search.py
+#, python-format
+msgid "%(service)s's answer was larger than a page of adverts should be."
+msgstr ""
 
 #: src/postulo/resume/views.py
 #, python-format
@@ -1563,10 +1625,82 @@ msgstr "%(service)s hizmetinin doi.org üzerinden boş alanlar için hiçbir bil
 msgid "%(share)s%%"
 msgstr "%%%(share)s"
 
+#: src/postulo/jobs/enrichment.py
+#, python-format
+msgid "%(source)s asked for an address it did not declare."
+msgstr ""
+
+#: src/postulo/jobs/enrichment.py
+#, python-format
+msgid "%(source)s asked for fewer requests. Try again later."
+msgstr ""
+
+#: src/postulo/jobs/enrichment.py
+#, python-format
+msgid "%(source)s asked for more requests than one press allows."
+msgstr ""
+
+#: src/postulo/jobs/enrichment.py
+#, python-format
+msgid "%(source)s cannot be asked about this company."
+msgstr ""
+
+#: src/postulo/jobs/enrichment.py
+#, python-format
+msgid "%(source)s could not be reached."
+msgstr ""
+
+#: src/postulo/templates/jobs/company_enrichment.html
+#, python-format
+msgid "%(source)s could not be read."
+msgstr ""
+
+#: src/postulo/jobs/enrichment.py
+#, python-format
+msgid "%(source)s redirected too many times."
+msgstr ""
+
+#: src/postulo/jobs/enrichment.py
+#, python-format
+msgid "%(source)s sent its answer with the content encoding “%(coding)s”, which Postulo does not unpack."
+msgstr ""
+
+#: src/postulo/jobs/enrichment.py
+#, python-format
+msgid "%(source)s sent the request somewhere else."
+msgstr ""
+
+#: src/postulo/jobs/enrichment.py
+#, python-format
+msgid "%(source)s took longer than %(seconds)s second to answer."
+msgid_plural "%(source)s took longer than %(seconds)s seconds to answer."
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/postulo/jobs/enrichment.py
+#, python-format
+msgid "%(source)s's answer could not be read."
+msgstr ""
+
+#: src/postulo/jobs/enrichment.py
+#, python-format
+msgid "%(source)s's answer was larger than one company's should be."
+msgstr ""
+
+#: src/postulo/templates/jobs/listing_search.html
+#, python-format
+msgid "%(source)s: asked at %(hosts)s. It is sent the words, the place and the filters you search for, or an advert's number when you press Review, and nothing about you."
+msgstr ""
+
 #: src/postulo/applications/agenda.py
 #, python-format
 msgid "%(start)s to %(end)s"
 msgstr "%(start)s ile %(end)s arası"
+
+#: src/postulo/jobs/enrichment_offers.py
+#, python-format
+msgid "%(state)s since %(date)s"
+msgstr ""
 
 #: src/postulo/templates/applications/partials/board.html
 #, python-format
@@ -1879,8 +2013,8 @@ msgid "<em>Headline</em> is a short professional title, such as “Backend engin
 msgstr "<em>Meslek başlığı</em>, “Backend mühendisi” gibi kısa bir mesleki unvandır. Kendine ait bir meslek başlığı olan CV bunun yerine onu yazdırır."
 
 #: src/postulo/templates/help/career.html
-msgid "<em>Import</em> reads a Europass CV; <em>Export</em> writes your details and your career as one file you can keep or move to another Postulo; <em>Preview</em> shows the whole record as a document, and <em>Your CVs</em> opens the variants made from it."
-msgstr "<em>İçe aktar</em> bir Europass CV'sini okur; <em>Dışa aktar</em> bilgilerinizi ve kariyerinizi saklayabileceğiniz veya başka bir Postulo'ya taşıyabileceğiniz tek bir dosya olarak yazar; <em>Önizleme</em> tüm kaydı bir belge olarak gösterir ve <em>CV'leriniz</em> ondan oluşturulan varyantları açar."
+msgid "<em>Import</em> reads a CV you have as a file; <em>Export</em> writes your details and your career as one file you can keep or move to another Postulo; <em>Preview</em> shows the whole record as a document, and <em>Your CVs</em> opens the variants made from it."
+msgstr ""
 
 #: src/postulo/templates/help/identifiers.html
 msgid "<em>Kind</em> is the register the identifier belongs to, and <em>What goes where</em> shows what each one looks like. <em>Other</em> takes anything else, with a name you give it."
@@ -2304,7 +2438,7 @@ msgstr "Belgelerinizden bir dosya"
 msgid "A file goes under Files first; an entry points at it rather than keeping a copy."
 msgstr "Bir dosya önce Dosyalar altına gider; bir girdi onun bir kopyasını tutmak yerine ona işaret eder."
 
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 msgid "A file that Postulo itself wrote is read on a page of its own."
 msgstr "Postulo'nun kendisinin yazdığı bir dosya kendi sayfasında okunur."
 
@@ -2353,6 +2487,10 @@ msgstr "Bir başlık, altındaki cümle ve ardından kart ne içinse o."
 #: src/postulo/jobs/vcards.py
 msgid "a job title"
 msgstr "bir iş unvanı"
+
+#: src/postulo/jobs/search_views.py
+msgid "A job title, a skill or an employer, as you would type it on the service."
+msgstr ""
 
 #: src/postulo/documents/integrity.py
 msgid "a JPEG picture"
@@ -2463,6 +2601,10 @@ msgstr "İlan, hakkında henüz hiçbir karar vermediğiniz, fark ettiğiniz bir
 msgid "A listing keeps its deadline, which the closing-soon notice then watches, and its tags are written into its description."
 msgstr "Bir ilan son başvuru tarihini korur (yakında kapanıyor bildirimi de bu tarihi izler) ve etiketleri açıklamasına yazılır."
 
+#: src/postulo/templates/jobs/listing_search.html
+msgid "A listing like it"
+msgstr ""
+
 #: src/postulo/templates/jobs/capture_review.html
 msgid "A listing with this title at this company exists; a board that mints a fresh address per visit may be showing you the same advert."
 msgstr "Bu şirkette bu başlıkla bir ilan zaten var; her ziyarette yeni bir adres üreten bir ilan sitesi size aynı ilanı gösteriyor olabilir."
@@ -2514,6 +2656,10 @@ msgstr "Bir modül: Postulo'nun içinde gelir ve kaldırılamaz."
 #: src/postulo/templates/applications/report.html
 msgid "A month"
 msgstr "Bir ay"
+
+#: src/postulo/jobs/enrichment_views.py
+msgid "a name"
+msgstr ""
 
 #: src/postulo/core/messaging_services.py
 #, python-format
@@ -2732,6 +2878,10 @@ msgstr "Sonradan silinmiş bir kayıt"
 msgid "A referee who is not a contact yet. Their name is enough; it is added to your contacts without a company, and is used instead of the choice above."
 msgstr "Henüz kişileriniz arasında olmayan bir referans. Adı yeterlidir; şirketsiz olarak kişilerinize eklenir ve yukarıdaki seçimin yerine kullanılır."
 
+#: src/postulo/jobs/enrichment_views.py
+msgid "a register number"
+msgstr ""
+
 #: src/postulo/applications/ical_import.py
 msgid "A reminder"
 msgstr "Bir hatırlatma"
@@ -2920,6 +3070,10 @@ msgstr "Bir belirteç, Postulo dışındaki bir aracın sizin adınıza iş yapm
 msgid "A town and a country alone are kept as a place. Nothing checks that an address exists, and a country Postulo has no rules for is free-form."
 msgstr "Yalnızca bir kasaba ve bir ülke, bir yer olarak tutulur. Hiçbir şey bir adresin var olduğunu denetlemez; Postulo'nun kuralı olmayan bir ülkenin adresi serbest biçimlidir."
 
+#: src/postulo/jobs/search_views.py
+msgid "A town or a region."
+msgstr ""
+
 #: src/postulo/resume/candidate.py
 msgid "A translation"
 msgstr "Bir çeviri"
@@ -2949,6 +3103,10 @@ msgstr "Bir görünümün adında en az bir harf veya rakam olmalıdır."
 msgid "A way back rather than a way on, which is why it is an outline."
 msgstr "İleri değil geri götüren bir yol; bu yüzden yalnızca çerçeveli."
 
+#: src/postulo/jobs/enrichment_views.py
+msgid "a website"
+msgstr ""
+
 #: src/postulo/templates/applications/report.html
 #: src/postulo/templates/documents/themes/base_report.html
 msgid "A week, on average"
@@ -2957,6 +3115,10 @@ msgstr "Haftada ortalama"
 #: src/postulo/templates/core/partials/widget_offers.html
 msgid "A widget added in a later release, or brought by a plugin, waits above until you say yes to it. Nothing arrives on your dashboard without being asked."
 msgstr "Sonraki bir sürümde eklenen ya da bir eklentiyle gelen bir bileşen, siz onaylayana kadar yukarıda bekler. Gösterge panelinize istenmeden hiçbir şey gelmez."
+
+#: src/postulo/jobs/enrichment_views.py
+msgid "a Wikidata identifier"
+msgstr ""
 
 #: src/postulo/documents/integrity.py
 msgid "a Word document"
@@ -3082,7 +3244,8 @@ msgstr "Satın alındı veya birleşti"
 msgid "acquired_by must be a company you can see."
 msgstr "acquired_by görebildiğiniz bir şirket olmalıdır."
 
-#: src/postulo/jobs/models.py src/postulo/templates/jobs/company_form.html
+#: src/postulo/jobs/enrichment_offers.py src/postulo/jobs/models.py
+#: src/postulo/templates/jobs/company_form.html
 msgid "Acronym or short name"
 msgstr "Kısaltma veya kısa ad"
 
@@ -3194,7 +3357,7 @@ msgstr "Beceri ekle"
 msgid "Add a tag"
 msgstr "Bir etiket ekle"
 
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 msgid "Add all of this"
 msgstr "Bunların hepsini ekle"
 
@@ -3401,7 +3564,8 @@ msgid "addok (France's Base Adresse Nationale)"
 msgstr "addok (Fransa'nın Base Adresse Nationale hizmeti)"
 
 #: src/postulo/applications/forms.py src/postulo/applications/reports.py
-#: src/postulo/jobs/tables.py src/postulo/templates/partials/web_links.html
+#: src/postulo/jobs/enrichment_offers.py src/postulo/jobs/tables.py
+#: src/postulo/templates/partials/web_links.html
 msgid "Address"
 msgstr "Adres"
 
@@ -3444,6 +3608,10 @@ msgstr "Reklamcılık"
 #: src/postulo/jobs/industries.py
 msgid "Advertising and marketing"
 msgstr "Reklam ve pazarlama"
+
+#: src/postulo/templates/jobs/listing_search.html
+msgid "Adverts found"
+msgstr ""
 
 #: src/postulo/applications/models.py
 msgid "adviser"
@@ -3614,6 +3782,10 @@ msgstr "Birincil adresiniz değiştiğinde kendiliğinden de olur."
 msgid "Also in %(names)s"
 msgstr "Ayrıca %(names)s dilinde"
 
+#: src/postulo/templates/jobs/company_enrichment.html
+msgid "Also said"
+msgstr ""
+
 #: src/postulo/accounts/models.py
 msgid "Always"
 msgstr "Her zaman"
@@ -3679,6 +3851,10 @@ msgstr "Adresler denetlenmeye başlamadan önce kaydedilmiş ya da bir dosyayla 
 #: src/postulo/resume/candidate.py
 msgid "An address that could not be read"
 msgstr "Okunamayan bir adres"
+
+#: src/postulo/jobs/enrichment_views.py
+msgid "an address with a country"
+msgstr ""
 
 #: src/postulo/applications/models.py
 msgid "An address, a telephone number or the link to the call."
@@ -3758,7 +3934,7 @@ msgstr "Simge düğmesi"
 msgid "An identifier"
 msgstr "Bir tanımlayıcı"
 
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 msgid "An import only ever adds. Nothing already in your career record is changed or removed, and anything that turns out to be a duplicate is yours to delete."
 msgstr "İçe aktarma yalnızca ekler. Kariyer kaydınızda hâlihazırda olan hiçbir şey değişmez ya da kaldırılmaz ve yinelenen çıkan ne varsa silmek size kalmış."
 
@@ -3777,6 +3953,10 @@ msgstr "Bir görüşme bir başvuruya aittir. Bir başvuru seçin."
 #: src/postulo/notifications/base.py
 msgid "An interview is scheduled or moved"
 msgstr "Bir görüşme planlanır ya da taşınır"
+
+#: src/postulo/jobs/enrichment_views.py
+msgid "an LEI"
+msgstr ""
 
 #: src/postulo/notifications/base.py
 msgid "An offer is recorded"
@@ -3847,6 +4027,11 @@ msgstr "Başka bir yedekleme zaten çalışıyordu."
 #: src/postulo/templates/accounts/invite_created.html
 msgid "Another invitation"
 msgstr "Başka bir davet"
+
+#: src/postulo/jobs/enrichment_offers.py
+#, python-format
+msgid "Another of your companies already has %(identifier)s."
+msgstr ""
 
 #: src/postulo/jobs/register_views.py
 #, python-format
@@ -4314,6 +4499,11 @@ msgstr "Geçerlilik tarihi"
 msgid "as of %(date)s"
 msgstr "%(date)s itibarıyla"
 
+#: src/postulo/templates/jobs/partials/enrichment_origins.html
+#, python-format
+msgid "As of %(date)s."
+msgstr ""
+
 #: src/postulo/templates/applications/interview_detail.html
 #: src/postulo/templates/documents/themes/base_interview.html
 #, fuzzy, python-format
@@ -4381,14 +4571,31 @@ msgstr "Asya"
 msgid "Asked"
 msgstr "Soruldu"
 
+#: src/postulo/jobs/search_views.py
+msgid "Asked for the advert. Check it before it becomes a listing."
+msgstr ""
+
 #: src/postulo/templates/server/record_of_processing.html
 msgid "Asked only when somebody presses for it, one company at a time. Each is sent what is listed and nothing about the person asking."
 msgstr "Yalnızca biri istediğinde, her seferinde bir şirket için sorgulanır. Her birine listelenenler gönderilir, soran kişi hakkında hiçbir şey gönderilmez."
+
+#: src/postulo/templates/server/record_of_processing.html
+msgid "Asked only when somebody presses Search or Review. Each is sent what is listed and nothing about the person asking; nothing it answers is kept unless the person saves an advert."
+msgstr ""
 
 #: src/postulo/templates/connections/pairing.html
 #, python-format
 msgid "Asks %(plugin)s now. Nothing it answers is kept here."
 msgstr "%(plugin)s eklentisine şimdi sorar. Verdiği yanıttan hiçbir şey burada saklanmaz."
+
+#: src/postulo/templates/cotton/enrichment_ask.html
+#, python-format
+msgid "Asks <bdi>%(hosts)s</bdi>. Sent: %(what)s."
+msgstr ""
+
+#: src/postulo/templates/jobs/company_detail.html
+msgid "Asks the places you choose, once each; nothing is kept until you say so."
+msgstr ""
 
 #: src/postulo/applications/analytics.py src/postulo/applications/models.py
 msgid "Assessment"
@@ -4410,6 +4617,10 @@ msgstr "Üyesi olduğunuz veya olduğunuz dernekler, topluluklar ve kulüpler."
 #, fuzzy
 msgid "at"
 msgstr "bünyesinde"
+
+#: src/postulo/jobs/search_views.py
+msgid "At any time"
+msgstr ""
 
 #: src/postulo/templates/settings/appearance.html
 msgid "At each status"
@@ -4616,6 +4827,10 @@ msgstr "Takvime dön"
 msgid "Back to the calendar, to change any of this"
 msgstr "Bunlardan birini değiştirmek için takvime dön"
 
+#: src/postulo/templates/jobs/company_enrichment.html
+msgid "Back to the company"
+msgstr ""
+
 #: src/postulo/core/help.py
 msgid "Back to the dashboard"
 msgstr "Gösterge paneline dön"
@@ -4663,6 +4878,7 @@ msgstr "Bilgilerinize geri dön"
 
 #: src/postulo/templates/jobs/capture_decided.html
 #: src/postulo/templates/jobs/capture_page.html
+#: src/postulo/templates/jobs/listing_search.html
 msgid "Back to your listings"
 msgstr "İlanlarınıza geri dön"
 
@@ -5012,6 +5228,7 @@ msgstr "Şununla eşleştirilebilir"
 #: src/postulo/templates/documents/upload_form.html
 #: src/postulo/templates/jobs/address_place.html
 #: src/postulo/templates/jobs/capture_page_forget.html
+#: src/postulo/templates/jobs/company_enrichment.html
 #: src/postulo/templates/jobs/company_form.html
 #: src/postulo/templates/jobs/company_register.html
 #: src/postulo/templates/jobs/company_wikidata.html
@@ -5065,6 +5282,11 @@ msgstr "Eklenemez"
 #: src/postulo/templates/applications/ical_import.html
 msgid "Cannot be added."
 msgstr "Eklenemez."
+
+#: src/postulo/templates/cotton/enrichment_ask.html
+#, python-format
+msgid "Cannot be asked: this company would need %(what)s."
+msgstr ""
 
 #: src/postulo/templates/server/overview.html
 msgid "cannot be checked on this machine"
@@ -5183,13 +5405,14 @@ msgstr "Kariyer önizlemesi"
 msgid "Career sections"
 msgstr "Kariyer bölümleri"
 
+#: src/postulo/jobs/enrichment_offers.py src/postulo/jobs/tables.py
+#: src/postulo/templates/jobs/company_detail.html
+msgid "Careers page"
+msgstr "Kariyer sayfası"
+
 #: src/postulo/jobs/models.py
 msgid "careers page"
 msgstr "kariyer sayfası"
-
-#: src/postulo/jobs/tables.py src/postulo/templates/jobs/company_detail.html
-msgid "Careers page"
-msgstr "Kariyer sayfası"
 
 #: src/postulo/templates/server/email.html
 #, python-format
@@ -5244,7 +5467,8 @@ msgstr "Sertifikasyon"
 
 #: src/postulo/documents/rendering.py src/postulo/jobs/merging.py
 #: src/postulo/resume/candidate.py src/postulo/resume/registry.py
-#: src/postulo/resume/views_candidate.py
+#: src/postulo/resume/views.py src/postulo/resume/views_candidate.py
+#: src/postulo/templates/resume/import.html
 #: src/postulo/templates/resume/preview.html
 msgid "Certifications"
 msgstr "Sertifikasyonlar"
@@ -5355,6 +5579,10 @@ msgstr "Güncellemeleri denetle"
 msgid "Check it answers"
 msgstr "Yanıt verdiğini denetle"
 
+#: src/postulo/templates/jobs/partials/enrichment_origins.html
+msgid "Check it there"
+msgstr ""
+
 #: src/postulo/templates/jobs/capture_review.html
 msgid "Check the reading against it"
 msgstr "Okumayı bununla karşılaştır"
@@ -5430,13 +5658,10 @@ msgstr "Listeden bir ülke seçin."
 msgid "Choose a destination and save it first."
 msgstr "Önce bir hedef seçin ve kaydedin."
 
-#: src/postulo/resume/views.py
-msgid "Choose a Europass file first."
-msgstr "Önce bir Europass dosyası seçin."
-
 #: src/postulo/applications/views_ical.py src/postulo/core/views_kind_files.py
 #: src/postulo/jobs/vcard_views.py src/postulo/jobs/views.py
-#: src/postulo/resume/views_candidate.py src/postulo/resume/views_references.py
+#: src/postulo/resume/views.py src/postulo/resume/views_candidate.py
+#: src/postulo/resume/views_references.py
 msgid "Choose a file first."
 msgstr "Önce bir dosya seçin."
 
@@ -5505,6 +5730,10 @@ msgstr "Başka bir dosya seç"
 msgid "Choose at least one document to record."
 msgstr "Kaydedilecek en az bir belge seçin."
 
+#: src/postulo/jobs/enrichment_views.py
+msgid "Choose at least one place to ask."
+msgstr ""
+
 #: src/postulo/templates/cotton/date_field.html
 msgid "Choose dates from a calendar"
 msgstr "Tarihleri bir takvimden seçin"
@@ -5545,9 +5774,9 @@ msgstr "Doğum tarihini bir takvimden seçin"
 msgid "Choose the destination"
 msgstr "Hedefi seçin"
 
-#: src/postulo/templates/resume/europass_import.html
-msgid "Choose the PDF you downloaded from europass.europa.eu, as it is: the CV is attached inside it, and that is what Postulo reads. Older Europass files read too: the XML and PDF of the editor before 2020, and the JSON of its web service. Postulo works out which it is, shows you what is in it, and writes nothing until you say so."
-msgstr "europass.europa.eu adresinden indirdiğiniz PDF'yi olduğu gibi seçin: CV onun içine eklenmiştir ve Postulo'nun okuduğu da budur. Eski Europass dosyaları da okunur: 2020 öncesi düzenleyicinin XML ve PDF dosyaları ile web hizmetinin JSON dosyası. Postulo hangisi olduğunu anlar, içinde ne olduğunu size gösterir ve siz söyleyene kadar hiçbir şey yazmaz."
+#: src/postulo/templates/resume/import.html
+msgid "Choose the file as you downloaded it. Postulo works out which format it is, shows you what is in it, and writes nothing until you say so."
+msgstr ""
 
 #: src/postulo/accounts/forms.py src/postulo/jobs/forms.py
 msgid "Choose the type of identifier."
@@ -5568,6 +5797,10 @@ msgstr "İletiyle ne yapılacağını seçin."
 #: src/postulo/jobs/status_views.py
 msgid "Choose what was reported and the date."
 msgstr "Neyin bildirildiğini ve tarihini seçin."
+
+#: src/postulo/templates/cotton/enrichment_ask.html
+msgid "Choose where to ask about this company. Each place is asked once, now, and learns only what is listed. Nothing is kept until you tick it."
+msgstr ""
 
 #: src/postulo/applications/views.py
 msgid "Choose which application this is about first."
@@ -5896,6 +6129,10 @@ msgstr "Şirket eklendi."
 msgid "Company deleted, along with its postings."
 msgstr "Şirket, ilanlarıyla birlikte silindi."
 
+#: src/postulo/plugins/kinds.py
+msgid "Company details"
+msgstr ""
+
 #: src/postulo/jobs/models.py
 msgid "company identifier"
 msgstr "şirket tanımlayıcısı"
@@ -6198,7 +6435,8 @@ msgstr "Kurs"
 
 #: src/postulo/documents/rendering.py src/postulo/jobs/merging.py
 #: src/postulo/resume/candidate.py src/postulo/resume/registry.py
-#: src/postulo/resume/views_candidate.py
+#: src/postulo/resume/views.py src/postulo/resume/views_candidate.py
+#: src/postulo/templates/resume/import.html
 #: src/postulo/templates/resume/preview.html
 msgid "Courses"
 msgstr "Kurslar"
@@ -6838,6 +7076,10 @@ msgstr "ayrıntı"
 msgid "details"
 msgstr "ayrıntılar"
 
+#: src/postulo/templates/jobs/company_enrichment.html
+msgid "Details found"
+msgstr ""
+
 #: src/postulo/core/design.py src/postulo/templates/server/design.html
 msgid "Dialogs"
 msgstr "İletişim kutuları"
@@ -6955,7 +7197,7 @@ msgid "document themes"
 msgstr "belge temaları"
 
 #: src/postulo/core/help.py src/postulo/core/navigation.py
-#: src/postulo/documents/apps.py
+#: src/postulo/documents/apps.py src/postulo/plugins/categories.py
 #: src/postulo/templates/applications/application_detail.html
 #: src/postulo/templates/base.html
 #: src/postulo/templates/cotton/documents_nav.html
@@ -7198,7 +7440,7 @@ msgstr "E-ticaret"
 msgid "Each invitation may be used once, and expires on its own. Its link is shown once, when it is made."
 msgstr "Her davet bir kez kullanılabilir ve kendiliğinden sona erer. Bağlantısı yalnızca bir kez, oluşturulduğunda gösterilir."
 
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 msgid "Each is added as one of your contacts and as a reference you have not asked yet, so none is printed on a CV until you say they agreed."
 msgstr "Her biri kişilerinizden biri ve henüz sormadığınız bir referans olarak eklenir; bu nedenle kabul ettiklerini belirtene kadar hiçbiri CV'de basılmaz."
 
@@ -7318,7 +7560,7 @@ msgstr "editörler"
 #: src/postulo/documents/rendering.py src/postulo/jobs/industries.py
 #: src/postulo/resume/candidate.py src/postulo/resume/registry.py
 #: src/postulo/resume/views_candidate.py
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 #: src/postulo/templates/resume/preview.html
 msgid "Education"
 msgstr "Eğitim"
@@ -7355,6 +7597,7 @@ msgid "email address"
 msgstr "e-posta adresi"
 
 #: src/postulo/core/channels.py src/postulo/documents/printing.py
+#: src/postulo/jobs/enrichment_offers.py
 msgid "Email address"
 msgstr "E-posta adresi"
 
@@ -7539,11 +7782,7 @@ msgstr "ESCO becerisi"
 msgid "Europass"
 msgstr "Europass"
 
-#: src/postulo/core/transfers.py
-msgid "Europass import"
-msgstr "Europass içe aktarma"
-
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 msgid "Europass records five levels per language and Postulo keeps one, so the lowest is taken. Where the file states none, none is written: a level is a claim about yourself that somebody will test, so it is yours to make afterwards."
 msgstr "Europass her dil için beş düzey kaydeder, Postulo ise bir tane tutar; bu yüzden en düşüğü alınır. Dosya hiçbirini belirtmiyorsa hiçbiri yazılmaz: bir düzey, kendiniz hakkında birinin sınayacağı bir iddiadır; bu yüzden onu sonradan belirlemek size kalır."
 
@@ -7783,7 +8022,7 @@ msgstr "Feshedilenleri hariç tut"
 
 #: src/postulo/documents/rendering.py src/postulo/resume/candidate.py
 #: src/postulo/resume/registry.py src/postulo/resume/views_candidate.py
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 #: src/postulo/templates/resume/preview.html
 msgid "Experience"
 msgstr "Deneyim"
@@ -8145,6 +8384,10 @@ msgstr "Bul"
 msgid "Find a language"
 msgstr "Dil bul"
 
+#: src/postulo/templates/cotton/enrichment_ask.html
+msgid "Find details"
+msgstr ""
+
 #: src/postulo/templates/jobs/company_form.html
 msgid "Find logo"
 msgstr "Logo bul"
@@ -8407,6 +8650,13 @@ msgstr[1] "Sunucuda %(count)d seçenek bulundu. Ne kullanacağınızı seçin, a
 
 #: src/postulo/jobs/slow.py
 #, python-format
+msgid "Found %(count)s detail. Nothing is kept until you tick it."
+msgid_plural "Found %(count)s details. Nothing is kept until you tick it."
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/postulo/jobs/slow.py
+#, python-format
 msgid "Found a logo at %(url)s."
 msgstr "%(url)s adresinde bir logo bulundu."
 
@@ -8434,10 +8684,14 @@ msgstr "Şu yolla bulundu"
 msgid "found via"
 msgstr "bulunma yolu"
 
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 #, python-format
 msgid "Found: %(names)s. Only the ones you have left blank will be filled in."
 msgstr "Bulunanlar: %(names)s. Yalnızca boş bıraktıklarınız doldurulacak."
+
+#: src/postulo/jobs/enrichment_offers.py
+msgid "Founded"
+msgstr ""
 
 #: src/postulo/jobs/models.py
 msgid "Freelance"
@@ -8492,6 +8746,11 @@ msgstr "%(name)s kaynağından."
 #, python-format
 msgid "From %(register)s"
 msgstr "%(register)s sicilinden"
+
+#: src/postulo/templates/jobs/partials/enrichment_origins.html
+#, python-format
+msgid "From %(source)s: <bdi>%(where)s</bdi>."
+msgstr ""
 
 #: src/postulo/core/tables.py
 #, fuzzy, python-format
@@ -8907,6 +9166,10 @@ msgctxt "pronouns"
 msgid "he/him"
 msgstr "o/onu (eril)"
 
+#: src/postulo/jobs/enrichment_offers.py
+msgid "Head office"
+msgstr ""
+
 #: src/postulo/accounts/models.py src/postulo/documents/models.py
 #: src/postulo/resume/views.py
 msgid "headline"
@@ -9057,7 +9320,8 @@ msgstr "Onur veya ödül"
 
 #: src/postulo/documents/rendering.py src/postulo/jobs/merging.py
 #: src/postulo/resume/candidate.py src/postulo/resume/registry.py
-#: src/postulo/resume/views_candidate.py
+#: src/postulo/resume/views.py src/postulo/resume/views_candidate.py
+#: src/postulo/templates/resume/import.html
 #: src/postulo/templates/resume/preview.html
 msgid "Honours and awards"
 msgstr "Onurlar ve ödüller"
@@ -9127,6 +9391,10 @@ msgstr "İşverene nasıl ulaşır"
 #: src/postulo/documents/models.py
 msgid "how it reaches the employer"
 msgstr "işverene nasıl ulaşır"
+
+#: src/postulo/templates/resume/import.html
+msgid "How it was read"
+msgstr ""
 
 #: src/postulo/applications/widgets.py
 msgid "How long they take"
@@ -9290,6 +9558,7 @@ msgstr "idempotent istekler"
 msgid "identifier"
 msgstr "tanımlayıcı"
 
+#: src/postulo/jobs/enrichment_offers.py
 #: src/postulo/templates/cotton/identifier_row.html
 msgid "Identifier"
 msgstr "Tanımlayıcı"
@@ -9370,9 +9639,9 @@ msgstr "Bu bir referans mektubuysa"
 msgid "If you are reading this, the email settings of your Postulo instance work. Nothing else to do."
 msgstr "Bunu okuyorsanız, Postulo kurulumunuzun e-posta ayarları çalışıyor demektir. Başka yapılacak bir şey yok."
 
-#: src/postulo/templates/resume/europass_import.html
-msgid "If you have applied to an EU institution or through a national employment service, you already have this file. Rather than type it all again, hand it over."
-msgstr "Bir AB kurumuna ya da ulusal bir iş kurumu üzerinden başvurduysanız bu dosya zaten sizde var. Hepsini yeniden yazmak yerine dosyayı yükleyin."
+#: src/postulo/templates/resume/import.html
+msgid "If your career is already written down in a file, hand it over rather than type it all again."
+msgstr ""
 
 #: src/postulo/core/models.py
 msgid "ignore robots.txt when capturing"
@@ -9394,9 +9663,9 @@ msgid "Import"
 msgstr "İçe aktar"
 
 #: src/postulo/resume/views.py src/postulo/templates/resume/candidate_file.html
-#: src/postulo/templates/resume/europass_import.html
-msgid "Import a Europass CV"
-msgstr "Europass CV'si içe aktar"
+#: src/postulo/templates/resume/import.html
+msgid "Import a CV"
+msgstr ""
 
 #: src/postulo/templates/applications/ical_import.html
 msgid "Import an iCalendar file"
@@ -9553,6 +9822,13 @@ msgstr "Dosyada iki kez"
 msgid "In the instance's time zone."
 msgstr "Kurulumun saat diliminde."
 
+#: src/postulo/jobs/search_views.py
+#, python-format
+msgid "In the last day"
+msgid_plural "In the last %(count)d days"
+msgstr[0] ""
+msgstr[1] ""
+
 #: src/postulo/core/search.py
 #, python-format
 msgid "in the motivation letter rendered on %(when)s"
@@ -9590,6 +9866,10 @@ msgstr "%(when)s tarihinde %(company)s şirketine gönderdiğiniz raporda"
 #: src/postulo/templates/documents/rendered_compare.html
 msgid "In this version, and not in the one before"
 msgstr "Bu sürümde var, bir öncekinde yok"
+
+#: src/postulo/templates/jobs/listing_search.html
+msgid "In your listings"
+msgstr ""
 
 #: src/postulo/applications/forms.py
 msgid "In your time zone."
@@ -9646,13 +9926,14 @@ msgstr "Endüstriler"
 msgid "industries"
 msgstr "endüstriler"
 
-#: src/postulo/jobs/models.py
-msgid "industry"
-msgstr "endüstri"
-
+#: src/postulo/jobs/enrichment_offers.py
 #: src/postulo/templates/jobs/industry_form.html
 msgid "Industry"
 msgstr "Endüstri"
+
+#: src/postulo/jobs/models.py
+msgid "industry"
+msgstr "endüstri"
 
 #: src/postulo/jobs/views.py
 msgid "Industry renamed."
@@ -9864,6 +10145,10 @@ msgstr "veren"
 #: src/postulo/resume/models.py
 msgid "issued on"
 msgstr "verilme tarihi"
+
+#: src/postulo/jobs/enrichment_offers.py
+msgid "It already has a logo."
+msgstr ""
 
 #: src/postulo/templates/settings/account.html
 msgid "It also gets you back in: ask for a sign-in code and it arrives there. Making a different address primary moves that with it. You are still asked for your authenticator app if you have one."
@@ -10182,6 +10467,10 @@ msgstr "sokağına göre"
 msgid "Its street will be looked up with %(service)s shortly."
 msgstr "Sokağı kısa süre içinde %(service)s hizmetiyle sorgulanacak."
 
+#: src/postulo/templates/jobs/listing_search.html
+msgid "Its terms of use"
+msgstr ""
+
 #: src/postulo/core/models.py
 #, fuzzy
 msgid "its town"
@@ -10207,6 +10496,18 @@ msgstr "İş arama raporu"
 #, python-format
 msgid "Job search report · %(period)s"
 msgstr "İş arama raporu · %(period)s"
+
+#: src/postulo/jobs/search_views.py
+msgid "Job service"
+msgstr ""
+
+#: src/postulo/plugins/kinds.py
+msgid "Job services"
+msgstr ""
+
+#: src/postulo/templates/server/record_of_processing.html
+msgid "Job services it may search"
+msgstr ""
 
 #: src/postulo/applications/forms.py src/postulo/jobs/forms.py
 #: src/postulo/jobs/models.py
@@ -10293,6 +10594,7 @@ msgstr "Bunları koru"
 msgid "Keep this view as"
 msgstr "Bu görünümü şu adla sakla"
 
+#: src/postulo/templates/jobs/company_enrichment.html
 #: src/postulo/templates/jobs/company_register.html
 msgid "Keep what is ticked"
 msgstr "İşaretlileri sakla"
@@ -10312,6 +10614,13 @@ msgstr "Sayfa saklanıyor"
 #: src/postulo/templates/jobs/merge.html
 msgid "Kept"
 msgstr "Saklandı"
+
+#: src/postulo/jobs/enrichment_views.py
+#, python-format
+msgid "Kept %(count)s detail."
+msgid_plural "Kept %(count)s details."
+msgstr[0] ""
+msgstr[1] ""
 
 #: src/postulo/templates/server/person_recovery.html
 msgid "Kept after they are used or expire, because taking somebody's account back is not something to be able to do without a trace."
@@ -10489,7 +10798,7 @@ msgstr "kariyer kaydınızın dili"
 #: src/postulo/documents/rendering.py src/postulo/resume/candidate.py
 #: src/postulo/resume/registry.py src/postulo/resume/views.py
 #: src/postulo/resume/views_candidate.py
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 #: src/postulo/templates/resume/preview.html
 msgid "Languages"
 msgstr "Diller"
@@ -10689,6 +10998,7 @@ msgstr "Saklanmış olanı korumak için boş bırakın."
 msgid "Leave empty if this is your current role."
 msgstr "Şu anki pozisyonunuz buysa boş bırakın."
 
+#: src/postulo/templates/jobs/company_enrichment.html
 #: src/postulo/templates/jobs/company_wikidata.html
 msgid "Leave it as it is"
 msgstr "Olduğu gibi bırak"
@@ -10799,6 +11109,10 @@ msgstr "Yasal bildirim"
 msgid "Legal services"
 msgstr "Hukuk hizmetleri"
 
+#: src/postulo/jobs/enrichment_offers.py
+msgid "Legal state"
+msgstr ""
+
 #: src/postulo/jobs/models.py
 msgid "legal state"
 msgstr "yasal durum"
@@ -10892,6 +11206,10 @@ msgstr "Düzey 8"
 #: src/postulo/templates/server/plugins.html
 msgid "Licence"
 msgstr "Lisans"
+
+#: src/postulo/templates/jobs/listing_search.html
+msgid "Licence of its adverts:"
+msgstr ""
 
 #: src/postulo/accounts/models.py src/postulo/core/context_processors.py
 msgid "Light"
@@ -11045,6 +11363,10 @@ msgstr "konum"
 msgid "Location"
 msgstr "Konum"
 
+#: src/postulo/jobs/enrichment_offers.py
+msgid "Logo"
+msgstr ""
+
 #: src/postulo/jobs/models.py
 msgid "logo"
 msgstr "logo"
@@ -11106,6 +11428,10 @@ msgstr "sorgu hizmeti adresi"
 #: src/postulo/jobs/slow.py
 msgid "Looking for a logo"
 msgstr "Logo aranıyor"
+
+#: src/postulo/jobs/slow.py
+msgid "Looking for details"
+msgstr ""
 
 #: src/postulo/templates/applications/application_list.html
 #: src/postulo/templates/jobs/company_list.html
@@ -11402,7 +11728,7 @@ msgstr "Üyelik kuruluşları"
 #: src/postulo/documents/rendering.py src/postulo/jobs/merging.py
 #: src/postulo/resume/candidate.py src/postulo/resume/registry.py
 #: src/postulo/resume/views.py src/postulo/resume/views_candidate.py
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 #: src/postulo/templates/resume/preview.html
 msgid "Memberships"
 msgstr "Üyelikler"
@@ -11777,8 +12103,8 @@ msgstr "NACE kısmı"
 msgid "name"
 msgstr "ad"
 
-#: src/postulo/api/forms.py src/postulo/jobs/tables.py
-#: src/postulo/templates/cotton/identifier_row.html
+#: src/postulo/api/forms.py src/postulo/jobs/enrichment_offers.py
+#: src/postulo/jobs/tables.py src/postulo/templates/cotton/identifier_row.html
 #: src/postulo/templates/partials/messaging_handles.html
 #: src/postulo/templates/partials/phone_numbers.html
 #: src/postulo/templates/partials/postal_addresses.html
@@ -12046,6 +12372,7 @@ msgid "Next month"
 msgstr "Sonraki ay"
 
 #: src/postulo/templates/cotton/document_viewer.html
+#: src/postulo/templates/jobs/listing_search.html
 msgid "Next page"
 msgstr "Sonraki sayfa"
 
@@ -12253,6 +12580,14 @@ msgstr "Henüz bu türden mektup yok."
 #: src/postulo/templates/documents/letter_list.html
 msgid "No letters yet. A cover letter is for one posting; a motivation letter tells your story; a speculative letter goes where nothing is advertised; a follow-up note comes after an interview."
 msgstr "Henüz mektup yok. Ön yazı tek bir ilan içindir; niyet mektubu hikâyenizi anlatır; girişim mektubu hiçbir ilanın olmadığı yere gider; takip notu bir görüşmeden sonra gelir."
+
+#: src/postulo/templates/jobs/company_enrichment.html
+msgid "No licence is stated."
+msgstr ""
+
+#: src/postulo/templates/jobs/company_enrichment.html
+msgid "No licence is stated; the name and the mark are the company's."
+msgstr ""
 
 #: src/postulo/templates/connections/partials/option_table.html
 msgid "No longer on the server"
@@ -12570,6 +12905,10 @@ msgstr "Hiçbiri başka bir şeyden çıkarılmaz: cinsiyetiniz adınızdan, uyr
 msgid "None of this company's industries is Education, so it is not listed as a school or university."
 msgstr "Bu şirketin endüstrilerinden hiçbiri Eğitim değil, bu yüzden okul veya üniversite olarak listelenmez."
 
+#: src/postulo/jobs/slow.py
+msgid "None of those can be asked about this company any more."
+msgstr ""
+
 #: src/postulo/templates/jobs/company_places.html
 msgid "None of your companies has this name or identifier."
 msgstr "Şirketlerinizin hiçbiri bu ada veya tanımlayıcıya sahip değil."
@@ -12639,6 +12978,10 @@ msgstr "Eşleşmiyor"
 #: src/postulo/templates/partials/phone_widget.html
 msgid "Not a possible number"
 msgstr "Olası bir numara değil"
+
+#: src/postulo/jobs/enrichment_offers.py
+msgid "Not a profile on a service Postulo knows."
+msgstr ""
 
 #: src/postulo/documents/models.py
 msgid "Not accepted"
@@ -13077,9 +13420,17 @@ msgstr "Siz gözden geçirene kadar hiçbir şey kaydedilmez."
 msgid "Nothing is sent to the server as a password until a new one is entered."
 msgstr "Yeni bir tane girilene kadar sunucuya parola olarak hiçbir şey gönderilmez."
 
+#: src/postulo/jobs/logos.py
+msgid "Nothing is switched on that finds a logo on a website."
+msgstr ""
+
 #: src/postulo/templates/applications/application_detail.html
 msgid "Nothing kept yet. Keep what you typed into the employer's form, so you can see what they were told."
 msgstr "Henüz saklanan bir şey yok. İşverenin formuna yazdıklarınızı saklayın; böylece onlara ne söylediğinizi görebilirsiniz."
+
+#: src/postulo/templates/jobs/listing_search.html
+msgid "Nothing matches that search."
+msgstr ""
 
 #: src/postulo/templates/applications/application_list.html
 #: src/postulo/templates/jobs/company_list.html
@@ -13196,6 +13547,18 @@ msgstr "Henüz hiçbir şey gönderilmedi."
 msgid "Nothing standing at Offer. Record one from an application's page when it arrives."
 msgstr "Teklif aşamasında duran bir şey yok. Teklif geldiğinde bir başvurunun sayfasından kaydedin."
 
+#: src/postulo/resume/views.py
+msgid "Nothing that reads a CV from a file is switched on here, so that file was not read."
+msgstr ""
+
+#: src/postulo/templates/resume/import.html
+msgid "Nothing that reads a CV from a file is switched on here, so there is no file to choose."
+msgstr ""
+
+#: src/postulo/templates/jobs/company_enrichment.html
+msgid "Nothing that was found can be added to what the company already has."
+msgstr ""
+
 #: src/postulo/core/design.py src/postulo/templates/server/design.html
 msgid "Nothing there"
 msgstr "Orada hiçbir şey yok"
@@ -13279,7 +13642,7 @@ msgstr "O sayfadan hiçbir şey saklanmadı."
 msgid "Nothing was kept of this page"
 msgstr "Bu sayfadan hiçbir şey saklanmadı"
 
-#: src/postulo/jobs/register_views.py
+#: src/postulo/jobs/enrichment_views.py src/postulo/jobs/register_views.py
 msgid "Nothing was kept."
 msgstr "Hiçbir şey saklanmadı."
 
@@ -13626,6 +13989,13 @@ msgstr "Satır başına bir başarı."
 #: src/postulo/documents/forms.py
 msgid "One address: the person you met, or your contact for this application, or the company's own. It is needed to send, and noted on the timeline when it is given."
 msgstr "Tek bir adres: tanıştığınız kişi, bu başvuru için ilgili kişiniz ya da şirketin kendi adresi. Göndermek için gerekir ve verildiğinde zaman çizelgesine not düşülür."
+
+#: src/postulo/templates/jobs/listing_search.html
+#, python-format
+msgid "One advert found"
+msgid_plural "%(counter)s adverts found"
+msgstr[0] ""
+msgstr[1] ""
 
 #: src/postulo/templates/applications/report.html
 #, python-format
@@ -13981,6 +14351,7 @@ msgstr "CV'de yalnızca yıl basılır, bu yüzden günün bir önemi yok."
 msgid "Only this publication, as a reference:"
 msgstr "Yalnızca bu yayın, kaynak olarak:"
 
+#: src/postulo/templates/jobs/company_enrichment.html
 #: src/postulo/templates/jobs/company_register.html
 msgid "Only what you tick is kept; nothing else on the company changes."
 msgstr "Yalnızca işaretledikleriniz saklanır; şirketteki başka hiçbir şey değişmez."
@@ -14092,6 +14463,10 @@ msgstr "Ya da yeni bir kişi"
 msgid "Or say only this"
 msgstr "Ya da yalnızca şunu söyle"
 
+#: src/postulo/templates/jobs/capture_form.html
+msgid "Or search a job service for adverts"
+msgstr ""
+
 #: src/postulo/templates/jobs/move_owner.html
 msgid "Or to a person"
 msgstr "Ya da bir kişiye"
@@ -14193,6 +14568,10 @@ msgstr "Diğer zamirler"
 #: src/postulo/jobs/industries.py
 msgid "Other services"
 msgstr "Diğer hizmetler"
+
+#: src/postulo/documents/themes.py
+msgid "Other themes"
+msgstr ""
 
 #: src/postulo/accounts/forms.py
 msgid "Other time zones"
@@ -14545,6 +14924,10 @@ msgstr "Emeklilik, sigorta, ödenekler, ekipman: ne belirtildiyse."
 msgid "People"
 msgstr "Kişiler"
 
+#: src/postulo/jobs/enrichment_offers.py
+msgid "People employed"
+msgstr ""
+
 #: src/postulo/jobs/models.py
 msgid "Per day"
 msgstr "Günlük"
@@ -14592,7 +14975,7 @@ msgstr "kişi"
 
 #: src/postulo/accounts/views.py src/postulo/core/help.py
 #: src/postulo/templates/accounts/profile.html
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 msgid "Personal details"
 msgstr "Kişisel ayrıntılar"
 
@@ -14679,7 +15062,7 @@ msgstr "%(version)s sürümüne sabitlenmiş"
 msgid "Pinned to a version"
 msgstr "Bir sürüme sabitlenmiş"
 
-#: src/postulo/core/models.py
+#: src/postulo/core/models.py src/postulo/jobs/search_views.py
 msgid "Place"
 msgstr "Yer"
 
@@ -15066,6 +15449,10 @@ msgstr "Postulo bunu unuttu. Siz sağlayıcıda da geri çekene kadar izin sağl
 msgid "Postulo has forgotten the grant. The provider still has it until you withdraw it there as well."
 msgstr "Postulo izni unuttu. Sağlayıcı, siz orada da geri çekene kadar izni tutar."
 
+#: src/postulo/templates/jobs/company_enrichment.html
+msgid "Postulo has nowhere to keep these yet. They are shown for you to read, and are not kept."
+msgstr ""
+
 #: src/postulo/core/tagline.py
 msgid "Postulo is a self-hosted job application manager: your applications, CVs and cover letters on your own server, with no paid features."
 msgstr "Postulo kendi sunucunuzda barındırılan bir iş başvurusu yöneticisidir: başvurularınız, CV'leriniz ve ön yazılarınız kendi sunucunuzda; ücretli özellik yok."
@@ -15176,7 +15563,7 @@ msgstr "halen"
 #: src/postulo/documents/rendering.py src/postulo/resume/candidate.py
 #: src/postulo/resume/registry.py src/postulo/resume/views.py
 #: src/postulo/resume/views_candidate.py
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 #: src/postulo/templates/resume/preview.html
 msgid "Presentations, conferences and seminars"
 msgstr "Sunumlar, konferanslar ve seminerler"
@@ -15409,7 +15796,7 @@ msgstr "Proje"
 
 #: src/postulo/documents/rendering.py src/postulo/resume/candidate.py
 #: src/postulo/resume/registry.py src/postulo/resume/views_candidate.py
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 #: src/postulo/templates/resume/preview.html
 msgid "Projects"
 msgstr "Projeler"
@@ -15476,7 +15863,9 @@ msgid "Publication"
 msgstr "Yayın"
 
 #: src/postulo/documents/rendering.py src/postulo/resume/candidate.py
-#: src/postulo/resume/registry.py src/postulo/resume/views_candidate.py
+#: src/postulo/resume/registry.py src/postulo/resume/views.py
+#: src/postulo/resume/views_candidate.py
+#: src/postulo/templates/resume/import.html
 #: src/postulo/templates/resume/preview.html
 msgid "Publications"
 msgstr "Yayınlar"
@@ -15488,6 +15877,15 @@ msgstr "yayınlar"
 #: src/postulo/templates/resume/references.html
 msgid "Publications in the file"
 msgstr "Dosyadaki yayınlar"
+
+#: src/postulo/jobs/search_views.py
+msgid "Published"
+msgstr ""
+
+#: src/postulo/templates/jobs/listing_search.html
+#, python-format
+msgid "Published %(when)s"
+msgstr ""
 
 #: src/postulo/resume/models.py
 msgid "published in"
@@ -15660,18 +16058,6 @@ msgstr "Şöyle oku"
 msgid "Read as %(name)s."
 msgstr "%(name)s olarak okundu."
 
-#: src/postulo/resume/views.py
-msgid "Read as Europass JSON, the older format as the Europass web service wrote it until 2020."
-msgstr "Europass JSON olarak okundu; Europass web hizmetinin 2020'ye kadar yazdığı eski biçim."
-
-#: src/postulo/resume/views.py
-msgid "Read as Europass XML in the older format, the one the Europass editor wrote until 2020."
-msgstr "Eski biçimdeki Europass XML olarak okundu; Europass düzenleyicisinin 2020'ye kadar yazdığı biçim."
-
-#: src/postulo/resume/views.py
-msgid "Read as Europass XML, the format europass.europa.eu has written since 2020."
-msgstr "Europass XML olarak okundu; europass.europa.eu'nun 2020'den beri yazdığı biçim."
-
 #: src/postulo/jobs/models.py
 msgid "read by"
 msgstr "okuyan"
@@ -15701,16 +16087,8 @@ msgstr "Okunduğu yer"
 msgid "Read from <bdi>%(address)s</bdi>."
 msgstr "<bdi>%(address)s</bdi> adresinden okundu."
 
-#: src/postulo/resume/views.py
-msgid "Read from the Europass XML attached to the PDF, in the older format the Europass editor wrote until 2020."
-msgstr "PDF'ye eklenmiş Europass XML'inden, Europass düzenleyicisinin 2020'ye kadar yazdığı eski biçimde okundu."
-
-#: src/postulo/resume/views.py
-msgid "Read from the Europass XML attached to the PDF, the format europass.europa.eu has written since 2020."
-msgstr "PDF'ye eklenmiş Europass XML'inden, europass.europa.eu'nun 2020'den beri yazdığı biçimde okundu."
-
 #: src/postulo/templates/jobs/company_places.html
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 #: src/postulo/templates/resume/references.html
 #: src/postulo/templates/server/plugins.html
 msgid "Read it"
@@ -16015,8 +16393,7 @@ msgid "Reference letters they wrote"
 msgstr "Yazdıkları referans mektupları"
 
 #: src/postulo/documents/rendering.py src/postulo/resume/registry.py
-#: src/postulo/resume/views.py
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/resume/views.py src/postulo/templates/resume/import.html
 msgid "References"
 msgstr "Referanslar"
 
@@ -16189,6 +16566,14 @@ msgstr "Uzaktan"
 #: src/postulo/plugins/models.py
 msgid "remote address"
 msgstr "uzak adres"
+
+#: src/postulo/jobs/search_views.py
+msgid "Remote work only"
+msgstr ""
+
+#: src/postulo/jobs/search_views.py
+msgid "remote work only"
+msgstr ""
 
 #: src/postulo/templates/accounts/profile.html
 #: src/postulo/templates/connections/confirm_delete.html
@@ -16383,6 +16768,7 @@ msgstr "Saklama"
 msgid "retired on"
 msgstr "kullanımdan kaldırılma tarihi"
 
+#: src/postulo/templates/jobs/company_enrichment.html
 #: src/postulo/templates/jobs/company_register.html
 #, python-format
 msgid "Retrieved %(when)s."
@@ -16398,6 +16784,7 @@ msgstr "Ters vekil sunucu"
 
 #: src/postulo/templates/jobs/capture_list.html
 #: src/postulo/templates/jobs/listing_list.html
+#: src/postulo/templates/jobs/listing_search.html
 msgid "Review"
 msgstr "Gözden geçir"
 
@@ -16512,6 +16899,10 @@ msgstr "%(running)s çalışıyor; tamamlamak için yeniden başlatın"
 #: src/postulo/templates/server/backups.html
 msgid "Runs in the background; you can leave this page while it works."
 msgstr "Arka planda çalışır; çalışırken bu sayfadan ayrılabilirsiniz."
+
+#: src/postulo/templates/jobs/company_enrichment.html
+msgid "Said, and not offered"
+msgstr ""
 
 #: src/postulo/templates/core/import_csv_map.html
 msgid "Salaries are in"
@@ -16706,6 +17097,14 @@ msgstr "Bu tanımlayıcının ne olduğunu belirtin."
 msgid "Say what this number is."
 msgstr "Bu numaranın ne olduğunu belirtin."
 
+#: src/postulo/jobs/listing_search.py
+msgid "Say what to search for."
+msgstr ""
+
+#: src/postulo/jobs/search_views.py
+msgid "Say what to search for: some words, or a place."
+msgstr ""
+
 #: src/postulo/applications/forms.py
 msgid "Say which currency the amount is in."
 msgstr "Tutarın hangi para biriminde olduğunu belirtin."
@@ -16784,9 +17183,15 @@ msgstr "Mühür Postulo tarafından kontrol edilmedi"
 #: src/postulo/templates/core/search.html
 #: src/postulo/templates/cotton/site_search.html
 #: src/postulo/templates/jobs/industry_list.html
+#: src/postulo/templates/jobs/listing_search.html
 #: src/postulo/templates/resume/answer_list.html
 msgid "Search"
 msgstr "Ara"
+
+#: src/postulo/templates/jobs/listing_list.html
+#: src/postulo/templates/jobs/listing_search.html
+msgid "Search a job service"
+msgstr ""
 
 #: src/postulo/applications/tables.py
 msgid "Search applications"
@@ -16816,6 +17221,10 @@ msgstr "Mektuplarda ara"
 #: src/postulo/jobs/tables.py
 msgid "Search listings"
 msgstr "İlanlarda ara"
+
+#: src/postulo/templates/jobs/listing_search.html
+msgid "Search the adverts a job service publishes, and review the one you want before it becomes a listing. Nothing is asked until you press Search."
+msgstr ""
 
 #: src/postulo/applications/views.py
 msgid "Search the calendar"
@@ -17190,6 +17599,18 @@ msgstr "Sonuçlandı"
 #: src/postulo/templates/server/design.html
 msgid "Seven colours, each tuned to 3:1 against the card in both themes."
 msgstr "Yedi renk; her biri iki temada da karta karşı 3:1 olacak şekilde ayarlandı."
+
+#: src/postulo/jobs/search_views.py
+msgid "Several countries"
+msgstr ""
+
+#: src/postulo/jobs/enrichment_offers.py
+msgid "Several social profiles are switched off."
+msgstr ""
+
+#: src/postulo/jobs/enrichment_offers.py
+msgid "Several telephone numbers are switched off."
+msgstr ""
 
 #: src/postulo/jobs/industries.py
 msgid "Sewerage"
@@ -17633,7 +18054,7 @@ msgstr "beceri grupları"
 #: src/postulo/resume/registry.py src/postulo/resume/views.py
 #: src/postulo/resume/views_candidate.py
 #: src/postulo/templates/cotton/listing_skills.html
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 #: src/postulo/templates/resume/preview.html
 msgid "Skills"
 msgstr "Beceriler"
@@ -17688,7 +18109,7 @@ msgid "Snoozed for two weeks."
 msgstr "İki hafta ertelendi."
 
 #: src/postulo/core/models.py src/postulo/core/web_links.py
-#: src/postulo/documents/printing.py
+#: src/postulo/documents/printing.py src/postulo/jobs/enrichment_offers.py
 msgid "Social profile"
 msgstr "Sosyal profil"
 
@@ -17878,6 +18299,7 @@ msgstr "Kaynak, bir ilandaki “nereden bulundu” alanıdır. Bu alanı doldurd
 msgid "source version"
 msgstr "kaynaktaki sürüm"
 
+#: src/postulo/templates/jobs/company_enrichment.html
 #: src/postulo/templates/jobs/company_register.html
 #, python-format
 msgid "Source: %(source)s."
@@ -17917,7 +18339,7 @@ msgstr "Personel temini"
 #: src/postulo/templates/core/kind_file.html
 #: src/postulo/templates/jobs/contact_vcards.html
 #: src/postulo/templates/resume/candidate_file.html
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 msgid "Start again"
 msgstr "Baştan başla"
 
@@ -18168,6 +18590,10 @@ msgstr "ORCID kaydımdan öner"
 #: src/postulo/applications/models.py
 msgid "suggested by"
 msgstr "öneren"
+
+#: src/postulo/documents/themes.py
+msgid "Suggested for this document"
+msgstr ""
 
 #: src/postulo/applications/models.py
 msgid "suggested status"
@@ -18420,6 +18846,7 @@ msgid "telephone"
 msgstr "telefon"
 
 #: src/postulo/core/channels.py src/postulo/documents/printing.py
+#: src/postulo/jobs/enrichment_offers.py
 #: src/postulo/templates/partials/phone_widget.html
 #: src/postulo/templates/server/design.html
 msgid "Telephone number"
@@ -18537,7 +18964,7 @@ msgstr "Teşekkürler, {{ role }}"
 msgid "Thank-you"
 msgstr "Teşekkür"
 
-#: src/postulo/jobs/register_views.py
+#: src/postulo/jobs/enrichment_offers.py
 msgid "That address could not be added."
 msgstr "Bu adres eklenemedi."
 
@@ -18566,6 +18993,10 @@ msgstr "O adres çok fazla yönlendirme yaptı."
 #, python-format
 msgid "That address returned %(kind)s rather than a web page."
 msgstr "O adres bir web sayfası yerine %(kind)s döndürdü."
+
+#: src/postulo/jobs/listing_search.py
+msgid "That advert cannot be asked of this service."
+msgstr ""
 
 #: src/postulo/documents/slow.py
 msgid "That application is no longer here."
@@ -18999,6 +19430,10 @@ msgstr "Bu bir Wikidata öğesi tanımlayıcısı değil."
 msgid "That is not an address Postulo can use."
 msgstr "Bu, Postulo'nun kullanabileceği bir adres değil."
 
+#: src/postulo/jobs/listing_search.py
+msgid "That is not an advert this service could have named."
+msgstr ""
+
 #: src/postulo/core/offsite.py
 msgid "That is not an age recipient. It starts age1 and is 62 characters long."
 msgstr "Bu bir age alıcısı değil. age1 ile başlar ve 62 karakter uzunluğundadır."
@@ -19102,6 +19537,10 @@ msgstr "Bu öğe zaten şununla eşleştirilmiş: %(record)s. Önce eşleştirme
 #: src/postulo/plugins/pairing.py
 msgid "That item is no longer on the other side."
 msgstr "Bu öğe artık karşı tarafta değil."
+
+#: src/postulo/jobs/search_views.py
+msgid "That job service is not offered here."
+msgstr ""
 
 #: src/postulo/templates/account/recovery_unusable.html
 msgid "That link cannot be used"
@@ -19225,6 +19664,14 @@ msgstr "Bu yanıt Postulo'nun yaptığı bir istekten gelmedi."
 #: src/postulo/core/views_access.py
 msgid "That rule existed, and is changed."
 msgstr "Bu kural zaten vardı ve değiştirildi."
+
+#: src/postulo/jobs/listing_search.py
+msgid "That search cannot be asked of this service."
+msgstr ""
+
+#: src/postulo/jobs/listing_search.py
+msgid "That search is longer than a service can be asked."
+msgstr ""
 
 #: src/postulo/applications/views.py
 msgid "That suggestion has already been answered."
@@ -19567,6 +20014,11 @@ msgstr "Eklediği şirketler, kişiler ve ilanlar. Başvurular ve notlar her zam
 msgid "The company %(name)s is not in your account, and is added with it."
 msgstr "%(name)s şirketi hesabınızda yok ve bununla birlikte eklenir."
 
+#: src/postulo/templates/jobs/company_enrichment.html
+#, python-format
+msgid "The company already has <bdi>%(current)s</bdi>."
+msgstr ""
+
 #: src/postulo/jobs/views.py
 msgid "The company already has that name."
 msgstr "Şirket zaten bu ada sahip."
@@ -19796,7 +20248,7 @@ msgstr "Rakam, vergiden önce, yazdıkları hâliyle."
 #: src/postulo/templates/documents/upload_detail.html
 #: src/postulo/templates/jobs/contact_vcards.html
 #: src/postulo/templates/resume/candidate_file.html
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 msgid "The file"
 msgstr "Dosya"
 
@@ -20189,6 +20641,11 @@ msgstr "Logo değiştirildi."
 msgid "The logo was not changed: %(problem)s"
 msgstr "Logo değiştirilmedi: %(problem)s"
 
+#: src/postulo/jobs/enrichment_offers.py
+#, python-format
+msgid "The logo was not kept: %(problem)s"
+msgstr ""
+
 #: src/postulo/templates/applications/report.html
 msgid "The longest gap is measured inside this period, so a silence that began before it is not carried in. A period still running is only counted up to today."
 msgstr "En uzun ara bu dönemin içinde ölçülür, bu yüzden ondan önce başlamış bir sessizlik içeriye taşınmaz. Hâlâ süren bir dönem yalnızca bugüne kadar sayılır."
@@ -20390,6 +20847,10 @@ msgstr "Bilgilerinizdeki fotoğraf, adınızın yanında. PDF'de ve önizlemede 
 msgid "The picture that stands for you on these pages: one you upload, your Gravatar, or your initials."
 msgstr "Bu sayfalarda sizi temsil eden resim: yüklediğiniz bir resim, Gravatar'ınız veya baş harfleriniz."
 
+#: src/postulo/jobs/search_views.py
+msgid "the place"
+msgstr ""
+
 #: src/postulo/accounts/models.py
 msgid "The plugin whose calendar entries set the date, such as a monthly declaration."
 msgstr "Tarihi belirleyen takvim girdilerinin sahibi eklenti; örneğin aylık bir beyanname."
@@ -20522,9 +20983,13 @@ msgstr "İstek, bu çağrının en fazla okuduğu boyut olan %(limit)s değerind
 msgid "The request was not in the shape this call takes."
 msgstr "İstek, bu çağrının beklediği biçimde değildi."
 
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 msgid "The rest of the file is still worth importing. What is listed here is not, and you can add it by hand afterwards."
 msgstr "Dosyanın geri kalanı yine de içe aktarmaya değer. Burada listelenenler değil; onları sonradan elle ekleyebilirsiniz."
+
+#: src/postulo/templates/jobs/listing_search.html
+msgid "The results are shown and not kept. An advert is kept only once you review it and save it."
+msgstr ""
 
 #: src/postulo/templates/applications/application_intake.html
 #: src/postulo/templates/jobs/capture_review.html
@@ -20629,6 +21094,14 @@ msgstr "Sunucu bu kimlik bilgilerini geri çevirdi: %(detail)s"
 #: src/postulo/core/server_forms.py
 msgid "The server that accepts the mail — its name, not an address."
 msgstr "Postayı kabul eden sunucu — adresi değil, adı."
+
+#: src/postulo/jobs/listing_search.py
+msgid "The service's address is not one it declared."
+msgstr ""
+
+#: src/postulo/jobs/listing_search.py
+msgid "The service's answer could not be read."
+msgstr ""
 
 #: src/postulo/core/server_forms.py
 msgid "The service's base address. Left empty with Nominatim, OpenStreetMap's public instance is used: https://nominatim.openstreetmap.org. For your own: for example https://photon.example.org"
@@ -20882,6 +21355,10 @@ msgstr "Wheel paketinin üst verileri okunamıyor; paket bozuk olabilir."
 msgid "The wheel's metadata is far larger than any plugin's."
 msgstr "Wheel paketinin üst verileri, herhangi bir eklentininkinden çok daha büyük."
 
+#: src/postulo/jobs/search_views.py
+msgid "the words"
+msgstr ""
+
 #: src/postulo/templates/documents/rendered_compare.html
 msgid "The words are the same in both. If the two PDFs look different, what changed is how they are set: the theme, or the layout."
 msgstr "Sözcükler ikisinde de aynı. İki PDF farklı görünüyorsa değişen, nasıl dizildikleridir: tema ya da düzen."
@@ -20889,6 +21366,10 @@ msgstr "Sözcükler ikisinde de aynı. İki PDF farklı görünüyorsa değişen
 #: src/postulo/templates/documents/letter_detail.html
 msgid "The words without the layout, in this letter's language. None of these is filed as a version you sent."
 msgstr "Düzen olmadan yalnızca metin, bu mektubun dilinde. Bunların hiçbiri gönderdiğiniz bir sürüm olarak kaydedilmez."
+
+#: src/postulo/jobs/listing_search.py
+msgid "the words, the place and the filters searched for"
+msgstr ""
 
 #: src/postulo/core/errands.py
 msgid "The work was interrupted before it finished. Please try again."
@@ -22482,6 +22963,7 @@ msgid "Waiting after this one: %(count)s."
 msgstr "Bundan sonra bekleyen: %(count)s."
 
 #: src/postulo/applications/models.py src/postulo/jobs/models.py
+#: src/postulo/templates/jobs/listing_search.html
 msgid "Waiting for review"
 msgstr "Gözden geçirilmeyi bekliyor"
 
@@ -22573,7 +23055,8 @@ msgid "WebP image"
 msgstr "WebP görüntüsü"
 
 #: src/postulo/core/models.py src/postulo/core/web_links.py
-#: src/postulo/documents/printing.py src/postulo/jobs/tables.py
+#: src/postulo/documents/printing.py src/postulo/jobs/enrichment_offers.py
+#: src/postulo/jobs/tables.py
 #: src/postulo/templates/applications/interview_detail.html
 #: src/postulo/templates/jobs/company_detail.html
 msgid "Website"
@@ -22718,6 +23201,10 @@ msgstr "Bu dönemde gelen geri dönüşler"
 msgid "what came of it"
 msgstr "sonucu ne oldu"
 
+#: src/postulo/templates/resume/import.html
+msgid "What can be read here"
+msgstr ""
+
 #: src/postulo/core/server_forms.py
 msgid "What carries the mail off this machine."
 msgstr "Postayı bu makineden dışarı taşıyan şey."
@@ -22739,7 +23226,7 @@ msgstr "Değişenler: %(title)s"
 msgid "What changes how Postulo behaves for you. Everything here works from the keyboard, with a screen reader and with scripts off; these are the choices on top of that."
 msgstr "Postulo'nun sizin için nasıl davrandığını değiştirenler. Buradaki her şey klavyeyle, ekran okuyucuyla ve betikler kapalıyken çalışır; bunlar onun üzerine gelen seçeneklerdir."
 
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 msgid "What could not be read"
 msgstr "Okunamayanlar"
 
@@ -22800,7 +23287,7 @@ msgstr "Ajandada neler var, en yakını başta. Bir başvurunun sayfasından pla
 #: src/postulo/templates/applications/ical_import.html
 #: src/postulo/templates/core/kind_file.html
 #: src/postulo/templates/resume/candidate_file.html
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 msgid "What is in the file"
 msgstr "Dosyada ne var"
 
@@ -23059,6 +23546,7 @@ msgstr "Bu konuda ne yapılmalı, tek cümleyle."
 msgid "What to do. It is what the reminder says when it falls due."
 msgstr "Ne yapılacağı. Hatırlatmanın zamanı geldiğinde söylediği budur."
 
+#: src/postulo/templates/jobs/company_enrichment.html
 #: src/postulo/templates/jobs/company_register.html
 msgid "What to keep"
 msgstr "Saklanacaklar"
@@ -23118,6 +23606,10 @@ msgstr "Orada ne yaptığınız. “Belirtilmedi” hiçbir şey basmaz."
 #: src/postulo/jobs/widgets.py
 msgid "What you have noticed and not yet acted on, and what closes this week."
 msgstr "Fark ettiğiniz ama henüz üzerine gitmediğiniz şeyler ve bu hafta kapananlar."
+
+#: src/postulo/templates/jobs/company_enrichment.html
+msgid "What you have recorded is never replaced from here. Change it on the company's own page if a source is right."
+msgstr ""
 
 #: src/postulo/resume/models.py
 msgid "what you presented"
@@ -23215,6 +23707,10 @@ msgstr "İlanlarınıza ne zaman girdiği."
 msgid "When it happened, which is not always when you write it down."
 msgstr "Ne zaman olduğu; bu her zaman sizin onu yazdığınız an değildir."
 
+#: src/postulo/jobs/search_views.py
+msgid "when it was published"
+msgstr ""
+
 #: src/postulo/jobs/forms.py
 msgid "When the employer put it up, if the posting says. Empty means unknown."
 msgstr "İlan belirtiyorsa, işverenin onu yayımladığı tarih. Boş, bilinmiyor demektir."
@@ -23304,6 +23800,10 @@ msgstr "Birinin onu nerede kontrol edebileceği. CV bunu bağlantı olarak yazd�
 msgid "Where the companies' map takes the tiles it is drawn on, and whether addresses are pinned at their street."
 msgstr "Şirket haritasının üzerine çizildiği döşemeleri nereden aldığı ve adreslerin sokaklarına iğnelenip iğnelenmediği."
 
+#: src/postulo/templates/resume/import.html
+msgid "Where the file states no level, none is written: a level is a claim about yourself that somebody will test, so it is yours to make afterwards."
+msgstr ""
+
 #: src/postulo/jobs/models.py
 msgid "where the logo came from"
 msgstr "logonun nereden geldiği"
@@ -23361,6 +23861,10 @@ msgstr "Bu girdinin kendi bölümündeki yeri <a href=\"%(overview_url)s\" class
 #: src/postulo/templates/help/telephone_numbers.html
 msgid "Where this instance can send a code to a telephone, a number you have confirmed can also be the one that gets you back into your account. That choice is separate from the primary, so changing what a recruiter dials never changes how you prove it is you. The bin will not remove that number while it is your way in. Changing its digits makes it another number, which has to be confirmed again and is no longer your way in."
 msgstr "Bu kurulum bir telefona kod gönderebiliyorsa, onayladığınız bir numara hesabınıza yeniden girmenizi sağlayan numara da olabilir. Bu seçim birincilden ayrıdır; bu yüzden bir işe alım uzmanının aradığı numarayı değiştirmek, kimliğinizi nasıl kanıtladığınızı asla değiştirmez. Çöp kutusu, hesabınıza giriş yolunuz olduğu sürece o numarayı kaldırmaz. Rakamlarını değiştirmek onu başka bir numara yapar; bu numaranın yeniden onaylanması gerekir ve artık giriş yolunuz değildir."
+
+#: src/postulo/templates/cotton/enrichment_ask.html
+msgid "Where to ask"
+msgstr ""
 
 #: src/postulo/templates/server/register_lookup.html
 msgid "Where to get a key"
@@ -23774,6 +24278,10 @@ msgstr "Ahşap ürünler"
 msgid "Word document"
 msgstr "Word belgesi"
 
+#: src/postulo/jobs/search_views.py
+msgid "Words"
+msgstr ""
+
 #: src/postulo/accounts/forms.py
 msgid "Words and chevrons"
 msgstr "Sözcükler ve köşeli oklar"
@@ -23901,7 +24409,7 @@ msgstr "Yazan: <bdi>%(name)s</bdi>"
 msgid "Written by Postulo %(version)s on %(when)s."
 msgstr "Postulo %(version)s tarafından %(when)s tarihinde yazıldı."
 
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 #, python-format
 msgid "Written in %(tongue)s, which will be recorded as the language of your career record if you have not already set one."
 msgstr "%(tongue)s dilinde yazılmış; henüz bir dil belirlemediyseniz kariyer kaydınızın dili olarak bu kaydedilecek."
@@ -24490,7 +24998,7 @@ msgstr "Kaydınız (JSON)"
 
 #: src/postulo/templates/core/export.html
 #: src/postulo/templates/resume/candidate_file.html
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 msgid "Your record as a file"
 msgstr "Dosya olarak kaydınız"
 
@@ -24616,9 +25124,13 @@ msgstr "{value} ana makine adından sonra gelir: yolda, bir soru işaretinden ve
 msgid "· in the <a href=\"%(group_url)s\" class=\"underline\">%(name)s</a> group"
 msgstr "· <a href=\"%(group_url)s\" class=\"underline\">%(name)s</a> grubunda"
 
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 msgid "· no level in the file, so none will be claimed"
 msgstr "· dosyada düzey yok, bu yüzden hiçbir düzey iddia edilmeyecek"
+
+#: src/postulo/templates/resume/import.html
+msgid "· not a level Postulo keeps, so none will be claimed"
+msgstr ""
 
 #: src/postulo/templates/applications/application_detail.html
 #, python-format
