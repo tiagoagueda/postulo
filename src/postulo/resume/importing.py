@@ -14,6 +14,7 @@ lost.
 
 from __future__ import annotations
 
+import datetime as dt
 from dataclasses import dataclass, field
 
 from django.core.exceptions import ValidationError
@@ -27,10 +28,11 @@ from . import ordering
 
 @dataclass
 class Record:
-    """A career record, in Postulo's terms rather than Europass's.
+    """A career record, in Postulo's terms rather than the file's.
 
     The intermediate shape every reader produces. Everything downstream works on this, so
-    another format is another front door and not another mapping.
+    another format is another front door and not another mapping. `ROWS` says which keys a
+    row of each list holds.
     """
 
     #: Personal details, to fill blanks on the profile and never to overwrite.
@@ -65,6 +67,28 @@ class Record:
     locale: str = ""
     #: What was in the file and could not be read, in words, to be shown before importing.
     skipped: list[str] = field(default_factory=list)
+    #: Credentials somebody awarded: ``name``, and optionally ``issuer``, ``issued_on``,
+    #: ``expires_on`` and ``credential_url`` (#1260).
+    certifications: list[dict] = field(default_factory=list)
+    #: Prizes, scholarships and distinctions: ``title``, and optionally ``awarded_by``,
+    #: ``awarded_on``, ``summary`` and ``url`` (#1260).
+    honours: list[dict] = field(default_factory=list)
+    #: Learning that was taken and is neither a degree nor a credential: ``title``, and
+    #: optionally ``provider``, ``start_date``, ``end_date``, ``hours``, ``summary`` and
+    #: ``url`` (#1260).
+    courses: list[dict] = field(default_factory=list)
+    #: Published work: ``title``, and optionally ``publisher``, ``date`` -- text, a year, a
+    #: year and month or a whole date as ISO 8601 writes them, because that is what a
+    #: publication keeps -- ``url`` and ``doi`` (#1260).
+    publications: list[dict] = field(default_factory=list)
+    #: One sentence saying which format was read, in the reader's language, for the top of
+    #: the review: "Read as Europass XML, the format ... has written since 2020." The
+    #: importer writes it, because only the importer knows its formats (#1260).
+    source_label: str = ""
+    #: What was read and put somewhere a person might not expect, in words, shown on the
+    #: review before anything is written: a format's volunteering kept as memberships, say.
+    #: Not what could not be read, which is ``skipped`` (#1260).
+    notes: list[str] = field(default_factory=list)
 
     @property
     def is_empty(self) -> bool:
@@ -75,6 +99,10 @@ class Record:
                 self.languages,
                 self.skill_groups,
                 self.projects,
+                self.certifications,
+                self.honours,
+                self.courses,
+                self.publications,
                 self.memberships,
                 self.participations,
                 self.references,
@@ -88,10 +116,85 @@ class Record:
             "languages": len(self.languages),
             "skills": sum(len(group["skills"]) for group in self.skill_groups),
             "projects": len(self.projects),
+            "certifications": len(self.certifications),
+            "honours": len(self.honours),
+            "courses": len(self.courses),
+            "publications": len(self.publications),
             "memberships": len(self.memberships),
             "participations": len(self.participations),
             "references": len(self.references),
         }
+
+
+@dataclass(frozen=True)
+class Rows:
+    """What a row of one of a record's lists holds (#1260).
+
+    ``required`` are the keys the review and the writer read without asking whether they
+    are there; ``optional`` the ones read where present; ``dates`` which of either are a
+    ``datetime.date`` or ``None``. The contract an importer is held to by
+    `postulo.plugins.testing.assert_is_an_importer`, and what the page keeps between its
+    two steps.
+    """
+
+    required: tuple[str, ...]
+    optional: tuple[str, ...] = ()
+    dates: tuple[str, ...] = ()
+
+    @property
+    def known(self) -> tuple[str, ...]:
+        return (*self.required, *self.optional)
+
+
+_PERIOD = ("start_date", "end_date")
+
+#: Every list of a record, and the keys of its rows.
+ROWS: dict[str, Rows] = {
+    "experience": Rows(
+        ("role", "organisation", "location", "start_date", "end_date", "summary"),
+        ("highlights",),
+        _PERIOD,
+    ),
+    "education": Rows(
+        (
+            "qualification",
+            "institution",
+            "location",
+            "start_date",
+            "end_date",
+            "grade",
+            "highlights",
+        ),
+        ("eqf_level", "field_of_study"),
+        _PERIOD,
+    ),
+    # ``levels`` and ``stated`` are for the review only: what the file says about a level
+    # in more parts, or in other words, than the one level a language keeps.
+    "languages": Rows(("name", "proficiency"), ("code", "levels", "stated")),
+    "skill_groups": Rows(("name", "skills")),
+    "projects": Rows(
+        ("name",), ("summary", "role", "url", "start_date", "end_date", "highlights"), _PERIOD
+    ),
+    "certifications": Rows(
+        ("name",),
+        ("issuer", "issued_on", "expires_on", "credential_url"),
+        ("issued_on", "expires_on"),
+    ),
+    "honours": Rows(("title",), ("awarded_by", "awarded_on", "summary", "url"), ("awarded_on",)),
+    "courses": Rows(
+        ("title",), ("provider", "start_date", "end_date", "hours", "summary", "url"), _PERIOD
+    ),
+    "publications": Rows(("title",), ("publisher", "date", "url", "doi")),
+    "memberships": Rows(
+        ("organisation",), ("role", "start_date", "end_date", "summary", "url"), _PERIOD
+    ),
+    "participations": Rows(
+        ("event",),
+        ("title", "role", "kind", "start_date", "end_date", "place", "summary", "url"),
+        _PERIOD,
+    ),
+    "references": Rows(("name",), ("relationship", "email", "phone")),
+}
 
 
 @dataclass
@@ -194,6 +297,29 @@ def _clean_website(owner, site: str, report: Report) -> str:
     return form.cleaned_data["url"]
 
 
+def _words(entry: dict, key: str, limit: int | None = None) -> str:
+    """What a row says under a key, as text cut to its column, or nothing.
+
+    For the keys a row may leave out (#1260): a plugin's record is whatever it says, so a
+    number or a list where text belongs is nothing, never a failed import.
+    """
+    value = entry.get(key)
+    text = value.strip() if isinstance(value, str) else ""
+    return text[:limit] if limit else text
+
+
+def _day(entry: dict, key: str):
+    """A date a row gives under a key, or ``None`` for anything that is not one."""
+    value = entry.get(key)
+    return value if isinstance(value, dt.date) and not isinstance(value, dt.datetime) else None
+
+
+def _web_address(entry: dict, key: str, limit: int = 200) -> str:
+    """A file's address is a claim: only a web address that fits the column is kept."""
+    address = _words(entry, key)
+    return address if address.startswith(("http://", "https://")) and len(address) <= limit else ""
+
+
 def language_code_of(entry: dict) -> str:
     """The code a language of a record is chosen by, or nothing.
 
@@ -221,15 +347,20 @@ def apply(owner, record: Record) -> Report:
     from postulo.accounts.models import PersonIdentifier
     from postulo.core import postal
 
+    from . import publications
     from .models import (
+        Certification,
+        Course,
         Education,
         Experience,
+        Honour,
         LanguageSkill,
         Membership,
         Participation,
         ParticipationKind,
         ParticipationRole,
         Project,
+        Publication,
         Skill,
         SkillGroup,
     )
@@ -388,6 +519,8 @@ def apply(owner, record: Record) -> Report:
                 start_date=entry["start_date"],
                 end_date=entry["end_date"],
                 summary=entry["summary"],
+                # One achievement a line, where the file keeps them apart from the summary.
+                highlights=_words(entry, "highlights"),
             )
         )
     ordering.place_many(Experience, owner, experience)
@@ -400,6 +533,7 @@ def apply(owner, record: Record) -> Report:
             Education(
                 owner=owner,
                 qualification=entry["qualification"][:200],
+                field_of_study=_words(entry, "field_of_study", 200),
                 institution=entry["institution"][:200],
                 # Linked where the name is one of the person's companies, never added (#685).
                 company=company_named(owner, entry["institution"][:200]),
@@ -455,12 +589,124 @@ def apply(owner, record: Record) -> Report:
         report.added["skills"] = len(skills)
 
     projects = [
-        Project(owner=owner, name=entry["name"][:200], summary=entry.get("summary", ""))
+        Project(
+            owner=owner,
+            name=entry["name"][:200],
+            summary=entry.get("summary", ""),
+            role=_words(entry, "role", 200),
+            url=_web_address(entry, "url"),
+            start_date=_day(entry, "start_date"),
+            end_date=_day(entry, "end_date"),
+            highlights=_words(entry, "highlights"),
+        )
         for entry in record.projects
     ]
     ordering.place_many(Project, owner, projects)
     if projects:
         report.added["projects"] = len(projects)
+
+    # The four sections a record could not carry until #1260. Each needs only its name or
+    # title; an entry without one is left out, as a membership with no organisation is. The
+    # body that gave it is linked where it is one of the person's companies, never added.
+    certifications = []
+    for entry in record.certifications:
+        name = _words(entry, "name", 200)
+        if not name:
+            continue
+        issuer = _words(entry, "issuer", 200)
+        certifications.append(
+            Certification(
+                owner=owner,
+                name=name,
+                issuer=issuer,
+                company=company_named(owner, issuer),
+                issued_on=_day(entry, "issued_on"),
+                expires_on=_day(entry, "expires_on"),
+                credential_url=_web_address(entry, "credential_url"),
+            )
+        )
+    ordering.place_many(Certification, owner, certifications)
+    if certifications:
+        report.added["certifications"] = len(certifications)
+
+    honours = []
+    for entry in record.honours:
+        title = _words(entry, "title", 200)
+        if not title:
+            continue
+        giver = _words(entry, "awarded_by", 200)
+        honours.append(
+            Honour(
+                owner=owner,
+                title=title,
+                awarded_by=giver,
+                company=company_named(owner, giver),
+                awarded_on=_day(entry, "awarded_on"),
+                summary=_words(entry, "summary"),
+                url=_web_address(entry, "url"),
+            )
+        )
+    ordering.place_many(Honour, owner, honours)
+    if honours:
+        report.added["honours"] = len(honours)
+
+    courses = []
+    for entry in record.courses:
+        title = _words(entry, "title", 200)
+        if not title:
+            continue
+        provider = _words(entry, "provider", 200)
+        hours = entry.get("hours")
+        courses.append(
+            Course(
+                owner=owner,
+                title=title,
+                provider=provider,
+                company=company_named(owner, provider),
+                start_date=_day(entry, "start_date"),
+                end_date=_day(entry, "end_date"),
+                # The hours the form would take, or none: never a number cut to fit.
+                hours=hours
+                if type(hours) is int and Course.HOURS_MIN <= hours <= Course.HOURS_MAX
+                else None,
+                summary=_words(entry, "summary"),
+                url=_web_address(entry, "url"),
+            )
+        )
+    ordering.place_many(Course, owner, courses)
+    if courses:
+        report.added["courses"] = len(courses)
+
+    # A publication is held to the rules the form holds a person to, as one read from a
+    # bibliography file is (#687): a date or a DOI that is not shaped like one is left
+    # blank. Its type is *Other*, because a record does not say one and none is guessed;
+    # its key is made here, since `bulk_create` calls no `save`.
+    taken = set(
+        Publication.objects.for_user(owner).exclude(cite_key="").values_list("cite_key", flat=True)
+    )
+    published = []
+    for entry in record.publications:
+        title = _words(entry, "title", 500)
+        if not title:
+            continue
+        values = publications.sanitise(
+            {
+                "entry_type": "misc",
+                "title": title,
+                "publisher": _words(entry, "publisher", 200),
+                "date": _words(entry, "date", 10),
+                "doi": _words(entry, "doi", publications.DOI_MAX_LENGTH),
+                "url": _web_address(entry, "url", 500),
+            },
+            taken,
+        )
+        item = Publication(owner=owner, **values)
+        item.cite_key = item.free_cite_key(taken)
+        taken.add(item.cite_key)
+        published.append(item)
+    ordering.place_many(Publication, owner, published)
+    if published:
+        report.added["publications"] = len(published)
 
     memberships = []
     for entry in record.memberships:

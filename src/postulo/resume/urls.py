@@ -13,7 +13,10 @@ app_name = "resume"
 urlpatterns = [
     path("", views.ResumeOverviewView.as_view(), name="overview"),
     path("preview/", views.ResumePreviewView.as_view(), name="preview"),
-    path("import/", views.EuropassImportView.as_view(), name="europass_import"),
+    path("import/", views.CareerImportView.as_view(), name="import"),
+    # The name the page had while Europass was the only importer, kept for one release:
+    # the wiki told plugin authors to post their test file to it (#1260).
+    path("import/", views.CareerImportView.as_view(), name="europass_import"),
     # One person's own record as a file (#181). Neither address names a record: what is
     # downloaded and what is added to are the account of whoever is signed in.
     path("file/", views_candidate.CandidateFileView.as_view(), name="candidate_file"),

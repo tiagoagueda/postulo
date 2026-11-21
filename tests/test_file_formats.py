@@ -35,7 +35,10 @@ SUB_MODULES = {
     "europass": ("Europass import", "id-card"),
     # A CV downloaded in the two formats that carry its structure (#1100).
     "format-europass": ("Europass export", "id-card"),
-    "format-json-resume": ("JSON Resume", "braces"),
+    "format-json-resume": ("JSON Resume export", "braces"),
+    # The two importers that came with it (#1260).
+    "json-resume": ("JSON Resume import", "braces"),
+    "linkedin-archive": ("LinkedIn data archive import", "file-up"),
     "format-bibliography": ("Bibliography", "book-text"),
 }
 
