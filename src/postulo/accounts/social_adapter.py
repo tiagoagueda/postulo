@@ -8,10 +8,12 @@ default single sign-on signs in accounts that exist, and the identity provider o
 becomes the invitation when the operator says so.
 
 **Finding an account that already exists** is the other half, and it is worth being
-explicit about what it trusts. With ``POSTULO_OIDC_LINK_BY_EMAIL`` on, which is the
-default, somebody arriving through the provider is signed in as the local account holding
-the address the provider asserts. allauth only ever matches an address the provider
-marked verified, so an unverified claim links to nothing — but "verified" is the
+explicit about what it trusts. With ``POSTULO_OIDC_LINK_BY_EMAIL`` on, which it is not
+unless the operator says so (#892), somebody arriving through the provider is signed in as
+the local account holding the address the provider asserts, and only when that account has
+itself verified the address (#730). allauth only matches an address the provider marked
+verified, so an unverified claim links to nothing (a claim sent as the *string* "false" is
+the exception still open, #1300) — but "verified" is the
 provider's word, and the security of the whole arrangement is the operator's answer to
 one question: does *their* provider only mark an address verified when the person proved
 they hold it? For a Keycloak, Authentik or Pocket ID they run, yes. For an endpoint that
