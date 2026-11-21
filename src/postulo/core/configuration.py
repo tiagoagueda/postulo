@@ -697,6 +697,19 @@ _VARIABLES: tuple[Variable, ...] = (
         ),
     ),
     Variable(
+        "POSTULO_OIDC_PKCE",
+        Kind.BOOLEAN,
+        "sign-in",
+        "Whether single sign-on sends a PKCE challenge (S256) with the handshake.",
+        default=True,
+        notes=(
+            "PKCE ties the code the provider sends back to the sign-in that asked for it, so a "
+            "code caught on the way opens nothing. Keycloak, Authentik, Authelia, Entra ID and "
+            "Google accept it, and some providers require it. Turn it off only for a provider "
+            "that refuses the handshake because of it."
+        ),
+    ),
+    Variable(
         "POSTULO_OIDC_IS_SECOND_FACTOR",
         Kind.BOOLEAN,
         "sign-in",

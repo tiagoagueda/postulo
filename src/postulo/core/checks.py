@@ -211,6 +211,51 @@ def sso_linking_unchosen(app_configs=None, **kwargs) -> list[Warning]:
     ]
 
 
+#: Hosts a plain-`http` issuer may have without a warning: this machine, which no network
+#: stands between. The same names a browser treats as a secure context.
+LOOPBACK_NAMES = ("localhost",)
+
+
+def _loopback(host: str) -> bool:
+    import ipaddress
+
+    if host in LOOPBACK_NAMES or host.endswith(".localhost"):
+        return True
+    try:
+        return ipaddress.ip_address(host).is_loopback
+    except ValueError:
+        return False
+
+
+@register("postulo")
+def sso_issuer_over_http(app_configs=None, **kwargs) -> list[Warning]:
+    """A single sign-on issuer reached over plain `http` (#1261).
+
+    allauth does not check the signature of an ID token that came straight from the token
+    endpoint, which OpenID Connect allows because TLS to the issuer is the proof of where it
+    came from. Over plain `http` there is no proof: whoever stands between Postulo and the
+    provider can answer as the provider, and so say who is signing in. A warning and not an
+    error, because a test instance inside a mesh may use one knowingly; an issuer on this
+    machine is not warned about, since no network stands between the two.
+    """
+    from postulo.accounts import sso
+
+    if not sso.enabled():
+        return []
+    address = sso.server_url()
+    parts = urlsplit(address)
+    if parts.scheme != "http" or _loopback((parts.hostname or "").casefold()):
+        return []
+    return [
+        Warning(
+            f"POSTULO_OIDC_SERVER_URL is {address!r}, plain http: the provider's answers, and "
+            "so who is signed in as whom, are not protected on the way.",
+            hint="Reach the provider at an https:// address, even inside your own network.",
+            id="postulo.W008",
+        )
+    ]
+
+
 @register("postulo")
 def footer_links(app_configs=None, **kwargs) -> list[Error]:
     """The two addresses the foot of every page links to, when they are the operator's (#212).
