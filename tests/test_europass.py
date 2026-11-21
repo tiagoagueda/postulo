@@ -70,6 +70,11 @@ def test_it_reads_the_nested_shape_the_reader_was_first_written_to():
         "memberships": 0,
         "participations": 0,
         "references": 0,
+        # The four sections a record carries since #1260, none of which Europass fills.
+        "certifications": 0,
+        "honours": 0,
+        "courses": 0,
+        "publications": 0,
     }
     assert record.person["first_name"] == "Alex"
     assert record.person["email"] == "alex@example.org"
@@ -90,6 +95,11 @@ def test_it_reads_the_shape_the_schema_gives_a_cv(user):
         "memberships": 0,
         "participations": 0,
         "references": 0,
+        # The four sections a record carries since #1260, none of which Europass fills.
+        "certifications": 0,
+        "honours": 0,
+        "courses": 0,
+        "publications": 0,
     }
     assert record.person["phone"] == "+3225551234"
     assert record.person["website"] == "https://sam.example.org"
@@ -403,7 +413,7 @@ def test_confirming_writes_it_and_forgets_the_file(client, user):
     response = client.post(url, {"action": "confirm"}, follow=True)
 
     assert Experience.objects.filter(owner=user).count() == 2
-    assert client.session.get("europass_import") is None
+    assert client.session.get("career_import") is None
     assert response.redirect_chain[-1][0] == reverse("resume:overview")
 
 
@@ -414,7 +424,7 @@ def test_starting_again_drops_what_was_read(client, user):
 
     client.post(url, {"action": "forget"})
 
-    assert client.session.get("europass_import") is None
+    assert client.session.get("career_import") is None
     assert not Experience.objects.filter(owner=user).exists()
 
 
@@ -487,7 +497,7 @@ def test_what_is_held_between_the_two_steps_is_the_record_and_not_the_file(clien
 
     client.post(reverse("resume:europass_import"), {"file": upload()})
 
-    held = client.session["europass_import_data"]
+    held = client.session["career_import_data"]
     assert set(held) == {
         "person",
         "locale",
@@ -496,6 +506,10 @@ def test_what_is_held_between_the_two_steps_is_the_record_and_not_the_file(clien
         "languages",
         "skill_groups",
         "projects",
+        "certifications",
+        "honours",
+        "courses",
+        "publications",
         "memberships",
         "participations",
         "references",

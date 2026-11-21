@@ -1850,8 +1850,8 @@ msgid "<em>Headline</em> is a short professional title, such as “Backend engin
 msgstr "<em>პროფესიული სათაური</em> მოკლე პროფესიული სათაურია, მაგ. „Backend ინჟინერი“. CV, რომელსაც საკუთარი სათაური აქვს, მის ნაცვლად თავისას ბეჭდავს."
 
 #: src/postulo/templates/help/career.html
-msgid "<em>Import</em> reads a Europass CV; <em>Export</em> writes your details and your career as one file you can keep or move to another Postulo; <em>Preview</em> shows the whole record as a document, and <em>Your CVs</em> opens the variants made from it."
-msgstr "<em>იმპორტი</em> კითხულობს Europass CV-ს; <em>ექსპორტი</em> წერს თქვენს მონაცემებსა და თქვენს კარიერას ერთ ფაილად, რომლის შენახვაც ან სხვა Postulo-ზე გადატანაც შეგიძლიათ; <em>წინასწარი ხედი</em> აჩვენებს მთელ ისტორიას დოკუმენტის სახით, ხოლო <em>თქვენი CV-ები</em> ხსნის მისგან შექმნილ ვარიანტებს."
+msgid "<em>Import</em> reads a CV you have as a file; <em>Export</em> writes your details and your career as one file you can keep or move to another Postulo; <em>Preview</em> shows the whole record as a document, and <em>Your CVs</em> opens the variants made from it."
+msgstr ""
 
 #: src/postulo/templates/help/identifiers.html
 msgid "<em>Kind</em> is the register the identifier belongs to, and <em>What goes where</em> shows what each one looks like. <em>Other</em> takes anything else, with a name you give it."
@@ -2275,7 +2275,7 @@ msgstr "ფაილი თქვენი დოკუმენტებიდ�
 msgid "A file goes under Files first; an entry points at it rather than keeping a copy."
 msgstr "ფაილი ჯერ „ფაილებში“ თავსდება; ჩანაწერი მასზე მიუთითებს და ასლს არ ინახავს."
 
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 msgid "A file that Postulo itself wrote is read on a page of its own."
 msgstr "ფაილი, რომელიც თავად Postulo-მ დაწერა, საკუთარ გვერდზე იკითხება."
 
@@ -3167,7 +3167,7 @@ msgstr "უნარის დამატება"
 msgid "Add a tag"
 msgstr "იარლიყის დამატება"
 
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 msgid "Add all of this"
 msgstr "ყველაფრის დამატება"
 
@@ -3730,7 +3730,7 @@ msgstr "ხატულიანი ღილაკი"
 msgid "An identifier"
 msgstr "იდენტიფიკატორი"
 
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 msgid "An import only ever adds. Nothing already in your career record is changed or removed, and anything that turns out to be a duplicate is yours to delete."
 msgstr "იმპორტი მხოლოდ ამატებს. არაფერი, რაც უკვე თქვენს კარიერულ ჩანაწერშია, არ იცვლება და არ იშლება, ხოლო რაც დუბლიკატი აღმოჩნდება, მისი წაშლა თქვენზეა."
 
@@ -5208,7 +5208,8 @@ msgstr "სერტიფიკაცია"
 
 #: src/postulo/documents/rendering.py src/postulo/jobs/merging.py
 #: src/postulo/resume/candidate.py src/postulo/resume/registry.py
-#: src/postulo/resume/views_candidate.py
+#: src/postulo/resume/views.py src/postulo/resume/views_candidate.py
+#: src/postulo/templates/resume/import.html
 #: src/postulo/templates/resume/preview.html
 msgid "Certifications"
 msgstr "სერტიფიკაციები"
@@ -5396,13 +5397,10 @@ msgstr "აირჩიეთ ქვეყანა სიიდან."
 msgid "Choose a destination and save it first."
 msgstr "ჯერ აირჩიეთ დანიშნულების ადგილი და შეინახეთ."
 
-#: src/postulo/resume/views.py
-msgid "Choose a Europass file first."
-msgstr "ჯერ აირჩიეთ Europass-ის ფაილი."
-
 #: src/postulo/applications/views_ical.py src/postulo/core/views_kind_files.py
 #: src/postulo/jobs/vcard_views.py src/postulo/jobs/views.py
-#: src/postulo/resume/views_candidate.py src/postulo/resume/views_references.py
+#: src/postulo/resume/views.py src/postulo/resume/views_candidate.py
+#: src/postulo/resume/views_references.py
 msgid "Choose a file first."
 msgstr "ჯერ აირჩიეთ ფაილი."
 
@@ -5511,9 +5509,9 @@ msgstr "დაბადების თარიღის არჩევა კ
 msgid "Choose the destination"
 msgstr "დანიშნულების ადგილის არჩევა"
 
-#: src/postulo/templates/resume/europass_import.html
-msgid "Choose the PDF you downloaded from europass.europa.eu, as it is: the CV is attached inside it, and that is what Postulo reads. Older Europass files read too: the XML and PDF of the editor before 2020, and the JSON of its web service. Postulo works out which it is, shows you what is in it, and writes nothing until you say so."
-msgstr "აირჩიეთ PDF, რომელიც europass.europa.eu-დან ჩამოტვირთეთ, ისე, როგორც არის: CV მასშია მიმაგრებული და Postulo სწორედ მას კითხულობს. ძველი Europass ფაილებიც იკითხება: 2020 წლამდელი რედაქტორის XML და PDF და მისი ვებსერვისის JSON. Postulo თავად ადგენს, რომელი ფორმატია, გაჩვენებთ, რა არის მასში, და არაფერს ჩაწერს, სანამ არ დაადასტურებთ."
+#: src/postulo/templates/resume/import.html
+msgid "Choose the file as you downloaded it. Postulo works out which format it is, shows you what is in it, and writes nothing until you say so."
+msgstr ""
 
 #: src/postulo/accounts/forms.py src/postulo/jobs/forms.py
 msgid "Choose the type of identifier."
@@ -6163,7 +6161,8 @@ msgstr "კურსი"
 
 #: src/postulo/documents/rendering.py src/postulo/jobs/merging.py
 #: src/postulo/resume/candidate.py src/postulo/resume/registry.py
-#: src/postulo/resume/views_candidate.py
+#: src/postulo/resume/views.py src/postulo/resume/views_candidate.py
+#: src/postulo/templates/resume/import.html
 #: src/postulo/templates/resume/preview.html
 msgid "Courses"
 msgstr "კურსები"
@@ -7159,7 +7158,7 @@ msgstr "ელექტრონული კომერცია"
 msgid "Each invitation may be used once, and expires on its own. Its link is shown once, when it is made."
 msgstr "თითოეული მოწვევის გამოყენება ერთხელ შეიძლება და მას ვადა თავისით გასდის. მისი ბმული მხოლოდ ერთხელ ჩანს, შექმნისას."
 
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 msgid "Each is added as one of your contacts and as a reference you have not asked yet, so none is printed on a CV until you say they agreed."
 msgstr "თითოეული დაემატება როგორც თქვენი კონტაქტი და როგორც რეკომენდატორი, რომელსაც ჯერ არ ჰკითხეთ, ამიტომ არცერთი CV-ზე არ დაიბეჭდება, სანამ არ მიუთითებთ, რომ დათანხმდნენ."
 
@@ -7272,7 +7271,7 @@ msgstr "რედაქტორები"
 #: src/postulo/documents/rendering.py src/postulo/jobs/industries.py
 #: src/postulo/resume/candidate.py src/postulo/resume/registry.py
 #: src/postulo/resume/views_candidate.py
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 #: src/postulo/templates/resume/preview.html
 msgid "Education"
 msgstr "განათლება"
@@ -7487,11 +7486,7 @@ msgstr "ESCO უნარი"
 msgid "Europass"
 msgstr "Europass"
 
-#: src/postulo/core/transfers.py
-msgid "Europass import"
-msgstr "Europass-ის იმპორტი"
-
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 msgid "Europass records five levels per language and Postulo keeps one, so the lowest is taken. Where the file states none, none is written: a level is a claim about yourself that somebody will test, so it is yours to make afterwards."
 msgstr "Europass თითოეული ენისთვის ხუთ დონეს აღრიცხავს, Postulo კი ერთს ინახავს, ამიტომ აიღება ყველაზე დაბალი. სადაც ფაილში დონე მითითებული არ არის, არც აქ ჩაიწერება: დონე თქვენს შესახებ განცხადებაა, რომელსაც ვინმე გადაამოწმებს, ამიტომ მისი მითითება შემდეგ თქვენ გადასაწყვეტია."
 
@@ -7735,7 +7730,7 @@ msgstr "ლიკვიდირებულების გამორიც�
 
 #: src/postulo/documents/rendering.py src/postulo/resume/candidate.py
 #: src/postulo/resume/registry.py src/postulo/resume/views_candidate.py
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 #: src/postulo/templates/resume/preview.html
 msgid "Experience"
 msgstr "გამოცდილება"
@@ -8390,7 +8385,7 @@ msgstr "მოძიების წყარო"
 msgid "found via"
 msgstr "სად იპოვეთ"
 
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 #, python-format
 msgid "Found: %(names)s. Only the ones you have left blank will be filled in."
 msgstr "ნაპოვნია: %(names)s. შეივსება მხოლოდ ის, რაც ცარიელი დატოვეთ."
@@ -9021,7 +9016,8 @@ msgstr "ჯილდო ან პრემია"
 
 #: src/postulo/documents/rendering.py src/postulo/jobs/merging.py
 #: src/postulo/resume/candidate.py src/postulo/resume/registry.py
-#: src/postulo/resume/views_candidate.py
+#: src/postulo/resume/views.py src/postulo/resume/views_candidate.py
+#: src/postulo/templates/resume/import.html
 #: src/postulo/templates/resume/preview.html
 msgid "Honours and awards"
 msgstr "ჯილდოები და პრემიები"
@@ -9091,6 +9087,10 @@ msgstr "როგორ აღწევს დამსაქმებლამ�
 #: src/postulo/documents/models.py
 msgid "how it reaches the employer"
 msgstr "როგორ აღწევს დამსაქმებლამდე"
+
+#: src/postulo/templates/resume/import.html
+msgid "How it was read"
+msgstr ""
 
 #: src/postulo/applications/widgets.py
 msgid "How long they take"
@@ -9330,9 +9330,9 @@ msgstr "თუ ეს სარეკომენდაციო წერილ
 msgid "If you are reading this, the email settings of your Postulo instance work. Nothing else to do."
 msgstr "თუ ამას კითხულობთ, თქვენი Postulo-ს ინსტალაციის ფოსტის პარამეტრები მუშაობს. სხვა არაფერია გასაკეთებელი."
 
-#: src/postulo/templates/resume/europass_import.html
-msgid "If you have applied to an EU institution or through a national employment service, you already have this file. Rather than type it all again, hand it over."
-msgstr "თუ ევროკავშირის დაწესებულებაში ან ეროვნული დასაქმების სააგენტოს მეშვეობით გაგიგზავნიათ განაცხადი, ეს ფაილი უკვე გაქვთ. იმის ნაცვლად, რომ ყველაფერი თავიდან აკრიფოთ, უბრალოდ ატვირთეთ."
+#: src/postulo/templates/resume/import.html
+msgid "If your career is already written down in a file, hand it over rather than type it all again."
+msgstr ""
 
 #: src/postulo/core/models.py
 msgid "ignore robots.txt when capturing"
@@ -9354,9 +9354,9 @@ msgid "Import"
 msgstr "იმპორტი"
 
 #: src/postulo/resume/views.py src/postulo/templates/resume/candidate_file.html
-#: src/postulo/templates/resume/europass_import.html
-msgid "Import a Europass CV"
-msgstr "Europass CV-ის იმპორტი"
+#: src/postulo/templates/resume/import.html
+msgid "Import a CV"
+msgstr ""
 
 #: src/postulo/templates/applications/ical_import.html
 msgid "Import an iCalendar file"
@@ -10449,7 +10449,7 @@ msgstr "თქვენი კარიერული ჩანაწერი�
 #: src/postulo/documents/rendering.py src/postulo/resume/candidate.py
 #: src/postulo/resume/registry.py src/postulo/resume/views.py
 #: src/postulo/resume/views_candidate.py
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 #: src/postulo/templates/resume/preview.html
 msgid "Languages"
 msgstr "ენები"
@@ -11361,7 +11361,7 @@ msgstr "საწევრო ორგანიზაციები"
 #: src/postulo/documents/rendering.py src/postulo/jobs/merging.py
 #: src/postulo/resume/candidate.py src/postulo/resume/registry.py
 #: src/postulo/resume/views.py src/postulo/resume/views_candidate.py
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 #: src/postulo/templates/resume/preview.html
 msgid "Memberships"
 msgstr "წევრობები"
@@ -13154,6 +13154,14 @@ msgstr "ჯერ არაფერი გაგზავნილა."
 msgid "Nothing standing at Offer. Record one from an application's page when it arrives."
 msgstr "„შეთავაზების“ სტატუსზე არაფერია. როცა შეთავაზება მოვა, აღრიცხეთ ის განაცხადის გვერდიდან."
 
+#: src/postulo/resume/views.py
+msgid "Nothing that reads a CV from a file is switched on here, so that file was not read."
+msgstr ""
+
+#: src/postulo/templates/resume/import.html
+msgid "Nothing that reads a CV from a file is switched on here, so there is no file to choose."
+msgstr ""
+
 #: src/postulo/core/design.py src/postulo/templates/server/design.html
 msgid "Nothing there"
 msgstr "აქ არაფერია"
@@ -14543,7 +14551,7 @@ msgstr "ადამიანი"
 
 #: src/postulo/accounts/views.py src/postulo/core/help.py
 #: src/postulo/templates/accounts/profile.html
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 msgid "Personal details"
 msgstr "პირადი მონაცემები"
 
@@ -15128,7 +15136,7 @@ msgstr "დღემდე"
 #: src/postulo/documents/rendering.py src/postulo/resume/candidate.py
 #: src/postulo/resume/registry.py src/postulo/resume/views.py
 #: src/postulo/resume/views_candidate.py
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 #: src/postulo/templates/resume/preview.html
 msgid "Presentations, conferences and seminars"
 msgstr "პრეზენტაციები, კონფერენციები და სემინარები"
@@ -15363,7 +15371,7 @@ msgstr "პროექტი"
 
 #: src/postulo/documents/rendering.py src/postulo/resume/candidate.py
 #: src/postulo/resume/registry.py src/postulo/resume/views_candidate.py
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 #: src/postulo/templates/resume/preview.html
 msgid "Projects"
 msgstr "პროექტები"
@@ -15429,7 +15437,9 @@ msgid "Publication"
 msgstr "პუბლიკაცია"
 
 #: src/postulo/documents/rendering.py src/postulo/resume/candidate.py
-#: src/postulo/resume/registry.py src/postulo/resume/views_candidate.py
+#: src/postulo/resume/registry.py src/postulo/resume/views.py
+#: src/postulo/resume/views_candidate.py
+#: src/postulo/templates/resume/import.html
 #: src/postulo/templates/resume/preview.html
 msgid "Publications"
 msgstr "პუბლიკაციები"
@@ -15616,18 +15626,6 @@ msgstr "წაიკითხება როგორც"
 msgid "Read as %(name)s."
 msgstr "წაკითხულია როგორც %(name)s."
 
-#: src/postulo/resume/views.py
-msgid "Read as Europass JSON, the older format as the Europass web service wrote it until 2020."
-msgstr "წაკითხულია როგორც Europass JSON — ძველი ფორმატი, რომელსაც Europass-ის ვებსერვისი 2020 წლამდე წერდა."
-
-#: src/postulo/resume/views.py
-msgid "Read as Europass XML in the older format, the one the Europass editor wrote until 2020."
-msgstr "წაკითხულია როგორც Europass XML ძველ ფორმატში — იმაში, რომელსაც Europass-ის რედაქტორი 2020 წლამდე წერდა."
-
-#: src/postulo/resume/views.py
-msgid "Read as Europass XML, the format europass.europa.eu has written since 2020."
-msgstr "წაკითხულია როგორც Europass XML — ფორმატი, რომელსაც europass.europa.eu 2020 წლიდან წერს."
-
 #: src/postulo/jobs/models.py
 #, fuzzy
 msgid "read by"
@@ -15657,16 +15655,8 @@ msgstr "საიდან წაიკითხა"
 msgid "Read from <bdi>%(address)s</bdi>."
 msgstr "წაკითხულია მისამართიდან <bdi>%(address)s</bdi>."
 
-#: src/postulo/resume/views.py
-msgid "Read from the Europass XML attached to the PDF, in the older format the Europass editor wrote until 2020."
-msgstr "წაკითხულია PDF-ზე მიმაგრებული Europass XML-იდან, ძველ ფორმატში, რომელსაც Europass-ის რედაქტორი 2020 წლამდე წერდა."
-
-#: src/postulo/resume/views.py
-msgid "Read from the Europass XML attached to the PDF, the format europass.europa.eu has written since 2020."
-msgstr "წაკითხულია PDF-ზე მიმაგრებული Europass XML-იდან — ფორმატი, რომელსაც europass.europa.eu 2020 წლიდან წერს."
-
 #: src/postulo/templates/jobs/company_places.html
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 #: src/postulo/templates/resume/references.html
 #: src/postulo/templates/server/plugins.html
 msgid "Read it"
@@ -15973,8 +15963,7 @@ msgid "Reference letters they wrote"
 msgstr "მათ მიერ დაწერილი სარეკომენდაციო წერილები"
 
 #: src/postulo/documents/rendering.py src/postulo/resume/registry.py
-#: src/postulo/resume/views.py
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/resume/views.py src/postulo/templates/resume/import.html
 msgid "References"
 msgstr "რეკომენდაციები"
 
@@ -17585,7 +17574,7 @@ msgstr "უნარების ჯგუფები"
 #: src/postulo/resume/registry.py src/postulo/resume/views.py
 #: src/postulo/resume/views_candidate.py
 #: src/postulo/templates/cotton/listing_skills.html
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 #: src/postulo/templates/resume/preview.html
 msgid "Skills"
 msgstr "უნარები"
@@ -17867,7 +17856,7 @@ msgstr "პერსონალის დაქირავება"
 #: src/postulo/templates/core/kind_file.html
 #: src/postulo/templates/jobs/contact_vcards.html
 #: src/postulo/templates/resume/candidate_file.html
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 msgid "Start again"
 msgstr "თავიდან დაწყება"
 
@@ -19748,7 +19737,7 @@ msgstr "თანხა ისე, როგორც მათ დაწერ�
 #: src/postulo/templates/documents/upload_detail.html
 #: src/postulo/templates/jobs/contact_vcards.html
 #: src/postulo/templates/resume/candidate_file.html
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 msgid "The file"
 msgstr "ფაილი"
 
@@ -20475,7 +20464,7 @@ msgstr "მოთხოვნა აღემატება %(limit)s ზღვ
 msgid "The request was not in the shape this call takes."
 msgstr "მოთხოვნა არ იყო ისეთი ფორმის, როგორსაც ეს გამოძახება იღებს."
 
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 msgid "The rest of the file is still worth importing. What is listed here is not, and you can add it by hand afterwards."
 msgstr "ფაილის დანარჩენი ნაწილის იმპორტი მაინც ღირს. აქ ჩამოთვლილისა — არა, და მისი დამატება შემდეგ ხელით შეგიძლიათ."
 
@@ -22659,6 +22648,10 @@ msgstr "რა პასუხები მოვიდა ამ პერი�
 msgid "what came of it"
 msgstr "შედეგი"
 
+#: src/postulo/templates/resume/import.html
+msgid "What can be read here"
+msgstr ""
+
 #: src/postulo/core/server_forms.py
 msgid "What carries the mail off this machine."
 msgstr "რის მეშვეობით გადის ფოსტა ამ სერვერიდან."
@@ -22680,7 +22673,7 @@ msgstr "რა შეიცვალა: %(title)s"
 msgid "What changes how Postulo behaves for you. Everything here works from the keyboard, with a screen reader and with scripts off; these are the choices on top of that."
 msgstr "რა ცვლის Postulo-ს ქცევას თქვენთვის. აქ ყველაფერი მუშაობს კლავიატურიდან, ეკრანის წამკითხველით და გამორთული სკრიპტებით; ეს არჩევანი ამას ემატება."
 
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 msgid "What could not be read"
 msgstr "რისი წაკითხვა ვერ მოხერხდა"
 
@@ -22741,7 +22734,7 @@ msgstr "რა არის დღიურში, უახლოესიდ�
 #: src/postulo/templates/applications/ical_import.html
 #: src/postulo/templates/core/kind_file.html
 #: src/postulo/templates/resume/candidate_file.html
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 msgid "What is in the file"
 msgstr "რა არის ფაილში"
 
@@ -23242,6 +23235,10 @@ msgstr "სად შეუძლია ვინმეს მისი შე�
 #: src/postulo/templates/server/maps.html
 msgid "Where the companies' map takes the tiles it is drawn on, and whether addresses are pinned at their street."
 msgstr "საიდან იღებს კომპანიების რუკა ფილებს, რომლებზეც ის იხატება, და აღინიშნება თუ არა მისამართები ქუჩის მიხედვით."
+
+#: src/postulo/templates/resume/import.html
+msgid "Where the file states no level, none is written: a level is a claim about yourself that somebody will test, so it is yours to make afterwards."
+msgstr ""
 
 #: src/postulo/jobs/models.py
 msgid "where the logo came from"
@@ -23840,7 +23837,7 @@ msgstr "დაწერა <bdi>%(name)s</bdi>"
 msgid "Written by Postulo %(version)s on %(when)s."
 msgstr "შექმნილია: Postulo %(version)s, %(when)s."
 
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 #, python-format
 msgid "Written in %(tongue)s, which will be recorded as the language of your career record if you have not already set one."
 msgstr "დაწერილია ენაზე: %(tongue)s. ის თქვენი კარიერული ჩანაწერის ენად დაფიქსირდება, თუ ენა ჯერ არ მიგითითებიათ."
@@ -24427,7 +24424,7 @@ msgstr "თქვენი ჩანაწერი (JSON)"
 
 #: src/postulo/templates/core/export.html
 #: src/postulo/templates/resume/candidate_file.html
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 msgid "Your record as a file"
 msgstr "თქვენი მონაცემები ფაილად"
 
@@ -24553,9 +24550,13 @@ msgstr "{value} ჰოსტის შემდეგ უნდა იყოს:
 msgid "· in the <a href=\"%(group_url)s\" class=\"underline\">%(name)s</a> group"
 msgstr "· <a href=\"%(group_url)s\" class=\"underline\">%(name)s</a> ჯგუფში"
 
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 msgid "· no level in the file, so none will be claimed"
 msgstr "· ფაილში დონე არ არის, ამიტომ არცერთი დონე არ გამოცხადდება"
+
+#: src/postulo/templates/resume/import.html
+msgid "· not a level Postulo keeps, so none will be claimed"
+msgstr ""
 
 #: src/postulo/templates/applications/application_detail.html
 #, python-format

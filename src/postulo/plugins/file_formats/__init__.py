@@ -207,7 +207,9 @@ class EuropassFormat:
 @declares(
     shipped(
         name=JSON_RESUME,
-        label=_("JSON Resume"),
+        # "export", beside the importer's "JSON Resume import": two switches, and the words
+        # say which is which, as #911 did for Europass (#1260).
+        label=_("JSON Resume export"),
         kind="feature",
         parent=FILE_FORMATS,
         categories=("files",),
