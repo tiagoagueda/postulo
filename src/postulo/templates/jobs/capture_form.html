@@ -91,6 +91,12 @@
         <li>{% translate "Nothing is saved until you have reviewed it." %}</li>
       </ul>
 
+      {% if can_search_services %}
+        <p class="mb-4 text-sm" data-search-services>
+          <a href="{% url 'listings:search' %}" class="text-brand-600 underline dark:text-brand-400">{% translate "Or search a job service for adverts" %}</a>
+        </p>
+      {% endif %}
+
       <c-section-title>{% translate "Sources installed" %}</c-section-title>
       <ul class="space-y-1 text-sm text-ink-500 dark:text-ink-400">
         {% for source in sources %}

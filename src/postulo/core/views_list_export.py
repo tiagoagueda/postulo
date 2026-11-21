@@ -42,7 +42,7 @@ class TableExportView(LoginRequiredMixin, View):
 
     def get(self, request: HttpRequest, name: str) -> HttpResponse:
         from postulo.documents import paper as papers
-        from postulo.documents import themes
+        from postulo.documents import theme_choice, themes
 
         if "from" in request.GET:
             asked = QueryDict(urlsplit(request.GET.get("from", "")).query)
@@ -71,7 +71,11 @@ class TableExportView(LoginRequiredMixin, View):
                 "sort": table.sort_in_words(),
                 "columns": [str(column.label) for column in table.exported_columns],
                 "left_out": [str(column.label) for column in table.left_out],
-                "theme_choices": themes.choices_for(themes.Kind.LIST),
+                "theme_groups": themes.option_groups(
+                    theme_choice.offered_for(
+                        themes.Kind.LIST, request.user, list_export.language_for(request.user)
+                    )
+                ),
                 "chosen_theme": theme,
                 "language_choices": list_export.offered_languages(),
                 "chosen_language": list_export.language_for(request.user),

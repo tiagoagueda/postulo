@@ -1500,25 +1500,40 @@ msgstr "%(scheme)s: Das ist nicht die übliche Form."
 msgid "%(sent)s, %(failed)s; each document says which."
 msgstr "%(sent)s, %(failed)s; jedes Dokument sagt, was zutrifft."
 
-#: src/postulo/resume/lookups.py
+#: src/postulo/jobs/listing_search.py src/postulo/resume/lookups.py
 #, python-format
 msgid "%(service)s answered %(status)s."
 msgstr "%(service)s antwortete mit %(status)s."
 
-#: src/postulo/resume/lookups.py
+#: src/postulo/jobs/listing_search.py src/postulo/resume/lookups.py
 #, python-format
 msgid "%(service)s asked for fewer requests. Try again later."
 msgstr "%(service)s bat um weniger Anfragen. Versuchen Sie es später noch einmal."
 
-#: src/postulo/resume/lookups.py
+#: src/postulo/jobs/listing_search.py src/postulo/resume/lookups.py
 #, python-format
 msgid "%(service)s could not be reached."
 msgstr "%(service)s konnte nicht erreicht werden."
+
+#: src/postulo/jobs/listing_search.py
+#, python-format
+msgid "%(service)s did not accept that search."
+msgstr ""
+
+#: src/postulo/templates/jobs/listing_search.html
+#, python-format
+msgid "%(service)s does not search by %(criteria)s, so that was not sent."
+msgstr ""
 
 #: src/postulo/resume/lookups.py
 #, python-format
 msgid "%(service)s has no record in a form Postulo reads."
 msgstr "%(service)s hat keinen Eintrag in einer Form, die Postulo lesen kann."
+
+#: src/postulo/jobs/listing_search.py
+#, python-format
+msgid "%(service)s has nothing at the address it was asked at."
+msgstr ""
 
 #: src/postulo/core/web_links.py src/postulo/jobs/surface.py
 #, python-format
@@ -1530,6 +1545,11 @@ msgstr "%(service)s wird bereits von einer anderen Zeile verwendet."
 msgid "%(service)s knows no such identifier."
 msgstr "%(service)s kennt keine solche Kennung."
 
+#: src/postulo/jobs/listing_search.py
+#, python-format
+msgid "%(service)s no longer has that advert."
+msgstr ""
+
 #: src/postulo/resume/lookups.py
 #, python-format
 msgid "%(service)s redirected too many times."
@@ -1540,7 +1560,7 @@ msgstr "%(service)s hat zu oft weitergeleitet."
 msgid "%(service)s refused the look-ups (%(status)s). They are stopped."
 msgstr "%(service)s hat die Abfragen abgelehnt (%(status)s). Sie wurden angehalten."
 
-#: src/postulo/resume/lookups.py
+#: src/postulo/jobs/listing_search.py src/postulo/resume/lookups.py
 #, python-format
 msgid "%(service)s sent the request somewhere else."
 msgstr "%(service)s hat die Anfrage anderswohin weitergeleitet."
@@ -1550,10 +1570,20 @@ msgstr "%(service)s hat die Anfrage anderswohin weitergeleitet."
 msgid "%(service)s sent the request to an address Postulo does not dial."
 msgstr "%(service)s hat die Anfrage an eine Adresse weitergeleitet, die Postulo nicht aufruft."
 
-#: src/postulo/resume/lookups.py
+#: src/postulo/jobs/listing_search.py src/postulo/resume/lookups.py
 #, python-format
 msgid "%(service)s took too long to answer."
 msgstr "%(service)s hat zu lange für die Antwort gebraucht."
+
+#: src/postulo/jobs/listing_search.py
+#, python-format
+msgid "%(service)s's answer could not be read."
+msgstr ""
+
+#: src/postulo/jobs/listing_search.py
+#, python-format
+msgid "%(service)s's answer was larger than a page of adverts should be."
+msgstr ""
 
 #: src/postulo/resume/views.py
 #, python-format
@@ -1625,6 +1655,11 @@ msgstr ""
 #: src/postulo/jobs/enrichment.py
 #, python-format
 msgid "%(source)s's answer was larger than one company's should be."
+msgstr ""
+
+#: src/postulo/templates/jobs/listing_search.html
+#, python-format
+msgid "%(source)s: asked at %(hosts)s. It is sent the words, the place and the filters you search for, or an advert's number when you press Review, and nothing about you."
 msgstr ""
 
 #: src/postulo/applications/agenda.py
@@ -1949,8 +1984,8 @@ msgid "<em>Headline</em> is a short professional title, such as “Backend engin
 msgstr "<em>Titelzeile</em> ist ein kurzer Berufstitel, etwa „Backend-Entwickler“. Ein Lebenslauf mit eigener Titelzeile druckt stattdessen diese."
 
 #: src/postulo/templates/help/career.html
-msgid "<em>Import</em> reads a Europass CV; <em>Export</em> writes your details and your career as one file you can keep or move to another Postulo; <em>Preview</em> shows the whole record as a document, and <em>Your CVs</em> opens the variants made from it."
-msgstr "<em>Importieren</em> liest einen Europass-Lebenslauf; <em>Export</em> schreibt Ihre Angaben und Ihren Werdegang in eine Datei, die Sie aufbewahren oder in ein anderes Postulo übertragen können; <em>Vorschau</em> zeigt den gesamten Werdegang als Dokument, und <em>Ihre Lebensläufe</em> öffnet die daraus erstellten Varianten."
+msgid "<em>Import</em> reads a CV you have as a file; <em>Export</em> writes your details and your career as one file you can keep or move to another Postulo; <em>Preview</em> shows the whole record as a document, and <em>Your CVs</em> opens the variants made from it."
+msgstr ""
 
 #: src/postulo/templates/help/identifiers.html
 msgid "<em>Kind</em> is the register the identifier belongs to, and <em>What goes where</em> shows what each one looks like. <em>Other</em> takes anything else, with a name you give it."
@@ -2377,7 +2412,7 @@ msgstr "Eine Datei aus Ihren Dokumenten"
 msgid "A file goes under Files first; an entry points at it rather than keeping a copy."
 msgstr "Eine Datei kommt zuerst unter Dateien; ein Eintrag verweist darauf, statt eine Kopie zu behalten."
 
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 msgid "A file that Postulo itself wrote is read on a page of its own."
 msgstr "Eine Datei, die Postulo selbst geschrieben hat, wird auf einer eigenen Seite gelesen."
 
@@ -2426,6 +2461,10 @@ msgstr "Eine Überschrift, der Satz darunter und dann das, wofür die Karte da i
 #: src/postulo/jobs/vcards.py
 msgid "a job title"
 msgstr "eine Berufsbezeichnung"
+
+#: src/postulo/jobs/search_views.py
+msgid "A job title, a skill or an employer, as you would type it on the service."
+msgstr ""
 
 #: src/postulo/documents/integrity.py
 msgid "a JPEG picture"
@@ -2535,6 +2574,10 @@ msgstr "Eine Stellenanzeige ist eine Anzeige, die Sie bemerkt haben, bevor Sie e
 #: src/postulo/templates/core/import_csv.html
 msgid "A listing keeps its deadline, which the closing-soon notice then watches, and its tags are written into its description."
 msgstr "Eine Stellenanzeige behält ihre Frist, die der Hinweis auf baldigen Ablauf dann überwacht, und ihre Schlagwörter werden in ihre Beschreibung übernommen."
+
+#: src/postulo/templates/jobs/listing_search.html
+msgid "A listing like it"
+msgstr ""
 
 #: src/postulo/templates/jobs/capture_review.html
 msgid "A listing with this title at this company exists; a board that mints a fresh address per visit may be showing you the same advert."
@@ -3005,6 +3048,10 @@ msgstr "Ein Token lässt ein Werkzeug außerhalb von Postulo für Sie handeln �
 msgid "A town and a country alone are kept as a place. Nothing checks that an address exists, and a country Postulo has no rules for is free-form."
 msgstr "Ein Ort und ein Land allein werden als Ort gespeichert. Nichts prüft, ob eine Anschrift existiert, und für ein Land, für das Postulo keine Regeln hat, gilt Freitext."
 
+#: src/postulo/jobs/search_views.py
+msgid "A town or a region."
+msgstr ""
+
 #: src/postulo/resume/candidate.py
 msgid "A translation"
 msgstr "Eine Übersetzung"
@@ -3286,7 +3333,7 @@ msgstr "Fähigkeit hinzufügen"
 msgid "Add a tag"
 msgstr "Schlagwort hinzufügen"
 
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 msgid "Add all of this"
 msgstr "Alles übernehmen"
 
@@ -3538,6 +3585,10 @@ msgstr "Werbung"
 #: src/postulo/jobs/industries.py
 msgid "Advertising and marketing"
 msgstr "Werbung und Marketing"
+
+#: src/postulo/templates/jobs/listing_search.html
+msgid "Adverts found"
+msgstr ""
 
 #: src/postulo/applications/models.py
 msgid "adviser"
@@ -3860,7 +3911,7 @@ msgstr "Eine Symbolschaltfläche"
 msgid "An identifier"
 msgstr "Eine Kennung"
 
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 msgid "An import only ever adds. Nothing already in your career record is changed or removed, and anything that turns out to be a duplicate is yours to delete."
 msgstr "Ein Import fügt nur hinzu. Nichts, was bereits in Ihrem Werdegang steht, wird geändert oder entfernt, und was sich als Dublette erweist, können Sie selbst löschen."
 
@@ -4492,10 +4543,18 @@ msgstr "Asien"
 msgid "Asked"
 msgstr "Gefragt"
 
+#: src/postulo/jobs/search_views.py
+msgid "Asked for the advert. Check it before it becomes a listing."
+msgstr ""
+
 #: src/postulo/templates/server/record_of_processing.html
 #, fuzzy
 msgid "Asked only when somebody presses for it, one company at a time. Each is sent what is listed and nothing about the person asking."
 msgstr "Wird nur abgefragt, wenn jemand es auslöst, jeweils für ein Unternehmen. Jeder Dienst erhält, was aufgeführt ist, und nichts über die anfragende Person."
+
+#: src/postulo/templates/server/record_of_processing.html
+msgid "Asked only when somebody presses Search or Review. Each is sent what is listed and nothing about the person asking; nothing it answers is kept unless the person saves an advert."
+msgstr ""
 
 #: src/postulo/templates/connections/pairing.html
 #, python-format
@@ -4531,6 +4590,10 @@ msgstr "Verbände, Gesellschaften und Vereine, denen Sie angehören oder angehö
 #, fuzzy
 msgid "at"
 msgstr "bei"
+
+#: src/postulo/jobs/search_views.py
+msgid "At any time"
+msgstr ""
 
 #: src/postulo/templates/settings/appearance.html
 msgid "At each status"
@@ -4782,6 +4845,7 @@ msgstr "Zurück zu Ihren Angaben"
 
 #: src/postulo/templates/jobs/capture_decided.html
 #: src/postulo/templates/jobs/capture_page.html
+#: src/postulo/templates/jobs/listing_search.html
 msgid "Back to your listings"
 msgstr "Zurück zu Ihren Stellenanzeigen"
 
@@ -5367,7 +5431,8 @@ msgstr "Zertifizierung"
 
 #: src/postulo/documents/rendering.py src/postulo/jobs/merging.py
 #: src/postulo/resume/candidate.py src/postulo/resume/registry.py
-#: src/postulo/resume/views_candidate.py
+#: src/postulo/resume/views.py src/postulo/resume/views_candidate.py
+#: src/postulo/templates/resume/import.html
 #: src/postulo/templates/resume/preview.html
 msgid "Certifications"
 msgstr "Zertifizierungen"
@@ -5557,13 +5622,10 @@ msgstr "Wählen Sie ein Land aus der Liste."
 msgid "Choose a destination and save it first."
 msgstr "Wählen Sie zuerst ein Ziel und speichern Sie es."
 
-#: src/postulo/resume/views.py
-msgid "Choose a Europass file first."
-msgstr "Wählen Sie zuerst eine Europass-Datei aus."
-
 #: src/postulo/applications/views_ical.py src/postulo/core/views_kind_files.py
 #: src/postulo/jobs/vcard_views.py src/postulo/jobs/views.py
-#: src/postulo/resume/views_candidate.py src/postulo/resume/views_references.py
+#: src/postulo/resume/views.py src/postulo/resume/views_candidate.py
+#: src/postulo/resume/views_references.py
 msgid "Choose a file first."
 msgstr "Wählen Sie zuerst eine Datei."
 
@@ -5676,9 +5738,9 @@ msgstr "Geburtsdatum aus einem Kalender wählen"
 msgid "Choose the destination"
 msgstr "Ziel wählen"
 
-#: src/postulo/templates/resume/europass_import.html
-msgid "Choose the PDF you downloaded from europass.europa.eu, as it is: the CV is attached inside it, and that is what Postulo reads. Older Europass files read too: the XML and PDF of the editor before 2020, and the JSON of its web service. Postulo works out which it is, shows you what is in it, and writes nothing until you say so."
-msgstr "Wählen Sie das PDF, das Sie von europass.europa.eu heruntergeladen haben, so wie es ist: Der Lebenslauf ist darin angehängt, und den liest Postulo. Auch ältere Europass-Dateien werden gelesen: XML und PDF des Editors vor 2020 und das JSON seines Webdienstes. Postulo erkennt selbst, was es ist, zeigt Ihnen, was darin steht, und schreibt nichts, bevor Sie es sagen."
+#: src/postulo/templates/resume/import.html
+msgid "Choose the file as you downloaded it. Postulo works out which format it is, shows you what is in it, and writes nothing until you say so."
+msgstr ""
 
 #: src/postulo/accounts/forms.py src/postulo/jobs/forms.py
 msgid "Choose the type of identifier."
@@ -6333,7 +6395,8 @@ msgstr "Kurs"
 
 #: src/postulo/documents/rendering.py src/postulo/jobs/merging.py
 #: src/postulo/resume/candidate.py src/postulo/resume/registry.py
-#: src/postulo/resume/views_candidate.py
+#: src/postulo/resume/views.py src/postulo/resume/views_candidate.py
+#: src/postulo/templates/resume/import.html
 #: src/postulo/templates/resume/preview.html
 msgid "Courses"
 msgstr "Kurse"
@@ -7091,7 +7154,7 @@ msgid "document themes"
 msgstr "Dokument-Designs"
 
 #: src/postulo/core/help.py src/postulo/core/navigation.py
-#: src/postulo/documents/apps.py
+#: src/postulo/documents/apps.py src/postulo/plugins/categories.py
 #: src/postulo/templates/applications/application_detail.html
 #: src/postulo/templates/base.html
 #: src/postulo/templates/cotton/documents_nav.html
@@ -7332,7 +7395,7 @@ msgstr "E-Commerce"
 msgid "Each invitation may be used once, and expires on its own. Its link is shown once, when it is made."
 msgstr "Jede Einladung kann einmal verwendet werden und läuft von selbst ab. Ihr Link wird einmal angezeigt, wenn sie erstellt wird."
 
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 msgid "Each is added as one of your contacts and as a reference you have not asked yet, so none is printed on a CV until you say they agreed."
 msgstr "Jede Person wird als einer Ihrer Kontakte und als noch nicht gefragte Referenz hinzugefügt, sodass keine auf einem Lebenslauf gedruckt wird, bis Sie angeben, dass sie zugestimmt hat."
 
@@ -7445,7 +7508,7 @@ msgstr "Herausgeber"
 #: src/postulo/documents/rendering.py src/postulo/jobs/industries.py
 #: src/postulo/resume/candidate.py src/postulo/resume/registry.py
 #: src/postulo/resume/views_candidate.py
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 #: src/postulo/templates/resume/preview.html
 msgid "Education"
 msgstr "Ausbildung"
@@ -7664,11 +7727,7 @@ msgstr "ESCO-Fähigkeit"
 msgid "Europass"
 msgstr "Europass"
 
-#: src/postulo/core/transfers.py
-msgid "Europass import"
-msgstr "Europass-Import"
-
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 msgid "Europass records five levels per language and Postulo keeps one, so the lowest is taken. Where the file states none, none is written: a level is a claim about yourself that somebody will test, so it is yours to make afterwards."
 msgstr "Europass führt fünf Stufen je Sprache und Postulo behält eine, also wird die niedrigste genommen. Wo die Datei keine nennt, wird keine eingetragen: Eine Stufe ist eine Behauptung über Sie selbst, die jemand prüfen wird, also ist es an Ihnen, sie hinterher aufzustellen."
 
@@ -7910,7 +7969,7 @@ msgstr "Aufgelöste ausschließen"
 
 #: src/postulo/documents/rendering.py src/postulo/resume/candidate.py
 #: src/postulo/resume/registry.py src/postulo/resume/views_candidate.py
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 #: src/postulo/templates/resume/preview.html
 msgid "Experience"
 msgstr "Berufserfahrung"
@@ -8569,7 +8628,7 @@ msgstr "Gefunden über"
 msgid "found via"
 msgstr "gefunden über"
 
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 #, python-format
 msgid "Found: %(names)s. Only the ones you have left blank will be filled in."
 msgstr "Gefunden: %(names)s. Nur die Felder, die Sie leer gelassen haben, werden gefüllt."
@@ -9200,7 +9259,8 @@ msgstr "Ehrung oder Auszeichnung"
 
 #: src/postulo/documents/rendering.py src/postulo/jobs/merging.py
 #: src/postulo/resume/candidate.py src/postulo/resume/registry.py
-#: src/postulo/resume/views_candidate.py
+#: src/postulo/resume/views.py src/postulo/resume/views_candidate.py
+#: src/postulo/templates/resume/import.html
 #: src/postulo/templates/resume/preview.html
 msgid "Honours and awards"
 msgstr "Ehrungen und Auszeichnungen"
@@ -9272,6 +9332,10 @@ msgstr "Übermittlungsweg"
 #, fuzzy
 msgid "how it reaches the employer"
 msgstr "Übermittlungsweg"
+
+#: src/postulo/templates/resume/import.html
+msgid "How it was read"
+msgstr ""
 
 #: src/postulo/applications/widgets.py
 msgid "How long they take"
@@ -9512,9 +9576,9 @@ msgstr "Wenn dies ein Referenzschreiben ist"
 msgid "If you are reading this, the email settings of your Postulo instance work. Nothing else to do."
 msgstr "Wenn Sie das lesen, funktionieren die E-Mail-Einstellungen Ihrer Postulo-Instanz. Nichts weiter zu tun."
 
-#: src/postulo/templates/resume/europass_import.html
-msgid "If you have applied to an EU institution or through a national employment service, you already have this file. Rather than type it all again, hand it over."
-msgstr "Wenn Sie sich bei einer EU-Einrichtung oder über eine nationale Arbeitsverwaltung beworben haben, besitzen Sie diese Datei bereits. Statt alles noch einmal einzutippen, laden Sie sie einfach hoch."
+#: src/postulo/templates/resume/import.html
+msgid "If your career is already written down in a file, hand it over rather than type it all again."
+msgstr ""
 
 #: src/postulo/core/models.py
 msgid "ignore robots.txt when capturing"
@@ -9536,9 +9600,9 @@ msgid "Import"
 msgstr "Importieren"
 
 #: src/postulo/resume/views.py src/postulo/templates/resume/candidate_file.html
-#: src/postulo/templates/resume/europass_import.html
-msgid "Import a Europass CV"
-msgstr "Europass-Lebenslauf importieren"
+#: src/postulo/templates/resume/import.html
+msgid "Import a CV"
+msgstr ""
 
 #: src/postulo/templates/applications/ical_import.html
 msgid "Import an iCalendar file"
@@ -9692,6 +9756,13 @@ msgstr "Zweimal in der Datei"
 msgid "In the instance's time zone."
 msgstr "In der Zeitzone der Instanz."
 
+#: src/postulo/jobs/search_views.py
+#, python-format
+msgid "In the last day"
+msgid_plural "In the last %(count)d days"
+msgstr[0] ""
+msgstr[1] ""
+
 #: src/postulo/core/search.py
 #, python-format
 msgid "in the motivation letter rendered on %(when)s"
@@ -9729,6 +9800,10 @@ msgstr "im Bericht, den Sie am %(when)s an %(company)s gesendet haben"
 #: src/postulo/templates/documents/rendered_compare.html
 msgid "In this version, and not in the one before"
 msgstr "In dieser, aber nicht in der vorherigen Version"
+
+#: src/postulo/templates/jobs/listing_search.html
+msgid "In your listings"
+msgstr ""
 
 #: src/postulo/applications/forms.py
 msgid "In your time zone."
@@ -10324,6 +10399,10 @@ msgstr "anhand der Straße"
 msgid "Its street will be looked up with %(service)s shortly."
 msgstr "Die Straße wird in Kürze über %(service)s nachgeschlagen."
 
+#: src/postulo/templates/jobs/listing_search.html
+msgid "Its terms of use"
+msgstr ""
+
 #: src/postulo/core/models.py
 #, fuzzy
 msgid "its town"
@@ -10349,6 +10428,18 @@ msgstr "Bericht über die Arbeitssuche"
 #, python-format
 msgid "Job search report · %(period)s"
 msgstr "Bericht zur Stellensuche · %(period)s"
+
+#: src/postulo/jobs/search_views.py
+msgid "Job service"
+msgstr ""
+
+#: src/postulo/plugins/kinds.py
+msgid "Job services"
+msgstr ""
+
+#: src/postulo/templates/server/record_of_processing.html
+msgid "Job services it may search"
+msgstr ""
 
 #: src/postulo/applications/forms.py src/postulo/jobs/forms.py
 #: src/postulo/jobs/models.py
@@ -10640,7 +10731,7 @@ msgstr "Sprache Ihres Werdegangs"
 #: src/postulo/documents/rendering.py src/postulo/resume/candidate.py
 #: src/postulo/resume/registry.py src/postulo/resume/views.py
 #: src/postulo/resume/views_candidate.py
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 #: src/postulo/templates/resume/preview.html
 msgid "Languages"
 msgstr "Sprachen"
@@ -11047,6 +11138,10 @@ msgstr "Niveau 8"
 #: src/postulo/templates/server/plugins.html
 msgid "Licence"
 msgstr "Lizenz"
+
+#: src/postulo/templates/jobs/listing_search.html
+msgid "Licence of its adverts:"
+msgstr ""
 
 #: src/postulo/accounts/models.py src/postulo/core/context_processors.py
 msgid "Light"
@@ -11558,7 +11653,7 @@ msgstr "Mitgliedsorganisationen"
 #: src/postulo/documents/rendering.py src/postulo/jobs/merging.py
 #: src/postulo/resume/candidate.py src/postulo/resume/registry.py
 #: src/postulo/resume/views.py src/postulo/resume/views_candidate.py
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 #: src/postulo/templates/resume/preview.html
 msgid "Memberships"
 msgstr "Mitgliedschaften"
@@ -12197,6 +12292,7 @@ msgid "Next month"
 msgstr "Nächster Monat"
 
 #: src/postulo/templates/cotton/document_viewer.html
+#: src/postulo/templates/jobs/listing_search.html
 msgid "Next page"
 msgstr "Nächste Seite"
 
@@ -13251,6 +13347,10 @@ msgstr ""
 msgid "Nothing kept yet. Keep what you typed into the employer's form, so you can see what they were told."
 msgstr "Noch nichts gespeichert. Speichern Sie, was Sie in das Formular des Arbeitgebers eingegeben haben, damit Sie sehen können, was ihm mitgeteilt wurde."
 
+#: src/postulo/templates/jobs/listing_search.html
+msgid "Nothing matches that search."
+msgstr ""
+
 #: src/postulo/templates/applications/application_list.html
 #: src/postulo/templates/jobs/company_list.html
 #: src/postulo/templates/jobs/listing_list.html
@@ -13365,6 +13465,14 @@ msgstr "Noch nichts gesendet."
 #: src/postulo/templates/applications/offer_compare.html
 msgid "Nothing standing at Offer. Record one from an application's page when it arrives."
 msgstr "Keine Bewerbung steht bei „Angebot“. Erfassen Sie ein Angebot auf der Seite der Bewerbung, sobald es eintrifft."
+
+#: src/postulo/resume/views.py
+msgid "Nothing that reads a CV from a file is switched on here, so that file was not read."
+msgstr ""
+
+#: src/postulo/templates/resume/import.html
+msgid "Nothing that reads a CV from a file is switched on here, so there is no file to choose."
+msgstr ""
 
 #: src/postulo/templates/jobs/company_enrichment.html
 msgid "Nothing that was found can be added to what the company already has."
@@ -13800,6 +13908,13 @@ msgstr "Ein Erfolg pro Zeile."
 #: src/postulo/documents/forms.py
 msgid "One address: the person you met, or your contact for this application, or the company's own. It is needed to send, and noted on the timeline when it is given."
 msgstr "Eine Adresse: die Person, die Sie getroffen haben, oder Ihr Kontakt für diese Bewerbung oder die des Unternehmens selbst. Sie wird zum Senden benötigt und in der Chronik vermerkt, wenn sie angegeben ist."
+
+#: src/postulo/templates/jobs/listing_search.html
+#, python-format
+msgid "One advert found"
+msgid_plural "%(counter)s adverts found"
+msgstr[0] ""
+msgstr[1] ""
 
 #: src/postulo/templates/applications/report.html
 #, python-format
@@ -14257,6 +14372,10 @@ msgstr "Oder ein neuer Kontakt"
 msgid "Or say only this"
 msgstr "Oder nur dies angeben"
 
+#: src/postulo/templates/jobs/capture_form.html
+msgid "Or search a job service for adverts"
+msgstr ""
+
 #: src/postulo/templates/jobs/move_owner.html
 msgid "Or to a person"
 msgstr "Oder an eine Person"
@@ -14359,6 +14478,10 @@ msgstr "Andere Pronomen"
 #: src/postulo/jobs/industries.py
 msgid "Other services"
 msgstr "Sonstige Dienstleistungen"
+
+#: src/postulo/documents/themes.py
+msgid "Other themes"
+msgstr ""
 
 #: src/postulo/accounts/forms.py
 msgid "Other time zones"
@@ -14757,7 +14880,7 @@ msgstr "Person"
 
 #: src/postulo/accounts/views.py src/postulo/core/help.py
 #: src/postulo/templates/accounts/profile.html
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 msgid "Personal details"
 msgstr "Persönliche Angaben"
 
@@ -14844,7 +14967,7 @@ msgstr "Auf %(version)s festgelegt"
 msgid "Pinned to a version"
 msgstr "Auf eine Version festgelegt"
 
-#: src/postulo/core/models.py
+#: src/postulo/core/models.py src/postulo/jobs/search_views.py
 msgid "Place"
 msgstr "Ort"
 
@@ -15342,7 +15465,7 @@ msgstr "heute"
 #: src/postulo/documents/rendering.py src/postulo/resume/candidate.py
 #: src/postulo/resume/registry.py src/postulo/resume/views.py
 #: src/postulo/resume/views_candidate.py
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 #: src/postulo/templates/resume/preview.html
 msgid "Presentations, conferences and seminars"
 msgstr "Vorträge, Konferenzen und Seminare"
@@ -15578,7 +15701,7 @@ msgstr "Projekt"
 
 #: src/postulo/documents/rendering.py src/postulo/resume/candidate.py
 #: src/postulo/resume/registry.py src/postulo/resume/views_candidate.py
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 #: src/postulo/templates/resume/preview.html
 msgid "Projects"
 msgstr "Projekte"
@@ -15644,7 +15767,9 @@ msgid "Publication"
 msgstr "Veröffentlichung"
 
 #: src/postulo/documents/rendering.py src/postulo/resume/candidate.py
-#: src/postulo/resume/registry.py src/postulo/resume/views_candidate.py
+#: src/postulo/resume/registry.py src/postulo/resume/views.py
+#: src/postulo/resume/views_candidate.py
+#: src/postulo/templates/resume/import.html
 #: src/postulo/templates/resume/preview.html
 msgid "Publications"
 msgstr "Veröffentlichungen"
@@ -15656,6 +15781,15 @@ msgstr "Veröffentlichungen"
 #: src/postulo/templates/resume/references.html
 msgid "Publications in the file"
 msgstr "Veröffentlichungen in der Datei"
+
+#: src/postulo/jobs/search_views.py
+msgid "Published"
+msgstr ""
+
+#: src/postulo/templates/jobs/listing_search.html
+#, python-format
+msgid "Published %(when)s"
+msgstr ""
 
 #: src/postulo/resume/models.py
 msgid "published in"
@@ -15833,18 +15967,6 @@ msgstr "Lesen als"
 msgid "Read as %(name)s."
 msgstr "Gelesen als %(name)s."
 
-#: src/postulo/resume/views.py
-msgid "Read as Europass JSON, the older format as the Europass web service wrote it until 2020."
-msgstr "Als Europass-JSON gelesen, das ältere Format, wie der Europass-Webdienst es bis 2020 schrieb."
-
-#: src/postulo/resume/views.py
-msgid "Read as Europass XML in the older format, the one the Europass editor wrote until 2020."
-msgstr "Als Europass-XML im älteren Format gelesen, wie der Europass-Editor es bis 2020 schrieb."
-
-#: src/postulo/resume/views.py
-msgid "Read as Europass XML, the format europass.europa.eu has written since 2020."
-msgstr "Als Europass-XML gelesen, das Format, das europass.europa.eu seit 2020 schreibt."
-
 #: src/postulo/jobs/models.py
 msgid "read by"
 msgstr "gelesen von"
@@ -15873,16 +15995,8 @@ msgstr "Gelesen aus"
 msgid "Read from <bdi>%(address)s</bdi>."
 msgstr "Gelesen aus <bdi>%(address)s</bdi>."
 
-#: src/postulo/resume/views.py
-msgid "Read from the Europass XML attached to the PDF, in the older format the Europass editor wrote until 2020."
-msgstr "Aus dem an das PDF angehängten Europass-XML gelesen, im älteren Format, das der Europass-Editor bis 2020 schrieb."
-
-#: src/postulo/resume/views.py
-msgid "Read from the Europass XML attached to the PDF, the format europass.europa.eu has written since 2020."
-msgstr "Aus dem an das PDF angehängten Europass-XML gelesen, dem Format, das europass.europa.eu seit 2020 schreibt."
-
 #: src/postulo/templates/jobs/company_places.html
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 #: src/postulo/templates/resume/references.html
 #: src/postulo/templates/server/plugins.html
 msgid "Read it"
@@ -16190,8 +16304,7 @@ msgid "Reference letters they wrote"
 msgstr "Von dieser Person verfasste Referenzschreiben"
 
 #: src/postulo/documents/rendering.py src/postulo/resume/registry.py
-#: src/postulo/resume/views.py
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/resume/views.py src/postulo/templates/resume/import.html
 msgid "References"
 msgstr "Referenzen"
 
@@ -16365,6 +16478,14 @@ msgstr "Remote"
 #: src/postulo/plugins/models.py
 msgid "remote address"
 msgstr "entfernte Adresse"
+
+#: src/postulo/jobs/search_views.py
+msgid "Remote work only"
+msgstr ""
+
+#: src/postulo/jobs/search_views.py
+msgid "remote work only"
+msgstr ""
 
 #: src/postulo/templates/accounts/profile.html
 #: src/postulo/templates/connections/confirm_delete.html
@@ -16573,6 +16694,7 @@ msgstr "Reverse-Proxy"
 
 #: src/postulo/templates/jobs/capture_list.html
 #: src/postulo/templates/jobs/listing_list.html
+#: src/postulo/templates/jobs/listing_search.html
 msgid "Review"
 msgstr "Prüfen"
 
@@ -16885,6 +17007,14 @@ msgstr "Geben Sie an, um welche Kennung es sich handelt."
 msgid "Say what this number is."
 msgstr "Geben Sie an, um welche Nummer es sich handelt."
 
+#: src/postulo/jobs/listing_search.py
+msgid "Say what to search for."
+msgstr ""
+
+#: src/postulo/jobs/search_views.py
+msgid "Say what to search for: some words, or a place."
+msgstr ""
+
 #: src/postulo/applications/forms.py
 msgid "Say which currency the amount is in."
 msgstr "Geben Sie an, in welcher Währung der Betrag steht."
@@ -16963,9 +17093,15 @@ msgstr "Siegel nicht von Postulo geprüft"
 #: src/postulo/templates/core/search.html
 #: src/postulo/templates/cotton/site_search.html
 #: src/postulo/templates/jobs/industry_list.html
+#: src/postulo/templates/jobs/listing_search.html
 #: src/postulo/templates/resume/answer_list.html
 msgid "Search"
 msgstr "Suchen"
+
+#: src/postulo/templates/jobs/listing_list.html
+#: src/postulo/templates/jobs/listing_search.html
+msgid "Search a job service"
+msgstr ""
 
 #: src/postulo/applications/tables.py
 msgid "Search applications"
@@ -16995,6 +17131,10 @@ msgstr "Briefe durchsuchen"
 #: src/postulo/jobs/tables.py
 msgid "Search listings"
 msgstr "Stellenanzeigen durchsuchen"
+
+#: src/postulo/templates/jobs/listing_search.html
+msgid "Search the adverts a job service publishes, and review the one you want before it becomes a listing. Nothing is asked until you press Search."
+msgstr ""
 
 #: src/postulo/applications/views.py
 msgid "Search the calendar"
@@ -17367,6 +17507,10 @@ msgstr "Erledigt"
 #: src/postulo/templates/server/design.html
 msgid "Seven colours, each tuned to 3:1 against the card in both themes."
 msgstr "Sieben Farben, jede auf 3:1 gegenüber der Karte abgestimmt, in beiden Designs."
+
+#: src/postulo/jobs/search_views.py
+msgid "Several countries"
+msgstr ""
 
 #: src/postulo/jobs/enrichment_offers.py
 msgid "Several social profiles are switched off."
@@ -17816,7 +17960,7 @@ msgstr "Fähigkeitsgruppen"
 #: src/postulo/resume/registry.py src/postulo/resume/views.py
 #: src/postulo/resume/views_candidate.py
 #: src/postulo/templates/cotton/listing_skills.html
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 #: src/postulo/templates/resume/preview.html
 msgid "Skills"
 msgstr "Fähigkeiten"
@@ -18096,7 +18240,7 @@ msgstr "Personaldienstleistungen"
 #: src/postulo/templates/core/kind_file.html
 #: src/postulo/templates/jobs/contact_vcards.html
 #: src/postulo/templates/resume/candidate_file.html
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 msgid "Start again"
 msgstr "Neu beginnen"
 
@@ -18345,6 +18489,10 @@ msgstr "Aus meinem ORCID-Eintrag vorschlagen"
 #: src/postulo/applications/models.py
 msgid "suggested by"
 msgstr "vorgeschlagen von"
+
+#: src/postulo/documents/themes.py
+msgid "Suggested for this document"
+msgstr ""
 
 #: src/postulo/applications/models.py
 msgid "suggested status"
@@ -18742,6 +18890,10 @@ msgstr "Diese Adresse hat zu oft weitergeleitet."
 #, python-format
 msgid "That address returned %(kind)s rather than a web page."
 msgstr "Diese Adresse lieferte %(kind)s statt einer Webseite."
+
+#: src/postulo/jobs/listing_search.py
+msgid "That advert cannot be asked of this service."
+msgstr ""
 
 #: src/postulo/documents/slow.py
 msgid "That application is no longer here."
@@ -19175,6 +19327,10 @@ msgstr "Das ist keine Kennung eines Wikidata-Datenobjekts."
 msgid "That is not an address Postulo can use."
 msgstr "Das ist keine Adresse, die Postulo verwenden kann."
 
+#: src/postulo/jobs/listing_search.py
+msgid "That is not an advert this service could have named."
+msgstr ""
+
 #: src/postulo/core/offsite.py
 msgid "That is not an age recipient. It starts age1 and is 62 characters long."
 msgstr "Das ist kein age-Empfänger. Er beginnt mit age1 und ist 62 Zeichen lang."
@@ -19280,6 +19436,10 @@ msgstr "Dieses Objekt ist bereits mit %(record)s gekoppelt. Entkoppeln Sie es zu
 #: src/postulo/plugins/pairing.py
 msgid "That item is no longer on the other side."
 msgstr "Dieses Objekt ist auf der anderen Seite nicht mehr vorhanden."
+
+#: src/postulo/jobs/search_views.py
+msgid "That job service is not offered here."
+msgstr ""
 
 #: src/postulo/templates/account/recovery_unusable.html
 msgid "That link cannot be used"
@@ -19403,6 +19563,14 @@ msgstr "Diese Antwort kam nicht von einer Anfrage, die Postulo gestellt hat."
 #: src/postulo/core/views_access.py
 msgid "That rule existed, and is changed."
 msgstr "Diese Regel bestand bereits und wurde geändert."
+
+#: src/postulo/jobs/listing_search.py
+msgid "That search cannot be asked of this service."
+msgstr ""
+
+#: src/postulo/jobs/listing_search.py
+msgid "That search is longer than a service can be asked."
+msgstr ""
 
 #: src/postulo/applications/views.py
 msgid "That suggestion has already been answered."
@@ -19979,7 +20147,7 @@ msgstr "Die Zahl, wie sie geschrieben wurde, vor Steuern."
 #: src/postulo/templates/documents/upload_detail.html
 #: src/postulo/templates/jobs/contact_vcards.html
 #: src/postulo/templates/resume/candidate_file.html
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 msgid "The file"
 msgstr "Die Datei"
 
@@ -20582,6 +20750,10 @@ msgstr "Das Foto aus Ihren Angaben, neben Ihrem Namen. Es ist im PDF und in der 
 msgid "The picture that stands for you on these pages: one you upload, your Gravatar, or your initials."
 msgstr "Das Bild, das Sie auf diesen Seiten vertritt: eines, das Sie hochladen, Ihr Gravatar oder Ihre Initialen."
 
+#: src/postulo/jobs/search_views.py
+msgid "the place"
+msgstr ""
+
 #: src/postulo/accounts/models.py
 msgid "The plugin whose calendar entries set the date, such as a monthly declaration."
 msgstr "Das Plugin, dessen Kalendereinträge das Datum bestimmen, etwa eine monatliche Meldung."
@@ -20715,9 +20887,13 @@ msgstr "Die Anfrage ist größer als %(limit)s, die Höchstgrenze, die dieser Au
 msgid "The request was not in the shape this call takes."
 msgstr "Die Anfrage hatte nicht die Form, die dieser Aufruf annimmt."
 
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 msgid "The rest of the file is still worth importing. What is listed here is not, and you can add it by hand afterwards."
 msgstr "Der Rest der Datei ist trotzdem einen Import wert. Was hier steht, ist es nicht; Sie können es danach von Hand ergänzen."
+
+#: src/postulo/templates/jobs/listing_search.html
+msgid "The results are shown and not kept. An advert is kept only once you review it and save it."
+msgstr ""
 
 #: src/postulo/templates/applications/application_intake.html
 #: src/postulo/templates/jobs/capture_review.html
@@ -20821,6 +20997,14 @@ msgstr "Der Server hat diese Zugangsdaten abgelehnt: %(detail)s"
 #: src/postulo/core/server_forms.py
 msgid "The server that accepts the mail — its name, not an address."
 msgstr "Der Server, der die E-Mail annimmt – sein Name, keine Adresse."
+
+#: src/postulo/jobs/listing_search.py
+msgid "The service's address is not one it declared."
+msgstr ""
+
+#: src/postulo/jobs/listing_search.py
+msgid "The service's answer could not be read."
+msgstr ""
 
 #: src/postulo/core/server_forms.py
 msgid "The service's base address. Left empty with Nominatim, OpenStreetMap's public instance is used: https://nominatim.openstreetmap.org. For your own: for example https://photon.example.org"
@@ -21076,6 +21260,10 @@ msgstr "Die Metadaten des Wheels können nicht gelesen werden; es ist möglicher
 msgid "The wheel's metadata is far larger than any plugin's."
 msgstr "Die Metadaten des Wheels sind weit größer als die jedes Plugins."
 
+#: src/postulo/jobs/search_views.py
+msgid "the words"
+msgstr ""
+
 #: src/postulo/templates/documents/rendered_compare.html
 msgid "The words are the same in both. If the two PDFs look different, what changed is how they are set: the theme, or the layout."
 msgstr "Die Worte sind in beiden gleich. Sehen die beiden PDFs verschieden aus, hat sich geändert, wie sie gesetzt sind: das Design oder das Layout."
@@ -21083,6 +21271,10 @@ msgstr "Die Worte sind in beiden gleich. Sehen die beiden PDFs verschieden aus, 
 #: src/postulo/templates/documents/letter_detail.html
 msgid "The words without the layout, in this letter's language. None of these is filed as a version you sent."
 msgstr "Der Text ohne Layout, in der Sprache dieses Briefes. Keine dieser Fassungen wird als gesendete Version abgelegt."
+
+#: src/postulo/jobs/listing_search.py
+msgid "the words, the place and the filters searched for"
+msgstr ""
 
 #: src/postulo/core/errands.py
 msgid "The work was interrupted before it finished. Please try again."
@@ -22666,6 +22858,7 @@ msgid "Waiting after this one: %(count)s."
 msgstr "Danach warten noch: %(count)s."
 
 #: src/postulo/applications/models.py src/postulo/jobs/models.py
+#: src/postulo/templates/jobs/listing_search.html
 msgid "Waiting for review"
 msgstr "Wartet auf Prüfung"
 
@@ -22892,6 +23085,10 @@ msgstr "Was in diesem Zeitraum zurückkam"
 msgid "what came of it"
 msgstr "was daraus wurde"
 
+#: src/postulo/templates/resume/import.html
+msgid "What can be read here"
+msgstr ""
+
 #: src/postulo/core/server_forms.py
 msgid "What carries the mail off this machine."
 msgstr "Was die E-Mails von diesem Rechner aus versendet."
@@ -22913,7 +23110,7 @@ msgstr "Was sich in %(title)s geändert hat"
 msgid "What changes how Postulo behaves for you. Everything here works from the keyboard, with a screen reader and with scripts off; these are the choices on top of that."
 msgstr "Einstellungen, die ändern, wie sich Postulo für Sie verhält. Alles hier funktioniert mit der Tastatur, mit einem Screenreader und ohne Skripte; dies sind die Wahlmöglichkeiten darüber hinaus."
 
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 msgid "What could not be read"
 msgstr "Was nicht gelesen werden konnte"
 
@@ -22974,7 +23171,7 @@ msgstr "Was im Terminkalender steht, das Nächste zuerst. Planen Sie ein Gesprä
 #: src/postulo/templates/applications/ical_import.html
 #: src/postulo/templates/core/kind_file.html
 #: src/postulo/templates/resume/candidate_file.html
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 msgid "What is in the file"
 msgstr "Was in der Datei steht"
 
@@ -23395,6 +23592,10 @@ msgstr "Wann sie in Ihre Anzeigen kam."
 msgid "When it happened, which is not always when you write it down."
 msgstr "Wann es geschah, was nicht immer der Zeitpunkt ist, zu dem Sie es aufschreiben."
 
+#: src/postulo/jobs/search_views.py
+msgid "when it was published"
+msgstr ""
+
 #: src/postulo/jobs/forms.py
 msgid "When the employer put it up, if the posting says. Empty means unknown."
 msgstr "Wann der Arbeitgeber sie veröffentlicht hat, falls die Stellenanzeige es angibt. Leer heißt unbekannt."
@@ -23483,6 +23684,10 @@ msgstr "Wo man es prüfen kann. Ein Lebenslauf druckt es als Link."
 #: src/postulo/templates/server/maps.html
 msgid "Where the companies' map takes the tiles it is drawn on, and whether addresses are pinned at their street."
 msgstr "Woher die Unternehmenskarte die Kacheln bezieht, auf denen sie dargestellt wird, und ob Adressen an ihrer Straße markiert werden."
+
+#: src/postulo/templates/resume/import.html
+msgid "Where the file states no level, none is written: a level is a claim about yourself that somebody will test, so it is yours to make afterwards."
+msgstr ""
 
 #: src/postulo/jobs/models.py
 msgid "where the logo came from"
@@ -23961,6 +24166,10 @@ msgstr "Holzwaren"
 msgid "Word document"
 msgstr "Word-Dokument"
 
+#: src/postulo/jobs/search_views.py
+msgid "Words"
+msgstr ""
+
 #: src/postulo/accounts/forms.py
 msgid "Words and chevrons"
 msgstr "Wörter und Pfeile"
@@ -24088,7 +24297,7 @@ msgstr "Verfasst von <bdi>%(name)s</bdi>"
 msgid "Written by Postulo %(version)s on %(when)s."
 msgstr "Geschrieben von Postulo %(version)s am %(when)s."
 
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 #, python-format
 msgid "Written in %(tongue)s, which will be recorded as the language of your career record if you have not already set one."
 msgstr "Auf %(tongue)s verfasst; dies wird als Sprache Ihres Werdegangs gespeichert, falls Sie noch keine festgelegt haben."
@@ -24676,7 +24885,7 @@ msgstr "Ihr Datensatz (JSON)"
 
 #: src/postulo/templates/core/export.html
 #: src/postulo/templates/resume/candidate_file.html
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 msgid "Your record as a file"
 msgstr "Ihr Werdegang als Datei"
 
@@ -24807,9 +25016,13 @@ msgstr "{value} kommt nach dem Host: im Pfad, nach einem Fragezeichen oder nach 
 msgid "· in the <a href=\"%(group_url)s\" class=\"underline\">%(name)s</a> group"
 msgstr "· in der Gruppe <a href=\"%(group_url)s\" class=\"underline\">%(name)s</a>"
 
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 msgid "· no level in the file, so none will be claimed"
 msgstr "· keine Stufe in der Datei, daher wird keine angegeben"
+
+#: src/postulo/templates/resume/import.html
+msgid "· not a level Postulo keeps, so none will be claimed"
+msgstr ""
 
 #: src/postulo/templates/applications/application_detail.html
 #, python-format

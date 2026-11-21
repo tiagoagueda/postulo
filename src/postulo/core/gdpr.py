@@ -611,7 +611,8 @@ def record_of_processing() -> dict:
     """What the instance processes, why, and who receives it — drawn at read time.
 
     And which outside services it may call on a person's press (`outside_services`): the
-    company registers, while *Register lookup* is on (#1021).
+    company registers, while *Register lookup* is on (#1021); and the job services it may
+    search, while *Listing search* and the service are on (`job_services`, #1253).
 
     Every installed plugin is a purpose: what it is, and the one line it says it does.
     Every connection is a recipient, counted by plugin and kind: the label and the
@@ -652,6 +653,7 @@ def record_of_processing() -> dict:
         "recipients": recipients,
         "geocoder": geocoder,
         "services": outside_services(),
+        "job_services": job_services(),
     }
 
 
@@ -668,6 +670,18 @@ def outside_services() -> list[dict]:
 
     found = register_lookup.services() if register_lookup.offered_anywhere() else []
     return found + enrichment.services()
+
+
+def job_services() -> list[dict]:
+    """The job services a person's press can make this instance search, and what each is
+    sent (#1253).
+
+    Drawn from the listing searches installed, and only those somebody here can reach: the
+    feature and the service's own switch on, for the instance or for an account.
+    """
+    from postulo.jobs import listing_search
+
+    return listing_search.services()
 
 
 # ---------------------------------------------------------------------- the notice

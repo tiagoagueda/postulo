@@ -280,11 +280,11 @@ def test_an_importer_that_is_off_does_not_read_the_persons_file(mode, client, us
     undo = switch_off(mode, "europass", user, monkeypatch)
 
     client.post(url, {"file": upload()})
-    assert client.session.get("europass_import") is None
+    assert client.session.get("career_import") is None
 
     undo()
     client.post(url, {"file": upload()})
-    assert client.session.get("europass_import")
+    assert client.session.get("career_import")
 
 
 # ----------------------------------------------------------------------- outboxes

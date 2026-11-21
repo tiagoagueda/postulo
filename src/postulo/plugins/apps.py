@@ -20,6 +20,7 @@ class PluginsConfig(AppConfig):
         from .identifiers import Identifiers
         from .installing import activate
         from .link_services import LinkServices
+        from .listing_search import ListingSearches
         from .messaging_services import MessagingServices
         from .nace import Nace
         from .register_lookup import RegisterAdapters
@@ -42,6 +43,9 @@ class PluginsConfig(AppConfig):
         # And the company registers Register lookup may ask (#1021): a registry, which the
         # feature beside it switches.
         register_builtin("register-adapter", RegisterAdapters)
+        # And the job services Listing search may search (#1253): a registry, which the
+        # feature and a switch per service decide about.
+        register_builtin("listing-search", ListingSearches)
         # And the vocabularies a field suggests from (#1252): NACE for industries, offline
         # and on by default.
         register_builtin("suggestion-source", Nace)

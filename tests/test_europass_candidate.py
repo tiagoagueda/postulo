@@ -265,6 +265,11 @@ def test_the_format_europass_writes_today_reads():
         "skills": 5,
         "projects": 1,
         "references": 0,
+        # The four sections a record carries since #1260, none of which Europass fills.
+        "certifications": 0,
+        "honours": 0,
+        "courses": 0,
+        "publications": 0,
     }
     assert record.person["first_name"] == "Alex"
     assert record.person["last_name"] == "Morgan"
@@ -915,6 +920,11 @@ def test_a_real_download_reads():
         "memberships": 0,
         "participations": 0,
         "references": 0,
+        # The four sections a record carries since #1260, none of which Europass fills.
+        "certifications": 0,
+        "honours": 0,
+        "courses": 0,
+        "publications": 0,
     }
     assert record.skipped == []
 
@@ -1243,7 +1253,7 @@ def test_nothing_is_read_as_an_honour():
     record = europass.read(data)
 
     assert [row["organisation"] for row in record.memberships] == ["Club"]
-    assert not hasattr(record, "honours")
+    assert record.honours == [], "a record has honours since #1260; Europass fills none"
 
 
 def test_no_citation_count_is_invented_from_a_file(user):

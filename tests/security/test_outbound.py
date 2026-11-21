@@ -2005,3 +2005,90 @@ def test_every_register_postulo_ships_is_asked_on_its_own_public_name_over_https
         "api.company-information.service.gov.uk",
         "api.gleif.org",
     }
+
+
+# ------------------------------------------------- a job service's search (#1253)
+#
+# *Listing search* asks the hosts each listing search declares, through the public-only client
+# as a register lookup does: a service whose name answers with a private address is refused
+# whatever the operator allowed for connections, the socket goes to the address that was
+# checked, nothing is followed, and what was typed reaches a parameter's value alone.
+
+
+def _listing_search():
+    from postulo.jobs import listing_search
+
+    return listing_search, listing_search.ListingSearch(
+        key="xx-jobs",
+        label="Example Jobs",
+        countries=(),
+        languages=(),
+        hosts=("jobs.example",),
+        supports=frozenset({"words"}),
+        request=lambda criteria: ("https://jobs.example/search", {"q": criteria.words}),
+        read=lambda document, criteria: listing_search.Results(),
+        one=lambda key: (f"https://jobs.example/adverts/{key}", {}),
+        read_one=lambda document, key: None,
+        source="Example Jobs",
+        licence="CC0 1.0",
+    )
+
+
+def test_a_listing_search_dials_the_address_it_approved(monkeypatch):
+    listing_search, search = _listing_search()
+    resolving(monkeypatch, {"jobs.example": PUBLIC})
+    transport, seen = recorder(200, b"{}", "application/json")
+    _register_client(monkeypatch, transport)
+
+    listing_search.search(search, listing_search.Criteria(words="nurse&host=evil.example"))
+
+    assert str(seen[0].url.host) == "93.184.216.34", "the socket went to the approved address"
+    assert seen[0].headers["Host"] == "jobs.example"
+    assert seen[0].url.params["q"] == "nurse&host=evil.example"
+    assert seen[0].url.path == "/search"
+
+
+@pytest.mark.parametrize("allowed", [False, True])
+def test_a_listing_search_on_a_private_address_is_refused_whatever_connections_allow(
+    monkeypatch, settings, allowed
+):
+    listing_search, search = _listing_search()
+    settings.POSTULO_CONNECTIONS_ALLOW_PRIVATE = allowed
+    resolving(monkeypatch, {})
+    transport, seen = recorder()
+    _register_client(monkeypatch, transport)
+
+    with pytest.raises(listing_search.SearchRefused):
+        listing_search.search(search, listing_search.Criteria(words="nurse"))
+
+    assert seen == [], "nothing was sent"
+
+
+def test_a_listing_search_that_redirects_onto_the_network_is_not_followed(monkeypatch):
+    listing_search, search = _listing_search()
+    resolving(monkeypatch, {"jobs.example": PUBLIC})
+    seen: list[httpx.Request] = []
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        seen.append(snapshot(request))
+        return httpx.Response(302, headers={"Location": "http://192.168.1.50/"})
+
+    _register_client(monkeypatch, httpx.MockTransport(handler))
+
+    with pytest.raises(listing_search.SearchRefused, match="somewhere else"):
+        listing_search.advert(search, "1001")
+
+    assert len(seen) == 1, "the hop onto the network was never opened"
+
+
+def test_every_job_service_postulo_ships_is_asked_on_its_own_public_name_over_https():
+    """The destinations are a fixed list, and the list is the searches' own declarations."""
+    from postulo.jobs import listing_search
+    from postulo.plugins.listing_search.sweden import SEARCHES
+
+    hosts = {host for search in SEARCHES for host in search.hosts}
+    assert hosts == {"jobsearch.api.jobtechdev.se"}
+    for search in SEARCHES:
+        for criteria in (listing_search.Criteria(words="x"), listing_search.Criteria(page=100)):
+            address = httpx.URL(search.request(criteria)[0])
+            assert address.scheme == "https" and address.host in search.hosts

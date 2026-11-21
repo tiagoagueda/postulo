@@ -230,6 +230,11 @@ EXCUSED: dict[str, str] = {
         "fetch it sends you to the company's page, so the walk never finds it drawn (#673)"
     ),
     "jobs:company_names": "a form's answer that adds or removes one name and goes back (#673)",
+    "listings:search": (
+        "a job service's search, offered only while Listing search is on, which starts off and "
+        "which the walk leaves off; tests/e2e/test_listing_search.py turns it on and runs axe "
+        "over the form and its results in both themes (#1253)"
+    ),
     "jobs:company_register": (
         "what a press of Look up brought back from a company register, held in the session; "
         "without a lookup it sends you to the company's page, and the walk makes no request "
@@ -302,6 +307,10 @@ EXCUSED: dict[str, str] = {
     "listings:shortlist": "a POST from the listings table",
     "listings:discard": "a POST from the listings table",
     "listings:restore": "a POST that brings a discarded listing back",
+    "resume:europass_import": (
+        "the name `resume:import` had while Europass was the only importer, kept for one "
+        "release; the same address, which is walked under its own name (#1260)"
+    ),
     "resume:item_move": "a POST that reorders one entry in the career record",
     "resume:skill_suggestions": (
         "the `<option>` elements the skill box asks for as somebody types, as a fragment "

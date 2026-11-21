@@ -697,6 +697,19 @@ _VARIABLES: tuple[Variable, ...] = (
         ),
     ),
     Variable(
+        "POSTULO_OIDC_PKCE",
+        Kind.BOOLEAN,
+        "sign-in",
+        "Whether single sign-on sends a PKCE challenge (S256) with the handshake.",
+        default=True,
+        notes=(
+            "PKCE ties the code the provider sends back to the sign-in that asked for it, so a "
+            "code caught on the way opens nothing. Keycloak, Authentik, Authelia, Entra ID and "
+            "Google accept it, and some providers require it. Turn it off only for a provider "
+            "that refuses the handshake because of it."
+        ),
+    ),
+    Variable(
         "POSTULO_OIDC_IS_SECOND_FACTOR",
         Kind.BOOLEAN,
         "sign-in",
@@ -1449,6 +1462,13 @@ _VARIABLES: tuple[Variable, ...] = (
             "Counted once per source per press, for a source that answers on hosts of its own. "
             "One that reads the company's own website counts against POSTULO_FETCH_RATE."
         ),
+    ),
+    _rate(
+        "POSTULO_LISTING_SEARCH_RATE",
+        "60/h",
+        "Searches of a job service, and reviews of an advert found there, per account.",
+        notes="Each press is one request to the service, counted before it is made; turning "
+        "a page is another press (#1253).",
     ),
     _rate("POSTULO_API_RATE", "600/h", "Calls one API token may make."),
     _rate(

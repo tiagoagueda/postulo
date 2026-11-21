@@ -238,6 +238,28 @@ def _first_reply_days(applications) -> dict[int, int]:
     return days
 
 
+def held_interview_sources(user, *, start=None, end=None):
+    """The two records an interview that was held can be in: ``(diary, entries)``.
+
+    The diary's interviews settled as held, and the *interview* entries typed onto a
+    timeline with no diary row behind them, each scoped to ``user`` and to the dates given.
+    An entry dated to the same application and moment as a diary row is that interview
+    twice, and whoever reads both removes it (`interviews_held` counts them; the report
+    lists them one by one, #1262), so the number and the list cannot disagree.
+    """
+    diary = Interview.objects.for_user(user).filter(outcome=InterviewOutcome.DONE)
+    entries = ApplicationEvent.objects.for_user(user).filter(
+        kind=EventKind.INTERVIEW, interview__isnull=True
+    )
+    if start is not None:
+        diary = diary.filter(starts_at__date__gte=start)
+        entries = entries.filter(occurred_at__date__gte=start)
+    if end is not None:
+        diary = diary.filter(starts_at__date__lte=end)
+        entries = entries.filter(occurred_at__date__lte=end)
+    return diary, entries
+
+
 def interviews_held(user, *, start=None, end=None) -> int:
     """How many interviews were actually attended, from the diary and the timeline together.
 
@@ -257,17 +279,7 @@ def interviews_held(user, *, start=None, end=None) -> int:
     alone (#448): moving the interview or settling it again changes the count once, and
     the entry keeps what was written. Nobody showing up is an entry of its own kind.
     """
-    diary = Interview.objects.for_user(user).filter(outcome=InterviewOutcome.DONE)
-    entries = ApplicationEvent.objects.for_user(user).filter(
-        kind=EventKind.INTERVIEW, interview__isnull=True
-    )
-    if start is not None:
-        diary = diary.filter(starts_at__date__gte=start)
-        entries = entries.filter(occurred_at__date__gte=start)
-    if end is not None:
-        diary = diary.filter(starts_at__date__lte=end)
-        entries = entries.filter(occurred_at__date__lte=end)
-
+    diary, entries = held_interview_sources(user, start=start, end=end)
     held = diary.count()
     twins = set(diary.values_list("application_id", "starts_at"))
     typed = sum(

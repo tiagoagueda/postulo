@@ -10,6 +10,8 @@ rather than to Europass, because "every plugin author remembers" is not a contro
 from __future__ import annotations
 
 import codecs
+import datetime as dt
+from pathlib import Path
 
 import pytest
 from django.urls import reverse
@@ -41,7 +43,7 @@ def test_an_importer_is_checked_against_its_own_protocol():
 
 def test_europass_ships_in_the_box():
     found = registry.plugins("importer")
-    assert [plugin.name for plugin in found] == ["europass"]
+    assert [plugin.name for plugin in found] == ["europass", "json-resume", "linkedin-archive"]
     assert isinstance(found[0], EuropassImporter)
 
 
@@ -297,7 +299,12 @@ def test_the_group_is_advertised():
 
 def test_a_third_party_importer_is_loaded_and_asked_first(installed):
     found = registry.plugins("importer")
-    assert [plugin.name for plugin in found] == ["hr-xml", "europass"]
+    assert [plugin.name for plugin in found] == [
+        "hr-xml",
+        "europass",
+        "json-resume",
+        "linkedin-archive",
+    ]
     assert isinstance(found[0], base.ImporterPlugin)
 
 
@@ -326,7 +333,7 @@ def test_a_package_that_is_not_an_importer_is_left_out(monkeypatch, caplog):
         found = registry.plugins("importer")
     finally:
         registry._cache.clear()
-    assert [plugin.name for plugin in found] == ["europass"]
+    assert [plugin.name for plugin in found] == ["europass", "json-resume", "linkedin-archive"]
     assert "not-one" in caplog.text
 
 
@@ -369,7 +376,10 @@ def test_the_refusal_names_what_is_installed(client, user, installed):
 
     response = client.post(url, {"file": _upload("cv.docx", WORD_FILE)}, follow=True)
 
-    assert b"What is installed reads: HR-XML, Europass import." in response.content
+    assert (
+        b"What is installed reads: HR-XML, Europass import, JSON Resume import, "
+        b"LinkedIn data archive import." in response.content
+    )
 
 
 @pytest.mark.parametrize(
@@ -477,3 +487,573 @@ def test_a_good_website_and_orcid_are_still_stored(user):
     assert report.skipped == []
     assert user.profile.web_links.get().url == "https://example.com/me"
     assert user.profile.identifiers.get().value == "0000-0002-1825-0097"
+
+
+# ------------------------------------------- the page names no format (#1260)
+
+
+DATA = Path(__file__).parent / "data"
+
+
+def _switch_off(name: str):
+    from postulo.plugins.models import PluginPolicy
+
+    return PluginPolicy.objects.create(
+        plugin=name, person=None, state=PluginPolicy.State.FORCED_OFF
+    )
+
+
+class _Wider:
+    """An importer that fills what a record has carried since #1260, and says what it accepts."""
+
+    name = "wider"
+    version = "1.0"
+    kind = "importer"
+    label = "Wider"
+    description = "Reads a test file that starts with WIDER."
+    accepts = (".wider", "application/x-wider")
+
+    def can_handle(self, data: bytes, filename: str = "") -> bool:
+        return data.startswith(b"WIDER")
+
+    def read(self, data: bytes):
+        from postulo.plugins.api import ImportRefused, Record
+
+        if data != b"WIDER":
+            raise ImportRefused("That is not a whole WIDER file.")
+        return Record(
+            source="wider",
+            source_label="Read as a WIDER file.",
+            notes=["Volunteering was read as memberships."],
+            skipped=["An interest in chess has nowhere to go."],
+            experience=[
+                {
+                    "role": "Route planner",
+                    "organisation": "Example Transportes, Lda.",
+                    "location": "Lisboa",
+                    "start_date": dt.date(2021, 3, 1),
+                    "end_date": None,
+                    "summary": "Planned daily routes.",
+                    "highlights": "Cut empty kilometres by a tenth",
+                }
+            ],
+            education=[
+                {
+                    "qualification": "Licenciatura",
+                    "institution": "Example Polytechnic",
+                    "location": "",
+                    "start_date": dt.date(2014, 1, 1),
+                    "end_date": dt.date(2017, 1, 1),
+                    "grade": "15/20",
+                    "highlights": "",
+                    "field_of_study": "Logistics",
+                }
+            ],
+            languages=[
+                # No `levels`, which only Europass has; and a level in the file's own words.
+                {
+                    "name": "English",
+                    "proficiency": "",
+                    "stated": "Professional working proficiency",
+                },
+                {"name": "Portuguese", "proficiency": "native"},
+            ],
+            projects=[
+                {
+                    "name": "Depot move",
+                    "summary": "Moved the depot.",
+                    "role": "Lead",
+                    "url": "https://example.org/depot",
+                    "start_date": dt.date(2022, 1, 1),
+                    "end_date": dt.date(2022, 6, 1),
+                    "highlights": "On time",
+                }
+            ],
+            certifications=[
+                {
+                    "name": "ADR driver training",
+                    "issuer": "Example Institute",
+                    "issued_on": dt.date(2022, 5, 10),
+                    "expires_on": dt.date(2027, 5, 10),
+                    "credential_url": "https://example.org/adr",
+                },
+                {"name": ""},
+            ],
+            honours=[
+                {
+                    "title": "Planner of the year",
+                    "awarded_by": "Example Logistics SA",
+                    "awarded_on": dt.date(2020, 12, 1),
+                    "summary": "For the winter timetable.",
+                    "url": "javascript:alert(1)",
+                }
+            ],
+            courses=[
+                {
+                    "title": "Warehouse safety",
+                    "provider": "Example Academy",
+                    "start_date": dt.date(2019, 2, 1),
+                    "end_date": dt.date(2019, 2, 5),
+                    "hours": 40,
+                    "summary": "A week.",
+                    "url": "https://example.org/safety",
+                },
+                {"title": "Hours out of range", "hours": 0},
+            ],
+            publications=[
+                {
+                    "title": "Empty kilometres in regional haulage",
+                    "publisher": "Example Press",
+                    "date": "2023-05",
+                    "url": "https://example.org/paper",
+                    "doi": "https://doi.org/10.1000/182",
+                },
+                {"title": "A date nobody can read", "date": "last spring", "doi": "not-a-doi"},
+            ],
+        )
+
+
+@pytest.fixture
+def wider(monkeypatch):
+    registry.register_builtin("importer", _Wider)
+    monkeypatch.setattr(registry, "_cache", {})
+    yield _Wider
+    registry.unregister_builtin("importer", _Wider)
+    registry._cache.clear()
+
+
+def test_the_page_has_a_name_of_its_own_and_the_old_one_still_leads_to_it(client, user):
+    """`resume:europass_import` is what the wiki told plugin authors to post to."""
+    assert reverse("resume:import") == reverse("resume:europass_import")
+    client.force_login(user)
+
+    page = client.get(reverse("resume:europass_import"))
+
+    assert page.status_code == 200
+    assert page.resolver_match.view_name == "resume:import"
+
+
+def test_the_page_names_no_format_and_says_what_is_installed(client, user, wider):
+    client.force_login(user)
+
+    body = client.get(reverse("resume:import")).content.decode()
+
+    assert "Import a CV" in body
+    assert "Import a Europass CV" not in body
+    # Each importer in its own words: the label and the description it declares.
+    assert "Europass import" in body and "europass.europa.eu" in body
+    assert "Wider" in body and "Reads a test file that starts with WIDER." in body
+
+
+def test_the_file_box_accepts_what_the_importers_say_they_read(client, user):
+    client.force_login(user)
+
+    body = client.get(reverse("resume:import")).content.decode()
+
+    assert (
+        'accept=".pdf,.xml,.json,application/pdf,text/xml,application/xml,application/json,'
+        '.zip,.csv,application/zip,text/csv"' in body
+    ), "what the box accepted while it named Europass, and what the other two add"
+
+
+def test_a_second_importer_adds_what_it_reads_to_the_file_box(client, user, wider):
+    client.force_login(user)
+
+    body = client.get(reverse("resume:import")).content.decode()
+
+    assert ".wider,application/x-wider" in body and ".pdf" in body
+
+
+def test_an_importer_that_does_not_say_leaves_the_file_box_open(client, user, installed):
+    """`accepts` is optional: a list that left a format out would grey its files out."""
+    client.force_login(user)
+
+    body = client.get(reverse("resume:import")).content.decode()
+
+    assert 'type="file"' in body and "accept=" not in body
+
+
+def test_what_an_importer_puts_in_accepts_is_held_to_extensions_and_media_types(wider):
+    from postulo.resume.views import accepted_by
+
+    class Odd(_Wider):
+        accepts = (".ok", '" onfocus="alert(1)', "text/plain", 7, ".ok")
+
+    assert accepted_by([Odd()]) == ".ok,text/plain"
+    assert accepted_by([]) == ""
+
+
+def test_with_no_importer_switched_on_there_is_no_file_box(client, user):
+    client.force_login(user)
+    for name in ("europass", "json-resume", "linkedin-archive"):
+        _switch_off(name)
+
+    page = client.get(reverse("resume:import"))
+    body = page.content.decode()
+
+    assert page.status_code == 200
+    assert 'type="file"' not in body and "data-no-importer" in body
+    # And a file sent anyway is told why nothing read it, in a sentence that names nothing.
+    response = client.post(
+        reverse("resume:import"), {"file": _upload("cv.json", _europass_file())}, follow=True
+    )
+    assert "Nothing that reads a CV from a file is switched on here" in response.content.decode()
+    assert client.session.get("career_import") is None
+
+
+def test_every_importer_that_ships_has_its_own_entry_behind_import(user):
+    """The entry was governed by `europass` whatever read the file: with that one off and
+    another on, *Import* was not offered at all."""
+    from postulo.core import transfers
+
+    entry = transfers.importer_entry(_Wider, 105)
+    assert (entry.key, entry.module, entry.order) == ("career-wider-import", "wider", 105)
+    assert entry.url(None) == reverse("resume:import")
+    transfers.register(entry)
+    try:
+        offered = [t.key for t in transfers.offered("career", "import", user)]
+        assert offered[0] == "career-europass-import" and "career-wider-import" in offered
+
+        _switch_off("europass")
+
+        offered = [t.key for t in transfers.offered("career", "import", user)]
+        assert "career-europass-import" not in offered and "career-wider-import" in offered
+    finally:
+        transfers.forget(entry.key)
+
+
+def test_the_sentence_about_the_format_is_the_importers_own(client, user, wider):
+    client.force_login(user)
+    url = reverse("resume:import")
+
+    client.post(url, {"file": _upload("mine.wider", b"WIDER")})
+    body = client.get(url).content.decode()
+
+    assert "Read as a WIDER file." in body
+    assert "Europass" not in body.split("data-import-found")[1]
+
+
+def test_europass_says_which_of_its_formats_it_read():
+    """The five sentences were the page's; they are the plugin's now, with its catalogue."""
+    from postulo.plugins.europass import reader
+
+    assert set(reader.SOURCE_LABELS) == {"candidate", "pdf-candidate", "xml", "pdf-xml", "json"}
+    for name in ("europass.xml", "europass.json", "europass-candidate.xml"):
+        record = EuropassImporter().read((DATA / name).read_bytes())
+        assert record.source_label == str(reader.SOURCE_LABELS[record.source])
+        assert record.source_label.startswith("Read as Europass")
+
+
+def test_the_review_lists_the_four_new_sections_and_how_the_file_was_read(client, user, wider):
+    client.force_login(user)
+    url = reverse("resume:import")
+
+    client.post(url, {"file": _upload("mine.wider", b"WIDER")})
+    page = client.get(url)
+    body = page.content.decode()
+
+    for label in ("Certifications", "Honours and awards", "Courses", "Publications"):
+        assert label in body
+    for said in (
+        "ADR driver training",
+        "Example Institute",
+        "Planner of the year",
+        "Warehouse safety",
+        "Empty kilometres in regional haulage",
+    ):
+        assert said in body
+    # What was read and put somewhere unexpected is said apart from what was not read.
+    assert "How it was read" in body and "Volunteering was read as memberships." in body
+    assert "What could not be read" in body and "An interest in chess" in body
+    # The file's own words for a level are shown, and no level is claimed for them.
+    assert "Professional working proficiency" in body
+    assert "not a level Postulo keeps, so none will be claimed" in body
+    assert "Europass records five levels" not in body
+    assert "Where the file states no level, none is written" in body
+    counts = {str(row["label"]): row["total"] for row in page.context["found"]["counts"]}
+    assert counts["Certifications"] == 2 and counts["Publications"] == 2
+
+
+def test_the_five_levels_are_explained_only_for_a_file_that_has_them(client, user):
+    client.force_login(user)
+    url = reverse("resume:import")
+
+    client.post(url, {"file": _upload("cv.xml", (DATA / "europass.xml").read_bytes())})
+    body = client.get(url).content.decode()
+
+    assert "Europass records five levels per language" in body
+
+
+def test_confirming_writes_the_four_new_sections_and_the_optional_keys(client, user, wider):
+    from postulo.resume.models import (
+        Certification,
+        Course,
+        Education,
+        Experience,
+        Honour,
+        Project,
+        Publication,
+    )
+
+    client.force_login(user)
+    url = reverse("resume:import")
+    client.post(url, {"file": _upload("mine.wider", b"WIDER")})
+    # Dates cross the session as text and come back as dates.
+    held = client.session["career_import_data"]
+    assert held["certifications"][0]["issued_on"] == "2022-05-10"
+    assert held["projects"][0]["start_date"] == "2022-01-01"
+
+    response = client.post(url, {"action": "confirm"}, follow=True)
+
+    assert response.status_code == 200
+    certification = Certification.objects.for_user(user).get()
+    assert (certification.name, certification.issuer) == (
+        "ADR driver training",
+        "Example Institute",
+    )
+    assert certification.issued_on == dt.date(2022, 5, 10)
+    assert certification.expires_on == dt.date(2027, 5, 10)
+    assert certification.credential_url == "https://example.org/adr"
+    honour = Honour.objects.for_user(user).get()
+    assert (honour.title, honour.awarded_by) == ("Planner of the year", "Example Logistics SA")
+    assert honour.awarded_on == dt.date(2020, 12, 1)
+    assert honour.url == "", "only a web address is kept as a link"
+    first, second = Course.objects.for_user(user).order_by("title")
+    assert (first.title, first.hours) == ("Hours out of range", None)
+    assert (second.title, second.provider, second.hours) == (
+        "Warehouse safety",
+        "Example Academy",
+        40,
+    )
+    assert second.end_date == dt.date(2019, 2, 5)
+    read, unread = Publication.objects.for_user(user).order_by("-date")
+    assert (read.title, read.publisher) == (
+        "Empty kilometres in regional haulage",
+        "Example Press",
+    )
+    assert (read.date, read.doi, read.entry_type) == ("2023-05", "10.1000/182", "misc")
+    assert read.cite_key and read.cite_key != unread.cite_key
+    assert (unread.date, unread.doi) == ("", ""), "held to the rules the form holds a person to"
+    # And the keys the models already held, which an import used to drop.
+    assert Experience.objects.for_user(user).get().highlights == "Cut empty kilometres by a tenth"
+    assert Education.objects.for_user(user).get().field_of_study == "Logistics"
+    project = Project.objects.for_user(user).get()
+    assert (project.role, project.url, project.highlights) == (
+        "Lead",
+        "https://example.org/depot",
+        "On time",
+    )
+    assert (project.start_date, project.end_date) == (dt.date(2022, 1, 1), dt.date(2022, 6, 1))
+
+
+def test_a_record_of_only_the_new_sections_is_not_empty():
+    from postulo.plugins.api import Record
+
+    assert Record().is_empty
+    for name in ("certifications", "honours", "courses", "publications"):
+        assert not Record(**{name: [{"title": "x", "name": "x"}]}).is_empty
+
+
+def test_what_an_import_adds_is_only_ever_the_persons_own(user, other_user):
+    """The writer never sees anybody but the owner it is handed (#129)."""
+    from postulo.resume import importing
+    from postulo.resume.models import Certification, Course, Honour, Publication
+
+    importing.apply(user, _Wider().read(b"WIDER"))
+
+    for model in (Certification, Honour, Course, Publication):
+        assert model.objects.for_user(user).exists()
+        assert not model.objects.for_user(other_user).exists()
+
+
+def test_the_giver_is_linked_to_a_company_the_person_has_and_none_is_added(user):
+    from postulo.jobs.models import Company
+    from postulo.resume import importing
+    from postulo.resume.models import Certification, Honour
+
+    held = Company.objects.create(owner=user, name="Example Institute")
+
+    importing.apply(user, _Wider().read(b"WIDER"))
+
+    assert Certification.objects.for_user(user).get().company == held
+    assert Honour.objects.for_user(user).get().company is None
+    assert Company.objects.for_user(user).count() == 1, "a file must not fill the list (#683)"
+
+
+# --------------------------------------------- the published contract check (#1260)
+
+
+EUROPASS_SAMPLES = (
+    "europass.xml",
+    "europass.json",
+    "europass-candidate.xml",
+    "europass-candidate-sample.xml",
+    "europass-cedefop-shape.xml",
+)
+
+#: Files Europass must leave to somebody else.
+NOT_EUROPASS = (
+    b'{"basics": {"name": "Alex"}}',
+    b"<html><body>Hello</body></html>",
+    WORD_FILE,
+)
+
+
+def _samples() -> list[bytes]:
+    return [(DATA / name).read_bytes() for name in EUROPASS_SAMPLES]
+
+
+def test_europass_meets_the_contract_every_importer_is_held_to():
+    """No `django_db` needed by the check: it is this module's mark that grants one."""
+    from postulo.plugins.testing import assert_is_an_importer
+
+    assert_is_an_importer(EuropassImporter(), samples=_samples(), not_samples=NOT_EUROPASS)
+
+
+def test_the_test_double_meets_it_too():
+    from postulo.plugins.testing import assert_is_an_importer
+
+    assert_is_an_importer(_Wider(), samples=[b"WIDER"], not_samples=[b"NARROW"])
+
+
+def _broken(**changes):
+    """`_Wider` with one thing wrong, which is how a real importer is wrong."""
+    return type("Broken", (_Wider,), changes)()
+
+
+def _reads(record_changes):
+    def read(self, data: bytes):
+        from postulo.plugins.api import ImportRefused
+
+        if data != b"WIDER":
+            raise ImportRefused("no")
+        record = _Wider().read(data)
+        record_changes(record)
+        return record
+
+    return read
+
+
+def _writes(self, data: bytes):
+    from postulo.jobs.models import Industry
+    from postulo.plugins.api import ImportRefused
+
+    if data != b"WIDER":
+        raise ImportRefused("no")
+    Industry.objects.filter(pk=0).update(name="written by an importer")
+    return _Wider().read(data)
+
+
+def _raises(self, data: bytes):
+    if data != b"WIDER":
+        raise ValueError("not what I expected")
+    return _Wider().read(data)
+
+
+@pytest.mark.parametrize(
+    ("changes", "said"),
+    [
+        ({"kind": "source"}, "its kind is"),
+        ({"description": ""}, "no description"),
+        ({"accepts": ("wider",)}, "neither an extension nor a media type"),
+        ({"accepts": [".wider"]}, "accepts is a tuple"),
+        (
+            {"can_handle": lambda self, data, filename="": data[0] == 87},
+            "can_handle raised IndexError",
+        ),
+        (
+            {"can_handle": lambda self, data, filename="": 1 if data == b"WIDER" else 0},
+            "not a bool",
+        ),
+        ({"can_handle": lambda self, data, filename="": True}, "claims a file that is not its"),
+        ({"can_handle": lambda self, data, filename="": False}, "does not recognise the sample"),
+        ({"read": lambda self, data: {"experience": []}}, "not the Record on the plugin surface"),
+        ({"read": _raises}, "read raised ValueError"),
+        ({"read": _writes}, "wrote to the database"),
+        (
+            {"read": _reads(lambda record: record.experience[0].pop("summary"))},
+            "experience[0] has no ['summary']",
+        ),
+        (
+            {"read": _reads(lambda record: record.experience[0].update(organization="x"))},
+            "keys nothing reads: ['organization']",
+        ),
+        (
+            {
+                "read": _reads(
+                    lambda record: record.experience[0].update(
+                        start_date=dt.datetime(2021, 3, 1, 9, 0)
+                    )
+                )
+            },
+            "not a datetime.date or None",
+        ),
+        (
+            {"read": _reads(lambda record: record.experience[0].update(start_date="2021-03"))},
+            "not a datetime.date or None",
+        ),
+        (
+            {"read": _reads(lambda record: record.courses[0].update(hours="40"))},
+            "courses[0]: hours is str",
+        ),
+        (
+            {"read": _reads(lambda record: record.person.update(surname="Morgan"))},
+            "person has keys nothing reads",
+        ),
+        (
+            {"read": _reads(lambda record: record.skipped.append(7))},
+            "skipped is not a list of sentences",
+        ),
+    ],
+    ids=[
+        "kind",
+        "description",
+        "accepts-bare-word",
+        "accepts-list",
+        "can-handle-raises",
+        "can-handle-not-bool",
+        "claims-everything",
+        "claims-nothing",
+        "not-a-record",
+        "read-raises",
+        "read-writes",
+        "missing-key",
+        "misspelt-key",
+        "datetime",
+        "date-as-text",
+        "hours-as-text",
+        "person-key",
+        "skipped",
+    ],
+)
+def test_the_contract_check_names_what_is_wrong(changes, said):
+    from postulo.plugins.testing import assert_is_an_importer
+
+    with pytest.raises(AssertionError) as raised:
+        assert_is_an_importer(_broken(**changes), samples=[b"WIDER"], not_samples=[b"NARROW"])
+
+    assert said in str(raised.value)
+
+
+def test_the_contract_check_needs_a_sample():
+    from postulo.plugins.testing import assert_is_an_importer
+
+    with pytest.raises(AssertionError, match="at least one file"):
+        assert_is_an_importer(_Wider(), samples=[])
+
+
+def test_every_list_of_a_record_has_its_keys_written_down():
+    """`ROWS` is the contract: a list added to `Record` without its keys fails here."""
+    import dataclasses
+
+    from postulo.resume.importing import ROWS, Record
+
+    lists = {
+        field.name
+        for field in dataclasses.fields(Record)
+        if field.name not in ("person", "source", "source_label", "locale", "skipped", "notes")
+    }
+    assert lists == set(ROWS)
+    for name, rows in ROWS.items():
+        assert set(rows.dates) <= set(rows.known), name
+        assert not set(rows.required) & set(rows.optional), name

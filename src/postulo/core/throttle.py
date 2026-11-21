@@ -228,6 +228,16 @@ def enrichment(user) -> None:
     consume("enrichment", user, rate_for("POSTULO_ENRICHMENT_RATE"))
 
 
+def listing_search(user) -> None:
+    """One press of *Search* or *Review* on a job service, against the account's own
+    allowance (#1253).
+
+    Each is one request to somebody else's service, so each is counted, before it is made,
+    whether the service answers or not; turning a page is another press.
+    """
+    consume("listing-search", user, rate_for("POSTULO_LISTING_SEARCH_RATE"))
+
+
 def api(token) -> None:
     """Per token rather than per account, so revoking one revokes its allowance with it."""
     consume("api", token, rate_for("POSTULO_API_RATE"))

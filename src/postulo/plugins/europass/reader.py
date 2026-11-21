@@ -116,6 +116,29 @@ SKILL_HEADINGS = (
 )
 
 
+#: Which Europass format was read, in words, for the top of the review. The PDF is named
+#: because it is the file a person chose: saying only "XML" about it would describe a file
+#: they never saw (#244). The sentences were the import page's until the page stopped naming
+#: a format (#1260); they are Europass's, so they are kept and translated here.
+SOURCE_LABELS = {
+    "candidate": _("Read as Europass XML, the format europass.europa.eu has written since 2020."),
+    "pdf-candidate": _(
+        "Read from the Europass XML attached to the PDF, the format europass.europa.eu has "
+        "written since 2020."
+    ),
+    "xml": _(
+        "Read as Europass XML in the older format, the one the Europass editor wrote until 2020."
+    ),
+    "pdf-xml": _(
+        "Read from the Europass XML attached to the PDF, in the older format the Europass "
+        "editor wrote until 2020."
+    ),
+    "json": _(
+        "Read as Europass JSON, the older format as the Europass web service wrote it until 2020."
+    ),
+}
+
+
 class EuropassError(ImportRefused):
     """The file could not be read, and the message says why in plain words."""
 
@@ -162,9 +185,11 @@ def read(data: bytes) -> Record:
     # importer faces rather than one Europass happened to think about.
     refuse_unreadable(data)
 
-    if pdf.is_pdf(data):
-        return read_pdf(data)
-    return _read_document(data)
+    record = read_pdf(data) if pdf.is_pdf(data) else _read_document(data)
+    # In the reader's language as the file is read: the review keeps the sentence, as it
+    # keeps what could not be read.
+    record.source_label = str(SOURCE_LABELS.get(record.source, ""))
+    return record
 
 
 def _read_document(data: bytes) -> Record:

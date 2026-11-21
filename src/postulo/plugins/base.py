@@ -758,6 +758,40 @@ class SuggestionSourcePlugin(Protocol):
     sources: tuple
 
 
+# ---------------------------------------------------------------- listing searches
+
+#: Where a package that knows how to search a job service by criteria registers itself
+#: (#1253). Open, as the register-adapter group is, and for the same reason: an entry is the
+#: hosts a service answers on, how a search is described as an address and its parameters,
+#: and how the answer is read. Postulo makes the request itself, through the guarded client,
+#: under the feature's switch and the account's allowance, so a registry somebody else wrote
+#: can add a service and cannot dial anywhere its own declaration does not name.
+LISTING_SEARCH_GROUP = "postulo.listing_searches"
+
+
+@runtime_checkable
+class ListingSearchPlugin(Protocol):
+    """A registry of the job services *Search a job service* may ask (#1253).
+
+    The shape of a register-adapter plugin: it holds no rows and is not asked to do
+    anything. It answers "which services can be searched, and how is each asked and read",
+    each entry a `ListingSearch` from the plugin surface. Whether anything is asked at all is
+    the ``listing-search`` feature's decision, and each service has a switch of its own under
+    it, so this kind is not switched on its own.
+
+    **It does not reach the network itself.** A search describes the request and reads the
+    JSON it is handed; the request, the deadline, the size limit and the allowance are
+    Postulo's.
+    """
+
+    #: The identifier the registry keys on.
+    name: str
+    #: What kind of plugin this is; always ``"listing-search"``.
+    kind: str
+    #: The services it contributes, each a `ListingSearch` from the plugin surface.
+    searches: tuple
+
+
 # --------------------------------------------------------------------- features
 
 #: Where something that *changes what Postulo keeps* registers itself.

@@ -89,6 +89,13 @@ registry that holds sources. A source builds addresses and reads answers; Postul
 request, on a press, and keeps nothing a person did not tick. `extract_jsonld`,
 `extract_microdata` and `extract_rdfa` read the structured data a page declares, for a source
 that reads one.
+**A job service can be searched through it (#1253)**: `ListingSearch` is how one service is
+searched by criteria and how one advert is asked for again, `SearchCriteria` what the person
+searched for, `SearchHit` and `SearchResults` what a search hands back, each hit a
+`JobPostingData`, and `ListingSearchPlugin` the registry that holds them. A search names an
+address and its parameters and reads JSON; Postulo encodes the query and makes the request, on
+a press, and a chosen hit goes to the review every capture goes through. `listing_searches`
+reads the services installed.
 
 **A field can suggest from a vocabulary (#1252)**: `SuggestionSource` is one vocabulary -- the
 fields it suggests for, its languages, whether it is offline, its licence, its hosts if it dials
@@ -241,6 +248,11 @@ if TYPE_CHECKING:  # pragma: no cover - the names `__getattr__` resolves at run 
     from postulo.jobs.enrichment import Source as EnrichmentSource
     from postulo.jobs.enrichment import Subject as EnrichmentSubject
     from postulo.jobs.history import record_listing_event
+    from postulo.jobs.listing_search import Criteria as SearchCriteria
+    from postulo.jobs.listing_search import Hit as SearchHit
+    from postulo.jobs.listing_search import ListingSearch
+    from postulo.jobs.listing_search import Results as SearchResults
+    from postulo.jobs.listing_search import searches as listing_searches
     from postulo.jobs.models import Company, CompanyKind, Contact, Department
     from postulo.jobs.places import resolve as place_of
     from postulo.jobs.register_lookup import Adapter as RegisterAdapter
@@ -310,6 +322,7 @@ from .base import (
     ImportRefused,
     JobPostingData,
     LinkServicePlugin,
+    ListingSearchPlugin,
     Manifest,
     MessagingServicePlugin,
     OutboxPlugin,
@@ -396,6 +409,8 @@ __all__ = [
     "LinkRow",
     "LinkService",
     "LinkServicePlugin",
+    "ListingSearch",
+    "ListingSearchPlugin",
     "Manifest",
     "MessagingService",
     "MessagingServicePlugin",
@@ -420,6 +435,9 @@ __all__ = [
     "Reminder",
     "RemoteItem",
     "SavedRows",
+    "SearchCriteria",
+    "SearchHit",
+    "SearchResults",
     "SourcePlugin",
     "StorePlugin",
     "SubPlugin",
@@ -474,6 +492,7 @@ __all__ = [
     "language_tag",
     "link_service_of",
     "links_for",
+    "listing_searches",
     "load_theme_asset",
     "manifest_of",
     "medium_of",
@@ -660,6 +679,21 @@ _ELSEWHERE: dict[str, tuple[str, str]] = {
     "extract_jsonld": ("postulo.plugins.builtin.htmlutil", "extract_jsonld"),
     "extract_microdata": ("postulo.plugins.builtin.htmlutil", "extract_microdata"),
     "extract_rdfa": ("postulo.plugins.builtin.htmlutil", "extract_rdfa"),
+    # ------------------------------------------------- how a job service is searched (#1253)
+    # A `listing-search` plugin adds entries to the registry *Search a job service* reads: one
+    # `ListingSearch` per service -- a key, a name, its countries and languages, the hosts it
+    # may be asked on, which of the criteria it honours, how a search (`SearchCriteria`) and
+    # one advert are each described as an address and its parameters, and how the JSON that
+    # comes back is read into `SearchResults` of `SearchHit`s and into one `JobPostingData`.
+    # It never makes the request and never writes the query string: Postulo encodes the
+    # parameters and asks, through the public-only client, to those hosts alone, under the
+    # feature's switch, the service's own and the account's allowance. `listing_searches()` is
+    # every service installed, by key. None of these needs Django set up to be imported.
+    "ListingSearch": ("postulo.jobs.listing_search", "ListingSearch"),
+    "SearchCriteria": ("postulo.jobs.listing_search", "Criteria"),
+    "SearchHit": ("postulo.jobs.listing_search", "Hit"),
+    "SearchResults": ("postulo.jobs.listing_search", "Results"),
+    "listing_searches": ("postulo.jobs.listing_search", "searches"),
     # ----------------------------------------------- where a field's suggestions come from (#1252)
     # A `suggestion-source` plugin adds a vocabulary a field may suggest from: one
     # `SuggestionSource` -- a key, a name, the fields it suggests for, the languages it reads
@@ -888,6 +922,9 @@ def __getattr__(name: str):
         # kinds it can set by having a template for each. The templates live in a
         # `templates/` directory beside the package and go on Django's search path when the
         # plugin is registered -- which is the only way markup reaches the renderer (#132).
+        # A theme may say the languages (BCP 47) and countries (ISO 3166-1) it is made for,
+        # in `languages` and `countries`; the picker then lists it first for such a document
+        # and hides nothing (#1255).
         from postulo.documents import themes
 
         return themes.Kind if name == "ThemeKind" else themes.Theme
