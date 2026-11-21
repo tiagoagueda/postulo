@@ -39,12 +39,13 @@ from postulo.core import weeks
 from postulo.jobs.models import Company, CompanyKind, Contact
 
 from . import endings
-from .analytics import RESPONSE_STATUSES, interviews_held
+from .analytics import RESPONSE_STATUSES, held_interview_sources, interviews_held
 from .models import (
     Application,
     ApplicationEvent,
     Appointment,
     Channel,
+    InterviewKind,
     Status,
 )
 
@@ -351,6 +352,12 @@ class Evidence:
     status: str
     last_activity_on: dt.date | None
     pk: int = 0
+    #: How it was made, in words and as the stable value of `Channel`, and where the job is
+    #: (#1262): the columns an employment office's table has beside the employer. Empty when
+    #: the person did not say.
+    channel: str = ""
+    channel_key: str = ""
+    location: str = ""
     #: How it got there and how it ended (#239). In the spreadsheet and not on the page or
     #: the document: the page is what an employment office is handed, and who referred
     #: somebody is the person's own business and another person's name.
@@ -358,6 +365,21 @@ class Evidence:
     referrer: str = ""
     last_stage: str = ""
     end_reason: str = ""
+
+
+@dataclass
+class HeldInterview:
+    """One interview held in the period, as an office's second table lists it (#1262).
+
+    The employer and the job, never the people met: an interviewer's name is another
+    person's, and a theme is not told it (#239).
+    """
+
+    on: dt.date
+    company: str
+    role: str
+    #: In words, or empty for one typed straight onto a timeline, which has no kind.
+    kind: str = ""
 
 
 @dataclass
@@ -388,6 +410,8 @@ class Report:
     cadence: Cadence
     evidence: list[Evidence] = field(default_factory=list)
     happened: Happened = field(default_factory=Happened)
+    #: The interviews `happened.interviews` counts, one by one, oldest first (#1262).
+    interviews: list[HeldInterview] = field(default_factory=list)
     sources: list[Tally] = field(default_factory=list)
     #: By sector, each with its industries beneath (#897): a report an office reads says
     #: *section J, division 62*, and the person's own words are the line below.
@@ -440,6 +464,42 @@ def _first_reaching(user, statuses, period: Period) -> int:
     )
 
 
+def _held_interviews(user, period: Period) -> list[HeldInterview]:
+    """The period's interviews one by one: the ones `interviews_held` counts, from the same
+    two records with the same overlap removed, so the list is as long as the figure."""
+    diary, entries = held_interview_sources(user, start=period.start, end=period.end)
+    diary = list(diary.select_related("application__posting__company"))
+    kinds = dict(InterviewKind.choices)
+    twins = {(row.application_id, row.starts_at) for row in diary}
+    rows = [
+        (
+            row.starts_at,
+            row.pk,
+            HeldInterview(
+                on=timezone.localdate(row.starts_at),
+                company=row.application.posting.company.name,
+                role=row.application.posting.title,
+                kind=str(kinds.get(row.kind, "")),
+            ),
+        )
+        for row in diary
+    ]
+    rows += [
+        (
+            entry.occurred_at,
+            entry.pk,
+            HeldInterview(
+                on=timezone.localdate(entry.occurred_at),
+                company=entry.application.posting.company.name,
+                role=entry.application.posting.title,
+            ),
+        )
+        for entry in entries.select_related("application__posting__company")
+        if (entry.application_id, entry.occurred_at) not in twins
+    ]
+    return [row for _when, _pk, row in sorted(rows, key=lambda item: item[:2])]
+
+
 def build(user, period: Period, *, today: dt.date | None = None) -> Report:
     """The report for one person and one period."""
     today = today or timezone.localdate()
@@ -459,6 +519,7 @@ def build(user, period: Period, *, today: dt.date | None = None) -> Report:
     ended = endings.for_applications(inside)
 
     labels = dict(Application._meta.get_field("status").choices)
+    channels = dict(Channel.choices)
     evidence = [
         Evidence(
             applied_on=timezone.localdate(application.applied_at),
@@ -473,6 +534,9 @@ def build(user, period: Period, *, today: dt.date | None = None) -> Report:
                 else None
             ),
             pk=application.pk,
+            channel=str(channels.get(application.channel, "")) if application.channel else "",
+            channel_key=application.channel or "",
+            location=(application.posting.location or "").strip(),
             agency=application.through_agency.name if application.through_agency_id else "",
             referrer=application.referred_by.name if application.referred_by_id else "",
             last_stage=ended[application.pk].last_stage_label if application.pk in ended else "",
@@ -505,6 +569,7 @@ def build(user, period: Period, *, today: dt.date | None = None) -> Report:
         offers=_first_reaching(user, {Status.OFFER}, period),
         rejections=_first_reaching(user, {Status.REJECTED}, period),
     )
+    report.interviews = _held_interviews(user, period)
 
     unrecorded = str(_("Not recorded"))
     by_source: dict[str, int] = {}
@@ -698,7 +763,9 @@ def as_context(report: Report) -> dict:
 
     The evidence rows are the ones the page shows, without how somebody got there or how it
     ended (#239): who referred somebody is their own business and another person's name, and
-    a theme is not told it.
+    a theme is not told it. Each row says how the application was made and where the job is,
+    and ``interviews`` lists the period's interviews by employer and job, never by the people
+    met (#1262): the columns an employment office's table has.
     """
     cadence = report.cadence
     return {
@@ -752,8 +819,15 @@ def as_context(report: Report) -> dict:
                 "url": row.url,
                 "status": row.status,
                 "last_activity_on": row.last_activity_on,
+                "channel": row.channel,
+                "channel_key": row.channel_key,
+                "location": row.location,
             }
             for row in report.evidence
+        ],
+        "interviews": [
+            {"on": row.on, "company": row.company, "role": row.role, "kind": row.kind}
+            for row in report.interviews
         ],
         "sources": [{"name": str(row.name), "count": row.count} for row in report.sources],
         "industries": [

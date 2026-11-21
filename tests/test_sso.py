@@ -404,3 +404,184 @@ def test_the_policy_lets_the_form_answer_with_a_redirect_to_the_provider_only(se
         assert origins and origins[0] in base.SECURE_CSP["form-action"]
     else:
         assert origins == [] and base.SECURE_CSP["form-action"] == ["'self'"]
+
+
+# ------------------------------------------------------------------ PKCE (#1261)
+
+DISCOVERY = {
+    "issuer": "https://auth.example.org/application/o/postulo/",
+    "authorization_endpoint": "https://auth.example.org/application/o/authorize/",
+    "token_endpoint": "https://auth.example.org/application/o/token/",
+    "userinfo_endpoint": "https://auth.example.org/application/o/userinfo/",
+    "jwks_uri": "https://auth.example.org/application/o/postulo/jwks/",
+}
+
+
+def with_pkce(enabled: bool) -> dict:
+    """The provider as `base.py` builds it, with PKCE as the variable says."""
+    import copy
+
+    providers = copy.deepcopy(PROVIDER)
+    providers["openid_connect"]["APPS"][0]["settings"]["oauth_pkce_enabled"] = enabled
+    return providers
+
+
+@pytest.fixture
+def no_discovery(monkeypatch):
+    """The provider's discovery document, without asking the provider for it."""
+    from allauth.socialaccount.providers.openid_connect.views import OpenIDConnectOAuth2Adapter
+
+    monkeypatch.setattr(OpenIDConnectOAuth2Adapter, "openid_config", property(lambda s: DISCOVERY))
+
+
+def start_the_handshake(client) -> dict[str, list[str]]:
+    """Press the provider's button; the query of the address the browser is sent to."""
+    from urllib.parse import parse_qs, urlsplit
+
+    response = client.post(sso.login_url(), {"process": "login"})
+    assert response.status_code == 302
+    location = response["Location"]
+    assert location.startswith(DISCOVERY["authorization_endpoint"])
+    return parse_qs(urlsplit(location).query)
+
+
+def test_the_handshake_sends_a_pkce_challenge(client, configured, no_discovery):
+    configured.SOCIALACCOUNT_PROVIDERS = with_pkce(True)
+
+    query = start_the_handshake(client)
+
+    assert query["code_challenge_method"] == ["S256"]
+    assert len(query["code_challenge"][0]) == 43, "a SHA-256, base64url without padding"
+
+
+def test_the_code_is_spent_with_the_verifier_of_that_challenge(
+    client, configured, no_discovery, monkeypatch
+):
+    """The other half: what goes to the token endpoint is the secret behind the challenge."""
+    import base64
+    import hashlib
+
+    from allauth.socialaccount.providers.oauth2.client import OAuth2Client, OAuth2Error
+
+    configured.SOCIALACCOUNT_PROVIDERS = with_pkce(True)
+    query = start_the_handshake(client)
+    sent = {}
+
+    def token_endpoint(self, code, pkce_code_verifier=None, extra_data=None):
+        sent["code"], sent["verifier"] = code, pkce_code_verifier
+        raise OAuth2Error("stop here: the request is what is being looked at")
+
+    monkeypatch.setattr(OAuth2Client, "get_access_token", token_endpoint)
+    client.get(
+        "/accounts/sso/oidc/login/callback/", {"state": query["state"][0], "code": "the-code"}
+    )
+
+    digest = hashlib.sha256(sent["verifier"].encode("ascii")).digest()
+    assert base64.urlsafe_b64encode(digest).rstrip(b"=").decode() == query["code_challenge"][0]
+    assert sent["code"] == "the-code"
+
+
+def test_an_operator_can_turn_pkce_off(client, configured, no_discovery):
+    configured.SOCIALACCOUNT_PROVIDERS = with_pkce(False)
+
+    query = start_the_handshake(client)
+
+    assert "code_challenge" not in query and "code_challenge_method" not in query
+
+
+def test_pkce_is_on_unless_the_operator_turns_it_off():
+    from postulo.core import configuration
+
+    assert configuration.VARIABLES["POSTULO_OIDC_PKCE"].default is True
+    assert configuration.read("POSTULO_OIDC_PKCE", environ={}) is True
+    assert configuration.read("POSTULO_OIDC_PKCE", environ={"POSTULO_OIDC_PKCE": "false"}) is False
+
+
+#: Starts the settings once per environment, in one process: the provider each one builds.
+SETTINGS_PROBE = """
+import json, os, sys
+cases = json.load(sys.stdin)
+found = {}
+for name, environ in cases.items():
+    for module in [m for m in sys.modules if m.startswith("postulo.config.settings")]:
+        del sys.modules[module]
+    for key in [k for k in os.environ if k.startswith("POSTULO_OIDC_")]:
+        del os.environ[key]
+    os.environ.update(environ)
+    from postulo.config.settings import base
+    apps = (base.SOCIALACCOUNT_PROVIDERS.get("openid_connect") or {}).get("APPS") or [{}]
+    found[name] = apps[0].get("settings", {}).get("oauth_pkce_enabled")
+print(json.dumps(found))
+"""
+
+
+def test_the_settings_hand_the_variable_to_allauth():
+    """What `base.py` builds from the environment, read from the module itself."""
+    import json
+    import os
+    import subprocess
+    import sys
+    from pathlib import Path
+
+    provider = {
+        "POSTULO_OIDC_SERVER_URL": "https://auth.example.org/application/o/postulo/",
+        "POSTULO_OIDC_CLIENT_ID": "postulo",
+    }
+    cases = {
+        "unset": provider,
+        "off": {**provider, "POSTULO_OIDC_PKCE": "false"},
+        "no provider": {},
+    }
+    environ = {k: v for k, v in os.environ.items() if not k.startswith("POSTULO_")}
+    run = subprocess.run(  # noqa: S603 - this interpreter, and a string written here
+        [sys.executable, "-c", SETTINGS_PROBE],
+        input=json.dumps(cases),
+        capture_output=True,
+        text=True,
+        env=environ,
+        cwd=Path(__file__).resolve().parents[1],
+        check=True,
+    )
+    assert json.loads(run.stdout.strip().splitlines()[-1]) == {
+        "unset": True,
+        "off": False,
+        "no provider": None,
+    }
+
+
+# ------------------------------------------------- an issuer over plain http (#1261)
+
+
+@pytest.mark.parametrize(
+    "address,warned",
+    [
+        ("https://auth.example.org/application/o/postulo/", False),
+        ("http://auth.example.org/application/o/postulo/", True),
+        ("http://100.66.30.95:9000/realms/postulo", True),
+        ("http://keycloak:8080/realms/postulo", True),
+        ("HTTP://Auth.Example.org/realms/postulo", True),
+        ("http://localhost:8080/realms/postulo", False),
+        ("http://id.localhost/realms/postulo", False),
+        ("http://127.0.0.1:8080/realms/postulo", False),
+        ("http://[::1]:8080/realms/postulo", False),
+    ],
+)
+def test_an_issuer_over_plain_http_is_warned_about(configured, address, warned):
+    import copy
+
+    from postulo.core.checks import sso_issuer_over_http
+
+    providers = copy.deepcopy(PROVIDER)
+    providers["openid_connect"]["APPS"][0]["settings"]["server_url"] = address
+    configured.SOCIALACCOUNT_PROVIDERS = providers
+
+    problems = sso_issuer_over_http()
+
+    assert [problem.id for problem in problems] == (["postulo.W008"] if warned else [])
+
+
+def test_no_provider_no_issuer_warning(settings):
+    from postulo.core.checks import sso_issuer_over_http
+
+    settings.SOCIALACCOUNT_PROVIDERS = {}
+    assert sso_issuer_over_http() == []
