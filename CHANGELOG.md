@@ -13,6 +13,7 @@ All notable changes to Postulo are recorded here. The format follows
 ### 🔒 Security
 
 - Start-up warns (`postulo.W008`) when the single sign-on issuer is a plain `http://` address that is not this machine, since nothing then proves the provider's answers came from the provider. (#1261)
+- The wiki compares calendar providers (CalDAV, Apple, Google, Microsoft, Proton, ICS addresses): what works today, what each needs and what it risks (#1254)
 
 ## [0.5.5] — 2026-11-16
 
