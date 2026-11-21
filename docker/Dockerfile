@@ -232,6 +232,7 @@ ENV PYTHONUNBUFFERED=1 \
     POSTULO_BACKUP_DIR=/app/data/backups \
     POSTULO_GEOLOCATIONS_DIR=/app/data/geonames \
     POSTULO_ESCO_DIR=/app/data/esco \
+    POSTULO_EARNINGS_DIR=/app/data/earnings \
     POSTULO_STATIC_ROOT=/app/staticfiles
 
 # The city table the map places locations from is read from the data volume, not from
@@ -430,6 +431,7 @@ COPY docker/entrypoint.sh /usr/local/bin/postulo-entrypoint
 RUN chmod +x /usr/local/bin/postulo-entrypoint \
     && useradd --system --create-home --uid 1000 postulo \
     && mkdir -p /app/data/media /app/data/backups /app/data/plugins /app/data/esco \
+       /app/data/earnings \
     && chown -R postulo:postulo /app/data
 
 # Nothing here needs root, and the data directory is the only thing it writes to.

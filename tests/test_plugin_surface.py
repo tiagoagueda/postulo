@@ -81,6 +81,12 @@ REACHING_PAST: dict[str, dict[str, str]] = {
             "table of language codes for the whole of Postulo, not a second one here"
         ),
     },
+    "earnings": {
+        "postulo.core.configuration": (
+            "`POSTULO_EARNINGS_DIR`: where a refreshed copy of Eurostat's figures is read "
+            "from, which is an instance setting, declared once with the others (#1186)"
+        ),
+    },
     "email": {
         "postulo.core.site": "the instance's name and from-address, for the message it sends",
         # `Notification` used to be reached past the surface as well — by this plugin and by
@@ -330,6 +336,9 @@ def test_the_plugins_that_hold_no_data_need_only_the_surface():
     assert reaching("postulo.plugins.messaging_services") == {SURFACE}
     assert reaching("postulo.plugins.messaging_contacts") == {SURFACE}
     assert reaching("postulo.plugins.register_lookup") == {SURFACE}
+    # And a source of company details: a page in, offered values out, read with the surface's
+    # own readers of structured data (#1256).
+    assert reaching("postulo.plugins.company_site") == {SURFACE}
 
 
 def test_no_plugin_postulo_ships_reaches_for_a_model():

@@ -136,7 +136,7 @@ def test_every_plugin_postulo_ships_declares_the_full_set():
     assert not missing, "\n".join(missing)
 
 
-def test_these_are_the_plugins_that_ship_across_thirteen_kinds():
+def test_these_are_the_plugins_that_ship_across_sixteen_kinds():
     """Named rather than counted, so that losing one to a bad import is a failure rather
     than a quiet absence — and so that adding one is a line somebody wrote.
 
@@ -171,7 +171,13 @@ def test_these_are_the_plugins_that_ship_across_thirteen_kinds():
     `register-adapters` is a third vocabulary, and a kind of its own too: the company
     registers *Register lookup* may ask, one per country, which a package for another country
     may add to; `register-lookup` is the feature that decides whether any is asked, and it is
-    a feature that starts off (#1021).
+    one of the features that start off (#1021). `listing-search` is another (#1253): it decides
+    whether a job service is searched at all, with a switch per service under it, and
+    `listing-searches` is the registry of the services Postulo ships a search for.
+
+    `company-site` is the one source of company details Postulo ships, a kind of its own: the
+    company's own website, read on a press of *Find logo* or *Find details*, and on by
+    default because *Find logo* always read it (#1256).
 
     `multiple-fields` is a module with no behaviour of its own: the parent of the six features
     that let a field hold more than one value (#875), whose switch is theirs, and
@@ -179,7 +185,7 @@ def test_these_are_the_plugins_that_ship_across_thirteen_kinds():
     `file-formats` for the formats Postulo reads and writes: PDF, which is required, Word,
     OpenDocument, iCalendar and vCard, with Europass beside them (#877).
 
-    `placeholder-checks` is the first of a thirteenth kind, the writing checkers: what reads
+    `placeholder-checks` is the first of another kind, the writing checkers: what reads
     a letter's own words and says what it noticed. It is required, as PDF is, because it is
     the check a letter always had before it was a plugin (#1258). `writing-basics` is the
     second, the local reference checker, and starts off as `register-lookup` does.
@@ -189,7 +195,7 @@ def test_these_are_the_plugins_that_ship_across_thirteen_kinds():
         for classes in registry.builtins().values()
         for plugin_class in classes
     }
-    assert len(registry.builtins()) == 13, sorted(registry.builtins())
+    assert len(registry.builtins()) == 16, sorted(registry.builtins())
 
     assert found == {
         "board",
@@ -200,6 +206,8 @@ def test_these_are_the_plugins_that_ship_across_thirteen_kinds():
         "webhook",
         "local",
         "europass",
+        "json-resume",
+        "linkedin-archive",
         "smtp",
         "own-mail",
         "phone-numbers",
@@ -220,11 +228,15 @@ def test_these_are_the_plugins_that_ship_across_thirteen_kinds():
         "bibliography-lookups",
         "register-lookup",
         "register-adapters",
+        "company-site",
+        "listing-search",
+        "listing-searches",
         "nace",
         "esco",
         "geonames",
         "placeholder-checks",
         "writing-basics",
+        "earnings",
         "multiple-fields",
         "builtin-notifications",
         "file-formats",

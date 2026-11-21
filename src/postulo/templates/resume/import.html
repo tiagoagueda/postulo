@@ -1,0 +1,292 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% translate "Import a CV" %}{% endblock %}
+
+{% block content %}
+  <div class="mx-auto max-w-3xl">
+    <c-page-title>
+      {% translate "Import a CV" %}
+      <c-slot name="subtitle">
+      {% blocktranslate trimmed %}
+        If your career is already written down in a file, hand it over rather than type it
+        all again.
+      {% endblocktranslate %}
+      </c-slot>
+    </c-page-title>
+
+    {% if not found %}
+      {% if importers %}
+        <form method="post" enctype="multipart/form-data" class="card mb-6">
+          {% csrf_token %}
+          <p class="mb-3 text-sm text-ink-500 dark:text-ink-400">
+            {% blocktranslate trimmed %}
+              Choose the file as you downloaded it. Postulo works out which format it is,
+              shows you what is in it, and writes nothing until you say so.
+            {% endblocktranslate %}
+          </p>
+          {% comment %} What this instance reads, in each importer's own words: the page names
+             no format, so the next one is a plugin and not a change here (#1260). {% endcomment %}
+          <h2 class="mb-1 text-sm font-medium">{% translate "What can be read here" %}</h2>
+          <dl class="mb-4 space-y-2 text-sm" data-importers>
+            {% for importer in importers %}
+              <div>
+                <dt class="font-medium">{{ importer.label }}</dt>
+                <dd class="text-ink-500 dark:text-ink-400">{{ importer.description }}</dd>
+              </div>
+            {% endfor %}
+          </dl>
+          <label class="mb-3 block text-sm font-medium" for="file">{% translate "The file" %}</label>
+          <input type="file" name="file" id="file" required
+                 {% if accept %}accept="{{ accept }}"{% endif %}
+                 class="mb-4 block w-full">
+          <button type="submit" class="btn">{% translate "Read it" %}</button>
+        </form>
+      {% else %}
+        <div class="alert mb-6 text-sm" data-variant="info" role="note" data-no-importer>
+          <div>
+            <p>
+              {% blocktranslate trimmed %}
+                Nothing that reads a CV from a file is switched on here, so there is no file
+                to choose.
+              {% endblocktranslate %}
+            </p>
+          </div>
+        </div>
+      {% endif %}
+
+      <div class="alert text-sm" data-variant="info" role="note">
+        <div>
+          <p>
+            {% blocktranslate trimmed %}
+              An import only ever adds. Nothing already in your career record is changed or
+              removed, and anything that turns out to be a duplicate is yours to delete.
+            {% endblocktranslate %}
+          </p>
+        </div>
+      </div>
+
+      {% comment %} Somebody holding a file Postulo wrote arrives here, because this is
+         where *Import* leads; the page that reads theirs is the other one (#181). {% endcomment %}
+      <div class="mt-6 flex flex-wrap items-center gap-3">
+        <p class="text-sm text-ink-500 dark:text-ink-400">
+          {% translate "A file that Postulo itself wrote is read on a page of its own." %}
+        </p>
+        <a href="{% url 'resume:candidate_file' %}" class="btn" data-variant="ghost">{% translate "Your record as a file" %}</a>
+      </div>
+    {% else %}
+      <div class="card mb-6" data-import-found>
+        <c-section-title>{% translate "What is in the file" %}</c-section-title>
+        {% if found.source %}
+          <p class="mb-3 text-sm text-ink-500 dark:text-ink-400">{{ found.source }}</p>
+        {% endif %}
+        {% if found.locale %}
+          {% comment %} The file has always said which language it was written in and nothing
+             here read it, so a career typed in Portuguese arrived with no record language and
+             the fallback warnings from #131 fired on every entry of it (#235). {% endcomment %}
+          <p class="mb-3 text-sm text-ink-500 dark:text-ink-400">
+            {% blocktranslate trimmed with tongue=found.locale %}
+              Written in {{ tongue }}, which will be recorded as the language of your career
+              record if you have not already set one.
+            {% endblocktranslate %}
+          </p>
+        {% endif %}
+        <dl class="mb-4 grid gap-x-4 gap-y-1 text-sm sm:grid-cols-[10rem_1fr]">
+          {% for row in found.counts %}
+            <dt class="text-ink-500 dark:text-ink-400">{{ row.label }}</dt>
+            <dd class="tabular-nums">{{ row.total }}</dd>
+          {% endfor %}
+        </dl>
+
+        {% if found.notes %}
+          {% comment %} What was read and put somewhere a person might not look for it: said
+             before anything is written, and apart from what could not be read (#1260). {% endcomment %}
+          <h3 class="mt-4 mb-1 text-sm font-medium">{% translate "How it was read" %}</h3>
+          <ul class="space-y-1 text-sm text-ink-600 dark:text-ink-300" data-import-notes>
+            {% for note in found.notes %}<li>{{ note }}</li>{% endfor %}
+          </ul>
+        {% endif %}
+
+        {% if found.experience %}
+          <h3 class="mt-4 mb-1 text-sm font-medium">{% translate "Experience" %}</h3>
+          <ul class="space-y-1 text-sm text-ink-600 dark:text-ink-300">
+            {% for row in found.experience %}
+              <li><bdi>{{ row.role }}</bdi>{% if row.organisation %} · <bdi>{{ row.organisation }}</bdi>{% endif %}</li>
+            {% endfor %}
+          </ul>
+        {% endif %}
+
+        {% if found.education %}
+          <h3 class="mt-4 mb-1 text-sm font-medium">{% translate "Education" %}</h3>
+          <ul class="space-y-1 text-sm text-ink-600 dark:text-ink-300">
+            {% for row in found.education %}
+              <li><bdi>{{ row.qualification }}</bdi>{% if row.institution %} · <bdi>{{ row.institution }}</bdi>{% endif %}</li>
+            {% endfor %}
+          </ul>
+        {% endif %}
+
+        {% if found.languages %}
+          <h3 class="mt-4 mb-1 text-sm font-medium">{% translate "Languages" %}</h3>
+          {% comment %} A file may keep several levels per language (Europass keeps five) and
+             Postulo keeps one, so all of them are shown: the one that will be saved is the
+             lowest, and somebody who disagrees can change it afterwards knowing what was
+             thrown away. {% endcomment %}
+          <ul class="space-y-1 text-sm text-ink-600 dark:text-ink-300">
+            {% for row in found.languages %}
+              <li>
+                {{ row.name }}
+                {% if row.unset and row.stated %}
+                  {% comment %} The file's own words for the level, which are none of Postulo's:
+                     shown, and never turned into a level by a table (#1260). {% endcomment %}
+                  <span class="text-ink-500 dark:text-ink-400">· <bdi>{{ row.stated }}</bdi></span>
+                  <span class="text-amber-700 dark:text-amber-400">
+                    {% translate "· not a level Postulo keeps, so none will be claimed" %}
+                  </span>
+                {% elif row.unset %}
+                  <span class="text-amber-700 dark:text-amber-400">
+                    {% translate "· no level in the file, so none will be claimed" %}
+                  </span>
+                {% else %}
+                  <span class="text-ink-500 dark:text-ink-400">· {{ row.proficiency }}</span>
+                {% endif %}
+                {% if row.levels %}
+                  <span class="text-xs text-ink-500 dark:text-ink-400">
+                    ({% for part in row.levels %}{{ part.part }} {{ part.level }}{% if not forloop.last %}, {% endif %}{% endfor %})
+                  </span>
+                {% endif %}
+              </li>
+            {% endfor %}
+          </ul>
+          {% if found.several_levels %}
+            <p class="mt-1 text-xs text-ink-500 dark:text-ink-400">
+              {% blocktranslate trimmed %}
+                Europass records five levels per language and Postulo keeps one, so the lowest
+                is taken. Where the file states none, none is written: a level is a claim about
+                yourself that somebody will test, so it is yours to make afterwards.
+              {% endblocktranslate %}
+            </p>
+          {% elif found.no_level %}
+            <p class="mt-1 text-xs text-ink-500 dark:text-ink-400">
+              {% blocktranslate trimmed %}
+                Where the file states no level, none is written: a level is a claim about
+                yourself that somebody will test, so it is yours to make afterwards.
+              {% endblocktranslate %}
+            </p>
+          {% endif %}
+        {% endif %}
+
+        {% if found.skill_groups %}
+          <h3 class="mt-4 mb-1 text-sm font-medium">{% translate "Skills" %}</h3>
+          <ul class="space-y-1 text-sm text-ink-600 dark:text-ink-300">
+            {% for group in found.skill_groups %}
+              <li>{{ group.name }}: {{ group.skills|join:", " }}</li>
+            {% endfor %}
+          </ul>
+        {% endif %}
+
+        {% if found.projects %}
+          <h3 class="mt-4 mb-1 text-sm font-medium">{% translate "Projects" %}</h3>
+          <ul class="space-y-1 text-sm text-ink-600 dark:text-ink-300">
+            {% for row in found.projects %}<li>{{ row.name }}</li>{% endfor %}
+          </ul>
+        {% endif %}
+
+        {% if found.certifications %}
+          <h3 class="mt-4 mb-1 text-sm font-medium">{% translate "Certifications" %}</h3>
+          <ul class="space-y-1 text-sm text-ink-600 dark:text-ink-300">
+            {% for row in found.certifications %}
+              <li><bdi>{{ row.name }}</bdi>{% if row.issuer %} · <bdi>{{ row.issuer }}</bdi>{% endif %}</li>
+            {% endfor %}
+          </ul>
+        {% endif %}
+
+        {% if found.honours %}
+          <h3 class="mt-4 mb-1 text-sm font-medium">{% translate "Honours and awards" %}</h3>
+          <ul class="space-y-1 text-sm text-ink-600 dark:text-ink-300">
+            {% for row in found.honours %}
+              <li><bdi>{{ row.title }}</bdi>{% if row.awarded_by %} · <bdi>{{ row.awarded_by }}</bdi>{% endif %}</li>
+            {% endfor %}
+          </ul>
+        {% endif %}
+
+        {% if found.courses %}
+          <h3 class="mt-4 mb-1 text-sm font-medium">{% translate "Courses" %}</h3>
+          <ul class="space-y-1 text-sm text-ink-600 dark:text-ink-300">
+            {% for row in found.courses %}
+              <li><bdi>{{ row.title }}</bdi>{% if row.provider %} · <bdi>{{ row.provider }}</bdi>{% endif %}</li>
+            {% endfor %}
+          </ul>
+        {% endif %}
+
+        {% if found.publications %}
+          <h3 class="mt-4 mb-1 text-sm font-medium">{% translate "Publications" %}</h3>
+          <ul class="space-y-1 text-sm text-ink-600 dark:text-ink-300">
+            {% for row in found.publications %}<li><bdi>{{ row.title }}</bdi></li>{% endfor %}
+          </ul>
+        {% endif %}
+
+        {% if found.memberships %}
+          <h3 class="mt-4 mb-1 text-sm font-medium">{% translate "Memberships" %}</h3>
+          <ul class="space-y-1 text-sm text-ink-600 dark:text-ink-300">
+            {% for row in found.memberships %}<li><bdi>{{ row.organisation }}</bdi></li>{% endfor %}
+          </ul>
+        {% endif %}
+
+        {% if found.participations %}
+          <h3 class="mt-4 mb-1 text-sm font-medium">{% translate "Presentations, conferences and seminars" %}</h3>
+          <ul class="space-y-1 text-sm text-ink-600 dark:text-ink-300">
+            {% for row in found.participations %}<li><bdi>{{ row.event }}</bdi></li>{% endfor %}
+          </ul>
+        {% endif %}
+
+        {% if found.references %}
+          <h3 class="mt-4 mb-1 text-sm font-medium">{% translate "References" %}</h3>
+          {% comment %} Other people, so each is listed before anything is written: each becomes
+             a contact, and none is printed on a CV until you have said they agreed (#696). {% endcomment %}
+          <ul class="space-y-1 text-sm text-ink-600 dark:text-ink-300">
+            {% for row in found.references %}
+              <li><bdi>{{ row.name }}</bdi>{% if row.relationship %} · <bdi>{{ row.relationship }}</bdi>{% endif %}</li>
+            {% endfor %}
+          </ul>
+          <p class="mt-1 text-xs text-ink-500 dark:text-ink-400">
+            {% blocktranslate trimmed %}
+              Each is added as one of your contacts and as a reference you have not asked yet,
+              so none is printed on a CV until you say they agreed.
+            {% endblocktranslate %}
+          </p>
+        {% endif %}
+
+        {% if found.person %}
+          <h3 class="mt-4 mb-1 text-sm font-medium">{% translate "Personal details" %}</h3>
+          <p class="text-sm text-ink-600 dark:text-ink-300">
+            {% blocktranslate with names=found.person|join:", " trimmed %}
+              Found: {{ names }}. Only the ones you have left blank will be filled in.
+            {% endblocktranslate %}
+          </p>
+        {% endif %}
+        {% if found.skipped %}
+          <h3 class="mt-4 mb-1 text-sm font-medium">{% translate "What could not be read" %}</h3>
+          <ul class="space-y-1 text-sm text-amber-700 dark:text-amber-400">
+            {% for note in found.skipped %}<li>{{ note }}</li>{% endfor %}
+          </ul>
+          <p class="mt-1 text-xs text-ink-500 dark:text-ink-400">
+            {% blocktranslate trimmed %}
+              The rest of the file is still worth importing. What is listed here is not,
+              and you can add it by hand afterwards.
+            {% endblocktranslate %}
+          </p>
+        {% endif %}
+      </div>
+
+      <form method="post" class="flex items-center gap-3">
+        {% csrf_token %}
+        <button type="submit" name="action" value="confirm" class="btn">
+          {% translate "Add all of this" %}
+        </button>
+        <button type="submit" name="action" value="forget" class="btn" data-variant="ghost">
+          {% translate "Start again" %}
+        </button>
+      </form>
+    {% endif %}
+  </div>
+{% endblock %}

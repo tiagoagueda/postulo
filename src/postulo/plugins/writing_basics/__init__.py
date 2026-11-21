@@ -15,7 +15,7 @@ purpose loses that one and keeps the rest:
 text the person stored (`checks`). It asks nobody anything and keeps nothing.
 
 **Bundled and off until an administrator switches it on** (`plugins` migration
-``0018_writing_basics_starts_off``), because style hints are opinions, where the placeholder
+``0020_writing_basics_starts_off``), because style hints are opinions, where the placeholder
 checks are facts. A bundled plugin is the administrator's to switch, never the person's; the
 hints fold away under their own heading. Spelling is deliberately not here: the browser
 checks it already, in the letter's language, and a dictionary small, clearly licensed and

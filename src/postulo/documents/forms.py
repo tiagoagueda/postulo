@@ -22,7 +22,7 @@ from postulo.jobs.models import Contact
 from postulo.resume.models import Link
 from postulo.resume.registry import OVERVIEW_ORDER, SECTIONS
 
-from . import credentials, integrity, paper, paper_choice, proofs, readers, themes
+from . import credentials, integrity, paper, paper_choice, proofs, readers, theme_choice, themes
 from .kinds import PROOF_KINDS, DocumentKind
 from .models import (
     CV,
@@ -146,7 +146,13 @@ class ThemeChoiceMixin:
         field = self.fields.get("theme")
         if field is None:
             return
-        choices = themes.choices_for(self.theme_kind)
+        # The themes made for this document's language and country first (#1255): the
+        # language the document has, or is being given, and the person's own country.
+        language = self.initial.get("language") or getattr(self.instance, "language", "") or ""
+        owner = getattr(self, "user", None)
+        if owner is None and getattr(self.instance, "owner_id", None):
+            owner = self.instance.owner
+        choices = theme_choice.offered_for(self.theme_kind, owner, str(language))
         self.fields["theme"] = forms.ChoiceField(
             label=field.label,
             help_text=field.help_text,
@@ -156,7 +162,7 @@ class ThemeChoiceMixin:
         # A document whose theme came from a plugin that has since been removed opens on the
         # theme it is actually being rendered in, rather than on an error about a field
         # nobody touched. It already looks like this; the form stops pretending otherwise.
-        if self.initial.get("theme") not in {value for value, _label in choices}:
+        if not self.fields["theme"].valid_value(self.initial.get("theme")):
             self.initial["theme"] = themes.DEFAULT
 
 

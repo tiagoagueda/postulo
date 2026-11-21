@@ -195,6 +195,9 @@ def test_a_notifier_connection_carries_a_switch_per_event(client, user):
     connection = Connection.objects.get(owner=user)
     assert connection.config == {
         "to": user.email,
+        # Left out of the post, so as it happens, and the hour of a daily mail unset (#1259).
+        "when": "",
+        "hour": "",
         "event_reminder_due": True,
         "event_capture_received": False,
         "event_went_quiet": False,

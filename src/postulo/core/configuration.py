@@ -250,7 +250,7 @@ AREAS: tuple[Area, ...] = (
     Area(
         "maps",
         "Maps and places",
-        ("MAP", "GEOCODER", "GEONAMES", "GEOLOCATIONS", "ESCO"),
+        ("MAP", "GEOCODER", "GEONAMES", "GEOLOCATIONS", "ESCO", "EARNINGS"),
         notes=(
             "The tiles and the geocoder can also be set from Server settings -> Maps when not "
             "set here."
@@ -694,6 +694,19 @@ _VARIABLES: tuple[Variable, ...] = (
             "endpoint that speaks OpenID Connect. Off, a person signs in here once and connects "
             "the provider from their own account page. With a provider and this unset, start-up "
             "says so."
+        ),
+    ),
+    Variable(
+        "POSTULO_OIDC_PKCE",
+        Kind.BOOLEAN,
+        "sign-in",
+        "Whether single sign-on sends a PKCE challenge (S256) with the handshake.",
+        default=True,
+        notes=(
+            "PKCE ties the code the provider sends back to the sign-in that asked for it, so a "
+            "code caught on the way opens nothing. Keycloak, Authentik, Authelia, Entra ID and "
+            "Google accept it, and some providers require it. Turn it off only for a provider "
+            "that refuses the handshake because of it."
         ),
     ),
     Variable(
@@ -1369,6 +1382,17 @@ _VARIABLES: tuple[Variable, ...] = (
         interpolate=False,
         empty_is_unset=True,
     ),
+    Variable(
+        "POSTULO_EARNINGS_DIR",
+        Kind.PATH,
+        "maps",
+        "Where manage.py fetch_earnings writes Eurostat's earnings statistics, and where a "
+        "refreshed file is read from; the copy that ships with Postulo is read otherwise.",
+        default=PACKAGE_DIR / "plugins" / "earnings" / "data",
+        image="/app/data/earnings",
+        interpolate=False,
+        empty_is_unset=True,
+    ),
     # ----------------------------------------------------------------------------- plugins
     Variable(
         "POSTULO_PLUGINS_DIR",
@@ -1440,6 +1464,22 @@ _VARIABLES: tuple[Variable, ...] = (
         "POSTULO_REGISTER_LOOKUP_RATE",
         "30/h",
         "Look-ups in a company register, per account.",
+    ),
+    _rate(
+        "POSTULO_ENRICHMENT_RATE",
+        "30/h",
+        "Sources asked by Find details on a company, per account.",
+        notes=(
+            "Counted once per source per press, for a source that answers on hosts of its own. "
+            "One that reads the company's own website counts against POSTULO_FETCH_RATE."
+        ),
+    ),
+    _rate(
+        "POSTULO_LISTING_SEARCH_RATE",
+        "60/h",
+        "Searches of a job service, and reviews of an advert found there, per account.",
+        notes="Each press is one request to the service, counted before it is made; turning "
+        "a page is another press (#1253).",
     ),
     _rate("POSTULO_API_RATE", "600/h", "Calls one API token may make."),
     _rate(

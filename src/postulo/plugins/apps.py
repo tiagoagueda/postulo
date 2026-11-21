@@ -14,11 +14,14 @@ class PluginsConfig(AppConfig):
         Before anything reads entry points, so a plugin installed through the interface
         is found exactly as one installed with pip would be.
         """
+        from .company_site import CompanySite
+        from .earnings import Earnings
         from .esco import Esco
         from .geonames import Geonames
         from .identifiers import Identifiers
         from .installing import activate
         from .link_services import LinkServices
+        from .listing_search import ListingSearches
         from .messaging_services import MessagingServices
         from .nace import Nace
         from .placeholder_checks import PlaceholderChecks
@@ -43,6 +46,9 @@ class PluginsConfig(AppConfig):
         # And the company registers Register lookup may ask (#1021): a registry, which the
         # feature beside it switches.
         register_builtin("register-adapter", RegisterAdapters)
+        # And the job services Listing search may search (#1253): a registry, which the
+        # feature and a switch per service decide about.
+        register_builtin("listing-search", ListingSearches)
         # And the vocabularies a field suggests from (#1252): NACE for industries, offline
         # and on by default.
         register_builtin("suggestion-source", Nace)
@@ -55,8 +61,16 @@ class PluginsConfig(AppConfig):
         # checks first, which are always on.
         register_builtin("writing-checker", PlaceholderChecks)
         # And Writing basics, the local reference checker: bundled, and off for the instance
-        # until an administrator switches it on (plugins migration 0018).
+        # until an administrator switches it on (plugins migration 0020).
         register_builtin("writing-checker", WritingBasics)
+        # And Eurostat's earnings statistics beside a listing (#1257): offline, and off until
+        # an administrator switches it on (migration 0019), with its file's system check.
+        register_builtin("earnings-source", Earnings)
+        from .earnings import checks as earnings_checks  # noqa: F401
+
+        # And the company's own website, read for its details and its logo on a press (#1256):
+        # the source Find logo asks, on by default because Find logo always read the site.
+        register_builtin("company-enrichment", CompanySite)
         register_builtin_locales()
         register_builtin_themes()
         # And now import what is installed, so a plugin that will not load says so in the

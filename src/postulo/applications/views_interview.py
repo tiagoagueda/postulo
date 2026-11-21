@@ -36,7 +36,7 @@ class InterviewDetailView(LoginRequiredMixin, View):
 
     def get(self, request: HttpRequest, pk: int) -> HttpResponse:
         from postulo.documents import paper as papers
-        from postulo.documents import themes
+        from postulo.documents import theme_choice, themes
 
         interview = _interview_for(request, pk)
         theme = interview_brief.theme_for(request.user)
@@ -47,7 +47,13 @@ class InterviewDetailView(LoginRequiredMixin, View):
                 "interview": interview,
                 "application": interview.application,
                 "brief": interview_brief.as_context(request.user, interview),
-                "theme_choices": themes.choices_for(themes.Kind.INTERVIEW),
+                "theme_groups": themes.option_groups(
+                    theme_choice.offered_for(
+                        themes.Kind.INTERVIEW,
+                        request.user,
+                        interview_brief.language_for(request.user),
+                    )
+                ),
                 "chosen_theme": theme,
                 "language_choices": interview_brief.offered_languages(),
                 "chosen_language": interview_brief.language_for(request.user),

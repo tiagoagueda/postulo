@@ -107,6 +107,25 @@ def _calendar_download(request: HttpRequest) -> str:
     return reverse("applications:calendar_download") + (f"?{query}" if query else "")
 
 
+def importer_entry(plugin, order: int = 100) -> Transfer:
+    """The career's *Import* entry for an importer Postulo ships (#1260).
+
+    One for each, all leading to the one page that reads whatever is installed: the menu
+    says which formats there are, and each entry follows its own importer's switch, so
+    *Import* is still offered when one of them is off. The label is the importer's own, so
+    the menu and the plugins page say one thing (#911).
+    """
+    return Transfer(
+        f"career-{plugin.name}-import",
+        CAREER,
+        IMPORT,
+        plugin.label,
+        _to("resume:import"),
+        order,
+        plugin.name,
+    )
+
+
 def register_the_ones_postulo_has() -> None:
     """Postulo's own, described once. Idempotent, so a test may call it again."""
     described = (
@@ -152,16 +171,6 @@ def register_the_ones_postulo_has() -> None:
             _("Your record (JSON)"),
             _to("resume:candidate_file"),
             100,
-        ),
-        Transfer(
-            "career-europass-import",
-            CAREER,
-            IMPORT,
-            # The importer's own label, so the menu and the plugins page say one thing (#911).
-            _("Europass import"),
-            _to("resume:europass_import"),
-            100,
-            "europass",
         ),
         Transfer(
             "career-bibliography-import",

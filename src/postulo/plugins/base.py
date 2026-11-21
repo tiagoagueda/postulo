@@ -692,6 +692,42 @@ class RegisterAdapterPlugin(Protocol):
     adapters: tuple
 
 
+# ---------------------------------------------------------- company enrichment (#1256)
+
+#: Where a package that knows where a company's details can be read registers itself (#1256).
+#: Open, as the register-adapter group is, and on the same terms: a source says what of a
+#: company it starts from, which facts it may offer, the hosts it may be asked on and how the
+#: answers are read, and Postulo makes every request itself, through the guarded client, on a
+#: press. A package installed beside Postulo may add a source; it cannot dial anywhere its
+#: declaration does not name, and it cannot take a key another source already holds.
+COMPANY_ENRICHMENT_GROUP = "postulo.company_enrichment"
+
+
+@runtime_checkable
+class CompanyEnrichmentPlugin(Protocol):
+    """A registry of the places a company's details may be read from, on a press (#1256).
+
+    The shape of a register-adapter plugin: it holds no rows and is never asked to *do*
+    anything. It says which sources it contributes, each an `EnrichmentSource` from the
+    plugin surface, and each source's ``read`` turns the answers Postulo fetched into
+    offered values that say where they were read. Nothing is kept until a person ticks it.
+
+    **Unlike a register adapter, each plugin of this kind is its own switch.** There is no
+    feature in front of it: an administrator, or the person, switches the plugin, and a
+    source of a plugin that is off is neither listed nor asked.
+
+    **It does not reach the network itself.** A source builds addresses and reads what it is
+    handed; the request, the deadline, the size limit and the allowance are Postulo's.
+    """
+
+    #: The identifier the registry and the policy key on.
+    name: str
+    #: What kind of plugin this is; always ``"company-enrichment"``.
+    kind: str
+    #: The sources it contributes, each an `EnrichmentSource` from the plugin surface.
+    sources: tuple
+
+
 # ---------------------------------------------------------------- suggestion sources
 
 #: Where a package that knows a vocabulary a field can suggest from registers itself (#1252).
@@ -753,6 +789,76 @@ class WritingCheckerPlugin(Protocol):
     kind: str
     #: The checkers it contributes, each a `WritingChecker` from the plugin surface.
     checkers: tuple
+
+
+# ------------------------------------------------------------------ earnings sources
+
+#: Where a package that knows published earnings statistics registers itself (#1257). Open,
+#: as the suggestion-source group is: a source says which countries it answers for, whether it
+#: is offline, its licence and its citation and, if it dials out, the hosts it may; a package
+#: for one country's statistics office may add one, and cannot take a key another holds.
+EARNINGS_SOURCE_GROUP = "postulo.earnings_sources"
+
+
+@runtime_checkable
+class EarningsSourcePlugin(Protocol):
+    """A registry of the published earnings statistics a listing may be read beside (#1257).
+
+    The shape of a suggestion-source plugin: it holds no rows and is not asked to do
+    anything but say which sources it contributes, each an `EarningsSource` from the plugin
+    surface. A source answers one question -- what did employees of this occupation's group
+    earn in this country -- with `EarningsFigure`s, plain values that each say what they
+    are, and Postulo draws them: the plugin hands over no markup.
+
+    **A figure is a statistic and is drawn as one.** Postulo names the measure, gross or
+    net, the period, the year, the group and the source beside every amount, converts
+    nothing, compares it with nobody's salary and recommends none; a plugin cannot make it
+    do otherwise, because all it hands over is the values.
+
+    **A source that reaches the network says so**: it names its hosts and is never asked on
+    a page load. Nothing asks one on a press yet, so only offline sources are shown.
+    """
+
+    #: The identifier the registry keys on.
+    name: str
+    #: What kind of plugin this is; always ``"earnings-source"``.
+    kind: str
+    #: The sources it contributes, each an `EarningsSource` from the plugin surface.
+    sources: tuple
+
+
+# ---------------------------------------------------------------- listing searches
+
+#: Where a package that knows how to search a job service by criteria registers itself
+#: (#1253). Open, as the register-adapter group is, and for the same reason: an entry is the
+#: hosts a service answers on, how a search is described as an address and its parameters,
+#: and how the answer is read. Postulo makes the request itself, through the guarded client,
+#: under the feature's switch and the account's allowance, so a registry somebody else wrote
+#: can add a service and cannot dial anywhere its own declaration does not name.
+LISTING_SEARCH_GROUP = "postulo.listing_searches"
+
+
+@runtime_checkable
+class ListingSearchPlugin(Protocol):
+    """A registry of the job services *Search a job service* may ask (#1253).
+
+    The shape of a register-adapter plugin: it holds no rows and is not asked to do
+    anything. It answers "which services can be searched, and how is each asked and read",
+    each entry a `ListingSearch` from the plugin surface. Whether anything is asked at all is
+    the ``listing-search`` feature's decision, and each service has a switch of its own under
+    it, so this kind is not switched on its own.
+
+    **It does not reach the network itself.** A search describes the request and reads the
+    JSON it is handed; the request, the deadline, the size limit and the allowance are
+    Postulo's.
+    """
+
+    #: The identifier the registry keys on.
+    name: str
+    #: What kind of plugin this is; always ``"listing-search"``.
+    kind: str
+    #: The services it contributes, each a `ListingSearch` from the plugin surface.
+    searches: tuple
 
 
 # --------------------------------------------------------------------- features
@@ -900,6 +1006,8 @@ SUB_PLUGIN_KINDS = (
     "outbox",
     "suggestion-source",
     "writing-checker",
+    "earnings-source",
+    "company-enrichment",
 )
 #: Where the parent's name and the sub-plugin's id are joined in the name policy rows hold.
 SUB_PLUGIN_SEPARATOR = ":"

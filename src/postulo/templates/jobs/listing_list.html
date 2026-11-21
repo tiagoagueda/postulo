@@ -107,6 +107,11 @@
         <a href="{% url 'jobs:capture_create' %}" class="btn">{% icon "clipboard-paste" %}<span class="btn-label">{% translate "Capture a posting" %}</span></a>
         <a href="{% url 'listings:create' %}" class="btn">{% icon "plus" %}<span class="btn-label">{% translate "Add a listing" %}</span></a>
       </div>
+      {% comment %} Searching a job service, drawn only while Listing search and a service are
+         on for this person (#1253): a third way to a listing, through review. {% endcomment %}
+      {% if can_search_services %}
+        <a href="{% url 'listings:search' %}" class="btn" data-variant="outline" data-search-services>{% icon "search" %}<span class="btn-label">{% translate "Search a job service" %}</span></a>
+      {% endif %}
     </div>
   </div>
 

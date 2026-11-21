@@ -80,6 +80,23 @@ register is asked about one number, `RegisterRecord` and `RegisterAddress` what 
 and `RegisterAdapterPlugin` the registry that holds them. An adapter builds an address and reads
 JSON; Postulo makes the request.
 
+**A company's details can be read from a source (#1256)**: `EnrichmentSource` is one place
+they can be read from -- what of a company it starts from, the fields it may offer, the hosts
+it may be asked on or the company's own site, how its answers are read -- `EnrichmentSubject`
+what it is told of the company, `EnrichmentAnswer` one answer Postulo fetched for it,
+`OfferedValue` one value it offers with where it read it, and `CompanyEnrichmentPlugin` the
+registry that holds sources. A source builds addresses and reads answers; Postulo makes every
+request, on a press, and keeps nothing a person did not tick. `extract_jsonld`,
+`extract_microdata` and `extract_rdfa` read the structured data a page declares, for a source
+that reads one.
+**A job service can be searched through it (#1253)**: `ListingSearch` is how one service is
+searched by criteria and how one advert is asked for again, `SearchCriteria` what the person
+searched for, `SearchHit` and `SearchResults` what a search hands back, each hit a
+`JobPostingData`, and `ListingSearchPlugin` the registry that holds them. A search names an
+address and its parameters and reads JSON; Postulo encodes the query and makes the request, on
+a press, and a chosen hit goes to the review every capture goes through. `listing_searches`
+reads the services installed.
+
 **A field can suggest from a vocabulary (#1252)**: `SuggestionSource` is one vocabulary -- the
 fields it suggests for, its languages, whether it is offline, its licence, its hosts if it dials
 out -- and `SuggestionSourcePlugin` the registry that holds them. A source reached over the
@@ -91,6 +108,12 @@ network is asked on a press and never on a page load.
 sentence and, where it has one, a replacement. `WritingCheckerPlugin` holds the checkers.
 Postulo draws the one list and puts a replacement in only when the person presses for it; a
 checker reached over the network is never asked by a page.
+**A listing can be read beside published earnings statistics (#1257)**: `EarningsSource` is one
+publisher's figures -- the countries it answers for, whether it is offline, its licence, its
+citation, its hosts if it dials out -- `EarningsFigure` one amount with everything that says
+what it is (the measure, gross or net, the period, the currency, the year, the group it
+describes), and `EarningsSourcePlugin` the registry that holds them. A source hands over plain
+values and Postulo draws them, converting and comparing nothing.
 
 **A backup can leave the machine (#325)**: `BackupDestinationPlugin` is what keeps the
 instance's archives somewhere else, `BackupArchive` what it is handed (already encrypted to the
@@ -193,6 +216,8 @@ if TYPE_CHECKING:  # pragma: no cover - the names `__getattr__` resolves at run 
     from postulo.core.card_rows import links_for as links_for
     from postulo.core.card_rows import numbers_for as numbers_for
     from postulo.core.currencies import CURRENCY_CODES
+    from postulo.core.earnings import Figure as EarningsFigure
+    from postulo.core.earnings import Source as EarningsSource
     from postulo.core.languages import match as language_match
     from postulo.core.languages import matches as language_matches
     from postulo.core.languages import override as language_override
@@ -238,7 +263,16 @@ if TYPE_CHECKING:  # pragma: no cover - the names `__getattr__` resolves at run 
     from postulo.documents.theme_assets import load as load_theme_asset
     from postulo.documents.themes import Kind as ThemeKind
     from postulo.documents.themes import Theme
+    from postulo.jobs.enrichment import Answer as EnrichmentAnswer
+    from postulo.jobs.enrichment import Offered as OfferedValue
+    from postulo.jobs.enrichment import Source as EnrichmentSource
+    from postulo.jobs.enrichment import Subject as EnrichmentSubject
     from postulo.jobs.history import record_listing_event
+    from postulo.jobs.listing_search import Criteria as SearchCriteria
+    from postulo.jobs.listing_search import Hit as SearchHit
+    from postulo.jobs.listing_search import ListingSearch
+    from postulo.jobs.listing_search import Results as SearchResults
+    from postulo.jobs.listing_search import searches as listing_searches
     from postulo.jobs.models import Company, CompanyKind, Contact, Department
     from postulo.jobs.places import resolve as place_of
     from postulo.jobs.register_lookup import Adapter as RegisterAdapter
@@ -257,6 +291,7 @@ if TYPE_CHECKING:  # pragma: no cover - the names `__getattr__` resolves at run 
         update_contact,
     )
     from postulo.notifications.base import EVENTS, Notification, NotifierPlugin
+    from postulo.plugins.builtin.htmlutil import extract_jsonld, extract_microdata, extract_rdfa
     from postulo.plugins.policy import enabled_sub_plugins, sub_plugin_enabled
     from postulo.resume.importing import Record
 
@@ -288,6 +323,7 @@ from .base import (
     BackupManifest,
     BackupRef,
     # ------------------------------------------------- the protocols to satisfy
+    CompanyEnrichmentPlugin,
     ConnectedPlugin,
     # ------------------------------- what a plugin raises when the other side has finished
     ConnectionUnusable,
@@ -297,6 +333,7 @@ from .base import (
     DiscoveredOption,
     # ------------------------------------------- what a store is handed, and gives back
     DocumentMetadata,
+    EarningsSourcePlugin,
     EnvironmentVariable,  # one variable the plugin reads (#1186)
     ExternalRef,
     FeaturePlugin,
@@ -306,6 +343,7 @@ from .base import (
     ImportRefused,
     JobPostingData,
     LinkServicePlugin,
+    ListingSearchPlugin,
     Manifest,
     MessagingServicePlugin,
     OutboxPlugin,
@@ -361,6 +399,7 @@ __all__ = [
     "CalendarItems",
     "CalendarRefused",
     "Company",
+    "CompanyEnrichmentPlugin",
     "CompanyKind",
     "ConnectedPlugin",
     "ConnectionUnusable",
@@ -373,6 +412,12 @@ __all__ = [
     "DiscoveredOption",
     "DocumentFormat",
     "DocumentMetadata",
+    "EarningsFigure",
+    "EarningsSource",
+    "EarningsSourcePlugin",
+    "EnrichmentAnswer",
+    "EnrichmentSource",
+    "EnrichmentSubject",
     "EnvironmentVariable",
     "EventKind",
     "ExternalRef",
@@ -389,11 +434,14 @@ __all__ = [
     "LinkRow",
     "LinkService",
     "LinkServicePlugin",
+    "ListingSearch",
+    "ListingSearchPlugin",
     "Manifest",
     "MessagingService",
     "MessagingServicePlugin",
     "Notification",
     "NotifierPlugin",
+    "OfferedValue",
     "OutboxPlugin",
     "Outline",
     "OwnedModel",
@@ -412,6 +460,9 @@ __all__ = [
     "Reminder",
     "RemoteItem",
     "SavedRows",
+    "SearchCriteria",
+    "SearchHit",
+    "SearchResults",
     "SourcePlugin",
     "StorePlugin",
     "SubPlugin",
@@ -459,6 +510,9 @@ __all__ = [
     "description_of",
     "enabled_sub_plugins",
     "event_lines",
+    "extract_jsonld",
+    "extract_microdata",
+    "extract_rdfa",
     "get_or_create_company",
     "get_or_create_department",
     "is_language_tag",
@@ -469,6 +523,7 @@ __all__ = [
     "language_tag",
     "link_service_of",
     "links_for",
+    "listing_searches",
     "load_theme_asset",
     "manifest_of",
     "medium_of",
@@ -632,6 +687,44 @@ _ELSEWHERE: dict[str, tuple[str, str]] = {
     "RegisterAdapter": ("postulo.jobs.register_lookup", "Adapter"),
     "RegisterAddress": ("postulo.jobs.register_lookup", "Address"),
     "RegisterRecord": ("postulo.jobs.register_lookup", "Record"),
+    # ------------------------------------------ where a company's details are read from (#1256)
+    # A `company-enrichment` plugin adds sources *Find details* may ask about a company: one
+    # `EnrichmentSource` each -- a key, a name, what of the company it starts from, the fields
+    # it may offer, the hosts it may be asked on (or the company's own website), the addresses
+    # to ask and how the answers are read. It is handed an `EnrichmentSubject`, which holds only
+    # what it starts from, and the `EnrichmentAnswer`s Postulo fetched, and returns
+    # `OfferedValue`s, each naming its field, its value and where it was read; an address in
+    # one is a `RegisterAddress`. The source never makes a request: Postulo does, through the
+    # public-only client, on a press, under the plugin's own switch and the account's
+    # allowance, and nothing is kept until the person ticks it. The contract holds no model,
+    # so a plugin builds its sources at import.
+    "EnrichmentSource": ("postulo.jobs.enrichment", "Source"),
+    "EnrichmentSubject": ("postulo.jobs.enrichment", "Subject"),
+    "EnrichmentAnswer": ("postulo.jobs.enrichment", "Answer"),
+    "OfferedValue": ("postulo.jobs.enrichment", "Offered"),
+    # What a page declares about itself in schema.org's vocabulary, whichever of the three
+    # syntaxes wrote it: JSON-LD, microdata or RDFa, each as the plain objects JSON-LD would
+    # have given. For a source that reads a page (`reads="page"`): the readers capture uses,
+    # written for hostile pages, so a plugin does not carry a parser of its own. A page nested
+    # deeper than Python recurses raises `RecursionError` from `extract_jsonld`; catch it.
+    "extract_jsonld": ("postulo.plugins.builtin.htmlutil", "extract_jsonld"),
+    "extract_microdata": ("postulo.plugins.builtin.htmlutil", "extract_microdata"),
+    "extract_rdfa": ("postulo.plugins.builtin.htmlutil", "extract_rdfa"),
+    # ------------------------------------------------- how a job service is searched (#1253)
+    # A `listing-search` plugin adds entries to the registry *Search a job service* reads: one
+    # `ListingSearch` per service -- a key, a name, its countries and languages, the hosts it
+    # may be asked on, which of the criteria it honours, how a search (`SearchCriteria`) and
+    # one advert are each described as an address and its parameters, and how the JSON that
+    # comes back is read into `SearchResults` of `SearchHit`s and into one `JobPostingData`.
+    # It never makes the request and never writes the query string: Postulo encodes the
+    # parameters and asks, through the public-only client, to those hosts alone, under the
+    # feature's switch, the service's own and the account's allowance. `listing_searches()` is
+    # every service installed, by key. None of these needs Django set up to be imported.
+    "ListingSearch": ("postulo.jobs.listing_search", "ListingSearch"),
+    "SearchCriteria": ("postulo.jobs.listing_search", "Criteria"),
+    "SearchHit": ("postulo.jobs.listing_search", "Hit"),
+    "SearchResults": ("postulo.jobs.listing_search", "Results"),
+    "listing_searches": ("postulo.jobs.listing_search", "searches"),
     # ----------------------------------------------- where a field's suggestions come from (#1252)
     # A `suggestion-source` plugin adds a vocabulary a field may suggest from: one
     # `SuggestionSource` -- a key, a name, the fields it suggests for, the languages it reads
@@ -651,6 +744,16 @@ _ELSEWHERE: dict[str, tuple[str, str]] = {
     "WritingFinding": ("postulo.core.writing_checks", "Finding"),
     "WritingPassage": ("postulo.core.writing_checks", "Passage"),
     "WritingPlaceholder": ("postulo.core.writing_checks", "Placeholder"),
+    # ------------------------------------- published earnings statistics for a listing (#1257)
+    # An `earnings-source` plugin adds a publisher's figures: one `EarningsSource` -- a key,
+    # the publisher's name, the countries it answers for, whether it is offline, its licence,
+    # its citation and, for one that dials out, its hosts -- whose `figures` answers, for an
+    # ISCO-08 unit group and a country, with `EarningsFigure`s: an amount with its measure,
+    # gross or net, its period, its currency, its year and the group it describes. Plain
+    # values with no model behind them, so a plugin builds them at import. Postulo draws
+    # them, converts nothing, and only offline sources are asked by a page.
+    "EarningsFigure": ("postulo.core.earnings", "Figure"),
+    "EarningsSource": ("postulo.core.earnings", "Source"),
     # ----------------------------------------- companies, departments and the person (#328)
     # What a sync of contacts needs and could not reach: the companies and departments a
     # card is filed under, the vocabularies it maps onto, and the person's own card. All of
@@ -873,6 +976,9 @@ def __getattr__(name: str):
         # kinds it can set by having a template for each. The templates live in a
         # `templates/` directory beside the package and go on Django's search path when the
         # plugin is registered -- which is the only way markup reaches the renderer (#132).
+        # A theme may say the languages (BCP 47) and countries (ISO 3166-1) it is made for,
+        # in `languages` and `countries`; the picker then lists it first for such a document
+        # and hides nothing (#1255).
         from postulo.documents import themes
 
         return themes.Kind if name == "ThemeKind" else themes.Theme

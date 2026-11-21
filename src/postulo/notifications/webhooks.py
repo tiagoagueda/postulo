@@ -19,6 +19,11 @@ kept, and the same end when its connection or its account goes. What a row holds
 notification as a webhook is sent it, which is all of it, so the retry hands the notifier
 the notification it was handed the first time. Which of the two a row is, is its
 connection's plugin: there is no second table and no second pass to reason about.
+
+**And a message a notifier asked to keep (#1259).** A notifier with ``hold_until`` may say
+"not now, at eight": the message waits here as a row not yet tried, due at that time, and
+the same pass hands it over. A notifier with ``send_many`` is handed all of one connection's
+due rows at once, which is how a digest is one mail.
 """
 
 from __future__ import annotations
@@ -144,6 +149,11 @@ def notification_from(body: str) -> Notification:
 
 
 def pending(now=None):
+    """Every row due now, oldest due first: what a scheduler pass works through."""
+    return _due(now)
+
+
+def _due(now=None):
     from postulo.plugins.models import Connection
 
     now = now or timezone.now()
@@ -175,6 +185,32 @@ def claim(row, now=None) -> bool:
     )
 
 
+def _failed(row, now, message: str, *, final: bool = False) -> bool:
+    """Write one attempt that did not arrive on ``row``: retried later, or given up on."""
+    exhausted = row.attempts >= MAX_ATTEMPTS
+    row.status = DeliveryStatus.GIVEN_UP if final or exhausted else DeliveryStatus.FAILED
+    row.last_error = message[:500]
+    row.next_attempt_at = (
+        None if final or exhausted else now + FIRST_RETRY * (2 ** (row.attempts - 1))
+    )
+    row.save()
+    return False
+
+
+def _arrived(row, now, status: int | None = None) -> bool:
+    """Write one attempt that arrived on ``row``."""
+    row.status = DeliveryStatus.SENT
+    row.last_status = status
+    row.last_error = ""
+    row.next_attempt_at = None
+    row.sent_at = now
+    # The text of a notification (the role, the company, a note, an offer's terms) has done
+    # its job once the receiver has it, and is not kept for the row's whole life (#752).
+    row.body = ""
+    row.save()
+    return True
+
+
 def deliver(row) -> bool:
     """One attempt at one row. Records the outcome on the row; never raises."""
     now = timezone.now()
@@ -183,25 +219,10 @@ def deliver(row) -> bool:
     row.last_attempt_at = now
 
     def fail(message: str, *, final: bool = False) -> bool:
-        exhausted = row.attempts >= MAX_ATTEMPTS
-        row.status = DeliveryStatus.GIVEN_UP if final or exhausted else DeliveryStatus.FAILED
-        row.last_error = message[:500]
-        row.next_attempt_at = (
-            None if final or exhausted else now + FIRST_RETRY * (2 ** (row.attempts - 1))
-        )
-        row.save()
-        return False
+        return _failed(row, now, message, final=final)
 
     def arrived(status: int | None = None) -> bool:
-        row.status = DeliveryStatus.SENT
-        row.last_status = status
-        row.last_error = ""
-        row.next_attempt_at = None
-        row.sent_at = now
-        # The text of a notification (the role, the company, a note, an offer's terms) has done
-        # its job once the receiver has it, and is not kept for the row's whole life (#752).
-        row.body = ""
-        row.save()
+        _arrived(row, now, status)
         connection.record_test(True)
         return True
 
@@ -255,13 +276,53 @@ def deliver(row) -> bool:
     return fail(answered, final=400 <= status < 500 and status not in (408, 429))
 
 
+def hold(connection, notification: Notification, until) -> WebhookDelivery | None:
+    """Keep a message for a notifier that asked to send it later, until ``until`` (#1259).
+
+    A row like any other in this queue, waiting and not yet tried: the pass that delivers the
+    rest hands it to its notifier at the first pass after ``until``, and the attempts a failure
+    may spend count from then. Nothing new to scope or to forget: it belongs to the connection
+    and its owner, goes with either, and is never in an archive, as a retry's row is (#752).
+    """
+    return _row(
+        connection, notification, status=DeliveryStatus.PENDING, attempts=0, next_attempt_at=until
+    )
+
+
+def _due_with(row, now) -> list[tuple[WebhookDelivery, Notification]]:
+    """The other rows of ``row``'s connection due now, each claimed, with its notification.
+
+    Gathered by connection *and* owner, never by key alone, and each taken with `claim` as
+    the pass takes one, so two schedulers never hand the same message over twice (#221). A
+    row whose text no longer reads is given up on, as it would be alone.
+    """
+    gathered = []
+    others = (
+        _due(now).filter(owner_id=row.owner_id, connection_id=row.connection_id).exclude(pk=row.pk)
+    )
+    for other in list(others[:BATCH]):
+        if not claim(other, now):
+            continue
+        other.attempts += 1
+        other.last_attempt_at = now
+        try:
+            gathered.append((other, notification_from(other.body)))
+        except (ValueError, KeyError, TypeError) as unreadable:
+            _failed(other, now, f"{type(unreadable).__name__}: {unreadable}", final=True)
+    return gathered
+
+
 def _send_again(row, connection, fail, arrived) -> bool:
-    """One more attempt at a send that failed at its notifier (#1163).
+    """One more attempt at a send that failed at its notifier, or one that was kept (#1163).
 
     What `notifications.service` does for a first send, for one connection: the notifier is
     handed the notification it was handed then, in the language its words are in and the
     recipient's time zone. The outcome is written where the first one was, on the connection,
     and on the row, which is what decides whether there is another attempt.
+
+    A notifier with ``send_many`` is handed every row of this connection that is due in this
+    pass at once, oldest first, so what it kept travels together (#1259). They arrive or fail
+    together, and a failure is retried as a single row's is: each row keeps its own count.
     """
     notifier = connection.plugin_instance
     if notifier is None:
@@ -275,11 +336,26 @@ def _send_again(row, connection, fail, arrived) -> bool:
         # An event this version no longer has, or a row that is not one: no retry reads it.
         return fail(f"{type(unreadable).__name__}: {unreadable}", final=True)
     owner = row.owner
+    now = row.last_attempt_at
+    send_many = getattr(notifier, "send_many", None)
+    others = _due_with(row, now) if send_many is not None else []
+
+    def settle(message: str = "", *, ok: bool = False, final: bool = False) -> None:
+        for other, _notification in others:
+            if ok:
+                _arrived(other, now)
+            else:
+                _failed(other, now, message, final=final)
+
     try:
         # The recipient's time zone, and the language the words are already in: theirs, as
         # `notify` stamped it, and theirs again for a row that somehow names none.
         with as_person(owner), languages.override(notification.language):
-            notifier.send(notification, connection.full_config, owner)
+            if send_many is not None:
+                together = sorted([(row, notification), *others], key=lambda pair: pair[0].pk)
+                send_many([held for _kept, held in together], connection.full_config, owner)
+            else:
+                notifier.send(notification, connection.full_config, owner)
     except ConnectionUnusable as dead:
         # The other side has ended the connection since the first send: switched off with
         # the reason, as a first send does, and this row is not what brings it back (#216).
@@ -287,10 +363,12 @@ def _send_again(row, connection, fail, arrived) -> bool:
             "Notifier %r says connection %s is finished: %s", connection.plugin, connection.pk, dead
         )
         connection.retire(str(dead), keep_secrets=dead.keep_secrets)
+        settle(str(dead), final=True)
         return fail(str(dead), final=True)
     except SecretsUnreadable as unreadable:
         # No retry can read them either, as for a webhook's secret (#573).
         connection.record_test(False, str(unreadable))
+        settle(str(unreadable), final=True)
         return fail(str(unreadable), final=True)
     except Exception as error:
         logger.info(
@@ -300,7 +378,9 @@ def _send_again(row, connection, fail, arrived) -> bool:
             error,
         )
         connection.record_test(False, f"{type(error).__name__}: {error}")
+        settle(f"{type(error).__name__}: {error}")
         return fail(f"{type(error).__name__}: {error}")
+    settle(ok=True)
     return arrived()
 
 
