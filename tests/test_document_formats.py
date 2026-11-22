@@ -715,6 +715,7 @@ POSTULOS_OWN = ["txt", "odt", "docx", "europass", "json-resume"]
 def test_postulo_ships_plain_text_opendocument_and_word():
     assert [one.key for one in formats.all_formats()] == POSTULOS_OWN
     assert formats.get("docx").extension == "docx"
+    assert set(POSTULOS_OWN) == formats.OWN_KEYS, "the keys nobody else may take are these"
 
 
 def test_another_format_is_added_and_not_written_in(client, person, cv, a_plugins_format):
@@ -761,6 +762,56 @@ def test_registering_postulos_own_twice_changes_nothing():
     formats.register_the_ones_postulo_has()
 
     assert [one.key for one in formats.all_formats()] == POSTULOS_OWN
+
+
+def test_the_plugins_are_loaded_before_postulos_own_formats_are_registered():
+    """The premise of the next test: `postulo.plugins` imports every installed plugin in its
+    `ready`, which runs before the documents app's, where Postulo's formats are registered."""
+    from django.conf import settings
+
+    installed = list(settings.INSTALLED_APPS)
+    assert installed.index("postulo.plugins") < installed.index("postulo.documents")
+
+
+def test_a_plugin_loaded_first_cannot_take_one_of_postulos_own_keys(caplog):
+    """As the process starts (#1255): a plugin's module registers a format under `docx` while
+    it is imported, before the documents app has registered Word. Word is still Postulo's,
+    and Postulo's own come first in the list, before whatever a plugin brought."""
+
+    def not_word(outline: formats.Outline) -> bytes:
+        return b"not a Word file"
+
+    usurper = formats.Format(
+        key="docx",
+        label="Not Word",
+        extension="docx",
+        content_type="text/plain",
+        write=not_word,
+        provider="A plugin",
+    )
+    shout = formats.Format(
+        key="shout",
+        label="Shouted text",
+        extension="shout",
+        content_type="text/x-shout; charset=utf-8",
+        write=not_word,
+        provider="A plugin",
+    )
+    formats.forget()
+    try:
+        # What a plugin's import does, while `postulo.plugins` is getting ready.
+        assert formats.register(usurper) is False
+        formats.register(shout)
+        # What the documents app does, afterwards.
+        formats.register_the_ones_postulo_has()
+
+        assert formats.get("docx").write is not not_word
+        assert formats.get("docx").label == "Word document"
+        assert [one.key for one in formats.all_formats()] == [*POSTULOS_OWN, "shout"]
+        assert "one of Postulo's own" in caplog.text
+    finally:
+        formats.forget()
+        formats.register_the_ones_postulo_has()
 
 
 def test_a_format_that_fails_is_a_sentence_and_the_others_still_work(client, person, cv, caplog):

@@ -8,6 +8,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### ✨ Added
 
+- A theme from a plugin can say the languages and countries it suits, and the theme menu lists those first, under their own heading, for a document in that language or country; nothing is hidden or chosen for you, and a plugin can carry the new Documents category (#1255)
 - Email notifications can arrive once a day instead of as they happen: one mail at an hour you choose in your own time zone, 08:00 unless you say otherwise (#1259)
 - A notifier plugin can keep a message until a time it chooses (`hold_until`) and take every kept message of a connection at once (`send_many`); kept messages wait and are retried as failed sends do (#1259)
 - *Your career → Import* reads a JSON Resume file, any version from 1.0.0 to 1.7.1; what has no place in a career record is named on the review (#1260)
@@ -24,6 +25,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🐛 Fixed
 
+- A plugin can no longer take the place of one of Postulo's own document formats, such as Word, by registering it before Postulo has as the server starts; Postulo's own formats are now always listed before a plugin's (#1255)
 - Browser notifications: two reminders due together no longer replace one another, a long message in a non-Latin script is no longer refused by the push service, and an iPhone or iPad is told to add Postulo to the Home Screen first (#1259)
 
 ### 🔒 Security
