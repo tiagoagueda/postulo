@@ -138,6 +138,8 @@ BY_KEY = {item.key: item for item in ITEMS}
 CAREER_NAMES: tuple[str, ...] = (
     "resume:overview",
     "resume:preview",
+    "resume:import",
+    # The same page under the name it had until #1260, kept for one release.
     "resume:europass_import",
     "resume:candidate_file",
     "resume:candidate_download",

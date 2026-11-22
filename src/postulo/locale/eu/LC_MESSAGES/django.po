@@ -1851,8 +1851,8 @@ msgid "<em>Headline</em> is a short professional title, such as “Backend engin
 msgstr "<em>Titularra</em> lanbide-titulu laburra da, adibidez «Backend ingeniaria». Bere titularra duen CV batek hura inprimatzen du horren ordez."
 
 #: src/postulo/templates/help/career.html
-msgid "<em>Import</em> reads a Europass CV; <em>Export</em> writes your details and your career as one file you can keep or move to another Postulo; <em>Preview</em> shows the whole record as a document, and <em>Your CVs</em> opens the variants made from it."
-msgstr "<em>Inportatu</em> aukerak Europass CV bat irakurtzen du; <em>Esportatu</em> aukerak zure datuak eta ibilbidea gorde edo beste Postulo batera eraman dezakezun fitxategi bakar gisa idazten ditu; <em>Aurrebista</em> aukerak erregistro osoa dokumentu gisa erakusten du, eta <em>Zure CVak</em> aukerak hartatik sortutako aldaerak irekitzen ditu."
+msgid "<em>Import</em> reads a CV you have as a file; <em>Export</em> writes your details and your career as one file you can keep or move to another Postulo; <em>Preview</em> shows the whole record as a document, and <em>Your CVs</em> opens the variants made from it."
+msgstr ""
 
 #: src/postulo/templates/help/identifiers.html
 msgid "<em>Kind</em> is the register the identifier belongs to, and <em>What goes where</em> shows what each one looks like. <em>Other</em> takes anything else, with a name you give it."
@@ -2280,7 +2280,7 @@ msgstr "Zure dokumentuetako fitxategi bat"
 msgid "A file goes under Files first; an entry points at it rather than keeping a copy."
 msgstr "Fitxategi bat «Fitxategiak» atalera doa lehenik; sarrera batek hari erreferentzia egiten dio, kopia bat gorde beharrean."
 
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 msgid "A file that Postulo itself wrote is read on a page of its own."
 msgstr "Postulok berak idatzitako fitxategi bat bere orri propioan irakurtzen da."
 
@@ -3177,7 +3177,7 @@ msgstr "Gehitu gaitasun bat"
 msgid "Add a tag"
 msgstr "Gehitu etiketa bat"
 
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 msgid "Add all of this"
 msgstr "Gehitu hau guztia"
 
@@ -3741,7 +3741,7 @@ msgstr "Ikono-botoi bat"
 msgid "An identifier"
 msgstr "Identifikatzailea"
 
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 msgid "An import only ever adds. Nothing already in your career record is changed or removed, and anything that turns out to be a duplicate is yours to delete."
 msgstr "Inportatzeak gehitu baino ez du egiten. Zure ibilbide profesionaleko erregistroan dagoen ezer ez da aldatzen ezta kentzen ere, eta bikoiztua dela ikusten den edozer zuk ezabatu behar duzu."
 
@@ -5225,7 +5225,8 @@ msgstr "Ziurtapena"
 
 #: src/postulo/documents/rendering.py src/postulo/jobs/merging.py
 #: src/postulo/resume/candidate.py src/postulo/resume/registry.py
-#: src/postulo/resume/views_candidate.py
+#: src/postulo/resume/views.py src/postulo/resume/views_candidate.py
+#: src/postulo/templates/resume/import.html
 #: src/postulo/templates/resume/preview.html
 msgid "Certifications"
 msgstr "Ziurtapenak"
@@ -5412,13 +5413,10 @@ msgstr "Aukeratu herrialde bat zerrendatik."
 msgid "Choose a destination and save it first."
 msgstr "Aukeratu helmuga bat eta gorde lehenik."
 
-#: src/postulo/resume/views.py
-msgid "Choose a Europass file first."
-msgstr "Aukeratu Europass fitxategi bat lehenik."
-
 #: src/postulo/applications/views_ical.py src/postulo/core/views_kind_files.py
 #: src/postulo/jobs/vcard_views.py src/postulo/jobs/views.py
-#: src/postulo/resume/views_candidate.py src/postulo/resume/views_references.py
+#: src/postulo/resume/views.py src/postulo/resume/views_candidate.py
+#: src/postulo/resume/views_references.py
 msgid "Choose a file first."
 msgstr "Aukeratu fitxategi bat lehenik."
 
@@ -5527,9 +5525,9 @@ msgstr "Aukeratu jaiotza-data egutegi batetik"
 msgid "Choose the destination"
 msgstr "Aukeratu helmuga"
 
-#: src/postulo/templates/resume/europass_import.html
-msgid "Choose the PDF you downloaded from europass.europa.eu, as it is: the CV is attached inside it, and that is what Postulo reads. Older Europass files read too: the XML and PDF of the editor before 2020, and the JSON of its web service. Postulo works out which it is, shows you what is in it, and writes nothing until you say so."
-msgstr "Aukeratu europass.europa.eu gunetik deskargatu zenuen PDFa, dagoen-dagoenean: CVa barruan erantsita dago, eta hori da Postulok irakurtzen duena. Europass fitxategi zaharragoak ere irakur daitezke: 2020 aurreko editorearen XML eta PDF fitxategiak, eta haren web-zerbitzuaren JSONa. Postulok zein den ondorioztatzen du, barruan dagoena erakusten dizu, eta ez du ezer idazten zuk baietz esan arte."
+#: src/postulo/templates/resume/import.html
+msgid "Choose the file as you downloaded it. Postulo works out which format it is, shows you what is in it, and writes nothing until you say so."
+msgstr ""
 
 #: src/postulo/accounts/forms.py src/postulo/jobs/forms.py
 msgid "Choose the type of identifier."
@@ -6179,7 +6177,8 @@ msgstr "Ikastaroa"
 
 #: src/postulo/documents/rendering.py src/postulo/jobs/merging.py
 #: src/postulo/resume/candidate.py src/postulo/resume/registry.py
-#: src/postulo/resume/views_candidate.py
+#: src/postulo/resume/views.py src/postulo/resume/views_candidate.py
+#: src/postulo/templates/resume/import.html
 #: src/postulo/templates/resume/preview.html
 msgid "Courses"
 msgstr "Ikastaroak"
@@ -7175,7 +7174,7 @@ msgstr "Merkataritza elektronikoa"
 msgid "Each invitation may be used once, and expires on its own. Its link is shown once, when it is made."
 msgstr "Gonbidapen bakoitza behin erabil daiteke, eta berez iraungitzen da. Haren esteka behin bakarrik erakusten da, sortzen denean."
 
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 msgid "Each is added as one of your contacts and as a reference you have not asked yet, so none is printed on a CV until you say they agreed."
 msgstr "Bakoitza zure kontaktuetako bat bezala gehitzen da, eta oraindik galdetu ez diozun erreferentzia gisa; beraz, ez da bat ere CV batean inprimatuko onartu dutela adierazi arte."
 
@@ -7289,7 +7288,7 @@ msgstr "editoreak"
 #: src/postulo/documents/rendering.py src/postulo/jobs/industries.py
 #: src/postulo/resume/candidate.py src/postulo/resume/registry.py
 #: src/postulo/resume/views_candidate.py
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 #: src/postulo/templates/resume/preview.html
 msgid "Education"
 msgstr "Prestakuntza"
@@ -7507,11 +7506,7 @@ msgstr "ESCO gaitasuna"
 msgid "Europass"
 msgstr "Europass"
 
-#: src/postulo/core/transfers.py
-msgid "Europass import"
-msgstr "Europass inportazioa"
-
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 msgid "Europass records five levels per language and Postulo keeps one, so the lowest is taken. Where the file states none, none is written: a level is a claim about yourself that somebody will test, so it is yours to make afterwards."
 msgstr "Europassek bost maila gordetzen ditu hizkuntza bakoitzeko eta Postulok bakarra; beraz, baxuena hartzen da. Fitxategiak mailarik adierazten ez duenean, ez da mailarik idazten: maila bat norberari buruzko baieztapena da, eta norbaitek probatuko du; beraz, zuri dagokizu gero ezartzea."
 
@@ -7751,7 +7746,7 @@ msgstr "Baztertu desegindakoak"
 
 #: src/postulo/documents/rendering.py src/postulo/resume/candidate.py
 #: src/postulo/resume/registry.py src/postulo/resume/views_candidate.py
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 #: src/postulo/templates/resume/preview.html
 msgid "Experience"
 msgstr "Esperientzia"
@@ -8399,7 +8394,7 @@ msgstr "Aurkitzeko bidea"
 msgid "found via"
 msgstr "aurkitzeko bidea"
 
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 #, python-format
 msgid "Found: %(names)s. Only the ones you have left blank will be filled in."
 msgstr "Aurkituak: %(names)s. Hutsik utzi dituzunak baino ez dira beteko."
@@ -9021,7 +9016,8 @@ msgstr "Ohorea edo saria"
 
 #: src/postulo/documents/rendering.py src/postulo/jobs/merging.py
 #: src/postulo/resume/candidate.py src/postulo/resume/registry.py
-#: src/postulo/resume/views_candidate.py
+#: src/postulo/resume/views.py src/postulo/resume/views_candidate.py
+#: src/postulo/templates/resume/import.html
 #: src/postulo/templates/resume/preview.html
 msgid "Honours and awards"
 msgstr "Ohoreak eta sariak"
@@ -9091,6 +9087,10 @@ msgstr "Nola iristen den enplegatzailearengana"
 #: src/postulo/documents/models.py
 msgid "how it reaches the employer"
 msgstr "nola iristen den enplegatzailearengana"
+
+#: src/postulo/templates/resume/import.html
+msgid "How it was read"
+msgstr ""
 
 #: src/postulo/applications/widgets.py
 msgid "How long they take"
@@ -9330,9 +9330,9 @@ msgstr "Erreferentzia-gutuna bada"
 msgid "If you are reading this, the email settings of your Postulo instance work. Nothing else to do."
 msgstr "Hau irakurtzen ari bazara, zure Postulo instantziaren posta-ezarpenek funtzionatzen dute. Ez dago beste ezer egiteko."
 
-#: src/postulo/templates/resume/europass_import.html
-msgid "If you have applied to an EU institution or through a national employment service, you already have this file. Rather than type it all again, hand it over."
-msgstr "EBko erakunde batean edo enplegu-zerbitzu nazional baten bidez hautagaitza aurkeztu baduzu, fitxategi hau baduzu jada. Dena berriro idatzi beharrean, eman ezazu hemen."
+#: src/postulo/templates/resume/import.html
+msgid "If your career is already written down in a file, hand it over rather than type it all again."
+msgstr ""
 
 #: src/postulo/core/models.py
 msgid "ignore robots.txt when capturing"
@@ -9354,9 +9354,9 @@ msgid "Import"
 msgstr "Inportatu"
 
 #: src/postulo/resume/views.py src/postulo/templates/resume/candidate_file.html
-#: src/postulo/templates/resume/europass_import.html
-msgid "Import a Europass CV"
-msgstr "Inportatu Europass CV bat"
+#: src/postulo/templates/resume/import.html
+msgid "Import a CV"
+msgstr ""
 
 #: src/postulo/templates/applications/ical_import.html
 msgid "Import an iCalendar file"
@@ -10440,7 +10440,7 @@ msgstr "zure ibilbide-erregistroaren hizkuntza"
 #: src/postulo/documents/rendering.py src/postulo/resume/candidate.py
 #: src/postulo/resume/registry.py src/postulo/resume/views.py
 #: src/postulo/resume/views_candidate.py
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 #: src/postulo/templates/resume/preview.html
 msgid "Languages"
 msgstr "Hizkuntzak"
@@ -11348,7 +11348,7 @@ msgstr "Kide-erakundeak"
 #: src/postulo/documents/rendering.py src/postulo/jobs/merging.py
 #: src/postulo/resume/candidate.py src/postulo/resume/registry.py
 #: src/postulo/resume/views.py src/postulo/resume/views_candidate.py
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 #: src/postulo/templates/resume/preview.html
 msgid "Memberships"
 msgstr "Kidetzak"
@@ -13132,6 +13132,14 @@ msgstr "Oraindik ez da ezer bidali."
 msgid "Nothing standing at Offer. Record one from an application's page when it arrives."
 msgstr "Ez dago ezer «Eskaintza» egoeran. Erregistratu bat hautagaitza baten orritik, iristen denean."
 
+#: src/postulo/resume/views.py
+msgid "Nothing that reads a CV from a file is switched on here, so that file was not read."
+msgstr ""
+
+#: src/postulo/templates/resume/import.html
+msgid "Nothing that reads a CV from a file is switched on here, so there is no file to choose."
+msgstr ""
+
 #: src/postulo/core/design.py src/postulo/templates/server/design.html
 msgid "Nothing there"
 msgstr "Hor ez dago ezer"
@@ -14511,7 +14519,7 @@ msgstr "pertsona"
 
 #: src/postulo/accounts/views.py src/postulo/core/help.py
 #: src/postulo/templates/accounts/profile.html
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 msgid "Personal details"
 msgstr "Datu pertsonalak"
 
@@ -15093,7 +15101,7 @@ msgstr "gaur egun"
 #: src/postulo/documents/rendering.py src/postulo/resume/candidate.py
 #: src/postulo/resume/registry.py src/postulo/resume/views.py
 #: src/postulo/resume/views_candidate.py
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 #: src/postulo/templates/resume/preview.html
 msgid "Presentations, conferences and seminars"
 msgstr "Aurkezpenak, biltzarrak eta mintegiak"
@@ -15326,7 +15334,7 @@ msgstr "Proiektua"
 
 #: src/postulo/documents/rendering.py src/postulo/resume/candidate.py
 #: src/postulo/resume/registry.py src/postulo/resume/views_candidate.py
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 #: src/postulo/templates/resume/preview.html
 msgid "Projects"
 msgstr "Proiektuak"
@@ -15392,7 +15400,9 @@ msgid "Publication"
 msgstr "Argitalpena"
 
 #: src/postulo/documents/rendering.py src/postulo/resume/candidate.py
-#: src/postulo/resume/registry.py src/postulo/resume/views_candidate.py
+#: src/postulo/resume/registry.py src/postulo/resume/views.py
+#: src/postulo/resume/views_candidate.py
+#: src/postulo/templates/resume/import.html
 #: src/postulo/templates/resume/preview.html
 msgid "Publications"
 msgstr "Argitalpenak"
@@ -15576,18 +15586,6 @@ msgstr "Irakurri honela"
 msgid "Read as %(name)s."
 msgstr "%(name)s gisa irakurri da."
 
-#: src/postulo/resume/views.py
-msgid "Read as Europass JSON, the older format as the Europass web service wrote it until 2020."
-msgstr "Europass JSON gisa irakurria, Europass web-zerbitzuak 2020ra arte idazten zuen formatu zaharra."
-
-#: src/postulo/resume/views.py
-msgid "Read as Europass XML in the older format, the one the Europass editor wrote until 2020."
-msgstr "Europass XML gisa irakurria, formatu zaharrean, Europass editoreak 2020ra arte idazten zuena."
-
-#: src/postulo/resume/views.py
-msgid "Read as Europass XML, the format europass.europa.eu has written since 2020."
-msgstr "Europass XML gisa irakurria, europass.europa.eu-k 2020tik idazten duen formatua."
-
 #: src/postulo/jobs/models.py
 msgid "read by"
 msgstr "nork irakurria"
@@ -15615,16 +15613,8 @@ msgstr "Nondik irakurria"
 msgid "Read from <bdi>%(address)s</bdi>."
 msgstr "<bdi>%(address)s</bdi> helbidetik irakurria."
 
-#: src/postulo/resume/views.py
-msgid "Read from the Europass XML attached to the PDF, in the older format the Europass editor wrote until 2020."
-msgstr "PDFari erantsitako Europass XMLtik irakurria, Europass editoreak 2020ra arte idazten zuen formatu zaharrean."
-
-#: src/postulo/resume/views.py
-msgid "Read from the Europass XML attached to the PDF, the format europass.europa.eu has written since 2020."
-msgstr "PDFari erantsitako Europass XMLtik irakurria, europass.europa.eu-k 2020tik idazten duen formatuan."
-
 #: src/postulo/templates/jobs/company_places.html
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 #: src/postulo/templates/resume/references.html
 #: src/postulo/templates/server/plugins.html
 msgid "Read it"
@@ -15929,8 +15919,7 @@ msgid "Reference letters they wrote"
 msgstr "Idatzi dituen erreferentzia-gutunak"
 
 #: src/postulo/documents/rendering.py src/postulo/resume/registry.py
-#: src/postulo/resume/views.py
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/resume/views.py src/postulo/templates/resume/import.html
 msgid "References"
 msgstr "Erreferentziak"
 
@@ -17548,7 +17537,7 @@ msgstr "gaitasun-taldeak"
 #: src/postulo/resume/registry.py src/postulo/resume/views.py
 #: src/postulo/resume/views_candidate.py
 #: src/postulo/templates/cotton/listing_skills.html
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 #: src/postulo/templates/resume/preview.html
 msgid "Skills"
 msgstr "Gaitasunak"
@@ -17831,7 +17820,7 @@ msgstr "Langile-hautaketa"
 #: src/postulo/templates/core/kind_file.html
 #: src/postulo/templates/jobs/contact_vcards.html
 #: src/postulo/templates/resume/candidate_file.html
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 msgid "Start again"
 msgstr "Hasi berriro"
 
@@ -19704,7 +19693,7 @@ msgstr "Haiek idatzi zuten zifra, zergen aurretik."
 #: src/postulo/templates/documents/upload_detail.html
 #: src/postulo/templates/jobs/contact_vcards.html
 #: src/postulo/templates/resume/candidate_file.html
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 msgid "The file"
 msgstr "Fitxategia"
 
@@ -20429,7 +20418,7 @@ msgstr "Eskaera %(limit)s baino handiagoa da, eta hori da dei honek irakurtzen d
 msgid "The request was not in the shape this call takes."
 msgstr "Eskaerak ez zuen dei honek onartzen duen forma."
 
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 msgid "The rest of the file is still worth importing. What is listed here is not, and you can add it by hand afterwards."
 msgstr "Fitxategiaren gainerakoa inportatzea merezi du, hala ere. Hemen zerrendatutakoa ez, baina eskuz gehi dezakezu gero."
 
@@ -22612,6 +22601,10 @@ msgstr "Zer itzuli zen aldi honetan"
 msgid "what came of it"
 msgstr "zer atera zen hartatik"
 
+#: src/postulo/templates/resume/import.html
+msgid "What can be read here"
+msgstr ""
+
 #: src/postulo/core/server_forms.py
 msgid "What carries the mail off this machine."
 msgstr "Posta makina honetatik ateratzen duena."
@@ -22633,7 +22626,7 @@ msgstr "Zer aldatu den hemen: %(title)s"
 msgid "What changes how Postulo behaves for you. Everything here works from the keyboard, with a screen reader and with scripts off; these are the choices on top of that."
 msgstr "Postulok zurekin nola jokatzen duen aldatzen duena. Hemengo guztia teklatuarekin, pantaila-irakurgailu batekin eta scriptak itzalita dabil; hauek horren gaineko aukerak dira."
 
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 msgid "What could not be read"
 msgstr "Zer ezin izan den irakurri"
 
@@ -22694,7 +22687,7 @@ msgstr "Egunkarian dagoena, hurbilena lehenik. Antolatu bat hautagaitza baten or
 #: src/postulo/templates/applications/ical_import.html
 #: src/postulo/templates/core/kind_file.html
 #: src/postulo/templates/resume/candidate_file.html
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 msgid "What is in the file"
 msgstr "Zer dagoen fitxategian"
 
@@ -23194,6 +23187,10 @@ msgstr "Norbaitek non egiazta dezakeen. CV batek esteka gisa inprimatzen du."
 #: src/postulo/templates/server/maps.html
 msgid "Where the companies' map takes the tiles it is drawn on, and whether addresses are pinned at their street."
 msgstr "Enpresen mapak nondik hartzen dituen marrazteko lauzak, eta helbideak beren kalean kokatzen diren ala ez."
+
+#: src/postulo/templates/resume/import.html
+msgid "Where the file states no level, none is written: a level is a claim about yourself that somebody will test, so it is yours to make afterwards."
+msgstr ""
 
 #: src/postulo/jobs/models.py
 msgid "where the logo came from"
@@ -23789,7 +23786,7 @@ msgstr "Egilea: <bdi>%(name)s</bdi>"
 msgid "Written by Postulo %(version)s on %(when)s."
 msgstr "Postulo %(version)s bertsioak idatzia, data: %(when)s."
 
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 #, python-format
 msgid "Written in %(tongue)s, which will be recorded as the language of your career record if you have not already set one."
 msgstr "%(tongue)s hizkuntzan idatzia; zure ibilbide-erregistroaren hizkuntza gisa erregistratuko da, oraindik bat ezarri ez baduzu."
@@ -24374,7 +24371,7 @@ msgstr "Zure erregistroa (JSON)"
 
 #: src/postulo/templates/core/export.html
 #: src/postulo/templates/resume/candidate_file.html
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 msgid "Your record as a file"
 msgstr "Zure erregistroa fitxategi gisa"
 
@@ -24500,9 +24497,13 @@ msgstr "{value} ostalariaren ondoren doa: bide-izenean, galdera-ikurraren ondore
 msgid "· in the <a href=\"%(group_url)s\" class=\"underline\">%(name)s</a> group"
 msgstr "· <a href=\"%(group_url)s\" class=\"underline\">%(name)s</a> taldean"
 
-#: src/postulo/templates/resume/europass_import.html
+#: src/postulo/templates/resume/import.html
 msgid "· no level in the file, so none will be claimed"
 msgstr "· fitxategian ez dago mailarik; beraz, ez da bat ere adieraziko"
+
+#: src/postulo/templates/resume/import.html
+msgid "· not a level Postulo keeps, so none will be claimed"
+msgstr ""
 
 #: src/postulo/templates/applications/application_detail.html
 #, python-format

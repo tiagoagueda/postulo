@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import datetime as dt
 import logging
+import re
 from urllib.parse import urlencode
 
 from django.contrib import messages
@@ -837,8 +838,8 @@ def create_from_orcid(owner, works: list[dict]) -> int:
     return added
 
 
-class EuropassImportView(LoginRequiredMixin, TemplateView):
-    """Read a Europass file, show what is in it, and write it only when told to.
+class CareerImportView(LoginRequiredMixin, TemplateView):
+    """Read a career out of a file, show what is in it, and write it only when told to.
 
     Two steps on one address, the same shape as the spreadsheet import: the file is read
     and held in the session, the page says what was found, and nothing reaches the career
@@ -847,49 +848,59 @@ class EuropassImportView(LoginRequiredMixin, TemplateView):
 
     What is held between the two steps is the parsed record, not the file. There is no
     reason to keep somebody's CV on the server for longer than it takes to read it.
+
+    The page names no format (#1260). Which files it reads, what the file box accepts and
+    the sentence saying what a file was read as all come from the importers that are on for
+    the person, so a second importer is a plugin and not a change here. It was the Europass
+    import's page until then, and `resume:europass_import` still names it for one release.
     """
 
-    template_name = "resume/europass_import.html"
-    SESSION_KEY = "europass_import"
+    template_name = "resume/import.html"
+    SESSION_KEY = "career_import"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         held = self.request.session.get(self.SESSION_KEY)
-        context["section_title"] = _("Import a Europass CV")
+        importers = importers_for(self.request.user)
+        context["section_title"] = _("Import a CV")
         context["found"] = _for_display(held) if held else None
+        context["importers"] = [
+            {"label": base.label_of(plugin), "description": base.description_of(plugin)}
+            for plugin in importers
+        ]
+        context["accept"] = accepted_by(importers)
         return context
 
     def post(self, request, *args, **kwargs):
         if request.POST.get("action") == "forget":
             request.session.pop(self.SESSION_KEY, None)
-            return redirect("resume:europass_import")
+            request.session.pop(f"{self.SESSION_KEY}_data", None)
+            return redirect("resume:import")
 
         if request.POST.get("action") == "confirm":
             return self._write(request)
 
         upload = request.FILES.get("file")
         if not upload:
-            messages.error(request, _("Choose a Europass file first."))
-            return redirect("resume:europass_import")
+            messages.error(request, _("Choose a file first."))
+            return redirect("resume:import")
         if upload.size > base.MAX_IMPORT_BYTES:
             messages.error(
                 request,
                 _("That file is over %(limit)s MB. A CV is not that big.")
                 % {"limit": base.MAX_IMPORT_BYTES // (1024 * 1024)},
             )
-            return redirect("resume:europass_import")
+            return redirect("resume:import")
 
-        # Refuse first, then ask what is installed rather than naming Europass. The
-        # refusals belong to the kind and apply whoever would have read the file. One
-        # importer ships in the box and is the only one that answers today; the point is
-        # that the second one need not be a change to this view.
+        # Refuse first, then ask what is installed rather than naming a format. The
+        # refusals belong to the kind and apply whoever would have read the file.
         data = upload.read()
-        from postulo.plugins.policy import plugins_for
+        importers = importers_for(request.user)
 
         try:
             base.refuse_unreadable(data)
             importer = None
-            for plugin in plugins_for(request.user, "importer"):
+            for plugin in importers:
                 # A plugin that raises is logged and skipped, as capture does (#611): one
                 # faulty add-on must not stop the importers behind it.
                 try:
@@ -901,15 +912,18 @@ class EuropassImportView(LoginRequiredMixin, TemplateView):
                     importer = plugin
                     break
             if importer is None:
+                if not importers:
+                    raise base.ImportRefused(
+                        _(
+                            "Nothing that reads a CV from a file is switched on here, so "
+                            "that file was not read."
+                        )
+                    )
                 # Named from the registry, for the same reason the lookup above is: with a
                 # second importer installed, the sentence has to say so (#105).
                 raise base.ImportRefused(
                     _("Nothing installed here reads that file. What is installed reads: %(what)s.")
-                    % {
-                        "what": ", ".join(
-                            str(p.label) for p in plugins_for(request.user, "importer")
-                        )
-                    }
+                    % {"what": ", ".join(str(p.label) for p in importers)}
                 )
             try:
                 record = importer.read(data)
@@ -923,23 +937,23 @@ class EuropassImportView(LoginRequiredMixin, TemplateView):
                 ) from None
         except base.ImportRefused as error:
             messages.error(request, str(error))
-            return redirect("resume:europass_import")
+            return redirect("resume:import")
 
         if record.is_empty:
             messages.warning(
                 request, _("That file was read, and there was nothing in it to import.")
             )
-            return redirect("resume:europass_import")
+            return redirect("resume:import")
 
         request.session[self.SESSION_KEY] = _summarise(record)
         request.session[f"{self.SESSION_KEY}_data"] = _to_session(record)
-        return redirect("resume:europass_import")
+        return redirect("resume:import")
 
     def _write(self, request):
         raw = request.session.get(f"{self.SESSION_KEY}_data")
         if not raw:
             messages.error(request, _("There is nothing waiting to be imported."))
-            return redirect("resume:europass_import")
+            return redirect("resume:import")
 
         record = _from_session(raw)
         with transaction.atomic():
@@ -963,7 +977,36 @@ class EuropassImportView(LoginRequiredMixin, TemplateView):
         return redirect("resume:overview")
 
 
-#: Europass's own words on the left, Postulo's on the right. The session holds the keys,
+def importers_for(user) -> list:
+    """The importers that are on for this person, in the order they are asked."""
+    from postulo.plugins.policy import plugins_for
+
+    return plugins_for(user, "importer")
+
+
+#: What an importer may put in ``accepts``: a file extension, or a media type.
+_ACCEPTED = re.compile(r"\.[A-Za-z0-9]{1,12}|[a-z]+/[A-Za-z0-9][A-Za-z0-9.+-]*")
+
+
+def accepted_by(importers) -> str:
+    """The file box's ``accept``: what the importers here say they read (#1260).
+
+    ``accepts`` is optional, so that an importer written before it existed still loads. Where
+    one of them does not say, the box accepts anything: a list that left its files out
+    would grey them out in the file chooser, for a reason nobody could see.
+    """
+    found: list[str] = []
+    for plugin in importers:
+        declared = getattr(plugin, "accepts", None)
+        if not isinstance(declared, (tuple, list)) or not declared:
+            return ""
+        for each in declared:
+            if isinstance(each, str) and _ACCEPTED.fullmatch(each) and each not in found:
+                found.append(each)
+    return ",".join(found)
+
+
+#: The record's own words on the left, Postulo's on the right. The session holds the keys,
 #: so a language changed between reading the file and confirming it still reads properly.
 COUNT_LABELS = {
     "experience": _("Positions"),
@@ -971,6 +1014,10 @@ COUNT_LABELS = {
     "languages": _("Languages"),
     "skills": _("Skills"),
     "projects": _("Projects and achievements"),
+    "certifications": _("Certifications"),
+    "honours": _("Honours and awards"),
+    "courses": _("Courses"),
+    "publications": _("Publications"),
     "memberships": _("Memberships"),
     "participations": _("Presentations, conferences and seminars"),
     "references": _("References"),
@@ -985,26 +1032,6 @@ PERSON_LABELS = {
     "location": _("where you live"),
     "headline": _("headline"),
     "orcid": _("ORCID"),
-}
-
-#: Which Europass format was read, in words. The PDF is named because it is the file a
-#: person chose: saying only "XML" about it would describe a file they never saw (#244).
-SOURCE_LABELS = {
-    "candidate": _("Read as Europass XML, the format europass.europa.eu has written since 2020."),
-    "pdf-candidate": _(
-        "Read from the Europass XML attached to the PDF, the format europass.europa.eu has "
-        "written since 2020."
-    ),
-    "xml": _(
-        "Read as Europass XML in the older format, the one the Europass editor wrote until 2020."
-    ),
-    "pdf-xml": _(
-        "Read from the Europass XML attached to the PDF, in the older format the Europass "
-        "editor wrote until 2020."
-    ),
-    "json": _(
-        "Read as Europass JSON, the older format as the Europass web service wrote it until 2020."
-    ),
 }
 
 LEVEL_LABELS = {
@@ -1024,7 +1051,9 @@ def _for_display(held: dict) -> dict:
         for key, total in held.get("counts", {}).items()
         if total
     ]
-    shown["source"] = SOURCE_LABELS.get(held.get("source"), "")
+    # Which format was read, in the importer's own sentence (#244, #1260): the importer
+    # knows its formats and this page does not.
+    shown["source"] = held.get("source_label", "")
     shown["person"] = [PERSON_LABELS.get(key, key) for key in held.get("person", {})]
     shown["languages"] = [
         {
@@ -1034,6 +1063,9 @@ def _for_display(held: dict) -> dict:
             # that states no CEFR level is the ordinary case, and the honest answer to "how
             # good is your German" is the one the person gives afterwards (#235).
             "unset": not row.get("proficiency"),
+            # What the file says instead, in its own words, where that is no level of
+            # Postulo's: shown, and never turned into one by a table (#1260).
+            "stated": row.get("stated", ""),
             "levels": [
                 {"part": LEVEL_LABELS.get(part, part), "level": level}
                 for part, level in (row.get("levels") or {}).items()
@@ -1041,6 +1073,8 @@ def _for_display(held: dict) -> dict:
         }
         for row in held.get("languages", [])
     ]
+    shown["several_levels"] = any(row["levels"] for row in shown["languages"])
+    shown["no_level"] = any(row["unset"] for row in shown["languages"])
     shown["locale"] = languages.native_name(held.get("locale", ""), held.get("locale", ""))
     return shown
 
@@ -1052,13 +1086,20 @@ def _proficiency_label(value):
         return value
 
 
+def _said(row: dict, key: str) -> str:
+    """What a row says under a key it may leave out, as text for the review."""
+    value = row.get(key)
+    return value if isinstance(value, str) else ""
+
+
 def _summarise(record: importing.Record) -> dict:
     """What the review page shows: enough to recognise the file, not the whole of it."""
     return {
         "counts": record.counts(),
-        "source": record.source,
+        "source_label": str(record.source_label or ""),
         "locale": record.locale,
-        "skipped": record.skipped,
+        "skipped": [str(note) for note in record.skipped],
+        "notes": [str(note) for note in record.notes],
         "person": record.person,
         "experience": [
             {"role": row["role"], "organisation": row["organisation"]} for row in record.experience
@@ -1068,11 +1109,30 @@ def _summarise(record: importing.Record) -> dict:
             for row in record.education
         ],
         "languages": [
-            {"name": row["name"], "proficiency": row["proficiency"], "levels": row["levels"]}
+            {
+                "name": row["name"],
+                "proficiency": row["proficiency"],
+                # Both for the review only, and both a row may leave out (#1260).
+                "levels": row.get("levels") or {},
+                "stated": _said(row, "stated"),
+            }
             for row in record.languages
         ],
         "skill_groups": record.skill_groups,
         "projects": [{"name": row["name"]} for row in record.projects],
+        "certifications": [
+            {"name": _said(row, "name"), "issuer": _said(row, "issuer")}
+            for row in record.certifications
+        ],
+        "honours": [
+            {"title": _said(row, "title"), "awarded_by": _said(row, "awarded_by")}
+            for row in record.honours
+        ],
+        "courses": [
+            {"title": _said(row, "title"), "provider": _said(row, "provider")}
+            for row in record.courses
+        ],
+        "publications": [{"title": _said(row, "title")} for row in record.publications],
         "memberships": [{"organisation": row["organisation"]} for row in record.memberships],
         "participations": [{"event": row["event"]} for row in record.participations],
         # Each person, by name, before anything is written: they become contacts (#696).
@@ -1083,95 +1143,35 @@ def _summarise(record: importing.Record) -> dict:
     }
 
 
+def _with_dates(row: dict, rows: importing.Rows, convert) -> dict:
+    """A row with its dates turned one way or the other; a date it must have is always there."""
+    return {
+        **row,
+        **{key: convert(row.get(key)) for key in rows.dates if key in row or key in rows.required},
+    }
+
+
 def _to_session(record: importing.Record) -> dict:
     """The record as something a session can hold: dates become strings."""
-    return {
-        "person": record.person,
-        "locale": record.locale,
-        "experience": [
-            {
-                **row,
-                "start_date": _iso(row["start_date"]),
-                "end_date": _iso(row["end_date"]),
-            }
-            for row in record.experience
-        ],
-        "education": [
-            {
-                **row,
-                "start_date": _iso(row["start_date"]),
-                "end_date": _iso(row["end_date"]),
-            }
-            for row in record.education
-        ],
-        "languages": record.languages,
-        "skill_groups": record.skill_groups,
-        "projects": record.projects,
-        "memberships": [
-            {
-                **row,
-                "start_date": _iso(row.get("start_date")),
-                "end_date": _iso(row.get("end_date")),
-            }
-            for row in record.memberships
-        ],
-        "participations": [
-            {
-                **row,
-                "start_date": _iso(row.get("start_date")),
-                "end_date": _iso(row.get("end_date")),
-            }
-            for row in record.participations
-        ],
-        "references": record.references,
-    }
+    held = {"person": record.person, "locale": record.locale}
+    for name, rows in importing.ROWS.items():
+        held[name] = [_with_dates(row, rows, _iso) for row in getattr(record, name)]
+    return held
 
 
 def _from_session(raw: dict) -> importing.Record:
     return importing.Record(
         person=raw.get("person", {}),
         locale=raw.get("locale", ""),
-        experience=[
-            {
-                **row,
-                "start_date": _date(row.get("start_date")),
-                "end_date": _date(row.get("end_date")),
-            }
-            for row in raw.get("experience", [])
-        ],
-        education=[
-            {
-                **row,
-                "start_date": _date(row.get("start_date")),
-                "end_date": _date(row.get("end_date")),
-            }
-            for row in raw.get("education", [])
-        ],
-        languages=raw.get("languages", []),
-        skill_groups=raw.get("skill_groups", []),
-        projects=raw.get("projects", []),
-        memberships=[
-            {
-                **row,
-                "start_date": _date(row.get("start_date")),
-                "end_date": _date(row.get("end_date")),
-            }
-            for row in raw.get("memberships", [])
-        ],
-        participations=[
-            {
-                **row,
-                "start_date": _date(row.get("start_date")),
-                "end_date": _date(row.get("end_date")),
-            }
-            for row in raw.get("participations", [])
-        ],
-        references=raw.get("references", []),
+        **{
+            name: [_with_dates(row, rows, _date) for row in raw.get(name, [])]
+            for name, rows in importing.ROWS.items()
+        },
     )
 
 
 def _iso(value):
-    return value.isoformat() if value else None
+    return value.isoformat() if isinstance(value, dt.date) else None
 
 
 def _date(value):

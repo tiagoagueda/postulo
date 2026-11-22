@@ -296,6 +296,10 @@ EXCUSED: dict[str, str] = {
     "listings:shortlist": "a POST from the listings table",
     "listings:discard": "a POST from the listings table",
     "listings:restore": "a POST that brings a discarded listing back",
+    "resume:europass_import": (
+        "the name `resume:import` had while Europass was the only importer, kept for one "
+        "release; the same address, which is walked under its own name (#1260)"
+    ),
     "resume:item_move": "a POST that reorders one entry in the career record",
     "resume:skill_suggestions": (
         "the `<option>` elements the skill box asks for as somebody types, as a fragment "
