@@ -43,7 +43,7 @@ def test_an_importer_is_checked_against_its_own_protocol():
 
 def test_europass_ships_in_the_box():
     found = registry.plugins("importer")
-    assert [plugin.name for plugin in found] == ["europass"]
+    assert [plugin.name for plugin in found] == ["europass", "json-resume", "linkedin-archive"]
     assert isinstance(found[0], EuropassImporter)
 
 
@@ -299,7 +299,12 @@ def test_the_group_is_advertised():
 
 def test_a_third_party_importer_is_loaded_and_asked_first(installed):
     found = registry.plugins("importer")
-    assert [plugin.name for plugin in found] == ["hr-xml", "europass"]
+    assert [plugin.name for plugin in found] == [
+        "hr-xml",
+        "europass",
+        "json-resume",
+        "linkedin-archive",
+    ]
     assert isinstance(found[0], base.ImporterPlugin)
 
 
@@ -328,7 +333,7 @@ def test_a_package_that_is_not_an_importer_is_left_out(monkeypatch, caplog):
         found = registry.plugins("importer")
     finally:
         registry._cache.clear()
-    assert [plugin.name for plugin in found] == ["europass"]
+    assert [plugin.name for plugin in found] == ["europass", "json-resume", "linkedin-archive"]
     assert "not-one" in caplog.text
 
 
@@ -371,7 +376,10 @@ def test_the_refusal_names_what_is_installed(client, user, installed):
 
     response = client.post(url, {"file": _upload("cv.docx", WORD_FILE)}, follow=True)
 
-    assert b"What is installed reads: HR-XML, Europass import." in response.content
+    assert (
+        b"What is installed reads: HR-XML, Europass import, JSON Resume import, "
+        b"LinkedIn data archive import." in response.content
+    )
 
 
 @pytest.mark.parametrize(
@@ -643,8 +651,9 @@ def test_the_file_box_accepts_what_the_importers_say_they_read(client, user):
     body = client.get(reverse("resume:import")).content.decode()
 
     assert (
-        'accept=".pdf,.xml,.json,application/pdf,text/xml,application/xml,application/json"' in body
-    ), "what the box accepted while it named Europass"
+        'accept=".pdf,.xml,.json,application/pdf,text/xml,application/xml,application/json,'
+        '.zip,.csv,application/zip,text/csv"' in body
+    ), "what the box accepted while it named Europass, and what the other two add"
 
 
 def test_a_second_importer_adds_what_it_reads_to_the_file_box(client, user, wider):
@@ -676,7 +685,8 @@ def test_what_an_importer_puts_in_accepts_is_held_to_extensions_and_media_types(
 
 def test_with_no_importer_switched_on_there_is_no_file_box(client, user):
     client.force_login(user)
-    _switch_off("europass")
+    for name in ("europass", "json-resume", "linkedin-archive"):
+        _switch_off(name)
 
     page = client.get(reverse("resume:import"))
     body = page.content.decode()
@@ -702,7 +712,7 @@ def test_every_importer_that_ships_has_its_own_entry_behind_import(user):
     transfers.register(entry)
     try:
         offered = [t.key for t in transfers.offered("career", "import", user)]
-        assert offered[:2] == ["career-europass-import", "career-wider-import"]
+        assert offered[0] == "career-europass-import" and "career-wider-import" in offered
 
         _switch_off("europass")
 
