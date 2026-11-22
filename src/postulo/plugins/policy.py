@@ -95,7 +95,9 @@ GOVERNED_KINDS = (
 #: ``linkedin`` means (#305). So is a **messaging-service** plugin, the registry of the
 #: services a handle can be on (#682). So is a **register-adapter** plugin (#1021): it says how
 #: a country's register is asked, and whether anything is asked at all is the decision of the
-#: ``register-lookup`` feature, which is governed like any other.
+#: ``register-lookup`` feature, which is governed like any other. So is a **listing-search**
+#: plugin (#1253): it says how a job service is searched, and whether one is asked is the
+#: decision of the ``listing-search`` feature and of the switch each service has under it.
 #:
 #: A **backup-destination** plugin is here for the transport's reason: where the instance's
 #: archives are kept is the operator's plumbing, and *forced off* for one person would mean
@@ -106,6 +108,7 @@ UNGOVERNED_KINDS = (
     "link-service",
     "messaging-service",
     "register-adapter",
+    "listing-search",
     "backup-destination",
 )
 

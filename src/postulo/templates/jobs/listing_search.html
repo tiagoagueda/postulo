@@ -1,0 +1,137 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% translate "Search a job service" %}{% endblock %}
+
+{% block content %}
+  <div class="max-w-3xl" data-listing-search>
+    <c-page-title>
+      {% translate "Search a job service" %}
+      <c-slot name="subtitle">
+        {% blocktranslate trimmed %}
+          Search the adverts a job service publishes, and review the one you want before it
+          becomes a listing. Nothing is asked until you press Search.
+        {% endblocktranslate %}
+      </c-slot>
+    </c-page-title>
+
+    {% comment %} A plain form post, with scripts on or off (#1253): the search travels in the
+       body, never in the address, and nothing of it is kept. {% endcomment %}
+    <form method="post" novalidate class="card mb-6" data-search-form>
+      {% csrf_token %}
+      {% if form.non_field_errors %}
+        <div class="alert mb-4" data-variant="destructive" role="alert">
+          {% for error in form.non_field_errors %}<p>{{ error }}</p>{% endfor %}
+        </div>
+      {% endif %}
+      <c-field :field="form.service" />
+      {% if form.words %}<c-field :field="form.words" />{% endif %}
+      {% if form.place %}<c-field :field="form.place" />{% endif %}
+      {% if form.since %}<c-field :field="form.since" />{% endif %}
+      {% if form.remote %}<c-field :field="form.remote" />{% endif %}
+      <div class="flex flex-wrap items-center gap-3">
+        <button type="submit" name="search" value="1" class="btn">{% translate "Search" %}</button>
+        <a href="{% url 'listings:list' %}" class="btn" data-variant="ghost">{% translate "Back to your listings" %}</a>
+      </div>
+    </form>
+
+    {% if results %}
+      <section aria-labelledby="results-heading" data-search-results>
+        <c-section-title id="results-heading">
+          {% if results.total is not None %}
+            {% blocktranslate count counter=results.total trimmed %}
+              One advert found
+            {% plural %}
+              {{ counter }} adverts found
+            {% endblocktranslate %}
+          {% else %}
+            {% translate "Adverts found" %}
+          {% endif %}
+        </c-section-title>
+        {% if left_out %}
+          <p class="mb-3 text-sm text-ink-500 dark:text-ink-400" data-left-out>
+            {% blocktranslate trimmed with service=service.label criteria=left_out|join:", " %}
+              {{ service }} does not search by {{ criteria }}, so that was not sent.
+            {% endblocktranslate %}
+          </p>
+        {% endif %}
+        {% if rows %}
+          <ul class="card divide-y divide-ink-100 p-0 dark:divide-ink-800">
+            {% for row in rows %}
+              <li class="flex flex-wrap items-start gap-3 px-4 py-3" data-search-hit="{{ row.key }}">
+                <div class="min-w-0 flex-1">
+                  <p class="font-medium">
+                    {% if row.posting.url %}
+                      <a href="{{ row.posting.url }}" rel="noopener noreferrer external" target="_blank" class="text-brand-600 underline dark:text-brand-400"><bdi{% if language %} lang="{{ language }}"{% endif %}>{{ row.posting.title }}</bdi></a>
+                    {% else %}
+                      <bdi{% if language %} lang="{{ language }}"{% endif %}>{{ row.posting.title }}</bdi>
+                    {% endif %}
+                  </p>
+                  <p class="text-sm text-ink-500 dark:text-ink-400">
+                    {% if row.posting.company_name %}<bdi{% if language %} lang="{{ language }}"{% endif %}>{{ row.posting.company_name }}</bdi>{% endif %}
+                    {% if row.posting.location %} · <bdi{% if language %} lang="{{ language }}"{% endif %}>{{ row.posting.location }}</bdi>{% endif %}
+                    {% if row.posting.posted_at %} · {% blocktranslate trimmed with when=row.posting.posted_at|date:"DATE_FORMAT" %}Published {{ when }}{% endblocktranslate %}{% endif %}
+                  </p>
+                </div>
+                {% comment %} Told, not refused (#178): what the person already holds of this
+                   advert is said beside it, and Review still makes a capture if pressed. {% endcomment %}
+                {% if row.known.listings %}
+                  <span class="badge" data-tone="green" data-known="listing">{% translate "In your listings" %}</span>
+                {% elif row.known.captures %}
+                  <span class="badge" data-tone="amber" data-known="capture">{% translate "Waiting for review" %}</span>
+                {% elif row.known.similar %}
+                  <span class="badge" data-tone="grey" data-known="similar">{% translate "A listing like it" %}</span>
+                {% endif %}
+                <form method="post">
+                  {% csrf_token %}
+                  <input type="hidden" name="service" value="{{ service.key }}">
+                  <input type="hidden" name="advert" value="{{ row.key }}">
+                  <button type="submit" name="review" value="1" class="btn" data-variant="outline" data-size="sm">
+                    {% translate "Review" %}<span class="sr-only">: {{ row.posting.title }}</span>
+                  </button>
+                </form>
+              </li>
+            {% endfor %}
+          </ul>
+        {% else %}
+          <c-empty variant="quiet">{% translate "Nothing matches that search." %}</c-empty>
+        {% endif %}
+
+        {% if next_page %}
+          {% comment %} The next page is another press, and another request: the same search
+             sent again from hidden fields, never kept between the two. {% endcomment %}
+          <form method="post" class="mt-4" data-next-page>
+            {% csrf_token %}
+            <input type="hidden" name="service" value="{{ service.key }}">
+            {% if form.words %}<input type="hidden" name="words" value="{{ form.cleaned_data.words }}">{% endif %}
+            {% if form.place %}<input type="hidden" name="place" value="{{ form.cleaned_data.place }}">{% endif %}
+            {% if form.since and form.cleaned_data.since %}<input type="hidden" name="since" value="{{ form.cleaned_data.since }}">{% endif %}
+            {% if form.remote and form.cleaned_data.remote %}<input type="hidden" name="remote" value="on">{% endif %}
+            <input type="hidden" name="page" value="{{ next_page }}">
+            <button type="submit" name="search" value="1" class="btn" data-variant="outline">{% translate "Next page" %}</button>
+          </form>
+        {% endif %}
+      </section>
+    {% endif %}
+
+    {% comment %} Who is asked, what is sent and under what licence its adverts are, said on the
+       page itself, for the service chosen or, before a search, for each one offered. {% endcomment %}
+    <div class="mt-8 border-t border-ink-200 pt-4 text-xs text-ink-500 dark:border-ink-800 dark:text-ink-400" data-search-terms>
+      {% for one in services %}
+        {% if not service or one.key == service.key %}
+          <p class="mb-2" data-search-service="{{ one.key }}">
+            {% blocktranslate trimmed with source=one.source hosts=one.hosts|join:", " %}
+              {{ source }}: asked at {{ hosts }}. It is sent the words, the place and the filters you search for, or an advert's number when you press Review, and nothing about you.
+            {% endblocktranslate %}
+            {% if one.licence %}
+              {% translate "Licence of its adverts:" %}
+              {% if one.licence_url %}<a href="{{ one.licence_url }}" rel="noopener noreferrer external license" target="_blank" class="underline">{{ one.licence }}</a>{% else %}{{ one.licence }}{% endif %}.
+            {% endif %}
+            {% if one.terms_url %}<a href="{{ one.terms_url }}" rel="noopener noreferrer external" target="_blank" class="underline">{% translate "Its terms of use" %}</a>.{% endif %}
+          </p>
+        {% endif %}
+      {% endfor %}
+      <p>{% translate "The results are shown and not kept. An advert is kept only once you review it and save it." %}</p>
+    </div>
+  </div>
+{% endblock %}

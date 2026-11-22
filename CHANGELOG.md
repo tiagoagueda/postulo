@@ -8,6 +8,8 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### ✨ Added
 
+- Plugins can describe a job service searched by criteria (the listing-search kind); Postulo makes the request on a press, shows the results without keeping them and sends a chosen advert to review; off until an administrator switches it on, with a switch per service (#1253)
+- Search Arbetsförmedlingen's job adverts (Sweden) from Listings and review a result as any capture; no key is needed and the adverts are under CC0 (#1253)
 - A theme from a plugin can say the languages and countries it suits, and the theme menu lists those first, under their own heading, for a document in that language or country; nothing is hidden or chosen for you, and a plugin can carry the new Documents category (#1255)
 - Email notifications can arrive once a day instead of as they happen: one mail at an hour you choose in your own time zone, 08:00 unless you say otherwise (#1259)
 - A notifier plugin can keep a message until a time it chooses (`hold_until`) and take every kept message of a connection at once (`send_many`); kept messages wait and are retried as failed sends do (#1259)

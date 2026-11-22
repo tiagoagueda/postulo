@@ -136,7 +136,7 @@ def test_every_plugin_postulo_ships_declares_the_full_set():
     assert not missing, "\n".join(missing)
 
 
-def test_these_are_the_plugins_that_ship_across_twelve_kinds():
+def test_these_are_the_plugins_that_ship_across_thirteen_kinds():
     """Named rather than counted, so that losing one to a bad import is a failure rather
     than a quiet absence — and so that adding one is a line somebody wrote.
 
@@ -171,7 +171,9 @@ def test_these_are_the_plugins_that_ship_across_twelve_kinds():
     `register-adapters` is a third vocabulary, and a kind of its own too: the company
     registers *Register lookup* may ask, one per country, which a package for another country
     may add to; `register-lookup` is the feature that decides whether any is asked, and it is
-    the one feature that starts off (#1021).
+    one of the features that start off (#1021). `listing-search` is another (#1253): it decides
+    whether a job service is searched at all, with a switch per service under it, and
+    `listing-searches` is the registry of the services Postulo ships a search for.
 
     `multiple-fields` is a module with no behaviour of its own: the parent of the six features
     that let a field hold more than one value (#875), whose switch is theirs, and
@@ -184,7 +186,7 @@ def test_these_are_the_plugins_that_ship_across_twelve_kinds():
         for classes in registry.builtins().values()
         for plugin_class in classes
     }
-    assert len(registry.builtins()) == 12, sorted(registry.builtins())
+    assert len(registry.builtins()) == 13, sorted(registry.builtins())
 
     assert found == {
         "board",
@@ -217,6 +219,8 @@ def test_these_are_the_plugins_that_ship_across_twelve_kinds():
         "bibliography-lookups",
         "register-lookup",
         "register-adapters",
+        "listing-search",
+        "listing-searches",
         "nace",
         "esco",
         "geonames",

@@ -1557,25 +1557,40 @@ msgstr "%(scheme)s: tai nėra įprasta forma."
 msgid "%(sent)s, %(failed)s; each document says which."
 msgstr "%(sent)s, %(failed)s; tai nurodyta prie kiekvieno dokumento."
 
-#: src/postulo/resume/lookups.py
+#: src/postulo/jobs/listing_search.py src/postulo/resume/lookups.py
 #, python-format
 msgid "%(service)s answered %(status)s."
 msgstr "Paslauga %(service)s atsakė: %(status)s."
 
-#: src/postulo/resume/lookups.py
+#: src/postulo/jobs/listing_search.py src/postulo/resume/lookups.py
 #, python-format
 msgid "%(service)s asked for fewer requests. Try again later."
 msgstr "Paslauga %(service)s paprašė siųsti mažiau užklausų. Bandykite dar kartą vėliau."
 
-#: src/postulo/resume/lookups.py
+#: src/postulo/jobs/listing_search.py src/postulo/resume/lookups.py
 #, python-format
 msgid "%(service)s could not be reached."
 msgstr "Nepavyko pasiekti paslaugos %(service)s."
+
+#: src/postulo/jobs/listing_search.py
+#, python-format
+msgid "%(service)s did not accept that search."
+msgstr ""
+
+#: src/postulo/templates/jobs/listing_search.html
+#, python-format
+msgid "%(service)s does not search by %(criteria)s, so that was not sent."
+msgstr ""
 
 #: src/postulo/resume/lookups.py
 #, python-format
 msgid "%(service)s has no record in a form Postulo reads."
 msgstr "Paslauga %(service)s neturi įrašo tokiu formatu, kurį Postulo galėtų nuskaityti."
+
+#: src/postulo/jobs/listing_search.py
+#, python-format
+msgid "%(service)s has nothing at the address it was asked at."
+msgstr ""
 
 #: src/postulo/core/web_links.py src/postulo/jobs/surface.py
 #, python-format
@@ -1587,6 +1602,11 @@ msgstr "Paslauga %(service)s jau naudojama kitoje eilutėje."
 msgid "%(service)s knows no such identifier."
 msgstr "Paslauga %(service)s tokio identifikatoriaus nežino."
 
+#: src/postulo/jobs/listing_search.py
+#, python-format
+msgid "%(service)s no longer has that advert."
+msgstr ""
+
 #: src/postulo/resume/lookups.py
 #, python-format
 msgid "%(service)s redirected too many times."
@@ -1597,7 +1617,7 @@ msgstr "Paslauga %(service)s peradresavo per daug kartų."
 msgid "%(service)s refused the look-ups (%(status)s). They are stopped."
 msgstr "Paslauga %(service)s atmetė paieškos užklausas (%(status)s). Jos sustabdytos."
 
-#: src/postulo/resume/lookups.py
+#: src/postulo/jobs/listing_search.py src/postulo/resume/lookups.py
 #, python-format
 msgid "%(service)s sent the request somewhere else."
 msgstr "Paslauga %(service)s nukreipė užklausą kitur."
@@ -1607,10 +1627,20 @@ msgstr "Paslauga %(service)s nukreipė užklausą kitur."
 msgid "%(service)s sent the request to an address Postulo does not dial."
 msgstr "Paslauga %(service)s nukreipė užklausą adresu, kuriuo Postulo nesijungia."
 
-#: src/postulo/resume/lookups.py
+#: src/postulo/jobs/listing_search.py src/postulo/resume/lookups.py
 #, python-format
 msgid "%(service)s took too long to answer."
 msgstr "Paslauga %(service)s per ilgai neatsakė."
+
+#: src/postulo/jobs/listing_search.py
+#, python-format
+msgid "%(service)s's answer could not be read."
+msgstr ""
+
+#: src/postulo/jobs/listing_search.py
+#, python-format
+msgid "%(service)s's answer was larger than a page of adverts should be."
+msgstr ""
 
 #: src/postulo/resume/views.py
 #, python-format
@@ -1621,6 +1651,11 @@ msgstr "Paslauga %(service)s per doi.org neturėjo nieko tuštiems laukeliams u�
 #, python-format
 msgid "%(share)s%%"
 msgstr "%(share)s %%"
+
+#: src/postulo/templates/jobs/listing_search.html
+#, python-format
+msgid "%(source)s: asked at %(hosts)s. It is sent the words, the place and the filters you search for, or an advert's number when you press Review, and nothing about you."
+msgstr ""
 
 #: src/postulo/applications/agenda.py
 #, python-format
@@ -2434,6 +2469,10 @@ msgstr "Antraštė, po ja esantis sakinys ir tada tai, kam skirta kortelė."
 msgid "a job title"
 msgstr "pareigų pavadinimas"
 
+#: src/postulo/jobs/search_views.py
+msgid "A job title, a skill or an employer, as you would type it on the service."
+msgstr ""
+
 #: src/postulo/documents/integrity.py
 msgid "a JPEG picture"
 msgstr "JPEG vaizdas"
@@ -2542,6 +2581,10 @@ msgstr "Skelbimas – tai pastebėtas darbo skelbimas, kol dar nieko dėl jo nen
 #: src/postulo/templates/core/import_csv.html
 msgid "A listing keeps its deadline, which the closing-soon notice then watches, and its tags are written into its description."
 msgstr "Skelbimas išsaugo savo terminą, kurį vėliau stebi įspėjimas, kad skelbimas netrukus baigs galioti, o jo žymos įrašomos į aprašymą."
+
+#: src/postulo/templates/jobs/listing_search.html
+msgid "A listing like it"
+msgstr ""
 
 #: src/postulo/templates/jobs/capture_review.html
 msgid "A listing with this title at this company exists; a board that mints a fresh address per visit may be showing you the same advert."
@@ -2999,6 +3042,10 @@ msgstr "Žetonas leidžia už Postulo ribų esančiam įrankiui veikti jūsų va
 #: src/postulo/templates/help/postal_addresses.html
 msgid "A town and a country alone are kept as a place. Nothing checks that an address exists, and a country Postulo has no rules for is free-form."
 msgstr "Vien miestas ir šalis saugomi kaip vieta. Niekas netikrina, ar adresas egzistuoja, o šalies, kuriai Postulo neturi taisyklių, adresas įvedamas laisva forma."
+
+#: src/postulo/jobs/search_views.py
+msgid "A town or a region."
+msgstr ""
 
 #: src/postulo/resume/candidate.py
 msgid "A translation"
@@ -3527,6 +3574,10 @@ msgstr "Reklama"
 #: src/postulo/jobs/industries.py
 msgid "Advertising and marketing"
 msgstr "Reklama ir rinkodara"
+
+#: src/postulo/templates/jobs/listing_search.html
+msgid "Adverts found"
+msgstr ""
 
 #: src/postulo/applications/models.py
 msgid "adviser"
@@ -4463,9 +4514,17 @@ msgstr "Azija"
 msgid "Asked"
 msgstr "Paprašyta"
 
+#: src/postulo/jobs/search_views.py
+msgid "Asked for the advert. Check it before it becomes a listing."
+msgstr ""
+
 #: src/postulo/templates/server/record_of_processing.html
 msgid "Asked only when somebody presses for it, one company at a time. Each is sent what is listed and nothing about the person asking."
 msgstr "Klausiama tik tada, kai kas nors to paprašo, po vieną įmonę. Kiekvienai paslaugai siunčiama tai, kas nurodyta, ir nieko apie klausiantį asmenį."
+
+#: src/postulo/templates/server/record_of_processing.html
+msgid "Asked only when somebody presses Search or Review. Each is sent what is listed and nothing about the person asking; nothing it answers is kept unless the person saves an advert."
+msgstr ""
 
 #: src/postulo/templates/connections/pairing.html
 #, python-format
@@ -4491,6 +4550,10 @@ msgstr "Asociacijos, draugijos ir klubai, kuriems priklausote ar priklausėte."
 #: src/postulo/core/models.py
 msgid "at"
 msgstr "laikas"
+
+#: src/postulo/jobs/search_views.py
+msgid "At any time"
+msgstr ""
 
 #: src/postulo/templates/settings/appearance.html
 msgid "At each status"
@@ -4739,6 +4802,7 @@ msgstr "Atgal į skiltį „Jūsų duomenys“"
 
 #: src/postulo/templates/jobs/capture_decided.html
 #: src/postulo/templates/jobs/capture_page.html
+#: src/postulo/templates/jobs/listing_search.html
 msgid "Back to your listings"
 msgstr "Atgal į jūsų skelbimus"
 
@@ -9595,6 +9659,14 @@ msgstr "Faile du kartus"
 msgid "In the instance's time zone."
 msgstr "Pagal šio egzemplioriaus laiko juostą."
 
+#: src/postulo/jobs/search_views.py
+#, python-format
+msgid "In the last day"
+msgid_plural "In the last %(count)d days"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+
 #: src/postulo/core/search.py
 #, python-format
 msgid "in the motivation letter rendered on %(when)s"
@@ -9632,6 +9704,10 @@ msgstr "ataskaitoje, kurią %(when)s išsiuntėte įmonei %(company)s"
 #: src/postulo/templates/documents/rendered_compare.html
 msgid "In this version, and not in the one before"
 msgstr "Šioje versijoje yra, ankstesnėje nėra"
+
+#: src/postulo/templates/jobs/listing_search.html
+msgid "In your listings"
+msgstr ""
 
 #: src/postulo/applications/forms.py
 msgid "In your time zone."
@@ -10221,6 +10297,10 @@ msgstr "pagal gatvę"
 msgid "Its street will be looked up with %(service)s shortly."
 msgstr "Netrukus jo gatvės bus ieškoma naudojant paslaugą %(service)s."
 
+#: src/postulo/templates/jobs/listing_search.html
+msgid "Its terms of use"
+msgstr ""
+
 #: src/postulo/core/models.py
 msgid "its town"
 msgstr "pagal gyvenvietę"
@@ -10245,6 +10325,18 @@ msgstr "Darbo paieškos ataskaita"
 #, python-format
 msgid "Job search report · %(period)s"
 msgstr "Darbo paieškos ataskaita · %(period)s"
+
+#: src/postulo/jobs/search_views.py
+msgid "Job service"
+msgstr ""
+
+#: src/postulo/plugins/kinds.py
+msgid "Job services"
+msgstr ""
+
+#: src/postulo/templates/server/record_of_processing.html
+msgid "Job services it may search"
+msgstr ""
 
 #: src/postulo/applications/forms.py src/postulo/jobs/forms.py
 #: src/postulo/jobs/models.py
@@ -10925,6 +11017,10 @@ msgstr "8 lygis"
 #: src/postulo/templates/server/plugins.html
 msgid "Licence"
 msgstr "Licencija"
+
+#: src/postulo/templates/jobs/listing_search.html
+msgid "Licence of its adverts:"
+msgstr ""
 
 #: src/postulo/accounts/models.py src/postulo/core/context_processors.py
 msgid "Light"
@@ -12067,6 +12163,7 @@ msgid "Next month"
 msgstr "Kitas mėnuo"
 
 #: src/postulo/templates/cotton/document_viewer.html
+#: src/postulo/templates/jobs/listing_search.html
 msgid "Next page"
 msgstr "Kitas puslapis"
 
@@ -13099,6 +13196,10 @@ msgstr "Serveriui nesiunčiamas joks slaptažodis, kol nebus įvestas naujas."
 msgid "Nothing kept yet. Keep what you typed into the employer's form, so you can see what they were told."
 msgstr "Kol kas nieko neišsaugota. Išsaugokite tai, ką įvedėte į darbdavio formą, kad matytumėte, ką jiems pasakėte."
 
+#: src/postulo/templates/jobs/listing_search.html
+msgid "Nothing matches that search."
+msgstr ""
+
 #: src/postulo/templates/applications/application_list.html
 #: src/postulo/templates/jobs/company_list.html
 #: src/postulo/templates/jobs/listing_list.html
@@ -13655,6 +13756,14 @@ msgstr "Vienas pasiekimas eilutėje."
 msgid "One address: the person you met, or your contact for this application, or the company's own. It is needed to send, and noted on the timeline when it is given."
 msgstr "Vienas adresas: žmogaus, su kuriuo susitikote, arba jūsų kontakto dėl šios paraiškos, arba paties įmonės. Jo reikia siunčiant, o kai jis nurodytas, tai pažymima chronologijoje."
 
+#: src/postulo/templates/jobs/listing_search.html
+#, python-format
+msgid "One advert found"
+msgid_plural "%(counter)s adverts found"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+
 #: src/postulo/templates/applications/report.html
 #, python-format
 msgid "One application sent in this period."
@@ -14122,6 +14231,10 @@ msgstr "Arba naujas kontaktas"
 #: src/postulo/accounts/forms.py
 msgid "Or say only this"
 msgstr "Arba nurodyti tik tai"
+
+#: src/postulo/templates/jobs/capture_form.html
+msgid "Or search a job service for adverts"
+msgstr ""
 
 #: src/postulo/templates/jobs/move_owner.html
 msgid "Or to a person"
@@ -14710,7 +14823,7 @@ msgstr "Prisegta prie %(version)s"
 msgid "Pinned to a version"
 msgstr "Prisegta prie versijos"
 
-#: src/postulo/core/models.py
+#: src/postulo/core/models.py src/postulo/jobs/search_views.py
 msgid "Place"
 msgstr "Vieta"
 
@@ -15519,6 +15632,15 @@ msgstr "publikacijos"
 msgid "Publications in the file"
 msgstr "Failo publikacijos"
 
+#: src/postulo/jobs/search_views.py
+msgid "Published"
+msgstr ""
+
+#: src/postulo/templates/jobs/listing_search.html
+#, python-format
+msgid "Published %(when)s"
+msgstr ""
+
 #: src/postulo/resume/models.py
 msgid "published in"
 msgstr "paskelbta leidinyje"
@@ -16203,6 +16325,14 @@ msgstr "Nuotoliniu būdu"
 msgid "remote address"
 msgstr "nuotolinis adresas"
 
+#: src/postulo/jobs/search_views.py
+msgid "Remote work only"
+msgstr ""
+
+#: src/postulo/jobs/search_views.py
+msgid "remote work only"
+msgstr ""
+
 #: src/postulo/templates/accounts/profile.html
 #: src/postulo/templates/connections/confirm_delete.html
 #: src/postulo/templates/connections/list.html
@@ -16406,6 +16536,7 @@ msgstr "Atvirkštinis tarpinis serveris"
 
 #: src/postulo/templates/jobs/capture_list.html
 #: src/postulo/templates/jobs/listing_list.html
+#: src/postulo/templates/jobs/listing_search.html
 msgid "Review"
 msgstr "Peržiūrėti"
 
@@ -16714,6 +16845,14 @@ msgstr "Nurodykite, kas tai per identifikatorius."
 msgid "Say what this number is."
 msgstr "Nurodykite, koks tai numeris."
 
+#: src/postulo/jobs/listing_search.py
+msgid "Say what to search for."
+msgstr ""
+
+#: src/postulo/jobs/search_views.py
+msgid "Say what to search for: some words, or a place."
+msgstr ""
+
 #: src/postulo/applications/forms.py
 msgid "Say which currency the amount is in."
 msgstr "Nurodykite, kuria valiuta nurodyta suma."
@@ -16793,9 +16932,15 @@ msgstr "Postulo netikrino spaudo"
 #: src/postulo/templates/core/search.html
 #: src/postulo/templates/cotton/site_search.html
 #: src/postulo/templates/jobs/industry_list.html
+#: src/postulo/templates/jobs/listing_search.html
 #: src/postulo/templates/resume/answer_list.html
 msgid "Search"
 msgstr "Ieškoti"
+
+#: src/postulo/templates/jobs/listing_list.html
+#: src/postulo/templates/jobs/listing_search.html
+msgid "Search a job service"
+msgstr ""
 
 #: src/postulo/applications/tables.py
 msgid "Search applications"
@@ -16825,6 +16970,10 @@ msgstr "Ieškoti laiškų"
 #: src/postulo/jobs/tables.py
 msgid "Search listings"
 msgstr "Ieškoti skelbimų"
+
+#: src/postulo/templates/jobs/listing_search.html
+msgid "Search the adverts a job service publishes, and review the one you want before it becomes a listing. Nothing is asked until you press Search."
+msgstr ""
 
 #: src/postulo/applications/views.py
 msgid "Search the calendar"
@@ -17194,6 +17343,10 @@ msgstr "Baigtos"
 #: src/postulo/templates/server/design.html
 msgid "Seven colours, each tuned to 3:1 against the card in both themes."
 msgstr "Septynios spalvos, kurių kiekvienos kontrastas su kortele abiejose spalvų schemose yra 3:1."
+
+#: src/postulo/jobs/search_views.py
+msgid "Several countries"
+msgstr ""
 
 #: src/postulo/jobs/industries.py
 msgid "Sewerage"
@@ -18548,6 +18701,10 @@ msgstr "Tas adresas peradresavo per daug kartų."
 msgid "That address returned %(kind)s rather than a web page."
 msgstr "Tas adresas grąžino %(kind)s, o ne tinklalapį."
 
+#: src/postulo/jobs/listing_search.py
+msgid "That advert cannot be asked of this service."
+msgstr ""
+
 #: src/postulo/documents/slow.py
 msgid "That application is no longer here."
 msgstr "Tos paraiškos čia nebėra."
@@ -18984,6 +19141,10 @@ msgstr "Tai ne Wikidata elemento identifikatorius."
 msgid "That is not an address Postulo can use."
 msgstr "Tai nėra adresas, kurį Postulo gali naudoti."
 
+#: src/postulo/jobs/listing_search.py
+msgid "That is not an advert this service could have named."
+msgstr ""
+
 #: src/postulo/core/offsite.py
 msgid "That is not an age recipient. It starts age1 and is 62 characters long."
 msgstr "Tai nėra age gavėjas. Jis prasideda age1 ir yra 62 simbolių ilgio."
@@ -19090,6 +19251,10 @@ msgstr "Šis elementas jau susietas su %(record)s. Pirmiausia jį atsiekite."
 #: src/postulo/plugins/pairing.py
 msgid "That item is no longer on the other side."
 msgstr "Šio elemento kitoje pusėje nebėra."
+
+#: src/postulo/jobs/search_views.py
+msgid "That job service is not offered here."
+msgstr ""
 
 #: src/postulo/templates/account/recovery_unusable.html
 msgid "That link cannot be used"
@@ -19214,6 +19379,14 @@ msgstr "Šis atsakymas nėra atsakymas į Postulo pateiktą užklausą."
 #: src/postulo/core/views_access.py
 msgid "That rule existed, and is changed."
 msgstr "Tokia taisyklė jau buvo; ji pakeista."
+
+#: src/postulo/jobs/listing_search.py
+msgid "That search cannot be asked of this service."
+msgstr ""
+
+#: src/postulo/jobs/listing_search.py
+msgid "That search is longer than a service can be asked."
+msgstr ""
 
 #: src/postulo/applications/views.py
 msgid "That suggestion has already been answered."
@@ -20386,6 +20559,10 @@ msgstr "Nuotrauka iš jūsų duomenų, šalia jūsų vardo. Ji yra PDF faile ir 
 msgid "The picture that stands for you on these pages: one you upload, your Gravatar, or your initials."
 msgstr "Vaizdas, žymintis jus šiuose puslapiuose: jūsų įkeltas, Gravatar arba jūsų inicialai."
 
+#: src/postulo/jobs/search_views.py
+msgid "the place"
+msgstr ""
+
 #: src/postulo/accounts/models.py
 msgid "The plugin whose calendar entries set the date, such as a monthly declaration."
 msgstr "Papildinys, kurio kalendoriaus įrašai nustato datą, pavyzdžiui, mėnesinė deklaracija."
@@ -20523,6 +20700,10 @@ msgstr "Užklausos forma ne tokia, kokią priima šis iškvietimas."
 msgid "The rest of the file is still worth importing. What is listed here is not, and you can add it by hand afterwards."
 msgstr "Likusią failo dalį vis tiek verta importuoti. To, kas išvardyta čia, ne, ir vėliau galėsite tai pridėti ranka."
 
+#: src/postulo/templates/jobs/listing_search.html
+msgid "The results are shown and not kept. An advert is kept only once you review it and save it."
+msgstr ""
+
 #: src/postulo/templates/applications/application_intake.html
 #: src/postulo/templates/jobs/capture_review.html
 #: src/postulo/templates/jobs/listing_form.html
@@ -20625,6 +20806,14 @@ msgstr "Serveris atmetė šiuos prisijungimo duomenis: %(detail)s"
 #: src/postulo/core/server_forms.py
 msgid "The server that accepts the mail — its name, not an address."
 msgstr "Serveris, priimantis laiškus – jo pavadinimas, ne adresas."
+
+#: src/postulo/jobs/listing_search.py
+msgid "The service's address is not one it declared."
+msgstr ""
+
+#: src/postulo/jobs/listing_search.py
+msgid "The service's answer could not be read."
+msgstr ""
 
 #: src/postulo/core/server_forms.py
 msgid "The service's base address. Left empty with Nominatim, OpenStreetMap's public instance is used: https://nominatim.openstreetmap.org. For your own: for example https://photon.example.org"
@@ -20878,6 +21067,10 @@ msgstr "Wheel paketo metaduomenų nepavyksta nuskaityti; jie gali būti pažeist
 msgid "The wheel's metadata is far larger than any plugin's."
 msgstr "Wheel paketo metaduomenys yra daug didesni nei bet kurio papildinio."
 
+#: src/postulo/jobs/search_views.py
+msgid "the words"
+msgstr ""
+
 #: src/postulo/templates/documents/rendered_compare.html
 msgid "The words are the same in both. If the two PDFs look different, what changed is how they are set: the theme, or the layout."
 msgstr "Žodžiai abiejuose vienodi. Jei du PDF atrodo skirtingai, pasikeitė jų maketavimas: apipavidalinimas arba išdėstymas."
@@ -20885,6 +21078,10 @@ msgstr "Žodžiai abiejuose vienodi. Jei du PDF atrodo skirtingai, pasikeitė j�
 #: src/postulo/templates/documents/letter_detail.html
 msgid "The words without the layout, in this letter's language. None of these is filed as a version you sent."
 msgstr "Žodžiai be maketo, šio laiško kalba. Nė vienas iš šių failų neįrašomas kaip išsiųsta versija."
+
+#: src/postulo/jobs/listing_search.py
+msgid "the words, the place and the filters searched for"
+msgstr ""
 
 #: src/postulo/core/errands.py
 msgid "The work was interrupted before it finished. Please try again."
@@ -22467,6 +22664,7 @@ msgid "Waiting after this one: %(count)s."
 msgstr "Po šio dar laukia: %(count)s."
 
 #: src/postulo/applications/models.py src/postulo/jobs/models.py
+#: src/postulo/templates/jobs/listing_search.html
 msgid "Waiting for review"
 msgstr "Laukia peržiūros"
 
@@ -23191,6 +23389,10 @@ msgstr "Kada jis buvo įtrauktas į jūsų skelbimus."
 msgid "When it happened, which is not always when you write it down."
 msgstr "Kada tai įvyko, o tai ne visada tada, kai tai užrašote."
 
+#: src/postulo/jobs/search_views.py
+msgid "when it was published"
+msgstr ""
+
 #: src/postulo/jobs/forms.py
 msgid "When the employer put it up, if the posting says. Empty means unknown."
 msgstr "Kada darbdavys jį paskelbė, jei tai nurodyta skelbime. Tuščia reiškia, kad nežinoma."
@@ -23752,6 +23954,10 @@ msgstr "Medienos gaminiai"
 #: src/postulo/documents/formats.py
 msgid "Word document"
 msgstr "Word dokumentas"
+
+#: src/postulo/jobs/search_views.py
+msgid "Words"
+msgstr ""
 
 #: src/postulo/accounts/forms.py
 msgid "Words and chevrons"

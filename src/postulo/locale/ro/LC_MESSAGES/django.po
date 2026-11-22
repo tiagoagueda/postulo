@@ -1557,25 +1557,40 @@ msgstr "%(scheme)s: aceasta nu este forma obișnuită."
 msgid "%(sent)s, %(failed)s; each document says which."
 msgstr "%(sent)s, %(failed)s; fiecare document spune care."
 
-#: src/postulo/resume/lookups.py
+#: src/postulo/jobs/listing_search.py src/postulo/resume/lookups.py
 #, python-format
 msgid "%(service)s answered %(status)s."
 msgstr "%(service)s a răspuns %(status)s."
 
-#: src/postulo/resume/lookups.py
+#: src/postulo/jobs/listing_search.py src/postulo/resume/lookups.py
 #, python-format
 msgid "%(service)s asked for fewer requests. Try again later."
 msgstr "%(service)s a cerut reducerea numărului de cereri. Încercați din nou mai târziu."
 
-#: src/postulo/resume/lookups.py
+#: src/postulo/jobs/listing_search.py src/postulo/resume/lookups.py
 #, python-format
 msgid "%(service)s could not be reached."
 msgstr "%(service)s nu a putut fi contactat."
+
+#: src/postulo/jobs/listing_search.py
+#, python-format
+msgid "%(service)s did not accept that search."
+msgstr ""
+
+#: src/postulo/templates/jobs/listing_search.html
+#, python-format
+msgid "%(service)s does not search by %(criteria)s, so that was not sent."
+msgstr ""
 
 #: src/postulo/resume/lookups.py
 #, python-format
 msgid "%(service)s has no record in a form Postulo reads."
 msgstr "%(service)s nu are nicio înregistrare într-o formă pe care Postulo o poate citi."
+
+#: src/postulo/jobs/listing_search.py
+#, python-format
+msgid "%(service)s has nothing at the address it was asked at."
+msgstr ""
 
 #: src/postulo/core/web_links.py src/postulo/jobs/surface.py
 #, python-format
@@ -1587,6 +1602,11 @@ msgstr "%(service)s este deja utilizat de un alt rând."
 msgid "%(service)s knows no such identifier."
 msgstr "%(service)s nu cunoaște un astfel de identificator."
 
+#: src/postulo/jobs/listing_search.py
+#, python-format
+msgid "%(service)s no longer has that advert."
+msgstr ""
+
 #: src/postulo/resume/lookups.py
 #, python-format
 msgid "%(service)s redirected too many times."
@@ -1597,7 +1617,7 @@ msgstr "%(service)s a redirecționat de prea multe ori."
 msgid "%(service)s refused the look-ups (%(status)s). They are stopped."
 msgstr "%(service)s a refuzat căutările (%(status)s). Acestea au fost oprite."
 
-#: src/postulo/resume/lookups.py
+#: src/postulo/jobs/listing_search.py src/postulo/resume/lookups.py
 #, python-format
 msgid "%(service)s sent the request somewhere else."
 msgstr "%(service)s a trimis cererea în altă parte."
@@ -1607,10 +1627,20 @@ msgstr "%(service)s a trimis cererea în altă parte."
 msgid "%(service)s sent the request to an address Postulo does not dial."
 msgstr "%(service)s a trimis cererea către o adresă pe care Postulo nu o contactează."
 
-#: src/postulo/resume/lookups.py
+#: src/postulo/jobs/listing_search.py src/postulo/resume/lookups.py
 #, python-format
 msgid "%(service)s took too long to answer."
 msgstr "%(service)s a întârziat prea mult cu răspunsul."
+
+#: src/postulo/jobs/listing_search.py
+#, python-format
+msgid "%(service)s's answer could not be read."
+msgstr ""
+
+#: src/postulo/jobs/listing_search.py
+#, python-format
+msgid "%(service)s's answer was larger than a page of adverts should be."
+msgstr ""
 
 #: src/postulo/resume/views.py
 #, python-format
@@ -1621,6 +1651,11 @@ msgstr "%(service)s, prin doi.org, nu avea nimic pentru casetele goale."
 #, python-format
 msgid "%(share)s%%"
 msgstr "%(share)s%%"
+
+#: src/postulo/templates/jobs/listing_search.html
+#, python-format
+msgid "%(source)s: asked at %(hosts)s. It is sent the words, the place and the filters you search for, or an advert's number when you press Review, and nothing about you."
+msgstr ""
 
 #: src/postulo/applications/agenda.py
 #, python-format
@@ -2440,6 +2475,10 @@ msgstr "Un titlu, propoziția de sub el și apoi ceea ce urmează să conțină 
 msgid "a job title"
 msgstr "un titlu de post"
 
+#: src/postulo/jobs/search_views.py
+msgid "A job title, a skill or an employer, as you would type it on the service."
+msgstr ""
+
 #: src/postulo/documents/integrity.py
 msgid "a JPEG picture"
 msgstr "o imagine JPEG"
@@ -2548,6 +2587,10 @@ msgstr "Un anunț este o ofertă de angajare pe care ați observat-o, înainte d
 #: src/postulo/templates/core/import_csv.html
 msgid "A listing keeps its deadline, which the closing-soon notice then watches, and its tags are written into its description."
 msgstr "Un anunț își păstrează termenul-limită, pe care notificarea de închidere iminentă îl urmărește apoi, iar etichetele lui sunt scrise în descrierea sa."
+
+#: src/postulo/templates/jobs/listing_search.html
+msgid "A listing like it"
+msgstr ""
 
 #: src/postulo/templates/jobs/capture_review.html
 msgid "A listing with this title at this company exists; a board that mints a fresh address per visit may be showing you the same advert."
@@ -3009,6 +3052,10 @@ msgstr "Un token permite unui instrument din afara Postulo să acționeze în nu
 #: src/postulo/templates/help/postal_addresses.html
 msgid "A town and a country alone are kept as a place. Nothing checks that an address exists, and a country Postulo has no rules for is free-form."
 msgstr "Un oraș și o țară singure sunt păstrate ca locație. Nimic nu verifică dacă o adresă există, iar o țară pentru care Postulo nu are reguli este în format liber."
+
+#: src/postulo/jobs/search_views.py
+msgid "A town or a region."
+msgstr ""
 
 #: src/postulo/resume/candidate.py
 msgid "A translation"
@@ -3544,6 +3591,10 @@ msgstr "Publicitate"
 #: src/postulo/jobs/industries.py
 msgid "Advertising and marketing"
 msgstr "Publicitate și marketing"
+
+#: src/postulo/templates/jobs/listing_search.html
+msgid "Adverts found"
+msgstr ""
 
 #: src/postulo/applications/models.py
 msgid "adviser"
@@ -4486,10 +4537,18 @@ msgstr "Asia"
 msgid "Asked"
 msgstr "Întrebat"
 
+#: src/postulo/jobs/search_views.py
+msgid "Asked for the advert. Check it before it becomes a listing."
+msgstr ""
+
 #: src/postulo/templates/server/record_of_processing.html
 #, fuzzy
 msgid "Asked only when somebody presses for it, one company at a time. Each is sent what is listed and nothing about the person asking."
 msgstr "Sunt interogate doar când cineva solicită acest lucru, câte o companie pe rând. Fiecăruia i se trimite ce este listat și nimic despre persoana care întreabă."
+
+#: src/postulo/templates/server/record_of_processing.html
+msgid "Asked only when somebody presses Search or Review. Each is sent what is listed and nothing about the person asking; nothing it answers is kept unless the person saves an advert."
+msgstr ""
 
 #: src/postulo/templates/connections/pairing.html
 #, python-format
@@ -4515,6 +4574,10 @@ msgstr "Asociații, societăți și cluburi din care faceți sau ați făcut par
 #: src/postulo/core/models.py
 msgid "at"
 msgstr "la"
+
+#: src/postulo/jobs/search_views.py
+msgid "At any time"
+msgstr ""
 
 #: src/postulo/templates/settings/appearance.html
 msgid "At each status"
@@ -4764,6 +4827,7 @@ msgstr "Înapoi la Datele dumneavoastră"
 
 #: src/postulo/templates/jobs/capture_decided.html
 #: src/postulo/templates/jobs/capture_page.html
+#: src/postulo/templates/jobs/listing_search.html
 msgid "Back to your listings"
 msgstr "Înapoi la anunțurile dumneavoastră"
 
@@ -9647,6 +9711,14 @@ msgstr "În fișier de două ori"
 msgid "In the instance's time zone."
 msgstr "În fusul orar al instanței."
 
+#: src/postulo/jobs/search_views.py
+#, python-format
+msgid "In the last day"
+msgid_plural "In the last %(count)d days"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+
 #: src/postulo/core/search.py
 #, python-format
 msgid "in the motivation letter rendered on %(when)s"
@@ -9684,6 +9756,10 @@ msgstr "în raportul pe care l-ați trimis către %(company)s la %(when)s"
 #: src/postulo/templates/documents/rendered_compare.html
 msgid "In this version, and not in the one before"
 msgstr "În această versiune, și nu în cea dinainte"
+
+#: src/postulo/templates/jobs/listing_search.html
+msgid "In your listings"
+msgstr ""
 
 #: src/postulo/applications/forms.py
 msgid "In your time zone."
@@ -10274,6 +10350,10 @@ msgstr "strada sa"
 msgid "Its street will be looked up with %(service)s shortly."
 msgstr "Strada sa va fi căutată în curând cu %(service)s."
 
+#: src/postulo/templates/jobs/listing_search.html
+msgid "Its terms of use"
+msgstr ""
+
 #: src/postulo/core/models.py
 msgid "its town"
 msgstr "orașul său"
@@ -10298,6 +10378,18 @@ msgstr "Raport de căutare a unui loc de muncă"
 #, python-format
 msgid "Job search report · %(period)s"
 msgstr "Raport privind căutarea unui loc de muncă · %(period)s"
+
+#: src/postulo/jobs/search_views.py
+msgid "Job service"
+msgstr ""
+
+#: src/postulo/plugins/kinds.py
+msgid "Job services"
+msgstr ""
+
+#: src/postulo/templates/server/record_of_processing.html
+msgid "Job services it may search"
+msgstr ""
 
 #: src/postulo/applications/forms.py src/postulo/jobs/forms.py
 #: src/postulo/jobs/models.py
@@ -10984,6 +11076,10 @@ msgstr "Nivelul 8"
 #, fuzzy
 msgid "Licence"
 msgstr "Licență"
+
+#: src/postulo/templates/jobs/listing_search.html
+msgid "Licence of its adverts:"
+msgstr ""
 
 #: src/postulo/accounts/models.py src/postulo/core/context_processors.py
 msgid "Light"
@@ -12132,6 +12228,7 @@ msgid "Next month"
 msgstr "Luna următoare"
 
 #: src/postulo/templates/cotton/document_viewer.html
+#: src/postulo/templates/jobs/listing_search.html
 msgid "Next page"
 msgstr "Pagina următoare"
 
@@ -13175,6 +13272,10 @@ msgstr "Nicio parolă nu este trimisă serverului până când nu este introdus�
 msgid "Nothing kept yet. Keep what you typed into the employer's form, so you can see what they were told."
 msgstr "Încă nu s-a păstrat nimic. Păstrați ce ați introdus în formularul angajatorului, ca să vedeți ce i s-a spus."
 
+#: src/postulo/templates/jobs/listing_search.html
+msgid "Nothing matches that search."
+msgstr ""
+
 #: src/postulo/templates/applications/application_list.html
 #: src/postulo/templates/jobs/company_list.html
 #: src/postulo/templates/jobs/listing_list.html
@@ -13730,6 +13831,14 @@ msgstr "O realizare pe fiecare rând."
 msgid "One address: the person you met, or your contact for this application, or the company's own. It is needed to send, and noted on the timeline when it is given."
 msgstr "O singură adresă: persoana pe care ați cunoscut-o, contactul dumneavoastră pentru această candidatură sau adresa companiei. Este necesară pentru trimitere și este consemnată în cronologie când este dată."
 
+#: src/postulo/templates/jobs/listing_search.html
+#, python-format
+msgid "One advert found"
+msgid_plural "%(counter)s adverts found"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+
 #: src/postulo/templates/applications/report.html
 #, python-format
 msgid "One application sent in this period."
@@ -14199,6 +14308,10 @@ msgstr "Sau un contact nou"
 #, fuzzy
 msgid "Or say only this"
 msgstr "Sau spuneți doar atât"
+
+#: src/postulo/templates/jobs/capture_form.html
+msgid "Or search a job service for adverts"
+msgstr ""
 
 #: src/postulo/templates/jobs/move_owner.html
 msgid "Or to a person"
@@ -14788,7 +14901,7 @@ msgstr "Fixat la versiunea %(version)s"
 msgid "Pinned to a version"
 msgstr "Fixat la o versiune"
 
-#: src/postulo/core/models.py
+#: src/postulo/core/models.py src/postulo/jobs/search_views.py
 msgid "Place"
 msgstr "Loc"
 
@@ -15596,6 +15709,15 @@ msgstr "publicații"
 msgid "Publications in the file"
 msgstr "Publicații din fișier"
 
+#: src/postulo/jobs/search_views.py
+msgid "Published"
+msgstr ""
+
+#: src/postulo/templates/jobs/listing_search.html
+#, python-format
+msgid "Published %(when)s"
+msgstr ""
+
 #: src/postulo/resume/models.py
 msgid "published in"
 msgstr "publicat în"
@@ -16287,6 +16409,14 @@ msgstr "La distanță"
 msgid "remote address"
 msgstr "adresă la distanță"
 
+#: src/postulo/jobs/search_views.py
+msgid "Remote work only"
+msgstr ""
+
+#: src/postulo/jobs/search_views.py
+msgid "remote work only"
+msgstr ""
+
 #: src/postulo/templates/accounts/profile.html
 #: src/postulo/templates/connections/confirm_delete.html
 #: src/postulo/templates/connections/list.html
@@ -16490,6 +16620,7 @@ msgstr "Proxy invers"
 
 #: src/postulo/templates/jobs/capture_list.html
 #: src/postulo/templates/jobs/listing_list.html
+#: src/postulo/templates/jobs/listing_search.html
 msgid "Review"
 msgstr "Revizuiți"
 
@@ -16798,6 +16929,14 @@ msgstr "Spuneți ce este acest identificator."
 msgid "Say what this number is."
 msgstr "Spuneți ce este acest număr."
 
+#: src/postulo/jobs/listing_search.py
+msgid "Say what to search for."
+msgstr ""
+
+#: src/postulo/jobs/search_views.py
+msgid "Say what to search for: some words, or a place."
+msgstr ""
+
 #: src/postulo/applications/forms.py
 msgid "Say which currency the amount is in."
 msgstr "Precizați în ce monedă este suma."
@@ -16877,9 +17016,15 @@ msgstr "Sigiliu neverificat de Postulo"
 #: src/postulo/templates/core/search.html
 #: src/postulo/templates/cotton/site_search.html
 #: src/postulo/templates/jobs/industry_list.html
+#: src/postulo/templates/jobs/listing_search.html
 #: src/postulo/templates/resume/answer_list.html
 msgid "Search"
 msgstr "Căutați"
+
+#: src/postulo/templates/jobs/listing_list.html
+#: src/postulo/templates/jobs/listing_search.html
+msgid "Search a job service"
+msgstr ""
 
 #: src/postulo/applications/tables.py
 msgid "Search applications"
@@ -16909,6 +17054,10 @@ msgstr "Căutați scrisori"
 #: src/postulo/jobs/tables.py
 msgid "Search listings"
 msgstr "Căutați anunțuri"
+
+#: src/postulo/templates/jobs/listing_search.html
+msgid "Search the adverts a job service publishes, and review the one you want before it becomes a listing. Nothing is asked until you press Search."
+msgstr ""
 
 #: src/postulo/applications/views.py
 msgid "Search the calendar"
@@ -17278,6 +17427,10 @@ msgstr "Încheiată"
 #: src/postulo/templates/server/design.html
 msgid "Seven colours, each tuned to 3:1 against the card in both themes."
 msgstr "Șapte culori, fiecare ajustată la 3:1 față de card în ambele teme."
+
+#: src/postulo/jobs/search_views.py
+msgid "Several countries"
+msgstr ""
 
 #: src/postulo/jobs/industries.py
 msgid "Sewerage"
@@ -18643,6 +18796,10 @@ msgstr "Adresa aceea a redirecționat de prea multe ori."
 msgid "That address returned %(kind)s rather than a web page."
 msgstr "Adresa aceea a returnat %(kind)s în loc de o pagină web."
 
+#: src/postulo/jobs/listing_search.py
+msgid "That advert cannot be asked of this service."
+msgstr ""
+
 #: src/postulo/documents/slow.py
 msgid "That application is no longer here."
 msgstr "Acea candidatură nu mai este aici."
@@ -19079,6 +19236,10 @@ msgstr "Acesta nu este identificatorul unui element Wikidata."
 msgid "That is not an address Postulo can use."
 msgstr "Aceasta nu este o adresă pe care Postulo o poate folosi."
 
+#: src/postulo/jobs/listing_search.py
+msgid "That is not an advert this service could have named."
+msgstr ""
+
 #: src/postulo/core/offsite.py
 msgid "That is not an age recipient. It starts age1 and is 62 characters long."
 msgstr "Acesta nu este un destinatar age. Începe cu age1 și are 62 de caractere."
@@ -19186,6 +19347,10 @@ msgstr "Acel element este deja asociat cu %(record)s. Dezasociați-l mai întâi
 #: src/postulo/plugins/pairing.py
 msgid "That item is no longer on the other side."
 msgstr "Acel element nu mai există pe cealaltă parte."
+
+#: src/postulo/jobs/search_views.py
+msgid "That job service is not offered here."
+msgstr ""
 
 #: src/postulo/templates/account/recovery_unusable.html
 msgid "That link cannot be used"
@@ -19310,6 +19475,14 @@ msgstr "Acel răspuns nu a venit dintr-o cerere făcută de Postulo."
 #: src/postulo/core/views_access.py
 msgid "That rule existed, and is changed."
 msgstr "Această regulă exista deja și a fost modificată."
+
+#: src/postulo/jobs/listing_search.py
+msgid "That search cannot be asked of this service."
+msgstr ""
+
+#: src/postulo/jobs/listing_search.py
+msgid "That search is longer than a service can be asked."
+msgstr ""
 
 #: src/postulo/applications/views.py
 msgid "That suggestion has already been answered."
@@ -20483,6 +20656,10 @@ msgstr "Fotografia din datele dumneavoastră, lângă numele dumneavoastră. Apa
 msgid "The picture that stands for you on these pages: one you upload, your Gravatar, or your initials."
 msgstr "Imaginea care vă reprezintă pe aceste pagini: una pe care o încărcați, Gravatarul sau inițialele dumneavoastră."
 
+#: src/postulo/jobs/search_views.py
+msgid "the place"
+msgstr ""
+
 #: src/postulo/accounts/models.py
 msgid "The plugin whose calendar entries set the date, such as a monthly declaration."
 msgstr "Pluginul ale cărui intrări din calendar stabilesc data, cum ar fi o declarație lunară."
@@ -20619,6 +20796,10 @@ msgstr "Cererea nu avea forma pe care o primește acest apel."
 msgid "The rest of the file is still worth importing. What is listed here is not, and you can add it by hand afterwards."
 msgstr "Restul fișierului merită totuși importat. Ce este listat aici nu, dar îl puteți adăuga manual după aceea."
 
+#: src/postulo/templates/jobs/listing_search.html
+msgid "The results are shown and not kept. An advert is kept only once you review it and save it."
+msgstr ""
+
 #: src/postulo/templates/applications/application_intake.html
 #: src/postulo/templates/jobs/capture_review.html
 #: src/postulo/templates/jobs/listing_form.html
@@ -20721,6 +20902,14 @@ msgstr "Serverul a refuzat aceste date de autentificare: %(detail)s"
 #: src/postulo/core/server_forms.py
 msgid "The server that accepts the mail — its name, not an address."
 msgstr "Serverul care acceptă e-mailul — numele lui, nu o adresă."
+
+#: src/postulo/jobs/listing_search.py
+msgid "The service's address is not one it declared."
+msgstr ""
+
+#: src/postulo/jobs/listing_search.py
+msgid "The service's answer could not be read."
+msgstr ""
 
 #: src/postulo/core/server_forms.py
 msgid "The service's base address. Left empty with Nominatim, OpenStreetMap's public instance is used: https://nominatim.openstreetmap.org. For your own: for example https://photon.example.org"
@@ -20975,6 +21164,10 @@ msgstr "Metadatele pachetului wheel nu pot fi citite; este posibil să fie deter
 msgid "The wheel's metadata is far larger than any plugin's."
 msgstr "Metadatele pachetului wheel sunt mult mai mari decât ale oricărui plugin."
 
+#: src/postulo/jobs/search_views.py
+msgid "the words"
+msgstr ""
+
 #: src/postulo/templates/documents/rendered_compare.html
 msgid "The words are the same in both. If the two PDFs look different, what changed is how they are set: the theme, or the layout."
 msgstr "Cuvintele sunt aceleași în ambele. Dacă cele două PDF-uri arată diferit, ce s-a schimbat este felul în care sunt așezate: tema sau aspectul."
@@ -20982,6 +21175,10 @@ msgstr "Cuvintele sunt aceleași în ambele. Dacă cele două PDF-uri arată dif
 #: src/postulo/templates/documents/letter_detail.html
 msgid "The words without the layout, in this letter's language. None of these is filed as a version you sent."
 msgstr "Textul fără machetare, în limba acestei scrisori. Niciuna dintre acestea nu este înregistrată ca versiune trimisă de dumneavoastră."
+
+#: src/postulo/jobs/listing_search.py
+msgid "the words, the place and the filters searched for"
+msgstr ""
 
 #: src/postulo/core/errands.py
 msgid "The work was interrupted before it finished. Please try again."
@@ -22574,6 +22771,7 @@ msgid "Waiting after this one: %(count)s."
 msgstr "În așteptare după aceasta: %(count)s."
 
 #: src/postulo/applications/models.py src/postulo/jobs/models.py
+#: src/postulo/templates/jobs/listing_search.html
 msgid "Waiting for review"
 msgstr "În așteptarea revizuirii"
 
@@ -23300,6 +23498,10 @@ msgstr "Când a intrat în anunțurile dumneavoastră."
 msgid "When it happened, which is not always when you write it down."
 msgstr "Când s-a întâmplat, ceea ce nu coincide mereu cu momentul în care îl notați."
 
+#: src/postulo/jobs/search_views.py
+msgid "when it was published"
+msgstr ""
+
 #: src/postulo/jobs/forms.py
 msgid "When the employer put it up, if the posting says. Empty means unknown."
 msgstr "Când l-a publicat angajatorul, dacă anunțul precizează. Gol înseamnă necunoscut."
@@ -23864,6 +24066,10 @@ msgstr "Produse din lemn"
 #: src/postulo/documents/formats.py
 msgid "Word document"
 msgstr "Document Word"
+
+#: src/postulo/jobs/search_views.py
+msgid "Words"
+msgstr ""
 
 #: src/postulo/accounts/forms.py
 msgid "Words and chevrons"
