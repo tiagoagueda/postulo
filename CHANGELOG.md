@@ -8,6 +8,8 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### ✨ Added
 
+- Email notifications can arrive once a day instead of as they happen: one mail at an hour you choose in your own time zone, 08:00 unless you say otherwise (#1259)
+- A notifier plugin can keep a message until a time it chooses (`hold_until`) and take every kept message of a connection at once (`send_many`); kept messages wait and are retried as failed sends do (#1259)
 - *Your career → Import* reads a JSON Resume file, any version from 1.0.0 to 1.7.1; what has no place in a career record is named on the review (#1260)
 - *Your career → Import* reads the career in the copy of your data LinkedIn sends you, the ZIP as it came; messages, connections and the rest are named and never opened (#1260)
 - An importer plugin can hand over certifications, honours, courses and publications, a project's dates, role and link, and notes on how a file was read; `assert_is_an_importer` in `postulo.plugins.testing` holds an importer to the contract (#1260)
@@ -15,13 +17,18 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🔧 Changed
 
+- The wiki compares calendar providers (CalDAV, Apple, Google, Microsoft, Proton, ICS addresses): what works today, what each needs and what it risks (#1254)
 - The page behind *Your career → Import* is *Import a CV* and names no format: it lists what each importer that is switched on reads, and each bundled importer has its own entry in the menu. A Europass file is read as before (#1260)
 - The *JSON Resume* switch under *Extend file formats* is called *JSON Resume export*, beside *JSON Resume import* (#1260)
 - Single sign-on now sends a PKCE challenge (S256) with every handshake, so an authorisation code caught on the way opens nothing. **If your provider then refuses the sign-in, set `POSTULO_OIDC_PKCE=false`.** (#1261)
-- The wiki compares calendar providers (CalDAV, Apple, Google, Microsoft, Proton, ICS addresses): what works today, what each needs and what it risks (#1254)
+
+### 🐛 Fixed
+
+- Browser notifications: two reminders due together no longer replace one another, a long message in a non-Latin script is no longer refused by the push service, and an iPhone or iPad is told to add Postulo to the Home Screen first (#1259)
 
 ### 🔒 Security
 
+- A notification sent to a person carries at most 500 characters of text, so a long note on a status change, an offer's terms or a plugin's note no longer travels in full through a push or chat service; a webhook still gets the whole text (#1259)
 - Start-up warns (`postulo.W008`) when the single sign-on issuer is a plain `http://` address that is not this machine, since nothing then proves the provider's answers came from the provider. (#1261)
 
 ### ⚠️ Deprecated

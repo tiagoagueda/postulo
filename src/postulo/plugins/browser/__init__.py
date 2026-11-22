@@ -19,6 +19,7 @@ waiting for a tab is left with `postulo.notifications.inbox`, which is Postulo's
 
 from __future__ import annotations
 
+import json
 from urllib.parse import urlsplit
 
 from django.templatetags.static import static
@@ -36,14 +37,59 @@ PUSH = "push"
 TAB = "tab"
 
 
-def _payload(title: str, body: str = "", url: str = "", tag: str = "") -> dict:
-    return {
+#: The most a push payload may weigh before it is encrypted, in bytes of UTF-8 JSON (#1259).
+#: A push service takes at most 4096 bytes of message (RFC 8030 §7.2, which the browser
+#: makers' services enforce as a ceiling), and encryption adds a header of 86 bytes, a
+#: delimiter and a 16-byte tag; what is left is kept well clear of that, so a link or a tag
+#: as long as they may be still fits. Counted in characters, 300 of a title and 1000 of a
+#: body in Chinese, Hindi or emoji came to more than twice that, the service refused it,
+#: and every retry was refused the same way.
+PAYLOAD_BYTES = 3000
+
+#: What a cut text ends with, so the reader can tell it goes on in Postulo.
+ELLIPSIS = "…"
+
+
+def _weight(payload: dict) -> int:
+    return len(json.dumps(payload, ensure_ascii=False).encode("utf-8"))
+
+
+def _fit(payload: dict) -> dict:
+    """``payload`` cut until it weighs at most `PAYLOAD_BYTES`: the body first, then the title.
+
+    Each pass cuts by as many bytes as are over, at a character's edge, so a text in any
+    script ends on a whole character; escaping (a newline is two bytes in JSON) can leave a
+    little over, which the next pass takes.
+    """
+    for name in ("body", "title"):
+        while _weight(payload) > PAYLOAD_BYTES and payload[name]:
+            over = _weight(payload) - PAYLOAD_BYTES
+            raw = payload[name].encode("utf-8")
+            keep = len(raw) - over - len(ELLIPSIS.encode("utf-8"))
+            if keep <= 0:
+                payload[name] = ""
+                continue
+            payload[name] = raw[:keep].decode("utf-8", "ignore").rstrip() + ELLIPSIS
+    return payload
+
+
+def _payload(title: str, body: str = "", url: str = "", tag: str = "", language: str = "") -> dict:
+    """What a browser is pushed: bounded in characters as the inbox is, then in bytes.
+
+    ``tag`` is what makes a later notification replace an earlier one on the screen, so it
+    is the message's own key: two reminders due together are two notifications, and the
+    same reminder pushed again replaces itself (#1259).
+    """
+    payload = {
         "title": title[:300],
         "body": body[:1000],
         "url": url,
         "tag": tag,
         "icon": static("brand/icon-192.png"),
     }
+    if language:
+        payload["lang"] = language
+    return _fit(payload)
 
 
 @declares(
@@ -128,6 +174,12 @@ class BrowserNotifier:
                     "a secure (HTTPS) address."
                 )
             ),
+            "web-push-install-first": str(
+                _(
+                    "On an iPhone or an iPad, notifications only reach Postulo added to the Home "
+                    "Screen. Add it from the Share menu, open it from there, then come back here."
+                )
+            ),
         }
 
     def validate(self, config: dict) -> dict[str, list[str]]:
@@ -166,7 +218,11 @@ class BrowserNotifier:
             webpush.push(
                 subscription,
                 _payload(
-                    notification.title, notification.body, notification.url, notification.event
+                    notification.title,
+                    notification.body,
+                    notification.url,
+                    notification.key or notification.event,
+                    notification.language,
                 ),
             )
         except webpush.PushFailed as error:
