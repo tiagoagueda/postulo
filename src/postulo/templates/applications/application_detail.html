@@ -270,6 +270,12 @@
         </div>
       {% endif %}
 
+      {% comment %} Published earnings statistics for the listing's group of occupations and
+         country (#1257), in the period and currency of the latest offer where there is one.
+         Beside the offers and never among them: nothing is compared and nothing recommended.
+         Nothing is drawn while no earnings source is enabled. {% endcomment %}
+      <c-earnings-reference :panel="earnings" />
+
       {% comment %} What this application was told in answer to the employer's own questions
          (#1092): copies, as given, so that editing a saved answer later changes nothing
          that was sent. Added from a saved one or written here. {% endcomment %}

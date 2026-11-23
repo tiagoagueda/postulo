@@ -81,6 +81,12 @@ REACHING_PAST: dict[str, dict[str, str]] = {
             "table of language codes for the whole of Postulo, not a second one here"
         ),
     },
+    "earnings": {
+        "postulo.core.configuration": (
+            "`POSTULO_EARNINGS_DIR`: where a refreshed copy of Eurostat's figures is read "
+            "from, which is an instance setting, declared once with the others (#1186)"
+        ),
+    },
     "email": {
         "postulo.core.site": "the instance's name and from-address, for the message it sends",
         # `Notification` used to be reached past the surface as well — by this plugin and by

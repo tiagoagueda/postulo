@@ -102,6 +102,13 @@ fields it suggests for, its languages, whether it is offline, its licence, its h
 out -- and `SuggestionSourcePlugin` the registry that holds them. A source reached over the
 network is asked on a press and never on a page load.
 
+**A listing can be read beside published earnings statistics (#1257)**: `EarningsSource` is one
+publisher's figures -- the countries it answers for, whether it is offline, its licence, its
+citation, its hosts if it dials out -- `EarningsFigure` one amount with everything that says
+what it is (the measure, gross or net, the period, the currency, the year, the group it
+describes), and `EarningsSourcePlugin` the registry that holds them. A source hands over plain
+values and Postulo draws them, converting and comparing nothing.
+
 **A backup can leave the machine (#325)**: `BackupDestinationPlugin` is what keeps the
 instance's archives somewhere else, `BackupArchive` what it is handed (already encrypted to the
 operator's age recipient), `BackupManifest` what the archive says about itself in plain values,
@@ -203,6 +210,8 @@ if TYPE_CHECKING:  # pragma: no cover - the names `__getattr__` resolves at run 
     from postulo.core.card_rows import links_for as links_for
     from postulo.core.card_rows import numbers_for as numbers_for
     from postulo.core.currencies import CURRENCY_CODES
+    from postulo.core.earnings import Figure as EarningsFigure
+    from postulo.core.earnings import Source as EarningsSource
     from postulo.core.languages import match as language_match
     from postulo.core.languages import matches as language_matches
     from postulo.core.languages import override as language_override
@@ -313,6 +322,7 @@ from .base import (
     DiscoveredOption,
     # ------------------------------------------- what a store is handed, and gives back
     DocumentMetadata,
+    EarningsSourcePlugin,
     EnvironmentVariable,  # one variable the plugin reads (#1186)
     ExternalRef,
     FeaturePlugin,
@@ -390,6 +400,9 @@ __all__ = [
     "DiscoveredOption",
     "DocumentFormat",
     "DocumentMetadata",
+    "EarningsFigure",
+    "EarningsSource",
+    "EarningsSourcePlugin",
     "EnrichmentAnswer",
     "EnrichmentSource",
     "EnrichmentSubject",
@@ -700,6 +713,16 @@ _ELSEWHERE: dict[str, tuple[str, str]] = {
     # in, whether it is offline, its licence and, for one that dials out, its hosts -- whose
     # `offer` answers with `(text, group)` pairs. Only offline sources are asked by a page.
     "SuggestionSource": ("postulo.core.suggestion_sources", "Source"),
+    # ------------------------------------- published earnings statistics for a listing (#1257)
+    # An `earnings-source` plugin adds a publisher's figures: one `EarningsSource` -- a key,
+    # the publisher's name, the countries it answers for, whether it is offline, its licence,
+    # its citation and, for one that dials out, its hosts -- whose `figures` answers, for an
+    # ISCO-08 unit group and a country, with `EarningsFigure`s: an amount with its measure,
+    # gross or net, its period, its currency, its year and the group it describes. Plain
+    # values with no model behind them, so a plugin builds them at import. Postulo draws
+    # them, converts nothing, and only offline sources are asked by a page.
+    "EarningsFigure": ("postulo.core.earnings", "Figure"),
+    "EarningsSource": ("postulo.core.earnings", "Source"),
     # ----------------------------------------- companies, departments and the person (#328)
     # What a sync of contacts needs and could not reach: the companies and departments a
     # card is filed under, the vocabularies it maps onto, and the person's own card. All of

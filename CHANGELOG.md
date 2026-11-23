@@ -8,6 +8,8 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### ✨ Added
 
+- Plugins can supply published earnings statistics for a listing's occupation and country (an earnings source); the listing and application pages draw each figure with its measure, period, year and source, never as a recommendation, and nothing until a source is enabled (#1257)
+- A listing and an application can show Eurostat's earnings statistics for the occupation group and country, with the national minimum wage, each with its source and year and never as a recommendation; off until an administrator enables Earnings statistics (#1257)
 - A `company-enrichment` plugin kind: a source says where a company's details can be read and Postulo asks it on a press of *Find details*; each value is shown with where it was read and its licence, and kept only when ticked. For plugin authors; nothing changes until a source is installed (#1256)
 - *Find details* on a company's page reads the company's own website, on a press, for what it declares about itself and offers each value with where it was read; *Find logo* is now part of the same switchable plugin, and works for a person the company is shared with to change too (#1256)
 - Plugins can describe a job service searched by criteria (the listing-search kind); Postulo makes the request on a press, shows the results without keeping them and sends a chosen advert to review; off until an administrator switches it on, with a switch per service (#1253)
@@ -29,9 +31,9 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🐛 Fixed
 
+- CI's unit tests no longer lose a worker when the runner host runs short of memory: the migration and catalogue tests run in a process of their own after the suite. A browser step stopped by its time limit no longer claims its failed tests failed again alone. (#1316)
 - A plugin can no longer take the place of one of Postulo's own document formats, such as Word, by registering it before Postulo has as the server starts; Postulo's own formats are now always listed before a plugin's (#1255)
 - Browser notifications: two reminders due together no longer replace one another, a long message in a non-Latin script is no longer refused by the push service, and an iPhone or iPad is told to add Postulo to the Home Screen first (#1259)
-- CI's unit tests no longer lose a worker when the runner host runs short of memory: the migration and catalogue tests run in a process of their own after the suite. A browser step stopped by its time limit no longer claims its failed tests failed again alone. (#1316)
 
 ### 🔒 Security
 

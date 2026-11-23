@@ -90,6 +90,12 @@ it once and restores the result afterwards; two lines in the plugin's ``tests/co
 runs a connection the way the scheduler and *Sync now* do -- so a state is kept or refused by
 the same rules -- optionally from a state of the test's choosing, and `kept_sync_state` reads
 what the next run will be handed.
+
+**And an earnings source held to its contract (#1257).** `assert_is_an_earnings_source` holds
+a plugin of the kind to what Postulo accepts and draws: each source usable, and for an offline
+one a figure for every country it declares, each saying what it is -- a known measure, period
+and basis, a positive amount, a currency code, a year and the group it describes -- whatever
+occupation, period and currency it is asked with.
 """
 
 from __future__ import annotations
@@ -737,6 +743,59 @@ def assert_declares_usable_environment(plugin) -> None:
         assert read_environment(variable, environ={}) == variable.default, (
             f"{variable.name}: reading it unset does not give its default"
         )
+
+
+def assert_is_an_earnings_source(plugin) -> None:
+    """Hold an earnings-source plugin to its contract (#1257).
+
+    Fails unless the plugin answers to the protocol and every source it offers is one Postulo
+    would ask: a key, a label, a licence, its countries as two upper-case letters, and either
+    offline or naming its hosts. No two sources share a key.
+
+    An offline source is then asked, as a page asks it, about every country it declares:
+    with no occupation, where it must have at least one figure (a country it has nothing for
+    is not one it answers for), and with an occupation, a period and a currency, which are
+    hints it must cope with whatever they are. Every figure must be one Postulo draws: a
+    known measure, period and basis, a positive `Decimal`, a three-letter currency, the year
+    and the group it describes. A source that needs the network is checked on its
+    declaration alone: nothing here dials out.
+    """
+    from postulo.core import earnings
+
+    from .base import EarningsSourcePlugin
+
+    assert isinstance(plugin, EarningsSourcePlugin), (
+        f"{plugin!r} does not provide name, kind and sources"
+    )
+    assert plugin.kind == earnings.KIND, f"its kind is {plugin.kind!r}"
+    offered = tuple(plugin.sources)
+    assert offered, "it offers no source"
+    keys = []
+    for source in offered:
+        problems = earnings.source_problems(source)
+        assert not problems, f"{getattr(source, 'key', source)!r}: " + "; ".join(problems)
+        keys.append(source.key)
+    assert len(keys) == len(set(keys)), f"two sources share a key: {keys}"
+
+    asked = (
+        {},
+        {"period": "year", "currency": "EUR"},
+        {"period": "month", "currency": "XXX"},
+        {"period": "day", "currency": ""},
+    )
+    for source in offered:
+        if not source.offline:
+            continue
+        for country in source.countries:
+            for code in ("", "2512", "0110", "9999"):
+                for hints in asked:
+                    figures = list(source.figures(code, country, **hints))
+                    where = f"{source.key}: figures({code!r}, {country!r}, {hints})"
+                    for figure in figures:
+                        problems = earnings.figure_problems(figure)
+                        assert not problems, f"{where}: " + "; ".join(problems)
+                    if not code and not hints:
+                        assert figures, f"{where} gave nothing for a country it declares"
 
 
 def draw_widget(plugin, key: str, user, connection=None) -> str:

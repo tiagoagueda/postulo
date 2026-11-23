@@ -1,0 +1,70 @@
+{% load i18n %}
+<c-vars panel />
+{% comment %} Published earnings statistics for a listing's group of occupations and country
+   (#1257): `<c-earnings-reference :panel="earnings" />`, with `jobs.listing_earnings.panel`.
+
+   Drawn on two pages -- the listing's own, and its application's -- which is why it is a
+   component. Nothing is drawn where the panel is empty: no source enabled, no country read
+   from the listing's place, or no figure for it.
+
+   The figures are a statistics office's, handed over as plain values by an `earnings-source`
+   plugin and put into words by Postulo. Every amount sits under the group it describes and
+   beside its measure, with gross or net, its period and its year in the same breath, and each
+   source is cited with its licence. Nothing here is compared with the listing's salary or an
+   offer, and nothing is recommended: the card says so in its first sentence.
+{% endcomment %}
+{% if panel %}
+  <div class="card mb-6" data-earnings-reference>
+    <c-section-title>
+      {% translate "Earnings statistics" %}
+      <c-slot name="subtitle">{% translate "What a statistics office published about the earnings of a group of occupations in this listing's country. A statistic about many jobs, not about this one, and not a recommendation." %}</c-slot>
+    </c-section-title>
+    <dl class="space-y-3 text-sm">
+      <div>
+        <dt class="text-xs text-ink-500 dark:text-ink-400">{% translate "Country" %}</dt>
+        <dd data-earnings-country>{{ panel.country_name }}</dd>
+      </div>
+    </dl>
+    {% if not panel.matched %}
+      <p class="mt-3 text-sm text-ink-500 dark:text-ink-400" data-earnings-unmatched>
+        {% translate "This listing's title matches no group of occupations, so these are for all employees." %}
+      </p>
+    {% endif %}
+    {% for block in panel.blocks %}
+      <div class="mt-4" data-earnings-source="{{ block.key }}">
+        {% for group in block.groups %}
+          <h3 class="mt-3 text-sm font-medium" data-earnings-group>{{ group.name }}</h3>
+          <dl class="mt-1 space-y-2 text-sm">
+            {% for row in group.rows %}
+              <div data-earnings-figure>
+                <dt class="text-xs text-ink-500 dark:text-ink-400">{{ row.label }}</dt>
+                <dd>
+                  {{ row.value }}
+                  {% if row.note %}<span class="block text-xs text-ink-500 dark:text-ink-400">{{ row.note }}</span>{% endif %}
+                </dd>
+              </div>
+            {% endfor %}
+          </dl>
+        {% endfor %}
+        <dl class="mt-3 space-y-2 text-xs text-ink-500 dark:text-ink-400" data-earnings-citation>
+          <div>
+            <dt>{% translate "Source" %}</dt>
+            <dd>
+              {% if block.url %}
+                <a href="{{ block.url }}" rel="noopener noreferrer external" class="underline">{{ block.label }}</a>
+              {% else %}
+                {{ block.label }}
+              {% endif %}
+              {% if block.citation %}<span class="block">{{ block.citation }}</span>{% endif %}
+              {% if block.scope %}<span class="block">{{ block.scope }}</span>{% endif %}
+            </dd>
+          </div>
+          <div>
+            <dt>{% translate "Licence" %}</dt>
+            <dd>{{ block.licence }}</dd>
+          </div>
+        </dl>
+      </div>
+    {% endfor %}
+  </div>
+{% endif %}

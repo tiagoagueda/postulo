@@ -103,3 +103,13 @@ jobs:
         # it had taken half a minute, and ten were not enough the first time the cache was
         # empty (#1110). The limit is there to end a hang, not to time the service.
         timeout-minutes: 30
+
+      # Eurostat's earnings tables, for the same reason (#1257): the refresh validates what
+      # it builds, so a table renamed or reshaped fails here and not on an administrator's
+      # run. Written to a scratch directory; the copy in the repository is not touched.
+      - name: Refresh Eurostat's earnings statistics
+        run: uv run manage.py fetch_earnings
+        env:
+          DJANGO_SETTINGS_MODULE: postulo.config.settings.test
+          POSTULO_EARNINGS_DIR: /tmp/earnings
+        timeout-minutes: 10

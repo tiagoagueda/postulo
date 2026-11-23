@@ -136,7 +136,7 @@ def test_every_plugin_postulo_ships_declares_the_full_set():
     assert not missing, "\n".join(missing)
 
 
-def test_these_are_the_plugins_that_ship_across_fourteen_kinds():
+def test_these_are_the_plugins_that_ship_across_fifteen_kinds():
     """Named rather than counted, so that losing one to a bad import is a failure rather
     than a quiet absence — and so that adding one is a line somebody wrote.
 
@@ -190,7 +190,7 @@ def test_these_are_the_plugins_that_ship_across_fourteen_kinds():
         for classes in registry.builtins().values()
         for plugin_class in classes
     }
-    assert len(registry.builtins()) == 14, sorted(registry.builtins())
+    assert len(registry.builtins()) == 15, sorted(registry.builtins())
 
     assert found == {
         "board",
@@ -229,6 +229,7 @@ def test_these_are_the_plugins_that_ship_across_fourteen_kinds():
         "nace",
         "esco",
         "geonames",
+        "earnings",
         "multiple-fields",
         "builtin-notifications",
         "file-formats",
