@@ -59,6 +59,9 @@ from people who decided it was worth something.
 
 <a href="https://www.buymeacoffee.com/tiagoagueda"><img src="https://source.tiagoagueda.com/postulo/postulo/raw/branch/main/assets/support/buy-me-a-coffee-qr.png" alt="Buy me a coffee — scan to open buymeacoffee.com/tiagoagueda" width="165" height="165"></a>
 
+Or in bitcoin, to the project's one address: [`bc1q2knzwlxzhv2mgt4q4040y3jtkn5a7z0tpkjdzt`](bitcoin:bc1q2knzwlxzhv2mgt4q4040y3jtkn5a7z0tpkjdzt). It is public on
+purpose, so anyone can see [everything it has received](https://mempool.space/address/bc1q2knzwlxzhv2mgt4q4040y3jtkn5a7z0tpkjdzt) and where it went.
+
 Nothing is owed. Nothing is unlocked by it, now or later — that is what the paragraph above
 promises and it is not negotiable. And **nothing a person is shown while using Postulo to
 look for work will ever ask for money**: no banner in the interface, no prompt, no reminder

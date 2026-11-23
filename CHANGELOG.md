@@ -8,6 +8,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### ✨ Added
 
+- Donations can also be made in bitcoin, to one address for everything Postulo, public so anyone can see what it received; the READMEs, FUNDING.md and CONTRIBUTING.md give it beside Buy Me a Coffee (#1314)
 - Plugins can supply published earnings statistics for a listing's occupation and country (an earnings source); the listing and application pages draw each figure with its measure, period, year and source, never as a recommendation, and nothing until a source is enabled (#1257)
 - A listing and an application can show Eurostat's earnings statistics for the occupation group and country, with the national minimum wage, each with its source and year and never as a recommendation; off until an administrator enables Earnings statistics (#1257)
 - A `company-enrichment` plugin kind: a source says where a company's details can be read and Postulo asks it on a press of *Find details*; each value is shown with where it was read and its licence, and kept only when ticked. For plugin authors; nothing changes until a source is installed (#1256)

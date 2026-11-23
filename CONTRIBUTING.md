@@ -6,7 +6,9 @@ read-only mirror, so please open issues and pull requests on Forgejo. Everyone t
 part, in issues, pull requests and Weblate alike, is held to the
 [code of conduct](CODE_OF_CONDUCT.md). What the interface promises people with
 disabilities, and what a change must therefore not break, is in
-[ACCESSIBILITY.md](ACCESSIBILITY.md).
+[ACCESSIBILITY.md](ACCESSIBILITY.md). To support the work with money rather than code, through
+Buy Me a Coffee or in bitcoin, see [FUNDING.md](FUNDING.md): it says what that does and, above
+all, what it never buys.
 
 ## Opening an issue
 

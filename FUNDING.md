@@ -7,6 +7,9 @@ going comes from people who decided it was worth something.
 
 <a href="https://www.buymeacoffee.com/tiagoagueda"><img src="assets/support/buy-me-a-coffee-qr.png" alt="Buy me a coffee — scan to open buymeacoffee.com/tiagoagueda" width="165" height="165"></a>
 
+Or in bitcoin, to the project's one address: [`bc1q2knzwlxzhv2mgt4q4040y3jtkn5a7z0tpkjdzt`](bitcoin:bc1q2knzwlxzhv2mgt4q4040y3jtkn5a7z0tpkjdzt). It is public on
+purpose, so anyone can see [everything it has received](https://mempool.space/address/bc1q2knzwlxzhv2mgt4q4040y3jtkn5a7z0tpkjdzt) and where it went.
+
 This file exists because `.github/FUNDING.yml` can hold a link and nothing else, and a link
 on its own does not say what is being asked for, what it changes, or what it does not.
 
@@ -96,7 +99,9 @@ that is actually on offer.
 
 ## Where the money goes, exactly
 
-To Tiago Águeda, through [Buy Me a Coffee](https://buymeacoffee.com/tiagoagueda). There is
+To Tiago Águeda, through [Buy Me a Coffee](https://buymeacoffee.com/tiagoagueda) or in bitcoin
+to `bc1q2knzwlxzhv2mgt4q4040y3jtkn5a7z0tpkjdzt`, the one address for everything Postulo, whose
+[history](https://mempool.space/address/bc1q2knzwlxzhv2mgt4q4040y3jtkn5a7z0tpkjdzt) anyone can read. There is
 no fund, no foundation, no collective, and nobody else with a claim on it. Contributors are
 credited in the history and the changelog; none of them are paid, and none of them have been
 asked to work for free on the understanding that money might arrive.
@@ -110,6 +115,9 @@ worth less.
 **Can I get an invoice or a receipt?** Buy Me a Coffee issues its own receipt. Anything
 beyond that — a company invoice, a VAT number, a purchase-order reference — is a
 conversation: <tiago.agueda@tiagoagueda.com>.
+
+**And for bitcoin?** The transaction is the record, and it is public. A very small amount
+may cost more in fees than it gives; a few euros' worth is a sensible least.
 
 **Will supporting get my issue looked at sooner?** No. See above; that is deliberate.
 
