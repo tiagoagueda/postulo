@@ -31,6 +31,11 @@ from postulo.core import languages
 #: catalogue of every set, over 250 MB for as long as the file runs. Under plain `load`
 #: every worker handed any test from here parsed them all, and they were handed them at the
 #: same time, near the end of the suite, when each worker was at its largest.
+#:
+#: The tests that read the catalogues are `heavy` as well (#1316): the parse took one process
+#: 385 MB above its start, and on top of a worker already grown through the suite that was a
+#: 1.25 GB process on a runner host with no memory to spare, which the kernel killed. CI runs
+#: them in a process of their own after the suite; the rest of the file stays in it.
 pytestmark = pytest.mark.xdist_group("catalogues")
 
 REPO = Path(__file__).resolve().parents[1]
@@ -254,6 +259,7 @@ def test_a_string_belongs_to_exactly_one_set(tool):
             seen[reference] = subject.name
 
 
+@pytest.mark.heavy
 def test_postulos_own_catalogue_comes_first(compiled):
     """Which is what decides a msgid two catalogues both define.
 
@@ -267,6 +273,7 @@ def test_postulos_own_catalogue_comes_first(compiled):
     assert settings.LOCALE_PATHS[0] == compiled["postulo"]
 
 
+@pytest.mark.heavy
 @pytest.mark.parametrize("code", CODES)
 def test_the_compiled_catalogue_loads_and_pluralises(code, compiled):
     """The plural rule, which has to be right before anybody translates against it.
@@ -303,6 +310,7 @@ def sound_translations(catalogue, code: str) -> list:
     ]
 
 
+@pytest.mark.heavy
 @pytest.mark.parametrize("code", CODES)
 def test_a_started_catalogue_actually_translates(code, compiled, catalogues):
     """Not one string in particular, which a machine draft may have broken and `compile`
@@ -323,6 +331,7 @@ def test_a_started_catalogue_actually_translates(code, compiled, catalogues):
     )
 
 
+@pytest.mark.heavy
 @pytest.mark.parametrize("name", [n for n in NAMES if n != "postulo"])
 def test_a_plugins_own_strings_reach_the_reader(name, compiled, catalogues):
     """The point of the whole exercise: a plugin's catalogue is one Django actually reads.
@@ -349,6 +358,7 @@ def test_a_plugins_own_strings_reach_the_reader(name, compiled, catalogues):
         assert translation.gettext(english) == english
 
 
+@pytest.mark.heavy
 @pytest.mark.parametrize("code", CODES)
 def test_the_interface_renders_in_every_language(client, user, code, compiled, catalogues):
     """Each language, one full page: nothing raises, and the page says which it is in.
@@ -380,6 +390,7 @@ def test_the_interface_renders_in_every_language(client, user, code, compiled, c
     assert heading in body
 
 
+@pytest.mark.heavy
 @pytest.mark.django_db
 def test_a_language_nobody_has_translated_is_not_offered(catalogues):
     """Offering somebody their language and handing them English is a promise with

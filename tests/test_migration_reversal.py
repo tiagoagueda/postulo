@@ -21,6 +21,9 @@ from django.test import TransactionTestCase
 pytestmark = [
     pytest.mark.django_db(transaction=True),
     pytest.mark.xdist_group("migration_reversal"),
+    # Going back and forward over every migration took one process 250 MB above its start,
+    # on top of whatever the worker had grown to (#1316): run apart, after the suite.
+    pytest.mark.heavy,
 ]
 
 #: Where each test starts: the migration it then undoes, or is refused.

@@ -31,6 +31,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 - A plugin can no longer take the place of one of Postulo's own document formats, such as Word, by registering it before Postulo has as the server starts; Postulo's own formats are now always listed before a plugin's (#1255)
 - Browser notifications: two reminders due together no longer replace one another, a long message in a non-Latin script is no longer refused by the push service, and an iPhone or iPad is told to add Postulo to the Home Screen first (#1259)
+- CI's unit tests no longer lose a worker when the runner host runs short of memory: the migration and catalogue tests run in a process of their own after the suite. A browser step stopped by its time limit no longer claims its failed tests failed again alone. (#1316)
 
 ### 🔒 Security
 

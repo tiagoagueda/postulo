@@ -11,6 +11,10 @@ import pytest
 from django.db import connection
 from django.db.migrations.executor import MigrationExecutor
 
+#: Building the project state before and after the migration took one process 400 MB above
+#: its start (#1316), so the test runs apart, after the suite, rather than on a grown worker.
+pytestmark = pytest.mark.heavy
+
 BEFORE = [("jobs", "0013_company_kind")]
 AFTER = [("jobs", "0014_remove_companyidentifier_one_company_per_identifier_per_owner_and_more")]
 

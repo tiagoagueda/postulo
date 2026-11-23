@@ -234,11 +234,24 @@ jobs:
           # How loaded the host is, so a failure that passes alone can be read against it:
           # starved of processor, or of memory (run 723).
           uptime; nproc; free -m; cat /proc/pressure/cpu /proc/pressure/memory 2>/dev/null || true
-          if uv run pytest -m e2e --browser chromium --last-failed --last-failed-no-failures none \
-              -p no:xdist --tracing on --screenshot on --output browser-artifacts; then
+          # pytest writes which tests failed as the session ends. A step stopped by its time
+          # limit, or a process killed, ends no session: there is no list, the run below
+          # selected nothing and exited 5, and this step reported that "the failed tests fail
+          # again when run alone" when nothing had run at all (runs 2172 and 2175, #1316).
+          if [ ! -s .pytest_cache/v/cache/lastfailed ]; then
+            echo "::error::The test step was stopped before pytest recorded which tests failed (its time limit, or a killed process): nothing was run again. Read the step's log, and the load printed above."
+            exit 1
+          fi
+          status=0
+          uv run pytest -m e2e --browser chromium --last-failed --last-failed-no-failures none \
+              -p no:xdist --tracing on --screenshot on --output browser-artifacts || status=$?
+          if [ "$status" -eq 0 ]; then
             echo "::warning::The failed tests pass when run again alone: a flake, or a test that depends on the ones before it. The job stays failed; the trace is in the browser-failure artifact."
-          else
+          elif [ "$status" -eq 1 ]; then
             echo "::error::The failed tests fail again when run alone. The trace is in the browser-failure artifact."
+            exit 1
+          else
+            echo "::error::Running the failed tests again got no result (pytest exited $status), so this step says nothing about them."
             exit 1
           fi
 
@@ -454,11 +467,32 @@ jobs:
         # which in a worker grown through the rest of the suite took the 2 GB job container
         # over its limit and had the worker killed (2026-10-10).
         #
+        # Then the tests that each take a process several hundred megabytes above its start
+        # (#1316): the migrations gone back over and folded, and the tests that parse every
+        # catalogue. On a worker already grown through the suite they made a 1.25 GB process,
+        # which the runner host's kernel killed when it ran out of memory. Alone they peak at
+        # about 750 MB and take about four minutes.
+        #
         # By file: without one, pytest collected all 25,000 tests to keep the 19 marked, about
         # 15 s of every run (#1033). A test marked `heavy` in another file has to be named
         # here as well, which `tests/test_release_tools.py` holds.
-        run: uv run pytest -m heavy -p no:xdist tests/security/test_markdown.py
-        timeout-minutes: 10
+        if: matrix.python-version != '3.14'
+        run: >-
+          uv run pytest -m heavy -p no:xdist
+          tests/security/test_markdown.py tests/test_migration_identifier_case.py
+          tests/test_migration_reversal.py tests/test_translations.py
+        timeout-minutes: 20
+
+      - name: Test what needs a process to itself, and add it to what the suite covers
+        # The same, on the leg that measures: added to what the suite step measured
+        # (`--cov-append`), so the tests that left the suite still count, and `fail_under` is
+        # checked again on the whole (#1316).
+        if: matrix.python-version == '3.14'
+        run: >-
+          uv run pytest -m heavy -p no:xdist --cov --cov-append --cov-report=term-missing
+          tests/security/test_markdown.py tests/test_migration_identifier_case.py
+          tests/test_migration_reversal.py tests/test_translations.py
+        timeout-minutes: 20
 
   checks:
     # "Checks" first: the release gate requires a job whose name starts with it

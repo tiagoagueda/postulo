@@ -235,8 +235,29 @@ jobs:
         # which in a worker grown through the rest of the suite took the 2 GB job container
         # over its limit and had the worker killed (2026-10-10).
         #
+        # Then the tests that each take a process several hundred megabytes above its start
+        # (#1316): the migrations gone back over and folded, and the tests that parse every
+        # catalogue. On a worker already grown through the suite they made a 1.25 GB process,
+        # which the runner host's kernel killed when it ran out of memory. Alone they peak at
+        # about 750 MB and take about four minutes.
+        #
         # By file: without one, pytest collected all 25,000 tests to keep the 19 marked, about
         # 15 s of every run (#1033). A test marked `heavy` in another file has to be named
         # here as well, which `tests/test_release_tools.py` holds.
-        run: uv run pytest -m heavy -p no:xdist tests/security/test_markdown.py
-        timeout-minutes: 10
+        if: matrix.python-version != '3.14'
+        run: >-
+          uv run pytest -m heavy -p no:xdist
+          tests/security/test_markdown.py tests/test_migration_identifier_case.py
+          tests/test_migration_reversal.py tests/test_translations.py
+        timeout-minutes: 20
+
+      - name: Test what needs a process to itself, and add it to what the suite covers
+        # The same, on the leg that measures: added to what the suite step measured
+        # (`--cov-append`), so the tests that left the suite still count, and `fail_under` is
+        # checked again on the whole (#1316).
+        if: matrix.python-version == '3.14'
+        run: >-
+          uv run pytest -m heavy -p no:xdist --cov --cov-append --cov-report=term-missing
+          tests/security/test_markdown.py tests/test_migration_identifier_case.py
+          tests/test_migration_reversal.py tests/test_translations.py
+        timeout-minutes: 20
