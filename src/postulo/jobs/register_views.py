@@ -11,14 +11,17 @@ offered from an LEI record only where the company has none.
 
 The offers are worked out again from the held answer when *Keep* is pressed, never from what
 the form sent back, so a hand-written POST can tick only what the page could have offered.
+
+What is ticked is written by the takers *Find details* writes through (`enrichment_offers`,
+#1256), so an address, a state, an industry, an acronym and a register number are kept the
+same way whichever page offered them.
 """
 
 from __future__ import annotations
 
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.contrib.contenttypes.models import ContentType
-from django.db import IntegrityError, transaction
+from django.db import transaction
 from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
@@ -30,8 +33,8 @@ from django.views import View
 from postulo.core.mixins import WRITE, shared_scope
 from postulo.core.redirects import safe_next
 
-from . import identifiers, industries, register_lookup, trail
-from .models import Company, Industry, LegalState
+from . import enrichment_offers, identifiers, industries, register_lookup, trail
+from .models import Company, LegalState
 
 #: What the review page can offer, in the order it draws them.
 TAKES = ("name", "acronym", "address", "state", "industry", "register")
@@ -65,19 +68,7 @@ def _same(one: str, other: str) -> bool:
 
 def _address_row(company, address):
     """An unsaved row for what the register gave, so it is compared as a stored one is."""
-    from postulo.core.models import PostalAddress
-
-    return PostalAddress(
-        content_type=ContentType.objects.get_for_model(Company),
-        object_id=company.pk,
-        kind=PostalAddress.Kind.OTHER,
-        label=str(_("Registered office"))[:60],
-        street=address.street,
-        postcode=address.postcode,
-        municipality=address.municipality,
-        region=address.region,
-        country=address.country,
-    )
+    return enrichment_offers.address_row(company, address, _("Registered office"))
 
 
 def offers(company, record, scheme: str) -> dict:
@@ -275,54 +266,26 @@ class CompanyRegisterView(LoginRequiredMixin, View):
         fields: list[str] = []
         with transaction.atomic():
             if "acronym" in ticked:
-                from .models import CompanyName
-
                 # Each short name the register gave, never one the page did not offer.
-                added = [
-                    company.add_acronym(name, CompanyName.Source.TYPED)
-                    for name in found["acronym"]["values"]
-                ]
-                if any(added):
-                    fields.append("names")
+                fields += enrichment_offers.take_acronyms(company, found["acronym"]["values"])
             if "address" in ticked:
-                row = found["address"]["row"]
-                row.is_primary = not company.postal_addresses.exists()
                 try:
-                    with transaction.atomic():
-                        row.save()
-                    fields.append(trail.BLOCKS["postal_addresses"])
-                except IntegrityError:
-                    refused.append(_("That address could not be added."))
+                    fields += enrichment_offers.take_address(company, found["address"]["row"])
+                except enrichment_offers.NotKept as refusal:
+                    refused.append(str(refusal))
             if "state" in ticked:
                 state = found["state"]
-                company.legal_state = state["value"]
-                company.legal_state_since = state["since"]
-                company.legal_state_source = source
-                company.acquired_by = None
-                company.save(
-                    update_fields=[
-                        "legal_state",
-                        "legal_state_since",
-                        "legal_state_source",
-                        "acquired_by",
-                        "updated_at",
-                    ]
+                fields += enrichment_offers.take_state(
+                    company, state["value"], state["since"], source
                 )
-                fields += ["legal_state", "legal_state_since"]
             if "industry" in ticked:
-                company.industries.add(*Industry.named(user, [found["industry"]["value"]]))
-                fields.append("industries")
+                fields += enrichment_offers.take_industry(company, user, found["industry"]["value"])
             if "register" in ticked:
                 try:
-                    with transaction.atomic():
-                        # Through the company, which the caller has already scoped to a
-                        # grant to write; the row is owned as the company is.
-                        company.identifiers.create(
-                            scheme=identifiers.REGISTER,
-                            value=found["register"]["value"],
-                        )
-                    fields.append(trail.BLOCKS["identifiers"])
-                except IntegrityError:
+                    fields += enrichment_offers.take_identifier(
+                        company, identifiers.REGISTER, found["register"]["value"]
+                    )
+                except enrichment_offers.NotKept:
                     refused.append(
                         _("Another of your companies already has the register number %(number)s.")
                         % {"number": found["register"]["value"]}

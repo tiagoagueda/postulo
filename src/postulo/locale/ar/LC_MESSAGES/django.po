@@ -15,6 +15,16 @@ msgstr ""
 "Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 ? 4 : 5;\n"
 "X-Generator: postulo scripts/messages.py\n"
 
+#: src/postulo/jobs/enrichment_offers.py
+#, python-format
+msgid "%(address)s was not added."
+msgstr ""
+
+#: src/postulo/jobs/enrichment_offers.py
+#, python-format
+msgid "%(address)s was not added: %(reason)s"
+msgstr ""
+
 #: src/postulo/core/personal.py
 #, python-format
 msgid "%(code)s is not a country in the list."
@@ -561,6 +571,17 @@ msgstr[2] "%(count)s من الإعلانات التي تفكر فيها تُغل
 msgstr[3] "%(count)s إعلانات تفكر فيها تُغلق قريبًا"
 msgstr[4] "%(count)s إعلانًا تفكر فيها تُغلق قريبًا"
 msgstr[5] "%(count)s إعلان تفكر فيها تُغلق قريبًا"
+
+#: src/postulo/jobs/enrichment_offers.py
+#, python-format
+msgid "%(count)s person or more"
+msgid_plural "%(count)s people or more"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+msgstr[4] ""
+msgstr[5] ""
 
 #: src/postulo/plugins/base.py
 #, python-format
@@ -1112,6 +1133,11 @@ msgstr "يقع %(host)s على شبكة خاصة أو محلية. لا يتصل 
 msgid "%(i)s interviews and %(e)s entries in listings' histories would be kept without the name."
 msgstr "سيُحتفظ دون الاسم بالمقابلات (%(i)s) وبالبنود في سجلات تغييرات الإعلانات (%(e)s)."
 
+#: src/postulo/jobs/enrichment_offers.py
+#, python-format
+msgid "%(industry)s (NACE %(division)s)"
+msgstr ""
+
 #: src/postulo/templates/server/logs.html
 #, python-format
 msgid "%(kilobytes)s on disk"
@@ -1204,7 +1230,7 @@ msgstr "من %(least)s إلى %(most)s"
 msgid "%(list)s · %(date)s"
 msgstr "%(list)s · %(date)s"
 
-#: src/postulo/jobs/models.py
+#: src/postulo/jobs/enrichment_offers.py src/postulo/jobs/models.py
 #, python-format
 msgid "%(low)s to %(high)s"
 msgstr "من %(low)s إلى %(high)s"
@@ -1620,6 +1646,16 @@ msgstr "%(name)s: أُغفل الرقم %(value)s. %(why)s"
 msgid "%(names)s can see “%(other)s” and not “%(kept)s”. Share “%(kept)s” with them first, or nothing is merged."
 msgstr "يستطيع %(names)s رؤية «%(other)s» دون «%(kept)s». شارك «%(kept)s» معهم أولًا، وإلا فلن يُدمج شيء."
 
+#: src/postulo/jobs/enrichment_offers.py
+#, python-format
+msgid "%(number)s was not added."
+msgstr ""
+
+#: src/postulo/jobs/enrichment_offers.py
+#, python-format
+msgid "%(number)s was not added: %(reason)s"
+msgstr ""
+
 #: src/postulo/resume/views.py
 #, fuzzy, python-format
 msgid "%(ok)s, %(broken)s; the ones that did not say why."
@@ -1919,6 +1955,72 @@ msgstr "لم يكن لدى خدمة %(service)s، عبر doi.org، شيء للح
 msgid "%(share)s%%"
 msgstr "%(share)s%%"
 
+#: src/postulo/jobs/enrichment.py
+#, python-format
+msgid "%(source)s asked for an address it did not declare."
+msgstr ""
+
+#: src/postulo/jobs/enrichment.py
+#, python-format
+msgid "%(source)s asked for fewer requests. Try again later."
+msgstr ""
+
+#: src/postulo/jobs/enrichment.py
+#, python-format
+msgid "%(source)s asked for more requests than one press allows."
+msgstr ""
+
+#: src/postulo/jobs/enrichment.py
+#, python-format
+msgid "%(source)s cannot be asked about this company."
+msgstr ""
+
+#: src/postulo/jobs/enrichment.py
+#, python-format
+msgid "%(source)s could not be reached."
+msgstr ""
+
+#: src/postulo/templates/jobs/company_enrichment.html
+#, python-format
+msgid "%(source)s could not be read."
+msgstr ""
+
+#: src/postulo/jobs/enrichment.py
+#, python-format
+msgid "%(source)s redirected too many times."
+msgstr ""
+
+#: src/postulo/jobs/enrichment.py
+#, python-format
+msgid "%(source)s sent its answer with the content encoding “%(coding)s”, which Postulo does not unpack."
+msgstr ""
+
+#: src/postulo/jobs/enrichment.py
+#, python-format
+msgid "%(source)s sent the request somewhere else."
+msgstr ""
+
+#: src/postulo/jobs/enrichment.py
+#, python-format
+msgid "%(source)s took longer than %(seconds)s second to answer."
+msgid_plural "%(source)s took longer than %(seconds)s seconds to answer."
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+msgstr[4] ""
+msgstr[5] ""
+
+#: src/postulo/jobs/enrichment.py
+#, python-format
+msgid "%(source)s's answer could not be read."
+msgstr ""
+
+#: src/postulo/jobs/enrichment.py
+#, python-format
+msgid "%(source)s's answer was larger than one company's should be."
+msgstr ""
+
 #: src/postulo/templates/jobs/listing_search.html
 #, python-format
 msgid "%(source)s: asked at %(hosts)s. It is sent the words, the place and the filters you search for, or an advert's number when you press Review, and nothing about you."
@@ -1928,6 +2030,11 @@ msgstr ""
 #, python-format
 msgid "%(start)s to %(end)s"
 msgstr "من %(start)s إلى %(end)s"
+
+#: src/postulo/jobs/enrichment_offers.py
+#, python-format
+msgid "%(state)s since %(date)s"
+msgstr ""
 
 #: src/postulo/templates/applications/partials/board.html
 #, python-format
@@ -2966,6 +3073,10 @@ msgstr "وحدة: مدمجة في Postulo ولا يمكن إزالتها."
 msgid "A month"
 msgstr "شهر"
 
+#: src/postulo/jobs/enrichment_views.py
+msgid "a name"
+msgstr ""
+
 #: src/postulo/core/messaging_services.py
 #, python-format
 msgid "A name is at most %(max)s characters."
@@ -3186,6 +3297,10 @@ msgstr "سجل حُذف لاحقًا"
 #: src/postulo/documents/forms.py
 msgid "A referee who is not a contact yet. Their name is enough; it is added to your contacts without a company, and is used instead of the choice above."
 msgstr "مُزكٍّ ليس من جهات اتصالك بعد. يكفي اسمه؛ يُضاف إلى جهات اتصالك دون شركة، ويُستخدم بدلًا من الاختيار أعلاه."
+
+#: src/postulo/jobs/enrichment_views.py
+msgid "a register number"
+msgstr ""
 
 #: src/postulo/applications/ical_import.py
 msgid "A reminder"
@@ -3411,6 +3526,10 @@ msgstr "يجب أن يحتوي اسم العرض على حرف أو رقم وا�
 msgid "A way back rather than a way on, which is why it is an outline."
 msgstr "طريق للرجوع لا للمضي قدمًا، ولهذا هو زر بإطار فقط."
 
+#: src/postulo/jobs/enrichment_views.py
+msgid "a website"
+msgstr ""
+
 #: src/postulo/templates/applications/report.html
 #: src/postulo/templates/documents/themes/base_report.html
 msgid "A week, on average"
@@ -3419,6 +3538,10 @@ msgstr "في الأسبوع، في المتوسط"
 #: src/postulo/templates/core/partials/widget_offers.html
 msgid "A widget added in a later release, or brought by a plugin, waits above until you say yes to it. Nothing arrives on your dashboard without being asked."
 msgstr "الأداة المضافة في إصدار لاحق، أو التي يجلبها مكوّن إضافي، تنتظر في الأعلى حتى توافق عليها. لا يصل شيء إلى لوحة المعلومات دون أن تطلبه."
+
+#: src/postulo/jobs/enrichment_views.py
+msgid "a Wikidata identifier"
+msgstr ""
 
 #: src/postulo/documents/integrity.py
 msgid "a Word document"
@@ -3546,7 +3669,8 @@ msgstr "مستحوَذ عليها أو مندمجة"
 msgid "acquired_by must be a company you can see."
 msgstr "يجب أن يكون acquired_by شركة يمكنك رؤيتها."
 
-#: src/postulo/jobs/models.py src/postulo/templates/jobs/company_form.html
+#: src/postulo/jobs/enrichment_offers.py src/postulo/jobs/models.py
+#: src/postulo/templates/jobs/company_form.html
 msgid "Acronym or short name"
 msgstr "اختصار أو اسم مختصر"
 
@@ -3883,7 +4007,8 @@ msgid "addok (France's Base Adresse Nationale)"
 msgstr "addok (Base Adresse Nationale، قاعدة العناوين الوطنية في فرنسا)"
 
 #: src/postulo/applications/forms.py src/postulo/applications/reports.py
-#: src/postulo/jobs/tables.py src/postulo/templates/partials/web_links.html
+#: src/postulo/jobs/enrichment_offers.py src/postulo/jobs/tables.py
+#: src/postulo/templates/partials/web_links.html
 #, fuzzy
 msgid "Address"
 msgstr "عنوان الويب"
@@ -4111,6 +4236,10 @@ msgstr "يحدث هذا أيضًا تلقائيًا عند تغيّر عنوان
 msgid "Also in %(names)s"
 msgstr "موجود أيضًا في %(names)s"
 
+#: src/postulo/templates/jobs/company_enrichment.html
+msgid "Also said"
+msgstr ""
+
 #: src/postulo/accounts/models.py
 msgid "Always"
 msgstr "دائمًا"
@@ -4177,6 +4306,10 @@ msgstr "العنوان المسجّل قبل بدء التحقق من العنا
 #: src/postulo/resume/candidate.py
 msgid "An address that could not be read"
 msgstr "عنوان تعذرت قراءته"
+
+#: src/postulo/jobs/enrichment_views.py
+msgid "an address with a country"
+msgstr ""
 
 #: src/postulo/applications/models.py
 msgid "An address, a telephone number or the link to the call."
@@ -4276,6 +4409,10 @@ msgstr "تنتمي المقابلة إلى طلب توظيف. اختر واحد�
 msgid "An interview is scheduled or moved"
 msgstr "تُجدوَل مقابلة أو يتغيّر موعدها"
 
+#: src/postulo/jobs/enrichment_views.py
+msgid "an LEI"
+msgstr ""
+
 #: src/postulo/notifications/base.py
 msgid "An offer is recorded"
 msgstr "يُسجَّل عرض"
@@ -4358,6 +4495,11 @@ msgstr "كان نسخ احتياطي آخر قيد التشغيل بالفعل."
 #: src/postulo/templates/accounts/invite_created.html
 msgid "Another invitation"
 msgstr "دعوة أخرى"
+
+#: src/postulo/jobs/enrichment_offers.py
+#, python-format
+msgid "Another of your companies already has %(identifier)s."
+msgstr ""
 
 #: src/postulo/jobs/register_views.py
 #, python-format
@@ -4823,6 +4965,11 @@ msgstr "اعتبارًا من"
 msgid "as of %(date)s"
 msgstr "اعتبارًا من %(date)s"
 
+#: src/postulo/templates/jobs/partials/enrichment_origins.html
+#, python-format
+msgid "As of %(date)s."
+msgstr ""
+
 #: src/postulo/templates/applications/interview_detail.html
 #: src/postulo/templates/documents/themes/base_interview.html
 #, fuzzy, python-format
@@ -4906,6 +5053,15 @@ msgstr ""
 #, python-format
 msgid "Asks %(plugin)s now. Nothing it answers is kept here."
 msgstr "يسأل %(plugin)s الآن. لا يُحفظ هنا أي شيء مما يجيب به."
+
+#: src/postulo/templates/cotton/enrichment_ask.html
+#, python-format
+msgid "Asks <bdi>%(hosts)s</bdi>. Sent: %(what)s."
+msgstr ""
+
+#: src/postulo/templates/jobs/company_detail.html
+msgid "Asks the places you choose, once each; nothing is kept until you say so."
+msgstr ""
 
 #: src/postulo/applications/analytics.py src/postulo/applications/models.py
 msgid "Assessment"
@@ -5130,6 +5286,10 @@ msgstr "العودة إلى التقويم"
 #: src/postulo/templates/applications/calendar_print.html
 msgid "Back to the calendar, to change any of this"
 msgstr "العودة إلى التقويم لتغيير أي من هذا"
+
+#: src/postulo/templates/jobs/company_enrichment.html
+msgid "Back to the company"
+msgstr ""
 
 #: src/postulo/core/help.py
 msgid "Back to the dashboard"
@@ -5529,6 +5689,7 @@ msgstr "يمكن إقرانه بـ"
 #: src/postulo/templates/documents/upload_form.html
 #: src/postulo/templates/jobs/address_place.html
 #: src/postulo/templates/jobs/capture_page_forget.html
+#: src/postulo/templates/jobs/company_enrichment.html
 #: src/postulo/templates/jobs/company_form.html
 #: src/postulo/templates/jobs/company_register.html
 #: src/postulo/templates/jobs/company_wikidata.html
@@ -5582,6 +5743,11 @@ msgstr "لا يمكن إضافته"
 #: src/postulo/templates/applications/ical_import.html
 msgid "Cannot be added."
 msgstr "لا يمكن إضافته."
+
+#: src/postulo/templates/cotton/enrichment_ask.html
+#, python-format
+msgid "Cannot be asked: this company would need %(what)s."
+msgstr ""
 
 #: src/postulo/templates/server/overview.html
 msgid "cannot be checked on this machine"
@@ -5704,12 +5870,13 @@ msgstr "معاينة السجل المهني"
 msgid "Career sections"
 msgstr "أقسام السجل المهني"
 
-#: src/postulo/jobs/models.py
-msgid "careers page"
+#: src/postulo/jobs/enrichment_offers.py src/postulo/jobs/tables.py
+#: src/postulo/templates/jobs/company_detail.html
+msgid "Careers page"
 msgstr "صفحة الوظائف"
 
-#: src/postulo/jobs/tables.py src/postulo/templates/jobs/company_detail.html
-msgid "Careers page"
+#: src/postulo/jobs/models.py
+msgid "careers page"
 msgstr "صفحة الوظائف"
 
 #: src/postulo/templates/server/email.html
@@ -5877,6 +6044,10 @@ msgstr "التحقق من وجود تحديثات"
 msgid "Check it answers"
 msgstr "التحقق من استجابته"
 
+#: src/postulo/templates/jobs/partials/enrichment_origins.html
+msgid "Check it there"
+msgstr ""
+
 #: src/postulo/templates/jobs/capture_review.html
 msgid "Check the reading against it"
 msgstr "التحقق من القراءة بمقارنتها بها"
@@ -6024,6 +6195,10 @@ msgstr "اختيار ملف آخر"
 msgid "Choose at least one document to record."
 msgstr "اختر مستندًا واحدًا على الأقل لتسجيله."
 
+#: src/postulo/jobs/enrichment_views.py
+msgid "Choose at least one place to ask."
+msgstr ""
+
 #: src/postulo/templates/cotton/date_field.html
 msgid "Choose dates from a calendar"
 msgstr "اختيار التواريخ من التقويم"
@@ -6087,6 +6262,10 @@ msgstr "اختر ما تريد فعله بالرسالة."
 #: src/postulo/jobs/status_views.py
 msgid "Choose what was reported and the date."
 msgstr "اختر ما أُبلغ عنه وتاريخه."
+
+#: src/postulo/templates/cotton/enrichment_ask.html
+msgid "Choose where to ask about this company. Each place is asked once, now, and learns only what is listed. Nothing is kept until you tick it."
+msgstr ""
 
 #: src/postulo/applications/views.py
 msgid "Choose which application this is about first."
@@ -6417,6 +6596,10 @@ msgstr "تمت إضافة الشركة."
 #: src/postulo/jobs/views.py
 msgid "Company deleted, along with its postings."
 msgstr "تم حذف الشركة مع إعلاناتها."
+
+#: src/postulo/plugins/kinds.py
+msgid "Company details"
+msgstr ""
 
 #: src/postulo/jobs/models.py
 msgid "company identifier"
@@ -7366,6 +7549,10 @@ msgstr "التفصيل"
 msgid "details"
 msgstr "التفاصيل"
 
+#: src/postulo/templates/jobs/company_enrichment.html
+msgid "Details found"
+msgstr ""
+
 #: src/postulo/core/design.py src/postulo/templates/server/design.html
 msgid "Dialogs"
 msgstr "مربعات الحوار"
@@ -7872,6 +8059,7 @@ msgid "email address"
 msgstr "عنوان البريد الإلكتروني"
 
 #: src/postulo/core/channels.py src/postulo/documents/printing.py
+#: src/postulo/jobs/enrichment_offers.py
 msgid "Email address"
 msgstr "عنوان البريد الإلكتروني"
 
@@ -8657,6 +8845,10 @@ msgstr "بحث"
 msgid "Find a language"
 msgstr "البحث عن لغة"
 
+#: src/postulo/templates/cotton/enrichment_ask.html
+msgid "Find details"
+msgstr ""
+
 #: src/postulo/templates/jobs/company_form.html
 msgid "Find logo"
 msgstr "البحث عن شعار"
@@ -8922,6 +9114,17 @@ msgstr[5] "عُثر على %(count)d خيار في الخادم. اختر ما �
 
 #: src/postulo/jobs/slow.py
 #, python-format
+msgid "Found %(count)s detail. Nothing is kept until you tick it."
+msgid_plural "Found %(count)s details. Nothing is kept until you tick it."
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+msgstr[4] ""
+msgstr[5] ""
+
+#: src/postulo/jobs/slow.py
+#, python-format
 msgid "Found a logo at %(url)s."
 msgstr "عُثر على شعار في %(url)s."
 
@@ -8953,6 +9156,10 @@ msgstr "عُثر عليه عبر"
 #, python-format
 msgid "Found: %(names)s. Only the ones you have left blank will be filled in."
 msgstr "تم العثور على: %(names)s. لن تُملأ إلا الحقول التي تركتها فارغة."
+
+#: src/postulo/jobs/enrichment_offers.py
+msgid "Founded"
+msgstr ""
 
 #: src/postulo/jobs/models.py
 msgid "Freelance"
@@ -9006,6 +9213,11 @@ msgstr "من %(name)s."
 #, python-format
 msgid "From %(register)s"
 msgstr "من سجل %(register)s"
+
+#: src/postulo/templates/jobs/partials/enrichment_origins.html
+#, python-format
+msgid "From %(source)s: <bdi>%(where)s</bdi>."
+msgstr ""
 
 #: src/postulo/core/tables.py
 #, python-format
@@ -9419,6 +9631,10 @@ msgctxt "pronouns"
 msgid "he/him"
 msgstr "هو"
 
+#: src/postulo/jobs/enrichment_offers.py
+msgid "Head office"
+msgstr ""
+
 #: src/postulo/accounts/models.py src/postulo/documents/models.py
 #: src/postulo/resume/views.py
 msgid "headline"
@@ -9803,6 +10019,7 @@ msgstr "طلبات HTTP متساوية الأثر"
 msgid "identifier"
 msgstr "المعرّف"
 
+#: src/postulo/jobs/enrichment_offers.py
 #: src/postulo/templates/cotton/identifier_row.html
 msgid "Identifier"
 msgstr "المعرّف"
@@ -10178,12 +10395,13 @@ msgstr "مجالات النشاط"
 msgid "industries"
 msgstr "مجالات النشاط"
 
-#: src/postulo/jobs/models.py
-msgid "industry"
-msgstr "مجال النشاط"
-
+#: src/postulo/jobs/enrichment_offers.py
 #: src/postulo/templates/jobs/industry_form.html
 msgid "Industry"
+msgstr "مجال النشاط"
+
+#: src/postulo/jobs/models.py
+msgid "industry"
 msgstr "مجال النشاط"
 
 #: src/postulo/jobs/views.py
@@ -10394,6 +10612,10 @@ msgstr "جهة الإصدار"
 #: src/postulo/resume/models.py
 msgid "issued on"
 msgstr "تاريخ الإصدار"
+
+#: src/postulo/jobs/enrichment_offers.py
+msgid "It already has a logo."
+msgstr ""
 
 #: src/postulo/templates/settings/account.html
 msgid "It also gets you back in: ask for a sign-in code and it arrives there. Making a different address primary moves that with it. You are still asked for your authenticator app if you have one."
@@ -10841,6 +11063,7 @@ msgstr "الاحتفاظ بهذه"
 msgid "Keep this view as"
 msgstr "الاحتفاظ بهذا العرض باسم"
 
+#: src/postulo/templates/jobs/company_enrichment.html
 #: src/postulo/templates/jobs/company_register.html
 msgid "Keep what is ticked"
 msgstr "الاحتفاظ بما هو محدّد"
@@ -10861,6 +11084,17 @@ msgstr "الاحتفاظ بالصفحة"
 #, fuzzy
 msgid "Kept"
 msgstr "محفوظ"
+
+#: src/postulo/jobs/enrichment_views.py
+#, python-format
+msgid "Kept %(count)s detail."
+msgid_plural "Kept %(count)s details."
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+msgstr[4] ""
+msgstr[5] ""
 
 #: src/postulo/templates/server/person_recovery.html
 msgid "Kept after they are used or expire, because taking somebody's account back is not something to be able to do without a trace."
@@ -11240,6 +11474,7 @@ msgstr "اتركه فارغًا للإبقاء على القيمة المخزّ�
 msgid "Leave empty if this is your current role."
 msgstr "اتركه فارغًا إن كانت هذه وظيفتك الحالية."
 
+#: src/postulo/templates/jobs/company_enrichment.html
 #: src/postulo/templates/jobs/company_wikidata.html
 msgid "Leave it as it is"
 msgstr "إبقاؤه كما هو"
@@ -11348,6 +11583,10 @@ msgstr "إشعار قانوني"
 #: src/postulo/jobs/industries.py
 msgid "Legal services"
 msgstr "الخدمات القانونية"
+
+#: src/postulo/jobs/enrichment_offers.py
+msgid "Legal state"
+msgstr ""
 
 #: src/postulo/jobs/models.py
 msgid "legal state"
@@ -11599,6 +11838,10 @@ msgstr "المكان"
 msgid "Location"
 msgstr "المكان"
 
+#: src/postulo/jobs/enrichment_offers.py
+msgid "Logo"
+msgstr ""
+
 #: src/postulo/jobs/models.py
 msgid "logo"
 msgstr "الشعار"
@@ -11661,6 +11904,10 @@ msgstr "عنوان خدمة البحث"
 #: src/postulo/jobs/slow.py
 msgid "Looking for a logo"
 msgstr "جارٍ البحث عن شعار"
+
+#: src/postulo/jobs/slow.py
+msgid "Looking for details"
+msgstr ""
 
 #: src/postulo/templates/applications/application_list.html
 #: src/postulo/templates/jobs/company_list.html
@@ -12321,8 +12568,8 @@ msgstr "باب NACE"
 msgid "name"
 msgstr "الاسم"
 
-#: src/postulo/api/forms.py src/postulo/jobs/tables.py
-#: src/postulo/templates/cotton/identifier_row.html
+#: src/postulo/api/forms.py src/postulo/jobs/enrichment_offers.py
+#: src/postulo/jobs/tables.py src/postulo/templates/cotton/identifier_row.html
 #: src/postulo/templates/partials/messaging_handles.html
 #: src/postulo/templates/partials/phone_numbers.html
 #: src/postulo/templates/partials/postal_addresses.html
@@ -12807,6 +13054,14 @@ msgstr "لا توجد خطابات من هذا النوع بعد."
 msgid "No letters yet. A cover letter is for one posting; a motivation letter tells your story; a speculative letter goes where nothing is advertised; a follow-up note comes after an interview."
 msgstr "لا توجد خطابات بعد. خطاب التقديم مخصص لإعلان واحد؛ والخطاب التحفيزي يروي قصتك؛ وخطاب الترشح التلقائي يُرسَل حيث لا يوجد إعلان؛ وخطاب المتابعة يأتي بعد مقابلة."
 
+#: src/postulo/templates/jobs/company_enrichment.html
+msgid "No licence is stated."
+msgstr ""
+
+#: src/postulo/templates/jobs/company_enrichment.html
+msgid "No licence is stated; the name and the mark are the company's."
+msgstr ""
+
 #: src/postulo/templates/connections/partials/option_table.html
 msgid "No longer on the server"
 msgstr "لم يعد موجودًا في الخادم"
@@ -13120,6 +13375,10 @@ msgstr "لا يُستنتج شيء منها من أي شيء آخر: لا يُخ
 msgid "None of this company's industries is Education, so it is not listed as a school or university."
 msgstr "لا يوجد التعليم بين مجالات نشاط هذه الشركة، لذا لا تُدرج كمدرسة أو جامعة."
 
+#: src/postulo/jobs/slow.py
+msgid "None of those can be asked about this company any more."
+msgstr ""
+
 #: src/postulo/templates/jobs/company_places.html
 msgid "None of your companies has this name or identifier."
 msgstr "لا توجد بين شركاتك شركة بهذا الاسم أو المعرّف."
@@ -13190,6 +13449,10 @@ msgstr "غير مناسب"
 #: src/postulo/templates/partials/phone_widget.html
 msgid "Not a possible number"
 msgstr "رقم غير صالح"
+
+#: src/postulo/jobs/enrichment_offers.py
+msgid "Not a profile on a service Postulo knows."
+msgstr ""
 
 #: src/postulo/documents/models.py
 msgid "Not accepted"
@@ -13639,6 +13902,10 @@ msgstr "لا يُحفظ شيء حتى تراجعه."
 msgid "Nothing is sent to the server as a password until a new one is entered."
 msgstr "لا يُرسل أي شيء إلى الخادم بوصفه كلمة مرور حتى تُدخل كلمة جديدة."
 
+#: src/postulo/jobs/logos.py
+msgid "Nothing is switched on that finds a logo on a website."
+msgstr ""
+
 #: src/postulo/templates/applications/application_detail.html
 msgid "Nothing kept yet. Keep what you typed into the employer's form, so you can see what they were told."
 msgstr "لم يُحفظ شيء بعد. احتفظ بما كتبته في نموذج صاحب العمل لترى ما أُخبر به."
@@ -13771,6 +14038,10 @@ msgstr ""
 msgid "Nothing that reads a CV from a file is switched on here, so there is no file to choose."
 msgstr ""
 
+#: src/postulo/templates/jobs/company_enrichment.html
+msgid "Nothing that was found can be added to what the company already has."
+msgstr ""
+
 #: src/postulo/core/design.py src/postulo/templates/server/design.html
 msgid "Nothing there"
 msgstr "لا شيء هنا"
@@ -13854,7 +14125,7 @@ msgstr "لم يُحتفظ بأي شيء من تلك الصفحة."
 msgid "Nothing was kept of this page"
 msgstr "لم يُحتفظ بشيء من هذه الصفحة"
 
-#: src/postulo/jobs/register_views.py
+#: src/postulo/jobs/enrichment_views.py src/postulo/jobs/register_views.py
 msgid "Nothing was kept."
 msgstr "لم يُحتفظ بشيء."
 
@@ -14623,6 +14894,7 @@ msgstr "لا تظهر في السيرة الذاتية إلا السنة، لذ�
 msgid "Only this publication, as a reference:"
 msgstr "هذا المنشور فقط، كمرجع:"
 
+#: src/postulo/templates/jobs/company_enrichment.html
 #: src/postulo/templates/jobs/company_register.html
 msgid "Only what you tick is kept; nothing else on the company changes."
 msgstr "لا يُحتفظ إلا بما تحدّده؛ ولا يتغير شيء آخر في الشركة."
@@ -15199,6 +15471,10 @@ msgstr "التقاعد والتأمين والبدلات والمعدات: أي�
 msgid "People"
 msgstr "الأشخاص"
 
+#: src/postulo/jobs/enrichment_offers.py
+msgid "People employed"
+msgstr ""
+
 #: src/postulo/jobs/models.py
 msgid "Per day"
 msgstr "يوميًا"
@@ -15719,6 +15995,10 @@ msgstr "لقد نسيه Postulo. لكن المزوّد يحتفظ بالتفوي
 #: src/postulo/core/server_views.py
 msgid "Postulo has forgotten the grant. The provider still has it until you withdraw it there as well."
 msgstr "نسي Postulo التفويض. لا يزال المزوّد يحتفظ به حتى تسحبه من هناك أيضًا."
+
+#: src/postulo/templates/jobs/company_enrichment.html
+msgid "Postulo has nowhere to keep these yet. They are shown for you to read, and are not kept."
+msgstr ""
 
 #: src/postulo/core/tagline.py
 msgid "Postulo is a self-hosted job application manager: your applications, CVs and cover letters on your own server, with no paid features."
@@ -17053,6 +17333,7 @@ msgstr "الاحتفاظ بالبيانات"
 msgid "retired on"
 msgstr "تاريخ الإنهاء"
 
+#: src/postulo/templates/jobs/company_enrichment.html
 #: src/postulo/templates/jobs/company_register.html
 #, python-format
 msgid "Retrieved %(when)s."
@@ -17184,6 +17465,10 @@ msgstr "يعمل %(running)s؛ أعد التشغيل للإنهاء"
 #: src/postulo/templates/server/backups.html
 msgid "Runs in the background; you can leave this page while it works."
 msgstr "تعمل في الخلفية؛ يمكنك مغادرة هذه الصفحة أثناء عملها."
+
+#: src/postulo/templates/jobs/company_enrichment.html
+msgid "Said, and not offered"
+msgstr ""
 
 #: src/postulo/templates/core/import_csv_map.html
 msgid "Salaries are in"
@@ -17882,6 +18167,14 @@ msgstr "سبعة ألوان، ضُبط تباين كل منها على 3:1 مق�
 msgid "Several countries"
 msgstr ""
 
+#: src/postulo/jobs/enrichment_offers.py
+msgid "Several social profiles are switched off."
+msgstr ""
+
+#: src/postulo/jobs/enrichment_offers.py
+msgid "Several telephone numbers are switched off."
+msgstr ""
+
 #: src/postulo/jobs/industries.py
 msgid "Sewerage"
 msgstr "الصرف الصحي"
@@ -18377,7 +18670,7 @@ msgid "Snoozed for two weeks."
 msgstr "تم التأجيل لمدة أسبوعين."
 
 #: src/postulo/core/models.py src/postulo/core/web_links.py
-#: src/postulo/documents/printing.py
+#: src/postulo/documents/printing.py src/postulo/jobs/enrichment_offers.py
 msgid "Social profile"
 msgstr "حساب على شبكة اجتماعية"
 
@@ -18563,6 +18856,7 @@ msgstr "المصدر هو حقل «عُثر عليه عبر» في الإعلا�
 msgid "source version"
 msgstr "إصدار أداة القراءة"
 
+#: src/postulo/templates/jobs/company_enrichment.html
 #: src/postulo/templates/jobs/company_register.html
 #, python-format
 msgid "Source: %(source)s."
@@ -19105,6 +19399,7 @@ msgid "telephone"
 msgstr "الهاتف"
 
 #: src/postulo/core/channels.py src/postulo/documents/printing.py
+#: src/postulo/jobs/enrichment_offers.py
 #: src/postulo/templates/partials/phone_widget.html
 #: src/postulo/templates/server/design.html
 msgid "Telephone number"
@@ -19217,7 +19512,7 @@ msgstr "شكرًا، {{ role }}"
 msgid "Thank-you"
 msgstr "شكر"
 
-#: src/postulo/jobs/register_views.py
+#: src/postulo/jobs/enrichment_offers.py
 msgid "That address could not be added."
 msgstr "تعذّرت إضافة ذلك العنوان."
 
@@ -20308,6 +20603,11 @@ msgstr "الشركات وجهات الاتصال والإعلانات التي �
 msgid "The company %(name)s is not in your account, and is added with it."
 msgstr "الشركة %(name)s ليست في حسابك، وتُضاف معه."
 
+#: src/postulo/templates/jobs/company_enrichment.html
+#, python-format
+msgid "The company already has <bdi>%(current)s</bdi>."
+msgstr ""
+
 #: src/postulo/jobs/views.py
 msgid "The company already has that name."
 msgstr "الشركة تحمل هذا الاسم بالفعل."
@@ -20946,6 +21246,11 @@ msgstr "تم تغيير الشعار."
 #, python-format
 msgid "The logo was not changed: %(problem)s"
 msgstr "لم يُغيَّر الشعار: %(problem)s"
+
+#: src/postulo/jobs/enrichment_offers.py
+#, python-format
+msgid "The logo was not kept: %(problem)s"
+msgstr ""
 
 #: src/postulo/templates/applications/report.html
 msgid "The longest gap is measured inside this period, so a silence that began before it is not carried in. A period still running is only counted up to today."
@@ -23373,7 +23678,8 @@ msgid "WebP image"
 msgstr "صورة WebP"
 
 #: src/postulo/core/models.py src/postulo/core/web_links.py
-#: src/postulo/documents/printing.py src/postulo/jobs/tables.py
+#: src/postulo/documents/printing.py src/postulo/jobs/enrichment_offers.py
+#: src/postulo/jobs/tables.py
 #: src/postulo/templates/applications/interview_detail.html
 #: src/postulo/templates/jobs/company_detail.html
 msgid "Website"
@@ -23850,6 +24156,7 @@ msgstr "ما يجب فعله حياله، في جملة واحدة."
 msgid "What to do. It is what the reminder says when it falls due."
 msgstr "ما يجب فعله. هذا ما يقوله التذكير عندما يحين موعده."
 
+#: src/postulo/templates/jobs/company_enrichment.html
 #: src/postulo/templates/jobs/company_register.html
 msgid "What to keep"
 msgstr "ما يُحتفظ به"
@@ -23909,6 +24216,10 @@ msgstr "ما قمت به هناك. لا يُظهر «غير محدد» أي شي
 #: src/postulo/jobs/widgets.py
 msgid "What you have noticed and not yet acted on, and what closes this week."
 msgstr "ما لاحظته ولم تتخذ بشأنه إجراءً بعد، وما يُغلق هذا الأسبوع."
+
+#: src/postulo/templates/jobs/company_enrichment.html
+msgid "What you have recorded is never replaced from here. Change it on the company's own page if a source is right."
+msgstr ""
 
 #: src/postulo/resume/models.py
 msgid "what you presented"
@@ -24160,6 +24471,10 @@ msgstr "يُحدَّد موضع هذا البند في قسمه بالأسهم �
 #: src/postulo/templates/help/telephone_numbers.html
 msgid "Where this instance can send a code to a telephone, a number you have confirmed can also be the one that gets you back into your account. That choice is separate from the primary, so changing what a recruiter dials never changes how you prove it is you. The bin will not remove that number while it is your way in. Changing its digits makes it another number, which has to be confirmed again and is no longer your way in."
 msgstr "إذا كان هذا المثيل يستطيع إرسال رمز إلى هاتف، فيمكن للرقم الذي أكّدته أن يكون أيضًا الرقم الذي يعيدك إلى حسابك. هذا الاختيار منفصل عن الرقم الأساسي، لذا فإن تغيير الرقم الذي يتصل به مسؤول التوظيف لا يغيّر أبدًا طريقة إثبات هويتك. لن تزيل سلة المهملات ذلك الرقم ما دام وسيلتك للدخول. وتغيير أرقامه يجعله رقمًا آخر، يجب تأكيده مجددًا ولا يعود وسيلتك للدخول."
+
+#: src/postulo/templates/cotton/enrichment_ask.html
+msgid "Where to ask"
+msgstr ""
 
 #: src/postulo/templates/server/register_lookup.html
 msgid "Where to get a key"

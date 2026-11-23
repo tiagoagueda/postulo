@@ -692,6 +692,42 @@ class RegisterAdapterPlugin(Protocol):
     adapters: tuple
 
 
+# ---------------------------------------------------------- company enrichment (#1256)
+
+#: Where a package that knows where a company's details can be read registers itself (#1256).
+#: Open, as the register-adapter group is, and on the same terms: a source says what of a
+#: company it starts from, which facts it may offer, the hosts it may be asked on and how the
+#: answers are read, and Postulo makes every request itself, through the guarded client, on a
+#: press. A package installed beside Postulo may add a source; it cannot dial anywhere its
+#: declaration does not name, and it cannot take a key another source already holds.
+COMPANY_ENRICHMENT_GROUP = "postulo.company_enrichment"
+
+
+@runtime_checkable
+class CompanyEnrichmentPlugin(Protocol):
+    """A registry of the places a company's details may be read from, on a press (#1256).
+
+    The shape of a register-adapter plugin: it holds no rows and is never asked to *do*
+    anything. It says which sources it contributes, each an `EnrichmentSource` from the
+    plugin surface, and each source's ``read`` turns the answers Postulo fetched into
+    offered values that say where they were read. Nothing is kept until a person ticks it.
+
+    **Unlike a register adapter, each plugin of this kind is its own switch.** There is no
+    feature in front of it: an administrator, or the person, switches the plugin, and a
+    source of a plugin that is off is neither listed nor asked.
+
+    **It does not reach the network itself.** A source builds addresses and reads what it is
+    handed; the request, the deadline, the size limit and the allowance are Postulo's.
+    """
+
+    #: The identifier the registry and the policy key on.
+    name: str
+    #: What kind of plugin this is; always ``"company-enrichment"``.
+    kind: str
+    #: The sources it contributes, each an `EnrichmentSource` from the plugin surface.
+    sources: tuple
+
+
 # ---------------------------------------------------------------- suggestion sources
 
 #: Where a package that knows a vocabulary a field can suggest from registers itself (#1252).
@@ -900,6 +936,7 @@ SUB_PLUGIN_KINDS = (
     "feature",
     "outbox",
     "suggestion-source",
+    "company-enrichment",
 )
 #: Where the parent's name and the sub-plugin's id are joined in the name policy rows hold.
 SUB_PLUGIN_SEPARATOR = ":"

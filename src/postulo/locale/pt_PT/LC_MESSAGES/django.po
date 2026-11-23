@@ -15,6 +15,16 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: postulo scripts/messages.py\n"
 
+#: src/postulo/jobs/enrichment_offers.py
+#, python-format
+msgid "%(address)s was not added."
+msgstr ""
+
+#: src/postulo/jobs/enrichment_offers.py
+#, python-format
+msgid "%(address)s was not added: %(reason)s"
+msgstr ""
+
 #: src/postulo/core/personal.py
 #, python-format
 msgid "%(code)s is not a country in the list."
@@ -373,6 +383,13 @@ msgid "%(count)s listing you are considering closes soon"
 msgid_plural "%(count)s listings you are considering close soon"
 msgstr[0] "%(count)s anúncio que está a considerar fecha em breve"
 msgstr[1] "%(count)s anúncios que está a considerar fecham em breve"
+
+#: src/postulo/jobs/enrichment_offers.py
+#, python-format
+msgid "%(count)s person or more"
+msgid_plural "%(count)s people or more"
+msgstr[0] ""
+msgstr[1] ""
 
 #: src/postulo/plugins/base.py
 #, python-format
@@ -788,6 +805,11 @@ msgstr "%(host)s está numa rede privada ou local. O Postulo só se liga a uma q
 msgid "%(i)s interviews and %(e)s entries in listings' histories would be kept without the name."
 msgstr "%(i)s entrevistas e %(e)s entradas no histórico de anúncios seriam mantidas sem o nome."
 
+#: src/postulo/jobs/enrichment_offers.py
+#, python-format
+msgid "%(industry)s (NACE %(division)s)"
+msgstr ""
+
 #: src/postulo/templates/server/logs.html
 #, python-format
 msgid "%(kilobytes)s on disk"
@@ -872,7 +894,7 @@ msgstr "de %(least)s a %(most)s"
 msgid "%(list)s · %(date)s"
 msgstr "%(list)s · %(date)s"
 
-#: src/postulo/jobs/models.py
+#: src/postulo/jobs/enrichment_offers.py src/postulo/jobs/models.py
 #, python-format
 msgid "%(low)s to %(high)s"
 msgstr "%(low)s a %(high)s"
@@ -1268,6 +1290,16 @@ msgstr "%(name)s: o número %(value)s foi deixado de fora. %(why)s"
 msgid "%(names)s can see “%(other)s” and not “%(kept)s”. Share “%(kept)s” with them first, or nothing is merged."
 msgstr "«%(other)s» é visível para %(names)s, e «%(kept)s» não. Partilhe primeiro «%(kept)s» com quem vê o outro, ou nada é fundido."
 
+#: src/postulo/jobs/enrichment_offers.py
+#, python-format
+msgid "%(number)s was not added."
+msgstr ""
+
+#: src/postulo/jobs/enrichment_offers.py
+#, python-format
+msgid "%(number)s was not added: %(reason)s"
+msgstr ""
+
 #: src/postulo/resume/views.py
 #, python-format
 msgid "%(ok)s, %(broken)s; the ones that did not say why."
@@ -1563,6 +1595,68 @@ msgstr "%(service)s, através de doi.org, não tinha nada para os campos que est
 msgid "%(share)s%%"
 msgstr "%(share)s%%"
 
+#: src/postulo/jobs/enrichment.py
+#, python-format
+msgid "%(source)s asked for an address it did not declare."
+msgstr ""
+
+#: src/postulo/jobs/enrichment.py
+#, python-format
+msgid "%(source)s asked for fewer requests. Try again later."
+msgstr ""
+
+#: src/postulo/jobs/enrichment.py
+#, python-format
+msgid "%(source)s asked for more requests than one press allows."
+msgstr ""
+
+#: src/postulo/jobs/enrichment.py
+#, python-format
+msgid "%(source)s cannot be asked about this company."
+msgstr ""
+
+#: src/postulo/jobs/enrichment.py
+#, python-format
+msgid "%(source)s could not be reached."
+msgstr ""
+
+#: src/postulo/templates/jobs/company_enrichment.html
+#, python-format
+msgid "%(source)s could not be read."
+msgstr ""
+
+#: src/postulo/jobs/enrichment.py
+#, python-format
+msgid "%(source)s redirected too many times."
+msgstr ""
+
+#: src/postulo/jobs/enrichment.py
+#, python-format
+msgid "%(source)s sent its answer with the content encoding “%(coding)s”, which Postulo does not unpack."
+msgstr ""
+
+#: src/postulo/jobs/enrichment.py
+#, python-format
+msgid "%(source)s sent the request somewhere else."
+msgstr ""
+
+#: src/postulo/jobs/enrichment.py
+#, python-format
+msgid "%(source)s took longer than %(seconds)s second to answer."
+msgid_plural "%(source)s took longer than %(seconds)s seconds to answer."
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/postulo/jobs/enrichment.py
+#, python-format
+msgid "%(source)s's answer could not be read."
+msgstr ""
+
+#: src/postulo/jobs/enrichment.py
+#, python-format
+msgid "%(source)s's answer was larger than one company's should be."
+msgstr ""
+
 #: src/postulo/templates/jobs/listing_search.html
 #, python-format
 msgid "%(source)s: asked at %(hosts)s. It is sent the words, the place and the filters you search for, or an advert's number when you press Review, and nothing about you."
@@ -1572,6 +1666,11 @@ msgstr ""
 #, python-format
 msgid "%(start)s to %(end)s"
 msgstr "%(start)s a %(end)s"
+
+#: src/postulo/jobs/enrichment_offers.py
+#, python-format
+msgid "%(state)s since %(date)s"
+msgstr ""
 
 #: src/postulo/templates/applications/partials/board.html
 #, python-format
@@ -2524,6 +2623,10 @@ msgstr "Um módulo: vem dentro do Postulo e não pode ser removido."
 msgid "A month"
 msgstr "Um mês"
 
+#: src/postulo/jobs/enrichment_views.py
+msgid "a name"
+msgstr ""
+
 #: src/postulo/core/messaging_services.py
 #, python-format
 msgid "A name is at most %(max)s characters."
@@ -2739,6 +2842,10 @@ msgstr "Um registo entretanto eliminado"
 #: src/postulo/documents/forms.py
 msgid "A referee who is not a contact yet. Their name is enough; it is added to your contacts without a company, and is used instead of the choice above."
 msgstr "Um recomendante que ainda não é contacto. Basta o nome; é adicionado aos seus contactos sem empresa e usado em vez da escolha acima."
+
+#: src/postulo/jobs/enrichment_views.py
+msgid "a register number"
+msgstr ""
 
 #: src/postulo/applications/ical_import.py
 msgid "A reminder"
@@ -2960,6 +3067,10 @@ msgstr "O nome de uma vista tem de ter pelo menos uma letra ou um algarismo."
 msgid "A way back rather than a way on, which is why it is an outline."
 msgstr "Um caminho de volta em vez de um caminho em frente: daí o contorno."
 
+#: src/postulo/jobs/enrichment_views.py
+msgid "a website"
+msgstr ""
+
 #: src/postulo/templates/applications/report.html
 #: src/postulo/templates/documents/themes/base_report.html
 msgid "A week, on average"
@@ -2968,6 +3079,10 @@ msgstr "Por semana, em média"
 #: src/postulo/templates/core/partials/widget_offers.html
 msgid "A widget added in a later release, or brought by a plugin, waits above until you say yes to it. Nothing arrives on your dashboard without being asked."
 msgstr "Um widget adicionado numa versão posterior, ou trazido por um plugin, espera acima até que diga que sim. Nada chega ao seu painel sem ser pedido."
+
+#: src/postulo/jobs/enrichment_views.py
+msgid "a Wikidata identifier"
+msgstr ""
 
 #: src/postulo/documents/integrity.py
 msgid "a Word document"
@@ -3092,7 +3207,8 @@ msgstr "Adquirida ou fundida"
 msgid "acquired_by must be a company you can see."
 msgstr "acquired_by tem de ser uma empresa que possa ver."
 
-#: src/postulo/jobs/models.py src/postulo/templates/jobs/company_form.html
+#: src/postulo/jobs/enrichment_offers.py src/postulo/jobs/models.py
+#: src/postulo/templates/jobs/company_form.html
 msgid "Acronym or short name"
 msgstr "Sigla ou nome curto"
 
@@ -3409,7 +3525,8 @@ msgid "addok (France's Base Adresse Nationale)"
 msgstr "addok (a Base Adresse Nationale francesa)"
 
 #: src/postulo/applications/forms.py src/postulo/applications/reports.py
-#: src/postulo/jobs/tables.py src/postulo/templates/partials/web_links.html
+#: src/postulo/jobs/enrichment_offers.py src/postulo/jobs/tables.py
+#: src/postulo/templates/partials/web_links.html
 msgid "Address"
 msgstr "Endereço"
 
@@ -3624,6 +3741,10 @@ msgstr "Também acontece automaticamente quando o seu endereço principal muda."
 msgid "Also in %(names)s"
 msgstr "Também em %(names)s"
 
+#: src/postulo/templates/jobs/company_enrichment.html
+msgid "Also said"
+msgstr ""
+
 #: src/postulo/accounts/models.py
 msgid "Always"
 msgstr "Sempre"
@@ -3689,6 +3810,10 @@ msgstr "Uma morada registada antes de as moradas serem verificadas, ou trazida p
 #: src/postulo/resume/candidate.py
 msgid "An address that could not be read"
 msgstr "Uma morada que não foi possível ler"
+
+#: src/postulo/jobs/enrichment_views.py
+msgid "an address with a country"
+msgstr ""
 
 #: src/postulo/applications/models.py
 msgid "An address, a telephone number or the link to the call."
@@ -3788,6 +3913,10 @@ msgstr "Uma entrevista pertence a uma candidatura. Escolha uma."
 msgid "An interview is scheduled or moved"
 msgstr "Uma entrevista é marcada ou mudada"
 
+#: src/postulo/jobs/enrichment_views.py
+msgid "an LEI"
+msgstr ""
+
 #: src/postulo/notifications/base.py
 msgid "An offer is recorded"
 msgstr "Uma proposta é registada"
@@ -3857,6 +3986,11 @@ msgstr "Já estava a decorrer outra cópia de segurança."
 #: src/postulo/templates/accounts/invite_created.html
 msgid "Another invitation"
 msgstr "Outro convite"
+
+#: src/postulo/jobs/enrichment_offers.py
+#, python-format
+msgid "Another of your companies already has %(identifier)s."
+msgstr ""
 
 #: src/postulo/jobs/register_views.py
 #, python-format
@@ -4320,6 +4454,11 @@ msgstr "À data de"
 msgid "as of %(date)s"
 msgstr "à data de %(date)s"
 
+#: src/postulo/templates/jobs/partials/enrichment_origins.html
+#, python-format
+msgid "As of %(date)s."
+msgstr ""
+
 #: src/postulo/templates/applications/interview_detail.html
 #: src/postulo/templates/documents/themes/base_interview.html
 #, python-format
@@ -4402,6 +4541,15 @@ msgstr ""
 #, python-format
 msgid "Asks %(plugin)s now. Nothing it answers is kept here."
 msgstr "Pergunta agora a %(plugin)s. Nada do que responder é guardado aqui."
+
+#: src/postulo/templates/cotton/enrichment_ask.html
+#, python-format
+msgid "Asks <bdi>%(hosts)s</bdi>. Sent: %(what)s."
+msgstr ""
+
+#: src/postulo/templates/jobs/company_detail.html
+msgid "Asks the places you choose, once each; nothing is kept until you say so."
+msgstr ""
 
 #: src/postulo/applications/analytics.py src/postulo/applications/models.py
 msgid "Assessment"
@@ -4625,6 +4773,10 @@ msgstr "Voltar ao calendário"
 #: src/postulo/templates/applications/calendar_print.html
 msgid "Back to the calendar, to change any of this"
 msgstr "Voltar ao calendário, para alterar algo disto"
+
+#: src/postulo/templates/jobs/company_enrichment.html
+msgid "Back to the company"
+msgstr ""
 
 #: src/postulo/core/help.py
 msgid "Back to the dashboard"
@@ -5021,6 +5173,7 @@ msgstr "Pode emparelhar com"
 #: src/postulo/templates/documents/upload_form.html
 #: src/postulo/templates/jobs/address_place.html
 #: src/postulo/templates/jobs/capture_page_forget.html
+#: src/postulo/templates/jobs/company_enrichment.html
 #: src/postulo/templates/jobs/company_form.html
 #: src/postulo/templates/jobs/company_register.html
 #: src/postulo/templates/jobs/company_wikidata.html
@@ -5074,6 +5227,11 @@ msgstr "Não pode ser adicionado"
 #: src/postulo/templates/applications/ical_import.html
 msgid "Cannot be added."
 msgstr "Não pode ser adicionado."
+
+#: src/postulo/templates/cotton/enrichment_ask.html
+#, python-format
+msgid "Cannot be asked: this company would need %(what)s."
+msgstr ""
 
 #: src/postulo/templates/server/overview.html
 msgid "cannot be checked on this machine"
@@ -5192,13 +5350,14 @@ msgstr "Pré-visualização do percurso"
 msgid "Career sections"
 msgstr "Secções do percurso"
 
+#: src/postulo/jobs/enrichment_offers.py src/postulo/jobs/tables.py
+#: src/postulo/templates/jobs/company_detail.html
+msgid "Careers page"
+msgstr "Página de carreiras"
+
 #: src/postulo/jobs/models.py
 msgid "careers page"
 msgstr "página de carreiras"
-
-#: src/postulo/jobs/tables.py src/postulo/templates/jobs/company_detail.html
-msgid "Careers page"
-msgstr "Página de carreiras"
 
 #: src/postulo/templates/server/email.html
 #, python-format
@@ -5363,6 +5522,10 @@ msgstr "Procurar atualizações"
 msgid "Check it answers"
 msgstr "Verificar se responde"
 
+#: src/postulo/templates/jobs/partials/enrichment_origins.html
+msgid "Check it there"
+msgstr ""
+
 #: src/postulo/templates/jobs/capture_review.html
 msgid "Check the reading against it"
 msgstr "Conferir a leitura com ela"
@@ -5509,6 +5672,10 @@ msgstr "Escolher outro ficheiro"
 msgid "Choose at least one document to record."
 msgstr "Escolha pelo menos um documento a registar."
 
+#: src/postulo/jobs/enrichment_views.py
+msgid "Choose at least one place to ask."
+msgstr ""
+
 #: src/postulo/templates/cotton/date_field.html
 msgid "Choose dates from a calendar"
 msgstr "Escolher datas num calendário"
@@ -5572,6 +5739,10 @@ msgstr "Escolha o que fazer com a mensagem."
 #: src/postulo/jobs/status_views.py
 msgid "Choose what was reported and the date."
 msgstr "Escolha o que foi comunicado e a data."
+
+#: src/postulo/templates/cotton/enrichment_ask.html
+msgid "Choose where to ask about this company. Each place is asked once, now, and learns only what is listed. Nothing is kept until you tick it."
+msgstr ""
 
 #: src/postulo/applications/views.py
 msgid "Choose which application this is about first."
@@ -5895,6 +6066,10 @@ msgstr "Empresa adicionada."
 #: src/postulo/jobs/views.py
 msgid "Company deleted, along with its postings."
 msgstr "Empresa eliminada, juntamente com os seus anúncios."
+
+#: src/postulo/plugins/kinds.py
+msgid "Company details"
+msgstr ""
 
 #: src/postulo/jobs/models.py
 msgid "company identifier"
@@ -6834,6 +7009,10 @@ msgstr "detalhe"
 msgid "details"
 msgstr "detalhes"
 
+#: src/postulo/templates/jobs/company_enrichment.html
+msgid "Details found"
+msgstr ""
+
 #: src/postulo/core/design.py src/postulo/templates/server/design.html
 msgid "Dialogs"
 msgstr "Caixas de diálogo"
@@ -7337,6 +7516,7 @@ msgid "email address"
 msgstr "endereço de e-mail"
 
 #: src/postulo/core/channels.py src/postulo/documents/printing.py
+#: src/postulo/jobs/enrichment_offers.py
 msgid "Email address"
 msgstr "Endereço de e-mail"
 
@@ -8118,6 +8298,10 @@ msgstr "Procurar"
 msgid "Find a language"
 msgstr "Procurar um idioma"
 
+#: src/postulo/templates/cotton/enrichment_ask.html
+msgid "Find details"
+msgstr ""
+
 #: src/postulo/templates/jobs/company_form.html
 msgid "Find logo"
 msgstr "Procurar logótipo"
@@ -8377,6 +8561,13 @@ msgstr[1] "Foram encontradas %(count)d opções no servidor. Escolha o que usar 
 
 #: src/postulo/jobs/slow.py
 #, python-format
+msgid "Found %(count)s detail. Nothing is kept until you tick it."
+msgid_plural "Found %(count)s details. Nothing is kept until you tick it."
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/postulo/jobs/slow.py
+#, python-format
 msgid "Found a logo at %(url)s."
 msgstr "Encontrado um logótipo em %(url)s."
 
@@ -8409,6 +8600,10 @@ msgstr "encontrado através de"
 #, python-format
 msgid "Found: %(names)s. Only the ones you have left blank will be filled in."
 msgstr "Encontrado: %(names)s. Só serão preenchidos os campos que deixou em branco."
+
+#: src/postulo/jobs/enrichment_offers.py
+msgid "Founded"
+msgstr ""
 
 #: src/postulo/jobs/models.py
 msgid "Freelance"
@@ -8462,6 +8657,11 @@ msgstr "De %(name)s."
 #, python-format
 msgid "From %(register)s"
 msgstr "De %(register)s"
+
+#: src/postulo/templates/jobs/partials/enrichment_origins.html
+#, python-format
+msgid "From %(source)s: <bdi>%(where)s</bdi>."
+msgstr ""
 
 #: src/postulo/core/tables.py
 #, python-format
@@ -8872,6 +9072,10 @@ msgctxt "pronouns"
 msgid "he/him"
 msgstr "ele/dele"
 
+#: src/postulo/jobs/enrichment_offers.py
+msgid "Head office"
+msgstr ""
+
 #: src/postulo/accounts/models.py src/postulo/documents/models.py
 #: src/postulo/resume/views.py
 msgid "headline"
@@ -9259,6 +9463,7 @@ msgstr "pedidos idempotentes"
 msgid "identifier"
 msgstr "identificador"
 
+#: src/postulo/jobs/enrichment_offers.py
 #: src/postulo/templates/cotton/identifier_row.html
 msgid "Identifier"
 msgstr "Identificador"
@@ -9622,13 +9827,14 @@ msgstr "Ramos de atividade"
 msgid "industries"
 msgstr "ramos de atividade"
 
-#: src/postulo/jobs/models.py
-msgid "industry"
-msgstr "ramo de atividade"
-
+#: src/postulo/jobs/enrichment_offers.py
 #: src/postulo/templates/jobs/industry_form.html
 msgid "Industry"
 msgstr "Ramo de atividade"
+
+#: src/postulo/jobs/models.py
+msgid "industry"
+msgstr "ramo de atividade"
 
 #: src/postulo/jobs/views.py
 msgid "Industry renamed."
@@ -9839,6 +10045,10 @@ msgstr "emitida por"
 #: src/postulo/resume/models.py
 msgid "issued on"
 msgstr "emitida em"
+
+#: src/postulo/jobs/enrichment_offers.py
+msgid "It already has a logo."
+msgstr ""
 
 #: src/postulo/templates/settings/account.html
 msgid "It also gets you back in: ask for a sign-in code and it arrives there. Making a different address primary moves that with it. You are still asked for your authenticator app if you have one."
@@ -10278,6 +10488,7 @@ msgstr "Guardar estes"
 msgid "Keep this view as"
 msgstr "Guardar esta vista como"
 
+#: src/postulo/templates/jobs/company_enrichment.html
 #: src/postulo/templates/jobs/company_register.html
 msgid "Keep what is ticked"
 msgstr "Manter o que está assinalado"
@@ -10297,6 +10508,13 @@ msgstr "Guardar a página"
 #: src/postulo/templates/jobs/merge.html
 msgid "Kept"
 msgstr "Registo mantido"
+
+#: src/postulo/jobs/enrichment_views.py
+#, python-format
+msgid "Kept %(count)s detail."
+msgid_plural "Kept %(count)s details."
+msgstr[0] ""
+msgstr[1] ""
 
 #: src/postulo/templates/server/person_recovery.html
 msgid "Kept after they are used or expire, because taking somebody's account back is not something to be able to do without a trace."
@@ -10673,6 +10891,7 @@ msgstr "Deixe em branco para manter a que já está guardada."
 msgid "Leave empty if this is your current role."
 msgstr "Deixe vazio se esta é a sua função atual."
 
+#: src/postulo/templates/jobs/company_enrichment.html
 #: src/postulo/templates/jobs/company_wikidata.html
 msgid "Leave it as it is"
 msgstr "Deixar como está"
@@ -10780,6 +10999,10 @@ msgstr "Aviso legal"
 #: src/postulo/jobs/industries.py
 msgid "Legal services"
 msgstr "Serviços jurídicos"
+
+#: src/postulo/jobs/enrichment_offers.py
+msgid "Legal state"
+msgstr ""
 
 #: src/postulo/jobs/models.py
 msgid "legal state"
@@ -11029,6 +11252,10 @@ msgstr "localização"
 msgid "Location"
 msgstr "Localização"
 
+#: src/postulo/jobs/enrichment_offers.py
+msgid "Logo"
+msgstr ""
+
 #: src/postulo/jobs/models.py
 msgid "logo"
 msgstr "logótipo"
@@ -11090,6 +11317,10 @@ msgstr "endereço do serviço de consulta"
 #: src/postulo/jobs/slow.py
 msgid "Looking for a logo"
 msgstr "À procura de um logótipo"
+
+#: src/postulo/jobs/slow.py
+msgid "Looking for details"
+msgstr ""
 
 #: src/postulo/templates/applications/application_list.html
 #: src/postulo/templates/jobs/company_list.html
@@ -11743,8 +11974,8 @@ msgstr "Secção NACE"
 msgid "name"
 msgstr "nome"
 
-#: src/postulo/api/forms.py src/postulo/jobs/tables.py
-#: src/postulo/templates/cotton/identifier_row.html
+#: src/postulo/api/forms.py src/postulo/jobs/enrichment_offers.py
+#: src/postulo/jobs/tables.py src/postulo/templates/cotton/identifier_row.html
 #: src/postulo/templates/partials/messaging_handles.html
 #: src/postulo/templates/partials/phone_numbers.html
 #: src/postulo/templates/partials/postal_addresses.html
@@ -12221,6 +12452,14 @@ msgstr "Ainda não há cartas deste tipo."
 msgid "No letters yet. A cover letter is for one posting; a motivation letter tells your story; a speculative letter goes where nothing is advertised; a follow-up note comes after an interview."
 msgstr "Ainda não há cartas. Uma carta de apresentação é para um anúncio; uma carta de motivação conta a sua história; uma carta de candidatura espontânea vai para onde nada é anunciado; uma mensagem de seguimento vem depois de uma entrevista."
 
+#: src/postulo/templates/jobs/company_enrichment.html
+msgid "No licence is stated."
+msgstr ""
+
+#: src/postulo/templates/jobs/company_enrichment.html
+msgid "No licence is stated; the name and the mark are the company's."
+msgstr ""
+
 #: src/postulo/templates/connections/partials/option_table.html
 msgid "No longer on the server"
 msgstr "Já não está no servidor"
@@ -12534,6 +12773,10 @@ msgstr "Nada é deduzido de outra coisa: o seu género não é adivinhado a part
 msgid "None of this company's industries is Education, so it is not listed as a school or university."
 msgstr "Nenhum dos ramos de atividade desta empresa é Educação, por isso não é listada como escola ou universidade."
 
+#: src/postulo/jobs/slow.py
+msgid "None of those can be asked about this company any more."
+msgstr ""
+
 #: src/postulo/templates/jobs/company_places.html
 msgid "None of your companies has this name or identifier."
 msgstr "Nenhuma das suas empresas tem este nome ou identificador."
@@ -12603,6 +12846,10 @@ msgstr "Não correspondia"
 #: src/postulo/templates/partials/phone_widget.html
 msgid "Not a possible number"
 msgstr "Número impossível"
+
+#: src/postulo/jobs/enrichment_offers.py
+msgid "Not a profile on a service Postulo knows."
+msgstr ""
 
 #: src/postulo/documents/models.py
 msgid "Not accepted"
@@ -13038,6 +13285,10 @@ msgstr "Nada é guardado antes de o rever."
 msgid "Nothing is sent to the server as a password until a new one is entered."
 msgstr "Nenhuma palavra-passe é enviada ao servidor até ser introduzida uma nova."
 
+#: src/postulo/jobs/logos.py
+msgid "Nothing is switched on that finds a logo on a website."
+msgstr ""
+
 #: src/postulo/templates/applications/application_detail.html
 msgid "Nothing kept yet. Keep what you typed into the employer's form, so you can see what they were told."
 msgstr "Ainda nada guardado. Guarde o que escreveu no formulário do empregador, para poder ver o que lhes foi dito."
@@ -13169,6 +13420,10 @@ msgstr ""
 msgid "Nothing that reads a CV from a file is switched on here, so there is no file to choose."
 msgstr ""
 
+#: src/postulo/templates/jobs/company_enrichment.html
+msgid "Nothing that was found can be added to what the company already has."
+msgstr ""
+
 #: src/postulo/core/design.py src/postulo/templates/server/design.html
 msgid "Nothing there"
 msgstr "Nada aqui"
@@ -13252,7 +13507,7 @@ msgstr "Nada foi guardado dessa página."
 msgid "Nothing was kept of this page"
 msgstr "Nada foi guardado desta página"
 
-#: src/postulo/jobs/register_views.py
+#: src/postulo/jobs/enrichment_views.py src/postulo/jobs/register_views.py
 msgid "Nothing was kept."
 msgstr "Nada foi mantido."
 
@@ -13943,6 +14198,7 @@ msgstr "Só o ano é impresso num CV, pelo que o dia é indiferente."
 msgid "Only this publication, as a reference:"
 msgstr "Só esta publicação, como referência:"
 
+#: src/postulo/templates/jobs/company_enrichment.html
 #: src/postulo/templates/jobs/company_register.html
 msgid "Only what you tick is kept; nothing else on the company changes."
 msgstr "Só é mantido o que assinalar; mais nada na empresa muda."
@@ -14509,6 +14765,10 @@ msgstr "Pensão, seguro, subsídios, equipamento: o que tiver sido nomeado."
 msgid "People"
 msgstr "Pessoas"
 
+#: src/postulo/jobs/enrichment_offers.py
+msgid "People employed"
+msgstr ""
+
 #: src/postulo/jobs/models.py
 msgid "Per day"
 msgstr "Por dia"
@@ -15026,6 +15286,10 @@ msgstr "O Postulo esqueceu-o. O fornecedor mantém a autorização até a retira
 #: src/postulo/core/server_views.py
 msgid "Postulo has forgotten the grant. The provider still has it until you withdraw it there as well."
 msgstr "O Postulo esqueceu a autorização. O fornecedor mantém-na até a retirar lá também."
+
+#: src/postulo/templates/jobs/company_enrichment.html
+msgid "Postulo has nowhere to keep these yet. They are shown for you to read, and are not kept."
+msgstr ""
 
 #: src/postulo/core/tagline.py
 msgid "Postulo is a self-hosted job application manager: your applications, CVs and cover letters on your own server, with no paid features."
@@ -16335,6 +16599,7 @@ msgstr "Conservação"
 msgid "retired on"
 msgstr "retirado em"
 
+#: src/postulo/templates/jobs/company_enrichment.html
 #: src/postulo/templates/jobs/company_register.html
 #, fuzzy, python-format
 msgid "Retrieved %(when)s."
@@ -16465,6 +16730,10 @@ msgstr "em execução: %(running)s; reinicie para concluir"
 #: src/postulo/templates/server/backups.html
 msgid "Runs in the background; you can leave this page while it works."
 msgstr "Corre em segundo plano; pode sair desta página enquanto decorre."
+
+#: src/postulo/templates/jobs/company_enrichment.html
+msgid "Said, and not offered"
+msgstr ""
 
 #: src/postulo/templates/core/import_csv_map.html
 msgid "Salaries are in"
@@ -17161,6 +17430,14 @@ msgstr "Sete cores, cada uma afinada a 3:1 sobre o cartão, nos dois temas."
 msgid "Several countries"
 msgstr ""
 
+#: src/postulo/jobs/enrichment_offers.py
+msgid "Several social profiles are switched off."
+msgstr ""
+
+#: src/postulo/jobs/enrichment_offers.py
+msgid "Several telephone numbers are switched off."
+msgstr ""
+
 #: src/postulo/jobs/industries.py
 msgid "Sewerage"
 msgstr "Saneamento"
@@ -17652,7 +17929,7 @@ msgid "Snoozed for two weeks."
 msgstr "Adiada por duas semanas."
 
 #: src/postulo/core/models.py src/postulo/core/web_links.py
-#: src/postulo/documents/printing.py
+#: src/postulo/documents/printing.py src/postulo/jobs/enrichment_offers.py
 msgid "Social profile"
 msgstr "Perfil social"
 
@@ -17837,6 +18114,7 @@ msgstr "A origem é o campo «encontrada via» de um anúncio. Preencha-o e esta
 msgid "source version"
 msgstr "versão da fonte"
 
+#: src/postulo/templates/jobs/company_enrichment.html
 #: src/postulo/templates/jobs/company_register.html
 #, python-format
 msgid "Source: %(source)s."
@@ -18373,6 +18651,7 @@ msgid "telephone"
 msgstr "telefone"
 
 #: src/postulo/core/channels.py src/postulo/documents/printing.py
+#: src/postulo/jobs/enrichment_offers.py
 #: src/postulo/templates/partials/phone_widget.html
 #: src/postulo/templates/server/design.html
 msgid "Telephone number"
@@ -18485,7 +18764,7 @@ msgstr "Obrigado(a): {{ role }}"
 msgid "Thank-you"
 msgstr "Agradecimento"
 
-#: src/postulo/jobs/register_views.py
+#: src/postulo/jobs/enrichment_offers.py
 msgid "That address could not be added."
 msgstr "Não foi possível adicionar essa morada."
 
@@ -19534,6 +19813,11 @@ msgstr "As empresas, os contactos e os anúncios que acrescenta. As candidaturas
 msgid "The company %(name)s is not in your account, and is added with it."
 msgstr "A empresa %(name)s não está na sua conta e é adicionada juntamente."
 
+#: src/postulo/templates/jobs/company_enrichment.html
+#, python-format
+msgid "The company already has <bdi>%(current)s</bdi>."
+msgstr ""
+
 #: src/postulo/jobs/views.py
 msgid "The company already has that name."
 msgstr "A empresa já tem esse nome."
@@ -20154,6 +20438,11 @@ msgstr "O logótipo foi alterado."
 #, python-format
 msgid "The logo was not changed: %(problem)s"
 msgstr "O logótipo não foi alterado: %(problem)s"
+
+#: src/postulo/jobs/enrichment_offers.py
+#, python-format
+msgid "The logo was not kept: %(problem)s"
+msgstr ""
 
 #: src/postulo/templates/applications/report.html
 msgid "The longest gap is measured inside this period, so a silence that began before it is not carried in. A period still running is only counted up to today."
@@ -22545,7 +22834,8 @@ msgid "WebP image"
 msgstr "Imagem WebP"
 
 #: src/postulo/core/models.py src/postulo/core/web_links.py
-#: src/postulo/documents/printing.py src/postulo/jobs/tables.py
+#: src/postulo/documents/printing.py src/postulo/jobs/enrichment_offers.py
+#: src/postulo/jobs/tables.py
 #: src/postulo/templates/applications/interview_detail.html
 #: src/postulo/templates/jobs/company_detail.html
 msgid "Website"
@@ -23020,6 +23310,7 @@ msgstr "O que fazer, numa frase."
 msgid "What to do. It is what the reminder says when it falls due."
 msgstr "O que há a fazer. É o que o lembrete diz quando chega a altura."
 
+#: src/postulo/templates/jobs/company_enrichment.html
 #: src/postulo/templates/jobs/company_register.html
 msgid "What to keep"
 msgstr "O que manter"
@@ -23079,6 +23370,10 @@ msgstr "O que fez lá. «Não indicado» não imprime nada."
 #: src/postulo/jobs/widgets.py
 msgid "What you have noticed and not yet acted on, and what closes this week."
 msgstr "Aquilo em que reparou e ainda não tratou, e o que fecha esta semana."
+
+#: src/postulo/templates/jobs/company_enrichment.html
+msgid "What you have recorded is never replaced from here. Change it on the company's own page if a source is right."
+msgstr ""
 
 #: src/postulo/resume/models.py
 msgid "what you presented"
@@ -23331,6 +23626,10 @@ msgstr "A posição desta entrada na sua secção define-se com as setas em <a h
 #: src/postulo/templates/help/telephone_numbers.html
 msgid "Where this instance can send a code to a telephone, a number you have confirmed can also be the one that gets you back into your account. That choice is separate from the primary, so changing what a recruiter dials never changes how you prove it is you. The bin will not remove that number while it is your way in. Changing its digits makes it another number, which has to be confirmed again and is no longer your way in."
 msgstr "Quando esta instância consegue enviar um código para um telefone, um número que tenha confirmado pode também ser o que lhe permite voltar a entrar na sua conta. Essa escolha é separada do principal, por isso mudar o número que um recrutador marca nunca muda a forma como prova a sua identidade. O caixote do lixo não remove esse número enquanto for a sua maneira de voltar a entrar. Mudar os seus algarismos faz dele outro número, que tem de ser confirmado de novo e deixa de ser a sua maneira de voltar a entrar."
+
+#: src/postulo/templates/cotton/enrichment_ask.html
+msgid "Where to ask"
+msgstr ""
 
 #: src/postulo/templates/server/register_lookup.html
 msgid "Where to get a key"

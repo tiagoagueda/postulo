@@ -37,6 +37,7 @@ LABELS: dict[str, str] = {
     "register-adapter": _("Company registers"),
     "listing-search": _("Job services"),
     "suggestion-source": _("Suggestions"),
+    "company-enrichment": _("Company details"),
     "backup-destination": _("Backup destination"),
 }
 
@@ -57,6 +58,7 @@ TONES: dict[str, str] = {
     "register-adapter": "violet",
     "listing-search": "blue",
     "suggestion-source": "green",
+    "company-enrichment": "violet",
     "backup-destination": "teal",
 }
 

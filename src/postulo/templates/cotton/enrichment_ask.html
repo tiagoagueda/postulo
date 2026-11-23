@@ -1,0 +1,42 @@
+{% load i18n postulo %}
+<c-vars company sources next="" />
+{% comment %} *Find details* on a company (#1256): the button, and the dialog that says where
+   a press would ask and what it would send.
+
+   `<c-enrichment-ask :company="company" :sources="enrichment_sources" next="…" />`, where
+   `sources` is what `enrichment_views.ask_rows` gave: every source that is on for the reader,
+   each with the hosts a press would reach, what is sent, and whether this company has what
+   the source starts from. The caller draws it only where that list is not empty and the
+   reader may change the company.
+
+   Opening the dialog asks nothing of anybody. It is `<c-dialog>`: a popover that opens with
+   no script and a modal where one runs, around a plain form, so the press works either way
+   and lands on the errand's own page. A source the company cannot start is listed and
+   disabled, with what it needs; the others start ticked, and one is left out of a press by
+   unticking it. Drawn outside any form, because it is one. {% endcomment %}
+{% url 'jobs:company_enrichment' company.pk as ask_url %}
+<button type="button" class="btn" data-variant="outline" data-size="sm" popovertarget="details-dialog" data-find-details>{% icon "search" %}{% translate "Find details" %}</button>
+<c-dialog id="details-dialog" tone="plain" :action="ask_url">
+  <c-slot name="title">{% translate "Find details" %}</c-slot>
+  <c-slot name="description">{% translate "Choose where to ask about this company. Each place is asked once, now, and learns only what is listed. Nothing is kept until you tick it." %}</c-slot>
+  <fieldset class="space-y-3 text-sm" data-enrichment-sources>
+    <legend class="sr-only">{% translate "Where to ask" %}</legend>
+    {% for row in sources %}
+      <label class="flex items-start gap-2">
+        <input type="checkbox" class="input mt-0.5" name="source" value="{{ row.key }}"{% if row.usable %} checked{% else %} disabled{% endif %}>
+        <span>
+          <span class="font-medium">{{ row.label }}</span>
+          <span class="block text-xs text-ink-500 dark:text-ink-400">
+            {% if row.usable %}
+              {% blocktranslate trimmed with hosts=row.hosts|join:", " what=row.sends %}Asks <bdi>{{ hosts }}</bdi>. Sent: {{ what }}.{% endblocktranslate %}
+            {% else %}
+              {% blocktranslate trimmed with what=row.needs|join:", " %}Cannot be asked: this company would need {{ what }}.{% endblocktranslate %}
+            {% endif %}
+          </span>
+        </span>
+      </label>
+    {% endfor %}
+  </fieldset>
+  {% if next %}<input type="hidden" name="next" value="{{ next }}">{% endif %}
+  <c-slot name="footer"><button type="submit" class="btn">{% translate "Find details" %}</button></c-slot>
+</c-dialog>

@@ -136,7 +136,7 @@ def test_every_plugin_postulo_ships_declares_the_full_set():
     assert not missing, "\n".join(missing)
 
 
-def test_these_are_the_plugins_that_ship_across_thirteen_kinds():
+def test_these_are_the_plugins_that_ship_across_fourteen_kinds():
     """Named rather than counted, so that losing one to a bad import is a failure rather
     than a quiet absence — and so that adding one is a line somebody wrote.
 
@@ -175,6 +175,10 @@ def test_these_are_the_plugins_that_ship_across_thirteen_kinds():
     whether a job service is searched at all, with a switch per service under it, and
     `listing-searches` is the registry of the services Postulo ships a search for.
 
+    `company-site` is the one source of company details Postulo ships, a kind of its own: the
+    company's own website, read on a press of *Find logo* or *Find details*, and on by
+    default because *Find logo* always read it (#1256).
+
     `multiple-fields` is a module with no behaviour of its own: the parent of the six features
     that let a field hold more than one value (#875), whose switch is theirs, and
     `builtin-notifications` is the same for the three notifiers that ship (#876), and
@@ -186,7 +190,7 @@ def test_these_are_the_plugins_that_ship_across_thirteen_kinds():
         for classes in registry.builtins().values()
         for plugin_class in classes
     }
-    assert len(registry.builtins()) == 13, sorted(registry.builtins())
+    assert len(registry.builtins()) == 14, sorted(registry.builtins())
 
     assert found == {
         "board",
@@ -219,6 +223,7 @@ def test_these_are_the_plugins_that_ship_across_thirteen_kinds():
         "bibliography-lookups",
         "register-lookup",
         "register-adapters",
+        "company-site",
         "listing-search",
         "listing-searches",
         "nace",

@@ -15,6 +15,16 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n % 10 == 1 && (n % 100 < 11 || n % 100 > 19)) ? 0 : ((n % 10 >= 2 && n % 10 <= 9 && (n % 100 < 11 || n % 100 > 19)) ? 1 : 2);\n"
 "X-Generator: postulo scripts/messages.py\n"
 
+#: src/postulo/jobs/enrichment_offers.py
+#, python-format
+msgid "%(address)s was not added."
+msgstr ""
+
+#: src/postulo/jobs/enrichment_offers.py
+#, python-format
+msgid "%(address)s was not added: %(reason)s"
+msgstr ""
+
 #: src/postulo/core/personal.py
 #, python-format
 msgid "%(code)s is not a country in the list."
@@ -420,6 +430,14 @@ msgid_plural "%(count)s listings you are considering close soon"
 msgstr[0] "%(count)s svarstomas skelbimas netrukus baigs galioti"
 msgstr[1] "%(count)s svarstomi skelbimai netrukus baigs galioti"
 msgstr[2] "%(count)s svarstomų skelbimų netrukus baigs galioti"
+
+#: src/postulo/jobs/enrichment_offers.py
+#, python-format
+msgid "%(count)s person or more"
+msgid_plural "%(count)s people or more"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
 
 #: src/postulo/plugins/base.py
 #, python-format
@@ -869,6 +887,11 @@ msgstr "%(host)s yra privačiajame arba vietiniame tinkle. Postulo prie tokio ju
 msgid "%(i)s interviews and %(e)s entries in listings' histories would be kept without the name."
 msgstr "Be vardo būtų palikta pokalbių: %(i)s; skelbimų istorijos įrašų: %(e)s."
 
+#: src/postulo/jobs/enrichment_offers.py
+#, python-format
+msgid "%(industry)s (NACE %(division)s)"
+msgstr ""
+
 #: src/postulo/templates/server/logs.html
 #, python-format
 msgid "%(kilobytes)s on disk"
@@ -955,7 +978,7 @@ msgstr "nuo %(least)s iki %(most)s"
 msgid "%(list)s · %(date)s"
 msgstr "%(list)s · %(date)s"
 
-#: src/postulo/jobs/models.py
+#: src/postulo/jobs/enrichment_offers.py src/postulo/jobs/models.py
 #, python-format
 msgid "%(low)s to %(high)s"
 msgstr "nuo %(low)s iki %(high)s"
@@ -1356,6 +1379,16 @@ msgstr "%(name)s: numeris %(value)s praleistas. %(why)s"
 msgid "%(names)s can see “%(other)s” and not “%(kept)s”. Share “%(kept)s” with them first, or nothing is merged."
 msgstr "%(names)s mato „%(other)s“, bet nemato „%(kept)s“. Pirmiausia pasidalykite „%(kept)s“ su jais, kitaip niekas nebus sujungta."
 
+#: src/postulo/jobs/enrichment_offers.py
+#, python-format
+msgid "%(number)s was not added."
+msgstr ""
+
+#: src/postulo/jobs/enrichment_offers.py
+#, python-format
+msgid "%(number)s was not added: %(reason)s"
+msgstr ""
+
 #: src/postulo/resume/views.py
 #, python-format
 msgid "%(ok)s, %(broken)s; the ones that did not say why."
@@ -1652,6 +1685,69 @@ msgstr "Paslauga %(service)s per doi.org neturėjo nieko tuštiems laukeliams u�
 msgid "%(share)s%%"
 msgstr "%(share)s %%"
 
+#: src/postulo/jobs/enrichment.py
+#, python-format
+msgid "%(source)s asked for an address it did not declare."
+msgstr ""
+
+#: src/postulo/jobs/enrichment.py
+#, python-format
+msgid "%(source)s asked for fewer requests. Try again later."
+msgstr ""
+
+#: src/postulo/jobs/enrichment.py
+#, python-format
+msgid "%(source)s asked for more requests than one press allows."
+msgstr ""
+
+#: src/postulo/jobs/enrichment.py
+#, python-format
+msgid "%(source)s cannot be asked about this company."
+msgstr ""
+
+#: src/postulo/jobs/enrichment.py
+#, python-format
+msgid "%(source)s could not be reached."
+msgstr ""
+
+#: src/postulo/templates/jobs/company_enrichment.html
+#, python-format
+msgid "%(source)s could not be read."
+msgstr ""
+
+#: src/postulo/jobs/enrichment.py
+#, python-format
+msgid "%(source)s redirected too many times."
+msgstr ""
+
+#: src/postulo/jobs/enrichment.py
+#, python-format
+msgid "%(source)s sent its answer with the content encoding “%(coding)s”, which Postulo does not unpack."
+msgstr ""
+
+#: src/postulo/jobs/enrichment.py
+#, python-format
+msgid "%(source)s sent the request somewhere else."
+msgstr ""
+
+#: src/postulo/jobs/enrichment.py
+#, python-format
+msgid "%(source)s took longer than %(seconds)s second to answer."
+msgid_plural "%(source)s took longer than %(seconds)s seconds to answer."
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+
+#: src/postulo/jobs/enrichment.py
+#, python-format
+msgid "%(source)s's answer could not be read."
+msgstr ""
+
+#: src/postulo/jobs/enrichment.py
+#, python-format
+msgid "%(source)s's answer was larger than one company's should be."
+msgstr ""
+
 #: src/postulo/templates/jobs/listing_search.html
 #, python-format
 msgid "%(source)s: asked at %(hosts)s. It is sent the words, the place and the filters you search for, or an advert's number when you press Review, and nothing about you."
@@ -1661,6 +1757,11 @@ msgstr ""
 #, python-format
 msgid "%(start)s to %(end)s"
 msgstr "%(start)s–%(end)s"
+
+#: src/postulo/jobs/enrichment_offers.py
+#, python-format
+msgid "%(state)s since %(date)s"
+msgstr ""
 
 #: src/postulo/templates/applications/partials/board.html
 #, python-format
@@ -2638,6 +2739,10 @@ msgstr "Modulis: jis yra Postulo dalis ir jo pašalinti negalima."
 msgid "A month"
 msgstr "Mėnuo"
 
+#: src/postulo/jobs/enrichment_views.py
+msgid "a name"
+msgstr ""
+
 #: src/postulo/core/messaging_services.py
 #, python-format
 msgid "A name is at most %(max)s characters."
@@ -2854,6 +2959,10 @@ msgstr "Vėliau ištrintas įrašas"
 #: src/postulo/documents/forms.py
 msgid "A referee who is not a contact yet. Their name is enough; it is added to your contacts without a company, and is used instead of the choice above."
 msgstr "Rekomendacijos davėjas, kuris dar nėra jūsų kontaktas. Pakanka vardo; jis pridedamas prie jūsų kontaktų be įmonės ir naudojamas vietoj aukščiau pasirinkto."
+
+#: src/postulo/jobs/enrichment_views.py
+msgid "a register number"
+msgstr ""
 
 #: src/postulo/applications/ical_import.py
 msgid "A reminder"
@@ -3075,6 +3184,10 @@ msgstr "Rodinio pavadinime turi būti bent viena raidė ar skaitmuo."
 msgid "A way back rather than a way on, which is why it is an outline."
 msgstr "Kelias atgal, o ne pirmyn, todėl mygtukas kontūrinis."
 
+#: src/postulo/jobs/enrichment_views.py
+msgid "a website"
+msgstr ""
+
 #: src/postulo/templates/applications/report.html
 #: src/postulo/templates/documents/themes/base_report.html
 msgid "A week, on average"
@@ -3083,6 +3196,10 @@ msgstr "Vidutiniškai per savaitę"
 #: src/postulo/templates/core/partials/widget_offers.html
 msgid "A widget added in a later release, or brought by a plugin, waits above until you say yes to it. Nothing arrives on your dashboard without being asked."
 msgstr "Vėlesnėje laidoje pridėtas ar su papildiniu atkeliavęs valdiklis laukia viršuje, kol jį patvirtinsite. Be jūsų sutikimo skydelyje niekas neatsiranda."
+
+#: src/postulo/jobs/enrichment_views.py
+msgid "a Wikidata identifier"
+msgstr ""
 
 #: src/postulo/documents/integrity.py
 msgid "a Word document"
@@ -3208,7 +3325,8 @@ msgstr "Įsigyta arba sujungta"
 msgid "acquired_by must be a company you can see."
 msgstr "acquired_by turi būti įmonė, kurią galite matyti."
 
-#: src/postulo/jobs/models.py src/postulo/templates/jobs/company_form.html
+#: src/postulo/jobs/enrichment_offers.py src/postulo/jobs/models.py
+#: src/postulo/templates/jobs/company_form.html
 msgid "Acronym or short name"
 msgstr "Santrumpa arba trumpasis pavadinimas"
 
@@ -3531,7 +3649,8 @@ msgid "addok (France's Base Adresse Nationale)"
 msgstr "addok (Prancūzijos Base Adresse Nationale)"
 
 #: src/postulo/applications/forms.py src/postulo/applications/reports.py
-#: src/postulo/jobs/tables.py src/postulo/templates/partials/web_links.html
+#: src/postulo/jobs/enrichment_offers.py src/postulo/jobs/tables.py
+#: src/postulo/templates/partials/web_links.html
 msgid "Address"
 msgstr "Adresas"
 
@@ -3748,6 +3867,10 @@ msgstr "Įvyksta ir savaime, kai pasikeičia jūsų pagrindinis adresas."
 msgid "Also in %(names)s"
 msgstr "Taip pat kalbomis: %(names)s"
 
+#: src/postulo/templates/jobs/company_enrichment.html
+msgid "Also said"
+msgstr ""
+
 #: src/postulo/accounts/models.py
 msgid "Always"
 msgstr "Visada"
@@ -3813,6 +3936,10 @@ msgstr "Adresas, įrašytas dar prieš pradedant tikrinti adresus arba gautas i�
 #: src/postulo/resume/candidate.py
 msgid "An address that could not be read"
 msgstr "Adresas, kurio nepavyko nuskaityti"
+
+#: src/postulo/jobs/enrichment_views.py
+msgid "an address with a country"
+msgstr ""
 
 #: src/postulo/applications/models.py
 msgid "An address, a telephone number or the link to the call."
@@ -3912,6 +4039,10 @@ msgstr "Pokalbis priklauso paraiškai. Pasirinkite ją."
 msgid "An interview is scheduled or moved"
 msgstr "Pokalbis suplanuotas ar perkeltas"
 
+#: src/postulo/jobs/enrichment_views.py
+msgid "an LEI"
+msgstr ""
+
 #: src/postulo/notifications/base.py
 msgid "An offer is recorded"
 msgstr "Įrašytas pasiūlymas"
@@ -3984,6 +4115,11 @@ msgstr "Jau buvo kuriama kita atsarginė kopija."
 #: src/postulo/templates/accounts/invite_created.html
 msgid "Another invitation"
 msgstr "Kitas kvietimas"
+
+#: src/postulo/jobs/enrichment_offers.py
+#, python-format
+msgid "Another of your companies already has %(identifier)s."
+msgstr ""
 
 #: src/postulo/jobs/register_views.py
 #, python-format
@@ -4448,6 +4584,11 @@ msgstr "Nuo"
 msgid "as of %(date)s"
 msgstr "nuo %(date)s"
 
+#: src/postulo/templates/jobs/partials/enrichment_origins.html
+#, python-format
+msgid "As of %(date)s."
+msgstr ""
+
 #: src/postulo/templates/applications/interview_detail.html
 #: src/postulo/templates/documents/themes/base_interview.html
 #, python-format
@@ -4530,6 +4671,15 @@ msgstr ""
 #, python-format
 msgid "Asks %(plugin)s now. Nothing it answers is kept here."
 msgstr "Dabar pateikia užklausą papildiniui %(plugin)s. Niekas iš atsakymo čia nesaugoma."
+
+#: src/postulo/templates/cotton/enrichment_ask.html
+#, python-format
+msgid "Asks <bdi>%(hosts)s</bdi>. Sent: %(what)s."
+msgstr ""
+
+#: src/postulo/templates/jobs/company_detail.html
+msgid "Asks the places you choose, once each; nothing is kept until you say so."
+msgstr ""
 
 #: src/postulo/applications/analytics.py src/postulo/applications/models.py
 msgid "Assessment"
@@ -4754,6 +4904,10 @@ msgstr "Atgal į kalendorių"
 #: src/postulo/templates/applications/calendar_print.html
 msgid "Back to the calendar, to change any of this"
 msgstr "Atgal į kalendorių, kad ką nors iš to pakeistumėte"
+
+#: src/postulo/templates/jobs/company_enrichment.html
+msgid "Back to the company"
+msgstr ""
 
 #: src/postulo/core/help.py
 msgid "Back to the dashboard"
@@ -5151,6 +5305,7 @@ msgstr "Galima susieti su"
 #: src/postulo/templates/documents/upload_form.html
 #: src/postulo/templates/jobs/address_place.html
 #: src/postulo/templates/jobs/capture_page_forget.html
+#: src/postulo/templates/jobs/company_enrichment.html
 #: src/postulo/templates/jobs/company_form.html
 #: src/postulo/templates/jobs/company_register.html
 #: src/postulo/templates/jobs/company_wikidata.html
@@ -5204,6 +5359,11 @@ msgstr "Negalima pridėti"
 #: src/postulo/templates/applications/ical_import.html
 msgid "Cannot be added."
 msgstr "Negalima pridėti."
+
+#: src/postulo/templates/cotton/enrichment_ask.html
+#, python-format
+msgid "Cannot be asked: this company would need %(what)s."
+msgstr ""
 
 #: src/postulo/templates/server/overview.html
 msgid "cannot be checked on this machine"
@@ -5324,13 +5484,14 @@ msgstr "Karjeros išankstinė peržiūra"
 msgid "Career sections"
 msgstr "Karjeros skiltys"
 
+#: src/postulo/jobs/enrichment_offers.py src/postulo/jobs/tables.py
+#: src/postulo/templates/jobs/company_detail.html
+msgid "Careers page"
+msgstr "Karjeros puslapis"
+
 #: src/postulo/jobs/models.py
 msgid "careers page"
 msgstr "karjeros puslapis"
-
-#: src/postulo/jobs/tables.py src/postulo/templates/jobs/company_detail.html
-msgid "Careers page"
-msgstr "Karjeros puslapis"
 
 #: src/postulo/templates/server/email.html
 #, python-format
@@ -5498,6 +5659,10 @@ msgstr "Tikrinti naujinius"
 msgid "Check it answers"
 msgstr "Patikrinti, ar atsako"
 
+#: src/postulo/templates/jobs/partials/enrichment_origins.html
+msgid "Check it there"
+msgstr ""
+
 #: src/postulo/templates/jobs/capture_review.html
 msgid "Check the reading against it"
 msgstr "Palyginti nuskaitytą turinį su juo"
@@ -5644,6 +5809,10 @@ msgstr "Pasirinkti kitą failą"
 msgid "Choose at least one document to record."
 msgstr "Pasirinkite bent vieną dokumentą, kurį norite įrašyti."
 
+#: src/postulo/jobs/enrichment_views.py
+msgid "Choose at least one place to ask."
+msgstr ""
+
 #: src/postulo/templates/cotton/date_field.html
 msgid "Choose dates from a calendar"
 msgstr "Pasirinkite datas iš kalendoriaus"
@@ -5707,6 +5876,10 @@ msgstr "Pasirinkite, ką daryti su laišku."
 #: src/postulo/jobs/status_views.py
 msgid "Choose what was reported and the date."
 msgstr "Pasirinkite, kas buvo pranešta, ir datą."
+
+#: src/postulo/templates/cotton/enrichment_ask.html
+msgid "Choose where to ask about this company. Each place is asked once, now, and learns only what is listed. Nothing is kept until you tick it."
+msgstr ""
 
 #: src/postulo/applications/views.py
 msgid "Choose which application this is about first."
@@ -6031,6 +6204,10 @@ msgstr "Įmonė pridėta."
 #: src/postulo/jobs/views.py
 msgid "Company deleted, along with its postings."
 msgstr "Įmonė ištrinta kartu su jos skelbimais."
+
+#: src/postulo/plugins/kinds.py
+msgid "Company details"
+msgstr ""
 
 #: src/postulo/jobs/models.py
 msgid "company identifier"
@@ -6971,6 +7148,10 @@ msgstr "išsami informacija"
 msgid "details"
 msgstr "duomenys"
 
+#: src/postulo/templates/jobs/company_enrichment.html
+msgid "Details found"
+msgstr ""
+
 #: src/postulo/core/design.py src/postulo/templates/server/design.html
 msgid "Dialogs"
 msgstr "Dialogo langai"
@@ -7476,6 +7657,7 @@ msgid "email address"
 msgstr "el. pašto adresas"
 
 #: src/postulo/core/channels.py src/postulo/documents/printing.py
+#: src/postulo/jobs/enrichment_offers.py
 msgid "Email address"
 msgstr "El. pašto adresas"
 
@@ -8256,6 +8438,10 @@ msgstr "Rasti"
 msgid "Find a language"
 msgstr "Ieškoti kalbos"
 
+#: src/postulo/templates/cotton/enrichment_ask.html
+msgid "Find details"
+msgstr ""
+
 #: src/postulo/templates/jobs/company_form.html
 msgid "Find logo"
 msgstr "Rasti logotipą"
@@ -8516,6 +8702,14 @@ msgstr[2] "Serveryje rasta %(count)d parinkčių. Pasirinkite, ką naudoti, ir i
 
 #: src/postulo/jobs/slow.py
 #, python-format
+msgid "Found %(count)s detail. Nothing is kept until you tick it."
+msgid_plural "Found %(count)s details. Nothing is kept until you tick it."
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+
+#: src/postulo/jobs/slow.py
+#, python-format
 msgid "Found a logo at %(url)s."
 msgstr "Rastas logotipas adresu %(url)s."
 
@@ -8547,6 +8741,10 @@ msgstr "kur rastas"
 #, python-format
 msgid "Found: %(names)s. Only the ones you have left blank will be filled in."
 msgstr "Rasta: %(names)s. Bus užpildyti tik tie laukai, kuriuos palikote tuščius."
+
+#: src/postulo/jobs/enrichment_offers.py
+msgid "Founded"
+msgstr ""
 
 #: src/postulo/jobs/models.py
 msgid "Freelance"
@@ -8600,6 +8798,11 @@ msgstr "Iš failo %(name)s."
 #, python-format
 msgid "From %(register)s"
 msgstr "Iš registro %(register)s"
+
+#: src/postulo/templates/jobs/partials/enrichment_origins.html
+#, python-format
+msgid "From %(source)s: <bdi>%(where)s</bdi>."
+msgstr ""
 
 #: src/postulo/core/tables.py
 #, python-format
@@ -9012,6 +9215,10 @@ msgctxt "pronouns"
 msgid "he/him"
 msgstr "jis / jo"
 
+#: src/postulo/jobs/enrichment_offers.py
+msgid "Head office"
+msgstr ""
+
 #: src/postulo/accounts/models.py src/postulo/documents/models.py
 #: src/postulo/resume/views.py
 msgid "headline"
@@ -9398,6 +9605,7 @@ msgstr "idempotentinės užklausos"
 msgid "identifier"
 msgstr "identifikatorius"
 
+#: src/postulo/jobs/enrichment_offers.py
 #: src/postulo/templates/cotton/identifier_row.html
 msgid "Identifier"
 msgstr "Identifikatorius"
@@ -9764,13 +9972,14 @@ msgstr "Šakos"
 msgid "industries"
 msgstr "šakos"
 
-#: src/postulo/jobs/models.py
-msgid "industry"
-msgstr "šaka"
-
+#: src/postulo/jobs/enrichment_offers.py
 #: src/postulo/templates/jobs/industry_form.html
 msgid "Industry"
 msgstr "Šaka"
+
+#: src/postulo/jobs/models.py
+msgid "industry"
+msgstr "šaka"
 
 #: src/postulo/jobs/views.py
 msgid "Industry renamed."
@@ -9981,6 +10190,10 @@ msgstr "išdavė"
 #: src/postulo/resume/models.py
 msgid "issued on"
 msgstr "išduota"
+
+#: src/postulo/jobs/enrichment_offers.py
+msgid "It already has a logo."
+msgstr ""
 
 #: src/postulo/templates/settings/account.html
 msgid "It also gets you back in: ask for a sign-in code and it arrives there. Making a different address primary moves that with it. You are still asked for your authenticator app if you have one."
@@ -10421,6 +10634,7 @@ msgstr "Išsaugoti šiuos"
 msgid "Keep this view as"
 msgstr "Išsaugoti šį rodinį kaip"
 
+#: src/postulo/templates/jobs/company_enrichment.html
 #: src/postulo/templates/jobs/company_register.html
 msgid "Keep what is ticked"
 msgstr "Išsaugoti tai, kas pažymėta"
@@ -10440,6 +10654,14 @@ msgstr "Puslapio saugojimas"
 #: src/postulo/templates/jobs/merge.html
 msgid "Kept"
 msgstr "Palikta"
+
+#: src/postulo/jobs/enrichment_views.py
+#, python-format
+msgid "Kept %(count)s detail."
+msgid_plural "Kept %(count)s details."
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
 
 #: src/postulo/templates/server/person_recovery.html
 msgid "Kept after they are used or expire, because taking somebody's account back is not something to be able to do without a trace."
@@ -10817,6 +11039,7 @@ msgstr "Palikite tuščią, kad išliktų jau išsaugotas."
 msgid "Leave empty if this is your current role."
 msgstr "Palikite tuščią, jei tai dabartinės pareigos."
 
+#: src/postulo/templates/jobs/company_enrichment.html
 #: src/postulo/templates/jobs/company_wikidata.html
 msgid "Leave it as it is"
 msgstr "Palikti kaip yra"
@@ -10924,6 +11147,10 @@ msgstr "Teisinė informacija"
 #: src/postulo/jobs/industries.py
 msgid "Legal services"
 msgstr "Teisinės paslaugos"
+
+#: src/postulo/jobs/enrichment_offers.py
+msgid "Legal state"
+msgstr ""
 
 #: src/postulo/jobs/models.py
 msgid "legal state"
@@ -11174,6 +11401,10 @@ msgstr "vieta"
 msgid "Location"
 msgstr "Vieta"
 
+#: src/postulo/jobs/enrichment_offers.py
+msgid "Logo"
+msgstr ""
+
 #: src/postulo/jobs/models.py
 msgid "logo"
 msgstr "logotipas"
@@ -11235,6 +11466,10 @@ msgstr "paieškos paslaugos adresas"
 #: src/postulo/jobs/slow.py
 msgid "Looking for a logo"
 msgstr "Ieškoma logotipo"
+
+#: src/postulo/jobs/slow.py
+msgid "Looking for details"
+msgstr ""
 
 #: src/postulo/templates/applications/application_list.html
 #: src/postulo/templates/jobs/company_list.html
@@ -11890,8 +12125,8 @@ msgstr "NACE skyrius"
 msgid "name"
 msgstr "pavadinimas"
 
-#: src/postulo/api/forms.py src/postulo/jobs/tables.py
-#: src/postulo/templates/cotton/identifier_row.html
+#: src/postulo/api/forms.py src/postulo/jobs/enrichment_offers.py
+#: src/postulo/jobs/tables.py src/postulo/templates/cotton/identifier_row.html
 #: src/postulo/templates/partials/messaging_handles.html
 #: src/postulo/templates/partials/phone_numbers.html
 #: src/postulo/templates/partials/postal_addresses.html
@@ -12372,6 +12607,14 @@ msgstr "Tokios rūšies laiškų dar nėra."
 msgid "No letters yet. A cover letter is for one posting; a motivation letter tells your story; a speculative letter goes where nothing is advertised; a follow-up note comes after an interview."
 msgstr "Laiškų dar nėra. Motyvacinis laiškas rašomas vienam skelbimui; bendrasis motyvacinis laiškas pasakoja jūsų istoriją; savarankiškos kandidatūros laiškas siunčiamas ten, kur nieko neskelbiama; pasiteiravimo laiškas siunčiamas po pokalbio."
 
+#: src/postulo/templates/jobs/company_enrichment.html
+msgid "No licence is stated."
+msgstr ""
+
+#: src/postulo/templates/jobs/company_enrichment.html
+msgid "No licence is stated; the name and the mark are the company's."
+msgstr ""
+
 #: src/postulo/templates/connections/partials/option_table.html
 msgid "No longer on the server"
 msgstr "Serveryje nebėra"
@@ -12686,6 +12929,10 @@ msgstr "Niekas nėra išvedama iš kitų duomenų: jūsų lytis nespėjama pagal
 msgid "None of this company's industries is Education, so it is not listed as a school or university."
 msgstr "Nė viena šios įmonės šaka nėra švietimas, todėl ji neįtraukta į mokyklų ar universitetų sąrašą."
 
+#: src/postulo/jobs/slow.py
+msgid "None of those can be asked about this company any more."
+msgstr ""
+
 #: src/postulo/templates/jobs/company_places.html
 msgid "None of your companies has this name or identifier."
 msgstr "Nė viena jūsų įmonė neturi tokio pavadinimo ar identifikatoriaus."
@@ -12755,6 +13002,10 @@ msgstr "Neatitiko"
 #: src/postulo/templates/partials/phone_widget.html
 msgid "Not a possible number"
 msgstr "Neįmanomas numeris"
+
+#: src/postulo/jobs/enrichment_offers.py
+msgid "Not a profile on a service Postulo knows."
+msgstr ""
 
 #: src/postulo/documents/models.py
 msgid "Not accepted"
@@ -13192,6 +13443,10 @@ msgstr "Niekas neišsaugoma, kol neperžiūrėsite."
 msgid "Nothing is sent to the server as a password until a new one is entered."
 msgstr "Serveriui nesiunčiamas joks slaptažodis, kol nebus įvestas naujas."
 
+#: src/postulo/jobs/logos.py
+msgid "Nothing is switched on that finds a logo on a website."
+msgstr ""
+
 #: src/postulo/templates/applications/application_detail.html
 msgid "Nothing kept yet. Keep what you typed into the employer's form, so you can see what they were told."
 msgstr "Kol kas nieko neišsaugota. Išsaugokite tai, ką įvedėte į darbdavio formą, kad matytumėte, ką jiems pasakėte."
@@ -13323,6 +13578,10 @@ msgstr ""
 msgid "Nothing that reads a CV from a file is switched on here, so there is no file to choose."
 msgstr ""
 
+#: src/postulo/templates/jobs/company_enrichment.html
+msgid "Nothing that was found can be added to what the company already has."
+msgstr ""
+
 #: src/postulo/core/design.py src/postulo/templates/server/design.html
 msgid "Nothing there"
 msgstr "Nieko nėra"
@@ -13406,7 +13665,7 @@ msgstr "Nieko nebuvo išsaugota iš to puslapio."
 msgid "Nothing was kept of this page"
 msgstr "Iš šio puslapio nieko neišsaugota"
 
-#: src/postulo/jobs/register_views.py
+#: src/postulo/jobs/enrichment_views.py src/postulo/jobs/register_views.py
 msgid "Nothing was kept."
 msgstr "Nieko neišsaugota."
 
@@ -14120,6 +14379,7 @@ msgstr "CV pateikiami tik metai, todėl diena nieko nekeičia."
 msgid "Only this publication, as a reference:"
 msgstr "Tik ši publikacija kaip nuoroda:"
 
+#: src/postulo/templates/jobs/company_enrichment.html
 #: src/postulo/templates/jobs/company_register.html
 msgid "Only what you tick is kept; nothing else on the company changes."
 msgstr "Išsaugoma tik tai, ką pažymite; niekas kita įmonėje nesikeičia."
@@ -14689,6 +14949,10 @@ msgstr "Pensija, draudimas, išmokos, įranga: viskas, kas buvo paminėta."
 msgid "People"
 msgstr "Žmonės"
 
+#: src/postulo/jobs/enrichment_offers.py
+msgid "People employed"
+msgstr ""
+
 #: src/postulo/jobs/models.py
 msgid "Per day"
 msgstr "Per dieną"
@@ -15207,6 +15471,10 @@ msgstr "Postulo tai pamiršo. Teikėjas leidimą vis dar turi, kol jo neatšauks
 #: src/postulo/core/server_views.py
 msgid "Postulo has forgotten the grant. The provider still has it until you withdraw it there as well."
 msgstr "Postulo pamiršo leidimą. Teikėjas jį saugo, kol neatšauksite jo ir ten."
+
+#: src/postulo/templates/jobs/company_enrichment.html
+msgid "Postulo has nowhere to keep these yet. They are shown for you to read, and are not kept."
+msgstr ""
 
 #: src/postulo/core/tagline.py
 msgid "Postulo is a self-hosted job application manager: your applications, CVs and cover letters on your own server, with no paid features."
@@ -16521,6 +16789,7 @@ msgstr "Saugojimas"
 msgid "retired on"
 msgstr "pašalinimo data"
 
+#: src/postulo/templates/jobs/company_enrichment.html
 #: src/postulo/templates/jobs/company_register.html
 #, python-format
 msgid "Retrieved %(when)s."
@@ -16651,6 +16920,10 @@ msgstr "veikia %(running)s; norėdami užbaigti, paleiskite iš naujo"
 #: src/postulo/templates/server/backups.html
 msgid "Runs in the background; you can leave this page while it works."
 msgstr "Vykdoma fone; kol vyksta, galite išeiti iš šio puslapio."
+
+#: src/postulo/templates/jobs/company_enrichment.html
+msgid "Said, and not offered"
+msgstr ""
 
 #: src/postulo/templates/core/import_csv_map.html
 msgid "Salaries are in"
@@ -17348,6 +17621,14 @@ msgstr "Septynios spalvos, kurių kiekvienos kontrastas su kortele abiejose spal
 msgid "Several countries"
 msgstr ""
 
+#: src/postulo/jobs/enrichment_offers.py
+msgid "Several social profiles are switched off."
+msgstr ""
+
+#: src/postulo/jobs/enrichment_offers.py
+msgid "Several telephone numbers are switched off."
+msgstr ""
+
 #: src/postulo/jobs/industries.py
 msgid "Sewerage"
 msgstr "Nuotekų tvarkymas"
@@ -17840,7 +18121,7 @@ msgid "Snoozed for two weeks."
 msgstr "Atidėta dviem savaitėms."
 
 #: src/postulo/core/models.py src/postulo/core/web_links.py
-#: src/postulo/documents/printing.py
+#: src/postulo/documents/printing.py src/postulo/jobs/enrichment_offers.py
 msgid "Social profile"
 msgstr "Socialinio tinklo profilis"
 
@@ -18025,6 +18306,7 @@ msgstr "Šaltinis – tai skelbimo laukas „Rasta per“. Užpildykite jį, ir 
 msgid "source version"
 msgstr "nuskaitymo priemonės versija"
 
+#: src/postulo/templates/jobs/company_enrichment.html
 #: src/postulo/templates/jobs/company_register.html
 #, python-format
 msgid "Source: %(source)s."
@@ -18559,6 +18841,7 @@ msgid "telephone"
 msgstr "telefonas"
 
 #: src/postulo/core/channels.py src/postulo/documents/printing.py
+#: src/postulo/jobs/enrichment_offers.py
 #: src/postulo/templates/partials/phone_widget.html
 #: src/postulo/templates/server/design.html
 msgid "Telephone number"
@@ -18671,7 +18954,7 @@ msgstr "Dėkoju – {{ role }}"
 msgid "Thank-you"
 msgstr "Padėka"
 
-#: src/postulo/jobs/register_views.py
+#: src/postulo/jobs/enrichment_offers.py
 msgid "That address could not be added."
 msgstr "Šio adreso pridėti nepavyko."
 
@@ -19731,6 +20014,11 @@ msgstr "Jos pridedamos įmonės, kontaktai ir skelbimai. Paraiškos ir pastabos 
 msgid "The company %(name)s is not in your account, and is added with it."
 msgstr "Įmonės %(name)s jūsų paskyroje nėra, todėl ji pridedama kartu."
 
+#: src/postulo/templates/jobs/company_enrichment.html
+#, python-format
+msgid "The company already has <bdi>%(current)s</bdi>."
+msgstr ""
+
 #: src/postulo/jobs/views.py
 msgid "The company already has that name."
 msgstr "Įmonė jau turi tokį pavadinimą."
@@ -20355,6 +20643,11 @@ msgstr "Logotipas pakeistas."
 #, python-format
 msgid "The logo was not changed: %(problem)s"
 msgstr "Logotipas nepakeistas: %(problem)s"
+
+#: src/postulo/jobs/enrichment_offers.py
+#, python-format
+msgid "The logo was not kept: %(problem)s"
+msgstr ""
 
 #: src/postulo/templates/applications/report.html
 msgid "The longest gap is measured inside this period, so a silence that began before it is not carried in. A period still running is only counted up to today."
@@ -22755,7 +23048,8 @@ msgid "WebP image"
 msgstr "WebP vaizdas"
 
 #: src/postulo/core/models.py src/postulo/core/web_links.py
-#: src/postulo/documents/printing.py src/postulo/jobs/tables.py
+#: src/postulo/documents/printing.py src/postulo/jobs/enrichment_offers.py
+#: src/postulo/jobs/tables.py
 #: src/postulo/templates/applications/interview_detail.html
 #: src/postulo/templates/jobs/company_detail.html
 msgid "Website"
@@ -23233,6 +23527,7 @@ msgstr "Ką dėl to daryti – vienu sakiniu."
 msgid "What to do. It is what the reminder says when it falls due."
 msgstr "Ką daryti. Tai priminimas pasakys, kai ateis jo laikas."
 
+#: src/postulo/templates/jobs/company_enrichment.html
 #: src/postulo/templates/jobs/company_register.html
 msgid "What to keep"
 msgstr "Ką išsaugoti"
@@ -23292,6 +23587,10 @@ msgstr "Ką ten veikėte. Pasirinkus „Nenurodyta“, nieko nepateikiama."
 #: src/postulo/jobs/widgets.py
 msgid "What you have noticed and not yet acted on, and what closes this week."
 msgstr "Ką pastebėjote, bet dar nieko nesiėmėte, ir kas baigia galioti šią savaitę."
+
+#: src/postulo/templates/jobs/company_enrichment.html
+msgid "What you have recorded is never replaced from here. Change it on the company's own page if a source is right."
+msgstr ""
 
 #: src/postulo/resume/models.py
 msgid "what you presented"
@@ -23543,6 +23842,10 @@ msgstr "Šio įrašo vieta jo skiltyje nustatoma rodyklėmis skiltyje <a href=\"
 #: src/postulo/templates/help/telephone_numbers.html
 msgid "Where this instance can send a code to a telephone, a number you have confirmed can also be the one that gets you back into your account. That choice is separate from the primary, so changing what a recruiter dials never changes how you prove it is you. The bin will not remove that number while it is your way in. Changing its digits makes it another number, which has to be confirmed again and is no longer your way in."
 msgstr "Jei šis egzempliorius gali siųsti kodą į telefoną, patvirtintas numeris taip pat gali būti tas, kuriuo atgaunate prieigą prie paskyros. Šis pasirinkimas nepriklauso nuo pagrindinio numerio, todėl pakeitus numerį, kuriuo skambina atrankos specialistas, niekada nepasikeičia tai, kaip įrodote savo tapatybę. Šiukšlinė nepašalins šio numerio, kol jis yra jūsų būdas patekti į paskyrą. Pakeitus jo skaitmenis, jis tampa kitu numeriu, kurį reikia patvirtinti iš naujo ir kuris nebėra jūsų būdas patekti į paskyrą."
+
+#: src/postulo/templates/cotton/enrichment_ask.html
+msgid "Where to ask"
+msgstr ""
 
 #: src/postulo/templates/server/register_lookup.html
 msgid "Where to get a key"

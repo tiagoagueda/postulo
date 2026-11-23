@@ -240,6 +240,12 @@ EXCUSED: dict[str, str] = {
         "without a lookup it sends you to the company's page, and the walk makes no request "
         "to a register, so it never finds it drawn (#1021)"
     ),
+    "jobs:company_enrichment": (
+        "what a press of Find details brought back, held in the errand's row; without a press "
+        "it sends you to the company's page, and the walk asks no source, so it never finds it "
+        "drawn (#1256). tests/test_company_enrichment.py draws it and "
+        "tests/e2e/test_company_enrichment.py runs axe over it"
+    ),
     "jobs:company_signal_add": "a POST from the company form that adds a hiring entry (#941)",
     "jobs:company_signal_edit": "a POST from the company form that changes a hiring entry (#941)",
     "jobs:company_signal_remove": "a POST from the company form that removes a hiring entry (#941)",

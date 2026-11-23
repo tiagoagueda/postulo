@@ -8,6 +8,8 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### ✨ Added
 
+- A `company-enrichment` plugin kind: a source says where a company's details can be read and Postulo asks it on a press of *Find details*; each value is shown with where it was read and its licence, and kept only when ticked. For plugin authors; nothing changes until a source is installed (#1256)
+- *Find details* on a company's page reads the company's own website, on a press, for what it declares about itself and offers each value with where it was read; *Find logo* is now part of the same switchable plugin, and works for a person the company is shared with to change too (#1256)
 - Plugins can describe a job service searched by criteria (the listing-search kind); Postulo makes the request on a press, shows the results without keeping them and sends a chosen advert to review; off until an administrator switches it on, with a switch per service (#1253)
 - Search Arbetsförmedlingen's job adverts (Sweden) from Listings and review a result as any capture; no key is needed and the adverts are under CC0 (#1253)
 - A theme from a plugin can say the languages and countries it suits, and the theme menu lists those first, under their own heading, for a document in that language or country; nothing is hidden or chosen for you, and a plugin can carry the new Documents category (#1255)

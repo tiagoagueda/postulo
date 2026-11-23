@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% translate "Details found" %}{% endblock %}
+
+{% block content %}
+  <div class="max-w-2xl">
+    <c-page-title>
+      {% translate "Details found" %}
+      <c-slot name="subtitle"><bdi>{{ company.name }}</bdi></c-slot>
+    </c-page-title>
+    {% comment %} What the sources said about a company, before anything is kept (#1256),
+       modelled on the register review (#1021). Every value is a stranger's text, cleaned to
+       plain text and drawn in its own direction, with who said it and where they read it.
+       Every offer starts unticked: nothing is kept that was not chosen. A field that holds
+       one value and is filled is never offered a different one, only told. An offered logo
+       is named by its address and not drawn: the page draws no picture from another server
+       (`img-src 'self'`), and fetching it first would be a request nobody ticked. {% endcomment %}
+    {% for source in review.sources %}
+      {% if source.error %}
+        <div class="alert mb-4" data-variant="warning" data-enrichment-problem>
+          {% blocktranslate trimmed with source=source.label %}{{ source }} could not be read.{% endblocktranslate %}
+          {{ source.error }}
+        </div>
+      {% endif %}
+    {% endfor %}
+
+    <form method="post" action="{% url 'jobs:company_enrichment' company.pk %}">
+      {% csrf_token %}
+      <input type="hidden" name="errand" value="{{ errand.pk }}">
+      <div class="card mb-4" data-enrichment-offers>
+        <h2 class="legend-title">{% translate "What to keep" %}</h2>
+        {% if review.groups %}
+          <div class="space-y-4">
+        {% endif %}
+        {% for group in review.groups %}
+          <fieldset data-enrichment-field="{{ group.field }}">
+            <legend class="mb-2 text-sm font-medium">{{ group.label }}</legend>
+            <div class="space-y-3 text-sm">
+              {% if group.radio %}
+                <label class="flex items-center gap-2"><input type="radio" class="input" name="choose-{{ group.field }}" value="" checked> {% translate "Leave it as it is" %}</label>
+              {% endif %}
+              {% for choice in group.choices %}
+                <label class="flex items-start gap-2">
+                  {% if group.radio %}
+                    <input type="radio" class="input mt-0.5" name="choose-{{ group.field }}" value="{{ choice.id }}">
+                  {% else %}
+                    <input type="checkbox" class="input mt-0.5" name="take" value="{{ choice.id }}">
+                  {% endif %}
+                  <span>
+                    <bdi class="break-all">{{ choice.text }}</bdi>
+                    {% include "jobs/partials/enrichment_origins.html" with origins=choice.origins %}
+                  </span>
+                </label>
+              {% endfor %}
+            </div>
+          </fieldset>
+        {% empty %}
+          <p class="text-sm text-ink-500 dark:text-ink-400">{% translate "Nothing that was found can be added to what the company already has." %}</p>
+        {% endfor %}
+        {% if review.groups %}
+          </div>
+        {% endif %}
+      </div>
+
+      {% if review.said %}
+        <div class="card mb-4" data-enrichment-said>
+          <h2 class="legend-title">{% translate "Said, and not offered" %}</h2>
+          <p class="mb-3 text-xs text-ink-500 dark:text-ink-400">{% translate "What you have recorded is never replaced from here. Change it on the company's own page if a source is right." %}</p>
+          <dl class="space-y-3 text-sm">
+            {% for row in review.said %}
+              <div>
+                <dt class="text-ink-500 dark:text-ink-400">{{ row.label }}</dt>
+                <dd>
+                  <bdi class="break-all">{{ row.text }}</bdi>
+                  {% include "jobs/partials/enrichment_origins.html" with origins=row.origins %}
+                  <span class="block text-xs text-ink-500 dark:text-ink-400">{% if row.current %}{% blocktranslate trimmed with current=row.current %}The company already has <bdi>{{ current }}</bdi>.{% endblocktranslate %}{% else %}{{ row.why }}{% endif %}</span>
+                </dd>
+              </div>
+            {% endfor %}
+          </dl>
+        </div>
+      {% endif %}
+
+      {% if review.also %}
+        <div class="card mb-4" data-enrichment-also>
+          <h2 class="legend-title">{% translate "Also said" %}</h2>
+          <p class="mb-3 text-xs text-ink-500 dark:text-ink-400">{% translate "Postulo has nowhere to keep these yet. They are shown for you to read, and are not kept." %}</p>
+          <dl class="space-y-3 text-sm">
+            {% for row in review.also %}
+              <div>
+                <dt class="text-ink-500 dark:text-ink-400">{{ row.label }}</dt>
+                <dd>
+                  <bdi class="break-all">{{ row.text }}</bdi>
+                  {% include "jobs/partials/enrichment_origins.html" with origins=row.origins %}
+                </dd>
+              </div>
+            {% endfor %}
+          </dl>
+        </div>
+      {% endif %}
+
+      {% comment %} Attribution as each source's terms ask for it, and the source named where
+         it states no licence. {% endcomment %}
+      <div class="mb-4 space-y-1 text-xs text-ink-500 dark:text-ink-400" data-enrichment-attribution>
+        {% for source in review.sources %}
+          {% if not source.error %}
+            <p>
+              {% blocktranslate trimmed with source=source.source %}Source: {{ source }}.{% endblocktranslate %}
+              {% if source.licence %}{% if source.licence_url %}<a href="{{ source.licence_url }}" rel="noopener noreferrer external license" target="_blank" class="underline">{{ source.licence }}</a>{% else %}{{ source.licence }}{% endif %}.{% elif source.own_site %}{% translate "No licence is stated; the name and the mark are the company's." %}{% else %}{% translate "No licence is stated." %}{% endif %}
+            </p>
+          {% endif %}
+        {% endfor %}
+        <p>
+          {% if retrieved %}{% blocktranslate trimmed with when=retrieved|date:"DATETIME_FORMAT" %}Retrieved {{ when }}.{% endblocktranslate %}{% endif %}
+          {% translate "Only what you tick is kept; nothing else on the company changes." %}
+        </p>
+      </div>
+      <div class="flex flex-wrap items-center gap-3">
+        {% if review.groups %}<button type="submit" name="keep" value="1" class="btn">{% translate "Keep what is ticked" %}</button>{% endif %}
+        <button type="submit" name="cancel" value="1" class="btn" data-variant="{% if review.groups %}ghost{% else %}outline{% endif %}">{% if review.groups %}{% translate "Cancel" %}{% else %}{% translate "Back to the company" %}{% endif %}</button>
+      </div>
+    </form>
+  </div>
+{% endblock %}

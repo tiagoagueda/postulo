@@ -22,7 +22,12 @@ from django.urls import reverse
 
 from postulo.jobs.models import Company, Contact, JobPosting, Share
 
-from .test_isolation_sweep import API, FACTORIES, route_of
+from .test_isolation_sweep import (  # noqa: F401 - an autouse fixture, active once imported
+    API,
+    FACTORIES,
+    _a_source_of_company_details,
+    route_of,
+)
 
 pytestmark = pytest.mark.django_db
 
@@ -64,6 +69,7 @@ WRITE = {
     "jobs:company_wikidata",
     "jobs:company_names",
     "jobs:company_register",
+    "jobs:company_enrichment",
     "jobs:company_signal_add",
     "jobs:company_signal_edit",
     "jobs:company_signal_remove",

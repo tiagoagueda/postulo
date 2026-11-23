@@ -79,6 +79,9 @@ GOVERNED_KINDS = (
     "feature",
     "outbox",
     "suggestion-source",
+    # Each source of a company's details is its own switch (#1256): there is no feature in
+    # front of the kind, as there is in front of the register adapters.
+    "company-enrichment",
 )
 
 #: The rest. Named rather than implied, because the guard below has to look a plugin up by

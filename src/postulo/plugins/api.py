@@ -80,6 +80,15 @@ register is asked about one number, `RegisterRecord` and `RegisterAddress` what 
 and `RegisterAdapterPlugin` the registry that holds them. An adapter builds an address and reads
 JSON; Postulo makes the request.
 
+**A company's details can be read from a source (#1256)**: `EnrichmentSource` is one place
+they can be read from -- what of a company it starts from, the fields it may offer, the hosts
+it may be asked on or the company's own site, how its answers are read -- `EnrichmentSubject`
+what it is told of the company, `EnrichmentAnswer` one answer Postulo fetched for it,
+`OfferedValue` one value it offers with where it read it, and `CompanyEnrichmentPlugin` the
+registry that holds sources. A source builds addresses and reads answers; Postulo makes every
+request, on a press, and keeps nothing a person did not tick. `extract_jsonld`,
+`extract_microdata` and `extract_rdfa` read the structured data a page declares, for a source
+that reads one.
 **A job service can be searched through it (#1253)**: `ListingSearch` is how one service is
 searched by criteria and how one advert is asked for again, `SearchCriteria` what the person
 searched for, `SearchHit` and `SearchResults` what a search hands back, each hit a
@@ -234,6 +243,10 @@ if TYPE_CHECKING:  # pragma: no cover - the names `__getattr__` resolves at run 
     from postulo.documents.theme_assets import load as load_theme_asset
     from postulo.documents.themes import Kind as ThemeKind
     from postulo.documents.themes import Theme
+    from postulo.jobs.enrichment import Answer as EnrichmentAnswer
+    from postulo.jobs.enrichment import Offered as OfferedValue
+    from postulo.jobs.enrichment import Source as EnrichmentSource
+    from postulo.jobs.enrichment import Subject as EnrichmentSubject
     from postulo.jobs.history import record_listing_event
     from postulo.jobs.listing_search import Criteria as SearchCriteria
     from postulo.jobs.listing_search import Hit as SearchHit
@@ -258,6 +271,7 @@ if TYPE_CHECKING:  # pragma: no cover - the names `__getattr__` resolves at run 
         update_contact,
     )
     from postulo.notifications.base import EVENTS, Notification, NotifierPlugin
+    from postulo.plugins.builtin.htmlutil import extract_jsonld, extract_microdata, extract_rdfa
     from postulo.plugins.policy import enabled_sub_plugins, sub_plugin_enabled
     from postulo.resume.importing import Record
 
@@ -289,6 +303,7 @@ from .base import (
     BackupManifest,
     BackupRef,
     # ------------------------------------------------- the protocols to satisfy
+    CompanyEnrichmentPlugin,
     ConnectedPlugin,
     # ------------------------------- what a plugin raises when the other side has finished
     ConnectionUnusable,
@@ -362,6 +377,7 @@ __all__ = [
     "CalendarItems",
     "CalendarRefused",
     "Company",
+    "CompanyEnrichmentPlugin",
     "CompanyKind",
     "ConnectedPlugin",
     "ConnectionUnusable",
@@ -374,6 +390,9 @@ __all__ = [
     "DiscoveredOption",
     "DocumentFormat",
     "DocumentMetadata",
+    "EnrichmentAnswer",
+    "EnrichmentSource",
+    "EnrichmentSubject",
     "EnvironmentVariable",
     "EventKind",
     "ExternalRef",
@@ -397,6 +416,7 @@ __all__ = [
     "MessagingServicePlugin",
     "Notification",
     "NotifierPlugin",
+    "OfferedValue",
     "OutboxPlugin",
     "Outline",
     "OwnedModel",
@@ -459,6 +479,9 @@ __all__ = [
     "description_of",
     "enabled_sub_plugins",
     "event_lines",
+    "extract_jsonld",
+    "extract_microdata",
+    "extract_rdfa",
     "get_or_create_company",
     "get_or_create_department",
     "is_language_tag",
@@ -633,6 +656,29 @@ _ELSEWHERE: dict[str, tuple[str, str]] = {
     "RegisterAdapter": ("postulo.jobs.register_lookup", "Adapter"),
     "RegisterAddress": ("postulo.jobs.register_lookup", "Address"),
     "RegisterRecord": ("postulo.jobs.register_lookup", "Record"),
+    # ------------------------------------------ where a company's details are read from (#1256)
+    # A `company-enrichment` plugin adds sources *Find details* may ask about a company: one
+    # `EnrichmentSource` each -- a key, a name, what of the company it starts from, the fields
+    # it may offer, the hosts it may be asked on (or the company's own website), the addresses
+    # to ask and how the answers are read. It is handed an `EnrichmentSubject`, which holds only
+    # what it starts from, and the `EnrichmentAnswer`s Postulo fetched, and returns
+    # `OfferedValue`s, each naming its field, its value and where it was read; an address in
+    # one is a `RegisterAddress`. The source never makes a request: Postulo does, through the
+    # public-only client, on a press, under the plugin's own switch and the account's
+    # allowance, and nothing is kept until the person ticks it. The contract holds no model,
+    # so a plugin builds its sources at import.
+    "EnrichmentSource": ("postulo.jobs.enrichment", "Source"),
+    "EnrichmentSubject": ("postulo.jobs.enrichment", "Subject"),
+    "EnrichmentAnswer": ("postulo.jobs.enrichment", "Answer"),
+    "OfferedValue": ("postulo.jobs.enrichment", "Offered"),
+    # What a page declares about itself in schema.org's vocabulary, whichever of the three
+    # syntaxes wrote it: JSON-LD, microdata or RDFa, each as the plain objects JSON-LD would
+    # have given. For a source that reads a page (`reads="page"`): the readers capture uses,
+    # written for hostile pages, so a plugin does not carry a parser of its own. A page nested
+    # deeper than Python recurses raises `RecursionError` from `extract_jsonld`; catch it.
+    "extract_jsonld": ("postulo.plugins.builtin.htmlutil", "extract_jsonld"),
+    "extract_microdata": ("postulo.plugins.builtin.htmlutil", "extract_microdata"),
+    "extract_rdfa": ("postulo.plugins.builtin.htmlutil", "extract_rdfa"),
     # ------------------------------------------------- how a job service is searched (#1253)
     # A `listing-search` plugin adds entries to the registry *Search a job service* reads: one
     # `ListingSearch` per service -- a key, a name, its countries and languages, the hosts it
