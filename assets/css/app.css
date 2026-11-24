@@ -3510,3 +3510,22 @@ html {
     color: HighlightText;
   }
 }
+
+/*
+ * The words a writing check points at, inside its line of the list (#1258). The browser's own
+ * `<mark>` is yellow on whatever the text is, which in the dark theme is pale text on yellow.
+ * The span is underlined as well as tinted, so it is told apart without colour, and in a
+ * high-contrast theme it takes the system's own highlight pair.
+ */
+@layer components {
+  [data-writing-findings] mark {
+    @apply rounded-sm bg-amber-100 px-0.5 text-amber-950 underline decoration-amber-700 decoration-2 underline-offset-2 dark:bg-amber-900 dark:text-amber-50 dark:decoration-amber-300;
+  }
+}
+
+@media (forced-colors: active) {
+  [data-writing-findings] mark {
+    background-color: Mark;
+    color: MarkText;
+  }
+}

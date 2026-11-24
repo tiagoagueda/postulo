@@ -34,6 +34,7 @@ urlpatterns = [
         "letters/<int:pk>/preview/", views.CoverLetterPreviewView.as_view(), name="letter_preview"
     ),
     path("letters/<int:pk>/draft/", views.CoverLetterDraftView.as_view(), name="letter_draft"),
+    path("letters/<int:pk>/apply/", views.CoverLetterApplyView.as_view(), name="letter_apply"),
     path(
         "letters/<int:pk>/as/<slug:format>/",
         views.CoverLetterDownloadView.as_view(),

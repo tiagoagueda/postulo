@@ -79,6 +79,7 @@ GOVERNED_KINDS = (
     "feature",
     "outbox",
     "suggestion-source",
+    "writing-checker",
     "earnings-source",
     # Each source of a company's details is its own switch (#1256): there is no feature in
     # front of the kind, as there is in front of the register adapters.

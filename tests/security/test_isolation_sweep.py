@@ -709,6 +709,8 @@ FACTORIES: dict[str, Callable] = {
     "documents:cv_item_delete": pk_of(cv_item),
     "documents:cv_item_move": pk_of(cv_item, direction="up"),
     "documents:cv_item_update": pk_of(cv_item),
+    # putting a suggested replacement into a letter (#1258)
+    "documents:letter_apply": pk_of(letter),
     "documents:letter_delete": pk_of(letter),
     "documents:letter_detail": pk_of(letter),
     "documents:letter_draft": pk_of(letter),

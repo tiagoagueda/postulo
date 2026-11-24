@@ -38,6 +38,7 @@ from .models import (
     ReferenceDelivery,
     ReferenceLetter,
     UploadedDocument,
+    document_language,
 )
 from .properties import (
     KEYWORDS_HELP,
@@ -87,6 +88,40 @@ class LanguageChoiceMixin:
         if field is not None:
             field.widget = language_widget(self["language"].value())
             field.required = False
+
+
+class WrittenLanguageMixin:
+    """The boxes a document's words are typed in say which language those words are in (#1258).
+
+    A browser checks spelling in the language of the element, and the subject and the body
+    carried none, so it checked them in the language of the page: somebody reading Postulo
+    in Portuguese and writing a letter in English had every English word underlined. The two
+    boxes now carry the document's ``lang`` and ``dir`` and ask for the check, which is the
+    browser's own and sends nothing anywhere Postulo controls.
+
+    The language is the one `document_language` gives the finished document: what the form
+    holds for it, then the profile of whoever it is for, then the instance's. With scripts
+    off it follows a change of the language picker at the next save.
+    """
+
+    #: The fields the document's own words are typed in.
+    WRITTEN = ("subject", "body")
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        language = self.written_language()
+        for name in self.WRITTEN:
+            if name in self.fields:
+                self.fields[name].widget.attrs.update(
+                    {"lang": language, "dir": languages.direction(language), "spellcheck": "true"}
+                )
+
+    def written_language(self) -> str:
+        from types import SimpleNamespace
+
+        held = self["language"].value() if "language" in self.fields else ""
+        owner = getattr(self, "user", None) or getattr(self.instance, "owner", None)
+        return document_language(SimpleNamespace(language=held or "", owner=owner))
 
 
 class ThemeChoiceMixin:
@@ -526,7 +561,11 @@ class CompanyNameChoiceMixin:
 
 
 class CoverLetterForm(
-    CompanyNameChoiceMixin, ThemeChoiceMixin, LanguageChoiceMixin, OwnerScopedModelForm
+    WrittenLanguageMixin,
+    CompanyNameChoiceMixin,
+    ThemeChoiceMixin,
+    LanguageChoiceMixin,
+    OwnerScopedModelForm,
 ):
     """A letter of any of the four kinds.
 
@@ -567,7 +606,9 @@ class CoverLetterForm(
         self.initial.setdefault("theme", LETTER_THEMES.get(kind, themes.DEFAULT))
 
 
-class MessageTemplateForm(CompanyNameChoiceMixin, LanguageChoiceMixin, OwnerScopedModelForm):
+class MessageTemplateForm(
+    WrittenLanguageMixin, CompanyNameChoiceMixin, LanguageChoiceMixin, OwnerScopedModelForm
+):
     """A message written many times: what it is for, its subject and its words (#1094)."""
 
     class Meta:

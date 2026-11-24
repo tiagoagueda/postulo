@@ -46,6 +46,7 @@ from .base import (
     SUB_PLUGIN_KINDS,
     SUGGESTION_SOURCE_GROUP,
     TRANSPORT_GROUP,
+    WRITING_CHECKER_GROUP,
     BackupDestinationPlugin,
     CompanyEnrichmentPlugin,
     ConnectedPlugin,
@@ -63,6 +64,7 @@ from .base import (
     SubPluginEntry,
     SuggestionSourcePlugin,
     TransportPlugin,
+    WritingCheckerPlugin,
     sub_plugins_of,
 )
 from .builtin import BUILTIN_SOURCES
@@ -100,6 +102,9 @@ ENTRY_POINT_GROUP = "postulo.sources"
 #: A **listing-search** plugin is open the same way: the job services *Search a job service*
 #: may ask, which a package for another service may add to (#1253).
 #:
+#: A **writing-checker** plugin is open the same way (#1258): what reads a letter's own words
+#: and says what it noticed, which a package installed beside Postulo may add to.
+#:
 #: A **backup-destination** plugin is a transport's kind of thing for archives: instance
 #: plumbing that keeps the backups somewhere besides this disk, chosen by an administrator
 #: and owned by nobody, so that nobody's account leaving stops the copies (#325).
@@ -114,6 +119,7 @@ GROUPS = {
     "register-adapter": REGISTER_ADAPTER_GROUP,
     "listing-search": LISTING_SEARCH_GROUP,
     "suggestion-source": SUGGESTION_SOURCE_GROUP,
+    "writing-checker": WRITING_CHECKER_GROUP,
     "earnings-source": EARNINGS_SOURCE_GROUP,
     "company-enrichment": COMPANY_ENRICHMENT_GROUP,
     "backup-destination": BACKUP_DESTINATION_GROUP,
@@ -150,6 +156,7 @@ def _protocol_for(kind: str):
         "register-adapter": RegisterAdapterPlugin,
         "listing-search": ListingSearchPlugin,
         "suggestion-source": SuggestionSourcePlugin,
+        "writing-checker": WritingCheckerPlugin,
         "earnings-source": EarningsSourcePlugin,
         "company-enrichment": CompanyEnrichmentPlugin,
         "backup-destination": BackupDestinationPlugin,

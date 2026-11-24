@@ -136,7 +136,7 @@ def test_every_plugin_postulo_ships_declares_the_full_set():
     assert not missing, "\n".join(missing)
 
 
-def test_these_are_the_plugins_that_ship_across_fifteen_kinds():
+def test_these_are_the_plugins_that_ship_across_sixteen_kinds():
     """Named rather than counted, so that losing one to a bad import is a failure rather
     than a quiet absence — and so that adding one is a line somebody wrote.
 
@@ -184,13 +184,18 @@ def test_these_are_the_plugins_that_ship_across_fifteen_kinds():
     `builtin-notifications` is the same for the three notifiers that ship (#876), and
     `file-formats` for the formats Postulo reads and writes: PDF, which is required, Word,
     OpenDocument, iCalendar and vCard, with Europass beside them (#877).
+
+    `placeholder-checks` is the first of another kind, the writing checkers: what reads
+    a letter's own words and says what it noticed. It is required, as PDF is, because it is
+    the check a letter always had before it was a plugin (#1258). `writing-basics` is the
+    second, the local reference checker, and starts off as `register-lookup` does.
     """
     found = {
         manifest_of(plugin_class()).name
         for classes in registry.builtins().values()
         for plugin_class in classes
     }
-    assert len(registry.builtins()) == 15, sorted(registry.builtins())
+    assert len(registry.builtins()) == 16, sorted(registry.builtins())
 
     assert found == {
         "board",
@@ -229,6 +234,8 @@ def test_these_are_the_plugins_that_ship_across_fifteen_kinds():
         "nace",
         "esco",
         "geonames",
+        "placeholder-checks",
+        "writing-basics",
         "earnings",
         "multiple-fields",
         "builtin-notifications",

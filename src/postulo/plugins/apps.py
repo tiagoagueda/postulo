@@ -24,6 +24,7 @@ class PluginsConfig(AppConfig):
         from .listing_search import ListingSearches
         from .messaging_services import MessagingServices
         from .nace import Nace
+        from .placeholder_checks import PlaceholderChecks
         from .register_lookup import RegisterAdapters
         from .registry import (
             load_everything,
@@ -31,6 +32,7 @@ class PluginsConfig(AppConfig):
             register_builtin_locales,
             register_builtin_themes,
         )
+        from .writing_basics import WritingBasics
 
         activate()
         _forget_decisions_when_their_rows_change()
@@ -55,6 +57,12 @@ class PluginsConfig(AppConfig):
         _tell_the_vocabulary_who_decides()
         # And GeoNames' places for a city, offline and on by default (#1252).
         register_builtin("suggestion-source", Geonames)
+        # And what reads a letter's own words and says what it noticed (#1258): the placeholder
+        # checks first, which are always on.
+        register_builtin("writing-checker", PlaceholderChecks)
+        # And Writing basics, the local reference checker: bundled, and off for the instance
+        # until an administrator switches it on (plugins migration 0020).
+        register_builtin("writing-checker", WritingBasics)
         # And Eurostat's earnings statistics beside a listing (#1257): offline, and off until
         # an administrator switches it on (migration 0019), with its file's system check.
         register_builtin("earnings-source", Earnings)

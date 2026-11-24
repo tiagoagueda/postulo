@@ -10,6 +10,8 @@ swallow the keyboard on its way through the page.
 
 from __future__ import annotations
 
+import re
+
 import pytest
 from playwright.sync_api import Page, expect
 
@@ -117,8 +119,9 @@ def test_the_frame_is_named_and_is_not_a_keyboard_trap(page: Page, live_server, 
 
 
 def test_a_letters_chooser_redraws_the_frame_for_that_application(page: Page, live_server, cv):
-    """The application picker targets the frame rather than a new tab, so choosing one is
-    reading the letter the way that employer will -- plain HTML, no script."""
+    """Choosing an application draws the letter's page again for it (#1258), so the frame,
+    the PDF and the list of what will go out wrong follow one choice -- plain HTML, no
+    script. It used to re-target the frame alone (#293)."""
     from postulo.applications.models import Application, Status
     from postulo.documents.models import CoverLetter
     from postulo.jobs.models import Company, JobPosting
@@ -126,7 +129,9 @@ def test_a_letters_chooser_redraws_the_frame_for_that_application(page: Page, li
     applicant = cv.owner
     company = Company.objects.create(owner=applicant, name="Aperture Science")
     posting = JobPosting.objects.create(owner=applicant, company=company, title="Test engineer")
-    Application.objects.create(owner=applicant, posting=posting, status=Status.APPLIED)
+    application = Application.objects.create(
+        owner=applicant, posting=posting, status=Status.APPLIED
+    )
     letter = CoverLetter.objects.create(
         owner=applicant, name="To Aperture", body="Dear {{ company }}, about the {{ role }}."
     )
@@ -140,8 +145,18 @@ def test_a_letters_chooser_redraws_the_frame_for_that_application(page: Page, li
     page.locator("#preview-application").select_option(index=1)
     page.get_by_role("button", name="Read it below").click()
 
+    # The page itself came back for the application, landing on the list above the frame. The
+    # chooser carries the paper as well, and the page keeps it.
+    expect(page).to_have_url(
+        re.compile(
+            rf"/documents/letters/{letter.pk}/\?application={application.pk}"
+            r"(&paper=[\w-]+)?#writing-findings$"
+        )
+    )
+    expect(page.locator("#preview-application")).to_have_value(str(application.pk))
+    # A new page opens on the PDF again. The frame is lazy, and in a hidden tab it is never
+    # loaded, so a wait on what it says would never end: the quick view is opened first.
+    show_quick_view(page)
     expect(page.frame_locator("iframe[data-document-preview]").locator("body")).to_contain_text(
         "Aperture Science"
     )
-    # The page itself did not navigate: only the frame did.
-    expect(page).to_have_url(f"{live_server.url}/documents/letters/{letter.pk}/")

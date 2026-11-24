@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import datetime as dt
 import io
+import re
 import zipfile
 
 import pytest
@@ -117,8 +118,13 @@ def test_a_letters_draft_leaves_the_frame_and_the_page_alone(page: Page, live_se
     expect(frame.locator("body")).to_contain_text("Dear")
     assert not RenderedDocument.objects.exists()
 
-    # And the button above it still does what it did.
+    # And the button above it still does what it did: since #1258 it draws the page again
+    # for that application. A new page opens on the PDF again. The frame is lazy, and in a
+    # hidden tab it is never loaded, so a wait on what it says would never end: the quick
+    # view is opened first, as in test_document_preview.py.
     page.get_by_role("button", name="Read it below").click()
+    expect(page).to_have_url(re.compile(r"\?application=\d+"))
+    show_quick_view(page)
     expect(page.frame_locator("iframe[data-document-preview]").locator("body")).to_contain_text(
         "Aperture Science"
     )

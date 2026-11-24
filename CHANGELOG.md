@@ -9,6 +9,9 @@ All notable changes to Postulo are recorded here. The format follows
 ### ✨ Added
 
 - Donations can also be made in bitcoin, to one address for everything Postulo, public so anyone can see what it received; the READMEs, FUNDING.md and CONTRIBUTING.md give it beside Buy Me a Coffee (#1314)
+- A letter's page lists what will go out wrong before it goes, for the application chosen: a placeholder with nothing to fill it, or a misspelt one, read out with its count; plugins of a new kind, writing-checker, add to the same list (#1258)
+- A suggested replacement in that list is put into the letter one press at a time, refused if the letter changed since, and can be undone (#1258)
+- Writing basics, a bundled checker that reads letters on the instance and sends nothing: hints for a letter naming neither company nor role, starter notes left in, length, repeated words and spaces, very long sentences; off until an administrator switches it on (#1258)
 - Plugins can supply published earnings statistics for a listing's occupation and country (an earnings source); the listing and application pages draw each figure with its measure, period, year and source, never as a recommendation, and nothing until a source is enabled (#1257)
 - A listing and an application can show Eurostat's earnings statistics for the occupation group and country, with the national minimum wage, each with its source and year and never as a recommendation; off until an administrator enables Earnings statistics (#1257)
 - A `company-enrichment` plugin kind: a source says where a company's details can be read and Postulo asks it on a press of *Find details*; each value is shown with where it was read and its licence, and kept only when ticked. For plugin authors; nothing changes until a source is installed (#1256)
@@ -25,10 +28,12 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🔧 Changed
 
-- The wiki compares calendar providers (CalDAV, Apple, Google, Microsoft, Proton, ICS addresses): what works today, what each needs and what it risks (#1254)
+- *Read it below* draws the letter's page again for the application chosen, so the preview, the PDF and the list agree; a misspelt placeholder now also asks before a letter is frozen (#1258)
+- A letter's and a message's subject and body tell the browser their language, so its spelling check reads them in the letter's language rather than the interface's (#1258)
 - The page behind *Your career → Import* is *Import a CV* and names no format: it lists what each importer that is switched on reads, and each bundled importer has its own entry in the menu. A Europass file is read as before (#1260)
 - The *JSON Resume* switch under *Extend file formats* is called *JSON Resume export*, beside *JSON Resume import* (#1260)
 - Single sign-on now sends a PKCE challenge (S256) with every handshake, so an authorisation code caught on the way opens nothing. **If your provider then refuses the sign-in, set `POSTULO_OIDC_PKCE=false`.** (#1261)
+- The wiki compares calendar providers (CalDAV, Apple, Google, Microsoft, Proton, ICS addresses): what works today, what each needs and what it risks (#1254)
 
 ### 🐛 Fixed
 
